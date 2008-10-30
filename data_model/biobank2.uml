@@ -1,0 +1,3261 @@
+<?xml version = "1.0" encoding = "UTF-8" ?>
+<uml version="6">
+  <argo version="6">
+    <documentation>
+      <authorname></authorname>
+      <authoremail></authoremail>
+      <version>0.26</version>
+      <description>
+        
+      </description>
+    </documentation>
+    <settings>
+      <notationlanguage>UML 1.4</notationlanguage>
+      <showboldnames>false</showboldnames>
+      <useguillemots>false</useguillemots>
+      <showassociationnames>true</showassociationnames>
+      <showvisibility>false</showvisibility>
+      <showmultiplicity>false</showmultiplicity>
+      <showinitialvalue>false</showinitialvalue>
+      <showproperties>false</showproperties>
+      <showtypes>true</showtypes>
+      <showstereotypes>false</showstereotypes>
+      <showsingularmultiplicities>true</showsingularmultiplicities>
+      <defaultshadowwidth>1</defaultshadowwidth>
+      <hidebidirectionalarrows>true</hidebidirectionalarrows>    
+      <fontname>Dialog</fontname>
+      <fontsize>10</fontsize>
+      <defaultstereotypeview>0</defaultstereotypeview>
+      <generationoutputdir>/tmp</generationoutputdir>
+      <activediagram>Class Diagram 2</activediagram>
+    </settings>
+    <searchpath href="PROJECT_DIR" />
+    <members>
+      <member type="profile"
+              name="biobank2_profile.profile" />
+      <member type="xmi"
+              name="biobank2.xmi" />
+      <member type="pgml"
+              name="biobank2_ClassDiagram1.pgml"
+              diagramclass="org.argouml.uml.diagram.static_structure.ui.UMLClassDiagram"
+              diagramname="Class Diagram 1" />
+      <member type="pgml"
+              name="biobank2_ClassDiagram2.pgml"
+              diagramclass="org.argouml.uml.diagram.static_structure.ui.UMLClassDiagram"
+              diagramname="Class Diagram 2" />
+      <member type="todo"
+              name="biobank2.todo" />
+    </members>
+    <historyfile name="" />
+  </argo>
+<profile>
+		<plugin>
+			UML 1.4
+		</plugin>
+</profile>
+<XMI xmi.version = '1.2' xmlns:UML = 'org.omg.xmi.namespace.UML' timestamp = 'Thu Oct 30 14:04:09 MDT 2008'>
+  <XMI.header>    <XMI.documentation>
+      <XMI.exporter>ArgoUML (using Netbeans XMI Writer version 1.0)</XMI.exporter>
+      <XMI.exporterVersion>0.26(6) revised on $Date: 2007-05-12 08:08:08 +0200 (Sat, 12 May 2007) $ </XMI.exporterVersion>
+    </XMI.documentation>
+    <XMI.metamodel xmi.name="UML" xmi.version="1.4"/></XMI.header>
+  <XMI.content>
+    <UML:Model xmi.id = 'MX_EAID_6318152E_A62D_4c4d_BE2E_1F237D6F09C1' name = 'Model'
+      isSpecification = 'false' isRoot = 'false' isLeaf = 'false' isAbstract = 'false'>
+      <UML:Namespace.ownedElement>
+        <UML:Package xmi.id = 'EAPK_6318152E_A62D_4c4d_BE2E_1F237D6F09C1' name = 'Logical View'
+          visibility = 'public' isSpecification = 'false' isRoot = 'false' isLeaf = 'false'
+          isAbstract = 'false'>
+          <UML:Namespace.ownedElement>
+            <UML:Package xmi.id = 'EAPK_6693F63C_DA3B_4a30_B5CD_EC5DEAC518E8' name = 'Data Model'
+              visibility = 'public' isSpecification = 'false' isRoot = 'false' isLeaf = 'false'
+              isAbstract = 'false'>
+              <UML:ModelElement.stereotype>
+                <UML:Stereotype xmi.idref = '-64--88-0-1-8238f4:115206c0709:-8000:0000000000000807'/>
+              </UML:ModelElement.stereotype>
+              <UML:Namespace.ownedElement>
+                <UML:Package xmi.id = 'EAPK_13C2A393_A2C6_4d7c_9441_319ED9A21FBA' name = 'Diagrams'
+                  visibility = 'public' isSpecification = 'false' isRoot = 'false' isLeaf = 'false'
+                  isAbstract = 'false'/>
+                <UML:Class xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000003991'
+                  name = 'USER' visibility = 'public' isSpecification = 'false' isRoot = 'false'
+                  isLeaf = 'false' isAbstract = 'false' isActive = 'false'>
+                  <UML:ModelElement.clientDependency>
+                    <UML:Dependency xmi.idref = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000716F'/>
+                  </UML:ModelElement.clientDependency>
+                  <UML:ModelElement.stereotype>
+                    <UML:Stereotype xmi.idref = '-64--88-0-1-8238f4:115206c0709:-8000:0000000000000807'/>
+                  </UML:ModelElement.stereotype>
+                  <UML:Classifier.feature>
+                    <UML:Attribute xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000008CC8'
+                      name = 'ID' visibility = 'public' isSpecification = 'false' ownerScope = 'instance'
+                      changeability = 'changeable' targetScope = 'instance'>
+                      <UML:StructuralFeature.multiplicity>
+                        <UML:Multiplicity xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000008CC9'>
+                          <UML:Multiplicity.range>
+                            <UML:MultiplicityRange xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000008CCA'
+                              lower = '1' upper = '1'/>
+                          </UML:Multiplicity.range>
+                        </UML:Multiplicity>
+                      </UML:StructuralFeature.multiplicity>
+                      <UML:StructuralFeature.type>
+                        <UML:DataType xmi.idref = 'eaxmiid0'/>
+                      </UML:StructuralFeature.type>
+                    </UML:Attribute>
+                    <UML:Attribute xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000008CCB'
+                      name = 'EMAIL_ADDRESS' visibility = 'public' isSpecification = 'false' ownerScope = 'instance'
+                      changeability = 'changeable' targetScope = 'instance'>
+                      <UML:StructuralFeature.multiplicity>
+                        <UML:Multiplicity xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000008CCC'>
+                          <UML:Multiplicity.range>
+                            <UML:MultiplicityRange xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000008CCD'
+                              lower = '1' upper = '1'/>
+                          </UML:Multiplicity.range>
+                        </UML:Multiplicity>
+                      </UML:StructuralFeature.multiplicity>
+                      <UML:StructuralFeature.type>
+                        <UML:DataType xmi.idref = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000008CD0'/>
+                      </UML:StructuralFeature.type>
+                    </UML:Attribute>
+                    <UML:Attribute xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000009A84'
+                      name = 'PASSWORD' visibility = 'public' isSpecification = 'false' ownerScope = 'instance'
+                      changeability = 'changeable' targetScope = 'instance'>
+                      <UML:StructuralFeature.multiplicity>
+                        <UML:Multiplicity xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000009A85'>
+                          <UML:Multiplicity.range>
+                            <UML:MultiplicityRange xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000009A86'
+                              lower = '1' upper = '1'/>
+                          </UML:Multiplicity.range>
+                        </UML:Multiplicity>
+                      </UML:StructuralFeature.multiplicity>
+                      <UML:StructuralFeature.type>
+                        <UML:DataType xmi.idref = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000009A88'/>
+                      </UML:StructuralFeature.type>
+                    </UML:Attribute>
+                    <UML:Operation xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000A97F'
+                      name = 'PK_ID' visibility = 'public' isSpecification = 'false' ownerScope = 'instance'
+                      isQuery = 'false' concurrency = 'sequential' isRoot = 'false' isLeaf = 'false'
+                      isAbstract = 'false'>
+                      <UML:BehavioralFeature.parameter>
+                        <UML:Parameter xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000A980'
+                          name = 'return' isSpecification = 'false' kind = 'return'/>
+                        <UML:Parameter xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000B73A'
+                          name = 'ID' isSpecification = 'false'>
+                          <UML:Parameter.type>
+                            <UML:DataType xmi.idref = 'eaxmiid0'/>
+                          </UML:Parameter.type>
+                        </UML:Parameter>
+                      </UML:BehavioralFeature.parameter>
+                    </UML:Operation>
+                    <UML:Attribute xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000C4F5'
+                      name = 'FIRST_NAME' visibility = 'public' isSpecification = 'false' ownerScope = 'instance'
+                      changeability = 'changeable' targetScope = 'instance'>
+                      <UML:StructuralFeature.multiplicity>
+                        <UML:Multiplicity xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000C4F6'>
+                          <UML:Multiplicity.range>
+                            <UML:MultiplicityRange xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000C4F7'
+                              lower = '1' upper = '1'/>
+                          </UML:Multiplicity.range>
+                        </UML:Multiplicity>
+                      </UML:StructuralFeature.multiplicity>
+                      <UML:StructuralFeature.type>
+                        <UML:DataType xmi.idref = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000009A88'/>
+                      </UML:StructuralFeature.type>
+                    </UML:Attribute>
+                    <UML:Attribute xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000C4F9'
+                      name = 'LAST_NAME' visibility = 'public' isSpecification = 'false' ownerScope = 'instance'
+                      changeability = 'changeable' targetScope = 'instance'>
+                      <UML:StructuralFeature.multiplicity>
+                        <UML:Multiplicity xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000C4FA'>
+                          <UML:Multiplicity.range>
+                            <UML:MultiplicityRange xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000C4FB'
+                              lower = '1' upper = '1'/>
+                          </UML:Multiplicity.range>
+                        </UML:Multiplicity>
+                      </UML:StructuralFeature.multiplicity>
+                      <UML:StructuralFeature.type>
+                        <UML:DataType xmi.idref = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000009A88'/>
+                      </UML:StructuralFeature.type>
+                    </UML:Attribute>
+                    <UML:Attribute xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000C4FC'
+                      name = 'LOGIN_NAME' visibility = 'public' isSpecification = 'false' ownerScope = 'instance'
+                      changeability = 'changeable' targetScope = 'instance'>
+                      <UML:StructuralFeature.multiplicity>
+                        <UML:Multiplicity xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000C4FD'>
+                          <UML:Multiplicity.range>
+                            <UML:MultiplicityRange xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000C4FE'
+                              lower = '1' upper = '1'/>
+                          </UML:Multiplicity.range>
+                        </UML:Multiplicity>
+                      </UML:StructuralFeature.multiplicity>
+                      <UML:StructuralFeature.type>
+                        <UML:DataType xmi.idref = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000009A88'/>
+                      </UML:StructuralFeature.type>
+                    </UML:Attribute>
+                    <UML:Attribute xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000C4FF'
+                      name = 'START_DATE' visibility = 'public' isSpecification = 'false' ownerScope = 'instance'
+                      changeability = 'changeable' targetScope = 'instance'>
+                      <UML:StructuralFeature.multiplicity>
+                        <UML:Multiplicity xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000C500'>
+                          <UML:Multiplicity.range>
+                            <UML:MultiplicityRange xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000C501'
+                              lower = '1' upper = '1'/>
+                          </UML:Multiplicity.range>
+                        </UML:Multiplicity>
+                      </UML:StructuralFeature.multiplicity>
+                      <UML:StructuralFeature.type>
+                        <UML:DataType xmi.idref = 'eaxmiid4'/>
+                      </UML:StructuralFeature.type>
+                    </UML:Attribute>
+                    <UML:Attribute xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000C502'
+                      name = 'ACTIVITY_STATUS' visibility = 'public' isSpecification = 'false'
+                      ownerScope = 'instance' changeability = 'changeable' targetScope = 'instance'>
+                      <UML:StructuralFeature.multiplicity>
+                        <UML:Multiplicity xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000C503'>
+                          <UML:Multiplicity.range>
+                            <UML:MultiplicityRange xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000C504'
+                              lower = '1' upper = '1'/>
+                          </UML:Multiplicity.range>
+                        </UML:Multiplicity>
+                      </UML:StructuralFeature.multiplicity>
+                      <UML:StructuralFeature.type>
+                        <UML:DataType xmi.idref = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000009A88'/>
+                      </UML:StructuralFeature.type>
+                    </UML:Attribute>
+                    <UML:Attribute xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000C505'
+                      name = 'DEPARTMENT_ID' visibility = 'public' isSpecification = 'false' ownerScope = 'instance'
+                      changeability = 'changeable' targetScope = 'instance'>
+                      <UML:StructuralFeature.multiplicity>
+                        <UML:Multiplicity xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000C506'>
+                          <UML:Multiplicity.range>
+                            <UML:MultiplicityRange xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000C507'
+                              lower = '1' upper = '1'/>
+                          </UML:Multiplicity.range>
+                        </UML:Multiplicity>
+                      </UML:StructuralFeature.multiplicity>
+                      <UML:StructuralFeature.type>
+                        <UML:DataType xmi.idref = 'eaxmiid0'/>
+                      </UML:StructuralFeature.type>
+                    </UML:Attribute>
+                    <UML:Attribute xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000C508'
+                      name = 'RESEARCH_GROUP_ID' visibility = 'public' isSpecification = 'false'
+                      ownerScope = 'instance' changeability = 'changeable' targetScope = 'instance'>
+                      <UML:StructuralFeature.multiplicity>
+                        <UML:Multiplicity xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000C509'>
+                          <UML:Multiplicity.range>
+                            <UML:MultiplicityRange xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000C50A'
+                              lower = '1' upper = '1'/>
+                          </UML:Multiplicity.range>
+                        </UML:Multiplicity>
+                      </UML:StructuralFeature.multiplicity>
+                      <UML:StructuralFeature.type>
+                        <UML:DataType xmi.idref = 'eaxmiid0'/>
+                      </UML:StructuralFeature.type>
+                    </UML:Attribute>
+                    <UML:Attribute xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000C50B'
+                      name = 'INSTITUTION_ID' visibility = 'public' isSpecification = 'false'
+                      ownerScope = 'instance' changeability = 'changeable' targetScope = 'instance'>
+                      <UML:StructuralFeature.multiplicity>
+                        <UML:Multiplicity xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000C50C'>
+                          <UML:Multiplicity.range>
+                            <UML:MultiplicityRange xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000C50D'
+                              lower = '1' upper = '1'/>
+                          </UML:Multiplicity.range>
+                        </UML:Multiplicity>
+                      </UML:StructuralFeature.multiplicity>
+                      <UML:StructuralFeature.type>
+                        <UML:DataType xmi.idref = 'eaxmiid0'/>
+                      </UML:StructuralFeature.type>
+                    </UML:Attribute>
+                    <UML:Attribute xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000C50E'
+                      name = 'ADDRESS_ID' visibility = 'public' isSpecification = 'false' ownerScope = 'instance'
+                      changeability = 'changeable' targetScope = 'instance'>
+                      <UML:StructuralFeature.multiplicity>
+                        <UML:Multiplicity xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000C50F'>
+                          <UML:Multiplicity.range>
+                            <UML:MultiplicityRange xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000C510'
+                              lower = '1' upper = '1'/>
+                          </UML:Multiplicity.range>
+                        </UML:Multiplicity>
+                      </UML:StructuralFeature.multiplicity>
+                      <UML:StructuralFeature.type>
+                        <UML:DataType xmi.idref = 'eaxmiid0'/>
+                      </UML:StructuralFeature.type>
+                    </UML:Attribute>
+                    <UML:Attribute xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000C511'
+                      name = 'CSM_USER_ID' visibility = 'public' isSpecification = 'false' ownerScope = 'instance'
+                      changeability = 'changeable' targetScope = 'instance'>
+                      <UML:StructuralFeature.multiplicity>
+                        <UML:Multiplicity xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000C512'>
+                          <UML:Multiplicity.range>
+                            <UML:MultiplicityRange xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000C513'
+                              lower = '1' upper = '1'/>
+                          </UML:Multiplicity.range>
+                        </UML:Multiplicity>
+                      </UML:StructuralFeature.multiplicity>
+                      <UML:StructuralFeature.type>
+                        <UML:DataType xmi.idref = 'eaxmiid0'/>
+                      </UML:StructuralFeature.type>
+                    </UML:Attribute>
+                    <UML:Attribute xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000C514'
+                      name = 'STATUS_COMMENT' visibility = 'public' isSpecification = 'false'
+                      ownerScope = 'instance' changeability = 'changeable' targetScope = 'instance'>
+                      <UML:StructuralFeature.multiplicity>
+                        <UML:Multiplicity xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000C515'>
+                          <UML:Multiplicity.range>
+                            <UML:MultiplicityRange xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000C516'
+                              lower = '1' upper = '1'/>
+                          </UML:Multiplicity.range>
+                        </UML:Multiplicity>
+                      </UML:StructuralFeature.multiplicity>
+                      <UML:StructuralFeature.type>
+                        <UML:DataType xmi.idref = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000C517'/>
+                      </UML:StructuralFeature.type>
+                    </UML:Attribute>
+                    <UML:Operation xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000F3F7'
+                      name = 'FK_ADDRESS_ID' visibility = 'public' isSpecification = 'false' ownerScope = 'instance'
+                      isQuery = 'false' concurrency = 'sequential' isRoot = 'false' isLeaf = 'false'
+                      isAbstract = 'false'>
+                      <UML:BehavioralFeature.parameter>
+                        <UML:Parameter xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000F3F8'
+                          name = 'return' isSpecification = 'false' kind = 'return'/>
+                        <UML:Parameter xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000F3F9'
+                          name = 'ADDRESS_ID' isSpecification = 'false'>
+                          <UML:Parameter.type>
+                            <UML:DataType xmi.idref = 'eaxmiid0'/>
+                          </UML:Parameter.type>
+                        </UML:Parameter>
+                      </UML:BehavioralFeature.parameter>
+                    </UML:Operation>
+                    <UML:Operation xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000F403'
+                      name = 'FK_SITE_ID' visibility = 'public' isSpecification = 'false' ownerScope = 'instance'
+                      isQuery = 'false' concurrency = 'sequential' isRoot = 'false' isLeaf = 'false'
+                      isAbstract = 'false'>
+                      <UML:BehavioralFeature.parameter>
+                        <UML:Parameter xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000F404'
+                          name = 'return' isSpecification = 'false' kind = 'return'/>
+                        <UML:Parameter xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000F405'
+                          name = 'SITE_ID' isSpecification = 'false'>
+                          <UML:Parameter.type>
+                            <UML:DataType xmi.idref = 'eaxmiid0'/>
+                          </UML:Parameter.type>
+                        </UML:Parameter>
+                      </UML:BehavioralFeature.parameter>
+                    </UML:Operation>
+                  </UML:Classifier.feature>
+                </UML:Class>
+                <UML:Dependency xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000716F'
+                  name = 'USER -&gt; User' isSpecification = 'false'>
+                  <UML:Dependency.client>
+                    <UML:Class xmi.idref = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000003991'/>
+                    <UML:Class xmi.idref = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000001CF4'/>
+                  </UML:Dependency.client>
+                  <UML:Dependency.supplier>
+                    <UML:Class xmi.idref = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000001CF4'/>
+                  </UML:Dependency.supplier>
+                </UML:Dependency>
+                <UML:Class xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000D332'
+                  name = 'SITE' visibility = 'public' isSpecification = 'false' isRoot = 'false'
+                  isLeaf = 'false' isAbstract = 'false' isActive = 'false'>
+                  <UML:ModelElement.clientDependency>
+                    <UML:Dependency xmi.idref = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000D34E'/>
+                  </UML:ModelElement.clientDependency>
+                  <UML:ModelElement.stereotype>
+                    <UML:Stereotype xmi.idref = '-64--88-0-1-8238f4:115206c0709:-8000:0000000000000807'/>
+                  </UML:ModelElement.stereotype>
+                  <UML:Namespace.ownedElement>
+                    <UML:Dependency xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000D34E'
+                      name = 'SITE -&gt; Site' isSpecification = 'false'>
+                      <UML:Dependency.client>
+                        <UML:Class xmi.idref = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000D332'/>
+                        <UML:Class xmi.idref = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000D34D'/>
+                      </UML:Dependency.client>
+                      <UML:Dependency.supplier>
+                        <UML:Class xmi.idref = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000D34D'/>
+                      </UML:Dependency.supplier>
+                    </UML:Dependency>
+                  </UML:Namespace.ownedElement>
+                  <UML:Classifier.feature>
+                    <UML:Attribute xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000D333'
+                      name = 'ID' visibility = 'public' isSpecification = 'false' ownerScope = 'instance'
+                      changeability = 'changeable' targetScope = 'instance'>
+                      <UML:StructuralFeature.multiplicity>
+                        <UML:Multiplicity xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000D334'>
+                          <UML:Multiplicity.range>
+                            <UML:MultiplicityRange xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000D335'
+                              lower = '1' upper = '1'/>
+                          </UML:Multiplicity.range>
+                        </UML:Multiplicity>
+                      </UML:StructuralFeature.multiplicity>
+                      <UML:StructuralFeature.type>
+                        <UML:DataType xmi.idref = 'eaxmiid0'/>
+                      </UML:StructuralFeature.type>
+                    </UML:Attribute>
+                    <UML:Attribute xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000D336'
+                      name = 'NAME' visibility = 'public' isSpecification = 'false' ownerScope = 'instance'
+                      changeability = 'changeable' targetScope = 'instance'>
+                      <UML:StructuralFeature.multiplicity>
+                        <UML:Multiplicity xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000D337'>
+                          <UML:Multiplicity.range>
+                            <UML:MultiplicityRange xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000D338'
+                              lower = '1' upper = '1'/>
+                          </UML:Multiplicity.range>
+                        </UML:Multiplicity>
+                      </UML:StructuralFeature.multiplicity>
+                      <UML:StructuralFeature.type>
+                        <UML:DataType xmi.idref = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000D34F'/>
+                      </UML:StructuralFeature.type>
+                    </UML:Attribute>
+                    <UML:Attribute xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000D339'
+                      name = 'TYPE' visibility = 'public' isSpecification = 'false' ownerScope = 'instance'
+                      changeability = 'changeable' targetScope = 'instance'>
+                      <UML:StructuralFeature.multiplicity>
+                        <UML:Multiplicity xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000D33A'>
+                          <UML:Multiplicity.range>
+                            <UML:MultiplicityRange xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000D33B'
+                              lower = '1' upper = '1'/>
+                          </UML:Multiplicity.range>
+                        </UML:Multiplicity>
+                      </UML:StructuralFeature.multiplicity>
+                      <UML:StructuralFeature.type>
+                        <UML:DataType xmi.idref = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000009A88'/>
+                      </UML:StructuralFeature.type>
+                    </UML:Attribute>
+                    <UML:Attribute xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000D33C'
+                      name = 'EMAIL_ADDRESS' visibility = 'public' isSpecification = 'false' ownerScope = 'instance'
+                      changeability = 'changeable' targetScope = 'instance'>
+                      <UML:StructuralFeature.multiplicity>
+                        <UML:Multiplicity xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000D33D'>
+                          <UML:Multiplicity.range>
+                            <UML:MultiplicityRange xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000D33E'
+                              lower = '1' upper = '1'/>
+                          </UML:Multiplicity.range>
+                        </UML:Multiplicity>
+                      </UML:StructuralFeature.multiplicity>
+                      <UML:StructuralFeature.type>
+                        <UML:DataType xmi.idref = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000D34F'/>
+                      </UML:StructuralFeature.type>
+                    </UML:Attribute>
+                    <UML:Attribute xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000D344'
+                      name = 'ACTIVITY_STATUS' visibility = 'public' isSpecification = 'false'
+                      ownerScope = 'instance' changeability = 'changeable' targetScope = 'instance'>
+                      <UML:StructuralFeature.multiplicity>
+                        <UML:Multiplicity xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000D345'>
+                          <UML:Multiplicity.range>
+                            <UML:MultiplicityRange xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000D346'
+                              lower = '1' upper = '1'/>
+                          </UML:Multiplicity.range>
+                        </UML:Multiplicity>
+                      </UML:StructuralFeature.multiplicity>
+                      <UML:StructuralFeature.type>
+                        <UML:DataType xmi.idref = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000009A88'/>
+                      </UML:StructuralFeature.type>
+                    </UML:Attribute>
+                    <UML:Attribute xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000D341'
+                      name = 'USER_ID' visibility = 'public' isSpecification = 'false' ownerScope = 'instance'
+                      changeability = 'changeable' targetScope = 'instance'>
+                      <UML:StructuralFeature.multiplicity>
+                        <UML:Multiplicity xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000D342'>
+                          <UML:Multiplicity.range>
+                            <UML:MultiplicityRange xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000D343'
+                              lower = '1' upper = '1'/>
+                          </UML:Multiplicity.range>
+                        </UML:Multiplicity>
+                      </UML:StructuralFeature.multiplicity>
+                      <UML:StructuralFeature.type>
+                        <UML:DataType xmi.idref = 'eaxmiid0'/>
+                      </UML:StructuralFeature.type>
+                    </UML:Attribute>
+                    <UML:Attribute xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000D347'
+                      name = 'ADDRESS_ID' visibility = 'public' isSpecification = 'false' ownerScope = 'instance'
+                      changeability = 'changeable' targetScope = 'instance'>
+                      <UML:StructuralFeature.multiplicity>
+                        <UML:Multiplicity xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000D348'>
+                          <UML:Multiplicity.range>
+                            <UML:MultiplicityRange xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000D349'
+                              lower = '1' upper = '1'/>
+                          </UML:Multiplicity.range>
+                        </UML:Multiplicity>
+                      </UML:StructuralFeature.multiplicity>
+                      <UML:StructuralFeature.type>
+                        <UML:DataType xmi.idref = 'eaxmiid0'/>
+                      </UML:StructuralFeature.type>
+                    </UML:Attribute>
+                    <UML:Operation xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000D34A'
+                      name = 'PK_ID' visibility = 'public' isSpecification = 'false' ownerScope = 'instance'
+                      isQuery = 'false' concurrency = 'sequential' isRoot = 'false' isLeaf = 'false'
+                      isAbstract = 'false'>
+                      <UML:BehavioralFeature.parameter>
+                        <UML:Parameter xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000D34B'
+                          name = 'return' isSpecification = 'false' kind = 'return'/>
+                        <UML:Parameter xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000D34C'
+                          name = 'ID' isSpecification = 'false'>
+                          <UML:Parameter.type>
+                            <UML:DataType xmi.idref = 'eaxmiid0'/>
+                          </UML:Parameter.type>
+                        </UML:Parameter>
+                      </UML:BehavioralFeature.parameter>
+                    </UML:Operation>
+                    <UML:Operation xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000F3EA'
+                      name = 'FK_USER_ID' visibility = 'public' isSpecification = 'false' ownerScope = 'instance'
+                      isQuery = 'false' concurrency = 'sequential' isRoot = 'false' isLeaf = 'false'
+                      isAbstract = 'false'>
+                      <UML:BehavioralFeature.parameter>
+                        <UML:Parameter xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000F3EB'
+                          name = 'return' isSpecification = 'false' kind = 'return'/>
+                        <UML:Parameter xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000F3EC'
+                          name = 'USER_ID' isSpecification = 'false'>
+                          <UML:Parameter.type>
+                            <UML:DataType xmi.idref = 'eaxmiid0'/>
+                          </UML:Parameter.type>
+                        </UML:Parameter>
+                      </UML:BehavioralFeature.parameter>
+                    </UML:Operation>
+                    <UML:Operation xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000F3ED'
+                      name = 'FK_ADDRESS_ID' visibility = 'public' isSpecification = 'false' ownerScope = 'instance'
+                      isQuery = 'false' concurrency = 'sequential' isRoot = 'false' isLeaf = 'false'
+                      isAbstract = 'false'>
+                      <UML:BehavioralFeature.parameter>
+                        <UML:Parameter xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000F3EE'
+                          name = 'return' isSpecification = 'false' kind = 'return'/>
+                        <UML:Parameter xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000F3EF'
+                          name = 'ADDRESS_ID' isSpecification = 'false'>
+                          <UML:Parameter.type>
+                            <UML:DataType xmi.idref = 'eaxmiid0'/>
+                          </UML:Parameter.type>
+                        </UML:Parameter>
+                      </UML:BehavioralFeature.parameter>
+                    </UML:Operation>
+                  </UML:Classifier.feature>
+                </UML:Class>
+                <UML:Association xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000E394'
+                  name = '(ADDRESS_ID = ID)' isSpecification = 'false' isRoot = 'false' isLeaf = 'false'
+                  isAbstract = 'false'>
+                  <UML:Association.connection>
+                    <UML:AssociationEnd xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000E395'
+                      name = 'FK_ADDRESS_ID' visibility = 'public' isSpecification = 'false' isNavigable = 'false'
+                      ordering = 'unordered' aggregation = 'none' targetScope = 'instance' changeability = 'changeable'>
+                      <UML:AssociationEnd.multiplicity>
+                        <UML:Multiplicity xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000E396'>
+                          <UML:Multiplicity.range>
+                            <UML:MultiplicityRange xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000E397'
+                              lower = '1' upper = '1'/>
+                          </UML:Multiplicity.range>
+                        </UML:Multiplicity>
+                      </UML:AssociationEnd.multiplicity>
+                      <UML:AssociationEnd.participant>
+                        <UML:Class xmi.idref = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000D332'/>
+                      </UML:AssociationEnd.participant>
+                    </UML:AssociationEnd>
+                    <UML:AssociationEnd xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000E398'
+                      name = 'PK_ID' visibility = 'public' isSpecification = 'false' isNavigable = 'true'
+                      ordering = 'unordered' aggregation = 'none' targetScope = 'instance' changeability = 'changeable'>
+                      <UML:AssociationEnd.multiplicity>
+                        <UML:Multiplicity xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000E399'>
+                          <UML:Multiplicity.range>
+                            <UML:MultiplicityRange xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000E39A'
+                              lower = '1' upper = '1'/>
+                          </UML:Multiplicity.range>
+                        </UML:Multiplicity>
+                      </UML:AssociationEnd.multiplicity>
+                      <UML:AssociationEnd.participant>
+                        <UML:Class xmi.idref = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000D350'/>
+                      </UML:AssociationEnd.participant>
+                    </UML:AssociationEnd>
+                  </UML:Association.connection>
+                </UML:Association>
+                <UML:Association xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000F3F0'
+                  name = '(ADDRESS_ID = ID)' isSpecification = 'false' isRoot = 'false' isLeaf = 'false'
+                  isAbstract = 'false'>
+                  <UML:Association.connection>
+                    <UML:AssociationEnd xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000F3F1'
+                      name = 'FK_ADDRESS_ID' visibility = 'public' isSpecification = 'false' isNavigable = 'false'
+                      ordering = 'unordered' aggregation = 'none' targetScope = 'instance' changeability = 'changeable'>
+                      <UML:AssociationEnd.multiplicity>
+                        <UML:Multiplicity xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000F3F2'>
+                          <UML:Multiplicity.range>
+                            <UML:MultiplicityRange xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000F3F3'
+                              lower = '1' upper = '1'/>
+                          </UML:Multiplicity.range>
+                        </UML:Multiplicity>
+                      </UML:AssociationEnd.multiplicity>
+                      <UML:AssociationEnd.participant>
+                        <UML:Class xmi.idref = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000003991'/>
+                      </UML:AssociationEnd.participant>
+                    </UML:AssociationEnd>
+                    <UML:AssociationEnd xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000F3F4'
+                      name = 'PK_ID' visibility = 'public' isSpecification = 'false' isNavigable = 'true'
+                      ordering = 'unordered' aggregation = 'none' targetScope = 'instance' changeability = 'changeable'>
+                      <UML:AssociationEnd.multiplicity>
+                        <UML:Multiplicity xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000F3F5'>
+                          <UML:Multiplicity.range>
+                            <UML:MultiplicityRange xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000F3F6'
+                              lower = '1' upper = '1'/>
+                          </UML:Multiplicity.range>
+                        </UML:Multiplicity>
+                      </UML:AssociationEnd.multiplicity>
+                      <UML:AssociationEnd.participant>
+                        <UML:Class xmi.idref = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000D350'/>
+                      </UML:AssociationEnd.participant>
+                    </UML:AssociationEnd>
+                  </UML:Association.connection>
+                </UML:Association>
+                <UML:Association xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000F3FA'
+                  name = '(USER_ID = ID)' isSpecification = 'false' isRoot = 'false' isLeaf = 'false'
+                  isAbstract = 'false'>
+                  <UML:Association.connection>
+                    <UML:AssociationEnd xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000F3FB'
+                      name = 'FK_ADDRESS_ID' visibility = 'public' isSpecification = 'false' isNavigable = 'true'
+                      ordering = 'unordered' aggregation = 'none' targetScope = 'instance' changeability = 'changeable'>
+                      <UML:AssociationEnd.multiplicity>
+                        <UML:Multiplicity xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000F402'>
+                          <UML:Multiplicity.range>
+                            <UML:MultiplicityRange xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000F401'
+                              lower = '0' upper = '-1'/>
+                          </UML:Multiplicity.range>
+                        </UML:Multiplicity>
+                      </UML:AssociationEnd.multiplicity>
+                      <UML:AssociationEnd.participant>
+                        <UML:Class xmi.idref = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000D332'/>
+                      </UML:AssociationEnd.participant>
+                    </UML:AssociationEnd>
+                    <UML:AssociationEnd xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000F3FE'
+                      name = 'PK_ID' visibility = 'public' isSpecification = 'false' isNavigable = 'true'
+                      ordering = 'unordered' aggregation = 'none' targetScope = 'instance' changeability = 'changeable'>
+                      <UML:AssociationEnd.multiplicity>
+                        <UML:Multiplicity xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000F3FF'>
+                          <UML:Multiplicity.range>
+                            <UML:MultiplicityRange xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000F400'
+                              lower = '1' upper = '1'/>
+                          </UML:Multiplicity.range>
+                        </UML:Multiplicity>
+                      </UML:AssociationEnd.multiplicity>
+                      <UML:AssociationEnd.participant>
+                        <UML:Class xmi.idref = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000003991'/>
+                      </UML:AssociationEnd.participant>
+                    </UML:AssociationEnd>
+                  </UML:Association.connection>
+                </UML:Association>
+                <UML:Class xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000D350'
+                  name = 'ADDRESS' visibility = 'public' isSpecification = 'false' isRoot = 'false'
+                  isLeaf = 'false' isAbstract = 'false' isActive = 'false'>
+                  <UML:ModelElement.clientDependency>
+                    <UML:Dependency xmi.idref = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000013C90'/>
+                  </UML:ModelElement.clientDependency>
+                  <UML:ModelElement.stereotype>
+                    <UML:Stereotype xmi.idref = '-64--88-0-1-8238f4:115206c0709:-8000:0000000000000807'/>
+                  </UML:ModelElement.stereotype>
+                  <UML:Namespace.ownedElement>
+                    <UML:Dependency xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000013C90'
+                      name = 'ADDRESS -&gt; Address' isSpecification = 'false'>
+                      <UML:Dependency.client>
+                        <UML:Class xmi.idref = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000D350'/>
+                      </UML:Dependency.client>
+                      <UML:Dependency.supplier>
+                        <UML:Class xmi.idref = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000010279'/>
+                      </UML:Dependency.supplier>
+                    </UML:Dependency>
+                  </UML:Namespace.ownedElement>
+                  <UML:Classifier.feature>
+                    <UML:Attribute xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000D351'
+                      name = 'ID' visibility = 'public' isSpecification = 'false' ownerScope = 'instance'
+                      changeability = 'changeable' targetScope = 'instance'>
+                      <UML:StructuralFeature.multiplicity>
+                        <UML:Multiplicity xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000D352'>
+                          <UML:Multiplicity.range>
+                            <UML:MultiplicityRange xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000D353'
+                              lower = '1' upper = '1'/>
+                          </UML:Multiplicity.range>
+                        </UML:Multiplicity>
+                      </UML:StructuralFeature.multiplicity>
+                      <UML:StructuralFeature.type>
+                        <UML:DataType xmi.idref = 'eaxmiid0'/>
+                      </UML:StructuralFeature.type>
+                    </UML:Attribute>
+                    <UML:Attribute xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000D354'
+                      name = 'STREET' visibility = 'public' isSpecification = 'false' ownerScope = 'instance'
+                      changeability = 'changeable' targetScope = 'instance'>
+                      <UML:StructuralFeature.multiplicity>
+                        <UML:Multiplicity xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000D355'>
+                          <UML:Multiplicity.range>
+                            <UML:MultiplicityRange xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000D356'
+                              lower = '1' upper = '1'/>
+                          </UML:Multiplicity.range>
+                        </UML:Multiplicity>
+                      </UML:StructuralFeature.multiplicity>
+                      <UML:StructuralFeature.type>
+                        <UML:DataType xmi.idref = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000D34F'/>
+                      </UML:StructuralFeature.type>
+                    </UML:Attribute>
+                    <UML:Attribute xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000D357'
+                      name = 'CITY' visibility = 'public' isSpecification = 'false' ownerScope = 'instance'
+                      changeability = 'changeable' targetScope = 'instance'>
+                      <UML:StructuralFeature.multiplicity>
+                        <UML:Multiplicity xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000D358'>
+                          <UML:Multiplicity.range>
+                            <UML:MultiplicityRange xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000D359'
+                              lower = '1' upper = '1'/>
+                          </UML:Multiplicity.range>
+                        </UML:Multiplicity>
+                      </UML:StructuralFeature.multiplicity>
+                      <UML:StructuralFeature.type>
+                        <UML:DataType xmi.idref = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000009A88'/>
+                      </UML:StructuralFeature.type>
+                    </UML:Attribute>
+                    <UML:Attribute xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000D35A'
+                      name = 'PROVINCE' visibility = 'public' isSpecification = 'false' ownerScope = 'instance'
+                      changeability = 'changeable' targetScope = 'instance'>
+                      <UML:StructuralFeature.multiplicity>
+                        <UML:Multiplicity xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000D35B'>
+                          <UML:Multiplicity.range>
+                            <UML:MultiplicityRange xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000D35C'
+                              lower = '1' upper = '1'/>
+                          </UML:Multiplicity.range>
+                        </UML:Multiplicity>
+                      </UML:StructuralFeature.multiplicity>
+                      <UML:StructuralFeature.type>
+                        <UML:DataType xmi.idref = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000009A88'/>
+                      </UML:StructuralFeature.type>
+                    </UML:Attribute>
+                    <UML:Attribute xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000D35D'
+                      name = 'COUNTRY' visibility = 'public' isSpecification = 'false' ownerScope = 'instance'
+                      changeability = 'changeable' targetScope = 'instance'>
+                      <UML:StructuralFeature.multiplicity>
+                        <UML:Multiplicity xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000D35E'>
+                          <UML:Multiplicity.range>
+                            <UML:MultiplicityRange xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000D35F'
+                              lower = '1' upper = '1'/>
+                          </UML:Multiplicity.range>
+                        </UML:Multiplicity>
+                      </UML:StructuralFeature.multiplicity>
+                      <UML:StructuralFeature.type>
+                        <UML:DataType xmi.idref = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000009A88'/>
+                      </UML:StructuralFeature.type>
+                    </UML:Attribute>
+                    <UML:Attribute xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000D360'
+                      name = 'POSTAL_CODE' visibility = 'public' isSpecification = 'false' ownerScope = 'instance'
+                      changeability = 'changeable' targetScope = 'instance'>
+                      <UML:StructuralFeature.multiplicity>
+                        <UML:Multiplicity xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000D361'>
+                          <UML:Multiplicity.range>
+                            <UML:MultiplicityRange xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000D362'
+                              lower = '1' upper = '1'/>
+                          </UML:Multiplicity.range>
+                        </UML:Multiplicity>
+                      </UML:StructuralFeature.multiplicity>
+                      <UML:StructuralFeature.type>
+                        <UML:DataType xmi.idref = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000009A88'/>
+                      </UML:StructuralFeature.type>
+                    </UML:Attribute>
+                    <UML:Attribute xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000D363'
+                      name = 'TELEPHONE_NUMBER' visibility = 'public' isSpecification = 'false'
+                      ownerScope = 'instance' changeability = 'changeable' targetScope = 'instance'>
+                      <UML:StructuralFeature.multiplicity>
+                        <UML:Multiplicity xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000D364'>
+                          <UML:Multiplicity.range>
+                            <UML:MultiplicityRange xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000D365'
+                              lower = '1' upper = '1'/>
+                          </UML:Multiplicity.range>
+                        </UML:Multiplicity>
+                      </UML:StructuralFeature.multiplicity>
+                      <UML:StructuralFeature.type>
+                        <UML:DataType xmi.idref = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000009A88'/>
+                      </UML:StructuralFeature.type>
+                    </UML:Attribute>
+                    <UML:Attribute xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000D366'
+                      name = 'FAX_NUMBER' visibility = 'public' isSpecification = 'false' ownerScope = 'instance'
+                      changeability = 'changeable' targetScope = 'instance'>
+                      <UML:StructuralFeature.multiplicity>
+                        <UML:Multiplicity xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000D367'>
+                          <UML:Multiplicity.range>
+                            <UML:MultiplicityRange xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000D368'
+                              lower = '1' upper = '1'/>
+                          </UML:Multiplicity.range>
+                        </UML:Multiplicity>
+                      </UML:StructuralFeature.multiplicity>
+                      <UML:StructuralFeature.type>
+                        <UML:DataType xmi.idref = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000009A88'/>
+                      </UML:StructuralFeature.type>
+                    </UML:Attribute>
+                    <UML:Operation xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000D369'
+                      name = 'PK_ID' visibility = 'public' isSpecification = 'false' ownerScope = 'instance'
+                      isQuery = 'false' concurrency = 'sequential' isRoot = 'false' isLeaf = 'false'
+                      isAbstract = 'false'>
+                      <UML:BehavioralFeature.parameter>
+                        <UML:Parameter xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000D36A'
+                          name = 'return' isSpecification = 'false' kind = 'return'/>
+                        <UML:Parameter xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000D36B'
+                          name = 'ID' isSpecification = 'false'>
+                          <UML:Parameter.type>
+                            <UML:DataType xmi.idref = 'eaxmiid0'/>
+                          </UML:Parameter.type>
+                        </UML:Parameter>
+                      </UML:BehavioralFeature.parameter>
+                    </UML:Operation>
+                  </UML:Classifier.feature>
+                </UML:Class>
+              </UML:Namespace.ownedElement>
+            </UML:Package>
+            <UML:Package xmi.id = 'EAPK_6A1F7B6A_C113_44b4_85DC_AC4BBBA11077' name = 'Logical Model'
+              visibility = 'public' isSpecification = 'false' isRoot = 'false' isLeaf = 'false'
+              isAbstract = 'false'>
+              <UML:Namespace.ownedElement>
+                <UML:Package xmi.id = 'EAPK_CB699A04_2FDB_43de_9F15_2FBB5DA90527' name = 'Diagrams'
+                  visibility = 'public' isSpecification = 'false' isRoot = 'false' isLeaf = 'false'
+                  isAbstract = 'false'/>
+                <UML:Package xmi.id = 'EAPK_43BAE89C_5241_4bc7_B74B_FC946B52F491' name = 'java'
+                  visibility = 'public' isSpecification = 'false' isRoot = 'false' isLeaf = 'false'
+                  isAbstract = 'false'>
+                  <UML:Namespace.ownedElement>
+                    <UML:Package xmi.id = 'EAPK_0CA6AD77_D114_4100_AE05_E65AB1F45D7E' name = 'lang'
+                      visibility = 'public' isSpecification = 'false' isRoot = 'false' isLeaf = 'false'
+                      isAbstract = 'false'>
+                      <UML:Namespace.ownedElement>
+                        <UML:Class xmi.id = 'EAID_0BE8D824_9BDD_478b_A20C_613CD28C5AC4' name = 'Float'
+                          visibility = 'public' isSpecification = 'false' isRoot = 'false' isLeaf = 'false'
+                          isAbstract = 'false' isActive = 'false'/>
+                        <UML:Class xmi.id = 'EAID_61D84993_837B_48c3_9F63_E3020F52FA13' name = 'Integer'
+                          visibility = 'public' isSpecification = 'false' isRoot = 'false' isLeaf = 'false'
+                          isAbstract = 'false' isActive = 'false'/>
+                        <UML:Class xmi.id = 'EAID_C97D344F_72B7_4704_A8DB_7392DF5D80D0' name = 'Boolean'
+                          visibility = 'public' isSpecification = 'false' isRoot = 'false' isLeaf = 'false'
+                          isAbstract = 'false' isActive = 'false'/>
+                        <UML:Class xmi.id = 'EAID_D1A51FE0_90DA_4977_B520_F3A871CBA44E' name = 'String'
+                          visibility = 'public' isSpecification = 'false' isRoot = 'false' isLeaf = 'false'
+                          isAbstract = 'false' isActive = 'false'/>
+                        <UML:Class xmi.id = 'EAID_D2DA7AC3_01F2_405e_995D_672D8DFD6E99' name = 'Double'
+                          visibility = 'public' isSpecification = 'false' isRoot = 'false' isLeaf = 'false'
+                          isAbstract = 'false' isActive = 'false'/>
+                      </UML:Namespace.ownedElement>
+                    </UML:Package>
+                    <UML:Package xmi.id = 'EAPK_65413A3A_338B_4a5c_96B7_B456DA3809A1' name = 'util'
+                      visibility = 'public' isSpecification = 'false' isRoot = 'false' isLeaf = 'false'
+                      isAbstract = 'false'>
+                      <UML:Namespace.ownedElement>
+                        <UML:Class xmi.id = 'EAID_D50C9E68_E240_456a_A166_F1706281B491' name = 'Date'
+                          visibility = 'public' isSpecification = 'false' isRoot = 'false' isLeaf = 'false'
+                          isAbstract = 'false' isActive = 'false'/>
+                      </UML:Namespace.ownedElement>
+                    </UML:Package>
+                  </UML:Namespace.ownedElement>
+                </UML:Package>
+                <UML:Package xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000001CF0'
+                  name = 'edu' isSpecification = 'false' isRoot = 'false' isLeaf = 'false'
+                  isAbstract = 'false'>
+                  <UML:Namespace.ownedElement>
+                    <UML:Package xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000001CF1'
+                      name = 'ualberta' isSpecification = 'false' isRoot = 'false' isLeaf = 'false'
+                      isAbstract = 'false'>
+                      <UML:Namespace.ownedElement>
+                        <UML:Package xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000001CF2'
+                          name = 'med' isSpecification = 'false' isRoot = 'false' isLeaf = 'false'
+                          isAbstract = 'false'>
+                          <UML:Namespace.ownedElement>
+                            <UML:Package xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000001CF3'
+                              name = 'biobank' isSpecification = 'false' isRoot = 'false' isLeaf = 'false'
+                              isAbstract = 'false'>
+                              <UML:Namespace.ownedElement>
+                                <UML:Class xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000001CF4'
+                                  name = 'User' visibility = 'public' isSpecification = 'false' isRoot = 'false'
+                                  isLeaf = 'false' isAbstract = 'false' isActive = 'false'>
+                                  <UML:ModelElement.clientDependency>
+                                    <UML:Dependency xmi.idref = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000716F'/>
+                                  </UML:ModelElement.clientDependency>
+                                  <UML:Classifier.feature>
+                                    <UML:Attribute xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000001027A'
+                                      name = 'emailAddress' visibility = 'public' isSpecification = 'false' ownerScope = 'instance'
+                                      changeability = 'changeable' targetScope = 'instance'>
+                                      <UML:StructuralFeature.multiplicity>
+                                        <UML:Multiplicity xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000001027B'>
+                                          <UML:Multiplicity.range>
+                                            <UML:MultiplicityRange xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000001027C'
+                                              lower = '1' upper = '1'/>
+                                          </UML:Multiplicity.range>
+                                        </UML:Multiplicity>
+                                      </UML:StructuralFeature.multiplicity>
+                                      <UML:StructuralFeature.type>
+                                        <UML:Class xmi.idref = 'EAID_D1A51FE0_90DA_4977_B520_F3A871CBA44E'/>
+                                      </UML:StructuralFeature.type>
+                                    </UML:Attribute>
+                                    <UML:Attribute xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000001027D'
+                                      name = 'password' visibility = 'public' isSpecification = 'false' ownerScope = 'instance'
+                                      changeability = 'changeable' targetScope = 'instance'>
+                                      <UML:StructuralFeature.multiplicity>
+                                        <UML:Multiplicity xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000001027E'>
+                                          <UML:Multiplicity.range>
+                                            <UML:MultiplicityRange xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000001027F'
+                                              lower = '1' upper = '1'/>
+                                          </UML:Multiplicity.range>
+                                        </UML:Multiplicity>
+                                      </UML:StructuralFeature.multiplicity>
+                                      <UML:StructuralFeature.type>
+                                        <UML:Class xmi.idref = 'EAID_D1A51FE0_90DA_4977_B520_F3A871CBA44E'/>
+                                      </UML:StructuralFeature.type>
+                                    </UML:Attribute>
+                                    <UML:Attribute xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000010280'
+                                      name = 'firstName' visibility = 'public' isSpecification = 'false' ownerScope = 'instance'
+                                      changeability = 'changeable' targetScope = 'instance'>
+                                      <UML:StructuralFeature.multiplicity>
+                                        <UML:Multiplicity xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000010281'>
+                                          <UML:Multiplicity.range>
+                                            <UML:MultiplicityRange xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000010282'
+                                              lower = '1' upper = '1'/>
+                                          </UML:Multiplicity.range>
+                                        </UML:Multiplicity>
+                                      </UML:StructuralFeature.multiplicity>
+                                      <UML:StructuralFeature.type>
+                                        <UML:Class xmi.idref = 'EAID_D1A51FE0_90DA_4977_B520_F3A871CBA44E'/>
+                                      </UML:StructuralFeature.type>
+                                    </UML:Attribute>
+                                    <UML:Attribute xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000010283'
+                                      name = 'lastName' visibility = 'public' isSpecification = 'false' ownerScope = 'instance'
+                                      changeability = 'changeable' targetScope = 'instance'>
+                                      <UML:StructuralFeature.multiplicity>
+                                        <UML:Multiplicity xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000010284'>
+                                          <UML:Multiplicity.range>
+                                            <UML:MultiplicityRange xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000010285'
+                                              lower = '1' upper = '1'/>
+                                          </UML:Multiplicity.range>
+                                        </UML:Multiplicity>
+                                      </UML:StructuralFeature.multiplicity>
+                                      <UML:StructuralFeature.type>
+                                        <UML:Class xmi.idref = 'EAID_D1A51FE0_90DA_4977_B520_F3A871CBA44E'/>
+                                      </UML:StructuralFeature.type>
+                                    </UML:Attribute>
+                                    <UML:Attribute xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000013C87'
+                                      name = 'loginName' visibility = 'public' isSpecification = 'false' ownerScope = 'instance'
+                                      changeability = 'changeable' targetScope = 'instance'>
+                                      <UML:StructuralFeature.multiplicity>
+                                        <UML:Multiplicity xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000013C88'>
+                                          <UML:Multiplicity.range>
+                                            <UML:MultiplicityRange xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000013C89'
+                                              lower = '1' upper = '1'/>
+                                          </UML:Multiplicity.range>
+                                        </UML:Multiplicity>
+                                      </UML:StructuralFeature.multiplicity>
+                                      <UML:StructuralFeature.type>
+                                        <UML:Class xmi.idref = 'EAID_D1A51FE0_90DA_4977_B520_F3A871CBA44E'/>
+                                      </UML:StructuralFeature.type>
+                                    </UML:Attribute>
+                                    <UML:Attribute xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000013C8A'
+                                      name = 'startDate' visibility = 'public' isSpecification = 'false' ownerScope = 'instance'
+                                      changeability = 'changeable' targetScope = 'instance'>
+                                      <UML:StructuralFeature.multiplicity>
+                                        <UML:Multiplicity xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000013C8B'>
+                                          <UML:Multiplicity.range>
+                                            <UML:MultiplicityRange xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000013C8C'
+                                              lower = '1' upper = '1'/>
+                                          </UML:Multiplicity.range>
+                                        </UML:Multiplicity>
+                                      </UML:StructuralFeature.multiplicity>
+                                      <UML:StructuralFeature.type>
+                                        <UML:Class xmi.idref = 'EAID_D50C9E68_E240_456a_A166_F1706281B491'/>
+                                      </UML:StructuralFeature.type>
+                                    </UML:Attribute>
+                                    <UML:Attribute xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000013C8D'
+                                      name = 'activityStatus' visibility = 'public' isSpecification = 'false'
+                                      ownerScope = 'instance' changeability = 'changeable' targetScope = 'instance'>
+                                      <UML:StructuralFeature.multiplicity>
+                                        <UML:Multiplicity xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000013C8E'>
+                                          <UML:Multiplicity.range>
+                                            <UML:MultiplicityRange xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000013C8F'
+                                              lower = '1' upper = '1'/>
+                                          </UML:Multiplicity.range>
+                                        </UML:Multiplicity>
+                                      </UML:StructuralFeature.multiplicity>
+                                      <UML:StructuralFeature.type>
+                                        <UML:Class xmi.idref = 'EAID_D1A51FE0_90DA_4977_B520_F3A871CBA44E'/>
+                                      </UML:StructuralFeature.type>
+                                    </UML:Attribute>
+                                  </UML:Classifier.feature>
+                                </UML:Class>
+                                <UML:Class xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000010279'
+                                  name = 'Address' visibility = 'public' isSpecification = 'false' isRoot = 'false'
+                                  isLeaf = 'false' isAbstract = 'false' isActive = 'false'>
+                                  <UML:Classifier.feature>
+                                    <UML:Attribute xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000013C9D'
+                                      name = 'street' visibility = 'public' isSpecification = 'false' ownerScope = 'instance'
+                                      changeability = 'changeable' targetScope = 'instance'>
+                                      <UML:StructuralFeature.multiplicity>
+                                        <UML:Multiplicity xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000013C9E'>
+                                          <UML:Multiplicity.range>
+                                            <UML:MultiplicityRange xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000013C9F'
+                                              lower = '1' upper = '1'/>
+                                          </UML:Multiplicity.range>
+                                        </UML:Multiplicity>
+                                      </UML:StructuralFeature.multiplicity>
+                                      <UML:StructuralFeature.type>
+                                        <UML:Class xmi.idref = 'EAID_D1A51FE0_90DA_4977_B520_F3A871CBA44E'/>
+                                      </UML:StructuralFeature.type>
+                                    </UML:Attribute>
+                                    <UML:Attribute xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000013CA0'
+                                      name = 'city' visibility = 'public' isSpecification = 'false' ownerScope = 'instance'
+                                      changeability = 'changeable' targetScope = 'instance'>
+                                      <UML:StructuralFeature.multiplicity>
+                                        <UML:Multiplicity xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000013CA1'>
+                                          <UML:Multiplicity.range>
+                                            <UML:MultiplicityRange xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000013CA2'
+                                              lower = '1' upper = '1'/>
+                                          </UML:Multiplicity.range>
+                                        </UML:Multiplicity>
+                                      </UML:StructuralFeature.multiplicity>
+                                      <UML:StructuralFeature.type>
+                                        <UML:Class xmi.idref = 'EAID_D1A51FE0_90DA_4977_B520_F3A871CBA44E'/>
+                                      </UML:StructuralFeature.type>
+                                    </UML:Attribute>
+                                    <UML:Attribute xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000013CA3'
+                                      name = 'province' visibility = 'public' isSpecification = 'false' ownerScope = 'instance'
+                                      changeability = 'changeable' targetScope = 'instance'>
+                                      <UML:StructuralFeature.multiplicity>
+                                        <UML:Multiplicity xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000013CA4'>
+                                          <UML:Multiplicity.range>
+                                            <UML:MultiplicityRange xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000013CA5'
+                                              lower = '1' upper = '1'/>
+                                          </UML:Multiplicity.range>
+                                        </UML:Multiplicity>
+                                      </UML:StructuralFeature.multiplicity>
+                                      <UML:StructuralFeature.type>
+                                        <UML:Class xmi.idref = 'EAID_D1A51FE0_90DA_4977_B520_F3A871CBA44E'/>
+                                      </UML:StructuralFeature.type>
+                                    </UML:Attribute>
+                                    <UML:Attribute xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000013CA6'
+                                      name = 'country' visibility = 'public' isSpecification = 'false' ownerScope = 'instance'
+                                      changeability = 'changeable' targetScope = 'instance'>
+                                      <UML:StructuralFeature.multiplicity>
+                                        <UML:Multiplicity xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000013CA7'>
+                                          <UML:Multiplicity.range>
+                                            <UML:MultiplicityRange xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000013CA8'
+                                              lower = '1' upper = '1'/>
+                                          </UML:Multiplicity.range>
+                                        </UML:Multiplicity>
+                                      </UML:StructuralFeature.multiplicity>
+                                      <UML:StructuralFeature.type>
+                                        <UML:Class xmi.idref = 'EAID_D1A51FE0_90DA_4977_B520_F3A871CBA44E'/>
+                                      </UML:StructuralFeature.type>
+                                    </UML:Attribute>
+                                    <UML:Attribute xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000013CA9'
+                                      name = 'postalCode' visibility = 'public' isSpecification = 'false' ownerScope = 'instance'
+                                      changeability = 'changeable' targetScope = 'instance'>
+                                      <UML:StructuralFeature.multiplicity>
+                                        <UML:Multiplicity xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000013CAA'>
+                                          <UML:Multiplicity.range>
+                                            <UML:MultiplicityRange xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000013CAB'
+                                              lower = '1' upper = '1'/>
+                                          </UML:Multiplicity.range>
+                                        </UML:Multiplicity>
+                                      </UML:StructuralFeature.multiplicity>
+                                      <UML:StructuralFeature.type>
+                                        <UML:Class xmi.idref = 'EAID_D1A51FE0_90DA_4977_B520_F3A871CBA44E'/>
+                                      </UML:StructuralFeature.type>
+                                    </UML:Attribute>
+                                    <UML:Attribute xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000013CAC'
+                                      name = 'telephoneNumber' visibility = 'public' isSpecification = 'false'
+                                      ownerScope = 'instance' changeability = 'changeable' targetScope = 'instance'>
+                                      <UML:StructuralFeature.multiplicity>
+                                        <UML:Multiplicity xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000013CAD'>
+                                          <UML:Multiplicity.range>
+                                            <UML:MultiplicityRange xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000013CAE'
+                                              lower = '1' upper = '1'/>
+                                          </UML:Multiplicity.range>
+                                        </UML:Multiplicity>
+                                      </UML:StructuralFeature.multiplicity>
+                                      <UML:StructuralFeature.type>
+                                        <UML:Class xmi.idref = 'EAID_D1A51FE0_90DA_4977_B520_F3A871CBA44E'/>
+                                      </UML:StructuralFeature.type>
+                                    </UML:Attribute>
+                                    <UML:Attribute xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000013CAF'
+                                      name = 'faxNumber' visibility = 'public' isSpecification = 'false' ownerScope = 'instance'
+                                      changeability = 'changeable' targetScope = 'instance'>
+                                      <UML:StructuralFeature.multiplicity>
+                                        <UML:Multiplicity xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000013CB0'>
+                                          <UML:Multiplicity.range>
+                                            <UML:MultiplicityRange xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000013CB1'
+                                              lower = '1' upper = '1'/>
+                                          </UML:Multiplicity.range>
+                                        </UML:Multiplicity>
+                                      </UML:StructuralFeature.multiplicity>
+                                      <UML:StructuralFeature.type>
+                                        <UML:Class xmi.idref = 'EAID_D1A51FE0_90DA_4977_B520_F3A871CBA44E'/>
+                                      </UML:StructuralFeature.type>
+                                    </UML:Attribute>
+                                  </UML:Classifier.feature>
+                                </UML:Class>
+                                <UML:Class xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000D34D'
+                                  name = 'Site' visibility = 'public' isSpecification = 'false' isRoot = 'false'
+                                  isLeaf = 'false' isAbstract = 'false' isActive = 'false'>
+                                  <UML:ModelElement.clientDependency>
+                                    <UML:Dependency xmi.idref = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000D34E'/>
+                                  </UML:ModelElement.clientDependency>
+                                  <UML:Classifier.feature>
+                                    <UML:Attribute xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000013C91'
+                                      name = 'name' visibility = 'public' isSpecification = 'false' ownerScope = 'instance'
+                                      changeability = 'changeable' targetScope = 'instance'>
+                                      <UML:StructuralFeature.multiplicity>
+                                        <UML:Multiplicity xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000013C92'>
+                                          <UML:Multiplicity.range>
+                                            <UML:MultiplicityRange xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000013C93'
+                                              lower = '1' upper = '1'/>
+                                          </UML:Multiplicity.range>
+                                        </UML:Multiplicity>
+                                      </UML:StructuralFeature.multiplicity>
+                                      <UML:StructuralFeature.type>
+                                        <UML:Class xmi.idref = 'EAID_D1A51FE0_90DA_4977_B520_F3A871CBA44E'/>
+                                      </UML:StructuralFeature.type>
+                                    </UML:Attribute>
+                                    <UML:Attribute xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000013C94'
+                                      name = 'type' visibility = 'public' isSpecification = 'false' ownerScope = 'instance'
+                                      changeability = 'changeable' targetScope = 'instance'>
+                                      <UML:StructuralFeature.multiplicity>
+                                        <UML:Multiplicity xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000013C95'>
+                                          <UML:Multiplicity.range>
+                                            <UML:MultiplicityRange xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000013C96'
+                                              lower = '1' upper = '1'/>
+                                          </UML:Multiplicity.range>
+                                        </UML:Multiplicity>
+                                      </UML:StructuralFeature.multiplicity>
+                                      <UML:StructuralFeature.type>
+                                        <UML:Class xmi.idref = 'EAID_D1A51FE0_90DA_4977_B520_F3A871CBA44E'/>
+                                      </UML:StructuralFeature.type>
+                                    </UML:Attribute>
+                                    <UML:Attribute xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000013C97'
+                                      name = 'emailAddress' visibility = 'public' isSpecification = 'false' ownerScope = 'instance'
+                                      changeability = 'changeable' targetScope = 'instance'>
+                                      <UML:StructuralFeature.multiplicity>
+                                        <UML:Multiplicity xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000013C98'>
+                                          <UML:Multiplicity.range>
+                                            <UML:MultiplicityRange xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000013C99'
+                                              lower = '1' upper = '1'/>
+                                          </UML:Multiplicity.range>
+                                        </UML:Multiplicity>
+                                      </UML:StructuralFeature.multiplicity>
+                                      <UML:StructuralFeature.type>
+                                        <UML:Class xmi.idref = 'EAID_D1A51FE0_90DA_4977_B520_F3A871CBA44E'/>
+                                      </UML:StructuralFeature.type>
+                                    </UML:Attribute>
+                                    <UML:Attribute xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000013C9A'
+                                      name = 'activityStatus' visibility = 'public' isSpecification = 'false'
+                                      ownerScope = 'instance' changeability = 'changeable' targetScope = 'instance'>
+                                      <UML:StructuralFeature.multiplicity>
+                                        <UML:Multiplicity xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000013C9B'>
+                                          <UML:Multiplicity.range>
+                                            <UML:MultiplicityRange xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000013C9C'
+                                              lower = '1' upper = '1'/>
+                                          </UML:Multiplicity.range>
+                                        </UML:Multiplicity>
+                                      </UML:StructuralFeature.multiplicity>
+                                      <UML:StructuralFeature.type>
+                                        <UML:Class xmi.idref = 'EAID_D1A51FE0_90DA_4977_B520_F3A871CBA44E'/>
+                                      </UML:StructuralFeature.type>
+                                    </UML:Attribute>
+                                  </UML:Classifier.feature>
+                                </UML:Class>
+                                <UML:Association xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000013CB2'
+                                  name = '' isSpecification = 'false' isRoot = 'false' isLeaf = 'false' isAbstract = 'false'>
+                                  <UML:Association.connection>
+                                    <UML:AssociationEnd xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000013CB3'
+                                      name = 'user' visibility = 'public' isSpecification = 'false' isNavigable = 'false'
+                                      ordering = 'unordered' aggregation = 'none' targetScope = 'instance' changeability = 'changeable'>
+                                      <UML:AssociationEnd.multiplicity>
+                                        <UML:Multiplicity xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000013CB4'>
+                                          <UML:Multiplicity.range>
+                                            <UML:MultiplicityRange xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000013CB5'
+                                              lower = '1' upper = '1'/>
+                                          </UML:Multiplicity.range>
+                                        </UML:Multiplicity>
+                                      </UML:AssociationEnd.multiplicity>
+                                      <UML:AssociationEnd.participant>
+                                        <UML:Class xmi.idref = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000001CF4'/>
+                                      </UML:AssociationEnd.participant>
+                                    </UML:AssociationEnd>
+                                    <UML:AssociationEnd xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000013CB6'
+                                      name = 'address' visibility = 'public' isSpecification = 'false' isNavigable = 'true'
+                                      ordering = 'unordered' aggregation = 'none' targetScope = 'instance' changeability = 'changeable'>
+                                      <UML:AssociationEnd.multiplicity>
+                                        <UML:Multiplicity xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000013CB7'>
+                                          <UML:Multiplicity.range>
+                                            <UML:MultiplicityRange xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000013CB8'
+                                              lower = '1' upper = '1'/>
+                                          </UML:Multiplicity.range>
+                                        </UML:Multiplicity>
+                                      </UML:AssociationEnd.multiplicity>
+                                      <UML:AssociationEnd.participant>
+                                        <UML:Class xmi.idref = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000010279'/>
+                                      </UML:AssociationEnd.participant>
+                                    </UML:AssociationEnd>
+                                  </UML:Association.connection>
+                                </UML:Association>
+                                <UML:Association xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000015A1D'
+                                  name = '' isSpecification = 'false' isRoot = 'false' isLeaf = 'false' isAbstract = 'false'>
+                                  <UML:Association.connection>
+                                    <UML:AssociationEnd xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000015A1E'
+                                      name = 'site' visibility = 'public' isSpecification = 'false' isNavigable = 'false'
+                                      ordering = 'unordered' aggregation = 'none' targetScope = 'instance' changeability = 'changeable'>
+                                      <UML:AssociationEnd.multiplicity>
+                                        <UML:Multiplicity xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000015A1F'>
+                                          <UML:Multiplicity.range>
+                                            <UML:MultiplicityRange xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000015A20'
+                                              lower = '1' upper = '1'/>
+                                          </UML:Multiplicity.range>
+                                        </UML:Multiplicity>
+                                      </UML:AssociationEnd.multiplicity>
+                                      <UML:AssociationEnd.participant>
+                                        <UML:Class xmi.idref = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000D34D'/>
+                                      </UML:AssociationEnd.participant>
+                                    </UML:AssociationEnd>
+                                    <UML:AssociationEnd xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000015A21'
+                                      name = 'user' visibility = 'public' isSpecification = 'false' isNavigable = 'true'
+                                      ordering = 'unordered' aggregation = 'none' targetScope = 'instance' changeability = 'changeable'>
+                                      <UML:AssociationEnd.multiplicity>
+                                        <UML:Multiplicity xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000015A25'>
+                                          <UML:Multiplicity.range>
+                                            <UML:MultiplicityRange xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000015A24'
+                                              lower = '0' upper = '-1'/>
+                                          </UML:Multiplicity.range>
+                                        </UML:Multiplicity>
+                                      </UML:AssociationEnd.multiplicity>
+                                      <UML:AssociationEnd.participant>
+                                        <UML:Class xmi.idref = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000001CF4'/>
+                                      </UML:AssociationEnd.participant>
+                                    </UML:AssociationEnd>
+                                  </UML:Association.connection>
+                                </UML:Association>
+                                <UML:Association xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000015A26'
+                                  name = '' isSpecification = 'false' isRoot = 'false' isLeaf = 'false' isAbstract = 'false'>
+                                  <UML:Association.connection>
+                                    <UML:AssociationEnd xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000015A27'
+                                      name = 'site' visibility = 'public' isSpecification = 'false' isNavigable = 'true'
+                                      ordering = 'unordered' aggregation = 'none' targetScope = 'instance' changeability = 'changeable'>
+                                      <UML:AssociationEnd.multiplicity>
+                                        <UML:Multiplicity xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000015A28'>
+                                          <UML:Multiplicity.range>
+                                            <UML:MultiplicityRange xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000015A29'
+                                              lower = '1' upper = '1'/>
+                                          </UML:Multiplicity.range>
+                                        </UML:Multiplicity>
+                                      </UML:AssociationEnd.multiplicity>
+                                      <UML:AssociationEnd.participant>
+                                        <UML:Class xmi.idref = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000D34D'/>
+                                      </UML:AssociationEnd.participant>
+                                    </UML:AssociationEnd>
+                                    <UML:AssociationEnd xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000015A2A'
+                                      name = 'address' visibility = 'public' isSpecification = 'false' isNavigable = 'true'
+                                      ordering = 'unordered' aggregation = 'none' targetScope = 'instance' changeability = 'changeable'>
+                                      <UML:AssociationEnd.multiplicity>
+                                        <UML:Multiplicity xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000015A2B'>
+                                          <UML:Multiplicity.range>
+                                            <UML:MultiplicityRange xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000015A2C'
+                                              lower = '1' upper = '1'/>
+                                          </UML:Multiplicity.range>
+                                        </UML:Multiplicity>
+                                      </UML:AssociationEnd.multiplicity>
+                                      <UML:AssociationEnd.participant>
+                                        <UML:Class xmi.idref = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000010279'/>
+                                      </UML:AssociationEnd.participant>
+                                    </UML:AssociationEnd>
+                                  </UML:Association.connection>
+                                </UML:Association>
+                              </UML:Namespace.ownedElement>
+                            </UML:Package>
+                          </UML:Namespace.ownedElement>
+                        </UML:Package>
+                      </UML:Namespace.ownedElement>
+                    </UML:Package>
+                  </UML:Namespace.ownedElement>
+                </UML:Package>
+              </UML:Namespace.ownedElement>
+            </UML:Package>
+          </UML:Namespace.ownedElement>
+        </UML:Package>
+        <UML:DataType xmi.id = 'eaxmiid2' name = 'VARCHAR2' visibility = 'private'
+          isSpecification = 'false' isRoot = 'false' isLeaf = 'false' isAbstract = 'false'/>
+        <UML:DataType xmi.id = 'eaxmiid0' name = 'NUMBER' visibility = 'private'
+          isSpecification = 'false' isRoot = 'false' isLeaf = 'false' isAbstract = 'false'/>
+        <UML:DataType xmi.id = 'eaxmiid3' name = 'CLOB' visibility = 'private' isSpecification = 'false'
+          isRoot = 'false' isLeaf = 'false' isAbstract = 'false'/>
+        <UML:DataType xmi.id = 'eaxmiid4' name = 'DATE' visibility = 'private' isSpecification = 'false'
+          isRoot = 'false' isLeaf = 'false' isAbstract = 'false'/>
+        <UML:DataType xmi.id = '-64--88-1-107-c5495e:111b963703a:-8000:00000000000031A1'
+          name = 'boolean' isSpecification = 'false' isRoot = 'false' isLeaf = 'false'
+          isAbstract = 'false'/>
+        <UML:DataType xmi.id = '-64--88-1-107-c5495e:111b963703a:-8000:00000000000031A2'
+          name = 'byte' isSpecification = 'false' isRoot = 'false' isLeaf = 'false'
+          isAbstract = 'false'/>
+        <UML:DataType xmi.id = '-64--88-1-107-c5495e:111b963703a:-8000:00000000000031A3'
+          name = 'char' isSpecification = 'false' isRoot = 'false' isLeaf = 'false'
+          isAbstract = 'false'/>
+        <UML:DataType xmi.id = '-64--88-1-107-c5495e:111b963703a:-8000:00000000000031A4'
+          name = 'double' isSpecification = 'false' isRoot = 'false' isLeaf = 'false'
+          isAbstract = 'false'/>
+        <UML:TagDefinition xmi.id = '-64--88-1-107-8238f4:112105617ae:-8000:000000000000315F'
+          name = 'inverse-of' isSpecification = 'false' tagType = 'String'>
+          <UML:TagDefinition.multiplicity>
+            <UML:Multiplicity xmi.id = '-64--88-0-1-19a32e0:1151feda71c:-8000:0000000000001011'>
+              <UML:Multiplicity.range>
+                <UML:MultiplicityRange xmi.id = '-64--88-0-1-19a32e0:1151feda71c:-8000:0000000000001010'
+                  lower = '0' upper = '1'/>
+              </UML:Multiplicity.range>
+            </UML:Multiplicity>
+          </UML:TagDefinition.multiplicity>
+        </UML:TagDefinition>
+        <UML:TagDefinition xmi.id = '-64--88-1-107-8238f4:1121acba21f:-8000:000000000000317C'
+          name = 'type' isSpecification = 'false' tagType = 'String'/>
+        <UML:TagDefinition xmi.id = '-64--88-1-107-8238f4:1121acba21f:-8000:0000000000003190'
+          name = 'mapped-attributes' isSpecification = 'false' tagType = 'String'/>
+        <UML:TagDefinition xmi.id = '-91-112-10-23-8238f4:112534eb692:-8000:0000000000000FDD'
+          name = 'correlation-table' isSpecification = 'false' tagType = 'String'>
+          <UML:TagDefinition.multiplicity>
+            <UML:Multiplicity xmi.id = '-64--88-0-1-19a32e0:1151feda71c:-8000:0000000000000FFB'>
+              <UML:Multiplicity.range>
+                <UML:MultiplicityRange xmi.id = '-64--88-0-1-19a32e0:1151feda71c:-8000:0000000000000FFA'
+                  lower = '0' upper = '1'/>
+              </UML:Multiplicity.range>
+            </UML:Multiplicity>
+          </UML:TagDefinition.multiplicity>
+        </UML:TagDefinition>
+        <UML:TagDefinition xmi.id = '-64--88-0-1-19a32e0:1151feda71c:-8000:0000000000000FEA'
+          name = 'description' isSpecification = 'false' tagType = 'String'/>
+        <UML:TagDefinition xmi.id = '-64--88-0-1-19a32e0:1151feda71c:-8000:0000000000000FFC'
+          name = 'discriminator' isSpecification = 'false' tagType = 'String'/>
+        <UML:TagDefinition xmi.id = '-64--88-0-1-19a32e0:1151feda71c:-8000:0000000000001001'
+          name = 'documentation' isSpecification = 'false' tagType = 'String'/>
+        <UML:TagDefinition xmi.id = '-64--88-0-1-19a32e0:1151feda71c:-8000:0000000000001006'
+          name = 'id-attribute' isSpecification = 'false' tagType = 'String'/>
+        <UML:TagDefinition xmi.id = '-64--88-0-1-19a32e0:1151feda71c:-8000:000000000000100B'
+          name = 'implements-association' isSpecification = 'false' tagType = 'String'/>
+        <UML:TagDefinition xmi.id = '-64--88-0-1-19a32e0:1151feda71c:-8000:0000000000001012'
+          name = 'lazy-load' isSpecification = 'false' tagType = 'String'/>
+        <UML:TagDefinition xmi.id = '-64--88-0-1-19a32e0:1151feda71c:-8000:0000000000001017'
+          name = 'mapped-collection-table' isSpecification = 'false' tagType = 'String'/>
+        <UML:TagDefinition xmi.id = '-64--88-0-1-19a32e0:1151feda71c:-8000:000000000000101C'
+          name = 'mapped-element' isSpecification = 'false' tagType = 'String'/>
+        <UML:Stereotype xmi.id = '-64--88-0-1-8238f4:115206c0709:-8000:0000000000000807'
+          name = 'table' isSpecification = 'false' isRoot = 'false' isLeaf = 'false'
+          isAbstract = 'false'>
+          <UML:Stereotype.baseClass>Classifier</UML:Stereotype.baseClass>
+        </UML:Stereotype>
+        <UML:DataType xmi.id = '-64--88-0-1-8238f4:11524461844:-8000:0000000000000804'
+          name = 'int' isSpecification = 'false' isRoot = 'false' isLeaf = 'false'
+          isAbstract = 'false'/>
+        <UML:TagDefinition xmi.id = '-64--88-0-1-8238f4:11524461844:-8000:000000000000081C'
+          name = '' isSpecification = 'false' tagType = 'String'>
+          <UML:TagDefinition.multiplicity>
+            <UML:Multiplicity xmi.id = '-64--88-0-1-8238f4:11524461844:-8000:000000000000081D'>
+              <UML:Multiplicity.range>
+                <UML:MultiplicityRange xmi.id = '-64--88-0-1-8238f4:11524461844:-8000:000000000000081E'
+                  lower = '0' upper = '1'/>
+              </UML:Multiplicity.range>
+            </UML:Multiplicity>
+          </UML:TagDefinition.multiplicity>
+        </UML:TagDefinition>
+        <UML:DataType xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000008CD0'
+          name = 'VARCHAR(100)' isSpecification = 'false' isRoot = 'false' isLeaf = 'false'
+          isAbstract = 'false'/>
+        <UML:DataType xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000009A88'
+          name = 'VARCHAR(50)' isSpecification = 'false' isRoot = 'false' isLeaf = 'false'
+          isAbstract = 'false'/>
+        <UML:DataType xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000C517'
+          name = 'TEXT' isSpecification = 'false' isRoot = 'false' isLeaf = 'false'
+          isAbstract = 'false'/>
+        <UML:DataType xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000D33F'
+          name = 'VARCHAR(150)' isSpecification = 'false' isRoot = 'false' isLeaf = 'false'
+          isAbstract = 'false'/>
+        <UML:DataType xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000D34F'
+          name = 'VARCHAR(255)' isSpecification = 'false' isRoot = 'false' isLeaf = 'false'
+          isAbstract = 'false'/>
+      </UML:Namespace.ownedElement>
+    </UML:Model>
+  </XMI.content>
+</XMI>
+<pgml description="org.argouml.uml.diagram.static_structure.ui.UMLClassDiagram|EAPK_13C2A393_A2C6_4d7c_9441_319ED9A21FBA"
+      name="Class Diagram 1"
+>
+  <group name="Fig0"
+       description="org.argouml.uml.diagram.static_structure.ui.FigClass[48, 336, 238, 377]pathVisible=false;stereotypeView=0;operationsVisible=true;attributesVisible=true;"
+       href="-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000003991"
+       fill="1"
+       fillcolor="white"
+       stroke="1"
+       strokecolor="black"
+  >
+    <private>
+    </private>
+    
+    <rectangle name="Fig0.0"
+      x="48"
+      y="336"
+      width="238"
+      height="377"
+      fill="1"
+      fillcolor="white"
+      stroke="0"
+      strokecolor="black"
+    />
+    <group name="Fig0.1"
+         description="org.argouml.uml.diagram.ui.FigStereotypesCompartment[48, 336, 238, 15]"
+         href="-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000003991"
+         fill="1"
+         fillcolor="white"
+         stroke="1"
+         strokecolor="black"
+    >
+      <private>
+      </private>
+      
+      <rectangle name="Fig0.1.0"
+        x="48"
+        y="336"
+        width="238"
+        height="15"
+        fill="1"
+        fillcolor="white"
+        stroke="1"
+        strokecolor="black"
+      />
+      <text name="Fig0.1.1"
+        x="49"
+        y="337"
+        width="236"
+        height="13"
+        fill="1"
+        fillcolor="white"
+        stroke="0"
+        strokecolor="black"
+        textcolor="black"
+        font="Dialog"
+        italic="false"
+        bold="false"
+        textsize="10"
+        justification="Center"
+      >&lt;&lt;table&gt;&gt;</text>
+    </group>
+    <text name="Fig0.2"
+      x="48"
+      y="351"
+      width="238"
+      height="20"
+      fill="1"
+      fillcolor="white"
+      stroke="0"
+      strokecolor="red"
+      textcolor="black"
+      font="Dialog"
+      italic="false"
+      bold="false"
+      textsize="10"
+      justification="Center"
+    >USER</text>
+    <group name="Fig0.3"
+         description="org.argouml.uml.diagram.ui.FigOperationsCompartment[49, 612, 237, 100]"
+         fill="1"
+         fillcolor="white"
+         stroke="0"
+         strokecolor="black"
+    >
+      <private>
+      </private>
+      
+      <rectangle name="Fig0.3.0"
+        x="49"
+        y="612"
+        width="237"
+        height="100"
+        fill="1"
+        fillcolor="white"
+        stroke="0"
+        strokecolor="black"
+      />
+      <path name="Fig0.3.1"
+        description="org.argouml.uml.diagram.ui.FigEditableCompartment$FigSeperator"
+        fill="1"
+        fillcolor="white"
+        stroke="1"
+        strokecolor="black"
+      >
+        <moveto x="49"
+                y="612" />
+        <lineto x="286"
+                y="612" />
+      </path>
+      <text name="Fig0.3.2"
+        x="49"
+        y="613"
+        width="99"
+        height="13"
+        fill="0"
+        fillcolor="white"
+        stroke="0"
+        strokecolor="black"
+        textcolor="black"
+        font="Dialog"
+        italic="false"
+        bold="false"
+        textsize="10"
+        justification="Left"
+      >PK_ID(ID : NUMBER)</text>
+      <text name="Fig0.3.3"
+        x="49"
+        y="626"
+        width="192"
+        height="13"
+        fill="0"
+        fillcolor="white"
+        stroke="0"
+        strokecolor="black"
+        textcolor="black"
+        font="Dialog"
+        italic="false"
+        bold="false"
+        textsize="10"
+        justification="Left"
+      >FK_ADDRESS_ID(ADDRESS_ID : NUMBER)</text>
+      <text name="Fig0.3.4"
+        x="49"
+        y="639"
+        width="146"
+        height="19"
+        fill="0"
+        fillcolor="white"
+        stroke="0"
+        strokecolor="black"
+        textcolor="black"
+        font="Dialog"
+        italic="false"
+        bold="false"
+        textsize="10"
+        justification="Left"
+      >FK_SITE_ID(SITE_ID : NUMBER)</text>
+    </group>
+    <group name="Fig0.4"
+         description="org.argouml.uml.diagram.ui.FigAttributesCompartment[49, 372, 237, 239]"
+         fill="1"
+         fillcolor="white"
+         stroke="0"
+         strokecolor="black"
+    >
+      <private>
+      </private>
+      
+      <rectangle name="Fig0.4.0"
+        x="49"
+        y="372"
+        width="237"
+        height="239"
+        fill="1"
+        fillcolor="white"
+        stroke="0"
+        strokecolor="black"
+      />
+      <path name="Fig0.4.1"
+        description="org.argouml.uml.diagram.ui.FigEditableCompartment$FigSeperator"
+        fill="1"
+        fillcolor="white"
+        stroke="1"
+        strokecolor="black"
+      >
+        <moveto x="49"
+                y="372" />
+        <lineto x="286"
+                y="372" />
+      </path>
+      <text name="Fig0.4.2"
+        x="49"
+        y="373"
+        width="65"
+        height="13"
+        fill="0"
+        fillcolor="white"
+        stroke="0"
+        strokecolor="black"
+        textcolor="black"
+        font="Dialog"
+        italic="false"
+        bold="false"
+        textsize="10"
+        justification="Left"
+      >ID : NUMBER</text>
+      <text name="Fig0.4.3"
+        x="49"
+        y="386"
+        width="162"
+        height="13"
+        fill="0"
+        fillcolor="white"
+        stroke="0"
+        strokecolor="black"
+        textcolor="black"
+        font="Dialog"
+        italic="false"
+        bold="false"
+        textsize="10"
+        justification="Left"
+      >EMAIL_ADDRESS : VARCHAR(100)</text>
+      <text name="Fig0.4.4"
+        x="49"
+        y="399"
+        width="133"
+        height="13"
+        fill="0"
+        fillcolor="white"
+        stroke="0"
+        strokecolor="black"
+        textcolor="black"
+        font="Dialog"
+        italic="false"
+        bold="false"
+        textsize="10"
+        justification="Left"
+      >PASSWORD : VARCHAR(50)</text>
+      <text name="Fig0.4.5"
+        x="49"
+        y="412"
+        width="138"
+        height="13"
+        fill="0"
+        fillcolor="white"
+        stroke="0"
+        strokecolor="black"
+        textcolor="black"
+        font="Dialog"
+        italic="false"
+        bold="false"
+        textsize="10"
+        justification="Left"
+      >FIRST_NAME : VARCHAR(50)</text>
+      <text name="Fig0.4.6"
+        x="49"
+        y="425"
+        width="136"
+        height="13"
+        fill="0"
+        fillcolor="white"
+        stroke="0"
+        strokecolor="black"
+        textcolor="black"
+        font="Dialog"
+        italic="false"
+        bold="false"
+        textsize="10"
+        justification="Left"
+      >LAST_NAME : VARCHAR(50)</text>
+      <text name="Fig0.4.7"
+        x="49"
+        y="438"
+        width="143"
+        height="13"
+        fill="0"
+        fillcolor="white"
+        stroke="0"
+        strokecolor="black"
+        textcolor="black"
+        font="Dialog"
+        italic="false"
+        bold="false"
+        textsize="10"
+        justification="Left"
+      >LOGIN_NAME : VARCHAR(50)</text>
+      <text name="Fig0.4.8"
+        x="49"
+        y="451"
+        width="100"
+        height="13"
+        fill="0"
+        fillcolor="white"
+        stroke="0"
+        strokecolor="black"
+        textcolor="black"
+        font="Dialog"
+        italic="false"
+        bold="false"
+        textsize="10"
+        justification="Left"
+      >START_DATE : DATE</text>
+      <text name="Fig0.4.9"
+        x="49"
+        y="464"
+        width="166"
+        height="13"
+        fill="0"
+        fillcolor="white"
+        stroke="0"
+        strokecolor="black"
+        textcolor="black"
+        font="Dialog"
+        italic="false"
+        bold="false"
+        textsize="10"
+        justification="Left"
+      >ACTIVITY_STATUS : VARCHAR(50)</text>
+      <text name="Fig0.4.10"
+        x="49"
+        y="477"
+        width="134"
+        height="13"
+        fill="0"
+        fillcolor="white"
+        stroke="0"
+        strokecolor="black"
+        textcolor="black"
+        font="Dialog"
+        italic="false"
+        bold="false"
+        textsize="10"
+        justification="Left"
+      >DEPARTMENT_ID : NUMBER</text>
+      <text name="Fig0.4.11"
+        x="49"
+        y="490"
+        width="157"
+        height="13"
+        fill="0"
+        fillcolor="white"
+        stroke="0"
+        strokecolor="black"
+        textcolor="black"
+        font="Dialog"
+        italic="false"
+        bold="false"
+        textsize="10"
+        justification="Left"
+      >RESEARCH_GROUP_ID : NUMBER</text>
+      <text name="Fig0.4.12"
+        x="49"
+        y="503"
+        width="131"
+        height="13"
+        fill="0"
+        fillcolor="white"
+        stroke="0"
+        strokecolor="black"
+        textcolor="black"
+        font="Dialog"
+        italic="false"
+        bold="false"
+        textsize="10"
+        justification="Left"
+      >INSTITUTION_ID : NUMBER</text>
+      <text name="Fig0.4.13"
+        x="49"
+        y="516"
+        width="112"
+        height="13"
+        fill="0"
+        fillcolor="white"
+        stroke="0"
+        strokecolor="black"
+        textcolor="black"
+        font="Dialog"
+        italic="false"
+        bold="false"
+        textsize="10"
+        justification="Left"
+      >ADDRESS_ID : NUMBER</text>
+      <text name="Fig0.4.14"
+        x="49"
+        y="529"
+        width="119"
+        height="13"
+        fill="0"
+        fillcolor="white"
+        stroke="0"
+        strokecolor="black"
+        textcolor="black"
+        font="Dialog"
+        italic="false"
+        bold="false"
+        textsize="10"
+        justification="Left"
+      >CSM_USER_ID : NUMBER</text>
+      <text name="Fig0.4.15"
+        x="49"
+        y="542"
+        width="130"
+        height="19"
+        fill="0"
+        fillcolor="white"
+        stroke="0"
+        strokecolor="black"
+        textcolor="black"
+        font="Dialog"
+        italic="false"
+        bold="false"
+        textsize="10"
+        justification="Left"
+      >STATUS_COMMENT : TEXT</text>
+    </group>
+    <rectangle name="Fig0.5"
+      x="48"
+      y="336"
+      width="238"
+      height="377"
+      fill="0"
+      fillcolor="white"
+      stroke="1"
+      strokecolor="black"
+    />
+  </group>
+  <group name="Fig1"
+       description="org.argouml.uml.diagram.static_structure.ui.FigClass[40, 48, 238, 272]pathVisible=false;stereotypeView=0;operationsVisible=true;attributesVisible=true;"
+       href="-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000D332"
+       fill="1"
+       fillcolor="white"
+       stroke="1"
+       strokecolor="black"
+  >
+    <private>
+    </private>
+    
+    <rectangle name="Fig1.0"
+      x="40"
+      y="48"
+      width="238"
+      height="272"
+      fill="1"
+      fillcolor="white"
+      stroke="0"
+      strokecolor="black"
+    />
+    <group name="Fig1.1"
+         description="org.argouml.uml.diagram.ui.FigStereotypesCompartment[40, 48, 238, 15]"
+         href="-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000D332"
+         fill="1"
+         fillcolor="white"
+         stroke="1"
+         strokecolor="black"
+    >
+      <private>
+      </private>
+      
+      <rectangle name="Fig1.1.0"
+        x="40"
+        y="48"
+        width="238"
+        height="15"
+        fill="1"
+        fillcolor="white"
+        stroke="1"
+        strokecolor="black"
+      />
+      <text name="Fig1.1.1"
+        x="41"
+        y="49"
+        width="236"
+        height="13"
+        fill="1"
+        fillcolor="white"
+        stroke="0"
+        strokecolor="black"
+        textcolor="black"
+        font="Dialog"
+        italic="false"
+        bold="false"
+        textsize="10"
+        justification="Center"
+      >&lt;&lt;table&gt;&gt;</text>
+    </group>
+    <text name="Fig1.2"
+      x="40"
+      y="63"
+      width="238"
+      height="20"
+      fill="1"
+      fillcolor="white"
+      stroke="0"
+      strokecolor="red"
+      textcolor="black"
+      font="Dialog"
+      italic="false"
+      bold="false"
+      textsize="10"
+      justification="Center"
+    >SITE</text>
+    <group name="Fig1.3"
+         description="org.argouml.uml.diagram.ui.FigOperationsCompartment[41, 226, 237, 93]"
+         fill="1"
+         fillcolor="white"
+         stroke="0"
+         strokecolor="black"
+    >
+      <private>
+      </private>
+      
+      <rectangle name="Fig1.3.0"
+        x="41"
+        y="226"
+        width="237"
+        height="93"
+        fill="1"
+        fillcolor="white"
+        stroke="0"
+        strokecolor="black"
+      />
+      <path name="Fig1.3.1"
+        description="org.argouml.uml.diagram.ui.FigEditableCompartment$FigSeperator"
+        fill="1"
+        fillcolor="white"
+        stroke="1"
+        strokecolor="black"
+      >
+        <moveto x="41"
+                y="226" />
+        <lineto x="278"
+                y="226" />
+      </path>
+      <text name="Fig1.3.2"
+        x="41"
+        y="227"
+        width="99"
+        height="13"
+        fill="0"
+        fillcolor="white"
+        stroke="0"
+        strokecolor="black"
+        textcolor="black"
+        font="Dialog"
+        italic="false"
+        bold="false"
+        textsize="10"
+        justification="Left"
+      >PK_ID(ID : NUMBER)</text>
+      <text name="Fig1.3.3"
+        x="41"
+        y="240"
+        width="154"
+        height="13"
+        fill="0"
+        fillcolor="white"
+        stroke="0"
+        strokecolor="black"
+        textcolor="black"
+        font="Dialog"
+        italic="false"
+        bold="false"
+        textsize="10"
+        justification="Left"
+      >FK_USER_ID(USER_ID : NUMBER)</text>
+      <text name="Fig1.3.4"
+        x="41"
+        y="253"
+        width="192"
+        height="19"
+        fill="0"
+        fillcolor="white"
+        stroke="0"
+        strokecolor="black"
+        textcolor="black"
+        font="Dialog"
+        italic="false"
+        bold="false"
+        textsize="10"
+        justification="Left"
+      >FK_ADDRESS_ID(ADDRESS_ID : NUMBER)</text>
+    </group>
+    <group name="Fig1.4"
+         description="org.argouml.uml.diagram.ui.FigAttributesCompartment[41, 84, 237, 141]"
+         fill="1"
+         fillcolor="white"
+         stroke="0"
+         strokecolor="black"
+    >
+      <private>
+      </private>
+      
+      <rectangle name="Fig1.4.0"
+        x="41"
+        y="84"
+        width="237"
+        height="141"
+        fill="1"
+        fillcolor="white"
+        stroke="0"
+        strokecolor="black"
+      />
+      <path name="Fig1.4.1"
+        description="org.argouml.uml.diagram.ui.FigEditableCompartment$FigSeperator"
+        fill="1"
+        fillcolor="white"
+        stroke="1"
+        strokecolor="black"
+      >
+        <moveto x="41"
+                y="84" />
+        <lineto x="278"
+                y="84" />
+      </path>
+      <text name="Fig1.4.2"
+        x="41"
+        y="85"
+        width="65"
+        height="13"
+        fill="0"
+        fillcolor="white"
+        stroke="0"
+        strokecolor="black"
+        textcolor="black"
+        font="Dialog"
+        italic="false"
+        bold="false"
+        textsize="10"
+        justification="Left"
+      >ID : NUMBER</text>
+      <text name="Fig1.4.3"
+        x="41"
+        y="98"
+        width="114"
+        height="13"
+        fill="0"
+        fillcolor="white"
+        stroke="0"
+        strokecolor="black"
+        textcolor="black"
+        font="Dialog"
+        italic="false"
+        bold="false"
+        textsize="10"
+        justification="Left"
+      >NAME : VARCHAR(255)</text>
+      <text name="Fig1.4.4"
+        x="41"
+        y="111"
+        width="103"
+        height="13"
+        fill="0"
+        fillcolor="white"
+        stroke="0"
+        strokecolor="black"
+        textcolor="black"
+        font="Dialog"
+        italic="false"
+        bold="false"
+        textsize="10"
+        justification="Left"
+      >TYPE : VARCHAR(50)</text>
+      <text name="Fig1.4.5"
+        x="41"
+        y="124"
+        width="162"
+        height="13"
+        fill="0"
+        fillcolor="white"
+        stroke="0"
+        strokecolor="black"
+        textcolor="black"
+        font="Dialog"
+        italic="false"
+        bold="false"
+        textsize="10"
+        justification="Left"
+      >EMAIL_ADDRESS : VARCHAR(255)</text>
+      <text name="Fig1.4.6"
+        x="41"
+        y="137"
+        width="166"
+        height="13"
+        fill="0"
+        fillcolor="white"
+        stroke="0"
+        strokecolor="black"
+        textcolor="black"
+        font="Dialog"
+        italic="false"
+        bold="false"
+        textsize="10"
+        justification="Left"
+      >ACTIVITY_STATUS : VARCHAR(50)</text>
+      <text name="Fig1.4.7"
+        x="41"
+        y="150"
+        width="93"
+        height="13"
+        fill="0"
+        fillcolor="white"
+        stroke="0"
+        strokecolor="black"
+        textcolor="black"
+        font="Dialog"
+        italic="false"
+        bold="false"
+        textsize="10"
+        justification="Left"
+      >USER_ID : NUMBER</text>
+      <text name="Fig1.4.8"
+        x="41"
+        y="163"
+        width="112"
+        height="19"
+        fill="0"
+        fillcolor="white"
+        stroke="0"
+        strokecolor="black"
+        textcolor="black"
+        font="Dialog"
+        italic="false"
+        bold="false"
+        textsize="10"
+        justification="Left"
+      >ADDRESS_ID : NUMBER</text>
+    </group>
+    <rectangle name="Fig1.5"
+      x="40"
+      y="48"
+      width="238"
+      height="272"
+      fill="0"
+      fillcolor="white"
+      stroke="1"
+      strokecolor="black"
+    />
+  </group>
+  <group name="Fig2"
+       description="org.argouml.uml.diagram.static_structure.ui.FigClass[456, 208, 224, 274]pathVisible=false;stereotypeView=0;operationsVisible=true;attributesVisible=true;"
+       href="-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000D350"
+       fill="1"
+       fillcolor="white"
+       stroke="1"
+       strokecolor="black"
+  >
+    <private>
+    </private>
+    
+    <rectangle name="Fig2.0"
+      x="456"
+      y="208"
+      width="224"
+      height="274"
+      fill="1"
+      fillcolor="white"
+      stroke="0"
+      strokecolor="black"
+    />
+    <group name="Fig2.1"
+         description="org.argouml.uml.diagram.ui.FigStereotypesCompartment[456, 208, 224, 15]"
+         href="-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000D350"
+         fill="1"
+         fillcolor="white"
+         stroke="1"
+         strokecolor="black"
+    >
+      <private>
+      </private>
+      
+      <rectangle name="Fig2.1.0"
+        x="456"
+        y="208"
+        width="224"
+        height="15"
+        fill="1"
+        fillcolor="white"
+        stroke="1"
+        strokecolor="black"
+      />
+      <text name="Fig2.1.1"
+        x="457"
+        y="209"
+        width="222"
+        height="13"
+        fill="1"
+        fillcolor="white"
+        stroke="0"
+        strokecolor="black"
+        textcolor="black"
+        font="Dialog"
+        italic="false"
+        bold="false"
+        textsize="10"
+        justification="Center"
+      >&lt;&lt;table&gt;&gt;</text>
+    </group>
+    <text name="Fig2.2"
+      x="456"
+      y="223"
+      width="224"
+      height="20"
+      fill="1"
+      fillcolor="white"
+      stroke="0"
+      strokecolor="red"
+      textcolor="black"
+      font="Dialog"
+      italic="false"
+      bold="false"
+      textsize="10"
+      justification="Center"
+    >ADDRESS</text>
+    <group name="Fig2.3"
+         description="org.argouml.uml.diagram.ui.FigOperationsCompartment[457, 407, 223, 74]"
+         fill="1"
+         fillcolor="white"
+         stroke="0"
+         strokecolor="black"
+    >
+      <private>
+      </private>
+      
+      <rectangle name="Fig2.3.0"
+        x="457"
+        y="407"
+        width="223"
+        height="74"
+        fill="1"
+        fillcolor="white"
+        stroke="0"
+        strokecolor="black"
+      />
+      <path name="Fig2.3.1"
+        description="org.argouml.uml.diagram.ui.FigEditableCompartment$FigSeperator"
+        fill="1"
+        fillcolor="white"
+        stroke="1"
+        strokecolor="black"
+      >
+        <moveto x="457"
+                y="407" />
+        <lineto x="680"
+                y="407" />
+      </path>
+      <text name="Fig2.3.2"
+        x="457"
+        y="408"
+        width="99"
+        height="19"
+        fill="0"
+        fillcolor="white"
+        stroke="0"
+        strokecolor="black"
+        textcolor="black"
+        font="Dialog"
+        italic="false"
+        bold="false"
+        textsize="10"
+        justification="Left"
+      >PK_ID(ID : NUMBER)</text>
+    </group>
+    <group name="Fig2.4"
+         description="org.argouml.uml.diagram.ui.FigAttributesCompartment[457, 244, 223, 162]"
+         fill="1"
+         fillcolor="white"
+         stroke="0"
+         strokecolor="black"
+    >
+      <private>
+      </private>
+      
+      <rectangle name="Fig2.4.0"
+        x="457"
+        y="244"
+        width="223"
+        height="162"
+        fill="1"
+        fillcolor="white"
+        stroke="0"
+        strokecolor="black"
+      />
+      <path name="Fig2.4.1"
+        description="org.argouml.uml.diagram.ui.FigEditableCompartment$FigSeperator"
+        fill="1"
+        fillcolor="white"
+        stroke="1"
+        strokecolor="black"
+      >
+        <moveto x="457"
+                y="244" />
+        <lineto x="680"
+                y="244" />
+      </path>
+      <text name="Fig2.4.2"
+        x="457"
+        y="245"
+        width="65"
+        height="13"
+        fill="0"
+        fillcolor="white"
+        stroke="0"
+        strokecolor="black"
+        textcolor="black"
+        font="Dialog"
+        italic="false"
+        bold="false"
+        textsize="10"
+        justification="Left"
+      >ID : NUMBER</text>
+      <text name="Fig2.4.3"
+        x="457"
+        y="258"
+        width="119"
+        height="13"
+        fill="0"
+        fillcolor="white"
+        stroke="0"
+        strokecolor="black"
+        textcolor="black"
+        font="Dialog"
+        italic="false"
+        bold="false"
+        textsize="10"
+        justification="Left"
+      >STREET : VARCHAR(255)</text>
+      <text name="Fig2.4.4"
+        x="457"
+        y="271"
+        width="102"
+        height="13"
+        fill="0"
+        fillcolor="white"
+        stroke="0"
+        strokecolor="black"
+        textcolor="black"
+        font="Dialog"
+        italic="false"
+        bold="false"
+        textsize="10"
+        justification="Left"
+      >CITY : VARCHAR(50)</text>
+      <text name="Fig2.4.5"
+        x="457"
+        y="284"
+        width="129"
+        height="13"
+        fill="0"
+        fillcolor="white"
+        stroke="0"
+        strokecolor="black"
+        textcolor="black"
+        font="Dialog"
+        italic="false"
+        bold="false"
+        textsize="10"
+        justification="Left"
+      >PROVINCE : VARCHAR(50)</text>
+      <text name="Fig2.4.6"
+        x="457"
+        y="297"
+        width="127"
+        height="13"
+        fill="0"
+        fillcolor="white"
+        stroke="0"
+        strokecolor="black"
+        textcolor="black"
+        font="Dialog"
+        italic="false"
+        bold="false"
+        textsize="10"
+        justification="Left"
+      >COUNTRY : VARCHAR(50)</text>
+      <text name="Fig2.4.7"
+        x="457"
+        y="310"
+        width="149"
+        height="13"
+        fill="0"
+        fillcolor="white"
+        stroke="0"
+        strokecolor="black"
+        textcolor="black"
+        font="Dialog"
+        italic="false"
+        bold="false"
+        textsize="10"
+        justification="Left"
+      >POSTAL_CODE : VARCHAR(50)</text>
+      <text name="Fig2.4.8"
+        x="457"
+        y="323"
+        width="179"
+        height="13"
+        fill="0"
+        fillcolor="white"
+        stroke="0"
+        strokecolor="black"
+        textcolor="black"
+        font="Dialog"
+        italic="false"
+        bold="false"
+        textsize="10"
+        justification="Left"
+      >TELEPHONE_NUMBER : VARCHAR(50)</text>
+      <text name="Fig2.4.9"
+        x="457"
+        y="336"
+        width="143"
+        height="19"
+        fill="0"
+        fillcolor="white"
+        stroke="0"
+        strokecolor="black"
+        textcolor="black"
+        font="Dialog"
+        italic="false"
+        bold="false"
+        textsize="10"
+        justification="Left"
+      >FAX_NUMBER : VARCHAR(50)</text>
+    </group>
+    <rectangle name="Fig2.5"
+      x="456"
+      y="208"
+      width="224"
+      height="274"
+      fill="0"
+      fillcolor="white"
+      stroke="1"
+      strokecolor="black"
+    />
+  </group>
+  <group name="Fig3"
+       description="org.argouml.uml.diagram.ui.FigAssociation"
+       href="-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000E394"
+       stroke="1"
+       strokecolor="black"
+  >
+    <private>
+      sourcePortFig="Fig1.0"
+      destPortFig="Fig2.0"
+      sourceFigNode="Fig1"
+      destFigNode="Fig2"
+    </private>
+    <path name="Fig3.0"
+      description="org.argouml.gefext.ArgoFigPoly"
+      fill="0"
+      fillcolor="white"
+      stroke="1"
+      strokecolor="black"
+    >
+      <moveto x="278"
+              y="232" />
+      <lineto x="456"
+              y="232" />
+    </path>
+  </group>
+  <group name="Fig4"
+       description="org.argouml.uml.diagram.ui.FigAssociation"
+       href="-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000F3F0"
+       stroke="1"
+       strokecolor="black"
+  >
+    <private>
+      sourcePortFig="Fig0.0"
+      destPortFig="Fig2.0"
+      sourceFigNode="Fig0"
+      destFigNode="Fig2"
+    </private>
+    <path name="Fig4.0"
+      description="org.argouml.gefext.ArgoFigPoly"
+      fill="0"
+      fillcolor="white"
+      stroke="1"
+      strokecolor="black"
+    >
+      <moveto x="286"
+              y="416" />
+      <lineto x="456"
+              y="416" />
+    </path>
+  </group>
+  <group name="Fig5"
+       description="org.argouml.uml.diagram.ui.FigAssociation"
+       href="-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000F3FA"
+       stroke="1"
+       strokecolor="black"
+  >
+    <private>
+      sourcePortFig="Fig1.0"
+      destPortFig="Fig0.0"
+      sourceFigNode="Fig1"
+      destFigNode="Fig0"
+    </private>
+    <path name="Fig5.0"
+      description="org.argouml.gefext.ArgoFigPoly"
+      fill="0"
+      fillcolor="white"
+      stroke="1"
+      strokecolor="black"
+    >
+      <moveto x="246"
+              y="320" />
+      <lineto x="246"
+              y="336" />
+    </path>
+  </group>
+</pgml>
+<pgml description="org.argouml.uml.diagram.static_structure.ui.UMLClassDiagram|EAPK_CB699A04_2FDB_43de_9F15_2FBB5DA90527"
+      name="Class Diagram 2"
+>
+  <group name="Fig0"
+       description="org.argouml.uml.diagram.static_structure.ui.FigClass[72, 328, 192, 153]pathVisible=false;stereotypeView=0;operationsVisible=true;attributesVisible=true;"
+       href="-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000001CF4"
+       fill="1"
+       fillcolor="white"
+       stroke="1"
+       strokecolor="black"
+  >
+    <private>
+    </private>
+    
+    <rectangle name="Fig0.0"
+      x="72"
+      y="328"
+      width="192"
+      height="153"
+      fill="1"
+      fillcolor="white"
+      stroke="0"
+      strokecolor="black"
+    />
+    <group name="Fig0.1"
+         description="org.argouml.uml.diagram.ui.FigStereotypesCompartment[72, 328, 192, 0]"
+         href="-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000001CF4"
+         fill="1"
+         fillcolor="white"
+         stroke="1"
+         strokecolor="black"
+    >
+      <private>
+      </private>
+      
+      <rectangle name="Fig0.1.0"
+        x="72"
+        y="328"
+        width="192"
+        height="0"
+        fill="1"
+        fillcolor="white"
+        stroke="1"
+        strokecolor="black"
+      />
+    </group>
+    <text name="Fig0.2"
+      x="72"
+      y="328"
+      width="192"
+      height="20"
+      fill="1"
+      fillcolor="white"
+      stroke="0"
+      strokecolor="red"
+      textcolor="black"
+      font="Dialog"
+      italic="false"
+      bold="false"
+      textsize="10"
+      justification="Center"
+    >User</text>
+    <group name="Fig0.3"
+         description="org.argouml.uml.diagram.ui.FigOperationsCompartment[73, 453, 191, 27]"
+         fill="1"
+         fillcolor="white"
+         stroke="0"
+         strokecolor="black"
+    >
+      <private>
+      </private>
+      
+      <rectangle name="Fig0.3.0"
+        x="73"
+        y="453"
+        width="191"
+        height="27"
+        fill="1"
+        fillcolor="white"
+        stroke="0"
+        strokecolor="black"
+      />
+      <path name="Fig0.3.1"
+        description="org.argouml.uml.diagram.ui.FigEditableCompartment$FigSeperator"
+        fill="1"
+        fillcolor="white"
+        stroke="1"
+        strokecolor="black"
+      >
+        <moveto x="73"
+                y="453" />
+        <lineto x="264"
+                y="453" />
+      </path>
+    </group>
+    <group name="Fig0.4"
+         description="org.argouml.uml.diagram.ui.FigAttributesCompartment[73, 349, 191, 103]"
+         fill="1"
+         fillcolor="white"
+         stroke="0"
+         strokecolor="black"
+    >
+      <private>
+      </private>
+      
+      <rectangle name="Fig0.4.0"
+        x="73"
+        y="349"
+        width="191"
+        height="103"
+        fill="1"
+        fillcolor="white"
+        stroke="0"
+        strokecolor="black"
+      />
+      <path name="Fig0.4.1"
+        description="org.argouml.uml.diagram.ui.FigEditableCompartment$FigSeperator"
+        fill="1"
+        fillcolor="white"
+        stroke="1"
+        strokecolor="black"
+      >
+        <moveto x="73"
+                y="349" />
+        <lineto x="264"
+                y="349" />
+      </path>
+      <text name="Fig0.4.2"
+        x="73"
+        y="350"
+        width="110"
+        height="16"
+        fill="0"
+        fillcolor="white"
+        stroke="0"
+        strokecolor="black"
+        textcolor="black"
+        font="Dialog"
+        italic="false"
+        bold="false"
+        textsize="10"
+        justification="Left"
+      >emailAddress : String</text>
+      <text name="Fig0.4.3"
+        x="73"
+        y="363"
+        width="90"
+        height="16"
+        fill="0"
+        fillcolor="white"
+        stroke="0"
+        strokecolor="black"
+        textcolor="black"
+        font="Dialog"
+        italic="false"
+        bold="false"
+        textsize="10"
+        justification="Left"
+      >password : String</text>
+      <text name="Fig0.4.4"
+        x="73"
+        y="376"
+        width="91"
+        height="16"
+        fill="0"
+        fillcolor="white"
+        stroke="0"
+        strokecolor="black"
+        textcolor="black"
+        font="Dialog"
+        italic="false"
+        bold="false"
+        textsize="10"
+        justification="Left"
+      >firstName : String</text>
+      <text name="Fig0.4.5"
+        x="73"
+        y="389"
+        width="89"
+        height="16"
+        fill="0"
+        fillcolor="white"
+        stroke="0"
+        strokecolor="black"
+        textcolor="black"
+        font="Dialog"
+        italic="false"
+        bold="false"
+        textsize="10"
+        justification="Left"
+      >lastName : String</text>
+      <text name="Fig0.4.6"
+        x="73"
+        y="402"
+        width="96"
+        height="16"
+        fill="0"
+        fillcolor="white"
+        stroke="0"
+        strokecolor="black"
+        textcolor="black"
+        font="Dialog"
+        italic="false"
+        bold="false"
+        textsize="10"
+        justification="Left"
+      >loginName : String</text>
+      <text name="Fig0.4.7"
+        x="73"
+        y="415"
+        width="84"
+        height="13"
+        fill="0"
+        fillcolor="white"
+        stroke="0"
+        strokecolor="black"
+        textcolor="black"
+        font="Dialog"
+        italic="false"
+        bold="false"
+        textsize="10"
+        justification="Left"
+      >startDate : Date</text>
+      <text name="Fig0.4.8"
+        x="73"
+        y="428"
+        width="108"
+        height="22"
+        fill="0"
+        fillcolor="white"
+        stroke="0"
+        strokecolor="black"
+        textcolor="black"
+        font="Dialog"
+        italic="false"
+        bold="false"
+        textsize="10"
+        justification="Left"
+      >activityStatus : String</text>
+    </group>
+    <rectangle name="Fig0.5"
+      x="72"
+      y="328"
+      width="192"
+      height="153"
+      fill="0"
+      fillcolor="white"
+      stroke="1"
+      strokecolor="black"
+    />
+  </group>
+  <group name="Fig1"
+       description="org.argouml.uml.diagram.static_structure.ui.FigClass[576, 232, 216, 153]pathVisible=false;stereotypeView=0;operationsVisible=true;attributesVisible=true;"
+       href="-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000010279"
+       fill="1"
+       fillcolor="white"
+       stroke="1"
+       strokecolor="black"
+  >
+    <private>
+    </private>
+    
+    <rectangle name="Fig1.0"
+      x="576"
+      y="232"
+      width="216"
+      height="153"
+      fill="1"
+      fillcolor="white"
+      stroke="0"
+      strokecolor="black"
+    />
+    <group name="Fig1.1"
+         description="org.argouml.uml.diagram.ui.FigStereotypesCompartment[576, 232, 216, 0]"
+         href="-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000010279"
+         fill="1"
+         fillcolor="white"
+         stroke="1"
+         strokecolor="black"
+    >
+      <private>
+      </private>
+      
+      <rectangle name="Fig1.1.0"
+        x="576"
+        y="232"
+        width="216"
+        height="0"
+        fill="1"
+        fillcolor="white"
+        stroke="1"
+        strokecolor="black"
+      />
+    </group>
+    <text name="Fig1.2"
+      x="576"
+      y="232"
+      width="216"
+      height="20"
+      fill="1"
+      fillcolor="white"
+      stroke="0"
+      strokecolor="red"
+      textcolor="black"
+      font="Dialog"
+      italic="false"
+      bold="false"
+      textsize="10"
+      justification="Center"
+    >Address</text>
+    <group name="Fig1.3"
+         description="org.argouml.uml.diagram.ui.FigOperationsCompartment[577, 357, 215, 27]"
+         fill="1"
+         fillcolor="white"
+         stroke="0"
+         strokecolor="black"
+    >
+      <private>
+      </private>
+      
+      <rectangle name="Fig1.3.0"
+        x="577"
+        y="357"
+        width="215"
+        height="27"
+        fill="1"
+        fillcolor="white"
+        stroke="0"
+        strokecolor="black"
+      />
+      <path name="Fig1.3.1"
+        description="org.argouml.uml.diagram.ui.FigEditableCompartment$FigSeperator"
+        fill="1"
+        fillcolor="white"
+        stroke="1"
+        strokecolor="black"
+      >
+        <moveto x="577"
+                y="357" />
+        <lineto x="792"
+                y="357" />
+      </path>
+    </group>
+    <group name="Fig1.4"
+         description="org.argouml.uml.diagram.ui.FigAttributesCompartment[577, 253, 215, 103]"
+         fill="1"
+         fillcolor="white"
+         stroke="0"
+         strokecolor="black"
+    >
+      <private>
+      </private>
+      
+      <rectangle name="Fig1.4.0"
+        x="577"
+        y="253"
+        width="215"
+        height="103"
+        fill="1"
+        fillcolor="white"
+        stroke="0"
+        strokecolor="black"
+      />
+      <path name="Fig1.4.1"
+        description="org.argouml.uml.diagram.ui.FigEditableCompartment$FigSeperator"
+        fill="1"
+        fillcolor="white"
+        stroke="1"
+        strokecolor="black"
+      >
+        <moveto x="577"
+                y="253" />
+        <lineto x="792"
+                y="253" />
+      </path>
+      <text name="Fig1.4.2"
+        x="577"
+        y="254"
+        width="72"
+        height="13"
+        fill="0"
+        fillcolor="white"
+        stroke="0"
+        strokecolor="black"
+        textcolor="black"
+        font="Dialog"
+        italic="false"
+        bold="false"
+        textsize="10"
+        justification="Left"
+      >street : String</text>
+      <text name="Fig1.4.3"
+        x="577"
+        y="267"
+        width="60"
+        height="13"
+        fill="0"
+        fillcolor="white"
+        stroke="0"
+        strokecolor="black"
+        textcolor="black"
+        font="Dialog"
+        italic="false"
+        bold="false"
+        textsize="10"
+        justification="Left"
+      >city : String</text>
+      <text name="Fig1.4.4"
+        x="577"
+        y="280"
+        width="84"
+        height="13"
+        fill="0"
+        fillcolor="white"
+        stroke="0"
+        strokecolor="black"
+        textcolor="black"
+        font="Dialog"
+        italic="false"
+        bold="false"
+        textsize="10"
+        justification="Left"
+      >province : String</text>
+      <text name="Fig1.4.5"
+        x="577"
+        y="293"
+        width="79"
+        height="13"
+        fill="0"
+        fillcolor="white"
+        stroke="0"
+        strokecolor="black"
+        textcolor="black"
+        font="Dialog"
+        italic="false"
+        bold="false"
+        textsize="10"
+        justification="Left"
+      >country : String</text>
+      <text name="Fig1.4.6"
+        x="577"
+        y="306"
+        width="98"
+        height="16"
+        fill="0"
+        fillcolor="white"
+        stroke="0"
+        strokecolor="black"
+        textcolor="black"
+        font="Dialog"
+        italic="false"
+        bold="false"
+        textsize="10"
+        justification="Left"
+      >postalCode : String</text>
+      <text name="Fig1.4.7"
+        x="577"
+        y="319"
+        width="130"
+        height="13"
+        fill="0"
+        fillcolor="white"
+        stroke="0"
+        strokecolor="black"
+        textcolor="black"
+        font="Dialog"
+        italic="false"
+        bold="false"
+        textsize="10"
+        justification="Left"
+      >telephoneNumber : String</text>
+      <text name="Fig1.4.8"
+        x="577"
+        y="332"
+        width="97"
+        height="19"
+        fill="0"
+        fillcolor="white"
+        stroke="0"
+        strokecolor="black"
+        textcolor="black"
+        font="Dialog"
+        italic="false"
+        bold="false"
+        textsize="10"
+        justification="Left"
+      >faxNumber : String</text>
+    </group>
+    <rectangle name="Fig1.5"
+      x="576"
+      y="232"
+      width="216"
+      height="153"
+      fill="0"
+      fillcolor="white"
+      stroke="1"
+      strokecolor="black"
+    />
+  </group>
+  <group name="Fig2"
+       description="org.argouml.uml.diagram.static_structure.ui.FigClass[80, 24, 152, 108]pathVisible=false;stereotypeView=0;operationsVisible=true;attributesVisible=true;"
+       href="-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000D34D"
+       fill="1"
+       fillcolor="white"
+       stroke="1"
+       strokecolor="black"
+  >
+    <private>
+    </private>
+    
+    <rectangle name="Fig2.0"
+      x="80"
+      y="24"
+      width="152"
+      height="108"
+      fill="1"
+      fillcolor="white"
+      stroke="0"
+      strokecolor="black"
+    />
+    <group name="Fig2.1"
+         description="org.argouml.uml.diagram.ui.FigStereotypesCompartment[80, 24, 152, 0]"
+         href="-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000D34D"
+         fill="1"
+         fillcolor="white"
+         stroke="1"
+         strokecolor="black"
+    >
+      <private>
+      </private>
+      
+      <rectangle name="Fig2.1.0"
+        x="80"
+        y="24"
+        width="152"
+        height="0"
+        fill="1"
+        fillcolor="white"
+        stroke="1"
+        strokecolor="black"
+      />
+    </group>
+    <text name="Fig2.2"
+      x="80"
+      y="24"
+      width="152"
+      height="20"
+      fill="1"
+      fillcolor="white"
+      stroke="0"
+      strokecolor="red"
+      textcolor="black"
+      font="Dialog"
+      italic="false"
+      bold="false"
+      textsize="10"
+      justification="Center"
+    >Site</text>
+    <group name="Fig2.3"
+         description="org.argouml.uml.diagram.ui.FigOperationsCompartment[81, 107, 151, 24]"
+         fill="1"
+         fillcolor="white"
+         stroke="0"
+         strokecolor="black"
+    >
+      <private>
+      </private>
+      
+      <rectangle name="Fig2.3.0"
+        x="81"
+        y="107"
+        width="151"
+        height="24"
+        fill="1"
+        fillcolor="white"
+        stroke="0"
+        strokecolor="black"
+      />
+      <path name="Fig2.3.1"
+        description="org.argouml.uml.diagram.ui.FigEditableCompartment$FigSeperator"
+        fill="1"
+        fillcolor="white"
+        stroke="1"
+        strokecolor="black"
+      >
+        <moveto x="81"
+                y="107" />
+        <lineto x="232"
+                y="107" />
+      </path>
+    </group>
+    <group name="Fig2.4"
+         description="org.argouml.uml.diagram.ui.FigAttributesCompartment[81, 45, 151, 61]"
+         fill="1"
+         fillcolor="white"
+         stroke="0"
+         strokecolor="black"
+    >
+      <private>
+      </private>
+      
+      <rectangle name="Fig2.4.0"
+        x="81"
+        y="45"
+        width="151"
+        height="61"
+        fill="1"
+        fillcolor="white"
+        stroke="0"
+        strokecolor="black"
+      />
+      <path name="Fig2.4.1"
+        description="org.argouml.uml.diagram.ui.FigEditableCompartment$FigSeperator"
+        fill="1"
+        fillcolor="white"
+        stroke="1"
+        strokecolor="black"
+      >
+        <moveto x="81"
+                y="45" />
+        <lineto x="232"
+                y="45" />
+      </path>
+      <text name="Fig2.4.2"
+        x="81"
+        y="46"
+        width="71"
+        height="16"
+        fill="0"
+        fillcolor="white"
+        stroke="0"
+        strokecolor="black"
+        textcolor="black"
+        font="Dialog"
+        italic="false"
+        bold="false"
+        textsize="10"
+        justification="Left"
+      >name : String</text>
+      <text name="Fig2.4.3"
+        x="81"
+        y="59"
+        width="65"
+        height="16"
+        fill="0"
+        fillcolor="white"
+        stroke="0"
+        strokecolor="black"
+        textcolor="black"
+        font="Dialog"
+        italic="false"
+        bold="false"
+        textsize="10"
+        justification="Left"
+      >type : String</text>
+      <text name="Fig2.4.4"
+        x="81"
+        y="72"
+        width="110"
+        height="16"
+        fill="0"
+        fillcolor="white"
+        stroke="0"
+        strokecolor="black"
+        textcolor="black"
+        font="Dialog"
+        italic="false"
+        bold="false"
+        textsize="10"
+        justification="Left"
+      >emailAddress : String</text>
+      <text name="Fig2.4.5"
+        x="81"
+        y="85"
+        width="108"
+        height="22"
+        fill="0"
+        fillcolor="white"
+        stroke="0"
+        strokecolor="black"
+        textcolor="black"
+        font="Dialog"
+        italic="false"
+        bold="false"
+        textsize="10"
+        justification="Left"
+      >activityStatus : String</text>
+    </group>
+    <rectangle name="Fig2.5"
+      x="80"
+      y="24"
+      width="152"
+      height="108"
+      fill="0"
+      fillcolor="white"
+      stroke="1"
+      strokecolor="black"
+    />
+  </group>
+  <group name="Fig3"
+       description="org.argouml.uml.diagram.ui.FigAssociation"
+       href="-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000013CB2"
+       stroke="1"
+       strokecolor="black"
+  >
+    <private>
+      sourcePortFig="Fig0.0"
+      destPortFig="Fig1.0"
+      sourceFigNode="Fig0"
+      destFigNode="Fig1"
+    </private>
+    <path name="Fig3.0"
+      description="org.argouml.gefext.ArgoFigPoly"
+      fill="0"
+      fillcolor="white"
+      stroke="1"
+      strokecolor="black"
+    >
+      <moveto x="264"
+              y="344" />
+      <lineto x="576"
+              y="344" />
+    </path>
+  </group>
+  <group name="Fig4"
+       description="org.argouml.uml.diagram.ui.FigAssociation"
+       href="-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000015A1D"
+       stroke="1"
+       strokecolor="black"
+  >
+    <private>
+      sourcePortFig="Fig2.0"
+      destPortFig="Fig0.0"
+      sourceFigNode="Fig2"
+      destFigNode="Fig0"
+    </private>
+    <path name="Fig4.0"
+      description="org.argouml.gefext.ArgoFigPoly"
+      fill="0"
+      fillcolor="white"
+      stroke="1"
+      strokecolor="black"
+    >
+      <moveto x="144"
+              y="132" />
+      <lineto x="144"
+              y="328" />
+    </path>
+  </group>
+  <group name="Fig5"
+       description="org.argouml.uml.diagram.ui.FigAssociation"
+       href="-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000015A26"
+       stroke="1"
+       strokecolor="black"
+  >
+    <private>
+      sourcePortFig="Fig2.0"
+      destPortFig="Fig1.0"
+      sourceFigNode="Fig2"
+      destFigNode="Fig1"
+    </private>
+    <path name="Fig5.0"
+      description="org.argouml.gefext.ArgoFigPoly"
+      fill="0"
+      fillcolor="white"
+      stroke="1"
+      strokecolor="black"
+    >
+      <moveto x="232"
+              y="132" />
+      <lineto x="576"
+              y="232" />
+    </path>
+  </group>
+</pgml>
+<todo>
+<todolist>
+</todolist>
+<resolvedcritics>
+</resolvedcritics>
+</todo>
+</uml>
