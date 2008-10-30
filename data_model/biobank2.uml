@@ -53,7 +53,7 @@
 			UML 1.4
 		</plugin>
 </profile>
-<XMI xmi.version = '1.2' xmlns:UML = 'org.omg.xmi.namespace.UML' timestamp = 'Thu Oct 30 14:04:09 MDT 2008'>
+<XMI xmi.version = '1.2' xmlns:UML = 'org.omg.xmi.namespace.UML' timestamp = 'Thu Oct 30 15:39:52 MDT 2008'>
   <XMI.header>    <XMI.documentation>
       <XMI.exporter>ArgoUML (using Netbeans XMI Writer version 1.0)</XMI.exporter>
       <XMI.exporterVersion>0.26(6) revised on $Date: 2007-05-12 08:08:08 +0200 (Sat, 12 May 2007) $ </XMI.exporterVersion>
@@ -70,9 +70,6 @@
             <UML:Package xmi.id = 'EAPK_6693F63C_DA3B_4a30_B5CD_EC5DEAC518E8' name = 'Data Model'
               visibility = 'public' isSpecification = 'false' isRoot = 'false' isLeaf = 'false'
               isAbstract = 'false'>
-              <UML:ModelElement.stereotype>
-                <UML:Stereotype xmi.idref = '-64--88-0-1-8238f4:115206c0709:-8000:0000000000000807'/>
-              </UML:ModelElement.stereotype>
               <UML:Namespace.ownedElement>
                 <UML:Package xmi.id = 'EAPK_13C2A393_A2C6_4d7c_9441_319ED9A21FBA' name = 'Diagrams'
                   visibility = 'public' isSpecification = 'false' isRoot = 'false' isLeaf = 'false'
@@ -81,10 +78,10 @@
                   name = 'USER' visibility = 'public' isSpecification = 'false' isRoot = 'false'
                   isLeaf = 'false' isAbstract = 'false' isActive = 'false'>
                   <UML:ModelElement.clientDependency>
-                    <UML:Dependency xmi.idref = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000716F'/>
+                    <UML:Dependency xmi.idref = '-127--128-23-33--7f5efc28:11d4f40695b:-8000:000000000000EBC6'/>
                   </UML:ModelElement.clientDependency>
                   <UML:ModelElement.stereotype>
-                    <UML:Stereotype xmi.idref = '-64--88-0-1-8238f4:115206c0709:-8000:0000000000000807'/>
+                    <UML:Stereotype xmi.idref = '-127--128-23-33--7f5efc28:11d4f40695b:-8000:000000000000C245'/>
                   </UML:ModelElement.stereotype>
                   <UML:Classifier.feature>
                     <UML:Attribute xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000008CC8'
@@ -98,6 +95,15 @@
                           </UML:Multiplicity.range>
                         </UML:Multiplicity>
                       </UML:StructuralFeature.multiplicity>
+                      <UML:ModelElement.taggedValue>
+                        <UML:TaggedValue xmi.id = '-127--128-23-33--7f5efc28:11d4f40695b:-8000:0000000000013695'
+                          isSpecification = 'false'>
+                          <UML:TaggedValue.dataValue>edu.ualberta.med.biobank.User.id</UML:TaggedValue.dataValue>
+                          <UML:TaggedValue.type>
+                            <UML:TagDefinition xmi.idref = '-64--88-1-107-8238f4:1121acba21f:-8000:0000000000003190'/>
+                          </UML:TaggedValue.type>
+                        </UML:TaggedValue>
+                      </UML:ModelElement.taggedValue>
                       <UML:StructuralFeature.type>
                         <UML:DataType xmi.idref = 'eaxmiid0'/>
                       </UML:StructuralFeature.type>
@@ -113,6 +119,15 @@
                           </UML:Multiplicity.range>
                         </UML:Multiplicity>
                       </UML:StructuralFeature.multiplicity>
+                      <UML:ModelElement.taggedValue>
+                        <UML:TaggedValue xmi.id = '-127--128-23-33--7f5efc28:11d4f40695b:-8000:0000000000013694'
+                          isSpecification = 'false'>
+                          <UML:TaggedValue.dataValue>edu.ualberta.med.biobank.User.emailAddress</UML:TaggedValue.dataValue>
+                          <UML:TaggedValue.type>
+                            <UML:TagDefinition xmi.idref = '-64--88-1-107-8238f4:1121acba21f:-8000:0000000000003190'/>
+                          </UML:TaggedValue.type>
+                        </UML:TaggedValue>
+                      </UML:ModelElement.taggedValue>
                       <UML:StructuralFeature.type>
                         <UML:DataType xmi.idref = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000008CD0'/>
                       </UML:StructuralFeature.type>
@@ -128,6 +143,15 @@
                           </UML:Multiplicity.range>
                         </UML:Multiplicity>
                       </UML:StructuralFeature.multiplicity>
+                      <UML:ModelElement.taggedValue>
+                        <UML:TaggedValue xmi.id = '-127--128-23-33--7f5efc28:11d4f40695b:-8000:0000000000013696'
+                          isSpecification = 'false'>
+                          <UML:TaggedValue.dataValue>edu.ualberta.med.biobank.User.password</UML:TaggedValue.dataValue>
+                          <UML:TaggedValue.type>
+                            <UML:TagDefinition xmi.idref = '-64--88-1-107-8238f4:1121acba21f:-8000:0000000000003190'/>
+                          </UML:TaggedValue.type>
+                        </UML:TaggedValue>
+                      </UML:ModelElement.taggedValue>
                       <UML:StructuralFeature.type>
                         <UML:DataType xmi.idref = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000009A88'/>
                       </UML:StructuralFeature.type>
@@ -158,6 +182,15 @@
                           </UML:Multiplicity.range>
                         </UML:Multiplicity>
                       </UML:StructuralFeature.multiplicity>
+                      <UML:ModelElement.taggedValue>
+                        <UML:TaggedValue xmi.id = '-127--128-23-33--7f5efc28:11d4f40695b:-8000:0000000000013697'
+                          isSpecification = 'false'>
+                          <UML:TaggedValue.dataValue>edu.ualberta.med.biobank.User.firstName</UML:TaggedValue.dataValue>
+                          <UML:TaggedValue.type>
+                            <UML:TagDefinition xmi.idref = '-64--88-1-107-8238f4:1121acba21f:-8000:0000000000003190'/>
+                          </UML:TaggedValue.type>
+                        </UML:TaggedValue>
+                      </UML:ModelElement.taggedValue>
                       <UML:StructuralFeature.type>
                         <UML:DataType xmi.idref = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000009A88'/>
                       </UML:StructuralFeature.type>
@@ -173,6 +206,15 @@
                           </UML:Multiplicity.range>
                         </UML:Multiplicity>
                       </UML:StructuralFeature.multiplicity>
+                      <UML:ModelElement.taggedValue>
+                        <UML:TaggedValue xmi.id = '-127--128-23-33--7f5efc28:11d4f40695b:-8000:0000000000013698'
+                          isSpecification = 'false'>
+                          <UML:TaggedValue.dataValue>edu.ualberta.med.biobank.User.lastName</UML:TaggedValue.dataValue>
+                          <UML:TaggedValue.type>
+                            <UML:TagDefinition xmi.idref = '-64--88-1-107-8238f4:1121acba21f:-8000:0000000000003190'/>
+                          </UML:TaggedValue.type>
+                        </UML:TaggedValue>
+                      </UML:ModelElement.taggedValue>
                       <UML:StructuralFeature.type>
                         <UML:DataType xmi.idref = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000009A88'/>
                       </UML:StructuralFeature.type>
@@ -188,6 +230,15 @@
                           </UML:Multiplicity.range>
                         </UML:Multiplicity>
                       </UML:StructuralFeature.multiplicity>
+                      <UML:ModelElement.taggedValue>
+                        <UML:TaggedValue xmi.id = '-127--128-23-33--7f5efc28:11d4f40695b:-8000:0000000000013699'
+                          isSpecification = 'false'>
+                          <UML:TaggedValue.dataValue>edu.ualberta.med.biobank.User.loginName</UML:TaggedValue.dataValue>
+                          <UML:TaggedValue.type>
+                            <UML:TagDefinition xmi.idref = '-64--88-1-107-8238f4:1121acba21f:-8000:0000000000003190'/>
+                          </UML:TaggedValue.type>
+                        </UML:TaggedValue>
+                      </UML:ModelElement.taggedValue>
                       <UML:StructuralFeature.type>
                         <UML:DataType xmi.idref = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000009A88'/>
                       </UML:StructuralFeature.type>
@@ -203,6 +254,15 @@
                           </UML:Multiplicity.range>
                         </UML:Multiplicity>
                       </UML:StructuralFeature.multiplicity>
+                      <UML:ModelElement.taggedValue>
+                        <UML:TaggedValue xmi.id = '-127--128-23-33--7f5efc28:11d4f40695b:-8000:000000000001369A'
+                          isSpecification = 'false'>
+                          <UML:TaggedValue.dataValue>edu.ualberta.med.biobank.User.startDate</UML:TaggedValue.dataValue>
+                          <UML:TaggedValue.type>
+                            <UML:TagDefinition xmi.idref = '-64--88-1-107-8238f4:1121acba21f:-8000:0000000000003190'/>
+                          </UML:TaggedValue.type>
+                        </UML:TaggedValue>
+                      </UML:ModelElement.taggedValue>
                       <UML:StructuralFeature.type>
                         <UML:DataType xmi.idref = 'eaxmiid4'/>
                       </UML:StructuralFeature.type>
@@ -218,6 +278,15 @@
                           </UML:Multiplicity.range>
                         </UML:Multiplicity>
                       </UML:StructuralFeature.multiplicity>
+                      <UML:ModelElement.taggedValue>
+                        <UML:TaggedValue xmi.id = '-127--128-23-33--7f5efc28:11d4f40695b:-8000:000000000001369B'
+                          isSpecification = 'false'>
+                          <UML:TaggedValue.dataValue>edu.ualberta.med.biobank.User.activityStatus</UML:TaggedValue.dataValue>
+                          <UML:TaggedValue.type>
+                            <UML:TagDefinition xmi.idref = '-64--88-1-107-8238f4:1121acba21f:-8000:0000000000003190'/>
+                          </UML:TaggedValue.type>
+                        </UML:TaggedValue>
+                      </UML:ModelElement.taggedValue>
                       <UML:StructuralFeature.type>
                         <UML:DataType xmi.idref = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000009A88'/>
                       </UML:StructuralFeature.type>
@@ -233,6 +302,15 @@
                           </UML:Multiplicity.range>
                         </UML:Multiplicity>
                       </UML:StructuralFeature.multiplicity>
+                      <UML:ModelElement.taggedValue>
+                        <UML:TaggedValue xmi.id = '-127--128-23-33--7f5efc28:11d4f40695b:-8000:000000000001369C'
+                          isSpecification = 'false'>
+                          <UML:TaggedValue.dataValue>edu.ualberta.med.biobank.User.department</UML:TaggedValue.dataValue>
+                          <UML:TaggedValue.type>
+                            <UML:TagDefinition xmi.idref = '-64--88-0-1-19a32e0:1151feda71c:-8000:000000000000100B'/>
+                          </UML:TaggedValue.type>
+                        </UML:TaggedValue>
+                      </UML:ModelElement.taggedValue>
                       <UML:StructuralFeature.type>
                         <UML:DataType xmi.idref = 'eaxmiid0'/>
                       </UML:StructuralFeature.type>
@@ -248,6 +326,15 @@
                           </UML:Multiplicity.range>
                         </UML:Multiplicity>
                       </UML:StructuralFeature.multiplicity>
+                      <UML:ModelElement.taggedValue>
+                        <UML:TaggedValue xmi.id = '-127--128-23-33--7f5efc28:11d4f40695b:-8000:000000000001369D'
+                          isSpecification = 'false'>
+                          <UML:TaggedValue.dataValue>edu.ualberta.med.biobank.User.researchGroup</UML:TaggedValue.dataValue>
+                          <UML:TaggedValue.type>
+                            <UML:TagDefinition xmi.idref = '-64--88-0-1-19a32e0:1151feda71c:-8000:000000000000100B'/>
+                          </UML:TaggedValue.type>
+                        </UML:TaggedValue>
+                      </UML:ModelElement.taggedValue>
                       <UML:StructuralFeature.type>
                         <UML:DataType xmi.idref = 'eaxmiid0'/>
                       </UML:StructuralFeature.type>
@@ -263,6 +350,15 @@
                           </UML:Multiplicity.range>
                         </UML:Multiplicity>
                       </UML:StructuralFeature.multiplicity>
+                      <UML:ModelElement.taggedValue>
+                        <UML:TaggedValue xmi.id = '-127--128-23-33--7f5efc28:11d4f40695b:-8000:000000000001369E'
+                          isSpecification = 'false'>
+                          <UML:TaggedValue.dataValue>edu.ualberta.med.biobank.User.institution</UML:TaggedValue.dataValue>
+                          <UML:TaggedValue.type>
+                            <UML:TagDefinition xmi.idref = '-64--88-0-1-19a32e0:1151feda71c:-8000:000000000000100B'/>
+                          </UML:TaggedValue.type>
+                        </UML:TaggedValue>
+                      </UML:ModelElement.taggedValue>
                       <UML:StructuralFeature.type>
                         <UML:DataType xmi.idref = 'eaxmiid0'/>
                       </UML:StructuralFeature.type>
@@ -278,6 +374,15 @@
                           </UML:Multiplicity.range>
                         </UML:Multiplicity>
                       </UML:StructuralFeature.multiplicity>
+                      <UML:ModelElement.taggedValue>
+                        <UML:TaggedValue xmi.id = '-127--128-23-33--7f5efc28:11d4f40695b:-8000:000000000001369F'
+                          isSpecification = 'false'>
+                          <UML:TaggedValue.dataValue>edu.ualberta.med.biobank.User.address</UML:TaggedValue.dataValue>
+                          <UML:TaggedValue.type>
+                            <UML:TagDefinition xmi.idref = '-64--88-0-1-19a32e0:1151feda71c:-8000:000000000000100B'/>
+                          </UML:TaggedValue.type>
+                        </UML:TaggedValue>
+                      </UML:ModelElement.taggedValue>
                       <UML:StructuralFeature.type>
                         <UML:DataType xmi.idref = 'eaxmiid0'/>
                       </UML:StructuralFeature.type>
@@ -293,6 +398,15 @@
                           </UML:Multiplicity.range>
                         </UML:Multiplicity>
                       </UML:StructuralFeature.multiplicity>
+                      <UML:ModelElement.taggedValue>
+                        <UML:TaggedValue xmi.id = '-127--128-23-33--7f5efc28:11d4f40695b:-8000:00000000000136A0'
+                          isSpecification = 'false'>
+                          <UML:TaggedValue.dataValue>edu.ualberta.med.biobank.User.csmUser</UML:TaggedValue.dataValue>
+                          <UML:TaggedValue.type>
+                            <UML:TagDefinition xmi.idref = '-64--88-0-1-19a32e0:1151feda71c:-8000:000000000000100B'/>
+                          </UML:TaggedValue.type>
+                        </UML:TaggedValue>
+                      </UML:ModelElement.taggedValue>
                       <UML:StructuralFeature.type>
                         <UML:DataType xmi.idref = 'eaxmiid0'/>
                       </UML:StructuralFeature.type>
@@ -308,6 +422,15 @@
                           </UML:Multiplicity.range>
                         </UML:Multiplicity>
                       </UML:StructuralFeature.multiplicity>
+                      <UML:ModelElement.taggedValue>
+                        <UML:TaggedValue xmi.id = '-127--128-23-33--7f5efc28:11d4f40695b:-8000:00000000000136A1'
+                          isSpecification = 'false'>
+                          <UML:TaggedValue.dataValue></UML:TaggedValue.dataValue>
+                          <UML:TaggedValue.type>
+                            <UML:TagDefinition xmi.idref = '-64--88-1-107-8238f4:1121acba21f:-8000:0000000000003190'/>
+                          </UML:TaggedValue.type>
+                        </UML:TaggedValue>
+                      </UML:ModelElement.taggedValue>
                       <UML:StructuralFeature.type>
                         <UML:DataType xmi.idref = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000C517'/>
                       </UML:StructuralFeature.type>
@@ -344,37 +467,15 @@
                     </UML:Operation>
                   </UML:Classifier.feature>
                 </UML:Class>
-                <UML:Dependency xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000716F'
-                  name = 'USER -&gt; User' isSpecification = 'false'>
-                  <UML:Dependency.client>
-                    <UML:Class xmi.idref = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000003991'/>
-                    <UML:Class xmi.idref = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000001CF4'/>
-                  </UML:Dependency.client>
-                  <UML:Dependency.supplier>
-                    <UML:Class xmi.idref = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000001CF4'/>
-                  </UML:Dependency.supplier>
-                </UML:Dependency>
                 <UML:Class xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000D332'
                   name = 'SITE' visibility = 'public' isSpecification = 'false' isRoot = 'false'
                   isLeaf = 'false' isAbstract = 'false' isActive = 'false'>
                   <UML:ModelElement.clientDependency>
-                    <UML:Dependency xmi.idref = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000D34E'/>
+                    <UML:Dependency xmi.idref = '-127--128-23-33--7f5efc28:11d4f40695b:-8000:0000000000005EB5'/>
                   </UML:ModelElement.clientDependency>
                   <UML:ModelElement.stereotype>
-                    <UML:Stereotype xmi.idref = '-64--88-0-1-8238f4:115206c0709:-8000:0000000000000807'/>
+                    <UML:Stereotype xmi.idref = '-127--128-23-33--7f5efc28:11d4f40695b:-8000:000000000000C245'/>
                   </UML:ModelElement.stereotype>
-                  <UML:Namespace.ownedElement>
-                    <UML:Dependency xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000D34E'
-                      name = 'SITE -&gt; Site' isSpecification = 'false'>
-                      <UML:Dependency.client>
-                        <UML:Class xmi.idref = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000D332'/>
-                        <UML:Class xmi.idref = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000D34D'/>
-                      </UML:Dependency.client>
-                      <UML:Dependency.supplier>
-                        <UML:Class xmi.idref = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000D34D'/>
-                      </UML:Dependency.supplier>
-                    </UML:Dependency>
-                  </UML:Namespace.ownedElement>
                   <UML:Classifier.feature>
                     <UML:Attribute xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000D333'
                       name = 'ID' visibility = 'public' isSpecification = 'false' ownerScope = 'instance'
@@ -387,6 +488,15 @@
                           </UML:Multiplicity.range>
                         </UML:Multiplicity>
                       </UML:StructuralFeature.multiplicity>
+                      <UML:ModelElement.taggedValue>
+                        <UML:TaggedValue xmi.id = '-127--128-23-33--7f5efc28:11d4f40695b:-8000:000000000001368A'
+                          isSpecification = 'false'>
+                          <UML:TaggedValue.dataValue>edu.ualberta.med.biobank.Site.id</UML:TaggedValue.dataValue>
+                          <UML:TaggedValue.type>
+                            <UML:TagDefinition xmi.idref = '-64--88-1-107-8238f4:1121acba21f:-8000:0000000000003190'/>
+                          </UML:TaggedValue.type>
+                        </UML:TaggedValue>
+                      </UML:ModelElement.taggedValue>
                       <UML:StructuralFeature.type>
                         <UML:DataType xmi.idref = 'eaxmiid0'/>
                       </UML:StructuralFeature.type>
@@ -402,6 +512,15 @@
                           </UML:Multiplicity.range>
                         </UML:Multiplicity>
                       </UML:StructuralFeature.multiplicity>
+                      <UML:ModelElement.taggedValue>
+                        <UML:TaggedValue xmi.id = '-127--128-23-33--7f5efc28:11d4f40695b:-8000:00000000000108C9'
+                          isSpecification = 'false'>
+                          <UML:TaggedValue.dataValue>edu.ualberta.med.biobank.Site.name</UML:TaggedValue.dataValue>
+                          <UML:TaggedValue.type>
+                            <UML:TagDefinition xmi.idref = '-64--88-1-107-8238f4:1121acba21f:-8000:0000000000003190'/>
+                          </UML:TaggedValue.type>
+                        </UML:TaggedValue>
+                      </UML:ModelElement.taggedValue>
                       <UML:StructuralFeature.type>
                         <UML:DataType xmi.idref = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000D34F'/>
                       </UML:StructuralFeature.type>
@@ -417,6 +536,15 @@
                           </UML:Multiplicity.range>
                         </UML:Multiplicity>
                       </UML:StructuralFeature.multiplicity>
+                      <UML:ModelElement.taggedValue>
+                        <UML:TaggedValue xmi.id = '-127--128-23-33--7f5efc28:11d4f40695b:-8000:000000000001174E'
+                          isSpecification = 'false'>
+                          <UML:TaggedValue.dataValue>edu.ualberta.med.biobank.Site.type</UML:TaggedValue.dataValue>
+                          <UML:TaggedValue.type>
+                            <UML:TagDefinition xmi.idref = '-64--88-1-107-8238f4:1121acba21f:-8000:0000000000003190'/>
+                          </UML:TaggedValue.type>
+                        </UML:TaggedValue>
+                      </UML:ModelElement.taggedValue>
                       <UML:StructuralFeature.type>
                         <UML:DataType xmi.idref = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000009A88'/>
                       </UML:StructuralFeature.type>
@@ -432,6 +560,15 @@
                           </UML:Multiplicity.range>
                         </UML:Multiplicity>
                       </UML:StructuralFeature.multiplicity>
+                      <UML:ModelElement.taggedValue>
+                        <UML:TaggedValue xmi.id = '-127--128-23-33--7f5efc28:11d4f40695b:-8000:000000000001174D'
+                          isSpecification = 'false'>
+                          <UML:TaggedValue.dataValue>edu.ualberta.med.biobank.Site.emailAddress</UML:TaggedValue.dataValue>
+                          <UML:TaggedValue.type>
+                            <UML:TagDefinition xmi.idref = '-64--88-1-107-8238f4:1121acba21f:-8000:0000000000003190'/>
+                          </UML:TaggedValue.type>
+                        </UML:TaggedValue>
+                      </UML:ModelElement.taggedValue>
                       <UML:StructuralFeature.type>
                         <UML:DataType xmi.idref = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000D34F'/>
                       </UML:StructuralFeature.type>
@@ -447,6 +584,15 @@
                           </UML:Multiplicity.range>
                         </UML:Multiplicity>
                       </UML:StructuralFeature.multiplicity>
+                      <UML:ModelElement.taggedValue>
+                        <UML:TaggedValue xmi.id = '-127--128-23-33--7f5efc28:11d4f40695b:-8000:000000000001174F'
+                          isSpecification = 'false'>
+                          <UML:TaggedValue.dataValue>edu.ualberta.med.biobank.Site.activityStatus</UML:TaggedValue.dataValue>
+                          <UML:TaggedValue.type>
+                            <UML:TagDefinition xmi.idref = '-64--88-1-107-8238f4:1121acba21f:-8000:0000000000003190'/>
+                          </UML:TaggedValue.type>
+                        </UML:TaggedValue>
+                      </UML:ModelElement.taggedValue>
                       <UML:StructuralFeature.type>
                         <UML:DataType xmi.idref = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000009A88'/>
                       </UML:StructuralFeature.type>
@@ -462,6 +608,15 @@
                           </UML:Multiplicity.range>
                         </UML:Multiplicity>
                       </UML:StructuralFeature.multiplicity>
+                      <UML:ModelElement.taggedValue>
+                        <UML:TaggedValue xmi.id = '-127--128-23-33--7f5efc28:11d4f40695b:-8000:0000000000011751'
+                          isSpecification = 'false'>
+                          <UML:TaggedValue.dataValue>edu.ualberta.med.biobank.Site.users</UML:TaggedValue.dataValue>
+                          <UML:TaggedValue.type>
+                            <UML:TagDefinition xmi.idref = '-64--88-0-1-19a32e0:1151feda71c:-8000:000000000000100B'/>
+                          </UML:TaggedValue.type>
+                        </UML:TaggedValue>
+                      </UML:ModelElement.taggedValue>
                       <UML:StructuralFeature.type>
                         <UML:DataType xmi.idref = 'eaxmiid0'/>
                       </UML:StructuralFeature.type>
@@ -477,6 +632,15 @@
                           </UML:Multiplicity.range>
                         </UML:Multiplicity>
                       </UML:StructuralFeature.multiplicity>
+                      <UML:ModelElement.taggedValue>
+                        <UML:TaggedValue xmi.id = '-127--128-23-33--7f5efc28:11d4f40695b:-8000:0000000000011752'
+                          isSpecification = 'false'>
+                          <UML:TaggedValue.dataValue>edu.ualberta.med.biobank.Site.address</UML:TaggedValue.dataValue>
+                          <UML:TaggedValue.type>
+                            <UML:TagDefinition xmi.idref = '-64--88-0-1-19a32e0:1151feda71c:-8000:000000000000100B'/>
+                          </UML:TaggedValue.type>
+                        </UML:TaggedValue>
+                      </UML:ModelElement.taggedValue>
                       <UML:StructuralFeature.type>
                         <UML:DataType xmi.idref = 'eaxmiid0'/>
                       </UML:StructuralFeature.type>
@@ -605,7 +769,7 @@
                   isAbstract = 'false'>
                   <UML:Association.connection>
                     <UML:AssociationEnd xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000F3FB'
-                      name = 'FK_ADDRESS_ID' visibility = 'public' isSpecification = 'false' isNavigable = 'true'
+                      name = 'FK_ADDRESS_ID' visibility = 'public' isSpecification = 'false' isNavigable = 'false'
                       ordering = 'unordered' aggregation = 'none' targetScope = 'instance' changeability = 'changeable'>
                       <UML:AssociationEnd.multiplicity>
                         <UML:Multiplicity xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000F402'>
@@ -643,19 +807,8 @@
                     <UML:Dependency xmi.idref = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000013C90'/>
                   </UML:ModelElement.clientDependency>
                   <UML:ModelElement.stereotype>
-                    <UML:Stereotype xmi.idref = '-64--88-0-1-8238f4:115206c0709:-8000:0000000000000807'/>
+                    <UML:Stereotype xmi.idref = '-127--128-23-33--7f5efc28:11d4f40695b:-8000:000000000000C245'/>
                   </UML:ModelElement.stereotype>
-                  <UML:Namespace.ownedElement>
-                    <UML:Dependency xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000013C90'
-                      name = 'ADDRESS -&gt; Address' isSpecification = 'false'>
-                      <UML:Dependency.client>
-                        <UML:Class xmi.idref = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000D350'/>
-                      </UML:Dependency.client>
-                      <UML:Dependency.supplier>
-                        <UML:Class xmi.idref = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000010279'/>
-                      </UML:Dependency.supplier>
-                    </UML:Dependency>
-                  </UML:Namespace.ownedElement>
                   <UML:Classifier.feature>
                     <UML:Attribute xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000D351'
                       name = 'ID' visibility = 'public' isSpecification = 'false' ownerScope = 'instance'
@@ -668,6 +821,15 @@
                           </UML:Multiplicity.range>
                         </UML:Multiplicity>
                       </UML:StructuralFeature.multiplicity>
+                      <UML:ModelElement.taggedValue>
+                        <UML:TaggedValue xmi.id = '-127--128-23-33--7f5efc28:11d4f40695b:-8000:000000000001368C'
+                          isSpecification = 'false'>
+                          <UML:TaggedValue.dataValue>edu.ualberta.med.biobank.Address.id</UML:TaggedValue.dataValue>
+                          <UML:TaggedValue.type>
+                            <UML:TagDefinition xmi.idref = '-64--88-1-107-8238f4:1121acba21f:-8000:0000000000003190'/>
+                          </UML:TaggedValue.type>
+                        </UML:TaggedValue>
+                      </UML:ModelElement.taggedValue>
                       <UML:StructuralFeature.type>
                         <UML:DataType xmi.idref = 'eaxmiid0'/>
                       </UML:StructuralFeature.type>
@@ -683,6 +845,15 @@
                           </UML:Multiplicity.range>
                         </UML:Multiplicity>
                       </UML:StructuralFeature.multiplicity>
+                      <UML:ModelElement.taggedValue>
+                        <UML:TaggedValue xmi.id = '-127--128-23-33--7f5efc28:11d4f40695b:-8000:000000000001368D'
+                          isSpecification = 'false'>
+                          <UML:TaggedValue.dataValue>edu.ualberta.med.biobank.Address.street</UML:TaggedValue.dataValue>
+                          <UML:TaggedValue.type>
+                            <UML:TagDefinition xmi.idref = '-64--88-1-107-8238f4:1121acba21f:-8000:0000000000003190'/>
+                          </UML:TaggedValue.type>
+                        </UML:TaggedValue>
+                      </UML:ModelElement.taggedValue>
                       <UML:StructuralFeature.type>
                         <UML:DataType xmi.idref = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000D34F'/>
                       </UML:StructuralFeature.type>
@@ -698,6 +869,15 @@
                           </UML:Multiplicity.range>
                         </UML:Multiplicity>
                       </UML:StructuralFeature.multiplicity>
+                      <UML:ModelElement.taggedValue>
+                        <UML:TaggedValue xmi.id = '-127--128-23-33--7f5efc28:11d4f40695b:-8000:000000000001368E'
+                          isSpecification = 'false'>
+                          <UML:TaggedValue.dataValue>edu.ualberta.med.biobank.Address.city</UML:TaggedValue.dataValue>
+                          <UML:TaggedValue.type>
+                            <UML:TagDefinition xmi.idref = '-64--88-1-107-8238f4:1121acba21f:-8000:0000000000003190'/>
+                          </UML:TaggedValue.type>
+                        </UML:TaggedValue>
+                      </UML:ModelElement.taggedValue>
                       <UML:StructuralFeature.type>
                         <UML:DataType xmi.idref = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000009A88'/>
                       </UML:StructuralFeature.type>
@@ -713,6 +893,15 @@
                           </UML:Multiplicity.range>
                         </UML:Multiplicity>
                       </UML:StructuralFeature.multiplicity>
+                      <UML:ModelElement.taggedValue>
+                        <UML:TaggedValue xmi.id = '-127--128-23-33--7f5efc28:11d4f40695b:-8000:000000000001368F'
+                          isSpecification = 'false'>
+                          <UML:TaggedValue.dataValue>edu.ualberta.med.biobank.Address.province</UML:TaggedValue.dataValue>
+                          <UML:TaggedValue.type>
+                            <UML:TagDefinition xmi.idref = '-64--88-1-107-8238f4:1121acba21f:-8000:0000000000003190'/>
+                          </UML:TaggedValue.type>
+                        </UML:TaggedValue>
+                      </UML:ModelElement.taggedValue>
                       <UML:StructuralFeature.type>
                         <UML:DataType xmi.idref = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000009A88'/>
                       </UML:StructuralFeature.type>
@@ -728,6 +917,15 @@
                           </UML:Multiplicity.range>
                         </UML:Multiplicity>
                       </UML:StructuralFeature.multiplicity>
+                      <UML:ModelElement.taggedValue>
+                        <UML:TaggedValue xmi.id = '-127--128-23-33--7f5efc28:11d4f40695b:-8000:0000000000013690'
+                          isSpecification = 'false'>
+                          <UML:TaggedValue.dataValue>edu.ualberta.med.biobank.Address.country</UML:TaggedValue.dataValue>
+                          <UML:TaggedValue.type>
+                            <UML:TagDefinition xmi.idref = '-64--88-1-107-8238f4:1121acba21f:-8000:0000000000003190'/>
+                          </UML:TaggedValue.type>
+                        </UML:TaggedValue>
+                      </UML:ModelElement.taggedValue>
                       <UML:StructuralFeature.type>
                         <UML:DataType xmi.idref = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000009A88'/>
                       </UML:StructuralFeature.type>
@@ -743,6 +941,15 @@
                           </UML:Multiplicity.range>
                         </UML:Multiplicity>
                       </UML:StructuralFeature.multiplicity>
+                      <UML:ModelElement.taggedValue>
+                        <UML:TaggedValue xmi.id = '-127--128-23-33--7f5efc28:11d4f40695b:-8000:0000000000013691'
+                          isSpecification = 'false'>
+                          <UML:TaggedValue.dataValue>edu.ualberta.med.biobank.Address.postalCode</UML:TaggedValue.dataValue>
+                          <UML:TaggedValue.type>
+                            <UML:TagDefinition xmi.idref = '-64--88-1-107-8238f4:1121acba21f:-8000:0000000000003190'/>
+                          </UML:TaggedValue.type>
+                        </UML:TaggedValue>
+                      </UML:ModelElement.taggedValue>
                       <UML:StructuralFeature.type>
                         <UML:DataType xmi.idref = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000009A88'/>
                       </UML:StructuralFeature.type>
@@ -758,6 +965,15 @@
                           </UML:Multiplicity.range>
                         </UML:Multiplicity>
                       </UML:StructuralFeature.multiplicity>
+                      <UML:ModelElement.taggedValue>
+                        <UML:TaggedValue xmi.id = '-127--128-23-33--7f5efc28:11d4f40695b:-8000:0000000000013692'
+                          isSpecification = 'false'>
+                          <UML:TaggedValue.dataValue>edu.ualberta.med.biobank.Address.telephoneNumber</UML:TaggedValue.dataValue>
+                          <UML:TaggedValue.type>
+                            <UML:TagDefinition xmi.idref = '-64--88-1-107-8238f4:1121acba21f:-8000:0000000000003190'/>
+                          </UML:TaggedValue.type>
+                        </UML:TaggedValue>
+                      </UML:ModelElement.taggedValue>
                       <UML:StructuralFeature.type>
                         <UML:DataType xmi.idref = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000009A88'/>
                       </UML:StructuralFeature.type>
@@ -773,6 +989,15 @@
                           </UML:Multiplicity.range>
                         </UML:Multiplicity>
                       </UML:StructuralFeature.multiplicity>
+                      <UML:ModelElement.taggedValue>
+                        <UML:TaggedValue xmi.id = '-127--128-23-33--7f5efc28:11d4f40695b:-8000:0000000000013693'
+                          isSpecification = 'false'>
+                          <UML:TaggedValue.dataValue>edu.ualberta.med.biobank.Address.faxNumber</UML:TaggedValue.dataValue>
+                          <UML:TaggedValue.type>
+                            <UML:TagDefinition xmi.idref = '-64--88-1-107-8238f4:1121acba21f:-8000:0000000000003190'/>
+                          </UML:TaggedValue.type>
+                        </UML:TaggedValue>
+                      </UML:ModelElement.taggedValue>
                       <UML:StructuralFeature.type>
                         <UML:DataType xmi.idref = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000009A88'/>
                       </UML:StructuralFeature.type>
@@ -794,6 +1019,42 @@
                     </UML:Operation>
                   </UML:Classifier.feature>
                 </UML:Class>
+                <UML:Dependency xmi.id = '-127--128-23-33--7f5efc28:11d4f40695b:-8000:0000000000005EB5'
+                  name = 'SITE -&gt; Site' isSpecification = 'false'>
+                  <UML:ModelElement.stereotype>
+                    <UML:Stereotype xmi.idref = '-127--128-23-33--7f5efc28:11d4f40695b:-8000:000000000000EBC4'/>
+                  </UML:ModelElement.stereotype>
+                  <UML:Dependency.client>
+                    <UML:Class xmi.idref = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000D332'/>
+                  </UML:Dependency.client>
+                  <UML:Dependency.supplier>
+                    <UML:Class xmi.idref = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000D34D'/>
+                  </UML:Dependency.supplier>
+                </UML:Dependency>
+                <UML:Dependency xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000013C90'
+                  name = 'ADDRESS -&gt; Address' isSpecification = 'false'>
+                  <UML:ModelElement.stereotype>
+                    <UML:Stereotype xmi.idref = '-127--128-23-33--7f5efc28:11d4f40695b:-8000:000000000000EBC4'/>
+                  </UML:ModelElement.stereotype>
+                  <UML:Dependency.client>
+                    <UML:Class xmi.idref = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000D350'/>
+                  </UML:Dependency.client>
+                  <UML:Dependency.supplier>
+                    <UML:Class xmi.idref = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000010279'/>
+                  </UML:Dependency.supplier>
+                </UML:Dependency>
+                <UML:Dependency xmi.id = '-127--128-23-33--7f5efc28:11d4f40695b:-8000:000000000000EBC6'
+                  name = 'USER -&gt; User' isSpecification = 'false'>
+                  <UML:ModelElement.stereotype>
+                    <UML:Stereotype xmi.idref = '-127--128-23-33--7f5efc28:11d4f40695b:-8000:000000000000EBC4'/>
+                  </UML:ModelElement.stereotype>
+                  <UML:Dependency.client>
+                    <UML:Class xmi.idref = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000003991'/>
+                  </UML:Dependency.client>
+                  <UML:Dependency.supplier>
+                    <UML:Class xmi.idref = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000001CF4'/>
+                  </UML:Dependency.supplier>
+                </UML:Dependency>
               </UML:Namespace.ownedElement>
             </UML:Package>
             <UML:Package xmi.id = 'EAPK_6A1F7B6A_C113_44b4_85DC_AC4BBBA11077' name = 'Logical Model'
@@ -858,12 +1119,24 @@
                                 <UML:Class xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000001CF4'
                                   name = 'User' visibility = 'public' isSpecification = 'false' isRoot = 'false'
                                   isLeaf = 'false' isAbstract = 'false' isActive = 'false'>
-                                  <UML:ModelElement.clientDependency>
-                                    <UML:Dependency xmi.idref = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000716F'/>
-                                  </UML:ModelElement.clientDependency>
                                   <UML:Classifier.feature>
+                                    <UML:Attribute xmi.id = '-127--128-23-33--7f5efc28:11d4f40695b:-8000:0000000000013466'
+                                      name = 'id' visibility = 'private' isSpecification = 'false' ownerScope = 'instance'
+                                      changeability = 'changeable' targetScope = 'instance'>
+                                      <UML:StructuralFeature.multiplicity>
+                                        <UML:Multiplicity xmi.id = '-127--128-23-33--7f5efc28:11d4f40695b:-8000:0000000000013467'>
+                                          <UML:Multiplicity.range>
+                                            <UML:MultiplicityRange xmi.id = '-127--128-23-33--7f5efc28:11d4f40695b:-8000:0000000000013468'
+                                              lower = '1' upper = '1'/>
+                                          </UML:Multiplicity.range>
+                                        </UML:Multiplicity>
+                                      </UML:StructuralFeature.multiplicity>
+                                      <UML:StructuralFeature.type>
+                                        <UML:Class xmi.idref = 'EAID_61D84993_837B_48c3_9F63_E3020F52FA13'/>
+                                      </UML:StructuralFeature.type>
+                                    </UML:Attribute>
                                     <UML:Attribute xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000001027A'
-                                      name = 'emailAddress' visibility = 'public' isSpecification = 'false' ownerScope = 'instance'
+                                      name = 'emailAddress' visibility = 'private' isSpecification = 'false' ownerScope = 'instance'
                                       changeability = 'changeable' targetScope = 'instance'>
                                       <UML:StructuralFeature.multiplicity>
                                         <UML:Multiplicity xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000001027B'>
@@ -878,7 +1151,7 @@
                                       </UML:StructuralFeature.type>
                                     </UML:Attribute>
                                     <UML:Attribute xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000001027D'
-                                      name = 'password' visibility = 'public' isSpecification = 'false' ownerScope = 'instance'
+                                      name = 'password' visibility = 'private' isSpecification = 'false' ownerScope = 'instance'
                                       changeability = 'changeable' targetScope = 'instance'>
                                       <UML:StructuralFeature.multiplicity>
                                         <UML:Multiplicity xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000001027E'>
@@ -893,7 +1166,7 @@
                                       </UML:StructuralFeature.type>
                                     </UML:Attribute>
                                     <UML:Attribute xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000010280'
-                                      name = 'firstName' visibility = 'public' isSpecification = 'false' ownerScope = 'instance'
+                                      name = 'firstName' visibility = 'private' isSpecification = 'false' ownerScope = 'instance'
                                       changeability = 'changeable' targetScope = 'instance'>
                                       <UML:StructuralFeature.multiplicity>
                                         <UML:Multiplicity xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000010281'>
@@ -908,7 +1181,7 @@
                                       </UML:StructuralFeature.type>
                                     </UML:Attribute>
                                     <UML:Attribute xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000010283'
-                                      name = 'lastName' visibility = 'public' isSpecification = 'false' ownerScope = 'instance'
+                                      name = 'lastName' visibility = 'private' isSpecification = 'false' ownerScope = 'instance'
                                       changeability = 'changeable' targetScope = 'instance'>
                                       <UML:StructuralFeature.multiplicity>
                                         <UML:Multiplicity xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000010284'>
@@ -923,7 +1196,7 @@
                                       </UML:StructuralFeature.type>
                                     </UML:Attribute>
                                     <UML:Attribute xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000013C87'
-                                      name = 'loginName' visibility = 'public' isSpecification = 'false' ownerScope = 'instance'
+                                      name = 'loginName' visibility = 'private' isSpecification = 'false' ownerScope = 'instance'
                                       changeability = 'changeable' targetScope = 'instance'>
                                       <UML:StructuralFeature.multiplicity>
                                         <UML:Multiplicity xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000013C88'>
@@ -938,7 +1211,7 @@
                                       </UML:StructuralFeature.type>
                                     </UML:Attribute>
                                     <UML:Attribute xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000013C8A'
-                                      name = 'startDate' visibility = 'public' isSpecification = 'false' ownerScope = 'instance'
+                                      name = 'startDate' visibility = 'private' isSpecification = 'false' ownerScope = 'instance'
                                       changeability = 'changeable' targetScope = 'instance'>
                                       <UML:StructuralFeature.multiplicity>
                                         <UML:Multiplicity xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000013C8B'>
@@ -953,7 +1226,7 @@
                                       </UML:StructuralFeature.type>
                                     </UML:Attribute>
                                     <UML:Attribute xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000013C8D'
-                                      name = 'activityStatus' visibility = 'public' isSpecification = 'false'
+                                      name = 'activityStatus' visibility = 'private' isSpecification = 'false'
                                       ownerScope = 'instance' changeability = 'changeable' targetScope = 'instance'>
                                       <UML:StructuralFeature.multiplicity>
                                         <UML:Multiplicity xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000013C8E'>
@@ -973,6 +1246,21 @@
                                   name = 'Address' visibility = 'public' isSpecification = 'false' isRoot = 'false'
                                   isLeaf = 'false' isAbstract = 'false' isActive = 'false'>
                                   <UML:Classifier.feature>
+                                    <UML:Attribute xmi.id = '-127--128-23-33--7f5efc28:11d4f40695b:-8000:0000000000013463'
+                                      name = 'id' visibility = 'public' isSpecification = 'false' ownerScope = 'instance'
+                                      changeability = 'changeable' targetScope = 'instance'>
+                                      <UML:StructuralFeature.multiplicity>
+                                        <UML:Multiplicity xmi.id = '-127--128-23-33--7f5efc28:11d4f40695b:-8000:0000000000013464'>
+                                          <UML:Multiplicity.range>
+                                            <UML:MultiplicityRange xmi.id = '-127--128-23-33--7f5efc28:11d4f40695b:-8000:0000000000013465'
+                                              lower = '1' upper = '1'/>
+                                          </UML:Multiplicity.range>
+                                        </UML:Multiplicity>
+                                      </UML:StructuralFeature.multiplicity>
+                                      <UML:StructuralFeature.type>
+                                        <UML:Class xmi.idref = 'EAID_61D84993_837B_48c3_9F63_E3020F52FA13'/>
+                                      </UML:StructuralFeature.type>
+                                    </UML:Attribute>
                                     <UML:Attribute xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000013C9D'
                                       name = 'street' visibility = 'public' isSpecification = 'false' ownerScope = 'instance'
                                       changeability = 'changeable' targetScope = 'instance'>
@@ -1083,12 +1371,24 @@
                                 <UML:Class xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000D34D'
                                   name = 'Site' visibility = 'public' isSpecification = 'false' isRoot = 'false'
                                   isLeaf = 'false' isAbstract = 'false' isActive = 'false'>
-                                  <UML:ModelElement.clientDependency>
-                                    <UML:Dependency xmi.idref = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000D34E'/>
-                                  </UML:ModelElement.clientDependency>
                                   <UML:Classifier.feature>
+                                    <UML:Attribute xmi.id = '-127--128-23-33--7f5efc28:11d4f40695b:-8000:0000000000013469'
+                                      name = 'id' visibility = 'private' isSpecification = 'false' ownerScope = 'instance'
+                                      changeability = 'changeable' targetScope = 'instance'>
+                                      <UML:StructuralFeature.multiplicity>
+                                        <UML:Multiplicity xmi.id = '-127--128-23-33--7f5efc28:11d4f40695b:-8000:000000000001346A'>
+                                          <UML:Multiplicity.range>
+                                            <UML:MultiplicityRange xmi.id = '-127--128-23-33--7f5efc28:11d4f40695b:-8000:000000000001346B'
+                                              lower = '1' upper = '1'/>
+                                          </UML:Multiplicity.range>
+                                        </UML:Multiplicity>
+                                      </UML:StructuralFeature.multiplicity>
+                                      <UML:StructuralFeature.type>
+                                        <UML:Class xmi.idref = 'EAID_61D84993_837B_48c3_9F63_E3020F52FA13'/>
+                                      </UML:StructuralFeature.type>
+                                    </UML:Attribute>
                                     <UML:Attribute xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000013C91'
-                                      name = 'name' visibility = 'public' isSpecification = 'false' ownerScope = 'instance'
+                                      name = 'name' visibility = 'private' isSpecification = 'false' ownerScope = 'instance'
                                       changeability = 'changeable' targetScope = 'instance'>
                                       <UML:StructuralFeature.multiplicity>
                                         <UML:Multiplicity xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000013C92'>
@@ -1103,7 +1403,7 @@
                                       </UML:StructuralFeature.type>
                                     </UML:Attribute>
                                     <UML:Attribute xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000013C94'
-                                      name = 'type' visibility = 'public' isSpecification = 'false' ownerScope = 'instance'
+                                      name = 'type' visibility = 'private' isSpecification = 'false' ownerScope = 'instance'
                                       changeability = 'changeable' targetScope = 'instance'>
                                       <UML:StructuralFeature.multiplicity>
                                         <UML:Multiplicity xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000013C95'>
@@ -1118,7 +1418,7 @@
                                       </UML:StructuralFeature.type>
                                     </UML:Attribute>
                                     <UML:Attribute xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000013C97'
-                                      name = 'emailAddress' visibility = 'public' isSpecification = 'false' ownerScope = 'instance'
+                                      name = 'emailAddress' visibility = 'private' isSpecification = 'false' ownerScope = 'instance'
                                       changeability = 'changeable' targetScope = 'instance'>
                                       <UML:StructuralFeature.multiplicity>
                                         <UML:Multiplicity xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000013C98'>
@@ -1133,7 +1433,7 @@
                                       </UML:StructuralFeature.type>
                                     </UML:Attribute>
                                     <UML:Attribute xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000013C9A'
-                                      name = 'activityStatus' visibility = 'public' isSpecification = 'false'
+                                      name = 'activityStatus' visibility = 'private' isSpecification = 'false'
                                       ownerScope = 'instance' changeability = 'changeable' targetScope = 'instance'>
                                       <UML:StructuralFeature.multiplicity>
                                         <UML:Multiplicity xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000013C9B'>
@@ -1191,10 +1491,10 @@
                                       name = 'site' visibility = 'public' isSpecification = 'false' isNavigable = 'false'
                                       ordering = 'unordered' aggregation = 'none' targetScope = 'instance' changeability = 'changeable'>
                                       <UML:AssociationEnd.multiplicity>
-                                        <UML:Multiplicity xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000015A1F'>
+                                        <UML:Multiplicity xmi.id = '-127--128-23-33--7f5efc28:11d4f40695b:-8000:0000000000013687'>
                                           <UML:Multiplicity.range>
-                                            <UML:MultiplicityRange xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000015A20'
-                                              lower = '1' upper = '1'/>
+                                            <UML:MultiplicityRange xmi.id = '-127--128-23-33--7f5efc28:11d4f40695b:-8000:0000000000013686'
+                                              lower = '0' upper = '-1'/>
                                           </UML:Multiplicity.range>
                                         </UML:Multiplicity>
                                       </UML:AssociationEnd.multiplicity>
@@ -1203,13 +1503,13 @@
                                       </UML:AssociationEnd.participant>
                                     </UML:AssociationEnd>
                                     <UML:AssociationEnd xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000015A21'
-                                      name = 'user' visibility = 'public' isSpecification = 'false' isNavigable = 'true'
+                                      name = 'users' visibility = 'public' isSpecification = 'false' isNavigable = 'true'
                                       ordering = 'unordered' aggregation = 'none' targetScope = 'instance' changeability = 'changeable'>
                                       <UML:AssociationEnd.multiplicity>
-                                        <UML:Multiplicity xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000015A25'>
+                                        <UML:Multiplicity xmi.id = '-127--128-23-33--7f5efc28:11d4f40695b:-8000:0000000000013689'>
                                           <UML:Multiplicity.range>
-                                            <UML:MultiplicityRange xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000015A24'
-                                              lower = '0' upper = '-1'/>
+                                            <UML:MultiplicityRange xmi.id = '-127--128-23-33--7f5efc28:11d4f40695b:-8000:0000000000013688'
+                                              lower = '1' upper = '1'/>
                                           </UML:Multiplicity.range>
                                         </UML:Multiplicity>
                                       </UML:AssociationEnd.multiplicity>
@@ -1223,7 +1523,7 @@
                                   name = '' isSpecification = 'false' isRoot = 'false' isLeaf = 'false' isAbstract = 'false'>
                                   <UML:Association.connection>
                                     <UML:AssociationEnd xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000015A27'
-                                      name = 'site' visibility = 'public' isSpecification = 'false' isNavigable = 'true'
+                                      name = 'site' visibility = 'public' isSpecification = 'false' isNavigable = 'false'
                                       ordering = 'unordered' aggregation = 'none' targetScope = 'instance' changeability = 'changeable'>
                                       <UML:AssociationEnd.multiplicity>
                                         <UML:Multiplicity xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000015A28'>
@@ -1328,25 +1628,9 @@
           name = 'mapped-collection-table' isSpecification = 'false' tagType = 'String'/>
         <UML:TagDefinition xmi.id = '-64--88-0-1-19a32e0:1151feda71c:-8000:000000000000101C'
           name = 'mapped-element' isSpecification = 'false' tagType = 'String'/>
-        <UML:Stereotype xmi.id = '-64--88-0-1-8238f4:115206c0709:-8000:0000000000000807'
-          name = 'table' isSpecification = 'false' isRoot = 'false' isLeaf = 'false'
-          isAbstract = 'false'>
-          <UML:Stereotype.baseClass>Classifier</UML:Stereotype.baseClass>
-        </UML:Stereotype>
         <UML:DataType xmi.id = '-64--88-0-1-8238f4:11524461844:-8000:0000000000000804'
           name = 'int' isSpecification = 'false' isRoot = 'false' isLeaf = 'false'
           isAbstract = 'false'/>
-        <UML:TagDefinition xmi.id = '-64--88-0-1-8238f4:11524461844:-8000:000000000000081C'
-          name = '' isSpecification = 'false' tagType = 'String'>
-          <UML:TagDefinition.multiplicity>
-            <UML:Multiplicity xmi.id = '-64--88-0-1-8238f4:11524461844:-8000:000000000000081D'>
-              <UML:Multiplicity.range>
-                <UML:MultiplicityRange xmi.id = '-64--88-0-1-8238f4:11524461844:-8000:000000000000081E'
-                  lower = '0' upper = '1'/>
-              </UML:Multiplicity.range>
-            </UML:Multiplicity>
-          </UML:TagDefinition.multiplicity>
-        </UML:TagDefinition>
         <UML:DataType xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000008CD0'
           name = 'VARCHAR(100)' isSpecification = 'false' isRoot = 'false' isLeaf = 'false'
           isAbstract = 'false'/>
@@ -1362,6 +1646,16 @@
         <UML:DataType xmi.id = '-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000D34F'
           name = 'VARCHAR(255)' isSpecification = 'false' isRoot = 'false' isLeaf = 'false'
           isAbstract = 'false'/>
+        <UML:Stereotype xmi.id = '-127--128-23-33--7f5efc28:11d4f40695b:-8000:000000000000C245'
+          name = 'table' isSpecification = 'false' isRoot = 'false' isLeaf = 'false'
+          isAbstract = 'false'>
+          <UML:Stereotype.baseClass>Class</UML:Stereotype.baseClass>
+        </UML:Stereotype>
+        <UML:Stereotype xmi.id = '-127--128-23-33--7f5efc28:11d4f40695b:-8000:000000000000EBC4'
+          name = 'DataSource' visibility = 'private' isSpecification = 'false' isRoot = 'false'
+          isLeaf = 'false' isAbstract = 'false'>
+          <UML:Stereotype.baseClass>Dependency</UML:Stereotype.baseClass>
+        </UML:Stereotype>
       </UML:Namespace.ownedElement>
     </UML:Model>
   </XMI.content>
@@ -1370,7 +1664,7 @@
       name="Class Diagram 1"
 >
   <group name="Fig0"
-       description="org.argouml.uml.diagram.static_structure.ui.FigClass[48, 336, 238, 377]pathVisible=false;stereotypeView=0;operationsVisible=true;attributesVisible=true;"
+       description="org.argouml.uml.diagram.static_structure.ui.FigClass[80, 368, 264, 345]pathVisible=false;stereotypeView=0;operationsVisible=true;attributesVisible=true;"
        href="-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000003991"
        fill="1"
        fillcolor="white"
@@ -1381,17 +1675,17 @@
     </private>
     
     <rectangle name="Fig0.0"
-      x="48"
-      y="336"
-      width="238"
-      height="377"
+      x="80"
+      y="368"
+      width="264"
+      height="345"
       fill="1"
       fillcolor="white"
       stroke="0"
       strokecolor="black"
     />
     <group name="Fig0.1"
-         description="org.argouml.uml.diagram.ui.FigStereotypesCompartment[48, 336, 238, 15]"
+         description="org.argouml.uml.diagram.ui.FigStereotypesCompartment[80, 368, 264, 15]"
          href="-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000003991"
          fill="1"
          fillcolor="white"
@@ -1402,9 +1696,9 @@
       </private>
       
       <rectangle name="Fig0.1.0"
-        x="48"
-        y="336"
-        width="238"
+        x="80"
+        y="368"
+        width="264"
         height="15"
         fill="1"
         fillcolor="white"
@@ -1412,9 +1706,9 @@
         strokecolor="black"
       />
       <text name="Fig0.1.1"
-        x="49"
-        y="337"
-        width="236"
+        x="81"
+        y="369"
+        width="262"
         height="13"
         fill="1"
         fillcolor="white"
@@ -1429,9 +1723,9 @@
       >&lt;&lt;table&gt;&gt;</text>
     </group>
     <text name="Fig0.2"
-      x="48"
-      y="351"
-      width="238"
+      x="80"
+      y="383"
+      width="264"
       height="20"
       fill="1"
       fillcolor="white"
@@ -1445,7 +1739,7 @@
       justification="Center"
     >USER</text>
     <group name="Fig0.3"
-         description="org.argouml.uml.diagram.ui.FigOperationsCompartment[49, 612, 237, 100]"
+         description="org.argouml.uml.diagram.ui.FigOperationsCompartment[81, 628, 263, 84]"
          fill="1"
          fillcolor="white"
          stroke="0"
@@ -1455,10 +1749,10 @@
       </private>
       
       <rectangle name="Fig0.3.0"
-        x="49"
-        y="612"
-        width="237"
-        height="100"
+        x="81"
+        y="628"
+        width="263"
+        height="84"
         fill="1"
         fillcolor="white"
         stroke="0"
@@ -1471,14 +1765,14 @@
         stroke="1"
         strokecolor="black"
       >
-        <moveto x="49"
-                y="612" />
-        <lineto x="286"
-                y="612" />
+        <moveto x="81"
+                y="628" />
+        <lineto x="344"
+                y="628" />
       </path>
       <text name="Fig0.3.2"
-        x="49"
-        y="613"
+        x="81"
+        y="629"
         width="99"
         height="13"
         fill="0"
@@ -1493,8 +1787,8 @@
         justification="Left"
       >PK_ID(ID : NUMBER)</text>
       <text name="Fig0.3.3"
-        x="49"
-        y="626"
+        x="81"
+        y="642"
         width="192"
         height="13"
         fill="0"
@@ -1509,8 +1803,8 @@
         justification="Left"
       >FK_ADDRESS_ID(ADDRESS_ID : NUMBER)</text>
       <text name="Fig0.3.4"
-        x="49"
-        y="639"
+        x="81"
+        y="655"
         width="146"
         height="19"
         fill="0"
@@ -1526,7 +1820,7 @@
       >FK_SITE_ID(SITE_ID : NUMBER)</text>
     </group>
     <group name="Fig0.4"
-         description="org.argouml.uml.diagram.ui.FigAttributesCompartment[49, 372, 237, 239]"
+         description="org.argouml.uml.diagram.ui.FigAttributesCompartment[81, 404, 263, 223]"
          fill="1"
          fillcolor="white"
          stroke="0"
@@ -1536,10 +1830,10 @@
       </private>
       
       <rectangle name="Fig0.4.0"
-        x="49"
-        y="372"
-        width="237"
-        height="239"
+        x="81"
+        y="404"
+        width="263"
+        height="223"
         fill="1"
         fillcolor="white"
         stroke="0"
@@ -1552,14 +1846,14 @@
         stroke="1"
         strokecolor="black"
       >
-        <moveto x="49"
-                y="372" />
-        <lineto x="286"
-                y="372" />
+        <moveto x="81"
+                y="404" />
+        <lineto x="344"
+                y="404" />
       </path>
       <text name="Fig0.4.2"
-        x="49"
-        y="373"
+        x="81"
+        y="405"
         width="65"
         height="13"
         fill="0"
@@ -1574,8 +1868,8 @@
         justification="Left"
       >ID : NUMBER</text>
       <text name="Fig0.4.3"
-        x="49"
-        y="386"
+        x="81"
+        y="418"
         width="162"
         height="13"
         fill="0"
@@ -1590,8 +1884,8 @@
         justification="Left"
       >EMAIL_ADDRESS : VARCHAR(100)</text>
       <text name="Fig0.4.4"
-        x="49"
-        y="399"
+        x="81"
+        y="431"
         width="133"
         height="13"
         fill="0"
@@ -1606,8 +1900,8 @@
         justification="Left"
       >PASSWORD : VARCHAR(50)</text>
       <text name="Fig0.4.5"
-        x="49"
-        y="412"
+        x="81"
+        y="444"
         width="138"
         height="13"
         fill="0"
@@ -1622,8 +1916,8 @@
         justification="Left"
       >FIRST_NAME : VARCHAR(50)</text>
       <text name="Fig0.4.6"
-        x="49"
-        y="425"
+        x="81"
+        y="457"
         width="136"
         height="13"
         fill="0"
@@ -1638,8 +1932,8 @@
         justification="Left"
       >LAST_NAME : VARCHAR(50)</text>
       <text name="Fig0.4.7"
-        x="49"
-        y="438"
+        x="81"
+        y="470"
         width="143"
         height="13"
         fill="0"
@@ -1654,8 +1948,8 @@
         justification="Left"
       >LOGIN_NAME : VARCHAR(50)</text>
       <text name="Fig0.4.8"
-        x="49"
-        y="451"
+        x="81"
+        y="483"
         width="100"
         height="13"
         fill="0"
@@ -1670,8 +1964,8 @@
         justification="Left"
       >START_DATE : DATE</text>
       <text name="Fig0.4.9"
-        x="49"
-        y="464"
+        x="81"
+        y="496"
         width="166"
         height="13"
         fill="0"
@@ -1686,8 +1980,8 @@
         justification="Left"
       >ACTIVITY_STATUS : VARCHAR(50)</text>
       <text name="Fig0.4.10"
-        x="49"
-        y="477"
+        x="81"
+        y="509"
         width="134"
         height="13"
         fill="0"
@@ -1702,8 +1996,8 @@
         justification="Left"
       >DEPARTMENT_ID : NUMBER</text>
       <text name="Fig0.4.11"
-        x="49"
-        y="490"
+        x="81"
+        y="522"
         width="157"
         height="13"
         fill="0"
@@ -1718,8 +2012,8 @@
         justification="Left"
       >RESEARCH_GROUP_ID : NUMBER</text>
       <text name="Fig0.4.12"
-        x="49"
-        y="503"
+        x="81"
+        y="535"
         width="131"
         height="13"
         fill="0"
@@ -1734,8 +2028,8 @@
         justification="Left"
       >INSTITUTION_ID : NUMBER</text>
       <text name="Fig0.4.13"
-        x="49"
-        y="516"
+        x="81"
+        y="548"
         width="112"
         height="13"
         fill="0"
@@ -1750,8 +2044,8 @@
         justification="Left"
       >ADDRESS_ID : NUMBER</text>
       <text name="Fig0.4.14"
-        x="49"
-        y="529"
+        x="81"
+        y="561"
         width="119"
         height="13"
         fill="0"
@@ -1766,8 +2060,8 @@
         justification="Left"
       >CSM_USER_ID : NUMBER</text>
       <text name="Fig0.4.15"
-        x="49"
-        y="542"
+        x="81"
+        y="574"
         width="130"
         height="19"
         fill="0"
@@ -1783,10 +2077,10 @@
       >STATUS_COMMENT : TEXT</text>
     </group>
     <rectangle name="Fig0.5"
-      x="48"
-      y="336"
-      width="238"
-      height="377"
+      x="80"
+      y="368"
+      width="264"
+      height="345"
       fill="0"
       fillcolor="white"
       stroke="1"
@@ -1794,7 +2088,7 @@
     />
   </group>
   <group name="Fig1"
-       description="org.argouml.uml.diagram.static_structure.ui.FigClass[40, 48, 238, 272]pathVisible=false;stereotypeView=0;operationsVisible=true;attributesVisible=true;"
+       description="org.argouml.uml.diagram.static_structure.ui.FigClass[96, 0, 238, 248]pathVisible=false;stereotypeView=0;operationsVisible=true;attributesVisible=true;"
        href="-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000D332"
        fill="1"
        fillcolor="white"
@@ -1805,17 +2099,17 @@
     </private>
     
     <rectangle name="Fig1.0"
-      x="40"
-      y="48"
+      x="96"
+      y="0"
       width="238"
-      height="272"
+      height="248"
       fill="1"
       fillcolor="white"
       stroke="0"
       strokecolor="black"
     />
     <group name="Fig1.1"
-         description="org.argouml.uml.diagram.ui.FigStereotypesCompartment[40, 48, 238, 15]"
+         description="org.argouml.uml.diagram.ui.FigStereotypesCompartment[96, 0, 238, 15]"
          href="-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000D332"
          fill="1"
          fillcolor="white"
@@ -1826,8 +2120,8 @@
       </private>
       
       <rectangle name="Fig1.1.0"
-        x="40"
-        y="48"
+        x="96"
+        y="0"
         width="238"
         height="15"
         fill="1"
@@ -1836,8 +2130,8 @@
         strokecolor="black"
       />
       <text name="Fig1.1.1"
-        x="41"
-        y="49"
+        x="97"
+        y="1"
         width="236"
         height="13"
         fill="1"
@@ -1853,8 +2147,8 @@
       >&lt;&lt;table&gt;&gt;</text>
     </group>
     <text name="Fig1.2"
-      x="40"
-      y="63"
+      x="96"
+      y="15"
       width="238"
       height="20"
       fill="1"
@@ -1869,7 +2163,7 @@
       justification="Center"
     >SITE</text>
     <group name="Fig1.3"
-         description="org.argouml.uml.diagram.ui.FigOperationsCompartment[41, 226, 237, 93]"
+         description="org.argouml.uml.diagram.ui.FigOperationsCompartment[97, 166, 237, 81]"
          fill="1"
          fillcolor="white"
          stroke="0"
@@ -1879,10 +2173,10 @@
       </private>
       
       <rectangle name="Fig1.3.0"
-        x="41"
-        y="226"
+        x="97"
+        y="166"
         width="237"
-        height="93"
+        height="81"
         fill="1"
         fillcolor="white"
         stroke="0"
@@ -1895,14 +2189,14 @@
         stroke="1"
         strokecolor="black"
       >
-        <moveto x="41"
-                y="226" />
-        <lineto x="278"
-                y="226" />
+        <moveto x="97"
+                y="166" />
+        <lineto x="334"
+                y="166" />
       </path>
       <text name="Fig1.3.2"
-        x="41"
-        y="227"
+        x="97"
+        y="167"
         width="99"
         height="13"
         fill="0"
@@ -1917,8 +2211,8 @@
         justification="Left"
       >PK_ID(ID : NUMBER)</text>
       <text name="Fig1.3.3"
-        x="41"
-        y="240"
+        x="97"
+        y="180"
         width="154"
         height="13"
         fill="0"
@@ -1933,8 +2227,8 @@
         justification="Left"
       >FK_USER_ID(USER_ID : NUMBER)</text>
       <text name="Fig1.3.4"
-        x="41"
-        y="253"
+        x="97"
+        y="193"
         width="192"
         height="19"
         fill="0"
@@ -1950,7 +2244,7 @@
       >FK_ADDRESS_ID(ADDRESS_ID : NUMBER)</text>
     </group>
     <group name="Fig1.4"
-         description="org.argouml.uml.diagram.ui.FigAttributesCompartment[41, 84, 237, 141]"
+         description="org.argouml.uml.diagram.ui.FigAttributesCompartment[97, 36, 237, 129]"
          fill="1"
          fillcolor="white"
          stroke="0"
@@ -1960,10 +2254,10 @@
       </private>
       
       <rectangle name="Fig1.4.0"
-        x="41"
-        y="84"
+        x="97"
+        y="36"
         width="237"
-        height="141"
+        height="129"
         fill="1"
         fillcolor="white"
         stroke="0"
@@ -1976,14 +2270,14 @@
         stroke="1"
         strokecolor="black"
       >
-        <moveto x="41"
-                y="84" />
-        <lineto x="278"
-                y="84" />
+        <moveto x="97"
+                y="36" />
+        <lineto x="334"
+                y="36" />
       </path>
       <text name="Fig1.4.2"
-        x="41"
-        y="85"
+        x="97"
+        y="37"
         width="65"
         height="13"
         fill="0"
@@ -1998,8 +2292,8 @@
         justification="Left"
       >ID : NUMBER</text>
       <text name="Fig1.4.3"
-        x="41"
-        y="98"
+        x="97"
+        y="50"
         width="114"
         height="13"
         fill="0"
@@ -2014,8 +2308,8 @@
         justification="Left"
       >NAME : VARCHAR(255)</text>
       <text name="Fig1.4.4"
-        x="41"
-        y="111"
+        x="97"
+        y="63"
         width="103"
         height="13"
         fill="0"
@@ -2030,8 +2324,8 @@
         justification="Left"
       >TYPE : VARCHAR(50)</text>
       <text name="Fig1.4.5"
-        x="41"
-        y="124"
+        x="97"
+        y="76"
         width="162"
         height="13"
         fill="0"
@@ -2046,8 +2340,8 @@
         justification="Left"
       >EMAIL_ADDRESS : VARCHAR(255)</text>
       <text name="Fig1.4.6"
-        x="41"
-        y="137"
+        x="97"
+        y="89"
         width="166"
         height="13"
         fill="0"
@@ -2062,8 +2356,8 @@
         justification="Left"
       >ACTIVITY_STATUS : VARCHAR(50)</text>
       <text name="Fig1.4.7"
-        x="41"
-        y="150"
+        x="97"
+        y="102"
         width="93"
         height="13"
         fill="0"
@@ -2078,8 +2372,8 @@
         justification="Left"
       >USER_ID : NUMBER</text>
       <text name="Fig1.4.8"
-        x="41"
-        y="163"
+        x="97"
+        y="115"
         width="112"
         height="19"
         fill="0"
@@ -2095,10 +2389,10 @@
       >ADDRESS_ID : NUMBER</text>
     </group>
     <rectangle name="Fig1.5"
-      x="40"
-      y="48"
+      x="96"
+      y="0"
       width="238"
-      height="272"
+      height="248"
       fill="0"
       fillcolor="white"
       stroke="1"
@@ -2106,7 +2400,7 @@
     />
   </group>
   <group name="Fig2"
-       description="org.argouml.uml.diagram.static_structure.ui.FigClass[456, 208, 224, 274]pathVisible=false;stereotypeView=0;operationsVisible=true;attributesVisible=true;"
+       description="org.argouml.uml.diagram.static_structure.ui.FigClass[544, 216, 232, 240]pathVisible=false;stereotypeView=0;operationsVisible=true;attributesVisible=true;"
        href="-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000D350"
        fill="1"
        fillcolor="white"
@@ -2117,17 +2411,17 @@
     </private>
     
     <rectangle name="Fig2.0"
-      x="456"
-      y="208"
-      width="224"
-      height="274"
+      x="544"
+      y="216"
+      width="232"
+      height="240"
       fill="1"
       fillcolor="white"
       stroke="0"
       strokecolor="black"
     />
     <group name="Fig2.1"
-         description="org.argouml.uml.diagram.ui.FigStereotypesCompartment[456, 208, 224, 15]"
+         description="org.argouml.uml.diagram.ui.FigStereotypesCompartment[544, 216, 232, 15]"
          href="-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000D350"
          fill="1"
          fillcolor="white"
@@ -2138,9 +2432,9 @@
       </private>
       
       <rectangle name="Fig2.1.0"
-        x="456"
-        y="208"
-        width="224"
+        x="544"
+        y="216"
+        width="232"
         height="15"
         fill="1"
         fillcolor="white"
@@ -2148,9 +2442,9 @@
         strokecolor="black"
       />
       <text name="Fig2.1.1"
-        x="457"
-        y="209"
-        width="222"
+        x="545"
+        y="217"
+        width="230"
         height="13"
         fill="1"
         fillcolor="white"
@@ -2165,9 +2459,9 @@
       >&lt;&lt;table&gt;&gt;</text>
     </group>
     <text name="Fig2.2"
-      x="456"
-      y="223"
-      width="224"
+      x="544"
+      y="231"
+      width="232"
       height="20"
       fill="1"
       fillcolor="white"
@@ -2181,7 +2475,7 @@
       justification="Center"
     >ADDRESS</text>
     <group name="Fig2.3"
-         description="org.argouml.uml.diagram.ui.FigOperationsCompartment[457, 407, 223, 74]"
+         description="org.argouml.uml.diagram.ui.FigOperationsCompartment[545, 398, 231, 57]"
          fill="1"
          fillcolor="white"
          stroke="0"
@@ -2191,10 +2485,10 @@
       </private>
       
       <rectangle name="Fig2.3.0"
-        x="457"
-        y="407"
-        width="223"
-        height="74"
+        x="545"
+        y="398"
+        width="231"
+        height="57"
         fill="1"
         fillcolor="white"
         stroke="0"
@@ -2207,14 +2501,14 @@
         stroke="1"
         strokecolor="black"
       >
-        <moveto x="457"
-                y="407" />
-        <lineto x="680"
-                y="407" />
+        <moveto x="545"
+                y="398" />
+        <lineto x="776"
+                y="398" />
       </path>
       <text name="Fig2.3.2"
-        x="457"
-        y="408"
+        x="545"
+        y="399"
         width="99"
         height="19"
         fill="0"
@@ -2230,7 +2524,7 @@
       >PK_ID(ID : NUMBER)</text>
     </group>
     <group name="Fig2.4"
-         description="org.argouml.uml.diagram.ui.FigAttributesCompartment[457, 244, 223, 162]"
+         description="org.argouml.uml.diagram.ui.FigAttributesCompartment[545, 252, 231, 145]"
          fill="1"
          fillcolor="white"
          stroke="0"
@@ -2240,10 +2534,10 @@
       </private>
       
       <rectangle name="Fig2.4.0"
-        x="457"
-        y="244"
-        width="223"
-        height="162"
+        x="545"
+        y="252"
+        width="231"
+        height="145"
         fill="1"
         fillcolor="white"
         stroke="0"
@@ -2256,14 +2550,14 @@
         stroke="1"
         strokecolor="black"
       >
-        <moveto x="457"
-                y="244" />
-        <lineto x="680"
-                y="244" />
+        <moveto x="545"
+                y="252" />
+        <lineto x="776"
+                y="252" />
       </path>
       <text name="Fig2.4.2"
-        x="457"
-        y="245"
+        x="545"
+        y="253"
         width="65"
         height="13"
         fill="0"
@@ -2278,8 +2572,8 @@
         justification="Left"
       >ID : NUMBER</text>
       <text name="Fig2.4.3"
-        x="457"
-        y="258"
+        x="545"
+        y="266"
         width="119"
         height="13"
         fill="0"
@@ -2294,8 +2588,8 @@
         justification="Left"
       >STREET : VARCHAR(255)</text>
       <text name="Fig2.4.4"
-        x="457"
-        y="271"
+        x="545"
+        y="279"
         width="102"
         height="13"
         fill="0"
@@ -2310,8 +2604,8 @@
         justification="Left"
       >CITY : VARCHAR(50)</text>
       <text name="Fig2.4.5"
-        x="457"
-        y="284"
+        x="545"
+        y="292"
         width="129"
         height="13"
         fill="0"
@@ -2326,8 +2620,8 @@
         justification="Left"
       >PROVINCE : VARCHAR(50)</text>
       <text name="Fig2.4.6"
-        x="457"
-        y="297"
+        x="545"
+        y="305"
         width="127"
         height="13"
         fill="0"
@@ -2342,8 +2636,8 @@
         justification="Left"
       >COUNTRY : VARCHAR(50)</text>
       <text name="Fig2.4.7"
-        x="457"
-        y="310"
+        x="545"
+        y="318"
         width="149"
         height="13"
         fill="0"
@@ -2358,8 +2652,8 @@
         justification="Left"
       >POSTAL_CODE : VARCHAR(50)</text>
       <text name="Fig2.4.8"
-        x="457"
-        y="323"
+        x="545"
+        y="331"
         width="179"
         height="13"
         fill="0"
@@ -2374,8 +2668,8 @@
         justification="Left"
       >TELEPHONE_NUMBER : VARCHAR(50)</text>
       <text name="Fig2.4.9"
-        x="457"
-        y="336"
+        x="545"
+        y="344"
         width="143"
         height="19"
         fill="0"
@@ -2391,10 +2685,10 @@
       >FAX_NUMBER : VARCHAR(50)</text>
     </group>
     <rectangle name="Fig2.5"
-      x="456"
-      y="208"
-      width="224"
-      height="274"
+      x="544"
+      y="216"
+      width="232"
+      height="240"
       fill="0"
       fillcolor="white"
       stroke="1"
@@ -2420,10 +2714,10 @@
       stroke="1"
       strokecolor="black"
     >
-      <moveto x="278"
-              y="232" />
-      <lineto x="456"
-              y="232" />
+      <moveto x="334"
+              y="216" />
+      <lineto x="544"
+              y="216" />
     </path>
   </group>
   <group name="Fig4"
@@ -2445,9 +2739,9 @@
       stroke="1"
       strokecolor="black"
     >
-      <moveto x="286"
+      <moveto x="344"
               y="416" />
-      <lineto x="456"
+      <lineto x="544"
               y="416" />
     </path>
   </group>
@@ -2471,9 +2765,9 @@
       strokecolor="black"
     >
       <moveto x="246"
-              y="320" />
+              y="248" />
       <lineto x="246"
-              y="336" />
+              y="368" />
     </path>
   </group>
 </pgml>
@@ -2481,7 +2775,7 @@
       name="Class Diagram 2"
 >
   <group name="Fig0"
-       description="org.argouml.uml.diagram.static_structure.ui.FigClass[72, 328, 192, 153]pathVisible=false;stereotypeView=0;operationsVisible=true;attributesVisible=true;"
+       description="org.argouml.uml.diagram.static_structure.ui.FigClass[72, 328, 192, 168]pathVisible=false;stereotypeView=0;operationsVisible=true;attributesVisible=true;"
        href="-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000001CF4"
        fill="1"
        fillcolor="white"
@@ -2495,7 +2789,7 @@
       x="72"
       y="328"
       width="192"
-      height="153"
+      height="168"
       fill="1"
       fillcolor="white"
       stroke="0"
@@ -2540,7 +2834,7 @@
       justification="Center"
     >User</text>
     <group name="Fig0.3"
-         description="org.argouml.uml.diagram.ui.FigOperationsCompartment[73, 453, 191, 27]"
+         description="org.argouml.uml.diagram.ui.FigOperationsCompartment[73, 467, 191, 28]"
          fill="1"
          fillcolor="white"
          stroke="0"
@@ -2551,9 +2845,9 @@
       
       <rectangle name="Fig0.3.0"
         x="73"
-        y="453"
+        y="467"
         width="191"
-        height="27"
+        height="28"
         fill="1"
         fillcolor="white"
         stroke="0"
@@ -2567,13 +2861,13 @@
         strokecolor="black"
       >
         <moveto x="73"
-                y="453" />
+                y="467" />
         <lineto x="264"
-                y="453" />
+                y="467" />
       </path>
     </group>
     <group name="Fig0.4"
-         description="org.argouml.uml.diagram.ui.FigAttributesCompartment[73, 349, 191, 103]"
+         description="org.argouml.uml.diagram.ui.FigAttributesCompartment[73, 349, 191, 117]"
          fill="1"
          fillcolor="white"
          stroke="0"
@@ -2586,7 +2880,7 @@
         x="73"
         y="349"
         width="191"
-        height="103"
+        height="117"
         fill="1"
         fillcolor="white"
         stroke="0"
@@ -2607,8 +2901,24 @@
       <text name="Fig0.4.2"
         x="73"
         y="350"
-        width="110"
-        height="16"
+        width="59"
+        height="13"
+        fill="0"
+        fillcolor="white"
+        stroke="0"
+        strokecolor="black"
+        textcolor="black"
+        font="Dialog"
+        italic="false"
+        bold="false"
+        textsize="10"
+        justification="Left"
+      >id : Integer</text>
+      <text name="Fig0.4.3"
+        x="73"
+        y="363"
+        width="109"
+        height="13"
         fill="0"
         fillcolor="white"
         stroke="0"
@@ -2620,11 +2930,11 @@
         textsize="10"
         justification="Left"
       >emailAddress : String</text>
-      <text name="Fig0.4.3"
+      <text name="Fig0.4.4"
         x="73"
-        y="363"
-        width="90"
-        height="16"
+        y="376"
+        width="89"
+        height="13"
         fill="0"
         fillcolor="white"
         stroke="0"
@@ -2636,11 +2946,11 @@
         textsize="10"
         justification="Left"
       >password : String</text>
-      <text name="Fig0.4.4"
+      <text name="Fig0.4.5"
         x="73"
-        y="376"
+        y="389"
         width="91"
-        height="16"
+        height="13"
         fill="0"
         fillcolor="white"
         stroke="0"
@@ -2652,11 +2962,11 @@
         textsize="10"
         justification="Left"
       >firstName : String</text>
-      <text name="Fig0.4.5"
+      <text name="Fig0.4.6"
         x="73"
-        y="389"
+        y="402"
         width="89"
-        height="16"
+        height="13"
         fill="0"
         fillcolor="white"
         stroke="0"
@@ -2668,11 +2978,11 @@
         textsize="10"
         justification="Left"
       >lastName : String</text>
-      <text name="Fig0.4.6"
+      <text name="Fig0.4.7"
         x="73"
-        y="402"
-        width="96"
-        height="16"
+        y="415"
+        width="95"
+        height="13"
         fill="0"
         fillcolor="white"
         stroke="0"
@@ -2684,9 +2994,9 @@
         textsize="10"
         justification="Left"
       >loginName : String</text>
-      <text name="Fig0.4.7"
+      <text name="Fig0.4.8"
         x="73"
-        y="415"
+        y="428"
         width="84"
         height="13"
         fill="0"
@@ -2700,11 +3010,11 @@
         textsize="10"
         justification="Left"
       >startDate : Date</text>
-      <text name="Fig0.4.8"
+      <text name="Fig0.4.9"
         x="73"
-        y="428"
+        y="441"
         width="108"
-        height="22"
+        height="19"
         fill="0"
         fillcolor="white"
         stroke="0"
@@ -2721,7 +3031,7 @@
       x="72"
       y="328"
       width="192"
-      height="153"
+      height="168"
       fill="0"
       fillcolor="white"
       stroke="1"
@@ -2729,7 +3039,7 @@
     />
   </group>
   <group name="Fig1"
-       description="org.argouml.uml.diagram.static_structure.ui.FigClass[576, 232, 216, 153]pathVisible=false;stereotypeView=0;operationsVisible=true;attributesVisible=true;"
+       description="org.argouml.uml.diagram.static_structure.ui.FigClass[400, 128, 216, 224]pathVisible=false;stereotypeView=0;operationsVisible=true;attributesVisible=true;"
        href="-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000010279"
        fill="1"
        fillcolor="white"
@@ -2740,17 +3050,17 @@
     </private>
     
     <rectangle name="Fig1.0"
-      x="576"
-      y="232"
+      x="400"
+      y="128"
       width="216"
-      height="153"
+      height="224"
       fill="1"
       fillcolor="white"
       stroke="0"
       strokecolor="black"
     />
     <group name="Fig1.1"
-         description="org.argouml.uml.diagram.ui.FigStereotypesCompartment[576, 232, 216, 0]"
+         description="org.argouml.uml.diagram.ui.FigStereotypesCompartment[400, 128, 216, 0]"
          href="-127--128-23-33-21cf89ba:11d4565062c:-8000:0000000000010279"
          fill="1"
          fillcolor="white"
@@ -2761,8 +3071,8 @@
       </private>
       
       <rectangle name="Fig1.1.0"
-        x="576"
-        y="232"
+        x="400"
+        y="128"
         width="216"
         height="0"
         fill="1"
@@ -2772,8 +3082,8 @@
       />
     </group>
     <text name="Fig1.2"
-      x="576"
-      y="232"
+      x="400"
+      y="128"
       width="216"
       height="20"
       fill="1"
@@ -2788,7 +3098,7 @@
       justification="Center"
     >Address</text>
     <group name="Fig1.3"
-         description="org.argouml.uml.diagram.ui.FigOperationsCompartment[577, 357, 215, 27]"
+         description="org.argouml.uml.diagram.ui.FigOperationsCompartment[401, 295, 215, 56]"
          fill="1"
          fillcolor="white"
          stroke="0"
@@ -2798,10 +3108,10 @@
       </private>
       
       <rectangle name="Fig1.3.0"
-        x="577"
-        y="357"
+        x="401"
+        y="295"
         width="215"
-        height="27"
+        height="56"
         fill="1"
         fillcolor="white"
         stroke="0"
@@ -2814,14 +3124,14 @@
         stroke="1"
         strokecolor="black"
       >
-        <moveto x="577"
-                y="357" />
-        <lineto x="792"
-                y="357" />
+        <moveto x="401"
+                y="295" />
+        <lineto x="616"
+                y="295" />
       </path>
     </group>
     <group name="Fig1.4"
-         description="org.argouml.uml.diagram.ui.FigAttributesCompartment[577, 253, 215, 103]"
+         description="org.argouml.uml.diagram.ui.FigAttributesCompartment[401, 149, 215, 145]"
          fill="1"
          fillcolor="white"
          stroke="0"
@@ -2831,10 +3141,10 @@
       </private>
       
       <rectangle name="Fig1.4.0"
-        x="577"
-        y="253"
+        x="401"
+        y="149"
         width="215"
-        height="103"
+        height="145"
         fill="1"
         fillcolor="white"
         stroke="0"
@@ -2847,14 +3157,30 @@
         stroke="1"
         strokecolor="black"
       >
-        <moveto x="577"
-                y="253" />
-        <lineto x="792"
-                y="253" />
+        <moveto x="401"
+                y="149" />
+        <lineto x="616"
+                y="149" />
       </path>
       <text name="Fig1.4.2"
-        x="577"
-        y="254"
+        x="401"
+        y="150"
+        width="59"
+        height="13"
+        fill="0"
+        fillcolor="white"
+        stroke="0"
+        strokecolor="black"
+        textcolor="black"
+        font="Dialog"
+        italic="false"
+        bold="false"
+        textsize="10"
+        justification="Left"
+      >id : Integer</text>
+      <text name="Fig1.4.3"
+        x="401"
+        y="163"
         width="72"
         height="13"
         fill="0"
@@ -2868,9 +3194,9 @@
         textsize="10"
         justification="Left"
       >street : String</text>
-      <text name="Fig1.4.3"
-        x="577"
-        y="267"
+      <text name="Fig1.4.4"
+        x="401"
+        y="176"
         width="60"
         height="13"
         fill="0"
@@ -2884,9 +3210,9 @@
         textsize="10"
         justification="Left"
       >city : String</text>
-      <text name="Fig1.4.4"
-        x="577"
-        y="280"
+      <text name="Fig1.4.5"
+        x="401"
+        y="189"
         width="84"
         height="13"
         fill="0"
@@ -2900,9 +3226,9 @@
         textsize="10"
         justification="Left"
       >province : String</text>
-      <text name="Fig1.4.5"
-        x="577"
-        y="293"
+      <text name="Fig1.4.6"
+        x="401"
+        y="202"
         width="79"
         height="13"
         fill="0"
@@ -2916,11 +3242,11 @@
         textsize="10"
         justification="Left"
       >country : String</text>
-      <text name="Fig1.4.6"
-        x="577"
-        y="306"
+      <text name="Fig1.4.7"
+        x="401"
+        y="215"
         width="98"
-        height="16"
+        height="13"
         fill="0"
         fillcolor="white"
         stroke="0"
@@ -2932,9 +3258,9 @@
         textsize="10"
         justification="Left"
       >postalCode : String</text>
-      <text name="Fig1.4.7"
-        x="577"
-        y="319"
+      <text name="Fig1.4.8"
+        x="401"
+        y="228"
         width="130"
         height="13"
         fill="0"
@@ -2948,9 +3274,9 @@
         textsize="10"
         justification="Left"
       >telephoneNumber : String</text>
-      <text name="Fig1.4.8"
-        x="577"
-        y="332"
+      <text name="Fig1.4.9"
+        x="401"
+        y="241"
         width="97"
         height="19"
         fill="0"
@@ -2966,10 +3292,10 @@
       >faxNumber : String</text>
     </group>
     <rectangle name="Fig1.5"
-      x="576"
-      y="232"
+      x="400"
+      y="128"
       width="216"
-      height="153"
+      height="224"
       fill="0"
       fillcolor="white"
       stroke="1"
@@ -2977,7 +3303,7 @@
     />
   </group>
   <group name="Fig2"
-       description="org.argouml.uml.diagram.static_structure.ui.FigClass[80, 24, 152, 108]pathVisible=false;stereotypeView=0;operationsVisible=true;attributesVisible=true;"
+       description="org.argouml.uml.diagram.static_structure.ui.FigClass[80, 24, 152, 123]pathVisible=false;stereotypeView=0;operationsVisible=true;attributesVisible=true;"
        href="-127--128-23-33-21cf89ba:11d4565062c:-8000:000000000000D34D"
        fill="1"
        fillcolor="white"
@@ -2991,7 +3317,7 @@
       x="80"
       y="24"
       width="152"
-      height="108"
+      height="123"
       fill="1"
       fillcolor="white"
       stroke="0"
@@ -3036,7 +3362,7 @@
       justification="Center"
     >Site</text>
     <group name="Fig2.3"
-         description="org.argouml.uml.diagram.ui.FigOperationsCompartment[81, 107, 151, 24]"
+         description="org.argouml.uml.diagram.ui.FigOperationsCompartment[81, 121, 151, 25]"
          fill="1"
          fillcolor="white"
          stroke="0"
@@ -3047,9 +3373,9 @@
       
       <rectangle name="Fig2.3.0"
         x="81"
-        y="107"
+        y="121"
         width="151"
-        height="24"
+        height="25"
         fill="1"
         fillcolor="white"
         stroke="0"
@@ -3063,13 +3389,13 @@
         strokecolor="black"
       >
         <moveto x="81"
-                y="107" />
+                y="121" />
         <lineto x="232"
-                y="107" />
+                y="121" />
       </path>
     </group>
     <group name="Fig2.4"
-         description="org.argouml.uml.diagram.ui.FigAttributesCompartment[81, 45, 151, 61]"
+         description="org.argouml.uml.diagram.ui.FigAttributesCompartment[81, 45, 151, 75]"
          fill="1"
          fillcolor="white"
          stroke="0"
@@ -3082,7 +3408,7 @@
         x="81"
         y="45"
         width="151"
-        height="61"
+        height="75"
         fill="1"
         fillcolor="white"
         stroke="0"
@@ -3103,8 +3429,24 @@
       <text name="Fig2.4.2"
         x="81"
         y="46"
-        width="71"
-        height="16"
+        width="59"
+        height="13"
+        fill="0"
+        fillcolor="white"
+        stroke="0"
+        strokecolor="black"
+        textcolor="black"
+        font="Dialog"
+        italic="false"
+        bold="false"
+        textsize="10"
+        justification="Left"
+      >id : Integer</text>
+      <text name="Fig2.4.3"
+        x="81"
+        y="59"
+        width="70"
+        height="13"
         fill="0"
         fillcolor="white"
         stroke="0"
@@ -3116,11 +3458,11 @@
         textsize="10"
         justification="Left"
       >name : String</text>
-      <text name="Fig2.4.3"
+      <text name="Fig2.4.4"
         x="81"
-        y="59"
-        width="65"
-        height="16"
+        y="72"
+        width="64"
+        height="13"
         fill="0"
         fillcolor="white"
         stroke="0"
@@ -3132,11 +3474,11 @@
         textsize="10"
         justification="Left"
       >type : String</text>
-      <text name="Fig2.4.4"
+      <text name="Fig2.4.5"
         x="81"
-        y="72"
-        width="110"
-        height="16"
+        y="85"
+        width="109"
+        height="13"
         fill="0"
         fillcolor="white"
         stroke="0"
@@ -3148,11 +3490,11 @@
         textsize="10"
         justification="Left"
       >emailAddress : String</text>
-      <text name="Fig2.4.5"
+      <text name="Fig2.4.6"
         x="81"
-        y="85"
+        y="98"
         width="108"
-        height="22"
+        height="19"
         fill="0"
         fillcolor="white"
         stroke="0"
@@ -3169,7 +3511,7 @@
       x="80"
       y="24"
       width="152"
-      height="108"
+      height="123"
       fill="0"
       fillcolor="white"
       stroke="1"
@@ -3196,9 +3538,9 @@
       strokecolor="black"
     >
       <moveto x="264"
-              y="344" />
-      <lineto x="576"
-              y="344" />
+              y="328" />
+      <lineto x="400"
+              y="328" />
     </path>
   </group>
   <group name="Fig4"
@@ -3221,7 +3563,7 @@
       strokecolor="black"
     >
       <moveto x="144"
-              y="132" />
+              y="147" />
       <lineto x="144"
               y="328" />
     </path>
@@ -3246,9 +3588,9 @@
       strokecolor="black"
     >
       <moveto x="232"
-              y="132" />
-      <lineto x="576"
-              y="232" />
+              y="147" />
+      <lineto x="400"
+              y="147" />
     </path>
   </group>
 </pgml>
