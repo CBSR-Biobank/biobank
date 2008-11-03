@@ -23,7 +23,9 @@
 
   <path  id="codegen.biobank2.hibernate.schemaexport.classpath">
     <path>
+      <pathelement location="." />
       <pathelement location="${cacore.sdk.system.lib.dir}/hibernate3.jar" />
+      <pathelement location="${codegen.biobank2.src}" />
       <fileset dir="${cacore.sdk.system.lib.dir}" >
         <include name="**/*.jar" />
       </fileset>
@@ -45,16 +47,13 @@
         drop="no"
         delimiter=";"
         output="schema-export.sql">
-        <fileset dir="codegen.biobank2.src">
-            <include name="**/*.hbm.xml"/>
-        </fileset>
+      <fileset dir=".">
+        <include name="**/*.hbm.xml"/>
+      </fileset>
     </schemaexport>
   </target>
 
   <target name="clean"
     description="clean up" >
-    <!-- Delete the ${build}  directory trees -->
-    <delete dir="${build}"/>
-    <!--delete dir="${dist}"/-->
   </target>
 </project>
