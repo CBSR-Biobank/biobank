@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+
+   <extension
+         id="biobank2"
+         point="org.eclipse.core.runtime.applications">
+      <application>
+         <run
+               class="edu.ualberta.med.biobank.Application">
+         </run>
+      </application>
+   </extension>
+   <extension
+         point="org.eclipse.ui.perspectives">
+      <perspective
+            name="RCP Perspective"
+            class="edu.ualberta.med.biobank.Perspective"
+            id="biobank2.perspective">
+      </perspective>
+   </extension>
+   <extension
+         id="product"
+         point="org.eclipse.core.runtime.products">
+      <product
+            application="biobank2.application"
+            name="Hello RCP">
+         <property
+               name="windowImages"
+               value="icons/alt_window_16.gif,icons/alt_window_32.gif">
+         </property>
+      </product>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            defaultHandler="edu.ualberta.med.biobank.handler.LoginHandler"
+            id="login.command"
+            name="Login">
+      </command>
+      <command
+            defaultHandler="edu.ualberta.med.biobank.handler.ExitHandler"
+            id="exit.command"
+            name="Exit">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            locationURI="menu:org.eclipse.ui.main.menu">
+         <menu
+               id="mymenu"
+               label="File">
+            <command
+                  commandId="login.command"
+                  label="Login"
+                  style="push">
+            </command>
+            <command
+                  commandId="exit.command"
+                  label="Exit"
+                  style="push">
+            </command>
+         </menu>
+      </menuContribution>
+   </extension>
+   <extension
+         point="org.eclipse.ui.views">
+   </extension>
+
+</plugin>

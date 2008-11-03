@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans>
+	<bean id="ServiceInfo" class="java.util.HashMap">
+		<constructor-arg>
+			<map>
+				<entry key="APPLICATION_SERVICE_BEAN" value="applicationService"/>
+				<entry key="AUTHENTICATION_SERVICE_BEAN" value-ref="authenticationProvider"/>
+				<entry key="APPLICATION_SERVICE_URL"  value="http://localhost:8080/biobank2"/>
+				<entry key="APPLICATION_SERVICE_CONFIG"  value-ref="applicationServiceConfig"/>
+			</map>
+		</constructor-arg>
+	</bean>
+
+	<bean id="interceptor" class="gov.nih.nci.system.client.proxy.ApplicationServiceProxy" singleton="true">
+		<property name="proxyFactory">
+			<bean class="gov.nih.nci.system.client.proxy.ProxyHelperImpl"/>
+		</property>
+	</bean>
+
+	<bean id="applicationService" class="org.springframework.aop.framework.ProxyFactoryBean">
+		<property name="target">
+			<bean class="org.springframework.remoting.httpinvoker.HttpInvokerProxyFactoryBean">
+				<property name="serviceUrl" value="http://localhost:8080/biobank2/http/applicationService"/>
+				<property name="serviceInterface" value="gov.nih.nci.system.applicationservice.ApplicationService"/>
+				<property name="httpInvokerRequestExecutor">
+					<bean class="org.acegisecurity.context.httpinvoker.AuthenticationSimpleHttpInvokerRequestExecutor"/>
+				</property>
+			</bean>
+		</property>
+		<property name="interceptorNames" value="interceptor"/>
+		<property name="interfaces" value="gov.nih.nci.system.applicationservice.ApplicationService"/>
+	</bean>
+
+	<bean id="authenticationProvider" class="org.acegisecurity.providers.rcp.RemoteAuthenticationProvider">
+		<property name="remoteAuthenticationManager">
+			<bean class="org.springframework.remoting.httpinvoker.HttpInvokerProxyFactoryBean">
+			    <property name="serviceUrl" value="http://localhost:8080/biobank2/http/remoteAuthenticationManager"/>
+			    <property name="serviceInterface" value="org.acegisecurity.providers.rcp.RemoteAuthenticationManager"/>
+			</bean>
+		</property>
+	</bean>
+
+	<!-- Dont touch this unless you know what you are doing -->
+	<bean id="applicationServiceConfig" class="java.lang.String">
+		<constructor-arg>
+			<value>
+				&lt;bean id=&quot;interceptor&quot; class=&quot;gov.nih.nci.system.client.proxy.ApplicationServiceProxy&quot;&gt;
+					&lt;property name=&quot;proxyFactory&quot;&gt;
+						&lt;bean class=&quot;gov.nih.nci.system.client.proxy.ProxyHelperImpl&quot;/&gt;
+					&lt;/property&gt;
+				&lt;/bean&gt;
+				&lt;bean id=&quot;applicationService&quot; class=&quot;org.springframework.aop.framework.ProxyFactoryBean&quot;&gt;
+					&lt;property name=&quot;target&quot;&gt;
+						&lt;bean class=&quot;org.springframework.remoting.httpinvoker.HttpInvokerProxyFactoryBean&quot;&gt;
+							&lt;property name=&quot;serviceUrl&quot; value=&quot;URL_KEY/http/applicationService&quot;/&gt;
+							&lt;property name=&quot;serviceInterface&quot; value=&quot;gov.nih.nci.system.applicationservice.ApplicationService&quot;/&gt;
+							&lt;property name=&quot;httpInvokerRequestExecutor&quot;&gt;
+								&lt;bean class=&quot;org.acegisecurity.context.httpinvoker.AuthenticationSimpleHttpInvokerRequestExecutor&quot;/&gt;
+							&lt;/property&gt;
+						&lt;/bean&gt;
+					&lt;/property&gt;
+					&lt;property name=&quot;interceptorNames&quot; value=&quot;interceptor&quot;/&gt;
+					&lt;property name=&quot;interfaces&quot; value=&quot;gov.nih.nci.system.applicationservice.ApplicationService&quot;/&gt;
+				&lt;/bean&gt;
+				&lt;bean id=&quot;authenticationProvider&quot; class=&quot;org.acegisecurity.providers.rcp.RemoteAuthenticationProvider&quot;&gt;
+					&lt;property name=&quot;remoteAuthenticationManager&quot;&gt;
+							&lt;bean class=&quot;org.springframework.remoting.httpinvoker.HttpInvokerProxyFactoryBean&quot;&gt;
+								&lt;property name=&quot;serviceUrl&quot; value=&quot;URL_KEY/http/remoteAuthenticationManager&quot;/&gt;
+								&lt;property name=&quot;serviceInterface&quot; value=&quot;org.acegisecurity.providers.rcp.RemoteAuthenticationManager&quot;/&gt;
+							&lt;/bean&gt;
+					&lt;/property&gt;
+				&lt;/bean&gt;
+			</value>
+		</constructor-arg>
+	</bean>
+
+</beans>
