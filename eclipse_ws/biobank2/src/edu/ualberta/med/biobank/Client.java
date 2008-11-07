@@ -10,12 +10,12 @@ public class Client {
 		ApplicationService appService 
 			//= ApplicationServiceProvider.getApplicationService();
 			= ApplicationServiceProvider.getApplicationServiceFromUrl(
-					"http://localhost:8080/biobank2");
+					"http://localhost:8080/biobank2", "biobank", "changeme");
 		
 		User user = new User();
 		System.out.println(" searching domain object");
 
-		Collection results = appService.search(User.class, user);
+		Collection<Object> results = appService.search(User.class, user);
 		for (Object obj : results) {
 			printObject(obj, User.class);
 		}
