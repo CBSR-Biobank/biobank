@@ -4,6 +4,8 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
+import edu.ualberta.med.biobank.webservice.Controller;
+
 /**
  * The activator class controls the plug-in life cycle
  */
@@ -14,6 +16,8 @@ public class Activator extends AbstractUIPlugin {
 
 	// The shared instance
 	private static Activator plugin;
+	
+	Controller wsController;
 	
 	/**
 	 * The constructor
@@ -28,6 +32,7 @@ public class Activator extends AbstractUIPlugin {
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
+		wsController = new Controller();
 	}
 
 	/*
@@ -57,5 +62,9 @@ public class Activator extends AbstractUIPlugin {
 	 */
 	public static ImageDescriptor getImageDescriptor(String path) {
 		return imageDescriptorFromPlugin(PLUGIN_ID, path);
+	}
+	
+	public Controller getWsController() {
+		return wsController;
 	}
 }

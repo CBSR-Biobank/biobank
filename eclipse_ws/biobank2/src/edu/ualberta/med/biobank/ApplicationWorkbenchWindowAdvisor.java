@@ -5,6 +5,7 @@ import org.eclipse.ui.application.ActionBarAdvisor;
 import org.eclipse.ui.application.IActionBarConfigurer;
 import org.eclipse.ui.application.IWorkbenchWindowConfigurer;
 import org.eclipse.ui.application.WorkbenchWindowAdvisor;
+import org.eclipse.jface.action.IStatusLineManager;
 
 public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
@@ -20,6 +21,15 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
         IWorkbenchWindowConfigurer configurer = getWindowConfigurer();
         configurer.setInitialSize(new Point(400, 300));
         configurer.setShowCoolBar(false);
-        configurer.setShowStatusLine(false);
-    }
+        configurer.setShowStatusLine(true);
+        configurer.setTitle("BioBank2");
+    }	
+    
+    // This is the new method
+	@Override
+	public void postWindowOpen() {
+		IStatusLineManager statusline = getWindowConfigurer()
+				.getActionBarConfigurer().getStatusLineManager();
+		statusline.setMessage(null, "Status line is ready");
+	}
 }
