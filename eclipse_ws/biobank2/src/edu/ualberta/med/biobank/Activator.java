@@ -3,8 +3,8 @@ package edu.ualberta.med.biobank;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
-
-import edu.ualberta.med.biobank.webservice.Controller;
+import edu.ualberta.med.biobank.webservice.Session;
+import org.eclipse.jface.dialogs.IDialogSettings;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -17,7 +17,9 @@ public class Activator extends AbstractUIPlugin {
 	// The shared instance
 	private static Activator plugin;
 	
-	Controller wsController;
+	Session wsSession;
+	
+	public static final String DLG_SETTINGS_SECTION = "edu.ualberta.med.biobank";
 	
 	/**
 	 * The constructor
@@ -32,7 +34,7 @@ public class Activator extends AbstractUIPlugin {
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
-		wsController = new Controller();
+		wsSession = new Session();
 	}
 
 	/*
@@ -64,7 +66,21 @@ public class Activator extends AbstractUIPlugin {
 		return imageDescriptorFromPlugin(PLUGIN_ID, path);
 	}
 	
-	public Controller getWsController() {
-		return wsController;
+	public Session getWsSession() {
+		return wsSession;
+	}
+	
+	public void setWsUserData(String userName, String server) {
+		IDialogSettings settings = getDialogSettings().getSection(DLG_SETTINGS_SECTION);
+		if (settings == null) {
+			settings = getDialogSettings().addNewSection(DLG_SETTINGS_SECTION);
+		}
+		settings.put("server", server);
+	}
+	
+	public String getWsUserData() {
+		IDialogSettings settings = getDialogSettings().getSection(DLG_SETTINGS_SECTION);
+		if (settings == null) return null;
+		return settings.get("server");
 	}
 }

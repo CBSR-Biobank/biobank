@@ -8,12 +8,12 @@ import java.util.EventObject;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.lang.InterruptedException;
 
-public class Controller implements Runnable {	
+public class Session implements Runnable {	
 	private ApplicationService appService;
 	private ListenerList listenerList;
 	private LinkedBlockingQueue<EventObject> eventQ;
 	
-	public Controller() {
+	public Session() {
 		eventQ = new LinkedBlockingQueue<EventObject>();
 	}
 	
@@ -69,7 +69,7 @@ public class Controller implements Runnable {
 	private void informListeners(EventObject event) {
 		Object[] listeners = listenerList.getListeners();
 		for (int i = 0; i < listeners.length; ++i) {
-			((IControllerListener) listeners[i]).eventHappened(event);
+			((ISessionListener) listeners[i]).eventHappened(event);
 		}
 
 	}

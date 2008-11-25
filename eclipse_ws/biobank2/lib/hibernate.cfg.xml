@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-configuration PUBLIC "-//Hibernate/Hibernate Configuration DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
+<hibernate-configuration>
+	<session-factory>
+
+		<!-- Properties for the session factory -->
+		<property name="connection.driver_class">com.mysql.jdbc.Driver</property>
+		<property name="connection.url">jdbc:mysql://localhost:8081/example</property>
+		<property name="connection.username">dummy</property>
+		<property name="connection.password">ozzy498</property>
+		<property name="connection.provider_class">org.hibernate.connection.C3P0ConnectionProvider</property>
+		<property name="c3p0.max_size">10</property>
+		<property name="c3p0.min_size">2</property>
+		<property name="c3p0.timeout">5000</property>
+		<property name="c3p0.max_statements">100</property>
+		<property name="c3p0.idle_test_period">3000</property>
+		<property name="c3p0.acquire_increment">2</property>
+		<property name="c3p0.validate">false</property>
+		<property name="hibernate.show_sql">false</property>
+		<property name="dialect">org.hibernate.dialect.MySQLDialect</property>
+		<property name="max_fetch_depth">1</property>
+		<property name="cglib.use_reflection_optimizer">false</property>
+		<property name="jdbc.batch_versioned_data">true</property>
+		<property name="jdbc.use_streams_for_binary">true</property>
+		<property name="cache.use_query_cache">false</property>
+		<property name="cache.provider_class">org.hibernate.cache.EhCacheProvider</property>
+
+		<!-- Mapped Resources -->
+		<mapping resource="gov/nih/nci/cacoresdk/domain/inheritance/childwithassociation/Payment.hbm.xml" />
+		<mapping resource="gov/nih/nci/cacoresdk/domain/inheritance/childwithassociation/Bank.hbm.xml" />
+		<mapping resource="gov/nih/nci/cacoresdk/domain/inheritance/childwithassociation/sametable/Designer.hbm.xml" />
+		<mapping resource="gov/nih/nci/cacoresdk/domain/inheritance/childwithassociation/sametable/Shoes.hbm.xml" />
+		<mapping resource="gov/nih/nci/cacoresdk/domain/inheritance/multiplechild/Student.hbm.xml" />
+		<mapping resource="gov/nih/nci/cacoresdk/domain/inheritance/multiplechild/sametable/Organization.hbm.xml" />
+		<mapping resource="gov/nih/nci/cacoresdk/domain/inheritance/onechild/Mammal.hbm.xml" />
+		<mapping resource="gov/nih/nci/cacoresdk/domain/inheritance/onechild/sametable/Currency.hbm.xml" />
+		<mapping resource="gov/nih/nci/cacoresdk/domain/inheritance/parentwithassociation/Professor.hbm.xml" />
+		<mapping resource="gov/nih/nci/cacoresdk/domain/inheritance/parentwithassociation/Assistant.hbm.xml" />
+		<mapping resource="gov/nih/nci/cacoresdk/domain/inheritance/parentwithassociation/sametable/Luggage.hbm.xml" />
+		<mapping resource="gov/nih/nci/cacoresdk/domain/inheritance/parentwithassociation/sametable/Wheel.hbm.xml" />
+		<mapping resource="gov/nih/nci/cacoresdk/domain/inheritance/twolevelinheritance/Display.hbm.xml" />
+		<mapping resource="gov/nih/nci/cacoresdk/domain/inheritance/twolevelinheritance/sametable/Goverment.hbm.xml" />
+		<mapping resource="gov/nih/nci/cacoresdk/domain/inheritance/twolevelinheritance/sametablerootlevel/Calculator.hbm.xml" />
+		<mapping resource="gov/nih/nci/cacoresdk/domain/manytomany/bidirectional/Project.hbm.xml" />
+		<mapping resource="gov/nih/nci/cacoresdk/domain/manytomany/bidirectional/Employee.hbm.xml" />
+		<mapping resource="gov/nih/nci/cacoresdk/domain/manytomany/unidirectional/Book.hbm.xml" />
+		<mapping resource="gov/nih/nci/cacoresdk/domain/manytomany/unidirectional/Author.hbm.xml" />
+		<mapping resource="gov/nih/nci/cacoresdk/domain/manytoone/unidirectional/Chef.hbm.xml" />
+		<mapping resource="gov/nih/nci/cacoresdk/domain/manytoone/unidirectional/Restaurant.hbm.xml" />
+		<mapping resource="gov/nih/nci/cacoresdk/domain/manytoone/unidirectional/withjoin/Album.hbm.xml" />
+		<mapping resource="gov/nih/nci/cacoresdk/domain/manytoone/unidirectional/withjoin/Song.hbm.xml" />
+		<mapping resource="gov/nih/nci/cacoresdk/domain/onetomany/bidirectional/HardDrive.hbm.xml" />
+		<mapping resource="gov/nih/nci/cacoresdk/domain/onetomany/bidirectional/Computer.hbm.xml" />
+		<mapping resource="gov/nih/nci/cacoresdk/domain/onetomany/bidirectional/withjoin/Flight.hbm.xml" />
+		<mapping resource="gov/nih/nci/cacoresdk/domain/onetomany/bidirectional/withjoin/Passanger.hbm.xml" />
+		<mapping resource="gov/nih/nci/cacoresdk/domain/onetomany/unidirectional/Key.hbm.xml" />
+		<mapping resource="gov/nih/nci/cacoresdk/domain/onetomany/unidirectional/KeyChain.hbm.xml" />
+		<mapping resource="gov/nih/nci/cacoresdk/domain/onetomany/unidirectional/withjoin/Button.hbm.xml" />
+		<mapping resource="gov/nih/nci/cacoresdk/domain/onetomany/unidirectional/withjoin/Shirt.hbm.xml" />
+		<mapping resource="gov/nih/nci/cacoresdk/domain/onetomany/selfassociation/Element.hbm.xml" />
+		<mapping resource="gov/nih/nci/cacoresdk/domain/onetoone/bidirectional/OrderLine.hbm.xml" />
+		<mapping resource="gov/nih/nci/cacoresdk/domain/onetoone/bidirectional/Product.hbm.xml" />
+		<mapping resource="gov/nih/nci/cacoresdk/domain/onetoone/bidirectional/withjoin/Chain.hbm.xml" />
+		<mapping resource="gov/nih/nci/cacoresdk/domain/onetoone/bidirectional/withjoin/Pendant.hbm.xml" />
+		<mapping resource="gov/nih/nci/cacoresdk/domain/onetoone/multipleassociation/Parent.hbm.xml" />
+		<mapping resource="gov/nih/nci/cacoresdk/domain/onetoone/multipleassociation/Child.hbm.xml" />
+		<mapping resource="gov/nih/nci/cacoresdk/domain/onetoone/multipleassociation/withjoin/Bride.hbm.xml" />
+		<mapping resource="gov/nih/nci/cacoresdk/domain/onetoone/multipleassociation/withjoin/InLaw.hbm.xml" />
+		<mapping resource="gov/nih/nci/cacoresdk/domain/onetoone/unidirectional/Person.hbm.xml" />
+		<mapping resource="gov/nih/nci/cacoresdk/domain/onetoone/unidirectional/Address.hbm.xml" />
+		<mapping resource="gov/nih/nci/cacoresdk/domain/onetoone/unidirectional/withjoin/Bag.hbm.xml" />
+		<mapping resource="gov/nih/nci/cacoresdk/domain/onetoone/unidirectional/withjoin/Handle.hbm.xml" />
+		<mapping resource="gov/nih/nci/cacoresdk/domain/other/datatype/AllDataType.hbm.xml" />
+		<mapping resource="gov/nih/nci/cacoresdk/domain/other/levelassociation/Card.hbm.xml" />
+		<mapping resource="gov/nih/nci/cacoresdk/domain/other/levelassociation/Deck.hbm.xml" />
+		<mapping resource="gov/nih/nci/cacoresdk/domain/other/levelassociation/Hand.hbm.xml" />
+		<mapping resource="gov/nih/nci/cacoresdk/domain/other/levelassociation/Suit.hbm.xml" />
+		<mapping resource="gov/nih/nci/cacoresdk/domain/other/primarykey/StringKey.hbm.xml" />
+		<mapping resource="gov/nih/nci/cacoresdk/domain/other/primarykey/IntegerKey.hbm.xml" />
+		<mapping resource="gov/nih/nci/cacoresdk/domain/other/primarykey/FloatKey.hbm.xml" />
+		<mapping resource="gov/nih/nci/cacoresdk/domain/other/primarykey/DoubleKey.hbm.xml" />
+		<mapping resource="gov/nih/nci/cacoresdk/domain/other/primarykey/CharacterKey.hbm.xml" />
+		<mapping resource="gov/nih/nci/cacoresdk/domain/other/primarykey/CharacterPrimitiveKey.hbm.xml" />
+		<mapping resource="gov/nih/nci/cacoresdk/domain/other/primarykey/DoublePrimitiveKey.hbm.xml" />
+		<mapping resource="gov/nih/nci/cacoresdk/domain/other/primarykey/FloatPrimitiveKey.hbm.xml" />
+		<mapping resource="gov/nih/nci/cacoresdk/domain/other/primarykey/IntegerPrimitiveKey.hbm.xml" />
+		<mapping resource="gov/nih/nci/cacoresdk/domain/other/primarykey/LongKey.hbm.xml" />
+		<mapping resource="gov/nih/nci/cacoresdk/domain/other/primarykey/LongPrimitiveKey.hbm.xml" />
+		<mapping resource="gov/nih/nci/cacoresdk/domain/other/primarykey/NoIdKey.hbm.xml" />
+		<mapping resource="gov/nih/nci/cacoresdk/domain/other/primarykey/StringPrimitiveKey.hbm.xml" />
+	</session-factory>
+</hibernate-configuration>
+
+
