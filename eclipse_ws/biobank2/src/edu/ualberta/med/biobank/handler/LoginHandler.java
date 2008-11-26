@@ -16,9 +16,8 @@ public class LoginHandler extends AbstractHandler implements IHandler {
 		LoginDialog loginDialog = new LoginDialog(PlatformUI.getWorkbench()
 				.getActiveWorkbenchWindow().getShell());
 		if (loginDialog.open() == Window.OK) {
-			Activator.getDefault().getWsSession().login(
-					loginDialog.getServer(), loginDialog.getUserName(), loginDialog.getPassword());
-			
+			Activator activator = Activator.getDefault(); 
+			activator.getWsSession().login(activator.getSessionCredentials());
 		}
 		return null;
 	}

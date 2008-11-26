@@ -7,25 +7,32 @@ import java.util.EventListener;
 import java.util.EventObject;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.lang.InterruptedException;
+import edu.ualberta.med.biobank.SessionCredentials;
 
-public class Session implements Runnable {	
+/**
+ * Thread that invokes API to caCORE generated application. 
+ * 
+ *
+ */
+public class Session extends Thread {	
 	private ApplicationService appService;
 	private ListenerList listenerList;
 	private LinkedBlockingQueue<EventObject> eventQ;
 	
 	public Session() {
 		eventQ = new LinkedBlockingQueue<EventObject>();
+		listenerList = new ListenerList();
 	}
 	
 	public void addListener(EventListener l) {
 		listenerList.add(l);		
 	}
 	
-	public void login(String url, String userName, String password) {
+	public void login(SessionCredentials sc) {
 		LoginEvent event = new LoginEvent(this);
-		event.setUrl(url);
-		event.setUserName(userName);
-		event.setPassword(password);
+		event.setUrl(sc.getServer());
+		event.setUserName(sc.getUserName());
+		event.setPassword(sc.getPassword());
 
 		try {		
 			eventQ.put(event);

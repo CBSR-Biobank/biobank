@@ -1,15 +1,19 @@
 package edu.ualberta.med.biobank;
 
+import java.util.EventObject;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 import edu.ualberta.med.biobank.webservice.Session;
-import org.eclipse.jface.dialogs.IDialogSettings;
+import edu.ualberta.med.biobank.webservice.ISessionListener;
+import edu.ualberta.med.biobank.webservice.LoginResultEvent;
 
 /**
  * The activator class controls the plug-in life cycle
  */
-public class Activator extends AbstractUIPlugin {
+public class Activator extends AbstractUIPlugin implements ISessionListener {
 
 	// The plug-in ID
 	public static final String PLUGIN_ID = "biobank2";
@@ -17,9 +21,9 @@ public class Activator extends AbstractUIPlugin {
 	// The shared instance
 	private static Activator plugin;
 	
-	Session wsSession;
+	private Session wsSession;
 	
-	public static final String DLG_SETTINGS_SECTION = "edu.ualberta.med.biobank";
+	private SessionCredentials sessionCredentials;
 	
 	/**
 	 * The constructor
@@ -35,6 +39,8 @@ public class Activator extends AbstractUIPlugin {
 		super.start(context);
 		plugin = this;
 		wsSession = new Session();
+		wsSession.addListener(this);
+		wsSession.start();
 	}
 
 	/*
@@ -70,17 +76,24 @@ public class Activator extends AbstractUIPlugin {
 		return wsSession;
 	}
 	
-	public void setWsUserData(String userName, String server) {
-		IDialogSettings settings = getDialogSettings().getSection(DLG_SETTINGS_SECTION);
-		if (settings == null) {
-			settings = getDialogSettings().addNewSection(DLG_SETTINGS_SECTION);
-		}
-		settings.put("server", server);
+	public void setSessionCredentials(SessionCredentials sc) {
+		sessionCredentials = sc;
 	}
 	
-	public String getWsUserData() {
-		IDialogSettings settings = getDialogSettings().getSection(DLG_SETTINGS_SECTION);
-		if (settings == null) return null;
-		return settings.get("server");
+	public SessionCredentials getSessionCredentials() {
+		return sessionCredentials;
+	}
+
+	public void eventHappened(EventObject event) {
+		if (event instanceof LoginResultEvent) {
+			LoginResultEvent loginResult = (LoginResultEvent)event;
+			if (loginResult.getResult()) {		
+				System.out.println("login successfull");
+			}
+			else {	
+				System.out.println("login unsuccessfull");
+			}
+		}
+		
 	}
 }
