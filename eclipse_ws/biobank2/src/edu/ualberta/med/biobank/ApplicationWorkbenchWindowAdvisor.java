@@ -23,6 +23,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
         configurer.setShowCoolBar(false);
         configurer.setShowStatusLine(true);
         configurer.setTitle("BioBank2");
+        configurer.setShowProgressIndicator(true);
     }	
     
     // This is the new method

@@ -7,6 +7,10 @@ import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.IHandler;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
+
 import edu.ualberta.med.biobank.Activator;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
@@ -32,34 +36,26 @@ public class LoginHandler extends AbstractHandler implements IHandler {
 			sc = activator.getSessionCredentials();
 			
 			IWorkbenchWindow window 
-				//= HandlerUtil.getActiveWorkbenchWindowChecked(event);
 				= PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 
-			ProgressMonitorDialog pd = new ProgressMonitorDialog(window.getShell());
 			loginSuccessful = false;
-			try {
-				pd.run(true /*fork*/, false /*cancelable*/,	new IRunnableWithProgress() {
-					public void run(IProgressMonitor monitor) throws
-					InvocationTargetException, InterruptedException {
-						monitor.beginTask("Logging in ... ", 100);
-						
-						try {
-							ApplicationService appService 
-							= ApplicationServiceProvider.getApplicationServiceFromUrl(
-									sc.getServer(), sc.getUserName(), sc.getPassword());
-							loginSuccessful = true;
-						}
-						catch (Exception e) {	
-						}
-						
-						monitor.done();
+			Job job = new Job("logging in") {
+				protected IStatus run(IProgressMonitor monitor) {
+					monitor.beginTask("Logging in ... ", 100);
+					
+					try {
+						ApplicationService appService 
+						= ApplicationServiceProvider.getApplicationServiceFromUrl(
+								sc.getServer(), sc.getUserName(), sc.getPassword());
+						loginSuccessful = true;
 					}
-				});
-			}
-			catch (InvocationTargetException e) {
-			} 
-			catch (InterruptedException e) {
-			}
+					catch (Exception e) {	
+					}
+					return Status.OK_STATUS;
+				}
+			};
+			job.setUser(true);
+			job.schedule();
 		}
 		return null;
 	}
