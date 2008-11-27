@@ -30,6 +30,6 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 	public void postWindowOpen() {
 		IStatusLineManager statusline = getWindowConfigurer()
 				.getActionBarConfigurer().getStatusLineManager();
-		statusline.setMessage(null, "Status line is ready");
+		statusline.setMessage(null, "");
 	}
 }
