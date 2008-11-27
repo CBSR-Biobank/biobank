@@ -14,9 +14,9 @@
    <extension
          point="org.eclipse.ui.perspectives">
       <perspective
-            name="RCP Perspective"
             class="edu.ualberta.med.biobank.Perspective"
-            id="biobank2.perspective">
+            id="edu.ualberta.med.biobank.perspective"
+            name="Biobank Perspective">
       </perspective>
    </extension>
    <extension
@@ -66,6 +66,12 @@
    </extension>
    <extension
          point="org.eclipse.ui.views">
+      <view
+            class="edu.ualberta.med.biobank.views.SessionsView"
+            id="edu.ualberta.med.biobank.views.sessions"
+            name="Sessions"
+            restorable="true">
+      </view>
    </extension>
 
 </plugin>

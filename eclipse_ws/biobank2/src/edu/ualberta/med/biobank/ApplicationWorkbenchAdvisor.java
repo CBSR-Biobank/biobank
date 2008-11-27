@@ -7,7 +7,7 @@ import org.eclipse.ui.application.IWorkbenchConfigurer;
 
 public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
 
-	private static final String PERSPECTIVE_ID = "biobank2.perspective";
+	private static final String PERSPECTIVE_ID = "edu.ualberta.med.biobank.perspective";
 
     public WorkbenchWindowAdvisor createWorkbenchWindowAdvisor(IWorkbenchWindowConfigurer configurer) {
         return new ApplicationWorkbenchWindowAdvisor(configurer);
