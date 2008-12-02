@@ -1,7 +1,5 @@
 package edu.ualberta.med.biobank.handler;
 
-import java.lang.reflect.InvocationTargetException;
-
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
@@ -10,22 +8,21 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.swt.widgets.Display;
 
 import edu.ualberta.med.biobank.Activator;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.handlers.HandlerUtil;
-import org.eclipse.jface.dialogs.ProgressMonitorDialog;
-import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.window.Window;
 import edu.ualberta.med.biobank.LoginDialog;
 import edu.ualberta.med.biobank.SessionCredentials;
+import edu.ualberta.med.biobank.views.SessionsView;
 import gov.nih.nci.system.client.ApplicationServiceProvider;
 import gov.nih.nci.system.applicationservice.ApplicationService;
 
 public class LoginHandler extends AbstractHandler implements IHandler {
 	private SessionCredentials sc;
-	private boolean loginSuccessful; 
+	ApplicationService appService;
 
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		LoginDialog loginDialog = new LoginDialog(PlatformUI.getWorkbench()
@@ -38,16 +35,20 @@ public class LoginHandler extends AbstractHandler implements IHandler {
 			IWorkbenchWindow window 
 				= PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 
-			loginSuccessful = false;
 			Job job = new Job("logging in") {
 				protected IStatus run(IProgressMonitor monitor) {
 					monitor.beginTask("Logging in ... ", 100);
 					
 					try {
-						ApplicationService appService 
-						= ApplicationServiceProvider.getApplicationServiceFromUrl(
+						appService = ApplicationServiceProvider.getApplicationServiceFromUrl(
 								sc.getServer(), sc.getUserName(), sc.getPassword());
-						loginSuccessful = true;
+						
+						Display.getDefault().asyncExec(new Runnable() {
+					          public void run() {
+					        	  SessionsView view = Activator.getDefault().getSessionView();
+					        	  view.addSession(appService, sc.getServer());
+					          }
+						});
 					}
 					catch (Exception e) {	
 					}

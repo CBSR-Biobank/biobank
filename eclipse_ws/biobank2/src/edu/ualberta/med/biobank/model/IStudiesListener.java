@@ -1,5 +1,5 @@
 package edu.ualberta.med.biobank.model;
 
 public interface IStudiesListener {
-	public void studiesChanged(StudyGroup studyGroup, Study study);
+	public void studiesChanged(BioBank studyGroup, Study study);
 }

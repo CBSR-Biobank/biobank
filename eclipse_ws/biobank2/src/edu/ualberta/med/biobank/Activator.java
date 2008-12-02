@@ -1,11 +1,11 @@
 package edu.ualberta.med.biobank;
 
 import java.util.EventObject;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.ui.part.ViewPart;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
+import edu.ualberta.med.biobank.views.SessionsView;
 import edu.ualberta.med.biobank.webservice.Session;
 import edu.ualberta.med.biobank.webservice.ISessionListener;
 import edu.ualberta.med.biobank.webservice.LoginResultEvent;
@@ -24,6 +24,8 @@ public class Activator extends AbstractUIPlugin implements ISessionListener {
 	private Session wsSession;
 	
 	private SessionCredentials sessionCredentials;
+	
+	private SessionsView sessionView;
 	
 	/**
 	 * The constructor
@@ -95,5 +97,13 @@ public class Activator extends AbstractUIPlugin implements ISessionListener {
 			}
 		}
 		
+	}
+
+	public void setSessionView(SessionsView sessionView) {
+		this.sessionView = sessionView;
+	}
+
+	public SessionsView getSessionView() {
+		return sessionView;
 	}
 }
