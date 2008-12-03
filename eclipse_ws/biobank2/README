@@ -1,3 +1,15 @@
+CSM UPT
+  URL: http://localhost:8080/
+  Login ID: biobank
+  Password: *****
+  Application Name: biobank2
+  
+TO REBUILD DATABASE:
+  run ant in schema directory.
+
+
 NOTES:
   Async update: http://dev.eclipse.org/newslists/news.eclipse.platform.rcp/msg32257.html
+  
+  
   

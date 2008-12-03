@@ -12,6 +12,10 @@ public class StudiesNode extends WsObject {
 	
 	public Study[] getStudies() {
 		Collection<Study> collection = bioBank.getStudyCollection(); 
+		if (collection == null) {
+			// call appService here to get
+			return null;
+		}
 		return (Study[]) collection.toArray(new Study[collection.size()]);
 	}
 

@@ -16,6 +16,10 @@ public class BioBankNode extends WsObject {
 		return bioBank;
 	}
 	
+	public String getName() {
+		return bioBank.getName();
+	}
+	
 	public WsObject[] getChildren() {
 		return children;
 	}

@@ -11,7 +11,6 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.swt.widgets.Display;
 
 import edu.ualberta.med.biobank.Activator;
-import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.jface.window.Window;
 import edu.ualberta.med.biobank.LoginDialog;
@@ -21,27 +20,22 @@ import gov.nih.nci.system.client.ApplicationServiceProvider;
 import gov.nih.nci.system.applicationservice.ApplicationService;
 
 public class LoginHandler extends AbstractHandler implements IHandler {
-	private SessionCredentials sc;
-	ApplicationService appService;
 
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		LoginDialog loginDialog = new LoginDialog(PlatformUI.getWorkbench()
 				.getActiveWorkbenchWindow().getShell());
 		if (loginDialog.open() == Window.OK) {
-			Activator activator = Activator.getDefault(); 
-			//activator.getWsSession().login(activator.getSessionCredentials());
-			sc = activator.getSessionCredentials();
-			
-			IWorkbenchWindow window 
-				= PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+			Activator activator = Activator.getDefault();
+			final SessionCredentials sc = activator.getSessionCredentials();
 
 			Job job = new Job("logging in") {
 				protected IStatus run(IProgressMonitor monitor) {
 					monitor.beginTask("Logging in ... ", 100);
 					
 					try {
-						appService = ApplicationServiceProvider.getApplicationServiceFromUrl(
-								sc.getServer(), sc.getUserName(), sc.getPassword());
+						final ApplicationService appService 
+							= ApplicationServiceProvider.getApplicationServiceFromUrl(
+								"http://" + sc.getServer() + "/biobank2", sc.getUserName(), sc.getPassword());
 						
 						Display.getDefault().asyncExec(new Runnable() {
 					          public void run() {
@@ -51,6 +45,13 @@ public class LoginHandler extends AbstractHandler implements IHandler {
 						});
 					}
 					catch (Exception e) {	
+						System.out.println(">>>" + e.getMessage());
+						
+						Display.getDefault().asyncExec(new Runnable() {
+					          public void run() {
+					        	  Activator.getDefault().getSessionView().loginFailed(sc);
+					          }
+						});
 					}
 					return Status.OK_STATUS;
 				}
