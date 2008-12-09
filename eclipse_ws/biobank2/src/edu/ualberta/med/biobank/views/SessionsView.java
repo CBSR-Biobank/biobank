@@ -14,13 +14,13 @@ import org.eclipse.ui.part.ViewPart;
 import edu.ualberta.med.biobank.Activator;
 import edu.ualberta.med.biobank.SessionCredentials;
 import edu.ualberta.med.biobank.model.RootNode;
-import edu.ualberta.med.biobank.model.BioBankNode;
+import edu.ualberta.med.biobank.model.SiteNode;
 import edu.ualberta.med.biobank.model.SessionNode;
 import edu.ualberta.med.biobank.model.ISessionNodeListener;
 import edu.ualberta.med.biobank.SessionContentProvider;
 import edu.ualberta.med.biobank.SessionLabelProvider;
 import gov.nih.nci.system.applicationservice.ApplicationService;
-import edu.ualberta.med.biobank.model.BioBank;
+import edu.ualberta.med.biobank.model.Site;
 
 public class SessionsView extends ViewPart {
 	public static final String ID =
@@ -62,24 +62,26 @@ public class SessionsView extends ViewPart {
 		
 		treeViewer.setInput(rootNode);
 		sessionNode.addListener(new ISessionNodeListener() {
-			public void sessionChanged(SessionNode sessionNode, BioBankNode bioBankNode) {
+			public void sessionChanged(SessionNode sessionNode, SiteNode siteNode) {
 				treeViewer.refresh();
 			}
 		});
 
-		// get the BioBank sites stored on this server
+		// get the Site sites stored on this server
 		Job job = new Job("logging in") {
 			protected IStatus run(IProgressMonitor monitor) {
 				monitor.beginTask("Logging in ... ", 100);
 				
-				BioBank bioBank = new BioBank();				
+				Site site = new Site();				
 				try {
-					final List<Object> bioBanks = appService.search(BioBank.class, bioBank);
+					final List<Object> sites = appService.search(Site.class, site);
 					
 					Display.getDefault().asyncExec(new Runnable() {
-				          public void run() {
-				        	  Activator.getDefault().getSessionView().addBioBanks(sessionNode, bioBanks);
-				          }
+						public void run() {
+							for (Object obj : sites) {
+								sessionNode.addSite((Site) obj);
+							}
+						}
 					});
 				}
 				catch (Exception e) {
@@ -91,12 +93,4 @@ public class SessionsView extends ViewPart {
 		job.setUser(true);
 		job.schedule();
 	}
-	
-	public void addBioBanks(SessionNode sessionNode, List<Object> bioBanks) {
-		for (Object obj : bioBanks) {
-			sessionNode.addBioBank((BioBank) obj);
-		}
-		
-	}
-
 }

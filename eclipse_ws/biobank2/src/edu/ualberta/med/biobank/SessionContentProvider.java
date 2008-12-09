@@ -4,7 +4,7 @@ import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 import edu.ualberta.med.biobank.model.RootNode;
 import edu.ualberta.med.biobank.model.SessionNode;
-import edu.ualberta.med.biobank.model.BioBankNode;
+import edu.ualberta.med.biobank.model.SiteNode;
 import edu.ualberta.med.biobank.model.ClinicsNode;
 import edu.ualberta.med.biobank.model.StudiesNode;
 
@@ -24,10 +24,10 @@ public class SessionContentProvider implements ITreeContentProvider {
 			return ((RootNode) element).getSessions();
 		}
 		else if (element instanceof SessionNode) {
-			return ((SessionNode) element).getBioBanks();
+			return ((SessionNode) element).getSites();
 		}
-		else if (element instanceof BioBankNode) {
-			return ((BioBankNode) element).getChildren();
+		else if (element instanceof SiteNode) {
+			return ((SiteNode) element).getChildren();
 		}
 		else if (element instanceof ClinicsNode) {
 			return ((ClinicsNode) element).getClinics();
@@ -49,8 +49,8 @@ public class SessionContentProvider implements ITreeContentProvider {
 		else if (element instanceof SessionNode) {
 			return ((SessionNode) element).getParent();
 		}
-		else if (element instanceof BioBankNode) {
-			return ((BioBankNode) element).getParent();
+		else if (element instanceof SiteNode) {
+			return ((SiteNode) element).getParent();
 		}
 		else if (element instanceof ClinicsNode) {
 			return ((ClinicsNode) element).getParent();

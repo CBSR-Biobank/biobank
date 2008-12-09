@@ -3,15 +3,15 @@ package edu.ualberta.med.biobank.model;
 import java.util.Collection;
 
 public class StudiesNode extends WsObject {
-	private BioBank bioBank;
+	private Site site;
 	
-	public StudiesNode(BioBank bioBank) {
-		this.bioBank = bioBank;
+	public StudiesNode(Site site) {
+		this.site = site;
 		setName("Studies");
 	}
 	
 	public Study[] getStudies() {
-		Collection<Study> collection = bioBank.getStudyCollection(); 
+		Collection<Study> collection = site.getStudyCollection(); 
 		if (collection == null) {
 			// call appService here to get
 			return null;
@@ -20,7 +20,7 @@ public class StudiesNode extends WsObject {
 	}
 
 	protected void fireChildrenChanged() {
-		BioBankNode parent = (BioBankNode) getParent();
+		SiteNode parent = (SiteNode) getParent();
 		if (parent == null) return; 
 		parent.fireChildrenChanged();
 	}

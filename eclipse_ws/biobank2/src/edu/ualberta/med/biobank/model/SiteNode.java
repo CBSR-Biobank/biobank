@@ -1,23 +1,23 @@
 package edu.ualberta.med.biobank.model;
 
-public class BioBankNode extends WsObject {
-	private BioBank bioBank;
+public class SiteNode extends WsObject {
+	private Site site;
 	
 	private WsObject[] children;
 
-	public BioBankNode(BioBank bioBank) {
-		this.bioBank = bioBank;
-		children = new WsObject[] { new StudiesNode(bioBank), new ClinicsNode(bioBank) };
+	public SiteNode(Site site) {
+		this.site = site;
+		children = new WsObject[] { new StudiesNode(site), new ClinicsNode(site) };
 		children[0].setParent(this);
 		children[1].setParent(this);
 	}
 
-	public BioBank getBioBank() {
-		return bioBank;
+	public Site getSite() {
+		return site;
 	}
 	
 	public String getName() {
-		return bioBank.getName();
+		return site.getName();
 	}
 	
 	public WsObject[] getChildren() {

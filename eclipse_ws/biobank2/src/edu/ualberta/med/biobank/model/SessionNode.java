@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import org.eclipse.core.runtime.ListenerList;
 
 public class SessionNode extends WsObject {
-	private ArrayList<BioBankNode> bioBankNodes;
+	private ArrayList<SiteNode> siteNodes;
 	
 	private ListenerList listeners;
 	
@@ -17,29 +17,29 @@ public class SessionNode extends WsObject {
 		setName(name);
 	}
 	
-	public void addBioBank(BioBank bioBank) {
-		if (bioBankNodes == null) {
-			bioBankNodes = new ArrayList<BioBankNode>();
+	public void addSite(Site site) {
+		if (siteNodes == null) {
+			siteNodes = new ArrayList<SiteNode>();
 		}
-		BioBankNode bioBankNode = new BioBankNode(bioBank);
-		bioBankNode.setParent(this);
-		bioBankNodes.add(bioBankNode);
+		SiteNode siteNode = new SiteNode(site);
+		siteNode.setParent(this);
+		siteNodes.add(siteNode);
 		fireChildrenChanged(null);
 	}
 
-	public void removeBioBank(BioBank bioBank) {
-		if (bioBankNodes != null) {
-			bioBankNodes.remove(bioBank);
-			if (bioBankNodes.isEmpty())
-				bioBankNodes = null;
+	public void removeSite(Site site) {
+		if (siteNodes != null) {
+			siteNodes.remove(site);
+			if (siteNodes.isEmpty())
+				siteNodes = null;
 		}
 	}	
 	
-	public BioBankNode[] getBioBanks() {
-		if (bioBankNodes == null) {
-			return new BioBankNode[0];
+	public SiteNode[] getSites() {
+		if (siteNodes == null) {
+			return new SiteNode[0];
 		}
-		return (BioBankNode[]) bioBankNodes.toArray(new BioBankNode[bioBankNodes.size()]);
+		return (SiteNode[]) siteNodes.toArray(new SiteNode[siteNodes.size()]);
 	}
 
 
@@ -57,11 +57,11 @@ public class SessionNode extends WsObject {
 		}
 	}
 
-	protected void fireChildrenChanged(BioBankNode bioBankNode) {
+	protected void fireChildrenChanged(SiteNode siteNode) {
 		if (listeners == null) return;
 		
 		for (Object l : listeners.getListeners()) {
-			((ISessionNodeListener) l).sessionChanged(this, bioBankNode);
+			((ISessionNodeListener) l).sessionChanged(this, siteNode);
 		}
 	}
 }
