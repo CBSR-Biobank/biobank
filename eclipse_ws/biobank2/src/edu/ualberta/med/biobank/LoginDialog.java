@@ -172,7 +172,7 @@ public class LoginDialog extends Dialog {
 			"Server field must not be blank.");
 			return;
 		}
-		if (userNameText.getText().equals("")) {
+		if (userNameText.getText().equals("") && !Activator.getDefault().isDebugging()) {
 			MessageDialog.openError(getShell(), "Invalid User Name",
 			"User Name field must not be blank.");
 			return;

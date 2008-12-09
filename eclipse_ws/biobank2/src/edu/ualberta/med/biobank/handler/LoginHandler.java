@@ -33,9 +33,18 @@ public class LoginHandler extends AbstractHandler implements IHandler {
 					monitor.beginTask("Logging in ... ", 100);
 					
 					try {
-						final ApplicationService appService 
-							= ApplicationServiceProvider.getApplicationServiceFromUrl(
-								"http://" + sc.getServer() + "/biobank2", sc.getUserName(), sc.getPassword());
+						final ApplicationService appService;
+						final String userName = sc.getUserName(); 
+						
+						if (userName.length() == 0) {
+							appService = ApplicationServiceProvider.getApplicationServiceFromUrl(
+									"http://" + sc.getServer() + "/biobank2");
+							
+						}
+						else {
+							appService = ApplicationServiceProvider.getApplicationServiceFromUrl(
+									"http://" + sc.getServer() + "/biobank2", userName, sc.getPassword());
+						}
 						
 						Display.getDefault().asyncExec(new Runnable() {
 					          public void run() {

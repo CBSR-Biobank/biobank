@@ -2,7 +2,6 @@ package edu.ualberta.med.biobank;
 
 import java.util.EventObject;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.ui.part.ViewPart;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 import edu.ualberta.med.biobank.views.SessionsView;
