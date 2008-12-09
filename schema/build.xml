@@ -10,7 +10,6 @@
 -->
 
   <property name="cacore.sdk.dir" location="${basedir}/../caCORE_SDK/sdk" />
-  <property name="cacore.sdk.lib.dir" location="${cacore.sdk.dir}/lib" />
   <property name="cacore.sdk.system.lib.dir"
     location="${cacore.sdk.dir}/system/lib" />
 
@@ -27,9 +26,6 @@
       <pathelement location="${cacore.sdk.system.lib.dir}/hibernate3.jar" />
       <pathelement location="${codegen.biobank2.src}" />
       <fileset dir="${cacore.sdk.system.lib.dir}" >
-        <include name="**/*.jar" />
-      </fileset>
-      <fileset dir="${cacore.sdk.lib.dir}" >
         <include name="**/*.jar" />
       </fileset>
     </path>

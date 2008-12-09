@@ -1,0 +1,18 @@
+To build model with caCORE SDK:
+  - download caCORE SDK from here:
+      http://ncicb.nci.nih.gov/infrastructure/cacoresdk
+  - move file to <proj_dir>/caCORE
+  - uncompress file in <proj_dir>/caCORE/sdk
+  - move <proj_dir>/deploy.properties to <proj_dir>/caCORE/sdk/conf
+  - change <proj_dir>/caCORE/sdk/conf/deploy.properties to suit your system:
+       - DB_CONNECTION_URL
+       - DB_USERNAME
+       - DB_PASSWORD
+       - DB_DRIVER
+       - DB_DIALECT
+  - in directory <proj_dir>/caCORE/sdk issue command: ant build-system
+  - to generate database schema: cd to <proj_dir>/schema and run ant
+  - copy <proj_dir>/caCORE/sdk/output/biobank2/package/webapp/biobank2.war to
+    $JBOSS_HOME/server/default/deploy
+  - copy <proj_dir>/caCORE/sdk/output/biobank2/build/jar/biobank2-beans.jar to
+    <projdir>/eclipse_ws/biobank2/lib
