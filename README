@@ -16,3 +16,6 @@ To build model with caCORE SDK:
     $JBOSS_HOME/server/default/deploy
   - copy <proj_dir>/caCORE/sdk/output/biobank2/build/jar/biobank2-beans.jar to
     <projdir>/eclipse_ws/biobank2/lib
+
+MySQL Server
+  - my.cnf must have "lower_case_table_names=1"
