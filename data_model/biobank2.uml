@@ -27,7 +27,7 @@
       <fontsize>12</fontsize>
       <defaultstereotypeview>0</defaultstereotypeview>
       <generationoutputdir>/tmp</generationoutputdir>
-      <activediagram>DM-STORAGE_TYPE</activediagram>
+      <activediagram>StorageType</activediagram>
     </settings>
     <searchpath href="PROJECT_DIR" />
     <members>
@@ -109,7 +109,7 @@
 			UML 1.4
 		</plugin>
 </profile>
-<XMI xmi.version = '1.2' xmlns:UML = 'org.omg.xmi.namespace.UML' timestamp = 'Mon Jan 12 16:48:43 MST 2009'>
+<XMI xmi.version = '1.2' xmlns:UML = 'org.omg.xmi.namespace.UML' timestamp = 'Mon Jan 12 16:54:11 MST 2009'>
   <XMI.header>    <XMI.documentation>
       <XMI.exporter>ArgoUML (using Netbeans XMI Writer version 1.0)</XMI.exporter>
       <XMI.exporterVersion>0.26.2(6) revised on $Date: 2007-05-12 08:08:08 +0200 (Sat, 12 May 2007) $ </XMI.exporterVersion>
@@ -6295,6 +6295,9 @@
                                     <UML:Class xmi.id = '127-0-0-1--6131fb51:11e1e178620:-8000:0000000000000F87'
                                       name = 'StorageType' visibility = 'public' isSpecification = 'false' isRoot = 'false'
                                       isLeaf = 'false' isAbstract = 'false' isActive = 'false'>
+                                      <UML:GeneralizableElement.generalization>
+                                        <UML:Generalization xmi.idref = '127-0-1-1-62f71f2:11ecbc7b894:-8000:000000000000185B'/>
+                                      </UML:GeneralizableElement.generalization>
                                       <UML:Classifier.feature>
                                         <UML:Attribute xmi.id = '127-0-1-1-f534589:11ebcb9ae1d:-8000:000000000000112F'
                                           name = 'id' visibility = 'private' isSpecification = 'false' ownerScope = 'instance'
@@ -6783,9 +6786,6 @@
                                       <UML:ModelElement.clientDependency>
                                         <UML:Dependency xmi.idref = '127-0-1-1-f534589:11ebcb9ae1d:-8000:0000000000001102'/>
                                       </UML:ModelElement.clientDependency>
-                                      <UML:GeneralizableElement.generalization>
-                                        <UML:Generalization xmi.idref = '127-0-1-1-73fc7089:11ea7f12923:-8000:0000000000001082'/>
-                                      </UML:GeneralizableElement.generalization>
                                       <UML:Classifier.feature>
                                         <UML:Attribute xmi.id = '127-0-1-1-73fc7089:11ea7f12923:-8000:0000000000001063'
                                           name = 'id' visibility = 'private' isSpecification = 'false' ownerScope = 'instance'
@@ -6930,15 +6930,6 @@
                                         </UML:Attribute>
                                       </UML:Classifier.feature>
                                     </UML:Class>
-                                    <UML:Generalization xmi.id = '127-0-1-1-73fc7089:11ea7f12923:-8000:0000000000001082'
-                                      isSpecification = 'false'>
-                                      <UML:Generalization.child>
-                                        <UML:Class xmi.idref = '127-0-1-1-73fc7089:11ea7f12923:-8000:0000000000001062'/>
-                                      </UML:Generalization.child>
-                                      <UML:Generalization.parent>
-                                        <UML:Class xmi.idref = '127-0-0-1--6131fb51:11e1e178620:-8000:0000000000000F87'/>
-                                      </UML:Generalization.parent>
-                                    </UML:Generalization>
                                     <UML:Association xmi.id = '127-0-1-1-f534589:11ebcb9ae1d:-8000:00000000000010DC'
                                       name = '' isSpecification = 'false' isRoot = 'false' isLeaf = 'false' isAbstract = 'false'>
                                       <UML:Association.connection>
@@ -7292,6 +7283,15 @@
                                       </UML:Generalization.child>
                                       <UML:Generalization.parent>
                                         <UML:Class xmi.idref = '127-0-0-1--6131fb51:11e1e178620:-8000:0000000000000F9B'/>
+                                      </UML:Generalization.parent>
+                                    </UML:Generalization>
+                                    <UML:Generalization xmi.id = '127-0-1-1-62f71f2:11ecbc7b894:-8000:000000000000185B'
+                                      isSpecification = 'false'>
+                                      <UML:Generalization.child>
+                                        <UML:Class xmi.idref = '127-0-0-1--6131fb51:11e1e178620:-8000:0000000000000F87'/>
+                                      </UML:Generalization.child>
+                                      <UML:Generalization.parent>
+                                        <UML:Class xmi.idref = '127-0-1-1-73fc7089:11ea7f12923:-8000:0000000000001062'/>
                                       </UML:Generalization.parent>
                                     </UML:Generalization>
                                   </UML:Namespace.ownedElement>
@@ -19116,7 +19116,7 @@
     <rectangle name="Fig0.0"
       x="40"
       y="248"
-      width="160"
+      width="161"
       height="139"
       fill="1"
       fillcolor="white"
@@ -19124,7 +19124,7 @@
       strokecolor="black"
     />
     <group name="Fig0.1"
-         description="org.argouml.uml.diagram.ui.FigStereotypesCompartment[40, 248, 160, 0]"
+         description="org.argouml.uml.diagram.ui.FigStereotypesCompartment[40, 248, 161, 0]"
          href="127-0-1-1-73fc7089:11ea7f12923:-8000:0000000000001062"
          fill="1"
          fillcolor="white"
@@ -19137,7 +19137,7 @@
       <rectangle name="Fig0.1.0"
         x="40"
         y="248"
-        width="160"
+        width="161"
         height="0"
         fill="1"
         fillcolor="white"
@@ -19148,7 +19148,7 @@
     <text name="Fig0.2"
       x="40"
       y="248"
-      width="160"
+      width="161"
       height="21"
       fill="1"
       fillcolor="white"
@@ -19162,7 +19162,7 @@
       justification="Center"
     >ContainerType</text>
     <group name="Fig0.3"
-         description="org.argouml.uml.diagram.ui.FigOperationsCompartment[41, 363, 159, 23]"
+         description="org.argouml.uml.diagram.ui.FigOperationsCompartment[41, 363, 160, 23]"
          fill="1"
          fillcolor="white"
          stroke="0"
@@ -19174,7 +19174,7 @@
       <rectangle name="Fig0.3.0"
         x="41"
         y="363"
-        width="159"
+        width="160"
         height="23"
         fill="1"
         fillcolor="white"
@@ -19190,7 +19190,7 @@
       >
         <moveto x="41"
                 y="363" />
-        <lineto x="200"
+        <lineto x="201"
                 y="363" />
       </path>
     </group>
@@ -19207,7 +19207,7 @@
       <rectangle name="Fig0.4.0"
         x="41"
         y="270"
-        width="159"
+        width="160"
         height="92"
         fill="1"
         fillcolor="white"
@@ -19223,14 +19223,14 @@
       >
         <moveto x="41"
                 y="270" />
-        <lineto x="200"
+        <lineto x="201"
                 y="270" />
       </path>
       <text name="Fig0.4.2"
         x="41"
         y="271"
         width="63"
-        height="17"
+        height="14"
         fill="0"
         fillcolor="white"
         stroke="0"
@@ -19326,7 +19326,7 @@
     <rectangle name="Fig0.5"
       x="40"
       y="248"
-      width="160"
+      width="161"
       height="139"
       fill="0"
       fillcolor="white"
@@ -19549,27 +19549,27 @@
   </group>
   <group name="Fig3"
        description="org.argouml.uml.diagram.ui.FigGeneralization"
-       href="127-0-1-1-73fc7089:11ea7f12923:-8000:0000000000001082"
+       href="127-0-1-1-62f71f2:11ecbc7b894:-8000:000000000000185B"
        stroke="1"
        strokecolor="black"
   >
     <private>
-      sourcePortFig="Fig0"
-      destPortFig="Fig1"
-      sourceFigNode="Fig0"
-      destFigNode="Fig1"
+      sourcePortFig="Fig1.0"
+      destPortFig="Fig0"
+      sourceFigNode="Fig1"
+      destFigNode="Fig0"
     </private>
     <path name="Fig3.0"
-      description="org.argouml.gefext.ArgoFigPoly"
+      description="org.tigris.gef.presentation.FigPoly"
       fill="0"
       fillcolor="white"
       stroke="1"
       strokecolor="black"
     >
-      <moveto x="120"
-              y="248" />
-      <lineto x="120"
+      <moveto x="112"
               y="169" />
+      <lineto x="112"
+              y="248" />
     </path>
   </group>
 </pgml>
