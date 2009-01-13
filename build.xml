@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="schema" basedir="." default="schemaexport">
+
+<!--
+  Overall build file
+
+-->
+
+<property name="cacore.sdk.dir" location="caCORE_SDK/sdk" />
+<property name="eclipse.proj.dir" location="eclipse_ws/biobank2/lib" />
+<property name="schema.dir" location="schema" />
+<property environment="env"/>
+<property name="env.JBOSS_HOME" value="TO_BE_REPLACED" />
+
+<target name="sdk">
+  <ant
+     dir="${cacore.sdk.dir}"
+     target="build-system"
+     inheritRefs="false" />
+  <copy
+     file="${cacore.sdk.dir}/output/biobank2/build/jar/biobank2-beans.jar"
+     tofile="${eclipse.proj.dir}/biobank2-beans.jar"/>
+</target>
+
+<target name="deploy">
+  <fail unless="env.JBOSS_HOME" message="$JBOSS_HOME not defined" />
+  <antcall target="sdk" />
+  <copy
+     file="${cacore.sdk.dir}/output/biobank2/package/webapp/biobank2.war"
+     tofile="${env.JBOSS_HOME}/server/default/deploy/biobank2.war"/>
+</target>
+
+<target name="schemaexport" depends="sdk">
+  <ant
+     dir="${schema.dir}"
+     target="schemaexport"
+     inheritRefs="false" />
+</target>
+
+</project>
