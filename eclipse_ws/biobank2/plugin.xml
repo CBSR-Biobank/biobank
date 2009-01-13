@@ -35,13 +35,28 @@
          point="org.eclipse.ui.commands">
       <command
             defaultHandler="edu.ualberta.med.biobank.handler.LoginHandler"
-            id="login.command"
+            id="edu.ualberta.med.biobank.commands.login"
             name="Login">
       </command>
       <command
-            defaultHandler="edu.ualberta.med.biobank.handler.ExitHandler"
-            id="exit.command"
-            name="Exit">
+            defaultHandler="edu.ualberta.med.biobank.handler.LogoutHandler"
+            id="edu.ualberta.med.biobank.commands.logout"
+            name="Logout">
+      </command>
+      <command
+            defaultHandler="edu.ualberta.med.biobank.handler.QuitHandler"
+            id="edu.ualberta.med.biobank.commands.quit"
+            name="Quit">
+      </command>
+      <command
+            defaultHandler="edu.ualberta.med.biobank.handler.AddSiteHandler"
+            id="edu.ualberta.med.biobank.commands.addSite"
+            name="AddSite">
+      </command>
+      <command
+            defaultHandler="edu.ualberta.med.biobank.handler.EditSiteHandler"
+            id="edu.ualberta.med.biobank.commands.editSite"
+            name="EditSite">
       </command>
    </extension>
    <extension
@@ -49,18 +64,52 @@
       <menuContribution
             locationURI="menu:org.eclipse.ui.main.menu">
          <menu
-               id="mymenu"
-               label="File">
+               id="edu.ualberta.med.biobank.menu.biobank"
+               label="BioBank"
+               mnemonic="B">
             <command
-                  commandId="login.command"
+                  commandId="edu.ualberta.med.biobank.commands.login"
+                  id="edu.ualberta.med.biobank.menu.login"
                   label="Login"
+                  mnemonic="i"
                   style="push">
             </command>
             <command
-                  commandId="exit.command"
-                  label="Exit"
+                  commandId="edu.ualberta.med.biobank.commands.logout"
+                  id="edu.ualberta.med.biobank.menu.logout"
+                  label="Logout"
+                  mnemonic="o"
                   style="push">
             </command>
+            <command
+                  commandId="edu.ualberta.med.biobank.commands.quit"
+                  id="edu.ualberta.med.biobank.menu.quit"
+                  label="Quit"
+                  mnemonic="Q"
+                  style="push">
+            </command>
+         </menu>
+         <menu
+               id="edu.ualberta.med.biobank.menu.administration"
+               label="Administration"
+               mnemonic="A">
+            <menu
+                  id="edu.ualberta.med.biobank.menu.site"
+                  label="Site"
+                  mnemonic="i">
+               <command
+                     commandId="edu.ualberta.med.biobank.commands.addSite"
+                     id="edu.ualberta.med.biobank.menu.addSite"
+                     label="Add"
+                     style="push">
+               </command>
+               <command
+                     commandId="edu.ualberta.med.biobank.commands.editSite"
+                     id="edu.ualberta.med.biobank.menu.editSite"
+                     label="Edit"
+                     style="push">
+               </command>
+            </menu>
          </menu>
       </menuContribution>
    </extension>

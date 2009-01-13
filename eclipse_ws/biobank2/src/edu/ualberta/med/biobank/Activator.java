@@ -8,6 +8,7 @@ import edu.ualberta.med.biobank.views.SessionsView;
 import edu.ualberta.med.biobank.webservice.Session;
 import edu.ualberta.med.biobank.webservice.ISessionListener;
 import edu.ualberta.med.biobank.webservice.LoginResultEvent;
+import gov.nih.nci.system.applicationservice.ApplicationService;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -97,12 +98,20 @@ public class Activator extends AbstractUIPlugin implements ISessionListener {
 		}
 		
 	}
-
+	
+	public void addSession(final ApplicationService appService, final String name) {
+		sessionView.addSession(appService, name);		
+	}
+	
+	public void addSessionFailed(final SessionCredentials sc) {
+		sessionView.loginFailed(sc);
+	}
+	
 	public void setSessionView(SessionsView sessionView) {
 		this.sessionView = sessionView;
 	}
-
-	public SessionsView getSessionView() {
-		return sessionView;
+	
+	public int getSessionCount() {
+		return sessionView.getSessionCount(); 
 	}
 }

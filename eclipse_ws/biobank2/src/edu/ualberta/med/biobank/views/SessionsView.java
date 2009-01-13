@@ -11,6 +11,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.part.ViewPart;
+import org.hibernate.hql.ast.tree.Node;
+
 import edu.ualberta.med.biobank.Activator;
 import edu.ualberta.med.biobank.SessionCredentials;
 import edu.ualberta.med.biobank.model.RootNode;
@@ -92,5 +94,21 @@ public class SessionsView extends ViewPart {
 		};
 		job.setUser(true);
 		job.schedule();
+	}
+	
+	public void deleteSession(String name) throws Exception {
+		rootNode.deleteSessionNode(name);
+	}
+	
+	public int getSessionCount() {
+		return rootNode.getChildCount();
+	}
+	
+	public ArrayList<String> getSessionNames() {
+		ArrayList<String> names = new ArrayList<String>();
+		for (SessionNode node : rootNode.getSessions()) {
+			names.add(node.getName());
+		}
+		return names;
 	}
 }

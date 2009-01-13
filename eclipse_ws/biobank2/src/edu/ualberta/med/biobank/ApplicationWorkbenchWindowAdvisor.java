@@ -22,7 +22,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
         configurer.setInitialSize(new Point(400, 300));
         configurer.setShowCoolBar(false);
         configurer.setShowStatusLine(true);
-        configurer.setTitle("Site2");
+        configurer.setTitle("BioBank2");
         configurer.setShowProgressIndicator(true);
     }	
     

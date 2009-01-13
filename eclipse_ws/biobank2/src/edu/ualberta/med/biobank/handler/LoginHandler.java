@@ -15,7 +15,6 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.jface.window.Window;
 import edu.ualberta.med.biobank.LoginDialog;
 import edu.ualberta.med.biobank.SessionCredentials;
-import edu.ualberta.med.biobank.views.SessionsView;
 import gov.nih.nci.system.client.ApplicationServiceProvider;
 import gov.nih.nci.system.applicationservice.ApplicationService;
 
@@ -48,8 +47,7 @@ public class LoginHandler extends AbstractHandler implements IHandler {
 						
 						Display.getDefault().asyncExec(new Runnable() {
 					          public void run() {
-					        	  SessionsView view = Activator.getDefault().getSessionView();
-					        	  view.addSession(appService, sc.getServer());
+					        	  Activator.getDefault().addSession(appService, sc.getServer());
 					          }
 						});
 					}
@@ -58,7 +56,7 @@ public class LoginHandler extends AbstractHandler implements IHandler {
 						
 						Display.getDefault().asyncExec(new Runnable() {
 					          public void run() {
-					        	  Activator.getDefault().getSessionView().loginFailed(sc);
+					        	  Activator.getDefault().addSessionFailed(sc);
 					          }
 						});
 					}
