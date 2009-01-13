@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="schema" basedir="." default="schemaexport">
+<project name="biobank2" basedir="." default="sdk">
 
 <!--
   Overall build file
+
+  use command "ant -projecthelp" to display the targets.
 
 -->
 
@@ -12,17 +14,24 @@
 <property environment="env"/>
 <property name="env.JBOSS_HOME" value="TO_BE_REPLACED" />
 
-<target name="sdk">
+<target name="sdk"
+        description="builds the caCORE SDK from the data model" >
   <ant
      dir="${cacore.sdk.dir}"
      target="build-system"
      inheritRefs="false" />
+</target>
+
+<target name="deploy-eclipse"
+        description="deploys the caCORE SDK beans to the eclipse project"
+        depends="sdk">
   <copy
      file="${cacore.sdk.dir}/output/biobank2/build/jar/biobank2-beans.jar"
      tofile="${eclipse.proj.dir}/biobank2-beans.jar"/>
 </target>
 
-<target name="deploy">
+<target name="deploy-jboss"
+        description="deploys the caCORE SDK webapp to JBoss">
   <fail unless="env.JBOSS_HOME" message="$JBOSS_HOME not defined" />
   <antcall target="sdk" />
   <copy
@@ -30,10 +39,26 @@
      tofile="${env.JBOSS_HOME}/server/default/deploy/biobank2.war"/>
 </target>
 
-<target name="schemaexport" depends="sdk">
+<target
+   name="deploy"
+   description="deploys to JBoss and Eclipse project">
+  <antcall target="deploy-jboss" />
+  <antcall target="deploy-eclipse" />
+</target>
+
+<target name="schema"
+        description="generates the database schema for the caCORE SDK data model"
+        depends="sdk">
   <ant
      dir="${schema.dir}"
      target="schemaexport"
+     inheritRefs="false" />
+</target>
+
+<target name="clean">
+  <ant
+     dir="${cacore.sdk.dir}"
+     target="clean"
      inheritRefs="false" />
 </target>
 
