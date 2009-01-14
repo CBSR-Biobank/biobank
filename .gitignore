@@ -5,12 +5,10 @@ CSM_API_rel_401.zip
 CSM_API_rel_401/
 CSM_UPT_4_0_Release.zip
 CSM_UPT_4_0_Release/
-data_model/ClassDiagram1.png
-data_model/ClassDiagram2.png
-data_model/biobank2.uml.with_study_data
+data_model/*.png
 data_model/biobank2.uml~
 eclipse_ws/.metadata/
 eclipse_ws/biobank2/.settings/
 eclipse_ws/biobank2/bin/
-eclipse_ws/biobank2/build.properties
-runtime-biobank2/
+runtime-biobank2.biobank2/
+schema/schema-export.sql

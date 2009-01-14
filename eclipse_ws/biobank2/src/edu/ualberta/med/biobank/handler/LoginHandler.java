@@ -13,8 +13,8 @@ import org.eclipse.swt.widgets.Display;
 import edu.ualberta.med.biobank.Activator;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.jface.window.Window;
-import edu.ualberta.med.biobank.LoginDialog;
 import edu.ualberta.med.biobank.SessionCredentials;
+import edu.ualberta.med.biobank.dialogs.LoginDialog;
 import gov.nih.nci.system.client.ApplicationServiceProvider;
 import gov.nih.nci.system.applicationservice.ApplicationService;
 

@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank;
+package edu.ualberta.med.biobank.cnf;
 
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ILabelProviderListener;

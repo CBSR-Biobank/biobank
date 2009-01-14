@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank;
+package edu.ualberta.med.biobank.dialogs;
 
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.swt.widgets.Shell;
@@ -17,6 +17,10 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import org.osgi.service.prefs.Preferences;
 import org.osgi.service.prefs.BackingStoreException;
+
+import edu.ualberta.med.biobank.Activator;
+import edu.ualberta.med.biobank.Application;
+import edu.ualberta.med.biobank.SessionCredentials;
 
 public class LoginDialog extends Dialog {
 	

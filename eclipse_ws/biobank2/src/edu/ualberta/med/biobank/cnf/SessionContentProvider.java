@@ -1,8 +1,8 @@
-package edu.ualberta.med.biobank;
+package edu.ualberta.med.biobank.cnf;
 
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
-import edu.ualberta.med.biobank.model.RootNode;
+import edu.ualberta.med.biobank.model.NavigatorRoot;
 import edu.ualberta.med.biobank.model.SessionNode;
 import edu.ualberta.med.biobank.model.SiteNode;
 import edu.ualberta.med.biobank.model.ClinicsNode;
@@ -10,7 +10,7 @@ import edu.ualberta.med.biobank.model.StudiesNode;
 
 public class SessionContentProvider implements ITreeContentProvider {
 	
-	private RootNode rootNode;
+	private NavigatorRoot rootNode;
 	
 	public SessionContentProvider() {
 		super();
@@ -20,8 +20,8 @@ public class SessionContentProvider implements ITreeContentProvider {
 	 * @see org.eclipse.jface.viewers.ITreeContentProvider#getChildren(java.lang.Object)
 	 */
 	public Object[] getChildren(Object element) {
-		if (element instanceof RootNode) {
-			return ((RootNode) element).getSessions();
+		if (element instanceof NavigatorRoot) {
+			return ((NavigatorRoot) element).getSessions();
 		}
 		else if (element instanceof SessionNode) {
 			return ((SessionNode) element).getSites();
@@ -43,7 +43,7 @@ public class SessionContentProvider implements ITreeContentProvider {
 	 * @see org.eclipse.jface.viewers.ITreeContentProvider#getParent(java.lang.Object)
 	 */
 	public Object getParent(Object element) {
-		if (element instanceof RootNode) {
+		if (element instanceof NavigatorRoot) {
 			return null;
 		}
 		else if (element instanceof SessionNode) {
@@ -86,8 +86,8 @@ public class SessionContentProvider implements ITreeContentProvider {
 	 * @see org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer, java.lang.Object, java.lang.Object)
 	 */
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-		if (newInput instanceof RootNode)
-			rootNode = (RootNode) newInput;
+		if (newInput instanceof NavigatorRoot)
+			rootNode = (NavigatorRoot) newInput;
 		else if (newInput == null)
 			rootNode = null;
 	}

@@ -12,24 +12,24 @@
       </application>
    </extension>
    <extension
+         id="product"
+         point="org.eclipse.core.runtime.products">
+      <product
+            application="edu.ualberta.med.biobank.application"
+            name="Biobank2">
+         <property
+               name="windowImages"
+               value="icons/alt_window_16.gif,icons/alt_window_32.gif">
+         </property>
+      </product>
+   </extension>
+   <extension
          point="org.eclipse.ui.perspectives">
       <perspective
             class="edu.ualberta.med.biobank.Perspective"
             id="edu.ualberta.med.biobank.perspective"
             name="Biobank Perspective">
       </perspective>
-   </extension>
-   <extension
-         id="product"
-         point="org.eclipse.core.runtime.products">
-      <product
-            application="biobank2.application"
-            name="Hello RCP">
-         <property
-               name="windowImages"
-               value="icons/alt_window_16.gif,icons/alt_window_32.gif">
-         </property>
-      </product>
    </extension>
    <extension
          point="org.eclipse.ui.commands">
@@ -116,11 +116,52 @@
    <extension
          point="org.eclipse.ui.views">
       <view
-            class="edu.ualberta.med.biobank.views.SessionsView"
-            id="edu.ualberta.med.biobank.views.sessions"
+            allowMultiple="false"
+            class="edu.ualberta.med.biobank.cnf.SessionNavigator"
+            id="edu.ualberta.med.biobank.views.session"
             name="Sessions"
             restorable="true">
       </view>
    </extension>
-
+   <extension
+         point="org.eclipse.ui.perspectiveExtensions">
+      <perspectiveExtension
+            targetID="edu.ualberta.med.biobank.perspective">
+         <view
+               id="edu.ualberta.med.biobank.views.session"
+               minimized="false"
+               ratio="0.5"
+               relationship="left"
+               relative="org.eclipse.ui.editorss">
+         </view>
+      </perspectiveExtension>
+   </extension>
+   <extension point="org.eclipse.ui.navigator.navigatorContent">
+      <navigatorContent
+            contentProvider="edu.ualberta.med.biobank.cnf.SessionContentProvider"
+            id="edu.ualberta.med.biobank.cnf.sessionContent"
+            labelProvider="edu.ualberta.med.biobank.cnf.SessionLabelProvider"
+            name="Session Content">
+         <triggerPoints>
+            <instanceof
+                  value="edu.ualberta.med.biobank.model.NavigatorRoot">
+            </instanceof>
+         </triggerPoints>
+      </navigatorContent>
+   </extension>
+   <extension point="org.eclipse.ui.navigator.viewer">
+      <viewerActionBinding viewerId="edu.ualberta.med.biobank.views.session">
+            <includes>
+                 <actionExtension pattern="org.eclipse.ui.navigator.resources.*" />
+             </includes>            
+      </viewerActionBinding>
+      <viewerContentBinding viewerId="edu.ualberta.med.biobank.views.session">
+         <includes>
+            <contentExtension  pattern="org.eclipse.ui.navigator.resourceContent" />
+             <contentExtension pattern="org.eclipse.ui.navigator.resources.filters.*"/>
+             <contentExtension pattern="org.eclipse.ui.navigator.resources.linkHelper"/>
+             <contentExtension pattern="org.eclipse.ui.navigator.resources.workingSets"/>
+         </includes>
+      </viewerContentBinding>
+   </extension>
 </plugin>

@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.views;
+package edu.ualberta.med.biobank.cnf;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,16 +11,13 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.part.ViewPart;
-import org.hibernate.hql.ast.tree.Node;
 
 import edu.ualberta.med.biobank.Activator;
 import edu.ualberta.med.biobank.SessionCredentials;
-import edu.ualberta.med.biobank.model.RootNode;
+import edu.ualberta.med.biobank.model.NavigatorRoot;
 import edu.ualberta.med.biobank.model.SiteNode;
 import edu.ualberta.med.biobank.model.SessionNode;
 import edu.ualberta.med.biobank.model.ISessionNodeListener;
-import edu.ualberta.med.biobank.SessionContentProvider;
-import edu.ualberta.med.biobank.SessionLabelProvider;
 import gov.nih.nci.system.applicationservice.ApplicationService;
 import edu.ualberta.med.biobank.model.Site;
 
@@ -30,12 +27,12 @@ public class SessionsView extends ViewPart {
 
 	private TreeViewer treeViewer;
 	
-	private RootNode rootNode;
+	private NavigatorRoot rootNode;
 	
 	public SessionsView() {
 		super();
 		Activator.getDefault().setSessionView(this);
-		rootNode = new RootNode();
+		rootNode = new NavigatorRoot();
 	}
 
 	@Override

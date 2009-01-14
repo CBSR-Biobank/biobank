@@ -3,10 +3,12 @@ package edu.ualberta.med.biobank.model;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-public class RootNode extends WsObject {
+import org.eclipse.core.runtime.PlatformObject;
+
+public class NavigatorRoot extends PlatformObject {
 	private ArrayList<SessionNode> sessions;
 	
-	public RootNode() {
+	public NavigatorRoot() {
 		sessions = new ArrayList<SessionNode>();
 	}
 	
