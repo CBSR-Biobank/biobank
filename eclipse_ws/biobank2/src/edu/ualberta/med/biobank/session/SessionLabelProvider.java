@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.cnf;
+package edu.ualberta.med.biobank.session;
 
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ILabelProviderListener;
@@ -12,7 +12,10 @@ public class SessionLabelProvider implements ILabelProvider {
 	}
 
 	public String getText(Object element) {
-		return ((WsObject) element).getName();
+		if (element instanceof WsObject) {
+			return ((WsObject) element).getName();
+		}
+		return new String();
 	}
 
 	public void addListener(ILabelProviderListener listener) {		

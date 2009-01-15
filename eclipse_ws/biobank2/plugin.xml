@@ -117,7 +117,7 @@
          point="org.eclipse.ui.views">
       <view
             allowMultiple="false"
-            class="edu.ualberta.med.biobank.cnf.SessionNavigator"
+            class="edu.ualberta.med.biobank.session.SessionsView"
             id="edu.ualberta.med.biobank.views.session"
             name="Sessions"
             restorable="true">
@@ -135,33 +135,5 @@
                relative="org.eclipse.ui.editorss">
          </view>
       </perspectiveExtension>
-   </extension>
-   <extension point="org.eclipse.ui.navigator.navigatorContent">
-      <navigatorContent
-            contentProvider="edu.ualberta.med.biobank.cnf.SessionContentProvider"
-            id="edu.ualberta.med.biobank.cnf.sessionContent"
-            labelProvider="edu.ualberta.med.biobank.cnf.SessionLabelProvider"
-            name="Session Content">
-         <triggerPoints>
-            <instanceof
-                  value="edu.ualberta.med.biobank.model.NavigatorRoot">
-            </instanceof>
-         </triggerPoints>
-      </navigatorContent>
-   </extension>
-   <extension point="org.eclipse.ui.navigator.viewer">
-      <viewerActionBinding viewerId="edu.ualberta.med.biobank.views.session">
-            <includes>
-                 <actionExtension pattern="org.eclipse.ui.navigator.resources.*" />
-             </includes>            
-      </viewerActionBinding>
-      <viewerContentBinding viewerId="edu.ualberta.med.biobank.views.session">
-         <includes>
-            <contentExtension  pattern="org.eclipse.ui.navigator.resourceContent" />
-             <contentExtension pattern="org.eclipse.ui.navigator.resources.filters.*"/>
-             <contentExtension pattern="org.eclipse.ui.navigator.resources.linkHelper"/>
-             <contentExtension pattern="org.eclipse.ui.navigator.resources.workingSets"/>
-         </includes>
-      </viewerContentBinding>
    </extension>
 </plugin>

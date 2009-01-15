@@ -5,11 +5,7 @@ Bundle-SymbolicName: biobank2; singleton:=true
 Bundle-Version: 1.0.0
 Bundle-Activator: edu.ualberta.med.biobank.Activator
 Require-Bundle: org.eclipse.ui,
- org.eclipse.core.runtime,
- org.eclipse.core.resources;bundle-version="3.4.1",
- org.eclipse.ui.navigator;bundle-version="3.3.101",
- org.eclipse.ui.navigator.resources;bundle-version="3.3.101",
- org.eclipse.ui.ide;bundle-version="3.4.1"
+ org.eclipse.core.runtime
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ClassPath: lib/acegi-security-1.0.4.jar,

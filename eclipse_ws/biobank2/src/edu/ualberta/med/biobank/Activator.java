@@ -5,7 +5,7 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
-import edu.ualberta.med.biobank.cnf.SessionsView;
+import edu.ualberta.med.biobank.session.SessionsView;
 import edu.ualberta.med.biobank.webservice.Session;
 import edu.ualberta.med.biobank.webservice.ISessionListener;
 import edu.ualberta.med.biobank.webservice.LoginResultEvent;
