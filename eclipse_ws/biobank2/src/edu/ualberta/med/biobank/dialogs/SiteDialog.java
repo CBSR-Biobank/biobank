@@ -1,102 +1,93 @@
 package edu.ualberta.med.biobank.dialogs;
 
-import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 
-import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
-import edu.ualberta.med.biobank.model.Address;
-
-public class SiteDialog extends Dialog {
+public class SiteDialog extends TitleAreaDialog {
+	private static final HashMap<String, List<String>> groups = 
+		new HashMap<String, List<String>>() {{
+		put("root", Arrays.asList("Site Name"));
+		put("Address", Arrays.asList(
+				"Street 1", "Street 2", "City", "Province", "Telephone",
+				"Fax Number", "Email Address"));
+		}};
+	
+	private ArrayList<Text> settings;
 
 	public SiteDialog(Shell parentShell) {
 		super(parentShell);
-	}
-
-	protected Control createDialogArea(Composite parent) {
-		Composite composite = new Composite(parent, SWT.NONE);
-		composite.setLayout(new GridLayout(2, false));
-		
-		Label nameLabel = new Label(composite, SWT.NONE);
-		nameLabel.setText("Site Name:");
-		nameLabel.setLayoutData(new GridData(GridData.END, GridData.CENTER,
-				false, false));
-		
-		final Text nameText = new Text(composite, SWT.BORDER | SWT.SINGLE);
-		nameText.setLayoutData(new GridData(GridData.FILL, GridData.FILL,
-				true, false));
-		
-		createAddressControls(parent, Address.class);
-		
-		return composite;
+		setShellStyle(getShellStyle() | SWT.RESIZE);
+		settings = new ArrayList<Text>();
 	}
 	
-	protected void createAddressControls(Composite parent, Class<?> c) {
-		String name = c.getName();
-		Group classGroup = new Group(parent, SWT.SHADOW_IN);
-		classGroup.setLayout(new GridLayout(2, false));
-		classGroup.setText(name.substring(name.lastIndexOf(".") + 1, name.length()));
-		
-		for (Field f : c.getDeclaredFields()) {
-			String fname = f.getName(); 
-			if (fname.equals("id") || fname.equals("serialVersionUID")) continue;
-			
-			Label label = new Label(classGroup, SWT.NONE);
-			label.setText(toTitleCase(f.getName()) + ":");
-			label.setLayoutData(new GridData(GridData.END, GridData.CENTER,
-					false, false));
-			
-			final Text text = new Text(classGroup, SWT.BORDER | SWT.SINGLE);
-			text.setLayoutData(new GridData(GridData.FILL, GridData.FILL,
-					true, false));
-		}
+	protected void configureShell(Shell shell) {
+		super.configureShell(shell);
+		shell.setText("BioBank Site Information");
 	}
 	
-	/**
-     * Converts the string with a camel case or with underscores and replace it 
-     * with spaces between each word, and underscores replaced by spaces.
-     * For example "javaProgramming" and "JAVA_PROGRAMMING"
-     * would both become Java Programming".
-     * @param str The String to convert
-     * @return The converted String
-     */
-    public static String toTitleCase(String str) {
-        if ((str == null) || (str.length() == 0)) return str;
- 
-        StringBuffer result = new StringBuffer(); 
-        // Pretend space before first character
-        char prevChar = ' ';
- 
-        // Change underscore to space, insert space before capitals
-        for (int i = 0; i < str.length(); i++ ) {
-            char c = str.charAt(i);
-            if (c == '_') {
-                result.append(' ');
-            }
-            else if ((prevChar == ' ') || (prevChar == '_')) {
-                result.append( Character.toUpperCase( c ) );
-            }
-            else if (Character.isUpperCase(c) && !Character.isUpperCase(prevChar)) {
-                // Insert space before start of word if camel case
-                result.append(' ');
-                result.append(Character.toUpperCase(c));
-            }
-            else {
-                result.append(c);
-            }
- 
-            prevChar = c;
-        }
- 
-        return result.toString();
+	protected Control createContents(Composite parent) {
+        Control contents = super.createContents(parent);
+        setTitle("Add New Site");
+        setMessage("Creates a new BioBank site.");
+        return contents;
     }
 
+
+	protected Control createDialogArea(Composite parent) {
+		Composite parentComposite = (Composite) super.createDialogArea(parent);
+
+        Composite contents = new Composite(parentComposite, SWT.NONE);
+		GridData gd = new GridData(GridData.CENTER, GridData.CENTER, true, true);
+		contents.setLayoutData(gd);
+		GridLayout layout = new GridLayout(2, true);
+        layout.marginHeight = convertVerticalDLUsToPixels(IDialogConstants.VERTICAL_MARGIN);
+        layout.marginWidth = convertHorizontalDLUsToPixels(IDialogConstants.HORIZONTAL_MARGIN);
+        layout.verticalSpacing = convertVerticalDLUsToPixels(IDialogConstants.VERTICAL_SPACING);
+        layout.horizontalSpacing = convertHorizontalDLUsToPixels(IDialogConstants.HORIZONTAL_SPACING);
+		contents.setLayout(layout);
+		contents.setFont(parentComposite.getFont());
+
+		
+		Iterator<String> it = groups.keySet().iterator();
+		while (it.hasNext()) {
+			String gName = it.next();
+			
+			if (!gName.equals("root")) {
+				Label gLabel = new Label(contents, SWT.NONE);
+				gLabel.setText(gName);
+				GridData gridData = new GridData(GridData.HORIZONTAL_ALIGN_FILL);
+				gridData.horizontalSpan = 2;
+				gLabel.setLayoutData(gridData);
+			}
+			
+			for (String f : groups.get(gName)) {
+				new Label(contents, SWT.NONE).setText(f + ":");
+				
+				Text text = new Text(contents, SWT.BORDER | SWT.SINGLE);
+				GridData textGridData = new GridData(GridData.HORIZONTAL_ALIGN_FILL);
+				textGridData.widthHint = 250;
+				text.setLayoutData(textGridData);
+				settings.add(text);
+			}
+		}
+		
+		GridData contentsGridData = new GridData(GridData.CENTER, GridData.CENTER, true, true);
+		contents.setLayoutData(contentsGridData);
+		
+		return contents;
+	}
 }
