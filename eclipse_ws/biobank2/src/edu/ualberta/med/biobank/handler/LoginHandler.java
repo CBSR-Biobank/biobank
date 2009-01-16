@@ -36,18 +36,22 @@ public class LoginHandler extends AbstractHandler implements IHandler {
 						final String userName = sc.getUserName(); 
 						
 						if (userName.length() == 0) {
-							appService = ApplicationServiceProvider.getApplicationServiceFromUrl(
+							appService = ApplicationServiceProvider
+							.getApplicationServiceFromUrl(
 									"http://" + sc.getServer() + "/biobank2");
 							
 						}
 						else {
-							appService = ApplicationServiceProvider.getApplicationServiceFromUrl(
-									"http://" + sc.getServer() + "/biobank2", userName, sc.getPassword());
+							appService = ApplicationServiceProvider
+							.getApplicationServiceFromUrl(
+									"http://" + sc.getServer() + "/biobank2", 
+									userName, sc.getPassword());
 						}
 						
 						Display.getDefault().asyncExec(new Runnable() {
 					          public void run() {
-					        	  Activator.getDefault().addSession(appService, sc.getServer());
+					        	  Activator.getDefault().addSession(
+					        			  appService, sc.getServer());
 					          }
 						});
 					}

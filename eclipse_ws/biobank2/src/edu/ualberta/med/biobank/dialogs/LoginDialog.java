@@ -100,7 +100,6 @@ public class LoginDialog extends Dialog {
 
 		serverText.select(serverText.indexOf(prefs.get(LAST_SERVER, "")));
 		
-
 		Label userNameLabel = new Label(composite, SWT.NONE);
 		userNameLabel.setText("&User Name:");
 		userNameLabel.setLayoutData(new GridData(GridData.END, GridData.CENTER,

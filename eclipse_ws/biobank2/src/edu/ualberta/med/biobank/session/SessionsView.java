@@ -69,7 +69,7 @@ public class SessionsView extends ViewPart {
 		// get the Site sites stored on this server
 		Job job = new Job("logging in") {
 			protected IStatus run(IProgressMonitor monitor) {
-				monitor.beginTask("Logging in ... ", 100);
+				monitor.beginTask("Querying Sites ... ", 100);
 				
 				Site site = new Site();				
 				try {
