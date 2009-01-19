@@ -28,11 +28,17 @@ public class SiteDialog extends TitleAreaDialog {
 		}};
 	
 	private ArrayList<Text> settings;
+	private boolean editMode = false;
 
 	public SiteDialog(Shell parentShell) {
 		super(parentShell);
 		setShellStyle(getShellStyle() | SWT.RESIZE);
 		settings = new ArrayList<Text>();
+	}
+
+	public SiteDialog(Shell parentShell, boolean editMode) {
+		this(parentShell);
+		this.editMode = editMode;
 	}
 	
 	protected void configureShell(Shell shell) {
@@ -42,48 +48,53 @@ public class SiteDialog extends TitleAreaDialog {
 	
 	protected Control createContents(Composite parent) {
         Control contents = super.createContents(parent);
-        setTitle("Add New Site");
+        if (editMode) {
+        	setTitle("Edit Site Information");
+        }
+        else {
+        	setTitle("Add New Site");
+        }
         setMessage("Creates a new BioBank site.");
         return contents;
     }
 
 
 	protected Control createDialogArea(Composite parent) {
+		GridLayout layout;
+		
 		Composite parentComposite = (Composite) super.createDialogArea(parent);
 
         Composite contents = new Composite(parentComposite, SWT.NONE);
-		GridData gd = new GridData(GridData.CENTER, GridData.CENTER, true, true);
-		contents.setLayoutData(gd);
-		GridLayout layout = new GridLayout(1, true);
+		layout = new GridLayout(1, false);
         layout.marginHeight = convertVerticalDLUsToPixels(IDialogConstants.VERTICAL_MARGIN);
         layout.marginWidth = convertHorizontalDLUsToPixels(IDialogConstants.HORIZONTAL_MARGIN);
         layout.verticalSpacing = convertVerticalDLUsToPixels(IDialogConstants.VERTICAL_SPACING);
         layout.horizontalSpacing = convertHorizontalDLUsToPixels(IDialogConstants.HORIZONTAL_SPACING);
 		contents.setLayout(layout);
+		contents.setLayoutData(new GridData(GridData.FILL_BOTH));
 		contents.setFont(parentComposite.getFont());
 		
 		Iterator<String> it = groups.keySet().iterator();
 		while (it.hasNext()) {
 			String gName = it.next();
 			
-			Group group = new Group(contents, SWT.NONE);
+			Group group = new Group(contents, SWT.SHADOW_NONE);
 			group.setText(gName);
-			GridData gridData = new GridData(GridData.HORIZONTAL_ALIGN_FILL);
-			group.setLayoutData(gridData);
+			group.setLayout(new GridLayout(2, false));
+			group.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
 			
 			for (String f : groups.get(gName)) {
-				new Label(group, SWT.NONE).setText(f + ":");
+				Label label = new Label(group, SWT.LEFT);
+				label.setText(f + ":");
 				
-				Text text = new Text(group, SWT.BORDER | SWT.SINGLE);
-				GridData textGridData = new GridData(GridData.HORIZONTAL_ALIGN_FILL);
-				textGridData.widthHint = 250;
-				text.setLayoutData(textGridData);
+				Text text = new Text(group, SWT.SINGLE | SWT.BORDER);
+				text.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
 				settings.add(text);
 			}
 		}
 		
-		GridData contentsGridData = new GridData(GridData.CENTER, GridData.CENTER, true, true);
-		contents.setLayoutData(contentsGridData);
+		//GridData contentsGridData = new GridData(GridData.CENTER, GridData.CENTER, true, true);
+		//contents.setLayoutData(contentsGridData);
 		
 		return contents;
 	}

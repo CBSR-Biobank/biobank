@@ -1,6 +1,6 @@
 package edu.ualberta.med.biobank.dialogs;
 
-import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridLayout;
@@ -22,7 +22,7 @@ import edu.ualberta.med.biobank.Activator;
 import edu.ualberta.med.biobank.Application;
 import edu.ualberta.med.biobank.SessionCredentials;
 
-public class LoginDialog extends Dialog {
+public class LoginDialog extends TitleAreaDialog {
 	
 	private ArrayList<String> servers;
 	
@@ -79,19 +79,34 @@ public class LoginDialog extends Dialog {
 		}
 	}
 	
-	protected Control createDialogArea(Composite parent) {
+	protected void configureShell(Shell shell) {
+		super.configureShell(shell);
+		shell.setText("BioBank Login");
+	}
+	
+	protected Control createContents(Composite parent) {
+        Control contents = super.createContents(parent);
+    	setTitle("Login to a BioBank server");
+        setMessage("Enter server name and login details.");
+        return contents;
+	}
+	
+	protected Control createDialogArea(Composite parent) {		
+		Composite parentComposite = (Composite) super.createDialogArea(parent);
+		
 		Preferences prefs = new ConfigurationScope().getNode(Application.PLUGIN_ID);
 		
-		Composite composite = new Composite(parent, SWT.NONE);
+		Composite contents = new Composite(parentComposite, SWT.NONE);
 		GridLayout layout = new GridLayout(2, false);
-		composite.setLayout(layout);
+		contents.setLayout(layout);
+		contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		
-		Label serverLabel = new Label(composite, SWT.NONE);
+		Label serverLabel = new Label(contents, SWT.NONE);
 		serverLabel.setText("&Server:");
 		serverLabel.setLayoutData(new GridData(GridData.END, GridData.CENTER,
 				false, false));
 
-		serverText = new Combo(composite, SWT.BORDER);
+		serverText = new Combo(contents, SWT.BORDER);
 		serverText.setLayoutData(new GridData(GridData.FILL, GridData.FILL,
 				true, false));
 		for (Iterator<String> it = servers.iterator(); it.hasNext(); ) {
@@ -100,7 +115,7 @@ public class LoginDialog extends Dialog {
 
 		serverText.select(serverText.indexOf(prefs.get(LAST_SERVER, "")));
 		
-		Label userNameLabel = new Label(composite, SWT.NONE);
+		Label userNameLabel = new Label(contents, SWT.NONE);
 		userNameLabel.setText("&User Name:");
 		userNameLabel.setLayoutData(new GridData(GridData.END, GridData.CENTER,
 				false, false));
@@ -109,7 +124,7 @@ public class LoginDialog extends Dialog {
 				false);
 		gridData.widthHint = convertHeightInCharsToPixels(20);
 
-		userNameText = new Combo(composite, SWT.BORDER);
+		userNameText = new Combo(contents, SWT.BORDER);
 		userNameText.setLayoutData(new GridData(GridData.FILL, GridData.FILL,
 				true, false));
 
@@ -118,16 +133,16 @@ public class LoginDialog extends Dialog {
 		}
 		userNameText.select(userNameText.indexOf(prefs.get(LAST_USER_NAME, "")));
 		
-		Label passwordLabel = new Label(composite, SWT.NONE);
+		Label passwordLabel = new Label(contents, SWT.NONE);
 		passwordLabel.setText("&Password:");
 		passwordLabel.setLayoutData(new GridData(GridData.END, GridData.CENTER,
 				false, false));
 
-		passwordText = new Text(composite, SWT.BORDER | SWT.PASSWORD);
+		passwordText = new Text(contents, SWT.BORDER | SWT.PASSWORD);
 		passwordText.setLayoutData(new GridData(GridData.FILL, GridData.FILL,
 				true, false));
 		
-		return composite;
+		return contents;
 	}
 	
 	protected void buttonPressed(int buttonId) {
