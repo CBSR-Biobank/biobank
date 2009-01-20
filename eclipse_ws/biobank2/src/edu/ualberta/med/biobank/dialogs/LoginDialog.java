@@ -147,7 +147,7 @@ public class LoginDialog extends TitleAreaDialog {
 	
 	protected void buttonPressed(int buttonId) {
 		if ((buttonId == IDialogConstants.OK_ID)
-				|| (buttonId == IDialogConstants.CANCEL_ID)) {			
+				|| (buttonId == IDialogConstants.CANCEL_ID)) {		
 			Preferences prefs = new ConfigurationScope().getNode(Application.PLUGIN_ID);
 			prefs.put(LAST_SERVER, serverText.getText());
 			prefs.put(LAST_USER_NAME, userNameText.getText());

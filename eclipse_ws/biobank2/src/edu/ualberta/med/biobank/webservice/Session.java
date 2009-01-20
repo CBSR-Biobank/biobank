@@ -15,6 +15,7 @@ import edu.ualberta.med.biobank.SessionCredentials;
  *
  */
 public class Session extends Thread {	
+	@SuppressWarnings("unused")
 	private ApplicationService appService;
 	private ListenerList listenerList;
 	private LinkedBlockingQueue<EventObject> eventQ;
