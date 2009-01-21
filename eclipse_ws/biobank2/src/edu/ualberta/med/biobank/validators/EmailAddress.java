@@ -25,19 +25,24 @@ public class EmailAddress implements IValidator {
 	}
 
 	public IStatus validate(Object value) {
-		if (value instanceof String) {
-			Matcher m = pattern.matcher((String) value);
-			if (m.matches()) {
-				return Status.OK_STATUS;
-			}
-			else {
-				controlDecoration.show();
-				return ValidationStatus.error(message);
-			}
-		}
-		else {
+		if (! (value instanceof String)) {
 			throw new RuntimeException(
 			"Not supposed to be called for non-strings.");
+		}
+
+		if (((String) value).length() == 0) {
+			controlDecoration.hide();
+			return Status.OK_STATUS;
+		}
+
+		Matcher m = pattern.matcher((String) value);
+		if (m.matches()) {
+			controlDecoration.hide();
+			return Status.OK_STATUS;
+		}
+		else {
+			controlDecoration.show();
+			return ValidationStatus.error(message);
 		}
 	}
 }

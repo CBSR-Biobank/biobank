@@ -1,22 +1,22 @@
 package edu.ualberta.med.biobank.dialogs;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-
+import org.eclipse.core.databinding.AggregateValidationStatus;
 import org.eclipse.core.databinding.DataBindingContext;
 import org.eclipse.core.databinding.UpdateValueStrategy;
 import org.eclipse.core.databinding.beans.PojoObservables;
+import org.eclipse.core.databinding.observable.ChangeEvent;
+import org.eclipse.core.databinding.observable.IChangeListener;
+import org.eclipse.core.databinding.observable.value.IObservableValue;
+import org.eclipse.core.databinding.observable.value.WritableValue;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.databinding.swt.SWTObservables;
 import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.jface.fieldassist.ControlDecoration;
 import org.eclipse.jface.fieldassist.FieldDecoration;
 import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.KeyEvent;
-import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -32,8 +32,8 @@ import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.validators.EmailAddress;
 
-@SuppressWarnings("serial")
 public class SiteDialog extends TitleAreaDialog {	
+	private static final String OK_MESSAGE = "Creates a new BioBank site.";
 	private static final String MESSAGE = "Site must have a name";
 	private Site site;
 	private Text name;
@@ -45,6 +45,7 @@ public class SiteDialog extends TitleAreaDialog {
 	private Text phoneNumber;
 	private Text faxNumber;
 	private Text email;
+	private ControlDecoration emailDecorator;
 		
 	// used to select a list	
 	private static final String[] provinces = new String[] {
@@ -83,8 +84,6 @@ public class SiteDialog extends TitleAreaDialog {
 	
 	protected Control createContents(Composite parent) {
         Control contents = super.createContents(parent);
-        initializeControls();
-        validatePage();
         
         if (editMode) {
         	setTitle("Edit Site Information");
@@ -92,7 +91,7 @@ public class SiteDialog extends TitleAreaDialog {
         else {
         	setTitle("Add New Site");
         }
-        setMessage("Creates a new BioBank site.");
+        setMessage(OK_MESSAGE);
         return contents;
     }
 	
@@ -177,22 +176,11 @@ public class SiteDialog extends TitleAreaDialog {
 				
 		email = new Text(group, SWT.SINGLE | SWT.BORDER);
 		email.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
+		emailDecorator = createDecorator(email, MESSAGE);
 		
 		site = new Site();
 		site.setAddress(new Address());
 		bindValues();
-		
-		KeyListener kl = new KeyListener() {
-			public void keyPressed(final KeyEvent event) {
-			}
-			
-			public void keyReleased(KeyEvent e) {
-				setDialogComplete(validatePage());				
-			}
-		}; 
-
-		// enables / disables the OK button
-    	name.addKeyListener(kl);
 		
 		// When adding help uncomment line below
 		// PlatformUI.getWorkbench().getHelpSystem().setHelp(composite, IJavaHelpContextIds.XXXXX);
@@ -200,21 +188,9 @@ public class SiteDialog extends TitleAreaDialog {
 		return parentComposite;
 	}
 	
-    private void initializeControls() {
-        setDialogComplete(validatePage());
-    }
-	
 	protected void okPressed() {
 		super.okPressed();
 	}
-	
-    protected void setDialogComplete(boolean value) {
-        okButton.setEnabled(value);
-    }
-
-    private boolean validatePage() {
-    	return (name.getText().length() != 0);
-    }
     
     private ControlDecoration createDecorator(Text text, String message) {
 		ControlDecoration controlDecoration = new ControlDecoration(text,
@@ -229,8 +205,22 @@ public class SiteDialog extends TitleAreaDialog {
     private void bindValues() {
     	DataBindingContext dbc = new DataBindingContext();
     	UpdateValueStrategy update = new UpdateValueStrategy();
-		update.setAfterConvertValidator(new EmailAddress(MESSAGE,
-				nameDecorator));
+    	
+    	IObservableValue statusObservable = new WritableValue();
+    	statusObservable.addChangeListener(new IChangeListener() {
+			public void handleChange(ChangeEvent event) {
+				IObservableValue validationStatus 
+				= (IObservableValue) event.getSource(); 
+				IStatus bindStatus = (IStatus) validationStatus.getValue(); 
+				if (bindStatus.getSeverity() == IStatus.OK) {
+					setMessage(OK_MESSAGE);
+					//okButton.setEnabled(true);
+				}
+				else {
+					setMessage(bindStatus.getMessage(), IMessageProvider.ERROR);
+				}		
+			}
+    	}); 
     	
     	Address address = site.getAddress();
 
@@ -248,6 +238,13 @@ public class SiteDialog extends TitleAreaDialog {
     	dbc.bindValue(SWTObservables.observeText(faxNumber, SWT.Modify),
     			PojoObservables.observeValue(address, "faxNumber"), null, null);
     	dbc.bindValue(SWTObservables.observeText(email, SWT.Modify),
-    			PojoObservables.observeValue(address, "email"), null, null);
+    			PojoObservables.observeValue(address, "email"), 
+    			new UpdateValueStrategy().setAfterConvertValidator(
+    					new EmailAddress(MESSAGE, emailDecorator)), 
+    			null);
+    	
+    	dbc.bindValue(statusObservable, new AggregateValidationStatus(
+    			dbc.getBindings(), AggregateValidationStatus.MAX_SEVERITY),
+    			null, null); 
     }
 }
