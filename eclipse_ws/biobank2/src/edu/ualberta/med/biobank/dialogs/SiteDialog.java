@@ -31,10 +31,12 @@ import org.eclipse.swt.widgets.Text;
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.validators.EmailAddress;
+import edu.ualberta.med.biobank.validators.NonEmptyString;
 
 public class SiteDialog extends TitleAreaDialog {	
 	private static final String OK_MESSAGE = "Creates a new BioBank site.";
-	private static final String MESSAGE = "Site must have a name";
+	private static final String NO_SITE_NAME_MESSAGE = "Site must have a name";
+	private static final String INVALID_EMAIL_MESSAGE = "Email address is invalid";
 	private Site site;
 	private Text name;
 	private ControlDecoration nameDecorator;
@@ -100,6 +102,7 @@ public class SiteDialog extends TitleAreaDialog {
                 IDialogConstants.OK_LABEL, true);
         createButton(parent, IDialogConstants.CANCEL_ID,
                 IDialogConstants.CANCEL_LABEL, false);
+		okButton.setEnabled(false);
     }
 
 
@@ -122,61 +125,30 @@ public class SiteDialog extends TitleAreaDialog {
 		group.setText("Site");
 		group.setLayout(new GridLayout(2, false));
 		group.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
-			
-		Label label = new Label(group, SWT.LEFT);
-		label.setText("Name:");		
-		name = new Text(group, SWT.SINGLE | SWT.BORDER);
-		name.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
-		nameDecorator = createDecorator(name, MESSAGE);
+		
+		name = createLabelledText(group, "Name:", 100, null);
+		nameDecorator = createDecorator(name, NO_SITE_NAME_MESSAGE);
 		
 		group = new Group(contents, SWT.SHADOW_NONE);
-		group.setText("Site Address");
+		group.setText("Address");
 		group.setLayout(new GridLayout(2, false));
 		group.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
+
+		street1 = createLabelledText(group, "Street 1:", 100, null);
+		street2 = createLabelledText(group, "Street 2:", 100, null);
+		city = createLabelledText(group, "City:", 100, null);
 		
-		label = new Label(group, SWT.LEFT);
-		label.setText("Street 1:");
-				
-		street1 = new Text(group, SWT.SINGLE | SWT.BORDER);
-		street1.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
-		
-		label = new Label(group, SWT.LEFT);
-		label.setText("Street 2:");
-				
-		street2 = new Text(group, SWT.SINGLE | SWT.BORDER);
-		street2.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
-		
-		label = new Label(group, SWT.LEFT);
-		label.setText("City:");
-				
-		city = new Text(group, SWT.SINGLE | SWT.BORDER);
-		city.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
-		
-		label = new Label(group, SWT.LEFT);
+		Label label = new Label(group, SWT.LEFT);
 		label.setText("Province:");
 		
 		province = new Combo(group, SWT.READ_ONLY);
 		province.setItems(provinces);
 		province.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
-		
-		label = new Label(group, SWT.LEFT);
-		label.setText("Telephone:");
-				
-		phoneNumber = new Text(group, SWT.SINGLE | SWT.BORDER);
-		phoneNumber.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
-		
-		label = new Label(group, SWT.LEFT);
-		label.setText("Fax Number:");
-				
-		faxNumber = new Text(group, SWT.SINGLE | SWT.BORDER);
-		faxNumber.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
-		
-		label = new Label(group, SWT.LEFT);
-		label.setText("Email Address:");
-				
-		email = new Text(group, SWT.SINGLE | SWT.BORDER);
-		email.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
-		emailDecorator = createDecorator(email, MESSAGE);
+
+		phoneNumber = createLabelledText(group, "Phone Number:", 100, null);
+		faxNumber = createLabelledText(group, "Fax Number:", 100, null);
+		email = createLabelledText(group, "Email Address:", 100, null);
+		emailDecorator = createDecorator(email, INVALID_EMAIL_MESSAGE);
 		
 		site = new Site();
 		site.setAddress(new Address());
@@ -187,6 +159,19 @@ public class SiteDialog extends TitleAreaDialog {
 		
 		return parentComposite;
 	}
+	
+	protected Text createLabelledText(Composite parent, String label, int limit, String tip) {
+        new Label(parent, SWT.LEFT).setText(label);
+        Text text  = new Text(parent, SWT.SINGLE);
+        if (limit > 0) {
+            text.setTextLimit(limit);
+        }
+        if (tip != null) {
+            text.setToolTipText(tip);
+        }
+        text.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
+        return text;
+    }
 	
 	protected void okPressed() {
 		super.okPressed();
@@ -204,7 +189,6 @@ public class SiteDialog extends TitleAreaDialog {
     
     private void bindValues() {
     	DataBindingContext dbc = new DataBindingContext();
-    	UpdateValueStrategy update = new UpdateValueStrategy();
     	
     	IObservableValue statusObservable = new WritableValue();
     	statusObservable.addChangeListener(new IChangeListener() {
@@ -214,10 +198,11 @@ public class SiteDialog extends TitleAreaDialog {
 				IStatus bindStatus = (IStatus) validationStatus.getValue(); 
 				if (bindStatus.getSeverity() == IStatus.OK) {
 					setMessage(OK_MESSAGE);
-					//okButton.setEnabled(true);
+					okButton.setEnabled(true);
 				}
 				else {
 					setMessage(bindStatus.getMessage(), IMessageProvider.ERROR);
+					okButton.setEnabled(false);
 				}		
 			}
     	}); 
@@ -225,7 +210,10 @@ public class SiteDialog extends TitleAreaDialog {
     	Address address = site.getAddress();
 
     	dbc.bindValue(SWTObservables.observeText(name, SWT.Modify),
-    			PojoObservables.observeValue(site, "name"), update, null);
+    			PojoObservables.observeValue(site, "name"), 
+    			new UpdateValueStrategy().setAfterConvertValidator(
+    					new NonEmptyString(NO_SITE_NAME_MESSAGE, nameDecorator)), 
+    					null);
     	dbc.bindValue(SWTObservables.observeText(street1, SWT.Modify),
     			PojoObservables.observeValue(address, "street"), null, null);
     	// TODO add Address.street2 to model
@@ -240,8 +228,8 @@ public class SiteDialog extends TitleAreaDialog {
     	dbc.bindValue(SWTObservables.observeText(email, SWT.Modify),
     			PojoObservables.observeValue(address, "email"), 
     			new UpdateValueStrategy().setAfterConvertValidator(
-    					new EmailAddress(MESSAGE, emailDecorator)), 
-    			null);
+    					new EmailAddress(INVALID_EMAIL_MESSAGE, emailDecorator)), 
+    					null);
     	
     	dbc.bindValue(statusObservable, new AggregateValidationStatus(
     			dbc.getBindings(), AggregateValidationStatus.MAX_SEVERITY),
