@@ -1,22 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry exported="true" kind="lib" path="conf/"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/J2SE-1.5"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="lib" path="lib/acegi-security-1.0.4.jar"/>
-	<classpathentry kind="lib" path="lib/antlr-2.7.6.jar"/>
-	<classpathentry kind="lib" path="lib/asm.jar"/>
-	<classpathentry kind="lib" path="lib/biobank2-beans.jar"/>
-	<classpathentry kind="lib" path="lib/castor-1.0.2.jar"/>
-	<classpathentry kind="lib" path="lib/cglib-2.1.3.jar"/>
-	<classpathentry kind="lib" path="lib/commons-codec-1.3.jar"/>
-	<classpathentry kind="lib" path="lib/commons-collections-3.2.jar"/>
-	<classpathentry kind="lib" path="lib/commons-logging-1.1.jar"/>
-	<classpathentry kind="lib" path="lib/hibernate3.jar"/>
-	<classpathentry kind="lib" path="lib/log4j-1.2.14.jar"/>
-	<classpathentry kind="lib" path="lib/sdk-client-framework.jar"/>
-	<classpathentry kind="lib" path="lib/spring.jar"/>
-	<classpathentry kind="lib" path="lib/xercesImpl.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/acegi-security-1.0.4.jar" sourcepath="biobank2src.zip"/>
+	<classpathentry exported="true" kind="lib" path="lib/antlr-2.7.6.jar" sourcepath="biobank2src.zip"/>
+	<classpathentry exported="true" kind="lib" path="lib/asm.jar" sourcepath="biobank2src.zip"/>
+	<classpathentry exported="true" kind="lib" path="lib/biobank2-beans.jar" sourcepath="biobank2src.zip"/>
+	<classpathentry exported="true" kind="lib" path="lib/castor-1.0.2.jar" sourcepath="biobank2src.zip"/>
+	<classpathentry exported="true" kind="lib" path="lib/cglib-2.1.3.jar" sourcepath="biobank2src.zip"/>
+	<classpathentry exported="true" kind="lib" path="lib/commons-codec-1.3.jar" sourcepath="biobank2src.zip"/>
+	<classpathentry exported="true" kind="lib" path="lib/commons-collections-3.2.jar" sourcepath="biobank2src.zip"/>
+	<classpathentry exported="true" kind="lib" path="lib/commons-logging-1.1.jar" sourcepath="biobank2src.zip"/>
+	<classpathentry exported="true" kind="lib" path="lib/hibernate3.jar" sourcepath="biobank2src.zip"/>
+	<classpathentry exported="true" kind="lib" path="lib/log4j-1.2.14.jar" sourcepath="biobank2src.zip"/>
+	<classpathentry exported="true" kind="lib" path="lib/sdk-client-framework.jar" sourcepath="biobank2src.zip"/>
+	<classpathentry exported="true" kind="lib" path="lib/spring.jar" sourcepath="biobank2src.zip"/>
+	<classpathentry exported="true" kind="lib" path="lib/xercesImpl.jar" sourcepath="biobank2src.zip"/>
+	<classpathentry exported="true" kind="lib" path="conf" sourcepath="conf"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

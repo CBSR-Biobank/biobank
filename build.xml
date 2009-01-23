@@ -12,10 +12,12 @@
 <property name="eclipse.proj.dir" location="eclipse_ws/biobank2/lib" />
 <property name="schema.dir" location="schema" />
 <property environment="env"/>
-<property name="env.JBOSS_HOME" value="TO_BE_REPLACED" />
 
 <target name="sdk"
         description="builds the caCORE SDK from the data model" >
+  <copy
+     file="sdk_conf/deploy.properties"
+     tofile="${cacore.sdk.dir}/conf/deploy.properties"/>
   <ant
      dir="${cacore.sdk.dir}"
      target="build-system"

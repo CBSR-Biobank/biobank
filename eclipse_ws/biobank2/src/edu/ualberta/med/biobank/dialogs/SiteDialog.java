@@ -1,12 +1,21 @@
 package edu.ualberta.med.biobank.dialogs;
 
+import java.util.Iterator;
+
 import org.eclipse.core.databinding.AggregateValidationStatus;
 import org.eclipse.core.databinding.DataBindingContext;
 import org.eclipse.core.databinding.UpdateValueStrategy;
+import org.eclipse.core.databinding.ValidationStatusProvider;
 import org.eclipse.core.databinding.beans.PojoObservables;
 import org.eclipse.core.databinding.observable.ChangeEvent;
 import org.eclipse.core.databinding.observable.IChangeListener;
+import org.eclipse.core.databinding.observable.IObservable;
+import org.eclipse.core.databinding.observable.IStaleListener;
+import org.eclipse.core.databinding.observable.StaleEvent;
+import org.eclipse.core.databinding.observable.list.IObservableList;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
+import org.eclipse.core.databinding.observable.value.IValueChangeListener;
+import org.eclipse.core.databinding.observable.value.ValueChangeEvent;
 import org.eclipse.core.databinding.observable.value.WritableValue;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.databinding.swt.SWTObservables;
@@ -16,6 +25,7 @@ import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.jface.fieldassist.ControlDecoration;
 import org.eclipse.jface.fieldassist.FieldDecoration;
 import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
+import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -32,20 +42,23 @@ import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.validators.EmailAddress;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
+import edu.ualberta.med.biobank.widgets.PhoneNumber;
 
 public class SiteDialog extends TitleAreaDialog {	
 	private static final String OK_MESSAGE = "Creates a new BioBank site.";
 	private static final String NO_SITE_NAME_MESSAGE = "Site must have a name";
 	private static final String INVALID_EMAIL_MESSAGE = "Email address is invalid";
-	private Site site;
+	
+	private final Site site = new Site();
+	
 	private Text name;
 	private ControlDecoration nameDecorator;
 	private Text street1;
 	private Text street2;
 	private Text city;
 	private Combo province;
-	private Text phoneNumber;
-	private Text faxNumber;
+	private PhoneNumber phoneNumber;
+	private PhoneNumber faxNumber;
 	private Text email;
 	private ControlDecoration emailDecorator;
 		
@@ -68,6 +81,10 @@ public class SiteDialog extends TitleAreaDialog {
 		
 	private Button okButton;
 	private boolean editMode = false;
+
+	private IObservableValue aggregateStatus;
+	private IStatus currentStatus;
+	private boolean currentStatusStale;
 
 	public SiteDialog(Shell parentShell) {
 		super(parentShell);
@@ -106,18 +123,10 @@ public class SiteDialog extends TitleAreaDialog {
     }
 
 
-	protected Control createDialogArea(Composite parent) {
-		GridLayout layout;
-		
+	protected Control createDialogArea(Composite parent) {		
 		Composite parentComposite = (Composite) super.createDialogArea(parent);
 
         Composite contents = new Composite(parentComposite, SWT.NONE);
-		layout = new GridLayout(1, false);
-        layout.marginHeight = convertVerticalDLUsToPixels(IDialogConstants.VERTICAL_MARGIN);
-        layout.marginWidth = convertHorizontalDLUsToPixels(IDialogConstants.HORIZONTAL_MARGIN);
-        layout.verticalSpacing = convertVerticalDLUsToPixels(IDialogConstants.VERTICAL_SPACING);
-        layout.horizontalSpacing = convertHorizontalDLUsToPixels(IDialogConstants.HORIZONTAL_SPACING);
-		contents.setLayout(layout);
 		contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		contents.setFont(parentComposite.getFont());
 				
@@ -145,14 +154,18 @@ public class SiteDialog extends TitleAreaDialog {
 		province.setItems(provinces);
 		province.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
 
-		phoneNumber = createLabelledText(group, "Phone Number:", 100, null);
-		faxNumber = createLabelledText(group, "Fax Number:", 100, null);
+        new Label(group, SWT.LEFT).setText("Phone Number:");
+		phoneNumber = new PhoneNumber(group, SWT.NONE);		
+        new Label(group, SWT.LEFT).setText("Fax Number:");
+		faxNumber = new PhoneNumber(group, SWT.NONE);
+		
 		email = createLabelledText(group, "Email Address:", 100, null);
 		emailDecorator = createDecorator(email, INVALID_EMAIL_MESSAGE);
 		
-		site = new Site();
 		site.setAddress(new Address());
 		bindValues();
+
+		GridLayoutFactory.swtDefaults().applyTo(contents);
 		
 		// When adding help uncomment line below
 		// PlatformUI.getWorkbench().getHelpSystem().setHelp(composite, IJavaHelpContextIds.XXXXX);
@@ -190,23 +203,6 @@ public class SiteDialog extends TitleAreaDialog {
     private void bindValues() {
     	DataBindingContext dbc = new DataBindingContext();
     	
-    	IObservableValue statusObservable = new WritableValue();
-    	statusObservable.addChangeListener(new IChangeListener() {
-			public void handleChange(ChangeEvent event) {
-				IObservableValue validationStatus 
-				= (IObservableValue) event.getSource(); 
-				IStatus bindStatus = (IStatus) validationStatus.getValue(); 
-				if (bindStatus.getSeverity() == IStatus.OK) {
-					setMessage(OK_MESSAGE);
-					okButton.setEnabled(true);
-				}
-				else {
-					setMessage(bindStatus.getMessage(), IMessageProvider.ERROR);
-					okButton.setEnabled(false);
-				}		
-			}
-    	}); 
-    	
     	Address address = site.getAddress();
 
     	dbc.bindValue(SWTObservables.observeText(name, SWT.Modify),
@@ -215,24 +211,49 @@ public class SiteDialog extends TitleAreaDialog {
     					new NonEmptyString(NO_SITE_NAME_MESSAGE, nameDecorator)), 
     					null);
     	dbc.bindValue(SWTObservables.observeText(street1, SWT.Modify),
-    			PojoObservables.observeValue(address, "street"), null, null);
-    	// TODO add Address.street2 to model
+    			PojoObservables.observeValue(address, "street1"), null, null);
+    	dbc.bindValue(SWTObservables.observeText(street2, SWT.Modify),
+    			PojoObservables.observeValue(address, "street2"), null, null);
     	dbc.bindValue(SWTObservables.observeText(city, SWT.Modify),
     			PojoObservables.observeValue(address, "city"), null, null);
     	dbc.bindValue(SWTObservables.observeSelection(province),
     			PojoObservables.observeValue(address, "province"), null, null);
-    	dbc.bindValue(SWTObservables.observeText(phoneNumber, SWT.Modify),
-    			PojoObservables.observeValue(address, "phoneNumber"), null, null);
-    	dbc.bindValue(SWTObservables.observeText(faxNumber, SWT.Modify),
-    			PojoObservables.observeValue(address, "faxNumber"), null, null);
+    	
+    	phoneNumber.bindValues(dbc);
+    	faxNumber.bindValues(dbc);
+    	
     	dbc.bindValue(SWTObservables.observeText(email, SWT.Modify),
     			PojoObservables.observeValue(address, "email"), 
     			new UpdateValueStrategy().setAfterConvertValidator(
     					new EmailAddress(INVALID_EMAIL_MESSAGE, emailDecorator)), 
     					null);
     	
-    	dbc.bindValue(statusObservable, new AggregateValidationStatus(
-    			dbc.getBindings(), AggregateValidationStatus.MAX_SEVERITY),
-    			null, null); 
+    	aggregateStatus = new AggregateValidationStatus(
+    			dbc.getBindings(), AggregateValidationStatus.MAX_SEVERITY); 
+    			
+    	aggregateStatus.addValueChangeListener(new IValueChangeListener() {
+			public void handleValueChange(ValueChangeEvent event) {
+				currentStatus = (IStatus) event.diff.getNewValue();
+				currentStatusStale = aggregateStatus.isStale();
+				handleStatusChanged();
+			}
+    	}); 
+		aggregateStatus.addStaleListener(new IStaleListener() {
+			public void handleStale(StaleEvent staleEvent) {
+				currentStatusStale = true;
+				handleStatusChanged();
+			}
+		});
+    }
+    
+    protected void handleStatusChanged() {
+    	int severity = currentStatus.getSeverity(); 
+		okButton.setEnabled(severity == IStatus.OK);
+		if (severity == IStatus.OK) {
+			setMessage(OK_MESSAGE);
+		}
+		else {
+			setMessage(currentStatus.getMessage(), IMessageProvider.ERROR);
+		}		
     }
 }

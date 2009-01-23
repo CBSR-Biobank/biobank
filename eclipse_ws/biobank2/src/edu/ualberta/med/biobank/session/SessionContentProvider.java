@@ -10,6 +10,7 @@ import edu.ualberta.med.biobank.model.StudiesNode;
 
 public class SessionContentProvider implements ITreeContentProvider {
 	
+	@SuppressWarnings("unused")
 	private RootNode rootNode;
 	
 	public SessionContentProvider() {

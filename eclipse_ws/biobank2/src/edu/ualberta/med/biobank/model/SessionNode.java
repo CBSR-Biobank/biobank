@@ -41,6 +41,10 @@ public class SessionNode extends WsObject {
 		}
 		return (SiteNode[]) siteNodes.toArray(new SiteNode[siteNodes.size()]);
 	}
+	
+	public ApplicationService getAppService() {
+		return appService;
+	}
 
 
 	public void addListener(ISessionNodeListener listener) {

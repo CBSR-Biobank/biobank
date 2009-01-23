@@ -8,7 +8,6 @@ import org.eclipse.jface.window.Window;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.Activator;
-import edu.ualberta.med.biobank.dialogs.LoginDialog;
 import edu.ualberta.med.biobank.dialogs.SiteDialog;
 
 public class AddSiteHandler extends AbstractHandler implements IHandler {

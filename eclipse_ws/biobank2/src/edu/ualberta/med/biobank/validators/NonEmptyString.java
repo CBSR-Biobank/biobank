@@ -18,7 +18,6 @@ public class NonEmptyString implements IValidator {
 		this.controlDecoration = controlDecoration;
 	}
 
-	@Override
 	public IStatus validate(Object value) {
 		if (! (value instanceof String)) {
 			throw new RuntimeException(
