@@ -42,24 +42,35 @@ import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.validators.EmailAddress;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
+import edu.ualberta.med.biobank.validators.PostalCode;
+import edu.ualberta.med.biobank.validators.TelephoneNumber;
 import edu.ualberta.med.biobank.widgets.PhoneNumber;
 
 public class SiteDialog extends TitleAreaDialog {	
 	private static final String OK_MESSAGE = "Creates a new BioBank site.";
 	private static final String NO_SITE_NAME_MESSAGE = "Site must have a name";
+	private static final String INVALID_POSTAL_CODE_MESSAGE = "Invalid postal code";
+	private static final String INVALID_PHONE_NUMBER_MESSAGE = "Telephone number is invalid";
 	private static final String INVALID_EMAIL_MESSAGE = "Email address is invalid";
+	
+	private static final int LABEL_INDENT_WIDTH = 32;
 	
 	private final Site site = new Site();
 	
 	private Text name;
-	private ControlDecoration nameDecorator;
 	private Text street1;
 	private Text street2;
 	private Text city;
 	private Combo province;
-	private PhoneNumber phoneNumber;
-	private PhoneNumber faxNumber;
+	private Text postalCode;
+	private Text phoneNumber;
+	private Text faxNumber;
 	private Text email;
+	
+	private ControlDecoration nameDecorator;
+	private ControlDecoration postalCodeDecorator;
+	private ControlDecoration phoneNumberDecorator;
+	private ControlDecoration faxNumberDecorator;
 	private ControlDecoration emailDecorator;
 		
 	// used to select a list	
@@ -154,10 +165,14 @@ public class SiteDialog extends TitleAreaDialog {
 		province.setItems(provinces);
 		province.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
 
-        new Label(group, SWT.LEFT).setText("Phone Number:");
-		phoneNumber = new PhoneNumber(group, SWT.NONE);		
-        new Label(group, SWT.LEFT).setText("Fax Number:");
-		faxNumber = new PhoneNumber(group, SWT.NONE);
+		postalCode = createLabelledText(group, "Postal Code:", 7, null);
+		postalCodeDecorator = createDecorator(postalCode, INVALID_POSTAL_CODE_MESSAGE);
+		
+		phoneNumber = createLabelledText(group, "Phone Number:", 100, null);
+		phoneNumberDecorator = createDecorator(phoneNumber, INVALID_PHONE_NUMBER_MESSAGE);
+		
+		faxNumber = createLabelledText(group, "Fax Number:", 100, null);
+		faxNumberDecorator = createDecorator(faxNumber, INVALID_PHONE_NUMBER_MESSAGE);
 		
 		email = createLabelledText(group, "Email Address:", 100, null);
 		emailDecorator = createDecorator(email, INVALID_EMAIL_MESSAGE);
@@ -166,6 +181,7 @@ public class SiteDialog extends TitleAreaDialog {
 		bindValues();
 
 		GridLayoutFactory.swtDefaults().applyTo(contents);
+		
 		
 		// When adding help uncomment line below
 		// PlatformUI.getWorkbench().getHelpSystem().setHelp(composite, IJavaHelpContextIds.XXXXX);
@@ -185,10 +201,6 @@ public class SiteDialog extends TitleAreaDialog {
         text.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
         return text;
     }
-	
-	protected void okPressed() {
-		super.okPressed();
-	}
     
     private ControlDecoration createDecorator(Text text, String message) {
 		ControlDecoration controlDecoration = new ControlDecoration(text,
@@ -197,6 +209,11 @@ public class SiteDialog extends TitleAreaDialog {
 		FieldDecoration fieldDecoration = FieldDecorationRegistry.getDefault()
 				.getFieldDecoration(FieldDecorationRegistry.DEC_ERROR);
 		controlDecoration.setImage(fieldDecoration.getImage());
+		
+		// make room for the decorator
+		((GridData) text.getLayoutData()).horizontalIndent 
+			= controlDecoration.getMarginWidth() 
+			+ fieldDecoration.getImage().getBounds().width;		
 		return controlDecoration;
 	}
     
@@ -218,15 +235,26 @@ public class SiteDialog extends TitleAreaDialog {
     			PojoObservables.observeValue(address, "city"), null, null);
     	dbc.bindValue(SWTObservables.observeSelection(province),
     			PojoObservables.observeValue(address, "province"), null, null);
-    	
-    	phoneNumber.bindValues(dbc);
-    	faxNumber.bindValues(dbc);
-    	
+    	dbc.bindValue(SWTObservables.observeText(postalCode, SWT.Modify),
+    			PojoObservables.observeValue(address, "postalCode"), 
+    			new UpdateValueStrategy().setAfterConvertValidator(
+    					new PostalCode(INVALID_POSTAL_CODE_MESSAGE, postalCodeDecorator)), 
+    			null);
+    	dbc.bindValue(SWTObservables.observeText(phoneNumber, SWT.Modify),
+    			PojoObservables.observeValue(address, "phoneNumber"), 
+    			new UpdateValueStrategy().setAfterConvertValidator(
+    					new TelephoneNumber(INVALID_PHONE_NUMBER_MESSAGE, phoneNumberDecorator)), 
+    			null);
+    	dbc.bindValue(SWTObservables.observeText(faxNumber, SWT.Modify),
+    			PojoObservables.observeValue(address, "faxNumber"), 
+    			new UpdateValueStrategy().setAfterConvertValidator(
+    					new TelephoneNumber(INVALID_PHONE_NUMBER_MESSAGE, faxNumberDecorator)), 
+    			null);    	
     	dbc.bindValue(SWTObservables.observeText(email, SWT.Modify),
     			PojoObservables.observeValue(address, "email"), 
     			new UpdateValueStrategy().setAfterConvertValidator(
     					new EmailAddress(INVALID_EMAIL_MESSAGE, emailDecorator)), 
-    					null);
+    			null);
     	
     	aggregateStatus = new AggregateValidationStatus(
     			dbc.getBindings(), AggregateValidationStatus.MAX_SEVERITY); 
@@ -256,4 +284,8 @@ public class SiteDialog extends TitleAreaDialog {
 			setMessage(currentStatus.getMessage(), IMessageProvider.ERROR);
 		}		
     }
+	
+	protected void okPressed() {
+		super.okPressed();
+	}
 }
