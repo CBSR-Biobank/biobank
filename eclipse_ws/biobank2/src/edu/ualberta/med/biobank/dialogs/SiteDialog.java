@@ -11,12 +11,15 @@ import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
+import edu.ualberta.med.biobank.Activator;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
 
@@ -26,17 +29,21 @@ public class SiteDialog extends AddressDialog {
 	
 	private final Site site = new Site();
 	
+	private String[] sessionNames;
+
+	protected Combo session;
 	private Text name;	
 	private ControlDecoration nameDecorator;
 	private boolean editMode = false;
 
-	public SiteDialog(Shell parentShell) {
+	public SiteDialog(Shell parentShell, String[] sessionNames) {
 		super(parentShell);
 		setShellStyle(getShellStyle() | SWT.RESIZE);
+		this.sessionNames = sessionNames;
 	}
 
-	public SiteDialog(Shell parentShell, boolean editMode) {
-		this(parentShell);
+	public SiteDialog(Shell parentShell, String[] sessionNames, boolean editMode) {
+		this(parentShell, sessionNames);
 		this.editMode = editMode;
 	}
 	
@@ -69,6 +76,18 @@ public class SiteDialog extends AddressDialog {
 		group.setText("Site");
 		group.setLayout(new GridLayout(2, false));
 		group.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
+		
+		if (sessionNames.length > 1) {			
+			Label label = new Label(group, SWT.LEFT);
+			label.setText("Session:");
+			
+			session = new Combo(group, SWT.READ_ONLY);
+			session.setItems(sessionNames);
+			session.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
+		}
+		else {
+			session = null;
+		}
 		
 		name = createLabelledText(group, "Name:", 100, null);
 		nameDecorator = createDecorator(name, NO_SITE_NAME_MESSAGE);
@@ -110,6 +129,21 @@ public class SiteDialog extends AddressDialog {
     }
 	
 	protected void okPressed() {
+		site.setAddress(address);
+		String sessionName;
+		if (session == null) {
+			sessionName = sessionNames[0];
+		}
+		else {
+			sessionName = session.getText();
+		}
+		
+		try {
+			Activator.getDefault().createObject(sessionName, site);
+		}
+		catch (Exception exp) {
+			exp.printStackTrace();
+		}
 		super.okPressed();
 	}
 }

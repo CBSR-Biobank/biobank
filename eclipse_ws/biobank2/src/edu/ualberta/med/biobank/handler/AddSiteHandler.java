@@ -14,8 +14,9 @@ public class AddSiteHandler extends AbstractHandler implements IHandler {
 
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		try {
-			SiteDialog siteDialog = new SiteDialog(PlatformUI.getWorkbench()
-					.getActiveWorkbenchWindow().getShell());
+			SiteDialog siteDialog = new SiteDialog(
+					PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
+					Activator.getDefault().getSessionNames());
 			if (siteDialog.open() == Window.OK) {
 
 			}

@@ -9,7 +9,7 @@
 -->
 
 <property name="cacore.sdk.dir" location="caCORE_SDK/sdk" />
-<property name="eclipse.proj.dir" location="eclipse_ws/biobank2/lib" />
+<property name="eclipse.proj.dir" location="eclipse_ws/biobank2" />
 <property name="schema.dir" location="schema" />
 <property environment="env"/>
 
@@ -27,9 +27,17 @@
 <target name="deploy-eclipse"
         description="deploys the caCORE SDK beans to the eclipse project"
         depends="sdk">
+  <copy todir="${eclipse.proj.dir}/lib">
+    <fileset dir="${cacore.sdk.dir}/output/biobank2/package/remote-client/lib" />
+  </copy>
+  <copy todir="${eclipse.proj.dir}/conf">
+    <fileset dir="${cacore.sdk.dir}/output/biobank2/package/remote-client/conf">
+      <include name="application-config-client*.xml" />
+    </fileset>
+  </copy>
   <copy
-     file="${cacore.sdk.dir}/output/biobank2/build/jar/biobank2-beans.jar"
-     tofile="${eclipse.proj.dir}/biobank2-beans.jar"/>
+     file="${cacore.sdk.dir}/output/biobank2/src/hibernate.cfg.xml"
+     tofile="${eclipse.proj.dir}/lib"/>
 </target>
 
 <target name="deploy-jboss"
