@@ -6,10 +6,17 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
 
 import edu.ualberta.med.biobank.Activator;
@@ -26,9 +33,9 @@ import gov.nih.nci.system.query.SDKQueryResult;
 import gov.nih.nci.system.query.example.InsertExampleQuery;
 import edu.ualberta.med.biobank.model.Site;
 
-public class SessionsView extends ViewPart {
+public class SessionsView extends ViewPart implements ISelectionChangedListener {
 	public static final String ID =
-	      "edu.ualberta.med.biobank.views.sessions";
+	      "edu.ualberta.med.biobank.session.SessionView";
 
 	private TreeViewer treeViewer;
 	
@@ -51,6 +58,7 @@ public class SessionsView extends ViewPart {
 		getSite().setSelectionProvider(treeViewer);
 		treeViewer.setLabelProvider(new SessionLabelProvider());
 		treeViewer.setContentProvider(new SessionContentProvider());
+        treeViewer.addSelectionChangedListener(this);
 	}
 	
 	@Override
@@ -205,5 +213,41 @@ public class SessionsView extends ViewPart {
 	
 	public String[] getSessionNames() {
 		return sessions.keySet().toArray(new String[sessions.size()]);
+	}
+
+	@Override
+	public void selectionChanged(SelectionChangedEvent event) {
+		Object selection = event.getSelection();
+		
+		if (selection == null) return;
+		
+		Object element = ((StructuredSelection)selection).getFirstElement();
+
+		if (element instanceof SiteNode) {
+			SiteNode node = (SiteNode) element;
+			String pageId = edu.ualberta.med.biobank.views.SiteView.ID;
+			if ((pageId == null) || (pageId.length() == 0)) {
+				// TODO: log an error here
+				return;
+			}
+			
+			IWorkbenchWindow activeWorkbenchWindow
+			= PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+
+			if (activeWorkbenchWindow == null) return;
+
+			IWorkbenchPage page = activeWorkbenchWindow.getActivePage();
+
+			if (page == null) return;
+
+			try {
+				page.showView(pageId);
+			} 
+			catch (PartInitException e) {
+				// handle error
+				e.printStackTrace();				
+			}
+			
+		}
 	}
 }
