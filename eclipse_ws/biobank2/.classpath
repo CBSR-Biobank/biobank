@@ -6,7 +6,7 @@
 	<classpathentry exported="true" kind="lib" path="lib/acegi-security-1.0.4.jar" sourcepath="biobank2src.zip"/>
 	<classpathentry exported="true" kind="lib" path="lib/antlr-2.7.6.jar" sourcepath="biobank2src.zip"/>
 	<classpathentry exported="true" kind="lib" path="lib/asm.jar" sourcepath="biobank2src.zip"/>
-	<classpathentry exported="true" kind="lib" path="lib/biobank2-beans.jar" sourcepath="biobank2src.zip"/>
+	<classpathentry exported="true" kind="lib" path="lib/biobank2-beans.jar" sourcepath="lib/biobank2-beans.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/castor-1.0.2.jar" sourcepath="biobank2src.zip"/>
 	<classpathentry exported="true" kind="lib" path="lib/cglib-2.1.3.jar" sourcepath="biobank2src.zip"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons-codec-1.3.jar" sourcepath="biobank2src.zip"/>

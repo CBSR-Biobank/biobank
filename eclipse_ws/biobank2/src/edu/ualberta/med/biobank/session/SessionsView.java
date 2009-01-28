@@ -34,13 +34,13 @@ public class SessionsView extends ViewPart {
 	
 	private RootNode rootNode;
 	
-	private HashMap<String, WritableApplicationService> sessions;
+	private HashMap<String, SessionNode> sessions;
 	
 	public SessionsView() {
 		super();
 		Activator.getDefault().setSessionView(this);
 		rootNode = new RootNode();
-		sessions = new  HashMap<String, WritableApplicationService>();
+		sessions = new  HashMap<String, SessionNode>();
 	}
 
 	@Override
@@ -105,9 +105,9 @@ public class SessionsView extends ViewPart {
 		job.schedule();
 	}
 	
-	public void addSession(final WritableApplicationService appService, final String name) {
-		sessions.put(name, appService);
+	public void addSession(final WritableApplicationService appService, final String name)  throws Exception {
 		final SessionNode sessionNode = new SessionNode(appService, name);
+		sessions.put(name, sessionNode);
 		rootNode.addSessionNode(sessionNode);
 		
 		treeViewer.setInput(rootNode);
@@ -116,14 +116,26 @@ public class SessionsView extends ViewPart {
 				treeViewer.refresh();
 			}
 		});
-
+		
+		updateSites(name);
+	}
+	
+	public void updateSites(final String sessionName) throws Exception {
+		if (!sessions.containsKey(sessionName)) {
+			throw new Exception();
+		}
+		
+		final SessionNode sessionNode = sessions.get(sessionName);
+		
 		// get the Site sites stored on this server
 		Job job = new Job("logging in") {
 			protected IStatus run(IProgressMonitor monitor) {
+				
 				monitor.beginTask("Querying Sites ... ", 100);
 				
 				Site site = new Site();				
 				try {
+					WritableApplicationService appService = sessionNode.getAppService();
 					final List<Object> sites = appService.search(Site.class, site);
 					
 					Display.getDefault().asyncExec(new Runnable() {
@@ -132,8 +144,46 @@ public class SessionsView extends ViewPart {
 								Site site = (Site) obj;
 								sessionNode.addSite(site);
 							}
+							treeViewer.expandToLevel(2);
 						}
 					});
+				}
+				catch (Exception exp) {
+					exp.printStackTrace();
+				}
+				return Status.OK_STATUS;
+			}
+		};
+		job.setUser(true);
+		job.schedule();
+	}
+	
+	public void createObject(final String sessionName, final Object o) throws Exception {
+		if (!sessions.containsKey(sessionName)) {
+			throw new Exception();
+		}
+		
+		final SessionNode sessionNode = sessions.get(sessionName);
+		
+		Job job = new Job("Creating Object") {
+			protected IStatus run(IProgressMonitor monitor) {
+				monitor.beginTask("Submitting information ... ", 100);
+				
+				try {
+					SDKQuery query;
+					SDKQueryResult result;
+					WritableApplicationService appService = sessionNode.getAppService();
+					
+					if (o instanceof Site) {
+						Site site = (Site) o;
+						query = new InsertExampleQuery(site.getAddress());					
+						result = appService.executeQuery(query);
+						site.setAddress((Address) result.getObjectResult());
+						query = new InsertExampleQuery(site);	
+						appService.executeQuery(query);
+					}
+					
+					updateSites(sessionName);
 				}
 				catch (Exception exp) {
 					exp.printStackTrace();
@@ -155,38 +205,5 @@ public class SessionsView extends ViewPart {
 	
 	public String[] getSessionNames() {
 		return sessions.keySet().toArray(new String[sessions.size()]);
-	}
-	
-	public void createObject(final String sessionName, final Object o) throws Exception {
-		if (!sessions.containsKey(sessionName)) {
-			throw new Exception();
-		}
-		
-		Job job = new Job("Creating Object") {
-			protected IStatus run(IProgressMonitor monitor) {
-				monitor.beginTask("Submitting information ... ", 100);
-				
-				try {
-					SDKQuery query;
-					SDKQueryResult result;
-					WritableApplicationService appService = sessions.get(sessionName);
-					
-					if (o instanceof Site) {
-						Site site = (Site) o;
-						query = new InsertExampleQuery(site.getAddress());					
-						result = appService.executeQuery(query);
-						site.setAddress((Address) result.getObjectResult());
-						query = new InsertExampleQuery(site);	
-						appService.executeQuery(query);
-					}
-				}
-				catch (Exception exp) {
-					exp.printStackTrace();
-				}
-				return Status.OK_STATUS;
-			}
-		};
-		job.setUser(true);
-		job.schedule();
 	}
 }

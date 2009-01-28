@@ -109,7 +109,11 @@ public class Activator extends AbstractUIPlugin implements ISessionListener {
 	public void addSession(final WritableApplicationService appService, final String name) {
 		getLog().log(new Status(IStatus.WARNING,getBundle().getSymbolicName(),0,
 				"session opened: " + name, null));
-		sessionView.addSession(appService, name);		
+		try {
+			sessionView.addSession(appService, name);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}		
 	}
 	
 	public void addSessionFailed(final SessionCredentials sc) {
