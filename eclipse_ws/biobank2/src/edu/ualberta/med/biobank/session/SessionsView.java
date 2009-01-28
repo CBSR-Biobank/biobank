@@ -14,6 +14,7 @@ import org.eclipse.ui.part.ViewPart;
 
 import edu.ualberta.med.biobank.Activator;
 import edu.ualberta.med.biobank.SessionCredentials;
+import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.RootNode;
 import edu.ualberta.med.biobank.model.SiteNode;
 import edu.ualberta.med.biobank.model.SessionNode;
@@ -21,6 +22,7 @@ import edu.ualberta.med.biobank.model.ISessionNodeListener;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.client.ApplicationServiceProvider;
 import gov.nih.nci.system.query.SDKQuery;
+import gov.nih.nci.system.query.SDKQueryResult;
 import gov.nih.nci.system.query.example.InsertExampleQuery;
 import edu.ualberta.med.biobank.model.Site;
 
@@ -160,14 +162,23 @@ public class SessionsView extends ViewPart {
 			throw new Exception();
 		}
 		
-		final SDKQuery query = new InsertExampleQuery(o);
-		
 		Job job = new Job("Creating Object") {
 			protected IStatus run(IProgressMonitor monitor) {
 				monitor.beginTask("Submitting information ... ", 100);
 				
 				try {
-					sessions.get(sessionName).executeQuery(query);
+					SDKQuery query;
+					SDKQueryResult result;
+					WritableApplicationService appService = sessions.get(sessionName);
+					
+					if (o instanceof Site) {
+						Site site = (Site) o;
+						query = new InsertExampleQuery(site.getAddress());					
+						result = appService.executeQuery(query);
+						site.setAddress((Address) result.getObjectResult());
+						query = new InsertExampleQuery(site);	
+						appService.executeQuery(query);
+					}
 				}
 				catch (Exception exp) {
 					exp.printStackTrace();
