@@ -100,7 +100,6 @@ public class BioBankPlugin extends AbstractUIPlugin implements ISessionListener 
 				System.out.println("login unsuccessfull");
 			}
 		}
-		
 	}
 	
 	public void setSessionView(SessionsView sessionView) {

@@ -36,15 +36,15 @@ public class LoginForm extends EditorPart {
 	
 	private ArrayList<String> userNames;
 
+	private FormToolkit toolkit;
+	
+	private ScrolledForm form;	
+
 	private Combo serverText;
 
 	private Combo userNameText;
 
 	private Text passwordText;
-
-	private FormToolkit toolkit;
-	
-	private ScrolledForm form;	
 	
 	private static final String SAVED_SERVERS = "savedServers";
 	
@@ -153,6 +153,7 @@ public class LoginForm extends EditorPart {
 			public void widgetSelected(SelectionEvent e) {
 				buttonPressed(IDialogConstants.OK_ID);
 				BioBankPlugin.getDefault().createSession();
+				getSite().getPage().closeEditor(LoginForm.this, false);
 			}
 		});
 		
@@ -160,6 +161,7 @@ public class LoginForm extends EditorPart {
 		cancelButton.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				buttonPressed(IDialogConstants.CANCEL_ID);
+				getSite().getPage().closeEditor(LoginForm.this, false);
 			}
 		});
 	}
@@ -210,8 +212,8 @@ public class LoginForm extends EditorPart {
 
 	@Override
 	public void doSave(IProgressMonitor monitor) {
-		// TODO Auto-generated method stub
-		
+		buttonPressed(IDialogConstants.OK_ID);
+		BioBankPlugin.getDefault().createSession();
 	}
 
 	@Override

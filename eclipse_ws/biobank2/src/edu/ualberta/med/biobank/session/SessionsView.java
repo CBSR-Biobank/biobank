@@ -7,6 +7,8 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -14,16 +16,18 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionCredentials;
+import edu.ualberta.med.biobank.forms.LoginForm;
+import edu.ualberta.med.biobank.forms.SiteForm;
 import edu.ualberta.med.biobank.model.Address;
+import edu.ualberta.med.biobank.model.LoginInput;
 import edu.ualberta.med.biobank.model.RootNode;
+import edu.ualberta.med.biobank.model.SiteInput;
 import edu.ualberta.med.biobank.model.SiteNode;
 import edu.ualberta.med.biobank.model.SessionNode;
 import edu.ualberta.med.biobank.model.ISessionNodeListener;
@@ -34,7 +38,7 @@ import gov.nih.nci.system.query.SDKQueryResult;
 import gov.nih.nci.system.query.example.InsertExampleQuery;
 import edu.ualberta.med.biobank.model.Site;
 
-public class SessionsView extends ViewPart implements ISelectionChangedListener {
+public class SessionsView extends ViewPart implements IDoubleClickListener {
 	public static final String ID =
 	      "edu.ualberta.med.biobank.session.SessionView";
 
@@ -59,7 +63,7 @@ public class SessionsView extends ViewPart implements ISelectionChangedListener 
 		getSite().setSelectionProvider(treeViewer);
 		treeViewer.setLabelProvider(new SessionLabelProvider());
 		treeViewer.setContentProvider(new SessionContentProvider());
-        treeViewer.addSelectionChangedListener(this);
+        treeViewer.addDoubleClickListener(this);
 	}
 	
 	@Override
@@ -222,7 +226,7 @@ public class SessionsView extends ViewPart implements ISelectionChangedListener 
 	}
 
 	@Override
-	public void selectionChanged(SelectionChangedEvent event) {
+	public void doubleClick(DoubleClickEvent event) {
 		Object selection = event.getSelection();
 		
 		if (selection == null) return;
@@ -231,23 +235,10 @@ public class SessionsView extends ViewPart implements ISelectionChangedListener 
 
 		if (element instanceof SiteNode) {
 			SiteNode node = (SiteNode) element;
-			String pageId = edu.ualberta.med.biobank.views.WorkArea.ID;
-			if ((pageId == null) || (pageId.length() == 0)) {
-				// TODO: log an error here
-				return;
-			}
+			SiteInput input = new SiteInput(node.getSite().getId(), node);
 			
-			IWorkbenchWindow activeWorkbenchWindow
-			= PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-
-			if (activeWorkbenchWindow == null) return;
-
-			IWorkbenchPage page = activeWorkbenchWindow.getActivePage();
-
-			if (page == null) return;
-
 			try {
-				page.showView(pageId);
+				getSite().getPage().openEditor(input, SiteForm.ID, true);
 			} 
 			catch (PartInitException e) {
 				// handle error

@@ -153,5 +153,11 @@
             id="edu.ualberta.med.biobank.forms.LoginForm"
             name="Login">
       </editor>
+      <editor
+            class="edu.ualberta.med.biobank.forms.SiteForm"
+            default="false"
+            id="edu.ualberta.med.biobank.forms.SiteForm"
+            name="Site">
+      </editor>
    </extension>
 </plugin>
