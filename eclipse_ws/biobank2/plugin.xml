@@ -118,8 +118,15 @@
       <view
             allowMultiple="false"
             class="edu.ualberta.med.biobank.session.SessionsView"
-            id="edu.ualberta.med.biobank.views.session"
+            id="edu.ualberta.med.biobank.session.SessionView"
             name="Sessions"
+            restorable="true">
+      </view>
+      <view
+            allowMultiple="false"
+            class="edu.ualberta.med.biobank.views.SiteView"
+            id="edu.ualberta.med.biobank.views.SiteView"
+            name="Site"
             restorable="true">
       </view>
    </extension>
@@ -128,11 +135,14 @@
       <perspectiveExtension
             targetID="edu.ualberta.med.biobank.perspective">
          <view
-               id="edu.ualberta.med.biobank.views.session"
+               closeable="false"
+               id="edu.ualberta.med.biobank.session.SessionView"
                minimized="false"
+               moveable="false"
                ratio="0.5"
                relationship="left"
-               relative="org.eclipse.ui.editorss">
+               relative="org.eclipse.ui.editorss"
+               showTitle="false">
          </view>
       </perspectiveExtension>
    </extension>

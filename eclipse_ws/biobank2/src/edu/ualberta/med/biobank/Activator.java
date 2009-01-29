@@ -1,17 +1,17 @@
 package edu.ualberta.med.biobank;
 
 import java.util.EventObject;
-
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
+
 import edu.ualberta.med.biobank.session.SessionsView;
 import edu.ualberta.med.biobank.webservice.Session;
 import edu.ualberta.med.biobank.webservice.ISessionListener;
 import edu.ualberta.med.biobank.webservice.LoginResultEvent;
-import gov.nih.nci.system.applicationservice.ApplicationService;
+import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -47,7 +47,6 @@ public class Activator extends AbstractUIPlugin implements ISessionListener {
 		wsSession.addListener(this);
 		wsSession.start();
 	}
-
 
 	/*
 	 * (non-Javadoc)
@@ -103,10 +102,18 @@ public class Activator extends AbstractUIPlugin implements ISessionListener {
 		
 	}
 	
-	public void addSession(final ApplicationService appService, final String name) {
+	public void createSession() {
+		sessionView.createSession(getSessionCredentials());
+	}
+	
+	public void addSession(final WritableApplicationService appService, final String name) {
 		getLog().log(new Status(IStatus.WARNING,getBundle().getSymbolicName(),0,
 				"session opened: " + name, null));
-		sessionView.addSession(appService, name);		
+		try {
+			sessionView.addSession(appService, name);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}		
 	}
 	
 	public void addSessionFailed(final SessionCredentials sc) {
@@ -121,5 +128,13 @@ public class Activator extends AbstractUIPlugin implements ISessionListener {
 	
 	public int getSessionCount() {
 		return sessionView.getSessionCount(); 
+	}
+
+	public String[] getSessionNames() {
+		return sessionView.getSessionNames();
+	}
+	
+	public void createObject(final String sessionName, final Object o) throws Exception {
+		sessionView.createObject(sessionName, o);
 	}
 }

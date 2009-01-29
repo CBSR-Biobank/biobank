@@ -1,18 +1,18 @@
 package edu.ualberta.med.biobank.model;
 
-import gov.nih.nci.system.applicationservice.ApplicationService;
+import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 import java.util.ArrayList;
 import org.eclipse.core.runtime.ListenerList;
 
 public class SessionNode extends WsObject {
-	private ArrayList<SiteNode> siteNodes;
+	private ArrayList<SiteNode> siteNodes = null;
 	
 	private ListenerList listeners;
 	
-	private ApplicationService appService;
+	private WritableApplicationService appService;
 	
-	public SessionNode(ApplicationService appService, String name) {
+	public SessionNode(WritableApplicationService appService, String name) {
 		this.appService = appService;
 		setName(name);
 	}
@@ -21,6 +21,10 @@ public class SessionNode extends WsObject {
 		if (siteNodes == null) {
 			siteNodes = new ArrayList<SiteNode>();
 		}
+		
+		// make sure this site is not already in collection
+		if (containsSite(site)) return;
+		
 		SiteNode siteNode = new SiteNode(site);
 		siteNode.setParent(this);
 		siteNodes.add(siteNode);
@@ -28,12 +32,21 @@ public class SessionNode extends WsObject {
 	}
 
 	public void removeSite(Site site) {
-		if (siteNodes != null) {
-			siteNodes.remove(site);
-			if (siteNodes.isEmpty())
-				siteNodes = null;
+		if (siteNodes == null) return;
+		
+		siteNodes.remove(site);
+		if (siteNodes.isEmpty())
+			siteNodes = null;
+	}
+	
+	public boolean containsSite(Site site) {
+		if (siteNodes == null) return false;
+		
+		for (SiteNode node : siteNodes) {
+			if (node.getSite().getId().equals(site.getId())) return true;
 		}
-	}	
+		return false;
+	}
 	
 	public SiteNode[] getSites() {
 		if (siteNodes == null) {
@@ -42,7 +55,7 @@ public class SessionNode extends WsObject {
 		return (SiteNode[]) siteNodes.toArray(new SiteNode[siteNodes.size()]);
 	}
 	
-	public ApplicationService getAppService() {
+	public WritableApplicationService getAppService() {
 		return appService;
 	}
 
