@@ -7,8 +7,8 @@ import org.eclipse.core.commands.IHandler;
 import org.eclipse.jface.window.Window;
 import org.eclipse.ui.PlatformUI;
 
-import edu.ualberta.med.biobank.Activator;
-import edu.ualberta.med.biobank.dialogs.SiteDialog;
+import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.forms.SiteDialog;
 
 public class AddSiteHandler extends AbstractHandler implements IHandler {
 
@@ -16,7 +16,7 @@ public class AddSiteHandler extends AbstractHandler implements IHandler {
 		try {
 			SiteDialog siteDialog = new SiteDialog(
 					PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
-					Activator.getDefault().getSessionNames());
+					BioBankPlugin.getDefault().getSessionNames());
 			if (siteDialog.open() == Window.OK) {
 
 			}
@@ -29,6 +29,6 @@ public class AddSiteHandler extends AbstractHandler implements IHandler {
 	}
 	
 	public boolean isEnabled() {
-		return (Activator.getDefault().getSessionCount() > 0);
+		return (BioBankPlugin.getDefault().getSessionCount() > 0);
 	}
 }

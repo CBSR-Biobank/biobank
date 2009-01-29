@@ -6,6 +6,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -19,7 +20,7 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
 
-import edu.ualberta.med.biobank.Activator;
+import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionCredentials;
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.RootNode;
@@ -45,7 +46,7 @@ public class SessionsView extends ViewPart implements ISelectionChangedListener 
 	
 	public SessionsView() {
 		super();
-		Activator.getDefault().setSessionView(this);
+		BioBankPlugin.getDefault().setSessionView(this);
 		rootNode = new RootNode();
 		sessions = new  HashMap<String, SessionNode>();
 	}
@@ -66,11 +67,6 @@ public class SessionsView extends ViewPart implements ISelectionChangedListener 
 		// TODO Auto-generated method stub
 	}
 	
-	public void loginFailed(SessionCredentials sc) {
-		// pop up a dialog box here
-		
-	}
-	
 	public void createSession(final SessionCredentials sc) {
 		Job job = new Job("logging in") {
 			protected IStatus run(IProgressMonitor monitor) {
@@ -89,21 +85,26 @@ public class SessionsView extends ViewPart implements ISelectionChangedListener 
 						appService = (WritableApplicationService) 
 						ApplicationServiceProvider.getApplicationServiceFromUrl(url, userName, sc.getPassword());
 					}
-
 					
 					Display.getDefault().asyncExec(new Runnable() {
 				          public void run() {
-				        	  Activator.getDefault().addSession(appService, sc.getServer());
+				        	  try {
+								addSession(appService, sc.getServer());
+							} catch (Exception e) {
+								e.printStackTrace();
+							}
 				          }
 					});
 				}
-				catch (Exception exp) {	
+				catch (final Exception exp) {	
 					exp.printStackTrace();
 					
 					Display.getDefault().asyncExec(new Runnable() {
-				          public void run() {
-				        	  Activator.getDefault().addSessionFailed(sc);
-				          }
+						public void run() {
+							MessageDialog.openError(
+									PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), 
+									"Login Failed", exp.getMessage());
+						}
 					});
 				}
 				return Status.OK_STATUS;
@@ -126,6 +127,11 @@ public class SessionsView extends ViewPart implements ISelectionChangedListener 
 		});
 		
 		updateSites(name);
+	}
+	
+	public void loginFailed(SessionCredentials sc) {
+		// pop up a dialog box here
+		
 	}
 	
 	public void updateSites(final String sessionName) throws Exception {
@@ -225,7 +231,7 @@ public class SessionsView extends ViewPart implements ISelectionChangedListener 
 
 		if (element instanceof SiteNode) {
 			SiteNode node = (SiteNode) element;
-			String pageId = edu.ualberta.med.biobank.views.SiteView.ID;
+			String pageId = edu.ualberta.med.biobank.views.WorkArea.ID;
 			if ((pageId == null) || (pageId.length() == 0)) {
 				// TODO: log an error here
 				return;

@@ -3,10 +3,10 @@ package edu.ualberta.med.biobank.views;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.part.ViewPart;
 
-public class SiteView extends ViewPart {
-	public static String ID = "edu.ualberta.med.biobank.views.SiteView";
+public class WorkArea extends ViewPart {
+	public static String ID = "edu.ualberta.med.biobank.views.WorkArea";
 	
-	public SiteView() {
+	public WorkArea() {
 		super();
 	}
 	

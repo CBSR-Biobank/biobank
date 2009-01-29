@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank;
+package edu.ualberta.med.biobank.rcp;
 
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -20,8 +20,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
     protected void resetPerspective(IWorkbenchWindow window) {	
     	IWorkbenchAction quickStartAction = ActionFactory.INTRO.create(window);
     	register(quickStartAction);
-    	IWorkbenchAction resetView = ActionFactory.RESET_PERSPECTIVE
-    	.create(window);
+    	IWorkbenchAction resetView = ActionFactory.RESET_PERSPECTIVE.create(window);
     	register(resetView);
     }
 

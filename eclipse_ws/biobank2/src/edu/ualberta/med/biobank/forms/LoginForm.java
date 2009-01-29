@@ -1,28 +1,36 @@
-package edu.ualberta.med.biobank.dialogs;
+package edu.ualberta.med.biobank.forms;
 
-import org.eclipse.jface.dialogs.TitleAreaDialog;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IEditorSite;
+import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.forms.widgets.FormToolkit;
+import org.eclipse.ui.forms.widgets.ScrolledForm;
+import org.eclipse.ui.part.EditorPart;
 import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.preferences.ConfigurationScope;
-import org.eclipse.jface.dialogs.MessageDialog;
 import java.util.ArrayList;
 import java.util.Iterator;
 import org.osgi.service.prefs.Preferences;
 import org.osgi.service.prefs.BackingStoreException;
 
-import edu.ualberta.med.biobank.Activator;
-import edu.ualberta.med.biobank.Application;
+import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionCredentials;
+import edu.ualberta.med.biobank.rcp.Application;
 
-public class LoginDialog extends TitleAreaDialog {
+public class LoginForm extends EditorPart {
+	public static final String ID =
+	      "edu.ualberta.med.biobank.forms.LoginForm";
 	
 	private ArrayList<String> servers;
 	
@@ -33,6 +41,10 @@ public class LoginDialog extends TitleAreaDialog {
 	private Combo userNameText;
 
 	private Text passwordText;
+
+	private FormToolkit toolkit;
+	
+	private ScrolledForm form;	
 	
 	private static final String SAVED_SERVERS = "savedServers";
 	
@@ -46,9 +58,7 @@ public class LoginDialog extends TitleAreaDialog {
 
 	private static final String LAST_USER_NAME = "lastUserName";
 	
-	public LoginDialog(Shell parentShell) {			
-		super(parentShell);	
-		
+	public LoginForm() {  
 		servers = new ArrayList<String>();
 		userNames = new ArrayList<String>();
 		
@@ -62,12 +72,7 @@ public class LoginDialog extends TitleAreaDialog {
 				Preferences node = prefsServers.node(serverNodeName);
 				servers.add(node.get(SERVER, ""));
 			}
-		}
-		catch (BackingStoreException e) {
-			e.printStackTrace();
-		}
-		
-		try {
+			
 			String[] userNodeNames = prefsUserNames.childrenNames();
 			for (String userNodeName : userNodeNames) {
 				Preferences node = prefsUserNames.node(userNodeName);
@@ -78,25 +83,26 @@ public class LoginDialog extends TitleAreaDialog {
 			e.printStackTrace();
 		}
 	}
-	
-	protected void configureShell(Shell shell) {
-		super.configureShell(shell);
-		shell.setText("BioBank Login");
+
+	@Override
+	public void init(IEditorSite site, IEditorInput input)
+			throws PartInitException {
+		setSite(site);
+		setInput(input);
+		
 	}
-	
-	protected Control createContents(Composite parent) {
-        Control contents = super.createContents(parent);
-    	setTitle("Login to a BioBank server");
-        setMessage("Enter server name and login details.");
-        return contents;
-	}
-	
-	protected Control createDialogArea(Composite parent) {		
-		Composite parentComposite = (Composite) super.createDialogArea(parent);
+
+	@Override
+	public void createPartControl(Composite parent) {
+		toolkit = new FormToolkit(parent.getDisplay());
+		form = toolkit.createScrolledForm(parent);	
+		
+		form.setText("BioBank Login");
 		
 		Preferences prefs = new ConfigurationScope().getNode(Application.PLUGIN_ID);
 		
-		Composite contents = new Composite(parentComposite, SWT.NONE);
+		Composite contents = form.getBody();
+		
 		GridLayout layout = new GridLayout(2, false);
 		contents.setLayout(layout);
 		contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
@@ -120,9 +126,9 @@ public class LoginDialog extends TitleAreaDialog {
 		userNameLabel.setLayoutData(new GridData(GridData.END, GridData.CENTER,
 				false, false));
 
-		GridData gridData = new GridData(GridData.FILL, GridData.FILL, true,
-				false);
-		gridData.widthHint = convertHeightInCharsToPixels(20);
+		//GridData gridData = new GridData(GridData.FILL, GridData.FILL, true,
+		//		false);
+		//gridData.widthHint = convertHeightInCharsToPixels(20);
 
 		userNameText = new Combo(contents, SWT.BORDER);
 		userNameText.setLayoutData(new GridData(GridData.FILL, GridData.FILL,
@@ -142,7 +148,25 @@ public class LoginDialog extends TitleAreaDialog {
 		passwordText.setLayoutData(new GridData(GridData.FILL, GridData.FILL,
 				true, false));
 		
-		return contents;
+		final Button submitButton = toolkit.createButton(contents, "Submit", SWT.FLAT);
+		submitButton.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				buttonPressed(IDialogConstants.OK_ID);
+				BioBankPlugin.getDefault().createSession();
+			}
+		});
+		
+		final Button cancelButton = toolkit.createButton(contents, "Cancel", SWT.FLAT);
+		cancelButton.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				buttonPressed(IDialogConstants.CANCEL_ID);
+			}
+		});
+	}
+
+	@Override
+	public void setFocus() {
+		form.setFocus();
 	}
 	
 	protected void buttonPressed(int buttonId) {
@@ -171,7 +195,8 @@ public class LoginDialog extends TitleAreaDialog {
 			} catch (BackingStoreException e) {
 				e.printStackTrace();
 			}
-
+			
+			if (buttonId == IDialogConstants.CANCEL_ID) return;
 			
 			SessionCredentials sc = new SessionCredentials();			
 			
@@ -179,23 +204,43 @@ public class LoginDialog extends TitleAreaDialog {
 			sc.setUserName(userNameText.getText());
 			sc.setPassword(passwordText.getText());
 			
-			Activator.getDefault().setSessionCredentials(sc);
+			BioBankPlugin.getDefault().setSessionCredentials(sc);
 		}
-		super.buttonPressed(buttonId);
 	}
 
-	protected void okPressed() {
-		if (serverText.getText().equals("")) {
-			MessageDialog.openError(getShell(), "Invalid Server Name",
-			"Server field must not be blank.");
-			return;
-		}
-		if (userNameText.getText().equals("") && !Activator.getDefault().isDebugging()) {
-			MessageDialog.openError(getShell(), "Invalid User Name",
-			"User Name field must not be blank.");
-			return;
-		}
-		super.okPressed();
+	@Override
+	public void doSave(IProgressMonitor monitor) {
+		// TODO Auto-generated method stub
+		
 	}
+
+	@Override
+	public void doSaveAs() {		
+	}
+
+	@Override
+	public boolean isDirty() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean isSaveAsAllowed() {
+		return false;
+	}
+
+//	protected void okPressed() {
+//		if (serverText.getText().equals("")) {
+//			MessageDialog.openError(getShell(), "Invalid Server Name",
+//			"Server field must not be blank.");
+//			return;
+//		}
+//		if (userNameText.getText().equals("") && !Activator.getDefault().isDebugging()) {
+//			MessageDialog.openError(getShell(), "Invalid User Name",
+//			"User Name field must not be blank.");
+//			return;
+//		}
+//		super.okPressed();
+//	}
 
 }

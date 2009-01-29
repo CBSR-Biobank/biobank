@@ -3,13 +3,14 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Biobank2 Plug-in
 Bundle-SymbolicName: biobank2; singleton:=true
 Bundle-Version: 1.0.0
-Bundle-Activator: edu.ualberta.med.biobank.Activator
+Bundle-Activator: edu.ualberta.med.biobank.BioBankPlugin
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.core.resources;bundle-version="3.4.1",
  org.eclipse.core.databinding;bundle-version="1.1.1",
  org.eclipse.core.databinding.beans;bundle-version="1.1.1",
- org.eclipse.jface.databinding;bundle-version="1.2.1"
+ org.eclipse.jface.databinding;bundle-version="1.2.1",
+ org.eclipse.ui.forms;bundle-version="3.3.101"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ClassPath: lib/acegi-security-1.0.4.jar,

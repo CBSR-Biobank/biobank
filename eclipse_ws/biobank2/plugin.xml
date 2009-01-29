@@ -7,7 +7,7 @@
          point="org.eclipse.core.runtime.applications">
       <application>
          <run
-               class="edu.ualberta.med.biobank.Application">
+               class="edu.ualberta.med.biobank.rcp.Application">
          </run>
       </application>
    </extension>
@@ -26,7 +26,7 @@
    <extension
          point="org.eclipse.ui.perspectives">
       <perspective
-            class="edu.ualberta.med.biobank.Perspective"
+            class="edu.ualberta.med.biobank.rcp.Perspective"
             id="edu.ualberta.med.biobank.perspective"
             name="Biobank Perspective">
       </perspective>
@@ -123,10 +123,10 @@
             restorable="true">
       </view>
       <view
-            allowMultiple="false"
-            class="edu.ualberta.med.biobank.views.SiteView"
-            id="edu.ualberta.med.biobank.views.SiteView"
-            name="Site"
+            allowMultiple="true"
+            class="edu.ualberta.med.biobank.views.WorkArea"
+            id="edu.ualberta.med.biobank.views.WorkArea"
+            name="WorkArea"
             restorable="true">
       </view>
    </extension>
@@ -145,5 +145,13 @@
                showTitle="false">
          </view>
       </perspectiveExtension>
+   </extension>
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            class="edu.ualberta.med.biobank.forms.LoginForm"
+            id="edu.ualberta.med.biobank.forms.LoginForm"
+            name="Login">
+      </editor>
    </extension>
 </plugin>

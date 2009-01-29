@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.dialogs;
+package edu.ualberta.med.biobank.forms;
 
 import org.eclipse.core.databinding.DataBindingContext;
 import org.eclipse.core.databinding.UpdateValueStrategy;
@@ -19,7 +19,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
-import edu.ualberta.med.biobank.Activator;
+import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
 
@@ -139,7 +139,7 @@ public class SiteDialog extends AddressDialog {
 		}
 		
 		try {
-			Activator.getDefault().createObject(sessionName, site);
+			BioBankPlugin.getDefault().createObject(sessionName, site);
 		}
 		catch (Exception exp) {
 			exp.printStackTrace();

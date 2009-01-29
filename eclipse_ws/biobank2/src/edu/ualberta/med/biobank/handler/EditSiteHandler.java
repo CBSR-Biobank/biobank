@@ -5,7 +5,7 @@ import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.IHandler;
 
-import edu.ualberta.med.biobank.Activator;
+import edu.ualberta.med.biobank.BioBankPlugin;
 
 public class EditSiteHandler extends AbstractHandler implements IHandler {	
 	public Object execute(ExecutionEvent event) throws ExecutionException {
@@ -14,6 +14,6 @@ public class EditSiteHandler extends AbstractHandler implements IHandler {
 	}
 	
 	public boolean isEnabled() {
-		return (Activator.getDefault().getSessionCount() > 0);
+		return (BioBankPlugin.getDefault().getSessionCount() > 0);
 	}
 }

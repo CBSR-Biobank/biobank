@@ -4,19 +4,20 @@ import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.IHandler;
-
-import edu.ualberta.med.biobank.Activator;
+import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.jface.window.Window;
-import edu.ualberta.med.biobank.dialogs.LoginDialog;
+
+import edu.ualberta.med.biobank.forms.LoginForm;
+import edu.ualberta.med.biobank.model.LoginInput;
 
 public class LoginHandler extends AbstractHandler implements IHandler {
 
 	public Object execute(ExecutionEvent event) throws ExecutionException {
-		LoginDialog loginDialog = new LoginDialog(PlatformUI.getWorkbench()
-				.getActiveWorkbenchWindow().getShell());
-		if (loginDialog.open() == Window.OK) {
-			Activator.getDefault().createSession();
+		try {
+			PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage()
+			.openEditor(new LoginInput(), LoginForm.ID, true);
+		} catch (PartInitException e) {
+			e.printStackTrace();
 		}
 		return null;
 	}

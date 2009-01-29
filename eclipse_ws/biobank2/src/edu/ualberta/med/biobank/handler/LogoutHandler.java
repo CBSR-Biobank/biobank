@@ -5,7 +5,7 @@ import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.IHandler;
 
-import edu.ualberta.med.biobank.Activator;
+import edu.ualberta.med.biobank.BioBankPlugin;
 
 public class LogoutHandler extends AbstractHandler implements IHandler {
 
@@ -22,7 +22,7 @@ public class LogoutHandler extends AbstractHandler implements IHandler {
 
 	@Override
 	public boolean isEnabled() {
-		return (Activator.getDefault().getSessionCount() > 0);
+		return (BioBankPlugin.getDefault().getSessionCount() > 0);
 	}
 
 }
