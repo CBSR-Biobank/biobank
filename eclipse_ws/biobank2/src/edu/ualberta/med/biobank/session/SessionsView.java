@@ -20,7 +20,7 @@ import org.eclipse.ui.part.ViewPart;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionCredentials;
-import edu.ualberta.med.biobank.forms.SiteDialog;
+import edu.ualberta.med.biobank.forms.SiteForm;
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.RootNode;
 import edu.ualberta.med.biobank.model.SiteInput;
@@ -234,7 +234,7 @@ public class SessionsView extends ViewPart implements IDoubleClickListener {
 			SiteInput input = new SiteInput(node.getSite().getId(), node);
 			
 			try {
-				getSite().getPage().openEditor(input, SiteDialog.ID, true);
+				getSite().getPage().openEditor(input, SiteForm.ID, true);
 			} 
 			catch (PartInitException e) {
 				// handle error

@@ -39,7 +39,7 @@ import edu.ualberta.med.biobank.validators.EmailAddress;
 import edu.ualberta.med.biobank.validators.PostalCode;
 import edu.ualberta.med.biobank.validators.TelephoneNumber;
 
-public abstract class AddressDialog extends EditorPart {	
+public abstract class AddressForm extends EditorPart {	
 	protected static final String INVALID_POSTAL_CODE_MESSAGE = "Invalid postal code";
 	protected static final String INVALID_PHONE_NUMBER_MESSAGE = "Telephone number is invalid";
 	protected static final String INVALID_EMAIL_MESSAGE = "Email address is invalid";
