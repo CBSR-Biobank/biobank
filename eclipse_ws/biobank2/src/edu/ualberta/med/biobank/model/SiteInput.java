@@ -41,6 +41,8 @@ public class SiteInput implements IEditorInput {
 	 * @see org.eclipse.ui.IEditorInput#getName()
 	 */
 	public String getName() {
+		if (node == null) return "New Site";
+		
 		return node.getSite().getName();
 	}
 
@@ -69,7 +71,10 @@ public class SiteInput implements IEditorInput {
 	 */
 	@SuppressWarnings("unchecked")
 	public Object getAdapter(Class adapter) {
-		if (adapter == SiteNode.class) return node;
+		if (adapter == SiteNode.class) {
+			if (node == null) return new SiteNode(null);
+			return node;
+		}
 		return null;
 	}
 	/* (non-Javadoc)

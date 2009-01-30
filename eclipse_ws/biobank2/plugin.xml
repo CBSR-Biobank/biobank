@@ -122,13 +122,6 @@
             name="Sessions"
             restorable="true">
       </view>
-      <view
-            allowMultiple="true"
-            class="edu.ualberta.med.biobank.views.WorkArea"
-            id="edu.ualberta.med.biobank.views.WorkArea"
-            name="WorkArea"
-            restorable="true">
-      </view>
    </extension>
    <extension
          point="org.eclipse.ui.perspectiveExtensions">
@@ -154,9 +147,9 @@
             name="Login">
       </editor>
       <editor
-            class="edu.ualberta.med.biobank.forms.SiteForm"
+            class="edu.ualberta.med.biobank.forms.SiteDialog"
             default="false"
-            id="edu.ualberta.med.biobank.forms.SiteForm"
+            id="edu.ualberta.med.biobank.forms.SiteDialog"
             name="Site">
       </editor>
    </extension>

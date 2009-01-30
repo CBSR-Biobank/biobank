@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.forms;
 
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
@@ -13,38 +12,20 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.ISaveablePart;
 import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.part.EditorPart;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 
 import edu.ualberta.med.biobank.model.SiteInput;
 import edu.ualberta.med.biobank.model.SiteNode;
 
-public class SiteForm extends EditorPart {
+public class SiteForm extends AddressDialog {
 	public static final String ID =
 	      "edu.ualberta.med.biobank.forms.SiteForm";
 
 	private SiteNode siteNode;
 	
-	private boolean dirty = false;
-
-	private FormToolkit toolkit;
-	
-	private ScrolledForm form;
-	
 	protected Combo session;
 	private Text name;
-
-	@Override
-	public void doSave(IProgressMonitor monitor) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void doSaveAs() {
-		setDirty(false);
-	}
 
 	@Override
 	public void init(IEditorSite site, IEditorInput input)
@@ -60,11 +41,6 @@ public class SiteForm extends EditorPart {
 	@Override
 	public boolean isDirty() {
 		return dirty;
-	}
-
-	private void setDirty(boolean d) {
-		dirty = d;
-		firePropertyChange(ISaveablePart.PROP_DIRTY);
 	}
 
 	@Override
@@ -102,24 +78,21 @@ public class SiteForm extends EditorPart {
 		name = createLabelledText(contents, "Name:", 0, null);
 		name.setText(siteNode.getSite().getName());
 		name.addKeyListener(keyListener);
+		
+		createAddressArea(contents);
+		
+		toolkit.paintBordersFor(form.getBody());
 	}
-	
-	protected Text createLabelledText(Composite parent, String label, int limit, String tip) {
-		toolkit.createLabel(parent, label, SWT.LEFT);
-        Text text  = toolkit.createText(parent, siteNode.getSite().getName());
-        if (limit > 0) {
-            text.setTextLimit(limit);
-        }
-        if (tip != null) {
-            text.setToolTipText(tip);
-        }
-        text.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
-        return text;
-    }
 
 	@Override
 	public void setFocus() {
 		form.setFocus();		
+	}
+
+	@Override
+	protected void handleStatusChanged() {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

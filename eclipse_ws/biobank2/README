@@ -11,7 +11,9 @@ TO REBUILD DATABASE:
 NOTES:
   Async update: http://dev.eclipse.org/newslists/news.eclipse.platform.rcp/msg32257.html
   
-  
  
 TODO
   - Consider using PShelf Widget from Nebula: http://www.eclipse.org/nebula/
+  
+  
+See Eclipse project org.eclipse.ui.examples.contributions.model for UI design. 

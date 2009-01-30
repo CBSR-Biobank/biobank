@@ -9,10 +9,9 @@ import org.eclipse.core.databinding.observable.StaleEvent;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.observable.value.IValueChangeListener;
 import org.eclipse.core.databinding.observable.value.ValueChangeEvent;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.databinding.swt.SWTObservables;
-import org.eclipse.jface.dialogs.IDialogConstants;
-import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.jface.fieldassist.ControlDecoration;
 import org.eclipse.jface.fieldassist.FieldDecoration;
 import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
@@ -22,21 +21,34 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IEditorSite;
+import org.eclipse.ui.ISaveablePart;
+import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.forms.widgets.FormToolkit;
+import org.eclipse.ui.forms.widgets.ScrolledForm;
+import org.eclipse.ui.part.EditorPart;
 
 import edu.ualberta.med.biobank.model.Address;
+import edu.ualberta.med.biobank.model.SiteInput;
+import edu.ualberta.med.biobank.model.SiteNode;
 import edu.ualberta.med.biobank.validators.EmailAddress;
 import edu.ualberta.med.biobank.validators.PostalCode;
 import edu.ualberta.med.biobank.validators.TelephoneNumber;
 
-public abstract class AddressDialog extends TitleAreaDialog {	
+public abstract class AddressDialog extends EditorPart {	
 	protected static final String INVALID_POSTAL_CODE_MESSAGE = "Invalid postal code";
 	protected static final String INVALID_PHONE_NUMBER_MESSAGE = "Telephone number is invalid";
 	protected static final String INVALID_EMAIL_MESSAGE = "Email address is invalid";
+
+	protected boolean dirty = false;
+
+	protected FormToolkit toolkit;
+	
+	protected ScrolledForm form;
 	
 	protected final Address address = new Address();
 	
@@ -79,28 +91,32 @@ public abstract class AddressDialog extends TitleAreaDialog {
 	protected IStatus currentStatus;
 	protected boolean currentStatusStale;
 
-	public AddressDialog(Shell parentShell) {
-		super(parentShell);
-		setShellStyle(getShellStyle() | SWT.RESIZE);
+	public void doSave(IProgressMonitor monitor) {
+		setDirty(false);
 	}
 	
-	protected void configureShell(Shell shell) {
-		super.configureShell(shell);
-		shell.setText("BioBank Site Information");
+	public void doSaveAs() {
 	}
 	
-	protected Control createContents(Composite parent) {
-        return super.createContents(parent);
-    }
-	
-    protected void createButtonsForButtonBar(Composite parent) {
-        okButton = createButton(parent, IDialogConstants.OK_ID,
-                IDialogConstants.OK_LABEL, true);
-        createButton(parent, IDialogConstants.CANCEL_ID,
-                IDialogConstants.CANCEL_LABEL, false);
-		okButton.setEnabled(false);
-    }
+	public boolean isSaveAsAllowed() {
+		return false;
+	}
 
+	public void init(IEditorSite site, IEditorInput input)
+			throws PartInitException {
+		setSite(site);
+		setInput(input);
+		setDirty(false);
+	}
+	
+	public boolean isDirty() {
+		return dirty;
+	}
+
+	protected void setDirty(boolean d) {
+		dirty = d;
+		firePropertyChange(ISaveablePart.PROP_DIRTY);
+	}
 
 	protected void createAddressArea(Composite parent) {
 		Group group;
@@ -135,8 +151,8 @@ public abstract class AddressDialog extends TitleAreaDialog {
 	}
 	
 	protected Text createLabelledText(Composite parent, String label, int limit, String tip) {
-        new Label(parent, SWT.LEFT).setText(label);
-        Text text  = new Text(parent, SWT.SINGLE);
+		toolkit.createLabel(parent, label, SWT.LEFT);
+        Text text  = toolkit.createText(parent, "", SWT.SINGLE);
         if (limit > 0) {
             text.setTextLimit(limit);
         }

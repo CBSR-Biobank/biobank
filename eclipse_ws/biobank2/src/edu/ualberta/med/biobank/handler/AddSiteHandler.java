@@ -4,22 +4,19 @@ import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.IHandler;
-import org.eclipse.jface.window.Window;
-import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.handlers.HandlerUtil;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.forms.SiteDialog;
+import edu.ualberta.med.biobank.model.SiteInput;
 
 public class AddSiteHandler extends AbstractHandler implements IHandler {
 
 	public Object execute(ExecutionEvent event) throws ExecutionException {
+		SiteInput input = new SiteInput(0, null);
 		try {
-			SiteDialog siteDialog = new SiteDialog(
-					PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
-					BioBankPlugin.getDefault().getSessionNames());
-			if (siteDialog.open() == Window.OK) {
-
-			}
+			HandlerUtil.getActiveWorkbenchWindowChecked(event).getActivePage()
+			.openEditor(input, SiteDialog.ID, true);
 		}
 		catch (Exception exp) {
 			exp.printStackTrace();
