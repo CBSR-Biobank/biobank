@@ -6,11 +6,11 @@ import org.eclipse.ui.IPersistableElement;
 
 public class SiteInput implements IEditorInput {
 	private int index;
-	private SiteNode node;
+	private Object parent;
 
-	public SiteInput(int i, SiteNode n) {
+	public SiteInput(int i, Object o) {
 		index = i;
-		node = n;
+		parent = o;
 	}
 
 	public int getIndex() {
@@ -41,9 +41,10 @@ public class SiteInput implements IEditorInput {
 	 * @see org.eclipse.ui.IEditorInput#getName()
 	 */
 	public String getName() {
-		if (node == null) return "New Site";
-		
-		return node.getSite().getName();
+		if (parent instanceof SiteNode) {
+			((SiteNode) parent).getSite().getName();
+		}
+		return "New Site";
 	}
 
 	/*
@@ -71,9 +72,11 @@ public class SiteInput implements IEditorInput {
 	 */
 	@SuppressWarnings("unchecked")
 	public Object getAdapter(Class adapter) {
-		if (adapter == SiteNode.class) {
-			if (node == null) return new SiteNode(null);
-			return node;
+		if ((parent instanceof SiteNode) && (adapter == SiteNode.class)) {
+			return (SiteNode) parent;
+		}
+		else if ((parent instanceof SessionNode) && (adapter == SessionNode.class)) {
+			return (SessionNode) parent;
 		}
 		return null;
 	}

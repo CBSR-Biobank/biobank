@@ -17,6 +17,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
+import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionCredentials;
@@ -84,16 +85,25 @@ public class SessionsView extends ViewPart implements IDoubleClickListener {
 					else {
 						appService = (WritableApplicationService) 
 						ApplicationServiceProvider.getApplicationServiceFromUrl(url, userName, sc.getPassword());
-					}
+					}	
+
+					Site site = new Site();		
+					final List<Object> sites = appService.search(Site.class, site);
 					
 					Display.getDefault().asyncExec(new Runnable() {
 				          public void run() {
-				        	  try {
-								addSession(appService, sc.getServer());
-							} catch (Exception e) {
-								e.printStackTrace();
-							}
+				        	  addSession(appService, sc.getServer(), sites);
 				          }
+					});
+				}
+				catch (final RemoteConnectFailureException exp) {
+					Display.getDefault().asyncExec(new Runnable() {
+						public void run() {
+							MessageDialog.openError(
+									PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), 
+									"Connection Attempt Failed", 
+									"Could not connect to server. Make sure server is running.");
+						}
 					});
 				}
 				catch (final Exception exp) {	
@@ -114,7 +124,8 @@ public class SessionsView extends ViewPart implements IDoubleClickListener {
 		job.schedule();
 	}
 	
-	public void addSession(final WritableApplicationService appService, final String name)  throws Exception {
+	public void addSession(final WritableApplicationService appService, String name, 
+			List<Object> sites) {
 		final SessionNode sessionNode = new SessionNode(appService, name);
 		sessions.put(name, sessionNode);
 		rootNode.addSessionNode(sessionNode);
@@ -126,12 +137,11 @@ public class SessionsView extends ViewPart implements IDoubleClickListener {
 			}
 		});
 		
-		updateSites(name);
-	}
-	
-	public void loginFailed(SessionCredentials sc) {
-		// pop up a dialog box here
-		
+		for (Object obj : sites) {
+			sessionNode.addSite((Site) obj);
+		}
+		treeViewer.refresh();
+		treeViewer.expandToLevel(2);
 	}
 	
 	public void updateSites(final String sessionName) throws Exception {

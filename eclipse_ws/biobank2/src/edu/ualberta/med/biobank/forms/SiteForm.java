@@ -5,6 +5,7 @@ import org.eclipse.core.databinding.UpdateValueStrategy;
 import org.eclipse.core.databinding.beans.PojoObservables;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.databinding.swt.SWTObservables;
+import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.fieldassist.ControlDecoration;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.swt.SWT;
@@ -15,12 +16,18 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IEditorSite;
+import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.model.Address;
+import edu.ualberta.med.biobank.model.SessionNode;
 import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.model.SiteInput;
+import edu.ualberta.med.biobank.model.SiteNode;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
 
 public class SiteForm extends AddressForm {	
@@ -30,7 +37,7 @@ public class SiteForm extends AddressForm {
 	private static final String OK_MESSAGE = "Creates a new BioBank site.";
 	private static final String NO_SITE_NAME_MESSAGE = "Site must have a name";
 	
-	private final Site site = new Site();
+	private Site site;
 	
 	private String[] sessionNames;
 
@@ -38,6 +45,31 @@ public class SiteForm extends AddressForm {
 	private Text name;	
 	private ControlDecoration nameDecorator;
 	private boolean editMode = false;
+
+	public void init(IEditorSite editorSite, IEditorInput input) throws PartInitException {
+		super.init(editorSite, input);
+		if ( !(input instanceof SiteInput)) 
+			throw new PartInitException("Invalid editor input"); 
+		
+		SiteInput siteInput = (SiteInput) input;
+		SessionNode sessionNode = (SessionNode) input.getAdapter(SessionNode.class);
+		SiteNode siteNode = (SiteNode) input.getAdapter(SiteNode.class);
+		
+		if ((sessionNode == null) && (siteNode == null)) 
+			throw new PartInitException("Invalid editor input adapter");
+		if (siteNode != null) {
+			site = siteNode.getSite();
+			address = site.getAddress();
+			editMode = true;
+			setPartName("Site " + site.getName());
+		}
+		else {
+			site = new Site();
+			address = new Address();
+			setPartName("New Site");
+		}
+	}
+	
 
 	public void createPartControl(Composite parent) {
 		KeyListener keyListener = new KeyListener() {
@@ -55,9 +87,11 @@ public class SiteForm extends AddressForm {
 		};
 		
 		toolkit = new FormToolkit(parent.getDisplay());
-		form = toolkit.createScrolledForm(parent);	
+		form = toolkit.createForm(parent);	
 		
 		form.setText("BioBank Site Information");
+		toolkit.decorateFormHeading(form);
+		form.setMessage(OK_MESSAGE);
 		
 		Composite contents = form.getBody();
 		
@@ -109,12 +143,12 @@ public class SiteForm extends AddressForm {
     
     protected void handleStatusChanged() {
     	int severity = currentStatus.getSeverity(); 
-		okButton.setEnabled(severity == IStatus.OK);
+		//okButton.setEnabled(severity == IStatus.OK);
 		if (severity == IStatus.OK) {
-			//setMessage(OK_MESSAGE);
+			form.setMessage(OK_MESSAGE);
 		}
 		else {
-			//setMessage(currentStatus.getMessage(), IMessageProvider.ERROR);
+			form.setMessage(currentStatus.getMessage(), IMessageProvider.ERROR);
 		}		
     }
 	

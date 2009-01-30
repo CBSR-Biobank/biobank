@@ -15,14 +15,20 @@ public class RootNode extends WsObject {
 	}	
 	
 	public void deleteSessionNode(String name) throws Exception {
+		SessionNode nodeToDelete = null;
+		
 		for (Iterator<SessionNode> it = sessions.iterator(); it.hasNext(); ) {
 			SessionNode node = it.next();
 			if (node.getName().equals(name)) {
-				sessions.remove(node);
+				nodeToDelete = node;
 			}
 		}
-		// no session with name found
-		throw new Exception();
+		if (nodeToDelete == null) {
+			// no session with name found
+			throw new RuntimeException();
+		}
+		
+		sessions.remove(nodeToDelete);
 	}
 	
 	public SessionNode[] getSessions() {

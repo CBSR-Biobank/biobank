@@ -1,7 +1,13 @@
 package edu.ualberta.med.biobank;
 
+import java.net.URL;
 import java.util.EventObject;
+
+import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
@@ -14,6 +20,7 @@ import edu.ualberta.med.biobank.webservice.LoginResultEvent;
  * The activator class controls the plug-in life cycle
  */
 public class BioBankPlugin extends AbstractUIPlugin implements ISessionListener {
+	public static final String IMG_FORM_BG = "formBg";
 
 	// The plug-in ID
 	public static final String PLUGIN_ID = "biobank2";
@@ -43,6 +50,23 @@ public class BioBankPlugin extends AbstractUIPlugin implements ISessionListener 
 		wsSession = new Session();
 		wsSession.addListener(this);
 		wsSession.start();
+	}
+	
+	protected void initializeImageRegistry(ImageRegistry registry) {
+		registerImage(registry, IMG_FORM_BG, "form_banner.bmp");
+	}
+
+	private void registerImage(ImageRegistry registry, String key,
+			String fileName) {
+		try {
+			IPath path = new Path("icons/" + fileName);
+			URL url = FileLocator.find(getBundle(), path, null);
+			if (url!=null) {
+				ImageDescriptor desc = ImageDescriptor.createFromURL(url);
+				registry.put(key, desc);
+			}
+		} catch (Exception e) {
+		}
 	}
 
 	/*

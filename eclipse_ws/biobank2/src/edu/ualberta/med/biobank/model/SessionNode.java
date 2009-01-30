@@ -22,8 +22,9 @@ public class SessionNode extends WsObject {
 			siteNodes = new ArrayList<SiteNode>();
 		}
 		
-		// make sure this site is not already in collection
-		if (containsSite(site)) return;
+		// is site has already been added, get rid of old one
+		if (!siteNodes.isEmpty())
+			removeSite(site);
 		
 		SiteNode siteNode = new SiteNode(site);
 		siteNode.setParent(this);
@@ -33,8 +34,12 @@ public class SessionNode extends WsObject {
 
 	public void removeSite(Site site) {
 		if (siteNodes == null) return;
+
+		for (SiteNode node : siteNodes) {
+			if (node.getSite().getId().equals(site.getId())) 
+				siteNodes.remove(node);
+		}
 		
-		siteNodes.remove(site);
 		if (siteNodes.isEmpty())
 			siteNodes = null;
 	}
