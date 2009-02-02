@@ -21,7 +21,7 @@ import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionCredentials;
-import edu.ualberta.med.biobank.forms.SiteForm;
+import edu.ualberta.med.biobank.forms.SiteEntryForm;
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.RootNode;
 import edu.ualberta.med.biobank.model.SiteInput;
@@ -244,7 +244,7 @@ public class SessionsView extends ViewPart implements IDoubleClickListener {
 			SiteInput input = new SiteInput(node.getSite().getId(), node);
 			
 			try {
-				getSite().getPage().openEditor(input, SiteForm.ID, true);
+				getSite().getPage().openEditor(input, SiteEntryForm.ID, true);
 			} 
 			catch (PartInitException e) {
 				// handle error

@@ -147,7 +147,7 @@
             name="Login">
       </editor>
       <editor
-            class="edu.ualberta.med.biobank.forms.SiteForm"
+            class="edu.ualberta.med.biobank.forms.SiteEntryForm"
             default="false"
             id="edu.ualberta.med.biobank.forms.SiteDialog"
             name="Site">

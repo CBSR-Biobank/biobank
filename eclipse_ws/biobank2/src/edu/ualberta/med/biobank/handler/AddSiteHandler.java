@@ -7,7 +7,7 @@ import org.eclipse.core.commands.IHandler;
 import org.eclipse.ui.handlers.HandlerUtil;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
-import edu.ualberta.med.biobank.forms.SiteForm;
+import edu.ualberta.med.biobank.forms.SiteEntryForm;
 import edu.ualberta.med.biobank.model.SiteInput;
 
 public class AddSiteHandler extends AbstractHandler implements IHandler {
@@ -16,7 +16,7 @@ public class AddSiteHandler extends AbstractHandler implements IHandler {
 		SiteInput input = new SiteInput(0, null);
 		try {
 			HandlerUtil.getActiveWorkbenchWindowChecked(event).getActivePage()
-			.openEditor(input, SiteForm.ID, true);
+			.openEditor(input, SiteEntryForm.ID, true);
 		}
 		catch (Exception exp) {
 			exp.printStackTrace();

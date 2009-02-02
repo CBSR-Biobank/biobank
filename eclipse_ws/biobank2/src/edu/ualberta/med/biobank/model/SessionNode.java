@@ -34,11 +34,16 @@ public class SessionNode extends WsObject {
 
 	public void removeSite(Site site) {
 		if (siteNodes == null) return;
+		
+		SiteNode nodeToRemove = null;
 
 		for (SiteNode node : siteNodes) {
 			if (node.getSite().getId().equals(site.getId())) 
-				siteNodes.remove(node);
+				nodeToRemove = node;
 		}
+		
+		if (nodeToRemove != null)
+			siteNodes.remove(nodeToRemove);
 		
 		if (siteNodes.isEmpty())
 			siteNodes = null;
