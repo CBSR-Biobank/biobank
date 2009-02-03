@@ -49,12 +49,12 @@
             name="Quit">
       </command>
       <command
-            defaultHandler="edu.ualberta.med.biobank.handler.AddSiteHandler"
+            defaultHandler="edu.ualberta.med.biobank.handler.SiteAddHandler"
             id="edu.ualberta.med.biobank.commands.addSite"
             name="AddSite">
       </command>
       <command
-            defaultHandler="edu.ualberta.med.biobank.handler.EditSiteHandler"
+            defaultHandler="edu.ualberta.med.biobank.handler.SiteViewHandler"
             id="edu.ualberta.med.biobank.commands.editSite"
             name="EditSite">
       </command>
@@ -149,8 +149,14 @@
       <editor
             class="edu.ualberta.med.biobank.forms.SiteEntryForm"
             default="false"
-            id="edu.ualberta.med.biobank.forms.SiteDialog"
-            name="Site">
+            id="edu.ualberta.med.biobank.forms.SiteEntryForm"
+            name="Site Entry">
+      </editor>
+      <editor
+            class="edu.ualberta.med.biobank.forms.SiteViewForm"
+            default="false"
+            id="edu.ualberta.med.biobank.forms.SiteViewForm"
+            name="Site View">
       </editor>
    </extension>
 </plugin>

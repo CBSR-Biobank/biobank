@@ -42,7 +42,7 @@ public class SiteInput implements IEditorInput {
 	 */
 	public String getName() {
 		if (parent instanceof SiteNode) {
-			((SiteNode) parent).getSite().getName();
+			return ((SiteNode) parent).getSite().getName();
 		}
 		return "New Site";
 	}

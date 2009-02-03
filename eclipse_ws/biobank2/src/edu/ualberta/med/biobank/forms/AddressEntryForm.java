@@ -178,7 +178,7 @@ public abstract class AddressEntryForm extends EditorPart {
 				}
 				
 				dbc.bindValue(SWTObservables.observeText(controls.get(key), SWT.Modify),
-						PojoObservables.observeValue(address, "street1"), uvs, null);
+						PojoObservables.observeValue(address, key), uvs, null);
 			}
 			else if (fi.widgetClass == Combo.class) {
 		    	dbc.bindValue(SWTObservables.observeSelection(controls.get(key)),

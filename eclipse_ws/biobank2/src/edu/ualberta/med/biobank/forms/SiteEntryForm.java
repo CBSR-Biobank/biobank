@@ -32,15 +32,13 @@ import edu.ualberta.med.biobank.validators.NonEmptyString;
 
 public class SiteEntryForm extends AddressEntryForm {	
 	public static final String ID =
-	      "edu.ualberta.med.biobank.forms.SiteDialog";
+	      "edu.ualberta.med.biobank.forms.SiteEntryForm";
 	
 	private static final String OK_MESSAGE = "Creates a new BioBank site.";
 	private static final String NO_SITE_NAME_MESSAGE = "Site must have a name";
 	
 	private Site site;
 	
-	private String[] sessionNames;
-
 	protected Combo session;
 	private Text name;	
 	private ControlDecoration nameDecorator;
@@ -77,12 +75,16 @@ public class SiteEntryForm extends AddressEntryForm {
 		toolkit.decorateFormHeading(form);
 		form.setMessage(OK_MESSAGE);
 		
-		GridLayout layout = new GridLayout();
-		layout.numColumns = 1;
+		GridLayout layout = new GridLayout(1, false);
 		//layout.marginHeight = 10;
 		//layout.marginWidth = 6;
 		//layout.horizontalSpacing = 20;
 		form.getBody().setLayout(layout);
+		
+		toolkit.createLabel(form.getBody(), 
+				"Studies, Clinics, and Storage Types can be added after submitting this initial information.", 
+				SWT.LEFT);
+
 		
 		Section section = toolkit.createSection(form.getBody(), 
 				ExpandableComposite.TITLE_BAR
@@ -91,9 +93,8 @@ public class SiteEntryForm extends AddressEntryForm {
 		Composite sbody = toolkit.createComposite(section);
 		section.setClient(sbody);
 		section.setLayoutData(new GridData(GridData.FILL_BOTH));
-		layout = new GridLayout();
+		layout = new GridLayout(2, false);
 		layout.horizontalSpacing = 10;
-		layout.numColumns = 2;
 		sbody.setLayout(layout);
 		toolkit.paintBordersFor(sbody);
 		
