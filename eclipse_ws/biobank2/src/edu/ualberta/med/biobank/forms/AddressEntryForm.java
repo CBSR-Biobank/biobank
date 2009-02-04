@@ -3,15 +3,9 @@ package edu.ualberta.med.biobank.forms;
 import java.lang.reflect.Constructor;
 import java.util.HashMap;
 
-import org.eclipse.core.databinding.AggregateValidationStatus;
 import org.eclipse.core.databinding.DataBindingContext;
 import org.eclipse.core.databinding.UpdateValueStrategy;
 import org.eclipse.core.databinding.beans.PojoObservables;
-import org.eclipse.core.databinding.observable.IStaleListener;
-import org.eclipse.core.databinding.observable.StaleEvent;
-import org.eclipse.core.databinding.observable.value.IObservableValue;
-import org.eclipse.core.databinding.observable.value.IValueChangeListener;
-import org.eclipse.core.databinding.observable.value.ValueChangeEvent;
 import org.eclipse.core.databinding.validation.IValidator;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -20,6 +14,10 @@ import org.eclipse.jface.fieldassist.ControlDecoration;
 import org.eclipse.jface.fieldassist.FieldDecoration;
 import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.KeyListener;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -53,11 +51,21 @@ public abstract class AddressEntryForm extends EditorPart {
 	protected Address address;
 		
 	protected Button okButton;
-	protected boolean editMode = false;
 
-	protected IObservableValue aggregateStatus;
 	protected IStatus currentStatus;
-	protected boolean currentStatusStale;
+	
+	protected KeyListener keyListener = new KeyListener() {
+		@Override
+		public void keyPressed(KeyEvent e) {
+			if ((e.keyCode & SWT.MODIFIER_MASK) == 0) {
+				setDirty(true);
+			}
+		}
+
+		@Override
+		public void keyReleased(KeyEvent e) {			
+		}
+	};
 	
 	public AddressEntryForm() {
 		super();
@@ -95,7 +103,7 @@ public abstract class AddressEntryForm extends EditorPart {
 	protected void createAddressArea() {
 		Section section = toolkit.createSection(form.getBody(), Section.TITLE_BAR);
 		section.setText("Address");
-		section.setLayoutData(new GridData(GridData.FILL_BOTH));
+		section.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		Composite sbody = toolkit.createComposite(section);
 		section.setClient(sbody);
 		GridLayout layout = new GridLayout();
@@ -110,6 +118,7 @@ public abstract class AddressEntryForm extends EditorPart {
 			if (fi.widgetClass == Text.class) {
 				Text text = createLabelledText(sbody, fi.label + " :", 100, null);
 				controls.put(key, text);
+				text.addKeyListener(keyListener);
 				
 				if (fi.validatorClass != null) {
 					fieldDecorators.put(key, createDecorator(text, fi.errMsg));
@@ -124,6 +133,12 @@ public abstract class AddressEntryForm extends EditorPart {
 				combo.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
 				toolkit.adapt(combo, true, true);
 				controls.put(key, combo);
+				
+				combo.addSelectionListener(new SelectionAdapter() {
+					public void widgetSelected(SelectionEvent e) {
+						setDirty(true);
+					}
+				});
 			}
 			else {
 				assert false : fi.widgetClass;
@@ -187,25 +202,6 @@ public abstract class AddressEntryForm extends EditorPart {
 			else {
 				assert false : fi.widgetClass;
 			}
-		}
-    	
-    	aggregateStatus = new AggregateValidationStatus(
-    			dbc.getBindings(), AggregateValidationStatus.MAX_SEVERITY); 
-    			
-    	aggregateStatus.addValueChangeListener(new IValueChangeListener() {
-			public void handleValueChange(ValueChangeEvent event) {
-				currentStatus = (IStatus) event.diff.getNewValue();
-				currentStatusStale = aggregateStatus.isStale();
-				handleStatusChanged();
-			}
-    	}); 
-		aggregateStatus.addStaleListener(new IStaleListener() {
-			public void handleStale(StaleEvent staleEvent) {
-				currentStatusStale = true;
-				handleStatusChanged();
-			}
-		});
+		}  
     }
-    
-    protected abstract void handleStatusChanged();
 }

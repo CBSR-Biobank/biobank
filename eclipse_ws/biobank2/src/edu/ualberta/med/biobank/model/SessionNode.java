@@ -3,6 +3,8 @@ package edu.ualberta.med.biobank.model;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 import java.util.ArrayList;
+
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.ListenerList;
 
 public class SessionNode extends WsObject {
@@ -63,6 +65,16 @@ public class SessionNode extends WsObject {
 			return new SiteNode[0];
 		}
 		return (SiteNode[]) siteNodes.toArray(new SiteNode[siteNodes.size()]);
+	}
+	
+	public SiteNode getSite(int id) {
+		if (siteNodes == null) return null;
+		
+		for (SiteNode node : siteNodes) {
+			if (node.getSite().getId().equals(id)) return node;
+		}
+		Assert.isTrue(false, "node with id " + id + " not found");
+		return null;
 	}
 	
 	public WritableApplicationService getAppService() {

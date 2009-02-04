@@ -141,4 +141,8 @@ public class BioBankPlugin extends AbstractUIPlugin implements ISessionListener 
 	public void createObject(final String sessionName, final Object o) throws Exception {
 		sessionView.createObject(sessionName, o);
 	}
+	
+	public void updateObject(final String sessionName, final Object o) throws Exception {
+		sessionView.updateObject(sessionName, o);
+	}
 }

@@ -2,6 +2,8 @@ package edu.ualberta.med.biobank.session;
 
 import java.util.HashMap;
 import java.util.List;
+
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -33,6 +35,7 @@ import gov.nih.nci.system.client.ApplicationServiceProvider;
 import gov.nih.nci.system.query.SDKQuery;
 import gov.nih.nci.system.query.SDKQueryResult;
 import gov.nih.nci.system.query.example.InsertExampleQuery;
+import gov.nih.nci.system.query.example.UpdateExampleQuery;
 import edu.ualberta.med.biobank.model.Site;
 
 public class SessionsView extends ViewPart implements IDoubleClickListener {
@@ -200,6 +203,9 @@ public class SessionsView extends ViewPart implements IDoubleClickListener {
 					
 					if (o instanceof Site) {
 						Site site = (Site) o;
+						Assert.isTrue(site.getId() == null, "insert invoked on site already in database");
+						Assert.isTrue(site.getAddress().getId() == null, "insert invoked on address already in database");
+						
 						query = new InsertExampleQuery(site.getAddress());					
 						result = appService.executeQuery(query);
 						site.setAddress((Address) result.getObjectResult());
@@ -208,6 +214,54 @@ public class SessionsView extends ViewPart implements IDoubleClickListener {
 					}
 					
 					updateSites(sessionName);
+				}
+				catch (Exception exp) {
+					exp.printStackTrace();
+				}
+				return Status.OK_STATUS;
+			}
+		};
+		job.setUser(true);
+		job.schedule();
+	}
+	
+	public void updateObject(final String sessionName, final Object o) throws Exception {
+		Assert.isTrue(sessions.containsKey(sessionName), "Session named " + sessionName + " not found");
+		
+		final SessionNode sessionNode = sessions.get(sessionName);
+		
+		Job job = new Job("Creating Object") {
+			protected IStatus run(IProgressMonitor monitor) {
+				monitor.beginTask("Submitting information ... ", 100);
+				
+				try {
+					SDKQuery query;
+					SDKQueryResult result = null;
+					WritableApplicationService appService = sessionNode.getAppService();
+					
+					if (o instanceof Site) {
+						Site site = (Site) o;
+						Assert.isNotNull(site.getId(), "update invoked on site not in database");
+						Assert.isNotNull(site.getAddress().getId(), "update invoked on address not in database");
+						
+						query = new UpdateExampleQuery(site.getAddress());					
+						result = appService.executeQuery(query);
+						site.setAddress((Address) result.getObjectResult());
+						query = new UpdateExampleQuery(site);	
+						result = appService.executeQuery(query);
+					}
+					
+					updateSites(sessionName);
+					
+					if (result != null) {
+						final int id =  ((Site) result.getObjectResult()).getId();
+						
+						Display.getDefault().asyncExec(new Runnable() {
+							public void run() {
+								openSiteNode(sessionNode.getSite(id));
+							}
+						});
+					}
 				}
 				catch (Exception exp) {
 					exp.printStackTrace();
@@ -240,17 +294,19 @@ public class SessionsView extends ViewPart implements IDoubleClickListener {
 		Object element = ((StructuredSelection)selection).getFirstElement();
 
 		if (element instanceof SiteNode) {
-			SiteNode node = (SiteNode) element;
-			SiteInput input = new SiteInput(node.getSite().getId(), node);
-			
-			try {
-				getSite().getPage().openEditor(input, SiteViewForm.ID, true);
-			} 
-			catch (PartInitException e) {
-				// handle error
-				e.printStackTrace();				
-			}
-			
+			openSiteNode((SiteNode) element);
+		}
+	}
+	
+	private void openSiteNode(SiteNode node) {
+		SiteInput input = new SiteInput(node.getSite().getId(), node);
+		
+		try {
+			getSite().getPage().openEditor(input, SiteViewForm.ID, true);
+		} 
+		catch (PartInitException e) {
+			// handle error
+			e.printStackTrace();				
 		}
 	}
 }

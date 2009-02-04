@@ -17,6 +17,7 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.ISaveablePart;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.Form;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
@@ -69,24 +70,14 @@ public abstract class AddressViewForm extends EditorPart {
 		firePropertyChange(ISaveablePart.PROP_DIRTY);
 	}
 
-	protected void createAddressArea() {
+	protected void createAddressArea(Composite parent) {
 		Assert.isNotNull(toolkit);
 		Assert.isNotNull(form);
-		
-		Section section = toolkit.createSection(form.getBody(), Section.TITLE_BAR);
-		section.setText("Address");
-		section.setLayoutData(new GridData(GridData.FILL_BOTH));
-		Composite sbody = toolkit.createComposite(section);
-		section.setClient(sbody);
-		GridLayout layout = new GridLayout(2, false);
-		layout.horizontalSpacing = 10;
-		sbody.setLayout(layout);
-		toolkit.paintBordersFor(sbody);
 		
 		for (String key : AddressFieldsConstants.ORDERED_FIELDS) {
 			FieldInfo fi = AddressFieldsConstants.FIELDS.get(key);
 
-			Label field = createLabelledField(sbody, fi.label + " :", 100, null);
+			Label field = createLabelledField(parent, fi.label + " :", 100, null);
 			controls.put(key, field);
 		}
 	}
@@ -104,6 +95,4 @@ public abstract class AddressViewForm extends EditorPart {
 					PojoObservables.observeValue(address, key), null, null);
 		}
     }
-    
-    protected abstract void handleStatusChanged();
 }

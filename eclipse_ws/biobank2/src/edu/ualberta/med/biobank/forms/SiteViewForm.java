@@ -4,18 +4,21 @@ import org.eclipse.core.databinding.DataBindingContext;
 import org.eclipse.core.databinding.beans.PojoObservables;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.databinding.swt.SWTObservables;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
-import org.eclipse.ui.forms.widgets.TableWrapLayout;
 
-import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.SiteInput;
 import edu.ualberta.med.biobank.model.SiteNode;
@@ -25,19 +28,26 @@ public class SiteViewForm extends AddressViewForm {
 	public static final String ID =
 	      "edu.ualberta.med.biobank.forms.SiteViewForm";
 	
+	private SiteNode node;
 	private Site site;
 	
 	Label name;
 
 	public void doSave(IProgressMonitor monitor) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
-	public void doSaveAs() {
-		// TODO Auto-generated method stub
-		
+	public void doSaveAs() {		
+	}
+
+	@Override
+	public boolean isDirty() {
+		return false;
+	}
+
+	@Override
+	public boolean isSaveAsAllowed() {
+		return false;
 	}
 
 	public void init(IEditorSite editorSite, IEditorInput input)
@@ -46,11 +56,13 @@ public class SiteViewForm extends AddressViewForm {
 		if ( !(input instanceof SiteInput)) 
 			throw new PartInitException("Invalid editor input"); 
 		
-		SiteNode node = (SiteNode) ((SiteInput) input).getAdapter(SiteNode.class);
+		node = (SiteNode) ((SiteInput) input).getAdapter(SiteNode.class);
 
 		site = node.getSite();
 		address = site.getAddress();
-		setPartName("Site " + site.getName());
+		if (site.getName() != null) {
+			setPartName("Site " + site.getName());
+		}
 	}
 
 	@Override
@@ -58,33 +70,137 @@ public class SiteViewForm extends AddressViewForm {
 		
 		toolkit = new FormToolkit(parent.getDisplay());
 		form = toolkit.createForm(parent);	
+
+		if (site.getName() != null) {
+			form.setText("BioBank Site: " + site.getName());
+		}
 		
-		form.setText("BioBank Site Information");
 		toolkit.decorateFormHeading(form);
 		//form.setMessage(OK_MESSAGE);
 		
 		GridLayout layout = new GridLayout(1, false);
-		layout.marginHeight = 10;
-		layout.marginWidth = 6;
+		//layout.marginHeight = 10;
+		//layout.marginWidth = 6;
 		//layout.horizontalSpacing = 20;
 		form.getBody().setLayout(layout);
-		//form.getBody().setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		form.getBody().setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		
-		Section section = toolkit.createSection(form.getBody(), Section.TITLE_BAR);
+		Section section = toolkit.createSection(form.getBody(),  
+				ExpandableComposite.TITLE_BAR | ExpandableComposite.TWISTIE
+				| ExpandableComposite.EXPANDED);
 		section.setText("Site");
-		section.setLayout(layout);
-		section.setLayoutData(new GridData(GridData.FILL_BOTH));
+		section.setLayout(new GridLayout(1, false));
+		section.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));		
 		Composite sbody = toolkit.createComposite(section);
 		section.setClient(sbody);
-		layout = new GridLayout(2, false);
-		layout.horizontalSpacing = 10;
-		sbody.setLayout(layout);
-		toolkit.paintBordersFor(sbody);
-		form.getBody().setLayout(layout);
+		sbody.setLayout(new GridLayout(2, false));
+		sbody.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));		
+		toolkit.paintBordersFor(sbody);	
 		
 		name = createLabelledField(sbody, "Name :", 100, null);
+
+		section = toolkit.createSection(form.getBody(),  
+				ExpandableComposite.TITLE_BAR | ExpandableComposite.TWISTIE);
+		section.setText("Address");
+		sbody = toolkit.createComposite(section);
+		section.setClient(sbody);
+		section.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		sbody.setLayout(new GridLayout(4, false));
+		sbody.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));	
+		toolkit.paintBordersFor(sbody);
 		
-		createAddressArea();
+		createAddressArea(sbody);
+
+		section = toolkit.createSection(form.getBody(),  
+				ExpandableComposite.TITLE_BAR | ExpandableComposite.TWISTIE
+				| ExpandableComposite.EXPANDED);
+		section.setText("Studies");
+		sbody = toolkit.createComposite(section);
+		section.setClient(sbody);
+		section.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		layout = new GridLayout();
+		//layout.horizontalSpacing = 10;
+		layout.numColumns = 4;
+		sbody.setLayout(layout);
+		toolkit.paintBordersFor(sbody);
+		
+		// studies go here
+
+		section = toolkit.createSection(form.getBody(),  
+				ExpandableComposite.TITLE_BAR | ExpandableComposite.TWISTIE
+				| ExpandableComposite.EXPANDED);
+		section.setText("Clinics");
+		sbody = toolkit.createComposite(section);
+		section.setClient(sbody);
+		section.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		layout = new GridLayout();
+		layout.horizontalSpacing = 10;
+		layout.numColumns = 4;
+		sbody.setLayout(layout);
+		toolkit.paintBordersFor(sbody);
+		
+		// Clinics go here
+
+		section = toolkit.createSection(form.getBody(),  
+				ExpandableComposite.TITLE_BAR | ExpandableComposite.TWISTIE
+				| ExpandableComposite.EXPANDED);
+		section.setText("Storage Types");
+		sbody = toolkit.createComposite(section);
+		section.setClient(sbody);
+		section.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		layout = new GridLayout();
+		layout.horizontalSpacing = 10;
+		layout.numColumns = 4;
+		sbody.setLayout(layout);
+		toolkit.paintBordersFor(sbody);
+		
+		// Storage types go here
+
+		section = toolkit.createSection(form.getBody(), SWT.NONE);
+		sbody = toolkit.createComposite(section);
+		section.setClient(sbody);
+		section.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		layout = new GridLayout();
+		layout.horizontalSpacing = 10;
+		layout.numColumns = 4;
+		sbody.setLayout(layout);
+		toolkit.paintBordersFor(sbody);
+
+		final Button edit = toolkit.createButton(sbody, "Edit Site Info", SWT.PUSH);
+		edit.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				getSite().getPage().closeEditor(SiteViewForm.this, false);
+				
+				SiteInput input = new SiteInput(node.getSite().getId(), node);
+				
+				try {
+					getSite().getPage().openEditor(input, SiteEntryForm.ID, true);
+				} 
+				catch (PartInitException exp) {
+					// handle error
+					exp.printStackTrace();				
+				}
+			}
+		});
+
+		final Button study = toolkit.createButton(sbody, "Add Study", SWT.PUSH);
+		study.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+			}
+		});
+
+		final Button clinic = toolkit.createButton(sbody, "Add Clinic", SWT.PUSH);
+		clinic.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+			}
+		});
+
+		final Button storageType = toolkit.createButton(sbody, "Add Storage Type", SWT.PUSH);
+		storageType.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+			}
+		});
+		
 		bindValues();
 	}
     
@@ -98,26 +214,8 @@ public class SiteViewForm extends AddressViewForm {
     }
 
 	@Override
-	public boolean isDirty() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean isSaveAsAllowed() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
 	public void setFocus() {
-		// TODO Auto-generated method stub
-		
+		form.setFocus();
 	}
 
-	@Override
-	protected void handleStatusChanged() {
-		// TODO Auto-generated method stub
-		
-	}
 }
