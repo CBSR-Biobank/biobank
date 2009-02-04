@@ -15,6 +15,7 @@ public class SessionNode extends WsObject {
 	private WritableApplicationService appService;
 	
 	public SessionNode(WritableApplicationService appService, String name) {
+		super(null);
 		this.appService = appService;
 		setName(name);
 	}
@@ -28,7 +29,7 @@ public class SessionNode extends WsObject {
 		if (!siteNodes.isEmpty())
 			removeSite(site);
 		
-		SiteNode siteNode = new SiteNode(site);
+		SiteNode siteNode = new SiteNode(this, site);
 		siteNode.setParent(this);
 		siteNodes.add(siteNode);
 		fireChildrenChanged(null);

@@ -7,6 +7,7 @@ public class RootNode extends WsObject {
 	private ArrayList<SessionNode> sessions;
 	
 	public RootNode() {
+		super(null);
 		sessions = new ArrayList<SessionNode>();
 	}
 	

@@ -5,8 +5,8 @@ import org.eclipse.jface.viewers.Viewer;
 import edu.ualberta.med.biobank.model.RootNode;
 import edu.ualberta.med.biobank.model.SessionNode;
 import edu.ualberta.med.biobank.model.SiteNode;
-import edu.ualberta.med.biobank.model.ClinicsNode;
-import edu.ualberta.med.biobank.model.StudiesNode;
+import edu.ualberta.med.biobank.model.ClinicGroupNode;
+import edu.ualberta.med.biobank.model.StudyGroupNode;
 
 public class SessionContentProvider implements ITreeContentProvider {
 	
@@ -30,13 +30,12 @@ public class SessionContentProvider implements ITreeContentProvider {
 		else if (element instanceof SiteNode) {
 			return ((SiteNode) element).getChildren();
 		}
-		else if (element instanceof ClinicsNode) {
-			return ((ClinicsNode) element).getClinics();
+		else if (element instanceof ClinicGroupNode) {
+			return ((ClinicGroupNode) element).getClinicNodes();
 		}
-		else if (element instanceof StudiesNode) {
-			return ((StudiesNode) element).getStudies();
+		else if (element instanceof StudyGroupNode) {
+			return ((StudyGroupNode) element).getStudieNodes();
 		}
-		// TODO Auto-generated method stub
 		return new Object[0];
 	}
 
@@ -53,11 +52,11 @@ public class SessionContentProvider implements ITreeContentProvider {
 		else if (element instanceof SiteNode) {
 			return ((SiteNode) element).getParent();
 		}
-		else if (element instanceof ClinicsNode) {
-			return ((ClinicsNode) element).getParent();
+		else if (element instanceof ClinicGroupNode) {
+			return ((ClinicGroupNode) element).getParent();
 		}
-		else if (element instanceof StudiesNode) {
-			return ((StudiesNode) element).getParent();
+		else if (element instanceof StudyGroupNode) {
+			return ((StudyGroupNode) element).getParent();
 		}
 		return null;
 	}

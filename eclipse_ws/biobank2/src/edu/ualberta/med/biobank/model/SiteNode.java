@@ -5,9 +5,10 @@ public class SiteNode extends WsObject {
 	
 	private WsObject[] children;
 
-	public SiteNode(Site site) {
+	public SiteNode(SessionNode parent, Site site) {
+		super(parent);
 		this.site = site;
-		children = new WsObject[] { new StudiesNode(site), new ClinicsNode(site) };
+		children = new WsObject[] { new StudyGroupNode(this), new ClinicGroupNode(this) };
 		children[0].setParent(this);
 		children[1].setParent(this);
 	}
@@ -24,12 +25,12 @@ public class SiteNode extends WsObject {
 		return children;
 	}
 	
-	public ClinicsNode getClinicsNode() {
-		return (ClinicsNode) children[0];
+	public ClinicGroupNode getClinicGroupNode() {
+		return (ClinicGroupNode) children[0];
 	}
 	
-	public StudiesNode getStudiesNode() {
-		return (StudiesNode) children[1];
+	public StudyGroupNode getStudieGroupNode() {
+		return (StudyGroupNode) children[1];
 	}
 
 	protected void fireChildrenChanged() {

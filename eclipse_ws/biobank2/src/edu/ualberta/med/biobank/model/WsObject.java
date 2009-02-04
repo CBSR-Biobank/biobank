@@ -4,6 +4,10 @@ public class WsObject {
 	private WsObject parent;
 	private String name;
 	
+	public WsObject(WsObject parent) {
+		this.parent = parent;
+	}
+	
 	public void setParent(WsObject parent) {
 		this.parent = parent;
 	}
