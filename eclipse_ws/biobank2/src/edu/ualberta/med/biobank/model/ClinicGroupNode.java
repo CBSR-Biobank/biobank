@@ -11,6 +11,11 @@ public class ClinicGroupNode extends WsObject {
 		clinics = new ArrayList<ClinicNode>();
 	}
 	
+	public void addClinic(Clinic clinic) {
+		ClinicNode node = new ClinicNode(this, clinic);
+		addChild(node);
+	}
+	
 	public void addChild(ClinicNode clinicNode) {
 		clinics.add(clinicNode);
 		fireChildrenChanged();

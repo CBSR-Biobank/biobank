@@ -18,7 +18,6 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
@@ -30,6 +29,7 @@ import edu.ualberta.med.biobank.forms.SiteViewForm;
 import edu.ualberta.med.biobank.forms.WsObjectInput;
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Clinic;
+import edu.ualberta.med.biobank.model.ClinicGroupNode;
 import edu.ualberta.med.biobank.model.RootNode;
 import edu.ualberta.med.biobank.model.SiteNode;
 import edu.ualberta.med.biobank.model.SessionNode;
@@ -74,7 +74,11 @@ public class SessionsView extends ViewPart {
 		}
 
 		@Override
-		public void treeExpanded(TreeExpansionEvent e) {			
+		public void treeExpanded(TreeExpansionEvent e) {
+			Object o = e.getElement();
+			if (o instanceof ClinicGroupNode) {
+				updateClinics((ClinicGroupNode) o);
+			}			
 		}
 	};
 	
@@ -176,15 +180,13 @@ public class SessionsView extends ViewPart {
 		treeViewer.expandToLevel(2);
 	}
 	
-	public void updateSites(final String sessionName) throws Exception {
-		if (!sessions.containsKey(sessionName)) {
-			throw new Exception();
-		}
-		
-		final SessionNode sessionNode = sessions.get(sessionName);
+	public void updateSites(final SessionNode sessionNode) {
+		String sessionName = sessionNode.getName();
+		Assert.isTrue(sessions.containsKey(sessionName), 
+				"Session named " + sessionName + " not found");
 		
 		// get the Site sites stored on this server
-		Job job = new Job("logging in") {
+		Job job = new Job("Querying Sites") {
 			protected IStatus run(IProgressMonitor monitor) {
 				
 				monitor.beginTask("Querying Sites ... ", 100);
@@ -197,8 +199,7 @@ public class SessionsView extends ViewPart {
 					Display.getDefault().asyncExec(new Runnable() {
 						public void run() {
 							for (Object obj : sites) {
-								Site site = (Site) obj;
-								sessionNode.addSite(site);
+								sessionNode.addSite((Site) obj);
 							}
 							treeViewer.expandToLevel(2);
 						}
@@ -210,7 +211,44 @@ public class SessionsView extends ViewPart {
 				return Status.OK_STATUS;
 			}
 		};
-		job.setUser(true);
+		job.setUser(false);
+		job.schedule();
+	}
+	
+	public void updateClinics(final ClinicGroupNode groupNode) {
+		String sessionName = groupNode.getParent().getParent().getName();
+		Assert.isTrue(sessions.containsKey(sessionName), 
+				"Session named " + sessionName + " not found");
+		
+		final SessionNode sessionNode = sessions.get(sessionName);
+		
+		// get the Site sites stored on this server
+		Job job = new Job("Querying Clinics") {
+			protected IStatus run(IProgressMonitor monitor) {
+				
+				monitor.beginTask("Querying Clinics ... ", 100);
+				
+				Clinic clinic = new Clinic();				
+				try {
+					WritableApplicationService appService = sessionNode.getAppService();
+					final List<Object> sites = appService.search(Clinic.class, clinic);
+					
+					Display.getDefault().asyncExec(new Runnable() {
+						public void run() {
+							for (Object obj : sites) {
+								groupNode.addClinic((Clinic) obj);
+							}
+							// treeViewer.expandToLevel(2);
+						}
+					});
+				}
+				catch (Exception exp) {
+					exp.printStackTrace();
+				}
+				return Status.OK_STATUS;
+			}
+		};
+		job.setUser(false);
 		job.schedule();
 	}
 	
@@ -257,7 +295,7 @@ public class SessionsView extends ViewPart {
 								+ o.getClass().getName() + " not supported yet");
 					}
 					
-					updateSites(sessionName);
+					updateSites(sessionNode);
 				}
 				catch (Exception exp) {
 					exp.printStackTrace();
@@ -294,7 +332,7 @@ public class SessionsView extends ViewPart {
 						query = new UpdateExampleQuery(site);	
 						result = appService.executeQuery(query);
 						
-						updateSites(sessionName);
+						updateSites(sessionNode);
 						
 						if (result != null) {
 							final int id =  ((Site) result.getObjectResult()).getId();
