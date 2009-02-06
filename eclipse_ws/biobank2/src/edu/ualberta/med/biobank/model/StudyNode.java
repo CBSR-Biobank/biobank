@@ -15,4 +15,9 @@ public class StudyNode extends WsObject {
 	public Study getStudy() {
 		return study;
 	}
+
+	@Override
+	public int getId() {
+		return study.getId();
+	}
 }

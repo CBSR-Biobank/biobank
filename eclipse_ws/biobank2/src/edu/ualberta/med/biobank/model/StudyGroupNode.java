@@ -19,4 +19,9 @@ public class StudyGroupNode extends WsObject {
 		if (parent == null) return; 
 		parent.fireChildrenChanged();
 	}
+
+	@Override
+	public int getId() {
+		return 0;
+	}
 }

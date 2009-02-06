@@ -1,6 +1,6 @@
 package edu.ualberta.med.biobank.model;
 
-public class WsObject {
+public abstract class WsObject {
 	private WsObject parent;
 	private String name;
 	
@@ -17,7 +17,10 @@ public class WsObject {
 	public void setName(String name) {
 		this.name = name;
 	}
+
 	public String getName() {
 		return name;
 	}
+	
+	public abstract int getId();
 }

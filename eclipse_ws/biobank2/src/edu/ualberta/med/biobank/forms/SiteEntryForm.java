@@ -1,13 +1,8 @@
 package edu.ualberta.med.biobank.forms;
 
-import org.eclipse.core.databinding.AggregateValidationStatus;
 import org.eclipse.core.databinding.DataBindingContext;
 import org.eclipse.core.databinding.UpdateValueStrategy;
 import org.eclipse.core.databinding.beans.PojoObservables;
-import org.eclipse.core.databinding.observable.ChangeEvent;
-import org.eclipse.core.databinding.observable.IChangeListener;
-import org.eclipse.core.databinding.observable.value.IObservableValue;
-import org.eclipse.core.databinding.observable.value.WritableValue;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.databinding.swt.SWTObservables;
@@ -28,12 +23,12 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
+import org.springframework.util.Assert;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
-import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Site;
-import edu.ualberta.med.biobank.model.SiteInput;
 import edu.ualberta.med.biobank.model.SiteNode;
+import edu.ualberta.med.biobank.model.WsObject;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
 
 public class SiteEntryForm extends AddressEntryForm {	
@@ -44,6 +39,8 @@ public class SiteEntryForm extends AddressEntryForm {
 	private static final String SITE_OK_MESSAGE = "Edit a BioBank site.";
 	private static final String NO_SITE_NAME_MESSAGE = "Site must have a name";
 	
+	private WsObject node;
+	
 	private Site site;
 	
 	protected Combo session;
@@ -53,20 +50,25 @@ public class SiteEntryForm extends AddressEntryForm {
 
 	public void init(IEditorSite editorSite, IEditorInput input) throws PartInitException {
 		super.init(editorSite, input);
-		if ( !(input instanceof SiteInput)) 
-			throw new PartInitException("Invalid editor input"); 
+		if ( !(input instanceof WsObjectInput)) 
+			throw new PartInitException("Invalid editor input");
 		
-		SiteNode node = (SiteNode) ((SiteInput) input).getAdapter(SiteNode.class);
-
-		if (node == null) {
-			site = new Site();
-			address = new Address();
+		node = ((WsObjectInput) input).getWsObject();
+		Assert.notNull(node, "Null editor input");
+		
+		Assert.isTrue((node instanceof SiteNode), 
+				"Invalid editor input: object of type "
+				+ node.getClass().getName());
+		
+		SiteNode siteNode = (SiteNode) node;
+		site = siteNode.getSite();
+		address = site.getAddress();
+		
+		if (site.getId() == null) {
 			setPartName("New Site");
 		}
 		else {
-			site = node.getSite();
-			address = site.getAddress();
-			setPartName("Site " + site.getName());		
+			setPartName("Site " + site.getName());
 		}
 	}
 	
@@ -83,8 +85,6 @@ public class SiteEntryForm extends AddressEntryForm {
 		
 		form.setText("BioBank Site Information");
 		toolkit.decorateFormHeading(form);
-		
-		
 		form.setMessage(getOkMessage());
 		
 		GridLayout layout = new GridLayout(1, false);
@@ -160,20 +160,7 @@ public class SiteEntryForm extends AddressEntryForm {
     					new NonEmptyString(NO_SITE_NAME_MESSAGE, nameDecorator)), 
     					null);
     	
-    	super.bindValues(dbc);      
-		
-		IObservableValue statusObservable = new WritableValue();
-		statusObservable.addChangeListener(new IChangeListener() {
-			public void handleChange(ChangeEvent event) {
-				IObservableValue validationStatus 
-					= (IObservableValue) event.getSource(); 
-				handleStatusChanged((IStatus) validationStatus.getValue());
-			}
-		}); 
-		
-		dbc.bindValue(statusObservable, new AggregateValidationStatus(
-                dbc.getBindings(), AggregateValidationStatus.MAX_SEVERITY),
-                null, null); 
+    	super.bindValues(dbc); 
     }
     
     protected void handleStatusChanged(IStatus status) {
@@ -196,12 +183,12 @@ public class SiteEntryForm extends AddressEntryForm {
     private void saveSettings() {
 		site.setAddress(address);
 		String sessionName;
-		if (session == null) {
-			String[] sessionNames = BioBankPlugin.getDefault().getSessionNames();
-			sessionName = sessionNames[0];
+		
+		if (node instanceof SiteNode) {
+			sessionName = node.getParent().getName();
 		}
 		else {
-			sessionName = session.getText();
+			sessionName = node.getName();
 		}
 		
 		try {

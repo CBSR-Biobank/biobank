@@ -53,11 +53,6 @@
             id="edu.ualberta.med.biobank.commands.addSite"
             name="AddSite">
       </command>
-      <command
-            defaultHandler="edu.ualberta.med.biobank.handler.SiteViewHandler"
-            id="edu.ualberta.med.biobank.commands.editSite"
-            name="EditSite">
-      </command>
    </extension>
    <extension
          point="org.eclipse.ui.menus">
@@ -142,11 +137,6 @@
    <extension
          point="org.eclipse.ui.editors">
       <editor
-            class="edu.ualberta.med.biobank.forms.LoginForm"
-            id="edu.ualberta.med.biobank.forms.LoginForm"
-            name="Login">
-      </editor>
-      <editor
             class="edu.ualberta.med.biobank.forms.SiteEntryForm"
             default="false"
             id="edu.ualberta.med.biobank.forms.SiteEntryForm"
@@ -157,6 +147,12 @@
             default="false"
             id="edu.ualberta.med.biobank.forms.SiteViewForm"
             name="Site View">
+      </editor>
+      <editor
+            class="edu.ualberta.med.biobank.forms.ClinicEntryForm"
+            default="false"
+            id="edu.ualberta.med.biobank.forms.ClinicEntryForm"
+            name="Clinic Entry">
       </editor>
    </extension>
    <extension

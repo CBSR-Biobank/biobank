@@ -1,10 +1,28 @@
-package edu.ualberta.med.biobank.model;
+package edu.ualberta.med.biobank.forms;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPersistableElement;
 
-public class LoginInput implements IEditorInput {
+import edu.ualberta.med.biobank.model.ClinicNode;
+import edu.ualberta.med.biobank.model.SiteNode;
+import edu.ualberta.med.biobank.model.WsObject;
+
+public class WsObjectInput implements IEditorInput {
+	private WsObject wsObject;
+
+	public WsObjectInput(WsObject o) {
+		wsObject = o;
+	}
+
+	public int getIndex() {
+		if (wsObject != null) return wsObject.getId();
+		return 0;
+	}
+	
+	public WsObject getWsObject() {
+		return wsObject;
+	}
 
 	/*
 	 * (non-Javadoc)
@@ -30,7 +48,18 @@ public class LoginInput implements IEditorInput {
 	 * @see org.eclipse.ui.IEditorInput#getName()
 	 */
 	public String getName() {
-		return "";
+		if (wsObject != null) { 
+			String name = wsObject.getName();
+			if (name != null) {
+				if (wsObject instanceof SiteNode) return "Site " + name;
+				if (wsObject instanceof ClinicNode) return "Clinic " + name;
+			}
+			else {
+				if (wsObject instanceof SiteNode) return "New Site";
+				if (wsObject instanceof ClinicNode) return "New Clinic";
+			}
+		}
+		return null;
 	}
 
 	/*
@@ -56,21 +85,26 @@ public class LoginInput implements IEditorInput {
 	 * 
 	 * @see org.eclipse.core.runtime.IAdaptable#getAdapter(java.lang.Class)
 	 */
+	@SuppressWarnings("unchecked")
 	public Object getAdapter(Class adapter) {
 		return null;
 	}
-	
 	/* (non-Javadoc)
 	 * @see java.lang.Object#hashCode()
 	 */
 	public int hashCode() {
-		return 0;
+		return getIndex();
 	}
 	
 	/* (non-Javadoc)
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
 	public boolean equals(Object o) {
-		return true;
+		if (o instanceof WsObjectInput) {
+			if (wsObject.getClass() != ((WsObjectInput)o).wsObject.getClass()) return false;
+		
+			return (getIndex() == ((WsObjectInput)o).getIndex()); 
+		}
+		return false;
 	}
 }

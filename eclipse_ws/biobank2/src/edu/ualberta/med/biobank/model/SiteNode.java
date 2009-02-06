@@ -25,17 +25,23 @@ public class SiteNode extends WsObject {
 		return children;
 	}
 	
-	public ClinicGroupNode getClinicGroupNode() {
-		return (ClinicGroupNode) children[0];
+	public StudyGroupNode getStudieGroupNode() {
+		return (StudyGroupNode) children[0];
 	}
 	
-	public StudyGroupNode getStudieGroupNode() {
-		return (StudyGroupNode) children[1];
+	public ClinicGroupNode getClinicGroupNode() {
+		return (ClinicGroupNode) children[1];
 	}
 
 	protected void fireChildrenChanged() {
 		SessionNode parent = (SessionNode) getParent();
 		if (parent == null) return; 
 		parent.fireChildrenChanged(this);
+	}
+
+	@Override
+	public int getId() {
+		// TODO Auto-generated method stub
+		return site.getId();
 	}
 }

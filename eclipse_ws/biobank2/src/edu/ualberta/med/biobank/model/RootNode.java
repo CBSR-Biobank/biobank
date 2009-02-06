@@ -42,4 +42,9 @@ public class RootNode extends WsObject {
 	public int getChildCount() {
 		return sessions.size();
 	}
+
+	@Override
+	public int getId() {
+		return 0;
+	}
 }

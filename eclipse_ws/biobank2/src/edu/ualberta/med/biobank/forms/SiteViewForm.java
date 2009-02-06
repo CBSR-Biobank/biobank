@@ -18,17 +18,20 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
+import org.springframework.util.Assert;
 
+import edu.ualberta.med.biobank.model.Address;
+import edu.ualberta.med.biobank.model.Clinic;
+import edu.ualberta.med.biobank.model.ClinicNode;
 import edu.ualberta.med.biobank.model.Site;
-import edu.ualberta.med.biobank.model.SiteInput;
 import edu.ualberta.med.biobank.model.SiteNode;
-
+import edu.ualberta.med.biobank.model.WsObject;
 
 public class SiteViewForm extends AddressViewForm {	
 	public static final String ID =
 	      "edu.ualberta.med.biobank.forms.SiteViewForm";
 	
-	private SiteNode node;
+	private WsObject node;
 	private Site site;
 	
 	Label name;
@@ -53,15 +56,21 @@ public class SiteViewForm extends AddressViewForm {
 	public void init(IEditorSite editorSite, IEditorInput input)
 			throws PartInitException {
 		super.init(editorSite, input);
-		if ( !(input instanceof SiteInput)) 
+		if ( !(input instanceof WsObjectInput)) 
 			throw new PartInitException("Invalid editor input"); 
 		
-		node = (SiteNode) ((SiteInput) input).getAdapter(SiteNode.class);
+		node = ((WsObjectInput) input).getWsObject();
+		Assert.notNull(node, "Null editor input");
 
-		site = node.getSite();
-		address = site.getAddress();
-		if (site.getName() != null) {
+		if (node instanceof SiteNode) {
+			SiteNode siteNode = (SiteNode) node;
+			site = siteNode.getSite();
+			address = site.getAddress();
 			setPartName("Site " + site.getName());
+		}
+		else {
+			Assert.isTrue(false, "Invalid editor input: object of type "
+				+ node.getClass().getName());
 		}
 	}
 
@@ -171,7 +180,7 @@ public class SiteViewForm extends AddressViewForm {
 			public void widgetSelected(SelectionEvent e) {
 				getSite().getPage().closeEditor(SiteViewForm.this, false);
 				
-				SiteInput input = new SiteInput(node.getSite().getId(), node);
+				WsObjectInput input = new WsObjectInput(node);
 				
 				try {
 					getSite().getPage().openEditor(input, SiteEntryForm.ID, true);
@@ -192,6 +201,18 @@ public class SiteViewForm extends AddressViewForm {
 		final Button clinic = toolkit.createButton(sbody, "Add Clinic", SWT.PUSH);
 		clinic.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
+				try {
+					SiteNode siteNode = (SiteNode) node;
+					Clinic clinic = new Clinic();
+					clinic.setAddress(new Address());
+					ClinicNode clinicNode = new ClinicNode(siteNode.getClinicGroupNode(), clinic);
+					siteNode.getClinicGroupNode().addChild(clinicNode);
+					getSite().getPage().openEditor(new WsObjectInput(clinicNode), ClinicEntryForm.ID, true);
+				} 
+				catch (PartInitException exp) {
+					// handle error
+					exp.printStackTrace();				
+				}
 			}
 		});
 

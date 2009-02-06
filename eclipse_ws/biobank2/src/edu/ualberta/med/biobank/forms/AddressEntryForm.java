@@ -3,10 +3,16 @@ package edu.ualberta.med.biobank.forms;
 import java.lang.reflect.Constructor;
 import java.util.HashMap;
 
+import org.eclipse.core.databinding.AggregateValidationStatus;
 import org.eclipse.core.databinding.DataBindingContext;
 import org.eclipse.core.databinding.UpdateValueStrategy;
 import org.eclipse.core.databinding.beans.PojoObservables;
+import org.eclipse.core.databinding.observable.ChangeEvent;
+import org.eclipse.core.databinding.observable.IChangeListener;
+import org.eclipse.core.databinding.observable.value.IObservableValue;
+import org.eclipse.core.databinding.observable.value.WritableValue;
 import org.eclipse.core.databinding.validation.IValidator;
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.databinding.swt.SWTObservables;
@@ -200,8 +206,23 @@ public abstract class AddressEntryForm extends EditorPart {
 		    			PojoObservables.observeValue(address, "province"), null, null);
 			}
 			else {
-				assert false : fi.widgetClass;
+				Assert.isTrue(false, "Invalid class " + fi.widgetClass.getName());
 			}
-		}  
+		}       
+		
+		IObservableValue statusObservable = new WritableValue();
+		statusObservable.addChangeListener(new IChangeListener() {
+			public void handleChange(ChangeEvent event) {
+				IObservableValue validationStatus 
+					= (IObservableValue) event.getSource(); 
+				handleStatusChanged((IStatus) validationStatus.getValue());
+			}
+		}); 
+		
+		dbc.bindValue(statusObservable, new AggregateValidationStatus(
+                dbc.getBindings(), AggregateValidationStatus.MAX_SEVERITY),
+                null, null); 
     }
+    
+    protected abstract void handleStatusChanged(IStatus severity);
 }

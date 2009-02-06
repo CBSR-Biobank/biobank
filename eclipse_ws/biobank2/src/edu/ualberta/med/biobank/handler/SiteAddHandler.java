@@ -8,12 +8,12 @@ import org.eclipse.ui.handlers.HandlerUtil;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.forms.SiteEntryForm;
-import edu.ualberta.med.biobank.model.SiteInput;
+import edu.ualberta.med.biobank.forms.WsObjectInput;
 
 public class SiteAddHandler extends AbstractHandler implements IHandler {
 
 	public Object execute(ExecutionEvent event) throws ExecutionException {
-		SiteInput input = new SiteInput(0, null);
+		WsObjectInput input = new WsObjectInput(null);
 		try {
 			HandlerUtil.getActiveWorkbenchWindowChecked(event).getActivePage()
 			.openEditor(input, SiteEntryForm.ID, true);

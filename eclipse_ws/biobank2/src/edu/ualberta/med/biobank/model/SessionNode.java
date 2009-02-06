@@ -104,4 +104,9 @@ public class SessionNode extends WsObject {
 			((ISessionNodeListener) l).sessionChanged(this, siteNode);
 		}
 	}
+
+	@Override
+	public int getId() {
+		return 0;
+	}
 }

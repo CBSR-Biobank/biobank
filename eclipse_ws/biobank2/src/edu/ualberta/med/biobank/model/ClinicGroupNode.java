@@ -11,6 +11,11 @@ public class ClinicGroupNode extends WsObject {
 		clinics = new ArrayList<ClinicNode>();
 	}
 	
+	public void addChild(ClinicNode clinicNode) {
+		clinics.add(clinicNode);
+		fireChildrenChanged();
+	}
+	
 	public ClinicNode[] getClinicNodes() {
 		return (ClinicNode[]) clinics.toArray(new ClinicNode[clinics.size()]);
 	}
@@ -19,5 +24,10 @@ public class ClinicGroupNode extends WsObject {
 		SiteNode parent = (SiteNode) getParent();
 		if (parent == null) return; 
 		parent.fireChildrenChanged();
+	}
+
+	@Override
+	public int getId() {
+		return 0;
 	}
 }

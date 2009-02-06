@@ -24,9 +24,10 @@ import org.springframework.remoting.RemoteConnectFailureException;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionCredentials;
 import edu.ualberta.med.biobank.forms.SiteViewForm;
+import edu.ualberta.med.biobank.forms.WsObjectInput;
 import edu.ualberta.med.biobank.model.Address;
+import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.RootNode;
-import edu.ualberta.med.biobank.model.SiteInput;
 import edu.ualberta.med.biobank.model.SiteNode;
 import edu.ualberta.med.biobank.model.SessionNode;
 import edu.ualberta.med.biobank.model.ISessionNodeListener;
@@ -56,8 +57,7 @@ public class SessionsView extends ViewPart implements IDoubleClickListener {
 	}
 
 	@Override
-	public void createPartControl(Composite parent) {
-		
+	public void createPartControl(Composite parent) {		
 		treeViewer = new TreeViewer(parent, SWT.BORDER | SWT.MULTI
 				| SWT.V_SCROLL);
 		getSite().setSelectionProvider(treeViewer);
@@ -68,7 +68,6 @@ public class SessionsView extends ViewPart implements IDoubleClickListener {
 	
 	@Override
 	public void setFocus() {
-		// TODO Auto-generated method stub
 	}
 	
 	public void createSession(final SessionCredentials sc) {
@@ -211,6 +210,21 @@ public class SessionsView extends ViewPart implements IDoubleClickListener {
 						site.setAddress((Address) result.getObjectResult());
 						query = new InsertExampleQuery(site);	
 						appService.executeQuery(query);
+					}					
+					else if (o instanceof Clinic) {
+						Clinic clinic = (Clinic) o;
+						Assert.isTrue(clinic.getId() == null, "insert invoked on site already in database");
+						Assert.isTrue(clinic.getAddress().getId() == null, "insert invoked on address already in database");
+						
+						query = new InsertExampleQuery(clinic.getAddress());					
+						result = appService.executeQuery(query);
+						clinic.setAddress((Address) result.getObjectResult());
+						query = new InsertExampleQuery(clinic);	
+						appService.executeQuery(query);
+					}
+					else {
+						Assert.isTrue(false, "creating of objects of type " 
+								+ o.getClass().getName() + " not supported yet");
 					}
 					
 					updateSites(sessionName);
@@ -249,18 +263,33 @@ public class SessionsView extends ViewPart implements IDoubleClickListener {
 						site.setAddress((Address) result.getObjectResult());
 						query = new UpdateExampleQuery(site);	
 						result = appService.executeQuery(query);
-					}
-					
-					updateSites(sessionName);
-					
-					if (result != null) {
-						final int id =  ((Site) result.getObjectResult()).getId();
 						
-						Display.getDefault().asyncExec(new Runnable() {
-							public void run() {
-								openSiteNode(sessionNode.getSite(id));
-							}
-						});
+						updateSites(sessionName);
+						
+						if (result != null) {
+							final int id =  ((Site) result.getObjectResult()).getId();
+							
+							Display.getDefault().asyncExec(new Runnable() {
+								public void run() {
+									openSiteNode(sessionNode.getSite(id));
+								}
+							});
+						}
+					}					
+					else if (o instanceof Clinic) {
+						Clinic clinic = (Clinic) o;
+						Assert.isTrue(clinic.getId() == null, "insert invoked on site already in database");
+						Assert.isTrue(clinic.getAddress().getId() == null, "insert invoked on address already in database");
+						
+						query = new UpdateExampleQuery(clinic.getAddress());					
+						result = appService.executeQuery(query);
+						clinic.setAddress((Address) result.getObjectResult());
+						query = new UpdateExampleQuery(clinic);	
+						appService.executeQuery(query);
+					}
+					else {
+						Assert.isTrue(false, "updating of objects of type " 
+								+ o.getClass().getName() + " not supported yet");
 					}
 				}
 				catch (Exception exp) {
@@ -292,6 +321,8 @@ public class SessionsView extends ViewPart implements IDoubleClickListener {
 		if (selection == null) return;
 		
 		Object element = ((StructuredSelection)selection).getFirstElement();
+		
+		treeViewer.expandToLevel(element, 1);
 
 		if (element instanceof SiteNode) {
 			openSiteNode((SiteNode) element);
@@ -299,7 +330,7 @@ public class SessionsView extends ViewPart implements IDoubleClickListener {
 	}
 	
 	private void openSiteNode(SiteNode node) {
-		SiteInput input = new SiteInput(node.getSite().getId(), node);
+		WsObjectInput input = new WsObjectInput(node);
 		
 		try {
 			getSite().getPage().openEditor(input, SiteViewForm.ID, true);

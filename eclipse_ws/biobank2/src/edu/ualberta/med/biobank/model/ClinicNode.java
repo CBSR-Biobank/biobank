@@ -15,4 +15,11 @@ public class ClinicNode extends WsObject {
 	public Clinic getClinic() {
 		return clinic;
 	}
+
+	@Override
+	public int getId() {
+		Object o = (Object) clinic.getId();
+		if (o == null) return 0;
+		return clinic.getId();
+	}
 }

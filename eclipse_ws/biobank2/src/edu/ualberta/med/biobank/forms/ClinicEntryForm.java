@@ -8,8 +8,6 @@ import org.eclipse.jface.databinding.swt.SWTObservables;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.fieldassist.ControlDecoration;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.KeyEvent;
-import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
@@ -24,67 +22,79 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
+import org.springframework.util.Assert;
+
 import edu.ualberta.med.biobank.BioBankPlugin;
-import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Clinic;
-import edu.ualberta.med.biobank.model.SiteInput;
+import edu.ualberta.med.biobank.model.ClinicNode;
+import edu.ualberta.med.biobank.model.SiteNode;
+import edu.ualberta.med.biobank.model.WsObject;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
 
 public class ClinicEntryForm extends AddressEntryForm {	
 	public static final String ID =
-	      "edu.ualberta.med.biobank.forms.SiteEntryForm";
+	      "edu.ualberta.med.biobank.forms.ClinicEntryForm";
 	
-	private static final String OK_MESSAGE = "Creates a new BioBank site.";
-	private static final String NO_SITE_NAME_MESSAGE = "Site must have a name";
+	private static final String NEW_CLINIC_OK_MESSAGE = "New clinic information.";
+	private static final String CLINIC_OK_MESSAGE = "Clinic information.";
+	private static final String NO_CLINIC_NAME_MESSAGE = "Clinic must have a name";
+	
+	private WsObject node;
 	
 	private Clinic clinic;
 	
 	protected Combo session;
 	private Text name;	
 	private ControlDecoration nameDecorator;
+	private Button submit;
 
 	public void init(IEditorSite editorSite, IEditorInput input) throws PartInitException {
 		super.init(editorSite, input);
-		if ( !(input instanceof SiteInput)) 
-			throw new PartInitException("Invalid editor input"); 
+		if ( !(input instanceof WsObjectInput)) 
+			throw new PartInitException("Invalid editor input");
+		
+		node = ((WsObjectInput) input).getWsObject();
+		Assert.notNull(node, "Null editor input");
 
-		clinic = new Clinic();
-		address = new Address();
-		setPartName("New Clinic");
+		Assert.isTrue((node instanceof ClinicNode), 
+				"Invalid editor input: object of type "
+				+ node.getClass().getName());
+
+		ClinicNode clinicNode = (ClinicNode) node;
+		clinic = clinicNode.getClinic();
+		SiteNode siteNode = (SiteNode) clinicNode.getParent().getParent();
+		clinic.setSite(siteNode.getSite());
+		address = clinic.getAddress();
+		
+		if (clinic.getId() == null) {
+			setPartName("New Clinic");
+		}
+		else {
+			setPartName("Clinic " + clinic.getName());
+		}
+	}
+	
+	private String getOkMessage() {
+		if (clinic.getId() == null) {
+			return NEW_CLINIC_OK_MESSAGE;
+		}
+		return CLINIC_OK_MESSAGE;
 	}
 
-	public void createPartControl(Composite parent) {
-		KeyListener keyListener = new KeyListener() {
-			@Override
-			public void keyPressed(KeyEvent e) {
-				if ((e.keyCode & SWT.MODIFIER_MASK) == 0) {
-					setDirty(true);
-				}
-			}
-			
-			@Override
-			public void keyReleased(KeyEvent e) {
-				// nothing
-			}
-		};
-		
+	public void createPartControl(Composite parent) {		
 		toolkit = new FormToolkit(parent.getDisplay());
 		form = toolkit.createForm(parent);	
 		
-		form.setText("BioBank Site Information");
+		form.setText("Clinic Information");
 		toolkit.decorateFormHeading(form);
-		form.setMessage(OK_MESSAGE);
+		form.setMessage(getOkMessage());
 		
 		GridLayout layout = new GridLayout(1, false);
-		//layout.marginHeight = 10;
-		//layout.marginWidth = 6;
-		//layout.horizontalSpacing = 20;
 		form.getBody().setLayout(layout);
 		
 		toolkit.createLabel(form.getBody(), 
-				"Studies, Clinics, and Storage Types can be added after submitting this initial information.", 
+				"Clinics can be associated with studies after submitting this initial information.", 
 				SWT.LEFT);
-
 		
 		Section section = toolkit.createSection(form.getBody(), 
 				ExpandableComposite.TITLE_BAR
@@ -98,20 +108,8 @@ public class ClinicEntryForm extends AddressEntryForm {
 		sbody.setLayout(layout);
 		toolkit.paintBordersFor(sbody);
 		
-		String[] sessionNames = BioBankPlugin.getDefault().getSessionNames();
-		
-		if (sessionNames.length > 1) {			
-			toolkit.createLabel(sbody, "Session:", SWT.LEFT);
-			session = new Combo(sbody, SWT.READ_ONLY);
-			session.setItems(sessionNames);
-			session.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
-		}
-		else {
-			session = null;
-		}
-		
 		name = createLabelledText(sbody, "Name:", 100, null);
-		nameDecorator = createDecorator(name, NO_SITE_NAME_MESSAGE);
+		nameDecorator = createDecorator(name, NO_CLINIC_NAME_MESSAGE);
 		
 		createAddressArea();
 
@@ -125,17 +123,17 @@ public class ClinicEntryForm extends AddressEntryForm {
 		sbody.setLayout(layout);
 		toolkit.paintBordersFor(sbody);
 
-		final Button submit = toolkit.createButton(sbody, "Submit", SWT.PUSH);
+		submit = toolkit.createButton(sbody, "Submit", SWT.PUSH);
 		submit.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				clinic.setAddress(address);
 				String sessionName;
-				if (session == null) {
-					String[] sessionNames = BioBankPlugin.getDefault().getSessionNames();
-					sessionName = sessionNames[0];
+				
+				if (node instanceof ClinicNode) {
+					sessionName = node.getParent().getParent().getParent().getName();
 				}
 				else {
-					sessionName = session.getText();
+					sessionName = node.getParent().getParent().getName();
 				}
 				
 				try {
@@ -144,13 +142,6 @@ public class ClinicEntryForm extends AddressEntryForm {
 				catch (Exception exp) {
 					exp.printStackTrace();
 				}
-				getSite().getPage().closeEditor(ClinicEntryForm.this, false);
-			}
-		});
-
-		final Button cancel = toolkit.createButton(sbody, "Cancel", SWT.PUSH);
-		cancel.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
 				getSite().getPage().closeEditor(ClinicEntryForm.this, false);
 			}
 		});
@@ -167,20 +158,20 @@ public class ClinicEntryForm extends AddressEntryForm {
     	dbc.bindValue(SWTObservables.observeText(name, SWT.Modify),
     			PojoObservables.observeValue(clinic, "name"), 
     			new UpdateValueStrategy().setAfterConvertValidator(
-    					new NonEmptyString(NO_SITE_NAME_MESSAGE, nameDecorator)), 
+    					new NonEmptyString(NO_CLINIC_NAME_MESSAGE, nameDecorator)), 
     					null);
     	
     	super.bindValues(dbc);
     }
     
-    protected void handleStatusChanged() {
-    	int severity = currentStatus.getSeverity(); 
-		//okButton.setEnabled(severity == IStatus.OK);
-		if (severity == IStatus.OK) {
-			form.setMessage(OK_MESSAGE);
+    protected void handleStatusChanged(IStatus status) {
+		if (status.getSeverity() == IStatus.OK) {
+			form.setMessage(getOkMessage());
+	    	submit.setEnabled(true);
 		}
 		else {
-			form.setMessage(currentStatus.getMessage(), IMessageProvider.ERROR);
+			form.setMessage(status.getMessage(), IMessageProvider.ERROR);
+	    	submit.setEnabled(false);
 		}		
     }
 
