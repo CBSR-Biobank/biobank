@@ -11,11 +11,14 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
+import org.eclipse.jface.viewers.ITreeViewerListener;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.viewers.TreeExpansionEvent;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
@@ -39,7 +42,7 @@ import gov.nih.nci.system.query.example.InsertExampleQuery;
 import gov.nih.nci.system.query.example.UpdateExampleQuery;
 import edu.ualberta.med.biobank.model.Site;
 
-public class SessionsView extends ViewPart implements IDoubleClickListener {
+public class SessionsView extends ViewPart {
 	public static final String ID =
 	      "edu.ualberta.med.biobank.session.SessionView";
 
@@ -48,6 +51,32 @@ public class SessionsView extends ViewPart implements IDoubleClickListener {
 	private RootNode rootNode;
 	
 	private HashMap<String, SessionNode> sessions;
+	
+	private IDoubleClickListener doubleClickListener = new IDoubleClickListener() {
+		public void doubleClick(DoubleClickEvent event) {
+			Object selection = event.getSelection();
+
+			if (selection == null) return;
+
+			Object element = ((StructuredSelection)selection).getFirstElement();
+
+			treeViewer.expandToLevel(element, 1);
+
+			if (element instanceof SiteNode) {
+				openSiteNode((SiteNode) element);
+			}
+		}
+	};
+	
+	private ITreeViewerListener treeViewerListener = new ITreeViewerListener() {
+		@Override
+		public void treeCollapsed(TreeExpansionEvent e) {
+		}
+
+		@Override
+		public void treeExpanded(TreeExpansionEvent e) {			
+		}
+	};
 	
 	public SessionsView() {
 		super();
@@ -63,7 +92,8 @@ public class SessionsView extends ViewPart implements IDoubleClickListener {
 		getSite().setSelectionProvider(treeViewer);
 		treeViewer.setLabelProvider(new SessionLabelProvider());
 		treeViewer.setContentProvider(new SessionContentProvider());
-        treeViewer.addDoubleClickListener(this);
+        treeViewer.addDoubleClickListener(doubleClickListener);
+        treeViewer.addTreeListener(treeViewerListener);
 	}
 	
 	@Override
@@ -312,21 +342,6 @@ public class SessionsView extends ViewPart implements IDoubleClickListener {
 	
 	public String[] getSessionNames() {
 		return sessions.keySet().toArray(new String[sessions.size()]);
-	}
-
-	@Override
-	public void doubleClick(DoubleClickEvent event) {
-		Object selection = event.getSelection();
-		
-		if (selection == null) return;
-		
-		Object element = ((StructuredSelection)selection).getFirstElement();
-		
-		treeViewer.expandToLevel(element, 1);
-
-		if (element instanceof SiteNode) {
-			openSiteNode((SiteNode) element);
-		}
 	}
 	
 	private void openSiteNode(SiteNode node) {

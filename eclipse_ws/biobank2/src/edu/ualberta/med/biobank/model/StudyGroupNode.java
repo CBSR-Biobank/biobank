@@ -8,6 +8,7 @@ public class StudyGroupNode extends WsObject {
 	public StudyGroupNode(SiteNode parent) {
 		super(parent);
 		setName("Studies");
+		studies = new ArrayList<StudyNode>();
 	}
 	
 	public StudyNode[] getStudieNodes() {
