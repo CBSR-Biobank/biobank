@@ -100,6 +100,8 @@ public class WsObjectInput implements IEditorInput {
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
 	public boolean equals(Object o) {
+		if (wsObject == null) return false;
+		
 		if (o instanceof WsObjectInput) {
 			if (wsObject.getClass() != ((WsObjectInput)o).wsObject.getClass()) return false;
 		

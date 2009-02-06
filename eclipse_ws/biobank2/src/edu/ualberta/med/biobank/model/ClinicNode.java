@@ -1,5 +1,8 @@
 package edu.ualberta.med.biobank.model;
 
+import org.eclipse.core.runtime.Assert;
+
+
 public class ClinicNode extends WsObject {
 	private Clinic clinic;
 	
@@ -14,6 +17,11 @@ public class ClinicNode extends WsObject {
 
 	public Clinic getClinic() {
 		return clinic;
+	}
+	
+	public String getName() {
+		Assert.isNotNull(clinic, "Clinic is null");
+		return clinic.getName();
 	}
 
 	@Override

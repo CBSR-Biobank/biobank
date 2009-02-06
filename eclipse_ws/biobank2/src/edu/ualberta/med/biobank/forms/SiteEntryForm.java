@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.forms;
 import org.eclipse.core.databinding.DataBindingContext;
 import org.eclipse.core.databinding.UpdateValueStrategy;
 import org.eclipse.core.databinding.beans.PojoObservables;
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.databinding.swt.SWTObservables;
@@ -23,7 +24,6 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
-import org.springframework.util.Assert;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.model.Site;
@@ -54,7 +54,7 @@ public class SiteEntryForm extends AddressEntryForm {
 			throw new PartInitException("Invalid editor input");
 		
 		node = ((WsObjectInput) input).getWsObject();
-		Assert.notNull(node, "Null editor input");
+		Assert.isNotNull(node, "Null editor input");
 		
 		Assert.isTrue((node instanceof SiteNode), 
 				"Invalid editor input: object of type "

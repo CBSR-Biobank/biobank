@@ -165,14 +165,8 @@ public class SiteViewForm extends AddressViewForm {
 		
 		// Storage types go here
 
-		section = toolkit.createSection(form.getBody(), SWT.NONE);
-		sbody = toolkit.createComposite(section);
-		section.setClient(sbody);
-		section.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		layout = new GridLayout();
-		layout.horizontalSpacing = 10;
-		layout.numColumns = 4;
-		sbody.setLayout(layout);
+		sbody = toolkit.createComposite(form.getBody());
+		sbody.setLayout(new GridLayout(4, false));
 		toolkit.paintBordersFor(sbody);
 
 		final Button edit = toolkit.createButton(sbody, "Edit Site Info", SWT.PUSH);

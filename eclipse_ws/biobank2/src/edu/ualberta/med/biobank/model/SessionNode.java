@@ -18,19 +18,15 @@ public class SessionNode extends WsObject {
 		super(null);
 		this.appService = appService;
 		setName(name);
+		siteNodes = new ArrayList<SiteNode>();
 	}
 	
 	public void addSite(Site site) {
-		if (siteNodes == null) {
-			siteNodes = new ArrayList<SiteNode>();
-		}
-		
 		// is site has already been added, get rid of old one
 		if (!siteNodes.isEmpty())
 			removeSite(site);
 		
 		SiteNode siteNode = new SiteNode(this, site);
-		siteNode.setParent(this);
 		siteNodes.add(siteNode);
 		fireChildrenChanged(null);
 	}
@@ -41,15 +37,13 @@ public class SessionNode extends WsObject {
 		SiteNode nodeToRemove = null;
 
 		for (SiteNode node : siteNodes) {
-			if (node.getSite().getId().equals(site.getId())) 
+			if (node.getSite().getId().equals(site.getId())
+					|| node.getSite().getName().equals(site.getName())) 
 				nodeToRemove = node;
 		}
 		
 		if (nodeToRemove != null)
 			siteNodes.remove(nodeToRemove);
-		
-		if (siteNodes.isEmpty())
-			siteNodes = null;
 	}
 	
 	public boolean containsSite(Site site) {

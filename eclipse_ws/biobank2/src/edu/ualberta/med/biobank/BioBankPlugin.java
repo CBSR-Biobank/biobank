@@ -11,6 +11,7 @@ import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
+import edu.ualberta.med.biobank.model.SessionNode;
 import edu.ualberta.med.biobank.session.SessionsView;
 import edu.ualberta.med.biobank.webservice.Session;
 import edu.ualberta.med.biobank.webservice.ISessionListener;
@@ -133,6 +134,15 @@ public class BioBankPlugin extends AbstractUIPlugin implements ISessionListener 
 	public int getSessionCount() {
 		return sessionView.getSessionCount(); 
 	}
+	
+	public SessionNode getSessionNode(String sessionName) {
+		return sessionView.getSessionNode(sessionName);
+	}
+	
+	public SessionNode getSessionNode(int count) {
+		return sessionView.getSessionNode(count);
+	}
+
 
 	public String[] getSessionNames() {
 		return sessionView.getSessionNames();

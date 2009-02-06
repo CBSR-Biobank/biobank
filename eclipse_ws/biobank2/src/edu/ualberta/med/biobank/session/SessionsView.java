@@ -25,11 +25,13 @@ import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionCredentials;
+import edu.ualberta.med.biobank.forms.ClinicViewForm;
 import edu.ualberta.med.biobank.forms.SiteViewForm;
 import edu.ualberta.med.biobank.forms.WsObjectInput;
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.ClinicGroupNode;
+import edu.ualberta.med.biobank.model.ClinicNode;
 import edu.ualberta.med.biobank.model.RootNode;
 import edu.ualberta.med.biobank.model.SiteNode;
 import edu.ualberta.med.biobank.model.SessionNode;
@@ -65,6 +67,13 @@ public class SessionsView extends ViewPart {
 			if (element instanceof SiteNode) {
 				openSiteNode((SiteNode) element);
 			}
+			else if (element instanceof ClinicNode) {
+				openClinicNode((ClinicNode) element);
+			}
+			else {
+				Assert.isTrue(false, "double click on class "
+						+ element.getClass().getName() + " not implemented yet");
+			}
 		}
 	};
 	
@@ -98,6 +107,7 @@ public class SessionsView extends ViewPart {
 		treeViewer.setContentProvider(new SessionContentProvider());
         treeViewer.addDoubleClickListener(doubleClickListener);
         treeViewer.addTreeListener(treeViewerListener);
+		treeViewer.setInput(rootNode);
 	}
 	
 	@Override
@@ -166,18 +176,32 @@ public class SessionsView extends ViewPart {
 		sessions.put(name, sessionNode);
 		rootNode.addSessionNode(sessionNode);
 		
-		treeViewer.setInput(rootNode);
 		sessionNode.addListener(new ISessionNodeListener() {
 			public void sessionChanged(SessionNode sessionNode, SiteNode siteNode) {
 				treeViewer.refresh();
 			}
 		});
 		
-		for (Object obj : sites) {
-			sessionNode.addSite((Site) obj);
+		for (Object o : sites) {
+			sessionNode.addSite((Site) o);
 		}
 		treeViewer.refresh();
 		treeViewer.expandToLevel(2);
+	}
+	
+	public SessionNode getSessionNode(String sessionName) {
+		for (SessionNode node : rootNode.getSessions()) {
+			if (node.getName().equals(sessionName)) return node;
+		}
+		Assert.isTrue(false, "Session with name " + sessionName
+				+ " not found");
+		return null;
+	}
+	
+	public SessionNode getSessionNode(int count) {
+		SessionNode[] nodes = rootNode.getSessions();
+		Assert.isTrue(count < nodes.length, "Invalid session node count: " + count);
+		return nodes[count];
 	}
 	
 	public void updateSites(final SessionNode sessionNode) {
@@ -238,7 +262,7 @@ public class SessionsView extends ViewPart {
 							for (Object obj : sites) {
 								groupNode.addClinic((Clinic) obj);
 							}
-							// treeViewer.expandToLevel(2);
+							treeViewer.expandToLevel(groupNode, 1);
 						}
 					});
 				}
@@ -387,6 +411,18 @@ public class SessionsView extends ViewPart {
 		
 		try {
 			getSite().getPage().openEditor(input, SiteViewForm.ID, true);
+		} 
+		catch (PartInitException e) {
+			// handle error
+			e.printStackTrace();				
+		}
+	}
+	
+	private void openClinicNode(ClinicNode node) {
+		WsObjectInput input = new WsObjectInput(node);
+		
+		try {
+			getSite().getPage().openEditor(input, ClinicViewForm.ID, true);
 		} 
 		catch (PartInitException e) {
 			// handle error

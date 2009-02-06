@@ -1,5 +1,7 @@
 package edu.ualberta.med.biobank.model;
 
+import org.springframework.util.Assert;
+
 public class SiteNode extends WsObject {
 	private Site site;
 	
@@ -41,7 +43,9 @@ public class SiteNode extends WsObject {
 
 	@Override
 	public int getId() {
-		// TODO Auto-generated method stub
-		return site.getId();
+		Assert.notNull(site, "Site is null");
+		Object o = (Object) site.getId();
+		if (o == null) return 0;
+		return ((Integer) o).intValue();
 	}
 }

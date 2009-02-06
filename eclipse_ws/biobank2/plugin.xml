@@ -154,6 +154,12 @@
             id="edu.ualberta.med.biobank.forms.ClinicEntryForm"
             name="Clinic Entry">
       </editor>
+      <editor
+            class="edu.ualberta.med.biobank.forms.ClinicViewForm"
+            default="false"
+            id="edu.ualberta.med.biobank.forms.ClinicViewForm"
+            name="Clinic View">
+      </editor>
    </extension>
    <extension
          point="org.eclipse.ui.bindings">
