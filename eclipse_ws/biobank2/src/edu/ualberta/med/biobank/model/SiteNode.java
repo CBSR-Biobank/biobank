@@ -10,7 +10,11 @@ public class SiteNode extends WsObject {
 	public SiteNode(SessionNode parent, Site site) {
 		super(parent);
 		this.site = site;
-		children = new WsObject[] { new StudyGroupNode(this), new ClinicGroupNode(this) };
+		children = new WsObject[] { 
+				new GroupNode<StudyNode>(this, "Studies"), 
+				new GroupNode<ClinicNode>(this, "Clinics"), 
+				//new GroupNode<SiteNode, StorageTypeNode>(this, "Clinics")  
+		};
 		children[0].setParent(this);
 		children[1].setParent(this);
 	}
@@ -31,12 +35,14 @@ public class SiteNode extends WsObject {
 		return children;
 	}
 	
-	public StudyGroupNode getStudieGroupNode() {
-		return (StudyGroupNode) children[0];
+	@SuppressWarnings("unchecked")
+	public GroupNode<StudyNode> getStudiesGroupNode() {
+		return (GroupNode<StudyNode>) children[0];
 	}
 	
-	public ClinicGroupNode getClinicGroupNode() {
-		return (ClinicGroupNode) children[1];
+	@SuppressWarnings("unchecked")
+	public GroupNode<ClinicNode> getClinicGroupNode() {
+		return (GroupNode<ClinicNode>) children[1];
 	}
 
 	@Override

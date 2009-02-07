@@ -6,7 +6,7 @@ import org.eclipse.core.runtime.Assert;
 public class ClinicNode extends WsObject {
 	private Clinic clinic;
 	
-	public ClinicNode(ClinicGroupNode parent, Clinic clinic) {
+	public ClinicNode(GroupNode<ClinicNode> parent, Clinic clinic) {
 		super(parent);
 		this.clinic = clinic;
 	}

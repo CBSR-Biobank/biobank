@@ -2,11 +2,11 @@ package edu.ualberta.med.biobank.session;
 
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
+
+import edu.ualberta.med.biobank.model.GroupNode;
 import edu.ualberta.med.biobank.model.RootNode;
 import edu.ualberta.med.biobank.model.SessionNode;
 import edu.ualberta.med.biobank.model.SiteNode;
-import edu.ualberta.med.biobank.model.ClinicGroupNode;
-import edu.ualberta.med.biobank.model.StudyGroupNode;
 import edu.ualberta.med.biobank.model.WsObject;
 
 public class SessionContentProvider implements ITreeContentProvider {
@@ -31,11 +31,8 @@ public class SessionContentProvider implements ITreeContentProvider {
 		else if (element instanceof SiteNode) {
 			return ((SiteNode) element).getChildren();
 		}
-		else if (element instanceof ClinicGroupNode) {
-			return ((ClinicGroupNode) element).getClinicNodes();
-		}
-		else if (element instanceof StudyGroupNode) {
-			return ((StudyGroupNode) element).getStudieNodes();
+		else if (element instanceof GroupNode) {
+			return ((GroupNode) element).getItems().toArray();
 		}
 		return new Object[0];
 	}
@@ -49,8 +46,7 @@ public class SessionContentProvider implements ITreeContentProvider {
 		}
 		else if ((element instanceof SessionNode)
 				||(element instanceof SiteNode)
-				|| (element instanceof ClinicGroupNode)
-				|| (element instanceof StudyGroupNode)) {
+				|| (element instanceof GroupNode)) {
 			return ((WsObject) element).getParent();
 		}
 		return null;
@@ -62,8 +58,7 @@ public class SessionContentProvider implements ITreeContentProvider {
 	public boolean hasChildren(Object element) {
 		if ((element instanceof SessionNode)
 				||(element instanceof SiteNode)
-				|| (element instanceof ClinicGroupNode)
-				|| (element instanceof StudyGroupNode)) {
+				|| (element instanceof GroupNode)) {
 			return true;
 		}
 		return false;

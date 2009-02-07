@@ -30,8 +30,8 @@ import edu.ualberta.med.biobank.forms.SiteViewForm;
 import edu.ualberta.med.biobank.forms.WsObjectInput;
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Clinic;
-import edu.ualberta.med.biobank.model.ClinicGroupNode;
 import edu.ualberta.med.biobank.model.ClinicNode;
+import edu.ualberta.med.biobank.model.GroupNode;
 import edu.ualberta.med.biobank.model.RootNode;
 import edu.ualberta.med.biobank.model.SiteNode;
 import edu.ualberta.med.biobank.model.SessionNode;
@@ -54,6 +54,7 @@ public class SessionsView extends ViewPart {
 	private HashMap<String, SessionNode> sessions;
 	
 	private IDoubleClickListener doubleClickListener = new IDoubleClickListener() {
+		@SuppressWarnings("unchecked")
 		public void doubleClick(DoubleClickEvent event) {
 			Object selection = event.getSelection();
 
@@ -66,8 +67,11 @@ public class SessionsView extends ViewPart {
 			if (element instanceof SiteNode) {
 				openSiteNode((SiteNode) element);
 			}
-			else if (element instanceof ClinicGroupNode) {
-				updateClinics((ClinicGroupNode) element);
+			else if (element instanceof GroupNode<?>) {
+				GroupNode<?> groupNode = (GroupNode<?>) element;
+				if (groupNode.getName().equals("Clinics")) {
+					updateClinics((GroupNode<ClinicNode>) groupNode);
+				}
 			}
 			else if (element instanceof ClinicNode) {
 				openClinicNode((ClinicNode) element);
@@ -84,12 +88,17 @@ public class SessionsView extends ViewPart {
 		public void treeCollapsed(TreeExpansionEvent e) {
 		}
 
+		@SuppressWarnings("unchecked")
 		@Override
 		public void treeExpanded(TreeExpansionEvent e) {
 			Object o = e.getElement();
-			if (o instanceof ClinicGroupNode) {
-				updateClinics((ClinicGroupNode) o);
-			}			
+			if (o instanceof GroupNode) {
+				GroupNode<ClinicNode> clinicGroupNode
+					= (GroupNode<ClinicNode>) o;
+				if (clinicGroupNode.getName().equals("Clinic")) {
+					updateClinics(clinicGroupNode);
+				}			
+			}
 		}
 	};
 	
@@ -235,7 +244,7 @@ public class SessionsView extends ViewPart {
 		job.schedule();
 	}
 	
-	public void updateClinics(final ClinicGroupNode groupNode) {
+	public void updateClinics(final GroupNode<ClinicNode> groupNode) {
 		String sessionName = groupNode.getParent().getParent().getName();
 		Assert.isTrue(sessions.containsKey(sessionName), 
 				"Session named " + sessionName + " not found");
@@ -256,7 +265,9 @@ public class SessionsView extends ViewPart {
 					Display.getDefault().asyncExec(new Runnable() {
 						public void run() {
 							for (Object obj : sites) {
-								groupNode.addClinic((Clinic) obj);
+								ClinicNode node = new ClinicNode(
+										groupNode, (Clinic) obj);
+								groupNode.addChild(node);
 							}
 							treeViewer.expandToLevel(groupNode, 1);
 							treeViewer.refresh(groupNode);

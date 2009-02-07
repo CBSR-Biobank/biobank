@@ -3,7 +3,7 @@ package edu.ualberta.med.biobank.model;
 public class StudyNode extends WsObject {
 	private Study study;
 	
-	public StudyNode(ClinicGroupNode parent, Study study) {
+	public StudyNode(GroupNode<ClinicNode> parent, Study study) {
 		super(parent);
 		this.setStudy(study);
 	}
