@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.session;
+package edu.ualberta.med.biobank.treeview;
 
 import java.util.HashMap;
 import java.util.List;
@@ -30,11 +30,6 @@ import edu.ualberta.med.biobank.forms.SiteViewForm;
 import edu.ualberta.med.biobank.forms.WsObjectInput;
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Clinic;
-import edu.ualberta.med.biobank.model.ClinicNode;
-import edu.ualberta.med.biobank.model.GroupNode;
-import edu.ualberta.med.biobank.model.RootNode;
-import edu.ualberta.med.biobank.model.SiteNode;
-import edu.ualberta.med.biobank.model.SessionNode;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.client.ApplicationServiceProvider;
 import gov.nih.nci.system.query.SDKQuery;
@@ -49,12 +44,11 @@ public class SessionsView extends ViewPart {
 
 	private TreeViewer treeViewer;
 	
-	private RootNode rootNode;
+	private Node rootNode;
 	
-	private HashMap<String, SessionNode> sessions;
+	private HashMap<String, SessionAdapter> sessions;
 	
 	private IDoubleClickListener doubleClickListener = new IDoubleClickListener() {
-		@SuppressWarnings("unchecked")
 		public void doubleClick(DoubleClickEvent event) {
 			Object selection = event.getSelection();
 
@@ -64,17 +58,17 @@ public class SessionsView extends ViewPart {
 
 			treeViewer.expandToLevel(element, 1);
 
-			if (element instanceof SiteNode) {
-				openSiteNode((SiteNode) element);
+			if (element instanceof SiteAdapter) {
+				openSiteNode((SiteAdapter) element);
 			}
-			else if (element instanceof GroupNode<?>) {
-				GroupNode<?> groupNode = (GroupNode<?>) element;
-				if (groupNode.getName().equals("Clinics")) {
-					updateClinics((GroupNode<ClinicNode>) groupNode);
+			else if (element instanceof Node) {
+				Node node = (Node) element;
+				if (node.getName().equals("Clinics")) {
+					updateClinics(node);
 				}
 			}
-			else if (element instanceof ClinicNode) {
-				openClinicNode((ClinicNode) element);
+			else if (element instanceof ClinicAdapter) {
+				openClinicNode((ClinicAdapter) element);
 			}
 			else {
 				Assert.isTrue(false, "double click on class "
@@ -88,15 +82,13 @@ public class SessionsView extends ViewPart {
 		public void treeCollapsed(TreeExpansionEvent e) {
 		}
 
-		@SuppressWarnings("unchecked")
 		@Override
 		public void treeExpanded(TreeExpansionEvent e) {
 			Object o = e.getElement();
-			if (o instanceof GroupNode) {
-				GroupNode<ClinicNode> clinicGroupNode
-					= (GroupNode<ClinicNode>) o;
-				if (clinicGroupNode.getName().equals("Clinic")) {
-					updateClinics(clinicGroupNode);
+			if (o instanceof Node) {
+				Node node = (Node) o;
+				if (node.getName().equals("Clinic")) {
+					updateClinics(node);
 				}			
 			}
 		}
@@ -105,8 +97,8 @@ public class SessionsView extends ViewPart {
 	public SessionsView() {
 		super();
 		BioBankPlugin.getDefault().setSessionView(this);
-		rootNode = new RootNode();
-		sessions = new  HashMap<String, SessionNode>();
+		rootNode = new Node(null, 1, "root");
+		sessions = new  HashMap<String, SessionAdapter>();
 	}
 
 	@Override
@@ -183,33 +175,37 @@ public class SessionsView extends ViewPart {
 	
 	public void addSession(final WritableApplicationService appService, String name, 
 			List<Object> sites) {
-		final SessionNode sessionNode = new SessionNode(appService, name);
+		int id = sessions.size();
+		final SessionAdapter sessionNode = new SessionAdapter(appService, id, name);
 		sessions.put(name, sessionNode);
-		rootNode.addSessionNode(sessionNode);
+		rootNode.addChild(sessionNode);
 		
 		for (Object o : sites) {
-			sessionNode.addSite((Site) o);
+			SiteAdapter siteNode = new SiteAdapter(sessionNode, (Site) o);
+			sessionNode.addChild(siteNode);
 		}
 		treeViewer.refresh();
 		treeViewer.expandToLevel(2);
 	}
 	
-	public SessionNode getSessionNode(String sessionName) {
-		for (SessionNode node : rootNode.getSessions()) {
-			if (node.getName().equals(sessionName)) return node;
+	public SessionAdapter getSessionNode(String sessionName) {
+		for (Node node : rootNode.getChildren()) {
+			if (node.getName().equals(sessionName)) 
+				return (SessionAdapter) node;
 		}
 		Assert.isTrue(false, "Session with name " + sessionName
 				+ " not found");
 		return null;
 	}
 	
-	public SessionNode getSessionNode(int count) {
-		SessionNode[] nodes = rootNode.getSessions();
-		Assert.isTrue(count < nodes.length, "Invalid session node count: " + count);
-		return nodes[count];
+	public SessionAdapter getSessionNode(int count) {
+		List<Node> nodes = rootNode.getChildren();
+		Assert.isTrue(count < nodes.size(), 
+				"Invalid session node count: " + count);
+		return (SessionAdapter) nodes.get(count);
 	}
 	
-	public void updateSites(final SessionNode sessionNode) {
+	public void updateSites(final SessionAdapter sessionNode) {
 		String sessionName = sessionNode.getName();
 		Assert.isTrue(sessions.containsKey(sessionName), 
 				"Session named " + sessionName + " not found");
@@ -227,8 +223,10 @@ public class SessionsView extends ViewPart {
 					
 					Display.getDefault().asyncExec(new Runnable() {
 						public void run() {
-							for (Object obj : sites) {
-								sessionNode.addSite((Site) obj);
+							for (Object o : sites) {
+								SiteAdapter siteNode 
+									= new SiteAdapter(sessionNode, (Site) o);
+								sessionNode.addChild(siteNode);
 							}
 							treeViewer.refresh(sessionNode);
 						}
@@ -244,12 +242,12 @@ public class SessionsView extends ViewPart {
 		job.schedule();
 	}
 	
-	public void updateClinics(final GroupNode<ClinicNode> groupNode) {
+	public void updateClinics(final Node groupNode) {
 		String sessionName = groupNode.getParent().getParent().getName();
 		Assert.isTrue(sessions.containsKey(sessionName), 
 				"Session named " + sessionName + " not found");
 		
-		final SessionNode sessionNode = sessions.get(sessionName);
+		final SessionAdapter sessionNode = sessions.get(sessionName);
 		
 		// get the Site sites stored on this server
 		Job job = new Job("Querying Clinics") {
@@ -265,7 +263,7 @@ public class SessionsView extends ViewPart {
 					Display.getDefault().asyncExec(new Runnable() {
 						public void run() {
 							for (Object obj : sites) {
-								ClinicNode node = new ClinicNode(
+								ClinicAdapter node = new ClinicAdapter(
 										groupNode, (Clinic) obj);
 								groupNode.addChild(node);
 							}
@@ -289,7 +287,7 @@ public class SessionsView extends ViewPart {
 			throw new Exception();
 		}
 		
-		final SessionNode sessionNode = sessions.get(sessionName);
+		final SessionAdapter sessionNode = sessions.get(sessionName);
 		
 		Job job = new Job("Creating Object") {
 			protected IStatus run(IProgressMonitor monitor) {
@@ -342,7 +340,7 @@ public class SessionsView extends ViewPart {
 	public void updateObject(final String sessionName, final Object o) throws Exception {
 		Assert.isTrue(sessions.containsKey(sessionName), "Session named " + sessionName + " not found");
 		
-		final SessionNode sessionNode = sessions.get(sessionName);
+		final SessionAdapter sessionNode = sessions.get(sessionName);
 		
 		Job job = new Job("Creating Object") {
 			protected IStatus run(IProgressMonitor monitor) {
@@ -371,7 +369,7 @@ public class SessionsView extends ViewPart {
 							
 							Display.getDefault().asyncExec(new Runnable() {
 								public void run() {
-									openSiteNode(sessionNode.getSite(id));
+									openSiteNode((SiteAdapter) sessionNode.getChild(id));
 								}
 							});
 						}
@@ -403,18 +401,18 @@ public class SessionsView extends ViewPart {
 	}
 	
 	public void deleteSession(String name) throws Exception {
-		rootNode.deleteSessionNode(name);
+		rootNode.removeByName(name);
 	}
 	
 	public int getSessionCount() {
-		return rootNode.getChildCount();
+		return rootNode.getChildren().size();
 	}
 	
 	public String[] getSessionNames() {
 		return sessions.keySet().toArray(new String[sessions.size()]);
 	}
 	
-	private void openSiteNode(SiteNode node) {
+	private void openSiteNode(SiteAdapter node) {
 		WsObjectInput input = new WsObjectInput(node);
 		
 		try {
@@ -426,7 +424,7 @@ public class SessionsView extends ViewPart {
 		}
 	}
 	
-	private void openClinicNode(ClinicNode node) {
+	private void openClinicNode(ClinicAdapter node) {
 		WsObjectInput input = new WsObjectInput(node);
 		
 		try {

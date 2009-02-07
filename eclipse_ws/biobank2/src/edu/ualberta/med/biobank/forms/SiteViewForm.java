@@ -18,16 +18,16 @@ import org.springframework.util.Assert;
 
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Clinic;
-import edu.ualberta.med.biobank.model.ClinicNode;
 import edu.ualberta.med.biobank.model.Site;
-import edu.ualberta.med.biobank.model.SiteNode;
-import edu.ualberta.med.biobank.model.WsObject;
+import edu.ualberta.med.biobank.treeview.Node;
+import edu.ualberta.med.biobank.treeview.ClinicAdapter;
+import edu.ualberta.med.biobank.treeview.SiteAdapter;
 
 public class SiteViewForm extends AddressViewForm {	
 	public static final String ID =
 	      "edu.ualberta.med.biobank.forms.SiteViewForm";
 	
-	private WsObject node;
+	private Node node;
 	private Site site;
 	
 	Label name;
@@ -58,8 +58,8 @@ public class SiteViewForm extends AddressViewForm {
 		node = ((WsObjectInput) input).getWsObject();
 		Assert.notNull(node, "Null editor input");
 
-		if (node instanceof SiteNode) {
-			SiteNode siteNode = (SiteNode) node;
+		if (node instanceof SiteAdapter) {
+			SiteAdapter siteNode = (SiteAdapter) node;
 			site = siteNode.getSite();
 			address = site.getAddress();
 			setPartName("Site " + site.getName());
@@ -128,10 +128,10 @@ public class SiteViewForm extends AddressViewForm {
 		clinic.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				try {
-					SiteNode siteNode = (SiteNode) node;
+					SiteAdapter siteNode = (SiteAdapter) node;
 					Clinic clinic = new Clinic();
 					clinic.setAddress(new Address());
-					ClinicNode clinicNode = new ClinicNode(siteNode.getClinicGroupNode(), clinic);
+					ClinicAdapter clinicNode = new ClinicAdapter(siteNode.getClinicGroupNode(), clinic);
 					siteNode.getClinicGroupNode().addChild(clinicNode);
 					getSite().getPage().openEditor(new WsObjectInput(clinicNode), ClinicEntryForm.ID, true);
 				} 

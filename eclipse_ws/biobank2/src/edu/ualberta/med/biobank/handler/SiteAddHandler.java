@@ -11,9 +11,9 @@ import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.forms.SiteEntryForm;
 import edu.ualberta.med.biobank.forms.WsObjectInput;
 import edu.ualberta.med.biobank.model.Address;
-import edu.ualberta.med.biobank.model.SessionNode;
 import edu.ualberta.med.biobank.model.Site;
-import edu.ualberta.med.biobank.model.SiteNode;
+import edu.ualberta.med.biobank.treeview.SessionAdapter;
+import edu.ualberta.med.biobank.treeview.SiteAdapter;
 
 public class SiteAddHandler extends AbstractHandler implements IHandler {
 
@@ -22,14 +22,14 @@ public class SiteAddHandler extends AbstractHandler implements IHandler {
 		
 		Assert.isTrue(numSessions >= 1);
 		
-		SessionNode sessionNode;
-		SiteNode siteNode = null;
+		SessionAdapter sessionNode;
+		SiteAdapter siteNode = null;
 		
 		if (numSessions == 1) {
 			sessionNode = BioBankPlugin.getDefault().getSessionNode(0);
 			Site site = new Site();
 			site.setAddress(new Address());
-			siteNode = new SiteNode(sessionNode, site);
+			siteNode = new SiteAdapter(sessionNode, site);
 		}
 		else {
 			Assert.isTrue(false, "not implemented yet");

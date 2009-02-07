@@ -27,8 +27,8 @@ import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.model.Site;
-import edu.ualberta.med.biobank.model.SiteNode;
-import edu.ualberta.med.biobank.model.WsObject;
+import edu.ualberta.med.biobank.treeview.Node;
+import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
 
 public class SiteEntryForm extends AddressEntryForm {	
@@ -39,7 +39,7 @@ public class SiteEntryForm extends AddressEntryForm {
 	private static final String SITE_OK_MESSAGE = "Edit a BioBank site.";
 	private static final String NO_SITE_NAME_MESSAGE = "Site must have a name";
 	
-	private WsObject node;
+	private Node node;
 	
 	private Site site;
 	
@@ -56,11 +56,11 @@ public class SiteEntryForm extends AddressEntryForm {
 		node = ((WsObjectInput) input).getWsObject();
 		Assert.isNotNull(node, "Null editor input");
 		
-		Assert.isTrue((node instanceof SiteNode), 
+		Assert.isTrue((node instanceof SiteAdapter), 
 				"Invalid editor input: object of type "
 				+ node.getClass().getName());
 		
-		SiteNode siteNode = (SiteNode) node;
+		SiteAdapter siteNode = (SiteAdapter) node;
 		site = siteNode.getSite();
 		address = site.getAddress();
 		
@@ -184,7 +184,7 @@ public class SiteEntryForm extends AddressEntryForm {
 		site.setAddress(address);
 		String sessionName;
 		
-		if (node instanceof SiteNode) {
+		if (node instanceof SiteAdapter) {
 			sessionName = node.getParent().getName();
 		}
 		else {

@@ -1,9 +1,8 @@
-package edu.ualberta.med.biobank.session;
+package edu.ualberta.med.biobank.treeview;
 
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.swt.graphics.Image;
-import edu.ualberta.med.biobank.model.WsObject;
 
 public class SessionLabelProvider implements ILabelProvider {
 
@@ -12,8 +11,8 @@ public class SessionLabelProvider implements ILabelProvider {
 	}
 
 	public String getText(Object element) {
-		if (element instanceof WsObject) {
-			return ((WsObject) element).getName();
+		if (element instanceof Node) {
+			return ((Node) element).getName();
 		}
 		return new String();
 	}

@@ -26,9 +26,9 @@ import org.springframework.util.Assert;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.model.Clinic;
-import edu.ualberta.med.biobank.model.ClinicNode;
-import edu.ualberta.med.biobank.model.SiteNode;
-import edu.ualberta.med.biobank.model.WsObject;
+import edu.ualberta.med.biobank.treeview.Node;
+import edu.ualberta.med.biobank.treeview.ClinicAdapter;
+import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
 
 public class ClinicEntryForm extends AddressEntryForm {	
@@ -39,7 +39,7 @@ public class ClinicEntryForm extends AddressEntryForm {
 	private static final String CLINIC_OK_MESSAGE = "Clinic information.";
 	private static final String NO_CLINIC_NAME_MESSAGE = "Clinic must have a name";
 	
-	private WsObject node;
+	private Node node;
 	
 	private Clinic clinic;
 	
@@ -56,13 +56,13 @@ public class ClinicEntryForm extends AddressEntryForm {
 		node = ((WsObjectInput) input).getWsObject();
 		Assert.notNull(node, "Null editor input");
 
-		Assert.isTrue((node instanceof ClinicNode), 
+		Assert.isTrue((node instanceof ClinicAdapter), 
 				"Invalid editor input: object of type "
 				+ node.getClass().getName());
 
-		ClinicNode clinicNode = (ClinicNode) node;
+		ClinicAdapter clinicNode = (ClinicAdapter) node;
 		clinic = clinicNode.getClinic();
-		SiteNode siteNode = (SiteNode) clinicNode.getParent().getParent();
+		SiteAdapter siteNode = (SiteAdapter) clinicNode.getParent().getParent();
 		clinic.setSite(siteNode.getSite());
 		address = clinic.getAddress();
 		
@@ -129,7 +129,7 @@ public class ClinicEntryForm extends AddressEntryForm {
 				clinic.setAddress(address);
 				String sessionName;
 				
-				if (node instanceof ClinicNode) {
+				if (node instanceof ClinicAdapter) {
 					sessionName = node.getParent().getParent().getParent().getName();
 				}
 				else {

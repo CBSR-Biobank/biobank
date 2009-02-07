@@ -4,14 +4,14 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPersistableElement;
 
-import edu.ualberta.med.biobank.model.ClinicNode;
-import edu.ualberta.med.biobank.model.SiteNode;
-import edu.ualberta.med.biobank.model.WsObject;
+import edu.ualberta.med.biobank.treeview.Node;
+import edu.ualberta.med.biobank.treeview.ClinicAdapter;
+import edu.ualberta.med.biobank.treeview.SiteAdapter;
 
 public class WsObjectInput implements IEditorInput {
-	private WsObject wsObject;
+	private Node wsObject;
 
-	public WsObjectInput(WsObject o) {
+	public WsObjectInput(Node o) {
 		wsObject = o;
 	}
 
@@ -20,7 +20,7 @@ public class WsObjectInput implements IEditorInput {
 		return 0;
 	}
 	
-	public WsObject getWsObject() {
+	public Node getWsObject() {
 		return wsObject;
 	}
 
@@ -51,12 +51,12 @@ public class WsObjectInput implements IEditorInput {
 		if (wsObject != null) { 
 			String name = wsObject.getName();
 			if (name != null) {
-				if (wsObject instanceof SiteNode) return "Site " + name;
-				if (wsObject instanceof ClinicNode) return "Clinic " + name;
+				if (wsObject instanceof SiteAdapter) return "Site " + name;
+				if (wsObject instanceof ClinicAdapter) return "Clinic " + name;
 			}
 			else {
-				if (wsObject instanceof SiteNode) return "New Site";
-				if (wsObject instanceof ClinicNode) return "New Clinic";
+				if (wsObject instanceof SiteAdapter) return "New Site";
+				if (wsObject instanceof ClinicAdapter) return "New Clinic";
 			}
 		}
 		return null;

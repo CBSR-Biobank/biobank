@@ -1,9 +1,7 @@
 package edu.ualberta.med.biobank.forms;
 
 import org.eclipse.core.databinding.DataBindingContext;
-import org.eclipse.core.databinding.beans.PojoObservables;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.jface.databinding.swt.SWTObservables;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -21,14 +19,14 @@ import org.eclipse.ui.forms.widgets.Section;
 import org.springframework.util.Assert;
 
 import edu.ualberta.med.biobank.model.Clinic;
-import edu.ualberta.med.biobank.model.ClinicNode;
-import edu.ualberta.med.biobank.model.WsObject;
+import edu.ualberta.med.biobank.treeview.Node;
+import edu.ualberta.med.biobank.treeview.ClinicAdapter;
 
 public class ClinicViewForm  extends AddressViewForm {	
 	public static final String ID =
 	      "edu.ualberta.med.biobank.forms.ClinicViewForm";
 	
-	private WsObject node;
+	private Node node;
 	private Clinic clinic;
 	
 	Label name;
@@ -59,8 +57,8 @@ public class ClinicViewForm  extends AddressViewForm {
 		node = ((WsObjectInput) input).getWsObject();
 		Assert.notNull(node, "Null editor input");
 
-		if (node instanceof ClinicNode) {
-			ClinicNode clinicNode = (ClinicNode) node;
+		if (node instanceof ClinicAdapter) {
+			ClinicAdapter clinicNode = (ClinicAdapter) node;
 			clinic = clinicNode.getClinic();
 			address = clinic.getAddress();
 			setPartName("Clinic " + clinic.getName());
