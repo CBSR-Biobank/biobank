@@ -95,7 +95,7 @@ public class ClinicViewForm  extends AddressViewForm {
 		section.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));		
 		Composite sbody = toolkit.createComposite(section);
 		section.setClient(sbody);
-		sbody.setLayout(new GridLayout(2, false));
+		sbody.setLayout(new GridLayout(4, false));
 		sbody.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));		
 		toolkit.paintBordersFor(sbody);	
 		

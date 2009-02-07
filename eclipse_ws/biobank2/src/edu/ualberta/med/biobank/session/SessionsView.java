@@ -66,6 +66,9 @@ public class SessionsView extends ViewPart {
 			if (element instanceof SiteNode) {
 				openSiteNode((SiteNode) element);
 			}
+			else if (element instanceof ClinicGroupNode) {
+				updateClinics((ClinicGroupNode) element);
+			}
 			else if (element instanceof ClinicNode) {
 				openClinicNode((ClinicNode) element);
 			}
@@ -165,7 +168,7 @@ public class SessionsView extends ViewPart {
 				return Status.OK_STATUS;
 			}
 		};
-		job.setUser(true);
+		job.setUser(false);
 		job.schedule();
 	}
 	
@@ -255,6 +258,7 @@ public class SessionsView extends ViewPart {
 							for (Object obj : sites) {
 								groupNode.addClinic((Clinic) obj);
 							}
+							treeViewer.expandToLevel(groupNode, 1);
 							treeViewer.refresh(groupNode);
 						}
 					});
