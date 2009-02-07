@@ -1,16 +1,11 @@
 package edu.ualberta.med.biobank.model;
 
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
-
 import java.util.ArrayList;
-
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.core.runtime.ListenerList;
 
 public class SessionNode extends WsObject {
 	private ArrayList<SiteNode> siteNodes = null;
-	
-	private ListenerList listeners;
 	
 	private WritableApplicationService appService;
 	
@@ -21,24 +16,39 @@ public class SessionNode extends WsObject {
 		siteNodes = new ArrayList<SiteNode>();
 	}
 	
-	public void addSite(Site site) {
-		// is site has already been added, get rid of old one
-		if (!siteNodes.isEmpty())
-			removeSite(site);
+	public void addSite(Site site) {		
+		if (containsSite(site.getId())) {
+			// don't add - assume our model is up to date 
+			return;
+		}
 		
-		SiteNode siteNode = new SiteNode(this, site);
-		siteNodes.add(siteNode);
-		fireChildrenChanged(null);
+		SiteNode siteNode = getNamedSite(site.getName());
+		if (siteNode != null) {
+			// may have inserted a new site into database
+			siteNode.setSite(site);
+			return;
+		}
+		
+		siteNodes.add(new SiteNode(this, site));
 	}
 
 	public void removeSite(Site site) {
-		if (siteNodes == null) return;
-		
 		SiteNode nodeToRemove = null;
 
 		for (SiteNode node : siteNodes) {
-			if (node.getSite().getId().equals(site.getId())
-					|| node.getSite().getName().equals(site.getName())) 
+			if (node.getSite().getId().equals(site.getId()))
+				nodeToRemove = node;
+		}
+		
+		if (nodeToRemove != null)
+			siteNodes.remove(nodeToRemove);
+	}
+
+	public void removeSiteByName(String name) {
+		SiteNode nodeToRemove = null;
+
+		for (SiteNode node : siteNodes) {
+			if (node.getSite().getName().equals(name))
 				nodeToRemove = node;
 		}
 		
@@ -46,13 +56,24 @@ public class SessionNode extends WsObject {
 			siteNodes.remove(nodeToRemove);
 	}
 	
-	public boolean containsSite(Site site) {
-		if (siteNodes == null) return false;
-		
+	/**
+	 * Returns true if there is a site with the same ID.
+	 * 
+	 * @param site
+	 * @return
+	 */
+	public boolean containsSite(int id) {		
 		for (SiteNode node : siteNodes) {
-			if (node.getSite().getId().equals(site.getId())) return true;
+			if (node.getSite().getId().equals(id)) return true;
 		}
 		return false;
+	}
+	
+	public SiteNode getNamedSite(String name) {		
+		for (SiteNode node : siteNodes) {
+			if (node.getSite().getName().equals(name)) return node;
+		}
+		return null;
 	}
 	
 	public SiteNode[] getSites() {
@@ -62,9 +83,7 @@ public class SessionNode extends WsObject {
 		return (SiteNode[]) siteNodes.toArray(new SiteNode[siteNodes.size()]);
 	}
 	
-	public SiteNode getSite(int id) {
-		if (siteNodes == null) return null;
-		
+	public SiteNode getSite(int id) {		
 		for (SiteNode node : siteNodes) {
 			if (node.getSite().getId().equals(id)) return node;
 		}
@@ -74,29 +93,6 @@ public class SessionNode extends WsObject {
 	
 	public WritableApplicationService getAppService() {
 		return appService;
-	}
-
-
-	public void addListener(ISessionNodeListener listener) {
-		if (listeners == null)
-			listeners = new ListenerList();
-		listeners.add(listener);
-	}
-
-	public void removeListener(ISessionNodeListener listener) {
-		if (listeners != null) {
-			listeners.remove(listener);
-			if (listeners.isEmpty())
-				listeners = null;
-		}
-	}
-
-	protected void fireChildrenChanged(SiteNode siteNode) {
-		if (listeners == null) return;
-		
-		for (Object l : listeners.getListeners()) {
-			((ISessionNodeListener) l).sessionChanged(this, siteNode);
-		}
 	}
 
 	@Override

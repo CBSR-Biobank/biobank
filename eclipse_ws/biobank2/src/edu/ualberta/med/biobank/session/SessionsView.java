@@ -35,7 +35,6 @@ import edu.ualberta.med.biobank.model.ClinicNode;
 import edu.ualberta.med.biobank.model.RootNode;
 import edu.ualberta.med.biobank.model.SiteNode;
 import edu.ualberta.med.biobank.model.SessionNode;
-import edu.ualberta.med.biobank.model.ISessionNodeListener;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.client.ApplicationServiceProvider;
 import gov.nih.nci.system.query.SDKQuery;
@@ -176,12 +175,6 @@ public class SessionsView extends ViewPart {
 		sessions.put(name, sessionNode);
 		rootNode.addSessionNode(sessionNode);
 		
-		sessionNode.addListener(new ISessionNodeListener() {
-			public void sessionChanged(SessionNode sessionNode, SiteNode siteNode) {
-				treeViewer.refresh();
-			}
-		});
-		
 		for (Object o : sites) {
 			sessionNode.addSite((Site) o);
 		}
@@ -225,7 +218,7 @@ public class SessionsView extends ViewPart {
 							for (Object obj : sites) {
 								sessionNode.addSite((Site) obj);
 							}
-							treeViewer.expandToLevel(2);
+							treeViewer.refresh(sessionNode);
 						}
 					});
 				}
@@ -262,7 +255,7 @@ public class SessionsView extends ViewPart {
 							for (Object obj : sites) {
 								groupNode.addClinic((Clinic) obj);
 							}
-							treeViewer.expandToLevel(groupNode, 1);
+							treeViewer.refresh(groupNode);
 						}
 					});
 				}

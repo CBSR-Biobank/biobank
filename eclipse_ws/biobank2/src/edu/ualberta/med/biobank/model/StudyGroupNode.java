@@ -14,13 +14,7 @@ public class StudyGroupNode extends WsObject {
 	public StudyNode[] getStudieNodes() {
 		return (StudyNode[]) studies.toArray(new StudyNode[studies.size()]);
 	}
-
-	protected void fireChildrenChanged() {
-		SiteNode parent = (SiteNode) getParent();
-		if (parent == null) return; 
-		parent.fireChildrenChanged();
-	}
-
+	
 	@Override
 	public int getId() {
 		return 0;

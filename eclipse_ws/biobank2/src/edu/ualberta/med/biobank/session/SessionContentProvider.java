@@ -7,6 +7,7 @@ import edu.ualberta.med.biobank.model.SessionNode;
 import edu.ualberta.med.biobank.model.SiteNode;
 import edu.ualberta.med.biobank.model.ClinicGroupNode;
 import edu.ualberta.med.biobank.model.StudyGroupNode;
+import edu.ualberta.med.biobank.model.WsObject;
 
 public class SessionContentProvider implements ITreeContentProvider {
 	
@@ -46,17 +47,11 @@ public class SessionContentProvider implements ITreeContentProvider {
 		if (element instanceof RootNode) {
 			return null;
 		}
-		else if (element instanceof SessionNode) {
-			return ((SessionNode) element).getParent();
-		}
-		else if (element instanceof SiteNode) {
-			return ((SiteNode) element).getParent();
-		}
-		else if (element instanceof ClinicGroupNode) {
-			return ((ClinicGroupNode) element).getParent();
-		}
-		else if (element instanceof StudyGroupNode) {
-			return ((StudyGroupNode) element).getParent();
+		else if ((element instanceof SessionNode)
+				||(element instanceof SiteNode)
+				|| (element instanceof ClinicGroupNode)
+				|| (element instanceof StudyGroupNode)) {
+			return ((WsObject) element).getParent();
 		}
 		return null;
 	}
@@ -65,7 +60,13 @@ public class SessionContentProvider implements ITreeContentProvider {
 	 * @see org.eclipse.jface.viewers.ITreeContentProvider#hasChildren(java.lang.Object)
 	 */
 	public boolean hasChildren(Object element) {
-		return true;
+		if ((element instanceof SessionNode)
+				||(element instanceof SiteNode)
+				|| (element instanceof ClinicGroupNode)
+				|| (element instanceof StudyGroupNode)) {
+			return true;
+		}
+		return false;
 	}
 
 	/* (non-Javadoc)

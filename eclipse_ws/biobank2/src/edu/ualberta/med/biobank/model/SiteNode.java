@@ -15,6 +15,10 @@ public class SiteNode extends WsObject {
 		children[1].setParent(this);
 	}
 
+	public void setSite(Site site) {
+		this.site = site;
+	}
+
 	public Site getSite() {
 		return site;
 	}
@@ -33,12 +37,6 @@ public class SiteNode extends WsObject {
 	
 	public ClinicGroupNode getClinicGroupNode() {
 		return (ClinicGroupNode) children[1];
-	}
-
-	protected void fireChildrenChanged() {
-		SessionNode parent = (SessionNode) getParent();
-		if (parent == null) return; 
-		parent.fireChildrenChanged(this);
 	}
 
 	@Override
