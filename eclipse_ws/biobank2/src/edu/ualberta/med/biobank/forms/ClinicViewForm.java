@@ -54,7 +54,7 @@ public class ClinicViewForm  extends AddressViewForm {
 		if ( !(input instanceof NodeInput)) 
 			throw new PartInitException("Invalid editor input"); 
 		
-		node = ((NodeInput) input).getWsObject();
+		node = ((NodeInput) input).getNode();
 		Assert.notNull(node, "Null editor input");
 
 		if (node instanceof ClinicAdapter) {

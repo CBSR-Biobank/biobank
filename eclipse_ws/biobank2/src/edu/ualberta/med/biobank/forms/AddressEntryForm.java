@@ -17,8 +17,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.databinding.swt.SWTObservables;
 import org.eclipse.jface.fieldassist.ControlDecoration;
-import org.eclipse.jface.fieldassist.FieldDecoration;
-import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
@@ -122,12 +120,12 @@ public abstract class AddressEntryForm extends EditorPart {
 			FieldInfo fi = AddressFieldsConstants.FIELDS.get(key);
 			
 			if (fi.widgetClass == Text.class) {
-				Text text = createLabelledText(sbody, fi.label + " :", 100, null);
+				Text text = FormUtils.createLabelledText(toolkit, sbody, fi.label + " :", 100, null);
 				controls.put(key, text);
 				text.addKeyListener(keyListener);
 				
 				if (fi.validatorClass != null) {
-					fieldDecorators.put(key, createDecorator(text, fi.errMsg));
+					fieldDecorators.put(key, FormUtils.createDecorator(text, fi.errMsg));
 				}
 			}
 			else if (fi.widgetClass == Combo.class) {
@@ -152,34 +150,6 @@ public abstract class AddressEntryForm extends EditorPart {
 		}
 	}
 	
-	protected Text createLabelledText(Composite parent, String label, int limit, String tip) {
-		toolkit.createLabel(parent, label, SWT.LEFT);
-        Text text  = toolkit.createText(parent, "", SWT.SINGLE);
-        if (limit > 0) {
-            text.setTextLimit(limit);
-        }
-        if (tip != null) {
-            text.setToolTipText(tip);
-        }
-        text.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
-        return text;
-    }
-    
-    protected ControlDecoration createDecorator(Text text, String message) {
-		ControlDecoration controlDecoration = new ControlDecoration(text,
-				SWT.LEFT | SWT.TOP);
-		controlDecoration.setDescriptionText(message);
-		FieldDecoration fieldDecoration = FieldDecorationRegistry.getDefault()
-				.getFieldDecoration(FieldDecorationRegistry.DEC_ERROR);
-		controlDecoration.setImage(fieldDecoration.getImage());
-		
-		// make room for the decorator
-		((GridData) text.getLayoutData()).horizontalIndent 
-			= controlDecoration.getMarginWidth() 
-			+ fieldDecoration.getImage().getBounds().width;		
-		return controlDecoration;
-	}
-    
     protected void bindValues(DataBindingContext dbc) {
 		for (String key : AddressFieldsConstants.FIELDS.keySet()) {
 			FieldInfo fi = AddressFieldsConstants.FIELDS.get(key);

@@ -19,9 +19,11 @@ import org.springframework.util.Assert;
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.ClinicAdapter;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
+import edu.ualberta.med.biobank.treeview.StudyAdapter;
 
 public class SiteViewForm extends AddressViewForm {	
 	public static final String ID =
@@ -55,7 +57,7 @@ public class SiteViewForm extends AddressViewForm {
 		if ( !(input instanceof NodeInput)) 
 			throw new PartInitException("Invalid editor input"); 
 		
-		node = ((NodeInput) input).getWsObject();
+		node = ((NodeInput) input).getNode();
 		Assert.notNull(node, "Null editor input");
 
 		if (node instanceof SiteAdapter) {
@@ -121,6 +123,17 @@ public class SiteViewForm extends AddressViewForm {
 		final Button study = toolkit.createButton(sbody, "Add Study", SWT.PUSH);
 		study.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
+				try {
+					SiteAdapter siteAdapter = (SiteAdapter) node;
+					Study study = new Study();
+					StudyAdapter studyNode = new StudyAdapter(siteAdapter.getStudiesGroupNode(), study);
+					siteAdapter.getStudiesGroupNode().addChild(studyNode);
+					getSite().getPage().openEditor(new NodeInput(studyNode), StudyEntryForm.ID, true);
+				} 
+				catch (PartInitException exp) {
+					// handle error
+					exp.printStackTrace();				
+				}
 			}
 		});
 

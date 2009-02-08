@@ -122,16 +122,13 @@ public class SiteEntryForm extends AddressEntryForm {
 			session = null;
 		}
 		
-		name = createLabelledText(sbody, "Name:", 100, null);
-		nameDecorator = createDecorator(name, NO_SITE_NAME_MESSAGE);
+		name = FormUtils.createLabelledText(toolkit, sbody, "Name:", 100, null);
+		nameDecorator = FormUtils.createDecorator(name, NO_SITE_NAME_MESSAGE);
 		name.addKeyListener(keyListener);
 		
 		createAddressArea();
 
-		section = toolkit.createSection(form.getBody(), SWT.NONE);
-		sbody = toolkit.createComposite(section);
-		section.setClient(sbody);
-		section.setLayoutData(new GridData(GridData.FILL_BOTH));
+		sbody = toolkit.createComposite(form.getBody());
 		layout = new GridLayout();
 		layout.horizontalSpacing = 10;
 		layout.numColumns = 2;

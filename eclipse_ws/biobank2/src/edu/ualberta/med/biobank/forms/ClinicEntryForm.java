@@ -53,7 +53,7 @@ public class ClinicEntryForm extends AddressEntryForm {
 		if ( !(input instanceof NodeInput)) 
 			throw new PartInitException("Invalid editor input");
 		
-		node = ((NodeInput) input).getWsObject();
+		node = ((NodeInput) input).getNode();
 		Assert.notNull(node, "Null editor input");
 
 		Assert.isTrue((node instanceof ClinicAdapter), 
@@ -108,8 +108,8 @@ public class ClinicEntryForm extends AddressEntryForm {
 		sbody.setLayout(layout);
 		toolkit.paintBordersFor(sbody);
 		
-		name = createLabelledText(sbody, "Name:", 100, null);
-		nameDecorator = createDecorator(name, NO_CLINIC_NAME_MESSAGE);
+		name = FormUtils.createLabelledText(toolkit, sbody, "Name:", 100, null);
+		nameDecorator = FormUtils.createDecorator(name, NO_CLINIC_NAME_MESSAGE);
 		
 		createAddressArea();
 
