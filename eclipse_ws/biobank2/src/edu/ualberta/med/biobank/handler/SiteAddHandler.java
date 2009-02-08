@@ -9,7 +9,7 @@ import org.eclipse.ui.handlers.HandlerUtil;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.forms.SiteEntryForm;
-import edu.ualberta.med.biobank.forms.WsObjectInput;
+import edu.ualberta.med.biobank.forms.NodeInput;
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.treeview.SessionAdapter;
@@ -35,7 +35,7 @@ public class SiteAddHandler extends AbstractHandler implements IHandler {
 			Assert.isTrue(false, "not implemented yet");
 		}
 		
-		WsObjectInput input = new WsObjectInput(siteNode);
+		NodeInput input = new NodeInput(siteNode);
 		try {
 			HandlerUtil.getActiveWorkbenchWindowChecked(event).getActivePage()
 			.openEditor(input, SiteEntryForm.ID, true);

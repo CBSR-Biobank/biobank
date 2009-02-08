@@ -50,10 +50,10 @@ public class ClinicEntryForm extends AddressEntryForm {
 
 	public void init(IEditorSite editorSite, IEditorInput input) throws PartInitException {
 		super.init(editorSite, input);
-		if ( !(input instanceof WsObjectInput)) 
+		if ( !(input instanceof NodeInput)) 
 			throw new PartInitException("Invalid editor input");
 		
-		node = ((WsObjectInput) input).getWsObject();
+		node = ((NodeInput) input).getWsObject();
 		Assert.notNull(node, "Null editor input");
 
 		Assert.isTrue((node instanceof ClinicAdapter), 

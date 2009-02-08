@@ -51,10 +51,10 @@ public class ClinicViewForm  extends AddressViewForm {
 	public void init(IEditorSite editorSite, IEditorInput input)
 			throws PartInitException {
 		super.init(editorSite, input);
-		if ( !(input instanceof WsObjectInput)) 
+		if ( !(input instanceof NodeInput)) 
 			throw new PartInitException("Invalid editor input"); 
 		
-		node = ((WsObjectInput) input).getWsObject();
+		node = ((NodeInput) input).getWsObject();
 		Assert.notNull(node, "Null editor input");
 
 		if (node instanceof ClinicAdapter) {
@@ -121,7 +121,7 @@ public class ClinicViewForm  extends AddressViewForm {
 			public void widgetSelected(SelectionEvent e) {
 				getSite().getPage().closeEditor(ClinicViewForm.this, false);
 				
-				WsObjectInput input = new WsObjectInput(node);
+				NodeInput input = new NodeInput(node);
 				
 				try {
 					getSite().getPage().openEditor(input, ClinicEntryForm.ID, true);

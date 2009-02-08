@@ -21,13 +21,14 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
+import org.springframework.remoting.RemoteAccessException;
 import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionCredentials;
 import edu.ualberta.med.biobank.forms.ClinicViewForm;
 import edu.ualberta.med.biobank.forms.SiteViewForm;
-import edu.ualberta.med.biobank.forms.WsObjectInput;
+import edu.ualberta.med.biobank.forms.NodeInput;
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Clinic;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -176,7 +177,7 @@ public class SessionsView extends ViewPart {
 	public void addSession(final WritableApplicationService appService, String name, 
 			List<Object> sites) {
 		int id = sessions.size();
-		final SessionAdapter sessionNode = new SessionAdapter(appService, id, name);
+		final SessionAdapter sessionNode = new SessionAdapter(rootNode, appService, id, name);
 		sessions.put(name, sessionNode);
 		rootNode.addChild(sessionNode);
 		
@@ -232,6 +233,16 @@ public class SessionsView extends ViewPart {
 						}
 					});
 				}
+				catch (final RemoteConnectFailureException exp) {
+					Display.getDefault().asyncExec(new Runnable() {
+						public void run() {
+							MessageDialog.openError(
+									PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), 
+									"Connection Attempt Failed", 
+									"Could not connect to server. Make sure server is running.");
+						}
+					});
+				}
 				catch (Exception exp) {
 					exp.printStackTrace();
 				}
@@ -269,6 +280,16 @@ public class SessionsView extends ViewPart {
 							}
 							treeViewer.expandToLevel(groupNode, 1);
 							treeViewer.refresh(groupNode);
+						}
+					});
+				}
+				catch (final RemoteConnectFailureException exp) {
+					Display.getDefault().asyncExec(new Runnable() {
+						public void run() {
+							MessageDialog.openError(
+									PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), 
+									"Connection Attempt Failed", 
+									"Could not connect to server. Make sure server is running.");
 						}
 					});
 				}
@@ -327,13 +348,23 @@ public class SessionsView extends ViewPart {
 					
 					updateSites(sessionNode);
 				}
+				catch (final RemoteAccessException exp) {
+					Display.getDefault().asyncExec(new Runnable() {
+						public void run() {
+							MessageDialog.openError(
+									PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), 
+									"Connection Attempt Failed", 
+									"Could not perform database operation. Make sure server is running correct version.");
+						}
+					});
+				}
 				catch (Exception exp) {
 					exp.printStackTrace();
 				}
 				return Status.OK_STATUS;
 			}
 		};
-		job.setUser(true);
+		job.setUser(false);
 		job.schedule();
 	}
 	
@@ -390,13 +421,23 @@ public class SessionsView extends ViewPart {
 								+ o.getClass().getName() + " not supported yet");
 					}
 				}
+				catch (final RemoteConnectFailureException exp) {
+					Display.getDefault().asyncExec(new Runnable() {
+						public void run() {
+							MessageDialog.openError(
+									PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), 
+									"Connection Attempt Failed",
+									"Could not perform database operation. Make sure server is running correct version.");
+						}
+					});
+				}
 				catch (Exception exp) {
 					exp.printStackTrace();
 				}
 				return Status.OK_STATUS;
 			}
 		};
-		job.setUser(true);
+		job.setUser(false);
 		job.schedule();
 	}
 	
@@ -413,7 +454,7 @@ public class SessionsView extends ViewPart {
 	}
 	
 	private void openSiteNode(SiteAdapter node) {
-		WsObjectInput input = new WsObjectInput(node);
+		NodeInput input = new NodeInput(node);
 		
 		try {
 			getSite().getPage().openEditor(input, SiteViewForm.ID, true);
@@ -425,7 +466,7 @@ public class SessionsView extends ViewPart {
 	}
 	
 	private void openClinicNode(ClinicAdapter node) {
-		WsObjectInput input = new WsObjectInput(node);
+		NodeInput input = new NodeInput(node);
 		
 		try {
 			getSite().getPage().openEditor(input, ClinicViewForm.ID, true);

@@ -71,6 +71,7 @@ public class Node {
 	}
 	
 	public void addChild(Node child) {	
+		hasChildren = true;
 		if (contains(child)) {
 			// don't add - assume our model is up to date 
 			return;

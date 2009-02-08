@@ -15,6 +15,7 @@ public class SiteAdapter extends Node {
 			new Node(this, 2, "Clinics", true),
 			new Node(this, 3, "Storage Types", true)
 		);
+		setHasChildren(true);
 	}
 
 	public void setSite(Site site) {

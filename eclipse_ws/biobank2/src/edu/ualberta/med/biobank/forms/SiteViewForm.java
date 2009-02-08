@@ -52,10 +52,10 @@ public class SiteViewForm extends AddressViewForm {
 	public void init(IEditorSite editorSite, IEditorInput input)
 			throws PartInitException {
 		super.init(editorSite, input);
-		if ( !(input instanceof WsObjectInput)) 
+		if ( !(input instanceof NodeInput)) 
 			throw new PartInitException("Invalid editor input"); 
 		
-		node = ((WsObjectInput) input).getWsObject();
+		node = ((NodeInput) input).getWsObject();
 		Assert.notNull(node, "Null editor input");
 
 		if (node instanceof SiteAdapter) {
@@ -106,7 +106,7 @@ public class SiteViewForm extends AddressViewForm {
 			public void widgetSelected(SelectionEvent e) {
 				getSite().getPage().closeEditor(SiteViewForm.this, false);
 				
-				WsObjectInput input = new WsObjectInput(node);
+				NodeInput input = new NodeInput(node);
 				
 				try {
 					getSite().getPage().openEditor(input, SiteEntryForm.ID, true);
@@ -133,7 +133,7 @@ public class SiteViewForm extends AddressViewForm {
 					clinic.setAddress(new Address());
 					ClinicAdapter clinicNode = new ClinicAdapter(siteNode.getClinicGroupNode(), clinic);
 					siteNode.getClinicGroupNode().addChild(clinicNode);
-					getSite().getPage().openEditor(new WsObjectInput(clinicNode), ClinicEntryForm.ID, true);
+					getSite().getPage().openEditor(new NodeInput(clinicNode), ClinicEntryForm.ID, true);
 				} 
 				catch (PartInitException exp) {
 					// handle error

@@ -8,10 +8,10 @@ import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.ClinicAdapter;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 
-public class WsObjectInput implements IEditorInput {
+public class NodeInput implements IEditorInput {
 	private Node wsObject;
 
-	public WsObjectInput(Node o) {
+	public NodeInput(Node o) {
 		wsObject = o;
 	}
 
@@ -20,7 +20,7 @@ public class WsObjectInput implements IEditorInput {
 		return 0;
 	}
 	
-	public Node getWsObject() {
+	public Node getNode() {
 		return wsObject;
 	}
 
@@ -102,10 +102,10 @@ public class WsObjectInput implements IEditorInput {
 	public boolean equals(Object o) {
 		if (wsObject == null) return false;
 		
-		if (o instanceof WsObjectInput) {
-			if (wsObject.getClass() != ((WsObjectInput)o).wsObject.getClass()) return false;
+		if (o instanceof NodeInput) {
+			if (wsObject.getClass() != ((NodeInput)o).wsObject.getClass()) return false;
 		
-			return (getIndex() == ((WsObjectInput)o).getIndex()); 
+			return (getIndex() == ((NodeInput)o).getIndex()); 
 		}
 		return false;
 	}

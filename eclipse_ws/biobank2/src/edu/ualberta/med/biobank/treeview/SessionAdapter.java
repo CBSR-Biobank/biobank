@@ -6,9 +6,9 @@ public class SessionAdapter extends Node {
 	
 	private WritableApplicationService appService;
 	
-	public SessionAdapter(WritableApplicationService appService, 
+	public SessionAdapter(Node parent, WritableApplicationService appService, 
 			int sessionId, String name) {
-		super(null);
+		super(parent);
 		this.appService = appService;
 		setId(sessionId);
 		setName(name);
