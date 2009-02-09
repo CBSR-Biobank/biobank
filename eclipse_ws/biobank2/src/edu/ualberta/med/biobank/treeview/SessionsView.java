@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.treeview;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
@@ -62,14 +63,14 @@ public class SessionsView extends ViewPart {
 			if (element instanceof SiteAdapter) {
 				openSiteNode((SiteAdapter) element);
 			}
+			else if (element instanceof ClinicAdapter) {
+				openClinicNode((ClinicAdapter) element);
+			}
 			else if (element instanceof Node) {
 				Node node = (Node) element;
 				if (node.getName().equals("Clinics")) {
 					updateClinics(node);
 				}
-			}
-			else if (element instanceof ClinicAdapter) {
-				openClinicNode((ClinicAdapter) element);
 			}
 			else {
 				Assert.isTrue(false, "double click on class "
@@ -88,7 +89,7 @@ public class SessionsView extends ViewPart {
 			Object o = e.getElement();
 			if (o instanceof Node) {
 				Node node = (Node) o;
-				if (node.getName().equals("Clinic")) {
+				if (node.getName().equals("Clinics")) {
 					updateClinics(node);
 				}			
 			}
@@ -254,11 +255,12 @@ public class SessionsView extends ViewPart {
 	}
 	
 	public void updateClinics(final Node groupNode) {
-		String sessionName = groupNode.getParent().getParent().getName();
+		final SiteAdapter siteNode = (SiteAdapter) groupNode.getParent();
+		final SessionAdapter sessionNode = (SessionAdapter) siteNode.getParent();
+		
+		String sessionName = sessionNode.getName();
 		Assert.isTrue(sessions.containsKey(sessionName), 
 				"Session named " + sessionName + " not found");
-		
-		final SessionAdapter sessionNode = sessions.get(sessionName);
 		
 		// get the Site sites stored on this server
 		Job job = new Job("Querying Clinics") {
@@ -266,16 +268,15 @@ public class SessionsView extends ViewPart {
 				
 				monitor.beginTask("Querying Clinics ... ", 100);
 				
-				Clinic clinic = new Clinic();				
 				try {
-					WritableApplicationService appService = sessionNode.getAppService();
-					final List<Object> sites = appService.search(Clinic.class, clinic);
+					Site site = siteNode.getSite();
+					final Collection<Clinic> clinics = site.getClinicCollection();
 					
 					Display.getDefault().asyncExec(new Runnable() {
 						public void run() {
-							for (Object obj : sites) {
-								ClinicAdapter node = new ClinicAdapter(
-										groupNode, (Clinic) obj);
+							for (Clinic clinic : clinics) {
+								ClinicAdapter node = 
+									new ClinicAdapter(groupNode, clinic);
 								groupNode.addChild(node);
 							}
 							treeViewer.expandToLevel(groupNode, 1);
