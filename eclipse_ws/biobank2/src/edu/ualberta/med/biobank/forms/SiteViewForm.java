@@ -21,6 +21,7 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.handlers.IHandlerService;
 import org.springframework.util.Assert;
 
+import edu.ualberta.med.biobank.handler.ClinicAddHandler;
 import edu.ualberta.med.biobank.handler.StudyAddHandler;
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Clinic;
@@ -35,7 +36,7 @@ public class SiteViewForm extends AddressViewForm {
 	public static final String ID =
 	      "edu.ualberta.med.biobank.forms.SiteViewForm";
 	
-	private Node node;
+	private SiteAdapter siteAdapter;
 	private Site site;
 	
 	Label name;
@@ -63,12 +64,12 @@ public class SiteViewForm extends AddressViewForm {
 		if ( !(input instanceof NodeInput)) 
 			throw new PartInitException("Invalid editor input"); 
 		
-		node = ((NodeInput) input).getNode();
+		Node node = ((NodeInput) input).getNode();
 		Assert.notNull(node, "Null editor input");
 
 		if (node instanceof SiteAdapter) {
-			SiteAdapter siteNode = (SiteAdapter) node;
-			site = siteNode.getSite();
+			siteAdapter = (SiteAdapter) node;
+			site = siteAdapter.getSite();
 			address = site.getAddress();
 			setPartName("Site " + site.getName());
 		}
@@ -113,13 +114,11 @@ public class SiteViewForm extends AddressViewForm {
 		edit.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				getSite().getPage().closeEditor(SiteViewForm.this, false);
-				
-				NodeInput input = new NodeInput(node);
-				
 				try {
-					getSite().getPage().openEditor(input, SiteEntryForm.ID, true);
-				} 
-				catch (PartInitException exp) {
+					getSite().getPage().openEditor(new NodeInput(siteAdapter), 
+							SiteEntryForm.ID, true);
+				}
+				catch (Exception exp) {
 					// handle error
 					exp.printStackTrace();				
 				}
@@ -128,12 +127,14 @@ public class SiteViewForm extends AddressViewForm {
 
 		final Button study = toolkit.createButton(sbody, "Add Study", SWT.PUSH);
 		study.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				IHandlerService handlerService = (IHandlerService) PlatformUI.getWorkbench()
-					.getService(IHandlerService.class);
-				
+			public void widgetSelected(SelectionEvent e) {				
 				try {
-					handlerService.executeCommand(StudyAddHandler.ID, null);
+					Study study = new Study();
+					Node studiesNode = siteAdapter.getStudiesGroupNode();
+					StudyAdapter studyAdapter = new StudyAdapter(studiesNode, study);
+					studiesNode.addChild(studyAdapter);
+					getSite().getPage().openEditor(new NodeInput(studyAdapter), 
+							StudyEntryForm.ID, true);
 				} 
 				catch (Exception exp) {
 					// handle error
@@ -146,14 +147,15 @@ public class SiteViewForm extends AddressViewForm {
 		clinic.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				try {
-					SiteAdapter siteNode = (SiteAdapter) node;
 					Clinic clinic = new Clinic();
 					clinic.setAddress(new Address());
-					ClinicAdapter clinicNode = new ClinicAdapter(siteNode.getClinicGroupNode(), clinic);
-					siteNode.getClinicGroupNode().addChild(clinicNode);
-					getSite().getPage().openEditor(new NodeInput(clinicNode), ClinicEntryForm.ID, true);
+					Node clinicsNode = siteAdapter.getClinicGroupNode();
+					ClinicAdapter clinicAdapter = new ClinicAdapter(clinicsNode, clinic);
+					clinicsNode.addChild(clinicAdapter);
+					getSite().getPage().openEditor(new NodeInput(clinicAdapter), 
+							ClinicEntryForm.ID, true);
 				} 
-				catch (PartInitException exp) {
+				catch (Exception exp) {
 					// handle error
 					exp.printStackTrace();				
 				}

@@ -51,17 +51,17 @@
       <command
             defaultHandler="edu.ualberta.med.biobank.handler.SiteAddHandler"
             id="edu.ualberta.med.biobank.commands.addSite"
-            name="AddSite">
+            name="Add Site">
       </command>
       <command
             defaultHandler="edu.ualberta.med.biobank.handler.StudyAddHandler"
-            id="edu.ualberta.med.biobank.commands.addSite"
+            id="edu.ualberta.med.biobank.commands.addStudy"
             name="Add Study">
-         <commandParameter
-               id="edu.ualberta.med.biobank.commandsParameter.site"
-               name="%commandParameter.siteAdapter"
-               optional="true">
-         </commandParameter>
+      </command>
+      <command
+            defaultHandler="edu.ualberta.med.biobank.handler.ClinicAddHandler"
+            id="edu.ualberta.med.biobank.commands.addClinic"
+            name="Add Clinic">
       </command>
    </extension>
    <extension
@@ -183,11 +183,5 @@
             id="org.eclipse.ui.examples.contributions.scheme"
             name="%scheme.info.name">
       </scheme>
-      <key
-            commandId="org.eclipse.ui.file.save"
-            contextId="org.eclipse.ui.contexts.window"
-            schemeId="org.eclipse.ui.examples.contributions.scheme"
-            sequence="CTRL+S">
-      </key>
    </extension>
 </plugin>

@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.forms;
 
 import java.lang.reflect.Constructor;
 import java.util.HashMap;
+import java.util.List;
 
 import org.eclipse.core.databinding.AggregateValidationStatus;
 import org.eclipse.core.databinding.DataBindingContext;
@@ -19,6 +20,7 @@ import org.eclipse.jface.databinding.swt.SWTObservables;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.fieldassist.ControlDecoration;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -29,16 +31,23 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.ISaveablePart;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.Form;
 import org.eclipse.ui.forms.widgets.FormToolkit;
+import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.part.EditorPart;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.helpers.StudyEntryHelper;
+import edu.ualberta.med.biobank.model.Clinic;
+import edu.ualberta.med.biobank.model.SdataType;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.SessionAdapter;
@@ -78,9 +87,15 @@ public class StudyEntryForm extends EditorPart {
 	
 	private Form form;
 	
-	private Node node;
+	private org.eclipse.swt.widgets.List clinicsList;
+	
+	private org.eclipse.swt.widgets.List selClinicsList;
+	
+	private StudyAdapter studyAdapter;
 	
 	private Study study;
+	
+	private List<Clinic> allClinics;
 	
 	private Button submit;
 	
@@ -123,15 +138,15 @@ public class StudyEntryForm extends EditorPart {
 		setInput(input);
 		setDirty(false);
 		
-		node = ((NodeInput) input).getNode();
+		Node node = ((NodeInput) input).getNode();
 		Assert.isNotNull(node, "Null editor input");
 		
 		Assert.isTrue((node instanceof StudyAdapter), 
 				"Invalid editor input: object of type "
 				+ node.getClass().getName());
 		
-		StudyAdapter studyNode = (StudyAdapter) node;
-		study = studyNode.getStudy();
+		studyAdapter = (StudyAdapter) node;
+		study = studyAdapter.getStudy();
 		
 		if (study.getId() == null) {
 			setPartName("New Study");
@@ -210,6 +225,37 @@ public class StudyEntryForm extends EditorPart {
 			}
 		}
 
+		Section section = toolkit.createSection(form.getBody(), Section.TITLE_BAR);
+		section.setText("Clinics");
+		section.setFont(FormUtils.getSectionFont());
+		section.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		sbody = toolkit.createComposite(section);
+		section.setClient(sbody);
+		layout = new GridLayout(2, false);
+		layout.horizontalSpacing = 10;
+		sbody.setLayout(layout);
+		sbody.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		
+		Label label = toolkit.createLabel(sbody, "Selected Clinics");
+		label.setFont(FormUtils.getSectionFont());
+		label = toolkit.createLabel(sbody, "Available Clinics");
+		label.setFont(FormUtils.getSectionFont());
+		
+		selClinicsList = new org.eclipse.swt.widgets.List(sbody, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
+		//clinicsList.setBounds (0, 0, 100, 100);
+		selClinicsList.setData(FormToolkit.KEY_DRAW_BORDER, FormToolkit.TEXT_BORDER);
+		selClinicsList.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		toolkit.adapt(selClinicsList, true, true);
+		
+		clinicsList = new org.eclipse.swt.widgets.List(sbody, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
+		clinicsList.setData(FormToolkit.KEY_DRAW_BORDER, FormToolkit.TEXT_BORDER);
+		GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
+		gd.heightHint = 100;
+		clinicsList.setLayoutData(gd);
+		toolkit.adapt(clinicsList, true, true);
+		
+		toolkit.paintBordersFor(sbody);
+
 		sbody = toolkit.createComposite(form.getBody());
 		layout = new GridLayout();
 		layout = new GridLayout(2, false);
@@ -226,6 +272,12 @@ public class StudyEntryForm extends EditorPart {
 		});
 		
 		bindValues();
+		
+		BusyIndicator.showWhile(
+				PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+				.getShell().getDisplay(),
+				new StudyEntryHelper(this)
+		);
 	}
 	
     private void bindValues() {
@@ -292,7 +344,7 @@ public class StudyEntryForm extends EditorPart {
     }
     
     private void saveSettings() {
-		Node sessionNode = node.getParent().getParent().getParent();
+		Node sessionNode = studyAdapter.getParent().getParent().getParent();
 		Assert.isTrue(sessionNode instanceof SessionAdapter, 
 				"Invalid node type for session: " + sessionNode.getClass().getName());
 
@@ -315,6 +367,36 @@ public class StudyEntryForm extends EditorPart {
 	@Override
 	public void setFocus() {
 		form.setFocus();
+	}
+	
+	public Study getStudy() {
+		return study;
+	}
+	
+	public SessionAdapter getSessionAdapter() {
+		SessionAdapter sessionAdapter = null;
+		
+		int sessions = BioBankPlugin.getDefault().getSessionCount();
+		if (sessions == 1) {
+			sessionAdapter = BioBankPlugin.getDefault().getSessionNode(0);
+		}
+		else {
+			Assert.isTrue(false, "not implemented yet");
+		}
+		return sessionAdapter;
+	}
+	
+	/* called by helper - helper is a runnable */
+	public void helperResult(final List<SdataType> sdataTypes, 
+			final List<Clinic> allClinics) {
+		Display.getDefault().asyncExec(new Runnable() {
+			public void run() {
+				StudyEntryForm.this.allClinics = allClinics;
+
+				for (Clinic clinic : allClinics)
+					clinicsList.add(clinic.getName());
+			}
+		});
 	}
 
 }
