@@ -1,9 +1,11 @@
 package edu.ualberta.med.biobank.treeview;
 
-import java.util.ArrayList;
-import java.util.List;
+import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 import org.eclipse.core.runtime.Assert;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class Node {
 	
@@ -65,9 +67,14 @@ public class Node {
 		return children;
 	}
 	
-	public Node getChild(int i) {
-		Assert.isTrue(i < children.size(), "Invalid index: " + i);
-		return children.get(i);
+	public Node getChild(int id) {
+		if (children.size() == 0) return null;
+		
+		for (Node child : children) {
+			if (child.getId() == id) return child;	
+		}	
+		Assert.isTrue(false, "Invalid child id: " + id);
+		return null;
 	}
 	
 	public void addChild(Node child) {	
@@ -145,5 +152,10 @@ public class Node {
 
 	public boolean hasChildren() {
 		return hasChildren;
+	}
+	
+	public WritableApplicationService getAppService() {
+		Assert.isNotNull(parent, "parent is null");
+		return parent.getAppService();
 	}
 }

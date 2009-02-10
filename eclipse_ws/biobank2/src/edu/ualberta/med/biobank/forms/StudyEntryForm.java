@@ -36,19 +36,19 @@ import org.eclipse.ui.ISaveablePart;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.forms.widgets.Form;
 import org.eclipse.ui.forms.widgets.FormToolkit;
-import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.part.EditorPart;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.Node;
-import edu.ualberta.med.biobank.treeview.SiteAdapter;
+import edu.ualberta.med.biobank.treeview.SessionAdapter;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
+import edu.ualberta.med.biobank.validators.NonEmptyString;
 
 @SuppressWarnings("serial")
 public class StudyEntryForm extends EditorPart {
 	public static final String ID =
-	      "edu.ualberta.med.biobank.forms.StudyViewForm";
+	      "edu.ualberta.med.biobank.forms.StudyEntryForm";
 	
 	private static final String NEW_STUDY_OK_MESSAGE 
 		= "Create a new study.";
@@ -56,13 +56,15 @@ public class StudyEntryForm extends EditorPart {
 
 	public static final String[]  ORDERED_FIELDS = new String[] {
 		"name",
-		"shortName"
+		"nameShort"
 	};
 	
 	public static final HashMap<String, FieldInfo> FIELDS = 
 		new HashMap<String, FieldInfo>() {{
-			put("name", new FieldInfo("Name", Text.class,  null,  null));
-			put("shortName", new FieldInfo("Short Name", Text.class,  null,  null));
+			put("name", new FieldInfo("Name", Text.class,  
+					NonEmptyString.class, "Study name cannot be blank"));
+			put("nameShort", new FieldInfo("Short Name", Text.class,  
+					NonEmptyString.class, "Study short name cannot be blank"));
 		}
 	};
 	
@@ -124,7 +126,7 @@ public class StudyEntryForm extends EditorPart {
 		node = ((NodeInput) input).getNode();
 		Assert.isNotNull(node, "Null editor input");
 		
-		Assert.isTrue((node instanceof SiteAdapter), 
+		Assert.isTrue((node instanceof StudyAdapter), 
 				"Invalid editor input: object of type "
 				+ node.getClass().getName());
 		
@@ -155,7 +157,7 @@ public class StudyEntryForm extends EditorPart {
 	}
 
 	@Override
-	public void createPartControl(Composite parent) {		
+	public void createPartControl(Composite parent) {
 		toolkit = new FormToolkit(parent.getDisplay());
 		form = toolkit.createForm(parent);	
 		
@@ -163,22 +165,18 @@ public class StudyEntryForm extends EditorPart {
 		toolkit.decorateFormHeading(form);
 		form.setMessage(getOkMessage());
 		
-		GridLayout layout = new GridLayout(2, false);
+		GridLayout layout = new GridLayout(1, false);
 		form.getBody().setLayout(layout);
 		
-		Section section = toolkit.createSection(form.getBody(), Section.TITLE_BAR);
-		section.setText("Address");
-		section.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		Composite sbody = toolkit.createComposite(section);
-		section.setClient(sbody);
-		layout = new GridLayout();
+		Composite sbody = toolkit.createComposite(form.getBody());
+		layout = new GridLayout(2, false);
 		layout.horizontalSpacing = 10;
-		layout.numColumns = 2;
 		sbody.setLayout(layout);
+		sbody.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		toolkit.paintBordersFor(sbody);
 		
-		for (String key : AddressFieldsConstants.ORDERED_FIELDS) {
-			FieldInfo fi = AddressFieldsConstants.FIELDS.get(key);
+		for (String key : ORDERED_FIELDS) {
+			FieldInfo fi = FIELDS.get(key);
 			
 			if (fi.widgetClass == Text.class) {
 				Text text = FormUtils.createLabelledText(toolkit, 
@@ -214,9 +212,10 @@ public class StudyEntryForm extends EditorPart {
 
 		sbody = toolkit.createComposite(form.getBody());
 		layout = new GridLayout();
+		layout = new GridLayout(2, false);
 		layout.horizontalSpacing = 10;
-		layout.numColumns = 2;
 		sbody.setLayout(layout);
+		sbody.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		toolkit.paintBordersFor(sbody);
 
 		submit = toolkit.createButton(sbody, "Submit", SWT.PUSH);
@@ -231,8 +230,8 @@ public class StudyEntryForm extends EditorPart {
 	
     private void bindValues() {
     	DataBindingContext dbc = new DataBindingContext();
-		for (String key : AddressFieldsConstants.FIELDS.keySet()) {
-			FieldInfo fi = AddressFieldsConstants.FIELDS.get(key);
+		for (String key : FIELDS.keySet()) {
+			FieldInfo fi = FIELDS.get(key);
 			UpdateValueStrategy uvs = null;
 
 			if (fi.widgetClass == Text.class) {				
@@ -293,14 +292,11 @@ public class StudyEntryForm extends EditorPart {
     }
     
     private void saveSettings() {
-		String sessionName;
-		
-		if (node instanceof StudyAdapter) {
-			sessionName = node.getParent().getParent().getName();
-		}
-		else {
-			sessionName = node.getParent().getName();
-		}
+		Node sessionNode = node.getParent().getParent().getParent();
+		Assert.isTrue(sessionNode instanceof SessionAdapter, 
+				"Invalid node type for session: " + sessionNode.getClass().getName());
+
+		String sessionName = ((SessionAdapter) sessionNode).getName();
 		
 		try {
 			if (study.getId() == null) {

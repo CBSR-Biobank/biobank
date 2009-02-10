@@ -14,6 +14,7 @@ public class StudyAdapter extends Node {
 
 	public void setStudy(Study study) {
 		this.study = study;
+		this.study.setName("");
 	}
 
 	public Study getStudy() {
@@ -31,7 +32,7 @@ public class StudyAdapter extends Node {
 	@Override
 	public String getName() {
 		Assert.isNotNull(study, "study is null");
-		Object o = (Object) study.getId();
+		Object o = (Object) study.getName();
 		if (o == null) return null;
 		return study.getName();
 	}

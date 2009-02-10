@@ -4,6 +4,7 @@ import org.eclipse.jface.fieldassist.ControlDecoration;
 import org.eclipse.jface.fieldassist.FieldDecoration;
 import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
@@ -39,5 +40,9 @@ public class FormUtils {
 			+ fieldDecoration.getImage().getBounds().width;		
 		return controlDecoration;
 	}
+    
+    public static Font getSectionFont() {
+    	return new Font (null, "sans-serif", 9, SWT.BOLD);
+    }
 
 }

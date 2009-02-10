@@ -3,7 +3,6 @@ package edu.ualberta.med.biobank.handler;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.commands.IHandler;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.ui.handlers.HandlerUtil;
 
@@ -15,7 +14,7 @@ import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.treeview.SessionAdapter;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 
-public class SiteAddHandler extends AbstractHandler implements IHandler {
+public class SiteAddHandler extends AbstractHandler {
 
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		int numSessions = BioBankPlugin.getDefault().getSessionCount();

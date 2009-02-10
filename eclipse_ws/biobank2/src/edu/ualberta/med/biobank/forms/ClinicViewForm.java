@@ -89,6 +89,7 @@ public class ClinicViewForm  extends AddressViewForm {
 		Section section = toolkit.createSection(form.getBody(),  
 				ExpandableComposite.TITLE_BAR | ExpandableComposite.TWISTIE);
 		section.setText("Address");
+		section.setFont(FormUtils.getSectionFont());
 		section.setLayout(new GridLayout(1, false));
 		section.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));		
 		Composite sbody = toolkit.createComposite(section);
@@ -103,6 +104,7 @@ public class ClinicViewForm  extends AddressViewForm {
 				ExpandableComposite.TITLE_BAR | ExpandableComposite.TWISTIE
 				| ExpandableComposite.EXPANDED);
 		section.setText("Associated Studies");
+		section.setFont(FormUtils.getSectionFont());
 		section.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		sbody = toolkit.createComposite(section);
 		sbody.setLayout(new GridLayout(4, false));

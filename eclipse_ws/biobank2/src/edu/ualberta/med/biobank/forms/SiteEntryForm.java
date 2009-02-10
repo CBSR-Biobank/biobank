@@ -21,6 +21,7 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
@@ -102,6 +103,7 @@ public class SiteEntryForm extends AddressEntryForm {
 				ExpandableComposite.TITLE_BAR
 				| ExpandableComposite.EXPANDED);
 		section.setText("Site");
+		section.setFont(FormUtils.getSectionFont());
 		Composite sbody = toolkit.createComposite(section);
 		section.setClient(sbody);
 		section.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -138,7 +140,8 @@ public class SiteEntryForm extends AddressEntryForm {
 		submit = toolkit.createButton(sbody, "Submit", SWT.PUSH);
 		submit.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				saveSettings();
+				PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+					.getActivePage().saveEditor(SiteEntryForm.this, false);
 			}
 		});
 		

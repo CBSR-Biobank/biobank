@@ -53,6 +53,16 @@
             id="edu.ualberta.med.biobank.commands.addSite"
             name="AddSite">
       </command>
+      <command
+            defaultHandler="edu.ualberta.med.biobank.handler.StudyAddHandler"
+            id="edu.ualberta.med.biobank.commands.addSite"
+            name="Add Study">
+         <commandParameter
+               id="edu.ualberta.med.biobank.commandsParameter.site"
+               name="%commandParameter.siteAdapter"
+               optional="true">
+         </commandParameter>
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.menus">
@@ -159,6 +169,12 @@
             default="false"
             id="edu.ualberta.med.biobank.forms.ClinicViewForm"
             name="Clinic View">
+      </editor>
+      <editor
+            class="edu.ualberta.med.biobank.forms.StudyEntryForm"
+            default="false"
+            id="edu.ualberta.med.biobank.forms.StudyEntryForm"
+            name="Study Entry">
       </editor>
    </extension>
    <extension

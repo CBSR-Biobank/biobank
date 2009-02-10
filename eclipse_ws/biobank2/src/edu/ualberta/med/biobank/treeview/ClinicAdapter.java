@@ -15,6 +15,7 @@ public class ClinicAdapter extends Node {
 
 	public void setClinic(Clinic clinic) {
 		this.clinic = clinic;
+		this.clinic.setName("");
 	}
 
 	public Clinic getClinic() {
@@ -36,7 +37,7 @@ public class ClinicAdapter extends Node {
 	@Override
 	public String getName() {
 		Assert.isNotNull(clinic, "Clinic is null");
-		Object o = (Object) clinic.getId();
+		Object o = (Object) clinic.getName();
 		if (o == null) return null;
 		return clinic.getName();
 	}

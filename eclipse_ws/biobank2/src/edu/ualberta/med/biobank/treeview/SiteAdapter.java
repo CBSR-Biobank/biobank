@@ -20,6 +20,7 @@ public class SiteAdapter extends Node {
 
 	public void setSite(Site site) {
 		this.site = site;
+		this.site.setName("");
 	}
 
 	public Site getSite() {
@@ -43,7 +44,7 @@ public class SiteAdapter extends Node {
 
 	@Override
 	public String getName() {
-		Object o = (Object) site.getId();
+		Object o = (Object) site.getName();
 		if (o == null) return null;
 		return site.getName();
 	}

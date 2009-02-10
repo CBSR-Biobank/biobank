@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.forms;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPersistableElement;
@@ -7,21 +8,22 @@ import org.eclipse.ui.IPersistableElement;
 import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.ClinicAdapter;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
+import edu.ualberta.med.biobank.treeview.StudyAdapter;
 
 public class NodeInput implements IEditorInput {
-	private Node wsObject;
+	private Node node;
 
 	public NodeInput(Node o) {
-		wsObject = o;
+		node = o;
 	}
 
 	public int getIndex() {
-		if (wsObject != null) return wsObject.getId();
+		if (node != null) return node.getId();
 		return 0;
 	}
 	
 	public Node getNode() {
-		return wsObject;
+		return node;
 	}
 
 	/*
@@ -48,15 +50,21 @@ public class NodeInput implements IEditorInput {
 	 * @see org.eclipse.ui.IEditorInput#getName()
 	 */
 	public String getName() {
-		if (wsObject != null) { 
-			String name = wsObject.getName();
+		if (node != null) { 
+			String name = node.getName();
 			if (name != null) {
-				if (wsObject instanceof SiteAdapter) return "Site " + name;
-				if (wsObject instanceof ClinicAdapter) return "Clinic " + name;
+				if (node instanceof SiteAdapter) return "Site " + name;
+				else if (node instanceof StudyAdapter) return "Study " + name;
+				else if (node instanceof ClinicAdapter) return "Clinic " + name;
+				else Assert.isTrue(false, "tooltip name for "
+						+ node.getClass().getName() + " not implemented");
 			}
 			else {
-				if (wsObject instanceof SiteAdapter) return "New Site";
-				if (wsObject instanceof ClinicAdapter) return "New Clinic";
+				if (node instanceof SiteAdapter) return "New Site";
+				else if (node instanceof StudyAdapter) return "New Study";
+				else if (node instanceof ClinicAdapter) return "New Clinic";
+				else Assert.isTrue(false, "tooltip name for "
+						+ node.getClass().getName() + " not implemented");
 			}
 		}
 		return null;
@@ -100,10 +108,10 @@ public class NodeInput implements IEditorInput {
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
 	public boolean equals(Object o) {
-		if (wsObject == null) return false;
+		if (node == null) return false;
 		
 		if (o instanceof NodeInput) {
-			if (wsObject.getClass() != ((NodeInput)o).wsObject.getClass()) return false;
+			if (node.getClass() != ((NodeInput)o).node.getClass()) return false;
 		
 			return (getIndex() == ((NodeInput)o).getIndex()); 
 		}

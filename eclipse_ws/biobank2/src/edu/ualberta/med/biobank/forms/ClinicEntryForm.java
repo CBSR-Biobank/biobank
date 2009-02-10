@@ -100,6 +100,7 @@ public class ClinicEntryForm extends AddressEntryForm {
 				ExpandableComposite.TITLE_BAR
 				| ExpandableComposite.EXPANDED);
 		section.setText("Site");
+		section.setFont(FormUtils.getSectionFont());
 		Composite sbody = toolkit.createComposite(section);
 		section.setClient(sbody);
 		section.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
