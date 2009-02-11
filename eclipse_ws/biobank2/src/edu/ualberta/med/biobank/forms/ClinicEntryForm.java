@@ -3,11 +3,13 @@ package edu.ualberta.med.biobank.forms;
 import org.eclipse.core.databinding.DataBindingContext;
 import org.eclipse.core.databinding.UpdateValueStrategy;
 import org.eclipse.core.databinding.beans.PojoObservables;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.databinding.swt.SWTObservables;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.fieldassist.ControlDecoration;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
@@ -19,12 +21,13 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
 import org.springframework.util.Assert;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.helpers.ClinicSaveHelper;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.ClinicAdapter;
@@ -39,7 +42,7 @@ public class ClinicEntryForm extends AddressEntryForm {
 	private static final String CLINIC_OK_MESSAGE = "Clinic information.";
 	private static final String NO_CLINIC_NAME_MESSAGE = "Clinic must have a name";
 	
-	private Node node;
+	private ClinicAdapter clinicAdapter;
 	
 	private Clinic clinic;
 	
@@ -53,16 +56,16 @@ public class ClinicEntryForm extends AddressEntryForm {
 		if ( !(input instanceof NodeInput)) 
 			throw new PartInitException("Invalid editor input");
 		
-		node = ((NodeInput) input).getNode();
+		Node node = ((NodeInput) input).getNode();
 		Assert.notNull(node, "Null editor input");
 
 		Assert.isTrue((node instanceof ClinicAdapter), 
 				"Invalid editor input: object of type "
 				+ node.getClass().getName());
 
-		ClinicAdapter clinicNode = (ClinicAdapter) node;
-		clinic = clinicNode.getClinic();
-		SiteAdapter siteNode = (SiteAdapter) clinicNode.getParent().getParent();
+		clinicAdapter = (ClinicAdapter) node;
+		clinic = clinicAdapter.getClinic();
+		SiteAdapter siteNode = (SiteAdapter) clinicAdapter.getParent().getParent();
 		clinic.setSite(siteNode.getSite());
 		address = clinic.getAddress();
 		
@@ -127,25 +130,10 @@ public class ClinicEntryForm extends AddressEntryForm {
 		submit = toolkit.createButton(sbody, "Submit", SWT.PUSH);
 		submit.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				clinic.setAddress(address);
-				String sessionName;
-				
-				if (node instanceof ClinicAdapter) {
-					sessionName = node.getParent().getParent().getParent().getName();
-				}
-				else {
-					sessionName = node.getParent().getParent().getName();
-				}
-				
-				try {
-					BioBankPlugin.getDefault().createObject(sessionName, clinic);
-				}
-				catch (Exception exp) {
-					exp.printStackTrace();
-				}
-				getSite().getPage().closeEditor(ClinicEntryForm.this, false);
+				PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+				.getActivePage().saveEditor(ClinicEntryForm.this, false);
 			}
-		});
+		});		
 		
 		bindValues();
 		
@@ -179,5 +167,26 @@ public class ClinicEntryForm extends AddressEntryForm {
 	@Override
 	public void setFocus() {
 		form.setFocus();
+	}
+
+	@Override
+	public void doSave(IProgressMonitor monitor) {
+		setDirty(false);
+		saveSettings();
+	}
+	
+	public void saveSettings() {
+		clinic.setAddress(address);
+		
+		ClinicSaveHelper helper = new ClinicSaveHelper(
+				clinicAdapter.getAppService(), clinic);
+		
+		BusyIndicator.showWhile(
+				PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+				.getShell().getDisplay(), helper);
+		
+		clinic = helper.getResult();
+		
+		getSite().getPage().closeEditor(ClinicEntryForm.this, false);
 	}
 }

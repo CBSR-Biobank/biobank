@@ -31,7 +31,6 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
@@ -44,7 +43,7 @@ import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.part.EditorPart;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
-import edu.ualberta.med.biobank.helpers.StudyEntryHelper;
+import edu.ualberta.med.biobank.helpers.StudyInformationHelper;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.SdataType;
 import edu.ualberta.med.biobank.model.Study;
@@ -94,6 +93,8 @@ public class StudyEntryForm extends EditorPart {
 	private Study study;
 	
 	private List<Clinic> allClinics;
+	
+	private List<SdataType> sdataTypes;
 	
 	private Button submit;
 	
@@ -252,11 +253,18 @@ public class StudyEntryForm extends EditorPart {
 		
 		bindValues();
 		
+		StudyInformationHelper helper = new StudyInformationHelper(
+				studyAdapter.getAppService(), study);
+		
 		BusyIndicator.showWhile(
 				PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-				.getShell().getDisplay(),
-				new StudyEntryHelper(this)
-		);
+				.getShell().getDisplay(), helper);
+		
+		allClinics = helper.getAllClinics();
+		sdataTypes = helper.getSdataTypes();
+		
+		for (Clinic clinic : allClinics)
+			clinicsMultiSelect.addAvailable(clinic.getName());
 	}
 	
     private void bindValues() {
@@ -364,18 +372,4 @@ public class StudyEntryForm extends EditorPart {
 		}
 		return sessionAdapter;
 	}
-	
-	/* called by helper - helper is a runnable */
-	public void helperResult(final List<SdataType> sdataTypes, 
-			final List<Clinic> allClinics) {
-		Display.getDefault().asyncExec(new Runnable() {
-			public void run() {
-				StudyEntryForm.this.allClinics = allClinics;
-
-				for (Clinic clinic : allClinics)
-					clinicsMultiSelect.addAvailable(clinic.getName());
-			}
-		});
-	}
-
 }

@@ -26,14 +26,12 @@ import org.springframework.remoting.RemoteAccessException;
 import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
-import edu.ualberta.med.biobank.SessionCredentials;
 import edu.ualberta.med.biobank.forms.ClinicViewForm;
 import edu.ualberta.med.biobank.forms.SiteViewForm;
 import edu.ualberta.med.biobank.forms.NodeInput;
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Clinic;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
-import gov.nih.nci.system.client.ApplicationServiceProvider;
 import gov.nih.nci.system.query.SDKQuery;
 import gov.nih.nci.system.query.SDKQueryResult;
 import gov.nih.nci.system.query.example.InsertExampleQuery;
@@ -104,7 +102,7 @@ public class SessionsView extends ViewPart {
 	
 	public SessionsView() {
 		super();
-		BioBankPlugin.getDefault().setSessionView(this);
+		BioBankPlugin.getDefault().setSessionsView(this);
 		rootNode = new Node(null, 1, "root");
 		sessions = new  HashMap<String, SessionAdapter>();
 	}
@@ -125,64 +123,8 @@ public class SessionsView extends ViewPart {
 	public void setFocus() {
 	}
 	
-	public void createSession(final SessionCredentials sc) {
-		Job job = new Job("logging in") {
-			protected IStatus run(IProgressMonitor monitor) {
-				
-				monitor.beginTask("Logging in ... ", 100);					
-				try {
-					final WritableApplicationService appService;
-					final String userName = sc.getUserName(); 
-					final String url = "http://" + sc.getServer() + "/biobank2";
-					
-					if (userName.length() == 0) {
-						appService =  (WritableApplicationService) 
-						ApplicationServiceProvider.getApplicationServiceFromUrl(url);
-					}
-					else {
-						appService = (WritableApplicationService) 
-						ApplicationServiceProvider.getApplicationServiceFromUrl(url, userName, sc.getPassword());
-					}	
-
-					Site site = new Site();		
-					final List<Object> sites = appService.search(Site.class, site);
-					
-					Display.getDefault().asyncExec(new Runnable() {
-				          public void run() {
-				        	  addSession(appService, sc.getServer(), sites);
-				          }
-					});
-				}
-				catch (final RemoteConnectFailureException exp) {
-					Display.getDefault().asyncExec(new Runnable() {
-						public void run() {
-							MessageDialog.openError(
-									PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), 
-									"Connection Attempt Failed", 
-									"Could not connect to server. Make sure server is running.");
-						}
-					});
-				}
-				catch (final Exception exp) {	
-					exp.printStackTrace();
-					
-					Display.getDefault().asyncExec(new Runnable() {
-						public void run() {
-							MessageDialog.openError(
-									PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), 
-									"Login Failed", exp.getMessage());
-						}
-					});
-				}
-				return Status.OK_STATUS;
-			}
-		};
-		job.setUser(false);
-		job.schedule();
-	}
-	
 	public void addSession(final WritableApplicationService appService, String name, 
-			List<Object> sites) {
+			List<Site> sites) {
 		int id = sessions.size();
 		final SessionAdapter sessionNode = new SessionAdapter(rootNode, appService, id, name);
 		sessions.put(name, sessionNode);
@@ -336,18 +278,7 @@ public class SessionsView extends ViewPart {
 						site.setAddress((Address) result.getObjectResult());
 						query = new InsertExampleQuery(site);	
 						appService.executeQuery(query);
-					}					
-					else if (o instanceof Clinic) {
-						Clinic clinic = (Clinic) o;
-						Assert.isTrue(clinic.getId() == null, "insert invoked on site already in database");
-						Assert.isTrue(clinic.getAddress().getId() == null, "insert invoked on address already in database");
-						
-						query = new InsertExampleQuery(clinic.getAddress());					
-						result = appService.executeQuery(query);
-						clinic.setAddress((Address) result.getObjectResult());
-						query = new InsertExampleQuery(clinic);	
-						appService.executeQuery(query);
-					}
+					}	
 					else {
 						Assert.isTrue(false, "creating of objects of type " 
 								+ o.getClass().getName() + " not supported yet");

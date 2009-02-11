@@ -2,7 +2,6 @@ package edu.ualberta.med.biobank.helpers;
 
 import java.util.List;
 
-import edu.ualberta.med.biobank.forms.StudyEntryForm;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.SdataType;
 import edu.ualberta.med.biobank.model.Study;
@@ -13,20 +12,23 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
  * Returns the objects required by the form.
  *
  */
-public class StudyEntryHelper implements Runnable {
+public class StudyInformationHelper implements Runnable {
 	
-	StudyEntryForm form;
+	private WritableApplicationService appService;
 	
-	public StudyEntryHelper(StudyEntryForm form) {
-		this.form = form;
+	private Study study;
+	
+	private List<SdataType> sdataTypes = null;		
+	
+	private List<Clinic> allClinics = null;
+	
+	public StudyInformationHelper(WritableApplicationService appService, Study study) {
+		this.appService = appService;
+		this.study = study;
 	}
 
 	@Override
-	public void run() {		
-		List<SdataType> sdataTypes = null;		
-		List<Clinic> allClinics = null;
-		
-		WritableApplicationService appService = form.getSessionAdapter().getAppService();						
+	public void run() {
 		SdataType sdataType = new SdataType();
 		Clinic clinic = new Clinic();
 		try {
@@ -36,12 +38,16 @@ public class StudyEntryHelper implements Runnable {
 			e.printStackTrace();
 		}
 		
-		Study study = form.getStudy();
-		
 		if (study.getId() != null) {
 			study.getClinicCollection();
 		}
-		
-		form.helperResult(sdataTypes, allClinics);
+	}
+	
+	public List<SdataType> getSdataTypes() {
+		return sdataTypes;
+	}
+	
+	public List<Clinic> getAllClinics() {
+		return allClinics;
 	}
 }

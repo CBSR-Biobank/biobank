@@ -21,9 +21,9 @@ import org.osgi.service.prefs.Preferences;
 import org.osgi.service.prefs.BackingStoreException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
-import edu.ualberta.med.biobank.SessionCredentials;
 import edu.ualberta.med.biobank.helpers.SessionHelper;
 import edu.ualberta.med.biobank.rcp.Application;
+import edu.ualberta.med.biobank.views.SessionsView;
 
 public class LoginDialog extends TitleAreaDialog {
 	
@@ -173,16 +173,7 @@ public class LoginDialog extends TitleAreaDialog {
 				prefs.flush();
 			} catch (BackingStoreException e) {
 				e.printStackTrace();
-			}
-
-			
-			SessionCredentials sc = new SessionCredentials();			
-			
-			sc.setServer(serverText.getText());
-			sc.setUserName(userNameText.getText());
-			sc.setPassword(passwordText.getText());
-			
-			BioBankPlugin.getDefault().setSessionCredentials(sc);
+			}	
 		}
 		super.buttonPressed(buttonId);
 	}
@@ -198,14 +189,19 @@ public class LoginDialog extends TitleAreaDialog {
 			"User Name field must not be blank.");
 			return;
 		}
-		super.okPressed();	
+		
+		SessionHelper sessionHelper = new SessionHelper(serverText.getText(),
+				userNameText.getText(), passwordText.getText());
 		
 		BusyIndicator.showWhile(
 				PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-				.getShell().getDisplay(),
-				SessionHelper.createSession(serverText.getText(),
-						userNameText.getText(), passwordText.getText());
-		);
+				.getShell().getDisplay(), sessionHelper);
+		
+		SessionsView view = BioBankPlugin.getDefault().getSessionsView();
+		view.addSession(sessionHelper.getAppService(), serverText.getText(), 
+				sessionHelper.getSites());
+		
+		super.okPressed();	
 	}
 
 }

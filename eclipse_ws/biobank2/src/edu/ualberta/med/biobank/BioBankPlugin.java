@@ -1,8 +1,6 @@
 package edu.ualberta.med.biobank;
 
 import java.net.URL;
-import java.util.EventObject;
-
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
@@ -13,14 +11,11 @@ import org.osgi.framework.BundleContext;
 
 import edu.ualberta.med.biobank.treeview.SessionAdapter;
 import edu.ualberta.med.biobank.views.SessionsView;
-import edu.ualberta.med.biobank.webservice.Session;
-import edu.ualberta.med.biobank.webservice.ISessionListener;
-import edu.ualberta.med.biobank.webservice.LoginResultEvent;
 
 /**
  * The activator class controls the plug-in life cycle
  */
-public class BioBankPlugin extends AbstractUIPlugin implements ISessionListener {
+public class BioBankPlugin extends AbstractUIPlugin {
 	public static final String IMG_FORM_BG = "formBg";
 
 	// The plug-in ID
@@ -28,10 +23,6 @@ public class BioBankPlugin extends AbstractUIPlugin implements ISessionListener 
 
 	// The shared instance
 	private static BioBankPlugin plugin;
-	
-	private Session wsSession;
-	
-	private SessionCredentials sessionCredentials;
 	
 	private SessionsView sessionView;
 	
@@ -48,9 +39,6 @@ public class BioBankPlugin extends AbstractUIPlugin implements ISessionListener 
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
-		wsSession = new Session();
-		wsSession.addListener(this);
-		wsSession.start();
 	}
 	
 	protected void initializeImageRegistry(ImageRegistry registry) {
@@ -99,36 +87,12 @@ public class BioBankPlugin extends AbstractUIPlugin implements ISessionListener 
 		return imageDescriptorFromPlugin(PLUGIN_ID, path);
 	}
 	
-	public Session getWsSession() {
-		return wsSession;
-	}
-	
-	public void setSessionCredentials(SessionCredentials sc) {
-		sessionCredentials = sc;
-	}
-	
-	public SessionCredentials getSessionCredentials() {
-		return sessionCredentials;
-	}
- 	
-	public void createSession() {
-		sessionView.createSession(getSessionCredentials());
-	}
-
-	public void eventHappened(EventObject event) {
-		if (event instanceof LoginResultEvent) {
-			LoginResultEvent loginResult = (LoginResultEvent)event;
-			if (loginResult.getResult()) {		
-				System.out.println("login successfull");
-			}
-			else {	
-				System.out.println("login unsuccessfull");
-			}
-		}
-	}
-	
-	public void setSessionView(SessionsView sessionView) {
+	public void setSessionsView(SessionsView sessionView) {
 		this.sessionView = sessionView;
+	}
+	
+	public SessionsView getSessionsView() {
+		return sessionView;
 	}
 	
 	public int getSessionCount() {
@@ -142,7 +106,6 @@ public class BioBankPlugin extends AbstractUIPlugin implements ISessionListener 
 	public SessionAdapter getSessionNode(int count) {
 		return sessionView.getSessionNode(count);
 	}
-
 
 	public String[] getSessionNames() {
 		return sessionView.getSessionNames();

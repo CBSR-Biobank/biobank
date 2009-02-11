@@ -1,7 +1,5 @@
 package edu.ualberta.med.biobank.forms;
 
-import org.eclipse.core.commands.Command;
-import org.eclipse.core.commands.IParameter;
 import org.eclipse.core.databinding.DataBindingContext;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.swt.SWT;
@@ -15,14 +13,9 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.commands.ICommandService;
 import org.eclipse.ui.forms.widgets.FormToolkit;
-import org.eclipse.ui.handlers.IHandlerService;
 import org.springframework.util.Assert;
 
-import edu.ualberta.med.biobank.handler.ClinicAddHandler;
-import edu.ualberta.med.biobank.handler.StudyAddHandler;
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Site;
