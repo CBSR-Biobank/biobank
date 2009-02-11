@@ -229,7 +229,8 @@ public class StudyEntryForm extends EditorPart {
 		section.setFont(FormUtils.getSectionFont());
 		section.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		
-		clinicsMultiSelect = new MultiSelect(section, SWT.NONE, 100);
+		clinicsMultiSelect = new MultiSelect(section, SWT.NONE, 
+				"Selected Clinics", "Available Clinics", 100);
 		section.setClient(clinicsMultiSelect);
 		clinicsMultiSelect.adaptToToolkit(toolkit);
 		

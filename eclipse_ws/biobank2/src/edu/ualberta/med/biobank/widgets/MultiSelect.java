@@ -17,7 +17,8 @@ public class MultiSelect extends Composite {
 	
 	private List availList;
 
-	public MultiSelect(Composite parent, int style, int minHeight) {
+	public MultiSelect(Composite parent, int style, String leftLabel, 
+			String rightLabel, int minHeight) {
 		super(parent, style);
 		
 		setLayout(new GridLayout(3, false));
@@ -50,13 +51,13 @@ public class MultiSelect extends Composite {
 		availList.setLayoutData(gd);
 		
 		Label label = new Label(this, SWT.NONE);
-		label.setText("Selected Clinics");
+		label.setText(leftLabel);
 		label.setFont(FormUtils.getSectionFont());
 		gd = new GridData(SWT.FILL, SWT.FILL, true, true);
 		gd.horizontalSpan = 2;
 		label.setLayoutData(gd);
 		label = new Label(this, SWT.NONE);
-		label.setText("Available Clinics");
+		label.setText(rightLabel);
 		label.setFont(FormUtils.getSectionFont());
 	}
 
