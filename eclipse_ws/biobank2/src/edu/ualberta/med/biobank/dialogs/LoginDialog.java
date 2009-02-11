@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.dialogs;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Combo;
@@ -10,6 +11,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.core.runtime.preferences.ConfigurationScope;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -20,6 +22,7 @@ import org.osgi.service.prefs.BackingStoreException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionCredentials;
+import edu.ualberta.med.biobank.helpers.SessionHelper;
 import edu.ualberta.med.biobank.rcp.Application;
 
 public class LoginDialog extends TitleAreaDialog {
@@ -195,7 +198,14 @@ public class LoginDialog extends TitleAreaDialog {
 			"User Name field must not be blank.");
 			return;
 		}
-		super.okPressed();
+		super.okPressed();	
+		
+		BusyIndicator.showWhile(
+				PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+				.getShell().getDisplay(),
+				SessionHelper.createSession(serverText.getText(),
+						userNameText.getText(), passwordText.getText());
+		);
 	}
 
 }
