@@ -1,6 +1,8 @@
 package edu.ualberta.med.biobank;
 
 import java.net.URL;
+
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
@@ -99,23 +101,21 @@ public class BioBankPlugin extends AbstractUIPlugin {
 		return sessionView.getSessionCount(); 
 	}
 	
-	public SessionAdapter getSessionNode(String sessionName) {
-		return sessionView.getSessionNode(sessionName);
+	public SessionAdapter getSessionAdapter(String sessionName) {
+		return sessionView.getSessionAdapter(sessionName);
 	}
 	
-	public SessionAdapter getSessionNode(int count) {
-		return sessionView.getSessionNode(count);
+	public SessionAdapter getSessionAdapter(int count) {
+		return sessionView.getSessionAdapter(count);
 	}
 
 	public String[] getSessionNames() {
 		return sessionView.getSessionNames();
 	}
 	
-	public void createObject(final String sessionName, final Object o) throws Exception {
-		sessionView.createObject(sessionName, o);
-	}
-	
-	public void updateObject(final String sessionName, final Object o) throws Exception {
-		sessionView.updateObject(sessionName, o);
+	public SessionAdapter getSessionSingle() {
+		int count = sessionView.getSessionCount();
+		Assert.isTrue(count == 1, "No sessions or more than 1 session connected");
+		return sessionView.getSessionAdapter(0);
 	}
 }

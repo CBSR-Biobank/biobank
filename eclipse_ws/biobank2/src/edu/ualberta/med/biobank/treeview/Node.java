@@ -9,6 +9,8 @@ import java.util.List;
 
 public class Node {
 	
+	protected IDeltaListener listener = NullDeltaListener.getSoleInstance();
+	
 	private int id;
 	
 	private String name;
@@ -90,14 +92,13 @@ public class Node {
 			// replace current object with new one
 			int index = children.indexOf(namedChild);
 			children.remove(index);
-			children.add(index, child);
-			return;
 		}
-			
+		
 		children.add(child);
+		fireAdd(child);
 	}
 	
-	public void remove(Node item) {		
+	public void removeChild(Node item) {		
 		if (children.size() == 0) return;
 		
 		Node itemToRemove = null;
@@ -108,8 +109,10 @@ public class Node {
 				itemToRemove = child;
 		}
 		
-		if (itemToRemove != null)
+		if (itemToRemove != null) {
 			children.remove(itemToRemove);
+			fireRemove(itemToRemove);
+		}
 	}
 
 	public void removeByName(String name) {	
@@ -122,8 +125,10 @@ public class Node {
 				itemToRemove = child;
 		}
 		
-		if (itemToRemove != null)
+		if (itemToRemove != null) {
 			children.remove(itemToRemove);
+			fireRemove(itemToRemove);
+		}
 	}
 	
 	public boolean contains(Node item) {		
@@ -157,5 +162,23 @@ public class Node {
 	public WritableApplicationService getAppService() {
 		Assert.isNotNull(parent, "parent is null");
 		return parent.getAppService();
+	}
+	
+	public void addListener(IDeltaListener listener) {
+		this.listener = listener;
+	}	
+	
+	public void removeListener(IDeltaListener listener) {
+		if(this.listener.equals(listener)) {
+			this.listener = NullDeltaListener.getSoleInstance();
+		}
+	}
+	
+	protected void fireAdd(Object added) {
+		listener.add(new DeltaEvent(added));
+	}
+
+	protected void fireRemove(Object removed) {
+		listener.remove(new DeltaEvent(removed));
 	}
 }

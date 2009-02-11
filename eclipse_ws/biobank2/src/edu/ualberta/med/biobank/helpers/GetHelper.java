@@ -1,29 +1,34 @@
 package edu.ualberta.med.biobank.helpers;
 
+import java.lang.reflect.Constructor;
 import java.util.List;
 
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
 import org.springframework.remoting.RemoteConnectFailureException;
-
-import edu.ualberta.med.biobank.model.Site;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
-public class SitesGetHelper implements Runnable {
+public class GetHelper<T> implements Runnable {
 
 	private WritableApplicationService appService;
 	
-	private List<Site> sites;
+	private List<T> result;
+	
+	private Class<T> klass;
 
-	public SitesGetHelper(WritableApplicationService appService) {
+	public GetHelper(WritableApplicationService appService, Class<T> klass) {
 		this.appService = appService;
+		this.klass = klass;
 	}
 
-	public void run() {
-		Site site = new Site();				
+	public void run() {	
 		try {
-			sites = appService.search(Site.class, site);
+			Class<?>[] param = new Class<?>[0];
+			Constructor<T> ct = klass.getConstructor(param); 
+			Object[] args = new Object[0];
+			Object obj = ct.newInstance(args);
+			result = appService.search(klass, obj);
 		}
 		catch (final RemoteConnectFailureException exp) {
 			Display.getDefault().asyncExec(new Runnable() {
@@ -40,7 +45,7 @@ public class SitesGetHelper implements Runnable {
 		}
 	}
 	
-	public List<Site> getSites() {
-		return sites;
+	public List<T> getResult() {
+		return result;
 	}
 }

@@ -1,9 +1,11 @@
 package edu.ualberta.med.biobank.treeview;
 
 import org.eclipse.jface.viewers.ITreeContentProvider;
+import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 
-public class NodeContentProvider implements ITreeContentProvider {
+public class NodeContentProvider implements ITreeContentProvider, IDeltaListener {
+	protected TreeViewer viewer;
 	
 	public NodeContentProvider() {
 		super();
@@ -57,5 +59,37 @@ public class NodeContentProvider implements ITreeContentProvider {
 	 * @see org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer, java.lang.Object, java.lang.Object)
 	 */
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+		this.viewer = (TreeViewer)viewer;
+		if (oldInput != null) {
+			removeListenerFrom((Node) oldInput);
+		}
+		if (newInput != null) {
+			addListenerTo((Node) newInput);
+		}
+	}
+	
+	protected void removeListenerFrom(Node node) {
+		node.removeListener(this);
+		for (Node child : node.getChildren()) {
+			removeListenerFrom(child);
+		}
+	}
+	
+	protected void addListenerTo(Node node) {
+		node.addListener(this);
+		for (Node child : node.getChildren()) {
+			addListenerTo(child);
+		}
+	}
+
+	@Override
+	public void add(DeltaEvent event) {
+		Node node = ((Node)event.receiver()).getParent();
+		viewer.refresh(node, false);
+	}
+
+	@Override
+	public void remove(DeltaEvent event) {
+		add(event);
 	}
 }

@@ -128,6 +128,15 @@ public class StudyEntryForm extends EditorPart {
 	}
 
 	@Override
+	public void dispose() {	
+		if (!dirty && (study.getId() == null)) {
+			// remove temporary node
+			Node groupNode = studyAdapter.getParent();
+			groupNode.removeChild(studyAdapter);
+		}
+	}
+
+	@Override
 	public void init(IEditorSite site, IEditorInput input)
 			throws PartInitException {
 		if ( !(input instanceof NodeInput)) 
@@ -331,23 +340,8 @@ public class StudyEntryForm extends EditorPart {
     }
     
     private void saveSettings() {
-		Node sessionNode = studyAdapter.getParent().getParent().getParent();
-		Assert.isTrue(sessionNode instanceof SessionAdapter, 
-				"Invalid node type for session: " + sessionNode.getClass().getName());
-
-		String sessionName = ((SessionAdapter) sessionNode).getName();
-		
-		try {
-			if (study.getId() == null) {
-				BioBankPlugin.getDefault().createObject(sessionName, study);
-			}
-			else {
-				BioBankPlugin.getDefault().updateObject(sessionName, study);
-			}
-		}
-		catch (Exception exp) {
-			exp.printStackTrace();
-		}
+    	// TODO; needs implementation
+    	
 		getSite().getPage().closeEditor(StudyEntryForm.this, false);    	
     }
 
@@ -365,7 +359,7 @@ public class StudyEntryForm extends EditorPart {
 		
 		int sessions = BioBankPlugin.getDefault().getSessionCount();
 		if (sessions == 1) {
-			sessionAdapter = BioBankPlugin.getDefault().getSessionNode(0);
+			sessionAdapter = BioBankPlugin.getDefault().getSessionAdapter(0);
 		}
 		else {
 			Assert.isTrue(false, "not implemented yet");

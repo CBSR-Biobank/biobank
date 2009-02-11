@@ -10,6 +10,7 @@ import org.eclipse.jface.databinding.swt.SWTObservables;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.fieldassist.ControlDecoration;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
@@ -27,8 +28,11 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.helpers.GetHelper;
+import edu.ualberta.med.biobank.helpers.SiteSaveHelper;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.treeview.Node;
+import edu.ualberta.med.biobank.treeview.SessionAdapter;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
 
@@ -40,7 +44,7 @@ public class SiteEntryForm extends AddressEntryForm {
 	private static final String SITE_OK_MESSAGE = "Edit a BioBank site.";
 	private static final String NO_SITE_NAME_MESSAGE = "Site must have a name";
 	
-	private Node node;
+	private SiteAdapter siteAdapter;
 	
 	private Site site;
 	
@@ -54,16 +58,16 @@ public class SiteEntryForm extends AddressEntryForm {
 		if ( !(input instanceof NodeInput)) 
 			throw new PartInitException("Invalid editor input");
 		
-		node = ((NodeInput) input).getNode();
+		Node node = ((NodeInput) input).getNode();
 		Assert.isNotNull(node, "Null editor input");
 		
 		Assert.isTrue((node instanceof SiteAdapter), 
 				"Invalid editor input: object of type "
 				+ node.getClass().getName());
 		
-		SiteAdapter siteNode = (SiteAdapter) node;
-		site = siteNode.getSite();
-		address = site.getAddress();
+		siteAdapter = (SiteAdapter) node;
+		site = siteAdapter.getSite();
+		address = site.getAddress();		
 		
 		if (site.getId() == null) {
 			setPartName("New Site");
@@ -182,26 +186,29 @@ public class SiteEntryForm extends AddressEntryForm {
     
     private void saveSettings() {
 		site.setAddress(address);
-		String sessionName;
 		
-		if (node instanceof SiteAdapter) {
-			sessionName = node.getParent().getName();
-		}
-		else {
-			sessionName = node.getName();
+		if (siteAdapter.getParent() == null) {
+			siteAdapter.setParent(BioBankPlugin.getDefault().getSessionSingle());
 		}
 		
-		try {
-			if (site.getId() == null) {
-				BioBankPlugin.getDefault().createObject(sessionName, site);
-			}
-			else {
-				BioBankPlugin.getDefault().updateObject(sessionName, site);
-			}
+		SiteSaveHelper helper = new SiteSaveHelper(
+				siteAdapter.getAppService(), site);
+		BusyIndicator.showWhile(
+				PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+				.getShell().getDisplay(), helper);
+		
+		GetHelper<Site> sitesHelper = new GetHelper<Site> (
+				siteAdapter.getAppService(), Site.class);
+		BusyIndicator.showWhile(
+				PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+				.getShell().getDisplay(), sitesHelper);
+		
+		SessionAdapter sessionNode = (SessionAdapter) siteAdapter.getParent();
+		for (Site site : sitesHelper.getResult()) {
+			SiteAdapter adapter = new SiteAdapter(sessionNode, site);
+			sessionNode.addChild(adapter);
 		}
-		catch (Exception exp) {
-			exp.printStackTrace();
-		}
+		
 		getSite().getPage().closeEditor(SiteEntryForm.this, false);    	
     }
 

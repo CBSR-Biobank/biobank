@@ -27,6 +27,7 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
 import org.springframework.util.Assert;
 
+import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.helpers.ClinicSaveHelper;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.treeview.Node;
@@ -185,7 +186,21 @@ public class ClinicEntryForm extends AddressEntryForm {
 				PlatformUI.getWorkbench().getActiveWorkbenchWindow()
 				.getShell().getDisplay(), helper);
 		
-		clinic = helper.getResult();
+		final SiteAdapter siteAdapter = 
+			(SiteAdapter) clinicAdapter.getParent().getParent();
+		BusyIndicator.showWhile(
+				PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+				.getShell().getDisplay(), new Runnable() {
+					public void run() {
+						siteAdapter.getSite().getClinicCollection();
+					}
+				});
+		
+		Node node = siteAdapter.getClinicGroupNode();
+		for (Clinic clinic : siteAdapter.getSite().getClinicCollection()) {
+			ClinicAdapter adapter = new ClinicAdapter(node, clinic);
+			node.addChild(adapter);
+		}
 		
 		getSite().getPage().closeEditor(ClinicEntryForm.this, false);
 	}

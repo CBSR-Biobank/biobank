@@ -1,15 +1,9 @@
 package edu.ualberta.med.biobank.views;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ITreeViewerListener;
@@ -18,24 +12,15 @@ import org.eclipse.jface.viewers.TreeExpansionEvent;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
-import org.springframework.remoting.RemoteAccessException;
-import org.springframework.remoting.RemoteConnectFailureException;
+import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.forms.ClinicViewForm;
 import edu.ualberta.med.biobank.forms.SiteViewForm;
 import edu.ualberta.med.biobank.forms.NodeInput;
-import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Clinic;
-import gov.nih.nci.system.applicationservice.WritableApplicationService;
-import gov.nih.nci.system.query.SDKQuery;
-import gov.nih.nci.system.query.SDKQueryResult;
-import gov.nih.nci.system.query.example.InsertExampleQuery;
-import gov.nih.nci.system.query.example.UpdateExampleQuery;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.treeview.ClinicAdapter;
 import edu.ualberta.med.biobank.treeview.Node;
@@ -116,6 +101,7 @@ public class SessionsView extends ViewPart {
 		treeViewer.setContentProvider(new NodeContentProvider());
         treeViewer.addDoubleClickListener(doubleClickListener);
         treeViewer.addTreeListener(treeViewerListener);
+        treeViewer.setUseHashlookup(true);
 		treeViewer.setInput(rootNode);
 	}
 	
@@ -134,11 +120,11 @@ public class SessionsView extends ViewPart {
 			SiteAdapter siteNode = new SiteAdapter(sessionNode, (Site) o);
 			sessionNode.addChild(siteNode);
 		}
-		treeViewer.refresh();
-		treeViewer.expandToLevel(2);
+		//treeViewer.refresh();
+		//treeViewer.expandToLevel(2);
 	}
 	
-	public SessionAdapter getSessionNode(String sessionName) {
+	public SessionAdapter getSessionAdapter(String sessionName) {
 		for (Node node : rootNode.getChildren()) {
 			if (node.getName().equals(sessionName)) 
 				return (SessionAdapter) node;
@@ -148,239 +134,34 @@ public class SessionsView extends ViewPart {
 		return null;
 	}
 	
-	public SessionAdapter getSessionNode(int count) {
+	public SessionAdapter getSessionAdapter(int count) {
 		List<Node> nodes = rootNode.getChildren();
 		Assert.isTrue(count < nodes.size(), 
 				"Invalid session node count: " + count);
 		return (SessionAdapter) nodes.get(count);
 	}
 	
-	public void updateSites(final SessionAdapter sessionNode) {
-		String sessionName = sessionNode.getName();
-		Assert.isTrue(sessions.containsKey(sessionName), 
-				"Session named " + sessionName + " not found");
+	public void updateClinics(final Node groupNode) {		
+		final Site site = ((SiteAdapter) groupNode.getParent()).getSite();
+		Assert.isNotNull(site, "null site");
 		
-		// get the Site sites stored on this server
-		Job job = new Job("Querying Sites") {
-			protected IStatus run(IProgressMonitor monitor) {
+		treeViewer.getControl().getDisplay().asyncExec(new Runnable() {
+			public void run() {
+				site.getClinicCollection();
 				
-				monitor.beginTask("Querying Sites ... ", 100);
+				for (Clinic clinic : site.getClinicCollection()) {
+					ClinicAdapter node = new ClinicAdapter(groupNode, clinic);
+					groupNode.addChild(node);
+				}
 				
-				Site site = new Site();				
-				try {
-					WritableApplicationService appService = sessionNode.getAppService();
-					final List<Object> sites = appService.search(Site.class, site);
-					
-					Display.getDefault().asyncExec(new Runnable() {
-						public void run() {
-							for (Object o : sites) {
-								SiteAdapter siteNode 
-									= new SiteAdapter(sessionNode, (Site) o);
-								sessionNode.addChild(siteNode);
-							}
-							treeViewer.refresh(sessionNode);
-						}
-					});
-				}
-				catch (final RemoteConnectFailureException exp) {
-					Display.getDefault().asyncExec(new Runnable() {
-						public void run() {
-							MessageDialog.openError(
-									PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), 
-									"Connection Attempt Failed", 
-									"Could not connect to server. Make sure server is running.");
-						}
-					});
-				}
-				catch (Exception exp) {
-					exp.printStackTrace();
-				}
-				return Status.OK_STATUS;
+				treeViewer.expandToLevel(groupNode, 1);
 			}
-		};
-		job.setUser(false);
-		job.schedule();
+		});
 	}
 	
-	public void updateClinics(final Node groupNode) {
-		final SiteAdapter siteNode = (SiteAdapter) groupNode.getParent();
-		final SessionAdapter sessionNode = (SessionAdapter) siteNode.getParent();
-		
-		String sessionName = sessionNode.getName();
-		Assert.isTrue(sessions.containsKey(sessionName), 
-				"Session named " + sessionName + " not found");
-		
-		// get the Site sites stored on this server
-		Job job = new Job("Querying Clinics") {
-			protected IStatus run(IProgressMonitor monitor) {
-				
-				monitor.beginTask("Querying Clinics ... ", 100);
-				
-				try {
-					Site site = siteNode.getSite();
-					final Collection<Clinic> clinics = site.getClinicCollection();
-					
-					Display.getDefault().asyncExec(new Runnable() {
-						public void run() {
-							for (Clinic clinic : clinics) {
-								ClinicAdapter node = 
-									new ClinicAdapter(groupNode, clinic);
-								groupNode.addChild(node);
-							}
-							treeViewer.expandToLevel(groupNode, 1);
-							treeViewer.refresh(groupNode);
-						}
-					});
-				}
-				catch (final RemoteConnectFailureException exp) {
-					Display.getDefault().asyncExec(new Runnable() {
-						public void run() {
-							MessageDialog.openError(
-									PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), 
-									"Connection Attempt Failed", 
-									"Could not connect to server. Make sure server is running.");
-						}
-					});
-				}
-				catch (Exception exp) {
-					exp.printStackTrace();
-				}
-				return Status.OK_STATUS;
-			}
-		};
-		job.setUser(false);
-		job.schedule();
-	}
-	
-	public void createObject(final String sessionName, final Object o) throws Exception {
-		if (!sessions.containsKey(sessionName)) {
-			throw new Exception();
-		}
-		
-		final SessionAdapter sessionNode = sessions.get(sessionName);
-		
-		Job job = new Job("Creating Object") {
-			protected IStatus run(IProgressMonitor monitor) {
-				monitor.beginTask("Submitting information ... ", 100);
-				
-				try {
-					SDKQuery query;
-					SDKQueryResult result;
-					WritableApplicationService appService = sessionNode.getAppService();
-					
-					if (o instanceof Site) {
-						Site site = (Site) o;
-						Assert.isTrue(site.getId() == null, "insert invoked on site already in database");
-						Assert.isTrue(site.getAddress().getId() == null, "insert invoked on address already in database");
-						
-						query = new InsertExampleQuery(site.getAddress());					
-						result = appService.executeQuery(query);
-						site.setAddress((Address) result.getObjectResult());
-						query = new InsertExampleQuery(site);	
-						appService.executeQuery(query);
-					}	
-					else {
-						Assert.isTrue(false, "creating of objects of type " 
-								+ o.getClass().getName() + " not supported yet");
-					}
-					
-					updateSites(sessionNode);
-				}
-				catch (final RemoteAccessException exp) {
-					Display.getDefault().asyncExec(new Runnable() {
-						public void run() {
-							MessageDialog.openError(
-									PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), 
-									"Connection Attempt Failed", 
-									"Could not perform database operation. Make sure server is running correct version.");
-						}
-					});
-				}
-				catch (Exception exp) {
-					exp.printStackTrace();
-				}
-				return Status.OK_STATUS;
-			}
-		};
-		job.setUser(false);
-		job.schedule();
-	}
-	
-	public void updateObject(final String sessionName, final Object o) throws Exception {
-		Assert.isTrue(sessions.containsKey(sessionName), "Session named " + sessionName + " not found");
-		
-		final SessionAdapter sessionNode = sessions.get(sessionName);
-		
-		Job job = new Job("Creating Object") {
-			protected IStatus run(IProgressMonitor monitor) {
-				monitor.beginTask("Submitting information ... ", 100);
-				
-				try {
-					SDKQuery query;
-					SDKQueryResult result = null;
-					WritableApplicationService appService = sessionNode.getAppService();
-					
-					if (o instanceof Site) {
-						Site site = (Site) o;
-						Assert.isNotNull(site.getId(), "update invoked on site not in database");
-						Assert.isNotNull(site.getAddress().getId(), "update invoked on address not in database");
-						
-						query = new UpdateExampleQuery(site.getAddress());					
-						result = appService.executeQuery(query);
-						site.setAddress((Address) result.getObjectResult());
-						query = new UpdateExampleQuery(site);	
-						result = appService.executeQuery(query);
-						
-						updateSites(sessionNode);
-						
-						if (result != null) {
-							final int id =  ((Site) result.getObjectResult()).getId();
-							
-							Display.getDefault().asyncExec(new Runnable() {
-								public void run() {
-									openSiteNode((SiteAdapter) sessionNode.getChild(id));
-								}
-							});
-						}
-					}					
-					else if (o instanceof Clinic) {
-						Clinic clinic = (Clinic) o;
-						Assert.isTrue(clinic.getId() == null, "insert invoked on site already in database");
-						Assert.isTrue(clinic.getAddress().getId() == null, "insert invoked on address already in database");
-						
-						query = new UpdateExampleQuery(clinic.getAddress());					
-						result = appService.executeQuery(query);
-						clinic.setAddress((Address) result.getObjectResult());
-						query = new UpdateExampleQuery(clinic);	
-						appService.executeQuery(query);
-					}
-					else {
-						Assert.isTrue(false, "updating of objects of type " 
-								+ o.getClass().getName() + " not supported yet");
-					}
-				}
-				catch (final RemoteConnectFailureException exp) {
-					Display.getDefault().asyncExec(new Runnable() {
-						public void run() {
-							MessageDialog.openError(
-									PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), 
-									"Connection Attempt Failed",
-									"Could not perform database operation. Make sure server is running correct version.");
-						}
-					});
-				}
-				catch (Exception exp) {
-					exp.printStackTrace();
-				}
-				return Status.OK_STATUS;
-			}
-		};
-		job.setUser(false);
-		job.schedule();
-	}
-	
-	public void deleteSession(String name) throws Exception {
+	public void deleteSession(String name) {
 		rootNode.removeByName(name);
+		//treeViewer.refresh();
 	}
 	
 	public int getSessionCount() {
