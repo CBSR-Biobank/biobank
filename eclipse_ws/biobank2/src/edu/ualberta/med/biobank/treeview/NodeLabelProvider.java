@@ -4,7 +4,7 @@ import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.swt.graphics.Image;
 
-public class SessionLabelProvider implements ILabelProvider {
+public class NodeLabelProvider implements ILabelProvider {
 
 	public Image getImage(Object element) {
 		return null;

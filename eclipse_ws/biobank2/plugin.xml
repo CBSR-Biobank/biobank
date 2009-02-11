@@ -122,7 +122,7 @@
          point="org.eclipse.ui.views">
       <view
             allowMultiple="false"
-            class="edu.ualberta.med.biobank.treeview.SessionsView"
+            class="edu.ualberta.med.biobank.views.SessionsView"
             id="edu.ualberta.med.biobank.session.SessionView"
             name="Sessions"
             restorable="true">

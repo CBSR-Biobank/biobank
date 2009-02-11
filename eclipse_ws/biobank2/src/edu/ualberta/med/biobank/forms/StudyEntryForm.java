@@ -53,6 +53,7 @@ import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.SessionAdapter;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
+import edu.ualberta.med.biobank.widgets.MultiSelect;
 
 @SuppressWarnings("serial")
 public class StudyEntryForm extends EditorPart {
@@ -87,9 +88,7 @@ public class StudyEntryForm extends EditorPart {
 	
 	private Form form;
 	
-	private org.eclipse.swt.widgets.List clinicsList;
-	
-	private org.eclipse.swt.widgets.List selClinicsList;
+	private MultiSelect clinicsMultiSelect;
 	
 	private StudyAdapter studyAdapter;
 	
@@ -229,30 +228,10 @@ public class StudyEntryForm extends EditorPart {
 		section.setText("Clinics");
 		section.setFont(FormUtils.getSectionFont());
 		section.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		sbody = toolkit.createComposite(section);
-		section.setClient(sbody);
-		layout = new GridLayout(2, false);
-		layout.horizontalSpacing = 10;
-		sbody.setLayout(layout);
-		sbody.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		
-		Label label = toolkit.createLabel(sbody, "Selected Clinics");
-		label.setFont(FormUtils.getSectionFont());
-		label = toolkit.createLabel(sbody, "Available Clinics");
-		label.setFont(FormUtils.getSectionFont());
-		
-		selClinicsList = new org.eclipse.swt.widgets.List(sbody, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
-		//clinicsList.setBounds (0, 0, 100, 100);
-		selClinicsList.setData(FormToolkit.KEY_DRAW_BORDER, FormToolkit.TEXT_BORDER);
-		selClinicsList.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-		toolkit.adapt(selClinicsList, true, true);
-		
-		clinicsList = new org.eclipse.swt.widgets.List(sbody, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
-		clinicsList.setData(FormToolkit.KEY_DRAW_BORDER, FormToolkit.TEXT_BORDER);
-		GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
-		gd.heightHint = 100;
-		clinicsList.setLayoutData(gd);
-		toolkit.adapt(clinicsList, true, true);
+		clinicsMultiSelect = new MultiSelect(section, SWT.NONE, 100);
+		section.setClient(clinicsMultiSelect);
+		clinicsMultiSelect.adaptToToolkit(toolkit);
 		
 		toolkit.paintBordersFor(sbody);
 
@@ -394,7 +373,7 @@ public class StudyEntryForm extends EditorPart {
 				StudyEntryForm.this.allClinics = allClinics;
 
 				for (Clinic clinic : allClinics)
-					clinicsList.add(clinic.getName());
+					clinicsMultiSelect.addAvailable(clinic.getName());
 			}
 		});
 	}

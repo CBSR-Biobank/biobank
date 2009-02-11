@@ -3,7 +3,7 @@ package edu.ualberta.med.biobank.rcp;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPerspectiveFactory;
 
-import edu.ualberta.med.biobank.treeview.SessionsView;
+import edu.ualberta.med.biobank.views.SessionsView;
 
 public class Perspective implements IPerspectiveFactory {
 

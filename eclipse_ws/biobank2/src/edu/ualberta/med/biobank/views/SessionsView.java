@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.treeview;
+package edu.ualberta.med.biobank.views;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -39,6 +39,12 @@ import gov.nih.nci.system.query.SDKQueryResult;
 import gov.nih.nci.system.query.example.InsertExampleQuery;
 import gov.nih.nci.system.query.example.UpdateExampleQuery;
 import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.treeview.ClinicAdapter;
+import edu.ualberta.med.biobank.treeview.Node;
+import edu.ualberta.med.biobank.treeview.SessionAdapter;
+import edu.ualberta.med.biobank.treeview.NodeContentProvider;
+import edu.ualberta.med.biobank.treeview.NodeLabelProvider;
+import edu.ualberta.med.biobank.treeview.SiteAdapter;
 
 public class SessionsView extends ViewPart {
 	public static final String ID =
@@ -108,8 +114,8 @@ public class SessionsView extends ViewPart {
 		treeViewer = new TreeViewer(parent, SWT.BORDER | SWT.MULTI
 				| SWT.V_SCROLL);
 		getSite().setSelectionProvider(treeViewer);
-		treeViewer.setLabelProvider(new SessionLabelProvider());
-		treeViewer.setContentProvider(new SessionContentProvider());
+		treeViewer.setLabelProvider(new NodeLabelProvider());
+		treeViewer.setContentProvider(new NodeContentProvider());
         treeViewer.addDoubleClickListener(doubleClickListener);
         treeViewer.addTreeListener(treeViewerListener);
 		treeViewer.setInput(rootNode);

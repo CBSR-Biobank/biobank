@@ -3,9 +3,9 @@ package edu.ualberta.med.biobank.treeview;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 
-public class SessionContentProvider implements ITreeContentProvider {
+public class NodeContentProvider implements ITreeContentProvider {
 	
-	public SessionContentProvider() {
+	public NodeContentProvider() {
 		super();
 	}
 

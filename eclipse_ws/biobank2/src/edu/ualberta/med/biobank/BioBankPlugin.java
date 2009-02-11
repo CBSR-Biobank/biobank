@@ -12,7 +12,7 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
 import edu.ualberta.med.biobank.treeview.SessionAdapter;
-import edu.ualberta.med.biobank.treeview.SessionsView;
+import edu.ualberta.med.biobank.views.SessionsView;
 import edu.ualberta.med.biobank.webservice.Session;
 import edu.ualberta.med.biobank.webservice.ISessionListener;
 import edu.ualberta.med.biobank.webservice.LoginResultEvent;
