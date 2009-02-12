@@ -95,6 +95,7 @@ public class Node {
 		}
 		
 		children.add(child);
+		child.addListener(listener);
 		fireAdd(child);
 	}
 	

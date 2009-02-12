@@ -172,7 +172,7 @@ public class ClinicEntryForm extends AddressEntryForm {
 
 	@Override
 	public void doSave(IProgressMonitor monitor) {
-		setDirty(false);
+		super.doSave(monitor);
 		saveSettings();
 	}
 	
@@ -196,11 +196,7 @@ public class ClinicEntryForm extends AddressEntryForm {
 					}
 				});
 		
-		Node node = siteAdapter.getClinicGroupNode();
-		for (Clinic clinic : siteAdapter.getSite().getClinicCollection()) {
-			ClinicAdapter adapter = new ClinicAdapter(node, clinic);
-			node.addChild(adapter);
-		}
+		BioBankPlugin.getDefault().getSessionsView().updateClinics(clinicAdapter.getParent());
 		
 		getSite().getPage().closeEditor(ClinicEntryForm.this, false);
 	}

@@ -120,8 +120,7 @@ public class SessionsView extends ViewPart {
 			SiteAdapter siteNode = new SiteAdapter(sessionNode, (Site) o);
 			sessionNode.addChild(siteNode);
 		}
-		//treeViewer.refresh();
-		//treeViewer.expandToLevel(2);
+		treeViewer.expandToLevel(2);
 	}
 	
 	public SessionAdapter getSessionAdapter(String sessionName) {

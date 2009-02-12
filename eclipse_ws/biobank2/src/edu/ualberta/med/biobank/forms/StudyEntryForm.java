@@ -234,7 +234,7 @@ public class StudyEntryForm extends EditorPart {
 		}
 
 		Section section = toolkit.createSection(form.getBody(), Section.TITLE_BAR);
-		section.setText("Clinics");
+		section.setText("Clinic Selection");
 		section.setFont(FormUtils.getSectionFont());
 		section.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		
@@ -271,9 +271,12 @@ public class StudyEntryForm extends EditorPart {
 		
 		allClinics = helper.getAllClinics();
 		sdataTypes = helper.getSdataTypes();
-		
-		for (Clinic clinic : allClinics)
-			clinicsMultiSelect.addAvailable(clinic.getName());
+
+		HashMap<Integer, String> availClinics = new HashMap<Integer, String>();
+		for (Clinic clinic : allClinics) {
+			availClinics.put(clinic.getId(), clinic.getName());
+		}
+		clinicsMultiSelect.addAvailable(availClinics);
 	}
 	
     private void bindValues() {

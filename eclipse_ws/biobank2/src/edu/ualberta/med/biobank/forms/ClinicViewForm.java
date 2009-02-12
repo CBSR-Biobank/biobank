@@ -86,21 +86,14 @@ public class ClinicViewForm  extends AddressViewForm {
 		form.getBody().setLayout(layout);
 		form.getBody().setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		
-		Section section = toolkit.createSection(form.getBody(),  
-				ExpandableComposite.TITLE_BAR | ExpandableComposite.TWISTIE);
-		section.setText("Address");
-		section.setFont(FormUtils.getSectionFont());
-		section.setLayout(new GridLayout(1, false));
-		section.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));		
-		Composite sbody = toolkit.createComposite(section);
-		section.setClient(sbody);
+		Composite sbody = toolkit.createComposite(form.getBody());
 		sbody.setLayout(new GridLayout(4, false));
 		sbody.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));		
 		toolkit.paintBordersFor(sbody);	
 		
 		createAddressArea(sbody);
 
-		section = toolkit.createSection(form.getBody(),  
+		Section section = toolkit.createSection(form.getBody(),  
 				ExpandableComposite.TITLE_BAR | ExpandableComposite.TWISTIE
 				| ExpandableComposite.EXPANDED);
 		section.setText("Associated Studies");

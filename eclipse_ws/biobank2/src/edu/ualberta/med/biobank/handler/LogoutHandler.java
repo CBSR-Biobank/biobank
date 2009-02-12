@@ -4,6 +4,7 @@ import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.views.SessionsView;
@@ -21,6 +22,10 @@ public class LogoutHandler extends AbstractHandler {
 		else {
 			Assert.isTrue(false, "not implemented yet");
 		}
+		
+		// close all editors
+		PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+			.getActivePage().closeAllEditors(true);
 		return null;
 	}
 
