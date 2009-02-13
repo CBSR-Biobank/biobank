@@ -2,11 +2,8 @@ package edu.ualberta.med.biobank.widgets;
 
 import java.util.HashMap;
 
-import org.eclipse.jface.viewers.ILabelProvider;
-import org.eclipse.jface.viewers.ILabelProviderListener;
-import org.eclipse.jface.viewers.IStructuredContentProvider;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ListViewer;
-import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.dnd.DND;
 import org.eclipse.swt.dnd.DragSourceEvent;
@@ -14,7 +11,6 @@ import org.eclipse.swt.dnd.DragSourceListener;
 import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.dnd.TransferData;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -61,7 +57,7 @@ public class MultiSelect extends Composite {
 		availList = createLabelledList(this, rightLabel);
 		
 		dragAndDropSupport(availList, selList);
-		//dragAndDropSupport(selList, availList);
+		dragAndDropSupport(selList, availList);
 	}
 	
 	private ListViewer createLabelledList(Composite parent, String label) {
@@ -73,8 +69,6 @@ public class MultiSelect extends Composite {
 		gd.heightHint = minHeight;
 		gd.widthHint = 180;
 		lv.getList().setLayoutData(gd);
-		lv.setContentProvider(new ContentProvider());
-		lv.setLabelProvider(new LabelProvider());
 		
 		Label l = new Label(selComposite, SWT.NONE);
 		l.setText(label);
@@ -88,13 +82,8 @@ public class MultiSelect extends Composite {
 	}
 	
 	private void dragAndDropSupport(ListViewer fromList, ListViewer toList) {
-		fromList.addDragSupport(DND.DROP_MOVE,
-				new Transfer[] { TextTransfer.getInstance() },
-				new ListViewerDragListener(fromList));
-		
-		toList.addDropSupport(DND.DROP_MOVE, 
-				new Transfer[] { TextTransfer.getInstance() },
-				new ListViewerDropListener(toList));
+		new ListViewerDragListener(fromList);
+		new ListViewerDropListener(toList);
 	}
 
 	public void adaptToToolkit(FormToolkit toolkit) {
@@ -118,55 +107,15 @@ public class MultiSelect extends Composite {
 	}
 }
 
-class ContentProvider implements IStructuredContentProvider {
-	
-	@SuppressWarnings("unchecked")
-	public Object[] getElements(Object element) {
-		return ((HashMap<Integer, String>) element).entrySet().toArray();
-	}
-	public void dispose() {
-		// do nothing
-	}
-	@Override
-	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-		// do nothing
-	}
-}
-
-class LabelProvider implements ILabelProvider {
-	public Image getImage(Object element) {
-		return null;
-	}
-	@Override
-	public String getText(Object element) {
-		return (String) element;
-	}
-	@Override
-	public void addListener(ILabelProviderListener listener) {
-		// do nothing
-	}
-	@Override
-	public void dispose() {
-		// do nothing
-	}
-
-	@Override
-	public boolean isLabelProperty(Object element, String property) {
-		return false;
-	}
-
-	@Override
-	public void removeListener(ILabelProviderListener listener) {
-		// do nothing		
-	}
-	
-}
-
 class ListViewerDragListener implements DragSourceListener {
 	private ListViewer viewer;
 
 	public ListViewerDragListener(ListViewer viewer) {
 		this.viewer = viewer;
+		
+		viewer.addDragSupport(DND.DROP_MOVE | DND.DROP_COPY,
+				new Transfer[] { TextTransfer.getInstance() },
+				this);
 	}
 
 	public void dragStart(DragSourceEvent event) {
@@ -174,17 +123,24 @@ class ListViewerDragListener implements DragSourceListener {
 	}
 
 	public void dragSetData(DragSourceEvent event) {
-		event.data = viewer.getSelection();
+		event.data = ((IStructuredSelection) viewer.getSelection()).getFirstElement();
 	}
 
 	public void dragFinished(DragSourceEvent event) {
+		if (event.doit) {
+			viewer.remove(((IStructuredSelection) 
+					viewer.getSelection()).getFirstElement());
+		}
 	}
 
 }
 
-class ListViewerDropListener extends ViewerDropAdapter {
+class ListViewerDropListener extends ViewerDropAdapter {	
 	public ListViewerDropListener(ListViewer viewer) {
 		super(viewer);
+		viewer.addDropSupport(DND.DROP_MOVE | DND.DROP_COPY, 
+				new Transfer[] { TextTransfer.getInstance() },
+				this);
 	}
 
 	@Override
@@ -192,16 +148,13 @@ class ListViewerDropListener extends ViewerDropAdapter {
 		String target = (String) getCurrentTarget();
 		if (target == null)
 			target = (String) getViewer().getInput();
-		String[] toDrop = (String[])data;
+		String toDrop = (String)data;
 		ListViewer viewer = (ListViewer) getViewer();
 
-		for (int i = 0; i < toDrop.length; i++)
-			if (toDrop[i].equals(target))
-				return false;
-		for (int i = 0; i < toDrop.length; i++) {
-			viewer.add(toDrop[i]);
-			viewer.reveal(toDrop[i]);
-		}
+		if (toDrop.equals(target)) return false;
+		
+		viewer.add(toDrop);
+		viewer.reveal(toDrop);
 		return true;	
 	}
 
