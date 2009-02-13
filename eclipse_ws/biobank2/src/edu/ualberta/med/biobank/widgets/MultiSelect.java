@@ -1,21 +1,22 @@
 package edu.ualberta.med.biobank.widgets;
 
 import java.util.HashMap;
-import java.util.List;
 
-import org.eclipse.jface.util.LocalSelectionTransfer;
+import org.eclipse.jface.viewers.ILabelProvider;
+import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.dnd.DND;
 import org.eclipse.swt.dnd.DragSourceEvent;
 import org.eclipse.swt.dnd.DragSourceListener;
-import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.dnd.TransferData;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
@@ -23,9 +24,6 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.jface.viewers.ViewerDropAdapter;
 
 import edu.ualberta.med.biobank.forms.FormUtils;
-import edu.ualberta.med.biobank.treeview.Node;
-import edu.ualberta.med.biobank.treeview.NodeContentProvider;
-import edu.ualberta.med.biobank.treeview.NodeLabelProvider;
 import edu.ualberta.med.biobank.treeview.NodeTransfer;
 
 public class MultiSelect extends Composite {
@@ -33,9 +31,9 @@ public class MultiSelect extends Composite {
 	
 	private TreeViewer availTree;
 	
-	private Node selTreeRootNode = new Node(null, 0, "selRoot");
+	private MultiSelectNode selTreeRootNode = new MultiSelectNode(null, 0, "selRoot");
 	
-	private Node availTreeRootNode = new Node(null, 0, "availRoot");
+	private MultiSelectNode availTreeRootNode = new MultiSelectNode(null, 0, "availRoot");
 	
 	private int minHeight;
 
@@ -45,23 +43,8 @@ public class MultiSelect extends Composite {
 		
 		this.minHeight = minHeight;
 		
-		setLayout(new GridLayout(3, false));
+		setLayout(new GridLayout(2, false));
 		setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		
-		Composite buttons = new Composite(this, SWT.NONE);
-		buttons.setLayout(new GridLayout(1, true));
-		GridData gd = new GridData();
-		gd.horizontalAlignment = GridData.FILL;
-		gd.verticalAlignment = SWT.TOP;
-		buttons.setLayoutData(gd);
-		
-		Button upButton = new Button(buttons, SWT.PUSH);
-		upButton.setText("Move Up");
-		upButton.setLayoutData(new GridData(GridData.FILL, GridData.CENTER, false, false));
-		
-		Button downButton = new Button(buttons, SWT.PUSH);
-		downButton.setText("Move Down");
-		downButton.setLayoutData(new GridData(GridData.FILL, GridData.CENTER, false, false));
 
 		selTree = createLabelledTree(this, leftLabel);
 		selTree.setInput(selTreeRootNode);
@@ -75,9 +58,11 @@ public class MultiSelect extends Composite {
 	private TreeViewer createLabelledTree(Composite parent, String label) {
 		Composite selComposite = new Composite(parent, SWT.NONE);
 		selComposite.setLayout(new GridLayout(1, true));
+		GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
+		selComposite.setLayoutData(gd);
 		
 		TreeViewer tv = new TreeViewer(selComposite);
-		GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
+		gd = new GridData(SWT.FILL, SWT.FILL, true, true);
 		gd.heightHint = minHeight;
 		gd.widthHint = 180;
 		tv.getTree().setLayoutData(gd);
@@ -90,8 +75,68 @@ public class MultiSelect extends Composite {
 		gd.horizontalAlignment = SWT.CENTER;
 		l.setLayoutData(gd);
 
-		tv.setLabelProvider(new NodeLabelProvider());
-		tv.setContentProvider(new NodeContentProvider());
+		tv.setLabelProvider(new ILabelProvider(){
+
+			@Override
+			public Image getImage(Object element) {
+				return null;
+			}
+
+			@Override
+			public String getText(Object element) {
+				return ((MultiSelectNode) element).getName();
+			}
+
+			@Override
+			public void addListener(ILabelProviderListener listener) {				
+			}
+
+			@Override
+			public void dispose() {				
+			}
+
+			@Override
+			public boolean isLabelProperty(Object element, String property) {
+				return false;
+			}
+
+			@Override
+			public void removeListener(ILabelProviderListener listener) {				
+			}
+		});
+		
+		tv.setContentProvider(new ITreeContentProvider() {
+
+			@Override
+			public Object[] getChildren(Object parentElement) {
+				((MultiSelectNode) parentElement).getChildren().toArray();
+				return null;
+			}
+
+			@Override
+			public Object getParent(Object element) {
+				return null;
+			}
+
+			@Override
+			public boolean hasChildren(Object element) {
+				return (((MultiSelectNode) element).getChildCount() > 0);
+			}
+
+			@Override
+			public Object[] getElements(Object inputElement) {
+				return getChildren(inputElement);
+			}
+
+			@Override
+			public void dispose() {				
+			}
+
+			@Override
+			public void inputChanged(Viewer viewer, Object oldInput,
+					Object newInput) {				
+			}
+		});
 		
 		return tv;
 	}
@@ -117,15 +162,19 @@ public class MultiSelect extends Composite {
 	
 	public void addAvailable(HashMap<Integer, String> available) {
 		for (int key : available.keySet()) {
-			availTreeRootNode.addChild(new Node(availTreeRootNode, key, available.get(key)));
+			availTreeRootNode.addChild(new MultiSelectNode(availTreeRootNode, key, available.get(key)));
 		}
 	}
 }
 
+/**
+ * Drag support for moving items between TreeViewers in this widget.
+ *
+ */
 class TreeViewerDragListener implements DragSourceListener {
 	private TreeViewer viewer;
 	
-	private Node[] dragData;
+	private MultiSelectNode[] dragData;
 
 	public TreeViewerDragListener(TreeViewer viewer) {
 		this.viewer = viewer;
@@ -137,35 +186,40 @@ class TreeViewerDragListener implements DragSourceListener {
 
 	public void dragStart(DragSourceEvent event) {
 		event.doit = !viewer.getSelection().isEmpty();
-		System.out.println(event.toString());
+		System.out.println("dragStart: " + event.toString());
 	}
 
 	public void dragSetData(DragSourceEvent event) {
 		Object[] selections = ((IStructuredSelection) viewer.getSelection()).toArray();
 		
 		int count = 0;
-		Node[] nodes = new Node[selections.length];
+		MultiSelectNode[] nodes = new MultiSelectNode[selections.length];
 		for (Object sel : selections) {
-			nodes[count] = (Node) sel;
+			nodes[count] = (MultiSelectNode) sel;
 			++count;
 		}
 		event.data = nodes;
 		dragData = nodes;
-		System.out.println(event.toString());
+		System.out.println("dragSetData: " + event.toString());
 	}
 
 	public void dragFinished(DragSourceEvent event) {
 		if (!event.doit) return;
 
-		Node rootNode = (Node) viewer.getInput();
-		for (Node node : dragData) {
+		MultiSelectNode rootNode = (MultiSelectNode) viewer.getInput();
+		for (MultiSelectNode node : dragData) {
 			rootNode.removeChild(node);
 			System.out.println("removed " + node.getName()
-					+ " from " + rootNode.getName());
+					+ " from " + rootNode.getName()
+					+ ", event: " + event.toString());
 		}
 	}
 }
 
+/**
+ * Drop support for moving items between TreeViewers in this widget.
+ *
+ */
 class TreeViewerDropListener extends ViewerDropAdapter {	
 	public TreeViewerDropListener(TreeViewer viewer) {
 		super(viewer);
@@ -176,30 +230,33 @@ class TreeViewerDropListener extends ViewerDropAdapter {
 
 	@Override
 	public boolean performDrop(Object data) {
-		Node target = (Node) getCurrentTarget();
-		if (target == null)
-			target = (Node) getViewer().getInput();
+		boolean result = true;
 		
-		Node[] nodes = (Node[]) data;
+		System.out.println("performDrop: event: " + data.toString());
+		MultiSelectNode target = (MultiSelectNode) getCurrentTarget();
+		if (target == null)
+			target = (MultiSelectNode) getViewer().getInput();
+		
+		MultiSelectNode[] nodes = (MultiSelectNode[]) data;
 		
 		TreeViewer viewer = (TreeViewer) getViewer();
 	
-		for (Node node : nodes) {
+		for (MultiSelectNode node : nodes) {
+			System.out.println("target: " + target + ", node_parent: " + node.getParent());
+			
 			if (target.getParent() == null) {
 				target.addChild(node);
-				viewer.reveal(node);
 				System.out.println("added " + node.getName()
 						+ " to " + target.getName());
 			}
 			else {
 				target.getParent().insertAfter(target, node);
-				viewer.reveal(node);
-				System.out.println("added " + node.getName()
+				System.out.println("inserted after " + node.getName()
 						+ " to " + target.getParent().getName());
-				
 			}
+			viewer.reveal(node);
 		}
-		return true;	
+		return result;	
 	}
 
 	@Override
