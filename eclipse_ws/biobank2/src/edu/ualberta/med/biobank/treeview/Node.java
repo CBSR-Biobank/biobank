@@ -93,10 +93,20 @@ public class Node {
 			int index = children.indexOf(namedChild);
 			children.remove(index);
 		}
-		
+
+		child.setParent(this);
 		children.add(child);
 		child.addListener(listener);
 		fireAdd(child);
+	}
+	
+	public void insertAfter(Node existingNode, Node newNode) {
+		int pos = children.indexOf(existingNode);
+		Assert.isTrue(pos >= 0, "existing node not found: " + existingNode.getName());
+		newNode.setParent(this);
+		children.add(pos + 1, newNode);
+		newNode.addListener(listener);
+		fireAdd(newNode);
 	}
 	
 	public void removeChild(Node item) {		

@@ -1,9 +1,11 @@
 package edu.ualberta.med.biobank.widgets;
 
 import java.util.HashMap;
+import java.util.List;
 
+import org.eclipse.jface.util.LocalSelectionTransfer;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.ListViewer;
+import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.dnd.DND;
 import org.eclipse.swt.dnd.DragSourceEvent;
@@ -21,11 +23,19 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.jface.viewers.ViewerDropAdapter;
 
 import edu.ualberta.med.biobank.forms.FormUtils;
+import edu.ualberta.med.biobank.treeview.Node;
+import edu.ualberta.med.biobank.treeview.NodeContentProvider;
+import edu.ualberta.med.biobank.treeview.NodeLabelProvider;
+import edu.ualberta.med.biobank.treeview.NodeTransfer;
 
 public class MultiSelect extends Composite {
-	private ListViewer selList;
+	private TreeViewer selTree;
 	
-	private ListViewer availList;
+	private TreeViewer availTree;
+	
+	private Node selTreeRootNode = new Node(null, 0, "selRoot");
+	
+	private Node availTreeRootNode = new Node(null, 0, "availRoot");
 	
 	private int minHeight;
 
@@ -53,22 +63,24 @@ public class MultiSelect extends Composite {
 		downButton.setText("Move Down");
 		downButton.setLayoutData(new GridData(GridData.FILL, GridData.CENTER, false, false));
 
-		selList = createLabelledList(this, leftLabel);
-		availList = createLabelledList(this, rightLabel);
+		selTree = createLabelledTree(this, leftLabel);
+		selTree.setInput(selTreeRootNode);
+		availTree = createLabelledTree(this, rightLabel);
+		availTree.setInput(availTreeRootNode);
 		
-		dragAndDropSupport(availList, selList);
-		dragAndDropSupport(selList, availList);
+		dragAndDropSupport(availTree, selTree);
+		dragAndDropSupport(selTree, availTree);
 	}
 	
-	private ListViewer createLabelledList(Composite parent, String label) {
+	private TreeViewer createLabelledTree(Composite parent, String label) {
 		Composite selComposite = new Composite(parent, SWT.NONE);
 		selComposite.setLayout(new GridLayout(1, true));
 		
-		ListViewer lv = new ListViewer(selComposite);
+		TreeViewer tv = new TreeViewer(selComposite);
 		GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
 		gd.heightHint = minHeight;
 		gd.widthHint = 180;
-		lv.getList().setLayoutData(gd);
+		tv.getTree().setLayoutData(gd);
 		
 		Label l = new Label(selComposite, SWT.NONE);
 		l.setText(label);
@@ -77,13 +89,16 @@ public class MultiSelect extends Composite {
 		gd.horizontalSpan = 2;
 		gd.horizontalAlignment = SWT.CENTER;
 		l.setLayoutData(gd);
+
+		tv.setLabelProvider(new NodeLabelProvider());
+		tv.setContentProvider(new NodeContentProvider());
 		
-		return lv;
+		return tv;
 	}
 	
-	private void dragAndDropSupport(ListViewer fromList, ListViewer toList) {
-		new ListViewerDragListener(fromList);
-		new ListViewerDropListener(toList);
+	private void dragAndDropSupport(TreeViewer fromList, TreeViewer toList) {
+		new TreeViewerDragListener(fromList);
+		new TreeViewerDropListener(toList);
 	}
 
 	public void adaptToToolkit(FormToolkit toolkit) {
@@ -102,66 +117,96 @@ public class MultiSelect extends Composite {
 	
 	public void addAvailable(HashMap<Integer, String> available) {
 		for (int key : available.keySet()) {
-			availList.add(available.get(key));
+			availTreeRootNode.addChild(new Node(availTreeRootNode, key, available.get(key)));
 		}
 	}
 }
 
-class ListViewerDragListener implements DragSourceListener {
-	private ListViewer viewer;
+class TreeViewerDragListener implements DragSourceListener {
+	private TreeViewer viewer;
+	
+	private Node[] dragData;
 
-	public ListViewerDragListener(ListViewer viewer) {
+	public TreeViewerDragListener(TreeViewer viewer) {
 		this.viewer = viewer;
 		
 		viewer.addDragSupport(DND.DROP_MOVE | DND.DROP_COPY,
-				new Transfer[] { TextTransfer.getInstance() },
+				new Transfer[] { NodeTransfer.getInstance() },
 				this);
 	}
 
 	public void dragStart(DragSourceEvent event) {
 		event.doit = !viewer.getSelection().isEmpty();
+		System.out.println(event.toString());
 	}
 
 	public void dragSetData(DragSourceEvent event) {
-		event.data = ((IStructuredSelection) viewer.getSelection()).getFirstElement();
+		Object[] selections = ((IStructuredSelection) viewer.getSelection()).toArray();
+		
+		int count = 0;
+		Node[] nodes = new Node[selections.length];
+		for (Object sel : selections) {
+			nodes[count] = (Node) sel;
+			++count;
+		}
+		event.data = nodes;
+		dragData = nodes;
+		System.out.println(event.toString());
 	}
 
 	public void dragFinished(DragSourceEvent event) {
-		if (event.doit) {
-			viewer.remove(((IStructuredSelection) 
-					viewer.getSelection()).getFirstElement());
+		if (!event.doit) return;
+
+		Node rootNode = (Node) viewer.getInput();
+		for (Node node : dragData) {
+			rootNode.removeChild(node);
+			System.out.println("removed " + node.getName()
+					+ " from " + rootNode.getName());
 		}
 	}
-
 }
 
-class ListViewerDropListener extends ViewerDropAdapter {	
-	public ListViewerDropListener(ListViewer viewer) {
+class TreeViewerDropListener extends ViewerDropAdapter {	
+	public TreeViewerDropListener(TreeViewer viewer) {
 		super(viewer);
 		viewer.addDropSupport(DND.DROP_MOVE | DND.DROP_COPY, 
-				new Transfer[] { TextTransfer.getInstance() },
+				new Transfer[] { NodeTransfer.getInstance() },
 				this);
 	}
 
 	@Override
 	public boolean performDrop(Object data) {
-		String target = (String) getCurrentTarget();
+		Node target = (Node) getCurrentTarget();
 		if (target == null)
-			target = (String) getViewer().getInput();
-		String toDrop = (String)data;
-		ListViewer viewer = (ListViewer) getViewer();
-
-		if (toDrop.equals(target)) return false;
+			target = (Node) getViewer().getInput();
 		
-		viewer.add(toDrop);
-		viewer.reveal(toDrop);
+		Node[] nodes = (Node[]) data;
+		
+		TreeViewer viewer = (TreeViewer) getViewer();
+	
+		for (Node node : nodes) {
+			if (target.getParent() == null) {
+				target.addChild(node);
+				viewer.reveal(node);
+				System.out.println("added " + node.getName()
+						+ " to " + target.getName());
+			}
+			else {
+				target.getParent().insertAfter(target, node);
+				viewer.reveal(node);
+				System.out.println("added " + node.getName()
+						+ " to " + target.getParent().getName());
+				
+			}
+		}
 		return true;	
 	}
 
 	@Override
 	public boolean validateDrop(Object target, int operation,
 			TransferData transferType) {
-		return TextTransfer.getInstance().isSupportedType(transferType);
+		return NodeTransfer.getInstance().isSupportedType(transferType);
 	}
 
 }
+
