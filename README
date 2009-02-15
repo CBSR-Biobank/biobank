@@ -19,3 +19,7 @@ To build model with caCORE SDK:
 
 MySQL Server
   - my.cnf must have "lower_case_table_names=1"
+
+
+Git Repo now at:
+  ssh://biobank@aicml-med.cs.ualberta.ca/home/biobank/gitrepo/biobank2.git
