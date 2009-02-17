@@ -68,17 +68,17 @@ public class NodeContentProvider implements ITreeContentProvider, IDeltaListener
 		}
 	}
 	
-	protected void removeListenerFrom(Node node) {
-		node.removeListener(this);
-		for (Node child : node.getChildren()) {
-			removeListenerFrom(child);
-		}
-	}
-	
 	protected void addListenerTo(Node node) {
 		node.addListener(this);
 		for (Node child : node.getChildren()) {
 			addListenerTo(child);
+		}
+	}
+	
+	protected void removeListenerFrom(Node node) {
+		node.removeListener(this);
+		for (Node child : node.getChildren()) {
+			removeListenerFrom(child);
 		}
 	}
 

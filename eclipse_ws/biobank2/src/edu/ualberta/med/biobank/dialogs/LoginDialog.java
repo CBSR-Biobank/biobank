@@ -21,9 +21,9 @@ import org.osgi.service.prefs.Preferences;
 import org.osgi.service.prefs.BackingStoreException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.helpers.SessionHelper;
 import edu.ualberta.med.biobank.rcp.Application;
-import edu.ualberta.med.biobank.views.SessionsView;
 
 public class LoginDialog extends TitleAreaDialog {
 	
@@ -197,8 +197,8 @@ public class LoginDialog extends TitleAreaDialog {
 				PlatformUI.getWorkbench().getActiveWorkbenchWindow()
 				.getShell().getDisplay(), sessionHelper);
 		
-		SessionsView view = BioBankPlugin.getDefault().getSessionsView();
-		view.addSession(sessionHelper.getAppService(), serverText.getText(), 
+		SessionManager.getInstance().addSession(
+				sessionHelper.getAppService(), serverText.getText(), 
 				sessionHelper.getSites());
 		
 		super.okPressed();	

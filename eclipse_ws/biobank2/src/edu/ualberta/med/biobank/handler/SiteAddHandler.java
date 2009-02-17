@@ -6,7 +6,7 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.ui.handlers.HandlerUtil;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.forms.SiteEntryForm;
 import edu.ualberta.med.biobank.forms.NodeInput;
 import edu.ualberta.med.biobank.model.Address;
@@ -16,7 +16,7 @@ import edu.ualberta.med.biobank.treeview.SiteAdapter;
 public class SiteAddHandler extends AbstractHandler {
 
 	public Object execute(ExecutionEvent event) throws ExecutionException {
-		int numSessions = BioBankPlugin.getDefault().getSessionCount();
+		int numSessions = SessionManager.getInstance().getSessionCount();
 		
 		Assert.isTrue(numSessions >= 1);
 		
@@ -37,6 +37,6 @@ public class SiteAddHandler extends AbstractHandler {
 	}
 	
 	public boolean isEnabled() {
-		return (BioBankPlugin.getDefault().getSessionCount() > 0);
+		return (SessionManager.getInstance().getSessionCount() > 0);
 	}
 }

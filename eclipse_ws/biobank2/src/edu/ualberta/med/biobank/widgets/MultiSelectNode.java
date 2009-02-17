@@ -5,6 +5,10 @@ import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
 
+import edu.ualberta.med.biobank.treeview.DeltaEvent;
+import edu.ualberta.med.biobank.treeview.IDeltaListener;
+import edu.ualberta.med.biobank.treeview.NullDeltaListener;
+
 public class MultiSelectNode {	
 	private int id;
 	
@@ -13,6 +17,8 @@ public class MultiSelectNode {
 	protected MultiSelectNode parent;
 
 	protected List<MultiSelectNode> children;
+	
+	protected IDeltaListener listener = NullDeltaListener.getSoleInstance();
 	
 	public MultiSelectNode(MultiSelectNode parent) {
 		this.parent = parent;
@@ -56,6 +62,8 @@ public class MultiSelectNode {
 	public void addChild(MultiSelectNode child) {
 		child.setParent(this);
 		children.add(child);
+		child.addListener(listener);
+		fireAdd(child);
 	}
 	
 	public void insertAfter(MultiSelectNode existingNode, MultiSelectNode newNode) {
@@ -63,6 +71,8 @@ public class MultiSelectNode {
 		Assert.isTrue(pos >= 0, "existing node not found: " + existingNode.getName());
 		newNode.setParent(this);
 		children.add(pos + 1, newNode);
+		newNode.addListener(listener);
+		fireAdd(newNode);
 	}
 	
 	public void removeChild(MultiSelectNode item) {		
@@ -78,11 +88,29 @@ public class MultiSelectNode {
 		
 		if (itemToRemove != null) {
 			children.remove(itemToRemove);
-			System.out.println("removeChild: removed child: " + item.getName());
+			fireRemove(itemToRemove);
 		}
 	}
 	
 	public int getChildCount() {
 		return children.size();
+	}
+	
+	public void addListener(IDeltaListener listener) {
+		this.listener = listener;
+	}	
+	
+	public void removeListener(IDeltaListener listener) {
+		if(this.listener.equals(listener)) {
+			this.listener = NullDeltaListener.getSoleInstance();
+		}
+	}
+	
+	protected void fireAdd(Object added) {
+		listener.add(new DeltaEvent(added));
+	}
+
+	protected void fireRemove(Object removed) {
+		listener.remove(new DeltaEvent(removed));
 	}
 }

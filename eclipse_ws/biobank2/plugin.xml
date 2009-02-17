@@ -117,7 +117,7 @@
       <view
             allowMultiple="false"
             class="edu.ualberta.med.biobank.views.SessionsView"
-            id="edu.ualberta.med.biobank.session.SessionView"
+            id="edu.ualberta.med.biobank.views.SessionsView"
             name="Sessions"
             restorable="true">
       </view>
@@ -128,7 +128,7 @@
             targetID="edu.ualberta.med.biobank.perspective">
          <view
                closeable="false"
-               id="edu.ualberta.med.biobank.session.SessionView"
+               id="edu.ualberta.med.biobank.views.SessionsView"
                minimized="false"
                moveable="false"
                ratio="0.5"

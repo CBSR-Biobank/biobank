@@ -5,9 +5,7 @@ import java.util.HashMap;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.dnd.DND;
 import org.eclipse.swt.dnd.DragSourceEvent;
@@ -24,7 +22,6 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.jface.viewers.ViewerDropAdapter;
 
 import edu.ualberta.med.biobank.forms.FormUtils;
-import edu.ualberta.med.biobank.treeview.NodeTransfer;
 
 public class MultiSelect extends Composite {
 	private TreeViewer selTree;
@@ -105,38 +102,7 @@ public class MultiSelect extends Composite {
 			}
 		});
 		
-		tv.setContentProvider(new ITreeContentProvider() {
-
-			@Override
-			public Object[] getChildren(Object parentElement) {
-				((MultiSelectNode) parentElement).getChildren().toArray();
-				return null;
-			}
-
-			@Override
-			public Object getParent(Object element) {
-				return null;
-			}
-
-			@Override
-			public boolean hasChildren(Object element) {
-				return (((MultiSelectNode) element).getChildCount() > 0);
-			}
-
-			@Override
-			public Object[] getElements(Object inputElement) {
-				return getChildren(inputElement);
-			}
-
-			@Override
-			public void dispose() {				
-			}
-
-			@Override
-			public void inputChanged(Viewer viewer, Object oldInput,
-					Object newInput) {				
-			}
-		});
+		tv.setContentProvider(new MultiSelectNodeContentProvider());
 		
 		return tv;
 	}
@@ -180,7 +146,7 @@ class TreeViewerDragListener implements DragSourceListener {
 		this.viewer = viewer;
 		
 		viewer.addDragSupport(DND.DROP_MOVE | DND.DROP_COPY,
-				new Transfer[] { NodeTransfer.getInstance() },
+				new Transfer[] { MultiSelectNodeTransfer.getInstance() },
 				this);
 	}
 
@@ -224,7 +190,7 @@ class TreeViewerDropListener extends ViewerDropAdapter {
 	public TreeViewerDropListener(TreeViewer viewer) {
 		super(viewer);
 		viewer.addDropSupport(DND.DROP_MOVE | DND.DROP_COPY, 
-				new Transfer[] { NodeTransfer.getInstance() },
+				new Transfer[] { MultiSelectNodeTransfer.getInstance() },
 				this);
 	}
 
@@ -251,8 +217,9 @@ class TreeViewerDropListener extends ViewerDropAdapter {
 			}
 			else {
 				target.getParent().insertAfter(target, node);
-				System.out.println("inserted after " + node.getName()
-						+ " to " + target.getParent().getName());
+				System.out.println("inserted " + node.getName()
+						+ " after " + target.getName() 
+						+ " on "+ target.getParent().getName());
 			}
 			viewer.reveal(node);
 		}
@@ -262,7 +229,7 @@ class TreeViewerDropListener extends ViewerDropAdapter {
 	@Override
 	public boolean validateDrop(Object target, int operation,
 			TransferData transferType) {
-		return NodeTransfer.getInstance().isSupportedType(transferType);
+		return MultiSelectNodeTransfer.getInstance().isSupportedType(transferType);
 	}
 
 }

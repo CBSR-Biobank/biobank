@@ -42,7 +42,7 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.part.EditorPart;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.helpers.StudyInformationHelper;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.SdataType;
@@ -360,9 +360,9 @@ public class StudyEntryForm extends EditorPart {
 	public SessionAdapter getSessionAdapter() {
 		SessionAdapter sessionAdapter = null;
 		
-		int sessions = BioBankPlugin.getDefault().getSessionCount();
+		int sessions = SessionManager.getInstance().getSessionCount();
 		if (sessions == 1) {
-			sessionAdapter = BioBankPlugin.getDefault().getSessionAdapter(0);
+			sessionAdapter = SessionManager.getInstance().getSessionAdapter(0);
 		}
 		else {
 			Assert.isTrue(false, "not implemented yet");

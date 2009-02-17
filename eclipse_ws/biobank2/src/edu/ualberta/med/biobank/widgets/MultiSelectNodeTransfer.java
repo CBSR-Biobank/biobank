@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.treeview;
+package edu.ualberta.med.biobank.widgets;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -11,15 +11,15 @@ import java.util.List;
 import org.eclipse.swt.dnd.ByteArrayTransfer;
 import org.eclipse.swt.dnd.TransferData;
 
-public class NodeTransfer extends ByteArrayTransfer {
-	private static final NodeTransfer INSTANCE =
-		new NodeTransfer();
+public class MultiSelectNodeTransfer extends ByteArrayTransfer {
+	private static final MultiSelectNodeTransfer INSTANCE =
+		new MultiSelectNodeTransfer();
 
-	public static NodeTransfer getInstance() {
+	public static MultiSelectNodeTransfer getInstance() {
 		return INSTANCE;
 	}
 	
-	private NodeTransfer() {
+	private MultiSelectNodeTransfer() {
 		super();
 	}
 
@@ -39,8 +39,8 @@ public class NodeTransfer extends ByteArrayTransfer {
 	
 	protected void javaToNative(Object data, TransferData transferData) {
 
-		if (!(data instanceof Node[])) return;
-		Node[] items = (Node[]) data;
+		if (!(data instanceof MultiSelectNode[])) return;
+		MultiSelectNode[] items = (MultiSelectNode[]) data;
 
 		/**
 		 * The serialization format is:
@@ -54,7 +54,7 @@ public class NodeTransfer extends ByteArrayTransfer {
 			DataOutputStream dataOut = new DataOutputStream(out);
 			dataOut.writeInt(items.length);
 			for (int i = 0; i < items.length; i++) {
-				Node item = items[i];
+				MultiSelectNode item = items[i];
 				dataOut.writeUTF("" + item.getId());
 				dataOut.writeUTF(item.getName());
 			}
@@ -80,13 +80,13 @@ public class NodeTransfer extends ByteArrayTransfer {
 		DataInputStream in =new DataInputStream(new ByteArrayInputStream(bytes));
 		try {
 			int count = in.readInt();
-			List<Node> items = new ArrayList<Node>(count);
+			List<MultiSelectNode> items = new ArrayList<MultiSelectNode>(count);
 			for (int i = 0; i < count; i++) {
 				String typeId = in.readUTF();
 				String info = in.readUTF();
-				items.add(new Node(null, new Integer(typeId).intValue(), info));
+				items.add(new MultiSelectNode(null, new Integer(typeId).intValue(), info));
 			}
-			return (Node[]) items.toArray(new Node[items.size()]);
+			return (MultiSelectNode[]) items.toArray(new MultiSelectNode[items.size()]);
 		}
 		catch (IOException e) {
 			return null;

@@ -2,7 +2,6 @@ package edu.ualberta.med.biobank;
 
 import java.net.URL;
 
-import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
@@ -10,9 +9,6 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
-
-import edu.ualberta.med.biobank.treeview.SessionAdapter;
-import edu.ualberta.med.biobank.views.SessionsView;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -25,8 +21,6 @@ public class BioBankPlugin extends AbstractUIPlugin {
 
 	// The shared instance
 	private static BioBankPlugin plugin;
-	
-	private SessionsView sessionView;
 	
 	/**
 	 * The constructor
@@ -41,6 +35,7 @@ public class BioBankPlugin extends AbstractUIPlugin {
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
+		SessionManager.getInstance();
 	}
 	
 	protected void initializeImageRegistry(ImageRegistry registry) {
@@ -87,35 +82,5 @@ public class BioBankPlugin extends AbstractUIPlugin {
 	 */
 	public static ImageDescriptor getImageDescriptor(String path) {
 		return imageDescriptorFromPlugin(PLUGIN_ID, path);
-	}
-	
-	public void setSessionsView(SessionsView sessionView) {
-		this.sessionView = sessionView;
-	}
-	
-	public SessionsView getSessionsView() {
-		return sessionView;
-	}
-	
-	public int getSessionCount() {
-		return sessionView.getSessionCount(); 
-	}
-	
-	public SessionAdapter getSessionAdapter(String sessionName) {
-		return sessionView.getSessionAdapter(sessionName);
-	}
-	
-	public SessionAdapter getSessionAdapter(int count) {
-		return sessionView.getSessionAdapter(count);
-	}
-
-	public String[] getSessionNames() {
-		return sessionView.getSessionNames();
-	}
-	
-	public SessionAdapter getSessionSingle() {
-		int count = sessionView.getSessionCount();
-		Assert.isTrue(count == 1, "No sessions or more than 1 session connected");
-		return sessionView.getSessionAdapter(0);
 	}
 }

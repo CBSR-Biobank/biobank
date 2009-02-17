@@ -5,7 +5,7 @@ import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.ui.handlers.HandlerUtil;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.forms.ClinicEntryForm;
 import edu.ualberta.med.biobank.forms.NodeInput;
 import edu.ualberta.med.biobank.model.Address;
@@ -34,6 +34,6 @@ public class ClinicAddHandler extends AbstractHandler {
 	}
 	
 	public boolean isEnabled() {
-		return (BioBankPlugin.getDefault().getSessionCount() > 0);
+		return (SessionManager.getInstance().getSessionCount() > 0);
 	}
 }

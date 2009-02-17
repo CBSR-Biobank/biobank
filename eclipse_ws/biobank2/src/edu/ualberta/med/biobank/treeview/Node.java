@@ -123,7 +123,6 @@ public class Node {
 		if (itemToRemove != null) {
 			children.remove(itemToRemove);
 			fireRemove(itemToRemove);
-			System.out.println("removeChild: removed child: " + item.getName());
 		}
 	}
 

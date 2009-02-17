@@ -27,7 +27,7 @@ import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.helpers.GetHelper;
 import edu.ualberta.med.biobank.helpers.SiteSaveHelper;
 import edu.ualberta.med.biobank.model.Site;
@@ -116,7 +116,7 @@ public class SiteEntryForm extends AddressEntryForm {
 		sbody.setLayout(layout);
 		toolkit.paintBordersFor(sbody);
 		
-		String[] sessionNames = BioBankPlugin.getDefault().getSessionNames();
+		String[] sessionNames = SessionManager.getInstance().getSessionNames();
 		
 		if (sessionNames.length > 1) {			
 			toolkit.createLabel(sbody, "Session:", SWT.LEFT);
@@ -188,7 +188,7 @@ public class SiteEntryForm extends AddressEntryForm {
 		site.setAddress(address);
 		
 		if (siteAdapter.getParent() == null) {
-			siteAdapter.setParent(BioBankPlugin.getDefault().getSessionSingle());
+			siteAdapter.setParent(SessionManager.getInstance().getSessionSingle());
 		}
 		
 		SiteSaveHelper helper = new SiteSaveHelper(
