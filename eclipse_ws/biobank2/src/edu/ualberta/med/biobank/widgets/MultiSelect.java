@@ -152,7 +152,7 @@ class TreeViewerDragListener implements DragSourceListener {
 
 	public void dragStart(DragSourceEvent event) {
 		event.doit = !viewer.getSelection().isEmpty();
-		System.out.println("dragStart: " + event.toString());
+		//System.out.println("dragStart: " + event.toString());
 	}
 
 	public void dragSetData(DragSourceEvent event) {
@@ -166,7 +166,7 @@ class TreeViewerDragListener implements DragSourceListener {
 		}
 		event.data = nodes;
 		dragData = nodes;
-		System.out.println("dragSetData: " + event.toString());
+		//System.out.println("dragSetData: " + event.toString());
 	}
 
 	public void dragFinished(DragSourceEvent event) {
@@ -175,9 +175,9 @@ class TreeViewerDragListener implements DragSourceListener {
 		MultiSelectNode rootNode = (MultiSelectNode) viewer.getInput();
 		for (MultiSelectNode node : dragData) {
 			rootNode.removeChild(node);
-			System.out.println("removed " + node.getName()
-					+ " from " + rootNode.getName()
-					+ ", event: " + event.toString());
+			//System.out.println("removed " + node.getName()
+			//		+ " from " + rootNode.getName()
+			//		+ ", event: " + event.toString());
 		}
 	}
 }
@@ -198,7 +198,7 @@ class TreeViewerDropListener extends ViewerDropAdapter {
 	public boolean performDrop(Object data) {
 		boolean result = true;
 		
-		System.out.println("performDrop: event: " + data.toString());
+		//System.out.println("performDrop: event: " + data.toString());
 		MultiSelectNode target = (MultiSelectNode) getCurrentTarget();
 		if (target == null)
 			target = (MultiSelectNode) getViewer().getInput();
@@ -208,18 +208,18 @@ class TreeViewerDropListener extends ViewerDropAdapter {
 		TreeViewer viewer = (TreeViewer) getViewer();
 	
 		for (MultiSelectNode node : nodes) {
-			System.out.println("target: " + target + ", node_parent: " + node.getParent());
+			//System.out.println("target: " + target + ", node_parent: " + node.getParent());
 			
 			if (target.getParent() == null) {
 				target.addChild(node);
-				System.out.println("added " + node.getName()
-						+ " to " + target.getName());
+				//System.out.println("added " + node.getName()
+				//		+ " to " + target.getName());
 			}
 			else {
 				target.getParent().insertAfter(target, node);
-				System.out.println("inserted " + node.getName()
-						+ " after " + target.getName() 
-						+ " on "+ target.getParent().getName());
+				//System.out.println("inserted " + node.getName()
+				//		+ " after " + target.getName() 
+				//		+ " on "+ target.getParent().getName());
 			}
 			viewer.reveal(node);
 		}
