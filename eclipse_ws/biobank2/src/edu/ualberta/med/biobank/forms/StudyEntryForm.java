@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.forms;
 
 import java.lang.reflect.Constructor;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -45,8 +46,10 @@ import org.eclipse.ui.part.EditorPart;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.helpers.StudyInformationHelper;
 import edu.ualberta.med.biobank.model.Clinic;
+import edu.ualberta.med.biobank.model.Sdata;
 import edu.ualberta.med.biobank.model.SdataType;
 import edu.ualberta.med.biobank.model.Study;
+import edu.ualberta.med.biobank.model.Worksheet;
 import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.SessionAdapter;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
@@ -62,9 +65,13 @@ public class StudyEntryForm extends EditorPart {
 		= "Create a new study.";
 	private static final String STUDY_OK_MESSAGE = "Edit a study.";
 
-	public static final String[]  ORDERED_FIELDS = new String[] {
+	public static final String[] ORDERED_FIELDS = new String[] {
 		"name",
-		"nameShort"
+		"nameShort",
+		"aliquotVolume",
+		"bloodReceived",
+		"visitList",
+		"worksheet",
 	};
 	
 	public static final HashMap<String, FieldInfo> FIELDS = 
@@ -73,6 +80,14 @@ public class StudyEntryForm extends EditorPart {
 					NonEmptyString.class, "Study name cannot be blank"));
 			put("nameShort", new FieldInfo("Short Name", Text.class,  
 					NonEmptyString.class, "Study short name cannot be blank"));
+			put("aliquotVolume", new FieldInfo("Aliquot Volume", Text.class,  
+					null, null));
+			put("bloodReceived", new FieldInfo("Blood Received", Text.class,  
+					null, null));
+			put("visitList", new FieldInfo("Visit List", Text.class,  
+					null, null));
+			put("worksheet", new FieldInfo("Worksheet Name", Text.class,  
+					null, null));
 		}
 	};
 	
@@ -96,7 +111,7 @@ public class StudyEntryForm extends EditorPart {
 	
 	private List<Clinic> allClinics;
 	
-	private List<SdataType> sdataTypes;
+	private List<SdataType> allSdataTypes;
 	
 	private Button submit;
 	
@@ -157,6 +172,7 @@ public class StudyEntryForm extends EditorPart {
 		
 		studyAdapter = (StudyAdapter) node;
 		study = studyAdapter.getStudy();
+		study.setWorksheet(new Worksheet());
 		
 		if (study.getId() == null) {
 			setPartName("New Study");
@@ -282,7 +298,7 @@ public class StudyEntryForm extends EditorPart {
 				.getShell().getDisplay(), helper);
 		
 		allClinics = helper.getAllClinics();
-		sdataTypes = helper.getSdataTypes();
+		allSdataTypes = helper.getSdataTypes();
 
 		HashMap<Integer, String> availClinics = new HashMap<Integer, String>();
 		for (Clinic clinic : allClinics) {
@@ -291,7 +307,7 @@ public class StudyEntryForm extends EditorPart {
 		clinicsMultiSelect.addAvailable(availClinics);
 
 		HashMap<Integer, String> availSdata = new HashMap<Integer, String>();
-		for (SdataType sdataType : sdataTypes) {
+		for (SdataType sdataType : allSdataTypes) {
 			availSdata.put(sdataType.getId(), sdataType.getType());
 		}
 		sdataMultiSelect.addAvailable(availSdata);
@@ -316,8 +332,17 @@ public class StudyEntryForm extends EditorPart {
 					}
 				}
 				
-				dbc.bindValue(SWTObservables.observeText(controls.get(key), SWT.Modify),
-						PojoObservables.observeValue(study, key), uvs, null);
+				if (key.equals("worksheet")) {			
+					dbc.bindValue(SWTObservables.observeText(controls.get(key), 
+							SWT.Modify),
+							PojoObservables.observeValue(study.getWorksheet(), "name"), 
+							uvs, null);
+				}
+				else {				
+					dbc.bindValue(SWTObservables.observeText(controls.get(key), 
+							SWT.Modify),
+							PojoObservables.observeValue(study, key), uvs, null);
+				}
 			}
 			else if (fi.widgetClass == Combo.class) {
 		    	dbc.bindValue(SWTObservables.observeSelection(controls.get(key)),
@@ -361,7 +386,30 @@ public class StudyEntryForm extends EditorPart {
     }
     
     private void saveSettings() {
-    	// TODO; needs implementation
+    	// get the selected clinics from widget
+    	List<Integer> selClinicIds = clinicsMultiSelect.getSelected();
+    	List<Clinic> selClinics = new ArrayList<Clinic>();
+    	for (Clinic clinic : allClinics) {
+    		if (selClinicIds.indexOf(clinic.getId()) >= 0) {
+    			selClinics.add(clinic);
+    		}
+    		
+    	}
+    	Assert.isTrue(selClinics.size() == selClinicIds.size(), 
+    			"problem with clinic selections");
+		study.setClinicCollection(selClinics);
+
+    	// get the selected study data types from widget
+    	List<Integer> selSdataTypeIds = sdataMultiSelect.getSelected();
+    	List<Sdata> selSdata = new ArrayList<Sdata>();
+    	for (SdataType sdataType : allSdataTypes) {
+    		if (selSdataTypeIds.indexOf(sdataType.getId()) >= 0) {
+    			Sdata newSdata = new Sdata();
+    			newSdata.setSdataType(sdataType);
+    			selSdata.add(newSdata);
+    		}
+    	}
+    	study.setSdataCollection(selSdata);
     	
 		getSite().getPage().closeEditor(StudyEntryForm.this, false);    	
     }

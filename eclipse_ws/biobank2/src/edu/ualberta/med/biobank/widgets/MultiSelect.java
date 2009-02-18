@@ -32,12 +32,11 @@ public class MultiSelect extends Composite {
 	
 	HashMap<String, Integer> availableInv;
 
-	public MultiSelect(Composite parent, int style, String leftLabel, 
+	public MultiSelect(Composite parent,int style, String leftLabel, 
 			String rightLabel, int minHeight) {
 		super(parent, style);
 		
-		availableInv = new HashMap<String, Integer>();
-		
+		availableInv = new HashMap<String, Integer>();		
 		this.minHeight = minHeight;
 		
 		setLayout(new GridLayout(2, false));
@@ -104,7 +103,8 @@ public class MultiSelect extends Composite {
 		}
 		
 		for (int key : available.keySet()) {
-			availTreeRootNode.addChild(new MultiSelectNode(availTreeRootNode, key, available.get(key)));
+			availTreeRootNode.addChild(new MultiSelectNode(
+					availTreeRootNode, key, available.get(key)));
 		}
 	}
 	

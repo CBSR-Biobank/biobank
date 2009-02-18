@@ -11,6 +11,7 @@ import org.eclipse.swt.dnd.TransferData;
  *
  */
 public class TreeViewerDropListener extends ViewerDropAdapter {	
+	
 	public TreeViewerDropListener(TreeViewer viewer) {
 		super(viewer);
 		viewer.addDropSupport(DND.DROP_MOVE | DND.DROP_COPY, 
@@ -36,11 +37,13 @@ public class TreeViewerDropListener extends ViewerDropAdapter {
 			
 			if (target.getParent() == null) {
 				target.addChild(node);
+				
 				MultiSelect.log4j.trace("added " + node.getName()
 						+ " to " + target.getName());
 			}
 			else {
 				target.getParent().insertAfter(target, node);
+				
 				MultiSelect.log4j.trace("inserted " + node.getName()
 						+ " after " + target.getName() 
 						+ " on "+ target.getParent().getName());
