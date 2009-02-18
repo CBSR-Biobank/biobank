@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank;
 
 import java.net.URL;
 
+import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
@@ -14,13 +15,15 @@ import org.osgi.framework.BundleContext;
  * The activator class controls the plug-in life cycle
  */
 public class BioBankPlugin extends AbstractUIPlugin {
-	public static final String IMG_FORM_BG = "formBg";
-
 	// The plug-in ID
 	public static final String PLUGIN_ID = "biobank2";
 
+	public static final String IMG_FORM_BG = "formBg";
+
 	// The shared instance
 	private static BioBankPlugin plugin;
+	
+	static Logger log4j = Logger.getLogger(BioBankPlugin.class.getName());
 	
 	/**
 	 * The constructor
@@ -36,6 +39,10 @@ public class BioBankPlugin extends AbstractUIPlugin {
 		super.start(context);
 		plugin = this;
 		SessionManager.getInstance();
+		
+		Logger l = Logger.getRootLogger();
+		
+		log4j.debug(PLUGIN_ID + " started");
 	}
 	
 	protected void initializeImageRegistry(ImageRegistry registry) {
@@ -62,6 +69,8 @@ public class BioBankPlugin extends AbstractUIPlugin {
 	public void stop(BundleContext context) throws Exception {
 		plugin = null;
 		super.stop(context);
+		
+		log4j.debug(PLUGIN_ID + " stopped");
 	}
 
 	/**

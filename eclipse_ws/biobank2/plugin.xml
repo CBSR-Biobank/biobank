@@ -16,7 +16,7 @@
          point="org.eclipse.core.runtime.products">
       <product
             application="edu.ualberta.med.biobank.application"
-            name="Biobank2">
+            name="BioBank2">
          <property
                name="windowImages"
                value="icons/alt_window_16.gif,icons/alt_window_32.gif">

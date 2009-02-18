@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.widgets;
 
 import java.util.HashMap;
 
+import org.apache.log4j.Logger;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -33,6 +34,8 @@ public class MultiSelect extends Composite {
 	private MultiSelectNode availTreeRootNode = new MultiSelectNode(null, 0, "availRoot");
 	
 	private int minHeight;
+	
+	static Logger log4j = Logger.getLogger(MultiSelect.class.getName());
 
 	public MultiSelect(Composite parent, int style, String leftLabel, 
 			String rightLabel, int minHeight) {
@@ -152,7 +155,7 @@ class TreeViewerDragListener implements DragSourceListener {
 
 	public void dragStart(DragSourceEvent event) {
 		event.doit = !viewer.getSelection().isEmpty();
-		//System.out.println("dragStart: " + event.toString());
+		MultiSelect.log4j.trace("dragStart: " + event.toString());
 	}
 
 	public void dragSetData(DragSourceEvent event) {
@@ -166,7 +169,7 @@ class TreeViewerDragListener implements DragSourceListener {
 		}
 		event.data = nodes;
 		dragData = nodes;
-		//System.out.println("dragSetData: " + event.toString());
+		MultiSelect.log4j.trace("dragSetData: " + event.toString());
 	}
 
 	public void dragFinished(DragSourceEvent event) {
@@ -175,9 +178,9 @@ class TreeViewerDragListener implements DragSourceListener {
 		MultiSelectNode rootNode = (MultiSelectNode) viewer.getInput();
 		for (MultiSelectNode node : dragData) {
 			rootNode.removeChild(node);
-			//System.out.println("removed " + node.getName()
-			//		+ " from " + rootNode.getName()
-			//		+ ", event: " + event.toString());
+			MultiSelect.log4j.trace("removed " + node.getName()
+					+ " from " + rootNode.getName()
+					+ ", event: " + event.toString());
 		}
 	}
 }
@@ -198,7 +201,7 @@ class TreeViewerDropListener extends ViewerDropAdapter {
 	public boolean performDrop(Object data) {
 		boolean result = true;
 		
-		//System.out.println("performDrop: event: " + data.toString());
+		MultiSelect.log4j.trace("performDrop: event: " + data.toString());
 		MultiSelectNode target = (MultiSelectNode) getCurrentTarget();
 		if (target == null)
 			target = (MultiSelectNode) getViewer().getInput();
@@ -208,18 +211,18 @@ class TreeViewerDropListener extends ViewerDropAdapter {
 		TreeViewer viewer = (TreeViewer) getViewer();
 	
 		for (MultiSelectNode node : nodes) {
-			//System.out.println("target: " + target + ", node_parent: " + node.getParent());
+			MultiSelect.log4j.trace("target: " + target + ", node_parent: " + node.getParent());
 			
 			if (target.getParent() == null) {
 				target.addChild(node);
-				//System.out.println("added " + node.getName()
-				//		+ " to " + target.getName());
+				MultiSelect.log4j.trace("added " + node.getName()
+						+ " to " + target.getName());
 			}
 			else {
 				target.getParent().insertAfter(target, node);
-				//System.out.println("inserted " + node.getName()
-				//		+ " after " + target.getName() 
-				//		+ " on "+ target.getParent().getName());
+				MultiSelect.log4j.trace("inserted " + node.getName()
+						+ " after " + target.getName() 
+						+ " on "+ target.getParent().getName());
 			}
 			viewer.reveal(node);
 		}
