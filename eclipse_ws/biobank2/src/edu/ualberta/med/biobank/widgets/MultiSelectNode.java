@@ -81,8 +81,7 @@ public class MultiSelectNode {
 		MultiSelectNode itemToRemove = null;
 
 		for (MultiSelectNode child : children) {
-			if ((child.getId() == item.getId()) 
-					&& child.getName().equals(item.getName()))
+			if (child == item)
 				itemToRemove = child;
 		}
 		
@@ -112,5 +111,9 @@ public class MultiSelectNode {
 
 	protected void fireRemove(Object removed) {
 		listener.remove(new DeltaEvent(removed));
+	}
+	
+	public String toString() {
+		return name;
 	}
 }

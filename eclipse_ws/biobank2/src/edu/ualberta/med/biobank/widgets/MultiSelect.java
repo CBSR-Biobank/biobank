@@ -58,12 +58,6 @@ public class MultiSelect extends Composite {
 		GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
 		selComposite.setLayoutData(gd);
 		
-		TreeViewer tv = new TreeViewer(selComposite);
-		gd = new GridData(SWT.FILL, SWT.FILL, true, true);
-		gd.heightHint = minHeight;
-		gd.widthHint = 180;
-		tv.getTree().setLayoutData(gd);
-		
 		Label l = new Label(selComposite, SWT.NONE);
 		l.setText(label);
 		l.setFont(FormUtils.getHeadingFont());
@@ -71,6 +65,12 @@ public class MultiSelect extends Composite {
 		gd.horizontalSpan = 2;
 		gd.horizontalAlignment = SWT.CENTER;
 		l.setLayoutData(gd);
+		
+		TreeViewer tv = new TreeViewer(selComposite);
+		gd = new GridData(SWT.FILL, SWT.FILL, true, true);
+		gd.heightHint = minHeight;
+		gd.widthHint = 180;
+		tv.getTree().setLayoutData(gd);
 
 		tv.setLabelProvider(new ILabelProvider(){
 
