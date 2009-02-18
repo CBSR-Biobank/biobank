@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank;
 import java.util.HashMap;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
@@ -25,6 +26,8 @@ import edu.ualberta.med.biobank.views.SessionsView;
 
 public class SessionManager {
 	private static SessionManager instance = null;
+	
+	static Logger log4j = Logger.getLogger(SessionManager.class.getName());
 	
 	private SessionsView view;
 	
@@ -118,7 +121,8 @@ public class SessionManager {
 			SiteAdapter siteNode = new SiteAdapter(sessionNode, (Site) o);
 			sessionNode.addChild(siteNode);
 		}
-		view.getTreeViewer().expandToLevel(2);
+		view.getTreeViewer().expandToLevel(2);	
+		log4j.debug("addSession: " + name);
 	}
 	
 	public SessionAdapter getSessionAdapter(String sessionName) {
@@ -152,6 +156,7 @@ public class SessionManager {
 				}
 				
 				view.getTreeViewer().expandToLevel(groupNode, 1);
+				SessionManager.log4j.debug("updateClinics:");
 			}
 		});
 	}

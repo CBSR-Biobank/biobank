@@ -19,11 +19,11 @@ public class BioBankPlugin extends AbstractUIPlugin {
 	public static final String PLUGIN_ID = "biobank2";
 
 	public static final String IMG_FORM_BG = "formBg";
+	
+	static Logger log4j = Logger.getLogger(BioBankPlugin.class.getName());
 
 	// The shared instance
 	private static BioBankPlugin plugin;
-	
-	static Logger log4j = Logger.getLogger(BioBankPlugin.class.getName());
 	
 	/**
 	 * The constructor
@@ -38,10 +38,7 @@ public class BioBankPlugin extends AbstractUIPlugin {
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
-		SessionManager.getInstance();
-		
-		Logger l = Logger.getRootLogger();
-		
+		SessionManager.getInstance();		
 		log4j.debug(PLUGIN_ID + " started");
 	}
 	

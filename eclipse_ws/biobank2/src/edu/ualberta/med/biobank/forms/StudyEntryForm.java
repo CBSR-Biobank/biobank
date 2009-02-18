@@ -88,6 +88,8 @@ public class StudyEntryForm extends EditorPart {
 	
 	private MultiSelect clinicsMultiSelect;
 	
+	private MultiSelect sdataMultiSelect;
+	
 	private StudyAdapter studyAdapter;
 	
 	private Study study;
@@ -242,6 +244,16 @@ public class StudyEntryForm extends EditorPart {
 				"Selected Clinics", "Available Clinics", 100);
 		section.setClient(clinicsMultiSelect);
 		clinicsMultiSelect.adaptToToolkit(toolkit);
+
+		section = toolkit.createSection(form.getBody(), Section.TITLE_BAR);
+		section.setText("Study Information Selection");
+		section.setFont(FormUtils.getSectionFont());
+		section.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		
+		sdataMultiSelect = new MultiSelect(section, SWT.NONE, 
+				"Selected Information Items", "Available Information Items", 150);
+		section.setClient(sdataMultiSelect);
+		sdataMultiSelect.adaptToToolkit(toolkit);
 		
 		toolkit.paintBordersFor(sbody);
 
@@ -277,6 +289,12 @@ public class StudyEntryForm extends EditorPart {
 			availClinics.put(clinic.getId(), clinic.getName());
 		}
 		clinicsMultiSelect.addAvailable(availClinics);
+
+		HashMap<Integer, String> availSdata = new HashMap<Integer, String>();
+		for (SdataType sdataType : sdataTypes) {
+			availSdata.put(sdataType.getId(), sdataType.getType());
+		}
+		sdataMultiSelect.addAvailable(availSdata);
 	}
 	
     private void bindValues() {

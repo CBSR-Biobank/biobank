@@ -1,0 +1,5 @@
+# Debugging options for org.eclipsercp.hyperbola.ui
+
+# Turn on debugging for the plugin.
+biobank2/debug=true
+

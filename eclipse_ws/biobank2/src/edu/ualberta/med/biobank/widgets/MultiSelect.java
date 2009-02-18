@@ -1,30 +1,25 @@
 package edu.ualberta.med.biobank.widgets;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.eclipse.jface.viewers.ILabelProvider;
-import org.eclipse.jface.viewers.ILabelProviderListener;
-import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.dnd.DND;
-import org.eclipse.swt.dnd.DragSourceEvent;
-import org.eclipse.swt.dnd.DragSourceListener;
-import org.eclipse.swt.dnd.Transfer;
-import org.eclipse.swt.dnd.TransferData;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.forms.widgets.FormToolkit;
-import org.eclipse.jface.viewers.ViewerDropAdapter;
 
 import edu.ualberta.med.biobank.forms.FormUtils;
 
 public class MultiSelect extends Composite {
+	
+	static Logger log4j = Logger.getLogger(MultiSelect.class.getName());
+	
 	private TreeViewer selTree;
 	
 	private TreeViewer availTree;
@@ -35,11 +30,13 @@ public class MultiSelect extends Composite {
 	
 	private int minHeight;
 	
-	static Logger log4j = Logger.getLogger(MultiSelect.class.getName());
+	HashMap<String, Integer> availableInv;
 
 	public MultiSelect(Composite parent, int style, String leftLabel, 
 			String rightLabel, int minHeight) {
 		super(parent, style);
+		
+		availableInv = new HashMap<String, Integer>();
 		
 		this.minHeight = minHeight;
 		
@@ -75,36 +72,7 @@ public class MultiSelect extends Composite {
 		gd.widthHint = 180;
 		tv.getTree().setLayoutData(gd);
 
-		tv.setLabelProvider(new ILabelProvider(){
-
-			@Override
-			public Image getImage(Object element) {
-				return null;
-			}
-
-			@Override
-			public String getText(Object element) {
-				return ((MultiSelectNode) element).getName();
-			}
-
-			@Override
-			public void addListener(ILabelProviderListener listener) {				
-			}
-
-			@Override
-			public void dispose() {				
-			}
-
-			@Override
-			public boolean isLabelProperty(Object element, String property) {
-				return false;
-			}
-
-			@Override
-			public void removeListener(ILabelProviderListener listener) {				
-			}
-		});
-		
+		tv.setLabelProvider(new MultiSelectNodeLabelProvider());		
 		tv.setContentProvider(new MultiSelectNodeContentProvider());
 		
 		return tv;
@@ -130,110 +98,25 @@ public class MultiSelect extends Composite {
 	}
 	
 	public void addAvailable(HashMap<Integer, String> available) {
+		// create an inverse map
+		for (int key : available.keySet()) {
+			availableInv.put(available.get(key), key);
+		}
+		
 		for (int key : available.keySet()) {
 			availTreeRootNode.addChild(new MultiSelectNode(availTreeRootNode, key, available.get(key)));
 		}
 	}
-}
-
-/**
- * Drag support for moving items between TreeViewers in this widget.
- *
- */
-class TreeViewerDragListener implements DragSourceListener {
-	private TreeViewer viewer;
 	
-	private MultiSelectNode[] dragData;
-
-	public TreeViewerDragListener(TreeViewer viewer) {
-		this.viewer = viewer;
-		
-		viewer.addDragSupport(DND.DROP_MOVE | DND.DROP_COPY,
-				new Transfer[] { MultiSelectNodeTransfer.getInstance() },
-				this);
-	}
-
-	public void dragStart(DragSourceEvent event) {
-		event.doit = !viewer.getSelection().isEmpty();
-		MultiSelect.log4j.trace("dragStart: " + event.toString());
-	}
-
-	public void dragSetData(DragSourceEvent event) {
-		Object[] selections = ((IStructuredSelection) viewer.getSelection()).toArray();
-		
-		int count = 0;
-		MultiSelectNode[] nodes = new MultiSelectNode[selections.length];
-		for (Object sel : selections) {
-			nodes[count] = (MultiSelectNode) sel;
-			++count;
-		}
-		event.data = nodes;
-		dragData = nodes;
-		MultiSelect.log4j.trace("dragSetData: " + event.toString());
-	}
-
-	public void dragFinished(DragSourceEvent event) {
-		if (!event.doit) return;
-
-		MultiSelectNode rootNode = (MultiSelectNode) viewer.getInput();
-		for (MultiSelectNode node : dragData) {
-			rootNode.removeChild(node);
-			MultiSelect.log4j.trace("removed " + node.getName()
-					+ " from " + rootNode.getName()
-					+ ", event: " + event.toString());
-		}
+	/**
+	 * Return the selected items in the order specified by user.
+	 * 
+	 */
+	public List<Integer> getSelected() {
+		List<Integer> result = new ArrayList<Integer>();		
+		for (MultiSelectNode node : selTreeRootNode.getChildren()) {
+			result.add(availableInv.get(node.getName()));
+		}		
+		return result;
 	}
 }
-
-/**
- * Drop support for moving items between TreeViewers in this widget.
- *
- */
-class TreeViewerDropListener extends ViewerDropAdapter {	
-	public TreeViewerDropListener(TreeViewer viewer) {
-		super(viewer);
-		viewer.addDropSupport(DND.DROP_MOVE | DND.DROP_COPY, 
-				new Transfer[] { MultiSelectNodeTransfer.getInstance() },
-				this);
-	}
-
-	@Override
-	public boolean performDrop(Object data) {
-		boolean result = true;
-		
-		MultiSelect.log4j.trace("performDrop: event: " + data.toString());
-		MultiSelectNode target = (MultiSelectNode) getCurrentTarget();
-		if (target == null)
-			target = (MultiSelectNode) getViewer().getInput();
-		
-		MultiSelectNode[] nodes = (MultiSelectNode[]) data;
-		
-		TreeViewer viewer = (TreeViewer) getViewer();
-	
-		for (MultiSelectNode node : nodes) {
-			MultiSelect.log4j.trace("target: " + target + ", node_parent: " + node.getParent());
-			
-			if (target.getParent() == null) {
-				target.addChild(node);
-				MultiSelect.log4j.trace("added " + node.getName()
-						+ " to " + target.getName());
-			}
-			else {
-				target.getParent().insertAfter(target, node);
-				MultiSelect.log4j.trace("inserted " + node.getName()
-						+ " after " + target.getName() 
-						+ " on "+ target.getParent().getName());
-			}
-			viewer.reveal(node);
-		}
-		return result;	
-	}
-
-	@Override
-	public boolean validateDrop(Object target, int operation,
-			TransferData transferType) {
-		return MultiSelectNodeTransfer.getInstance().isSupportedType(transferType);
-	}
-
-}
-

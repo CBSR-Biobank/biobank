@@ -95,6 +95,14 @@ public class MultiSelectNode {
 		return children.size();
 	}
 	
+	public boolean hasChild(String name) {
+		for (MultiSelectNode child : children) {
+			if (child.getName().equals(name))
+				return true;
+		}
+		return false;
+	}
+	
 	public void addListener(IDeltaListener listener) {
 		this.listener = listener;
 	}	
