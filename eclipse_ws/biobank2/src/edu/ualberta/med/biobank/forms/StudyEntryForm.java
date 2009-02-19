@@ -68,7 +68,7 @@ public class StudyEntryForm extends EditorPart {
 	public static final String[] ORDERED_FIELDS = new String[] {
 		"name",
 		"nameShort",
-		"aliquotVolume",
+		"aliquotVolumes",
 		"bloodReceived",
 		"visitList",
 		"worksheet",
@@ -80,7 +80,7 @@ public class StudyEntryForm extends EditorPart {
 					NonEmptyString.class, "Study name cannot be blank"));
 			put("nameShort", new FieldInfo("Short Name", Text.class,  
 					NonEmptyString.class, "Study short name cannot be blank"));
-			put("aliquotVolume", new FieldInfo("Aliquot Volume", Text.class,  
+			put("aliquotVolumes", new FieldInfo("Aliquot Volumes", Text.class,  
 					null, null));
 			put("bloodReceived", new FieldInfo("Blood Received", Text.class,  
 					null, null));
