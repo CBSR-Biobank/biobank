@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.forms;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -38,8 +39,8 @@ import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.ISaveablePart;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.forms.widgets.Form;
 import org.eclipse.ui.forms.widgets.FormToolkit;
+import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.part.EditorPart;
 
@@ -62,13 +63,13 @@ public class StudyEntryForm extends EditorPart {
 	      "edu.ualberta.med.biobank.forms.StudyEntryForm";
 	
 	private static final String NEW_STUDY_OK_MESSAGE 
-		= "Create a new study.";
-	private static final String STUDY_OK_MESSAGE = "Edit a study.";
+		= "Creating a new study.";
+	private static final String STUDY_OK_MESSAGE = "Editing an existing study.";
 
 	public static final String[] ORDERED_FIELDS = new String[] {
 		"name",
 		"nameShort",
-		"aliquotVolume",
+		"aliquotVolumes",
 		"bloodReceived",
 		"visitList",
 		"worksheet",
@@ -80,7 +81,7 @@ public class StudyEntryForm extends EditorPart {
 					NonEmptyString.class, "Study name cannot be blank"));
 			put("nameShort", new FieldInfo("Short Name", Text.class,  
 					NonEmptyString.class, "Study short name cannot be blank"));
-			put("aliquotVolume", new FieldInfo("Aliquot Volume", Text.class,  
+			put("aliquotVolumes", new FieldInfo("Aliquot Volumes", Text.class,  
 					null, null));
 			put("bloodReceived", new FieldInfo("Blood Received", Text.class,  
 					null, null));
@@ -99,7 +100,7 @@ public class StudyEntryForm extends EditorPart {
 
 	private FormToolkit toolkit;
 	
-	private Form form;
+	private ScrolledForm form;
 	
 	private MultiSelect clinicsMultiSelect;
 	
@@ -200,11 +201,11 @@ public class StudyEntryForm extends EditorPart {
 	@Override
 	public void createPartControl(Composite parent) {
 		toolkit = new FormToolkit(parent.getDisplay());
-		form = toolkit.createForm(parent);	
+		form = toolkit.createScrolledForm(parent);	
 		
 		form.setText("Study Information");
-		toolkit.decorateFormHeading(form);
-		form.setMessage(getOkMessage());
+		//toolkit.decorateFormHeading(form);
+		form.setMessage(getOkMessage(), IMessageProvider.NONE);
 		
 		GridLayout layout = new GridLayout(1, false);
 		form.getBody().setLayout(layout);
@@ -327,9 +328,22 @@ public class StudyEntryForm extends EditorPart {
 						Object[] args = new Object[] { fi.errMsg, fieldDecorators.get(key) };
 						uvs = new UpdateValueStrategy();
 						uvs.setAfterConvertValidator((IValidator) cons.newInstance(args));
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
+					} 
+					catch (NoSuchMethodException e) {
+                        throw new RuntimeException(e);
+                    }
+                    catch (InvocationTargetException e) {
+                        throw new RuntimeException(e);
+                    } 
+                    catch (IllegalArgumentException e) {
+                        throw new RuntimeException(e);
+                    } 
+                    catch (InstantiationException e) {
+                        throw new RuntimeException(e);
+                    } 
+                    catch (IllegalAccessException e) {
+                        throw new RuntimeException(e);
+                    }
 				}
 				
 				if (key.equals("worksheet")) {			
@@ -376,7 +390,7 @@ public class StudyEntryForm extends EditorPart {
     
     protected void handleStatusChanged(IStatus status) {
 		if (status.getSeverity() == IStatus.OK) {
-			form.setMessage(getOkMessage());
+			form.setMessage(getOkMessage(), IMessageProvider.NONE);
 	    	submit.setEnabled(true);
 		}
 		else {

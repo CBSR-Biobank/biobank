@@ -111,8 +111,7 @@ public class SiteViewForm extends AddressViewForm {
 					getSite().getPage().openEditor(new NodeInput(siteAdapter), 
 							SiteEntryForm.ID, true);
 				}
-				catch (Exception exp) {
-					// handle error
+				catch (PartInitException exp) {
 					exp.printStackTrace();				
 				}
 			}
@@ -129,8 +128,7 @@ public class SiteViewForm extends AddressViewForm {
 					getSite().getPage().openEditor(new NodeInput(studyAdapter), 
 							StudyEntryForm.ID, true);
 				} 
-				catch (Exception exp) {
-					// handle error
+				catch (PartInitException exp) {
 					exp.printStackTrace();				
 				}
 			}
@@ -148,8 +146,7 @@ public class SiteViewForm extends AddressViewForm {
 					getSite().getPage().openEditor(new NodeInput(clinicAdapter), 
 							ClinicEntryForm.ID, true);
 				} 
-				catch (Exception exp) {
-					// handle error
+				catch (PartInitException exp) {
 					exp.printStackTrace();				
 				}
 			}

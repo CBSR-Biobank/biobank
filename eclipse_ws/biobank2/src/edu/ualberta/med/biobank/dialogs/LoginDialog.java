@@ -171,7 +171,8 @@ public class LoginDialog extends TitleAreaDialog {
 			
 			try {
 				prefs.flush();
-			} catch (BackingStoreException e) {
+			} 
+			catch (BackingStoreException e) {
 				e.printStackTrace();
 			}	
 		}

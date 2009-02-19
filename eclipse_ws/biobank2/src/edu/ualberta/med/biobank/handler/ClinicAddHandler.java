@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.handler;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.handlers.HandlerUtil;
 
 import edu.ualberta.med.biobank.SessionManager;
@@ -26,9 +27,9 @@ public class ClinicAddHandler extends AbstractHandler {
 			HandlerUtil.getActiveWorkbenchWindowChecked(event).getActivePage()
 			.openEditor(input, ClinicEntryForm.ID, true);
 		}
-		catch (Exception exp) {
-			exp.printStackTrace();
-		}
+        catch (PartInitException e) {
+            e.printStackTrace();
+        }
 		
 		return null;
 	}

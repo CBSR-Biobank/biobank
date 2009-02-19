@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.forms;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 
 import org.eclipse.core.databinding.AggregateValidationStatus;
@@ -157,20 +158,33 @@ public abstract class AddressEntryForm extends EditorPart {
 			UpdateValueStrategy uvs = null;
 
 			if (fi.widgetClass == Text.class) {				
-				if (fi.validatorClass != null) {
-					try {
-						Class<?>[] types = new Class[] { String.class, ControlDecoration.class };				
-						Constructor<?> cons = fi.validatorClass.getConstructor(types);
-						Object[] args = new Object[] { fi.errMsg, fieldDecorators.get(key) };
-						uvs = new UpdateValueStrategy();
-						uvs.setAfterConvertValidator((IValidator) cons.newInstance(args));
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-				}
-				
-				dbc.bindValue(SWTObservables.observeText(controls.get(key), SWT.Modify),
-						PojoObservables.observeValue(address, key), uvs, null);
+			    if (fi.validatorClass != null) {
+			        try {
+			            Class<?>[] types = new Class[] { String.class, ControlDecoration.class };				
+			            Constructor<?> cons = fi.validatorClass.getConstructor(types);
+			            Object[] args = new Object[] { fi.errMsg, fieldDecorators.get(key) };
+			            uvs = new UpdateValueStrategy();
+			            uvs.setAfterConvertValidator((IValidator) cons.newInstance(args));
+			        } 
+			        catch (NoSuchMethodException e) {
+			            throw new RuntimeException(e);
+			        }
+			        catch (InvocationTargetException e) {
+                        throw new RuntimeException(e);
+			        } 
+			        catch (IllegalArgumentException e) {
+                        throw new RuntimeException(e);
+			        } 
+			        catch (InstantiationException e) {
+                        throw new RuntimeException(e);
+			        } 
+			        catch (IllegalAccessException e) {
+                        throw new RuntimeException(e);
+			        }
+			    }
+
+			    dbc.bindValue(SWTObservables.observeText(controls.get(key), SWT.Modify),
+			            PojoObservables.observeValue(address, key), uvs, null);
 			}
 			else if (fi.widgetClass == Combo.class) {
 		    	dbc.bindValue(SWTObservables.observeSelection(controls.get(key)),
