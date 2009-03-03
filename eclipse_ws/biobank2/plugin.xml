@@ -178,4 +178,20 @@
             name="%scheme.info.name">
       </scheme>
    </extension>
+   <extension
+         id="product1"
+         point="org.eclipse.core.runtime.products">
+      <product
+            application="biobank2.biobank2"
+            name="BioBank2">
+         <property
+               name="windowImages"
+               value="icons/alt_window_16.gif,icons/alt_window_32.gif">
+         </property>
+         <property
+               name="appName"
+               value="BioBank2">
+         </property>
+      </product>
+   </extension>
 </plugin>
