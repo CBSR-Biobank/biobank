@@ -26,5 +26,6 @@
 	<classpathentry kind="lib" path="lib/jaxrpc.jar"/>
 	<classpathentry kind="lib" path="lib/sdk-grid-remoting.jar"/>
 	<classpathentry kind="lib" path="lib/sdk-security.jar"/>
+	<classpathentry kind="lib" path="lib/commons-lang-2.4.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

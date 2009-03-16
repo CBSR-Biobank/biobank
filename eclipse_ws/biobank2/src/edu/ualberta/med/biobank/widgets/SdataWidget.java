@@ -1,29 +1,35 @@
 package edu.ualberta.med.biobank.widgets;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.List;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.FormToolkit;
+import org.apache.commons.lang.StringUtils;
 
 import edu.ualberta.med.biobank.dialogs.ListAddDialog;
 import edu.ualberta.med.biobank.model.SdataType;
 
 public class SdataWidget extends Composite {
+    String type;
     Button checkButton;
     Button addButton;
     Button removeButton;
+    List list;
+    boolean hasListValues;
 
     public SdataWidget(Composite parent, int style, SdataType sdataType) {
         super(parent, style);
@@ -31,9 +37,10 @@ public class SdataWidget extends Composite {
         setLayout(new GridLayout(1, false));
         setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         
-        final String type = sdataType.getType();
-        if (type.equals("Aliquot Volume") || type.equals("Blood Received") 
-                || type.equals("Visit")) {
+        type = sdataType.getType();
+        hasListValues = type.equals("Aliquot Volume") || type.equals("Blood Received") 
+            || type.equals("Visit"); 
+        if (hasListValues) {
             
             checkButton = new Button(this, SWT.CHECK);
             checkButton.setText(type);
@@ -43,8 +50,112 @@ public class SdataWidget extends Composite {
             comp.setLayout(new GridLayout(2, false));
             comp.setLayoutData(new GridData(GridData.FILL_BOTH));
             
-            final List list = new List(comp, SWT.BORDER | SWT.V_SCROLL);
+            list = new List(comp, SWT.BORDER | SWT.V_SCROLL);
             list.setLayoutData(new GridData(GridData.FILL_BOTH));
+            Menu m = new Menu(
+                    PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+                    .getShell(), 
+                    SWT.POP_UP); 
+            
+            MenuItem mi = new MenuItem(m, SWT.CASCADE);
+            mi.setText("Move to Top");
+            mi.addSelectionListener(new SelectionListener() {
+                public void widgetSelected(SelectionEvent event) {
+                    int index = list.getSelectionIndex();
+                    if (index <= 0) return;
+                    String[] items = list.getItems();
+                    String[] newList = new String[items.length];
+                    newList[0] = items[index];
+                    int i = 1;
+                    for (String item : items) {
+                        if (!item.equals(items[index])) {
+                            newList[i] = item;
+                            ++i;
+                        }
+                    }
+                    list.setItems(newList);
+                }
+
+                @Override
+                public void widgetDefaultSelected(SelectionEvent e) {                    
+                }
+            });
+            
+            mi = new MenuItem(m, SWT.CASCADE);
+            mi.setText("Move Up");
+            mi.addSelectionListener(new SelectionListener() {
+                public void widgetSelected(SelectionEvent event) {
+                    int index = list.getSelectionIndex();
+                    if (index <= 0) return;
+                    String[] items = list.getItems();
+                    String[] newList = new String[items.length];
+                    int i = 0;
+                    for (String item : items) {
+                        if ((i < index - 1) || (i > index)) {
+                            newList[i] = item;
+                        }
+                        ++i;
+                    }
+                    newList[index -1] = items[index];
+                    newList[index] = items[index - 1];
+                    list.setItems(newList);
+                }
+
+                @Override
+                public void widgetDefaultSelected(SelectionEvent e) {                    
+                }
+            });
+            
+            mi = new MenuItem(m, SWT.CASCADE);
+            mi.setText("Move Down");
+            mi.addSelectionListener(new SelectionListener() {
+                public void widgetSelected(SelectionEvent event) {
+                    int index = list.getSelectionIndex();
+                    String[] items = list.getItems();
+                    if (index >= items.length - 1) return;
+                    String[] newList = new String[items.length];
+                    int i = 0;
+                    for (String item : items) {
+                        if ((i < index) || (i > index + 1)) {
+                            newList[i] = item;
+                        }
+                        ++i;
+                    }
+                    newList[index] = items[index + 1];
+                    newList[index + 1] = items[index];
+                    list.setItems(newList);
+                }
+
+                @Override
+                public void widgetDefaultSelected(SelectionEvent e) {                    
+                }
+            });
+            
+            mi = new MenuItem(m, SWT.CASCADE);
+            mi.setText("Move to Bottom");
+            mi.addSelectionListener(new SelectionListener() {
+                public void widgetSelected(SelectionEvent event) {
+                    int index = list.getSelectionIndex();
+                    String[] items = list.getItems();
+                    if (index >= items.length - 1) return;
+                    String[] newList = new String[items.length];
+                    int i = 0;
+                    for (String item : items) {
+                        if (!item.equals(items[index])) {
+                            newList[i] = item;
+                            ++i;
+                        }
+                    }
+                    newList[i] = items[index];
+                    list.setItems(newList);
+                }
+
+                @Override
+                public void widgetDefaultSelected(SelectionEvent e) {                    
+                }
+            });
+            
+            list.setMenu(m);
             
             // this composite holds the "Add" and "Remove" buttons
             comp = new Composite(comp, SWT.NONE);
@@ -157,6 +268,14 @@ public class SdataWidget extends Composite {
                 adaptAllChildren((Composite) aChild, toolkit);
             }
         }
+    }
+    
+    public String getResult() {
+        if (hasListValues) {
+            return StringUtils.join(list.getItems(), ";");
+        }
+        return checkButton.getEnabled() ? "yes" : "no";
+        
     }
 
 }

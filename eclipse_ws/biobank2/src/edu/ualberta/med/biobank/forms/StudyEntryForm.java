@@ -407,18 +407,11 @@ public class StudyEntryForm extends EditorPart {
     	Assert.isTrue(selClinics.size() == selClinicIds.size(), 
     			"problem with clinic selections");
 		study.setClinicCollection(selClinics);
-
-    	// get the selected study data types from widget
-    	List<Integer> selSdataTypeIds = sdataMultiSelect.getSelected();
-    	List<Sdata> selSdata = new ArrayList<Sdata>();
-    	for (SdataType sdataType : allSdataTypes) {
-    		if (selSdataTypeIds.indexOf(sdataType.getId()) >= 0) {
-    			Sdata newSdata = new Sdata();
-    			newSdata.setSdataType(sdataType);
-    			selSdata.add(newSdata);
-    		}
+    	
+    	for (String key : sdataWidgets.keySet()) {
+    	    SdataWidget w = sdataWidgets.get(key);
+    	    System.out.println("sdataWidget " + key + ": " + w.getResult());
     	}
-    	study.setSdataCollection(selSdata);
     	
 		getSite().getPage().closeEditor(StudyEntryForm.this, false);    	
     }
