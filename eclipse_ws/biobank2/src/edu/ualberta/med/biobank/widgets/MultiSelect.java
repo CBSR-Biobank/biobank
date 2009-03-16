@@ -31,6 +31,8 @@ public class MultiSelect extends Composite {
 	private int minHeight;
 	
 	HashMap<String, Integer> availableInv;
+    
+    HashMap<String, Integer> selectedInv;
 
 	public MultiSelect(Composite parent,int style, String leftLabel, 
 			String rightLabel, int minHeight) {
@@ -83,6 +85,7 @@ public class MultiSelect extends Composite {
 	}
 
 	public void adaptToToolkit(FormToolkit toolkit) {
+        toolkit.adapt(this, true, true);
 		adaptAllChildren(this, toolkit);
 	}
 	
@@ -107,6 +110,18 @@ public class MultiSelect extends Composite {
 					availTreeRootNode, key, available.get(key)));
 		}
 	}
+    
+    public void addSelected(HashMap<Integer, String> selected) {
+        // create an inverse map
+        for (int key : selected.keySet()) {
+            selectedInv.put(selected.get(key), key);
+        }
+        
+        for (int key : selected.keySet()) {
+            selTreeRootNode.addChild(new MultiSelectNode(
+                    selTreeRootNode, key, selected.get(key)));
+        }
+    }
 	
 	/**
 	 * Return the selected items in the order specified by user.

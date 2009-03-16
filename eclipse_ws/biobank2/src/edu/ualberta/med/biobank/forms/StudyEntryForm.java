@@ -56,6 +56,7 @@ import edu.ualberta.med.biobank.treeview.SessionAdapter;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
 import edu.ualberta.med.biobank.widgets.MultiSelect;
+import edu.ualberta.med.biobank.widgets.SdataWidget;
 
 @SuppressWarnings("serial")
 public class StudyEntryForm extends EditorPart {
@@ -69,10 +70,6 @@ public class StudyEntryForm extends EditorPart {
 	public static final String[] ORDERED_FIELDS = new String[] {
 		"name",
 		"nameShort",
-		"aliquotVolumes",
-		"bloodReceived",
-		"visitList",
-		"worksheet",
 	};
 	
 	public static final HashMap<String, FieldInfo> FIELDS = 
@@ -81,14 +78,6 @@ public class StudyEntryForm extends EditorPart {
 					NonEmptyString.class, "Study name cannot be blank"));
 			put("nameShort", new FieldInfo("Short Name", Text.class,  
 					NonEmptyString.class, "Study short name cannot be blank"));
-			put("aliquotVolumes", new FieldInfo("Aliquot Volumes", Text.class,  
-					null, null));
-			put("bloodReceived", new FieldInfo("Blood Received", Text.class,  
-					null, null));
-			put("visitList", new FieldInfo("Visit List", Text.class,  
-					null, null));
-			put("worksheet", new FieldInfo("Worksheet Name", Text.class,  
-					null, null));
 		}
 	};
 	
@@ -115,6 +104,8 @@ public class StudyEntryForm extends EditorPart {
 	private List<SdataType> allSdataTypes;
 	
 	private Button submit;
+        
+    private HashMap<String, SdataWidget> sdataWidgets;
 	
 	private KeyListener keyListener = new KeyListener() {
 		@Override
@@ -133,6 +124,7 @@ public class StudyEntryForm extends EditorPart {
 		super();
 		controls = new HashMap<String, Control>();
 		fieldDecorators = new HashMap<String, ControlDecoration>();
+		sdataWidgets = new HashMap<String, SdataWidget>();
 	}
 
 	@Override
@@ -252,44 +244,16 @@ public class StudyEntryForm extends EditorPart {
 			}
 		}
 
-		Section section = toolkit.createSection(form.getBody(), Section.TITLE_BAR);
+		Section section = toolkit.createSection(form.getBody(), 
+		        Section.TWISTIE | Section.TITLE_BAR | Section.EXPANDED);
 		section.setText("Clinic Selection");
-		section.setFont(FormUtils.getSectionFont());
+		//section.setFont(FormUtils.getSectionFont());
 		section.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		
 		clinicsMultiSelect = new MultiSelect(section, SWT.NONE, 
 				"Selected Clinics", "Available Clinics", 100);
 		section.setClient(clinicsMultiSelect);
 		clinicsMultiSelect.adaptToToolkit(toolkit);
-
-		section = toolkit.createSection(form.getBody(), Section.TITLE_BAR);
-		section.setText("Study Information Selection");
-		section.setFont(FormUtils.getSectionFont());
-		section.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		
-		sdataMultiSelect = new MultiSelect(section, SWT.NONE, 
-				"Selected Information Items", "Available Information Items", 150);
-		section.setClient(sdataMultiSelect);
-		sdataMultiSelect.adaptToToolkit(toolkit);
-		
-		toolkit.paintBordersFor(sbody);
-
-		sbody = toolkit.createComposite(form.getBody());
-		layout = new GridLayout();
-		layout = new GridLayout(2, false);
-		layout.horizontalSpacing = 10;
-		sbody.setLayout(layout);
-		sbody.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		toolkit.paintBordersFor(sbody);
-
-		submit = toolkit.createButton(sbody, "Submit", SWT.PUSH);
-		submit.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				saveSettings();
-			}
-		});
-		
-		bindValues();
 		
 		StudyInformationHelper helper = new StudyInformationHelper(
 				studyAdapter.getAppService(), study);
@@ -299,7 +263,7 @@ public class StudyEntryForm extends EditorPart {
 				.getShell().getDisplay(), helper);
 		
 		allClinics = helper.getAllClinics();
-		allSdataTypes = helper.getSdataTypes();
+        allSdataTypes = helper.getSdataTypes();
 
 		HashMap<Integer, String> availClinics = new HashMap<Integer, String>();
 		for (Clinic clinic : allClinics) {
@@ -307,11 +271,42 @@ public class StudyEntryForm extends EditorPart {
 		}
 		clinicsMultiSelect.addAvailable(availClinics);
 
-		HashMap<Integer, String> availSdata = new HashMap<Integer, String>();
-		for (SdataType sdataType : allSdataTypes) {
-			availSdata.put(sdataType.getId(), sdataType.getType());
-		}
-		sdataMultiSelect.addAvailable(availSdata);
+        section = toolkit.createSection(form.getBody(), 
+                Section.TWISTIE | Section.TITLE_BAR | Section.EXPANDED);
+        section.setText("Study Information Selection");
+        //section.setFont(FormUtils.getSectionFont());
+        section.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+        sbody = toolkit.createComposite(section);
+        section.setClient(sbody);        
+        layout = new GridLayout(1, false);
+        layout.verticalSpacing = 10;
+        sbody.setLayout(layout);
+        sbody.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        toolkit.paintBordersFor(sbody);
+        
+        for (SdataType sdataType : allSdataTypes) {
+            SdataWidget w = new SdataWidget(sbody, SWT.NONE, sdataType); 
+            w.adaptToToolkit(toolkit);
+            sdataWidgets.put(sdataType.getType(), w);
+        }		
+
+
+        sbody = toolkit.createComposite(form.getBody());
+        layout = new GridLayout(2, false);
+        layout.horizontalSpacing = 10;
+        sbody.setLayout(layout);
+        sbody.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        toolkit.paintBordersFor(sbody);
+
+        submit = toolkit.createButton(sbody, "Submit", SWT.PUSH);
+        submit.addSelectionListener(new SelectionAdapter() {
+            public void widgetSelected(SelectionEvent e) {
+                saveSettings();
+            }
+        });
+        
+        bindValues();
 	}
 	
     private void bindValues() {

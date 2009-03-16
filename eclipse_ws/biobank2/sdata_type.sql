@@ -25,7 +25,7 @@ SET character_set_client = @saved_cs_client;
 
 LOCK TABLES `sdata_type` WRITE;
 /*!40000 ALTER TABLE `sdata_type` DISABLE KEYS */;
-INSERT INTO `sdata_type` VALUES (1,'Date Drawn'),(2,'Date Received'),(3,'Date Processed'),(4,'Comments'),(5,'WBC Count'),(6,'Time Arrived'),(7,'Biopsy Length'),(8,'Shipped Date'),(9,'Consent');
+INSERT INTO `sdata_type` VALUES (1,'Date Drawn'),(2,'Date Received'),(3,'Date Processed'),(4,'Comments'),(5,'Worksheet'),(6,'Aliquot Volume'),(7,'Blood Received'),(8,'WBC Count'),(9,'Time Arrived'),(10,'Biopsy Length'),(11,'Visit'),(12,'Shipped Date'),(13,'Consent');
 /*!40000 ALTER TABLE `sdata_type` ENABLE KEYS */;
 UNLOCK TABLES;
 
