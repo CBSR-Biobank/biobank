@@ -4,7 +4,9 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.databinding.AggregateValidationStatus;
 import org.eclipse.core.databinding.DataBindingContext;
@@ -45,7 +47,9 @@ import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.part.EditorPart;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.helpers.SiteSaveHelper;
 import edu.ualberta.med.biobank.helpers.StudyInformationHelper;
+import edu.ualberta.med.biobank.helpers.StudySaveHelper;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Sdata;
 import edu.ualberta.med.biobank.model.SdataType;
@@ -65,6 +69,7 @@ public class StudyEntryForm extends EditorPart {
 	
 	private static final String NEW_STUDY_OK_MESSAGE 
 		= "Creating a new study.";
+	
 	private static final String STUDY_OK_MESSAGE = "Editing an existing study.";
 
 	public static final String[] ORDERED_FIELDS = new String[] {
@@ -92,8 +97,6 @@ public class StudyEntryForm extends EditorPart {
 	private ScrolledForm form;
 	
 	private MultiSelect clinicsMultiSelect;
-	
-	private MultiSelect sdataMultiSelect;
 	
 	private StudyAdapter studyAdapter;
 	
@@ -397,7 +400,7 @@ public class StudyEntryForm extends EditorPart {
     private void saveSettings() {
     	// get the selected clinics from widget
     	List<Integer> selClinicIds = clinicsMultiSelect.getSelected();
-    	List<Clinic> selClinics = new ArrayList<Clinic>();
+    	Set<Clinic> selClinics = new HashSet<Clinic>();
     	for (Clinic clinic : allClinics) {
     		if (selClinicIds.indexOf(clinic.getId()) >= 0) {
     			selClinics.add(clinic);
@@ -407,11 +410,30 @@ public class StudyEntryForm extends EditorPart {
     	Assert.isTrue(selClinics.size() == selClinicIds.size(), 
     			"problem with clinic selections");
 		study.setClinicCollection(selClinics);
-    	
-    	for (String key : sdataWidgets.keySet()) {
-    	    SdataWidget w = sdataWidgets.get(key);
-    	    System.out.println("sdataWidget " + key + ": " + w.getResult());
+        
+		Set<Sdata> sdataList = new HashSet<Sdata>();
+        for (SdataType sdataType : allSdataTypes) {
+            String type = sdataType.getType();
+    	    String value =  sdataWidgets.get(type).getResult();
+    	    if (value.equals("no")) continue;
+    	    Sdata sdata = new Sdata();
+    	    sdata.setSdataType(sdataType);
+            if (value.equals("yes")) {
+                value = "";
+            }
+            sdata.setValue(value);
+    	    sdataList.add(sdata);
     	}
+        
+        if (sdataList.size() > 0) {
+            study.setSdataCollection(sdataList);
+        }
+        
+        StudySaveHelper helper = new StudySaveHelper(
+                studyAdapter.getAppService(), study);
+        BusyIndicator.showWhile(
+                PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+                .getShell().getDisplay(), helper);
     	
 		getSite().getPage().closeEditor(StudyEntryForm.this, false);    	
     }

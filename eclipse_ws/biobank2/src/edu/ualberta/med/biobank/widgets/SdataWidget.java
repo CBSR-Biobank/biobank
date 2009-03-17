@@ -274,7 +274,7 @@ public class SdataWidget extends Composite {
         if (hasListValues) {
             return StringUtils.join(list.getItems(), ";");
         }
-        return checkButton.getEnabled() ? "yes" : "no";
+        return checkButton.getSelection() ? "yes" : "no";
         
     }
 
