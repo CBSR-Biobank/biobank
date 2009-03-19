@@ -41,14 +41,6 @@ public class StudySaveHelper implements Runnable {
             saveSdata();
             
             study.setWorksheet(null);
-            
-            if (study.getPatientCollection() == null) {
-            	study.setPatientCollection(new HashSet<Patient>());
-            }
-            
-            if (study.getStorageContainerCollection() == null) {
-            	study.setStorageContainerCollection(new HashSet<StorageContainer>());
-            }
 
             if ((study.getId() == null) || (study.getId() == 0)) {
                 query = new InsertExampleQuery(study);
