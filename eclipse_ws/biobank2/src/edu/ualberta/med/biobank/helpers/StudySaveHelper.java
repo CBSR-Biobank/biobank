@@ -1,12 +1,12 @@
 package edu.ualberta.med.biobank.helpers;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import edu.ualberta.med.biobank.model.Clinic;
+import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.Sdata;
+import edu.ualberta.med.biobank.model.StorageContainer;
 import edu.ualberta.med.biobank.model.Study;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.SDKQuery;
@@ -39,6 +39,16 @@ public class StudySaveHelper implements Runnable {
             
             checkClinics();
             saveSdata();
+            
+            study.setWorksheet(null);
+            
+            if (study.getPatientCollection() == null) {
+            	study.setPatientCollection(new HashSet<Patient>());
+            }
+            
+            if (study.getStorageContainerCollection() == null) {
+            	study.setStorageContainerCollection(new HashSet<StorageContainer>());
+            }
 
             if ((study.getId() == null) || (study.getId() == 0)) {
                 query = new InsertExampleQuery(study);
