@@ -392,7 +392,7 @@ public class StudyEntryForm extends EditorPart {
 		else {
 			form.setMessage(status.getMessage(), IMessageProvider.ERROR);
 	    	submit.setEnabled(false);
-		}		
+		}
     }
     
     private void saveSettings() {
@@ -432,6 +432,8 @@ public class StudyEntryForm extends EditorPart {
         BusyIndicator.showWhile(
                 PlatformUI.getWorkbench().getActiveWorkbenchWindow()
                 .getShell().getDisplay(), helper);
+        
+        SessionManager.getInstance().updateStudies(studyAdapter.getParent());
     	
 		getSite().getPage().closeEditor(StudyEntryForm.this, false);    	
     }

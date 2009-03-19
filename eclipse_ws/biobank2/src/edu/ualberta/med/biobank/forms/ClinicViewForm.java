@@ -97,7 +97,7 @@ public class ClinicViewForm  extends AddressViewForm {
 				ExpandableComposite.TITLE_BAR | ExpandableComposite.TWISTIE
 				| ExpandableComposite.EXPANDED);
 		section.setText("Associated Studies");
-		section.setFont(FormUtils.getSectionFont());
+		//section.setFont(FormUtils.getSectionFont());
 		section.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		sbody = toolkit.createComposite(section);
 		sbody.setLayout(new GridLayout(4, false));

@@ -8,9 +8,6 @@ public class SiteAdapter extends Node {
 	public SiteAdapter(SessionAdapter parent, Site site) {
 		super(parent);
 		this.site = site;
-	}
-	
-	public void addChildren() {
 		addChild(new Node(this, 1, "Studies", true));
 		addChild(new Node(this, 2, "Clinics", true));
 		addChild(new Node(this, 3, "Storage Types", true));

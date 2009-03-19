@@ -24,6 +24,9 @@ public class Node {
 	public Node(Node parent) {
 		this.parent = parent;
 		children = new ArrayList<Node>();
+        if (parent != null) {
+            addListener(parent.listener);
+        }
 	}
 	
 	public Node(Node parent, int id, String name) {

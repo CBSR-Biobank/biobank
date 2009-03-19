@@ -4,9 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import edu.ualberta.med.biobank.model.Clinic;
-import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.Sdata;
-import edu.ualberta.med.biobank.model.StorageContainer;
 import edu.ualberta.med.biobank.model.Study;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.SDKQuery;

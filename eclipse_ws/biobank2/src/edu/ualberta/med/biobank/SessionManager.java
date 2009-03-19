@@ -11,6 +11,7 @@ import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ITreeViewerListener;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeExpansionEvent;
+import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.ui.PartInitException;
 
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -128,7 +129,6 @@ public class SessionManager {
 		for (Object o : sites) {
 			SiteAdapter siteNode = new SiteAdapter(sessionNode, (Site) o);
 			sessionNode.addChild(siteNode);
-			siteNode.addChildren();
 		}
 		view.getTreeViewer().expandToLevel(2);	
 		log4j.debug("addSession: " + name);
@@ -179,6 +179,7 @@ public class SessionManager {
                         
                         StudyAdapter node = new StudyAdapter(groupNode, study);
                         groupNode.addChild(node);
+                        view.getTreeViewer().update(node, null);
                     }
                     view.getTreeViewer().expandToLevel(groupNode, 1);
                 }
@@ -267,5 +268,9 @@ public class SessionManager {
 		int count = sessions.size();
 		Assert.isTrue(count == 1, "No sessions or more than 1 session connected");
 		return getSessionAdapter(0);
+	}
+	
+	public TreeViewer getTreeViewer() {
+	    return view.getTreeViewer();
 	}
 }
