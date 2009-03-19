@@ -1,7 +1,7 @@
 package edu.ualberta.med.biobank.helpers;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Sdata;
@@ -78,7 +78,7 @@ public class StudySaveHelper implements Runnable {
     private void saveSdata() {
         SDKQuery query;
         SDKQueryResult result;
-        Set<Sdata> savedSdataList = new HashSet<Sdata>();
+        List<Sdata> savedSdataList = new ArrayList<Sdata>();
 
         try {
             for (Sdata sdata 

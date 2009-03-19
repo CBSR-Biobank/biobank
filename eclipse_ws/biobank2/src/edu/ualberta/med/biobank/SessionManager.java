@@ -20,6 +20,7 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import edu.ualberta.med.biobank.forms.ClinicViewForm;
 import edu.ualberta.med.biobank.forms.SiteViewForm;
 import edu.ualberta.med.biobank.forms.NodeInput;
+import edu.ualberta.med.biobank.forms.StudyViewForm;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
@@ -58,6 +59,9 @@ public class SessionManager {
 			if (element instanceof SiteAdapter) {
 				openSiteNode((SiteAdapter) element);
 			}
+            else if (element instanceof StudyAdapter) {
+                openStudyNode((StudyAdapter) element);
+            }
 			else if (element instanceof ClinicAdapter) {
 				openClinicNode((ClinicAdapter) element);
 			}
@@ -251,6 +255,18 @@ public class SessionManager {
 			e.printStackTrace();				
 		}
 	}
+    
+    private void openStudyNode(StudyAdapter node) {
+        NodeInput input = new NodeInput(node);
+        
+        try {
+            view.getSite().getPage().openEditor(input, StudyViewForm.ID, true);
+        } 
+        catch (PartInitException e) {
+            // handle error
+            e.printStackTrace();                
+        }
+    }
 	
 	private void openClinicNode(ClinicAdapter node) {
 		NodeInput input = new NodeInput(node);

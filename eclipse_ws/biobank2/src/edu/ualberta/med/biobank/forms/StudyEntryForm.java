@@ -2,10 +2,9 @@ package edu.ualberta.med.biobank.forms;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.eclipse.core.databinding.AggregateValidationStatus;
 import org.eclipse.core.databinding.DataBindingContext;
@@ -398,7 +397,7 @@ public class StudyEntryForm extends EditorPart {
     private void saveSettings() {
     	// get the selected clinics from widget
     	List<Integer> selClinicIds = clinicsMultiSelect.getSelected();
-    	Set<Clinic> selClinics = new HashSet<Clinic>();
+    	List<Clinic> selClinics = new ArrayList<Clinic>();
     	for (Clinic clinic : allClinics) {
     		if (selClinicIds.indexOf(clinic.getId()) >= 0) {
     			selClinics.add(clinic);
@@ -409,7 +408,7 @@ public class StudyEntryForm extends EditorPart {
     			"problem with clinic selections");
 		study.setClinicCollection(selClinics);
         
-		Set<Sdata> sdataList = new HashSet<Sdata>();
+		List<Sdata> sdataList = new ArrayList<Sdata>();
         for (SdataType sdataType : allSdataTypes) {
             String type = sdataType.getType();
     	    String value =  sdataWidgets.get(type).getResult();

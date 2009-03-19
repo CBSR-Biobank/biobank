@@ -7,10 +7,19 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
 public class FormUtils {
+    
+    public static Label createLabelledField(FormToolkit toolkit, Composite parent, 
+            String label) {
+        toolkit.createLabel(parent, label, SWT.LEFT);
+        Label field = toolkit.createLabel(parent, "", SWT.SINGLE);
+        field.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
+        return field;
+    }
 	
 	public static Text createLabelledText(FormToolkit toolkit, Composite parent, 
 			String label, int limit, String tip) {

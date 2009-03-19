@@ -6,8 +6,6 @@ import org.eclipse.core.databinding.beans.PojoObservables;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.databinding.swt.SWTObservables;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -74,17 +72,10 @@ public abstract class AddressViewForm extends EditorPart {
 		for (String key : AddressFieldsConstants.ORDERED_FIELDS) {
 			FieldInfo fi = AddressFieldsConstants.FIELDS.get(key);
 
-			Label field = createLabelledField(parent, fi.label + " :", 100, null);
+			Label field = FormUtils.createLabelledField(toolkit, parent, fi.label + " :");
 			controls.put(key, field);
 		}
 	}
-	
-	protected Label createLabelledField(Composite parent, String label, int limit, String tip) {
-		toolkit.createLabel(parent, label, SWT.LEFT);
-        Label field = toolkit.createLabel(parent, "", SWT.SINGLE);
-        field.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
-        return field;
-    }
     
     protected void bindValues(DataBindingContext dbc) {
 		for (String key : AddressFieldsConstants.FIELDS.keySet()) {
