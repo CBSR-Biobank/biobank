@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.widgets;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
@@ -12,6 +13,7 @@ public class MultiSelectNodeContentProvider implements ITreeContentProvider, IDe
 
 	@Override
 	public Object[] getChildren(Object parentElement) {
+	    Assert.isTrue(parentElement instanceof MultiSelectNode, "Invalid object");
 		return ((MultiSelectNode) parentElement).getChildren().toArray();
 	}
 
@@ -22,6 +24,7 @@ public class MultiSelectNodeContentProvider implements ITreeContentProvider, IDe
 
 	@Override
 	public boolean hasChildren(Object element) {
+        Assert.isTrue(element instanceof MultiSelectNode, "Invalid object");
 		return (((MultiSelectNode) element).getChildCount() > 0);
 	}
 

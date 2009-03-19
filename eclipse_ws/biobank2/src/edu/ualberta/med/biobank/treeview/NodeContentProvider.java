@@ -1,44 +1,35 @@
 package edu.ualberta.med.biobank.treeview;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 
 public class NodeContentProvider implements ITreeContentProvider, IDeltaListener {
 	protected TreeViewer viewer;
-	
-	public NodeContentProvider() {
-		super();
-	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.viewers.ITreeContentProvider#getChildren(java.lang.Object)
 	 */
 	public Object[] getChildren(Object element) {
-		if (element instanceof Node) {
-			return ((Node) element).getChildren().toArray();
-		}
-		return new Object[0];
+        Assert.isTrue(element instanceof Node, "Invalid object");
+        return ((Node) element).getChildren().toArray();
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.viewers.ITreeContentProvider#getParent(java.lang.Object)
 	 */
 	public Object getParent(Object element) {
-		if (element instanceof Node) {
-			return ((Node) element).getParent();
-		}
-		return null;
+        Assert.isTrue(element instanceof Node, "Invalid object");
+        return ((Node) element).getParent();
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.viewers.ITreeContentProvider#hasChildren(java.lang.Object)
 	 */
 	public boolean hasChildren(Object element) {
-		if (element instanceof Node) {
-			return ((Node) element).hasChildren();
-		}
-		return false;
+        Assert.isTrue(element instanceof Node, "Invalid object");
+        return ((Node) element).hasChildren();
 	}
 
 	/* (non-Javadoc)

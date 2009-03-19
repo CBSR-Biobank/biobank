@@ -108,7 +108,7 @@ public abstract class AddressEntryForm extends EditorPart {
 	protected void createAddressArea() {
 		Section section = toolkit.createSection(form.getBody(), Section.TITLE_BAR);
 		section.setText("Address");
-		section.setFont(FormUtils.getSectionFont());
+		//section.setFont(FormUtils.getSectionFont());
 		section.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		Composite sbody = toolkit.createComposite(section);
 		section.setClient(sbody);

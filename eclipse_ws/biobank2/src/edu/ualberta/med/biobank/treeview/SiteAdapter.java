@@ -1,7 +1,5 @@
 package edu.ualberta.med.biobank.treeview;
 
-import java.util.Arrays;
-
 import edu.ualberta.med.biobank.model.Site;
 
 public class SiteAdapter extends Node {
@@ -10,12 +8,12 @@ public class SiteAdapter extends Node {
 	public SiteAdapter(SessionAdapter parent, Site site) {
 		super(parent);
 		this.site = site;
-		children = Arrays.asList(
-			new Node(this, 1, "Studies", true),
-			new Node(this, 2, "Clinics", true),
-			new Node(this, 3, "Storage Types", true)
-		);
-		setHasChildren(true);
+	}
+	
+	public void addChildren() {
+		addChild(new Node(this, 1, "Studies", true));
+		addChild(new Node(this, 2, "Clinics", true));
+		addChild(new Node(this, 3, "Storage Types", true));
 	}
 
 	public void setSite(Site site) {

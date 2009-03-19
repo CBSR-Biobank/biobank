@@ -46,7 +46,6 @@ import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.part.EditorPart;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.helpers.SiteSaveHelper;
 import edu.ualberta.med.biobank.helpers.StudyInformationHelper;
 import edu.ualberta.med.biobank.helpers.StudySaveHelper;
 import edu.ualberta.med.biobank.model.Clinic;

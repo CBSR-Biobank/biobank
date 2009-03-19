@@ -170,6 +170,12 @@
             id="edu.ualberta.med.biobank.forms.StudyEntryForm"
             name="Study Entry">
       </editor>
+      <editor
+            class="edu.ualberta.med.biobank.forms.StudyViewForm"
+            default="false"
+            id="edu.ualberta.med.biobank.forms.StudyViewForm"
+            name="Study View">
+      </editor>
    </extension>
    <extension
          point="org.eclipse.ui.bindings">

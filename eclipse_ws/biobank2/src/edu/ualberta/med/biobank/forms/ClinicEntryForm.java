@@ -104,7 +104,7 @@ public class ClinicEntryForm extends AddressEntryForm {
 				ExpandableComposite.TITLE_BAR
 				| ExpandableComposite.EXPANDED);
 		section.setText("Site");
-		section.setFont(FormUtils.getSectionFont());
+		//section.setFont(FormUtils.getSectionFont());
 		Composite sbody = toolkit.createComposite(section);
 		section.setClient(sbody);
 		section.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -114,6 +114,7 @@ public class ClinicEntryForm extends AddressEntryForm {
 		toolkit.paintBordersFor(sbody);
 		
 		name = FormUtils.createLabelledText(toolkit, sbody, "Name:", 100, null);
+        name.addKeyListener(keyListener);
 		nameDecorator = FormUtils.createDecorator(name, NO_CLINIC_NAME_MESSAGE);
 		
 		createAddressArea();
