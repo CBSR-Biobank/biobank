@@ -17,6 +17,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
@@ -111,11 +112,14 @@ public class ClinicEntryForm extends AddressEntryForm {
 		layout = new GridLayout(2, false);
 		layout.horizontalSpacing = 10;
 		sbody.setLayout(layout);
-		toolkit.paintBordersFor(sbody);
-		
-		name = FormUtils.createLabelledText(toolkit, sbody, "Name:", 100, null);
+		toolkit.paintBordersFor(sbody);		
+
+        Label label = toolkit.createLabel(sbody, "Name:", SWT.LEFT);
+        label.setLayoutData(new GridData());
+        name = toolkit.createText(sbody, "", SWT.SINGLE);
+        name.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         name.addKeyListener(keyListener);
-		nameDecorator = FormUtils.createDecorator(name, NO_CLINIC_NAME_MESSAGE);
+		nameDecorator = FormUtils.createDecorator(label, NO_CLINIC_NAME_MESSAGE);
 		
 		createAddressArea();
 
@@ -123,9 +127,7 @@ public class ClinicEntryForm extends AddressEntryForm {
 		sbody = toolkit.createComposite(section);
 		section.setClient(sbody);
 		section.setLayoutData(new GridData(GridData.FILL_BOTH));
-		layout = new GridLayout();
-		layout.horizontalSpacing = 10;
-		layout.numColumns = 2;
+		layout = new GridLayout(2, false);
 		sbody.setLayout(layout);
 		toolkit.paintBordersFor(sbody);
 

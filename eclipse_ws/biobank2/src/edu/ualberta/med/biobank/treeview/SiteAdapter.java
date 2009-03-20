@@ -15,7 +15,6 @@ public class SiteAdapter extends Node {
 
 	public void setSite(Site site) {
 		this.site = site;
-		this.site.setName("");
 	}
 
 	public Site getSite() {

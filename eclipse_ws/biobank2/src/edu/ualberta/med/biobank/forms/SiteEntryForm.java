@@ -18,6 +18,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
@@ -29,7 +30,9 @@ import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.helpers.GetHelper;
+import edu.ualberta.med.biobank.helpers.SiteGetHelper;
 import edu.ualberta.med.biobank.helpers.SiteSaveHelper;
+import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.SessionAdapter;
@@ -66,8 +69,7 @@ public class SiteEntryForm extends AddressEntryForm {
 				+ node.getClass().getName());
 		
 		siteAdapter = (SiteAdapter) node;
-		site = siteAdapter.getSite();
-		address = site.getAddress();		
+		site = siteAdapter.getSite();	
 		
 		if (site.getId() == null) {
 			setPartName("New Site");
@@ -83,8 +85,30 @@ public class SiteEntryForm extends AddressEntryForm {
 		}
 		return SITE_OK_MESSAGE;
 	}
+	
+    // We don't want to modify the Site object we already have in memory.
+    // Therefore, we need to get a new one from the ORM
+	private void loadSite() {
+        if ((site.getId() == null) || (site.getId() == 0)) {
+            site = new Site();
+            site.setAddress(new Address());
+            return;
+        }
+        
+        SiteGetHelper helper = new SiteGetHelper(
+            siteAdapter.getAppService(), site.getId(), 0);
 
-	public void createPartControl(Composite parent) {		
+        BusyIndicator.showWhile(
+            PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+            .getShell().getDisplay(), helper);
+
+        site = helper.getResult();
+	}
+
+	public void createPartControl(Composite parent) {
+	    loadSite();
+        address = site.getAddress();    
+        
 		toolkit = new FormToolkit(parent.getDisplay());
 		form = toolkit.createForm(parent);	
 		
@@ -127,10 +151,13 @@ public class SiteEntryForm extends AddressEntryForm {
 		else {
 			session = null;
 		}
+
+        Label label = toolkit.createLabel(sbody, "Name:", SWT.LEFT);
+        name  = toolkit.createText(sbody, "", SWT.SINGLE);
+        name.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        name.addKeyListener(keyListener);		
 		
-		name = FormUtils.createLabelledText(toolkit, sbody, "Name:", 100, null);
-		nameDecorator = FormUtils.createDecorator(name, NO_SITE_NAME_MESSAGE);
-		name.addKeyListener(keyListener);
+		nameDecorator = FormUtils.createDecorator(label, NO_SITE_NAME_MESSAGE);
 		
 		createAddressArea();
 
@@ -202,6 +229,8 @@ public class SiteEntryForm extends AddressEntryForm {
 		BusyIndicator.showWhile(
 				PlatformUI.getWorkbench().getActiveWorkbenchWindow()
 				.getShell().getDisplay(), sitesHelper);
+		
+		siteAdapter.setSite(site);
 		
 		SessionAdapter sessionNode = (SessionAdapter) siteAdapter.getParent();
 		for (Site site : sitesHelper.getResult()) {

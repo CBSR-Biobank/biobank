@@ -20,7 +20,7 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
-import org.eclipse.swt.widgets.TreeItem;
+import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.handlers.IHandlerService;
@@ -29,6 +29,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 import edu.ualberta.med.biobank.forms.ClinicViewForm;
+import edu.ualberta.med.biobank.forms.SiteEntryForm;
 import edu.ualberta.med.biobank.forms.SiteViewForm;
 import edu.ualberta.med.biobank.forms.NodeInput;
 import edu.ualberta.med.biobank.forms.StudyViewForm;
@@ -68,13 +69,13 @@ public class SessionManager {
 			view.getTreeViewer().expandToLevel(element, 1);
 
 			if (element instanceof SiteAdapter) {
-				openSiteNode((SiteAdapter) element);
+				openSiteViewForm((SiteAdapter) element);
 			}
             else if (element instanceof StudyAdapter) {
-                openStudyNode((StudyAdapter) element);
+                openStudyViewForm((StudyAdapter) element);
             }
 			else if (element instanceof ClinicAdapter) {
-				openClinicNode((ClinicAdapter) element);
+				openClinicViewForm((ClinicAdapter) element);
 			}
 			else if (element instanceof Node) {
 				Node node = (Node) element;
@@ -134,6 +135,7 @@ public class SessionManager {
                 popupMenuSessionNode((SessionAdapter) element, tv, tree, menu);
             }
             else if (element instanceof SiteAdapter) {
+                popupMenuSiteNode((SiteAdapter) element, tv, tree, menu);
             }
             else if (element instanceof StudyAdapter) {
             }
@@ -305,7 +307,7 @@ public class SessionManager {
 		return sessions.keySet().toArray(new String[sessions.size()]);
 	}
 	
-	private void openSiteNode(SiteAdapter node) {
+	private void openSiteViewForm(SiteAdapter node) {
 		NodeInput input = new NodeInput(node);
 		
 		try {
@@ -317,26 +319,24 @@ public class SessionManager {
 		}
 	}
     
-    private void openStudyNode(StudyAdapter node) {
+    private void openStudyViewForm(StudyAdapter node) {
         NodeInput input = new NodeInput(node);
         
         try {
             view.getSite().getPage().openEditor(input, StudyViewForm.ID, true);
         } 
         catch (PartInitException e) {
-            // handle error
             e.printStackTrace();                
         }
     }
 	
-	private void openClinicNode(ClinicAdapter node) {
+	private void openClinicViewForm(ClinicAdapter node) {
 		NodeInput input = new NodeInput(node);
 		
 		try {
 			view.getSite().getPage().openEditor(input, ClinicViewForm.ID, true);
 		} 
 		catch (PartInitException e) {
-			// handle error
 			e.printStackTrace();				
 		}
 	}
@@ -392,4 +392,46 @@ public class SessionManager {
         });
 	    
 	}
+	
+	private void closeEditor(NodeInput input) {
+        IEditorPart part = 
+            view.getSite().getPage().findEditor(input);
+        if (part != null) {
+            view.getSite().getPage().closeEditor(part, true);
+        }
+	    
+	}
+    
+    private void popupMenuSiteNode(final SiteAdapter siteAdapter, TreeViewer tv,  
+            Tree tree,  Menu menu) {
+        MenuItem mi = new MenuItem (menu, SWT.PUSH);
+        mi.setText ("Edit");
+        mi.addSelectionListener(new SelectionListener() {
+            public void widgetSelected(SelectionEvent event) {
+                NodeInput ni = new NodeInput(siteAdapter);
+                closeEditor(ni);
+                try {
+                    view.getSite().getPage().openEditor(ni, SiteEntryForm.ID, true);
+                }
+                catch (PartInitException exp) {
+                    exp.printStackTrace();              
+                }
+            }
+
+            public void widgetDefaultSelected(SelectionEvent e) {                    
+            }
+        });
+
+        mi = new MenuItem (menu, SWT.PUSH);
+        mi.setText ("View");
+        mi.addSelectionListener(new SelectionListener() {
+            public void widgetSelected(SelectionEvent event) {
+                closeEditor(new NodeInput(siteAdapter));
+                openSiteViewForm(siteAdapter);
+            }
+
+            public void widgetDefaultSelected(SelectionEvent e) {                    
+            }
+        }); 
+    }
 }

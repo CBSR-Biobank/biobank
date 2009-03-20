@@ -101,7 +101,9 @@ public class StudyViewForm extends EditorPart {
         label.setText(study.getNameShort());
 
         label = toolkit.createLabel(sbody, "Clinics:", SWT.LEFT);
+        label.setLayoutData(new GridData(GridData.VERTICAL_ALIGN_BEGINNING));
         Table tbl = toolkit.createTable(sbody, SWT.NONE);
+        tbl.setLayoutData(new GridData(GridData.VERTICAL_ALIGN_BEGINNING | GridData.FILL_HORIZONTAL));
         Collection<Clinic> clinics = study.getClinicCollection();
         for (Object obj : clinics.toArray(new Object[clinics.size()])) {
             TableItem item = new TableItem(tbl, 0);

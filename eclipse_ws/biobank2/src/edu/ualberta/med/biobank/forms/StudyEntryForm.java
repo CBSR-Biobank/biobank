@@ -33,6 +33,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
@@ -45,7 +46,7 @@ import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.part.EditorPart;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.helpers.StudyInformationHelper;
+import edu.ualberta.med.biobank.helpers.GetHelper;
 import edu.ualberta.med.biobank.helpers.StudySaveHelper;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Sdata;
@@ -53,7 +54,6 @@ import edu.ualberta.med.biobank.model.SdataType;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.Worksheet;
 import edu.ualberta.med.biobank.treeview.Node;
-import edu.ualberta.med.biobank.treeview.SessionAdapter;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
 import edu.ualberta.med.biobank.widgets.MultiSelect;
@@ -206,41 +206,28 @@ public class StudyEntryForm extends EditorPart {
 		layout = new GridLayout(2, false);
 		layout.horizontalSpacing = 10;
 		sbody.setLayout(layout);
-		sbody.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        sbody.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		toolkit.paintBordersFor(sbody);
 		
 		for (String key : ORDERED_FIELDS) {
 			FieldInfo fi = FIELDS.get(key);
 			
 			if (fi.widgetClass == Text.class) {
-				Text text = FormUtils.createLabelledText(toolkit, 
-						sbody, fi.label + " :", 100, null);
+                Label label = toolkit.createLabel(sbody, fi.label + ":", SWT.LEFT);
+                label.setLayoutData(new GridData());
+                Text text  = toolkit.createText(sbody, "", SWT.SINGLE);
+                text.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+                
 				controls.put(key, text);
 				text.addKeyListener(keyListener);
 				
 				if (fi.validatorClass != null) {
 					fieldDecorators.put(key, 
-							FormUtils.createDecorator(text, fi.errMsg));
+							FormUtils.createDecorator(label, fi.errMsg));
 				}
-			}
-			else if (fi.widgetClass == Combo.class) {
-				toolkit.createLabel(sbody, fi.label + " :", SWT.LEFT);
-				Combo combo = new Combo(sbody, SWT.READ_ONLY);
-				if (key.equals("province")) {
-					combo.setItems(AddressFieldsConstants.PROVINCES);
-				}
-				combo.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
-				toolkit.adapt(combo, true, true);
-				controls.put(key, combo);
-				
-				combo.addSelectionListener(new SelectionAdapter() {
-					public void widgetSelected(SelectionEvent e) {
-						setDirty(true);
-					}
-				});
 			}
 			else {
-				assert false : fi.widgetClass;
+				Assert.isTrue(false, "invalid widget class " + fi.widgetClass.getName());
 			}
 		}
 
@@ -254,16 +241,24 @@ public class StudyEntryForm extends EditorPart {
 				"Selected Clinics", "Available Clinics", 100);
 		section.setClient(clinicsMultiSelect);
 		clinicsMultiSelect.adaptToToolkit(toolkit);
+        
+        GetHelper<Clinic> clinicHelper = new GetHelper<Clinic>(
+                studyAdapter.getAppService(), Clinic.class);
+        
+        BusyIndicator.showWhile(
+                PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+                .getShell().getDisplay(), clinicHelper);
 		
-		StudyInformationHelper helper = new StudyInformationHelper(
-				studyAdapter.getAppService(), study);
+        allClinics = clinicHelper.getResult();
+        
+		GetHelper<SdataType> sdataTypeHelper = new GetHelper<SdataType>(
+				studyAdapter.getAppService(), SdataType.class);
 		
 		BusyIndicator.showWhile(
 				PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-				.getShell().getDisplay(), helper);
+				.getShell().getDisplay(), sdataTypeHelper);
 		
-		allClinics = helper.getAllClinics();
-        allSdataTypes = helper.getSdataTypes();
+        allSdataTypes = sdataTypeHelper.getResult();
 
 		HashMap<Integer, String> availClinics = new HashMap<Integer, String>();
 		for (Clinic clinic : allClinics) {
@@ -440,22 +435,5 @@ public class StudyEntryForm extends EditorPart {
 	@Override
 	public void setFocus() {
 		form.setFocus();
-	}
-	
-	public Study getStudy() {
-		return study;
-	}
-	
-	public SessionAdapter getSessionAdapter() {
-		SessionAdapter sessionAdapter = null;
-		
-		int sessions = SessionManager.getInstance().getSessionCount();
-		if (sessions == 1) {
-			sessionAdapter = SessionManager.getInstance().getSessionAdapter(0);
-		}
-		else {
-			Assert.isTrue(false, "not implemented yet");
-		}
-		return sessionAdapter;
 	}
 }

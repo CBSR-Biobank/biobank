@@ -17,18 +17,23 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.databinding.swt.SWTObservables;
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.fieldassist.ControlDecoration;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.FontMetrics;
+import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
@@ -111,10 +116,11 @@ public abstract class AddressEntryForm extends EditorPart {
 		//section.setFont(FormUtils.getSectionFont());
 		section.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		Composite sbody = toolkit.createComposite(section);
+		GC gc = new GC(sbody);
+		FontMetrics fm = gc.getFontMetrics();
 		section.setClient(sbody);
-		GridLayout layout = new GridLayout();
-		layout.horizontalSpacing = 10;
-		layout.numColumns = 2;
+        GridLayout layout = new GridLayout(2, false);
+        layout.horizontalSpacing = 10;
 		sbody.setLayout(layout);
 		toolkit.paintBordersFor(sbody);
 		
@@ -122,12 +128,15 @@ public abstract class AddressEntryForm extends EditorPart {
 			FieldInfo fi = AddressFieldsConstants.FIELDS.get(key);
 			
 			if (fi.widgetClass == Text.class) {
-				Text text = FormUtils.createLabelledText(toolkit, sbody, fi.label + " :", 100, null);
+		        Label label = toolkit.createLabel(sbody, fi.label + ":", SWT.LEFT);
+		        label.setLayoutData(new GridData());
+		        Text text  = toolkit.createText(sbody, "", SWT.SINGLE);
+		        text.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 				controls.put(key, text);
 				text.addKeyListener(keyListener);
 				
 				if (fi.validatorClass != null) {
-					fieldDecorators.put(key, FormUtils.createDecorator(text, fi.errMsg));
+					fieldDecorators.put(key, FormUtils.createDecorator(label, fi.errMsg));
 				}
 			}
 			else if (fi.widgetClass == Combo.class) {

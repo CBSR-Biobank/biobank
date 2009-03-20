@@ -22,8 +22,8 @@ public class FormUtils {
     }
 	
 	public static Text createLabelledText(FormToolkit toolkit, Composite parent, 
-			String label, int limit, String tip) {
-		toolkit.createLabel(parent, label, SWT.LEFT);
+			String labelTxt, int limit, String tip) {
+		toolkit.createLabel(parent, labelTxt, SWT.LEFT);
         Text text  = toolkit.createText(parent, "", SWT.SINGLE);
         if (limit > 0) {
             text.setTextLimit(limit);
@@ -31,22 +31,22 @@ public class FormUtils {
         if (tip != null) {
             text.setToolTipText(tip);
         }
-        text.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
+        text.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         return text;
     }
     
-    public static ControlDecoration createDecorator(Text text, String message) {
-		ControlDecoration controlDecoration = new ControlDecoration(text,
-				SWT.LEFT | SWT.TOP);
+    public static ControlDecoration createDecorator(Label label, String message) {
+		ControlDecoration controlDecoration = new ControlDecoration(label,
+				SWT.RIGHT | SWT.TOP);
 		controlDecoration.setDescriptionText(message);
 		FieldDecoration fieldDecoration = FieldDecorationRegistry.getDefault()
 				.getFieldDecoration(FieldDecorationRegistry.DEC_ERROR);
 		controlDecoration.setImage(fieldDecoration.getImage());
 		
 		// make room for the decorator
-		((GridData) text.getLayoutData()).horizontalIndent 
-			= controlDecoration.getMarginWidth() 
-			+ fieldDecoration.getImage().getBounds().width;		
+//		((GridData) label.getLayoutData()).minimumWidth
+//			+= controlDecoration.getMarginWidth() 
+//			+ fieldDecoration.getImage().getBounds().width;		
 		return controlDecoration;
 	}
     
