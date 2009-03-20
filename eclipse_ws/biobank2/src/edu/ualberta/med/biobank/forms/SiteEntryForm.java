@@ -117,15 +117,11 @@ public class SiteEntryForm extends AddressEntryForm {
 		form.setMessage(getOkMessage());
 		
 		GridLayout layout = new GridLayout(1, false);
-		//layout.marginHeight = 10;
-		//layout.marginWidth = 6;
-		//layout.horizontalSpacing = 20;
 		form.getBody().setLayout(layout);
 		
 		toolkit.createLabel(form.getBody(), 
 				"Studies, Clinics, and Storage Types can be added after submitting this information.", 
 				SWT.LEFT);
-
 		
 		Section section = toolkit.createSection(form.getBody(), 
 				ExpandableComposite.TITLE_BAR

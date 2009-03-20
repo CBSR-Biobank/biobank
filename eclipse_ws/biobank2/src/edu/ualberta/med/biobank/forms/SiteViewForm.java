@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.forms;
 import org.eclipse.core.databinding.DataBindingContext;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
@@ -13,9 +14,13 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
+import org.eclipse.ui.forms.widgets.Section;
 import org.springframework.util.Assert;
 
+import edu.ualberta.med.biobank.helpers.SiteGetHelper;
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Site;
@@ -71,10 +76,27 @@ public class SiteViewForm extends AddressViewForm {
 				+ node.getClass().getName());
 		}
 	}
+    
+    // We don't want to modify the Site object we already have in memory.
+    // Therefore, we need to get a new one from the ORM
+    private void loadSite() {
+        Assert.isTrue((site.getId() != null) && (site.getId() != 0),
+            "site not in database");
+
+        SiteGetHelper helper = new SiteGetHelper(
+            siteAdapter.getAppService(), site.getId(), SiteGetHelper.LOAD_ALL);
+
+        BusyIndicator.showWhile(
+            PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+            .getShell().getDisplay(), helper);
+
+        site = helper.getResult();
+    }
 
 	@Override
 	public void createPartControl(Composite parent) {
-		
+		loadSite();
+		address = site.getAddress();
 		toolkit = new FormToolkit(parent.getDisplay());
 		form = toolkit.createForm(parent);	
 
@@ -85,18 +107,21 @@ public class SiteViewForm extends AddressViewForm {
 		toolkit.decorateFormHeading(form);
 		//form.setMessage(OK_MESSAGE);
 		
-		GridLayout layout = new GridLayout(1, false);
-		//layout.marginHeight = 10;
-		//layout.marginWidth = 6;
-		//layout.horizontalSpacing = 20;
-		form.getBody().setLayout(layout);
+		form.getBody().setLayout(new GridLayout(1, false));
 		form.getBody().setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		
-		Composite sbody = toolkit.createComposite(form.getBody());
-		sbody.setLayout(new GridLayout(2, false));
-		sbody.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));		
-		toolkit.paintBordersFor(sbody);	
-		
+        
+        Section section = toolkit.createSection(form.getBody(), 
+            Section.TWISTIE | Section.TITLE_BAR | Section.EXPANDED);
+        section.setText("Address");
+        //section.setLayout(new GridLayout(1, false));
+        section.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        
+        Composite sbody = toolkit.createComposite(section);
+        GridLayout layout = new GridLayout(2, false);
+        layout.horizontalSpacing = 10;
+        sbody.setLayout(layout);
+        sbody.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        toolkit.paintBordersFor(sbody);		
 		createAddressArea(sbody);
 
 		sbody = toolkit.createComposite(form.getBody());

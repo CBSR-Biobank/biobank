@@ -15,6 +15,7 @@ public class SiteGetHelper implements Runnable {
     public static final int LOAD_STUDIES = 1 << 0;
     public static final int LOAD_CLINICS = 1 << 1;
     public static final int LOAD_STORAGE_CONTAINERS = 1 << 2;
+    public static final int LOAD_ALL = LOAD_STUDIES & LOAD_CLINICS & LOAD_STORAGE_CONTAINERS;
     
     private WritableApplicationService appService;
     

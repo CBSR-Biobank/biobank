@@ -17,7 +17,7 @@ public class FormUtils {
             String label) {
         toolkit.createLabel(parent, label, SWT.LEFT);
         Label field = toolkit.createLabel(parent, "", SWT.SINGLE);
-        field.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
+        field.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         return field;
     }
 	
