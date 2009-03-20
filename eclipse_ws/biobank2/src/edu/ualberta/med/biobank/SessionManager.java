@@ -23,6 +23,7 @@ import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.handlers.IHandlerService;
 
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -356,6 +357,15 @@ public class SessionManager {
         mi.setText ("Logout");
         mi.addSelectionListener(new SelectionListener() {
             public void widgetSelected(SelectionEvent event) {
+                IHandlerService handlerService = 
+                    (IHandlerService) PlatformUI.getWorkbench().getService(
+                        IHandlerService.class);
+
+                try {
+                    handlerService.executeCommand("edu.ualberta.med.biobank.commands.logout", null);
+                } catch (Exception ex) {
+                    throw new RuntimeException("edu.ualberta.med.biobank.commands.logout not found");
+                }
             }
 
             public void widgetDefaultSelected(SelectionEvent e) {                    
@@ -366,6 +376,15 @@ public class SessionManager {
         mi.setText ("Add Site");
         mi.addSelectionListener(new SelectionListener() {
             public void widgetSelected(SelectionEvent event) {
+                IHandlerService handlerService = 
+                    (IHandlerService) PlatformUI.getWorkbench().getService(
+                        IHandlerService.class);
+
+                try {
+                    handlerService.executeCommand("edu.ualberta.med.biobank.commands.addSite", null);
+                } catch (Exception ex) {
+                    throw new RuntimeException("edu.ualberta.med.biobank.commands.addSite not found");
+                }
             }
 
             public void widgetDefaultSelected(SelectionEvent e) {                    
