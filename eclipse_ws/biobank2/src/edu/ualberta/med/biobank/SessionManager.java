@@ -12,7 +12,17 @@ import org.eclipse.jface.viewers.ITreeViewerListener;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeExpansionEvent;
 import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
+import org.eclipse.swt.widgets.Tree;
+import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
 
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -67,7 +77,10 @@ public class SessionManager {
 			}
 			else if (element instanceof Node) {
 				Node node = (Node) element;
-				if (node.getName().equals("Clinics")) {
+                if (node.getName().equals("Studies")) {
+                    updateStudies(node);
+                }
+                else if (node.getName().equals("Clinics")) {
 					updateClinics(node);
 				}
 			}
@@ -102,8 +115,55 @@ public class SessionManager {
 		}
 	};
 	
+	private Listener treeViewMenuListener = new Listener() {
+        @Override
+        public void handleEvent(Event event) {
+            TreeViewer tv = view.getTreeViewer();
+            Tree tree = tv.getTree();
+            Menu menu = tree.getMenu();
+            
+            for (MenuItem menuItem : menu.getItems ()) {
+                menuItem.dispose ();
+            }
+            
+            Object element = ((StructuredSelection)
+                    tv.getSelection()).getFirstElement();
+
+            if (element instanceof SessionAdapter) {
+                popupMenuSessionNode((SessionAdapter) element, tv, tree, menu);
+            }
+            else if (element instanceof SiteAdapter) {
+            }
+            else if (element instanceof StudyAdapter) {
+            }
+            else if (element instanceof ClinicAdapter) {
+            }
+            else if (element instanceof Node) {
+                Node node = (Node) element;
+                if (node.getName().equals("Studies")) {
+                }
+                else if (node.getName().equals("Clinics")) {
+                }
+                else if (node.getName().equals("Storage Container")) {
+                }
+                else {
+                    Assert.isTrue(false, "double click on class "
+                            + node.getName() + " is not supported");
+                }
+            }
+            else {
+                Assert.isTrue(false, "double click on class "
+                        + element.getClass().getName() + " is not supported");
+            }
+        }
+	};
+	
 	public ITreeViewerListener getTreeViewerListener() {
 		return treeViewerListener;
+	}
+	
+	public Listener getTreeViewerMenuListener() {
+	    return treeViewMenuListener;
 	}
 
 	public static SessionManager getInstance() {
@@ -288,5 +348,29 @@ public class SessionManager {
 	
 	public TreeViewer getTreeViewer() {
 	    return view.getTreeViewer();
+	}
+	
+	private void popupMenuSessionNode(SessionAdapter siteAdapter, TreeViewer tv,  
+	        Tree tree,  Menu menu) {
+        MenuItem mi = new MenuItem (menu, SWT.PUSH);
+        mi.setText ("Logout");
+        mi.addSelectionListener(new SelectionListener() {
+            public void widgetSelected(SelectionEvent event) {
+            }
+
+            public void widgetDefaultSelected(SelectionEvent e) {                    
+            }
+        });
+
+        mi = new MenuItem (menu, SWT.PUSH);
+        mi.setText ("Add Site");
+        mi.addSelectionListener(new SelectionListener() {
+            public void widgetSelected(SelectionEvent event) {
+            }
+
+            public void widgetDefaultSelected(SelectionEvent e) {                    
+            }
+        });
+	    
 	}
 }

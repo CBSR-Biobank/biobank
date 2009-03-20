@@ -3,6 +3,8 @@ package edu.ualberta.med.biobank.views;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
 
 import edu.ualberta.med.biobank.SessionManager;
@@ -37,9 +39,17 @@ public class SessionsView extends ViewPart {
         		SessionManager.getInstance().getTreeViewerListener());
         treeViewer.setUseHashlookup(true);
 		treeViewer.setInput(SessionManager.getInstance().getRootNode());
+		
+        Menu menu = new Menu(PlatformUI.getWorkbench()
+                .getActiveWorkbenchWindow().getShell(), SWT.NONE);
+        menu.addListener(SWT.Show, 
+            SessionManager.getInstance().getTreeViewerMenuListener());
+        
+		treeViewer.getTree().setMenu(menu);
 	}
 	
 	@Override
 	public void setFocus() {
 	}
 }
+;
