@@ -14,8 +14,8 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.ISaveablePart;
 import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.forms.widgets.Form;
 import org.eclipse.ui.forms.widgets.FormToolkit;
+import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.part.EditorPart;
 
 import edu.ualberta.med.biobank.model.Address;
@@ -25,7 +25,7 @@ public abstract class AddressViewForm extends EditorPart {
 
 	protected FormToolkit toolkit;
 	
-	protected Form form;
+	protected ScrolledForm form;
 	
 	private HashMap<String, Control> controls;
 	

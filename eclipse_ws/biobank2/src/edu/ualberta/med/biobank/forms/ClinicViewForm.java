@@ -2,6 +2,8 @@ package edu.ualberta.med.biobank.forms;
 
 import org.eclipse.core.databinding.DataBindingContext;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.viewers.IStructuredContentProvider;
+import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -19,6 +21,7 @@ import org.eclipse.ui.forms.widgets.Section;
 import org.springframework.util.Assert;
 
 import edu.ualberta.med.biobank.model.Clinic;
+import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.ClinicAdapter;
 
@@ -73,14 +76,11 @@ public class ClinicViewForm  extends AddressViewForm {
 	public void createPartControl(Composite parent) {
 		
 		toolkit = new FormToolkit(parent.getDisplay());
-		form = toolkit.createForm(parent);	
+        form = toolkit.createScrolledForm(parent);  
 
 		if (clinic.getName() != null) {
 			form.setText("Clinic: " + clinic.getName());
 		}
-		
-		toolkit.decorateFormHeading(form);
-		//form.setMessage(OK_MESSAGE);
 		
 		GridLayout layout = new GridLayout(1, false);
 		form.getBody().setLayout(layout);
@@ -142,3 +142,4 @@ public class ClinicViewForm  extends AddressViewForm {
 	}
 
 }
+

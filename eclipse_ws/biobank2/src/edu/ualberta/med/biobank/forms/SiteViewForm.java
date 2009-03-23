@@ -1,21 +1,33 @@
 package edu.ualberta.med.biobank.forms;
 
+import java.util.Collection;
+import java.util.Iterator;
+
 import org.eclipse.core.databinding.DataBindingContext;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.viewers.IStructuredContentProvider;
+import org.eclipse.jface.viewers.ITableLabelProvider;
+import org.eclipse.jface.viewers.LabelProvider;
+import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.jface.viewers.TableViewerColumn;
+import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
 import org.springframework.util.Assert;
@@ -35,7 +47,12 @@ public class SiteViewForm extends AddressViewForm {
 	      "edu.ualberta.med.biobank.forms.SiteViewForm";
 	
 	private SiteAdapter siteAdapter;
+	
 	private Site site;
+	
+	private TableViewer studyTableViewer;
+    private TableViewer clinicTableViewer;
+	
 	
 	Label name;
 
@@ -98,32 +115,122 @@ public class SiteViewForm extends AddressViewForm {
 		loadSite();
 		address = site.getAddress();
 		toolkit = new FormToolkit(parent.getDisplay());
-		form = toolkit.createForm(parent);	
+        form = toolkit.createScrolledForm(parent);  
 
 		if (site.getName() != null) {
 			form.setText("BioBank Site: " + site.getName());
 		}
 		
-		toolkit.decorateFormHeading(form);
-		//form.setMessage(OK_MESSAGE);
-		
 		form.getBody().setLayout(new GridLayout(1, false));
 		form.getBody().setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		
+		createAddressSection();
+		createStudySection();
+		createClinicSection();
+		createButtons();
         
+        bindValues();
+	}
+	
+	private void createAddressSection() {        
+        Section section = toolkit.createSection(form.getBody(), 
+            Section.TWISTIE | Section.TITLE_BAR); // | Section.EXPANDED);
+        section.setText("Address");
+        section.setLayout(new GridLayout(1, false));
+        section.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));        
+        Composite sbody;
+        sbody = toolkit.createComposite(section);
+        section.setClient(sbody);
+        
+        sbody.setLayout(new GridLayout(2, false));
+        toolkit.paintBordersFor(sbody);     
+        createAddressArea(sbody);
+	}
+	
+    private void createStudySection() {        
         Section section = toolkit.createSection(form.getBody(), 
             Section.TWISTIE | Section.TITLE_BAR | Section.EXPANDED);
-        section.setText("Address");
-        //section.setLayout(new GridLayout(1, false));
-        section.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        section.setText("Studies");
+        section.setLayout(new GridLayout(1, false));
+        section.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));        
+        Composite sbody;
+        sbody = toolkit.createComposite(section);
+        section.setClient(sbody);
         
-        Composite sbody = toolkit.createComposite(section);
-        GridLayout layout = new GridLayout(2, false);
-        layout.horizontalSpacing = 10;
-        sbody.setLayout(layout);
-        sbody.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        toolkit.paintBordersFor(sbody);		
-		createAddressArea(sbody);
-
+        sbody.setLayout(new GridLayout(2, false));
+        toolkit.paintBordersFor(sbody);   
+        
+        Table table = toolkit.createTable(sbody, SWT.NONE);
+        studyTableViewer = new TableViewer(table, SWT.MULTI | SWT.H_SCROLL
+            | SWT.V_SCROLL | SWT.FULL_SELECTION);
+        studyTableViewer.setLabelProvider(new StudyLabelProvider());
+        studyTableViewer.setContentProvider(new StudyContentProvider());
+        String [] colNames = new String[] {"Name", "Short Name", "Num. Patients"};
+        for (String name : colNames) {
+            TableColumn col = new TableColumn(table, SWT.NONE);
+            col.setText(name);
+            col.setResizable(true);
+            col.setWidth(100);
+        }
+        studyTableViewer.setColumnProperties(colNames);
+        table.setHeaderVisible(true);
+        table.setLinesVisible(true);
+        
+        // hack required here because site.getStudyCollection().toArray(new Study[0])
+        // returns Object[].        
+        int count = 0;
+        Collection<Study> studies = site.getStudyCollection();
+        Study [] arr = new Study [studies.size()];
+        Iterator<Study> it = studies.iterator();
+        while (it.hasNext()) {
+            arr[count] = it.next();
+            ++count;
+        }        
+        studyTableViewer.setInput(arr);
+    }
+    
+    private void createClinicSection() {        
+        Section section = toolkit.createSection(form.getBody(), 
+            Section.TWISTIE | Section.TITLE_BAR | Section.EXPANDED);
+        section.setText("Clinics");
+        section.setLayout(new GridLayout(1, false));
+        section.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));        
+        Composite sbody;
+        sbody = toolkit.createComposite(section);
+        section.setClient(sbody);
+        
+        sbody.setLayout(new GridLayout(2, false));
+        toolkit.paintBordersFor(sbody);   
+        
+        Table table = toolkit.createTable(sbody, SWT.NONE);
+        table.setLayoutData(new GridData(GridData.VERTICAL_ALIGN_BEGINNING | GridData.FILL_HORIZONTAL));
+        clinicTableViewer = new TableViewer(table);
+        clinicTableViewer.setLabelProvider(new LabelProvider());
+        clinicTableViewer.setContentProvider(new ClinicContentProvider());
+        
+        String[] titles = {"Name", "Num Studies"};
+        for (int i = 0; i < titles.length; i++) {
+            TableColumn column = new TableColumn(table, SWT.NONE);
+            column.setText (titles [i]);
+        }
+        table.setLinesVisible(true);
+        table.setHeaderVisible(true);
+        
+        Collection<Clinic> studies = site.getClinicCollection();
+        for (Object obj : studies.toArray(new Object[studies.size()])) {
+            Clinic clinic = (Clinic) obj;
+            TableItem item = new TableItem(table, 0);
+            item.setText(0, clinic.getName());
+        }
+        
+        for (int i = 0; i < titles.length; i++) {
+            table.getColumn(i).pack();
+        }
+    }
+	
+	private void createButtons() {      
+        Composite sbody;
+        
 		sbody = toolkit.createComposite(form.getBody());
 		sbody.setLayout(new GridLayout(4, false));
 		toolkit.paintBordersFor(sbody);
@@ -187,8 +294,6 @@ public class SiteViewForm extends AddressViewForm {
 			public void widgetSelected(SelectionEvent e) {
 			}
 		});
-		
-		bindValues();
 	}
     
     private void bindValues() {
@@ -202,3 +307,73 @@ public class SiteViewForm extends AddressViewForm {
 	}
 
 }
+
+class StudyContentProvider implements IStructuredContentProvider {   
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.viewers.IStructuredContentProvider#getElements(java.lang.Object)
+     */
+    public Object[] getElements(Object inputElement) {
+        return (Study[])inputElement;
+    }
+
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.viewers.IContentProvider#dispose()
+     */
+    public void dispose() {
+        
+    }
+
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer, java.lang.Object, java.lang.Object)
+     */
+    public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+        
+    }
+
+}
+
+class StudyLabelProvider extends LabelProvider implements ITableLabelProvider {
+
+    @Override
+    public Image getColumnImage(Object element, int columnIndex) {
+        return null;
+    }
+
+    @Override
+    public String getColumnText(Object element, int columnIndex) {
+        switch (columnIndex) {
+            case 0: return ((Study) element).getName();
+            case 1: return ((Study) element).getNameShort();
+        }
+        return "";
+    }
+    
+    public boolean isLabelProperty(Object element, String property) {
+        return false;
+    }
+}
+
+class ClinicContentProvider implements IStructuredContentProvider {   
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.viewers.IStructuredContentProvider#getElements(java.lang.Object)
+     */
+    public Object[] getElements(Object inputElement) {
+        return (Clinic[])inputElement;
+    }
+
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.viewers.IContentProvider#dispose()
+     */
+    public void dispose() {
+        
+    }
+
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer, java.lang.Object, java.lang.Object)
+     */
+    public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+        
+    }
+
+}
+
