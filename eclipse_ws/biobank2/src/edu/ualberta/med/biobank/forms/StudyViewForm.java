@@ -1,28 +1,37 @@
 package edu.ualberta.med.biobank.forms;
 
 import java.util.Collection;
+import java.util.Iterator;
+
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.forms.widgets.Form;
+import org.eclipse.ui.forms.ManagedForm;
+import org.eclipse.ui.forms.events.ExpansionAdapter;
+import org.eclipse.ui.forms.events.ExpansionEvent;
 import org.eclipse.ui.forms.widgets.FormToolkit;
+import org.eclipse.ui.forms.widgets.ScrolledForm;
+import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.part.EditorPart;
 import org.springframework.util.Assert;
 
-import edu.ualberta.med.biobank.model.Clinic;
+import edu.ualberta.med.biobank.model.Patient;
+import edu.ualberta.med.biobank.model.Sdata;
+import edu.ualberta.med.biobank.model.StorageContainer;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
-import org.eclipse.swt.widgets.Table;
+import edu.ualberta.med.biobank.widgets.BiobankCollectionTable;
 
 public class StudyViewForm extends EditorPart {
+
     public static final String ID =
         "edu.ualberta.med.biobank.forms.StudyViewForm";
     
@@ -30,8 +39,9 @@ public class StudyViewForm extends EditorPart {
     private Study study;
 
     protected FormToolkit toolkit;
-    
-    protected Form form;
+
+    private ManagedForm mform;
+    protected ScrolledForm form;
 
     @Override
     public void doSave(IProgressMonitor monitor) {
@@ -52,8 +62,8 @@ public class StudyViewForm extends EditorPart {
     }
 
     @Override
-    public void init(IEditorSite editorSite, IEditorInput input)
-            throws PartInitException {
+    public void init(IEditorSite editorSite, IEditorInput input) 
+    throws PartInitException {
         if ( !(input instanceof NodeInput)) 
             throw new PartInitException("Invalid editor input"); 
         
@@ -77,42 +87,136 @@ public class StudyViewForm extends EditorPart {
 
     @Override
     public void createPartControl(Composite parent) {
-        
-        toolkit = new FormToolkit(parent.getDisplay());
-        form = toolkit.createForm(parent);  
+        mform = new ManagedForm(parent);
+        BusyIndicator.showWhile(parent.getDisplay(), new Runnable() {
+            public void run() {
+                createFormContent();
+            }
+        });
+    }
+    
+    protected void createFormContent() {
+        toolkit = mform.getToolkit();
+        form = mform.getForm();
 
         if (study.getName() != null) {
             form.setText("Study: " + study.getName());
         }
         
-        toolkit.decorateFormHeading(form);
+        //toolkit.decorateFormHeading(form);
         //form.setMessage(OK_MESSAGE);
         
         GridLayout layout = new GridLayout(1, false);
         form.getBody().setLayout(layout);
         form.getBody().setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         
-        Composite sbody = toolkit.createComposite(form.getBody());
-        sbody.setLayout(new GridLayout(2, false));
-        sbody.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));        
-        toolkit.paintBordersFor(sbody); 
+        Composite client = toolkit.createComposite(form.getBody());
+        client.setLayout(new GridLayout(2, false));
+        client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));        
+        toolkit.paintBordersFor(client); 
         
-        Label label = FormUtils.createLabelledField(toolkit, sbody, "Short Name:");
-        label.setText(study.getNameShort());
+        Label label = FormUtils.createLabelledField(toolkit, client, "Short Name:");
+        label.setText(study.getNameShort());        
 
-        label = toolkit.createLabel(sbody, "Clinics:", SWT.LEFT);
-        label.setLayoutData(new GridData(GridData.VERTICAL_ALIGN_BEGINNING));
-        Table tbl = toolkit.createTable(sbody, SWT.NONE);
-        tbl.setLayoutData(new GridData(GridData.VERTICAL_ALIGN_BEGINNING | GridData.FILL_HORIZONTAL));
-        Collection<Clinic> clinics = study.getClinicCollection();
-        for (Object obj : clinics.toArray(new Object[clinics.size()])) {
-            TableItem item = new TableItem(tbl, 0);
-            item.setText(((Clinic) obj).getName());
-        }
+        FormUtils.createClinicSection(toolkit, form.getBody(), 
+                study.getClinicCollection());
+        
+        createDataCollectedSection();
+        createPatientsSection();
+        createStorageContainerSection();
+        form.reflow(true);
     }
+    
+    private void createDataCollectedSection() {           
+        Section section = createSection("Study Data Collected");
 
+        // hack required here because site.getStudyCollection().toArray(new Study[0])
+        // returns Object[].        
+        int count = 0;
+        Collection<Sdata> sdatas = study.getSdataCollection();
+        Sdata [] arr = new Sdata [sdatas.size()];
+        Iterator<Sdata> it = sdatas.iterator();
+        while (it.hasNext()) {
+            arr[count] = it.next();
+            ++count;
+        }
+
+        String [] headings = new String[] {"Name", "Valid Values"};      
+        BiobankCollectionTable comp = 
+            new BiobankCollectionTable(section, SWT.NONE, headings, arr);
+        section.setClient(comp);
+        comp.adaptToToolkit(toolkit); 
+        toolkit.paintBordersFor(comp);
+
+        comp.getTableViewer().addDoubleClickListener(
+                FormUtils.getBiobankCollectionDoubleClickListener());
+    }
+    
+    private void createPatientsSection() {        
+        Section section = createSection("Patients");  
+        
+        // hack required here because site.getStudyCollection().toArray(new Study[0])
+        // returns Object[].        
+        int count = 0;
+        Collection<Patient> patients = study.getPatientCollection();
+        Patient [] arr = new Patient [patients.size()];
+        Iterator<Patient> it = patients.iterator();
+        while (it.hasNext()) {
+            arr[count] = it.next();
+            ++count;
+        }
+
+        String [] headings = new String[] {"Patient Number"};      
+        BiobankCollectionTable comp = 
+            new BiobankCollectionTable(section, SWT.NONE, headings, arr);
+        section.setClient(comp);
+        comp.adaptToToolkit(toolkit);   
+        toolkit.paintBordersFor(comp);
+        
+        comp.getTableViewer().addDoubleClickListener(
+                FormUtils.getBiobankCollectionDoubleClickListener());
+    }
+    
+    private void createStorageContainerSection() {        
+        Section section = createSection("Storage Containers");  
+        
+        // hack required here because site.getStudyCollection().toArray(new Study[0])
+        // returns Object[].        
+        int count = 0;
+        Collection<StorageContainer> storageContainers = study.getStorageContainerCollection();
+        StorageContainer [] arr = new StorageContainer [storageContainers.size()];
+        Iterator<StorageContainer> it = storageContainers.iterator();
+        while (it.hasNext()) {
+            arr[count] = it.next();
+            ++count;
+        }
+
+        String [] headings = new String[] {"Name", "Status", "Bar Code", "Full", "Temperature"};      
+        BiobankCollectionTable comp = 
+            new BiobankCollectionTable(section, SWT.NONE, headings, arr);
+        section.setClient(comp);
+        comp.adaptToToolkit(toolkit);   
+        toolkit.paintBordersFor(comp);
+        
+        comp.getTableViewer().addDoubleClickListener(
+                FormUtils.getBiobankCollectionDoubleClickListener());
+    }
+    
     @Override
     public void setFocus() {
     }
-
+    
+    private Section createSection(String title) {
+        Section section = toolkit.createSection(form.getBody(),
+                Section.TWISTIE | Section.TITLE_BAR | Section.EXPANDED); 
+        section.setText(title);
+        section.setLayout(new GridLayout(1, false));
+        section.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        section.addExpansionListener(new ExpansionAdapter() {
+            public void expansionStateChanged(ExpansionEvent e) {
+                form.reflow(false);
+            }
+        });
+        return section;
+    }
 }

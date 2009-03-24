@@ -12,10 +12,11 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class SiteGetHelper implements Runnable {
 
+    public static final int LOAD_BASIC   = 0;
     public static final int LOAD_STUDIES = 1 << 0;
     public static final int LOAD_CLINICS = 1 << 1;
-    public static final int LOAD_STORAGE_CONTAINERS = 1 << 2;
-    public static final int LOAD_ALL = LOAD_STUDIES & LOAD_CLINICS & LOAD_STORAGE_CONTAINERS;
+    public static final int LOAD_STORAGE_TYPES = 1 << 2;
+    public static final int LOAD_ALL = LOAD_STUDIES & LOAD_CLINICS & LOAD_STORAGE_TYPES;
     
     private WritableApplicationService appService;
     
@@ -48,7 +49,7 @@ public class SiteGetHelper implements Runnable {
                 site.getClinicCollection();
             }
 
-            if ((flags & LOAD_STORAGE_CONTAINERS) != 0) { 
+            if ((flags & LOAD_STORAGE_TYPES) != 0) { 
                 site.getStorageTypeCollection();
             }
         }

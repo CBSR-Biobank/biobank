@@ -2,8 +2,6 @@ package edu.ualberta.med.biobank.forms;
 
 import org.eclipse.core.databinding.DataBindingContext;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.jface.viewers.IStructuredContentProvider;
-import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -21,7 +19,6 @@ import org.eclipse.ui.forms.widgets.Section;
 import org.springframework.util.Assert;
 
 import edu.ualberta.med.biobank.model.Clinic;
-import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.ClinicAdapter;
 
@@ -86,12 +83,12 @@ public class ClinicViewForm  extends AddressViewForm {
 		form.getBody().setLayout(layout);
 		form.getBody().setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		
-		Composite sbody = toolkit.createComposite(form.getBody());
-		sbody.setLayout(new GridLayout(4, false));
-		sbody.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));		
-		toolkit.paintBordersFor(sbody);	
+		Composite client = toolkit.createComposite(form.getBody());
+		client.setLayout(new GridLayout(4, false));
+		client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));		
+		toolkit.paintBordersFor(client);	
 		
-		createAddressArea(sbody);
+		createAddressArea(client);
 
 		Section section = toolkit.createSection(form.getBody(),  
 				ExpandableComposite.TITLE_BAR | ExpandableComposite.TWISTIE
@@ -99,19 +96,19 @@ public class ClinicViewForm  extends AddressViewForm {
 		section.setText("Associated Studies");
 		//section.setFont(FormUtils.getSectionFont());
 		section.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		sbody = toolkit.createComposite(section);
-		sbody.setLayout(new GridLayout(4, false));
-		sbody.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));		
-		section.setClient(sbody);
-		toolkit.paintBordersFor(sbody);
+		client = toolkit.createComposite(section);
+		client.setLayout(new GridLayout(4, false));
+		client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));		
+		section.setClient(client);
+		toolkit.paintBordersFor(client);
 		
 		// studies go here
 
-		sbody = toolkit.createComposite(form.getBody());
-		sbody.setLayout(new GridLayout(4, false));
-		toolkit.paintBordersFor(sbody);
+		client = toolkit.createComposite(form.getBody());
+		client.setLayout(new GridLayout(4, false));
+		toolkit.paintBordersFor(client);
 
-		final Button edit = toolkit.createButton(sbody, "Edit Clinic Info", SWT.PUSH);
+		final Button edit = toolkit.createButton(client, "Edit Clinic Info", SWT.PUSH);
 		edit.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				getSite().getPage().closeEditor(ClinicViewForm.this, false);

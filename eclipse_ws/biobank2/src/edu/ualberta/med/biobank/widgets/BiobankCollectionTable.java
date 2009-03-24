@@ -1,8 +1,5 @@
 package edu.ualberta.med.biobank.widgets;
 
-import org.eclipse.jface.viewers.DoubleClickEvent;
-import org.eclipse.jface.viewers.IDoubleClickListener;
-import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableLayout;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.SWT;
@@ -15,13 +12,6 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.ui.forms.widgets.FormToolkit;
-import org.springframework.util.Assert;
-
-import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.model.Clinic;
-import edu.ualberta.med.biobank.model.Study;
-import edu.ualberta.med.biobank.treeview.ClinicAdapter;
-import edu.ualberta.med.biobank.treeview.StudyAdapter;
 
 public class BiobankCollectionTable extends Composite {
     

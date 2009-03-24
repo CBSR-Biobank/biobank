@@ -23,8 +23,6 @@ import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.FontMetrics;
-import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -113,22 +111,20 @@ public abstract class AddressEntryForm extends EditorPart {
 		section.setText("Address");
 		//section.setFont(FormUtils.getSectionFont());
 		section.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		Composite sbody = toolkit.createComposite(section);
-		GC gc = new GC(sbody);
-		FontMetrics fm = gc.getFontMetrics();
-		section.setClient(sbody);
+		Composite client = toolkit.createComposite(section);
+		section.setClient(client);
         GridLayout layout = new GridLayout(2, false);
         layout.horizontalSpacing = 10;
-		sbody.setLayout(layout);
-		toolkit.paintBordersFor(sbody);
+		client.setLayout(layout);
+		toolkit.paintBordersFor(client);
 		
 		for (String key : AddressFieldsConstants.ORDERED_FIELDS) {
 			FieldInfo fi = AddressFieldsConstants.FIELDS.get(key);
 			
 			if (fi.widgetClass == Text.class) {
-		        Label label = toolkit.createLabel(sbody, fi.label + ":", SWT.LEFT);
+		        Label label = toolkit.createLabel(client, fi.label + ":", SWT.LEFT);
 		        label.setLayoutData(new GridData());
-		        Text text  = toolkit.createText(sbody, "", SWT.SINGLE);
+		        Text text  = toolkit.createText(client, "", SWT.SINGLE);
 		        text.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 				controls.put(key, text);
 				text.addKeyListener(keyListener);
@@ -138,8 +134,8 @@ public abstract class AddressEntryForm extends EditorPart {
 				}
 			}
 			else if (fi.widgetClass == Combo.class) {
-				toolkit.createLabel(sbody, fi.label + " :", SWT.LEFT);
-				Combo combo = new Combo(sbody, SWT.READ_ONLY);
+				toolkit.createLabel(client, fi.label + " :", SWT.LEFT);
+				Combo combo = new Combo(client, SWT.READ_ONLY);
 				if (key.equals("province")) {
 					combo.setItems(AddressFieldsConstants.PROVINCES);
 				}

@@ -128,19 +128,19 @@ public class SiteEntryForm extends AddressEntryForm {
 				| ExpandableComposite.EXPANDED);
 		section.setText("Site");
 		//section.setFont(FormUtils.getSectionFont());
-		Composite sbody = toolkit.createComposite(section);
-		section.setClient(sbody);
+		Composite client = toolkit.createComposite(section);
+		section.setClient(client);
 		section.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		layout = new GridLayout(2, false);
 		layout.horizontalSpacing = 10;
-		sbody.setLayout(layout);
-		toolkit.paintBordersFor(sbody);
+		client.setLayout(layout);
+		toolkit.paintBordersFor(client);
 		
 		String[] sessionNames = SessionManager.getInstance().getSessionNames();
 		
 		if (sessionNames.length > 1) {			
-			toolkit.createLabel(sbody, "Session:", SWT.LEFT);
-			session = new Combo(sbody, SWT.READ_ONLY);
+			toolkit.createLabel(client, "Session:", SWT.LEFT);
+			session = new Combo(client, SWT.READ_ONLY);
 			session.setItems(sessionNames);
 			session.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
 		}
@@ -148,8 +148,8 @@ public class SiteEntryForm extends AddressEntryForm {
 			session = null;
 		}
 
-        Label label = toolkit.createLabel(sbody, "Name:", SWT.LEFT);
-        name  = toolkit.createText(sbody, "", SWT.SINGLE);
+        Label label = toolkit.createLabel(client, "Name:", SWT.LEFT);
+        name  = toolkit.createText(client, "", SWT.SINGLE);
         name.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         name.addKeyListener(keyListener);		
 		
@@ -157,14 +157,14 @@ public class SiteEntryForm extends AddressEntryForm {
 		
 		createAddressArea();
 
-		sbody = toolkit.createComposite(form.getBody());
+		client = toolkit.createComposite(form.getBody());
 		layout = new GridLayout();
 		layout.horizontalSpacing = 10;
 		layout.numColumns = 2;
-		sbody.setLayout(layout);
-		toolkit.paintBordersFor(sbody);
+		client.setLayout(layout);
+		toolkit.paintBordersFor(client);
 
-		submit = toolkit.createButton(sbody, "Submit", SWT.PUSH);
+		submit = toolkit.createButton(client, "Submit", SWT.PUSH);
 		submit.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				PlatformUI.getWorkbench().getActiveWorkbenchWindow()

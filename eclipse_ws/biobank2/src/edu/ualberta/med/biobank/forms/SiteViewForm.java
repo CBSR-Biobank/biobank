@@ -5,10 +5,6 @@ import java.util.Iterator;
 
 import org.eclipse.core.databinding.DataBindingContext;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.jface.viewers.DoubleClickEvent;
-import org.eclipse.jface.viewers.IDoubleClickListener;
-import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -17,7 +13,6 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
@@ -26,7 +21,6 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
 import org.springframework.util.Assert;
 
-import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.helpers.SiteGetHelper;
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Clinic;
@@ -45,26 +39,6 @@ public class SiteViewForm extends AddressViewForm {
 	private SiteAdapter siteAdapter;
 	
 	private Site site;
-	
-    private IDoubleClickListener doubleClickListener = new IDoubleClickListener() {
-        public void doubleClick(DoubleClickEvent event) {
-            Object selection = event.getSelection();
-            Object element = ((StructuredSelection)selection).getFirstElement();
-            
-            if (element instanceof Study) {
-                StudyAdapter node = new StudyAdapter(null, (Study) element);
-                SessionManager.getInstance().openStudyViewForm(node);
-            }
-            else if (element instanceof Clinic) {
-                ClinicAdapter node = new ClinicAdapter(null, (Clinic) element);
-                SessionManager.getInstance().openClinicViewForm(node);
-            }
-            else {
-                Assert.isTrue(false, "invalid type for element: " 
-                        + element.getClass().getName());
-            }
-        }
-    };
 
 	public void doSave(IProgressMonitor monitor) {
 	}
@@ -136,7 +110,8 @@ public class SiteViewForm extends AddressViewForm {
 		
 		createAddressSection();
 		createStudySection();
-		createClinicSection();
+		FormUtils.createClinicSection(toolkit, form.getBody(), 
+		        site.getClinicCollection());
 		createButtons();
         
         bindValues();
@@ -148,13 +123,13 @@ public class SiteViewForm extends AddressViewForm {
         section.setText("Address");
         section.setLayout(new GridLayout(1, false));
         section.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));        
-        Composite sbody;
-        sbody = toolkit.createComposite(section);
-        section.setClient(sbody);
+        Composite client;
+        client = toolkit.createComposite(section);
+        section.setClient(client);
         
-        sbody.setLayout(new GridLayout(2, false));
-        toolkit.paintBordersFor(sbody);     
-        createAddressArea(sbody);
+        client.setLayout(new GridLayout(2, false));
+        toolkit.paintBordersFor(client);     
+        createAddressArea(client);
 	}
 	
     private void createStudySection() {        
@@ -182,44 +157,18 @@ public class SiteViewForm extends AddressViewForm {
         comp.adaptToToolkit(toolkit);   
         toolkit.paintBordersFor(comp);
         
-        comp.getTableViewer().addDoubleClickListener(doubleClickListener);
-    }
-    
-    private void createClinicSection() {        
-        Section section = toolkit.createSection(form.getBody(), 
-            Section.TWISTIE | Section.TITLE_BAR | Section.EXPANDED);
-        section.setText("Clinics");
-        section.setLayout(new GridLayout(1, false));
-        section.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));      
-        
-        // hack required here because site.getStudyCollection().toArray(new Study[0])
-        // returns Object[].        
-        int count = 0;
-        Collection<Clinic> clinics = site.getClinicCollection();
-        Clinic [] arr = new Clinic [clinics.size()];
-        Iterator<Clinic> it = clinics.iterator();
-        while (it.hasNext()) {
-            arr[count] = it.next();
-            ++count;
-        }      
-        
-        String[] headings = {"Name", "Num Studies"};        
-        BiobankCollectionTable comp = 
-            new BiobankCollectionTable(section, SWT.NONE, headings, arr);
-        section.setClient(comp);
-        comp.adaptToToolkit(toolkit);   
-        toolkit.paintBordersFor(comp);
-        comp.getTableViewer().addDoubleClickListener(doubleClickListener);
+        comp.getTableViewer().addDoubleClickListener(
+                FormUtils.getBiobankCollectionDoubleClickListener());
     }
 	
 	private void createButtons() {      
-        Composite sbody;
+        Composite client;
         
-		sbody = toolkit.createComposite(form.getBody());
-		sbody.setLayout(new GridLayout(4, false));
-		toolkit.paintBordersFor(sbody);
+		client = toolkit.createComposite(form.getBody());
+		client.setLayout(new GridLayout(4, false));
+		toolkit.paintBordersFor(client);
 
-		final Button edit = toolkit.createButton(sbody, "Edit Site Info", SWT.PUSH);
+		final Button edit = toolkit.createButton(client, "Edit Site Info", SWT.PUSH);
 		edit.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				getSite().getPage().closeEditor(SiteViewForm.this, false);
@@ -233,7 +182,7 @@ public class SiteViewForm extends AddressViewForm {
 			}
 		});
 
-		final Button study = toolkit.createButton(sbody, "Add Study", SWT.PUSH);
+		final Button study = toolkit.createButton(client, "Add Study", SWT.PUSH);
 		study.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {				
 				try {
@@ -253,7 +202,7 @@ public class SiteViewForm extends AddressViewForm {
 			}
 		});
 
-		final Button clinic = toolkit.createButton(sbody, "Add Clinic", SWT.PUSH);
+		final Button clinic = toolkit.createButton(client, "Add Clinic", SWT.PUSH);
 		clinic.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				try {
@@ -273,7 +222,7 @@ public class SiteViewForm extends AddressViewForm {
 			}
 		});
 
-		final Button storageType = toolkit.createButton(sbody, "Add Storage Type", SWT.PUSH);
+		final Button storageType = toolkit.createButton(client, "Add Storage Type", SWT.PUSH);
 		storageType.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 			}

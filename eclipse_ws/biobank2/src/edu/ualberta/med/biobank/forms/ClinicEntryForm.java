@@ -106,17 +106,17 @@ public class ClinicEntryForm extends AddressEntryForm {
 				| ExpandableComposite.EXPANDED);
 		section.setText("Site");
 		//section.setFont(FormUtils.getSectionFont());
-		Composite sbody = toolkit.createComposite(section);
-		section.setClient(sbody);
+		Composite client = toolkit.createComposite(section);
+		section.setClient(client);
 		section.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		layout = new GridLayout(2, false);
 		layout.horizontalSpacing = 10;
-		sbody.setLayout(layout);
-		toolkit.paintBordersFor(sbody);		
+		client.setLayout(layout);
+		toolkit.paintBordersFor(client);		
 
-        Label label = toolkit.createLabel(sbody, "Name:", SWT.LEFT);
+        Label label = toolkit.createLabel(client, "Name:", SWT.LEFT);
         label.setLayoutData(new GridData());
-        name = toolkit.createText(sbody, "", SWT.SINGLE);
+        name = toolkit.createText(client, "", SWT.SINGLE);
         name.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         name.addKeyListener(keyListener);
 		nameDecorator = FormUtils.createDecorator(label, NO_CLINIC_NAME_MESSAGE);
@@ -124,14 +124,14 @@ public class ClinicEntryForm extends AddressEntryForm {
 		createAddressArea();
 
 		section = toolkit.createSection(form.getBody(), SWT.NONE);
-		sbody = toolkit.createComposite(section);
-		section.setClient(sbody);
+		client = toolkit.createComposite(section);
+		section.setClient(client);
 		section.setLayoutData(new GridData(GridData.FILL_BOTH));
 		layout = new GridLayout(2, false);
-		sbody.setLayout(layout);
-		toolkit.paintBordersFor(sbody);
+		client.setLayout(layout);
+		toolkit.paintBordersFor(client);
 
-		submit = toolkit.createButton(sbody, "Submit", SWT.PUSH);
+		submit = toolkit.createButton(client, "Submit", SWT.PUSH);
 		submit.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				PlatformUI.getWorkbench().getActiveWorkbenchWindow()

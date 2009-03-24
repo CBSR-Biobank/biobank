@@ -14,16 +14,26 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
  *
  */
 public class StudyGetHelper implements Runnable {
+    
+    public static final int LOAD_BASIC    = 0;
+    public static final int LOAD_CLINICS  = 1 << 0;
+    public static final int LOAD_PATIENTS = 1 << 1;
+    public static final int LOAD_STORAGE_CONTAINERS = 1 << 2;
+    public static final int LOAD_SDATA = 1 << 3;
+    public static final int LOAD_ALL = 
+        LOAD_CLINICS & LOAD_PATIENTS & LOAD_STORAGE_CONTAINERS & LOAD_SDATA;
 	
 	private WritableApplicationService appService;
 	
 	private int id;
+    private int flags;
 	
 	private Study study;
 	
 	public StudyGetHelper(WritableApplicationService appService, int id, int flags) {
 		this.appService = appService;
 		this.id = id;
+		this.flags = flags;
 	}
 
 	@Override
@@ -36,8 +46,22 @@ public class StudyGetHelper implements Runnable {
 	        Assert.isTrue(result.size() == 1);
 	        
 	        study = result.get(0);
-	        
-	        study.getClinicCollection();
+
+            if ((flags & LOAD_CLINICS) != 0) { 
+                study.getClinicCollection();
+            }
+
+            if ((flags & LOAD_PATIENTS) != 0) { 
+                study.getPatientCollection();
+            }
+
+            if ((flags & LOAD_STORAGE_CONTAINERS) != 0) { 
+                study.getPatientCollection();
+            }
+
+            if ((flags & LOAD_SDATA) != 0) { 
+                study.getSdataCollection();
+            }
 	    }
 	    catch (final RemoteConnectFailureException exp) {
 	        Display.getDefault().asyncExec(new Runnable() {

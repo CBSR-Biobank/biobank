@@ -202,20 +202,20 @@ public class StudyEntryForm extends EditorPart {
 		GridLayout layout = new GridLayout(1, false);
 		form.getBody().setLayout(layout);
 		
-		Composite sbody = toolkit.createComposite(form.getBody());
+		Composite client = toolkit.createComposite(form.getBody());
 		layout = new GridLayout(2, false);
 		layout.horizontalSpacing = 10;
-		sbody.setLayout(layout);
-        sbody.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		toolkit.paintBordersFor(sbody);
+		client.setLayout(layout);
+        client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		toolkit.paintBordersFor(client);
 		
 		for (String key : ORDERED_FIELDS) {
 			FieldInfo fi = FIELDS.get(key);
 			
 			if (fi.widgetClass == Text.class) {
-                Label label = toolkit.createLabel(sbody, fi.label + ":", SWT.LEFT);
+                Label label = toolkit.createLabel(client, fi.label + ":", SWT.LEFT);
                 label.setLayoutData(new GridData());
-                Text text  = toolkit.createText(sbody, "", SWT.SINGLE);
+                Text text  = toolkit.createText(client, "", SWT.SINGLE);
                 text.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
                 
 				controls.put(key, text);
@@ -272,29 +272,29 @@ public class StudyEntryForm extends EditorPart {
         //section.setFont(FormUtils.getSectionFont());
         section.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-        sbody = toolkit.createComposite(section);
-        section.setClient(sbody);        
+        client = toolkit.createComposite(section);
+        section.setClient(client);        
         layout = new GridLayout(1, false);
         layout.verticalSpacing = 10;
-        sbody.setLayout(layout);
-        sbody.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        toolkit.paintBordersFor(sbody);
+        client.setLayout(layout);
+        client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        toolkit.paintBordersFor(client);
         
         for (SdataType sdataType : allSdataTypes) {
-            SdataWidget w = new SdataWidget(sbody, SWT.NONE, sdataType); 
+            SdataWidget w = new SdataWidget(client, SWT.NONE, sdataType); 
             w.adaptToToolkit(toolkit);
             sdataWidgets.put(sdataType.getType(), w);
         }		
 
 
-        sbody = toolkit.createComposite(form.getBody());
+        client = toolkit.createComposite(form.getBody());
         layout = new GridLayout(2, false);
         layout.horizontalSpacing = 10;
-        sbody.setLayout(layout);
-        sbody.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        toolkit.paintBordersFor(sbody);
+        client.setLayout(layout);
+        client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        toolkit.paintBordersFor(client);
 
-        submit = toolkit.createButton(sbody, "Submit", SWT.PUSH);
+        submit = toolkit.createButton(client, "Submit", SWT.PUSH);
         submit.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent e) {
                 saveSettings();
