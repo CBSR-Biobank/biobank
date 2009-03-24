@@ -319,7 +319,7 @@ public class SessionManager {
 		}
 	}
     
-    private void openStudyViewForm(StudyAdapter node) {
+    public void openStudyViewForm(StudyAdapter node) {
         NodeInput input = new NodeInput(node);
         
         try {
@@ -330,7 +330,7 @@ public class SessionManager {
         }
     }
 	
-	private void openClinicViewForm(ClinicAdapter node) {
+	public void openClinicViewForm(ClinicAdapter node) {
 		NodeInput input = new NodeInput(node);
 		
 		try {

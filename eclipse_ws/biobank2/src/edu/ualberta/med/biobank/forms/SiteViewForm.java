@@ -5,11 +5,14 @@ import java.util.Iterator;
 
 import org.eclipse.core.databinding.DataBindingContext;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
+import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.viewers.TableLayout;
 import org.eclipse.jface.viewers.TableViewer;
-import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
@@ -32,6 +35,7 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
 import org.springframework.util.Assert;
 
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.helpers.SiteGetHelper;
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Clinic;
@@ -152,29 +156,41 @@ public class SiteViewForm extends AddressViewForm {
             Section.TWISTIE | Section.TITLE_BAR | Section.EXPANDED);
         section.setText("Studies");
         section.setLayout(new GridLayout(1, false));
-        section.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));        
+        GridData gd = new GridData(GridData.FILL_HORIZONTAL);
+        gd.heightHint = 300;
+        section.setLayoutData(gd);   
         Composite sbody;
         sbody = toolkit.createComposite(section);
-        section.setClient(sbody);
-        
+        section.setClient(sbody);        
         sbody.setLayout(new GridLayout(2, false));
-        toolkit.paintBordersFor(sbody);   
+        gd = new GridData();
+        gd.heightHint = 300;
+        sbody.setLayoutData(gd);
+        toolkit.paintBordersFor(sbody);
         
-        Table table = toolkit.createTable(sbody, SWT.NONE);
-        studyTableViewer = new TableViewer(table, SWT.MULTI | SWT.H_SCROLL
-            | SWT.V_SCROLL | SWT.FULL_SELECTION);
+        studyTableViewer = new TableViewer(sbody, SWT.MULTI | SWT.H_SCROLL
+                | SWT.V_SCROLL | SWT.FULL_SELECTION);
         studyTableViewer.setLabelProvider(new StudyLabelProvider());
         studyTableViewer.setContentProvider(new StudyContentProvider());
+        
+        //Table table = toolkit.createTable(sbody, SWT.NONE);
+        Table table = studyTableViewer.getTable();
+        table.setLayout(new TableLayout());
+        gd = new GridData(GridData.FILL_BOTH);
+        gd.heightHint = 300;
+        table.setLayoutData(gd);
+        table.setFont(sbody.getFont());
+        table.setHeaderVisible(true);
+        table.setLinesVisible(true);
+        
         String [] colNames = new String[] {"Name", "Short Name", "Num. Patients"};
         for (String name : colNames) {
             TableColumn col = new TableColumn(table, SWT.NONE);
             col.setText(name);
             col.setResizable(true);
-            col.setWidth(100);
+            //col.setWidth(100);
         }
         studyTableViewer.setColumnProperties(colNames);
-        table.setHeaderVisible(true);
-        table.setLinesVisible(true);
         
         // hack required here because site.getStudyCollection().toArray(new Study[0])
         // returns Object[].        
@@ -187,6 +203,19 @@ public class SiteViewForm extends AddressViewForm {
             ++count;
         }        
         studyTableViewer.setInput(arr);
+        
+        for (int i = 0, n = table.getColumnCount(); i < n; i++) {
+            table.getColumn(i).pack();
+        }
+
+        studyTableViewer.addDoubleClickListener(new IDoubleClickListener() {
+            public void doubleClick(DoubleClickEvent event) {
+                Object selection = event.getSelection();
+                Object element = ((StructuredSelection)selection).getFirstElement();
+                StudyAdapter node = new StudyAdapter(null, (Study) element);
+                SessionManager.getInstance().openStudyViewForm(node);
+            }
+        });
     }
     
     private void createClinicSection() {        
@@ -210,7 +239,7 @@ public class SiteViewForm extends AddressViewForm {
         
         String[] titles = {"Name", "Num Studies"};
         for (int i = 0; i < titles.length; i++) {
-            TableColumn column = new TableColumn(table, SWT.NONE);
+            TableColumn column = new TableColumn(table, SWT.NONE, i);
             column.setText (titles [i]);
         }
         table.setLinesVisible(true);
@@ -341,9 +370,10 @@ class StudyLabelProvider extends LabelProvider implements ITableLabelProvider {
 
     @Override
     public String getColumnText(Object element, int columnIndex) {
+        final Study study = (Study) element;
         switch (columnIndex) {
-            case 0: return ((Study) element).getName();
-            case 1: return ((Study) element).getNameShort();
+            case 0: return study.getName();
+            case 1: return study.getNameShort();
         }
         return "";
     }
