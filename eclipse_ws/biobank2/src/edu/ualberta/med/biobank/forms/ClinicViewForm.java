@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.forms;
 
 import org.eclipse.core.databinding.DataBindingContext;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -14,7 +13,6 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
-import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
 import org.springframework.util.Assert;
 
@@ -30,23 +28,6 @@ public class ClinicViewForm  extends AddressViewForm {
 	private Clinic clinic;
 	
 	Label name;
-
-	public void doSave(IProgressMonitor monitor) {
-	}
-
-	@Override
-	public void doSaveAs() {		
-	}
-
-	@Override
-	public boolean isDirty() {
-		return false;
-	}
-
-	@Override
-	public boolean isSaveAsAllowed() {
-		return false;
-	}
 
 	public void init(IEditorSite editorSite, IEditorInput input)
 			throws PartInitException {
@@ -69,12 +50,7 @@ public class ClinicViewForm  extends AddressViewForm {
 		}
 	}
 
-	@Override
-	public void createPartControl(Composite parent) {
-		
-		toolkit = new FormToolkit(parent.getDisplay());
-        form = toolkit.createScrolledForm(parent);  
-
+	protected void createFormContent() {
 		if (clinic.getName() != null) {
 			form.setText("Clinic: " + clinic.getName());
 		}
@@ -132,11 +108,5 @@ public class ClinicViewForm  extends AddressViewForm {
     	DataBindingContext dbc = new DataBindingContext();    	
     	super.bindValues(dbc);
     }
-
-	@Override
-	public void setFocus() {
-		form.setFocus();
-	}
-
 }
 

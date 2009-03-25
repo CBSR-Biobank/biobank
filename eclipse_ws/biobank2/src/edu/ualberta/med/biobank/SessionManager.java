@@ -218,6 +218,32 @@ public class SessionManager {
 		return (SessionAdapter) nodes.get(count);
 	}
     
+    public void updateSites(final SessionAdapter sessionAdapter) {        
+        view.getTreeViewer().getControl().getDisplay().asyncExec(new Runnable() {
+            public void run() {                
+                // read from database again 
+                Site siteSearch = new Site();    
+                
+                WritableApplicationService appService = sessionAdapter.getAppService();
+                try {
+                    List<Site> result = appService.search(Site.class, siteSearch);
+                    for (Site site: result) {
+                        SessionManager.log4j.trace("updateSites: Site "
+                                + site.getId() + ": " + site.getName());
+                        
+                        SiteAdapter node = new SiteAdapter(sessionAdapter, site);
+                        sessionAdapter.addChild(node);
+                        view.getTreeViewer().update(node, null);
+                    }
+                    view.getTreeViewer().expandToLevel(sessionAdapter, 1);
+                }
+                catch (ApplicationException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+    
     public void updateStudies(final Node groupNode) {       
         final Site currentSite = ((SiteAdapter) groupNode.getParent()).getSite();
         Assert.isNotNull(currentSite, "null site");        

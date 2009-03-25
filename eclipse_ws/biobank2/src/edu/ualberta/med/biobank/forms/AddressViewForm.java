@@ -4,7 +4,6 @@ import java.util.HashMap;
 import org.eclipse.core.databinding.DataBindingContext;
 import org.eclipse.core.databinding.beans.PojoObservables;
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.databinding.swt.SWTObservables;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
@@ -12,20 +11,12 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
-import org.eclipse.ui.ISaveablePart;
 import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.forms.widgets.FormToolkit;
-import org.eclipse.ui.forms.widgets.ScrolledForm;
-import org.eclipse.ui.part.EditorPart;
 
 import edu.ualberta.med.biobank.model.Address;
 
-public abstract class AddressViewForm extends EditorPart {
+public abstract class AddressViewForm extends BiobankViewForm {
 	protected boolean dirty = false;
-
-	protected FormToolkit toolkit;
-	
-	protected ScrolledForm form;
 	
 	private HashMap<String, Control> controls;
 	
@@ -38,31 +29,9 @@ public abstract class AddressViewForm extends EditorPart {
 		controls = new HashMap<String, Control>();
 	}
 
-	public void doSave(IProgressMonitor monitor) {
-		setDirty(false);
-	}
-	
-	public void doSaveAs() {
-	}
-	
-	public boolean isSaveAsAllowed() {
-		return false;
-	}
-
 	public void init(IEditorSite site, IEditorInput input)
 			throws PartInitException {
-		setSite(site);
-		setInput(input);
-		setDirty(false);
-	}
-	
-	public boolean isDirty() {
-		return dirty;
-	}
-
-	protected void setDirty(boolean d) {
-		dirty = d;
-		firePropertyChange(ISaveablePart.PROP_DIRTY);
+		super.init(site, input);
 	}
 
 	protected void createAddressArea(Composite parent) {

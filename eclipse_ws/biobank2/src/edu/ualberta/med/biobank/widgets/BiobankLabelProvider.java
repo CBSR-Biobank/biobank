@@ -10,7 +10,10 @@ import edu.ualberta.med.biobank.model.Sdata;
 import edu.ualberta.med.biobank.model.StorageContainer;
 import edu.ualberta.med.biobank.model.Study;
 
-
+/**
+ * This code must not run in the UI thread.
+ *
+ */
 public class BiobankLabelProvider extends LabelProvider implements ITableLabelProvider {
 
     @Override
@@ -25,12 +28,14 @@ public class BiobankLabelProvider extends LabelProvider implements ITableLabelPr
             switch (columnIndex) {
                 case 0: return study.getName();
                 case 1: return study.getNameShort();
+                case 2: return "" + study.getPatientCollection().size();
             }
         }
         else if (element instanceof Clinic) {
             final Clinic clinic = (Clinic) element;
             switch (columnIndex) {
                 case 0: return clinic.getName();
+                case 1: return "" + clinic.getStudyCollection().size();
             }
         }
         else if (element instanceof Patient) {

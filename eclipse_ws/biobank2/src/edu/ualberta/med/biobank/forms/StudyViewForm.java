@@ -3,9 +3,7 @@ package edu.ualberta.med.biobank.forms;
 import java.util.Collection;
 import java.util.Iterator;
 
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -13,13 +11,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.forms.ManagedForm;
-import org.eclipse.ui.forms.events.ExpansionAdapter;
-import org.eclipse.ui.forms.events.ExpansionEvent;
-import org.eclipse.ui.forms.widgets.FormToolkit;
-import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
-import org.eclipse.ui.part.EditorPart;
 import org.springframework.util.Assert;
 
 import edu.ualberta.med.biobank.model.Patient;
@@ -30,7 +22,7 @@ import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankCollectionTable;
 
-public class StudyViewForm extends EditorPart {
+public class StudyViewForm extends BiobankViewForm {
 
     public static final String ID =
         "edu.ualberta.med.biobank.forms.StudyViewForm";
@@ -38,37 +30,13 @@ public class StudyViewForm extends EditorPart {
     private StudyAdapter studyAdapter;
     private Study study;
 
-    protected FormToolkit toolkit;
-
-    private ManagedForm mform;
-    protected ScrolledForm form;
-
-    @Override
-    public void doSave(IProgressMonitor monitor) {
-    }
-
-    @Override
-    public void doSaveAs() {
-    }
-
-    @Override
-    public boolean isDirty() {
-        return false;
-    }
-
-    @Override
-    public boolean isSaveAsAllowed() {
-        return false;
-    }
-
     @Override
     public void init(IEditorSite editorSite, IEditorInput input) 
     throws PartInitException {
         if ( !(input instanceof NodeInput)) 
             throw new PartInitException("Invalid editor input"); 
         
-        setSite(editorSite);
-        setInput(input);
+        super.init(editorSite, input);
         
         Node node = ((NodeInput) input).getNode();
         Assert.notNull(node, "Null editor input");
@@ -82,29 +50,13 @@ public class StudyViewForm extends EditorPart {
             Assert.isTrue(false, "Invalid editor input: object of type "
                 + node.getClass().getName());
         }
-
-    }
-
-    @Override
-    public void createPartControl(Composite parent) {
-        mform = new ManagedForm(parent);
-        BusyIndicator.showWhile(parent.getDisplay(), new Runnable() {
-            public void run() {
-                createFormContent();
-            }
-        });
     }
     
     protected void createFormContent() {
-        toolkit = mform.getToolkit();
-        form = mform.getForm();
 
         if (study.getName() != null) {
             form.setText("Study: " + study.getName());
         }
-        
-        //toolkit.decorateFormHeading(form);
-        //form.setMessage(OK_MESSAGE);
         
         GridLayout layout = new GridLayout(1, false);
         form.getBody().setLayout(layout);
@@ -124,7 +76,6 @@ public class StudyViewForm extends EditorPart {
         createDataCollectedSection();
         createPatientsSection();
         createStorageContainerSection();
-        form.reflow(true);
     }
     
     private void createDataCollectedSection() {           
@@ -200,23 +151,5 @@ public class StudyViewForm extends EditorPart {
         
         comp.getTableViewer().addDoubleClickListener(
                 FormUtils.getBiobankCollectionDoubleClickListener());
-    }
-    
-    @Override
-    public void setFocus() {
-    }
-    
-    private Section createSection(String title) {
-        Section section = toolkit.createSection(form.getBody(),
-                Section.TWISTIE | Section.TITLE_BAR | Section.EXPANDED); 
-        section.setText(title);
-        section.setLayout(new GridLayout(1, false));
-        section.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        section.addExpansionListener(new ExpansionAdapter() {
-            public void expansionStateChanged(ExpansionEvent e) {
-                form.reflow(false);
-            }
-        });
-        return section;
     }
 }

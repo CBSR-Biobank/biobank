@@ -29,10 +29,7 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.helpers.GetHelper;
-import edu.ualberta.med.biobank.helpers.SiteGetHelper;
 import edu.ualberta.med.biobank.helpers.SiteSaveHelper;
-import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.SessionAdapter;
@@ -85,28 +82,9 @@ public class SiteEntryForm extends AddressEntryForm {
 		}
 		return SITE_OK_MESSAGE;
 	}
-	
-    // We don't want to modify the Site object we already have in memory.
-    // Therefore, we need to get a new one from the ORM
-	private void loadSite() {
-        if ((site.getId() == null) || (site.getId() == 0)) {
-            site = new Site();
-            site.setAddress(new Address());
-            return;
-        }
-        
-        SiteGetHelper helper = new SiteGetHelper(
-            siteAdapter.getAppService(), site.getId(), 0);
-
-        BusyIndicator.showWhile(
-            PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-            .getShell().getDisplay(), helper);
-
-        site = helper.getResult();
-	}
 
 	public void createPartControl(Composite parent) {
-	    loadSite();
+	    // TODO: load site child objects
         address = site.getAddress();    
         
 		toolkit = new FormToolkit(parent.getDisplay());
@@ -220,20 +198,8 @@ public class SiteEntryForm extends AddressEntryForm {
 				PlatformUI.getWorkbench().getActiveWorkbenchWindow()
 				.getShell().getDisplay(), helper);
 		
-		GetHelper<Site> sitesHelper = new GetHelper<Site> (
-				siteAdapter.getAppService(), Site.class);
-		BusyIndicator.showWhile(
-				PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-				.getShell().getDisplay(), sitesHelper);
-		
-		siteAdapter.setSite(site);
-		
-		SessionAdapter sessionNode = (SessionAdapter) siteAdapter.getParent();
-		for (Site site : sitesHelper.getResult()) {
-			SiteAdapter adapter = new SiteAdapter(sessionNode, site);
-			sessionNode.addChild(adapter);
-		}
-		
+		SessionManager.getInstance().updateSites(
+		        (SessionAdapter) siteAdapter.getParent());		
 		getSite().getPage().closeEditor(SiteEntryForm.this, false);    	
     }
 

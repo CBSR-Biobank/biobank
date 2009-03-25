@@ -4,9 +4,7 @@ import java.util.Collection;
 import java.util.Iterator;
 
 import org.eclipse.core.databinding.DataBindingContext;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
@@ -16,12 +14,9 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
 import org.springframework.util.Assert;
 
-import edu.ualberta.med.biobank.helpers.SiteGetHelper;
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Site;
@@ -39,23 +34,6 @@ public class SiteViewForm extends AddressViewForm {
 	private SiteAdapter siteAdapter;
 	
 	private Site site;
-
-	public void doSave(IProgressMonitor monitor) {
-	}
-
-	@Override
-	public void doSaveAs() {		
-	}
-
-	@Override
-	public boolean isDirty() {
-		return false;
-	}
-
-	@Override
-	public boolean isSaveAsAllowed() {
-		return false;
-	}
 
 	public void init(IEditorSite editorSite, IEditorInput input)
 			throws PartInitException {
@@ -78,28 +56,8 @@ public class SiteViewForm extends AddressViewForm {
 		}
 	}
     
-    // We don't want to modify the Site object we already have in memory.
-    // Therefore, we need to get a new one from the ORM
-    private void loadSite() {
-        Assert.isTrue((site.getId() != null) && (site.getId() != 0),
-            "site not in database");
-
-        SiteGetHelper helper = new SiteGetHelper(
-            siteAdapter.getAppService(), site.getId(), SiteGetHelper.LOAD_ALL);
-
-        BusyIndicator.showWhile(
-            PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-            .getShell().getDisplay(), helper);
-
-        site = helper.getResult();
-    }
-
-	@Override
-	public void createPartControl(Composite parent) {
-		loadSite();
-		address = site.getAddress();
-		toolkit = new FormToolkit(parent.getDisplay());
-        form = toolkit.createScrolledForm(parent);  
+    protected void createFormContent() {
+		address = site.getAddress();  
 
 		if (site.getName() != null) {
 			form.setText("BioBank Site: " + site.getName());
@@ -233,11 +191,5 @@ public class SiteViewForm extends AddressViewForm {
     	DataBindingContext dbc = new DataBindingContext();    	
     	super.bindValues(dbc);
     }
-
-	@Override
-	public void setFocus() {
-		form.setFocus();
-	}
-
 }
 
