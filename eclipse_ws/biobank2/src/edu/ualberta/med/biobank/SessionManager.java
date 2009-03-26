@@ -32,6 +32,7 @@ import edu.ualberta.med.biobank.forms.ClinicViewForm;
 import edu.ualberta.med.biobank.forms.SiteEntryForm;
 import edu.ualberta.med.biobank.forms.SiteViewForm;
 import edu.ualberta.med.biobank.forms.NodeInput;
+import edu.ualberta.med.biobank.forms.StudyEntryForm;
 import edu.ualberta.med.biobank.forms.StudyViewForm;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Site;
@@ -138,6 +139,7 @@ public class SessionManager {
                 popupMenuSiteNode((SiteAdapter) element, tv, tree, menu);
             }
             else if (element instanceof StudyAdapter) {
+                popupMenuStudyNode((StudyAdapter) element, tv, tree, menu);
             }
             else if (element instanceof ClinicAdapter) {
             }
@@ -431,7 +433,7 @@ public class SessionManager {
     private void popupMenuSiteNode(final SiteAdapter siteAdapter, TreeViewer tv,  
             Tree tree,  Menu menu) {
         MenuItem mi = new MenuItem (menu, SWT.PUSH);
-        mi.setText ("Edit");
+        mi.setText ("Edit Site");
         mi.addSelectionListener(new SelectionListener() {
             public void widgetSelected(SelectionEvent event) {
                 NodeInput ni = new NodeInput(siteAdapter);
@@ -449,11 +451,44 @@ public class SessionManager {
         });
 
         mi = new MenuItem (menu, SWT.PUSH);
-        mi.setText ("View");
+        mi.setText ("View Site");
         mi.addSelectionListener(new SelectionListener() {
             public void widgetSelected(SelectionEvent event) {
                 closeEditor(new NodeInput(siteAdapter));
                 openSiteViewForm(siteAdapter);
+            }
+
+            public void widgetDefaultSelected(SelectionEvent e) {                    
+            }
+        }); 
+    }
+    
+    private void popupMenuStudyNode(final StudyAdapter studyAdapter, TreeViewer tv,  
+            Tree tree,  Menu menu) {
+        MenuItem mi = new MenuItem (menu, SWT.PUSH);
+        mi.setText ("Edit Study");
+        mi.addSelectionListener(new SelectionListener() {
+            public void widgetSelected(SelectionEvent event) {
+                NodeInput ni = new NodeInput(studyAdapter);
+                closeEditor(ni);
+                try {
+                    view.getSite().getPage().openEditor(ni, StudyEntryForm.ID, true);
+                }
+                catch (PartInitException exp) {
+                    exp.printStackTrace();              
+                }
+            }
+
+            public void widgetDefaultSelected(SelectionEvent e) {                    
+            }
+        });
+
+        mi = new MenuItem (menu, SWT.PUSH);
+        mi.setText ("View Study");
+        mi.addSelectionListener(new SelectionListener() {
+            public void widgetSelected(SelectionEvent event) {
+                closeEditor(new NodeInput(studyAdapter));
+                openStudyViewForm(studyAdapter);
             }
 
             public void widgetDefaultSelected(SelectionEvent e) {                    

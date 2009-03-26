@@ -39,6 +39,7 @@ public class MultiSelect extends Composite {
 		super(parent, style);
 		
 		availableInv = new HashMap<String, Integer>();		
+		selectedInv = new HashMap<String, Integer>();      
 		this.minHeight = minHeight;
 		
 		setLayout(new GridLayout(2, false));

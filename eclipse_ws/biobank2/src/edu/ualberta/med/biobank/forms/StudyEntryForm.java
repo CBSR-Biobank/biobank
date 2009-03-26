@@ -202,47 +202,9 @@ public class StudyEntryForm extends BiobankEditForm {
 				Assert.isTrue(false, "invalid widget class " + fi.widgetClass.getName());
 			}
 		}
-
-		Section section = toolkit.createSection(form.getBody(), 
-		        Section.TWISTIE | Section.TITLE_BAR | Section.EXPANDED);
-		section.setText("Clinic Selection");
-		//section.setFont(FormUtils.getSectionFont());
-		section.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		
-		clinicsMultiSelect = new MultiSelect(section, SWT.NONE, 
-				"Selected Clinics", "Available Clinics", 100);
-		section.setClient(clinicsMultiSelect);
-		clinicsMultiSelect.adaptToToolkit(toolkit);
-		
-        allClinics = site.getClinicCollection();		
-        allSdataTypes = getAllSdataTypes();
-
-		HashMap<Integer, String> availClinics = new HashMap<Integer, String>();
-		for (Clinic clinic : allClinics) {
-			availClinics.put(clinic.getId(), clinic.getName());
-		}
-		clinicsMultiSelect.addAvailable(availClinics);
-
-        section = toolkit.createSection(form.getBody(), 
-                Section.TWISTIE | Section.TITLE_BAR | Section.EXPANDED);
-        section.setText("Study Information Selection");
-        //section.setFont(FormUtils.getSectionFont());
-        section.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-
-        client = toolkit.createComposite(section);
-        section.setClient(client);        
-        layout = new GridLayout(1, false);
-        layout.verticalSpacing = 10;
-        client.setLayout(layout);
-        client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        toolkit.paintBordersFor(client);
-        
-        for (SdataType sdataType : allSdataTypes) {
-            SdataWidget w = new SdataWidget(client, SWT.NONE, sdataType); 
-            w.adaptToToolkit(toolkit);
-            sdataWidgets.put(sdataType.getType(), w);
-        }		
-
+		createClinicSection();
+		createSdataSection();
 
         client = toolkit.createComposite(form.getBody());
         layout = new GridLayout(2, false);
@@ -260,6 +222,81 @@ public class StudyEntryForm extends BiobankEditForm {
         
         bindValues();
 	}
+    
+    private void createClinicSection() {
+        Section section = toolkit.createSection(form.getBody(), 
+                Section.TWISTIE | Section.TITLE_BAR | Section.EXPANDED);
+        section.setText("Clinic Selection");
+        section.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        
+        clinicsMultiSelect = new MultiSelect(section, SWT.NONE, 
+                "Selected Clinics", "Available Clinics", 100);
+        section.setClient(clinicsMultiSelect);
+        clinicsMultiSelect.adaptToToolkit(toolkit);
+        
+        Collection<Clinic> studyClinics = study.getClinicCollection(); 
+        allClinics = site.getClinicCollection();
+
+        HashMap<Integer, String> availClinics = new HashMap<Integer, String>();
+        HashMap<Integer, String> selClinics = new HashMap<Integer, String>();
+
+        if (studyClinics != null) {
+            for (Clinic clinic : studyClinics) {
+                selClinics.put(clinic.getId(), clinic.getName());
+            }
+            clinicsMultiSelect.addSelected(selClinics);
+        }
+        
+        for (Clinic clinic : allClinics) {
+            if (selClinics.get(clinic.getId()) == null) {
+                availClinics.put(clinic.getId(), clinic.getName());
+            }
+        }
+        clinicsMultiSelect.addAvailable(availClinics);
+    }
+    
+    private void createSdataSection() {
+        Collection<Sdata> studySdata = study.getSdataCollection();
+        HashMap<Integer, Sdata> selected = new HashMap<Integer, Sdata>();
+        
+        if (studySdata != null) {
+            for (Sdata sdata : studySdata) {
+                selected.put(sdata.getSdataType().getId(), sdata);
+            }
+        }
+            
+        allSdataTypes = getAllSdataTypes();
+
+        Section section = toolkit.createSection(form.getBody(), 
+                Section.TWISTIE | Section.TITLE_BAR | Section.EXPANDED);
+        section.setText("Study Information Selection");
+        //section.setFont(FormUtils.getSectionFont());
+        section.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+        Composite client = toolkit.createComposite(section);
+        section.setClient(client);        
+        GridLayout layout = new GridLayout(1, false);
+        layout.verticalSpacing = 10;
+        client.setLayout(layout);
+        client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        toolkit.paintBordersFor(client);
+        
+        for (SdataType sdataType : allSdataTypes) {
+            String value = "";
+            Sdata sdata = selected.get(sdataType.getId());
+            boolean itemSelected = false;
+            if (sdata != null) {
+                itemSelected = true;
+                value = sdata.getValue(); 
+            }
+            
+            SdataWidget w = 
+                new SdataWidget(client, SWT.NONE, sdataType, itemSelected, value); 
+            w.adaptToToolkit(toolkit);
+            sdataWidgets.put(sdataType.getType(), w);
+        }
+        
+    }
 	
     private void bindValues() {
     	DataBindingContext dbc = new DataBindingContext();

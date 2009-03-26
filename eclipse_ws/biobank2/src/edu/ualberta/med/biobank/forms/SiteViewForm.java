@@ -161,12 +161,9 @@ public class SiteViewForm extends AddressViewForm {
 			public void widgetSelected(SelectionEvent e) {
 				try {
 					Clinic clinic = new Clinic();
-					clinic.setName("New Clinic");
 					clinic.setAddress(new Address());
 					Node clinicsNode = siteAdapter.getClinicGroupNode();
 					ClinicAdapter clinicAdapter = new ClinicAdapter(clinicsNode, clinic);
-					clinicsNode.addChild(clinicAdapter);
-                    clinic.setName("");
 					getSite().getPage().openEditor(new NodeInput(clinicAdapter), 
 							ClinicEntryForm.ID, true);
 				} 

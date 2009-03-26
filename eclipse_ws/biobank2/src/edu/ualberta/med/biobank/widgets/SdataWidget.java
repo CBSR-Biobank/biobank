@@ -31,7 +31,8 @@ public class SdataWidget extends Composite {
     List list;
     boolean hasListValues;
 
-    public SdataWidget(Composite parent, int style, SdataType sdataType) {
+    public SdataWidget(Composite parent, int style, SdataType sdataType, 
+            boolean selected, String value) {
         super(parent, style);
         
         setLayout(new GridLayout(1, false));
@@ -44,6 +45,7 @@ public class SdataWidget extends Composite {
             
             checkButton = new Button(this, SWT.CHECK);
             checkButton.setText(type);
+            checkButton.setSelection(selected);
             
             // this composite holds the list and the "Add" and "Remove" buttons
             Composite comp = new Composite(this, SWT.NONE);
@@ -52,6 +54,11 @@ public class SdataWidget extends Composite {
             
             list = new List(comp, SWT.BORDER | SWT.V_SCROLL);
             list.setLayoutData(new GridData(GridData.FILL_BOTH));
+            if (value.length() > 0) {
+                for (String item : value.split(";")) {
+                    list.add(item);
+                }       
+            }
             Menu m = new Menu(
                     PlatformUI.getWorkbench().getActiveWorkbenchWindow()
                     .getShell(), 
@@ -252,6 +259,7 @@ public class SdataWidget extends Composite {
             checkButton.setText(type);
             GridData gd = new GridData(GridData.VERTICAL_ALIGN_BEGINNING | GridData.GRAB_HORIZONTAL);
             checkButton.setLayoutData(gd);
+            checkButton.setSelection(selected);
         }
     }
 
