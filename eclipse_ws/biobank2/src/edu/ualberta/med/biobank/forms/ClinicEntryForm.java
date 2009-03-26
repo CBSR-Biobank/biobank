@@ -3,10 +3,11 @@ package edu.ualberta.med.biobank.forms;
 import org.eclipse.core.databinding.DataBindingContext;
 import org.eclipse.core.databinding.UpdateValueStrategy;
 import org.eclipse.core.databinding.beans.PojoObservables;
-import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.databinding.swt.SWTObservables;
 import org.eclipse.jface.dialogs.IMessageProvider;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.fieldassist.ControlDecoration;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
@@ -17,6 +18,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IEditorInput;
@@ -24,17 +26,20 @@ import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
-import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
-import org.springframework.util.Assert;
+import org.springframework.remoting.RemoteAccessException;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.helpers.ClinicSaveHelper;
+import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.ClinicAdapter;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
+import gov.nih.nci.system.query.SDKQuery;
+import gov.nih.nci.system.query.SDKQueryResult;
+import gov.nih.nci.system.query.example.InsertExampleQuery;
+import gov.nih.nci.system.query.example.UpdateExampleQuery;
 
 public class ClinicEntryForm extends AddressEntryForm {	
 	public static final String ID =
@@ -59,7 +64,7 @@ public class ClinicEntryForm extends AddressEntryForm {
 			throw new PartInitException("Invalid editor input");
 		
 		Node node = ((NodeInput) input).getNode();
-		Assert.notNull(node, "Null editor input");
+		Assert.isNotNull(node, "Null editor input");
 
 		Assert.isTrue((node instanceof ClinicAdapter), 
 				"Invalid editor input: object of type "
@@ -86,13 +91,8 @@ public class ClinicEntryForm extends AddressEntryForm {
 		return CLINIC_OK_MESSAGE;
 	}
 
-	public void createPartControl(Composite parent) {		
-		toolkit = new FormToolkit(parent.getDisplay());
-		form = toolkit.createForm(parent);	
-		
+	protected void createFormContent() {			
 		form.setText("Clinic Information");
-		toolkit.decorateFormHeading(form);
-		form.setMessage(getOkMessage());
 		
 		GridLayout layout = new GridLayout(1, false);
 		form.getBody().setLayout(layout);
@@ -159,7 +159,7 @@ public class ClinicEntryForm extends AddressEntryForm {
     
     protected void handleStatusChanged(IStatus status) {
 		if (status.getSeverity() == IStatus.OK) {
-			form.setMessage(getOkMessage());
+			form.setMessage(getOkMessage(), IMessageProvider.NONE);
 	    	submit.setEnabled(true);
 		}
 		else {
@@ -172,22 +172,49 @@ public class ClinicEntryForm extends AddressEntryForm {
 	public void setFocus() {
 		form.setFocus();
 	}
-
-	@Override
-	public void doSave(IProgressMonitor monitor) {
-		super.doSave(monitor);
-		saveSettings();
-	}
 	
-	public void saveSettings() {
+	public void saveForm() {
 		clinic.setAddress(address);
 		
-		ClinicSaveHelper helper = new ClinicSaveHelper(
-				clinicAdapter.getAppService(), clinic);
-		
-		BusyIndicator.showWhile(
-				PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-				.getShell().getDisplay(), helper);
+        try {
+            SDKQuery query;
+            SDKQueryResult result;
+
+            if ((clinic.getId() == null) || (clinic.getId() == 0)) {
+                Assert.isTrue(clinic.getAddress().getId() == null, 
+                        "insert invoked on address already in database");
+                
+                query = new InsertExampleQuery(clinic.getAddress());                    
+                result = clinicAdapter.getAppService().executeQuery(query);
+                clinic.setAddress((Address) result.getObjectResult());
+                query = new InsertExampleQuery(clinic); 
+            }
+            else { 
+                Assert.isNotNull(clinic.getAddress().getId(), 
+                        "update invoked on address not in database");
+
+                query = new UpdateExampleQuery(clinic.getAddress());                    
+                result = clinicAdapter.getAppService().executeQuery(query);
+                clinic.setAddress((Address) result.getObjectResult());
+                query = new UpdateExampleQuery(clinic); 
+            }
+            
+            result = clinicAdapter.getAppService().executeQuery(query);
+            clinic = (Clinic) result.getObjectResult();
+        }
+        catch (final RemoteAccessException exp) {
+            Display.getDefault().asyncExec(new Runnable() {
+                public void run() {
+                    MessageDialog.openError(
+                            PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), 
+                            "Connection Attempt Failed", 
+                            "Could not perform database operation. Make sure server is running correct version.");
+                }
+            });
+        }
+        catch (Exception exp) {
+            exp.printStackTrace();
+        }
 		
 		final SiteAdapter siteAdapter = 
 			(SiteAdapter) clinicAdapter.getParent().getParent();

@@ -145,12 +145,8 @@ public class SiteViewForm extends AddressViewForm {
 			public void widgetSelected(SelectionEvent e) {				
 				try {
 					Study study = new Study();
-					study.setSite(site);
-                    study.setNameShort("New Study");
 					Node studiesNode = siteAdapter.getStudiesGroupNode();
 					StudyAdapter studyAdapter = new StudyAdapter(studiesNode, study);
-					studiesNode.addChild(studyAdapter);
-                    study.setNameShort("");
 					getSite().getPage().openEditor(new NodeInput(studyAdapter), 
 							StudyEntryForm.ID, true);
 				} 

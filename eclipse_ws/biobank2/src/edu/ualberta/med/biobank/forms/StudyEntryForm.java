@@ -3,8 +3,11 @@ package edu.ualberta.med.biobank.forms;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.databinding.AggregateValidationStatus;
 import org.eclipse.core.databinding.DataBindingContext;
@@ -16,13 +19,12 @@ import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.observable.value.WritableValue;
 import org.eclipse.core.databinding.validation.IValidator;
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.databinding.swt.SWTObservables;
 import org.eclipse.jface.dialogs.IMessageProvider;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.fieldassist.ControlDecoration;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -33,34 +35,37 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
-import org.eclipse.ui.ISaveablePart;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.forms.widgets.FormToolkit;
-import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
-import org.eclipse.ui.part.EditorPart;
+import org.springframework.remoting.RemoteAccessException;
+import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.helpers.GetHelper;
-import edu.ualberta.med.biobank.helpers.StudySaveHelper;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Sdata;
 import edu.ualberta.med.biobank.model.SdataType;
+import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.Worksheet;
 import edu.ualberta.med.biobank.treeview.Node;
+import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
 import edu.ualberta.med.biobank.widgets.MultiSelect;
 import edu.ualberta.med.biobank.widgets.SdataWidget;
+import gov.nih.nci.system.query.SDKQuery;
+import gov.nih.nci.system.query.SDKQueryResult;
+import gov.nih.nci.system.query.example.InsertExampleQuery;
+import gov.nih.nci.system.query.example.UpdateExampleQuery;
 
 @SuppressWarnings("serial")
-public class StudyEntryForm extends EditorPart {
+public class StudyEntryForm extends BiobankEditForm {
 	public static final String ID =
 	      "edu.ualberta.med.biobank.forms.StudyEntryForm";
 	
@@ -86,12 +91,6 @@ public class StudyEntryForm extends EditorPart {
 	private HashMap<String, Control> controls;
 		
 	private HashMap<String, ControlDecoration> fieldDecorators;
-		
-	private boolean dirty = false;
-
-	private FormToolkit toolkit;
-	
-	private ScrolledForm form;
 	
 	private MultiSelect clinicsMultiSelect;
 	
@@ -99,9 +98,11 @@ public class StudyEntryForm extends EditorPart {
 	
 	private Study study;
 	
-	private List<Clinic> allClinics;
+	private Site site;
 	
-	private List<SdataType> allSdataTypes;
+	private Collection<Clinic> allClinics;
+	
+	private Collection<SdataType> allSdataTypes;
 	
 	private Button submit;
         
@@ -128,18 +129,8 @@ public class StudyEntryForm extends EditorPart {
 	}
 
 	@Override
-	public void doSave(IProgressMonitor monitor) {
-		setDirty(false);
-		saveSettings();
-	}
-
-	@Override
-	public void doSaveAs() {		
-	}
-
-	@Override
 	public void dispose() {	
-		if (!dirty && (study.getId() == null)) {
+		if (!isDirty() && (study.getId() == null)) {
 			// remove temporary node
 			Node groupNode = studyAdapter.getParent();
 			groupNode.removeChild(studyAdapter);
@@ -147,14 +138,12 @@ public class StudyEntryForm extends EditorPart {
 	}
 
 	@Override
-	public void init(IEditorSite site, IEditorInput input)
+	public void init(IEditorSite editorSite, IEditorInput input)
 			throws PartInitException {
 		if ( !(input instanceof NodeInput)) 
 			throw new PartInitException("Invalid editor input");
 		
-		setSite(site);
-		setInput(input);
-		setDirty(false);
+		super.init(editorSite, input);
 		
 		Node node = ((NodeInput) input).getNode();
 		Assert.isNotNull(node, "Null editor input");
@@ -166,6 +155,7 @@ public class StudyEntryForm extends EditorPart {
 		studyAdapter = (StudyAdapter) node;
 		study = studyAdapter.getStudy();
 		study.setWorksheet(new Worksheet());
+        site = ((SiteAdapter) studyAdapter.getParent().getParent()).getSite();        
 		
 		if (study.getId() == null) {
 			setPartName("New Study");
@@ -175,26 +165,8 @@ public class StudyEntryForm extends EditorPart {
 		}
 	}
 
-	@Override
-	public boolean isDirty() {
-		return dirty;
-	}
-
-	private void setDirty(boolean d) {
-		dirty = d;
-		firePropertyChange(ISaveablePart.PROP_DIRTY);
-	}
-
-	@Override
-	public boolean isSaveAsAllowed() {
-		return false;
-	}
-
-	@Override
-	public void createPartControl(Composite parent) {
-		toolkit = new FormToolkit(parent.getDisplay());
-		form = toolkit.createScrolledForm(parent);	
-		
+    @Override
+    protected void createFormContent() {
 		form.setText("Study Information");
 		//toolkit.decorateFormHeading(form);
 		form.setMessage(getOkMessage(), IMessageProvider.NONE);
@@ -241,24 +213,9 @@ public class StudyEntryForm extends EditorPart {
 				"Selected Clinics", "Available Clinics", 100);
 		section.setClient(clinicsMultiSelect);
 		clinicsMultiSelect.adaptToToolkit(toolkit);
-        
-        GetHelper<Clinic> clinicHelper = new GetHelper<Clinic>(
-                studyAdapter.getAppService(), Clinic.class);
-        
-        BusyIndicator.showWhile(
-                PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-                .getShell().getDisplay(), clinicHelper);
 		
-        allClinics = clinicHelper.getResult();
-        
-		GetHelper<SdataType> sdataTypeHelper = new GetHelper<SdataType>(
-				studyAdapter.getAppService(), SdataType.class);
-		
-		BusyIndicator.showWhile(
-				PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-				.getShell().getDisplay(), sdataTypeHelper);
-		
-        allSdataTypes = sdataTypeHelper.getResult();
+        allClinics = site.getClinicCollection();		
+        allSdataTypes = getAllSdataTypes();
 
 		HashMap<Integer, String> availClinics = new HashMap<Integer, String>();
 		for (Clinic clinic : allClinics) {
@@ -297,7 +254,7 @@ public class StudyEntryForm extends EditorPart {
         submit = toolkit.createButton(client, "Submit", SWT.PUSH);
         submit.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent e) {
-                saveSettings();
+                doSaveInternal();
             }
         });
         
@@ -389,10 +346,10 @@ public class StudyEntryForm extends EditorPart {
 		}
     }
     
-    private void saveSettings() {
+    protected void saveForm() {
     	// get the selected clinics from widget
     	List<Integer> selClinicIds = clinicsMultiSelect.getSelected();
-    	List<Clinic> selClinics = new ArrayList<Clinic>();
+    	Set<Clinic> selClinics = new HashSet<Clinic>();
     	for (Clinic clinic : allClinics) {
     		if (selClinicIds.indexOf(clinic.getId()) >= 0) {
     			selClinics.add(clinic);
@@ -407,7 +364,7 @@ public class StudyEntryForm extends EditorPart {
         for (SdataType sdataType : allSdataTypes) {
             String type = sdataType.getType();
     	    String value =  sdataWidgets.get(type).getResult();
-    	    if (value.equals("no")) continue;
+    	    if ((value.length() == 0) || value.equals("no")) continue;
     	    Sdata sdata = new Sdata();
     	    sdata.setSdataType(sdataType);
             if (value.equals("yes")) {
@@ -416,24 +373,81 @@ public class StudyEntryForm extends EditorPart {
             sdata.setValue(value);
     	    sdataList.add(sdata);
     	}
+        study.setSdataCollection(sdataList);
         
-        if (sdataList.size() > 0) {
-            study.setSdataCollection(sdataList);
-        }
-        
-        StudySaveHelper helper = new StudySaveHelper(
-                studyAdapter.getAppService(), study);
-        BusyIndicator.showWhile(
-                PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-                .getShell().getDisplay(), helper);
-        
-        SessionManager.getInstance().updateStudies(studyAdapter.getParent());
-    	
+        saveStudy(study);        
+        SessionManager.getInstance().updateStudies(studyAdapter.getParent());    	
 		getSite().getPage().closeEditor(StudyEntryForm.this, false);    	
     }
+    
+    private void saveStudy(Study study) {
+        try {
+            SDKQuery query;
+            SDKQueryResult result;
+            Set<Sdata> savedSdataList = new HashSet<Sdata>();
+            
+            study.setSite(site);
+            study.setWorksheet(null);
 
-	@Override
-	public void setFocus() {
-		form.setFocus();
-	}
+            if (study.getSdataCollection().size() > 0) {
+                for (Sdata sdata : study.getSdataCollection()) {
+                    if ((sdata.getId() == null) || (sdata.getId() == 0)) {
+                        query = new InsertExampleQuery(sdata);
+                    }
+                    else {
+                        query = new UpdateExampleQuery(sdata);
+                    }                  
+
+                    result = studyAdapter.getAppService().executeQuery(query);
+                    savedSdataList.add((Sdata) result.getObjectResult());
+                }
+            }
+            study.setSdataCollection(savedSdataList);
+
+            if ((study.getId() == null) || (study.getId() == 0)) {
+                query = new InsertExampleQuery(study);
+            }
+            else { 
+                query = new UpdateExampleQuery(study);
+            }
+            
+            result = studyAdapter.getAppService().executeQuery(query);
+            study = (Study) result.getObjectResult();
+        }
+        catch (final RemoteAccessException exp) {
+            Display.getDefault().asyncExec(new Runnable() {
+                public void run() {
+                    MessageDialog.openError(
+                            PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), 
+                            "Connection Attempt Failed", 
+                            "Could not perform database operation. Make sure server is running correct version.");
+                }
+            });
+        }
+        catch (Exception exp) {
+            exp.printStackTrace();
+        }
+    }
+    
+    private List<SdataType> getAllSdataTypes() {        
+        SdataType criteria = new SdataType();
+
+        try {
+            return studyAdapter.getAppService().search(SdataType.class, criteria);
+        }
+        catch (final RemoteConnectFailureException exp) {
+            Display.getDefault().asyncExec(new Runnable() {
+                public void run() {
+                    MessageDialog.openError(
+                            PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), 
+                            "Connection Attempt Failed", 
+                    "Could not connect to server. Make sure server is running.");
+                }
+            });
+        }
+        catch (Exception exp) {
+            exp.printStackTrace();
+        }
+        return null;
+    }
 }

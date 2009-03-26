@@ -14,13 +14,10 @@ import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.observable.value.WritableValue;
 import org.eclipse.core.databinding.validation.IValidator;
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.databinding.swt.SWTObservables;
 import org.eclipse.jface.fieldassist.ControlDecoration;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.KeyEvent;
-import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
@@ -33,26 +30,16 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
-import org.eclipse.ui.ISaveablePart;
 import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.forms.widgets.Form;
-import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
-import org.eclipse.ui.part.EditorPart;
 
 import edu.ualberta.med.biobank.model.Address;
 
-public abstract class AddressEntryForm extends EditorPart {
+public abstract class AddressEntryForm extends BiobankEditForm {
 	
 	private HashMap<String, Control> controls;
 		
 	private HashMap<String, ControlDecoration> fieldDecorators;
-
-	protected boolean dirty = false;
-
-	protected FormToolkit toolkit;
-	
-	protected Form form;
 	
 	protected Address address;
 		
@@ -60,50 +47,15 @@ public abstract class AddressEntryForm extends EditorPart {
 
 	protected IStatus currentStatus;
 	
-	protected KeyListener keyListener = new KeyListener() {
-		@Override
-		public void keyPressed(KeyEvent e) {
-			if ((e.keyCode & SWT.MODIFIER_MASK) == 0) {
-				setDirty(true);
-			}
-		}
-
-		@Override
-		public void keyReleased(KeyEvent e) {			
-		}
-	};
-	
 	public AddressEntryForm() {
 		super();
 		controls = new HashMap<String, Control>();
 		fieldDecorators = new HashMap<String, ControlDecoration>();
 	}
 
-	public void doSave(IProgressMonitor monitor) {
-		setDirty(false);
-	}
-	
-	public void doSaveAs() {
-	}
-	
-	public boolean isSaveAsAllowed() {
-		return false;
-	}
-
 	public void init(IEditorSite site, IEditorInput input)
 			throws PartInitException {
-		setSite(site);
-		setInput(input);
-		setDirty(false);
-	}
-	
-	public boolean isDirty() {
-		return dirty;
-	}
-
-	protected void setDirty(boolean d) {
-		dirty = d;
-		firePropertyChange(ISaveablePart.PROP_DIRTY);
+        super.init(site, input);
 	}
 
 	protected void createAddressArea() {
