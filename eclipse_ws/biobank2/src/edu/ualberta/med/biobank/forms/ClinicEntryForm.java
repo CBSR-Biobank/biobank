@@ -10,7 +10,6 @@ import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.fieldassist.ControlDecoration;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
@@ -30,11 +29,10 @@ import org.eclipse.ui.forms.widgets.Section;
 import org.springframework.remoting.RemoteAccessException;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.forms.input.ClinicInput;
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Clinic;
-import edu.ualberta.med.biobank.treeview.Node;
-import edu.ualberta.med.biobank.treeview.ClinicAdapter;
-import edu.ualberta.med.biobank.treeview.SiteAdapter;
+import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
 import gov.nih.nci.system.query.SDKQuery;
 import gov.nih.nci.system.query.SDKQueryResult;
@@ -49,7 +47,7 @@ public class ClinicEntryForm extends AddressEntryForm {
 	private static final String CLINIC_OK_MESSAGE = "Clinic information.";
 	private static final String NO_CLINIC_NAME_MESSAGE = "Clinic must have a name";
 	
-	private ClinicAdapter clinicAdapter;
+	private Site site;
 	
 	private Clinic clinic;
 	
@@ -60,20 +58,18 @@ public class ClinicEntryForm extends AddressEntryForm {
 
 	public void init(IEditorSite editorSite, IEditorInput input) throws PartInitException {
 		super.init(editorSite, input);
-		if ( !(input instanceof NodeInput)) 
+		if ( !(input instanceof ClinicInput)) 
 			throw new PartInitException("Invalid editor input");
 		
-		Node node = ((NodeInput) input).getNode();
-		Assert.isNotNull(node, "Null editor input");
+		ClinicInput clinicInput = (ClinicInput) input;
+		
+		setSessionName(clinicInput.getSessionName());
+		setAppService(SessionManager.getInstance().getAppService(
+		        clinicInput.getSessionName()));
 
-		Assert.isTrue((node instanceof ClinicAdapter), 
-				"Invalid editor input: object of type "
-				+ node.getClass().getName());
-
-		clinicAdapter = (ClinicAdapter) node;
-		clinic = clinicAdapter.getClinic();
-		SiteAdapter siteNode = (SiteAdapter) clinicAdapter.getParent().getParent();
-		clinic.setSite(siteNode.getSite());
+		clinic = clinicInput.getClinic();
+		site = clinicInput.getParentSite();		
+		clinic.setSite(site);
 		address = clinic.getAddress();
 		
 		if (clinic.getId() == null) {
@@ -185,7 +181,7 @@ public class ClinicEntryForm extends AddressEntryForm {
                         "insert invoked on address already in database");
                 
                 query = new InsertExampleQuery(clinic.getAddress());                    
-                result = clinicAdapter.getAppService().executeQuery(query);
+                result = appService.executeQuery(query);
                 clinic.setAddress((Address) result.getObjectResult());
                 query = new InsertExampleQuery(clinic); 
             }
@@ -194,12 +190,12 @@ public class ClinicEntryForm extends AddressEntryForm {
                         "update invoked on address not in database");
 
                 query = new UpdateExampleQuery(clinic.getAddress());                    
-                result = clinicAdapter.getAppService().executeQuery(query);
+                result = appService.executeQuery(query);
                 clinic.setAddress((Address) result.getObjectResult());
                 query = new UpdateExampleQuery(clinic); 
             }
             
-            result = clinicAdapter.getAppService().executeQuery(query);
+            result = appService.executeQuery(query);
             clinic = (Clinic) result.getObjectResult();
         }
         catch (final RemoteAccessException exp) {
@@ -216,18 +212,7 @@ public class ClinicEntryForm extends AddressEntryForm {
             exp.printStackTrace();
         }
 		
-		final SiteAdapter siteAdapter = 
-			(SiteAdapter) clinicAdapter.getParent().getParent();
-		BusyIndicator.showWhile(
-				PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-				.getShell().getDisplay(), new Runnable() {
-					public void run() {
-						siteAdapter.getSite().getClinicCollection();
-					}
-				});
-		
-		SessionManager.getInstance().updateClinics(clinicAdapter.getParent());
-		
+		SessionManager.getInstance().updateClinics(site);		
 		getSite().getPage().closeEditor(ClinicEntryForm.this, false);
 	}
 }

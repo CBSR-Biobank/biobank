@@ -98,6 +98,10 @@ public class FormUtils {
                 getBiobankCollectionDoubleClickListener());
     }
     
+    /**
+     * Double click listener for tables used in view forms.
+     * 
+     */
     public static IDoubleClickListener getBiobankCollectionDoubleClickListener() {
         return new IDoubleClickListener() {
             public void doubleClick(DoubleClickEvent event) {
@@ -109,8 +113,9 @@ public class FormUtils {
                     SessionManager.getInstance().openStudyViewForm(node);
                 }
                 else if (element instanceof Clinic) {
-                    ClinicAdapter node = new ClinicAdapter(null, (Clinic) element);
-                    SessionManager.getInstance().openClinicViewForm(node);
+                    Clinic clinic = (Clinic) element;
+                    SessionManager.getInstance().openClinicViewForm(
+                            null, clinic.getSite(), clinic);
                 }
                 else {
                     Assert.isTrue(false, "invalid type for element: " 

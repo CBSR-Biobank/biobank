@@ -14,17 +14,17 @@ import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.Section;
-import org.springframework.util.Assert;
 
+import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.forms.input.ClinicInput;
 import edu.ualberta.med.biobank.model.Clinic;
-import edu.ualberta.med.biobank.treeview.Node;
-import edu.ualberta.med.biobank.treeview.ClinicAdapter;
+import edu.ualberta.med.biobank.model.Site;
 
 public class ClinicViewForm  extends AddressViewForm {	
 	public static final String ID =
 	      "edu.ualberta.med.biobank.forms.ClinicViewForm";
 	
-	private Node node;
+    private Site site;
 	private Clinic clinic;
 	
 	Label name;
@@ -34,20 +34,17 @@ public class ClinicViewForm  extends AddressViewForm {
 		super.init(editorSite, input);
 		if ( !(input instanceof NodeInput)) 
 			throw new PartInitException("Invalid editor input"); 
-		
-		node = ((NodeInput) input).getNode();
-		Assert.notNull(node, "Null editor input");
+        
+        ClinicInput clinicInput = (ClinicInput) input;
+        
+        setSessionName(clinicInput.getSessionName());
+        setAppService(SessionManager.getInstance().getAppService(
+                clinicInput.getSessionName()));
 
-		if (node instanceof ClinicAdapter) {
-			ClinicAdapter clinicNode = (ClinicAdapter) node;
-			clinic = clinicNode.getClinic();
-			address = clinic.getAddress();
-			setPartName("Clinic " + clinic.getName());
-		}
-		else {
-			Assert.isTrue(false, "Invalid editor input: object of type "
-				+ node.getClass().getName());
-		}
+        clinic = clinicInput.getClinic();
+        site = clinicInput.getParentSite();     
+        clinic.setSite(site);
+        address = clinic.getAddress();
 	}
 
 	protected void createFormContent() {
@@ -87,10 +84,8 @@ public class ClinicViewForm  extends AddressViewForm {
 		final Button edit = toolkit.createButton(client, "Edit Clinic Info", SWT.PUSH);
 		edit.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				getSite().getPage().closeEditor(ClinicViewForm.this, false);
-				
-				NodeInput input = new NodeInput(node);
-				
+				getSite().getPage().closeEditor(ClinicViewForm.this, false);				
+				ClinicInput input = new ClinicInput(sessionName, site, clinic);				
 				try {
 					getSite().getPage().openEditor(input, ClinicEntryForm.ID, true);
 				} 

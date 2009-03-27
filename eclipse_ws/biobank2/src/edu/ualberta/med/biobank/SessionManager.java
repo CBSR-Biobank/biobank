@@ -34,6 +34,7 @@ import edu.ualberta.med.biobank.forms.SiteViewForm;
 import edu.ualberta.med.biobank.forms.NodeInput;
 import edu.ualberta.med.biobank.forms.StudyEntryForm;
 import edu.ualberta.med.biobank.forms.StudyViewForm;
+import edu.ualberta.med.biobank.forms.input.ClinicInput;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
@@ -76,7 +77,11 @@ public class SessionManager {
                 openStudyViewForm((StudyAdapter) element);
             }
 			else if (element instanceof ClinicAdapter) {
-				openClinicViewForm((ClinicAdapter) element);
+			    ClinicAdapter clinicAdapter = (ClinicAdapter) element;
+			    SiteAdapter siteAdapter = (SiteAdapter) clinicAdapter.getParent().getParent();
+			    Site site = clinicAdapter.getClinic().getSite();
+			    String sessionName = ((SessionAdapter) siteAdapter.getParent()).getName();
+				openClinicViewForm(sessionName, site, clinicAdapter.getClinic());
 			}
 			else if (element instanceof Node) {
 				Node node = (Node) element;
@@ -203,14 +208,10 @@ public class SessionManager {
 		log4j.debug("addSession: " + name);
 	}
 	
-	public SessionAdapter getSessionAdapter(String sessionName) {
-		for (Node node : rootNode.getChildren()) {
-			if (node.getName().equals(sessionName)) 
-				return (SessionAdapter) node;
-		}
-		Assert.isTrue(false, "Session with name " + sessionName
-				+ " not found");
-		return null;
+	public WritableApplicationService getAppService(String sessionName) {
+	    SessionAdapter sessionAdapter = sessions.get(sessionName);
+	    Assert.isNotNull(sessionAdapter, "Invalid session name " + sessionName);
+	    return sessionAdapter.getAppService();
 	}
 	
 	public SessionAdapter getSessionAdapter(int count) {
@@ -284,8 +285,33 @@ public class SessionManager {
             }
         });
     }
-	
-    public void updateClinics(final Node groupNode) {	     
+    
+    private SiteAdapter findSite(Node node, Site site) {
+        if ((node instanceof Node) || (node instanceof SessionAdapter)) {
+            for (Node childNode : node.getChildren()) {
+                return findSite(childNode, site);
+            }
+        }
+        else if (node instanceof SiteAdapter) {
+            SiteAdapter siteAdapter = (SiteAdapter) node;
+            if (siteAdapter.getSite().getId() == site.getId()) {
+                return siteAdapter;
+            }
+        }
+        else {
+            Assert.isTrue(false, "Invalid node type: " 
+                    + node.getClass().getName());
+        }
+        return null;
+    }
+
+    public void updateClinics(Site site) {
+        SiteAdapter siteAdapter = findSite(rootNode, site);
+        Assert.isNotNull(siteAdapter, "Could not find site" + site.getName());
+        updateClinics(siteAdapter.getChildByName("Studies"));
+    }
+
+    public void updateClinics(final Node groupNode) {        
         final Site currentSite = ((SiteAdapter) groupNode.getParent()).getSite();
         Assert.isNotNull(currentSite, "null site");   
 
@@ -358,9 +384,11 @@ public class SessionManager {
         }
     }
 	
-	public void openClinicViewForm(ClinicAdapter node) {
-		NodeInput input = new NodeInput(node);
-		
+	public void openClinicViewForm(String sessionName, Site site, Clinic clinic) {
+	    if (sessionName == null) {
+	        sessionName = getSessionNames()[0];
+	    }
+        ClinicInput input = new ClinicInput(sessionName, site, clinic);		
 		try {
 			view.getSite().getPage().openEditor(input, ClinicViewForm.ID, true);
 		} 

@@ -1,5 +1,7 @@
 package edu.ualberta.med.biobank.forms;
 
+import gov.nih.nci.system.applicationservice.WritableApplicationService;
+
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
@@ -17,6 +19,10 @@ import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.part.EditorPart;
 
 public abstract class BiobankEditForm extends EditorPart {
+    
+    protected WritableApplicationService appService;
+    
+    protected String sessionName;
 
     private boolean dirty = false;
 
@@ -106,6 +112,18 @@ public abstract class BiobankEditForm extends EditorPart {
     @Override
     public void setFocus() {
         form.setFocus();
+    }
+
+    public String getSessionName() {
+        return sessionName;
+    }
+
+    public void setSessionName(String sessionName) {
+        this.sessionName = sessionName;
+    }
+
+    public void setAppService(WritableApplicationService appService) {
+        this.appService = appService;
     }
 
 }

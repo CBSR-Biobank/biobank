@@ -108,7 +108,7 @@ public class NodeInput implements IEditorInput {
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
 	public boolean equals(Object o) {
-		if (node == null) return false;
+		if ((node == null) || (o == null)) return false;
 		
 		if (o instanceof NodeInput) {
 			if (node.getClass() != ((NodeInput)o).node.getClass()) return false;
