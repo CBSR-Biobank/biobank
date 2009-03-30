@@ -17,12 +17,12 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.forms.widgets.Section;
 import org.springframework.util.Assert;
 
-import edu.ualberta.med.biobank.model.Address;
+import edu.ualberta.med.biobank.forms.input.ClinicInput;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.Node;
-import edu.ualberta.med.biobank.treeview.ClinicAdapter;
+import edu.ualberta.med.biobank.treeview.SessionAdapter;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankCollectionTable;
@@ -160,12 +160,10 @@ public class SiteViewForm extends AddressViewForm {
 		clinic.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				try {
-					Clinic clinic = new Clinic();
-					clinic.setAddress(new Address());
-					Node clinicsNode = siteAdapter.getClinicGroupNode();
-					ClinicAdapter clinicAdapter = new ClinicAdapter(clinicsNode, clinic);
-					getSite().getPage().openEditor(new NodeInput(clinicAdapter), 
-							ClinicEntryForm.ID, true);
+					String sessionName = ((SessionAdapter) siteAdapter.getParent()).getName();
+					ClinicInput input = new ClinicInput(sessionName, new Clinic());
+					getSite().getPage().openEditor(
+							input, ClinicEntryForm.ID, true);
 				} 
 				catch (PartInitException exp) {
 					exp.printStackTrace();				

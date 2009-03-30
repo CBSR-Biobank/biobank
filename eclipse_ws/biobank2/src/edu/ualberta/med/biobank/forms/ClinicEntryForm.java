@@ -68,9 +68,11 @@ public class ClinicEntryForm extends AddressEntryForm {
 		        clinicInput.getSessionName()));
 
 		clinic = clinicInput.getClinic();
-		site = clinicInput.getParentSite();		
-		clinic.setSite(site);
+		site = clinicInput.getClinic().getSite();
 		address = clinic.getAddress();
+		if (address == null) {
+			clinic.setAddress(new Address());
+		}
 		
 		if (clinic.getId() == null) {
 			setPartName("New Clinic");

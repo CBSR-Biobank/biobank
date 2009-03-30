@@ -42,7 +42,7 @@ public class ClinicViewForm  extends AddressViewForm {
                 clinicInput.getSessionName()));
 
         clinic = clinicInput.getClinic();
-        site = clinicInput.getParentSite();     
+        site = clinicInput.getClinic().getSite();     
         clinic.setSite(site);
         address = clinic.getAddress();
 	}
@@ -85,7 +85,7 @@ public class ClinicViewForm  extends AddressViewForm {
 		edit.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				getSite().getPage().closeEditor(ClinicViewForm.this, false);				
-				ClinicInput input = new ClinicInput(sessionName, site, clinic);				
+				ClinicInput input = new ClinicInput(sessionName, clinic);				
 				try {
 					getSite().getPage().openEditor(input, ClinicEntryForm.ID, true);
 				} 

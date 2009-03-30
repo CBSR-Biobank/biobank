@@ -79,9 +79,8 @@ public class SessionManager {
 			else if (element instanceof ClinicAdapter) {
 			    ClinicAdapter clinicAdapter = (ClinicAdapter) element;
 			    SiteAdapter siteAdapter = (SiteAdapter) clinicAdapter.getParent().getParent();
-			    Site site = clinicAdapter.getClinic().getSite();
 			    String sessionName = ((SessionAdapter) siteAdapter.getParent()).getName();
-				openClinicViewForm(sessionName, site, clinicAdapter.getClinic());
+				openClinicViewForm(sessionName, clinicAdapter.getClinic());
 			}
 			else if (element instanceof Node) {
 				Node node = (Node) element;
@@ -384,11 +383,11 @@ public class SessionManager {
         }
     }
 	
-	public void openClinicViewForm(String sessionName, Site site, Clinic clinic) {
+	public void openClinicViewForm(String sessionName, Clinic clinic) {
 	    if (sessionName == null) {
 	        sessionName = getSessionNames()[0];
 	    }
-        ClinicInput input = new ClinicInput(sessionName, site, clinic);		
+        ClinicInput input = new ClinicInput(sessionName, clinic);		
 		try {
 			view.getSite().getPage().openEditor(input, ClinicViewForm.ID, true);
 		} 

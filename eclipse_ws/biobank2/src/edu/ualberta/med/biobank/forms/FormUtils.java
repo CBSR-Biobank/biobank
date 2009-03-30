@@ -23,7 +23,6 @@ import org.springframework.util.Assert;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Study;
-import edu.ualberta.med.biobank.treeview.ClinicAdapter;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankCollectionTable;
 
@@ -115,7 +114,7 @@ public class FormUtils {
                 else if (element instanceof Clinic) {
                     Clinic clinic = (Clinic) element;
                     SessionManager.getInstance().openClinicViewForm(
-                            null, clinic.getSite(), clinic);
+                            null, clinic);
                 }
                 else {
                     Assert.isTrue(false, "invalid type for element: " 

@@ -1,25 +1,13 @@
 package edu.ualberta.med.biobank.forms.input;
 
 import edu.ualberta.med.biobank.model.Clinic;
-import edu.ualberta.med.biobank.model.Site;
 
-public class ClinicInput extends FormInput {    
-    private Site parentSite;
-    
+public class ClinicInput extends FormInput {      
     private Clinic clinic;
     
-    public ClinicInput(String sessionName, Site parentSite, Clinic clinic) {
+    public ClinicInput(String sessionName, Clinic clinic) {
         super(sessionName);
-        this.parentSite = parentSite;
         this.clinic = clinic;
-    }
-    
-    public Site getParentSite() {
-        return parentSite;
-    }
-
-    public void setParentSite(Site parentSite) {
-        this.parentSite = parentSite;
     }
 
     public Clinic getClinic() {
