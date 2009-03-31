@@ -32,16 +32,19 @@ import edu.ualberta.med.biobank.forms.ClinicEntryForm;
 import edu.ualberta.med.biobank.forms.ClinicViewForm;
 import edu.ualberta.med.biobank.forms.SiteEntryForm;
 import edu.ualberta.med.biobank.forms.SiteViewForm;
+import edu.ualberta.med.biobank.forms.StorageTypeEntryForm;
 import edu.ualberta.med.biobank.forms.StudyEntryForm;
 import edu.ualberta.med.biobank.forms.StudyViewForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.model.StorageType;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.ClinicAdapter;
 import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.SessionAdapter;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
+import edu.ualberta.med.biobank.treeview.StorageTypeAdapter;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
 import edu.ualberta.med.biobank.views.SessionsView;
 
@@ -153,7 +156,8 @@ public class SessionManager {
                 else if (node.getName().equals("Clinics")) {
                     popupMenuClinicsNode(node, tv, tree, menu);
                 }
-                else if (node.getName().equals("Storage Container")) {
+                else if (node.getName().equals("Storage Types")) {
+                    popupMenuStorageTypesNode(node, tv, tree, menu);
                 }
                 else {
                     Assert.isTrue(false, "double click on class "
@@ -523,6 +527,29 @@ public class SessionManager {
                 FormInput input = new FormInput(clinicAdapter);
                 try {
                     view.getSite().getPage().openEditor(input, ClinicEntryForm.ID, true);
+                }
+                catch (PartInitException exp) {
+                    exp.printStackTrace();              
+                }
+            }
+
+            public void widgetDefaultSelected(SelectionEvent e) {                    
+            }
+        });
+    }
+    
+    private void popupMenuStorageTypesNode(final Node storageTypesGroupNode, 
+            TreeViewer tv, Tree tree,  Menu menu) {
+        MenuItem mi = new MenuItem (menu, SWT.PUSH);
+        mi.setText ("Add Storage Type");
+        mi.addSelectionListener(new SelectionListener() {
+            public void widgetSelected(SelectionEvent event) {
+                StorageTypeAdapter storageTypeAdapter = new StorageTypeAdapter(
+                        storageTypesGroupNode, new StorageType());
+                FormInput input = new FormInput(storageTypeAdapter);
+                try {
+                    view.getSite().getPage().openEditor(
+                            input, StorageTypeEntryForm.ID, true);
                 }
                 catch (PartInitException exp) {
                     exp.printStackTrace();              

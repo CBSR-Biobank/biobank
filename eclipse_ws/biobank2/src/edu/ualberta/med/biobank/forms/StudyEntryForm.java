@@ -25,8 +25,6 @@ import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.fieldassist.ControlDecoration;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.KeyEvent;
-import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
@@ -109,33 +107,11 @@ public class StudyEntryForm extends BiobankEditForm {
         
     private HashMap<String, SdataWidget> sdataWidgets;
 	
-	private KeyListener keyListener = new KeyListener() {
-		@Override
-		public void keyPressed(KeyEvent e) {
-			if ((e.keyCode & SWT.MODIFIER_MASK) == 0) {
-				setDirty(true);
-			}
-		}
-
-		@Override
-		public void keyReleased(KeyEvent e) {			
-		}
-	};
-	
 	public StudyEntryForm() {
 		super();
 		controls = new HashMap<String, Control>();
 		fieldDecorators = new HashMap<String, ControlDecoration>();
 		sdataWidgets = new HashMap<String, SdataWidget>();
-	}
-
-	@Override
-	public void dispose() {	
-		if (!isDirty() && (study.getId() == null)) {
-			// remove temporary node
-			Node groupNode = studyAdapter.getParent();
-			groupNode.removeChild(studyAdapter);
-		}
 	}
 
 	@Override
@@ -169,7 +145,6 @@ public class StudyEntryForm extends BiobankEditForm {
     @Override
     protected void createFormContent() {
 		form.setText("Study Information");
-		//toolkit.decorateFormHeading(form);
 		form.setMessage(getOkMessage(), IMessageProvider.NONE);
 		
 		GridLayout layout = new GridLayout(1, false);

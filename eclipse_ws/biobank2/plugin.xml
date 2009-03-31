@@ -176,6 +176,12 @@
             id="edu.ualberta.med.biobank.forms.StudyViewForm"
             name="Study View">
       </editor>
+      <editor
+            class="edu.ualberta.med.biobank.forms.StorageTypeEntryForm"
+            default="false"
+            id="edu.ualberta.med.biobank.forms.StorageTypeEntryForm"
+            name="Storage Type Entry">
+      </editor>
    </extension>
    <extension
          point="org.eclipse.ui.bindings">

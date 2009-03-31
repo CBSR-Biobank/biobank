@@ -102,7 +102,7 @@ public abstract class AddressEntryForm extends BiobankEditForm {
 				});
 			}
 			else {
-				assert false : fi.widgetClass;
+			    Assert.isTrue(false, "invalid widget class " + fi.widgetClass.getName());
 			}
 		}
 	}
