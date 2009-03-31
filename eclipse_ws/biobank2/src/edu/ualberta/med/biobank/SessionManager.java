@@ -31,10 +31,9 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import edu.ualberta.med.biobank.forms.ClinicViewForm;
 import edu.ualberta.med.biobank.forms.SiteEntryForm;
 import edu.ualberta.med.biobank.forms.SiteViewForm;
-import edu.ualberta.med.biobank.forms.NodeInput;
 import edu.ualberta.med.biobank.forms.StudyEntryForm;
 import edu.ualberta.med.biobank.forms.StudyViewForm;
-import edu.ualberta.med.biobank.forms.input.ClinicInput;
+import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
@@ -52,8 +51,8 @@ public class SessionManager {
 	
 	private SessionsView view;
 	
-	private HashMap<String, SessionAdapter> sessions;
-	
+	private HashMap<String, SessionAdapter> sessionsByName;
+    
 	private Node rootNode;
 	
 	public Node getRootNode() {
@@ -78,9 +77,7 @@ public class SessionManager {
             }
 			else if (element instanceof ClinicAdapter) {
 			    ClinicAdapter clinicAdapter = (ClinicAdapter) element;
-			    SiteAdapter siteAdapter = (SiteAdapter) clinicAdapter.getParent().getParent();
-			    String sessionName = ((SessionAdapter) siteAdapter.getParent()).getName();
-				openClinicViewForm(sessionName, clinicAdapter.getClinic());
+				openClinicViewForm(clinicAdapter);
 			}
 			else if (element instanceof Node) {
 				Node node = (Node) element;
@@ -166,6 +163,12 @@ public class SessionManager {
             }
         }
 	};
+    
+    private SessionManager() {
+        super();
+        rootNode = new Node(null, 1, "root");
+        sessionsByName = new  HashMap<String, SessionAdapter>();
+    }
 	
 	public ITreeViewerListener getTreeViewerListener() {
 		return treeViewerListener;
@@ -182,35 +185,24 @@ public class SessionManager {
 		return instance;
 	}
 	
-	private SessionManager() {
-		super();
-		rootNode = new Node(null, 1, "root");
-		sessions = new  HashMap<String, SessionAdapter>();
-	}
-	
 	public void setSessionsView(SessionsView view) {
 		this.view = view;
 	}
 	
 	public void addSession(final WritableApplicationService appService, String name, 
 			List<Site> sites) {
-		int id = sessions.size();
+		int id = sessionsByName.size();
 		final SessionAdapter sessionNode = new SessionAdapter(rootNode, appService, id, name);
-		sessions.put(name, sessionNode);
+		sessionsByName.put(name, sessionNode);
 		rootNode.addChild(sessionNode);
 		
 		for (Object o : sites) {
-			SiteAdapter siteNode = new SiteAdapter(sessionNode, (Site) o);
+		    Site site = (Site) o;
+			SiteAdapter siteNode = new SiteAdapter(sessionNode, site);
 			sessionNode.addChild(siteNode);
 		}
 		view.getTreeViewer().expandToLevel(2);	
 		log4j.debug("addSession: " + name);
-	}
-	
-	public WritableApplicationService getAppService(String sessionName) {
-	    SessionAdapter sessionAdapter = sessions.get(sessionName);
-	    Assert.isNotNull(sessionAdapter, "Invalid session name " + sessionName);
-	    return sessionAdapter.getAppService();
 	}
 	
 	public SessionAdapter getSessionAdapter(int count) {
@@ -284,33 +276,9 @@ public class SessionManager {
             }
         });
     }
-    
-    private SiteAdapter findSite(Node node, Site site) {
-        if ((node instanceof Node) || (node instanceof SessionAdapter)) {
-            for (Node childNode : node.getChildren()) {
-                return findSite(childNode, site);
-            }
-        }
-        else if (node instanceof SiteAdapter) {
-            SiteAdapter siteAdapter = (SiteAdapter) node;
-            if (siteAdapter.getSite().getId() == site.getId()) {
-                return siteAdapter;
-            }
-        }
-        else {
-            Assert.isTrue(false, "Invalid node type: " 
-                    + node.getClass().getName());
-        }
-        return null;
-    }
 
-    public void updateClinics(Site site) {
-        SiteAdapter siteAdapter = findSite(rootNode, site);
-        Assert.isNotNull(siteAdapter, "Could not find site" + site.getName());
-        updateClinics(siteAdapter.getChildByName("Studies"));
-    }
-
-    public void updateClinics(final Node groupNode) {        
+    public void updateClinics(final Node groupNode) {    
+        Assert.isTrue(groupNode.getName().equals("Clinics"));
         final Site currentSite = ((SiteAdapter) groupNode.getParent()).getSite();
         Assert.isNotNull(currentSite, "null site");   
 
@@ -357,11 +325,11 @@ public class SessionManager {
 	}
 	
 	public String[] getSessionNames() {
-		return sessions.keySet().toArray(new String[sessions.size()]);
+		return sessionsByName.keySet().toArray(new String[sessionsByName.size()]);
 	}
 	
 	private void openSiteViewForm(SiteAdapter node) {
-		NodeInput input = new NodeInput(node);
+		FormInput input = new FormInput(node);
 		
 		try {
 			view.getSite().getPage().openEditor(input, SiteViewForm.ID, true);
@@ -372,24 +340,20 @@ public class SessionManager {
 		}
 	}
     
-    public void openStudyViewForm(StudyAdapter node) {
-        NodeInput input = new NodeInput(node);
-        
+    public void openStudyViewForm(StudyAdapter studyAdapter) {
         try {
-            view.getSite().getPage().openEditor(input, StudyViewForm.ID, true);
+            view.getSite().getPage().openEditor(
+                    new FormInput(studyAdapter), StudyViewForm.ID, true);
         } 
         catch (PartInitException e) {
             e.printStackTrace();                
         }
     }
 	
-	public void openClinicViewForm(String sessionName, Clinic clinic) {
-	    if (sessionName == null) {
-	        sessionName = getSessionNames()[0];
-	    }
-        ClinicInput input = new ClinicInput(sessionName, clinic);		
+	public void openClinicViewForm(ClinicAdapter clinicAdapter) {
 		try {
-			view.getSite().getPage().openEditor(input, ClinicViewForm.ID, true);
+			view.getSite().getPage().openEditor(
+			        new FormInput(clinicAdapter), ClinicViewForm.ID, true);
 		} 
 		catch (PartInitException e) {
 			e.printStackTrace();				
@@ -397,7 +361,7 @@ public class SessionManager {
 	}
 	
 	public SessionAdapter getSessionSingle() {
-		int count = sessions.size();
+		int count = sessionsByName.size();
 		Assert.isTrue(count == 1, "No sessions or more than 1 session connected");
 		return getSessionAdapter(0);
 	}
@@ -448,7 +412,7 @@ public class SessionManager {
 	    
 	}
 	
-	private void closeEditor(NodeInput input) {
+	private void closeEditor(FormInput input) {
         IEditorPart part = 
             view.getSite().getPage().findEditor(input);
         if (part != null) {
@@ -463,7 +427,7 @@ public class SessionManager {
         mi.setText ("Edit Site");
         mi.addSelectionListener(new SelectionListener() {
             public void widgetSelected(SelectionEvent event) {
-                NodeInput ni = new NodeInput(siteAdapter);
+                FormInput ni = new FormInput(siteAdapter);
                 closeEditor(ni);
                 try {
                     view.getSite().getPage().openEditor(ni, SiteEntryForm.ID, true);
@@ -481,7 +445,7 @@ public class SessionManager {
         mi.setText ("View Site");
         mi.addSelectionListener(new SelectionListener() {
             public void widgetSelected(SelectionEvent event) {
-                closeEditor(new NodeInput(siteAdapter));
+                closeEditor(new FormInput(siteAdapter));
                 openSiteViewForm(siteAdapter);
             }
 
@@ -496,7 +460,7 @@ public class SessionManager {
         mi.setText ("Edit Study");
         mi.addSelectionListener(new SelectionListener() {
             public void widgetSelected(SelectionEvent event) {
-                NodeInput ni = new NodeInput(studyAdapter);
+                FormInput ni = new FormInput(studyAdapter);
                 closeEditor(ni);
                 try {
                     view.getSite().getPage().openEditor(ni, StudyEntryForm.ID, true);
@@ -514,7 +478,7 @@ public class SessionManager {
         mi.setText ("View Study");
         mi.addSelectionListener(new SelectionListener() {
             public void widgetSelected(SelectionEvent event) {
-                closeEditor(new NodeInput(studyAdapter));
+                closeEditor(new FormInput(studyAdapter));
                 openStudyViewForm(studyAdapter);
             }
 

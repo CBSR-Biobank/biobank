@@ -1,22 +1,24 @@
 package edu.ualberta.med.biobank.forms.input;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPersistableElement;
 
-public class FormInput implements IEditorInput {
-    protected String sessionName;
+import edu.ualberta.med.biobank.treeview.ClinicAdapter;
+import edu.ualberta.med.biobank.treeview.Node;
+import edu.ualberta.med.biobank.treeview.SiteAdapter;
+import edu.ualberta.med.biobank.treeview.StudyAdapter;
 
-    public FormInput(String sessionName) {
-        this.sessionName = sessionName;
+public class FormInput implements IEditorInput {
+    private Node node;
+
+    public FormInput(Node o) {
+        node = o;
     }
     
-    public String getSessionName() {
-        return sessionName;
-    }
-
-    public void setSessionName(String sessionName) {
-        this.sessionName = sessionName;
+    public Node getNode() {
+        return node;
     }
 
     @Override
@@ -31,9 +33,26 @@ public class FormInput implements IEditorInput {
 
     @Override
     public String getName() {
+        if (node == null) return null;
+
+        String name = node.getName();
+        if (name != null) {
+            if (node instanceof SiteAdapter) return "Site " + name;
+            else if (node instanceof StudyAdapter) return "Study " + name;
+            else if (node instanceof ClinicAdapter) return "Clinic " + name;
+            else Assert.isTrue(false, "tooltip name for "
+                    + node.getClass().getName() + " not implemented");
+        }
+        else {
+            if (node instanceof SiteAdapter) return "New Site";
+            else if (node instanceof StudyAdapter) return "New Study";
+            else if (node instanceof ClinicAdapter) return "New Clinic";
+            else Assert.isTrue(false, "tooltip name for "
+                    + node.getClass().getName() + " not implemented");
+        }
         return null;
     }
-
+    
     @Override
     public IPersistableElement getPersistable() {
         return null;
@@ -41,13 +60,22 @@ public class FormInput implements IEditorInput {
 
     @Override
     public String getToolTipText() {
-        return null;
+        return getName();
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public Object getAdapter(Class adapter) {
         return null;
+    }
+    
+    public boolean equals(Object o) {
+        if ((node == null) || (o == null)) return false;
+        
+        if (o instanceof FormInput) {
+            if (node.getClass() != ((FormInput)o).node.getClass()) return false;
+        }
+        return false;
     }
 
 }

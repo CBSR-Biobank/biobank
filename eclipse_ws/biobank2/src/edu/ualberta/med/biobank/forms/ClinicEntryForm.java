@@ -29,10 +29,11 @@ import org.eclipse.ui.forms.widgets.Section;
 import org.springframework.remoting.RemoteAccessException;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.forms.input.ClinicInput;
+import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Clinic;
-import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.treeview.ClinicAdapter;
+import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
 import gov.nih.nci.system.query.SDKQuery;
 import gov.nih.nci.system.query.SDKQueryResult;
@@ -47,8 +48,7 @@ public class ClinicEntryForm extends AddressEntryForm {
 	private static final String CLINIC_OK_MESSAGE = "Clinic information.";
 	private static final String NO_CLINIC_NAME_MESSAGE = "Clinic must have a name";
 	
-	private Site site;
-	
+	private ClinicAdapter clinicAdapter;
 	private Clinic clinic;
 	
 	protected Combo session;
@@ -58,20 +58,19 @@ public class ClinicEntryForm extends AddressEntryForm {
 
 	public void init(IEditorSite editorSite, IEditorInput input) throws PartInitException {
 		super.init(editorSite, input);
-		if ( !(input instanceof ClinicInput)) 
+		if ( !(input instanceof FormInput)) 
 			throw new PartInitException("Invalid editor input");
 		
-		ClinicInput clinicInput = (ClinicInput) input;
+		FormInput clinicInput = (FormInput) input;
 		
-		setSessionName(clinicInput.getSessionName());
-		setAppService(SessionManager.getInstance().getAppService(
-		        clinicInput.getSessionName()));
-
-		clinic = clinicInput.getClinic();
-		site = clinicInput.getClinic().getSite();
+		clinicAdapter = (ClinicAdapter) clinicInput.getNode();
+		clinic = clinicAdapter.getClinic();		
+		setAppService(clinicAdapter.getAppService());
+		
 		address = clinic.getAddress();
 		if (address == null) {
-			clinic.setAddress(new Address());
+		    address = new Address();
+			clinic.setAddress(address);
 		}
 		
 		if (clinic.getId() == null) {
@@ -102,8 +101,7 @@ public class ClinicEntryForm extends AddressEntryForm {
 		Section section = toolkit.createSection(form.getBody(), 
 				ExpandableComposite.TITLE_BAR
 				| ExpandableComposite.EXPANDED);
-		section.setText("Site");
-		//section.setFont(FormUtils.getSectionFont());
+		section.setText("Clinic");
 		Composite client = toolkit.createComposite(section);
 		section.setClient(client);
 		section.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -173,6 +171,8 @@ public class ClinicEntryForm extends AddressEntryForm {
 	
 	public void saveForm() {
 		clinic.setAddress(address);
+		SiteAdapter siteAdapter = (SiteAdapter) clinicAdapter.getParent().getParent();
+		clinic.setSite(siteAdapter.getSite());
 		
         try {
             SDKQuery query;
@@ -182,7 +182,7 @@ public class ClinicEntryForm extends AddressEntryForm {
                 Assert.isTrue(clinic.getAddress().getId() == null, 
                         "insert invoked on address already in database");
                 
-                query = new InsertExampleQuery(clinic.getAddress());                    
+                query = new InsertExampleQuery(address);                    
                 result = appService.executeQuery(query);
                 clinic.setAddress((Address) result.getObjectResult());
                 query = new InsertExampleQuery(clinic); 
@@ -214,7 +214,7 @@ public class ClinicEntryForm extends AddressEntryForm {
             exp.printStackTrace();
         }
 		
-		SessionManager.getInstance().updateClinics(site);		
+		SessionManager.getInstance().updateClinics(clinicAdapter.getParent());		
 		getSite().getPage().closeEditor(ClinicEntryForm.this, false);
 	}
 }

@@ -14,6 +14,7 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.forms.widgets.Section;
 import org.springframework.util.Assert;
 
+import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.Sdata;
 import edu.ualberta.med.biobank.model.StorageContainer;
@@ -33,12 +34,12 @@ public class StudyViewForm extends BiobankViewForm {
     @Override
     public void init(IEditorSite editorSite, IEditorInput input) 
     throws PartInitException {
-        if ( !(input instanceof NodeInput)) 
+        if ( !(input instanceof FormInput)) 
             throw new PartInitException("Invalid editor input"); 
         
         super.init(editorSite, input);
         
-        Node node = ((NodeInput) input).getNode();
+        Node node = ((FormInput) input).getNode();
         Assert.notNull(node, "Null editor input");
 
         if (node instanceof StudyAdapter) {

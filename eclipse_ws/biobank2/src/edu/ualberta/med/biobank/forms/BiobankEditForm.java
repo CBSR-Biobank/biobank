@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.forms;
 
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
@@ -123,6 +124,7 @@ public abstract class BiobankEditForm extends EditorPart {
     }
 
     public void setAppService(WritableApplicationService appService) {
+        Assert.isNotNull(appService, "appService is null");
         this.appService = appService;
     }
 

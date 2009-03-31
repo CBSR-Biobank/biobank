@@ -29,6 +29,7 @@ import org.eclipse.ui.forms.widgets.Section;
 import org.springframework.remoting.RemoteAccessException;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.treeview.Node;
@@ -59,10 +60,10 @@ public class SiteEntryForm extends AddressEntryForm {
 
 	public void init(IEditorSite editorSite, IEditorInput input) throws PartInitException {
 		super.init(editorSite, input);
-		if ( !(input instanceof NodeInput)) 
+		if ( !(input instanceof FormInput)) 
 			throw new PartInitException("Invalid editor input");
 		
-		Node node = ((NodeInput) input).getNode();
+		Node node = ((FormInput) input).getNode();
 		Assert.isNotNull(node, "Null editor input");
 		
 		Assert.isTrue((node instanceof SiteAdapter), 

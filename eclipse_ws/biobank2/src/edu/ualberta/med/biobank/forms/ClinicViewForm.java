@@ -15,16 +15,15 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.Section;
 
-import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.forms.input.ClinicInput;
+import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Clinic;
-import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.treeview.ClinicAdapter;
 
 public class ClinicViewForm  extends AddressViewForm {	
 	public static final String ID =
 	      "edu.ualberta.med.biobank.forms.ClinicViewForm";
-	
-    private Site site;
+
+	private ClinicAdapter clinicAdapter;
 	private Clinic clinic;
 	
 	Label name;
@@ -32,18 +31,13 @@ public class ClinicViewForm  extends AddressViewForm {
 	public void init(IEditorSite editorSite, IEditorInput input)
 			throws PartInitException {
 		super.init(editorSite, input);
-		if ( !(input instanceof NodeInput)) 
+		if ( !(input instanceof FormInput)) 
 			throw new PartInitException("Invalid editor input"); 
         
-        ClinicInput clinicInput = (ClinicInput) input;
+        FormInput clinicInput = (FormInput) input;
         
-        setSessionName(clinicInput.getSessionName());
-        setAppService(SessionManager.getInstance().getAppService(
-                clinicInput.getSessionName()));
-
-        clinic = clinicInput.getClinic();
-        site = clinicInput.getClinic().getSite();     
-        clinic.setSite(site);
+        clinicAdapter = (ClinicAdapter) clinicInput.getNode();
+        clinic = clinicAdapter.getClinic();
         address = clinic.getAddress();
 	}
 
@@ -84,10 +78,9 @@ public class ClinicViewForm  extends AddressViewForm {
 		final Button edit = toolkit.createButton(client, "Edit Clinic Info", SWT.PUSH);
 		edit.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				getSite().getPage().closeEditor(ClinicViewForm.this, false);				
-				ClinicInput input = new ClinicInput(sessionName, clinic);				
 				try {
-					getSite().getPage().openEditor(input, ClinicEntryForm.ID, true);
+					getSite().getPage().openEditor(
+					        new FormInput(clinicAdapter), ClinicEntryForm.ID, true);
 				} 
 				catch (PartInitException exp) {
 					// handle error

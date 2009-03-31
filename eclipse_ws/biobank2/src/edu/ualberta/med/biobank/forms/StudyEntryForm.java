@@ -47,6 +47,7 @@ import org.springframework.remoting.RemoteAccessException;
 import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Sdata;
 import edu.ualberta.med.biobank.model.SdataType;
@@ -140,12 +141,12 @@ public class StudyEntryForm extends BiobankEditForm {
 	@Override
 	public void init(IEditorSite editorSite, IEditorInput input)
 			throws PartInitException {
-		if ( !(input instanceof NodeInput)) 
+		if ( !(input instanceof FormInput)) 
 			throw new PartInitException("Invalid editor input");
 		
 		super.init(editorSite, input);
 		
-		Node node = ((NodeInput) input).getNode();
+		Node node = ((FormInput) input).getNode();
 		Assert.isNotNull(node, "Null editor input");
 		
 		Assert.isTrue((node instanceof StudyAdapter), 

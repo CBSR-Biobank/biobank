@@ -17,12 +17,12 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.forms.widgets.Section;
 import org.springframework.util.Assert;
 
-import edu.ualberta.med.biobank.forms.input.ClinicInput;
+import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
+import edu.ualberta.med.biobank.treeview.ClinicAdapter;
 import edu.ualberta.med.biobank.treeview.Node;
-import edu.ualberta.med.biobank.treeview.SessionAdapter;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankCollectionTable;
@@ -38,10 +38,10 @@ public class SiteViewForm extends AddressViewForm {
 	public void init(IEditorSite editorSite, IEditorInput input)
 			throws PartInitException {
 		super.init(editorSite, input);
-		if ( !(input instanceof NodeInput)) 
+		if ( !(input instanceof FormInput)) 
 			throw new PartInitException("Invalid editor input"); 
 		
-		Node node = ((NodeInput) input).getNode();
+		Node node = ((FormInput) input).getNode();
 		Assert.notNull(node, "Null editor input");
 
 		if (node instanceof SiteAdapter) {
@@ -131,7 +131,7 @@ public class SiteViewForm extends AddressViewForm {
 			public void widgetSelected(SelectionEvent e) {
 				getSite().getPage().closeEditor(SiteViewForm.this, false);
 				try {
-					getSite().getPage().openEditor(new NodeInput(siteAdapter), 
+					getSite().getPage().openEditor(new FormInput(siteAdapter), 
 							SiteEntryForm.ID, true);
 				}
 				catch (PartInitException exp) {
@@ -147,7 +147,7 @@ public class SiteViewForm extends AddressViewForm {
 					Study study = new Study();
 					Node studiesNode = siteAdapter.getStudiesGroupNode();
 					StudyAdapter studyAdapter = new StudyAdapter(studiesNode, study);
-					getSite().getPage().openEditor(new NodeInput(studyAdapter), 
+					getSite().getPage().openEditor(new FormInput(studyAdapter), 
 							StudyEntryForm.ID, true);
 				} 
 				catch (PartInitException exp) {
@@ -160,10 +160,10 @@ public class SiteViewForm extends AddressViewForm {
 		clinic.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				try {
-					String sessionName = ((SessionAdapter) siteAdapter.getParent()).getName();
-					ClinicInput input = new ClinicInput(sessionName, new Clinic());
+					ClinicAdapter clinicAdapter = new ClinicAdapter(
+					        siteAdapter.getClinicGroupNode(), new Clinic());
 					getSite().getPage().openEditor(
-							input, ClinicEntryForm.ID, true);
+							new FormInput(clinicAdapter), ClinicEntryForm.ID, true);
 				} 
 				catch (PartInitException exp) {
 					exp.printStackTrace();				

@@ -112,9 +112,9 @@ public class FormUtils {
                     SessionManager.getInstance().openStudyViewForm(node);
                 }
                 else if (element instanceof Clinic) {
-                    Clinic clinic = (Clinic) element;
-                    SessionManager.getInstance().openClinicViewForm(
-                            null, clinic);
+                    // TODO: need to open clinic view form
+                    //Clinic clinic = (Clinic) element;
+                    //SessionManager.getInstance().openClinicViewForm(clinic);
                 }
                 else {
                     Assert.isTrue(false, "invalid type for element: " 

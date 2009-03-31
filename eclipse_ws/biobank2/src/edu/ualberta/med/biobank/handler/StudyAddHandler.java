@@ -6,8 +6,8 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.ui.handlers.HandlerUtil;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.forms.NodeInput;
 import edu.ualberta.med.biobank.forms.StudyEntryForm;
+import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
 
@@ -19,7 +19,7 @@ public class StudyAddHandler extends AbstractHandler {
 		Study study = new Study();
 		StudyAdapter studyNode = new StudyAdapter(null, study);
 		
-		NodeInput input = new NodeInput(studyNode);
+		FormInput input = new FormInput(studyNode);
 		try {
 			HandlerUtil.getActiveWorkbenchWindowChecked(event).getActivePage()
 			.openEditor(input, StudyEntryForm.ID, true);
