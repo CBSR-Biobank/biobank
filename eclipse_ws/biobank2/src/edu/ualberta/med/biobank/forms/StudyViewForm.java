@@ -20,6 +20,7 @@ import edu.ualberta.med.biobank.model.Sdata;
 import edu.ualberta.med.biobank.model.StorageContainer;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.Node;
+import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankCollectionTable;
 
@@ -69,9 +70,12 @@ public class StudyViewForm extends BiobankViewForm {
         toolkit.paintBordersFor(client); 
         
         Label label = FormUtils.createLabelledField(toolkit, client, "Short Name:");
-        label.setText(study.getNameShort());        
+        label.setText(study.getNameShort());
+        
+        Node clinicGroupNode = 
+            ((SiteAdapter) studyAdapter.getParent().getParent()).getClinicGroupNode();
 
-        FormUtils.createClinicSection(toolkit, form.getBody(), 
+        FormUtils.createClinicSection(toolkit, form.getBody(), clinicGroupNode,
                 study.getClinicCollection());
         
         createDataCollectedSection();

@@ -28,6 +28,7 @@ import org.eclipse.ui.handlers.IHandlerService;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
+import edu.ualberta.med.biobank.forms.ClinicEntryForm;
 import edu.ualberta.med.biobank.forms.ClinicViewForm;
 import edu.ualberta.med.biobank.forms.SiteEntryForm;
 import edu.ualberta.med.biobank.forms.SiteViewForm;
@@ -147,8 +148,10 @@ public class SessionManager {
             else if (element instanceof Node) {
                 Node node = (Node) element;
                 if (node.getName().equals("Studies")) {
+                    popupMenuStudiesNode(node, tv, tree, menu);
                 }
                 else if (node.getName().equals("Clinics")) {
+                    popupMenuClinicsNode(node, tv, tree, menu);
                 }
                 else if (node.getName().equals("Storage Container")) {
                 }
@@ -485,5 +488,49 @@ public class SessionManager {
             public void widgetDefaultSelected(SelectionEvent e) {                    
             }
         }); 
+    }
+    
+    private void popupMenuStudiesNode(final Node studiesGroupNode, TreeViewer tv,  
+            Tree tree,  Menu menu) {
+        MenuItem mi = new MenuItem (menu, SWT.PUSH);
+        mi.setText ("Add Study");
+        mi.addSelectionListener(new SelectionListener() {
+            public void widgetSelected(SelectionEvent event) {
+                StudyAdapter studyAdapter = new StudyAdapter(studiesGroupNode, new Study());
+                FormInput input = new FormInput(studyAdapter);
+                closeEditor(input);
+                try {
+                    view.getSite().getPage().openEditor(
+                            input, StudyEntryForm.ID, true);
+                }
+                catch (PartInitException exp) {
+                    exp.printStackTrace();              
+                }
+            }
+
+            public void widgetDefaultSelected(SelectionEvent e) {                    
+            }
+        });
+    }
+    
+    private void popupMenuClinicsNode(final Node clinicsGroupNode, TreeViewer tv,  
+            Tree tree,  Menu menu) {
+        MenuItem mi = new MenuItem (menu, SWT.PUSH);
+        mi.setText ("Add Clinic");
+        mi.addSelectionListener(new SelectionListener() {
+            public void widgetSelected(SelectionEvent event) {
+                ClinicAdapter clinicAdapter = new ClinicAdapter(clinicsGroupNode, new Clinic());
+                FormInput input = new FormInput(clinicAdapter);
+                try {
+                    view.getSite().getPage().openEditor(input, ClinicEntryForm.ID, true);
+                }
+                catch (PartInitException exp) {
+                    exp.printStackTrace();              
+                }
+            }
+
+            public void widgetDefaultSelected(SelectionEvent e) {                    
+            }
+        });
     }
 }

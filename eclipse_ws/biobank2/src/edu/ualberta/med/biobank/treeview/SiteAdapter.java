@@ -3,14 +3,18 @@ package edu.ualberta.med.biobank.treeview;
 import edu.ualberta.med.biobank.model.Site;
 
 public class SiteAdapter extends Node {
+    public static final int STUDIES_NODE_ID = 1;
+    public static final int CLINICS_NODE_ID = 1;
+    public static final int STORAGE_TYPES_NODE_ID = 1;
+    
 	private Site site;
 
 	public SiteAdapter(SessionAdapter parent, Site site) {
 		super(parent);
 		this.site = site;
-		addChild(new Node(this, 1, "Studies", true));
-		addChild(new Node(this, 2, "Clinics", true));
-		addChild(new Node(this, 3, "Storage Types", true));
+		addChild(new Node(this, STUDIES_NODE_ID, "Studies", true));
+		addChild(new Node(this, CLINICS_NODE_ID, "Clinics", true));
+		addChild(new Node(this, STORAGE_TYPES_NODE_ID, "Storage Types", true));
 	}
 
 	public void setSite(Site site) {
@@ -22,12 +26,16 @@ public class SiteAdapter extends Node {
 	}
 	
 	public Node getStudiesGroupNode() {
-		return children.get(0);
+		return children.get(STUDIES_NODE_ID - 1);
 	}
 	
 	public Node getClinicGroupNode() {
-		return children.get(1);
+		return children.get(CLINICS_NODE_ID - 1);
 	}
+    
+    public Node getStorageTypesGroupNode() {
+        return children.get(STORAGE_TYPES_NODE_ID - 1);
+    }
 
 	@Override
 	public int getId() {

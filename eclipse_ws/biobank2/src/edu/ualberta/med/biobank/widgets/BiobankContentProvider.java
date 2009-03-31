@@ -4,22 +4,22 @@ import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 import org.springframework.util.Assert;
 
-import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.Sdata;
 import edu.ualberta.med.biobank.model.StorageContainer;
-import edu.ualberta.med.biobank.model.Study;
+import edu.ualberta.med.biobank.treeview.ClinicAdapter;
+import edu.ualberta.med.biobank.treeview.StudyAdapter;
 
 public class BiobankContentProvider implements IStructuredContentProvider {   
     /* (non-Javadoc)
      * @see org.eclipse.jface.viewers.IStructuredContentProvider#getElements(java.lang.Object)
      */
     public Object[] getElements(Object inputElement) {
-        if (inputElement instanceof Study[]) {
-            return (Study[])inputElement;
+        if (inputElement instanceof StudyAdapter[]) {
+            return (StudyAdapter[])inputElement;
         }
-        else if (inputElement instanceof Clinic[]) {
-            return (Clinic[])inputElement;
+        else if (inputElement instanceof ClinicAdapter[]) {
+            return (ClinicAdapter[])inputElement;
         }
         else if (inputElement instanceof Patient[]) {
             return (Patient[])inputElement;

@@ -162,7 +162,7 @@ public class StudyEntryForm extends BiobankEditForm {
 			setPartName("New Study");
 		}
 		else {
-			setPartName("Study" + study.getName());
+			setPartName("Study " + study.getName());
 		}
 	}
 

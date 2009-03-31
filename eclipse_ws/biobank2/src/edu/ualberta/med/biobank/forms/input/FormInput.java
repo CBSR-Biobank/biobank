@@ -17,6 +17,11 @@ public class FormInput implements IEditorInput {
         node = o;
     }
     
+    public int getIndex() {
+        if (node != null) return node.getId();
+        return 0;
+    }
+    
     public Node getNode() {
         return node;
     }
@@ -74,6 +79,8 @@ public class FormInput implements IEditorInput {
         
         if (o instanceof FormInput) {
             if (node.getClass() != ((FormInput)o).node.getClass()) return false;
+            
+            return (getIndex() == ((FormInput)o).getIndex()); 
         }
         return false;
     }

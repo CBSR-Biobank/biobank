@@ -1,8 +1,6 @@
 package edu.ualberta.med.biobank.forms;
 
 import java.util.Collection;
-import java.util.Iterator;
-
 import org.eclipse.core.databinding.DataBindingContext;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -69,7 +67,7 @@ public class SiteViewForm extends AddressViewForm {
 		createAddressSection();
 		createStudySection();
 		FormUtils.createClinicSection(toolkit, form.getBody(), 
-		        site.getClinicCollection());
+		        siteAdapter.getClinicGroupNode(), site.getClinicCollection());
 		createButtons();
         
         bindValues();
@@ -99,18 +97,19 @@ public class SiteViewForm extends AddressViewForm {
         
         // hack required here because site.getStudyCollection().toArray(new Study[0])
         // returns Object[].        
-        int count = 0;
         Collection<Study> studies = site.getStudyCollection();
-        Study [] arr = new Study [studies.size()];
-        Iterator<Study> it = studies.iterator();
-        while (it.hasNext()) {
-            arr[count] = it.next();
-            ++count;
+        StudyAdapter [] studyAdapters = new StudyAdapter [studies.size()];
+        int count = 0;
+        for (Study study : studies) {
+            studyAdapters[count] = new StudyAdapter(
+                    siteAdapter.getStudiesGroupNode(), study);
+            count++;
+            
         }
 
         String [] headings = new String[] {"Name", "Short Name", "Num. Patients"};      
         BiobankCollectionTable comp = 
-            new BiobankCollectionTable(section, SWT.NONE, headings, arr);
+            new BiobankCollectionTable(section, SWT.NONE, headings, studyAdapters);
         section.setClient(comp);
         comp.adaptToToolkit(toolkit);   
         toolkit.paintBordersFor(comp);

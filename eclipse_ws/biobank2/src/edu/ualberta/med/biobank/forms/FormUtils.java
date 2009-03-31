@@ -1,8 +1,6 @@
 package edu.ualberta.med.biobank.forms;
 
 import java.util.Collection;
-import java.util.Iterator;
-
 import org.eclipse.jface.fieldassist.ControlDecoration;
 import org.eclipse.jface.fieldassist.FieldDecoration;
 import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
@@ -22,7 +20,9 @@ import org.springframework.util.Assert;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.model.Clinic;
-import edu.ualberta.med.biobank.model.Study;
+import edu.ualberta.med.biobank.model.Sdata;
+import edu.ualberta.med.biobank.treeview.ClinicAdapter;
+import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankCollectionTable;
 
@@ -70,26 +70,23 @@ public class FormUtils {
 
     
     public static void createClinicSection(FormToolkit toolkit, Composite parent,
-            Collection<Clinic> clinics) {        
+            Node clinicGroupParent, Collection<Clinic> clinics) {        
         Section section = toolkit.createSection(parent, 
             Section.TWISTIE | Section.TITLE_BAR | Section.EXPANDED);
         section.setText("Clinics");
         section.setLayout(new GridLayout(1, false));
-        section.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));      
+        section.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        ClinicAdapter [] clinicAdapters = new ClinicAdapter [clinics.size()];   
         
-        // hack required here because site.getStudyCollection().toArray(new Study[0])
-        // returns Object[].        
         int count = 0;
-        Clinic [] arr = new Clinic [clinics.size()];
-        Iterator<Clinic> it = clinics.iterator();
-        while (it.hasNext()) {
-            arr[count] = it.next();
+        for (Clinic clinic : clinics) {
+            clinicAdapters[count] = new ClinicAdapter(clinicGroupParent, clinic);
             ++count;
-        }      
+        }
         
         String[] headings = {"Name", "Num Studies"};        
         BiobankCollectionTable comp = 
-            new BiobankCollectionTable(section, SWT.NONE, headings, arr);
+            new BiobankCollectionTable(section, SWT.NONE, headings, clinicAdapters);
         section.setClient(comp);
         comp.adaptToToolkit(toolkit);   
         toolkit.paintBordersFor(comp);
@@ -107,14 +104,16 @@ public class FormUtils {
                 Object selection = event.getSelection();
                 Object element = ((StructuredSelection)selection).getFirstElement();
                 
-                if (element instanceof Study) {
-                    StudyAdapter node = new StudyAdapter(null, (Study) element);
-                    SessionManager.getInstance().openStudyViewForm(node);
+                if (element instanceof StudyAdapter) {
+                    SessionManager.getInstance().openStudyViewForm(
+                            (StudyAdapter) element);
                 }
-                else if (element instanceof Clinic) {
-                    // TODO: need to open clinic view form
-                    //Clinic clinic = (Clinic) element;
-                    //SessionManager.getInstance().openClinicViewForm(clinic);
+                else if (element instanceof ClinicAdapter) {
+                    SessionManager.getInstance().openClinicViewForm(
+                            (ClinicAdapter) element);
+                }
+                else if (element instanceof Sdata) {
+                    // do nothing
                 }
                 else {
                     Assert.isTrue(false, "invalid type for element: " 
