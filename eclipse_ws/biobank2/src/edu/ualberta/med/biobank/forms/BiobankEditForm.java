@@ -42,6 +42,14 @@ import org.eclipse.ui.part.EditorPart;
 import edu.ualberta.med.biobank.SessionManager;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
+/**
+ * Base class for data entry forms.
+ * 
+ * Notes:
+ *  - createFormContent() and saveForm() are called in their own thread so 
+ *    making calls to the database is possible.
+ *
+ */
 public abstract class BiobankEditForm extends EditorPart {
     
     protected WritableApplicationService appService;
@@ -165,13 +173,17 @@ public abstract class BiobankEditForm extends EditorPart {
     }
     
     protected Control createBoundWidget(Composite composite, 
-        Class<?> widgetClass, String fieldLabel, String [] widgetValues, 
+        Class<?> widgetClass, int widgetOptions, String fieldLabel, String [] widgetValues, 
         IObservableValue modelObservableValue, Class<?> validatorClass, 
         String validatorErrMsg) {
         if (widgetClass == Text.class) {
-            Label label = toolkit.createLabel(composite, fieldLabel + ":", SWT.LEFT);
+            Label label = toolkit.createLabel(
+                composite, fieldLabel + ":", SWT.LEFT);
             label.setLayoutData(new GridData(GridData.VERTICAL_ALIGN_BEGINNING));
-            Text text  = toolkit.createText(composite, "", SWT.SINGLE);
+            if (widgetOptions == SWT.NONE) {
+                widgetOptions = SWT.SINGLE;
+            }
+            Text text  = toolkit.createText(composite, "", widgetOptions);
             text.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
             text.addKeyListener(keyListener);
             
@@ -244,7 +256,7 @@ public abstract class BiobankEditForm extends EditorPart {
         for (String key : fieldOrder) {
             fi = fields.get(key);
             
-            Control control = createBoundWidget(client, fi.widgetClass, 
+            Control control = createBoundWidget(client, fi.widgetClass, SWT.NONE,
                 fi.label, fi.widgetValues, PojoObservables.observeValue(pojo, key),
                 fi.validatorClass, fi.errMsg);
             controls.put(key, control);

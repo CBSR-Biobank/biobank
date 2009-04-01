@@ -321,6 +321,10 @@ public class SessionManager {
             }
         });
     }
+    
+    public void updateStorageTypes(StorageTypeAdapter storageTypeAdapter) {
+        
+    }
 	
 	public void deleteSession(String name) {
 		rootNode.removeByName(name);

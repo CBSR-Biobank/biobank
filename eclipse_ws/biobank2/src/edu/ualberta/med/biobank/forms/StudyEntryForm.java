@@ -66,18 +66,19 @@ public class StudyEntryForm extends BiobankEditForm {
 	};
 	
 	public static final HashMap<String, FieldInfo> FIELDS = 
-		new HashMap<String, FieldInfo>() {{
-			put("name", new FieldInfo("Name", Text.class, null, 
-					NonEmptyString.class, "Study name cannot be blank"));
-			put("nameShort", new FieldInfo("Short Name", Text.class, null,
-					NonEmptyString.class, "Study short name cannot be blank"));
-            put("activityStatus", 
-                new FieldInfo(
-                    "Activity Status", Combo.class, 
-                    FormConstants.ACTIVITY_STATUS, null, null));
-            put("comment", new FieldInfo("Comments", Text.class, null,
-                null, null));
-		}
+	    new HashMap<String, FieldInfo>() {{
+	        put("name", new FieldInfo(
+	            "Name", Text.class, SWT.NONE, null, 
+	            NonEmptyString.class, "Study name cannot be blank"));
+	        put("nameShort", new FieldInfo(
+	            "Short Name", Text.class, SWT.NONE, null,
+	            NonEmptyString.class, "Study short name cannot be blank"));
+	        put("activityStatus",  new FieldInfo(
+	            "Activity Status", Combo.class, SWT.NONE, 
+	            FormConstants.ACTIVITY_STATUS, null, null));
+	        put("comment", new FieldInfo(
+	            "Comments", Text.class, SWT.NONE, null, null, null));
+	    }
 	};
 	
 	private MultiSelect clinicsMultiSelect;
@@ -215,7 +216,6 @@ public class StudyEntryForm extends BiobankEditForm {
         Section section = toolkit.createSection(form.getBody(), 
                 Section.TWISTIE | Section.TITLE_BAR | Section.EXPANDED);
         section.setText("Study Information Selection");
-        //section.setFont(FormUtils.getSectionFont());
         section.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         Composite client = toolkit.createComposite(section);

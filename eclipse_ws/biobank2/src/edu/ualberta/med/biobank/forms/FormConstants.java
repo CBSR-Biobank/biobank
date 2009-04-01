@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.forms;
 
 import java.util.HashMap;
 
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Text;
 
@@ -22,9 +23,9 @@ public class FormConstants {
         "email"
     };
 
-    // used to select a list	
+    // used to select a list
     public static final String[] PROVINCES = new String[] {
-        "Alberta", 
+        "Alberta",
         "British Columbia",
         "Manitoba",
         "New Brunswick",
@@ -37,18 +38,30 @@ public class FormConstants {
         "Quebec",
         "Saskatchewan",
         "Yukon"
-    };	
+    };
 
-    public static final HashMap<String, FieldInfo> ADDRESS_FIELDS = 
+    public static final HashMap<String, FieldInfo> ADDRESS_FIELDS =
         new HashMap<String, FieldInfo>() {{
-            put("street1",     new FieldInfo("Street 1",      Text.class,  null, null,  null));
-            put("street2",     new FieldInfo("Street 2",      Text.class,  null, null,  null));
-            put("city",        new FieldInfo("City",          Text.class,  null, null,  null));
-            put("province",    new FieldInfo("Province",      Combo.class, PROVINCES, null,  null));
-            put("postalCode",  new FieldInfo("Postal Code",   Text.class,  null, PostalCode.class, "Invalid postal code"));
-            put("phoneNumber", new FieldInfo("Phone Number",  Text.class,  null, TelephoneNumber.class, "Telephone number is invalid"));
-            put("faxNumber",   new FieldInfo("Fax Number",    Text.class,  null, TelephoneNumber.class, "Telephone number is invalid"));
-            put("email",       new FieldInfo("Email Address", Text.class,  null, EmailAddress.class, "Email address is invalid"));
+            put("street1", new FieldInfo(
+                "Street 1", Text.class,  SWT.NONE, null, null,  null));
+            put("street2",  new FieldInfo(
+                "Street 2", Text.class,  SWT.NONE, null, null,  null));
+            put("city", new FieldInfo(
+                "City", Text.class,  SWT.NONE, null, null,  null));
+            put("province", new FieldInfo(
+                "Province", Combo.class, SWT.NONE, PROVINCES, null, null));
+            put("postalCode", new FieldInfo(
+                "Postal Code", Text.class, SWT.NONE, null, PostalCode.class, 
+            "Invalid postal code"));
+            put("phoneNumber", new FieldInfo(
+                "Phone Number", Text.class, SWT.NONE, null, 
+                TelephoneNumber.class, "Telephone number is invalid"));
+            put("faxNumber", new FieldInfo(
+                "Fax Number", Text.class, SWT.NONE, null, 
+                TelephoneNumber.class, "Telephone number is invalid"));
+            put("email", new FieldInfo(
+                "Email Address", Text.class, SWT.NONE, null, 
+                EmailAddress.class, "Email address is invalid"));
         }
     };
 

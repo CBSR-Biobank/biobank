@@ -105,17 +105,18 @@ public class SiteEntryForm extends AddressEntryFormCommon {
 		
 		createSessionSelectionWidget(client);	  
 
-        createBoundWidget(client, Text.class, "Name", null,
+        createBoundWidget(client, Text.class, SWT.NONE, "Name", null,
             PojoObservables.observeValue(site, "name"),
             NonEmptyString.class, NO_SITE_NAME_MESSAGE);      
 
-        createBoundWidget(client, Combo.class, "Activity Status", 
+        createBoundWidget(client, Combo.class, SWT.NONE, "Activity Status", 
             FormConstants.ACTIVITY_STATUS,
             PojoObservables.observeValue(site, "activityStatus"),
             null, null);  
 
-        Text comment = (Text) createBoundWidget(client, Text.class, "Comments", 
-            null, PojoObservables.observeValue(site, "comment"), null, null);
+        Text comment = (Text) createBoundWidget(client, Text.class, SWT.MULTI, 
+            "Comments", null, PojoObservables.observeValue(site, "comment"), 
+            null, null);
         GridData gd = new GridData(GridData.FILL_HORIZONTAL);
         gd.heightHint = 40;
         comment.setLayoutData(gd);

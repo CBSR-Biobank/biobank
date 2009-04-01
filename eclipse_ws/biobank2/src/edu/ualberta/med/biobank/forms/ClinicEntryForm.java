@@ -113,18 +113,19 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
 		client.setLayout(layout);
 		toolkit.paintBordersFor(client);	
 
-		name = (Text) createBoundWidget(client, Text.class, "Name", null,
+		name = (Text) createBoundWidget(client, Text.class, SWT.NONE, "Name", null,
 		    PojoObservables.observeValue(clinic, "name"),
 		    NonEmptyString.class, NO_CLINIC_NAME_MESSAGE);
         name.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));    
 
-        createBoundWidget(client, Combo.class, "Activity Status", 
+        createBoundWidget(client, Combo.class, SWT.NONE, "Activity Status", 
             FormConstants.ACTIVITY_STATUS,
             PojoObservables.observeValue(clinic, "activityStatus"),
             null, null);  
 
-        Text comment = (Text) createBoundWidget(client, Text.class, "Comments", 
-            null, PojoObservables.observeValue(clinic, "comment"), null, null);
+        Text comment = (Text) createBoundWidget(client, Text.class, SWT.MULTI, 
+            "Comments", null, PojoObservables.observeValue(clinic, "comment"), 
+            null, null);
         GridData gd = new GridData(GridData.FILL_HORIZONTAL);
         gd.heightHint = 40;
         comment.setLayoutData(gd);
