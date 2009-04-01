@@ -1,14 +1,10 @@
 package edu.ualberta.med.biobank.forms;
 
-import org.eclipse.core.databinding.DataBindingContext;
-import org.eclipse.core.databinding.UpdateValueStrategy;
 import org.eclipse.core.databinding.beans.PojoObservables;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.jface.databinding.swt.SWTObservables;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.fieldassist.ControlDecoration;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -18,14 +14,11 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.forms.widgets.ExpandableComposite;
-import org.eclipse.ui.forms.widgets.Section;
 import org.springframework.remoting.RemoteAccessException;
 
 import edu.ualberta.med.biobank.SessionManager;
@@ -41,7 +34,7 @@ import gov.nih.nci.system.query.SDKQueryResult;
 import gov.nih.nci.system.query.example.InsertExampleQuery;
 import gov.nih.nci.system.query.example.UpdateExampleQuery;
 
-public class SiteEntryForm extends AddressEntryForm {	
+public class SiteEntryForm extends AddressEntryFormCommon {	
 	public static final String ID =
 	      "edu.ualberta.med.biobank.forms.SiteEntryForm";
 	
@@ -54,10 +47,8 @@ public class SiteEntryForm extends AddressEntryForm {
 	private Site site;
 	
 	protected Combo session;
-	private Text name;	
-	private ControlDecoration nameDecorator;
 	private Button submit;
-
+	
 	public void init(IEditorSite editorSite, IEditorInput input) throws PartInitException {
 		super.init(editorSite, input);
 		if ( !(input instanceof FormInput)) 
@@ -90,52 +81,49 @@ public class SiteEntryForm extends AddressEntryForm {
 
 	protected void createFormContent() {
         address = site.getAddress();   
-		
 		form.setText("BioBank Site Information");
-		
-		GridLayout layout = new GridLayout(1, false);
-		form.getBody().setLayout(layout);
-		
+		form.getBody().setLayout(new GridLayout(1, false));
+		createSiteSection();
+        createAddressArea();
+        createButtonsSection();
+        
+        // When adding help uncomment line below
+        // PlatformUI.getWorkbench().getHelpSystem().setHelp(composite, IJavaHelpContextIds.XXXXX);
+	}
+	
+	private void createSiteSection() {		
 		toolkit.createLabel(form.getBody(), 
 				"Studies, Clinics, and Storage Types can be added after submitting this information.", 
 				SWT.LEFT);
 		
-		Section section = toolkit.createSection(form.getBody(), 
-				ExpandableComposite.TITLE_BAR
-				| ExpandableComposite.EXPANDED);
-		section.setText("Site");
-		//section.setFont(FormUtils.getSectionFont());
-		Composite client = toolkit.createComposite(section);
-		section.setClient(client);
-		section.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		layout = new GridLayout(2, false);
+		Composite client = toolkit.createComposite(form.getBody());
+		GridLayout layout = new GridLayout(2, false);
 		layout.horizontalSpacing = 10;
 		client.setLayout(layout);
+        client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		toolkit.paintBordersFor(client);
 		
-		String[] sessionNames = SessionManager.getInstance().getSessionNames();
-		
-		if (sessionNames.length > 1) {			
-			toolkit.createLabel(client, "Session:", SWT.LEFT);
-			session = new Combo(client, SWT.READ_ONLY);
-			session.setItems(sessionNames);
-			session.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
-		}
-		else {
-			session = null;
-		}
+		createSessionSelectionWidget(client);	  
 
-        Label label = toolkit.createLabel(client, "Name:", SWT.LEFT);
-        name  = toolkit.createText(client, "", SWT.SINGLE);
-        name.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        name.addKeyListener(keyListener);		
-		
-		nameDecorator = FormUtils.createDecorator(label, NO_SITE_NAME_MESSAGE);
-		
-		createAddressArea();
+        createBoundWidget(client, Text.class, "Name", null,
+            PojoObservables.observeValue(site, "name"),
+            NonEmptyString.class, NO_SITE_NAME_MESSAGE);      
 
-		client = toolkit.createComposite(form.getBody());
-		layout = new GridLayout();
+        createBoundWidget(client, Combo.class, "Activity Status", 
+            FormConstants.ACTIVITY_STATUS,
+            PojoObservables.observeValue(site, "activityStatus"),
+            null, null);  
+
+        Text comment = (Text) createBoundWidget(client, Text.class, "Comments", 
+            null, PojoObservables.observeValue(site, "comment"), null, null);
+        GridData gd = new GridData(GridData.FILL_HORIZONTAL);
+        gd.heightHint = 40;
+        comment.setLayoutData(gd);
+	}
+	
+	private void createButtonsSection() {
+		Composite client = toolkit.createComposite(form.getBody());
+		GridLayout layout = new GridLayout();
 		layout.horizontalSpacing = 10;
 		layout.numColumns = 2;
 		client.setLayout(layout);
@@ -148,24 +136,7 @@ public class SiteEntryForm extends AddressEntryForm {
 					.getActivePage().saveEditor(SiteEntryForm.this, false);
 			}
 		});
-		
-		bindValues();
-		
-		// When adding help uncomment line below
-		// PlatformUI.getWorkbench().getHelpSystem().setHelp(composite, IJavaHelpContextIds.XXXXX);
 	}
-    
-    private void bindValues() {
-    	DataBindingContext dbc = new DataBindingContext();
-
-    	dbc.bindValue(SWTObservables.observeText(name, SWT.Modify),
-    			PojoObservables.observeValue(site, "name"), 
-    			new UpdateValueStrategy().setAfterConvertValidator(
-    					new NonEmptyString(NO_SITE_NAME_MESSAGE, nameDecorator)), 
-    					null);
-    	
-    	super.bindValues(dbc); 
-    }
     
     protected void handleStatusChanged(IStatus status) {
 		if (status.getSeverity() == IStatus.OK) {

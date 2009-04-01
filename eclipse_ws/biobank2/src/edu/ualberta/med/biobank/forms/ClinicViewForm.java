@@ -15,6 +15,7 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.Section;
 
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.treeview.ClinicAdapter;
@@ -79,8 +80,10 @@ public class ClinicViewForm  extends AddressViewForm {
 		edit.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				try {
+				    FormInput input = new FormInput(clinicAdapter); 
+		            SessionManager.getInstance().closeEditor(input);
 					getSite().getPage().openEditor(
-					        new FormInput(clinicAdapter), ClinicEntryForm.ID, true);
+					        input, ClinicEntryForm.ID, true);
 				} 
 				catch (PartInitException exp) {
 					// handle error

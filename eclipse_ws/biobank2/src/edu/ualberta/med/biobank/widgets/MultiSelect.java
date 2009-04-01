@@ -131,7 +131,7 @@ public class MultiSelect extends Composite {
 	public List<Integer> getSelected() {
 		List<Integer> result = new ArrayList<Integer>();		
 		for (MultiSelectNode node : selTreeRootNode.getChildren()) {
-			result.add(availableInv.get(node.getName()));
+			result.add(selectedInv.get(node.getName()));
 		}		
 		return result;
 	}

@@ -1,7 +1,5 @@
 package edu.ualberta.med.biobank.forms;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -9,21 +7,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.eclipse.core.databinding.AggregateValidationStatus;
-import org.eclipse.core.databinding.DataBindingContext;
-import org.eclipse.core.databinding.UpdateValueStrategy;
-import org.eclipse.core.databinding.beans.PojoObservables;
-import org.eclipse.core.databinding.observable.ChangeEvent;
-import org.eclipse.core.databinding.observable.IChangeListener;
-import org.eclipse.core.databinding.observable.value.IObservableValue;
-import org.eclipse.core.databinding.observable.value.WritableValue;
-import org.eclipse.core.databinding.validation.IValidator;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.jface.databinding.swt.SWTObservables;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.fieldassist.ControlDecoration;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -32,9 +19,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
@@ -76,20 +61,24 @@ public class StudyEntryForm extends BiobankEditForm {
 	public static final String[] ORDERED_FIELDS = new String[] {
 		"name",
 		"nameShort",
+		"activityStatus",
+		"comment"
 	};
 	
 	public static final HashMap<String, FieldInfo> FIELDS = 
 		new HashMap<String, FieldInfo>() {{
-			put("name", new FieldInfo("Name", Text.class,  
+			put("name", new FieldInfo("Name", Text.class, null, 
 					NonEmptyString.class, "Study name cannot be blank"));
-			put("nameShort", new FieldInfo("Short Name", Text.class,  
+			put("nameShort", new FieldInfo("Short Name", Text.class, null,
 					NonEmptyString.class, "Study short name cannot be blank"));
+            put("activityStatus", 
+                new FieldInfo(
+                    "Activity Status", Combo.class, 
+                    FormConstants.ACTIVITY_STATUS, null, null));
+            put("comment", new FieldInfo("Comments", Text.class, null,
+                null, null));
 		}
 	};
-	
-	private HashMap<String, Control> controls;
-		
-	private HashMap<String, ControlDecoration> fieldDecorators;
 	
 	private MultiSelect clinicsMultiSelect;
 	
@@ -109,8 +98,6 @@ public class StudyEntryForm extends BiobankEditForm {
 	
 	public StudyEntryForm() {
 		super();
-		controls = new HashMap<String, Control>();
-		fieldDecorators = new HashMap<String, ControlDecoration>();
 		sdataWidgets = new HashMap<String, SdataWidget>();
 	}
 
@@ -157,27 +144,11 @@ public class StudyEntryForm extends BiobankEditForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		toolkit.paintBordersFor(client);
 		
-		for (String key : ORDERED_FIELDS) {
-			FieldInfo fi = FIELDS.get(key);
-			
-			if (fi.widgetClass == Text.class) {
-                Label label = toolkit.createLabel(client, fi.label + ":", SWT.LEFT);
-                label.setLayoutData(new GridData());
-                Text text  = toolkit.createText(client, "", SWT.SINGLE);
-                text.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-                
-				controls.put(key, text);
-				text.addKeyListener(keyListener);
-				
-				if (fi.validatorClass != null) {
-					fieldDecorators.put(key, 
-							FormUtils.createDecorator(label, fi.errMsg));
-				}
-			}
-			else {
-				Assert.isTrue(false, "invalid widget class " + fi.widgetClass.getName());
-			}
-		}
+        createWidgetsFromHashMap(FIELDS, ORDERED_FIELDS, study, client);
+        Text comments = (Text) controls.get("comment");
+        GridData gd = new GridData(GridData.FILL_HORIZONTAL);
+        gd.heightHint = 40;
+        comments.setLayoutData(gd);
 		
 		createClinicSection();
 		createSdataSection();
@@ -195,8 +166,6 @@ public class StudyEntryForm extends BiobankEditForm {
                 doSaveInternal();
             }
         });
-        
-        bindValues();
 	}
     
     private void createClinicSection() {
@@ -252,7 +221,8 @@ public class StudyEntryForm extends BiobankEditForm {
         Composite client = toolkit.createComposite(section);
         section.setClient(client);        
         GridLayout layout = new GridLayout(1, false);
-        layout.verticalSpacing = 10;
+        layout.verticalSpacing = 0;
+        layout.marginHeight = 0;
         client.setLayout(layout);
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
@@ -272,73 +242,6 @@ public class StudyEntryForm extends BiobankEditForm {
             sdataWidgets.put(sdataType.getType(), w);
         }
         
-    }
-	
-    private void bindValues() {
-    	DataBindingContext dbc = new DataBindingContext();
-		for (String key : FIELDS.keySet()) {
-			FieldInfo fi = FIELDS.get(key);
-			UpdateValueStrategy uvs = null;
-
-			if (fi.widgetClass == Text.class) {				
-				if (fi.validatorClass != null) {
-					try {
-						Class<?>[] types = new Class[] { String.class, ControlDecoration.class };				
-						Constructor<?> cons = fi.validatorClass.getConstructor(types);
-						Object[] args = new Object[] { fi.errMsg, fieldDecorators.get(key) };
-						uvs = new UpdateValueStrategy();
-						uvs.setAfterConvertValidator((IValidator) cons.newInstance(args));
-					} 
-					catch (NoSuchMethodException e) {
-                        throw new RuntimeException(e);
-                    }
-                    catch (InvocationTargetException e) {
-                        throw new RuntimeException(e);
-                    } 
-                    catch (IllegalArgumentException e) {
-                        throw new RuntimeException(e);
-                    } 
-                    catch (InstantiationException e) {
-                        throw new RuntimeException(e);
-                    } 
-                    catch (IllegalAccessException e) {
-                        throw new RuntimeException(e);
-                    }
-				}
-				
-				if (key.equals("worksheet")) {			
-					dbc.bindValue(SWTObservables.observeText(controls.get(key), 
-							SWT.Modify),
-							PojoObservables.observeValue(study.getWorksheet(), "name"), 
-							uvs, null);
-				}
-				else {				
-					dbc.bindValue(SWTObservables.observeText(controls.get(key), 
-							SWT.Modify),
-							PojoObservables.observeValue(study, key), uvs, null);
-				}
-			}
-			else if (fi.widgetClass == Combo.class) {
-		    	dbc.bindValue(SWTObservables.observeSelection(controls.get(key)),
-		    			PojoObservables.observeValue(study, "province"), null, null);
-			}
-			else {
-				Assert.isTrue(false, "Invalid class " + fi.widgetClass.getName());
-			}
-		}       
-		
-		IObservableValue statusObservable = new WritableValue();
-		statusObservable.addChangeListener(new IChangeListener() {
-			public void handleChange(ChangeEvent event) {
-				IObservableValue validationStatus 
-					= (IObservableValue) event.getSource(); 
-				handleStatusChanged((IStatus) validationStatus.getValue());
-			}
-		}); 
-		
-		dbc.bindValue(statusObservable, new AggregateValidationStatus(
-                dbc.getBindings(), AggregateValidationStatus.MAX_SEVERITY),
-                null, null); 
     }
 	
 	private String getOkMessage() {
@@ -364,7 +267,8 @@ public class StudyEntryForm extends BiobankEditForm {
     	List<Integer> selClinicIds = clinicsMultiSelect.getSelected();
     	Set<Clinic> selClinics = new HashSet<Clinic>();
     	for (Clinic clinic : allClinics) {
-    		if (selClinicIds.indexOf(clinic.getId()) >= 0) {
+    	    int id = clinic.getId();
+    		if (selClinicIds.indexOf(id) >= 0) {
     			selClinics.add(clinic);
     		}
     		

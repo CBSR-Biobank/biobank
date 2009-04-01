@@ -1,14 +1,10 @@
 package edu.ualberta.med.biobank.forms;
 
-import org.eclipse.core.databinding.DataBindingContext;
-import org.eclipse.core.databinding.UpdateValueStrategy;
 import org.eclipse.core.databinding.beans.PojoObservables;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.jface.databinding.swt.SWTObservables;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.fieldassist.ControlDecoration;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -18,7 +14,6 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
@@ -40,7 +35,7 @@ import gov.nih.nci.system.query.SDKQueryResult;
 import gov.nih.nci.system.query.example.InsertExampleQuery;
 import gov.nih.nci.system.query.example.UpdateExampleQuery;
 
-public class ClinicEntryForm extends AddressEntryForm {	
+public class ClinicEntryForm extends AddressEntryFormCommon {	
 	public static final String ID =
 	      "edu.ualberta.med.biobank.forms.ClinicEntryForm";
 	
@@ -53,7 +48,6 @@ public class ClinicEntryForm extends AddressEntryForm {
 	
 	protected Combo session;
 	private Text name;	
-	private ControlDecoration nameDecorator;
 	private Button submit;
 
 	public void init(IEditorSite editorSite, IEditorInput input) throws PartInitException {
@@ -97,6 +91,15 @@ public class ClinicEntryForm extends AddressEntryForm {
 		toolkit.createLabel(form.getBody(), 
 				"Clinics can be associated with studies after submitting this initial information.", 
 				SWT.LEFT);
+		createClinicInfoSection();        
+        createAddressArea();
+        createButtonsSection();
+        
+        // When adding help uncomment line below
+        // PlatformUI.getWorkbench().getHelpSystem().setHelp(composite, IJavaHelpContextIds.XXXXX);
+	}
+	
+	private void createClinicInfoSection() {
 		
 		Section section = toolkit.createSection(form.getBody(), 
 				ExpandableComposite.TITLE_BAR
@@ -105,25 +108,34 @@ public class ClinicEntryForm extends AddressEntryForm {
 		Composite client = toolkit.createComposite(section);
 		section.setClient(client);
 		section.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		layout = new GridLayout(2, false);
+		GridLayout layout = new GridLayout(2, false);
 		layout.horizontalSpacing = 10;
 		client.setLayout(layout);
-		toolkit.paintBordersFor(client);		
+		toolkit.paintBordersFor(client);	
 
-        Label label = toolkit.createLabel(client, "Name:", SWT.LEFT);
-        label.setLayoutData(new GridData());
-        name = toolkit.createText(client, "", SWT.SINGLE);
-        name.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        name.addKeyListener(keyListener);
-		nameDecorator = FormUtils.createDecorator(label, NO_CLINIC_NAME_MESSAGE);
-		
-		createAddressArea();
+		name = (Text) createBoundWidget(client, Text.class, "Name", null,
+		    PojoObservables.observeValue(clinic, "name"),
+		    NonEmptyString.class, NO_CLINIC_NAME_MESSAGE);
+        name.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));    
 
-		section = toolkit.createSection(form.getBody(), SWT.NONE);
-		client = toolkit.createComposite(section);
+        createBoundWidget(client, Combo.class, "Activity Status", 
+            FormConstants.ACTIVITY_STATUS,
+            PojoObservables.observeValue(clinic, "activityStatus"),
+            null, null);  
+
+        Text comment = (Text) createBoundWidget(client, Text.class, "Comments", 
+            null, PojoObservables.observeValue(clinic, "comment"), null, null);
+        GridData gd = new GridData(GridData.FILL_HORIZONTAL);
+        gd.heightHint = 40;
+        comment.setLayoutData(gd);
+	}
+	
+	private void createButtonsSection() {
+		Section section = toolkit.createSection(form.getBody(), SWT.NONE);
+		Composite client = toolkit.createComposite(section);
 		section.setClient(client);
 		section.setLayoutData(new GridData(GridData.FILL_BOTH));
-		layout = new GridLayout(2, false);
+		GridLayout layout = new GridLayout(2, false);
 		client.setLayout(layout);
 		toolkit.paintBordersFor(client);
 
@@ -133,25 +145,8 @@ public class ClinicEntryForm extends AddressEntryForm {
 				PlatformUI.getWorkbench().getActiveWorkbenchWindow()
 				.getActivePage().saveEditor(ClinicEntryForm.this, false);
 			}
-		});		
-		
-		bindValues();
-		
-		// When adding help uncomment line below
-		// PlatformUI.getWorkbench().getHelpSystem().setHelp(composite, IJavaHelpContextIds.XXXXX);
+		});	
 	}
-    
-    private void bindValues() {
-    	DataBindingContext dbc = new DataBindingContext();
-
-    	dbc.bindValue(SWTObservables.observeText(name, SWT.Modify),
-    			PojoObservables.observeValue(clinic, "name"), 
-    			new UpdateValueStrategy().setAfterConvertValidator(
-    					new NonEmptyString(NO_CLINIC_NAME_MESSAGE, nameDecorator)), 
-    					null);
-    	
-    	super.bindValues(dbc);
-    }
     
     protected void handleStatusChanged(IStatus status) {
 		if (status.getSeverity() == IStatus.OK) {

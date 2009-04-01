@@ -419,7 +419,7 @@ public class SessionManager {
 	    
 	}
 	
-	private void closeEditor(FormInput input) {
+	public void closeEditor(FormInput input) {
         IEditorPart part = 
             view.getSite().getPage().findEditor(input);
         if (part != null) {

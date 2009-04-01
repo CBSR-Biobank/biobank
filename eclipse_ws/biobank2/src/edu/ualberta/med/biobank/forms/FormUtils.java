@@ -12,6 +12,7 @@ import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.widgets.FormToolkit;
@@ -50,9 +51,9 @@ public class FormUtils {
         return text;
     }
     
-    public static ControlDecoration createDecorator(Label label, String message) {
-		ControlDecoration controlDecoration = new ControlDecoration(label,
-				SWT.RIGHT | SWT.TOP);
+    public static ControlDecoration createDecorator(Control control, String message) {
+		ControlDecoration controlDecoration = new ControlDecoration(control,
+				SWT.LEFT | SWT.TOP);
 		controlDecoration.setDescriptionText(message);
 		FieldDecoration fieldDecoration = FieldDecorationRegistry.getDefault()
 				.getFieldDecoration(FieldDecorationRegistry.DEC_ERROR);

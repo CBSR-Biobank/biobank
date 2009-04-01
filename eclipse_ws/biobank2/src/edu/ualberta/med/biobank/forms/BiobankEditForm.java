@@ -3,9 +3,6 @@ package edu.ualberta.med.biobank.forms;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
-
-import gov.nih.nci.system.applicationservice.WritableApplicationService;
-
 import org.eclipse.core.databinding.AggregateValidationStatus;
 import org.eclipse.core.databinding.DataBindingContext;
 import org.eclipse.core.databinding.UpdateValueStrategy;
@@ -42,6 +39,9 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.part.EditorPart;
 
+import edu.ualberta.med.biobank.SessionManager;
+import gov.nih.nci.system.applicationservice.WritableApplicationService;
+
 public abstract class BiobankEditForm extends EditorPart {
     
     protected WritableApplicationService appService;
@@ -55,10 +55,12 @@ public abstract class BiobankEditForm extends EditorPart {
     protected FormToolkit toolkit;
     
     protected ScrolledForm form;
-        
-    private HashMap<String, ControlDecoration> fieldDecorators;
     
-    private HashMap<String, Control> controls;
+    protected HashMap<String, Control> controls;
+
+    protected IStatus currentStatus;
+    
+    protected DataBindingContext dbc;
     
     protected KeyListener keyListener = new KeyListener() {
         @Override
@@ -75,8 +77,8 @@ public abstract class BiobankEditForm extends EditorPart {
     
     public BiobankEditForm() {
         super();
-        fieldDecorators = new HashMap<String, ControlDecoration>();
         controls = new HashMap<String, Control>();
+        dbc = new DataBindingContext();
     }
 
     @Override
@@ -132,6 +134,7 @@ public abstract class BiobankEditForm extends EditorPart {
             public void run() {
                 createFormContent();
                 form.reflow(true);
+                bindValues();
             }
         });
     }
@@ -161,91 +164,111 @@ public abstract class BiobankEditForm extends EditorPart {
         this.appService = appService;
     }
     
-    protected void createWidgetsFromHashMap(HashMap<String, FieldInfo> fields, 
-            String [] fieldOrder, Object pojo, Composite client) {
-        
-        for (String key : fieldOrder) {
-            FieldInfo fi = fields.get(key);
+    protected Control createBoundWidget(Composite composite, 
+        Class<?> widgetClass, String fieldLabel, String [] widgetValues, 
+        IObservableValue modelObservableValue, Class<?> validatorClass, 
+        String validatorErrMsg) {
+        if (widgetClass == Text.class) {
+            Label label = toolkit.createLabel(composite, fieldLabel + ":", SWT.LEFT);
+            label.setLayoutData(new GridData(GridData.VERTICAL_ALIGN_BEGINNING));
+            Text text  = toolkit.createText(composite, "", SWT.SINGLE);
+            text.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+            text.addKeyListener(keyListener);
             
-            if (fi.widgetClass == Text.class) {
-                Label label = toolkit.createLabel(client, fi.label + ":", SWT.LEFT);
-                label.setLayoutData(new GridData());
-                Text text  = toolkit.createText(client, "", SWT.SINGLE);
-                text.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-                
-                controls.put(key, text);
-                text.addKeyListener(keyListener);
-                
-                if (fi.validatorClass != null) {
-                    fieldDecorators.put(key, 
-                            FormUtils.createDecorator(label, fi.errMsg));
-                }
-            }    
-            else if (fi.widgetClass == Combo.class) {
-                toolkit.createLabel(client, fi.label + " :", SWT.LEFT);
-                Combo combo = new Combo(client, SWT.READ_ONLY);
-                combo.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
-                toolkit.adapt(combo, true, true);
-                controls.put(key, combo);
-                
-                combo.addSelectionListener(new SelectionAdapter() {
-                    public void widgetSelected(SelectionEvent e) {
-                        setDirty(true);
-                    }
-                });
-            }            
-            else {
-                Assert.isTrue(false, "invalid widget class " + fi.widgetClass.getName());
+            UpdateValueStrategy uvs = null;
+            if (validatorClass != null) {
+                IValidator validator = createValidator(validatorClass, 
+                    FormUtils.createDecorator(text, validatorErrMsg), 
+                    validatorErrMsg);
+                uvs = new UpdateValueStrategy();
+                uvs.setAfterConvertValidator(validator);
             }
+
+            dbc.bindValue(SWTObservables.observeText(text, SWT.Modify),
+                modelObservableValue, uvs, null);
+            return text;
+        }    
+        else if (widgetClass == Combo.class) {
+            toolkit.createLabel(composite, fieldLabel + " :", SWT.LEFT);
+            Combo combo = new Combo(composite, SWT.READ_ONLY);
+            combo.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
+            Assert.isNotNull(widgetValues, "combo values not assigned");
+            combo.setItems(widgetValues);
+            toolkit.adapt(combo, true, true);
+            
+            dbc.bindValue(SWTObservables.observeSelection(combo),
+                modelObservableValue, null, null);
+            
+            combo.addSelectionListener(new SelectionAdapter() {
+                public void widgetSelected(SelectionEvent e) {
+                    setDirty(true);
+                }
+            });
+            return combo;
+        }            
+        else {
+            Assert.isTrue(false, "invalid widget class " + widgetClass.getName());
+        }
+        return null;
+    }
+    
+    protected IValidator createValidator(Class<?> validatorClass, 
+        ControlDecoration dec, String validatorErrMsg) {
+        try {
+            Class<?>[] types = new Class[] { String.class, ControlDecoration.class };               
+            Constructor<?> cons = validatorClass.getConstructor(types);
+            Object[] args = new Object[] { validatorErrMsg, dec};
+            return (IValidator) cons.newInstance(args);
+        } 
+        catch (NoSuchMethodException e) {
+            throw new RuntimeException(e);
+        }
+        catch (InvocationTargetException e) {
+            throw new RuntimeException(e);
+        } 
+        catch (IllegalArgumentException e) {
+            throw new RuntimeException(e);
+        } 
+        catch (InstantiationException e) {
+            throw new RuntimeException(e);
+        } 
+        catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
         }
     }
     
-    
-
-    protected void bindValuesFromHashMap(DataBindingContext dbc,
-            HashMap<String, FieldInfo> fields, Object pojo) {    
-        for (String key : fields.keySet()) {
-            FieldInfo fi = fields.get(key);
-            UpdateValueStrategy uvs = null;
-
-            if (fi.widgetClass == Text.class) {             
-                if (fi.validatorClass != null) {
-                    try {
-                        Class<?>[] types = new Class[] { String.class, ControlDecoration.class };               
-                        Constructor<?> cons = fi.validatorClass.getConstructor(types);
-                        Object[] args = new Object[] { fi.errMsg, fieldDecorators.get(key) };
-                        uvs = new UpdateValueStrategy();
-                        uvs.setAfterConvertValidator((IValidator) cons.newInstance(args));
-                    } 
-                    catch (NoSuchMethodException e) {
-                        throw new RuntimeException(e);
-                    }
-                    catch (InvocationTargetException e) {
-                        throw new RuntimeException(e);
-                    } 
-                    catch (IllegalArgumentException e) {
-                        throw new RuntimeException(e);
-                    } 
-                    catch (InstantiationException e) {
-                        throw new RuntimeException(e);
-                    } 
-                    catch (IllegalAccessException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-
-                dbc.bindValue(SWTObservables.observeText(controls.get(key), SWT.Modify),
-                        PojoObservables.observeValue(pojo, key), uvs, null);
-            }
-            else if (fi.widgetClass == Combo.class) {
-                dbc.bindValue(SWTObservables.observeSelection(controls.get(key)),
-                        PojoObservables.observeValue(pojo, "activityStatus"), null, null);
-            }
-            else {
-                Assert.isTrue(false, "Invalid class " + fi.widgetClass.getName());
-            }
-        }       
+    protected void createWidgetsFromHashMap(HashMap<String, FieldInfo> fields, 
+            String [] fieldOrder, Object pojo, Composite client) {
+        FieldInfo fi;
         
+        for (String key : fieldOrder) {
+            fi = fields.get(key);
+            
+            Control control = createBoundWidget(client, fi.widgetClass, 
+                fi.label, fi.widgetValues, PojoObservables.observeValue(pojo, key),
+                fi.validatorClass, fi.errMsg);
+            controls.put(key, control);
+        }     
+    }
+    
+    protected Combo createSessionSelectionWidget(Composite client) {
+        String[] sessionNames = SessionManager.getInstance().getSessionNames();
+        
+        if (sessionNames.length > 1) {  
+            toolkit.createLabel(client, "Session:", SWT.LEFT);
+            Combo session = new Combo(client, SWT.READ_ONLY);
+            session.setItems(sessionNames);
+            session.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+            return session;
+        }   
+        return null;
+    }
+    
+    protected void bindValues() {
+        bindChangeListener();
+    }
+    
+    protected void bindChangeListener() {
         IObservableValue statusObservable = new WritableValue();
         statusObservable.addChangeListener(new IChangeListener() {
             public void handleChange(ChangeEvent event) {
@@ -256,8 +279,8 @@ public abstract class BiobankEditForm extends EditorPart {
         }); 
         
         dbc.bindValue(statusObservable, new AggregateValidationStatus(
-                dbc.getBindings(), AggregateValidationStatus.MAX_SEVERITY),
-                null, null); 
+            dbc.getBindings(), AggregateValidationStatus.MAX_SEVERITY),
+            null, null); 
     }
     
     protected abstract void handleStatusChanged(IStatus status);

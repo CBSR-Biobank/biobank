@@ -38,8 +38,8 @@ public abstract class AddressViewForm extends BiobankViewForm {
 		Assert.isNotNull(toolkit);
 		Assert.isNotNull(form);
 		
-		for (String key : AddressFieldsConstants.ORDERED_FIELDS) {
-			FieldInfo fi = AddressFieldsConstants.FIELDS.get(key);
+		for (String key : FormConstants.ADDRESS_ORDERED_FIELDS) {
+			FieldInfo fi = FormConstants.ADDRESS_FIELDS.get(key);
 
 			Label field = FormUtils.createLabelledField(toolkit, parent, fi.label + " :");
 			controls.put(key, field);
@@ -47,7 +47,7 @@ public abstract class AddressViewForm extends BiobankViewForm {
 	}
     
     protected void bindValues(DataBindingContext dbc) {
-		for (String key : AddressFieldsConstants.FIELDS.keySet()) {
+		for (String key : FormConstants.ADDRESS_FIELDS.keySet()) {
 			dbc.bindValue(SWTObservables.observeText(controls.get(key)),
 					PojoObservables.observeValue(address, key), null, null);
 		}
