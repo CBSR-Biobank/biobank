@@ -27,6 +27,8 @@ import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.StorageType;
 import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.StorageTypeAdapter;
+import edu.ualberta.med.biobank.validators.DoubleNumber;
+import edu.ualberta.med.biobank.validators.IntegerNumber;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
 import gov.nih.nci.system.query.SDKQuery;
 import gov.nih.nci.system.query.SDKQueryResult;
@@ -110,8 +112,8 @@ public class StorageTypeEntryForm extends BiobankEditForm {
         
         createBoundWidget(client, Text.class, SWT.NONE, 
             "Default Temperature (Celcius)", 
-            null, PojoObservables.observeValue(storageType, "comment"), null, 
-            null);
+            null, PojoObservables.observeValue(storageType, "defaultTemperature"), 
+            DoubleNumber.class, "Default temperature is not a valid number");
 
         createBoundWidget(client, Combo.class, SWT.NONE, "Activity Status", 
             FormConstants.ACTIVITY_STATUS,
@@ -146,16 +148,16 @@ public class StorageTypeEntryForm extends BiobankEditForm {
             null, null); 
         
         createBoundWidget(client, Text.class, SWT.NONE, "Dimension One Capacity", 
-            null, PojoObservables.observeValue(capacity, "dimensionOneCapacity"), 
-            null, null);
+            null, PojoObservables.observeValue(capacity, "dimensionOneCapacity"),
+            IntegerNumber.class, "Dimension one capacity is not a valid number");
         
         createBoundWidget(client, Text.class, SWT.NONE, "Dimension Two Label", 
-            null, PojoObservables.observeValue(storageType, "dimensionOneLabel"), 
+            null, PojoObservables.observeValue(storageType, "dimensionTwoLabel"), 
             null, null); 
         
         createBoundWidget(client, Text.class, SWT.NONE, "Dimension Two Capacity", 
-            null, PojoObservables.observeValue(capacity, "dimensionOneCapacity"), 
-            null, null);
+            null, PojoObservables.observeValue(capacity, "dimensionTwoCapacity"), 
+            IntegerNumber.class, "Dimension two capacity is not a valid nubmer");
     }
     
     private void createContentsSection() {

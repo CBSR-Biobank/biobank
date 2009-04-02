@@ -53,7 +53,7 @@ public class FormUtils {
     
     public static ControlDecoration createDecorator(Control control, String message) {
 		ControlDecoration controlDecoration = new ControlDecoration(control,
-				SWT.LEFT | SWT.TOP);
+				SWT.RIGHT | SWT.TOP);
 		controlDecoration.setDescriptionText(message);
 		FieldDecoration fieldDecoration = FieldDecorationRegistry.getDefault()
 				.getFieldDecoration(FieldDecorationRegistry.DEC_ERROR);

@@ -293,7 +293,7 @@ public class StudyEntryForm extends BiobankEditForm {
         study.setSdataCollection(sdataList);
         
         saveStudy(study);        
-        SessionManager.getInstance().updateStudies(studyAdapter.getParent());    	
+        SessionManager.getInstance().updateStudies(studyAdapter);    	
 		getSite().getPage().closeEditor(StudyEntryForm.this, false);    	
     }
     

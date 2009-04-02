@@ -1,21 +1,14 @@
 package edu.ualberta.med.biobank.validators;
 
-import org.eclipse.core.databinding.validation.IValidator;
 import org.eclipse.core.databinding.validation.ValidationStatus;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.fieldassist.ControlDecoration;
 
-public class TelephoneNumber implements IValidator {
-	
-	private final String message;
-	
-	private final ControlDecoration controlDecoration;
+public class TelephoneNumber extends AbstractValidator {
 	
 	public TelephoneNumber(String message, ControlDecoration controlDecoration) {
-		super();
-		this.message = message;
-		this.controlDecoration = controlDecoration;
+        super(message, controlDecoration);
 	}
 
 	public IStatus validate(Object value) {

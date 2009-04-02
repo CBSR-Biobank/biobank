@@ -190,10 +190,10 @@ public abstract class BiobankEditForm extends EditorPart {
             UpdateValueStrategy uvs = null;
             if (validatorClass != null) {
                 IValidator validator = createValidator(validatorClass, 
-                    FormUtils.createDecorator(text, validatorErrMsg), 
+                    FormUtils.createDecorator(label, validatorErrMsg), 
                     validatorErrMsg);
                 uvs = new UpdateValueStrategy();
-                uvs.setAfterConvertValidator(validator);
+                uvs.setAfterGetValidator(validator);
             }
 
             dbc.bindValue(SWTObservables.observeText(text, SWT.Modify),

@@ -41,11 +41,14 @@ import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.StorageType;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.ClinicAdapter;
+import edu.ualberta.med.biobank.treeview.ClinicGroup;
 import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.SessionAdapter;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.treeview.StorageTypeAdapter;
+import edu.ualberta.med.biobank.treeview.StorageTypeGroup;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
+import edu.ualberta.med.biobank.treeview.StudyGroup;
 import edu.ualberta.med.biobank.views.SessionsView;
 
 public class SessionManager {
@@ -83,15 +86,18 @@ public class SessionManager {
 			    ClinicAdapter clinicAdapter = (ClinicAdapter) element;
 				openClinicViewForm(clinicAdapter);
 			}
-			else if (element instanceof Node) {
-				Node node = (Node) element;
-                if (node.getName().equals("Studies")) {
-                    updateStudies(node);
-                }
-                else if (node.getName().equals("Clinics")) {
-					updateClinics(node);
-				}
-			}
+            else if (element instanceof StudyGroup) {
+                StudyGroup group = (StudyGroup) element;
+                updateStudies(group);
+            }
+            else if (element instanceof ClinicGroup) {
+                ClinicGroup group = (ClinicGroup) element;
+                updateClinics(group);
+            }
+            else if (element instanceof StorageTypeGroup) {
+                StorageTypeGroup group = (StorageTypeGroup) element;
+                updateStorageTypes(group);
+            }
 			else {
 				Assert.isTrue(false, "double click on class "
 						+ element.getClass().getName() + " not implemented yet");
@@ -110,16 +116,16 @@ public class SessionManager {
 
 		@Override
 		public void treeExpanded(TreeExpansionEvent e) {
-			Object o = e.getElement();
-			if (o instanceof Node) {
-				Node node = (Node) o;
-				if (node.getName().equals("Studies")) {
-					updateStudies(node);
-				}			
-				else if (node.getName().equals("Clinics")) {
-                    updateClinics(node);
-                }           
-			}
+			Object element = e.getElement();
+			if (element instanceof StudyGroup) {
+                updateStudies((StudyGroup) element);
+            }
+            else if (element instanceof ClinicGroup) {
+                updateClinics((ClinicGroup) element);
+            }
+            else if (element instanceof StorageTypeGroup) {
+                updateStorageTypes((StorageTypeGroup) element);
+            }
 		}
 	};
 	
@@ -148,21 +154,14 @@ public class SessionManager {
             }
             else if (element instanceof ClinicAdapter) {
             }
-            else if (element instanceof Node) {
-                Node node = (Node) element;
-                if (node.getName().equals("Studies")) {
-                    popupMenuStudiesNode(node, tv, tree, menu);
-                }
-                else if (node.getName().equals("Clinics")) {
-                    popupMenuClinicsNode(node, tv, tree, menu);
-                }
-                else if (node.getName().equals("Storage Types")) {
-                    popupMenuStorageTypesNode(node, tv, tree, menu);
-                }
-                else {
-                    Assert.isTrue(false, "double click on class "
-                            + node.getName() + " is not supported");
-                }
+            else if (element instanceof StudyGroup) {
+                popupMenuStudiesNode((StudyGroup) element, tv, tree, menu);
+            }
+            else if (element instanceof ClinicGroup) {
+                popupMenuClinicsNode((ClinicGroup) element, tv, tree, menu);
+            }
+            else if (element instanceof StorageTypeGroup) {
+                popupMenuStorageTypesNode((StorageTypeGroup) element, tv, tree, menu);
             }
             else {
                 Assert.isTrue(false, "double click on class "
@@ -245,6 +244,12 @@ public class SessionManager {
         });
     }
     
+    public void updateStudies(StudyAdapter studyAdapter) {   
+        Assert.isNotNull(studyAdapter.getParent(),    
+            "clinic adapter does not have a parent");        
+        updateStudies(studyAdapter.getParent());  
+    }
+    
     public void updateStudies(final Node groupNode) {       
         final Site currentSite = ((SiteAdapter) groupNode.getParent()).getSite();
         Assert.isNotNull(currentSite, "null site");        
@@ -284,6 +289,12 @@ public class SessionManager {
         });
     }
 
+    public void updateClinics(ClinicAdapter clinicAdapter) {   
+        Assert.isNotNull(clinicAdapter.getParent(), 
+            "clinic adapter does not have a parent");
+        updateClinics(clinicAdapter.getParent());
+    }
+
     public void updateClinics(final Node groupNode) {    
         Assert.isTrue(groupNode.getName().equals("Clinics"));
         final Site currentSite = ((SiteAdapter) groupNode.getParent()).getSite();
@@ -307,7 +318,7 @@ public class SessionManager {
                             + site.getName() + " has " + clinics.size() + " studies");
 
                     for (Clinic clinic : clinics) {
-                        SessionManager.log4j.trace("updateStudies: Study "
+                        SessionManager.log4j.trace("updateStudies: Clinic "
                                 + clinic.getId() + ": " + clinic.getName());
                         
                         ClinicAdapter node = new ClinicAdapter(groupNode, clinic);
@@ -323,7 +334,51 @@ public class SessionManager {
     }
     
     public void updateStorageTypes(StorageTypeAdapter storageTypeAdapter) {
-        
+        Assert.isNotNull(storageTypeAdapter.getParent(), 
+            "clinic adapter does not have a parent");
+        updateStorageTypes(storageTypeAdapter.getParent());
+    }
+
+    public void updateStorageTypes(final Node groupNode) {    
+        Assert.isTrue(groupNode.getName().equals("Storage Types"));
+        final Site currentSite = ((SiteAdapter) groupNode.getParent()).getSite();
+        Assert.isNotNull(currentSite, "null site");   
+
+        view.getTreeViewer().getControl().getDisplay().asyncExec(new Runnable() {
+            public void run() {              
+                // read from database again 
+                Site site = new Site();                
+                site.setId(currentSite.getId());
+
+                WritableApplicationService appService = groupNode.getAppService();
+                try {
+                    List<Site> result = appService.search(Site.class, site);
+                    Assert.isTrue(result.size() == 1);
+                    site = result.get(0);
+
+                    Collection<StorageType> storageTypes = 
+                        site.getStorageTypeCollection();
+                    currentSite.setStorageTypeCollection(storageTypes);
+                    SessionManager.log4j.trace("updateStudies: Site " 
+                        + site.getName() + " has " + storageTypes.size() 
+                        + " studies");
+
+                    for (StorageType storageTpe : storageTypes) {
+                        SessionManager.log4j.trace(
+                            "updateStudies: Storage Type "
+                            + storageTpe.getId() + ": " + storageTpe.getName());
+
+                        StorageTypeAdapter node = 
+                            new StorageTypeAdapter(groupNode, storageTpe);
+                        groupNode.addChild(node);
+                    }
+                    view.getTreeViewer().expandToLevel(groupNode, 1);
+                }
+                catch (ApplicationException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 	
 	public void deleteSession(String name) {

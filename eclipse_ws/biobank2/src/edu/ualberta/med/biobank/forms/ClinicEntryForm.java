@@ -210,7 +210,7 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
             exp.printStackTrace();
         }
 		
-		SessionManager.getInstance().updateClinics(clinicAdapter.getParent());		
+		SessionManager.getInstance().updateClinics(clinicAdapter);		
 		getSite().getPage().closeEditor(ClinicEntryForm.this, false);
 	}
 }
