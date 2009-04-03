@@ -78,9 +78,9 @@ public class StudyViewForm extends BiobankViewForm {
         FormUtils.createClinicSection(toolkit, form.getBody(), clinicGroupNode,
                 study.getClinicCollection());
         
-        createDataCollectedSection();
         createPatientsSection();
         createStorageContainerSection();
+        createDataCollectedSection();
     }
     
     private void createDataCollectedSection() {           
@@ -97,7 +97,7 @@ public class StudyViewForm extends BiobankViewForm {
             ++count;
         }
 
-        String [] headings = new String[] {"Name", "Valid Values"};      
+        String [] headings = new String[] {"Name", "Valid Values (optional)"};      
         BiobankCollectionTable comp = 
             new BiobankCollectionTable(section, SWT.NONE, headings, arr);
         section.setClient(comp);

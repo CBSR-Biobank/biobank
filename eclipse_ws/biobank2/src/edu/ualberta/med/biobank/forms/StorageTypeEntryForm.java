@@ -1,4 +1,5 @@
 package edu.ualberta.med.biobank.forms;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -30,7 +31,6 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.SampleDerivativeType;
-import edu.ualberta.med.biobank.model.SdataType;
 import edu.ualberta.med.biobank.model.StorageType;
 import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.StorageTypeAdapter;
@@ -198,24 +198,20 @@ public class StorageTypeEntryForm extends BiobankEditForm {
 
         HashMap<Integer, String> availSampleDerivTypes = 
             new HashMap<Integer, String>();
-        HashMap<Integer, String> selSampleDerivTypes = 
-            new HashMap<Integer, String>();
+        List<Integer> selSampleDerivTypes = new ArrayList<Integer>();
 
         if (stSamplesTypes != null) {
             for (SampleDerivativeType sampleType : stSamplesTypes) {
-                selSampleDerivTypes.put(sampleType.getId(), 
-                    sampleType.getNameShort());
+                selSampleDerivTypes.add(sampleType.getId());
             }
-            samplesMultiSelect.addSelected(selSampleDerivTypes);
         }
         
         for (SampleDerivativeType sampleType : allSampleDerivTypes) {
-            if (selSampleDerivTypes.get(sampleType.getId()) == null) {
-                availSampleDerivTypes.put(sampleType.getId(), 
+            availSampleDerivTypes.put(sampleType.getId(), 
                     sampleType.getNameShort());
-            }
         }
-        samplesMultiSelect.addAvailable(availSampleDerivTypes);
+        samplesMultiSelect.addSelections(availSampleDerivTypes, 
+            selSampleDerivTypes);
     }
     
     protected void createButtons() {

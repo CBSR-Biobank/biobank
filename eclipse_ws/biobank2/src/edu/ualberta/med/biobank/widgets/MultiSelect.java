@@ -13,7 +13,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.forms.widgets.FormToolkit;
-import org.springframework.util.Assert;
 
 import edu.ualberta.med.biobank.forms.FormUtils;
 
@@ -32,17 +31,11 @@ public class MultiSelect extends Composite {
 		new MultiSelectNode(null, 0, "availRoot");
 	
 	private int minHeight;
-	
-	HashMap<String, Integer> availableInv;
-    
-    HashMap<String, Integer> selectedInv;
 
 	public MultiSelect(Composite parent,int style, String leftLabel, 
 			String rightLabel, int minHeight) {
 		super(parent, style);
 		
-		availableInv = new HashMap<String, Integer>();		
-		selectedInv = new HashMap<String, Integer>();      
 		this.minHeight = minHeight;
 		
 		setLayout(new GridLayout(2, false));
@@ -103,29 +96,19 @@ public class MultiSelect extends Composite {
 		}
 	}
 	
-	public void addAvailable(HashMap<Integer, String> available) {
-		// create an inverse map
+	public void addSelections(HashMap<Integer, String> available,
+	    List<Integer> selected) {
 		for (int key : available.keySet()) {
-			availableInv.put(available.get(key), key);
-		}
-		
-		for (int key : available.keySet()) {
-			availTreeRootNode.addChild(new MultiSelectNode(
-					availTreeRootNode, key, available.get(key)));
+		    if (selected.contains(key)) {
+		        selTreeRootNode.addChild(new MultiSelectNode(
+		            selTreeRootNode, key, available.get(key)));
+		    }
+		    else {
+		        availTreeRootNode.addChild(new MultiSelectNode(
+		            availTreeRootNode, key, available.get(key)));
+		    }
 		}
 	}
-    
-    public void addSelected(HashMap<Integer, String> selected) {
-        // create an inverse map
-        for (int key : selected.keySet()) {
-            selectedInv.put(selected.get(key), key);
-        }
-        
-        for (int key : selected.keySet()) {
-            selTreeRootNode.addChild(new MultiSelectNode(
-                    selTreeRootNode, key, selected.get(key)));
-        }
-    }
 	
 	/**
 	 * Return the selected items in the order specified by user.
@@ -134,15 +117,7 @@ public class MultiSelect extends Composite {
 	public List<Integer> getSelected() {
 		List<Integer> result = new ArrayList<Integer>();		
 		for (MultiSelectNode node : selTreeRootNode.getChildren()) {
-			if (selectedInv.containsKey(node.getName())) {
-				result.add(selectedInv.get(node.getName()));
-			}
-			else if (availableInv.containsKey(node.getName())) {
-				result.add(availableInv.get(node.getName()));
-			}
-			else {
-				Assert.isTrue(false, "key " + node.getName() + " not found");
-			}
+		    result.add(node.getId());
 		}		
 		return result;
 	}

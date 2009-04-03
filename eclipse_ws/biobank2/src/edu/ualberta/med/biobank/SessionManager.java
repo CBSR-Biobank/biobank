@@ -76,7 +76,10 @@ public class SessionManager {
 
 			view.getTreeViewer().expandToLevel(element, 1);
 
-			if (element instanceof SiteAdapter) {
+			if (element instanceof SessionAdapter) {
+                // do nothing
+            }
+            else if (element instanceof SiteAdapter) {
 				openSiteViewForm((SiteAdapter) element);
 			}
             else if (element instanceof StudyAdapter) {

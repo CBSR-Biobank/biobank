@@ -184,21 +184,18 @@ public class StudyEntryForm extends BiobankEditForm {
         allClinics = site.getClinicCollection();
 
         HashMap<Integer, String> availClinics = new HashMap<Integer, String>();
-        HashMap<Integer, String> selClinics = new HashMap<Integer, String>();
+        List<Integer> selClinics = new ArrayList<Integer>();
 
         if (studyClinics != null) {
             for (Clinic clinic : studyClinics) {
-                selClinics.put(clinic.getId(), clinic.getName());
+                selClinics.add(clinic.getId());
             }
-            clinicsMultiSelect.addSelected(selClinics);
         }
         
         for (Clinic clinic : allClinics) {
-            if (selClinics.get(clinic.getId()) == null) {
-                availClinics.put(clinic.getId(), clinic.getName());
-            }
+            availClinics.put(clinic.getId(), clinic.getName());
         }
-        clinicsMultiSelect.addAvailable(availClinics);
+        clinicsMultiSelect.addSelections(availClinics, selClinics);
     }
     
     private void createSdataSection() {
