@@ -18,10 +18,12 @@ import org.springframework.util.Assert;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.model.StorageType;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.ClinicAdapter;
 import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
+import edu.ualberta.med.biobank.treeview.StorageTypeAdapter;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankCollectionTable;
 
@@ -68,6 +70,7 @@ public class SiteViewForm extends AddressViewForm {
 		createStudySection();
 		FormUtils.createClinicSection(toolkit, form.getBody(), 
 		        siteAdapter.getClinicGroupNode(), site.getClinicCollection());
+		createStorageTypesSection();
 		createButtons();
         
         bindValues();
@@ -95,8 +98,6 @@ public class SiteViewForm extends AddressViewForm {
         section.setLayout(new GridLayout(1, false));
         section.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));  
         
-        // hack required here because site.getStudyCollection().toArray(new Study[0])
-        // returns Object[].        
         Collection<Study> studies = site.getStudyCollection();
         StudyAdapter [] studyAdapters = new StudyAdapter [studies.size()];
         int count = 0;
@@ -110,6 +111,33 @@ public class SiteViewForm extends AddressViewForm {
         String [] headings = new String[] {"Name", "Short Name", "Num. Patients"};      
         BiobankCollectionTable comp = 
             new BiobankCollectionTable(section, SWT.NONE, headings, studyAdapters);
+        section.setClient(comp);
+        comp.adaptToToolkit(toolkit);   
+        toolkit.paintBordersFor(comp);
+        
+        comp.getTableViewer().addDoubleClickListener(
+                FormUtils.getBiobankCollectionDoubleClickListener());
+    }
+    
+    private void createStorageTypesSection() {        
+        Section section = toolkit.createSection(form.getBody(), 
+            Section.TWISTIE | Section.TITLE_BAR | Section.EXPANDED);
+        section.setText("Storage Types");
+        section.setLayout(new GridLayout(1, false));
+        section.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));  
+        
+        Collection<StorageType> collection = site.getStorageTypeCollection();
+        StorageTypeAdapter [] adapters = new StorageTypeAdapter [collection.size()];
+        int count = 0;
+        for (StorageType storageType : collection) {
+            adapters[count] = new StorageTypeAdapter(
+                    siteAdapter.getStorageTypesGroupNode(), storageType);
+            count++;
+        }
+
+        String [] headings = new String[] {"Name", "Activity Status", "Default Temperature"};      
+        BiobankCollectionTable comp = 
+            new BiobankCollectionTable(section, SWT.NONE, headings, adapters);
         section.setClient(comp);
         comp.adaptToToolkit(toolkit);   
         toolkit.paintBordersFor(comp);

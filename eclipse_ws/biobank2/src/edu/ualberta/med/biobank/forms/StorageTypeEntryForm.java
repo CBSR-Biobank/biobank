@@ -25,14 +25,16 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.Section;
 import org.springframework.remoting.RemoteAccessException;
-import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.forms.input.FormInput;
+import edu.ualberta.med.biobank.helpers.GetHelper;
 import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.SampleDerivativeType;
+import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.StorageType;
 import edu.ualberta.med.biobank.treeview.Node;
+import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.treeview.StorageTypeAdapter;
 import edu.ualberta.med.biobank.validators.DoubleNumber;
 import edu.ualberta.med.biobank.validators.IntegerNumber;
@@ -62,13 +64,13 @@ public class StorageTypeEntryForm extends BiobankEditForm {
     
     private Capacity capacity;
     
-    //private Site site;
-    
     private Button submit;
     
     private MultiSelect samplesMultiSelect;
     
-    private Collection<SampleDerivativeType> allSampleDerivTypes;
+    private List<SampleDerivativeType> allSampleDerivTypes;
+    
+    private List<StorageType> allStorageTypes;
     
     public StorageTypeEntryForm() {
         super();
@@ -86,6 +88,7 @@ public class StorageTypeEntryForm extends BiobankEditForm {
         Assert.isNotNull(node, "Null editor input");
         
         storageTypeAdapter = (StorageTypeAdapter) node;
+        appService = storageTypeAdapter.getAppService();
         storageType = storageTypeAdapter.getStorageType();       
         
         if (storageType.getId() == null) {
@@ -107,6 +110,7 @@ public class StorageTypeEntryForm extends BiobankEditForm {
         createStorageTypeSection();     
         createDimensionsSection();
         createSampleDerivTypesSection();
+        createChildStorageTypesSection();
         createButtons();
     }
     
@@ -173,11 +177,14 @@ public class StorageTypeEntryForm extends BiobankEditForm {
     }
     
     private void createSampleDerivTypesSection() {
-        storageType.getHoldsStorageTypeCollection();
         Collection<SampleDerivativeType> stSamplesTypes = 
             storageType.getSampleDerivativeTypeCollection();
         
-        allSampleDerivTypes = getAllSampleDerivativeTypes();
+        GetHelper<SampleDerivativeType> helper = 
+            new GetHelper<SampleDerivativeType>();
+        
+        allSampleDerivTypes = helper.getModelObjects(
+            appService, SampleDerivativeType.class);
         
         Section section = toolkit.createSection(form.getBody(), 
                 Section.TWISTIE | Section.TITLE_BAR | Section.EXPANDED);
@@ -212,6 +219,48 @@ public class StorageTypeEntryForm extends BiobankEditForm {
         }
         samplesMultiSelect.addSelections(availSampleDerivTypes, 
             selSampleDerivTypes);
+    }
+    
+    private void createChildStorageTypesSection() {
+        Collection<StorageType> childStorageTypes = 
+            storageType.getChildStorageTypeCollection();
+        
+        GetHelper<StorageType> helper = new GetHelper<StorageType>();
+        
+        allStorageTypes = helper.getModelObjects(appService, StorageType.class);
+        
+        Section section = toolkit.createSection(form.getBody(), 
+                Section.TWISTIE | Section.TITLE_BAR | Section.EXPANDED);
+        section.setText("Contains Storage Types");
+        
+        section.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));     
+        Composite client = toolkit.createComposite(section);
+        section.setClient(client);
+        GridLayout layout = new GridLayout(2, false);
+        layout.horizontalSpacing = 10;
+        client.setLayout(layout);
+        client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        toolkit.paintBordersFor(client);  
+        
+        samplesMultiSelect = new MultiSelect(client, SWT.NONE, 
+                "Selected Storage Types", "Available Storage Types", 100);
+        samplesMultiSelect.adaptToToolkit(toolkit);
+
+        HashMap<Integer, String> availStorageTypes = 
+            new HashMap<Integer, String>();
+        List<Integer> selChildStorageTypes = new ArrayList<Integer>();
+
+        if (childStorageTypes != null) {
+            for (StorageType childStorageType : childStorageTypes) {
+                selChildStorageTypes.add(childStorageType.getId());
+            }
+        }
+        
+        for (StorageType storageType : allStorageTypes) {
+            availStorageTypes.put(storageType.getId(), storageType.getName());
+        }
+        samplesMultiSelect.addSelections(availStorageTypes, 
+            selChildStorageTypes);
     }
     
     protected void createButtons() {
@@ -263,7 +312,7 @@ public class StorageTypeEntryForm extends BiobankEditForm {
                     "insert invoked on capacity already in database");
                 
                 query = new InsertExampleQuery(capacity);                  
-                result = storageTypeAdapter.getAppService().executeQuery(query);
+                result = appService.executeQuery(query);
                 storageType.setCapacity((Capacity) result.getObjectResult());
                 query = new InsertExampleQuery(storageType);   
             }
@@ -272,13 +321,24 @@ public class StorageTypeEntryForm extends BiobankEditForm {
                     "update invoked on address not in database");
 
                 query = new UpdateExampleQuery(capacity);                  
-                result = storageTypeAdapter.getAppService().executeQuery(query);
+                result = appService.executeQuery(query);
                 storageType.setCapacity((Capacity) result.getObjectResult());
                 query = new UpdateExampleQuery(storageType);   
             }
             
-            result = storageTypeAdapter.getAppService().executeQuery(query);
+            result = appService.executeQuery(query);
             storageType = (StorageType) result.getObjectResult();
+            
+            // associate the storage type to it's site
+            Site site = (Site) ((SiteAdapter) storageTypeAdapter.getParent().getParent()).getSite();
+            Assert.isTrue((site.getId() != null) && (site.getId() != 0),
+                "site is not in the database");
+            Collection<StorageType> collection = site.getStorageTypeCollection();
+            collection.add(storageType);
+            site.setStorageTypeCollection(collection);
+
+            query = new UpdateExampleQuery(site);
+            appService.executeQuery(query);
         }
         catch (final RemoteAccessException exp) {
             Display.getDefault().asyncExec(new Runnable() {
@@ -296,29 +356,5 @@ public class StorageTypeEntryForm extends BiobankEditForm {
         
         SessionManager.getInstance().updateStorageTypes(storageTypeAdapter);      
         getSite().getPage().closeEditor(this, false);    
-    }
-    
-    private List<SampleDerivativeType> getAllSampleDerivativeTypes() {        
-        SampleDerivativeType sample = new SampleDerivativeType();
-
-        try {
-            return storageTypeAdapter.getAppService().search(
-                SampleDerivativeType.class, sample);
-        }
-        catch (final RemoteConnectFailureException exp) {
-            Display.getDefault().asyncExec(new Runnable() {
-                public void run() {
-                    MessageDialog.openError(
-                        PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-                        .getShell(),
-                        "Connection Attempt Failed",
-                        "Could not connect to server. Make sure server is running.");
-                }
-            });
-        }
-        catch (Exception exp) {
-            exp.printStackTrace();
-        }
-        return null;
     }
 }

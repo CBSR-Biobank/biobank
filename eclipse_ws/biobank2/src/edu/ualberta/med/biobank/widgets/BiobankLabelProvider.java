@@ -6,9 +6,9 @@ import org.eclipse.swt.graphics.Image;
 
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.Sdata;
-import edu.ualberta.med.biobank.model.StorageContainer;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.ClinicAdapter;
+import edu.ualberta.med.biobank.treeview.StorageTypeAdapter;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
 
 /**
@@ -45,14 +45,12 @@ public class BiobankLabelProvider extends LabelProvider implements ITableLabelPr
                 case 0: return patient.getNumber();
             }
         }
-        else if (element instanceof StorageContainer) {
-            final StorageContainer container = (StorageContainer) element;
+        else if (element instanceof StorageTypeAdapter) {
+            final StorageTypeAdapter adapter = (StorageTypeAdapter) element;
             switch (columnIndex) {
-                case 0: return container.getName();
-                case 1: return container.getActivityStatus();
-                case 2: return container.getBarcode();
-                case 3: return container.getFull() ? "Y" : "N";
-                case 4: return "" + container.getTemperature();
+                case 0: return adapter.getName();
+                case 1: return adapter.getStorageType().getActivityStatus();
+                case 2: return "" + adapter.getStorageType().getDefaultTemperature();
             }
         }
         else if (element instanceof Sdata) {
