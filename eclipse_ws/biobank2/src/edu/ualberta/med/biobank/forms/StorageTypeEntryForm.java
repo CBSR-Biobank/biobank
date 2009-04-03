@@ -1,4 +1,8 @@
 package edu.ualberta.med.biobank.forms;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+
 import org.eclipse.core.databinding.beans.PojoObservables;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IStatus;
@@ -20,16 +24,20 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.Section;
 import org.springframework.remoting.RemoteAccessException;
+import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Capacity;
+import edu.ualberta.med.biobank.model.SampleDerivativeType;
+import edu.ualberta.med.biobank.model.SdataType;
 import edu.ualberta.med.biobank.model.StorageType;
 import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.StorageTypeAdapter;
 import edu.ualberta.med.biobank.validators.DoubleNumber;
 import edu.ualberta.med.biobank.validators.IntegerNumber;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
+import edu.ualberta.med.biobank.widgets.MultiSelect;
 import gov.nih.nci.system.query.SDKQuery;
 import gov.nih.nci.system.query.SDKQueryResult;
 import gov.nih.nci.system.query.example.InsertExampleQuery;
@@ -57,6 +65,10 @@ public class StorageTypeEntryForm extends BiobankEditForm {
     //private Site site;
     
     private Button submit;
+    
+    private MultiSelect samplesMultiSelect;
+    
+    private Collection<SampleDerivativeType> allSampleDerivTypes;
     
     public StorageTypeEntryForm() {
         super();
@@ -94,7 +106,7 @@ public class StorageTypeEntryForm extends BiobankEditForm {
         form.getBody().setLayout(new GridLayout(1, false));
         createStorageTypeSection();     
         createDimensionsSection();
-        createContentsSection();
+        createSampleDerivTypesSection();
         createButtons();
     }
     
@@ -160,10 +172,16 @@ public class StorageTypeEntryForm extends BiobankEditForm {
             IntegerNumber.class, "Dimension two capacity is not a valid nubmer");
     }
     
-    private void createContentsSection() {
+    private void createSampleDerivTypesSection() {
+        storageType.getHoldsStorageTypeCollection();
+        Collection<SampleDerivativeType> stSamplesTypes = 
+            storageType.getSampleDerivativeTypeCollection();
+        
+        allSampleDerivTypes = getAllSampleDerivativeTypes();
+        
         Section section = toolkit.createSection(form.getBody(), 
                 Section.TWISTIE | Section.TITLE_BAR | Section.EXPANDED);
-        section.setText("Contents");
+        section.setText("Contains Sample Derivative Types");
         
         section.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));     
         Composite client = toolkit.createComposite(section);
@@ -173,6 +191,31 @@ public class StorageTypeEntryForm extends BiobankEditForm {
         client.setLayout(layout);
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);  
+        
+        samplesMultiSelect = new MultiSelect(client, SWT.NONE, 
+                "Selected Sample Derivatives", "Available Sample Derivatives", 100);
+        samplesMultiSelect.adaptToToolkit(toolkit);
+
+        HashMap<Integer, String> availSampleDerivTypes = 
+            new HashMap<Integer, String>();
+        HashMap<Integer, String> selSampleDerivTypes = 
+            new HashMap<Integer, String>();
+
+        if (stSamplesTypes != null) {
+            for (SampleDerivativeType sampleType : stSamplesTypes) {
+                selSampleDerivTypes.put(sampleType.getId(), 
+                    sampleType.getNameShort());
+            }
+            samplesMultiSelect.addSelected(selSampleDerivTypes);
+        }
+        
+        for (SampleDerivativeType sampleType : allSampleDerivTypes) {
+            if (selSampleDerivTypes.get(sampleType.getId()) == null) {
+                availSampleDerivTypes.put(sampleType.getId(), 
+                    sampleType.getNameShort());
+            }
+        }
+        samplesMultiSelect.addAvailable(availSampleDerivTypes);
     }
     
     protected void createButtons() {
@@ -257,5 +300,29 @@ public class StorageTypeEntryForm extends BiobankEditForm {
         
         SessionManager.getInstance().updateStorageTypes(storageTypeAdapter);      
         getSite().getPage().closeEditor(this, false);    
+    }
+    
+    private List<SampleDerivativeType> getAllSampleDerivativeTypes() {        
+        SampleDerivativeType sample = new SampleDerivativeType();
+
+        try {
+            return storageTypeAdapter.getAppService().search(
+                SampleDerivativeType.class, sample);
+        }
+        catch (final RemoteConnectFailureException exp) {
+            Display.getDefault().asyncExec(new Runnable() {
+                public void run() {
+                    MessageDialog.openError(
+                        PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+                        .getShell(),
+                        "Connection Attempt Failed",
+                        "Could not connect to server. Make sure server is running.");
+                }
+            });
+        }
+        catch (Exception exp) {
+            exp.printStackTrace();
+        }
+        return null;
     }
 }

@@ -8,10 +8,18 @@
 
 -->
 
+<property environment="env"/>
 <property name="cacore.sdk.dir" location="caCORE_SDK/sdk" />
 <property name="eclipse.proj.dir" location="eclipse_ws/biobank2" />
+<property name="data.dir" location="data" />
+<property name="data.sql.dir" location="${data.dir}/sql" />
 <property name="schema.dir" location="schema" />
-<property environment="env"/>
+<property name="mysql.driver.string" value="org.gjt.mm.mysql.Driver" />
+<property name="database.host" value="localhost" />
+<property name="database.port" value="3306" />
+<property name="database.name" value="biobank2" />
+<property name="database.username" value="dummy" />
+<property name="database.password" value="ozzy498" />
 
 <target name="sdk"
         description="builds the caCORE SDK from the data model" >
@@ -63,6 +71,22 @@
      dir="${schema.dir}"
      target="schemaexport"
      inheritRefs="false" />
+</target>
+
+<target name="dbcreate">
+  <antcall target="schema" />
+  <sql driver="${mysql.driver.string}"
+        url="jdbc:mysql://${database.host}:${database.port}/${database.name}"
+        userid="${database.username}" password="${database.password}" >
+    <transaction src="${data.sql.dir}/sampleTypes.sql" />
+    <transaction src="${data.sql.dir}/sdataTypes.sql" />
+    <transaction>commit;</transaction>
+    <classpath>
+      <fileset dir="${cacore.sdk.dir}/system/lib">
+	<include name="*.jar" />
+      </fileset>
+    </classpath>
+  </sql>
 </target>
 
 <target name="clean">
