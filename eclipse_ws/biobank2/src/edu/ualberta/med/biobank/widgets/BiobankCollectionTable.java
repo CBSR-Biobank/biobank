@@ -24,7 +24,7 @@ public class BiobankCollectionTable extends Composite {
         setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         setLayout(new GridLayout(1, false));
         
-        tableViewer = new TableViewer(this, SWT.MULTI | SWT.H_SCROLL
+        tableViewer = new TableViewer(this, SWT.BORDER | SWT.MULTI | SWT.H_SCROLL
                 | SWT.V_SCROLL | SWT.FULL_SELECTION);
         tableViewer.setLabelProvider(new BiobankLabelProvider());
         tableViewer.setContentProvider(new BiobankContentProvider());
@@ -34,7 +34,7 @@ public class BiobankCollectionTable extends Composite {
         GridData gd = new GridData(GridData.FILL_BOTH);
         gd.heightHint = 100;
         table.setLayoutData(gd);
-        table.setFont(getFont());
+        //table.setFont(getFont());
         table.setHeaderVisible(true);
         table.setLinesVisible(true);
         

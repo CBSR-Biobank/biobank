@@ -13,6 +13,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.forms.widgets.FormToolkit;
+import org.springframework.util.Assert;
 
 import edu.ualberta.med.biobank.forms.FormUtils;
 
@@ -24,9 +25,11 @@ public class MultiSelect extends Composite {
 	
 	private TreeViewer availTree;
 	
-	private MultiSelectNode selTreeRootNode = new MultiSelectNode(null, 0, "selRoot");
+	private MultiSelectNode selTreeRootNode = 
+		new MultiSelectNode(null, 0, "selRoot");
 	
-	private MultiSelectNode availTreeRootNode = new MultiSelectNode(null, 0, "availRoot");
+	private MultiSelectNode availTreeRootNode = 
+		new MultiSelectNode(null, 0, "availRoot");
 	
 	private int minHeight;
 	
@@ -131,7 +134,15 @@ public class MultiSelect extends Composite {
 	public List<Integer> getSelected() {
 		List<Integer> result = new ArrayList<Integer>();		
 		for (MultiSelectNode node : selTreeRootNode.getChildren()) {
-			result.add(selectedInv.get(node.getName()));
+			if (selectedInv.containsKey(node.getName())) {
+				result.add(selectedInv.get(node.getName()));
+			}
+			else if (availableInv.containsKey(node.getName())) {
+				result.add(availableInv.get(node.getName()));
+			}
+			else {
+				Assert.isTrue(false, "key " + node.getName() + " not found");
+			}
 		}		
 		return result;
 	}
