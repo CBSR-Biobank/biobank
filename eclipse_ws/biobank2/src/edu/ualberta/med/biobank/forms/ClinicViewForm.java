@@ -1,6 +1,6 @@
 package edu.ualberta.med.biobank.forms;
 
-import org.eclipse.core.databinding.DataBindingContext;
+import org.eclipse.core.databinding.beans.PojoObservables;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -20,7 +20,7 @@ import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.treeview.ClinicAdapter;
 
-public class ClinicViewForm  extends AddressViewForm {	
+public class ClinicViewForm  extends AddressViewFormCommon {	
 	public static final String ID =
 	      "edu.ualberta.med.biobank.forms.ClinicViewForm";
 
@@ -50,29 +50,46 @@ public class ClinicViewForm  extends AddressViewForm {
 		GridLayout layout = new GridLayout(1, false);
 		form.getBody().setLayout(layout);
 		form.getBody().setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		
-		Composite client = toolkit.createComposite(form.getBody());
-		client.setLayout(new GridLayout(4, false));
-		client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));		
-		toolkit.paintBordersFor(client);	
-		
+		createClinicSection();
+        createStudiesSection();
+        createButtonsSection();
+	}
+    
+    private void createClinicSection() {    
+        Composite client = toolkit.createComposite(form.getBody());
+        client.setLayout(new GridLayout(2, false));
+        client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        toolkit.paintBordersFor(client);
+        
+        createBoundWidget(client, Label.class, SWT.NONE, "Activity Status",
+            PojoObservables.observeValue(clinic, "activityStatus"));
+        
+        Label comments = (Label) createBoundWidget(client, Label.class, 
+            SWT.NONE, "Comments", PojoObservables.observeValue(clinic, "comment"));
+        GridData gd = new GridData();
+        gd.heightHint = 100;
+        comments.setLayoutData(gd);		
 		createAddressArea(client);
-
+	}
+	
+	protected void createStudiesSection() {
 		Section section = toolkit.createSection(form.getBody(),  
 				ExpandableComposite.TITLE_BAR | ExpandableComposite.TWISTIE
 				| ExpandableComposite.EXPANDED);
 		section.setText("Associated Studies");
 		//section.setFont(FormUtils.getSectionFont());
 		section.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		client = toolkit.createComposite(section);
+		Composite client = toolkit.createComposite(section);
 		client.setLayout(new GridLayout(4, false));
 		client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));		
 		section.setClient(client);
-		toolkit.paintBordersFor(client);
+		toolkit.paintBordersFor(client);	
 		
-		// studies go here
-
-		client = toolkit.createComposite(form.getBody());
+		// TODO studies go here
+	}
+	
+	protected void createButtonsSection() {
+		Composite client = toolkit.createComposite(form.getBody());
 		client.setLayout(new GridLayout(4, false));
 		toolkit.paintBordersFor(client);
 
@@ -91,13 +108,6 @@ public class ClinicViewForm  extends AddressViewForm {
 				}
 			}
 		});
-		
-		bindValues();
 	}
-    
-    private void bindValues() {
-    	DataBindingContext dbc = new DataBindingContext();    	
-    	super.bindValues(dbc);
-    }
 }
 

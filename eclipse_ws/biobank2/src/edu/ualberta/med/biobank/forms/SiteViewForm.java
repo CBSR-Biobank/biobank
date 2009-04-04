@@ -1,7 +1,8 @@
 package edu.ualberta.med.biobank.forms;
 
 import java.util.Collection;
-import org.eclipse.core.databinding.DataBindingContext;
+
+import org.eclipse.core.databinding.beans.PojoObservables;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -9,6 +10,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
@@ -25,7 +27,7 @@ import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankCollectionTable;
 
-public class SiteViewForm extends AddressViewForm {	
+public class SiteViewForm extends AddressViewFormCommon {	
 	public static final String ID =
 	      "edu.ualberta.med.biobank.forms.SiteViewForm";
 	
@@ -64,39 +66,39 @@ public class SiteViewForm extends AddressViewForm {
 		form.getBody().setLayout(new GridLayout(1, false));
 		form.getBody().setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		
+		createSiteSection();
 		createAddressSection();
 		createStudySection();
 		FormUtils.createClinicSection(toolkit, form.getBody(), 
 		        siteAdapter.getClinicGroupNode(), site.getClinicCollection());
 		createButtons();
-        
-        bindValues();
 	}
+    
+    private void createSiteSection() {    
+		Composite client = toolkit.createComposite(form.getBody());
+		client.setLayout(new GridLayout(2, false));
+		client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		toolkit.paintBordersFor(client);
+		
+    	createBoundWidget(client, Label.class, SWT.NONE, "Activity Status",
+    	    PojoObservables.observeValue(site, "activityStatus"));
+		
+    	Label comments = (Label) createBoundWidget(client, Label.class, 
+    	    SWT.NONE, "Comments", PojoObservables.observeValue(site, "comment"));
+    	GridData gd = new GridData();
+    	gd.heightHint = 100;
+    	comments.setLayoutData(gd);
+    }
 	
-	private void createAddressSection() {        
-        Section section = toolkit.createSection(form.getBody(), 
-            Section.TWISTIE | Section.TITLE_BAR); // | Section.EXPANDED);
-        section.setText("Address");
-        section.setLayout(new GridLayout(1, false));
-        section.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));        
-        Composite client;
-        client = toolkit.createComposite(section);
-        section.setClient(client);
-        
-        client.setLayout(new GridLayout(2, false));
-        toolkit.paintBordersFor(client);     
+	private void createAddressSection() {   
+		Composite client = createSectionWithClient("Address");
+        Section section = (Section) client.getParent();
+        section.setExpanded(false);
         createAddressArea(client);
 	}
 	
     private void createStudySection() {        
-        Section section = toolkit.createSection(form.getBody(), 
-            Section.TWISTIE | Section.TITLE_BAR | Section.EXPANDED);
-        section.setText("Studies");
-        section.setLayout(new GridLayout(1, false));
-        section.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));  
-        
-        // hack required here because site.getStudyCollection().toArray(new Study[0])
-        // returns Object[].        
+		Composite client = createSectionWithClient("Studies");
         Collection<Study> studies = site.getStudyCollection();
         StudyAdapter [] studyAdapters = new StudyAdapter [studies.size()];
         int count = 0;
@@ -109,8 +111,7 @@ public class SiteViewForm extends AddressViewForm {
 
         String [] headings = new String[] {"Name", "Short Name", "Num. Patients"};      
         BiobankCollectionTable comp = 
-            new BiobankCollectionTable(section, SWT.NONE, headings, studyAdapters);
-        section.setClient(comp);
+            new BiobankCollectionTable(client, SWT.NONE, headings, studyAdapters);
         comp.adaptToToolkit(toolkit);   
         toolkit.paintBordersFor(comp);
         
@@ -119,9 +120,7 @@ public class SiteViewForm extends AddressViewForm {
     }
 	
 	private void createButtons() {      
-        Composite client;
-        
-		client = toolkit.createComposite(form.getBody());
+		Composite client = toolkit.createComposite(form.getBody());
 		client.setLayout(new GridLayout(4, false));
 		toolkit.paintBordersFor(client);
 
@@ -176,10 +175,5 @@ public class SiteViewForm extends AddressViewForm {
 			}
 		});
 	}
-    
-    private void bindValues() {
-    	DataBindingContext dbc = new DataBindingContext();    	
-    	super.bindValues(dbc);
-    }
 }
 
