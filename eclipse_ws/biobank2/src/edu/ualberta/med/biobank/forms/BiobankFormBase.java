@@ -83,7 +83,9 @@ public abstract class BiobankFormBase extends EditorPart {
     protected Section createSection(String title) {
         Section section = toolkit.createSection(form.getBody(),
                 Section.TWISTIE | Section.TITLE_BAR | Section.EXPANDED); 
-        section.setText(title);
+        if (title != null) {
+            section.setText(title);
+        }
         section.setLayout(new GridLayout(1, false));
         section.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         section.addExpansionListener(new ExpansionAdapter() {
@@ -100,7 +102,7 @@ public abstract class BiobankFormBase extends EditorPart {
         client = toolkit.createComposite(section);
         section.setClient(client);
         
-        client.setLayout(new GridLayout(1, false));
+        client.setLayout(new GridLayout(2, false));
         toolkit.paintBordersFor(client); 
         return client;
     }

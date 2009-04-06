@@ -98,18 +98,7 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
 	}
 	
 	private void createClinicInfoSection() {
-		
-		Section section = toolkit.createSection(form.getBody(), 
-				ExpandableComposite.TITLE_BAR
-				| ExpandableComposite.EXPANDED);
-		section.setText("Clinic");
-		Composite client = toolkit.createComposite(section);
-		section.setClient(client);
-		section.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		GridLayout layout = new GridLayout(2, false);
-		layout.horizontalSpacing = 10;
-		client.setLayout(layout);
-		toolkit.paintBordersFor(client);	
+	    Composite client = createSectionWithClient("Clinic");
 
 		name = (Text) createBoundWidget(client, Text.class, SWT.NONE, "Name", null,
 		    PojoObservables.observeValue(clinic, "name"),
@@ -130,14 +119,7 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
 	}
 	
 	private void createButtonsSection() {
-		Section section = toolkit.createSection(form.getBody(), SWT.NONE);
-		Composite client = toolkit.createComposite(section);
-		section.setClient(client);
-		section.setLayoutData(new GridData(GridData.FILL_BOTH));
-		GridLayout layout = new GridLayout(2, false);
-		client.setLayout(layout);
-		toolkit.paintBordersFor(client);
-
+        Composite client = createSectionWithClient(null);
 		submit = toolkit.createButton(client, "Submit", SWT.PUSH);
 		submit.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
