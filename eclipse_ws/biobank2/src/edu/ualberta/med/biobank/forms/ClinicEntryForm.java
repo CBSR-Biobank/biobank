@@ -52,8 +52,6 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
 
 	public void init(IEditorSite editorSite, IEditorInput input) throws PartInitException {
 		super.init(editorSite, input);
-		if ( !(input instanceof FormInput)) 
-			throw new PartInitException("Invalid editor input");
 		
 		FormInput clinicInput = (FormInput) input;
 		

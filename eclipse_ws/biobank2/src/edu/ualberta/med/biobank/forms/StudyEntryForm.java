@@ -25,7 +25,6 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.forms.widgets.Section;
 import org.springframework.remoting.RemoteAccessException;
 import org.springframework.remoting.RemoteConnectFailureException;
 
@@ -77,7 +76,7 @@ public class StudyEntryForm extends BiobankEditForm {
 	            "Activity Status", Combo.class, SWT.NONE, 
 	            FormConstants.ACTIVITY_STATUS, null, null));
 	        put("comment", new FieldInfo(
-	            "Comments", Text.class, SWT.NONE, null, null, null));
+	            "Comments", Text.class, SWT.MULTI, null, null, null));
 	    }
 	};
 	
@@ -105,8 +104,6 @@ public class StudyEntryForm extends BiobankEditForm {
 	@Override
 	public void init(IEditorSite editorSite, IEditorInput input)
 			throws PartInitException {
-		if ( !(input instanceof FormInput)) 
-			throw new PartInitException("Invalid editor input");
 		
 		super.init(editorSite, input);
 		
@@ -147,39 +144,17 @@ public class StudyEntryForm extends BiobankEditForm {
 		
         createWidgetsFromHashMap(FIELDS, ORDERED_FIELDS, study, client);
         Text comments = (Text) controls.get("comment");
-        GridData gd = new GridData(GridData.FILL_HORIZONTAL);
+        GridData gd = (GridData) comments.getLayoutData();
         gd.heightHint = 40;
-        comments.setLayoutData(gd);
+        //comments.setLayoutData(gd);
 		
 		createClinicSection();
 		createSdataSection();
-
-        client = toolkit.createComposite(form.getBody());
-        layout = new GridLayout(2, false);
-        layout.horizontalSpacing = 10;
-        client.setLayout(layout);
-        client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        toolkit.paintBordersFor(client);
-
-        submit = toolkit.createButton(client, "Submit", SWT.PUSH);
-        submit.addSelectionListener(new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent e) {
-                doSaveInternal();
-            }
-        });
-	}
+		createButtonsSection();
+    }
     
     private void createClinicSection() {
-        Section section = toolkit.createSection(form.getBody(), 
-                Section.TWISTIE | Section.TITLE_BAR | Section.EXPANDED);
-        section.setText("Clinic Selection");
-        section.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        
-        clinicsMultiSelect = new MultiSelect(section, SWT.NONE, 
-                "Selected Clinics", "Available Clinics", 100);
-        section.setClient(clinicsMultiSelect);
-        clinicsMultiSelect.adaptToToolkit(toolkit);
-        
+        Composite client = createSectionWithClient("Available Clinics");        
         Collection<Clinic> studyClinics = study.getClinicCollection(); 
         allClinics = site.getClinicCollection();
 
@@ -195,10 +170,15 @@ public class StudyEntryForm extends BiobankEditForm {
         for (Clinic clinic : allClinics) {
             availClinics.put(clinic.getId(), clinic.getName());
         }
+        
+        clinicsMultiSelect = new MultiSelect(client, SWT.NONE, 
+                "Selected Clinics", "Available Clinics", 100);
+        clinicsMultiSelect.adaptToToolkit(toolkit);
         clinicsMultiSelect.addSelections(availClinics, selClinics);
     }
     
     private void createSdataSection() {
+        Composite client = createSectionWithClient("Study Information Selection");  
         Collection<Sdata> studySdata = study.getSdataCollection();
         HashMap<Integer, Sdata> selected = new HashMap<Integer, Sdata>();
         
@@ -209,20 +189,6 @@ public class StudyEntryForm extends BiobankEditForm {
         }
             
         allSdataTypes = getAllSdataTypes();
-
-        Section section = toolkit.createSection(form.getBody(), 
-                Section.TWISTIE | Section.TITLE_BAR | Section.EXPANDED);
-        section.setText("Study Information Selection");
-        section.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-
-        Composite client = toolkit.createComposite(section);
-        section.setClient(client);        
-        GridLayout layout = new GridLayout(1, false);
-        layout.verticalSpacing = 0;
-        layout.marginHeight = 0;
-        client.setLayout(layout);
-        client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        toolkit.paintBordersFor(client);
         
         for (SdataType sdataType : allSdataTypes) {
             String value = "";
@@ -238,7 +204,22 @@ public class StudyEntryForm extends BiobankEditForm {
             w.adaptToToolkit(toolkit);
             sdataWidgets.put(sdataType.getType(), w);
         }
-        
+    }
+    
+    private void createButtonsSection() {        
+        Composite client = toolkit.createComposite(form.getBody());
+        GridLayout layout = new GridLayout(2, false);
+        layout.horizontalSpacing = 10;
+        client.setLayout(layout);
+        client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        toolkit.paintBordersFor(client);
+
+        submit = toolkit.createButton(client, "Submit", SWT.PUSH);
+        submit.addSelectionListener(new SelectionAdapter() {
+            public void widgetSelected(SelectionEvent e) {
+                doSaveInternal();
+            }
+        });
     }
 	
 	private String getOkMessage() {

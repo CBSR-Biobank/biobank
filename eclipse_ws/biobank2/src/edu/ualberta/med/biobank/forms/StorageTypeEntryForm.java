@@ -1,9 +1,13 @@
 package edu.ualberta.med.biobank.forms;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.eclipse.core.databinding.beans.PojoObservables;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IStatus;
@@ -23,7 +27,6 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.forms.widgets.Section;
 import org.springframework.remoting.RemoteAccessException;
 
 import edu.ualberta.med.biobank.SessionManager;
@@ -58,6 +61,8 @@ public class StorageTypeEntryForm extends BiobankEditForm {
     private static final String NO_STORAGE_TYPE_NAME_MESSAGE = 
         "Storage type must have a name";
     
+    static Logger log4j = Logger.getLogger(SessionManager.class.getName());
+    
     private StorageTypeAdapter storageTypeAdapter;
     
     private StorageType storageType;
@@ -68,9 +73,11 @@ public class StorageTypeEntryForm extends BiobankEditForm {
     
     private MultiSelect samplesMultiSelect;
     
+    private MultiSelect childStorageTypesMultiSelect;
+    
     private List<SampleDerivativeType> allSampleDerivTypes;
     
-    private List<StorageType> allStorageTypes;
+    private Collection<StorageType> allStorageTypes;
     
     public StorageTypeEntryForm() {
         super();
@@ -78,10 +85,7 @@ public class StorageTypeEntryForm extends BiobankEditForm {
 
     @Override
     public void init(IEditorSite editorSite, IEditorInput input)
-            throws PartInitException {
-        if ( !(input instanceof FormInput)) 
-            throw new PartInitException("Invalid editor input");
-        
+            throws PartInitException {        
         super.init(editorSite, input);
         
         Node node = ((FormInput) input).getNode();
@@ -145,17 +149,11 @@ public class StorageTypeEntryForm extends BiobankEditForm {
     }
     
     private void createDimensionsSection() {
-        Section section = toolkit.createSection(form.getBody(), 
-            Section.TITLE_BAR | Section.EXPANDED);
-        section.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        section.setText("Default Capacity");
+        Composite client = createSectionWithClient("Default Capacity");
         
-        section.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));     
-        Composite client = toolkit.createComposite(section);
-        section.setClient(client);
-        GridLayout layout = new GridLayout(2, false);
+        GridLayout layout = (GridLayout) client.getLayout();
+        layout.numColumns = 2;
         layout.horizontalSpacing = 10;
-        client.setLayout(layout);
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);  
         
@@ -177,6 +175,10 @@ public class StorageTypeEntryForm extends BiobankEditForm {
     }
     
     private void createSampleDerivTypesSection() {
+        Composite client = createSectionWithClient("Contains Sample Derivative Types");
+        GridLayout layout = (GridLayout) client.getLayout();
+        layout.numColumns = 2;
+        
         Collection<SampleDerivativeType> stSamplesTypes = 
             storageType.getSampleDerivativeTypeCollection();
         
@@ -185,19 +187,6 @@ public class StorageTypeEntryForm extends BiobankEditForm {
         
         allSampleDerivTypes = helper.getModelObjects(
             appService, SampleDerivativeType.class);
-        
-        Section section = toolkit.createSection(form.getBody(), 
-                Section.TWISTIE | Section.TITLE_BAR | Section.EXPANDED);
-        section.setText("Contains Sample Derivative Types");
-        
-        section.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));     
-        Composite client = toolkit.createComposite(section);
-        section.setClient(client);
-        GridLayout layout = new GridLayout(2, false);
-        layout.horizontalSpacing = 10;
-        client.setLayout(layout);
-        client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        toolkit.paintBordersFor(client);  
         
         samplesMultiSelect = new MultiSelect(client, SWT.NONE, 
                 "Selected Sample Derivatives", "Available Sample Derivatives", 100);
@@ -221,30 +210,22 @@ public class StorageTypeEntryForm extends BiobankEditForm {
             selSampleDerivTypes);
     }
     
-    private void createChildStorageTypesSection() {
+    private void createChildStorageTypesSection() {    
+        Composite client = createSectionWithClient("Contains Storage Types");
+        GridLayout layout = (GridLayout) client.getLayout();
+        layout.numColumns = 2;
+        
         Collection<StorageType> childStorageTypes = 
             storageType.getChildStorageTypeCollection();
         
-        GetHelper<StorageType> helper = new GetHelper<StorageType>();
+        SiteAdapter siteAdapter = 
+            (SiteAdapter) storageTypeAdapter.getParent().getParent();
+        Site site = (Site) siteAdapter.getSite();
+        allStorageTypes = site.getStorageTypeCollection();
         
-        allStorageTypes = helper.getModelObjects(appService, StorageType.class);
-        
-        Section section = toolkit.createSection(form.getBody(), 
-                Section.TWISTIE | Section.TITLE_BAR | Section.EXPANDED);
-        section.setText("Contains Storage Types");
-        
-        section.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));     
-        Composite client = toolkit.createComposite(section);
-        section.setClient(client);
-        GridLayout layout = new GridLayout(2, false);
-        layout.horizontalSpacing = 10;
-        client.setLayout(layout);
-        client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        toolkit.paintBordersFor(client);  
-        
-        samplesMultiSelect = new MultiSelect(client, SWT.NONE, 
+        childStorageTypesMultiSelect = new MultiSelect(client, SWT.NONE, 
                 "Selected Storage Types", "Available Storage Types", 100);
-        samplesMultiSelect.adaptToToolkit(toolkit);
+        childStorageTypesMultiSelect.adaptToToolkit(toolkit);
 
         HashMap<Integer, String> availStorageTypes = 
             new HashMap<Integer, String>();
@@ -256,10 +237,18 @@ public class StorageTypeEntryForm extends BiobankEditForm {
             }
         }
         
-        for (StorageType storageType : allStorageTypes) {
-            availStorageTypes.put(storageType.getId(), storageType.getName());
+        int myId = 0;
+        if (storageType.getId() != null) {
+            myId = storageType.getId(); 
         }
-        samplesMultiSelect.addSelections(availStorageTypes, 
+        
+        for (StorageType storageType : allStorageTypes) {
+            int id = storageType.getId(); 
+            if (myId != id) {
+                availStorageTypes.put(id, storageType.getName());
+            }
+        }
+        childStorageTypesMultiSelect.addSelections(availStorageTypes, 
             selChildStorageTypes);
     }
     
@@ -302,7 +291,10 @@ public class StorageTypeEntryForm extends BiobankEditForm {
      * Called by base class when form data is to be saved.
      */
     @Override
-    protected void saveForm() {        
+    protected void saveForm() { 
+        saveSampleDerivativeTypes(); 
+        saveChildStorageTypes();
+        
         try {
             SDKQuery query;
             SDKQueryResult result;
@@ -338,6 +330,7 @@ public class StorageTypeEntryForm extends BiobankEditForm {
             site.setStorageTypeCollection(collection);
 
             query = new UpdateExampleQuery(site);
+            log4j.debug("site id: " + site.getId());
             appService.executeQuery(query);
         }
         catch (final RemoteAccessException exp) {
@@ -356,5 +349,35 @@ public class StorageTypeEntryForm extends BiobankEditForm {
         
         SessionManager.getInstance().updateStorageTypes(storageTypeAdapter);      
         getSite().getPage().closeEditor(this, false);    
+    }
+    
+    private void saveSampleDerivativeTypes() {
+        List<Integer> selSampleTypeIds = samplesMultiSelect.getSelected();
+        Set<SampleDerivativeType> selSampleTypes = new HashSet<SampleDerivativeType>();
+        for (SampleDerivativeType sampleType : allSampleDerivTypes) {
+            int id = sampleType.getId();
+            if (selSampleTypeIds.indexOf(id) >= 0) {
+                selSampleTypes.add(sampleType);
+            }
+            
+        }
+        Assert.isTrue(selSampleTypes.size() == selSampleTypeIds.size(), 
+                "problem with sample type selections");
+        storageType.setSampleDerivativeTypeCollection(selSampleTypes);        
+    }
+    
+    private void saveChildStorageTypes() {
+        List<Integer> selStorageTypeIds = childStorageTypesMultiSelect.getSelected();
+        Set<StorageType> selStorageTypes = new HashSet<StorageType>();
+        for (StorageType storageType : allStorageTypes) {
+            int id = storageType.getId();
+            if (selStorageTypeIds.indexOf(id) >= 0) {
+                selStorageTypes.add(storageType);
+            }
+            
+        }
+        Assert.isTrue(selStorageTypes.size() == selStorageTypeIds.size(), 
+                "problem with sample type selections");
+        storageType.setChildStorageTypeCollection(selStorageTypes);        
     }
 }

@@ -1,6 +1,8 @@
 package edu.ualberta.med.biobank.forms;
 
-import org.eclipse.core.databinding.DataBindingContext;
+import java.util.Collection;
+
+import org.eclipse.core.databinding.beans.PojoObservables;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -12,15 +14,17 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Clinic;
+import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.ClinicAdapter;
+import edu.ualberta.med.biobank.treeview.StudyAdapter;
+import edu.ualberta.med.biobank.widgets.BiobankCollectionTable;
 
-public class ClinicViewForm  extends AddressViewForm {	
+public class ClinicViewForm  extends AddressViewFormCommon {	
 	public static final String ID =
 	      "edu.ualberta.med.biobank.forms.ClinicViewForm";
 
@@ -32,8 +36,6 @@ public class ClinicViewForm  extends AddressViewForm {
 	public void init(IEditorSite editorSite, IEditorInput input)
 			throws PartInitException {
 		super.init(editorSite, input);
-		if ( !(input instanceof FormInput)) 
-			throw new PartInitException("Invalid editor input"); 
         
         FormInput clinicInput = (FormInput) input;
         
@@ -50,29 +52,56 @@ public class ClinicViewForm  extends AddressViewForm {
 		GridLayout layout = new GridLayout(1, false);
 		form.getBody().setLayout(layout);
 		form.getBody().setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		createClinicSection();
+		createAddressSection();
+        createStudiesSection();
+        createButtonsSection();
+	}
+    
+    private void createClinicSection() {    
+        Composite client = toolkit.createComposite(form.getBody());
+        client.setLayout(new GridLayout(2, false));
+        client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        toolkit.paintBordersFor(client);
+        
+        createBoundWidget(client, Label.class, SWT.NONE, "Activity Status",
+            PojoObservables.observeValue(clinic, "activityStatus"));
+        
+        createBoundWidget(client, Label.class, 
+            SWT.NONE, "Comments", PojoObservables.observeValue(clinic, "comment"));		
+	}
+    
+    private void createAddressSection() {   
+        Composite client = createSectionWithClient("Address");
+        Section section = (Section) client.getParent();
+        section.setExpanded(false);
+        createAddressArea(client);
+    }
+	
+	protected void createStudiesSection() {
+        Composite client = createSectionWithClient("Studies");
+		Collection<Study> studies = clinic.getStudyCollection();
 		
+        StudyAdapter [] studyAdapters = new StudyAdapter [studies.size()];
+        int count = 0;
+        for (Study study : studies) {
+            studyAdapters[count] = new StudyAdapter(
+                clinicAdapter.getParent(), study);
+            count++;
+        }
+
+        String [] headings = new String[] {"Name", "Short Name", "Num. Patients"};      
+        BiobankCollectionTable comp = 
+            new BiobankCollectionTable(client, SWT.NONE, headings, studyAdapters);
+        comp.adaptToToolkit(toolkit);   
+        toolkit.paintBordersFor(comp);
+        
+        comp.getTableViewer().addDoubleClickListener(
+                FormUtils.getBiobankCollectionDoubleClickListener());
+	}
+	
+	protected void createButtonsSection() {
 		Composite client = toolkit.createComposite(form.getBody());
-		client.setLayout(new GridLayout(4, false));
-		client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));		
-		toolkit.paintBordersFor(client);	
-		
-		createAddressArea(client);
-
-		Section section = toolkit.createSection(form.getBody(),  
-				ExpandableComposite.TITLE_BAR | ExpandableComposite.TWISTIE
-				| ExpandableComposite.EXPANDED);
-		section.setText("Associated Studies");
-		//section.setFont(FormUtils.getSectionFont());
-		section.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		client = toolkit.createComposite(section);
-		client.setLayout(new GridLayout(4, false));
-		client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));		
-		section.setClient(client);
-		toolkit.paintBordersFor(client);
-		
-		// studies go here
-
-		client = toolkit.createComposite(form.getBody());
 		client.setLayout(new GridLayout(4, false));
 		toolkit.paintBordersFor(client);
 
@@ -91,13 +120,6 @@ public class ClinicViewForm  extends AddressViewForm {
 				}
 			}
 		});
-		
-		bindValues();
 	}
-    
-    private void bindValues() {
-    	DataBindingContext dbc = new DataBindingContext();    	
-    	super.bindValues(dbc);
-    }
 }
 

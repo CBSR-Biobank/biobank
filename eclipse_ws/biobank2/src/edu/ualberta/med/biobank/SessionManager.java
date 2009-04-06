@@ -33,6 +33,7 @@ import edu.ualberta.med.biobank.forms.ClinicViewForm;
 import edu.ualberta.med.biobank.forms.SiteEntryForm;
 import edu.ualberta.med.biobank.forms.SiteViewForm;
 import edu.ualberta.med.biobank.forms.StorageTypeEntryForm;
+import edu.ualberta.med.biobank.forms.StorageTypeViewForm;
 import edu.ualberta.med.biobank.forms.StudyEntryForm;
 import edu.ualberta.med.biobank.forms.StudyViewForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
@@ -82,24 +83,23 @@ public class SessionManager {
             else if (element instanceof SiteAdapter) {
 				openSiteViewForm((SiteAdapter) element);
 			}
+            else if (element instanceof StudyGroup) {
+                updateStudies((StudyGroup) element);
+            }
+            else if (element instanceof ClinicGroup) {
+                updateClinics((ClinicGroup) element);
+            }
+            else if (element instanceof StorageTypeGroup) {
+                updateStorageTypes((StorageTypeGroup) element);
+            }
             else if (element instanceof StudyAdapter) {
                 openStudyViewForm((StudyAdapter) element);
             }
 			else if (element instanceof ClinicAdapter) {
-			    ClinicAdapter clinicAdapter = (ClinicAdapter) element;
-				openClinicViewForm(clinicAdapter);
+				openClinicViewForm((ClinicAdapter) element);
 			}
-            else if (element instanceof StudyGroup) {
-                StudyGroup group = (StudyGroup) element;
-                updateStudies(group);
-            }
-            else if (element instanceof ClinicGroup) {
-                ClinicGroup group = (ClinicGroup) element;
-                updateClinics(group);
-            }
-            else if (element instanceof StorageTypeGroup) {
-                StorageTypeGroup group = (StorageTypeGroup) element;
-                updateStorageTypes(group);
+            else if (element instanceof StorageTypeAdapter) {
+                openStorageTypeViewForm((StorageTypeAdapter) element);
             }
 			else {
 				Assert.isTrue(false, "double click on class "
@@ -428,6 +428,16 @@ public class SessionManager {
 			e.printStackTrace();				
 		}
 	}
+    
+    public void openStorageTypeViewForm(StorageTypeAdapter adapter) {
+        try {
+            view.getSite().getPage().openEditor(
+                    new FormInput(adapter), StorageTypeViewForm.ID, true);
+        } 
+        catch (PartInitException e) {
+            e.printStackTrace();                
+        }
+    }
 	
 	public SessionAdapter getSessionSingle() {
 		int count = sessionsByName.size();

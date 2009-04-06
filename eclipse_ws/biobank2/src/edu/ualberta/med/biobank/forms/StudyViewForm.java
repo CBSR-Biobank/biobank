@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.forms;
 import java.util.Collection;
 import java.util.Iterator;
 
+import org.eclipse.core.databinding.beans.PojoObservables;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -34,10 +35,7 @@ public class StudyViewForm extends BiobankViewForm {
 
     @Override
     public void init(IEditorSite editorSite, IEditorInput input) 
-    throws PartInitException {
-        if ( !(input instanceof FormInput)) 
-            throw new PartInitException("Invalid editor input"); 
-        
+    throws PartInitException {        
         super.init(editorSite, input);
         
         Node node = ((FormInput) input).getNode();
@@ -69,8 +67,14 @@ public class StudyViewForm extends BiobankViewForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));        
         toolkit.paintBordersFor(client); 
         
-        Label label = FormUtils.createLabelledField(toolkit, client, "Short Name:");
-        label.setText(study.getNameShort());
+        createBoundWidget(client, Label.class, SWT.NONE, "Short Name",
+            PojoObservables.observeValue(study, "nameShort"));
+        
+        createBoundWidget(client, Label.class, SWT.NONE, "Activity Status",
+            PojoObservables.observeValue(study, "activityStatus"));
+        
+        createBoundWidget(client, Label.class, 
+            SWT.NONE, "Comments", PojoObservables.observeValue(study, "comment"));
         
         Node clinicGroupNode = 
             ((SiteAdapter) studyAdapter.getParent().getParent()).getClinicGroupNode();

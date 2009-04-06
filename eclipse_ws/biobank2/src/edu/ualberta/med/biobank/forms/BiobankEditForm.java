@@ -34,10 +34,6 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.ISaveablePart;
 import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.forms.ManagedForm;
-import org.eclipse.ui.forms.widgets.FormToolkit;
-import org.eclipse.ui.forms.widgets.ScrolledForm;
-import org.eclipse.ui.part.EditorPart;
 
 import edu.ualberta.med.biobank.SessionManager;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -50,21 +46,13 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
  *    making calls to the database is possible.
  *
  */
-public abstract class BiobankEditForm extends EditorPart {
+public abstract class BiobankEditForm extends BiobankFormBase {
     
     protected WritableApplicationService appService;
     
     protected String sessionName;
 
     private boolean dirty = false;
-
-    private ManagedForm mform;
-
-    protected FormToolkit toolkit;
-    
-    protected ScrolledForm form;
-    
-    protected HashMap<String, Control> controls;
 
     protected IStatus currentStatus;
     
@@ -110,8 +98,7 @@ public abstract class BiobankEditForm extends EditorPart {
     @Override
     public void init(IEditorSite editorSite, IEditorInput input)
             throws PartInitException {
-        setSite(editorSite);
-        setInput(input);
+        super.init(editorSite, input);
         setDirty(false);
     }
 
@@ -129,29 +116,8 @@ public abstract class BiobankEditForm extends EditorPart {
     public boolean isSaveAsAllowed() {
         return false;
     }
-
-    @Override
-    public void createPartControl(Composite parent) {
-        mform = new ManagedForm(parent);
-        toolkit = mform.getToolkit();
-        form = mform.getForm();
-        
-        // start a new runnable so that database objects are populated in a
-        // separate thread.
-        BusyIndicator.showWhile(parent.getDisplay(), new Runnable() {
-            public void run() {
-                createFormContent();
-                form.reflow(true);
-                bindValues();
-            }
-        });
-    }
     
-    
-    abstract protected void createFormContent();
-    
-    abstract protected void saveForm();
-    
+    abstract protected void saveForm();   
     
 
     @Override
@@ -256,8 +222,9 @@ public abstract class BiobankEditForm extends EditorPart {
         for (String key : fieldOrder) {
             fi = fields.get(key);
             
-            Control control = createBoundWidget(client, fi.widgetClass, SWT.NONE,
-                fi.label, fi.widgetValues, PojoObservables.observeValue(pojo, key),
+            Control control = createBoundWidget(client, fi.widgetClass, 
+                fi.widgetOptions, fi.label, fi.widgetValues, 
+                PojoObservables.observeValue(pojo, key),
                 fi.validatorClass, fi.errMsg);
             controls.put(key, control);
         }     

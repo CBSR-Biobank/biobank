@@ -6,6 +6,7 @@ import org.springframework.util.Assert;
 
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.Sdata;
+import edu.ualberta.med.biobank.model.StorageContainer;
 import edu.ualberta.med.biobank.treeview.ClinicAdapter;
 import edu.ualberta.med.biobank.treeview.StorageTypeAdapter;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
@@ -26,6 +27,9 @@ public class BiobankContentProvider implements IStructuredContentProvider {
         }
         else if (inputElement instanceof StorageTypeAdapter[]) {
             return (StorageTypeAdapter[])inputElement;
+        }
+        else if (inputElement instanceof StorageContainer[]) {
+            return (StorageContainer[])inputElement;
         }
         else if (inputElement instanceof Sdata[]) {
             return (Sdata[])inputElement;
