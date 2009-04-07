@@ -28,7 +28,6 @@ import org.eclipse.ui.PlatformUI;
 import org.springframework.remoting.RemoteAccessException;
 import org.springframework.remoting.RemoteConnectFailureException;
 
-import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Sdata;
@@ -271,8 +270,8 @@ public class StudyEntryForm extends BiobankEditForm {
         study.setSdataCollection(sdataList);
         
         saveStudy(study);        
-        SessionManager.getInstance().updateStudies(studyAdapter);    	
-		getSite().getPage().closeEditor(StudyEntryForm.this, false);    	
+        studyAdapter.getParent().performExpand();    	
+		getSite().getPage().closeEditor(this, false);    	
     }
     
     private void saveStudy(Study study) {

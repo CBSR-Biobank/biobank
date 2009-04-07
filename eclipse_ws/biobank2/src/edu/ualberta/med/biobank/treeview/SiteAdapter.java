@@ -1,5 +1,18 @@
 package edu.ualberta.med.biobank.treeview;
 
+import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
+import org.eclipse.swt.widgets.Tree;
+import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
+
+import edu.ualberta.med.biobank.forms.SiteEntryForm;
+import edu.ualberta.med.biobank.forms.SiteViewForm;
+import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Site;
 
 public class SiteAdapter extends Node {
@@ -50,4 +63,46 @@ public class SiteAdapter extends Node {
 		if (o == null) return null;
 		return site.getName();
 	}
+    
+    private void openViewForm() {
+        try {
+            PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage()
+            .openEditor(new FormInput(this), SiteViewForm.ID, true);
+        } 
+        catch (PartInitException e) {
+            // handle error
+            e.printStackTrace();                
+        }
+    }
+    
+    public void performDoubleClick() {
+        openViewForm();
+    }
+    
+    public void performExpand() {
+    }
+    
+    public void popupMenu(TreeViewer tv, Tree tree,  Menu menu) {
+        MenuItem mi = new MenuItem (menu, SWT.PUSH);
+        mi.setText ("Edit Site");
+        mi.addSelectionListener(new SelectionListener() {
+            public void widgetSelected(SelectionEvent event) {
+                openForm(SiteEntryForm.ID);
+            }
+
+            public void widgetDefaultSelected(SelectionEvent e) {                    
+            }
+        });
+
+        mi = new MenuItem (menu, SWT.PUSH);
+        mi.setText ("View Site");
+        mi.addSelectionListener(new SelectionListener() {
+            public void widgetSelected(SelectionEvent event) {
+                openViewForm();
+            }
+
+            public void widgetDefaultSelected(SelectionEvent e) {                    
+            }
+        }); 
+    }
 }

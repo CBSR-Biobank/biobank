@@ -4,10 +4,10 @@ import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 import org.springframework.util.Assert;
 
-import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.Sdata;
 import edu.ualberta.med.biobank.model.StorageContainer;
 import edu.ualberta.med.biobank.treeview.ClinicAdapter;
+import edu.ualberta.med.biobank.treeview.PatientAdapter;
 import edu.ualberta.med.biobank.treeview.StorageTypeAdapter;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
 
@@ -22,8 +22,8 @@ public class BiobankContentProvider implements IStructuredContentProvider {
         else if (inputElement instanceof ClinicAdapter[]) {
             return (ClinicAdapter[])inputElement;
         }
-        else if (inputElement instanceof Patient[]) {
-            return (Patient[])inputElement;
+        else if (inputElement instanceof PatientAdapter[]) {
+            return (PatientAdapter[])inputElement;
         }
         else if (inputElement instanceof StorageTypeAdapter[]) {
             return (StorageTypeAdapter[])inputElement;

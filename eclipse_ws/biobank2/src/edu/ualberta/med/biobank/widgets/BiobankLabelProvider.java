@@ -8,6 +8,7 @@ import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.Sdata;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.ClinicAdapter;
+import edu.ualberta.med.biobank.treeview.PatientAdapter;
 import edu.ualberta.med.biobank.treeview.StorageTypeAdapter;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
 
@@ -39,8 +40,9 @@ public class BiobankLabelProvider extends LabelProvider implements ITableLabelPr
                 case 1: return "" + clinicAdapter.getClinic().getStudyCollection().size();
             }
         }
-        else if (element instanceof Patient) {
-            final Patient patient = (Patient) element;
+        else if (element instanceof PatientAdapter) {
+            final Patient patient = (Patient) (
+                (PatientAdapter) element).getPatient();
             switch (columnIndex) {
                 case 0: return patient.getNumber();
             }

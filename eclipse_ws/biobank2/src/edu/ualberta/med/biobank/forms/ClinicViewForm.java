@@ -16,7 +16,6 @@ import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.forms.widgets.Section;
 
-import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Study;
@@ -108,16 +107,7 @@ public class ClinicViewForm  extends AddressViewFormCommon {
 		final Button edit = toolkit.createButton(client, "Edit Clinic Info", SWT.PUSH);
 		edit.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				try {
-				    FormInput input = new FormInput(clinicAdapter); 
-		            SessionManager.getInstance().closeEditor(input);
-					getSite().getPage().openEditor(
-					        input, ClinicEntryForm.ID, true);
-				} 
-				catch (PartInitException exp) {
-					// handle error
-					exp.printStackTrace();				
-				}
+                clinicAdapter.openForm(ClinicEntryForm.ID);
 			}
 		});
 	}

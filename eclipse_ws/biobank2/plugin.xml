@@ -188,6 +188,18 @@
             id="edu.ualberta.med.biobank.forms.StorageTypeViewForm"
             name="StorageType View">
       </editor>
+      <editor
+            class="edu.ualberta.med.biobank.forms.PatientEntryForm"
+            default="false"
+            id="edu.ualberta.med.biobank.forms.PatientEntryForm"
+            name="Patient Entry">
+      </editor>
+      <editor
+            class="edu.ualberta.med.biobank.forms.PatientViewForm"
+            default="false"
+            id="edu.ualberta.med.biobank.forms.PatientViewForm"
+            name="Patient View">
+      </editor>
    </extension>
    <extension
          point="org.eclipse.ui.bindings">

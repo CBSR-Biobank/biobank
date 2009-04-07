@@ -108,9 +108,9 @@ public class StorageTypeEntryForm extends BiobankEditForm {
     @Override
     protected void createFormContent() {
         form.setText("Storage Type Information");
-        form.setMessage(getOkMessage(), IMessageProvider.NONE);
-        
+        form.setMessage(getOkMessage(), IMessageProvider.NONE);        
         form.getBody().setLayout(new GridLayout(1, false));
+        
         createStorageTypeSection();     
         createDimensionsSection();
         createSampleDerivTypesSection();
@@ -292,12 +292,12 @@ public class StorageTypeEntryForm extends BiobankEditForm {
      */
     @Override
     protected void saveForm() { 
-        saveSampleDerivativeTypes(); 
-        saveChildStorageTypes();
-        
         try {
             SDKQuery query;
             SDKQueryResult result;
+            
+            saveSampleDerivativeTypes(); 
+            saveChildStorageTypes();
 
             if ((storageType.getId() == null) || (storageType.getId() == 0)) {
                 Assert.isTrue(capacity.getId() == null, 
@@ -347,7 +347,7 @@ public class StorageTypeEntryForm extends BiobankEditForm {
             exp.printStackTrace(); 
         }
         
-        SessionManager.getInstance().updateStorageTypes(storageTypeAdapter);      
+        storageTypeAdapter.getParent().performExpand();      
         getSite().getPage().closeEditor(this, false);    
     }
     

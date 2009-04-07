@@ -26,7 +26,6 @@ import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.treeview.Node;
-import edu.ualberta.med.biobank.treeview.SessionAdapter;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
 import gov.nih.nci.system.query.SDKQuery;
@@ -193,9 +192,8 @@ public class SiteEntryForm extends AddressEntryFormCommon {
             exp.printStackTrace();
         }
 		
-		SessionManager.getInstance().updateSites(
-		        (SessionAdapter) siteAdapter.getParent());		
-		getSite().getPage().closeEditor(SiteEntryForm.this, false);    	
+		siteAdapter.getParent().performExpand();		
+		getSite().getPage().closeEditor(this, false);    	
     }
 
 	@Override

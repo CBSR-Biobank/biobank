@@ -17,14 +17,10 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
-import org.springframework.util.Assert;
 
-import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.model.Clinic;
-import edu.ualberta.med.biobank.model.Sdata;
 import edu.ualberta.med.biobank.treeview.ClinicAdapter;
 import edu.ualberta.med.biobank.treeview.Node;
-import edu.ualberta.med.biobank.treeview.StudyAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankCollectionTable;
 
 public class FormUtils {
@@ -104,22 +100,7 @@ public class FormUtils {
             public void doubleClick(DoubleClickEvent event) {
                 Object selection = event.getSelection();
                 Object element = ((StructuredSelection)selection).getFirstElement();
-                
-                if (element instanceof StudyAdapter) {
-                    SessionManager.getInstance().openStudyViewForm(
-                            (StudyAdapter) element);
-                }
-                else if (element instanceof ClinicAdapter) {
-                    SessionManager.getInstance().openClinicViewForm(
-                            (ClinicAdapter) element);
-                }
-                else if (element instanceof Sdata) {
-                    // do nothing
-                }
-                else {
-                    Assert.isTrue(false, "invalid type for element: " 
-                            + element.getClass().getName());
-                }
+                ((Node) element).performDoubleClick();
             }
         };
     }

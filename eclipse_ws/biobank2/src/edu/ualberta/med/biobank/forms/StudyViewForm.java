@@ -21,6 +21,7 @@ import edu.ualberta.med.biobank.model.Sdata;
 import edu.ualberta.med.biobank.model.StorageContainer;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.Node;
+import edu.ualberta.med.biobank.treeview.PatientAdapter;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankCollectionTable;
@@ -87,31 +88,6 @@ public class StudyViewForm extends BiobankViewForm {
         createDataCollectedSection();
     }
     
-    private void createDataCollectedSection() {           
-        Section section = createSection("Study Data Collected");
-
-        // hack required here because site.getStudyCollection().toArray(new Study[0])
-        // returns Object[].        
-        int count = 0;
-        Collection<Sdata> sdatas = study.getSdataCollection();
-        Sdata [] arr = new Sdata [sdatas.size()];
-        Iterator<Sdata> it = sdatas.iterator();
-        while (it.hasNext()) {
-            arr[count] = it.next();
-            ++count;
-        }
-
-        String [] headings = new String[] {"Name", "Valid Values (optional)"};      
-        BiobankCollectionTable comp = 
-            new BiobankCollectionTable(section, SWT.NONE, headings, arr);
-        section.setClient(comp);
-        comp.adaptToToolkit(toolkit); 
-        toolkit.paintBordersFor(comp);
-
-        comp.getTableViewer().addDoubleClickListener(
-                FormUtils.getBiobankCollectionDoubleClickListener());
-    }
-    
     private void createPatientsSection() {        
         Section section = createSection("Patients");  
         
@@ -119,10 +95,9 @@ public class StudyViewForm extends BiobankViewForm {
         // returns Object[].        
         int count = 0;
         Collection<Patient> patients = study.getPatientCollection();
-        Patient [] arr = new Patient [patients.size()];
-        Iterator<Patient> it = patients.iterator();
-        while (it.hasNext()) {
-            arr[count] = it.next();
+        PatientAdapter [] arr = new PatientAdapter [patients.size()];
+        for (Patient patient : patients) {
+            arr[count] = new PatientAdapter(studyAdapter, patient);
             ++count;
         }
 
@@ -158,6 +133,31 @@ public class StudyViewForm extends BiobankViewForm {
         comp.adaptToToolkit(toolkit);   
         toolkit.paintBordersFor(comp);
         
+        comp.getTableViewer().addDoubleClickListener(
+                FormUtils.getBiobankCollectionDoubleClickListener());
+    }
+    
+    private void createDataCollectedSection() {           
+        Section section = createSection("Study Data Collected");
+
+        // hack required here because site.getStudyCollection().toArray(new Study[0])
+        // returns Object[].        
+        int count = 0;
+        Collection<Sdata> sdatas = study.getSdataCollection();
+        Sdata [] arr = new Sdata [sdatas.size()];
+        Iterator<Sdata> it = sdatas.iterator();
+        while (it.hasNext()) {
+            arr[count] = it.next();
+            ++count;
+        }
+
+        String [] headings = new String[] {"Name", "Valid Values (optional)"};      
+        BiobankCollectionTable comp = 
+            new BiobankCollectionTable(section, SWT.NONE, headings, arr);
+        section.setClient(comp);
+        comp.adaptToToolkit(toolkit); 
+        toolkit.paintBordersFor(comp);
+
         comp.getTableViewer().addDoubleClickListener(
                 FormUtils.getBiobankCollectionDoubleClickListener());
     }

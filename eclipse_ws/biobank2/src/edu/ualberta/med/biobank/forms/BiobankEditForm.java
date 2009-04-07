@@ -117,6 +117,13 @@ public abstract class BiobankEditForm extends BiobankFormBase {
         return false;
     }
     
+
+    @Override
+    public void createPartControl(Composite parent) {
+        super.createPartControl(parent);
+        bindChangeListener();
+    }
+    
     abstract protected void saveForm();   
     
 
@@ -241,10 +248,6 @@ public abstract class BiobankEditForm extends BiobankFormBase {
             return session;
         }   
         return null;
-    }
-    
-    protected void bindValues() {
-        bindChangeListener();
     }
     
     protected void bindChangeListener() {
