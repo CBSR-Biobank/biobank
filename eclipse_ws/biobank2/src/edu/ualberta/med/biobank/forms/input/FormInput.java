@@ -8,6 +8,7 @@ import org.eclipse.ui.IPersistableElement;
 import edu.ualberta.med.biobank.treeview.ClinicAdapter;
 import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.PatientAdapter;
+import edu.ualberta.med.biobank.treeview.PatientVisitAdapter;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.treeview.StorageTypeAdapter;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
@@ -49,6 +50,7 @@ public class FormInput implements IEditorInput {
             else if (node instanceof ClinicAdapter) return "Clinic " + name;
             else if (node instanceof StorageTypeAdapter) return "Storage Type " + name;
             else if (node instanceof PatientAdapter) return "Patient " + name;
+            else if (node instanceof PatientVisitAdapter) return "Patient " + name;
             else Assert.isTrue(false, "tooltip name for "
                     + node.getClass().getName() + " not implemented");
         }
@@ -58,6 +60,7 @@ public class FormInput implements IEditorInput {
             else if (node instanceof ClinicAdapter) return "New Clinic";
             else if (node instanceof StorageTypeAdapter) return "New Storage Type";
             else if (node instanceof PatientAdapter) return "New Patient";
+            else if (node instanceof PatientVisitAdapter) return "New Patient Visit";
             else Assert.isTrue(false, "tooltip name for "
                     + node.getClass().getName() + " not implemented");
         }

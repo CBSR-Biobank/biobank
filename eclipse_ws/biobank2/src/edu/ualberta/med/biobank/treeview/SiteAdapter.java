@@ -64,19 +64,8 @@ public class SiteAdapter extends Node {
 		return site.getName();
 	}
     
-    private void openViewForm() {
-        try {
-            PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage()
-            .openEditor(new FormInput(this), SiteViewForm.ID, true);
-        } 
-        catch (PartInitException e) {
-            // handle error
-            e.printStackTrace();                
-        }
-    }
-    
     public void performDoubleClick() {
-        openViewForm();
+        openForm(SiteViewForm.ID);
     }
     
     public void performExpand() {
@@ -98,7 +87,7 @@ public class SiteAdapter extends Node {
         mi.setText ("View Site");
         mi.addSelectionListener(new SelectionListener() {
             public void widgetSelected(SelectionEvent event) {
-                openViewForm();
+                openForm(SiteViewForm.ID);
             }
 
             public void widgetDefaultSelected(SelectionEvent e) {                    
