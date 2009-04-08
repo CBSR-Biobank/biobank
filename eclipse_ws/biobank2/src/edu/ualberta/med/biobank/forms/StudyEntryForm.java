@@ -41,10 +41,13 @@ import edu.ualberta.med.biobank.treeview.StudyAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
 import edu.ualberta.med.biobank.widgets.MultiSelect;
 import edu.ualberta.med.biobank.widgets.SdataWidget;
+import gov.nih.nci.system.applicationservice.ApplicationException;
+import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.SDKQuery;
 import gov.nih.nci.system.query.SDKQueryResult;
 import gov.nih.nci.system.query.example.InsertExampleQuery;
 import gov.nih.nci.system.query.example.UpdateExampleQuery;
+import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 @SuppressWarnings("serial")
 public class StudyEntryForm extends BiobankEditForm {
@@ -241,74 +244,45 @@ public class StudyEntryForm extends BiobankEditForm {
 		}
     }
     
-    protected void saveForm() {
-    	// get the selected clinics from widget
-    	List<Integer> selClinicIds = clinicsMultiSelect.getSelected();
-    	Set<Clinic> selClinics = new HashSet<Clinic>();
-    	for (Clinic clinic : allClinics) {
-    	    int id = clinic.getId();
-    		if (selClinicIds.indexOf(id) >= 0) {
-    			selClinics.add(clinic);
-    		}
-    		
-    	}
-    	Assert.isTrue(selClinics.size() == selClinicIds.size(), 
-    			"problem with clinic selections");
-		study.setClinicCollection(selClinics);
-        
-		List<Sdata> sdataList = new ArrayList<Sdata>();
-        for (SdataType sdataType : allSdataTypes) {
-            String type = sdataType.getType();
-    	    String value =  sdataWidgets.get(type).getResult();
-    	    if ((value.length() == 0) || value.equals("no")) continue;
-    	    Sdata sdata = new Sdata();
-    	    sdata.setSdataType(sdataType);
-            if (value.equals("yes")) {
-                value = "";
-            }
-            sdata.setValue(value);
-    	    sdataList.add(sdata);
-    	}
-        study.setSdataCollection(sdataList);
-        
-        saveStudy(study);        
-        studyAdapter.getParent().performExpand();    	
-		getSite().getPage().closeEditor(this, false);    	
-    }
-    
-    private void saveStudy(Study study) {
+    protected void saveForm() {        
         try {
-            SDKQuery query;
-            SDKQueryResult result;
-            Set<Sdata> savedSdataList = new HashSet<Sdata>();
-            
-            study.setSite(site);
-            study.setWorksheet(null);
+            if ((study.getId() == null) && !checkStudyNameUnique()) {
+                setDirty(true);
+                return;
+            }
 
-            if (study.getSdataCollection().size() > 0) {
-                for (Sdata sdata : study.getSdataCollection()) {
-                    if ((sdata.getId() == null) || (sdata.getId() == 0)) {
-                        query = new InsertExampleQuery(sdata);
-                    }
-                    else {
-                        query = new UpdateExampleQuery(sdata);
-                    }                  
-
-                    result = studyAdapter.getAppService().executeQuery(query);
-                    savedSdataList.add((Sdata) result.getObjectResult());
+            // get the selected clinics from widget
+            List<Integer> selClinicIds = clinicsMultiSelect.getSelected();
+            Set<Clinic> selClinics = new HashSet<Clinic>();
+            for (Clinic clinic : allClinics) {
+                int id = clinic.getId();
+                if (selClinicIds.indexOf(id) >= 0) {
+                    selClinics.add(clinic);
                 }
-            }
-            study.setSdataCollection(savedSdataList);
 
-            if ((study.getId() == null) || (study.getId() == 0)) {
-                query = new InsertExampleQuery(study);
             }
-            else { 
-                query = new UpdateExampleQuery(study);
+            Assert.isTrue(selClinics.size() == selClinicIds.size(), 
+            "problem with clinic selections");
+            study.setClinicCollection(selClinics);
+
+            List<Sdata> sdataList = new ArrayList<Sdata>();
+            for (SdataType sdataType : allSdataTypes) {
+                String type = sdataType.getType();
+                String value =  sdataWidgets.get(type).getResult();
+                if ((value.length() == 0) || value.equals("no")) continue;
+                Sdata sdata = new Sdata();
+                sdata.setSdataType(sdataType);
+                if (value.equals("yes")) {
+                    value = "";
+                }
+                sdata.setValue(value);
+                sdataList.add(sdata);
             }
-            
-            result = studyAdapter.getAppService().executeQuery(query);
-            study = (Study) result.getObjectResult();
+            study.setSdataCollection(sdataList);
+
+            saveStudy(study);        
+            studyAdapter.getParent().performExpand();    	
+            getSite().getPage().closeEditor(this, false);    
         }
         catch (final RemoteAccessException exp) {
             Display.getDefault().asyncExec(new Runnable() {
@@ -320,9 +294,43 @@ public class StudyEntryForm extends BiobankEditForm {
                 }
             });
         }
-        catch (Exception exp) {
-            exp.printStackTrace();
+        catch (ApplicationException e) {
+            e.printStackTrace();
+        }	
+    }
+    
+    private void saveStudy(Study study) throws ApplicationException {
+        SDKQuery query;
+        SDKQueryResult result;
+        Set<Sdata> savedSdataList = new HashSet<Sdata>();
+
+        study.setSite(site);
+        study.setWorksheet(null);
+
+        if (study.getSdataCollection().size() > 0) {
+            for (Sdata sdata : study.getSdataCollection()) {
+                if ((sdata.getId() == null) || (sdata.getId() == 0)) {
+                    query = new InsertExampleQuery(sdata);
+                }
+                else {
+                    query = new UpdateExampleQuery(sdata);
+                }                  
+
+                result = studyAdapter.getAppService().executeQuery(query);
+                savedSdataList.add((Sdata) result.getObjectResult());
+            }
         }
+        study.setSdataCollection(savedSdataList);
+
+        if ((study.getId() == null) || (study.getId() == 0)) {
+            query = new InsertExampleQuery(study);
+        }
+        else { 
+            query = new UpdateExampleQuery(study);
+        }
+
+        result = studyAdapter.getAppService().executeQuery(query);
+        study = (Study) result.getObjectResult();
     }
     
     private List<SdataType> getAllSdataTypes() {        
@@ -345,5 +353,55 @@ public class StudyEntryForm extends BiobankEditForm {
             exp.printStackTrace();
         }
         return null;
+    }
+    
+    private boolean checkStudyNameUnique() throws ApplicationException {
+        WritableApplicationService appService = studyAdapter.getAppService();
+        Site site = (Site) ((SiteAdapter) 
+            studyAdapter.getParent().getParent()).getSite();
+        
+        HQLCriteria c = new HQLCriteria(
+            "from edu.ualberta.med.biobank.model.Study as study "
+            + "inner join fetch study.site "
+            + "where study.site.id='" + site.getId() + "' "
+            + "and study.name = '" + study.getName() + "'");
+
+        List<Object> results = appService.query(c);
+        
+        if (results.size() > 0) {
+            Display.getDefault().asyncExec(new Runnable() {
+                public void run() {
+                    MessageDialog.openError(
+                        PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), 
+                        "Study Name Problem", 
+                        "A study with name \"" + study.getName() 
+                        + "\" already exists.");
+                }
+            });
+            return false;
+        }
+        
+        c = new HQLCriteria(
+            "from edu.ualberta.med.biobank.model.Study as study "
+            + "inner join fetch study.site "
+            + "where study.site.id='" + site.getId() + "' "
+            + "and study.nameShort = '" + study.getNameShort() + "'");
+
+        results = appService.query(c);
+        
+        if (results.size() > 0) {
+            Display.getDefault().asyncExec(new Runnable() {
+                public void run() {
+                    MessageDialog.openError(
+                        PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), 
+                        "Study Name Problem", 
+                        "A study with short name \"" + study.getName() 
+                        + "\" already exists.");
+                }
+            });
+            return false;
+        }
+        
+        return true;
     }
 }

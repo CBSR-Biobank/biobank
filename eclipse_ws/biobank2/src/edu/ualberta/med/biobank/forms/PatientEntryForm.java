@@ -1,6 +1,6 @@
 package edu.ualberta.med.biobank.forms;
 
-import java.util.Collection;
+import java.util.List;
 
 import org.eclipse.core.databinding.beans.PojoObservables;
 import org.eclipse.core.runtime.Assert;
@@ -29,10 +29,13 @@ import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.PatientAdapter;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
+import gov.nih.nci.system.applicationservice.ApplicationException;
+import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.SDKQuery;
 import gov.nih.nci.system.query.SDKQueryResult;
 import gov.nih.nci.system.query.example.InsertExampleQuery;
 import gov.nih.nci.system.query.example.UpdateExampleQuery;
+import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class PatientEntryForm extends BiobankEditForm {
     public static final String ID =
@@ -138,8 +141,13 @@ public class PatientEntryForm extends BiobankEditForm {
             SDKQuery query;
             SDKQueryResult result;
             
+            if ((patient.getId() == null) && !checkPatientNumberUnique()) {
+                setDirty(true);
+                return;
+            }
+            
             Study study = (Study) (
-                (StudyAdapter) patientAdapter.getParent()).getStudy();
+                (StudyAdapter) patientAdapter.getParent().getParent()).getStudy();
             patient.setStudy(study);
 
             if ((patient.getId() == null) || (patient.getId() == 0)) {
@@ -151,16 +159,6 @@ public class PatientEntryForm extends BiobankEditForm {
             
             result = appService.executeQuery(query);
             patient = (Patient) result.getObjectResult();
-            
-            // associate the patient to it's study
-            Assert.isTrue((study.getId() != null) && (study.getId() != 0),
-                "study is not in the database");
-            Collection<Patient> collection = study.getPatientCollection();
-            collection.add(patient);
-            study.setPatientCollection(collection);
-
-            query = new UpdateExampleQuery(study);
-            appService.executeQuery(query);
         }
         catch (final RemoteAccessException exp) {
             Display.getDefault().asyncExec(new Runnable() {
@@ -178,6 +176,32 @@ public class PatientEntryForm extends BiobankEditForm {
 
         patientAdapter.getParent().performExpand();        
         getSite().getPage().closeEditor(this, false);
+    }
+    
+    private boolean checkPatientNumberUnique() throws ApplicationException {
+        WritableApplicationService appService = patientAdapter.getAppService();
+        Study study = (Study) ((StudyAdapter) 
+            patientAdapter.getParent().getParent()).getStudy();
+        
+        HQLCriteria c = new HQLCriteria(
+            "from edu.ualberta.med.biobank.model.Patient as p "
+            + "inner join fetch p.study "
+            + "where p.study.id='" + study.getId() + "' "
+            + "and p.number = '" + patient.getNumber() + "'");
+        
+        List<Object> results = appService.query(c);
+        if (results.size() == 0) return true;
+        
+        Display.getDefault().asyncExec(new Runnable() {
+            public void run() {
+                MessageDialog.openError(
+                    PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), 
+                    "Patient Number Problem", 
+                    "A patient with number \"" + patient.getNumber() 
+                    + "\" already exists.");
+            }
+        });
+        return false;
     }
 
 }

@@ -1,5 +1,7 @@
 package edu.ualberta.med.biobank.forms;
 
+import java.util.List;
+
 import org.eclipse.core.databinding.beans.PojoObservables;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IStatus;
@@ -24,21 +26,30 @@ import org.springframework.remoting.RemoteAccessException;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Clinic;
+import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.treeview.ClinicAdapter;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
+import gov.nih.nci.system.applicationservice.ApplicationException;
+import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.SDKQuery;
 import gov.nih.nci.system.query.SDKQueryResult;
 import gov.nih.nci.system.query.example.InsertExampleQuery;
 import gov.nih.nci.system.query.example.UpdateExampleQuery;
+import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class ClinicEntryForm extends AddressEntryFormCommon {	
 	public static final String ID =
 	      "edu.ualberta.med.biobank.forms.ClinicEntryForm";
 	
-	private static final String NEW_CLINIC_OK_MESSAGE = "New clinic information.";
-	private static final String CLINIC_OK_MESSAGE = "Clinic information.";
-	private static final String NO_CLINIC_NAME_MESSAGE = "Clinic must have a name";
+	private static final String NEW_CLINIC_OK_MESSAGE = 
+	    "New clinic information.";
+	
+	private static final String CLINIC_OK_MESSAGE = 
+	    "Clinic information.";
+	
+	private static final String NO_CLINIC_NAME_MESSAGE = 
+	    "Clinic must have a name";
 	
 	private ClinicAdapter clinicAdapter;
 	private Clinic clinic;
@@ -156,6 +167,11 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
         try {
             SDKQuery query;
             SDKQueryResult result;
+            
+            if ((clinic.getId() == null) && !checkClinicNameUnique()) {
+                setDirty(true);
+                return;
+            }
 
             if ((clinic.getId() == null) || (clinic.getId() == 0)) {
                 Assert.isTrue(clinic.getAddress().getId() == null, 
@@ -178,6 +194,9 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
             
             result = appService.executeQuery(query);
             clinic = (Clinic) result.getObjectResult();
+            
+            clinicAdapter.getParent().performExpand();    
+            getSite().getPage().closeEditor(this, false);       
         }
         catch (final RemoteAccessException exp) {
             Display.getDefault().asyncExec(new Runnable() {
@@ -192,7 +211,30 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
         catch (Exception exp) {
             exp.printStackTrace();
         }
-		
-		clinicAdapter.getParent().performExpand();
 	}
+    
+    private boolean checkClinicNameUnique() throws ApplicationException {
+        WritableApplicationService appService = clinicAdapter.getAppService();
+        Site site = (Site) ((SiteAdapter) 
+            clinicAdapter.getParent().getParent()).getSite();
+
+        HQLCriteria c = new HQLCriteria(
+            "from edu.ualberta.med.biobank.model.Clinic as clinic "
+            + "inner join fetch clinic.site "
+            + "where clinic.site.id='" + site.getId() + "' "
+            + "and clinic.name = '" + clinic.getName() + "'");
+
+        List<Object> results = appService.query(c);
+        if (results.size() == 0) return true;
+        
+        Display.getDefault().asyncExec(new Runnable() {
+            public void run() {
+                MessageDialog.openError(
+                    PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), 
+                    "Site Name Problem", 
+                "A clinic with name \"" + clinic.getName() + "\" already exists.");
+            }
+        });
+        return false;
+    }
 }

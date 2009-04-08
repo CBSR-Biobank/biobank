@@ -22,7 +22,6 @@ INSERT INTO `sdata_type` VALUES
        (9,'Time Arrived'),
        (10,'Biopsy Length'),
        (11,'Visit'),
-       (12,'Shipped Date'),
-       (13,'Consent');
+       (12,'Shipped Date');
 UNLOCK TABLES;
 

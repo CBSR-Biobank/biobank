@@ -163,7 +163,10 @@ public class SiteEntryForm extends AddressEntryFormCommon {
             
             WritableApplicationService appService = siteAdapter.getAppService();
             
-            if (!checkSiteNameUnique())  return;
+            if ((site.getName() == null) && !checkSiteNameUnique()) {
+                setDirty(true);
+                return;
+            }
 
             site.setAddress(address);          
             if ((site.getId() == null) || (site.getId() == 0)) {
@@ -185,6 +188,9 @@ public class SiteEntryForm extends AddressEntryFormCommon {
             
             result = appService.executeQuery(query);
             site = (Site) result.getObjectResult();
+            
+            siteAdapter.getParent().performExpand();        
+            getSite().getPage().closeEditor(this, false);       
         }
         catch (final RemoteAccessException exp) {
             Display.getDefault().asyncExec(new Runnable() {
@@ -199,9 +205,6 @@ public class SiteEntryForm extends AddressEntryFormCommon {
         catch (Exception exp) {
             exp.printStackTrace();
         }
-		
-		siteAdapter.getParent().performExpand();		
-		getSite().getPage().closeEditor(this, false);    	
     }
     
     private boolean checkSiteNameUnique() throws ApplicationException {
@@ -219,7 +222,7 @@ public class SiteEntryForm extends AddressEntryFormCommon {
                 MessageDialog.openError(
                     PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), 
                     "Site Name Problem", 
-                "A site with that name already exists.");
+                "A site with name \"" + site.getName() + "\" already exists.");
             }
         });
         return false;

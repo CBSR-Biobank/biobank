@@ -43,10 +43,13 @@ import edu.ualberta.med.biobank.validators.DoubleNumber;
 import edu.ualberta.med.biobank.validators.IntegerNumber;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
 import edu.ualberta.med.biobank.widgets.MultiSelect;
+import gov.nih.nci.system.applicationservice.ApplicationException;
+import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.SDKQuery;
 import gov.nih.nci.system.query.SDKQueryResult;
 import gov.nih.nci.system.query.example.InsertExampleQuery;
 import gov.nih.nci.system.query.example.UpdateExampleQuery;
+import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class StorageTypeEntryForm extends BiobankEditForm {
     public static final String ID =
@@ -296,8 +299,20 @@ public class StorageTypeEntryForm extends BiobankEditForm {
             SDKQuery query;
             SDKQueryResult result;
             
+            if ((storageType.getId() == null) && !checkStorageTypeNameUnique()) {
+                setDirty(true);
+                return;
+            }
+            
             saveSampleDerivativeTypes(); 
             saveChildStorageTypes();
+            
+            // associate the storage type to it's site
+            Site site = (Site) ((SiteAdapter) 
+                storageTypeAdapter.getParent().getParent()).getSite();
+            Assert.isTrue((site != null) && (site.getId() != null) && (site.getId() != 0),
+                "site is not in the database");
+            storageType.setSite(site);
 
             if ((storageType.getId() == null) || (storageType.getId() == 0)) {
                 Assert.isTrue(capacity.getId() == null, 
@@ -320,18 +335,6 @@ public class StorageTypeEntryForm extends BiobankEditForm {
             
             result = appService.executeQuery(query);
             storageType = (StorageType) result.getObjectResult();
-            
-            // associate the storage type to it's site
-            Site site = (Site) ((SiteAdapter) storageTypeAdapter.getParent().getParent()).getSite();
-            Assert.isTrue((site.getId() != null) && (site.getId() != 0),
-                "site is not in the database");
-            Collection<StorageType> collection = site.getStorageTypeCollection();
-            collection.add(storageType);
-            site.setStorageTypeCollection(collection);
-
-            query = new UpdateExampleQuery(site);
-            log4j.debug("site id: " + site.getId());
-            appService.executeQuery(query);
         }
         catch (final RemoteAccessException exp) {
             Display.getDefault().asyncExec(new Runnable() {
@@ -379,5 +382,31 @@ public class StorageTypeEntryForm extends BiobankEditForm {
         Assert.isTrue(selStorageTypes.size() == selStorageTypeIds.size(), 
                 "problem with sample type selections");
         storageType.setChildStorageTypeCollection(selStorageTypes);        
+    }
+    
+    private boolean checkStorageTypeNameUnique() throws ApplicationException {
+        WritableApplicationService appService = storageTypeAdapter.getAppService();
+        Site site = (Site) ((SiteAdapter) 
+            storageTypeAdapter.getParent().getParent()).getSite();
+        
+        HQLCriteria c = new HQLCriteria(
+            "from edu.ualberta.med.biobank.model.StorageType as st "
+            + "inner join fetch st.site "
+            + "where st.site.id='" + site.getId() + "' "
+            + "and st.name = '" + storageType.getName() + "'");
+
+        List<Object> results = appService.query(c);
+        if (results.size() == 0) return true;
+        
+        Display.getDefault().asyncExec(new Runnable() {
+            public void run() {
+                MessageDialog.openError(
+                    PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), 
+                    "Site Name Problem", 
+                    "A storage type with name \"" + storageType.getName() 
+                    + "\" already exists.");
+            }
+        });
+        return false;
     }
 }

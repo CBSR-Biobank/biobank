@@ -53,7 +53,7 @@ public class StorageTypeAdapter extends Node {
     
     public void popupMenu(TreeViewer tv, Tree tree,  Menu menu) {
         MenuItem mi = new MenuItem (menu, SWT.PUSH);
-        mi.setText ("Edit Clinic");
+        mi.setText ("Edit Storage Type");
         mi.addSelectionListener(new SelectionListener() {
             public void widgetSelected(SelectionEvent event) {
                 openForm(new FormInput(StorageTypeAdapter.this), 
@@ -65,7 +65,7 @@ public class StorageTypeAdapter extends Node {
         });
 
         mi = new MenuItem (menu, SWT.PUSH);
-        mi.setText ("View Clinic");
+        mi.setText ("View Storage Type");
         mi.addSelectionListener(new SelectionListener() {
             public void widgetSelected(SelectionEvent event) {
                 openForm(new FormInput(StorageTypeAdapter.this), 
