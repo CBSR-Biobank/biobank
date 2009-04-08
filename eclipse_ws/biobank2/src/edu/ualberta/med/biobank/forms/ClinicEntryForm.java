@@ -115,8 +115,14 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
         comment.setLayoutData(gd);
 	}
 	
-	private void createButtonsSection() {
-        Composite client = createSectionWithClient(null);
+	private void createButtonsSection() {       
+        Composite client = toolkit.createComposite(form.getBody());
+        GridLayout layout = new GridLayout(2, false);
+        layout.horizontalSpacing = 10;
+        client.setLayout(layout);
+        client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        toolkit.paintBordersFor(client);
+        
 		submit = toolkit.createButton(client, "Submit", SWT.PUSH);
 		submit.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {

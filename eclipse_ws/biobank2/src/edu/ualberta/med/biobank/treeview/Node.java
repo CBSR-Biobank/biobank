@@ -218,8 +218,7 @@ public class Node {
             + this.getName());
     }
     
-    public void closeEditor() {
-        FormInput input = new FormInput(this);
+    public void closeEditor(FormInput input) {
         IWorkbenchPage page = 
             PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
         IEditorPart part = page.findEditor(input);
@@ -228,11 +227,11 @@ public class Node {
         }
     }
     
-    public void openForm(String id) {
-        closeEditor();
+    public void openForm(FormInput input, String id) {
+        closeEditor(input);
         try {
             PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage()
-            .openEditor(new FormInput(this), id, true);
+            .openEditor(input, id, true);
         } 
         catch (PartInitException e) {
             // handle error

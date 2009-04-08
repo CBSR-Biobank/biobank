@@ -11,6 +11,7 @@ import org.eclipse.swt.widgets.Tree;
 
 import edu.ualberta.med.biobank.forms.StudyEntryForm;
 import edu.ualberta.med.biobank.forms.StudyViewForm;
+import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Study;
 
 public class StudyAdapter extends Node {
@@ -19,8 +20,14 @@ public class StudyAdapter extends Node {
 	private Study study;
 	
 	public StudyAdapter(Node parent, Study study) {
-		super(parent, study.getId(), study.getName(), true);
-		this.setStudy(study);
+        super(parent);
+        this.setStudy(study);
+	    
+	    if (study.getId() != null) {
+	        setId(study.getId());
+	        setName(study.getName());
+	        
+	    }
         addChild(new PatientGroup(this, PATIENTS_NODE_ID));
 	}
 
@@ -49,7 +56,7 @@ public class StudyAdapter extends Node {
 	}
     
     public void performDoubleClick() {
-        openForm(StudyViewForm.ID);
+        openForm(new FormInput(this), StudyViewForm.ID);
     }
     
     public void performExpand() {
@@ -60,7 +67,7 @@ public class StudyAdapter extends Node {
         mi.setText ("Edit Study");
         mi.addSelectionListener(new SelectionListener() {
             public void widgetSelected(SelectionEvent event) {
-                openForm(StudyEntryForm.ID);
+                openForm(new FormInput(StudyAdapter.this), StudyEntryForm.ID);
             }
 
             public void widgetDefaultSelected(SelectionEvent e) {                    
@@ -71,7 +78,7 @@ public class StudyAdapter extends Node {
         mi.setText ("View Study");
         mi.addSelectionListener(new SelectionListener() {
             public void widgetSelected(SelectionEvent event) {
-                openForm(StudyViewForm.ID);
+                openForm(new FormInput(StudyAdapter.this), StudyViewForm.ID);
             }
 
             public void widgetDefaultSelected(SelectionEvent e) {                    

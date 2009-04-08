@@ -180,6 +180,8 @@ public class StudyEntryForm extends BiobankEditForm {
         Composite client = createSectionWithClient("Study Information Selection");  
         Collection<Sdata> studySdata = study.getSdataCollection();
         HashMap<Integer, Sdata> selected = new HashMap<Integer, Sdata>();
+        GridLayout gl = (GridLayout) client.getLayout();
+        gl.numColumns = 1;
         
         if (studySdata != null) {
             for (Sdata sdata : studySdata) {

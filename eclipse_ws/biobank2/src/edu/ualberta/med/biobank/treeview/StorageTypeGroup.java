@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.treeview;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.forms.StorageTypeEntryForm;
+import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.StorageType;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -80,7 +81,9 @@ public class StorageTypeGroup extends Node {
         mi.setText ("Add Storage Type");
         mi.addSelectionListener(new SelectionListener() {
             public void widgetSelected(SelectionEvent event) {
-                openForm(StorageTypeEntryForm.ID);
+                StorageTypeAdapter adapter = new StorageTypeAdapter(
+                    StorageTypeGroup.this, new StorageType());
+                openForm(new FormInput(adapter), StorageTypeEntryForm.ID);
             }
 
             public void widgetDefaultSelected(SelectionEvent e) {                    

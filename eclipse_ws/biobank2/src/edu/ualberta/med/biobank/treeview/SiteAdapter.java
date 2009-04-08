@@ -7,8 +7,6 @@ import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
-import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.forms.SiteEntryForm;
 import edu.ualberta.med.biobank.forms.SiteViewForm;
@@ -65,7 +63,7 @@ public class SiteAdapter extends Node {
 	}
     
     public void performDoubleClick() {
-        openForm(SiteViewForm.ID);
+        openForm(new FormInput(this), SiteViewForm.ID);
     }
     
     public void performExpand() {
@@ -76,7 +74,7 @@ public class SiteAdapter extends Node {
         mi.setText ("Edit Site");
         mi.addSelectionListener(new SelectionListener() {
             public void widgetSelected(SelectionEvent event) {
-                openForm(SiteEntryForm.ID);
+                openForm(new FormInput(SiteAdapter.this), SiteEntryForm.ID);
             }
 
             public void widgetDefaultSelected(SelectionEvent e) {                    
@@ -87,7 +85,7 @@ public class SiteAdapter extends Node {
         mi.setText ("View Site");
         mi.addSelectionListener(new SelectionListener() {
             public void widgetSelected(SelectionEvent event) {
-                openForm(SiteViewForm.ID);
+                openForm(new FormInput(SiteAdapter.this), SiteViewForm.ID);
             }
 
             public void widgetDefaultSelected(SelectionEvent e) {                    

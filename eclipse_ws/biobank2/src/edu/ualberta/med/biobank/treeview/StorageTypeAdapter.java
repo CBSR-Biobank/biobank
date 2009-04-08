@@ -11,6 +11,7 @@ import org.eclipse.swt.widgets.Tree;
 
 import edu.ualberta.med.biobank.forms.StorageTypeEntryForm;
 import edu.ualberta.med.biobank.forms.StorageTypeViewForm;
+import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.StorageType;
 
 public class StorageTypeAdapter extends Node {
@@ -47,7 +48,7 @@ public class StorageTypeAdapter extends Node {
 	}
 	
     public void performDoubleClick() {
-        openForm(StorageTypeViewForm.ID);
+        openForm(new FormInput(this), StorageTypeViewForm.ID);
     }
     
     public void popupMenu(TreeViewer tv, Tree tree,  Menu menu) {
@@ -55,7 +56,8 @@ public class StorageTypeAdapter extends Node {
         mi.setText ("Edit Clinic");
         mi.addSelectionListener(new SelectionListener() {
             public void widgetSelected(SelectionEvent event) {
-                openForm(StorageTypeEntryForm.ID);
+                openForm(new FormInput(StorageTypeAdapter.this), 
+                    StorageTypeEntryForm.ID);
             }
 
             public void widgetDefaultSelected(SelectionEvent e) {                    
@@ -66,7 +68,8 @@ public class StorageTypeAdapter extends Node {
         mi.setText ("View Clinic");
         mi.addSelectionListener(new SelectionListener() {
             public void widgetSelected(SelectionEvent event) {
-                openForm(StorageTypeViewForm.ID);
+                openForm(new FormInput(StorageTypeAdapter.this), 
+                    StorageTypeViewForm.ID);
             }
 
             public void widgetDefaultSelected(SelectionEvent e) {                    

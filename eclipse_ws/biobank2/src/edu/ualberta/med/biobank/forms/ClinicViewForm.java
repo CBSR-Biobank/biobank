@@ -107,7 +107,7 @@ public class ClinicViewForm  extends AddressViewFormCommon {
 		final Button edit = toolkit.createButton(client, "Edit Clinic Info", SWT.PUSH);
 		edit.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-                clinicAdapter.openForm(ClinicEntryForm.ID);
+                clinicAdapter.openForm(new FormInput(clinicAdapter), ClinicEntryForm.ID);
 			}
 		});
 	}

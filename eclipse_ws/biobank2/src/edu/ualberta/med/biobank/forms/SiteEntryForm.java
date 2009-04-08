@@ -1,5 +1,7 @@
 package edu.ualberta.med.biobank.forms;
 
+import java.util.List;
+
 import org.eclipse.core.databinding.beans.PojoObservables;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IStatus;
@@ -28,10 +30,13 @@ import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
+import gov.nih.nci.system.applicationservice.ApplicationException;
+import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.SDKQuery;
 import gov.nih.nci.system.query.SDKQueryResult;
 import gov.nih.nci.system.query.example.InsertExampleQuery;
 import gov.nih.nci.system.query.example.UpdateExampleQuery;
+import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class SiteEntryForm extends AddressEntryFormCommon {	
 	public static final String ID =
@@ -148,21 +153,24 @@ public class SiteEntryForm extends AddressEntryFormCommon {
     }
     
     protected void saveForm() {
-		site.setAddress(address);
-		
-		if (siteAdapter.getParent() == null) {
-			siteAdapter.setParent(SessionManager.getInstance().getSessionSingle());
-		}
-		  
+        if (siteAdapter.getParent() == null) {
+            siteAdapter.setParent(SessionManager.getInstance().getSessionSingle());
+        }
+        
         try {
             SDKQuery query;
             SDKQueryResult result;
+            
+            WritableApplicationService appService = siteAdapter.getAppService();
+            
+            if (!checkSiteNameUnique())  return;
 
+            site.setAddress(address);          
             if ((site.getId() == null) || (site.getId() == 0)) {
                 Assert.isTrue(site.getAddress().getId() == null, "insert invoked on address already in database");
                 
                 query = new InsertExampleQuery(site.getAddress());                  
-                result = siteAdapter.getAppService().executeQuery(query);
+                result = appService.executeQuery(query);
                 site.setAddress((Address) result.getObjectResult());
                 query = new InsertExampleQuery(site);   
             }
@@ -170,12 +178,12 @@ public class SiteEntryForm extends AddressEntryFormCommon {
                 Assert.isNotNull(site.getAddress().getId(), "update invoked on address not in database");
 
                 query = new UpdateExampleQuery(site.getAddress());                  
-                result = siteAdapter.getAppService().executeQuery(query);
+                result = appService.executeQuery(query);
                 site.setAddress((Address) result.getObjectResult());
                 query = new UpdateExampleQuery(site);   
             }
             
-            result = siteAdapter.getAppService().executeQuery(query);
+            result = appService.executeQuery(query);
             site = (Site) result.getObjectResult();
         }
         catch (final RemoteAccessException exp) {
@@ -194,6 +202,27 @@ public class SiteEntryForm extends AddressEntryFormCommon {
 		
 		siteAdapter.getParent().performExpand();		
 		getSite().getPage().closeEditor(this, false);    	
+    }
+    
+    private boolean checkSiteNameUnique() throws ApplicationException {
+        WritableApplicationService appService = siteAdapter.getAppService();
+
+        HQLCriteria c = new HQLCriteria(
+            "from edu.ualberta.med.biobank.model.Site where name = '"
+            + site.getName() + "'");
+
+        List<Object> results = appService.query(c);
+        if (results.size() == 0) return true;
+        
+        Display.getDefault().asyncExec(new Runnable() {
+            public void run() {
+                MessageDialog.openError(
+                    PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), 
+                    "Site Name Problem", 
+                "A site with that name already exists.");
+            }
+        });
+        return false;
     }
 
 	@Override

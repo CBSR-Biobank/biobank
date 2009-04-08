@@ -11,6 +11,7 @@ import org.eclipse.swt.widgets.Tree;
 
 import edu.ualberta.med.biobank.forms.ClinicEntryForm;
 import edu.ualberta.med.biobank.forms.ClinicViewForm;
+import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Clinic;
 
 public class ClinicAdapter extends Node {
@@ -52,7 +53,7 @@ public class ClinicAdapter extends Node {
 	}
     
     public void performDoubleClick() {
-        openForm(ClinicViewForm.ID);
+        openForm(new FormInput(this), ClinicViewForm.ID);
     }
     
     public void popupMenu(TreeViewer tv, Tree tree,  Menu menu) {
@@ -60,7 +61,7 @@ public class ClinicAdapter extends Node {
         mi.setText ("Edit Clinic");
         mi.addSelectionListener(new SelectionListener() {
             public void widgetSelected(SelectionEvent event) {
-                openForm(ClinicEntryForm.ID);
+                openForm(new FormInput(ClinicAdapter.this), ClinicEntryForm.ID);
             }
 
             public void widgetDefaultSelected(SelectionEvent e) {                    
@@ -71,7 +72,7 @@ public class ClinicAdapter extends Node {
         mi.setText ("View Clinic");
         mi.addSelectionListener(new SelectionListener() {
             public void widgetSelected(SelectionEvent event) {
-                openForm(ClinicViewForm.ID);
+                openForm(new FormInput(ClinicAdapter.this), ClinicViewForm.ID);
             }
 
             public void widgetDefaultSelected(SelectionEvent e) {                    

@@ -17,6 +17,7 @@ import org.eclipse.ui.PartInitException;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.forms.StudyEntryForm;
+import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -84,7 +85,9 @@ public class StudyGroup extends Node {
         mi.setText ("Add Study");
         mi.addSelectionListener(new SelectionListener() {
             public void widgetSelected(SelectionEvent event) {
-                openForm(StudyEntryForm.ID);
+                StudyAdapter adapter = new StudyAdapter(
+                    StudyGroup.this, new Study());
+                openForm(new FormInput(adapter), StudyEntryForm.ID);
             }
 
             public void widgetDefaultSelected(SelectionEvent e) {                    
