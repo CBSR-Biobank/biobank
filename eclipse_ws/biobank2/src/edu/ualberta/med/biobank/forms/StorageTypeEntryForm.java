@@ -306,6 +306,7 @@ public class StorageTypeEntryForm extends BiobankEditForm {
             
             saveSampleDerivativeTypes(); 
             saveChildStorageTypes();
+            storageType.setCapacity(capacity);
             
             // associate the storage type to it's site
             Site site = (Site) ((SiteAdapter) 
@@ -315,21 +316,9 @@ public class StorageTypeEntryForm extends BiobankEditForm {
             storageType.setSite(site);
 
             if ((storageType.getId() == null) || (storageType.getId() == 0)) {
-                Assert.isTrue(capacity.getId() == null, 
-                    "insert invoked on capacity already in database");
-                
-                query = new InsertExampleQuery(capacity);                  
-                result = appService.executeQuery(query);
-                storageType.setCapacity((Capacity) result.getObjectResult());
                 query = new InsertExampleQuery(storageType);   
             }
             else { 
-                Assert.isNotNull(capacity.getId(), 
-                    "update invoked on address not in database");
-
-                query = new UpdateExampleQuery(capacity);                  
-                result = appService.executeQuery(query);
-                storageType.setCapacity((Capacity) result.getObjectResult());
                 query = new UpdateExampleQuery(storageType);   
             }
             

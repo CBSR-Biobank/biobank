@@ -173,22 +173,13 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
                 return;
             }
 
+            clinic.setAddress(address);
             if ((clinic.getId() == null) || (clinic.getId() == 0)) {
-                Assert.isTrue(clinic.getAddress().getId() == null, 
-                        "insert invoked on address already in database");
-                
-                query = new InsertExampleQuery(address);                    
-                result = appService.executeQuery(query);
-                clinic.setAddress((Address) result.getObjectResult());
                 query = new InsertExampleQuery(clinic); 
             }
             else { 
                 Assert.isNotNull(clinic.getAddress().getId(), 
                         "update invoked on address not in database");
-
-                query = new UpdateExampleQuery(clinic.getAddress());                    
-                result = appService.executeQuery(query);
-                clinic.setAddress((Address) result.getObjectResult());
                 query = new UpdateExampleQuery(clinic); 
             }
             

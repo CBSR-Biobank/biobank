@@ -1,17 +1,25 @@
 package edu.ualberta.med.biobank.treeview;
 
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
+import org.eclipse.ui.PlatformUI;
+import org.springframework.remoting.RemoteAccessException;
 
 import edu.ualberta.med.biobank.forms.SiteEntryForm;
 import edu.ualberta.med.biobank.forms.SiteViewForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Site;
+import gov.nih.nci.system.applicationservice.ApplicationException;
+import gov.nih.nci.system.applicationservice.WritableApplicationService;
+import gov.nih.nci.system.query.SDKQuery;
+import gov.nih.nci.system.query.example.DeleteExampleQuery;
 
 public class SiteAdapter extends Node {
     public static final int STUDIES_NODE_ID = 0;
@@ -91,5 +99,48 @@ public class SiteAdapter extends Node {
             public void widgetDefaultSelected(SelectionEvent e) {                    
             }
         }); 
+
+        mi = new MenuItem (menu, SWT.PUSH);
+        mi.setText ("Delete Site");
+        mi.addSelectionListener(new SelectionListener() {
+            public void widgetSelected(SelectionEvent event) {
+                deleteSite();
+            }
+
+            public void widgetDefaultSelected(SelectionEvent e) {                    
+            }
+        }); 
+    }
+    
+    protected void deleteSite() {
+        boolean result = MessageDialog.openConfirm(
+            PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), 
+            "Site Deletion", 
+            "Are you sure you want to delete site " + site.getName()
+            + "?");
+        
+        if (!result) return;
+        
+        try {
+            SDKQuery query;
+
+            WritableApplicationService appService = getAppService();       
+            query = new DeleteExampleQuery(getSite());
+            appService.executeQuery(query);
+        }
+        catch (final RemoteAccessException exp) {
+            Display.getDefault().asyncExec(new Runnable() {
+                public void run() {
+                    MessageDialog.openError(
+                            PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), 
+                            "Connection Attempt Failed", 
+                            "Could not perform database operation. Make sure server is running correct version.");
+                }
+            });
+        }
+        catch (ApplicationException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 }

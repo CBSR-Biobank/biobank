@@ -1,8 +1,6 @@
 package edu.ualberta.med.biobank.forms;
 
-import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
@@ -22,9 +20,7 @@ public abstract class AddressEntryFormCommon extends BiobankEditForm {
 	protected void createAddressArea() {
 	    Composite client = createSectionWithClient("Address");
         createWidgetsFromHashMap(FormConstants.ADDRESS_FIELDS, 
-                FormConstants.ADDRESS_ORDERED_FIELDS, address, client);        
-        Combo combo = (Combo) controls.get("province");
-        Assert.isNotNull(combo, "could not find province combo for address");
+                FormConstants.ADDRESS_ORDERED_FIELDS, address, client);  
 	}
     
     protected abstract void handleStatusChanged(IStatus severity);
