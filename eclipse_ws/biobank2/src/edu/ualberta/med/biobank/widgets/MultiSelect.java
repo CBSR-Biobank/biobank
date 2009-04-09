@@ -1,9 +1,10 @@
 package edu.ualberta.med.biobank.widgets;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
+import org.apache.commons.collections.MapIterator;
+import org.apache.commons.collections.map.ListOrderedMap;
 import org.apache.log4j.Logger;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
@@ -13,7 +14,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.forms.widgets.FormToolkit;
-
 import edu.ualberta.med.biobank.forms.FormUtils;
 
 public class MultiSelect extends Composite {
@@ -96,16 +96,19 @@ public class MultiSelect extends Composite {
 		}
 	}
 	
-	public void addSelections(HashMap<Integer, String> available,
+	public void addSelections(ListOrderedMap available,
 	    List<Integer> selected) {
-		for (int key : available.keySet()) {
+        MapIterator it = available.mapIterator();
+        
+        while (it.hasNext()) {
+            int key = (Integer) it.next();
 		    if (selected.contains(key)) {
 		        selTreeRootNode.addChild(new MultiSelectNode(
-		            selTreeRootNode, key, available.get(key)));
+		            selTreeRootNode, key, (String) it.getValue()));
 		    }
 		    else {
 		        availTreeRootNode.addChild(new MultiSelectNode(
-		            availTreeRootNode, key, available.get(key)));
+		            availTreeRootNode, key, (String) it.getValue()));
 		    }
 		}
 	}

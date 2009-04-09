@@ -8,7 +8,7 @@ import org.eclipse.ui.PartInitException;
 
 import edu.ualberta.med.biobank.model.Address;
 
-public abstract class AddressEntryFormCommon extends BiobankEditForm {
+public abstract class AddressEntryFormCommon extends BiobankEntryForm {
     
 	protected Address address;
 
@@ -19,8 +19,7 @@ public abstract class AddressEntryFormCommon extends BiobankEditForm {
 
 	protected void createAddressArea() {
 	    Composite client = createSectionWithClient("Address");
-        createWidgetsFromHashMap(FormConstants.ADDRESS_FIELDS, 
-                FormConstants.ADDRESS_ORDERED_FIELDS, address, client);  
+        createWidgetsFromMap(FormConstants.ADDRESS_FIELDS, address, client);  
 	}
     
     protected abstract void handleStatusChanged(IStatus severity);

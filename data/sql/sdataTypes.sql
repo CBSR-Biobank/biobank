@@ -11,17 +11,16 @@
 
 LOCK TABLES `sdata_type` WRITE;
 INSERT INTO `sdata_type` VALUES
-       (1,'Date Drawn'),
-       (2,'Date Received'),
-       (3,'Date Processed'),
-       (4,'Comments'),
-       (5,'Worksheet'),
-       (6,'Aliquot Volume'),
-       (7,'Blood Received'),
-       (8,'WBC Count'),
-       (9,'Time Arrived'),
-       (10,'Biopsy Length'),
-       (11,'Visit'),
-       (12,'Shipped Date');
+       ( 1,'Date Drawn'),
+       ( 2,'Date Received'),
+       ( 3,'Date Processed'),
+       ( 4,'Comments'),
+       ( 5,'Aliquot Volume'),
+       ( 6,'Blood Received'),
+       ( 7,'WBC Count'),
+       ( 8,'Time Arrived'),
+       ( 9,'Biopsy Length'),
+       (10,'Visit'),
+       (11,'Shipped Date');
 UNLOCK TABLES;
 

@@ -3,6 +3,9 @@ package edu.ualberta.med.biobank.forms;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
+
+import org.apache.commons.collections.MapIterator;
+import org.apache.commons.collections.map.ListOrderedMap;
 import org.eclipse.core.databinding.AggregateValidationStatus;
 import org.eclipse.core.databinding.DataBindingContext;
 import org.eclipse.core.databinding.UpdateValueStrategy;
@@ -46,7 +49,7 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
  *    making calls to the database is possible.
  *
  */
-public abstract class BiobankEditForm extends BiobankFormBase {
+public abstract class BiobankEntryForm extends BiobankFormBase {
     
     protected WritableApplicationService appService;
     
@@ -71,7 +74,7 @@ public abstract class BiobankEditForm extends BiobankFormBase {
         }
     };
     
-    public BiobankEditForm() {
+    public BiobankEntryForm() {
         super();
         controls = new HashMap<String, Control>();
         dbc = new DataBindingContext();
@@ -222,12 +225,14 @@ public abstract class BiobankEditForm extends BiobankFormBase {
         }
     }
     
-    protected void createWidgetsFromHashMap(HashMap<String, FieldInfo> fields, 
-            String [] fieldOrder, Object pojo, Composite client) {
+    protected void createWidgetsFromMap(ListOrderedMap fieldsMap, 
+            Object pojo, Composite client) {
         FieldInfo fi;
         
-        for (String key : fieldOrder) {
-            fi = fields.get(key);
+        MapIterator it = fieldsMap.mapIterator();
+        while (it.hasNext()) {
+            String key = (String) it.next();
+            fi = (FieldInfo) it.getValue();
             
             Control control = createBoundWidget(client, fi.widgetClass, 
                 fi.widgetOptions, fi.label, fi.widgetValues, 

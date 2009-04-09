@@ -6,7 +6,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeMap;
 
+import org.apache.commons.collections.map.ListOrderedMap;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.dialogs.IMessageProvider;
@@ -50,7 +52,7 @@ import gov.nih.nci.system.query.example.UpdateExampleQuery;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 @SuppressWarnings("serial")
-public class StudyEntryForm extends BiobankEditForm {
+public class StudyEntryForm extends BiobankEntryForm {
 	public static final String ID =
 	      "edu.ualberta.med.biobank.forms.StudyEntryForm";
 	
@@ -66,8 +68,8 @@ public class StudyEntryForm extends BiobankEditForm {
 		"comment"
 	};
 	
-	public static final HashMap<String, FieldInfo> FIELDS = 
-	    new HashMap<String, FieldInfo>() {{
+	public static final ListOrderedMap FIELDS = 
+	    new ListOrderedMap() {{
 	        put("name", new FieldInfo(
 	            "Name", Text.class, SWT.NONE, null, 
 	            NonEmptyString.class, "Study name cannot be blank"));
@@ -96,11 +98,11 @@ public class StudyEntryForm extends BiobankEditForm {
 	
 	private Button submit;
         
-    private HashMap<String, SdataWidget> sdataWidgets;
+    private TreeMap<String, SdataWidget> sdataWidgets;
 	
 	public StudyEntryForm() {
 		super();
-		sdataWidgets = new HashMap<String, SdataWidget>();
+		sdataWidgets = new TreeMap<String, SdataWidget>();
 	}
 
 	@Override
@@ -133,18 +135,16 @@ public class StudyEntryForm extends BiobankEditForm {
     protected void createFormContent() {
 		form.setText("Study Information");
 		form.setMessage(getOkMessage(), IMessageProvider.NONE);
-		
-		GridLayout layout = new GridLayout(1, false);
-		form.getBody().setLayout(layout);
+		form.getBody().setLayout(new GridLayout(1, false));
 		
 		Composite client = toolkit.createComposite(form.getBody());
-		layout = new GridLayout(2, false);
+		GridLayout layout = new GridLayout(2, false);
 		layout.horizontalSpacing = 10;
 		client.setLayout(layout);
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		toolkit.paintBordersFor(client);
 		
-        createWidgetsFromHashMap(FIELDS, ORDERED_FIELDS, study, client);
+        createWidgetsFromMap(FIELDS, study, client);
         Text comments = (Text) controls.get("comment");
         GridData gd = (GridData) comments.getLayoutData();
         gd.heightHint = 40;
@@ -160,7 +160,7 @@ public class StudyEntryForm extends BiobankEditForm {
         Collection<Clinic> studyClinics = study.getClinicCollection(); 
         allClinics = site.getClinicCollection();
 
-        HashMap<Integer, String> availClinics = new HashMap<Integer, String>();
+        ListOrderedMap availClinics = new ListOrderedMap();
         List<Integer> selClinics = new ArrayList<Integer>();
 
         if (studyClinics != null) {

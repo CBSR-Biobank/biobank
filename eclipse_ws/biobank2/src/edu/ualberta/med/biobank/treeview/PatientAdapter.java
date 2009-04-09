@@ -11,8 +11,10 @@ import org.eclipse.swt.widgets.Tree;
 
 import edu.ualberta.med.biobank.forms.PatientEntryForm;
 import edu.ualberta.med.biobank.forms.PatientViewForm;
+import edu.ualberta.med.biobank.forms.PatientVisitEntryForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Patient;
+import edu.ualberta.med.biobank.model.PatientVisit;
 
 public class PatientAdapter extends Node {
     
@@ -64,6 +66,19 @@ public class PatientAdapter extends Node {
         mi.addSelectionListener(new SelectionListener() {
             public void widgetSelected(SelectionEvent event) {
                 openForm(new FormInput(PatientAdapter.this), PatientViewForm.ID);
+            }
+
+            public void widgetDefaultSelected(SelectionEvent e) {                    
+            }
+        }); 
+
+        mi = new MenuItem (menu, SWT.PUSH);
+        mi.setText ("Add Patient Visit");
+        mi.addSelectionListener(new SelectionListener() {
+            public void widgetSelected(SelectionEvent event) {
+                PatientVisitAdapter adapter = new PatientVisitAdapter(
+                    PatientAdapter.this, new PatientVisit());
+                openForm(new FormInput(adapter), PatientVisitEntryForm.ID);
             }
 
             public void widgetDefaultSelected(SelectionEvent e) {                    

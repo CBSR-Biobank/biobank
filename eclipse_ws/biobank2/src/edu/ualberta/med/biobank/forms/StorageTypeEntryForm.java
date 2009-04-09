@@ -2,11 +2,11 @@ package edu.ualberta.med.biobank.forms;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.collections.map.ListOrderedMap;
 import org.apache.log4j.Logger;
 import org.eclipse.core.databinding.beans.PojoObservables;
 import org.eclipse.core.runtime.Assert;
@@ -51,7 +51,7 @@ import gov.nih.nci.system.query.example.InsertExampleQuery;
 import gov.nih.nci.system.query.example.UpdateExampleQuery;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
-public class StorageTypeEntryForm extends BiobankEditForm {
+public class StorageTypeEntryForm extends BiobankEntryForm {
     public static final String ID =
         "edu.ualberta.med.biobank.forms.StorageTypeEntryForm";
     
@@ -195,8 +195,7 @@ public class StorageTypeEntryForm extends BiobankEditForm {
                 "Selected Sample Derivatives", "Available Sample Derivatives", 100);
         samplesMultiSelect.adaptToToolkit(toolkit);
 
-        HashMap<Integer, String> availSampleDerivTypes = 
-            new HashMap<Integer, String>();
+        ListOrderedMap availSampleDerivTypes = new ListOrderedMap();
         List<Integer> selSampleDerivTypes = new ArrayList<Integer>();
 
         if (stSamplesTypes != null) {
@@ -230,8 +229,7 @@ public class StorageTypeEntryForm extends BiobankEditForm {
                 "Selected Storage Types", "Available Storage Types", 100);
         childStorageTypesMultiSelect.adaptToToolkit(toolkit);
 
-        HashMap<Integer, String> availStorageTypes = 
-            new HashMap<Integer, String>();
+        ListOrderedMap availStorageTypes = new ListOrderedMap();
         List<Integer> selChildStorageTypes = new ArrayList<Integer>();
 
         if (childStorageTypes != null) {

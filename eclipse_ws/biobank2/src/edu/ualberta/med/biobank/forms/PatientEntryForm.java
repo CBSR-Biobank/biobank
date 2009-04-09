@@ -37,7 +37,7 @@ import gov.nih.nci.system.query.example.InsertExampleQuery;
 import gov.nih.nci.system.query.example.UpdateExampleQuery;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
-public class PatientEntryForm extends BiobankEditForm {
+public class PatientEntryForm extends BiobankEntryForm {
     public static final String ID =
         "edu.ualberta.med.biobank.forms.PatientEntryForm";
     

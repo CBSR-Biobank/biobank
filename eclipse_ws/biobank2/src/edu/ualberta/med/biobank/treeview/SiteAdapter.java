@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.treeview;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Display;
@@ -121,26 +122,33 @@ public class SiteAdapter extends Node {
         
         if (!result) return;
         
-        try {
-            SDKQuery query;
+        BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
+            public void run() {
 
-            WritableApplicationService appService = getAppService();       
-            query = new DeleteExampleQuery(getSite());
-            appService.executeQuery(query);
-        }
-        catch (final RemoteAccessException exp) {
-            Display.getDefault().asyncExec(new Runnable() {
-                public void run() {
-                    MessageDialog.openError(
-                            PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), 
-                            "Connection Attempt Failed", 
-                            "Could not perform database operation. Make sure server is running correct version.");
+                try {
+                    SDKQuery query;
+
+                    WritableApplicationService appService = getAppService();       
+                    query = new DeleteExampleQuery(site);
+                    site.getAddress();
+                    site.getClinicCollection();
+                    appService.executeQuery(query);
                 }
-            });
-        }
-        catch (ApplicationException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+                catch (final RemoteAccessException exp) {
+                    Display.getDefault().asyncExec(new Runnable() {
+                        public void run() {
+                            MessageDialog.openError(
+                                PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), 
+                                "Connection Attempt Failed", 
+                            "Could not perform database operation. Make sure server is running correct version.");
+                        }
+                    });
+                }
+                catch (ApplicationException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 }

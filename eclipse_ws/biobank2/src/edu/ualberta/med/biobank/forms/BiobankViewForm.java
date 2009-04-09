@@ -1,9 +1,9 @@
 package edu.ualberta.med.biobank.forms;
 
 import java.util.HashMap;
-
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
-
+import org.apache.commons.collections.MapIterator;
+import org.apache.commons.collections.map.ListOrderedMap;
 import org.eclipse.core.databinding.DataBindingContext;
 import org.eclipse.core.databinding.beans.PojoObservables;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
@@ -76,12 +76,14 @@ public abstract class BiobankViewForm extends BiobankFormBase {
     	return null;
     }
     
-    protected void createWidgetsFromHashMap(HashMap<String, FieldInfo> fields, 
-            String [] fieldOrder, Object pojo, Composite client) {
+    protected void createWidgetsFromMap(ListOrderedMap fieldsMap, 
+            Object pojo, Composite client) {
         FieldInfo fi;
         
-        for (String key : fieldOrder) {
-            fi = fields.get(key);
+        MapIterator it = fieldsMap.mapIterator();
+        while (it.hasNext()) {
+            String key = (String) it.next();
+            fi = (FieldInfo) it.getValue();
             
             Control control = createBoundWidget(client, fi.widgetClass, SWT.NONE,
                 fi.label, PojoObservables.observeValue(pojo, key));

@@ -8,7 +8,6 @@ public abstract class AddressViewFormCommon extends BiobankViewForm {
 	protected Address address;
 
 	protected void createAddressArea(Composite parent) {		
-		createWidgetsFromHashMap(FormConstants.ADDRESS_FIELDS,
-				FormConstants.ADDRESS_ORDERED_FIELDS, address, parent);
+		createWidgetsFromMap(FormConstants.ADDRESS_FIELDS, address, parent);
 	}
 }

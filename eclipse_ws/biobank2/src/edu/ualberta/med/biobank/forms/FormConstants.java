@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.forms;
 
-import java.util.HashMap;
-
+import org.apache.commons.collections.map.ListOrderedMap;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Text;
@@ -12,16 +11,6 @@ import edu.ualberta.med.biobank.validators.TelephoneNumber;
 
 @SuppressWarnings("serial")
 public class FormConstants {
-    public static final String[]  ADDRESS_ORDERED_FIELDS = new String[] {
-        "street1",
-        "street2",
-        "city",
-        "province",
-        "postalCode",
-        "phoneNumber",
-        "faxNumber",
-        "email"
-    };
 
     // used to select a list
     public static final String[] PROVINCES = new String[] {
@@ -40,8 +29,11 @@ public class FormConstants {
         "Yukon"
     };
 
-    public static final HashMap<String, FieldInfo> ADDRESS_FIELDS =
-        new HashMap<String, FieldInfo>() {{
+    /*
+     * Want to preserve insert order so using ListOrderedMap.
+     */
+    public static final ListOrderedMap ADDRESS_FIELDS =
+        new ListOrderedMap() {{
             put("street1", new FieldInfo(
                 "Street 1", Text.class,  SWT.NONE, null, null,  null));
             put("street2",  new FieldInfo(
