@@ -4,7 +4,6 @@
 	
 	<!-- Import the files for each remote service -->
 	<import resource="application-config-client-info.xml"/>
-    <import resource="application-config-client-info-levante.xml"/>
 	
 	<!-- Make an entry for ServiceInfo for each remote service. The default service bean must be called "ServiceInfo" -->
 	<alias alias="ServiceInfo" name="biobank2ServiceInfo"/>
