@@ -40,4 +40,5 @@ Bundle-ClassPath: lib/acegi-security-1.0.4.jar,
  lib/sdk-security.jar,
  lib/sdk-writable-core.jar,
  lib/commons-lang-2.4.jar,
+ lib/gface_0.9.1.jar,
  lib/

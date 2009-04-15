@@ -12,11 +12,11 @@ import org.eclipse.swt.widgets.Text;
 
 public class ListAddDialog extends Dialog {
     
-    String title;
-    String prompt;
-    String helpText;
-    Text items;
-    String [] result;
+    private String title;
+    private String prompt;
+    private String helpText;
+    private Text items;
+    private String [] result;
 
     public ListAddDialog(Shell parentShell, String title, String prompt, String helpText) {
         super(parentShell);

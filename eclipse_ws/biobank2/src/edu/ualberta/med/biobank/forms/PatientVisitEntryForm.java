@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.forms;
 
+import java.text.DateFormat;
 import java.util.Collection;
 
 import org.apache.commons.collections.MapIterator;
@@ -14,10 +15,18 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
 
+import com.gface.date.DatePicker;
+import com.gface.date.DateSelectedEvent;
+import com.gface.date.DateSelectionListener;
+
+import edu.ualberta.med.biobank.dialogs.DatePickerDlg;
+import edu.ualberta.med.biobank.dialogs.ListAddDialog;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.PatientVisitData;
@@ -48,6 +57,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
     private Button submit;
 
     public PatientVisitEntryForm() {
+        super();
         pvDataMap = new ListOrderedMap();
     }
 
@@ -112,29 +122,60 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
             toolkit.createLabel(client, key + ":", SWT.LEFT);
 
             if (key.equals("Date Drawn")) {
+                createDatePickerSection(client, key, "select date", value);
             }
             else if (key.equals("Date Received")) {
+                toolkit.createText(client, value, SWT.NONE);
             }
             else if (key.equals("Date Processed")) {
+                toolkit.createText(client, value, SWT.NONE);
             }
             else if (key.equals("Comments")) {
-            toolkit.createText(client, value, SWT.NONE);
+                toolkit.createText(client, value, SWT.NONE);
             }
             else if (key.equals("Aliquot Volume")) {
+                toolkit.createText(client, value, SWT.NONE);
             }
             else if (key.equals("Blood Received")) {
+                toolkit.createText(client, value, SWT.NONE);
             }
             else if (key.equals("WBC Count")) {
+                toolkit.createText(client, value, SWT.NONE);
             }
             else if (key.equals("Time Arrived")) {
+                toolkit.createText(client, value, SWT.NONE);
             }
             else if (key.equals("Biopsy Length")) {
+                toolkit.createText(client, value, SWT.NONE);
             }
             else if (key.equals("Visit")) {
+                toolkit.createText(client, value, SWT.NONE);
             }
             else if (key.equals("Shipped Date")) {
+                toolkit.createText(client, value, SWT.NONE);
             }
         }
+    }
+    
+    private void createDatePickerSection(Composite client, final String title, 
+        final String prompt, String value) {
+        Composite dateArea = toolkit.createComposite(client);
+        GridLayout layout = new GridLayout(2, false);
+        layout.horizontalSpacing = 10;
+        dateArea.setLayout(layout);
+        dateArea.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        
+        toolkit.createText(dateArea, value, SWT.NONE);
+        
+        Button btn = toolkit.createButton(dateArea, "Pick Date", SWT.PUSH);
+        btn.addSelectionListener(new SelectionAdapter() {
+            public void widgetSelected(SelectionEvent e) {                
+                DatePickerDlg dlg = new DatePickerDlg(
+                    PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), 
+                    title, prompt);
+                dlg.open();
+            }
+        });
     }
 
     private void createButtonsSection() {
