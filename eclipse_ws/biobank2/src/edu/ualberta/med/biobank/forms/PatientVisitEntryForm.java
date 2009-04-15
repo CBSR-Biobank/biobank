@@ -19,6 +19,7 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
@@ -61,12 +62,12 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
     }
     
     class PvInitialValue {
-        String label;
-        String options;
+        int id;
+        String [] options;
         String value;
         
-        public PvInitialValue(String label) {
-            this.label = label;
+        public PvInitialValue(int id) {
+            this.id = id;
             this.value = new String();
         }
     }
@@ -113,9 +114,9 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
             patientVisitAdapter.getParent().getParent().getParent()).getStudy();
 
         for (Sdata sdata : study.getSdataCollection()) {
-            PvInitialValue pvInitialValue = new PvInitialValue(sdata.getSdataType().getType());
-            pvInitialValue.options = sdata.getValue();
-            pvInitialValuesMap.put(sdata.getSdataType().getId(), pvInitialValue);
+            PvInitialValue pvInitialValue = new PvInitialValue(sdata.getSdataType().getId());
+            pvInitialValue.options = sdata.getValue().split(";");
+            pvInitialValuesMap.put(sdata.getSdataType().getType(), pvInitialValue);
         }
 
         Collection<PatientVisitData> pvDataCollection =
@@ -123,7 +124,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         if (pvDataCollection != null) {
             for (PatientVisitData pvData : pvDataCollection) {
                 PvInitialValue pvInitialValue = (PvInitialValue) 
-                    pvInitialValuesMap.get(pvData.getSdataType().getId());
+                    pvInitialValuesMap.get(pvData.getSdataType().getType());
                 pvInitialValue.value = pvData.getValue();
             }
         }
@@ -132,13 +133,12 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         MapIterator it = pvInitialValuesMap.mapIterator();
         while (it.hasNext()) {
             control = null;
-            Integer key = (Integer) it.next();
+            String label = (String) it.next();
             PvInitialValue pvInitialValue = (PvInitialValue) it.getValue();
-            Label label = toolkit.createLabel(client, pvInitialValue.label + ":", 
-                SWT.LEFT);
-            label.setLayoutData(new GridData(GridData.VERTICAL_ALIGN_BEGINNING));
+            Label labelWidget = toolkit.createLabel(client, label + ":", SWT.LEFT);
+            labelWidget.setLayoutData(new GridData(GridData.VERTICAL_ALIGN_BEGINNING));
 
-            switch (key) {
+            switch (pvInitialValue.id) {
                 case  1: // Date Drawn
                 case  2: // Date Received
                 case  3: // Date Processed
@@ -166,14 +166,15 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
                     break;
                     
                 default:
-                    Assert.isTrue(false, "Invalid sdata type: " + key);
+                    Assert.isTrue(false, "Invalid sdata type: " 
+                        + pvInitialValue.id);
             }
             GridData gd = new GridData(GridData.FILL_HORIZONTAL);
-            if (key == 4) {
+            if (pvInitialValue.id == 4) {
                 gd.heightHint = 40;
             }
             control.setLayoutData(gd);
-            controls.put(pvInitialValue.label, control);
+            controls.put(label, control);
         }
     }
 
@@ -196,13 +197,12 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         return datePicker;
     }
     
-    private Control createComboSection(Composite client, String values, 
+    private Control createComboSection(Composite client, String [] values, 
         String selected) {
         
-        String [] options = values.split(";");
         int count = 0, index = 0;
-        for (String option : options) {
-            if (selected.equals(option)) {
+        for (String value : values) {
+            if (selected.equals(value)) {
                 index = count;
                 break;
             }
@@ -211,7 +211,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         
         Combo combo = new Combo(client, SWT.READ_ONLY);
         combo.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
-        combo.setItems(options);
+        combo.setItems(values);
         combo.select(index);
         
         toolkit.adapt(combo, true, true);
@@ -248,6 +248,23 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
 
     @Override
     protected void saveForm() {
+        for (String key : controls.keySet()) {
+            Control control = controls.get(key);
+            if (control instanceof Text) {
+                System.out.println(key + ": " + ((Text) control).getText());
+            }
+            else if (control instanceof Combo) {
+                int index = ((Combo) control).getSelectionIndex(); 
+                PvInitialValue pvInitialValue = 
+                    (PvInitialValue) pvInitialValuesMap.get(key);
+                Assert.isTrue(index < pvInitialValue.options.length,
+                    "Invalid combo box selection " + index);
+                System.out.println(key + ": " + pvInitialValue.options[index]);
+            }
+            else if (control instanceof DatePickerCombo) {
+                System.out.println(key + ": " + ((DatePickerCombo) control).getDate());
+            }
+        }
 
     }
 }
