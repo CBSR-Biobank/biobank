@@ -68,7 +68,12 @@ public abstract class BiobankFormBase extends EditorPart {
         // separate thread.
         BusyIndicator.showWhile(parent.getDisplay(), new Runnable() {
             public void run() {
-                createFormContent();
+                try {
+                    createFormContent();
+                }
+                catch (Exception e) {
+                    e.printStackTrace();
+                }   
                 form.reflow(true);
             }
         });        

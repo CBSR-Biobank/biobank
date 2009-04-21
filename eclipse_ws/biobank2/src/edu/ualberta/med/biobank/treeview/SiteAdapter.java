@@ -17,7 +17,6 @@ import edu.ualberta.med.biobank.forms.SiteEntryForm;
 import edu.ualberta.med.biobank.forms.SiteViewForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Site;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.SDKQuery;
 import gov.nih.nci.system.query.example.DeleteExampleQuery;
@@ -144,7 +143,7 @@ public class SiteAdapter extends Node {
                         }
                     });
                 }
-                catch (ApplicationException e) {
+                catch (Exception e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
                 }

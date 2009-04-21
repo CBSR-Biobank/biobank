@@ -294,7 +294,7 @@ public class StudyEntryForm extends BiobankEntryForm {
                 }
             });
         }
-        catch (ApplicationException e) {
+        catch (Exception e) {
             e.printStackTrace();
         }	
     }

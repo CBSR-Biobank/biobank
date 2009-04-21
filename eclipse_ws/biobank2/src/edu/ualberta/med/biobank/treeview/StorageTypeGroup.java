@@ -5,7 +5,6 @@ import edu.ualberta.med.biobank.forms.StorageTypeEntryForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.StorageType;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 import java.util.Collection;
@@ -69,7 +68,7 @@ public class StorageTypeGroup extends Node {
                     SessionManager.getInstance().getTreeViewer().expandToLevel(
                         StorageTypeGroup.this, 1);
                 }
-                catch (ApplicationException e) {
+                catch (Exception e) {
                     e.printStackTrace();
                 }
             }

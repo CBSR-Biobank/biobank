@@ -21,7 +21,6 @@ import edu.ualberta.med.biobank.forms.ClinicEntryForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Site;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class ClinicGroup extends Node {
@@ -68,7 +67,7 @@ public class ClinicGroup extends Node {
                     SessionManager.getInstance().getTreeViewer().expandToLevel(
                         ClinicGroup.this, 1);
                 }
-                catch (ApplicationException e) {
+                catch (Exception e) {
                     e.printStackTrace();
                 }
             }

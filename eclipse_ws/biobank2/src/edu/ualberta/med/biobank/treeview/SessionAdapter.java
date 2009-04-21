@@ -16,8 +16,6 @@ import org.eclipse.ui.handlers.IHandlerService;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.model.Site;
-
-import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class SessionAdapter extends Node {
@@ -64,7 +62,7 @@ public class SessionAdapter extends Node {
                     SessionManager.getInstance().getTreeViewer().expandToLevel(
                         SessionAdapter.this, 1);
                 }
-                catch (ApplicationException e) {
+                catch (Exception e) {
                     e.printStackTrace();
                 }
             }

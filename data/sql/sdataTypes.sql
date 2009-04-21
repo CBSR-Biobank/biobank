@@ -14,13 +14,14 @@ INSERT INTO `sdata_type` VALUES
        ( 1,'Date Drawn'),
        ( 2,'Date Received'),
        ( 3,'Date Processed'),
-       ( 4,'Comments'),
+       ( 4,'Shipped Date'),
        ( 5,'Aliquot Volume'),
        ( 6,'Blood Received'),
-       ( 7,'WBC Count'),
-       ( 8,'Time Arrived'),
-       ( 9,'Biopsy Length'),
-       (10,'Visit'),
-       (11,'Shipped Date');
+       ( 7,'Visit'),
+       ( 8,'WBC Count'),
+       ( 9,'Time Arrived'),
+       (10,'Biopsy Length'),
+       -- comments should be last
+       (11,'Comments');
 UNLOCK TABLES;
 

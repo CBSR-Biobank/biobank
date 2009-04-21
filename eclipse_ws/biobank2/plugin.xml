@@ -206,6 +206,12 @@
             id="edu.ualberta.med.biobank.forms.PatientVisitEntryForm"
             name="Patient Visit Entry">
       </editor>
+      <editor
+            class="edu.ualberta.med.biobank.forms.PatientVisitViewForm"
+            default="false"
+            id="edu.ualberta.med.biobank.forms.PatientVisitViewForm"
+            name="Patient Visit View">
+      </editor>
    </extension>
    <extension
          point="org.eclipse.ui.bindings">

@@ -46,7 +46,7 @@ public class PatientViewForm extends BiobankViewForm {
 
     @Override
     protected void createFormContent() {
-        form.setText("BioBank Site: " + patient.getNumber());    
+        form.setText("Patient: " + patient.getNumber());    
         form.getBody().setLayout(new GridLayout(1, false));
         form.getBody().setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         

@@ -1,20 +1,26 @@
 package edu.ualberta.med.biobank.treeview;
 
+import java.util.Collection;
+import java.util.List;
+
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
 
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.forms.PatientEntryForm;
 import edu.ualberta.med.biobank.forms.PatientViewForm;
 import edu.ualberta.med.biobank.forms.PatientVisitEntryForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.PatientVisit;
+import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class PatientAdapter extends Node {
     
@@ -23,6 +29,7 @@ public class PatientAdapter extends Node {
     public PatientAdapter(Node parent, Patient patient) {
         super(parent);
         this.patient = patient;
+        setHasChildren(true);
     }
     
     public Patient getPatient() {
@@ -47,6 +54,36 @@ public class PatientAdapter extends Node {
     
     public void performDoubleClick() {
         openForm(new FormInput(this), PatientViewForm.ID);
+    }
+
+    public void performExpand() {   
+        Display.getDefault().asyncExec(new Runnable() {
+            public void run() {                
+                // read from database again                 
+                WritableApplicationService appService = getAppService();
+                try {
+                    Patient searchPatient = new Patient();
+                    searchPatient.setId(patient.getId());
+                    List<Patient> result = appService.search(Patient.class, searchPatient);
+                    Assert.isTrue(result.size() == 1);
+                    searchPatient = result.get(0);
+
+                    Collection<PatientVisit> visits = searchPatient.getPatientVisitCollection();
+
+                    for (PatientVisit visit : visits) {
+                        PatientVisitAdapter node = 
+                            new PatientVisitAdapter(PatientAdapter.this, visit);
+                        addChild(node);
+                        SessionManager.getInstance().getTreeViewer().update(node, null);
+                    }
+                    SessionManager.getInstance().getTreeViewer().expandToLevel(
+                        PatientAdapter.this, 1);
+                }
+                catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
     
     public void popupMenu(TreeViewer tv, Tree tree,  Menu menu) {
