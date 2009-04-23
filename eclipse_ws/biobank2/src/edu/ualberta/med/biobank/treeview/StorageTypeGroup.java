@@ -60,10 +60,16 @@ public class StorageTypeGroup extends Node {
                         log4j.trace(
                             "updateStudies: Storage Type "
                             + storageType.getId() + ": " + storageType.getName());
+                        
+                        StorageTypeAdapter node = 
+                            (StorageTypeAdapter) getChild(storageType.getId());
 
-                        StorageTypeAdapter node = new StorageTypeAdapter(
-                            StorageTypeGroup.this, storageType);
-                        addChild(node);
+                        if (node == null) {
+                            node = new StorageTypeAdapter(StorageTypeGroup.this, storageType);
+                            addChild(node);
+                        }
+                        
+                        SessionManager.getInstance().getTreeViewer().update(node, null);
                     }
                     SessionManager.getInstance().getTreeViewer().expandToLevel(
                         StorageTypeGroup.this, 1);

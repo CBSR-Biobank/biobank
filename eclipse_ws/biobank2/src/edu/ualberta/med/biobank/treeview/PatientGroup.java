@@ -47,8 +47,13 @@ public class PatientGroup extends Node {
 
                     for (Patient patient: patients) {
                         PatientAdapter node = 
-                            new PatientAdapter(PatientGroup.this, patient);
-                        addChild(node);
+                            (PatientAdapter) getChild(patient.getId());
+
+                        if (node == null) {
+                            node = new PatientAdapter(PatientGroup.this, patient);
+                            addChild(node);
+                        }
+                        
                         SessionManager.getInstance().getTreeViewer().update(node, null);
                     }
                     SessionManager.getInstance().getTreeViewer().expandToLevel(

@@ -65,8 +65,13 @@ public class StudyGroup extends Node {
                                 + ", short name: " + study.getNameShort());
                         
                         StudyAdapter node = 
-                            new StudyAdapter(StudyGroup.this, study);
-                        addChild(node);
+                            (StudyAdapter) getChild(study.getId());
+
+                        if (node == null) {
+                            node = new StudyAdapter(StudyGroup.this, study);
+                            addChild(node);
+                        }
+                        
                         SessionManager.getInstance().getTreeViewer().update(node, null);
                     }
                     SessionManager.getInstance().getTreeViewer().expandToLevel(

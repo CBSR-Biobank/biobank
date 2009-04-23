@@ -7,7 +7,7 @@ import gov.nih.nci.system.client.ApplicationServiceProvider;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
-import org.springframework.remoting.RemoteConnectFailureException;
+import org.springframework.remoting.RemoteAccessException;
 
 public class SessionHelper implements Runnable {
 	
@@ -46,7 +46,7 @@ public class SessionHelper implements Runnable {
 			Site site = new Site();		
 			sites = appService.search(Site.class, site);
 		}
-		catch (final RemoteConnectFailureException exp) {
+		catch (final RemoteAccessException exp) {
 			Display.getDefault().asyncExec(new Runnable() {
 				public void run() {
 					MessageDialog.openError(

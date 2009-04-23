@@ -1,12 +1,11 @@
 package edu.ualberta.med.biobank.forms;
 
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.commons.collections.MapIterator;
 import org.apache.commons.collections.map.ListOrderedMap;
@@ -160,7 +159,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
             control = null;
             String label = (String) it.next();
             PatientVisitInfo pvInfo = (PatientVisitInfo) it.getValue();
-            String value = "";
+            String value = null;
             int typeId = pvInfo.sdata.getSdataType().getId();
             
             if (pvInfo.pvData != null) {
@@ -171,38 +170,38 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
             labelWidget.setLayoutData(new GridData(GridData.VERTICAL_ALIGN_BEGINNING));
 
             switch (typeId) {
-                case  1: // Date Drawn
-                case  2: // Date Received
-                case  3: // Date Processed
-                case 11: // Shipped Date
+                case 1: // Date Drawn
+                case 2: // Date Received
+                case 3: // Date Processed
+                case 4: // Shipped Date
                     control = createDatePickerSection(client, value);
                     break;
                     
-                case  5: // Aliquot Volume
-                case  6: // Blood Received
-                case 10: // Visit
+                case 5: // Aliquot Volume
+                case 6: // Blood Received
+                case 7: // Visit
                     control = createComboSection(client, 
                         pvInfo.sdata.getValue().split(";"), 
                         value);
                     break;
                     
-                case  4: // Comments
-                    control = toolkit.createText(client, value, 
-                        SWT.LEFT | SWT.MULTI);
-                    break;
-                    
-                case  7: // WBC Count
-                case  8: // Time Arrived
-                case  9: // Biopsy Length
+                case  8: // WBC Count
+                case  9: // Time Arrived
+                case  10: // Biopsy Length
                     control = toolkit.createText(client, value, 
                         SWT.LEFT);
+                    break;
+                    
+                case 11: // Comments
+                    control = toolkit.createText(client, value, 
+                        SWT.LEFT | SWT.MULTI);
                     break;
                     
                 default:
                     Assert.isTrue(false, "Invalid sdata type: " + typeId);
             }
             GridData gd = new GridData(GridData.FILL_HORIZONTAL);
-            if (typeId == 4) {
+            if (typeId == 11) {
                 gd.heightHint = 40;
             }
             control.setLayoutData(gd);
@@ -218,7 +217,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         datePicker.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         datePicker.setDateFormat(new SimpleDateFormat(DATE_FORMAT));
 
-        if (value.length() > 0) {
+        if ((value != null) && (value.length() > 0)) {
             SimpleDateFormat df = new SimpleDateFormat(DATE_FORMAT);
             try {
                 datePicker.setDate(df.parse(value));
@@ -233,19 +232,20 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
     private Control createComboSection(Composite client, String [] values, 
         String selected) {
         
-        int count = 0, index = 0;
-        for (String value : values) {
-            if (selected.equals(value)) {
-                index = count;
-                break;
-            }
-            ++count;
-        }
-        
         Combo combo = new Combo(client, SWT.READ_ONLY);
         combo.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
         combo.setItems(values);
-        combo.select(index);
+        
+        if (selected != null) {
+            int count = 0;       
+            for (String value : values) {
+                if (selected.equals(value)) {
+                    combo.select(count);
+                    break;
+                }
+                ++count;
+            }
+        }
         
         toolkit.adapt(combo, true, true);
         
@@ -296,7 +296,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
             PatientAdapter patientAdapter = 
                 (PatientAdapter) patientVisitAdapter.getParent();
             
-            patientVisit.setPatient(patientAdapter.getPatient());
+            patientVisit.setPatient(patientAdapter.getPatient()); 
 
             if ((patientVisit.getId() == null) || (patientVisit.getId() == 0)) {
                 query = new InsertExampleQuery(patientVisit);
@@ -306,9 +306,10 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
             }
 
             result = appService.executeQuery(query);
-            patientVisit = (PatientVisit) result.getObjectResult();
+            patientVisit = (PatientVisit) result.getObjectResult();     
             
-            savePatientVisitData();     
+            savePatientVisitData();
+            
             patientAdapter.performExpand();       
             getSite().getPage().closeEditor(this, false);    
         }
@@ -327,16 +328,18 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         }
     }
     
-    private List<PatientVisitData> savePatientVisitData() throws ApplicationException {
+    private Set<PatientVisitData> savePatientVisitData() throws ApplicationException {
         SDKQuery query;
         SDKQueryResult result;
-        List<PatientVisitData> pvDataCollection = new ArrayList<PatientVisitData>();
+        Set<PatientVisitData> pvDataCollection = new HashSet<PatientVisitData>();
         
         for (String key : controls.keySet()) {
             PatientVisitInfo pvInfo = (PatientVisitInfo) pvInfoMap.get(key);
             PatientVisitData pvData = new PatientVisitData();
-            
-            pvData.setPatientVisit(patientVisit);
+
+            if ((patientVisit.getId() != null) && (patientVisit.getId() != 0)) {
+                pvData.setPatientVisit(patientVisit);
+            }
             pvData.setSdata(pvInfo.sdata);
             
             if (pvInfo.pvData != null) {

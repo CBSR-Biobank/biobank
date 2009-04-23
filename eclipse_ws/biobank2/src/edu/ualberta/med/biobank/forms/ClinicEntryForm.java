@@ -105,8 +105,13 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
         // PlatformUI.getWorkbench().getHelpSystem().setHelp(composite, IJavaHelpContextIds.XXXXX);
 	}
 	
-	private void createClinicInfoSection() {
-	    Composite client = createSectionWithClient("Clinic");
+	private void createClinicInfoSection() {      
+        Composite client = toolkit.createComposite(form.getBody());
+        GridLayout layout = new GridLayout(2, false);
+        layout.horizontalSpacing = 10;
+        client.setLayout(layout);
+        client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        toolkit.paintBordersFor(client);
 
 		name = (Text) createBoundWidget(client, Text.class, SWT.NONE, "Name", null,
 		    PojoObservables.observeValue(clinic, "name"),
@@ -173,14 +178,22 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
                 return;
             }
 
-            clinic.setAddress(address);
+            clinic.setAddress(address);       
             if ((clinic.getId() == null) || (clinic.getId() == 0)) {
-                query = new InsertExampleQuery(clinic); 
+                Assert.isTrue(clinic.getAddress().getId() == null, "insert invoked on address already in database");
+                
+                query = new InsertExampleQuery(clinic.getAddress());                  
+                result = appService.executeQuery(query);
+                clinic.setAddress((Address) result.getObjectResult());
+                query = new InsertExampleQuery(clinic);   
             }
             else { 
-                Assert.isNotNull(clinic.getAddress().getId(), 
-                        "update invoked on address not in database");
-                query = new UpdateExampleQuery(clinic); 
+                Assert.isNotNull(clinic.getAddress().getId(), "update invoked on address not in database");
+
+                query = new UpdateExampleQuery(clinic.getAddress());                  
+                result = appService.executeQuery(query);
+                clinic.setAddress((Address) result.getObjectResult());
+                query = new UpdateExampleQuery(clinic);   
             }
             
             result = appService.executeQuery(query);

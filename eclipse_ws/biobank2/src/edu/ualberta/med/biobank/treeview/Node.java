@@ -91,7 +91,8 @@ public class Node {
 	
 	public void addChild(Node child) {	
 		hasChildren = true;
-		if (contains(child)) {
+		Node existingNode = contains(child); 
+		if (existingNode != null) {
 			// don't add - assume our model is up to date 
 			return;
 		}
@@ -152,15 +153,15 @@ public class Node {
 		}
 	}
 	
-	public boolean contains(Node item) {		
-		if (children.size() == 0) return false;
+	public Node contains(Node item) {		
+		if (children.size() == 0) return null;
 
 		for (Node child : children) {
 			if ((child.getId() == item.getId()) 
 					&& child.getName().equals(item.getName()))
-				return true;
+				return child;
 		}
-		return false;
+		return null;
 	}
 	
 	public Node getChildByName(String name) {

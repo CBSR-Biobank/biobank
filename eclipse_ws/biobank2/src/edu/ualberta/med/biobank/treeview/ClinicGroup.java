@@ -61,8 +61,14 @@ public class ClinicGroup extends Node {
                                 + clinic.getId() + ": " + clinic.getName());
                         
                         ClinicAdapter node = 
-                            new ClinicAdapter(ClinicGroup.this, clinic);
-                        addChild(node);
+                            (ClinicAdapter) getChild(clinic.getId());
+
+                        if (node == null) {
+                            node = new ClinicAdapter(ClinicGroup.this, clinic);
+                            addChild(node);
+                        }
+                        
+                        SessionManager.getInstance().getTreeViewer().update(node, null);
                     }
                     SessionManager.getInstance().getTreeViewer().expandToLevel(
                         ClinicGroup.this, 1);

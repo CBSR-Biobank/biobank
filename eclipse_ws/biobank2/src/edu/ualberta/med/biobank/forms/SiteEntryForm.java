@@ -25,6 +25,7 @@ import org.springframework.remoting.RemoteAccessException;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.forms.input.FormInput;
+import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
@@ -166,11 +167,21 @@ public class SiteEntryForm extends AddressEntryFormCommon {
             }
 
             WritableApplicationService appService = siteAdapter.getAppService();          
-            site.setAddress(address);          
+            site.setAddress(address);         
             if ((site.getId() == null) || (site.getId() == 0)) {
+                Assert.isTrue(site.getAddress().getId() == null, "insert invoked on address already in database");
+                
+                query = new InsertExampleQuery(site.getAddress());                  
+                result = appService.executeQuery(query);
+                site.setAddress((Address) result.getObjectResult());
                 query = new InsertExampleQuery(site);   
             }
             else { 
+                Assert.isNotNull(site.getAddress().getId(), "update invoked on address not in database");
+
+                query = new UpdateExampleQuery(site.getAddress());                  
+                result = appService.executeQuery(query);
+                site.setAddress((Address) result.getObjectResult());
                 query = new UpdateExampleQuery(site);   
             }
             

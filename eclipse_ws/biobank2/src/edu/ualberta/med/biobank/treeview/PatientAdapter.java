@@ -71,9 +71,14 @@ public class PatientAdapter extends Node {
                     Collection<PatientVisit> visits = searchPatient.getPatientVisitCollection();
 
                     for (PatientVisit visit : visits) {
-                        PatientVisitAdapter node = 
-                            new PatientVisitAdapter(PatientAdapter.this, visit);
-                        addChild(node);
+                        PatientVisitAdapter node = (PatientVisitAdapter) 
+                            getChild(visit.getId());
+                            
+                        if (node == null) {
+                            node = new PatientVisitAdapter(PatientAdapter.this, visit);
+                            addChild(node);
+                        }
+                        
                         SessionManager.getInstance().getTreeViewer().update(node, null);
                     }
                     SessionManager.getInstance().getTreeViewer().expandToLevel(

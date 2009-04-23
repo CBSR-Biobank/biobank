@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.treeview;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
@@ -13,6 +14,7 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.handlers.IHandlerService;
+import org.springframework.remoting.RemoteAccessException;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.model.Site;
@@ -54,13 +56,25 @@ public class SessionAdapter extends Node {
                         log4j.trace("updateSites: Site "
                                 + site.getId() + ": " + site.getName());
                         
-                        SiteAdapter node = 
-                            new SiteAdapter(SessionAdapter.this, site);
-                        addChild(node);
-                        SessionManager.getInstance().getTreeViewer().update(node, null);
+                        SiteAdapter node =  (SiteAdapter) getChild(site.getId());
+                        if (node == null) {
+                            node = new SiteAdapter(SessionAdapter.this, site);
+                            addChild(node);
+                        }
+                        SessionManager.getInstance().getTreeViewer().update(node, null);                        
                     }
                     SessionManager.getInstance().getTreeViewer().expandToLevel(
                         SessionAdapter.this, 1);
+                }
+                catch (final RemoteAccessException exp) {
+                    Display.getDefault().asyncExec(new Runnable() {
+                        public void run() {
+                            MessageDialog.openError(
+                                    PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), 
+                                    "Connection Attempt Failed", 
+                                    "Could not perform database operation. Make sure server is running correct version.");
+                        }
+                    });
                 }
                 catch (Exception e) {
                     e.printStackTrace();
