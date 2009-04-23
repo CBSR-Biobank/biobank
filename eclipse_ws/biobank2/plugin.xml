@@ -212,6 +212,12 @@
             id="edu.ualberta.med.biobank.forms.PatientVisitViewForm"
             name="Patient Visit View">
       </editor>
+      <editor
+            class="edu.ualberta.med.biobank.forms.StorageContainerEntryForm"
+            default="false"
+            id="edu.ualberta.med.biobank.forms.StorageContainerEntryForm"
+            name="Storage Container Entry">
+      </editor>
    </extension>
    <extension
          point="org.eclipse.ui.bindings">
