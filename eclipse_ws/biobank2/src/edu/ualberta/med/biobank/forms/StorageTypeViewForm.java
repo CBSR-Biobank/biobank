@@ -79,6 +79,10 @@ public class StorageTypeViewForm extends BiobankViewForm {
         createBoundWidget(client, Label.class, SWT.NONE, "Name",
             PojoObservables.observeValue(storageType, "name"));
         
+        createBoundWidget(client, Label.class, SWT.NONE, 
+            "Default Temperature\n(Celcius)",
+            PojoObservables.observeValue(storageType, "defaultTemperature"));
+        
         createBoundWidget(client, Label.class, SWT.NONE, "Activity Status",
             PojoObservables.observeValue(storageType, "activityStatus"));
         

@@ -85,7 +85,6 @@ public class Node {
 		for (Node child : children) {
 			if (child.getId() == id) return child;	
 		}	
-		Assert.isTrue(false, "Invalid child id: " + id);
 		return null;
 	}
 	

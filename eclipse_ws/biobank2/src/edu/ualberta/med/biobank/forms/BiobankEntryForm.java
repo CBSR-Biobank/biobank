@@ -148,14 +148,26 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
         this.appService = appService;
     }
     
+    protected Control createBoundWidgetWithLabel(Composite composite, 
+        Class<?> widgetClass, int widgetOptions, String fieldLabel, 
+        String [] widgetValues, 
+        IObservableValue modelObservableValue, Class<?> validatorClass, 
+        String validatorErrMsg) {
+        Label label;
+        
+        label = toolkit.createLabel(composite, fieldLabel + ":", SWT.LEFT);
+        label.setLayoutData(new GridData(GridData.VERTICAL_ALIGN_BEGINNING));
+        return createBoundWidget(composite, widgetClass, widgetOptions, label,
+            widgetValues, modelObservableValue, validatorClass, validatorErrMsg);
+    
+    }
+    
     protected Control createBoundWidget(Composite composite, 
-        Class<?> widgetClass, int widgetOptions, String fieldLabel, String [] widgetValues, 
+        Class<?> widgetClass, int widgetOptions, Label label, 
+        String [] widgetValues, 
         IObservableValue modelObservableValue, Class<?> validatorClass, 
         String validatorErrMsg) {
         if (widgetClass == Text.class) {
-            Label label = toolkit.createLabel(
-                composite, fieldLabel + ":", SWT.LEFT);
-            label.setLayoutData(new GridData(GridData.VERTICAL_ALIGN_BEGINNING));
             if (widgetOptions == SWT.NONE) {
                 widgetOptions = SWT.SINGLE;
             }
@@ -177,7 +189,6 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
             return text;
         }    
         else if (widgetClass == Combo.class) {
-            toolkit.createLabel(composite, fieldLabel + " :", SWT.LEFT);
             Combo combo = new Combo(composite, SWT.READ_ONLY);
             combo.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
             Assert.isNotNull(widgetValues, "combo values not assigned");
@@ -234,7 +245,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
             String key = (String) it.next();
             fi = (FieldInfo) it.getValue();
             
-            Control control = createBoundWidget(client, fi.widgetClass, 
+            Control control = createBoundWidgetWithLabel(client, fi.widgetClass, 
                 fi.widgetOptions, fi.label, fi.widgetValues, 
                 PojoObservables.observeValue(pojo, key),
                 fi.validatorClass, fi.errMsg);

@@ -130,7 +130,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        createBoundWidget(client, Text.class, SWT.NONE, "Visit Number", null,
+        createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Visit Number", null,
             PojoObservables.observeValue(patientVisit, "number"),
             NonEmptyString.class, NO_VISIT_NUMBER_MESSAGE);
 

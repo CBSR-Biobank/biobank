@@ -129,21 +129,21 @@ public class StorageTypeEntryForm extends BiobankEntryForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);  
 
-        createBoundWidget(client, Text.class, SWT.NONE, "Name", null,
+        createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Name", null,
             PojoObservables.observeValue(storageType, "name"),
             NonEmptyString.class, NO_STORAGE_TYPE_NAME_MESSAGE);
         
-        createBoundWidget(client, Text.class, SWT.NONE, 
-            "Default Temperature (Celcius)", 
+        createBoundWidgetWithLabel(client, Text.class, SWT.NONE, 
+            "Default Temperature\n(Celcius)", 
             null, PojoObservables.observeValue(storageType, "defaultTemperature"), 
             DoubleNumber.class, "Default temperature is not a valid number");
 
-        createBoundWidget(client, Combo.class, SWT.NONE, "Activity Status", 
+        createBoundWidgetWithLabel(client, Combo.class, SWT.NONE, "Activity Status", 
             FormConstants.ACTIVITY_STATUS,
             PojoObservables.observeValue(storageType, "activityStatus"),
             null, null);  
 
-        Text comment = (Text) createBoundWidget(client, Text.class, SWT.MULTI,
+        Text comment = (Text) createBoundWidgetWithLabel(client, Text.class, SWT.MULTI,
             "Comments", null, 
             PojoObservables.observeValue(storageType, "comment"), null, null);
         GridData gd = new GridData(GridData.FILL_HORIZONTAL);
@@ -160,19 +160,19 @@ public class StorageTypeEntryForm extends BiobankEntryForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);  
         
-        createBoundWidget(client, Text.class, SWT.NONE, "Dimension One Label", 
+        createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Dimension One Label", 
             null, PojoObservables.observeValue(storageType, "dimensionOneLabel"), 
             null, null); 
         
-        createBoundWidget(client, Text.class, SWT.NONE, "Dimension One Capacity", 
+        createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Dimension One Capacity", 
             null, PojoObservables.observeValue(capacity, "dimensionOneCapacity"),
             IntegerNumber.class, "Dimension one capacity is not a valid number");
         
-        createBoundWidget(client, Text.class, SWT.NONE, "Dimension Two Label", 
+        createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Dimension Two Label", 
             null, PojoObservables.observeValue(storageType, "dimensionTwoLabel"), 
             null, null); 
         
-        createBoundWidget(client, Text.class, SWT.NONE, "Dimension Two Capacity", 
+        createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Dimension Two Capacity", 
             null, PojoObservables.observeValue(capacity, "dimensionTwoCapacity"), 
             IntegerNumber.class, "Dimension two capacity is not a valid nubmer");
     }

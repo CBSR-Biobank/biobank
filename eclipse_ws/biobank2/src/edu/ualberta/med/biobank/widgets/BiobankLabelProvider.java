@@ -8,6 +8,7 @@ import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.Sdata;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.ClinicAdapter;
+import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.PatientAdapter;
 import edu.ualberta.med.biobank.treeview.StorageTypeAdapter;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
@@ -63,6 +64,10 @@ public class BiobankLabelProvider extends LabelProvider implements ITableLabelPr
             }
         }
         return "";
+    }
+
+    public String getText(Object element) {
+        return ((Node) element).getName();
     }
     
     public boolean isLabelProperty(Object element, String property) {

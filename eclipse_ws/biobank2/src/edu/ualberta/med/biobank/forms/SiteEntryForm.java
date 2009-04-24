@@ -73,13 +73,6 @@ public class SiteEntryForm extends AddressEntryFormCommon {
 			setPartName("Site " + site.getName());
 		}
 	}
-	
-	private String getOkMessage() {
-		if (site.getId() == null) {
-			return NEW_SITE_OK_MESSAGE;
-		}
-		return SITE_OK_MESSAGE;
-	}
 
 	protected void createFormContent() {
         address = site.getAddress();   
@@ -107,16 +100,16 @@ public class SiteEntryForm extends AddressEntryFormCommon {
 		
 		createSessionSelectionWidget(client);	  
 
-        createBoundWidget(client, Text.class, SWT.NONE, "Name", null,
+        createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Name", null,
             PojoObservables.observeValue(site, "name"),
             NonEmptyString.class, NO_SITE_NAME_MESSAGE);      
 
-        createBoundWidget(client, Combo.class, SWT.NONE, "Activity Status", 
+        createBoundWidgetWithLabel(client, Combo.class, SWT.NONE, "Activity Status", 
             FormConstants.ACTIVITY_STATUS,
             PojoObservables.observeValue(site, "activityStatus"),
             null, null);  
 
-        Text comment = (Text) createBoundWidget(client, Text.class, SWT.MULTI, 
+        Text comment = (Text) createBoundWidgetWithLabel(client, Text.class, SWT.MULTI, 
             "Comments", null, PojoObservables.observeValue(site, "comment"), 
             null, null);
         GridData gd = new GridData(GridData.FILL_HORIZONTAL);
@@ -140,6 +133,13 @@ public class SiteEntryForm extends AddressEntryFormCommon {
 			}
 		});
 	}
+    
+    private String getOkMessage() {
+        if (site.getId() == null) {
+            return NEW_SITE_OK_MESSAGE;
+        }
+        return SITE_OK_MESSAGE;
+    }
     
     protected void handleStatusChanged(IStatus status) {
 		if (status.getSeverity() == IStatus.OK) {
