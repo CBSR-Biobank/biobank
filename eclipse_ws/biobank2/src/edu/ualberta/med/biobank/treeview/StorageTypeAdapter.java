@@ -19,7 +19,7 @@ public class StorageTypeAdapter extends Node {
 	private StorageType storageType;
 	
 	public StorageTypeAdapter(Node parent, StorageType storageType) {
-		super(parent);
+		super(parent, storageType.getId(), storageType.getName());
 		this.setStudy(storageType);
 	}
 
@@ -42,8 +42,8 @@ public class StorageTypeAdapter extends Node {
 	@Override
 	public String getName() {
 		Assert.isNotNull(storageType, "storage type is null");
-		Object o = (Object) storageType.getName();
-		if (o == null) return null;
+		//Object o = (Object) storageType.getName();
+		//if (o == null) return null;
 		return storageType.getName();
 	}
 	

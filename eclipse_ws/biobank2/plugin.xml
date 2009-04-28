@@ -51,7 +51,7 @@
       <command
             defaultHandler="edu.ualberta.med.biobank.handler.SiteAddHandler"
             id="edu.ualberta.med.biobank.commands.addSite"
-            name="Add Site">
+            name="Add Repository Site">
       </command>
       <command
             defaultHandler="edu.ualberta.med.biobank.handler.StudyAddHandler"
@@ -100,7 +100,7 @@
                mnemonic="A">
             <menu
                   id="edu.ualberta.med.biobank.menu.site"
-                  label="Site"
+                  label="Repository Site"
                   mnemonic="i">
                <command
                      commandId="edu.ualberta.med.biobank.commands.addSite"

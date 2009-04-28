@@ -104,7 +104,7 @@ public class SessionAdapter extends Node {
         });
 
         mi = new MenuItem (menu, SWT.PUSH);
-        mi.setText ("Add Site");
+        mi.setText ("Add Repository Site");
         mi.addSelectionListener(new SelectionListener() {
             public void widgetSelected(SelectionEvent event) {
                 IHandlerService handlerService = 
@@ -114,7 +114,8 @@ public class SessionAdapter extends Node {
                 try {
                     handlerService.executeCommand("edu.ualberta.med.biobank.commands.addSite", null);
                 } catch (Exception ex) {
-                    throw new RuntimeException("edu.ualberta.med.biobank.commands.addSite not found");
+                    //throw new RuntimeException("edu.ualberta.med.biobank.commands.addSite not found");
+                    ex.printStackTrace();
                 }
             }
 

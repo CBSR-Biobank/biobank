@@ -46,7 +46,7 @@ public class SiteViewForm extends AddressViewFormCommon {
 			siteAdapter = (SiteAdapter) node;
 			site = siteAdapter.getSite();
 			address = site.getAddress();
-			setPartName("Site " + site.getName());
+			setPartName("Repository Site " + site.getName());
 		}
 		else {
 			Assert.isTrue(false, "Invalid editor input: object of type "
@@ -58,7 +58,7 @@ public class SiteViewForm extends AddressViewFormCommon {
 		address = site.getAddress();  
 
 		if (site.getName() != null) {
-			form.setText("BioBank Site: " + site.getName());
+			form.setText("Repository Site: " + site.getName());
 		}
 		
 		form.getBody().setLayout(new GridLayout(1, false));

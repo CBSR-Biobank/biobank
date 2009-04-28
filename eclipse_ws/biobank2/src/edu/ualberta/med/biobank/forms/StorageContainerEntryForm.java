@@ -137,7 +137,6 @@ public class StorageContainerEntryForm extends BiobankEntryForm {
         comment.setLayoutData(gd);     
         
         createStorageTypesSection(client);
-        createLocationSection(client);   
     }
     
     private void createStorageTypesSection(Composite client) {        
@@ -148,8 +147,7 @@ public class StorageContainerEntryForm extends BiobankEntryForm {
         
         int count = 0;
         for (StorageType storageType : storageTypes) {
-            adapters[count] = new StorageTypeAdapter(
-                null, storageType);
+            adapters[count] = new StorageTypeAdapter(null, storageType);
             ++count;
         }
         
@@ -166,8 +164,8 @@ public class StorageContainerEntryForm extends BiobankEntryForm {
             @Override
             public void selectionChanged(SelectionChangedEvent event) {
                 Object selection = event.getSelection();
-                StorageTypeAdapter adapter = (StorageTypeAdapter)
-                ((StructuredSelection)selection).getFirstElement();
+                StorageTypeAdapter adapter = 
+                    (StorageTypeAdapter) ((StructuredSelection)selection).getFirstElement();
                 final StorageType storageType = adapter.getStorageType();
 
                 setDirty(true);
@@ -195,15 +193,9 @@ public class StorageContainerEntryForm extends BiobankEntryForm {
         tempWidget = (Text) createBoundWidgetWithLabel(client, Text.class, 
             SWT.NONE, "Temperature (Celcius)", 
             null, PojoObservables.observeValue(storageContainer, "temperature"), 
-            DoubleNumber.class, "Default temperature is not a valid number"); 
-    }
+            DoubleNumber.class, "Default temperature is not a valid number");
         
-    private void updateForm(double temp, String dim1Label, String dim2Label, 
-        int dim1Max, int dim2Max) {
-        tempWidget.setText("" + temp);
-        dimensionOneLabel.setText("Position - " + dim1Label + "\n(1 - " + dim1Max + "):");
-        dimensionTwoLabel.setText("Position - " + dim2Label + "\n(1 - " + dim2Max + "):");
-        form.reflow(true);
+        createLocationSection(client);   
     }
     
     private void createLocationSection(Composite client) {  
@@ -262,6 +254,14 @@ public class StorageContainerEntryForm extends BiobankEntryForm {
             submit.setEnabled(false);
         }       
 
+    }
+        
+    private void updateForm(double temp, String dim1Label, String dim2Label, 
+        int dim1Max, int dim2Max) {
+        tempWidget.setText("" + temp);
+        dimensionOneLabel.setText("Position - " + dim1Label + "\n(1 - " + dim1Max + "):");
+        dimensionTwoLabel.setText("Position - " + dim2Label + "\n(1 - " + dim2Max + "):");
+        form.reflow(true);
     }
 
     @Override

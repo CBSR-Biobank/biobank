@@ -51,7 +51,7 @@ public class FormInput implements IEditorInput {
             else if (node instanceof ClinicAdapter) return "Clinic " + name;
             else if (node instanceof StorageTypeAdapter) return "Storage Type " + name;
             else if (node instanceof PatientAdapter) return "Patient " + name;
-            else if (node instanceof PatientVisitAdapter) return "Patient " + name;
+            else if (node instanceof PatientVisitAdapter) return "Patient Visit " + name;
             else if (node instanceof StorageContainerAdapter) return "Storage Container " + name;
             else Assert.isTrue(false, "tooltip name for "
                     + node.getClass().getName() + " not implemented");

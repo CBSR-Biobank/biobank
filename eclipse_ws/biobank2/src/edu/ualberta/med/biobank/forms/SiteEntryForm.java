@@ -67,16 +67,16 @@ public class SiteEntryForm extends AddressEntryFormCommon {
 		site = siteAdapter.getSite();	
 		
 		if (site.getId() == null) {
-			setPartName("New Site");
+			setPartName("New Repository Site");
 		}
 		else {
-			setPartName("Site " + site.getName());
+			setPartName("Repository Site " + site.getName());
 		}
 	}
 
 	protected void createFormContent() {
         address = site.getAddress();   
-		form.setText("BioBank Site Information");
+		form.setText("Repository Site Information");
 		form.getBody().setLayout(new GridLayout(1, false));
 		createSiteSection();
         createAddressArea();

@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.forms;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
@@ -101,14 +102,14 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         Assert.isNotNull(node, "Null editor input");
 
         patientVisitAdapter = (PatientVisitAdapter) node;
-        appService = patientVisitAdapter.getAppService();
         patientVisit = patientVisitAdapter.getPatientVisit();
+        appService = patientVisitAdapter.getAppService();
 
         if (patientVisit.getId() == null) {
             setPartName("New Patient Visit");
         }
         else {
-            setPartName("Patient Visit" + patientVisit.getId());
+            setPartName("Patient Visit " + patientVisit.getNumber());
         }
     }
 
@@ -150,6 +151,14 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
                 String key = pvData.getSdata().getSdataType().getType();
                 PatientVisitInfo pvInfo = (PatientVisitInfo) pvInfoMap.get(key);
                 pvInfo.pvData = pvData;
+                
+                System.out.println("--- id: " + pvData.getId() + ", value: " 
+                    + pvData.getValue() + ", pv_id: " 
+                    + pvData.getPatientVisit().getId());
+                
+                // pvData.getId()
+                // pvData.getValue()
+                // pvDataCollection.size()
             }
         }
 
@@ -296,7 +305,28 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
             PatientAdapter patientAdapter = 
                 (PatientAdapter) patientVisitAdapter.getParent();
             
-            patientVisit.setPatient(patientAdapter.getPatient()); 
+            System.out.println("*** patient visit id: " + patientVisit.getId()); 
+            
+            if (patientVisit.getPatientVisitDataCollection() != null) {
+                for (PatientVisitData pvData : 
+                    patientVisit.getPatientVisitDataCollection()) {
+                    System.out.println("*** id: " + pvData.getId() + ", value: " 
+                        + pvData.getValue() + ", pv_id: " 
+                        + pvData.getPatientVisit().getId());
+                }
+            }
+            
+            patientVisit.setPatient(patientAdapter.getPatient());
+            savePatientVisitData();
+            
+            for (PatientVisitData pvData : 
+                patientVisit.getPatientVisitDataCollection()) {
+                System.out.println("id: " + pvData.getId() + ", value: " 
+                    + pvData.getValue() + ", pv_id: " 
+                    + pvData.getPatientVisit().getId());
+            }            
+
+            System.out.println("pv data size: " + patientVisit.getPatientVisitDataCollection().size());
 
             if ((patientVisit.getId() == null) || (patientVisit.getId() == 0)) {
                 query = new InsertExampleQuery(patientVisit);
@@ -306,9 +336,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
             }
 
             result = appService.executeQuery(query);
-            patientVisit = (PatientVisit) result.getObjectResult();     
-            
-            savePatientVisitData();
+            patientVisit = (PatientVisit) result.getObjectResult();   
             
             patientAdapter.performExpand();       
             getSite().getPage().closeEditor(this, false);    
@@ -328,58 +356,62 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         }
     }
     
-    private Set<PatientVisitData> savePatientVisitData() throws ApplicationException {
-        SDKQuery query;
-        SDKQueryResult result;
-        Set<PatientVisitData> pvDataCollection = new HashSet<PatientVisitData>();
+    private void savePatientVisitData() throws ApplicationException {
+        boolean newCollection = false;
+        Collection<PatientVisitData> pvDataCollection;
         
-        for (String key : controls.keySet()) {
-            PatientVisitInfo pvInfo = (PatientVisitInfo) pvInfoMap.get(key);
-            PatientVisitData pvData = new PatientVisitData();
-
-            if ((patientVisit.getId() != null) && (patientVisit.getId() != 0)) {
-                pvData.setPatientVisit(patientVisit);
-            }
-            pvData.setSdata(pvInfo.sdata);
-            
-            if (pvInfo.pvData != null) {
-                pvData.setId(pvInfo.pvData.getId());
-            }
+        pvDataCollection = patientVisit.getPatientVisitDataCollection();
+        if (pvDataCollection == null) {
+            pvDataCollection = new ArrayList<PatientVisitData>();
+            newCollection = true;
+        }
+        
+        for (String key : controls.keySet()) {   
+            PatientVisitInfo pvInfo = (PatientVisitInfo) pvInfoMap.get(key);         
             Control control = controls.get(key);
+            String value = "";
             
             if (control instanceof Text) {
-                pvData.setValue(((Text) control).getText());
+                value = ((Text) control).getText();
                 System.out.println(key + ": " + ((Text) control).getText());
             }
             else if (control instanceof Combo) {
                 String [] options = pvInfo.sdata.getValue().split(";");
                 int index = ((Combo) control).getSelectionIndex();
-                
-                Assert.isTrue(index < options.length,
-                    "Invalid combo box selection " + index);
-                pvData.setValue(options[index]);
-                System.out.println(key + ": " + options[index]);
+                if (index >= 0) {
+                    Assert.isTrue(index < options.length,
+                        "Invalid combo box selection " + index);
+                    value = options[index];
+                    System.out.println(key + ": " + options[index]);
+                }
             }
             else if (control instanceof DatePickerCombo) {
                 SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
                 Date date = ((DatePickerCombo) control).getDate();
                 if (date != null) {
                     System.out.println(key + ": " +  sdf.format(date));
-                    pvData.setValue(sdf.format(date));
+                    value = sdf.format(date);
                 }
             }
 
-            if (pvInfo.pvData == null) {
-                query = new InsertExampleQuery(pvData);
-            }
-            else {
-                query = new UpdateExampleQuery(pvData);
-            }                  
+            PatientVisitData pvData = pvInfo.pvData;
 
-            result = patientVisitAdapter.getAppService().executeQuery(query);
-            pvDataCollection.add((PatientVisitData) result.getObjectResult());
+            if (pvInfo.pvData == null) {
+                pvData = new PatientVisitData();
+                pvData.setSdata(pvInfo.sdata);
+                pvData.setPatientVisit(patientVisit);    
+            }
+            pvData.setValue(value);     
+            
+            // pvData.getId()
+            
+            if (pvInfo.pvData == null) {   
+                pvDataCollection.add(pvData);
+            }
         }
         
-        return pvDataCollection;
+        if (newCollection) {
+            patientVisit.setPatientVisitDataCollection(pvDataCollection);
+        }
     }
 }

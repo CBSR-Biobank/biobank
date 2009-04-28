@@ -29,7 +29,7 @@ public class SiteAdapter extends Node {
 	private Site site;
 
 	public SiteAdapter(SessionAdapter parent, Site site) {
-		super(parent, site.getId(), site.getName());
+		super(parent);
 		this.site = site;
 		addChild(new StudyGroup(this, STUDIES_NODE_ID));
 		addChild(new ClinicGroup(this, CLINICS_NODE_ID));
