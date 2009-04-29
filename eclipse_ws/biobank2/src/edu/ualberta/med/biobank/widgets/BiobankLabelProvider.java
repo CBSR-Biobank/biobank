@@ -3,9 +3,11 @@ package edu.ualberta.med.biobank.widgets;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.swt.graphics.Image;
+import org.springframework.util.Assert;
 
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.Sdata;
+import edu.ualberta.med.biobank.model.StorageType;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.ClinicAdapter;
 import edu.ualberta.med.biobank.treeview.Node;
@@ -63,10 +65,16 @@ public class BiobankLabelProvider extends LabelProvider implements ITableLabelPr
                 case 1: return sdata.getValue();
             }
         }
+        else {
+            Assert.isTrue(false, "invalid object type");
+        }
         return "";
     }
 
     public String getText(Object element) {
+        if (element instanceof StorageType) {
+            return ((StorageType) element).getName();
+        }
         return ((Node) element).getName();
     }
     

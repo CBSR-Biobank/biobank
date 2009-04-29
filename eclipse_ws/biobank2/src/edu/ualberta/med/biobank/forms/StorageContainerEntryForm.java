@@ -142,33 +142,30 @@ public class StorageContainerEntryForm extends BiobankEntryForm {
     private void createStorageTypesSection(Composite client) {        
         Collection<StorageType> storageTypes = 
             site.getStorageTypeCollection();
-        StorageTypeAdapter [] adapters = 
-            new StorageTypeAdapter [storageTypes.size()];
-        
+        StorageType[] arr = new StorageType[storageTypes.size()];
         int count = 0;
-        for (StorageType storageType : storageTypes) {
-            adapters[count] = new StorageTypeAdapter(null, storageType);
-            ++count;
+        for (StorageType st : storageTypes) {
+            arr[count] = st;
+            count++;
         }
         
-        toolkit.createLabel(client, "Container Type:", SWT.LEFT);
+        toolkit.createLabel(client, "Container Type:", SWT.LEFT);        
         
         ComboViewer viewer = new ComboViewer(client, SWT.READ_ONLY);
         viewer.setContentProvider(new BiobankContentProvider());
         viewer.setLabelProvider(new BiobankLabelProvider());
-        viewer.setInput(adapters);
+        viewer.setInput(arr);
         
         Combo combo = viewer.getCombo();
         combo.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));  
         viewer.addSelectionChangedListener(new ISelectionChangedListener() {
             @Override
             public void selectionChanged(SelectionChangedEvent event) {
-                Object selection = event.getSelection();
-                StorageTypeAdapter adapter = 
-                    (StorageTypeAdapter) ((StructuredSelection)selection).getFirstElement();
-                final StorageType storageType = adapter.getStorageType();
-
                 setDirty(true);
+                
+                Object selection = event.getSelection();
+                final StorageType storageType = 
+                    (StorageType) ((StructuredSelection)selection).getFirstElement();
                 
                 BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
                     public void run() {
@@ -256,6 +253,11 @@ public class StorageContainerEntryForm extends BiobankEntryForm {
 
     }
         
+    /*
+     * Parameters need to be passed as objects since they could be set to NULL 
+     * in the database.
+     * 
+     */
     private void updateForm(Object temp, Object dim1Label, Object dim2Label, 
         Object dim1Max, Object dim2Max) {
         String str = "";
