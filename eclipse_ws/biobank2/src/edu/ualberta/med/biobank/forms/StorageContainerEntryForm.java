@@ -172,13 +172,13 @@ public class StorageContainerEntryForm extends BiobankEntryForm {
                 
                 BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
                     public void run() {
-                        final double temp = storageType.getDefaultTemperature();
+                        final Object temp = storageType.getDefaultTemperature();                        
                         
-                        final String dim1Label = storageType.getDimensionOneLabel();
-                        final String dim2Label = storageType.getDimensionTwoLabel();
+                        final Object dim1Label = storageType.getDimensionOneLabel();
+                        final Object dim2Label = storageType.getDimensionTwoLabel();
 
-                        final int dim1Max = storageType.getCapacity().getDimensionOneCapacity();
-                        final int dim2Max = storageType.getCapacity().getDimensionTwoCapacity();
+                        final Object dim1Max = storageType.getCapacity().getDimensionOneCapacity();
+                        final Object dim2Max = storageType.getCapacity().getDimensionTwoCapacity();
 
                         Display.getDefault().asyncExec(new Runnable() {
                             public void run() {                
@@ -256,11 +256,45 @@ public class StorageContainerEntryForm extends BiobankEntryForm {
 
     }
         
-    private void updateForm(double temp, String dim1Label, String dim2Label, 
-        int dim1Max, int dim2Max) {
-        tempWidget.setText("" + temp);
-        dimensionOneLabel.setText("Position - " + dim1Label + "\n(1 - " + dim1Max + "):");
-        dimensionTwoLabel.setText("Position - " + dim2Label + "\n(1 - " + dim2Max + "):");
+    private void updateForm(Object temp, Object dim1Label, Object dim2Label, 
+        Object dim1Max, Object dim2Max) {
+        String str = "";
+        if (temp != null) {
+            str = "" + (Double) temp;
+        }
+        tempWidget.setText(str);
+        
+        // handle dimension 1 
+        str = "Position ";
+        
+        if (dim1Label != null) {
+            str += "- " + (String) dim1Label; 
+        }
+        else {
+            str += "Dimension 1 ";
+        }
+        
+        if (dim1Max != null) {
+            str += "\n(1 - " + (Integer) dim1Max + ")";
+        }
+        
+        dimensionOneLabel.setText(str + ":");
+
+        // handle dimension 2
+        str = "Position ";
+        
+        if (dim1Label != null) {
+            str += "- " + (String) dim2Label; 
+        }
+        else {
+            str += "Dimension 2 ";
+        }
+        
+        if (dim1Max != null) {
+            str += "\n(1 - " + (Integer) dim2Max + ")";
+        }
+        
+        dimensionTwoLabel.setText(str + ":");
         form.reflow(true);
     }
 

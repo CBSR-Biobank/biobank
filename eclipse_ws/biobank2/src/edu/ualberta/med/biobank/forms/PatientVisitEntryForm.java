@@ -2,11 +2,9 @@ package edu.ualberta.med.biobank.forms;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.Set;
 
 import org.apache.commons.collections.MapIterator;
 import org.apache.commons.collections.map.ListOrderedMap;
@@ -362,7 +360,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         
         pvDataCollection = patientVisit.getPatientVisitDataCollection();
         if (pvDataCollection == null) {
-            pvDataCollection = new ArrayList<PatientVisitData>();
+            pvDataCollection = new HashSet<PatientVisitData>();
             newCollection = true;
         }
         
