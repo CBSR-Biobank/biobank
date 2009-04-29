@@ -12,7 +12,6 @@ import org.eclipse.core.databinding.beans.PojoObservables;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.dialogs.IMessageProvider;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -22,14 +21,11 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.PlatformUI;
-import org.springframework.remoting.RemoteConnectFailureException;
 
 import com.gface.date.DatePickerCombo;
 import com.gface.date.DatePickerStyle;
@@ -295,63 +291,48 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
     }
 
     @Override
-    protected void saveForm() {
-        try {
-            SDKQuery query;
-            SDKQueryResult result;
-            
-            PatientAdapter patientAdapter = 
-                (PatientAdapter) patientVisitAdapter.getParent();
-            
-            System.out.println("*** patient visit id: " + patientVisit.getId()); 
-            
-            if (patientVisit.getPatientVisitDataCollection() != null) {
-                for (PatientVisitData pvData : 
-                    patientVisit.getPatientVisitDataCollection()) {
-                    System.out.println("*** id: " + pvData.getId() + ", value: " 
-                        + pvData.getValue() + ", pv_id: " 
-                        + pvData.getPatientVisit().getId());
-                }
-            }
-            
-            patientVisit.setPatient(patientAdapter.getPatient());
-            savePatientVisitData();
-            
+    protected void saveForm() throws Exception {
+        SDKQuery query;
+        SDKQueryResult result;
+
+        PatientAdapter patientAdapter = 
+            (PatientAdapter) patientVisitAdapter.getParent();
+
+        System.out.println("*** patient visit id: " + patientVisit.getId()); 
+
+        if (patientVisit.getPatientVisitDataCollection() != null) {
             for (PatientVisitData pvData : 
                 patientVisit.getPatientVisitDataCollection()) {
-                System.out.println("id: " + pvData.getId() + ", value: " 
+                System.out.println("*** id: " + pvData.getId() + ", value: " 
                     + pvData.getValue() + ", pv_id: " 
                     + pvData.getPatientVisit().getId());
-            }            
-
-            System.out.println("pv data size: " + patientVisit.getPatientVisitDataCollection().size());
-
-            if ((patientVisit.getId() == null) || (patientVisit.getId() == 0)) {
-                query = new InsertExampleQuery(patientVisit);
             }
-            else { 
-                query = new UpdateExampleQuery(patientVisit);
-            }
+        }
 
-            result = appService.executeQuery(query);
-            patientVisit = (PatientVisit) result.getObjectResult();   
-            
-            patientAdapter.performExpand();       
-            getSite().getPage().closeEditor(this, false);    
+        patientVisit.setPatient(patientAdapter.getPatient());
+        savePatientVisitData();
+
+        for (PatientVisitData pvData : 
+            patientVisit.getPatientVisitDataCollection()) {
+            System.out.println("id: " + pvData.getId() + ", value: " 
+                + pvData.getValue() + ", pv_id: " 
+                + pvData.getPatientVisit().getId());
+        }            
+
+        System.out.println("pv data size: " + patientVisit.getPatientVisitDataCollection().size());
+
+        if ((patientVisit.getId() == null) || (patientVisit.getId() == 0)) {
+            query = new InsertExampleQuery(patientVisit);
         }
-        catch (final RemoteConnectFailureException exp) {
-            Display.getDefault().asyncExec(new Runnable() {
-                public void run() {
-                    MessageDialog.openError(
-                            PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), 
-                            "Connection Attempt Failed", 
-                    "Could not connect to server. Make sure server is running.");
-                }
-            });
+        else { 
+            query = new UpdateExampleQuery(patientVisit);
         }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
+
+        result = appService.executeQuery(query);
+        patientVisit = (PatientVisit) result.getObjectResult();   
+
+        patientAdapter.performExpand();       
+        getSite().getPage().closeEditor(this, false);  
     }
     
     private void savePatientVisitData() throws ApplicationException {

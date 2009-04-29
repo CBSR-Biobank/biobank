@@ -35,12 +35,17 @@ import edu.ualberta.med.biobank.model.StorageType;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.StorageContainerAdapter;
+import edu.ualberta.med.biobank.treeview.StorageContainerGroup;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
 import edu.ualberta.med.biobank.validators.DoubleNumber;
 import edu.ualberta.med.biobank.validators.IntegerNumber;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
 import edu.ualberta.med.biobank.widgets.BiobankContentProvider;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
+import gov.nih.nci.system.query.SDKQuery;
+import gov.nih.nci.system.query.SDKQueryResult;
+import gov.nih.nci.system.query.example.InsertExampleQuery;
+import gov.nih.nci.system.query.example.UpdateExampleQuery;
 
 public class StorageContainerEntryForm extends BiobankEntryForm {
     public static final String ID =
@@ -70,6 +75,8 @@ public class StorageContainerEntryForm extends BiobankEntryForm {
     private Label dimensionTwoLabel;
     
     private Button submit;
+    
+    ComboViewer storageTypeComboViewer;
 
     @Override
     public void init(IEditorSite editorSite, IEditorInput input)
@@ -87,7 +94,7 @@ public class StorageContainerEntryForm extends BiobankEntryForm {
             setPartName("Storage Container");
         }
         else {
-            setPartName("Storage Container" + storageContainer.getId());
+            setPartName("Storage Container " + storageContainer.getName());
         }
     }
 
@@ -150,14 +157,14 @@ public class StorageContainerEntryForm extends BiobankEntryForm {
         
         toolkit.createLabel(client, "Container Type:", SWT.LEFT);        
         
-        ComboViewer viewer = new ComboViewer(client, SWT.READ_ONLY);
-        viewer.setContentProvider(new BiobankContentProvider());
-        viewer.setLabelProvider(new BiobankLabelProvider());
-        viewer.setInput(arr);
+        storageTypeComboViewer = new ComboViewer(client, SWT.READ_ONLY);
+        storageTypeComboViewer.setContentProvider(new BiobankContentProvider());
+        storageTypeComboViewer.setLabelProvider(new BiobankLabelProvider());
+        storageTypeComboViewer.setInput(arr);
         
-        Combo combo = viewer.getCombo();
+        Combo combo = storageTypeComboViewer.getCombo();
         combo.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));  
-        viewer.addSelectionChangedListener(new ISelectionChangedListener() {
+        storageTypeComboViewer.addSelectionChangedListener(new ISelectionChangedListener() {
             @Override
             public void selectionChanged(SelectionChangedEvent event) {
                 setDirty(true);
@@ -300,8 +307,30 @@ public class StorageContainerEntryForm extends BiobankEntryForm {
     }
 
     @Override
-    protected void saveForm() {
-        // TODO Auto-generated method stub
+    protected void saveForm() throws Exception {
+        SDKQuery query;
+        SDKQueryResult result;
+        
+        StorageType storageType = 
+            (StorageType) (
+                (StructuredSelection)
+                storageTypeComboViewer.getSelection()).getFirstElement();
+        storageContainer.setStorageType(storageType);
+        storageContainer.setCapacity(storageType.getCapacity());
+        storageContainer.setStudy(study);
+
+        if (storageContainer.getId() == null) {
+            query = new InsertExampleQuery(storageContainer);
+        }
+        else { 
+            query = new UpdateExampleQuery(storageContainer);
+        }
+
+        result = appService.executeQuery(query);
+        storageContainer = (StorageContainer) result.getObjectResult();   
+
+        ((StorageContainerGroup) storageContainerAdapter.getParent()).performExpand();       
+        getSite().getPage().closeEditor(this, false);  
 
     }
 
