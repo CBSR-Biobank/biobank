@@ -42,13 +42,13 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
 	public static final String ID =
 	      "edu.ualberta.med.biobank.forms.ClinicEntryForm";
 	
-	private static final String NEW_CLINIC_OK_MESSAGE = 
+	private static final String MSG_NEW_CLINIC_OK = 
 	    "New clinic information.";
 	
-	private static final String CLINIC_OK_MESSAGE = 
+	private static final String MSG_CLINIC_OK = 
 	    "Clinic information.";
 	
-	private static final String NO_CLINIC_NAME_MESSAGE = 
+	private static final String MSG_NO_CLINIC_NAME = 
 	    "Clinic must have a name";
 	
 	private ClinicAdapter clinicAdapter;
@@ -83,9 +83,9 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
 	
 	private String getOkMessage() {
 		if (clinic.getId() == null) {
-			return NEW_CLINIC_OK_MESSAGE;
+			return MSG_NEW_CLINIC_OK;
 		}
-		return CLINIC_OK_MESSAGE;
+		return MSG_CLINIC_OK;
 	}
 
 	protected void createFormContent() {			
@@ -115,7 +115,7 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
 
 		name = (Text) createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Name", null,
 		    PojoObservables.observeValue(clinic, "name"),
-		    NonEmptyString.class, NO_CLINIC_NAME_MESSAGE);
+		    NonEmptyString.class, MSG_NO_CLINIC_NAME);
         name.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));    
 
         createBoundWidgetWithLabel(client, Combo.class, SWT.NONE, "Activity Status", 

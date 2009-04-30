@@ -13,8 +13,16 @@ public class IntegerNumber extends AbstractValidator {
     private static final Pattern pattern = Pattern.compile(
             "^[0-9\\+-]*$");
     
+    private boolean allowEmpty = true;
+    
     public IntegerNumber(String message, ControlDecoration controlDecoration) {
         super(message, controlDecoration);
+    }
+    
+    public IntegerNumber(String message, ControlDecoration controlDecoration,
+        boolean allowEmpty) {
+        super(message, controlDecoration);
+        this.allowEmpty = allowEmpty;
     }
 
     @Override
@@ -25,8 +33,14 @@ public class IntegerNumber extends AbstractValidator {
         }
         
         if (((String) value).length() == 0) {
-            controlDecoration.hide();
-            return Status.OK_STATUS;
+            if (allowEmpty) {
+                controlDecoration.hide();
+                return Status.OK_STATUS;
+            }
+            else {
+                controlDecoration.show();
+                return ValidationStatus.error(message);
+            }
         }
 
         Matcher m = pattern.matcher((String) value);

@@ -55,13 +55,13 @@ public class StorageTypeEntryForm extends BiobankEntryForm {
     public static final String ID =
         "edu.ualberta.med.biobank.forms.StorageTypeEntryForm";
     
-    private static final String NEW_STORAGE_TYPE_OK_MESSAGE = 
+    private static final String MSG_NEW_STORAGE_TYPE_OK = 
         "Creating a new storage type.";
     
-    private static final String STORAGE_TYPE_OK_MESSAGE = 
+    private static final String MSG_STORAGE_TYPE_OK = 
         "Editing an existing storage type.";
     
-    private static final String NO_STORAGE_TYPE_NAME_MESSAGE = 
+    private static final String MSG_NO_STORAGE_TYPE_NAME = 
         "Storage type must have a name";
     
     static Logger log4j = Logger.getLogger(SessionManager.class.getName());
@@ -131,7 +131,7 @@ public class StorageTypeEntryForm extends BiobankEntryForm {
 
         createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Name", null,
             PojoObservables.observeValue(storageType, "name"),
-            NonEmptyString.class, NO_STORAGE_TYPE_NAME_MESSAGE);
+            NonEmptyString.class, MSG_NO_STORAGE_TYPE_NAME);
         
         createBoundWidgetWithLabel(client, Text.class, SWT.NONE, 
             "Default Temperature\n(Celcius)", 
@@ -283,9 +283,9 @@ public class StorageTypeEntryForm extends BiobankEntryForm {
     
     private String getOkMessage() {
         if (storageType.getId() == null) {
-            return NEW_STORAGE_TYPE_OK_MESSAGE;
+            return MSG_NEW_STORAGE_TYPE_OK;
         }
-        return STORAGE_TYPE_OK_MESSAGE;
+        return MSG_STORAGE_TYPE_OK;
     }
 
     /**

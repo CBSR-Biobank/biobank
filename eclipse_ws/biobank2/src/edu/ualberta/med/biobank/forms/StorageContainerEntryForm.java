@@ -2,9 +2,12 @@ package edu.ualberta.med.biobank.forms;
 
 import java.util.Collection;
 
+import org.eclipse.core.databinding.UpdateValueStrategy;
 import org.eclipse.core.databinding.beans.PojoObservables;
+import org.eclipse.core.databinding.validation.IValidator;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.jface.databinding.swt.SWTObservables;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -51,18 +54,26 @@ public class StorageContainerEntryForm extends BiobankEntryForm {
     public static final String ID =
         "edu.ualberta.med.biobank.forms.StorageContainerEntryForm";
 
-    public static final String NEW_STORAGE_CONTAINER_OK_MESSAGE =
+    public static final String MSG_STORAGE_CONTAINER_NEW_OK =
         "Creating a new storage container.";
 
-    public static final String STORAGE_CONTAINER_OK_MESSAGE =
+    public static final String MSG_STORAGE_CONTAINER_OK =
         "Editing an existing storage container.";
     
-    public static final String NO_CONTAINER_NAME_MESSAGE =
+    public static final String MSG_CONTAINER_NAME_EMPTY =
         "Storage container must have a name";
+    
+    public static final String MSG_STORAGE_TYPE_EMPTY =
+        "Storage container must have a container type";
+
+    public static final String MSG_INVALID_POSITION =
+        "Position is empty or not a valid number";
     
     private StorageContainerAdapter storageContainerAdapter;
     
     private StorageContainer storageContainer;
+    
+    private ContainerPosition position;
 
     private Study study;
     
@@ -123,7 +134,7 @@ public class StorageContainerEntryForm extends BiobankEntryForm {
 
         createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Name", null,
             PojoObservables.observeValue(storageContainer, "name"),
-            NonEmptyString.class, NO_CONTAINER_NAME_MESSAGE);   
+            NonEmptyString.class, MSG_CONTAINER_NAME_EMPTY);   
 
         createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Barcode", null,
             PojoObservables.observeValue(storageContainer, "barcode"),
@@ -155,7 +166,8 @@ public class StorageContainerEntryForm extends BiobankEntryForm {
             count++;
         }
         
-        toolkit.createLabel(client, "Container Type:", SWT.LEFT);        
+        Label storageTypeLabel = 
+            toolkit.createLabel(client, "Container Type:", SWT.LEFT);        
         
         storageTypeComboViewer = new ComboViewer(client, SWT.READ_ONLY);
         storageTypeComboViewer.setContentProvider(new BiobankContentProvider());
@@ -192,6 +204,7 @@ public class StorageContainerEntryForm extends BiobankEntryForm {
                 });
             }
         });  
+        bindStorageTypeCombo(storageTypeLabel, combo);
         
         tempWidget = (Text) createBoundWidgetWithLabel(client, Text.class, 
             SWT.NONE, "Temperature (Celcius)", 
@@ -202,7 +215,7 @@ public class StorageContainerEntryForm extends BiobankEntryForm {
     }
     
     private void createLocationSection(Composite client) {  
-        ContainerPosition position = storageContainer.getLocatedAtPosition();
+        position = storageContainer.getLocatedAtPosition();
         if (position == null) {
             position = new ContainerPosition();
         }
@@ -210,16 +223,24 @@ public class StorageContainerEntryForm extends BiobankEntryForm {
         dimensionOneLabel = toolkit.createLabel(client, "Position Dimension 1:", 
             SWT.LEFT);
         
+        IntegerNumber validator = new IntegerNumber(MSG_INVALID_POSITION,
+            FormUtils.createDecorator(dimensionOneLabel, MSG_INVALID_POSITION),
+            false);
+        
         createBoundWidget(client, Text.class, SWT.NONE,  dimensionOneLabel,
             null, PojoObservables.observeValue(position, "positionDimensionOne"), 
-            IntegerNumber.class, "Position is not a valid number");
+            validator);
         
         dimensionTwoLabel = toolkit.createLabel(client, "Position Dimension 2:", 
             SWT.LEFT);  
         
+        validator = new IntegerNumber(MSG_INVALID_POSITION,
+            FormUtils.createDecorator(dimensionTwoLabel, MSG_INVALID_POSITION),
+            false);
+        
         createBoundWidget(client, Text.class, SWT.NONE,  dimensionTwoLabel,
             null, PojoObservables.observeValue(position, "positionDimensionTwo"), 
-            DoubleNumber.class, "Position is not a valid number");
+            validator);
     }
     
     private void createButtonsSection() {
@@ -239,11 +260,23 @@ public class StorageContainerEntryForm extends BiobankEntryForm {
         });
     }
     
+    private void bindStorageTypeCombo(Label label, Combo combo) {
+        IValidator validator = createValidator(NonEmptyString.class, 
+            FormUtils.createDecorator(label, MSG_STORAGE_TYPE_EMPTY), 
+            MSG_STORAGE_TYPE_EMPTY);
+        UpdateValueStrategy uvs = new UpdateValueStrategy();
+        uvs.setAfterGetValidator(validator);
+            
+        dbc.bindValue(SWTObservables.observeSelection(combo),
+            PojoObservables.observeValue(storageContainer, "barcode"),
+            uvs, null);
+    }
+    
     private String getOkMessage() {
         if (storageContainer.getId() == null) {
-            return NEW_STORAGE_CONTAINER_OK_MESSAGE;
+            return MSG_STORAGE_CONTAINER_NEW_OK;
         }
-        return STORAGE_CONTAINER_OK_MESSAGE;
+        return MSG_STORAGE_CONTAINER_OK;
     }
 
     @Override
@@ -316,6 +349,7 @@ public class StorageContainerEntryForm extends BiobankEntryForm {
                 (StructuredSelection)
                 storageTypeComboViewer.getSelection()).getFirstElement();
         storageContainer.setStorageType(storageType);
+        storageContainer.setLocatedAtPosition(position);
         storageContainer.setCapacity(storageType.getCapacity());
         storageContainer.setStudy(study);
 

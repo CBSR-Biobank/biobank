@@ -42,9 +42,9 @@ public class SiteEntryForm extends AddressEntryFormCommon {
 	public static final String ID =
 	      "edu.ualberta.med.biobank.forms.SiteEntryForm";
 	
-	private static final String NEW_SITE_OK_MESSAGE = "Create a new BioBank site.";
-	private static final String SITE_OK_MESSAGE = "Edit a BioBank site.";
-	private static final String NO_SITE_NAME_MESSAGE = "Site must have a name";
+	private static final String MSG_NEW_SITE_OK = "Create a new BioBank site.";
+	private static final String MSG_SITE_OK = "Edit a BioBank site.";
+	private static final String MSG_NO_SITE_NAME = "Site must have a name";
 	
 	private SiteAdapter siteAdapter;
 	
@@ -102,7 +102,7 @@ public class SiteEntryForm extends AddressEntryFormCommon {
 
         createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Name", null,
             PojoObservables.observeValue(site, "name"),
-            NonEmptyString.class, NO_SITE_NAME_MESSAGE);      
+            NonEmptyString.class, MSG_NO_SITE_NAME);      
 
         createBoundWidgetWithLabel(client, Combo.class, SWT.NONE, "Activity Status", 
             FormConstants.ACTIVITY_STATUS,
@@ -136,9 +136,9 @@ public class SiteEntryForm extends AddressEntryFormCommon {
     
     private String getOkMessage() {
         if (site.getId() == null) {
-            return NEW_SITE_OK_MESSAGE;
+            return MSG_NEW_SITE_OK;
         }
-        return SITE_OK_MESSAGE;
+        return MSG_SITE_OK;
     }
     
     protected void handleStatusChanged(IStatus status) {

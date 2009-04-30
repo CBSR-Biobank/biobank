@@ -183,8 +183,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
     protected Control createBoundWidget(Composite composite, 
         Class<?> widgetClass, int widgetOptions, Label label, 
         String [] widgetValues, 
-        IObservableValue modelObservableValue, Class<?> validatorClass, 
-        String validatorErrMsg) {
+        IObservableValue modelObservableValue, IValidator validator) {
         if (widgetClass == Text.class) {
             if (widgetOptions == SWT.NONE) {
                 widgetOptions = SWT.SINGLE;
@@ -194,10 +193,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
             text.addKeyListener(keyListener);
             
             UpdateValueStrategy uvs = null;
-            if (validatorClass != null) {
-                IValidator validator = createValidator(validatorClass, 
-                    FormUtils.createDecorator(label, validatorErrMsg), 
-                    validatorErrMsg);
+            if (validator != null) {
                 uvs = new UpdateValueStrategy();
                 uvs.setAfterGetValidator(validator);
             }
@@ -227,6 +223,23 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
             Assert.isTrue(false, "invalid widget class " + widgetClass.getName());
         }
         return null;
+    }
+    
+    protected Control createBoundWidget(Composite composite, 
+        Class<?> widgetClass, int widgetOptions, Label label, 
+        String [] widgetValues, 
+        IObservableValue modelObservableValue, Class<?> validatorClass, 
+        String validatorErrMsg) {
+        IValidator validator = null;
+
+        if (validatorClass != null) {
+            validator = createValidator(validatorClass, 
+                FormUtils.createDecorator(label, validatorErrMsg), 
+                validatorErrMsg);
+        }
+        
+        return createBoundWidget(composite, widgetClass, widgetOptions, label, 
+            widgetValues,  modelObservableValue, validator); 
     }
     
     protected IValidator createValidator(Class<?> validatorClass, 

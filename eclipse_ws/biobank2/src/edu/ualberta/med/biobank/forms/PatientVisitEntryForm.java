@@ -50,13 +50,13 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
     public static final String ID =
         "edu.ualberta.med.biobank.forms.PatientVisitEntryForm";
 
-    public static final String NEW_PATIENT_VISIT_OK_MESSAGE =
+    public static final String MSG_NEW_PATIENT_VISIT_OK =
         "Creating a new patient visit record.";
 
-    public static final String PATIENT_VISIT_OK_MESSAGE =
+    public static final String MSG_PATIENT_VISIT_OK =
         "Editing an existing patient visit record.";
     
-    public static final String NO_VISIT_NUMBER_MESSAGE =
+    public static final String MSG_NO_VISIT_NUMBER =
         "Visit must have a number";
     
     public static final String DATE_FORMAT = 
@@ -127,7 +127,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
 
         createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Visit Number", null,
             PojoObservables.observeValue(patientVisit, "number"),
-            NonEmptyString.class, NO_VISIT_NUMBER_MESSAGE);
+            NonEmptyString.class, MSG_NO_VISIT_NUMBER);
 
         study = (Study) ((StudyAdapter)
             patientVisitAdapter.getParent().getParent().getParent()).getStudy();
@@ -273,9 +273,9 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
 
     private String getOkMessage() {
         if (patientVisit.getId() == null) {
-            return NEW_PATIENT_VISIT_OK_MESSAGE;
+            return MSG_NEW_PATIENT_VISIT_OK;
         }
-        return PATIENT_VISIT_OK_MESSAGE;
+        return MSG_PATIENT_VISIT_OK;
     }
 
     @Override

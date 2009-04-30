@@ -56,10 +56,10 @@ public class StudyEntryForm extends BiobankEntryForm {
 	public static final String ID =
 	      "edu.ualberta.med.biobank.forms.StudyEntryForm";
 	
-	private static final String NEW_STUDY_OK_MESSAGE 
+	private static final String MSG_NEW_STUDY_OK 
 		= "Creating a new study.";
 	
-	private static final String STUDY_OK_MESSAGE = "Editing an existing study.";
+	private static final String MSG_STUDY_OK = "Editing an existing study.";
 
 	public static final String[] ORDERED_FIELDS = new String[] {
 		"name",
@@ -228,9 +228,9 @@ public class StudyEntryForm extends BiobankEntryForm {
 	
 	private String getOkMessage() {
 		if (study.getId() == null) {
-			return NEW_STUDY_OK_MESSAGE;
+			return MSG_NEW_STUDY_OK;
 		}
-		return STUDY_OK_MESSAGE;
+		return MSG_STUDY_OK;
 	}
     
     protected void handleStatusChanged(IStatus status) {
