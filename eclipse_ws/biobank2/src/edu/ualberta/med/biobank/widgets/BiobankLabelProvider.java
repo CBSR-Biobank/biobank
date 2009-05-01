@@ -7,6 +7,7 @@ import org.springframework.util.Assert;
 
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.Sdata;
+import edu.ualberta.med.biobank.model.StorageContainer;
 import edu.ualberta.med.biobank.model.StorageType;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.ClinicAdapter;
@@ -63,6 +64,20 @@ public class BiobankLabelProvider extends LabelProvider implements ITableLabelPr
             switch (columnIndex) {
                 case 0: return sdata.getSdataType().getType();
                 case 1: return sdata.getValue();
+            }
+        }
+        else if (element instanceof StorageContainer) {
+            final StorageContainer container = (StorageContainer) element;
+            switch (columnIndex) {
+                case 0: return container.getName();
+                case 1: return container.getActivityStatus();
+                case 2: return container.getBarcode();
+                case 3:
+                    Object o = container.getFull();
+                    if (o == null) return "";
+                    return (Boolean) o ? "Yes" : "No";
+                    
+                case 4: return "" + container.getTemperature();
             }
         }
         else {

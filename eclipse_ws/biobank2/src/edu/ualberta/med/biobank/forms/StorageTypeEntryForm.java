@@ -64,6 +64,9 @@ public class StorageTypeEntryForm extends BiobankEntryForm {
     private static final String MSG_NO_STORAGE_TYPE_NAME = 
         "Storage type must have a name";
     
+    private static final String MSG_NO_DIMENSION_LABEL =
+        "Dimension labels must be assigned";
+    
     static Logger log4j = Logger.getLogger(SessionManager.class.getName());
     
     private StorageTypeAdapter storageTypeAdapter;
@@ -162,7 +165,7 @@ public class StorageTypeEntryForm extends BiobankEntryForm {
         
         createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Dimension One Label", 
             null, PojoObservables.observeValue(storageType, "dimensionOneLabel"), 
-            null, null); 
+            NonEmptyString.class, MSG_NO_DIMENSION_LABEL); 
         
         createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Dimension One Capacity", 
             null, PojoObservables.observeValue(capacity, "dimensionOneCapacity"),
@@ -170,7 +173,7 @@ public class StorageTypeEntryForm extends BiobankEntryForm {
         
         createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Dimension Two Label", 
             null, PojoObservables.observeValue(storageType, "dimensionTwoLabel"), 
-            null, null); 
+            NonEmptyString.class, MSG_NO_DIMENSION_LABEL); 
         
         createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Dimension Two Capacity", 
             null, PojoObservables.observeValue(capacity, "dimensionTwoCapacity"), 

@@ -31,6 +31,7 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.forms.input.FormInput;
+import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.StorageContainer;
@@ -87,7 +88,9 @@ public class StorageContainerEntryForm extends BiobankEntryForm {
     
     private Button submit;
     
-    ComboViewer storageTypeComboViewer;
+    private StorageType currentStorageType;
+    
+    private ComboViewer storageTypeComboViewer;
 
     @Override
     public void init(IEditorSite editorSite, IEditorInput input)
@@ -112,9 +115,9 @@ public class StorageContainerEntryForm extends BiobankEntryForm {
     @Override
     protected void createFormContent() {
         study = (Study) (
-            (StudyAdapter) storageContainerAdapter.getParent().getParent()).getStudy(); 
-        
+            (StudyAdapter) storageContainerAdapter.getParent().getParent()).getStudy();
         site = study.getSite();
+        currentStorageType = storageContainer.getStorageType();
         
         form.setText("Storage Container");
         form.getBody().setLayout(new GridLayout(1, false));
@@ -123,8 +126,7 @@ public class StorageContainerEntryForm extends BiobankEntryForm {
         createButtonsSection();
     }
     
-    private void createContainerSection() {
-        
+    private void createContainerSection() {        
         Composite client = toolkit.createComposite(form.getBody());
         GridLayout layout = new GridLayout(2, false);
         layout.horizontalSpacing = 10;
@@ -156,13 +158,17 @@ public class StorageContainerEntryForm extends BiobankEntryForm {
         createStorageTypesSection(client);
     }
     
-    private void createStorageTypesSection(Composite client) {        
+    private void createStorageTypesSection(Composite client) {
         Collection<StorageType> storageTypes = 
             site.getStorageTypeCollection();
         StorageType[] arr = new StorageType[storageTypes.size()];
         int count = 0;
         for (StorageType st : storageTypes) {
             arr[count] = st;
+            if ((currentStorageType != null) 
+                && currentStorageType.getId().equals(st.getId())) {
+                currentStorageType = st;
+            }
             count++;
         }
         
@@ -173,6 +179,9 @@ public class StorageContainerEntryForm extends BiobankEntryForm {
         storageTypeComboViewer.setContentProvider(new BiobankContentProvider());
         storageTypeComboViewer.setLabelProvider(new BiobankLabelProvider());
         storageTypeComboViewer.setInput(arr);
+        if (currentStorageType != null) {
+            storageTypeComboViewer.setSelection(new StructuredSelection(currentStorageType));
+        }        
         
         Combo combo = storageTypeComboViewer.getCombo();
         combo.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));  
@@ -187,13 +196,13 @@ public class StorageContainerEntryForm extends BiobankEntryForm {
                 
                 BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
                     public void run() {
-                        final Object temp = storageType.getDefaultTemperature();                        
+                        final Double temp = storageType.getDefaultTemperature();                        
                         
-                        final Object dim1Label = storageType.getDimensionOneLabel();
-                        final Object dim2Label = storageType.getDimensionTwoLabel();
+                        final String dim1Label = storageType.getDimensionOneLabel();
+                        final String dim2Label = storageType.getDimensionTwoLabel();
 
-                        final Object dim1Max = storageType.getCapacity().getDimensionOneCapacity();
-                        final Object dim2Max = storageType.getCapacity().getDimensionTwoCapacity();
+                        final Integer dim1Max = storageType.getCapacity().getDimensionOneCapacity();
+                        final Integer dim2Max = storageType.getCapacity().getDimensionTwoCapacity();
 
                         Display.getDefault().asyncExec(new Runnable() {
                             public void run() {                
@@ -211,17 +220,46 @@ public class StorageContainerEntryForm extends BiobankEntryForm {
             null, PojoObservables.observeValue(storageContainer, "temperature"), 
             DoubleNumber.class, "Default temperature is not a valid number");
         
-        createLocationSection(client);   
+        createLocationSection();   
     }
     
-    private void createLocationSection(Composite client) {  
+    private void createLocationSection() {
+        String dim1Label = null, dim2Label = null;
+        Integer dim1Max = null, dim2Max = null;
+        
+        Composite client = createSectionWithClient("Location");
         position = storageContainer.getLocatedAtPosition();
         if (position == null) {
             position = new ContainerPosition();
         }
         
-        dimensionOneLabel = toolkit.createLabel(client, "Position Dimension 1:", 
-            SWT.LEFT);
+        if (currentStorageType != null) {
+            dim1Label = currentStorageType.getDimensionOneLabel();
+            dim2Label = currentStorageType.getDimensionTwoLabel();
+        }
+        
+        // could be that the dimension labels are not assigned in the 
+        // database objects
+        if (dim1Label == null) {
+            dim1Label = "Dimension 1";
+            dim2Label = "Dimension 2";
+        }
+
+        if (currentStorageType != null) { 
+            Capacity capacity = currentStorageType.getCapacity(); 
+            if (capacity != null) {
+                dim1Max = capacity.getDimensionOneCapacity();
+                dim2Max = capacity.getDimensionTwoCapacity();
+                if (dim1Max != null) {
+                    dim1Label += "\n(1 - " + dim1Max + ")";
+                }
+                if (dim2Max != null) {
+                    dim2Label += "\n(1 - " + dim2Max + ")";
+                }
+            }
+        }
+        
+        dimensionOneLabel = toolkit.createLabel(client, dim1Label + ":", SWT.LEFT);        
         
         IntegerNumber validator = new IntegerNumber(MSG_INVALID_POSITION,
             FormUtils.createDecorator(dimensionOneLabel, MSG_INVALID_POSITION),
@@ -231,8 +269,7 @@ public class StorageContainerEntryForm extends BiobankEntryForm {
             null, PojoObservables.observeValue(position, "positionDimensionOne"), 
             validator);
         
-        dimensionTwoLabel = toolkit.createLabel(client, "Position Dimension 2:", 
-            SWT.LEFT);  
+        dimensionTwoLabel = toolkit.createLabel(client, dim2Label + ":", SWT.LEFT);  
         
         validator = new IntegerNumber(MSG_INVALID_POSITION,
             FormUtils.createDecorator(dimensionTwoLabel, MSG_INVALID_POSITION),
@@ -289,7 +326,6 @@ public class StorageContainerEntryForm extends BiobankEntryForm {
             form.setMessage(status.getMessage(), IMessageProvider.ERROR);
             submit.setEnabled(false);
         }       
-
     }
         
     /*
@@ -297,8 +333,8 @@ public class StorageContainerEntryForm extends BiobankEntryForm {
      * in the database.
      * 
      */
-    private void updateForm(Object temp, Object dim1Label, Object dim2Label, 
-        Object dim1Max, Object dim2Max) {
+    private void updateForm(Double temp, String dim1Label, String dim2Label, 
+        Integer dim1Max, Integer dim2Max) {
         String str = "";
         if (temp != null) {
             str = "" + (Double) temp;
@@ -306,10 +342,10 @@ public class StorageContainerEntryForm extends BiobankEntryForm {
         tempWidget.setText(str);
         
         // handle dimension 1 
-        str = "Position ";
+        str = "";
         
         if (dim1Label != null) {
-            str += "- " + (String) dim1Label; 
+            str += dim1Label; 
         }
         else {
             str += "Dimension 1 ";
@@ -322,10 +358,10 @@ public class StorageContainerEntryForm extends BiobankEntryForm {
         dimensionOneLabel.setText(str + ":");
 
         // handle dimension 2
-        str = "Position ";
+        str = "";
         
         if (dim1Label != null) {
-            str += "- " + (String) dim2Label; 
+            str += dim2Label; 
         }
         else {
             str += "Dimension 2 ";
