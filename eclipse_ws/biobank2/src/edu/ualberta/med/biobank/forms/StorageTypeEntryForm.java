@@ -295,53 +295,55 @@ public class StorageTypeEntryForm extends BiobankEntryForm {
      * Called by base class when form data is to be saved.
      */
     @Override
-    protected void saveForm() { 
-        try {
-            SDKQuery query;
-            SDKQueryResult result;
-            
-            if ((storageType.getId() == null) && !checkStorageTypeNameUnique()) {
-                setDirty(true);
-                return;
-            }
-            
-            saveSampleDerivativeTypes(); 
-            saveChildStorageTypes();
-            storageType.setCapacity(capacity);
-            
-            // associate the storage type to it's site
-            Site site = (Site) ((SiteAdapter) 
-                storageTypeAdapter.getParent().getParent()).getSite();
-            Assert.isTrue((site != null) && (site.getId() != null) && (site.getId() != 0),
-                "site is not in the database");
-            storageType.setSite(site);
+    protected void saveForm() throws Exception { 
+        SDKQuery query;
+        SDKQueryResult result;
 
-            if ((storageType.getId() == null) || (storageType.getId() == 0)) {
-                query = new InsertExampleQuery(storageType);   
-            }
-            else { 
-                query = new UpdateExampleQuery(storageType);   
-            }
-            
-            result = appService.executeQuery(query);
-            storageType = (StorageType) result.getObjectResult();
+        if ((storageType.getId() == null) && !checkStorageTypeNameUnique()) {
+            setDirty(true);
+            return;
         }
-        catch (final RemoteAccessException exp) {
-            Display.getDefault().asyncExec(new Runnable() {
-                public void run() {
-                    MessageDialog.openError(
-                            PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), 
-                            "Connection Attempt Failed", 
-                            "Could not perform database operation. Make sure server is running correct version.");
-                }
-            });
+
+        saveSampleDerivativeTypes(); 
+        saveChildStorageTypes();
+        saveCapacity();
+
+        // associate the storage type to it's site
+        Site site = (Site) ((SiteAdapter) 
+            storageTypeAdapter.getParent().getParent()).getSite();
+        Assert.isTrue((site != null) && (site.getId() != null) && (site.getId() != 0),
+        "site is not in the database");
+        storageType.setSite(site);
+
+        if ((storageType.getId() == null) || (storageType.getId() == 0)) {
+            query = new InsertExampleQuery(storageType);   
         }
-        catch (Exception exp) {
-            exp.printStackTrace(); 
+        else { 
+            query = new UpdateExampleQuery(storageType);   
         }
+
+        result = appService.executeQuery(query);
+        storageType = (StorageType) result.getObjectResult();
         
         storageTypeAdapter.getParent().performExpand();      
         getSite().getPage().closeEditor(this, false);    
+    }
+    
+    private void saveCapacity() throws Exception {
+        SDKQuery query;
+        SDKQueryResult result;
+        
+        Integer id = capacity.getId(); 
+
+        if ((id == null) || (id == 0)) {
+            query = new InsertExampleQuery(capacity);   
+        }
+        else { 
+            query = new UpdateExampleQuery(capacity);   
+        }
+
+        result = appService.executeQuery(query);
+        storageType.setCapacity((Capacity) result.getObjectResult());
     }
     
     private void saveSampleDerivativeTypes() {
