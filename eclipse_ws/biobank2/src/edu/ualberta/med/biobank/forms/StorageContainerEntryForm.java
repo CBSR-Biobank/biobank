@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.forms;
 
 import java.util.Collection;
+import java.util.List;
 
 import org.eclipse.core.databinding.UpdateValueStrategy;
 import org.eclipse.core.databinding.beans.PojoObservables;
@@ -9,6 +10,7 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.databinding.swt.SWTObservables;
 import org.eclipse.jface.dialogs.IMessageProvider;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
@@ -46,10 +48,12 @@ import edu.ualberta.med.biobank.validators.IntegerNumber;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
 import edu.ualberta.med.biobank.widgets.BiobankContentProvider;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
+import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.SDKQuery;
 import gov.nih.nci.system.query.SDKQueryResult;
 import gov.nih.nci.system.query.example.InsertExampleQuery;
 import gov.nih.nci.system.query.example.UpdateExampleQuery;
+import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class StorageContainerEntryForm extends BiobankEntryForm {
     public static final String ID =
@@ -379,14 +383,19 @@ public class StorageContainerEntryForm extends BiobankEntryForm {
     protected void saveForm() throws Exception {
         SDKQuery query;
         SDKQueryResult result;
+
+        if ((storageContainer.getId() == null) && !checkStorageContainerUnique()) {
+            setDirty(true);
+            return;
+        }
         
         StorageType storageType = 
             (StorageType) (
                 (StructuredSelection)
                 storageTypeComboViewer.getSelection()).getFirstElement();
         storageContainer.setStorageType(storageType);
-        storageContainer.setLocatedAtPosition(position);
-        storageContainer.setCapacity(storageType.getCapacity());
+        savePosition();
+        saveCapacity(storageType.getCapacity());
         storageContainer.setStudy(study);
 
         if (storageContainer.getId() == null) {
@@ -403,5 +412,64 @@ public class StorageContainerEntryForm extends BiobankEntryForm {
         getSite().getPage().closeEditor(this, false);  
 
     }
+    
+    protected void savePosition() throws Exception {
+        SDKQuery query;
+        SDKQueryResult result;
+        
+        Integer id = position.getId(); 
 
+        if ((id == null) || (id == 0)) {
+            query = new InsertExampleQuery(position);   
+        }
+        else { 
+            query = new UpdateExampleQuery(position);   
+        }
+
+        result = appService.executeQuery(query);
+        storageContainer.setLocatedAtPosition(
+            (ContainerPosition) result.getObjectResult());
+    }
+    
+    private void saveCapacity(Capacity capacity) throws Exception {
+        SDKQuery query;
+        SDKQueryResult result;
+        
+        Integer id = capacity.getId(); 
+
+        if ((id == null) || (id == 0)) {
+            query = new InsertExampleQuery(capacity);   
+        }
+        else { 
+            query = new UpdateExampleQuery(capacity);   
+        }
+
+        result = appService.executeQuery(query);
+        storageContainer.setCapacity((Capacity) result.getObjectResult());
+    }
+    
+    private boolean checkStorageContainerUnique() throws Exception {
+        WritableApplicationService appService = storageContainerAdapter.getAppService();
+        
+        HQLCriteria c = new HQLCriteria(
+            "from edu.ualberta.med.biobank.model.StorageContainer as sc "
+            + "inner join fetch sc.study "
+            + "where sc.study.id='" + study.getId() + "' "
+            + "and (sc.name = '" + storageContainer.getName() + "' "
+            + "or sc.barcode = '" + storageContainer.getBarcode() + "')");
+
+        List<Object> results = appService.query(c);
+        if (results.size() == 0) return true;
+        
+        Display.getDefault().asyncExec(new Runnable() {
+            public void run() {
+                MessageDialog.openError(
+                    PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), 
+                    "Site Name Problem", 
+                    "A storage container with name \"" + storageContainer.getName() 
+                    + "\" already exists.");
+            }
+        });
+        return false;
+    }
 }
