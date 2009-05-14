@@ -63,6 +63,8 @@ public class SiteViewForm extends AddressViewFormCommon {
 			form.setText("Repository Site: " + site.getName());
 		}
 		
+		addRefreshToolbarAction();
+		
 		form.getBody().setLayout(new GridLayout(1, false));
 		form.getBody().setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		

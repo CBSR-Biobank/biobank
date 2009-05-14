@@ -1,24 +1,33 @@
 package edu.ualberta.med.biobank.forms;
 
+import java.net.URL;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.core.databinding.beans.PojoObservables;
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.Section;
 import org.springframework.util.Assert;
 
+import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.Sdata;
@@ -63,16 +72,15 @@ public class StudyViewForm extends BiobankViewForm {
 		else {
 			Assert.isTrue(false, "Invalid editor input: object of type "
 					+ node.getClass().getName());
-		}
+		}    
 	}
 
 	protected void createFormContent() {
-
 		if (study.getName() != null) {
 			form.setText("Study: " + study.getName());
 		}
-
-		createReloadSection();
+		
+		addRefreshToolbarAction();
 		
 		GridLayout layout = new GridLayout(1, false);
 		form.getBody().setLayout(layout);
@@ -225,4 +233,5 @@ public class StudyViewForm extends BiobankViewForm {
 			e.printStackTrace();
 		}
 	}
+
 }

@@ -1,6 +1,8 @@
 package edu.ualberta.med.biobank.forms;
 
 import java.util.HashMap;
+
+import edu.ualberta.med.biobank.BioBankPlugin;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import org.apache.commons.collections.MapIterator;
 import org.apache.commons.collections.map.ListOrderedMap;
@@ -8,6 +10,9 @@ import org.eclipse.core.databinding.DataBindingContext;
 import org.eclipse.core.databinding.beans.PojoObservables;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.databinding.swt.SWTObservables;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -19,7 +24,11 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IEditorSite;
+import org.eclipse.ui.PartInitException;
 
 public abstract class BiobankViewForm extends BiobankFormBase {
     
@@ -37,6 +46,7 @@ public abstract class BiobankViewForm extends BiobankFormBase {
         dbc = new DataBindingContext();
     }
 
+	
     @Override
     public boolean isDirty() {
         return false;
@@ -95,20 +105,16 @@ public abstract class BiobankViewForm extends BiobankFormBase {
         }     
     }
 
-	protected void createReloadSection() {        
-		Composite client = toolkit.createComposite(form.getBody());
-		GridLayout layout = new GridLayout(2, false);
-		layout.horizontalSpacing = 10;
-		client.setLayout(layout);
-		client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		toolkit.paintBordersFor(client);
-
-		Button reload = toolkit.createButton(client, "Reload", SWT.PUSH);
-		reload.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
+	protected void addRefreshToolbarAction() {        
+		Action reloadAction = new Action("Reload") {
+			public void run() {
 				reload();
-			}
-		});
+			}			
+		};
+		reloadAction.setImageDescriptor(BioBankPlugin.getImageDescriptor("icons/arrow_refresh.png"));
+		form.getToolBarManager().add(reloadAction);
+		form.updateToolBar();		
+		
 	}
 
 	protected abstract void reload();
