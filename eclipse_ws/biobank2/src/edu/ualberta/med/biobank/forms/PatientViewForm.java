@@ -65,4 +65,10 @@ public class PatientViewForm extends BiobankViewForm {
             PojoObservables.observeValue(patient, "number"));
         
     }
+
+	@Override
+	protected void reload() {
+		// TODO Auto-generated method stub
+		
+	}
 }

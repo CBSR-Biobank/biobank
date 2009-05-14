@@ -10,7 +10,11 @@ import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.databinding.swt.SWTObservables;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -91,4 +95,21 @@ public abstract class BiobankViewForm extends BiobankFormBase {
         }     
     }
 
+	protected void createReloadSection() {        
+		Composite client = toolkit.createComposite(form.getBody());
+		GridLayout layout = new GridLayout(2, false);
+		layout.horizontalSpacing = 10;
+		client.setLayout(layout);
+		client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		toolkit.paintBordersFor(client);
+
+		Button reload = toolkit.createButton(client, "Reload", SWT.PUSH);
+		reload.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				reload();
+			}
+		});
+	}
+
+	protected abstract void reload();
 }

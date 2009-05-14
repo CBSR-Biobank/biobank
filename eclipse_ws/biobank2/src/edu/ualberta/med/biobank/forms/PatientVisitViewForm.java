@@ -130,4 +130,10 @@ public class PatientVisitViewForm extends BiobankViewForm {
         
     }
 
+	@Override
+	protected void reload() {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

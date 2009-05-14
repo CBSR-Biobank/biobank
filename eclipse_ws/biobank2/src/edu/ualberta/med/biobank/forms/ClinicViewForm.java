@@ -111,5 +111,11 @@ public class ClinicViewForm  extends AddressViewFormCommon {
 			}
 		});
 	}
+
+	@Override
+	protected void reload() {
+		// TODO Auto-generated method stub
+		
+	}
 }
 
