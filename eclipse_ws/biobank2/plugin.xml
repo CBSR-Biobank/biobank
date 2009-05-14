@@ -224,6 +224,12 @@
             id="edu.ualberta.med.biobank.forms.StorageContainerViewForm"
             name="Storage Container View">
       </editor>
+      <editor
+            class="edu.ualberta.med.biobank.forms.ScanSamplesEntryForm"
+            default="false"
+            id="edu.ualberta.med.biobank.forms.ScanSamplesEntryForm"
+            name="Scan Samples Entry">
+      </editor>
    </extension>
    <extension
          point="org.eclipse.ui.bindings">

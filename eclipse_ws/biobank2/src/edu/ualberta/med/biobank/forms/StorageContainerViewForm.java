@@ -102,4 +102,10 @@ public class StorageContainerViewForm extends BiobankViewForm {
         
     }
 
+	@Override
+	protected void reload() {
+		// TODO Auto-generated method stub
+		
+	}
+
 }
