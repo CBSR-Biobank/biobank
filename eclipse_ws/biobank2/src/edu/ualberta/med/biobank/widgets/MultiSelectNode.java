@@ -121,6 +121,7 @@ public class MultiSelectNode {
 		listener.remove(new DeltaEvent(removed));
 	}
 	
+	@Override
 	public String toString() {
 		return name;
 	}

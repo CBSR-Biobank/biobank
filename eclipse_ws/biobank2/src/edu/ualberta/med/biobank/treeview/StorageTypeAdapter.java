@@ -34,7 +34,7 @@ public class StorageTypeAdapter extends Node {
 	@Override
 	public int getId() {
 		Assert.isNotNull(storageType, "storage type is null");
-		Object o = (Object) storageType.getId();
+		Object o = storageType.getId();
 		if (o == null) return 0;
 		return storageType.getId();
 	}
@@ -47,11 +47,13 @@ public class StorageTypeAdapter extends Node {
 		return storageType.getName();
 	}
 	
-    public void performDoubleClick() {
+    @Override
+	public void performDoubleClick() {
         openForm(new FormInput(this), StorageTypeViewForm.ID);
     }
     
-    public void popupMenu(TreeViewer tv, Tree tree,  Menu menu) {
+    @Override
+	public void popupMenu(TreeViewer tv, Tree tree,  Menu menu) {
         MenuItem mi = new MenuItem (menu, SWT.PUSH);
         mi.setText ("Edit Storage Type");
         mi.addSelectionListener(new SelectionListener() {

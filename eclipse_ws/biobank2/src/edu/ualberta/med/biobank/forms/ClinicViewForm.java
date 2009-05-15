@@ -35,6 +35,7 @@ public class ClinicViewForm  extends AddressViewFormCommon {
 	
 	private BiobankCollectionTable studiesTable;
 	
+	@Override
 	public void init(IEditorSite editorSite, IEditorInput input)
 			throws PartInitException {
 		super.init(editorSite, input);
@@ -61,6 +62,7 @@ public class ClinicViewForm  extends AddressViewFormCommon {
 		}
 	}
 
+	@Override
 	protected void createFormContent() {
 		if (clinic.getName() != null) {
 			form.setText("Clinic: " + clinic.getName());
@@ -129,6 +131,7 @@ public class ClinicViewForm  extends AddressViewFormCommon {
 
 		final Button edit = toolkit.createButton(client, "Edit Clinic Info", SWT.PUSH);
 		edit.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
                 clinicAdapter.openForm(new FormInput(clinicAdapter), ClinicEntryForm.ID);
 			}

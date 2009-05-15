@@ -174,7 +174,8 @@ public class SdataWidget extends Composite {
             addButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
             addButton.addSelectionListener(new SelectionAdapter() {
-                public void widgetSelected(SelectionEvent e) {                    
+                @Override
+				public void widgetSelected(SelectionEvent e) {                    
                     String title = "";
                     String prompt = "";
                     String helpText = "";
@@ -247,7 +248,8 @@ public class SdataWidget extends Composite {
             removeButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
             removeButton.addSelectionListener(new SelectionAdapter() {
-                public void widgetSelected(SelectionEvent e) {
+                @Override
+				public void widgetSelected(SelectionEvent e) {
                     for (String selection : list.getSelection()) {
                         list.remove(selection);
                     }

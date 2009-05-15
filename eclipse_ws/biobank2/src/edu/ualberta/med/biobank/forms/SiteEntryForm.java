@@ -53,6 +53,7 @@ public class SiteEntryForm extends AddressEntryFormCommon {
 	protected Combo session;
 	private Button submit;
 	
+	@Override
 	public void init(IEditorSite editorSite, IEditorInput input) throws PartInitException {
 		super.init(editorSite, input);
 		
@@ -74,6 +75,7 @@ public class SiteEntryForm extends AddressEntryFormCommon {
 		}
 	}
 
+	@Override
 	protected void createFormContent() {
         address = site.getAddress();   
 		form.setText("Repository Site Information");
@@ -127,6 +129,7 @@ public class SiteEntryForm extends AddressEntryFormCommon {
 
 		submit = toolkit.createButton(client, "Submit", SWT.PUSH);
 		submit.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				PlatformUI.getWorkbench().getActiveWorkbenchWindow()
 					.getActivePage().saveEditor(SiteEntryForm.this, false);
@@ -141,7 +144,8 @@ public class SiteEntryForm extends AddressEntryFormCommon {
         return MSG_SITE_OK;
     }
     
-    protected void handleStatusChanged(IStatus status) {
+    @Override
+	protected void handleStatusChanged(IStatus status) {
 		if (status.getSeverity() == IStatus.OK) {
 			form.setMessage(getOkMessage(), IMessageProvider.NONE);
 	    	submit.setEnabled(true);
@@ -152,7 +156,8 @@ public class SiteEntryForm extends AddressEntryFormCommon {
 		}		
     }
     
-    protected void saveForm() {
+    @Override
+	protected void saveForm() {
         if (siteAdapter.getParent() == null) {
             siteAdapter.setParent(SessionManager.getInstance().getSessionSingle());
         }

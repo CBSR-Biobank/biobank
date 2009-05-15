@@ -1,8 +1,13 @@
 package edu.ualberta.med.biobank.forms;
 
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.util.Collection;
 
 import org.eclipse.core.databinding.beans.PojoObservables;
+import org.eclipse.core.databinding.observable.value.IObservableValue;
+import org.eclipse.core.databinding.observable.value.WritableValue;
+import org.eclipse.jface.databinding.swt.SWTObservables;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -11,6 +16,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
@@ -36,10 +42,13 @@ public class SiteViewForm extends AddressViewFormCommon {
 	private SiteAdapter siteAdapter;
 	
 	private Site site;
+	
+	private TestClass testClass = new TestClass("toto");
 
 	private BiobankCollectionTable studiesTable;
 	private BiobankCollectionTable storageTypesTable;
 	
+	@Override
 	public void init(IEditorSite editorSite, IEditorInput input)
 			throws PartInitException {
 		super.init(editorSite, input);
@@ -59,7 +68,8 @@ public class SiteViewForm extends AddressViewFormCommon {
 		}
 	}
     
-    protected void createFormContent() {
+    @Override
+	protected void createFormContent() {
 		address = site.getAddress();  
 
 		if (site.getName() != null) {
@@ -71,6 +81,9 @@ public class SiteViewForm extends AddressViewFormCommon {
 		form.getBody().setLayout(new GridLayout(1, false));
 		form.getBody().setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		
+		// TODO to remove = only for testing
+		//testMethod();
+
 		createSiteSection();
 		createAddressSection();
 		createStudySection();
@@ -78,6 +91,38 @@ public class SiteViewForm extends AddressViewFormCommon {
 		        siteAdapter.getClinicGroupNode(), site.getClinicCollection());
         createStorageTypesSection();
 		createButtons();
+	}
+
+	private void testMethod() {
+		Composite client = toolkit.createComposite(form.getBody());
+		client.setLayout(new GridLayout(2, false));
+		client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		toolkit.paintBordersFor(client);
+		Text text  = toolkit.createText(client, "", SWT.NONE);
+		text.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		//dbc.bindValue(SWTObservables.observeText(text, SWT.Modify), 
+			//	BeansObservables.observeValue(testClass, "name"), null, null);
+		
+		dbc.bindValue(SWTObservables.observeText(text, SWT.Modify),
+			testClass.stringValue, null, null);
+
+		
+		Button test = toolkit.createButton(client, "Test", SWT.PUSH);
+		test.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				System.out.println(testClass.getName());
+				System.out.println(testClass.stringValue.getValue());
+			}
+		});
+		Button modifyTest = toolkit.createButton(client, "ModifyTest", SWT.PUSH);
+		modifyTest.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				testClass.setName("Emily");
+				testClass.stringValue.setValue("titi");
+			}
+		});
 	}
     
     private void createSiteSection() {    
@@ -156,6 +201,7 @@ public class SiteViewForm extends AddressViewFormCommon {
 
 		final Button edit = toolkit.createButton(client, "Edit Site Info", SWT.PUSH);
 		edit.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				getSite().getPage().closeEditor(SiteViewForm.this, false);
 				try {
@@ -170,6 +216,7 @@ public class SiteViewForm extends AddressViewFormCommon {
 
 		final Button study = toolkit.createButton(client, "Add Study", SWT.PUSH);
 		study.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {				
 				try {
 					Study study = new Study();
@@ -186,6 +233,7 @@ public class SiteViewForm extends AddressViewFormCommon {
 
 		final Button clinic = toolkit.createButton(client, "Add Clinic", SWT.PUSH);
 		clinic.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				try {
 					ClinicAdapter clinicAdapter = new ClinicAdapter(
@@ -201,6 +249,7 @@ public class SiteViewForm extends AddressViewFormCommon {
 
 		final Button storageType = toolkit.createButton(client, "Add Storage Type", SWT.PUSH);
 		storageType.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 			}
 		});
@@ -210,5 +259,33 @@ public class SiteViewForm extends AddressViewFormCommon {
 	protected void reload() {
 		studiesTable.getTableViewer().setInput(getStudiesAdapters());
 		storageTypesTable.getTableViewer().setInput(getStorageTypesAdapters());
+	}
+	
+	public class TestClass {
+		public IObservableValue stringValue = new WritableValue(null, String.class);
+		
+		private String name;
+		
+		private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
+		
+		public TestClass(String name) {
+			this.name = name;
+		}
+		public void setName(String name) {
+			this.name = name;
+		}
+		public String getName() {
+			return name;
+		}
+
+		public void addPropertyChangeListener(String propertyName,
+				PropertyChangeListener listener) {
+			propertyChangeSupport.addPropertyChangeListener(propertyName, listener);
+		}
+
+		public void removePropertyChangeListener(PropertyChangeListener listener) {
+			propertyChangeSupport.removePropertyChangeListener(listener);
+		}
+
 	}
 }

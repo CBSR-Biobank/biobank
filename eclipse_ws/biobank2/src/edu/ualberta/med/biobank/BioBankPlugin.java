@@ -35,6 +35,7 @@ public class BioBankPlugin extends AbstractUIPlugin {
 	 * (non-Javadoc)
 	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)
 	 */
+	@Override
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
@@ -42,6 +43,7 @@ public class BioBankPlugin extends AbstractUIPlugin {
 		log4j.debug(PLUGIN_ID + " started");
 	}
 	
+	@Override
 	protected void initializeImageRegistry(ImageRegistry registry) {
 		registerImage(registry, IMG_FORM_BG, "form_banner.bmp");
 	}
@@ -63,6 +65,7 @@ public class BioBankPlugin extends AbstractUIPlugin {
 	 * (non-Javadoc)
 	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
 	 */
+	@Override
 	public void stop(BundleContext context) throws Exception {
 		plugin = null;
 		super.stop(context);

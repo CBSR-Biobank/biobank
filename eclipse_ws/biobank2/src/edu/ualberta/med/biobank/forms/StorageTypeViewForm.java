@@ -62,6 +62,8 @@ public class StorageTypeViewForm extends BiobankViewForm {
     protected void createFormContent() {
         form.setText("Storage Type: " + storageType.getName());
         
+        addRefreshToolbarAction();
+        
         form.getBody().setLayout(new GridLayout(1, false));
         createStorageTypeSection();     
         createDimensionsSection();
@@ -158,7 +160,8 @@ public class StorageTypeViewForm extends BiobankViewForm {
         final Button edit = toolkit.createButton(
             client, "Edit this information", SWT.PUSH);
         edit.addSelectionListener(new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent e) {
+            @Override
+			public void widgetSelected(SelectionEvent e) {
                 getSite().getPage().closeEditor(StorageTypeViewForm.this, false);
                 try {
                     getSite().getPage().openEditor(

@@ -26,7 +26,7 @@ public class StorageContainerAdapter extends Node {
     @Override
     public int getId() {
         Assert.isNotNull(storageContainer, "storageContainer is null");
-        Object o = (Object) storageContainer.getId();
+        Object o = storageContainer.getId();
         if (o == null) return 0;
         return storageContainer.getId();
     }
@@ -34,12 +34,13 @@ public class StorageContainerAdapter extends Node {
     @Override
     public String getName() {
         Assert.isNotNull(storageContainer, "storageContainer is null");
-        Object o = (Object) storageContainer.getName();
+        Object o = storageContainer.getName();
         if (o == null) return null;
         return storageContainer.getName();
     }
     
-    public void performDoubleClick() {
+    @Override
+	public void performDoubleClick() {
         openForm(new FormInput(this), StorageContainerViewForm.ID);
     }
     
@@ -47,7 +48,8 @@ public class StorageContainerAdapter extends Node {
         return storageContainer;
     }
     
-    public void popupMenu(TreeViewer tv, Tree tree,  Menu menu) {
+    @Override
+	public void popupMenu(TreeViewer tv, Tree tree,  Menu menu) {
         MenuItem mi = new MenuItem (menu, SWT.PUSH);
         mi.setText ("Edit Storage Container");
         mi.addSelectionListener(new SelectionListener() {

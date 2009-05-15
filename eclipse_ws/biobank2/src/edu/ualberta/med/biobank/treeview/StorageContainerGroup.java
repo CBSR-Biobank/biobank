@@ -26,11 +26,13 @@ public class StorageContainerGroup extends Node {
         super(parent, id, "Storage Containers", true);
     }
 
-    public void performDoubleClick() {
+    @Override
+	public void performDoubleClick() {
         performExpand();
     }
 
-    public void performExpand() {   
+    @Override
+	public void performExpand() {   
         final Study parentStudy = ((StudyAdapter) getParent()).getStudy();
         Display.getDefault().asyncExec(new Runnable() {
             public void run() {                
@@ -68,7 +70,8 @@ public class StorageContainerGroup extends Node {
         });
     }
     
-    public void popupMenu(TreeViewer tv, Tree tree,  Menu menu) {
+    @Override
+	public void popupMenu(TreeViewer tv, Tree tree,  Menu menu) {
         MenuItem mi = new MenuItem (menu, SWT.PUSH);
         mi.setText ("Add a Storage Container");
         mi.addSelectionListener(new SelectionListener() {

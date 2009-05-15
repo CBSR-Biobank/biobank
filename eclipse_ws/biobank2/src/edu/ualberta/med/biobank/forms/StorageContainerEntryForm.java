@@ -118,8 +118,7 @@ public class StorageContainerEntryForm extends BiobankEntryForm {
 
     @Override
     protected void createFormContent() {
-        study = (Study) (
-            (StudyAdapter) storageContainerAdapter.getParent().getParent()).getStudy();
+        study = ((StudyAdapter) storageContainerAdapter.getParent().getParent()).getStudy();
         site = study.getSite();
         currentStorageType = storageContainer.getStorageType();
         
@@ -294,7 +293,8 @@ public class StorageContainerEntryForm extends BiobankEntryForm {
 
         submit = toolkit.createButton(client, "Submit", SWT.PUSH);
         submit.addSelectionListener(new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent e) {
+            @Override
+			public void widgetSelected(SelectionEvent e) {
                 PlatformUI.getWorkbench().getActiveWorkbenchWindow()
                     .getActivePage().saveEditor(StorageContainerEntryForm.this, false);
             }
@@ -341,7 +341,7 @@ public class StorageContainerEntryForm extends BiobankEntryForm {
         Integer dim1Max, Integer dim2Max) {
         String str = "";
         if (temp != null) {
-            str = "" + (Double) temp;
+            str = "" + temp;
         }
         tempWidget.setText(str);
         
@@ -356,7 +356,7 @@ public class StorageContainerEntryForm extends BiobankEntryForm {
         }
         
         if (dim1Max != null) {
-            str += "\n(1 - " + (Integer) dim1Max + ")";
+            str += "\n(1 - " + dim1Max + ")";
         }
         
         dimensionOneLabel.setText(str + ":");
@@ -372,7 +372,7 @@ public class StorageContainerEntryForm extends BiobankEntryForm {
         }
         
         if (dim1Max != null) {
-            str += "\n(1 - " + (Integer) dim2Max + ")";
+            str += "\n(1 - " + dim2Max + ")";
         }
         
         dimensionTwoLabel.setText(str + ":");

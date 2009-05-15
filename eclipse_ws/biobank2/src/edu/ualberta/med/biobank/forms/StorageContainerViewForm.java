@@ -52,6 +52,8 @@ public class StorageContainerViewForm extends BiobankViewForm {
         form.setText("Storage Container " + storageContainer.getName());
         form.getBody().setLayout(new GridLayout(1, false));
         
+        addRefreshToolbarAction();
+        
         createContainerSection();
     }
     

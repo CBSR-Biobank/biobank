@@ -32,6 +32,7 @@ public class ClinicAdapter extends Node {
 		return clinic;
 	}
 	
+	@Override
 	public void addChild(Node child) {
 		Assert.isTrue(false, "Cannot add children to this adapter");
 	}
@@ -39,7 +40,7 @@ public class ClinicAdapter extends Node {
 	@Override
 	public int getId() {
 		Assert.isNotNull(clinic, "Clinic is null");
-		Object o = (Object) clinic.getId();
+		Object o = clinic.getId();
 		if (o == null) return 0;
 		return clinic.getId();
 	}
@@ -47,16 +48,18 @@ public class ClinicAdapter extends Node {
 	@Override
 	public String getName() {
 		Assert.isNotNull(clinic, "Clinic is null");
-		Object o = (Object) clinic.getName();
+		Object o = clinic.getName();
 		if (o == null) return null;
 		return clinic.getName();
 	}
     
-    public void performDoubleClick() {
+    @Override
+	public void performDoubleClick() {
         openForm(new FormInput(this), ClinicViewForm.ID);
     }
     
-    public void popupMenu(TreeViewer tv, Tree tree,  Menu menu) {
+    @Override
+	public void popupMenu(TreeViewer tv, Tree tree,  Menu menu) {
         MenuItem mi = new MenuItem (menu, SWT.PUSH);
         mi.setText ("Edit Clinic");
         mi.addSelectionListener(new SelectionListener() {

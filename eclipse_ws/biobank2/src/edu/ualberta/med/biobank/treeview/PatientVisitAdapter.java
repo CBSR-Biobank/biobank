@@ -8,9 +8,6 @@ import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
-import org.eclipse.ui.IEditorInput;
-import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.forms.PatientVisitEntryForm;
 import edu.ualberta.med.biobank.forms.PatientVisitViewForm;
@@ -34,7 +31,7 @@ public class PatientVisitAdapter extends Node {
     @Override
     public int getId() {
         Assert.isNotNull(patientVisit, "patientVisit is null");
-        Object o = (Object) patientVisit.getId();
+        Object o = patientVisit.getId();
         if (o == null) return 0;
         return patientVisit.getId();
     }
@@ -42,16 +39,18 @@ public class PatientVisitAdapter extends Node {
     @Override
     public String getName() {
         Assert.isNotNull(patientVisit, "patientVisit is null");
-        Object o = (Object) patientVisit.getNumber();
+        Object o = patientVisit.getNumber();
         if (o == null) return null;
         return patientVisit.getNumber();
     }
     
-    public void performDoubleClick() {
+    @Override
+	public void performDoubleClick() {
         openForm(new FormInput(this), PatientVisitViewForm.ID);
     }
     
-    public void popupMenu(TreeViewer tv, Tree tree,  Menu menu) {
+    @Override
+	public void popupMenu(TreeViewer tv, Tree tree,  Menu menu) {
         MenuItem mi = new MenuItem (menu, SWT.PUSH);
         mi.setText ("Edit Visit");
         mi.addSelectionListener(new SelectionListener() {

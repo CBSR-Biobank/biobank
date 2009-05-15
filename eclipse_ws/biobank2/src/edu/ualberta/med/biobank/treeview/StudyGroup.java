@@ -13,7 +13,6 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
-import org.eclipse.ui.PartInitException;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.forms.StudyEntryForm;
@@ -30,15 +29,17 @@ public class StudyGroup extends Node {
         super(parent, id, "Studies", true);
     }
     
-    public void openViewForm() throws PartInitException {
+    public void openViewForm() {
         Assert.isTrue(false, "should not be called");
     }
     
-    public void performDoubleClick() {
+    @Override
+	public void performDoubleClick() {
         performExpand();
     }
 
-    public void performExpand() {
+    @Override
+	public void performExpand() {
         final Site currentSite = ((SiteAdapter) getParent()).getSite();
         Assert.isNotNull(currentSite, "null site");        
         
@@ -84,7 +85,8 @@ public class StudyGroup extends Node {
         });
     }
     
-    public void popupMenu(TreeViewer tv, Tree tree,  Menu menu) {
+    @Override
+	public void popupMenu(TreeViewer tv, Tree tree,  Menu menu) {
         MenuItem mi = new MenuItem (menu, SWT.PUSH);
         mi.setText ("Add Study");
         mi.addSelectionListener(new SelectionListener() {

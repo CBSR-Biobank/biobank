@@ -53,8 +53,8 @@ public class StudyViewForm extends BiobankViewForm {
 
 			// retrieve info from database because could have been modified after first opening
 
-			// study = studyAdapter.getStudy();
-			retrieveStudy();
+			study = studyAdapter.getStudy();
+			//retrieveStudy();
 			setPartName("Study " + study.getName());
 		}
 		else {
@@ -63,6 +63,7 @@ public class StudyViewForm extends BiobankViewForm {
 		}    
 	}
 
+	@Override
 	protected void createFormContent() {
 		if (study.getName() != null) {
 			form.setText("Study: " + study.getName());
@@ -182,10 +183,12 @@ public class StudyViewForm extends BiobankViewForm {
 
 	@Override
 	protected void reload() {    	
-		retrieveStudy();
+		//retrieveStudy();
 		patientsTable.getTableViewer().setInput(getPatientsAdapters());	
 		sContainersTable.getTableViewer().setInput(getStorageContainers());
 		sDatasTable.getTableViewer().setInput(getSDatas());
+		System.out.println(study.getComment());
+		//study.setComment("comment changed !");
 	}
 
 	private void retrieveStudy() {

@@ -85,11 +85,13 @@ public class LoginDialog extends TitleAreaDialog {
 		}
 	}
 	
+	@Override
 	protected void configureShell(Shell shell) {
 		super.configureShell(shell);
 		shell.setText("BioBank Login");
 	}
 	
+	@Override
 	protected Control createContents(Composite parent) {
         Control contents = super.createContents(parent);
     	setTitle("Login to a BioBank server");
@@ -97,6 +99,7 @@ public class LoginDialog extends TitleAreaDialog {
         return contents;
 	}
 	
+	@Override
 	protected Control createDialogArea(Composite parent) {		
 		Composite parentComposite = (Composite) super.createDialogArea(parent);
 		
@@ -151,6 +154,7 @@ public class LoginDialog extends TitleAreaDialog {
 		return contents;
 	}
 	
+	@Override
 	protected void buttonPressed(int buttonId) {
 		if ((buttonId == IDialogConstants.OK_ID)
 				|| (buttonId == IDialogConstants.CANCEL_ID)) {		
@@ -182,6 +186,7 @@ public class LoginDialog extends TitleAreaDialog {
 		super.buttonPressed(buttonId);
 	}
 
+	@Override
 	protected void okPressed() {
 		if (serverText.getText().equals("")) {
 			MessageDialog.openError(getShell(), "Invalid Server Name",

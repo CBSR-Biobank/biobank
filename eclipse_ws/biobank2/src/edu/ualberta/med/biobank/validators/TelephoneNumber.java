@@ -11,6 +11,7 @@ public class TelephoneNumber extends AbstractValidator {
         super(message, controlDecoration);
 	}
 
+	@Override
 	public IStatus validate(Object value) {
 		if (! (value instanceof String)) {
 			throw new RuntimeException(

@@ -39,7 +39,7 @@ public class PatientAdapter extends Node {
     @Override
     public int getId() {
         Assert.isNotNull(patient, "patient is null");
-        Object o = (Object) patient.getId();
+        Object o = patient.getId();
         if (o == null) return 0;
         return patient.getId();
     }
@@ -47,16 +47,18 @@ public class PatientAdapter extends Node {
     @Override
     public String getName() {
         Assert.isNotNull(patient, "storage type is null");
-        Object o = (Object) patient.getNumber();
+        Object o = patient.getNumber();
         if (o == null) return null;
         return patient.getNumber();
     }
     
-    public void performDoubleClick() {
+    @Override
+	public void performDoubleClick() {
         openForm(new FormInput(this), PatientViewForm.ID);
     }
 
-    public void performExpand() {   
+    @Override
+	public void performExpand() {   
         Display.getDefault().asyncExec(new Runnable() {
             public void run() {                
                 // read from database again                 
@@ -91,7 +93,8 @@ public class PatientAdapter extends Node {
         });
     }
     
-    public void popupMenu(TreeViewer tv, Tree tree,  Menu menu) {
+    @Override
+	public void popupMenu(TreeViewer tv, Tree tree,  Menu menu) {
         MenuItem mi = new MenuItem (menu, SWT.PUSH);
         mi.setText ("Edit Patient");
         mi.addSelectionListener(new SelectionListener() {

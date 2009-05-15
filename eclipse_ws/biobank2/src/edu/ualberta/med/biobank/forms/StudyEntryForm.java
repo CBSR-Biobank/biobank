@@ -220,7 +220,8 @@ public class StudyEntryForm extends BiobankEntryForm {
 
         submit = toolkit.createButton(client, "Submit", SWT.PUSH);
         submit.addSelectionListener(new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent e) {
+            @Override
+			public void widgetSelected(SelectionEvent e) {
                 doSaveInternal();
             }
         });
@@ -233,7 +234,8 @@ public class StudyEntryForm extends BiobankEntryForm {
 		return MSG_STUDY_OK;
 	}
     
-    protected void handleStatusChanged(IStatus status) {
+    @Override
+	protected void handleStatusChanged(IStatus status) {
 		if (status.getSeverity() == IStatus.OK) {
 			form.setMessage(getOkMessage(), IMessageProvider.NONE);
 	    	submit.setEnabled(true);
@@ -244,7 +246,8 @@ public class StudyEntryForm extends BiobankEntryForm {
 		}
     }
     
-    protected void saveForm() {        
+    @Override
+	protected void saveForm() {        
         try {
             if ((study.getId() == null) && !checkStudyNameUnique()) {
                 setDirty(true);
@@ -357,8 +360,7 @@ public class StudyEntryForm extends BiobankEntryForm {
     
     private boolean checkStudyNameUnique() throws ApplicationException {
         WritableApplicationService appService = studyAdapter.getAppService();
-        Site site = (Site) ((SiteAdapter) 
-            studyAdapter.getParent().getParent()).getSite();
+        Site site = ((SiteAdapter) studyAdapter.getParent().getParent()).getSite();
         
         HQLCriteria c = new HQLCriteria(
             "from edu.ualberta.med.biobank.model.Study as study "

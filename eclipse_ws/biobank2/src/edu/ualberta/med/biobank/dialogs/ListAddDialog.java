@@ -25,17 +25,20 @@ public class ListAddDialog extends Dialog {
         this.helpText = helpText;
     }
     
-    protected void configureShell(Shell shell) {
+    @Override
+	protected void configureShell(Shell shell) {
         super.configureShell(shell);
         shell.setText(title);
     }
     
-    protected Control createContents(Composite parent) {
+    @Override
+	protected Control createContents(Composite parent) {
         Control contents = super.createContents(parent);
         return contents;
     }
     
-    protected Control createDialogArea(Composite parent) {      
+    @Override
+	protected Control createDialogArea(Composite parent) {      
         Composite parentComposite = (Composite) super.createDialogArea(parent);  
         Composite contents = new Composite(parentComposite, SWT.NONE);
         contents.setLayout(new GridLayout(1, false));
@@ -49,7 +52,8 @@ public class ListAddDialog extends Dialog {
         return contents;
     }
     
-    protected void okPressed() {
+    @Override
+	protected void okPressed() {
         result = items.getText().split(";");        
         super.okPressed();  
     }

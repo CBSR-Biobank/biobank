@@ -109,7 +109,8 @@ public class PatientEntryForm extends BiobankEntryForm {
 
         submit = toolkit.createButton(client, "Submit", SWT.PUSH);
         submit.addSelectionListener(new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent e) {
+            @Override
+			public void widgetSelected(SelectionEvent e) {
                 PlatformUI.getWorkbench().getActiveWorkbenchWindow()
                     .getActivePage().saveEditor(PatientEntryForm.this, false);
             }
@@ -146,8 +147,7 @@ public class PatientEntryForm extends BiobankEntryForm {
                 return;
             }
             
-            Study study = (Study) (
-                (StudyAdapter) patientAdapter.getParent().getParent()).getStudy();
+            Study study = ((StudyAdapter) patientAdapter.getParent().getParent()).getStudy();
             patient.setStudy(study);
 
             if ((patient.getId() == null) || (patient.getId() == 0)) {
@@ -180,8 +180,7 @@ public class PatientEntryForm extends BiobankEntryForm {
     
     private boolean checkPatientNumberUnique() throws ApplicationException {
         WritableApplicationService appService = patientAdapter.getAppService();
-        Study study = (Study) ((StudyAdapter) 
-            patientAdapter.getParent().getParent()).getStudy();
+        Study study = ((StudyAdapter) patientAdapter.getParent().getParent()).getStudy();
         
         HQLCriteria c = new HQLCriteria(
             "from edu.ualberta.med.biobank.model.Patient as p "
