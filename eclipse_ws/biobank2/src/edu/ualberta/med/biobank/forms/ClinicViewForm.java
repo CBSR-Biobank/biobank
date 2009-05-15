@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.forms;
 
 import java.util.Collection;
+import java.util.List;
 
 import org.eclipse.core.databinding.beans.PojoObservables;
 import org.eclipse.swt.SWT;
@@ -15,6 +16,7 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.forms.widgets.Section;
+import org.springframework.util.Assert;
 
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Clinic;
@@ -22,6 +24,7 @@ import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.ClinicAdapter;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankCollectionTable;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ClinicViewForm  extends AddressViewFormCommon {	
 	public static final String ID =
@@ -30,8 +33,8 @@ public class ClinicViewForm  extends AddressViewFormCommon {
 	private ClinicAdapter clinicAdapter;
 	private Clinic clinic;
 	
-	Label name;
-
+	private BiobankCollectionTable studiesTable;
+	
 	public void init(IEditorSite editorSite, IEditorInput input)
 			throws PartInitException {
 		super.init(editorSite, input);
@@ -39,8 +42,23 @@ public class ClinicViewForm  extends AddressViewFormCommon {
         FormInput clinicInput = (FormInput) input;
         
         clinicAdapter = (ClinicAdapter) clinicInput.getNode();
-        clinic = clinicAdapter.getClinic();
+        //clinic = clinicAdapter.getClinic();
+        retrieveClinic();
         address = clinic.getAddress();
+	}
+
+	private void retrieveClinic() {
+		List<Clinic> result;
+		Clinic searchClinic = new Clinic();
+		searchClinic.setId(clinicAdapter.getClinic().getId());
+		try {
+			result = clinicAdapter.getAppService().search(Clinic.class, searchClinic);
+			Assert.isTrue(result.size() == 1);
+			clinic = result.get(0);
+			clinicAdapter.setClinic(clinic);
+		} catch (ApplicationException e) {
+			e.printStackTrace();
+		}
 	}
 
 	protected void createFormContent() {
@@ -81,6 +99,17 @@ public class ClinicViewForm  extends AddressViewFormCommon {
 	
 	protected void createStudiesSection() {
         Composite client = createSectionWithClient("Studies");
+        
+        String [] headings = new String[] {"Name", "Short Name", "Num. Patients"};      
+        studiesTable = new BiobankCollectionTable(client, SWT.NONE, headings, getStudiesAdapters());
+        studiesTable.adaptToToolkit(toolkit);   
+        toolkit.paintBordersFor(studiesTable);
+        
+        studiesTable.getTableViewer().addDoubleClickListener(
+                FormUtils.getBiobankCollectionDoubleClickListener());
+	}
+
+	private StudyAdapter[] getStudiesAdapters() {
 		Collection<Study> studies = clinic.getStudyCollection();
 		
         StudyAdapter [] studyAdapters = new StudyAdapter [studies.size()];
@@ -90,15 +119,7 @@ public class ClinicViewForm  extends AddressViewFormCommon {
                 clinicAdapter.getParent(), study);
             count++;
         }
-
-        String [] headings = new String[] {"Name", "Short Name", "Num. Patients"};      
-        BiobankCollectionTable comp = 
-            new BiobankCollectionTable(client, SWT.NONE, headings, studyAdapters);
-        comp.adaptToToolkit(toolkit);   
-        toolkit.paintBordersFor(comp);
-        
-        comp.getTableViewer().addDoubleClickListener(
-                FormUtils.getBiobankCollectionDoubleClickListener());
+		return studyAdapters;
 	}
 	
 	protected void createButtonsSection() {
@@ -116,8 +137,8 @@ public class ClinicViewForm  extends AddressViewFormCommon {
 
 	@Override
 	protected void reload() {
-		// TODO Auto-generated method stub
-		
+		retrieveClinic();
+		studiesTable.getTableViewer().setInput(getStudiesAdapters());	
 	}
 }
 

@@ -1,33 +1,21 @@
 package edu.ualberta.med.biobank.forms;
 
-import java.net.URL;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.core.databinding.beans.PojoObservables;
-import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.IAction;
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.Section;
 import org.springframework.util.Assert;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.Sdata;
@@ -65,7 +53,7 @@ public class StudyViewForm extends BiobankViewForm {
 
 			// retrieve info from database because could have been modified after first opening
 
-			//			study = studyAdapter.getStudy();
+			// study = studyAdapter.getStudy();
 			retrieveStudy();
 			setPartName("Study " + study.getName());
 		}
@@ -115,10 +103,8 @@ public class StudyViewForm extends BiobankViewForm {
 	private void createPatientsSection() {        
 		Section section = createSection("Patients");  
 
-		PatientAdapter[] patients = loadPatients();
-
 		String [] headings = new String[] {"Patient Number"};      
-		patientsTable = new BiobankCollectionTable(section, SWT.NONE, headings, patients);
+		patientsTable = new BiobankCollectionTable(section, SWT.NONE, headings, getPatientsAdapters());
 		section.setClient(patientsTable);
 		patientsTable.adaptToToolkit(toolkit);   
 		toolkit.paintBordersFor(patientsTable);
@@ -127,7 +113,7 @@ public class StudyViewForm extends BiobankViewForm {
 				FormUtils.getBiobankCollectionDoubleClickListener());
 	}
 
-	private PatientAdapter[] loadPatients() {
+	private PatientAdapter[] getPatientsAdapters() {
 		// hack required here because site.getStudyCollection().toArray(new Study[0])
 		// returns Object[].        
 		int count = 0;
@@ -140,17 +126,11 @@ public class StudyViewForm extends BiobankViewForm {
 		return arr;
 	}
 
-	private void reloadPatients() {
-		patientsTable.getTableViewer().setInput(loadPatients());
-	}
-
 	private void createStorageContainerSection() {        
 		Section section = createSection("Storage Containers");  
 
-		StorageContainer[] sContainers = loadStorageContainers();
-
 		String [] headings = new String[] {"Name", "Status", "Bar Code", "Full", "Temperature"};      
-		sContainersTable = new BiobankCollectionTable(section, SWT.NONE, headings, sContainers);
+		sContainersTable = new BiobankCollectionTable(section, SWT.NONE, headings, getStorageContainers());
 		section.setClient(sContainersTable);
 		sContainersTable.adaptToToolkit(toolkit);   
 		toolkit.paintBordersFor(sContainersTable);
@@ -159,7 +139,7 @@ public class StudyViewForm extends BiobankViewForm {
 				FormUtils.getBiobankCollectionDoubleClickListener());
 	}
 
-	private StorageContainer[] loadStorageContainers() {
+	private StorageContainer[] getStorageContainers() {
 		// hack required here because site.getStudyCollection().toArray(new Study[0])
 		// returns Object[].        
 		int count = 0;
@@ -173,17 +153,11 @@ public class StudyViewForm extends BiobankViewForm {
 		return arr;
 	}
 	
-	private void reloadStorageContainers() {
-		sContainersTable.getTableViewer().setInput(loadStorageContainers());
-	}
-
 	private void createDataCollectedSection() {           
 		Section section = createSection("Study Data Collected");
 
-		Sdata[] sDatas = loadSDatas();
-
 		String [] headings = new String[] {"Name", "Valid Values (optional)"};      
-		sDatasTable = new BiobankCollectionTable(section, SWT.NONE, headings, sDatas);
+		sDatasTable = new BiobankCollectionTable(section, SWT.NONE, headings, getSDatas());
 		section.setClient(sDatasTable);
 		sDatasTable.adaptToToolkit(toolkit); 
 		toolkit.paintBordersFor(sDatasTable);
@@ -192,7 +166,7 @@ public class StudyViewForm extends BiobankViewForm {
 				FormUtils.getBiobankCollectionDoubleClickListener());
 	}
 
-	private Sdata[] loadSDatas() {
+	private Sdata[] getSDatas() {
 		// hack required here because site.getStudyCollection().toArray(new Study[0])
 		// returns Object[].        
 		int count = 0;
@@ -206,17 +180,12 @@ public class StudyViewForm extends BiobankViewForm {
 		return arr;
 	}
 
-	private void reloadSDatas() {
-		sDatasTable.getTableViewer().setInput(loadSDatas());
-	}
-
-
 	@Override
 	protected void reload() {    	
 		retrieveStudy();
-		reloadPatients();	
-		reloadStorageContainers();
-		reloadSDatas();
+		patientsTable.getTableViewer().setInput(getPatientsAdapters());	
+		sContainersTable.getTableViewer().setInput(getStorageContainers());
+		sDatasTable.getTableViewer().setInput(getSDatas());
 	}
 
 	private void retrieveStudy() {

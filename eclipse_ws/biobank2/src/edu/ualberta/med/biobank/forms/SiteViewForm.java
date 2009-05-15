@@ -37,6 +37,9 @@ public class SiteViewForm extends AddressViewFormCommon {
 	
 	private Site site;
 
+	private BiobankCollectionTable studiesTable;
+	private BiobankCollectionTable storageTypesTable;
+	
 	public void init(IEditorSite editorSite, IEditorInput input)
 			throws PartInitException {
 		super.init(editorSite, input);
@@ -99,7 +102,18 @@ public class SiteViewForm extends AddressViewFormCommon {
 	
     private void createStudySection() {        
 		Composite client = createSectionWithClient("Studies");
-        Collection<Study> studies = site.getStudyCollection();
+		
+        String [] headings = new String[] {"Name", "Short Name", "Num. Patients"};      
+        studiesTable = new BiobankCollectionTable(client, SWT.NONE, headings, getStudiesAdapters());
+        studiesTable.adaptToToolkit(toolkit);   
+        toolkit.paintBordersFor(studiesTable);
+        
+        studiesTable.getTableViewer().addDoubleClickListener(
+                FormUtils.getBiobankCollectionDoubleClickListener());
+    }
+
+	private StudyAdapter[] getStudiesAdapters() {
+		Collection<Study> studies = site.getStudyCollection();
         StudyAdapter [] studyAdapters = new StudyAdapter [studies.size()];
         int count = 0;
         for (Study study : studies) {
@@ -107,20 +121,24 @@ public class SiteViewForm extends AddressViewFormCommon {
                     siteAdapter.getStudiesGroupNode(), study);
             count++;
         }
-
-        String [] headings = new String[] {"Name", "Short Name", "Num. Patients"};      
-        BiobankCollectionTable comp = 
-            new BiobankCollectionTable(client, SWT.NONE, headings, studyAdapters);
-        comp.adaptToToolkit(toolkit);   
-        toolkit.paintBordersFor(comp);
-        
-        comp.getTableViewer().addDoubleClickListener(
-                FormUtils.getBiobankCollectionDoubleClickListener());
-    }
+		return studyAdapters;
+	}
     
     private void createStorageTypesSection() {     
-        Composite client = createSectionWithClient("Studies");
-        Collection<StorageType> stCollection = site.getStorageTypeCollection();
+        Composite client = createSectionWithClient("Storage Types");
+        
+        String [] headings = new String[] {"Name", "Status", "Default Temperature"};      
+        storageTypesTable = new BiobankCollectionTable(client, SWT.NONE, headings, getStorageTypesAdapters());
+        storageTypesTable.adaptToToolkit(toolkit);   
+        toolkit.paintBordersFor(storageTypesTable);
+        
+        storageTypesTable.getTableViewer().addDoubleClickListener(
+                FormUtils.getBiobankCollectionDoubleClickListener());
+        
+    }
+
+	private StorageTypeAdapter[] getStorageTypesAdapters() {
+		Collection<StorageType> stCollection = site.getStorageTypeCollection();
         StorageTypeAdapter [] adapters = new StorageTypeAdapter [stCollection.size()];
         int count = 0;
         for (StorageType storage : stCollection) {
@@ -128,17 +146,8 @@ public class SiteViewForm extends AddressViewFormCommon {
                     siteAdapter.getStudiesGroupNode(), storage);
             count++;
         }
-
-        String [] headings = new String[] {"Name", "Status", "Default Temperature"};      
-        BiobankCollectionTable comp = 
-            new BiobankCollectionTable(client, SWT.NONE, headings, adapters);
-        comp.adaptToToolkit(toolkit);   
-        toolkit.paintBordersFor(comp);
-        
-        comp.getTableViewer().addDoubleClickListener(
-                FormUtils.getBiobankCollectionDoubleClickListener());
-        
-    }
+		return adapters;
+	}
 	
 	private void createButtons() {      
 		Composite client = toolkit.createComposite(form.getBody());
@@ -199,7 +208,7 @@ public class SiteViewForm extends AddressViewFormCommon {
 
 	@Override
 	protected void reload() {
-		// TODO Auto-generated method stub
-		
+		studiesTable.getTableViewer().setInput(getStudiesAdapters());
+		storageTypesTable.getTableViewer().setInput(getStorageTypesAdapters());
 	}
 }
