@@ -41,13 +41,13 @@ public class PatientEntryForm extends BiobankEntryForm {
     public static final String ID =
         "edu.ualberta.med.biobank.forms.PatientEntryForm";
     
-    public static final String NEW_PATIENT_OK_MESSAGE =
+    public static final String MSG_NEW_PATIENT_OK =
         "Creating a new patient record.";
         
-    public static final String PATIENT_OK_MESSAGE =
+    public static final String MSG_PATIENT_OK =
         "Editing an existing patient record.";
     
-    public static final String NO_PATIENT_NUMBER_MESSAGE =
+    public static final String MSG_NO_PATIENT_NUMBER =
         "Patient must have a patient number";
     
     private PatientAdapter patientAdapter;
@@ -96,7 +96,7 @@ public class PatientEntryForm extends BiobankEntryForm {
 
         createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Patient Number", null,
             PojoObservables.observeValue(patient, "number"),
-            NonEmptyString.class, NO_PATIENT_NUMBER_MESSAGE);
+            NonEmptyString.class, MSG_NO_PATIENT_NUMBER);
     }
     
     protected void createButtons() {
@@ -118,9 +118,9 @@ public class PatientEntryForm extends BiobankEntryForm {
     
     private String getOkMessage() {
         if (patient.getId() == null) {
-            return NEW_PATIENT_OK_MESSAGE;
+            return MSG_NEW_PATIENT_OK;
         }
-        return PATIENT_OK_MESSAGE;
+        return MSG_PATIENT_OK;
     }
     
     @Override

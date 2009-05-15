@@ -19,6 +19,7 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.databinding.swt.SWTObservables;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.fieldassist.ControlDecoration;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
@@ -37,6 +38,8 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.ISaveablePart;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
+import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.SessionManager;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -89,7 +92,22 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
     protected void doSaveInternal() {
         BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
             public void run() {
-                saveForm();
+                try {
+                    saveForm();
+                }
+                catch (final RemoteConnectFailureException exp) {
+                    Display.getDefault().asyncExec(new Runnable() {
+                        public void run() {
+                            MessageDialog.openError(
+                                PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), 
+                                "Connection Attempt Failed", 
+                            "Could not connect to server. Make sure server is running.");
+                        }
+                    });
+                }
+                catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         });
     }
@@ -127,7 +145,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
         bindChangeListener();
     }
     
-    abstract protected void saveForm();   
+    abstract protected void saveForm() throws Exception;   
     
 
     @Override
@@ -165,8 +183,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
     protected Control createBoundWidget(Composite composite, 
         Class<?> widgetClass, int widgetOptions, Label label, 
         String [] widgetValues, 
-        IObservableValue modelObservableValue, Class<?> validatorClass, 
-        String validatorErrMsg) {
+        IObservableValue modelObservableValue, IValidator validator) {
         if (widgetClass == Text.class) {
             if (widgetOptions == SWT.NONE) {
                 widgetOptions = SWT.SINGLE;
@@ -176,10 +193,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
             text.addKeyListener(keyListener);
             
             UpdateValueStrategy uvs = null;
-            if (validatorClass != null) {
-                IValidator validator = createValidator(validatorClass, 
-                    FormUtils.createDecorator(label, validatorErrMsg), 
-                    validatorErrMsg);
+            if (validator != null) {
                 uvs = new UpdateValueStrategy();
                 uvs.setAfterGetValidator(validator);
             }
@@ -209,6 +223,23 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
             Assert.isTrue(false, "invalid widget class " + widgetClass.getName());
         }
         return null;
+    }
+    
+    protected Control createBoundWidget(Composite composite, 
+        Class<?> widgetClass, int widgetOptions, Label label, 
+        String [] widgetValues, 
+        IObservableValue modelObservableValue, Class<?> validatorClass, 
+        String validatorErrMsg) {
+        IValidator validator = null;
+
+        if (validatorClass != null) {
+            validator = createValidator(validatorClass, 
+                FormUtils.createDecorator(label, validatorErrMsg), 
+                validatorErrMsg);
+        }
+        
+        return createBoundWidget(composite, widgetClass, widgetOptions, label, 
+            widgetValues,  modelObservableValue, validator); 
     }
     
     protected IValidator createValidator(Class<?> validatorClass, 

@@ -27,7 +27,6 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
-import org.springframework.remoting.RemoteAccessException;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.forms.input.FormInput;
@@ -55,14 +54,17 @@ public class StorageTypeEntryForm extends BiobankEntryForm {
     public static final String ID =
         "edu.ualberta.med.biobank.forms.StorageTypeEntryForm";
     
-    private static final String NEW_STORAGE_TYPE_OK_MESSAGE = 
+    private static final String MSG_NEW_STORAGE_TYPE_OK = 
         "Creating a new storage type.";
     
-    private static final String STORAGE_TYPE_OK_MESSAGE = 
+    private static final String MSG_STORAGE_TYPE_OK = 
         "Editing an existing storage type.";
     
-    private static final String NO_STORAGE_TYPE_NAME_MESSAGE = 
+    private static final String MSG_NO_STORAGE_TYPE_NAME = 
         "Storage type must have a name";
+    
+    private static final String MSG_NO_DIMENSION_LABEL =
+        "Dimension labels must be assigned";
     
     static Logger log4j = Logger.getLogger(SessionManager.class.getName());
     
@@ -131,7 +133,7 @@ public class StorageTypeEntryForm extends BiobankEntryForm {
 
         createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Name", null,
             PojoObservables.observeValue(storageType, "name"),
-            NonEmptyString.class, NO_STORAGE_TYPE_NAME_MESSAGE);
+            NonEmptyString.class, MSG_NO_STORAGE_TYPE_NAME);
         
         createBoundWidgetWithLabel(client, Text.class, SWT.NONE, 
             "Default Temperature\n(Celcius)", 
@@ -162,7 +164,7 @@ public class StorageTypeEntryForm extends BiobankEntryForm {
         
         createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Dimension One Label", 
             null, PojoObservables.observeValue(storageType, "dimensionOneLabel"), 
-            null, null); 
+            NonEmptyString.class, MSG_NO_DIMENSION_LABEL); 
         
         createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Dimension One Capacity", 
             null, PojoObservables.observeValue(capacity, "dimensionOneCapacity"),
@@ -170,7 +172,7 @@ public class StorageTypeEntryForm extends BiobankEntryForm {
         
         createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Dimension Two Label", 
             null, PojoObservables.observeValue(storageType, "dimensionTwoLabel"), 
-            null, null); 
+            NonEmptyString.class, MSG_NO_DIMENSION_LABEL); 
         
         createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Dimension Two Capacity", 
             null, PojoObservables.observeValue(capacity, "dimensionTwoCapacity"), 
@@ -283,62 +285,64 @@ public class StorageTypeEntryForm extends BiobankEntryForm {
     
     private String getOkMessage() {
         if (storageType.getId() == null) {
-            return NEW_STORAGE_TYPE_OK_MESSAGE;
+            return MSG_NEW_STORAGE_TYPE_OK;
         }
-        return STORAGE_TYPE_OK_MESSAGE;
+        return MSG_STORAGE_TYPE_OK;
     }
 
     /**
      * Called by base class when form data is to be saved.
      */
     @Override
-    protected void saveForm() { 
-        try {
-            SDKQuery query;
-            SDKQueryResult result;
-            
-            if ((storageType.getId() == null) && !checkStorageTypeNameUnique()) {
-                setDirty(true);
-                return;
-            }
-            
-            saveSampleDerivativeTypes(); 
-            saveChildStorageTypes();
-            storageType.setCapacity(capacity);
-            
-            // associate the storage type to it's site
-            Site site = (Site) ((SiteAdapter) 
-                storageTypeAdapter.getParent().getParent()).getSite();
-            Assert.isTrue((site != null) && (site.getId() != null) && (site.getId() != 0),
-                "site is not in the database");
-            storageType.setSite(site);
+    protected void saveForm() throws Exception { 
+        SDKQuery query;
+        SDKQueryResult result;
 
-            if ((storageType.getId() == null) || (storageType.getId() == 0)) {
-                query = new InsertExampleQuery(storageType);   
-            }
-            else { 
-                query = new UpdateExampleQuery(storageType);   
-            }
-            
-            result = appService.executeQuery(query);
-            storageType = (StorageType) result.getObjectResult();
+        if ((storageType.getId() == null) && !checkStorageTypeNameUnique()) {
+            setDirty(true);
+            return;
         }
-        catch (final RemoteAccessException exp) {
-            Display.getDefault().asyncExec(new Runnable() {
-                public void run() {
-                    MessageDialog.openError(
-                            PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), 
-                            "Connection Attempt Failed", 
-                            "Could not perform database operation. Make sure server is running correct version.");
-                }
-            });
+
+        saveSampleDerivativeTypes(); 
+        saveChildStorageTypes();
+        saveCapacity();
+
+        // associate the storage type to it's site
+        Site site = (Site) ((SiteAdapter) 
+            storageTypeAdapter.getParent().getParent()).getSite();
+        Assert.isTrue((site != null) && (site.getId() != null) && (site.getId() != 0),
+        "site is not in the database");
+        storageType.setSite(site);
+
+        if ((storageType.getId() == null) || (storageType.getId() == 0)) {
+            query = new InsertExampleQuery(storageType);   
         }
-        catch (Exception exp) {
-            exp.printStackTrace(); 
+        else { 
+            query = new UpdateExampleQuery(storageType);   
         }
+
+        result = appService.executeQuery(query);
+        storageType = (StorageType) result.getObjectResult();
         
         storageTypeAdapter.getParent().performExpand();      
         getSite().getPage().closeEditor(this, false);    
+    }
+    
+    private void saveCapacity() throws Exception {
+        SDKQuery query;
+        SDKQueryResult result;
+        
+        Integer id = capacity.getId(); 
+
+        if ((id == null) || (id == 0)) {
+            query = new InsertExampleQuery(capacity);   
+        }
+        else { 
+            query = new UpdateExampleQuery(capacity);   
+        }
+
+        result = appService.executeQuery(query);
+        storageType.setCapacity((Capacity) result.getObjectResult());
     }
     
     private void saveSampleDerivativeTypes() {

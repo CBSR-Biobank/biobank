@@ -20,10 +20,12 @@ import org.springframework.util.Assert;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.model.StorageType;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.ClinicAdapter;
 import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
+import edu.ualberta.med.biobank.treeview.StorageTypeAdapter;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankCollectionTable;
 
@@ -69,6 +71,7 @@ public class SiteViewForm extends AddressViewFormCommon {
 		createStudySection();
 		FormUtils.createClinicSection(toolkit, form.getBody(), 
 		        siteAdapter.getClinicGroupNode(), site.getClinicCollection());
+        createStorageTypesSection();
 		createButtons();
 	}
     
@@ -111,6 +114,28 @@ public class SiteViewForm extends AddressViewFormCommon {
         
         comp.getTableViewer().addDoubleClickListener(
                 FormUtils.getBiobankCollectionDoubleClickListener());
+    }
+    
+    private void createStorageTypesSection() {     
+        Composite client = createSectionWithClient("Studies");
+        Collection<StorageType> stCollection = site.getStorageTypeCollection();
+        StorageTypeAdapter [] adapters = new StorageTypeAdapter [stCollection.size()];
+        int count = 0;
+        for (StorageType storage : stCollection) {
+            adapters[count] = new StorageTypeAdapter(
+                    siteAdapter.getStudiesGroupNode(), storage);
+            count++;
+        }
+
+        String [] headings = new String[] {"Name", "Status", "Default Temperature"};      
+        BiobankCollectionTable comp = 
+            new BiobankCollectionTable(client, SWT.NONE, headings, adapters);
+        comp.adaptToToolkit(toolkit);   
+        toolkit.paintBordersFor(comp);
+        
+        comp.getTableViewer().addDoubleClickListener(
+                FormUtils.getBiobankCollectionDoubleClickListener());
+        
     }
 	
 	private void createButtons() {      

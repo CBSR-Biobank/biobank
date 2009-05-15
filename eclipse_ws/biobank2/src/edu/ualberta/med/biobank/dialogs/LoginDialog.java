@@ -17,12 +17,15 @@ import org.eclipse.core.runtime.preferences.ConfigurationScope;
 import org.eclipse.jface.dialogs.MessageDialog;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
+
 import org.osgi.service.prefs.Preferences;
 import org.osgi.service.prefs.BackingStoreException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.helpers.SessionHelper;
+import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.rcp.Application;
 
 public class LoginDialog extends TitleAreaDialog {
@@ -199,9 +202,11 @@ public class LoginDialog extends TitleAreaDialog {
 				PlatformUI.getWorkbench().getActiveWorkbenchWindow()
 				.getShell().getDisplay(), sessionHelper);
 		
-		SessionManager.getInstance().addSession(
-				sessionHelper.getAppService(), serverText.getText(), 
-				sessionHelper.getSites());
+		List<Site> sites = sessionHelper.getSites();
+		if (sites != null) {		
+		    SessionManager.getInstance().addSession(
+		        sessionHelper.getAppService(), serverText.getText(), sites);
+		}
 		
 		super.okPressed();	
 	}

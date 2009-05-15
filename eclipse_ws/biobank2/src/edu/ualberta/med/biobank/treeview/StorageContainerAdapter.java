@@ -10,6 +10,7 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
 
 import edu.ualberta.med.biobank.forms.StorageContainerEntryForm;
+import edu.ualberta.med.biobank.forms.StorageContainerViewForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.StorageContainer;
 
@@ -39,7 +40,7 @@ public class StorageContainerAdapter extends Node {
     }
     
     public void performDoubleClick() {
-        //openForm(new FormInput(this), StorageContainerViewForm.ID);
+        openForm(new FormInput(this), StorageContainerViewForm.ID);
     }
     
     public StorageContainer getStorageContainer() {
@@ -63,8 +64,8 @@ public class StorageContainerAdapter extends Node {
         mi.setText ("View Storage Container");
         mi.addSelectionListener(new SelectionListener() {
             public void widgetSelected(SelectionEvent event) {
-                //openForm(new FormInput(StorageContainerAdapter.this), 
-                //    StorageContainerViewForm.ID);
+                openForm(new FormInput(StorageContainerAdapter.this), 
+                    StorageContainerViewForm.ID);
             }
 
             public void widgetDefaultSelected(SelectionEvent e) {                    

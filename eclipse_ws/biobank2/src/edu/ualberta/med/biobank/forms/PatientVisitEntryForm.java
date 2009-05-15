@@ -2,11 +2,9 @@ package edu.ualberta.med.biobank.forms;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.Set;
 
 import org.apache.commons.collections.MapIterator;
 import org.apache.commons.collections.map.ListOrderedMap;
@@ -14,7 +12,6 @@ import org.eclipse.core.databinding.beans.PojoObservables;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.dialogs.IMessageProvider;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -24,14 +21,11 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.PlatformUI;
-import org.springframework.remoting.RemoteConnectFailureException;
 
 import com.gface.date.DatePickerCombo;
 import com.gface.date.DatePickerStyle;
@@ -56,13 +50,13 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
     public static final String ID =
         "edu.ualberta.med.biobank.forms.PatientVisitEntryForm";
 
-    public static final String NEW_PATIENT_VISIT_OK_MESSAGE =
+    public static final String MSG_NEW_PATIENT_VISIT_OK =
         "Creating a new patient visit record.";
 
-    public static final String PATIENT_VISIT_OK_MESSAGE =
+    public static final String MSG_PATIENT_VISIT_OK =
         "Editing an existing patient visit record.";
     
-    public static final String NO_VISIT_NUMBER_MESSAGE =
+    public static final String MSG_NO_VISIT_NUMBER =
         "Visit must have a number";
     
     public static final String DATE_FORMAT = 
@@ -133,7 +127,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
 
         createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Visit Number", null,
             PojoObservables.observeValue(patientVisit, "number"),
-            NonEmptyString.class, NO_VISIT_NUMBER_MESSAGE);
+            NonEmptyString.class, MSG_NO_VISIT_NUMBER);
 
         study = (Study) ((StudyAdapter)
             patientVisitAdapter.getParent().getParent().getParent()).getStudy();
@@ -279,9 +273,9 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
 
     private String getOkMessage() {
         if (patientVisit.getId() == null) {
-            return NEW_PATIENT_VISIT_OK_MESSAGE;
+            return MSG_NEW_PATIENT_VISIT_OK;
         }
-        return PATIENT_VISIT_OK_MESSAGE;
+        return MSG_PATIENT_VISIT_OK;
     }
 
     @Override
@@ -297,63 +291,48 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
     }
 
     @Override
-    protected void saveForm() {
-        try {
-            SDKQuery query;
-            SDKQueryResult result;
-            
-            PatientAdapter patientAdapter = 
-                (PatientAdapter) patientVisitAdapter.getParent();
-            
-            System.out.println("*** patient visit id: " + patientVisit.getId()); 
-            
-            if (patientVisit.getPatientVisitDataCollection() != null) {
-                for (PatientVisitData pvData : 
-                    patientVisit.getPatientVisitDataCollection()) {
-                    System.out.println("*** id: " + pvData.getId() + ", value: " 
-                        + pvData.getValue() + ", pv_id: " 
-                        + pvData.getPatientVisit().getId());
-                }
-            }
-            
-            patientVisit.setPatient(patientAdapter.getPatient());
-            savePatientVisitData();
-            
+    protected void saveForm() throws Exception {
+        SDKQuery query;
+        SDKQueryResult result;
+
+        PatientAdapter patientAdapter = 
+            (PatientAdapter) patientVisitAdapter.getParent();
+
+        System.out.println("*** patient visit id: " + patientVisit.getId()); 
+
+        if (patientVisit.getPatientVisitDataCollection() != null) {
             for (PatientVisitData pvData : 
                 patientVisit.getPatientVisitDataCollection()) {
-                System.out.println("id: " + pvData.getId() + ", value: " 
+                System.out.println("*** id: " + pvData.getId() + ", value: " 
                     + pvData.getValue() + ", pv_id: " 
                     + pvData.getPatientVisit().getId());
-            }            
-
-            System.out.println("pv data size: " + patientVisit.getPatientVisitDataCollection().size());
-
-            if ((patientVisit.getId() == null) || (patientVisit.getId() == 0)) {
-                query = new InsertExampleQuery(patientVisit);
             }
-            else { 
-                query = new UpdateExampleQuery(patientVisit);
-            }
+        }
 
-            result = appService.executeQuery(query);
-            patientVisit = (PatientVisit) result.getObjectResult();   
-            
-            patientAdapter.performExpand();       
-            getSite().getPage().closeEditor(this, false);    
+        patientVisit.setPatient(patientAdapter.getPatient());
+        savePatientVisitData();
+
+        for (PatientVisitData pvData : 
+            patientVisit.getPatientVisitDataCollection()) {
+            System.out.println("id: " + pvData.getId() + ", value: " 
+                + pvData.getValue() + ", pv_id: " 
+                + pvData.getPatientVisit().getId());
+        }            
+
+        System.out.println("pv data size: " + patientVisit.getPatientVisitDataCollection().size());
+
+        if ((patientVisit.getId() == null) || (patientVisit.getId() == 0)) {
+            query = new InsertExampleQuery(patientVisit);
         }
-        catch (final RemoteConnectFailureException exp) {
-            Display.getDefault().asyncExec(new Runnable() {
-                public void run() {
-                    MessageDialog.openError(
-                            PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), 
-                            "Connection Attempt Failed", 
-                    "Could not connect to server. Make sure server is running.");
-                }
-            });
+        else { 
+            query = new UpdateExampleQuery(patientVisit);
         }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
+
+        result = appService.executeQuery(query);
+        patientVisit = (PatientVisit) result.getObjectResult();   
+
+        patientAdapter.performExpand();       
+        getSite().getPage().closeEditor(this, false);  
     }
     
     private void savePatientVisitData() throws ApplicationException {
@@ -362,7 +341,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         
         pvDataCollection = patientVisit.getPatientVisitDataCollection();
         if (pvDataCollection == null) {
-            pvDataCollection = new ArrayList<PatientVisitData>();
+            pvDataCollection = new HashSet<PatientVisitData>();
             newCollection = true;
         }
         

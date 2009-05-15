@@ -218,6 +218,12 @@
             id="edu.ualberta.med.biobank.forms.StorageContainerEntryForm"
             name="Storage Container Entry">
       </editor>
+      <editor
+            class="edu.ualberta.med.biobank.forms.StorageContainerViewForm"
+            default="false"
+            id="edu.ualberta.med.biobank.forms.StorageContainerViewForm"
+            name="Storage Container View">
+      </editor>
    </extension>
    <extension
          point="org.eclipse.ui.bindings">
