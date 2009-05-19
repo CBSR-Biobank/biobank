@@ -18,7 +18,7 @@ import org.eclipse.ui.PartInitException;
 
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Capacity;
-import edu.ualberta.med.biobank.model.SampleDerivativeType;
+import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.model.StorageType;
 import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.StorageTypeAdapter;
@@ -125,7 +125,7 @@ public class StorageTypeViewForm extends BiobankViewForm {
         GridData gd = new GridData(GridData.FILL_BOTH);
         gd.heightHint = 100;
         list.setLayoutData(gd);
-        for (SampleDerivativeType type : storageType.getSampleDerivativeTypeCollection()) {
+        for (SampleType type : storageType.getSampleTypeCollection()) {
             list.add(type.getNameShort());
         }
     }
