@@ -55,7 +55,7 @@ public class SiteViewForm extends AddressViewFormCommon {
 
 		if (node instanceof SiteAdapter) {
 			siteAdapter = (SiteAdapter) node;
-			retrieveSite();			
+			retrieveSite();	
 			setPartName("Repository Site " + site.getName());
 		}
 		else {
@@ -72,7 +72,7 @@ public class SiteViewForm extends AddressViewFormCommon {
 			form.setText("Repository Site: " + site.getName());
 		}
 		
-		addRefreshToolbarAction();
+		addRefreshToolbarAction();			
 		
 		form.getBody().setLayout(new GridLayout(1, false));
 		form.getBody().setLayoutData(new GridData(GridData.FILL_HORIZONTAL));

@@ -8,12 +8,15 @@ import org.eclipse.core.databinding.beans.PojoObservables;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
@@ -110,10 +113,17 @@ public abstract class BiobankViewForm extends BiobankFormBase {
 				reload();
 			}			
 		};
-		reloadAction.setImageDescriptor(BioBankPlugin.getImageDescriptor("icons/arrow_refresh.png"));
+		ImageDescriptor imgDesc = BioBankPlugin.getImageDescriptor("icons/arrow_refresh.png");
+		reloadAction.setImageDescriptor(imgDesc);
 		form.getToolBarManager().add(reloadAction);
 		form.updateToolBar();		
 		
+		
+		Menu menu = new Menu(form);
+		form.setMenu(menu);
+		MenuItem item = new MenuItem(menu, SWT.PUSH);
+		item.setText("Reload");
+		item.setImage(imgDesc.createImage());
 	}
 	
 	protected abstract void reload();

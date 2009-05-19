@@ -56,7 +56,6 @@ public class StudyViewForm extends BiobankViewForm {
 			studyAdapter = (StudyAdapter) node;
 
 			// retrieve info from database because could have been modified after first opening
-			study = studyAdapter.getStudy();
 			retrieveStudy();
 			setPartName("Study " + study.getName());
 		}
