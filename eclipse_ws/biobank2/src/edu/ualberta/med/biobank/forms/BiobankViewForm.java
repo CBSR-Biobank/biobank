@@ -4,12 +4,10 @@ import java.util.HashMap;
 
 import org.apache.commons.collections.MapIterator;
 import org.apache.commons.collections.map.ListOrderedMap;
-import org.eclipse.core.databinding.DataBindingContext;
 import org.eclipse.core.databinding.beans.PojoObservables;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.databinding.swt.SWTObservables;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Combo;
@@ -29,12 +27,9 @@ public abstract class BiobankViewForm extends BiobankFormBase {
 	
 	private HashMap<String, Control> controls;
     
-    protected DataBindingContext dbc;
-    
     public BiobankViewForm() {
         super();
         controls = new HashMap<String, Control>();
-        dbc = new DataBindingContext();
     }
 
 	
@@ -56,23 +51,18 @@ public abstract class BiobankViewForm extends BiobankFormBase {
         this.appService = appService;
     }
     
-    protected Control createBoundWidget(Composite composite, 
-    		Class<?> widgetClass, int widgetOptions, String fieldLabel, 
-    		IObservableValue modelObservableValue) {
+    protected Control createWidget(Composite parent, Class<?> widgetClass, 
+    		int widgetOptions, String fieldLabel) {
     	if ((widgetClass == Combo.class) || (widgetClass == Text.class) 
     			|| (widgetClass == Label.class)) {
-    		Label label = toolkit.createLabel(
-    				composite, fieldLabel + ":", SWT.LEFT);
+    		Label label = toolkit.createLabel(parent, fieldLabel + ":", SWT.LEFT);
     		label.setLayoutData(new GridData(GridData.VERTICAL_ALIGN_BEGINNING));
     		if (widgetOptions == SWT.NONE) {
     			widgetOptions = SWT.SINGLE;
     		}    		
-    		Label field = toolkit.createLabel(composite, "", 
-    				widgetOptions | SWT.LEFT | SWT.BORDER);
+    		Label field = toolkit.createLabel(parent, "", widgetOptions | SWT.LEFT | SWT.BORDER);
     		field.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 
-    		dbc.bindValue(SWTObservables.observeText(field),
-    				modelObservableValue, null, null);
     		return field;
     	} 
     	else {
@@ -81,8 +71,7 @@ public abstract class BiobankViewForm extends BiobankFormBase {
     	return null;
     }
     
-    protected void createWidgetsFromMap(ListOrderedMap fieldsMap, 
-            Object pojo, Composite client) {
+    protected void createWidgetsFromMap(ListOrderedMap fieldsMap, Composite parent) {
         FieldInfo fi;
         
         MapIterator it = fieldsMap.mapIterator();
@@ -90,12 +79,30 @@ public abstract class BiobankViewForm extends BiobankFormBase {
             String key = (String) it.next();
             fi = (FieldInfo) it.getValue();
             
-            Control control = createBoundWidget(client, fi.widgetClass, SWT.NONE,
-                fi.label, PojoObservables.observeValue(pojo, key));
+            Control control = createWidget(parent, fi.widgetClass, SWT.NONE,
+                fi.label);
             controls.put(key, control);
         }     
     }
+    
 
+	protected void setWidgetsValues(ListOrderedMap fieldsMap, Object bean) {
+		MapIterator it = fieldsMap.mapIterator();
+        while (it.hasNext()) {
+            String key = (String) it.next();
+            FieldInfo fi = (FieldInfo) it.getValue();
+            IObservableValue ov = PojoObservables.observeValue(bean, key);
+            Object value = ov.getValue();
+            if (value != null) {
+            	Control control = controls.get(key);            
+            	if ((fi.widgetClass == Combo.class) || (fi.widgetClass == Text.class) 
+            			|| (fi.widgetClass == Label.class)) {
+            		((Label) control).setText((String)value);
+            	}
+            }
+        }     
+	}
+	
 	protected void addRefreshToolbarAction() {        
 		Action reloadAction = new Action("Reload") {
 			@Override
@@ -108,7 +115,7 @@ public abstract class BiobankViewForm extends BiobankFormBase {
 		form.updateToolBar();		
 		
 	}
-
+	
 	protected abstract void reload();
 
 }

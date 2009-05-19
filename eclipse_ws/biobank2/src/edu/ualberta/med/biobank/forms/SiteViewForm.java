@@ -1,13 +1,8 @@
 package edu.ualberta.med.biobank.forms;
 
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
 import java.util.Collection;
+import java.util.List;
 
-import org.eclipse.core.databinding.beans.PojoObservables;
-import org.eclipse.core.databinding.observable.value.IObservableValue;
-import org.eclipse.core.databinding.observable.value.WritableValue;
-import org.eclipse.jface.databinding.swt.SWTObservables;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -16,11 +11,9 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.forms.widgets.Section;
 import org.springframework.util.Assert;
 
 import edu.ualberta.med.biobank.forms.input.FormInput;
@@ -34,6 +27,7 @@ import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.treeview.StorageTypeAdapter;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankCollectionTable;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class SiteViewForm extends AddressViewFormCommon {	
 	public static final String ID =
@@ -43,10 +37,13 @@ public class SiteViewForm extends AddressViewFormCommon {
 	
 	private Site site;
 	
-	private TestClass testClass = new TestClass("toto");
-
 	private BiobankCollectionTable studiesTable;
+	private BiobankCollectionTable clinicsTable;
 	private BiobankCollectionTable storageTypesTable;
+
+	private Label activityStatusLabel;
+
+	private Label commentLabel;
 	
 	@Override
 	public void init(IEditorSite editorSite, IEditorInput input)
@@ -58,8 +55,7 @@ public class SiteViewForm extends AddressViewFormCommon {
 
 		if (node instanceof SiteAdapter) {
 			siteAdapter = (SiteAdapter) node;
-			site = siteAdapter.getSite();
-			address = site.getAddress();
+			retrieveSite();			
 			setPartName("Repository Site " + site.getName());
 		}
 		else {
@@ -81,68 +77,29 @@ public class SiteViewForm extends AddressViewFormCommon {
 		form.getBody().setLayout(new GridLayout(1, false));
 		form.getBody().setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		
-		// TODO to remove = only for testing
-		//testMethod();
-
 		createSiteSection();
 		createAddressSection();
 		createStudySection();
-		FormUtils.createClinicSection(toolkit, form.getBody(), 
+		clinicsTable = FormUtils.createClinicSection(toolkit, form.getBody(), 
 		        siteAdapter.getClinicGroupNode(), site.getClinicCollection());
         createStorageTypesSection();
 		createButtons();
 	}
 
-	private void testMethod() {
-		Composite client = toolkit.createComposite(form.getBody());
-		client.setLayout(new GridLayout(2, false));
-		client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		toolkit.paintBordersFor(client);
-		Text text  = toolkit.createText(client, "", SWT.NONE);
-		text.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		//dbc.bindValue(SWTObservables.observeText(text, SWT.Modify), 
-			//	BeansObservables.observeValue(testClass, "name"), null, null);
-		
-		dbc.bindValue(SWTObservables.observeText(text, SWT.Modify),
-			testClass.stringValue, null, null);
-
-		
-		Button test = toolkit.createButton(client, "Test", SWT.PUSH);
-		test.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				System.out.println(testClass.getName());
-				System.out.println(testClass.stringValue.getValue());
-			}
-		});
-		Button modifyTest = toolkit.createButton(client, "ModifyTest", SWT.PUSH);
-		modifyTest.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				testClass.setName("Emily");
-				testClass.stringValue.setValue("titi");
-			}
-		});
-	}
-    
     private void createSiteSection() {    
 		Composite client = toolkit.createComposite(form.getBody());
 		client.setLayout(new GridLayout(2, false));
 		client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		toolkit.paintBordersFor(client);
 		
-    	createBoundWidget(client, Label.class, SWT.NONE, "Activity Status",
-    	    PojoObservables.observeValue(site, "activityStatus"));
-		
-    	createBoundWidget(client, Label.class, 
-    	    SWT.NONE, "Comments", PojoObservables.observeValue(site, "comment"));
+    	activityStatusLabel = (Label)createWidget(client, Label.class, SWT.NONE, "Activity Status");
+    	commentLabel = (Label)createWidget(client, Label.class, SWT.NONE, "Comments");
+    	setSiteSectionValues();
     }
 	
-	private void createAddressSection() {   
-		Composite client = createSectionWithClient("Address");
-        Section section = (Section) client.getParent();
-        section.setExpanded(false);
-        createAddressArea(client);
+	private void setSiteSectionValues() {
+		FormUtils.setTextValue(activityStatusLabel, site.getActivityStatus());
+		FormUtils.setTextValue(commentLabel, site.getComment());	
 	}
 	
     private void createStudySection() {        
@@ -257,35 +214,28 @@ public class SiteViewForm extends AddressViewFormCommon {
 
 	@Override
 	protected void reload() {
+		retrieveSite();
+		setPartName("Repository Site " + site.getName());
+		form.setText("Repository Site: " + site.getName());
+		setSiteSectionValues();
+		setAdressValues();
 		studiesTable.getTableViewer().setInput(getStudiesAdapters());
+		clinicsTable.getTableViewer().setInput(FormUtils.getClinicsAdapters(siteAdapter.getClinicGroupNode(), site.getClinicCollection()));
 		storageTypesTable.getTableViewer().setInput(getStorageTypesAdapters());
 	}
 	
-	public class TestClass {
-		public IObservableValue stringValue = new WritableValue(null, String.class);
-		
-		private String name;
-		
-		private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
-		
-		public TestClass(String name) {
-			this.name = name;
+	private void retrieveSite() {
+		List<Site> result;
+		Site searchSite = new Site();
+		searchSite.setId(siteAdapter.getSite().getId());
+		try {
+			result = siteAdapter.getAppService().search(Site.class, searchSite);
+			Assert.isTrue(result.size() == 1);
+			site = result.get(0);
+			siteAdapter.setSite(site);
+			address = site.getAddress();
+		} catch (ApplicationException e) {
+			e.printStackTrace();
 		}
-		public void setName(String name) {
-			this.name = name;
-		}
-		public String getName() {
-			return name;
-		}
-
-		public void addPropertyChangeListener(String propertyName,
-				PropertyChangeListener listener) {
-			propertyChangeSupport.addPropertyChangeListener(propertyName, listener);
-		}
-
-		public void removePropertyChangeListener(PropertyChangeListener listener) {
-			propertyChangeSupport.removePropertyChangeListener(listener);
-		}
-
 	}
 }

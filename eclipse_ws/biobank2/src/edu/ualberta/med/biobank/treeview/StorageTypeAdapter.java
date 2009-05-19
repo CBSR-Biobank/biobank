@@ -20,10 +20,10 @@ public class StorageTypeAdapter extends Node {
 	
 	public StorageTypeAdapter(Node parent, StorageType storageType) {
 		super(parent);
-		this.setStudy(storageType);
+		this.setStorageType(storageType);
 	}
 
-	public void setStudy(StorageType storageType) {
+	public void setStorageType(StorageType storageType) {
 		this.storageType = storageType;
 	}
 

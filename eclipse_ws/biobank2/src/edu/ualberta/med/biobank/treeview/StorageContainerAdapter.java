@@ -48,6 +48,10 @@ public class StorageContainerAdapter extends Node {
         return storageContainer;
     }
     
+    public void setStorageContainer(StorageContainer storageContainer) {
+    	this.storageContainer = storageContainer;
+    }
+    
     @Override
 	public void popupMenu(TreeViewer tv, Tree tree,  Menu menu) {
         MenuItem mi = new MenuItem (menu, SWT.PUSH);

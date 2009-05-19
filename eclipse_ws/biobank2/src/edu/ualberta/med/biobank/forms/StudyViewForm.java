@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-import org.eclipse.core.databinding.beans.PojoObservables;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -36,10 +35,15 @@ public class StudyViewForm extends BiobankViewForm {
 	private StudyAdapter studyAdapter;
 	private Study study;
 
+	private Label nameShortLabel;
+	private Label activityStatusLabel;
+	private Label commentLabel;
+
+	private BiobankCollectionTable clinicsTable;
 	private BiobankCollectionTable patientsTable;
 	private BiobankCollectionTable sContainersTable;
 	private BiobankCollectionTable sDatasTable;
-	
+
 	@Override
 	public void init(IEditorSite editorSite, IEditorInput input) 
 	throws PartInitException {        
@@ -52,9 +56,8 @@ public class StudyViewForm extends BiobankViewForm {
 			studyAdapter = (StudyAdapter) node;
 
 			// retrieve info from database because could have been modified after first opening
-
 			study = studyAdapter.getStudy();
-			//retrieveStudy();
+			retrieveStudy();
 			setPartName("Study " + study.getName());
 		}
 		else {
@@ -80,25 +83,26 @@ public class StudyViewForm extends BiobankViewForm {
 		client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));        
 		toolkit.paintBordersFor(client); 
 
-		createBoundWidget(client, Label.class, SWT.NONE, "Short Name",
-				PojoObservables.observeValue(study, "nameShort"));
+		nameShortLabel = (Label)createWidget(client, Label.class, SWT.NONE, "Short Name");
+		activityStatusLabel = (Label)createWidget(client, Label.class, SWT.NONE, "Activity Status");
+		commentLabel = (Label)createWidget(client, Label.class, SWT.NONE, "Comments");
 
-		createBoundWidget(client, Label.class, SWT.NONE, "Activity Status",
-				PojoObservables.observeValue(study, "activityStatus"));
-
-		createBoundWidget(client, Label.class, 
-				SWT.NONE, "Comments", PojoObservables.observeValue(study, "comment"));
-
+		setStudySectionValues();
+				
 		Node clinicGroupNode = 
 			((SiteAdapter) studyAdapter.getParent().getParent()).getClinicGroupNode();
-
-		FormUtils.createClinicSection(toolkit, form.getBody(), clinicGroupNode,
+		clinicsTable = FormUtils.createClinicSection(toolkit, form.getBody(), clinicGroupNode,
 				study.getClinicCollection());
-
 
 		createPatientsSection();
 		createStorageContainerSection();
 		createDataCollectedSection();        
+	}
+
+	private void setStudySectionValues() {
+		FormUtils.setTextValue(nameShortLabel, study.getNameShort());
+		FormUtils.setTextValue(activityStatusLabel, study.getActivityStatus());
+		FormUtils.setTextValue(commentLabel, study.getComment());
 	}
 
 	private void createPatientsSection() {        
@@ -183,12 +187,16 @@ public class StudyViewForm extends BiobankViewForm {
 
 	@Override
 	protected void reload() {    	
-		//retrieveStudy();
+		retrieveStudy();
+		setPartName("Study " + study.getName());
+		form.setText("Study: " + study.getName());
+		setStudySectionValues();
+		Node clinicGroupNode = 
+			((SiteAdapter) studyAdapter.getParent().getParent()).getClinicGroupNode();
+		clinicsTable.getTableViewer().setInput(FormUtils.getClinicsAdapters(clinicGroupNode, study.getClinicCollection()));
 		patientsTable.getTableViewer().setInput(getPatientsAdapters());	
 		sContainersTable.getTableViewer().setInput(getStorageContainers());
 		sDatasTable.getTableViewer().setInput(getSDatas());
-		System.out.println(study.getComment());
-		//study.setComment("comment changed !");
 	}
 
 	private void retrieveStudy() {
@@ -201,7 +209,6 @@ public class StudyViewForm extends BiobankViewForm {
 			study = result.get(0);
 			studyAdapter.setStudy(study);
 		} catch (ApplicationException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
