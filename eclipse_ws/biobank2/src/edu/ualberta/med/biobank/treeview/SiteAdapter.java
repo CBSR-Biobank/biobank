@@ -58,26 +58,29 @@ public class SiteAdapter extends Node {
 
 	@Override
 	public int getId() {
-		Object o = (Object) site.getId();
+		Object o = site.getId();
 		if (o == null) return 0;
 		return site.getId();
 	}
 
 	@Override
 	public String getName() {
-		Object o = (Object) site.getName();
+		Object o = site.getName();
 		if (o == null) return null;
 		return site.getName();
 	}
     
-    public void performDoubleClick() {
+    @Override
+	public void performDoubleClick() {
         openForm(new FormInput(this), SiteViewForm.ID);
     }
     
-    public void performExpand() {
+    @Override
+	public void performExpand() {
     }
     
-    public void popupMenu(TreeViewer tv, Tree tree,  Menu menu) {
+    @Override
+	public void popupMenu(TreeViewer tv, Tree tree,  Menu menu) {
         MenuItem mi = new MenuItem (menu, SWT.PUSH);
         mi.setText ("Edit Site");
         mi.addSelectionListener(new SelectionListener() {

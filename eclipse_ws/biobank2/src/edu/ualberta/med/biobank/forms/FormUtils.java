@@ -66,30 +66,38 @@ public class FormUtils {
     }
 
     
-    public static void createClinicSection(FormToolkit toolkit, Composite parent,
+    public static BiobankCollectionTable createClinicSection(FormToolkit toolkit, Composite parent,
             Node clinicGroupParent, Collection<Clinic> clinics) {        
         Section section = toolkit.createSection(parent, 
             Section.TWISTIE | Section.TITLE_BAR | Section.EXPANDED);
         section.setText("Clinics");
         section.setLayout(new GridLayout(1, false));
         section.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        ClinicAdapter [] clinicAdapters = new ClinicAdapter [clinics.size()];   
+        
+        String[] headings = {"Name", "Num Studies"};        
+        BiobankCollectionTable comp = 
+            new BiobankCollectionTable(section, SWT.NONE, headings, getClinicsAdapters(clinicGroupParent,
+    				clinics));
+        section.setClient(comp);
+        comp.adaptToToolkit(toolkit);   
+        toolkit.paintBordersFor(comp);
+        comp.getTableViewer().addDoubleClickListener(
+                getBiobankCollectionDoubleClickListener());
+        return comp;
+    }
+
+	public static ClinicAdapter[] getClinicsAdapters(Node clinicGroupParent,
+			Collection<Clinic> clinics) {
+		ClinicAdapter [] clinicAdapters = new ClinicAdapter [clinics.size()];   
         
         int count = 0;
         for (Clinic clinic : clinics) {
             clinicAdapters[count] = new ClinicAdapter(clinicGroupParent, clinic);
             ++count;
         }
-        
-        String[] headings = {"Name", "Num Studies"};        
-        BiobankCollectionTable comp = 
-            new BiobankCollectionTable(section, SWT.NONE, headings, clinicAdapters);
-        section.setClient(comp);
-        comp.adaptToToolkit(toolkit);   
-        toolkit.paintBordersFor(comp);
-        comp.getTableViewer().addDoubleClickListener(
-                getBiobankCollectionDoubleClickListener());
-    }
+		return clinicAdapters;
+	}
+	
     
     /**
      * Double click listener for tables used in view forms.
@@ -103,5 +111,11 @@ public class FormUtils {
                 ((Node) element).performDoubleClick();
             }
         };
+    }
+    
+    public static void setTextValue(Label label, String value) {
+    	if (value != null) {
+    		label.setText(value);
+    	}
     }
 }

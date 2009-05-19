@@ -40,7 +40,6 @@ import edu.ualberta.med.biobank.treeview.PatientAdapter;
 import edu.ualberta.med.biobank.treeview.PatientVisitAdapter;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.query.SDKQuery;
 import gov.nih.nci.system.query.SDKQueryResult;
 import gov.nih.nci.system.query.example.InsertExampleQuery;
@@ -129,8 +128,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
             PojoObservables.observeValue(patientVisit, "number"),
             NonEmptyString.class, MSG_NO_VISIT_NUMBER);
 
-        study = (Study) ((StudyAdapter)
-            patientVisitAdapter.getParent().getParent().getParent()).getStudy();
+        study = ((StudyAdapter) patientVisitAdapter.getParent().getParent().getParent()).getStudy();
 
         for (Sdata sdata : study.getSdataCollection()) {
             PatientVisitInfo pvInfo = new PatientVisitInfo();
@@ -265,7 +263,8 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
 
         submit = toolkit.createButton(client, "Submit", SWT.PUSH);
         submit.addSelectionListener(new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent e) {
+            @Override
+			public void widgetSelected(SelectionEvent e) {
                 doSaveInternal();
             }
         });
@@ -335,7 +334,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         getSite().getPage().closeEditor(this, false);  
     }
     
-    private void savePatientVisitData() throws ApplicationException {
+    private void savePatientVisitData() {
         boolean newCollection = false;
         Collection<PatientVisitData> pvDataCollection;
         

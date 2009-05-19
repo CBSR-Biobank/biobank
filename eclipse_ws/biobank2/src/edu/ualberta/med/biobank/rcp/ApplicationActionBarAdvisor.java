@@ -13,7 +13,8 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
         super(configurer);
     }
 
-    protected void makeActions(IWorkbenchWindow window) {	
+    @Override
+	protected void makeActions(IWorkbenchWindow window) {	
     	//resetPerspective(window);
     }
 
@@ -24,7 +25,8 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
     	register(resetView);
     }
 
-    protected void fillMenuBar(IMenuManager menuBar) {
+    @Override
+	protected void fillMenuBar(IMenuManager menuBar) {
     }
     
 }

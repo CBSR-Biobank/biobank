@@ -86,7 +86,8 @@ public class FormInput implements IEditorInput {
         return null;
     }
     
-    public boolean equals(Object o) {
+    @Override
+	public boolean equals(Object o) {
         if ((node == null) || (o == null)) return false;
         
         if (o instanceof FormInput) {

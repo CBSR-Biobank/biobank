@@ -12,6 +12,7 @@ public abstract class AddressEntryFormCommon extends BiobankEntryForm {
     
 	protected Address address;
 
+	@Override
 	public void init(IEditorSite site, IEditorInput input)
 			throws PartInitException {
         super.init(site, input);
@@ -22,5 +23,6 @@ public abstract class AddressEntryFormCommon extends BiobankEntryForm {
         createWidgetsFromMap(FormConstants.ADDRESS_FIELDS, address, client);  
 	}
     
-    protected abstract void handleStatusChanged(IStatus severity);
+    @Override
+	protected abstract void handleStatusChanged(IStatus severity);
 }

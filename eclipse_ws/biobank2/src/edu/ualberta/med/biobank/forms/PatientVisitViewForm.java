@@ -75,6 +75,8 @@ public class PatientVisitViewForm extends BiobankViewForm {
         form.getBody().setLayout(new GridLayout(1, false));
         form.getBody().setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         
+        addRefreshToolbarAction();
+        
         createVisitSection();
 
     }
@@ -87,8 +89,7 @@ public class PatientVisitViewForm extends BiobankViewForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);  
         
-        Study study = (Study) ((StudyAdapter)
-            patientVisitAdapter.getParent().getParent().getParent()).getStudy();
+        Study study = ((StudyAdapter) patientVisitAdapter.getParent().getParent().getParent()).getStudy();
 
         for (Sdata sdata : study.getSdataCollection()) {
             PatientVisitInfo pvInfo = new PatientVisitInfo();
@@ -129,5 +130,11 @@ public class PatientVisitViewForm extends BiobankViewForm {
         }
         
     }
+
+	@Override
+	protected void reload() {
+		// TODO Auto-generated method stub
+		
+	}
 
 }

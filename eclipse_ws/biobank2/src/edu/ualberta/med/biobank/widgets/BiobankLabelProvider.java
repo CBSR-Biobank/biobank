@@ -30,7 +30,7 @@ public class BiobankLabelProvider extends LabelProvider implements ITableLabelPr
     @Override
     public String getColumnText(Object element, int columnIndex) {
         if (element instanceof StudyAdapter) {
-            final Study study = (Study) ((StudyAdapter)element).getStudy();
+            final Study study = ((StudyAdapter)element).getStudy();
             switch (columnIndex) {
                 case 0: return study.getName();
                 case 1: return study.getNameShort();
@@ -45,8 +45,7 @@ public class BiobankLabelProvider extends LabelProvider implements ITableLabelPr
             }
         }
         else if (element instanceof PatientAdapter) {
-            final Patient patient = (Patient) (
-                (PatientAdapter) element).getPatient();
+            final Patient patient = ((PatientAdapter) element).getPatient();
             switch (columnIndex) {
                 case 0: return patient.getNumber();
             }
@@ -86,14 +85,16 @@ public class BiobankLabelProvider extends LabelProvider implements ITableLabelPr
         return "";
     }
 
-    public String getText(Object element) {
+    @Override
+	public String getText(Object element) {
         if (element instanceof StorageType) {
             return ((StorageType) element).getName();
         }
         return ((Node) element).getName();
     }
     
-    public boolean isLabelProperty(Object element, String property) {
+    @Override
+	public boolean isLabelProperty(Object element, String property) {
         return false;
     }
 }

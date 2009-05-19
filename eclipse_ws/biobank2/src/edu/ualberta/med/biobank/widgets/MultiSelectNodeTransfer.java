@@ -29,14 +29,17 @@ public class MultiSelectNodeTransfer extends ByteArrayTransfer {
 
 	private static final int TYPEID = registerType(TYPE_NAME);
 
+	@Override
 	protected int[] getTypeIds() {
 		return new int[] { TYPEID };
 	}
 
+	@Override
 	protected String[] getTypeNames() {
 		return new String[] { TYPE_NAME };
 	}
 	
+	@Override
 	protected void javaToNative(Object data, TransferData transferData) {
 
 		if (!(data instanceof MultiSelectNode[])) return;
@@ -66,6 +69,7 @@ public class MultiSelectNodeTransfer extends ByteArrayTransfer {
 			// Send nothing if there were problems.
 		}
 	}
+	@Override
 	protected Object nativeToJava(TransferData transferData) {
 		/**
 		 * The serialization format is:
@@ -86,7 +90,7 @@ public class MultiSelectNodeTransfer extends ByteArrayTransfer {
 				String info = in.readUTF();
 				items.add(new MultiSelectNode(null, new Integer(typeId).intValue(), info));
 			}
-			return (MultiSelectNode[]) items.toArray(new MultiSelectNode[items.size()]);
+			return items.toArray(new MultiSelectNode[items.size()]);
 		}
 		catch (IOException e) {
 			return null;

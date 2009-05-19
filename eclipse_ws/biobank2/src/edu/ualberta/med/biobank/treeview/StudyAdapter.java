@@ -44,7 +44,7 @@ public class StudyAdapter extends Node {
 	@Override
 	public int getId() {
 		Assert.isNotNull(study, "study is null");
-		Object o = (Object) study.getId();
+		Object o = study.getId();
 		if (o == null) return 0;
 		return study.getId();
 	}
@@ -52,19 +52,22 @@ public class StudyAdapter extends Node {
 	@Override
 	public String getName() {
 		Assert.isNotNull(study, "study is null");
-		Object o = (Object) study.getNameShort();
+		Object o = study.getNameShort();
 		if (o == null) return null;
 		return study.getNameShort();
 	}
     
-    public void performDoubleClick() {
+    @Override
+	public void performDoubleClick() {
         openForm(new FormInput(this), StudyViewForm.ID);
     }
     
-    public void performExpand() {
+    @Override
+	public void performExpand() {
     }
     
-    public void popupMenu(TreeViewer tv, Tree tree,  Menu menu) {
+    @Override
+	public void popupMenu(TreeViewer tv, Tree tree,  Menu menu) {
         MenuItem mi = new MenuItem (menu, SWT.PUSH);
         mi.setText ("Edit Study");
         mi.addSelectionListener(new SelectionListener() {

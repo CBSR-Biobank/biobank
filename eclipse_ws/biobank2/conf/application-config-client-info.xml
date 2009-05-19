@@ -21,7 +21,7 @@
 	<bean id="biobank2ApplicationService" class="org.springframework.aop.framework.ProxyFactoryBean">
 		<property name="target">
 			<bean class="org.springframework.remoting.httpinvoker.HttpInvokerProxyFactoryBean">
-				<property name="serviceUrl" value="http://localhost:8080/biobank2/http/applicationService"/>
+				<property name="serviceUrl" value="http://aicml-med.cs.ualberta.ca:8080/biobank2/http/applicationService"/>
 				<property name="serviceInterface" value="gov.nih.nci.system.applicationservice.WritableApplicationService"/>
 				<property name="httpInvokerRequestExecutor">
 				<bean class="gov.nih.nci.system.springframework.remoting.httpinvoker.GSIHttpInvokerRequestExecutor"/>
@@ -38,7 +38,7 @@
 				<bean class="org.acegisecurity.providers.rcp.RemoteAuthenticationProvider">
 					<property name="remoteAuthenticationManager">
 						<bean class="org.springframework.remoting.httpinvoker.HttpInvokerProxyFactoryBean">
-						    <property name="serviceUrl" value="http://localhost:8080/biobank2/http/remoteAuthenticationManager"/>
+						    <property name="serviceUrl" value="http://aicml-med.cs.ualberta.ca:8080/biobank2/http/remoteAuthenticationManager"/>
 						    <property name="serviceInterface" value="org.acegisecurity.providers.rcp.RemoteAuthenticationManager"/>
 						</bean>
 					</property>
@@ -72,7 +72,7 @@
 				&lt;bean id=&quot;biobank2ApplicationService&quot; class=&quot;org.springframework.aop.framework.ProxyFactoryBean&quot;&gt;
 					&lt;property name=&quot;target&quot;&gt;
 						&lt;bean class=&quot;org.springframework.remoting.httpinvoker.HttpInvokerProxyFactoryBean&quot;&gt;
-							&lt;property name=&quot;serviceUrl&quot; value=&quot;http://localhost:8080/biobank2/http/applicationService&quot;/&gt;
+							&lt;property name=&quot;serviceUrl&quot; value=&quot;http://aicml-med.cs.ualberta.ca:8080/biobank2/http/applicationService&quot;/&gt;
 							&lt;property name=&quot;serviceInterface&quot; value=&quot;gov.nih.nci.system.applicationservice.WritableApplicationService&quot;/&gt;
 							&lt;property name=&quot;httpInvokerRequestExecutor&quot;&gt;
 							&lt;bean class=&quot;gov.nih.nci.system.springframework.remoting.httpinvoker.GSIHttpInvokerRequestExecutor&quot;/&gt;
@@ -89,7 +89,7 @@
 							&lt;bean class=&quot;org.acegisecurity.providers.rcp.RemoteAuthenticationProvider&quot;&gt;
 								&lt;property name=&quot;remoteAuthenticationManager&quot;&gt;
 									&lt;bean class=&quot;org.springframework.remoting.httpinvoker.HttpInvokerProxyFactoryBean&quot;&gt;
-									    &lt;property name=&quot;serviceUrl&quot; value=&quot;http://localhost:8080/biobank2/http/remoteAuthenticationManager&quot;/&gt;
+									    &lt;property name=&quot;serviceUrl&quot; value=&quot;http://aicml-med.cs.ualberta.ca:8080/biobank2/http/remoteAuthenticationManager&quot;/&gt;
 									    &lt;property name=&quot;serviceInterface&quot; value=&quot;org.acegisecurity.providers.rcp.RemoteAuthenticationManager&quot;/&gt;
 									&lt;/bean&gt;
 								&lt;/property&gt;

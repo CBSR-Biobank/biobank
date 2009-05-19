@@ -29,11 +29,13 @@ public class StorageTypeGroup extends Node {
         super(parent, id, "Storage Types", true);
     }
     
-    public void performDoubleClick() {
+    @Override
+	public void performDoubleClick() {
         performExpand();
     }
 
-    public void performExpand() { 
+    @Override
+	public void performExpand() { 
         final Site currentSite = ((SiteAdapter) getParent()).getSite();
         Assert.isNotNull(currentSite, "null site");   
 
@@ -81,7 +83,8 @@ public class StorageTypeGroup extends Node {
         });
     }
     
-    public void popupMenu(TreeViewer tv, Tree tree,  Menu menu) {
+    @Override
+	public void popupMenu(TreeViewer tv, Tree tree,  Menu menu) {
         MenuItem mi = new MenuItem (menu, SWT.PUSH);
         mi.setText ("Add Storage Type");
         mi.addSelectionListener(new SelectionListener() {

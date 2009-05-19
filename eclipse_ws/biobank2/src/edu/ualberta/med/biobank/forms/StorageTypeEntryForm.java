@@ -224,7 +224,7 @@ public class StorageTypeEntryForm extends BiobankEntryForm {
         
         SiteAdapter siteAdapter = 
             (SiteAdapter) storageTypeAdapter.getParent().getParent();
-        Site site = (Site) siteAdapter.getSite();
+        Site site = siteAdapter.getSite();
         allStorageTypes = site.getStorageTypeCollection();
         
         childStorageTypesMultiSelect = new MultiSelect(client, SWT.NONE, 
@@ -265,14 +265,16 @@ public class StorageTypeEntryForm extends BiobankEntryForm {
 
         submit = toolkit.createButton(client, "Submit", SWT.PUSH);
         submit.addSelectionListener(new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent e) {
+            @Override
+			public void widgetSelected(SelectionEvent e) {
                 PlatformUI.getWorkbench().getActiveWorkbenchWindow()
                     .getActivePage().saveEditor(StorageTypeEntryForm.this, false);
             }
         });
     }
     
-    protected void handleStatusChanged(IStatus status) {
+    @Override
+	protected void handleStatusChanged(IStatus status) {
         if (status.getSeverity() == IStatus.OK) {
             form.setMessage(getOkMessage(), IMessageProvider.NONE);
             submit.setEnabled(true);
@@ -308,7 +310,7 @@ public class StorageTypeEntryForm extends BiobankEntryForm {
         saveCapacity();
 
         // associate the storage type to it's site
-        Site site = (Site) ((SiteAdapter) 
+        Site site = ((SiteAdapter) 
             storageTypeAdapter.getParent().getParent()).getSite();
         Assert.isTrue((site != null) && (site.getId() != null) && (site.getId() != 0),
         "site is not in the database");
@@ -377,7 +379,7 @@ public class StorageTypeEntryForm extends BiobankEntryForm {
     
     private boolean checkStorageTypeNameUnique() throws ApplicationException {
         WritableApplicationService appService = storageTypeAdapter.getAppService();
-        Site site = (Site) ((SiteAdapter) 
+        Site site = ((SiteAdapter) 
             storageTypeAdapter.getParent().getParent()).getSite();
         
         HQLCriteria c = new HQLCriteria(

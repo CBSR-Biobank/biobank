@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.forms;
 
-import org.eclipse.core.databinding.beans.PojoObservables;
+import java.util.List;
+
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -17,6 +18,7 @@ import edu.ualberta.med.biobank.model.StorageContainer;
 import edu.ualberta.med.biobank.model.StorageType;
 import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.StorageContainerAdapter;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class StorageContainerViewForm extends BiobankViewForm {
     
@@ -26,6 +28,22 @@ public class StorageContainerViewForm extends BiobankViewForm {
     private StorageContainerAdapter storageContainerAdapter;
     
     private StorageContainer storageContainer;
+
+	private Label nameLabel;
+
+	private Label barCodeLabel;
+
+	private Label activityStatusLabel;
+
+	private Label commentsLabel;
+
+	private Label storageTypeLabel;
+
+	private Label temperatureLabel;
+
+	private Label positionDimOneLabel;
+
+	private Label positionDimTwoLabel;
     
     @Override
     public void init(IEditorSite editorSite, IEditorInput input)
@@ -35,30 +53,42 @@ public class StorageContainerViewForm extends BiobankViewForm {
         Node node = ((FormInput) input).getNode();
         Assert.isNotNull(node, "Null editor input");
 
-        storageContainerAdapter = (StorageContainerAdapter) node;
-        appService = storageContainerAdapter.getAppService();
-        storageContainer = storageContainerAdapter.getStorageContainer();
-
-        if (storageContainer.getId() == null) {
-            setPartName("Storage Container");
-        }
-        else {
-            setPartName("Storage Container " + storageContainer.getName());
+        if (node instanceof StorageContainerAdapter) {
+        	storageContainerAdapter = (StorageContainerAdapter) node;
+        	appService = storageContainerAdapter.getAppService();
+        	retrieveStorageContainer();
+        	setPartName("Storage Container " + storageContainer.getName());
+        } else {
+        	Assert.isTrue(false, "Invalid editor input: object of type "
+        			+ node.getClass().getName());
         }
     }
+
+	private void retrieveStorageContainer() {
+		List<StorageContainer> result;
+		StorageContainer searchStorageContainer = new StorageContainer();
+		searchStorageContainer.setId(storageContainerAdapter.getStorageContainer().getId());
+		try {
+			result = appService.search(StorageContainer.class, searchStorageContainer);
+			Assert.isTrue(result.size() == 1);
+			storageContainer = result.get(0);
+			storageContainerAdapter.setStorageContainer(storageContainer);
+		} catch (ApplicationException e) {
+			e.printStackTrace();
+		}
+	}
 
     @Override
     protected void createFormContent() {        
         form.setText("Storage Container " + storageContainer.getName());
         form.getBody().setLayout(new GridLayout(1, false));
         
+        addRefreshToolbarAction();
+        
         createContainerSection();
     }
     
-    private void createContainerSection() {        
-        StorageType storageType = storageContainer.getStorageType();        
-        ContainerPosition position = storageContainer.getLocatedAtPosition();
-        
+    private void createContainerSection() {       
         Composite client = toolkit.createComposite(form.getBody());
         GridLayout layout = new GridLayout(2, false);
         layout.horizontalSpacing = 10;
@@ -66,40 +96,47 @@ public class StorageContainerViewForm extends BiobankViewForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);  
         
-        createBoundWidget(client, Label.class, SWT.NONE, "Name",
-            PojoObservables.observeValue(storageContainer, "name"));
-            
-        createBoundWidget(client, Label.class, SWT.NONE, "Bar Code",
-            PojoObservables.observeValue(storageContainer, "barcode"));
-        
-        createBoundWidget(client, Label.class, SWT.NONE, "Activity Status",
-            PojoObservables.observeValue(storageContainer, "activityStatus"));
-        
-        createBoundWidget(client, Label.class, SWT.NONE, "Comments", 
-            PojoObservables.observeValue(storageContainer, "comment"));
-        
-        createBoundWidget(client, Label.class, SWT.NONE, "Storage Type", 
-            PojoObservables.observeValue(storageType, "name"));
-        
-        createBoundWidget(client, Label.class, SWT.NONE, "Temperature", 
-            PojoObservables.observeValue(storageContainer, "temperature"));
-        
-        String str = storageType.getDimensionOneLabel();
-        if (str == null) {
-            str = "Position Dimension 1";
+        nameLabel = (Label)createWidget(client, Label.class, SWT.NONE, "Name");
+        barCodeLabel = (Label)createWidget(client, Label.class, SWT.NONE, "Bar Code");
+        activityStatusLabel = (Label)createWidget(client, Label.class, SWT.NONE, "Activity Status");
+        commentsLabel = (Label)createWidget(client, Label.class, SWT.NONE, "Comments"); 
+        storageTypeLabel = (Label)createWidget(client, Label.class, SWT.NONE, "Storage Type"); 
+        temperatureLabel = (Label)createWidget(client, Label.class, SWT.NONE, "Temperature"); 
+                
+        StorageType storageType = storageContainer.getStorageType();       
+        String label = storageType.getDimensionOneLabel();
+        if (label == null) {
+            label = "Position Dimension 1";
         }
+        positionDimOneLabel = (Label)createWidget(client, Label.class, SWT.NONE, label); 
         
-        createBoundWidget(client, Label.class, SWT.NONE, 
-            str,  PojoObservables.observeValue(position, "positionDimensionOne"));
+        label = storageType.getDimensionTwoLabel();
+        if (label == null) {
+            label = "Position Dimension 2";
+        }        
+        positionDimTwoLabel = (Label)createWidget(client, Label.class, SWT.NONE, label); 
         
-        str = storageType.getDimensionTwoLabel();
-        if (str == null) {
-            str = "Position Dimension 2";
-        }
-        
-        createBoundWidget(client, Label.class, SWT.NONE, 
-            str, PojoObservables.observeValue(position, "positionDimensionTwo"));
-        
+        setContainerValues();        
     }
+
+	private void setContainerValues() {		
+		FormUtils.setTextValue(nameLabel, storageContainer.getName());
+		FormUtils.setTextValue(barCodeLabel, storageContainer.getBarcode());
+		FormUtils.setTextValue(activityStatusLabel, storageContainer.getActivityStatus());
+		FormUtils.setTextValue(commentsLabel, storageContainer.getComment());
+		FormUtils.setTextValue(storageTypeLabel, storageContainer.getStorageType().getName());
+		FormUtils.setTextValue(temperatureLabel, storageContainer.getTemperature().toString());
+        ContainerPosition position = storageContainer.getLocatedAtPosition();
+        FormUtils.setTextValue(positionDimOneLabel, position.getPositionDimensionOne().toString());
+        FormUtils.setTextValue(positionDimTwoLabel, position.getPositionDimensionTwo().toString());
+	}
+
+	@Override
+	protected void reload() {
+		retrieveStorageContainer();
+		setPartName("Storage Container " + storageContainer.getName());
+		form.setText("Storage Container " + storageContainer.getName());
+		setContainerValues();
+	}
 
 }
