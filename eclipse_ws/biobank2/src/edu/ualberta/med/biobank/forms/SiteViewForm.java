@@ -1,8 +1,8 @@
 package edu.ualberta.med.biobank.forms;
 
 import java.util.Collection;
+import java.util.List;
 
-import org.eclipse.core.databinding.beans.PojoObservables;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -14,7 +14,6 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.forms.widgets.Section;
 import org.springframework.util.Assert;
 
 import edu.ualberta.med.biobank.forms.input.FormInput;
@@ -28,6 +27,7 @@ import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.treeview.StorageTypeAdapter;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankCollectionTable;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class SiteViewForm extends AddressViewFormCommon {	
 	public static final String ID =
@@ -36,7 +36,16 @@ public class SiteViewForm extends AddressViewFormCommon {
 	private SiteAdapter siteAdapter;
 	
 	private Site site;
+	
+	private BiobankCollectionTable studiesTable;
+	private BiobankCollectionTable clinicsTable;
+	private BiobankCollectionTable storageTypesTable;
 
+	private Label activityStatusLabel;
+
+	private Label commentLabel;
+	
+	@Override
 	public void init(IEditorSite editorSite, IEditorInput input)
 			throws PartInitException {
 		super.init(editorSite, input);
@@ -46,8 +55,7 @@ public class SiteViewForm extends AddressViewFormCommon {
 
 		if (node instanceof SiteAdapter) {
 			siteAdapter = (SiteAdapter) node;
-			site = siteAdapter.getSite();
-			address = site.getAddress();
+			retrieveSite();	
 			setPartName("Repository Site " + site.getName());
 		}
 		else {
@@ -56,12 +64,15 @@ public class SiteViewForm extends AddressViewFormCommon {
 		}
 	}
     
-    protected void createFormContent() {
+    @Override
+	protected void createFormContent() {
 		address = site.getAddress();  
 
 		if (site.getName() != null) {
 			form.setText("Repository Site: " + site.getName());
 		}
+		
+		addRefreshToolbarAction();			
 		
 		form.getBody().setLayout(new GridLayout(1, false));
 		form.getBody().setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -69,35 +80,42 @@ public class SiteViewForm extends AddressViewFormCommon {
 		createSiteSection();
 		createAddressSection();
 		createStudySection();
-		FormUtils.createClinicSection(toolkit, form.getBody(), 
+		clinicsTable = FormUtils.createClinicSection(toolkit, form.getBody(), 
 		        siteAdapter.getClinicGroupNode(), site.getClinicCollection());
         createStorageTypesSection();
 		createButtons();
 	}
-    
+
     private void createSiteSection() {    
 		Composite client = toolkit.createComposite(form.getBody());
 		client.setLayout(new GridLayout(2, false));
 		client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		toolkit.paintBordersFor(client);
 		
-    	createBoundWidget(client, Label.class, SWT.NONE, "Activity Status",
-    	    PojoObservables.observeValue(site, "activityStatus"));
-		
-    	createBoundWidget(client, Label.class, 
-    	    SWT.NONE, "Comments", PojoObservables.observeValue(site, "comment"));
+    	activityStatusLabel = (Label)createWidget(client, Label.class, SWT.NONE, "Activity Status");
+    	commentLabel = (Label)createWidget(client, Label.class, SWT.NONE, "Comments");
+    	setSiteSectionValues();
     }
 	
-	private void createAddressSection() {   
-		Composite client = createSectionWithClient("Address");
-        Section section = (Section) client.getParent();
-        section.setExpanded(false);
-        createAddressArea(client);
+	private void setSiteSectionValues() {
+		FormUtils.setTextValue(activityStatusLabel, site.getActivityStatus());
+		FormUtils.setTextValue(commentLabel, site.getComment());	
 	}
 	
     private void createStudySection() {        
 		Composite client = createSectionWithClient("Studies");
-        Collection<Study> studies = site.getStudyCollection();
+		
+        String [] headings = new String[] {"Name", "Short Name", "Num. Patients"};      
+        studiesTable = new BiobankCollectionTable(client, SWT.NONE, headings, getStudiesAdapters());
+        studiesTable.adaptToToolkit(toolkit);   
+        toolkit.paintBordersFor(studiesTable);
+        
+        studiesTable.getTableViewer().addDoubleClickListener(
+                FormUtils.getBiobankCollectionDoubleClickListener());
+    }
+
+	private StudyAdapter[] getStudiesAdapters() {
+		Collection<Study> studies = site.getStudyCollection();
         StudyAdapter [] studyAdapters = new StudyAdapter [studies.size()];
         int count = 0;
         for (Study study : studies) {
@@ -105,20 +123,24 @@ public class SiteViewForm extends AddressViewFormCommon {
                     siteAdapter.getStudiesGroupNode(), study);
             count++;
         }
-
-        String [] headings = new String[] {"Name", "Short Name", "Num. Patients"};      
-        BiobankCollectionTable comp = 
-            new BiobankCollectionTable(client, SWT.NONE, headings, studyAdapters);
-        comp.adaptToToolkit(toolkit);   
-        toolkit.paintBordersFor(comp);
-        
-        comp.getTableViewer().addDoubleClickListener(
-                FormUtils.getBiobankCollectionDoubleClickListener());
-    }
+		return studyAdapters;
+	}
     
     private void createStorageTypesSection() {     
-        Composite client = createSectionWithClient("Studies");
-        Collection<StorageType> stCollection = site.getStorageTypeCollection();
+        Composite client = createSectionWithClient("Storage Types");
+        
+        String [] headings = new String[] {"Name", "Status", "Default Temperature"};      
+        storageTypesTable = new BiobankCollectionTable(client, SWT.NONE, headings, getStorageTypesAdapters());
+        storageTypesTable.adaptToToolkit(toolkit);   
+        toolkit.paintBordersFor(storageTypesTable);
+        
+        storageTypesTable.getTableViewer().addDoubleClickListener(
+                FormUtils.getBiobankCollectionDoubleClickListener());
+        
+    }
+
+	private StorageTypeAdapter[] getStorageTypesAdapters() {
+		Collection<StorageType> stCollection = site.getStorageTypeCollection();
         StorageTypeAdapter [] adapters = new StorageTypeAdapter [stCollection.size()];
         int count = 0;
         for (StorageType storage : stCollection) {
@@ -126,17 +148,8 @@ public class SiteViewForm extends AddressViewFormCommon {
                     siteAdapter.getStudiesGroupNode(), storage);
             count++;
         }
-
-        String [] headings = new String[] {"Name", "Status", "Default Temperature"};      
-        BiobankCollectionTable comp = 
-            new BiobankCollectionTable(client, SWT.NONE, headings, adapters);
-        comp.adaptToToolkit(toolkit);   
-        toolkit.paintBordersFor(comp);
-        
-        comp.getTableViewer().addDoubleClickListener(
-                FormUtils.getBiobankCollectionDoubleClickListener());
-        
-    }
+		return adapters;
+	}
 	
 	private void createButtons() {      
 		Composite client = toolkit.createComposite(form.getBody());
@@ -145,6 +158,7 @@ public class SiteViewForm extends AddressViewFormCommon {
 
 		final Button edit = toolkit.createButton(client, "Edit Site Info", SWT.PUSH);
 		edit.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				getSite().getPage().closeEditor(SiteViewForm.this, false);
 				try {
@@ -159,6 +173,7 @@ public class SiteViewForm extends AddressViewFormCommon {
 
 		final Button study = toolkit.createButton(client, "Add Study", SWT.PUSH);
 		study.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {				
 				try {
 					Study study = new Study();
@@ -175,6 +190,7 @@ public class SiteViewForm extends AddressViewFormCommon {
 
 		final Button clinic = toolkit.createButton(client, "Add Clinic", SWT.PUSH);
 		clinic.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				try {
 					ClinicAdapter clinicAdapter = new ClinicAdapter(
@@ -190,8 +206,36 @@ public class SiteViewForm extends AddressViewFormCommon {
 
 		final Button storageType = toolkit.createButton(client, "Add Storage Type", SWT.PUSH);
 		storageType.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 			}
 		});
+	}
+
+	@Override
+	protected void reload() {
+		retrieveSite();
+		setPartName("Repository Site " + site.getName());
+		form.setText("Repository Site: " + site.getName());
+		setSiteSectionValues();
+		setAdressValues();
+		studiesTable.getTableViewer().setInput(getStudiesAdapters());
+		clinicsTable.getTableViewer().setInput(FormUtils.getClinicsAdapters(siteAdapter.getClinicGroupNode(), site.getClinicCollection()));
+		storageTypesTable.getTableViewer().setInput(getStorageTypesAdapters());
+	}
+	
+	private void retrieveSite() {
+		List<Site> result;
+		Site searchSite = new Site();
+		searchSite.setId(siteAdapter.getSite().getId());
+		try {
+			result = siteAdapter.getAppService().search(Site.class, searchSite);
+			Assert.isTrue(result.size() == 1);
+			site = result.get(0);
+			siteAdapter.setSite(site);
+			address = site.getAddress();
+		} catch (ApplicationException e) {
+			e.printStackTrace();
+		}
 	}
 }

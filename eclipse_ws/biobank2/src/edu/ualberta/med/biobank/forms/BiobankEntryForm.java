@@ -213,7 +213,8 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
                 modelObservableValue, null, null);
             
             combo.addSelectionListener(new SelectionAdapter() {
-                public void widgetSelected(SelectionEvent e) {
+                @Override
+				public void widgetSelected(SelectionEvent e) {
                     setDirty(true);
                 }
             });

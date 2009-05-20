@@ -36,6 +36,7 @@ public class SiteAddHandler extends AbstractHandler {
 		return null;
 	}
 	
+	@Override
 	public boolean isEnabled() {
 		return (SessionManager.getInstance().getSessionCount() > 0);
 	}

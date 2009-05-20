@@ -34,6 +34,7 @@ public class SessionAdapter extends Node {
 		setName(name);
 	}
 
+	@Override
 	public WritableApplicationService getAppService() {
 		return appService;
 	}
@@ -43,7 +44,8 @@ public class SessionAdapter extends Node {
 		return 0;
 	}
 
-    public void performExpand() {        
+    @Override
+	public void performExpand() {        
         Display.getDefault().asyncExec(new Runnable() {
             public void run() {                
                 // read from database again 
@@ -83,7 +85,8 @@ public class SessionAdapter extends Node {
         });
     }
     
-    public void popupMenu(TreeViewer tv, Tree tree,  Menu menu) {
+    @Override
+	public void popupMenu(TreeViewer tv, Tree tree,  Menu menu) {
         MenuItem mi = new MenuItem (menu, SWT.PUSH);
         mi.setText ("Logout");
         mi.addSelectionListener(new SelectionListener() {

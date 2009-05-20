@@ -58,6 +58,7 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
 	private Text name;	
 	private Button submit;
 
+	@Override
 	public void init(IEditorSite editorSite, IEditorInput input) throws PartInitException {
 		super.init(editorSite, input);
 		
@@ -88,6 +89,7 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
 		return MSG_CLINIC_OK;
 	}
 
+	@Override
 	protected void createFormContent() {			
 		form.setText("Clinic Information");
 		
@@ -141,6 +143,7 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
         
 		submit = toolkit.createButton(client, "Submit", SWT.PUSH);
 		submit.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				PlatformUI.getWorkbench().getActiveWorkbenchWindow()
 				.getActivePage().saveEditor(ClinicEntryForm.this, false);
@@ -148,7 +151,8 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
 		});	
 	}
     
-    protected void handleStatusChanged(IStatus status) {
+    @Override
+	protected void handleStatusChanged(IStatus status) {
 		if (status.getSeverity() == IStatus.OK) {
 			form.setMessage(getOkMessage(), IMessageProvider.NONE);
 	    	submit.setEnabled(true);
@@ -164,6 +168,7 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
 		form.setFocus();
 	}
 	
+	@Override
 	public void saveForm() {
 		clinic.setAddress(address);
 		SiteAdapter siteAdapter = (SiteAdapter) clinicAdapter.getParent().getParent();
@@ -219,8 +224,7 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
     
     private boolean checkClinicNameUnique() throws ApplicationException {
         WritableApplicationService appService = clinicAdapter.getAppService();
-        Site site = (Site) ((SiteAdapter) 
-            clinicAdapter.getParent().getParent()).getSite();
+        Site site = ((SiteAdapter) clinicAdapter.getParent().getParent()).getSite();
 
         HQLCriteria c = new HQLCriteria(
             "from edu.ualberta.med.biobank.model.Clinic as clinic "

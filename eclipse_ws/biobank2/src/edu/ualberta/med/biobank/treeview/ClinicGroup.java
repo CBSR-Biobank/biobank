@@ -31,11 +31,13 @@ public class ClinicGroup extends Node {
         super(parent, id, "Clinics", true);
     }
 
-    public void performDoubleClick() {
+    @Override
+	public void performDoubleClick() {
         performExpand();
     }
 
-    public void performExpand() {    
+    @Override
+	public void performExpand() {    
         final Site currentSite = ((SiteAdapter) getParent()).getSite();
         Assert.isNotNull(currentSite, "null site");   
 
@@ -80,7 +82,8 @@ public class ClinicGroup extends Node {
         });
     }
     
-    public void popupMenu(TreeViewer tv, Tree tree,  Menu menu) {
+    @Override
+	public void popupMenu(TreeViewer tv, Tree tree,  Menu menu) {
         MenuItem mi = new MenuItem (menu, SWT.PUSH);
         mi.setText ("Add Clinic");
         mi.addSelectionListener(new SelectionListener() {

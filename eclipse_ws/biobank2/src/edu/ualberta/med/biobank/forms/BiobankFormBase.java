@@ -94,7 +94,8 @@ public abstract class BiobankFormBase extends EditorPart {
         section.setLayout(new GridLayout(1, false));
         section.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         section.addExpansionListener(new ExpansionAdapter() {
-            public void expansionStateChanged(ExpansionEvent e) {
+            @Override
+			public void expansionStateChanged(ExpansionEvent e) {
                 form.reflow(false);
             }
         });

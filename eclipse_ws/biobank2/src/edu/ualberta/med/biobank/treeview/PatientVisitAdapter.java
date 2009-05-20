@@ -11,6 +11,7 @@ import org.eclipse.swt.widgets.Tree;
 
 import edu.ualberta.med.biobank.forms.PatientVisitEntryForm;
 import edu.ualberta.med.biobank.forms.PatientVisitViewForm;
+//import edu.ualberta.med.biobank.forms.ScanSamplesEntryForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.PatientVisit;
 
@@ -30,7 +31,7 @@ public class PatientVisitAdapter extends Node {
     @Override
     public int getId() {
         Assert.isNotNull(patientVisit, "patientVisit is null");
-        Object o = (Object) patientVisit.getId();
+        Object o = patientVisit.getId();
         if (o == null) return 0;
         return patientVisit.getId();
     }
@@ -38,16 +39,18 @@ public class PatientVisitAdapter extends Node {
     @Override
     public String getName() {
         Assert.isNotNull(patientVisit, "patientVisit is null");
-        Object o = (Object) patientVisit.getNumber();
+        Object o = patientVisit.getNumber();
         if (o == null) return null;
         return patientVisit.getNumber();
     }
     
-    public void performDoubleClick() {
+    @Override
+	public void performDoubleClick() {
         openForm(new FormInput(this), PatientVisitViewForm.ID);
     }
     
-    public void popupMenu(TreeViewer tv, Tree tree,  Menu menu) {
+    @Override
+	public void popupMenu(TreeViewer tv, Tree tree,  Menu menu) {
         MenuItem mi = new MenuItem (menu, SWT.PUSH);
         mi.setText ("Edit Visit");
         mi.addSelectionListener(new SelectionListener() {
@@ -81,6 +84,16 @@ public class PatientVisitAdapter extends Node {
             public void widgetDefaultSelected(SelectionEvent e) {                    
             }
         }); 
-    }
+        
+        mi = new MenuItem (menu, SWT.PUSH);
+        mi.setText ("Scan samples");
+        mi.addSelectionListener(new SelectionListener() {
+            public void widgetSelected(SelectionEvent event) {
+            	//openForm(new FormInput(PatientVisitAdapter.this), ScanSamplesEntryForm.ID);
+            }
 
+            public void widgetDefaultSelected(SelectionEvent e) {                    
+            }
+        }); 
+    }
 }

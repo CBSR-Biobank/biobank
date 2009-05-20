@@ -213,6 +213,7 @@ public class Node {
             + this.getName());
     }
     
+    //@SuppressWarnings("unused")
     public void popupMenu(TreeViewer tv, Tree tree,  Menu menu) {
         Assert.isTrue(false, "should be implemented by derived class: "
             + this.getName());
