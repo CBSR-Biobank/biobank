@@ -17,7 +17,7 @@ import org.eclipse.ui.PartInitException;
 
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Capacity;
-import edu.ualberta.med.biobank.model.SampleDerivativeType;
+//import edu.ualberta.med.biobank.model.SampleDerivativeType;
 import edu.ualberta.med.biobank.model.StorageType;
 import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.StorageTypeAdapter;
@@ -159,19 +159,19 @@ public class StorageTypeViewForm extends BiobankViewForm {
         Label label = toolkit.createLabel(client, "Sample derivative types:");      
         label.setLayoutData(new GridData(SWT.LEFT, SWT.BEGINNING, false, false));
         
-        sampleDerivTypesList = new org.eclipse.swt.widgets.List(client, SWT.BORDER | SWT.V_SCROLL);
-        GridData gd = new GridData(GridData.FILL_BOTH);
-        gd.heightHint = 100;
-        sampleDerivTypesList.setLayoutData(gd);
-        setSampleDerivTypesValues();
+//        sampleDerivTypesList = new org.eclipse.swt.widgets.List(client, SWT.BORDER | SWT.V_SCROLL);
+//        GridData gd = new GridData(GridData.FILL_BOTH);
+//        gd.heightHint = 100;
+//        sampleDerivTypesList.setLayoutData(gd);
+//        setSampleDerivTypesValues();
     }
 
-	private void setSampleDerivTypesValues() {
-		sampleDerivTypesList.removeAll();
-		for (SampleDerivativeType type : storageType.getSampleDerivativeTypeCollection()) {
-            sampleDerivTypesList.add(type.getNameShort());
-        }
-	}
+//	private void setSampleDerivTypesValues() {
+//		sampleDerivTypesList.removeAll();
+//		for (SampleDerivativeType type : storageType.getSampleDerivativeTypeCollection()) {
+//            sampleDerivTypesList.add(type.getNameShort());
+//        }
+//	}
 
     private void createChildStorageTypesSection() {
         Composite client = createSectionWithClient("Contains Storage Types");       
@@ -227,7 +227,7 @@ public class StorageTypeViewForm extends BiobankViewForm {
 		form.setText("Storage Type: " + storageType.getName());
 		setStorageTypeValues();
 		setDimensionsValues();
-		setSampleDerivTypesValues();
+//		setSampleDerivTypesValues();
 		setChildStorageTypesValues();
 	}
 }
