@@ -125,10 +125,10 @@ public class StorageContainerViewForm extends BiobankViewForm {
 		FormUtils.setTextValue(activityStatusLabel, storageContainer.getActivityStatus());
 		FormUtils.setTextValue(commentsLabel, storageContainer.getComment());
 		FormUtils.setTextValue(storageTypeLabel, storageContainer.getStorageType().getName());
-		FormUtils.setTextValue(temperatureLabel, storageContainer.getTemperature().toString());
+		FormUtils.setTextValue(temperatureLabel, storageContainer.getTemperature());
         ContainerPosition position = storageContainer.getLocatedAtPosition();
-        FormUtils.setTextValue(positionDimOneLabel, position.getPositionDimensionOne().toString());
-        FormUtils.setTextValue(positionDimTwoLabel, position.getPositionDimensionTwo().toString());
+        FormUtils.setTextValue(positionDimOneLabel, position.getPositionDimensionOne());
+        FormUtils.setTextValue(positionDimTwoLabel, position.getPositionDimensionTwo());
 	}
 
 	@Override

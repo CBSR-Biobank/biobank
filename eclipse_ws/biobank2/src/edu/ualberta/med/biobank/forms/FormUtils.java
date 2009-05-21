@@ -118,4 +118,10 @@ public class FormUtils {
     		label.setText(value);
     	}
     }
+    
+    public static void setTextValue(Label label, Object value) {
+    	if (value != null) {
+    		setTextValue(label, value.toString());
+    	}
+    }
 }

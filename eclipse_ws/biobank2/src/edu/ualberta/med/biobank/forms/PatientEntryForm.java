@@ -78,7 +78,7 @@ public class PatientEntryForm extends BiobankEntryForm {
 
     @Override
     protected void createFormContent() {
-        form.setText("Storage Type Information");
+        form.setText("Patient Information");
         form.setMessage(getOkMessage(), IMessageProvider.NONE);
         form.getBody().setLayout(new GridLayout(1, false));
         
