@@ -42,18 +42,14 @@ public class StudyAdapter extends Node {
 	}
 
 	@Override
-	public int getId() {
+	public Integer getId() {
 		Assert.isNotNull(study, "study is null");
-		Object o = study.getId();
-		if (o == null) return 0;
 		return study.getId();
 	}
 
 	@Override
 	public String getName() {
 		Assert.isNotNull(study, "study is null");
-		Object o = study.getNameShort();
-		if (o == null) return null;
 		return study.getNameShort();
 	}
     

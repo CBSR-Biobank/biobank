@@ -227,7 +227,7 @@ public class StorageTypeViewForm extends BiobankViewForm {
 		form.setText("Storage Type: " + storageType.getName());
 		setStorageTypeValues();
 		setDimensionsValues();
-		setSampleDerivTypesValues();
+//		setSampleDerivTypesValues();
 		setChildStorageTypesValues();
 	}
 }

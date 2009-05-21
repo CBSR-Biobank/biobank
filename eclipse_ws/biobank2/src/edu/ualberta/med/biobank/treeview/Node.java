@@ -18,7 +18,7 @@ public class Node {
 	
 	protected IDeltaListener listener = NullDeltaListener.getSoleInstance();
 	
-	private int id;
+	private Integer id;
 	
 	private String name;
 	
@@ -59,7 +59,7 @@ public class Node {
 		this.id = id;
 	}
 	
-	public int getId() {
+	public Integer getId() {
 		return id;
 	}
 	

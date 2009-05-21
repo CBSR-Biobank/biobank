@@ -11,5 +11,7 @@ eclipse_ws/.metadata/
 eclipse_ws/biobank2/.settings/
 eclipse_ws/biobank2/bin/
 eclipse_ws/biobank2/log/
+eclipse_ws/biobank2/src/edu/ualberta/med/biobank/test/
 runtime-biobank2.biobank2/
 schema/schema-export.sql
+

@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.treeview;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
@@ -57,16 +58,14 @@ public class SiteAdapter extends Node {
     }
 
 	@Override
-	public int getId() {
-		Object o = site.getId();
-		if (o == null) return 0;
+	public Integer getId() {
+        Assert.isNotNull(site, "site is null");
 		return site.getId();
 	}
 
 	@Override
 	public String getName() {
-		Object o = site.getName();
-		if (o == null) return null;
+        Assert.isNotNull(site, "site is null");
 		return site.getName();
 	}
     

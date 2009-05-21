@@ -24,18 +24,14 @@ public class StorageContainerAdapter extends Node {
     }
 
     @Override
-    public int getId() {
+    public Integer getId() {
         Assert.isNotNull(storageContainer, "storageContainer is null");
-        Object o = storageContainer.getId();
-        if (o == null) return 0;
         return storageContainer.getId();
     }
 
     @Override
     public String getName() {
         Assert.isNotNull(storageContainer, "storageContainer is null");
-        Object o = storageContainer.getName();
-        if (o == null) return null;
         return storageContainer.getName();
     }
     
