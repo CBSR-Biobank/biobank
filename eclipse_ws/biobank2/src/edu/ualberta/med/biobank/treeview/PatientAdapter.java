@@ -41,18 +41,14 @@ public class PatientAdapter extends Node {
     }
 
     @Override
-    public int getId() {
+    public Integer getId() {
         Assert.isNotNull(patient, "patient is null");
-        Object o = patient.getId();
-        if (o == null) return 0;
         return patient.getId();
     }
 
     @Override
     public String getName() {
         Assert.isNotNull(patient, "storage type is null");
-        Object o = patient.getNumber();
-        if (o == null) return null;
         return patient.getNumber();
     }
     
