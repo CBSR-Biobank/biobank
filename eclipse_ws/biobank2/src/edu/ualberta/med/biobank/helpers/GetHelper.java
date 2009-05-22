@@ -1,13 +1,12 @@
 package edu.ualberta.med.biobank.helpers;
 
+import edu.ualberta.med.biobank.BioBankPlugin;
+import gov.nih.nci.system.applicationservice.WritableApplicationService;
+
 import java.lang.reflect.Constructor;
 import java.util.List;
 
-import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.ui.PlatformUI;
 import org.springframework.remoting.RemoteConnectFailureException;
-import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class GetHelper<T> {
 
@@ -21,14 +20,7 @@ public class GetHelper<T> {
 			return appService.search(klass, obj);
 		}
 		catch (final RemoteConnectFailureException exp) {
-			Display.getDefault().asyncExec(new Runnable() {
-				public void run() {
-					MessageDialog.openError(
-							PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), 
-							"Connection Attempt Failed", 
-					"Could not connect to server. Make sure server is running.");
-				}
-			});
+			BioBankPlugin.openRemoteConnectErrorMessage();			
 		}
 		catch (Exception exp) {
 			exp.printStackTrace();

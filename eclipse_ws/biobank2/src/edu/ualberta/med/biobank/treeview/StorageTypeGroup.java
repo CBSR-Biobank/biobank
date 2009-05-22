@@ -1,12 +1,5 @@
 package edu.ualberta.med.biobank.treeview;
 
-import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.forms.StorageTypeEntryForm;
-import edu.ualberta.med.biobank.forms.input.FormInput;
-import edu.ualberta.med.biobank.model.Site;
-import edu.ualberta.med.biobank.model.StorageType;
-import gov.nih.nci.system.applicationservice.WritableApplicationService;
-
 import java.util.Collection;
 import java.util.List;
 
@@ -20,6 +13,13 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
+
+import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.forms.StorageTypeEntryForm;
+import edu.ualberta.med.biobank.forms.input.FormInput;
+import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.model.StorageType;
+import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class StorageTypeGroup extends Node {
     

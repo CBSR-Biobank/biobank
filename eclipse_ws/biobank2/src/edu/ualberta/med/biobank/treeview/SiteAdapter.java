@@ -13,6 +13,7 @@ import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.PlatformUI;
 import org.springframework.remoting.RemoteAccessException;
 
+import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.forms.SiteEntryForm;
 import edu.ualberta.med.biobank.forms.SiteViewForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
@@ -137,14 +138,7 @@ public class SiteAdapter extends Node {
                     appService.executeQuery(query);
                 }
                 catch (final RemoteAccessException exp) {
-                    Display.getDefault().asyncExec(new Runnable() {
-                        public void run() {
-                            MessageDialog.openError(
-                                PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), 
-                                "Connection Attempt Failed", 
-                            "Could not perform database operation. Make sure server is running correct version.");
-                        }
-                    });
+                	BioBankPlugin.openRemoteAccessErrorMessage();
                 }
                 catch (Exception e) {
                     // TODO Auto-generated catch block

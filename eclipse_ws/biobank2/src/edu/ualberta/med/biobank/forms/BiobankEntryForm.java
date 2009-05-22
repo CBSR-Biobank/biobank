@@ -19,7 +19,6 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.databinding.swt.SWTObservables;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.fieldassist.ControlDecoration;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
@@ -38,9 +37,9 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.ISaveablePart;
 import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.PlatformUI;
 import org.springframework.remoting.RemoteConnectFailureException;
 
+import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
@@ -94,16 +93,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
 				try {
 					saveForm();
 				} catch (final RemoteConnectFailureException exp) {
-					Display.getDefault().asyncExec(new Runnable() {
-						public void run() {
-							MessageDialog
-									.openError(PlatformUI.getWorkbench()
-											.getActiveWorkbenchWindow()
-											.getShell(),
-											"Connection Attempt Failed",
-											"Could not connect to server. Make sure server is running.");
-						}
-					});
+					BioBankPlugin.openRemoteConnectErrorMessage();
 				} catch (Exception e) {
 					e.printStackTrace();
 				}

@@ -10,7 +10,6 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.databinding.swt.SWTObservables;
 import org.eclipse.jface.dialogs.IMessageProvider;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
@@ -32,6 +31,7 @@ import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 
+import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.ContainerPosition;
@@ -461,15 +461,9 @@ public class StorageContainerEntryForm extends BiobankEntryForm {
         List<Object> results = appService.query(c);
         if (results.size() == 0) return true;
         
-        Display.getDefault().asyncExec(new Runnable() {
-            public void run() {
-                MessageDialog.openError(
-                    PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), 
-                    "Site Name Problem", 
+        BioBankPlugin.openAsyncError("Site Name Problem", 
                     "A storage container with name \"" + storageContainer.getName() 
                     + "\" already exists.");
-            }
-        });
         return false;
     }
 }

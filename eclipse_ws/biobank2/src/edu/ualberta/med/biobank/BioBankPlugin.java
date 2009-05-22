@@ -6,8 +6,11 @@ import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
@@ -91,5 +94,40 @@ public class BioBankPlugin extends AbstractUIPlugin {
 	 */
 	public static ImageDescriptor getImageDescriptor(String path) {
 		return imageDescriptorFromPlugin(PLUGIN_ID, path);
+	}
+	
+	
+	/**
+	 * Display an error message
+	 */
+	public static void openError(String title, String message) {
+		MessageDialog.openError(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), title, message);
+	}
+	
+	/**
+	 * Display an error message asynchronously
+	 */
+	public static void openAsyncError(final String title, final String message) {
+		Display.getDefault().asyncExec(new Runnable() {
+			public void run() {
+				MessageDialog.openError(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), title, message);
+			}
+		});
+	}
+	 
+	/**
+	 * Display remote access error message
+	 */
+	public static void openRemoteAccessErrorMessage() {
+		openAsyncError("Connection Attempt Failed",
+				"Could not perform database operation. Make sure server is running correct version.");
+	}
+	
+	/**
+	 * Display remote connect error message
+	 */
+	public static void openRemoteConnectErrorMessage() {
+		openAsyncError("Connection Attempt Failed", 
+				"Could not connect to server. Make sure server is running.");
 	}
 }

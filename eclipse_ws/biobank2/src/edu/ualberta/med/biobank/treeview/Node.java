@@ -1,18 +1,19 @@
 package edu.ualberta.med.biobank.treeview;
 
-import edu.ualberta.med.biobank.forms.input.FormInput;
-import gov.nih.nci.system.applicationservice.WritableApplicationService;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.jface.viewers.TreeViewer;
 
-import java.util.ArrayList;
-import java.util.List;
+import edu.ualberta.med.biobank.forms.input.FormInput;
+import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class Node {
 	

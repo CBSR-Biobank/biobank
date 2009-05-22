@@ -1,9 +1,9 @@
 package edu.ualberta.med.biobank.rcp;
 
+import org.eclipse.ui.application.IWorkbenchConfigurer;
 import org.eclipse.ui.application.IWorkbenchWindowConfigurer;
 import org.eclipse.ui.application.WorkbenchAdvisor;
 import org.eclipse.ui.application.WorkbenchWindowAdvisor;
-import org.eclipse.ui.application.IWorkbenchConfigurer;
 
 
 public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
