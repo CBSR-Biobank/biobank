@@ -47,272 +47,262 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 /**
  * Base class for data entry forms.
  * 
- * Notes:
- *  - createFormContent() and saveForm() are called in their own thread so 
- *    making calls to the database is possible.
- *
+ * Notes: - createFormContent() and saveForm() are called in their own thread so
+ * making calls to the database is possible.
+ * 
  */
 public abstract class BiobankEntryForm extends BiobankFormBase {
-    
-    protected WritableApplicationService appService;
-    
-    protected String sessionName;
 
-    private boolean dirty = false;
+	protected WritableApplicationService appService;
 
-    protected IStatus currentStatus;
-    
-    protected DataBindingContext dbc;
-    
-    protected KeyListener keyListener = new KeyListener() {
-        @Override
-        public void keyPressed(KeyEvent e) {
-            if ((e.keyCode & SWT.MODIFIER_MASK) == 0) {
-                setDirty(true);
-            }
-        }
+	protected String sessionName;
 
-        @Override
-        public void keyReleased(KeyEvent e) {           
-        }
-    };
-    
-    public BiobankEntryForm() {
-        super();
-        controls = new HashMap<String, Control>();
-        dbc = new DataBindingContext();
-    }
+	private boolean dirty = false;
 
-    @Override
-    public void doSave(IProgressMonitor monitor) {
-        setDirty(false);
-        doSaveInternal();
-    }
-    
-    protected void doSaveInternal() {
-        BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
-            public void run() {
-                try {
-                    saveForm();
-                }
-                catch (final RemoteConnectFailureException exp) {
-                    Display.getDefault().asyncExec(new Runnable() {
-                        public void run() {
-                            MessageDialog.openError(
-                                PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), 
-                                "Connection Attempt Failed", 
-                            "Could not connect to server. Make sure server is running.");
-                        }
-                    });
-                }
-                catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-    }
+	protected IStatus currentStatus;
 
-    @Override
-    public void doSaveAs() {
-    }
+	protected DataBindingContext dbc;
 
-    @Override
-    public void init(IEditorSite editorSite, IEditorInput input)
-            throws PartInitException {
-        super.init(editorSite, input);
-        setDirty(false);
-    }
+	protected KeyListener keyListener = new KeyListener() {
+		@Override
+		public void keyPressed(KeyEvent e) {
+			if ((e.keyCode & SWT.MODIFIER_MASK) == 0) {
+				setDirty(true);
+			}
+		}
 
-    @Override
-    public boolean isDirty() {
-        return dirty;
-    }
+		@Override
+		public void keyReleased(KeyEvent e) {
+		}
+	};
 
-    protected void setDirty(boolean d) {
-        dirty = d;
-        firePropertyChange(ISaveablePart.PROP_DIRTY);
-    }
+	public BiobankEntryForm() {
+		super();
+		controls = new HashMap<String, Control>();
+		dbc = new DataBindingContext();
+	}
 
-    @Override
-    public boolean isSaveAsAllowed() {
-        return false;
-    }
-    
+	@Override
+	public void doSave(IProgressMonitor monitor) {
+		setDirty(false);
+		doSaveInternal();
+	}
 
-    @Override
-    public void createPartControl(Composite parent) {
-        super.createPartControl(parent);
-        bindChangeListener();
-    }
-    
-    abstract protected void saveForm() throws Exception;   
-    
+	protected void doSaveInternal() {
+		BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
+			public void run() {
+				try {
+					saveForm();
+				} catch (final RemoteConnectFailureException exp) {
+					Display.getDefault().asyncExec(new Runnable() {
+						public void run() {
+							MessageDialog
+									.openError(PlatformUI.getWorkbench()
+											.getActiveWorkbenchWindow()
+											.getShell(),
+											"Connection Attempt Failed",
+											"Could not connect to server. Make sure server is running.");
+						}
+					});
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+	}
 
-    @Override
-    public void setFocus() {
-        form.setFocus();
-    }
+	@Override
+	public void doSaveAs() {
+	}
 
-    public String getSessionName() {
-        return sessionName;
-    }
+	@Override
+	public void init(IEditorSite editorSite, IEditorInput input)
+			throws PartInitException {
+		super.init(editorSite, input);
+		setDirty(false);
+	}
 
-    public void setSessionName(String sessionName) {
-        this.sessionName = sessionName;
-    }
+	@Override
+	public boolean isDirty() {
+		return dirty;
+	}
 
-    public void setAppService(WritableApplicationService appService) {
-        Assert.isNotNull(appService, "appService is null");
-        this.appService = appService;
-    }
-    
-    protected Control createBoundWidgetWithLabel(Composite composite, 
-        Class<?> widgetClass, int widgetOptions, String fieldLabel, 
-        String [] widgetValues, 
-        IObservableValue modelObservableValue, Class<?> validatorClass, 
-        String validatorErrMsg) {
-        Label label;
-        
-        label = toolkit.createLabel(composite, fieldLabel + ":", SWT.LEFT);
-        label.setLayoutData(new GridData(GridData.VERTICAL_ALIGN_BEGINNING));
-        return createBoundWidget(composite, widgetClass, widgetOptions, label,
-            widgetValues, modelObservableValue, validatorClass, validatorErrMsg);
-    
-    }
-    
-    protected Control createBoundWidget(Composite composite, 
-        Class<?> widgetClass, int widgetOptions, Label label, 
-        String [] widgetValues, 
-        IObservableValue modelObservableValue, IValidator validator) {
-        if (widgetClass == Text.class) {
-            if (widgetOptions == SWT.NONE) {
-                widgetOptions = SWT.SINGLE;
-            }
-            Text text  = toolkit.createText(composite, "", widgetOptions);
-            text.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-            text.addKeyListener(keyListener);
-            
-            UpdateValueStrategy uvs = null;
-            if (validator != null) {
-                uvs = new UpdateValueStrategy();
-                uvs.setAfterGetValidator(validator);
-            }
+	protected void setDirty(boolean d) {
+		dirty = d;
+		firePropertyChange(ISaveablePart.PROP_DIRTY);
+	}
 
-            dbc.bindValue(SWTObservables.observeText(text, SWT.Modify),
-                modelObservableValue, uvs, null);
-            return text;
-        }    
-        else if (widgetClass == Combo.class) {
-            Combo combo = new Combo(composite, SWT.READ_ONLY);
-            combo.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
-            Assert.isNotNull(widgetValues, "combo values not assigned");
-            combo.setItems(widgetValues);
-            toolkit.adapt(combo, true, true);
-            
-            dbc.bindValue(SWTObservables.observeSelection(combo),
-                modelObservableValue, null, null);
-            
-            combo.addSelectionListener(new SelectionAdapter() {
-                @Override
+	@Override
+	public boolean isSaveAsAllowed() {
+		return false;
+	}
+
+	@Override
+	public void createPartControl(Composite parent) {
+		super.createPartControl(parent);
+		bindChangeListener();
+	}
+
+	abstract protected void saveForm() throws Exception;
+
+	@Override
+	public void setFocus() {
+		form.setFocus();
+	}
+
+	public String getSessionName() {
+		return sessionName;
+	}
+
+	public void setSessionName(String sessionName) {
+		this.sessionName = sessionName;
+	}
+
+	public void setAppService(WritableApplicationService appService) {
+		Assert.isNotNull(appService, "appService is null");
+		this.appService = appService;
+	}
+
+	protected Control createBoundWidgetWithLabel(Composite composite,
+			Class<?> widgetClass, int widgetOptions, String fieldLabel,
+			String[] widgetValues, IObservableValue modelObservableValue,
+			Class<?> validatorClass, String validatorErrMsg) {
+		Label label;
+
+		label = toolkit.createLabel(composite, fieldLabel + ":", SWT.LEFT);
+		label.setLayoutData(new GridData(GridData.VERTICAL_ALIGN_BEGINNING));
+		return createBoundWidget(composite, widgetClass, widgetOptions, label,
+				widgetValues, modelObservableValue, validatorClass,
+				validatorErrMsg);
+
+	}
+
+	protected Control createBoundWidget(Composite composite,
+			Class<?> widgetClass, int widgetOptions, Label label,
+			String[] widgetValues, IObservableValue modelObservableValue,
+			IValidator validator) {
+		if (widgetClass == Text.class) {
+			if (widgetOptions == SWT.NONE) {
+				widgetOptions = SWT.SINGLE;
+			}
+			Text text = toolkit.createText(composite, "", widgetOptions);
+			text.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+			text.addKeyListener(keyListener);
+
+			UpdateValueStrategy uvs = null;
+			if (validator != null) {
+				uvs = new UpdateValueStrategy();
+				uvs.setAfterGetValidator(validator);
+			}
+
+			dbc.bindValue(SWTObservables.observeText(text, SWT.Modify),
+					modelObservableValue, uvs, null);
+			return text;
+		} else if (widgetClass == Combo.class) {
+			Combo combo = new Combo(composite, SWT.READ_ONLY);
+			combo.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
+			Assert.isNotNull(widgetValues, "combo values not assigned");
+			combo.setItems(widgetValues);
+			toolkit.adapt(combo, true, true);
+
+			dbc.bindValue(SWTObservables.observeSelection(combo),
+					modelObservableValue, null, null);
+
+			combo.addSelectionListener(new SelectionAdapter() {
+				@Override
 				public void widgetSelected(SelectionEvent e) {
-                    setDirty(true);
-                }
-            });
-            return combo;
-        }            
-        else {
-            Assert.isTrue(false, "invalid widget class " + widgetClass.getName());
-        }
-        return null;
-    }
-    
-    protected Control createBoundWidget(Composite composite, 
-        Class<?> widgetClass, int widgetOptions, Label label, 
-        String [] widgetValues, 
-        IObservableValue modelObservableValue, Class<?> validatorClass, 
-        String validatorErrMsg) {
-        IValidator validator = null;
+					setDirty(true);
+				}
+			});
+			return combo;
+		} else {
+			Assert.isTrue(false, "invalid widget class "
+					+ widgetClass.getName());
+		}
+		return null;
+	}
 
-        if (validatorClass != null) {
-            validator = createValidator(validatorClass, 
-                FormUtils.createDecorator(label, validatorErrMsg), 
-                validatorErrMsg);
-        }
-        
-        return createBoundWidget(composite, widgetClass, widgetOptions, label, 
-            widgetValues,  modelObservableValue, validator); 
-    }
-    
-    protected IValidator createValidator(Class<?> validatorClass, 
-        ControlDecoration dec, String validatorErrMsg) {
-        try {
-            Class<?>[] types = new Class[] { String.class, ControlDecoration.class };               
-            Constructor<?> cons = validatorClass.getConstructor(types);
-            Object[] args = new Object[] { validatorErrMsg, dec};
-            return (IValidator) cons.newInstance(args);
-        } 
-        catch (NoSuchMethodException e) {
-            throw new RuntimeException(e);
-        }
-        catch (InvocationTargetException e) {
-            throw new RuntimeException(e);
-        } 
-        catch (IllegalArgumentException e) {
-            throw new RuntimeException(e);
-        } 
-        catch (InstantiationException e) {
-            throw new RuntimeException(e);
-        } 
-        catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        }
-    }
-    
-    protected void createWidgetsFromMap(ListOrderedMap fieldsMap, 
-            Object pojo, Composite client) {
-        FieldInfo fi;
-        
-        MapIterator it = fieldsMap.mapIterator();
-        while (it.hasNext()) {
-            String key = (String) it.next();
-            fi = (FieldInfo) it.getValue();
-            
-            Control control = createBoundWidgetWithLabel(client, fi.widgetClass, 
-                fi.widgetOptions, fi.label, fi.widgetValues, 
-                PojoObservables.observeValue(pojo, key),
-                fi.validatorClass, fi.errMsg);
-            controls.put(key, control);
-        }     
-    }
-    
-    protected Combo createSessionSelectionWidget(Composite client) {
-        String[] sessionNames = SessionManager.getInstance().getSessionNames();
-        
-        if (sessionNames.length > 1) {  
-            toolkit.createLabel(client, "Session:", SWT.LEFT);
-            Combo session = new Combo(client, SWT.READ_ONLY);
-            session.setItems(sessionNames);
-            session.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-            return session;
-        }   
-        return null;
-    }
-    
-    protected void bindChangeListener() {
-        IObservableValue statusObservable = new WritableValue();
-        statusObservable.addChangeListener(new IChangeListener() {
-            public void handleChange(ChangeEvent event) {
-                IObservableValue validationStatus 
-                    = (IObservableValue) event.getSource(); 
-                handleStatusChanged((IStatus) validationStatus.getValue());
-            }
-        }); 
-        
-        dbc.bindValue(statusObservable, new AggregateValidationStatus(
-            dbc.getBindings(), AggregateValidationStatus.MAX_SEVERITY),
-            null, null); 
-    }
-    
-    protected abstract void handleStatusChanged(IStatus status);
+	protected Control createBoundWidget(Composite composite,
+			Class<?> widgetClass, int widgetOptions, Label label,
+			String[] widgetValues, IObservableValue modelObservableValue,
+			Class<?> validatorClass, String validatorErrMsg) {
+		IValidator validator = null;
+
+		if (validatorClass != null) {
+			validator = createValidator(validatorClass, FormUtils
+					.createDecorator(label, validatorErrMsg), validatorErrMsg);
+		}
+
+		return createBoundWidget(composite, widgetClass, widgetOptions, label,
+				widgetValues, modelObservableValue, validator);
+	}
+
+	protected IValidator createValidator(Class<?> validatorClass,
+			ControlDecoration dec, String validatorErrMsg) {
+		try {
+			Class<?>[] types = new Class[] { String.class,
+					ControlDecoration.class };
+			Constructor<?> cons = validatorClass.getConstructor(types);
+			Object[] args = new Object[] { validatorErrMsg, dec };
+			return (IValidator) cons.newInstance(args);
+		} catch (NoSuchMethodException e) {
+			throw new RuntimeException(e);
+		} catch (InvocationTargetException e) {
+			throw new RuntimeException(e);
+		} catch (IllegalArgumentException e) {
+			throw new RuntimeException(e);
+		} catch (InstantiationException e) {
+			throw new RuntimeException(e);
+		} catch (IllegalAccessException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	protected void createWidgetsFromMap(ListOrderedMap fieldsMap, Object pojo,
+			Composite client) {
+		FieldInfo fi;
+
+		MapIterator it = fieldsMap.mapIterator();
+		while (it.hasNext()) {
+			String key = (String) it.next();
+			fi = (FieldInfo) it.getValue();
+
+			Control control = createBoundWidgetWithLabel(client,
+					fi.widgetClass, fi.widgetOptions, fi.label,
+					fi.widgetValues, PojoObservables.observeValue(pojo, key),
+					fi.validatorClass, fi.errMsg);
+			controls.put(key, control);
+		}
+	}
+
+	protected Combo createSessionSelectionWidget(Composite client) {
+		String[] sessionNames = SessionManager.getInstance().getSessionNames();
+
+		if (sessionNames.length > 1) {
+			toolkit.createLabel(client, "Session:", SWT.LEFT);
+			Combo session = new Combo(client, SWT.READ_ONLY);
+			session.setItems(sessionNames);
+			session.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+			return session;
+		}
+		return null;
+	}
+
+	protected void bindChangeListener() {
+		IObservableValue statusObservable = new WritableValue();
+		statusObservable.addChangeListener(new IChangeListener() {
+			public void handleChange(ChangeEvent event) {
+				IObservableValue validationStatus = (IObservableValue) event
+						.getSource();
+				handleStatusChanged((IStatus) validationStatus.getValue());
+			}
+		});
+
+		dbc.bindValue(statusObservable, new AggregateValidationStatus(dbc
+				.getBindings(), AggregateValidationStatus.MAX_SEVERITY), null,
+				null);
+	}
+
+	protected abstract void handleStatusChanged(IStatus status);
 
 }

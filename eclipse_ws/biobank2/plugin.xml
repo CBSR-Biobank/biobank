@@ -225,9 +225,9 @@
             name="Storage Container View">
       </editor>
       <editor
-            class="edu.ualberta.med.biobank.forms.ScanSamplesEntryForm"
+            class="edu.ualberta.med.biobank.forms.LinkSamplesEntryForm"
             default="false"
-            id="edu.ualberta.med.biobank.forms.ScanSamplesEntryForm"
+            id="edu.ualberta.med.biobank.forms.LinkSamplesEntryForm"
             name="Scan Samples Entry">
       </editor>
    </extension>

@@ -11,7 +11,7 @@ import org.eclipse.swt.widgets.Tree;
 
 import edu.ualberta.med.biobank.forms.PatientVisitEntryForm;
 import edu.ualberta.med.biobank.forms.PatientVisitViewForm;
-import edu.ualberta.med.biobank.forms.ScanSamplesEntryForm;
+import edu.ualberta.med.biobank.forms.LinkSamplesEntryForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.PatientVisit;
 
@@ -76,24 +76,14 @@ public class PatientVisitAdapter extends Node {
         }); 
 
         mi = new MenuItem (menu, SWT.PUSH);
-        mi.setText ("Add Sample");
+        mi.setText ("Add Samples");
         mi.addSelectionListener(new SelectionListener() {
             public void widgetSelected(SelectionEvent event) {
+            	openForm(new FormInput(PatientVisitAdapter.this), LinkSamplesEntryForm.ID);
             }
 
             public void widgetDefaultSelected(SelectionEvent e) {                    
             }
-        }); 
-        
-        mi = new MenuItem (menu, SWT.PUSH);
-        mi.setText ("Scan samples");
-        mi.addSelectionListener(new SelectionListener() {
-            public void widgetSelected(SelectionEvent event) {
-            	openForm(new FormInput(PatientVisitAdapter.this), ScanSamplesEntryForm.ID);
-            }
-
-            public void widgetDefaultSelected(SelectionEvent e) {                    
-            }
-        }); 
+        });
     }
 }
