@@ -16,7 +16,6 @@ import edu.ualberta.med.biobank.model.Study;
 
 public class StudyAdapter extends Node {
     public static final int PATIENTS_NODE_ID = 0;
-    public static final int STORAGE_CONTAINERS_NODE_ID = 1;
     
 	private Study study;
 	
@@ -30,7 +29,6 @@ public class StudyAdapter extends Node {
 	        
 	    }
         addChild(new PatientGroup(this, PATIENTS_NODE_ID));
-        addChild(new StorageContainerGroup(this, STORAGE_CONTAINERS_NODE_ID));
 	}
 
 	public void setStudy(Study study) {

@@ -26,6 +26,7 @@ public class SiteAdapter extends Node {
     public static final int STUDIES_NODE_ID = 0;
     public static final int CLINICS_NODE_ID = 1;
     public static final int STORAGE_TYPES_NODE_ID = 2;
+    public static final int STORAGE_CONTAINERS_NODE_ID = 3;
     
 	private Site site;
 
@@ -35,6 +36,7 @@ public class SiteAdapter extends Node {
 		addChild(new StudyGroup(this, STUDIES_NODE_ID));
 		addChild(new ClinicGroup(this, CLINICS_NODE_ID));
 		addChild(new StorageTypeGroup(this, STORAGE_TYPES_NODE_ID));
+		addChild(new StorageContainerGroup(this, STORAGE_CONTAINERS_NODE_ID));
 	}
 
 	public void setSite(Site site) {
