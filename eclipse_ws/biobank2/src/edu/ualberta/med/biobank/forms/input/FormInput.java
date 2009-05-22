@@ -21,7 +21,7 @@ public class FormInput implements IEditorInput {
         node = o;
     }
     
-    public int getIndex() {
+    public Integer getIndex() {
         if (node != null) return node.getId();
         return 0;
     }

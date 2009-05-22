@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.forms;
 
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.swt.SWT;
@@ -14,11 +15,13 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.forms.widgets.Section;
 import org.springframework.util.Assert;
 
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.model.StorageContainer;
 import edu.ualberta.med.biobank.model.StorageType;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.ClinicAdapter;
@@ -40,6 +43,7 @@ public class SiteViewForm extends AddressViewFormCommon {
 	private BiobankCollectionTable studiesTable;
 	private BiobankCollectionTable clinicsTable;
 	private BiobankCollectionTable storageTypesTable;
+	private BiobankCollectionTable sContainersTable;
 
 	private Label activityStatusLabel;
 
@@ -83,6 +87,7 @@ public class SiteViewForm extends AddressViewFormCommon {
 		clinicsTable = FormUtils.createClinicSection(toolkit, form.getBody(), 
 		        siteAdapter.getClinicGroupNode(), site.getClinicCollection());
         createStorageTypesSection();
+        createStorageContainerSection();
 		createButtons();
 	}
 
@@ -149,6 +154,33 @@ public class SiteViewForm extends AddressViewFormCommon {
             count++;
         }
 		return adapters;
+	}
+
+	private void createStorageContainerSection() {        
+		Section section = createSection("Storage Containers");  
+
+		String [] headings = new String[] {"Name", "Status", "Bar Code", "Full", "Temperature"};      
+		sContainersTable = new BiobankCollectionTable(section, SWT.NONE, headings, getStorageContainers());
+		section.setClient(sContainersTable);
+		sContainersTable.adaptToToolkit(toolkit);   
+		toolkit.paintBordersFor(sContainersTable);
+
+		sContainersTable.getTableViewer().addDoubleClickListener(
+				FormUtils.getBiobankCollectionDoubleClickListener());
+	}
+
+	private StorageContainer[] getStorageContainers() {
+		// hack required here because site.getStudyCollection().toArray(new Study[0])
+		// returns Object[].        
+		int count = 0;
+		Collection<StorageContainer> storageContainers = site.getStorageContainerCollection();
+		StorageContainer [] arr = new StorageContainer [storageContainers.size()];
+		Iterator<StorageContainer> it = storageContainers.iterator();
+		while (it.hasNext()) {
+			arr[count] = it.next();
+			++count;
+		}
+		return arr;
 	}
 	
 	private void createButtons() {      
@@ -222,6 +254,7 @@ public class SiteViewForm extends AddressViewFormCommon {
 		studiesTable.getTableViewer().setInput(getStudiesAdapters());
 		clinicsTable.getTableViewer().setInput(FormUtils.getClinicsAdapters(siteAdapter.getClinicGroupNode(), site.getClinicCollection()));
 		storageTypesTable.getTableViewer().setInput(getStorageTypesAdapters());
+		sContainersTable.getTableViewer().setInput(getStorageContainers());
 	}
 	
 	private void retrieveSite() {

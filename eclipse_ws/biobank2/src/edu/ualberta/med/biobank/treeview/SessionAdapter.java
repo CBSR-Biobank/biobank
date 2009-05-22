@@ -40,8 +40,8 @@ public class SessionAdapter extends Node {
 	}
 
 	@Override
-	public int getId() {
-		return 0;
+	public Integer getId() {
+		return null;
 	}
 
     @Override

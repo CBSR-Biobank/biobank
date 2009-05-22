@@ -10,10 +10,12 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
@@ -110,7 +112,11 @@ public abstract class BiobankViewForm extends BiobankFormBase {
 		Action reloadAction = new Action("Reload") {
 			@Override
 			public void run() {
-				reload();
+		        BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
+		            public void run() {
+		                reload();
+		            }
+		        });
 			}			
 		};
 		ImageDescriptor imgDesc = BioBankPlugin.getImageDescriptor("icons/arrow_refresh.png");

@@ -19,7 +19,7 @@ public class Node {
 	
 	protected IDeltaListener listener = NullDeltaListener.getSoleInstance();
 	
-	private int id;
+	private Integer id;
 	
 	private String name;
 	
@@ -60,7 +60,7 @@ public class Node {
 		this.id = id;
 	}
 	
-	public int getId() {
+	public Integer getId() {
 		return id;
 	}
 	
@@ -214,7 +214,7 @@ public class Node {
             + this.getName());
     }
     
-    @SuppressWarnings("unused")
+    //@SuppressWarnings("unused")
     public void popupMenu(TreeViewer tv, Tree tree,  Menu menu) {
         Assert.isTrue(false, "should be implemented by derived class: "
             + this.getName());

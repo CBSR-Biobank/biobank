@@ -17,6 +17,7 @@ import org.eclipse.ui.PartInitException;
 
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Capacity;
+import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.model.StorageType;
 import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.StorageTypeAdapter;
@@ -48,7 +49,7 @@ public class StorageTypeViewForm extends BiobankViewForm {
 
 	private Label dimTwoCapacityLabel;
     
-	private org.eclipse.swt.widgets.List sampleDerivTypesList;
+	private org.eclipse.swt.widgets.List sampleTypesList;
 	
 	private org.eclipse.swt.widgets.List childStorageTypesList;
 	
@@ -100,7 +101,7 @@ public class StorageTypeViewForm extends BiobankViewForm {
         form.getBody().setLayout(new GridLayout(1, false));
         createStorageTypeSection();     
         createDimensionsSection();
-        createSampleDerivTypesSection();
+        createSampleTypesSection();
         createChildStorageTypesSection();
         createButtons();
     }
@@ -148,7 +149,7 @@ public class StorageTypeViewForm extends BiobankViewForm {
         FormUtils.setTextValue(dimTwoCapacityLabel, capacity.getDimensionTwoCapacity());
 	}
 
-    private void createSampleDerivTypesSection() {
+    private void createSampleTypesSection() {
         Composite client = createSectionWithClient("Contains Sample Derivatives");       
         GridLayout layout = (GridLayout) client.getLayout();
         layout.numColumns = 2;
@@ -158,19 +159,19 @@ public class StorageTypeViewForm extends BiobankViewForm {
         Label label = toolkit.createLabel(client, "Sample derivative types:");      
         label.setLayoutData(new GridData(SWT.LEFT, SWT.BEGINNING, false, false));
         
-//        sampleDerivTypesList = new org.eclipse.swt.widgets.List(client, SWT.BORDER | SWT.V_SCROLL);
-//        GridData gd = new GridData(GridData.FILL_BOTH);
-//        gd.heightHint = 100;
-//        sampleDerivTypesList.setLayoutData(gd);
-//        setSampleDerivTypesValues();
+        sampleTypesList = new org.eclipse.swt.widgets.List(client, SWT.BORDER | SWT.V_SCROLL);
+        GridData gd = new GridData(GridData.FILL_BOTH);
+        gd.heightHint = 100;
+        sampleTypesList.setLayoutData(gd);
+        setSampleDerivTypesValues();
     }
 
-//	private void setSampleDerivTypesValues() {
-//		sampleDerivTypesList.removeAll();
-//		for (SampleDerivativeType type : storageType.getSampleDerivativeTypeCollection()) {
-//            sampleDerivTypesList.add(type.getNameShort());
-//        }
-//	}
+	private void setSampleDerivTypesValues() {
+		sampleTypesList.removeAll();
+		for (SampleType type : storageType.getSampleTypeCollection()) {
+            sampleTypesList.add(type.getNameShort());
+        }
+	}
 
     private void createChildStorageTypesSection() {
         Composite client = createSectionWithClient("Contains Storage Types");       

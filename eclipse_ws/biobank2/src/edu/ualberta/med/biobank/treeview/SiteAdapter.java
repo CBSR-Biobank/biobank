@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.treeview;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
@@ -26,6 +27,7 @@ public class SiteAdapter extends Node {
     public static final int STUDIES_NODE_ID = 0;
     public static final int CLINICS_NODE_ID = 1;
     public static final int STORAGE_TYPES_NODE_ID = 2;
+    public static final int STORAGE_CONTAINERS_NODE_ID = 3;
     
 	private Site site;
 
@@ -35,6 +37,7 @@ public class SiteAdapter extends Node {
 		addChild(new StudyGroup(this, STUDIES_NODE_ID));
 		addChild(new ClinicGroup(this, CLINICS_NODE_ID));
 		addChild(new StorageTypeGroup(this, STORAGE_TYPES_NODE_ID));
+		addChild(new StorageContainerGroup(this, STORAGE_CONTAINERS_NODE_ID));
 	}
 
 	public void setSite(Site site) {
@@ -58,16 +61,14 @@ public class SiteAdapter extends Node {
     }
 
 	@Override
-	public int getId() {
-		Object o = site.getId();
-		if (o == null) return 0;
+	public Integer getId() {
+        Assert.isNotNull(site, "site is null");
 		return site.getId();
 	}
 
 	@Override
 	public String getName() {
-		Object o = site.getName();
-		if (o == null) return null;
+        Assert.isNotNull(site, "site is null");
 		return site.getName();
 	}
     

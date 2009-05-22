@@ -29,7 +29,9 @@ import org.eclipse.ui.PlatformUI;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.forms.input.FormInput;
+import edu.ualberta.med.biobank.helpers.GetHelper;
 import edu.ualberta.med.biobank.model.Capacity;
+import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.StorageType;
 import edu.ualberta.med.biobank.treeview.Node;
@@ -77,7 +79,7 @@ public class StorageTypeEntryForm extends BiobankEntryForm {
     
     private MultiSelect childStorageTypesMultiSelect;
     
-//    private List<SampleDerivativeType> allSampleDerivTypes;
+    private List<SampleType> allSampleDerivTypes;
     
     private Collection<StorageType> allStorageTypes;
     
@@ -181,14 +183,14 @@ public class StorageTypeEntryForm extends BiobankEntryForm {
         GridLayout layout = (GridLayout) client.getLayout();
         layout.numColumns = 2;
         
-//        Collection<SampleDerivativeType> stSamplesTypes = 
-//            storageType.getSampleDerivativeTypeCollection();
-//        
-//        GetHelper<SampleDerivativeType> helper = 
-//            new GetHelper<SampleDerivativeType>();
-//        
-//        allSampleDerivTypes = helper.getModelObjects(
-//            appService, SampleDerivativeType.class);
+        Collection<SampleType> stSamplesTypes = 
+            storageType.getSampleTypeCollection();
+        
+        GetHelper<SampleType> helper = 
+            new GetHelper<SampleType>();
+        
+        allSampleDerivTypes = helper.getModelObjects(
+            appService, SampleType.class);
         
         samplesMultiSelect = new MultiSelect(client, SWT.NONE, 
                 "Selected Sample Derivatives", "Available Sample Derivatives", 100);
@@ -197,16 +199,16 @@ public class StorageTypeEntryForm extends BiobankEntryForm {
         ListOrderedMap availSampleDerivTypes = new ListOrderedMap();
         List<Integer> selSampleDerivTypes = new ArrayList<Integer>();
 
-//        if (stSamplesTypes != null) {
-//            for (SampleDerivativeType sampleType : stSamplesTypes) {
-//                selSampleDerivTypes.add(sampleType.getId());
-//            }
-//        }
-//        
-//        for (SampleDerivativeType sampleType : allSampleDerivTypes) {
-//            availSampleDerivTypes.put(sampleType.getId(), 
-//                    sampleType.getNameShort());
-//        }
+        if (stSamplesTypes != null) {
+            for (SampleType sampleType : stSamplesTypes) {
+                selSampleDerivTypes.add(sampleType.getId());
+            }
+        }
+        
+        for (SampleType sampleType : allSampleDerivTypes) {
+            availSampleDerivTypes.put(sampleType.getId(), 
+                    sampleType.getNameShort());
+        }
         samplesMultiSelect.addSelections(availSampleDerivTypes, 
             selSampleDerivTypes);
     }
@@ -302,7 +304,7 @@ public class StorageTypeEntryForm extends BiobankEntryForm {
             return;
         }
 
-//        saveSampleDerivativeTypes(); 
+        saveSampleTypes(); 
         saveChildStorageTypes();
         saveCapacity();
 
@@ -344,20 +346,20 @@ public class StorageTypeEntryForm extends BiobankEntryForm {
         storageType.setCapacity((Capacity) result.getObjectResult());
     }
     
-//    private void saveSampleDerivativeTypes() {
-//        List<Integer> selSampleTypeIds = samplesMultiSelect.getSelected();
-//        Set<SampleDerivativeType> selSampleTypes = new HashSet<SampleDerivativeType>();
-//        for (SampleDerivativeType sampleType : allSampleDerivTypes) {
-//            int id = sampleType.getId();
-//            if (selSampleTypeIds.indexOf(id) >= 0) {
-//                selSampleTypes.add(sampleType);
-//            }
-//            
-//        }
-//        Assert.isTrue(selSampleTypes.size() == selSampleTypeIds.size(), 
-//                "problem with sample type selections");
-//        storageType.setSampleDerivativeTypeCollection(selSampleTypes);        
-//    }
+    private void saveSampleTypes() {
+        List<Integer> selSampleTypeIds = samplesMultiSelect.getSelected();
+        Set<SampleType> selSampleTypes = new HashSet<SampleType>();
+        for (SampleType sampleType : allSampleDerivTypes) {
+            int id = sampleType.getId();
+            if (selSampleTypeIds.indexOf(id) >= 0) {
+                selSampleTypes.add(sampleType);
+            }
+            
+        }
+        Assert.isTrue(selSampleTypes.size() == selSampleTypeIds.size(), 
+                "problem with sample type selections");
+        storageType.setSampleTypeCollection(selSampleTypes);        
+    }
     
     private void saveChildStorageTypes() {
         List<Integer> selStorageTypeIds = childStorageTypesMultiSelect.getSelected();

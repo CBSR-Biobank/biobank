@@ -38,18 +38,14 @@ public class ClinicAdapter extends Node {
 	}
 
 	@Override
-	public int getId() {
+	public Integer  getId() {
 		Assert.isNotNull(clinic, "Clinic is null");
-		Object o = clinic.getId();
-		if (o == null) return 0;
 		return clinic.getId();
 	}
 
 	@Override
 	public String getName() {
 		Assert.isNotNull(clinic, "Clinic is null");
-		Object o = clinic.getName();
-		if (o == null) return null;
 		return clinic.getName();
 	}
     

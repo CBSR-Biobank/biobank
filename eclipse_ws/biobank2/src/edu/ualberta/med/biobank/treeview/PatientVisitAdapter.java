@@ -29,18 +29,14 @@ public class PatientVisitAdapter extends Node {
     }
 
     @Override
-    public int getId() {
+    public Integer getId() {
         Assert.isNotNull(patientVisit, "patientVisit is null");
-        Object o = patientVisit.getId();
-        if (o == null) return 0;
         return patientVisit.getId();
     }
 
     @Override
     public String getName() {
         Assert.isNotNull(patientVisit, "patientVisit is null");
-        Object o = patientVisit.getNumber();
-        if (o == null) return null;
         return patientVisit.getNumber();
     }
     

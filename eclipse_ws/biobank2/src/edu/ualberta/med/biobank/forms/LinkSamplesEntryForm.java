@@ -25,7 +25,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
@@ -50,15 +50,19 @@ public class LinkSamplesEntryForm extends BiobankEntryForm {
 	private static final String MSG_SAMPLES_OK = "Editing samples.";
 
 	private Button submit;
+	
+	private Button scan;
 
 	private PatientVisitAdapter pvAdapter;
 
 	private PatientVisit patientVisit;
+	
+	private Composite typesSelectionSection;
 
 	private ScanPaletteWidget spw;
 
 	private List<ComboViewer> sampleTypeCombos;
-	private List<Text> sampleNumberTexts;
+	private List<Label> sampleNumberTexts;
 
 	@Override
 	public void init(IEditorSite editorSite, IEditorInput input)
@@ -111,27 +115,27 @@ public class LinkSamplesEntryForm extends BiobankEntryForm {
 	}
 
 	private void createTypesSelectionSection() {
-		Composite client = toolkit.createComposite(form.getBody());
+		typesSelectionSection = toolkit.createComposite(form.getBody());
 		GridLayout layout = new GridLayout(3, false);
 		layout.horizontalSpacing = 10;
-		client.setLayout(layout);
-		toolkit.paintBordersFor(client);
+		typesSelectionSection.setLayout(layout);
+		toolkit.paintBordersFor(typesSelectionSection);
 
 		List<SampleType> sampleTypes = getAllSampleTypes();
 		sampleTypeCombos = new ArrayList<ComboViewer>();
-		sampleNumberTexts = new ArrayList<Text>();
+		sampleNumberTexts = new ArrayList<Label>();
 		char letter = 'A';
 		for (int i = 0; i < ScanCell.ROW_MAX; i++) {
-			toolkit.createLabel(client, String.valueOf(letter), SWT.LEFT);
-			sampleTypeCombos.add(createSampleTypeCombo(client, sampleTypes));
-			Text text = toolkit.createText(client, "", SWT.READ_ONLY
-					| SWT.RIGHT);
+			toolkit.createLabel(typesSelectionSection, String.valueOf(letter), SWT.LEFT);
+			sampleTypeCombos.add(createSampleTypeCombo(typesSelectionSection, sampleTypes));
+			Label text = toolkit.createLabel(typesSelectionSection, "", SWT.RIGHT|SWT.BORDER);
 			GridData data = new GridData();
 			data.widthHint = 20;
 			text.setLayoutData(data);
 			sampleNumberTexts.add(text);
 			letter += 1;
 		}
+		typesSelectionSection.setEnabled(false);
 	}
 
 	private void createPaletteScanSection() {
@@ -154,7 +158,7 @@ public class LinkSamplesEntryForm extends BiobankEntryForm {
 		client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		toolkit.paintBordersFor(client);
 
-		Button scan = toolkit.createButton(client, "Scan", SWT.PUSH);
+		scan = toolkit.createButton(client, "Scan", SWT.PUSH);
 		scan.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -177,18 +181,17 @@ public class LinkSamplesEntryForm extends BiobankEntryForm {
 			public void run() {
 				try {
 					ScanCell[][] cells = ScanCell.getRandomScan();
-					for (int i = 0; i < cells.length; i++) {
+					for (int i = 0; i < cells.length; i++) { // rows
 						int samplesNumber = 0;
-						for (int j = 0; j < cells[i].length; j++) {
+						for (int j = 0; j < cells[i].length; j++) { // columns
 							if (cells[i][j] != null) {
 								samplesNumber++;
 								Sample sample = new Sample();
-								sample.setInventoryId(cells[i][j].getValue()); // UNIQUE ???
-								List<Sample> samples = appService.search(
-										Sample.class, sample);
-								if (samples.size() == 0) {
+								sample.setInventoryId(cells[i][j].getValue());
+								List<Sample> samples = appService.search(Sample.class, sample);
+								if (samples.size() == 0) { // new sample
 									cells[i][j].setStatus(CellStatus.NEW);
-								} else if (samples.size() == 1) {
+								} else if (samples.size() == 1) { // sample in DB
 									if (samples.get(0).getPatientVisit()
 											.equals(patientVisit)) {
 										cells[i][j]
@@ -205,6 +208,7 @@ public class LinkSamplesEntryForm extends BiobankEntryForm {
 								String.valueOf(samplesNumber));
 					}
 					spw.setScannedElements(cells);
+					typesSelectionSection.setEnabled(true);
 				} catch (RemoteConnectFailureException exp) {
 					BioBankPlugin.openRemoteConnectErrorMessage();
 				} catch (ApplicationException ae) {
