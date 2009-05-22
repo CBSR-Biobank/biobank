@@ -9,10 +9,7 @@ import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.IElementComparer;
-import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.LabelProvider;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
@@ -42,6 +39,9 @@ import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.PatientVisitAdapter;
 import edu.ualberta.med.biobank.widgets.ScanPaletteWidget;
 import gov.nih.nci.system.applicationservice.ApplicationException;
+import gov.nih.nci.system.query.SDKQuery;
+import gov.nih.nci.system.query.SDKQueryResult;
+import gov.nih.nci.system.query.example.InsertExampleQuery;
 
 public class LinkSamplesEntryForm extends BiobankEntryForm {
 
@@ -63,6 +63,8 @@ public class LinkSamplesEntryForm extends BiobankEntryForm {
 
 	private List<ComboViewer> sampleTypeCombos;
 	private List<Label> sampleNumberTexts;
+	
+	private ScanCell[][] cells;
 
 	@Override
 	public void init(IEditorSite editorSite, IEditorInput input)
@@ -98,8 +100,27 @@ public class LinkSamplesEntryForm extends BiobankEntryForm {
 
 	@Override
 	protected void saveForm() throws Exception {
-		// TODO Auto-generated method stub
+		SDKQuery query;
+		SDKQueryResult result;
 		System.out.println("save samples to patient visit !");
+		for (int indexRow = 0; indexRow < cells.length; indexRow++) {
+			ComboViewer cv = sampleTypeCombos.get(indexRow);			
+			SampleType type = (SampleType)((StructuredSelection)cv.getSelection()).getFirstElement();
+			// TODO prendre en compte le cas ou il n'y a pas de selection d'effectue
+			for (int indexColumn = 0; indexColumn < cells[indexRow].length; indexColumn++) {			
+				// Fait comme si l'echantillon n'existait pas de sur dans un premier temps
+				Sample sample = new Sample();
+				ScanCell cell = cells[indexRow][indexColumn];
+				if (cell != null) {
+					sample.setInventoryId(cells[indexRow][indexColumn].getValue());
+					sample.setPatientVisit(patientVisit);
+					sample.setSampleType(type);
+					query = new InsertExampleQuery(sample);
+					appService.executeQuery(query);
+					// TODO : tout faire dans une seule transaction ou non ?
+				}
+			}
+		}
 	}
 
 	@Override
@@ -177,10 +198,11 @@ public class LinkSamplesEntryForm extends BiobankEntryForm {
 	}
 
 	private void scan() {
+		// TODO prendre en compte le re-scan pour savoir si change ou non les combos
 		BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
 			public void run() {
 				try {
-					ScanCell[][] cells = ScanCell.getRandomScan();
+					cells = ScanCell.getRandomScan();
 					for (int i = 0; i < cells.length; i++) { // rows
 						int samplesNumber = 0;
 						for (int j = 0; j < cells[i].length; j++) { // columns
@@ -196,7 +218,7 @@ public class LinkSamplesEntryForm extends BiobankEntryForm {
 											.equals(patientVisit)) {
 										cells[i][j]
 												.setStatus(CellStatus.FILLED);
-									} else {
+									} else { // sample part of another patient visit !
 										cells[i][j].setStatus(CellStatus.ERROR);
 									}
 								} else {
@@ -243,19 +265,19 @@ public class LinkSamplesEntryForm extends BiobankEntryForm {
 				return ((SampleType) element).getName();
 			}
 		});
-		vwr.addSelectionChangedListener(new ISelectionChangedListener() {
-			@Override
-			public void selectionChanged(SelectionChangedEvent event) {
-				ISelection selection = event.getSelection();
-				if (selection instanceof StructuredSelection
-						&& ((StructuredSelection) selection).size() == 1) {
-					setDirty(true);
-					System.out
-							.println(((SampleType) ((StructuredSelection) selection)
-									.getFirstElement()).getName());
-				}
-			}
-		});
+//		vwr.addSelectionChangedListener(new ISelectionChangedListener() {
+//			@Override
+//			public void selectionChanged(SelectionChangedEvent event) {
+//				ISelection selection = event.getSelection();
+//				if (selection instanceof StructuredSelection
+//						&& ((StructuredSelection) selection).size() == 1) {
+//					setDirty(true);
+//					System.out
+//							.println(((SampleType) ((StructuredSelection) selection)
+//									.getFirstElement()).getName());
+//				}
+//			}
+//		});
 		vwr.setComparer(new IElementComparer() {
 			@Override
 			public boolean equals(Object a, Object b) {
