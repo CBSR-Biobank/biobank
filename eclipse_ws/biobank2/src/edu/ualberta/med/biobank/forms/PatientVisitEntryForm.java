@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 
 import org.apache.commons.collections.MapIterator;
 import org.apache.commons.collections.map.ListOrderedMap;
@@ -12,6 +13,7 @@ import org.eclipse.core.databinding.beans.PojoObservables;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.dialogs.IMessageProvider;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -21,16 +23,19 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
 
 import com.gface.date.DatePickerCombo;
 import com.gface.date.DatePickerStyle;
 
 import edu.ualberta.med.biobank.forms.input.FormInput;
+import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.PatientVisitData;
 import edu.ualberta.med.biobank.model.Sdata;
@@ -40,10 +45,13 @@ import edu.ualberta.med.biobank.treeview.PatientAdapter;
 import edu.ualberta.med.biobank.treeview.PatientVisitAdapter;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
+import gov.nih.nci.system.applicationservice.ApplicationException;
+import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.SDKQuery;
 import gov.nih.nci.system.query.SDKQueryResult;
 import gov.nih.nci.system.query.example.InsertExampleQuery;
 import gov.nih.nci.system.query.example.UpdateExampleQuery;
+import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class PatientVisitEntryForm extends BiobankEntryForm {
     public static final String ID =
@@ -290,7 +298,12 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
     }
 
     @Override
-    protected void saveForm() throws Exception {
+    protected void saveForm() throws Exception {     
+    	if ((patientVisit.getId() == null) && !checkVisitNumberUnique()) {
+    		setDirty(true);
+    		return;
+    	}
+    	
         SDKQuery query;
         SDKQueryResult result;
 
@@ -391,5 +404,34 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         if (newCollection) {
             patientVisit.setPatientVisitDataCollection(pvDataCollection);
         }
+    }
+    
+    private boolean checkVisitNumberUnique() throws ApplicationException {
+        WritableApplicationService appService = patientVisitAdapter.getAppService();
+        Patient patient = ((PatientAdapter) 
+        		patientVisitAdapter.getParent()).getPatient();
+        
+        HQLCriteria c = new HQLCriteria(
+            "from edu.ualberta.med.biobank.model.PatientVisit as v "
+            + "inner join fetch v.patient "
+            + "where v.patient.id='" + patient.getId() + "' "
+            + "and v.number = '" + patientVisit.getNumber() + "'");
+
+        List<Object> results = appService.query(c);
+        
+        if (results.size() > 0) {
+            Display.getDefault().asyncExec(new Runnable() {
+                public void run() {
+                    MessageDialog.openError(
+                        PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), 
+                        "Patient Visit Number Problem", 
+                        "A patient visit with number \"" 
+                        + patientVisit.getNumber() + "\" already exists.");
+                }
+            });
+            return false;
+        }
+        
+        return true;
     }
 }

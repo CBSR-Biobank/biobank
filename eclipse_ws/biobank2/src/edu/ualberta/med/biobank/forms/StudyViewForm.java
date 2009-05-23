@@ -105,7 +105,8 @@ public class StudyViewForm extends BiobankViewForm {
 		Section section = createSection("Patients");  
 
 		String [] headings = new String[] {"Patient Number"};      
-		patientsTable = new BiobankCollectionTable(section, SWT.NONE, headings, getPatientsAdapters());
+		patientsTable = new BiobankCollectionTable(section, SWT.NONE, headings, 
+				getPatientAdapters());
 		section.setClient(patientsTable);
 		patientsTable.adaptToToolkit(toolkit);   
 		toolkit.paintBordersFor(patientsTable);
@@ -114,8 +115,8 @@ public class StudyViewForm extends BiobankViewForm {
 				FormUtils.getBiobankCollectionDoubleClickListener());
 	}
 
-	private PatientAdapter[] getPatientsAdapters() {
-		// hack required here because site.getStudyCollection().toArray(new Study[0])
+	private PatientAdapter[] getPatientAdapters() {
+		// hack required here because xxx.getXxxxCollection().toArray(new Xxx[0])
 		// returns Object[].        
 		int count = 0;
 		Collection<Patient> patients = study.getPatientCollection();
@@ -163,7 +164,7 @@ public class StudyViewForm extends BiobankViewForm {
 		Node clinicGroupNode = 
 			((SiteAdapter) studyAdapter.getParent().getParent()).getClinicGroupNode();
 		clinicsTable.getTableViewer().setInput(FormUtils.getClinicsAdapters(clinicGroupNode, study.getClinicCollection()));
-		patientsTable.getTableViewer().setInput(getPatientsAdapters());	
+		patientsTable.getTableViewer().setInput(getPatientAdapters());	
 		sDatasTable.getTableViewer().setInput(getSDatas());
 	}
 
