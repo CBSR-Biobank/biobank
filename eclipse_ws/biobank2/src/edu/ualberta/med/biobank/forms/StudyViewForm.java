@@ -18,7 +18,6 @@ import org.springframework.util.Assert;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.Sdata;
-import edu.ualberta.med.biobank.model.StorageContainer;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.PatientAdapter;
@@ -41,7 +40,6 @@ public class StudyViewForm extends BiobankViewForm {
 
 	private BiobankCollectionTable clinicsTable;
 	private BiobankCollectionTable patientsTable;
-	private BiobankCollectionTable sContainersTable;
 	private BiobankCollectionTable sDatasTable;
 
 	@Override
@@ -94,7 +92,6 @@ public class StudyViewForm extends BiobankViewForm {
 				study.getClinicCollection());
 
 		createPatientsSection();
-		createStorageContainerSection();
 		createDataCollectedSection();        
 	}
 
@@ -108,7 +105,8 @@ public class StudyViewForm extends BiobankViewForm {
 		Section section = createSection("Patients");  
 
 		String [] headings = new String[] {"Patient Number"};      
-		patientsTable = new BiobankCollectionTable(section, SWT.NONE, headings, getPatientsAdapters());
+		patientsTable = new BiobankCollectionTable(section, SWT.NONE, headings, 
+				getPatientAdapters());
 		section.setClient(patientsTable);
 		patientsTable.adaptToToolkit(toolkit);   
 		toolkit.paintBordersFor(patientsTable);
@@ -117,41 +115,14 @@ public class StudyViewForm extends BiobankViewForm {
 				FormUtils.getBiobankCollectionDoubleClickListener());
 	}
 
-	private PatientAdapter[] getPatientsAdapters() {
-		// hack required here because site.getStudyCollection().toArray(new Study[0])
+	private PatientAdapter[] getPatientAdapters() {
+		// hack required here because xxx.getXxxxCollection().toArray(new Xxx[0])
 		// returns Object[].        
 		int count = 0;
 		Collection<Patient> patients = study.getPatientCollection();
 		PatientAdapter [] arr = new PatientAdapter [patients.size()];
 		for (Patient patient : patients) {
 			arr[count] = new PatientAdapter(studyAdapter, patient);
-			++count;
-		}
-		return arr;
-	}
-
-	private void createStorageContainerSection() {        
-		Section section = createSection("Storage Containers");  
-
-		String [] headings = new String[] {"Name", "Status", "Bar Code", "Full", "Temperature"};      
-		sContainersTable = new BiobankCollectionTable(section, SWT.NONE, headings, getStorageContainers());
-		section.setClient(sContainersTable);
-		sContainersTable.adaptToToolkit(toolkit);   
-		toolkit.paintBordersFor(sContainersTable);
-
-		sContainersTable.getTableViewer().addDoubleClickListener(
-				FormUtils.getBiobankCollectionDoubleClickListener());
-	}
-
-	private StorageContainer[] getStorageContainers() {
-		// hack required here because site.getStudyCollection().toArray(new Study[0])
-		// returns Object[].        
-		int count = 0;
-		Collection<StorageContainer> storageContainers = study.getStorageContainerCollection();
-		StorageContainer [] arr = new StorageContainer [storageContainers.size()];
-		Iterator<StorageContainer> it = storageContainers.iterator();
-		while (it.hasNext()) {
-			arr[count] = it.next();
 			++count;
 		}
 		return arr;
@@ -193,8 +164,7 @@ public class StudyViewForm extends BiobankViewForm {
 		Node clinicGroupNode = 
 			((SiteAdapter) studyAdapter.getParent().getParent()).getClinicGroupNode();
 		clinicsTable.getTableViewer().setInput(FormUtils.getClinicsAdapters(clinicGroupNode, study.getClinicCollection()));
-		patientsTable.getTableViewer().setInput(getPatientsAdapters());	
-		sContainersTable.getTableViewer().setInput(getStorageContainers());
+		patientsTable.getTableViewer().setInput(getPatientAdapters());	
 		sDatasTable.getTableViewer().setInput(getSDatas());
 	}
 

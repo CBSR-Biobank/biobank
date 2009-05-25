@@ -27,7 +27,6 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
-import org.springframework.remoting.RemoteAccessException;
 import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.forms.input.FormInput;
@@ -247,59 +246,44 @@ public class StudyEntryForm extends BiobankEntryForm {
     }
     
     @Override
-	protected void saveForm() {        
-        try {
-            if ((study.getId() == null) && !checkStudyNameUnique()) {
-                setDirty(true);
-                return;
-            }
+    protected void saveForm() throws Exception {        
+    	if ((study.getId() == null) && !checkStudyNameUnique()) {
+    		setDirty(true);
+    		return;
+    	}
 
-            // get the selected clinics from widget
-            List<Integer> selClinicIds = clinicsMultiSelect.getSelected();
-            Set<Clinic> selClinics = new HashSet<Clinic>();
-            for (Clinic clinic : allClinics) {
-                int id = clinic.getId();
-                if (selClinicIds.indexOf(id) >= 0) {
-                    selClinics.add(clinic);
-                }
+    	// get the selected clinics from widget
+    	List<Integer> selClinicIds = clinicsMultiSelect.getSelected();
+    	Set<Clinic> selClinics = new HashSet<Clinic>();
+    	for (Clinic clinic : allClinics) {
+    		int id = clinic.getId();
+    		if (selClinicIds.indexOf(id) >= 0) {
+    			selClinics.add(clinic);
+    		}
 
-            }
-            Assert.isTrue(selClinics.size() == selClinicIds.size(), 
-            "problem with clinic selections");
-            study.setClinicCollection(selClinics);
+    	}
+    	Assert.isTrue(selClinics.size() == selClinicIds.size(), 
+    			"problem with clinic selections");
+    	study.setClinicCollection(selClinics);
 
-            List<Sdata> sdataList = new ArrayList<Sdata>();
-            for (SdataType sdataType : allSdataTypes) {
-                String type = sdataType.getType();
-                String value =  sdataWidgets.get(type).getResult();
-                if ((value.length() == 0) || value.equals("no")) continue;
-                Sdata sdata = new Sdata();
-                sdata.setSdataType(sdataType);
-                if (value.equals("yes")) {
-                    value = "";
-                }
-                sdata.setValue(value);
-                sdataList.add(sdata);
-            }
-            study.setSdataCollection(sdataList);
+    	List<Sdata> sdataList = new ArrayList<Sdata>();
+    	for (SdataType sdataType : allSdataTypes) {
+    		String type = sdataType.getType();
+    		String value =  sdataWidgets.get(type).getResult();
+    		if ((value.length() == 0) || value.equals("no")) continue;
+    		Sdata sdata = new Sdata();
+    		sdata.setSdataType(sdataType);
+    		if (value.equals("yes")) {
+    			value = "";
+    		}
+    		sdata.setValue(value);
+    		sdataList.add(sdata);
+    	}
+    	study.setSdataCollection(sdataList);
 
-            saveStudy(study);        
-            studyAdapter.getParent().performExpand();    	
-            getSite().getPage().closeEditor(this, false);    
-        }
-        catch (final RemoteAccessException exp) {
-            Display.getDefault().asyncExec(new Runnable() {
-                public void run() {
-                    MessageDialog.openError(
-                            PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), 
-                            "Connection Attempt Failed", 
-                            "Could not perform database operation. Make sure server is running correct version.");
-                }
-            });
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-        }	
+    	saveStudy(study);        
+    	studyAdapter.getParent().performExpand();    	
+    	getSite().getPage().closeEditor(this, false);    
     }
     
     private void saveStudy(Study study) throws ApplicationException {

@@ -16,13 +16,13 @@ import org.eclipse.swt.widgets.Tree;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.forms.StorageContainerEntryForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
+import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.StorageContainer;
-import edu.ualberta.med.biobank.model.Study;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class StorageContainerGroup extends Node {
 
-    public StorageContainerGroup(StudyAdapter parent, int id) {
+    public StorageContainerGroup(SiteAdapter parent, int id) {
         super(parent, id, "Storage Containers", true);
     }
 
@@ -33,15 +33,15 @@ public class StorageContainerGroup extends Node {
 
     @Override
 	public void performExpand() {   
-        final Study parentStudy = ((StudyAdapter) getParent()).getStudy();
+        final Site parentSite = ((SiteAdapter) getParent()).getSite();
         Display.getDefault().asyncExec(new Runnable() {
             public void run() {                
                 // read from database again                 
                 WritableApplicationService appService = getAppService();
                 try {
-                    Study searchStudy = new Study();
-                    searchStudy.setId(parentStudy.getId());
-                    List<Study> result = appService.search(Study.class, searchStudy);
+                    Site searchStudy = new Site();
+                    searchStudy.setId(parentSite.getId());
+                    List<Site> result = appService.search(Site.class, searchStudy);
                     Assert.isTrue(result.size() == 1);
                     searchStudy = result.get(0);
 

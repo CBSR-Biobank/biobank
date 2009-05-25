@@ -6,6 +6,7 @@ import org.eclipse.swt.graphics.Image;
 import org.springframework.util.Assert;
 
 import edu.ualberta.med.biobank.model.Patient;
+import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.Sdata;
 import edu.ualberta.med.biobank.model.StorageContainer;
 import edu.ualberta.med.biobank.model.StorageType;
@@ -13,6 +14,7 @@ import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.ClinicAdapter;
 import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.PatientAdapter;
+import edu.ualberta.med.biobank.treeview.PatientVisitAdapter;
 import edu.ualberta.med.biobank.treeview.StorageTypeAdapter;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
 
@@ -48,6 +50,14 @@ public class BiobankLabelProvider extends LabelProvider implements ITableLabelPr
             final Patient patient = ((PatientAdapter) element).getPatient();
             switch (columnIndex) {
                 case 0: return patient.getNumber();
+            }
+        }
+        else if (element instanceof PatientVisitAdapter) {
+            final PatientVisit visit = 
+            	((PatientVisitAdapter) element).getPatientVisit();
+            switch (columnIndex) {
+                case 0: return visit.getNumber();
+                case 1: return "" + visit.getSampleCollection().size();
             }
         }
         else if (element instanceof StorageTypeAdapter) {

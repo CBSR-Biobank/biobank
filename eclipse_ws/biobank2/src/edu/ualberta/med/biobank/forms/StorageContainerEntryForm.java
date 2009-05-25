@@ -38,11 +38,10 @@ import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.StorageContainer;
 import edu.ualberta.med.biobank.model.StorageType;
-import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.Node;
+import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.treeview.StorageContainerAdapter;
 import edu.ualberta.med.biobank.treeview.StorageContainerGroup;
-import edu.ualberta.med.biobank.treeview.StudyAdapter;
 import edu.ualberta.med.biobank.validators.DoubleNumber;
 import edu.ualberta.med.biobank.validators.IntegerNumber;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
@@ -79,8 +78,6 @@ public class StorageContainerEntryForm extends BiobankEntryForm {
     private StorageContainer storageContainer;
     
     private ContainerPosition position;
-
-    private Study study;
     
     private Site site;
     
@@ -118,8 +115,7 @@ public class StorageContainerEntryForm extends BiobankEntryForm {
 
     @Override
     protected void createFormContent() {
-        study = ((StudyAdapter) storageContainerAdapter.getParent().getParent()).getStudy();
-        site = study.getSite();
+        site = ((SiteAdapter) storageContainerAdapter.getParent().getParent()).getSite();
         currentStorageType = storageContainer.getStorageType();
         
         form.setText("Storage Container");
@@ -396,7 +392,7 @@ public class StorageContainerEntryForm extends BiobankEntryForm {
         storageContainer.setStorageType(storageType);
         savePosition();
         saveCapacity(storageType.getCapacity());
-        storageContainer.setStudy(study);
+        storageContainer.setSite(site);
 
         if (storageContainer.getId() == null) {
             query = new InsertExampleQuery(storageContainer);
@@ -454,7 +450,7 @@ public class StorageContainerEntryForm extends BiobankEntryForm {
         HQLCriteria c = new HQLCriteria(
             "from edu.ualberta.med.biobank.model.StorageContainer as sc "
             + "inner join fetch sc.study "
-            + "where sc.study.id='" + study.getId() + "' "
+            + "where sc.site.id='" + site.getId() + "' "
             + "and (sc.name = '" + storageContainer.getName() + "' "
             + "or sc.barcode = '" + storageContainer.getBarcode() + "')");
 
