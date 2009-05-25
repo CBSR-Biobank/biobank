@@ -9,6 +9,7 @@ import edu.ualberta.med.biobank.model.StorageContainer;
 import edu.ualberta.med.biobank.model.StorageType;
 import edu.ualberta.med.biobank.treeview.ClinicAdapter;
 import edu.ualberta.med.biobank.treeview.PatientAdapter;
+import edu.ualberta.med.biobank.treeview.PatientVisitAdapter;
 import edu.ualberta.med.biobank.treeview.StorageTypeAdapter;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
 
@@ -25,6 +26,9 @@ public class BiobankContentProvider implements IStructuredContentProvider {
         }
         else if (inputElement instanceof PatientAdapter[]) {
             return (PatientAdapter[])inputElement;
+        }
+        else if (inputElement instanceof PatientVisitAdapter[]) {
+            return (PatientVisitAdapter[])inputElement;
         }
         else if (inputElement instanceof StorageTypeAdapter[]) {
             return (StorageTypeAdapter[])inputElement;
