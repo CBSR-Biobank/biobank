@@ -162,8 +162,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
 		label = toolkit.createLabel(composite, fieldLabel + ":", SWT.LEFT);
 		label.setLayoutData(new GridData(GridData.VERTICAL_ALIGN_BEGINNING));
 		return createBoundWidget(composite, widgetClass, widgetOptions, label,
-				widgetValues, modelObservableValue, validatorClass,
-				validatorErrMsg);
+			widgetValues, modelObservableValue, validatorClass, validatorErrMsg);
 
 	}
 
@@ -186,7 +185,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
 			}
 
 			dbc.bindValue(SWTObservables.observeText(text, SWT.Modify),
-					modelObservableValue, uvs, null);
+				modelObservableValue, uvs, null);
 			return text;
 		} else if (widgetClass == Combo.class) {
 			Combo combo = new Combo(composite, SWT.READ_ONLY);
@@ -196,7 +195,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
 			toolkit.adapt(combo, true, true);
 
 			dbc.bindValue(SWTObservables.observeSelection(combo),
-					modelObservableValue, null, null);
+				modelObservableValue, null, null);
 
 			combo.addSelectionListener(new SelectionAdapter() {
 				@Override
@@ -220,11 +219,11 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
 
 		if (validatorClass != null) {
 			validator = createValidator(validatorClass, FormUtils
-					.createDecorator(label, validatorErrMsg), validatorErrMsg);
+				.createDecorator(label, validatorErrMsg), validatorErrMsg);
 		}
 
 		return createBoundWidget(composite, widgetClass, widgetOptions, label,
-				widgetValues, modelObservableValue, validator);
+			widgetValues, modelObservableValue, validator);
 	}
 
 	protected IValidator createValidator(Class<?> validatorClass,
@@ -258,9 +257,9 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
 			fi = (FieldInfo) it.getValue();
 
 			Control control = createBoundWidgetWithLabel(client,
-					fi.widgetClass, fi.widgetOptions, fi.label,
-					fi.widgetValues, PojoObservables.observeValue(pojo, key),
-					fi.validatorClass, fi.errMsg);
+				fi.widgetClass, fi.widgetOptions, fi.label, fi.widgetValues,
+				PojoObservables.observeValue(pojo, key), fi.validatorClass,
+				fi.errMsg);
 			controls.put(key, control);
 		}
 	}
@@ -283,12 +282,13 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
 		statusObservable.addChangeListener(new IChangeListener() {
 			public void handleChange(ChangeEvent event) {
 				IObservableValue validationStatus = (IObservableValue) event
-						.getSource();
+					.getSource();
 				handleStatusChanged((IStatus) validationStatus.getValue());
 			}
 		});
 
-		dbc.bindValue(statusObservable, new AggregateValidationStatus(dbc
+		dbc
+			.bindValue(statusObservable, new AggregateValidationStatus(dbc
 				.getBindings(), AggregateValidationStatus.MAX_SEVERITY), null,
 				null);
 	}

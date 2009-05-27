@@ -3,15 +3,17 @@ package edu.ualberta.med.biobank.forms;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.databinding.UpdateValueStrategy;
+import org.eclipse.core.databinding.observable.value.IObservableValue;
+import org.eclipse.core.databinding.observable.value.WritableValue;
+import org.eclipse.core.databinding.validation.IValidator;
+import org.eclipse.core.databinding.validation.ValidationStatus;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.IMessageProvider;
-import org.eclipse.jface.viewers.ArrayContentProvider;
-import org.eclipse.jface.viewers.ComboViewer;
-import org.eclipse.jface.viewers.IElementComparer;
-import org.eclipse.jface.viewers.LabelProvider;
-import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.jface.viewers.ViewerComparator;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -19,10 +21,8 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
@@ -37,34 +37,33 @@ import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.model.ScanCell;
 import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.PatientVisitAdapter;
+import edu.ualberta.med.biobank.widgets.LinkSampleTypeWidget;
 import edu.ualberta.med.biobank.widgets.ScanPaletteWidget;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.query.SDKQuery;
-import gov.nih.nci.system.query.SDKQueryResult;
 import gov.nih.nci.system.query.example.InsertExampleQuery;
 
 public class LinkSamplesEntryForm extends BiobankEntryForm {
 
 	public static final String ID = "edu.ualberta.med.biobank.forms.LinkSamplesEntryForm";
 
-	private static final String MSG_SAMPLES_OK = "Editing samples.";
-
 	private Button submit;
-	
+
 	private Button scan;
 
 	private PatientVisitAdapter pvAdapter;
 
 	private PatientVisit patientVisit;
-	
+
 	private Composite typesSelectionSection;
 
 	private ScanPaletteWidget spw;
 
-	private List<ComboViewer> sampleTypeCombos;
-	private List<Label> sampleNumberTexts;
-	
+	private List<LinkSampleTypeWidget> sampleTypeWidgets;
+
 	private ScanCell[][] cells;
+
+	private IObservableValue scannedValue = new WritableValue(Boolean.FALSE,
+		Boolean.class);
 
 	@Override
 	public void init(IEditorSite editorSite, IEditorInput input)
@@ -74,19 +73,22 @@ public class LinkSamplesEntryForm extends BiobankEntryForm {
 		Node node = ((FormInput) input).getNode();
 		Assert.isNotNull(node, "Null editor input");
 
-		Assert.isTrue((node instanceof PatientVisitAdapter),
+		Assert
+			.isTrue((node instanceof PatientVisitAdapter),
 				"Invalid editor input: object of type "
 						+ node.getClass().getName());
 
 		pvAdapter = (PatientVisitAdapter) node;
 		patientVisit = pvAdapter.getPatientVisit();
 		appService = pvAdapter.getAppService();
+
+		setPartName("Link samples for " + patientVisit.getPatient().getNumber());
 	}
 
 	@Override
 	protected void handleStatusChanged(IStatus status) {
 		if (status.getSeverity() == IStatus.OK) {
-			form.setMessage(getOkMessage(), IMessageProvider.NONE);
+			form.setMessage("Linking samples.", IMessageProvider.NONE);
 			submit.setEnabled(true);
 		} else {
 			form.setMessage(status.getMessage(), IMessageProvider.ERROR);
@@ -94,45 +96,47 @@ public class LinkSamplesEntryForm extends BiobankEntryForm {
 		}
 	}
 
-	private String getOkMessage() {
-		return MSG_SAMPLES_OK;
-	}
-
-	@Override
-	protected void saveForm() throws Exception {
-		SDKQuery query;
-		SDKQueryResult result;
-		System.out.println("save samples to patient visit !");
-		for (int indexRow = 0; indexRow < cells.length; indexRow++) {
-			ComboViewer cv = sampleTypeCombos.get(indexRow);			
-			SampleType type = (SampleType)((StructuredSelection)cv.getSelection()).getFirstElement();
-			// TODO prendre en compte le cas ou il n'y a pas de selection d'effectue
-			for (int indexColumn = 0; indexColumn < cells[indexRow].length; indexColumn++) {			
-				// Fait comme si l'echantillon n'existait pas de sur dans un premier temps
-				Sample sample = new Sample();
-				ScanCell cell = cells[indexRow][indexColumn];
-				if (cell != null) {
-					sample.setInventoryId(cells[indexRow][indexColumn].getValue());
-					sample.setPatientVisit(patientVisit);
-					sample.setSampleType(type);
-					query = new InsertExampleQuery(sample);
-					appService.executeQuery(query);
-					// TODO : tout faire dans une seule transaction ou non ?
-				}
-			}
-		}
-	}
-
 	@Override
 	protected void createFormContent() {
-		form.setText("Scan new samples");
+		form.setText("Link samples for patient "
+				+ patientVisit.getPatient().getNumber() + " for visit "
+				+ patientVisit.getNumber());
 
 		GridLayout layout = new GridLayout(1, false);
 		form.getBody().setLayout(layout);
 
-		createPaletteScanSection();
+		createPaletteSection();
 		createTypesSelectionSection();
 		createButtonsSection();
+
+		WritableValue wv = new WritableValue(Boolean.FALSE, Boolean.class);
+		UpdateValueStrategy uvs = new UpdateValueStrategy();
+		uvs.setAfterConvertValidator(new IValidator() {
+			@Override
+			public IStatus validate(Object value) {
+				if (value instanceof Boolean && !(Boolean) value) {
+					return ValidationStatus.error("Scanner should be launched");
+				} else {
+					return Status.OK_STATUS;
+				}
+			}
+
+		});
+		dbc.bindValue(wv, scannedValue, uvs, uvs);
+		scannedValue.setValue(false);
+	}
+
+	private void createPaletteSection() {
+		Composite client = toolkit.createComposite(form.getBody());
+		GridLayout layout = new GridLayout(1, false);
+		client.setLayout(layout);
+		GridData gd = new GridData(SWT.CENTER, SWT.TOP, true, false);
+		gd.heightHint = ScanPaletteWidget.HEIGHT;
+		gd.widthHint = ScanPaletteWidget.WIDTH;
+		client.setLayoutData(gd);
+		spw = new ScanPaletteWidget(client, false);
+
+		toolkit.adapt(spw);
 	}
 
 	private void createTypesSelectionSection() {
@@ -143,32 +147,24 @@ public class LinkSamplesEntryForm extends BiobankEntryForm {
 		toolkit.paintBordersFor(typesSelectionSection);
 
 		List<SampleType> sampleTypes = getAllSampleTypes();
-		sampleTypeCombos = new ArrayList<ComboViewer>();
-		sampleNumberTexts = new ArrayList<Label>();
+		sampleTypeWidgets = new ArrayList<LinkSampleTypeWidget>();
 		char letter = 'A';
 		for (int i = 0; i < ScanCell.ROW_MAX; i++) {
-			toolkit.createLabel(typesSelectionSection, String.valueOf(letter), SWT.LEFT);
-			sampleTypeCombos.add(createSampleTypeCombo(typesSelectionSection, sampleTypes));
-			Label text = toolkit.createLabel(typesSelectionSection, "", SWT.RIGHT|SWT.BORDER);
-			GridData data = new GridData();
-			data.widthHint = 20;
-			text.setLayoutData(data);
-			sampleNumberTexts.add(text);
+			LinkSampleTypeWidget typeWidget = new LinkSampleTypeWidget(
+				typesSelectionSection, letter, sampleTypes, toolkit);
+			typeWidget
+				.addSelectionChangedListener(new ISelectionChangedListener() {
+					@Override
+					public void selectionChanged(SelectionChangedEvent event) {
+						setDirty(true);
+					}
+
+				});
+			typeWidget.addBinding(dbc);
+			sampleTypeWidgets.add(typeWidget);
 			letter += 1;
 		}
 		typesSelectionSection.setEnabled(false);
-	}
-
-	private void createPaletteScanSection() {
-		Composite client = toolkit.createComposite(form.getBody());
-		GridLayout layout = new GridLayout(1, false);
-		client.setLayout(layout);
-		GridData gd = new GridData(SWT.CENTER, SWT.TOP, true, false);
-		gd.heightHint = ScanPaletteWidget.HEIGHT;
-		gd.widthHint = ScanPaletteWidget.WIDTH;
-		client.setLayoutData(gd);
-		spw = new ScanPaletteWidget(client);
-		toolkit.adapt(spw);
 	}
 
 	private void createButtonsSection() {
@@ -194,47 +190,35 @@ public class LinkSamplesEntryForm extends BiobankEntryForm {
 				doSaveInternal();
 			}
 		});
-
 	}
 
 	private void scan() {
-		// TODO prendre en compte le re-scan pour savoir si change ou non les combos
 		BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
 			public void run() {
 				try {
+					submit.setEnabled(true);
+					// TODO launch scanner instead of random function
 					cells = ScanCell.getRandomScan();
+
 					for (int i = 0; i < cells.length; i++) { // rows
 						int samplesNumber = 0;
+						sampleTypeWidgets.get(i).initSelection();
 						for (int j = 0; j < cells[i].length; j++) { // columns
 							if (cells[i][j] != null) {
 								samplesNumber++;
-								Sample sample = new Sample();
-								sample.setInventoryId(cells[i][j].getValue());
-								List<Sample> samples = appService.search(Sample.class, sample);
-								if (samples.size() == 0) { // new sample
-									cells[i][j].setStatus(CellStatus.NEW);
-								} else if (samples.size() == 1) { // sample in DB
-									if (samples.get(0).getPatientVisit()
-											.equals(patientVisit)) {
-										cells[i][j]
-												.setStatus(CellStatus.FILLED);
-									} else { // sample part of another patient visit !
-										cells[i][j].setStatus(CellStatus.ERROR);
-									}
-								} else {
-									cells[i][j].setStatus(CellStatus.ERROR);
-								}
+								cells[i][j].setStatus(CellStatus.FILLED);
 							}
 						}
-						sampleNumberTexts.get(i).setText(
-								String.valueOf(samplesNumber));
+						sampleTypeWidgets.get(i).setNumber(samplesNumber);
 					}
+					// Show result in grid
 					spw.setScannedElements(cells);
 					typesSelectionSection.setEnabled(true);
+					scannedValue.setValue(true);
 				} catch (RemoteConnectFailureException exp) {
 					BioBankPlugin.openRemoteConnectErrorMessage();
-				} catch (ApplicationException ae) {
-					ae.printStackTrace();
+				} catch (Exception e) {
+					e.printStackTrace();
 				}
 			}
 		});
@@ -251,52 +235,31 @@ public class LinkSamplesEntryForm extends BiobankEntryForm {
 		return null;
 	}
 
-	protected ComboViewer createSampleTypeCombo(Composite parent,
-			List<SampleType> list) {
-		Combo combo = new Combo(parent, SWT.DROP_DOWN | SWT.READ_ONLY);
-		combo.setLayoutData(new GridData(SWT.LEFT, SWT.TOP, true, false));
-		toolkit.adapt(combo, true, true);
-
-		ComboViewer vwr = new ComboViewer(combo);
-		vwr.setContentProvider(new ArrayContentProvider());
-		vwr.setLabelProvider(new LabelProvider() {
-			@Override
-			public String getText(Object element) {
-				return ((SampleType) element).getName();
-			}
-		});
-//		vwr.addSelectionChangedListener(new ISelectionChangedListener() {
-//			@Override
-//			public void selectionChanged(SelectionChangedEvent event) {
-//				ISelection selection = event.getSelection();
-//				if (selection instanceof StructuredSelection
-//						&& ((StructuredSelection) selection).size() == 1) {
-//					setDirty(true);
-//					System.out
-//							.println(((SampleType) ((StructuredSelection) selection)
-//									.getFirstElement()).getName());
-//				}
-//			}
-//		});
-		vwr.setComparer(new IElementComparer() {
-			@Override
-			public boolean equals(Object a, Object b) {
-				if (a instanceof SampleType && b instanceof SampleType) {
-					return ((SampleType) a).getId().equals(
-							((SampleType) b).getId());
+	@Override
+	protected void saveForm() throws Exception {
+		List<SDKQuery> queries = new ArrayList<SDKQuery>();
+		for (int indexRow = 0; indexRow < cells.length; indexRow++) {
+			LinkSampleTypeWidget typeWidget = sampleTypeWidgets.get(indexRow);
+			if (typeWidget.needToSave()) {
+				SampleType type = typeWidget.getSelection();
+				for (int indexColumn = 0; indexColumn < cells[indexRow].length; indexColumn++) {
+					ScanCell cell = cells[indexRow][indexColumn];
+					if (cell != null && cell.getStatus().equals(CellStatus.NEW)) {
+						// add new samples
+						Sample sample = new Sample();
+						sample.setInventoryId(cells[indexRow][indexColumn]
+							.getValue());
+						sample.setPatientVisit(patientVisit);
+						sample.setSampleType(type);
+						queries.add(new InsertExampleQuery(sample));
+					}
 				}
-				return false;
 			}
-
-			@Override
-			public int hashCode(Object element) {
-				return element.hashCode();
-			}
-
-		});
-		vwr.setComparator(new ViewerComparator());
-		vwr.setInput(list);
-		return vwr;
+		}
+		// FIXME Should roll back if something wrong in one of them = not sure
+		// it works !!
+		appService.executeBatchQuery(queries);
+		setDirty(false);
 	}
 
 }
