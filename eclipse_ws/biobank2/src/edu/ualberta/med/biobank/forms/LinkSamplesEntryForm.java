@@ -130,11 +130,12 @@ public class LinkSamplesEntryForm extends BiobankEntryForm {
 		Composite client = toolkit.createComposite(form.getBody());
 		GridLayout layout = new GridLayout(1, false);
 		client.setLayout(layout);
-		GridData gd = new GridData(SWT.CENTER, SWT.TOP, true, false);
-		gd.heightHint = ScanPaletteWidget.HEIGHT;
-		gd.widthHint = ScanPaletteWidget.WIDTH;
-		client.setLayoutData(gd);
+
 		spw = new ScanPaletteWidget(client, false);
+		GridData gd = new GridData(SWT.CENTER, SWT.TOP, true, false);
+		gd.heightHint = spw.getHeight();
+		gd.widthHint = spw.getWidth();
+		client.setLayoutData(gd);
 
 		toolkit.adapt(spw);
 	}
@@ -196,9 +197,9 @@ public class LinkSamplesEntryForm extends BiobankEntryForm {
 		BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
 			public void run() {
 				try {
-					submit.setEnabled(true);
+					// submit.setEnabled(true);
 					// TODO launch scanner instead of random function
-					cells = ScanCell.getRandomScan();
+					cells = ScanCell.getRandomScanLink();
 
 					for (int i = 0; i < cells.length; i++) { // rows
 						int samplesNumber = 0;
@@ -260,6 +261,7 @@ public class LinkSamplesEntryForm extends BiobankEntryForm {
 		// it works !!
 		appService.executeBatchQuery(queries);
 		setDirty(false);
+		// FIXME Close and display the PatientVisit with added samples ?
 	}
 
 }

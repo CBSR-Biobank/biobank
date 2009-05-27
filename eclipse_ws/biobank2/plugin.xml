@@ -63,11 +63,6 @@
             id="edu.ualberta.med.biobank.commands.addClinic"
             name="Add Clinic">
       </command>
-      <command
-            defaultHandler="edu.ualberta.med.biobank.handler.ProcessSamplesHandler"
-            id="edu.ualberta.med.biobank.commands.samples.process"
-            name="Process samples">
-      </command>
    </extension>
    <extension
          point="org.eclipse.ui.menus">
@@ -114,17 +109,6 @@
                      style="push">
                </command>
             </menu>
-         </menu>
-         <menu
-               id="edu.ualberta.med.biobank.menu.samples"
-               label="Samples"
-               mnemonic="S">
-            <command
-                  commandId="edu.ualberta.med.biobank.commands.samples.process"
-                  id="edu.ualberta.med.biobank.menu.samples.process"
-                  mnemonic="p"
-                  style="push">
-            </command>
          </menu>
       </menuContribution>
    </extension>
@@ -245,6 +229,12 @@
             default="false"
             id="edu.ualberta.med.biobank.forms.LinkSamplesEntryForm"
             name="Scan Samples Entry">
+      </editor>
+      <editor
+            class="edu.ualberta.med.biobank.forms.ProcessSamplesEntryForm"
+            default="false"
+            id="edu.ualberta.med.biobank.forms.ProcessSamplesEntryForm"
+            name="Process samples">
       </editor>
    </extension>
    <extension

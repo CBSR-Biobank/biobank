@@ -6,28 +6,27 @@ import org.eclipse.swt.events.MouseTrackAdapter;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.GC;
-import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.model.ScanCell;
 
-public class ScanPaletteWidget extends Canvas {
+public class ScanPaletteWidget extends StorageContainerCanvas {
 
 	public static final int SAMPLE_WIDTH = 40;
 
+	/**
+	 * Palettes are always 8*12 = fix size
+	 */
+	public static final int PALETTE_WIDTH = SAMPLE_WIDTH * ScanCell.COL_MAX;
+	public static final int PALETTE_HEIGHT = SAMPLE_WIDTH * ScanCell.ROW_MAX;
+
+	public static final int LEGEND_TOTAL = 5;
 	public static final int LEGEND_HEIGHT = 20;
-	public static final int LEGEND_WIDTH = 70;
+	public static final int LEGEND_WIDTH = PALETTE_WIDTH / LEGEND_TOTAL;
 
-	public static final int GRID_WIDTH = SAMPLE_WIDTH * ScanCell.COL_MAX;
-	public static final int GRID_HEIGHT = SAMPLE_WIDTH * ScanCell.ROW_MAX;
-
-	public static final int WIDTH = GRID_WIDTH + LEGEND_WIDTH + 10;
-	public static final int HEIGHT = GRID_HEIGHT + 15;
-	// public static final int WIDTH = GRID_WIDTH + 10;
-	// public static final int HEIGHT = GRID_HEIGHT + LEGEND_HEIGHT + 15;
+	public static final int PALETTE_HEIGHT_AND_LEGEND = PALETTE_HEIGHT
+			+ LEGEND_HEIGHT + 4;
 
 	private ScanCell[][] scannedElements;
 
@@ -40,7 +39,7 @@ public class ScanPaletteWidget extends Canvas {
 	private static final int ERROR_COLOR = SWT.COLOR_YELLOW;
 
 	public ScanPaletteWidget(Composite parent, boolean showLegend) {
-		super(parent, SWT.DOUBLE_BUFFERED);
+		super(parent);
 		this.showLegend = showLegend;
 		addPaintListener(new PaintListener() {
 			@Override
@@ -63,74 +62,62 @@ public class ScanPaletteWidget extends Canvas {
 				}
 			}
 		});
+		setStorageSize(ScanCell.ROW_MAX, ScanCell.COL_MAX, SAMPLE_WIDTH,
+			SAMPLE_WIDTH);
 	}
 
 	public ScanPaletteWidget(Composite parent) {
 		this(parent, true);
 	}
 
-	private void paintPalette(PaintEvent e) {
-		// setBackground(e.display.getSystemColor(SWT.COLOR_WHITE));
-		// Point parentSize = getParent().getSize();
-		// setSize(parentSize.x, parentSize.y);
-		setSize(WIDTH, HEIGHT);
-		GC gc = e.gc;
-		char letter = 'A';
-		for (int indexRow = 0; indexRow < ScanCell.ROW_MAX; indexRow++) {
-			String currentLetter = String.valueOf(letter);
-			for (int indexCol = 0; indexCol < ScanCell.COL_MAX; indexCol++) {
-				int xPosition = SAMPLE_WIDTH * indexCol;
-				int yPosition = SAMPLE_WIDTH * indexRow;
-				Rectangle rectangle = new Rectangle(xPosition, yPosition,
-					SAMPLE_WIDTH, SAMPLE_WIDTH);
-				if (scannedElements != null
-						&& scannedElements[indexRow][indexCol] != null) {
-					Color color;
-					switch (scannedElements[indexRow][indexCol].getStatus()) {
-					case ERROR:
-						color = e.display.getSystemColor(ERROR_COLOR);
-						break;
-					case FILLED:
-						color = e.display.getSystemColor(FILLED_COLOR);
-						break;
-					case MISSING:
-						color = e.display.getSystemColor(MISSING_COLOR);
-						break;
-					case NEW:
-						color = e.display.getSystemColor(NEW_COLOR);
-						break;
-					default:
-						color = e.display.getSystemColor(EMPTY_COLOR);
-					}
-					gc.setBackground(color);
-					gc.fillRectangle(rectangle);
-				}
-				gc.setForeground(e.display.getSystemColor(SWT.COLOR_BLACK));
-				gc.drawRectangle(rectangle);
-				drawTextOnCenter(gc, currentLetter + (indexCol + 1), rectangle);
-			}
-			letter += 1;
-		}
+	@Override
+	protected void paintPalette(PaintEvent e) {
+		super.paintPalette(e);
 		if (showLegend) {
-			addLegend(e, gc, EMPTY_COLOR, 0, "Empty");
-			addLegend(e, gc, NEW_COLOR, 1, "New");
-			addLegend(e, gc, FILLED_COLOR, 2, "Filled");
-			addLegend(e, gc, MISSING_COLOR, 3, "Missing");
-			addLegend(e, gc, ERROR_COLOR, 4, "Error");
+			drawLegend(e, EMPTY_COLOR, 0, "Empty");
+			drawLegend(e, NEW_COLOR, 1, "New");
+			drawLegend(e, FILLED_COLOR, 2, "Filled");
+			drawLegend(e, MISSING_COLOR, 3, "Missing");
+			drawLegend(e, ERROR_COLOR, 4, "Error");
+			// Should Modify LEGEND_TOTAL if add a new legend
 		}
 	}
 
-	private void addLegend(PaintEvent e, GC gc, int color, int index,
-			String text) {
-		gc.setBackground(e.display.getSystemColor(color));
-		// TODO Choose where legends should be !
-		// Rectangle rectangle = new Rectangle(LEGEND_WIDTH * index, GRID_HEIGHT
-		// + 4, LEGEND_WIDTH, LEGEND_HEIGHT);
-		Rectangle rectangle = new Rectangle(GRID_WIDTH + 4, LEGEND_HEIGHT
-				* index, LEGEND_WIDTH, LEGEND_HEIGHT);
-		gc.fillRectangle(rectangle);
-		gc.drawRectangle(rectangle);
-		drawTextOnCenter(gc, text, rectangle);
+	@Override
+	protected void optionalDrawing(PaintEvent e, int indexRow, int indexCol,
+			Rectangle rectangle) {
+		if (scannedElements != null
+				&& scannedElements[indexRow][indexCol] != null
+				&& scannedElements[indexRow][indexCol].getStatus() != null) {
+			Color color;
+			switch (scannedElements[indexRow][indexCol].getStatus()) {
+			case ERROR:
+				color = e.display.getSystemColor(ERROR_COLOR);
+				break;
+			case FILLED:
+				color = e.display.getSystemColor(FILLED_COLOR);
+				break;
+			case MISSING:
+				color = e.display.getSystemColor(MISSING_COLOR);
+				break;
+			case NEW:
+				color = e.display.getSystemColor(NEW_COLOR);
+				break;
+			default:
+				color = e.display.getSystemColor(EMPTY_COLOR);
+			}
+			e.gc.setBackground(color);
+			e.gc.fillRectangle(rectangle);
+		}
+	}
+
+	private void drawLegend(PaintEvent e, int color, int index, String text) {
+		e.gc.setBackground(e.display.getSystemColor(color));
+		Rectangle rectangle = new Rectangle(LEGEND_WIDTH * index,
+			gridHeight + 4, LEGEND_WIDTH, LEGEND_HEIGHT);
+		e.gc.fillRectangle(rectangle);
+		e.gc.drawRectangle(rectangle);
+		drawTextOnCenter(e.gc, text, rectangle);
 	}
 
 	public void setScannedElements(ScanCell[][] randomScan) {
@@ -138,27 +125,23 @@ public class ScanPaletteWidget extends Canvas {
 		redraw();
 	}
 
-	/**
-	 * Draw the text on the middle of the rectangle
-	 */
-	public void drawTextOnCenter(GC gc, String text, Rectangle rectangle) {
-		Point textSize = gc.textExtent(text);
-		int xTextPosition = (rectangle.width - textSize.x) / 2 + rectangle.x;
-		int yTextPosition = (rectangle.height - textSize.y) / 2 + rectangle.y;
-		gc.drawText(text, xTextPosition, yTextPosition, true);
-	}
-
 	public ScanCell getCellAtCoordinates(int xPosition, int yPosition) {
 		if (scannedElements == null) {
 			return null;
 		}
-		int col = xPosition / SAMPLE_WIDTH;
-		int row = yPosition / SAMPLE_WIDTH;
+		int col = xPosition / cellWidth;
+		int row = yPosition / cellHeight;
 		if (col >= 0 && col < ScanCell.COL_MAX && row >= 0
 				&& row < ScanCell.ROW_MAX) {
 			return scannedElements[row][col];
 		}
 		return null;
+	}
+
+	@Override
+	protected void calculateSizes() {
+		super.calculateSizes();
+		height = height + LEGEND_HEIGHT + 4;
 	}
 
 }

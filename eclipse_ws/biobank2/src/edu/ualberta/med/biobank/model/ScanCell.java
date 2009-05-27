@@ -53,15 +53,36 @@ public class ScanCell {
 		this.value = value;
 	}
 
-	public static ScanCell[][] getRandomScan() {
+	public static ScanCell[][] getRandomScanLink() {
 		ScanCell[][] paletteScanned = new ScanCell[ROW_MAX][COL_MAX];
 		Random random = new Random();
-		// 0050657299 = pls
-		// 0024326625 = 1
-		// 6518493438 = autre visite
 		for (int indexRow = 0; indexRow < ROW_MAX; indexRow++) {
 			if (indexRow % 2 == 0) {
 				for (int indexCol = 0; indexCol < COL_MAX; indexCol++) {
+					StringBuffer digits = new StringBuffer();
+					for (int i = 0; i < 10; i++) {
+						digits.append(random.nextInt(10));
+					}
+					paletteScanned[indexRow][indexCol] = new ScanCell(indexRow,
+						indexCol, digits.toString());
+				}
+			}
+		}
+		return paletteScanned;
+	}
+
+	public static ScanCell[][] getRandomScanProcess() {
+		ScanCell[][] paletteScanned = new ScanCell[ROW_MAX][COL_MAX];
+		Random random = new Random();
+		for (int indexRow = 0; indexRow < ROW_MAX; indexRow++) {
+			for (int indexCol = 0; indexCol < COL_MAX; indexCol++) {
+				if (indexRow == 0 && indexCol == 0) {
+					paletteScanned[indexRow][indexCol] = new ScanCell(indexRow,
+						indexCol, "4852662165"); // sample existant - deja lie
+				} else if (indexRow == 7 && (indexCol > 5)) {
+					paletteScanned[indexRow][indexCol] = new ScanCell(indexRow,
+						indexCol, "");
+				} else {
 					StringBuffer digits = new StringBuffer();
 					for (int i = 0; i < 10; i++) {
 						digits.append(random.nextInt(10));
