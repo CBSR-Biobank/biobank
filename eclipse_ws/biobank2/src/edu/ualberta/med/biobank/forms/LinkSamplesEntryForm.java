@@ -245,7 +245,8 @@ public class LinkSamplesEntryForm extends BiobankEntryForm {
 				SampleType type = typeWidget.getSelection();
 				for (int indexColumn = 0; indexColumn < cells[indexRow].length; indexColumn++) {
 					ScanCell cell = cells[indexRow][indexColumn];
-					if (cell != null && cell.getStatus().equals(CellStatus.NEW)) {
+					if (cell != null
+							&& cell.getStatus().equals(CellStatus.FILLED)) {
 						// add new samples
 						Sample sample = new Sample();
 						sample.setInventoryId(cells[indexRow][indexColumn]
@@ -257,10 +258,11 @@ public class LinkSamplesEntryForm extends BiobankEntryForm {
 				}
 			}
 		}
-		// FIXME Should roll back if something wrong in one of them = not sure
+		// FIXME Should roll back if something wrong in one of them = not
+		// sure
 		// it works !!
 		appService.executeBatchQuery(queries);
-		setDirty(false);
+		getSite().getPage().closeEditor(this, false);
 		// FIXME Close and display the PatientVisit with added samples ?
 	}
 

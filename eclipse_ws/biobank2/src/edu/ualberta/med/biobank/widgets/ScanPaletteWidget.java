@@ -6,12 +6,13 @@ import org.eclipse.swt.events.MouseTrackAdapter;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.model.ScanCell;
 
-public class ScanPaletteWidget extends StorageContainerCanvas {
+public class ScanPaletteWidget extends StorageContainerWidget {
 
 	public static final int SAMPLE_WIDTH = 40;
 
@@ -62,8 +63,9 @@ public class ScanPaletteWidget extends StorageContainerCanvas {
 				}
 			}
 		});
-		setStorageSize(ScanCell.ROW_MAX, ScanCell.COL_MAX, SAMPLE_WIDTH,
-			SAMPLE_WIDTH);
+		cellWidth = SAMPLE_WIDTH;
+		cellHeight = SAMPLE_WIDTH;
+		setStorageSize(ScanCell.ROW_MAX, ScanCell.COL_MAX, false);
 	}
 
 	public ScanPaletteWidget(Composite parent) {
@@ -72,6 +74,8 @@ public class ScanPaletteWidget extends StorageContainerCanvas {
 
 	@Override
 	protected void paintPalette(PaintEvent e) {
+		Font font = new Font(e.display, "Sans", 8, SWT.NORMAL);
+		e.gc.setFont(font);
 		super.paintPalette(e);
 		if (showLegend) {
 			drawLegend(e, EMPTY_COLOR, 0, "Empty");
@@ -81,6 +85,15 @@ public class ScanPaletteWidget extends StorageContainerCanvas {
 			drawLegend(e, ERROR_COLOR, 4, "Error");
 			// Should Modify LEGEND_TOTAL if add a new legend
 		}
+	}
+
+	@Override
+	protected String getTextForBox(int indexRow, int indexCol) {
+		if (scannedElements != null
+				&& scannedElements[indexRow][indexCol] != null) {
+			return scannedElements[indexRow][indexCol].getFilledMessage();
+		}
+		return super.getTextForBox(indexRow, indexCol);
 	}
 
 	@Override
@@ -139,8 +152,8 @@ public class ScanPaletteWidget extends StorageContainerCanvas {
 	}
 
 	@Override
-	protected void calculateSizes() {
-		super.calculateSizes();
+	protected void calculateSizes(boolean recalculateCellSizes) {
+		super.calculateSizes(recalculateCellSizes);
 		height = height + LEGEND_HEIGHT + 4;
 	}
 

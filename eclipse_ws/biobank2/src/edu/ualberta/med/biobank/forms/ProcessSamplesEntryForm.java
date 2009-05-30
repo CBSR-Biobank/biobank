@@ -11,6 +11,7 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.IMessageProvider;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -24,19 +25,24 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
 import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.forms.input.FormInput;
+import edu.ualberta.med.biobank.forms.listener.EnterKeyToNextFieldListener;
 import edu.ualberta.med.biobank.model.CellStatus;
+import edu.ualberta.med.biobank.model.Container;
+import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.Sample;
 import edu.ualberta.med.biobank.model.ScanCell;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.Node;
-import edu.ualberta.med.biobank.treeview.SiteAdapter;
+import edu.ualberta.med.biobank.treeview.SessionAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
+import edu.ualberta.med.biobank.validators.PaletteBarCodeValidator;
 import edu.ualberta.med.biobank.widgets.ScanPaletteWidget;
-import edu.ualberta.med.biobank.widgets.StorageContainerCanvas;
+import edu.ualberta.med.biobank.widgets.StorageContainerWidget;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ProcessSamplesEntryForm extends BiobankEntryForm {
@@ -46,9 +52,11 @@ public class ProcessSamplesEntryForm extends BiobankEntryForm {
 	private Button scan;
 	private Button submit;
 
+	private IObservableValue plateToScan = new WritableValue("", String.class);
 	private IObservableValue palettePosition = new WritableValue("",
 		String.class);
-	private IObservableValue scannedValue = new WritableValue(Boolean.FALSE,
+	private IObservableValue confirmCancel = new WritableValue("", String.class);
+	private IObservableValue scanLaunched = new WritableValue(Boolean.FALSE,
 		Boolean.class);
 	private IObservableValue scanValid = new WritableValue(Boolean.TRUE,
 		Boolean.class);
@@ -56,6 +64,12 @@ public class ProcessSamplesEntryForm extends BiobankEntryForm {
 	private ScanCell[][] cells;
 
 	private Study currentStudy;
+	private Text positionText;
+	private StorageContainerWidget hotel;
+	private StorageContainerWidget freezer;
+	private Text plateToScanText;
+	private Text confirmCancelText;
+	private Button cancel;
 
 	@Override
 	public void init(IEditorSite editorSite, IEditorInput input)
@@ -66,7 +80,7 @@ public class ProcessSamplesEntryForm extends BiobankEntryForm {
 		Assert.isNotNull(node, "Null editor input");
 
 		Assert
-			.isTrue((node instanceof SiteAdapter),
+			.isTrue((node instanceof SessionAdapter),
 				"Invalid editor input: object of type "
 						+ node.getClass().getName());
 
@@ -99,7 +113,7 @@ public class ProcessSamplesEntryForm extends BiobankEntryForm {
 			}
 
 		});
-		dbc.bindValue(wv, scannedValue, uvs, uvs);
+		dbc.bindValue(wv, scanLaunched, uvs, uvs);
 
 		wv = new WritableValue(Boolean.TRUE, Boolean.class);
 		uvs = new UpdateValueStrategy();
@@ -121,29 +135,26 @@ public class ProcessSamplesEntryForm extends BiobankEntryForm {
 		GridLayout layout = new GridLayout(2, false);
 		client.setLayout(layout);
 
-		StorageContainerCanvas freezer = new StorageContainerCanvas(client);
+		freezer = new StorageContainerWidget(client);
 		toolkit.adapt(freezer);
-		int defaultRows = 5;
-		int defaultCols = 10;
-		freezer.setStorageSize(defaultRows, defaultCols,
-			ScanPaletteWidget.PALETTE_WIDTH / defaultCols, 20);
+		freezer.setStorageSize(5, 10, ScanPaletteWidget.PALETTE_WIDTH, 100);
 		GridData gdFreezer = new GridData();
 		gdFreezer.widthHint = freezer.getWidth();
 		gdFreezer.heightHint = freezer.getHeight();
 		freezer.setLayoutData(gdFreezer);
 
-		StorageContainerCanvas hotel = new StorageContainerCanvas(client);
+		hotel = new StorageContainerWidget(client);
 		toolkit.adapt(hotel);
-		defaultRows = 19;
-		defaultCols = 1;
-		hotel.setStorageSize(defaultRows, defaultCols, 100,
-			ScanPaletteWidget.PALETTE_HEIGHT_AND_LEGEND / defaultRows);
+		hotel.setStorageSize(11, 1, 100,
+			ScanPaletteWidget.PALETTE_HEIGHT_AND_LEGEND);
 		GridData gdHotel = new GridData();
 		gdHotel.widthHint = hotel.getWidth();
 		gdHotel.heightHint = hotel.getHeight();
 		gdHotel.verticalSpan = 2;
 		gdHotel.verticalAlignment = SWT.END;
 		hotel.setLayoutData(gdHotel);
+		hotel.setFirstColSign(null);
+		hotel.setFirstRowSign(1);
 
 		palette = new ScanPaletteWidget(client, true);
 		toolkit.adapt(palette);
@@ -158,20 +169,6 @@ public class ProcessSamplesEntryForm extends BiobankEntryForm {
 		client.setLayoutData(gd);
 	}
 
-	// private void createPaletteSection() {
-	// Composite client = toolkit.createComposite(form.getBody());
-	// GridLayout layout = new GridLayout(1, false);
-	// client.setLayout(layout);
-	//
-	// palette = new ScanPaletteWidget(client, false);
-	// GridData gd = new GridData(SWT.CENTER, SWT.TOP, true, false);
-	// gd.heightHint = palette.getHeight();
-	// gd.widthHint = palette.getWidth();
-	// client.setLayoutData(gd);
-	//
-	// toolkit.adapt(palette);
-	// }
-
 	private void createFieldsSection() {
 		Composite client = toolkit.createComposite(form.getBody());
 		GridLayout layout = new GridLayout(2, false);
@@ -182,14 +179,27 @@ public class ProcessSamplesEntryForm extends BiobankEntryForm {
 		client.setLayoutData(gd);
 		toolkit.paintBordersFor(client);
 
-		createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Position",
-			new String[0], palettePosition, NonEmptyString.class,
-			"Enter a position");
+		plateToScanText = (Text) createBoundWidgetWithLabel(client, Text.class,
+			SWT.NONE, "Plate to Scan", new String[0], plateToScan,
+			NonEmptyString.class, "Enter plate to scan");
+		plateToScanText.removeKeyListener(keyListener);
+		plateToScanText.addKeyListener(EnterKeyToNextFieldListener.INSTANCE);
+
+		positionText = (Text) createBoundWidgetWithLabel(client, Text.class,
+			SWT.NONE, "Position", new String[0], palettePosition,
+			PaletteBarCodeValidator.class, "Enter a position (eg 01AA01)");
+		positionText.removeKeyListener(keyListener);
+		positionText.addKeyListener(EnterKeyToNextFieldListener.INSTANCE);
+
+		confirmCancelText = (Text) createBoundWidgetWithLabel(client,
+			Text.class, SWT.NONE, "Submit / Cancel", new String[0],
+			confirmCancel, null, null);
+		confirmCancelText.removeKeyListener(keyListener);
 	}
 
 	private void createButtonsSection() {
 		Composite client = toolkit.createComposite(form.getBody());
-		GridLayout layout = new GridLayout(2, false);
+		GridLayout layout = new GridLayout(3, false);
 		layout.horizontalSpacing = 10;
 		client.setLayout(layout);
 		client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -199,7 +209,20 @@ public class ProcessSamplesEntryForm extends BiobankEntryForm {
 		scan.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				scan();
+				try {
+					scan();
+				} catch (Exception ex) {
+					// TODO Auto-generated catch block
+					ex.printStackTrace();
+				}
+			}
+		});
+
+		cancel = toolkit.createButton(client, "Cancel", SWT.PUSH);
+		cancel.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				cancel();
 			}
 		});
 
@@ -212,7 +235,39 @@ public class ProcessSamplesEntryForm extends BiobankEntryForm {
 		});
 	}
 
-	protected void scan() {
+	protected void scan() throws ApplicationException {
+		Container container = new Container();
+		container.setBarcode((String) palettePosition.getValue());
+		List<Container> containers = appService.search(Container.class,
+			container);
+		if (containers.size() == 0) {
+			// container n'existe pas encore - comment c'est ce que doit ajouter
+			// ?
+			// doit etre deja la ou creation maintenant ?
+		} else {
+			container = containers.get(0);
+			boolean result = MessageDialog
+				.openConfirm(PlatformUI.getWorkbench()
+					.getActiveWorkbenchWindow().getShell(), "Palette position",
+					"One palette already exists at this position. Do you want to continue ?");
+			if (!result)
+				return;
+
+			hotel.setStorageSize(container.getCapacity()
+				.getDimensionOneCapacity(), container.getCapacity()
+				.getDimensionTwoCapacity(), true);
+			ContainerPosition cp = container.getLocatedAtPosition();
+			Integer x = cp.getPositionDimensionOne();
+			Integer y = cp.getPositionDimensionTwo();
+		}
+
+		// TODO test to remove
+		hotel.setStorageSize(19, 1, true);
+		hotel.setSelectedBox(new int[] { 5, 0 });
+
+		freezer.setStorageSize(6, 10, true);
+		freezer.setSelectedBox(new int[] { 4, 2 });
+
 		BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
 			public void run() {
 				try {
@@ -235,8 +290,9 @@ public class ProcessSamplesEntryForm extends BiobankEntryForm {
 						showStudyInformation();
 					}
 					palette.setScannedElements(cells);
-					scannedValue.setValue(true);
+					scanLaunched.setValue(true);
 					scanValid.setValue(result);
+					setDirty(true);
 				} catch (RemoteConnectFailureException exp) {
 					BioBankPlugin.openRemoteConnectErrorMessage();
 				} catch (Exception e) {
@@ -270,21 +326,23 @@ public class ProcessSamplesEntryForm extends BiobankEntryForm {
 			scanCell.setMessage("Sample not found");
 			return false;
 		} else if (samples.size() == 1) {
+			scanCell.setStatus(CellStatus.NEW);
 			sample = samples.get(0);
 			Study cellStudy = sample.getPatientVisit().getPatient().getStudy();
 			if (currentStudy == null) {
 				// look which study is on the palette from the first cell
 				currentStudy = cellStudy;
-			} else {
-				if (!currentStudy.equals(cellStudy)) {
-					scanCell.setStatus(CellStatus.ERROR);
-					scanCell.setMessage("Not same study (study="
-							+ cellStudy.getNameShort() + ")");
-				}
+			} else if (!currentStudy.getId().equals(cellStudy.getId())) {
+				// FIXME problem if try currentStudy.equals(cellStudy)... should
+				// work !!
+				scanCell.setStatus(CellStatus.ERROR);
+				scanCell.setMessage("Not same study (study="
+						+ cellStudy.getNameShort() + ")");
 			}
+			scanCell.setFilledMessage(sample.getPatientVisit().getPatient()
+				.getNumber());
 			// TODO dans le cas d'un emplacement deja cree, verifier le cas
 			// ou le sample existe deja ou manque
-			scanCell.setStatus(CellStatus.NEW);
 			return true;
 		} else {
 			Assert.isTrue(false, "InventoryId should be unique !");
@@ -296,6 +354,13 @@ public class ProcessSamplesEntryForm extends BiobankEntryForm {
 	protected void saveForm() throws Exception {
 		// FIXME save form
 		System.out.println("save");
+		getSite().getPage().closeEditor(this, false);
+		// FIXME display informations ?
+	}
+
+	protected void cancel() {
+		// TODO cancel : reinit form
+
 	}
 
 	@Override
@@ -313,6 +378,13 @@ public class ProcessSamplesEntryForm extends BiobankEntryForm {
 			} else {
 				scan.setEnabled(true);
 			}
+		}
+	}
+
+	@Override
+	public void setFocus() {
+		if (plateToScan.getValue().toString().isEmpty()) {
+			plateToScanText.setFocus();
 		}
 	}
 

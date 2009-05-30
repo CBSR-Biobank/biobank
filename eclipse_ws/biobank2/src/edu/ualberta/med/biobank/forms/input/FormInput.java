@@ -9,6 +9,7 @@ import edu.ualberta.med.biobank.treeview.ClinicAdapter;
 import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.PatientAdapter;
 import edu.ualberta.med.biobank.treeview.PatientVisitAdapter;
+import edu.ualberta.med.biobank.treeview.SessionAdapter;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.treeview.StorageContainerAdapter;
 import edu.ualberta.med.biobank.treeview.StorageTypeAdapter;
@@ -62,6 +63,8 @@ public class FormInput implements IEditorInput {
 				return "Patient Visit " + name;
 			else if (node instanceof StorageContainerAdapter)
 				return "Storage Container " + name;
+			else if (node instanceof SessionAdapter)
+				return "Session " + name;
 			else
 				Assert.isTrue(false, "tooltip name for "
 						+ node.getClass().getName() + " not implemented");

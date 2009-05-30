@@ -121,7 +121,7 @@ public class SiteAdapter extends Node {
 		mi.setText("Process samples");
 		mi.addSelectionListener(new SelectionListener() {
 			public void widgetSelected(SelectionEvent event) {
-				openForm(new FormInput(SiteAdapter.this),
+				openForm(new FormInput(SiteAdapter.this.getParent()),
 					ProcessSamplesEntryForm.ID);
 			}
 

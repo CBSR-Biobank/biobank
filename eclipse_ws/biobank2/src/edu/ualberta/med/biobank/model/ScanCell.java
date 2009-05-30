@@ -27,25 +27,7 @@ public class ScanCell {
 
 	private String message;
 
-	public String getMessage() {
-		return message;
-	}
-
-	public void setMessage(String errorMessage) {
-		this.message = errorMessage;
-	}
-
-	public int getRow() {
-		return row;
-	}
-
-	public int getColumn() {
-		return column;
-	}
-
-	public String getValue() {
-		return value;
-	}
+	private String filledMessage;
 
 	public ScanCell(int row, int column, String value) {
 		this.row = row;
@@ -78,10 +60,18 @@ public class ScanCell {
 			for (int indexCol = 0; indexCol < COL_MAX; indexCol++) {
 				if (indexRow == 0 && indexCol == 0) {
 					paletteScanned[indexRow][indexCol] = new ScanCell(indexRow,
-						indexCol, "4852662165"); // sample existant - deja lie
+						indexCol, "8352288657"); // sample existant - deja lie
+				} else if (indexRow == 1 && indexCol == 0) {
+					paletteScanned[indexRow][indexCol] = new ScanCell(indexRow,
+						indexCol, "3811777308"); // sample appartenant a un
+					// autre patient mais meme study
+				} else if (indexRow == 2 && indexCol == 0) {
+					paletteScanned[indexRow][indexCol] = new ScanCell(indexRow,
+						indexCol, "5661188793"); // sample appartenant a un
+					// autre patientVisit et differente etude
 				} else if (indexRow == 7 && (indexCol > 5)) {
 					paletteScanned[indexRow][indexCol] = new ScanCell(indexRow,
-						indexCol, "");
+						indexCol, ""); // test pb scan
 				} else {
 					StringBuffer digits = new StringBuffer();
 					for (int i = 0; i < 10; i++) {
@@ -101,5 +91,33 @@ public class ScanCell {
 
 	public void setStatus(CellStatus status) {
 		this.status = status;
+	}
+
+	public String getFilledMessage() {
+		return filledMessage;
+	}
+
+	public void setFilledMessage(String filledMessage) {
+		this.filledMessage = filledMessage;
+	}
+
+	public String getMessage() {
+		return message;
+	}
+
+	public void setMessage(String errorMessage) {
+		this.message = errorMessage;
+	}
+
+	public int getRow() {
+		return row;
+	}
+
+	public int getColumn() {
+		return column;
+	}
+
+	public String getValue() {
+		return value;
 	}
 }
