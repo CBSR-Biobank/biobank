@@ -8,10 +8,13 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 
+import edu.ualberta.med.biobank.forms.LinkSamplesEntryForm;
+import edu.ualberta.med.biobank.forms.ProcessSamplesEntryForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
@@ -244,6 +247,20 @@ public class Node {
 		} catch (PartInitException e) {
 			// handle error
 			e.printStackTrace();
+		}
+	}
+
+	public void closeScannersEditors() {
+		IWorkbenchPage page = PlatformUI.getWorkbench()
+			.getActiveWorkbenchWindow().getActivePage();
+
+		IEditorReference[] editors = page.getEditorReferences();
+		for (IEditorReference editorRef : editors) {
+			IEditorPart editor = editorRef.getEditor(false);
+			if (editor != null
+					&& (editor instanceof LinkSamplesEntryForm || editor instanceof ProcessSamplesEntryForm)) {
+				page.closeEditor(editor, true);
+			}
 		}
 	}
 }

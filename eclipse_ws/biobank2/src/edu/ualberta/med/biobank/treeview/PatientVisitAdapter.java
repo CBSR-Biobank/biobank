@@ -75,6 +75,7 @@ public class PatientVisitAdapter extends Node {
 		mi.setText("Add Palette Samples");
 		mi.addSelectionListener(new SelectionListener() {
 			public void widgetSelected(SelectionEvent event) {
+				closeScannersEditors();
 				openForm(new FormInput(PatientVisitAdapter.this),
 					LinkSamplesEntryForm.ID);
 			}

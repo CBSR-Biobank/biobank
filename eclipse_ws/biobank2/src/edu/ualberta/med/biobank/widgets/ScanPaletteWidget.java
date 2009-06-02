@@ -4,7 +4,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseTrackAdapter;
 import org.eclipse.swt.events.PaintEvent;
-import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Rectangle;
@@ -12,7 +11,10 @@ import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.model.ScanCell;
 
-public class ScanPaletteWidget extends StorageContainerWidget {
+/**
+ * Specific widget to draw a palette
+ */
+public class ScanPaletteWidget extends AbstractGridContainerWidget {
 
 	public static final int SAMPLE_WIDTH = 40;
 
@@ -42,20 +44,14 @@ public class ScanPaletteWidget extends StorageContainerWidget {
 	public ScanPaletteWidget(Composite parent, boolean showLegend) {
 		super(parent);
 		this.showLegend = showLegend;
-		addPaintListener(new PaintListener() {
-			@Override
-			public void paintControl(PaintEvent e) {
-				paintPalette(e);
-			}
-		});
 		addMouseTrackListener(new MouseTrackAdapter() {
 			@Override
 			public void mouseHover(MouseEvent e) {
 				ScanCell cell = getCellAtCoordinates(e.x, e.y);
 				if (cell != null) {
 					String msg = cell.getValue();
-					if (cell.getMessage() != null) {
-						msg += " : " + cell.getMessage();
+					if (cell.getInformation() != null) {
+						msg += " : " + cell.getInformation();
 					}
 					setToolTipText(msg);
 				} else {
@@ -63,9 +59,9 @@ public class ScanPaletteWidget extends StorageContainerWidget {
 				}
 			}
 		});
-		cellWidth = SAMPLE_WIDTH;
-		cellHeight = SAMPLE_WIDTH;
-		setStorageSize(ScanCell.ROW_MAX, ScanCell.COL_MAX, false);
+		setCellWidth(SAMPLE_WIDTH);
+		setCellHeight(SAMPLE_WIDTH);
+		setStorageSize(ScanCell.ROW_MAX, ScanCell.COL_MAX);
 	}
 
 	public ScanPaletteWidget(Composite parent) {
@@ -91,13 +87,16 @@ public class ScanPaletteWidget extends StorageContainerWidget {
 	protected String getTextForBox(int indexRow, int indexCol) {
 		if (scannedElements != null
 				&& scannedElements[indexRow][indexCol] != null) {
-			return scannedElements[indexRow][indexCol].getFilledMessage();
+			String title = scannedElements[indexRow][indexCol].getTitle();
+			if (title != null) {
+				return scannedElements[indexRow][indexCol].getTitle();
+			}
 		}
 		return super.getTextForBox(indexRow, indexCol);
 	}
 
 	@Override
-	protected void optionalDrawing(PaintEvent e, int indexRow, int indexCol,
+	protected void specificDrawing(PaintEvent e, int indexRow, int indexCol,
 			Rectangle rectangle) {
 		if (scannedElements != null
 				&& scannedElements[indexRow][indexCol] != null
@@ -127,7 +126,7 @@ public class ScanPaletteWidget extends StorageContainerWidget {
 	private void drawLegend(PaintEvent e, int color, int index, String text) {
 		e.gc.setBackground(e.display.getSystemColor(color));
 		Rectangle rectangle = new Rectangle(LEGEND_WIDTH * index,
-			gridHeight + 4, LEGEND_WIDTH, LEGEND_HEIGHT);
+			getGridHeight() + 4, LEGEND_WIDTH, LEGEND_HEIGHT);
 		e.gc.fillRectangle(rectangle);
 		e.gc.drawRectangle(rectangle);
 		drawTextOnCenter(e.gc, text, rectangle);
@@ -142,8 +141,8 @@ public class ScanPaletteWidget extends StorageContainerWidget {
 		if (scannedElements == null) {
 			return null;
 		}
-		int col = xPosition / cellWidth;
-		int row = yPosition / cellHeight;
+		int col = xPosition / getCellWidth();
+		int row = yPosition / getCellHeight();
 		if (col >= 0 && col < ScanCell.COL_MAX && row >= 0
 				&& row < ScanCell.ROW_MAX) {
 			return scannedElements[row][col];
@@ -152,9 +151,8 @@ public class ScanPaletteWidget extends StorageContainerWidget {
 	}
 
 	@Override
-	protected void calculateSizes(boolean recalculateCellSizes) {
-		super.calculateSizes(recalculateCellSizes);
-		height = height + LEGEND_HEIGHT + 4;
+	protected void calculateSizes() {
+		super.calculateSizes();
+		setHeight(getHeight() + LEGEND_HEIGHT + 4);
 	}
-
 }

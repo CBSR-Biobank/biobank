@@ -137,7 +137,7 @@ public class ProcessSamplesEntryForm extends BiobankEntryForm {
 
 		freezer = new StorageContainerWidget(client);
 		toolkit.adapt(freezer);
-		freezer.setStorageSize(5, 10, ScanPaletteWidget.PALETTE_WIDTH, 100);
+		freezer.setGridSizes(5, 10, ScanPaletteWidget.PALETTE_WIDTH, 100);
 		GridData gdFreezer = new GridData();
 		gdFreezer.widthHint = freezer.getWidth();
 		gdFreezer.heightHint = freezer.getHeight();
@@ -145,7 +145,7 @@ public class ProcessSamplesEntryForm extends BiobankEntryForm {
 
 		hotel = new StorageContainerWidget(client);
 		toolkit.adapt(hotel);
-		hotel.setStorageSize(11, 1, 100,
+		hotel.setGridSizes(11, 1, 100,
 			ScanPaletteWidget.PALETTE_HEIGHT_AND_LEGEND);
 		GridData gdHotel = new GridData();
 		gdHotel.widthHint = hotel.getWidth();
@@ -235,46 +235,49 @@ public class ProcessSamplesEntryForm extends BiobankEntryForm {
 		});
 	}
 
-	protected void scan() throws ApplicationException {
-		Container container = new Container();
-		container.setBarcode((String) palettePosition.getValue());
-		List<Container> containers = appService.search(Container.class,
-			container);
-		if (containers.size() == 0) {
-			// container n'existe pas encore - comment c'est ce que doit ajouter
-			// ?
-			// doit etre deja la ou creation maintenant ?
-		} else {
-			container = containers.get(0);
-			boolean result = MessageDialog
-				.openConfirm(PlatformUI.getWorkbench()
-					.getActiveWorkbenchWindow().getShell(), "Palette position",
-					"One palette already exists at this position. Do you want to continue ?");
-			if (!result)
-				return;
-
-			hotel.setStorageSize(container.getCapacity()
-				.getDimensionOneCapacity(), container.getCapacity()
-				.getDimensionTwoCapacity(), true);
-			ContainerPosition cp = container.getLocatedAtPosition();
-			Integer x = cp.getPositionDimensionOne();
-			Integer y = cp.getPositionDimensionTwo();
-		}
-
-		// TODO test to remove
-		hotel.setStorageSize(19, 1, true);
-		hotel.setSelectedBox(new int[] { 5, 0 });
-
-		freezer.setStorageSize(6, 10, true);
-		freezer.setSelectedBox(new int[] { 4, 2 });
-
+	protected void scan() {
 		BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
 			public void run() {
 				try {
+					Container container = new Container();
+					container.setBarcode((String) palettePosition.getValue());
+					List<Container> containers = appService.search(
+						Container.class, container);
+					if (containers.size() == 0) {
+						// container n'existe pas encore - comment c'est ce que
+						// doit ajouter
+						// ?
+						// doit etre deja la ou creation maintenant ?
+					} else {
+						container = containers.get(0);
+						boolean result = MessageDialog
+							.openConfirm(PlatformUI.getWorkbench()
+								.getActiveWorkbenchWindow().getShell(),
+								"Palette position",
+								"One palette already exists at this position. Do you want to continue ?");
+						if (!result)
+							return;
+
+						hotel.setStorageSize(container.getCapacity()
+							.getDimensionOneCapacity(), container.getCapacity()
+							.getDimensionTwoCapacity());
+						ContainerPosition cp = container.getLocatedAtPosition();
+						Integer x = cp.getPositionDimensionOne();
+						Integer y = cp.getPositionDimensionTwo();
+					}
+
+					// TODO test to remove
+					hotel.setStorageSize(19, 1);
+					hotel.setSelectedBox(new int[] { 5, 0 });
+
+					freezer.setStorageSize(6, 10);
+					freezer.setSelectedBox(new int[] { 4, 2 });
+
 					currentStudy = null;
 
 					// TODO launch real scanner
 					cells = ScanCell.getRandomScanProcess();
+					scanLaunched.setValue(true);
 
 					// TODO gerer le cas ou la position existe deja et contient
 					// deja qqchose
@@ -286,26 +289,24 @@ public class ProcessSamplesEntryForm extends BiobankEntryForm {
 							}
 						}
 					}
-					if (currentStudy != null) {
-						showStudyInformation();
-					}
+					showStudyInformation();
 					palette.setScannedElements(cells);
-					scanLaunched.setValue(true);
 					scanValid.setValue(result);
 					setDirty(true);
 				} catch (RemoteConnectFailureException exp) {
 					BioBankPlugin.openRemoteConnectErrorMessage();
 				} catch (Exception e) {
 					e.printStackTrace();
+					scanValid.setValue(false);
 				}
 			}
 		});
 	}
 
 	protected void showStudyInformation() {
-		System.out.println(currentStudy.getNameShort());
-
-		if (currentStudy != null) {
+		if (currentStudy == null) {
+			form.setText("Processing samples");
+		} else {
 			form.setText("Processing samples for study "
 					+ currentStudy.getNameShort());
 		}
@@ -315,7 +316,7 @@ public class ProcessSamplesEntryForm extends BiobankEntryForm {
 		String value = scanCell.getValue();
 		if (value == null || value.isEmpty()) {
 			scanCell.setStatus(CellStatus.ERROR);
-			scanCell.setMessage("Error retrieving bar code");
+			scanCell.setInformation("Error retrieving bar code");
 			return false;
 		}
 		Sample sample = new Sample();
@@ -323,7 +324,7 @@ public class ProcessSamplesEntryForm extends BiobankEntryForm {
 		List<Sample> samples = appService.search(Sample.class, sample);
 		if (samples.size() == 0) {
 			scanCell.setStatus(CellStatus.ERROR);
-			scanCell.setMessage("Sample not found");
+			scanCell.setInformation("Sample not found");
 			return false;
 		} else if (samples.size() == 1) {
 			scanCell.setStatus(CellStatus.NEW);
@@ -332,15 +333,15 @@ public class ProcessSamplesEntryForm extends BiobankEntryForm {
 			if (currentStudy == null) {
 				// look which study is on the palette from the first cell
 				currentStudy = cellStudy;
-			} else if (!currentStudy.getId().equals(cellStudy.getId())) {
+			} else if (currentStudy.getId().equals(cellStudy.getId())) {
 				// FIXME problem if try currentStudy.equals(cellStudy)... should
 				// work !!
 				scanCell.setStatus(CellStatus.ERROR);
-				scanCell.setMessage("Not same study (study="
+				scanCell.setInformation("Not same study (study="
 						+ cellStudy.getNameShort() + ")");
 			}
-			scanCell.setFilledMessage(sample.getPatientVisit().getPatient()
-				.getNumber());
+			scanCell
+				.setTitle(sample.getPatientVisit().getPatient().getNumber());
 			// TODO dans le cas d'un emplacement deja cree, verifier le cas
 			// ou le sample existe deja ou manque
 			return true;
@@ -359,8 +360,13 @@ public class ProcessSamplesEntryForm extends BiobankEntryForm {
 	}
 
 	protected void cancel() {
-		// TODO cancel : reinit form
-
+		freezer.setSelectedBox(null);
+		hotel.setSelectedBox(null);
+		palette.setScannedElements(null);
+		cells = null;
+		currentStudy = null;
+		scanLaunched.setValue(false);
+		setDirty(false);
 	}
 
 	@Override
@@ -372,7 +378,9 @@ public class ProcessSamplesEntryForm extends BiobankEntryForm {
 		} else {
 			form.setMessage(status.getMessage(), IMessageProvider.ERROR);
 			submit.setEnabled(false);
-			if (palettePosition.getValue() == null
+			if (plateToScan.getValue() == null
+					|| plateToScan.getValue().toString().isEmpty()
+					|| palettePosition.getValue() == null
 					|| palettePosition.getValue().toString().isEmpty()) {
 				scan.setEnabled(false);
 			} else {

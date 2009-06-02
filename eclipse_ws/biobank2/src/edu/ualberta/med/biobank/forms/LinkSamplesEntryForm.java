@@ -23,6 +23,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
@@ -30,6 +31,7 @@ import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.forms.input.FormInput;
+import edu.ualberta.med.biobank.forms.listener.EnterKeyToNextFieldListener;
 import edu.ualberta.med.biobank.model.CellStatus;
 import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.Sample;
@@ -37,6 +39,7 @@ import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.model.ScanCell;
 import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.PatientVisitAdapter;
+import edu.ualberta.med.biobank.validators.NonEmptyString;
 import edu.ualberta.med.biobank.widgets.LinkSampleTypeWidget;
 import edu.ualberta.med.biobank.widgets.ScanPaletteWidget;
 import gov.nih.nci.system.query.SDKQuery;
@@ -64,6 +67,11 @@ public class LinkSamplesEntryForm extends BiobankEntryForm {
 
 	private IObservableValue scannedValue = new WritableValue(Boolean.FALSE,
 		Boolean.class);
+	private IObservableValue plateToScan = new WritableValue("", String.class);
+
+	private Button cancel;
+
+	private Text plateToScanText;
 
 	@Override
 	public void init(IEditorSite editorSite, IEditorInput input)
@@ -93,6 +101,12 @@ public class LinkSamplesEntryForm extends BiobankEntryForm {
 		} else {
 			form.setMessage(status.getMessage(), IMessageProvider.ERROR);
 			submit.setEnabled(false);
+			if (plateToScan.getValue() == null
+					|| plateToScan.getValue().toString().isEmpty()) {
+				scan.setEnabled(false);
+			} else {
+				scan.setEnabled(true);
+			}
 		}
 	}
 
@@ -107,6 +121,7 @@ public class LinkSamplesEntryForm extends BiobankEntryForm {
 
 		createPaletteSection();
 		createTypesSelectionSection();
+		createFieldsSection();
 		createButtonsSection();
 
 		WritableValue wv = new WritableValue(Boolean.FALSE, Boolean.class);
@@ -168,9 +183,26 @@ public class LinkSamplesEntryForm extends BiobankEntryForm {
 		typesSelectionSection.setEnabled(false);
 	}
 
-	private void createButtonsSection() {
+	private void createFieldsSection() {
 		Composite client = toolkit.createComposite(form.getBody());
 		GridLayout layout = new GridLayout(2, false);
+		layout.horizontalSpacing = 10;
+		client.setLayout(layout);
+		GridData gd = new GridData();
+		gd.widthHint = 200;
+		client.setLayoutData(gd);
+		toolkit.paintBordersFor(client);
+
+		plateToScanText = (Text) createBoundWidgetWithLabel(client, Text.class,
+			SWT.NONE, "Plate to Scan", new String[0], plateToScan,
+			NonEmptyString.class, "Enter plate to scan");
+		plateToScanText.removeKeyListener(keyListener);
+		plateToScanText.addKeyListener(EnterKeyToNextFieldListener.INSTANCE);
+	}
+
+	private void createButtonsSection() {
+		Composite client = toolkit.createComposite(form.getBody());
+		GridLayout layout = new GridLayout(3, false);
 		layout.horizontalSpacing = 10;
 		client.setLayout(layout);
 		client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -181,6 +213,14 @@ public class LinkSamplesEntryForm extends BiobankEntryForm {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				scan();
+			}
+		});
+
+		cancel = toolkit.createButton(client, "Cancel", SWT.PUSH);
+		cancel.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				cancel();
 			}
 		});
 
@@ -197,9 +237,9 @@ public class LinkSamplesEntryForm extends BiobankEntryForm {
 		BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
 			public void run() {
 				try {
-					// submit.setEnabled(true);
 					// TODO launch scanner instead of random function
 					cells = ScanCell.getRandomScanLink();
+					scannedValue.setValue(true);
 
 					for (int i = 0; i < cells.length; i++) { // rows
 						int samplesNumber = 0;
@@ -215,11 +255,11 @@ public class LinkSamplesEntryForm extends BiobankEntryForm {
 					// Show result in grid
 					spw.setScannedElements(cells);
 					typesSelectionSection.setEnabled(true);
-					scannedValue.setValue(true);
 				} catch (RemoteConnectFailureException exp) {
 					BioBankPlugin.openRemoteConnectErrorMessage();
 				} catch (Exception e) {
 					e.printStackTrace();
+					typesSelectionSection.setEnabled(true);
 				}
 			}
 		});
@@ -264,6 +304,18 @@ public class LinkSamplesEntryForm extends BiobankEntryForm {
 		appService.executeBatchQuery(queries);
 		getSite().getPage().closeEditor(this, false);
 		// FIXME Close and display the PatientVisit with added samples ?
+	}
+
+	protected void cancel() {
+		cells = null;
+		spw.setScannedElements(null);
+	}
+
+	@Override
+	public void setFocus() {
+		if (plateToScan.getValue().toString().isEmpty()) {
+			plateToScanText.setFocus();
+		}
 	}
 
 }

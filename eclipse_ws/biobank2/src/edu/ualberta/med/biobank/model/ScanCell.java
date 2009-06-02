@@ -25,9 +25,9 @@ public class ScanCell {
 
 	private CellStatus status;
 
-	private String message;
+	private String information;
 
-	private String filledMessage;
+	private String title;
 
 	public ScanCell(int row, int column, String value) {
 		this.row = row;
@@ -60,14 +60,14 @@ public class ScanCell {
 			for (int indexCol = 0; indexCol < COL_MAX; indexCol++) {
 				if (indexRow == 0 && indexCol == 0) {
 					paletteScanned[indexRow][indexCol] = new ScanCell(indexRow,
-						indexCol, "8352288657"); // sample existant - deja lie
+						indexCol, "4990741101"); // sample existant - deja lie
 				} else if (indexRow == 1 && indexCol == 0) {
 					paletteScanned[indexRow][indexCol] = new ScanCell(indexRow,
-						indexCol, "3811777308"); // sample appartenant a un
+						indexCol, "1853075889"); // sample appartenant a un
 					// autre patient mais meme study
 				} else if (indexRow == 2 && indexCol == 0) {
 					paletteScanned[indexRow][indexCol] = new ScanCell(indexRow,
-						indexCol, "5661188793"); // sample appartenant a un
+						indexCol, "8934954760"); // sample appartenant a un
 					// autre patientVisit et differente etude
 				} else if (indexRow == 7 && (indexCol > 5)) {
 					paletteScanned[indexRow][indexCol] = new ScanCell(indexRow,
@@ -93,20 +93,20 @@ public class ScanCell {
 		this.status = status;
 	}
 
-	public String getFilledMessage() {
-		return filledMessage;
+	public String getTitle() {
+		return title;
 	}
 
-	public void setFilledMessage(String filledMessage) {
-		this.filledMessage = filledMessage;
+	public void setTitle(String title) {
+		this.title = title;
 	}
 
-	public String getMessage() {
-		return message;
+	public String getInformation() {
+		return information;
 	}
 
-	public void setMessage(String errorMessage) {
-		this.message = errorMessage;
+	public void setInformation(String information) {
+		this.information = information;
 	}
 
 	public int getRow() {

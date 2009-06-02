@@ -5,6 +5,9 @@ import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.widgets.Control;
 
+/**
+ * When Enter key is used, go to next selectable widget
+ */
 public class EnterKeyToNextFieldListener implements KeyListener {
 
 	public static final EnterKeyToNextFieldListener INSTANCE = new EnterKeyToNextFieldListener();
