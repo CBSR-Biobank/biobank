@@ -48,12 +48,14 @@ public abstract class AbstractGridContainerWidget extends Canvas {
 	/**
 	 * First character or int used for the cells row labels
 	 */
-	protected Object firstRowSign = 'A';
+	private Object firstRowSign = 'A';
 
 	/**
 	 * First character or int used for the cells column labels
 	 */
-	protected Object firstColSign = 1;
+	private Object firstColSign = 1;
+
+	private boolean showColumnFirst = false;
 
 	/**
 	 * max width this container will have : used to calculate cells width
@@ -100,10 +102,14 @@ public abstract class AbstractGridContainerWidget extends Canvas {
 	 * the row sign, the column sign and the cell position.
 	 */
 	protected String getTextForBox(int indexRow, int indexCol) {
-		String text = getValueForCell(firstRowSign, indexRow,
+		String row = getValueForCell(firstRowSign, indexRow,
 			firstColSign == null);
-		text += getValueForCell(firstColSign, indexCol, firstRowSign == null);
-		return text;
+		String col = getValueForCell(firstColSign, indexCol,
+			firstRowSign == null);
+		if (showColumnFirst) {
+			return col + row;
+		}
+		return row + col;
 	}
 
 	private String getValueForCell(Object firstSign, int addValue,
@@ -230,5 +236,9 @@ public abstract class AbstractGridContainerWidget extends Canvas {
 
 	public void setFirstColSign(Object colSign) {
 		this.firstColSign = colSign;
+	}
+
+	public void setShowColumnFirst(boolean showColumnFirst) {
+		this.showColumnFirst = showColumnFirst;
 	}
 }

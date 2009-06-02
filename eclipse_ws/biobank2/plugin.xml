@@ -236,6 +236,12 @@
             id="edu.ualberta.med.biobank.forms.ProcessSamplesEntryForm"
             name="Process samples">
       </editor>
+      <editor
+            class="edu.ualberta.med.biobank.forms.ProcessCabinetEntryForm"
+            default="false"
+            id="edu.ualberta.med.biobank.forms.ProcessCabinetEntryForm"
+            name="Process cabinet">
+      </editor>
    </extension>
    <extension
          point="org.eclipse.ui.bindings">

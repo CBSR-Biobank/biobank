@@ -8,11 +8,12 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.fieldassist.ControlDecoration;
 
-public class PaletteBarCodeValidator extends AbstractValidator {
+public class CabinetIdValidator extends AbstractValidator {
 
-	private static final Pattern PATTERN = Pattern.compile("^[a-zA-Z0-9]{6}$");
+	public static final Pattern PATTERN = Pattern
+		.compile("^(\\p{Lower}{4}|\\p{Upper}{4})$");
 
-	public PaletteBarCodeValidator(String message,
+	public CabinetIdValidator(String message,
 			ControlDecoration controlDecoration) {
 		super(message, controlDecoration);
 	}

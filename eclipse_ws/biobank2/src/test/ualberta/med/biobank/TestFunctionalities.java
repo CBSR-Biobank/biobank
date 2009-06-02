@@ -1,5 +1,6 @@
 package test.ualberta.med.biobank;
 
+import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.Sample;
 import edu.ualberta.med.biobank.model.SamplePosition;
@@ -16,6 +17,7 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import junit.framework.Assert;
 
@@ -126,5 +128,37 @@ public class TestFunctionalities {
 			return sc;
 		}
 		return scs.get(0);
+	}
+
+	@Test
+	public void batchQueriesSite() throws ApplicationException {
+		List<SDKQuery> queries = new ArrayList<SDKQuery>();
+
+		Address address = new Address();
+		Random r = new Random();
+		address.setCity("Vesoul" + r.nextInt());
+		address = (Address) appService.executeQuery(
+			new InsertExampleQuery(address)).getObjectResult();
+
+		int sitesSize = appService.search(Site.class, new Site()).size();
+
+		Site site = new Site();
+		site.setName("TestBatch1" + r.nextInt());
+		site.setAddress(address);
+		queries.add(new InsertExampleQuery(site));
+
+		site = new Site();
+		site.setName("TestBatch2" + r.nextInt());
+		queries.add(new InsertExampleQuery(site));
+
+		try {
+			appService.executeBatchQuery(queries);
+		} catch (ApplicationException ae) {
+			ae.printStackTrace();
+		} finally {
+			int sitesSizeAfter = appService.search(Site.class, new Site())
+				.size();
+			Assert.assertEquals(sitesSize, sitesSizeAfter);
+		}
 	}
 }

@@ -14,6 +14,7 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.forms.LinkSamplesEntryForm;
+import edu.ualberta.med.biobank.forms.ProcessCabinetEntryForm;
 import edu.ualberta.med.biobank.forms.ProcessSamplesEntryForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -259,6 +260,19 @@ public class Node {
 			IEditorPart editor = editorRef.getEditor(false);
 			if (editor != null
 					&& (editor instanceof LinkSamplesEntryForm || editor instanceof ProcessSamplesEntryForm)) {
+				page.closeEditor(editor, true);
+			}
+		}
+	}
+
+	protected void closeCabinetsEditors() {
+		IWorkbenchPage page = PlatformUI.getWorkbench()
+			.getActiveWorkbenchWindow().getActivePage();
+
+		IEditorReference[] editors = page.getEditorReferences();
+		for (IEditorReference editorRef : editors) {
+			IEditorPart editor = editorRef.getEditor(false);
+			if (editor != null && editor instanceof ProcessCabinetEntryForm) {
 				page.closeEditor(editor, true);
 			}
 		}

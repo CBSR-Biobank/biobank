@@ -30,6 +30,7 @@ import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.forms.input.FormInput;
+import edu.ualberta.med.biobank.forms.listener.CancelSubmitListener;
 import edu.ualberta.med.biobank.forms.listener.EnterKeyToNextFieldListener;
 import edu.ualberta.med.biobank.model.CellStatus;
 import edu.ualberta.med.biobank.model.Container;
@@ -45,7 +46,8 @@ import edu.ualberta.med.biobank.widgets.ScanPaletteWidget;
 import edu.ualberta.med.biobank.widgets.StorageContainerWidget;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
-public class ProcessSamplesEntryForm extends BiobankEntryForm {
+public class ProcessSamplesEntryForm extends BiobankEntryForm implements
+		CancelConfirmForm {
 
 	public static final String ID = "edu.ualberta.med.biobank.forms.ProcessSamplesEntryForm";
 	private ScanPaletteWidget palette;
@@ -222,7 +224,7 @@ public class ProcessSamplesEntryForm extends BiobankEntryForm {
 		cancel.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				cancel();
+				cancelForm();
 			}
 		});
 
@@ -233,6 +235,7 @@ public class ProcessSamplesEntryForm extends BiobankEntryForm {
 				doSaveInternal();
 			}
 		});
+		confirmCancelText.addKeyListener(new CancelSubmitListener(this));
 	}
 
 	protected void scan() {
@@ -359,7 +362,7 @@ public class ProcessSamplesEntryForm extends BiobankEntryForm {
 		// FIXME display informations ?
 	}
 
-	protected void cancel() {
+	protected void cancelForm() {
 		freezer.setSelectedBox(null);
 		hotel.setSelectedBox(null);
 		palette.setScannedElements(null);
@@ -394,6 +397,18 @@ public class ProcessSamplesEntryForm extends BiobankEntryForm {
 		if (plateToScan.getValue().toString().isEmpty()) {
 			plateToScanText.setFocus();
 		}
+	}
+
+	public void cancel() throws Exception {
+		cancelForm();
+	}
+
+	public void confirm() throws Exception {
+		saveForm();
+	}
+
+	public boolean isConfirmEnabled() {
+		return submit.isEnabled();
 	}
 
 }

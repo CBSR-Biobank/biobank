@@ -12,6 +12,7 @@ import org.eclipse.swt.widgets.Tree;
 import edu.ualberta.med.biobank.forms.LinkSamplesEntryForm;
 import edu.ualberta.med.biobank.forms.PatientVisitEntryForm;
 import edu.ualberta.med.biobank.forms.PatientVisitViewForm;
+import edu.ualberta.med.biobank.forms.ProcessCabinetEntryForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.PatientVisit;
 
@@ -88,7 +89,9 @@ public class PatientVisitAdapter extends Node {
 		mi.setText("Add Cabinet Sample");
 		mi.addSelectionListener(new SelectionListener() {
 			public void widgetSelected(SelectionEvent event) {
-				System.out.println("add cabinet sample form");
+				closeCabinetsEditors();
+				openForm(new FormInput(PatientVisitAdapter.this),
+					ProcessCabinetEntryForm.ID);
 			}
 
 			public void widgetDefaultSelected(SelectionEvent e) {
