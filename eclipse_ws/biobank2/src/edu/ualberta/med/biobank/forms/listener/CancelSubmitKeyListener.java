@@ -9,11 +9,11 @@ import edu.ualberta.med.biobank.forms.CancelConfirmForm;
 /**
  * KeyListener for cancel/submit field used with the barcode scanner
  */
-public class CancelSubmitListener implements KeyListener {
+public class CancelSubmitKeyListener implements KeyListener {
 
 	public CancelConfirmForm form;
 
-	public CancelSubmitListener(CancelConfirmForm form) {
+	public CancelSubmitKeyListener(CancelConfirmForm form) {
 		this.form = form;
 	}
 

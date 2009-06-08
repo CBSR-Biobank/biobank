@@ -231,7 +231,7 @@ public class Node {
 				+ this.getName());
 	}
 
-	public void closeEditor(FormInput input) {
+	public static void closeEditor(FormInput input) {
 		IWorkbenchPage page = PlatformUI.getWorkbench()
 			.getActiveWorkbenchWindow().getActivePage();
 		IEditorPart part = page.findEditor(input);
@@ -240,7 +240,7 @@ public class Node {
 		}
 	}
 
-	public void openForm(FormInput input, String id) {
+	public static void openForm(FormInput input, String id) {
 		closeEditor(input);
 		try {
 			PlatformUI.getWorkbench().getActiveWorkbenchWindow()

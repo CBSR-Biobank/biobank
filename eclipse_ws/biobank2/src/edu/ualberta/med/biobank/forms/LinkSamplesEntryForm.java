@@ -120,8 +120,8 @@ public class LinkSamplesEntryForm extends BiobankEntryForm {
 		form.getBody().setLayout(layout);
 
 		createPaletteSection();
-		createTypesSelectionSection();
 		createFieldsSection();
+		createTypesSelectionSection();
 		createButtonsSection();
 
 		WritableValue wv = new WritableValue(Boolean.FALSE, Boolean.class);
@@ -188,16 +188,31 @@ public class LinkSamplesEntryForm extends BiobankEntryForm {
 		GridLayout layout = new GridLayout(2, false);
 		layout.horizontalSpacing = 10;
 		client.setLayout(layout);
-		GridData gd = new GridData();
-		gd.widthHint = 200;
-		client.setLayoutData(gd);
 		toolkit.paintBordersFor(client);
 
-		plateToScanText = (Text) createBoundWidgetWithLabel(client, Text.class,
+		Composite comp = toolkit.createComposite(client);
+		layout = new GridLayout(2, false);
+		layout.horizontalSpacing = 10;
+		comp.setLayout(layout);
+		GridData gd = new GridData();
+		gd.widthHint = 200;
+		comp.setLayoutData(gd);
+		toolkit.paintBordersFor(comp);
+		// TODO : could be a combo as there is not other need of the handheld
+		// scanner in this form !
+		plateToScanText = (Text) createBoundWidgetWithLabel(comp, Text.class,
 			SWT.NONE, "Plate to Scan", new String[0], plateToScan,
 			NonEmptyString.class, "Enter plate to scan");
 		plateToScanText.removeKeyListener(keyListener);
 		plateToScanText.addKeyListener(EnterKeyToNextFieldListener.INSTANCE);
+
+		scan = toolkit.createButton(client, "Scan", SWT.PUSH);
+		scan.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				scan();
+			}
+		});
 	}
 
 	private void createButtonsSection() {
@@ -207,14 +222,6 @@ public class LinkSamplesEntryForm extends BiobankEntryForm {
 		client.setLayout(layout);
 		client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		toolkit.paintBordersFor(client);
-
-		scan = toolkit.createButton(client, "Scan", SWT.PUSH);
-		scan.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				scan();
-			}
-		});
 
 		cancel = toolkit.createButton(client, "Cancel", SWT.PUSH);
 		cancel.addSelectionListener(new SelectionAdapter() {
@@ -243,7 +250,7 @@ public class LinkSamplesEntryForm extends BiobankEntryForm {
 
 					for (int i = 0; i < cells.length; i++) { // rows
 						int samplesNumber = 0;
-						sampleTypeWidgets.get(i).initSelection();
+						sampleTypeWidgets.get(i).resetValues();
 						for (int j = 0; j < cells[i].length; j++) { // columns
 							if (cells[i][j] != null) {
 								samplesNumber++;
@@ -277,38 +284,59 @@ public class LinkSamplesEntryForm extends BiobankEntryForm {
 	}
 
 	@Override
-	protected void saveForm() throws Exception {
-		List<SDKQuery> queries = new ArrayList<SDKQuery>();
-		for (int indexRow = 0; indexRow < cells.length; indexRow++) {
-			LinkSampleTypeWidget typeWidget = sampleTypeWidgets.get(indexRow);
-			if (typeWidget.needToSave()) {
-				SampleType type = typeWidget.getSelection();
-				for (int indexColumn = 0; indexColumn < cells[indexRow].length; indexColumn++) {
-					ScanCell cell = cells[indexRow][indexColumn];
-					if (cell != null
-							&& cell.getStatus().equals(CellStatus.FILLED)) {
-						// add new samples
-						Sample sample = new Sample();
-						sample.setInventoryId(cells[indexRow][indexColumn]
-							.getValue());
-						sample.setPatientVisit(patientVisit);
-						sample.setSampleType(type);
-						queries.add(new InsertExampleQuery(sample));
+	protected void saveForm() {
+		BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
+			public void run() {
+				try {
+					List<SDKQuery> queries = new ArrayList<SDKQuery>();
+					for (int indexRow = 0; indexRow < cells.length; indexRow++) {
+						LinkSampleTypeWidget typeWidget = sampleTypeWidgets
+							.get(indexRow);
+						if (typeWidget.needToSave()) {
+							SampleType type = typeWidget.getSelection();
+							for (int indexColumn = 0; indexColumn < cells[indexRow].length; indexColumn++) {
+								ScanCell cell = cells[indexRow][indexColumn];
+								if (cell != null
+										&& cell.getStatus().equals(
+											CellStatus.FILLED)) {
+									// add new samples
+									Sample sample = new Sample();
+									sample
+										.setInventoryId(cells[indexRow][indexColumn]
+											.getValue());
+									sample.setPatientVisit(patientVisit);
+									sample.setSampleType(type);
+									queries.add(new InsertExampleQuery(sample));
+								}
+							}
+						}
 					}
+					// FIXME Should roll back if something wrong in one of them
+					// =
+					// not
+					// sure
+					// it works !!
+					appService.executeBatchQuery(queries);
+					getSite().getPage().closeEditor(LinkSamplesEntryForm.this,
+						false);
+					Node.openForm(new FormInput(pvAdapter),
+						PatientVisitViewForm.ID);
+				} catch (RemoteConnectFailureException exp) {
+					BioBankPlugin.openRemoteConnectErrorMessage();
+				} catch (Exception e) {
+					e.printStackTrace();
+					typesSelectionSection.setEnabled(true);
 				}
 			}
-		}
-		// FIXME Should roll back if something wrong in one of them = not
-		// sure
-		// it works !!
-		appService.executeBatchQuery(queries);
-		getSite().getPage().closeEditor(this, false);
-		// FIXME Close and display the PatientVisit with added samples ?
+		});
 	}
 
 	protected void cancel() {
 		cells = null;
 		spw.setScannedElements(null);
+		for (LinkSampleTypeWidget stw : sampleTypeWidgets) {
+			stw.resetValues();
+		}
 	}
 
 	@Override

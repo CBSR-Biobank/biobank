@@ -70,8 +70,12 @@ public class ScanCell {
 						indexCol, "8934954760"); // sample appartenant a un
 					// autre patientVisit et differente etude
 				} else if (indexRow == 7 && (indexCol > 5)) {
-					paletteScanned[indexRow][indexCol] = new ScanCell(indexRow,
-						indexCol, ""); // test pb scan
+					if (indexCol < 10) {
+						paletteScanned[indexRow][indexCol] = new ScanCell(
+							indexRow, indexCol, ""); // test pb scan
+					} else {
+						paletteScanned[indexRow][indexCol] = null;
+					}
 				} else {
 					StringBuffer digits = new StringBuffer();
 					for (int i = 0; i < 10; i++) {

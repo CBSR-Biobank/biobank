@@ -15,9 +15,11 @@ import org.eclipse.core.databinding.observable.IChangeListener;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.observable.value.WritableValue;
 import org.eclipse.core.databinding.validation.IValidator;
+import org.eclipse.core.databinding.validation.ValidationStatus;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.databinding.swt.SWTObservables;
 import org.eclipse.jface.fieldassist.ControlDecoration;
 import org.eclipse.swt.SWT;
@@ -167,9 +169,8 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
 	}
 
 	protected Control createBoundWidget(Composite composite,
-			Class<?> widgetClass, int widgetOptions, Label label,
-			String[] widgetValues, IObservableValue modelObservableValue,
-			IValidator validator) {
+			Class<?> widgetClass, int widgetOptions, String[] widgetValues,
+			IObservableValue modelObservableValue, IValidator validator) {
 		if (widgetClass == Text.class) {
 			if (widgetOptions == SWT.NONE) {
 				widgetOptions = SWT.SINGLE;
@@ -222,7 +223,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
 				.createDecorator(label, validatorErrMsg), validatorErrMsg);
 		}
 
-		return createBoundWidget(composite, widgetClass, widgetOptions, label,
+		return createBoundWidget(composite, widgetClass, widgetOptions,
 			widgetValues, modelObservableValue, validator);
 	}
 
@@ -295,4 +296,29 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
 
 	protected abstract void handleStatusChanged(IStatus status);
 
+	protected void addSeparator() {
+		Label separator = toolkit.createSeparator(form.getBody(),
+			SWT.HORIZONTAL);
+		GridData gd = new GridData();
+		gd.grabExcessHorizontalSpace = true;
+		gd.horizontalAlignment = SWT.FILL;
+		separator.setLayoutData(gd);
+	}
+
+	protected void addBooleanBinding(WritableValue writableValue,
+			IObservableValue observableValue, final String errorMsg) {
+		UpdateValueStrategy uvs = new UpdateValueStrategy();
+		uvs.setAfterConvertValidator(new IValidator() {
+			@Override
+			public IStatus validate(Object value) {
+				if (value instanceof Boolean && !(Boolean) value) {
+					return ValidationStatus.error(errorMsg);
+				} else {
+					return Status.OK_STATUS;
+				}
+			}
+
+		});
+		dbc.bindValue(writableValue, observableValue, uvs, uvs);
+	}
 }
