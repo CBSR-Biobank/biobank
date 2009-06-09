@@ -5,7 +5,8 @@ import java.text.DecimalFormat;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
-import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Canvas;
@@ -21,25 +22,9 @@ public abstract class AbstractGridContainerWidget extends Canvas {
 
 	private int cellHeight = 40;
 
-	/**
-	 * Width the grid only. Calculated via method calculateSizes()
-	 */
-	private int gridWidth;
+	protected int gridWidth;
 
-	/**
-	 * Height the grid only. Calculated via method calculateSizes()
-	 */
-	private int gridHeight;
-
-	/**
-	 * Total width of the canvas. Calculated via method calculateSizes()
-	 */
-	private int width;
-
-	/**
-	 * Total height of the canvas. Calculated via method calculateSizes()
-	 */
-	private int height;
+	protected int gridHeight;
 
 	private int rows;
 
@@ -55,17 +40,20 @@ public abstract class AbstractGridContainerWidget extends Canvas {
 	 */
 	private Object firstColSign = 1;
 
+	/**
+	 * If yes, the first label in the box will be the column
+	 */
 	private boolean showColumnFirst = false;
 
 	/**
 	 * max width this container will have : used to calculate cells width
 	 */
-	private Integer maxWidth = -1;
+	private int maxWidth = -1;
 
 	/**
 	 * max height this container will have : used to calculate cells height
 	 */
-	private Integer maxHeight = -1;
+	private int maxHeight = -1;
 
 	public AbstractGridContainerWidget(Composite parent) {
 		super(parent, SWT.DOUBLE_BUFFERED);
@@ -78,23 +66,40 @@ public abstract class AbstractGridContainerWidget extends Canvas {
 	}
 
 	protected void paintPalette(PaintEvent e) {
-		setSize(width, height);
-		GC gc = e.gc;
 		for (int indexRow = 0; indexRow < rows; indexRow++) {
 			for (int indexCol = 0; indexCol < columns; indexCol++) {
 				int xPosition = cellWidth * indexCol;
 				int yPosition = cellHeight * indexRow;
 				Rectangle rectangle = new Rectangle(xPosition, yPosition,
 					cellWidth, cellHeight);
-				specificDrawing(e, indexRow, indexCol, rectangle);
-				gc.setForeground(e.display.getSystemColor(SWT.COLOR_BLACK));
-				gc.drawRectangle(rectangle);
+				drawRectangle(e, rectangle, indexRow, indexCol);
 				String text = getTextForBox(indexRow, indexCol);
 				if (text != null) {
-					drawTextOnCenter(gc, text, rectangle);
+					drawTextOnCenter(e, text, rectangle);
 				}
 			}
 		}
+	}
+
+	@Override
+	public Point computeSize(int wHint, int hHint, boolean changed) {
+		if (maxWidth != -1 && maxHeight != -1) {
+			cellWidth = maxWidth / columns;
+			cellHeight = maxHeight / rows;
+			gridWidth = maxWidth;
+			gridHeight = maxHeight;
+		} else {
+			gridWidth = cellWidth * columns;
+			gridHeight = cellHeight * rows;
+		}
+		return new Point(gridWidth + 10, gridHeight + 10);
+	}
+
+	@SuppressWarnings("unused")
+	protected void drawRectangle(PaintEvent e, Rectangle rectangle,
+			int indexRow, int indexCol) {
+		e.gc.setForeground(e.display.getSystemColor(SWT.COLOR_BLACK));
+		e.gc.drawRectangle(rectangle);
 	}
 
 	/**
@@ -131,17 +136,33 @@ public abstract class AbstractGridContainerWidget extends Canvas {
 		return "";
 	}
 
-	protected abstract void specificDrawing(PaintEvent e, int indexRow,
-			int indexCol, Rectangle rectangle);
-
 	/**
 	 * Draw the text on the middle of the rectangle
 	 */
-	public void drawTextOnCenter(GC gc, String text, Rectangle rectangle) {
-		Point textSize = gc.textExtent(text);
+	public void drawTextOnCenter(PaintEvent e, String text, Rectangle rectangle) {
+		Font oldFont = e.gc.getFont();
+		Point textSize = e.gc.textExtent(text);
+		if (textSize.x > rectangle.width) {
+			// Try to find a smallest font to see the whole text
+			FontData fd = oldFont.getFontData()[0];
+			int height = fd.getHeight();
+			Point currentTextSize = textSize;
+			while (currentTextSize.x > rectangle.width && height > 3) {
+				height--;
+				FontData fd2 = new FontData(fd.getName(), height, fd.getStyle());
+				e.gc.setFont(new Font(e.display, fd2));
+				currentTextSize = e.gc.textExtent(text);
+			}
+			if (height > 3) {
+				textSize = currentTextSize;
+			} else {
+				e.gc.setFont(oldFont);
+			}
+		}
 		int xTextPosition = (rectangle.width - textSize.x) / 2 + rectangle.x;
 		int yTextPosition = (rectangle.height - textSize.y) / 2 + rectangle.y;
-		gc.drawText(text, xTextPosition, yTextPosition, true);
+		e.gc.drawText(text, xTextPosition, yTextPosition, true);
+		e.gc.setFont(oldFont);
 	}
 
 	/**
@@ -167,19 +188,7 @@ public abstract class AbstractGridContainerWidget extends Canvas {
 	public void setStorageSize(int rows, int columns) {
 		this.rows = rows;
 		this.columns = columns;
-		calculateSizes();
 		redraw();
-	}
-
-	protected void calculateSizes() {
-		if (maxWidth != -1 && maxHeight != -1) {
-			cellWidth = maxWidth / columns;
-			cellHeight = maxHeight / rows;
-		}
-		gridWidth = cellWidth * columns;
-		gridHeight = cellHeight * rows;
-		width = gridWidth + 10;
-		height = gridHeight + 10;
 	}
 
 	public int getCellWidth() {
@@ -196,38 +205,6 @@ public abstract class AbstractGridContainerWidget extends Canvas {
 
 	public void setCellHeight(int cellHeight) {
 		this.cellHeight = cellHeight;
-	}
-
-	public int getWidth() {
-		return width;
-	}
-
-	public void setWidth(int width) {
-		this.width = width;
-	}
-
-	public int getHeight() {
-		return height;
-	}
-
-	public void setHeight(int height) {
-		this.height = height;
-	}
-
-	public int getGridWidth() {
-		return gridWidth;
-	}
-
-	public int getGridHeight() {
-		return gridHeight;
-	}
-
-	public void setMaxWidth(Integer maxWidth) {
-		this.maxWidth = maxWidth;
-	}
-
-	public void setMaxHeight(Integer maxHeight) {
-		this.maxHeight = maxHeight;
 	}
 
 	public void setFirstRowSign(Object rowSign) {

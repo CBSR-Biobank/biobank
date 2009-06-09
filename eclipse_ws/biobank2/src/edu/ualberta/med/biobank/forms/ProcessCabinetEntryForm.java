@@ -136,8 +136,6 @@ public class ProcessCabinetEntryForm extends BiobankEntryForm implements
 		drawer.setFirstColSign('A');
 		drawer.setShowColumnFirst(true);
 		GridData gdDrawer = new GridData();
-		gdDrawer.widthHint = drawer.getWidth();
-		gdDrawer.heightHint = drawer.getHeight();
 		gdDrawer.verticalAlignment = SWT.TOP;
 		drawer.setLayoutData(gdDrawer);
 
@@ -152,7 +150,6 @@ public class ProcessCabinetEntryForm extends BiobankEntryForm implements
 		typeText = toolkit.createLabel(client, "");
 		GridData gdText = new GridData();
 		gdText.grabExcessHorizontalSpace = true;
-		gdText.widthHint = drawer.getWidth();
 		typeText.setLayoutData(gdText);
 	}
 

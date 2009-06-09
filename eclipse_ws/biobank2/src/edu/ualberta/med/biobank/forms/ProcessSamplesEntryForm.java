@@ -126,29 +126,19 @@ public class ProcessSamplesEntryForm extends BiobankEntryForm implements
 		toolkit.adapt(freezer);
 		freezer.setGridSizes(5, 10, ScanPaletteWidget.PALETTE_WIDTH, 100);
 		GridData gdFreezer = new GridData();
-		gdFreezer.widthHint = freezer.getWidth();
-		gdFreezer.heightHint = freezer.getHeight();
 		gdFreezer.horizontalSpan = 2;
 		freezer.setLayoutData(gdFreezer);
 
 		toolkit.createLabel(client, "Palette");
 		toolkit.createLabel(client, "Hotel");
 
-		palette = new ScanPaletteWidget(client, true);
+		palette = new ScanPaletteWidget(client);
 		toolkit.adapt(palette);
-		GridData gdPalette = new GridData();
-		gdPalette.widthHint = palette.getWidth();
-		gdPalette.heightHint = palette.getHeight();
-		palette.setLayoutData(gdPalette);
 
 		hotel = new StorageContainerWidget(client);
 		toolkit.adapt(hotel);
 		hotel.setGridSizes(11, 1, 100,
 			ScanPaletteWidget.PALETTE_HEIGHT_AND_LEGEND);
-		GridData gdHotel = new GridData();
-		gdHotel.widthHint = hotel.getWidth();
-		gdHotel.heightHint = hotel.getHeight();
-		hotel.setLayoutData(gdHotel);
 		hotel.setFirstColSign(null);
 		hotel.setFirstRowSign(1);
 	}

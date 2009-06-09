@@ -242,7 +242,7 @@ public class TestFunctionalities {
 		site.setName("TestBatch2" + r.nextInt());
 		// Insert will failed because address is missing
 		// Roll back should be launched
-		// site.setAddress(address);
+		site.setAddress(address);
 		queries.add(new InsertExampleQuery(site));
 
 		try {

@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.widgets;
 
 import java.util.List;
 
+import org.eclipse.core.databinding.Binding;
 import org.eclipse.core.databinding.DataBindingContext;
 import org.eclipse.core.databinding.UpdateValueStrategy;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
@@ -44,11 +45,14 @@ public class LinkSampleTypeWidget {
 
 	private IObservableValue selectionDone = new WritableValue(Boolean.TRUE,
 		Boolean.class);
+	private Binding binding;
 
-	public LinkSampleTypeWidget(Composite parent, char letter,
+	public LinkSampleTypeWidget(Composite parent, Character letter,
 			List<SampleType> types, FormToolkit toolkit) {
 
-		toolkit.createLabel(parent, String.valueOf(letter), SWT.LEFT);
+		if (letter != null) {
+			toolkit.createLabel(parent, letter.toString(), SWT.LEFT);
+		}
 
 		createCombo(parent, types);
 		toolkit.adapt(combo, true, true);
@@ -56,10 +60,12 @@ public class LinkSampleTypeWidget {
 		textNumber = toolkit.createLabel(parent, "", SWT.RIGHT | SWT.BORDER);
 		GridData data = new GridData();
 		data.widthHint = 20;
+		data.horizontalAlignment = SWT.LEFT;
 		textNumber.setLayoutData(data);
 
 		controlDecoration = FormUtils.createDecorator(combo,
 			"A sample type should be selected");
+		setNumber(null);
 	}
 
 	private void createCombo(Composite parent, List<SampleType> types) {
@@ -135,27 +141,42 @@ public class LinkSampleTypeWidget {
 	}
 
 	public void addBinding(DataBindingContext dbc) {
-		WritableValue wv = new WritableValue(Boolean.FALSE, Boolean.class);
-		UpdateValueStrategy uvs = new UpdateValueStrategy();
-		uvs.setAfterGetValidator(new IValidator() {
-			@Override
-			public IStatus validate(Object value) {
-				if (value instanceof Boolean && !(Boolean) value) {
-					controlDecoration.show();
-					return ValidationStatus.error("Types should be selected");
-				} else {
-					controlDecoration.hide();
-					return Status.OK_STATUS;
+		if (binding == null) {
+			WritableValue wv = new WritableValue(Boolean.FALSE, Boolean.class);
+			UpdateValueStrategy uvs = new UpdateValueStrategy();
+			uvs.setAfterGetValidator(new IValidator() {
+				@Override
+				public IStatus validate(Object value) {
+					if (value instanceof Boolean && !(Boolean) value) {
+						controlDecoration.show();
+						return ValidationStatus
+							.error("Types should be selected");
+					} else {
+						controlDecoration.hide();
+						return Status.OK_STATUS;
+					}
 				}
-			}
 
-		});
-		dbc.bindValue(wv, selectionDone, uvs, uvs);
+			});
+			binding = dbc.bindValue(wv, selectionDone, uvs, uvs);
+		} else {
+			dbc.addBinding(binding);
+		}
+
 	}
 
-	public void resetValues() {
+	public void removeBinding(DataBindingContext dbc) {
+		if (binding != null) {
+			dbc.removeBinding(binding);
+		}
+	}
+
+	public void resetValues(boolean resetNumber) {
 		cv.setSelection(null);
-		setNumber(null);
+		if (resetNumber) {
+			setNumber(null);
+		} else {
+			setNumber(number); // to re-do the validation tests
+		}
 	}
-
 }

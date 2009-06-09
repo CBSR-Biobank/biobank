@@ -15,14 +15,15 @@ public class StorageContainerWidget extends AbstractGridContainerWidget {
 	}
 
 	@Override
-	protected void specificDrawing(PaintEvent e, int indexRow, int indexCol,
-			Rectangle rectangle) {
+	protected void drawRectangle(PaintEvent e, Rectangle rectangle,
+			int indexRow, int indexCol) {
 		if (selectedBox != null && selectedBox[0] == indexRow
 				&& selectedBox[1] == indexCol) {
 			Color color = e.display.getSystemColor(SWT.COLOR_BLUE);
 			e.gc.setBackground(color);
 			e.gc.fillRectangle(rectangle);
 		}
+		super.drawRectangle(e, rectangle, indexRow, indexCol);
 	}
 
 	public void setSelectedBox(int[] selectedBox) {

@@ -29,6 +29,10 @@ public class ScanCell {
 
 	private String title;
 
+	private boolean selected = false;
+
+	private SampleType type;
+
 	public ScanCell(int row, int column, String value) {
 		this.row = row;
 		this.column = column;
@@ -98,6 +102,9 @@ public class ScanCell {
 	}
 
 	public String getTitle() {
+		if (type != null) {
+			return type.getNameShort();
+		}
 		return title;
 	}
 
@@ -124,4 +131,21 @@ public class ScanCell {
 	public String getValue() {
 		return value;
 	}
+
+	public boolean isSelected() {
+		return selected;
+	}
+
+	public void setSelected(boolean selected) {
+		this.selected = selected;
+	}
+
+	public SampleType getType() {
+		return type;
+	}
+
+	public void setType(SampleType type) {
+		this.type = type;
+	}
+
 }
