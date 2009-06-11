@@ -15,9 +15,9 @@ import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Clinic;
 
 public class ClinicAdapter extends Node {
-    
+
 	private Clinic clinic;
-	
+
 	public ClinicAdapter(Node parent, Clinic clinic) {
 		super(parent);
 		this.clinic = clinic;
@@ -31,14 +31,14 @@ public class ClinicAdapter extends Node {
 	public Clinic getClinic() {
 		return clinic;
 	}
-	
+
 	@Override
 	public void addChild(Node child) {
 		Assert.isTrue(false, "Cannot add children to this adapter");
 	}
 
 	@Override
-	public Integer  getId() {
+	public Integer getId() {
 		Assert.isNotNull(clinic, "Clinic is null");
 		return clinic.getId();
 	}
@@ -48,34 +48,47 @@ public class ClinicAdapter extends Node {
 		Assert.isNotNull(clinic, "Clinic is null");
 		return clinic.getName();
 	}
-    
-    @Override
+
+	@Override
 	public void performDoubleClick() {
-        openForm(new FormInput(this), ClinicViewForm.ID);
-    }
-    
-    @Override
-	public void popupMenu(TreeViewer tv, Tree tree,  Menu menu) {
-        MenuItem mi = new MenuItem (menu, SWT.PUSH);
-        mi.setText ("Edit Clinic");
-        mi.addSelectionListener(new SelectionListener() {
-            public void widgetSelected(SelectionEvent event) {
-                openForm(new FormInput(ClinicAdapter.this), ClinicEntryForm.ID);
-            }
+		openForm(new FormInput(this), ClinicViewForm.ID);
+	}
 
-            public void widgetDefaultSelected(SelectionEvent e) {                    
-            }
-        });
+	@Override
+	public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
+		MenuItem mi = new MenuItem(menu, SWT.PUSH);
+		mi.setText("Edit Clinic");
+		mi.addSelectionListener(new SelectionListener() {
+			public void widgetSelected(SelectionEvent event) {
+				openForm(new FormInput(ClinicAdapter.this), ClinicEntryForm.ID);
+			}
 
-        mi = new MenuItem (menu, SWT.PUSH);
-        mi.setText ("View Clinic");
-        mi.addSelectionListener(new SelectionListener() {
-            public void widgetSelected(SelectionEvent event) {
-                openForm(new FormInput(ClinicAdapter.this), ClinicViewForm.ID);
-            }
+			public void widgetDefaultSelected(SelectionEvent e) {
+			}
+		});
 
-            public void widgetDefaultSelected(SelectionEvent e) {                    
-            }
-        }); 
-    }
+		mi = new MenuItem(menu, SWT.PUSH);
+		mi.setText("View Clinic");
+		mi.addSelectionListener(new SelectionListener() {
+			public void widgetSelected(SelectionEvent event) {
+				openForm(new FormInput(ClinicAdapter.this), ClinicViewForm.ID);
+			}
+
+			public void widgetDefaultSelected(SelectionEvent e) {
+			}
+		});
+	}
+
+	@Override
+	public boolean isSameCompositeObject(Object object) {
+		return object instanceof Clinic
+				&& ((Clinic) object).getId().equals(clinic.getId());
+	}
+
+	@Override
+	public boolean isSameNode(Node node) {
+		return node instanceof ClinicAdapter
+				&& ((ClinicAdapter) node).getClinic().getId().equals(
+					clinic.getId());
+	}
 }

@@ -63,6 +63,11 @@
             id="edu.ualberta.med.biobank.commands.addClinic"
             name="Add Clinic">
       </command>
+      <command
+            defaultHandler="edu.ualberta.med.biobank.handler.SearchHandler"
+            id="edu.ualberta.med.biobank.commands.search"
+            name="Search">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.menus">
@@ -109,6 +114,12 @@
                      style="push">
                </command>
             </menu>
+            <command
+                  commandId="edu.ualberta.med.biobank.commands.search"
+                  id="edu.ualberta.med.biobank.menu.search"
+                  label="Search"
+                  style="push">
+            </command>
          </menu>
       </menuContribution>
    </extension>
@@ -119,6 +130,13 @@
             class="edu.ualberta.med.biobank.views.SessionsView"
             id="edu.ualberta.med.biobank.views.SessionsView"
             name="Sessions"
+            restorable="true">
+      </view>
+      <view
+            allowMultiple="false"
+            class="edu.ualberta.med.biobank.views.SearchView"
+            id="edu.ualberta.med.biobank.views.SearchView"
+            name="Search"
             restorable="true">
       </view>
    </extension>
@@ -135,6 +153,17 @@
                relationship="left"
                relative="org.eclipse.ui.editorss"
                showTitle="false">
+         </view>
+         <view
+               closeable="true"
+               id="edu.ualberta.med.biobank.views.SearchView"
+               minimized="false"
+               moveable="true"
+               relationship="top"
+               relative="org.eclipse.ui.editorss"
+               showTitle="true"
+               standalone="true"
+               visible="true">
          </view>
       </perspectiveExtension>
    </extension>

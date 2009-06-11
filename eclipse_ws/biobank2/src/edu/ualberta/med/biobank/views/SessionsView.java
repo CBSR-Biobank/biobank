@@ -1,5 +1,10 @@
 package edu.ualberta.med.biobank.views;
 
+import org.eclipse.jface.viewers.IElementComparer;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
@@ -8,6 +13,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.NodeContentProvider;
 import edu.ualberta.med.biobank.treeview.NodeLabelProvider;
 
@@ -17,12 +23,18 @@ public class SessionsView extends ViewPart {
 
 	private TreeViewer treeViewer;
 
+	private TreeFilter treeFilter;
+
 	public SessionsView() {
 		SessionManager.getInstance().setSessionsView(this);
 	}
 
 	public TreeViewer getTreeViewer() {
 		return treeViewer;
+	}
+
+	public TreeFilter getFilter() {
+		return treeFilter;
 	}
 
 	@Override
@@ -38,6 +50,36 @@ public class SessionsView extends ViewPart {
 			.getTreeViewerListener());
 		treeViewer.setUseHashlookup(true);
 		treeViewer.setInput(SessionManager.getInstance().getRootNode());
+		treeViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+			public void selectionChanged(SelectionChangedEvent event) {
+				ISelection selection = event.getSelection();
+				if (!selection.isEmpty()
+						&& selection instanceof IStructuredSelection) {
+					Node node = (Node) ((IStructuredSelection) selection)
+						.getFirstElement();
+					getViewSite().getActionBars().getStatusLineManager()
+						.setMessage(node.getName());
+
+				}
+			}
+		});
+		treeViewer.setComparer(new IElementComparer() {
+			@Override
+			public boolean equals(Object a, Object b) {
+				if (a instanceof Node && b instanceof Node) {
+					return ((Node) a).isSameNode((Node) b);
+				}
+				return false;
+			}
+
+			@Override
+			public int hashCode(Object element) {
+				return element.hashCode();
+			}
+
+		});
+		treeFilter = new TreeFilter();
+		treeViewer.addFilter(treeFilter);
 
 		Menu menu = new Menu(PlatformUI.getWorkbench()
 			.getActiveWorkbenchWindow().getShell(), SWT.NONE);

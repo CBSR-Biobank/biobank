@@ -159,4 +159,17 @@ public class SiteAdapter extends Node {
 			}
 		});
 	}
+
+	@Override
+	public boolean isSameCompositeObject(Object object) {
+		return object instanceof Site
+				&& ((Site) object).getId().equals(site.getId());
+	}
+
+	@Override
+	public boolean isSameNode(Node node) {
+		return node instanceof SiteAdapter
+				&& ((SiteAdapter) node).getSite().getId().equals(site.getId());
+	}
+
 }

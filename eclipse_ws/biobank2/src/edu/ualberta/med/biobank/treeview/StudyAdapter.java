@@ -15,20 +15,20 @@ import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Study;
 
 public class StudyAdapter extends Node {
-    public static final int PATIENTS_NODE_ID = 0;
-    
+	public static final int PATIENTS_NODE_ID = 0;
+
 	private Study study;
-	
+
 	public StudyAdapter(Node parent, Study study) {
-        super(parent);
-        this.setStudy(study);
-	    
-	    if (study.getId() != null) {
-	        setId(study.getId());
-	        setName(study.getName());
-	        
-	    }
-        addChild(new PatientGroup(this, PATIENTS_NODE_ID));
+		super(parent);
+		this.setStudy(study);
+
+		if (study.getId() != null) {
+			setId(study.getId());
+			setName(study.getName());
+
+		}
+		addChild(new PatientGroup(this, PATIENTS_NODE_ID));
 	}
 
 	public void setStudy(Study study) {
@@ -50,38 +50,51 @@ public class StudyAdapter extends Node {
 		Assert.isNotNull(study, "study is null");
 		return study.getNameShort();
 	}
-    
-    @Override
+
+	@Override
 	public void performDoubleClick() {
-        openForm(new FormInput(this), StudyViewForm.ID);
-    }
-    
-    @Override
+		openForm(new FormInput(this), StudyViewForm.ID);
+	}
+
+	@Override
 	public void performExpand() {
-    }
-    
-    @Override
-	public void popupMenu(TreeViewer tv, Tree tree,  Menu menu) {
-        MenuItem mi = new MenuItem (menu, SWT.PUSH);
-        mi.setText ("Edit Study");
-        mi.addSelectionListener(new SelectionListener() {
-            public void widgetSelected(SelectionEvent event) {
-                openForm(new FormInput(StudyAdapter.this), StudyEntryForm.ID);
-            }
+	}
 
-            public void widgetDefaultSelected(SelectionEvent e) {                    
-            }
-        });
+	@Override
+	public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
+		MenuItem mi = new MenuItem(menu, SWT.PUSH);
+		mi.setText("Edit Study");
+		mi.addSelectionListener(new SelectionListener() {
+			public void widgetSelected(SelectionEvent event) {
+				openForm(new FormInput(StudyAdapter.this), StudyEntryForm.ID);
+			}
 
-        mi = new MenuItem (menu, SWT.PUSH);
-        mi.setText ("View Study");
-        mi.addSelectionListener(new SelectionListener() {
-            public void widgetSelected(SelectionEvent event) {
-                openForm(new FormInput(StudyAdapter.this), StudyViewForm.ID);
-            }
+			public void widgetDefaultSelected(SelectionEvent e) {
+			}
+		});
 
-            public void widgetDefaultSelected(SelectionEvent e) {                    
-            }
-        }); 
-    }
+		mi = new MenuItem(menu, SWT.PUSH);
+		mi.setText("View Study");
+		mi.addSelectionListener(new SelectionListener() {
+			public void widgetSelected(SelectionEvent event) {
+				openForm(new FormInput(StudyAdapter.this), StudyViewForm.ID);
+			}
+
+			public void widgetDefaultSelected(SelectionEvent e) {
+			}
+		});
+	}
+
+	@Override
+	public boolean isSameCompositeObject(Object object) {
+		return object instanceof Study
+				&& ((Study) object).getId().equals(study.getId());
+	}
+
+	@Override
+	public boolean isSameNode(Node node) {
+		return node instanceof StudyAdapter
+				&& ((StudyAdapter) node).getStudy().getId().equals(
+					study.getId());
+	}
 }

@@ -98,4 +98,17 @@ public class PatientVisitAdapter extends Node {
 			}
 		});
 	}
+
+	@Override
+	public boolean isSameCompositeObject(Object object) {
+		return object instanceof PatientVisit
+				&& ((PatientVisit) object).getId().equals(patientVisit.getId());
+	}
+
+	@Override
+	public boolean isSameNode(Node node) {
+		return node instanceof PatientVisitAdapter
+				&& ((PatientVisitAdapter) node).getPatientVisit().getId()
+					.equals(patientVisit.getId());
+	}
 }

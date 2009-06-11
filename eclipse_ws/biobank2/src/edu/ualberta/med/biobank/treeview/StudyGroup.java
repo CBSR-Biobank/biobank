@@ -22,83 +22,84 @@ import edu.ualberta.med.biobank.model.Study;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class StudyGroup extends Node {
-    
-    private static Logger log4j = Logger.getLogger(SessionManager.class.getName());
 
-    public StudyGroup(SiteAdapter parent, int id) {
-        super(parent, id, "Studies", true);
-    }
-    
-    public void openViewForm() {
-        Assert.isTrue(false, "should not be called");
-    }
-    
-    @Override
+	private static Logger log4j = Logger.getLogger(SessionManager.class
+		.getName());
+
+	public StudyGroup(SiteAdapter parent, int id) {
+		super(parent, id, "Studies", true);
+	}
+
+	public void openViewForm() {
+		Assert.isTrue(false, "should not be called");
+	}
+
+	@Override
 	public void performDoubleClick() {
-        performExpand();
-    }
+		performExpand();
+	}
 
-    @Override
+	@Override
 	public void performExpand() {
-        final Site currentSite = ((SiteAdapter) getParent()).getSite();
-        Assert.isNotNull(currentSite, "null site");        
-        
-        Display.getDefault().asyncExec(new Runnable() {
-            public void run() {                
-                // read from database again 
-                Site site = new Site();                
-                site.setId(currentSite.getId());
-                
-                WritableApplicationService appService = getAppService();
-                try {
-                    List<Site> result = appService.search(Site.class, site);
-                    Assert.isTrue(result.size() == 1);
-                    site = result.get(0);
+		final Site currentSite = ((SiteAdapter) getParent()).getSite();
+		Assert.isNotNull(currentSite, "null site");
 
-                    Collection<Study> studies = site.getStudyCollection();
-                    currentSite.setStudyCollection(studies);
-                    log4j.trace("updateStudies: Site " 
-                            + site.getName() + " has " + studies.size() + " studies");
+		Display.getDefault().asyncExec(new Runnable() {
+			public void run() {
+				// read from database again
+				Site site = new Site();
+				site.setId(currentSite.getId());
 
-                    for (Study study: studies) {
-                        log4j.trace("updateStudies: Study "
-                                + study.getId() + ": " + study.getName()
-                                + ", short name: " + study.getNameShort());
-                        
-                        StudyAdapter node = 
-                            (StudyAdapter) getChild(study.getId());
+				WritableApplicationService appService = getAppService();
+				try {
+					List<Site> result = appService.search(Site.class, site);
+					Assert.isTrue(result.size() == 1);
+					site = result.get(0);
 
-                        if (node == null) {
-                            node = new StudyAdapter(StudyGroup.this, study);
-                            addChild(node);
-                        }
-                        
-                        SessionManager.getInstance().getTreeViewer().update(node, null);
-                    }
-                    SessionManager.getInstance().getTreeViewer().expandToLevel(
-                        StudyGroup.this, 1);
-                }
-                catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-    }
-    
-    @Override
-	public void popupMenu(TreeViewer tv, Tree tree,  Menu menu) {
-        MenuItem mi = new MenuItem (menu, SWT.PUSH);
-        mi.setText ("Add Study");
-        mi.addSelectionListener(new SelectionListener() {
-            public void widgetSelected(SelectionEvent event) {
-                StudyAdapter adapter = new StudyAdapter(
-                    StudyGroup.this, new Study());
-                openForm(new FormInput(adapter), StudyEntryForm.ID);
-            }
+					Collection<Study> studies = site.getStudyCollection();
+					currentSite.setStudyCollection(studies);
+					log4j.trace("updateStudies: Site " + site.getName()
+							+ " has " + studies.size() + " studies");
 
-            public void widgetDefaultSelected(SelectionEvent e) {                    
-            }
-        });
-    }
+					for (Study study : studies) {
+						log4j.trace("updateStudies: Study " + study.getId()
+								+ ": " + study.getName() + ", short name: "
+								+ study.getNameShort());
+
+						StudyAdapter node = (StudyAdapter) getChild(study
+							.getId());
+
+						if (node == null) {
+							node = new StudyAdapter(StudyGroup.this, study);
+							addChild(node);
+						}
+
+						SessionManager.getInstance().getTreeViewer().update(
+							node, null);
+					}
+					SessionManager.getInstance().getTreeViewer().expandToLevel(
+						StudyGroup.this, 1);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+	}
+
+	@Override
+	public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
+		MenuItem mi = new MenuItem(menu, SWT.PUSH);
+		mi.setText("Add Study");
+		mi.addSelectionListener(new SelectionListener() {
+			public void widgetSelected(SelectionEvent event) {
+				StudyAdapter adapter = new StudyAdapter(StudyGroup.this,
+					new Study());
+				openForm(new FormInput(adapter), StudyEntryForm.ID);
+			}
+
+			public void widgetDefaultSelected(SelectionEvent e) {
+			}
+		});
+	}
 
 }

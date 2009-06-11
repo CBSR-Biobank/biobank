@@ -277,4 +277,13 @@ public class Node {
 			}
 		}
 	}
+
+	public boolean isSameCompositeObject(Object selection) {
+		return false;
+	}
+
+	public boolean isSameNode(Node node) {
+		return this.equals(node);
+	}
+
 }
