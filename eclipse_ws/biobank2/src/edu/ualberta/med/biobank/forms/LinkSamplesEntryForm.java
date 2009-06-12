@@ -47,7 +47,6 @@ import edu.ualberta.med.biobank.widgets.LinkSampleTypeWidget;
 import edu.ualberta.med.biobank.widgets.ScanLinkPaletteWidget;
 import edu.ualberta.med.biobank.widgets.listener.ScanPaletteModificationEvent;
 import edu.ualberta.med.biobank.widgets.listener.ScanPaletteModificationListener;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.query.SDKQuery;
 import gov.nih.nci.system.query.example.InsertExampleQuery;
 
@@ -238,7 +237,6 @@ public class LinkSamplesEntryForm extends BiobankEntryForm {
 					spw.enableSelection();
 					typesFilled.setValue(spw.isEverythingTyped());
 					spw.redraw();
-
 				}
 			}
 		});
@@ -298,12 +296,14 @@ public class LinkSamplesEntryForm extends BiobankEntryForm {
 		sampleTypeWidgets = new ArrayList<LinkSampleTypeWidget>();
 		char letter = 'A';
 		for (int i = 0; i < ScanCell.ROW_MAX; i++) {
-			LinkSampleTypeWidget typeWidget = new LinkSampleTypeWidget(
+			final LinkSampleTypeWidget typeWidget = new LinkSampleTypeWidget(
 				typesSelectionPerRowComposite, letter, sampleTypes, toolkit);
+			final int indexRow = i;
 			typeWidget
 				.addSelectionChangedListener(new ISelectionChangedListener() {
 					@Override
 					public void selectionChanged(SelectionChangedEvent event) {
+						setTypeForRow(typeWidget, indexRow);
 						setDirty(true);
 					}
 
@@ -417,13 +417,26 @@ public class LinkSamplesEntryForm extends BiobankEntryForm {
 		BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
 			public void run() {
 				try {
-					if (radioRowSelection.getSelection()) {
-						saveWithRowSelection();
-					} else {
-						saveWithCustomSelection();
+					List<SDKQuery> queries = new ArrayList<SDKQuery>();
+					ScanCell[][] cells = spw.getScannedElements();
+					for (int indexRow = 0; indexRow < cells.length; indexRow++) {
+						for (int indexColumn = 0; indexColumn < cells[indexRow].length; indexColumn++) {
+							ScanCell cell = cells[indexRow][indexColumn];
+							if (cell != null
+									&& cell.getStatus().equals(CellStatus.TYPE)) {
+								// add new samples
+								Sample sample = new Sample();
+								sample.setInventoryId(cell.getValue());
+								sample.setPatientVisit(patientVisit);
+								sample.setSampleType(cell.getType());
+								queries.add(new InsertExampleQuery(sample));
+							}
+						}
 					}
+					appService.executeBatchQuery(queries);
 					getSite().getPage().closeEditor(LinkSamplesEntryForm.this,
 						false);
+					pvAdapter.performExpand();
 					Node.openForm(new FormInput(pvAdapter),
 						PatientVisitViewForm.ID);
 				} catch (RemoteConnectFailureException exp) {
@@ -435,47 +448,18 @@ public class LinkSamplesEntryForm extends BiobankEntryForm {
 		});
 	}
 
-	private void saveWithRowSelection() throws ApplicationException {
-		List<SDKQuery> queries = new ArrayList<SDKQuery>();
-		ScanCell[][] cells = spw.getScannedElements();
-		for (int indexRow = 0; indexRow < cells.length; indexRow++) {
-			LinkSampleTypeWidget typeWidget = sampleTypeWidgets.get(indexRow);
-			if (typeWidget.needToSave()) {
-				SampleType type = typeWidget.getSelection();
-				for (int indexColumn = 0; indexColumn < cells[indexRow].length; indexColumn++) {
-					ScanCell cell = cells[indexRow][indexColumn];
-					if (cell != null
-							&& !cell.getStatus().equals(CellStatus.EMPTY)) {
-						// add new samples
-						Sample sample = new Sample();
-						sample.setInventoryId(cell.getValue());
-						sample.setPatientVisit(patientVisit);
-						sample.setSampleType(type);
-						queries.add(new InsertExampleQuery(sample));
-					}
-				}
-			}
-		}
-		appService.executeBatchQuery(queries);
-	}
-
-	protected void saveWithCustomSelection() throws ApplicationException {
-		List<SDKQuery> queries = new ArrayList<SDKQuery>();
-		ScanCell[][] cells = spw.getScannedElements();
-		for (int indexRow = 0; indexRow < cells.length; indexRow++) {
+	private void setTypeForRow(LinkSampleTypeWidget typeWidget, int indexRow) {
+		if (typeWidget.needToSave()) {
+			SampleType type = typeWidget.getSelection();
+			ScanCell[][] cells = spw.getScannedElements();
 			for (int indexColumn = 0; indexColumn < cells[indexRow].length; indexColumn++) {
 				ScanCell cell = cells[indexRow][indexColumn];
-				if (cell != null && cell.getStatus().equals(CellStatus.TYPE)) {
-					// add new samples
-					Sample sample = new Sample();
-					sample.setInventoryId(cell.getValue());
-					sample.setPatientVisit(patientVisit);
-					sample.setSampleType(cell.getType());
-					queries.add(new InsertExampleQuery(sample));
-				}
+				cell.setType(type);
+				cell.setStatus(CellStatus.TYPE);
+				spw.redraw();
+
 			}
 		}
-		appService.executeBatchQuery(queries);
 	}
 
 	protected void cancel() {

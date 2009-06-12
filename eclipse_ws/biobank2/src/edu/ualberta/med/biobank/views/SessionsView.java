@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.views;
 
-import org.eclipse.jface.viewers.IElementComparer;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -10,6 +9,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.dialogs.FilteredTree;
 import org.eclipse.ui.part.ViewPart;
 
 import edu.ualberta.med.biobank.SessionManager;
@@ -39,8 +39,11 @@ public class SessionsView extends ViewPart {
 
 	@Override
 	public void createPartControl(Composite parent) {
-		treeViewer = new TreeViewer(parent, SWT.BORDER | SWT.MULTI
-				| SWT.V_SCROLL);
+		FilteredTree filteredTree = new FilteredTree(parent, SWT.BORDER
+				| SWT.MULTI | SWT.V_SCROLL, new TreeFilter());
+		filteredTree.setBackground(parent.getDisplay().getSystemColor(
+			SWT.COLOR_LIST_BACKGROUND));
+		treeViewer = filteredTree.getViewer();
 		getSite().setSelectionProvider(treeViewer);
 		treeViewer.setLabelProvider(new NodeLabelProvider());
 		treeViewer.setContentProvider(new NodeContentProvider());
@@ -63,23 +66,6 @@ public class SessionsView extends ViewPart {
 				}
 			}
 		});
-		treeViewer.setComparer(new IElementComparer() {
-			@Override
-			public boolean equals(Object a, Object b) {
-				if (a instanceof Node && b instanceof Node) {
-					return ((Node) a).isSameNode((Node) b);
-				}
-				return false;
-			}
-
-			@Override
-			public int hashCode(Object element) {
-				return element.hashCode();
-			}
-
-		});
-		treeFilter = new TreeFilter();
-		treeViewer.addFilter(treeFilter);
 
 		Menu menu = new Menu(PlatformUI.getWorkbench()
 			.getActiveWorkbenchWindow().getShell(), SWT.NONE);

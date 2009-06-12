@@ -132,7 +132,11 @@ public class LinkSampleTypeWidget {
 	}
 
 	public boolean needToSave() {
-		return number > 0;
+		if (number == null) {
+			return false;
+		} else {
+			return number > 0;
+		}
 	}
 
 	public SampleType getSelection() {

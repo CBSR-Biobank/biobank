@@ -2,7 +2,6 @@ package edu.ualberta.med.biobank.treeview;
 
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
@@ -21,9 +20,6 @@ import edu.ualberta.med.biobank.model.Site;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class SessionAdapter extends Node {
-
-	private static Logger log4j = Logger.getLogger(SessionManager.class
-		.getName());
 
 	private WritableApplicationService appService;
 
@@ -46,37 +42,23 @@ public class SessionAdapter extends Node {
 	}
 
 	@Override
+	public String getTitle() {
+		return "";
+	}
+
+	@Override
 	public void performExpand() {
 		Display.getDefault().asyncExec(new Runnable() {
 			public void run() {
-				// read from database again
-				Site siteSearch = new Site();
-
-				WritableApplicationService appService = getAppService();
-				try {
-					List<Site> result = appService.search(Site.class,
-						siteSearch);
-					for (Site site : result) {
-						log4j.trace("updateSites: Site " + site.getId() + ": "
-								+ site.getName());
-
-						SiteAdapter node = (SiteAdapter) getChild(site.getId());
-						if (node == null) {
-							node = new SiteAdapter(SessionAdapter.this, site);
-							addChild(node);
-						}
-						SessionManager.getInstance().getTreeViewer().update(
-							node, null);
-					}
-					SessionManager.getInstance().getTreeViewer().expandToLevel(
-						SessionAdapter.this, 1);
-				} catch (final RemoteAccessException exp) {
-					BioBankPlugin.openRemoteAccessErrorMessage();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
+				loadChildren();
+				SessionManager.getInstance().getTreeViewer().expandToLevel(
+					SessionAdapter.this, 1);
 			}
 		});
+	}
+
+	@Override
+	public void performDoubleClick() {
 	}
 
 	@Override
@@ -122,4 +104,37 @@ public class SessionAdapter extends Node {
 			}
 		});
 	}
+
+	@Override
+	public void loadChildren() {
+		try {
+			// read from database again
+			Site siteSearch = new Site();
+			List<Site> result = appService.search(Site.class, siteSearch);
+			for (Site site : result) {
+				SessionManager.getLogger()
+					.trace(
+						"updateSites: Site " + site.getId() + ": "
+								+ site.getName());
+
+				SiteAdapter node = (SiteAdapter) getChild(site.getId());
+				if (node == null) {
+					node = new SiteAdapter(this, site);
+					addChild(node);
+				}
+				SessionManager.getInstance().getTreeViewer().update(node, null);
+			}
+		} catch (final RemoteAccessException exp) {
+			BioBankPlugin.openRemoteAccessErrorMessage();
+		} catch (Exception e) {
+			SessionManager.getLogger().error(
+				"Error while loading sites for session " + getName());
+		}
+	}
+
+	@Override
+	public Node accept(NodeSearchVisitor visitor) {
+		return visitor.visit(this);
+	}
+
 }

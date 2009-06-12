@@ -9,26 +9,25 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
 
-import edu.ualberta.med.biobank.forms.ClinicEntryForm;
-import edu.ualberta.med.biobank.forms.ClinicViewForm;
+import edu.ualberta.med.biobank.forms.SampleViewForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
-import edu.ualberta.med.biobank.model.Clinic;
+import edu.ualberta.med.biobank.model.Sample;
 
-public class ClinicAdapter extends Node {
+public class SampleAdapter extends Node {
 
-	private Clinic clinic;
+	private Sample sample;
 
-	public ClinicAdapter(Node parent, Clinic clinic) {
+	public SampleAdapter(Node parent, Sample sample) {
 		super(parent);
-		this.clinic = clinic;
+		this.sample = sample;
 	}
 
-	public void setClinic(Clinic clinic) {
-		this.clinic = clinic;
+	public void setSample(Sample sample) {
+		this.sample = sample;
 	}
 
-	public Clinic getClinic() {
-		return clinic;
+	public Sample getSample() {
+		return sample;
 	}
 
 	@Override
@@ -38,24 +37,24 @@ public class ClinicAdapter extends Node {
 
 	@Override
 	public Integer getId() {
-		Assert.isNotNull(clinic, "Clinic is null");
-		return clinic.getId();
+		Assert.isNotNull(sample, "Sample is null");
+		return sample.getId();
 	}
 
 	@Override
 	public String getName() {
-		Assert.isNotNull(clinic, "Clinic is null");
-		return clinic.getName();
+		Assert.isNotNull(sample, "Clinic is null");
+		return sample.getInventoryId();
 	}
 
 	@Override
 	public String getTitle() {
-		return getTitle("Clinic");
+		return getTitle("Sample");
 	}
 
 	@Override
 	public void performDoubleClick() {
-		openForm(new FormInput(this), ClinicViewForm.ID);
+		openForm(new FormInput(this), SampleViewForm.ID);
 	}
 
 	@Override
@@ -66,21 +65,10 @@ public class ClinicAdapter extends Node {
 	@Override
 	public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
 		MenuItem mi = new MenuItem(menu, SWT.PUSH);
-		mi.setText("Edit Clinic");
+		mi.setText("View Sample");
 		mi.addSelectionListener(new SelectionListener() {
 			public void widgetSelected(SelectionEvent event) {
-				openForm(new FormInput(ClinicAdapter.this), ClinicEntryForm.ID);
-			}
-
-			public void widgetDefaultSelected(SelectionEvent e) {
-			}
-		});
-
-		mi = new MenuItem(menu, SWT.PUSH);
-		mi.setText("View Clinic");
-		mi.addSelectionListener(new SelectionListener() {
-			public void widgetSelected(SelectionEvent event) {
-				openForm(new FormInput(ClinicAdapter.this), ClinicViewForm.ID);
+				openForm(new FormInput(SampleAdapter.this), SampleViewForm.ID);
 			}
 
 			public void widgetDefaultSelected(SelectionEvent e) {
@@ -90,8 +78,6 @@ public class ClinicAdapter extends Node {
 
 	@Override
 	public void loadChildren() {
-		// TODO Auto-generated method stub
-
 	}
 
 	@Override

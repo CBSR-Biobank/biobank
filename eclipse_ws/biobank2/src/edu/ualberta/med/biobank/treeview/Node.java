@@ -19,7 +19,7 @@ import edu.ualberta.med.biobank.forms.ProcessSamplesEntryForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
-public class Node {
+public abstract class Node {
 
 	protected IDeltaListener listener = NullDeltaListener.getSoleInstance();
 
@@ -76,6 +76,20 @@ public class Node {
 		return name;
 	}
 
+	public String getTitle() {
+		Assert.isTrue(false, "title for " + getClass().getName()
+				+ " not implemented");
+		return "";
+	}
+
+	protected String getTitle(String string) {
+		String name = getName();
+		if (name == null) {
+			return "New " + string;
+		}
+		return string + " " + name;
+	}
+
 	public List<Node> getItems() {
 		return children;
 	}
@@ -85,6 +99,13 @@ public class Node {
 	}
 
 	public Node getChild(int id) {
+		return getChild(id, false);
+	}
+
+	public Node getChild(int id, boolean reloadChildren) {
+		if (reloadChildren) {
+			loadChildren();
+		}
 		if (children.size() == 0)
 			return null;
 
@@ -216,20 +237,13 @@ public class Node {
 		listener.remove(new DeltaEvent(removed));
 	}
 
-	public void performDoubleClick() {
-		Assert.isTrue(false, "should be implemented by derived class: "
-				+ this.getName());
-	}
+	public abstract void performDoubleClick();
 
-	public void performExpand() {
-		Assert.isTrue(false, "should be implemented by derived class: "
-				+ this.getName());
-	}
+	public abstract void performExpand();
 
-	public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-		Assert.isTrue(false, "should be implemented by derived class: "
-				+ this.getName());
-	}
+	public abstract void popupMenu(TreeViewer tv, Tree tree, Menu menu);
+
+	public abstract void loadChildren();
 
 	public static void closeEditor(FormInput input) {
 		IWorkbenchPage page = PlatformUI.getWorkbench()
@@ -278,12 +292,18 @@ public class Node {
 		}
 	}
 
-	public boolean isSameCompositeObject(Object selection) {
-		return false;
+	public SessionAdapter getSessionAdapter() {
+		Node node = this;
+		while (node != null) {
+			if (node instanceof SessionAdapter) {
+				return (SessionAdapter) node;
+			} else {
+				node = node.getParent();
+			}
+		}
+		return null;
 	}
 
-	public boolean isSameNode(Node node) {
-		return this.equals(node);
-	}
+	public abstract Node accept(NodeSearchVisitor visitor);
 
 }

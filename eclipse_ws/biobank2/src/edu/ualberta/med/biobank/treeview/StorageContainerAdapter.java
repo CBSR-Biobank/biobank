@@ -37,6 +37,11 @@ public class StorageContainerAdapter extends Node {
 	}
 
 	@Override
+	public String getTitle() {
+		return getTitle("Storage Container");
+	}
+
+	@Override
 	public void performDoubleClick() {
 		openForm(new FormInput(this), StorageContainerViewForm.ID);
 	}
@@ -47,6 +52,10 @@ public class StorageContainerAdapter extends Node {
 
 	public void setStorageContainer(StorageContainer storageContainer) {
 		this.storageContainer = storageContainer;
+	}
+
+	@Override
+	public void performExpand() {
 	}
 
 	@Override
@@ -77,16 +86,13 @@ public class StorageContainerAdapter extends Node {
 	}
 
 	@Override
-	public boolean isSameCompositeObject(Object object) {
-		return object instanceof StorageContainer
-				&& ((StorageContainer) object).getId().equals(
-					storageContainer.getId());
+	public void loadChildren() {
+
 	}
 
 	@Override
-	public boolean isSameNode(Node node) {
-		return node instanceof StorageContainerAdapter
-				&& ((StorageContainerAdapter) node).getStorageContainer()
-					.getId().equals(storageContainer.getId());
+	public Node accept(NodeSearchVisitor visitor) {
+		return null;
 	}
+
 }

@@ -19,6 +19,7 @@ import org.eclipse.swt.widgets.Tree;
 
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.treeview.Node;
+import edu.ualberta.med.biobank.treeview.RootNode;
 import edu.ualberta.med.biobank.treeview.SessionAdapter;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.views.SessionsView;
@@ -94,7 +95,7 @@ public class SessionManager {
 
 	private SessionManager() {
 		super();
-		rootNode = new Node(null, 1, "root");
+		rootNode = RootNode.getRootNode();
 		sessionsByName = new HashMap<String, SessionAdapter>();
 	}
 
@@ -168,5 +169,9 @@ public class SessionManager {
 
 	public TreeFilter getTreeFilter() {
 		return view.getFilter();
+	}
+
+	public static Logger getLogger() {
+		return log4j;
 	}
 }

@@ -74,6 +74,11 @@ public class SiteAdapter extends Node {
 	}
 
 	@Override
+	public String getTitle() {
+		return getTitle("Site");
+	}
+
+	@Override
 	public void performDoubleClick() {
 		openForm(new FormInput(this), SiteViewForm.ID);
 	}
@@ -131,6 +136,11 @@ public class SiteAdapter extends Node {
 		});
 	}
 
+	@Override
+	public void loadChildren() {
+
+	}
+
 	protected void deleteSite() {
 		boolean result = MessageDialog.openConfirm(PlatformUI.getWorkbench()
 			.getActiveWorkbenchWindow().getShell(), "Site Deletion",
@@ -161,15 +171,7 @@ public class SiteAdapter extends Node {
 	}
 
 	@Override
-	public boolean isSameCompositeObject(Object object) {
-		return object instanceof Site
-				&& ((Site) object).getId().equals(site.getId());
+	public Node accept(NodeSearchVisitor visitor) {
+		return visitor.visit(this);
 	}
-
-	@Override
-	public boolean isSameNode(Node node) {
-		return node instanceof SiteAdapter
-				&& ((SiteAdapter) node).getSite().getId().equals(site.getId());
-	}
-
 }

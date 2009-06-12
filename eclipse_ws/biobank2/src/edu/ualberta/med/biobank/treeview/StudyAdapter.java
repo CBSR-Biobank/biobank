@@ -52,6 +52,11 @@ public class StudyAdapter extends Node {
 	}
 
 	@Override
+	public String getTitle() {
+		return getTitle("Study");
+	}
+
+	@Override
 	public void performDoubleClick() {
 		openForm(new FormInput(this), StudyViewForm.ID);
 	}
@@ -86,15 +91,11 @@ public class StudyAdapter extends Node {
 	}
 
 	@Override
-	public boolean isSameCompositeObject(Object object) {
-		return object instanceof Study
-				&& ((Study) object).getId().equals(study.getId());
+	public void loadChildren() {
 	}
 
 	@Override
-	public boolean isSameNode(Node node) {
-		return node instanceof StudyAdapter
-				&& ((StudyAdapter) node).getStudy().getId().equals(
-					study.getId());
+	public Node accept(NodeSearchVisitor visitor) {
+		return visitor.visit(this);
 	}
 }

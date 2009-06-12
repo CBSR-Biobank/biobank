@@ -18,69 +18,81 @@ import edu.ualberta.med.biobank.forms.PatientEntryForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.Study;
-import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class PatientGroup extends Node {
 
-    public PatientGroup(StudyAdapter parent, int id) {
-        super(parent, id, "Patients", true);
-    }
+	public PatientGroup(StudyAdapter parent, int id) {
+		super(parent, id, "Patients", true);
+	}
 
-    @Override
+	@Override
 	public void performDoubleClick() {
-        performExpand();
-    }
+		performExpand();
+	}
 
-    @Override
-	public void performExpand() {   
-        final Study parentStudy = ((StudyAdapter) getParent()).getStudy();
-        Display.getDefault().asyncExec(new Runnable() {
-            public void run() {                
-                // read from database again                 
-                WritableApplicationService appService = getAppService();
-                try {
-                    Study searchStudy = new Study();
-                    searchStudy.setId(parentStudy.getId());
-                    List<Study> result = appService.search(Study.class, searchStudy);
-                    Assert.isTrue(result.size() == 1);
-                    searchStudy = result.get(0);
+	@Override
+	public void performExpand() {
+		Display.getDefault().asyncExec(new Runnable() {
+			public void run() {
+				loadChildren();
+				SessionManager.getInstance().getTreeViewer().expandToLevel(
+					PatientGroup.this, 1);
+			}
+		});
+	}
 
-                    Collection<Patient> patients = searchStudy.getPatientCollection();
+	@Override
+	public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
+		MenuItem mi = new MenuItem(menu, SWT.PUSH);
+		mi.setText("Add Patient");
+		mi.addSelectionListener(new SelectionListener() {
+			public void widgetSelected(SelectionEvent event) {
+				PatientAdapter adapter = new PatientAdapter(PatientGroup.this,
+					new Patient());
+				openForm(new FormInput(adapter), PatientEntryForm.ID);
+			}
 
-                    for (Patient patient: patients) {
-                        PatientAdapter node = 
-                            (PatientAdapter) getChild(patient.getId());
+			public void widgetDefaultSelected(SelectionEvent e) {
+			}
+		});
+	}
 
-                        if (node == null) {
-                            node = new PatientAdapter(PatientGroup.this, patient);
-                            addChild(node);
-                        }
-                        
-                        SessionManager.getInstance().getTreeViewer().update(node, null);
-                    }
-                    SessionManager.getInstance().getTreeViewer().expandToLevel(
-                        PatientGroup.this, 1);
-                }
-                catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-    }
-    
-    @Override
-	public void popupMenu(TreeViewer tv, Tree tree,  Menu menu) {
-        MenuItem mi = new MenuItem (menu, SWT.PUSH);
-        mi.setText ("Add Patient");
-        mi.addSelectionListener(new SelectionListener() {
-            public void widgetSelected(SelectionEvent event) {
-                PatientAdapter adapter = new PatientAdapter(
-                    PatientGroup.this, new Patient());
-                openForm(new FormInput(adapter), PatientEntryForm.ID);
-            }
+	@Override
+	public void loadChildren() {
+		Study parentStudy = ((StudyAdapter) getParent()).getStudy();
+		Assert.isNotNull(parentStudy, "null study");
+		try {
+			// read from database again
+			Study searchStudy = new Study();
+			searchStudy.setId(parentStudy.getId());
+			List<Study> result = getAppService().search(Study.class,
+				searchStudy);
+			Assert.isTrue(result.size() == 1);
+			parentStudy = result.get(0);
+			((StudyAdapter) getParent()).setStudy(parentStudy);
 
-            public void widgetDefaultSelected(SelectionEvent e) {                    
-            }
-        }); 
-    }
+			Collection<Patient> patients = parentStudy.getPatientCollection();
+
+			for (Patient patient : patients) {
+				PatientAdapter node = (PatientAdapter) getChild(patient.getId());
+
+				if (node == null) {
+					node = new PatientAdapter(this, patient);
+					addChild(node);
+				}
+
+				SessionManager.getInstance().getTreeViewer().update(node, null);
+			}
+
+		} catch (Exception e) {
+			SessionManager.getLogger().error(
+				"Error while loading patient group children for study "
+						+ parentStudy.getName(), e);
+		}
+	}
+
+	@Override
+	public Node accept(NodeSearchVisitor visitor) {
+		return visitor.visit(this);
+	}
 }

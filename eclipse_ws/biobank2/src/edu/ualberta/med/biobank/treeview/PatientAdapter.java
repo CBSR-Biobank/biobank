@@ -20,7 +20,6 @@ import edu.ualberta.med.biobank.forms.PatientVisitEntryForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.PatientVisit;
-import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class PatientAdapter extends Node {
 
@@ -53,6 +52,11 @@ public class PatientAdapter extends Node {
 	}
 
 	@Override
+	public String getTitle() {
+		return getTitle("Patient");
+	}
+
+	@Override
 	public void performDoubleClick() {
 		performExpand();
 		openForm(new FormInput(this), PatientViewForm.ID);
@@ -62,37 +66,9 @@ public class PatientAdapter extends Node {
 	public void performExpand() {
 		Display.getDefault().asyncExec(new Runnable() {
 			public void run() {
-				// read from database again
-				WritableApplicationService appService = getAppService();
-				try {
-					Patient searchPatient = new Patient();
-					searchPatient.setId(patient.getId());
-					List<Patient> result = appService.search(Patient.class,
-						searchPatient);
-					Assert.isTrue(result.size() == 1);
-					searchPatient = result.get(0);
-
-					Collection<PatientVisit> visits = searchPatient
-						.getPatientVisitCollection();
-
-					for (PatientVisit visit : visits) {
-						PatientVisitAdapter node = (PatientVisitAdapter) getChild(visit
-							.getId());
-
-						if (node == null) {
-							node = new PatientVisitAdapter(PatientAdapter.this,
-								visit);
-							addChild(node);
-						}
-
-						SessionManager.getInstance().getTreeViewer().update(
-							node, null);
-					}
-					SessionManager.getInstance().getTreeViewer().expandToLevel(
-						PatientAdapter.this, 1);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
+				loadChildren();
+				SessionManager.getInstance().getTreeViewer().expandToLevel(
+					PatientAdapter.this, 1);
 			}
 		});
 	}
@@ -137,15 +113,40 @@ public class PatientAdapter extends Node {
 	}
 
 	@Override
-	public boolean isSameCompositeObject(Object object) {
-		return object instanceof Patient
-				&& ((Patient) object).getId().equals(patient.getId());
+	public void loadChildren() {
+		try {
+			// read from database again
+			Patient searchPatient = new Patient();
+			searchPatient.setId(patient.getId());
+			List<Patient> result = getAppService().search(Patient.class,
+				searchPatient);
+			Assert.isTrue(result.size() == 1);
+			patient = result.get(0);
+
+			Collection<PatientVisit> visits = patient
+				.getPatientVisitCollection();
+
+			for (PatientVisit visit : visits) {
+				PatientVisitAdapter node = (PatientVisitAdapter) getChild(visit
+					.getId());
+
+				if (node == null) {
+					node = new PatientVisitAdapter(this, visit);
+					addChild(node);
+				}
+
+				SessionManager.getInstance().getTreeViewer().update(node, null);
+			}
+
+		} catch (Exception e) {
+			SessionManager.getLogger().error(
+				"Error while loading children of patient "
+						+ patient.getNumber(), e);
+		}
 	}
 
 	@Override
-	public boolean isSameNode(Node node) {
-		return node instanceof PatientAdapter
-				&& ((PatientAdapter) node).getPatient().getId().equals(
-					patient.getId());
+	public Node accept(NodeSearchVisitor visitor) {
+		return visitor.visit(this);
 	}
 }

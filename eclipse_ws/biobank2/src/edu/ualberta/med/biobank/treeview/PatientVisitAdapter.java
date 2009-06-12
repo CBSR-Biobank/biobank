@@ -1,20 +1,31 @@
 package edu.ualberta.med.biobank.treeview;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
 
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.forms.LinkSamplesEntryForm;
 import edu.ualberta.med.biobank.forms.PatientVisitEntryForm;
 import edu.ualberta.med.biobank.forms.PatientVisitViewForm;
 import edu.ualberta.med.biobank.forms.ProcessCabinetEntryForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.PatientVisit;
+import edu.ualberta.med.biobank.model.Sample;
+import edu.ualberta.med.biobank.model.SampleType;
 
 public class PatientVisitAdapter extends Node {
 
@@ -23,6 +34,7 @@ public class PatientVisitAdapter extends Node {
 	public PatientVisitAdapter(Node parent, PatientVisit patientVisit) {
 		super(parent);
 		this.patientVisit = patientVisit;
+		setHasChildren(true);
 	}
 
 	public PatientVisit getPatientVisit() {
@@ -42,8 +54,24 @@ public class PatientVisitAdapter extends Node {
 	}
 
 	@Override
+	public String getTitle() {
+		return getTitle("Patient Visit");
+	}
+
+	@Override
 	public void performDoubleClick() {
 		openForm(new FormInput(this), PatientVisitViewForm.ID);
+	}
+
+	@Override
+	public void performExpand() {
+		BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
+			public void run() {
+				loadChildren();
+				SessionManager.getInstance().getTreeViewer().expandToLevel(
+					PatientVisitAdapter.this, 1);
+			}
+		});
 	}
 
 	@Override
@@ -100,15 +128,59 @@ public class PatientVisitAdapter extends Node {
 	}
 
 	@Override
-	public boolean isSameCompositeObject(Object object) {
-		return object instanceof PatientVisit
-				&& ((PatientVisit) object).getId().equals(patientVisit.getId());
+	public void loadChildren() {
+		try {
+			// read from database again
+			PatientVisit pv = new PatientVisit();
+			pv.setId(patientVisit.getId());
+			List<PatientVisit> result = getAppService().search(
+				PatientVisit.class, pv);
+			Assert.isTrue(result.size() == 1);
+			patientVisit = result.get(0);
+
+			Collection<Sample> samples = patientVisit.getSampleCollection();
+
+			Map<SampleType, List<Sample>> samplesMap = new HashMap<SampleType, List<Sample>>();
+			for (Sample sample : samples) {
+				List<Sample> samplesForType = samplesMap.get(sample
+					.getSampleType());
+				if (samplesForType == null) {
+					samplesForType = new ArrayList<Sample>();
+					samplesMap.put(sample.getSampleType(), samplesForType);
+				}
+				samplesForType.add(sample);
+			}
+			for (SampleType type : samplesMap.keySet()) {
+				SampleTypeAdapter node = (SampleTypeAdapter) getChild(type
+					.getId());
+				if (node == null) {
+					node = new SampleTypeAdapter(this, type);
+					addChild(node);
+				}
+				SessionManager.getInstance().getTreeViewer().update(node, null);
+				for (Sample sample : samplesMap.get(type)) {
+					SampleAdapter sampleNode = (SampleAdapter) node
+						.getChild(sample.getId());
+					if (sampleNode == null) {
+						sampleNode = new SampleAdapter(node, sample);
+						node.addChild(sampleNode);
+					}
+					SessionManager.getInstance().getTreeViewer().update(
+						sampleNode, null);
+				}
+			}
+
+		} catch (Exception e) {
+			SessionManager.getLogger().error(
+				"Error while loading children of patient visit "
+						+ patientVisit.getNumber(), e);
+		}
+
 	}
 
 	@Override
-	public boolean isSameNode(Node node) {
-		return node instanceof PatientVisitAdapter
-				&& ((PatientVisitAdapter) node).getPatientVisit().getId()
-					.equals(patientVisit.getId());
+	public Node accept(NodeSearchVisitor visitor) {
+		return visitor.visit(this);
 	}
+
 }
