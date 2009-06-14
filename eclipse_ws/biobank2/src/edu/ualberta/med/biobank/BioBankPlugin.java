@@ -1,6 +1,8 @@
 package edu.ualberta.med.biobank;
 
 import java.net.URL;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.FileLocator;
@@ -22,6 +24,10 @@ public class BioBankPlugin extends AbstractUIPlugin {
 	public static final String PLUGIN_ID = "biobank2";
 
 	public static final String IMG_FORM_BG = "formBg";
+
+	public static final String BARCODES_FILE = BioBankPlugin.class.getPackage()
+		.getName()
+			+ ".barcode";
 
 	static Logger log4j = Logger.getLogger(BioBankPlugin.class.getName());
 
@@ -145,5 +151,28 @@ public class BioBankPlugin extends AbstractUIPlugin {
 	public static void openRemoteConnectErrorMessage() {
 		openAsyncError("Connection Attempt Failed",
 			"Could not connect to server. Make sure server is running.");
+	}
+
+	public String getCancelBarcode() {
+		return ResourceBundle.getBundle(BARCODES_FILE, Locale.getDefault(),
+			getClass().getClassLoader()).getString("cancel");
+	}
+
+	public boolean isCancelBarcode(String code) {
+		return ResourceBundle.getBundle(BARCODES_FILE, Locale.getDefault(),
+			getClass().getClassLoader()).getString("cancel").equals(code);
+	}
+
+	public String getConfirmBarcode() {
+		return ResourceBundle.getBundle(BARCODES_FILE).getString("confirm");
+	}
+
+	public boolean isConfirmBarcode(String code) {
+		return ResourceBundle.getBundle(BARCODES_FILE).getString("confirm")
+			.equals(code);
+	}
+
+	public String[] getPlatesBarcodes() {
+		return null;
 	}
 }

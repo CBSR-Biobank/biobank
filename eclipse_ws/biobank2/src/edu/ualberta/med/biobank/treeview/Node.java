@@ -200,7 +200,7 @@ public abstract class Node {
 			return null;
 
 		for (Node child : children) {
-			if (child.getName().equals(name))
+			if (child.getName() != null && child.getName().equals(name))
 				return child;
 		}
 		return null;

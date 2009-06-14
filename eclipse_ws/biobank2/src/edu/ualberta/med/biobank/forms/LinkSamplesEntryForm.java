@@ -375,6 +375,12 @@ public class LinkSamplesEntryForm extends BiobankEntryForm {
 		BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
 			public void run() {
 				try {
+					System.out.println("Scanner = " + plateToScan.getValue());
+					// ResourceBundle rb = ResourceBundle.getBundle("barcode");
+					// System.out.println(rb.getString("cancel"));
+					System.out.println(BioBankPlugin.getDefault()
+						.getCancelBarcode());
+
 					// TODO launch scanner instead of random function
 					ScanCell[][] cells = ScanCell.getRandomScanLink();
 					scannedValue.setValue(true);

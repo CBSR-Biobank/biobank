@@ -159,7 +159,10 @@ public class SiteAdapter extends Node {
 					query = new DeleteExampleQuery(site);
 					site.getAddress();
 					site.getClinicCollection();
+					// FIXME should delete studies - patients - patient visits -
+					// sample !
 					appService.executeQuery(query);
+					getParent().removeChild(SiteAdapter.this);
 				} catch (final RemoteAccessException exp) {
 					BioBankPlugin.openRemoteAccessErrorMessage();
 				} catch (Exception e) {

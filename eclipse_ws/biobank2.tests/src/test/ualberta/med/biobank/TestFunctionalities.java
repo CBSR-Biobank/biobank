@@ -386,7 +386,7 @@ public class TestFunctionalities {
 		queries.add(new InsertExampleQuery(containerPosition));
 
 		containerPosition = new ContainerPosition();
-		containerPosition.setOccupiedContainer(sc);
+		containerPosition.setOccupiedContainer(sc); // same occupied container !
 		containerPosition.setParentContainer(scParent);
 		containerPosition.setPositionDimensionOne(9);
 		containerPosition.setPositionDimensionTwo(9);
@@ -526,8 +526,14 @@ public class TestFunctionalities {
 	}
 
 	@Test
-	public void test() throws Exception {
+	public void insertStorageTypeChild() throws Exception {
 		StorageType type = getStorageType();
+
+		int childrenCount = 0;
+		Collection<StorageType> children = type.getChildStorageTypeCollection();
+		if (children != null) {
+			childrenCount = children.size();
+		}
 
 		Capacity capacity = getNewCapacity();
 		Site site = getSite();
@@ -540,12 +546,25 @@ public class TestFunctionalities {
 		st = (StorageType) appService.executeQuery(new InsertExampleQuery(st))
 			.getObjectResult();
 
-		Collection<StorageType> children = type.getChildStorageTypeCollection();
-		if (children == null || children.size() == 0) {
+		if (children == null) {
 			children = new HashSet<StorageType>();
+			type.setChildStorageTypeCollection(children);
 		}
 		children.add(st);
 		appService.executeQuery(new UpdateExampleQuery(type));
 
+		// reread from database
+		StorageType searchType = new StorageType();
+		searchType.setId(type.getId());
+		type = (StorageType) appService.search(StorageType.class, searchType)
+			.get(0);
+		int childrenCountAfter = 0;
+		children = type.getChildStorageTypeCollection();
+		if (children != null) {
+			childrenCountAfter = children.size();
+		}
+
+		Assert.assertEquals(childrenCount + 1, childrenCountAfter);
 	}
+
 }
