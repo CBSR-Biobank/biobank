@@ -1,7 +1,10 @@
 package edu.ualberta.med.biobank;
 
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
+import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
 import org.apache.log4j.Logger;
@@ -154,13 +157,11 @@ public class BioBankPlugin extends AbstractUIPlugin {
 	}
 
 	public String getCancelBarcode() {
-		return ResourceBundle.getBundle(BARCODES_FILE, Locale.getDefault(),
-			getClass().getClassLoader()).getString("cancel");
+		return ResourceBundle.getBundle(BARCODES_FILE).getString("cancel");
 	}
 
 	public boolean isCancelBarcode(String code) {
-		return ResourceBundle.getBundle(BARCODES_FILE, Locale.getDefault(),
-			getClass().getClassLoader()).getString("cancel").equals(code);
+		return getCancelBarcode().equals(code);
 	}
 
 	public String getConfirmBarcode() {
@@ -168,11 +169,28 @@ public class BioBankPlugin extends AbstractUIPlugin {
 	}
 
 	public boolean isConfirmBarcode(String code) {
-		return ResourceBundle.getBundle(BARCODES_FILE).getString("confirm")
-			.equals(code);
+		return getConfirmBarcode().equals(code);
 	}
 
-	public String[] getPlatesBarcodes() {
-		return null;
+	public int getPlateNumber(String barcode) {
+		int i = 1;
+		String key = "plate.";
+		ResourceBundle bundle = ResourceBundle.getBundle(BARCODES_FILE);
+		while (true) { // stop when bundle return exception
+			try {
+			if (bundle.getString(key + i).equals(barcode)) {
+				return i;
+			}
+			} catch (MissingResourceException mre) {
+				return -1;
+			}
+			i++;
+		}
 	}
+
+	public boolean isValidPlateBarcode(String value) {
+		return getPlateNumber(value) != -1;
+	}
+	
+	
 }

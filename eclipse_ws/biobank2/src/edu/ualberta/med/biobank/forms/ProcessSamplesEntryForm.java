@@ -38,6 +38,7 @@ import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.SessionAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
 import edu.ualberta.med.biobank.validators.PaletteBarCodeValidator;
+import edu.ualberta.med.biobank.validators.ScannerBarcodeValidator;
 import edu.ualberta.med.biobank.widgets.ScanPaletteWidget;
 import edu.ualberta.med.biobank.widgets.StorageContainerWidget;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -155,7 +156,7 @@ public class ProcessSamplesEntryForm extends BiobankEntryForm implements
 
 		plateToScanText = (Text) createBoundWidgetWithLabel(client, Text.class,
 			SWT.NONE, "Plate to Scan", new String[0], plateToScan,
-			NonEmptyString.class, "Enter plate to scan");
+			ScannerBarcodeValidator.class, "Enter a valid plate barcode");
 		plateToScanText.removeKeyListener(keyListener);
 		plateToScanText.addKeyListener(EnterKeyToNextFieldListener.INSTANCE);
 
