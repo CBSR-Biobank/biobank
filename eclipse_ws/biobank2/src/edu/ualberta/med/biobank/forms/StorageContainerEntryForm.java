@@ -5,6 +5,8 @@ import java.util.List;
 
 import org.eclipse.core.databinding.UpdateValueStrategy;
 import org.eclipse.core.databinding.beans.PojoObservables;
+import org.eclipse.core.databinding.observable.value.IObservableValue;
+import org.eclipse.core.databinding.observable.value.WritableValue;
 import org.eclipse.core.databinding.validation.IValidator;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IStatus;
@@ -39,15 +41,12 @@ import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.StorageContainer;
 import edu.ualberta.med.biobank.model.StorageType;
 import edu.ualberta.med.biobank.treeview.Node;
-import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.treeview.StorageContainerAdapter;
-import edu.ualberta.med.biobank.treeview.StorageContainerGroup;
 import edu.ualberta.med.biobank.validators.DoubleNumber;
 import edu.ualberta.med.biobank.validators.IntegerNumber;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
 import edu.ualberta.med.biobank.widgets.BiobankContentProvider;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
-import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.SDKQuery;
 import gov.nih.nci.system.query.SDKQueryResult;
 import gov.nih.nci.system.query.example.InsertExampleQuery;
@@ -87,6 +86,8 @@ public class StorageContainerEntryForm extends BiobankEntryForm {
 
 	private ComboViewer storageTypeComboViewer;
 
+	private IObservableValue typeSelected = new WritableValue("", String.class);
+
 	@Override
 	public void init(IEditorSite editorSite, IEditorInput input)
 			throws PartInitException {
@@ -98,6 +99,7 @@ public class StorageContainerEntryForm extends BiobankEntryForm {
 		storageContainerAdapter = (StorageContainerAdapter) node;
 		appService = storageContainerAdapter.getAppService();
 		storageContainer = storageContainerAdapter.getStorageContainer();
+		site = storageContainerAdapter.getSite();
 
 		if (storageContainer.getId() == null) {
 			setPartName("Storage Container");
@@ -108,8 +110,6 @@ public class StorageContainerEntryForm extends BiobankEntryForm {
 
 	@Override
 	protected void createFormContent() {
-		site = ((SiteAdapter) storageContainerAdapter.getParent().getParent())
-			.getSite();
 		currentStorageType = storageContainer.getStorageType();
 
 		form.setText("Storage Container");
@@ -208,6 +208,7 @@ public class StorageContainerEntryForm extends BiobankEntryForm {
 											dim1Max, dim2Max);
 									}
 								});
+								storageContainer.setStorageType(storageType);
 							}
 						});
 				}
@@ -223,59 +224,63 @@ public class StorageContainerEntryForm extends BiobankEntryForm {
 	}
 
 	private void createLocationSection() {
-		String dim1Label = null, dim2Label = null;
-		Integer dim1Max = null, dim2Max = null;
-
-		Composite client = createSectionWithClient("Location");
 		position = storageContainer.getLocatedAtPosition();
-		if (position == null) {
-			position = new ContainerPosition();
-		}
+		// if position == null, we are in a storage container without parent
+		if (position != null) {
+			String dim1Label = null, dim2Label = null;
+			Integer dim1Max = null, dim2Max = null;
 
-		if (currentStorageType != null) {
-			dim1Label = currentStorageType.getDimensionOneLabel();
-			dim2Label = currentStorageType.getDimensionTwoLabel();
-		}
+			Composite locationComposite = createSectionWithClient("Location");
+			StorageContainer parentContainer = position.getParentContainer();
+			if (parentContainer != null) {
+				dim1Label = parentContainer.getStorageType()
+					.getDimensionOneLabel();
+				dim2Label = parentContainer.getStorageType()
+					.getDimensionTwoLabel();
 
-		// could be that the dimension labels are not assigned in the
-		// database objects
-		if (dim1Label == null) {
-			dim1Label = "Dimension 1";
-			dim2Label = "Dimension 2";
-		}
-
-		if (currentStorageType != null) {
-			Capacity capacity = currentStorageType.getCapacity();
-			if (capacity != null) {
-				dim1Max = capacity.getDimensionOneCapacity();
-				dim2Max = capacity.getDimensionTwoCapacity();
-				if (dim1Max != null) {
-					dim1Label += "\n(1 - " + dim1Max + ")";
-				}
-				if (dim2Max != null) {
-					dim2Label += "\n(1 - " + dim2Max + ")";
+				Capacity capacity = parentContainer.getStorageType()
+					.getCapacity();
+				if (capacity != null) {
+					dim1Max = capacity.getDimensionOneCapacity();
+					dim2Max = capacity.getDimensionTwoCapacity();
+					if (dim1Max != null) {
+						dim1Label += "\n(1 - " + dim1Max + ")";
+					}
+					if (dim2Max != null) {
+						dim2Label += "\n(1 - " + dim2Max + ")";
+					}
 				}
 			}
+
+			// could be that the dimension labels are not assigned in the
+			// database objects
+			if (dim1Label == null) {
+				dim1Label = "Dimension 1";
+				dim2Label = "Dimension 2";
+			}
+
+			dimensionOneLabel = toolkit.createLabel(locationComposite,
+				dim1Label + ":", SWT.LEFT);
+
+			IntegerNumber validator = new IntegerNumber(MSG_INVALID_POSITION,
+				FormUtils.createDecorator(dimensionOneLabel,
+					MSG_INVALID_POSITION), false);
+
+			createBoundWidget(locationComposite, Text.class, SWT.NONE, null,
+				PojoObservables.observeValue(position, "positionDimensionOne"),
+				validator);
+
+			dimensionTwoLabel = toolkit.createLabel(locationComposite,
+				dim2Label + ":", SWT.LEFT);
+
+			validator = new IntegerNumber(MSG_INVALID_POSITION, FormUtils
+				.createDecorator(dimensionTwoLabel, MSG_INVALID_POSITION),
+				false);
+
+			createBoundWidget(locationComposite, Text.class, SWT.NONE, null,
+				PojoObservables.observeValue(position, "positionDimensionTwo"),
+				validator);
 		}
-
-		dimensionOneLabel = toolkit.createLabel(client, dim1Label + ":",
-			SWT.LEFT);
-
-		IntegerNumber validator = new IntegerNumber(MSG_INVALID_POSITION,
-			FormUtils.createDecorator(dimensionOneLabel, MSG_INVALID_POSITION),
-			false);
-
-		createBoundWidget(client, Text.class, SWT.NONE, null, PojoObservables
-			.observeValue(position, "positionDimensionOne"), validator);
-
-		dimensionTwoLabel = toolkit.createLabel(client, dim2Label + ":",
-			SWT.LEFT);
-
-		validator = new IntegerNumber(MSG_INVALID_POSITION, FormUtils
-			.createDecorator(dimensionTwoLabel, MSG_INVALID_POSITION), false);
-
-		createBoundWidget(client, Text.class, SWT.NONE, null, PojoObservables
-			.observeValue(position, "positionDimensionTwo"), validator);
 	}
 
 	private void createButtonsSection() {
@@ -304,8 +309,8 @@ public class StorageContainerEntryForm extends BiobankEntryForm {
 		UpdateValueStrategy uvs = new UpdateValueStrategy();
 		uvs.setAfterGetValidator(validator);
 
-		dbc.bindValue(SWTObservables.observeSelection(combo), PojoObservables
-			.observeValue(storageContainer, "barcode"), uvs, null);
+		dbc.bindValue(SWTObservables.observeSelection(combo), typeSelected,
+			uvs, null);
 	}
 
 	private String getOkMessage() {
@@ -338,43 +343,42 @@ public class StorageContainerEntryForm extends BiobankEntryForm {
 		}
 		tempWidget.setText(str);
 
-		// handle dimension 1
-		str = "";
+		if (storageContainer.getLocatedAtPosition() != null) {
+			// handle dimension 1
+			str = "";
 
-		if (dim1Label != null) {
-			str += dim1Label;
-		} else {
-			str += "Dimension 1 ";
+			if (dim1Label != null) {
+				str += dim1Label;
+			} else {
+				str += "Dimension 1 ";
+			}
+
+			if (dim1Max != null) {
+				str += "\n(1 - " + dim1Max + ")";
+			}
+
+			dimensionOneLabel.setText(str + ":");
+
+			// handle dimension 2
+			str = "";
+
+			if (dim1Label != null) {
+				str += dim2Label;
+			} else {
+				str += "Dimension 2 ";
+			}
+
+			if (dim1Max != null) {
+				str += "\n(1 - " + dim2Max + ")";
+			}
+
+			dimensionTwoLabel.setText(str + ":");
 		}
-
-		if (dim1Max != null) {
-			str += "\n(1 - " + dim1Max + ")";
-		}
-
-		dimensionOneLabel.setText(str + ":");
-
-		// handle dimension 2
-		str = "";
-
-		if (dim1Label != null) {
-			str += dim2Label;
-		} else {
-			str += "Dimension 2 ";
-		}
-
-		if (dim1Max != null) {
-			str += "\n(1 - " + dim2Max + ")";
-		}
-
-		dimensionTwoLabel.setText(str + ":");
 		form.reflow(true);
 	}
 
 	@Override
 	protected void saveForm() throws Exception {
-		SDKQuery query;
-		SDKQueryResult result;
-
 		if ((storageContainer.getId() == null)
 				&& !checkStorageContainerUnique()) {
 			setDirty(true);
@@ -384,65 +388,48 @@ public class StorageContainerEntryForm extends BiobankEntryForm {
 		StorageType storageType = (StorageType) ((StructuredSelection) storageTypeComboViewer
 			.getSelection()).getFirstElement();
 		storageContainer.setStorageType(storageType);
-		savePosition();
-		saveCapacity(storageType.getCapacity());
+		storageContainer.setLocatedAtPosition(position);
 		storageContainer.setSite(site);
 
+		SDKQuery query;
 		if (storageContainer.getId() == null) {
 			query = new InsertExampleQuery(storageContainer);
 		} else {
 			query = new UpdateExampleQuery(storageContainer);
 		}
 
-		result = appService.executeQuery(query);
+		SDKQueryResult result = appService.executeQuery(query);
 		storageContainer = (StorageContainer) result.getObjectResult();
 
-		((StorageContainerGroup) storageContainerAdapter.getParent())
-			.performExpand();
+		storageContainerAdapter.getParent().performExpand();
 		getSite().getPage().closeEditor(this, false);
 
 	}
 
-	protected void savePosition() throws Exception {
-		SDKQuery query;
-		SDKQueryResult result;
-
-		Integer id = position.getId();
-
-		if ((id == null) || (id == 0)) {
-			query = new InsertExampleQuery(position);
-		} else {
-			query = new UpdateExampleQuery(position);
-		}
-
-		result = appService.executeQuery(query);
-		storageContainer.setLocatedAtPosition((ContainerPosition) result
-			.getObjectResult());
-	}
-
-	private void saveCapacity(Capacity capacity) throws Exception {
-		SDKQuery query;
-		SDKQueryResult result;
-
-		Integer id = capacity.getId();
-
-		if ((id == null) || (id == 0)) {
-			query = new InsertExampleQuery(capacity);
-		} else {
-			query = new UpdateExampleQuery(capacity);
-		}
-
-		result = appService.executeQuery(query);
-		storageContainer.setCapacity((Capacity) result.getObjectResult());
-	}
+	// protected void savePosition() throws Exception {
+	// if (position != null) {
+	// SDKQuery query;
+	// SDKQueryResult result;
+	//
+	// Integer id = position.getId();
+	//
+	// if ((id == null) || (id == 0)) {
+	// query = new InsertExampleQuery(position);
+	// } else {
+	// query = new UpdateExampleQuery(position);
+	// }
+	//
+	// result = appService.executeQuery(query);
+	// storageContainer.setLocatedAtPosition((ContainerPosition) result
+	// .getObjectResult());
+	// }
+	// }
 
 	private boolean checkStorageContainerUnique() throws Exception {
-		WritableApplicationService appService = storageContainerAdapter
-			.getAppService();
-
+		// FIXME set contraint directly into the model ?
 		HQLCriteria c = new HQLCriteria(
 			"from edu.ualberta.med.biobank.model.StorageContainer as sc "
-					+ "inner join fetch sc.study " + "where sc.site.id='"
+					+ "inner join fetch sc.site " + "where sc.site.id='"
 					+ site.getId() + "' " + "and (sc.name = '"
 					+ storageContainer.getName() + "' " + "or sc.barcode = '"
 					+ storageContainer.getBarcode() + "')");

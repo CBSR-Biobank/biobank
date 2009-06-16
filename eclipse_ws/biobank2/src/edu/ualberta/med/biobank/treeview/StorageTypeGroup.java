@@ -69,7 +69,7 @@ public class StorageTypeGroup extends Node {
 			List<Site> result = getAppService().search(Site.class, site);
 			Assert.isTrue(result.size() == 1);
 			currentSite = result.get(0);
-			((SiteAdapter) getParent()).setSite(site);
+			((SiteAdapter) getParent()).setSite(currentSite);
 
 			Collection<StorageType> storageTypes = currentSite
 				.getStorageTypeCollection();

@@ -1,9 +1,6 @@
 package edu.ualberta.med.biobank;
 
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
@@ -178,9 +175,9 @@ public class BioBankPlugin extends AbstractUIPlugin {
 		ResourceBundle bundle = ResourceBundle.getBundle(BARCODES_FILE);
 		while (true) { // stop when bundle return exception
 			try {
-			if (bundle.getString(key + i).equals(barcode)) {
-				return i;
-			}
+				if (bundle.getString(key + i).equals(barcode)) {
+					return i;
+				}
 			} catch (MissingResourceException mre) {
 				return -1;
 			}
@@ -189,8 +186,7 @@ public class BioBankPlugin extends AbstractUIPlugin {
 	}
 
 	public boolean isValidPlateBarcode(String value) {
-		return getPlateNumber(value) != -1;
+		return !value.isEmpty() && getPlateNumber(value) != -1;
 	}
-	
-	
+
 }

@@ -69,17 +69,23 @@ public class StorageContainerGroup extends Node {
 			parentSite = result.get(0);
 			((SiteAdapter) getParent()).setSite(parentSite);
 
-			for (StorageContainer patient : parentSite
+			for (StorageContainer storageContainer : parentSite
 				.getStorageContainerCollection()) {
-				StorageContainerAdapter node = (StorageContainerAdapter) getChild(patient
-					.getId());
 
-				if (node == null) {
-					node = new StorageContainerAdapter(this, patient);
-					addChild(node);
+				if (storageContainer.getLocatedAtPosition() == null
+						|| storageContainer.getLocatedAtPosition()
+							.getParentContainer() == null) {
+					StorageContainerAdapter node = (StorageContainerAdapter) getChild(storageContainer
+						.getId());
+
+					if (node == null) {
+						node = new StorageContainerAdapter(this,
+							storageContainer);
+						addChild(node);
+					}
+					SessionManager.getInstance().getTreeViewer().update(node,
+						null);
 				}
-
-				SessionManager.getInstance().getTreeViewer().update(node, null);
 			}
 		} catch (Exception e) {
 			SessionManager.getLogger().error(

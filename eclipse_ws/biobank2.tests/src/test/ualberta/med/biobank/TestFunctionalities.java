@@ -567,4 +567,20 @@ public class TestFunctionalities {
 		Assert.assertEquals(childrenCount + 1, childrenCountAfter);
 	}
 
+	@Test
+	public void insertStorageContainer() throws Exception {
+		Site site = getSite();
+		Capacity capacity = getNewCapacity();
+		StorageContainer sc = new StorageContainer();
+		sc.setSite(site);
+		sc.setCapacity(capacity);
+
+		StorageType st = new StorageType();
+		st.setId(1);
+		st = (StorageType) appService.search(StorageType.class, st).get(0);
+		sc.setStorageType(st);
+
+		appService.executeQuery(new InsertExampleQuery(sc));
+	}
+
 }

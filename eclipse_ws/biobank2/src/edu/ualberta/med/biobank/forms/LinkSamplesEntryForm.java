@@ -42,7 +42,6 @@ import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.model.ScanCell;
 import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.PatientVisitAdapter;
-import edu.ualberta.med.biobank.validators.NonEmptyString;
 import edu.ualberta.med.biobank.validators.ScannerBarcodeValidator;
 import edu.ualberta.med.biobank.widgets.LinkSampleTypeWidget;
 import edu.ualberta.med.biobank.widgets.ScanLinkPaletteWidget;
@@ -116,8 +115,8 @@ public class LinkSamplesEntryForm extends BiobankEntryForm {
 		} else {
 			form.setMessage(status.getMessage(), IMessageProvider.ERROR);
 			submit.setEnabled(false);
-			if (plateToScan.getValue() == null
-					|| plateToScan.getValue().toString().isEmpty()) {
+			if (!BioBankPlugin.getDefault().isValidPlateBarcode(
+				plateToScanText.getText())) {
 				scan.setEnabled(false);
 			} else {
 				scan.setEnabled(true);
@@ -376,15 +375,8 @@ public class LinkSamplesEntryForm extends BiobankEntryForm {
 		BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
 			public void run() {
 				try {
-					System.out.println("Scanner = " + plateToScan.getValue());
-					// ResourceBundle rb = ResourceBundle.getBundle("barcode");
-					// System.out.println(rb.getString("cancel"));
-					
-					int scannerNumber = BioBankPlugin.getDefault()
-						.getPlateNumber(plateToScan.getValue().toString());
-					if (scannerNumber == 0) {
-						
-					}
+					System.out.println(BioBankPlugin.getDefault()
+						.getPlateNumber(plateToScan.getValue().toString()));
 
 					// TODO launch scanner instead of random function
 					ScanCell[][] cells = ScanCell.getRandomScanLink();
