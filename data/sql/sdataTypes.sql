@@ -9,8 +9,8 @@
 -- Table structure for table `sdata_type`
 --
 
-LOCK TABLES `sdata_type` WRITE;
-INSERT INTO `sdata_type` VALUES
+LOCK TABLES `SDATA_TYPE` WRITE;
+INSERT INTO `SDATA_TYPE` VALUES
        ( 1,'Date Drawn'),
        ( 2,'Date Received'),
        ( 3,'Date Processed'),
