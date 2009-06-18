@@ -41,6 +41,8 @@ import edu.ualberta.med.biobank.validators.DoubleNumber;
 import edu.ualberta.med.biobank.validators.IntegerNumber;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
 import edu.ualberta.med.biobank.widgets.MultiSelect;
+import edu.ualberta.med.biobank.widgets.listener.MultiSelectEvent;
+import edu.ualberta.med.biobank.widgets.listener.MultiSelectListener;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.SDKQuery;
@@ -80,8 +82,16 @@ public class StorageTypeEntryForm extends BiobankEntryForm {
 
 	private Site site;
 
+	private MultiSelectListener multiSelectListener;
+
 	public StorageTypeEntryForm() {
 		super();
+		multiSelectListener = new MultiSelectListener() {
+			@Override
+			public void selectionChanged(MultiSelectEvent event) {
+				setDirty(true);
+			}
+		};
 	}
 
 	@Override
@@ -196,6 +206,7 @@ public class StorageTypeEntryForm extends BiobankEntryForm {
 		samplesMultiSelect = new MultiSelect(client, SWT.NONE,
 			"Selected Sample Derivatives", "Available Sample Derivatives", 100);
 		samplesMultiSelect.adaptToToolkit(toolkit);
+		samplesMultiSelect.addSelectionChangedListener(multiSelectListener);
 
 		ListOrderedMap availSampleDerivTypes = new ListOrderedMap();
 		List<Integer> selSampleDerivTypes = new ArrayList<Integer>();
@@ -222,6 +233,8 @@ public class StorageTypeEntryForm extends BiobankEntryForm {
 		childStorageTypesMultiSelect = new MultiSelect(client, SWT.NONE,
 			"Selected Storage Types", "Available Storage Types", 100);
 		childStorageTypesMultiSelect.adaptToToolkit(toolkit);
+		childStorageTypesMultiSelect
+			.addSelectionChangedListener(multiSelectListener);
 
 		ListOrderedMap availStorageTypes = new ListOrderedMap();
 		List<Integer> selChildStorageTypes = new ArrayList<Integer>();

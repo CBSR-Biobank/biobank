@@ -9,19 +9,18 @@ import org.eclipse.swt.dnd.Transfer;
 
 /**
  * Drag support for moving items between TreeViewers in this widget.
- *
+ * 
  */
 public class TreeViewerDragListener implements DragSourceListener {
 	private TreeViewer viewer;
-	
+
 	private MultiSelectNode[] dragData;
 
 	public TreeViewerDragListener(TreeViewer viewer) {
 		this.viewer = viewer;
-		
+
 		viewer.addDragSupport(DND.DROP_MOVE | DND.DROP_COPY,
-				new Transfer[] { MultiSelectNodeTransfer.getInstance() },
-				this);
+			new Transfer[] { MultiSelectNodeTransfer.getInstance() }, this);
 	}
 
 	public void dragStart(DragSourceEvent event) {
@@ -30,8 +29,9 @@ public class TreeViewerDragListener implements DragSourceListener {
 	}
 
 	public void dragSetData(DragSourceEvent event) {
-		Object[] selections = ((IStructuredSelection) viewer.getSelection()).toArray();
-		
+		Object[] selections = ((IStructuredSelection) viewer.getSelection())
+			.toArray();
+
 		int count = 0;
 		MultiSelectNode[] nodes = new MultiSelectNode[selections.length];
 		for (Object sel : selections) {
@@ -44,14 +44,14 @@ public class TreeViewerDragListener implements DragSourceListener {
 	}
 
 	public void dragFinished(DragSourceEvent event) {
-		if (!event.doit) return;
+		if (!event.doit)
+			return;
 
 		MultiSelectNode rootNode = (MultiSelectNode) viewer.getInput();
 		for (MultiSelectNode node : dragData) {
 			rootNode.removeChild(node);
-			MultiSelect.log4j.trace("removed " + node.getName()
-					+ " from " + rootNode.getName()
-					+ ", event: " + event.toString());
+			MultiSelect.log4j.trace("removed " + node.getName() + " from "
+					+ rootNode.getName() + ", event: " + event.toString());
 		}
 	}
 }

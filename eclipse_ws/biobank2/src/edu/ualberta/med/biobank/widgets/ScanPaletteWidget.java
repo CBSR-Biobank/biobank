@@ -10,11 +10,10 @@ import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
-import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 
-import edu.ualberta.med.biobank.model.CellStatus;
+import edu.ualberta.med.biobank.model.SampleCellStatus;
 import edu.ualberta.med.biobank.model.ScanCell;
 import edu.ualberta.med.biobank.widgets.listener.ScanPaletteModificationEvent;
 import edu.ualberta.med.biobank.widgets.listener.ScanPaletteModificationListener;
@@ -32,10 +31,7 @@ public class ScanPaletteWidget extends AbstractGridContainerWidget {
 	public static final int PALETTE_WIDTH = SAMPLE_WIDTH * ScanCell.COL_MAX;
 	public static final int PALETTE_HEIGHT = SAMPLE_WIDTH * ScanCell.ROW_MAX;
 
-	protected List<CellStatus> statusAvailable;
-
-	public static final int LEGEND_HEIGHT = 20;
-	protected int legendWidth;
+	protected List<SampleCellStatus> statusAvailable;
 
 	public static final int PALETTE_HEIGHT_AND_LEGEND = PALETTE_HEIGHT
 			+ LEGEND_HEIGHT + 4;
@@ -66,16 +62,17 @@ public class ScanPaletteWidget extends AbstractGridContainerWidget {
 		setCellHeight(SAMPLE_WIDTH);
 		setStorageSize(ScanCell.ROW_MAX, ScanCell.COL_MAX);
 		initLegend();
-		legendWidth = PALETTE_WIDTH / statusAvailable.size();
 	}
 
 	protected void initLegend() {
-		statusAvailable = new ArrayList<CellStatus>();
-		statusAvailable.add(CellStatus.EMPTY);
-		statusAvailable.add(CellStatus.NEW);
-		statusAvailable.add(CellStatus.FILLED);
-		statusAvailable.add(CellStatus.MISSING);
-		statusAvailable.add(CellStatus.ERROR);
+		hasLegend = true;
+		statusAvailable = new ArrayList<SampleCellStatus>();
+		statusAvailable.add(SampleCellStatus.EMPTY);
+		statusAvailable.add(SampleCellStatus.NEW);
+		statusAvailable.add(SampleCellStatus.FILLED);
+		statusAvailable.add(SampleCellStatus.MISSING);
+		statusAvailable.add(SampleCellStatus.ERROR);
+		legendWidth = PALETTE_WIDTH / statusAvailable.size();
 	}
 
 	@Override
@@ -85,7 +82,7 @@ public class ScanPaletteWidget extends AbstractGridContainerWidget {
 		e.gc.setFont(new Font(e.display, fd2));
 		super.paintPalette(e);
 		for (int i = 0; i < statusAvailable.size(); i++) {
-			CellStatus status = statusAvailable.get(i);
+			SampleCellStatus status = statusAvailable.get(i);
 			drawLegend(e, status.getColor(), i, status.getLegend());
 		}
 	}
@@ -118,15 +115,6 @@ public class ScanPaletteWidget extends AbstractGridContainerWidget {
 		e.gc.drawRectangle(rectangle);
 	}
 
-	private void drawLegend(PaintEvent e, int color, int index, String text) {
-		e.gc.setBackground(e.display.getSystemColor(color));
-		Rectangle rectangle = new Rectangle(legendWidth * index,
-			gridHeight + 4, legendWidth, LEGEND_HEIGHT);
-		e.gc.fillRectangle(rectangle);
-		e.gc.drawRectangle(rectangle);
-		drawTextOnCenter(e, text, rectangle);
-	}
-
 	public void setScannedElements(ScanCell[][] randomScan) {
 		this.scannedElements = randomScan;
 		redraw();
@@ -147,12 +135,6 @@ public class ScanPaletteWidget extends AbstractGridContainerWidget {
 			return scannedElements[row][col];
 		}
 		return null;
-	}
-
-	@Override
-	public Point computeSize(int wHint, int hHint, boolean changed) {
-		Point size = super.computeSize(wHint, hHint, changed);
-		return new Point(size.x, size.y + LEGEND_HEIGHT + 4);
 	}
 
 	public void addModificationListener(ScanPaletteModificationListener listener) {

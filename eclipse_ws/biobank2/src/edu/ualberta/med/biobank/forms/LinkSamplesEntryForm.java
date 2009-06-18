@@ -33,11 +33,12 @@ import org.eclipse.ui.PartInitException;
 import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.forms.listener.EnterKeyToNextFieldListener;
-import edu.ualberta.med.biobank.model.CellStatus;
 import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.Sample;
+import edu.ualberta.med.biobank.model.SampleCellStatus;
 import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.model.ScanCell;
 import edu.ualberta.med.biobank.treeview.Node;
@@ -180,6 +181,7 @@ public class LinkSamplesEntryForm extends BiobankEntryForm {
 		client.setLayoutData(gd);
 
 		spw = new ScanLinkPaletteWidget(client);
+		spw.setVisible(true);
 		toolkit.adapt(spw);
 		spw.setLayoutData(new GridData(SWT.CENTER, SWT.TOP, true, false));
 	}
@@ -268,7 +270,7 @@ public class LinkSamplesEntryForm extends BiobankEntryForm {
 				if (type != null) {
 					for (ScanCell cell : spw.getSelectedCells()) {
 						cell.setType(type);
-						cell.setStatus(CellStatus.TYPE);
+						cell.setStatus(SampleCellStatus.TYPE);
 					}
 					spw.clearSelection();
 					customSelection.resetValues(true);
@@ -388,7 +390,7 @@ public class LinkSamplesEntryForm extends BiobankEntryForm {
 						for (int j = 0; j < cells[i].length; j++) { // columns
 							if (cells[i][j] != null) {
 								samplesNumber++;
-								cells[i][j].setStatus(CellStatus.NEW);
+								cells[i][j].setStatus(SampleCellStatus.NEW);
 							}
 						}
 						sampleTypeWidgets.get(i).setNumber(samplesNumber);
@@ -426,7 +428,8 @@ public class LinkSamplesEntryForm extends BiobankEntryForm {
 						for (int indexColumn = 0; indexColumn < cells[indexRow].length; indexColumn++) {
 							ScanCell cell = cells[indexRow][indexColumn];
 							if (cell != null
-									&& cell.getStatus().equals(CellStatus.TYPE)) {
+									&& cell.getStatus().equals(
+										SampleCellStatus.TYPE)) {
 								// add new samples
 								Sample sample = new Sample();
 								sample.setInventoryId(cell.getValue());
@@ -445,7 +448,8 @@ public class LinkSamplesEntryForm extends BiobankEntryForm {
 				} catch (RemoteConnectFailureException exp) {
 					BioBankPlugin.openRemoteConnectErrorMessage();
 				} catch (Exception e) {
-					e.printStackTrace();
+					SessionManager.getLogger().error(
+						"Error when linking samples", e);
 				}
 			}
 		});
@@ -458,7 +462,7 @@ public class LinkSamplesEntryForm extends BiobankEntryForm {
 			for (int indexColumn = 0; indexColumn < cells[indexRow].length; indexColumn++) {
 				ScanCell cell = cells[indexRow][indexColumn];
 				cell.setType(type);
-				cell.setStatus(CellStatus.TYPE);
+				cell.setStatus(SampleCellStatus.TYPE);
 				spw.redraw();
 
 			}

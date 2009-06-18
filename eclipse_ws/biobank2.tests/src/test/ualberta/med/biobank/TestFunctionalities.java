@@ -448,7 +448,7 @@ public class TestFunctionalities {
 
 			StorageContainer sc = new StorageContainer();
 			sc.setName("scTest");
-			sc.setCapacity(capacity);
+			// sc.setCapacity(capacity);
 			sc.setSite(site);
 			sc.setStorageType(st);
 			result = appService.executeQuery(new InsertExampleQuery(sc));
@@ -480,7 +480,7 @@ public class TestFunctionalities {
 
 		StorageContainer sc = new StorageContainer();
 		sc.setName("TestBatch-" + r.nextInt());
-		sc.setCapacity(capacity);
+		// sc.setCapacity(capacity);
 		sc.setSite(site);
 		sc.setStorageType(st);
 		queries.add(new InsertExampleQuery(sc));
@@ -573,7 +573,7 @@ public class TestFunctionalities {
 		Capacity capacity = getNewCapacity();
 		StorageContainer sc = new StorageContainer();
 		sc.setSite(site);
-		sc.setCapacity(capacity);
+		// sc.setCapacity(capacity);
 
 		StorageType st = new StorageType();
 		st.setId(1);

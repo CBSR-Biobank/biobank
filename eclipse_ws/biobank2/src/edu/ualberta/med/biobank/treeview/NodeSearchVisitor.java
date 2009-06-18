@@ -116,7 +116,22 @@ public class NodeSearchVisitor {
 
 	public Node visit(StorageContainerGroup scGroup) {
 		if (typeSearched == StorageContainer.class) {
-			return scGroup.getChild(id, true);
+			Node child = scGroup.getChild(id, true);
+			if (child == null) {
+				return visitChildren(scGroup);
+			}
+			return child;
+		}
+		return null;
+	}
+
+	public Node visit(StorageContainerAdapter container) {
+		if (typeSearched == StorageContainer.class) {
+			Node child = container.getChild(id, true);
+			if (child == null) {
+				return visitChildren(container);
+			}
+			return child;
 		}
 		return null;
 	}

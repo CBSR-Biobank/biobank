@@ -15,6 +15,7 @@ import org.eclipse.ui.PlatformUI;
 import org.springframework.remoting.RemoteAccessException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.forms.ProcessSamplesEntryForm;
 import edu.ualberta.med.biobank.forms.SiteEntryForm;
 import edu.ualberta.med.biobank.forms.SiteViewForm;
@@ -151,7 +152,6 @@ public class SiteAdapter extends Node {
 
 		BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
 			public void run() {
-
 				try {
 					SDKQuery query;
 
@@ -166,8 +166,8 @@ public class SiteAdapter extends Node {
 				} catch (final RemoteAccessException exp) {
 					BioBankPlugin.openRemoteAccessErrorMessage();
 				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					SessionManager.getLogger().error(
+						"Error while deletindg site " + site.getName());
 				}
 			}
 		});

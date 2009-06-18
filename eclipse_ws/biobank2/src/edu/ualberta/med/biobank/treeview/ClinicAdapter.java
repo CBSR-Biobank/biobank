@@ -90,7 +90,6 @@ public class ClinicAdapter extends Node {
 
 	@Override
 	public void loadChildren() {
-		// TODO Auto-generated method stub
 
 	}
 

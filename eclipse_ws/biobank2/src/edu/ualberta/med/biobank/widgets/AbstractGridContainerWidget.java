@@ -48,12 +48,31 @@ public abstract class AbstractGridContainerWidget extends Canvas {
 	/**
 	 * max width this container will have : used to calculate cells width
 	 */
-	private int maxWidth = -1;
+	protected int maxWidth = -1;
 
 	/**
 	 * max height this container will have : used to calculate cells height
 	 */
-	private int maxHeight = -1;
+	protected int maxHeight = -1;
+
+	/**
+	 * Height used when legend in under the grid
+	 */
+	public static final int LEGEND_HEIGHT = 20;
+
+	/**
+	 * width calculated when legend in under the grid
+	 */
+	protected int legendWidth;
+
+	/**
+	 * Width used when legend is on the side of the grid
+	 */
+	public static final int LEGEND_WIDTH = 70;
+
+	protected boolean hasLegend = false;
+
+	protected boolean legendOnSide = false;
 
 	public AbstractGridContainerWidget(Composite parent) {
 		super(parent, SWT.DOUBLE_BUFFERED);
@@ -92,7 +111,16 @@ public abstract class AbstractGridContainerWidget extends Canvas {
 			gridWidth = cellWidth * columns;
 			gridHeight = cellHeight * rows;
 		}
-		return new Point(gridWidth + 10, gridHeight + 10);
+		int width = gridWidth + 10;
+		int height = gridHeight + 10;
+		if (hasLegend) {
+			if (legendOnSide) {
+				width = width + LEGEND_WIDTH + 4;
+			} else {
+				height = height + LEGEND_HEIGHT + 4;
+			}
+		}
+		return new Point(width, height);
 	}
 
 	@SuppressWarnings("unused")
@@ -165,6 +193,23 @@ public abstract class AbstractGridContainerWidget extends Canvas {
 		e.gc.setFont(oldFont);
 	}
 
+	protected void drawLegend(PaintEvent e, int color, int index, String text) {
+		e.gc.setBackground(e.display.getSystemColor(color));
+		int width = legendWidth;
+		int startx = legendWidth * index;
+		int starty = gridHeight + 4;
+		if (legendOnSide) {
+			width = LEGEND_WIDTH;
+			startx = gridWidth + 4;
+			starty = LEGEND_HEIGHT * index;
+		}
+		Rectangle rectangle = new Rectangle(startx, starty, width,
+			LEGEND_HEIGHT);
+		e.gc.fillRectangle(rectangle);
+		e.gc.drawRectangle(rectangle);
+		drawTextOnCenter(e, text, rectangle);
+	}
+
 	/**
 	 * Modify dimensions of the grid. maxWidth and maxHeight are used to
 	 * calculate the size of the cells
@@ -218,4 +263,9 @@ public abstract class AbstractGridContainerWidget extends Canvas {
 	public void setShowColumnFirst(boolean showColumnFirst) {
 		this.showColumnFirst = showColumnFirst;
 	}
+
+	public void setLegendOnSide(boolean onSide) {
+		this.legendOnSide = onSide;
+	}
+
 }

@@ -38,3 +38,4 @@ INSERT INTO `SAMPLE_TYPE` VALUES
 (36, "Transverse Colon",             "Colon, T"),
 (37, "Meconium - BABY",              "Meconium"),
 (38, "WB DMSO",                      "WB DMSO");
+UNLOCK TABLES;

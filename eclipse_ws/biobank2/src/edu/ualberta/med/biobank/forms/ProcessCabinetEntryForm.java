@@ -15,6 +15,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -40,7 +41,7 @@ import edu.ualberta.med.biobank.treeview.PatientVisitAdapter;
 import edu.ualberta.med.biobank.validators.CabinetIdValidator;
 import edu.ualberta.med.biobank.validators.CabinetPositionCodeValidator;
 import edu.ualberta.med.biobank.widgets.CabinetBinWidget;
-import edu.ualberta.med.biobank.widgets.StorageContainerWidget;
+import edu.ualberta.med.biobank.widgets.ViewStorageContainerWidget;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
@@ -58,7 +59,7 @@ public class ProcessCabinetEntryForm extends BiobankEntryForm implements
 	private PatientVisitAdapter pvAdapter;
 	private PatientVisit patientVisit;
 
-	private StorageContainerWidget drawer;
+	private ViewStorageContainerWidget drawer;
 	private CabinetBinWidget bin;
 	private Label typeText;
 
@@ -130,7 +131,7 @@ public class ProcessCabinetEntryForm extends BiobankEntryForm implements
 		toolkit.createLabel(client, "Drawer");
 		toolkit.createLabel(client, "Bin");
 
-		drawer = new StorageContainerWidget(client);
+		drawer = new ViewStorageContainerWidget(client);
 		toolkit.adapt(drawer);
 		drawer.setGridSizes(4, 1, 150, 150);
 		drawer.setFirstColSign('A');
@@ -230,7 +231,7 @@ public class ProcessCabinetEntryForm extends BiobankEntryForm implements
 					// FIXME parse position, get Sample if exists and get Exact
 					// Positions !
 					Random r = new Random();
-					drawer.setSelectedBox(new int[] { r.nextInt(4), 0 });
+					drawer.setSelectedBox(new Point(r.nextInt(4), 0));
 					bin.setPosition(r.nextInt(36) + 1);
 
 					SamplePosition sp = new SamplePosition();

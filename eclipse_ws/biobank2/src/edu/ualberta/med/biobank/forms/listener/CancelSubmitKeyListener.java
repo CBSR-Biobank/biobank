@@ -4,6 +4,7 @@ import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.widgets.Text;
 
+import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.forms.CancelConfirmForm;
 
 /**
@@ -22,25 +23,16 @@ public class CancelSubmitKeyListener implements KeyListener {
 		if (e.keyCode == 13) {
 			String text = ((Text) e.widget).getText();
 			try {
-				if (isConfirmCode(text) && form.isConfirmEnabled()) {
+				if (BioBankPlugin.getDefault().isConfirmBarcode(text)
+						&& form.isConfirmEnabled()) {
 					form.confirm();
-				} else if (isCancelCode(text)) {
+				} else if (BioBankPlugin.getDefault().isCancelBarcode(text)) {
 					form.cancel();
 				}
 			} catch (Exception ex) {
 				throw new RuntimeException(ex);
 			}
 		}
-	}
-
-	private boolean isCancelCode(String text) {
-		// FIXME get the cancel bar code
-		return false;
-	}
-
-	private boolean isConfirmCode(String text) {
-		// FIXME get the confirm bar code
-		return false;
 	}
 
 	@Override

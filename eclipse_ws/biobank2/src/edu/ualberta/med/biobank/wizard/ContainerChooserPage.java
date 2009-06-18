@@ -1,0 +1,94 @@
+package edu.ualberta.med.biobank.wizard;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.eclipse.jface.viewers.ArrayContentProvider;
+import org.eclipse.jface.viewers.ComboViewer;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.LabelProvider;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.widgets.Combo;
+import org.eclipse.swt.widgets.Label;
+
+import edu.ualberta.med.biobank.model.ContainerCell;
+import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.model.StorageContainer;
+
+public class ContainerChooserPage extends AbstractContainerChooserPage {
+
+	public static final String NAME = "FIRST_CONTAINER";
+
+	public ContainerChooserPage() {
+		super(NAME);
+		setTitle("Main container");
+		setDescription("Choose main container");
+		gridHeight = 100;
+	}
+
+	@Override
+	protected void initComponent() {
+		Label label = new Label(pageContainer, SWT.NULL);
+		label.setText("Choose first container:");
+		Combo combo = new Combo(pageContainer, SWT.NONE);
+		final ComboViewer comboViewer = new ComboViewer(combo);
+		comboViewer.setContentProvider(new ArrayContentProvider());
+		comboViewer.setLabelProvider(new LabelProvider() {
+			@Override
+			public String getText(Object element) {
+				StorageContainer sc = (StorageContainer) element;
+				return sc.getName();
+			}
+		});
+		comboViewer.setInput(getTopContainers());
+		comboViewer
+			.addSelectionChangedListener(new ISelectionChangedListener() {
+				@Override
+				public void selectionChanged(SelectionChangedEvent event) {
+					setCurrentStorageContainer((StorageContainer) ((IStructuredSelection) comboViewer
+						.getSelection()).getFirstElement());
+					updateFreezerGrid();
+					pageContainer.layout(true, true);
+					textPosition.setText("");
+					setPageComplete(false);
+				}
+			});
+
+		super.initComponent();
+		containerWidget.setVisible(false);
+	}
+
+	private List<StorageContainer> getTopContainers() {
+		// reload site ?
+		List<StorageContainer> topContainers = new ArrayList<StorageContainer>();
+		for (StorageContainer storageContainer : getSite()
+			.getStorageContainerCollection()) {
+
+			if (storageContainer.getLocatedAtPosition() == null
+					|| storageContainer.getLocatedAtPosition()
+						.getParentContainer() == null) {
+				topContainers.add(storageContainer);
+			}
+		}
+		return topContainers;
+	}
+
+	public Site getSite() {
+		return ((ContainerChooserWizard) getWizard()).getSite();
+	}
+
+	@Override
+	protected ContainerCell positionSelection(MouseEvent e) {
+		ContainerCell cell = super.positionSelection(e);
+		if (cell != null) {
+			((AbstractContainerChooserPage) getNextPage())
+				.setCurrentStorageContainer(cell.getPosition()
+					.getOccupiedContainer());
+		}
+		return cell;
+	}
+
+}

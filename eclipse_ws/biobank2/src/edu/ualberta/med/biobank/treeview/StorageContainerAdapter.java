@@ -148,7 +148,7 @@ public class StorageContainerAdapter extends Node {
 
 	@Override
 	public Node accept(NodeSearchVisitor visitor) {
-		return null;
+		return visitor.visit(this);
 	}
 
 	public Site getSite() {

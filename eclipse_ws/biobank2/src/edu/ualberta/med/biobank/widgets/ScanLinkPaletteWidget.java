@@ -16,7 +16,7 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 
-import edu.ualberta.med.biobank.model.CellStatus;
+import edu.ualberta.med.biobank.model.SampleCellStatus;
 import edu.ualberta.med.biobank.model.ScanCell;
 import edu.ualberta.med.biobank.widgets.listener.ScanPaletteModificationEvent;
 
@@ -42,10 +42,12 @@ public class ScanLinkPaletteWidget extends ScanPaletteWidget {
 
 	@Override
 	protected void initLegend() {
-		statusAvailable = new ArrayList<CellStatus>();
-		statusAvailable.add(CellStatus.EMPTY);
-		statusAvailable.add(CellStatus.NO_TYPE);
-		statusAvailable.add(CellStatus.TYPE);
+		hasLegend = true;
+		statusAvailable = new ArrayList<SampleCellStatus>();
+		statusAvailable.add(SampleCellStatus.EMPTY);
+		statusAvailable.add(SampleCellStatus.NO_TYPE);
+		statusAvailable.add(SampleCellStatus.TYPE);
+		legendWidth = PALETTE_WIDTH / statusAvailable.size();
 	}
 
 	public void clearSelection() {
@@ -120,7 +122,7 @@ public class ScanLinkPaletteWidget extends ScanPaletteWidget {
 			for (ScanCell cell : rowCells) {
 				if (cell != null) {
 					cell.setType(null);
-					cell.setStatus(CellStatus.NEW);
+					cell.setStatus(SampleCellStatus.NEW);
 				}
 			}
 		}
