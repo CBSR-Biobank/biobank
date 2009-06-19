@@ -199,8 +199,9 @@ public class SiteEntryForm extends AddressEntryFormCommon {
 			getSite().getPage().closeEditor(this, false);
 		} catch (final RemoteAccessException exp) {
 			BioBankPlugin.openRemoteAccessErrorMessage();
-		} catch (Exception exp) {
-			exp.printStackTrace();
+		} catch (Exception e) {
+			SessionManager.getLogger().error(
+				"Error while creating site " + site.getName(), e);
 		}
 	}
 

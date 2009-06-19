@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.IEditorPart;
@@ -13,6 +14,7 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.forms.LinkSamplesEntryForm;
 import edu.ualberta.med.biobank.forms.ProcessCabinetEntryForm;
 import edu.ualberta.med.biobank.forms.ProcessSamplesEntryForm;
@@ -104,7 +106,7 @@ public abstract class Node {
 
 	public Node getChild(int id, boolean reloadChildren) {
 		if (reloadChildren) {
-			loadChildren();
+			loadChildren(false);
 		}
 		if (children.size() == 0)
 			return null;
@@ -239,11 +241,19 @@ public abstract class Node {
 
 	public abstract void performDoubleClick();
 
-	public abstract void performExpand();
+	public void performExpand() {
+		Display.getDefault().asyncExec(new Runnable() {
+			public void run() {
+				loadChildren(true);
+				SessionManager.getInstance().getTreeViewer().expandToLevel(
+					Node.this, 1);
+			}
+		});
+	}
 
 	public abstract void popupMenu(TreeViewer tv, Tree tree, Menu menu);
 
-	public abstract void loadChildren();
+	public abstract void loadChildren(boolean updateNode);
 
 	public static void closeEditor(FormInput input) {
 		IWorkbenchPage page = PlatformUI.getWorkbench()

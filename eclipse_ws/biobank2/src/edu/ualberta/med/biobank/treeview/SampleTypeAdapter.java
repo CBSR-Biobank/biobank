@@ -42,16 +42,12 @@ public class SampleTypeAdapter extends Node {
 	}
 
 	@Override
-	public void performExpand() {
-	}
-
-	@Override
 	public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
 
 	}
 
 	@Override
-	public void loadChildren() {
+	public void loadChildren(boolean updateNode) {
 	}
 
 	@Override

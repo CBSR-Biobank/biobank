@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.forms;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -100,6 +101,7 @@ public class StorageContainerEntryForm extends BiobankEntryForm {
 		appService = storageContainerAdapter.getAppService();
 		storageContainer = storageContainerAdapter.getStorageContainer();
 		site = storageContainerAdapter.getSite();
+		position = storageContainer.getLocatedAtPosition();
 
 		if (storageContainer.getId() == null) {
 			setPartName("Storage Container");
@@ -150,7 +152,13 @@ public class StorageContainerEntryForm extends BiobankEntryForm {
 	}
 
 	private void createStorageTypesSection(Composite client) {
-		Collection<StorageType> storageTypes = site.getStorageTypeCollection();
+		Collection<StorageType> storageTypes = new ArrayList<StorageType>();
+		if (position.getParentContainer() == null) {
+			storageTypes = site.getStorageTypeCollection();
+		} else {
+			storageTypes = position.getParentContainer().getStorageType()
+				.getChildStorageTypeCollection();
+		}
 		StorageType[] arr = new StorageType[storageTypes.size()];
 		int count = 0;
 		for (StorageType st : storageTypes) {
@@ -161,7 +169,6 @@ public class StorageContainerEntryForm extends BiobankEntryForm {
 			}
 			count++;
 		}
-
 		Label storageTypeLabel = toolkit.createLabel(client, "Container Type:",
 			SWT.LEFT);
 
@@ -224,31 +231,24 @@ public class StorageContainerEntryForm extends BiobankEntryForm {
 	}
 
 	private void createLocationSection() {
-		position = storageContainer.getLocatedAtPosition();
-		// if position == null, we are in a storage container without parent
-		if (position != null) {
+		StorageContainer parentContainer = position.getParentContainer();
+		if (parentContainer != null) {
 			String dim1Label = null, dim2Label = null;
 			Integer dim1Max = null, dim2Max = null;
 
 			Composite locationComposite = createSectionWithClient("Location");
-			StorageContainer parentContainer = position.getParentContainer();
-			if (parentContainer != null) {
-				dim1Label = parentContainer.getStorageType()
-					.getDimensionOneLabel();
-				dim2Label = parentContainer.getStorageType()
-					.getDimensionTwoLabel();
+			dim1Label = parentContainer.getStorageType().getDimensionOneLabel();
+			dim2Label = parentContainer.getStorageType().getDimensionTwoLabel();
 
-				Capacity capacity = parentContainer.getStorageType()
-					.getCapacity();
-				if (capacity != null) {
-					dim1Max = capacity.getDimensionOneCapacity();
-					dim2Max = capacity.getDimensionTwoCapacity();
-					if (dim1Max != null) {
-						dim1Label += "\n(1 - " + dim1Max + ")";
-					}
-					if (dim2Max != null) {
-						dim2Label += "\n(1 - " + dim2Max + ")";
-					}
+			Capacity capacity = parentContainer.getStorageType().getCapacity();
+			if (capacity != null) {
+				dim1Max = capacity.getDimensionOneCapacity();
+				dim2Max = capacity.getDimensionTwoCapacity();
+				if (dim1Max != null) {
+					dim1Label += "\n(1 - " + dim1Max + ")";
+				}
+				if (dim2Max != null) {
+					dim2Label += "\n(1 - " + dim2Max + ")";
 				}
 			}
 
@@ -343,7 +343,7 @@ public class StorageContainerEntryForm extends BiobankEntryForm {
 		}
 		tempWidget.setText(str);
 
-		if (storageContainer.getLocatedAtPosition() != null) {
+		if (position.getParentContainer() != null) {
 			// handle dimension 1
 			str = "";
 

@@ -1,13 +1,10 @@
 package edu.ualberta.med.biobank.treeview;
 
-import java.util.List;
-
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
@@ -17,6 +14,7 @@ import edu.ualberta.med.biobank.forms.StorageContainerEntryForm;
 import edu.ualberta.med.biobank.forms.StorageContainerViewForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.ContainerPosition;
+import edu.ualberta.med.biobank.model.ModelUtils;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.StorageContainer;
 
@@ -28,7 +26,7 @@ public class StorageContainerAdapter extends Node {
 			StorageContainer storageContainer) {
 		super(parent);
 		this.storageContainer = storageContainer;
-		setHasChildren(true);
+		setHasChildren(storageContainer.getOccupiedPositions().size() > 0);
 	}
 
 	@Override
@@ -51,6 +49,7 @@ public class StorageContainerAdapter extends Node {
 	@Override
 	public void performDoubleClick() {
 		openForm(new FormInput(this), StorageContainerViewForm.ID);
+		performExpand();
 	}
 
 	public StorageContainer getStorageContainer() {
@@ -59,17 +58,6 @@ public class StorageContainerAdapter extends Node {
 
 	public void setStorageContainer(StorageContainer storageContainer) {
 		this.storageContainer = storageContainer;
-	}
-
-	@Override
-	public void performExpand() {
-		Display.getDefault().asyncExec(new Runnable() {
-			public void run() {
-				loadChildren();
-				SessionManager.getInstance().getTreeViewer().expandToLevel(
-					StorageContainerAdapter.this, 1);
-			}
-		});
 	}
 
 	@Override
@@ -101,13 +89,9 @@ public class StorageContainerAdapter extends Node {
 		mi.setText("Add a Storage Container");
 		mi.addSelectionListener(new SelectionListener() {
 			public void widgetSelected(SelectionEvent event) {
-				StorageContainer newStorageContainer = new StorageContainer();
-				ContainerPosition position = new ContainerPosition();
-				position.setParentContainer(storageContainer);
-				position.setOccupiedContainer(newStorageContainer);
-				newStorageContainer.setLocatedAtPosition(position);
 				StorageContainerAdapter adapter = new StorageContainerAdapter(
-					StorageContainerAdapter.this, newStorageContainer);
+					StorageContainerAdapter.this, ModelUtils
+						.newStorageContainer(storageContainer));
 				openForm(new FormInput(adapter), StorageContainerEntryForm.ID);
 			}
 
@@ -117,16 +101,12 @@ public class StorageContainerAdapter extends Node {
 	}
 
 	@Override
-	public void loadChildren() {
+	public void loadChildren(boolean updateNode) {
 		try {
 			// read from database again
-			StorageContainer searcSC = new StorageContainer();
-			searcSC.setId(storageContainer.getId());
-			List<StorageContainer> result = getAppService().search(
-				StorageContainer.class, searcSC);
-			Assert.isTrue(result.size() == 1);
-			storageContainer = result.get(0);
-
+			storageContainer = (StorageContainer) ModelUtils.getObjectWithId(
+				getAppService(), StorageContainer.class, storageContainer
+					.getId());
 			for (ContainerPosition childPosition : storageContainer
 				.getOccupiedPositions()) {
 				StorageContainer child = childPosition.getOccupiedContainer();
@@ -137,7 +117,10 @@ public class StorageContainerAdapter extends Node {
 					node = new StorageContainerAdapter(this, child);
 					addChild(node);
 				}
-				SessionManager.getInstance().getTreeViewer().update(node, null);
+				if (updateNode) {
+					SessionManager.getInstance().getTreeViewer().update(node,
+						null);
+				}
 			}
 		} catch (Exception e) {
 			SessionManager.getLogger().error(

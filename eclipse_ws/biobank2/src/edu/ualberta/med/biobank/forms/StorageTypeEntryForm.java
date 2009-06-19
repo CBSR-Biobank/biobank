@@ -315,7 +315,8 @@ public class StorageTypeEntryForm extends BiobankEntryForm {
 
 		saveSampleTypes();
 		saveChildStorageTypes();
-		saveCapacity();
+		// saveCapacity();
+		storageType.setCapacity(capacity);
 
 		// associate the storage type to it's site
 		storageType.setSite(site);
@@ -338,21 +339,21 @@ public class StorageTypeEntryForm extends BiobankEntryForm {
 		getSite().getPage().closeEditor(this, false);
 	}
 
-	private void saveCapacity() throws Exception {
-		SDKQuery query;
-		SDKQueryResult result;
-
-		Integer id = capacity.getId();
-
-		if ((id == null) || (id == 0)) {
-			query = new InsertExampleQuery(capacity);
-		} else {
-			query = new UpdateExampleQuery(capacity);
-		}
-
-		result = appService.executeQuery(query);
-		storageType.setCapacity((Capacity) result.getObjectResult());
-	}
+	// private void saveCapacity() throws Exception {
+	// SDKQuery query;
+	// SDKQueryResult result;
+	//
+	// Integer id = capacity.getId();
+	//
+	// if ((id == null) || (id == 0)) {
+	// query = new InsertExampleQuery(capacity);
+	// } else {
+	// query = new UpdateExampleQuery(capacity);
+	// }
+	//
+	// result = appService.executeQuery(query);
+	// storageType.setCapacity((Capacity) result.getObjectResult());
+	// }
 
 	private void saveSampleTypes() {
 		List<Integer> selSampleTypeIds = samplesMultiSelect.getSelected();

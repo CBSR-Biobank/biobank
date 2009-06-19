@@ -49,11 +49,6 @@ public class StorageTypeAdapter extends Node {
 	}
 
 	@Override
-	public void performExpand() {
-
-	}
-
-	@Override
 	public void performDoubleClick() {
 		openForm(new FormInput(this), StorageTypeViewForm.ID);
 	}
@@ -86,7 +81,7 @@ public class StorageTypeAdapter extends Node {
 	}
 
 	@Override
-	public void loadChildren() {
+	public void loadChildren(boolean updateNode) {
 
 	}
 

@@ -1,8 +1,5 @@
 package edu.ualberta.med.biobank.wizard;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -14,9 +11,12 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Label;
 
+import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.model.ContainerCell;
-import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.model.ModelUtils;
 import edu.ualberta.med.biobank.model.StorageContainer;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ContainerChooserPage extends AbstractContainerChooserPage {
 
@@ -43,7 +43,13 @@ public class ContainerChooserPage extends AbstractContainerChooserPage {
 				return sc.getName();
 			}
 		});
-		comboViewer.setInput(getTopContainers());
+		try {
+			comboViewer.setInput(ModelUtils.getTopContainersForSite(
+				getAppService(), getSite()));
+		} catch (ApplicationException e) {
+			BioBankPlugin.openError("Error",
+				"Error retrieving containers informations from database");
+		}
 		comboViewer
 			.addSelectionChangedListener(new ISelectionChangedListener() {
 				@Override
@@ -61,34 +67,19 @@ public class ContainerChooserPage extends AbstractContainerChooserPage {
 		containerWidget.setVisible(false);
 	}
 
-	private List<StorageContainer> getTopContainers() {
-		// reload site ?
-		List<StorageContainer> topContainers = new ArrayList<StorageContainer>();
-		for (StorageContainer storageContainer : getSite()
-			.getStorageContainerCollection()) {
-
-			if (storageContainer.getLocatedAtPosition() == null
-					|| storageContainer.getLocatedAtPosition()
-						.getParentContainer() == null) {
-				topContainers.add(storageContainer);
-			}
-		}
-		return topContainers;
-	}
-
-	public Site getSite() {
-		return ((ContainerChooserWizard) getWizard()).getSite();
-	}
-
 	@Override
 	protected ContainerCell positionSelection(MouseEvent e) {
 		ContainerCell cell = super.positionSelection(e);
 		if (cell != null) {
-			((AbstractContainerChooserPage) getNextPage())
-				.setCurrentStorageContainer(cell.getPosition()
+			PalettePositionChooserPage nextPage = (PalettePositionChooserPage) getNextPage();
+			try {
+				nextPage.setCurrentStorageContainer(cell.getPosition()
 					.getOccupiedContainer());
+			} catch (ArrayIndexOutOfBoundsException aiobe) {
+				setPageComplete(false);
+				SessionManager.getLogger().error("Index error", aiobe);
+			}
 		}
 		return cell;
 	}
-
 }

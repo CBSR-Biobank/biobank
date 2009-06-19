@@ -27,7 +27,10 @@ public class ChooseStorageContainerWidget extends AbstractGridContainerWidget {
 		}
 		int col = x / getCellWidth();
 		int row = y / getCellHeight();
-		return cells[row][col];
+		if (col >= 0 && col < getColumns() && row >= 0 && row < getRows()) {
+			return cells[row][col];
+		}
+		return null;
 	}
 
 	private void initLegend() {

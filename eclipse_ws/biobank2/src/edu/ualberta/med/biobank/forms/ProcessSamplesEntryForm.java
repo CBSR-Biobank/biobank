@@ -10,6 +10,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
@@ -41,6 +42,7 @@ import edu.ualberta.med.biobank.model.SampleCellStatus;
 import edu.ualberta.med.biobank.model.SamplePosition;
 import edu.ualberta.med.biobank.model.ScanCell;
 import edu.ualberta.med.biobank.model.StorageContainer;
+import edu.ualberta.med.biobank.model.StorageType;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.NodeSearchVisitor;
@@ -80,6 +82,8 @@ public class ProcessSamplesEntryForm extends BiobankEntryForm implements
 	private IObservableValue scanLaunchedValue = new WritableValue(
 		Boolean.FALSE, Boolean.class);
 	private IObservableValue scanValidValue = new WritableValue(Boolean.TRUE,
+		Boolean.class);
+	private IObservableValue hasLocationValue = new WritableValue(Boolean.TRUE,
 		Boolean.class);
 
 	private ScanCell[][] cells;
@@ -136,6 +140,8 @@ public class ProcessSamplesEntryForm extends BiobankEntryForm implements
 			scanLaunchedValue, "Scanner should be launched");
 		addBooleanBinding(new WritableValue(Boolean.TRUE, Boolean.class),
 			scanValidValue, "Error in scanning result");
+		addBooleanBinding(new WritableValue(Boolean.TRUE, Boolean.class),
+			hasLocationValue, "Palette has no location");
 	}
 
 	private void createContainersSection() {
@@ -232,6 +238,7 @@ public class ProcessSamplesEntryForm extends BiobankEntryForm implements
 
 		locateButton = toolkit
 			.createButton(client, "Choose Location", SWT.PUSH);
+		locateButton.setVisible(false);
 		GridData gd = new GridData();
 		gd.horizontalSpan = 3;
 		locateButton.setLayoutData(gd);
@@ -273,20 +280,24 @@ public class ProcessSamplesEntryForm extends BiobankEntryForm implements
 				"No study has been found on this palette");
 			return;
 		}
-		ContainerChooserWizard wizard = new ContainerChooserWizard(currentStudy
-			.getSite());
+		ContainerChooserWizard wizard = new ContainerChooserWizard(appService,
+			currentStudy.getSite());
 		WizardDialog dialog = new WizardDialog(getSite().getShell(), wizard);
-		dialog.open();
-		initPalettePosition(wizard.getSelectedPosition());
+		int res = dialog.open();
+		if (res == Window.OK) {
+			initPalette(wizard.getSelectedPosition(), wizard.getStorageType());
+			showOnlyPalette(false);
+			showPalettePosition(currentPalette);
+		}
+		form.getBody().layout(true, true);
 	}
 
-	private void initPalettePosition(ContainerPosition position) {
+	private void initPalette(ContainerPosition position, StorageType type) {
 		currentPalette.setLocatedAtPosition(position);
+		currentPalette.setStorageType(type);
 		currentPalette.setName(paletteCodeValue.getValue().toString());
 		currentPalette.setBarcode(paletteCodeValue.getValue().toString());
-		showOnlyPalette(false);
-		showPalettePosition(currentPalette);
-		containersComposite.layout(true, true);
+		currentPalette.setSite(currentStudy.getSite());
 	}
 
 	protected void scan() {
@@ -320,11 +331,10 @@ public class ProcessSamplesEntryForm extends BiobankEntryForm implements
 						setDirty(true);
 
 						showAllContainers(true);
-
-						confirmCancelText.setFocus();
 					} else {
 						showAllContainers(false);
 					}
+					scanButton.traverse(SWT.TRAVERSE_TAB_NEXT);
 					form.layout(true, true);
 				} catch (RemoteConnectFailureException exp) {
 					BioBankPlugin.openRemoteConnectErrorMessage();
@@ -381,6 +391,9 @@ public class ProcessSamplesEntryForm extends BiobankEntryForm implements
 				.getPositionDimensionTwo() - 1));
 
 			paletteLabel.setText(palette.getName());
+			hasLocationValue.setValue(Boolean.TRUE);
+		} else {
+			hasLocationValue.setValue(Boolean.FALSE);
 		}
 	}
 
@@ -481,8 +494,6 @@ public class ProcessSamplesEntryForm extends BiobankEntryForm implements
 				try {
 					SDKQuery query;
 					if (isNewPalette()) {
-						// insert new container into selected
-						// set position in the choosen container
 						query = new InsertExampleQuery(currentPalette);
 						SDKQueryResult res = appService.executeQuery(query);
 						currentPalette = (StorageContainer) res
@@ -545,6 +556,7 @@ public class ProcessSamplesEntryForm extends BiobankEntryForm implements
 			form.setMessage("Processing samples.", IMessageProvider.NONE);
 			submitButton.setEnabled(true);
 			scanButton.setEnabled(true);
+			locateButton.setEnabled(true);
 		} else {
 			form.setMessage(status.getMessage(), IMessageProvider.ERROR);
 			submitButton.setEnabled(false);
@@ -552,13 +564,9 @@ public class ProcessSamplesEntryForm extends BiobankEntryForm implements
 				plateToScanText.getText())) {
 				scanButton.setEnabled(false);
 			} else {
-				if (status.getMessage() != null
-						&& status.getMessage().contains("position")) {
-					scanButton.setEnabled(false);
-				} else {
-					scanButton.setEnabled(true);
-				}
+				scanButton.setEnabled(!paletteCodeText.getText().isEmpty());
 			}
+			locateButton.setEnabled((Boolean) scanValidValue.getValue());
 		}
 	}
 
@@ -613,6 +621,7 @@ public class ProcessSamplesEntryForm extends BiobankEntryForm implements
 			showOnlyPalette(false);
 		} else {
 			showOnlyPalette(true);
+			hasLocationValue.setValue(Boolean.FALSE);
 			paletteLabel.setText("New Palette");
 		}
 		return true;

@@ -6,7 +6,6 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
@@ -44,17 +43,6 @@ public class SessionAdapter extends Node {
 	@Override
 	public String getTitle() {
 		return "";
-	}
-
-	@Override
-	public void performExpand() {
-		Display.getDefault().asyncExec(new Runnable() {
-			public void run() {
-				loadChildren();
-				SessionManager.getInstance().getTreeViewer().expandToLevel(
-					SessionAdapter.this, 1);
-			}
-		});
 	}
 
 	@Override
@@ -106,7 +94,7 @@ public class SessionAdapter extends Node {
 	}
 
 	@Override
-	public void loadChildren() {
+	public void loadChildren(boolean updateNode) {
 		try {
 			// read from database again
 			Site siteSearch = new Site();
@@ -122,7 +110,10 @@ public class SessionAdapter extends Node {
 					node = new SiteAdapter(this, site);
 					addChild(node);
 				}
-				SessionManager.getInstance().getTreeViewer().update(node, null);
+				if (updateNode) {
+					SessionManager.getInstance().getTreeViewer().update(node,
+						null);
+				}
 			}
 		} catch (final RemoteAccessException exp) {
 			BioBankPlugin.openRemoteAccessErrorMessage();

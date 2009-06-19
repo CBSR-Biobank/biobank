@@ -1,14 +1,12 @@
 package edu.ualberta.med.biobank.treeview;
 
 import java.util.Collection;
-import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
@@ -19,6 +17,7 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.forms.ClinicEntryForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Clinic;
+import edu.ualberta.med.biobank.model.ModelUtils;
 import edu.ualberta.med.biobank.model.Site;
 
 public class ClinicGroup extends Node {
@@ -30,17 +29,6 @@ public class ClinicGroup extends Node {
 	@Override
 	public void performDoubleClick() {
 		performExpand();
-	}
-
-	@Override
-	public void performExpand() {
-		Display.getDefault().asyncExec(new Runnable() {
-			public void run() {
-				loadChildren();
-				SessionManager.getInstance().getTreeViewer().expandToLevel(
-					ClinicGroup.this, 1);
-			}
-		});
 	}
 
 	@Override
@@ -67,17 +55,14 @@ public class ClinicGroup extends Node {
 	}
 
 	@Override
-	public void loadChildren() {
+	public void loadChildren(boolean updateNode) {
 		Site currentSite = ((SiteAdapter) getParent()).getSite();
 		Assert.isNotNull(currentSite, "null site");
 
-		// read from database again
 		try {
-			Site site = new Site();
-			site.setId(currentSite.getId());
-			List<Site> result = getAppService().search(Site.class, site);
-			Assert.isTrue(result.size() == 1);
-			currentSite = result.get(0);
+			// read from database again
+			currentSite = (Site) ModelUtils.getObjectWithId(getAppService(),
+				Site.class, currentSite.getId());
 			((SiteAdapter) getParent()).setSite(currentSite);
 
 			Collection<Clinic> clinics = currentSite.getClinicCollection();
@@ -97,7 +82,10 @@ public class ClinicGroup extends Node {
 					node = new ClinicAdapter(this, clinic);
 					addChild(node);
 				}
-				SessionManager.getInstance().getTreeViewer().update(node, null);
+				if (updateNode) {
+					SessionManager.getInstance().getTreeViewer().update(node,
+						null);
+				}
 			}
 		} catch (Exception e) {
 			SessionManager.getLogger().error(

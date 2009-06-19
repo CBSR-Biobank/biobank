@@ -22,7 +22,7 @@ public class NodeSearchVisitor {
 	}
 
 	private Node visitChildren(Node node) {
-		node.loadChildren();
+		node.loadChildren(false);
 		for (Node child : node.getChildren()) {
 			return child.accept(this);
 		}

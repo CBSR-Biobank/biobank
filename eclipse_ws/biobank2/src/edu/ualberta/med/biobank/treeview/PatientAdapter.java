@@ -1,14 +1,12 @@
 package edu.ualberta.med.biobank.treeview;
 
 import java.util.Collection;
-import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
@@ -18,6 +16,7 @@ import edu.ualberta.med.biobank.forms.PatientEntryForm;
 import edu.ualberta.med.biobank.forms.PatientViewForm;
 import edu.ualberta.med.biobank.forms.PatientVisitEntryForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
+import edu.ualberta.med.biobank.model.ModelUtils;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.PatientVisit;
 
@@ -63,17 +62,6 @@ public class PatientAdapter extends Node {
 	}
 
 	@Override
-	public void performExpand() {
-		Display.getDefault().asyncExec(new Runnable() {
-			public void run() {
-				loadChildren();
-				SessionManager.getInstance().getTreeViewer().expandToLevel(
-					PatientAdapter.this, 1);
-			}
-		});
-	}
-
-	@Override
 	public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
 		MenuItem mi = new MenuItem(menu, SWT.PUSH);
 		mi.setText("Edit Patient");
@@ -113,15 +101,11 @@ public class PatientAdapter extends Node {
 	}
 
 	@Override
-	public void loadChildren() {
+	public void loadChildren(boolean updateNode) {
 		try {
 			// read from database again
-			Patient searchPatient = new Patient();
-			searchPatient.setId(patient.getId());
-			List<Patient> result = getAppService().search(Patient.class,
-				searchPatient);
-			Assert.isTrue(result.size() == 1);
-			patient = result.get(0);
+			patient = (Patient) ModelUtils.getObjectWithId(getAppService(),
+				Patient.class, patient.getId());
 
 			Collection<PatientVisit> visits = patient
 				.getPatientVisitCollection();
@@ -134,10 +118,11 @@ public class PatientAdapter extends Node {
 					node = new PatientVisitAdapter(this, visit);
 					addChild(node);
 				}
-
-				SessionManager.getInstance().getTreeViewer().update(node, null);
+				if (updateNode) {
+					SessionManager.getInstance().getTreeViewer().update(node,
+						null);
+				}
 			}
-
 		} catch (Exception e) {
 			SessionManager.getLogger().error(
 				"Error while loading children of patient "

@@ -58,11 +58,6 @@ public class SampleAdapter extends Node {
 	}
 
 	@Override
-	public void performExpand() {
-
-	}
-
-	@Override
 	public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
 		MenuItem mi = new MenuItem(menu, SWT.PUSH);
 		mi.setText("View Sample");
@@ -77,7 +72,7 @@ public class SampleAdapter extends Node {
 	}
 
 	@Override
-	public void loadChildren() {
+	public void loadChildren(boolean updateNode) {
 	}
 
 	@Override

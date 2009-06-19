@@ -9,10 +9,8 @@ import java.util.Map;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
@@ -23,6 +21,7 @@ import edu.ualberta.med.biobank.forms.PatientVisitEntryForm;
 import edu.ualberta.med.biobank.forms.PatientVisitViewForm;
 import edu.ualberta.med.biobank.forms.ProcessCabinetEntryForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
+import edu.ualberta.med.biobank.model.ModelUtils;
 import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.Sample;
 import edu.ualberta.med.biobank.model.SampleType;
@@ -63,16 +62,16 @@ public class PatientVisitAdapter extends Node {
 		openForm(new FormInput(this), PatientVisitViewForm.ID);
 	}
 
-	@Override
-	public void performExpand() {
-		BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
-			public void run() {
-				loadChildren();
-				SessionManager.getInstance().getTreeViewer().expandToLevel(
-					PatientVisitAdapter.this, 1);
-			}
-		});
-	}
+	// @Override
+	// public void performExpand() {
+	// BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
+	// public void run() {
+	// loadChildren();
+	// SessionManager.getInstance().getTreeViewer().expandToLevel(
+	// PatientVisitAdapter.this, 1);
+	// }
+	// });
+	// }
 
 	@Override
 	public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
@@ -128,15 +127,11 @@ public class PatientVisitAdapter extends Node {
 	}
 
 	@Override
-	public void loadChildren() {
+	public void loadChildren(boolean updateNode) {
 		try {
 			// read from database again
-			PatientVisit pv = new PatientVisit();
-			pv.setId(patientVisit.getId());
-			List<PatientVisit> result = getAppService().search(
-				PatientVisit.class, pv);
-			Assert.isTrue(result.size() == 1);
-			patientVisit = result.get(0);
+			patientVisit = (PatientVisit) ModelUtils.getObjectWithId(
+				getAppService(), PatientVisit.class, patientVisit.getId());
 
 			Collection<Sample> samples = patientVisit.getSampleCollection();
 
@@ -165,8 +160,10 @@ public class PatientVisitAdapter extends Node {
 						sampleNode = new SampleAdapter(node, sample);
 						node.addChild(sampleNode);
 					}
-					SessionManager.getInstance().getTreeViewer().update(
-						sampleNode, null);
+					if (updateNode) {
+						SessionManager.getInstance().getTreeViewer().update(
+							sampleNode, null);
+					}
 				}
 			}
 

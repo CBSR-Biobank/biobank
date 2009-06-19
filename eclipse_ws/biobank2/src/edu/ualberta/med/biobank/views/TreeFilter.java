@@ -14,7 +14,7 @@ public class TreeFilter extends PatternFilter {
 				&& !(element instanceof PatientVisitAdapter)) {
 			// load node children, except for PatientVisit : don't want to load
 			// all samples only for filtering
-			((Node) element).loadChildren();
+			((Node) element).loadChildren(false);
 		}
 		return super.isElementVisible(viewer, element);
 	}

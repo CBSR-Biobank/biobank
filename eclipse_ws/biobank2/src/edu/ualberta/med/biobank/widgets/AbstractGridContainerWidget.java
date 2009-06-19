@@ -268,4 +268,12 @@ public abstract class AbstractGridContainerWidget extends Canvas {
 		this.legendOnSide = onSide;
 	}
 
+	public int getRows() {
+		return rows;
+	}
+
+	public int getColumns() {
+		return columns;
+	}
+
 }

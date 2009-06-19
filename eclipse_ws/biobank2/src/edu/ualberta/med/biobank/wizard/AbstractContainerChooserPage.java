@@ -15,8 +15,10 @@ import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.ContainerCell;
 import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.ContainerStatus;
+import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.StorageContainer;
 import edu.ualberta.med.biobank.widgets.ChooseStorageContainerWidget;
+import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public abstract class AbstractContainerChooserPage extends WizardPage {
 
@@ -81,7 +83,12 @@ public abstract class AbstractContainerChooserPage extends WizardPage {
 		if (cell != null) {
 			ContainerPosition cp = cell.getPosition();
 			if (cp != null && cp.getOccupiedContainer() != null) {
-				textPosition.setText(cp.getOccupiedContainer().getBarcode());
+				String code = cp.getOccupiedContainer().getBarcode();
+				if (code != null) {
+					textPosition.setText(code);
+				} else {
+					textPosition.setText(cp.getOccupiedContainer().getName());
+				}
 				setPageComplete(true);
 			}
 		} else {
@@ -156,6 +163,18 @@ public abstract class AbstractContainerChooserPage extends WizardPage {
 
 	public void setCurrentStorageContainer(StorageContainer container) {
 		this.currentContainer = container;
+	}
+
+	public StorageContainer getCurrentStorageContainer() {
+		return currentContainer;
+	}
+
+	public Site getSite() {
+		return ((ContainerChooserWizard) getWizard()).getSite();
+	}
+
+	public WritableApplicationService getAppService() {
+		return ((ContainerChooserWizard) getWizard()).getAppService();
 	}
 
 }

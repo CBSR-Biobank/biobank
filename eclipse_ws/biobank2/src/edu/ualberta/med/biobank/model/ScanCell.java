@@ -80,7 +80,7 @@ public class ScanCell {
 				// }
 				if (indexRow == 0 && indexCol == 0) {
 					paletteScanned[indexRow][indexCol] = new ScanCell(indexRow,
-						indexCol, "6982157916");
+						indexCol, "123");
 				} else {
 					paletteScanned[indexRow][indexCol] = new ScanCell(indexRow,
 						indexCol, null);
