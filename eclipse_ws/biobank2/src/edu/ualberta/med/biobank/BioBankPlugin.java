@@ -155,12 +155,12 @@ public class BioBankPlugin extends AbstractUIPlugin {
 
 	public boolean isCancelBarcode(String code) {
 		return getPreferenceStore().getString(
-			PreferenceConstants.SCANNER_CANCEL).equals(code);
+			PreferenceConstants.GENERAL_CANCEL).equals(code);
 	}
 
 	public boolean isConfirmBarcode(String code) {
 		return getPreferenceStore().getString(
-			PreferenceConstants.SCANNER_CONFIRM).equals(code);
+			PreferenceConstants.GENERAL_CONFIRM).equals(code);
 	}
 
 	public int getPlateNumber(String barcode) {

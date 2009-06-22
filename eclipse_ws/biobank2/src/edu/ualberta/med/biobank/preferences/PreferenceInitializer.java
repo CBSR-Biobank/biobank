@@ -20,8 +20,10 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 	public void initializeDefaultPreferences() {
 		IPreferenceStore store = BioBankPlugin.getDefault()
 			.getPreferenceStore();
-		store.setDefault(PreferenceConstants.SCANNER_CONFIRM, "CONFIRM");
-		store.setDefault(PreferenceConstants.SCANNER_CANCEL, "CANCEL");
+		store.setDefault(PreferenceConstants.GENERAL_CONFIRM, "CONFIRM");
+		store.setDefault(PreferenceConstants.GENERAL_CANCEL, "CANCEL");
+		store.setDefault(PreferenceConstants.GENERAL_ASK_PRINT, true);
+		store.setDefault(PreferenceConstants.GENERAL_TIME_OUT, 10);
 		for (int i = 1; i <= PreferenceConstants.SCANNER_PLATE_NUMBER; i++) {
 			store
 				.setDefault(PreferenceConstants.SCANNER_PLATE + i, "PLATE" + i);

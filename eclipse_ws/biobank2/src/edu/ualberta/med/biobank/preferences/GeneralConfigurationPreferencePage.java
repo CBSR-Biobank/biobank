@@ -1,19 +1,20 @@
 package edu.ualberta.med.biobank.preferences;
 
+import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
+import org.eclipse.jface.preference.IntegerFieldEditor;
 import org.eclipse.jface.preference.StringFieldEditor;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 
-public class HanldHeldScannerPreferencePage extends FieldEditorPreferencePage
-		implements IWorkbenchPreferencePage {
+public class GeneralConfigurationPreferencePage extends
+		FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
-	public HanldHeldScannerPreferencePage() {
+	public GeneralConfigurationPreferencePage() {
 		super(GRID);
 		setPreferenceStore(BioBankPlugin.getDefault().getPreferenceStore());
-		setDescription("Configuration of the hand held scanner:");
 	}
 
 	/**
@@ -23,14 +24,14 @@ public class HanldHeldScannerPreferencePage extends FieldEditorPreferencePage
 	 */
 	@Override
 	public void createFieldEditors() {
-		addField(new StringFieldEditor(PreferenceConstants.SCANNER_CONFIRM,
+		addField(new StringFieldEditor(PreferenceConstants.GENERAL_CONFIRM,
 			"Confirm barcode", getFieldEditorParent()));
-		addField(new StringFieldEditor(PreferenceConstants.SCANNER_CANCEL,
+		addField(new StringFieldEditor(PreferenceConstants.GENERAL_CANCEL,
 			"Cancel barcode", getFieldEditorParent()));
-		for (int i = 1; i <= PreferenceConstants.SCANNER_PLATE_NUMBER; i++) {
-			addField(new StringFieldEditor(PreferenceConstants.SCANNER_PLATE
-					+ i, "Plate " + i + " barcode", getFieldEditorParent()));
-		}
+		addField(new IntegerFieldEditor(PreferenceConstants.GENERAL_TIME_OUT,
+			"Security time out", getFieldEditorParent()));
+		addField(new BooleanFieldEditor(PreferenceConstants.GENERAL_ASK_PRINT,
+			"Ask to print activity log", getFieldEditorParent()));
 	}
 
 	/*

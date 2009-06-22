@@ -310,9 +310,14 @@
    <extension
          point="org.eclipse.ui.preferencePages">
       <page
-            class="edu.ualberta.med.biobank.preferences.HanldHeldScannerPreferencePage"
-            id="edu.ualberta.med.biobank.preferences.handHeldScanner"
-            name="Hand Held Scanner">
+            class="edu.ualberta.med.biobank.preferences.GeneralConfigurationPreferencePage"
+            id="edu.ualberta.med.biobank.preferences.gereral"
+            name="General">
+      </page>
+      <page
+            class="edu.ualberta.med.biobank.preferences.ScannerPreferencePage"
+            id="edu.ualberta.med.biobank.preferences.gereral"
+            name="Scanner">
       </page>
    </extension>
    <extension
