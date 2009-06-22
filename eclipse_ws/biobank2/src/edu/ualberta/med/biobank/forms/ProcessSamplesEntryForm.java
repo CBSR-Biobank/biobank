@@ -76,15 +76,15 @@ public class ProcessSamplesEntryForm extends BiobankEntryForm implements
 	private Button locateButton;
 
 	private IObservableValue plateToScanValue = new WritableValue("",
-		String.class);
+			String.class);
 	private IObservableValue paletteCodeValue = new WritableValue("",
-		String.class);
+			String.class);
 	private IObservableValue scanLaunchedValue = new WritableValue(
-		Boolean.FALSE, Boolean.class);
+			Boolean.FALSE, Boolean.class);
 	private IObservableValue scanValidValue = new WritableValue(Boolean.TRUE,
-		Boolean.class);
+			Boolean.class);
 	private IObservableValue hasLocationValue = new WritableValue(Boolean.TRUE,
-		Boolean.class);
+			Boolean.class);
 
 	private ScanCell[][] cells;
 
@@ -112,8 +112,7 @@ public class ProcessSamplesEntryForm extends BiobankEntryForm implements
 		Node node = ((FormInput) input).getNode();
 		Assert.isNotNull(node, "Null editor input");
 
-		Assert
-			.isTrue((node instanceof SessionAdapter),
+		Assert.isTrue((node instanceof SessionAdapter),
 				"Invalid editor input: object of type "
 						+ node.getClass().getName());
 
@@ -137,11 +136,11 @@ public class ProcessSamplesEntryForm extends BiobankEntryForm implements
 		createButtonsSection();
 
 		addBooleanBinding(new WritableValue(Boolean.FALSE, Boolean.class),
-			scanLaunchedValue, "Scanner should be launched");
+				scanLaunchedValue, "Scanner should be launched");
 		addBooleanBinding(new WritableValue(Boolean.TRUE, Boolean.class),
-			scanValidValue, "Error in scanning result");
+				scanValidValue, "Error in scanning result");
 		addBooleanBinding(new WritableValue(Boolean.TRUE, Boolean.class),
-			hasLocationValue, "Palette has no location");
+				hasLocationValue, "Palette has no location");
 	}
 
 	private void createContainersSection() {
@@ -158,7 +157,7 @@ public class ProcessSamplesEntryForm extends BiobankEntryForm implements
 		showAllContainers(false);
 
 		Composite freezerComposite = toolkit
-			.createComposite(containersComposite);
+				.createComposite(containersComposite);
 		freezerComposite.setLayout(getNeutralGridLayout());
 		GridData gdFreezer = new GridData();
 		gdFreezer.horizontalSpan = 2;
@@ -170,7 +169,7 @@ public class ProcessSamplesEntryForm extends BiobankEntryForm implements
 		freezerWidget.setGridSizes(5, 10, ScanPaletteWidget.PALETTE_WIDTH, 100);
 
 		Composite paletteComposite = toolkit
-			.createComposite(containersComposite);
+				.createComposite(containersComposite);
 		paletteComposite.setLayout(getNeutralGridLayout());
 		paletteComposite.setLayoutData(new GridData());
 		paletteLabel = toolkit.createLabel(paletteComposite, "Palette");
@@ -184,7 +183,7 @@ public class ProcessSamplesEntryForm extends BiobankEntryForm implements
 		hotelWidget = new ViewStorageContainerWidget(hotelComposite);
 		toolkit.adapt(hotelWidget);
 		hotelWidget.setGridSizes(11, 1, 100,
-			ScanPaletteWidget.PALETTE_HEIGHT_AND_LEGEND);
+				ScanPaletteWidget.PALETTE_HEIGHT_AND_LEGEND);
 		hotelWidget.setFirstColSign(null);
 		hotelWidget.setFirstRowSign(1);
 	}
@@ -209,14 +208,14 @@ public class ProcessSamplesEntryForm extends BiobankEntryForm implements
 		toolkit.paintBordersFor(client);
 
 		plateToScanText = (Text) createBoundWidgetWithLabel(client, Text.class,
-			SWT.NONE, "Plate to scan", new String[0], plateToScanValue,
-			ScannerBarcodeValidator.class, "Enter a valid plate barcode");
+				SWT.NONE, "Plate to scan", new String[0], plateToScanValue,
+				ScannerBarcodeValidator.class, "Enter a valid plate barcode");
 		plateToScanText.removeKeyListener(keyListener);
 		plateToScanText.addKeyListener(EnterKeyToNextFieldListener.INSTANCE);
 
 		paletteCodeText = (Text) createBoundWidgetWithLabel(client, Text.class,
-			SWT.NONE, "Palette barcode", new String[0], paletteCodeValue,
-			NonEmptyString.class, "Enter palette barcode");
+				SWT.NONE, "Palette barcode", new String[0], paletteCodeValue,
+				NonEmptyString.class, "Enter palette barcode");
 		paletteCodeText.removeKeyListener(keyListener);
 		paletteCodeText.addKeyListener(EnterKeyToNextFieldListener.INSTANCE);
 
@@ -237,7 +236,7 @@ public class ProcessSamplesEntryForm extends BiobankEntryForm implements
 		toolkit.paintBordersFor(client);
 
 		locateButton = toolkit
-			.createButton(client, "Choose Location", SWT.PUSH);
+				.createButton(client, "Choose Location", SWT.PUSH);
 		locateButton.setVisible(false);
 		GridData gd = new GridData();
 		gd.horizontalSpan = 3;
@@ -277,11 +276,11 @@ public class ProcessSamplesEntryForm extends BiobankEntryForm implements
 	protected void chooseLocation() {
 		if (currentStudy == null) {
 			BioBankPlugin.openError("Wizard Problem",
-				"No study has been found on this palette");
+					"No study has been found on this palette");
 			return;
 		}
 		ContainerChooserWizard wizard = new ContainerChooserWizard(appService,
-			currentStudy.getSite());
+				currentStudy.getSite());
 		WizardDialog dialog = new WizardDialog(getSite().getShell(), wizard);
 		int res = dialog.open();
 		if (res == Window.OK) {
@@ -307,9 +306,13 @@ public class ProcessSamplesEntryForm extends BiobankEntryForm implements
 					boolean showResult = getPaletteInformation();
 					if (showResult) {
 						// TODO launch real scanner
-						System.out.println("Plate to scan : "
-								+ BioBankPlugin.getDefault().getPlateNumber(
-									plateToScanValue.getValue().toString()));
+						System.out
+								.println("Plate to scan : "
+										+ BioBankPlugin.getDefault()
+												.getPlateNumber(
+														plateToScanValue
+																.getValue()
+																.toString()));
 						cells = ScanCell.getRandomScanProcess();
 
 						currentStudy = null;
@@ -364,31 +367,31 @@ public class ProcessSamplesEntryForm extends BiobankEntryForm implements
 		ContainerPosition palettePosition = palette.getLocatedAtPosition();
 		if (palettePosition != null) {
 			StorageContainer hotelContainer = palettePosition
-				.getParentContainer();
+					.getParentContainer();
 			ContainerPosition hotelPosition = hotelContainer
-				.getLocatedAtPosition();
+					.getLocatedAtPosition();
 			StorageContainer freezerContainer = hotelPosition
-				.getParentContainer();
+					.getParentContainer();
 
 			freezerLabel.setText(freezerContainer.getName());
 			int dim1 = freezerContainer.getStorageType().getCapacity()
-				.getDimensionOneCapacity();
+					.getDimensionOneCapacity();
 			int dim2 = freezerContainer.getStorageType().getCapacity()
-				.getDimensionTwoCapacity();
+					.getDimensionTwoCapacity();
 			freezerWidget.setStorageSize(dim1, dim2);
 			freezerWidget.setSelectedBox(new Point(hotelPosition
-				.getPositionDimensionOne() - 1, hotelPosition
-				.getPositionDimensionTwo() - 1));
+					.getPositionDimensionOne() - 1, hotelPosition
+					.getPositionDimensionTwo() - 1));
 
 			hotelLabel.setText(hotelContainer.getName());
 			dim1 = hotelContainer.getStorageType().getCapacity()
-				.getDimensionOneCapacity();
+					.getDimensionOneCapacity();
 			dim2 = hotelContainer.getStorageType().getCapacity()
-				.getDimensionTwoCapacity();
+					.getDimensionTwoCapacity();
 			hotelWidget.setStorageSize(dim1, dim2);
 			hotelWidget.setSelectedBox(new Point(palettePosition
-				.getPositionDimensionOne() - 1, palettePosition
-				.getPositionDimensionTwo() - 1));
+					.getPositionDimensionOne() - 1, palettePosition
+					.getPositionDimensionTwo() - 1));
 
 			paletteLabel.setText(palette.getName());
 			hasLocationValue.setValue(Boolean.TRUE);
@@ -442,7 +445,7 @@ public class ProcessSamplesEntryForm extends BiobankEntryForm implements
 					&& !sample.getId().equals(positionSample.getId())) {
 				scanCell.setStatus(SampleCellStatus.ERROR);
 				scanCell
-					.setInformation("Sample different from the one registered");
+						.setInformation("Sample different from the one registered");
 				scanCell.setTitle("!");
 				return false;
 			}
@@ -453,10 +456,10 @@ public class ProcessSamplesEntryForm extends BiobankEntryForm implements
 			} else {
 				if (sample.getSamplePosition() != null
 						&& !sample.getSamplePosition().getStorageContainer()
-							.getId().equals(currentPalette.getId())) {
+								.getId().equals(currentPalette.getId())) {
 					scanCell.setStatus(SampleCellStatus.ERROR);
 					scanCell
-						.setInformation("Sample registered onto another palette !");
+							.setInformation("Sample registered onto another palette !");
 					scanCell.setTitle("!");
 					return false;
 				}
@@ -475,7 +478,7 @@ public class ProcessSamplesEntryForm extends BiobankEntryForm implements
 				return false;
 			}
 			scanCell
-				.setTitle(sample.getPatientVisit().getPatient().getNumber());
+					.setTitle(sample.getPatientVisit().getPatient().getNumber());
 			return true;
 		} else {
 			Assert.isTrue(false, "InventoryId should be unique !");
@@ -497,7 +500,7 @@ public class ProcessSamplesEntryForm extends BiobankEntryForm implements
 						query = new InsertExampleQuery(currentPalette);
 						SDKQueryResult res = appService.executeQuery(query);
 						currentPalette = (StorageContainer) res
-							.getObjectResult();
+								.getObjectResult();
 					}
 
 					List<SDKQuery> queries = new ArrayList<SDKQuery>();
@@ -513,7 +516,7 @@ public class ProcessSamplesEntryForm extends BiobankEntryForm implements
 									samplePosition.setPositionDimensionOne(i);
 									samplePosition.setPositionDimensionTwo(j);
 									samplePosition
-										.setStorageContainer(currentPalette);
+											.setStorageContainer(currentPalette);
 									samplePosition.setSample(sample);
 									sample.setSamplePosition(samplePosition);
 									queries.add(new UpdateExampleQuery(sample));
@@ -524,17 +527,19 @@ public class ProcessSamplesEntryForm extends BiobankEntryForm implements
 					appService.executeBatchQuery(queries);
 
 					getSite().getPage().closeEditor(
-						ProcessSamplesEntryForm.this, false);
+							ProcessSamplesEntryForm.this, false);
 					Node node = sessionAdapter.accept(new NodeSearchVisitor(
-						StorageContainer.class, currentPalette.getId()));
-					SessionManager.getInstance().getTreeViewer().setSelection(
-						new StructuredSelection(node));
+							StorageContainer.class, currentPalette.getId()));
+					if (node != null) {
+						SessionManager.getInstance().getTreeViewer()
+								.setSelection(new StructuredSelection(node));
+					}
 					node.performDoubleClick();
 				} catch (RemoteConnectFailureException exp) {
 					BioBankPlugin.openRemoteConnectErrorMessage();
 				} catch (Exception e) {
 					SessionManager.getLogger().error(
-						"Error when saving palette process", e);
+							"Error when saving palette process", e);
 				}
 			}
 		});
@@ -561,7 +566,7 @@ public class ProcessSamplesEntryForm extends BiobankEntryForm implements
 			form.setMessage(status.getMessage(), IMessageProvider.ERROR);
 			submitButton.setEnabled(false);
 			if (!BioBankPlugin.getDefault().isValidPlateBarcode(
-				plateToScanText.getText())) {
+					plateToScanText.getText())) {
 				scanButton.setEnabled(false);
 			} else {
 				scanButton.setEnabled(!paletteCodeText.getText().isEmpty());
@@ -597,26 +602,27 @@ public class ProcessSamplesEntryForm extends BiobankEntryForm implements
 		currentPalette = new StorageContainer();
 		currentPalette.setBarcode((String) paletteCodeValue.getValue());
 		List<StorageContainer> containers = appService.search(
-			StorageContainer.class, currentPalette);
+				StorageContainer.class, currentPalette);
 		if (containers.size() == 1) {
 			currentPalette = containers.get(0);
 			boolean result = MessageDialog
-				.openConfirm(PlatformUI.getWorkbench()
-					.getActiveWorkbenchWindow().getShell(), "Palette barcode",
-					"This palette is already registered in the database. Do you want to continue ?");
+					.openConfirm(PlatformUI.getWorkbench()
+							.getActiveWorkbenchWindow().getShell(),
+							"Palette barcode",
+							"This palette is already registered in the database. Do you want to continue ?");
 			if (!result) {
 				return false;
 			}
 			showPalettePosition(currentPalette);
 			Capacity paletteCapacity = currentPalette.getStorageType()
-				.getCapacity();
+					.getCapacity();
 			currentPaletteSamples = new Sample[paletteCapacity
-				.getDimensionOneCapacity()][paletteCapacity
-				.getDimensionTwoCapacity()];
+					.getDimensionOneCapacity()][paletteCapacity
+					.getDimensionTwoCapacity()];
 			for (SamplePosition position : currentPalette
-				.getSamplePositionCollection()) {
+					.getSamplePositionCollection()) {
 				currentPaletteSamples[position.getPositionDimensionOne()][position
-					.getPositionDimensionTwo()] = position.getSample();
+						.getPositionDimensionTwo()] = position.getSample();
 			}
 			showOnlyPalette(false);
 		} else {

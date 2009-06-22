@@ -5,6 +5,7 @@ import java.text.DecimalFormat;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.Point;
@@ -90,7 +91,7 @@ public abstract class AbstractGridContainerWidget extends Canvas {
 				int xPosition = cellWidth * indexCol;
 				int yPosition = cellHeight * indexRow;
 				Rectangle rectangle = new Rectangle(xPosition, yPosition,
-					cellWidth, cellHeight);
+						cellWidth, cellHeight);
 				drawRectangle(e, rectangle, indexRow, indexCol);
 				String text = getTextForBox(indexRow, indexCol);
 				if (text != null) {
@@ -136,9 +137,9 @@ public abstract class AbstractGridContainerWidget extends Canvas {
 	 */
 	protected String getTextForBox(int indexRow, int indexCol) {
 		String row = getValueForCell(firstRowSign, indexRow,
-			firstColSign == null);
+				firstColSign == null);
 		String col = getValueForCell(firstColSign, indexCol,
-			firstRowSign == null);
+				firstRowSign == null);
 		if (showColumnFirst) {
 			return col + row;
 		}
@@ -193,8 +194,8 @@ public abstract class AbstractGridContainerWidget extends Canvas {
 		e.gc.setFont(oldFont);
 	}
 
-	protected void drawLegend(PaintEvent e, int color, int index, String text) {
-		e.gc.setBackground(e.display.getSystemColor(color));
+	protected void drawLegend(PaintEvent e, Color color, int index, String text) {
+		e.gc.setBackground(color);
 		int width = legendWidth;
 		int startx = legendWidth * index;
 		int starty = gridHeight + 4;
@@ -204,7 +205,7 @@ public abstract class AbstractGridContainerWidget extends Canvas {
 			starty = LEGEND_HEIGHT * index;
 		}
 		Rectangle rectangle = new Rectangle(startx, starty, width,
-			LEGEND_HEIGHT);
+				LEGEND_HEIGHT);
 		e.gc.fillRectangle(rectangle);
 		e.gc.drawRectangle(rectangle);
 		drawTextOnCenter(e, text, rectangle);
@@ -214,10 +215,14 @@ public abstract class AbstractGridContainerWidget extends Canvas {
 	 * Modify dimensions of the grid. maxWidth and maxHeight are used to
 	 * calculate the size of the cells
 	 * 
-	 * @param rows total number of rows
-	 * @param columns total number of columns
-	 * @param maxWidth max width the grid should have
-	 * @param maxHeight max height the grid should have
+	 * @param rows
+	 *            total number of rows
+	 * @param columns
+	 *            total number of columns
+	 * @param maxWidth
+	 *            max width the grid should have
+	 * @param maxHeight
+	 *            max height the grid should have
 	 */
 	public void setGridSizes(int rows, int columns, int maxWidth, int maxHeight) {
 		this.maxWidth = maxWidth;

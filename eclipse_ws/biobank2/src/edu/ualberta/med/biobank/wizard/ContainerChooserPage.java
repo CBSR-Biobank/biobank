@@ -14,6 +14,7 @@ import org.eclipse.swt.widgets.Label;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.model.ContainerCell;
+import edu.ualberta.med.biobank.model.ContainerStatus;
 import edu.ualberta.med.biobank.model.ModelUtils;
 import edu.ualberta.med.biobank.model.StorageContainer;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -45,23 +46,23 @@ public class ContainerChooserPage extends AbstractContainerChooserPage {
 		});
 		try {
 			comboViewer.setInput(ModelUtils.getTopContainersForSite(
-				getAppService(), getSite()));
+					getAppService(), getSite()));
 		} catch (ApplicationException e) {
 			BioBankPlugin.openError("Error",
-				"Error retrieving containers informations from database");
+					"Error retrieving containers informations from database");
 		}
 		comboViewer
-			.addSelectionChangedListener(new ISelectionChangedListener() {
-				@Override
-				public void selectionChanged(SelectionChangedEvent event) {
-					setCurrentStorageContainer((StorageContainer) ((IStructuredSelection) comboViewer
-						.getSelection()).getFirstElement());
-					updateFreezerGrid();
-					pageContainer.layout(true, true);
-					textPosition.setText("");
-					setPageComplete(false);
-				}
-			});
+				.addSelectionChangedListener(new ISelectionChangedListener() {
+					@Override
+					public void selectionChanged(SelectionChangedEvent event) {
+						setCurrentStorageContainer((StorageContainer) ((IStructuredSelection) comboViewer
+								.getSelection()).getFirstElement());
+						updateFreezerGrid();
+						pageContainer.layout(true, true);
+						textPosition.setText("");
+						setPageComplete(false);
+					}
+				});
 
 		super.initComponent();
 		containerWidget.setVisible(false);
@@ -74,12 +75,40 @@ public class ContainerChooserPage extends AbstractContainerChooserPage {
 			PalettePositionChooserPage nextPage = (PalettePositionChooserPage) getNextPage();
 			try {
 				nextPage.setCurrentStorageContainer(cell.getPosition()
-					.getOccupiedContainer());
+						.getOccupiedContainer());
 			} catch (ArrayIndexOutOfBoundsException aiobe) {
 				setPageComplete(false);
 				SessionManager.getLogger().error("Index error", aiobe);
 			}
 		}
 		return cell;
+	}
+
+	@Override
+	protected void setStatus(ContainerCell cell,
+			StorageContainer occupiedContainer) {
+		Boolean full = occupiedContainer.getFull();
+		if (full == null) {
+			full = Boolean.FALSE;
+		}
+		int total = 0;
+		if (!full) {
+			// check if we can add a palette in the hotel
+			if (occupiedContainer.getOccupiedPositions() != null) {
+				total = occupiedContainer.getOccupiedPositions().size();
+			}
+			int capacityTotal = occupiedContainer.getStorageType()
+					.getCapacity().getDimensionOneCapacity()
+					* occupiedContainer.getStorageType().getCapacity()
+							.getDimensionTwoCapacity();
+			full = (total == capacityTotal);
+		}
+		if (full) {
+			cell.setStatus(ContainerStatus.FILLED);
+		} else if (total == 0) {
+			cell.setStatus(ContainerStatus.EMPTY);
+		} else {
+			cell.setStatus(ContainerStatus.FREE_POSITIONS);
+		}
 	}
 }

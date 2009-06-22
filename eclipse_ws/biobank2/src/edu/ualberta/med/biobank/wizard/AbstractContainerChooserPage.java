@@ -80,7 +80,10 @@ public abstract class AbstractContainerChooserPage extends WizardPage {
 
 	protected ContainerCell positionSelection(MouseEvent e) {
 		ContainerCell cell = containerWidget.getPositionAtCoordinates(e.x, e.y);
-		if (cell != null) {
+		if (cell == null || cell.getStatus() == ContainerStatus.FILLED) {
+			textPosition.setText("");
+			setPageComplete(false);
+		} else {
 			ContainerPosition cp = cell.getPosition();
 			if (cp != null && cp.getOccupiedContainer() != null) {
 				String code = cp.getOccupiedContainer().getBarcode();
@@ -91,14 +94,42 @@ public abstract class AbstractContainerChooserPage extends WizardPage {
 				}
 				setPageComplete(true);
 			}
-		} else {
-			textPosition.setText("");
-			setPageComplete(false);
 		}
 		return cell;
 	}
 
+	/**
+	 * Update grid representation according to the container displayed
+	 */
 	protected void updateFreezerGrid() {
+		ContainerCell[][] cells = initGridSize();
+		if (currentContainer != null) {
+			// get cells informations
+			for (ContainerPosition position : currentContainer
+					.getOccupiedPositions()) {
+				int positionDim1 = position.getPositionDimensionOne() - 1;
+				int positionDim2 = position.getPositionDimensionTwo() - 1;
+				ContainerCell cell = new ContainerCell(position);
+				StorageContainer occupiedContainer = position
+						.getOccupiedContainer();
+				setStatus(cell, occupiedContainer);
+				cells[positionDim1][positionDim2] = cell;
+			}
+			initEmptyCells(cells);
+			containerWidget.setContainersStatus(cells);
+		}
+		containerWidget.setVisible(true);
+	}
+
+	protected void initEmptyCells(ContainerCell[][] cells) {
+		// do nothing per default : positions should be initialized in another
+		// way
+	}
+
+	protected abstract void setStatus(ContainerCell cell,
+			StorageContainer occupiedContainer);
+
+	private ContainerCell[][] initGridSize() {
 		int dim1;
 		int dim2;
 		if (currentContainer == null) {
@@ -116,49 +147,14 @@ public abstract class AbstractContainerChooserPage extends WizardPage {
 			width = gridWidth;
 		}
 		int height;
+		;
 		if (gridHeight == null) {
 			height = 300;
 		} else {
 			height = gridHeight;
 		}
 		containerWidget.setGridSizes(dim1, dim2, width, height);
-		if (currentContainer != null) {
-			ContainerCell[][] cells = new ContainerCell[dim1][dim2];
-			for (ContainerPosition position : currentContainer
-				.getOccupiedPositions()) {
-				int positionDim1 = position.getPositionDimensionOne() - 1;
-				int positionDim2 = position.getPositionDimensionTwo() - 1;
-				ContainerCell cell = new ContainerCell(position);
-				StorageContainer occupiedContainer = position
-					.getOccupiedContainer();
-				Boolean full = occupiedContainer.getFull();
-				if (full == null) {
-					full = Boolean.FALSE;
-				}
-				int total = 0;
-				if (!full) {
-					// check if we can add a palette in the hotel
-					if (occupiedContainer.getOccupiedPositions() != null) {
-						total = occupiedContainer.getOccupiedPositions().size();
-					}
-					int capacityTotal = occupiedContainer.getStorageType()
-						.getCapacity().getDimensionOneCapacity()
-							* occupiedContainer.getStorageType().getCapacity()
-								.getDimensionTwoCapacity();
-					full = (total == capacityTotal);
-				}
-				if (full) {
-					cell.setStatus(ContainerStatus.FILLED);
-				} else if (total == 0) {
-					cell.setStatus(ContainerStatus.EMPTY);
-				} else {
-					cell.setStatus(ContainerStatus.FREE_POSITIONS);
-				}
-				cells[positionDim1][positionDim2] = cell;
-			}
-			containerWidget.setContainersStatus(cells);
-		}
-		containerWidget.setVisible(true);
+		return new ContainerCell[dim1][dim2];
 	}
 
 	public void setCurrentStorageContainer(StorageContainer container) {
@@ -175,6 +171,14 @@ public abstract class AbstractContainerChooserPage extends WizardPage {
 
 	public WritableApplicationService getAppService() {
 		return ((ContainerChooserWizard) getWizard()).getAppService();
+	}
+
+	protected ContainerPosition newContainerPosition(int dim1, int dim2) {
+		ContainerPosition position = new ContainerPosition();
+		position.setParentContainer(currentContainer);
+		position.setPositionDimensionOne(dim1);
+		position.setPositionDimensionTwo(dim2);
+		return position;
 	}
 
 }

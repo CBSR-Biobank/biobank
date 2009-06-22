@@ -26,7 +26,8 @@ public class StorageContainerAdapter extends Node {
 			StorageContainer storageContainer) {
 		super(parent);
 		this.storageContainer = storageContainer;
-		setHasChildren(storageContainer.getOccupiedPositions().size() > 0);
+		setHasChildren(storageContainer.getOccupiedPositions() != null
+				&& storageContainer.getOccupiedPositions().size() > 0);
 	}
 
 	@Override
@@ -67,7 +68,7 @@ public class StorageContainerAdapter extends Node {
 		mi.addSelectionListener(new SelectionListener() {
 			public void widgetSelected(SelectionEvent event) {
 				openForm(new FormInput(StorageContainerAdapter.this),
-					StorageContainerEntryForm.ID);
+						StorageContainerEntryForm.ID);
 			}
 
 			public void widgetDefaultSelected(SelectionEvent e) {
@@ -79,7 +80,7 @@ public class StorageContainerAdapter extends Node {
 		mi.addSelectionListener(new SelectionListener() {
 			public void widgetSelected(SelectionEvent event) {
 				openForm(new FormInput(StorageContainerAdapter.this),
-					StorageContainerViewForm.ID);
+						StorageContainerViewForm.ID);
 			}
 
 			public void widgetDefaultSelected(SelectionEvent e) {
@@ -90,8 +91,8 @@ public class StorageContainerAdapter extends Node {
 		mi.addSelectionListener(new SelectionListener() {
 			public void widgetSelected(SelectionEvent event) {
 				StorageContainerAdapter adapter = new StorageContainerAdapter(
-					StorageContainerAdapter.this, ModelUtils
-						.newStorageContainer(storageContainer));
+						StorageContainerAdapter.this, ModelUtils
+								.newStorageContainer(storageContainer));
 				openForm(new FormInput(adapter), StorageContainerEntryForm.ID);
 			}
 
@@ -105,13 +106,13 @@ public class StorageContainerAdapter extends Node {
 		try {
 			// read from database again
 			storageContainer = (StorageContainer) ModelUtils.getObjectWithId(
-				getAppService(), StorageContainer.class, storageContainer
-					.getId());
+					getAppService(), StorageContainer.class, storageContainer
+							.getId());
 			for (ContainerPosition childPosition : storageContainer
-				.getOccupiedPositions()) {
+					.getOccupiedPositions()) {
 				StorageContainer child = childPosition.getOccupiedContainer();
 				StorageContainerAdapter node = (StorageContainerAdapter) getChild(child
-					.getId());
+						.getId());
 
 				if (node == null) {
 					node = new StorageContainerAdapter(this, child);
@@ -119,13 +120,13 @@ public class StorageContainerAdapter extends Node {
 				}
 				if (updateNode) {
 					SessionManager.getInstance().getTreeViewer().update(node,
-						null);
+							null);
 				}
 			}
 		} catch (Exception e) {
 			SessionManager.getLogger().error(
-				"Error while loading storage container group children for storage container "
-						+ storageContainer.getName(), e);
+					"Error while loading storage container group children for storage container "
+							+ storageContainer.getName(), e);
 		}
 	}
 
@@ -140,7 +141,7 @@ public class StorageContainerAdapter extends Node {
 			return ((StorageContainerAdapter) parent).getSite();
 		} else if (parent instanceof StorageContainerGroup) {
 			return ((SiteAdapter) ((StorageContainerGroup) parent).getParent())
-				.getSite();
+					.getSite();
 		}
 		return null;
 	}

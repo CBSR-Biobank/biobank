@@ -16,6 +16,8 @@ public class ChooseStorageContainerWidget extends AbstractGridContainerWidget {
 
 	private List<ContainerStatus> legendStatus;
 
+	private boolean showNullStatusAsEmpty = false;
+
 	public ChooseStorageContainerWidget(Composite parent) {
 		super(parent);
 		initLegend();
@@ -67,12 +69,20 @@ public class ChooseStorageContainerWidget extends AbstractGridContainerWidget {
 			}
 			ContainerStatus status = cell.getStatus();
 			if (status == null) {
-				status = ContainerStatus.NOT_INITIALIZED;
+				if (showNullStatusAsEmpty) {
+					status = ContainerStatus.EMPTY;
+				} else {
+					status = ContainerStatus.NOT_INITIALIZED;
+				}
 			}
-			e.gc.setBackground(e.display.getSystemColor(status.getColor()));
+			e.gc.setBackground(status.getColor());
 			e.gc.fillRectangle(rectangle);
 		}
 		super.drawRectangle(e, rectangle, indexRow, indexCol);
+	}
+
+	public void setShowNullStatusAsEmpty(boolean showNullStatusAsEmpty) {
+		this.showNullStatusAsEmpty = showNullStatusAsEmpty;
 	}
 
 }

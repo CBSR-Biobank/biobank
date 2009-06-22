@@ -22,9 +22,12 @@ public class NodeSearchVisitor {
 	}
 
 	private Node visitChildren(Node node) {
-		node.loadChildren(false);
+		node.loadChildren(true);
 		for (Node child : node.getChildren()) {
-			return child.accept(this);
+			Node foundChild = child.accept(this);
+			if (foundChild != null) {
+				return foundChild;
+			}
 		}
 		return null;
 	}
@@ -41,19 +44,19 @@ public class NodeSearchVisitor {
 				|| typeSearched == PatientVisit.class
 				|| typeSearched == Sample.class) {
 			return siteAdapter.getChild(SiteAdapter.STUDIES_NODE_ID).accept(
-				this);
+					this);
 		}
 		if (typeSearched == Clinic.class) {
 			return siteAdapter.getChild(SiteAdapter.CLINICS_NODE_ID).accept(
-				this);
+					this);
 		}
 		if (typeSearched == StorageType.class) {
 			return siteAdapter.getChild(SiteAdapter.STORAGE_TYPES_NODE_ID)
-				.accept(this);
+					.accept(this);
 		}
 		if (typeSearched == StorageContainer.class) {
 			return siteAdapter.getChild(SiteAdapter.STORAGE_CONTAINERS_NODE_ID)
-				.accept(this);
+					.accept(this);
 		}
 		return null;
 	}

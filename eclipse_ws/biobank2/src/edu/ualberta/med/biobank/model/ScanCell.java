@@ -52,7 +52,7 @@ public class ScanCell {
 						digits.append(random.nextInt(10));
 					}
 					paletteScanned[indexRow][indexCol] = new ScanCell(indexRow,
-						indexCol, digits.toString());
+							indexCol, digits.toString());
 				}
 			}
 		}
@@ -80,10 +80,10 @@ public class ScanCell {
 				// }
 				if (indexRow == 0 && indexCol == 0) {
 					paletteScanned[indexRow][indexCol] = new ScanCell(indexRow,
-						indexCol, "123");
+							indexCol, "2128418571");
 				} else {
 					paletteScanned[indexRow][indexCol] = new ScanCell(indexRow,
-						indexCol, null);
+							indexCol, null);
 				}
 			}
 		}

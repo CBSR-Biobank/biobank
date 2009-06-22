@@ -2,7 +2,6 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry exported="true" kind="lib" path="lib/"/>
-	<classpathentry kind="lib" path="/usr/abee8/cshome/degrisda/projects/biobank2/caCORE_SDK/sdk/writable-api/dist/sdk-writable-core.jar" sourcepath="/compsci/abee8/cshome/degrisda/projects/biobank2/caCORE_SDK/sdk/writable-api/dist/sdk-writable-core.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry exported="true" kind="lib" path="lib/acegi-security-1.0.4.jar" sourcepath="biobank2src.zip"/>

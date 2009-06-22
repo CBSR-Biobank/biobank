@@ -105,9 +105,8 @@ public class ScanPaletteWidget extends AbstractGridContainerWidget {
 		if (scannedElements != null
 				&& scannedElements[indexRow][indexCol] != null
 				&& scannedElements[indexRow][indexCol].getStatus() != null) {
-			Color color = e.display
-				.getSystemColor(scannedElements[indexRow][indexCol].getStatus()
-					.getColor());
+			Color color = scannedElements[indexRow][indexCol].getStatus()
+					.getColor();
 			e.gc.setBackground(color);
 			e.gc.fillRectangle(rectangle);
 		}
