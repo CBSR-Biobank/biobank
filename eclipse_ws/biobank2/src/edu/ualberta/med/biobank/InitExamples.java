@@ -44,8 +44,6 @@ public class InitExamples {
 
 	private PatientVisit patientVisit;
 
-	private StorageType cabinetType;
-
 	private StorageType binType;
 
 	private StorageType drawerType;
@@ -154,7 +152,7 @@ public class InitExamples {
 		binType = insertStorageTypeInSite("Bin", 4, 26, null);
 		drawerType = insertStorageTypeInSite("Drawer", 6, 6, Arrays
 			.asList(new StorageType[] { binType }));
-		cabinetType = insertStorageTypeInSite("Cabinet", 4, 1, Arrays
+		insertStorageTypeInSite("Cabinet", 4, 1, Arrays
 			.asList(new StorageType[] { drawerType }));
 	}
 

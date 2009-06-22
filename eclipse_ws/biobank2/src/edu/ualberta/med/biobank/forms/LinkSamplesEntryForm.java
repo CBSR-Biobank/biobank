@@ -12,6 +12,7 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.IMessageProvider;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.SWT;
@@ -30,6 +31,7 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
 import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
@@ -440,6 +442,13 @@ public class LinkSamplesEntryForm extends BiobankEntryForm {
 						}
 					}
 					appService.executeBatchQuery(queries);
+
+					boolean doPrint = MessageDialog.openQuestion(PlatformUI
+						.getWorkbench().getActiveWorkbenchWindow().getShell(),
+						"Print", "Do you want to print information ?");
+					if (doPrint) {
+						// FIXME implement print functionnality
+					}
 					getSite().getPage().closeEditor(LinkSamplesEntryForm.this,
 						false);
 					pvAdapter.performExpand();

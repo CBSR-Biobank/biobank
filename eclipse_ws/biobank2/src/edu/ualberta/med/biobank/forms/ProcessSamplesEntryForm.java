@@ -524,6 +524,13 @@ public class ProcessSamplesEntryForm extends BiobankEntryForm implements
 					}
 					appService.executeBatchQuery(queries);
 
+					boolean doPrint = MessageDialog.openQuestion(PlatformUI
+						.getWorkbench().getActiveWorkbenchWindow().getShell(),
+						"Print", "Do you want to print information ?");
+					if (doPrint) {
+						// FIXME implement print functionnality
+					}
+
 					getSite().getPage().closeEditor(
 						ProcessSamplesEntryForm.this, false);
 					Node node = sessionAdapter.accept(new NodeSearchVisitor(

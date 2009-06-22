@@ -6,6 +6,7 @@ import org.eclipse.core.databinding.observable.value.WritableValue;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.dialogs.IMessageProvider;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -26,6 +27,7 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
 import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
@@ -358,6 +360,12 @@ public class ProcessCabinetEntryForm extends BiobankEntryForm implements
 				try {
 					sample.setPatientVisit(patientVisit);
 					appService.executeQuery(new InsertExampleQuery(sample));
+					boolean doPrint = MessageDialog.openQuestion(PlatformUI
+						.getWorkbench().getActiveWorkbenchWindow().getShell(),
+						"Print", "Do you want to print information ?");
+					if (doPrint) {
+						// FIXME implement print functionnality
+					}
 					getSite().getPage().closeEditor(
 						ProcessCabinetEntryForm.this, false);
 				} catch (RemoteConnectFailureException exp) {

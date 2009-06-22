@@ -59,6 +59,7 @@ public class ScanCell {
 		return paletteScanned;
 	}
 
+	@SuppressWarnings("unused")
 	public static ScanCell[][] getRandomScanProcess() {
 		ScanCell[][] paletteScanned = new ScanCell[ROW_MAX][COL_MAX];
 		Random random = new Random();

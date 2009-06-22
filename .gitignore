@@ -8,7 +8,6 @@ CSM_UPT_4_0_Release/
 model/*.png
 model/biobank2.uml~
 eclipse_ws/.metadata
-eclipse_ws/biobank2/.settings/
 eclipse_ws/biobank2/bin
 eclipse_ws/biobank2/log
 eclipse_ws/biobank2/src/edu/ualberta/med/biobank/test

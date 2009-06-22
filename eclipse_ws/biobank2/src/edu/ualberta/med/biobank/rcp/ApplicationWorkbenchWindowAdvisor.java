@@ -37,4 +37,5 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 			.getActionBarConfigurer().getStatusLineManager();
 		statusline.setMessage(null, "Application ready");
 	}
+
 }

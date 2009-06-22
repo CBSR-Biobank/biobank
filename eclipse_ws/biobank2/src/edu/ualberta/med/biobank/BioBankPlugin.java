@@ -1,8 +1,6 @@
 package edu.ualberta.med.biobank;
 
 import java.net.URL;
-import java.util.MissingResourceException;
-import java.util.ResourceBundle;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.FileLocator;
@@ -15,6 +13,8 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
+
+import edu.ualberta.med.biobank.preferences.PreferenceConstants;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -153,36 +153,29 @@ public class BioBankPlugin extends AbstractUIPlugin {
 			"Could not connect to server. Make sure server is running.");
 	}
 
-	public String getCancelBarcode() {
-		return ResourceBundle.getBundle(BARCODES_FILE).getString("cancel");
-	}
-
 	public boolean isCancelBarcode(String code) {
-		return getCancelBarcode().equals(code);
-	}
-
-	public String getConfirmBarcode() {
-		return ResourceBundle.getBundle(BARCODES_FILE).getString("confirm");
+		return getPreferenceStore().getString(
+			PreferenceConstants.SCANNER_CANCEL).equals(code);
 	}
 
 	public boolean isConfirmBarcode(String code) {
-		return getConfirmBarcode().equals(code);
+		return getPreferenceStore().getString(
+			PreferenceConstants.SCANNER_CONFIRM).equals(code);
 	}
 
 	public int getPlateNumber(String barcode) {
-		int i = 1;
-		String key = "plate.";
-		ResourceBundle bundle = ResourceBundle.getBundle(BARCODES_FILE);
-		while (true) { // stop when bundle return exception
-			try {
-				if (bundle.getString(key + i).equals(barcode)) {
-					return i;
-				}
-			} catch (MissingResourceException mre) {
+		for (int i = 1; i <= PreferenceConstants.SCANNER_PLATE_NUMBER; i++) {
+			String pref = getPreferenceStore().getString(
+				PreferenceConstants.SCANNER_PLATE + i);
+			if (pref.isEmpty()) {
+				// should no be empty
 				return -1;
 			}
-			i++;
+			if (pref.equals(barcode)) {
+				return i;
+			}
 		}
+		return -1;
 	}
 
 	public boolean isValidPlateBarcode(String value) {

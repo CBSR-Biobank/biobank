@@ -5,7 +5,6 @@ import java.util.List;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
@@ -23,8 +22,6 @@ public class SampleViewForm extends BiobankViewForm {
 
 	private SampleAdapter sampleAdapter;
 	private Sample sample;
-
-	private Label label;
 
 	@Override
 	public void init(IEditorSite editorSite, IEditorInput input)
@@ -86,7 +83,7 @@ public class SampleViewForm extends BiobankViewForm {
 					+ ":"
 					+ sample.getSamplePosition().getPositionDimensionTwo();
 		}
-		label = toolkit.createLabel(client, string);
+		toolkit.createLabel(client, string);
 	}
 
 	@Override
