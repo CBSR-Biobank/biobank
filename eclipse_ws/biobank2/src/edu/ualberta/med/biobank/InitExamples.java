@@ -44,6 +44,12 @@ public class InitExamples {
 
 	private PatientVisit patientVisit;
 
+	private StorageType cabinetType;
+
+	private StorageType binType;
+
+	private StorageType drawerType;
+
 	/**
 	 * @param args
 	 */
@@ -145,6 +151,11 @@ public class InitExamples {
 			.asList(new StorageType[] { paletteType }));
 		freezerType = insertStorageTypeInSite("Freezer", 5, 6, Arrays
 			.asList(new StorageType[] { hotel13Type, hotel19Type }));
+		binType = insertStorageTypeInSite("Bin", 4, 26, null);
+		drawerType = insertStorageTypeInSite("Drawer", 6, 6, Arrays
+			.asList(new StorageType[] { binType }));
+		cabinetType = insertStorageTypeInSite("Cabinet", 4, 1, Arrays
+			.asList(new StorageType[] { drawerType }));
 	}
 
 	private StorageType insertStorageTypeInSite(String name, int dim1,

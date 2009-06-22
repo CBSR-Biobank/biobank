@@ -12,7 +12,7 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 
-public class CabinetBinWidget extends Canvas {
+public class CabinetDrawerWidget extends Canvas {
 
 	public static final int SQUARE_CELL_WIDTH = 70;
 
@@ -31,9 +31,9 @@ public class CabinetBinWidget extends Canvas {
 
 	private int boxNumber = 36;
 
-	private int position;
+	private int selectedBin;
 
-	public CabinetBinWidget(Composite parent) {
+	public CabinetDrawerWidget(Composite parent) {
 		super(parent, SWT.DOUBLE_BUFFERED);
 		addPaintListener(new PaintListener() {
 			@Override
@@ -75,7 +75,7 @@ public class CabinetBinWidget extends Canvas {
 				width, height);
 			gc.setForeground(e.display.getSystemColor(SWT.COLOR_BLACK));
 			gc.drawRectangle(rectangle);
-			if (position == boxIndex) {
+			if (selectedBin == boxIndex) {
 				gc.setBackground(new Color(e.display, 123, 11, 25));
 				gc.fillRectangle(rectangle);
 			}
@@ -102,8 +102,8 @@ public class CabinetBinWidget extends Canvas {
 		gc.drawText(text, xTextPosition, yTextPosition, true);
 	}
 
-	public void setPosition(int position) {
-		this.position = position;
+	public void setSelectedBin(int bin) {
+		this.selectedBin = bin;
 		redraw();
 	}
 

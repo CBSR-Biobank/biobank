@@ -42,4 +42,32 @@ public class ModelUtils {
 		Assert.isTrue(list.size() == 1);
 		return list.get(0);
 	}
+
+	public static StorageType getCabinetType(
+			WritableApplicationService appService) {
+		StorageType type = new StorageType();
+		type.setName("Cabinet");
+		List<StorageType> types;
+		try {
+			types = appService.search(StorageType.class, type);
+			if (types.size() == 1) {
+				return types.get(0);
+			}
+		} catch (ApplicationException e) {
+		}
+		return null;
+	}
+
+	public static StorageContainer getStorageContainerWithBarcode(
+			WritableApplicationService appService, String barcode)
+			throws ApplicationException {
+		StorageContainer container = new StorageContainer();
+		container.setBarcode(barcode);
+		List<StorageContainer> containers = appService.search(
+			StorageContainer.class, container);
+		if (containers.size() == 1) {
+			return containers.get(0);
+		}
+		return null;
+	}
 }

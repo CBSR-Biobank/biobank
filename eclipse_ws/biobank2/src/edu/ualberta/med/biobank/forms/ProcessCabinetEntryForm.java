@@ -1,16 +1,15 @@
 package edu.ualberta.med.biobank.forms;
 
-import java.util.List;
-import java.util.Random;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import org.eclipse.core.databinding.beans.PojoObservables;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.observable.value.WritableValue;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.dialogs.IMessageProvider;
+import org.eclipse.jface.viewers.ArrayContentProvider;
+import org.eclipse.jface.viewers.ComboViewer;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -19,6 +18,7 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
@@ -29,54 +29,60 @@ import org.eclipse.ui.PartInitException;
 import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.forms.listener.CancelSubmitKeyListener;
 import edu.ualberta.med.biobank.forms.listener.EnterKeyToNextFieldListener;
+import edu.ualberta.med.biobank.model.ModelUtils;
 import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.Sample;
 import edu.ualberta.med.biobank.model.SamplePosition;
 import edu.ualberta.med.biobank.model.SampleType;
+import edu.ualberta.med.biobank.model.StorageContainer;
+import edu.ualberta.med.biobank.model.StorageType;
 import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.PatientVisitAdapter;
-import edu.ualberta.med.biobank.validators.CabinetIdValidator;
 import edu.ualberta.med.biobank.validators.CabinetPositionCodeValidator;
-import edu.ualberta.med.biobank.widgets.CabinetBinWidget;
+import edu.ualberta.med.biobank.validators.NonEmptyString;
+import edu.ualberta.med.biobank.widgets.CabinetDrawerWidget;
 import edu.ualberta.med.biobank.widgets.ViewStorageContainerWidget;
 import gov.nih.nci.system.applicationservice.ApplicationException;
-import gov.nih.nci.system.query.hibernate.HQLCriteria;
+import gov.nih.nci.system.query.example.InsertExampleQuery;
 
 public class ProcessCabinetEntryForm extends BiobankEntryForm implements
 		CancelConfirmForm {
 
 	public static final String ID = "edu.ualberta.med.biobank.forms.ProcessCabinetEntryForm";
 
-	private static final Pattern HAIR_PATTERN = Pattern
-		.compile("^\\p{Upper}{4}$");
-
-	private static final Pattern DNA_PATTERN = Pattern
-		.compile("^\\p{Lower}{4}$");
-
 	private PatientVisitAdapter pvAdapter;
 	private PatientVisit patientVisit;
 
-	private ViewStorageContainerWidget drawer;
-	private CabinetBinWidget bin;
-	private Label typeText;
+	private Label cabinetLabel;
+	private Label drawerLabel;
+	private ViewStorageContainerWidget cabinetWidget;
+	private CabinetDrawerWidget drawerWidget;
 
+	private ComboViewer comboViewerSampleTypes;
 	private Text inventoryIdText;
 	private Text positionText;
-	private Button showResult;
+	private Button showPosition;
 
 	private Text confirmCancelText;
 	private Button cancel;
 	private Button submit;
 
-	private Sample sample = new Sample();
-
 	private IObservableValue cabinetPosition = new WritableValue("",
 		String.class);
 	private IObservableValue resultShown = new WritableValue(Boolean.FALSE,
 		Boolean.class);
+	private IObservableValue selectedSampleType = new WritableValue("",
+		String.class);
+
+	private StorageType cabinetType;
+	private Sample sample = new Sample();
+	private StorageContainer cabinet;
+	private StorageContainer drawer;
+	private StorageContainer bin;
 
 	@Override
 	public void init(IEditorSite editorSite, IEditorInput input)
@@ -119,6 +125,14 @@ public class ProcessCabinetEntryForm extends BiobankEntryForm implements
 	}
 
 	private void createLocationSection() {
+		// get storage type Cabinet from database
+		cabinetType = ModelUtils.getCabinetType(appService);
+		if (cabinetType == null) {
+			BioBankPlugin.openAsyncError("Cabinet error",
+				"Cannot find a storage type for cabinet !");
+			form.setEnabled(false);
+		}
+
 		Composite client = toolkit.createComposite(form.getBody());
 		GridLayout layout = new GridLayout(2, false);
 		client.setLayout(layout);
@@ -128,30 +142,26 @@ public class ProcessCabinetEntryForm extends BiobankEntryForm implements
 		client.setLayoutData(gd);
 		toolkit.paintBordersFor(client);
 
-		toolkit.createLabel(client, "Drawer");
-		toolkit.createLabel(client, "Bin");
+		cabinetLabel = toolkit.createLabel(client, "Cabinet");
+		drawerLabel = toolkit.createLabel(client, "Drawer");
 
-		drawer = new ViewStorageContainerWidget(client);
-		toolkit.adapt(drawer);
-		drawer.setGridSizes(4, 1, 150, 150);
-		drawer.setFirstColSign('A');
-		drawer.setShowColumnFirst(true);
+		cabinetWidget = new ViewStorageContainerWidget(client);
+		toolkit.adapt(cabinetWidget);
+		cabinetWidget.setGridSizes(4, 1, 150, 150);
+		cabinetWidget.setFirstColSign('A');
+		cabinetWidget.setShowColumnFirst(true);
 		GridData gdDrawer = new GridData();
 		gdDrawer.verticalAlignment = SWT.TOP;
-		drawer.setLayoutData(gdDrawer);
+		cabinetWidget.setLayoutData(gdDrawer);
 
-		bin = new CabinetBinWidget(client);
-		toolkit.adapt(bin);
+		drawerWidget = new CabinetDrawerWidget(client);
+		toolkit.adapt(drawerWidget);
 		GridData gdBin = new GridData();
-		gdBin.widthHint = CabinetBinWidget.WIDTH;
-		gdBin.heightHint = CabinetBinWidget.HEIGHT;
+		gdBin.widthHint = CabinetDrawerWidget.WIDTH;
+		gdBin.heightHint = CabinetDrawerWidget.HEIGHT;
 		gdBin.verticalSpan = 2;
-		bin.setLayoutData(gdBin);
+		drawerWidget.setLayoutData(gdBin);
 
-		typeText = toolkit.createLabel(client, "");
-		GridData gdText = new GridData();
-		gdText.grabExcessHorizontalSpace = true;
-		typeText.setLayoutData(gdText);
 	}
 
 	private void createFieldsSection() {
@@ -164,9 +174,27 @@ public class ProcessCabinetEntryForm extends BiobankEntryForm implements
 		client.setLayoutData(gd);
 		toolkit.paintBordersFor(client);
 
+		Combo comboSampleType = (Combo) createBoundWidgetWithLabel(client,
+			Combo.class, SWT.NONE, "Sample type", new String[0],
+			selectedSampleType, NonEmptyString.class,
+			"A sample type should be selected");
+		comboViewerSampleTypes = new ComboViewer(comboSampleType);
+		comboViewerSampleTypes.setContentProvider(new ArrayContentProvider());
+		comboViewerSampleTypes.setLabelProvider(new LabelProvider() {
+			@Override
+			public String getText(Object element) {
+				SampleType st = (SampleType) element;
+				return st.getName();
+			}
+		});
+		if (cabinetType != null) {
+			comboViewerSampleTypes.setInput(cabinetType
+				.getSampleTypeCollection());
+		}
+
 		inventoryIdText = (Text) createBoundWidgetWithLabel(client, Text.class,
 			SWT.NONE, "Inventory ID", new String[0], PojoObservables
-				.observeValue(sample, "inventoryId"), CabinetIdValidator.class,
+				.observeValue(sample, "inventoryId"), NonEmptyString.class,
 			"Enter Inventory Id (eg cdfg or DYUO)");
 		inventoryIdText.addKeyListener(EnterKeyToNextFieldListener.INSTANCE);
 
@@ -177,12 +205,12 @@ public class ProcessCabinetEntryForm extends BiobankEntryForm implements
 		positionText.removeKeyListener(keyListener);
 		positionText.addKeyListener(EnterKeyToNextFieldListener.INSTANCE);
 
-		showResult = toolkit.createButton(client, "Show Result", SWT.PUSH);
+		showPosition = toolkit.createButton(client, "Show Position", SWT.PUSH);
 		gd = new GridData();
 		gd.horizontalSpan = 2;
 		gd.horizontalAlignment = SWT.CENTER;
-		showResult.setLayoutData(gd);
-		showResult.addSelectionListener(new SelectionAdapter() {
+		showPosition.setLayoutData(gd);
+		showPosition.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				showPositionResult();
@@ -226,18 +254,43 @@ public class ProcessCabinetEntryForm extends BiobankEntryForm implements
 		BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
 			public void run() {
 				try {
-					resultShown.setValue(Boolean.TRUE);
+					String positionString = cabinetPosition.getValue()
+						.toString();
 
-					// FIXME parse position, get Sample if exists and get Exact
-					// Positions !
-					Random r = new Random();
-					drawer.setSelectedBox(new Point(r.nextInt(4), 0));
-					bin.setPosition(r.nextInt(36) + 1);
+					StorageContainer sc = ModelUtils
+						.getStorageContainerWithBarcode(appService,
+							positionString);
+					if (sc == null) {
+						SamplePosition sp = getSamplePosition(positionString);
+						if (sp == null) {
+							BioBankPlugin.openError("Cabinet error",
+								"Parent containers not found");
+							return;
+						}
+						Point drawerPosition = new Point(
+							drawer.getLocatedAtPosition()
+								.getPositionDimensionOne() - 1, drawer
+								.getLocatedAtPosition()
+								.getPositionDimensionTwo() - 1);
+						cabinetWidget.setSelectedBox(drawerPosition);
+						cabinetLabel.setText("Cabinet " + cabinet.getBarcode());
+						drawerWidget.setSelectedBin(bin.getLocatedAtPosition()
+							.getPositionDimensionTwo());
+						drawerLabel.setText("Drawer " + drawer.getBarcode());
 
-					SamplePosition sp = new SamplePosition();
+						sp.setSample(sample);
+						sample.setSamplePosition(sp);
 
-					sample.setSampleType(getSampleType());
+						IStructuredSelection stSelection = (IStructuredSelection) comboViewerSampleTypes
+							.getSelection();
+						sample.setSampleType((SampleType) stSelection
+							.getFirstElement());
 
+						resultShown.setValue(Boolean.TRUE);
+					} else {
+						BioBankPlugin.openError("Cabinet error",
+							"This position is already in use");
+					}
 				} catch (RemoteConnectFailureException exp) {
 					BioBankPlugin.openRemoteConnectErrorMessage();
 				} catch (Exception e) {
@@ -249,41 +302,51 @@ public class ProcessCabinetEntryForm extends BiobankEntryForm implements
 		});
 	}
 
-	private SampleType getSampleType() throws ApplicationException {
-		String inventoryId = sample.getInventoryId();
-		SampleType sampleType = null;
-		String s = "";
-		Matcher m = DNA_PATTERN.matcher(inventoryId);
-		if (m.matches()) {
-			s = "DNA";
-
-		} else {
-			m = HAIR_PATTERN.matcher(inventoryId);
-			if (m.matches()) {
-				s = "HAIR";
-			}
+	protected SamplePosition getSamplePosition(String positionString)
+			throws ApplicationException {
+		int end = 2;
+		String cabinetString = positionString.substring(0, end);
+		cabinet = ModelUtils.getStorageContainerWithBarcode(appService,
+			cabinetString);
+		if (cabinet == null) {
+			return null;
 		}
-
-		HQLCriteria criteria = new HQLCriteria(
-			"from edu.ualberta.med.biobank.model.SampleType where name like '"
-					+ s + "%'");
-		List<SampleType> list = appService.query(criteria);
-		if (list.size() == 1) {
-			sampleType = list.get(0);
-			typeText.setText("Type = " + sampleType.getNameShort());
-			typeText.redraw();
-		} else {
-			Assert.isTrue(true, "Should find one sample type corresponding to "
-					+ s);
+		end += 2;
+		String drawerString = positionString.substring(0, end);
+		drawer = ModelUtils.getStorageContainerWithBarcode(appService,
+			drawerString);
+		if (drawer == null
+				|| !drawer.getLocatedAtPosition().getParentContainer().getId()
+					.equals(cabinet.getId())) {
+			return null;
 		}
-		return sampleType;
+		end += 2;
+		String binString = positionString.substring(0, end);
+		bin = ModelUtils.getStorageContainerWithBarcode(appService, binString);
+		if (bin == null
+				|| !bin.getLocatedAtPosition().getParentContainer().getId()
+					.equals(drawer.getId())) {
+			return null;
+		}
+		SamplePosition sp = new SamplePosition();
+		sp.setStorageContainer(bin);
+		char letter = positionString.substring(6, 7).toCharArray()[0];
+		// positions start at A
+		sp.setPositionDimensionOne(letter - 'A' + 1);
+		letter = positionString.substring(7).toCharArray()[0];
+		sp.setPositionDimensionTwo(letter - 'A' + 1);
+		return sp;
 	}
 
 	protected void cancelForm() {
-		typeText.setText("");
-		drawer.setSelectedBox(null);
-		bin.setPosition(0);
+		sample = null;
+		cabinet = null;
+		drawer = null;
+		bin = null;
+		cabinetWidget.setSelectedBox(null);
+		drawerWidget.setSelectedBin(0);
 		resultShown.setValue(Boolean.FALSE);
+		selectedSampleType.setValue("");
 		inventoryIdText.setText("");
 		positionText.setText("");
 	}
@@ -292,7 +355,17 @@ public class ProcessCabinetEntryForm extends BiobankEntryForm implements
 	protected void saveForm() throws Exception {
 		BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
 			public void run() {
-				// TODO
+				try {
+					sample.setPatientVisit(patientVisit);
+					appService.executeQuery(new InsertExampleQuery(sample));
+					getSite().getPage().closeEditor(
+						ProcessCabinetEntryForm.this, false);
+				} catch (RemoteConnectFailureException exp) {
+					BioBankPlugin.openRemoteConnectErrorMessage();
+				} catch (Exception e) {
+					SessionManager.getLogger().error(
+						"Error when saving cabinet position", e);
+				}
 			}
 		});
 	}
@@ -302,15 +375,15 @@ public class ProcessCabinetEntryForm extends BiobankEntryForm implements
 		if (status.getSeverity() == IStatus.OK) {
 			form.setMessage("Processing samples.", IMessageProvider.NONE);
 			submit.setEnabled(true);
-			showResult.setEnabled(true);
+			showPosition.setEnabled(true);
 		} else {
 			form.setMessage(status.getMessage(), IMessageProvider.ERROR);
 			submit.setEnabled(false);
 			if (status.getMessage() != null
 					&& status.getMessage().contains("check values")) {
-				showResult.setEnabled(true);
+				showPosition.setEnabled(true);
 			} else {
-				showResult.setEnabled(false);
+				showPosition.setEnabled(false);
 			}
 		}
 	}

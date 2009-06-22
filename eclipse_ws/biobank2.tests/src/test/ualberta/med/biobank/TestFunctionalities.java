@@ -21,6 +21,7 @@ import gov.nih.nci.system.query.example.InsertExampleQuery;
 import gov.nih.nci.system.query.example.UpdateExampleQuery;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
+import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -257,6 +258,131 @@ public class TestFunctionalities {
 		}
 	}
 
+	// @Test
+	// public void batchQueriesPerson() throws Exception {
+	// List<SDKQuery> queries = new ArrayList<SDKQuery>();
+	//
+	// Address address = new Address();
+	// address.setZip("dada");
+	// address = (Address) appService.executeQuery(
+	// new InsertExampleQuery(address)).getObjectResult();
+	//
+	// int personSize = appService.search(Person.class, new Person()).size();
+	//
+	// Person p = new Person();
+	// p.setName("TestBatch" + r.nextInt());
+	// p.setLivesAt(address);
+	// queries.add(new InsertExampleQuery(p));
+	//
+	// p = new Person();
+	// p.setName("TestBatch2" + r.nextInt());
+	// // Insert will failed because address is missing
+	// // Roll back should be launched
+	// p.setLivesAt(address);
+	// queries.add(new InsertExampleQuery(p));
+	//
+	// try {
+	// appService.executeBatchQuery(queries);
+	//
+	// } catch (Exception ae) {
+	// System.err.println("batchQueriesSite : "
+	// + ae.getCause().getMessage());
+	// } finally {
+	// int personSizeAfter = appService.search(Person.class, new Person())
+	// .size();
+	// Assert.assertEquals(personSize, personSizeAfter);
+	// }
+	// }
+
+	//
+	// @Test
+	// public void batchQueriesBag() throws Exception {
+	// List<SDKQuery> queries = new ArrayList<SDKQuery>();
+	//
+	// Handle handle = new Handle();
+	// handle.setColor("blue");
+	// handle = (Handle) appService.executeQuery(
+	// new InsertExampleQuery(handle)).getObjectResult();
+	//
+	// int bagSize = getSize(Bag.class);
+	//
+	// Bag b = new Bag();
+	// b.setStyle("TestBatch" + r.nextInt());
+	// b.setHandle(handle);
+	// queries.add(new InsertExampleQuery(b));
+	//
+	// b = new Bag();
+	// b.setStyle("TestBatch2" + r.nextInt());
+	// // Insert will failed because address is missing
+	// // Roll back should be launched
+	// b.setHandle(handle);
+	// queries.add(new InsertExampleQuery(b));
+	//
+	// try {
+	// appService.executeBatchQuery(queries);
+	//
+	// } catch (Exception ae) {
+	// System.err.println("batchQueriesSite : "
+	// + ae.getCause().getMessage());
+	// } finally {
+	// int bagSizeAfter = getSize(Bag.class);
+	// Assert.assertEquals(bagSize, bagSizeAfter);
+	// }
+	// }
+	//
+	// //
+	// @Test
+	// public void batchQueriesChain() throws Exception {
+	// List<SDKQuery> queries = new ArrayList<SDKQuery>();
+	//
+	// OrderLine o = new OrderLine();
+	// o.setName("lineTest");
+	// o = (OrderLine) appService.executeQuery(new InsertExampleQuery(o))
+	// .getObjectResult();
+	//
+	// int productSize = getSize(Product.class);
+	//
+	// Product p = new Product();
+	// p.setName("TestBatch" + r.nextInt());
+	// p.setLine(o);
+	// queries.add(new InsertExampleQuery(p));
+	//
+	// p = new Product();
+	// p.setName("TestBatch" + r.nextInt());
+	// // // Insert will failed because address is missing
+	// // // Roll back should be launched
+	// p.setLine(o);
+	// queries.add(new InsertExampleQuery(p));
+	//
+	// try {
+	// appService.executeBatchQuery(queries);
+	//
+	// } catch (Exception ae) {
+	// System.err.println("batchQueriesSite : "
+	// + ae.getCause().getMessage());
+	// } finally {
+	// int productSizeAfter = getSize(Product.class);
+	// Assert.assertEquals(productSize, productSizeAfter);
+	// }
+	// }
+	//
+	// @Test
+	// public void testOrderline() throws Exception {
+	// HQLCriteria criteria = new HQLCriteria("from "
+	// + Product.class.getName() + " where line is null");
+	// List<Product> list = appService.query(criteria);
+	// System.out.println(list.size());
+	// }
+
+	@Test
+	public void testContainers() throws Exception {
+		HQLCriteria criteria = new HQLCriteria("from "
+				+ StorageContainer.class.getName()
+				+ " where locatedAtPosition.parentContainer is not null");
+		List<StorageContainer> list = appService.query(criteria);
+		System.out.println(list.size());
+	}
+
 	/**
 	 * Insert 2 sample with the executeBatchQuery method
 	 */
@@ -448,7 +574,6 @@ public class TestFunctionalities {
 
 			StorageContainer sc = new StorageContainer();
 			sc.setName("scTest");
-			// sc.setCapacity(capacity);
 			sc.setSite(site);
 			sc.setStorageType(st);
 			result = appService.executeQuery(new InsertExampleQuery(sc));
@@ -480,16 +605,14 @@ public class TestFunctionalities {
 
 		StorageContainer sc = new StorageContainer();
 		sc.setName("TestBatch-" + r.nextInt());
-		// sc.setCapacity(capacity);
 		sc.setSite(site);
 		sc.setStorageType(st);
 		queries.add(new InsertExampleQuery(sc));
 
 		sc = new StorageContainer();
 		sc.setName("TestBatch-" + r.nextInt());
-		//
+		// no site !!
 		queries.add(new InsertExampleQuery(sc));
-
 		try {
 			appService.executeBatchQuery(queries);
 		} catch (ApplicationException ae) {
@@ -567,20 +690,10 @@ public class TestFunctionalities {
 		Assert.assertEquals(childrenCount + 1, childrenCountAfter);
 	}
 
-	@Test
-	public void insertStorageContainer() throws Exception {
-		Site site = getSite();
-		Capacity capacity = getNewCapacity();
-		StorageContainer sc = new StorageContainer();
-		sc.setSite(site);
-		// sc.setCapacity(capacity);
-
-		StorageType st = new StorageType();
-		st.setId(1);
-		st = (StorageType) appService.search(StorageType.class, st).get(0);
-		sc.setStorageType(st);
-
-		appService.executeQuery(new InsertExampleQuery(sc));
+	private int getSize(Class<?> classType) throws Exception {
+		Constructor<?> constructor = classType.getConstructor();
+		Object instance = constructor.newInstance();
+		List<?> list = appService.search(classType, instance);
+		return list.size();
 	}
-
 }

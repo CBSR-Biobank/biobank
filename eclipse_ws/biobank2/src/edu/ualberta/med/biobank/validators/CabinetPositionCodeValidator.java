@@ -10,7 +10,8 @@ import org.eclipse.jface.fieldassist.ControlDecoration;
 
 public class CabinetPositionCodeValidator extends AbstractValidator {
 
-	private static final Pattern PATTERN = Pattern.compile("^[a-zA-Z0-9]{8}$");
+	private static final Pattern PATTERN = Pattern
+		.compile("^\\d{2}[A-Z]{2}\\d{2}[A-Z]{2}$");
 
 	public CabinetPositionCodeValidator(String message,
 			ControlDecoration controlDecoration) {

@@ -171,6 +171,12 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
 	protected Control createBoundWidget(Composite composite,
 			Class<?> widgetClass, int widgetOptions, String[] widgetValues,
 			IObservableValue modelObservableValue, IValidator validator) {
+
+		UpdateValueStrategy uvs = null;
+		if (validator != null) {
+			uvs = new UpdateValueStrategy();
+			uvs.setAfterGetValidator(validator);
+		}
 		if (widgetClass == Text.class) {
 			if (widgetOptions == SWT.NONE) {
 				widgetOptions = SWT.SINGLE;
@@ -178,12 +184,6 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
 			Text text = toolkit.createText(composite, "", widgetOptions);
 			text.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 			text.addKeyListener(keyListener);
-
-			UpdateValueStrategy uvs = null;
-			if (validator != null) {
-				uvs = new UpdateValueStrategy();
-				uvs.setAfterGetValidator(validator);
-			}
 
 			dbc.bindValue(SWTObservables.observeText(text, SWT.Modify),
 				modelObservableValue, uvs, null);
@@ -196,7 +196,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
 			toolkit.adapt(combo, true, true);
 
 			dbc.bindValue(SWTObservables.observeSelection(combo),
-				modelObservableValue, null, null);
+				modelObservableValue, uvs, null);
 
 			combo.addSelectionListener(new SelectionAdapter() {
 				@Override
