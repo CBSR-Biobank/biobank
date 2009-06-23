@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.forms;
 
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
@@ -23,6 +22,4 @@ public abstract class AddressEntryFormCommon extends BiobankEntryForm {
         createWidgetsFromMap(FormConstants.ADDRESS_FIELDS, address, client);  
 	}
     
-    @Override
-	protected abstract void handleStatusChanged(IStatus severity);
 }

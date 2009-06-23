@@ -6,7 +6,6 @@ import org.eclipse.core.databinding.beans.PojoObservables;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.dialogs.IMessageProvider;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -14,7 +13,6 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
@@ -22,6 +20,7 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.springframework.remoting.RemoteAccessException;
 
+import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.Study;
@@ -78,7 +77,7 @@ public class PatientEntryForm extends BiobankEntryForm {
 
     @Override
     protected void createFormContent() {
-        form.setText("Storage Type Information");
+        form.setText("Patient Information");
         form.setMessage(getOkMessage(), IMessageProvider.NONE);
         form.getBody().setLayout(new GridLayout(1, false));
         
@@ -161,14 +160,7 @@ public class PatientEntryForm extends BiobankEntryForm {
             patient = (Patient) result.getObjectResult();
         }
         catch (final RemoteAccessException exp) {
-            Display.getDefault().asyncExec(new Runnable() {
-                public void run() {
-                    MessageDialog.openError(
-                            PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), 
-                            "Connection Attempt Failed", 
-                            "Could not perform database operation. Make sure server is running correct version.");
-                }
-            });
+        	BioBankPlugin.openRemoteAccessErrorMessage();
         }
         catch (Exception exp) {
             exp.printStackTrace(); 
@@ -191,15 +183,9 @@ public class PatientEntryForm extends BiobankEntryForm {
         List<Object> results = appService.query(c);
         if (results.size() == 0) return true;
         
-        Display.getDefault().asyncExec(new Runnable() {
-            public void run() {
-                MessageDialog.openError(
-                    PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), 
-                    "Patient Number Problem", 
+        BioBankPlugin.openAsyncError("Patient Number Problem", 
                     "A patient with number \"" + patient.getNumber() 
                     + "\" already exists.");
-            }
-        });
         return false;
     }
 

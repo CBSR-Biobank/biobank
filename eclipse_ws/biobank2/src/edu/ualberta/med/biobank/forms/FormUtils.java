@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.forms;
 
 import java.util.Collection;
+
 import org.eclipse.jface.fieldassist.ControlDecoration;
 import org.eclipse.jface.fieldassist.FieldDecoration;
 import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
@@ -116,6 +117,12 @@ public class FormUtils {
     public static void setTextValue(Label label, String value) {
     	if (value != null) {
     		label.setText(value);
+    	}
+    }
+    
+    public static void setTextValue(Label label, Object value) {
+    	if (value != null) {
+    		setTextValue(label, value.toString());
     	}
     }
 }

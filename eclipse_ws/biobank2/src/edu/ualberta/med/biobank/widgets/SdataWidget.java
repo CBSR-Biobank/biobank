@@ -2,24 +2,24 @@ package edu.ualberta.med.biobank.widgets;
 
 import java.util.ArrayList;
 
+import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.List;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.FormToolkit;
-import org.apache.commons.lang.StringUtils;
 
+import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.dialogs.ListAddDialog;
 import edu.ualberta.med.biobank.model.SdataType;
 
@@ -231,9 +231,7 @@ public class SdataWidget extends Composite {
                         if (numDuplicates > 1) {
                             msg = "Values " + duplicates.toString() + " already in " + title;                            
                         }
-                        MessageDialog.openError(
-                                PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
-                                title, msg);
+                        BioBankPlugin.openError(title, msg);
                     }
                     
                     for (String item : unique.toArray(new String[unique.size()])) {

@@ -1,12 +1,12 @@
 package edu.ualberta.med.biobank.helpers;
 
-import java.util.List;
+import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.model.Site;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.client.ApplicationServiceProvider;
-import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.ui.PlatformUI;
+
+import java.util.List;
+
 import org.springframework.remoting.RemoteAccessException;
 
 public class SessionHelper implements Runnable {
@@ -47,25 +47,11 @@ public class SessionHelper implements Runnable {
 			sites = appService.search(Site.class, site);
 		}
 		catch (final RemoteAccessException exp) {
-			Display.getDefault().asyncExec(new Runnable() {
-				public void run() {
-					MessageDialog.openError(
-							PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), 
-							"Connection Attempt Failed", 
-					"Could not connect to server. Make sure server is running.");
-				}
-			});
+			BioBankPlugin.openRemoteConnectErrorMessage();
 		}
 		catch (final Exception exp) {	
 			exp.printStackTrace();
-
-			Display.getDefault().asyncExec(new Runnable() {
-				public void run() {
-					MessageDialog.openError(
-							PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), 
-							"Login Failed", exp.getMessage());
-				}
-			});
+			BioBankPlugin.openAsyncError("Login Failed", exp.getMessage());
 		}
 	}
 	

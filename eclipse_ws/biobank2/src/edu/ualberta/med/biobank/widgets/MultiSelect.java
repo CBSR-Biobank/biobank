@@ -14,30 +14,36 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.forms.widgets.FormToolkit;
+
 import edu.ualberta.med.biobank.forms.FormUtils;
+import edu.ualberta.med.biobank.widgets.listener.MultiSelectEvent;
+import edu.ualberta.med.biobank.widgets.listener.MultiSelectListener;
 
 public class MultiSelect extends Composite {
-	
+
 	static Logger log4j = Logger.getLogger(MultiSelect.class.getName());
-	
+
 	private TreeViewer selTree;
-	
+
 	private TreeViewer availTree;
-	
-	private MultiSelectNode selTreeRootNode = 
-		new MultiSelectNode(null, 0, "selRoot");
-	
-	private MultiSelectNode availTreeRootNode = 
-		new MultiSelectNode(null, 0, "availRoot");
-	
+
+	private MultiSelectNode selTreeRootNode = new MultiSelectNode(null, 0,
+		"selRoot");
+
+	private MultiSelectNode availTreeRootNode = new MultiSelectNode(null, 0,
+		"availRoot");
+
 	private int minHeight;
 
-	public MultiSelect(Composite parent,int style, String leftLabel, 
+	List<MultiSelectListener> listeners;
+
+	public MultiSelect(Composite parent, int style, String leftLabel,
 			String rightLabel, int minHeight) {
 		super(parent, style);
-		
+		listeners = new ArrayList<MultiSelectListener>();
+
 		this.minHeight = minHeight;
-		
+
 		setLayout(new GridLayout(2, false));
 		setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
@@ -45,17 +51,17 @@ public class MultiSelect extends Composite {
 		selTree.setInput(selTreeRootNode);
 		availTree = createLabelledTree(this, rightLabel);
 		availTree.setInput(availTreeRootNode);
-		
+
 		dragAndDropSupport(availTree, selTree);
 		dragAndDropSupport(selTree, availTree);
 	}
-	
+
 	private TreeViewer createLabelledTree(Composite parent, String label) {
 		Composite selComposite = new Composite(parent, SWT.NONE);
 		selComposite.setLayout(new GridLayout(1, true));
 		GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
 		selComposite.setLayoutData(gd);
-		
+
 		Label l = new Label(selComposite, SWT.NONE);
 		l.setText(label);
 		l.setFont(FormUtils.getHeadingFont());
@@ -63,29 +69,29 @@ public class MultiSelect extends Composite {
 		gd.horizontalSpan = 2;
 		gd.horizontalAlignment = SWT.CENTER;
 		l.setLayoutData(gd);
-		
+
 		TreeViewer tv = new TreeViewer(selComposite);
 		gd = new GridData(SWT.FILL, SWT.FILL, true, true);
 		gd.heightHint = minHeight;
 		gd.widthHint = 180;
 		tv.getTree().setLayoutData(gd);
 
-		tv.setLabelProvider(new MultiSelectNodeLabelProvider());		
+		tv.setLabelProvider(new MultiSelectNodeLabelProvider());
 		tv.setContentProvider(new MultiSelectNodeContentProvider());
-		
+
 		return tv;
 	}
-	
+
 	private void dragAndDropSupport(TreeViewer fromList, TreeViewer toList) {
 		new TreeViewerDragListener(fromList);
-		new TreeViewerDropListener(toList);
+		new TreeViewerDropListener(toList, this);
 	}
 
 	public void adaptToToolkit(FormToolkit toolkit) {
-        toolkit.adapt(this, true, true);
+		toolkit.adapt(this, true, true);
 		adaptAllChildren(this, toolkit);
 	}
-	
+
 	private void adaptAllChildren(Composite container, FormToolkit toolkit) {
 		Control[] children = container.getChildren();
 		for (Control aChild : children) {
@@ -95,33 +101,49 @@ public class MultiSelect extends Composite {
 			}
 		}
 	}
-	
-	public void addSelections(ListOrderedMap available,
-	    List<Integer> selected) {
-        MapIterator it = available.mapIterator();
-        
-        while (it.hasNext()) {
-            int key = (Integer) it.next();
-		    if (selected.contains(key)) {
-		        selTreeRootNode.addChild(new MultiSelectNode(
-		            selTreeRootNode, key, (String) it.getValue()));
-		    }
-		    else {
-		        availTreeRootNode.addChild(new MultiSelectNode(
-		            availTreeRootNode, key, (String) it.getValue()));
-		    }
+
+	public void addSelections(ListOrderedMap available, List<Integer> selected) {
+		MapIterator it = available.mapIterator();
+
+		while (it.hasNext()) {
+			int key = (Integer) it.next();
+			if (selected.contains(key)) {
+				selTreeRootNode.addChild(new MultiSelectNode(selTreeRootNode,
+					key, (String) it.getValue()));
+			} else {
+				availTreeRootNode.addChild(new MultiSelectNode(
+					availTreeRootNode, key, (String) it.getValue()));
+			}
 		}
 	}
-	
+
 	/**
 	 * Return the selected items in the order specified by user.
 	 * 
 	 */
 	public List<Integer> getSelected() {
-		List<Integer> result = new ArrayList<Integer>();		
+		List<Integer> result = new ArrayList<Integer>();
 		for (MultiSelectNode node : selTreeRootNode.getChildren()) {
-		    result.add(node.getId());
-		}		
+			result.add(node.getId());
+		}
 		return result;
+	}
+
+	public void addSelectionChangedListener(MultiSelectListener listener) {
+		listeners.add(listener);
+	}
+
+	public void removeSelectionChangedListener(MultiSelectListener listener) {
+		listeners.remove(listener);
+	}
+
+	public void notifyListeners(MultiSelectEvent event) {
+		for (MultiSelectListener listener : listeners) {
+			listener.selectionChanged(event);
+		}
+	}
+
+	public void notifyListeners() {
+		notifyListeners(new MultiSelectEvent(this));
 	}
 }

@@ -63,6 +63,11 @@
             id="edu.ualberta.med.biobank.commands.addClinic"
             name="Add Clinic">
       </command>
+      <command
+            defaultHandler="edu.ualberta.med.biobank.handler.SearchHandler"
+            id="edu.ualberta.med.biobank.commands.search"
+            name="Search">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.menus">
@@ -109,6 +114,18 @@
                      style="push">
                </command>
             </menu>
+            <command
+                  commandId="edu.ualberta.med.biobank.commands.search"
+                  id="edu.ualberta.med.biobank.menu.search"
+                  label="Search"
+                  style="push">
+            </command>
+            <command
+                  commandId="org.eclipse.ui.window.preferences"
+                  id="edu.ualberta.med.biobank.menu.configuration"
+                  label="Configuration"
+                  style="push">
+            </command>
          </menu>
       </menuContribution>
    </extension>
@@ -119,6 +136,13 @@
             class="edu.ualberta.med.biobank.views.SessionsView"
             id="edu.ualberta.med.biobank.views.SessionsView"
             name="Sessions"
+            restorable="true">
+      </view>
+      <view
+            allowMultiple="false"
+            class="edu.ualberta.med.biobank.views.SearchView"
+            id="edu.ualberta.med.biobank.views.SearchView"
+            name="Search"
             restorable="true">
       </view>
    </extension>
@@ -135,6 +159,17 @@
                relationship="left"
                relative="org.eclipse.ui.editorss"
                showTitle="false">
+         </view>
+         <view
+               closeable="true"
+               id="edu.ualberta.med.biobank.views.SearchView"
+               minimized="false"
+               moveable="true"
+               relationship="top"
+               relative="org.eclipse.ui.editorss"
+               showTitle="true"
+               standalone="true"
+               visible="true">
          </view>
       </perspectiveExtension>
    </extension>
@@ -225,10 +260,28 @@
             name="Storage Container View">
       </editor>
       <editor
-            class="edu.ualberta.med.biobank.forms.ScanSamplesEntryForm"
+            class="edu.ualberta.med.biobank.forms.LinkSamplesEntryForm"
             default="false"
-            id="edu.ualberta.med.biobank.forms.ScanSamplesEntryForm"
+            id="edu.ualberta.med.biobank.forms.LinkSamplesEntryForm"
             name="Scan Samples Entry">
+      </editor>
+      <editor
+            class="edu.ualberta.med.biobank.forms.ProcessSamplesEntryForm"
+            default="false"
+            id="edu.ualberta.med.biobank.forms.ProcessSamplesEntryForm"
+            name="Process samples">
+      </editor>
+      <editor
+            class="edu.ualberta.med.biobank.forms.ProcessCabinetEntryForm"
+            default="false"
+            id="edu.ualberta.med.biobank.forms.ProcessCabinetEntryForm"
+            name="Process cabinet">
+      </editor>
+      <editor
+            class="edu.ualberta.med.biobank.forms.SampleViewForm"
+            default="false"
+            id="edu.ualberta.med.biobank.forms.SampleViewForm"
+            name="Sample View">
       </editor>
    </extension>
    <extension
@@ -253,5 +306,45 @@
                value="BioBank2">
          </property>
       </product>
+   </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            class="edu.ualberta.med.biobank.preferences.GeneralConfigurationPreferencePage"
+            id="edu.ualberta.med.biobank.preferences.gereral"
+            name="General">
+      </page>
+      <page
+            class="edu.ualberta.med.biobank.preferences.ScannerPreferencePage"
+            id="edu.ualberta.med.biobank.preferences.gereral"
+            name="Scanner">
+      </page>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="edu.ualberta.med.biobank.preferences.PreferenceInitializer">
+      </initializer>
+   </extension>
+   <extension
+         point="org.eclipse.ui.activities">
+      <activity
+            description="Preferences from Eclipse Update UI"
+            id="edu.ualberta.med.biobank.activity.updateui"
+            name="Update Preferences">
+      </activity>
+      <activityPatternBinding
+            activityId="edu.ualberta.med.biobank.activity.updateui"
+            pattern="org\.eclipse\.update\.ui/org\.eclipse\.update\..*PreferencePage">
+      </activityPatternBinding>
+      <activity
+            description="Preferences from Eclipse IDE UI"
+            id="edu.ualberta.med.biobank.activity.eclipseide"
+            name="IDE General Preferences">
+      </activity>
+      <activityPatternBinding
+            activityId="edu.ualberta.med.biobank.activity.eclipseide"
+            pattern="org\.eclipse\.ui\.ide/org\.eclipse\.ui\.preferencePages\.Workbench">
+      </activityPatternBinding>
    </extension>
 </plugin>

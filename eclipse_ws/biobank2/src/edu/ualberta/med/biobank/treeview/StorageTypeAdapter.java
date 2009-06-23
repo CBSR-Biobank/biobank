@@ -15,9 +15,9 @@ import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.StorageType;
 
 public class StorageTypeAdapter extends Node {
-       
+
 	private StorageType storageType;
-	
+
 	public StorageTypeAdapter(Node parent, StorageType storageType) {
 		super(parent);
 		this.setStorageType(storageType);
@@ -42,36 +42,52 @@ public class StorageTypeAdapter extends Node {
 		Assert.isNotNull(storageType, "storage type is null");
 		return storageType.getName();
 	}
-	
-    @Override
+
+	@Override
+	public String getTitle() {
+		return getTitle("Storage Type");
+	}
+
+	@Override
 	public void performDoubleClick() {
-        openForm(new FormInput(this), StorageTypeViewForm.ID);
-    }
-    
-    @Override
-	public void popupMenu(TreeViewer tv, Tree tree,  Menu menu) {
-        MenuItem mi = new MenuItem (menu, SWT.PUSH);
-        mi.setText ("Edit Storage Type");
-        mi.addSelectionListener(new SelectionListener() {
-            public void widgetSelected(SelectionEvent event) {
-                openForm(new FormInput(StorageTypeAdapter.this), 
-                    StorageTypeEntryForm.ID);
-            }
+		openForm(new FormInput(this), StorageTypeViewForm.ID);
+	}
 
-            public void widgetDefaultSelected(SelectionEvent e) {                    
-            }
-        });
+	@Override
+	public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
+		MenuItem mi = new MenuItem(menu, SWT.PUSH);
+		mi.setText("Edit Storage Type");
+		mi.addSelectionListener(new SelectionListener() {
+			public void widgetSelected(SelectionEvent event) {
+				openForm(new FormInput(StorageTypeAdapter.this),
+					StorageTypeEntryForm.ID);
+			}
 
-        mi = new MenuItem (menu, SWT.PUSH);
-        mi.setText ("View Storage Type");
-        mi.addSelectionListener(new SelectionListener() {
-            public void widgetSelected(SelectionEvent event) {
-                openForm(new FormInput(StorageTypeAdapter.this), 
-                    StorageTypeViewForm.ID);
-            }
+			public void widgetDefaultSelected(SelectionEvent e) {
+			}
+		});
 
-            public void widgetDefaultSelected(SelectionEvent e) {                    
-            }
-        }); 
-    }
+		mi = new MenuItem(menu, SWT.PUSH);
+		mi.setText("View Storage Type");
+		mi.addSelectionListener(new SelectionListener() {
+			public void widgetSelected(SelectionEvent event) {
+				openForm(new FormInput(StorageTypeAdapter.this),
+					StorageTypeViewForm.ID);
+			}
+
+			public void widgetDefaultSelected(SelectionEvent e) {
+			}
+		});
+	}
+
+	@Override
+	public void loadChildren(boolean updateNode) {
+
+	}
+
+	@Override
+	public Node accept(NodeSearchVisitor visitor) {
+		return null;
+	}
+
 }

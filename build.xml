@@ -11,6 +11,7 @@
 <property environment="env"/>
 <property name="cacore.sdk.dir" location="caCORE_SDK/sdk" />
 <property name="eclipse.proj.dir" location="eclipse_ws/biobank2" />
+<property name="eclipse.proj.dir.junit" location="eclipse_ws/biobank2.tests" />
 <property name="data.dir" location="data" />
 <property name="data.sql.dir" location="${data.dir}/sql" />
 <property name="schema.dir" location="schema" />
@@ -46,6 +47,15 @@
   <copy
      file="${cacore.sdk.dir}/output/biobank2/src/hibernate.cfg.xml"
      tofile="${eclipse.proj.dir}/lib"/>
+
+  <copy todir="${eclipse.proj.dir.junit}/lib">
+    <fileset dir="${cacore.sdk.dir}/output/biobank2/package/remote-client/lib" />
+  </copy>
+  <copy todir="${eclipse.proj.dir.junit}/conf">
+     <fileset dir="${cacore.sdk.dir}/output/biobank2/package/remote-client/conf">
+       <include name="application-config-client*.xml" />
+     </fileset>
+   </copy>
 </target>
 
 <target name="deploy-jboss"
@@ -65,8 +75,8 @@
 </target>
 
 <target name="schema"
-        description="generates the database schema for the caCORE SDK data model"
-        depends="sdk">
+        description="generates the database schema for the caCORE SDK data model">
+<!--        depends="sdk">-->
   <ant
      dir="${schema.dir}"
      target="schemaexport"

@@ -122,7 +122,7 @@ public class StorageTypeViewForm extends BiobankViewForm {
 
 	private void setStorageTypeValues() {
 		FormUtils.setTextValue(nameLabel, storageType.getName());
-        FormUtils.setTextValue(defaultTempLabel, storageType.getDefaultTemperature().toString());
+        FormUtils.setTextValue(defaultTempLabel, storageType.getDefaultTemperature());
         FormUtils.setTextValue(activityStatusLabel, storageType.getActivityStatus());
         FormUtils.setTextValue(commentLabel, storageType.getComment());
 	}
@@ -144,9 +144,9 @@ public class StorageTypeViewForm extends BiobankViewForm {
 
 	private void setDimensionsValues() {
 		FormUtils.setTextValue(dimOneLabelLabel, storageType.getDimensionOneLabel());
-        FormUtils.setTextValue(dimOneCapacityLabel, capacity.getDimensionOneCapacity().toString());
+        FormUtils.setTextValue(dimOneCapacityLabel, capacity.getDimensionOneCapacity());
         FormUtils.setTextValue(dimTwoLabelLabel, storageType.getDimensionTwoLabel());
-        FormUtils.setTextValue(dimTwoCapacityLabel, capacity.getDimensionTwoCapacity().toString());
+        FormUtils.setTextValue(dimTwoCapacityLabel, capacity.getDimensionTwoCapacity());
 	}
 
     private void createSampleTypesSection() {

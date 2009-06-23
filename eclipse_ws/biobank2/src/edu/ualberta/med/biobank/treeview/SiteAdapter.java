@@ -14,6 +14,9 @@ import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.PlatformUI;
 import org.springframework.remoting.RemoteAccessException;
 
+import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.forms.ProcessSamplesEntryForm;
 import edu.ualberta.med.biobank.forms.SiteEntryForm;
 import edu.ualberta.med.biobank.forms.SiteViewForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
@@ -23,11 +26,11 @@ import gov.nih.nci.system.query.SDKQuery;
 import gov.nih.nci.system.query.example.DeleteExampleQuery;
 
 public class SiteAdapter extends Node {
-    public static final int STUDIES_NODE_ID = 0;
-    public static final int CLINICS_NODE_ID = 1;
-    public static final int STORAGE_TYPES_NODE_ID = 2;
-    public static final int STORAGE_CONTAINERS_NODE_ID = 3;
-    
+	public static final int STUDIES_NODE_ID = 0;
+	public static final int CLINICS_NODE_ID = 1;
+	public static final int STORAGE_TYPES_NODE_ID = 2;
+	public static final int STORAGE_CONTAINERS_NODE_ID = 3;
+
 	private Site site;
 
 	public SiteAdapter(SessionAdapter parent, Site site) {
@@ -46,112 +49,128 @@ public class SiteAdapter extends Node {
 	public Site getSite() {
 		return site;
 	}
-	
+
 	public Node getStudiesGroupNode() {
 		return children.get(STUDIES_NODE_ID);
 	}
-	
+
 	public Node getClinicGroupNode() {
 		return children.get(CLINICS_NODE_ID);
 	}
-    
-    public Node getStorageTypesGroupNode() {
-        return children.get(STORAGE_TYPES_NODE_ID);
-    }
+
+	public Node getStorageTypesGroupNode() {
+		return children.get(STORAGE_TYPES_NODE_ID);
+	}
 
 	@Override
 	public Integer getId() {
-        Assert.isNotNull(site, "site is null");
+		Assert.isNotNull(site, "site is null");
 		return site.getId();
 	}
 
 	@Override
 	public String getName() {
-        Assert.isNotNull(site, "site is null");
+		Assert.isNotNull(site, "site is null");
 		return site.getName();
 	}
-    
-    @Override
+
+	@Override
+	public String getTitle() {
+		return getTitle("Site");
+	}
+
+	@Override
 	public void performDoubleClick() {
-        openForm(new FormInput(this), SiteViewForm.ID);
-    }
-    
-    @Override
-	public void performExpand() {
-    }
-    
-    @Override
-	public void popupMenu(TreeViewer tv, Tree tree,  Menu menu) {
-        MenuItem mi = new MenuItem (menu, SWT.PUSH);
-        mi.setText ("Edit Site");
-        mi.addSelectionListener(new SelectionListener() {
-            public void widgetSelected(SelectionEvent event) {
-                openForm(new FormInput(SiteAdapter.this), SiteEntryForm.ID);
-            }
+		openForm(new FormInput(this), SiteViewForm.ID);
+	}
 
-            public void widgetDefaultSelected(SelectionEvent e) {                    
-            }
-        });
+	@Override
+	public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
+		MenuItem mi = new MenuItem(menu, SWT.PUSH);
+		mi.setText("Edit Site");
+		mi.addSelectionListener(new SelectionListener() {
+			public void widgetSelected(SelectionEvent event) {
+				openForm(new FormInput(SiteAdapter.this), SiteEntryForm.ID);
+			}
 
-        mi = new MenuItem (menu, SWT.PUSH);
-        mi.setText ("View Site");
-        mi.addSelectionListener(new SelectionListener() {
-            public void widgetSelected(SelectionEvent event) {
-                openForm(new FormInput(SiteAdapter.this), SiteViewForm.ID);
-            }
+			public void widgetDefaultSelected(SelectionEvent e) {
+			}
+		});
 
-            public void widgetDefaultSelected(SelectionEvent e) {                    
-            }
-        }); 
+		mi = new MenuItem(menu, SWT.PUSH);
+		mi.setText("View Site");
+		mi.addSelectionListener(new SelectionListener() {
+			public void widgetSelected(SelectionEvent event) {
+				openForm(new FormInput(SiteAdapter.this), SiteViewForm.ID);
+			}
 
-        mi = new MenuItem (menu, SWT.PUSH);
-        mi.setText ("Delete Site");
-        mi.addSelectionListener(new SelectionListener() {
-            public void widgetSelected(SelectionEvent event) {
-                deleteSite();
-            }
+			public void widgetDefaultSelected(SelectionEvent e) {
+			}
+		});
 
-            public void widgetDefaultSelected(SelectionEvent e) {                    
-            }
-        }); 
-    }
-    
-    protected void deleteSite() {
-        boolean result = MessageDialog.openConfirm(
-            PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), 
-            "Site Deletion", 
-            "Are you sure you want to delete site " + site.getName()
-            + "?");
-        
-        if (!result) return;
-        
-        BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
-            public void run() {
+		mi = new MenuItem(menu, SWT.PUSH);
+		mi.setText("Delete Site");
+		mi.addSelectionListener(new SelectionListener() {
+			public void widgetSelected(SelectionEvent event) {
+				deleteSite();
+			}
 
-                try {
-                    SDKQuery query;
+			public void widgetDefaultSelected(SelectionEvent e) {
+			}
+		});
 
-                    WritableApplicationService appService = getAppService();       
-                    query = new DeleteExampleQuery(site);
-                    site.getAddress();
-                    site.getClinicCollection();
-                    appService.executeQuery(query);
-                }
-                catch (final RemoteAccessException exp) {
-                    Display.getDefault().asyncExec(new Runnable() {
-                        public void run() {
-                            MessageDialog.openError(
-                                PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), 
-                                "Connection Attempt Failed", 
-                            "Could not perform database operation. Make sure server is running correct version.");
-                        }
-                    });
-                }
-                catch (Exception e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-            }
-        });
-    }
+		mi = new MenuItem(menu, SWT.PUSH);
+		mi.setText("Process samples");
+		mi.addSelectionListener(new SelectionListener() {
+			public void widgetSelected(SelectionEvent event) {
+				closeScannersEditors();
+				openForm(new FormInput(SiteAdapter.this.getParent()),
+					ProcessSamplesEntryForm.ID);
+			}
+
+			public void widgetDefaultSelected(SelectionEvent e) {
+			}
+		});
+	}
+
+	@Override
+	public void loadChildren(boolean updateNode) {
+
+	}
+
+	protected void deleteSite() {
+		boolean result = MessageDialog.openConfirm(PlatformUI.getWorkbench()
+			.getActiveWorkbenchWindow().getShell(), "Site Deletion",
+			"Are you sure you want to delete site " + site.getName() + "?");
+
+		if (!result)
+			return;
+
+		BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
+			public void run() {
+				try {
+					SDKQuery query;
+
+					WritableApplicationService appService = getAppService();
+					query = new DeleteExampleQuery(site);
+					site.getAddress();
+					site.getClinicCollection();
+					// FIXME should delete studies - patients - patient visits -
+					// sample !
+					appService.executeQuery(query);
+					getParent().removeChild(SiteAdapter.this);
+				} catch (final RemoteAccessException exp) {
+					BioBankPlugin.openRemoteAccessErrorMessage();
+				} catch (Exception e) {
+					SessionManager.getLogger().error(
+						"Error while deletindg site " + site.getName());
+				}
+			}
+		});
+	}
+
+	@Override
+	public Node accept(NodeSearchVisitor visitor) {
+		return visitor.visit(this);
+	}
 }

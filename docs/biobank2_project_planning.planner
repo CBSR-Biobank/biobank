@@ -57,14 +57,14 @@
           <predecessor id="1" predecessor-id="8" type="FS"/>
         </predecessors>
       </task>
-      <task id="10" name="update button for view forms" note="" work="28800" start="20090519T000000Z" end="20090519T170000Z" work-start="20090519T080000Z" percent-complete="0" priority="0" type="normal" scheduling="fixed-work"/>
+      <task id="10" name="update button for view forms" note="" work="28800" start="20090519T000000Z" end="20090519T170000Z" work-start="20090519T080000Z" percent-complete="100" priority="0" type="normal" scheduling="fixed-work"/>
       <task id="11" name="scanner integration" note="" work="748800" start="20090519T170000Z" end="20090624T170000Z" work-start="20090520T080000Z" percent-complete="0" priority="0" type="normal" scheduling="fixed-work">
-        <task id="12" name="Implement scan link" note="" work="288000" start="20090519T170000Z" end="20090602T170000Z" work-start="20090520T080000Z" percent-complete="0" priority="0" type="normal" scheduling="fixed-work">
+        <task id="12" name="Implement scan link" note="" work="288000" start="20090519T170000Z" end="20090602T170000Z" work-start="20090520T080000Z" percent-complete="100" priority="0" type="normal" scheduling="fixed-work">
           <predecessors>
             <predecessor id="1" predecessor-id="10" type="FS"/>
           </predecessors>
         </task>
-        <task id="13" name="Implement scan process" note="" work="144000" start="20090602T170000Z" end="20090609T170000Z" work-start="20090603T080000Z" percent-complete="0" priority="0" type="normal" scheduling="fixed-work">
+        <task id="13" name="Implement scan process" note="" work="144000" start="20090602T170000Z" end="20090609T170000Z" work-start="20090603T080000Z" percent-complete="100" priority="0" type="normal" scheduling="fixed-work">
           <predecessors>
             <predecessor id="1" predecessor-id="12" type="FS"/>
           </predecessors>
@@ -75,18 +75,18 @@
             <predecessor id="1" predecessor-id="13" type="FS"/>
           </predecessors>
         </task>
-        <task id="15" name="1D barcode scanning" note="" work="144000" start="20090616T170000Z" end="20090623T170000Z" work-start="20090617T080000Z" percent-complete="0" priority="0" type="normal" scheduling="fixed-work">
+        <task id="15" name="1D barcode scanning" note="" work="144000" start="20090616T170000Z" end="20090623T170000Z" work-start="20090617T080000Z" percent-complete="60" priority="0" type="normal" scheduling="fixed-work">
           <predecessors>
             <predecessor id="1" predecessor-id="14" type="FS"/>
           </predecessors>
         </task>
-        <task id="16" name="hand held scanner integration" note="" work="28800" start="20090623T170000Z" end="20090624T170000Z" work-start="20090624T080000Z" percent-complete="0" priority="0" type="normal" scheduling="fixed-work">
+        <task id="16" name="hand held scanner integration" note="" work="28800" start="20090623T170000Z" end="20090624T170000Z" work-start="20090624T080000Z" percent-complete="100" priority="0" type="normal" scheduling="fixed-work">
           <predecessors>
             <predecessor id="1" predecessor-id="15" type="FS"/>
           </predecessors>
         </task>
       </task>
-      <task id="17" name="java client search feature" note="" work="288000" start="20090624T170000Z" end="20090708T170000Z" work-start="20090625T080000Z" percent-complete="0" priority="0" type="normal" scheduling="fixed-work">
+      <task id="17" name="java client search feature" note="" work="288000" start="20090624T170000Z" end="20090708T170000Z" work-start="20090625T080000Z" percent-complete="10" priority="0" type="normal" scheduling="fixed-work">
         <predecessors>
           <predecessor id="1" predecessor-id="11" type="FS"/>
         </predecessors>
