@@ -15,10 +15,10 @@ import org.eclipse.jface.databinding.swt.SWTObservables;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
@@ -26,7 +26,6 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IEditorInput;
@@ -187,37 +186,17 @@ public class StorageContainerEntryForm extends BiobankEntryForm {
 			.addSelectionChangedListener(new ISelectionChangedListener() {
 				@Override
 				public void selectionChanged(SelectionChangedEvent event) {
-					setDirty(true);
-
-					Object selection = event.getSelection();
-					final StorageType storageType = (StorageType) ((StructuredSelection) selection)
+					IStructuredSelection selection = (IStructuredSelection) event
+						.getSelection();
+					StorageType storageType = (StorageType) selection
 						.getFirstElement();
-
-					BusyIndicator.showWhile(Display.getDefault(),
-						new Runnable() {
-							public void run() {
-								final Double temp = storageType
-									.getDefaultTemperature();
-
-								final String dim1Label = storageType
-									.getDimensionOneLabel();
-								final String dim2Label = storageType
-									.getDimensionTwoLabel();
-
-								final Integer dim1Max = storageType
-									.getCapacity().getDimensionOneCapacity();
-								final Integer dim2Max = storageType
-									.getCapacity().getDimensionTwoCapacity();
-
-								Display.getDefault().asyncExec(new Runnable() {
-									public void run() {
-										updateForm(temp, dim1Label, dim2Label,
-											dim1Max, dim2Max);
-									}
-								});
-								storageContainer.setStorageType(storageType);
-							}
-						});
+					Double temp = storageType.getDefaultTemperature();
+					if (temp == null) {
+						tempWidget.setText("");
+					} else {
+						tempWidget.setText(temp.toString());
+					}
+					setDirty(true);
 				}
 			});
 		bindStorageTypeCombo(storageTypeLabel, combo);
@@ -329,52 +308,6 @@ public class StorageContainerEntryForm extends BiobankEntryForm {
 			form.setMessage(status.getMessage(), IMessageProvider.ERROR);
 			submit.setEnabled(false);
 		}
-	}
-
-	/*
-	 * Parameters need to be passed as objects since they could be set to NULL
-	 * in the database.
-	 */
-	private void updateForm(Double temp, String dim1Label, String dim2Label,
-			Integer dim1Max, Integer dim2Max) {
-		String str = "";
-		if (temp != null) {
-			str = "" + temp;
-		}
-		tempWidget.setText(str);
-
-		if (position.getParentContainer() != null) {
-			// handle dimension 1
-			str = "";
-
-			if (dim1Label != null) {
-				str += dim1Label;
-			} else {
-				str += "Dimension 1 ";
-			}
-
-			if (dim1Max != null) {
-				str += "\n(1 - " + dim1Max + ")";
-			}
-
-			dimensionOneLabel.setText(str + ":");
-
-			// handle dimension 2
-			str = "";
-
-			if (dim1Label != null) {
-				str += dim2Label;
-			} else {
-				str += "Dimension 2 ";
-			}
-
-			if (dim1Max != null) {
-				str += "\n(1 - " + dim2Max + ")";
-			}
-
-			dimensionTwoLabel.setText(str + ":");
-		}
-		form.reflow(true);
 	}
 
 	@Override
