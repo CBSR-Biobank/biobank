@@ -76,6 +76,10 @@ public abstract class AbstractContainerChooserPage extends WizardPage {
 		label.setText("Choosen position:");
 		textPosition = new Text(pageContainer, SWT.READ_ONLY | SWT.BORDER
 				| SWT.SINGLE);
+		gd = new GridData();
+		gd.grabExcessHorizontalSpace = true;
+		gd.horizontalAlignment = SWT.FILL;
+		textPosition.setLayoutData(gd);
 	}
 
 	protected ContainerCell positionSelection(MouseEvent e) {

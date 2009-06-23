@@ -105,6 +105,10 @@ public class ProcessSamplesEntryForm extends BiobankEntryForm implements
 
 	private Composite containersComposite;
 
+	// for debugging only :
+	private Button existsButton;
+	private Button notexistsButton;
+
 	@Override
 	public void init(IEditorSite editorSite, IEditorInput input)
 			throws PartInitException {
@@ -221,6 +225,21 @@ public class ProcessSamplesEntryForm extends BiobankEntryForm implements
 		paletteCodeText.removeKeyListener(keyListener);
 		paletteCodeText.addKeyListener(EnterKeyToNextFieldListener.INSTANCE);
 
+		if (BioBankPlugin.getDefault().isDebugging()) {
+			gd.widthHint = 250;
+			Composite comp = toolkit.createComposite(client);
+			comp.setLayout(new GridLayout());
+			gd = new GridData();
+			gd.horizontalSpan = 2;
+			comp.setLayoutData(gd);
+			notexistsButton = toolkit.createButton(comp,
+				"Scan non processed Samples", SWT.RADIO);
+			notexistsButton.setSelection(true);
+			existsButton = toolkit.createButton(comp, "Scan processed sample",
+				SWT.RADIO);
+			toolkit.createButton(comp, "Default sample", SWT.RADIO);
+		}
+
 		scanButton = toolkit.createButton(client, "Scan", SWT.PUSH);
 		scanButton.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -286,14 +305,15 @@ public class ProcessSamplesEntryForm extends BiobankEntryForm implements
 		WizardDialog dialog = new WizardDialog(getSite().getShell(), wizard);
 		int res = dialog.open();
 		if (res == Window.OK) {
-			initPalette(wizard.getSelectedPosition(), wizard.getStorageType());
+			initNewPalette(wizard.getSelectedPosition(), wizard
+				.getStorageType());
 			showOnlyPalette(false);
 			showPalettePosition(currentPalette);
 		}
 		form.getBody().layout(true, true);
 	}
 
-	private void initPalette(ContainerPosition position, StorageType type) {
+	private void initNewPalette(ContainerPosition position, StorageType type) {
 		currentPalette.setLocatedAtPosition(position);
 		currentPalette.setStorageType(type);
 		currentPalette.setName(paletteCodeValue.getValue().toString());
@@ -311,7 +331,19 @@ public class ProcessSamplesEntryForm extends BiobankEntryForm implements
 						System.out.println("Plate to scan : "
 								+ BioBankPlugin.getDefault().getPlateNumber(
 									plateToScanValue.getValue().toString()));
-						cells = ScanCell.getRandomScanProcess();
+						if (BioBankPlugin.getDefault().isDebugging()) {
+							if (notexistsButton.getSelection()) {
+								cells = ScanCell
+									.getRandomScanProcessNotInPalette(appService);
+							} else if (existsButton.getSelection()) {
+								cells = ScanCell
+									.getRandomScanProcessAlreadyInPalette(appService);
+							} else {
+								cells = ScanCell.getRandomScanProcess();
+							}
+						} else {
+							cells = ScanCell.getRandomScanProcess();
+						}
 
 						currentStudy = null;
 						boolean result = true;
@@ -604,8 +636,9 @@ public class ProcessSamplesEntryForm extends BiobankEntryForm implements
 	 */
 	private boolean getPaletteInformation() throws ApplicationException {
 		currentPaletteSamples = null;
+		String barcode = (String) paletteCodeValue.getValue();
 		currentPalette = ModelUtils.getStorageContainerWithBarcode(appService,
-			(String) paletteCodeValue.getValue());
+			barcode);
 		if (currentPalette != null) {
 			boolean result = MessageDialog
 				.openConfirm(PlatformUI.getWorkbench()
@@ -627,6 +660,8 @@ public class ProcessSamplesEntryForm extends BiobankEntryForm implements
 			}
 			showOnlyPalette(false);
 		} else {
+			currentPalette = new StorageContainer();
+			currentPalette.setBarcode(barcode);
 			showOnlyPalette(true);
 			hasLocationValue.setValue(Boolean.FALSE);
 			paletteLabel.setText("New Palette");

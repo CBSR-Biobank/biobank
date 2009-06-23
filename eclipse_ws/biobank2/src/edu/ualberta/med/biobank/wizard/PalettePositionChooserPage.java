@@ -11,6 +11,7 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Label;
 
@@ -49,6 +50,10 @@ public class PalettePositionChooserPage extends AbstractContainerChooserPage {
 		Label label = new Label(pageContainer, SWT.NONE);
 		label.setText("Choose container type:");
 		combo = new Combo(pageContainer, SWT.NONE);
+		GridData gd = new GridData();
+		gd.grabExcessHorizontalSpace = true;
+		gd.horizontalAlignment = SWT.FILL;
+		combo.setLayoutData(gd);
 		comboViewer = new ComboViewer(combo);
 		comboViewer.setContentProvider(new ArrayContentProvider());
 		comboViewer.setLabelProvider(new LabelProvider() {
@@ -60,18 +65,18 @@ public class PalettePositionChooserPage extends AbstractContainerChooserPage {
 		});
 
 		comboViewer
-				.addSelectionChangedListener(new ISelectionChangedListener() {
-					@Override
-					public void selectionChanged(SelectionChangedEvent event) {
-						// type has been chosen = page complete if position
-						// choosen
-						if (!textPosition.getText().isEmpty()) {
-							setPageComplete(true);
-						}
-						storageType = (StorageType) ((IStructuredSelection) comboViewer
-								.getSelection()).getFirstElement();
+			.addSelectionChangedListener(new ISelectionChangedListener() {
+				@Override
+				public void selectionChanged(SelectionChangedEvent event) {
+					// type has been chosen = page complete if position
+					// choosen
+					if (!textPosition.getText().isEmpty()) {
+						setPageComplete(true);
 					}
-				});
+					storageType = (StorageType) ((IStructuredSelection) comboViewer
+						.getSelection()).getFirstElement();
+				}
+			});
 	}
 
 	@Override
@@ -82,12 +87,12 @@ public class PalettePositionChooserPage extends AbstractContainerChooserPage {
 		textPosition.setText("");
 		selectedPosition = null;
 		Collection<StorageType> types = getCurrentStorageContainer()
-				.getStorageType().getChildStorageTypeCollection();
+			.getStorageType().getChildStorageTypeCollection();
 		// TODO do not include type not active
 		comboViewer.setInput(types);
 		if (types.size() == 1) {
 			comboViewer
-					.setSelection(new StructuredSelection(types.toArray()[0]));
+				.setSelection(new StructuredSelection(types.toArray()[0]));
 		}
 		setPageComplete(false);
 	}
@@ -99,7 +104,7 @@ public class PalettePositionChooserPage extends AbstractContainerChooserPage {
 		if (cell.getStatus() == ContainerStatus.EMPTY) {
 			this.selectedPosition = cell.getPosition();
 			textPosition.setText(selectedPosition.getPositionDimensionOne()
-					.toString());
+				.toString());
 			complete = true;
 		} else {
 			textPosition.setText("");
@@ -108,7 +113,7 @@ public class PalettePositionChooserPage extends AbstractContainerChooserPage {
 		if (complete) {
 			if (comboViewer.getSelection() == null
 					|| ((IStructuredSelection) comboViewer.getSelection())
-							.isEmpty()) {
+						.isEmpty()) {
 				setPageComplete(false);
 			}
 		}
@@ -140,7 +145,7 @@ public class PalettePositionChooserPage extends AbstractContainerChooserPage {
 			for (int j = 0; j < cells[i].length; j++) {
 				if (cells[i][j] == null) {
 					ContainerCell cell = new ContainerCell(
-							newContainerPosition(i + 1, j + 1));
+						newContainerPosition(i + 1, j + 1));
 					cell.setStatus(ContainerStatus.EMPTY);
 					cells[i][j] = cell;
 				}

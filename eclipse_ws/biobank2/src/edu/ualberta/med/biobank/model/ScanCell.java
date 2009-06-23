@@ -1,6 +1,10 @@
 package edu.ualberta.med.biobank.model;
 
+import java.util.List;
 import java.util.Random;
+
+import gov.nih.nci.system.applicationservice.ApplicationException;
+import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class ScanCell {
 
@@ -86,6 +90,64 @@ public class ScanCell {
 					paletteScanned[indexRow][indexCol] = new ScanCell(indexRow,
 						indexCol, null);
 				}
+			}
+		}
+		return paletteScanned;
+	}
+
+	public static ScanCell[][] getRandomScanProcessAlreadyInPalette(
+			WritableApplicationService appService) {
+		// FIXME check uml pour positionSample/sample comme pour
+		// container/containerposition
+		ScanCell[][] paletteScanned = initArray();
+		List<Sample> samples;
+		try {
+			samples = appService.search(Sample.class, new Sample());
+			for (Sample sample : samples) {
+				if (sample.getSamplePosition() != null
+						&& sample.getSamplePosition().getStorageContainer() != null) {
+					paletteScanned[0][0] = new ScanCell(0, 0, sample
+						.getInventoryId());
+					break;
+				}
+			}
+		} catch (ApplicationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return paletteScanned;
+	}
+
+	public static ScanCell[][] getRandomScanProcessNotInPalette(
+			WritableApplicationService appService) {
+		// FIXME check uml pour positionSample/sample comme pour
+		// container/containerposition
+		ScanCell[][] paletteScanned = initArray();
+		List<Sample> samples;
+		try {
+			samples = appService.search(Sample.class, new Sample());
+			for (Sample sample : samples) {
+				if ((sample.getSamplePosition() == null || sample
+					.getSamplePosition().getStorageContainer() == null)
+						&& !sample.getInventoryId().equals("123")) {
+					paletteScanned[0][0] = new ScanCell(0, 0, sample
+						.getInventoryId());
+					break;
+				}
+			}
+		} catch (ApplicationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return paletteScanned;
+	}
+
+	private static ScanCell[][] initArray() {
+		ScanCell[][] paletteScanned = new ScanCell[ROW_MAX][COL_MAX];
+		for (int indexRow = 0; indexRow < ROW_MAX; indexRow++) {
+			for (int indexCol = 0; indexCol < COL_MAX; indexCol++) {
+				paletteScanned[indexRow][indexCol] = new ScanCell(indexRow,
+					indexCol, null);
 			}
 		}
 		return paletteScanned;
