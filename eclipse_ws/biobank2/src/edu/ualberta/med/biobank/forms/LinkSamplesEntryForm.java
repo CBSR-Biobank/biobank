@@ -84,11 +84,9 @@ public class LinkSamplesEntryForm extends BiobankEntryForm {
 
 	private Composite typesSelectionCustomComposite;
 
-	private Button radioRowSelection;
-
-	private Button radioCustomSelection;
-
 	private LinkSampleTypeWidget customSelection;
+
+	private Composite radioComponents;
 
 	@Override
 	public void init(IEditorSite editorSite, IEditorInput input)
@@ -190,15 +188,16 @@ public class LinkSamplesEntryForm extends BiobankEntryForm {
 
 	private void createTypesSelectionSection() {
 		// Radio buttons
-		Composite radioComp = toolkit.createComposite(form.getBody());
+		radioComponents = toolkit.createComposite(form.getBody());
 		RowLayout compLayout = new RowLayout();
-		radioComp.setLayout(compLayout);
-		toolkit.paintBordersFor(radioComp);
+		radioComponents.setLayout(compLayout);
+		toolkit.paintBordersFor(radioComponents);
+		radioComponents.setEnabled(false);
 
-		radioRowSelection = toolkit.createButton(radioComp, "Row choice",
-			SWT.RADIO);
-		radioCustomSelection = toolkit.createButton(radioComp,
-			"Custom Selection choice", SWT.RADIO);
+		final Button radioRowSelection = toolkit.createButton(radioComponents,
+			"Row choice", SWT.RADIO);
+		final Button radioCustomSelection = toolkit.createButton(
+			radioComponents, "Custom Selection choice", SWT.RADIO);
 
 		// stackLayout
 		final Composite selectionComp = toolkit.createComposite(form.getBody());
@@ -384,7 +383,7 @@ public class LinkSamplesEntryForm extends BiobankEntryForm {
 
 					// TODO launch scanner instead of random function
 					ScanCell[][] cells = ScanCell.getRandomScanLink();
-					scannedValue.setValue(true);
+					enabledOthersComponents();
 
 					for (int i = 0; i < cells.length; i++) { // rows
 						int samplesNumber = 0;
@@ -406,6 +405,12 @@ public class LinkSamplesEntryForm extends BiobankEntryForm {
 				}
 			}
 		});
+	}
+
+	protected void enabledOthersComponents() {
+		scannedValue.setValue(true);
+		radioComponents.setEnabled(true);
+
 	}
 
 	private List<SampleType> getAllSampleTypes() {

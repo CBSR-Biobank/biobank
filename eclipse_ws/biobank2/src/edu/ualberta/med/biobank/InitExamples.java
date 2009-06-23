@@ -53,6 +53,9 @@ public class InitExamples {
 	 */
 	public static void main(String[] args) throws Exception {
 		InitExamples init = new InitExamples();
+		// appService = (WritableApplicationService) ApplicationServiceProvider
+		// .getApplicationServiceFromUrl("http://aicml-med.cs.ualberta.ca:8080/biobank2");
+
 		appService = (WritableApplicationService) ApplicationServiceProvider
 			.getApplicationServiceFromUrl("http://localhost:8080/biobank2");
 

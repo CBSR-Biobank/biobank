@@ -135,35 +135,35 @@ public class ScanLinkPaletteWidget extends ScanPaletteWidget {
 				selectionTrackOn = true;
 				if (scannedElements != null) {
 					ScanCell cell = getCellAtCoordinates(e.x, e.y);
-					// if (cell != null) {
-					switch (selectionMode) {
-					case MULTI:
-						if (selectedCells.contains(cell)) {
-							selectedCells.remove(cell);
-							cell.setSelected(false);
-						} else {
+					if (cell != null) {
+						switch (selectionMode) {
+						case MULTI:
+							if (selectedCells.contains(cell)) {
+								selectedCells.remove(cell);
+								cell.setSelected(false);
+							} else {
+								selectedCells.add(cell);
+								cell.setSelected(true);
+							}
+							break;
+						case RANGE:
+							if (selectedCells.size() > 0) {
+								addAllCellsInRange(cell);
+							} else {
+								selectedCells.add(cell);
+								cell.setSelected(true);
+							}
+							break;
+						default:
+							clearSelection();
 							selectedCells.add(cell);
 							cell.setSelected(true);
+							break;
 						}
-						break;
-					case RANGE:
-						if (selectedCells.size() > 0) {
-							addAllCellsInRange(cell);
-						} else {
-							selectedCells.add(cell);
-							cell.setSelected(true);
-						}
-						break;
-					default:
-						clearSelection();
-						selectedCells.add(cell);
-						cell.setSelected(true);
-						break;
+						notifyListeners();
+						redraw();
 					}
-					notifyListeners();
-					redraw();
 				}
-				// }
 			}
 
 			@Override
