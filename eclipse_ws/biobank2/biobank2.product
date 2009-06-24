@@ -3,11 +3,13 @@
 
 <product name="BioBank2" id="biobank2.product1" application="biobank2.biobank2" version="1.0.0" useFeatures="false">
 
+
    <configIni use="default">
    </configIni>
 
    <launcherArgs>
-      <programArgs>-vm ./jre/bin</programArgs>
+      <programArgs>-debug -vm ./jre/bin</programArgs>
+      <vmArgs>-Xms128m -Xmx512m</vmArgs>
       <vmArgsMac>-XstartOnFirstThread -Dorg.eclipse.swt.internal.carbon.smallFonts</vmArgsMac>
    </launcherArgs>
 
@@ -21,6 +23,7 @@
          <bmp/>
       </win>
    </launcher>
+
 
    <vm>
       <linux>org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/java-6-sun-1.6.0.10</linux>
