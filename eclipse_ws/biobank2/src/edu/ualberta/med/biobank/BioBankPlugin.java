@@ -7,6 +7,7 @@ import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.swt.widgets.Display;
@@ -180,6 +181,11 @@ public class BioBankPlugin extends AbstractUIPlugin {
 
 	public boolean isValidPlateBarcode(String value) {
 		return !value.isEmpty() && getPlateNumber(value) != -1;
+	}
+
+	public static boolean isAskPrint() {
+		IPreferenceStore store = getDefault().getPreferenceStore();
+		return store.getBoolean(PreferenceConstants.GENERAL_ASK_PRINT);
 	}
 
 }

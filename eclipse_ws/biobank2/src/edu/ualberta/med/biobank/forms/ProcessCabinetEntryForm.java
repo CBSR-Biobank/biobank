@@ -360,11 +360,14 @@ public class ProcessCabinetEntryForm extends BiobankEntryForm implements
 				try {
 					sample.setPatientVisit(patientVisit);
 					appService.executeQuery(new InsertExampleQuery(sample));
-					boolean doPrint = MessageDialog.openQuestion(PlatformUI
-						.getWorkbench().getActiveWorkbenchWindow().getShell(),
-						"Print", "Do you want to print information ?");
-					if (doPrint) {
-						// FIXME implement print functionnality
+					if (BioBankPlugin.isAskPrint()) {
+						boolean doPrint = MessageDialog.openQuestion(PlatformUI
+							.getWorkbench().getActiveWorkbenchWindow()
+							.getShell(), "Print",
+							"Do you want to print information ?");
+						if (doPrint) {
+							// FIXME implement print functionnality
+						}
 					}
 					getSite().getPage().closeEditor(
 						ProcessCabinetEntryForm.this, false);
