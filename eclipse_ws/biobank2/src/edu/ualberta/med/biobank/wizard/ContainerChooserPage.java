@@ -46,23 +46,23 @@ public class ContainerChooserPage extends AbstractContainerChooserPage {
 		});
 		try {
 			comboViewer.setInput(ModelUtils.getTopContainersForSite(
-					getAppService(), getSite()));
+				getAppService(), getSite()));
 		} catch (ApplicationException e) {
 			BioBankPlugin.openError("Error",
-					"Error retrieving containers informations from database");
+				"Error retrieving containers informations from database");
 		}
 		comboViewer
-				.addSelectionChangedListener(new ISelectionChangedListener() {
-					@Override
-					public void selectionChanged(SelectionChangedEvent event) {
-						setCurrentStorageContainer((StorageContainer) ((IStructuredSelection) comboViewer
-								.getSelection()).getFirstElement());
-						updateFreezerGrid();
-						pageContainer.layout(true, true);
-						textPosition.setText("");
-						setPageComplete(false);
-					}
-				});
+			.addSelectionChangedListener(new ISelectionChangedListener() {
+				@Override
+				public void selectionChanged(SelectionChangedEvent event) {
+					setCurrentStorageContainer((StorageContainer) ((IStructuredSelection) comboViewer
+						.getSelection()).getFirstElement());
+					updateFreezerGrid();
+					pageContainer.layout(true, true);
+					textPosition.setText("");
+					setPageComplete(false);
+				}
+			});
 
 		super.initComponent();
 		containerWidget.setVisible(false);
@@ -75,7 +75,7 @@ public class ContainerChooserPage extends AbstractContainerChooserPage {
 			PalettePositionChooserPage nextPage = (PalettePositionChooserPage) getNextPage();
 			try {
 				nextPage.setCurrentStorageContainer(cell.getPosition()
-						.getOccupiedContainer());
+					.getOccupiedContainer());
 			} catch (ArrayIndexOutOfBoundsException aiobe) {
 				setPageComplete(false);
 				SessionManager.getLogger().error("Index error", aiobe);
@@ -98,9 +98,9 @@ public class ContainerChooserPage extends AbstractContainerChooserPage {
 				total = occupiedContainer.getOccupiedPositions().size();
 			}
 			int capacityTotal = occupiedContainer.getStorageType()
-					.getCapacity().getDimensionOneCapacity()
+				.getCapacity().getDimensionOneCapacity()
 					* occupiedContainer.getStorageType().getCapacity()
-							.getDimensionTwoCapacity();
+						.getDimensionTwoCapacity();
 			full = (total == capacityTotal);
 		}
 		if (full) {

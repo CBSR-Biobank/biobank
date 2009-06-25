@@ -15,9 +15,9 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.forms.LinkSamplesEntryForm;
-import edu.ualberta.med.biobank.forms.ProcessCabinetEntryForm;
-import edu.ualberta.med.biobank.forms.ProcessSamplesEntryForm;
+import edu.ualberta.med.biobank.forms.AddPaletteSamplesEntryForm;
+import edu.ualberta.med.biobank.forms.AddCabinetSampleEntryForm;
+import edu.ualberta.med.biobank.forms.AssignSamplesLocationEntryForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
@@ -283,7 +283,7 @@ public abstract class Node {
 		for (IEditorReference editorRef : editors) {
 			IEditorPart editor = editorRef.getEditor(false);
 			if (editor != null
-					&& (editor instanceof LinkSamplesEntryForm || editor instanceof ProcessSamplesEntryForm)) {
+					&& (editor instanceof AddPaletteSamplesEntryForm || editor instanceof AssignSamplesLocationEntryForm)) {
 				page.closeEditor(editor, true);
 			}
 		}
@@ -296,7 +296,7 @@ public abstract class Node {
 		IEditorReference[] editors = page.getEditorReferences();
 		for (IEditorReference editorRef : editors) {
 			IEditorPart editor = editorRef.getEditor(false);
-			if (editor != null && editor instanceof ProcessCabinetEntryForm) {
+			if (editor != null && editor instanceof AddCabinetSampleEntryForm) {
 				page.closeEditor(editor, true);
 			}
 		}

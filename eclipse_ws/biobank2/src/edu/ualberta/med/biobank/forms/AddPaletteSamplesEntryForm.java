@@ -46,18 +46,16 @@ import edu.ualberta.med.biobank.model.ScanCell;
 import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.PatientVisitAdapter;
 import edu.ualberta.med.biobank.validators.ScannerBarcodeValidator;
-import edu.ualberta.med.biobank.widgets.LinkSampleTypeWidget;
-import edu.ualberta.med.biobank.widgets.ScanLinkPaletteWidget;
+import edu.ualberta.med.biobank.widgets.AddSamplesScanPaletteWidget;
+import edu.ualberta.med.biobank.widgets.SampleTypeSelectionWidget;
 import edu.ualberta.med.biobank.widgets.listener.ScanPaletteModificationEvent;
 import edu.ualberta.med.biobank.widgets.listener.ScanPaletteModificationListener;
 import gov.nih.nci.system.query.SDKQuery;
 import gov.nih.nci.system.query.example.InsertExampleQuery;
 
-public class LinkSamplesEntryForm extends BiobankEntryForm {
+public class AddPaletteSamplesEntryForm extends BiobankEntryForm {
 
-	public static final String ID = "edu.ualberta.med.biobank.forms.LinkSamplesEntryForm";
-
-	private Button submit;
+	public static final String ID = "edu.ualberta.med.biobank.forms.AddPaletteSamplesEntryForm";
 
 	private Button scan;
 
@@ -67,9 +65,9 @@ public class LinkSamplesEntryForm extends BiobankEntryForm {
 
 	private Composite typesSelectionPerRowComposite;
 
-	private ScanLinkPaletteWidget spw;
+	private AddSamplesScanPaletteWidget spw;
 
-	private List<LinkSampleTypeWidget> sampleTypeWidgets;
+	private List<SampleTypeSelectionWidget> sampleTypeWidgets;
 
 	private IObservableValue scannedValue = new WritableValue(Boolean.FALSE,
 		Boolean.class);
@@ -78,13 +76,11 @@ public class LinkSamplesEntryForm extends BiobankEntryForm {
 	private IObservableValue typesFilled = new WritableValue(Boolean.TRUE,
 		Boolean.class);
 
-	private Button cancel;
-
 	private Text plateToScanText;
 
 	private Composite typesSelectionCustomComposite;
 
-	private LinkSampleTypeWidget customSelection;
+	private SampleTypeSelectionWidget customSelection;
 
 	private Composite radioComponents;
 
@@ -105,17 +101,17 @@ public class LinkSamplesEntryForm extends BiobankEntryForm {
 		patientVisit = pvAdapter.getPatientVisit();
 		appService = pvAdapter.getAppService();
 
-		setPartName("Link samples for " + patientVisit.getPatient().getNumber());
+		setPartName("Add samples for " + patientVisit.getPatient().getNumber());
 	}
 
 	@Override
 	protected void handleStatusChanged(IStatus status) {
 		if (status.getSeverity() == IStatus.OK) {
-			form.setMessage("Linking samples.", IMessageProvider.NONE);
-			submit.setEnabled(true);
+			form.setMessage("Adding samples.", IMessageProvider.NONE);
+			confirmButton.setEnabled(true);
 		} else {
 			form.setMessage(status.getMessage(), IMessageProvider.ERROR);
-			submit.setEnabled(false);
+			confirmButton.setEnabled(false);
 			if (!BioBankPlugin.getDefault().isValidPlateBarcode(
 				plateToScanText.getText())) {
 				scan.setEnabled(false);
@@ -127,7 +123,7 @@ public class LinkSamplesEntryForm extends BiobankEntryForm {
 
 	@Override
 	protected void createFormContent() {
-		form.setText("Link samples for patient "
+		form.setText("Adding samples for patient "
 				+ patientVisit.getPatient().getNumber() + " for visit "
 				+ patientVisit.getNumber());
 
@@ -180,7 +176,7 @@ public class LinkSamplesEntryForm extends BiobankEntryForm {
 		gd.grabExcessHorizontalSpace = true;
 		client.setLayoutData(gd);
 
-		spw = new ScanLinkPaletteWidget(client);
+		spw = new AddSamplesScanPaletteWidget(client);
 		spw.setVisible(true);
 		toolkit.adapt(spw);
 		spw.setLayoutData(new GridData(SWT.CENTER, SWT.TOP, true, false));
@@ -216,7 +212,7 @@ public class LinkSamplesEntryForm extends BiobankEntryForm {
 				if (radioRowSelection.getSelection()) {
 					selectionStackLayout.topControl = typesSelectionPerRowComposite;
 					selectionComp.layout();
-					for (LinkSampleTypeWidget sampleType : sampleTypeWidgets) {
+					for (SampleTypeSelectionWidget sampleType : sampleTypeWidgets) {
 						sampleType.addBinding(dbc);
 						sampleType.resetValues(false);
 					}
@@ -233,7 +229,7 @@ public class LinkSamplesEntryForm extends BiobankEntryForm {
 				if (radioCustomSelection.getSelection()) {
 					selectionStackLayout.topControl = typesSelectionCustomComposite;
 					selectionComp.layout();
-					for (LinkSampleTypeWidget sampleType : sampleTypeWidgets) {
+					for (SampleTypeSelectionWidget sampleType : sampleTypeWidgets) {
 						sampleType.removeBinding(dbc);
 					}
 					customSelection.addBinding(dbc);
@@ -258,7 +254,7 @@ public class LinkSamplesEntryForm extends BiobankEntryForm {
 		gd.horizontalSpan = 3;
 		label.setLayoutData(gd);
 
-		customSelection = new LinkSampleTypeWidget(
+		customSelection = new SampleTypeSelectionWidget(
 			typesSelectionCustomComposite, null, sampleTypes, toolkit);
 		customSelection.resetValues(true);
 
@@ -296,10 +292,10 @@ public class LinkSamplesEntryForm extends BiobankEntryForm {
 		typesSelectionPerRowComposite.setLayout(layout);
 		toolkit.paintBordersFor(typesSelectionPerRowComposite);
 
-		sampleTypeWidgets = new ArrayList<LinkSampleTypeWidget>();
+		sampleTypeWidgets = new ArrayList<SampleTypeSelectionWidget>();
 		char letter = 'A';
 		for (int i = 0; i < ScanCell.ROW_MAX; i++) {
-			final LinkSampleTypeWidget typeWidget = new LinkSampleTypeWidget(
+			final SampleTypeSelectionWidget typeWidget = new SampleTypeSelectionWidget(
 				typesSelectionPerRowComposite, letter, sampleTypes, toolkit);
 			final int indexRow = i;
 			typeWidget
@@ -357,21 +353,9 @@ public class LinkSamplesEntryForm extends BiobankEntryForm {
 		client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		toolkit.paintBordersFor(client);
 
-		cancel = toolkit.createButton(client, "Cancel", SWT.PUSH);
-		cancel.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				cancel();
-			}
-		});
+		initCancelButton(client);
 
-		submit = toolkit.createButton(client, "Submit", SWT.PUSH);
-		submit.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				doSaveInternal();
-			}
-		});
+		initConfirmButton(client, true, false);
 	}
 
 	private void scan() {
@@ -457,8 +441,8 @@ public class LinkSamplesEntryForm extends BiobankEntryForm {
 							// FIXME implement print functionnality
 						}
 					}
-					getSite().getPage().closeEditor(LinkSamplesEntryForm.this,
-						false);
+					getSite().getPage().closeEditor(
+						AddPaletteSamplesEntryForm.this, false);
 					pvAdapter.performExpand();
 					Node.openForm(new FormInput(pvAdapter),
 						PatientVisitViewForm.ID);
@@ -466,13 +450,14 @@ public class LinkSamplesEntryForm extends BiobankEntryForm {
 					BioBankPlugin.openRemoteConnectErrorMessage();
 				} catch (Exception e) {
 					SessionManager.getLogger().error(
-						"Error when linking samples", e);
+						"Error when adding samples", e);
 				}
 			}
 		});
 	}
 
-	private void setTypeForRow(LinkSampleTypeWidget typeWidget, int indexRow) {
+	private void setTypeForRow(SampleTypeSelectionWidget typeWidget,
+			int indexRow) {
 		if (typeWidget.needToSave()) {
 			SampleType type = typeWidget.getSelection();
 			ScanCell[][] cells = spw.getScannedElements();
@@ -486,9 +471,10 @@ public class LinkSamplesEntryForm extends BiobankEntryForm {
 		}
 	}
 
-	protected void cancel() {
+	@Override
+	protected void cancelForm() {
 		spw.setScannedElements(null);
-		for (LinkSampleTypeWidget stw : sampleTypeWidgets) {
+		for (SampleTypeSelectionWidget stw : sampleTypeWidgets) {
 			stw.resetValues(true);
 		}
 	}

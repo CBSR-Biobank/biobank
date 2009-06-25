@@ -33,7 +33,7 @@ import org.springframework.remoting.RemoteConnectFailureException;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.forms.input.FormInput;
-import edu.ualberta.med.biobank.forms.listener.CancelSubmitKeyListener;
+import edu.ualberta.med.biobank.forms.listener.CancelConfirmKeyListener;
 import edu.ualberta.med.biobank.forms.listener.EnterKeyToNextFieldListener;
 import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.ContainerPosition;
@@ -59,10 +59,10 @@ import gov.nih.nci.system.query.SDKQueryResult;
 import gov.nih.nci.system.query.example.InsertExampleQuery;
 import gov.nih.nci.system.query.example.UpdateExampleQuery;
 
-public class ProcessSamplesEntryForm extends BiobankEntryForm implements
+public class AssignSamplesLocationEntryForm extends BiobankEntryForm implements
 		CancelConfirmForm {
 
-	public static final String ID = "edu.ualberta.med.biobank.forms.ProcessSamplesEntryForm";
+	public static final String ID = "edu.ualberta.med.biobank.forms.AssignSamplesLocationEntryForm";
 
 	private ScanPaletteWidget paletteWidget;
 	private ViewStorageContainerWidget hotelWidget;
@@ -72,8 +72,6 @@ public class ProcessSamplesEntryForm extends BiobankEntryForm implements
 	private Text paletteCodeText;
 	private Button scanButton;
 	private Text confirmCancelText;
-	private Button cancelButton;
-	private Button submitButton;
 	private Button locateButton;
 
 	private IObservableValue plateToScanValue = new WritableValue("",
@@ -125,12 +123,12 @@ public class ProcessSamplesEntryForm extends BiobankEntryForm implements
 		sessionAdapter = (SessionAdapter) node;
 		appService = node.getAppService();
 
-		setPartName("Process samples");
+		setPartName("Assign samples location");
 	}
 
 	@Override
 	protected void createFormContent() {
-		form.setText("Processing samples");
+		form.setText("Assign samples location");
 
 		GridLayout layout = new GridLayout(1, false);
 		form.getBody().setLayout(layout);
@@ -167,20 +165,13 @@ public class ProcessSamplesEntryForm extends BiobankEntryForm implements
 		freezerComposite.setLayout(getNeutralGridLayout());
 		GridData gdFreezer = new GridData();
 		gdFreezer.horizontalSpan = 2;
+		gdFreezer.horizontalAlignment = SWT.RIGHT;
 		freezerComposite.setLayoutData(gdFreezer);
 		freezerLabel = toolkit.createLabel(freezerComposite, "Freezer");
 		freezerLabel.setLayoutData(new GridData());
 		freezerWidget = new ViewStorageContainerWidget(freezerComposite);
 		toolkit.adapt(freezerWidget);
 		freezerWidget.setGridSizes(5, 10, ScanPaletteWidget.PALETTE_WIDTH, 100);
-
-		Composite paletteComposite = toolkit
-			.createComposite(containersComposite);
-		paletteComposite.setLayout(getNeutralGridLayout());
-		paletteComposite.setLayoutData(new GridData());
-		paletteLabel = toolkit.createLabel(paletteComposite, "Palette");
-		paletteWidget = new ScanPaletteWidget(paletteComposite);
-		toolkit.adapt(paletteWidget);
 
 		Composite hotelComposite = toolkit.createComposite(containersComposite);
 		hotelComposite.setLayout(getNeutralGridLayout());
@@ -192,6 +183,15 @@ public class ProcessSamplesEntryForm extends BiobankEntryForm implements
 			ScanPaletteWidget.PALETTE_HEIGHT_AND_LEGEND);
 		hotelWidget.setFirstColSign(null);
 		hotelWidget.setFirstRowSign(1);
+
+		Composite paletteComposite = toolkit
+			.createComposite(containersComposite);
+		paletteComposite.setLayout(getNeutralGridLayout());
+		paletteComposite.setLayoutData(new GridData());
+		paletteLabel = toolkit.createLabel(paletteComposite, "Palette");
+		paletteWidget = new ScanPaletteWidget(paletteComposite);
+		toolkit.adapt(paletteWidget);
+
 	}
 
 	private GridLayout getNeutralGridLayout() {
@@ -233,9 +233,9 @@ public class ProcessSamplesEntryForm extends BiobankEntryForm implements
 			gd.horizontalSpan = 2;
 			comp.setLayoutData(gd);
 			notexistsButton = toolkit.createButton(comp,
-				"Scan non processed Samples", SWT.RADIO);
+				"Scan non localised Samples", SWT.RADIO);
 			notexistsButton.setSelection(true);
-			existsButton = toolkit.createButton(comp, "Scan processed sample",
+			existsButton = toolkit.createButton(comp, "Scan localised sample",
 				SWT.RADIO);
 			toolkit.createButton(comp, "Default sample", SWT.RADIO);
 		}
@@ -274,24 +274,13 @@ public class ProcessSamplesEntryForm extends BiobankEntryForm implements
 		gd = new GridData();
 		gd.widthHint = 100;
 		confirmCancelText.setLayoutData(gd);
-		confirmCancelText.addKeyListener(new CancelSubmitKeyListener(this));
+		confirmCancelText.addKeyListener(new CancelConfirmKeyListener(this));
 
-		cancelButton = toolkit.createButton(client, "Cancel", SWT.PUSH);
-		cancelButton.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				cancelForm();
-			}
-		});
+		initCancelButton(client);
 
-		submitButton = toolkit.createButton(client, "Submit", SWT.PUSH);
-		submitButton.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				doSaveInternal();
-			}
-		});
-		confirmCancelText.addKeyListener(new CancelSubmitKeyListener(this));
+		initConfirmButton(client, true, false);
+
+		confirmCancelText.addKeyListener(new CancelConfirmKeyListener(this));
 	}
 
 	protected void chooseLocation() {
@@ -310,7 +299,7 @@ public class ProcessSamplesEntryForm extends BiobankEntryForm implements
 			showOnlyPalette(false);
 			showPalettePosition(currentPalette);
 		}
-		form.getBody().layout(true, true);
+		form.reflow(true);
 	}
 
 	private void initNewPalette(ContainerPosition position, StorageType type) {
@@ -368,7 +357,7 @@ public class ProcessSamplesEntryForm extends BiobankEntryForm implements
 						showAllContainers(false);
 					}
 					scanButton.traverse(SWT.TRAVERSE_TAB_NEXT);
-					form.layout(true, true);
+					form.reflow(true);
 				} catch (RemoteConnectFailureException exp) {
 					BioBankPlugin.openRemoteConnectErrorMessage();
 				} catch (Exception e) {
@@ -435,9 +424,9 @@ public class ProcessSamplesEntryForm extends BiobankEntryForm implements
 	 */
 	protected void showStudyInformation() {
 		if (currentStudy == null) {
-			form.setText("Processing samples");
+			form.setText("Assigning samples location");
 		} else {
-			form.setText("Processing samples for study "
+			form.setText("Assigning samples location for study "
 					+ currentStudy.getNameShort());
 		}
 	}
@@ -567,7 +556,7 @@ public class ProcessSamplesEntryForm extends BiobankEntryForm implements
 					}
 
 					getSite().getPage().closeEditor(
-						ProcessSamplesEntryForm.this, false);
+						AssignSamplesLocationEntryForm.this, false);
 					Node node = sessionAdapter.accept(new NodeSearchVisitor(
 						StorageContainer.class, currentPalette.getId()));
 					if (node != null) {
@@ -579,12 +568,13 @@ public class ProcessSamplesEntryForm extends BiobankEntryForm implements
 					BioBankPlugin.openRemoteConnectErrorMessage();
 				} catch (Exception e) {
 					SessionManager.getLogger().error(
-						"Error when saving palette process", e);
+						"Error when saving palette location", e);
 				}
 			}
 		});
 	}
 
+	@Override
 	protected void cancelForm() {
 		freezerWidget.setSelectedBox(null);
 		hotelWidget.setSelectedBox(null);
@@ -598,13 +588,14 @@ public class ProcessSamplesEntryForm extends BiobankEntryForm implements
 	@Override
 	protected void handleStatusChanged(IStatus status) {
 		if (status.getSeverity() == IStatus.OK) {
-			form.setMessage("Processing samples.", IMessageProvider.NONE);
-			submitButton.setEnabled(true);
+			form.setMessage("Assigning samples location.",
+				IMessageProvider.NONE);
+			confirmButton.setEnabled(true);
 			scanButton.setEnabled(true);
 			locateButton.setEnabled(true);
 		} else {
 			form.setMessage(status.getMessage(), IMessageProvider.ERROR);
-			submitButton.setEnabled(false);
+			confirmButton.setEnabled(false);
 			if (!BioBankPlugin.getDefault().isValidPlateBarcode(
 				plateToScanText.getText())) {
 				scanButton.setEnabled(false);
@@ -631,7 +622,7 @@ public class ProcessSamplesEntryForm extends BiobankEntryForm implements
 	}
 
 	public boolean isConfirmEnabled() {
-		return submitButton.isEnabled();
+		return confirmButton.isEnabled();
 	}
 
 	/**

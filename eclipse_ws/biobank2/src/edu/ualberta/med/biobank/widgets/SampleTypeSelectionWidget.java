@@ -32,11 +32,11 @@ import edu.ualberta.med.biobank.forms.FormUtils;
 import edu.ualberta.med.biobank.model.SampleType;
 
 /**
- * Create 3 widgets to show types selection for sample in scan link : one label,
+ * Create 3 widgets to show types selection for samples on a palette: one label,
  * one combo with different types and one text showing total number of samples
  * found
  */
-public class LinkSampleTypeWidget {
+public class SampleTypeSelectionWidget {
 	private Combo combo;
 	private ComboViewer cv;
 	private ControlDecoration controlDecoration;
@@ -47,7 +47,7 @@ public class LinkSampleTypeWidget {
 		Boolean.class);
 	private Binding binding;
 
-	public LinkSampleTypeWidget(Composite parent, Character letter,
+	public SampleTypeSelectionWidget(Composite parent, Character letter,
 			List<SampleType> types, FormToolkit toolkit) {
 
 		if (letter != null) {

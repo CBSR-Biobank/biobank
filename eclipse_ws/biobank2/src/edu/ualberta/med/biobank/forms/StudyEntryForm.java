@@ -13,11 +13,8 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
@@ -84,8 +81,6 @@ public class StudyEntryForm extends BiobankEntryForm {
 	private Collection<Clinic> allClinics;
 
 	private Collection<SdataType> allSdataTypes;
-
-	private Button submit;
 
 	private TreeMap<String, SdataWidget> sdataWidgets;
 
@@ -207,13 +202,7 @@ public class StudyEntryForm extends BiobankEntryForm {
 		client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		toolkit.paintBordersFor(client);
 
-		submit = toolkit.createButton(client, "Submit", SWT.PUSH);
-		submit.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				doSaveInternal();
-			}
-		});
+		initConfirmButton(client, true, false);
 	}
 
 	private String getOkMessage() {
@@ -227,10 +216,10 @@ public class StudyEntryForm extends BiobankEntryForm {
 	protected void handleStatusChanged(IStatus status) {
 		if (status.getSeverity() == IStatus.OK) {
 			form.setMessage(getOkMessage(), IMessageProvider.NONE);
-			submit.setEnabled(true);
+			confirmButton.setEnabled(true);
 		} else {
 			form.setMessage(status.getMessage(), IMessageProvider.ERROR);
-			submit.setEnabled(false);
+			confirmButton.setEnabled(false);
 		}
 	}
 
@@ -364,5 +353,11 @@ public class StudyEntryForm extends BiobankEntryForm {
 		}
 
 		return true;
+	}
+
+	@Override
+	protected void cancelForm() {
+		// TODO Auto-generated method stub
+
 	}
 }

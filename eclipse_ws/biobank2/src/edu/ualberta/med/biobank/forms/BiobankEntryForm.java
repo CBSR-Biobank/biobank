@@ -29,6 +29,7 @@ import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -39,6 +40,7 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.ISaveablePart;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
 import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
@@ -63,6 +65,10 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
 	protected IStatus currentStatus;
 
 	protected DataBindingContext dbc;
+
+	protected Button confirmButton;
+
+	protected Button cancelButton;
 
 	protected KeyListener keyListener = new KeyListener() {
 		@Override
@@ -141,6 +147,41 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
 	public void setFocus() {
 		form.setFocus();
 	}
+
+	protected void initConfirmButton(Composite parent,
+			boolean doSaveInternalAction, boolean doSaveEditorAction) {
+		confirmButton = toolkit.createButton(parent, "Confirm", SWT.PUSH);
+		if (doSaveInternalAction) {
+			confirmButton.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(SelectionEvent e) {
+					doSaveInternal();
+				}
+			});
+		}
+		if (doSaveEditorAction) {
+			confirmButton.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(SelectionEvent e) {
+					PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+						.getActivePage().saveEditor(BiobankEntryForm.this,
+							false);
+				}
+			});
+		}
+	}
+
+	protected void initCancelButton(Composite parent) {
+		cancelButton = toolkit.createButton(parent, "Cancel", SWT.PUSH);
+		cancelButton.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				cancelForm();
+			}
+		});
+	}
+
+	protected abstract void cancelForm();
 
 	public String getSessionName() {
 		return sessionName;

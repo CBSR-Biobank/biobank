@@ -7,18 +7,14 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.PlatformUI;
 import org.springframework.remoting.RemoteAccessException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
@@ -49,7 +45,6 @@ public class SiteEntryForm extends AddressEntryFormCommon {
 	private Site site;
 
 	protected Combo session;
-	private Button submit;
 
 	@Override
 	public void init(IEditorSite editorSite, IEditorInput input)
@@ -128,14 +123,7 @@ public class SiteEntryForm extends AddressEntryFormCommon {
 		client.setLayout(layout);
 		toolkit.paintBordersFor(client);
 
-		submit = toolkit.createButton(client, "Submit", SWT.PUSH);
-		submit.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-					.getActivePage().saveEditor(SiteEntryForm.this, false);
-			}
-		});
+		initConfirmButton(client, false, true);
 	}
 
 	private String getOkMessage() {
@@ -149,10 +137,10 @@ public class SiteEntryForm extends AddressEntryFormCommon {
 	protected void handleStatusChanged(IStatus status) {
 		if (status.getSeverity() == IStatus.OK) {
 			form.setMessage(getOkMessage(), IMessageProvider.NONE);
-			submit.setEnabled(true);
+			confirmButton.setEnabled(true);
 		} else {
 			form.setMessage(status.getMessage(), IMessageProvider.ERROR);
-			submit.setEnabled(false);
+			confirmButton.setEnabled(false);
 		}
 	}
 
@@ -224,5 +212,11 @@ public class SiteEntryForm extends AddressEntryFormCommon {
 	@Override
 	public void setFocus() {
 		form.setFocus();
+	}
+
+	@Override
+	protected void cancelForm() {
+		// TODO Auto-generated method stub
+
 	}
 }

@@ -16,10 +16,10 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.forms.LinkSamplesEntryForm;
+import edu.ualberta.med.biobank.forms.AddPaletteSamplesEntryForm;
 import edu.ualberta.med.biobank.forms.PatientVisitEntryForm;
 import edu.ualberta.med.biobank.forms.PatientVisitViewForm;
-import edu.ualberta.med.biobank.forms.ProcessCabinetEntryForm;
+import edu.ualberta.med.biobank.forms.AddCabinetSampleEntryForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.ModelUtils;
 import edu.ualberta.med.biobank.model.PatientVisit;
@@ -105,7 +105,7 @@ public class PatientVisitAdapter extends Node {
 			public void widgetSelected(SelectionEvent event) {
 				closeScannersEditors();
 				openForm(new FormInput(PatientVisitAdapter.this),
-					LinkSamplesEntryForm.ID);
+					AddPaletteSamplesEntryForm.ID);
 			}
 
 			public void widgetDefaultSelected(SelectionEvent e) {
@@ -118,7 +118,7 @@ public class PatientVisitAdapter extends Node {
 			public void widgetSelected(SelectionEvent event) {
 				closeCabinetsEditors();
 				openForm(new FormInput(PatientVisitAdapter.this),
-					ProcessCabinetEntryForm.ID);
+					AddCabinetSampleEntryForm.ID);
 			}
 
 			public void widgetDefaultSelected(SelectionEvent e) {

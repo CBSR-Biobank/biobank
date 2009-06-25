@@ -20,7 +20,11 @@ import edu.ualberta.med.biobank.model.SampleCellStatus;
 import edu.ualberta.med.biobank.model.ScanCell;
 import edu.ualberta.med.biobank.widgets.listener.ScanPaletteModificationEvent;
 
-public class ScanLinkPaletteWidget extends ScanPaletteWidget {
+/**
+ * Widget to draw a palette for add palette samples screen. Can do selections
+ * inside the palette to assign a type
+ */
+public class AddSamplesScanPaletteWidget extends ScanPaletteWidget {
 
 	private List<ScanCell> selectedCells;
 	private ScanCell lastSelectedCell;
@@ -34,7 +38,7 @@ public class ScanLinkPaletteWidget extends ScanPaletteWidget {
 		NONE, MULTI, RANGE;
 	}
 
-	public ScanLinkPaletteWidget(Composite parent) {
+	public AddSamplesScanPaletteWidget(Composite parent) {
 		super(parent);
 		selectedCells = new ArrayList<ScanCell>();
 		initListeners();

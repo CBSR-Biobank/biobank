@@ -76,7 +76,7 @@ public class SampleViewForm extends BiobankViewForm {
 
 		String string = "Type = " + sample.getSampleType().getName() + "\n";
 		if (sample.getSamplePosition() == null) {
-			string += "No position - should be processed";
+			string += "No position - should be assign to a location";
 		} else {
 			string += "Position = "
 					+ sample.getSamplePosition().getPositionDimensionOne()

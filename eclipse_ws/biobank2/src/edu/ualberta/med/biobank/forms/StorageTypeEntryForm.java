@@ -13,18 +13,14 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
@@ -69,8 +65,6 @@ public class StorageTypeEntryForm extends BiobankEntryForm {
 	private StorageType storageType;
 
 	private Capacity capacity;
-
-	private Button submit;
 
 	private MultiSelect samplesMultiSelect;
 
@@ -271,25 +265,17 @@ public class StorageTypeEntryForm extends BiobankEntryForm {
 		client.setLayout(layout);
 		toolkit.paintBordersFor(client);
 
-		submit = toolkit.createButton(client, "Submit", SWT.PUSH);
-		submit.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-					.getActivePage().saveEditor(StorageTypeEntryForm.this,
-						false);
-			}
-		});
+		initConfirmButton(client, false, true);
 	}
 
 	@Override
 	protected void handleStatusChanged(IStatus status) {
 		if (status.getSeverity() == IStatus.OK) {
 			form.setMessage(getOkMessage(), IMessageProvider.NONE);
-			submit.setEnabled(true);
+			confirmButton.setEnabled(true);
 		} else {
 			form.setMessage(status.getMessage(), IMessageProvider.ERROR);
-			submit.setEnabled(false);
+			confirmButton.setEnabled(false);
 		}
 	}
 
@@ -404,5 +390,11 @@ public class StorageTypeEntryForm extends BiobankEntryForm {
 			"A storage type with name \"" + storageType.getName()
 					+ "\" already exists.");
 		return false;
+	}
+
+	@Override
+	protected void cancelForm() {
+		// TODO Auto-generated method stub
+
 	}
 }

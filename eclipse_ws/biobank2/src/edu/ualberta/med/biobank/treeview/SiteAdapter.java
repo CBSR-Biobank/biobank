@@ -16,7 +16,7 @@ import org.springframework.remoting.RemoteAccessException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.forms.ProcessSamplesEntryForm;
+import edu.ualberta.med.biobank.forms.AssignSamplesLocationEntryForm;
 import edu.ualberta.med.biobank.forms.SiteEntryForm;
 import edu.ualberta.med.biobank.forms.SiteViewForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
@@ -120,12 +120,12 @@ public class SiteAdapter extends Node {
 		});
 
 		mi = new MenuItem(menu, SWT.PUSH);
-		mi.setText("Process samples");
+		mi.setText("Assign samples locations");
 		mi.addSelectionListener(new SelectionListener() {
 			public void widgetSelected(SelectionEvent event) {
 				closeScannersEditors();
 				openForm(new FormInput(SiteAdapter.this.getParent()),
-					ProcessSamplesEntryForm.ID);
+					AssignSamplesLocationEntryForm.ID);
 			}
 
 			public void widgetDefaultSelected(SelectionEvent e) {

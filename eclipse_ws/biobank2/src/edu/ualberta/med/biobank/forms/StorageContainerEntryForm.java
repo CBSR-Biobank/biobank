@@ -19,11 +19,8 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
@@ -31,7 +28,6 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.forms.input.FormInput;
@@ -79,8 +75,6 @@ public class StorageContainerEntryForm extends BiobankEntryForm {
 	private Label dimensionOneLabel;
 
 	private Label dimensionTwoLabel;
-
-	private Button submit;
 
 	private StorageType currentStorageType;
 
@@ -270,15 +264,7 @@ public class StorageContainerEntryForm extends BiobankEntryForm {
 		client.setLayout(layout);
 		toolkit.paintBordersFor(client);
 
-		submit = toolkit.createButton(client, "Submit", SWT.PUSH);
-		submit.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-					.getActivePage().saveEditor(StorageContainerEntryForm.this,
-						false);
-			}
-		});
+		initConfirmButton(client, false, true);
 	}
 
 	private void bindStorageTypeCombo(Label label, Combo combo) {
@@ -303,10 +289,10 @@ public class StorageContainerEntryForm extends BiobankEntryForm {
 	protected void handleStatusChanged(IStatus status) {
 		if (status.getSeverity() == IStatus.OK) {
 			form.setMessage(getOkMessage(), IMessageProvider.NONE);
-			submit.setEnabled(true);
+			confirmButton.setEnabled(true);
 		} else {
 			form.setMessage(status.getMessage(), IMessageProvider.ERROR);
-			submit.setEnabled(false);
+			confirmButton.setEnabled(false);
 		}
 	}
 
@@ -375,5 +361,11 @@ public class StorageContainerEntryForm extends BiobankEntryForm {
 			"A storage container with name \"" + storageContainer.getName()
 					+ "\" already exists.");
 		return false;
+	}
+
+	@Override
+	protected void cancelForm() {
+		// TODO Auto-generated method stub
+
 	}
 }

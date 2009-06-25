@@ -20,7 +20,7 @@ public class ViewStorageContainerWidget extends AbstractGridContainerWidget {
 			int indexRow, int indexCol) {
 		if (selectedBox != null && selectedBox.x == indexRow
 				&& selectedBox.y == indexCol) {
-			Color color = e.display.getSystemColor(SWT.COLOR_CYAN);
+			Color color = e.display.getSystemColor(SWT.COLOR_RED);
 			e.gc.setBackground(color);
 			e.gc.fillRectangle(rectangle);
 		}

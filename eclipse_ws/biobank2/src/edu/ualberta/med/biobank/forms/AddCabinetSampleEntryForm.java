@@ -33,7 +33,7 @@ import org.springframework.remoting.RemoteConnectFailureException;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.forms.input.FormInput;
-import edu.ualberta.med.biobank.forms.listener.CancelSubmitKeyListener;
+import edu.ualberta.med.biobank.forms.listener.CancelConfirmKeyListener;
 import edu.ualberta.med.biobank.forms.listener.EnterKeyToNextFieldListener;
 import edu.ualberta.med.biobank.model.ModelUtils;
 import edu.ualberta.med.biobank.model.PatientVisit;
@@ -51,10 +51,10 @@ import edu.ualberta.med.biobank.widgets.ViewStorageContainerWidget;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.query.example.InsertExampleQuery;
 
-public class ProcessCabinetEntryForm extends BiobankEntryForm implements
+public class AddCabinetSampleEntryForm extends BiobankEntryForm implements
 		CancelConfirmForm {
 
-	public static final String ID = "edu.ualberta.med.biobank.forms.ProcessCabinetEntryForm";
+	public static final String ID = "edu.ualberta.med.biobank.forms.AddCabinetSampleEntryForm";
 
 	private PatientVisitAdapter pvAdapter;
 	private PatientVisit patientVisit;
@@ -70,8 +70,6 @@ public class ProcessCabinetEntryForm extends BiobankEntryForm implements
 	private Button showPosition;
 
 	private Text confirmCancelText;
-	private Button cancel;
-	private Button submit;
 
 	private IObservableValue cabinetPosition = new WritableValue("",
 		String.class);
@@ -103,13 +101,13 @@ public class ProcessCabinetEntryForm extends BiobankEntryForm implements
 		patientVisit = pvAdapter.getPatientVisit();
 		appService = pvAdapter.getAppService();
 
-		setPartName("Process cabinet sample for "
+		setPartName("Add cabinet sample for "
 				+ patientVisit.getPatient().getNumber());
 	}
 
 	@Override
 	protected void createFormContent() {
-		form.setText("Process cabinet samples for patient "
+		form.setText("Add cabinet samples for patient "
 				+ patientVisit.getPatient().getNumber() + " for visit "
 				+ patientVisit.getNumber());
 
@@ -232,24 +230,13 @@ public class ProcessCabinetEntryForm extends BiobankEntryForm implements
 		GridData gd = new GridData();
 		gd.widthHint = 100;
 		confirmCancelText.setLayoutData(gd);
-		confirmCancelText.addKeyListener(new CancelSubmitKeyListener(this));
+		confirmCancelText.addKeyListener(new CancelConfirmKeyListener(this));
 
-		cancel = toolkit.createButton(client, "Cancel", SWT.PUSH);
-		cancel.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				cancelForm();
-			}
-		});
+		initConfirmButton(client, true, false);
 
-		submit = toolkit.createButton(client, "Submit", SWT.PUSH);
-		submit.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				doSaveInternal();
-			}
-		});
-		confirmCancelText.addKeyListener(new CancelSubmitKeyListener(this));
+		initConfirmButton(client, true, false);
+
+		confirmCancelText.addKeyListener(new CancelConfirmKeyListener(this));
 	}
 
 	protected void showPositionResult() {
@@ -340,6 +327,7 @@ public class ProcessCabinetEntryForm extends BiobankEntryForm implements
 		return sp;
 	}
 
+	@Override
 	protected void cancelForm() {
 		sample = null;
 		cabinet = null;
@@ -370,7 +358,7 @@ public class ProcessCabinetEntryForm extends BiobankEntryForm implements
 						}
 					}
 					getSite().getPage().closeEditor(
-						ProcessCabinetEntryForm.this, false);
+						AddCabinetSampleEntryForm.this, false);
 				} catch (RemoteConnectFailureException exp) {
 					BioBankPlugin.openRemoteConnectErrorMessage();
 				} catch (Exception e) {
@@ -384,12 +372,12 @@ public class ProcessCabinetEntryForm extends BiobankEntryForm implements
 	@Override
 	protected void handleStatusChanged(IStatus status) {
 		if (status.getSeverity() == IStatus.OK) {
-			form.setMessage("Processing samples.", IMessageProvider.NONE);
-			submit.setEnabled(true);
+			form.setMessage("Add cabinet samples.", IMessageProvider.NONE);
+			confirmButton.setEnabled(true);
 			showPosition.setEnabled(true);
 		} else {
 			form.setMessage(status.getMessage(), IMessageProvider.ERROR);
-			submit.setEnabled(false);
+			confirmButton.setEnabled(false);
 			if (status.getMessage() != null
 					&& status.getMessage().contains("check values")) {
 				showPosition.setEnabled(true);
@@ -402,7 +390,7 @@ public class ProcessCabinetEntryForm extends BiobankEntryForm implements
 	// CancelConfirmForm implementation
 
 	public boolean isConfirmEnabled() {
-		return submit.isEnabled();
+		return confirmButton.isEnabled();
 	}
 
 	public void confirm() throws Exception {

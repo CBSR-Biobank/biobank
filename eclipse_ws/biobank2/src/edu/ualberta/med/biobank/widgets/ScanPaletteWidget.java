@@ -19,7 +19,7 @@ import edu.ualberta.med.biobank.widgets.listener.ScanPaletteModificationEvent;
 import edu.ualberta.med.biobank.widgets.listener.ScanPaletteModificationListener;
 
 /**
- * Specific widget to draw a palette
+ * Specific widget to draw a 8*12 palette
  */
 public class ScanPaletteWidget extends AbstractGridContainerWidget {
 
@@ -106,7 +106,7 @@ public class ScanPaletteWidget extends AbstractGridContainerWidget {
 				&& scannedElements[indexRow][indexCol] != null
 				&& scannedElements[indexRow][indexCol].getStatus() != null) {
 			Color color = scannedElements[indexRow][indexCol].getStatus()
-					.getColor();
+				.getColor();
 			e.gc.setBackground(color);
 			e.gc.fillRectangle(rectangle);
 		}

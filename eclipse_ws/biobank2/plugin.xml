@@ -260,22 +260,22 @@
             name="Storage Container View">
       </editor>
       <editor
-            class="edu.ualberta.med.biobank.forms.LinkSamplesEntryForm"
+            class="edu.ualberta.med.biobank.forms.AddPaletteSamplesEntryForm"
             default="false"
-            id="edu.ualberta.med.biobank.forms.LinkSamplesEntryForm"
-            name="Scan Samples Entry">
+            id="edu.ualberta.med.biobank.forms.AddPaletteSamplesEntryFormyForm"
+            name="Add Palette Samples Entry">
       </editor>
       <editor
-            class="edu.ualberta.med.biobank.forms.ProcessSamplesEntryForm"
+            class="edu.ualberta.med.biobank.forms.AssignSamplesLocationEntryForm"
             default="false"
-            id="edu.ualberta.med.biobank.forms.ProcessSamplesEntryForm"
-            name="Process samples">
+            id="edu.ualberta.med.biobank.forms.AssignSamplesLocationEntryForm"
+            name="Assign Samples Location Entry">
       </editor>
       <editor
-            class="edu.ualberta.med.biobank.forms.ProcessCabinetEntryForm"
+            class="edu.ualberta.med.biobank.forms.AddCabinetSampleEntryForm"
             default="false"
-            id="edu.ualberta.med.biobank.forms.ProcessCabinetEntryForm"
-            name="Process cabinet">
+            id="edu.ualberta.med.biobank.forms.AddCabinetSampleEntryForm"
+            name="Add Cabinet Samples Entry">
       </editor>
       <editor
             class="edu.ualberta.med.biobank.forms.SampleViewForm"
