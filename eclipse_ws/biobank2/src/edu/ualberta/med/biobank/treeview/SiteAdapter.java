@@ -120,7 +120,7 @@ public class SiteAdapter extends Node {
 		});
 
 		mi = new MenuItem(menu, SWT.PUSH);
-		mi.setText("Assign samples locations");
+		mi.setText("Assign sample locations");
 		mi.addSelectionListener(new SelectionListener() {
 			public void widgetSelected(SelectionEvent event) {
 				closeScannersEditors();

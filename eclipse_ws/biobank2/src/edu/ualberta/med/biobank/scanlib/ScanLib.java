@@ -2,110 +2,198 @@
 
 package edu.ualberta.med.biobank.scanlib;
 
-import com.sun.gluegen.runtime.*;
+import com.sun.gluegen.runtime.BufferFactory;
 
-public class ScanLib 
-{
+public class ScanLib {
+	public ScanLib() {
+		String osname = System.getProperty("os.name");
+		if (osname.startsWith("Windows")) {
+			System.loadLibrary("libscanlib");
+		}
+	}
 
+	/**
+	 * Interface to C language function: <br>
+	 * <code> int slCalibrateToPlate(unsigned int dpi, unsigned int plateNum); </code>
+	 */
+	public static native int slCalibrateToPlate(int dpi, int plateNum);
 
-  /** Interface to C language function: <br> <code> int slCalibrateToPlate(unsigned int dpi, unsigned int plateNum); </code>    */
-  public static native int slCalibrateToPlate(int dpi, int plateNum);
+	/**
+	 * Interface to C language function: <br>
+	 * <code> int slConfigPlateFrame(unsigned int plateNum, double left, double top, double right, double bottom); </code>
+	 */
+	public static native int slConfigPlateFrame(int plateNum, double left,
+			double top, double right, double bottom);
 
-  /** Interface to C language function: <br> <code> int slConfigPlateFrame(unsigned int plateNum, double left, double top, double right, double bottom); </code>    */
-  public static native int slConfigPlateFrame(int plateNum, double left, double top, double right, double bottom);
+	/**
+	 * Interface to C language function: <br>
+	 * <code> int slConfigScannerBrightness(int brightness); </code>
+	 */
+	public static native int slConfigScannerBrightness(int brightness);
 
-  /** Interface to C language function: <br> <code> int slConfigScannerBrightness(int brightness); </code>    */
-  public static native int slConfigScannerBrightness(int brightness);
+	/**
+	 * Interface to C language function: <br>
+	 * <code> int slConfigScannerContrast(int contrast); </code>
+	 */
+	public static native int slConfigScannerContrast(int contrast);
 
-  /** Interface to C language function: <br> <code> int slConfigScannerContrast(int contrast); </code>    */
-  public static native int slConfigScannerContrast(int contrast);
+	/**
+	 * Interface to C language function: <br>
+	 * <code> int slDecodeImage(unsigned int plateNum, char *  filename); </code>
+	 */
+	public static int slDecodeImage(int plateNum, java.nio.ByteBuffer filename) {
+		boolean _direct = BufferFactory.isDirect(filename);
+		if (_direct) {
+			return slDecodeImage0(plateNum, filename, BufferFactory
+				.getDirectBufferByteOffset(filename));
+		} else {
+			return slDecodeImage1(plateNum, BufferFactory.getArray(filename),
+				BufferFactory.getIndirectBufferByteOffset(filename));
+		}
+	}
 
-  /** Interface to C language function: <br> <code> int slDecodeImage(unsigned int plateNum, char *  filename); </code>    */
-  public static int slDecodeImage(int plateNum, java.nio.ByteBuffer filename)
-  {
-    boolean _direct = BufferFactory.isDirect(filename);
-    if (_direct) {
-        return slDecodeImage0(plateNum, filename, BufferFactory.getDirectBufferByteOffset(filename));
-    } else {
-      return slDecodeImage1(plateNum, BufferFactory.getArray(filename), BufferFactory.getIndirectBufferByteOffset(filename));
-    }
-  }
+	/**
+	 * Entry point to C language function:
+	 * <code> int slDecodeImage(unsigned int plateNum, char *  filename); </code>
+	 */
+	private static native int slDecodeImage0(int plateNum, Object filename,
+			int filename_byte_offset);
 
-  /** Entry point to C language function: <code> int slDecodeImage(unsigned int plateNum, char *  filename); </code>    */
-  private static native int slDecodeImage0(int plateNum, Object filename, int filename_byte_offset);
+	/**
+	 * Entry point to C language function:
+	 * <code> int slDecodeImage(unsigned int plateNum, char *  filename); </code>
+	 */
+	private static native int slDecodeImage1(int plateNum, Object filename,
+			int filename_byte_offset);
 
-  /** Entry point to C language function: <code> int slDecodeImage(unsigned int plateNum, char *  filename); </code>    */
-  private static native int slDecodeImage1(int plateNum, Object filename, int filename_byte_offset);
+	/**
+	 * Interface to C language function: <br>
+	 * <code> int slDecodeImage(unsigned int plateNum, char *  filename); </code>
+	 */
+	public static int slDecodeImage(int plateNum, byte[] filename,
+			int filename_offset) {
+		if (filename != null && filename.length <= filename_offset)
+			throw new RuntimeException(
+				"array offset argument \"filename_offset\" (" + filename_offset
+						+ ") equals or exceeds array length ("
+						+ filename.length + ")");
+		return slDecodeImage1(plateNum, filename, filename_offset);
 
-  /** Interface to C language function: <br> <code> int slDecodeImage(unsigned int plateNum, char *  filename); </code>    */
-  public static int slDecodeImage(int plateNum, byte[] filename, int filename_offset)
-  {
-    if(filename != null && filename.length <= filename_offset)
-      throw new RuntimeException("array offset argument \"filename_offset\" (" + filename_offset + ") equals or exceeds array length (" + filename.length + ")");
-        return slDecodeImage1(plateNum, filename, filename_offset);
+	}
 
-  }
+	/**
+	 * Interface to C language function: <br>
+	 * <code> int slDecodePlate(unsigned int dpi, unsigned int plateNum); </code>
+	 */
+	public static native int slDecodePlate(int dpi, int plateNum);
 
-  /** Interface to C language function: <br> <code> int slDecodePlate(unsigned int dpi, unsigned int plateNum); </code>    */
-  public static native int slDecodePlate(int dpi, int plateNum);
+	/**
+	 * Interface to C language function: <br>
+	 * <code> int slIsTwainAvailable(); </code>
+	 */
+	public static native int slIsTwainAvailable();
 
-  /** Interface to C language function: <br> <code> int slIsTwainAvailable(); </code>    */
-  public static native int slIsTwainAvailable();
+	/**
+	 * Interface to C language function: <br>
+	 * <code> int slScanImage(unsigned int dpi, double left, double top, double right, double bottom, char *  filename); </code>
+	 */
+	public static int slScanImage(int dpi, double left, double top,
+			double right, double bottom, java.nio.ByteBuffer filename) {
+		boolean _direct = BufferFactory.isDirect(filename);
+		if (_direct) {
+			return slScanImage0(dpi, left, top, right, bottom, filename,
+				BufferFactory.getDirectBufferByteOffset(filename));
+		} else {
+			return slScanImage1(dpi, left, top, right, bottom, BufferFactory
+				.getArray(filename), BufferFactory
+				.getIndirectBufferByteOffset(filename));
+		}
+	}
 
-  /** Interface to C language function: <br> <code> int slScanImage(unsigned int dpi, double left, double top, double right, double bottom, char *  filename); </code>    */
-  public static int slScanImage(int dpi, double left, double top, double right, double bottom, java.nio.ByteBuffer filename)
-  {
-    boolean _direct = BufferFactory.isDirect(filename);
-    if (_direct) {
-        return slScanImage0(dpi, left, top, right, bottom, filename, BufferFactory.getDirectBufferByteOffset(filename));
-    } else {
-      return slScanImage1(dpi, left, top, right, bottom, BufferFactory.getArray(filename), BufferFactory.getIndirectBufferByteOffset(filename));
-    }
-  }
+	/**
+	 * Entry point to C language function:
+	 * 
+	 * <code> int slScanImage(unsigned int dpi, double left, double top, double right, double bottom, char *  filename); </code>
+	 */
+	private static native int slScanImage0(int dpi, double left, double top,
+			double right, double bottom, Object filename,
+			int filename_byte_offset);
 
-  /** Entry point to C language function: <code> int slScanImage(unsigned int dpi, double left, double top, double right, double bottom, char *  filename); </code>    */
-  private static native int slScanImage0(int dpi, double left, double top, double right, double bottom, Object filename, int filename_byte_offset);
+	/**
+	 * Entry point to C language function:
+	 * 
+	 * <code> int slScanImage(unsigned int dpi, double left, double top, double right, double bottom, char *  filename); </code>
+	 */
+	private static native int slScanImage1(int dpi, double left, double top,
+			double right, double bottom, Object filename,
+			int filename_byte_offset);
 
-  /** Entry point to C language function: <code> int slScanImage(unsigned int dpi, double left, double top, double right, double bottom, char *  filename); </code>    */
-  private static native int slScanImage1(int dpi, double left, double top, double right, double bottom, Object filename, int filename_byte_offset);
+	/**
+	 * Interface to C language function: <br>
+	 * <code> int slScanImage(unsigned int dpi, double left, double top, double right, double bottom, char *  filename); </code>
+	 */
+	public static int slScanImage(int dpi, double left, double top,
+			double right, double bottom, byte[] filename, int filename_offset) {
+		if (filename != null && filename.length <= filename_offset)
+			throw new RuntimeException(
+				"array offset argument \"filename_offset\" (" + filename_offset
+						+ ") equals or exceeds array length ("
+						+ filename.length + ")");
+		return slScanImage1(dpi, left, top, right, bottom, filename,
+			filename_offset);
 
-  /** Interface to C language function: <br> <code> int slScanImage(unsigned int dpi, double left, double top, double right, double bottom, char *  filename); </code>    */
-  public static int slScanImage(int dpi, double left, double top, double right, double bottom, byte[] filename, int filename_offset)
-  {
-    if(filename != null && filename.length <= filename_offset)
-      throw new RuntimeException("array offset argument \"filename_offset\" (" + filename_offset + ") equals or exceeds array length (" + filename.length + ")");
-        return slScanImage1(dpi, left, top, right, bottom, filename, filename_offset);
+	}
 
-  }
+	/**
+	 * Interface to C language function: <br>
+	 * <code> int slScanPlate(unsigned int dpi, unsigned int plateNum, char *  filename); </code>
+	 */
+	public static int slScanPlate(int dpi, int plateNum,
+			java.nio.ByteBuffer filename) {
+		boolean _direct = BufferFactory.isDirect(filename);
+		if (_direct) {
+			return slScanPlate0(dpi, plateNum, filename, BufferFactory
+				.getDirectBufferByteOffset(filename));
+		} else {
+			return slScanPlate1(dpi, plateNum,
+				BufferFactory.getArray(filename), BufferFactory
+					.getIndirectBufferByteOffset(filename));
+		}
+	}
 
-  /** Interface to C language function: <br> <code> int slScanPlate(unsigned int dpi, unsigned int plateNum, char *  filename); </code>    */
-  public static int slScanPlate(int dpi, int plateNum, java.nio.ByteBuffer filename)
-  {
-    boolean _direct = BufferFactory.isDirect(filename);
-    if (_direct) {
-        return slScanPlate0(dpi, plateNum, filename, BufferFactory.getDirectBufferByteOffset(filename));
-    } else {
-      return slScanPlate1(dpi, plateNum, BufferFactory.getArray(filename), BufferFactory.getIndirectBufferByteOffset(filename));
-    }
-  }
+	/**
+	 * Entry point to C language function:
+	 * <code> int slScanPlate(unsigned int dpi, unsigned int plateNum, char *  filename); </code>
+	 */
+	private static native int slScanPlate0(int dpi, int plateNum,
+			Object filename, int filename_byte_offset);
 
-  /** Entry point to C language function: <code> int slScanPlate(unsigned int dpi, unsigned int plateNum, char *  filename); </code>    */
-  private static native int slScanPlate0(int dpi, int plateNum, Object filename, int filename_byte_offset);
+	/**
+	 * Entry point to C language function:
+	 * <code> int slScanPlate(unsigned int dpi, unsigned int plateNum, char *  filename); </code>
+	 */
+	private static native int slScanPlate1(int dpi, int plateNum,
+			Object filename, int filename_byte_offset);
 
-  /** Entry point to C language function: <code> int slScanPlate(unsigned int dpi, unsigned int plateNum, char *  filename); </code>    */
-  private static native int slScanPlate1(int dpi, int plateNum, Object filename, int filename_byte_offset);
+	/**
+	 * Interface to C language function: <br>
+	 * <code> int slScanPlate(unsigned int dpi, unsigned int plateNum, char *  filename); </code>
+	 */
+	public static int slScanPlate(int dpi, int plateNum, byte[] filename,
+			int filename_offset) {
+		if (filename != null && filename.length <= filename_offset)
+			throw new RuntimeException(
+				"array offset argument \"filename_offset\" (" + filename_offset
+						+ ") equals or exceeds array length ("
+						+ filename.length + ")");
+		return slScanPlate1(dpi, plateNum, filename, filename_offset);
 
-  /** Interface to C language function: <br> <code> int slScanPlate(unsigned int dpi, unsigned int plateNum, char *  filename); </code>    */
-  public static int slScanPlate(int dpi, int plateNum, byte[] filename, int filename_offset)
-  {
-    if(filename != null && filename.length <= filename_offset)
-      throw new RuntimeException("array offset argument \"filename_offset\" (" + filename_offset + ") equals or exceeds array length (" + filename.length + ")");
-        return slScanPlate1(dpi, plateNum, filename, filename_offset);
+	}
 
-  }
-
-  /** Interface to C language function: <br> <code> int slSelectSourceAsDefault(); </code>    */
-  public static native int slSelectSourceAsDefault();
-
+	/**
+	 * Interface to C language function: <br>
+	 * <code> int slSelectSourceAsDefault(); </code>
+	 */
+	public static native int slSelectSourceAsDefault();
 
 } // end of class ScanLib
