@@ -19,3 +19,8 @@ TODO
 See Eclipse project org.eclipse.ui.examples.contributions.model for UI design.
 
  
+ SWIG
+   Used to create JNI interface to ScanLib DLL.
+   
+   Command:
+     ./swig.exe -java -package edu.ualberta.med.biobank.scanlib /c/proj/c/scanlib/ScanLib.i

@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.forms;
 
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -319,13 +318,7 @@ public class AssignSamplesLocationEntryForm extends BiobankEntryForm implements
 					boolean showResult = getPaletteInformation();
 					if (showResult) {
 						// TODO launch real scanner
-						String fname = "plate1.bmp";
-						ByteBuffer buf = ByteBuffer.allocateDirect(fname
-							.length());
-						buf.put(fname.getBytes());
-						ScanLib scanlib = new ScanLib();
-
-						scanlib.slScanPlate(300, 1, buf);
+						ScanLib.slScanPlate(300, 1, "plate1.bmp");
 
 						System.out.println("Plate to scan : "
 								+ BioBankPlugin.getDefault().getPlateNumber(
