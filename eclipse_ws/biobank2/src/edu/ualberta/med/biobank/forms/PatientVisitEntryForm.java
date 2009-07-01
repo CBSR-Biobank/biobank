@@ -35,8 +35,8 @@ import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.PatientVisitData;
-import edu.ualberta.med.biobank.model.Sdata;
 import edu.ualberta.med.biobank.model.Study;
+import edu.ualberta.med.biobank.model.StudyInfo;
 import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.PatientAdapter;
 import edu.ualberta.med.biobank.treeview.PatientVisitAdapter;
@@ -75,11 +75,11 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
 	}
 
 	class PatientVisitInfo {
-		Sdata sdata;
+		StudyInfo studyInfo;
 		PatientVisitData pvData;
 
 		public PatientVisitInfo() {
-			sdata = null;
+			studyInfo = null;
 			pvData = null;
 		}
 	}
@@ -128,17 +128,17 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
 		study = ((StudyAdapter) patientVisitAdapter.getParent().getParent()
 			.getParent()).getStudy();
 
-		for (Sdata sdata : study.getSdataCollection()) {
+		for (StudyInfo studyInfo : study.getStudyInfoCollection()) {
 			PatientVisitInfo pvInfo = new PatientVisitInfo();
-			pvInfo.sdata = sdata;
-			pvInfoMap.put(sdata.getSdataType().getType(), pvInfo);
+			pvInfo.studyInfo = studyInfo;
+			pvInfoMap.put(studyInfo.getStudyInfoType().getType(), pvInfo);
 		}
 
 		Collection<PatientVisitData> pvDataCollection = patientVisit
 			.getPatientVisitDataCollection();
 		if (pvDataCollection != null) {
 			for (PatientVisitData pvData : pvDataCollection) {
-				String key = pvData.getSdata().getSdataType().getType();
+				String key = pvData.getStudyInfo().getStudyInfoType().getType();
 				PatientVisitInfo pvInfo = (PatientVisitInfo) pvInfoMap.get(key);
 				pvInfo.pvData = pvData;
 
@@ -159,7 +159,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
 			String label = (String) it.next();
 			PatientVisitInfo pvInfo = (PatientVisitInfo) it.getValue();
 			String value = null;
-			int typeId = pvInfo.sdata.getSdataType().getId();
+			int typeId = pvInfo.studyInfo.getStudyInfoType().getId();
 
 			if (pvInfo.pvData != null) {
 				value = pvInfo.pvData.getValue();
@@ -181,8 +181,8 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
 			case 5: // Aliquot Volume
 			case 6: // Blood Received
 			case 7: // Visit
-				control = createComboSection(client, pvInfo.sdata.getValue()
-					.split(";"), value);
+				control = createComboSection(client, pvInfo.studyInfo
+					.getPossibleValues().split(";"), value);
 				break;
 
 			case 8: // WBC Count
@@ -197,7 +197,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
 				break;
 
 			default:
-				Assert.isTrue(false, "Invalid sdata type: " + typeId);
+				Assert.isTrue(false, "Invalid studyInfo type: " + typeId);
 			}
 			GridData gd = new GridData(GridData.FILL_HORIZONTAL);
 			if (typeId == 11) {
@@ -348,7 +348,8 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
 				value = ((Text) control).getText();
 				System.out.println(key + ": " + ((Text) control).getText());
 			} else if (control instanceof Combo) {
-				String[] options = pvInfo.sdata.getValue().split(";");
+				String[] options = pvInfo.studyInfo.getPossibleValues().split(
+					";");
 				int index = ((Combo) control).getSelectionIndex();
 				if (index >= 0) {
 					Assert.isTrue(index < options.length,
@@ -369,7 +370,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
 
 			if (pvInfo.pvData == null) {
 				pvData = new PatientVisitData();
-				pvData.setSdata(pvInfo.sdata);
+				pvData.setStudyInfo(pvInfo.studyInfo);
 				pvData.setPatientVisit(patientVisit);
 			}
 			pvData.setValue(value);

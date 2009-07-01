@@ -83,13 +83,14 @@
      inheritRefs="false" />
 </target>
 
-<target name="dbcreate">
+<target name="dbcreate"
+    description="creates the default tables">
   <antcall target="schema" />
   <sql driver="${mysql.driver.string}"
         url="jdbc:mysql://${database.host}:${database.port}/${database.name}"
         userid="${database.username}" password="${database.password}" >
     <transaction src="${data.sql.dir}/sampleTypes.sql" />
-    <transaction src="${data.sql.dir}/sdataTypes.sql" />
+    <transaction src="${data.sql.dir}/studyInfo.sql" />
     <transaction>commit;</transaction>
     <classpath>
       <fileset dir="${cacore.sdk.dir}/system/lib">
