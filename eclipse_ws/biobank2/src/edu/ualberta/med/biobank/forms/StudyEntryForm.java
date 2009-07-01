@@ -27,17 +27,17 @@ import org.springframework.remoting.RemoteConnectFailureException;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Clinic;
-import edu.ualberta.med.biobank.model.Sdata;
-import edu.ualberta.med.biobank.model.SdataType;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
+import edu.ualberta.med.biobank.model.StudyInfo;
+import edu.ualberta.med.biobank.model.StudyInfoType;
 import edu.ualberta.med.biobank.model.Worksheet;
 import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
 import edu.ualberta.med.biobank.widgets.MultiSelect;
-import edu.ualberta.med.biobank.widgets.SdataWidget;
+import edu.ualberta.med.biobank.widgets.StudyInfoWidget;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.SDKQuery;
@@ -80,13 +80,13 @@ public class StudyEntryForm extends BiobankEntryForm {
 
 	private Collection<Clinic> allClinics;
 
-	private Collection<SdataType> allSdataTypes;
+	private Collection<StudyInfoType> allStudyInfoTypes;
 
-	private TreeMap<String, SdataWidget> sdataWidgets;
+	private TreeMap<String, StudyInfoWidget> studyInfoWidgets;
 
 	public StudyEntryForm() {
 		super();
-		sdataWidgets = new TreeMap<String, SdataWidget>();
+		studyInfoWidgets = new TreeMap<String, StudyInfoWidget>();
 	}
 
 	@Override
@@ -135,7 +135,7 @@ public class StudyEntryForm extends BiobankEntryForm {
 		// comments.setLayoutData(gd);
 
 		createClinicSection();
-		createSdataSection();
+		createStudyInfoSection();
 		createButtonsSection();
 	}
 
@@ -163,34 +163,34 @@ public class StudyEntryForm extends BiobankEntryForm {
 		clinicsMultiSelect.addSelections(availClinics, selClinics);
 	}
 
-	private void createSdataSection() {
+	private void createStudyInfoSection() {
 		Composite client = createSectionWithClient("Study Information Selection");
-		Collection<Sdata> studySdata = study.getSdataCollection();
-		HashMap<Integer, Sdata> selected = new HashMap<Integer, Sdata>();
+		Collection<StudyInfo> siCollection = study.getStudyInfoCollection();
+		HashMap<Integer, StudyInfo> selected = new HashMap<Integer, StudyInfo>();
 		GridLayout gl = (GridLayout) client.getLayout();
 		gl.numColumns = 1;
 
-		if (studySdata != null) {
-			for (Sdata sdata : studySdata) {
-				selected.put(sdata.getSdataType().getId(), sdata);
+		if (siCollection != null) {
+			for (StudyInfo studyInfo : siCollection) {
+				selected.put(studyInfo.getStudyInfoType().getId(), studyInfo);
 			}
 		}
 
-		allSdataTypes = getAllSdataTypes();
+		allStudyInfoTypes = getAllStudyInfoTypes();
 
-		for (SdataType sdataType : allSdataTypes) {
+		for (StudyInfoType studyInfoType : allStudyInfoTypes) {
 			String value = "";
-			Sdata sdata = selected.get(sdataType.getId());
+			StudyInfo studyInfo = selected.get(studyInfoType.getId());
 			boolean itemSelected = false;
-			if (sdata != null) {
+			if (studyInfo != null) {
 				itemSelected = true;
-				value = sdata.getValue();
+				value = studyInfo.getPossibleValues();
 			}
 
-			SdataWidget w = new SdataWidget(client, SWT.NONE, sdataType,
-				itemSelected, value);
+			StudyInfoWidget w = new StudyInfoWidget(client, SWT.NONE,
+				studyInfoType, itemSelected, value);
 			w.adaptToToolkit(toolkit);
-			sdataWidgets.put(sdataType.getType(), w);
+			studyInfoWidgets.put(studyInfoType.getType(), w);
 		}
 	}
 
@@ -245,21 +245,21 @@ public class StudyEntryForm extends BiobankEntryForm {
 				"problem with clinic selections");
 			study.setClinicCollection(selClinics);
 
-			List<Sdata> sdataList = new ArrayList<Sdata>();
-			for (SdataType sdataType : allSdataTypes) {
-				String type = sdataType.getType();
-				String value = sdataWidgets.get(type).getResult();
+			List<StudyInfo> studyInfoList = new ArrayList<StudyInfo>();
+			for (StudyInfoType studyInfoType : allStudyInfoTypes) {
+				String type = studyInfoType.getType();
+				String value = studyInfoWidgets.get(type).getResult();
 				if ((value.length() == 0) || value.equals("no"))
 					continue;
-				Sdata sdata = new Sdata();
-				sdata.setSdataType(sdataType);
+				StudyInfo studyInfo = new StudyInfo();
+				studyInfo.setStudyInfoType(studyInfoType);
 				if (value.equals("yes")) {
 					value = "";
 				}
-				sdata.setValue(value);
-				sdataList.add(sdata);
+				studyInfo.setPossibleValues(value);
+				studyInfoList.add(studyInfo);
 			}
-			study.setSdataCollection(sdataList);
+			study.setStudyInfoCollection(studyInfoList);
 
 			saveStudy(study);
 			studyAdapter.getParent().performExpand();
@@ -274,24 +274,24 @@ public class StudyEntryForm extends BiobankEntryForm {
 	private void saveStudy(Study study) throws ApplicationException {
 		SDKQuery query;
 		SDKQueryResult result;
-		Set<Sdata> savedSdataList = new HashSet<Sdata>();
+		Set<StudyInfo> savedStudyInfoList = new HashSet<StudyInfo>();
 
 		study.setSite(site);
 		study.setWorksheet(null);
 
-		if (study.getSdataCollection().size() > 0) {
-			for (Sdata sdata : study.getSdataCollection()) {
-				if ((sdata.getId() == null) || (sdata.getId() == 0)) {
-					query = new InsertExampleQuery(sdata);
+		if (study.getStudyInfoCollection().size() > 0) {
+			for (StudyInfo studyInfo : study.getStudyInfoCollection()) {
+				if ((studyInfo.getId() == null) || (studyInfo.getId() == 0)) {
+					query = new InsertExampleQuery(studyInfo);
 				} else {
-					query = new UpdateExampleQuery(sdata);
+					query = new UpdateExampleQuery(studyInfo);
 				}
 
 				result = studyAdapter.getAppService().executeQuery(query);
-				savedSdataList.add((Sdata) result.getObjectResult());
+				savedStudyInfoList.add((StudyInfo) result.getObjectResult());
 			}
 		}
-		study.setSdataCollection(savedSdataList);
+		study.setStudyInfoCollection(savedStudyInfoList);
 
 		if ((study.getId() == null) || (study.getId() == 0)) {
 			query = new InsertExampleQuery(study);
@@ -303,11 +303,11 @@ public class StudyEntryForm extends BiobankEntryForm {
 		study = (Study) result.getObjectResult();
 	}
 
-	private List<SdataType> getAllSdataTypes() {
-		SdataType criteria = new SdataType();
+	private List<StudyInfoType> getAllStudyInfoTypes() {
+		StudyInfoType criteria = new StudyInfoType();
 
 		try {
-			return studyAdapter.getAppService().search(SdataType.class,
+			return studyAdapter.getAppService().search(StudyInfoType.class,
 				criteria);
 		} catch (final RemoteConnectFailureException exp) {
 			BioBankPlugin.openRemoteConnectErrorMessage();

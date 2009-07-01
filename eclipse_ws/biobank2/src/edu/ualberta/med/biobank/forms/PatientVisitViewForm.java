@@ -17,8 +17,8 @@ import org.eclipse.ui.PartInitException;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.PatientVisitData;
-import edu.ualberta.med.biobank.model.Sdata;
 import edu.ualberta.med.biobank.model.Study;
+import edu.ualberta.med.biobank.model.StudyInfo;
 import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.PatientVisitAdapter;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
@@ -26,11 +26,11 @@ import edu.ualberta.med.biobank.treeview.StudyAdapter;
 public class PatientVisitViewForm extends BiobankViewForm {
 
 	class PatientVisitInfo {
-		Sdata sdata;
+		StudyInfo studyInfo;
 		PatientVisitData pvData;
 
 		public PatientVisitInfo() {
-			sdata = null;
+			studyInfo = null;
 			pvData = null;
 		}
 	}
@@ -90,17 +90,17 @@ public class PatientVisitViewForm extends BiobankViewForm {
 		Study study = ((StudyAdapter) patientVisitAdapter.getParent()
 			.getParent().getParent()).getStudy();
 
-		for (Sdata sdata : study.getSdataCollection()) {
+		for (StudyInfo studyInfo : study.getStudyInfoCollection()) {
 			PatientVisitInfo pvInfo = new PatientVisitInfo();
-			pvInfo.sdata = sdata;
-			pvInfoMap.put(sdata.getSdataType().getType(), pvInfo);
+			pvInfo.studyInfo = studyInfo;
+			pvInfoMap.put(studyInfo.getStudyInfoType().getType(), pvInfo);
 		}
 
 		Collection<PatientVisitData> pvDataCollection = patientVisit
 			.getPatientVisitDataCollection();
 		if (pvDataCollection != null) {
 			for (PatientVisitData pvData : pvDataCollection) {
-				String key = pvData.getSdata().getSdataType().getType();
+				String key = pvData.getStudyInfo().getStudyInfoType().getType();
 				PatientVisitInfo pvInfo = (PatientVisitInfo) pvInfoMap.get(key);
 				pvInfo.pvData = pvData;
 			}
@@ -112,7 +112,7 @@ public class PatientVisitViewForm extends BiobankViewForm {
 			String label = (String) it.next();
 			PatientVisitInfo pvInfo = (PatientVisitInfo) it.getValue();
 			String value = "";
-			int typeId = pvInfo.sdata.getSdataType().getId();
+			int typeId = pvInfo.studyInfo.getStudyInfoType().getId();
 
 			if (pvInfo.pvData != null) {
 				value = pvInfo.pvData.getValue();
