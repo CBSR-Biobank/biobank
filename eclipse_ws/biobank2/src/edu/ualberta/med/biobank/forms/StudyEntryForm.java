@@ -2,7 +2,6 @@ package edu.ualberta.med.biobank.forms;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -30,7 +29,6 @@ import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.StudyInfo;
-import edu.ualberta.med.biobank.model.StudyInfoType;
 import edu.ualberta.med.biobank.model.Worksheet;
 import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
@@ -80,7 +78,7 @@ public class StudyEntryForm extends BiobankEntryForm {
 
 	private Collection<Clinic> allClinics;
 
-	private Collection<StudyInfoType> allStudyInfoTypes;
+	private Collection<StudyInfo> allStudyInfos;
 
 	private TreeMap<String, StudyInfoWidget> studyInfoWidgets;
 
@@ -165,32 +163,34 @@ public class StudyEntryForm extends BiobankEntryForm {
 
 	private void createStudyInfoSection() {
 		Composite client = createSectionWithClient("Study Information Selection");
-		Collection<StudyInfo> siCollection = study.getStudyInfoCollection();
-		HashMap<Integer, StudyInfo> selected = new HashMap<Integer, StudyInfo>();
-		GridLayout gl = (GridLayout) client.getLayout();
-		gl.numColumns = 1;
+		// Collection<StudyInfo> siCollection = study.getStudyInfoCollection();
+		// HashMap<Integer, StudyInfo> selected = new HashMap<Integer,
+		// StudyInfo>();
+		// GridLayout gl = (GridLayout) client.getLayout();
+		// gl.numColumns = 1;
+		//
+		// if (siCollection != null) {
+		// for (StudyInfo studyInfo : siCollection) {
+		// selected.put(studyInfo.getStudyInfoType().getId(), studyInfo);
+		// }
+		// }
 
-		if (siCollection != null) {
-			for (StudyInfo studyInfo : siCollection) {
-				selected.put(studyInfo.getStudyInfoType().getId(), studyInfo);
-			}
-		}
+		allStudyInfos = getAllStudyInfos();
+		Assert.isNotNull(allStudyInfos);
 
-		allStudyInfoTypes = getAllStudyInfoTypes();
-
-		for (StudyInfoType studyInfoType : allStudyInfoTypes) {
+		for (StudyInfo studyInfo : allStudyInfos) {
 			String value = "";
-			StudyInfo studyInfo = selected.get(studyInfoType.getId());
 			boolean itemSelected = false;
-			if (studyInfo != null) {
-				itemSelected = true;
-				value = studyInfo.getPossibleValues();
-			}
+			// StudyInfo studyInfo = selected.get(studyInfoType.getId());
+			// if (studyInfo != null) {
+			// itemSelected = true;
+			// value = studyInfo.getPossibleValues();
+			// }
 
-			StudyInfoWidget w = new StudyInfoWidget(client, SWT.NONE,
-				studyInfoType, itemSelected, value);
+			StudyInfoWidget w = new StudyInfoWidget(client, SWT.NONE, studyInfo
+				.getStudyInfoType(), itemSelected, value);
 			w.adaptToToolkit(toolkit);
-			studyInfoWidgets.put(studyInfoType.getType(), w);
+			studyInfoWidgets.put(studyInfo.getLabel(), w);
 		}
 	}
 
@@ -246,13 +246,11 @@ public class StudyEntryForm extends BiobankEntryForm {
 			study.setClinicCollection(selClinics);
 
 			List<StudyInfo> studyInfoList = new ArrayList<StudyInfo>();
-			for (StudyInfoType studyInfoType : allStudyInfoTypes) {
-				String type = studyInfoType.getType();
+			for (StudyInfo studyInfo : allStudyInfos) {
+				String type = studyInfo.getStudyInfoType().getType();
 				String value = studyInfoWidgets.get(type).getResult();
 				if ((value.length() == 0) || value.equals("no"))
 					continue;
-				StudyInfo studyInfo = new StudyInfo();
-				studyInfo.setStudyInfoType(studyInfoType);
 				if (value.equals("yes")) {
 					value = "";
 				}
@@ -303,11 +301,11 @@ public class StudyEntryForm extends BiobankEntryForm {
 		study = (Study) result.getObjectResult();
 	}
 
-	private List<StudyInfoType> getAllStudyInfoTypes() {
-		StudyInfoType criteria = new StudyInfoType();
+	private List<StudyInfo> getAllStudyInfos() {
+		StudyInfo criteria = new StudyInfo();
 
 		try {
-			return studyAdapter.getAppService().search(StudyInfoType.class,
+			return studyAdapter.getAppService().search(StudyInfo.class,
 				criteria);
 		} catch (final RemoteConnectFailureException exp) {
 			BioBankPlugin.openRemoteConnectErrorMessage();

@@ -41,7 +41,7 @@ public class BioBankPlugin extends AbstractUIPlugin {
 	public BioBankPlugin() {
 		String osname = System.getProperty("os.name");
 		if (osname.startsWith("Windows")) {
-			System.loadLibrary("libscanlib");
+			System.loadLibrary("scanlib");
 		}
 	}
 
