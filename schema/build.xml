@@ -28,6 +28,7 @@
       <fileset dir="${cacore.sdk.system.lib.dir}" >
         <include name="**/*.jar" />
       </fileset>
+      <pathelement location="./mysql-connector-java-5.1.7-bin.jar" />
     </path>
   </path>
 
