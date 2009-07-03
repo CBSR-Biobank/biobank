@@ -60,10 +60,9 @@
    </copy>
 </target>
 
-<target name="deploy-jboss" depends="package-webapp-orm"
+<target name="deploy-jboss" 
         description="deploys the caCORE SDK webapp to JBoss">
   <fail unless="env.JBOSS_HOME" message="$JBOSS_HOME not defined" />
-  <antcall target="sdk" />
   <copy
      file="${cacore.sdk.dir}/output/biobank2/package/webapp/biobank2.war"
      tofile="${env.JBOSS_HOME}/server/default/deploy/biobank2.war"/>
@@ -76,7 +75,7 @@
   <antcall target="deploy-eclipse" />
 </target>
 
-<target name="schema"
+<target name="schema" 
         description="generates the database schema for the caCORE SDK data model">
 <!--        depends="sdk">-->
   <ant
@@ -132,17 +131,18 @@
 </target>
 
 <target name="package-webapp-orm" depends="package-codegen-orm">
+  <!-- antcall target="sdk" / -->
 	<war destfile="${cacore.sdk.dir}\output\${PROJECT_NAME}\package\webapp\${PROJECT_NAME}.war" webxml="${cacore.sdk.dir}\output\${PROJECT_NAME}\conf\system\web\WEB-INF\web.xml">
 		<manifest>
-			<attribute name="Generated-By" value="caCORE SDK Code Generator"/>
+			<attribute name="Generated-By" value="biobank2 caCORE SDK Code Generator"/>
 			<attribute name="Version" value="${VERSION}"/>
 		</manifest>
 		<lib dir="${cacore.sdk.dir}\system\dist" includes="*.jar"/>
 		<lib dir="${cacore.sdk.dir}\writable-api\dist" includes="*.jar">
 			<exclude name="${read-api-exclude-list}"/>
 		</lib>
-		<lib dir="${build.jar.dir.copy}" includes="${bean.file}" />
-		<lib dir="${build.jar.dir.copy}" includes="${orm.file}" />
+		<lib dir="${build.jar.dir.copy}" includes="${PROJECT_NAME}-beans.jar" />
+		<lib dir="${build.jar.dir.copy}" includes="${PROJECT_NAME}-orm.jar" />
 		<lib dir="${cacore.sdk.dir}\system\lib" includes="*.jar">
 			<exclude name="${server-exclude-commons-logging}"/>
 			<exclude name="${server-exclude-log4j}"/>
