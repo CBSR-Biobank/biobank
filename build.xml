@@ -60,7 +60,7 @@
    </copy>
 </target>
 
-<target name="deploy-jboss"
+<target name="deploy-jboss" depends="package-webapp-orm"
         description="deploys the caCORE SDK webapp to JBoss">
   <fail unless="env.JBOSS_HOME" message="$JBOSS_HOME not defined" />
   <antcall target="sdk" />
