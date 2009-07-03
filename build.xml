@@ -102,7 +102,7 @@
 </target>
 
 <!--Add the length="#" field into .hbm.xml, references the biobank.uml file for the VARCHAR(#) -->
-<target name="string-length-field-addition" description="XXX">
+<target name="string-length-field-addition" description="Add the length='#' field into .hbm.xml, references the biobank.uml file for the VARCHAR(#)">
   <exec executable="perl">
     <env key="PATH" path="${scripts.proj.dir}"/>
     <arg value="${scripts.proj.dir}/hbmstringlength.pl"/>
@@ -111,6 +111,66 @@
 	<arg value="0"/><!--Verbose-->
   </exec>
 </target>
+
+<property name="PROJECT_NAME" value="biobank2" />
+<property name="build.jar.dir.copy" location="${cacore.sdk.dir}\output\${PROJECT_NAME}\build\jar" /> <!--tp-->
+<property name="output.src.dir.copy" location="${cacore.sdk.dir}\output\${PROJECT_NAME}\src" /> <!--tp-->
+<property name="grid-jaas.dir.copy" location="${cacore.sdk.dir}\output\${PROJECT_NAME}\package\grid-jaas" /> <!--tp-->
+
+<target name="package-codegen-orm" description="REDO:: Packages the generated ORM and bean artifacts">
+	<jar destfile="${build.jar.dir.copy}\${PROJECT_NAME}-orm.jar" basedir="${output.src.dir.copy}">
+		<manifest>
+			<attribute name="Generated-By" value="caCORE SDK Code Generator"/>
+			<attribute name="Version" value="${VERSION}"/>
+		</manifest>
+		<include name="**/*.hbm.xml"/>
+		<include name="*.cfg.xml"/>
+		<include name="ehcache.xml"/>
+		<exclude name="${CSM_PROJECT_NAME}.csm.new.hibernate.cfg.xml"/>
+	</jar>
+</target>
+
+<target name="package-webapp-orm" depends="package-codegen-orm">
+	<war destfile="${cacore.sdk.dir}\output\${PROJECT_NAME}\package\webapp\${PROJECT_NAME}.war" webxml="${cacore.sdk.dir}\output\${PROJECT_NAME}\conf\system\web\WEB-INF\web.xml">
+		<manifest>
+			<attribute name="Generated-By" value="caCORE SDK Code Generator"/>
+			<attribute name="Version" value="${VERSION}"/>
+		</manifest>
+		<lib dir="${cacore.sdk.dir}\system\dist" includes="*.jar"/>
+		<lib dir="${cacore.sdk.dir}\writable-api\dist" includes="*.jar">
+			<exclude name="${read-api-exclude-list}"/>
+		</lib>
+		<lib dir="${build.jar.dir.copy}" includes="${bean.file}" />
+		<lib dir="${build.jar.dir.copy}" includes="${orm.file}" />
+		<lib dir="${cacore.sdk.dir}\system\lib" includes="*.jar">
+			<exclude name="${server-exclude-commons-logging}"/>
+			<exclude name="${server-exclude-log4j}"/>
+			<exclude name="servlet.jar"/>
+			<exclude name="xercesImpl*.*"/>
+			<exclude name="cog*.*"/>
+		</lib>
+		<lib dir="${grid-jaas.dir.copy}\lib" includes="*.*" excludes="${grid-jaas.file.output.jaas.jndibinder.name}"/>
+		<fileset dir="${cacore.sdk.dir}\system\web">
+			<include name="**/*"/>
+			<exclude name="**/web.xml"/>
+			<exclude name="${server-exclude-classes-list}"/>
+		</fileset>
+		<fileset dir="${cacore.sdk.dir}\system\web">
+			<include name="**/*"/>
+		</fileset>
+		<fileset dir="${cacore.sdk.dir}\output\${PROJECT_NAME}\build">
+			<include name="docs/**/*"/>
+		</fileset>
+		<classes dir="${output.src.dir.copy}">
+			<include name="${csm.security.config.file}"/>
+			<include name="${csm.ehcache.file}"/>
+			<include name="${clm.object.state.logger.config}"/>
+		</classes>
+		<webinf dir="${output.src.dir.copy}">
+			<include name="server-config.wsdd"/>
+		</webinf>
+	</war>
+</target>	
 <!--Add the length="#" field into .hbm.xml, references the biobank.uml file for the VARCHAR(#) -->
 
 
