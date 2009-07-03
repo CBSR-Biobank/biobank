@@ -14,26 +14,17 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
 
+import edu.ualberta.med.biobank.forms.PatientVisitEntryForm.PatientVisitInfo;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.PatientVisit;
-import edu.ualberta.med.biobank.model.PatientVisitData;
+import edu.ualberta.med.biobank.model.PvInfo;
+import edu.ualberta.med.biobank.model.PvInfoData;
 import edu.ualberta.med.biobank.model.Study;
-import edu.ualberta.med.biobank.model.StudyInfo;
 import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.PatientVisitAdapter;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
 
 public class PatientVisitViewForm extends BiobankViewForm {
-
-	class PatientVisitInfo {
-		StudyInfo studyInfo;
-		PatientVisitData pvData;
-
-		public PatientVisitInfo() {
-			studyInfo = null;
-			pvData = null;
-		}
-	}
 
 	public static final String ID = "edu.ualberta.med.biobank.forms.PatientVisitViewForm";
 
@@ -90,17 +81,19 @@ public class PatientVisitViewForm extends BiobankViewForm {
 		Study study = ((StudyAdapter) patientVisitAdapter.getParent()
 			.getParent().getParent()).getStudy();
 
-		for (StudyInfo studyInfo : study.getStudyInfoCollection()) {
-			PatientVisitInfo pvInfo = new PatientVisitInfo();
-			pvInfo.studyInfo = studyInfo;
-			pvInfoMap.put(studyInfo.getStudyInfoType().getType(), pvInfo);
+		// get all PvInfo from study, since user may not have filled in all
+		// fields
+		for (PvInfo pvInfo : study.getPvInfoCollection()) {
+			PvInfoData pvInfoData = new PvInfoData();
+			pvInfoData.setPvInfo(pvInfo);
+			pvInfoMap.put(pvInfo.getPvInfoType().getType(), pvInfoDat);
 		}
 
-		Collection<PatientVisitData> pvDataCollection = patientVisit
-			.getPatientVisitDataCollection();
+		Collection<PvInfoData> pvDataCollection = patientVisit
+			.getPvDataCollection();
 		if (pvDataCollection != null) {
-			for (PatientVisitData pvData : pvDataCollection) {
-				String key = pvData.getStudyInfo().getStudyInfoType().getType();
+			for (PvInfoData pvData : pvDataCollection) {
+				String key = pvData.getPvInfo().getPvInfoType().getType();
 				PatientVisitInfo pvInfo = (PatientVisitInfo) pvInfoMap.get(key);
 				pvInfo.pvData = pvData;
 			}
@@ -112,7 +105,7 @@ public class PatientVisitViewForm extends BiobankViewForm {
 			String label = (String) it.next();
 			PatientVisitInfo pvInfo = (PatientVisitInfo) it.getValue();
 			String value = "";
-			int typeId = pvInfo.studyInfo.getStudyInfoType().getId();
+			int typeId = pvInfo.pvInfo.getPvInfoType().getId();
 
 			if (pvInfo.pvData != null) {
 				value = pvInfo.pvData.getValue();

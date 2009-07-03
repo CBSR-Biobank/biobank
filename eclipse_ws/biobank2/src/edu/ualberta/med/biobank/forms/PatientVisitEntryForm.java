@@ -131,15 +131,14 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
 		for (PvInfo pvInfo : study.getPvInfoCollection()) {
 			PatientVisitInfo visitInfo = new PatientVisitInfo();
 			visitInfo.pvInfo = pvInfo;
-			pvInfoMap.put(pvInfo.getPvInfoPossible().getPvInfoType(), pvInfo);
+			pvInfoMap.put(pvInfo.getPvInfoType(), pvInfo);
 		}
 
 		Collection<PvInfoData> pvDataCollection = patientVisit
 			.getPvInfoDataCollection();
 		if (pvDataCollection != null) {
 			for (PvInfoData pvInfoData : pvDataCollection) {
-				String key = pvInfoData.getPvInfo().getPvInfoPossible()
-					.getPvInfoType().getType();
+				String key = pvInfoData.getPvInfo().getPvInfoType().getType();
 				PatientVisitInfo visitInfo = (PatientVisitInfo) pvInfoMap
 					.get(key);
 				visitInfo.pvInfoData = pvInfoData;
@@ -157,7 +156,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
 			String label = (String) it.next();
 			PatientVisitInfo pvInfo = (PatientVisitInfo) it.getValue();
 			String value = null;
-			int typeId = pvInfo.pvInfo.getStudyInfoType().getId();
+			int typeId = pvInfo.pvInfo.getPvInfoType().getId();
 
 			if (pvInfo.pvInfoData != null) {
 				value = pvInfo.pvInfoData.getValue();
@@ -365,7 +364,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
 
 			if (pvInfo.pvInfoData == null) {
 				pvInfoData = new PvInfoData();
-				pvInfoData.setStudyInfo(pvInfo.pvInfo);
+				pvInfoData.setPvInfo(pvInfo.pvInfo);
 				pvInfoData.setPatientVisit(patientVisit);
 			}
 			pvInfoData.setValue(value);

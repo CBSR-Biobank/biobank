@@ -4,9 +4,9 @@ import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 import org.springframework.util.Assert;
 
+import edu.ualberta.med.biobank.model.PvInfo;
 import edu.ualberta.med.biobank.model.StorageContainer;
 import edu.ualberta.med.biobank.model.StorageType;
-import edu.ualberta.med.biobank.model.StudyInfo;
 import edu.ualberta.med.biobank.treeview.ClinicAdapter;
 import edu.ualberta.med.biobank.treeview.PatientAdapter;
 import edu.ualberta.med.biobank.treeview.PatientVisitAdapter;
@@ -36,8 +36,8 @@ public class BiobankContentProvider implements IStructuredContentProvider {
 			return (StorageType[]) inputElement;
 		} else if (inputElement instanceof StorageContainer[]) {
 			return (StorageContainer[]) inputElement;
-		} else if (inputElement instanceof StudyInfo[]) {
-			return (StudyInfo[]) inputElement;
+		} else if (inputElement instanceof PvInfo[]) {
+			return (PvInfo[]) inputElement;
 		}
 		Assert.isTrue(false, "invalid type for inputElement: "
 				+ inputElement.getClass().getName());

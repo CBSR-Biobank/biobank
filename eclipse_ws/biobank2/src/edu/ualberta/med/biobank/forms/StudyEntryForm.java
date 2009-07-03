@@ -26,16 +26,17 @@ import org.springframework.remoting.RemoteConnectFailureException;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Clinic;
+import edu.ualberta.med.biobank.model.PvInfo;
+import edu.ualberta.med.biobank.model.PvInfoPossible;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
-import edu.ualberta.med.biobank.model.StudyInfo;
 import edu.ualberta.med.biobank.model.Worksheet;
 import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
 import edu.ualberta.med.biobank.widgets.MultiSelect;
-import edu.ualberta.med.biobank.widgets.StudyInfoWidget;
+import edu.ualberta.med.biobank.widgets.PvInfoWidget;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.SDKQuery;
@@ -78,13 +79,13 @@ public class StudyEntryForm extends BiobankEntryForm {
 
 	private Collection<Clinic> allClinics;
 
-	private Collection<StudyInfo> allStudyInfos;
+	private Collection<PvInfoPossible> possiblePvInfos;
 
-	private TreeMap<String, StudyInfoWidget> studyInfoWidgets;
+	private TreeMap<String, PvInfoWidget> studyInfoWidgets;
 
 	public StudyEntryForm() {
 		super();
-		studyInfoWidgets = new TreeMap<String, StudyInfoWidget>();
+		studyInfoWidgets = new TreeMap<String, PvInfoWidget>();
 	}
 
 	@Override
@@ -133,7 +134,7 @@ public class StudyEntryForm extends BiobankEntryForm {
 		// comments.setLayoutData(gd);
 
 		createClinicSection();
-		createStudyInfoSection();
+		createPvInfoSection();
 		createButtonsSection();
 	}
 
@@ -161,36 +162,36 @@ public class StudyEntryForm extends BiobankEntryForm {
 		clinicsMultiSelect.addSelections(availClinics, selClinics);
 	}
 
-	private void createStudyInfoSection() {
+	private void createPvInfoSection() {
 		Composite client = createSectionWithClient("Study Information Selection");
-		// Collection<StudyInfo> siCollection = study.getStudyInfoCollection();
-		// HashMap<Integer, StudyInfo> selected = new HashMap<Integer,
-		// StudyInfo>();
+		// Collection<PvInfo> siCollection = study.getPvInfoCollection();
+		// HashMap<Integer, PvInfo> selected = new HashMap<Integer,
+		// PvInfo>();
 		// GridLayout gl = (GridLayout) client.getLayout();
 		// gl.numColumns = 1;
 		//
 		// if (siCollection != null) {
-		// for (StudyInfo studyInfo : siCollection) {
-		// selected.put(studyInfo.getStudyInfoType().getId(), studyInfo);
+		// for (PvInfo studyInfo : siCollection) {
+		// selected.put(studyInfo.getPvInfoType().getId(), studyInfo);
 		// }
 		// }
 
-		allStudyInfos = getAllStudyInfos();
-		Assert.isNotNull(allStudyInfos);
+		possiblePvInfos = getPossiblePvInfos();
+		Assert.isNotNull(possiblePvInfos);
 
-		for (StudyInfo studyInfo : allStudyInfos) {
+		for (PvInfoPossible pvInfo : possiblePvInfos) {
 			String value = "";
 			boolean itemSelected = false;
-			// StudyInfo studyInfo = selected.get(studyInfoType.getId());
+			// PvInfo studyInfo = selected.get(studyInfoType.getId());
 			// if (studyInfo != null) {
 			// itemSelected = true;
 			// value = studyInfo.getPossibleValues();
 			// }
 
-			StudyInfoWidget w = new StudyInfoWidget(client, SWT.NONE, studyInfo
-				.getStudyInfoType(), itemSelected, value);
+			PvInfoWidget w = new PvInfoWidget(client, SWT.NONE, pvInfo
+				.getPvInfoType(), itemSelected, value);
 			w.adaptToToolkit(toolkit);
-			studyInfoWidgets.put(studyInfo.getLabel(), w);
+			studyInfoWidgets.put(pvInfo.getLabel(), w);
 		}
 	}
 
@@ -245,19 +246,24 @@ public class StudyEntryForm extends BiobankEntryForm {
 				"problem with clinic selections");
 			study.setClinicCollection(selClinics);
 
-			List<StudyInfo> studyInfoList = new ArrayList<StudyInfo>();
-			for (StudyInfo studyInfo : allStudyInfos) {
-				String type = studyInfo.getStudyInfoType().getType();
+			List<PvInfo> pvInfoList = new ArrayList<PvInfo>();
+			for (PvInfoPossible possiblePvInfo : possiblePvInfos) {
+				PvInfo pvInfo = new PvInfo();
+				String type = possiblePvInfo.getPvInfoType().getType();
 				String value = studyInfoWidgets.get(type).getResult();
+
+				// TODO: check for default PvInfoPossible
+
 				if ((value.length() == 0) || value.equals("no"))
 					continue;
 				if (value.equals("yes")) {
 					value = "";
 				}
-				studyInfo.setPossibleValues(value);
-				studyInfoList.add(studyInfo);
+				pvInfo.setLabel(possiblePvInfo.getLabel());
+				pvInfo.setPossibleValues(value);
+				pvInfoList.add(pvInfo);
 			}
-			study.setStudyInfoCollection(studyInfoList);
+			study.setPvInfoCollection(pvInfoList);
 
 			saveStudy(study);
 			studyAdapter.getParent().performExpand();
@@ -272,13 +278,13 @@ public class StudyEntryForm extends BiobankEntryForm {
 	private void saveStudy(Study study) throws ApplicationException {
 		SDKQuery query;
 		SDKQueryResult result;
-		Set<StudyInfo> savedStudyInfoList = new HashSet<StudyInfo>();
+		Set<PvInfo> savedPvInfoList = new HashSet<PvInfo>();
 
 		study.setSite(site);
 		study.setWorksheet(null);
 
-		if (study.getStudyInfoCollection().size() > 0) {
-			for (StudyInfo studyInfo : study.getStudyInfoCollection()) {
+		if (study.getPvInfoCollection().size() > 0) {
+			for (PvInfo studyInfo : study.getPvInfoCollection()) {
 				if ((studyInfo.getId() == null) || (studyInfo.getId() == 0)) {
 					query = new InsertExampleQuery(studyInfo);
 				} else {
@@ -286,10 +292,10 @@ public class StudyEntryForm extends BiobankEntryForm {
 				}
 
 				result = studyAdapter.getAppService().executeQuery(query);
-				savedStudyInfoList.add((StudyInfo) result.getObjectResult());
+				savedPvInfoList.add((PvInfo) result.getObjectResult());
 			}
 		}
-		study.setStudyInfoCollection(savedStudyInfoList);
+		study.setPvInfoCollection(savedPvInfoList);
 
 		if ((study.getId() == null) || (study.getId() == 0)) {
 			query = new InsertExampleQuery(study);
@@ -301,11 +307,11 @@ public class StudyEntryForm extends BiobankEntryForm {
 		study = (Study) result.getObjectResult();
 	}
 
-	private List<StudyInfo> getAllStudyInfos() {
-		StudyInfo criteria = new StudyInfo();
+	private List<PvInfoPossible> getPossiblePvInfos() {
+		PvInfoPossible criteria = new PvInfoPossible();
 
 		try {
-			return studyAdapter.getAppService().search(StudyInfo.class,
+			return studyAdapter.getAppService().search(PvInfoPossible.class,
 				criteria);
 		} catch (final RemoteConnectFailureException exp) {
 			BioBankPlugin.openRemoteConnectErrorMessage();

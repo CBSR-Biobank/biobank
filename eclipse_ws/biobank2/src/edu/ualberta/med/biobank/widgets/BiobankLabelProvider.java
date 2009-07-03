@@ -7,10 +7,10 @@ import org.springframework.util.Assert;
 
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.PatientVisit;
+import edu.ualberta.med.biobank.model.PvInfo;
 import edu.ualberta.med.biobank.model.StorageContainer;
 import edu.ualberta.med.biobank.model.StorageType;
 import edu.ualberta.med.biobank.model.Study;
-import edu.ualberta.med.biobank.model.StudyInfo;
 import edu.ualberta.med.biobank.treeview.ClinicAdapter;
 import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.PatientAdapter;
@@ -76,11 +76,11 @@ public class BiobankLabelProvider extends LabelProvider implements
 			case 2:
 				return "" + adapter.getStorageType().getDefaultTemperature();
 			}
-		} else if (element instanceof StudyInfo) {
-			final StudyInfo studyInfo = (StudyInfo) element;
+		} else if (element instanceof PvInfo) {
+			final PvInfo studyInfo = (PvInfo) element;
 			switch (columnIndex) {
 			case 0:
-				return studyInfo.getStudyInfoType().getType();
+				return studyInfo.getPvInfoType().getType();
 			case 1:
 				return studyInfo.getPossibleValues();
 			}
