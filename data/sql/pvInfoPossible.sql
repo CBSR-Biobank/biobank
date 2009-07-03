@@ -21,17 +21,17 @@ UNLOCK TABLES;
 
 LOCK TABLES `PV_INFO_POSSIBLE` WRITE;
 INSERT INTO `PV_INFO_POSSIBLE` VALUES
-       ( 1,'Date Drawn',NULL,3),
-       ( 2,'Shipped Date',NULL,3),
-       ( 3,'Date Received',NULL,3),
-       ( 4,'Date Processed',NULL,3),
-       ( 5,'Aliquot Volume',NULL,4),
-       ( 6,'Blood Received',NULL,5),
-       ( 7,'Consent',NULL,6),
-       ( 8,'Visit',NULL,4),
-       ( 9,'WBC Count',NULL,1),
-       (10,'Biopsy Length',NULL,1),
+       ( 1,'Date Drawn',3),
+       ( 2,'Shipped Date',3),
+       ( 3,'Date Received',3),
+       ( 4,'Date Processed',3),
+       ( 5,'Aliquot Volume',4),
+       ( 6,'Blood Received',5),
+       ( 7,'Consent',6),
+       ( 8,'Visit',4),
+       ( 9,'WBC Count',1),
+       (10,'Biopsy Length',1),
        -- comments should be last
-       (11,'Comments',NULL,2);
+       (11,'Comments',2);
 UNLOCK TABLES;
 

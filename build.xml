@@ -90,7 +90,7 @@
         url="jdbc:mysql://${database.host}:${database.port}/${database.name}"
         userid="${database.username}" password="${database.password}" >
     <transaction src="${data.sql.dir}/sampleTypes.sql" />
-    <transaction src="${data.sql.dir}/studyInfo.sql" />
+    <transaction src="${data.sql.dir}/pvInfoPossible.sql" />
     <transaction>commit;</transaction>
     <classpath>
       <fileset dir="${cacore.sdk.dir}/system/lib">
