@@ -34,9 +34,9 @@ import com.gface.date.DatePickerStyle;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.PatientVisit;
-import edu.ualberta.med.biobank.model.PatientVisitData;
+import edu.ualberta.med.biobank.model.PvInfo;
+import edu.ualberta.med.biobank.model.PvInfoData;
 import edu.ualberta.med.biobank.model.Study;
-import edu.ualberta.med.biobank.model.StudyInfo;
 import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.PatientAdapter;
 import edu.ualberta.med.biobank.treeview.PatientVisitAdapter;
@@ -75,12 +75,12 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
 	}
 
 	class PatientVisitInfo {
-		StudyInfo studyInfo;
-		PatientVisitData pvData;
+		PvInfo pvInfo;
+		PvInfoData pvInfoData;
 
 		public PatientVisitInfo() {
-			studyInfo = null;
-			pvData = null;
+			pvInfo = null;
+			pvInfoData = null;
 		}
 	}
 
@@ -128,27 +128,25 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
 		study = ((StudyAdapter) patientVisitAdapter.getParent().getParent()
 			.getParent()).getStudy();
 
-		for (StudyInfo studyInfo : study.getStudyInfoCollection()) {
-			PatientVisitInfo pvInfo = new PatientVisitInfo();
-			pvInfo.studyInfo = studyInfo;
-			pvInfoMap.put(studyInfo.getStudyInfoType().getType(), pvInfo);
+		for (PvInfo pvInfo : study.getPvInfoCollection()) {
+			PatientVisitInfo visitInfo = new PatientVisitInfo();
+			visitInfo.pvInfo = pvInfo;
+			pvInfoMap.put(pvInfo.getPvInfoPossible().getPvInfoType(), pvInfo);
 		}
 
-		Collection<PatientVisitData> pvDataCollection = patientVisit
-			.getPatientVisitDataCollection();
+		Collection<PvInfoData> pvDataCollection = patientVisit
+			.getPvInfoDataCollection();
 		if (pvDataCollection != null) {
-			for (PatientVisitData pvData : pvDataCollection) {
-				String key = pvData.getStudyInfo().getStudyInfoType().getType();
-				PatientVisitInfo pvInfo = (PatientVisitInfo) pvInfoMap.get(key);
-				pvInfo.pvData = pvData;
+			for (PvInfoData pvInfoData : pvDataCollection) {
+				String key = pvInfoData.getPvInfo().getPvInfoPossible()
+					.getPvInfoType().getType();
+				PatientVisitInfo visitInfo = (PatientVisitInfo) pvInfoMap
+					.get(key);
+				visitInfo.pvInfoData = pvInfoData;
 
-				System.out.println("--- id: " + pvData.getId() + ", value: "
-						+ pvData.getValue() + ", pv_id: "
-						+ pvData.getPatientVisit().getId());
-
-				// pvData.getId()
-				// pvData.getValue()
-				// pvDataCollection.size()
+				System.out.println("--- id: " + pvInfoData.getId()
+						+ ", value: " + pvInfoData.getValue() + ", pv_id: "
+						+ pvInfoData.getPatientVisit().getId());
 			}
 		}
 
@@ -159,10 +157,10 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
 			String label = (String) it.next();
 			PatientVisitInfo pvInfo = (PatientVisitInfo) it.getValue();
 			String value = null;
-			int typeId = pvInfo.studyInfo.getStudyInfoType().getId();
+			int typeId = pvInfo.pvInfo.getStudyInfoType().getId();
 
-			if (pvInfo.pvData != null) {
-				value = pvInfo.pvData.getValue();
+			if (pvInfo.pvInfoData != null) {
+				value = pvInfo.pvInfoData.getValue();
 			}
 
 			Label labelWidget = toolkit.createLabel(client, label + ":",
@@ -181,7 +179,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
 			case 5: // Aliquot Volume
 			case 6: // Blood Received
 			case 7: // Visit
-				control = createComboSection(client, pvInfo.studyInfo
+				control = createComboSection(client, pvInfo.pvInfo
 					.getPossibleValues().split(";"), value);
 				break;
 
@@ -197,7 +195,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
 				break;
 
 			default:
-				Assert.isTrue(false, "Invalid studyInfo type: " + typeId);
+				Assert.isTrue(false, "Invalid pvInfo type: " + typeId);
 			}
 			GridData gd = new GridData(GridData.FILL_HORIZONTAL);
 			if (typeId == 11) {
@@ -294,27 +292,25 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
 
 		System.out.println("*** patient visit id: " + patientVisit.getId());
 
-		if (patientVisit.getPatientVisitDataCollection() != null) {
-			for (PatientVisitData pvData : patientVisit
-				.getPatientVisitDataCollection()) {
-				System.out.println("*** id: " + pvData.getId() + ", value: "
-						+ pvData.getValue() + ", pv_id: "
-						+ pvData.getPatientVisit().getId());
+		if (patientVisit.getPvInfoDataCollection() != null) {
+			for (PvInfoData pvInfoData : patientVisit.getPvInfoDataCollection()) {
+				System.out.println("*** id: " + pvInfoData.getId()
+						+ ", value: " + pvInfoData.getValue() + ", pv_id: "
+						+ pvInfoData.getPatientVisit().getId());
 			}
 		}
 
 		patientVisit.setPatient(patientAdapter.getPatient());
-		savePatientVisitData();
+		savePvInfoData();
 
-		for (PatientVisitData pvData : patientVisit
-			.getPatientVisitDataCollection()) {
-			System.out.println("id: " + pvData.getId() + ", value: "
-					+ pvData.getValue() + ", pv_id: "
-					+ pvData.getPatientVisit().getId());
+		for (PvInfoData pvInfoData : patientVisit.getPvInfoDataCollection()) {
+			System.out.println("id: " + pvInfoData.getId() + ", value: "
+					+ pvInfoData.getValue() + ", pv_id: "
+					+ pvInfoData.getPatientVisit().getId());
 		}
 
 		System.out.println("pv data size: "
-				+ patientVisit.getPatientVisitDataCollection().size());
+				+ patientVisit.getPvInfoDataCollection().size());
 
 		if ((patientVisit.getId() == null) || (patientVisit.getId() == 0)) {
 			query = new InsertExampleQuery(patientVisit);
@@ -329,13 +325,13 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
 		getSite().getPage().closeEditor(this, false);
 	}
 
-	private void savePatientVisitData() {
+	private void savePvInfoData() {
 		boolean newCollection = false;
-		Collection<PatientVisitData> pvDataCollection;
+		Collection<PvInfoData> pvDataCollection;
 
-		pvDataCollection = patientVisit.getPatientVisitDataCollection();
+		pvDataCollection = patientVisit.getPvInfoDataCollection();
 		if (pvDataCollection == null) {
-			pvDataCollection = new HashSet<PatientVisitData>();
+			pvDataCollection = new HashSet<PvInfoData>();
 			newCollection = true;
 		}
 
@@ -348,8 +344,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
 				value = ((Text) control).getText();
 				System.out.println(key + ": " + ((Text) control).getText());
 			} else if (control instanceof Combo) {
-				String[] options = pvInfo.studyInfo.getPossibleValues().split(
-					";");
+				String[] options = pvInfo.pvInfo.getPossibleValues().split(";");
 				int index = ((Combo) control).getSelectionIndex();
 				if (index >= 0) {
 					Assert.isTrue(index < options.length,
@@ -366,24 +361,24 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
 				}
 			}
 
-			PatientVisitData pvData = pvInfo.pvData;
+			PvInfoData pvInfoData = pvInfo.pvInfoData;
 
-			if (pvInfo.pvData == null) {
-				pvData = new PatientVisitData();
-				pvData.setStudyInfo(pvInfo.studyInfo);
-				pvData.setPatientVisit(patientVisit);
+			if (pvInfo.pvInfoData == null) {
+				pvInfoData = new PvInfoData();
+				pvInfoData.setStudyInfo(pvInfo.pvInfo);
+				pvInfoData.setPatientVisit(patientVisit);
 			}
-			pvData.setValue(value);
+			pvInfoData.setValue(value);
 
-			// pvData.getId()
+			// pvInfoData.getId()
 
-			if (pvInfo.pvData == null) {
-				pvDataCollection.add(pvData);
+			if (pvInfo.pvInfoData == null) {
+				pvDataCollection.add(pvInfoData);
 			}
 		}
 
 		if (newCollection) {
-			patientVisit.setPatientVisitDataCollection(pvDataCollection);
+			patientVisit.setPvInfoDataCollection(pvDataCollection);
 		}
 	}
 
