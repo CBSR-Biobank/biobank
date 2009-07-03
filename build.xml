@@ -12,6 +12,8 @@
 <property name="cacore.sdk.dir" location="caCORE_SDK/sdk" />
 <property name="eclipse.proj.dir" location="eclipse_ws/biobank2" />
 <property name="eclipse.proj.dir.junit" location="eclipse_ws/biobank2.tests" />
+<property name="scripts.proj.dir" location="scripts" /> <!--tp-->
+<property name="model.proj.dir" location="model" /> <!--tp-->
 <property name="data.dir" location="data" />
 <property name="data.sql.dir" location="${data.dir}/sql" />
 <property name="schema.dir" location="schema" />
@@ -99,11 +101,27 @@
   </sql>
 </target>
 
+<!--Add the length="#" field into .hbm.xml, references the biobank.uml file for the VARCHAR(#) -->
+<target name="string-length-field-addition" description="XXX">
+  <exec executable="perl">
+    <env key="PATH" path="${scripts.proj.dir}"/>
+    <arg value="${scripts.proj.dir}/hbmstringlength.pl"/>
+    <arg value="${model.proj.dir}/biobank2.uml"/>
+    <arg value="${cacore.sdk.dir}/output/biobank2/src/edu/ualberta/med/biobank/model"/>
+	<arg value="0"/><!--Verbose-->
+  </exec>
+</target>
+<!--Add the length="#" field into .hbm.xml, references the biobank.uml file for the VARCHAR(#) -->
+
+
 <target name="clean">
   <ant
      dir="${cacore.sdk.dir}"
      target="clean"
      inheritRefs="false" />
 </target>
+
+
+
 
 </project>
