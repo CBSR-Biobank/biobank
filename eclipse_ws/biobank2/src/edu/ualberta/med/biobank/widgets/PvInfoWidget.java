@@ -21,7 +21,7 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.dialogs.ListAddDialog;
-import edu.ualberta.med.biobank.model.PvInfoType;
+import edu.ualberta.med.biobank.model.PvInfoPossible;
 
 public class PvInfoWidget extends Composite {
 	String type;
@@ -31,26 +31,117 @@ public class PvInfoWidget extends Composite {
 	List list;
 	boolean hasListValues;
 
-	public PvInfoWidget(Composite parent, int style, PvInfoType sdataType,
-			boolean selected, String value) {
+	public PvInfoWidget(Composite parent, int style,
+			PvInfoPossible pvInfoPossible, boolean selected, String value) {
 		super(parent, style);
 
 		setLayout(new GridLayout(1, false));
 		setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-		type = sdataType.getType();
-		hasListValues = type.equals("Aliquot Volume")
-				|| type.equals("Blood Received") || type.equals("Visit");
+		type = pvInfoPossible.getPvInfoType().getType();
+		hasListValues = type.equals("select_single")
+				|| type.equals("select_single_and_quantity")
+				|| type.equals("select_multiple");
 		if (hasListValues) {
 
 			checkButton = new Button(this, SWT.CHECK);
-			checkButton.setText(type);
+			checkButton.setText(pvInfoPossible.getLabel());
 			checkButton.setSelection(selected);
 
 			// this composite holds the list and the "Add" and "Remove" buttons
 			Composite comp = new Composite(this, SWT.NONE);
 			comp.setLayout(new GridLayout(2, false));
 			comp.setLayoutData(new GridData(GridData.FILL_BOTH));
+
+			// this composite holds the "Add" and "Remove" buttons
+			Composite bcomp = new Composite(comp, SWT.NONE);
+			bcomp.setLayout(new GridLayout(1, false));
+			bcomp.setLayoutData(new GridData());
+
+			addButton = new Button(bcomp, SWT.PUSH);
+			addButton.setText("Add");
+			addButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+			addButton.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(SelectionEvent e) {
+					String title = "";
+					String prompt = "";
+					String helpText = "";
+
+					if (type.equals("Aliquot Volume")) {
+						title = "Allowed Aliquot Volumes";
+						prompt = "Please enter a new volume:";
+						helpText = "To enter multiple volumes, separate with semicolon.";
+					} else if (type.equals("Blood Received")) {
+						title = "Allowed Blood Received Volumes";
+						prompt = "Please enter a new volume:";
+						helpText = "To enter multiple volumes, separate with semicolon.";
+					} else if (type.equals("Visit")) {
+						title = "Visit Values";
+						prompt = "Please enter a visit type:";
+						helpText = "To enter multiple visit values, separate with semicolon.";
+					} else {
+						Assert.isTrue(false, "invalid value for type " + type);
+					}
+
+					ListAddDialog dlg = new ListAddDialog(PlatformUI
+						.getWorkbench().getActiveWorkbenchWindow().getShell(),
+						title, prompt, helpText);
+					dlg.open();
+
+					// make sure there are no duplicates
+					String[] newItems = dlg.getResult();
+					String[] currentItems = list.getItems();
+					ArrayList<String> duplicates = new ArrayList<String>();
+					ArrayList<String> unique = new ArrayList<String>();
+
+					for (String newItem : newItems) {
+						boolean found = false;
+						for (String currentItem : currentItems) {
+							if (currentItem.equals(newItem)) {
+								found = true;
+								duplicates.add(newItem);
+								break;
+							}
+						}
+
+						if (!found) {
+							unique.add(newItem);
+						}
+					}
+
+					int numDuplicates = duplicates.size();
+					if (numDuplicates > 0) {
+						String msg = "Value " + duplicates.get(0)
+								+ " already in " + title;
+						if (numDuplicates > 1) {
+							msg = "Values " + duplicates.toString()
+									+ " already in " + title;
+						}
+						BioBankPlugin.openError(title, msg);
+					}
+
+					for (String item : unique
+						.toArray(new String[unique.size()])) {
+						list.add(item);
+					}
+					checkButton.setSelection(true);
+				}
+			});
+
+			removeButton = new Button(bcomp, SWT.PUSH);
+			removeButton.setText("Remove");
+			removeButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+			removeButton.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(SelectionEvent e) {
+					for (String selection : list.getSelection()) {
+						list.remove(selection);
+					}
+				}
+			});
 
 			list = new List(comp, SWT.BORDER | SWT.V_SCROLL);
 			list.setLayoutData(new GridData(GridData.FILL_BOTH));
@@ -165,99 +256,9 @@ public class PvInfoWidget extends Composite {
 			});
 
 			list.setMenu(m);
-
-			// this composite holds the "Add" and "Remove" buttons
-			comp = new Composite(comp, SWT.NONE);
-			comp.setLayout(new GridLayout(1, false));
-			comp.setLayoutData(new GridData());
-
-			addButton = new Button(comp, SWT.PUSH);
-			addButton.setText("Add");
-			addButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-
-			addButton.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(SelectionEvent e) {
-					String title = "";
-					String prompt = "";
-					String helpText = "";
-
-					if (type.equals("Aliquot Volume")) {
-						title = "Allowed Aliquot Volumes";
-						prompt = "Please enter a new volume:";
-						helpText = "To enter multiple volumes, separate with semicolon.";
-					} else if (type.equals("Blood Received")) {
-						title = "Allowed Blood Received Volumes";
-						prompt = "Please enter a new volume:";
-						helpText = "To enter multiple volumes, separate with semicolon.";
-					} else if (type.equals("Visit")) {
-						title = "Visit Values";
-						prompt = "Please enter a visit type:";
-						helpText = "To enter multiple visit values, separate with semicolon.";
-					} else {
-						Assert.isTrue(false, "invalid value for type " + type);
-					}
-
-					ListAddDialog dlg = new ListAddDialog(PlatformUI
-						.getWorkbench().getActiveWorkbenchWindow().getShell(),
-						title, prompt, helpText);
-					dlg.open();
-
-					// make sure there are no duplicates
-					String[] newItems = dlg.getResult();
-					String[] currentItems = list.getItems();
-					ArrayList<String> duplicates = new ArrayList<String>();
-					ArrayList<String> unique = new ArrayList<String>();
-
-					for (String newItem : newItems) {
-						boolean found = false;
-						for (String currentItem : currentItems) {
-							if (currentItem.equals(newItem)) {
-								found = true;
-								duplicates.add(newItem);
-								break;
-							}
-						}
-
-						if (!found) {
-							unique.add(newItem);
-						}
-					}
-
-					int numDuplicates = duplicates.size();
-					if (numDuplicates > 0) {
-						String msg = "Value " + duplicates.get(0)
-								+ " already in " + title;
-						if (numDuplicates > 1) {
-							msg = "Values " + duplicates.toString()
-									+ " already in " + title;
-						}
-						BioBankPlugin.openError(title, msg);
-					}
-
-					for (String item : unique
-						.toArray(new String[unique.size()])) {
-						list.add(item);
-					}
-					checkButton.setSelection(true);
-				}
-			});
-
-			removeButton = new Button(comp, SWT.PUSH);
-			removeButton.setText("Remove");
-			removeButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-
-			removeButton.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(SelectionEvent e) {
-					for (String selection : list.getSelection()) {
-						list.remove(selection);
-					}
-				}
-			});
 		} else {
 			checkButton = new Button(this, SWT.CHECK);
-			checkButton.setText(type);
+			checkButton.setText(pvInfoPossible.getLabel());
 			GridData gd = new GridData(GridData.VERTICAL_ALIGN_BEGINNING
 					| GridData.GRAB_HORIZONTAL);
 			checkButton.setLayoutData(gd);

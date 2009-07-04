@@ -132,7 +132,7 @@ public class StudyViewForm extends BiobankViewForm {
 	}
 
 	private void createDataCollectedSection() {
-		Section section = createSection("Study Data Collected");
+		Section section = createSection("Patient Visit Information Collected");
 
 		String[] headings = new String[] { "Name", "Valid Values (optional)" };
 		sDatasTable = new BiobankCollectionTable(section, SWT.NONE, headings,

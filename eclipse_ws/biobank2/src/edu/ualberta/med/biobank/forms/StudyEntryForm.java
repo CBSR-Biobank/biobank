@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.forms;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -163,35 +164,36 @@ public class StudyEntryForm extends BiobankEntryForm {
 	}
 
 	private void createPvInfoSection() {
-		Composite client = createSectionWithClient("Study Information Selection");
-		// Collection<PvInfo> siCollection = study.getPvInfoCollection();
-		// HashMap<Integer, PvInfo> selected = new HashMap<Integer,
-		// PvInfo>();
-		// GridLayout gl = (GridLayout) client.getLayout();
-		// gl.numColumns = 1;
-		//
-		// if (siCollection != null) {
-		// for (PvInfo studyInfo : siCollection) {
-		// selected.put(studyInfo.getPvInfoType().getId(), studyInfo);
-		// }
-		// }
+		Composite client = createSectionWithClient("Patient Visit Information Collected");
+		Collection<PvInfo> pviCollection = study.getPvInfoCollection();
+		HashMap<Integer, PvInfo> selected = new HashMap<Integer, PvInfo>();
+		GridLayout gl = (GridLayout) client.getLayout();
+		gl.numColumns = 1;
+
+		if (pviCollection != null) {
+			for (PvInfo studyInfo : pviCollection) {
+				selected.put(studyInfo.getPvInfoType().getId(), studyInfo);
+			}
+		}
 
 		possiblePvInfos = getPossiblePvInfos();
 		Assert.isNotNull(possiblePvInfos);
 
-		for (PvInfoPossible pvInfo : possiblePvInfos) {
+		for (PvInfoPossible possiblePvInfo : possiblePvInfos) {
+			String label = possiblePvInfo.getLabel();
 			String value = "";
 			boolean itemSelected = false;
-			// PvInfo studyInfo = selected.get(studyInfoType.getId());
-			// if (studyInfo != null) {
-			// itemSelected = true;
-			// value = studyInfo.getPossibleValues();
-			// }
+			PvInfo pvInfo = selected.get(possiblePvInfo.getId());
+			if (pvInfo != null) {
+				itemSelected = true;
+				label = pvInfo.getLabel();
+				value = pvInfo.getLabel();
+			}
 
-			PvInfoWidget w = new PvInfoWidget(client, SWT.NONE, pvInfo
-				.getPvInfoType(), itemSelected, value);
+			PvInfoWidget w = new PvInfoWidget(client, SWT.NONE, possiblePvInfo,
+				itemSelected, value);
 			w.adaptToToolkit(toolkit);
-			studyInfoWidgets.put(pvInfo.getLabel(), w);
+			studyInfoWidgets.put(label, w);
 		}
 	}
 
