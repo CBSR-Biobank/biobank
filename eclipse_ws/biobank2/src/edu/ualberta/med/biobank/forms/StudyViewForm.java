@@ -17,8 +17,8 @@ import org.springframework.util.Assert;
 
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Patient;
+import edu.ualberta.med.biobank.model.PvInfo;
 import edu.ualberta.med.biobank.model.Study;
-import edu.ualberta.med.biobank.model.StudyInfo;
 import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.PatientAdapter;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
@@ -136,7 +136,7 @@ public class StudyViewForm extends BiobankViewForm {
 
 		String[] headings = new String[] { "Name", "Valid Values (optional)" };
 		sDatasTable = new BiobankCollectionTable(section, SWT.NONE, headings,
-			getSDatas());
+			getStudyPvInfo());
 		section.setClient(sDatasTable);
 		sDatasTable.adaptToToolkit(toolkit);
 		toolkit.paintBordersFor(sDatasTable);
@@ -145,14 +145,13 @@ public class StudyViewForm extends BiobankViewForm {
 			FormUtils.getBiobankCollectionDoubleClickListener());
 	}
 
-	private StudyInfo[] getSDatas() {
+	private PvInfo[] getStudyPvInfo() {
 		// hack required here because site.getStudyCollection().toArray(new
-		// Study[0])
-		// returns Object[].
+		// Study[0]) returns Object[].
 		int count = 0;
-		Collection<StudyInfo> sdatas = study.getStudyInfoCollection();
-		StudyInfo[] arr = new StudyInfo[sdatas.size()];
-		Iterator<StudyInfo> it = sdatas.iterator();
+		Collection<PvInfo> pvInfos = study.getPvInfoCollection();
+		PvInfo[] arr = new PvInfo[pvInfos.size()];
+		Iterator<PvInfo> it = pvInfos.iterator();
 		while (it.hasNext()) {
 			arr[count] = it.next();
 			++count;
@@ -172,7 +171,7 @@ public class StudyViewForm extends BiobankViewForm {
 			FormUtils.getClinicsAdapters(clinicGroupNode, study
 				.getClinicCollection()));
 		patientsTable.getTableViewer().setInput(getPatientAdapters());
-		sDatasTable.getTableViewer().setInput(getSDatas());
+		sDatasTable.getTableViewer().setInput(getStudyPvInfo());
 	}
 
 	private void retrieveStudy() {

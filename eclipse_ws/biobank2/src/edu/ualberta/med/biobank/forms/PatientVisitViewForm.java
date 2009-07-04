@@ -14,7 +14,6 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
 
-import edu.ualberta.med.biobank.forms.PatientVisitEntryForm.PatientVisitInfo;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.PvInfo;
@@ -33,6 +32,18 @@ public class PatientVisitViewForm extends BiobankViewForm {
 	private PatientVisit patientVisit;
 
 	private ListOrderedMap pvInfoMap;
+
+	// used to keep track of which data has been entered or left blank for
+	// a patient visit.
+	class VisitInfo {
+		PvInfo studyPvInfo;
+		PvInfoData visitData;
+
+		public VisitInfo() {
+			studyPvInfo = null;
+			visitData = null;
+		}
+	}
 
 	public PatientVisitViewForm() {
 		super();
@@ -84,18 +95,18 @@ public class PatientVisitViewForm extends BiobankViewForm {
 		// get all PvInfo from study, since user may not have filled in all
 		// fields
 		for (PvInfo pvInfo : study.getPvInfoCollection()) {
-			PvInfoData pvInfoData = new PvInfoData();
-			pvInfoData.setPvInfo(pvInfo);
-			pvInfoMap.put(pvInfo.getPvInfoType().getType(), pvInfoDat);
+			VisitInfo visitInfo = new VisitInfo();
+			visitInfo.studyPvInfo = pvInfo;
+			pvInfoMap.put(pvInfo.getLabel(), visitInfo);
 		}
 
-		Collection<PvInfoData> pvDataCollection = patientVisit
-			.getPvDataCollection();
-		if (pvDataCollection != null) {
-			for (PvInfoData pvData : pvDataCollection) {
-				String key = pvData.getPvInfo().getPvInfoType().getType();
-				PatientVisitInfo pvInfo = (PatientVisitInfo) pvInfoMap.get(key);
-				pvInfo.pvData = pvData;
+		Collection<PvInfoData> pvInfoDataCollection = patientVisit
+			.getPvInfoDataCollection();
+		if (pvInfoDataCollection != null) {
+			for (PvInfoData pvInfoData : pvInfoDataCollection) {
+				Integer key = pvInfoData.getPvInfo().getId();
+				VisitInfo visitInfo = (VisitInfo) pvInfoMap.get(key);
+				visitInfo.visitData = pvInfoData;
 			}
 		}
 
@@ -103,12 +114,12 @@ public class PatientVisitViewForm extends BiobankViewForm {
 		MapIterator it = pvInfoMap.mapIterator();
 		while (it.hasNext()) {
 			String label = (String) it.next();
-			PatientVisitInfo pvInfo = (PatientVisitInfo) it.getValue();
+			VisitInfo visitInfo = (VisitInfo) it.getValue();
 			String value = "";
-			int typeId = pvInfo.pvInfo.getPvInfoType().getId();
+			int typeId = visitInfo.studyPvInfo.getPvInfoType().getId();
 
-			if (pvInfo.pvData != null) {
-				value = pvInfo.pvData.getValue();
+			if (visitInfo.visitData != null) {
+				value = visitInfo.visitData.getValue();
 			}
 
 			Label labelWidget = toolkit.createLabel(client, label + ":",
