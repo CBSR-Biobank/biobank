@@ -84,6 +84,11 @@ public class StudyEntryForm extends BiobankEntryForm {
 
     private TreeMap<String, PvInfoWidget> studyInfoWidgets;
 
+    class PvInfoDetails {
+        PvInfo pvInfo;
+        PvInfoPossible pvInfoPossible;
+    }
+
     public StudyEntryForm() {
         super();
         studyInfoWidgets = new TreeMap<String, PvInfoWidget>();
@@ -249,17 +254,17 @@ public class StudyEntryForm extends BiobankEntryForm {
 
         List<PvInfo> pvInfoList = new ArrayList<PvInfo>();
         for (PvInfoPossible possiblePvInfo : possiblePvInfos) {
+            String label = possiblePvInfo.getLabel();
+            String value = studyInfoWidgets.get(label).getResult();
+
+            if (!possiblePvInfo.getIsDefault() || (value.length() == 0)
+                || value.equals("no")) continue;
+            if (value.equals("yes")) value = "";
+
             PvInfo pvInfo = new PvInfo();
-            String type = possiblePvInfo.getPvInfoType().getType();
-            String value = studyInfoWidgets.get(type).getResult();
 
-            // TODO: check for default PvInfoPossible
-
-            if ((value.length() == 0) || value.equals("no")) continue;
-            if (value.equals("yes")) {
-                value = "";
-            }
-            pvInfo.setLabel(possiblePvInfo.getLabel());
+            pvInfo.setLabel(label);
+            pvInfo.setPvInfoType(possiblePvInfo.getPvInfoType());
             pvInfo.setPossibleValues(value);
             pvInfoList.add(pvInfo);
         }
