@@ -1,3 +1,4 @@
+
 package edu.ualberta.med.biobank.forms;
 
 import java.util.Collection;
@@ -28,165 +29,166 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class StudyViewForm extends BiobankViewForm {
 
-	public static final String ID = "edu.ualberta.med.biobank.forms.StudyViewForm";
+    public static final String ID = "edu.ualberta.med.biobank.forms.StudyViewForm";
 
-	private StudyAdapter studyAdapter;
-	private Study study;
+    private StudyAdapter studyAdapter;
+    private Study study;
 
-	private Label nameShortLabel;
-	private Label activityStatusLabel;
-	private Label commentLabel;
+    private Label nameShortLabel;
+    private Label activityStatusLabel;
+    private Label commentLabel;
 
-	private BiobankCollectionTable clinicsTable;
-	private BiobankCollectionTable patientsTable;
-	private BiobankCollectionTable sDatasTable;
+    private BiobankCollectionTable clinicsTable;
+    private BiobankCollectionTable patientsTable;
+    private BiobankCollectionTable pvInfosTable;
 
-	@Override
-	public void init(IEditorSite editorSite, IEditorInput input)
-			throws PartInitException {
-		super.init(editorSite, input);
+    @Override
+    public void init(IEditorSite editorSite, IEditorInput input)
+        throws PartInitException {
+        super.init(editorSite, input);
 
-		Node node = ((FormInput) input).getNode();
-		Assert.notNull(node, "Null editor input");
+        Node node = ((FormInput) input).getNode();
+        Assert.notNull(node, "Null editor input");
 
-		if (node instanceof StudyAdapter) {
-			studyAdapter = (StudyAdapter) node;
+        if (node instanceof StudyAdapter) {
+            studyAdapter = (StudyAdapter) node;
 
-			// retrieve info from database because could have been modified
-			// after first opening
-			retrieveStudy();
-			setPartName("Study " + study.getName());
-		} else {
-			Assert.isTrue(false, "Invalid editor input: object of type "
-					+ node.getClass().getName());
-		}
-	}
+            // retrieve info from database because could have been modified
+            // after first opening
+            retrieveStudy();
+            setPartName("Study " + study.getName());
+        }
+        else {
+            Assert.isTrue(false, "Invalid editor input: object of type "
+                + node.getClass().getName());
+        }
+    }
 
-	@Override
-	protected void createFormContent() {
-		if (study.getName() != null) {
-			form.setText("Study: " + study.getName());
-		}
+    @Override
+    protected void createFormContent() {
+        if (study.getName() != null) {
+            form.setText("Study: " + study.getName());
+        }
 
-		addRefreshToolbarAction();
+        addRefreshToolbarAction();
 
-		GridLayout layout = new GridLayout(1, false);
-		form.getBody().setLayout(layout);
-		form.getBody().setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        GridLayout layout = new GridLayout(1, false);
+        form.getBody().setLayout(layout);
+        form.getBody().setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-		Composite client = toolkit.createComposite(form.getBody());
-		client.setLayout(new GridLayout(2, false));
-		client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		toolkit.paintBordersFor(client);
+        Composite client = toolkit.createComposite(form.getBody());
+        client.setLayout(new GridLayout(2, false));
+        client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        toolkit.paintBordersFor(client);
 
-		nameShortLabel = (Label) createWidget(client, Label.class, SWT.NONE,
-			"Short Name");
-		activityStatusLabel = (Label) createWidget(client, Label.class,
-			SWT.NONE, "Activity Status");
-		commentLabel = (Label) createWidget(client, Label.class, SWT.NONE,
-			"Comments");
+        nameShortLabel = (Label) createWidget(client, Label.class, SWT.NONE,
+            "Short Name");
+        activityStatusLabel = (Label) createWidget(client, Label.class,
+            SWT.NONE, "Activity Status");
+        commentLabel = (Label) createWidget(client, Label.class, SWT.NONE,
+            "Comments");
 
-		setStudySectionValues();
+        setStudySectionValues();
 
-		Node clinicGroupNode = ((SiteAdapter) studyAdapter.getParent()
-			.getParent()).getClinicGroupNode();
-		clinicsTable = FormUtils.createClinicSection(toolkit, form.getBody(),
-			clinicGroupNode, study.getClinicCollection());
+        Node clinicGroupNode = ((SiteAdapter) studyAdapter.getParent().getParent()).getClinicGroupNode();
+        clinicsTable = FormUtils.createClinicSection(toolkit, form.getBody(),
+            clinicGroupNode, study.getClinicCollection());
 
-		createPatientsSection();
-		createDataCollectedSection();
-	}
+        createPatientsSection();
+        createPvDataSection();
+    }
 
-	private void setStudySectionValues() {
-		FormUtils.setTextValue(nameShortLabel, study.getNameShort());
-		FormUtils.setTextValue(activityStatusLabel, study.getActivityStatus());
-		FormUtils.setTextValue(commentLabel, study.getComment());
-	}
+    private void setStudySectionValues() {
+        FormUtils.setTextValue(nameShortLabel, study.getNameShort());
+        FormUtils.setTextValue(activityStatusLabel, study.getActivityStatus());
+        FormUtils.setTextValue(commentLabel, study.getComment());
+    }
 
-	private void createPatientsSection() {
-		Section section = createSection("Patients");
+    private void createPatientsSection() {
+        Section section = createSection("Patients");
 
-		String[] headings = new String[] { "Patient Number" };
-		patientsTable = new BiobankCollectionTable(section, SWT.NONE, headings,
-			getPatientAdapters());
-		section.setClient(patientsTable);
-		patientsTable.adaptToToolkit(toolkit);
-		toolkit.paintBordersFor(patientsTable);
+        String [] headings = new String [] { "Patient Number" };
+        patientsTable = new BiobankCollectionTable(section, SWT.NONE, headings,
+            getPatientAdapters());
+        section.setClient(patientsTable);
+        patientsTable.adaptToToolkit(toolkit);
+        toolkit.paintBordersFor(patientsTable);
 
-		patientsTable.getTableViewer().addDoubleClickListener(
-			FormUtils.getBiobankCollectionDoubleClickListener());
-	}
+        patientsTable.getTableViewer().addDoubleClickListener(
+            FormUtils.getBiobankCollectionDoubleClickListener());
+    }
 
-	private PatientAdapter[] getPatientAdapters() {
-		// hack required here because xxx.getXxxxCollection().toArray(new
-		// Xxx[0])
-		// returns Object[].
-		int count = 0;
-		Collection<Patient> patients = study.getPatientCollection();
-		PatientAdapter[] arr = new PatientAdapter[patients.size()];
-		for (Patient patient : patients) {
-			arr[count] = new PatientAdapter(studyAdapter, patient);
-			++count;
-		}
-		return arr;
-	}
+    private PatientAdapter [] getPatientAdapters() {
+        // hack required here because xxx.getXxxxCollection().toArray(new
+        // Xxx[0])
+        // returns Object[].
+        int count = 0;
+        Collection<Patient> patients = study.getPatientCollection();
+        PatientAdapter [] arr = new PatientAdapter [patients.size()];
+        for (Patient patient : patients) {
+            arr[count] = new PatientAdapter(studyAdapter, patient);
+            ++count;
+        }
+        return arr;
+    }
 
-	private void createDataCollectedSection() {
-		Section section = createSection("Patient Visit Information Collected");
+    private void createPvDataSection() {
+        Section section = createSection("Patient Visit Information Collected");
 
-		String[] headings = new String[] { "Name", "Valid Values (optional)" };
-		sDatasTable = new BiobankCollectionTable(section, SWT.NONE, headings,
-			getStudyPvInfo());
-		section.setClient(sDatasTable);
-		sDatasTable.adaptToToolkit(toolkit);
-		toolkit.paintBordersFor(sDatasTable);
+        String [] headings = new String [] { "Name", "Valid Values (optional)" };
+        pvInfosTable = new BiobankCollectionTable(section, SWT.NONE, headings,
+            getStudyPvInfo());
+        section.setClient(pvInfosTable);
+        pvInfosTable.adaptToToolkit(toolkit);
+        toolkit.paintBordersFor(pvInfosTable);
 
-		sDatasTable.getTableViewer().addDoubleClickListener(
-			FormUtils.getBiobankCollectionDoubleClickListener());
-	}
+        pvInfosTable.getTableViewer().addDoubleClickListener(
+            FormUtils.getBiobankCollectionDoubleClickListener());
+    }
 
-	private PvInfo[] getStudyPvInfo() {
-		// hack required here because site.getStudyCollection().toArray(new
-		// Study[0]) returns Object[].
-		int count = 0;
-		Collection<PvInfo> pvInfos = study.getPvInfoCollection();
-		PvInfo[] arr = new PvInfo[pvInfos.size()];
-		Iterator<PvInfo> it = pvInfos.iterator();
-		while (it.hasNext()) {
-			arr[count] = it.next();
-			++count;
-		}
-		return arr;
-	}
+    private PvInfo [] getStudyPvInfo() {
+        // hack required here because site.getStudyCollection().toArray(new
+        // Study[0]) returns Object[].
+        int count = 0;
+        Collection<PvInfo> pvInfos = study.getPvInfoCollection();
+        if (pvInfos == null) return null;
+        PvInfo [] arr = new PvInfo [pvInfos.size()];
+        Iterator<PvInfo> it = pvInfos.iterator();
+        while (it.hasNext()) {
+            arr[count] = it.next();
+            ++count;
+        }
+        return arr;
+    }
 
-	@Override
-	protected void reload() {
-		retrieveStudy();
-		setPartName("Study " + study.getName());
-		form.setText("Study: " + study.getName());
-		setStudySectionValues();
-		Node clinicGroupNode = ((SiteAdapter) studyAdapter.getParent()
-			.getParent()).getClinicGroupNode();
-		clinicsTable.getTableViewer().setInput(
-			FormUtils.getClinicsAdapters(clinicGroupNode, study
-				.getClinicCollection()));
-		patientsTable.getTableViewer().setInput(getPatientAdapters());
-		sDatasTable.getTableViewer().setInput(getStudyPvInfo());
-	}
+    @Override
+    protected void reload() {
+        retrieveStudy();
+        setPartName("Study " + study.getName());
+        form.setText("Study: " + study.getName());
+        setStudySectionValues();
+        Node clinicGroupNode = ((SiteAdapter) studyAdapter.getParent().getParent()).getClinicGroupNode();
+        clinicsTable.getTableViewer().setInput(
+            FormUtils.getClinicsAdapters(clinicGroupNode,
+                study.getClinicCollection()));
+        patientsTable.getTableViewer().setInput(getPatientAdapters());
+        pvInfosTable.getTableViewer().setInput(getStudyPvInfo());
+    }
 
-	private void retrieveStudy() {
-		List<Study> result;
-		Study searchStudy = new Study();
-		searchStudy.setId(studyAdapter.getStudy().getId());
-		try {
-			result = studyAdapter.getAppService().search(Study.class,
-				searchStudy);
-			Assert.isTrue(result.size() == 1);
-			study = result.get(0);
-			studyAdapter.setStudy(study);
-		} catch (ApplicationException e) {
-			e.printStackTrace();
-		}
-	}
+    private void retrieveStudy() {
+        List<Study> result;
+        Study searchStudy = new Study();
+        searchStudy.setId(studyAdapter.getStudy().getId());
+        try {
+            result = studyAdapter.getAppService().search(Study.class,
+                searchStudy);
+            Assert.isTrue(result.size() == 1);
+            study = result.get(0);
+            studyAdapter.setStudy(study);
+        }
+        catch (ApplicationException e) {
+            e.printStackTrace();
+        }
+    }
 
 }

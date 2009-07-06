@@ -70,13 +70,15 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
 
     private ListOrderedMap pvInfoMap;
 
-    class PatientVisitInfo {
+    class CombinedPvInfo {
         PvInfo pvInfo;
         PvInfoData pvInfoData;
+        Control control;
 
-        public PatientVisitInfo() {
+        public CombinedPvInfo() {
             pvInfo = null;
             pvInfoData = null;
+            control = null;
         }
     }
 
@@ -130,66 +132,63 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         study = ((StudyAdapter) patientVisitAdapter.getParent().getParent().getParent()).getStudy();
 
         for (PvInfo pvInfo : study.getPvInfoCollection()) {
-            PatientVisitInfo visitInfo = new PatientVisitInfo();
-            visitInfo.pvInfo = pvInfo;
-            pvInfoMap.put(pvInfo.getPvInfoType(), pvInfo);
+            CombinedPvInfo combinedPvInfo = new CombinedPvInfo();
+            combinedPvInfo.pvInfo = pvInfo;
+            pvInfoMap.put(pvInfo.getId(), combinedPvInfo);
         }
 
         Collection<PvInfoData> pvDataCollection = patientVisit.getPvInfoDataCollection();
         if (pvDataCollection != null) {
             for (PvInfoData pvInfoData : pvDataCollection) {
-                String key = pvInfoData.getPvInfo().getPvInfoType().getType();
-                PatientVisitInfo visitInfo = (PatientVisitInfo) pvInfoMap.get(key);
-                visitInfo.pvInfoData = pvInfoData;
-
-                System.out.println("--- id: " + pvInfoData.getId()
-                    + ", value: " + pvInfoData.getValue() + ", pv_id: "
-                    + pvInfoData.getPatientVisit().getId());
+                Integer key = pvInfoData.getPvInfo().getId();
+                CombinedPvInfo combinedPvInfo = (CombinedPvInfo) pvInfoMap.get(key);
+                Assert.isNotNull(combinedPvInfo);
+                combinedPvInfo.pvInfoData = pvInfoData;
             }
         }
 
-        Control control;
         MapIterator it = pvInfoMap.mapIterator();
         while (it.hasNext()) {
-            control = null;
-            String label = (String) it.next();
-            PatientVisitInfo pvInfo = (PatientVisitInfo) it.getValue();
+            Integer key = (Integer) it.next();
+            CombinedPvInfo combinedPvInfo = (CombinedPvInfo) it.getValue();
+            int typeId = combinedPvInfo.pvInfo.getPvInfoType().getId();
             String value = null;
-            int typeId = pvInfo.pvInfo.getPvInfoType().getId();
 
-            if (pvInfo.pvInfoData != null) {
-                value = pvInfo.pvInfoData.getValue();
+            if (combinedPvInfo.pvInfoData != null) {
+                value = combinedPvInfo.pvInfoData.getValue();
             }
 
-            Label labelWidget = toolkit.createLabel(client, label + ":",
-                SWT.LEFT);
+            Label labelWidget = toolkit.createLabel(client,
+                combinedPvInfo.pvInfo.getLabel() + ":", SWT.LEFT);
             labelWidget.setLayoutData(new GridData(
                 GridData.VERTICAL_ALIGN_BEGINNING));
 
             switch (typeId) {
-                case 1: // Date Drawn
-                case 2: // Date Received
-                case 3: // Date Processed
-                case 4: // Shipped Date
-                    control = createDatePickerSection(client, value);
+                case 1: // number
+                    combinedPvInfo.control = toolkit.createText(client, value,
+                        SWT.LEFT);
                     break;
 
-                case 5: // Aliquot Volume
-                case 6: // Blood Received
-                case 7: // Visit
-                    control = createComboSection(client,
-                        pvInfo.pvInfo.getPossibleValues().split(";"), value);
+                case 2: // text
+                    combinedPvInfo.control = toolkit.createText(client, value,
+                        SWT.LEFT | SWT.MULTI);
                     break;
 
-                case 8: // WBC Count
-                case 9: // Time Arrived
-                case 10: // Biopsy Length
-                    control = toolkit.createText(client, value, SWT.LEFT);
+                case 3: // date_time
+                    combinedPvInfo.control = createDatePickerSection(client,
+                        value);
                     break;
 
-                case 11: // Comments
-                    control = toolkit.createText(client, value, SWT.LEFT
-                        | SWT.MULTI);
+                case 4: // select_single
+                    combinedPvInfo.control = createComboSection(client,
+                        combinedPvInfo.pvInfo.getPossibleValues().split(";"),
+                        value);
+                    break;
+
+                case 5: // select_single_and_quantity
+                    break;
+
+                case 6: // select_multiple
                     break;
 
                 default:
@@ -199,8 +198,9 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
             if (typeId == 11) {
                 gd.heightHint = 40;
             }
-            control.setLayoutData(gd);
-            controls.put(label, control);
+            combinedPvInfo.control.setLayoutData(gd);
+            controls.put(combinedPvInfo.pvInfo.getLabel(),
+                combinedPvInfo.control);
         }
     }
 
@@ -336,7 +336,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         }
 
         for (String key : controls.keySet()) {
-            PatientVisitInfo pvInfo = (PatientVisitInfo) pvInfoMap.get(key);
+            CombinedPvInfo pvInfo = (CombinedPvInfo) pvInfoMap.get(key);
             Control control = controls.get(key);
             String value = "";
 
