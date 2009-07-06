@@ -258,7 +258,8 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         initConfirmButton(client, true, false);
     }
 
-    private String getOkMessage() {
+    @Override
+    protected String getOkMessage() {
         if (patientVisit.getId() == null) {
             return MSG_NEW_PATIENT_VISIT_OK;
         }
@@ -269,11 +270,11 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
     protected void handleStatusChanged(IStatus status) {
         if (status.getSeverity() == IStatus.OK) {
             form.setMessage(getOkMessage(), IMessageProvider.NONE);
-            confirmButton.setEnabled(true);
+            getConfirmButton().setEnabled(true);
         }
         else {
             form.setMessage(status.getMessage(), IMessageProvider.ERROR);
-            confirmButton.setEnabled(false);
+            getConfirmButton().setEnabled(false);
         }
     }
 

@@ -1,3 +1,4 @@
+
 package edu.ualberta.med.biobank.forms;
 
 import java.util.ArrayList;
@@ -55,435 +56,475 @@ import gov.nih.nci.system.query.example.InsertExampleQuery;
 
 public class AddPaletteSamplesEntryForm extends BiobankEntryForm {
 
-	public static final String ID = "edu.ualberta.med.biobank.forms.AddPaletteSamplesEntryForm";
+    public static final String ID = "edu.ualberta.med.biobank.forms.AddPaletteSamplesEntryForm";
 
-	private Button scan;
+    private Button scan;
 
-	private PatientVisitAdapter pvAdapter;
+    private PatientVisitAdapter pvAdapter;
 
-	private PatientVisit patientVisit;
+    private PatientVisit patientVisit;
 
-	private Composite typesSelectionPerRowComposite;
+    private Composite typesSelectionPerRowComposite;
 
-	private AddSamplesScanPaletteWidget spw;
+    private AddSamplesScanPaletteWidget spw;
 
-	private List<SampleTypeSelectionWidget> sampleTypeWidgets;
+    private List<SampleTypeSelectionWidget> sampleTypeWidgets;
 
-	private IObservableValue scannedValue = new WritableValue(Boolean.FALSE,
-		Boolean.class);
-	private IObservableValue plateToScan = new WritableValue("", String.class);
+    private IObservableValue scannedValue = new WritableValue(Boolean.FALSE,
+        Boolean.class);
+    private IObservableValue plateToScan = new WritableValue("", String.class);
 
-	private IObservableValue typesFilled = new WritableValue(Boolean.TRUE,
-		Boolean.class);
+    private IObservableValue typesFilled = new WritableValue(Boolean.TRUE,
+        Boolean.class);
 
-	private Text plateToScanText;
+    private Text plateToScanText;
 
-	private Composite typesSelectionCustomComposite;
+    private Composite typesSelectionCustomComposite;
 
-	private SampleTypeSelectionWidget customSelection;
+    private SampleTypeSelectionWidget customSelection;
 
-	private Composite radioComponents;
+    private Composite radioComponents;
 
-	@Override
-	public void init(IEditorSite editorSite, IEditorInput input)
-			throws PartInitException {
-		super.init(editorSite, input);
+    private Button confirmAndNextButton;
 
-		Node node = ((FormInput) input).getNode();
-		Assert.isNotNull(node, "Null editor input");
+    private Button confirmAndClose;
 
-		Assert
-			.isTrue((node instanceof PatientVisitAdapter),
-				"Invalid editor input: object of type "
-						+ node.getClass().getName());
+    @Override
+    public void init(IEditorSite editorSite, IEditorInput input)
+        throws PartInitException {
+        super.init(editorSite, input);
 
-		pvAdapter = (PatientVisitAdapter) node;
-		patientVisit = pvAdapter.getPatientVisit();
-		appService = pvAdapter.getAppService();
+        Node node = ((FormInput) input).getNode();
+        Assert.isNotNull(node, "Null editor input");
 
-		setPartName("Add samples for " + patientVisit.getPatient().getNumber());
-	}
+        Assert.isTrue((node instanceof PatientVisitAdapter),
+            "Invalid editor input: object of type " + node.getClass().getName());
 
-	@Override
-	protected void handleStatusChanged(IStatus status) {
-		if (status.getSeverity() == IStatus.OK) {
-			form.setMessage("Adding samples.", IMessageProvider.NONE);
-			confirmButton.setEnabled(true);
-		} else {
-			form.setMessage(status.getMessage(), IMessageProvider.ERROR);
-			confirmButton.setEnabled(false);
-			if (!BioBankPlugin.getDefault().isValidPlateBarcode(
-				plateToScanText.getText())) {
-				scan.setEnabled(false);
-			} else {
-				scan.setEnabled(true);
-			}
-		}
-	}
+        pvAdapter = (PatientVisitAdapter) node;
+        patientVisit = pvAdapter.getPatientVisit();
+        appService = pvAdapter.getAppService();
 
-	@Override
-	protected void createFormContent() {
-		form.setText("Adding samples for patient "
-				+ patientVisit.getPatient().getNumber() + " for visit "
-				+ patientVisit.getNumber());
+        setPartName("Add samples for " + patientVisit.getPatient().getNumber());
+    }
 
-		GridLayout layout = new GridLayout(1, false);
-		form.getBody().setLayout(layout);
+    @Override
+    protected void handleStatusChanged(IStatus status) {
+        if (status.getSeverity() == IStatus.OK) {
+            form.setMessage(getOkMessage(), IMessageProvider.NONE);
+            confirmAndNextButton.setEnabled(true);
+            confirmAndClose.setEnabled(true);
+        }
+        else {
+            form.setMessage(status.getMessage(), IMessageProvider.ERROR);
+            confirmAndNextButton.setEnabled(false);
+            confirmAndClose.setEnabled(false);
+            if (!BioBankPlugin.getDefault().isValidPlateBarcode(
+                plateToScanText.getText())) {
+                scan.setEnabled(false);
+            }
+            else {
+                scan.setEnabled(true);
+            }
+        }
+    }
 
-		createPaletteSection();
-		createFieldsSection();
-		createTypesSelectionSection();
-		createButtonsSection();
+    @Override
+    protected String getOkMessage() {
+        return "Adding samples.";
+    }
 
-		WritableValue wv = new WritableValue(Boolean.FALSE, Boolean.class);
-		UpdateValueStrategy uvs = new UpdateValueStrategy();
-		uvs.setAfterConvertValidator(new IValidator() {
-			@Override
-			public IStatus validate(Object value) {
-				if (value instanceof Boolean && !(Boolean) value) {
-					return ValidationStatus.error("Scanner should be launched");
-				} else {
-					return Status.OK_STATUS;
-				}
-			}
+    @Override
+    protected void createFormContent() {
+        form.setText("Adding samples for patient "
+            + patientVisit.getPatient().getNumber() + " for visit "
+            + patientVisit.getNumber());
 
-		});
-		dbc.bindValue(wv, scannedValue, uvs, uvs);
-		scannedValue.setValue(false);
+        GridLayout layout = new GridLayout(1, false);
+        form.getBody().setLayout(layout);
 
-		wv = new WritableValue(Boolean.TRUE, Boolean.class);
-		uvs = new UpdateValueStrategy();
-		uvs.setAfterConvertValidator(new IValidator() {
-			@Override
-			public IStatus validate(Object value) {
-				if (value instanceof Boolean && !(Boolean) value) {
-					return ValidationStatus.error("Give a type to each sample");
-				} else {
-					return Status.OK_STATUS;
-				}
-			}
+        createPaletteSection();
+        createFieldsSection();
+        createTypesSelectionSection();
+        createButtonsSection();
 
-		});
-		dbc.bindValue(wv, typesFilled, uvs, uvs);
-	}
+        WritableValue wv = new WritableValue(Boolean.FALSE, Boolean.class);
+        UpdateValueStrategy uvs = new UpdateValueStrategy();
+        uvs.setAfterConvertValidator(new IValidator() {
+            @Override
+            public IStatus validate(Object value) {
+                if (value instanceof Boolean && !(Boolean) value) {
+                    return ValidationStatus.error("Scanner should be launched");
+                }
+                else {
+                    return Status.OK_STATUS;
+                }
+            }
 
-	private void createPaletteSection() {
-		Composite client = toolkit.createComposite(form.getBody());
-		GridLayout layout = new GridLayout(1, false);
-		client.setLayout(layout);
-		GridData gd = new GridData();
-		gd.horizontalAlignment = SWT.CENTER;
-		gd.grabExcessHorizontalSpace = true;
-		client.setLayoutData(gd);
+        });
+        dbc.bindValue(wv, scannedValue, uvs, uvs);
+        scannedValue.setValue(false);
 
-		spw = new AddSamplesScanPaletteWidget(client);
-		spw.setVisible(true);
-		toolkit.adapt(spw);
-		spw.setLayoutData(new GridData(SWT.CENTER, SWT.TOP, true, false));
-	}
+        wv = new WritableValue(Boolean.TRUE, Boolean.class);
+        uvs = new UpdateValueStrategy();
+        uvs.setAfterConvertValidator(new IValidator() {
+            @Override
+            public IStatus validate(Object value) {
+                if (value instanceof Boolean && !(Boolean) value) {
+                    return ValidationStatus.error("Give a type to each sample");
+                }
+                else {
+                    return Status.OK_STATUS;
+                }
+            }
 
-	private void createTypesSelectionSection() {
-		// Radio buttons
-		radioComponents = toolkit.createComposite(form.getBody());
-		RowLayout compLayout = new RowLayout();
-		radioComponents.setLayout(compLayout);
-		toolkit.paintBordersFor(radioComponents);
-		radioComponents.setEnabled(false);
+        });
+        dbc.bindValue(wv, typesFilled, uvs, uvs);
+    }
 
-		final Button radioRowSelection = toolkit.createButton(radioComponents,
-			"Row choice", SWT.RADIO);
-		final Button radioCustomSelection = toolkit.createButton(
-			radioComponents, "Custom Selection choice", SWT.RADIO);
+    private void createPaletteSection() {
+        Composite client = toolkit.createComposite(form.getBody());
+        GridLayout layout = new GridLayout(1, false);
+        client.setLayout(layout);
+        GridData gd = new GridData();
+        gd.horizontalAlignment = SWT.CENTER;
+        gd.grabExcessHorizontalSpace = true;
+        client.setLayoutData(gd);
 
-		// stackLayout
-		final Composite selectionComp = toolkit.createComposite(form.getBody());
-		final StackLayout selectionStackLayout = new StackLayout();
-		selectionComp.setLayout(selectionStackLayout);
+        spw = new AddSamplesScanPaletteWidget(client);
+        spw.setVisible(true);
+        toolkit.adapt(spw);
+        spw.setLayoutData(new GridData(SWT.CENTER, SWT.TOP, true, false));
+    }
 
-		List<SampleType> sampleTypes = getAllSampleTypes();
-		createTypeSelectionPerRowComposite(selectionComp, sampleTypes);
-		createTypeSelectionCustom(selectionComp, sampleTypes);
-		radioRowSelection.setSelection(true);
-		selectionStackLayout.topControl = typesSelectionPerRowComposite;
+    private void createTypesSelectionSection() {
+        // Radio buttons
+        radioComponents = toolkit.createComposite(form.getBody());
+        RowLayout compLayout = new RowLayout();
+        radioComponents.setLayout(compLayout);
+        toolkit.paintBordersFor(radioComponents);
+        radioComponents.setEnabled(false);
 
-		radioRowSelection.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				if (radioRowSelection.getSelection()) {
-					selectionStackLayout.topControl = typesSelectionPerRowComposite;
-					selectionComp.layout();
-					for (SampleTypeSelectionWidget sampleType : sampleTypeWidgets) {
-						sampleType.addBinding(dbc);
-						sampleType.resetValues(false);
-					}
-					customSelection.addBinding(dbc);
-					spw.disableSelection();
-					typesFilled.setValue(Boolean.TRUE);
-					spw.redraw();
-				}
-			}
-		});
-		radioCustomSelection.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				if (radioCustomSelection.getSelection()) {
-					selectionStackLayout.topControl = typesSelectionCustomComposite;
-					selectionComp.layout();
-					for (SampleTypeSelectionWidget sampleType : sampleTypeWidgets) {
-						sampleType.removeBinding(dbc);
-					}
-					customSelection.addBinding(dbc);
-					spw.enableSelection();
-					typesFilled.setValue(spw.isEverythingTyped());
-					spw.redraw();
-				}
-			}
-		});
-	}
+        final Button radioRowSelection = toolkit.createButton(radioComponents,
+            "Row choice", SWT.RADIO);
+        final Button radioCustomSelection = toolkit.createButton(
+            radioComponents, "Custom Selection choice", SWT.RADIO);
 
-	private void createTypeSelectionCustom(Composite parent,
-			List<SampleType> sampleTypes) {
-		typesSelectionCustomComposite = toolkit.createComposite(parent);
-		GridLayout layout = new GridLayout(3, false);
-		typesSelectionCustomComposite.setLayout(layout);
-		toolkit.paintBordersFor(typesSelectionCustomComposite);
+        // stackLayout
+        final Composite selectionComp = toolkit.createComposite(form.getBody());
+        final StackLayout selectionStackLayout = new StackLayout();
+        selectionComp.setLayout(selectionStackLayout);
 
-		Label label = toolkit.createLabel(typesSelectionCustomComposite,
-			"Choose type for selected samples:");
-		GridData gd = new GridData();
-		gd.horizontalSpan = 3;
-		label.setLayoutData(gd);
+        List<SampleType> sampleTypes = getAllSampleTypes();
+        createTypeSelectionPerRowComposite(selectionComp, sampleTypes);
+        createTypeSelectionCustom(selectionComp, sampleTypes);
+        radioRowSelection.setSelection(true);
+        selectionStackLayout.topControl = typesSelectionPerRowComposite;
 
-		customSelection = new SampleTypeSelectionWidget(
-			typesSelectionCustomComposite, null, sampleTypes, toolkit);
-		customSelection.resetValues(true);
+        radioRowSelection.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                if (radioRowSelection.getSelection()) {
+                    selectionStackLayout.topControl = typesSelectionPerRowComposite;
+                    selectionComp.layout();
+                    for (SampleTypeSelectionWidget sampleType : sampleTypeWidgets) {
+                        sampleType.addBinding(dbc);
+                        sampleType.resetValues(false);
+                    }
+                    customSelection.addBinding(dbc);
+                    spw.disableSelection();
+                    typesFilled.setValue(Boolean.TRUE);
+                    spw.redraw();
+                }
+            }
+        });
+        radioCustomSelection.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                if (radioCustomSelection.getSelection()) {
+                    selectionStackLayout.topControl = typesSelectionCustomComposite;
+                    selectionComp.layout();
+                    for (SampleTypeSelectionWidget sampleType : sampleTypeWidgets) {
+                        sampleType.removeBinding(dbc);
+                    }
+                    customSelection.addBinding(dbc);
+                    spw.enableSelection();
+                    typesFilled.setValue(spw.isEverythingTyped());
+                    spw.redraw();
+                }
+            }
+        });
+    }
 
-		Button applyType = toolkit.createButton(typesSelectionCustomComposite,
-			"Apply", SWT.PUSH);
-		applyType.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				SampleType type = customSelection.getSelection();
-				if (type != null) {
-					for (ScanCell cell : spw.getSelectedCells()) {
-						cell.setType(type);
-						cell.setStatus(SampleCellStatus.TYPE);
-					}
-					spw.clearSelection();
-					customSelection.resetValues(true);
-					typesFilled.setValue(spw.isEverythingTyped());
-					spw.redraw();
-				}
-			}
-		});
-		spw.addModificationListener(new ScanPaletteModificationListener() {
-			@Override
-			public void modification(ScanPaletteModificationEvent spme) {
-				customSelection.setNumber(spme.selections);
-			}
-		});
-	}
+    private void createTypeSelectionCustom(Composite parent,
+        List<SampleType> sampleTypes) {
+        typesSelectionCustomComposite = toolkit.createComposite(parent);
+        GridLayout layout = new GridLayout(3, false);
+        typesSelectionCustomComposite.setLayout(layout);
+        toolkit.paintBordersFor(typesSelectionCustomComposite);
 
-	private void createTypeSelectionPerRowComposite(Composite parent,
-			List<SampleType> sampleTypes) {
-		typesSelectionPerRowComposite = toolkit.createComposite(parent);
-		GridLayout layout = new GridLayout(3, false);
-		layout.horizontalSpacing = 10;
-		typesSelectionPerRowComposite.setLayout(layout);
-		toolkit.paintBordersFor(typesSelectionPerRowComposite);
+        Label label = toolkit.createLabel(typesSelectionCustomComposite,
+            "Choose type for selected samples:");
+        GridData gd = new GridData();
+        gd.horizontalSpan = 3;
+        label.setLayoutData(gd);
 
-		sampleTypeWidgets = new ArrayList<SampleTypeSelectionWidget>();
-		char letter = 'A';
-		for (int i = 0; i < ScanCell.ROW_MAX; i++) {
-			final SampleTypeSelectionWidget typeWidget = new SampleTypeSelectionWidget(
-				typesSelectionPerRowComposite, letter, sampleTypes, toolkit);
-			final int indexRow = i;
-			typeWidget
-				.addSelectionChangedListener(new ISelectionChangedListener() {
-					@Override
-					public void selectionChanged(SelectionChangedEvent event) {
-						setTypeForRow(typeWidget, indexRow);
-						setDirty(true);
-					}
+        customSelection = new SampleTypeSelectionWidget(
+            typesSelectionCustomComposite, null, sampleTypes, toolkit);
+        customSelection.resetValues(true);
 
-				});
-			typeWidget.addBinding(dbc);
-			sampleTypeWidgets.add(typeWidget);
-			letter += 1;
-		}
-	}
+        Button applyType = toolkit.createButton(typesSelectionCustomComposite,
+            "Apply", SWT.PUSH);
+        applyType.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                SampleType type = customSelection.getSelection();
+                if (type != null) {
+                    for (ScanCell cell : spw.getSelectedCells()) {
+                        cell.setType(type);
+                        cell.setStatus(SampleCellStatus.TYPE);
+                    }
+                    spw.clearSelection();
+                    customSelection.resetValues(true);
+                    typesFilled.setValue(spw.isEverythingTyped());
+                    spw.redraw();
+                }
+            }
+        });
+        spw.addModificationListener(new ScanPaletteModificationListener() {
+            @Override
+            public void modification(ScanPaletteModificationEvent spme) {
+                customSelection.setNumber(spme.selections);
+            }
+        });
+    }
 
-	private void createFieldsSection() {
-		Composite client = toolkit.createComposite(form.getBody());
-		GridLayout layout = new GridLayout(2, false);
-		layout.horizontalSpacing = 10;
-		client.setLayout(layout);
-		toolkit.paintBordersFor(client);
+    private void createTypeSelectionPerRowComposite(Composite parent,
+        List<SampleType> sampleTypes) {
+        typesSelectionPerRowComposite = toolkit.createComposite(parent);
+        GridLayout layout = new GridLayout(3, false);
+        layout.horizontalSpacing = 10;
+        typesSelectionPerRowComposite.setLayout(layout);
+        toolkit.paintBordersFor(typesSelectionPerRowComposite);
 
-		Composite comp = toolkit.createComposite(client);
-		layout = new GridLayout(2, false);
-		layout.horizontalSpacing = 10;
-		comp.setLayout(layout);
-		GridData gd = new GridData();
-		gd.widthHint = 200;
-		comp.setLayoutData(gd);
-		toolkit.paintBordersFor(comp);
-		// TODO : could be a combo as there is not other need of the handheld
-		// scanner in this form !
-		plateToScanText = (Text) createBoundWidgetWithLabel(comp, Text.class,
-			SWT.NONE, "Plate to Scan", new String[0], plateToScan,
-			ScannerBarcodeValidator.class, "Enter a valid plate barcode");
-		plateToScanText.removeKeyListener(keyListener);
-		plateToScanText.addKeyListener(EnterKeyToNextFieldListener.INSTANCE);
+        sampleTypeWidgets = new ArrayList<SampleTypeSelectionWidget>();
+        char letter = 'A';
+        for (int i = 0; i < ScanCell.ROW_MAX; i++) {
+            final SampleTypeSelectionWidget typeWidget = new SampleTypeSelectionWidget(
+                typesSelectionPerRowComposite, letter, sampleTypes, toolkit);
+            final int indexRow = i;
+            typeWidget.addSelectionChangedListener(new ISelectionChangedListener() {
+                @Override
+                public void selectionChanged(SelectionChangedEvent event) {
+                    setTypeForRow(typeWidget, indexRow);
+                    setDirty(true);
+                }
 
-		scan = toolkit.createButton(client, "Scan", SWT.PUSH);
-		scan.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				scan();
-			}
-		});
-	}
+            });
+            typeWidget.addBinding(dbc);
+            sampleTypeWidgets.add(typeWidget);
+            letter += 1;
+        }
+    }
 
-	private void createButtonsSection() {
-		Composite client = toolkit.createComposite(form.getBody());
-		GridLayout layout = new GridLayout(3, false);
-		layout.horizontalSpacing = 10;
-		client.setLayout(layout);
-		client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		toolkit.paintBordersFor(client);
+    private void createFieldsSection() {
+        Composite client = toolkit.createComposite(form.getBody());
+        GridLayout layout = new GridLayout(2, false);
+        layout.horizontalSpacing = 10;
+        client.setLayout(layout);
+        toolkit.paintBordersFor(client);
 
-		initCancelButton(client);
+        Composite comp = toolkit.createComposite(client);
+        layout = new GridLayout(2, false);
+        layout.horizontalSpacing = 10;
+        comp.setLayout(layout);
+        GridData gd = new GridData();
+        gd.widthHint = 200;
+        comp.setLayoutData(gd);
+        toolkit.paintBordersFor(comp);
+        // TODO : could be a combo as there is not other need of the handheld
+        // scanner in this form !
+        plateToScanText = (Text) createBoundWidgetWithLabel(comp, Text.class,
+            SWT.NONE, "Plate to Scan", new String [0], plateToScan,
+            ScannerBarcodeValidator.class, "Enter a valid plate barcode");
+        plateToScanText.removeKeyListener(keyListener);
+        plateToScanText.addKeyListener(EnterKeyToNextFieldListener.INSTANCE);
 
-		initConfirmButton(client, true, false);
-	}
+        scan = toolkit.createButton(client, "Scan", SWT.PUSH);
+        scan.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                scan();
+            }
+        });
+    }
 
-	private void scan() {
-		BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
-			public void run() {
-				try {
-					System.out.println(BioBankPlugin.getDefault()
-						.getPlateNumber(plateToScan.getValue().toString()));
+    private void createButtonsSection() {
+        Composite client = toolkit.createComposite(form.getBody());
+        GridLayout layout = new GridLayout(4, false);
+        layout.horizontalSpacing = 10;
+        client.setLayout(layout);
+        client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        toolkit.paintBordersFor(client);
 
-					// TODO launch scanner instead of random function
-					ScanCell[][] cells = ScanCell.getRandomScanLink();
-					enabledOthersComponents();
+        initCancelButton(client);
 
-					for (int i = 0; i < cells.length; i++) { // rows
-						int samplesNumber = 0;
-						sampleTypeWidgets.get(i).resetValues(true);
-						for (int j = 0; j < cells[i].length; j++) { // columns
-							if (cells[i][j] != null) {
-								samplesNumber++;
-								cells[i][j].setStatus(SampleCellStatus.NEW);
-							}
-						}
-						sampleTypeWidgets.get(i).setNumber(samplesNumber);
-					}
-					// Show result in grid
-					spw.setScannedElements(cells);
-				} catch (RemoteConnectFailureException exp) {
-					BioBankPlugin.openRemoteConnectErrorMessage();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
+        confirmAndNextButton = toolkit.createButton(client,
+            "Confirm and scan next", SWT.PUSH);
+        confirmAndNextButton.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                saveAndNext();
+            }
+        });
+        confirmAndClose = toolkit.createButton(client, "Confirm and Close",
+            SWT.PUSH);
+        confirmAndClose.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                saveAndClose();
+            }
+        });
 
-	protected void enabledOthersComponents() {
-		scannedValue.setValue(true);
-		radioComponents.setEnabled(true);
+    }
 
-	}
+    private void scan() {
+        BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
+            public void run() {
+                try {
+                    System.out.println(BioBankPlugin.getDefault().getPlateNumber(
+                        plateToScan.getValue().toString()));
 
-	private List<SampleType> getAllSampleTypes() {
-		try {
-			return appService.search(SampleType.class, new SampleType());
-		} catch (final RemoteConnectFailureException exp) {
-			BioBankPlugin.openRemoteConnectErrorMessage();
-		} catch (Exception exp) {
-			exp.printStackTrace();
-		}
-		return null;
-	}
+                    // TODO launch scanner instead of random function
+                    ScanCell [][] cells = ScanCell.getRandomScanLink();
+                    enabledOthersComponents();
 
-	@Override
-	protected void saveForm() {
-		BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
-			public void run() {
-				try {
-					List<SDKQuery> queries = new ArrayList<SDKQuery>();
-					ScanCell[][] cells = spw.getScannedElements();
-					for (int indexRow = 0; indexRow < cells.length; indexRow++) {
-						for (int indexColumn = 0; indexColumn < cells[indexRow].length; indexColumn++) {
-							ScanCell cell = cells[indexRow][indexColumn];
-							if (cell != null
-									&& cell.getStatus().equals(
-										SampleCellStatus.TYPE)) {
-								// add new samples
-								Sample sample = new Sample();
-								sample.setInventoryId(cell.getValue());
-								sample.setPatientVisit(patientVisit);
-								sample.setSampleType(cell.getType());
-								queries.add(new InsertExampleQuery(sample));
-							}
-						}
-					}
-					appService.executeBatchQuery(queries);
+                    for (int i = 0; i < cells.length; i++) { // rows
+                        int samplesNumber = 0;
+                        sampleTypeWidgets.get(i).resetValues(true);
+                        for (int j = 0; j < cells[i].length; j++) { // columns
+                            if (cells[i][j] != null) {
+                                samplesNumber++;
+                                cells[i][j].setStatus(SampleCellStatus.NEW);
+                            }
+                        }
+                        sampleTypeWidgets.get(i).setNumber(samplesNumber);
+                    }
+                    // Show result in grid
+                    spw.setScannedElements(cells);
+                }
+                catch (RemoteConnectFailureException exp) {
+                    BioBankPlugin.openRemoteConnectErrorMessage();
+                }
+                catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
 
-					if (BioBankPlugin.isAskPrint()) {
-						boolean doPrint = MessageDialog.openQuestion(PlatformUI
-							.getWorkbench().getActiveWorkbenchWindow()
-							.getShell(), "Print",
-							"Do you want to print information ?");
-						if (doPrint) {
-							// FIXME implement print functionnality
-						}
-					}
-					getSite().getPage().closeEditor(
-						AddPaletteSamplesEntryForm.this, false);
-					pvAdapter.performExpand();
-					Node.openForm(new FormInput(pvAdapter),
-						PatientVisitViewForm.ID);
-				} catch (RemoteConnectFailureException exp) {
-					BioBankPlugin.openRemoteConnectErrorMessage();
-				} catch (Exception e) {
-					SessionManager.getLogger().error(
-						"Error when adding samples", e);
-				}
-			}
-		});
-	}
+    protected void enabledOthersComponents() {
+        scannedValue.setValue(true);
+        radioComponents.setEnabled(true);
 
-	private void setTypeForRow(SampleTypeSelectionWidget typeWidget,
-			int indexRow) {
-		if (typeWidget.needToSave()) {
-			SampleType type = typeWidget.getSelection();
-			ScanCell[][] cells = spw.getScannedElements();
-			for (int indexColumn = 0; indexColumn < cells[indexRow].length; indexColumn++) {
-				ScanCell cell = cells[indexRow][indexColumn];
-				cell.setType(type);
-				cell.setStatus(SampleCellStatus.TYPE);
-				spw.redraw();
+    }
 
-			}
-		}
-	}
+    private List<SampleType> getAllSampleTypes() {
+        try {
+            return appService.search(SampleType.class, new SampleType());
+        }
+        catch (final RemoteConnectFailureException exp) {
+            BioBankPlugin.openRemoteConnectErrorMessage();
+        }
+        catch (Exception exp) {
+            exp.printStackTrace();
+        }
+        return null;
+    }
 
-	@Override
-	protected void cancelForm() {
-		spw.setScannedElements(null);
-		for (SampleTypeSelectionWidget stw : sampleTypeWidgets) {
-			stw.resetValues(true);
-		}
-	}
+    @Override
+    protected void saveForm() {
+        BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
+            public void run() {
+                try {
+                    List<SDKQuery> queries = new ArrayList<SDKQuery>();
+                    ScanCell [][] cells = spw.getScannedElements();
+                    for (int indexRow = 0; indexRow < cells.length; indexRow++) {
+                        for (int indexColumn = 0; indexColumn < cells[indexRow].length; indexColumn++) {
+                            ScanCell cell = cells[indexRow][indexColumn];
+                            if (cell != null
+                                && cell.getStatus().equals(
+                                    SampleCellStatus.TYPE)) {
+                                // add new samples
+                                Sample sample = new Sample();
+                                sample.setInventoryId(cell.getValue());
+                                sample.setPatientVisit(patientVisit);
+                                sample.setSampleType(cell.getType());
+                                queries.add(new InsertExampleQuery(sample));
+                            }
+                        }
+                    }
+                    appService.executeBatchQuery(queries);
+                }
+                catch (RemoteConnectFailureException exp) {
+                    BioBankPlugin.openRemoteConnectErrorMessage();
+                }
+                catch (Exception e) {
+                    SessionManager.getLogger().error(
+                        "Error when adding samples", e);
+                }
+            }
+        });
+    }
 
-	@Override
-	public void setFocus() {
-		if (plateToScan.getValue().toString().isEmpty()) {
-			plateToScanText.setFocus();
-		}
-	}
+    private void setTypeForRow(SampleTypeSelectionWidget typeWidget,
+        int indexRow) {
+        if (typeWidget.needToSave()) {
+            SampleType type = typeWidget.getSelection();
+            ScanCell [][] cells = spw.getScannedElements();
+            for (int indexColumn = 0; indexColumn < cells[indexRow].length; indexColumn++) {
+                ScanCell cell = cells[indexRow][indexColumn];
+                cell.setType(type);
+                cell.setStatus(SampleCellStatus.TYPE);
+                spw.redraw();
+
+            }
+        }
+    }
+
+    @Override
+    protected void cancelForm() {
+        spw.setScannedElements(null);
+        for (SampleTypeSelectionWidget stw : sampleTypeWidgets) {
+            stw.resetValues(true);
+        }
+    }
+
+    @Override
+    public void setFocus() {
+        if (plateToScan.getValue().toString().isEmpty()) {
+            plateToScanText.setFocus();
+        }
+    }
+
+    private void saveAndClose() {
+        doSaveInternal();
+        if (BioBankPlugin.isAskPrint()) {
+            boolean doPrint = MessageDialog.openQuestion(
+                PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
+                "Print", "Do you want to print information ?");
+            if (doPrint) {
+                // FIXME implement print functionnality
+            }
+        }
+        getSite().getPage().closeEditor(AddPaletteSamplesEntryForm.this, false);
+        pvAdapter.performExpand();
+        Node.openForm(new FormInput(pvAdapter), PatientVisitViewForm.ID);
+    }
+
+    private void saveAndNext() {
+        doSaveInternal();
+        getSite().getPage().closeEditor(AddPaletteSamplesEntryForm.this, false);
+        Node.openForm(new FormInput(pvAdapter), AddPaletteSamplesEntryForm.ID);
+    }
 
 }

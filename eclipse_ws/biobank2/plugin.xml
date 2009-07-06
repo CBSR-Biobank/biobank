@@ -262,7 +262,7 @@
       <editor
             class="edu.ualberta.med.biobank.forms.AddPaletteSamplesEntryForm"
             default="false"
-            id="edu.ualberta.med.biobank.forms.AddPaletteSamplesEntryFormyForm"
+            id="edu.ualberta.med.biobank.forms.AddPaletteSamplesEntryForm"
             name="Add Palette Samples Entry">
       </editor>
       <editor

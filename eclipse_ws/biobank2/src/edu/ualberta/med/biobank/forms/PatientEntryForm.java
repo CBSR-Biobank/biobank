@@ -1,3 +1,4 @@
+
 package edu.ualberta.med.biobank.forms;
 
 import java.util.List;
@@ -33,147 +34,150 @@ import gov.nih.nci.system.query.example.UpdateExampleQuery;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class PatientEntryForm extends BiobankEntryForm {
-	public static final String ID = "edu.ualberta.med.biobank.forms.PatientEntryForm";
+    public static final String ID = "edu.ualberta.med.biobank.forms.PatientEntryForm";
 
-	public static final String MSG_NEW_PATIENT_OK = "Creating a new patient record.";
+    public static final String MSG_NEW_PATIENT_OK = "Creating a new patient record.";
 
-	public static final String MSG_PATIENT_OK = "Editing an existing patient record.";
+    public static final String MSG_PATIENT_OK = "Editing an existing patient record.";
 
-	public static final String MSG_NO_PATIENT_NUMBER = "Patient must have a patient number";
+    public static final String MSG_NO_PATIENT_NUMBER = "Patient must have a patient number";
 
-	private PatientAdapter patientAdapter;
+    private PatientAdapter patientAdapter;
 
-	private Patient patient;
+    private Patient patient;
 
-	@Override
-	public void init(IEditorSite editorSite, IEditorInput input)
-			throws PartInitException {
-		super.init(editorSite, input);
+    @Override
+    public void init(IEditorSite editorSite, IEditorInput input)
+        throws PartInitException {
+        super.init(editorSite, input);
 
-		Node node = ((FormInput) input).getNode();
-		Assert.isNotNull(node, "Null editor input");
+        Node node = ((FormInput) input).getNode();
+        Assert.isNotNull(node, "Null editor input");
 
-		patientAdapter = (PatientAdapter) node;
-		appService = patientAdapter.getAppService();
-		patient = patientAdapter.getPatient();
+        patientAdapter = (PatientAdapter) node;
+        appService = patientAdapter.getAppService();
+        patient = patientAdapter.getPatient();
 
-		if (patient.getId() == null) {
-			setPartName("New Patient");
-		} else {
-			setPartName("Patient " + patient.getNumber());
-		}
-	}
+        if (patient.getId() == null) {
+            setPartName("New Patient");
+        }
+        else {
+            setPartName("Patient " + patient.getNumber());
+        }
+    }
 
-	@Override
-	protected void createFormContent() {
-		form.setText("Patient Information");
-		form.setMessage(getOkMessage(), IMessageProvider.NONE);
-		form.getBody().setLayout(new GridLayout(1, false));
+    @Override
+    protected void createFormContent() {
+        form.setText("Patient Information");
+        form.setMessage(getOkMessage(), IMessageProvider.NONE);
+        form.getBody().setLayout(new GridLayout(1, false));
 
-		createPatientSection();
-		createButtons();
-	}
+        createPatientSection();
+        createButtons();
+    }
 
-	private void createPatientSection() {
-		Composite client = toolkit.createComposite(form.getBody());
-		GridLayout layout = new GridLayout(2, false);
-		layout.horizontalSpacing = 10;
-		client.setLayout(layout);
-		client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		toolkit.paintBordersFor(client);
+    private void createPatientSection() {
+        Composite client = toolkit.createComposite(form.getBody());
+        GridLayout layout = new GridLayout(2, false);
+        layout.horizontalSpacing = 10;
+        client.setLayout(layout);
+        client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        toolkit.paintBordersFor(client);
 
-		createBoundWidgetWithLabel(client, Text.class, SWT.NONE,
-			"Patient Number", null, PojoObservables.observeValue(patient,
-				"number"), NonEmptyString.class, MSG_NO_PATIENT_NUMBER);
-	}
+        createBoundWidgetWithLabel(client, Text.class, SWT.NONE,
+            "Patient Number", null, PojoObservables.observeValue(patient,
+                "number"), NonEmptyString.class, MSG_NO_PATIENT_NUMBER);
+    }
 
-	protected void createButtons() {
-		Composite client = toolkit.createComposite(form.getBody());
-		GridLayout layout = new GridLayout();
-		layout.horizontalSpacing = 10;
-		layout.numColumns = 2;
-		client.setLayout(layout);
-		toolkit.paintBordersFor(client);
+    protected void createButtons() {
+        Composite client = toolkit.createComposite(form.getBody());
+        GridLayout layout = new GridLayout();
+        layout.horizontalSpacing = 10;
+        layout.numColumns = 2;
+        client.setLayout(layout);
+        toolkit.paintBordersFor(client);
 
-		initConfirmButton(client, false, true);
-	}
+        initConfirmButton(client, false, true);
+    }
 
-	private String getOkMessage() {
-		if (patient.getId() == null) {
-			return MSG_NEW_PATIENT_OK;
-		}
-		return MSG_PATIENT_OK;
-	}
+    @Override
+    protected String getOkMessage() {
+        if (patient.getId() == null) {
+            return MSG_NEW_PATIENT_OK;
+        }
+        return MSG_PATIENT_OK;
+    }
 
-	@Override
-	protected void handleStatusChanged(IStatus status) {
-		if (status.getSeverity() == IStatus.OK) {
-			form.setMessage(getOkMessage(), IMessageProvider.NONE);
-			confirmButton.setEnabled(true);
-		} else {
-			form.setMessage(status.getMessage(), IMessageProvider.ERROR);
-			confirmButton.setEnabled(false);
-		}
-	}
+    @Override
+    protected void handleStatusChanged(IStatus status) {
+        if (status.getSeverity() == IStatus.OK) {
+            form.setMessage(getOkMessage(), IMessageProvider.NONE);
+            getConfirmButton().setEnabled(true);
+        }
+        else {
+            form.setMessage(status.getMessage(), IMessageProvider.ERROR);
+            getConfirmButton().setEnabled(false);
+        }
+    }
 
-	@Override
-	protected void saveForm() {
-		try {
-			SDKQuery query;
-			SDKQueryResult result;
+    @Override
+    protected void saveForm() {
+        try {
+            SDKQuery query;
+            SDKQueryResult result;
 
-			if ((patient.getId() == null) && !checkPatientNumberUnique()) {
-				setDirty(true);
-				return;
-			}
+            if ((patient.getId() == null) && !checkPatientNumberUnique()) {
+                setDirty(true);
+                return;
+            }
 
-			Study study = ((StudyAdapter) patientAdapter.getParent()
-				.getParent()).getStudy();
-			patient.setStudy(study);
+            Study study = ((StudyAdapter) patientAdapter.getParent().getParent()).getStudy();
+            patient.setStudy(study);
 
-			if ((patient.getId() == null) || (patient.getId() == 0)) {
-				query = new InsertExampleQuery(patient);
-			} else {
-				query = new UpdateExampleQuery(patient);
-			}
+            if ((patient.getId() == null) || (patient.getId() == 0)) {
+                query = new InsertExampleQuery(patient);
+            }
+            else {
+                query = new UpdateExampleQuery(patient);
+            }
 
-			result = appService.executeQuery(query);
-			patient = (Patient) result.getObjectResult();
-		} catch (final RemoteAccessException exp) {
-			BioBankPlugin.openRemoteAccessErrorMessage();
-		} catch (Exception exp) {
-			exp.printStackTrace();
-		}
+            result = appService.executeQuery(query);
+            patient = (Patient) result.getObjectResult();
+        }
+        catch (final RemoteAccessException exp) {
+            BioBankPlugin.openRemoteAccessErrorMessage();
+        }
+        catch (Exception exp) {
+            exp.printStackTrace();
+        }
 
-		patientAdapter.getParent().performExpand();
-		getSite().getPage().closeEditor(this, false);
-	}
+        patientAdapter.getParent().performExpand();
+        getSite().getPage().closeEditor(this, false);
+    }
 
-	private boolean checkPatientNumberUnique() throws ApplicationException {
-		WritableApplicationService appService = patientAdapter.getAppService();
-		Study study = ((StudyAdapter) patientAdapter.getParent().getParent())
-			.getStudy();
+    private boolean checkPatientNumberUnique() throws ApplicationException {
+        WritableApplicationService appService = patientAdapter.getAppService();
+        Study study = ((StudyAdapter) patientAdapter.getParent().getParent()).getStudy();
 
-		HQLCriteria c = new HQLCriteria(
-			"from edu.ualberta.med.biobank.model.Patient as p "
-					+ "inner join fetch p.study " + "where p.study.id='"
-					+ study.getId() + "' " + "and p.number = '"
-					+ patient.getNumber() + "'");
+        HQLCriteria c = new HQLCriteria(
+            "from edu.ualberta.med.biobank.model.Patient as p "
+                + "inner join fetch p.study " + "where p.study.id='"
+                + study.getId() + "' " + "and p.number = '"
+                + patient.getNumber() + "'");
 
-		List<Object> results = appService.query(c);
-		if (results.size() == 0)
-			return true;
+        List<Object> results = appService.query(c);
+        if (results.size() == 0) return true;
 
-		BioBankPlugin.openAsyncError("Patient Number Problem",
-			"A patient with number \"" + patient.getNumber()
-					+ "\" already exists.");
-		return false;
-	}
+        BioBankPlugin.openAsyncError("Patient Number Problem",
+            "A patient with number \"" + patient.getNumber()
+                + "\" already exists.");
+        return false;
+    }
 
-	@Override
-	protected void cancelForm() {
-		// TODO Auto-generated method stub
+    @Override
+    protected void cancelForm() {
+    // TODO Auto-generated method stub
 
-	}
+    }
 
 }

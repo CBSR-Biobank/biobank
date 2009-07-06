@@ -10,7 +10,6 @@ import java.util.Set;
 import org.apache.commons.collections.MapIterator;
 import org.apache.commons.collections.map.ListOrderedMap;
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -224,23 +223,12 @@ public class StudyEntryForm extends BiobankEntryForm {
         initConfirmButton(client, true, false);
     }
 
-    private String getOkMessage() {
+    @Override
+    protected String getOkMessage() {
         if (study.getId() == null) {
             return MSG_NEW_STUDY_OK;
         }
         return MSG_STUDY_OK;
-    }
-
-    @Override
-    protected void handleStatusChanged(IStatus status) {
-        if (status.getSeverity() == IStatus.OK) {
-            form.setMessage(getOkMessage(), IMessageProvider.NONE);
-            confirmButton.setEnabled(true);
-        }
-        else {
-            form.setMessage(status.getMessage(), IMessageProvider.ERROR);
-            confirmButton.setEnabled(false);
-        }
     }
 
     @Override
