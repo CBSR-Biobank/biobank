@@ -1,3 +1,4 @@
+
 package edu.ualberta.med.biobank.forms;
 
 import java.util.ArrayList;
@@ -5,8 +6,8 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.TreeMap;
 
+import org.apache.commons.collections.MapIterator;
 import org.apache.commons.collections.map.ListOrderedMap;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IStatus;
@@ -20,7 +21,6 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
-import org.springframework.remoting.RemoteAccessException;
 import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
@@ -47,321 +47,341 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 @SuppressWarnings("serial")
 public class StudyEntryForm extends BiobankEntryForm {
-	public static final String ID = "edu.ualberta.med.biobank.forms.StudyEntryForm";
+    public static final String ID = "edu.ualberta.med.biobank.forms.StudyEntryForm";
 
-	private static final String MSG_NEW_STUDY_OK = "Creating a new study.";
+    private static final String MSG_NEW_STUDY_OK = "Creating a new study.";
 
-	private static final String MSG_STUDY_OK = "Editing an existing study.";
+    private static final String MSG_STUDY_OK = "Editing an existing study.";
 
-	public static final String[] ORDERED_FIELDS = new String[] { "name",
-			"nameShort", "activityStatus", "comment" };
+    public static final String [] ORDERED_FIELDS = new String [] {
+        "name", "nameShort", "activityStatus", "comment" };
 
-	public static final ListOrderedMap FIELDS = new ListOrderedMap() {
-		{
-			put("name", new FieldInfo("Name", Text.class, SWT.NONE, null,
-				NonEmptyString.class, "Study name cannot be blank"));
-			put("nameShort", new FieldInfo("Short Name", Text.class, SWT.NONE,
-				null, NonEmptyString.class, "Study short name cannot be blank"));
-			put("activityStatus", new FieldInfo("Activity Status", Combo.class,
-				SWT.NONE, FormConstants.ACTIVITY_STATUS, null, null));
-			put("comment", new FieldInfo("Comments", Text.class, SWT.MULTI,
-				null, null, null));
-		}
-	};
+    public static final ListOrderedMap FIELDS = new ListOrderedMap() {
+        {
+            put("name", new FieldInfo("Name", Text.class, SWT.NONE, null,
+                NonEmptyString.class, "Study name cannot be blank"));
+            put("nameShort", new FieldInfo("Short Name", Text.class, SWT.NONE,
+                null, NonEmptyString.class, "Study short name cannot be blank"));
+            put("activityStatus", new FieldInfo("Activity Status", Combo.class,
+                SWT.NONE, FormConstants.ACTIVITY_STATUS, null, null));
+            put("comment", new FieldInfo("Comments", Text.class, SWT.MULTI,
+                null, null, null));
+        }
+    };
 
-	private MultiSelect clinicsMultiSelect;
+    private MultiSelect clinicsMultiSelect;
 
-	private StudyAdapter studyAdapter;
+    private StudyAdapter studyAdapter;
 
-	private Study study;
+    private Study study;
 
-	private Site site;
+    private Site site;
 
-	private Collection<Clinic> allClinics;
+    private Collection<Clinic> allClinics;
 
-	private Collection<PvInfoPossible> possiblePvInfos;
+    private Collection<PvInfoPossible> possiblePvInfos;
 
-	private TreeMap<String, PvInfoWidget> studyInfoWidgets;
+    class CombinedPvInfo {
+        PvInfoPossible pvInfoPossible;
+        PvInfo pvInfo;
+        PvInfoWidget wiget;
+    };
 
-	public StudyEntryForm() {
-		super();
-		studyInfoWidgets = new TreeMap<String, PvInfoWidget>();
-	}
+    private ListOrderedMap combinedPvInfoMap;
 
-	@Override
-	public void init(IEditorSite editorSite, IEditorInput input)
-			throws PartInitException {
+    public StudyEntryForm() {
+        super();
+        combinedPvInfoMap = new ListOrderedMap();
+    }
 
-		super.init(editorSite, input);
+    @Override
+    public void init(IEditorSite editorSite, IEditorInput input)
+        throws PartInitException {
 
-		Node node = ((FormInput) input).getNode();
-		Assert.isNotNull(node, "Null editor input");
+        super.init(editorSite, input);
 
-		Assert
-			.isTrue((node instanceof StudyAdapter),
-				"Invalid editor input: object of type "
-						+ node.getClass().getName());
+        Node node = ((FormInput) input).getNode();
+        Assert.isNotNull(node, "Null editor input");
 
-		studyAdapter = (StudyAdapter) node;
-		study = studyAdapter.getStudy();
-		study.setWorksheet(new Worksheet());
-		site = ((SiteAdapter) studyAdapter.getParent().getParent()).getSite();
+        Assert.isTrue((node instanceof StudyAdapter),
+            "Invalid editor input: object of type " + node.getClass().getName());
 
-		if (study.getId() == null) {
-			setPartName("New Study");
-		} else {
-			setPartName("Study " + study.getName());
-		}
-	}
+        studyAdapter = (StudyAdapter) node;
+        study = studyAdapter.getStudy();
+        study.setWorksheet(new Worksheet());
+        site = ((SiteAdapter) studyAdapter.getParent().getParent()).getSite();
 
-	@Override
-	protected void createFormContent() {
-		form.setText("Study Information");
-		form.setMessage(getOkMessage(), IMessageProvider.NONE);
-		form.getBody().setLayout(new GridLayout(1, false));
+        if (study.getId() == null) {
+            setPartName("New Study");
+        }
+        else {
+            setPartName("Study " + study.getName());
+        }
+    }
 
-		Composite client = toolkit.createComposite(form.getBody());
-		GridLayout layout = new GridLayout(2, false);
-		layout.horizontalSpacing = 10;
-		client.setLayout(layout);
-		client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		toolkit.paintBordersFor(client);
+    @Override
+    protected void createFormContent() {
+        form.setText("Study Information");
+        form.setMessage(getOkMessage(), IMessageProvider.NONE);
+        form.getBody().setLayout(new GridLayout(1, false));
 
-		createWidgetsFromMap(FIELDS, study, client);
-		Text comments = (Text) controls.get("comment");
-		GridData gd = (GridData) comments.getLayoutData();
-		gd.heightHint = 40;
-		// comments.setLayoutData(gd);
+        Composite client = toolkit.createComposite(form.getBody());
+        GridLayout layout = new GridLayout(2, false);
+        layout.horizontalSpacing = 10;
+        client.setLayout(layout);
+        client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        toolkit.paintBordersFor(client);
 
-		createClinicSection();
-		createPvInfoSection();
-		createButtonsSection();
-	}
+        createWidgetsFromMap(FIELDS, study, client);
+        Text comments = (Text) controls.get("comment");
+        GridData gd = (GridData) comments.getLayoutData();
+        gd.heightHint = 40;
+        // comments.setLayoutData(gd);
 
-	private void createClinicSection() {
-		Composite client = createSectionWithClient("Available Clinics");
-		Collection<Clinic> studyClinics = study.getClinicCollection();
-		allClinics = site.getClinicCollection();
+        createClinicSection();
+        createPvInfoSection();
+        createButtonsSection();
+    }
 
-		ListOrderedMap availClinics = new ListOrderedMap();
-		List<Integer> selClinics = new ArrayList<Integer>();
+    private void createClinicSection() {
+        Composite client = createSectionWithClient("Available Clinics");
+        Collection<Clinic> studyClinics = study.getClinicCollection();
+        allClinics = site.getClinicCollection();
 
-		if (studyClinics != null) {
-			for (Clinic clinic : studyClinics) {
-				selClinics.add(clinic.getId());
-			}
-		}
+        ListOrderedMap availClinics = new ListOrderedMap();
+        List<Integer> selClinics = new ArrayList<Integer>();
 
-		for (Clinic clinic : allClinics) {
-			availClinics.put(clinic.getId(), clinic.getName());
-		}
+        if (studyClinics != null) {
+            for (Clinic clinic : studyClinics) {
+                selClinics.add(clinic.getId());
+            }
+        }
 
-		clinicsMultiSelect = new MultiSelect(client, SWT.NONE,
-			"Selected Clinics", "Available Clinics", 100);
-		clinicsMultiSelect.adaptToToolkit(toolkit);
-		clinicsMultiSelect.addSelections(availClinics, selClinics);
-	}
+        for (Clinic clinic : allClinics) {
+            availClinics.put(clinic.getId(), clinic.getName());
+        }
 
-	private void createPvInfoSection() {
-		Composite client = createSectionWithClient("Study Information Selection");
-		// Collection<PvInfo> siCollection = study.getPvInfoCollection();
-		// HashMap<Integer, PvInfo> selected = new HashMap<Integer,
-		// PvInfo>();
-		// GridLayout gl = (GridLayout) client.getLayout();
-		// gl.numColumns = 1;
-		//
-		// if (siCollection != null) {
-		// for (PvInfo studyInfo : siCollection) {
-		// selected.put(studyInfo.getPvInfoType().getId(), studyInfo);
-		// }
-		// }
+        clinicsMultiSelect = new MultiSelect(client, SWT.NONE,
+            "Selected Clinics", "Available Clinics", 100);
+        clinicsMultiSelect.adaptToToolkit(toolkit);
+        clinicsMultiSelect.addSelections(availClinics, selClinics);
+    }
 
-		possiblePvInfos = getPossiblePvInfos();
-		Assert.isNotNull(possiblePvInfos);
+    private void createPvInfoSection() {
+        Composite client = createSectionWithClient("Patient Visit Information Collected");
+        Collection<PvInfo> pviCollection = study.getPvInfoCollection();
+        GridLayout gl = (GridLayout) client.getLayout();
+        gl.numColumns = 1;
 
-		for (PvInfoPossible pvInfo : possiblePvInfos) {
-			String value = "";
-			boolean itemSelected = false;
-			// PvInfo studyInfo = selected.get(studyInfoType.getId());
-			// if (studyInfo != null) {
-			// itemSelected = true;
-			// value = studyInfo.getPossibleValues();
-			// }
+        if (pviCollection != null) {
+            for (PvInfo pvInfo : pviCollection) {
+                CombinedPvInfo combinedPvInfo = new CombinedPvInfo();
+                combinedPvInfo.pvInfo = pvInfo;
+                combinedPvInfo.pvInfoPossible = pvInfo.getPvInfoPossible();
 
-			PvInfoWidget w = new PvInfoWidget(client, SWT.NONE, pvInfo
-				.getPvInfoType(), itemSelected, value);
-			w.adaptToToolkit(toolkit);
-			studyInfoWidgets.put(pvInfo.getLabel(), w);
-		}
-	}
+                combinedPvInfoMap.put(combinedPvInfo.pvInfoPossible.getId(),
+                    combinedPvInfo);
+            }
+        }
 
-	private void createButtonsSection() {
-		Composite client = toolkit.createComposite(form.getBody());
-		GridLayout layout = new GridLayout(2, false);
-		layout.horizontalSpacing = 10;
-		client.setLayout(layout);
-		client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		toolkit.paintBordersFor(client);
+        possiblePvInfos = getPossiblePvInfos();
+        Assert.isNotNull(possiblePvInfos);
 
-		initConfirmButton(client, true, false);
-	}
+        for (PvInfoPossible possiblePvInfo : possiblePvInfos) {
+            boolean selected = false;
+            String value = "";
+            CombinedPvInfo combinedPvInfo = (CombinedPvInfo) combinedPvInfoMap.get(possiblePvInfo.getId());
 
-	private String getOkMessage() {
-		if (study.getId() == null) {
-			return MSG_NEW_STUDY_OK;
-		}
-		return MSG_STUDY_OK;
-	}
+            if (combinedPvInfo == null) {
+                combinedPvInfo = new CombinedPvInfo();
+                combinedPvInfo.pvInfoPossible = possiblePvInfo;
+                combinedPvInfo.pvInfo = null;
+                selected = false;
+            }
+            else {
+                selected = true;
+                value = combinedPvInfo.pvInfo.getPossibleValues();
+            }
 
-	@Override
-	protected void handleStatusChanged(IStatus status) {
-		if (status.getSeverity() == IStatus.OK) {
-			form.setMessage(getOkMessage(), IMessageProvider.NONE);
-			confirmButton.setEnabled(true);
-		} else {
-			form.setMessage(status.getMessage(), IMessageProvider.ERROR);
-			confirmButton.setEnabled(false);
-		}
-	}
+            combinedPvInfo.wiget = new PvInfoWidget(client, SWT.NONE,
+                possiblePvInfo, selected, value);
 
-	@Override
-	protected void saveForm() {
-		try {
-			if ((study.getId() == null) && !checkStudyNameUnique()) {
-				setDirty(true);
-				return;
-			}
+            combinedPvInfoMap.put(combinedPvInfo.pvInfoPossible.getId(),
+                combinedPvInfo);
+        }
 
-			// get the selected clinics from widget
-			List<Integer> selClinicIds = clinicsMultiSelect.getSelected();
-			Set<Clinic> selClinics = new HashSet<Clinic>();
-			for (Clinic clinic : allClinics) {
-				int id = clinic.getId();
-				if (selClinicIds.indexOf(id) >= 0) {
-					selClinics.add(clinic);
-				}
+        // now create the widgets in order listed in PvInfoPossible
+    }
 
-			}
-			Assert.isTrue(selClinics.size() == selClinicIds.size(),
-				"problem with clinic selections");
-			study.setClinicCollection(selClinics);
+    private void createButtonsSection() {
+        Composite client = toolkit.createComposite(form.getBody());
+        GridLayout layout = new GridLayout(2, false);
+        layout.horizontalSpacing = 10;
+        client.setLayout(layout);
+        client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        toolkit.paintBordersFor(client);
 
-			List<PvInfo> pvInfoList = new ArrayList<PvInfo>();
-			for (PvInfoPossible possiblePvInfo : possiblePvInfos) {
-				PvInfo pvInfo = new PvInfo();
-				String type = possiblePvInfo.getPvInfoType().getType();
-				String value = studyInfoWidgets.get(type).getResult();
+        initConfirmButton(client, true, false);
+    }
 
-				// TODO: check for default PvInfoPossible
+    private String getOkMessage() {
+        if (study.getId() == null) {
+            return MSG_NEW_STUDY_OK;
+        }
+        return MSG_STUDY_OK;
+    }
 
-				if ((value.length() == 0) || value.equals("no"))
-					continue;
-				if (value.equals("yes")) {
-					value = "";
-				}
-				pvInfo.setLabel(possiblePvInfo.getLabel());
-				pvInfo.setPossibleValues(value);
-				pvInfoList.add(pvInfo);
-			}
-			study.setPvInfoCollection(pvInfoList);
+    @Override
+    protected void handleStatusChanged(IStatus status) {
+        if (status.getSeverity() == IStatus.OK) {
+            form.setMessage(getOkMessage(), IMessageProvider.NONE);
+            confirmButton.setEnabled(true);
+        }
+        else {
+            form.setMessage(status.getMessage(), IMessageProvider.ERROR);
+            confirmButton.setEnabled(false);
+        }
+    }
 
-			saveStudy(study);
-			studyAdapter.getParent().performExpand();
-			getSite().getPage().closeEditor(this, false);
-		} catch (RemoteAccessException exp) {
-			BioBankPlugin.openRemoteAccessErrorMessage();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
+    @Override
+    protected void saveForm() throws Exception {
+        if ((study.getId() == null) && !checkStudyNameUnique()) {
+            setDirty(true);
+            return;
+        }
 
-	private void saveStudy(Study study) throws ApplicationException {
-		SDKQuery query;
-		SDKQueryResult result;
-		Set<PvInfo> savedPvInfoList = new HashSet<PvInfo>();
+        // get the selected clinics from widget
+        List<Integer> selClinicIds = clinicsMultiSelect.getSelected();
+        Set<Clinic> selClinics = new HashSet<Clinic>();
+        for (Clinic clinic : allClinics) {
+            int id = clinic.getId();
+            if (selClinicIds.indexOf(id) >= 0) {
+                selClinics.add(clinic);
+            }
 
-		study.setSite(site);
-		study.setWorksheet(null);
+        }
+        Assert.isTrue(selClinics.size() == selClinicIds.size(),
+            "problem with clinic selections");
+        study.setClinicCollection(selClinics);
 
-		if (study.getPvInfoCollection().size() > 0) {
-			for (PvInfo studyInfo : study.getPvInfoCollection()) {
-				if ((studyInfo.getId() == null) || (studyInfo.getId() == 0)) {
-					query = new InsertExampleQuery(studyInfo);
-				} else {
-					query = new UpdateExampleQuery(studyInfo);
-				}
+        List<PvInfo> pvInfoList = new ArrayList<PvInfo>();
+        MapIterator it = combinedPvInfoMap.mapIterator();
+        while (it.hasNext()) {
+            @SuppressWarnings("unused")
+            Integer key = (Integer) it.next();
+            CombinedPvInfo combinedPvInfo = (CombinedPvInfo) it.getValue();
+            String value = combinedPvInfo.wiget.getResult();
 
-				result = studyAdapter.getAppService().executeQuery(query);
-				savedPvInfoList.add((PvInfo) result.getObjectResult());
-			}
-		}
-		study.setPvInfoCollection(savedPvInfoList);
+            if (!combinedPvInfo.pvInfoPossible.getIsDefault()
+                || (value.length() == 0) || value.equals("no")) continue;
 
-		if ((study.getId() == null) || (study.getId() == 0)) {
-			query = new InsertExampleQuery(study);
-		} else {
-			query = new UpdateExampleQuery(study);
-		}
+            PvInfo pvInfo = combinedPvInfo.pvInfo;
 
-		result = studyAdapter.getAppService().executeQuery(query);
-		study = (Study) result.getObjectResult();
-	}
+            if (pvInfo == null) {
+                pvInfo = new PvInfo();
+            }
 
-	private List<PvInfoPossible> getPossiblePvInfos() {
-		PvInfoPossible criteria = new PvInfoPossible();
+            pvInfo.setLabel(combinedPvInfo.pvInfoPossible.getLabel());
 
-		try {
-			return studyAdapter.getAppService().search(PvInfoPossible.class,
-				criteria);
-		} catch (final RemoteConnectFailureException exp) {
-			BioBankPlugin.openRemoteConnectErrorMessage();
-		} catch (Exception exp) {
-			exp.printStackTrace();
-		}
-		return null;
-	}
+            Integer typeId = combinedPvInfo.pvInfoPossible.getPvInfoType().getId();
+            if ((typeId == 4) || (typeId == 4) || (typeId == 4)) {
+                pvInfo.setPossibleValues(value);
+            }
+            pvInfoList.add(pvInfo);
+        }
+        study.setPvInfoCollection(pvInfoList);
+        saveStudy(study);
+        studyAdapter.getParent().performExpand();
+        getSite().getPage().closeEditor(this, false);
+    }
 
-	private boolean checkStudyNameUnique() throws ApplicationException {
-		WritableApplicationService appService = studyAdapter.getAppService();
-		Site site = ((SiteAdapter) studyAdapter.getParent().getParent())
-			.getSite();
+    private void saveStudy(Study study) throws ApplicationException {
+        SDKQuery query;
+        SDKQueryResult result;
+        Set<PvInfo> savedPvInfoList = new HashSet<PvInfo>();
 
-		HQLCriteria c = new HQLCriteria(
-			"from edu.ualberta.med.biobank.model.Study as study "
-					+ "inner join fetch study.site " + "where study.site.id='"
-					+ site.getId() + "' " + "and study.name = '"
-					+ study.getName() + "'");
+        study.setSite(site);
+        study.setWorksheet(null);
 
-		List<Object> results = appService.query(c);
+        if (study.getPvInfoCollection().size() > 0) {
+            for (PvInfo studyInfo : study.getPvInfoCollection()) {
+                if ((studyInfo.getId() == null) || (studyInfo.getId() == 0)) {
+                    query = new InsertExampleQuery(studyInfo);
+                }
+                else {
+                    query = new UpdateExampleQuery(studyInfo);
+                }
 
-		if (results.size() > 0) {
-			BioBankPlugin
-				.openAsyncError("Study Name Problem", "A study with name \""
-						+ study.getName() + "\" already exists.");
-			return false;
-		}
+                result = studyAdapter.getAppService().executeQuery(query);
+                savedPvInfoList.add((PvInfo) result.getObjectResult());
+            }
+        }
+        study.setPvInfoCollection(savedPvInfoList);
 
-		c = new HQLCriteria(
-			"from edu.ualberta.med.biobank.model.Study as study "
-					+ "inner join fetch study.site " + "where study.site.id='"
-					+ site.getId() + "' " + "and study.nameShort = '"
-					+ study.getNameShort() + "'");
+        if ((study.getId() == null) || (study.getId() == 0)) {
+            query = new InsertExampleQuery(study);
+        }
+        else {
+            query = new UpdateExampleQuery(study);
+        }
 
-		results = appService.query(c);
+        result = studyAdapter.getAppService().executeQuery(query);
+        study = (Study) result.getObjectResult();
+    }
 
-		if (results.size() > 0) {
-			BioBankPlugin.openAsyncError("Study Name Problem",
-				"A study with short name \"" + study.getName()
-						+ "\" already exists.");
-			return false;
-		}
+    private List<PvInfoPossible> getPossiblePvInfos() {
+        PvInfoPossible criteria = new PvInfoPossible();
 
-		return true;
-	}
+        try {
+            return studyAdapter.getAppService().search(PvInfoPossible.class,
+                criteria);
+        }
+        catch (final RemoteConnectFailureException exp) {
+            BioBankPlugin.openRemoteConnectErrorMessage();
+        }
+        catch (Exception exp) {
+            exp.printStackTrace();
+        }
+        return null;
+    }
 
-	@Override
-	protected void cancelForm() {
-		// TODO Auto-generated method stub
+    private boolean checkStudyNameUnique() throws Exception {
+        WritableApplicationService appService = studyAdapter.getAppService();
+        Site site = ((SiteAdapter) studyAdapter.getParent().getParent()).getSite();
 
-	}
+        HQLCriteria c = new HQLCriteria("from edu.ualberta.med.biobank.model."
+            + "Study as study inner join fetch study.site "
+            + "where study.site.id='" + site.getId() + "' "
+            + "and study.name = '" + study.getName() + "'");
+
+        List<Object> results = appService.query(c);
+
+        if (results.size() > 0) {
+            BioBankPlugin.openAsyncError("Study Name Problem",
+                "A study with name \"" + study.getName() + "\" already exists.");
+            return false;
+        }
+
+        c = new HQLCriteria("from edu.ualberta.med.biobank.model.Study "
+            + " as study inner join fetch study.site where study.site.id='"
+            + site.getId() + "' " + "and study.nameShort = '"
+            + study.getNameShort() + "'");
+
+        results = appService.query(c);
+
+        if (results.size() > 0) {
+            BioBankPlugin.openAsyncError("Study Name Problem",
+                "A study with short name \"" + study.getName()
+                    + "\" already exists.");
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    protected void cancelForm() {
+    // TODO Auto-generated method stub
+
+    }
 }
