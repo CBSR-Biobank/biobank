@@ -3,12 +3,11 @@ package edu.ualberta.med.biobank.forms;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.TreeMap;
 
+import org.apache.commons.collections.MapIterator;
 import org.apache.commons.collections.map.ListOrderedMap;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IStatus;
@@ -82,16 +81,17 @@ public class StudyEntryForm extends BiobankEntryForm {
 
     private Collection<PvInfoPossible> possiblePvInfos;
 
-    private TreeMap<String, PvInfoWidget> studyInfoWidgets;
-
-    class PvInfoDetails {
-        PvInfo pvInfo;
+    class CombinedPvInfo {
         PvInfoPossible pvInfoPossible;
-    }
+        PvInfo pvInfo;
+        PvInfoWidget wiget;
+    };
+
+    private ListOrderedMap combinedPvInfoMap;
 
     public StudyEntryForm() {
         super();
-        studyInfoWidgets = new TreeMap<String, PvInfoWidget>();
+        combinedPvInfoMap = new ListOrderedMap();
     }
 
     @Override
@@ -170,13 +170,17 @@ public class StudyEntryForm extends BiobankEntryForm {
     private void createPvInfoSection() {
         Composite client = createSectionWithClient("Patient Visit Information Collected");
         Collection<PvInfo> pviCollection = study.getPvInfoCollection();
-        HashMap<Integer, PvInfo> selected = new HashMap<Integer, PvInfo>();
         GridLayout gl = (GridLayout) client.getLayout();
         gl.numColumns = 1;
 
         if (pviCollection != null) {
-            for (PvInfo studyInfo : pviCollection) {
-                selected.put(studyInfo.getPvInfoType().getId(), studyInfo);
+            for (PvInfo pvInfo : pviCollection) {
+                CombinedPvInfo combinedPvInfo = new CombinedPvInfo();
+                combinedPvInfo.pvInfo = pvInfo;
+                combinedPvInfo.pvInfoPossible = pvInfo.getPvInfoPossible();
+
+                combinedPvInfoMap.put(combinedPvInfo.pvInfoPossible.getId(),
+                    combinedPvInfo);
             }
         }
 
@@ -184,21 +188,29 @@ public class StudyEntryForm extends BiobankEntryForm {
         Assert.isNotNull(possiblePvInfos);
 
         for (PvInfoPossible possiblePvInfo : possiblePvInfos) {
-            String label = possiblePvInfo.getLabel();
+            boolean selected = false;
             String value = "";
-            boolean itemSelected = false;
-            PvInfo pvInfo = selected.get(possiblePvInfo.getId());
-            if (pvInfo != null) {
-                itemSelected = true;
-                label = pvInfo.getLabel();
-                value = pvInfo.getLabel();
+            CombinedPvInfo combinedPvInfo = (CombinedPvInfo) combinedPvInfoMap.get(possiblePvInfo.getId());
+
+            if (combinedPvInfo == null) {
+                combinedPvInfo = new CombinedPvInfo();
+                combinedPvInfo.pvInfoPossible = possiblePvInfo;
+                combinedPvInfo.pvInfo = null;
+                selected = false;
+            }
+            else {
+                selected = true;
+                value = combinedPvInfo.pvInfo.getPossibleValues();
             }
 
-            PvInfoWidget w = new PvInfoWidget(client, SWT.NONE, possiblePvInfo,
-                itemSelected, value);
-            w.adaptToToolkit(toolkit);
-            studyInfoWidgets.put(label, w);
+            combinedPvInfo.wiget = new PvInfoWidget(client, SWT.NONE,
+                possiblePvInfo, selected, value);
+
+            combinedPvInfoMap.put(combinedPvInfo.pvInfoPossible.getId(),
+                combinedPvInfo);
         }
+
+        // now create the widgets in order listed in PvInfoPossible
     }
 
     private void createButtonsSection() {
@@ -253,23 +265,31 @@ public class StudyEntryForm extends BiobankEntryForm {
         study.setClinicCollection(selClinics);
 
         List<PvInfo> pvInfoList = new ArrayList<PvInfo>();
-        for (PvInfoPossible possiblePvInfo : possiblePvInfos) {
-            String label = possiblePvInfo.getLabel();
-            String value = studyInfoWidgets.get(label).getResult();
+        MapIterator it = combinedPvInfoMap.mapIterator();
+        while (it.hasNext()) {
+            @SuppressWarnings("unused")
+            Integer key = (Integer) it.next();
+            CombinedPvInfo combinedPvInfo = (CombinedPvInfo) it.getValue();
+            String value = combinedPvInfo.wiget.getResult();
 
-            if (!possiblePvInfo.getIsDefault() || (value.length() == 0)
-                || value.equals("no")) continue;
-            if (value.equals("yes")) value = "";
+            if (!combinedPvInfo.pvInfoPossible.getIsDefault()
+                || (value.length() == 0) || value.equals("no")) continue;
 
-            PvInfo pvInfo = new PvInfo();
+            PvInfo pvInfo = combinedPvInfo.pvInfo;
 
-            pvInfo.setLabel(label);
-            pvInfo.setPvInfoType(possiblePvInfo.getPvInfoType());
-            pvInfo.setPossibleValues(value);
+            if (pvInfo == null) {
+                pvInfo = new PvInfo();
+            }
+
+            pvInfo.setLabel(combinedPvInfo.pvInfoPossible.getLabel());
+
+            Integer typeId = combinedPvInfo.pvInfoPossible.getPvInfoType().getId();
+            if ((typeId == 4) || (typeId == 4) || (typeId == 4)) {
+                pvInfo.setPossibleValues(value);
+            }
             pvInfoList.add(pvInfo);
         }
         study.setPvInfoCollection(pvInfoList);
-
         saveStudy(study);
         studyAdapter.getParent().performExpand();
         getSite().getPage().closeEditor(this, false);
