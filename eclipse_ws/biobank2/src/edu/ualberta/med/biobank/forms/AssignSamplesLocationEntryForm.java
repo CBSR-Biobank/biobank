@@ -314,27 +314,18 @@ public class AssignSamplesLocationEntryForm extends BiobankEntryForm implements
                 try {
                     boolean showResult = getPaletteInformation();
                     if (showResult) {
-                        // TODO launch real scanner
-                        ScanLib scanLib = ScanLibFactory.getScanLib();
-                        int r = scanLib.slScanPlate(300, 1, "plate1.bmp");
+                        int plateNum = BioBankPlugin.getDefault().getPlateNumber(
+                            plateToScanValue.getValue().toString());
 
-                        System.out.println("Plate to scan : "
-                            + BioBankPlugin.getDefault().getPlateNumber(
-                                plateToScanValue.getValue().toString()));
-                        if (BioBankPlugin.getDefault().isDebugging()) {
-                            if (notexistsButton.getSelection()) {
-                                cells = ScanCell.getRandomScanProcessNotInPalette(appService);
-                            }
-                            else if (existsButton.getSelection()) {
-                                cells = ScanCell.getRandomScanProcessAlreadyInPalette(appService);
-                            }
-                            else {
-                                cells = ScanCell.getRandomScanProcess();
-                            }
+                        ScanLib scanLib = ScanLibFactory.getScanLib();
+                        int r = scanLib.slDecodePlate(ScanLib.DPI_300, plateNum);
+                        if (r < 0) {
+                            BioBankPlugin.openError("Scanner",
+                                "Could not decode image. Return code is: " + r);
+                            return;
                         }
-                        else {
-                            cells = ScanCell.getRandomScanProcess();
-                        }
+
+                        cells = ScanCell.getScanLibResults();
 
                         currentStudy = null;
                         boolean result = true;
