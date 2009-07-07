@@ -1,7 +1,6 @@
 
 package edu.ualberta.med.biobank.forms;
 
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
@@ -30,7 +29,6 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 
 import com.gface.date.DatePickerCombo;
-import com.gface.date.DatePickerStyle;
 
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Patient;
@@ -43,6 +41,7 @@ import edu.ualberta.med.biobank.treeview.PatientAdapter;
 import edu.ualberta.med.biobank.treeview.PatientVisitAdapter;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
+import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.SDKQuery;
@@ -175,8 +174,8 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
                     break;
 
                 case 3: // date_time
-                    combinedPvInfo.control = createDatePickerSection(client,
-                        value);
+                    combinedPvInfo.control = new DateTimeWidget(client,
+                        SWT.NONE, value);
                     break;
 
                 case 4: // select_single
@@ -202,26 +201,6 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
             controls.put(combinedPvInfo.pvInfo.getLabel(),
                 combinedPvInfo.control);
         }
-    }
-
-    private Control createDatePickerSection(Composite client, String value) {
-        DatePickerCombo datePicker = new DatePickerCombo(client, SWT.BORDER,
-            DatePickerStyle.BUTTONS_ON_BOTTOM | DatePickerStyle.YEAR_BUTTONS
-                | DatePickerStyle.HIDE_WHEN_NOT_IN_FOCUS);
-        datePicker.setLayout(new GridLayout(1, false));
-        datePicker.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        datePicker.setDateFormat(new SimpleDateFormat(DATE_FORMAT));
-
-        if ((value != null) && (value.length() > 0)) {
-            SimpleDateFormat df = new SimpleDateFormat(DATE_FORMAT);
-            try {
-                datePicker.setDate(df.parse(value));
-            }
-            catch (ParseException e1) {
-                e1.printStackTrace();
-            }
-        }
-        return datePicker;
     }
 
     private Control createComboSection(Composite client, String [] values,
