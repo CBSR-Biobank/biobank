@@ -54,6 +54,8 @@ import edu.ualberta.med.biobank.validators.ScannerBarcodeValidator;
 import edu.ualberta.med.biobank.widgets.ScanPaletteWidget;
 import edu.ualberta.med.biobank.widgets.ViewStorageContainerWidget;
 import edu.ualberta.med.biobank.wizard.ContainerChooserWizard;
+import edu.ualberta.med.scanlib.ScanLib;
+import edu.ualberta.med.scanlib.ScanLibFactory;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.query.SDKQuery;
 import gov.nih.nci.system.query.SDKQueryResult;
@@ -333,10 +335,11 @@ public class AssignSamplesLocationEntryForm extends BiobankEntryForm implements
                         int plate = BioBankPlugin.getDefault().getPlateNumber(
                             plateToScanValue.getValue().toString());
                         // TODO launch real scanner
-                        // ScanLib.slScanPlate(300, plate, "plate" + plate
-                        // + ".bmp");
+                        ScanLib scanLib = ScanLibFactory.getScanLib();
+                        int r = scanLib.slScanPlate(300, 1, "plate1.bmp");
 
                         System.out.println("Plate to scan : " + plate);
+
                         if (BioBankPlugin.getDefault().isDebugging()) {
                             if (notexistsButton.getSelection()) {
                                 cells = ScanCell.getRandomScanProcessNotInPalette(appService);

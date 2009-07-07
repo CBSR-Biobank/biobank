@@ -258,21 +258,21 @@ public class StudyEntryForm extends BiobankEntryForm {
             @SuppressWarnings("unused")
             Integer key = (Integer) it.next();
             CombinedPvInfo combinedPvInfo = (CombinedPvInfo) it.getValue();
-            String value = combinedPvInfo.wiget.getResult();
+            boolean selected = combinedPvInfo.wiget.getSelected();
 
-            if (!combinedPvInfo.pvInfoPossible.getIsDefault()
-                || (value.length() == 0) || value.equals("no")) continue;
+            if (!selected) continue;
 
+            String value = combinedPvInfo.wiget.getValues();
             PvInfo pvInfo = combinedPvInfo.pvInfo;
 
             if (pvInfo == null) {
                 pvInfo = new PvInfo();
+                pvInfo.setPvInfoPossible(combinedPvInfo.pvInfoPossible);
+                pvInfo.setPvInfoType(combinedPvInfo.pvInfoPossible.getPvInfoType());
             }
 
             pvInfo.setLabel(combinedPvInfo.pvInfoPossible.getLabel());
-
-            Integer typeId = combinedPvInfo.pvInfoPossible.getPvInfoType().getId();
-            if ((typeId == 4) || (typeId == 4) || (typeId == 4)) {
+            if (value != null) {
                 pvInfo.setPossibleValues(value);
             }
             pvInfoList.add(pvInfo);
@@ -292,12 +292,12 @@ public class StudyEntryForm extends BiobankEntryForm {
         study.setWorksheet(null);
 
         if (study.getPvInfoCollection().size() > 0) {
-            for (PvInfo studyInfo : study.getPvInfoCollection()) {
-                if ((studyInfo.getId() == null) || (studyInfo.getId() == 0)) {
-                    query = new InsertExampleQuery(studyInfo);
+            for (PvInfo pvInfo : study.getPvInfoCollection()) {
+                if ((pvInfo.getId() == null) || (pvInfo.getId() == 0)) {
+                    query = new InsertExampleQuery(pvInfo);
                 }
                 else {
-                    query = new UpdateExampleQuery(studyInfo);
+                    query = new UpdateExampleQuery(pvInfo);
                 }
 
                 result = studyAdapter.getAppService().executeQuery(query);
