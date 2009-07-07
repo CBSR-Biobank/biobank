@@ -72,7 +72,7 @@ public class CabinetDrawerWidget extends Canvas {
 							* RECTANGLE_CELL_HEIGHT);
 
 			Rectangle rectangle = new Rectangle(rectXPosition, rectYPosition,
-				width, height);
+					width, height);
 			gc.setForeground(e.display.getSystemColor(SWT.COLOR_BLACK));
 			gc.drawRectangle(rectangle);
 			if (selectedBin == boxIndex) {

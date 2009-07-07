@@ -118,7 +118,7 @@
 <property name="output.src.dir.copy" location="${cacore.sdk.dir}\output\${PROJECT_NAME}\src" /> <!--tp-->
 <property name="grid-jaas.dir.copy" location="${cacore.sdk.dir}\output\${PROJECT_NAME}\package\grid-jaas" /> <!--tp-->
 
-<target name="package-codegen-orm" description="REDO:: Packages the generated ORM and bean artifacts">
+<target name="package-codegen-orm" description="REDO:: Packages the generated ORM and bean artifacts" depends="string-length-field-addition">
 	<jar destfile="${build.jar.dir.copy}\${PROJECT_NAME}-orm.jar" basedir="${output.src.dir.copy}">
 		<manifest>
 			<attribute name="Generated-By" value="caCORE SDK Code Generator"/>

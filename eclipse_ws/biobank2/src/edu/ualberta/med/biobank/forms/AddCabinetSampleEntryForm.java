@@ -1,4 +1,3 @@
-
 package edu.ualberta.med.biobank.forms;
 
 import org.eclipse.core.databinding.beans.PojoObservables;
@@ -53,383 +52,404 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.query.example.InsertExampleQuery;
 
 public class AddCabinetSampleEntryForm extends BiobankEntryForm implements
-    CancelConfirmForm {
+		CancelConfirmForm {
 
-    public static final String ID = "edu.ualberta.med.biobank.forms.AddCabinetSampleEntryForm";
+	public static final String ID = "edu.ualberta.med.biobank.forms.AddCabinetSampleEntryForm";
 
-    private PatientVisitAdapter pvAdapter;
-    private PatientVisit patientVisit;
+	private PatientVisitAdapter pvAdapter;
+	private PatientVisit patientVisit;
 
-    private Label cabinetLabel;
-    private Label drawerLabel;
-    private ViewStorageContainerWidget cabinetWidget;
-    private CabinetDrawerWidget drawerWidget;
+	private Label cabinetLabel;
+	private Label drawerLabel;
+	private ViewStorageContainerWidget cabinetWidget;
+	private CabinetDrawerWidget drawerWidget;
 
-    private ComboViewer comboViewerSampleTypes;
-    private Text inventoryIdText;
-    private Text positionText;
-    private Button showPosition;
+	private ComboViewer comboViewerSampleTypes;
+	private Text inventoryIdText;
+	private Text positionText;
+	private Button showPosition;
 
-    private Text confirmCancelText;
+	private Text confirmCancelText;
 
-    private IObservableValue cabinetPosition = new WritableValue("",
-        String.class);
-    private IObservableValue resultShown = new WritableValue(Boolean.FALSE,
-        Boolean.class);
-    private IObservableValue selectedSampleType = new WritableValue("",
-        String.class);
+	private IObservableValue cabinetPosition = new WritableValue("",
+			String.class);
+	private IObservableValue resultShown = new WritableValue(Boolean.FALSE,
+			Boolean.class);
+	private IObservableValue selectedSampleType = new WritableValue("",
+			String.class);
 
-    private StorageType cabinetType;
-    private Sample sample = new Sample();
-    private StorageContainer cabinet;
-    private StorageContainer drawer;
-    private StorageContainer bin;
+	private StorageType cabinetType;
+	private Sample sample = new Sample();
+	private StorageContainer cabinet;
+	private StorageContainer drawer;
+	private StorageContainer bin;
 
-    private Button confirmAndNextButton;
+	private Button confirmAndNextButton;
 
-    private Button confirmAndEnd;
+	private Button confirmAndEnd;
 
-    @Override
-    public void init(IEditorSite editorSite, IEditorInput input)
-        throws PartInitException {
-        super.init(editorSite, input);
+	private static boolean activityToPrint = false;
+	private static boolean testDisposeOn = true;
 
-        Node node = ((FormInput) input).getNode();
-        Assert.isNotNull(node, "Null editor input");
+	@Override
+	public void init(IEditorSite editorSite, IEditorInput input)
+			throws PartInitException {
+		super.init(editorSite, input);
 
-        Assert.isTrue((node instanceof PatientVisitAdapter),
-            "Invalid editor input: object of type " + node.getClass().getName());
+		Node node = ((FormInput) input).getNode();
+		Assert.isNotNull(node, "Null editor input");
 
-        pvAdapter = (PatientVisitAdapter) node;
-        patientVisit = pvAdapter.getPatientVisit();
-        appService = pvAdapter.getAppService();
+		Assert.isTrue((node instanceof PatientVisitAdapter),
+				"Invalid editor input: object of type "
+						+ node.getClass().getName());
 
-        setPartName("Add cabinet sample for "
-            + patientVisit.getPatient().getNumber());
-    }
+		pvAdapter = (PatientVisitAdapter) node;
+		patientVisit = pvAdapter.getPatientVisit();
+		appService = pvAdapter.getAppService();
 
-    @Override
-    protected void createFormContent() {
-        form.setText("Add cabinet samples for patient "
-            + patientVisit.getPatient().getNumber() + " for visit "
-            + patientVisit.getNumber());
+		setPartName("Add cabinet sample for "
+				+ patientVisit.getPatient().getNumber());
 
-        GridLayout layout = new GridLayout(1, false);
-        form.getBody().setLayout(layout);
+		testDisposeOn = true;
+	}
 
-        createLocationSection();
-        addSeparator();
-        createFieldsSection();
-        addSeparator();
-        createButtonsSection();
+	@Override
+	public void dispose() {
+		if (testDisposeOn && activityToPrint) {
+			print();
+		}
+	}
 
-        addBooleanBinding(new WritableValue(Boolean.FALSE, Boolean.class),
-            resultShown, "Show results to check values");
-    }
+	@Override
+	protected void createFormContent() {
+		form.setText("Add cabinet samples for patient "
+				+ patientVisit.getPatient().getNumber() + " for visit "
+				+ patientVisit.getNumber());
 
-    private void createLocationSection() {
-        // get storage type Cabinet from database
-        cabinetType = ModelUtils.getCabinetType(appService);
-        if (cabinetType == null) {
-            BioBankPlugin.openAsyncError("Cabinet error",
-                "Cannot find a storage type for cabinet !");
-            form.setEnabled(false);
-        }
+		GridLayout layout = new GridLayout(1, false);
+		form.getBody().setLayout(layout);
 
-        Composite client = toolkit.createComposite(form.getBody());
-        GridLayout layout = new GridLayout(2, false);
-        client.setLayout(layout);
-        GridData gd = new GridData();
-        gd.horizontalAlignment = SWT.CENTER;
-        gd.grabExcessHorizontalSpace = true;
-        client.setLayoutData(gd);
-        toolkit.paintBordersFor(client);
+		createLocationSection();
+		addSeparator();
+		createFieldsSection();
+		addSeparator();
+		createButtonsSection();
 
-        cabinetLabel = toolkit.createLabel(client, "Cabinet");
-        drawerLabel = toolkit.createLabel(client, "Drawer");
+		addBooleanBinding(new WritableValue(Boolean.FALSE, Boolean.class),
+				resultShown, "Show results to check values");
+	}
 
-        cabinetWidget = new ViewStorageContainerWidget(client);
-        toolkit.adapt(cabinetWidget);
-        cabinetWidget.setGridSizes(4, 1, 150, 150);
-        cabinetWidget.setFirstColSign('A');
-        cabinetWidget.setShowColumnFirst(true);
-        GridData gdDrawer = new GridData();
-        gdDrawer.verticalAlignment = SWT.TOP;
-        cabinetWidget.setLayoutData(gdDrawer);
+	private void createLocationSection() {
+		// get storage type Cabinet from database
+		cabinetType = ModelUtils.getCabinetType(appService);
+		if (cabinetType == null) {
+			BioBankPlugin.openAsyncError("Cabinet error",
+					"Cannot find a storage type for cabinet !");
+			form.setEnabled(false);
+		}
 
-        drawerWidget = new CabinetDrawerWidget(client);
-        toolkit.adapt(drawerWidget);
-        GridData gdBin = new GridData();
-        gdBin.widthHint = CabinetDrawerWidget.WIDTH;
-        gdBin.heightHint = CabinetDrawerWidget.HEIGHT;
-        gdBin.verticalSpan = 2;
-        drawerWidget.setLayoutData(gdBin);
+		Composite client = toolkit.createComposite(form.getBody());
+		GridLayout layout = new GridLayout(2, false);
+		client.setLayout(layout);
+		GridData gd = new GridData();
+		gd.horizontalAlignment = SWT.CENTER;
+		gd.grabExcessHorizontalSpace = true;
+		client.setLayoutData(gd);
+		toolkit.paintBordersFor(client);
 
-    }
+		cabinetLabel = toolkit.createLabel(client, "Cabinet");
+		drawerLabel = toolkit.createLabel(client, "Drawer");
 
-    private void createFieldsSection() {
-        Composite client = toolkit.createComposite(form.getBody());
-        GridLayout layout = new GridLayout(2, false);
-        layout.horizontalSpacing = 10;
-        client.setLayout(layout);
-        GridData gd = new GridData();
-        gd.widthHint = 200;
-        client.setLayoutData(gd);
-        toolkit.paintBordersFor(client);
+		cabinetWidget = new ViewStorageContainerWidget(client);
+		toolkit.adapt(cabinetWidget);
+		cabinetWidget.setGridSizes(4, 1, 150, 150);
+		cabinetWidget.setFirstColSign('A');
+		cabinetWidget.setShowColumnFirst(true);
+		GridData gdDrawer = new GridData();
+		gdDrawer.verticalAlignment = SWT.TOP;
+		cabinetWidget.setLayoutData(gdDrawer);
 
-        Combo comboSampleType = (Combo) createBoundWidgetWithLabel(client,
-            Combo.class, SWT.NONE, "Sample type", new String [0],
-            selectedSampleType, NonEmptyString.class,
-            "A sample type should be selected");
-        comboViewerSampleTypes = new ComboViewer(comboSampleType);
-        comboViewerSampleTypes.setContentProvider(new ArrayContentProvider());
-        comboViewerSampleTypes.setLabelProvider(new LabelProvider() {
-            @Override
-            public String getText(Object element) {
-                SampleType st = (SampleType) element;
-                return st.getName();
-            }
-        });
-        if (cabinetType != null) {
-            comboViewerSampleTypes.setInput(cabinetType.getSampleTypeCollection());
-        }
+		drawerWidget = new CabinetDrawerWidget(client);
+		toolkit.adapt(drawerWidget);
+		GridData gdBin = new GridData();
+		gdBin.widthHint = CabinetDrawerWidget.WIDTH;
+		gdBin.heightHint = CabinetDrawerWidget.HEIGHT;
+		gdBin.verticalSpan = 2;
+		drawerWidget.setLayoutData(gdBin);
 
-        inventoryIdText = (Text) createBoundWidgetWithLabel(client, Text.class,
-            SWT.NONE, "Inventory ID", new String [0],
-            PojoObservables.observeValue(sample, "inventoryId"),
-            NonEmptyString.class, "Enter Inventory Id (eg cdfg or DYUO)");
-        inventoryIdText.addKeyListener(EnterKeyToNextFieldListener.INSTANCE);
+	}
 
-        positionText = (Text) createBoundWidgetWithLabel(client, Text.class,
-            SWT.NONE, "Position", new String [0], cabinetPosition,
-            CabinetPositionCodeValidator.class,
-            "Enter a position (eg 01AA01AB)");
-        positionText.removeKeyListener(keyListener);
-        positionText.addKeyListener(EnterKeyToNextFieldListener.INSTANCE);
+	private void createFieldsSection() {
+		Composite client = toolkit.createComposite(form.getBody());
+		GridLayout layout = new GridLayout(2, false);
+		layout.horizontalSpacing = 10;
+		client.setLayout(layout);
+		GridData gd = new GridData();
+		gd.widthHint = 200;
+		client.setLayoutData(gd);
+		toolkit.paintBordersFor(client);
 
-        showPosition = toolkit.createButton(client, "Show Position", SWT.PUSH);
-        gd = new GridData();
-        gd.horizontalSpan = 2;
-        gd.horizontalAlignment = SWT.CENTER;
-        showPosition.setLayoutData(gd);
-        showPosition.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                showPositionResult();
-            }
-        });
-    }
+		Combo comboSampleType = (Combo) createBoundWidgetWithLabel(client,
+				Combo.class, SWT.NONE, "Sample type", new String[0],
+				selectedSampleType, NonEmptyString.class,
+				"A sample type should be selected");
+		comboViewerSampleTypes = new ComboViewer(comboSampleType);
+		comboViewerSampleTypes.setContentProvider(new ArrayContentProvider());
+		comboViewerSampleTypes.setLabelProvider(new LabelProvider() {
+			@Override
+			public String getText(Object element) {
+				SampleType st = (SampleType) element;
+				return st.getName();
+			}
+		});
+		if (cabinetType != null) {
+			comboViewerSampleTypes.setInput(cabinetType
+					.getSampleTypeCollection());
+		}
 
-    private void createButtonsSection() {
-        Composite client = toolkit.createComposite(form.getBody());
-        GridLayout layout = new GridLayout(4, false);
-        layout.horizontalSpacing = 10;
-        client.setLayout(layout);
-        toolkit.paintBordersFor(client);
+		inventoryIdText = (Text) createBoundWidgetWithLabel(client, Text.class,
+				SWT.NONE, "Inventory ID", new String[0], PojoObservables
+						.observeValue(sample, "inventoryId"),
+				NonEmptyString.class, "Enter Inventory Id (eg cdfg or DYUO)");
+		inventoryIdText.addKeyListener(EnterKeyToNextFieldListener.INSTANCE);
 
-        confirmCancelText = toolkit.createText(client, "");
-        confirmCancelText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        GridData gd = new GridData();
-        gd.widthHint = 100;
-        confirmCancelText.setLayoutData(gd);
-        confirmCancelText.addKeyListener(new CancelConfirmKeyListener(this));
+		positionText = (Text) createBoundWidgetWithLabel(client, Text.class,
+				SWT.NONE, "Position", new String[0], cabinetPosition,
+				CabinetPositionCodeValidator.class,
+				"Enter a position (eg 01AA01AB)");
+		positionText.removeKeyListener(keyListener);
+		positionText.addKeyListener(EnterKeyToNextFieldListener.INSTANCE);
 
-        initCancelButton(client);
+		showPosition = toolkit.createButton(client, "Show Position", SWT.PUSH);
+		gd = new GridData();
+		gd.horizontalSpan = 2;
+		gd.horizontalAlignment = SWT.CENTER;
+		showPosition.setLayoutData(gd);
+		showPosition.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				showPositionResult();
+			}
+		});
+	}
 
-        confirmAndNextButton = toolkit.createButton(client,
-            "Confirm and scan next", SWT.PUSH);
-        confirmAndNextButton.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                saveAndNext();
-            }
-        });
-        confirmAndEnd = toolkit.createButton(client, "Confirm and End",
-            SWT.PUSH);
-        confirmAndEnd.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                saveAndClose();
-            }
-        });
-    }
+	private void createButtonsSection() {
+		Composite client = toolkit.createComposite(form.getBody());
+		GridLayout layout = new GridLayout(4, false);
+		layout.horizontalSpacing = 10;
+		client.setLayout(layout);
+		toolkit.paintBordersFor(client);
 
-    protected void showPositionResult() {
-        BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
-            public void run() {
-                try {
-                    String positionString = cabinetPosition.getValue().toString();
+		confirmCancelText = toolkit.createText(client, "");
+		confirmCancelText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		GridData gd = new GridData();
+		gd.widthHint = 100;
+		confirmCancelText.setLayoutData(gd);
+		confirmCancelText.addKeyListener(new CancelConfirmKeyListener(this));
 
-                    StorageContainer sc = ModelUtils.getStorageContainerWithBarcode(
-                        appService, positionString);
-                    if (sc == null) {
-                        SamplePosition sp = getSamplePosition(positionString);
-                        if (sp == null) {
-                            BioBankPlugin.openError("Cabinet error",
-                                "Parent containers not found");
-                            return;
-                        }
-                        Point drawerPosition = new Point(
-                            drawer.getLocatedAtPosition().getPositionDimensionOne() - 1,
-                            drawer.getLocatedAtPosition().getPositionDimensionTwo() - 1);
-                        cabinetWidget.setSelectedBox(drawerPosition);
-                        cabinetLabel.setText("Cabinet " + cabinet.getBarcode());
-                        drawerWidget.setSelectedBin(bin.getLocatedAtPosition().getPositionDimensionTwo());
-                        drawerLabel.setText("Drawer " + drawer.getBarcode());
+		initCancelButton(client);
 
-                        sp.setSample(sample);
-                        sample.setSamplePosition(sp);
+		confirmAndNextButton = toolkit.createButton(client,
+				"Confirm and scan next", SWT.PUSH);
+		confirmAndNextButton.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				saveAndNext();
+			}
+		});
+		confirmAndEnd = toolkit.createButton(client, "Confirm and End",
+				SWT.PUSH);
+		confirmAndEnd.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				saveAndClose();
+			}
+		});
+	}
 
-                        IStructuredSelection stSelection = (IStructuredSelection) comboViewerSampleTypes.getSelection();
-                        sample.setSampleType((SampleType) stSelection.getFirstElement());
+	protected void showPositionResult() {
+		BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
+			public void run() {
+				try {
+					String positionString = cabinetPosition.getValue()
+							.toString();
 
-                        resultShown.setValue(Boolean.TRUE);
-                    }
-                    else {
-                        BioBankPlugin.openError("Cabinet error",
-                            "This position is already in use");
-                    }
-                }
-                catch (RemoteConnectFailureException exp) {
-                    BioBankPlugin.openRemoteConnectErrorMessage();
-                }
-                catch (Exception e) {
-                    e.printStackTrace();
-                }
-                setDirty(true);
-            }
+					StorageContainer sc = ModelUtils
+							.getStorageContainerWithBarcode(appService,
+									positionString);
+					if (sc == null) {
+						SamplePosition sp = getSamplePosition(positionString);
+						if (sp == null) {
+							BioBankPlugin.openError("Cabinet error",
+									"Parent containers not found");
+							return;
+						}
+						Point drawerPosition = new Point(drawer
+								.getLocatedAtPosition()
+								.getPositionDimensionOne() - 1, drawer
+								.getLocatedAtPosition()
+								.getPositionDimensionTwo() - 1);
+						cabinetWidget.setSelectedBox(drawerPosition);
+						cabinetLabel.setText("Cabinet " + cabinet.getBarcode());
+						drawerWidget.setSelectedBin(bin.getLocatedAtPosition()
+								.getPositionDimensionTwo());
+						drawerLabel.setText("Drawer " + drawer.getBarcode());
 
-        });
-    }
+						sp.setSample(sample);
+						sample.setSamplePosition(sp);
 
-    protected SamplePosition getSamplePosition(String positionString)
-        throws ApplicationException {
-        int end = 2;
-        String cabinetString = positionString.substring(0, end);
-        cabinet = ModelUtils.getStorageContainerWithBarcode(appService,
-            cabinetString);
-        if (cabinet == null) {
-            return null;
-        }
-        end += 2;
-        String drawerString = positionString.substring(0, end);
-        drawer = ModelUtils.getStorageContainerWithBarcode(appService,
-            drawerString);
-        if (drawer == null
-            || !drawer.getLocatedAtPosition().getParentContainer().getId().equals(
-                cabinet.getId())) {
-            return null;
-        }
-        end += 2;
-        String binString = positionString.substring(0, end);
-        bin = ModelUtils.getStorageContainerWithBarcode(appService, binString);
-        if (bin == null
-            || !bin.getLocatedAtPosition().getParentContainer().getId().equals(
-                drawer.getId())) {
-            return null;
-        }
-        SamplePosition sp = new SamplePosition();
-        sp.setStorageContainer(bin);
-        char letter = positionString.substring(6, 7).toCharArray()[0];
-        // positions start at A
-        sp.setPositionDimensionOne(letter - 'A' + 1);
-        letter = positionString.substring(7).toCharArray()[0];
-        sp.setPositionDimensionTwo(letter - 'A' + 1);
-        return sp;
-    }
+						IStructuredSelection stSelection = (IStructuredSelection) comboViewerSampleTypes
+								.getSelection();
+						sample.setSampleType((SampleType) stSelection
+								.getFirstElement());
 
-    @Override
-    protected void cancelForm() {
-        sample = null;
-        cabinet = null;
-        drawer = null;
-        bin = null;
-        cabinetWidget.setSelectedBox(null);
-        drawerWidget.setSelectedBin(0);
-        resultShown.setValue(Boolean.FALSE);
-        selectedSampleType.setValue("");
-        inventoryIdText.setText("");
-        positionText.setText("");
-    }
+						resultShown.setValue(Boolean.TRUE);
+					} else {
+						BioBankPlugin.openError("Cabinet error",
+								"This position is already in use");
+					}
+				} catch (RemoteConnectFailureException exp) {
+					BioBankPlugin.openRemoteConnectErrorMessage();
+				} catch (Exception e) {
+					SessionManager.getLogger().error(
+							"Error while showing positions", e);
+				}
+				setDirty(true);
+			}
 
-    @Override
-    protected void saveForm() throws Exception {
-        BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
-            public void run() {
-                try {
-                    sample.setPatientVisit(patientVisit);
-                    appService.executeQuery(new InsertExampleQuery(sample));
-                }
-                catch (RemoteConnectFailureException exp) {
-                    BioBankPlugin.openRemoteConnectErrorMessage();
-                }
-                catch (Exception e) {
-                    SessionManager.getLogger().error(
-                        "Error when saving cabinet position", e);
-                }
-            }
-        });
-    }
+		});
+	}
 
-    @Override
-    protected String getOkMessage() {
-        return "Add cabinet samples.";
-    }
+	protected SamplePosition getSamplePosition(String positionString)
+			throws ApplicationException {
+		int end = 2;
+		String cabinetString = positionString.substring(0, end);
+		cabinet = ModelUtils.getStorageContainerWithBarcode(appService,
+				cabinetString);
+		if (cabinet == null) {
+			return null;
+		}
+		end += 2;
+		String drawerString = positionString.substring(0, end);
+		drawer = ModelUtils.getStorageContainerWithBarcode(appService,
+				drawerString);
+		if (drawer == null
+				|| !drawer.getLocatedAtPosition().getParentContainer().getId()
+						.equals(cabinet.getId())) {
+			return null;
+		}
+		end += 2;
+		String binString = positionString.substring(0, end);
+		bin = ModelUtils.getStorageContainerWithBarcode(appService, binString);
+		if (bin == null
+				|| !bin.getLocatedAtPosition().getParentContainer().getId()
+						.equals(drawer.getId())) {
+			return null;
+		}
+		SamplePosition sp = new SamplePosition();
+		sp.setStorageContainer(bin);
+		char letter = positionString.substring(6, 7).toCharArray()[0];
+		// positions start at A
+		sp.setPositionDimensionOne(letter - 'A' + 1);
+		letter = positionString.substring(7).toCharArray()[0];
+		sp.setPositionDimensionTwo(letter - 'A' + 1);
+		return sp;
+	}
 
-    @Override
-    protected void handleStatusChanged(IStatus status) {
-        if (status.getSeverity() == IStatus.OK) {
-            form.setMessage(getOkMessage(), IMessageProvider.NONE);
-            confirmAndNextButton.setEnabled(true);
-            confirmAndEnd.setEnabled(true);
-            showPosition.setEnabled(true);
-        }
-        else {
-            form.setMessage(status.getMessage(), IMessageProvider.ERROR);
-            confirmAndNextButton.setEnabled(false);
-            confirmAndEnd.setEnabled(false);
-            if (status.getMessage() != null
-                && status.getMessage().contains("check values")) {
-                showPosition.setEnabled(true);
-            }
-            else {
-                showPosition.setEnabled(false);
-            }
-        }
-    }
+	@Override
+	protected void cancelForm() {
+		sample = null;
+		cabinet = null;
+		drawer = null;
+		bin = null;
+		cabinetWidget.setSelectedBox(null);
+		drawerWidget.setSelectedBin(0);
+		resultShown.setValue(Boolean.FALSE);
+		selectedSampleType.setValue("");
+		inventoryIdText.setText("");
+		positionText.setText("");
+	}
 
-    // CancelConfirmForm implementation
-    public boolean isConfirmEnabled() {
-        return confirmAndNextButton.isEnabled();
-    }
+	@Override
+	protected void saveForm() throws RuntimeException {
+		BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
+			public void run() {
+				try {
+					sample.setPatientVisit(patientVisit);
+					appService.executeQuery(new InsertExampleQuery(sample));
+				} catch (RemoteConnectFailureException exp) {
+					BioBankPlugin.openRemoteConnectErrorMessage();
+				} catch (Exception e) {
+					SessionManager.getLogger().error(
+							"Error when saving cabinet position", e);
+				}
+			}
+		});
+	}
 
-    public void confirm() throws Exception {
-        saveAndNext();
-    }
+	@Override
+	protected String getOkMessage() {
+		return "Add cabinet samples.";
+	}
 
-    public void cancel() throws Exception {
-        cancelForm();
-    }
+	@Override
+	protected void handleStatusChanged(IStatus status) {
+		if (status.getSeverity() == IStatus.OK) {
+			form.setMessage(getOkMessage(), IMessageProvider.NONE);
+			confirmAndNextButton.setEnabled(true);
+			confirmAndEnd.setEnabled(true);
+			showPosition.setEnabled(true);
+		} else {
+			form.setMessage(status.getMessage(), IMessageProvider.ERROR);
+			confirmAndNextButton.setEnabled(false);
+			confirmAndEnd.setEnabled(false);
+			if (status.getMessage() != null
+					&& status.getMessage().contains("check values")) {
+				showPosition.setEnabled(true);
+			} else {
+				showPosition.setEnabled(false);
+			}
+		}
+	}
 
-    // End CancelConfirmForm implementation
+	// CancelConfirmForm implementation
+	public boolean isConfirmEnabled() {
+		return confirmAndNextButton.isEnabled();
+	}
 
-    private void saveAndNext() {
-        doSaveInternal();
-        getSite().getPage().closeEditor(AddCabinetSampleEntryForm.this, false);
-        Node.openForm(new FormInput(pvAdapter), AddCabinetSampleEntryForm.ID);
-    }
+	public void confirm() throws Exception {
+		saveAndNext();
+	}
 
-    private void saveAndClose() {
-        doSaveInternal();
-        if (BioBankPlugin.isAskPrint()) {
-            boolean doPrint = MessageDialog.openQuestion(
-                PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
-                "Print", "Do you want to print information ?");
-            if (doPrint) {
-                // FIXME implement print functionnality
-            }
-        }
-        getSite().getPage().closeEditor(AddCabinetSampleEntryForm.this, false);
-    }
+	public void cancel() throws Exception {
+		cancelForm();
+	}
+
+	// End CancelConfirmForm implementation
+
+	private void saveAndNext() {
+		testDisposeOn = false;
+		doSaveInternal();
+		getSite().getPage().closeEditor(AddCabinetSampleEntryForm.this, false);
+		Node.openForm(new FormInput(pvAdapter), AddCabinetSampleEntryForm.ID);
+	}
+
+	private void saveAndClose() {
+		testDisposeOn = true;
+		doSaveInternal();
+		getSite().getPage().closeEditor(AddCabinetSampleEntryForm.this, false);
+	}
+
+	private void print() {
+		if (BioBankPlugin.isAskPrint()) {
+			boolean doPrint = MessageDialog.openQuestion(PlatformUI
+					.getWorkbench().getActiveWorkbenchWindow().getShell(),
+					"Print", "Do you want to print information ?");
+			if (doPrint) {
+				// FIXME implement print functionnality
+			}
+		}
+		activityToPrint = false;
+	}
 
 }
