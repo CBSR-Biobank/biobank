@@ -1,5 +1,5 @@
 
-package edu.ualberta.med.biobank.scanlib;
+package edu.ualberta.med.scanlib;
 
 public class ScanLibWin32 extends ScanLib {
 

@@ -6,7 +6,7 @@
  * the SWIG interface file instead.
  * ----------------------------------------------------------------------------- */
 
-package edu.ualberta.med.biobank.scanlib;
+package edu.ualberta.med.scanlib;
 
 class ScanLibWin32WrapperJNI {
   public final static native int slIsTwainAvailable();
