@@ -68,6 +68,10 @@
             id="edu.ualberta.med.biobank.commands.search"
             name="Search">
       </command>
+      <command
+            id="edu.ualberta.med.biobank.commands.calibrate"
+            name="Calibrate">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.menus">
@@ -124,6 +128,16 @@
                   commandId="org.eclipse.ui.window.preferences"
                   id="edu.ualberta.med.biobank.menu.configuration"
                   label="Configuration"
+                  style="push">
+            </command>
+         </menu>
+         <menu
+               id="edu.ualberta.med.biobank.menu.scanner"
+               label="Scanner">
+            <command
+                  commandId="edu.ualberta.med.biobank.commands.calibrate"
+                  id="edu.ualberta.med.biobank.commands.calibrate"
+                  label="Calibrate"
                   style="push">
             </command>
          </menu>
