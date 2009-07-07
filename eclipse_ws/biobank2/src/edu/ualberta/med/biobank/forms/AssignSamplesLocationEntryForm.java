@@ -47,6 +47,7 @@ import edu.ualberta.med.biobank.model.StorageContainer;
 import edu.ualberta.med.biobank.model.StorageType;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.scanlib.ScanLib;
+import edu.ualberta.med.biobank.scanlib.ScanLibFactory;
 import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.NodeSearchVisitor;
 import edu.ualberta.med.biobank.treeview.SessionAdapter;
@@ -314,7 +315,8 @@ public class AssignSamplesLocationEntryForm extends BiobankEntryForm implements
                     boolean showResult = getPaletteInformation();
                     if (showResult) {
                         // TODO launch real scanner
-                        int r = ScanLib.slScanPlate(300, 1, "plate1.bmp");
+                        ScanLib scanLib = ScanLibFactory.getScanLib();
+                        int r = scanLib.slScanPlate(300, 1, "plate1.bmp");
 
                         System.out.println("Plate to scan : "
                             + BioBankPlugin.getDefault().getPlateNumber(
