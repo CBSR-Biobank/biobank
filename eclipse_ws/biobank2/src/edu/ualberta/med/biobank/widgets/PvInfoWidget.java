@@ -25,12 +25,12 @@ import edu.ualberta.med.biobank.dialogs.ListAddDialog;
 import edu.ualberta.med.biobank.model.PvInfoPossible;
 
 public class PvInfoWidget extends Composite {
-    String  label;
-    String  type;
-    Button  checkButton;
-    Button  addButton;
-    Button  removeButton;
-    List    list;
+    String label;
+    String type;
+    Button checkButton;
+    Button addButton;
+    Button removeButton;
+    List list;
     boolean hasListValues;
 
     public PvInfoWidget(Composite parent, int style,
@@ -49,7 +49,14 @@ public class PvInfoWidget extends Composite {
 
             checkButton = new Button(this, SWT.CHECK);
             checkButton.setText(label);
-            checkButton.setSelection(selected);
+
+            if (pvInfoPossible.getIsDefault()) {
+                checkButton.setEnabled(false);
+                checkButton.setSelection(true);
+            }
+            else {
+                checkButton.setSelection(selected);
+            }
 
             // this composite holds the list and the "Add" and "Remove" buttons
             Composite comp = new Composite(this, SWT.NONE);
@@ -93,18 +100,17 @@ public class PvInfoWidget extends Composite {
                         helpText = "To enter multiple consent values, separate with semicolon.";
                     }
                     else {
-                        Assert
-                            .isTrue(false, "invalid value for label " + label);
+                        Assert.isTrue(false, "invalid value for label " + label);
                     }
 
-                    ListAddDialog dlg = new ListAddDialog(PlatformUI
-                        .getWorkbench().getActiveWorkbenchWindow().getShell(),
+                    ListAddDialog dlg = new ListAddDialog(
+                        PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
                         title, prompt, helpText);
                     dlg.open();
 
                     // make sure there are no duplicates
-                    String[] newItems = dlg.getResult();
-                    String[] currentItems = list.getItems();
+                    String [] newItems = dlg.getResult();
+                    String [] currentItems = list.getItems();
                     ArrayList<String> duplicates = new ArrayList<String>();
 
                     for (String newItem : newItems) {
@@ -154,8 +160,9 @@ public class PvInfoWidget extends Composite {
                     list.add(item);
                 }
             }
-            Menu m = new Menu(PlatformUI.getWorkbench()
-                .getActiveWorkbenchWindow().getShell(), SWT.POP_UP);
+            Menu m = new Menu(
+                PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
+                SWT.POP_UP);
 
             MenuItem mi = new MenuItem(m, SWT.CASCADE);
             mi.setText("Move to Top");
@@ -163,8 +170,8 @@ public class PvInfoWidget extends Composite {
                 public void widgetSelected(SelectionEvent event) {
                     int index = list.getSelectionIndex();
                     if (index <= 0) return;
-                    String[] items = list.getItems();
-                    String[] newList = new String[items.length];
+                    String [] items = list.getItems();
+                    String [] newList = new String [items.length];
                     newList[0] = items[index];
                     int i = 1;
                     for (String item : items) {
@@ -177,8 +184,7 @@ public class PvInfoWidget extends Composite {
                 }
 
                 @Override
-                public void widgetDefaultSelected(SelectionEvent e) {
-                }
+                public void widgetDefaultSelected(SelectionEvent e) {}
             });
 
             mi = new MenuItem(m, SWT.CASCADE);
@@ -187,8 +193,8 @@ public class PvInfoWidget extends Composite {
                 public void widgetSelected(SelectionEvent event) {
                     int index = list.getSelectionIndex();
                     if (index <= 0) return;
-                    String[] items = list.getItems();
-                    String[] newList = new String[items.length];
+                    String [] items = list.getItems();
+                    String [] newList = new String [items.length];
                     int i = 0;
                     for (String item : items) {
                         if ((i < index - 1) || (i > index)) {
@@ -202,8 +208,7 @@ public class PvInfoWidget extends Composite {
                 }
 
                 @Override
-                public void widgetDefaultSelected(SelectionEvent e) {
-                }
+                public void widgetDefaultSelected(SelectionEvent e) {}
             });
 
             mi = new MenuItem(m, SWT.CASCADE);
@@ -211,9 +216,9 @@ public class PvInfoWidget extends Composite {
             mi.addSelectionListener(new SelectionListener() {
                 public void widgetSelected(SelectionEvent event) {
                     int index = list.getSelectionIndex();
-                    String[] items = list.getItems();
+                    String [] items = list.getItems();
                     if (index >= items.length - 1) return;
-                    String[] newList = new String[items.length];
+                    String [] newList = new String [items.length];
                     int i = 0;
                     for (String item : items) {
                         if ((i < index) || (i > index + 1)) {
@@ -227,8 +232,7 @@ public class PvInfoWidget extends Composite {
                 }
 
                 @Override
-                public void widgetDefaultSelected(SelectionEvent e) {
-                }
+                public void widgetDefaultSelected(SelectionEvent e) {}
             });
 
             mi = new MenuItem(m, SWT.CASCADE);
@@ -236,9 +240,9 @@ public class PvInfoWidget extends Composite {
             mi.addSelectionListener(new SelectionListener() {
                 public void widgetSelected(SelectionEvent event) {
                     int index = list.getSelectionIndex();
-                    String[] items = list.getItems();
+                    String [] items = list.getItems();
                     if (index >= items.length - 1) return;
-                    String[] newList = new String[items.length];
+                    String [] newList = new String [items.length];
                     int i = 0;
                     for (String item : items) {
                         if (!item.equals(items[index])) {
@@ -251,8 +255,7 @@ public class PvInfoWidget extends Composite {
                 }
 
                 @Override
-                public void widgetDefaultSelected(SelectionEvent e) {
-                }
+                public void widgetDefaultSelected(SelectionEvent e) {}
             });
 
             list.setMenu(m);
@@ -263,7 +266,14 @@ public class PvInfoWidget extends Composite {
             GridData gd = new GridData(GridData.VERTICAL_ALIGN_BEGINNING
                 | GridData.GRAB_HORIZONTAL);
             checkButton.setLayoutData(gd);
-            checkButton.setSelection(selected);
+
+            if (pvInfoPossible.getIsDefault()) {
+                checkButton.setEnabled(false);
+                checkButton.setSelection(true);
+            }
+            else {
+                checkButton.setSelection(selected);
+            }
         }
     }
 
@@ -273,7 +283,7 @@ public class PvInfoWidget extends Composite {
     }
 
     private void adaptAllChildren(Composite container, FormToolkit toolkit) {
-        Control[] children = container.getChildren();
+        Control [] children = container.getChildren();
         for (Control aChild : children) {
             toolkit.adapt(aChild, true, true);
             if (aChild instanceof Composite) {
@@ -282,12 +292,15 @@ public class PvInfoWidget extends Composite {
         }
     }
 
-    public String getResult() {
+    public boolean getSelected() {
+        return checkButton.getSelection();
+    }
+
+    public String getValues() {
         if (hasListValues) {
             return StringUtils.join(list.getItems(), ";");
         }
-        return checkButton.getSelection() ? "yes" : "no";
-
+        return null;
     }
 
 }
