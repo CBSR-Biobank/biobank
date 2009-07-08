@@ -148,6 +148,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
 
         MapIterator it = pvInfoMap.mapIterator();
         while (it.hasNext()) {
+            @SuppressWarnings("unused")
             Integer key = (Integer) it.next();
             CombinedPvInfo combinedPvInfo = (CombinedPvInfo) it.getValue();
             int typeId = combinedPvInfo.pvInfo.getPvInfoType().getId();
@@ -193,13 +194,16 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
                 default:
                     Assert.isTrue(false, "Invalid pvInfo type: " + typeId);
             }
-            GridData gd = new GridData(GridData.FILL_HORIZONTAL);
-            if (typeId == 11) {
-                gd.heightHint = 40;
+
+            if (combinedPvInfo.control != null) {
+                GridData gd = new GridData(GridData.FILL_HORIZONTAL);
+                if (typeId == 2) {
+                    gd.heightHint = 40;
+                }
+                combinedPvInfo.control.setLayoutData(gd);
+                controls.put(combinedPvInfo.pvInfo.getLabel(),
+                    combinedPvInfo.control);
             }
-            combinedPvInfo.control.setLayoutData(gd);
-            controls.put(combinedPvInfo.pvInfo.getLabel(),
-                combinedPvInfo.control);
         }
     }
 
