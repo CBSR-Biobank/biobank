@@ -50,6 +50,8 @@ import edu.ualberta.med.biobank.widgets.AddSamplesScanPaletteWidget;
 import edu.ualberta.med.biobank.widgets.SampleTypeSelectionWidget;
 import edu.ualberta.med.biobank.widgets.listener.ScanPaletteModificationEvent;
 import edu.ualberta.med.biobank.widgets.listener.ScanPaletteModificationListener;
+import edu.ualberta.med.scanlib.ScanLib;
+import edu.ualberta.med.scanlib.ScanLibFactory;
 import gov.nih.nci.system.query.SDKQuery;
 import gov.nih.nci.system.query.example.InsertExampleQuery;
 
@@ -398,11 +400,18 @@ public class AddPaletteSamplesEntryForm extends BiobankEntryForm {
 		BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
 			public void run() {
 				try {
-					System.out.println(BioBankPlugin.getDefault()
-							.getPlateNumber(plateToScan.getValue().toString()));
+					int plateNum = BioBankPlugin.getDefault().getPlateNumber(
+							plateToScan.getValue().toString());
+					ScanLib scanLib = ScanLibFactory.getScanLib();
+					int r = scanLib.slDecodePlate(ScanLib.DPI_300, plateNum);
+					if (r < 0) {
+						BioBankPlugin.openError("Scanner",
+								"Could not decode image. Return code is: " + r);
+						return;
+					}
 
-					// TODO launch scanner instead of random function
-					ScanCell[][] cells = ScanCell.getRandomScanLink();
+					ScanCell[][] cells = ScanCell.getScanLibResults();
+
 					enabledOthersComponents();
 
 					for (int i = 0; i < cells.length; i++) { // rows
@@ -410,12 +419,18 @@ public class AddPaletteSamplesEntryForm extends BiobankEntryForm {
 						sampleTypeWidgets.get(i).resetValues(true);
 						for (int j = 0; j < cells[i].length; j++) { // columns
 							if (cells[i][j] != null) {
-								samplesNumber++;
-								cells[i][j].setStatus(SampleCellStatus.NEW);
+								if (cells[i][j].getValue() != null) {
+									samplesNumber++;
+									cells[i][j].setStatus(SampleCellStatus.NEW);
+								} else {
+									cells[i][j]
+											.setStatus(SampleCellStatus.EMPTY);
+								}
 							}
 						}
 						sampleTypeWidgets.get(i).setNumber(samplesNumber);
 					}
+
 					// Show result in grid
 					spw.setScannedElements(cells);
 				} catch (RemoteConnectFailureException exp) {

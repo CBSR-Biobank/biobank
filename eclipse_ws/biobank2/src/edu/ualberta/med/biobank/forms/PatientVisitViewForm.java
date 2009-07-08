@@ -1,3 +1,4 @@
+
 package edu.ualberta.med.biobank.forms;
 
 import java.util.Collection;
@@ -25,120 +26,120 @@ import edu.ualberta.med.biobank.treeview.StudyAdapter;
 
 public class PatientVisitViewForm extends BiobankViewForm {
 
-	public static final String ID = "edu.ualberta.med.biobank.forms.PatientVisitViewForm";
+    public static final String ID = "edu.ualberta.med.biobank.forms.PatientVisitViewForm";
 
-	private PatientVisitAdapter patientVisitAdapter;
+    private PatientVisitAdapter patientVisitAdapter;
 
-	private PatientVisit patientVisit;
+    private PatientVisit patientVisit;
 
-	private ListOrderedMap pvInfoMap;
+    // used to keep track of which data has been entered or left blank for
+    // a patient visit.
+    class CombinedPvInfo {
+        PvInfo pvInfo;
+        PvInfoData pvInfoData;
 
-	// used to keep track of which data has been entered or left blank for
-	// a patient visit.
-	class VisitInfo {
-		PvInfo studyPvInfo;
-		PvInfoData visitData;
+        public CombinedPvInfo() {
+            pvInfo = null;
+            pvInfoData = null;
+        }
+    }
 
-		public VisitInfo() {
-			studyPvInfo = null;
-			visitData = null;
-		}
-	}
+    private ListOrderedMap combinedPvInfoMap;
 
-	public PatientVisitViewForm() {
-		super();
-		pvInfoMap = new ListOrderedMap();
-	}
+    public PatientVisitViewForm() {
+        super();
+        combinedPvInfoMap = new ListOrderedMap();
+    }
 
-	@Override
-	public void init(IEditorSite editorSite, IEditorInput input)
-			throws PartInitException {
-		super.init(editorSite, input);
+    @Override
+    public void init(IEditorSite editorSite, IEditorInput input)
+        throws PartInitException {
+        super.init(editorSite, input);
 
-		Node node = ((FormInput) input).getNode();
-		Assert.isNotNull(node, "Null editor input");
+        Node node = ((FormInput) input).getNode();
+        Assert.isNotNull(node, "Null editor input");
 
-		patientVisitAdapter = (PatientVisitAdapter) node;
-		appService = patientVisitAdapter.getAppService();
-		patientVisit = patientVisitAdapter.getPatientVisit();
+        patientVisitAdapter = (PatientVisitAdapter) node;
+        appService = patientVisitAdapter.getAppService();
+        patientVisit = patientVisitAdapter.getPatientVisit();
 
-		if (patientVisit.getId() == null) {
-			setPartName("New Visit");
-		} else {
-			setPartName("Visit " + patientVisit.getNumber());
-		}
-	}
+        if (patientVisit.getId() == null) {
+            setPartName("New Visit");
+        }
+        else {
+            setPartName("Visit " + patientVisit.getNumber());
+        }
+    }
 
-	@Override
-	protected void createFormContent() {
-		form.setText("Visit: " + patientVisit.getNumber());
-		form.getBody().setLayout(new GridLayout(1, false));
-		form.getBody().setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+    @Override
+    protected void createFormContent() {
+        form.setText("Visit: " + patientVisit.getNumber());
+        form.getBody().setLayout(new GridLayout(1, false));
+        form.getBody().setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-		addRefreshToolbarAction();
+        addRefreshToolbarAction();
 
-		createVisitSection();
+        createVisitSection();
 
-	}
+    }
 
-	private void createVisitSection() {
-		Composite client = toolkit.createComposite(form.getBody());
-		GridLayout layout = new GridLayout(2, false);
-		layout.horizontalSpacing = 10;
-		client.setLayout(layout);
-		client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		toolkit.paintBordersFor(client);
+    private void createVisitSection() {
+        Composite client = toolkit.createComposite(form.getBody());
+        GridLayout layout = new GridLayout(2, false);
+        layout.horizontalSpacing = 10;
+        client.setLayout(layout);
+        client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        toolkit.paintBordersFor(client);
 
-		Study study = ((StudyAdapter) patientVisitAdapter.getParent()
-			.getParent().getParent()).getStudy();
+        Study study = ((StudyAdapter) patientVisitAdapter.getParent().getParent().getParent()).getStudy();
 
-		// get all PvInfo from study, since user may not have filled in all
-		// fields
-		for (PvInfo pvInfo : study.getPvInfoCollection()) {
-			VisitInfo visitInfo = new VisitInfo();
-			visitInfo.studyPvInfo = pvInfo;
-			pvInfoMap.put(pvInfo.getLabel(), visitInfo);
-		}
+        // get all PvInfo from study, since user may not have filled in all
+        // fields
+        for (PvInfo pvInfo : study.getPvInfoCollection()) {
+            CombinedPvInfo combinedPvInfo = new CombinedPvInfo();
+            combinedPvInfo.pvInfo = pvInfo;
+            combinedPvInfoMap.put(pvInfo.getId(), combinedPvInfo);
+        }
 
-		Collection<PvInfoData> pvInfoDataCollection = patientVisit
-			.getPvInfoDataCollection();
-		if (pvInfoDataCollection != null) {
-			for (PvInfoData pvInfoData : pvInfoDataCollection) {
-				Integer key = pvInfoData.getPvInfo().getId();
-				VisitInfo visitInfo = (VisitInfo) pvInfoMap.get(key);
-				visitInfo.visitData = pvInfoData;
-			}
-		}
+        Collection<PvInfoData> pvInfoDataCollection = patientVisit.getPvInfoDataCollection();
+        if (pvInfoDataCollection != null) {
+            for (PvInfoData pvInfoData : pvInfoDataCollection) {
+                Integer key = pvInfoData.getPvInfo().getId();
+                CombinedPvInfo combinedPvInfo = (CombinedPvInfo) combinedPvInfoMap.get(key);
+                combinedPvInfo.pvInfoData = pvInfoData;
+            }
+        }
 
-		Label widget;
-		MapIterator it = pvInfoMap.mapIterator();
-		while (it.hasNext()) {
-			String label = (String) it.next();
-			VisitInfo visitInfo = (VisitInfo) it.getValue();
-			String value = "";
-			int typeId = visitInfo.studyPvInfo.getPvInfoType().getId();
+        Label widget;
+        MapIterator it = combinedPvInfoMap.mapIterator();
+        while (it.hasNext()) {
+            @SuppressWarnings("unused")
+            Integer key = (Integer) it.next();
+            CombinedPvInfo combinedPvInfo = (CombinedPvInfo) it.getValue();
+            Integer typeId = combinedPvInfo.pvInfo.getPvInfoType().getId();
+            String value = "";
 
-			if (visitInfo.visitData != null) {
-				value = visitInfo.visitData.getValue();
-			}
+            if (combinedPvInfo.pvInfoData != null) {
+                value = combinedPvInfo.pvInfoData.getValue();
+            }
 
-			Label labelWidget = toolkit.createLabel(client, label + ":",
-				SWT.LEFT);
-			labelWidget.setLayoutData(new GridData(
-				GridData.VERTICAL_ALIGN_BEGINNING));
-			widget = toolkit.createLabel(client, value, SWT.BORDER | SWT.LEFT);
-			GridData gd = new GridData(GridData.FILL_HORIZONTAL);
-			if (typeId == 4) {
-				gd.heightHint = 40;
-			}
-			widget.setLayoutData(gd);
-		}
+            Label labelWidget = toolkit.createLabel(client,
+                combinedPvInfo.pvInfo.getLabel() + ":", SWT.LEFT);
+            labelWidget.setLayoutData(new GridData(
+                GridData.VERTICAL_ALIGN_BEGINNING));
+            widget = toolkit.createLabel(client, value, SWT.BORDER | SWT.LEFT);
+            GridData gd = new GridData(GridData.FILL_HORIZONTAL);
+            if (typeId == 2) {
+                gd.heightHint = 40;
+            }
+            widget.setLayoutData(gd);
+        }
 
-	}
+    }
 
-	@Override
-	protected void reload() {
+    @Override
+    protected void reload() {
 
-	}
+    }
 
 }
