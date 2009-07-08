@@ -49,14 +49,17 @@ public class ScanCell {
 		ScanCell[][] paletteScanned = new ScanCell[ROW_MAX][COL_MAX];
 		Random random = new Random();
 		for (int indexRow = 0; indexRow < ROW_MAX; indexRow++) {
-			if (indexRow % 2 == 0) {
-				for (int indexCol = 0; indexCol < COL_MAX; indexCol++) {
+			for (int indexCol = 0; indexCol < COL_MAX; indexCol++) {
+				if (indexRow % 2 == 0) {
 					StringBuffer digits = new StringBuffer();
 					for (int i = 0; i < 10; i++) {
 						digits.append(random.nextInt(10));
 					}
 					paletteScanned[indexRow][indexCol] = new ScanCell(indexRow,
-						indexCol, digits.toString());
+							indexCol, digits.toString());
+				} else {
+					paletteScanned[indexRow][indexCol] = new ScanCell(indexRow,
+							indexCol, null);
 				}
 			}
 		}
@@ -85,10 +88,10 @@ public class ScanCell {
 				// }
 				if (indexRow == 0 && indexCol == 0) {
 					paletteScanned[indexRow][indexCol] = new ScanCell(indexRow,
-						indexCol, "123");
+							indexCol, "123");
 				} else {
 					paletteScanned[indexRow][indexCol] = new ScanCell(indexRow,
-						indexCol, null);
+							indexCol, null);
 				}
 			}
 		}
@@ -107,7 +110,7 @@ public class ScanCell {
 				if (sample.getSamplePosition() != null
 						&& sample.getSamplePosition().getStorageContainer() != null) {
 					paletteScanned[0][0] = new ScanCell(0, 0, sample
-						.getInventoryId());
+							.getInventoryId());
 					break;
 				}
 			}
@@ -128,10 +131,10 @@ public class ScanCell {
 			samples = appService.search(Sample.class, new Sample());
 			for (Sample sample : samples) {
 				if ((sample.getSamplePosition() == null || sample
-					.getSamplePosition().getStorageContainer() == null)
+						.getSamplePosition().getStorageContainer() == null)
 						&& !sample.getInventoryId().equals("123")) {
 					paletteScanned[0][0] = new ScanCell(0, 0, sample
-						.getInventoryId());
+							.getInventoryId());
 					break;
 				}
 			}
@@ -147,7 +150,7 @@ public class ScanCell {
 		for (int indexRow = 0; indexRow < ROW_MAX; indexRow++) {
 			for (int indexCol = 0; indexCol < COL_MAX; indexCol++) {
 				paletteScanned[indexRow][indexCol] = new ScanCell(indexRow,
-					indexCol, null);
+						indexCol, null);
 			}
 		}
 		return paletteScanned;

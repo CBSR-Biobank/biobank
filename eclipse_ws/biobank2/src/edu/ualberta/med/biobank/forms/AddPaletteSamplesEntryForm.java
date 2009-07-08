@@ -410,8 +410,13 @@ public class AddPaletteSamplesEntryForm extends BiobankEntryForm {
 						sampleTypeWidgets.get(i).resetValues(true);
 						for (int j = 0; j < cells[i].length; j++) { // columns
 							if (cells[i][j] != null) {
-								samplesNumber++;
-								cells[i][j].setStatus(SampleCellStatus.NEW);
+								if (cells[i][j].getValue() != null) {
+									samplesNumber++;
+									cells[i][j].setStatus(SampleCellStatus.NEW);
+								} else {
+									cells[i][j]
+											.setStatus(SampleCellStatus.EMPTY);
+								}
 							}
 						}
 						sampleTypeWidgets.get(i).setNumber(samplesNumber);
