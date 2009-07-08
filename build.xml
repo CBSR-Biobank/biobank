@@ -4,7 +4,7 @@
 	<!--
       Overall build file 
       use command "ant -projecthelp" to display the targets.
-    -->
+      -->
 
 	<property environment="env" />
 	<property name="cacore.sdk.dir" location="caCORE_SDK/sdk" />
@@ -70,6 +70,12 @@
 		        arg2="jboss"
 		        casesensitive="false"
 		        trim="true" />
+	</condition>
+	<condition property="WRITABLE_API_EXTENSION_ENABLED" value="true" else="false">
+		<or>
+			<equals arg1="${ENABLE_WRITABLE_API_EXTENSION}" arg2="true" casesensitive="false" trim="true" />
+			<equals arg1="${ENABLE_WRITABLE_API_EXTENSION}" arg2="yes" casesensitive="false" trim="true" />
+		</or>
 	</condition>
 	<condition property="read-api-exclude-list" value="" else="*.jar">
 		<equals arg1="${WRITABLE_API_EXTENSION_ENABLED}"
