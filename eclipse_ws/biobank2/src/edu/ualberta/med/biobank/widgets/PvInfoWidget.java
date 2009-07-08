@@ -13,18 +13,16 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.List;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.forms.widgets.FormToolkit;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.dialogs.ListAddDialog;
 import edu.ualberta.med.biobank.model.PvInfoPossible;
 
-public class PvInfoWidget extends Composite {
+public class PvInfoWidget extends BiobankWidget {
     String label;
     String type;
     Button checkButton;
@@ -273,21 +271,6 @@ public class PvInfoWidget extends Composite {
             }
             else {
                 checkButton.setSelection(selected);
-            }
-        }
-    }
-
-    public void adaptToToolkit(FormToolkit toolkit) {
-        toolkit.adapt(this, true, true);
-        adaptAllChildren(this, toolkit);
-    }
-
-    private void adaptAllChildren(Composite container, FormToolkit toolkit) {
-        Control [] children = container.getChildren();
-        for (Control aChild : children) {
-            toolkit.adapt(aChild, true, true);
-            if (aChild instanceof Composite) {
-                adaptAllChildren((Composite) aChild, toolkit);
             }
         }
     }
