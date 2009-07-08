@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.forms;
 
+import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -7,7 +8,6 @@ import java.util.List;
 
 import org.apache.commons.collections.MapIterator;
 import org.apache.commons.collections.map.ListOrderedMap;
-import org.eclipse.core.databinding.beans.PojoObservables;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.dialogs.IMessageProvider;
@@ -26,6 +26,7 @@ import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 
+import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.PatientVisit;
@@ -36,7 +37,6 @@ import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.PatientAdapter;
 import edu.ualberta.med.biobank.treeview.PatientVisitAdapter;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
-import edu.ualberta.med.biobank.validators.NonEmptyString;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -77,6 +77,8 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
 
 	private ListOrderedMap combinedPvInfoMap;
 
+	DateTimeWidget dateDrawn;
+
 	public PatientVisitEntryForm() {
 		super();
 		combinedPvInfoMap = new ListOrderedMap();
@@ -97,7 +99,9 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
 		if (patientVisit.getId() == null) {
 			setPartName("New Patient Visit");
 		} else {
-			setPartName("Patient Visit " + patientVisit.getNumber());
+			SimpleDateFormat sdf = new SimpleDateFormat(
+					BioBankPlugin.DATE_FORMAT);
+			setPartName("Visit " + sdf.format(patientVisit.getDateDrawn()));
 		}
 	}
 
@@ -119,10 +123,13 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
 		client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		toolkit.paintBordersFor(client);
 
-		createBoundWidgetWithLabel(client, Text.class, SWT.NONE,
-				"Visit Number", null, PojoObservables.observeValue(
-						patientVisit, "number"), NonEmptyString.class,
-				MSG_NO_VISIT_NUMBER);
+		SimpleDateFormat sdtf = new SimpleDateFormat(
+				BioBankPlugin.DATE_TIME_FORMAT);
+
+		toolkit.createLabel(client, "Date Drawn:", SWT.NONE);
+		dateDrawn = new DateTimeWidget(client, SWT.BORDER, sdtf
+				.format(patientVisit.getDateDrawn()));
+		dateDrawn.adaptToToolkit(toolkit);
 
 		study = ((StudyAdapter) patientVisitAdapter.getParent().getParent()
 				.getParent()).getStudy();
@@ -262,7 +269,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
 
 	@Override
 	protected void saveForm() throws Exception {
-		if ((patientVisit.getId() == null) && !checkVisitNumberUnique()) {
+		if ((patientVisit.getId() == null) && !checkVisitDateDrawnUnique()) {
 			setDirty(true);
 			return;
 		}
@@ -373,8 +380,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
 		patientVisit.setPvInfoDataCollection(pvDataCollection);
 	}
 
-	// TODO: change to check for collection date unique
-	private boolean checkVisitNumberUnique() throws ApplicationException {
+	private boolean checkVisitDateDrawnUnique() throws ApplicationException {
 		WritableApplicationService appService = patientVisitAdapter
 				.getAppService();
 		Patient patient = ((PatientAdapter) patientVisitAdapter.getParent())
@@ -384,7 +390,8 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
 				"from edu.ualberta.med.biobank.model.PatientVisit as v "
 						+ "inner join fetch v.patient "
 						+ "where v.patient.id='" + patient.getId() + "' "
-						+ "and v.number = '" + patientVisit.getNumber() + "'");
+						+ "and v.number = '" + patientVisit.getDateDrawn()
+						+ "'");
 
 		List<Object> results = appService.query(c);
 
@@ -395,7 +402,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
 							.getActiveWorkbenchWindow().getShell(),
 							"Patient Visit Number Problem",
 							"A patient visit with number \""
-									+ patientVisit.getNumber()
+									+ patientVisit.getDateDrawn()
 									+ "\" already exists.");
 				}
 			});

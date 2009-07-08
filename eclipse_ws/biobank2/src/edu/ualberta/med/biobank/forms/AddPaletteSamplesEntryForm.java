@@ -147,7 +147,7 @@ public class AddPaletteSamplesEntryForm extends BiobankEntryForm {
 	protected void createFormContent() {
 		form.setText("Adding samples for patient "
 				+ patientVisit.getPatient().getNumber() + " for visit "
-				+ patientVisit.getNumber());
+				+ patientVisit.getDateDrawn());
 
 		GridLayout layout = new GridLayout(1, false);
 		form.getBody().setLayout(layout);

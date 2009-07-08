@@ -345,28 +345,19 @@ public class AssignSamplesLocationEntryForm extends BiobankEntryForm implements
 				try {
 					boolean showResult = getPaletteInformation();
 					if (showResult) {
-						int plate = BioBankPlugin.getDefault().getPlateNumber(
-								plateToScanValue.getValue().toString());
-						// TODO launch real scanner
+						int plateNum = BioBankPlugin.getDefault()
+								.getPlateNumber(
+										plateToScanValue.getValue().toString());
 						ScanLib scanLib = ScanLibFactory.getScanLib();
-						int r = scanLib.slScanPlate(300, 1, "plate1.bmp");
-
-						System.out.println("Plate to scan : " + plate);
-
-						if (BioBankPlugin.getDefault().isDebugging()) {
-							if (notexistsButton.getSelection()) {
-								cells = ScanCell
-										.getRandomScanProcessNotInPalette(appService);
-							} else if (existsButton.getSelection()) {
-								cells = ScanCell
-										.getRandomScanProcessAlreadyInPalette(appService);
-							} else {
-								cells = ScanCell.getRandomScanProcess();
-							}
-						} else {
-							cells = ScanCell.getRandomScanProcess();
+						int r = scanLib
+								.slDecodePlate(ScanLib.DPI_300, plateNum);
+						if (r < 0) {
+							BioBankPlugin.openError("Scanner",
+									"Could not decode image. Return code is: "
+											+ r);
+							return;
 						}
-
+						cells = ScanCell.getScanLibResults();
 						currentStudy = null;
 						boolean result = true;
 						for (int i = 0; i < cells.length; i++) { // rows
@@ -379,6 +370,7 @@ public class AssignSamplesLocationEntryForm extends BiobankEntryForm implements
 										&& result;
 							}
 						}
+
 						scanValidValue.setValue(result);
 						paletteWidget.setScannedElements(cells);
 						showStudyInformation();

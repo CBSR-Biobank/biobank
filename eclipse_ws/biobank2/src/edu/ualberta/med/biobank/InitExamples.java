@@ -20,6 +20,8 @@ import gov.nih.nci.system.query.example.DeleteExampleQuery;
 import gov.nih.nci.system.query.example.InsertExampleQuery;
 
 import java.lang.reflect.Constructor;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -57,7 +59,7 @@ public class InitExamples {
 		// .getApplicationServiceFromUrl("http://aicml-med.cs.ualberta.ca:8080/biobank2");
 
 		appService = (WritableApplicationService) ApplicationServiceProvider
-			.getApplicationServiceFromUrl("http://localhost:8080/biobank2");
+				.getApplicationServiceFromUrl("http://localhost:8080/biobank2");
 
 		init.deletedAll(Site.class);
 		init.deletedAll(Clinic.class);
@@ -87,21 +89,28 @@ public class InitExamples {
 		sample.setPatientVisit(patientVisit);
 		sample.setSampleType(getSampleType());
 		SDKQueryResult res = appService.executeQuery(new InsertExampleQuery(
-			sample));
+				sample));
 		sample = (Sample) res.getObjectResult();
 	}
 
 	private SampleType getSampleType() throws ApplicationException {
 		return (SampleType) appService.search(SampleType.class,
-			new SampleType()).get(0);
+				new SampleType()).get(0);
 	}
 
 	private void insertPatientVisitInPatient() throws ApplicationException {
 		patientVisit = new PatientVisit();
-		patientVisit.setNumber("123");
+
+		SimpleDateFormat df = new SimpleDateFormat(BioBankPlugin.DATE_FORMAT);
+		try {
+			patientVisit.setDateDrawn(df.parse("2009-01-01"));
+		} catch (ParseException e1) {
+			e1.printStackTrace();
+		}
+
 		patientVisit.setPatient(patient);
 		SDKQueryResult res = appService.executeQuery(new InsertExampleQuery(
-			patientVisit));
+				patientVisit));
 		patientVisit = (PatientVisit) res.getObjectResult();
 	}
 
@@ -110,7 +119,7 @@ public class InitExamples {
 		patient.setNumber("1111");
 		patient.setStudy(study);
 		SDKQueryResult res = appService.executeQuery(new InsertExampleQuery(
-			patient));
+				patient));
 		patient = (Patient) res.getObjectResult();
 	}
 
@@ -120,7 +129,7 @@ public class InitExamples {
 		study.setNameShort("ST");
 		study.setSite(site);
 		SDKQueryResult res = appService.executeQuery(new InsertExampleQuery(
-			study));
+				study));
 		study = (Study) res.getObjectResult();
 	}
 
@@ -140,23 +149,23 @@ public class InitExamples {
 		address.setCity("Edmonton");
 		site.setAddress(address);
 		SDKQueryResult res = appService.executeQuery(new InsertExampleQuery(
-			site));
+				site));
 		site = (Site) res.getObjectResult();
 	}
 
 	private void insertStorageTypesInSite() throws ApplicationException {
 		paletteType = insertStorageTypeInSite("Palette", 8, 12, null);
 		hotel13Type = insertStorageTypeInSite("Hotel-13", 13, 1, Arrays
-			.asList(new StorageType[] { paletteType }));
+				.asList(new StorageType[] { paletteType }));
 		hotel19Type = insertStorageTypeInSite("Hotel-19", 19, 1, Arrays
-			.asList(new StorageType[] { paletteType }));
+				.asList(new StorageType[] { paletteType }));
 		freezerType = insertStorageTypeInSite("Freezer", 5, 6, Arrays
-			.asList(new StorageType[] { hotel13Type, hotel19Type }));
+				.asList(new StorageType[] { hotel13Type, hotel19Type }));
 		binType = insertStorageTypeInSite("Bin", 4, 26, null);
 		drawerType = insertStorageTypeInSite("Drawer", 6, 6, Arrays
-			.asList(new StorageType[] { binType }));
+				.asList(new StorageType[] { binType }));
 		insertStorageTypeInSite("Cabinet", 4, 1, Arrays
-			.asList(new StorageType[] { drawerType }));
+				.asList(new StorageType[] { drawerType }));
 	}
 
 	private StorageType insertStorageTypeInSite(String name, int dim1,
@@ -172,11 +181,11 @@ public class InitExamples {
 		st.setDimensionTwoLabel("dim2");
 		if (children != null) {
 			st
-				.setChildStorageTypeCollection(new HashSet<StorageType>(
-					children));
+					.setChildStorageTypeCollection(new HashSet<StorageType>(
+							children));
 		}
 		SDKQueryResult res = appService
-			.executeQuery(new InsertExampleQuery(st));
+				.executeQuery(new InsertExampleQuery(st));
 		return (StorageType) res.getObjectResult();
 	}
 
@@ -197,19 +206,19 @@ public class InitExamples {
 		}
 		sc.setLocatedAtPosition(cp);
 		SDKQueryResult res = appService
-			.executeQuery(new InsertExampleQuery(sc));
+				.executeQuery(new InsertExampleQuery(sc));
 		return (StorageContainer) res.getObjectResult();
 	}
 
 	private void insertStorageContainers() throws ApplicationException {
 		StorageContainer freezer = insertStorageContainer("Freezer1",
-			freezerType, null, 0, 0);
+				freezerType, null, 0, 0);
 		StorageContainer hotel1 = insertStorageContainer("Hotelaa",
-			hotel19Type, freezer, 1, 1);
+				hotel19Type, freezer, 1, 1);
 		insertStorageContainer("Palette1", paletteType, hotel1, 1, 1);
 		insertStorageContainer("Palette2", paletteType, hotel1, 3, 1);
 		StorageContainer hotel2 = insertStorageContainer("Hotelbb",
-			hotel13Type, freezer, 2, 2);
+				hotel13Type, freezer, 2, 2);
 		insertStorageContainer("Palette3", paletteType, hotel2, 1, 1);
 		insertStorageContainer("Palette4", paletteType, hotel2, 5, 1);
 	}
