@@ -33,5 +33,6 @@
 	<classpathentry kind="lib" path="lib/commons-lang-2.4.jar"/>
 	<classpathentry kind="lib" path="lib/gface_0.9.1.jar"/>
 	<classpathentry kind="lib" path="lib/gluegen.jar"/>
+	<classpathentry kind="lib" path="lib/scanlib.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
