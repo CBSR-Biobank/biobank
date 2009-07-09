@@ -24,10 +24,14 @@ public class BioBankPlugin extends AbstractUIPlugin {
 	// The plug-in ID
 	public static final String PLUGIN_ID = "biobank2";
 
+	public static final String DATE_FORMAT = "yyyy-MM-dd";
+
+	public static final String DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm";
+
 	public static final String IMG_FORM_BG = "formBg";
 
 	public static final String BARCODES_FILE = BioBankPlugin.class.getPackage()
-		.getName()
+			.getName()
 			+ ".barcode";
 
 	static Logger log4j = Logger.getLogger(BioBankPlugin.class.getName());
@@ -106,7 +110,8 @@ public class BioBankPlugin extends AbstractUIPlugin {
 	 * Returns an image descriptor for the image file at the given plug-in
 	 * relative path
 	 * 
-	 * @param path the path
+	 * @param path
+	 *            the path
 	 * @return the image descriptor
 	 */
 	public static ImageDescriptor getImageDescriptor(String path) {
@@ -118,7 +123,7 @@ public class BioBankPlugin extends AbstractUIPlugin {
 	 */
 	public static void openMessage(String title, String message) {
 		MessageDialog.openInformation(PlatformUI.getWorkbench()
-			.getActiveWorkbenchWindow().getShell(), title, message);
+				.getActiveWorkbenchWindow().getShell(), title, message);
 	}
 
 	/**
@@ -126,7 +131,7 @@ public class BioBankPlugin extends AbstractUIPlugin {
 	 */
 	public static void openError(String title, String message) {
 		MessageDialog.openError(PlatformUI.getWorkbench()
-			.getActiveWorkbenchWindow().getShell(), title, message);
+				.getActiveWorkbenchWindow().getShell(), title, message);
 	}
 
 	/**
@@ -136,7 +141,7 @@ public class BioBankPlugin extends AbstractUIPlugin {
 		Display.getDefault().asyncExec(new Runnable() {
 			public void run() {
 				MessageDialog.openError(PlatformUI.getWorkbench()
-					.getActiveWorkbenchWindow().getShell(), title, message);
+						.getActiveWorkbenchWindow().getShell(), title, message);
 			}
 		});
 	}
@@ -146,8 +151,8 @@ public class BioBankPlugin extends AbstractUIPlugin {
 	 */
 	public static void openRemoteAccessErrorMessage() {
 		openAsyncError(
-			"Connection Attempt Failed",
-			"Could not perform database operation. Make sure server is running correct version.");
+				"Connection Attempt Failed",
+				"Could not perform database operation. Make sure server is running correct version.");
 	}
 
 	/**
@@ -155,23 +160,23 @@ public class BioBankPlugin extends AbstractUIPlugin {
 	 */
 	public static void openRemoteConnectErrorMessage() {
 		openAsyncError("Connection Attempt Failed",
-			"Could not connect to server. Make sure server is running.");
+				"Could not connect to server. Make sure server is running.");
 	}
 
 	public boolean isCancelBarcode(String code) {
 		return getPreferenceStore().getString(
-			PreferenceConstants.GENERAL_CANCEL).equals(code);
+				PreferenceConstants.GENERAL_CANCEL).equals(code);
 	}
 
 	public boolean isConfirmBarcode(String code) {
 		return getPreferenceStore().getString(
-			PreferenceConstants.GENERAL_CONFIRM).equals(code);
+				PreferenceConstants.GENERAL_CONFIRM).equals(code);
 	}
 
 	public int getPlateNumber(String barcode) {
 		for (int i = 1; i <= PreferenceConstants.SCANNER_PLATE_NUMBER; i++) {
 			String pref = getPreferenceStore().getString(
-				PreferenceConstants.SCANNER_PLATE + i);
+					PreferenceConstants.SCANNER_PLATE + i);
 			if (pref.isEmpty()) {
 				// should no be empty
 				return -1;

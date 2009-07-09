@@ -124,7 +124,7 @@ public class AddCabinetSampleEntryForm extends BiobankEntryForm implements
 	protected void createFormContent() {
 		form.setText("Add cabinet samples for patient "
 				+ patientVisit.getPatient().getNumber() + " for visit "
-				+ patientVisit.getNumber());
+				+ patientVisit.getDateDrawn());
 
 		GridLayout layout = new GridLayout(1, false);
 		form.getBody().setLayout(layout);

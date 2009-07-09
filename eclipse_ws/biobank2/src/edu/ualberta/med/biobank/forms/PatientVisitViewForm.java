@@ -1,6 +1,6 @@
-
 package edu.ualberta.med.biobank.forms;
 
+import java.text.SimpleDateFormat;
 import java.util.Collection;
 
 import org.apache.commons.collections.MapIterator;
@@ -15,6 +15,7 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
 
+import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.PvInfo;
@@ -26,120 +27,126 @@ import edu.ualberta.med.biobank.treeview.StudyAdapter;
 
 public class PatientVisitViewForm extends BiobankViewForm {
 
-    public static final String ID = "edu.ualberta.med.biobank.forms.PatientVisitViewForm";
+	public static final String ID = "edu.ualberta.med.biobank.forms.PatientVisitViewForm";
 
-    private PatientVisitAdapter patientVisitAdapter;
+	private PatientVisitAdapter patientVisitAdapter;
 
-    private PatientVisit patientVisit;
+	private PatientVisit patientVisit;
 
-    // used to keep track of which data has been entered or left blank for
-    // a patient visit.
-    class CombinedPvInfo {
-        PvInfo pvInfo;
-        PvInfoData pvInfoData;
+	// used to keep track of which data has been entered or left blank for
+	// a patient visit.
+	class CombinedPvInfo {
+		PvInfo pvInfo;
+		PvInfoData pvInfoData;
 
-        public CombinedPvInfo() {
-            pvInfo = null;
-            pvInfoData = null;
-        }
-    }
+		public CombinedPvInfo() {
+			pvInfo = null;
+			pvInfoData = null;
+		}
+	}
 
-    private ListOrderedMap combinedPvInfoMap;
+	private ListOrderedMap combinedPvInfoMap;
 
-    public PatientVisitViewForm() {
-        super();
-        combinedPvInfoMap = new ListOrderedMap();
-    }
+	private SimpleDateFormat sdf;
 
-    @Override
-    public void init(IEditorSite editorSite, IEditorInput input)
-        throws PartInitException {
-        super.init(editorSite, input);
+	public PatientVisitViewForm() {
+		super();
+		combinedPvInfoMap = new ListOrderedMap();
+		sdf = new SimpleDateFormat(BioBankPlugin.DATE_FORMAT);
+	}
 
-        Node node = ((FormInput) input).getNode();
-        Assert.isNotNull(node, "Null editor input");
+	@Override
+	public void init(IEditorSite editorSite, IEditorInput input)
+			throws PartInitException {
+		super.init(editorSite, input);
 
-        patientVisitAdapter = (PatientVisitAdapter) node;
-        appService = patientVisitAdapter.getAppService();
-        patientVisit = patientVisitAdapter.getPatientVisit();
+		Node node = ((FormInput) input).getNode();
+		Assert.isNotNull(node, "Null editor input");
 
-        if (patientVisit.getId() == null) {
-            setPartName("New Visit");
-        }
-        else {
-            setPartName("Visit " + patientVisit.getNumber());
-        }
-    }
+		patientVisitAdapter = (PatientVisitAdapter) node;
+		appService = patientVisitAdapter.getAppService();
+		patientVisit = patientVisitAdapter.getPatientVisit();
 
-    @Override
-    protected void createFormContent() {
-        form.setText("Visit: " + patientVisit.getNumber());
-        form.getBody().setLayout(new GridLayout(1, false));
-        form.getBody().setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		if (patientVisit.getId() == null) {
+			setPartName("New Visit");
+		} else {
+			setPartName("Visit " + sdf.format(patientVisit.getDateDrawn()));
+		}
+	}
 
-        addRefreshToolbarAction();
+	@Override
+	protected void createFormContent() {
+		form.setText("Visit Drawn Date: "
+				+ sdf.format(patientVisit.getDateDrawn()));
+		form.getBody().setLayout(new GridLayout(1, false));
+		form.getBody().setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-        createVisitSection();
+		addRefreshToolbarAction();
 
-    }
+		createVisitSection();
 
-    private void createVisitSection() {
-        Composite client = toolkit.createComposite(form.getBody());
-        GridLayout layout = new GridLayout(2, false);
-        layout.horizontalSpacing = 10;
-        client.setLayout(layout);
-        client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        toolkit.paintBordersFor(client);
+	}
 
-        Study study = ((StudyAdapter) patientVisitAdapter.getParent().getParent().getParent()).getStudy();
+	private void createVisitSection() {
+		Composite client = toolkit.createComposite(form.getBody());
+		GridLayout layout = new GridLayout(2, false);
+		layout.horizontalSpacing = 10;
+		client.setLayout(layout);
+		client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		toolkit.paintBordersFor(client);
 
-        // get all PvInfo from study, since user may not have filled in all
-        // fields
-        for (PvInfo pvInfo : study.getPvInfoCollection()) {
-            CombinedPvInfo combinedPvInfo = new CombinedPvInfo();
-            combinedPvInfo.pvInfo = pvInfo;
-            combinedPvInfoMap.put(pvInfo.getId(), combinedPvInfo);
-        }
+		Study study = ((StudyAdapter) patientVisitAdapter.getParent()
+				.getParent().getParent()).getStudy();
 
-        Collection<PvInfoData> pvInfoDataCollection = patientVisit.getPvInfoDataCollection();
-        if (pvInfoDataCollection != null) {
-            for (PvInfoData pvInfoData : pvInfoDataCollection) {
-                Integer key = pvInfoData.getPvInfo().getId();
-                CombinedPvInfo combinedPvInfo = (CombinedPvInfo) combinedPvInfoMap.get(key);
-                combinedPvInfo.pvInfoData = pvInfoData;
-            }
-        }
+		// get all PvInfo from study, since user may not have filled in all
+		// fields
+		for (PvInfo pvInfo : study.getPvInfoCollection()) {
+			CombinedPvInfo combinedPvInfo = new CombinedPvInfo();
+			combinedPvInfo.pvInfo = pvInfo;
+			combinedPvInfoMap.put(pvInfo.getId(), combinedPvInfo);
+		}
 
-        Label widget;
-        MapIterator it = combinedPvInfoMap.mapIterator();
-        while (it.hasNext()) {
-            @SuppressWarnings("unused")
-            Integer key = (Integer) it.next();
-            CombinedPvInfo combinedPvInfo = (CombinedPvInfo) it.getValue();
-            Integer typeId = combinedPvInfo.pvInfo.getPvInfoType().getId();
-            String value = "";
+		Collection<PvInfoData> pvInfoDataCollection = patientVisit
+				.getPvInfoDataCollection();
+		if (pvInfoDataCollection != null) {
+			for (PvInfoData pvInfoData : pvInfoDataCollection) {
+				Integer key = pvInfoData.getPvInfo().getId();
+				CombinedPvInfo combinedPvInfo = (CombinedPvInfo) combinedPvInfoMap
+						.get(key);
+				combinedPvInfo.pvInfoData = pvInfoData;
+			}
+		}
 
-            if (combinedPvInfo.pvInfoData != null) {
-                value = combinedPvInfo.pvInfoData.getValue();
-            }
+		Label widget;
+		MapIterator it = combinedPvInfoMap.mapIterator();
+		while (it.hasNext()) {
+			@SuppressWarnings("unused")
+			Integer key = (Integer) it.next();
+			CombinedPvInfo combinedPvInfo = (CombinedPvInfo) it.getValue();
+			Integer typeId = combinedPvInfo.pvInfo.getPvInfoType().getId();
+			String value = "";
 
-            Label labelWidget = toolkit.createLabel(client,
-                combinedPvInfo.pvInfo.getLabel() + ":", SWT.LEFT);
-            labelWidget.setLayoutData(new GridData(
-                GridData.VERTICAL_ALIGN_BEGINNING));
-            widget = toolkit.createLabel(client, value, SWT.BORDER | SWT.LEFT);
-            GridData gd = new GridData(GridData.FILL_HORIZONTAL);
-            if (typeId == 2) {
-                gd.heightHint = 40;
-            }
-            widget.setLayoutData(gd);
-        }
+			if (combinedPvInfo.pvInfoData != null) {
+				value = combinedPvInfo.pvInfoData.getValue();
+			}
 
-    }
+			Label labelWidget = toolkit.createLabel(client,
+					combinedPvInfo.pvInfo.getLabel() + ":", SWT.LEFT);
+			labelWidget.setLayoutData(new GridData(
+					GridData.VERTICAL_ALIGN_BEGINNING));
+			widget = toolkit.createLabel(client, value, SWT.BORDER | SWT.LEFT);
+			GridData gd = new GridData(GridData.FILL_HORIZONTAL);
+			if (typeId == 2) {
+				gd.heightHint = 40;
+			}
+			widget.setLayoutData(gd);
+		}
 
-    @Override
-    protected void reload() {
+	}
 
-    }
+	@Override
+	protected void reload() {
+
+	}
 
 }
