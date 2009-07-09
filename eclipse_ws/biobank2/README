@@ -5,7 +5,7 @@ CSM UPT
   Application Name: biobank2
   
 TO REBUILD DATABASE:
-  run ant in schema directory.
+  run "ant dbcreate" in project root directory.
 
 
 NOTES:

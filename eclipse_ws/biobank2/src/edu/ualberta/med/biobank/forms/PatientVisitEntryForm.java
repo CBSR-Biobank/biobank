@@ -290,28 +290,8 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         SDKQueryResult result;
 
         PatientAdapter patientAdapter = (PatientAdapter) patientVisitAdapter.getParent();
-
-        System.out.println("*** patient visit id: " + patientVisit.getId());
-
-        if (patientVisit.getPvInfoDataCollection() != null) {
-            for (PvInfoData pvInfoData : patientVisit.getPvInfoDataCollection()) {
-                System.out.println("*** id: " + pvInfoData.getId()
-                    + ", value: " + pvInfoData.getValue() + ", pv_id: "
-                    + pvInfoData.getPatientVisit().getId());
-            }
-        }
-
         patientVisit.setPatient(patientAdapter.getPatient());
         savePvInfoData();
-
-        for (PvInfoData pvInfoData : patientVisit.getPvInfoDataCollection()) {
-            System.out.println("id: " + pvInfoData.getId() + ", value: "
-                + pvInfoData.getValue() + ", pv_id: "
-                + pvInfoData.getPatientVisit().getId());
-        }
-
-        System.out.println("pv data size: "
-            + patientVisit.getPvInfoDataCollection().size());
 
         if ((patientVisit.getId() == null) || (patientVisit.getId() == 0)) {
             query = new InsertExampleQuery(patientVisit);
@@ -332,6 +312,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
 
         MapIterator it = combinedPvInfoMap.mapIterator();
         while (it.hasNext()) {
+            @SuppressWarnings("unused")
             Integer key = (Integer) it.next();
             CombinedPvInfo combinedPvInfo = (CombinedPvInfo) it.getValue();
             String value = "";
@@ -347,7 +328,6 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
                     Assert.isTrue(index < options.length,
                         "Invalid combo box selection " + index);
                     value = options[index];
-                    System.out.println(key + ": " + options[index]);
                 }
             }
             else if (combinedPvInfo.control instanceof DateTimeWidget) {
@@ -400,7 +380,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         HQLCriteria c = new HQLCriteria(
             "from edu.ualberta.med.biobank.model.PatientVisit as v "
                 + "inner join fetch v.patient " + "where v.patient.id='"
-                + patient.getId() + "' " + "and v.number = '"
+                + patient.getId() + "' " + "and v.dateDrawn = '"
                 + patientVisit.getDateDrawn() + "'");
 
         List<Object> results = appService.query(c);
