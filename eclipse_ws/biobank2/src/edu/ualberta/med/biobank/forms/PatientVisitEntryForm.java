@@ -11,6 +11,7 @@ import java.util.List;
 
 import org.apache.commons.collections.MapIterator;
 import org.apache.commons.collections.map.ListOrderedMap;
+import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.dialogs.IMessageProvider;
@@ -40,7 +41,9 @@ import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.PatientAdapter;
 import edu.ualberta.med.biobank.treeview.PatientVisitAdapter;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
+import edu.ualberta.med.biobank.widgets.ComboAndQuantity;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
+import edu.ualberta.med.biobank.widgets.SelectMultiple;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.SDKQuery;
@@ -130,6 +133,8 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         toolkit.createLabel(client, "Date Drawn:", SWT.NONE);
         dateDrawn = new DateTimeWidget(client, SWT.BORDER,
             patientVisit.getDateDrawn());
+        dateDrawn.addSelectionListener(selectionListener);
+        dateDrawn.addModifyListener(modifyListener);
         dateDrawn.adaptToToolkit(toolkit);
 
         study = ((StudyAdapter) patientVisitAdapter.getParent().getParent().getParent()).getStudy();
@@ -155,7 +160,13 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
             it.next();
             CombinedPvInfo combinedPvInfo = (CombinedPvInfo) it.getValue();
             int typeId = combinedPvInfo.pvInfo.getPvInfoType().getId();
+            String possibleValues = combinedPvInfo.pvInfo.getPossibleValues();
             String value = null;
+
+            String [] pvalArr = null;
+            if (possibleValues != null) {
+                pvalArr = possibleValues.split(";");
+            }
 
             if (combinedPvInfo.pvInfoData != null) {
                 value = combinedPvInfo.pvInfoData.getValue();
@@ -192,20 +203,36 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
                     }
                     DateTimeWidget w = new DateTimeWidget(client, SWT.NONE,
                         date);
+                    w.addSelectionListener(selectionListener);
+                    w.addModifyListener(modifyListener);
                     w.adaptToToolkit(toolkit);
                     combinedPvInfo.control = w;
                     break;
 
                 case 4: // select_single
                     combinedPvInfo.control = createComboSection(client,
-                        combinedPvInfo.pvInfo.getPossibleValues().split(";"),
-                        value);
+                        pvalArr, value);
                     break;
 
-                case 5: // select_single_and_quantity
+                case 5: // select_single_and_quantity_1_5_1
+                    ComboAndQuantity c = new ComboAndQuantity(client,
+                        SWT.BORDER);
+                    c.adaptToToolkit(toolkit);
+                    c.addValues(pvalArr, 1, 5, 1);
+                    if (value != null) {
+                        String [] values = value.split(" ");
+                        Assert.isTrue(values.length == 2);
+                        c.setText(values[0], Integer.parseInt(values[1]));
+                    }
+                    combinedPvInfo.control = c;
                     break;
 
                 case 6: // select_multiple
+                    SelectMultiple s = new SelectMultiple(client, SWT.BORDER,
+                        pvalArr);
+                    s.adaptToToolkit(toolkit);
+                    s.setSelection(value);
+                    combinedPvInfo.control = s;
                     break;
 
                 default:
@@ -230,6 +257,8 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         Combo combo = new Combo(client, SWT.READ_ONLY);
         combo.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
         combo.setItems(values);
+        combo.addSelectionListener(selectionListener);
+        combo.addModifyListener(modifyListener);
 
         if (selected != null) {
             int count = 0;
@@ -330,6 +359,13 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
             }
             else if (combinedPvInfo.control instanceof DateTimeWidget) {
                 value = ((DateTimeWidget) combinedPvInfo.control).getText();
+            }
+            else if (combinedPvInfo.control instanceof ComboAndQuantity) {
+                value = ((ComboAndQuantity) combinedPvInfo.control).getText();
+            }
+            else if (combinedPvInfo.control instanceof SelectMultiple) {
+                String [] values = ((SelectMultiple) combinedPvInfo.control).getSelections();
+                value = StringUtils.join(values, ";");
             }
 
             if ((value == null) || (value.length() == 0)) continue;

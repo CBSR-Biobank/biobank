@@ -5,6 +5,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
@@ -42,7 +44,7 @@ public class DateTimeWidget extends BiobankWidget {
 
         Label l = new Label(this, SWT.NONE);
         l.setText("Hour:");
-        hour = new Combo(this, SWT.BORDER);
+        hour = new Combo(this, SWT.NONE);
         for (int h = 0; h < 24; ++h) {
             hour.add(String.format("%02d", h));
         }
@@ -50,12 +52,24 @@ public class DateTimeWidget extends BiobankWidget {
 
         l = new Label(this, SWT.NONE);
         l.setText("min:");
-        minutes = new Combo(this, SWT.BORDER);
+        minutes = new Combo(this, SWT.NONE);
         minutes.add("00");
         for (int m = 10; m < 60; m += 10) {
             minutes.add(String.format("%02d", m));
         }
         minutes.setText(minStr);
+    }
+
+    public void addSelectionListener(SelectionListener listener) {
+        datePicker.addSelectionListener(listener);
+        hour.addSelectionListener(listener);
+        minutes.addSelectionListener(listener);
+    }
+
+    public void addModifyListener(ModifyListener listener) {
+        datePicker.addModifyListener(listener);
+        hour.addModifyListener(listener);
+        minutes.addModifyListener(listener);
     }
 
     private DatePickerCombo createDatePickerSection(Composite client,
@@ -73,19 +87,14 @@ public class DateTimeWidget extends BiobankWidget {
     }
 
     public String getText() {
-        String dateStr = "";
-        SimpleDateFormat sdf = new SimpleDateFormat(BioBankPlugin.DATE_FORMAT);
         Date date = datePicker.getDate();
-        if (date != null) {
-            dateStr = sdf.format(date);
-        }
-
-        if ((dateStr.length() == 0) && (hour.getText().length() == 0)
-            && (minutes.getText().length() == 0)) {
+        if ((date == null) || (hour.getText().length() != 2)
+            && (minutes.getText().length() != 2)) {
             return null;
         }
-
-        return dateStr + " " + hour.getText() + ":" + minutes.getText();
+        SimpleDateFormat sdf = new SimpleDateFormat(BioBankPlugin.DATE_FORMAT);
+        return sdf.format(date) + " " + hour.getText() + ":"
+            + minutes.getText();
     }
 
 }
