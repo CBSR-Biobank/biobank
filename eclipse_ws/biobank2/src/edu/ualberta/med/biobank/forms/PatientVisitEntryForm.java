@@ -152,8 +152,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
 
         MapIterator it = combinedPvInfoMap.mapIterator();
         while (it.hasNext()) {
-            @SuppressWarnings("unused")
-            Integer key = (Integer) it.next();
+            it.next();
             CombinedPvInfo combinedPvInfo = (CombinedPvInfo) it.getValue();
             int typeId = combinedPvInfo.pvInfo.getPvInfoType().getId();
             String value = null;
@@ -312,8 +311,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
 
         MapIterator it = combinedPvInfoMap.mapIterator();
         while (it.hasNext()) {
-            @SuppressWarnings("unused")
-            Integer key = (Integer) it.next();
+            it.next();
             CombinedPvInfo combinedPvInfo = (CombinedPvInfo) it.getValue();
             String value = "";
 

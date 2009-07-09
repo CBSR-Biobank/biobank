@@ -255,8 +255,7 @@ public class StudyEntryForm extends BiobankEntryForm {
         List<PvInfo> pvInfoList = new ArrayList<PvInfo>();
         MapIterator it = combinedPvInfoMap.mapIterator();
         while (it.hasNext()) {
-            @SuppressWarnings("unused")
-            Integer key = (Integer) it.next();
+            it.next();
             CombinedPvInfo combinedPvInfo = (CombinedPvInfo) it.getValue();
             boolean selected = combinedPvInfo.wiget.getSelected();
 
