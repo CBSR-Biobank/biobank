@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.treeview;
 
 import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.TreeViewer;
@@ -41,8 +42,10 @@ public class PatientVisitAdapter extends Node {
 	@Override
 	public String getName() {
 		Assert.isNotNull(patientVisit, "patientVisit is null");
+		Date date = patientVisit.getDateDrawn();
+		Assert.isNotNull(date, "patient visid drawn date is null");
 		SimpleDateFormat sdf = new SimpleDateFormat(BioBankPlugin.DATE_FORMAT);
-		return sdf.format(patientVisit.getDateDrawn());
+		return sdf.format(date);
 	}
 
 	@Override

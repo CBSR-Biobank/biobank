@@ -61,7 +61,7 @@ public class ScanCell {
                 if (str.charAt(0) == '#') continue;
                 String [] fields = str.split(",");
                 Assert.isTrue(fields.length == 4);
-                int row = (int) (fields[1].charAt(0) - 'A');
+                int row = fields[1].charAt(0) - 'A';
                 int col = Integer.parseInt(fields[2]) - 1;
 
                 paletteScanned[row][col] = new ScanCell(row, col, fields[3]);
