@@ -136,13 +136,11 @@ public class PatientVisitViewForm extends BiobankViewForm {
                 GridData.VERTICAL_ALIGN_BEGINNING));
 
             int style = SWT.BORDER | SWT.LEFT;
-            if (type.equals("text")
-                || type.startsWith("select_single_and_quantity")) {
+            if (type.equals("text") || type.equals("select_multiple")) {
                 style |= SWT.WRAP;
             }
 
-            if ((value != null)
-                && type.startsWith("select_single_and_quantity")) {
+            if ((value != null) && type.equals("select_multiple")) {
                 value = value.replace(';', '\n');
             }
 

@@ -214,7 +214,17 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
                         pvalArr, value);
                     break;
 
-                case 5: // select_single_and_quantity_1_5_1
+                case 5: // select_multiple
+                    SelectMultiple s = new SelectMultiple(client, SWT.BORDER,
+                        pvalArr);
+                    s.adaptToToolkit(toolkit);
+                    if (value != null) {
+                        s.setSelections(value.split(";"));
+                    }
+                    combinedPvInfo.control = s;
+                    break;
+
+                case 6: // select_single_and_quantity_1_5_1
                     ComboAndQuantity c = new ComboAndQuantity(client,
                         SWT.BORDER);
                     c.adaptToToolkit(toolkit);
@@ -225,16 +235,6 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
                         c.setText(values[0], Integer.parseInt(values[1]));
                     }
                     combinedPvInfo.control = c;
-                    break;
-
-                case 6: // select_multiple
-                    SelectMultiple s = new SelectMultiple(client, SWT.BORDER,
-                        pvalArr);
-                    s.adaptToToolkit(toolkit);
-                    if (value != null) {
-                        s.setSelections(value.split(";"));
-                    }
-                    combinedPvInfo.control = s;
                     break;
 
                 default:

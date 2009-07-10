@@ -144,8 +144,14 @@ public class InitExamples {
     private void insertClinicsInSite() throws ApplicationException {
         int count = 1;
         for (Clinic clinic : clinics) {
+            clinic = new Clinic();
             clinic.setName("Clinic " + count);
             clinic.setSite(site);
+
+            Address address = new Address();
+            address.setCity("Edmonton");
+            clinic.setAddress(address);
+
             SDKQueryResult res = appService.executeQuery(new InsertExampleQuery(
                 clinic));
             clinic = (Clinic) res.getObjectResult();
