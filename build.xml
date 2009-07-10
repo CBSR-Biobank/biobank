@@ -83,6 +83,12 @@
 		        casesensitive="false"
 		        trim="true" />
 	</condition>
+	<condition property="SECURITY_ENABLED" value="true" else="false">
+		<or>
+			<equals arg1="${ENABLE_SECURITY}" arg2="true" casesensitive="false" trim="true" />
+			<equals arg1="${ENABLE_SECURITY}" arg2="yes" casesensitive="false" trim="true" />
+		</or>
+	</condition>
 	<!-- end of copied part -->
 
 

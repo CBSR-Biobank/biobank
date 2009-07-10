@@ -17,7 +17,7 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.model.SampleCellStatus;
-import edu.ualberta.med.biobank.model.ScanCell;
+import edu.ualberta.med.biobank.model.PaletteCell;
 import edu.ualberta.med.biobank.widgets.listener.ScanPaletteModificationEvent;
 
 /**
@@ -26,8 +26,8 @@ import edu.ualberta.med.biobank.widgets.listener.ScanPaletteModificationEvent;
  */
 public class AddSamplesScanPaletteWidget extends ScanPaletteWidget {
 
-	private List<ScanCell> selectedCells;
-	private ScanCell lastSelectedCell;
+	private List<PaletteCell> selectedCells;
+	private PaletteCell lastSelectedCell;
 	private boolean selectionTrackOn = false;
 	private SelectionMode selectionMode = SelectionMode.NONE;
 
@@ -40,7 +40,7 @@ public class AddSamplesScanPaletteWidget extends ScanPaletteWidget {
 
 	public AddSamplesScanPaletteWidget(Composite parent) {
 		super(parent);
-		selectedCells = new ArrayList<ScanCell>();
+		selectedCells = new ArrayList<PaletteCell>();
 		initListeners();
 	}
 
@@ -55,7 +55,7 @@ public class AddSamplesScanPaletteWidget extends ScanPaletteWidget {
 	}
 
 	public void clearSelection() {
-		for (ScanCell cell : selectedCells) {
+		for (PaletteCell cell : selectedCells) {
 			cell.setSelected(false);
 		}
 		notifyListeners();
@@ -67,8 +67,8 @@ public class AddSamplesScanPaletteWidget extends ScanPaletteWidget {
 			.size()));
 	}
 
-	private void addAllCellsInRange(ScanCell cell) {
-		ScanCell lastSelected = selectedCells.get(selectedCells.size() - 1);
+	private void addAllCellsInRange(PaletteCell cell) {
+		PaletteCell lastSelected = selectedCells.get(selectedCells.size() - 1);
 		int startRow = lastSelected.getRow();
 		int endRow = cell.getRow();
 		if (startRow > endRow) {
@@ -83,7 +83,7 @@ public class AddSamplesScanPaletteWidget extends ScanPaletteWidget {
 				endCol = lastSelected.getColumn();
 			}
 			for (int indexCol = startCol; indexCol <= endCol; indexCol++) {
-				ScanCell cellToAdd = scannedElements[indexRow][indexCol];
+				PaletteCell cellToAdd = scannedElements[indexRow][indexCol];
 				if (cellToAdd != null) {
 					if (!selectedCells.contains(cellToAdd)) {
 						cellToAdd.setSelected(true);
@@ -109,7 +109,7 @@ public class AddSamplesScanPaletteWidget extends ScanPaletteWidget {
 		}
 	}
 
-	public List<ScanCell> getSelectedCells() {
+	public List<PaletteCell> getSelectedCells() {
 		return selectedCells;
 	}
 
@@ -122,8 +122,8 @@ public class AddSamplesScanPaletteWidget extends ScanPaletteWidget {
 		removeMouseListener(selectionMouseListener);
 		removeMouseTrackListener(selectionMouseTrackListener);
 		clearSelection();
-		for (ScanCell[] rowCells : scannedElements) {
-			for (ScanCell cell : rowCells) {
+		for (PaletteCell[] rowCells : scannedElements) {
+			for (PaletteCell cell : rowCells) {
 				if (cell != null) {
 					cell.setType(null);
 					cell.setStatus(SampleCellStatus.NEW);
@@ -138,7 +138,7 @@ public class AddSamplesScanPaletteWidget extends ScanPaletteWidget {
 			public void mouseDown(MouseEvent e) {
 				selectionTrackOn = true;
 				if (scannedElements != null) {
-					ScanCell cell = getCellAtCoordinates(e.x, e.y);
+					PaletteCell cell = getCellAtCoordinates(e.x, e.y);
 					if (cell != null) {
 						switch (selectionMode) {
 						case MULTI:
@@ -180,7 +180,7 @@ public class AddSamplesScanPaletteWidget extends ScanPaletteWidget {
 			@Override
 			public void mouseHover(MouseEvent e) {
 				if (selectionTrackOn) {
-					ScanCell cell = getCellAtCoordinates(e.x, e.y);
+					PaletteCell cell = getCellAtCoordinates(e.x, e.y);
 					if (!cell.equals(lastSelectedCell)) {
 						selectedCells.add(cell);
 						cell.setSelected(true);
@@ -211,8 +211,8 @@ public class AddSamplesScanPaletteWidget extends ScanPaletteWidget {
 	}
 
 	public boolean isEverythingTyped() {
-		for (ScanCell[] rowCells : scannedElements) {
-			for (ScanCell cell : rowCells) {
+		for (PaletteCell[] rowCells : scannedElements) {
+			for (PaletteCell cell : rowCells) {
 				if (cell != null && cell.getType() == null) {
 					return false;
 				}
