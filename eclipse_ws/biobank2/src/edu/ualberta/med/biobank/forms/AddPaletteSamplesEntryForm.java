@@ -475,7 +475,7 @@ public class AddPaletteSamplesEntryForm extends BiobankEntryForm {
                     for (int indexRow = 0; indexRow < cells.length; indexRow++) {
                         for (int indexColumn = 0; indexColumn < cells[indexRow].length; indexColumn++) {
                             PaletteCell cell = cells[indexRow][indexColumn];
-                            if (cell != null
+                            if (PaletteCell.hasValue(cell)
                                 && cell.getStatus().equals(
                                     SampleCellStatus.TYPE)) {
                                 // add new samples
@@ -488,6 +488,7 @@ public class AddPaletteSamplesEntryForm extends BiobankEntryForm {
                         }
                     }
                     appService.executeBatchQuery(queries);
+                    activityToPrint = true;
                 } catch (RemoteConnectFailureException exp) {
                     BioBankPlugin.openRemoteConnectErrorMessage();
                 } catch (Exception e) {
@@ -505,10 +506,11 @@ public class AddPaletteSamplesEntryForm extends BiobankEntryForm {
             PaletteCell[][] cells = spw.getScannedElements();
             for (int indexColumn = 0; indexColumn < cells[indexRow].length; indexColumn++) {
                 PaletteCell cell = cells[indexRow][indexColumn];
-                cell.setType(type);
-                cell.setStatus(SampleCellStatus.TYPE);
-                spw.redraw();
-
+                if (PaletteCell.hasValue(cell)) {
+                    cell.setType(type);
+                    cell.setStatus(SampleCellStatus.TYPE);
+                    spw.redraw();
+                }
             }
         }
     }

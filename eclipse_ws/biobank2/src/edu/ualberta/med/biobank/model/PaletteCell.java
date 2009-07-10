@@ -192,4 +192,8 @@ public class PaletteCell {
         }
         return null;
     }
+
+    public static boolean hasValue(PaletteCell cell) {
+        return cell != null && cell.getValue() != null;
+    }
 }
