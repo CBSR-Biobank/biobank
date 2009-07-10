@@ -123,7 +123,7 @@ public class PatientVisitViewForm extends BiobankViewForm {
         while (it.hasNext()) {
             it.next();
             CombinedPvInfo combinedPvInfo = (CombinedPvInfo) it.getValue();
-            Integer typeId = combinedPvInfo.pvInfo.getPvInfoType().getId();
+            String type = combinedPvInfo.pvInfo.getPvInfoType().getType();
             String value = "";
 
             if (combinedPvInfo.pvInfoData != null) {
@@ -134,11 +134,20 @@ public class PatientVisitViewForm extends BiobankViewForm {
                 combinedPvInfo.pvInfo.getLabel() + ":", SWT.LEFT);
             labelWidget.setLayoutData(new GridData(
                 GridData.VERTICAL_ALIGN_BEGINNING));
-            widget = toolkit.createLabel(client, value, SWT.BORDER | SWT.LEFT);
-            GridData gd = new GridData(GridData.FILL_HORIZONTAL);
-            if (typeId == 2) {
-                gd.heightHint = 40;
+
+            int style = SWT.BORDER | SWT.LEFT;
+            if (type.equals("text")
+                || type.startsWith("select_single_and_quantity")) {
+                style |= SWT.WRAP;
             }
+
+            if ((value != null)
+                && type.startsWith("select_single_and_quantity")) {
+                value = value.replace(';', '\n');
+            }
+
+            widget = toolkit.createLabel(client, value, style);
+            GridData gd = new GridData(GridData.FILL_HORIZONTAL);
             widget.setLayoutData(gd);
         }
 

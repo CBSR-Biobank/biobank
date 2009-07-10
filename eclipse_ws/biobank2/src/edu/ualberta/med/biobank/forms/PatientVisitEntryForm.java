@@ -231,7 +231,9 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
                     SelectMultiple s = new SelectMultiple(client, SWT.BORDER,
                         pvalArr);
                     s.adaptToToolkit(toolkit);
-                    s.setSelection(value);
+                    if (value != null) {
+                        s.setSelections(value.split(";"));
+                    }
                     combinedPvInfo.control = s;
                     break;
 

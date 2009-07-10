@@ -37,6 +37,7 @@ public class InitExamples {
 
     private Site site;
     private Study study;
+    private Clinic [] clinics;
 
     private StorageType paletteType;
     private StorageType hotel19Type;
@@ -72,6 +73,7 @@ public class InitExamples {
         init.insertSite();
 
         init.insertStudyInSite();
+        init.insertClinicsInSite();
         init.insertPatientInStudy();
         init.insertPatientVisitInPatient();
         init.insertSampleInPatientVisit();
@@ -81,6 +83,10 @@ public class InitExamples {
         init.insertStorageContainers();
 
         System.out.println("Init done.");
+    }
+
+    InitExamples() {
+        clinics = new Clinic [2];
     }
 
     private void insertSampleInPatientVisit() throws ApplicationException {
@@ -133,6 +139,18 @@ public class InitExamples {
         SDKQueryResult res = appService.executeQuery(new InsertExampleQuery(
             study));
         study = (Study) res.getObjectResult();
+    }
+
+    private void insertClinicsInSite() throws ApplicationException {
+        int count = 1;
+        for (Clinic clinic : clinics) {
+            clinic.setName("Clinic " + count);
+            clinic.setSite(site);
+            SDKQueryResult res = appService.executeQuery(new InsertExampleQuery(
+                clinic));
+            clinic = (Clinic) res.getObjectResult();
+            ++count;
+        }
     }
 
     private void deletedAll(Class<?> classType) throws Exception {
