@@ -1,8 +1,8 @@
-﻿# Replace the <<database_name>> with proper database name that is to be created.
+-- Replace the <<database_name>> with proper database name that is to be created.
+-- CREATE DATABASE <<database_name>>;
+-- USE <<database_name>>; 
 
-#CREATE DATABASE <<database_name>>;
-
-#USE <<database_name>>;
+set foreign_key_checks=0;
 
 DROP TABLE IF EXISTS CSM_APPLICATION
 ;
@@ -353,5 +353,7 @@ ALTER TABLE CSM_USER_PE ADD CONSTRAINT FK_PROTECTION_ELEMENT_USER
 FOREIGN KEY (PROTECTION_ELEMENT_ID) REFERENCES CSM_PROTECTION_ELEMENT (PROTECTION_ELEMENT_ID)
 ON DELETE CASCADE
 ;
+
+set foreign_key_checks=1;
 
 COMMIT;

@@ -34,6 +34,5 @@
 	<classpathentry kind="lib" path="lib/gface_0.9.1.jar"/>
 	<classpathentry kind="lib" path="lib/gluegen.jar"/>
 	<classpathentry kind="lib" path="lib/scanlib.jar"/>
-	<classpathentry kind="lib" path="/compsci/abee8/cshome/degrisda/projects/biobank2/caCORE_SDK/sdk/system/lib/csmapi-4.1.jar" sourcepath="/usr/scratch/degrisda/frameworks/CSM_API_4_1_Source/src"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
