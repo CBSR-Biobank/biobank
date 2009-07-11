@@ -1,3 +1,4 @@
+
 package edu.ualberta.med.biobank;
 
 import java.util.HashMap;
@@ -11,11 +12,14 @@ import org.eclipse.jface.viewers.ITreeViewerListener;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeExpansionEvent;
 import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
+import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.treeview.Node;
@@ -27,151 +31,186 @@ import edu.ualberta.med.biobank.views.TreeFilter;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class SessionManager {
-	private static SessionManager instance = null;
+    private static SessionManager instance = null;
 
-	private static Logger log4j = Logger.getLogger(SessionManager.class
-		.getName());
+    private static Logger log4j = Logger.getLogger(SessionManager.class.getName());
 
-	private SessionsView view;
+    private SessionsView view;
 
-	private HashMap<String, SessionAdapter> sessionsByName;
+    private HashMap<String, SessionAdapter> sessionsByName;
 
-	private Node rootNode;
+    private Node rootNode;
 
-	public Node getRootNode() {
-		return rootNode;
-	}
+    public boolean inactiveTimeout = false;
 
-	private IDoubleClickListener doubleClickListener = new IDoubleClickListener() {
-		public void doubleClick(DoubleClickEvent event) {
-			Object selection = event.getSelection();
+    final int TIME_OUT = 3000;
 
-			if (selection == null)
-				return;
+    public Node getRootNode() {
+        return rootNode;
+    }
 
-			Object element = ((StructuredSelection) selection)
-				.getFirstElement();
-			((Node) element).performDoubleClick();
-			view.getTreeViewer().expandToLevel(element, 1);
-		}
-	};
+    private IDoubleClickListener doubleClickListener = new IDoubleClickListener() {
+        public void doubleClick(DoubleClickEvent event) {
+            Object selection = event.getSelection();
 
-	public IDoubleClickListener getDoubleClickListener() {
-		return doubleClickListener;
-	}
+            if (selection == null) return;
 
-	private ITreeViewerListener treeViewerListener = new ITreeViewerListener() {
-		@Override
-		public void treeCollapsed(TreeExpansionEvent e) {
-		}
+            Object element = ((StructuredSelection) selection).getFirstElement();
+            ((Node) element).performDoubleClick();
+            view.getTreeViewer().expandToLevel(element, 1);
+        }
+    };
 
-		@Override
-		public void treeExpanded(TreeExpansionEvent e) {
-			((Node) e.getElement()).performExpand();
-		}
-	};
+    public IDoubleClickListener getDoubleClickListener() {
+        return doubleClickListener;
+    }
 
-	/*
-	 * Pop-up menu for the tree viewer.
-	 */
-	private Listener treeViewMenuListener = new Listener() {
-		@Override
-		public void handleEvent(Event event) {
-			TreeViewer tv = view.getTreeViewer();
-			Tree tree = tv.getTree();
-			Menu menu = tree.getMenu();
+    private ITreeViewerListener treeViewerListener = new ITreeViewerListener() {
+        @Override
+        public void treeCollapsed(TreeExpansionEvent e) {}
 
-			for (MenuItem menuItem : menu.getItems()) {
-				menuItem.dispose();
-			}
+        @Override
+        public void treeExpanded(TreeExpansionEvent e) {
+            ((Node) e.getElement()).performExpand();
+        }
+    };
 
-			Object element = ((StructuredSelection) tv.getSelection())
-				.getFirstElement();
-			if (element != null) {
-				((Node) element).popupMenu(tv, tree, menu);
-			}
-		}
-	};
+    /*
+     * Pop-up menu for the tree viewer.
+     */
+    private Listener treeViewMenuListener = new Listener() {
+        @Override
+        public void handleEvent(Event event) {
+            TreeViewer tv = view.getTreeViewer();
+            Tree tree = tv.getTree();
+            Menu menu = tree.getMenu();
 
-	private SessionManager() {
-		super();
-		rootNode = RootNode.getRootNode();
-		sessionsByName = new HashMap<String, SessionAdapter>();
-	}
+            for (MenuItem menuItem : menu.getItems()) {
+                menuItem.dispose();
+            }
 
-	public ITreeViewerListener getTreeViewerListener() {
-		return treeViewerListener;
-	}
+            Object element = ((StructuredSelection) tv.getSelection()).getFirstElement();
+            if (element != null) {
+                ((Node) element).popupMenu(tv, tree, menu);
+            }
+        }
+    };
 
-	public Listener getTreeViewerMenuListener() {
-		return treeViewMenuListener;
-	}
+    private SessionManager() {
+        super();
+        rootNode = RootNode.getRootNode();
+        sessionsByName = new HashMap<String, SessionAdapter>();
+    }
 
-	public static SessionManager getInstance() {
-		if (instance == null) {
-			instance = new SessionManager();
-		}
-		return instance;
-	}
+    public ITreeViewerListener getTreeViewerListener() {
+        return treeViewerListener;
+    }
 
-	public void setSessionsView(SessionsView view) {
-		this.view = view;
-	}
+    public Listener getTreeViewerMenuListener() {
+        return treeViewMenuListener;
+    }
 
-	public void addSession(final WritableApplicationService appService,
-			String name, List<Site> sites) {
-		int id = sessionsByName.size();
-		final SessionAdapter sessionNode = new SessionAdapter(rootNode,
-			appService, id, name);
-		sessionsByName.put(name, sessionNode);
-		rootNode.addChild(sessionNode);
+    public static SessionManager getInstance() {
+        if (instance == null) {
+            instance = new SessionManager();
+        }
+        return instance;
+    }
 
-		for (Object o : sites) {
-			Site site = (Site) o;
-			SiteAdapter siteNode = new SiteAdapter(sessionNode, site);
-			sessionNode.addChild(siteNode);
-		}
-		view.getTreeViewer().expandToLevel(2);
-		log4j.debug("addSession: " + name);
-	}
+    public void setSessionsView(SessionsView view) {
+        this.view = view;
+    }
 
-	public SessionAdapter getSessionAdapter(int count) {
-		List<Node> nodes = rootNode.getChildren();
-		Assert.isTrue(count < nodes.size(), "Invalid session node count: "
-				+ count);
-		return (SessionAdapter) nodes.get(count);
-	}
+    public void addSession(final WritableApplicationService appService,
+        String name, List<Site> sites) {
+        int id = sessionsByName.size();
+        final SessionAdapter sessionNode = new SessionAdapter(rootNode,
+            appService, id, name);
+        sessionsByName.put(name, sessionNode);
+        rootNode.addChild(sessionNode);
 
-	public void deleteSession(String name) {
-		rootNode.removeByName(name);
-		// treeViewer.refresh();
-	}
+        for (Object o : sites) {
+            Site site = (Site) o;
+            SiteAdapter siteNode = new SiteAdapter(sessionNode, site);
+            sessionNode.addChild(siteNode);
+        }
+        view.getTreeViewer().expandToLevel(2);
+        log4j.debug("addSession: " + name);
+        startInactivityTimer();
+    }
 
-	public int getSessionCount() {
-		return rootNode.getChildren().size();
-	}
+    private void startInactivityTimer() {
+        final Display display = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell().getDisplay();
 
-	public String[] getSessionNames() {
-		return sessionsByName.keySet().toArray(
-			new String[sessionsByName.size()]);
-	}
+        final Runnable runnable = new Runnable() {
+            public void run() 
+                inactiveTimeout = true;
+                System.out.println("Idle for " + (TIME_OUT / 1000) + " seconds");
 
-	public SessionAdapter getSessionSingle() {
-		int count = sessionsByName.size();
-		Assert.isTrue(count == 1,
-			"No sessions or more than 1 session connected");
-		return getSessionAdapter(0);
-	}
+                BioBankPlugin.openMessage("Inactive Timeout",
+                    "The application has been inactive for "
+                        + (TIME_OUT / 1000)
+                        + " seconds.\n Do you want to log out?");
 
-	public TreeViewer getTreeViewer() {
-		return view.getTreeViewer();
-	}
+                for (SessionAdapter adapter : sessionsByName.values()) {
+                    deleteSession(adapter.getName());
+                }
+            }
+        };
 
-	public TreeFilter getTreeFilter() {
-		return view.getFilter();
-	}
+        // this listener will be called when the events listed below happen
+        Listener idleListener = new Listener() {
+            public void handleEvent(Event event) {
+                if (!inactiveTimeout && (sessionsByName.size() > 0)) {
+                    display.timerExec(TIME_OUT, runnable);
+                }
+            }
+        };
+        int [] events = {
+            SWT.KeyDown, SWT.KeyUp, SWT.MouseDown, SWT.MouseMove, SWT.MouseUp };
+        for (int event : events) {
+            display.addFilter(event, idleListener);
+        }
+        display.timerExec(TIME_OUT, runnable);
+    }
 
-	public static Logger getLogger() {
-		return log4j;
-	}
+    public SessionAdapter getSessionAdapter(int count) {
+        List<Node> nodes = rootNode.getChildren();
+        Assert.isTrue(count < nodes.size(), "Invalid session node count: "
+            + count);
+        return (SessionAdapter) nodes.get(count);
+    }
+
+    public void deleteSession(String name) {
+        rootNode.removeByName(name);
+        // treeViewer.refresh();
+    }
+
+    public int getSessionCount() {
+        return rootNode.getChildren().size();
+    }
+
+    public String [] getSessionNames() {
+        return sessionsByName.keySet().toArray(
+            new String [sessionsByName.size()]);
+    }
+
+    public SessionAdapter getSessionSingle() {
+        int count = sessionsByName.size();
+        Assert.isTrue(count == 1,
+            "No sessions or more than 1 session connected");
+        return getSessionAdapter(0);
+    }
+
+    public TreeViewer getTreeViewer() {
+        return view.getTreeViewer();
+    }
+
+    public TreeFilter getTreeFilter() {
+        return view.getFilter();
+    }
+
+    public static Logger getLogger() {
+        return log4j;
+    }
 }
