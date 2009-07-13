@@ -36,3 +36,4 @@
 	<classpathentry kind="lib" path="lib/scanlib.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
+
