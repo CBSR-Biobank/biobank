@@ -55,12 +55,14 @@ public class InitExamples {
     /**
      * @param args
      */
-    public static void main(String [] args) throws Exception {
+    public static void main(String[] args) throws Exception {
         InitExamples init = new InitExamples();
         // appService = (WritableApplicationService) ApplicationServiceProvider
         // .getApplicationServiceFromUrl("http://aicml-med.cs.ualberta.ca:8080/biobank2");
 
-        appService = (WritableApplicationService) ApplicationServiceProvider.getApplicationServiceFromUrl("http://localhost:8080/biobank2");
+        appService = (WritableApplicationService) ApplicationServiceProvider
+            .getApplicationServiceFromUrl("http://localhost:8080/biobank2",
+                "testuser", "test");
 
         init.deletedAll(Site.class);
         init.deletedAll(Clinic.class);
@@ -107,8 +109,7 @@ public class InitExamples {
     private void insertPatientVisitInPatient() throws ApplicationException {
         patientVisit = new PatientVisit();
 
-        SimpleDateFormat df = new SimpleDateFormat(
-            BioBankPlugin.DATE_TIME_FORMAT);
+        SimpleDateFormat df = new SimpleDateFormat(BioBankPlugin.DATE_FORMAT);
         try {
             patientVisit.setDateDrawn(df.parse("2009-01-01 00:00"));
         }

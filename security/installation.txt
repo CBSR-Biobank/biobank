@@ -1,0 +1,15 @@
+- flag ENABLE_SECURITY=true in deploy.properties file
+- Generate security tables with script AuthSchemaMySQL.sql
+- initialize security tables with super admin user with DataPrimingMySQL.sql
+  (check that the biobank2 application if configured inside it and that an administrator login is set (=administrator / default password = changeme)
+- deploy mysql-ds.xml in the deploy folder of the jboss server
+- deploy upt.war on jboss server (remove log4j.jar from the libs)
+- connect to http://machine:8080/upt
+- connect as administrator using loging/password/app = administrator/changeme/csmupt
+- create one admin user for biobank2
+- logout and connect as biobank admin on biobank app
+- create users for authentification
+- create all the protection elements corresponding to all model classes
+- create roles
+- 
+

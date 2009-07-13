@@ -140,10 +140,8 @@ public class SessionManager {
     }
 
     private void startInactivityTimer() {
-        final Display display = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell().getDisplay();
-
         final Runnable runnable = new Runnable() {
-            public void run() 
+            public void run() {
                 inactiveTimeout = true;
                 System.out.println("Idle for " + (TIME_OUT / 1000) + " seconds");
 
@@ -157,6 +155,8 @@ public class SessionManager {
                 }
             }
         };
+
+        final Display display = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell().getDisplay();
 
         // this listener will be called when the events listed below happen
         Listener idleListener = new Listener() {

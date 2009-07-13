@@ -12,12 +12,13 @@
 	<property name="eclipse.proj.dir.junit"
 	          location="eclipse_ws/biobank2.tests" />
 	<property name="scripts.proj.dir" location="scripts" />
-	<!--tp--> 
+	<!--tp-->
 	<property name="model.proj.dir" location="model" />
 	<!--tp-->
 	<property name="data.dir" location="data" />
 	<property name="data.sql.dir" location="${data.dir}/sql" />
 	<property name="schema.dir" location="schema" />
+	<property name="security.dir" location="security" />
 	<property name="mysql.driver.string" value="org.gjt.mm.mysql.Driver" />
 	<property name="database.host" value="localhost" />
 	<property name="database.port" value="3306" />
@@ -71,10 +72,18 @@
 		        casesensitive="false"
 		        trim="true" />
 	</condition>
-	<condition property="WRITABLE_API_EXTENSION_ENABLED" value="true" else="false">
+	<condition property="WRITABLE_API_EXTENSION_ENABLED"
+	           value="true"
+	           else="false">
 		<or>
-			<equals arg1="${ENABLE_WRITABLE_API_EXTENSION}" arg2="true" casesensitive="false" trim="true" />
-			<equals arg1="${ENABLE_WRITABLE_API_EXTENSION}" arg2="yes" casesensitive="false" trim="true" />
+			<equals arg1="${ENABLE_WRITABLE_API_EXTENSION}"
+			        arg2="true"
+			        casesensitive="false"
+			        trim="true" />
+			<equals arg1="${ENABLE_WRITABLE_API_EXTENSION}"
+			        arg2="yes"
+			        casesensitive="false"
+			        trim="true" />
 		</or>
 	</condition>
 	<condition property="read-api-exclude-list" value="" else="*.jar">
@@ -82,6 +91,18 @@
 		        arg2="true"
 		        casesensitive="false"
 		        trim="true" />
+	</condition>
+	<condition property="SECURITY_ENABLED" value="true" else="false">
+		<or>
+			<equals arg1="${ENABLE_SECURITY}"
+			        arg2="true"
+			        casesensitive="false"
+			        trim="true" />
+			<equals arg1="${ENABLE_SECURITY}"
+			        arg2="yes"
+			        casesensitive="false"
+			        trim="true" />
+		</or>
 	</condition>
 	<!-- end of copied part -->
 
@@ -123,8 +144,14 @@
 	<target name="deploy-jboss"
 	        description="deploys the caCORE SDK webapp to JBoss">
 		<fail unless="env.JBOSS_HOME" message="$JBOSS_HOME not defined" />
+		<copy file="${security.dir}/jboss/login-config.xml"
+								      tofile="${env.JBOSS_HOME}/server/default/conf/login-config.xml" overwrite="true" />
+		<copy file="${security.dir}/jboss/mysql-ds.xml"
+										      tofile="${env.JBOSS_HOME}/server/default/deploy/mysql-ds.xml" overwrite="true"/>
+		<copy file="${security.dir}/jboss/upt.war"
+						      tofile="${env.JBOSS_HOME}/server/default/deploy/upt.war" overwrite="true"/>				
 		<copy file="${cacore.sdk.dir}/output/biobank2/package/webapp/biobank2.war"
-		      tofile="${env.JBOSS_HOME}/server/default/deploy/biobank2.war" />
+		      tofile="${env.JBOSS_HOME}/server/default/deploy/biobank2.war" overwrite="true"/>
 	</target>
 
 	<target name="deploy" description="deploys to JBoss and Eclipse project">
@@ -154,6 +181,23 @@
 		</sql>
 	</target>
 
+	<target name="securityDBcreate"
+	        description="creates the default tables and datas for the security">
+		<sql driver="${mysql.driver.string}"
+		     url="jdbc:mysql://${database.host}:${database.port}/${database.name}"
+		     userid="${database.username}"
+		     password="${database.password}">
+			<transaction src="${security.dir}/AuthSchemaMySQL.sql" />
+			<transaction src="${security.dir}/DataPrimingMySQL.sql" />
+			<transaction>commit;</transaction>
+			<classpath>
+				<fileset dir="${cacore.sdk.dir}/system/lib">
+					<include name="*.jar" />
+				</fileset>
+			</classpath>
+		</sql>
+	</target>
+
 	<!--Add the length="#" field into .hbm.xml, references the biobank.uml file for the VARCHAR(#) -->
 	<target name="string-length-field-addition"
 	        description="Add the length='#' field into .hbm.xml, references the biobank.uml file for the VARCHAR(#)">
@@ -162,7 +206,8 @@
 			<arg value="${scripts.proj.dir}/hbmstringlength.pl" />
 			<arg value="${model.proj.dir}/biobank2.uml" />
 			<arg value="${cacore.sdk.dir}/output/biobank2/src/edu/ualberta/med/biobank/model" />
-			<arg value="0" /> <!--Verbose-->
+			<arg value="0" />
+			<!--Verbose-->
 		</exec>
 	</target>
 

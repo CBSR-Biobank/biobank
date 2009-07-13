@@ -10,10 +10,11 @@ public class Perspective implements IPerspectiveFactory {
 		// .getEditorArea());
 		// layout.getViewLayout(SessionsView.ID).setCloseable(false);
 		// layout.setEditorAreaVisible(false);
-		//
+
 		// layout.addView(SearchView.ID, IPageLayout.TOP, ratio, refId)
 		// IFolderLayout top = layout.createFolder("top", IPageLayout.TOP, 026f,
 		// layout.getEditorArea());
 		// top.addView();
+
 	}
 }

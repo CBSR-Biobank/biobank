@@ -1,4 +1,3 @@
-
 package edu.ualberta.med.biobank;
 
 import java.net.URL;
@@ -7,6 +6,7 @@ import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -31,7 +31,8 @@ public class BioBankPlugin extends AbstractUIPlugin {
 
     public static final String IMG_FORM_BG = "formBg";
 
-    public static final String BARCODES_FILE = BioBankPlugin.class.getPackage().getName()
+    public static final String BARCODES_FILE = BioBankPlugin.class.getPackage()
+        .getName()
         + ".barcode";
 
     static Logger log4j = Logger.getLogger(BioBankPlugin.class.getName());
@@ -78,8 +79,8 @@ public class BioBankPlugin extends AbstractUIPlugin {
                 ImageDescriptor desc = ImageDescriptor.createFromURL(url);
                 registry.put(key, desc);
             }
+        } catch (Exception e) {
         }
-        catch (Exception e) {}
     }
 
     /*
@@ -110,8 +111,7 @@ public class BioBankPlugin extends AbstractUIPlugin {
      * Returns an image descriptor for the image file at the given plug-in
      * relative path
      * 
-     * @param path
-     *            the path
+     * @param path the path
      * @return the image descriptor
      */
     public static ImageDescriptor getImageDescriptor(String path) {
@@ -122,18 +122,16 @@ public class BioBankPlugin extends AbstractUIPlugin {
      * Display an information message
      */
     public static void openMessage(String title, String message) {
-        MessageDialog.openInformation(
-            PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
-            title, message);
+        MessageDialog.openInformation(PlatformUI.getWorkbench()
+            .getActiveWorkbenchWindow().getShell(), title, message);
     }
 
     /**
      * Display an error message
      */
     public static void openError(String title, String message) {
-        MessageDialog.openError(
-            PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
-            title, message);
+        MessageDialog.openError(PlatformUI.getWorkbench()
+            .getActiveWorkbenchWindow().getShell(), title, message);
     }
 
     /**
@@ -142,9 +140,8 @@ public class BioBankPlugin extends AbstractUIPlugin {
     public static void openAsyncError(final String title, final String message) {
         Display.getDefault().asyncExec(new Runnable() {
             public void run() {
-                MessageDialog.openError(
-                    PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
-                    title, message);
+                MessageDialog.openError(PlatformUI.getWorkbench()
+                    .getActiveWorkbenchWindow().getShell(), title, message);
             }
         });
     }
@@ -200,4 +197,11 @@ public class BioBankPlugin extends AbstractUIPlugin {
         return store.getBoolean(PreferenceConstants.GENERAL_ASK_PRINT);
     }
 
+    public static boolean isRealScanEnabled() {
+        if (getDefault().isDebugging()) {
+            return Boolean.valueOf(Platform
+                .getDebugOption(BioBankPlugin.PLUGIN_ID + "/realScan"));
+        }
+        return false;
+    }
 }

@@ -7,7 +7,7 @@
 	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
-	<classpathentry exported="true" kind="lib" path="lib/acegi-security-1.0.4.jar" sourcepath="biobank2src.zip"/>
+	<classpathentry exported="true" kind="lib" path="lib/acegi-security-1.0.4.jar" sourcepath="/usr/scratch/degrisda/frameworks/acegi1.0.4"/>
 	<classpathentry exported="true" kind="lib" path="lib/antlr-2.7.6.jar" sourcepath="biobank2src.zip"/>
 	<classpathentry exported="true" kind="lib" path="lib/asm.jar" sourcepath="/home/loyola/proj/java/asm-1.5.3"/>
 	<classpathentry exported="true" kind="lib" path="lib/biobank2-beans.jar" sourcepath="lib/biobank2-beans.jar"/>
@@ -31,8 +31,9 @@
 	<classpathentry kind="lib" path="lib/sdk-grid-remoting.jar"/>
 	<classpathentry kind="lib" path="lib/sdk-security.jar"/>
 	<classpathentry kind="lib" path="lib/commons-lang-2.4.jar"/>
-	<classpathentry kind="lib" path="lib/gface_0.9.1.jar" sourcepath="C:/proj/java/biobank2/eclipse_ws/gface-src_0.9.1.zip"/>
+	<classpathentry kind="lib" path="lib/gface_0.9.1.jar"/>
 	<classpathentry kind="lib" path="lib/gluegen.jar"/>
 	<classpathentry kind="lib" path="lib/scanlib.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
+
