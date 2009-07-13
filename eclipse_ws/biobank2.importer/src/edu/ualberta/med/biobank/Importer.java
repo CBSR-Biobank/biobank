@@ -1,19 +1,6 @@
 
 package edu.ualberta.med.biobank;
 
-import edu.ualberta.med.biobank.model.Address;
-import edu.ualberta.med.biobank.model.Clinic;
-import edu.ualberta.med.biobank.model.Site;
-import edu.ualberta.med.biobank.model.Study;
-import gov.nih.nci.system.applicationservice.ApplicationException;
-import gov.nih.nci.system.applicationservice.WritableApplicationService;
-import gov.nih.nci.system.client.ApplicationServiceProvider;
-import gov.nih.nci.system.query.SDKQueryResult;
-import gov.nih.nci.system.query.example.DeleteExampleQuery;
-import gov.nih.nci.system.query.example.InsertExampleQuery;
-import gov.nih.nci.system.query.example.UpdateExampleQuery;
-
-import java.lang.reflect.Constructor;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
@@ -24,15 +11,20 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
+
+import edu.ualberta.med.biobank.model.Address;
+import edu.ualberta.med.biobank.model.Clinic;
+import edu.ualberta.med.biobank.model.Patient;
+import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.model.Study;
 
 // need to remove the password on MS Access side.
 
 public class Importer {
 
-    private static WritableApplicationService appService;
-
     private Connection con;
+
+    BioBank2Db bioBank2Db;
 
     private ArrayList<String> tables;
 
@@ -43,28 +35,29 @@ public class Importer {
     }
 
     Importer() {
+
+        bioBank2Db = new BioBank2Db();
+
         tables = new ArrayList<String>();
 
         try {
-            appService = (WritableApplicationService) ApplicationServiceProvider.getApplicationServiceFromUrl(
-                "http://localhost:8080/biobank2", "testuser", "test");
-
             Class.forName("sun.jdbc.odbc.JdbcOdbcDriver");
-
             con = getFileConnection();
 
             getTables();
             if (tables.size() == 0) throw new Exception();
             if (!tableExists("clinics")) throw new Exception();
             if (!tableExists("study_list")) throw new Exception();
+            if (!tableExists("patient")) throw new Exception();
 
-            deleteAll(Site.class);
+            bioBank2Db.deleteAll(Site.class);
 
-            cbrSite = createSite();
+            cbrSite = bioBank2Db.createSite();
 
-            importClinics();
             importStudies();
+            importClinics();
             importStudyClinicAssoc();
+            importPatients();
 
         }
         catch (Exception e) {
@@ -108,24 +101,30 @@ public class Importer {
         return false;
     }
 
-    private Site createSite() throws ApplicationException {
-        Site site = new Site();
-        site.setName("CBR");
-        Address address = new Address();
-        site.setAddress(address);
+    private void importStudies() throws Exception {
+        Study study;
 
-        SDKQueryResult res = appService.executeQuery(new InsertExampleQuery(
-            site));
-        site = (Site) res.getObjectResult();
+        bioBank2Db.deleteAll(Study.class);
+        System.out.println("importing studies ...");
 
-        return site;
+        Statement s = con.createStatement();
+        s.execute("select * from study_list");
+        ResultSet rs = s.getResultSet();
+        if (rs != null) {
+            while (rs.next()) {
+                study = new Study();
+                study.setName(rs.getString(2));
+                study.setNameShort(rs.getString(3));
+                study.setSite(cbrSite);
+                study = (Study) bioBank2Db.setObject(study);
+            }
+        }
     }
 
     private void importClinics() throws Exception {
         Clinic clinic;
-        SDKQueryResult res;
 
-        deleteAll(Clinic.class);
+        bioBank2Db.deleteAll(Clinic.class);
         System.out.println("importing clinics ...");
 
         Statement s = con.createStatement();
@@ -140,32 +139,26 @@ public class Importer {
 
                 Address address = new Address();
                 clinic.setAddress(address);
-
-                res = appService.executeQuery(new InsertExampleQuery(clinic));
-                clinic = (Clinic) res.getObjectResult();
+                clinic = (Clinic) bioBank2Db.setObject(clinic);
             }
         }
     }
 
-    private void importStudies() throws Exception {
-        Study study;
-        SDKQueryResult res;
+    private void importPatients() throws Exception {
+        Patient patient;
 
-        deleteAll(Study.class);
-        System.out.println("importing studies ...");
+        bioBank2Db.deleteAll(Patient.class);
+        System.out.println("importing patients ...");
 
         Statement s = con.createStatement();
-        s.execute("select * from study_list");
+        s.execute("select * from patient");
         ResultSet rs = s.getResultSet();
         if (rs != null) {
             while (rs.next()) {
-                study = new Study();
-                study.setName(rs.getString(2));
-                study.setNameShort(rs.getString(3));
-                study.setSite(cbrSite);
+                patient = new Patient();
+                patient.setNumber(rs.getString(1));
 
-                res = appService.executeQuery(new InsertExampleQuery(study));
-                study = (Study) res.getObjectResult();
+                patient = (Patient) bioBank2Db.setObject(patient);
             }
         }
     }
@@ -174,15 +167,14 @@ public class Importer {
         System.out.println("importing studies and clinic associations...");
 
         Collection<Clinic> clinicCollection;
-        SDKQueryResult res;
 
         Statement s = con.createStatement();
         s.execute("select study_list.study_name_short, clinics.clinic_site from clinics, study_list where study_list.study_nr=clinics.study_nr");
         ResultSet rs = s.getResultSet();
         if (rs != null) {
             while (rs.next()) {
-                Study study = localGetStudy(rs.getString(1));
-                Clinic clinic = localGetClinic(rs.getString(2));
+                Study study = bioBank2Db.getStudy(rs.getString(1));
+                Clinic clinic = bioBank2Db.getClinic(rs.getString(2));
                 clinicCollection = study.getClinicCollection();
 
                 if (clinicCollection == null) {
@@ -190,11 +182,8 @@ public class Importer {
                 }
 
                 clinicCollection.add(clinic);
-
                 study.setClinicCollection(clinicCollection);
-
-                res = appService.executeQuery(new UpdateExampleQuery(study));
-                study = (Study) res.getObjectResult();
+                study = bioBank2Db.setStudy(study);
             }
         }
     }
@@ -209,32 +198,5 @@ public class Importer {
             result[i - 1] = rs.getString(i);
         }
         return result;
-    }
-
-    private void deleteAll(Class<?> classType) throws Exception {
-        Constructor<?> constructor = classType.getConstructor();
-        Object instance = constructor.newInstance();
-        List<?> list = appService.search(classType, instance);
-        for (Object o : list) {
-            appService.executeQuery(new DeleteExampleQuery(o));
-        }
-    }
-
-    private Clinic localGetClinic(String name) throws Exception {
-        Clinic clinic = new Clinic();
-        clinic.setName(name);
-
-        List<Clinic> list = appService.search(Clinic.class, clinic);
-        if (list.size() == 0) throw new Exception();
-        return list.get(0);
-    }
-
-    private Study localGetStudy(String shortName) throws Exception {
-        Study study = new Study();
-        study.setNameShort(shortName);
-
-        List<Study> list = appService.search(Study.class, study);
-        if (list.size() == 0) throw new Exception();
-        return list.get(0);
     }
 }
