@@ -36,6 +36,7 @@ values("biobank2","biobank2","biobank2",1,sysdate());
 insert into csm_user (LOGIN_NAME,FIRST_NAME,LAST_NAME,PASSWORD,UPDATE_DATE) values 
 ("bbadmin","Biobank Administrator","NoName","7Bg9siN5e7M=",sysdate()),
 ("testuser","TestUser","NoName","orDBlaojDQE=",sysdate());
+("testuser","TestUser","NoName","",sysdate());
 
 -- set bbadmin (user_id = 2) as biobank user
 insert into csm_user_pe(PROTECTION_ELEMENT_ID,USER_ID)
@@ -126,6 +127,7 @@ VALUES("DELETE","This privilege permits a user to delete a logical entity. This 
 INSERT INTO csm_privilege (privilege_name, privilege_description, update_date)
 VALUES("EXECUTE","This privilege allows a user to execute a particular resource. The resource can be a method, function, behavior of the application, URL, button etc", sysdate());
 
+<<<<<<< HEAD:security/DataPrimingMySQL.sql
 -- associate privileges to role 
 insert into csm_role_privilege(ROLE_ID, PRIVILEGE_ID) values
 (1, 1),
@@ -136,6 +138,8 @@ insert into csm_role_privilege(ROLE_ID, PRIVILEGE_ID) values
 (1, 6),
 (1, 7);
 
+=======
+>>>>>>> c1a61da0a61c97acf290307a414054d5f863f41c:security/DataPrimingMySQL.sql
 set foreign_key_checks=1;
 
 COMMIT;
