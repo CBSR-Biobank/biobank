@@ -41,7 +41,7 @@ public class PvInfoWidget extends BiobankWidget {
         label = pvInfoPossible.getLabel();
         type = pvInfoPossible.getPvInfoType().getType();
         hasListValues = type.equals("select_single")
-            || type.equals("select_single_and_quantity")
+            || type.startsWith("select_single_and_quantity")
             || type.equals("select_multiple");
         if (hasListValues) {
 
@@ -87,10 +87,10 @@ public class PvInfoWidget extends BiobankWidget {
                         prompt = "Please enter a new volume:";
                         helpText = "To enter multiple volumes, separate with semicolon.";
                     }
-                    else if (label.equals("Visit")) {
-                        title = "Visit Values";
+                    else if (label.equals("Visit Type")) {
+                        title = "Visit Type Values";
                         prompt = "Please enter a visit type:";
-                        helpText = "To enter multiple visit values, separate with semicolon.";
+                        helpText = "To enter multiple visit type values, separate with semicolon.";
                     }
                     else if (label.equals("Consent")) {
                         title = "Consent Types";
@@ -153,7 +153,7 @@ public class PvInfoWidget extends BiobankWidget {
 
             list = new List(comp, SWT.BORDER | SWT.V_SCROLL);
             list.setLayoutData(new GridData(GridData.FILL_BOTH));
-            if (value.length() > 0) {
+            if ((value != null) && (value.length() > 0)) {
                 for (String item : value.split(";")) {
                     list.add(item);
                 }

@@ -1,3 +1,4 @@
+
 package edu.ualberta.med.biobank;
 
 import edu.ualberta.med.biobank.model.Address;
@@ -36,6 +37,7 @@ public class InitExamples {
 
     private Site site;
     private Study study;
+    private Clinic [] clinics;
 
     private StorageType paletteType;
     private StorageType hotel19Type;
@@ -61,6 +63,7 @@ public class InitExamples {
         appService = (WritableApplicationService) ApplicationServiceProvider
             .getApplicationServiceFromUrl("http://localhost:8080/biobank2",
                 "testuser", "test");
+
         init.deletedAll(Site.class);
         init.deletedAll(Clinic.class);
         init.deletedAll(Study.class);
@@ -72,6 +75,7 @@ public class InitExamples {
         init.insertSite();
 
         init.insertStudyInSite();
+        init.insertClinicsInSite();
         init.insertPatientInStudy();
         init.insertPatientVisitInPatient();
         init.insertSampleInPatientVisit();
@@ -81,6 +85,10 @@ public class InitExamples {
         init.insertStorageContainers();
 
         System.out.println("Init done.");
+    }
+
+    InitExamples() {
+        clinics = new Clinic [2];
     }
 
     private void insertSampleInPatientVisit() throws ApplicationException {
@@ -103,8 +111,9 @@ public class InitExamples {
 
         SimpleDateFormat df = new SimpleDateFormat(BioBankPlugin.DATE_FORMAT);
         try {
-            patientVisit.setDateDrawn(df.parse("2009-01-01"));
-        } catch (ParseException e1) {
+            patientVisit.setDateDrawn(df.parse("2009-01-01 00:00"));
+        }
+        catch (ParseException e1) {
             e1.printStackTrace();
         }
 
@@ -133,6 +142,24 @@ public class InitExamples {
         study = (Study) res.getObjectResult();
     }
 
+    private void insertClinicsInSite() throws ApplicationException {
+        int count = 1;
+        for (Clinic clinic : clinics) {
+            clinic = new Clinic();
+            clinic.setName("Clinic " + count);
+            clinic.setSite(site);
+
+            Address address = new Address();
+            address.setCity("Edmonton");
+            clinic.setAddress(address);
+
+            SDKQueryResult res = appService.executeQuery(new InsertExampleQuery(
+                clinic));
+            clinic = (Clinic) res.getObjectResult();
+            ++count;
+        }
+    }
+
     private void deletedAll(Class<?> classType) throws Exception {
         Constructor<?> constructor = classType.getConstructor();
         Object instance = constructor.newInstance();
@@ -155,17 +182,17 @@ public class InitExamples {
 
     private void insertStorageTypesInSite() throws ApplicationException {
         paletteType = insertStorageTypeInSite("Palette", 8, 12, null);
-        hotel13Type = insertStorageTypeInSite("Hotel-13", 13, 1, Arrays
-            .asList(new StorageType[] { paletteType }));
-        hotel19Type = insertStorageTypeInSite("Hotel-19", 19, 1, Arrays
-            .asList(new StorageType[] { paletteType }));
-        freezerType = insertStorageTypeInSite("Freezer", 5, 6, Arrays
-            .asList(new StorageType[] { hotel13Type, hotel19Type }));
+        hotel13Type = insertStorageTypeInSite("Hotel-13", 13, 1,
+            Arrays.asList(new StorageType [] { paletteType }));
+        hotel19Type = insertStorageTypeInSite("Hotel-19", 19, 1,
+            Arrays.asList(new StorageType [] { paletteType }));
+        freezerType = insertStorageTypeInSite("Freezer", 5, 6,
+            Arrays.asList(new StorageType [] { hotel13Type, hotel19Type }));
         binType = insertStorageTypeInSite("Bin", 4, 26, null);
-        drawerType = insertStorageTypeInSite("Drawer", 6, 6, Arrays
-            .asList(new StorageType[] { binType }));
-        insertStorageTypeInSite("Cabinet", 4, 1, Arrays
-            .asList(new StorageType[] { drawerType }));
+        drawerType = insertStorageTypeInSite("Drawer", 6, 6,
+            Arrays.asList(new StorageType [] { binType }));
+        insertStorageTypeInSite("Cabinet", 4, 1,
+            Arrays.asList(new StorageType [] { drawerType }));
     }
 
     private StorageType insertStorageTypeInSite(String name, int dim1,
@@ -180,12 +207,9 @@ public class InitExamples {
         st.setDimensionOneLabel("dim1");
         st.setDimensionTwoLabel("dim2");
         if (children != null) {
-            st
-                .setChildStorageTypeCollection(new HashSet<StorageType>(
-                    children));
+            st.setChildStorageTypeCollection(new HashSet<StorageType>(children));
         }
-        SDKQueryResult res = appService
-            .executeQuery(new InsertExampleQuery(st));
+        SDKQueryResult res = appService.executeQuery(new InsertExampleQuery(st));
         return (StorageType) res.getObjectResult();
     }
 
@@ -205,8 +229,7 @@ public class InitExamples {
             cp.setPositionDimensionTwo(pos2);
         }
         sc.setLocatedAtPosition(cp);
-        SDKQueryResult res = appService
-            .executeQuery(new InsertExampleQuery(sc));
+        SDKQueryResult res = appService.executeQuery(new InsertExampleQuery(sc));
         return (StorageContainer) res.getObjectResult();
     }
 

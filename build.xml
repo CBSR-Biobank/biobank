@@ -129,7 +129,7 @@
 			</fileset>
 		</copy>
 		<copy file="${cacore.sdk.dir}/output/biobank2/src/hibernate.cfg.xml"
-		      tofile="${eclipse.proj.dir}/lib" />
+		      tofile="${eclipse.proj.dir}/lib/" />
 
 		<copy todir="${eclipse.proj.dir.junit}/lib">
 			<fileset dir="${cacore.sdk.dir}/output/biobank2/package/remote-client/lib" />

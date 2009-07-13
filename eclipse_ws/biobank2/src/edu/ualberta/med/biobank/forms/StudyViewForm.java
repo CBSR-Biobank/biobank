@@ -85,7 +85,7 @@ public class StudyViewForm extends BiobankViewForm {
             "Short Name");
         activityStatusLabel = (Label) createWidget(client, Label.class,
             SWT.NONE, "Activity Status");
-        commentLabel = (Label) createWidget(client, Label.class, SWT.NONE,
+        commentLabel = (Label) createWidget(client, Label.class, SWT.WRAP,
             "Comments");
 
         setStudySectionValues();

@@ -26,8 +26,8 @@ INSERT INTO `PV_INFO_POSSIBLE` VALUES
        ( 3,'Date Received',b'0',3),
        ( 4,'Date Processed',b'0',3),
        ( 5,'Aliquot Volume',b'0',4),
-       ( 6,'Blood Received',b'0',5),
-       ( 7,'Consent',b'0',6),
+       ( 6,'Blood Received',b'0',6),
+       ( 7,'Consent',b'0',5),
        ( 8,'PBMC Count',b'0',1),
        ( 9,'Biopsy Length',b'0',1),
        -- comments should be last
