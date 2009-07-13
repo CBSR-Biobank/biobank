@@ -20,75 +20,80 @@ import edu.ualberta.med.biobank.model.StorageType;
 
 public class StorageTypeGroup extends Node {
 
-	public StorageTypeGroup(SiteAdapter parent, int id) {
-		super(parent, id, "Storage Types", true);
-	}
+    public StorageTypeGroup(SiteAdapter parent, int id) {
+        super(parent, id, "Storage Types", true);
+    }
 
-	@Override
-	public void performDoubleClick() {
-		performExpand();
-	}
+    @Override
+    public void performDoubleClick() {
+        performExpand();
+    }
 
-	@Override
-	public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-		MenuItem mi = new MenuItem(menu, SWT.PUSH);
-		mi.setText("Add Storage Type");
-		mi.addSelectionListener(new SelectionListener() {
-			public void widgetSelected(SelectionEvent event) {
-				StorageTypeAdapter adapter = new StorageTypeAdapter(
-					StorageTypeGroup.this, new StorageType());
-				openForm(new FormInput(adapter), StorageTypeEntryForm.ID);
-			}
+    @Override
+    public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
+        MenuItem mi = new MenuItem(menu, SWT.PUSH);
+        mi.setText("Add Storage Type");
+        mi.addSelectionListener(new SelectionListener() {
+            public void widgetSelected(SelectionEvent event) {
+                StorageTypeAdapter adapter = new StorageTypeAdapter(
+                    StorageTypeGroup.this, new StorageType());
+                openForm(new FormInput(adapter), StorageTypeEntryForm.ID);
+            }
 
-			public void widgetDefaultSelected(SelectionEvent e) {
-			}
-		});
-	}
+            public void widgetDefaultSelected(SelectionEvent e) {
+            }
+        });
+    }
 
-	@Override
-	public void loadChildren(boolean updateNode) {
-		Site currentSite = ((SiteAdapter) getParent()).getSite();
-		Assert.isNotNull(currentSite, "null site");
+    @Override
+    public void loadChildren(boolean updateNode) {
+        Site currentSite = ((SiteAdapter) getParent()).getSite();
+        Assert.isNotNull(currentSite, "null site");
 
-		try {
-			// read from database again
-			currentSite = (Site) ModelUtils.getObjectWithId(getAppService(),
-				Site.class, currentSite.getId());
-			((SiteAdapter) getParent()).setSite(currentSite);
+        try {
+            // read from database again
+            currentSite = (Site) ModelUtils.getObjectWithId(getAppService(),
+                Site.class, currentSite.getId());
+            ((SiteAdapter) getParent()).setSite(currentSite);
 
-			Collection<StorageType> storageTypes = currentSite
-				.getStorageTypeCollection();
-			SessionManager.getLogger().trace(
-				"updateStudies: Site " + currentSite.getName() + " has "
-						+ storageTypes.size() + " studies");
+            Collection<StorageType> storageTypes = currentSite
+                .getStorageTypeCollection();
+            SessionManager.getLogger().trace(
+                "updateStudies: Site " + currentSite.getName() + " has "
+                    + storageTypes.size() + " studies");
 
-			for (StorageType storageType : storageTypes) {
-				SessionManager.getLogger().trace(
-					"updateStudies: Storage Type " + storageType.getId() + ": "
-							+ storageType.getName());
+            for (StorageType storageType : storageTypes) {
+                SessionManager.getLogger().trace(
+                    "updateStudies: Storage Type " + storageType.getId() + ": "
+                        + storageType.getName());
 
-				StorageTypeAdapter node = (StorageTypeAdapter) getChild(storageType
-					.getId());
+                StorageTypeAdapter node = (StorageTypeAdapter) getChild(storageType
+                    .getId());
 
-				if (node == null) {
-					node = new StorageTypeAdapter(this, storageType);
-					addChild(node);
-				}
-				if (updateNode) {
-					SessionManager.getInstance().getTreeViewer().update(node,
-						null);
-				}
-			}
-		} catch (Exception e) {
-			SessionManager.getLogger().error(
-				"Error while loading storage type group children for site "
-						+ currentSite.getName(), e);
-		}
-	}
+                if (node == null) {
+                    node = new StorageTypeAdapter(this, storageType);
+                    addChild(node);
+                }
+                if (updateNode) {
+                    SessionManager.getInstance().getTreeViewer().update(node,
+                        null);
+                }
+            }
+        } catch (Exception e) {
+            SessionManager.getLogger().error(
+                "Error while loading storage type group children for site "
+                    + currentSite.getName(), e);
+        }
+    }
 
-	@Override
-	public Node accept(NodeSearchVisitor visitor) {
-		return visitor.visit(this);
-	}
+    @Override
+    public Node accept(NodeSearchVisitor visitor) {
+        return visitor.visit(this);
+    }
+
+    @Override
+    public String getTitle() {
+        return null;
+    }
 
 }

@@ -20,65 +20,70 @@ import edu.ualberta.med.biobank.model.Study;
 
 public class PatientGroup extends Node {
 
-	public PatientGroup(StudyAdapter parent, int id) {
-		super(parent, id, "Patients", true);
-	}
+    public PatientGroup(StudyAdapter parent, int id) {
+        super(parent, id, "Patients", true);
+    }
 
-	@Override
-	public void performDoubleClick() {
-		performExpand();
-	}
+    @Override
+    public void performDoubleClick() {
+        performExpand();
+    }
 
-	@Override
-	public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-		MenuItem mi = new MenuItem(menu, SWT.PUSH);
-		mi.setText("Add Patient");
-		mi.addSelectionListener(new SelectionListener() {
-			public void widgetSelected(SelectionEvent event) {
-				PatientAdapter adapter = new PatientAdapter(PatientGroup.this,
-					new Patient());
-				openForm(new FormInput(adapter), PatientEntryForm.ID);
-			}
+    @Override
+    public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
+        MenuItem mi = new MenuItem(menu, SWT.PUSH);
+        mi.setText("Add Patient");
+        mi.addSelectionListener(new SelectionListener() {
+            public void widgetSelected(SelectionEvent event) {
+                PatientAdapter adapter = new PatientAdapter(PatientGroup.this,
+                    new Patient());
+                openForm(new FormInput(adapter), PatientEntryForm.ID);
+            }
 
-			public void widgetDefaultSelected(SelectionEvent e) {
-			}
-		});
-	}
+            public void widgetDefaultSelected(SelectionEvent e) {
+            }
+        });
+    }
 
-	@Override
-	public void loadChildren(boolean updateNode) {
-		Study parentStudy = ((StudyAdapter) getParent()).getStudy();
-		Assert.isNotNull(parentStudy, "null study");
-		try {
-			// read from database again
-			parentStudy = (Study) ModelUtils.getObjectWithId(getAppService(),
-				Study.class, parentStudy.getId());
-			((StudyAdapter) getParent()).setStudy(parentStudy);
+    @Override
+    public void loadChildren(boolean updateNode) {
+        Study parentStudy = ((StudyAdapter) getParent()).getStudy();
+        Assert.isNotNull(parentStudy, "null study");
+        try {
+            // read from database again
+            parentStudy = (Study) ModelUtils.getObjectWithId(getAppService(),
+                Study.class, parentStudy.getId());
+            ((StudyAdapter) getParent()).setStudy(parentStudy);
 
-			Collection<Patient> patients = parentStudy.getPatientCollection();
+            Collection<Patient> patients = parentStudy.getPatientCollection();
 
-			for (Patient patient : patients) {
-				PatientAdapter node = (PatientAdapter) getChild(patient.getId());
+            for (Patient patient : patients) {
+                PatientAdapter node = (PatientAdapter) getChild(patient.getId());
 
-				if (node == null) {
-					node = new PatientAdapter(this, patient);
-					addChild(node);
-				}
-				if (updateNode) {
-					SessionManager.getInstance().getTreeViewer().update(node,
-						null);
-				}
-			}
+                if (node == null) {
+                    node = new PatientAdapter(this, patient);
+                    addChild(node);
+                }
+                if (updateNode) {
+                    SessionManager.getInstance().getTreeViewer().update(node,
+                        null);
+                }
+            }
 
-		} catch (Exception e) {
-			SessionManager.getLogger().error(
-				"Error while loading patient group children for study "
-						+ parentStudy.getName(), e);
-		}
-	}
+        } catch (Exception e) {
+            SessionManager.getLogger().error(
+                "Error while loading patient group children for study "
+                    + parentStudy.getName(), e);
+        }
+    }
 
-	@Override
-	public Node accept(NodeSearchVisitor visitor) {
-		return visitor.visit(this);
-	}
+    @Override
+    public Node accept(NodeSearchVisitor visitor) {
+        return visitor.visit(this);
+    }
+
+    @Override
+    public String getTitle() {
+        return null;
+    }
 }

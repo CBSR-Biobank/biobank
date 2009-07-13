@@ -11,51 +11,56 @@ import org.springframework.remoting.RemoteAccessException;
 
 public class SessionHelper implements Runnable {
 
-	private String serverUrl;
+    private String serverUrl;
 
-	private String userName;
+    private String userName;
 
-	private String password;
+    private String password;
 
-	private WritableApplicationService appService;
+    private WritableApplicationService appService;
 
-	private List<Site> sites;
+    private List<Site> sites;
 
-	public SessionHelper(String server, String userName, String password) {
-		this.serverUrl = "http://" + server + "/biobank2";
-		this.userName = userName;
-		this.password = password;
+    public SessionHelper(String server, String userName, String password) {
+        this.serverUrl = "http://" + server + "/biobank2";
+        this.userName = userName;
+        this.password = password;
 
-		appService = null;
-		sites = null;
-	}
+        appService = null;
+        sites = null;
+    }
 
-	public void run() {
-		try {
-			if (userName.length() == 0) {
-				appService = (WritableApplicationService) ApplicationServiceProvider
-						.getApplicationServiceFromUrl(serverUrl);
-			} else {
-				appService = (WritableApplicationService) ApplicationServiceProvider
-						.getApplicationServiceFromUrl(serverUrl, userName,
-								password);
-			}
+    public void run() {
+        try {
+            if (userName.length() == 0) {
+                if (BioBankPlugin.getDefault().isDebugging()) {
+                    appService = (WritableApplicationService) ApplicationServiceProvider
+                        .getApplicationServiceFromUrl(serverUrl, "testuser",
+                            "test");
+                } else {
+                    appService = (WritableApplicationService) ApplicationServiceProvider
+                        .getApplicationServiceFromUrl(serverUrl);
+                }
+            } else {
+                appService = (WritableApplicationService) ApplicationServiceProvider
+                    .getApplicationServiceFromUrl(serverUrl, userName, password);
+            }
 
-			Site site = new Site();
-			sites = appService.search(Site.class, site);
-		} catch (RemoteAccessException exp) {
-			BioBankPlugin.openRemoteConnectErrorMessage();
-		} catch (Exception exp) {
-			exp.printStackTrace();
-			BioBankPlugin.openAsyncError("Login Failed", exp.getMessage());
-		}
-	}
+            Site site = new Site();
+            sites = appService.search(Site.class, site);
+        } catch (RemoteAccessException exp) {
+            BioBankPlugin.openRemoteConnectErrorMessage();
+        } catch (Exception exp) {
+            exp.printStackTrace();
+            BioBankPlugin.openAsyncError("Login Failed", exp.getMessage());
+        }
+    }
 
-	public WritableApplicationService getAppService() {
-		return appService;
-	}
+    public WritableApplicationService getAppService() {
+        return appService;
+    }
 
-	public List<Site> getSites() {
-		return sites;
-	}
+    public List<Site> getSites() {
+        return sites;
+    }
 }

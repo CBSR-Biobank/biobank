@@ -1,4 +1,3 @@
-
 package edu.ualberta.med.biobank.widgets;
 
 import java.text.SimpleDateFormat;
@@ -32,8 +31,8 @@ public class DateTimeWidget extends BiobankWidget {
         SimpleDateFormat hourFormat = new SimpleDateFormat("HH");
         SimpleDateFormat minsFormat = new SimpleDateFormat("mm");
 
-        String hourStr = hourFormat.format(date);
-        String minStr = minsFormat.format(date);
+        String hourStr = date == null ? "" : hourFormat.format(date);
+        String minStr = date == null ? "" : minsFormat.format(date);
 
         GridLayout layout = new GridLayout(6, false);
         layout.horizontalSpacing = 5;
@@ -81,7 +80,8 @@ public class DateTimeWidget extends BiobankWidget {
                 | DatePickerStyle.HIDE_WHEN_NOT_IN_FOCUS);
         // datePicker.setLayout(new GridLayout());
         datePicker.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        datePicker.setDateFormat(new SimpleDateFormat(BioBankPlugin.DATE_FORMAT));
+        datePicker
+            .setDateFormat(new SimpleDateFormat(BioBankPlugin.DATE_FORMAT));
         datePicker.setDate(date);
         return datePicker;
     }
