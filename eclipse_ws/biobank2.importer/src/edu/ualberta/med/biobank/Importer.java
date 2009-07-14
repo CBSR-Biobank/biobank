@@ -21,7 +21,11 @@ import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
 
-// need to remove the password on MS Access side.
+/*
+ *  need to remove the password on MS Access side.
+ * a call to get a column from a result set can only be made once, otherwise the
+ * driver generates an exception.
+ */
 
 public class Importer {
 
@@ -54,15 +58,18 @@ public class Importer {
             if (!tableExists("patient")) throw new Exception();
             if (!tableExists("patient_visit")) throw new Exception();
 
+            // the order here matters
+            bioBank2Db.deleteAll(Patient.class);
+            bioBank2Db.deleteAll(Clinic.class);
+            bioBank2Db.deleteAll(Study.class);
             bioBank2Db.deleteAll(Site.class);
 
             cbrSite = bioBank2Db.createSite();
 
             importStudies();
             importClinics();
-            importStudyClinicAssoc();
             importPatients();
-            importPatientVisits();
+            // importPatientVisits();
 
         }
         catch (Exception e) {
@@ -109,7 +116,6 @@ public class Importer {
     private void importStudies() throws Exception {
         Study study;
 
-        bioBank2Db.deleteAll(Study.class);
         System.out.println("importing studies ...");
 
         Statement s = con.createStatement();
@@ -128,12 +134,12 @@ public class Importer {
 
     private void importClinics() throws Exception {
         Clinic clinic;
+        Collection<Clinic> clinicCollection;
 
-        bioBank2Db.deleteAll(Clinic.class);
         System.out.println("importing clinics ...");
 
         Statement s = con.createStatement();
-        s.execute("select * from clinics");
+        s.execute("select clinics.*, study_list.study_name_short from clinics, study_list where study_list.study_nr=clinics.study_nr");
         ResultSet rs = s.getResultSet();
         if (rs != null) {
             while (rs.next()) {
@@ -145,22 +151,9 @@ public class Importer {
                 Address address = new Address();
                 clinic.setAddress(address);
                 clinic = (Clinic) bioBank2Db.setObject(clinic);
-            }
-        }
-    }
 
-    private void importStudyClinicAssoc() throws Exception {
-        System.out.println("importing studies and clinic associations...");
-
-        Collection<Clinic> clinicCollection;
-
-        Statement s = con.createStatement();
-        s.execute("select study_list.study_name_short, clinics.clinic_site from clinics, study_list where study_list.study_nr=clinics.study_nr");
-        ResultSet rs = s.getResultSet();
-        if (rs != null) {
-            while (rs.next()) {
-                Study study = bioBank2Db.getStudy(rs.getString(1));
-                Clinic clinic = bioBank2Db.getClinic(rs.getString(2));
+                // assign clinic to study now
+                Study study = bioBank2Db.getStudy(rs.getString(5));
                 clinicCollection = study.getClinicCollection();
 
                 if (clinicCollection == null) {
@@ -176,18 +169,19 @@ public class Importer {
 
     private void importPatients() throws Exception {
         Patient patient;
-
-        bioBank2Db.deleteAll(Patient.class);
         System.out.println("importing patients ...");
 
         Statement s = con.createStatement();
-        s.execute("select * from patient");
+        s.execute("select patient.*, study_list.study_name_short from patient, study_list where study_list.study_nr=patient.study_nr");
         ResultSet rs = s.getResultSet();
         if (rs != null) {
             while (rs.next()) {
+                String patientNo = rs.getString(1);
+                System.out.println("importing patient number " + patientNo);
                 patient = new Patient();
-                patient.setNumber(rs.getString(1));
-
+                patient.setNumber(patientNo);
+                Study study = bioBank2Db.getStudy(rs.getString(5));
+                patient.setStudy(study);
                 patient = (Patient) bioBank2Db.setObject(patient);
             }
         }
@@ -198,7 +192,6 @@ public class Importer {
         PatientVisit pv;
         Date date;
 
-        bioBank2Db.deleteAll(Patient.class);
         System.out.println("importing patients ...");
 
         Statement s = con.createStatement();

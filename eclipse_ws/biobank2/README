@@ -1,7 +1,7 @@
 CSM UPT
-  URL: http://localhost:8080/
-  Login ID: biobank
-  Password: *****
+  URL: http://localhost:8080/upt
+  Login ID: bbadmin   
+  Password: bbadmin
   Application Name: biobank2
   
 TO REBUILD DATABASE:
