@@ -8,13 +8,16 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashSet;
 
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Patient;
+import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
 
@@ -49,6 +52,7 @@ public class Importer {
             if (!tableExists("clinics")) throw new Exception();
             if (!tableExists("study_list")) throw new Exception();
             if (!tableExists("patient")) throw new Exception();
+            if (!tableExists("patient_visit")) throw new Exception();
 
             bioBank2Db.deleteAll(Site.class);
 
@@ -58,6 +62,7 @@ public class Importer {
             importClinics();
             importStudyClinicAssoc();
             importPatients();
+            importPatientVisits();
 
         }
         catch (Exception e) {
@@ -144,25 +149,6 @@ public class Importer {
         }
     }
 
-    private void importPatients() throws Exception {
-        Patient patient;
-
-        bioBank2Db.deleteAll(Patient.class);
-        System.out.println("importing patients ...");
-
-        Statement s = con.createStatement();
-        s.execute("select * from patient");
-        ResultSet rs = s.getResultSet();
-        if (rs != null) {
-            while (rs.next()) {
-                patient = new Patient();
-                patient.setNumber(rs.getString(1));
-
-                patient = (Patient) bioBank2Db.setObject(patient);
-            }
-        }
-    }
-
     private void importStudyClinicAssoc() throws Exception {
         System.out.println("importing studies and clinic associations...");
 
@@ -184,6 +170,46 @@ public class Importer {
                 clinicCollection.add(clinic);
                 study.setClinicCollection(clinicCollection);
                 study = bioBank2Db.setStudy(study);
+            }
+        }
+    }
+
+    private void importPatients() throws Exception {
+        Patient patient;
+
+        bioBank2Db.deleteAll(Patient.class);
+        System.out.println("importing patients ...");
+
+        Statement s = con.createStatement();
+        s.execute("select * from patient");
+        ResultSet rs = s.getResultSet();
+        if (rs != null) {
+            while (rs.next()) {
+                patient = new Patient();
+                patient.setNumber(rs.getString(1));
+
+                patient = (Patient) bioBank2Db.setObject(patient);
+            }
+        }
+    }
+
+    private void importPatientVisits() throws Exception {
+        SimpleDateFormat dateFmt = new SimpleDateFormat("yyyy-MM-dd hh:mm aa");
+        PatientVisit pv;
+        Date date;
+
+        bioBank2Db.deleteAll(Patient.class);
+        System.out.println("importing patients ...");
+
+        Statement s = con.createStatement();
+        s.execute("select * from patient_visit");
+        ResultSet rs = s.getResultSet();
+        if (rs != null) {
+            while (rs.next()) {
+                pv = new PatientVisit();
+                date = dateFmt.parse(rs.getString(1));
+                pv.setDateDrawn(date);
+                pv = (PatientVisit) bioBank2Db.setObject(pv);
             }
         }
     }
