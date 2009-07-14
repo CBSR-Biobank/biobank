@@ -1,4 +1,3 @@
-
 package edu.ualberta.med.biobank;
 
 import java.util.HashMap;
@@ -33,7 +32,8 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 public class SessionManager {
     private static SessionManager instance = null;
 
-    private static Logger log4j = Logger.getLogger(SessionManager.class.getName());
+    private static Logger log4j = Logger.getLogger(SessionManager.class
+        .getName());
 
     private SessionsView view;
 
@@ -43,7 +43,7 @@ public class SessionManager {
 
     public boolean inactiveTimeout = false;
 
-    final int TIME_OUT = 3000;
+    final int TIME_OUT = 300000;
 
     public Node getRootNode() {
         return rootNode;
@@ -53,9 +53,11 @@ public class SessionManager {
         public void doubleClick(DoubleClickEvent event) {
             Object selection = event.getSelection();
 
-            if (selection == null) return;
+            if (selection == null)
+                return;
 
-            Object element = ((StructuredSelection) selection).getFirstElement();
+            Object element = ((StructuredSelection) selection)
+                .getFirstElement();
             ((Node) element).performDoubleClick();
             view.getTreeViewer().expandToLevel(element, 1);
         }
@@ -67,7 +69,8 @@ public class SessionManager {
 
     private ITreeViewerListener treeViewerListener = new ITreeViewerListener() {
         @Override
-        public void treeCollapsed(TreeExpansionEvent e) {}
+        public void treeCollapsed(TreeExpansionEvent e) {
+        }
 
         @Override
         public void treeExpanded(TreeExpansionEvent e) {
@@ -89,7 +92,8 @@ public class SessionManager {
                 menuItem.dispose();
             }
 
-            Object element = ((StructuredSelection) tv.getSelection()).getFirstElement();
+            Object element = ((StructuredSelection) tv.getSelection())
+                .getFirstElement();
             if (element != null) {
                 ((Node) element).popupMenu(tv, tree, menu);
             }
@@ -143,7 +147,8 @@ public class SessionManager {
         final Runnable runnable = new Runnable() {
             public void run() {
                 inactiveTimeout = true;
-                System.out.println("Idle for " + (TIME_OUT / 1000) + " seconds");
+                System.out
+                    .println("Idle for " + (TIME_OUT / 1000) + " seconds");
 
                 BioBankPlugin.openMessage("Inactive Timeout",
                     "The application has been inactive for "
@@ -156,7 +161,8 @@ public class SessionManager {
             }
         };
 
-        final Display display = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell().getDisplay();
+        final Display display = PlatformUI.getWorkbench()
+            .getActiveWorkbenchWindow().getShell().getDisplay();
 
         // this listener will be called when the events listed below happen
         Listener idleListener = new Listener() {
@@ -166,8 +172,8 @@ public class SessionManager {
                 }
             }
         };
-        int [] events = {
-            SWT.KeyDown, SWT.KeyUp, SWT.MouseDown, SWT.MouseMove, SWT.MouseUp };
+        int[] events = { SWT.KeyDown, SWT.KeyUp, SWT.MouseDown, SWT.MouseMove,
+            SWT.MouseUp };
         for (int event : events) {
             display.addFilter(event, idleListener);
         }
@@ -190,9 +196,9 @@ public class SessionManager {
         return rootNode.getChildren().size();
     }
 
-    public String [] getSessionNames() {
+    public String[] getSessionNames() {
         return sessionsByName.keySet().toArray(
-            new String [sessionsByName.size()]);
+            new String[sessionsByName.size()]);
     }
 
     public SessionAdapter getSessionSingle() {
