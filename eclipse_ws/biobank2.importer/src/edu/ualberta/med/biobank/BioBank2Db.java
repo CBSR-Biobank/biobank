@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank;
 
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Clinic;
+import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.PvInfoPossible;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
@@ -72,6 +73,15 @@ public class BioBank2Db {
         clinic.setName(name);
 
         List<Clinic> list = appService.search(Clinic.class, clinic);
+        if (list.size() != 1) throw new Exception();
+        return list.get(0);
+    }
+
+    public Patient getPatient(String number) throws Exception {
+        Patient patient = new Patient();
+        patient.setNumber(number);
+
+        List<Patient> list = appService.search(Patient.class, patient);
         if (list.size() != 1) throw new Exception();
         return list.get(0);
     }

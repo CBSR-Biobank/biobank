@@ -5,6 +5,8 @@ import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.PatientVisit;
+import edu.ualberta.med.biobank.model.PvInfo;
+import edu.ualberta.med.biobank.model.PvInfoData;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -49,15 +51,14 @@ public class Importer {
 
         try {
             appService = (WritableApplicationService) ApplicationServiceProvider.getApplicationServiceFromUrl(
-                // "http://localhost:8080/biobank2", "testuser", "test");
-                "http://aicml-med.cs.ualberta.ca:8080/biobank2", "testuser",
-                "test");
+                "http://localhost:8080/biobank2", "testuser", "test");
+            // "http://aicml-med.cs.ualberta.ca:8080/biobank2", "testuser",
+            // "test");
 
             bioBank2Db = BioBank2Db.getInstance();
             bioBank2Db.setAppService(appService);
 
-            Class.forName("sun.jdbc.odbc.JdbcOdbcDriver");
-            con = getFileConnection();
+            con = getMysqlConnection();
 
             getTables();
             if (tables.size() == 0) throw new Exception();
@@ -77,7 +78,7 @@ public class Importer {
             importStudies();
             importClinics();
             importPatients();
-            // importPatientVisits();
+            importPatientVisits();
 
         }
         catch (Exception e) {
@@ -86,16 +87,25 @@ public class Importer {
     }
 
     @SuppressWarnings("unused")
-    private Connection getDsnConnection() throws SQLException {
+    private Connection getDsnConnection() throws Exception {
+        Class.forName("sun.jdbc.odbc.JdbcOdbcDriver");
         String dbUrl = "jdbc:odbc:bbp_db";
         return DriverManager.getConnection(dbUrl, "", "");
     }
 
-    private Connection getFileConnection() throws SQLException {
+    @SuppressWarnings("unused")
+    private Connection getFileConnection() throws Exception {
+        Class.forName("sun.jdbc.odbc.JdbcOdbcDriver");
         String filename = "bbp_db.mdb";
         String database = "jdbc:odbc:Driver={Microsoft Access Driver (*.mdb)};DBQ=";
         database += filename.trim() + ";DriverID=22;READONLY=true}";
         return DriverManager.getConnection(database, "", "");
+    }
+
+    private Connection getMysqlConnection() throws Exception {
+        // Class.forName("com.mysql.jdbc.Driver");
+        return DriverManager.getConnection("jdbc:mysql://localhost:3306/bbpdb",
+            "dummy", "ozzy498");
     }
 
     private void getTables() throws SQLException {
@@ -137,6 +147,9 @@ public class Importer {
                 study.setSite(cbrSite);
                 study = (Study) bioBank2Db.setObject(study);
 
+                System.out.println("importing study " + study.getNameShort()
+                    + " ...");
+
                 if (study.getNameShort().equals("KDCS")) {
                     StudyPvInfo.assignKdcsInfo(study);
                 }
@@ -166,7 +179,8 @@ public class Importer {
         System.out.println("importing clinics ...");
 
         Statement s = con.createStatement();
-        s.execute("select clinics.*, study_list.study_name_short from clinics, study_list where study_list.study_nr=clinics.study_nr");
+        s.execute("select clinics.*, study_list.study_name_short "
+            + "from clinics, study_list where clinics.study_nr=study_list.study_nr");
         ResultSet rs = s.getResultSet();
         if (rs != null) {
             while (rs.next()) {
@@ -199,11 +213,13 @@ public class Importer {
         System.out.println("importing patients ...");
 
         Statement s = con.createStatement();
-        s.execute("select patient.*, study_list.study_name_short from patient, study_list where study_list.study_nr=patient.study_nr");
+        s.execute("select patient.*, study_list.study_name_short "
+            + "from patient, study_list where patient.study_nr=study_list.study_nr");
         ResultSet rs = s.getResultSet();
         if (rs != null) {
             while (rs.next()) {
-                Study study = bioBank2Db.getStudy(rs.getString(5));
+                String studyName = rs.getString(5);
+                Study study = bioBank2Db.getStudy(studyName);
                 String patientNo = rs.getString(1);
                 System.out.println("importing patient number " + patientNo);
                 patient = new Patient();
@@ -216,20 +232,56 @@ public class Importer {
     }
 
     private void importPatientVisits() throws Exception {
-        SimpleDateFormat dateFmt = new SimpleDateFormat("yyyy-MM-dd hh:mm aa");
-        PatientVisit pv;
+        SimpleDateFormat biobank2DateFmt = new SimpleDateFormat(
+            "yyyy-MM-dd HH:mm");
+        SimpleDateFormat bbpdbDateFmt = new SimpleDateFormat(
+            "yyyy-MM-dd hh:mm:ss aa");
+        Study study;
         Date date;
+        PatientVisit pv;
+        PvInfoData pvInfoData;
 
-        System.out.println("importing patients ...");
+        System.out.println("importing patient visits ...");
 
         Statement s = con.createStatement();
-        s.execute("select * from patient_visit");
+        s.execute("select patient_visit.*, study_list.study_name_short "
+            + "from patient_visit, study_list where patient_visit.study_nr=study_list.study_nr");
         ResultSet rs = s.getResultSet();
         if (rs != null) {
             while (rs.next()) {
+                Patient patient = bioBank2Db.getPatient(rs.getString(2));
+
                 pv = new PatientVisit();
-                date = dateFmt.parse(rs.getString(1));
+                date = bbpdbDateFmt.parse(rs.getString(5));
                 pv.setDateDrawn(date);
+                pv.setPatient(patient);
+                pv = (PatientVisit) bioBank2Db.setObject(pv);
+
+                study = bioBank2Db.getStudy(rs.getString(20));
+
+                // make sure the study is correct
+                if (patient.getStudy().getNameShort().equals(
+                    study.getNameShort())) throw new Exception();
+
+                HashSet<PvInfoData> pvInfoDataSet = new HashSet<PvInfoData>();
+
+                // now set corresponding patient visit info data
+                for (PvInfo pvInfo : study.getPvInfoCollection()) {
+                    pvInfoData = new PvInfoData();
+                    pvInfoData.setPvInfo(pvInfo);
+
+                    if (pvInfo.getLabel().equals("Date Received")) {
+                        date = bbpdbDateFmt.parse(rs.getString(6));
+                        pvInfoData.setValue(biobank2DateFmt.format(date));
+                    }
+                    else if (pvInfo.getLabel().equals("Aliquot Volume")) {
+                        pvInfoData.setValue(rs.getString(6));
+                    }
+
+                    pvInfoDataSet.add((PvInfoData) bioBank2Db.setObject(pvInfoData));
+                }
+
+                pv.setPvInfoDataCollection(pvInfoDataSet);
                 pv = (PatientVisit) bioBank2Db.setObject(pv);
             }
         }
