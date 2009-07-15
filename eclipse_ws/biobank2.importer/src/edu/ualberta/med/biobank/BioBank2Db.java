@@ -3,11 +3,11 @@ package edu.ualberta.med.biobank;
 
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Clinic;
+import edu.ualberta.med.biobank.model.PvInfoPossible;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
-import gov.nih.nci.system.client.ApplicationServiceProvider;
 import gov.nih.nci.system.query.SDKQuery;
 import gov.nih.nci.system.query.SDKQueryResult;
 import gov.nih.nci.system.query.example.DeleteExampleQuery;
@@ -19,16 +19,21 @@ import java.util.List;
 
 public class BioBank2Db {
 
-    private static WritableApplicationService appService;
+    private static WritableApplicationService appService = null;
 
-    BioBank2Db() {
-        try {
-            appService = (WritableApplicationService) ApplicationServiceProvider.getApplicationServiceFromUrl(
-                "http://localhost:8080/biobank2", "testuser", "test");
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
+    private static BioBank2Db instance = null;
+
+    private BioBank2Db() {}
+
+    public static BioBank2Db getInstance() {
+        if (instance != null) return instance;
+
+        instance = new BioBank2Db();
+        return instance;
+    }
+
+    public void setAppService(WritableApplicationService a) {
+        appService = a;
     }
 
     public void deleteAll(Class<?> classType) throws Exception {
@@ -58,23 +63,8 @@ public class BioBank2Db {
         study.setNameShort(shortName);
 
         List<Study> list = appService.search(Study.class, study);
-        if (list.size() == 0) throw new Exception();
+        if (list.size() != 1) throw new Exception();
         return list.get(0);
-    }
-
-    public Study setStudy(Study study) throws ApplicationException {
-        SDKQuery qry;
-        SDKQueryResult res;
-        Integer id = study.getId();
-
-        if (id == null) {
-            qry = new InsertExampleQuery(study);
-        }
-        else {
-            qry = new UpdateExampleQuery(study);
-        }
-        res = appService.executeQuery(qry);
-        return (Study) res.getObjectResult();
     }
 
     public Clinic getClinic(String name) throws Exception {
@@ -82,7 +72,17 @@ public class BioBank2Db {
         clinic.setName(name);
 
         List<Clinic> list = appService.search(Clinic.class, clinic);
-        if (list.size() == 0) throw new Exception();
+        if (list.size() != 1) throw new Exception();
+        return list.get(0);
+    }
+
+    public PvInfoPossible getPvInfoPossible(String label) throws Exception {
+        PvInfoPossible pvInfoPossible = new PvInfoPossible();
+        pvInfoPossible.setLabel(label);
+
+        List<PvInfoPossible> list = appService.search(PvInfoPossible.class,
+            pvInfoPossible);
+        if (list.size() != 1) throw new Exception();
         return list.get(0);
     }
 

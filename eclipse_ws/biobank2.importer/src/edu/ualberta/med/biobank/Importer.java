@@ -1,6 +1,15 @@
 
 package edu.ualberta.med.biobank;
 
+import edu.ualberta.med.biobank.model.Address;
+import edu.ualberta.med.biobank.model.Clinic;
+import edu.ualberta.med.biobank.model.Patient;
+import edu.ualberta.med.biobank.model.PatientVisit;
+import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.model.Study;
+import gov.nih.nci.system.applicationservice.WritableApplicationService;
+import gov.nih.nci.system.client.ApplicationServiceProvider;
+
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
@@ -14,13 +23,6 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 
-import edu.ualberta.med.biobank.model.Address;
-import edu.ualberta.med.biobank.model.Clinic;
-import edu.ualberta.med.biobank.model.Patient;
-import edu.ualberta.med.biobank.model.PatientVisit;
-import edu.ualberta.med.biobank.model.Site;
-import edu.ualberta.med.biobank.model.Study;
-
 /*
  *  need to remove the password on MS Access side.
  * a call to get a column from a result set can only be made once, otherwise the
@@ -28,10 +30,11 @@ import edu.ualberta.med.biobank.model.Study;
  */
 
 public class Importer {
+    private WritableApplicationService appService;
 
     private Connection con;
 
-    BioBank2Db bioBank2Db;
+    private BioBank2Db bioBank2Db;
 
     private ArrayList<String> tables;
 
@@ -42,12 +45,17 @@ public class Importer {
     }
 
     Importer() {
-
-        bioBank2Db = new BioBank2Db();
-
         tables = new ArrayList<String>();
 
         try {
+            appService = (WritableApplicationService) ApplicationServiceProvider.getApplicationServiceFromUrl(
+                // "http://localhost:8080/biobank2", "testuser", "test");
+                "http://aicml-med.cs.ualberta.ca:8080/biobank2", "testuser",
+                "test");
+
+            bioBank2Db = BioBank2Db.getInstance();
+            bioBank2Db.setAppService(appService);
+
             Class.forName("sun.jdbc.odbc.JdbcOdbcDriver");
             con = getFileConnection();
 
@@ -128,6 +136,25 @@ public class Importer {
                 study.setNameShort(rs.getString(3));
                 study.setSite(cbrSite);
                 study = (Study) bioBank2Db.setObject(study);
+
+                if (study.getNameShort().equals("KDCS")) {
+                    StudyPvInfo.assignKdcsInfo(study);
+                }
+                else if (study.getNameShort().equals("VAS")) {
+                    StudyPvInfo.assignVasInfo(study);
+                }
+                else if (study.getNameShort().equals("RVS")) {
+                    StudyPvInfo.assignRvsInfo(study);
+                }
+                else if (study.getNameShort().equals("NHS")) {
+                    StudyPvInfo.assignNhsInfo(study);
+                }
+                else if (study.getNameShort().equals("MPS")) {
+                    StudyPvInfo.assignMpsInfo(study);
+                }
+                else if (study.getNameShort().equals("BBP")) {
+                    StudyPvInfo.assignBbpPvInfo(study);
+                }
             }
         }
     }
@@ -162,7 +189,7 @@ public class Importer {
 
                 clinicCollection.add(clinic);
                 study.setClinicCollection(clinicCollection);
-                study = bioBank2Db.setStudy(study);
+                study = (Study) bioBank2Db.setObject(study);
             }
         }
     }
@@ -176,13 +203,14 @@ public class Importer {
         ResultSet rs = s.getResultSet();
         if (rs != null) {
             while (rs.next()) {
+                Study study = bioBank2Db.getStudy(rs.getString(5));
                 String patientNo = rs.getString(1);
                 System.out.println("importing patient number " + patientNo);
                 patient = new Patient();
                 patient.setNumber(patientNo);
-                Study study = bioBank2Db.getStudy(rs.getString(5));
                 patient.setStudy(study);
                 patient = (Patient) bioBank2Db.setObject(patient);
+                // Thread.sleep(150);
             }
         }
     }

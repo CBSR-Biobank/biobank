@@ -30,7 +30,8 @@ INSERT INTO `PV_INFO_POSSIBLE` VALUES
        ( 7,'Consent',b'0',5),
        ( 8,'PBMC Count',b'0',1),
        ( 9,'Biopsy Length',b'0',1),
+       (10,'Worksheet',b'0',2),
        -- comments should be last
-       (10,'Comments',b'0',2);
+       (11,'Comments',b'0',2);
 UNLOCK TABLES;
 

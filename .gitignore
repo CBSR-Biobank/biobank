@@ -14,5 +14,5 @@ eclipse_ws/biobank2/src/edu/ualberta/med/biobank/test
 runtime-biobank2.biobank2
 schema/schema-export.sql
 eclipse_ws/biobank2.tests/bin
-
+eclipse_ws/biobank2.importer/bin
 

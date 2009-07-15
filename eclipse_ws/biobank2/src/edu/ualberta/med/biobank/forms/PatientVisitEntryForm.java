@@ -1,4 +1,3 @@
-
 package edu.ualberta.med.biobank.forms;
 
 import java.text.ParseException;
@@ -104,8 +103,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
 
         if (patientVisit.getId() == null) {
             setPartName("New Patient Visit");
-        }
-        else {
+        } else {
             SimpleDateFormat sdf = new SimpleDateFormat(
                 BioBankPlugin.DATE_FORMAT);
             setPartName("Visit " + sdf.format(patientVisit.getDateDrawn()));
@@ -131,13 +129,14 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         toolkit.paintBordersFor(client);
 
         toolkit.createLabel(client, "Date Drawn:", SWT.NONE);
-        dateDrawn = new DateTimeWidget(client, SWT.BORDER,
-            patientVisit.getDateDrawn());
+        dateDrawn = new DateTimeWidget(client, SWT.BORDER, patientVisit
+            .getDateDrawn());
         dateDrawn.addSelectionListener(selectionListener);
         dateDrawn.addModifyListener(modifyListener);
         dateDrawn.adaptToToolkit(toolkit);
 
-        study = ((StudyAdapter) patientVisitAdapter.getParent().getParent().getParent()).getStudy();
+        study = ((StudyAdapter) patientVisitAdapter.getParent().getParent()
+            .getParent()).getStudy();
 
         for (PvInfo pvInfo : study.getPvInfoCollection()) {
             CombinedPvInfo combinedPvInfo = new CombinedPvInfo();
@@ -145,11 +144,13 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
             combinedPvInfoMap.put(pvInfo.getId(), combinedPvInfo);
         }
 
-        Collection<PvInfoData> pvDataCollection = patientVisit.getPvInfoDataCollection();
+        Collection<PvInfoData> pvDataCollection = patientVisit
+            .getPvInfoDataCollection();
         if (pvDataCollection != null) {
             for (PvInfoData pvInfoData : pvDataCollection) {
                 Integer key = pvInfoData.getPvInfo().getId();
-                CombinedPvInfo combinedPvInfo = (CombinedPvInfo) combinedPvInfoMap.get(key);
+                CombinedPvInfo combinedPvInfo = (CombinedPvInfo) combinedPvInfoMap
+                    .get(key);
                 Assert.isNotNull(combinedPvInfo);
                 combinedPvInfo.pvInfoData = pvInfoData;
             }
@@ -163,7 +164,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
             String possibleValues = combinedPvInfo.pvInfo.getPossibleValues();
             String value = null;
 
-            String [] pvalArr = null;
+            String[] pvalArr = null;
             if (possibleValues != null) {
                 pvalArr = possibleValues.split(";");
             }
@@ -178,67 +179,66 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
                 GridData.VERTICAL_ALIGN_BEGINNING));
 
             switch (typeId) {
-                case 1: // number
-                    combinedPvInfo.control = toolkit.createText(client, value,
-                        SWT.LEFT);
-                    break;
+            case 1: // number
+                combinedPvInfo.control = toolkit.createText(client, value,
+                    SWT.LEFT);
+                break;
 
-                case 2: // text
-                    combinedPvInfo.control = toolkit.createText(client, value,
-                        SWT.LEFT | SWT.MULTI);
-                    break;
+            case 2: // text
+                combinedPvInfo.control = toolkit.createText(client, value,
+                    SWT.LEFT | SWT.MULTI);
+                break;
 
-                case 3: // date_time
-                    SimpleDateFormat sdf = new SimpleDateFormat(
-                        BioBankPlugin.DATE_TIME_FORMAT);
+            case 3: // date_time
+                SimpleDateFormat sdf = new SimpleDateFormat(
+                    BioBankPlugin.DATE_TIME_FORMAT);
 
-                    Date date = new Date();
-                    if (value != null) {
-                        try {
-                            date = sdf.parse(value);
-                        }
-                        catch (ParseException e) {
-                            e.printStackTrace();
-                        }
+                Date date = new Date();
+                if (value != null) {
+                    try {
+                        date = sdf.parse(value);
+                    } catch (ParseException e) {
+                        e.printStackTrace();
                     }
-                    DateTimeWidget w = new DateTimeWidget(client, SWT.NONE,
-                        date);
-                    w.addSelectionListener(selectionListener);
-                    w.addModifyListener(modifyListener);
-                    w.adaptToToolkit(toolkit);
-                    combinedPvInfo.control = w;
-                    break;
+                }
+                DateTimeWidget w = new DateTimeWidget(client, SWT.NONE, date);
+                w.addSelectionListener(selectionListener);
+                w.addModifyListener(modifyListener);
+                w.adaptToToolkit(toolkit);
+                combinedPvInfo.control = w;
+                break;
 
-                case 4: // select_single
-                    combinedPvInfo.control = createComboSection(client,
-                        pvalArr, value);
-                    break;
+            case 4: // select_single
+                combinedPvInfo.control = createComboSection(client, pvalArr,
+                    value);
+                break;
 
-                case 5: // select_multiple
-                    SelectMultiple s = new SelectMultiple(client, SWT.BORDER,
-                        pvalArr);
-                    s.adaptToToolkit(toolkit);
-                    if (value != null) {
-                        s.setSelections(value.split(";"));
-                    }
-                    combinedPvInfo.control = s;
-                    break;
+            case 5: // select_multiple
+                SelectMultiple s = new SelectMultiple(client, SWT.BORDER,
+                    pvalArr);
+                s.adaptToToolkit(toolkit);
+                if (value != null) {
+                    s.setSelections(value.split(";"));
+                }
+                combinedPvInfo.control = s;
+                break;
 
-                case 6: // select_single_and_quantity_1_5_1
-                    ComboAndQuantity c = new ComboAndQuantity(client,
-                        SWT.BORDER);
-                    c.adaptToToolkit(toolkit);
+            case 6: // select_single_and_quantity_1_5_1
+                ComboAndQuantity c = new ComboAndQuantity(client, SWT.BORDER);
+                c.adaptToToolkit(toolkit);
+                if (pvalArr != null) {
                     c.addValues(pvalArr, 1, 5, 1);
-                    if (value != null) {
-                        String [] values = value.split(" ");
-                        Assert.isTrue(values.length == 2);
-                        c.setText(values[0], Integer.parseInt(values[1]));
-                    }
-                    combinedPvInfo.control = c;
-                    break;
+                }
+                if (value != null) {
+                    String[] values = value.split(" ");
+                    Assert.isTrue(values.length == 2);
+                    c.setText(values[0], Integer.parseInt(values[1]));
+                }
+                combinedPvInfo.control = c;
+                break;
 
-                default:
-                    Assert.isTrue(false, "Invalid pvInfo type: " + typeId);
+            default:
+                Assert.isTrue(false, "Invalid pvInfo type: " + typeId);
             }
 
             if (combinedPvInfo.control != null) {
@@ -253,12 +253,16 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         }
     }
 
-    private Control createComboSection(Composite client, String [] values,
+    private Control createComboSection(Composite client, String[] values,
         String selected) {
 
         Combo combo = new Combo(client, SWT.READ_ONLY);
         combo.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
-        combo.setItems(values);
+
+        if (values != null) {
+            combo.setItems(values);
+        }
+
         combo.addSelectionListener(selectionListener);
         combo.addModifyListener(modifyListener);
 
@@ -302,8 +306,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         if (status.getSeverity() == IStatus.OK) {
             form.setMessage(getOkMessage(), IMessageProvider.NONE);
             getConfirmButton().setEnabled(true);
-        }
-        else {
+        } else {
             form.setMessage(status.getMessage(), IMessageProvider.ERROR);
             getConfirmButton().setEnabled(false);
         }
@@ -319,14 +322,14 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         SDKQuery query;
         SDKQueryResult result;
 
-        PatientAdapter patientAdapter = (PatientAdapter) patientVisitAdapter.getParent();
+        PatientAdapter patientAdapter = (PatientAdapter) patientVisitAdapter
+            .getParent();
         patientVisit.setPatient(patientAdapter.getPatient());
         savePvInfoData();
 
         if ((patientVisit.getId() == null) || (patientVisit.getId() == 0)) {
             query = new InsertExampleQuery(patientVisit);
-        }
-        else {
+        } else {
             query = new UpdateExampleQuery(patientVisit);
         }
 
@@ -348,29 +351,28 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
 
             if (combinedPvInfo.control instanceof Text) {
                 value = ((Text) combinedPvInfo.control).getText();
-            }
-            else if (combinedPvInfo.control instanceof Combo) {
-                String [] options = combinedPvInfo.pvInfo.getPossibleValues().split(
-                    ";");
-                int index = ((Combo) combinedPvInfo.control).getSelectionIndex();
+            } else if (combinedPvInfo.control instanceof Combo) {
+                String[] options = combinedPvInfo.pvInfo.getPossibleValues()
+                    .split(";");
+                int index = ((Combo) combinedPvInfo.control)
+                    .getSelectionIndex();
                 if (index >= 0) {
                     Assert.isTrue(index < options.length,
                         "Invalid combo box selection " + index);
                     value = options[index];
                 }
-            }
-            else if (combinedPvInfo.control instanceof DateTimeWidget) {
+            } else if (combinedPvInfo.control instanceof DateTimeWidget) {
                 value = ((DateTimeWidget) combinedPvInfo.control).getText();
-            }
-            else if (combinedPvInfo.control instanceof ComboAndQuantity) {
+            } else if (combinedPvInfo.control instanceof ComboAndQuantity) {
                 value = ((ComboAndQuantity) combinedPvInfo.control).getText();
-            }
-            else if (combinedPvInfo.control instanceof SelectMultiple) {
-                String [] values = ((SelectMultiple) combinedPvInfo.control).getSelections();
+            } else if (combinedPvInfo.control instanceof SelectMultiple) {
+                String[] values = ((SelectMultiple) combinedPvInfo.control)
+                    .getSelections();
                 value = StringUtils.join(values, ";");
             }
 
-            if ((value == null) || (value.length() == 0)) continue;
+            if ((value == null) || (value.length() == 0))
+                continue;
 
             PvInfoData pvInfoData;
 
@@ -378,15 +380,15 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
                 pvInfoData = new PvInfoData();
                 pvInfoData.setPvInfo(combinedPvInfo.pvInfo);
                 pvInfoData.setPatientVisit(patientVisit);
-            }
-            else {
+            } else {
                 pvInfoData = combinedPvInfo.pvInfoData;
             }
             pvInfoData.setValue(value);
             pvDataCollection.add(pvInfoData);
         }
 
-        if (pvDataCollection.size() == 0) return;
+        if (pvDataCollection.size() == 0)
+            return;
 
         SDKQuery query;
         SDKQueryResult result;
@@ -397,8 +399,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
             PvInfoData pvInfoData = itr.next();
             if (pvInfoData.getId() == null) {
                 query = new InsertExampleQuery(pvInfoData);
-            }
-            else {
+            } else {
                 query = new UpdateExampleQuery(pvInfoData);
             }
 
@@ -410,8 +411,10 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
     }
 
     private boolean checkVisitDateDrawnUnique() throws ApplicationException {
-        WritableApplicationService appService = patientVisitAdapter.getAppService();
-        Patient patient = ((PatientAdapter) patientVisitAdapter.getParent()).getPatient();
+        WritableApplicationService appService = patientVisitAdapter
+            .getAppService();
+        Patient patient = ((PatientAdapter) patientVisitAdapter.getParent())
+            .getPatient();
 
         HQLCriteria c = new HQLCriteria(
             "from edu.ualberta.med.biobank.model.PatientVisit as v "
@@ -424,8 +427,8 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         if (results.size() > 0) {
             Display.getDefault().asyncExec(new Runnable() {
                 public void run() {
-                    MessageDialog.openError(
-                        PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
+                    MessageDialog.openError(PlatformUI.getWorkbench()
+                        .getActiveWorkbenchWindow().getShell(),
                         "Patient Visit Number Problem",
                         "A patient visit with number \""
                             + patientVisit.getDateDrawn()
