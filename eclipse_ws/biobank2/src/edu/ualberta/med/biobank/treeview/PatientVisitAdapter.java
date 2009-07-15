@@ -43,12 +43,13 @@ public class PatientVisitAdapter extends Node {
     public String getName() {
         Assert.isNotNull(patientVisit, "patientVisit is null");
         Date date = patientVisit.getDateDrawn();
-        if (date == null) {
-            date = new Date();
+        // Assert.isNotNull(date, "patient visid drawn date is null");
+        if (date != null) {
+            SimpleDateFormat sdf = new SimpleDateFormat(
+                BioBankPlugin.DATE_FORMAT);
+            return sdf.format(date);
         }
-        Assert.isNotNull(date, "patient visid drawn date is null");
-        SimpleDateFormat sdf = new SimpleDateFormat(BioBankPlugin.DATE_FORMAT);
-        return sdf.format(date);
+        return null;
     }
 
     @Override
@@ -166,6 +167,10 @@ public class PatientVisitAdapter extends Node {
     @Override
     public Node accept(NodeSearchVisitor visitor) {
         return visitor.visit(this);
+    }
+
+    public void setPatientVisit(PatientVisit patientVisit) {
+        this.patientVisit = patientVisit;
     }
 
 }

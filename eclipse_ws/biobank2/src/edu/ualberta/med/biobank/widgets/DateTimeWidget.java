@@ -35,8 +35,8 @@ public class DateTimeWidget extends BiobankWidget {
         SimpleDateFormat hourFormat = new SimpleDateFormat("HH");
         SimpleDateFormat minsFormat = new SimpleDateFormat("mm");
 
-        String hourStr = hourFormat.format(date);
-        String minStr = minsFormat.format(date);
+        String hourStr = date == null ? "" : hourFormat.format(date);
+        String minStr = date == null ? "" : minsFormat.format(date);
 
         GridLayout layout = new GridLayout(6, false);
         layout.horizontalSpacing = 5;
@@ -99,6 +99,18 @@ public class DateTimeWidget extends BiobankWidget {
         SimpleDateFormat sdf = new SimpleDateFormat(BioBankPlugin.DATE_FORMAT);
         return sdf.format(date) + " " + hour.getText() + ":"
             + minutes.getText();
+    }
+
+    @SuppressWarnings("deprecation")
+    public Date getDate() {
+        Date date = datePicker.getDate();
+        if ((date == null) || (hour.getText().length() != 2)
+            && (minutes.getText().length() != 2)) {
+            return null;
+        }
+        date.setHours(Integer.valueOf(hour.getText()));
+        date.setMinutes(Integer.valueOf(minutes.getText()));
+        return date;
     }
 
 }

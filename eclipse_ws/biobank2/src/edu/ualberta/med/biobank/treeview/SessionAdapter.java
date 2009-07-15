@@ -20,112 +20,124 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class SessionAdapter extends Node {
 
-	private WritableApplicationService appService;
+    private WritableApplicationService appService;
 
-	public SessionAdapter(Node parent, WritableApplicationService appService,
-			int sessionId, String name) {
-		super(parent);
-		this.appService = appService;
-		setId(sessionId);
-		setName(name);
-	}
+    private String userName;
 
-	@Override
-	public WritableApplicationService getAppService() {
-		return appService;
-	}
+    public SessionAdapter(Node parent, WritableApplicationService appService,
+        int sessionId, String name, String userName) {
+        super(parent);
+        this.appService = appService;
+        setId(sessionId);
+        setName(name);
+        this.userName = userName;
+    }
 
-	@Override
-	public Integer getId() {
-		return null;
-	}
+    @Override
+    public WritableApplicationService getAppService() {
+        return appService;
+    }
 
-	@Override
-	public String getTitle() {
-		return "";
-	}
+    @Override
+    public Integer getId() {
+        return null;
+    }
 
-	@Override
-	public void performDoubleClick() {
-	}
+    @Override
+    public String getTitle() {
+        return "";
+    }
 
-	@Override
-	public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-		MenuItem mi = new MenuItem(menu, SWT.PUSH);
-		mi.setText("Add Repository Site");
-		mi.addSelectionListener(new SelectionListener() {
-			public void widgetSelected(SelectionEvent event) {
-				IHandlerService handlerService = (IHandlerService) PlatformUI
-					.getWorkbench().getService(IHandlerService.class);
+    @Override
+    public void performDoubleClick() {
+    }
 
-				try {
-					handlerService.executeCommand(
-						"edu.ualberta.med.biobank.commands.addSite", null);
-				} catch (Exception ex) {
-					// throw new
-					// RuntimeException("edu.ualberta.med.biobank.commands.addSite not found");
-					ex.printStackTrace();
-				}
-			}
+    @Override
+    public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
+        MenuItem mi = new MenuItem(menu, SWT.PUSH);
+        mi.setText("Add Repository Site");
+        mi.addSelectionListener(new SelectionListener() {
+            public void widgetSelected(SelectionEvent event) {
+                IHandlerService handlerService = (IHandlerService) PlatformUI
+                    .getWorkbench().getService(IHandlerService.class);
 
-			public void widgetDefaultSelected(SelectionEvent e) {
-			}
-		});
+                try {
+                    handlerService.executeCommand(
+                        "edu.ualberta.med.biobank.commands.addSite", null);
+                } catch (Exception ex) {
+                    // throw new
+                    // RuntimeException("edu.ualberta.med.biobank.commands.addSite not found");
+                    ex.printStackTrace();
+                }
+            }
 
-		mi = new MenuItem(menu, SWT.PUSH);
-		mi.setText("Logout");
-		mi.addSelectionListener(new SelectionListener() {
-			public void widgetSelected(SelectionEvent event) {
-				IHandlerService handlerService = (IHandlerService) PlatformUI
-					.getWorkbench().getService(IHandlerService.class);
+            public void widgetDefaultSelected(SelectionEvent e) {
+            }
+        });
 
-				try {
-					handlerService.executeCommand(
-						"edu.ualberta.med.biobank.commands.logout", null);
-				} catch (Exception ex) {
-					throw new RuntimeException(
-						"edu.ualberta.med.biobank.commands.logout not found");
-				}
-			}
+        mi = new MenuItem(menu, SWT.PUSH);
+        mi.setText("Logout");
+        mi.addSelectionListener(new SelectionListener() {
+            public void widgetSelected(SelectionEvent event) {
+                IHandlerService handlerService = (IHandlerService) PlatformUI
+                    .getWorkbench().getService(IHandlerService.class);
 
-			public void widgetDefaultSelected(SelectionEvent e) {
-			}
-		});
-	}
+                try {
+                    handlerService.executeCommand(
+                        "edu.ualberta.med.biobank.commands.logout", null);
+                } catch (Exception ex) {
+                    throw new RuntimeException(
+                        "edu.ualberta.med.biobank.commands.logout not found");
+                }
+            }
 
-	@Override
-	public void loadChildren(boolean updateNode) {
-		try {
-			// read from database again
-			Site siteSearch = new Site();
-			List<Site> result = appService.search(Site.class, siteSearch);
-			for (Site site : result) {
-				SessionManager.getLogger()
-					.trace(
-						"updateSites: Site " + site.getId() + ": "
-								+ site.getName());
+            public void widgetDefaultSelected(SelectionEvent e) {
+            }
+        });
+    }
 
-				SiteAdapter node = (SiteAdapter) getChild(site.getId());
-				if (node == null) {
-					node = new SiteAdapter(this, site);
-					addChild(node);
-				}
-				if (updateNode) {
-					SessionManager.getInstance().getTreeViewer().update(node,
-						null);
-				}
-			}
-		} catch (final RemoteAccessException exp) {
-			BioBankPlugin.openRemoteAccessErrorMessage();
-		} catch (Exception e) {
-			SessionManager.getLogger().error(
-				"Error while loading sites for session " + getName());
-		}
-	}
+    @Override
+    public void loadChildren(boolean updateNode) {
+        try {
+            // read from database again
+            Site siteSearch = new Site();
+            List<Site> result = appService.search(Site.class, siteSearch);
+            for (Site site : result) {
+                SessionManager.getLogger()
+                    .trace(
+                        "updateSites: Site " + site.getId() + ": "
+                            + site.getName());
 
-	@Override
-	public Node accept(NodeSearchVisitor visitor) {
-		return visitor.visit(this);
-	}
+                SiteAdapter node = (SiteAdapter) getChild(site.getId());
+                if (node == null) {
+                    node = new SiteAdapter(this, site);
+                    addChild(node);
+                }
+                if (updateNode) {
+                    SessionManager.getInstance().getTreeViewer().update(node,
+                        null);
+                }
+            }
+        } catch (final RemoteAccessException exp) {
+            BioBankPlugin.openRemoteAccessErrorMessage();
+        } catch (Exception e) {
+            SessionManager.getLogger().error(
+                "Error while loading sites for session " + getName());
+        }
+    }
 
+    @Override
+    public Node accept(NodeSearchVisitor visitor) {
+        return visitor.visit(this);
+    }
+
+    @Override
+    public String getTreeText() {
+        if (userName.isEmpty()) {
+            return super.getTreeText();
+        } else {
+            return super.getTreeText() + " [" + userName + "]";
+        }
+
+    }
 }
