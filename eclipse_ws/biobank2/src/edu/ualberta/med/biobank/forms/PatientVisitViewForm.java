@@ -69,8 +69,8 @@ public class PatientVisitViewForm extends BiobankViewForm {
                 return sample.getAvailable() == null ? "" : sample
                     .getAvailable().toString();
             case 5:
-                return sample.getAvailableQuantity() == null ? "" : sample
-                    .getAvailableQuantity().toString();
+                return sample.getAvailable() == null ? "" : sample
+                    .getAvailable().toString();
             case 6:
                 return sample.getComment() == null ? "" : sample.getComment();
             }
