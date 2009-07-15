@@ -58,8 +58,7 @@ public class Importer {
             bioBank2Db = BioBank2Db.getInstance();
             bioBank2Db.setAppService(appService);
 
-            Class.forName("sun.jdbc.odbc.JdbcOdbcDriver");
-            con = getFileConnection();
+            con = getMysqlConnection();
 
             getTables();
             if (tables.size() == 0) throw new Exception();
@@ -88,16 +87,25 @@ public class Importer {
     }
 
     @SuppressWarnings("unused")
-    private Connection getDsnConnection() throws SQLException {
+    private Connection getDsnConnection() throws Exception {
+        Class.forName("sun.jdbc.odbc.JdbcOdbcDriver");
         String dbUrl = "jdbc:odbc:bbp_db";
         return DriverManager.getConnection(dbUrl, "", "");
     }
 
-    private Connection getFileConnection() throws SQLException {
+    @SuppressWarnings("unused")
+    private Connection getFileConnection() throws Exception {
+        Class.forName("sun.jdbc.odbc.JdbcOdbcDriver");
         String filename = "bbp_db.mdb";
         String database = "jdbc:odbc:Driver={Microsoft Access Driver (*.mdb)};DBQ=";
         database += filename.trim() + ";DriverID=22;READONLY=true}";
         return DriverManager.getConnection(database, "", "");
+    }
+
+    private Connection getMysqlConnection() throws Exception {
+        // Class.forName("com.mysql.jdbc.Driver");
+        return DriverManager.getConnection("jdbc:mysql://localhost:3306/bbpdb",
+            "dummy", "ozzy498");
     }
 
     private void getTables() throws SQLException {
