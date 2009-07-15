@@ -51,9 +51,9 @@ public class Importer {
 
         try {
             appService = (WritableApplicationService) ApplicationServiceProvider.getApplicationServiceFromUrl(
-                // "http://localhost:8080/biobank2", "testuser", "test");
-                "http://aicml-med.cs.ualberta.ca:8080/biobank2", "testuser",
-                "test");
+                "http://localhost:8080/biobank2", "testuser", "test");
+            // "http://aicml-med.cs.ualberta.ca:8080/biobank2", "testuser",
+            // "test");
 
             bioBank2Db = BioBank2Db.getInstance();
             bioBank2Db.setAppService(appService);
