@@ -97,4 +97,16 @@ public class DateTimeWidget extends BiobankWidget {
             + minutes.getText();
     }
 
+    @SuppressWarnings("deprecation")
+    public Date getDate() {
+        Date date = datePicker.getDate();
+        if ((date == null) || (hour.getText().length() != 2)
+            && (minutes.getText().length() != 2)) {
+            return null;
+        }
+        date.setHours(Integer.valueOf(hour.getText()));
+        date.setMinutes(Integer.valueOf(minutes.getText()));
+        return date;
+    }
+
 }

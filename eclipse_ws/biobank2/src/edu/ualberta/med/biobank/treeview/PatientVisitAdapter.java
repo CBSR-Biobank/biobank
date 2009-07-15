@@ -169,4 +169,8 @@ public class PatientVisitAdapter extends Node {
         return visitor.visit(this);
     }
 
+    public void setPatientVisit(PatientVisit patientVisit) {
+        this.patientVisit = patientVisit;
+    }
+
 }
