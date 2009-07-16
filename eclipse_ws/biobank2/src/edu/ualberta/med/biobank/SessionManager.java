@@ -126,10 +126,10 @@ public class SessionManager {
     }
 
     public void addSession(final WritableApplicationService appService,
-        String name, List<Site> sites) {
+        String name, String userName, List<Site> sites) {
         int id = sessionsByName.size();
         final SessionAdapter sessionNode = new SessionAdapter(rootNode,
-            appService, id, name);
+            appService, id, name, userName);
         sessionsByName.put(name, sessionNode);
         rootNode.addChild(sessionNode);
 

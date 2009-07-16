@@ -6,34 +6,38 @@ import org.eclipse.swt.widgets.Tree;
 
 public class RootNode extends Node {
 
-	private static Node instance;
+    private static Node instance;
 
-	private RootNode() {
-		super(null, 1, "root");
-	}
+    private RootNode() {
+        super(null, 1, "root");
+    }
 
-	public static Node getRootNode() {
-		if (instance == null) {
-			instance = new RootNode();
-		}
-		return instance;
-	}
+    public static Node getRootNode() {
+        if (instance == null) {
+            instance = new RootNode();
+        }
+        return instance;
+    }
 
-	@Override
-	public void performDoubleClick() {
-	}
+    @Override
+    public void performDoubleClick() {
+    }
 
-	@Override
-	public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-	}
+    @Override
+    public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
+    }
 
-	@Override
-	public void loadChildren(boolean updateNode) {
-	}
+    @Override
+    public void loadChildren(boolean updateNode) {
+    }
 
-	@Override
-	public Node accept(NodeSearchVisitor visitor) {
-		return null;
-	}
+    @Override
+    public Node accept(NodeSearchVisitor visitor) {
+        return null;
+    }
 
+    @Override
+    public String getTitle() {
+        return null;
+    }
 }

@@ -1,7 +1,5 @@
-
 package edu.ualberta.med.biobank.forms;
 
-import java.text.SimpleDateFormat;
 import java.util.Collection;
 
 import org.apache.commons.collections.MapIterator;
@@ -17,14 +15,18 @@ import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.forms.input.FormInput;
+import edu.ualberta.med.biobank.model.ModelUtils;
 import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.PvInfo;
 import edu.ualberta.med.biobank.model.PvInfoData;
+import edu.ualberta.med.biobank.model.Sample;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.PatientVisitAdapter;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
+import edu.ualberta.med.biobank.widgets.BiobankCollectionTable;
 
 public class PatientVisitViewForm extends BiobankViewForm {
 
@@ -33,6 +35,8 @@ public class PatientVisitViewForm extends BiobankViewForm {
     private PatientVisitAdapter patientVisitAdapter;
 
     private PatientVisit patientVisit;
+
+    private BiobankCollectionTable samplesTable;
 
     // used to keep track of which data has been entered or left blank for
     // a patient visit.
@@ -64,30 +68,26 @@ public class PatientVisitViewForm extends BiobankViewForm {
 
         patientVisitAdapter = (PatientVisitAdapter) node;
         appService = patientVisitAdapter.getAppService();
-        patientVisit = patientVisitAdapter.getPatientVisit();
+        retrievePatientVisit();
 
-        if (patientVisit.getId() == null) {
-            setPartName("New Visit");
-        }
-        else {
-            SimpleDateFormat sdf = new SimpleDateFormat(
-                BioBankPlugin.DATE_FORMAT);
-            setPartName("Visit " + sdf.format(patientVisit.getDateDrawn()));
-        }
+        setPartName("Visit "
+            + BioBankPlugin.getDateFormatter().format(
+                patientVisit.getDateDrawn()));
     }
 
     @Override
     protected void createFormContent() {
-        SimpleDateFormat sdf = new SimpleDateFormat(
-            BioBankPlugin.DATE_TIME_FORMAT);
         form.setText("Visit Drawn Date: "
-            + sdf.format(patientVisit.getDateDrawn()));
+            + BioBankPlugin.getDateTimeFormatter().format(
+                patientVisit.getDateDrawn()));
         form.getBody().setLayout(new GridLayout(1, false));
         form.getBody().setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         addRefreshToolbarAction();
 
         createVisitSection();
+
+        createSamplesSection();
 
     }
 
@@ -99,7 +99,8 @@ public class PatientVisitViewForm extends BiobankViewForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        Study study = ((StudyAdapter) patientVisitAdapter.getParent().getParent().getParent()).getStudy();
+        Study study = ((StudyAdapter) patientVisitAdapter.getParent()
+            .getParent().getParent()).getStudy();
 
         // get all PvInfo from study, since user may not have filled in all
         // fields
@@ -109,11 +110,13 @@ public class PatientVisitViewForm extends BiobankViewForm {
             combinedPvInfoMap.put(pvInfo.getId(), combinedPvInfo);
         }
 
-        Collection<PvInfoData> pvInfoDataCollection = patientVisit.getPvInfoDataCollection();
+        Collection<PvInfoData> pvInfoDataCollection = patientVisit
+            .getPvInfoDataCollection();
         if (pvInfoDataCollection != null) {
             for (PvInfoData pvInfoData : pvInfoDataCollection) {
                 Integer key = pvInfoData.getPvInfo().getId();
-                CombinedPvInfo combinedPvInfo = (CombinedPvInfo) combinedPvInfoMap.get(key);
+                CombinedPvInfo combinedPvInfo = (CombinedPvInfo) combinedPvInfoMap
+                    .get(key);
                 combinedPvInfo.pvInfoData = pvInfoData;
             }
         }
@@ -151,9 +154,61 @@ public class PatientVisitViewForm extends BiobankViewForm {
 
     }
 
-    @Override
-    protected void reload() {
+    private void createSamplesSection() {
+        Composite parent = createSectionWithClient("Samples");
+        String[] headings = new String[] { "Inventory ID", "Type", "Position",
+            "Process Date", "Available", "Available quantity", "Comment" };
+        int[] bounds = new int[] { -1, 130, 150, 150, -1, -1, -1 };
+        samplesTable = new BiobankCollectionTable(parent, SWT.NONE, headings,
+            bounds, getSamples());
+        GridData tableData = ((GridData) samplesTable.getLayoutData());
+        tableData.horizontalSpan = 2;
+        tableData.heightHint = 500;
+        samplesTable.adaptToToolkit(toolkit);
+        toolkit.paintBordersFor(samplesTable);
+
+        // samplesTable.getTableViewer().addDoubleClickListener(
+        // FormUtils.getBiobankCollectionDoubleClickListener());
 
     }
 
+    @Override
+    protected void reload() {
+        retrievePatientVisit();
+        setPartName("Visit "
+            + BioBankPlugin.getDateFormatter().format(
+                patientVisit.getDateDrawn()));
+        form.setText("Visit Drawn Date: "
+            + BioBankPlugin.getDateTimeFormatter().format(
+                patientVisit.getDateDrawn()));
+        // FIXME update all pvinfos ?
+        samplesTable.getTableViewer().setInput(getSamples());
+    }
+
+    private void retrievePatientVisit() {
+        try {
+            patientVisit = (PatientVisit) ModelUtils.getObjectWithId(
+                patientVisitAdapter.getAppService(), PatientVisit.class,
+                patientVisitAdapter.getPatientVisit().getId());
+            patientVisitAdapter.setPatientVisit(patientVisit);
+        } catch (Exception ex) {
+            SessionManager.getLogger().error(
+                "Error while retrieving patient visit "
+                    + patientVisitAdapter.getPatientVisit().getDateDrawn(), ex);
+        }
+    }
+
+    private Sample[] getSamples() {
+        // hack required here because xxx.getXxxxCollection().toArray(new
+        // Xxx[0])
+        // returns Object[].
+        Collection<Sample> sampleList = patientVisit.getSampleCollection();
+        Sample[] samples = new Sample[sampleList.size()];
+        int i = 0;
+        for (Sample s : sampleList) {
+            samples[i] = s;
+            i++;
+        }
+        return samples;
+    }
 }

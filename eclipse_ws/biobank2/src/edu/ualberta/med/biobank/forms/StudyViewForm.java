@@ -1,9 +1,7 @@
-
 package edu.ualberta.med.biobank.forms;
 
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.List;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -16,7 +14,9 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.forms.widgets.Section;
 import org.springframework.util.Assert;
 
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.forms.input.FormInput;
+import edu.ualberta.med.biobank.model.ModelUtils;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.PvInfo;
 import edu.ualberta.med.biobank.model.Study;
@@ -25,7 +25,6 @@ import edu.ualberta.med.biobank.treeview.PatientAdapter;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankCollectionTable;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class StudyViewForm extends BiobankViewForm {
 
@@ -57,8 +56,7 @@ public class StudyViewForm extends BiobankViewForm {
             // after first opening
             retrieveStudy();
             setPartName("Study " + study.getName());
-        }
-        else {
+        } else {
             Assert.isTrue(false, "Invalid editor input: object of type "
                 + node.getClass().getName());
         }
@@ -90,7 +88,8 @@ public class StudyViewForm extends BiobankViewForm {
 
         setStudySectionValues();
 
-        Node clinicGroupNode = ((SiteAdapter) studyAdapter.getParent().getParent()).getClinicGroupNode();
+        Node clinicGroupNode = ((SiteAdapter) studyAdapter.getParent()
+            .getParent()).getClinicGroupNode();
         clinicsTable = FormUtils.createClinicSection(toolkit, form.getBody(),
             clinicGroupNode, study.getClinicCollection());
 
@@ -107,7 +106,7 @@ public class StudyViewForm extends BiobankViewForm {
     private void createPatientsSection() {
         Section section = createSection("Patients");
 
-        String [] headings = new String [] { "Patient Number" };
+        String[] headings = new String[] { "Patient Number" };
         patientsTable = new BiobankCollectionTable(section, SWT.NONE, headings,
             getPatientAdapters());
         section.setClient(patientsTable);
@@ -118,13 +117,13 @@ public class StudyViewForm extends BiobankViewForm {
             FormUtils.getBiobankCollectionDoubleClickListener());
     }
 
-    private PatientAdapter [] getPatientAdapters() {
+    private PatientAdapter[] getPatientAdapters() {
         // hack required here because xxx.getXxxxCollection().toArray(new
         // Xxx[0])
         // returns Object[].
         int count = 0;
         Collection<Patient> patients = study.getPatientCollection();
-        PatientAdapter [] arr = new PatientAdapter [patients.size()];
+        PatientAdapter[] arr = new PatientAdapter[patients.size()];
         for (Patient patient : patients) {
             arr[count] = new PatientAdapter(studyAdapter, patient);
             ++count;
@@ -135,7 +134,7 @@ public class StudyViewForm extends BiobankViewForm {
     private void createPvDataSection() {
         Section section = createSection("Patient Visit Information Collected");
 
-        String [] headings = new String [] { "Name", "Valid Values (optional)" };
+        String[] headings = new String[] { "Name", "Valid Values (optional)" };
         pvInfosTable = new BiobankCollectionTable(section, SWT.NONE, headings,
             getStudyPvInfo());
         section.setClient(pvInfosTable);
@@ -146,13 +145,14 @@ public class StudyViewForm extends BiobankViewForm {
             FormUtils.getBiobankCollectionDoubleClickListener());
     }
 
-    private PvInfo [] getStudyPvInfo() {
+    private PvInfo[] getStudyPvInfo() {
         // hack required here because site.getStudyCollection().toArray(new
         // Study[0]) returns Object[].
         int count = 0;
         Collection<PvInfo> pvInfos = study.getPvInfoCollection();
-        if (pvInfos == null) return null;
-        PvInfo [] arr = new PvInfo [pvInfos.size()];
+        if (pvInfos == null)
+            return null;
+        PvInfo[] arr = new PvInfo[pvInfos.size()];
         Iterator<PvInfo> it = pvInfos.iterator();
         while (it.hasNext()) {
             arr[count] = it.next();
@@ -167,28 +167,24 @@ public class StudyViewForm extends BiobankViewForm {
         setPartName("Study " + study.getName());
         form.setText("Study: " + study.getName());
         setStudySectionValues();
-        Node clinicGroupNode = ((SiteAdapter) studyAdapter.getParent().getParent()).getClinicGroupNode();
+        Node clinicGroupNode = ((SiteAdapter) studyAdapter.getParent()
+            .getParent()).getClinicGroupNode();
         clinicsTable.getTableViewer().setInput(
-            FormUtils.getClinicsAdapters(clinicGroupNode,
-                study.getClinicCollection()));
+            FormUtils.getClinicsAdapters(clinicGroupNode, study
+                .getClinicCollection()));
         patientsTable.getTableViewer().setInput(getPatientAdapters());
         pvInfosTable.getTableViewer().setInput(getStudyPvInfo());
     }
 
     private void retrieveStudy() {
-        List<Study> result;
-        Study searchStudy = new Study();
-        searchStudy.setId(studyAdapter.getStudy().getId());
         try {
-            result = studyAdapter.getAppService().search(Study.class,
-                searchStudy);
-            Assert.isTrue(result.size() == 1);
-            study = result.get(0);
+            study = (Study) ModelUtils.getObjectWithId(studyAdapter
+                .getAppService(), Study.class, studyAdapter.getStudy().getId());
             studyAdapter.setStudy(study);
-        }
-        catch (ApplicationException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            SessionManager.getLogger().error(
+                "Error while retrieving study "
+                    + studyAdapter.getStudy().getName(), e);
         }
     }
-
 }

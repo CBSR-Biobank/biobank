@@ -82,7 +82,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
 
     private ListOrderedMap combinedPvInfoMap;
 
-    DateTimeWidget dateDrawn;
+    private DateTimeWidget dateDrawn;
 
     public PatientVisitEntryForm() {
         super();
@@ -325,16 +325,17 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         PatientAdapter patientAdapter = (PatientAdapter) patientVisitAdapter
             .getParent();
         patientVisit.setPatient(patientAdapter.getPatient());
-        savePvInfoData();
+        patientVisit.setDateDrawn(dateDrawn.getDate());
 
         if ((patientVisit.getId() == null) || (patientVisit.getId() == 0)) {
             query = new InsertExampleQuery(patientVisit);
         } else {
             query = new UpdateExampleQuery(patientVisit);
         }
-
         result = appService.executeQuery(query);
         patientVisit = (PatientVisit) result.getObjectResult();
+
+        savePvInfoData();
 
         patientAdapter.performExpand();
         getSite().getPage().closeEditor(this, false);

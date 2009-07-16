@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.forms;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.eclipse.core.databinding.UpdateValueStrategy;
@@ -482,6 +483,7 @@ public class AddPaletteSamplesEntryForm extends BiobankEntryForm {
                                 Sample sample = new Sample();
                                 sample.setInventoryId(cell.getValue());
                                 sample.setPatientVisit(patientVisit);
+                                sample.setProcessDate(new Date());
                                 sample.setSampleType(cell.getType());
                                 queries.add(new InsertExampleQuery(sample));
                             }

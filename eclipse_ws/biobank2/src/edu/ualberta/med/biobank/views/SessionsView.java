@@ -19,64 +19,64 @@ import edu.ualberta.med.biobank.treeview.NodeLabelProvider;
 
 public class SessionsView extends ViewPart {
 
-	public static final String ID = "edu.ualberta.med.biobank.views.SessionsView";
+    public static final String ID = "edu.ualberta.med.biobank.views.SessionsView";
 
-	private TreeViewer treeViewer;
+    private TreeViewer treeViewer;
 
-	private TreeFilter treeFilter;
+    private TreeFilter treeFilter;
 
-	public SessionsView() {
-		SessionManager.getInstance().setSessionsView(this);
-	}
+    public SessionsView() {
+        SessionManager.getInstance().setSessionsView(this);
+    }
 
-	public TreeViewer getTreeViewer() {
-		return treeViewer;
-	}
+    public TreeViewer getTreeViewer() {
+        return treeViewer;
+    }
 
-	public TreeFilter getFilter() {
-		return treeFilter;
-	}
+    public TreeFilter getFilter() {
+        return treeFilter;
+    }
 
-	@Override
-	public void createPartControl(Composite parent) {
-		FilteredTree filteredTree = new FilteredTree(parent, SWT.BORDER
-				| SWT.MULTI | SWT.V_SCROLL, new TreeFilter());
-		filteredTree.setBackground(parent.getDisplay().getSystemColor(
-			SWT.COLOR_LIST_BACKGROUND));
-		treeViewer = filteredTree.getViewer();
-		getSite().setSelectionProvider(treeViewer);
-		treeViewer.setLabelProvider(new NodeLabelProvider());
-		treeViewer.setContentProvider(new NodeContentProvider());
-		treeViewer.addDoubleClickListener(SessionManager.getInstance()
-			.getDoubleClickListener());
-		treeViewer.addTreeListener(SessionManager.getInstance()
-			.getTreeViewerListener());
-		treeViewer.setUseHashlookup(true);
-		treeViewer.setInput(SessionManager.getInstance().getRootNode());
-		treeViewer.addSelectionChangedListener(new ISelectionChangedListener() {
-			public void selectionChanged(SelectionChangedEvent event) {
-				ISelection selection = event.getSelection();
-				if (!selection.isEmpty()
-						&& selection instanceof IStructuredSelection) {
-					Node node = (Node) ((IStructuredSelection) selection)
-						.getFirstElement();
-					getViewSite().getActionBars().getStatusLineManager()
-						.setMessage(node.getName());
+    @Override
+    public void createPartControl(Composite parent) {
+        FilteredTree filteredTree = new FilteredTree(parent, SWT.BORDER
+            | SWT.MULTI | SWT.V_SCROLL, new TreeFilter(), true);
+        filteredTree.setBackground(parent.getDisplay().getSystemColor(
+            SWT.COLOR_LIST_BACKGROUND));
+        treeViewer = filteredTree.getViewer();
+        getSite().setSelectionProvider(treeViewer);
+        treeViewer.setLabelProvider(new NodeLabelProvider());
+        treeViewer.setContentProvider(new NodeContentProvider());
+        treeViewer.addDoubleClickListener(SessionManager.getInstance()
+            .getDoubleClickListener());
+        treeViewer.addTreeListener(SessionManager.getInstance()
+            .getTreeViewerListener());
+        treeViewer.setUseHashlookup(true);
+        treeViewer.setInput(SessionManager.getInstance().getRootNode());
+        treeViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+            public void selectionChanged(SelectionChangedEvent event) {
+                ISelection selection = event.getSelection();
+                if (!selection.isEmpty()
+                    && selection instanceof IStructuredSelection) {
+                    Node node = (Node) ((IStructuredSelection) selection)
+                        .getFirstElement();
+                    getViewSite().getActionBars().getStatusLineManager()
+                        .setMessage(node.getName());
 
-				}
-			}
-		});
+                }
+            }
+        });
 
-		Menu menu = new Menu(PlatformUI.getWorkbench()
-			.getActiveWorkbenchWindow().getShell(), SWT.NONE);
-		menu.addListener(SWT.Show, SessionManager.getInstance()
-			.getTreeViewerMenuListener());
+        Menu menu = new Menu(PlatformUI.getWorkbench()
+            .getActiveWorkbenchWindow().getShell(), SWT.NONE);
+        menu.addListener(SWT.Show, SessionManager.getInstance()
+            .getTreeViewerMenuListener());
 
-		treeViewer.getTree().setMenu(menu);
+        treeViewer.getTree().setMenu(menu);
 
-	}
+    }
 
-	@Override
-	public void setFocus() {
-	}
+    @Override
+    public void setFocus() {
+    }
 };
