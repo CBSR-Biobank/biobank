@@ -1,15 +1,11 @@
 package edu.ualberta.med.biobank.forms;
 
-import java.text.SimpleDateFormat;
 import java.util.Collection;
 
 import org.apache.commons.collections.MapIterator;
 import org.apache.commons.collections.map.ListOrderedMap;
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.jface.viewers.ITableLabelProvider;
-import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -21,14 +17,11 @@ import org.eclipse.ui.PartInitException;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.forms.input.FormInput;
-import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.ModelUtils;
 import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.PvInfo;
 import edu.ualberta.med.biobank.model.PvInfoData;
 import edu.ualberta.med.biobank.model.Sample;
-import edu.ualberta.med.biobank.model.SamplePosition;
-import edu.ualberta.med.biobank.model.StorageContainer;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.PatientVisitAdapter;
@@ -36,48 +29,6 @@ import edu.ualberta.med.biobank.treeview.StudyAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankCollectionTable;
 
 public class PatientVisitViewForm extends BiobankViewForm {
-
-    public class SampleLabelProvider extends LabelProvider implements
-        ITableLabelProvider {
-
-        @Override
-        public boolean isLabelProperty(Object element, String property) {
-            return false;
-        }
-
-        @Override
-        public Image getColumnImage(Object element, int columnIndex) {
-            return null;
-        }
-
-        @Override
-        public String getColumnText(Object element, int columnIndex) {
-            final Sample sample = (Sample) element;
-            switch (columnIndex) {
-            case 0:
-                return sample.getInventoryId();
-            case 1:
-                return sample.getSampleType() == null ? "" : sample
-                    .getSampleType().getName();
-            case 2:
-                return getSamplePosition(sample);
-            case 3:
-                return sample.getProcessDate() == null ? ""
-                    : new SimpleDateFormat(BioBankPlugin.DATE_TIME_FORMAT)
-                        .format(sample.getProcessDate());
-            case 4:
-                return sample.getAvailable() == null ? "" : sample
-                    .getAvailable().toString();
-            case 5:
-                return sample.getAvailable() == null ? "" : sample
-                    .getAvailable().toString();
-            case 6:
-                return sample.getComment() == null ? "" : sample.getComment();
-            }
-            return null;
-        }
-
-    }
 
     public static final String ID = "edu.ualberta.med.biobank.forms.PatientVisitViewForm";
 
@@ -105,33 +56,6 @@ public class PatientVisitViewForm extends BiobankViewForm {
         super();
         combinedPvInfoMap = new ListOrderedMap();
 
-    }
-
-    public String getSamplePosition(Sample sample) {
-        SamplePosition position = sample.getSamplePosition();
-        if (position == null) {
-            return "no position assigned";
-        } else {
-            String positionString = position.getPositionDimensionOne() + ""
-                + +position.getPositionDimensionTwo();
-            StorageContainer container = position.getStorageContainer();
-            System.out.println(container.getBarcode());
-            ContainerPosition containerPosition = container
-                .getLocatedAtPosition();
-            StorageContainer parent = containerPosition.getParentContainer();
-            while (parent != null) {
-                positionString = containerPosition.getPositionDimensionOne()
-                    + "" + +containerPosition.getPositionDimensionTwo() + ":"
-                    + positionString;
-                System.out.println("in container " + parent.getBarcode() + ":"
-                    + positionString);
-                container = parent;
-                containerPosition = parent.getLocatedAtPosition();
-                parent = containerPosition.getParentContainer();
-            }
-            positionString = container.getBarcode() + ":" + positionString;
-            return positionString;
-        }
     }
 
     @Override
@@ -237,8 +161,6 @@ public class PatientVisitViewForm extends BiobankViewForm {
         int[] bounds = new int[] { -1, 130, 150, 150, -1, -1, -1 };
         samplesTable = new BiobankCollectionTable(parent, SWT.NONE, headings,
             bounds, getSamples());
-        samplesTable.getTableViewer().setLabelProvider(
-            new SampleLabelProvider());
         GridData tableData = ((GridData) samplesTable.getLayoutData());
         tableData.horizontalSpan = 2;
         tableData.heightHint = 500;

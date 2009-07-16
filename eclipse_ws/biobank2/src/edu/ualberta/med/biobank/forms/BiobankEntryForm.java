@@ -1,4 +1,3 @@
-
 package edu.ualberta.med.biobank.forms;
 
 import java.lang.reflect.Constructor;
@@ -84,7 +83,8 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
         }
 
         @Override
-        public void keyReleased(KeyEvent e) {}
+        public void keyReleased(KeyEvent e) {
+        }
     };
 
     SelectionListener selectionListener = new SelectionAdapter() {
@@ -118,11 +118,9 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
             public void run() {
                 try {
                     saveForm();
-                }
-                catch (final RemoteConnectFailureException exp) {
+                } catch (final RemoteConnectFailureException exp) {
                     BioBankPlugin.openRemoteConnectErrorMessage();
-                }
-                catch (Exception e) {
+                } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
             }
@@ -130,7 +128,8 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
     }
 
     @Override
-    public void doSaveAs() {}
+    public void doSaveAs() {
+    }
 
     @Override
     public void init(IEditorSite editorSite, IEditorInput input)
@@ -182,8 +181,9 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
             confirmButton.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent e) {
-                    PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().saveEditor(
-                        BiobankEntryForm.this, false);
+                    PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+                        .getActivePage().saveEditor(BiobankEntryForm.this,
+                            false);
                 }
             });
         }
@@ -216,7 +216,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
 
     protected Control createBoundWidgetWithLabel(Composite composite,
         Class<?> widgetClass, int widgetOptions, String fieldLabel,
-        String [] widgetValues, IObservableValue modelObservableValue,
+        String[] widgetValues, IObservableValue modelObservableValue,
         Class<?> validatorClass, String validatorErrMsg) {
         Label label;
 
@@ -228,7 +228,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
     }
 
     protected Control createBoundWidget(Composite composite,
-        Class<?> widgetClass, int widgetOptions, String [] widgetValues,
+        Class<?> widgetClass, int widgetOptions, String[] widgetValues,
         IObservableValue modelObservableValue, IValidator validator) {
 
         UpdateValueStrategy uvs = null;
@@ -247,8 +247,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
             dbc.bindValue(SWTObservables.observeText(text, SWT.Modify),
                 modelObservableValue, uvs, null);
             return text;
-        }
-        else if (widgetClass == Combo.class) {
+        } else if (widgetClass == Combo.class) {
             Combo combo = new Combo(composite, SWT.READ_ONLY);
             combo.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
             Assert.isNotNull(widgetValues, "combo values not assigned");
@@ -261,8 +260,15 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
             combo.addSelectionListener(selectionListener);
             combo.addModifyListener(modifyListener);
             return combo;
-        }
-        else {
+        } else if (widgetClass == Button.class) {
+            Button button = new Button(composite, SWT.CHECK);
+            toolkit.adapt(button, true, true);
+            dbc.bindValue(SWTObservables.observeSelection(button),
+                modelObservableValue, uvs, null);
+
+            button.addSelectionListener(selectionListener);
+            return button;
+        } else {
             Assert.isTrue(false, "invalid widget class "
                 + widgetClass.getName());
         }
@@ -271,14 +277,13 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
 
     protected Control createBoundWidget(Composite composite,
         Class<?> widgetClass, int widgetOptions, Label label,
-        String [] widgetValues, IObservableValue modelObservableValue,
+        String[] widgetValues, IObservableValue modelObservableValue,
         Class<?> validatorClass, String validatorErrMsg) {
         IValidator validator = null;
 
         if (validatorClass != null) {
-            validator = createValidator(validatorClass,
-                FormUtils.createDecorator(label, validatorErrMsg),
-                validatorErrMsg);
+            validator = createValidator(validatorClass, FormUtils
+                .createDecorator(label, validatorErrMsg), validatorErrMsg);
         }
 
         return createBoundWidget(composite, widgetClass, widgetOptions,
@@ -288,25 +293,20 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
     protected IValidator createValidator(Class<?> validatorClass,
         ControlDecoration dec, String validatorErrMsg) {
         try {
-            Class<?> [] types = new Class [] {
-                String.class, ControlDecoration.class };
+            Class<?>[] types = new Class[] { String.class,
+                ControlDecoration.class };
             Constructor<?> cons = validatorClass.getConstructor(types);
-            Object [] args = new Object [] { validatorErrMsg, dec };
+            Object[] args = new Object[] { validatorErrMsg, dec };
             return (IValidator) cons.newInstance(args);
-        }
-        catch (NoSuchMethodException e) {
+        } catch (NoSuchMethodException e) {
             throw new RuntimeException(e);
-        }
-        catch (InvocationTargetException e) {
+        } catch (InvocationTargetException e) {
             throw new RuntimeException(e);
-        }
-        catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) {
             throw new RuntimeException(e);
-        }
-        catch (InstantiationException e) {
+        } catch (InstantiationException e) {
             throw new RuntimeException(e);
-        }
-        catch (IllegalAccessException e) {
+        } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         }
     }
@@ -329,7 +329,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
     }
 
     protected Combo createSessionSelectionWidget(Composite client) {
-        String [] sessionNames = SessionManager.getInstance().getSessionNames();
+        String[] sessionNames = SessionManager.getInstance().getSessionNames();
 
         if (sessionNames.length > 1) {
             toolkit.createLabel(client, "Session:", SWT.LEFT);
@@ -345,22 +345,23 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
         IObservableValue statusObservable = new WritableValue();
         statusObservable.addChangeListener(new IChangeListener() {
             public void handleChange(ChangeEvent event) {
-                IObservableValue validationStatus = (IObservableValue) event.getSource();
+                IObservableValue validationStatus = (IObservableValue) event
+                    .getSource();
                 handleStatusChanged((IStatus) validationStatus.getValue());
             }
         });
 
-        dbc.bindValue(statusObservable, new AggregateValidationStatus(
-            dbc.getBindings(), AggregateValidationStatus.MAX_SEVERITY), null,
-            null);
+        dbc
+            .bindValue(statusObservable, new AggregateValidationStatus(dbc
+                .getBindings(), AggregateValidationStatus.MAX_SEVERITY), null,
+                null);
     }
 
     protected void handleStatusChanged(IStatus status) {
         if (status.getSeverity() == IStatus.OK) {
             form.setMessage(getOkMessage(), IMessageProvider.NONE);
             confirmButton.setEnabled(true);
-        }
-        else {
+        } else {
             form.setMessage(status.getMessage(), IMessageProvider.ERROR);
             confirmButton.setEnabled(false);
         }
@@ -385,8 +386,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
             public IStatus validate(Object value) {
                 if (value instanceof Boolean && !(Boolean) value) {
                     return ValidationStatus.error(errorMsg);
-                }
-                else {
+                } else {
                     return Status.OK_STATUS;
                 }
             }

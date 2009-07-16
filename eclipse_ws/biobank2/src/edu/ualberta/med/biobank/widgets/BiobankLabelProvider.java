@@ -8,6 +8,7 @@ import org.eclipse.swt.graphics.Image;
 import org.springframework.util.Assert;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.model.ModelUtils;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.PvInfo;
@@ -120,8 +121,7 @@ public class BiobankLabelProvider extends LabelProvider implements
                 return sample.getSampleType() == null ? "" : sample
                     .getSampleType().getName();
             case 2:
-                return sample.getSamplePosition() == null ? "" : sample
-                    .getSamplePosition().toString();
+                return ModelUtils.getSamplePosition(sample);
             case 3:
                 return sample.getProcessDate() == null ? ""
                     : new SimpleDateFormat(BioBankPlugin.DATE_TIME_FORMAT)
