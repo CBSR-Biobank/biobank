@@ -24,6 +24,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 
+import org.apache.commons.lang.StringUtils;
+
 /*
  *  need to remove the password on MS Access side.
  * a call to get a column from a result set can only be made once, otherwise the
@@ -255,7 +257,7 @@ public class Importer {
                 pv.setPatient(patient);
                 pv = (PatientVisit) bioBank2Db.setObject(pv);
 
-                System.out.println("importin patient visit: patient/"
+                System.out.println("importing patient visit: patient/"
                     + patient.getNumber() + " visit date/"
                     + biobank2DateFmt.format(pv.getDateDrawn()));
 
@@ -285,13 +287,15 @@ public class Importer {
                             consents.add("Surveillance");
                         }
                         if (rs.getInt(10) == 1) {
-                            consents.add("Surveillance");
+                            consents.add("Genetic predisposition");
                         }
-                        pvInfoData.setValue(rs.getString(8));
+                        pvInfoData.setValue(StringUtils.join(consents, ";"));
                     }
                     else if (pvInfo.getLabel().equals("Worksheet")) {
                         pvInfoData.setValue(rs.getString(15));
                     }
+
+                    pvInfoData = (PvInfoData) bioBank2Db.setObject(pvInfoData);
                 }
             }
         }

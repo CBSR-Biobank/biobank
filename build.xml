@@ -2,7 +2,7 @@
 <project name="biobank2" basedir="." default="sdk-and-scripts">
 
 	<!--
-      Overall build file 
+      Overall build file
       use command "ant -projecthelp" to display the targets.
       -->
 
@@ -27,9 +27,9 @@
 	<property name="database.password" value="ozzy498" />
 
 
-	<!-- 
+	<!--
 	  files included in the sdk build.xml - necessary to be sure that we have
-	  all the keys for the target we redefined 
+	  all the keys for the target we redefined
 	-->
 	<property file="${cacore.sdk.dir}/installer.properties" />
 	<property file="${cacore.sdk.dir}/local.properties" />
@@ -149,7 +149,7 @@
 		<copy file="${security.dir}/jboss/mysql-ds.xml"
 										      tofile="${env.JBOSS_HOME}/server/default/deploy/mysql-ds.xml" overwrite="true"/>
 		<copy file="${security.dir}/jboss/upt.war"
-						      tofile="${env.JBOSS_HOME}/server/default/deploy/upt.war" overwrite="true"/>				
+						      tofile="${env.JBOSS_HOME}/server/default/deploy/upt.war" overwrite="true"/>
 		<copy file="${cacore.sdk.dir}/output/biobank2/package/webapp/biobank2.war"
 		      tofile="${env.JBOSS_HOME}/server/default/deploy/biobank2.war" overwrite="true"/>
 	</target>
@@ -201,7 +201,7 @@
 	<!--Add the length="#" field into .hbm.xml, references the biobank.uml file for the VARCHAR(#) -->
 	<target name="string-length-field-addition"
 	        description="Add the length='#' field into .hbm.xml, references the biobank.uml file for the VARCHAR(#)">
-		<exec executable="perl">
+		<exec executable="/usr/bin/perl">
 			<env key="PATH" path="${scripts.proj.dir}" />
 			<arg value="${scripts.proj.dir}/hbmstringlength.pl" />
 			<arg value="${model.proj.dir}/biobank2.uml" />
