@@ -22,7 +22,6 @@ import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashSet;
 
 /*
@@ -68,6 +67,9 @@ public class Importer {
             if (!tableExists("patient_visit")) throw new Exception();
 
             // the order here matters
+            bioBank2Db.deleteAll(PvInfoData.class);
+            bioBank2Db.deleteAll(PvInfo.class);
+            bioBank2Db.deleteAll(PatientVisit.class);
             bioBank2Db.deleteAll(Patient.class);
             bioBank2Db.deleteAll(Clinic.class);
             bioBank2Db.deleteAll(Study.class);
@@ -234,10 +236,7 @@ public class Importer {
     private void importPatientVisits() throws Exception {
         SimpleDateFormat biobank2DateFmt = new SimpleDateFormat(
             "yyyy-MM-dd HH:mm");
-        SimpleDateFormat bbpdbDateFmt = new SimpleDateFormat(
-            "yyyy-MM-dd hh:mm:ss aa");
         Study study;
-        Date date;
         PatientVisit pv;
         PvInfoData pvInfoData;
 
@@ -252,37 +251,38 @@ public class Importer {
                 Patient patient = bioBank2Db.getPatient(rs.getString(2));
 
                 pv = new PatientVisit();
-                date = bbpdbDateFmt.parse(rs.getString(5));
-                pv.setDateDrawn(date);
+                pv.setDateDrawn(rs.getDate(5));
                 pv.setPatient(patient);
                 pv = (PatientVisit) bioBank2Db.setObject(pv);
+
+                System.out.println("importin patient visit: patient/"
+                    + patient.getNumber() + " visit date/"
+                    + biobank2DateFmt.format(pv.getDateDrawn()));
 
                 study = bioBank2Db.getStudy(rs.getString(20));
 
                 // make sure the study is correct
-                if (patient.getStudy().getNameShort().equals(
-                    study.getNameShort())) throw new Exception();
-
-                HashSet<PvInfoData> pvInfoDataSet = new HashSet<PvInfoData>();
+                if (!patient.getStudy().getNameShort().equals(
+                    study.getNameShort())) {
+                    throw new Exception();
+                }
 
                 // now set corresponding patient visit info data
                 for (PvInfo pvInfo : study.getPvInfoCollection()) {
                     pvInfoData = new PvInfoData();
                     pvInfoData.setPvInfo(pvInfo);
+                    pvInfoData.setPatientVisit(pv);
 
                     if (pvInfo.getLabel().equals("Date Received")) {
-                        date = bbpdbDateFmt.parse(rs.getString(6));
-                        pvInfoData.setValue(biobank2DateFmt.format(date));
+                        pvInfoData.setValue(biobank2DateFmt.format(rs.getDate(6)));
                     }
-                    else if (pvInfo.getLabel().equals("Aliquot Volume")) {
-                        pvInfoData.setValue(rs.getString(6));
+                    else if (pvInfo.getLabel().equals("PBMC Count")) {
+                        pvInfoData.setValue(biobank2DateFmt.format(rs.getDate(8)));
                     }
-
-                    pvInfoDataSet.add((PvInfoData) bioBank2Db.setObject(pvInfoData));
+                    else if (pvInfo.getLabel().equals("PBMC Count")) {
+                        pvInfoData.setValue(biobank2DateFmt.format(rs.getDate(8)));
+                    }
                 }
-
-                pv.setPvInfoDataCollection(pvInfoDataSet);
-                pv = (PatientVisit) bioBank2Db.setObject(pv);
             }
         }
     }
