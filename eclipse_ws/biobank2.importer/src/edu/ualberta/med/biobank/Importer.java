@@ -277,10 +277,20 @@ public class Importer {
                         pvInfoData.setValue(biobank2DateFmt.format(rs.getDate(6)));
                     }
                     else if (pvInfo.getLabel().equals("PBMC Count")) {
-                        pvInfoData.setValue(biobank2DateFmt.format(rs.getDate(8)));
+                        pvInfoData.setValue(rs.getString(8));
                     }
-                    else if (pvInfo.getLabel().equals("PBMC Count")) {
-                        pvInfoData.setValue(biobank2DateFmt.format(rs.getDate(8)));
+                    else if (pvInfo.getLabel().equals("Consent")) {
+                        ArrayList<String> consents = new ArrayList<String>();
+                        if (rs.getInt(9) == 1) {
+                            consents.add("Surveillance");
+                        }
+                        if (rs.getInt(10) == 1) {
+                            consents.add("Surveillance");
+                        }
+                        pvInfoData.setValue(rs.getString(8));
+                    }
+                    else if (pvInfo.getLabel().equals("Worksheet")) {
+                        pvInfoData.setValue(rs.getString(15));
                     }
                 }
             }
