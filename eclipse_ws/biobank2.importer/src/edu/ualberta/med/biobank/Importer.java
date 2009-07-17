@@ -79,10 +79,14 @@ public class Importer {
 
             cbrSite = bioBank2Db.createSite();
 
+            SiteStorageTypes.insertStorageTypes(cbrSite);
+
             importStudies();
             importClinics();
             importPatients();
             importPatientVisits();
+
+            System.out.println("importing complete.");
 
         }
         catch (Exception e) {

@@ -33,6 +33,10 @@ public class BioBank2Db {
         return instance;
     }
 
+    public WritableApplicationService getAppService() {
+        return appService;
+    }
+
     public void setAppService(WritableApplicationService a) {
         appService = a;
     }
