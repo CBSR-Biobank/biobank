@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank;
 
 import java.net.URL;
+import java.text.SimpleDateFormat;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.FileLocator;
@@ -27,7 +28,11 @@ public class BioBankPlugin extends AbstractUIPlugin {
 
     public static final String DATE_FORMAT = "yyyy-MM-dd";
 
+    public SimpleDateFormat dateFormatter;
+
     public static final String DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm";
+
+    public SimpleDateFormat dateTimeFormatter;
 
     public static final String IMG_FORM_BG = "formBg";
 
@@ -211,5 +216,20 @@ public class BioBankPlugin extends AbstractUIPlugin {
                 .getDebugOption(BioBankPlugin.PLUGIN_ID + "/realScan"));
         }
         return false;
+    }
+
+    public static SimpleDateFormat getDateFormatter() {
+        if (getDefault().dateFormatter == null) {
+            getDefault().dateFormatter = new SimpleDateFormat(DATE_FORMAT);
+        }
+        return getDefault().dateFormatter;
+    }
+
+    public static SimpleDateFormat getDateTimeFormatter() {
+        if (getDefault().dateTimeFormatter == null) {
+            getDefault().dateTimeFormatter = new SimpleDateFormat(
+                DATE_TIME_FORMAT);
+        }
+        return getDefault().dateTimeFormatter;
     }
 }

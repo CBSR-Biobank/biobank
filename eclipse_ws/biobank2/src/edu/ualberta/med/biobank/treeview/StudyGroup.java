@@ -20,76 +20,81 @@ import edu.ualberta.med.biobank.model.Study;
 
 public class StudyGroup extends Node {
 
-	public StudyGroup(SiteAdapter parent, int id) {
-		super(parent, id, "Studies", true);
-	}
+    public StudyGroup(SiteAdapter parent, int id) {
+        super(parent, id, "Studies", true);
+    }
 
-	public void openViewForm() {
-		Assert.isTrue(false, "should not be called");
-	}
+    public void openViewForm() {
+        Assert.isTrue(false, "should not be called");
+    }
 
-	@Override
-	public void performDoubleClick() {
-		performExpand();
-	}
+    @Override
+    public void performDoubleClick() {
+        performExpand();
+    }
 
-	@Override
-	public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-		MenuItem mi = new MenuItem(menu, SWT.PUSH);
-		mi.setText("Add Study");
-		mi.addSelectionListener(new SelectionListener() {
-			public void widgetSelected(SelectionEvent event) {
-				StudyAdapter adapter = new StudyAdapter(StudyGroup.this,
-					new Study());
-				openForm(new FormInput(adapter), StudyEntryForm.ID);
-			}
+    @Override
+    public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
+        MenuItem mi = new MenuItem(menu, SWT.PUSH);
+        mi.setText("Add Study");
+        mi.addSelectionListener(new SelectionListener() {
+            public void widgetSelected(SelectionEvent event) {
+                StudyAdapter adapter = new StudyAdapter(StudyGroup.this,
+                    new Study());
+                openForm(new FormInput(adapter), StudyEntryForm.ID);
+            }
 
-			public void widgetDefaultSelected(SelectionEvent e) {
-			}
-		});
-	}
+            public void widgetDefaultSelected(SelectionEvent e) {
+            }
+        });
+    }
 
-	@Override
-	public void loadChildren(boolean updateNode) {
-		Site currentSite = ((SiteAdapter) getParent()).getSite();
-		Assert.isNotNull(currentSite, "null site");
-		try {
-			// read from database again
-			currentSite = (Site) ModelUtils.getObjectWithId(getAppService(),
-				Site.class, currentSite.getId());
-			((SiteAdapter) getParent()).setSite(currentSite);
+    @Override
+    public void loadChildren(boolean updateNode) {
+        Site currentSite = ((SiteAdapter) getParent()).getSite();
+        Assert.isNotNull(currentSite, "null site");
+        try {
+            // read from database again
+            currentSite = (Site) ModelUtils.getObjectWithId(getAppService(),
+                Site.class, currentSite.getId());
+            ((SiteAdapter) getParent()).setSite(currentSite);
 
-			Collection<Study> studies = currentSite.getStudyCollection();
-			SessionManager.getLogger().trace(
-				"updateStudies: Site " + currentSite.getName() + " has "
-						+ studies.size() + " studies");
+            Collection<Study> studies = currentSite.getStudyCollection();
+            SessionManager.getLogger().trace(
+                "updateStudies: Site " + currentSite.getName() + " has "
+                    + studies.size() + " studies");
 
-			for (Study study : studies) {
-				SessionManager.getLogger().trace(
-					"updateStudies: Study " + study.getId() + ": "
-							+ study.getName() + ", short name: "
-							+ study.getNameShort());
+            for (Study study : studies) {
+                SessionManager.getLogger().trace(
+                    "updateStudies: Study " + study.getId() + ": "
+                        + study.getName() + ", short name: "
+                        + study.getNameShort());
 
-				StudyAdapter node = (StudyAdapter) getChild(study.getId());
+                StudyAdapter node = (StudyAdapter) getChild(study.getId());
 
-				if (node == null) {
-					node = new StudyAdapter(this, study);
-					addChild(node);
-				}
-				if (updateNode) {
-					SessionManager.getInstance().getTreeViewer().update(node,
-						null);
-				}
-			}
-		} catch (Exception e) {
-			SessionManager.getLogger().error(
-				"Error while loading study group children for site "
-						+ currentSite.getName(), e);
-		}
-	}
+                if (node == null) {
+                    node = new StudyAdapter(this, study);
+                    addChild(node);
+                }
+                if (updateNode) {
+                    SessionManager.getInstance().getTreeViewer().update(node,
+                        null);
+                }
+            }
+        } catch (Exception e) {
+            SessionManager.getLogger().error(
+                "Error while loading study group children for site "
+                    + currentSite.getName(), e);
+        }
+    }
 
-	@Override
-	public Node accept(NodeSearchVisitor visitor) {
-		return visitor.visit(this);
-	}
+    @Override
+    public Node accept(NodeSearchVisitor visitor) {
+        return visitor.visit(this);
+    }
+
+    @Override
+    public String getTitle() {
+        return null;
+    }
 }

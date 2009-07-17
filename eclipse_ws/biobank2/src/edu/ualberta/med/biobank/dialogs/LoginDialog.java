@@ -1,4 +1,3 @@
-
 package edu.ualberta.med.biobank.dialogs;
 
 import java.util.ArrayList;
@@ -54,7 +53,8 @@ public class LoginDialog extends TitleAreaDialog {
 
     private static final String LAST_USER_NAME = "lastUserName";
 
-    private static final Logger logger = Logger.getLogger(LoginDialog.class.getName());
+    private static final Logger logger = Logger.getLogger(LoginDialog.class
+        .getName());
 
     public LoginDialog(Shell parentShell) {
         super(parentShell);
@@ -62,12 +62,13 @@ public class LoginDialog extends TitleAreaDialog {
         servers = new ArrayList<String>();
         userNames = new ArrayList<String>();
 
-        Preferences prefs = new ConfigurationScope().getNode(Application.PLUGIN_ID);
+        Preferences prefs = new ConfigurationScope()
+            .getNode(Application.PLUGIN_ID);
         Preferences prefsServers = prefs.node(SAVED_SERVERS);
         Preferences prefsUserNames = prefs.node(SAVED_USER_NAMES);
 
         try {
-            String [] serverNodeNames = prefsServers.childrenNames();
+            String[] serverNodeNames = prefsServers.childrenNames();
             for (String serverNodeName : serverNodeNames) {
                 Preferences node = prefsServers.node(serverNodeName);
                 servers.add(node.get(SERVER, ""));
@@ -77,7 +78,7 @@ public class LoginDialog extends TitleAreaDialog {
         }
 
         try {
-            String [] userNodeNames = prefsUserNames.childrenNames();
+            String[] userNodeNames = prefsUserNames.childrenNames();
             for (String userNodeName : userNodeNames) {
                 Preferences node = prefsUserNames.node(userNodeName);
                 userNames.add(node.get(USER_NAME, ""));
@@ -105,7 +106,8 @@ public class LoginDialog extends TitleAreaDialog {
     protected Control createDialogArea(Composite parent) {
         Composite parentComposite = (Composite) super.createDialogArea(parent);
 
-        Preferences prefs = new ConfigurationScope().getNode(Application.PLUGIN_ID);
+        Preferences prefs = new ConfigurationScope()
+            .getNode(Application.PLUGIN_ID);
 
         Composite contents = new Composite(parentComposite, SWT.NONE);
         GridLayout layout = new GridLayout(2, false);
@@ -142,7 +144,8 @@ public class LoginDialog extends TitleAreaDialog {
         for (Iterator<String> it = userNames.iterator(); it.hasNext();) {
             userNameText.add(it.next());
         }
-        userNameText.select(userNameText.indexOf(prefs.get(LAST_USER_NAME, "")));
+        userNameText
+            .select(userNameText.indexOf(prefs.get(LAST_USER_NAME, "")));
 
         Label passwordLabel = new Label(contents, SWT.NONE);
         passwordLabel.setText("&Password:");
@@ -160,21 +163,24 @@ public class LoginDialog extends TitleAreaDialog {
     protected void buttonPressed(int buttonId) {
         if ((buttonId == IDialogConstants.OK_ID)
             || (buttonId == IDialogConstants.CANCEL_ID)) {
-            Preferences prefs = new ConfigurationScope().getNode(Application.PLUGIN_ID);
+            Preferences prefs = new ConfigurationScope()
+                .getNode(Application.PLUGIN_ID);
             prefs.put(LAST_SERVER, serverText.getText());
             prefs.put(LAST_USER_NAME, userNameText.getText());
 
             if ((serverText.getSelectionIndex() == -1)
                 && !servers.contains(serverText.getText())) {
                 Preferences prefsServers = prefs.node(SAVED_SERVERS);
-                Preferences prefsServer = prefsServers.node(Integer.toString(servers.size()));
+                Preferences prefsServer = prefsServers.node(Integer
+                    .toString(servers.size()));
                 prefsServer.put(SERVER, serverText.getText());
             }
 
             if ((userNameText.getSelectionIndex() == -1)
                 && !userNames.contains(userNameText.getText())) {
                 Preferences prefsUserNames = prefs.node(SAVED_USER_NAMES);
-                Preferences prefsUserName = prefsUserNames.node(Integer.toString(userNames.size()));
+                Preferences prefsUserName = prefsUserNames.node(Integer
+                    .toString(userNames.size()));
                 prefsUserName.put(USER_NAME, userNameText.getText());
             }
 
@@ -205,14 +211,14 @@ public class LoginDialog extends TitleAreaDialog {
         SessionHelper sessionHelper = new SessionHelper(serverText.getText(),
             userNameText.getText(), passwordText.getText());
 
-        BusyIndicator.showWhile(
-            PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell().getDisplay(),
-            sessionHelper);
+        BusyIndicator.showWhile(PlatformUI.getWorkbench()
+            .getActiveWorkbenchWindow().getShell().getDisplay(), sessionHelper);
 
         List<Site> sites = sessionHelper.getSites();
         if (sites != null) {
             SessionManager.getInstance().addSession(
-                sessionHelper.getAppService(), serverText.getText(), sites);
+                sessionHelper.getAppService(), serverText.getText(),
+                userNameText.getText(), sites);
         }
 
         super.okPressed();
