@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.Semaphore;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.Assert;
@@ -43,7 +44,35 @@ public class SessionManager {
 
     public boolean inactiveTimeout = false;
 
-    final int TIME_OUT = 300000;
+    private final Semaphore timeoutSem = new Semaphore(100, true);
+
+    final int TIME_OUT = 900000;
+
+    final Runnable timeoutRunnable = new Runnable() {
+        public void run() {
+            try {
+                timeoutSem.acquire();
+                inactiveTimeout = true;
+                // System.out
+                // .println("startInactivityTimer_runnable: inactiveTimeout/"
+                // + inactiveTimeout);
+
+                boolean logout = BioBankPlugin.openConfirm("Inactive Timeout",
+                    "The application has been inactive for "
+                        + (TIME_OUT / 1000)
+                        + " seconds.\n Do you want to log out?");
+
+                if (logout) {
+                    for (SessionAdapter adapter : sessionsByName.values()) {
+                        deleteSession(adapter.getName());
+                    }
+                }
+                timeoutSem.release();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    };
 
     public Node getRootNode() {
         return rootNode;
@@ -144,40 +173,42 @@ public class SessionManager {
     }
 
     private void startInactivityTimer() {
-        final Runnable runnable = new Runnable() {
-            public void run() {
-                inactiveTimeout = true;
-                System.out
-                    .println("Idle for " + (TIME_OUT / 1000) + " seconds");
+        try {
+            timeoutSem.acquire();
+            inactiveTimeout = false;
+            // System.out.println("startInactivityTimer: inactiveTimeout/"
+            // + inactiveTimeout);
 
-                BioBankPlugin.openMessage("Inactive Timeout",
-                    "The application has been inactive for "
-                        + (TIME_OUT / 1000)
-                        + " seconds.\n Do you want to log out?");
+            final Display display = PlatformUI.getWorkbench()
+                .getActiveWorkbenchWindow().getShell().getDisplay();
 
-                for (SessionAdapter adapter : sessionsByName.values()) {
-                    deleteSession(adapter.getName());
+            // this listener will be called when the events listed below happen
+            Listener idleListener = new Listener() {
+                public void handleEvent(Event event) {
+                    try {
+                        timeoutSem.acquire();
+                        // System.out
+                        // .println("startInactivityTimer_idleListener: inactiveTimeout/"
+                        // + inactiveTimeout);
+                        if (!inactiveTimeout && (sessionsByName.size() > 0)) {
+                            display.timerExec(TIME_OUT, timeoutRunnable);
+                        }
+                        timeoutSem.release();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
+            };
+            int[] events = { SWT.KeyDown, SWT.KeyUp, SWT.MouseDown,
+                SWT.MouseMove, SWT.MouseUp };
+            for (int event : events) {
+                display.addFilter(event, idleListener);
             }
-        };
-
-        final Display display = PlatformUI.getWorkbench()
-            .getActiveWorkbenchWindow().getShell().getDisplay();
-
-        // this listener will be called when the events listed below happen
-        Listener idleListener = new Listener() {
-            public void handleEvent(Event event) {
-                if (!inactiveTimeout && (sessionsByName.size() > 0)) {
-                    display.timerExec(TIME_OUT, runnable);
-                }
-            }
-        };
-        int[] events = { SWT.KeyDown, SWT.KeyUp, SWT.MouseDown, SWT.MouseMove,
-            SWT.MouseUp };
-        for (int event : events) {
-            display.addFilter(event, idleListener);
+            display.timerExec(TIME_OUT, timeoutRunnable);
+            timeoutSem.release();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
-        display.timerExec(TIME_OUT, runnable);
     }
 
     public SessionAdapter getSessionAdapter(int count) {
