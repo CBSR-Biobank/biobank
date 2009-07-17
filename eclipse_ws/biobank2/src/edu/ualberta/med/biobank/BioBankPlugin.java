@@ -127,6 +127,14 @@ public class BioBankPlugin extends AbstractUIPlugin {
     }
 
     /**
+     * Display an information message
+     */
+    public static boolean openConfirm(String title, String message) {
+        return MessageDialog.openConfirm(PlatformUI.getWorkbench()
+            .getActiveWorkbenchWindow().getShell(), title, message);
+    }
+
+    /**
      * Display an error message
      */
     public static void openError(String title, String message) {
