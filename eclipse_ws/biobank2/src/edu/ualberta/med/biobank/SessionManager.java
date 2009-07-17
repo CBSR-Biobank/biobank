@@ -53,9 +53,9 @@ public class SessionManager {
             try {
                 timeoutSem.acquire();
                 inactiveTimeout = true;
-                System.out
-                    .println("startInactivityTimer_runnable: inactiveTimeout/"
-                        + inactiveTimeout);
+                // System.out
+                // .println("startInactivityTimer_runnable: inactiveTimeout/"
+                // + inactiveTimeout);
 
                 boolean logout = BioBankPlugin.openConfirm("Inactive Timeout",
                     "The application has been inactive for "
@@ -176,8 +176,8 @@ public class SessionManager {
         try {
             timeoutSem.acquire();
             inactiveTimeout = false;
-            System.out.println("startInactivityTimer: inactiveTimeout/"
-                + inactiveTimeout);
+            // System.out.println("startInactivityTimer: inactiveTimeout/"
+            // + inactiveTimeout);
 
             final Display display = PlatformUI.getWorkbench()
                 .getActiveWorkbenchWindow().getShell().getDisplay();
@@ -187,9 +187,9 @@ public class SessionManager {
                 public void handleEvent(Event event) {
                     try {
                         timeoutSem.acquire();
-                        System.out
-                            .println("startInactivityTimer_idleListener: inactiveTimeout/"
-                                + inactiveTimeout);
+                        // System.out
+                        // .println("startInactivityTimer_idleListener: inactiveTimeout/"
+                        // + inactiveTimeout);
                         if (!inactiveTimeout && (sessionsByName.size() > 0)) {
                             display.timerExec(TIME_OUT, timeoutRunnable);
                         }
