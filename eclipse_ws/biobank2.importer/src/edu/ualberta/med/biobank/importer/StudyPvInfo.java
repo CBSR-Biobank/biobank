@@ -1,5 +1,5 @@
 
-package edu.ualberta.med.biobank;
+package edu.ualberta.med.biobank.importer;
 
 import java.util.HashSet;
 

@@ -1,5 +1,5 @@
 
-package edu.ualberta.med.biobank;
+package edu.ualberta.med.biobank.importer;
 
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Clinic;

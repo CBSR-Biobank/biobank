@@ -1,5 +1,5 @@
 
-package edu.ualberta.med.biobank;
+package edu.ualberta.med.biobank.importer;
 
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Clinic;
@@ -8,6 +8,8 @@ import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.PvInfo;
 import edu.ualberta.med.biobank.model.PvInfoData;
 import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.model.StorageContainer;
+import edu.ualberta.med.biobank.model.StorageType;
 import edu.ualberta.med.biobank.model.Study;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.client.ApplicationServiceProvider;
@@ -35,6 +37,8 @@ import org.apache.commons.lang.StringUtils;
 public class Importer {
     private WritableApplicationService appService;
 
+    private static Importer instance = null;
+
     private Connection con;
 
     private BioBank2Db bioBank2Db;
@@ -44,10 +48,10 @@ public class Importer {
     private Site cbrSite;
 
     public static void main(String [] args) throws Exception {
-        new Importer();
+        Importer.getInstance();
     }
 
-    Importer() {
+    private Importer() {
         tables = new ArrayList<String>();
 
         try {
@@ -69,6 +73,8 @@ public class Importer {
             if (!tableExists("patient_visit")) throw new Exception();
 
             // the order here matters
+            bioBank2Db.deleteAll(StorageContainer.class);
+            bioBank2Db.deleteAll(StorageType.class);
             bioBank2Db.deleteAll(PvInfoData.class);
             bioBank2Db.deleteAll(PvInfo.class);
             bioBank2Db.deleteAll(PatientVisit.class);
@@ -79,7 +85,9 @@ public class Importer {
 
             cbrSite = bioBank2Db.createSite();
 
-            SiteStorageTypes.insertStorageTypes(cbrSite);
+            SiteStorageTypes.getInstance().insertStorageTypes(cbrSite);
+            SiteStorageContainers.getInstance().insertStorageContainers(
+                cbrSite);
 
             importStudies();
             importClinics();
@@ -92,6 +100,12 @@ public class Importer {
         catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public static Importer getInstance() {
+        if (instance != null) return instance;
+        instance = new Importer();
+        return instance;
     }
 
     @SuppressWarnings("unused")
