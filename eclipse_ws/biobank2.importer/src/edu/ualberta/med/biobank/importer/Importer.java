@@ -7,6 +7,9 @@ import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.PvInfo;
 import edu.ualberta.med.biobank.model.PvInfoData;
+import edu.ualberta.med.biobank.model.Sample;
+import edu.ualberta.med.biobank.model.SamplePosition;
+import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.StorageContainer;
 import edu.ualberta.med.biobank.model.StorageType;
@@ -66,11 +69,17 @@ public class Importer {
             con = getMysqlConnection();
 
             getTables();
-            if (tables.size() == 0) throw new Exception();
-            if (!tableExists("clinics")) throw new Exception();
-            if (!tableExists("study_list")) throw new Exception();
-            if (!tableExists("patient")) throw new Exception();
-            if (!tableExists("patient_visit")) throw new Exception();
+            if (tables.size() == 0) throw new Exception(
+                "No tables found in database");
+
+            String [] reqdTables = {
+                "clinics", "study_list", "patient", "patient_visit", "cabinet",
+                "sample_list" };
+
+            for (String table : reqdTables) {
+                if (!tableExists(table)) throw new Exception("Table " + table
+                    + " not found");
+            }
 
             // the order here matters
             bioBank2Db.deleteAll(StorageContainer.class);
@@ -88,6 +97,7 @@ public class Importer {
             SiteStorageTypes.getInstance().insertStorageTypes(cbrSite);
             SiteStorageContainers.getInstance().insertStorageContainers(cbrSite);
 
+            importCabinetSamples();
             importStudies();
             importClinics();
             importPatients();
@@ -322,41 +332,79 @@ public class Importer {
         System.out.println("importing cabinet samples ...");
 
         Statement s = con.createStatement();
-        s.execute("select cabinet.*, patient_visit.date_taken, study_list.study_name_short "
-            + "from cabinet, study_list, patient_visit "
+        s.execute("select patient_visit.visit_nr, patient_visit.date_taken, "
+            + "study_list.study_name_short, sample_list.sample_name_short, cabinet.*  "
+            + "from cabinet, study_list, patient_visit, sample_list "
             + "where cabinet.study_nr=study_list.study_nr "
             + "and patient_visit.study_nr=study_list.study_nr "
             + "and cabinet.visit_nr=patient_visit.visit_nr "
-            + "and cabinet.patient_nr=patient_visit.patient_nr");
+            + "and cabinet.patient_nr=patient_visit.patient_nr "
+            + "and cabinet.sample_nr=sample_list.sample_nr");
+
         ResultSet rs = s.getResultSet();
         if (rs != null) {
             StorageContainer cabinet = bioBank2Db.getStorageContainer("cabinet");
             int cabinetNum;
             StorageContainer drawer;
             StorageContainer bin;
+            PatientVisit visit;
+            SampleType sampleType;
             int drawerNum;
             int binNum;
             String drawerName;
             String binPos;
+            String sampleTypeNameShort;
 
             while (rs.next()) {
-                cabinetNum = rs.getInt(1);
+                cabinetNum = rs.getInt(5);
                 if (cabinetNum != 1) throw new Exception(
                     "Invalid cabinet number: " + cabinetNum);
 
-                drawerName = rs.getString(2);
-                binNum = rs.getInt(3);
-                binPos = rs.getString(4);
+                sampleTypeNameShort = rs.getString(4);
+                drawerName = rs.getString(6);
+                binNum = rs.getInt(7);
+                binPos = rs.getString(8);
 
-                drawerNum = drawerName.charAt(1) - 'A';
+                System.out.println("importing sample at position: "
+                    + drawerName + String.format("%02d", binNum) + binPos);
 
-                drawer = bioBank2Db.getStorageContainerContents(cabinet, 1,
-                    drawerNum);
-                bin = bioBank2Db.getStorageContainerContents(drawer, 1, binNum);
+                drawerNum = drawerName.charAt(1) - 'A' + 1;
+                drawer = bioBank2Db.getChildContainer(cabinet, 1, drawerNum);
+                bin = bioBank2Db.getChildContainer(drawer, 1, binNum);
 
+                sampleType = bioBank2Db.getSampleType(sampleTypeNameShort);
+                bioBank2Db.containerCheckSampleTypeValid(bin, sampleType);
+
+                SamplePosition spos = new SamplePosition();
+                spos.setPositionDimensionOne(1);
+                spos.setPositionDimensionTwo(binPos2Int(binPos));
+                spos.setStorageContainer(bin);
+
+                visit = bioBank2Db.getPatientVisit(rs.getString(4),
+                    rs.getInt(9), rs.getDate(2));
+
+                Sample sample = new Sample();
+                sample.setSampleType(sampleType);
+                sample.setInventoryId(rs.getString(12));
+                sample.setProcessDate(rs.getDate(13));
+                sample.setQuantity(rs.getDouble(14));
+                sample.setSamplePosition(spos);
+                sample.setPatientVisit(visit);
+
+                sample = (Sample) bioBank2Db.setObject(sample);
             }
         }
 
+    }
+
+    private static final String posAlpha = "ABCDEFGHJKLMNPQRSTUVWXYZ";
+
+    private int binPos2Int(String binPos) throws Exception {
+        if (binPos.length() != 2) {
+            throw new Exception("binPos has an invalid length: " + binPos);
+        }
+        return posAlpha.indexOf(binPos.charAt(0)) * 24
+            + posAlpha.indexOf(binPos.charAt(1));
     }
 
     @SuppressWarnings("unused")

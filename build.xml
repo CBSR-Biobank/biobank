@@ -9,6 +9,8 @@
 	<property environment="env" />
 	<property name="cacore.sdk.dir" location="caCORE_SDK/sdk" />
 	<property name="eclipse.proj.dir" location="eclipse_ws/biobank2" />
+	<property name="eclipse.proj.dir.importer"
+	          location="eclipse_ws/biobank2.importer" />
 	<property name="eclipse.proj.dir.junit"
 	          location="eclipse_ws/biobank2.tests" />
 	<property name="scripts.proj.dir" location="scripts" />
@@ -130,6 +132,14 @@
 		</copy>
 		<copy file="${cacore.sdk.dir}/output/biobank2/src/hibernate.cfg.xml"
 		      tofile="${eclipse.proj.dir}/lib/" />
+		<copy todir="${eclipse.proj.dir.importer}/lib">
+			<fileset dir="${cacore.sdk.dir}/output/biobank2/package/remote-client/lib" />
+		</copy>
+		<copy todir="${eclipse.proj.dir.importer}/conf">
+			<fileset dir="${cacore.sdk.dir}/output/biobank2/package/remote-client/conf">
+				<include name="application-config-client*.xml" />
+			</fileset>
+		</copy>
 
 		<copy todir="${eclipse.proj.dir.junit}/lib">
 			<fileset dir="${cacore.sdk.dir}/output/biobank2/package/remote-client/lib" />

@@ -5,9 +5,12 @@ import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.Patient;
+import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.PvInfoPossible;
+import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.StorageContainer;
+import edu.ualberta.med.biobank.model.StorageType;
 import edu.ualberta.med.biobank.model.Study;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -16,9 +19,12 @@ import gov.nih.nci.system.query.SDKQueryResult;
 import gov.nih.nci.system.query.example.DeleteExampleQuery;
 import gov.nih.nci.system.query.example.InsertExampleQuery;
 import gov.nih.nci.system.query.example.UpdateExampleQuery;
+import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 import java.lang.reflect.Constructor;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 public class BioBank2Db {
@@ -113,20 +119,75 @@ public class BioBank2Db {
         return list.get(0);
     }
 
-    public StorageContainer getStorageContainerContents(
-        StorageContainer container, int dim1pos, int dim2pos) throws Exception {
+    public SampleType getSampleType(String nameShort) throws Exception {
+        SampleType st = new SampleType();
+        st.setNameShort(nameShort);
+
+        List<SampleType> list = appService.search(SampleType.class, st);
+        if (list.size() != 1) throw new Exception("Sample type with short name"
+            + nameShort + " not found");
+        return list.get(0);
+    }
+
+    public StorageContainer getChildContainer(StorageContainer container,
+        int dim1pos, int dim2pos) throws Exception {
         Collection<ContainerPosition> positions = container.getOccupiedPositions();
         if ((positions == null)
             || (container.getOccupiedPositions().size() == 0)) {
             throw new Exception("Container " + container.getName()
-                + " has no sub containers");
+                + " has no child containers");
         }
         for (ContainerPosition position : positions) {
             if ((position.getPositionDimensionOne() == dim1pos)
-                && (position.getPositionDimensionTwo() == dim2pos)) return position.getParentContainer();
+                && (position.getPositionDimensionTwo() == dim2pos)) {
+                return position.getOccupiedContainer();
+            }
         }
         throw new Exception("Container " + container.getName()
-            + " has no sub container at position" + dim1pos + "," + dim2pos);
+            + " has no child container at position " + dim1pos + "," + dim2pos);
+    }
+
+    public void containerCheckSampleTypeValid(StorageContainer container,
+        SampleType sampleType) throws Exception {
+        StorageType stype = container.getStorageType();
+        Collection<SampleType> st = stype.getSampleTypeCollection();
+        if ((st == null) || (st.size() == 0)) {
+            throw new Exception("Container " + container.getName()
+                + " cannot hold any sample types: " + sampleType.getName());
+        }
+        HQLCriteria c = new HQLCriteria("select count(sampleTypes)"
+            + " from edu.ualberta.med.biobank.model.StorageType as stype"
+            + " inner join stype.sampleTypeCollection as sampleTypes"
+            + " where stype.id=? and sampleTypes.id=?");
+
+        c.setParameters(Arrays.asList(new Object [] {
+            stype.getId(), sampleType.getId() }));
+
+        List<Long> results = appService.query(c);
+        if (results.get(0) != 1) {
+            throw new Exception("Sample type " + sampleType.getName()
+                + " is not valid for container " + container.getName());
+        }
+    }
+
+    public PatientVisit getPatientVisit(String studyNameShort, int patientNum,
+        Date dateDrawn) throws Exception {
+        HQLCriteria c = new HQLCriteria("select patientvisit"
+            + " from edu.ualberta.med.biobank.model.Study as study"
+            + " inner join study.patientCollection as patients"
+            + " inner join patients.patientVisits as visits"
+            + " where study.nameShort=? and patients.number=?"
+            + " and visits.dateDrawn=?");
+
+        c.setParameters(Arrays.asList(new Object [] {
+            studyNameShort, patientNum, dateDrawn }));
+
+        List<PatientVisit> results = appService.query(c);
+        if (results.size() != 1) {
+            throw new Exception("found 0 or more than 1 patient visits: "
+                + results.size());
+        }
+        return results.get(0);
     }
 
     public Object setObject(Object o) throws Exception {
