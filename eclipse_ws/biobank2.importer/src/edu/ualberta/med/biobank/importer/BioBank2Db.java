@@ -3,9 +3,11 @@ package edu.ualberta.med.biobank.importer;
 
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Clinic;
+import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.PvInfoPossible;
 import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.model.StorageContainer;
 import edu.ualberta.med.biobank.model.Study;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -16,6 +18,7 @@ import gov.nih.nci.system.query.example.InsertExampleQuery;
 import gov.nih.nci.system.query.example.UpdateExampleQuery;
 
 import java.lang.reflect.Constructor;
+import java.util.Collection;
 import java.util.List;
 
 public class BioBank2Db {
@@ -98,6 +101,32 @@ public class BioBank2Db {
             pvInfoPossible);
         if (list.size() != 1) throw new Exception();
         return list.get(0);
+    }
+
+    public StorageContainer getStorageContainer(String name) throws Exception {
+        StorageContainer sc = new StorageContainer();
+        sc.setName(name);
+
+        List<StorageContainer> list = appService.search(StorageContainer.class,
+            sc);
+        if (list.size() != 1) throw new Exception();
+        return list.get(0);
+    }
+
+    public StorageContainer getStorageContainerContents(
+        StorageContainer container, int dim1pos, int dim2pos) throws Exception {
+        Collection<ContainerPosition> positions = container.getOccupiedPositions();
+        if ((positions == null)
+            || (container.getOccupiedPositions().size() == 0)) {
+            throw new Exception("Container " + container.getName()
+                + " has no sub containers");
+        }
+        for (ContainerPosition position : positions) {
+            if ((position.getPositionDimensionOne() == dim1pos)
+                && (position.getPositionDimensionTwo() == dim2pos)) return position.getParentContainer();
+        }
+        throw new Exception("Container " + container.getName()
+            + " has no sub container at position" + dim1pos + "," + dim2pos);
     }
 
     public Object setObject(Object o) throws Exception {

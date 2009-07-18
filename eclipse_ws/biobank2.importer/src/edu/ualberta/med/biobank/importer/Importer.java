@@ -86,8 +86,7 @@ public class Importer {
             cbrSite = bioBank2Db.createSite();
 
             SiteStorageTypes.getInstance().insertStorageTypes(cbrSite);
-            SiteStorageContainers.getInstance().insertStorageContainers(
-                cbrSite);
+            SiteStorageContainers.getInstance().insertStorageContainers(cbrSite);
 
             importStudies();
             importClinics();
@@ -317,6 +316,47 @@ public class Importer {
                 }
             }
         }
+    }
+
+    private void importCabinetSamples() throws Exception {
+        System.out.println("importing cabinet samples ...");
+
+        Statement s = con.createStatement();
+        s.execute("select cabinet.*, patient_visit.date_taken, study_list.study_name_short "
+            + "from cabinet, study_list, patient_visit "
+            + "where cabinet.study_nr=study_list.study_nr "
+            + "and patient_visit.study_nr=study_list.study_nr "
+            + "and cabinet.visit_nr=patient_visit.visit_nr "
+            + "and cabinet.patient_nr=patient_visit.patient_nr");
+        ResultSet rs = s.getResultSet();
+        if (rs != null) {
+            StorageContainer cabinet = bioBank2Db.getStorageContainer("cabinet");
+            int cabinetNum;
+            StorageContainer drawer;
+            StorageContainer bin;
+            int drawerNum;
+            int binNum;
+            String drawerName;
+            String binPos;
+
+            while (rs.next()) {
+                cabinetNum = rs.getInt(1);
+                if (cabinetNum != 1) throw new Exception(
+                    "Invalid cabinet number: " + cabinetNum);
+
+                drawerName = rs.getString(2);
+                binNum = rs.getInt(3);
+                binPos = rs.getString(4);
+
+                drawerNum = drawerName.charAt(1) - 'A';
+
+                drawer = bioBank2Db.getStorageContainerContents(cabinet, 1,
+                    drawerNum);
+                bin = bioBank2Db.getStorageContainerContents(drawer, 1, binNum);
+
+            }
+        }
+
     }
 
     @SuppressWarnings("unused")

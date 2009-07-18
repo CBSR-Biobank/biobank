@@ -57,7 +57,6 @@ public class SiteStorageContainers {
                 insertStorageContainer(site, String.format("%02d", j + 1),
                     SiteStorageTypes.getInstance().getStorageType("Bin"),
                     drawer, 1, j + 1);
-
             }
         }
     }
