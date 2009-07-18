@@ -3,7 +3,6 @@ package edu.ualberta.med.biobank.importer;
 
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Clinic;
-import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.PvInfoPossible;
@@ -131,20 +130,27 @@ public class BioBank2Db {
 
     public StorageContainer getChildContainer(StorageContainer container,
         int dim1pos, int dim2pos) throws Exception {
-        Collection<ContainerPosition> positions = container.getOccupiedPositions();
-        if ((positions == null)
-            || (container.getOccupiedPositions().size() == 0)) {
-            throw new Exception("Container " + container.getName()
-                + " has no child containers");
+
+        HQLCriteria c = new HQLCriteria("select occupied"
+            + " from edu.ualberta.med.biobank.model.StorageContainer as sc"
+            + " inner join sc.occupiedPositions as positions"
+            + " inner join positions.occupiedContainer as occupied"
+            + " where sc.id=? and positions.positionDimensionOne=? "
+            + " and positions.positionDimensionTwo=?");
+
+        c.setParameters(Arrays.asList(new Object [] {
+            container.getId(), dim1pos, dim2pos }));
+
+        List<StorageContainer> results = appService.query(c);
+        if (results.size() != 1) {
+            if (results.size() != 0) throw new Exception("Container "
+                + container.getName() + " has no child containers");
+            else
+                throw new Exception("Container " + container.getName()
+                    + " has no child container at position " + dim1pos + ","
+                    + dim2pos);
         }
-        for (ContainerPosition position : positions) {
-            if ((position.getPositionDimensionOne() == dim1pos)
-                && (position.getPositionDimensionTwo() == dim2pos)) {
-                return position.getOccupiedContainer();
-            }
-        }
-        throw new Exception("Container " + container.getName()
-            + " has no child container at position " + dim1pos + "," + dim2pos);
+        return results.get(0);
     }
 
     public void containerCheckSampleTypeValid(StorageContainer container,
@@ -172,20 +178,27 @@ public class BioBank2Db {
 
     public PatientVisit getPatientVisit(String studyNameShort, int patientNum,
         Date dateDrawn) throws Exception {
-        HQLCriteria c = new HQLCriteria("select patientvisit"
+        HQLCriteria c = new HQLCriteria("select visits"
             + " from edu.ualberta.med.biobank.model.Study as study"
             + " inner join study.patientCollection as patients"
-            + " inner join patients.patientVisits as visits"
+            + " inner join patients.patientVisitCollection as visits"
             + " where study.nameShort=? and patients.number=?"
             + " and visits.dateDrawn=?");
 
         c.setParameters(Arrays.asList(new Object [] {
-            studyNameShort, patientNum, dateDrawn }));
+            studyNameShort, String.format("%d", patientNum), dateDrawn }));
 
         List<PatientVisit> results = appService.query(c);
         if (results.size() != 1) {
-            throw new Exception("found 0 or more than 1 patient visits: "
-                + results.size());
+            for (PatientVisit v : results) {
+                System.out.println("id/" + v.getId() + " dateDrawn/"
+                    + Importer.biobank2DateFmt.format(v.getDateDrawn())
+                    + " pid/" + v.getPatient().getId());
+            }
+            throw new Exception("found " + results.size()
+                + " patient visits for studyName/" + studyNameShort
+                + " patientNum/" + patientNum + " dateDrawn/"
+                + Importer.biobank2DateFmt.format(dateDrawn));
         }
         return results.get(0);
     }

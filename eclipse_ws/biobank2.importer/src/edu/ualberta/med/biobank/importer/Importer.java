@@ -12,7 +12,6 @@ import edu.ualberta.med.biobank.model.SamplePosition;
 import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.StorageContainer;
-import edu.ualberta.med.biobank.model.StorageType;
 import edu.ualberta.med.biobank.model.Study;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.client.ApplicationServiceProvider;
@@ -38,6 +37,12 @@ import org.apache.commons.lang.StringUtils;
  */
 
 public class Importer {
+    public static final SimpleDateFormat bbpdbDateFmt = new SimpleDateFormat(
+        "yyyy-MM-dd HH:mm:ss");
+
+    public static final SimpleDateFormat biobank2DateFmt = new SimpleDateFormat(
+        "yyyy-MM-dd HH:mm");
+
     private WritableApplicationService appService;
 
     private static Importer instance = null;
@@ -66,6 +71,12 @@ public class Importer {
             bioBank2Db = BioBank2Db.getInstance();
             bioBank2Db.setAppService(appService);
 
+            // SimpleDateFormat dfmt = new
+            // SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            // bioBank2Db.getPatientVisit("BBP", 4,
+            // dfmt.parse("2001-06-04 12:13:00"));
+            // System.exit(0);
+
             con = getMysqlConnection();
 
             getTables();
@@ -82,26 +93,26 @@ public class Importer {
             }
 
             // the order here matters
-            bioBank2Db.deleteAll(StorageContainer.class);
-            bioBank2Db.deleteAll(StorageType.class);
-            bioBank2Db.deleteAll(PvInfoData.class);
-            bioBank2Db.deleteAll(PvInfo.class);
-            bioBank2Db.deleteAll(PatientVisit.class);
-            bioBank2Db.deleteAll(Patient.class);
-            bioBank2Db.deleteAll(Clinic.class);
-            bioBank2Db.deleteAll(Study.class);
-            bioBank2Db.deleteAll(Site.class);
+            // bioBank2Db.deleteAll(StorageContainer.class);
+            // bioBank2Db.deleteAll(StorageType.class);
+            // bioBank2Db.deleteAll(PvInfoData.class);
+            // bioBank2Db.deleteAll(PvInfo.class);
+            // bioBank2Db.deleteAll(PatientVisit.class);
+            // bioBank2Db.deleteAll(Patient.class);
+            // bioBank2Db.deleteAll(Clinic.class);
+            // bioBank2Db.deleteAll(Study.class);
+            // bioBank2Db.deleteAll(Site.class);
 
-            cbrSite = bioBank2Db.createSite();
+            // cbrSite = bioBank2Db.createSite();
 
-            SiteStorageTypes.getInstance().insertStorageTypes(cbrSite);
-            SiteStorageContainers.getInstance().insertStorageContainers(cbrSite);
-
+            // SiteStorageTypes.getInstance().insertStorageTypes(cbrSite);
+            // SiteStorageContainers.getInstance().insertStorageContainers(cbrSite);
+            //
+            // importStudies();
+            // importClinics();
+            // importPatients();
+            // importPatientVisits();
             importCabinetSamples();
-            importStudies();
-            importClinics();
-            importPatients();
-            importPatientVisits();
 
             System.out.println("importing complete.");
 
@@ -263,8 +274,6 @@ public class Importer {
     }
 
     private void importPatientVisits() throws Exception {
-        SimpleDateFormat biobank2DateFmt = new SimpleDateFormat(
-            "yyyy-MM-dd HH:mm");
         Study study;
         PatientVisit pv;
         PvInfoData pvInfoData;
@@ -280,7 +289,7 @@ public class Importer {
                 Patient patient = bioBank2Db.getPatient(rs.getString(2));
 
                 pv = new PatientVisit();
-                pv.setDateDrawn(rs.getDate(5));
+                pv.setDateDrawn(bbpdbDateFmt.parse(rs.getString(5)));
                 pv.setPatient(patient);
                 pv = (PatientVisit) bioBank2Db.setObject(pv);
 
@@ -303,7 +312,7 @@ public class Importer {
                     pvInfoData.setPatientVisit(pv);
 
                     if (pvInfo.getLabel().equals("Date Received")) {
-                        pvInfoData.setValue(biobank2DateFmt.format(rs.getDate(6)));
+                        pvInfoData.setValue(biobank2DateFmt.format(bbpdbDateFmt.parse(rs.getString(6))));
                     }
                     else if (pvInfo.getLabel().equals("PBMC Count")) {
                         pvInfoData.setValue(rs.getString(8));
@@ -380,7 +389,7 @@ public class Importer {
                 spos.setPositionDimensionTwo(binPos2Int(binPos));
                 spos.setStorageContainer(bin);
 
-                visit = bioBank2Db.getPatientVisit(rs.getString(4),
+                visit = bioBank2Db.getPatientVisit(rs.getString(3),
                     rs.getInt(9), rs.getDate(2));
 
                 Sample sample = new Sample();
@@ -390,6 +399,7 @@ public class Importer {
                 sample.setQuantity(rs.getDouble(14));
                 sample.setSamplePosition(spos);
                 sample.setPatientVisit(visit);
+                spos.setSample(sample);
 
                 sample = (Sample) bioBank2Db.setObject(sample);
             }
