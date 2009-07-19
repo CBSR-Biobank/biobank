@@ -1,5 +1,5 @@
 
-package edu.ualberta.med.biobank;
+package edu.ualberta.med.biobank.importer;
 
 import java.util.HashSet;
 
@@ -30,11 +30,8 @@ public class StudyPvInfo {
         for (String label : labels) {
             PvInfo pvInfo = getPvInfoFromPossible(label);
 
-            if (label.equals("Aliquot Volume")) {
-
-            }
-            else if (label.equals("Blood Received")) {
-
+            if (label.equals("Blood Received")) {
+                pvInfo.setPossibleValues("");
             }
 
             pvInfoSet.add((PvInfo) BioBank2Db.getInstance().setObject(pvInfo));

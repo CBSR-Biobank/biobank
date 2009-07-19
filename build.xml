@@ -2,13 +2,15 @@
 <project name="biobank2" basedir="." default="sdk-and-scripts">
 
 	<!--
-      Overall build file 
+      Overall build file
       use command "ant -projecthelp" to display the targets.
       -->
 
 	<property environment="env" />
 	<property name="cacore.sdk.dir" location="caCORE_SDK/sdk" />
 	<property name="eclipse.proj.dir" location="eclipse_ws/biobank2" />
+	<property name="eclipse.proj.dir.importer"
+	          location="eclipse_ws/biobank2.importer" />
 	<property name="eclipse.proj.dir.junit"
 	          location="eclipse_ws/biobank2.tests" />
 	<property name="scripts.proj.dir" location="scripts" />
@@ -27,9 +29,9 @@
 	<property name="database.password" value="ozzy498" />
 
 
-	<!-- 
+	<!--
 	  files included in the sdk build.xml - necessary to be sure that we have
-	  all the keys for the target we redefined 
+	  all the keys for the target we redefined
 	-->
 	<property file="${cacore.sdk.dir}/installer.properties" />
 	<property file="${cacore.sdk.dir}/local.properties" />
@@ -130,6 +132,14 @@
 		</copy>
 		<copy file="${cacore.sdk.dir}/output/biobank2/src/hibernate.cfg.xml"
 		      tofile="${eclipse.proj.dir}/lib/" />
+		<copy todir="${eclipse.proj.dir.importer}/lib">
+			<fileset dir="${cacore.sdk.dir}/output/biobank2/package/remote-client/lib" />
+		</copy>
+		<copy todir="${eclipse.proj.dir.importer}/conf">
+			<fileset dir="${cacore.sdk.dir}/output/biobank2/package/remote-client/conf">
+				<include name="application-config-client*.xml" />
+			</fileset>
+		</copy>
 
 		<copy todir="${eclipse.proj.dir.junit}/lib">
 			<fileset dir="${cacore.sdk.dir}/output/biobank2/package/remote-client/lib" />
@@ -149,7 +159,7 @@
 		<copy file="${security.dir}/jboss/mysql-ds.xml"
 										      tofile="${env.JBOSS_HOME}/server/default/deploy/mysql-ds.xml" overwrite="true"/>
 		<copy file="${security.dir}/jboss/upt.war"
-						      tofile="${env.JBOSS_HOME}/server/default/deploy/upt.war" overwrite="true"/>				
+						      tofile="${env.JBOSS_HOME}/server/default/deploy/upt.war" overwrite="true"/>
 		<copy file="${cacore.sdk.dir}/output/biobank2/package/webapp/biobank2.war"
 		      tofile="${env.JBOSS_HOME}/server/default/deploy/biobank2.war" overwrite="true"/>
 	</target>
@@ -201,7 +211,7 @@
 	<!--Add the length="#" field into .hbm.xml, references the biobank.uml file for the VARCHAR(#) -->
 	<target name="string-length-field-addition"
 	        description="Add the length='#' field into .hbm.xml, references the biobank.uml file for the VARCHAR(#)">
-		<exec executable="perl">
+		<exec executable="/usr/bin/perl">
 			<env key="PATH" path="${scripts.proj.dir}" />
 			<arg value="${scripts.proj.dir}/hbmstringlength.pl" />
 			<arg value="${model.proj.dir}/biobank2.uml" />

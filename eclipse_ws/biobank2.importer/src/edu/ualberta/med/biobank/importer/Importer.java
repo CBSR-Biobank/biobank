@@ -1,5 +1,5 @@
 
-package edu.ualberta.med.biobank;
+package edu.ualberta.med.biobank.importer;
 
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Clinic;
@@ -7,7 +7,11 @@ import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.PvInfo;
 import edu.ualberta.med.biobank.model.PvInfoData;
+import edu.ualberta.med.biobank.model.Sample;
+import edu.ualberta.med.biobank.model.SamplePosition;
+import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.model.StorageContainer;
 import edu.ualberta.med.biobank.model.Study;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.client.ApplicationServiceProvider;
@@ -22,8 +26,9 @@ import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashSet;
+
+import org.apache.commons.lang.StringUtils;
 
 /*
  *  need to remove the password on MS Access side.
@@ -32,7 +37,15 @@ import java.util.HashSet;
  */
 
 public class Importer {
+    public static final SimpleDateFormat bbpdbDateFmt = new SimpleDateFormat(
+        "yyyy-MM-dd HH:mm:ss");
+
+    public static final SimpleDateFormat biobank2DateFmt = new SimpleDateFormat(
+        "yyyy-MM-dd HH:mm");
+
     private WritableApplicationService appService;
+
+    private static Importer instance = null;
 
     private Connection con;
 
@@ -43,10 +56,10 @@ public class Importer {
     private Site cbrSite;
 
     public static void main(String [] args) throws Exception {
-        new Importer();
+        Importer.getInstance();
     }
 
-    Importer() {
+    private Importer() {
         tables = new ArrayList<String>();
 
         try {
@@ -58,32 +71,61 @@ public class Importer {
             bioBank2Db = BioBank2Db.getInstance();
             bioBank2Db.setAppService(appService);
 
+            // SimpleDateFormat dfmt = new
+            // SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            // bioBank2Db.getPatientVisit("BBP", 4,
+            // dfmt.parse("2001-06-04 12:13:00"));
+            // System.exit(0);
+
             con = getMysqlConnection();
 
             getTables();
-            if (tables.size() == 0) throw new Exception();
-            if (!tableExists("clinics")) throw new Exception();
-            if (!tableExists("study_list")) throw new Exception();
-            if (!tableExists("patient")) throw new Exception();
-            if (!tableExists("patient_visit")) throw new Exception();
+            if (tables.size() == 0) throw new Exception(
+                "No tables found in database");
+
+            String [] reqdTables = {
+                "clinics", "study_list", "patient", "patient_visit", "cabinet",
+                "sample_list" };
+
+            for (String table : reqdTables) {
+                if (!tableExists(table)) throw new Exception("Table " + table
+                    + " not found");
+            }
 
             // the order here matters
-            bioBank2Db.deleteAll(Patient.class);
-            bioBank2Db.deleteAll(Clinic.class);
-            bioBank2Db.deleteAll(Study.class);
-            bioBank2Db.deleteAll(Site.class);
+            // bioBank2Db.deleteAll(StorageContainer.class);
+            // bioBank2Db.deleteAll(StorageType.class);
+            // bioBank2Db.deleteAll(PvInfoData.class);
+            // bioBank2Db.deleteAll(PvInfo.class);
+            // bioBank2Db.deleteAll(PatientVisit.class);
+            // bioBank2Db.deleteAll(Patient.class);
+            // bioBank2Db.deleteAll(Clinic.class);
+            // bioBank2Db.deleteAll(Study.class);
+            // bioBank2Db.deleteAll(Site.class);
 
-            cbrSite = bioBank2Db.createSite();
+            // cbrSite = bioBank2Db.createSite();
 
-            importStudies();
-            importClinics();
-            importPatients();
-            importPatientVisits();
+            // SiteStorageTypes.getInstance().insertStorageTypes(cbrSite);
+            // SiteStorageContainers.getInstance().insertStorageContainers(cbrSite);
+            //
+            // importStudies();
+            // importClinics();
+            // importPatients();
+            // importPatientVisits();
+            importCabinetSamples();
+
+            System.out.println("importing complete.");
 
         }
         catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public static Importer getInstance() {
+        if (instance != null) return instance;
+        instance = new Importer();
+        return instance;
     }
 
     @SuppressWarnings("unused")
@@ -232,12 +274,7 @@ public class Importer {
     }
 
     private void importPatientVisits() throws Exception {
-        SimpleDateFormat biobank2DateFmt = new SimpleDateFormat(
-            "yyyy-MM-dd HH:mm");
-        SimpleDateFormat bbpdbDateFmt = new SimpleDateFormat(
-            "yyyy-MM-dd hh:mm:ss aa");
         Study study;
-        Date date;
         PatientVisit pv;
         PvInfoData pvInfoData;
 
@@ -252,39 +289,132 @@ public class Importer {
                 Patient patient = bioBank2Db.getPatient(rs.getString(2));
 
                 pv = new PatientVisit();
-                date = bbpdbDateFmt.parse(rs.getString(5));
-                pv.setDateDrawn(date);
+                pv.setDateDrawn(bbpdbDateFmt.parse(rs.getString(5)));
                 pv.setPatient(patient);
                 pv = (PatientVisit) bioBank2Db.setObject(pv);
+
+                System.out.println("importing patient visit: patient/"
+                    + patient.getNumber() + " visit date/"
+                    + biobank2DateFmt.format(pv.getDateDrawn()));
 
                 study = bioBank2Db.getStudy(rs.getString(20));
 
                 // make sure the study is correct
-                if (patient.getStudy().getNameShort().equals(
-                    study.getNameShort())) throw new Exception();
-
-                HashSet<PvInfoData> pvInfoDataSet = new HashSet<PvInfoData>();
+                if (!patient.getStudy().getNameShort().equals(
+                    study.getNameShort())) {
+                    throw new Exception();
+                }
 
                 // now set corresponding patient visit info data
                 for (PvInfo pvInfo : study.getPvInfoCollection()) {
                     pvInfoData = new PvInfoData();
                     pvInfoData.setPvInfo(pvInfo);
+                    pvInfoData.setPatientVisit(pv);
 
                     if (pvInfo.getLabel().equals("Date Received")) {
-                        date = bbpdbDateFmt.parse(rs.getString(6));
-                        pvInfoData.setValue(biobank2DateFmt.format(date));
+                        pvInfoData.setValue(biobank2DateFmt.format(bbpdbDateFmt.parse(rs.getString(6))));
                     }
-                    else if (pvInfo.getLabel().equals("Aliquot Volume")) {
-                        pvInfoData.setValue(rs.getString(6));
+                    else if (pvInfo.getLabel().equals("PBMC Count")) {
+                        pvInfoData.setValue(rs.getString(8));
+                    }
+                    else if (pvInfo.getLabel().equals("Consent")) {
+                        ArrayList<String> consents = new ArrayList<String>();
+                        if (rs.getInt(9) == 1) {
+                            consents.add("Surveillance");
+                        }
+                        if (rs.getInt(10) == 1) {
+                            consents.add("Genetic predisposition");
+                        }
+                        pvInfoData.setValue(StringUtils.join(consents, ";"));
+                    }
+                    else if (pvInfo.getLabel().equals("Worksheet")) {
+                        pvInfoData.setValue(rs.getString(15));
                     }
 
-                    pvInfoDataSet.add((PvInfoData) bioBank2Db.setObject(pvInfoData));
+                    pvInfoData = (PvInfoData) bioBank2Db.setObject(pvInfoData);
                 }
-
-                pv.setPvInfoDataCollection(pvInfoDataSet);
-                pv = (PatientVisit) bioBank2Db.setObject(pv);
             }
         }
+    }
+
+    private void importCabinetSamples() throws Exception {
+        System.out.println("importing cabinet samples ...");
+
+        Statement s = con.createStatement();
+        s.execute("select patient_visit.visit_nr, patient_visit.date_taken, "
+            + "study_list.study_name_short, sample_list.sample_name_short, cabinet.*  "
+            + "from cabinet, study_list, patient_visit, sample_list "
+            + "where cabinet.study_nr=study_list.study_nr "
+            + "and patient_visit.study_nr=study_list.study_nr "
+            + "and cabinet.visit_nr=patient_visit.visit_nr "
+            + "and cabinet.patient_nr=patient_visit.patient_nr "
+            + "and cabinet.sample_nr=sample_list.sample_nr");
+
+        ResultSet rs = s.getResultSet();
+        if (rs != null) {
+            StorageContainer cabinet = bioBank2Db.getStorageContainer("cabinet");
+            int cabinetNum;
+            StorageContainer drawer;
+            StorageContainer bin;
+            PatientVisit visit;
+            SampleType sampleType;
+            int drawerNum;
+            int binNum;
+            String drawerName;
+            String binPos;
+            String sampleTypeNameShort;
+
+            while (rs.next()) {
+                cabinetNum = rs.getInt(5);
+                if (cabinetNum != 1) throw new Exception(
+                    "Invalid cabinet number: " + cabinetNum);
+
+                sampleTypeNameShort = rs.getString(4);
+                drawerName = rs.getString(6);
+                binNum = rs.getInt(7);
+                binPos = rs.getString(8);
+
+                System.out.println("importing sample at position: "
+                    + drawerName + String.format("%02d", binNum) + binPos);
+
+                drawerNum = drawerName.charAt(1) - 'A' + 1;
+                drawer = bioBank2Db.getChildContainer(cabinet, 1, drawerNum);
+                bin = bioBank2Db.getChildContainer(drawer, 1, binNum);
+
+                sampleType = bioBank2Db.getSampleType(sampleTypeNameShort);
+                bioBank2Db.containerCheckSampleTypeValid(bin, sampleType);
+
+                SamplePosition spos = new SamplePosition();
+                spos.setPositionDimensionOne(1);
+                spos.setPositionDimensionTwo(binPos2Int(binPos));
+                spos.setStorageContainer(bin);
+
+                visit = bioBank2Db.getPatientVisit(rs.getString(3),
+                    rs.getInt(9), rs.getDate(2));
+
+                Sample sample = new Sample();
+                sample.setSampleType(sampleType);
+                sample.setInventoryId(rs.getString(12));
+                sample.setProcessDate(rs.getDate(13));
+                sample.setQuantity(rs.getDouble(14));
+                sample.setSamplePosition(spos);
+                sample.setPatientVisit(visit);
+                spos.setSample(sample);
+
+                sample = (Sample) bioBank2Db.setObject(sample);
+            }
+        }
+
+    }
+
+    private static final String posAlpha = "ABCDEFGHJKLMNPQRSTUVWXYZ";
+
+    private int binPos2Int(String binPos) throws Exception {
+        if (binPos.length() != 2) {
+            throw new Exception("binPos has an invalid length: " + binPos);
+        }
+        return posAlpha.indexOf(binPos.charAt(0)) * 24
+            + posAlpha.indexOf(binPos.charAt(1));
     }
 
     @SuppressWarnings("unused")

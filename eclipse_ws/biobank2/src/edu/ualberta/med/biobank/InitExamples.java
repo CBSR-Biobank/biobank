@@ -64,13 +64,13 @@ public class InitExamples {
             .getApplicationServiceFromUrl("http://localhost:8080/biobank2",
                 "testuser", "test");
 
-        init.deletedAll(Site.class);
-        init.deletedAll(Clinic.class);
-        init.deletedAll(Study.class);
-        init.deletedAll(StorageType.class);
-        init.deletedAll(StorageContainer.class);
-        init.deletedAll(PatientVisit.class);
-        init.deletedAll(Patient.class);
+        init.deleteAll(Site.class);
+        init.deleteAll(Clinic.class);
+        init.deleteAll(Study.class);
+        init.deleteAll(StorageType.class);
+        init.deleteAll(StorageContainer.class);
+        init.deleteAll(PatientVisit.class);
+        init.deleteAll(Patient.class);
 
         init.insertSite();
 
@@ -87,7 +87,7 @@ public class InitExamples {
         System.out.println("Init done.");
     }
 
-    InitExamples() {
+    public InitExamples() {
         clinics = new Clinic[2];
     }
 
@@ -160,7 +160,7 @@ public class InitExamples {
         }
     }
 
-    private void deletedAll(Class<?> classType) throws Exception {
+    private void deleteAll(Class<?> classType) throws Exception {
         Constructor<?> constructor = classType.getConstructor();
         Object instance = constructor.newInstance();
         List<?> list = appService.search(classType, instance);

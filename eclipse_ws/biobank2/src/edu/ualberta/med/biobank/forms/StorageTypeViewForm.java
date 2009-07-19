@@ -179,7 +179,7 @@ public class StorageTypeViewForm extends BiobankViewForm {
         layout.horizontalSpacing = 10;
         toolkit.paintBordersFor(client);
 
-        Label label = toolkit.createLabel(client, "Sample derivative types:");
+        Label label = toolkit.createLabel(client, "Sample types:");
         label
             .setLayoutData(new GridData(SWT.LEFT, SWT.BEGINNING, false, false));
 
