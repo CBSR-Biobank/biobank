@@ -23,7 +23,6 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 import java.lang.reflect.Constructor;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 
 public class BioBank2Db {
@@ -50,6 +49,7 @@ public class BioBank2Db {
     }
 
     public void deleteAll(Class<?> classType) throws Exception {
+        System.out.println("deleting all " + classType.getName() + " instances");
         Constructor<?> constructor = classType.getConstructor();
         Object instance = constructor.newInstance();
         List<?> list = appService.search(classType, instance);
@@ -123,8 +123,8 @@ public class BioBank2Db {
         st.setNameShort(nameShort);
 
         List<SampleType> list = appService.search(SampleType.class, st);
-        if (list.size() != 1) throw new Exception("Sample type with short name"
-            + nameShort + " not found");
+        if (list.size() != 1) throw new Exception(
+            "Sample type with short name " + nameShort + " not found");
         return list.get(0);
     }
 
@@ -177,7 +177,7 @@ public class BioBank2Db {
     }
 
     public PatientVisit getPatientVisit(String studyNameShort, int patientNum,
-        Date dateDrawn) throws Exception {
+        String dateDrawn) throws Exception {
         HQLCriteria c = new HQLCriteria("select visits"
             + " from edu.ualberta.med.biobank.model.Study as study"
             + " inner join study.patientCollection as patients"
@@ -186,7 +186,8 @@ public class BioBank2Db {
             + " and visits.dateDrawn=?");
 
         c.setParameters(Arrays.asList(new Object [] {
-            studyNameShort, String.format("%d", patientNum), dateDrawn }));
+            studyNameShort, String.format("%d", patientNum),
+            Importer.biobank2DateFmt.parse(dateDrawn) }));
 
         List<PatientVisit> results = appService.query(c);
         if (results.size() != 1) {
@@ -195,10 +196,22 @@ public class BioBank2Db {
                     + Importer.biobank2DateFmt.format(v.getDateDrawn())
                     + " pid/" + v.getPatient().getId());
             }
-            throw new Exception("found " + results.size()
-                + " patient visits for studyName/" + studyNameShort
-                + " patientNum/" + patientNum + " dateDrawn/"
-                + Importer.biobank2DateFmt.format(dateDrawn));
+            // Comment this exception out for now, just use the first patient
+            // visit
+            //
+            // throw new Exception("found " + results.size()
+            // + " patient visits for studyName/" + studyNameShort
+            // + " patientNum/" + patientNum + " dateDrawn/"
+            // + Importer.biobank2DateFmt.format(dateDrawn));
+            if (results.size() == 0) {
+                System.out.println("ERROR: found 0 patient visits for studyName/"
+                    + studyNameShort
+                    + " patientNum/"
+                    + patientNum
+                    + " dateDrawn/"
+                    + Importer.biobank2DateFmt.format(dateDrawn));
+            }
+            return null;
         }
         return results.get(0);
     }

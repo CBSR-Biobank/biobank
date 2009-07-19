@@ -93,6 +93,7 @@ public class Importer {
             }
 
             // the order here matters
+            bioBank2Db.deleteAll(Sample.class);
             // bioBank2Db.deleteAll(StorageContainer.class);
             // bioBank2Db.deleteAll(StorageType.class);
             // bioBank2Db.deleteAll(PvInfoData.class);
@@ -102,9 +103,9 @@ public class Importer {
             // bioBank2Db.deleteAll(Clinic.class);
             // bioBank2Db.deleteAll(Study.class);
             // bioBank2Db.deleteAll(Site.class);
-
+            //
             // cbrSite = bioBank2Db.createSite();
-
+            //
             // SiteStorageTypes.getInstance().insertStorageTypes(cbrSite);
             // SiteStorageContainers.getInstance().insertStorageContainers(cbrSite);
             //
@@ -163,7 +164,6 @@ public class Importer {
             // + res.getString("TABLE_TYPE") + ", " + res.getString("REMARKS"));
         }
         res.close();
-
     }
 
     private boolean tableExists(String name) {
@@ -369,17 +369,36 @@ public class Importer {
                 if (cabinetNum != 1) throw new Exception(
                     "Invalid cabinet number: " + cabinetNum);
 
-                sampleTypeNameShort = rs.getString(4);
                 drawerName = rs.getString(6);
+                drawerNum = drawerName.charAt(1) - 'A' + 1;
+
+                if (drawerNum > 4) {
+                    // no such drawer in real cabinet - was used only for
+                    // BBPDB test data
+                    continue;
+                }
+
                 binNum = rs.getInt(7);
                 binPos = rs.getString(8);
 
-                System.out.println("importing sample at position: "
-                    + drawerName + String.format("%02d", binNum) + binPos);
+                System.out.println("importing sample at position " + drawerName
+                    + String.format("%02d", binNum) + binPos);
 
-                drawerNum = drawerName.charAt(1) - 'A' + 1;
+                visit = bioBank2Db.getPatientVisit(rs.getString(3),
+                    rs.getInt(9), rs.getString(2));
+
+                if (visit == null) {
+                    continue;
+                }
+
+                sampleTypeNameShort = rs.getString(4);
+
                 drawer = bioBank2Db.getChildContainer(cabinet, 1, drawerNum);
                 bin = bioBank2Db.getChildContainer(drawer, 1, binNum);
+
+                if (sampleTypeNameShort.equals("DNA(WBC)")) {
+                    sampleTypeNameShort = "DNA(Blood)";
+                }
 
                 sampleType = bioBank2Db.getSampleType(sampleTypeNameShort);
                 bioBank2Db.containerCheckSampleTypeValid(bin, sampleType);
@@ -388,9 +407,6 @@ public class Importer {
                 spos.setPositionDimensionOne(1);
                 spos.setPositionDimensionTwo(binPos2Int(binPos));
                 spos.setStorageContainer(bin);
-
-                visit = bioBank2Db.getPatientVisit(rs.getString(3),
-                    rs.getInt(9), rs.getDate(2));
 
                 Sample sample = new Sample();
                 sample.setSampleType(sampleType);
