@@ -6,6 +6,7 @@ import java.util.Random;
 import edu.ualberta.med.scanlib.ScanCell;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
+import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class PaletteCell {
 
@@ -68,16 +69,15 @@ public class PaletteCell {
         // FIXME check uml pour positionSample/sample comme pour
         // container/containerposition
         PaletteCell[][] paletteScanned = initArray();
-        List<Sample> samples;
         try {
-            samples = appService.search(Sample.class, new Sample());
-            for (Sample sample : samples) {
-                if (sample.getSamplePosition() != null
-                    && sample.getSamplePosition().getStorageContainer() != null) {
-                    paletteScanned[0][0] = new PaletteCell(new ScanCell(0, 0,
-                        sample.getInventoryId()));
-                    break;
-                }
+            HQLCriteria criteria = new HQLCriteria("from "
+                + Sample.class.getName()
+                + " as s where s in (select sp.sample from "
+                + SamplePosition.class.getName() + " as sp)");
+            List<Sample> samples = appService.query(criteria);
+            if (samples.size() > 0) {
+                paletteScanned[0][0] = new PaletteCell(new ScanCell(0, 0,
+                    samples.get(0).getInventoryId()));
             }
         } catch (ApplicationException e) {
             // TODO Auto-generated catch block
@@ -91,17 +91,16 @@ public class PaletteCell {
         // FIXME check uml pour positionSample/sample comme pour
         // container/containerposition
         PaletteCell[][] paletteScanned = initArray();
-        List<Sample> samples;
         try {
-            samples = appService.search(Sample.class, new Sample());
-            for (Sample sample : samples) {
-                if ((sample.getSamplePosition() == null || sample
-                    .getSamplePosition().getStorageContainer() == null)
-                    && !sample.getInventoryId().equals("123")) {
-                    paletteScanned[0][0] = new PaletteCell(new ScanCell(0, 0,
-                        sample.getInventoryId()));
-                    break;
-                }
+            HQLCriteria criteria = new HQLCriteria("from "
+                + Sample.class.getName()
+                + " as s where s not in (select sp.sample from "
+                + SamplePosition.class.getName() + " as sp) "
+                + "and s.inventoryId <> '123'");
+            List<Sample> samples = appService.query(criteria);
+            if (samples.size() > 0) {
+                paletteScanned[0][0] = new PaletteCell(new ScanCell(0, 0,
+                    samples.get(0).getInventoryId()));
             }
         } catch (ApplicationException e) {
             // TODO Auto-generated catch block
