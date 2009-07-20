@@ -16,7 +16,9 @@ import org.springframework.remoting.RemoteAccessException;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.model.Site;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
+import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class SessionAdapter extends Node {
 
@@ -31,6 +33,7 @@ public class SessionAdapter extends Node {
         setId(sessionId);
         setName(name);
         this.userName = userName;
+        // getUserCsmId();
     }
 
     @Override
@@ -139,5 +142,23 @@ public class SessionAdapter extends Node {
             return super.getTreeText() + " [" + userName + "]";
         }
 
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public String getUserCsmId() {
+        HQLCriteria criteria = new HQLCriteria(
+            "from gov.nih.nci.security.authorization.domainobjects.User where loginName = '"
+                + userName + "'");
+        try {
+            List<Object> userCsmId = appService.query(criteria);
+            System.out.println(userCsmId);
+        } catch (ApplicationException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return "";
     }
 }

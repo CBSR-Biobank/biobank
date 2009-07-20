@@ -326,6 +326,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
             .getParent();
         patientVisit.setPatient(patientAdapter.getPatient());
         patientVisit.setDateDrawn(dateDrawn.getDate());
+        // TODO get csm_user_id and set it to the Patient Visit at insert
 
         if ((patientVisit.getId() == null) || (patientVisit.getId() == 0)) {
             query = new InsertExampleQuery(patientVisit);

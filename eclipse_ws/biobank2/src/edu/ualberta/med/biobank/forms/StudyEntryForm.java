@@ -1,4 +1,3 @@
-
 package edu.ualberta.med.biobank.forms;
 
 import java.util.ArrayList;
@@ -9,6 +8,7 @@ import java.util.Set;
 
 import org.apache.commons.collections.MapIterator;
 import org.apache.commons.collections.map.ListOrderedMap;
+import org.eclipse.core.databinding.beans.PojoObservables;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.swt.SWT;
@@ -52,8 +52,8 @@ public class StudyEntryForm extends BiobankEntryForm {
 
     private static final String MSG_STUDY_OK = "Editing an existing study.";
 
-    public static final String [] ORDERED_FIELDS = new String [] {
-        "name", "nameShort", "activityStatus", "comment" };
+    public static final String[] ORDERED_FIELDS = new String[] { "name",
+        "nameShort", "activityStatus", "comment" };
 
     public static final ListOrderedMap FIELDS = new ListOrderedMap() {
         {
@@ -102,8 +102,10 @@ public class StudyEntryForm extends BiobankEntryForm {
         Node node = ((FormInput) input).getNode();
         Assert.isNotNull(node, "Null editor input");
 
-        Assert.isTrue((node instanceof StudyAdapter),
-            "Invalid editor input: object of type " + node.getClass().getName());
+        Assert
+            .isTrue((node instanceof StudyAdapter),
+                "Invalid editor input: object of type "
+                    + node.getClass().getName());
 
         studyAdapter = (StudyAdapter) node;
         study = studyAdapter.getStudy();
@@ -112,8 +114,7 @@ public class StudyEntryForm extends BiobankEntryForm {
 
         if (study.getId() == null) {
             setPartName("New Study");
-        }
-        else {
+        } else {
             setPartName("Study " + study.getName());
         }
     }
@@ -132,6 +133,13 @@ public class StudyEntryForm extends BiobankEntryForm {
         toolkit.paintBordersFor(client);
 
         createWidgetsFromMap(FIELDS, study, client);
+        if (study.getWorksheet() == null) {
+            study.setWorksheet(new Worksheet());
+        }
+        createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Worksheet",
+            null, PojoObservables.observeValue(study.getWorksheet(), "name"),
+            NonEmptyString.class, "Worksheet barcode should be specified");
+
         Text comments = (Text) controls.get("comment");
         GridData gd = (GridData) comments.getLayoutData();
         gd.heightHint = 40;
@@ -189,15 +197,15 @@ public class StudyEntryForm extends BiobankEntryForm {
         for (PvInfoPossible possiblePvInfo : possiblePvInfos) {
             boolean selected = false;
             String value = "";
-            CombinedPvInfo combinedPvInfo = (CombinedPvInfo) combinedPvInfoMap.get(possiblePvInfo.getId());
+            CombinedPvInfo combinedPvInfo = (CombinedPvInfo) combinedPvInfoMap
+                .get(possiblePvInfo.getId());
 
             if (combinedPvInfo == null) {
                 combinedPvInfo = new CombinedPvInfo();
                 combinedPvInfo.pvInfoPossible = possiblePvInfo;
                 combinedPvInfo.pvInfo = null;
                 selected = false;
-            }
-            else {
+            } else {
                 selected = true;
                 value = combinedPvInfo.pvInfo.getPossibleValues();
             }
@@ -259,7 +267,8 @@ public class StudyEntryForm extends BiobankEntryForm {
             CombinedPvInfo combinedPvInfo = (CombinedPvInfo) it.getValue();
             boolean selected = combinedPvInfo.wiget.getSelected();
 
-            if (!selected) continue;
+            if (!selected)
+                continue;
 
             String value = combinedPvInfo.wiget.getValues();
             PvInfo pvInfo = combinedPvInfo.pvInfo;
@@ -267,7 +276,8 @@ public class StudyEntryForm extends BiobankEntryForm {
             if (pvInfo == null) {
                 pvInfo = new PvInfo();
                 pvInfo.setPvInfoPossible(combinedPvInfo.pvInfoPossible);
-                pvInfo.setPvInfoType(combinedPvInfo.pvInfoPossible.getPvInfoType());
+                pvInfo.setPvInfoType(combinedPvInfo.pvInfoPossible
+                    .getPvInfoType());
             }
 
             pvInfo.setLabel(combinedPvInfo.pvInfoPossible.getLabel());
@@ -288,14 +298,12 @@ public class StudyEntryForm extends BiobankEntryForm {
         Set<PvInfo> savedPvInfoList = new HashSet<PvInfo>();
 
         study.setSite(site);
-        study.setWorksheet(null);
 
         if (study.getPvInfoCollection().size() > 0) {
             for (PvInfo pvInfo : study.getPvInfoCollection()) {
                 if ((pvInfo.getId() == null) || (pvInfo.getId() == 0)) {
                     query = new InsertExampleQuery(pvInfo);
-                }
-                else {
+                } else {
                     query = new UpdateExampleQuery(pvInfo);
                 }
 
@@ -307,8 +315,7 @@ public class StudyEntryForm extends BiobankEntryForm {
 
         if ((study.getId() == null) || (study.getId() == 0)) {
             query = new InsertExampleQuery(study);
-        }
-        else {
+        } else {
             query = new UpdateExampleQuery(study);
         }
 
@@ -322,11 +329,9 @@ public class StudyEntryForm extends BiobankEntryForm {
         try {
             return studyAdapter.getAppService().search(PvInfoPossible.class,
                 criteria);
-        }
-        catch (final RemoteConnectFailureException exp) {
+        } catch (final RemoteConnectFailureException exp) {
             BioBankPlugin.openRemoteConnectErrorMessage();
-        }
-        catch (Exception exp) {
+        } catch (Exception exp) {
             exp.printStackTrace();
         }
         return null;
@@ -334,7 +339,8 @@ public class StudyEntryForm extends BiobankEntryForm {
 
     private boolean checkStudyNameUnique() throws Exception {
         WritableApplicationService appService = studyAdapter.getAppService();
-        Site site = ((SiteAdapter) studyAdapter.getParent().getParent()).getSite();
+        Site site = ((SiteAdapter) studyAdapter.getParent().getParent())
+            .getSite();
 
         HQLCriteria c = new HQLCriteria("from edu.ualberta.med.biobank.model."
             + "Study as study inner join fetch study.site "
@@ -344,8 +350,9 @@ public class StudyEntryForm extends BiobankEntryForm {
         List<Object> results = appService.query(c);
 
         if (results.size() > 0) {
-            BioBankPlugin.openAsyncError("Study Name Problem",
-                "A study with name \"" + study.getName() + "\" already exists.");
+            BioBankPlugin
+                .openAsyncError("Study Name Problem", "A study with name \""
+                    + study.getName() + "\" already exists.");
             return false;
         }
 
@@ -368,7 +375,7 @@ public class StudyEntryForm extends BiobankEntryForm {
 
     @Override
     protected void cancelForm() {
-    // TODO Auto-generated method stub
+        // TODO Auto-generated method stub
 
     }
 }

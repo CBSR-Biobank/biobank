@@ -17,6 +17,7 @@ import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.ModelUtils;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
+import edu.ualberta.med.biobank.model.Worksheet;
 
 public class StudyGroup extends Node {
 
@@ -39,8 +40,9 @@ public class StudyGroup extends Node {
         mi.setText("Add Study");
         mi.addSelectionListener(new SelectionListener() {
             public void widgetSelected(SelectionEvent event) {
-                StudyAdapter adapter = new StudyAdapter(StudyGroup.this,
-                    new Study());
+                Study study = new Study();
+                study.setWorksheet(new Worksheet());
+                StudyAdapter adapter = new StudyAdapter(StudyGroup.this, study);
                 openForm(new FormInput(adapter), StudyEntryForm.ID);
             }
 

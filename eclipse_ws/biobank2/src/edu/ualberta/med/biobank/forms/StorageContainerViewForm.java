@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.forms;
 
-import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
@@ -15,13 +14,11 @@ import org.eclipse.ui.PartInitException;
 
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.ContainerPosition;
-import edu.ualberta.med.biobank.model.Sample;
-import edu.ualberta.med.biobank.model.SamplePosition;
 import edu.ualberta.med.biobank.model.StorageContainer;
 import edu.ualberta.med.biobank.model.StorageType;
 import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.StorageContainerAdapter;
-import edu.ualberta.med.biobank.widgets.BiobankCollectionTable;
+import edu.ualberta.med.biobank.widgets.SamplesListWidget;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class StorageContainerViewForm extends BiobankViewForm {
@@ -32,7 +29,7 @@ public class StorageContainerViewForm extends BiobankViewForm {
 
     private StorageContainer storageContainer;
 
-    private BiobankCollectionTable samplesTable;
+    private SamplesListWidget samplesWidget;
 
     private Label nameLabel;
 
@@ -163,20 +160,10 @@ public class StorageContainerViewForm extends BiobankViewForm {
 
     private void createSamplesSection() {
         Composite parent = createSectionWithClient("Samples");
-        String[] headings = new String[] { "Inventory ID", "Type", "Position",
-            "Process Date", "Available", "Available quantity", "Comment" };
-        int[] bounds = new int[] { -1, 130, 150, 150, -1, -1, -1 };
-        samplesTable = new BiobankCollectionTable(parent, SWT.NONE, headings,
-            bounds, getSamples());
-        GridData tableData = ((GridData) samplesTable.getLayoutData());
-        tableData.horizontalSpan = 2;
-        tableData.heightHint = 500;
-        samplesTable.adaptToToolkit(toolkit);
-        toolkit.paintBordersFor(samplesTable);
-
-        // samplesTable.getTableViewer().addDoubleClickListener(
-        // FormUtils.getBiobankCollectionDoubleClickListener());
-
+        samplesWidget = new SamplesListWidget(parent, null);
+        samplesWidget.adaptToToolkit(toolkit, true);
+        samplesWidget.setSamplesFromPositions(storageContainer
+            .getSamplePositionCollection());
     }
 
     @Override
@@ -185,24 +172,6 @@ public class StorageContainerViewForm extends BiobankViewForm {
         setPartName("Storage Container " + storageContainer.getName());
         form.setText("Storage Container " + storageContainer.getName());
         setContainerValues();
-    }
-
-    private Sample[] getSamples() {
-        // hack required here because xxx.getXxxxCollection().toArray(new
-        // Xxx[0])
-        // returns Object[].
-        if (storageContainer.getSamplePositionCollection().size() == 0)
-            return new Sample[0];
-
-        Collection<SamplePosition> samplePosList = storageContainer
-            .getSamplePositionCollection();
-        Sample[] samples = new Sample[samplePosList.size()];
-        int i = 0;
-        for (SamplePosition sp : samplePosList) {
-            samples[i] = sp.getSample();
-            i++;
-        }
-        return samples;
     }
 
 }
