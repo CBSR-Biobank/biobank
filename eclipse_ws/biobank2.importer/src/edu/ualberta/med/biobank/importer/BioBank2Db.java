@@ -124,7 +124,7 @@ public class BioBank2Db {
 
         List<SampleType> list = appService.search(SampleType.class, st);
         if (list.size() != 1) throw new Exception(
-            "Sample type with short name " + nameShort + " not found");
+            "Sample type with short name \"" + nameShort + "\" not found");
         return list.get(0);
     }
 

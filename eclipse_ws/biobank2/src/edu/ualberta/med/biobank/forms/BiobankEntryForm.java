@@ -54,8 +54,8 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 /**
  * Base class for data entry forms.
  * 
- * Notes: - createFormContent() and saveForm() are called in their own thread so
- * making calls to the database is possible.
+ * Notes: - saveForm() is called in it's own thread so making calls to the
+ * database is possible.
  * 
  */
 public abstract class BiobankEntryForm extends BiobankFormBase {

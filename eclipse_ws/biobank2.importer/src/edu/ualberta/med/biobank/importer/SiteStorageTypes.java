@@ -38,6 +38,7 @@ public class SiteStorageTypes {
     }
 
     public void insertStorageTypes(Site site) throws Exception {
+        System.out.println("adding storage types ...");
         SampleType sampleType = new SampleType();
         Collection<SampleType> allSampleTypes = BioBank2Db.getInstance().getAppService().search(
             SampleType.class, sampleType);
@@ -56,37 +57,37 @@ public class SiteStorageTypes {
         }
 
         // Freezer Types
-        StorageType palette = assignStorageType(site, "Palette", "rows",
-            "columns", 8, 12, null, freezerSampleTypes);
+        StorageType palette = assignStorageType(site, "Palette", "Row",
+            "Column", 8, 12, null, freezerSampleTypes);
         storageTypeMap.put("Palette", palette);
 
-        StorageType hotel13 = assignStorageType(site, "Hotel-13", "row", "",
+        StorageType hotel13 = assignStorageType(site, "Hotel-13", "Row", "",
             13, 1, Arrays.asList(new StorageType [] { palette }), null);
         storageTypeMap.put("Hotel-13", hotel13);
 
-        StorageType hotel19 = assignStorageType(site, "Hotel-19", "row", "",
+        StorageType hotel19 = assignStorageType(site, "Hotel-19", "Row", "",
             19, 1, Arrays.asList(new StorageType [] { palette }), null);
         storageTypeMap.put("Hotel-19", hotel19);
 
         storageTypeMap.put("Freezer-3x10", assignStorageType(site, "Freezer",
-            "row", "column", 3, 10, Arrays.asList(new StorageType [] {
+            "Row", "Column", 3, 10, Arrays.asList(new StorageType [] {
                 hotel13, hotel19 }), null));
         storageTypeMap.put("Freezer-4x12", assignStorageType(site, "Freezer",
-            "row", "column", 4, 12, Arrays.asList(new StorageType [] {
+            "Row", "Column", 4, 12, Arrays.asList(new StorageType [] {
                 hotel13, hotel19 }), null));
         storageTypeMap.put("Freezer-5x9", assignStorageType(site, "Freezer",
-            "row", "column", 4, 12, Arrays.asList(new StorageType [] {
+            "Row", "Column", 4, 12, Arrays.asList(new StorageType [] {
                 hotel13, hotel19 }), null));
 
         // Cabinet Types
-        StorageType bin = assignStorageType(site, "Bin", "", "row", 1, 120,
+        StorageType bin = assignStorageType(site, "Bin", "Row", "", 120, 1,
             null, cabinetSampleTypes);
         storageTypeMap.put("Bin", bin);
-        StorageType drawer = assignStorageType(site, "Drawer", "", "row", 1,
-            36, Arrays.asList(new StorageType [] { bin }), null);
+        StorageType drawer = assignStorageType(site, "Drawer", "Row", "", 36,
+            1, Arrays.asList(new StorageType [] { bin }), null);
         storageTypeMap.put("Drawer", drawer);
-        storageTypeMap.put("Cabinet", assignStorageType(site, "Cabinet", "",
-            "row", 1, 4, Arrays.asList(new StorageType [] { drawer }), null));
+        storageTypeMap.put("Cabinet", assignStorageType(site, "Cabinet", "Row",
+            "", 4, 1, Arrays.asList(new StorageType [] { drawer }), null));
     }
 
     private StorageType assignStorageType(Site site, String name,
