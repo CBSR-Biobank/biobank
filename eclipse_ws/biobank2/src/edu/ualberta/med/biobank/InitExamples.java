@@ -64,13 +64,13 @@ public class InitExamples {
             .getApplicationServiceFromUrl("http://localhost:8080/biobank2",
                 "testuser", "test");
 
-        init.deleteAll(Site.class);
-        init.deleteAll(Clinic.class);
-        init.deleteAll(Study.class);
-        init.deleteAll(StorageType.class);
-        init.deleteAll(StorageContainer.class);
-        init.deleteAll(PatientVisit.class);
-        init.deleteAll(Patient.class);
+        // init.deleteAll(Site.class);
+        // init.deleteAll(Clinic.class);
+        // init.deleteAll(Study.class);
+        // init.deleteAll(StorageType.class);
+        // init.deleteAll(StorageContainer.class);
+        // init.deleteAll(PatientVisit.class);
+        // init.deleteAll(Patient.class);
 
         init.insertSite();
 
