@@ -21,12 +21,11 @@ import edu.ualberta.med.biobank.model.ModelUtils;
 import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.PvInfo;
 import edu.ualberta.med.biobank.model.PvInfoData;
-import edu.ualberta.med.biobank.model.Sample;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.PatientVisitAdapter;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
-import edu.ualberta.med.biobank.widgets.BiobankCollectionTable;
+import edu.ualberta.med.biobank.widgets.SamplesListWidget;
 
 public class PatientVisitViewForm extends BiobankViewForm {
 
@@ -36,7 +35,7 @@ public class PatientVisitViewForm extends BiobankViewForm {
 
     private PatientVisit patientVisit;
 
-    private BiobankCollectionTable samplesTable;
+    private SamplesListWidget samplesWidget;
 
     // used to keep track of which data has been entered or left blank for
     // a patient visit.
@@ -156,20 +155,10 @@ public class PatientVisitViewForm extends BiobankViewForm {
 
     private void createSamplesSection() {
         Composite parent = createSectionWithClient("Samples");
-        String[] headings = new String[] { "Inventory ID", "Type", "Position",
-            "Process Date", "Available", "Available quantity", "Comment" };
-        int[] bounds = new int[] { -1, 130, 150, 150, -1, -1, -1 };
-        samplesTable = new BiobankCollectionTable(parent, SWT.NONE, headings,
-            bounds, getSamples());
-        GridData tableData = ((GridData) samplesTable.getLayoutData());
-        tableData.horizontalSpan = 2;
-        tableData.heightHint = 500;
-        samplesTable.adaptToToolkit(toolkit);
-        toolkit.paintBordersFor(samplesTable);
-
-        // samplesTable.getTableViewer().addDoubleClickListener(
-        // FormUtils.getBiobankCollectionDoubleClickListener());
-
+        samplesWidget = new SamplesListWidget(parent, patientVisitAdapter
+            .getSessionAdapter());
+        samplesWidget.adaptToToolkit(toolkit, true);
+        samplesWidget.setSamples(patientVisit.getSampleCollection());
     }
 
     @Override
@@ -182,7 +171,7 @@ public class PatientVisitViewForm extends BiobankViewForm {
             + BioBankPlugin.getDateTimeFormatter().format(
                 patientVisit.getDateDrawn()));
         // FIXME update all pvinfos ?
-        samplesTable.getTableViewer().setInput(getSamples());
+        samplesWidget.setSamples(patientVisit.getSampleCollection());
     }
 
     private void retrievePatientVisit() {
@@ -198,17 +187,4 @@ public class PatientVisitViewForm extends BiobankViewForm {
         }
     }
 
-    private Sample[] getSamples() {
-        // hack required here because xxx.getXxxxCollection().toArray(new
-        // Xxx[0])
-        // returns Object[].
-        Collection<Sample> sampleList = patientVisit.getSampleCollection();
-        Sample[] samples = new Sample[sampleList.size()];
-        int i = 0;
-        for (Sample s : sampleList) {
-            samples[i] = s;
-            i++;
-        }
-        return samples;
-    }
 }
