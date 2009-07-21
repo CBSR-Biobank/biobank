@@ -40,14 +40,14 @@ import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.Sample;
 import edu.ualberta.med.biobank.model.SamplePosition;
 import edu.ualberta.med.biobank.model.SampleType;
-import edu.ualberta.med.biobank.model.StorageContainer;
-import edu.ualberta.med.biobank.model.StorageType;
+import edu.ualberta.med.biobank.model.Container;
+import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.PatientVisitAdapter;
 import edu.ualberta.med.biobank.validators.CabinetPositionCodeValidator;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
 import edu.ualberta.med.biobank.widgets.CabinetDrawerWidget;
-import edu.ualberta.med.biobank.widgets.ViewStorageContainerWidget;
+import edu.ualberta.med.biobank.widgets.ViewContainerWidget;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.query.example.InsertExampleQuery;
 
@@ -61,7 +61,7 @@ public class AddCabinetSampleEntryForm extends BiobankEntryForm implements
 
     private Label cabinetLabel;
     private Label drawerLabel;
-    private ViewStorageContainerWidget cabinetWidget;
+    private ViewContainerWidget cabinetWidget;
     private CabinetDrawerWidget drawerWidget;
 
     private ComboViewer comboViewerSampleTypes;
@@ -78,11 +78,11 @@ public class AddCabinetSampleEntryForm extends BiobankEntryForm implements
     private IObservableValue selectedSampleType = new WritableValue("",
         String.class);
 
-    private StorageType cabinetType;
+    private ContainerType cabinetType;
     private Sample sample = new Sample();
-    private StorageContainer cabinet;
-    private StorageContainer drawer;
-    private StorageContainer bin;
+    private Container cabinet;
+    private Container drawer;
+    private Container bin;
 
     private Button confirmAndNextButton;
 
@@ -161,7 +161,7 @@ public class AddCabinetSampleEntryForm extends BiobankEntryForm implements
         cabinetLabel = toolkit.createLabel(client, "Cabinet");
         drawerLabel = toolkit.createLabel(client, "Drawer");
 
-        cabinetWidget = new ViewStorageContainerWidget(client);
+        cabinetWidget = new ViewContainerWidget(client);
         toolkit.adapt(cabinetWidget);
         cabinetWidget.setGridSizes(4, 1, 150, 150);
         cabinetWidget.setFirstColSign('A');
@@ -275,8 +275,8 @@ public class AddCabinetSampleEntryForm extends BiobankEntryForm implements
                     String positionString = cabinetPosition.getValue()
                         .toString();
 
-                    StorageContainer sc = ModelUtils
-                        .getStorageContainerWithBarcode(appService,
+                    Container sc = ModelUtils
+                        .getContainerWithBarcode(appService,
                             positionString);
                     if (sc == null) {
                         SamplePosition sp = getSamplePosition(positionString);
@@ -286,13 +286,13 @@ public class AddCabinetSampleEntryForm extends BiobankEntryForm implements
                             return;
                         }
                         Point drawerPosition = new Point(
-                            drawer.getLocatedAtPosition()
+                            drawer.getPosition()
                                 .getPositionDimensionOne() - 1, drawer
-                                .getLocatedAtPosition()
+                                .getPosition()
                                 .getPositionDimensionTwo() - 1);
                         cabinetWidget.setSelectedBox(drawerPosition);
                         cabinetLabel.setText("Cabinet " + cabinet.getBarcode());
-                        drawerWidget.setSelectedBin(bin.getLocatedAtPosition()
+                        drawerWidget.setSelectedBin(bin.getPosition()
                             .getPositionDimensionTwo());
                         drawerLabel.setText("Drawer " + drawer.getBarcode());
 
@@ -325,30 +325,30 @@ public class AddCabinetSampleEntryForm extends BiobankEntryForm implements
         throws ApplicationException {
         int end = 2;
         String cabinetString = positionString.substring(0, end);
-        cabinet = ModelUtils.getStorageContainerWithBarcode(appService,
+        cabinet = ModelUtils.getContainerWithBarcode(appService,
             cabinetString);
         if (cabinet == null) {
             return null;
         }
         end += 2;
         String drawerString = positionString.substring(0, end);
-        drawer = ModelUtils.getStorageContainerWithBarcode(appService,
+        drawer = ModelUtils.getContainerWithBarcode(appService,
             drawerString);
         if (drawer == null
-            || !drawer.getLocatedAtPosition().getParentContainer().getId()
+            || !drawer.getPosition().getParentContainer().getId()
                 .equals(cabinet.getId())) {
             return null;
         }
         end += 2;
         String binString = positionString.substring(0, end);
-        bin = ModelUtils.getStorageContainerWithBarcode(appService, binString);
+        bin = ModelUtils.getContainerWithBarcode(appService, binString);
         if (bin == null
-            || !bin.getLocatedAtPosition().getParentContainer().getId().equals(
+            || !bin.getPosition().getParentContainer().getId().equals(
                 drawer.getId())) {
             return null;
         }
         SamplePosition sp = new SamplePosition();
-        sp.setStorageContainer(bin);
+        sp.setContainer(bin);
         char letter = positionString.substring(6, 7).toCharArray()[0];
         // positions start at A
         sp.setPositionDimensionOne(letter - 'A' + 1);

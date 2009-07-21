@@ -13,7 +13,7 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.model.Sample;
 import edu.ualberta.med.biobank.model.SamplePosition;
-import edu.ualberta.med.biobank.model.StorageContainer;
+import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.NodeSearchVisitor;
 import edu.ualberta.med.biobank.treeview.SessionAdapter;
@@ -42,10 +42,10 @@ public class SamplesListWidget extends BiobankCollectionTable {
                         .getFirstElement();
                     SamplePosition sp = sample.getSamplePosition();
                     if (sp != null) {
-                        StorageContainer sc = sp.getStorageContainer();
+                        Container sc = sp.getContainer();
                         Node node = sessionAdapter
                             .accept(new NodeSearchVisitor(
-                                StorageContainer.class, sc.getId()));
+                                Container.class, sc.getId()));
                         if (node != null) {
                             SessionManager.getInstance().getTreeViewer()
                                 .setSelection(new StructuredSelection(node));

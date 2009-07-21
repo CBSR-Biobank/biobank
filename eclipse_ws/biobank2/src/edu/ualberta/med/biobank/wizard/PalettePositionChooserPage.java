@@ -18,14 +18,14 @@ import org.eclipse.swt.widgets.Label;
 import edu.ualberta.med.biobank.model.ContainerCell;
 import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.ContainerStatus;
-import edu.ualberta.med.biobank.model.StorageContainer;
-import edu.ualberta.med.biobank.model.StorageType;
+import edu.ualberta.med.biobank.model.Container;
+import edu.ualberta.med.biobank.model.ContainerType;
 
 public class PalettePositionChooserPage extends AbstractContainerChooserPage {
 
 	public static final String NAME = "HOTEL_CONTAINER";
 	private ContainerPosition selectedPosition;
-	private StorageType storageType;
+	private ContainerType containerType;
 
 	private ComboViewer comboViewer;
 	private Combo combo;
@@ -59,7 +59,7 @@ public class PalettePositionChooserPage extends AbstractContainerChooserPage {
 		comboViewer.setLabelProvider(new LabelProvider() {
 			@Override
 			public String getText(Object element) {
-				StorageType st = (StorageType) element;
+				ContainerType st = (ContainerType) element;
 				return st.getName();
 			}
 		});
@@ -73,21 +73,21 @@ public class PalettePositionChooserPage extends AbstractContainerChooserPage {
 					if (!textPosition.getText().isEmpty()) {
 						setPageComplete(true);
 					}
-					storageType = (StorageType) ((IStructuredSelection) comboViewer
+					containerType = (ContainerType) ((IStructuredSelection) comboViewer
 						.getSelection()).getFirstElement();
 				}
 			});
 	}
 
 	@Override
-	public void setCurrentStorageContainer(StorageContainer container) {
-		super.setCurrentStorageContainer(container);
+	public void setCurrentContainer(Container container) {
+		super.setCurrentContainer(container);
 		setTitle("Container " + container.getName());
 		updateFreezerGrid();
 		textPosition.setText("");
 		selectedPosition = null;
-		Collection<StorageType> types = getCurrentStorageContainer()
-			.getStorageType().getChildStorageTypeCollection();
+		Collection<ContainerType> types = getCurrentContainer()
+			.getContainerType().getChildContainerTypeCollection();
 		// TODO do not include type not active
 		comboViewer.setInput(types);
 		if (types.size() == 1) {
@@ -125,13 +125,13 @@ public class PalettePositionChooserPage extends AbstractContainerChooserPage {
 		return selectedPosition;
 	}
 
-	public StorageType getStorageType() {
-		return storageType;
+	public ContainerType getContainerType() {
+		return containerType;
 	}
 
 	@Override
 	protected void setStatus(ContainerCell cell,
-			StorageContainer occupiedContainer) {
+			Container occupiedContainer) {
 		if (occupiedContainer == null) {
 			cell.setStatus(ContainerStatus.EMPTY);
 		} else {

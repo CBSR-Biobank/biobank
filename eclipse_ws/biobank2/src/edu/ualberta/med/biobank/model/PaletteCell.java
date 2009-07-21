@@ -73,7 +73,7 @@ public class PaletteCell {
             samples = appService.search(Sample.class, new Sample());
             for (Sample sample : samples) {
                 if (sample.getSamplePosition() != null
-                    && sample.getSamplePosition().getStorageContainer() != null) {
+                    && sample.getSamplePosition().getContainer() != null) {
                     paletteScanned[0][0] = new PaletteCell(new ScanCell(0, 0,
                         sample.getInventoryId()));
                     break;
@@ -96,7 +96,7 @@ public class PaletteCell {
             samples = appService.search(Sample.class, new Sample());
             for (Sample sample : samples) {
                 if ((sample.getSamplePosition() == null || sample
-                    .getSamplePosition().getStorageContainer() == null)
+                    .getSamplePosition().getContainer() == null)
                     && !sample.getInventoryId().equals("123")) {
                     paletteScanned[0][0] = new PaletteCell(new ScanCell(0, 0,
                         sample.getInventoryId()));

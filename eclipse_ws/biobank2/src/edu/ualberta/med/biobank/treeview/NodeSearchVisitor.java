@@ -5,8 +5,8 @@ import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.Sample;
 import edu.ualberta.med.biobank.model.Site;
-import edu.ualberta.med.biobank.model.StorageContainer;
-import edu.ualberta.med.biobank.model.StorageType;
+import edu.ualberta.med.biobank.model.Container;
+import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.Study;
 
 public class NodeSearchVisitor {
@@ -50,11 +50,11 @@ public class NodeSearchVisitor {
 			return siteAdapter.getChild(SiteAdapter.CLINICS_NODE_ID).accept(
 					this);
 		}
-		if (typeSearched == StorageType.class) {
+		if (typeSearched == ContainerType.class) {
 			return siteAdapter.getChild(SiteAdapter.STORAGE_TYPES_NODE_ID)
 					.accept(this);
 		}
-		if (typeSearched == StorageContainer.class) {
+		if (typeSearched == Container.class) {
 			return siteAdapter.getChild(SiteAdapter.STORAGE_CONTAINERS_NODE_ID)
 					.accept(this);
 		}
@@ -110,15 +110,15 @@ public class NodeSearchVisitor {
 		return null;
 	}
 
-	public Node visit(StorageTypeGroup stGroup) {
-		if (typeSearched == StorageType.class) {
+	public Node visit(ContainerTypeGroup stGroup) {
+		if (typeSearched == ContainerType.class) {
 			return stGroup.getChild(id, true);
 		}
 		return null;
 	}
 
-	public Node visit(StorageContainerGroup scGroup) {
-		if (typeSearched == StorageContainer.class) {
+	public Node visit(ContainerGroup scGroup) {
+		if (typeSearched == Container.class) {
 			Node child = scGroup.getChild(id, true);
 			if (child == null) {
 				return visitChildren(scGroup);
@@ -128,8 +128,8 @@ public class NodeSearchVisitor {
 		return null;
 	}
 
-	public Node visit(StorageContainerAdapter container) {
-		if (typeSearched == StorageContainer.class) {
+	public Node visit(ContainerAdapter container) {
+		if (typeSearched == Container.class) {
 			Node child = container.getChild(id, true);
 			if (child == null) {
 				return visitChildren(container);

@@ -10,7 +10,7 @@ import org.eclipse.swt.widgets.Composite;
 import edu.ualberta.med.biobank.model.ContainerCell;
 import edu.ualberta.med.biobank.model.ContainerStatus;
 
-public class ChooseStorageContainerWidget extends AbstractGridContainerWidget {
+public class ChooseContainerWidget extends AbstractGridContainerWidget {
 
 	private ContainerCell[][] cells;
 
@@ -18,7 +18,7 @@ public class ChooseStorageContainerWidget extends AbstractGridContainerWidget {
 
 	private boolean showNullStatusAsEmpty = false;
 
-	public ChooseStorageContainerWidget(Composite parent) {
+	public ChooseContainerWidget(Composite parent) {
 		super(parent);
 		initLegend();
 	}

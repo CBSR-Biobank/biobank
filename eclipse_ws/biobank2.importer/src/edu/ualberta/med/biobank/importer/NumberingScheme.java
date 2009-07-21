@@ -1,7 +1,7 @@
 
 package edu.ualberta.med.biobank.importer;
 
-import edu.ualberta.med.biobank.model.StorageType;
+import edu.ualberta.med.biobank.model.ContainerType;
 
 public class NumberingScheme {
 
@@ -34,14 +34,14 @@ public class NumberingScheme {
             + Integer.parseInt(pos.substring(1)) - 1;
     }
 
-    public static RowColPos hotelPos2RowCol(StorageType freezer, String pos)
+    public static RowColPos hotelPos2RowCol(ContainerType freezer, String pos)
         throws Exception {
         Integer rowCap = freezer.getCapacity().getDimensionOneCapacity();
         Integer colCap = freezer.getCapacity().getDimensionTwoCapacity();
 
         int alphaPos = binPos2Int(pos);
         if (alphaPos >= rowCap * colCap) {
-            throw new Exception("position out of bounds: storageType/"
+            throw new Exception("position out of bounds: containerType/"
                 + freezer.getName() + " pos/" + pos + " rowCap/" + rowCap
                 + " colCap/" + colCap);
         }

@@ -3,13 +3,13 @@ package edu.ualberta.med.biobank.importer;
 
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Clinic;
+import edu.ualberta.med.biobank.model.Container;
+import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.PvInfoPossible;
 import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.model.Site;
-import edu.ualberta.med.biobank.model.StorageContainer;
-import edu.ualberta.med.biobank.model.StorageType;
 import edu.ualberta.med.biobank.model.Study;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -21,6 +21,7 @@ import gov.nih.nci.system.query.example.UpdateExampleQuery;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 import java.lang.reflect.Constructor;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -29,9 +30,16 @@ public class BioBank2Db {
 
     private static WritableApplicationService appService = null;
 
+    public SimpleDateFormat bbpdbDateFmt;
+
+    public SimpleDateFormat biobank2DateFmt;
+
     private static BioBank2Db instance = null;
 
-    private BioBank2Db() {}
+    private BioBank2Db() {
+        bbpdbDateFmt = new SimpleDateFormat(Importer.BBPDB_DATE_FMT);
+        biobank2DateFmt = new SimpleDateFormat(Importer.BIOBANK2_DATE_FMT);
+    }
 
     public static BioBank2Db getInstance() {
         if (instance != null) return instance;
@@ -108,12 +116,11 @@ public class BioBank2Db {
         return list.get(0);
     }
 
-    public StorageContainer getStorageContainer(String name) throws Exception {
-        StorageContainer sc = new StorageContainer();
+    public Container getContainer(String name) throws Exception {
+        Container sc = new Container();
         sc.setName(name);
 
-        List<StorageContainer> list = appService.search(StorageContainer.class,
-            sc);
+        List<Container> list = appService.search(Container.class, sc);
         if (list.size() != 1) throw new Exception();
         return list.get(0);
     }
@@ -128,11 +135,11 @@ public class BioBank2Db {
         return list.get(0);
     }
 
-    public StorageContainer getChildContainer(StorageContainer container,
-        int dim1pos, int dim2pos) throws Exception {
+    public Container getChildContainer(Container container, int dim1pos,
+        int dim2pos) throws Exception {
 
         HQLCriteria c = new HQLCriteria("select occupied"
-            + " from edu.ualberta.med.biobank.model.StorageContainer as sc"
+            + " from edu.ualberta.med.biobank.model.Container as sc"
             + " inner join sc.occupiedPositions as positions"
             + " inner join positions.occupiedContainer as occupied"
             + " where sc.id=? and positions.positionDimensionOne=? "
@@ -141,7 +148,7 @@ public class BioBank2Db {
         c.setParameters(Arrays.asList(new Object [] {
             container.getId(), dim1pos, dim2pos }));
 
-        List<StorageContainer> results = appService.query(c);
+        List<Container> results = appService.query(c);
         if (results.size() != 1) {
             if (results.size() != 0) throw new Exception("Container "
                 + container.getName() + " has no child containers");
@@ -153,16 +160,16 @@ public class BioBank2Db {
         return results.get(0);
     }
 
-    public void containerCheckSampleTypeValid(StorageContainer container,
+    public void containerCheckSampleTypeValid(Container container,
         SampleType sampleType) throws Exception {
-        StorageType stype = container.getStorageType();
+        ContainerType stype = container.getContainerType();
         Collection<SampleType> st = stype.getSampleTypeCollection();
         if ((st == null) || (st.size() == 0)) {
             throw new Exception("Container " + container.getName()
                 + " cannot hold any sample types: " + sampleType.getName());
         }
         HQLCriteria c = new HQLCriteria("select count(sampleTypes)"
-            + " from edu.ualberta.med.biobank.model.StorageType as stype"
+            + " from edu.ualberta.med.biobank.model.ContainerType as stype"
             + " inner join stype.sampleTypeCollection as sampleTypes"
             + " where stype.id=? and sampleTypes.id=?");
 
@@ -187,15 +194,10 @@ public class BioBank2Db {
 
         c.setParameters(Arrays.asList(new Object [] {
             studyNameShort, String.format("%d", patientNum),
-            Importer.biobank2DateFmt.parse(dateDrawn) }));
+            biobank2DateFmt.parse(dateDrawn) }));
 
         List<PatientVisit> results = appService.query(c);
         if (results.size() != 1) {
-            for (PatientVisit v : results) {
-                System.out.println("id/" + v.getId() + " dateDrawn/"
-                    + Importer.biobank2DateFmt.format(v.getDateDrawn())
-                    + " pid/" + v.getPatient().getId());
-            }
             // Comment this exception out for now, just use the first patient
             // visit
             //
@@ -208,8 +210,18 @@ public class BioBank2Db {
                     + studyNameShort
                     + " patientNum/"
                     + patientNum
-                    + " dateDrawn/"
-                    + Importer.biobank2DateFmt.format(dateDrawn));
+                    + " dateDrawn/" + biobank2DateFmt.format(dateDrawn));
+            }
+            else {
+                System.out.println("WARNING: found " + results.size()
+                    + " patient visits for studyName/" + studyNameShort
+                    + " patientNum/" + patientNum + " dateDrawn/"
+                    + biobank2DateFmt.format(dateDrawn));
+                for (PatientVisit v : results) {
+                    System.out.println("visit_id/" + v.getId() + " dateDrawn/"
+                        + biobank2DateFmt.format(v.getDateDrawn()) + " pid/"
+                        + v.getPatient().getId());
+                }
             }
             return null;
         }

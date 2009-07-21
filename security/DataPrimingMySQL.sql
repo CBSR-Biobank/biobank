@@ -1,9 +1,9 @@
 --
--- The following entries creates a super admin application incase you decide 
+-- The following entries creates a super admin application incase you decide
 -- to use this database to run UPT also. In that case you need to provide
 -- the project login id and name for the super admin.
 -- However in incase you are using this database just to host the application's
--- authorization schema, these enteries are not used and hence they can be left as 
+-- authorization schema, these enteries are not used and hence they can be left as
 -- it is.
 --
 
@@ -14,15 +14,15 @@ values ("csmupt","CSM UPT Super Admin Application",0,0,sysdate());
 
 insert into csm_user (LOGIN_NAME,FIRST_NAME,LAST_NAME,PASSWORD,UPDATE_DATE)
 values ("administrator","Administrator","NoName","zJPWCwDeSgG8j2uyHEABIQ==",sysdate());
- 
+
 insert into csm_protection_element(PROTECTION_ELEMENT_NAME,PROTECTION_ELEMENT_DESCRIPTION,OBJECT_ID,APPLICATION_ID,UPDATE_DATE)
 values("csmupt","CSM UPT Super Admin Application Protection Element","csmupt",1,sysdate());
 
 insert into csm_user_pe(PROTECTION_ELEMENT_ID,USER_ID)
 values(1,1);
 
--- 
--- The following entry is for your application. 
+--
+-- The following entry is for your application.
 -- Replace <<application_context_name>> with your application name.
 --
 
@@ -33,7 +33,7 @@ insert into csm_protection_element(PROTECTION_ELEMENT_NAME,PROTECTION_ELEMENT_DE
 values("biobank2","biobank2","biobank2",1,sysdate());
 
 -- admin user for biobank2 and testuser
-insert into csm_user (LOGIN_NAME,FIRST_NAME,LAST_NAME,PASSWORD,UPDATE_DATE) values 
+insert into csm_user (LOGIN_NAME,FIRST_NAME,LAST_NAME,PASSWORD,UPDATE_DATE) values
 ("bbadmin","Biobank Administrator","NoName","7Bg9siN5e7M=",sysdate()),
 ("testuser","TestUser","NoName","orDBlaojDQE=",sysdate());
 
@@ -71,8 +71,8 @@ insert into csm_protection_element(PROTECTION_ELEMENT_NAME,PROTECTION_ELEMENT_DE
 ("edu.ualberta.med.biobank.model.SampleType","edu.ualberta.med.biobank.model.SampleType","edu.ualberta.med.biobank.model.SampleType",2,sysdate()),
 ("edu.ualberta.med.biobank.model.Shipment","edu.ualberta.med.biobank.model.Shipment","edu.ualberta.med.biobank.model.Shipment",2,sysdate()),
 ("edu.ualberta.med.biobank.model.Site","edu.ualberta.med.biobank.model.Site","edu.ualberta.med.biobank.model.Site",2,sysdate()),
-("edu.ualberta.med.biobank.model.StorageContainer","edu.ualberta.med.biobank.model.StorageContainer","edu.ualberta.med.biobank.model.StorageContainer",2,sysdate()),
-("edu.ualberta.med.biobank.model.StorageType","edu.ualberta.med.biobank.model.StorageType","edu.ualberta.med.biobank.model.StorageType",2,sysdate()),
+("edu.ualberta.med.biobank.model.Container","edu.ualberta.med.biobank.model.Container","edu.ualberta.med.biobank.model.Container",2,sysdate()),
+("edu.ualberta.med.biobank.model.ContainerType","edu.ualberta.med.biobank.model.ContainerType","edu.ualberta.med.biobank.model.ContainerType",2,sysdate()),
 ("edu.ualberta.med.biobank.model.Study","edu.ualberta.med.biobank.model.Study","edu.ualberta.med.biobank.model.Study",2,sysdate()),
 ("edu.ualberta.med.biobank.model.User","edu.ualberta.med.biobank.model.User","edu.ualberta.med.biobank.model.User",2,sysdate()),
 ("edu.ualberta.med.biobank.model.Worksheet","edu.ualberta.med.biobank.model.Worksheet","edu.ualberta.med.biobank.model.Worksheet",2,sysdate());
@@ -126,7 +126,7 @@ VALUES("DELETE","This privilege permits a user to delete a logical entity. This 
 INSERT INTO csm_privilege (privilege_name, privilege_description, update_date)
 VALUES("EXECUTE","This privilege allows a user to execute a particular resource. The resource can be a method, function, behavior of the application, URL, button etc", sysdate());
 
--- associate privileges to role 
+-- associate privileges to role
 insert into csm_role_privilege(ROLE_ID, PRIVILEGE_ID) values
 (1, 1),
 (1, 2),

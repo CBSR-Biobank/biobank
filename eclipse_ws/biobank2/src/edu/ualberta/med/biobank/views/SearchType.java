@@ -8,7 +8,7 @@ import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.Sample;
 import edu.ualberta.med.biobank.model.Site;
-import edu.ualberta.med.biobank.model.StorageContainer;
+import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.NodeSearchVisitor;
@@ -108,18 +108,18 @@ public enum SearchType {
         @Override
         public Node search(WritableApplicationService appService,
             String searchValue, SessionAdapter sessionAdapter) throws Exception {
-            StorageContainer storageContainer = new StorageContainer();
-            storageContainer.setBarcode(searchValue);
-            List<StorageContainer> containers = appService.search(
-                StorageContainer.class, storageContainer);
+            Container container = new Container();
+            container.setBarcode(searchValue);
+            List<Container> containers = appService.search(
+                Container.class, container);
             if (containers.size() == 0) {
                 BioBankPlugin.openMessage("Search",
                     "No storage container found with barcode " + searchValue);
             }
             else if (containers.size() == 1) {
-                storageContainer = containers.get(0);
+                container = containers.get(0);
                 return sessionAdapter.accept(new NodeSearchVisitor(
-                    StorageContainer.class, storageContainer.getId()));
+                    Container.class, container.getId()));
             }
             else {
                 throw new Exception("Should not find more than one entry ?");
