@@ -38,8 +38,8 @@ public class SiteAdapter extends Node {
 		this.site = site;
 		addChild(new StudyGroup(this, STUDIES_NODE_ID));
 		addChild(new ClinicGroup(this, CLINICS_NODE_ID));
-		addChild(new StorageTypeGroup(this, STORAGE_TYPES_NODE_ID));
-		addChild(new StorageContainerGroup(this, STORAGE_CONTAINERS_NODE_ID));
+		addChild(new ContainerTypeGroup(this, STORAGE_TYPES_NODE_ID));
+		addChild(new ContainerGroup(this, STORAGE_CONTAINERS_NODE_ID));
 	}
 
 	public void setSite(Site site) {
@@ -58,7 +58,7 @@ public class SiteAdapter extends Node {
 		return children.get(CLINICS_NODE_ID);
 	}
 
-	public Node getStorageTypesGroupNode() {
+	public Node getContainerTypesGroupNode() {
 		return children.get(STORAGE_TYPES_NODE_ID);
 	}
 

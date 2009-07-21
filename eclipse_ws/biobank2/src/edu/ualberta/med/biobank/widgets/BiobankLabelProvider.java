@@ -13,14 +13,14 @@ import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.PvInfo;
 import edu.ualberta.med.biobank.model.Sample;
-import edu.ualberta.med.biobank.model.StorageContainer;
-import edu.ualberta.med.biobank.model.StorageType;
+import edu.ualberta.med.biobank.model.Container;
+import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.ClinicAdapter;
 import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.PatientAdapter;
 import edu.ualberta.med.biobank.treeview.PatientVisitAdapter;
-import edu.ualberta.med.biobank.treeview.StorageTypeAdapter;
+import edu.ualberta.med.biobank.treeview.ContainerTypeAdapter;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
 
 /**
@@ -73,15 +73,15 @@ public class BiobankLabelProvider extends LabelProvider implements
             case 1:
                 return "" + visit.getSampleCollection().size();
             }
-        } else if (element instanceof StorageTypeAdapter) {
-            final StorageTypeAdapter adapter = (StorageTypeAdapter) element;
+        } else if (element instanceof ContainerTypeAdapter) {
+            final ContainerTypeAdapter adapter = (ContainerTypeAdapter) element;
             switch (columnIndex) {
             case 0:
                 return adapter.getName();
             case 1:
-                return adapter.getStorageType().getActivityStatus();
+                return adapter.getContainerType().getActivityStatus();
             case 2:
-                return "" + adapter.getStorageType().getDefaultTemperature();
+                return "" + adapter.getContainerType().getDefaultTemperature();
             }
         } else if (element instanceof PvInfo) {
             final PvInfo pvInfo = (PvInfo) element;
@@ -94,8 +94,8 @@ public class BiobankLabelProvider extends LabelProvider implements
                     return "N/A";
                 return pvInfo.getPossibleValues();
             }
-        } else if (element instanceof StorageContainer) {
-            final StorageContainer container = (StorageContainer) element;
+        } else if (element instanceof Container) {
+            final Container container = (Container) element;
             switch (columnIndex) {
             case 0:
                 return container.getName();
@@ -143,8 +143,8 @@ public class BiobankLabelProvider extends LabelProvider implements
 
     @Override
     public String getText(Object element) {
-        if (element instanceof StorageType) {
-            return ((StorageType) element).getName();
+        if (element instanceof ContainerType) {
+            return ((ContainerType) element).getName();
         }
         return ((Node) element).getName();
     }

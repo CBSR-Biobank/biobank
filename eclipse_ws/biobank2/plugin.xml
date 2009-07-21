@@ -238,15 +238,15 @@
             name="Study View">
       </editor>
       <editor
-            class="edu.ualberta.med.biobank.forms.StorageTypeEntryForm"
+            class="edu.ualberta.med.biobank.forms.ContainerTypeEntryForm"
             default="false"
-            id="edu.ualberta.med.biobank.forms.StorageTypeEntryForm"
+            id="edu.ualberta.med.biobank.forms.ContainerTypeEntryForm"
             name="Storage Type Entry">
       </editor>
       <editor
-            class="edu.ualberta.med.biobank.forms.StorageTypeViewForm"
+            class="edu.ualberta.med.biobank.forms.ContainerTypeViewForm"
             default="false"
-            id="edu.ualberta.med.biobank.forms.StorageTypeViewForm"
+            id="edu.ualberta.med.biobank.forms.ContainerTypeViewForm"
             name="StorageType View">
       </editor>
       <editor
@@ -274,13 +274,13 @@
             name="Patient Visit View">
       </editor>
       <editor
-            class="edu.ualberta.med.biobank.forms.StorageContainerEntryForm"
+            class="edu.ualberta.med.biobank.forms.ContainerEntryForm"
             default="false"
             id="edu.ualberta.med.biobank.forms.StorageContainerEntryForm"
             name="Storage Container Entry">
       </editor>
       <editor
-            class="edu.ualberta.med.biobank.forms.StorageContainerViewForm"
+            class="edu.ualberta.med.biobank.forms.ContainerViewForm"
             default="false"
             id="edu.ualberta.med.biobank.forms.StorageContainerViewForm"
             name="Storage Container View">

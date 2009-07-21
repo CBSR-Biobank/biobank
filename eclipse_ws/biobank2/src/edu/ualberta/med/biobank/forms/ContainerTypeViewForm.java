@@ -17,18 +17,18 @@ import org.eclipse.ui.PartInitException;
 
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Capacity;
+import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.SampleType;
-import edu.ualberta.med.biobank.model.StorageType;
+import edu.ualberta.med.biobank.treeview.ContainerTypeAdapter;
 import edu.ualberta.med.biobank.treeview.Node;
-import edu.ualberta.med.biobank.treeview.StorageTypeAdapter;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
-public class StorageTypeViewForm extends BiobankViewForm {
-    public static final String ID = "edu.ualberta.med.biobank.forms.StorageTypeViewForm";
+public class ContainerTypeViewForm extends BiobankViewForm {
+    public static final String ID = "edu.ualberta.med.biobank.forms.ContainerTypeViewForm";
 
-    private StorageTypeAdapter storageTypeAdapter;
+    private ContainerTypeAdapter containerTypeAdapter;
 
-    private StorageType storageType;
+    private ContainerType containerType;
 
     private Capacity capacity;
 
@@ -44,19 +44,15 @@ public class StorageTypeViewForm extends BiobankViewForm {
 
     private Label dimOneCapacityLabel;
 
-    private Button dimOneIsLetter;
-
     private Label dimTwoLabelLabel;
 
     private Label dimTwoCapacityLabel;
 
-    private Button dimTwoIsLetter;
-
     private org.eclipse.swt.widgets.List sampleTypesList;
 
-    private org.eclipse.swt.widgets.List childStorageTypesList;
+    private org.eclipse.swt.widgets.List childContainerTypesList;
 
-    public StorageTypeViewForm() {
+    public ContainerTypeViewForm() {
         super();
     }
 
@@ -68,27 +64,29 @@ public class StorageTypeViewForm extends BiobankViewForm {
         Node node = ((FormInput) input).getNode();
         Assert.isNotNull(node, "Null editor input");
 
-        if (node instanceof StorageTypeAdapter) {
-            storageTypeAdapter = (StorageTypeAdapter) node;
-            appService = storageTypeAdapter.getAppService();
-            retrieveStorageType();
-            setPartName("Storage Type " + storageType.getName());
+        if (node instanceof ContainerTypeAdapter) {
+            containerTypeAdapter = (ContainerTypeAdapter) node;
+            appService = containerTypeAdapter.getAppService();
+            retrieveContainerType();
+            setPartName("Container Type " + containerType.getName());
         } else {
             Assert.isTrue(false, "Invalid editor input: object of type "
                 + node.getClass().getName());
         }
     }
 
-    private void retrieveStorageType() {
-        List<StorageType> result;
-        StorageType searchStorageType = new StorageType();
-        searchStorageType.setId(storageTypeAdapter.getStorageType().getId());
+    private void retrieveContainerType() {
+        List<ContainerType> result;
+        ContainerType searchContainerType = new ContainerType();
+        searchContainerType
+            .setId(containerTypeAdapter.getContainerType().getId());
         try {
-            result = appService.search(StorageType.class, searchStorageType);
+            result = appService
+                .search(ContainerType.class, searchContainerType);
             Assert.isTrue(result.size() == 1);
-            storageType = result.get(0);
-            storageTypeAdapter.setStorageType(storageType);
-            capacity = storageType.getCapacity();
+            containerType = result.get(0);
+            containerTypeAdapter.setContainerType(containerType);
+            capacity = containerType.getCapacity();
         } catch (ApplicationException e) {
             e.printStackTrace();
         }
@@ -96,19 +94,19 @@ public class StorageTypeViewForm extends BiobankViewForm {
 
     @Override
     protected void createFormContent() {
-        form.setText("Storage Type: " + storageType.getName());
+        form.setText("Container Type: " + containerType.getName());
 
         addRefreshToolbarAction();
 
         form.getBody().setLayout(new GridLayout(1, false));
-        createStorageTypeSection();
+        createContainerTypeSection();
         createDimensionsSection();
         createSampleTypesSection();
-        createChildStorageTypesSection();
+        createChildContainerTypesSection();
         createButtons();
     }
 
-    private void createStorageTypeSection() {
+    private void createContainerTypeSection() {
         Composite client = toolkit.createComposite(form.getBody());
         client.setLayout(new GridLayout(2, false));
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -122,16 +120,16 @@ public class StorageTypeViewForm extends BiobankViewForm {
         commentLabel = (Label) createWidget(client, Label.class, SWT.NONE,
             "Comments");
 
-        setStorageTypeValues();
+        setContainerTypeValues();
     }
 
-    private void setStorageTypeValues() {
-        FormUtils.setTextValue(nameLabel, storageType.getName());
-        FormUtils.setTextValue(defaultTempLabel, storageType
+    private void setContainerTypeValues() {
+        FormUtils.setTextValue(nameLabel, containerType.getName());
+        FormUtils.setTextValue(defaultTempLabel, containerType
             .getDefaultTemperature());
-        FormUtils.setTextValue(activityStatusLabel, storageType
+        FormUtils.setTextValue(activityStatusLabel, containerType
             .getActivityStatus());
-        FormUtils.setTextValue(commentLabel, storageType.getComment());
+        FormUtils.setTextValue(commentLabel, containerType.getComment());
     }
 
     private void createDimensionsSection() {
@@ -145,31 +143,23 @@ public class StorageTypeViewForm extends BiobankViewForm {
             "Dimension One Label");
         dimOneCapacityLabel = (Label) createWidget(client, Label.class,
             SWT.NONE, "Dimension One Capacity");
-        dimOneIsLetter = (Button) createWidget(client, Button.class, SWT.NONE,
-            "Dimension One is Letter");
         dimTwoLabelLabel = (Label) createWidget(client, Label.class, SWT.NONE,
             "Dimension Two Label");
         dimTwoCapacityLabel = (Label) createWidget(client, Label.class,
             SWT.NONE, "Dimension Two Capacity");
-        dimTwoIsLetter = (Button) createWidget(client, Button.class, SWT.NONE,
-            "Dimension Two is Letter");
 
         setDimensionsValues();
     }
 
     private void setDimensionsValues() {
-        FormUtils.setTextValue(dimOneLabelLabel, storageType
+        FormUtils.setTextValue(dimOneLabelLabel, containerType
             .getDimensionOneLabel());
         FormUtils.setTextValue(dimOneCapacityLabel, capacity
             .getDimensionOneCapacity());
-        FormUtils.setCheckBoxValue(dimOneIsLetter, storageType
-            .getDimensionOneIsLetter());
-        FormUtils.setTextValue(dimTwoLabelLabel, storageType
+        FormUtils.setTextValue(dimTwoLabelLabel, containerType
             .getDimensionTwoLabel());
         FormUtils.setTextValue(dimTwoCapacityLabel, capacity
             .getDimensionTwoCapacity());
-        FormUtils.setCheckBoxValue(dimTwoIsLetter, storageType
-            .getDimensionTwoIsLetter());
     }
 
     private void createSampleTypesSection() {
@@ -193,13 +183,13 @@ public class StorageTypeViewForm extends BiobankViewForm {
 
     private void setSampleDerivTypesValues() {
         sampleTypesList.removeAll();
-        for (SampleType type : storageType.getSampleTypeCollection()) {
+        for (SampleType type : containerType.getSampleTypeCollection()) {
             sampleTypesList.add(type.getNameShort());
         }
     }
 
-    private void createChildStorageTypesSection() {
-        Composite client = createSectionWithClient("Contains Storage Types");
+    private void createChildContainerTypesSection() {
+        Composite client = createSectionWithClient("Contains Container Types");
         GridLayout layout = (GridLayout) client.getLayout();
         layout.numColumns = 2;
         layout.horizontalSpacing = 10;
@@ -209,18 +199,18 @@ public class StorageTypeViewForm extends BiobankViewForm {
         label
             .setLayoutData(new GridData(SWT.LEFT, SWT.BEGINNING, false, false));
 
-        childStorageTypesList = new org.eclipse.swt.widgets.List(client,
+        childContainerTypesList = new org.eclipse.swt.widgets.List(client,
             SWT.BORDER | SWT.V_SCROLL);
         GridData gd = new GridData(GridData.FILL_BOTH);
         gd.heightHint = 100;
-        childStorageTypesList.setLayoutData(gd);
-        setChildStorageTypesValues();
+        childContainerTypesList.setLayoutData(gd);
+        setChildContainerTypesValues();
     }
 
-    private void setChildStorageTypesValues() {
-        childStorageTypesList.removeAll();
-        for (StorageType type : storageType.getChildStorageTypeCollection()) {
-            childStorageTypesList.add(type.getName());
+    private void setChildContainerTypesValues() {
+        childContainerTypesList.removeAll();
+        for (ContainerType type : containerType.getChildContainerTypeCollection()) {
+            childContainerTypesList.add(type.getName());
         }
     }
 
@@ -234,12 +224,12 @@ public class StorageTypeViewForm extends BiobankViewForm {
         edit.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                getSite().getPage()
-                    .closeEditor(StorageTypeViewForm.this, false);
+                getSite().getPage().closeEditor(ContainerTypeViewForm.this,
+                    false);
                 try {
                     getSite().getPage().openEditor(
-                        new FormInput(storageTypeAdapter),
-                        StorageTypeEntryForm.ID, true);
+                        new FormInput(containerTypeAdapter),
+                        ContainerTypeEntryForm.ID, true);
                 } catch (PartInitException exp) {
                     exp.printStackTrace();
                 }
@@ -249,12 +239,12 @@ public class StorageTypeViewForm extends BiobankViewForm {
 
     @Override
     protected void reload() {
-        retrieveStorageType();
-        setPartName("Storage Type " + storageType.getName());
-        form.setText("Storage Type: " + storageType.getName());
-        setStorageTypeValues();
+        retrieveContainerType();
+        setPartName("Container Type " + containerType.getName());
+        form.setText("Container Type: " + containerType.getName());
+        setContainerTypeValues();
         setDimensionsValues();
         // setSampleDerivTypesValues();
-        setChildStorageTypesValues();
+        setChildContainerTypesValues();
     }
 }

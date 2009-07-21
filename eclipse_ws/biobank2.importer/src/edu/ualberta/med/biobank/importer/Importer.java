@@ -3,6 +3,9 @@ package edu.ualberta.med.biobank.importer;
 
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Clinic;
+import edu.ualberta.med.biobank.model.Container;
+import edu.ualberta.med.biobank.model.ContainerPosition;
+import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.PvInfo;
@@ -11,10 +14,10 @@ import edu.ualberta.med.biobank.model.Sample;
 import edu.ualberta.med.biobank.model.SamplePosition;
 import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.model.Site;
-import edu.ualberta.med.biobank.model.StorageContainer;
 import edu.ualberta.med.biobank.model.Study;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.client.ApplicationServiceProvider;
+import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -25,8 +28,10 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -37,11 +42,13 @@ import org.apache.commons.lang.StringUtils;
  */
 
 public class Importer {
-    public static final SimpleDateFormat bbpdbDateFmt = new SimpleDateFormat(
-        "yyyy-MM-dd HH:mm:ss");
+    public static final String BBPDB_DATE_FMT = "yyyy-MM-dd HH:mm:ss";
 
-    public static final SimpleDateFormat biobank2DateFmt = new SimpleDateFormat(
-        "yyyy-MM-dd HH:mm");
+    public static final String BIOBANK2_DATE_FMT = "yyyy-MM-dd HH:mm";
+
+    public SimpleDateFormat bbpdbDateFmt;
+
+    public SimpleDateFormat biobank2DateFmt;
 
     private WritableApplicationService appService;
 
@@ -68,6 +75,9 @@ public class Importer {
             // "http://aicml-med.cs.ualberta.ca:8080/biobank2", "testuser",
             // "test");
 
+            bbpdbDateFmt = new SimpleDateFormat(BBPDB_DATE_FMT);
+            biobank2DateFmt = new SimpleDateFormat(BIOBANK2_DATE_FMT);
+
             bioBank2Db = BioBank2Db.getInstance();
             bioBank2Db.setAppService(appService);
 
@@ -75,6 +85,9 @@ public class Importer {
             // SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             // bioBank2Db.getPatientVisit("BBP", 4,
             // dfmt.parse("2001-06-04 12:13:00"));
+
+            // checkCabinet();
+            // checkFreezer();
             // System.exit(0);
 
             con = getMysqlConnection();
@@ -94,25 +107,26 @@ public class Importer {
 
             // the order here matters
             bioBank2Db.deleteAll(Sample.class);
-            // bioBank2Db.deleteAll(StorageContainer.class);
-            // bioBank2Db.deleteAll(StorageType.class);
-            // bioBank2Db.deleteAll(PvInfoData.class);
-            // bioBank2Db.deleteAll(PvInfo.class);
-            // bioBank2Db.deleteAll(PatientVisit.class);
-            // bioBank2Db.deleteAll(Patient.class);
-            // bioBank2Db.deleteAll(Clinic.class);
-            // bioBank2Db.deleteAll(Study.class);
-            // bioBank2Db.deleteAll(Site.class);
-            //
-            // cbrSite = bioBank2Db.createSite();
-            //
-            // SiteStorageTypes.getInstance().insertStorageTypes(cbrSite);
-            // SiteStorageContainers.getInstance().insertStorageContainers(cbrSite);
-            //
-            // importStudies();
-            // importClinics();
-            // importPatients();
-            // importPatientVisits();
+            bioBank2Db.deleteAll(Container.class);
+            bioBank2Db.deleteAll(ContainerType.class);
+            bioBank2Db.deleteAll(PvInfoData.class);
+            bioBank2Db.deleteAll(PvInfo.class);
+            bioBank2Db.deleteAll(PatientVisit.class);
+            bioBank2Db.deleteAll(Patient.class);
+            bioBank2Db.deleteAll(Clinic.class);
+            bioBank2Db.deleteAll(Study.class);
+            bioBank2Db.deleteAll(Site.class);
+
+            cbrSite = bioBank2Db.createSite();
+
+            SiteContainerTypes.getInstance().insertContainerTypes(cbrSite);
+            SiteContainers.getInstance().insertContainers(cbrSite);
+
+            importStudies();
+            importClinics();
+            importPatients();
+            importPatientVisits();
+            importFreezerSamples();
             importCabinetSamples();
 
             System.out.println("importing complete.");
@@ -175,6 +189,7 @@ public class Importer {
 
     private void importStudies() throws Exception {
         Study study;
+        String studyNameShort;
 
         System.out.println("importing studies ...");
 
@@ -183,32 +198,36 @@ public class Importer {
         ResultSet rs = s.getResultSet();
         if (rs != null) {
             while (rs.next()) {
+                studyNameShort = rs.getString(3);
                 study = new Study();
                 study.setName(rs.getString(2));
-                study.setNameShort(rs.getString(3));
+                study.setNameShort(studyNameShort);
                 study.setSite(cbrSite);
                 study = (Study) bioBank2Db.setObject(study);
 
                 System.out.println("importing study " + study.getNameShort()
                     + " ...");
 
-                if (study.getNameShort().equals("KDCS")) {
+                if (studyNameShort.equals("KDCS")) {
                     StudyPvInfo.assignKdcsInfo(study);
                 }
-                else if (study.getNameShort().equals("VAS")) {
+                else if (studyNameShort.equals("VAS")) {
                     StudyPvInfo.assignVasInfo(study);
                 }
-                else if (study.getNameShort().equals("RVS")) {
+                else if (studyNameShort.equals("RVS")) {
                     StudyPvInfo.assignRvsInfo(study);
                 }
-                else if (study.getNameShort().equals("NHS")) {
+                else if (studyNameShort.equals("NHS")) {
                     StudyPvInfo.assignNhsInfo(study);
                 }
-                else if (study.getNameShort().equals("MPS")) {
+                else if (studyNameShort.equals("MPS")) {
                     StudyPvInfo.assignMpsInfo(study);
                 }
-                else if (study.getNameShort().equals("BBP")) {
+                else if (studyNameShort.equals("BBP")) {
                     StudyPvInfo.assignBbpPvInfo(study);
+                }
+                else {
+                    throw new Exception("Unknown study: " + studyNameShort);
                 }
             }
         }
@@ -352,10 +371,10 @@ public class Importer {
 
         ResultSet rs = s.getResultSet();
         if (rs != null) {
-            StorageContainer cabinet = bioBank2Db.getStorageContainer("cabinet");
+            Container cabinet = bioBank2Db.getContainer("cabinet");
             int cabinetNum;
-            StorageContainer drawer;
-            StorageContainer bin;
+            Container drawer;
+            Container bin;
             PatientVisit visit;
             SampleType sampleType;
             int drawerNum;
@@ -370,7 +389,7 @@ public class Importer {
                     "Invalid cabinet number: " + cabinetNum);
 
                 drawerName = rs.getString(6);
-                drawerNum = drawerName.charAt(1) - 'A' + 1;
+                drawerNum = NumberingScheme.pos2Int(drawerName.substring(1));
 
                 if (drawerNum > 4) {
                     // no such drawer in real cabinet - was used only for
@@ -381,8 +400,8 @@ public class Importer {
                 binNum = rs.getInt(7);
                 binPos = rs.getString(8);
 
-                System.out.println("importing sample at position " + drawerName
-                    + String.format("%02d", binNum) + binPos);
+                System.out.println("importing Cabinet sample at position "
+                    + drawerName + String.format("%02d", binNum) + binPos);
 
                 visit = bioBank2Db.getPatientVisit(rs.getString(3),
                     rs.getInt(9), rs.getString(2));
@@ -405,8 +424,8 @@ public class Importer {
 
                 SamplePosition spos = new SamplePosition();
                 spos.setPositionDimensionOne(1);
-                spos.setPositionDimensionTwo(binPos2Int(binPos));
-                spos.setStorageContainer(bin);
+                spos.setPositionDimensionTwo(NumberingScheme.binPos2Int(binPos));
+                spos.setContainer(bin);
 
                 Sample sample = new Sample();
                 sample.setSampleType(sampleType);
@@ -420,17 +439,145 @@ public class Importer {
                 sample = (Sample) bioBank2Db.setObject(sample);
             }
         }
-
     }
 
-    private static final String posAlpha = "ABCDEFGHJKLMNPQRSTUVWXYZ";
+    private void importFreezerSamples() throws Exception {
+        System.out.println("importing freezer samples ...");
 
-    private int binPos2Int(String binPos) throws Exception {
-        if (binPos.length() != 2) {
-            throw new Exception("binPos has an invalid length: " + binPos);
+        Statement s = con.createStatement();
+        s.execute("select patient_visit.date_taken, "
+            + "study_list.study_name_short, sample_list.sample_name_short, freezer.*  "
+            + "from freezer, study_list, patient_visit, sample_list "
+            + "where freezer.study_nr=study_list.study_nr "
+            + "and patient_visit.study_nr=study_list.study_nr "
+            + "and freezer.visit_nr=patient_visit.visit_nr "
+            + "and freezer.patient_nr=patient_visit.patient_nr "
+            + "and freezer.sample_nr=sample_list.sample_nr");
+
+        ResultSet rs = s.getResultSet();
+        if (rs != null) {
+            Container freezer = bioBank2Db.getContainer("FR01");
+            ContainerType freezerType = freezer.getContainerType();
+            int freezerNum;
+            Container hotel;
+            Container palette;
+            PatientVisit visit;
+            SampleType sampleType;
+            int patientNum;
+            RowColPos hotelPos;
+            int paletteNum;
+            String studyName;
+            String dateDrawn;
+            String hotelName;
+            String palettePos;
+            String sampleTypeNameShort;
+
+            while (rs.next()) {
+                freezerNum = rs.getInt(4);
+                if (freezerNum != 1) {
+                    System.out.println("Ignoring samples for freezer number "
+                        + freezerNum);
+                    continue;
+                }
+
+                hotelName = rs.getString(5);
+                hotelPos = NumberingScheme.hotelPos2RowCol(freezerType,
+                    hotelName);
+
+                paletteNum = rs.getInt(6) - 1;
+                palettePos = rs.getString(14);
+
+                System.out.println("importing FR01 sample at position "
+                    + hotelName + String.format("%02d", paletteNum)
+                    + palettePos);
+
+                studyName = rs.getString(2);
+                patientNum = rs.getInt(7);
+                dateDrawn = rs.getString(1);
+
+                visit = bioBank2Db.getPatientVisit(studyName, patientNum,
+                    dateDrawn);
+
+                if (visit == null) continue;
+
+                sampleTypeNameShort = rs.getString(3);
+
+                hotel = bioBank2Db.getChildContainer(freezer, hotelPos.row,
+                    hotelPos.col);
+                palette = bioBank2Db.getChildContainer(hotel, paletteNum, 0);
+
+                if (sampleTypeNameShort.equals("RNA Later")) {
+                    sampleTypeNameShort = "RNA Biopsy";
+                }
+
+                sampleType = bioBank2Db.getSampleType(sampleTypeNameShort);
+                bioBank2Db.containerCheckSampleTypeValid(palette, sampleType);
+
+                SamplePosition spos = new SamplePosition();
+                spos.setPositionDimensionOne(1);
+                spos.setPositionDimensionTwo(NumberingScheme.palettePos2Int(palettePos));
+                spos.setContainer(palette);
+
+                Sample sample = new Sample();
+                sample.setSampleType(sampleType);
+                sample.setInventoryId(rs.getString(10));
+                sample.setProcessDate(rs.getDate(11));
+                sample.setQuantity(rs.getDouble(15));
+                sample.setSamplePosition(spos);
+                sample.setPatientVisit(visit);
+                spos.setSample(sample);
+
+                sample = (Sample) bioBank2Db.setObject(sample);
+            }
         }
-        return posAlpha.indexOf(binPos.charAt(0)) * 24
-            + posAlpha.indexOf(binPos.charAt(1));
+    }
+
+    @SuppressWarnings("unused")
+    private void checkCabinet() throws Exception {
+
+        HQLCriteria c = new HQLCriteria("select sc"
+            + " from edu.ualberta.med.biobank.model.Container as sc"
+            + " where sc.name=?");
+        c.setParameters(Arrays.asList(new Object [] { "Cabinet" }));
+
+        System.out.println("CName        Type         CParent      pos1 pos2 SampleSize");
+        List<Container> containers = appService.query(c);
+        for (Container sc : containers) {
+            printContainerPositions(sc.getChildPositionCollection());
+        }
+    }
+
+    @SuppressWarnings("unused")
+    private void checkFreezer() throws Exception {
+
+        HQLCriteria c = new HQLCriteria("select sc"
+            + " from edu.ualberta.med.biobank.model.Container as sc"
+            + " where sc.name=?");
+        c.setParameters(Arrays.asList(new Object [] { "FR01" }));
+
+        System.out.println("CName        Type         CParent      pos1 pos2 SampleSize");
+        List<Container> containers = appService.query(c);
+        for (Container sc : containers) {
+            printContainerPositions(sc.getChildPositionCollection());
+        }
+    }
+
+    private void printContainerPositions(Collection<ContainerPosition> positions) {
+        if (positions == null) return;
+
+        for (ContainerPosition pos : positions) {
+            System.out.println(String.format(
+                "%-12s %-12s %-12s %2d  %2d    %3d",
+                pos.getContainer().getName(),
+                pos.getContainer().getContainerType().getName(),
+                pos.getParentContainer().getName(),
+                pos.getPositionDimensionOne(), pos.getPositionDimensionTwo(),
+                pos.getContainer().getSamplePositionCollection().size()));
+        }
+
+        for (ContainerPosition pos : positions) {
+            printContainerPositions(pos.getContainer().getChildPositionCollection());
+        }
     }
 
     @SuppressWarnings("unused")

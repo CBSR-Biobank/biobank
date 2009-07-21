@@ -7,11 +7,11 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 
-public class ViewStorageContainerWidget extends AbstractGridContainerWidget {
+public class ViewContainerWidget extends AbstractGridContainerWidget {
 
 	private Point selectedBox;
 
-	public ViewStorageContainerWidget(Composite parent) {
+	public ViewContainerWidget(Composite parent) {
 		super(parent);
 	}
 

@@ -27,12 +27,12 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.helpers.GetHelper;
 import edu.ualberta.med.biobank.model.Capacity;
+import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.model.Site;
-import edu.ualberta.med.biobank.model.StorageType;
+import edu.ualberta.med.biobank.treeview.ContainerTypeAdapter;
 import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
-import edu.ualberta.med.biobank.treeview.StorageTypeAdapter;
 import edu.ualberta.med.biobank.validators.DoubleNumber;
 import edu.ualberta.med.biobank.validators.IntegerNumber;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
@@ -47,8 +47,8 @@ import gov.nih.nci.system.query.example.InsertExampleQuery;
 import gov.nih.nci.system.query.example.UpdateExampleQuery;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
-public class StorageTypeEntryForm extends BiobankEntryForm {
-    public static final String ID = "edu.ualberta.med.biobank.forms.StorageTypeEntryForm";
+public class ContainerTypeEntryForm extends BiobankEntryForm {
+    public static final String ID = "edu.ualberta.med.biobank.forms.ContainerTypeEntryForm";
 
     private static final String MSG_NEW_STORAGE_TYPE_OK = "Creating a new storage type.";
 
@@ -60,25 +60,25 @@ public class StorageTypeEntryForm extends BiobankEntryForm {
 
     static Logger log4j = Logger.getLogger(SessionManager.class.getName());
 
-    private StorageTypeAdapter storageTypeAdapter;
+    private ContainerTypeAdapter containerTypeAdapter;
 
-    private StorageType storageType;
+    private ContainerType containerType;
 
     private Capacity capacity;
 
     private MultiSelect samplesMultiSelect;
 
-    private MultiSelect childStorageTypesMultiSelect;
+    private MultiSelect childContainerTypesMultiSelect;
 
     private List<SampleType> allSampleDerivTypes;
 
-    private Collection<StorageType> allStorageTypes;
+    private Collection<ContainerType> allContainerTypes;
 
     private Site site;
 
     private MultiSelectListener multiSelectListener;
 
-    public StorageTypeEntryForm() {
+    public ContainerTypeEntryForm() {
         super();
         multiSelectListener = new MultiSelectListener() {
             @Override
@@ -96,36 +96,36 @@ public class StorageTypeEntryForm extends BiobankEntryForm {
         Node node = ((FormInput) input).getNode();
         Assert.isNotNull(node, "Null editor input");
 
-        storageTypeAdapter = (StorageTypeAdapter) node;
-        appService = storageTypeAdapter.getAppService();
-        storageType = storageTypeAdapter.getStorageType();
-        site = ((SiteAdapter) storageTypeAdapter.getParent().getParent())
+        containerTypeAdapter = (ContainerTypeAdapter) node;
+        appService = containerTypeAdapter.getAppService();
+        containerType = containerTypeAdapter.getContainerType();
+        site = ((SiteAdapter) containerTypeAdapter.getParent().getParent())
             .getSite();
-        allStorageTypes = site.getStorageTypeCollection();
+        allContainerTypes = site.getContainerTypeCollection();
 
-        if (storageType.getId() == null) {
-            setPartName("New Storage Type");
+        if (containerType.getId() == null) {
+            setPartName("New Container Type");
             capacity = new Capacity();
         } else {
-            setPartName("Storage Type " + storageType.getName());
-            capacity = storageType.getCapacity();
+            setPartName("Container Type " + containerType.getName());
+            capacity = containerType.getCapacity();
         }
     }
 
     @Override
     protected void createFormContent() {
-        form.setText("Storage Type Information");
+        form.setText("Container Type Information");
         form.setMessage(getOkMessage(), IMessageProvider.NONE);
         form.getBody().setLayout(new GridLayout(1, false));
 
-        createStorageTypeSection();
+        createContainerTypeSection();
         createDimensionsSection();
         createSampleDerivTypesSection();
-        createChildStorageTypesSection();
+        createChildContainerTypesSection();
         createButtons();
     }
 
-    protected void createStorageTypeSection() {
+    protected void createContainerTypeSection() {
         Composite client = toolkit.createComposite(form.getBody());
         GridLayout layout = new GridLayout(2, false);
         layout.horizontalSpacing = 10;
@@ -134,21 +134,21 @@ public class StorageTypeEntryForm extends BiobankEntryForm {
         toolkit.paintBordersFor(client);
 
         createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Name", null,
-            PojoObservables.observeValue(storageType, "name"),
+            PojoObservables.observeValue(containerType, "name"),
             NonEmptyString.class, MSG_NO_STORAGE_TYPE_NAME);
 
         createBoundWidgetWithLabel(client, Text.class, SWT.NONE,
             "Default Temperature\n(Celcius)", null, PojoObservables
-                .observeValue(storageType, "defaultTemperature"),
+                .observeValue(containerType, "defaultTemperature"),
             DoubleNumber.class, "Default temperature is not a valid number");
 
         createBoundWidgetWithLabel(client, Combo.class, SWT.NONE,
             "Activity Status", FormConstants.ACTIVITY_STATUS, PojoObservables
-                .observeValue(storageType, "activityStatus"), null, null);
+                .observeValue(containerType, "activityStatus"), null, null);
 
         Text comment = (Text) createBoundWidgetWithLabel(client, Text.class,
             SWT.MULTI, "Comments", null, PojoObservables.observeValue(
-                storageType, "comment"), null, null);
+                containerType, "comment"), null, null);
         GridData gd = new GridData(GridData.FILL_HORIZONTAL);
         gd.heightHint = 40;
         comment.setLayoutData(gd);
@@ -165,7 +165,7 @@ public class StorageTypeEntryForm extends BiobankEntryForm {
 
         createBoundWidgetWithLabel(client, Text.class, SWT.NONE,
             "Dimension One Label", null, PojoObservables.observeValue(
-                storageType, "dimensionOneLabel"), NonEmptyString.class,
+                containerType, "dimensionOneLabel"), NonEmptyString.class,
             MSG_NO_DIMENSION_LABEL);
 
         createBoundWidgetWithLabel(client, Text.class, SWT.NONE,
@@ -175,11 +175,11 @@ public class StorageTypeEntryForm extends BiobankEntryForm {
 
         createBoundWidgetWithLabel(client, Button.class, SWT.NONE,
             "Dimension One is Letter", null, PojoObservables.observeValue(
-                storageType, "dimensionOneIsLetter"), null, null);
+                containerType, "dimensionOneIsLetter"), null, null);
 
         createBoundWidgetWithLabel(client, Text.class, SWT.NONE,
             "Dimension Two Label", null, PojoObservables.observeValue(
-                storageType, "dimensionTwoLabel"), NonEmptyString.class,
+                containerType, "dimensionTwoLabel"), NonEmptyString.class,
             MSG_NO_DIMENSION_LABEL);
 
         createBoundWidgetWithLabel(client, Text.class, SWT.NONE,
@@ -189,7 +189,7 @@ public class StorageTypeEntryForm extends BiobankEntryForm {
 
         createBoundWidgetWithLabel(client, Button.class, SWT.NONE,
             "Dimension Two is Letter", null, PojoObservables.observeValue(
-                storageType, "dimensionTwoIsLetter"), null, null);
+                containerType, "dimensionTwoIsLetter"), null, null);
     }
 
     private void createSampleDerivTypesSection() {
@@ -197,7 +197,7 @@ public class StorageTypeEntryForm extends BiobankEntryForm {
         GridLayout layout = (GridLayout) client.getLayout();
         layout.numColumns = 2;
 
-        Collection<SampleType> stSamplesTypes = storageType
+        Collection<SampleType> stSamplesTypes = containerType
             .getSampleTypeCollection();
 
         GetHelper<SampleType> helper = new GetHelper<SampleType>();
@@ -227,42 +227,42 @@ public class StorageTypeEntryForm extends BiobankEntryForm {
             selSampleDerivTypes);
     }
 
-    private void createChildStorageTypesSection() {
-        Composite client = createSectionWithClient("Contains Storage Types");
+    private void createChildContainerTypesSection() {
+        Composite client = createSectionWithClient("Contains Container Types");
         GridLayout layout = (GridLayout) client.getLayout();
         layout.numColumns = 2;
 
-        childStorageTypesMultiSelect = new MultiSelect(client, SWT.NONE,
-            "Selected Storage Types", "Available Storage Types", 100);
-        childStorageTypesMultiSelect.adaptToToolkit(toolkit);
-        childStorageTypesMultiSelect
+        childContainerTypesMultiSelect = new MultiSelect(client, SWT.NONE,
+            "Selected Container Types", "Available Container Types", 100);
+        childContainerTypesMultiSelect.adaptToToolkit(toolkit);
+        childContainerTypesMultiSelect
             .addSelectionChangedListener(multiSelectListener);
 
-        ListOrderedMap availStorageTypes = new ListOrderedMap();
-        List<Integer> selChildStorageTypes = new ArrayList<Integer>();
+        ListOrderedMap availContainerTypes = new ListOrderedMap();
+        List<Integer> selChildContainerTypes = new ArrayList<Integer>();
 
-        Collection<StorageType> childStorageTypes = storageType
-            .getChildStorageTypeCollection();
-        if (childStorageTypes != null) {
-            for (StorageType childStorageType : childStorageTypes) {
-                selChildStorageTypes.add(childStorageType.getId());
+        Collection<ContainerType> childContainerTypes = containerType
+            .getChildContainerTypeCollection();
+        if (childContainerTypes != null) {
+            for (ContainerType childContainerType : childContainerTypes) {
+                selChildContainerTypes.add(childContainerType.getId());
             }
         }
 
         int myId = 0;
-        if (storageType.getId() != null) {
-            myId = storageType.getId();
+        if (containerType.getId() != null) {
+            myId = containerType.getId();
         }
 
-        if (allStorageTypes != null)
-            for (StorageType storageType : allStorageTypes) {
-                int id = storageType.getId();
+        if (allContainerTypes != null)
+            for (ContainerType containerType : allContainerTypes) {
+                int id = containerType.getId();
                 if (myId != id) {
-                    availStorageTypes.put(id, storageType.getName());
+                    availContainerTypes.put(id, containerType.getName());
                 }
             }
-        childStorageTypesMultiSelect.addSelections(availStorageTypes,
-            selChildStorageTypes);
+        childContainerTypesMultiSelect.addSelections(availContainerTypes,
+            selChildContainerTypes);
     }
 
     protected void createButtons() {
@@ -278,7 +278,7 @@ public class StorageTypeEntryForm extends BiobankEntryForm {
 
     @Override
     protected String getOkMessage() {
-        if (storageType.getId() == null) {
+        if (containerType.getId() == null) {
             return MSG_NEW_STORAGE_TYPE_OK;
         }
         return MSG_STORAGE_TYPE_OK;
@@ -292,34 +292,34 @@ public class StorageTypeEntryForm extends BiobankEntryForm {
         SDKQuery query;
         SDKQueryResult result;
 
-        if ((storageType.getId() == null) && !checkStorageTypeNameUnique()) {
+        if ((containerType.getId() == null) && !checkContainerTypeNameUnique()) {
             setDirty(true);
             return;
         }
 
         saveSampleTypes();
-        saveChildStorageTypes();
+        saveChildContainerTypes();
         // saveCapacity();
-        storageType.setCapacity(capacity);
+        containerType.setCapacity(capacity);
 
         // associate the storage type to it's site
-        storageType.setSite(site);
+        containerType.setSite(site);
 
-        if ((storageType.getId() == null) || (storageType.getId() == 0)) {
-            query = new InsertExampleQuery(storageType);
+        if ((containerType.getId() == null) || (containerType.getId() == 0)) {
+            query = new InsertExampleQuery(containerType);
         } else {
-            query = new UpdateExampleQuery(storageType);
+            query = new UpdateExampleQuery(containerType);
         }
 
         result = appService.executeQuery(query);
-        storageType = (StorageType) result.getObjectResult();
-        if (allStorageTypes == null) {
-            allStorageTypes = new ArrayList<StorageType>();
+        containerType = (ContainerType) result.getObjectResult();
+        if (allContainerTypes == null) {
+            allContainerTypes = new ArrayList<ContainerType>();
         }
-        allStorageTypes.add(storageType);
-        site.setStorageTypeCollection(allStorageTypes);
+        allContainerTypes.add(containerType);
+        site.setContainerTypeCollection(allContainerTypes);
 
-        storageTypeAdapter.getParent().performExpand();
+        containerTypeAdapter.getParent().performExpand();
         getSite().getPage().closeEditor(this, false);
     }
 
@@ -336,7 +336,7 @@ public class StorageTypeEntryForm extends BiobankEntryForm {
     // }
     //
     // result = appService.executeQuery(query);
-    // storageType.setCapacity((Capacity) result.getObjectResult());
+    // containerType.setCapacity((Capacity) result.getObjectResult());
     // }
 
     private void saveSampleTypes() {
@@ -351,41 +351,41 @@ public class StorageTypeEntryForm extends BiobankEntryForm {
         }
         Assert.isTrue(selSampleTypes.size() == selSampleTypeIds.size(),
             "problem with sample type selections");
-        storageType.setSampleTypeCollection(selSampleTypes);
+        containerType.setSampleTypeCollection(selSampleTypes);
     }
 
-    private void saveChildStorageTypes() {
-        List<Integer> selStorageTypeIds = childStorageTypesMultiSelect
+    private void saveChildContainerTypes() {
+        List<Integer> selContainerTypeIds = childContainerTypesMultiSelect
             .getSelected();
-        Set<StorageType> selStorageTypes = new HashSet<StorageType>();
-        if (allStorageTypes != null) {
-            for (StorageType storageType : allStorageTypes) {
-                int id = storageType.getId();
-                if (selStorageTypeIds.indexOf(id) >= 0) {
-                    selStorageTypes.add(storageType);
+        Set<ContainerType> selContainerTypes = new HashSet<ContainerType>();
+        if (allContainerTypes != null) {
+            for (ContainerType containerType : allContainerTypes) {
+                int id = containerType.getId();
+                if (selContainerTypeIds.indexOf(id) >= 0) {
+                    selContainerTypes.add(containerType);
                 }
             }
         }
-        Assert.isTrue(selStorageTypes.size() == selStorageTypeIds.size(),
+        Assert.isTrue(selContainerTypes.size() == selContainerTypeIds.size(),
             "problem with sample type selections");
-        storageType.setChildStorageTypeCollection(selStorageTypes);
+        containerType.setChildContainerTypeCollection(selContainerTypes);
     }
 
-    private boolean checkStorageTypeNameUnique() throws ApplicationException {
-        WritableApplicationService appService = storageTypeAdapter
+    private boolean checkContainerTypeNameUnique() throws ApplicationException {
+        WritableApplicationService appService = containerTypeAdapter
             .getAppService();
         HQLCriteria c = new HQLCriteria(
-            "from edu.ualberta.med.biobank.model.StorageType as st "
+            "from edu.ualberta.med.biobank.model.ContainerType as st "
                 + "inner join fetch st.site " + "where st.site.id='"
                 + site.getId() + "' " + "and st.name = '"
-                + storageType.getName() + "'");
+                + containerType.getName() + "'");
 
         List<Object> results = appService.query(c);
         if (results.size() == 0)
             return true;
 
         BioBankPlugin.openAsyncError("Site Name Problem",
-            "A storage type with name \"" + storageType.getName()
+            "A storage type with name \"" + containerType.getName()
                 + "\" already exists.");
         return false;
     }

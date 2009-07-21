@@ -12,22 +12,22 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class ModelUtils {
 
-    public static List<StorageContainer> getTopContainersForSite(
+    public static List<Container> getTopContainersForSite(
         WritableApplicationService appService, Site site)
         throws ApplicationException {
         HQLCriteria criteria = new HQLCriteria("from "
-            + StorageContainer.class.getName() + " where site.id = "
-            + site.getId() + " and locatedAtPosition.parentContainer is null");
+            + Container.class.getName() + " where site.id = " + site.getId()
+            + " and locatedAtPosition.parentContainer is null");
         return appService.query(criteria);
     }
 
-    public static StorageContainer newStorageContainer(StorageContainer parent) {
-        StorageContainer newStorageContainer = new StorageContainer();
+    public static Container newContainer(Container parent) {
+        Container newContainer = new Container();
         ContainerPosition position = new ContainerPosition();
         position.setParentContainer(parent);
-        position.setOccupiedContainer(newStorageContainer);
-        newStorageContainer.setLocatedAtPosition(position);
-        return newStorageContainer;
+        position.setContainer(newContainer);
+        newContainer.setPosition(position);
+        return newContainer;
     }
 
     public static Object getObjectWithId(WritableApplicationService appService,
@@ -42,13 +42,13 @@ public class ModelUtils {
         return list.get(0);
     }
 
-    public static StorageType getCabinetType(
+    public static ContainerType getCabinetType(
         WritableApplicationService appService) {
-        StorageType type = new StorageType();
+        ContainerType type = new ContainerType();
         type.setName("Cabinet");
-        List<StorageType> types;
+        List<ContainerType> types;
         try {
-            types = appService.search(StorageType.class, type);
+            types = appService.search(ContainerType.class, type);
             if (types.size() == 1) {
                 return types.get(0);
             }
@@ -57,13 +57,13 @@ public class ModelUtils {
         return null;
     }
 
-    public static StorageContainer getStorageContainerWithBarcode(
+    public static Container getContainerWithBarcode(
         WritableApplicationService appService, String barcode)
         throws ApplicationException {
-        StorageContainer container = new StorageContainer();
+        Container container = new Container();
         container.setBarcode(barcode);
-        List<StorageContainer> containers = appService.search(
-            StorageContainer.class, container);
+        List<Container> containers = appService.search(Container.class,
+            container);
         if (containers.size() == 1) {
             return containers.get(0);
         }
@@ -76,16 +76,15 @@ public class ModelUtils {
             return "none";
         } else {
             String positionString = getPositionString(position);
-            StorageContainer container = position.getStorageContainer();
-            ContainerPosition containerPosition = container
-                .getLocatedAtPosition();
-            StorageContainer parent = containerPosition.getParentContainer();
+            Container container = position.getContainer();
+            ContainerPosition containerPosition = container.getPosition();
+            Container parent = containerPosition.getParentContainer();
             while (parent != null) {
                 positionString = getPositionString(containerPosition) + ":"
                     + positionString;
                 System.out.println(positionString);
                 container = parent;
-                containerPosition = parent.getLocatedAtPosition();
+                containerPosition = parent.getPosition();
                 parent = containerPosition.getParentContainer();
             }
             positionString = container.getBarcode() + ":" + positionString;
@@ -96,22 +95,8 @@ public class ModelUtils {
     public static String getPositionString(AbstractPosition position) {
         int dim1 = position.getPositionDimensionOne();
         int dim2 = position.getPositionDimensionTwo();
-        StorageType parentType = null;
-        if (position instanceof SamplePosition) {
-            parentType = ((SamplePosition) position).getStorageContainer()
-                .getStorageType();
-        } else {
-            parentType = ((ContainerPosition) position).getParentContainer()
-                .getStorageType();
-        }
         String dim1String = String.valueOf(dim1);
-        if (getBooleanValue(parentType.getDimensionOneIsLetter(), false)) {
-            dim1String = String.valueOf((char) ('A' + dim1));
-        }
         String dim2String = String.valueOf(dim2);
-        if (getBooleanValue(parentType.getDimensionTwoIsLetter(), false)) {
-            dim1String = String.valueOf((char) ('A' + dim2));
-        }
         return dim1String + dim2String;
     }
 

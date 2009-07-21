@@ -36,7 +36,6 @@ public class StudyViewForm extends BiobankViewForm {
     private Label nameShortLabel;
     private Label activityStatusLabel;
     private Label commentLabel;
-    private Label worksheetLabel;
 
     private BiobankCollectionTable clinicsTable;
     private BiobankCollectionTable patientsTable;
@@ -86,8 +85,6 @@ public class StudyViewForm extends BiobankViewForm {
             SWT.NONE, "Activity Status");
         commentLabel = (Label) createWidget(client, Label.class, SWT.WRAP,
             "Comments");
-        worksheetLabel = (Label) createWidget(client, Label.class, SWT.WRAP,
-            "Worksheet");
 
         setStudySectionValues();
 
@@ -104,10 +101,6 @@ public class StudyViewForm extends BiobankViewForm {
         FormUtils.setTextValue(nameShortLabel, study.getNameShort());
         FormUtils.setTextValue(activityStatusLabel, study.getActivityStatus());
         FormUtils.setTextValue(commentLabel, study.getComment());
-        if (study.getWorksheet() != null) {
-            FormUtils.setTextValue(worksheetLabel, study.getWorksheet()
-                .getName());
-        }
     }
 
     private void createPatientsSection() {

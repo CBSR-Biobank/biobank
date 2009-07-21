@@ -8,7 +8,6 @@ import java.util.Set;
 
 import org.apache.commons.collections.MapIterator;
 import org.apache.commons.collections.map.ListOrderedMap;
-import org.eclipse.core.databinding.beans.PojoObservables;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.swt.SWT;
@@ -29,7 +28,6 @@ import edu.ualberta.med.biobank.model.PvInfo;
 import edu.ualberta.med.biobank.model.PvInfoPossible;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
-import edu.ualberta.med.biobank.model.Worksheet;
 import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
@@ -109,7 +107,6 @@ public class StudyEntryForm extends BiobankEntryForm {
 
         studyAdapter = (StudyAdapter) node;
         study = studyAdapter.getStudy();
-        study.setWorksheet(new Worksheet());
         site = ((SiteAdapter) studyAdapter.getParent().getParent()).getSite();
 
         if (study.getId() == null) {
@@ -133,12 +130,6 @@ public class StudyEntryForm extends BiobankEntryForm {
         toolkit.paintBordersFor(client);
 
         createWidgetsFromMap(FIELDS, study, client);
-        if (study.getWorksheet() == null) {
-            study.setWorksheet(new Worksheet());
-        }
-        createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Worksheet",
-            null, PojoObservables.observeValue(study.getWorksheet(), "name"),
-            NonEmptyString.class, "Worksheet barcode should be specified");
 
         Text comments = (Text) controls.get("comment");
         GridData gd = (GridData) comments.getLayoutData();
