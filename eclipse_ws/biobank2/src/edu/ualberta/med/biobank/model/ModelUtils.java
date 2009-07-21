@@ -83,7 +83,6 @@ public class ModelUtils {
             while (parent != null) {
                 positionString = getPositionString(containerPosition) + ":"
                     + positionString;
-                System.out.println(positionString);
                 container = parent;
                 containerPosition = parent.getLocatedAtPosition();
                 parent = containerPosition.getParentContainer();

@@ -19,10 +19,16 @@ import edu.ualberta.med.biobank.forms.PatientVisitEntryForm;
 import edu.ualberta.med.biobank.forms.PatientVisitViewForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.PatientVisit;
+import edu.ualberta.med.biobank.model.Sample;
 
 public class PatientVisitAdapter extends Node {
 
     private PatientVisit patientVisit;
+
+    /**
+     * Sample selected in this patient visit
+     */
+    private Sample selectedSample;
 
     public PatientVisitAdapter(Node parent, PatientVisit patientVisit) {
         super(parent);
@@ -117,51 +123,6 @@ public class PatientVisitAdapter extends Node {
 
     @Override
     public void loadChildren(boolean updateNode) {
-        // try {
-        // // read from database again
-        // patientVisit = (PatientVisit) ModelUtils.getObjectWithId(
-        // getAppService(), PatientVisit.class, patientVisit.getId());
-        //
-        // Collection<Sample> samples = patientVisit.getSampleCollection();
-        //
-        // Map<SampleType, List<Sample>> samplesMap = new HashMap<SampleType,
-        // List<Sample>>();
-        // for (Sample sample : samples) {
-        // List<Sample> samplesForType = samplesMap.get(sample.getSampleType());
-        // if (samplesForType == null) {
-        // samplesForType = new ArrayList<Sample>();
-        // samplesMap.put(sample.getSampleType(), samplesForType);
-        // }
-        // samplesForType.add(sample);
-        // }
-        // for (SampleType type : samplesMap.keySet()) {
-        // SampleTypeAdapter node = (SampleTypeAdapter) getChild(type.getId());
-        // if (node == null) {
-        // node = new SampleTypeAdapter(this, type);
-        // addChild(node);
-        // }
-        // SessionManager.getInstance().getTreeViewer().update(node, null);
-        // for (Sample sample : samplesMap.get(type)) {
-        // SampleAdapter sampleNode = (SampleAdapter)
-        // node.getChild(sample.getId());
-        // if (sampleNode == null) {
-        // sampleNode = new SampleAdapter(node, sample);
-        // node.addChild(sampleNode);
-        // }
-        // if (updateNode) {
-        // SessionManager.getInstance().getTreeViewer().update(
-        // sampleNode, null);
-        // }
-        // }
-        // }
-        //
-        // }
-        // catch (Exception e) {
-        // SessionManager.getLogger().error(
-        // "Error while loading children of patient visit "
-        // + patientVisit.getNumber(), e);
-        // }
-
     }
 
     @Override
@@ -171,6 +132,14 @@ public class PatientVisitAdapter extends Node {
 
     public void setPatientVisit(PatientVisit patientVisit) {
         this.patientVisit = patientVisit;
+    }
+
+    public void setSelectedSample(Sample sample) {
+        this.selectedSample = sample;
+    }
+
+    public Sample getSelectedSample() {
+        return selectedSample;
     }
 
 }

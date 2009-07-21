@@ -162,7 +162,7 @@ public class StorageContainerViewForm extends BiobankViewForm {
         Composite parent = createSectionWithClient("Samples");
         samplesWidget = new SamplesListWidget(parent, null);
         samplesWidget.adaptToToolkit(toolkit, true);
-        samplesWidget.setSamplesFromPositions(storageContainer
+        samplesWidget.setSamplePositions(storageContainer
             .getSamplePositionCollection());
     }
 

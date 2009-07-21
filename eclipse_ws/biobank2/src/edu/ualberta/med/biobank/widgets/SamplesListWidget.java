@@ -1,7 +1,10 @@
 package edu.ualberta.med.biobank.widgets;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
+import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -21,11 +24,12 @@ import edu.ualberta.med.biobank.treeview.SessionAdapter;
 public class SamplesListWidget extends BiobankCollectionTable {
 
     private static final String[] headings = new String[] { "Inventory ID",
-        "Type", "Position", "Process Date", "Available", "Available quantity",
-        "Comment" };
+        "Type", "Position", "Process Date", "Available", "Quantity", "Comment" };
 
     private static final int[] bounds = new int[] { 130, 130, 150, 150, -1, -1,
         -1 };
+
+    private Map<Integer, Sample> samples;
 
     public SamplesListWidget(Composite parent,
         final SessionAdapter sessionAdapter) {
@@ -33,7 +37,10 @@ public class SamplesListWidget extends BiobankCollectionTable {
         GridData tableData = ((GridData) getLayoutData());
         tableData.heightHint = 500;
 
+        getTableViewer().setContentProvider(new ArrayContentProvider());
+
         if (sessionAdapter != null) {
+            // if session adapter is not null, can search for another node
             getTableViewer().addDoubleClickListener(new IDoubleClickListener() {
                 @Override
                 public void doubleClick(DoubleClickEvent event) {
@@ -65,37 +72,28 @@ public class SamplesListWidget extends BiobankCollectionTable {
     }
 
     public void setSamples(Collection<Sample> sampleCollection) {
-        getTableViewer().setInput(getSamplesArray(sampleCollection));
-    }
-
-    public void setSamplesFromPositions(
-        Collection<SamplePosition> samplePositions) {
-        getTableViewer().setInput(getSamplesArrayFromPosition(samplePositions));
-    }
-
-    private Sample[] getSamplesArray(Collection<Sample> samples) {
-        Sample[] samplesArray = new Sample[samples.size()];
-        int i = 0;
-        for (Sample s : samples) {
-            samplesArray[i] = s;
-            i++;
+        samples = new HashMap<Integer, Sample>();
+        for (Sample s : sampleCollection) {
+            samples.put(s.getId(), s);
         }
-        return samplesArray;
+        getTableViewer().setInput(samples.values());
     }
 
-    private Sample[] getSamplesArrayFromPosition(
-        Collection<SamplePosition> samplePositions) {
-        if (samplePositions.size() == 0) {
-            return new Sample[0];
+    public void setSamplePositions(
+        Collection<SamplePosition> samplePositionCollection) {
+        samples = new HashMap<Integer, Sample>();
+        for (SamplePosition s : samplePositionCollection) {
+            samples.put(s.getSample().getId(), s.getSample());
         }
-
-        Sample[] samples = new Sample[samplePositions.size()];
-        int i = 0;
-        for (SamplePosition sp : samplePositions) {
-            samples[i] = sp.getSample();
-            i++;
-        }
-        return samples;
+        getTableViewer().setInput(samples.values());
     }
 
+    public void setSelection(Sample selectedSample) {
+        if (selectedSample != null) {
+            // we need to do that, as the equals method from the cacore object
+            // doesn't work well !
+            Sample s = samples.get(selectedSample.getId());
+            getTableViewer().setSelection(new StructuredSelection(s), true);
+        }
+    }
 }

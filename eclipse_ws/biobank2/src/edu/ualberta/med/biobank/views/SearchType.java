@@ -1,4 +1,3 @@
-
 package edu.ualberta.med.biobank.views;
 
 import java.util.List;
@@ -12,6 +11,7 @@ import edu.ualberta.med.biobank.model.StorageContainer;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.NodeSearchVisitor;
+import edu.ualberta.med.biobank.treeview.PatientVisitAdapter;
 import edu.ualberta.med.biobank.treeview.SessionAdapter;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
@@ -26,13 +26,11 @@ public enum SearchType {
             if (sites.size() == 0) {
                 BioBankPlugin.openMessage("Search", "No site found with name "
                     + searchValue);
-            }
-            else if (sites.size() == 1) {
+            } else if (sites.size() == 1) {
                 site = sites.get(0);
                 return sessionAdapter.accept(new NodeSearchVisitor(Site.class,
                     site.getId()));
-            }
-            else {
+            } else {
                 throw new Exception("Should not find more than one entry ?");
             }
             return null;
@@ -48,13 +46,11 @@ public enum SearchType {
             if (studies.size() == 0) {
                 BioBankPlugin.openMessage("Search", "No study found with name "
                     + searchValue);
-            }
-            else if (studies.size() == 1) {
+            } else if (studies.size() == 1) {
                 study = studies.get(0);
                 return sessionAdapter.accept(new NodeSearchVisitor(Study.class,
                     study.getId()));
-            }
-            else {
+            } else {
                 throw new Exception("Should not find more than one entry ?");
             }
             return null;
@@ -70,13 +66,11 @@ public enum SearchType {
             if (patients.size() == 0) {
                 BioBankPlugin.openMessage("Search",
                     "No patient found with number " + searchValue);
-            }
-            else if (patients.size() == 1) {
+            } else if (patients.size() == 1) {
                 patient = patients.get(0);
                 return sessionAdapter.accept(new NodeSearchVisitor(
                     Patient.class, patient.getId()));
-            }
-            else {
+            } else {
                 throw new Exception("Should not find more than one entry ?");
             }
             return null;
@@ -92,13 +86,14 @@ public enum SearchType {
             if (samples.size() == 0) {
                 BioBankPlugin.openMessage("Search",
                     "No sample found with inventoryId " + searchValue);
-            }
-            else if (samples.size() == 1) {
+            } else if (samples.size() == 1) {
                 sample = samples.get(0);
-                return sessionAdapter.accept(new NodeSearchVisitor(
-                    PatientVisit.class, sample.getPatientVisit().getId()));
-            }
-            else {
+                PatientVisitAdapter pvAdapter = (PatientVisitAdapter) sessionAdapter
+                    .accept(new NodeSearchVisitor(PatientVisit.class, sample
+                        .getPatientVisit().getId()));
+                pvAdapter.setSelectedSample(sample);
+                return pvAdapter;
+            } else {
                 throw new Exception("Should not find more than one entry ?");
             }
             return null;
@@ -115,13 +110,11 @@ public enum SearchType {
             if (containers.size() == 0) {
                 BioBankPlugin.openMessage("Search",
                     "No storage container found with barcode " + searchValue);
-            }
-            else if (containers.size() == 1) {
+            } else if (containers.size() == 1) {
                 storageContainer = containers.get(0);
                 return sessionAdapter.accept(new NodeSearchVisitor(
                     StorageContainer.class, storageContainer.getId()));
-            }
-            else {
+            } else {
                 throw new Exception("Should not find more than one entry ?");
             }
             return null;
