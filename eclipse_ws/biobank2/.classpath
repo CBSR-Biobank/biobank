@@ -5,8 +5,8 @@
 			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="biobank2/lib"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
-	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
+	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
+	<classpathentry exported="true" kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry exported="true" kind="lib" path="lib/acegi-security-1.0.4.jar" sourcepath="/usr/scratch/degrisda/frameworks/acegi1.0.4"/>
 	<classpathentry exported="true" kind="lib" path="lib/antlr-2.7.6.jar" sourcepath="biobank2src.zip"/>
 	<classpathentry exported="true" kind="lib" path="lib/asm.jar" sourcepath="/home/loyola/proj/java/asm-1.5.3"/>
@@ -22,17 +22,17 @@
 	<classpathentry exported="true" kind="lib" path="lib/spring.jar" sourcepath="/usr/scratch/degrisda/frameworks/spring-framework-2.0.3/src"/>
 	<classpathentry exported="true" kind="lib" path="lib/xercesImpl.jar" sourcepath="biobank2src.zip"/>
 	<classpathentry exported="true" kind="lib" path="lib/sdk-writable-client-framework.jar"/>
-	<classpathentry kind="lib" path="conf" sourcepath="conf"/>
-	<classpathentry kind="lib" path="lib/axis.jar"/>
-	<classpathentry kind="lib" path="lib/caGrid-CQL-cql.1.0-1.2.jar"/>
-	<classpathentry kind="lib" path="lib/cog-jglobus.jar"/>
-	<classpathentry kind="lib" path="lib/commons-discovery-0.2.jar"/>
-	<classpathentry kind="lib" path="lib/jaxrpc.jar"/>
-	<classpathentry kind="lib" path="lib/sdk-grid-remoting.jar"/>
-	<classpathentry kind="lib" path="lib/sdk-security.jar"/>
-	<classpathentry kind="lib" path="lib/commons-lang-2.4.jar"/>
-	<classpathentry kind="lib" path="lib/gface_0.9.1.jar"/>
-	<classpathentry kind="lib" path="lib/gluegen.jar"/>
-	<classpathentry kind="lib" path="lib/scanlib.jar"/>
+	<classpathentry exported="true" kind="lib" path="conf" sourcepath="conf"/>
+	<classpathentry exported="true" kind="lib" path="lib/axis.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/caGrid-CQL-cql.1.0-1.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/cog-jglobus.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/commons-discovery-0.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jaxrpc.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/sdk-grid-remoting.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/sdk-security.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/commons-lang-2.4.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/gface_0.9.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/gluegen.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/scanlib.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

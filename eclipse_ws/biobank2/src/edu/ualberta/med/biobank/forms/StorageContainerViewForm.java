@@ -19,6 +19,7 @@ import edu.ualberta.med.biobank.model.StorageType;
 import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.StorageContainerAdapter;
 import edu.ualberta.med.biobank.widgets.SamplesListWidget;
+import edu.ualberta.med.biobank.widgets.ViewStorageContainerWidget;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class StorageContainerViewForm extends BiobankViewForm {
@@ -132,6 +133,11 @@ public class StorageContainerViewForm extends BiobankViewForm {
         }
 
         setContainerValues();
+        ViewStorageContainerWidget containerWidget = new ViewStorageContainerWidget(
+            client);
+        containerWidget.setStorageSize(5, 5);
+        // storageContainer.getValues();
+
     }
 
     private void setContainerValues() {
