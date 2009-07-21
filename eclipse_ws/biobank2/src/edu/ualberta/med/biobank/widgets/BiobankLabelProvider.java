@@ -130,8 +130,8 @@ public class BiobankLabelProvider extends LabelProvider implements
                 return sample.getAvailable() == null ? "" : sample
                     .getAvailable().toString();
             case 5:
-                return sample.getAvailable() == null ? "" : sample
-                    .getAvailable().toString();
+                return sample.getQuantity() == null ? "" : sample.getQuantity()
+                    .toString();
             case 6:
                 return sample.getComment() == null ? "" : sample.getComment();
             }

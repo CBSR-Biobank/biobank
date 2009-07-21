@@ -241,13 +241,13 @@
             class="edu.ualberta.med.biobank.forms.ContainerTypeEntryForm"
             default="false"
             id="edu.ualberta.med.biobank.forms.ContainerTypeEntryForm"
-            name="Storage Type Entry">
+            name="ContainerType Entry">
       </editor>
       <editor
             class="edu.ualberta.med.biobank.forms.ContainerTypeViewForm"
             default="false"
             id="edu.ualberta.med.biobank.forms.ContainerTypeViewForm"
-            name="StorageType View">
+            name="ContainerType View">
       </editor>
       <editor
             class="edu.ualberta.med.biobank.forms.PatientEntryForm"
@@ -276,14 +276,14 @@
       <editor
             class="edu.ualberta.med.biobank.forms.ContainerEntryForm"
             default="false"
-            id="edu.ualberta.med.biobank.forms.StorageContainerEntryForm"
-            name="Storage Container Entry">
+            id="edu.ualberta.med.biobank.forms.ContainerEntryForm"
+            name="Container Entry">
       </editor>
       <editor
             class="edu.ualberta.med.biobank.forms.ContainerViewForm"
             default="false"
-            id="edu.ualberta.med.biobank.forms.StorageContainerViewForm"
-            name="Storage Container View">
+            id="edu.ualberta.med.biobank.forms.ContainerViewForm"
+            name="Container View">
       </editor>
       <editor
             class="edu.ualberta.med.biobank.forms.AddPaletteSamplesEntryForm"
