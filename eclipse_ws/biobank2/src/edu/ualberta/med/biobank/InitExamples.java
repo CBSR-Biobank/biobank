@@ -64,7 +64,7 @@ public class InitExamples {
         // .getApplicationServiceFromUrl("http://aicml-med.cs.ualberta.ca:8080/biobank2");
 
         appService = (WritableApplicationService) ApplicationServiceProvider
-            .getApplicationServiceFromUrl("http://localhost:8080/biobank2",
+            .getApplicationServiceFromUrl("http://aicml-med:8080/biobank2",
                 "testuser", "test");
 
         init.deleteAll(Container.class);

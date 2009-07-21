@@ -13,13 +13,16 @@ import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
 
 import edu.ualberta.med.biobank.forms.input.FormInput;
+import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.Container;
+import edu.ualberta.med.biobank.model.ContainerCell;
 import edu.ualberta.med.biobank.model.ContainerPosition;
+import edu.ualberta.med.biobank.model.ContainerStatus;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.treeview.ContainerAdapter;
 import edu.ualberta.med.biobank.treeview.Node;
+import edu.ualberta.med.biobank.widgets.ChooseContainerWidget;
 import edu.ualberta.med.biobank.widgets.SamplesListWidget;
-import edu.ualberta.med.biobank.widgets.ViewContainerWidget;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ContainerViewForm extends BiobankViewForm {
@@ -131,23 +134,49 @@ public class ContainerViewForm extends BiobankViewForm {
         }
 
         setContainerValues();
-        /*
-         * ViewStorageContainerWidget containerWidget = new
-         * ViewStorageContainerWidget( client); ContainerCell[][] cells =
-         * initGridSize(); if (storageContainer != null) { // get cell
-         * information for (ContainerPosition position : storageContainer
-         * .getOccupiedPositions()) { int positionDim1 =
-         * position.getPositionDimensionOne() - 1; int positionDim2 =
-         * position.getPositionDimensionTwo() - 1; ContainerCell cell = new
-         * ContainerCell(position); StorageContainer occupiedContainer =
-         * position .getOccupiedContainer();
-         * containerWidget.setContainersStatus(cells); } }
-         */
 
-        ViewContainerWidget containerWidget = new ViewContainerWidget(client);
-        containerWidget.setStorageSize(5, 5);
-        // storageContainer.getValues();
+        ChooseContainerWidget containerWidget = new ChooseContainerWidget(
+            client);
+        Capacity cap = containerType.getCapacity();
+        ContainerCell[][] cells = new ContainerCell[cap
+            .getDimensionOneCapacity()][cap.getDimensionTwoCapacity()];
+        for (ContainerPosition position : container
+            .getChildPositionCollection()) {
+            int positionDim1 = position.getPositionDimensionOne() - 1;
+            int positionDim2 = position.getPositionDimensionTwo() - 1;
+            ContainerCell cell = new ContainerCell(position);
+            Container occupiedContainer = position.getContainer();
+            setStatus(cell, occupiedContainer);
+            cells[positionDim1][positionDim2] = cell;
+        }
+        containerWidget.setContainersStatus(cells);
 
+    }
+
+    protected void setStatus(ContainerCell cell, Container occupiedContainer) {
+        Boolean full = occupiedContainer.getFull();
+        if (full == null) {
+            full = Boolean.FALSE;
+        }
+        int total = 0;
+        if (!full) {
+            // check if we can add a palette in the hotel
+            if (occupiedContainer.getChildPositionCollection() != null) {
+                total = occupiedContainer.getChildPositionCollection().size();
+            }
+            int capacityTotal = occupiedContainer.getContainerType()
+                .getCapacity().getDimensionOneCapacity()
+                * occupiedContainer.getContainerType().getCapacity()
+                    .getDimensionTwoCapacity();
+            full = (total == capacityTotal);
+        }
+        if (full) {
+            cell.setStatus(ContainerStatus.FILLED);
+        } else if (total == 0) {
+            cell.setStatus(ContainerStatus.EMPTY);
+        } else {
+            cell.setStatus(ContainerStatus.FREE_POSITIONS);
+        }
     }
 
     private void setContainerValues() {

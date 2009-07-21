@@ -7,12 +7,9 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 
-import edu.ualberta.med.biobank.model.ContainerCell;
-
 public class ViewContainerWidget extends AbstractGridContainerWidget {
 
     private Point selectedBox;
-    private ContainerCell[][] cells;
 
     public ViewContainerWidget(Composite parent) {
         super(parent);
