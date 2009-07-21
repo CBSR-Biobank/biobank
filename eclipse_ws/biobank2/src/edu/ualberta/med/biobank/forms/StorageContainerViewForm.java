@@ -19,7 +19,6 @@ import edu.ualberta.med.biobank.model.StorageType;
 import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.StorageContainerAdapter;
 import edu.ualberta.med.biobank.widgets.SamplesListWidget;
-import edu.ualberta.med.biobank.widgets.ViewStorageContainerWidget;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class StorageContainerViewForm extends BiobankViewForm {
@@ -133,11 +132,18 @@ public class StorageContainerViewForm extends BiobankViewForm {
         }
 
         setContainerValues();
-        ViewStorageContainerWidget containerWidget = new ViewStorageContainerWidget(
-            client);
-        containerWidget.setStorageSize(5, 5);
-        // storageContainer.getValues();
-
+        /*
+         * ViewStorageContainerWidget containerWidget = new
+         * ViewStorageContainerWidget( client); ContainerCell[][] cells =
+         * initGridSize(); if (storageContainer != null) { // get cell
+         * information for (ContainerPosition position : storageContainer
+         * .getOccupiedPositions()) { int positionDim1 =
+         * position.getPositionDimensionOne() - 1; int positionDim2 =
+         * position.getPositionDimensionTwo() - 1; ContainerCell cell = new
+         * ContainerCell(position); StorageContainer occupiedContainer =
+         * position .getOccupiedContainer();
+         * containerWidget.setContainersStatus(cells); } }
+         */
     }
 
     private void setContainerValues() {
