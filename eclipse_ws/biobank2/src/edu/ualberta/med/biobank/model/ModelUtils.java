@@ -17,7 +17,7 @@ public class ModelUtils {
         throws ApplicationException {
         HQLCriteria criteria = new HQLCriteria("from "
             + Container.class.getName() + " where site.id = " + site.getId()
-            + " and locatedAtPosition.parentContainer is null");
+            + " and position.parentContainer is null");
         return appService.query(criteria);
     }
 
@@ -82,7 +82,6 @@ public class ModelUtils {
             while (parent != null) {
                 positionString = getPositionString(containerPosition) + ":"
                     + positionString;
-                System.out.println(positionString);
                 container = parent;
                 containerPosition = parent.getPosition();
                 parent = containerPosition.getParentContainer();

@@ -69,8 +69,8 @@ public class InitExamples {
 
         init.deleteAll(Container.class);
         init.deleteAll(ContainerType.class);
-        init.deleteAll(PatientVisit.class);
         init.deleteAll(Patient.class);
+        init.deleteAll(PatientVisit.class);
         init.deleteAll(Study.class);
         init.deleteAll(Clinic.class);
         init.deleteAll(Site.class);

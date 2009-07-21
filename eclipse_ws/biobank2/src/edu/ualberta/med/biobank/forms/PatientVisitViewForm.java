@@ -159,6 +159,7 @@ public class PatientVisitViewForm extends BiobankViewForm {
             .getSessionAdapter());
         samplesWidget.adaptToToolkit(toolkit, true);
         samplesWidget.setSamples(patientVisit.getSampleCollection());
+        samplesWidget.setSelection(patientVisitAdapter.getSelectedSample());
     }
 
     @Override
