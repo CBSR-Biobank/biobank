@@ -16,7 +16,7 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.model.ContainerCell;
 import edu.ualberta.med.biobank.model.ContainerStatus;
 import edu.ualberta.med.biobank.model.ModelUtils;
-import edu.ualberta.med.biobank.model.StorageContainer;
+import edu.ualberta.med.biobank.model.Container;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ContainerChooserPage extends AbstractContainerChooserPage {
@@ -40,7 +40,7 @@ public class ContainerChooserPage extends AbstractContainerChooserPage {
 		comboViewer.setLabelProvider(new LabelProvider() {
 			@Override
 			public String getText(Object element) {
-				StorageContainer sc = (StorageContainer) element;
+				Container sc = (Container) element;
 				return sc.getName();
 			}
 		});
@@ -55,7 +55,7 @@ public class ContainerChooserPage extends AbstractContainerChooserPage {
 			.addSelectionChangedListener(new ISelectionChangedListener() {
 				@Override
 				public void selectionChanged(SelectionChangedEvent event) {
-					setCurrentStorageContainer((StorageContainer) ((IStructuredSelection) comboViewer
+					setCurrentContainer((Container) ((IStructuredSelection) comboViewer
 						.getSelection()).getFirstElement());
 					updateFreezerGrid();
 					pageContainer.layout(true, true);
@@ -74,8 +74,8 @@ public class ContainerChooserPage extends AbstractContainerChooserPage {
 		if (cell != null) {
 			PalettePositionChooserPage nextPage = (PalettePositionChooserPage) getNextPage();
 			try {
-				nextPage.setCurrentStorageContainer(cell.getPosition()
-					.getOccupiedContainer());
+				nextPage.setCurrentContainer(cell.getPosition()
+					.getContainer());
 			} catch (ArrayIndexOutOfBoundsException aiobe) {
 				setPageComplete(false);
 				SessionManager.getLogger().error("Index error", aiobe);
@@ -86,7 +86,7 @@ public class ContainerChooserPage extends AbstractContainerChooserPage {
 
 	@Override
 	protected void setStatus(ContainerCell cell,
-			StorageContainer occupiedContainer) {
+			Container occupiedContainer) {
 		Boolean full = occupiedContainer.getFull();
 		if (full == null) {
 			full = Boolean.FALSE;
@@ -94,12 +94,12 @@ public class ContainerChooserPage extends AbstractContainerChooserPage {
 		int total = 0;
 		if (!full) {
 			// check if we can add a palette in the hotel
-			if (occupiedContainer.getOccupiedPositions() != null) {
-				total = occupiedContainer.getOccupiedPositions().size();
+			if (occupiedContainer.getChildPositionCollection() != null) {
+				total = occupiedContainer.getChildPositionCollection().size();
 			}
-			int capacityTotal = occupiedContainer.getStorageType()
+			int capacityTotal = occupiedContainer.getContainerType()
 				.getCapacity().getDimensionOneCapacity()
-					* occupiedContainer.getStorageType().getCapacity()
+					* occupiedContainer.getContainerType().getCapacity()
 						.getDimensionTwoCapacity();
 			full = (total == capacityTotal);
 		}

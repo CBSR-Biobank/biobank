@@ -13,21 +13,22 @@ import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
 
 import edu.ualberta.med.biobank.forms.input.FormInput;
+import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerPosition;
-import edu.ualberta.med.biobank.model.StorageContainer;
-import edu.ualberta.med.biobank.model.StorageType;
+import edu.ualberta.med.biobank.model.ContainerType;
+import edu.ualberta.med.biobank.treeview.ContainerAdapter;
 import edu.ualberta.med.biobank.treeview.Node;
-import edu.ualberta.med.biobank.treeview.StorageContainerAdapter;
 import edu.ualberta.med.biobank.widgets.SamplesListWidget;
+import edu.ualberta.med.biobank.widgets.ViewContainerWidget;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
-public class StorageContainerViewForm extends BiobankViewForm {
+public class ContainerViewForm extends BiobankViewForm {
 
-    public static final String ID = "edu.ualberta.med.biobank.forms.StorageContainerViewForm";
+    public static final String ID = "edu.ualberta.med.biobank.forms.ContainerViewForm";
 
-    private StorageContainerAdapter storageContainerAdapter;
+    private ContainerAdapter containerAdapter;
 
-    private StorageContainer storageContainer;
+    private Container container;
 
     private SamplesListWidget samplesWidget;
 
@@ -39,7 +40,7 @@ public class StorageContainerViewForm extends BiobankViewForm {
 
     private Label commentsLabel;
 
-    private Label storageTypeLabel;
+    private Label containerTypeLabel;
 
     private Label temperatureLabel;
 
@@ -55,28 +56,26 @@ public class StorageContainerViewForm extends BiobankViewForm {
         Node node = ((FormInput) input).getNode();
         Assert.isNotNull(node, "Null editor input");
 
-        if (node instanceof StorageContainerAdapter) {
-            storageContainerAdapter = (StorageContainerAdapter) node;
-            appService = storageContainerAdapter.getAppService();
-            retrieveStorageContainer();
-            setPartName("Storage Container " + storageContainer.getName());
+        if (node instanceof ContainerAdapter) {
+            containerAdapter = (ContainerAdapter) node;
+            appService = containerAdapter.getAppService();
+            retrieveContainer();
+            setPartName("Container " + container.getName());
         } else {
             Assert.isTrue(false, "Invalid editor input: object of type "
                 + node.getClass().getName());
         }
     }
 
-    private void retrieveStorageContainer() {
-        List<StorageContainer> result;
-        StorageContainer searchStorageContainer = new StorageContainer();
-        searchStorageContainer.setId(storageContainerAdapter
-            .getStorageContainer().getId());
+    private void retrieveContainer() {
+        List<Container> result;
+        Container searchContainer = new Container();
+        searchContainer.setId(containerAdapter.getContainer().getId());
         try {
-            result = appService.search(StorageContainer.class,
-                searchStorageContainer);
+            result = appService.search(Container.class, searchContainer);
             Assert.isTrue(result.size() == 1);
-            storageContainer = result.get(0);
-            storageContainerAdapter.setStorageContainer(storageContainer);
+            container = result.get(0);
+            containerAdapter.setContainer(container);
         } catch (ApplicationException e) {
             e.printStackTrace();
         }
@@ -84,13 +83,13 @@ public class StorageContainerViewForm extends BiobankViewForm {
 
     @Override
     protected void createFormContent() {
-        form.setText("Storage Container " + storageContainer.getName());
+        form.setText("Container " + container.getName());
         form.getBody().setLayout(new GridLayout(1, false));
 
         addRefreshToolbarAction();
         createContainerSection();
 
-        if (storageContainer.getStorageType().getChildStorageTypeCollection()
+        if (container.getContainerType().getChildContainerTypeCollection()
             .size() == 0) {
             // only show samples section this if this container type does not
             // have child containers
@@ -113,19 +112,19 @@ public class StorageContainerViewForm extends BiobankViewForm {
             SWT.NONE, "Activity Status");
         commentsLabel = (Label) createWidget(client, Label.class, SWT.NONE,
             "Comments");
-        storageTypeLabel = (Label) createWidget(client, Label.class, SWT.NONE,
-            "Storage Type");
+        containerTypeLabel = (Label) createWidget(client, Label.class,
+            SWT.NONE, "Container Type");
         temperatureLabel = (Label) createWidget(client, Label.class, SWT.NONE,
             "Temperature");
 
-        StorageType storageType = storageContainer.getStorageType();
-        String label = storageType.getDimensionOneLabel();
+        ContainerType containerType = container.getContainerType();
+        String label = containerType.getDimensionOneLabel();
         if ((label != null) && (label.length() > 0)) {
             positionDimOneLabel = (Label) createWidget(client, Label.class,
                 SWT.NONE, label);
         }
 
-        label = storageType.getDimensionTwoLabel();
+        label = containerType.getDimensionTwoLabel();
         if ((label != null) && (label.length() > 0)) {
             positionDimTwoLabel = (Label) createWidget(client, Label.class,
                 SWT.NONE, label);
@@ -144,19 +143,23 @@ public class StorageContainerViewForm extends BiobankViewForm {
          * position .getOccupiedContainer();
          * containerWidget.setContainersStatus(cells); } }
          */
+
+        ViewContainerWidget containerWidget = new ViewContainerWidget(client);
+        containerWidget.setStorageSize(5, 5);
+        // storageContainer.getValues();
+
     }
 
     private void setContainerValues() {
-        FormUtils.setTextValue(nameLabel, storageContainer.getName());
-        FormUtils.setTextValue(barCodeLabel, storageContainer.getBarcode());
-        FormUtils.setTextValue(activityStatusLabel, storageContainer
+        FormUtils.setTextValue(nameLabel, container.getName());
+        FormUtils.setTextValue(barCodeLabel, container.getBarcode());
+        FormUtils.setTextValue(activityStatusLabel, container
             .getActivityStatus());
-        FormUtils.setTextValue(commentsLabel, storageContainer.getComment());
-        FormUtils.setTextValue(storageTypeLabel, storageContainer
-            .getStorageType().getName());
-        FormUtils.setTextValue(temperatureLabel, storageContainer
-            .getTemperature());
-        ContainerPosition position = storageContainer.getLocatedAtPosition();
+        FormUtils.setTextValue(commentsLabel, container.getComment());
+        FormUtils.setTextValue(containerTypeLabel, container.getContainerType()
+            .getName());
+        FormUtils.setTextValue(temperatureLabel, container.getTemperature());
+        ContainerPosition position = container.getPosition();
         if (position != null) {
             if (positionDimOneLabel != null) {
                 FormUtils.setTextValue(positionDimOneLabel, position
@@ -174,15 +177,15 @@ public class StorageContainerViewForm extends BiobankViewForm {
         Composite parent = createSectionWithClient("Samples");
         samplesWidget = new SamplesListWidget(parent, null);
         samplesWidget.adaptToToolkit(toolkit, true);
-        samplesWidget.setSamplesFromPositions(storageContainer
+        samplesWidget.setSamplesFromPositions(container
             .getSamplePositionCollection());
     }
 
     @Override
     protected void reload() {
-        retrieveStorageContainer();
-        setPartName("Storage Container " + storageContainer.getName());
-        form.setText("Storage Container " + storageContainer.getName());
+        retrieveContainer();
+        setPartName("Container " + container.getName());
+        form.setText("Container " + container.getName());
         setContainerValues();
     }
 

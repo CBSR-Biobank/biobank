@@ -1,4 +1,3 @@
-
 package edu.ualberta.med.biobank.forms;
 
 import java.util.List;
@@ -53,16 +52,17 @@ public class SiteEntryForm extends AddressEntryFormCommon {
         Node node = ((FormInput) input).getNode();
         Assert.isNotNull(node, "Null editor input");
 
-        Assert.isTrue((node instanceof SiteAdapter),
-            "Invalid editor input: object of type " + node.getClass().getName());
+        Assert
+            .isTrue((node instanceof SiteAdapter),
+                "Invalid editor input: object of type "
+                    + node.getClass().getName());
 
         siteAdapter = (SiteAdapter) node;
         site = siteAdapter.getSite();
 
         if (site.getId() == null) {
             setPartName("New Repository Site");
-        }
-        else {
+        } else {
             setPartName("Repository Site " + site.getName());
         }
     }
@@ -82,10 +82,11 @@ public class SiteEntryForm extends AddressEntryFormCommon {
     }
 
     private void createSiteSection() {
-        toolkit.createLabel(
-            form.getBody(),
-            "Studies, Clinics, and Storage Types can be added after submitting this information.",
-            SWT.LEFT);
+        toolkit
+            .createLabel(
+                form.getBody(),
+                "Studies, Clinics, and Container Types can be added after submitting this information.",
+                SWT.LEFT);
 
         Composite client = toolkit.createComposite(form.getBody());
         GridLayout layout = new GridLayout(2, false);
@@ -101,8 +102,8 @@ public class SiteEntryForm extends AddressEntryFormCommon {
             MSG_NO_SITE_NAME);
 
         createBoundWidgetWithLabel(client, Combo.class, SWT.NONE,
-            "Activity Status", FormConstants.ACTIVITY_STATUS,
-            PojoObservables.observeValue(site, "activityStatus"), null, null);
+            "Activity Status", FormConstants.ACTIVITY_STATUS, PojoObservables
+                .observeValue(site, "activityStatus"), null, null);
 
         Text comment = (Text) createBoundWidgetWithLabel(client, Text.class,
             SWT.MULTI, "Comments", null, PojoObservables.observeValue(site,
@@ -134,7 +135,8 @@ public class SiteEntryForm extends AddressEntryFormCommon {
     @Override
     protected void saveForm() {
         if (siteAdapter.getParent() == null) {
-            siteAdapter.setParent(SessionManager.getInstance().getSessionSingle());
+            siteAdapter.setParent(SessionManager.getInstance()
+                .getSessionSingle());
         }
 
         try {
@@ -156,8 +158,7 @@ public class SiteEntryForm extends AddressEntryFormCommon {
                 result = appService.executeQuery(query);
                 site.setAddress((Address) result.getObjectResult());
                 query = new InsertExampleQuery(site);
-            }
-            else {
+            } else {
                 Assert.isNotNull(site.getAddress().getId(),
                     "update invoked on address not in database");
 
@@ -172,11 +173,9 @@ public class SiteEntryForm extends AddressEntryFormCommon {
 
             siteAdapter.getParent().performExpand();
             getSite().getPage().closeEditor(this, false);
-        }
-        catch (final RemoteAccessException exp) {
+        } catch (final RemoteAccessException exp) {
             BioBankPlugin.openRemoteAccessErrorMessage();
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             SessionManager.getLogger().error(
                 "Error while creating site " + site.getName(), e);
         }
@@ -190,7 +189,8 @@ public class SiteEntryForm extends AddressEntryFormCommon {
                 + site.getName() + "'");
 
         List<Object> results = appService.query(c);
-        if (results.size() == 0) return true;
+        if (results.size() == 0)
+            return true;
 
         BioBankPlugin.openAsyncError("Site Name Problem", "A site with name \""
             + site.getName() + "\" already exists.");
@@ -204,7 +204,7 @@ public class SiteEntryForm extends AddressEntryFormCommon {
 
     @Override
     protected void cancelForm() {
-    // TODO Auto-generated method stub
+        // TODO Auto-generated method stub
 
     }
 }

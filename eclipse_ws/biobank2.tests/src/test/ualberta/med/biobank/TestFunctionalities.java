@@ -9,8 +9,8 @@ import edu.ualberta.med.biobank.model.Sample;
 import edu.ualberta.med.biobank.model.SamplePosition;
 import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.model.Site;
-import edu.ualberta.med.biobank.model.StorageContainer;
-import edu.ualberta.med.biobank.model.StorageType;
+import edu.ualberta.med.biobank.model.Container;
+import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.Study;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -79,7 +79,7 @@ public class TestFunctionalities {
 		int samplePositionSize = appService.search(SamplePosition.class,
 			new SamplePosition()).size();
 
-		StorageContainer sc = getStorageContainer();
+		Container sc = getContainer();
 
 		// 1st test = sample not used in another sampleposition
 		Sample sample = findNotUsedSampleInSamplePosition();
@@ -116,13 +116,13 @@ public class TestFunctionalities {
 	/**
 	 * Insert a new SamplePosition
 	 */
-	private void trySamplePositionInsert(Sample sample, StorageContainer sc) {
+	private void trySamplePositionInsert(Sample sample, Container sc) {
 		try {
 			SamplePosition samplePosition = new SamplePosition();
 			samplePosition.setPositionDimensionOne(3);
 			samplePosition.setPositionDimensionTwo(3);
 			samplePosition.setSample(sample);
-			samplePosition.setStorageContainer(sc);
+			samplePosition.setContainer(sc);
 			SDKQueryResult res = appService
 				.executeQuery(new InsertExampleQuery(samplePosition));
 			samplePosition = (SamplePosition) res.getObjectResult();
@@ -144,7 +144,7 @@ public class TestFunctionalities {
 		int samplePositionSize = appService.search(SamplePosition.class,
 			new SamplePosition()).size();
 
-		StorageContainer sc = getStorageContainer();
+		Container sc = getContainer();
 
 		Sample sample = findNotUsedSampleInSamplePosition();
 		System.out.println("Not used sample = " + sample.getId());
@@ -153,14 +153,14 @@ public class TestFunctionalities {
 		samplePosition.setPositionDimensionOne(1);
 		samplePosition.setPositionDimensionTwo(1);
 		samplePosition.setSample(sample);
-		samplePosition.setStorageContainer(sc);
+		samplePosition.setContainer(sc);
 		queries.add(new InsertExampleQuery(samplePosition));
 
 		samplePosition = new SamplePosition();
 		samplePosition.setSample(sample);
 		samplePosition.setPositionDimensionOne(2);
 		samplePosition.setPositionDimensionTwo(2);
-		samplePosition.setStorageContainer(sc);
+		samplePosition.setContainer(sc);
 		// will failed because sample can't be link to 2 samplePosition
 		// roll back should be launched
 		queries.add(new InsertExampleQuery(samplePosition));
@@ -377,9 +377,9 @@ public class TestFunctionalities {
 	@Test
 	public void testContainers() throws Exception {
 		HQLCriteria criteria = new HQLCriteria("from "
-				+ StorageContainer.class.getName()
+				+ Container.class.getName()
 				+ " where locatedAtPosition.parentContainer is not null");
-		List<StorageContainer> list = appService.query(criteria);
+		List<Container> list = appService.query(criteria);
 		System.out.println(list.size());
 	}
 
@@ -445,37 +445,37 @@ public class TestFunctionalities {
 	}
 
 	/**
-	 * Insert 2 storageType with executeBatchQuery method
+	 * Insert 2 containerType with executeBatchQuery method
 	 */
 	@Test
-	public void batchQueriesStorageType() throws Exception {
+	public void batchQueriesContainerType() throws Exception {
 		List<SDKQuery> queries = new ArrayList<SDKQuery>();
 
-		int storageTypeSize = appService.search(StorageType.class,
-			new StorageType()).size();
+		int containerTypeSize = appService.search(ContainerType.class,
+			new ContainerType()).size();
 
 		Capacity capacity = getNewCapacity();
 		Site site = getSite();
 
-		StorageType st = new StorageType();
+		ContainerType st = new ContainerType();
 		st.setCapacity(capacity);
 		st.setSite(site);
 		st.setDefaultTemperature(r.nextDouble());
 		st.setName("TestBatch_" + r.nextInt());
 		queries.add(new InsertExampleQuery(st));
 
-		st = new StorageType();
+		st = new ContainerType();
 		queries.add(new InsertExampleQuery(st));
 
 		try {
 			appService.executeBatchQuery(queries);
 		} catch (ApplicationException ae) {
-			System.out.println("batchQueriesStorageType : "
+			System.out.println("batchQueriesContainerType : "
 					+ ae.getCause().getMessage());
 		} finally {
-			int storageTypeSizeAfter = appService.search(StorageType.class,
-				new StorageType()).size();
-			Assert.assertEquals(storageTypeSize, storageTypeSizeAfter);
+			int containerTypeSizeAfter = appService.search(ContainerType.class,
+				new ContainerType()).size();
+			Assert.assertEquals(containerTypeSize, containerTypeSizeAfter);
 		}
 
 	}
@@ -501,18 +501,18 @@ public class TestFunctionalities {
 		int containerPositionSize = appService.search(ContainerPosition.class,
 			new ContainerPosition()).size();
 
-		StorageContainer sc = getStorageContainer();
-		StorageContainer scParent = getAnotherStorageContainer(sc.getId());
+		Container sc = getContainer();
+		Container scParent = getAnotherContainer(sc.getId());
 
 		ContainerPosition containerPosition = new ContainerPosition();
 		containerPosition.setPositionDimensionOne(8);
 		containerPosition.setPositionDimensionTwo(8);
-		containerPosition.setOccupiedContainer(sc);
+		containerPosition.setContainer(sc);
 		containerPosition.setParentContainer(scParent);
 		queries.add(new InsertExampleQuery(containerPosition));
 
 		containerPosition = new ContainerPosition();
-		containerPosition.setOccupiedContainer(sc); // same occupied container !
+		containerPosition.setContainer(sc); // same occupied container !
 		containerPosition.setParentContainer(scParent);
 		containerPosition.setPositionDimensionOne(9);
 		containerPosition.setPositionDimensionTwo(9);
@@ -533,25 +533,25 @@ public class TestFunctionalities {
 	}
 
 	/**
-	 * Find a StorageContainer in the database
+	 * Find a Container in the database
 	 */
-	private StorageContainer getStorageContainer() throws Exception {
-		return getAnotherStorageContainer(null);
+	private Container getContainer() throws Exception {
+		return getAnotherContainer(null);
 	}
 
 	/**
-	 * Find a StorageContainer with id different from param id (if null, take
-	 * whichever StorageContainer)
+	 * Find a Container with id different from param id (if null, take
+	 * whichever Container)
 	 */
-	private StorageContainer getAnotherStorageContainer(Integer id)
+	private Container getAnotherContainer(Integer id)
 			throws Exception {
-		List<StorageContainer> scs;
+		List<Container> scs;
 		if (id == null) {
-			scs = appService.search(StorageContainer.class,
-				new StorageContainer());
+			scs = appService.search(Container.class,
+				new Container());
 		} else {
 			HQLCriteria c = new HQLCriteria(
-				"from edu.ualberta.med.biobank.model.StorageContainer where id <> "
+				"from edu.ualberta.med.biobank.model.Container where id <> "
 						+ id);
 			scs = appService.query(c);
 		}
@@ -565,19 +565,19 @@ public class TestFunctionalities {
 
 			Site site = getSite();
 
-			StorageType st = new StorageType();
+			ContainerType st = new ContainerType();
 			st.setCapacity(capacity);
 			st.setDefaultTemperature(40.0);
 			st.setSite(site);
 			result = appService.executeQuery(new InsertExampleQuery(st));
-			st = (StorageType) result.getObjectResult();
+			st = (ContainerType) result.getObjectResult();
 
-			StorageContainer sc = new StorageContainer();
+			Container sc = new Container();
 			sc.setName("scTest");
 			sc.setSite(site);
-			sc.setStorageType(st);
+			sc.setContainerType(st);
 			result = appService.executeQuery(new InsertExampleQuery(sc));
-			sc = (StorageContainer) result.getObjectResult();
+			sc = (Container) result.getObjectResult();
 			return sc;
 		}
 		return scs.get(0);
@@ -587,11 +587,11 @@ public class TestFunctionalities {
 	 * insert 2 storage containers using executeBatchQuery method
 	 */
 	@Test
-	public void batchQueriesStorageContainer() throws Exception {
+	public void batchQueriesContainer() throws Exception {
 		List<SDKQuery> queries = new ArrayList<SDKQuery>();
 
-		int storageContainerSize = appService.search(StorageContainer.class,
-			new StorageContainer()).size();
+		int containerSize = appService.search(Container.class,
+			new Container()).size();
 
 		Site site = getSite();
 
@@ -600,43 +600,43 @@ public class TestFunctionalities {
 
 		System.out.println("site=" + site.getId());
 
-		StorageType st = getStorageType();
+		ContainerType st = getContainerType();
 		System.out.println("st=" + st.getId());
 
-		StorageContainer sc = new StorageContainer();
+		Container sc = new Container();
 		sc.setName("TestBatch-" + r.nextInt());
 		sc.setSite(site);
-		sc.setStorageType(st);
+		sc.setContainerType(st);
 		queries.add(new InsertExampleQuery(sc));
 
-		sc = new StorageContainer();
+		sc = new Container();
 		sc.setName("TestBatch-" + r.nextInt());
 		// no site !!
 		queries.add(new InsertExampleQuery(sc));
 		try {
 			appService.executeBatchQuery(queries);
 		} catch (ApplicationException ae) {
-			System.out.println("batchQueriesStorageContainer:"
+			System.out.println("batchQueriesContainer:"
 					+ ae.getCause().getMessage());
 		} finally {
-			int storageContainerSizeAfter = appService.search(
-				StorageContainer.class, new StorageContainer()).size();
+			int containerSizeAfter = appService.search(
+				Container.class, new Container()).size();
 
 			Assert
-				.assertEquals(storageContainerSize, storageContainerSizeAfter);
+				.assertEquals(containerSize, containerSizeAfter);
 		}
 	}
 
 	/**
 	 * return a storage type from the database
 	 */
-	private StorageType getStorageType() throws Exception {
-		List<StorageType> types = appService.search(StorageType.class,
-			new StorageType());
+	private ContainerType getContainerType() throws Exception {
+		List<ContainerType> types = appService.search(ContainerType.class,
+			new ContainerType());
 		if (types.size() > 0) {
 			return types.get(0);
 		}
-		throw new Exception("One StorageType should be added");
+		throw new Exception("One ContainerType should be added");
 	}
 
 	@Test
@@ -649,11 +649,11 @@ public class TestFunctionalities {
 	}
 
 	@Test
-	public void insertStorageTypeChild() throws Exception {
-		StorageType type = getStorageType();
+	public void insertContainerTypeChild() throws Exception {
+		ContainerType type = getContainerType();
 
 		int childrenCount = 0;
-		Collection<StorageType> children = type.getChildStorageTypeCollection();
+		Collection<ContainerType> children = type.getChildContainerTypeCollection();
 		if (children != null) {
 			childrenCount = children.size();
 		}
@@ -661,28 +661,28 @@ public class TestFunctionalities {
 		Capacity capacity = getNewCapacity();
 		Site site = getSite();
 
-		StorageType st = new StorageType();
+		ContainerType st = new ContainerType();
 		st.setCapacity(capacity);
 		st.setSite(site);
 		st.setDefaultTemperature(r.nextDouble());
 		st.setName("enfantType" + r.nextInt());
-		st = (StorageType) appService.executeQuery(new InsertExampleQuery(st))
+		st = (ContainerType) appService.executeQuery(new InsertExampleQuery(st))
 			.getObjectResult();
 
 		if (children == null) {
-			children = new HashSet<StorageType>();
-			type.setChildStorageTypeCollection(children);
+			children = new HashSet<ContainerType>();
+			type.setChildContainerTypeCollection(children);
 		}
 		children.add(st);
 		appService.executeQuery(new UpdateExampleQuery(type));
 
 		// reread from database
-		StorageType searchType = new StorageType();
+		ContainerType searchType = new ContainerType();
 		searchType.setId(type.getId());
-		type = (StorageType) appService.search(StorageType.class, searchType)
+		type = (ContainerType) appService.search(ContainerType.class, searchType)
 			.get(0);
 		int childrenCountAfter = 0;
-		children = type.getChildStorageTypeCollection();
+		children = type.getChildContainerTypeCollection();
 		if (children != null) {
 			childrenCountAfter = children.size();
 		}

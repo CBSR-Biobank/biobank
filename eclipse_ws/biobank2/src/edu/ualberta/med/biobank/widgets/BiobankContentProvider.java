@@ -6,12 +6,12 @@ import org.springframework.util.Assert;
 
 import edu.ualberta.med.biobank.model.PvInfo;
 import edu.ualberta.med.biobank.model.Sample;
-import edu.ualberta.med.biobank.model.StorageContainer;
-import edu.ualberta.med.biobank.model.StorageType;
+import edu.ualberta.med.biobank.model.Container;
+import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.treeview.ClinicAdapter;
 import edu.ualberta.med.biobank.treeview.PatientAdapter;
 import edu.ualberta.med.biobank.treeview.PatientVisitAdapter;
-import edu.ualberta.med.biobank.treeview.StorageTypeAdapter;
+import edu.ualberta.med.biobank.treeview.ContainerTypeAdapter;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
 
 public class BiobankContentProvider implements IStructuredContentProvider {
@@ -31,12 +31,12 @@ public class BiobankContentProvider implements IStructuredContentProvider {
             return (PatientAdapter[]) inputElement;
         } else if (inputElement instanceof PatientVisitAdapter[]) {
             return (PatientVisitAdapter[]) inputElement;
-        } else if (inputElement instanceof StorageTypeAdapter[]) {
-            return (StorageTypeAdapter[]) inputElement;
-        } else if (inputElement instanceof StorageType[]) {
-            return (StorageType[]) inputElement;
-        } else if (inputElement instanceof StorageContainer[]) {
-            return (StorageContainer[]) inputElement;
+        } else if (inputElement instanceof ContainerTypeAdapter[]) {
+            return (ContainerTypeAdapter[]) inputElement;
+        } else if (inputElement instanceof ContainerType[]) {
+            return (ContainerType[]) inputElement;
+        } else if (inputElement instanceof Container[]) {
+            return (Container[]) inputElement;
         } else if (inputElement instanceof PvInfo[]) {
             return (PvInfo[]) inputElement;
         } else if (inputElement instanceof Sample[]) {

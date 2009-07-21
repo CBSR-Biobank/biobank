@@ -4,7 +4,7 @@ import org.eclipse.jface.wizard.Wizard;
 
 import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.Site;
-import edu.ualberta.med.biobank.model.StorageType;
+import edu.ualberta.med.biobank.model.ContainerType;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class ContainerChooserWizard extends Wizard {
@@ -46,7 +46,7 @@ public class ContainerChooserWizard extends Wizard {
 		return paletteChooserPage.getSelectedPosition();
 	}
 
-	public StorageType getStorageType() {
-		return paletteChooserPage.getStorageType();
+	public ContainerType getContainerType() {
+		return paletteChooserPage.getContainerType();
 	}
 }

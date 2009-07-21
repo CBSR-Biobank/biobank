@@ -1,6 +1,6 @@
 package edu.ualberta.med.biobank.treeview;
 
-import java.util.Collection;
+import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.TreeViewer;
@@ -12,16 +12,16 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.forms.StorageTypeEntryForm;
+import edu.ualberta.med.biobank.forms.ContainerEntryForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
+import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ModelUtils;
 import edu.ualberta.med.biobank.model.Site;
-import edu.ualberta.med.biobank.model.StorageType;
 
-public class StorageTypeGroup extends Node {
+public class ContainerGroup extends Node {
 
-    public StorageTypeGroup(SiteAdapter parent, int id) {
-        super(parent, id, "Storage Types", true);
+    public ContainerGroup(SiteAdapter parent, int id) {
+        super(parent, id, "Containers", true);
     }
 
     @Override
@@ -32,12 +32,12 @@ public class StorageTypeGroup extends Node {
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
         MenuItem mi = new MenuItem(menu, SWT.PUSH);
-        mi.setText("Add Storage Type");
+        mi.setText("Add a Container");
         mi.addSelectionListener(new SelectionListener() {
             public void widgetSelected(SelectionEvent event) {
-                StorageTypeAdapter adapter = new StorageTypeAdapter(
-                    StorageTypeGroup.this, new StorageType());
-                openForm(new FormInput(adapter), StorageTypeEntryForm.ID);
+                ContainerAdapter adapter = new ContainerAdapter(
+                    ContainerGroup.this, ModelUtils.newContainer(null));
+                openForm(new FormInput(adapter), ContainerEntryForm.ID);
             }
 
             public void widgetDefaultSelected(SelectionEvent e) {
@@ -47,31 +47,21 @@ public class StorageTypeGroup extends Node {
 
     @Override
     public void loadChildren(boolean updateNode) {
-        Site currentSite = ((SiteAdapter) getParent()).getSite();
-        Assert.isNotNull(currentSite, "null site");
-
+        Site parentSite = ((SiteAdapter) getParent()).getSite();
+        Assert.isNotNull(parentSite, "site null");
         try {
             // read from database again
-            currentSite = (Site) ModelUtils.getObjectWithId(getAppService(),
-                Site.class, currentSite.getId());
-            ((SiteAdapter) getParent()).setSite(currentSite);
+            parentSite = (Site) ModelUtils.getObjectWithId(getAppService(),
+                Site.class, parentSite.getId());
+            ((SiteAdapter) getParent()).setSite(parentSite);
 
-            Collection<StorageType> storageTypes = currentSite
-                .getStorageTypeCollection();
-            SessionManager.getLogger().trace(
-                "updateStudies: Site " + currentSite.getName() + " has "
-                    + storageTypes.size() + " studies");
-
-            for (StorageType storageType : storageTypes) {
-                SessionManager.getLogger().trace(
-                    "updateStudies: Storage Type " + storageType.getId() + ": "
-                        + storageType.getName());
-
-                StorageTypeAdapter node = (StorageTypeAdapter) getChild(storageType
+            List<Container> containers = ModelUtils.getTopContainersForSite(
+                getAppService(), parentSite);
+            for (Container container : containers) {
+                ContainerAdapter node = (ContainerAdapter) getChild(container
                     .getId());
-
                 if (node == null) {
-                    node = new StorageTypeAdapter(this, storageType);
+                    node = new ContainerAdapter(this, container);
                     addChild(node);
                 }
                 if (updateNode) {
@@ -81,8 +71,8 @@ public class StorageTypeGroup extends Node {
             }
         } catch (Exception e) {
             SessionManager.getLogger().error(
-                "Error while loading storage type group children for site "
-                    + currentSite.getName(), e);
+                "Error while loading storage container group children for site "
+                    + parentSite.getName(), e);
         }
     }
 

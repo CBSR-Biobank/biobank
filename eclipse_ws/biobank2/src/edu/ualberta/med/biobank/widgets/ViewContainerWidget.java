@@ -9,12 +9,12 @@ import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.model.ContainerCell;
 
-public class ViewStorageContainerWidget extends AbstractGridContainerWidget {
+public class ViewContainerWidget extends AbstractGridContainerWidget {
 
     private Point selectedBox;
     private ContainerCell[][] cells;
 
-    public ViewStorageContainerWidget(Composite parent) {
+    public ViewContainerWidget(Composite parent) {
         super(parent);
     }
 

@@ -41,15 +41,15 @@ import edu.ualberta.med.biobank.model.PaletteCell;
 import edu.ualberta.med.biobank.model.Sample;
 import edu.ualberta.med.biobank.model.SampleCellStatus;
 import edu.ualberta.med.biobank.model.SamplePosition;
-import edu.ualberta.med.biobank.model.StorageContainer;
-import edu.ualberta.med.biobank.model.StorageType;
+import edu.ualberta.med.biobank.model.Container;
+import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.SessionAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
 import edu.ualberta.med.biobank.validators.ScannerBarcodeValidator;
 import edu.ualberta.med.biobank.widgets.ScanPaletteWidget;
-import edu.ualberta.med.biobank.widgets.ViewStorageContainerWidget;
+import edu.ualberta.med.biobank.widgets.ViewContainerWidget;
 import edu.ualberta.med.biobank.wizard.ContainerChooserWizard;
 import edu.ualberta.med.scanlib.ScanLib;
 import edu.ualberta.med.scanlib.ScanLibFactory;
@@ -65,8 +65,8 @@ public class AssignSamplesLocationEntryForm extends BiobankEntryForm implements
     public static final String ID = "edu.ualberta.med.biobank.forms.AssignSamplesLocationEntryForm";
 
     private ScanPaletteWidget paletteWidget;
-    private ViewStorageContainerWidget hotelWidget;
-    private ViewStorageContainerWidget freezerWidget;
+    private ViewContainerWidget hotelWidget;
+    private ViewContainerWidget freezerWidget;
 
     private Text plateToScanText;
     private Text paletteCodeText;
@@ -89,7 +89,7 @@ public class AssignSamplesLocationEntryForm extends BiobankEntryForm implements
 
     private Study currentStudy;
 
-    protected StorageContainer currentPalette;
+    protected Container currentPalette;
 
     protected Sample[][] currentPaletteSamples;
 
@@ -185,7 +185,7 @@ public class AssignSamplesLocationEntryForm extends BiobankEntryForm implements
         freezerComposite.setLayoutData(gdFreezer);
         freezerLabel = toolkit.createLabel(freezerComposite, "Freezer");
         freezerLabel.setLayoutData(new GridData());
-        freezerWidget = new ViewStorageContainerWidget(freezerComposite);
+        freezerWidget = new ViewContainerWidget(freezerComposite);
         toolkit.adapt(freezerWidget);
         freezerWidget.setGridSizes(5, 10, ScanPaletteWidget.PALETTE_WIDTH, 100);
 
@@ -193,7 +193,7 @@ public class AssignSamplesLocationEntryForm extends BiobankEntryForm implements
         hotelComposite.setLayout(getNeutralGridLayout());
         hotelComposite.setLayoutData(new GridData());
         hotelLabel = toolkit.createLabel(hotelComposite, "Hotel");
-        hotelWidget = new ViewStorageContainerWidget(hotelComposite);
+        hotelWidget = new ViewContainerWidget(hotelComposite);
         toolkit.adapt(hotelWidget);
         hotelWidget.setGridSizes(11, 1, 100,
             ScanPaletteWidget.PALETTE_HEIGHT_AND_LEGEND);
@@ -324,16 +324,16 @@ public class AssignSamplesLocationEntryForm extends BiobankEntryForm implements
         int res = dialog.open();
         if (res == Window.OK) {
             initNewPalette(wizard.getSelectedPosition(), wizard
-                .getStorageType());
+                .getContainerType());
             showOnlyPalette(false);
             showPalettePosition(currentPalette);
         }
         form.reflow(true);
     }
 
-    private void initNewPalette(ContainerPosition position, StorageType type) {
-        currentPalette.setLocatedAtPosition(position);
-        currentPalette.setStorageType(type);
+    private void initNewPalette(ContainerPosition position, ContainerType type) {
+        currentPalette.setPosition(position);
+        currentPalette.setContainerType(type);
         currentPalette.setName(paletteCodeValue.getValue().toString());
         currentPalette.setBarcode(paletteCodeValue.getValue().toString());
         currentPalette.setSite(currentStudy.getSite());
@@ -419,20 +419,20 @@ public class AssignSamplesLocationEntryForm extends BiobankEntryForm implements
         ((GridData) locateButton.getLayoutData()).exclude = !show;
     }
 
-    protected void showPalettePosition(StorageContainer palette) {
-        ContainerPosition palettePosition = palette.getLocatedAtPosition();
+    protected void showPalettePosition(Container palette) {
+        ContainerPosition palettePosition = palette.getPosition();
         if (palettePosition != null) {
-            StorageContainer hotelContainer = palettePosition
+            Container hotelContainer = palettePosition
                 .getParentContainer();
             ContainerPosition hotelPosition = hotelContainer
-                .getLocatedAtPosition();
-            StorageContainer freezerContainer = hotelPosition
+                .getPosition();
+            Container freezerContainer = hotelPosition
                 .getParentContainer();
 
             freezerLabel.setText(freezerContainer.getName());
-            int dim1 = freezerContainer.getStorageType().getCapacity()
+            int dim1 = freezerContainer.getContainerType().getCapacity()
                 .getDimensionOneCapacity();
-            int dim2 = freezerContainer.getStorageType().getCapacity()
+            int dim2 = freezerContainer.getContainerType().getCapacity()
                 .getDimensionTwoCapacity();
             freezerWidget.setStorageSize(dim1, dim2);
             freezerWidget.setSelectedBox(new Point(hotelPosition
@@ -440,9 +440,9 @@ public class AssignSamplesLocationEntryForm extends BiobankEntryForm implements
                 .getPositionDimensionTwo() - 1));
 
             hotelLabel.setText(hotelContainer.getName());
-            dim1 = hotelContainer.getStorageType().getCapacity()
+            dim1 = hotelContainer.getContainerType().getCapacity()
                 .getDimensionOneCapacity();
-            dim2 = hotelContainer.getStorageType().getCapacity()
+            dim2 = hotelContainer.getContainerType().getCapacity()
                 .getDimensionTwoCapacity();
             hotelWidget.setStorageSize(dim1, dim2);
             hotelWidget.setSelectedBox(new Point(palettePosition
@@ -511,17 +511,17 @@ public class AssignSamplesLocationEntryForm extends BiobankEntryForm implements
                 scanCell.setSample(positionSample);
             } else {
                 if (sample.getSamplePosition() != null
-                    && !sample.getSamplePosition().getStorageContainer()
+                    && !sample.getSamplePosition().getContainer()
                         .getId().equals(currentPalette.getId())) {
                     scanCell.setStatus(SampleCellStatus.ERROR);
-                    StorageContainer samplePalette = sample.getSamplePosition()
-                        .getStorageContainer();
+                    Container samplePalette = sample.getSamplePosition()
+                        .getContainer();
                     String posString = samplePalette.getBarcode();
-                    StorageContainer parent = samplePalette
-                        .getLocatedAtPosition().getParentContainer();
+                    Container parent = samplePalette
+                        .getPosition().getParentContainer();
                     while (parent != null) {
                         posString = parent.getBarcode() + "-" + posString;
-                        parent = parent.getLocatedAtPosition()
+                        parent = parent.getPosition()
                             .getParentContainer();
                     }
                     scanCell
@@ -566,7 +566,7 @@ public class AssignSamplesLocationEntryForm extends BiobankEntryForm implements
                     if (isNewPalette()) {
                         query = new InsertExampleQuery(currentPalette);
                         SDKQueryResult res = appService.executeQuery(query);
-                        currentPalette = (StorageContainer) res
+                        currentPalette = (Container) res
                             .getObjectResult();
                     }
 
@@ -583,7 +583,7 @@ public class AssignSamplesLocationEntryForm extends BiobankEntryForm implements
                                     samplePosition.setPositionDimensionOne(i);
                                     samplePosition.setPositionDimensionTwo(j);
                                     samplePosition
-                                        .setStorageContainer(currentPalette);
+                                        .setContainer(currentPalette);
                                     samplePosition.setSample(sample);
                                     sample.setSamplePosition(samplePosition);
                                     queries.add(new UpdateExampleQuery(sample));
@@ -669,7 +669,7 @@ public class AssignSamplesLocationEntryForm extends BiobankEntryForm implements
     private boolean getPaletteInformation() throws ApplicationException {
         currentPaletteSamples = null;
         String barcode = (String) paletteCodeValue.getValue();
-        currentPalette = ModelUtils.getStorageContainerWithBarcode(appService,
+        currentPalette = ModelUtils.getContainerWithBarcode(appService,
             barcode);
         if (currentPalette != null) {
             boolean result = MessageDialog
@@ -680,7 +680,7 @@ public class AssignSamplesLocationEntryForm extends BiobankEntryForm implements
                 return false;
             }
             showPalettePosition(currentPalette);
-            Capacity paletteCapacity = currentPalette.getStorageType()
+            Capacity paletteCapacity = currentPalette.getContainerType()
                 .getCapacity();
             currentPaletteSamples = new Sample[paletteCapacity
                 .getDimensionOneCapacity()][paletteCapacity
@@ -692,7 +692,7 @@ public class AssignSamplesLocationEntryForm extends BiobankEntryForm implements
             }
             showOnlyPalette(false);
         } else {
-            currentPalette = new StorageContainer();
+            currentPalette = new Container();
             currentPalette.setBarcode(barcode);
             showOnlyPalette(true);
             hasLocationValue.setValue(Boolean.FALSE);
@@ -716,7 +716,7 @@ public class AssignSamplesLocationEntryForm extends BiobankEntryForm implements
         getSite().getPage().closeEditor(AssignSamplesLocationEntryForm.this,
             false);
         // Node node = sessionAdapter.accept(new NodeSearchVisitor(
-        // StorageContainer.class, currentPalette.getId()));
+        // Container.class, currentPalette.getId()));
         // if (node != null) {
         // SessionManager.getInstance().getTreeViewer().setSelection(
         // new StructuredSelection(node));
