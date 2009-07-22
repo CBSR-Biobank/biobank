@@ -310,6 +310,8 @@ public class Importer {
                 pv = new PatientVisit();
                 pv.setDateDrawn(bbpdbDateFmt.parse(rs.getString(5)));
                 pv.setPatient(patient);
+                pv.setClinic(bioBank2Db.getClinic(rs.getString(3)));
+                pv.setComments(rs.getString(4));
                 pv = (PatientVisit) bioBank2Db.setObject(pv);
 
                 System.out.println("importing patient visit: patient/"
@@ -412,8 +414,8 @@ public class Importer {
 
                 sampleTypeNameShort = rs.getString(4);
 
-                drawer = bioBank2Db.getChildContainer(cabinet, 1, drawerNum);
-                bin = bioBank2Db.getChildContainer(drawer, 1, binNum);
+                drawer = bioBank2Db.getChildContainer(cabinet, drawerNum, 0);
+                bin = bioBank2Db.getChildContainer(drawer, binNum, 0);
 
                 if (sampleTypeNameShort.equals("DNA(WBC)")) {
                     sampleTypeNameShort = "DNA(Blood)";
