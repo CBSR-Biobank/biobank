@@ -64,13 +64,13 @@ public class InitExamples {
         // .getApplicationServiceFromUrl("http://aicml-med.cs.ualberta.ca:8080/biobank2");
 
         appService = (WritableApplicationService) ApplicationServiceProvider
-            .getApplicationServiceFromUrl("http://aicml-med:8080/biobank2",
+            .getApplicationServiceFromUrl("http://localhost:8080/biobank2",
                 "testuser", "test");
 
         init.deleteAll(Container.class);
         init.deleteAll(ContainerType.class);
-        init.deleteAll(Patient.class);
         init.deleteAll(PatientVisit.class);
+        init.deleteAll(Patient.class);
         init.deleteAll(Study.class);
         init.deleteAll(Clinic.class);
         init.deleteAll(Site.class);
@@ -182,6 +182,7 @@ public class InitExamples {
         for (Object o : list) {
             appService.executeQuery(new DeleteExampleQuery(o));
         }
+
     }
 
     private void insertContainerTypesInSite() throws ApplicationException {

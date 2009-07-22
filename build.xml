@@ -122,29 +122,29 @@
 	<target name="deploy-eclipse"
 	        description="deploys the caCORE SDK beans to the eclipse project"
 	        depends="sdk-and-scripts">
-		<copy todir="${eclipse.proj.dir}/lib">
+		<copy todir="${eclipse.proj.dir}/lib" overwrite="true">
 			<fileset dir="${cacore.sdk.dir}/output/biobank2/package/remote-client/lib" />
 		</copy>
-		<copy todir="${eclipse.proj.dir}/conf">
+		<copy todir="${eclipse.proj.dir}/conf" overwrite="true">
 			<fileset dir="${cacore.sdk.dir}/output/biobank2/package/remote-client/conf">
 				<include name="application-config-client*.xml" />
 			</fileset>
 		</copy>
 		<copy file="${cacore.sdk.dir}/output/biobank2/src/hibernate.cfg.xml"
-		      tofile="${eclipse.proj.dir}/lib/" />
-		<copy todir="${eclipse.proj.dir.importer}/lib">
+		      tofile="${eclipse.proj.dir}/lib/hibernate.cfg.xml"  overwrite="true"/>
+		<copy todir="${eclipse.proj.dir.importer}/lib" overwrite="true">
 			<fileset dir="${cacore.sdk.dir}/output/biobank2/package/remote-client/lib" />
 		</copy>
-		<copy todir="${eclipse.proj.dir.importer}/conf">
+		<copy todir="${eclipse.proj.dir.importer}/conf" overwrite="true">
 			<fileset dir="${cacore.sdk.dir}/output/biobank2/package/remote-client/conf">
 				<include name="application-config-client*.xml" />
 			</fileset>
 		</copy>
 
-		<copy todir="${eclipse.proj.dir.junit}/lib">
+		<copy todir="${eclipse.proj.dir.junit}/lib" overwrite="true">
 			<fileset dir="${cacore.sdk.dir}/output/biobank2/package/remote-client/lib" />
 		</copy>
-		<copy todir="${eclipse.proj.dir.junit}/conf">
+		<copy todir="${eclipse.proj.dir.junit}/conf" overwrite="true">
 			<fileset dir="${cacore.sdk.dir}/output/biobank2/package/remote-client/conf">
 				<include name="application-config-client*.xml" />
 			</fileset>
