@@ -1,10 +1,10 @@
 
 package edu.ualberta.med.biobank.importer;
 
-import edu.ualberta.med.biobank.model.ContainerPosition;
-import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Container;
+import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.ContainerType;
+import edu.ualberta.med.biobank.model.Site;
 
 public class SiteContainers {
 
@@ -34,7 +34,9 @@ public class SiteContainers {
                 freezer3x10, i % 3, i / 3);
 
             for (int j = 0; j < 17; ++j) {
-                insertContainer(site, String.format("%02d", j + 1),
+                insertContainer(
+                    site,
+                    String.format("%02d", j + 1),
                     SiteContainerTypes.getInstance().getContainerType("Palette"),
                     hotel, j, 0);
             }
@@ -42,8 +44,8 @@ public class SiteContainers {
 
         // cabinet
         Container cabinet = insertContainer(site, "Cabinet",
-            SiteContainerTypes.getInstance().getContainerType("Cabinet"), null, 0,
-            0);
+            SiteContainerTypes.getInstance().getContainerType("Cabinet"), null,
+            0, 0);
 
         Container drawer;
         for (int i = 0; i < 4; ++i) {
@@ -60,14 +62,14 @@ public class SiteContainers {
         }
     }
 
-    private Container insertContainer(Site site, String name,
-        ContainerType st, Container parent, int pos1, int pos2)
-        throws Exception {
+    private Container insertContainer(Site site, String name, ContainerType st,
+        Container parent, int pos1, int pos2) throws Exception {
         Container sc = new Container();
         sc.setName(name);
         sc.setBarcode(name);
         sc.setSite(site);
         sc.setContainerType(st);
+        sc.setActivityStatus("Active");
         ContainerPosition cp = new ContainerPosition();
         cp.setContainer(sc);
         if (parent != null) {
