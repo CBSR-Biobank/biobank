@@ -109,8 +109,6 @@ public class Importer {
             bioBank2Db.deleteAll(Sample.class);
             bioBank2Db.deleteAll(Container.class);
             bioBank2Db.deleteAll(ContainerType.class);
-            // bioBank2Db.deleteAll(PvInfoData.class);
-            // bioBank2Db.deleteAll(PvInfo.class);
             bioBank2Db.deleteAll(PatientVisit.class);
             bioBank2Db.deleteAll(Patient.class);
             bioBank2Db.deleteAll(Clinic.class);
@@ -126,8 +124,8 @@ public class Importer {
             importClinics();
             importPatients();
             importPatientVisits();
-            importFreezerSamples();
             importCabinetSamples();
+            importFreezerSamples();
 
             System.out.println("importing complete.");
 
@@ -409,7 +407,7 @@ public class Importer {
                     continue;
                 }
 
-                binNum = rs.getInt(7);
+                binNum = rs.getInt(7) - 1;
                 binPos = rs.getString(8);
 
                 System.out.println("importing Cabinet sample at position "

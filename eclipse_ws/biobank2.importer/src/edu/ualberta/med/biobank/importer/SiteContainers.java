@@ -52,12 +52,12 @@ public class SiteContainers {
             drawer = insertContainer(site, String.format("A%c",
                 NumberingScheme.int2pos(i)),
                 SiteContainerTypes.getInstance().getContainerType("Drawer"),
-                cabinet, i + 1, 0);
+                cabinet, i, 0);
 
             for (int j = 0; j < 36; ++j) {
                 insertContainer(site, String.format("%02d", j + 1),
                     SiteContainerTypes.getInstance().getContainerType("Bin"),
-                    drawer, j + 1, 0);
+                    drawer, j, 0);
             }
         }
     }
