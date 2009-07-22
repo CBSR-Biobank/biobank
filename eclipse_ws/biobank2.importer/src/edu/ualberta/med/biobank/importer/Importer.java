@@ -294,6 +294,8 @@ public class Importer {
 
     private void importPatientVisits() throws Exception {
         Study study;
+        Clinic clinic;
+        String clinicName;
         PatientVisit pv;
         PvInfoData pvInfoData;
 
@@ -305,12 +307,19 @@ public class Importer {
         ResultSet rs = s.getResultSet();
         if (rs != null) {
             while (rs.next()) {
+                clinicName = rs.getString(3);
+                clinic = bioBank2Db.getClinic(clinicName);
+                if (clinic == null) {
+                    System.out.println("ERROR: no such clinic: " + clinicName);
+                    continue;
+                }
+
                 Patient patient = bioBank2Db.getPatient(rs.getString(2));
 
                 pv = new PatientVisit();
                 pv.setDateDrawn(bbpdbDateFmt.parse(rs.getString(5)));
                 pv.setPatient(patient);
-                pv.setClinic(bioBank2Db.getClinic(rs.getString(3)));
+                pv.setClinic(clinic);
                 pv.setComments(rs.getString(4));
                 pv = (PatientVisit) bioBank2Db.setObject(pv);
 

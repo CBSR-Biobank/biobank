@@ -84,7 +84,10 @@ public class BioBank2Db {
         study.setNameShort(shortName);
 
         List<Study> list = appService.search(Study.class, study);
-        if (list.size() != 1) throw new Exception();
+        if (list.size() != 1) {
+            throw new Exception("study with short name" + shortName
+                + " not found");
+        }
         return list.get(0);
     }
 
@@ -93,7 +96,12 @@ public class BioBank2Db {
         clinic.setName(name);
 
         List<Clinic> list = appService.search(Clinic.class, clinic);
-        if (list.size() != 1) throw new Exception();
+        if (list.size() == 0) return null;
+
+        if (list.size() > 1) {
+            throw new Exception("ERROR: multiple clinics with name " + name
+                + " found");
+        }
         return list.get(0);
     }
 
