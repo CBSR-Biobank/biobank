@@ -99,8 +99,8 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         containerTypeAdapter = (ContainerTypeAdapter) node;
         appService = containerTypeAdapter.getAppService();
         containerType = containerTypeAdapter.getContainerType();
-        site = ((SiteAdapter) containerTypeAdapter.getParent().getParent())
-            .getSite();
+        site = ((SiteAdapter) containerTypeAdapter
+            .getParentFromClass(SiteAdapter.class)).getSite();
         allContainerTypes = site.getContainerTypeCollection();
 
         if (containerType.getId() == null) {

@@ -1,4 +1,3 @@
-
 package edu.ualberta.med.biobank.forms;
 
 import java.util.List;
@@ -68,8 +67,7 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
 
         if (clinic.getId() == null) {
             setPartName("New Clinic");
-        }
-        else {
+        } else {
             setPartName("Clinic " + clinic.getName());
         }
     }
@@ -89,10 +87,11 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
         GridLayout layout = new GridLayout(1, false);
         form.getBody().setLayout(layout);
 
-        toolkit.createLabel(
-            form.getBody(),
-            "Clinics can be associated with studies after submitting this initial information.",
-            SWT.LEFT);
+        toolkit
+            .createLabel(
+                form.getBody(),
+                "Clinics can be associated with studies after submitting this initial information.",
+                SWT.LEFT);
         createClinicInfoSection();
         createAddressArea();
         createButtonsSection();
@@ -116,8 +115,8 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
         name.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         createBoundWidgetWithLabel(client, Combo.class, SWT.NONE,
-            "Activity Status", FormConstants.ACTIVITY_STATUS,
-            PojoObservables.observeValue(clinic, "activityStatus"), null, null);
+            "Activity Status", FormConstants.ACTIVITY_STATUS, PojoObservables
+                .observeValue(clinic, "activityStatus"), null, null);
 
         Text comment = (Text) createBoundWidgetWithLabel(client, Text.class,
             SWT.MULTI, "Comments", null, PojoObservables.observeValue(clinic,
@@ -143,8 +142,7 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
         if (status.getSeverity() == IStatus.OK) {
             form.setMessage(getOkMessage(), IMessageProvider.NONE);
             getConfirmButton().setEnabled(true);
-        }
-        else {
+        } else {
             form.setMessage(status.getMessage(), IMessageProvider.ERROR);
             getConfirmButton().setEnabled(false);
         }
@@ -158,7 +156,8 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
     @Override
     public void saveForm() {
         clinic.setAddress(address);
-        SiteAdapter siteAdapter = (SiteAdapter) clinicAdapter.getParent().getParent();
+        SiteAdapter siteAdapter = (SiteAdapter) clinicAdapter
+            .getParentFromClass(SiteAdapter.class);
         clinic.setSite(siteAdapter.getSite());
 
         try {
@@ -179,8 +178,7 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
                 result = appService.executeQuery(query);
                 clinic.setAddress((Address) result.getObjectResult());
                 query = new InsertExampleQuery(clinic);
-            }
-            else {
+            } else {
                 Assert.isNotNull(clinic.getAddress().getId(),
                     "update invoked on address not in database");
 
@@ -195,18 +193,17 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
 
             clinicAdapter.getParent().performExpand();
             getSite().getPage().closeEditor(this, false);
-        }
-        catch (final RemoteAccessException exp) {
+        } catch (final RemoteAccessException exp) {
             BioBankPlugin.openRemoteAccessErrorMessage();
-        }
-        catch (Exception exp) {
+        } catch (Exception exp) {
             exp.printStackTrace();
         }
     }
 
     private boolean checkClinicNameUnique() throws ApplicationException {
         WritableApplicationService appService = clinicAdapter.getAppService();
-        Site site = ((SiteAdapter) clinicAdapter.getParent().getParent()).getSite();
+        Site site = ((SiteAdapter) clinicAdapter
+            .getParentFromClass(SiteAdapter.class)).getSite();
 
         HQLCriteria c = new HQLCriteria(
             "from edu.ualberta.med.biobank.model.Clinic as clinic "
@@ -215,7 +212,8 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
                 + clinic.getName() + "'");
 
         List<Object> results = appService.query(c);
-        if (results.size() == 0) return true;
+        if (results.size() == 0)
+            return true;
 
         BioBankPlugin.openAsyncError("Site Name Problem",
             "A clinic with name \"" + clinic.getName() + "\" already exists.");
@@ -224,7 +222,7 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
 
     @Override
     protected void cancelForm() {
-    // TODO Auto-generated method stub
+        // TODO Auto-generated method stub
 
     }
 }

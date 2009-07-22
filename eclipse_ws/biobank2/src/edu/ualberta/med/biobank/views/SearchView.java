@@ -102,7 +102,8 @@ public class SearchView extends ViewPart {
                     if (treeSelection != null && treeSelection.size() > 0) {
                         Node node = (Node) treeSelection.getFirstElement();
                         appService = node.getAppService();
-                        sessionAdapter = node.getSessionAdapter();
+                        sessionAdapter = (SessionAdapter) node
+                            .getParentFromClass(SessionAdapter.class);
                     } else {
                         BioBankPlugin.openMessage("Search",
                             "No selection available for search");

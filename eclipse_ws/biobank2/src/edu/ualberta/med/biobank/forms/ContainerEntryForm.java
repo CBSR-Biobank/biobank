@@ -4,13 +4,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.eclipse.core.databinding.UpdateValueStrategy;
 import org.eclipse.core.databinding.beans.PojoObservables;
-import org.eclipse.core.databinding.observable.value.IObservableValue;
-import org.eclipse.core.databinding.observable.value.WritableValue;
-import org.eclipse.core.databinding.validation.IValidator;
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.jface.databinding.swt.SWTObservables;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -39,8 +34,6 @@ import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.validators.DoubleNumber;
 import edu.ualberta.med.biobank.validators.IntegerNumber;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
-import edu.ualberta.med.biobank.widgets.BiobankContentProvider;
-import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import gov.nih.nci.system.query.SDKQuery;
 import gov.nih.nci.system.query.SDKQueryResult;
 import gov.nih.nci.system.query.example.InsertExampleQuery;
@@ -77,8 +70,6 @@ public class ContainerEntryForm extends BiobankEntryForm {
     private ContainerType currentContainerType;
 
     private ComboViewer containerTypeComboViewer;
-
-    private IObservableValue typeSelected = new WritableValue("", String.class);
 
     @Override
     public void init(IEditorSite editorSite, IEditorInput input)
@@ -125,8 +116,8 @@ public class ContainerEntryForm extends BiobankEntryForm {
             NonEmptyString.class, MSG_CONTAINER_NAME_EMPTY);
 
         createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Barcode",
-            null, PojoObservables.observeValue(container, "barcode"),
-            null, null);
+            null, PojoObservables.observeValue(container, "barcode"), null,
+            null);
 
         createBoundWidgetWithLabel(client, Combo.class, SWT.NONE,
             "Activity Status", FormConstants.ACTIVITY_STATUS, PojoObservables
@@ -150,30 +141,17 @@ public class ContainerEntryForm extends BiobankEntryForm {
             containerTypes = position.getParentContainer().getContainerType()
                 .getChildContainerTypeCollection();
         }
-        ContainerType[] arr = new ContainerType[containerTypes.size()];
-        int count = 0;
-        for (ContainerType st : containerTypes) {
-            arr[count] = st;
+        containerTypeComboViewer = createComboViewerWithNoSelectionValidator(client,
+            "Container Type", containerTypes, MSG_STORAGE_TYPE_EMPTY);
+        for (ContainerType type : containerTypes) {
             if ((currentContainerType != null)
-                && currentContainerType.getId().equals(st.getId())) {
-                currentContainerType = st;
+                && currentContainerType.getId().equals(type.getId())) {
+                currentContainerType = type;
+                break;
             }
-            count++;
         }
-        Label containerTypeLabel = toolkit.createLabel(client, "Container Type:",
-            SWT.LEFT);
-
-        containerTypeComboViewer = new ComboViewer(client, SWT.READ_ONLY);
-        containerTypeComboViewer.setContentProvider(new BiobankContentProvider());
-        containerTypeComboViewer.setLabelProvider(new BiobankLabelProvider());
-        containerTypeComboViewer.setInput(arr);
-        if (currentContainerType != null) {
-            containerTypeComboViewer.setSelection(new StructuredSelection(
-                currentContainerType));
-        }
-
-        Combo combo = containerTypeComboViewer.getCombo();
-        combo.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
+        containerTypeComboViewer.setSelection(new StructuredSelection(
+            currentContainerType));
         containerTypeComboViewer
             .addSelectionChangedListener(new ISelectionChangedListener() {
                 @Override
@@ -188,15 +166,13 @@ public class ContainerEntryForm extends BiobankEntryForm {
                     } else {
                         tempWidget.setText(temp.toString());
                     }
-                    setDirty(true);
                 }
             });
-        bindContainerTypeCombo(containerTypeLabel, combo);
 
         tempWidget = (Text) createBoundWidgetWithLabel(client, Text.class,
             SWT.NONE, "Temperature (Celcius)", null, PojoObservables
-                .observeValue(container, "temperature"),
-            DoubleNumber.class, "Default temperature is not a valid number");
+                .observeValue(container, "temperature"), DoubleNumber.class,
+            "Default temperature is not a valid number");
 
         createLocationSection();
     }
@@ -266,17 +242,6 @@ public class ContainerEntryForm extends BiobankEntryForm {
         toolkit.paintBordersFor(client);
 
         initConfirmButton(client, false, true);
-    }
-
-    private void bindContainerTypeCombo(Label label, Combo combo) {
-        IValidator validator = createValidator(NonEmptyString.class, FormUtils
-            .createDecorator(label, MSG_STORAGE_TYPE_EMPTY),
-            MSG_STORAGE_TYPE_EMPTY);
-        UpdateValueStrategy uvs = new UpdateValueStrategy();
-        uvs.setAfterGetValidator(validator);
-
-        dbc.bindValue(SWTObservables.observeSelection(combo), typeSelected,
-            uvs, null);
     }
 
     @Override

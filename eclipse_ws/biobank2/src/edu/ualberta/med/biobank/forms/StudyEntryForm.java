@@ -107,7 +107,8 @@ public class StudyEntryForm extends BiobankEntryForm {
 
         studyAdapter = (StudyAdapter) node;
         study = studyAdapter.getStudy();
-        site = ((SiteAdapter) studyAdapter.getParent().getParent()).getSite();
+        site = ((SiteAdapter) studyAdapter
+            .getParentFromClass(SiteAdapter.class)).getSite();
 
         if (study.getId() == null) {
             setPartName("New Study");
@@ -129,7 +130,7 @@ public class StudyEntryForm extends BiobankEntryForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        createWidgetsFromMap(FIELDS, study, client);
+        createBoundWidgetsFromMap(FIELDS, study, client);
 
         Text comments = (Text) controls.get("comment");
         GridData gd = (GridData) comments.getLayoutData();
@@ -330,8 +331,8 @@ public class StudyEntryForm extends BiobankEntryForm {
 
     private boolean checkStudyNameUnique() throws Exception {
         WritableApplicationService appService = studyAdapter.getAppService();
-        Site site = ((SiteAdapter) studyAdapter.getParent().getParent())
-            .getSite();
+        Site site = ((SiteAdapter) studyAdapter
+            .getParentFromClass(SiteAdapter.class)).getSite();
 
         HQLCriteria c = new HQLCriteria("from edu.ualberta.med.biobank.model."
             + "Study as study inner join fetch study.site "
