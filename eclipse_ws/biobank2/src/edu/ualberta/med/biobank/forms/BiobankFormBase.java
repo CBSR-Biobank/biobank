@@ -2,12 +2,20 @@ package edu.ualberta.med.biobank.forms;
 
 import java.util.HashMap;
 
+import org.apache.commons.collections.MapIterator;
+import org.apache.commons.collections.map.ListOrderedMap;
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
@@ -36,7 +44,7 @@ public abstract class BiobankFormBase extends EditorPart {
 
     protected ScrolledForm form;
 
-    protected HashMap<String, Control> controls;
+    protected HashMap<String, Control> controls = new HashMap<String, Control>();
 
     @Override
     public void doSave(IProgressMonitor monitor) {
@@ -115,4 +123,45 @@ public abstract class BiobankFormBase extends EditorPart {
         return client;
     }
 
+    protected Control createWidget(Composite parent, Class<?> widgetClass,
+        int widgetOptions, String fieldLabel) {
+        Label label = toolkit.createLabel(parent, fieldLabel + ":", SWT.LEFT);
+        label.setLayoutData(new GridData(GridData.VERTICAL_ALIGN_BEGINNING));
+        if ((widgetClass == Combo.class) || (widgetClass == Text.class)
+            || (widgetClass == Label.class)) {
+            if (widgetOptions == SWT.NONE) {
+                widgetOptions = SWT.SINGLE;
+            }
+            Label field = toolkit.createLabel(parent, "", widgetOptions
+                | SWT.LEFT | SWT.BORDER);
+            field.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true,
+                false));
+
+            return field;
+        } else if (widgetClass == Button.class) {
+            Button button = new Button(parent, SWT.CHECK | widgetOptions);
+            button.setEnabled(false);
+            toolkit.adapt(button, true, true);
+            return button;
+        } else {
+            Assert.isTrue(false, "invalid widget class "
+                + widgetClass.getName());
+        }
+        return null;
+    }
+
+    protected void createWidgetsFromMap(ListOrderedMap fieldsMap,
+        Composite parent) {
+        FieldInfo fi;
+
+        MapIterator it = fieldsMap.mapIterator();
+        while (it.hasNext()) {
+            String key = (String) it.next();
+            fi = (FieldInfo) it.getValue();
+
+            Control control = createWidget(parent, fi.widgetClass, SWT.NONE,
+                fi.label);
+            controls.put(key, control);
+        }
+    }
 }

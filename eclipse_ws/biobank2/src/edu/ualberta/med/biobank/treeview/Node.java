@@ -298,11 +298,11 @@ public abstract class Node {
         }
     }
 
-    public SessionAdapter getSessionAdapter() {
+    public Node getParentFromClass(Class<?> parentClass) {
         Node node = this;
         while (node != null) {
-            if (node instanceof SessionAdapter) {
-                return (SessionAdapter) node;
+            if (node.getClass().equals(parentClass)) {
+                return node;
             } else {
                 node = node.getParent();
             }

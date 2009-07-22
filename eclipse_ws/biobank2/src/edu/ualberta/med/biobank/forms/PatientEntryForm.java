@@ -1,4 +1,3 @@
-
 package edu.ualberta.med.biobank.forms;
 
 import java.util.List;
@@ -60,8 +59,7 @@ public class PatientEntryForm extends BiobankEntryForm {
 
         if (patient.getId() == null) {
             setPartName("New Patient");
-        }
-        else {
+        } else {
             setPartName("Patient " + patient.getNumber());
         }
     }
@@ -113,8 +111,7 @@ public class PatientEntryForm extends BiobankEntryForm {
         if (status.getSeverity() == IStatus.OK) {
             form.setMessage(getOkMessage(), IMessageProvider.NONE);
             getConfirmButton().setEnabled(true);
-        }
-        else {
+        } else {
             form.setMessage(status.getMessage(), IMessageProvider.ERROR);
             getConfirmButton().setEnabled(false);
         }
@@ -131,23 +128,21 @@ public class PatientEntryForm extends BiobankEntryForm {
                 return;
             }
 
-            Study study = ((StudyAdapter) patientAdapter.getParent().getParent()).getStudy();
+            Study study = ((StudyAdapter) patientAdapter
+                .getParentFromClass(StudyAdapter.class)).getStudy();
             patient.setStudy(study);
 
             if ((patient.getId() == null) || (patient.getId() == 0)) {
                 query = new InsertExampleQuery(patient);
-            }
-            else {
+            } else {
                 query = new UpdateExampleQuery(patient);
             }
 
             result = appService.executeQuery(query);
             patient = (Patient) result.getObjectResult();
-        }
-        catch (final RemoteAccessException exp) {
+        } catch (final RemoteAccessException exp) {
             BioBankPlugin.openRemoteAccessErrorMessage();
-        }
-        catch (Exception exp) {
+        } catch (Exception exp) {
             exp.printStackTrace();
         }
 
@@ -157,7 +152,8 @@ public class PatientEntryForm extends BiobankEntryForm {
 
     private boolean checkPatientNumberUnique() throws ApplicationException {
         WritableApplicationService appService = patientAdapter.getAppService();
-        Study study = ((StudyAdapter) patientAdapter.getParent().getParent()).getStudy();
+        Study study = ((StudyAdapter) patientAdapter
+            .getParentFromClass(StudyAdapter.class)).getStudy();
 
         HQLCriteria c = new HQLCriteria(
             "from edu.ualberta.med.biobank.model.Patient as p "
@@ -166,7 +162,8 @@ public class PatientEntryForm extends BiobankEntryForm {
                 + patient.getNumber() + "'");
 
         List<Object> results = appService.query(c);
-        if (results.size() == 0) return true;
+        if (results.size() == 0)
+            return true;
 
         BioBankPlugin.openAsyncError("Patient Number Problem",
             "A patient with number \"" + patient.getNumber()
@@ -176,7 +173,7 @@ public class PatientEntryForm extends BiobankEntryForm {
 
     @Override
     protected void cancelForm() {
-    // TODO Auto-generated method stub
+        // TODO Auto-generated method stub
 
     }
 
