@@ -350,12 +350,15 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         PatientAdapter patientAdapter = (PatientAdapter) patientVisitAdapter
             .getParent();
         patientVisit.setPatient(patientAdapter.getPatient());
-        IStructuredSelection clinicSelection = (IStructuredSelection) clinicsComboViewer
-            .getSelection();
-        if (clinicSelection != null && clinicSelection.size() > 0) {
-            patientVisit.setClinic((Clinic) clinicSelection.getFirstElement());
-        } else {
-            patientVisit.setClinic(null);
+        if (clinicsComboViewer != null) {
+            IStructuredSelection clinicSelection = (IStructuredSelection) clinicsComboViewer
+                .getSelection();
+            if (clinicSelection != null && clinicSelection.size() > 0) {
+                patientVisit.setClinic((Clinic) clinicSelection
+                    .getFirstElement());
+            } else {
+                patientVisit.setClinic(null);
+            }
         }
         patientVisit.setDateDrawn(dateDrawn.getDate());
 

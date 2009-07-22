@@ -1,7 +1,5 @@
 package edu.ualberta.med.biobank.forms;
 
-import java.util.HashMap;
-
 import org.apache.commons.collections.MapIterator;
 import org.apache.commons.collections.map.ListOrderedMap;
 import org.eclipse.core.databinding.beans.PojoObservables;
@@ -26,13 +24,6 @@ public abstract class BiobankViewForm extends BiobankFormBase {
     protected WritableApplicationService appService;
 
     protected String sessionName;
-
-    private HashMap<String, Control> controls;
-
-    public BiobankViewForm() {
-        super();
-        controls = new HashMap<String, Control>();
-    }
 
     @Override
     public boolean isDirty() {

@@ -3,7 +3,6 @@ package edu.ualberta.med.biobank.forms;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
-import java.util.HashMap;
 
 import org.apache.commons.collections.MapIterator;
 import org.apache.commons.collections.map.ListOrderedMap;
@@ -75,7 +74,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
 
     protected IStatus currentStatus;
 
-    protected DataBindingContext dbc;
+    protected DataBindingContext dbc = new DataBindingContext();
 
     private Button confirmButton;
 
@@ -107,12 +106,6 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
             setDirty(true);
         }
     };
-
-    public BiobankEntryForm() {
-        super();
-        controls = new HashMap<String, Control>();
-        dbc = new DataBindingContext();
-    }
 
     @Override
     public void doSave(IProgressMonitor monitor) {
@@ -304,8 +297,9 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
      * 
      * @see BiobankLabelProvider#getColumnText
      */
-    protected ComboViewer createComboViewerWithNoSelectionValidator(Composite parent,
-        String fieldLabel, Collection<?> input, String errorMessage) {
+    protected ComboViewer createComboViewerWithNoSelectionValidator(
+        Composite parent, String fieldLabel, Collection<?> input,
+        String errorMessage) {
         Label label = toolkit.createLabel(parent, fieldLabel + ":", SWT.LEFT);
 
         ComboViewer comboViewer = new ComboViewer(parent, SWT.READ_ONLY);
@@ -355,8 +349,8 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
         }
     }
 
-    protected void createBoundWidgetsFromMap(ListOrderedMap fieldsMap, Object pojo,
-        Composite client) {
+    protected void createBoundWidgetsFromMap(ListOrderedMap fieldsMap,
+        Object pojo, Composite client) {
         FieldInfo fi;
 
         MapIterator it = fieldsMap.mapIterator();
@@ -406,7 +400,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
             form.setMessage(getOkMessage(), IMessageProvider.NONE);
             confirmButton.setEnabled(true);
         } else {
-            form.setMessage("toto", IMessageProvider.ERROR);
+            form.setMessage(status.getMessage(), IMessageProvider.ERROR);
             confirmButton.setEnabled(false);
         }
     }

@@ -44,7 +44,7 @@ public abstract class BiobankFormBase extends EditorPart {
 
     protected ScrolledForm form;
 
-    protected HashMap<String, Control> controls;
+    protected HashMap<String, Control> controls = new HashMap<String, Control>();
 
     @Override
     public void doSave(IProgressMonitor monitor) {
