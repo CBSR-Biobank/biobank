@@ -56,17 +56,20 @@ public class PatientGroup extends Node {
             ((StudyAdapter) getParent()).setStudy(parentStudy);
 
             Collection<Patient> patients = parentStudy.getPatientCollection();
-
             for (Patient patient : patients) {
-                PatientAdapter node = (PatientAdapter) getChild(patient.getId());
+                for (int i = 0; i < 20; i++) {
+                    PatientAdapter patGrp = new PatientAdapter();
+                    PatientAdapter node = (PatientAdapter) getChild(patient
+                        .getId());
 
-                if (node == null) {
-                    node = new PatientAdapter(this, patient);
-                    addChild(node);
-                }
-                if (updateNode) {
-                    SessionManager.getInstance().getTreeViewer().update(node,
-                        null);
+                    if (node == null) {
+                        node = new PatientAdapter(this, patient);
+                        addChild(node);
+                    }
+                    if (updateNode) {
+                        SessionManager.getInstance().getTreeViewer().update(
+                            node, null);
+                    }
                 }
             }
 
