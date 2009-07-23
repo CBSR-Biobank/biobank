@@ -21,6 +21,7 @@ import edu.ualberta.med.biobank.model.ContainerStatus;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.treeview.ContainerAdapter;
 import edu.ualberta.med.biobank.treeview.Node;
+import edu.ualberta.med.biobank.widgets.CabinetDrawerWidget;
 import edu.ualberta.med.biobank.widgets.ChooseContainerWidget;
 import edu.ualberta.med.biobank.widgets.SamplesListWidget;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -105,7 +106,8 @@ public class ContainerViewForm extends BiobankViewForm {
         GridLayout layout = new GridLayout(2, false);
         layout.horizontalSpacing = 10;
         client.setLayout(layout);
-        client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        GridData gridData = new GridData(GridData.FILL_HORIZONTAL);
+        client.setLayoutData(gridData);
         toolkit.paintBordersFor(client);
 
         nameLabel = (Label) createWidget(client, Label.class, SWT.NONE, "Name");
@@ -134,48 +136,65 @@ public class ContainerViewForm extends BiobankViewForm {
         }
 
         setContainerValues();
-
-        ChooseContainerWidget containerWidget = new ChooseContainerWidget(
-            client);
-        Capacity cap = containerType.getCapacity();
-        ContainerCell[][] cells = new ContainerCell[cap
-            .getDimensionOneCapacity()][cap.getDimensionTwoCapacity()];
-        for (ContainerPosition position : container
-            .getChildPositionCollection()) {
-            int positionDim1 = position.getPositionDimensionOne() - 1;
-            int positionDim2 = position.getPositionDimensionTwo() - 1;
-            ContainerCell cell = new ContainerCell(position);
-            Container occupiedContainer = position.getContainer();
-            setStatus(cell, occupiedContainer);
-            cells[positionDim1][positionDim2] = cell;
+        if (containerType.getChildContainerTypeCollection().size() > 0) {
+            visualizeContainer();
         }
-        containerWidget.setContainersStatus(cells);
-
     }
 
-    protected void setStatus(ContainerCell cell, Container occupiedContainer) {
-        Boolean full = occupiedContainer.getFull();
-        if (full == null) {
-            full = Boolean.FALSE;
-        }
-        int total = 0;
-        if (!full) {
-            // check if we can add a palette in the hotel
-            if (occupiedContainer.getChildPositionCollection() != null) {
-                total = occupiedContainer.getChildPositionCollection().size();
-            }
-            int capacityTotal = occupiedContainer.getContainerType()
-                .getCapacity().getDimensionOneCapacity()
-                * occupiedContainer.getContainerType().getCapacity()
-                    .getDimensionTwoCapacity();
-            full = (total == capacityTotal);
-        }
-        if (full) {
-            cell.setStatus(ContainerStatus.FILLED);
-        } else if (total == 0) {
-            cell.setStatus(ContainerStatus.EMPTY);
+    protected void visualizeContainer() {
+        // default 2 dimensional grid
+        int rowHeight = 40, colWidth = 40;
+        Composite client = createSectionWithClient("Container Visual");
+
+        ContainerType containerType = container.getContainerType();
+        Capacity cap = containerType.getCapacity();
+        Integer dim1 = cap.getDimensionOneCapacity();
+        Integer dim2 = cap.getDimensionTwoCapacity();
+        if (dim1 == null || dim1.intValue() == 0)
+            dim1 = new Integer(1);
+        if (dim2 == null || dim2.intValue() == 0)
+            dim2 = new Integer(1);
+
+        // get occupied positions
+        ContainerCell[][] cells = new ContainerCell[dim1][dim2];
+
+        if (containerType.getName().equalsIgnoreCase("Drawer")) {
+            // if Drawer, requires special grid
+            CabinetDrawerWidget containerWidget = new CabinetDrawerWidget(
+                client);
+            containerWidget.initLegend();
+            GridData gdBin = new GridData();
+            gdBin.widthHint = CabinetDrawerWidget.WIDTH;
+            gdBin.heightHint = CabinetDrawerWidget.HEIGHT
+                + CabinetDrawerWidget.LEGEND_HEIGHT;
+            gdBin.verticalSpan = 2;
+            containerWidget.setLayoutData(gdBin);
+            containerWidget.setContainersStatus(container
+                .getChildPositionCollection());
         } else {
-            cell.setStatus(ContainerStatus.FREE_POSITIONS);
+            // otherwise, normal grid
+            for (ContainerPosition position : container
+                .getChildPositionCollection()) {
+                int positionDim1 = position.getPositionDimensionOne()
+                    .intValue() - 1;
+                int positionDim2 = position.getPositionDimensionTwo()
+                    .intValue() - 1;
+                ContainerCell cell = new ContainerCell(position);
+                cell.setStatus(ContainerStatus.FILLED);
+                cells[positionDim1][positionDim2] = cell;
+            }
+            ChooseContainerWidget containerWidget = new ChooseContainerWidget(
+                client);
+            containerWidget.initLegend();
+            if (dim2.compareTo(new Integer(1)) == 0) {
+                // single dimension size
+                rowHeight = 40;
+                colWidth = 150;
+                containerWidget.setLegendOnSide(true);
+            }
+            containerWidget.setGridSizes(dim1, dim2, colWidth * dim2, rowHeight
+                * dim1);
+            containerWidget.setContainersStatus(cells);
         }
     }
 

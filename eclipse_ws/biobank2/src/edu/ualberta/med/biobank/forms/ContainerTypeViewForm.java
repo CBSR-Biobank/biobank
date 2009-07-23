@@ -21,6 +21,8 @@ import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.treeview.ContainerTypeAdapter;
 import edu.ualberta.med.biobank.treeview.Node;
+import edu.ualberta.med.biobank.widgets.CabinetDrawerWidget;
+import edu.ualberta.med.biobank.widgets.ChooseContainerWidget;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ContainerTypeViewForm extends BiobankViewForm {
@@ -100,6 +102,9 @@ public class ContainerTypeViewForm extends BiobankViewForm {
 
         form.getBody().setLayout(new GridLayout(1, false));
         createContainerTypeSection();
+        if (containerType.getChildContainerTypeCollection().size() > 0) {
+            visualizeContainer();
+        }
         createDimensionsSection();
         createSampleTypesSection();
         createChildContainerTypesSection();
@@ -205,6 +210,44 @@ public class ContainerTypeViewForm extends BiobankViewForm {
         gd.heightHint = 100;
         childContainerTypesList.setLayoutData(gd);
         setChildContainerTypesValues();
+    }
+
+    protected void visualizeContainer() {
+        // default 2 dimensional grid
+        int rowHeight = 40, colWidth = 40;
+        Composite client = createSectionWithClient("Container Visual");
+
+        Capacity cap = containerType.getCapacity();
+        Integer dim1 = cap.getDimensionOneCapacity();
+        Integer dim2 = cap.getDimensionTwoCapacity();
+        if (dim1 == null || dim1.intValue() == 0)
+            dim1 = new Integer(1);
+        if (dim2 == null || dim2.intValue() == 0)
+            dim2 = new Integer(1);
+
+        // get occupied positions
+
+        if (containerType.getName().equalsIgnoreCase("Drawer")) {
+            // if Drawer, requires special grid
+            CabinetDrawerWidget containerWidget = new CabinetDrawerWidget(
+                client);
+            GridData gdBin = new GridData();
+            gdBin.widthHint = CabinetDrawerWidget.WIDTH;
+            gdBin.heightHint = CabinetDrawerWidget.HEIGHT;
+            gdBin.verticalSpan = 2;
+            containerWidget.setLayoutData(gdBin);
+        } else {
+            // otherwise, normal grid
+            ChooseContainerWidget containerWidget = new ChooseContainerWidget(
+                client);
+            if (dim2.compareTo(new Integer(1)) == 0) {
+                // single dimension size
+                rowHeight = 40;
+                colWidth = 150;
+            }
+            containerWidget.setGridSizes(dim1, dim2, colWidth * dim2, rowHeight
+                * dim1);
+        }
     }
 
     private void setChildContainerTypesValues() {
