@@ -14,7 +14,6 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
-import org.springframework.remoting.RemoteAccessException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.forms.input.FormInput;
@@ -118,33 +117,27 @@ public class PatientEntryForm extends BiobankEntryForm {
     }
 
     @Override
-    protected void saveForm() {
-        try {
-            SDKQuery query;
-            SDKQueryResult result;
+    protected void saveForm() throws Exception {
+        SDKQuery query;
+        SDKQueryResult result;
 
-            if ((patient.getId() == null) && !checkPatientNumberUnique()) {
-                setDirty(true);
-                return;
-            }
-
-            Study study = ((StudyAdapter) patientAdapter
-                .getParentFromClass(StudyAdapter.class)).getStudy();
-            patient.setStudy(study);
-
-            if ((patient.getId() == null) || (patient.getId() == 0)) {
-                query = new InsertExampleQuery(patient);
-            } else {
-                query = new UpdateExampleQuery(patient);
-            }
-
-            result = appService.executeQuery(query);
-            patient = (Patient) result.getObjectResult();
-        } catch (final RemoteAccessException exp) {
-            BioBankPlugin.openRemoteAccessErrorMessage();
-        } catch (Exception exp) {
-            exp.printStackTrace();
+        if ((patient.getId() == null) && !checkPatientNumberUnique()) {
+            setDirty(true);
+            return;
         }
+
+        Study study = ((StudyAdapter) patientAdapter
+            .getParentFromClass(StudyAdapter.class)).getStudy();
+        patient.setStudy(study);
+
+        if ((patient.getId() == null) || (patient.getId() == 0)) {
+            query = new InsertExampleQuery(patient);
+        } else {
+            query = new UpdateExampleQuery(patient);
+        }
+
+        result = appService.executeQuery(query);
+        patient = (Patient) result.getObjectResult();
 
         patientAdapter.getParent().performExpand();
         getSite().getPage().closeEditor(this, false);
