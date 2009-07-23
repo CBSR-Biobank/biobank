@@ -9,6 +9,7 @@ import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.Sample;
+import edu.ualberta.med.biobank.model.SampleStorage;
 import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
@@ -18,6 +19,7 @@ import gov.nih.nci.system.client.ApplicationServiceProvider;
 import gov.nih.nci.system.query.SDKQueryResult;
 import gov.nih.nci.system.query.example.DeleteExampleQuery;
 import gov.nih.nci.system.query.example.InsertExampleQuery;
+import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 import java.lang.reflect.Constructor;
 import java.text.ParseException;
@@ -86,6 +88,7 @@ public class InitExamples {
         init.insertContainerTypesInSite();
 
         init.insertContainers();
+        init.insertSampleStorage();
 
         System.out.println("Init done.");
     }
@@ -253,4 +256,34 @@ public class InitExamples {
         insertContainer("Palette3", paletteType, hotel2, 1, 1);
         insertContainer("Palette4", paletteType, hotel2, 5, 1);
     }
+
+    private void insertSampleStorage() throws Exception {
+        HQLCriteria c = new HQLCriteria(
+            "from edu.ualberta.med.biobank.model.SampleType");
+        List<SampleType> results = appService.query(c);
+        if (results.size() == 0) {
+            throw new Exception("not sample types in database");
+        }
+
+        SampleStorage ss;
+
+        for (SampleType type : results) {
+            if (type.getName().equals("DNA (Blood)")) {
+                ss = new SampleStorage();
+                ss.setQuantity(2);
+                ss.setVolume(0.4);
+                ss.setSampleType(type);
+            } else if (type.getName().equals("Plasma (Na Heparin) - DAD")) {
+                ss = new SampleStorage();
+                ss.setQuantity(15);
+                ss.setVolume(0.2);
+                ss.setSampleType(type);
+            } else {
+                continue;
+            }
+
+            appService.executeQuery(new InsertExampleQuery(ss));
+        }
+    }
+
 }

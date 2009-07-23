@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.forms;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -334,10 +335,13 @@ public class StudyEntryForm extends BiobankEntryForm {
         Site site = ((SiteAdapter) studyAdapter
             .getParentFromClass(SiteAdapter.class)).getSite();
 
-        HQLCriteria c = new HQLCriteria("from edu.ualberta.med.biobank.model."
-            + "Study as study inner join fetch study.site "
-            + "where study.site.id='" + site.getId() + "' "
-            + "and study.name = '" + study.getName() + "'");
+        HQLCriteria c = new HQLCriteria(
+            "from edu.ualberta.med.biobank.model.Study as study "
+                + "inner join fetch study.site where study.site.id=? "
+                + "and study.name=?");
+
+        c.setParameters(Arrays.asList(new Object[] { site.getId(),
+            study.getName(), study.getNameShort() }));
 
         List<Object> results = appService.query(c);
 
@@ -348,10 +352,13 @@ public class StudyEntryForm extends BiobankEntryForm {
             return false;
         }
 
-        c = new HQLCriteria("from edu.ualberta.med.biobank.model.Study "
-            + " as study inner join fetch study.site where study.site.id='"
-            + site.getId() + "' " + "and study.nameShort = '"
-            + study.getNameShort() + "'");
+        c = new HQLCriteria(
+            "from edu.ualberta.med.biobank.model.Study as study "
+                + "inner join fetch study.site where study.site.id=?"
+                + "and study.nameShort=?");
+
+        c.setParameters(Arrays.asList(new Object[] { site.getId(),
+            study.getNameShort() }));
 
         results = appService.query(c);
 
