@@ -60,8 +60,8 @@ public class BiobankCollectionTable extends BiobankWidget {
             index++;
         }
         tableViewer.setColumnProperties(headings);
+        tableViewer.setUseHashlookup(true);
         if (data != null) {
-            tableViewer.setUseHashlookup(true);
             tableViewer.setInput(data);
             tableViewer.setItemCount(data.length);
         }

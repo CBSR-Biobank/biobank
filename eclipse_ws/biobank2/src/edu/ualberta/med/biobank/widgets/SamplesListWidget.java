@@ -75,7 +75,6 @@ public class SamplesListWidget extends BiobankCollectionTable {
         for (Sample s : sampleCollection) {
             samples.put(s.getId(), s);
         }
-        getTableViewer().setUseHashlookup(true);
         getTableViewer().setInput(samples.values());
         getTableViewer().setItemCount(samples.size());
     }
@@ -86,7 +85,6 @@ public class SamplesListWidget extends BiobankCollectionTable {
         for (SamplePosition s : samplePositionCollection) {
             samples.put(s.getSample().getId(), s.getSample());
         }
-        getTableViewer().setUseHashlookup(true);
         getTableViewer().setInput(samples.values());
         getTableViewer().setItemCount(samples.values().size());
     }
