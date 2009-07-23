@@ -4,6 +4,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 
+import org.acegisecurity.AccessDeniedException;
 import org.apache.commons.collections.MapIterator;
 import org.apache.commons.collections.map.ListOrderedMap;
 import org.eclipse.core.databinding.AggregateValidationStatus;
@@ -123,6 +124,8 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
                     BioBankPlugin.openRemoteConnectErrorMessage();
                 } catch (final RemoteAccessException exp) {
                     BioBankPlugin.openRemoteAccessErrorMessage();
+                } catch (final AccessDeniedException ade) {
+                    BioBankPlugin.openAccessDeniedErrorMessage();
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
