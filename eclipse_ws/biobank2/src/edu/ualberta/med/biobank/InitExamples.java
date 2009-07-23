@@ -186,22 +186,24 @@ public class InitExamples {
     }
 
     private void insertContainerTypesInSite() throws ApplicationException {
-        paletteType = insertContainerTypeInSite("Palette", 8, 12, null);
-        hotel13Type = insertContainerTypeInSite("Hotel-13", 13, 1, Arrays
-            .asList(new ContainerType[] { paletteType }));
-        hotel19Type = insertContainerTypeInSite("Hotel-19", 19, 1, Arrays
-            .asList(new ContainerType[] { paletteType }));
-        freezerType = insertContainerTypeInSite("Freezer", 5, 6, Arrays
-            .asList(new ContainerType[] { hotel13Type, hotel19Type }));
-        binType = insertContainerTypeInSite("Bin", 4, 26, null);
-        drawerType = insertContainerTypeInSite("Drawer", 6, 6, Arrays
-            .asList(new ContainerType[] { binType }));
-        insertContainerTypeInSite("Cabinet", 4, 1, Arrays
+        paletteType = insertContainerTypeInSite("Palette", "Row", "Column", 8,
+            12, null);
+        hotel13Type = insertContainerTypeInSite("Hotel-13", "Row", "", 13, 1,
+            Arrays.asList(new ContainerType[] { paletteType }));
+        hotel19Type = insertContainerTypeInSite("Hotel-19", "Row", "", 19, 1,
+            Arrays.asList(new ContainerType[] { paletteType }));
+        freezerType = insertContainerTypeInSite("Freezer", "Row", "Column", 5,
+            6, Arrays.asList(new ContainerType[] { hotel13Type, hotel19Type }));
+        binType = insertContainerTypeInSite("Bin", "Row", "", 120, 1, null);
+        drawerType = insertContainerTypeInSite("Drawer", "Row", "", 36, 1,
+            Arrays.asList(new ContainerType[] { binType }));
+        insertContainerTypeInSite("Cabinet", "Row", "", 4, 1, Arrays
             .asList(new ContainerType[] { drawerType }));
     }
 
-    private ContainerType insertContainerTypeInSite(String name, int dim1,
-        int dim2, List<ContainerType> children) throws ApplicationException {
+    private ContainerType insertContainerTypeInSite(String name,
+        String dim1label, String dim2label, int dim1, int dim2,
+        List<ContainerType> children) throws ApplicationException {
         ContainerType ct = new ContainerType();
         ct.setName(name);
         ct.setSite(site);
@@ -209,8 +211,8 @@ public class InitExamples {
         capacity.setDimensionOneCapacity(dim1);
         capacity.setDimensionTwoCapacity(dim2);
         ct.setCapacity(capacity);
-        ct.setDimensionOneLabel("dim1");
-        ct.setDimensionTwoLabel("dim2");
+        ct.setDimensionOneLabel(dim1label);
+        ct.setDimensionTwoLabel(dim2label);
         if (children != null) {
             ct.setChildContainerTypeCollection(new HashSet<ContainerType>(
                 children));

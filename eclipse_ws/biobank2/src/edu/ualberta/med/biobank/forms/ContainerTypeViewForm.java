@@ -78,8 +78,8 @@ public class ContainerTypeViewForm extends BiobankViewForm {
     private void retrieveContainerType() {
         List<ContainerType> result;
         ContainerType searchContainerType = new ContainerType();
-        searchContainerType
-            .setId(containerTypeAdapter.getContainerType().getId());
+        searchContainerType.setId(containerTypeAdapter.getContainerType()
+            .getId());
         try {
             result = appService
                 .search(ContainerType.class, searchContainerType);
@@ -163,7 +163,7 @@ public class ContainerTypeViewForm extends BiobankViewForm {
     }
 
     private void createSampleTypesSection() {
-        Composite client = createSectionWithClient("Contains Sample Derivatives");
+        Composite client = createSectionWithClient("Contains Samples");
         GridLayout layout = (GridLayout) client.getLayout();
         layout.numColumns = 2;
         layout.horizontalSpacing = 10;
@@ -195,7 +195,7 @@ public class ContainerTypeViewForm extends BiobankViewForm {
         layout.horizontalSpacing = 10;
         toolkit.paintBordersFor(client);
 
-        Label label = toolkit.createLabel(client, "Storage types:");
+        Label label = toolkit.createLabel(client, "Container types:");
         label
             .setLayoutData(new GridData(SWT.LEFT, SWT.BEGINNING, false, false));
 
@@ -209,7 +209,8 @@ public class ContainerTypeViewForm extends BiobankViewForm {
 
     private void setChildContainerTypesValues() {
         childContainerTypesList.removeAll();
-        for (ContainerType type : containerType.getChildContainerTypeCollection()) {
+        for (ContainerType type : containerType
+            .getChildContainerTypeCollection()) {
             childContainerTypesList.add(type.getName());
         }
     }

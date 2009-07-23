@@ -220,7 +220,7 @@ public class BioBank2Db {
                     + studyNameShort
                     + " patientNum/"
                     + patientNum
-                    + " dateDrawn/" + biobank2DateFmt.format(dateDrawn));
+                    + " dateDrawn/" + dateDrawn);
             }
             else {
                 System.out.println("WARNING: found " + results.size()
