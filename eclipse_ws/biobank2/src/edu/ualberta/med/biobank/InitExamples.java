@@ -56,9 +56,15 @@ public class InitExamples {
 
     /**
      * @param args
+     * @throws Exception
      */
     public static void main(String[] args) throws Exception {
-        InitExamples init = new InitExamples();
+        new InitExamples();
+    }
+
+    public InitExamples() throws Exception {
+        clinics = new Clinic[MAX_CLINICS];
+
         // appService = (WritableApplicationService)
         // ApplicationServiceProvider
         // .getApplicationServiceFromUrl("http://aicml-med.cs.ualberta.ca:8080/biobank2");
@@ -67,31 +73,28 @@ public class InitExamples {
             .getApplicationServiceFromUrl("http://localhost:8080/biobank2",
                 "testuser", "test");
 
-        init.deleteAll(Container.class);
-        init.deleteAll(ContainerType.class);
-        init.deleteAll(PatientVisit.class);
-        init.deleteAll(Patient.class);
-        init.deleteAll(Study.class);
-        init.deleteAll(Clinic.class);
-        init.deleteAll(Site.class);
+        deleteAll(Container.class);
+        deleteAll(ContainerType.class);
+        deleteAll(PatientVisit.class);
+        deleteAll(Patient.class);
+        deleteAll(Study.class);
+        deleteAll(Clinic.class);
+        deleteAll(Site.class);
 
-        init.insertSite();
+        insertSite();
 
-        init.insertClinicsInSite();
-        init.insertStudyInSite();
-        init.insertPatientInStudy();
-        init.insertPatientVisitInPatient();
-        init.insertSampleInPatientVisit();
+        insertClinicsInSite();
+        insertStudyInSite();
+        insertPatientInStudy();
+        insertPatientVisitInPatient();
+        insertSampleInPatientVisit();
 
-        init.insertContainerTypesInSite();
+        insertContainerTypesInSite();
 
-        init.insertContainers();
+        insertContainers();
+        insertStudySampleStorage();
 
         System.out.println("Init done.");
-    }
-
-    public InitExamples() {
-        clinics = new Clinic[MAX_CLINICS];
     }
 
     private void insertSite() throws ApplicationException {
@@ -124,7 +127,7 @@ public class InitExamples {
     private void insertStudyInSite() throws ApplicationException {
         study = new Study();
         study.setName("Study Test");
-        study.setNameShort("ST");
+        study.setNameShort("BBP");
         study.setSite(site);
         study.setClinicCollection(site.getClinicCollection());
         SDKQueryResult res = appService.executeQuery(new InsertExampleQuery(
@@ -252,5 +255,9 @@ public class InitExamples {
             2);
         insertContainer("Palette3", paletteType, hotel2, 1, 1);
         insertContainer("Palette4", paletteType, hotel2, 5, 1);
+    }
+
+    private void insertStudySampleStorage() {
+
     }
 }
