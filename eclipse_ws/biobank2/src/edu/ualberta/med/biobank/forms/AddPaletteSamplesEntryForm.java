@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.acegisecurity.AccessDeniedException;
 import org.eclipse.core.databinding.UpdateValueStrategy;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.observable.value.WritableValue;
@@ -493,6 +494,8 @@ public class AddPaletteSamplesEntryForm extends BiobankEntryForm {
                     activityToPrint = true;
                 } catch (RemoteConnectFailureException exp) {
                     BioBankPlugin.openRemoteConnectErrorMessage();
+                } catch (AccessDeniedException ade) {
+                    BioBankPlugin.openAccessDeniedErrorMessage();
                 } catch (Exception e) {
                     SessionManager.getLogger().error(
                         "Error when adding samples", e);

@@ -34,5 +34,7 @@
 	<classpathentry exported="true" kind="lib" path="lib/gface_0.9.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/gluegen.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/scanlib.jar"/>
+	<classpathentry kind="lib" path="lib/csmapi-4.1.jar" sourcepath="/usr/scratch/degrisda/frameworks/CSM_WS_4_1_Source/src/gov"/>
+	<classpathentry kind="lib" path="lib/jdom.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

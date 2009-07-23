@@ -4,6 +4,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 
+import org.acegisecurity.AccessDeniedException;
 import org.apache.commons.collections.MapIterator;
 import org.apache.commons.collections.map.ListOrderedMap;
 import org.eclipse.core.databinding.AggregateValidationStatus;
@@ -49,6 +50,7 @@ import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.ISaveablePart;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import org.springframework.remoting.RemoteAccessException;
 import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
@@ -120,6 +122,10 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
                     saveForm();
                 } catch (final RemoteConnectFailureException exp) {
                     BioBankPlugin.openRemoteConnectErrorMessage();
+                } catch (final RemoteAccessException exp) {
+                    BioBankPlugin.openRemoteAccessErrorMessage();
+                } catch (final AccessDeniedException ade) {
+                    BioBankPlugin.openAccessDeniedErrorMessage();
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
