@@ -1,6 +1,4 @@
 #!/bin/bash
-#
+
 # Database
 /usr/bin/mysqldump -udummy -pozzy498 biobank2 | gzip > backup/db/biobank_`date +%y_%m_%d`.sql.gz
-
-
