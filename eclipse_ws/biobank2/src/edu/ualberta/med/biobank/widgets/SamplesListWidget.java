@@ -14,12 +14,12 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.Sample;
 import edu.ualberta.med.biobank.model.SamplePosition;
-import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.NodeSearchVisitor;
-import edu.ualberta.med.biobank.treeview.SessionAdapter;
+import edu.ualberta.med.biobank.treeview.SiteAdapter;
 
 public class SamplesListWidget extends BiobankCollectionTable {
 
@@ -31,16 +31,16 @@ public class SamplesListWidget extends BiobankCollectionTable {
 
     private Map<Integer, Sample> samples;
 
-    public SamplesListWidget(Composite parent,
-        final SessionAdapter sessionAdapter) {
+    public SamplesListWidget(Composite parent, final SiteAdapter siteAdapter) {
         super(parent, SWT.NONE, headings, bounds, null);
         GridData tableData = ((GridData) getLayoutData());
         tableData.heightHint = 500;
 
         getTableViewer().setContentProvider(new ArrayContentProvider());
 
-        if (sessionAdapter != null) {
-            // if session adapter is not null, can search for another node
+        if (siteAdapter != null) {
+            // if site adapter is not null, can search for another node from the
+            // same site
             getTableViewer().addDoubleClickListener(new IDoubleClickListener() {
                 @Override
                 public void doubleClick(DoubleClickEvent event) {
@@ -50,9 +50,8 @@ public class SamplesListWidget extends BiobankCollectionTable {
                     SamplePosition sp = sample.getSamplePosition();
                     if (sp != null) {
                         Container sc = sp.getContainer();
-                        Node node = sessionAdapter
-                            .accept(new NodeSearchVisitor(
-                                Container.class, sc.getId()));
+                        Node node = siteAdapter.accept(new NodeSearchVisitor(
+                            Container.class, sc.getId()));
                         if (node != null) {
                             SessionManager.getInstance().getTreeViewer()
                                 .setSelection(new StructuredSelection(node));
@@ -76,7 +75,9 @@ public class SamplesListWidget extends BiobankCollectionTable {
         for (Sample s : sampleCollection) {
             samples.put(s.getId(), s);
         }
+        getTableViewer().setUseHashlookup(true);
         getTableViewer().setInput(samples.values());
+        getTableViewer().setItemCount(samples.size());
     }
 
     public void setSamplePositions(
@@ -85,7 +86,9 @@ public class SamplesListWidget extends BiobankCollectionTable {
         for (SamplePosition s : samplePositionCollection) {
             samples.put(s.getSample().getId(), s.getSample());
         }
+        getTableViewer().setUseHashlookup(true);
         getTableViewer().setInput(samples.values());
+        getTableViewer().setItemCount(samples.values().size());
     }
 
     public void setSelection(Sample selectedSample) {

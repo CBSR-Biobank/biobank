@@ -75,19 +75,21 @@ public class ModelUtils {
         if (position == null) {
             return "none";
         } else {
-            String positionString = getPositionString(position);
-            Container container = position.getContainer();
-            ContainerPosition containerPosition = container.getPosition();
-            Container parent = containerPosition.getParentContainer();
-            while (parent != null) {
-                positionString = getPositionString(containerPosition) + ":"
-                    + positionString;
-                container = parent;
-                containerPosition = parent.getPosition();
-                parent = containerPosition.getParentContainer();
-            }
-            positionString = container.getBarcode() + ":" + positionString;
-            return positionString;
+            // String positionString = getPositionString(position);
+            // Container container = position.getContainer();
+            // ContainerPosition containerPosition = container.getPosition();
+            // Container parent = containerPosition.getParentContainer();
+            // while (parent != null) {
+            // positionString = getPositionString(containerPosition) + ":"
+            // + positionString;
+            // container = parent;
+            // containerPosition = parent.getPosition();
+            // parent = containerPosition.getParentContainer();
+            // }
+            // positionString = container.getBarcode() + ":" + positionString;
+            // return positionString;
+            String containerPositionBarcode = position.getContainer().getName();
+            return containerPositionBarcode + getPositionString(position);
         }
     }
 
@@ -104,5 +106,28 @@ public class ModelUtils {
             return defaultValue;
         }
         return value.booleanValue();
+    }
+
+    /**
+     * Search an object of type clazz with the specific property :
+     * <ul>
+     * <li>if strict is true, then the property should be exactly equals to the
+     * text</li>
+     * <li>if strict is fault then, the property should contain the text</li>
+     * <ul>
+     * 
+     * @throws ApplicationException
+     */
+    public static <E> List<E> queryProperty(
+        WritableApplicationService appService, Class<E> clazz, String property,
+        String text, boolean strict) throws ApplicationException {
+        String query = "from " + clazz.getName() + " as o ";
+        query += " where o." + property;
+        if (strict) {
+            query += " = '" + text + "'";
+        } else {
+            query += " like '%" + text + "%'";
+        }
+        return appService.query(new HQLCriteria(query));
     }
 }

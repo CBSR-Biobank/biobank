@@ -4,6 +4,7 @@ import java.util.List;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.model.Container;
+import edu.ualberta.med.biobank.model.ModelUtils;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.Sample;
@@ -20,14 +21,13 @@ public enum SearchType {
         @Override
         public Node search(WritableApplicationService appService,
             String searchValue, SessionAdapter sessionAdapter) throws Exception {
-            Site site = new Site();
-            site.setName(searchValue);
-            List<Site> sites = appService.search(Site.class, site);
+            List<Site> sites = ModelUtils.queryProperty(appService, Site.class,
+                "name", searchValue, true);
             if (sites.size() == 0) {
                 BioBankPlugin.openMessage("Search", "No site found with name "
                     + searchValue);
             } else if (sites.size() == 1) {
-                site = sites.get(0);
+                Site site = sites.get(0);
                 return sessionAdapter.accept(new NodeSearchVisitor(Site.class,
                     site.getId()));
             } else {
@@ -40,14 +40,13 @@ public enum SearchType {
         @Override
         public Node search(WritableApplicationService appService,
             String searchValue, SessionAdapter sessionAdapter) throws Exception {
-            Study study = new Study();
-            study.setName(searchValue);
-            List<Study> studies = appService.search(Study.class, study);
+            List<Study> studies = ModelUtils.queryProperty(appService,
+                Study.class, "name", searchValue, true);
             if (studies.size() == 0) {
                 BioBankPlugin.openMessage("Search", "No study found with name "
                     + searchValue);
             } else if (studies.size() == 1) {
-                study = studies.get(0);
+                Study study = studies.get(0);
                 return sessionAdapter.accept(new NodeSearchVisitor(Study.class,
                     study.getId()));
             } else {
@@ -60,14 +59,13 @@ public enum SearchType {
         @Override
         public Node search(WritableApplicationService appService,
             String searchValue, SessionAdapter sessionAdapter) throws Exception {
-            Patient patient = new Patient();
-            patient.setNumber(searchValue);
-            List<Patient> patients = appService.search(Patient.class, patient);
+            List<Patient> patients = ModelUtils.queryProperty(appService,
+                Patient.class, "number", searchValue, true);
             if (patients.size() == 0) {
                 BioBankPlugin.openMessage("Search",
                     "No patient found with number " + searchValue);
             } else if (patients.size() == 1) {
-                patient = patients.get(0);
+                Patient patient = patients.get(0);
                 return sessionAdapter.accept(new NodeSearchVisitor(
                     Patient.class, patient.getId()));
             } else {
@@ -80,14 +78,13 @@ public enum SearchType {
         @Override
         public Node search(WritableApplicationService appService,
             String searchValue, SessionAdapter sessionAdapter) throws Exception {
-            Sample sample = new Sample();
-            sample.setInventoryId(searchValue);
-            List<Sample> samples = appService.search(Sample.class, sample);
+            List<Sample> samples = ModelUtils.queryProperty(appService,
+                Sample.class, "inventoryId", searchValue, true);
             if (samples.size() == 0) {
                 BioBankPlugin.openMessage("Search",
                     "No sample found with inventoryId " + searchValue);
             } else if (samples.size() == 1) {
-                sample = samples.get(0);
+                Sample sample = samples.get(0);
                 PatientVisitAdapter pvAdapter = (PatientVisitAdapter) sessionAdapter
                     .accept(new NodeSearchVisitor(PatientVisit.class, sample
                         .getPatientVisit().getId()));
@@ -103,15 +100,13 @@ public enum SearchType {
         @Override
         public Node search(WritableApplicationService appService,
             String searchValue, SessionAdapter sessionAdapter) throws Exception {
-            Container container = new Container();
-            container.setBarcode(searchValue);
-            List<Container> containers = appService.search(Container.class,
-                container);
+            List<Container> containers = ModelUtils.queryProperty(appService,
+                Container.class, "name", searchValue, true);
             if (containers.size() == 0) {
                 BioBankPlugin.openMessage("Search",
                     "No storage container found with barcode " + searchValue);
             } else if (containers.size() == 1) {
-                container = containers.get(0);
+                Container container = containers.get(0);
                 return sessionAdapter.accept(new NodeSearchVisitor(
                     Container.class, container.getId()));
             } else {
@@ -123,4 +118,5 @@ public enum SearchType {
 
     public abstract Node search(WritableApplicationService appService,
         String searchValue, SessionAdapter sessionAdapter) throws Exception;
+
 }

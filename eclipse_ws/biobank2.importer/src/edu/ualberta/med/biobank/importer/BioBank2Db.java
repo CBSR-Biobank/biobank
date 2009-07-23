@@ -24,6 +24,7 @@ import java.lang.reflect.Constructor;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 public class BioBank2Db {
@@ -91,18 +92,22 @@ public class BioBank2Db {
         return list.get(0);
     }
 
-    public Clinic getClinic(String name) throws Exception {
-        Clinic clinic = new Clinic();
-        clinic.setName(name);
+    public Clinic getClinic(Study study, String clinicName) throws Exception {
+        HQLCriteria c = new HQLCriteria("select clinics"
+            + " from edu.ualberta.med.biobank.model.Study as study"
+            + " inner join study.clinicCollection as clinics"
+            + " where study.id=? and clinics.name=?");
 
-        List<Clinic> list = appService.search(Clinic.class, clinic);
-        if (list.size() == 0) return null;
+        c.setParameters(Arrays.asList(new Object [] { study.getId(), clinicName }));
 
-        if (list.size() > 1) {
-            throw new Exception("ERROR: multiple clinics with name " + name
-                + " found");
+        List<Clinic> results = appService.query(c);
+        if (results.size() == 0) return null;
+
+        if (results.size() > 1) {
+            throw new Exception("ERROR: multiple clinics with name "
+                + clinicName + " found");
         }
-        return list.get(0);
+        return results.get(0);
     }
 
     public Patient getPatient(String number) throws Exception {
@@ -148,8 +153,8 @@ public class BioBank2Db {
 
         HQLCriteria c = new HQLCriteria("select occupied"
             + " from edu.ualberta.med.biobank.model.Container as sc"
-            + " inner join sc.occupiedPositions as positions"
-            + " inner join positions.occupiedContainer as occupied"
+            + " inner join sc.childPositionCollection as positions"
+            + " inner join positions.container as occupied"
             + " where sc.id=? and positions.positionDimensionOne=? "
             + " and positions.positionDimensionTwo=?");
 
@@ -193,6 +198,7 @@ public class BioBank2Db {
 
     public PatientVisit getPatientVisit(String studyNameShort, int patientNum,
         String dateDrawn) throws Exception {
+        Date date = biobank2DateFmt.parse(dateDrawn);
         HQLCriteria c = new HQLCriteria("select visits"
             + " from edu.ualberta.med.biobank.model.Study as study"
             + " inner join study.patientCollection as patients"
@@ -200,31 +206,26 @@ public class BioBank2Db {
             + " where study.nameShort=? and patients.number=?"
             + " and visits.dateDrawn=?");
 
+        // System.out.println("getPatientVisit: studyNameShort/" +
+        // studyNameShort
+        // + " patientNum/" + patientNum + " dateDrawn/" + dateDrawn);
+
         c.setParameters(Arrays.asList(new Object [] {
-            studyNameShort, String.format("%d", patientNum),
-            biobank2DateFmt.parse(dateDrawn) }));
+            studyNameShort, String.format("%d", patientNum), date }));
 
         List<PatientVisit> results = appService.query(c);
         if (results.size() != 1) {
-            // Comment this exception out for now, just use the first patient
-            // visit
-            //
-            // throw new Exception("found " + results.size()
-            // + " patient visits for studyName/" + studyNameShort
-            // + " patientNum/" + patientNum + " dateDrawn/"
-            // + Importer.biobank2DateFmt.format(dateDrawn));
             if (results.size() == 0) {
                 System.out.println("ERROR: found 0 patient visits for studyName/"
                     + studyNameShort
                     + " patientNum/"
                     + patientNum
-                    + " dateDrawn/" + biobank2DateFmt.format(dateDrawn));
+                    + " dateDrawn/" + dateDrawn);
             }
             else {
                 System.out.println("WARNING: found " + results.size()
                     + " patient visits for studyName/" + studyNameShort
-                    + " patientNum/" + patientNum + " dateDrawn/"
-                    + biobank2DateFmt.format(dateDrawn));
+                    + " patientNum/" + patientNum + " dateDrawn/" + dateDrawn);
                 for (PatientVisit v : results) {
                     System.out.println("visit_id/" + v.getId() + " dateDrawn/"
                         + biobank2DateFmt.format(v.getDateDrawn()) + " pid/"

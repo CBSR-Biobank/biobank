@@ -24,6 +24,7 @@ import edu.ualberta.med.biobank.model.PvInfoData;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.PatientVisitAdapter;
+import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
 import edu.ualberta.med.biobank.widgets.SamplesListWidget;
 
@@ -50,6 +51,8 @@ public class PatientVisitViewForm extends BiobankViewForm {
     }
 
     private ListOrderedMap combinedPvInfoMap;
+
+    private Label clinicLabel;
 
     public PatientVisitViewForm() {
         super();
@@ -98,8 +101,11 @@ public class PatientVisitViewForm extends BiobankViewForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        Study study = ((StudyAdapter) patientVisitAdapter.getParent()
-            .getParent().getParent()).getStudy();
+        Study study = ((StudyAdapter) patientVisitAdapter
+            .getParentFromClass(StudyAdapter.class)).getStudy();
+
+        clinicLabel = (Label) createWidget(client, Label.class, SWT.NONE,
+            "Clinic");
 
         // get all PvInfo from study, since user may not have filled in all
         // fields
@@ -150,13 +156,21 @@ public class PatientVisitViewForm extends BiobankViewForm {
             GridData gd = new GridData(GridData.FILL_HORIZONTAL);
             widget.setLayoutData(gd);
         }
+        setPatientVisitValues();
+    }
 
+    private void setPatientVisitValues() {
+        FormUtils.setTextValue(clinicLabel,
+            patientVisit.getClinic() == null ? "" : patientVisit.getClinic()
+                .getName());
+        // FIXME update all pvinfos ?
     }
 
     private void createSamplesSection() {
         Composite parent = createSectionWithClient("Samples");
-        samplesWidget = new SamplesListWidget(parent, patientVisitAdapter
-            .getSessionAdapter());
+        samplesWidget = new SamplesListWidget(parent,
+            (SiteAdapter) patientVisitAdapter
+                .getParentFromClass(SiteAdapter.class));
         samplesWidget.adaptToToolkit(toolkit, true);
         samplesWidget.setSamples(patientVisit.getSampleCollection());
         samplesWidget.setSelection(patientVisitAdapter.getSelectedSample());
@@ -171,7 +185,7 @@ public class PatientVisitViewForm extends BiobankViewForm {
         form.setText("Visit Drawn Date: "
             + BioBankPlugin.getDateTimeFormatter().format(
                 patientVisit.getDateDrawn()));
-        // FIXME update all pvinfos ?
+        setPatientVisitValues();
         samplesWidget.setSamples(patientVisit.getSampleCollection());
     }
 

@@ -2,7 +2,7 @@ package edu.ualberta.med.biobank.forms;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
+import java.util.Collection;
 
 import org.apache.commons.collections.MapIterator;
 import org.apache.commons.collections.map.ListOrderedMap;
@@ -23,6 +23,10 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.databinding.swt.SWTObservables;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.fieldassist.ControlDecoration;
+import org.eclipse.jface.viewers.ArrayContentProvider;
+import org.eclipse.jface.viewers.ComboViewer;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.KeyEvent;
@@ -49,6 +53,8 @@ import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.validators.NonEmptyString;
+import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 /**
@@ -68,7 +74,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
 
     protected IStatus currentStatus;
 
-    protected DataBindingContext dbc;
+    protected DataBindingContext dbc = new DataBindingContext();
 
     private Button confirmButton;
 
@@ -100,12 +106,6 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
             setDirty(true);
         }
     };
-
-    public BiobankEntryForm() {
-        super();
-        controls = new HashMap<String, Control>();
-        dbc = new DataBindingContext();
-    }
 
     @Override
     public void doSave(IProgressMonitor monitor) {
@@ -290,6 +290,44 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
             widgetValues, modelObservableValue, validator);
     }
 
+    /**
+     * Create a combo using ArrayContentProvider as content provider and
+     * BiobankLabelProvider as Label provider. You should use
+     * comboViewer.getSelection() to update datas.
+     * 
+     * @see BiobankLabelProvider#getColumnText
+     */
+    protected ComboViewer createComboViewerWithNoSelectionValidator(
+        Composite parent, String fieldLabel, Collection<?> input,
+        String errorMessage) {
+        Label label = toolkit.createLabel(parent, fieldLabel + ":", SWT.LEFT);
+
+        ComboViewer comboViewer = new ComboViewer(parent, SWT.READ_ONLY);
+        comboViewer.setContentProvider(new ArrayContentProvider());
+        comboViewer.setLabelProvider(new BiobankLabelProvider());
+        if (input != null) {
+            comboViewer.setInput(input);
+        }
+
+        Combo combo = comboViewer.getCombo();
+        combo.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
+        comboViewer
+            .addSelectionChangedListener(new ISelectionChangedListener() {
+                @Override
+                public void selectionChanged(SelectionChangedEvent event) {
+                    setDirty(true);
+                }
+            });
+        IValidator validator = createValidator(NonEmptyString.class, FormUtils
+            .createDecorator(label, errorMessage), errorMessage);
+        UpdateValueStrategy uvs = new UpdateValueStrategy();
+        uvs.setAfterGetValidator(validator);
+        IObservableValue selectedValue = new WritableValue("", String.class);
+        dbc.bindValue(SWTObservables.observeSelection(combo), selectedValue,
+            uvs, null);
+        return comboViewer;
+    }
+
     protected IValidator createValidator(Class<?> validatorClass,
         ControlDecoration dec, String validatorErrMsg) {
         try {
@@ -311,8 +349,8 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
         }
     }
 
-    protected void createWidgetsFromMap(ListOrderedMap fieldsMap, Object pojo,
-        Composite client) {
+    protected void createBoundWidgetsFromMap(ListOrderedMap fieldsMap,
+        Object pojo, Composite client) {
         FieldInfo fi;
 
         MapIterator it = fieldsMap.mapIterator();

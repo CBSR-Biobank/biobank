@@ -8,9 +8,9 @@ import java.util.HashSet;
 import java.util.List;
 
 import edu.ualberta.med.biobank.model.Capacity;
+import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.model.Site;
-import edu.ualberta.med.biobank.model.ContainerType;
 
 public class SiteContainerTypes {
 
@@ -38,7 +38,7 @@ public class SiteContainerTypes {
     }
 
     public void insertContainerTypes(Site site) throws Exception {
-        System.out.println("adding storage types ...");
+        System.out.println("adding container types ...");
         SampleType sampleType = new SampleType();
         Collection<SampleType> allSampleTypes = BioBank2Db.getInstance().getAppService().search(
             SampleType.class, sampleType);
@@ -61,33 +61,34 @@ public class SiteContainerTypes {
             "Column", 8, 12, null, freezerSampleTypes);
         containerTypeMap.put("Palette", palette);
 
-        ContainerType hotel13 = assignContainerType(site, "Hotel-13", "Row", "",
-            13, 1, Arrays.asList(new ContainerType [] { palette }), null);
+        ContainerType hotel13 = assignContainerType(site, "Hotel-13", "Row",
+            "", 13, 1, Arrays.asList(new ContainerType [] { palette }), null);
         containerTypeMap.put("Hotel-13", hotel13);
 
-        ContainerType hotel19 = assignContainerType(site, "Hotel-19", "Row", "",
-            19, 1, Arrays.asList(new ContainerType [] { palette }), null);
+        ContainerType hotel19 = assignContainerType(site, "Hotel-19", "Row",
+            "", 19, 1, Arrays.asList(new ContainerType [] { palette }), null);
         containerTypeMap.put("Hotel-19", hotel19);
 
-        containerTypeMap.put("Freezer-3x10", assignContainerType(site, "Freezer",
-            "Row", "Column", 3, 10, Arrays.asList(new ContainerType [] {
-                hotel13, hotel19 }), null));
-        containerTypeMap.put("Freezer-4x12", assignContainerType(site, "Freezer",
-            "Row", "Column", 4, 12, Arrays.asList(new ContainerType [] {
-                hotel13, hotel19 }), null));
-        containerTypeMap.put("Freezer-5x9", assignContainerType(site, "Freezer",
-            "Row", "Column", 4, 12, Arrays.asList(new ContainerType [] {
-                hotel13, hotel19 }), null));
+        containerTypeMap.put("Freezer-3x10", assignContainerType(site,
+            "Freezer", "Row", "Column", 3, 10,
+            Arrays.asList(new ContainerType [] { hotel13, hotel19 }), null));
+        containerTypeMap.put("Freezer-4x12", assignContainerType(site,
+            "Freezer", "Row", "Column", 4, 12,
+            Arrays.asList(new ContainerType [] { hotel13, hotel19 }), null));
+        containerTypeMap.put("Freezer-5x9", assignContainerType(site,
+            "Freezer", "Row", "Column", 4, 12,
+            Arrays.asList(new ContainerType [] { hotel13, hotel19 }), null));
 
         // Cabinet Types
         ContainerType bin = assignContainerType(site, "Bin", "Row", "", 120, 1,
             null, cabinetSampleTypes);
         containerTypeMap.put("Bin", bin);
-        ContainerType drawer = assignContainerType(site, "Drawer", "Row", "", 36,
-            1, Arrays.asList(new ContainerType [] { bin }), null);
+        ContainerType drawer = assignContainerType(site, "Drawer", "Row", "",
+            36, 1, Arrays.asList(new ContainerType [] { bin }), null);
         containerTypeMap.put("Drawer", drawer);
-        containerTypeMap.put("Cabinet", assignContainerType(site, "Cabinet", "Row",
-            "", 4, 1, Arrays.asList(new ContainerType [] { drawer }), null));
+        containerTypeMap.put("Cabinet", assignContainerType(site, "Cabinet",
+            "Row", "", 4, 1, Arrays.asList(new ContainerType [] { drawer }),
+            null));
     }
 
     private ContainerType assignContainerType(Site site, String name,
@@ -103,8 +104,10 @@ public class SiteContainerTypes {
         st.setCapacity(capacity);
         st.setDimensionOneLabel(dim1Label);
         st.setDimensionTwoLabel(dim2Label);
+        st.setActivityStatus("Active");
         if (children != null) {
-            st.setChildContainerTypeCollection(new HashSet<ContainerType>(children));
+            st.setChildContainerTypeCollection(new HashSet<ContainerType>(
+                children));
         }
         if (sampleTypes != null) {
             st.setSampleTypeCollection(sampleTypes);

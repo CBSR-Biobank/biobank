@@ -15,6 +15,9 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.viewers.ComboViewer;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -31,6 +34,7 @@ import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.forms.input.FormInput;
+import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.PvInfo;
@@ -60,13 +64,9 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
 
     public static final String MSG_NO_VISIT_NUMBER = "Visit must have a number";
 
-    public static final String DATE_FORMAT = "yyyy-MM-dd";
-
     private PatientVisitAdapter patientVisitAdapter;
 
     private PatientVisit patientVisit;
-
-    private Study study;
 
     class CombinedPvInfo {
         PvInfo pvInfo;
@@ -83,6 +83,8 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
     private ListOrderedMap combinedPvInfoMap;
 
     private DateTimeWidget dateDrawn;
+
+    private ComboViewer clinicsComboViewer;
 
     public PatientVisitEntryForm() {
         super();
@@ -115,7 +117,6 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         form.setText("Patient Visit Information");
         form.setMessage(getOkMessage(), IMessageProvider.NONE);
         form.getBody().setLayout(new GridLayout(1, false));
-
         createPvSection();
         createButtonsSection();
     }
@@ -128,6 +129,30 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
+        Study study = ((StudyAdapter) patientVisitAdapter
+            .getParentFromClass(StudyAdapter.class)).getStudy();
+        if (patientVisit.getId() == null) {
+            // choose clinic for new visit
+            Collection<Clinic> clinics = study.getClinicCollection();
+            clinicsComboViewer = createComboViewerWithNoSelectionValidator(
+                client, "Clinic", clinics, "A clinic should be selected");
+            if (patientVisit.getClinic() != null) {
+                for (Clinic clinic : clinics) {
+                    if (clinic.getId().equals(patientVisit.getClinic().getId())) {
+                        clinicsComboViewer
+                            .setSelection(new StructuredSelection(clinic));
+                        break;
+                    }
+                }
+            }
+        } else {
+            Label clinicLabel = (Label) createWidget(client, Label.class,
+                SWT.NONE, "Clinic");
+            if (patientVisit.getClinic() != null) {
+                clinicLabel.setText(patientVisit.getClinic().getName());
+            }
+        }
+
         toolkit.createLabel(client, "Date Drawn:", SWT.NONE);
         dateDrawn = new DateTimeWidget(client, SWT.BORDER, patientVisit
             .getDateDrawn());
@@ -135,8 +160,8 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         dateDrawn.addModifyListener(modifyListener);
         dateDrawn.adaptToToolkit(toolkit);
 
-        study = ((StudyAdapter) patientVisitAdapter.getParent().getParent()
-            .getParent()).getStudy();
+        study = ((StudyAdapter) patientVisitAdapter
+            .getParentFromClass(StudyAdapter.class)).getStudy();
 
         for (PvInfo pvInfo : study.getPvInfoCollection()) {
             CombinedPvInfo combinedPvInfo = new CombinedPvInfo();
@@ -325,8 +350,19 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         PatientAdapter patientAdapter = (PatientAdapter) patientVisitAdapter
             .getParent();
         patientVisit.setPatient(patientAdapter.getPatient());
+        if (clinicsComboViewer != null) {
+            IStructuredSelection clinicSelection = (IStructuredSelection) clinicsComboViewer
+                .getSelection();
+            if (clinicSelection != null && clinicSelection.size() > 0) {
+                patientVisit.setClinic((Clinic) clinicSelection
+                    .getFirstElement());
+            } else {
+                patientVisit.setClinic(null);
+            }
+        }
         patientVisit.setDateDrawn(dateDrawn.getDate());
-        // TODO get csm_user_id and set it to the Patient Visit at insert
+
+        // FIXME get csm_user_id and set it to the Patient Visit at insert
 
         if ((patientVisit.getId() == null) || (patientVisit.getId() == 0)) {
             query = new InsertExampleQuery(patientVisit);

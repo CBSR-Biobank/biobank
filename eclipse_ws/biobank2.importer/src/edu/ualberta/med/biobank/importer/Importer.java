@@ -109,8 +109,6 @@ public class Importer {
             bioBank2Db.deleteAll(Sample.class);
             bioBank2Db.deleteAll(Container.class);
             bioBank2Db.deleteAll(ContainerType.class);
-            bioBank2Db.deleteAll(PvInfoData.class);
-            bioBank2Db.deleteAll(PvInfo.class);
             bioBank2Db.deleteAll(PatientVisit.class);
             bioBank2Db.deleteAll(Patient.class);
             bioBank2Db.deleteAll(Clinic.class);
@@ -126,8 +124,8 @@ public class Importer {
             importClinics();
             importPatients();
             importPatientVisits();
-            importFreezerSamples();
             importCabinetSamples();
+            importFreezerSamples();
 
             System.out.println("importing complete.");
 
@@ -203,6 +201,7 @@ public class Importer {
                 study.setName(rs.getString(2));
                 study.setNameShort(studyNameShort);
                 study.setSite(cbrSite);
+                study.setActivityStatus("Active");
                 study = (Study) bioBank2Db.setObject(study);
 
                 System.out.println("importing study " + study.getNameShort()
@@ -249,6 +248,7 @@ public class Importer {
                 clinic.setName(rs.getString(1));
                 clinic.setComment(rs.getString(2));
                 clinic.setSite(cbrSite);
+                clinic.setActivityStatus("Active");
 
                 Address address = new Address();
                 clinic.setAddress(address);
@@ -307,8 +307,9 @@ public class Importer {
         ResultSet rs = s.getResultSet();
         if (rs != null) {
             while (rs.next()) {
+                study = bioBank2Db.getStudy(rs.getString(20));
                 clinicName = rs.getString(3);
-                clinic = bioBank2Db.getClinic(clinicName);
+                clinic = bioBank2Db.getClinic(study, clinicName);
                 if (clinic == null) {
                     System.out.println("ERROR: no such clinic: " + clinicName);
                     continue;
@@ -326,8 +327,6 @@ public class Importer {
                 System.out.println("importing patient visit: patient/"
                     + patient.getNumber() + " visit date/"
                     + biobank2DateFmt.format(pv.getDateDrawn()));
-
-                study = bioBank2Db.getStudy(rs.getString(20));
 
                 // make sure the study is correct
                 if (!patient.getStudy().getNameShort().equals(
@@ -408,7 +407,7 @@ public class Importer {
                     continue;
                 }
 
-                binNum = rs.getInt(7);
+                binNum = rs.getInt(7) - 1;
                 binPos = rs.getString(8);
 
                 System.out.println("importing Cabinet sample at position "

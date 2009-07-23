@@ -168,7 +168,7 @@ public class ContainerTypeViewForm extends BiobankViewForm {
     }
 
     private void createSampleTypesSection() {
-        Composite client = createSectionWithClient("Contains Sample Derivatives");
+        Composite client = createSectionWithClient("Contains Samples");
         GridLayout layout = (GridLayout) client.getLayout();
         layout.numColumns = 2;
         layout.horizontalSpacing = 10;
@@ -200,7 +200,7 @@ public class ContainerTypeViewForm extends BiobankViewForm {
         layout.horizontalSpacing = 10;
         toolkit.paintBordersFor(client);
 
-        Label label = toolkit.createLabel(client, "Storage types:");
+        Label label = toolkit.createLabel(client, "Container types:");
         label
             .setLayoutData(new GridData(SWT.LEFT, SWT.BEGINNING, false, false));
 

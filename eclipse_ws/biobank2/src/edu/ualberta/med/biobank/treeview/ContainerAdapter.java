@@ -86,12 +86,12 @@ public class ContainerAdapter extends Node {
             }
         });
 
-        mi.setText("Add a Container");
+        mi = new MenuItem(menu, SWT.PUSH);
+        mi.setText("Add a Child Container");
         mi.addSelectionListener(new SelectionListener() {
             public void widgetSelected(SelectionEvent event) {
                 ContainerAdapter adapter = new ContainerAdapter(
-                    ContainerAdapter.this, ModelUtils
-                        .newContainer(container));
+                    ContainerAdapter.this, ModelUtils.newContainer(container));
                 openForm(new FormInput(adapter), ContainerEntryForm.ID);
             }
 
@@ -104,8 +104,8 @@ public class ContainerAdapter extends Node {
     public void loadChildren(boolean updateNode) {
         try {
             // read from database again
-            container = (Container) ModelUtils.getObjectWithId(
-                getAppService(), Container.class, container.getId());
+            container = (Container) ModelUtils.getObjectWithId(getAppService(),
+                Container.class, container.getId());
             for (ContainerPosition childPosition : container
                 .getChildPositionCollection()) {
                 Container child = childPosition.getContainer();
@@ -142,6 +142,11 @@ public class ContainerAdapter extends Node {
                 .getSite();
         }
         return null;
+    }
+
+    @Override
+    public String getTreeText() {
+        return getName() + " (" + container.getContainerType().getName() + ")";
     }
 
 }
