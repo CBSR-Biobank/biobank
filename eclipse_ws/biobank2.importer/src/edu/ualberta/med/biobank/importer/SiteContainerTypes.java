@@ -38,7 +38,7 @@ public class SiteContainerTypes {
     }
 
     public void insertContainerTypes(Site site) throws Exception {
-        System.out.println("adding storage types ...");
+        System.out.println("adding container types ...");
         SampleType sampleType = new SampleType();
         Collection<SampleType> allSampleTypes = BioBank2Db.getInstance().getAppService().search(
             SampleType.class, sampleType);
