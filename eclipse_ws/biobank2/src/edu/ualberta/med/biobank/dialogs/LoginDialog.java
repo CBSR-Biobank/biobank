@@ -168,20 +168,22 @@ public class LoginDialog extends TitleAreaDialog {
             prefs.put(LAST_SERVER, serverText.getText());
             prefs.put(LAST_USER_NAME, userNameText.getText());
 
-            if ((serverText.getSelectionIndex() == -1)
+            if ((serverText.getText().length() > 0)
+                && (serverText.getSelectionIndex() == -1)
                 && !servers.contains(serverText.getText())) {
                 Preferences prefsServers = prefs.node(SAVED_SERVERS);
                 Preferences prefsServer = prefsServers.node(Integer
                     .toString(servers.size()));
-                prefsServer.put(SERVER, serverText.getText());
+                prefsServer.put(SERVER, serverText.getText().trim());
             }
 
-            if ((userNameText.getSelectionIndex() == -1)
+            if ((userNameText.getText().length() > 0)
+                && (userNameText.getSelectionIndex() == -1)
                 && !userNames.contains(userNameText.getText())) {
                 Preferences prefsUserNames = prefs.node(SAVED_USER_NAMES);
                 Preferences prefsUserName = prefsUserNames.node(Integer
                     .toString(userNames.size()));
-                prefsUserName.put(USER_NAME, userNameText.getText());
+                prefsUserName.put(USER_NAME, userNameText.getText().trim());
             }
 
             try {
