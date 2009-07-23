@@ -31,7 +31,7 @@ public class BiobankCollectionTable extends BiobankWidget {
             | SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION | SWT.VIRTUAL);
         tableViewer.setUseHashlookup(true);
         tableViewer.setLabelProvider(new BiobankLabelProvider());
-        tableViewer.setContentProvider(new BiobankContentProvider());
+        tableViewer.setContentProvider(new BiobankContentProvider(tableViewer));
 
         Table table = tableViewer.getTable();
         table.setLayout(new TableLayout());

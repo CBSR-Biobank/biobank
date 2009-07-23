@@ -1,20 +1,29 @@
 package edu.ualberta.med.biobank.widgets;
 
-import org.eclipse.jface.viewers.IStructuredContentProvider;
+import org.eclipse.jface.viewers.ILazyContentProvider;
+import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.springframework.util.Assert;
 
-import edu.ualberta.med.biobank.model.PvInfo;
-import edu.ualberta.med.biobank.model.Sample;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerType;
+import edu.ualberta.med.biobank.model.PvInfo;
+import edu.ualberta.med.biobank.model.Sample;
 import edu.ualberta.med.biobank.treeview.ClinicAdapter;
+import edu.ualberta.med.biobank.treeview.ContainerTypeAdapter;
 import edu.ualberta.med.biobank.treeview.PatientAdapter;
 import edu.ualberta.med.biobank.treeview.PatientVisitAdapter;
-import edu.ualberta.med.biobank.treeview.ContainerTypeAdapter;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
 
-public class BiobankContentProvider implements IStructuredContentProvider {
+public class BiobankContentProvider implements ILazyContentProvider {
+    private TableViewer viewer;
+
+    private Object[] elements;
+
+    public BiobankContentProvider(TableViewer viewer) {
+        this.viewer = viewer;
+    }
+
     /*
      * (non-Javadoc)
      * 
@@ -64,7 +73,11 @@ public class BiobankContentProvider implements IStructuredContentProvider {
      * .viewers.Viewer, java.lang.Object, java.lang.Object)
      */
     public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+        this.elements = (Object[]) newInput;
+    }
 
+    public void updateElement(int index) {
+        viewer.replace(elements[index], index);
     }
 
 }
