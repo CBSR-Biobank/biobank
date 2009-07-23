@@ -144,4 +144,9 @@ public class ContainerAdapter extends Node {
         return null;
     }
 
+    @Override
+    public String getTreeText() {
+        return getName() + " (" + container.getContainerType().getName() + ")";
+    }
+
 }
