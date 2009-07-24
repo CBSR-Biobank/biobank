@@ -12,8 +12,11 @@ import org.apache.commons.collections.map.ListOrderedMap;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
@@ -24,16 +27,18 @@ import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.forms.input.FormInput;
+import edu.ualberta.med.biobank.helpers.GetHelper;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.PvInfo;
 import edu.ualberta.med.biobank.model.PvInfoPossible;
-import edu.ualberta.med.biobank.model.SampleStorage;
+import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
+import edu.ualberta.med.biobank.widgets.BiobankCollectionTable;
 import edu.ualberta.med.biobank.widgets.MultiSelect;
 import edu.ualberta.med.biobank.widgets.PvInfoWidget;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -88,6 +93,12 @@ public class StudyEntryForm extends BiobankEntryForm {
 
     private ListOrderedMap combinedPvInfoMap;
 
+    private String[] sampleTypeNames;
+
+    private BiobankCollectionTable sampleStorageTable;
+
+    private Button addSampleStorageButton;
+
     public StudyEntryForm() {
         super();
         combinedPvInfoMap = new ListOrderedMap();
@@ -111,6 +122,7 @@ public class StudyEntryForm extends BiobankEntryForm {
         study = studyAdapter.getStudy();
         site = ((SiteAdapter) studyAdapter
             .getParentFromClass(SiteAdapter.class)).getSite();
+        appService = studyAdapter.getAppService();
 
         if (study.getId() == null) {
             setPartName("New Study");
@@ -170,11 +182,41 @@ public class StudyEntryForm extends BiobankEntryForm {
     }
 
     private void createSampleStorageSection() {
-        // SampleStorageWidget
         Composite client = createSectionWithClient("Sample Storage");
-        Collection<SampleStorage> storageCollection = study
-            .getSampleStorageCollection();
+        GetHelper<SampleType> helper = new GetHelper<SampleType>();
+        List<SampleType> sampleTypes = helper.getModelObjects(appService,
+            SampleType.class);
 
+        if (sampleTypes.size() == 0) {
+            toolkit.createLabel(client,
+                "*** no sample types defined for study ***");
+            return;
+        }
+
+        int count = 0;
+        sampleTypeNames = new String[sampleTypes.size()];
+        for (SampleType sampleType : sampleTypes) {
+            sampleTypeNames[count] = sampleType.getName();
+            ++count;
+        }
+
+        GridLayout layout = new GridLayout(1, false);
+        client.setLayout(layout);
+        client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+        addSampleStorageButton = toolkit.createButton(client,
+            "Add Sample Storage", SWT.PUSH);
+        addSampleStorageButton.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+            }
+        });
+
+        String[] headings = new String[] { "Sample type", "Quantity", "Volume" };
+        sampleStorageTable = new BiobankCollectionTable(client, SWT.NONE,
+            headings, FormUtils.toArray(study.getSampleStorageCollection()));
+        sampleStorageTable.adaptToToolkit(toolkit);
+        toolkit.paintBordersFor(sampleStorageTable);
     }
 
     private void createPvInfoSection() {

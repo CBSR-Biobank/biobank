@@ -303,23 +303,6 @@ public class InitExamples {
 
             SDKQueryResult res = appService
                 .executeQuery(new InsertExampleQuery(ss));
-            ss = (SampleStorage) res.getObjectResult();
-
-            System.out.println("sample storage study: "
-                + ss.getStudy().getName());
-        }
-
-        c = new HQLCriteria(
-            "from edu.ualberta.med.biobank.model.Study as study "
-                + "where study.nameShort=?");
-        c.setParameters(Arrays.asList(new Object[] { "BBP" }));
-        List<Study> studies2 = appService.query(c);
-        for (Study study : studies2) {
-            for (SampleStorage ss2 : study.getSampleStorageCollection()) {
-                System.out.println("sample storage: "
-                    + ss2.getSampleType().getName());
-            }
-
         }
     }
 
