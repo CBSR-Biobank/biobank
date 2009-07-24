@@ -1,8 +1,8 @@
--- MySQL dump 10.11
+-- MySQL dump 10.13  Distrib 5.1.35, for redhat-linux-gnu (i386)
 --
 -- Host: localhost    Database: biobank2
 -- ------------------------------------------------------
--- Server version	5.0.45
+-- Server version	5.1.35
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -20,21 +20,24 @@
 --
 
 DROP TABLE IF EXISTS `csm_application`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `csm_application` (
-  `APPLICATION_ID` bigint(20) NOT NULL auto_increment,
+  `APPLICATION_ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `APPLICATION_NAME` varchar(255) NOT NULL,
   `APPLICATION_DESCRIPTION` varchar(200) NOT NULL,
-  `DECLARATIVE_FLAG` tinyint(1) NOT NULL default '0',
-  `ACTIVE_FLAG` tinyint(1) NOT NULL default '0',
-  `UPDATE_DATE` date default '0000-00-00',
-  `DATABASE_URL` varchar(100) default NULL,
-  `DATABASE_USER_NAME` varchar(100) default NULL,
-  `DATABASE_PASSWORD` varchar(100) default NULL,
-  `DATABASE_DIALECT` varchar(100) default NULL,
-  `DATABASE_DRIVER` varchar(100) default NULL,
-  PRIMARY KEY  (`APPLICATION_ID`),
+  `DECLARATIVE_FLAG` tinyint(1) NOT NULL DEFAULT '0',
+  `ACTIVE_FLAG` tinyint(1) NOT NULL DEFAULT '0',
+  `UPDATE_DATE` date DEFAULT '0000-00-00',
+  `DATABASE_URL` varchar(100) DEFAULT NULL,
+  `DATABASE_USER_NAME` varchar(100) DEFAULT NULL,
+  `DATABASE_PASSWORD` varchar(100) DEFAULT NULL,
+  `DATABASE_DIALECT` varchar(100) DEFAULT NULL,
+  `DATABASE_DRIVER` varchar(100) DEFAULT NULL,
+  PRIMARY KEY (`APPLICATION_ID`),
   UNIQUE KEY `UQ_APPLICATION_NAME` (`APPLICATION_NAME`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Dumping data for table `csm_application`
@@ -51,23 +54,26 @@ UNLOCK TABLES;
 --
 
 DROP TABLE IF EXISTS `csm_filter_clause`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `csm_filter_clause` (
-  `FILTER_CLAUSE_ID` bigint(20) NOT NULL auto_increment,
+  `FILTER_CLAUSE_ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `CLASS_NAME` varchar(100) NOT NULL,
   `FILTER_CHAIN` varchar(2000) NOT NULL,
   `TARGET_CLASS_NAME` varchar(100) NOT NULL,
   `TARGET_CLASS_ATTRIBUTE_NAME` varchar(100) NOT NULL,
   `TARGET_CLASS_ATTRIBUTE_TYPE` varchar(100) NOT NULL,
-  `TARGET_CLASS_ALIAS` varchar(100) default NULL,
-  `TARGET_CLASS_ATTRIBUTE_ALIAS` varchar(100) default NULL,
+  `TARGET_CLASS_ALIAS` varchar(100) DEFAULT NULL,
+  `TARGET_CLASS_ATTRIBUTE_ALIAS` varchar(100) DEFAULT NULL,
   `GENERATED_SQL_USER` varchar(4000) NOT NULL,
   `GENERATED_SQL_GROUP` varchar(4000) NOT NULL,
   `APPLICATION_ID` bigint(20) NOT NULL,
-  `UPDATE_DATE` date NOT NULL default '0000-00-00',
-  PRIMARY KEY  (`FILTER_CLAUSE_ID`),
+  `UPDATE_DATE` date NOT NULL DEFAULT '0000-00-00',
+  PRIMARY KEY (`FILTER_CLAUSE_ID`),
   KEY `FK_APPLICATION_FILTER_CLAUSE` (`APPLICATION_ID`),
   CONSTRAINT `FK_APPLICATION_FILTER_CLAUSE` FOREIGN KEY (`APPLICATION_ID`) REFERENCES `csm_application` (`APPLICATION_ID`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Dumping data for table `csm_filter_clause`
@@ -83,17 +89,20 @@ UNLOCK TABLES;
 --
 
 DROP TABLE IF EXISTS `csm_group`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `csm_group` (
-  `GROUP_ID` bigint(20) NOT NULL auto_increment,
+  `GROUP_ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `GROUP_NAME` varchar(255) NOT NULL,
-  `GROUP_DESC` varchar(200) default NULL,
-  `UPDATE_DATE` date NOT NULL default '0000-00-00',
+  `GROUP_DESC` varchar(200) DEFAULT NULL,
+  `UPDATE_DATE` date NOT NULL DEFAULT '0000-00-00',
   `APPLICATION_ID` bigint(20) NOT NULL,
-  PRIMARY KEY  (`GROUP_ID`),
+  PRIMARY KEY (`GROUP_ID`),
   UNIQUE KEY `UQ_GROUP_GROUP_NAME` (`APPLICATION_ID`,`GROUP_NAME`),
   KEY `idx_APPLICATION_ID` (`APPLICATION_ID`),
   CONSTRAINT `FK_APPLICATION_GROUP` FOREIGN KEY (`APPLICATION_ID`) REFERENCES `csm_application` (`APPLICATION_ID`) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Dumping data for table `csm_group`
@@ -110,18 +119,21 @@ UNLOCK TABLES;
 --
 
 DROP TABLE IF EXISTS `csm_pg_pe`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `csm_pg_pe` (
-  `PG_PE_ID` bigint(20) NOT NULL auto_increment,
+  `PG_PE_ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `PROTECTION_GROUP_ID` bigint(20) NOT NULL,
   `PROTECTION_ELEMENT_ID` bigint(20) NOT NULL,
-  `UPDATE_DATE` date default '0000-00-00',
-  PRIMARY KEY  (`PG_PE_ID`),
+  `UPDATE_DATE` date DEFAULT '0000-00-00',
+  PRIMARY KEY (`PG_PE_ID`),
   UNIQUE KEY `UQ_PROTECTION_GROUP_PROTECTION_ELEMENT_PROTECTION_GROUP_ID` (`PROTECTION_ELEMENT_ID`,`PROTECTION_GROUP_ID`),
   KEY `idx_PROTECTION_ELEMENT_ID` (`PROTECTION_ELEMENT_ID`),
   KEY `idx_PROTECTION_GROUP_ID` (`PROTECTION_GROUP_ID`),
   CONSTRAINT `FK_PROTECTION_GROUP_PROTECTION_ELEMENT` FOREIGN KEY (`PROTECTION_GROUP_ID`) REFERENCES `csm_protection_group` (`PROTECTION_GROUP_ID`) ON DELETE CASCADE,
   CONSTRAINT `FK_PROTECTION_ELEMENT_PROTECTION_GROUP` FOREIGN KEY (`PROTECTION_ELEMENT_ID`) REFERENCES `csm_protection_element` (`PROTECTION_ELEMENT_ID`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=48 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=60 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Dumping data for table `csm_pg_pe`
@@ -129,7 +141,7 @@ CREATE TABLE `csm_pg_pe` (
 
 LOCK TABLES `csm_pg_pe` WRITE;
 /*!40000 ALTER TABLE `csm_pg_pe` DISABLE KEYS */;
-INSERT INTO `csm_pg_pe` VALUES (25,2,16,'0000-00-00'),(26,2,20,'0000-00-00'),(29,6,6,'0000-00-00'),(30,3,19,'0000-00-00'),(31,3,7,'0000-00-00'),(32,3,5,'0000-00-00'),(33,3,3,'0000-00-00'),(34,7,13,'0000-00-00'),(35,7,12,'0000-00-00'),(36,7,10,'0000-00-00'),(37,7,21,'0000-00-00'),(38,5,8,'0000-00-00'),(39,5,9,'0000-00-00'),(40,5,11,'0000-00-00'),(41,8,18,'0000-00-00'),(42,8,4,'0000-00-00'),(43,8,17,'0000-00-00'),(44,8,23,'0000-00-00'),(45,8,22,'0000-00-00'),(46,9,15,'0000-00-00'),(47,9,14,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (25,2,16,'0000-00-00'),(26,2,20,'0000-00-00'),(29,6,6,'0000-00-00'),(30,3,19,'0000-00-00'),(31,3,7,'0000-00-00'),(32,3,5,'0000-00-00'),(33,3,3,'0000-00-00'),(38,5,8,'0000-00-00'),(39,5,9,'0000-00-00'),(40,5,11,'0000-00-00'),(41,8,18,'0000-00-00'),(42,8,4,'0000-00-00'),(43,8,17,'0000-00-00'),(44,8,23,'0000-00-00'),(45,8,22,'0000-00-00'),(51,9,15,'0000-00-00'),(52,9,24,'0000-00-00'),(53,9,14,'0000-00-00'),(54,9,25,'0000-00-00'),(55,7,26,'0000-00-00'),(56,7,13,'0000-00-00'),(57,7,10,'0000-00-00'),(58,7,12,'0000-00-00'),(59,7,21,'0000-00-00');
 /*!40000 ALTER TABLE `csm_pg_pe` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -138,14 +150,17 @@ UNLOCK TABLES;
 --
 
 DROP TABLE IF EXISTS `csm_privilege`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `csm_privilege` (
-  `PRIVILEGE_ID` bigint(20) NOT NULL auto_increment,
+  `PRIVILEGE_ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `PRIVILEGE_NAME` varchar(100) NOT NULL,
-  `PRIVILEGE_DESCRIPTION` varchar(200) default NULL,
-  `UPDATE_DATE` date NOT NULL default '0000-00-00',
-  PRIMARY KEY  (`PRIVILEGE_ID`),
+  `PRIVILEGE_DESCRIPTION` varchar(200) DEFAULT NULL,
+  `UPDATE_DATE` date NOT NULL DEFAULT '0000-00-00',
+  PRIMARY KEY (`PRIVILEGE_ID`),
   UNIQUE KEY `UQ_PRIVILEGE_NAME` (`PRIVILEGE_NAME`)
 ) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Dumping data for table `csm_privilege`
@@ -162,21 +177,24 @@ UNLOCK TABLES;
 --
 
 DROP TABLE IF EXISTS `csm_protection_element`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `csm_protection_element` (
-  `PROTECTION_ELEMENT_ID` bigint(20) NOT NULL auto_increment,
+  `PROTECTION_ELEMENT_ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `PROTECTION_ELEMENT_NAME` varchar(100) NOT NULL,
-  `PROTECTION_ELEMENT_DESCRIPTION` varchar(200) default NULL,
+  `PROTECTION_ELEMENT_DESCRIPTION` varchar(200) DEFAULT NULL,
   `OBJECT_ID` varchar(100) NOT NULL,
-  `ATTRIBUTE` varchar(100) default NULL,
-  `ATTRIBUTE_VALUE` varchar(100) default NULL,
-  `PROTECTION_ELEMENT_TYPE` varchar(100) default NULL,
+  `ATTRIBUTE` varchar(100) DEFAULT NULL,
+  `ATTRIBUTE_VALUE` varchar(100) DEFAULT NULL,
+  `PROTECTION_ELEMENT_TYPE` varchar(100) DEFAULT NULL,
   `APPLICATION_ID` bigint(20) NOT NULL,
-  `UPDATE_DATE` date NOT NULL default '0000-00-00',
-  PRIMARY KEY  (`PROTECTION_ELEMENT_ID`),
+  `UPDATE_DATE` date NOT NULL DEFAULT '0000-00-00',
+  PRIMARY KEY (`PROTECTION_ELEMENT_ID`),
   UNIQUE KEY `UQ_PE_PE_NAME_ATTRIBUTE_VALUE_APP_ID` (`OBJECT_ID`,`ATTRIBUTE`,`ATTRIBUTE_VALUE`,`APPLICATION_ID`),
   KEY `idx_APPLICATION_ID` (`APPLICATION_ID`),
   CONSTRAINT `FK_PE_APPLICATION` FOREIGN KEY (`APPLICATION_ID`) REFERENCES `csm_application` (`APPLICATION_ID`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=27 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Dumping data for table `csm_protection_element`
@@ -184,7 +202,7 @@ CREATE TABLE `csm_protection_element` (
 
 LOCK TABLES `csm_protection_element` WRITE;
 /*!40000 ALTER TABLE `csm_protection_element` DISABLE KEYS */;
-INSERT INTO `csm_protection_element` VALUES (1,'csmupt','CSM UPT Super Admin Application Protection Element','csmupt',NULL,NULL,NULL,1,'2009-07-22'),(2,'biobank2','biobank2','biobank2',NULL,NULL,NULL,1,'2009-07-22'),(3,'edu.ualberta.med.biobank.model.AbstractPosition','edu.ualberta.med.biobank.model.AbstractPosition','edu.ualberta.med.biobank.model.AbstractPosition',NULL,NULL,NULL,2,'2009-07-22'),(4,'edu.ualberta.med.biobank.model.Address','edu.ualberta.med.biobank.model.Address','edu.ualberta.med.biobank.model.Address',NULL,NULL,NULL,2,'2009-07-22'),(5,'edu.ualberta.med.biobank.model.Capacity','edu.ualberta.med.biobank.model.Capacity','edu.ualberta.med.biobank.model.Capacity',NULL,NULL,NULL,2,'2009-07-22'),(6,'edu.ualberta.med.biobank.model.Clinic','edu.ualberta.med.biobank.model.Clinic','edu.ualberta.med.biobank.model.Clinic',NULL,NULL,NULL,2,'2009-07-22'),(7,'edu.ualberta.med.biobank.model.ContainerPosition','edu.ualberta.med.biobank.model.ContainerPosition','edu.ualberta.med.biobank.model.ContainerPosition',NULL,NULL,NULL,2,'2009-07-22'),(8,'edu.ualberta.med.biobank.model.Patient','edu.ualberta.med.biobank.model.Patient','edu.ualberta.med.biobank.model.Patient',NULL,NULL,NULL,2,'2009-07-22'),(9,'edu.ualberta.med.biobank.model.PatientVisit','edu.ualberta.med.biobank.model.PatientVisit','edu.ualberta.med.biobank.model.PatientVisit',NULL,NULL,NULL,2,'2009-07-22'),(10,'edu.ualberta.med.biobank.model.PvInfo','edu.ualberta.med.biobank.model.PvInfo','edu.ualberta.med.biobank.model.PvInfo',NULL,NULL,NULL,2,'2009-07-22'),(11,'edu.ualberta.med.biobank.model.PvInfoData','edu.ualberta.med.biobank.model.PvInfoData','edu.ualberta.med.biobank.model.PvInfoData',NULL,NULL,NULL,2,'2009-07-22'),(12,'edu.ualberta.med.biobank.model.PvInfoPossible','edu.ualberta.med.biobank.model.PvInfoPossible','edu.ualberta.med.biobank.model.PvInfoPossible',NULL,NULL,NULL,2,'2009-07-22'),(13,'edu.ualberta.med.biobank.model.PvInfoType','edu.ualberta.med.biobank.model.PvInfoType','edu.ualberta.med.biobank.model.PvInfoType',NULL,NULL,NULL,2,'2009-07-22'),(14,'edu.ualberta.med.biobank.model.Sample','edu.ualberta.med.biobank.model.Sample','edu.ualberta.med.biobank.model.Sample',NULL,NULL,NULL,2,'2009-07-22'),(15,'edu.ualberta.med.biobank.model.SamplePosition','edu.ualberta.med.biobank.model.SamplePosition','edu.ualberta.med.biobank.model.SamplePosition',NULL,NULL,NULL,2,'2009-07-22'),(16,'edu.ualberta.med.biobank.model.SampleType','edu.ualberta.med.biobank.model.SampleType','edu.ualberta.med.biobank.model.SampleType',NULL,NULL,NULL,2,'2009-07-22'),(17,'edu.ualberta.med.biobank.model.Shipment','edu.ualberta.med.biobank.model.Shipment','edu.ualberta.med.biobank.model.Shipment',NULL,NULL,NULL,2,'2009-07-22'),(18,'edu.ualberta.med.biobank.model.Site','edu.ualberta.med.biobank.model.Site','edu.ualberta.med.biobank.model.Site',NULL,NULL,NULL,2,'2009-07-22'),(19,'edu.ualberta.med.biobank.model.Container','edu.ualberta.med.biobank.model.Container','edu.ualberta.med.biobank.model.Container',NULL,NULL,NULL,2,'2009-07-22'),(20,'edu.ualberta.med.biobank.model.ContainerType','edu.ualberta.med.biobank.model.ContainerType','edu.ualberta.med.biobank.model.ContainerType',NULL,NULL,NULL,2,'2009-07-22'),(21,'edu.ualberta.med.biobank.model.Study','edu.ualberta.med.biobank.model.Study','edu.ualberta.med.biobank.model.Study',NULL,NULL,NULL,2,'2009-07-22'),(22,'edu.ualberta.med.biobank.model.User','edu.ualberta.med.biobank.model.User','edu.ualberta.med.biobank.model.User',NULL,NULL,NULL,2,'2009-07-22'),(23,'edu.ualberta.med.biobank.model.Worksheet','edu.ualberta.med.biobank.model.Worksheet','edu.ualberta.med.biobank.model.Worksheet',NULL,NULL,NULL,2,'2009-07-22');
+INSERT INTO `csm_protection_element` VALUES (1,'csmupt','CSM UPT Super Admin Application Protection Element','csmupt',NULL,NULL,NULL,1,'2009-07-22'),(2,'biobank2','biobank2','biobank2',NULL,NULL,NULL,1,'2009-07-22'),(3,'edu.ualberta.med.biobank.model.AbstractPosition','edu.ualberta.med.biobank.model.AbstractPosition','edu.ualberta.med.biobank.model.AbstractPosition',NULL,NULL,NULL,2,'2009-07-22'),(4,'edu.ualberta.med.biobank.model.Address','edu.ualberta.med.biobank.model.Address','edu.ualberta.med.biobank.model.Address',NULL,NULL,NULL,2,'2009-07-22'),(5,'edu.ualberta.med.biobank.model.Capacity','edu.ualberta.med.biobank.model.Capacity','edu.ualberta.med.biobank.model.Capacity',NULL,NULL,NULL,2,'2009-07-22'),(6,'edu.ualberta.med.biobank.model.Clinic','edu.ualberta.med.biobank.model.Clinic','edu.ualberta.med.biobank.model.Clinic',NULL,NULL,NULL,2,'2009-07-22'),(7,'edu.ualberta.med.biobank.model.ContainerPosition','edu.ualberta.med.biobank.model.ContainerPosition','edu.ualberta.med.biobank.model.ContainerPosition',NULL,NULL,NULL,2,'2009-07-22'),(8,'edu.ualberta.med.biobank.model.Patient','edu.ualberta.med.biobank.model.Patient','edu.ualberta.med.biobank.model.Patient',NULL,NULL,NULL,2,'2009-07-22'),(9,'edu.ualberta.med.biobank.model.PatientVisit','edu.ualberta.med.biobank.model.PatientVisit','edu.ualberta.med.biobank.model.PatientVisit',NULL,NULL,NULL,2,'2009-07-22'),(10,'edu.ualberta.med.biobank.model.PvInfo','edu.ualberta.med.biobank.model.PvInfo','edu.ualberta.med.biobank.model.PvInfo',NULL,NULL,NULL,2,'2009-07-22'),(11,'edu.ualberta.med.biobank.model.PvInfoData','edu.ualberta.med.biobank.model.PvInfoData','edu.ualberta.med.biobank.model.PvInfoData',NULL,NULL,NULL,2,'2009-07-22'),(12,'edu.ualberta.med.biobank.model.PvInfoPossible','edu.ualberta.med.biobank.model.PvInfoPossible','edu.ualberta.med.biobank.model.PvInfoPossible',NULL,NULL,NULL,2,'2009-07-22'),(13,'edu.ualberta.med.biobank.model.PvInfoType','edu.ualberta.med.biobank.model.PvInfoType','edu.ualberta.med.biobank.model.PvInfoType',NULL,NULL,NULL,2,'2009-07-22'),(14,'edu.ualberta.med.biobank.model.Sample','edu.ualberta.med.biobank.model.Sample','edu.ualberta.med.biobank.model.Sample',NULL,NULL,NULL,2,'2009-07-22'),(15,'edu.ualberta.med.biobank.model.SamplePosition','edu.ualberta.med.biobank.model.SamplePosition','edu.ualberta.med.biobank.model.SamplePosition',NULL,NULL,NULL,2,'2009-07-22'),(16,'edu.ualberta.med.biobank.model.SampleType','edu.ualberta.med.biobank.model.SampleType','edu.ualberta.med.biobank.model.SampleType',NULL,NULL,NULL,2,'2009-07-22'),(17,'edu.ualberta.med.biobank.model.Shipment','edu.ualberta.med.biobank.model.Shipment','edu.ualberta.med.biobank.model.Shipment',NULL,NULL,NULL,2,'2009-07-22'),(18,'edu.ualberta.med.biobank.model.Site','edu.ualberta.med.biobank.model.Site','edu.ualberta.med.biobank.model.Site',NULL,NULL,NULL,2,'2009-07-22'),(19,'edu.ualberta.med.biobank.model.Container','edu.ualberta.med.biobank.model.Container','edu.ualberta.med.biobank.model.Container',NULL,NULL,NULL,2,'2009-07-22'),(20,'edu.ualberta.med.biobank.model.ContainerType','edu.ualberta.med.biobank.model.ContainerType','edu.ualberta.med.biobank.model.ContainerType',NULL,NULL,NULL,2,'2009-07-22'),(21,'edu.ualberta.med.biobank.model.Study','edu.ualberta.med.biobank.model.Study','edu.ualberta.med.biobank.model.Study',NULL,NULL,NULL,2,'2009-07-22'),(22,'edu.ualberta.med.biobank.model.User','edu.ualberta.med.biobank.model.User','edu.ualberta.med.biobank.model.User',NULL,NULL,NULL,2,'2009-07-22'),(23,'edu.ualberta.med.biobank.model.Worksheet','edu.ualberta.med.biobank.model.Worksheet','edu.ualberta.med.biobank.model.Worksheet',NULL,NULL,NULL,2,'2009-07-22'),(24,'edu.ualberta.med.biobank.model.SampleSource','edu.ualberta.med.biobank.model.SampleSource','edu.ualberta.med.biobank.model.SampleSource','','','',2,'2009-07-23'),(25,'edu.ualberta.med.biobank.model.SampleStorage','edu.ualberta.med.biobank.model.SampleStorage','edu.ualberta.med.biobank.model.SampleStorage','','','',2,'2009-07-23'),(26,'edu.ualberta.med.biobank.model.StudySampleSource','edu.ualberta.med.biobank.model.StudySampleSource','edu.ualberta.med.biobank.model.StudySampleSource','','','',2,'2009-07-23');
 /*!40000 ALTER TABLE `csm_protection_element` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -193,21 +211,24 @@ UNLOCK TABLES;
 --
 
 DROP TABLE IF EXISTS `csm_protection_group`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `csm_protection_group` (
-  `PROTECTION_GROUP_ID` bigint(20) NOT NULL auto_increment,
+  `PROTECTION_GROUP_ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `PROTECTION_GROUP_NAME` varchar(100) NOT NULL,
-  `PROTECTION_GROUP_DESCRIPTION` varchar(200) default NULL,
+  `PROTECTION_GROUP_DESCRIPTION` varchar(200) DEFAULT NULL,
   `APPLICATION_ID` bigint(20) NOT NULL,
   `LARGE_ELEMENT_COUNT_FLAG` tinyint(1) NOT NULL,
-  `UPDATE_DATE` date NOT NULL default '0000-00-00',
-  `PARENT_PROTECTION_GROUP_ID` bigint(20) default NULL,
-  PRIMARY KEY  (`PROTECTION_GROUP_ID`),
+  `UPDATE_DATE` date NOT NULL DEFAULT '0000-00-00',
+  `PARENT_PROTECTION_GROUP_ID` bigint(20) DEFAULT NULL,
+  PRIMARY KEY (`PROTECTION_GROUP_ID`),
   UNIQUE KEY `UQ_PROTECTION_GROUP_PROTECTION_GROUP_NAME` (`APPLICATION_ID`,`PROTECTION_GROUP_NAME`),
   KEY `idx_APPLICATION_ID` (`APPLICATION_ID`),
   KEY `idx_PARENT_PROTECTION_GROUP_ID` (`PARENT_PROTECTION_GROUP_ID`),
   CONSTRAINT `FK_PROTECTION_GROUP` FOREIGN KEY (`PARENT_PROTECTION_GROUP_ID`) REFERENCES `csm_protection_group` (`PROTECTION_GROUP_ID`),
   CONSTRAINT `FK_PG_APPLICATION` FOREIGN KEY (`APPLICATION_ID`) REFERENCES `csm_application` (`APPLICATION_ID`) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Dumping data for table `csm_protection_group`
@@ -224,18 +245,21 @@ UNLOCK TABLES;
 --
 
 DROP TABLE IF EXISTS `csm_role`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `csm_role` (
-  `ROLE_ID` bigint(20) NOT NULL auto_increment,
+  `ROLE_ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `ROLE_NAME` varchar(100) NOT NULL,
-  `ROLE_DESCRIPTION` varchar(200) default NULL,
+  `ROLE_DESCRIPTION` varchar(200) DEFAULT NULL,
   `APPLICATION_ID` bigint(20) NOT NULL,
   `ACTIVE_FLAG` tinyint(1) NOT NULL,
-  `UPDATE_DATE` date NOT NULL default '0000-00-00',
-  PRIMARY KEY  (`ROLE_ID`),
+  `UPDATE_DATE` date NOT NULL DEFAULT '0000-00-00',
+  PRIMARY KEY (`ROLE_ID`),
   UNIQUE KEY `UQ_ROLE_ROLE_NAME` (`APPLICATION_ID`,`ROLE_NAME`),
   KEY `idx_APPLICATION_ID` (`APPLICATION_ID`),
   CONSTRAINT `FK_APPLICATION_ROLE` FOREIGN KEY (`APPLICATION_ID`) REFERENCES `csm_application` (`APPLICATION_ID`) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Dumping data for table `csm_role`
@@ -252,17 +276,20 @@ UNLOCK TABLES;
 --
 
 DROP TABLE IF EXISTS `csm_role_privilege`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `csm_role_privilege` (
-  `ROLE_PRIVILEGE_ID` bigint(20) NOT NULL auto_increment,
+  `ROLE_PRIVILEGE_ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `ROLE_ID` bigint(20) NOT NULL,
   `PRIVILEGE_ID` bigint(20) NOT NULL,
-  PRIMARY KEY  (`ROLE_PRIVILEGE_ID`),
+  PRIMARY KEY (`ROLE_PRIVILEGE_ID`),
   UNIQUE KEY `UQ_ROLE_PRIVILEGE_ROLE_ID` (`PRIVILEGE_ID`,`ROLE_ID`),
   KEY `idx_PRIVILEGE_ID` (`PRIVILEGE_ID`),
   KEY `idx_ROLE_ID` (`ROLE_ID`),
   CONSTRAINT `FK_ROLE` FOREIGN KEY (`ROLE_ID`) REFERENCES `csm_role` (`ROLE_ID`) ON DELETE CASCADE,
   CONSTRAINT `FK_PRIVILEGE_ROLE` FOREIGN KEY (`PRIVILEGE_ID`) REFERENCES `csm_privilege` (`PRIVILEGE_ID`) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Dumping data for table `csm_role_privilege`
@@ -279,25 +306,28 @@ UNLOCK TABLES;
 --
 
 DROP TABLE IF EXISTS `csm_user`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `csm_user` (
-  `USER_ID` bigint(20) NOT NULL auto_increment,
+  `USER_ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `LOGIN_NAME` varchar(500) NOT NULL,
-  `MIGRATED_FLAG` tinyint(1) NOT NULL default '0',
+  `MIGRATED_FLAG` tinyint(1) NOT NULL DEFAULT '0',
   `FIRST_NAME` varchar(100) NOT NULL,
   `LAST_NAME` varchar(100) NOT NULL,
-  `ORGANIZATION` varchar(100) default NULL,
-  `DEPARTMENT` varchar(100) default NULL,
-  `TITLE` varchar(100) default NULL,
-  `PHONE_NUMBER` varchar(15) default NULL,
-  `PASSWORD` varchar(100) default NULL,
-  `EMAIL_ID` varchar(100) default NULL,
-  `START_DATE` date default NULL,
-  `END_DATE` date default NULL,
-  `UPDATE_DATE` date NOT NULL default '0000-00-00',
-  `PREMGRT_LOGIN_NAME` varchar(100) default NULL,
-  PRIMARY KEY  (`USER_ID`),
+  `ORGANIZATION` varchar(100) DEFAULT NULL,
+  `DEPARTMENT` varchar(100) DEFAULT NULL,
+  `TITLE` varchar(100) DEFAULT NULL,
+  `PHONE_NUMBER` varchar(15) DEFAULT NULL,
+  `PASSWORD` varchar(100) DEFAULT NULL,
+  `EMAIL_ID` varchar(100) DEFAULT NULL,
+  `START_DATE` date DEFAULT NULL,
+  `END_DATE` date DEFAULT NULL,
+  `UPDATE_DATE` date NOT NULL DEFAULT '0000-00-00',
+  `PREMGRT_LOGIN_NAME` varchar(100) DEFAULT NULL,
+  PRIMARY KEY (`USER_ID`),
   UNIQUE KEY `UQ_LOGIN_NAME` (`LOGIN_NAME`)
 ) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Dumping data for table `csm_user`
@@ -305,8 +335,7 @@ CREATE TABLE `csm_user` (
 
 LOCK TABLES `csm_user` WRITE;
 /*!40000 ALTER TABLE `csm_user` DISABLE KEYS */;
-INSERT INTO `csm_user` VALUES (1,'administrator',0,'Administrator','NoName',NULL,NULL,NULL,NULL,'zJPWCwDeSgG8j2uyHEABIQ==',NULL,NULL,NULL,'2009-07-22',NULL),
-(2,'bbadmin',0,'Biobank Administrator','NoName',NULL,NULL,NULL,NULL,'7Bg9siN5e7M=',NULL,NULL,NULL,'2009-07-22',NULL),(3,'testuser',0,'TestUser','NoName',NULL,NULL,NULL,NULL,'orDBlaojDQE=',NULL,NULL,NULL,'2009-07-22',NULL),(4,'visitor',0,'visitor','visitor','','','','','xetbcEQIhCk=','',NULL,NULL,'2009-07-23',''),(5,'tech1',0,'tech1','tech1','','','','','XrqZ9qCiTTo=','',NULL,NULL,'2009-07-23','');
+INSERT INTO `csm_user` VALUES (1,'administrator',0,'Administrator','NoName',NULL,NULL,NULL,NULL,'zJPWCwDeSgG8j2uyHEABIQ==',NULL,NULL,NULL,'2009-07-22',NULL),(2,'bbadmin',0,'Biobank Administrator','NoName',NULL,NULL,NULL,NULL,'7Bg9siN5e7M=',NULL,NULL,NULL,'2009-07-22',NULL),(3,'testuser',0,'TestUser','NoName',NULL,NULL,NULL,NULL,'orDBlaojDQE=',NULL,NULL,NULL,'2009-07-22',NULL),(4,'visitor',0,'visitor','visitor','','','','','xetbcEQIhCk=','',NULL,NULL,'2009-07-23',''),(5,'tech1',0,'tech1','tech1','','','','','XrqZ9qCiTTo=','',NULL,NULL,'2009-07-23','');
 /*!40000 ALTER TABLE `csm_user` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -315,16 +344,19 @@ UNLOCK TABLES;
 --
 
 DROP TABLE IF EXISTS `csm_user_group`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `csm_user_group` (
-  `USER_GROUP_ID` bigint(20) NOT NULL auto_increment,
+  `USER_GROUP_ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `USER_ID` bigint(20) NOT NULL,
   `GROUP_ID` bigint(20) NOT NULL,
-  PRIMARY KEY  (`USER_GROUP_ID`),
+  PRIMARY KEY (`USER_GROUP_ID`),
   KEY `idx_USER_ID` (`USER_ID`),
   KEY `idx_GROUP_ID` (`GROUP_ID`),
   CONSTRAINT `FK_UG_GROUP` FOREIGN KEY (`GROUP_ID`) REFERENCES `csm_group` (`GROUP_ID`) ON DELETE CASCADE,
   CONSTRAINT `FK_USER_GROUP` FOREIGN KEY (`USER_ID`) REFERENCES `csm_user` (`USER_ID`) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Dumping data for table `csm_user_group`
@@ -341,14 +373,16 @@ UNLOCK TABLES;
 --
 
 DROP TABLE IF EXISTS `csm_user_group_role_pg`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `csm_user_group_role_pg` (
-  `USER_GROUP_ROLE_PG_ID` bigint(20) NOT NULL auto_increment,
-  `USER_ID` bigint(20) default NULL,
-  `GROUP_ID` bigint(20) default NULL,
+  `USER_GROUP_ROLE_PG_ID` bigint(20) NOT NULL AUTO_INCREMENT,
+  `USER_ID` bigint(20) DEFAULT NULL,
+  `GROUP_ID` bigint(20) DEFAULT NULL,
   `ROLE_ID` bigint(20) NOT NULL,
   `PROTECTION_GROUP_ID` bigint(20) NOT NULL,
-  `UPDATE_DATE` date NOT NULL default '0000-00-00',
-  PRIMARY KEY  (`USER_GROUP_ROLE_PG_ID`),
+  `UPDATE_DATE` date NOT NULL DEFAULT '0000-00-00',
+  PRIMARY KEY (`USER_GROUP_ROLE_PG_ID`),
   KEY `idx_GROUP_ID` (`GROUP_ID`),
   KEY `idx_ROLE_ID` (`ROLE_ID`),
   KEY `idx_PROTECTION_GROUP_ID` (`PROTECTION_GROUP_ID`),
@@ -358,6 +392,7 @@ CREATE TABLE `csm_user_group_role_pg` (
   CONSTRAINT `FK_USER_GROUP_ROLE_PROTECTION_GROUP_PROTECTION_GROUP` FOREIGN KEY (`PROTECTION_GROUP_ID`) REFERENCES `csm_protection_group` (`PROTECTION_GROUP_ID`) ON DELETE CASCADE,
   CONSTRAINT `FK_USER_GROUP_ROLE_PROTECTION_GROUP_ROLE` FOREIGN KEY (`ROLE_ID`) REFERENCES `csm_role` (`ROLE_ID`) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Dumping data for table `csm_user_group_role_pg`
@@ -374,17 +409,20 @@ UNLOCK TABLES;
 --
 
 DROP TABLE IF EXISTS `csm_user_pe`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `csm_user_pe` (
-  `USER_PROTECTION_ELEMENT_ID` bigint(20) NOT NULL auto_increment,
+  `USER_PROTECTION_ELEMENT_ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `PROTECTION_ELEMENT_ID` bigint(20) NOT NULL,
   `USER_ID` bigint(20) NOT NULL,
-  PRIMARY KEY  (`USER_PROTECTION_ELEMENT_ID`),
+  PRIMARY KEY (`USER_PROTECTION_ELEMENT_ID`),
   UNIQUE KEY `UQ_USER_PROTECTION_ELEMENT_PROTECTION_ELEMENT_ID` (`USER_ID`,`PROTECTION_ELEMENT_ID`),
   KEY `idx_USER_ID` (`USER_ID`),
   KEY `idx_PROTECTION_ELEMENT_ID` (`PROTECTION_ELEMENT_ID`),
   CONSTRAINT `FK_PROTECTION_ELEMENT_USER` FOREIGN KEY (`PROTECTION_ELEMENT_ID`) REFERENCES `csm_protection_element` (`PROTECTION_ELEMENT_ID`) ON DELETE CASCADE,
   CONSTRAINT `FK_PE_USER` FOREIGN KEY (`USER_ID`) REFERENCES `csm_user` (`USER_ID`) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Dumping data for table `csm_user_pe`
@@ -396,7 +434,6 @@ INSERT INTO `csm_user_pe` VALUES (1,1,1),(2,2,2);
 /*!40000 ALTER TABLE `csm_user_pe` ENABLE KEYS */;
 UNLOCK TABLES;
 
-
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
 /*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
@@ -405,4 +442,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2009-07-23 16:43:36
+-- Dump completed on 2009-07-24  2:04:50
