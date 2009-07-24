@@ -195,21 +195,6 @@
       <transaction src="${data.sql.dir}/pvInfoPossible.sql" />
       <transaction src="${data.sql.dir}/sampleSources.sql" />
       <transaction src="${data.sql.dir}/sampleTypes.sql" />
-      <transaction>commit;</transaction>
-      <classpath>
-	<fileset dir="${cacore.sdk.dir}/system/lib">
-	  <include name="*.jar" />
-	</fileset>
-      </classpath>
-    </sql>
-  </target>
-
-  <target name="securityDBcreate"
-	  description="creates the default tables and datas for the security">
-    <sql driver="${mysql.driver.string}"
-	 url="jdbc:mysql://${database.host}:${database.port}/${database.name}"
-	 userid="${database.username}"
-	 password="${database.password}">
       <transaction src="${security.dir}/schemaSecurityDump.sql" />
       <transaction>commit;</transaction>
       <classpath>

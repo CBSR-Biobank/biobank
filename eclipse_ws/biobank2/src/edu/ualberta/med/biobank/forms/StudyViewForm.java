@@ -119,13 +119,14 @@ public class StudyViewForm extends BiobankViewForm {
     private SampleStorage[] getSampleStorageAsArr() {
         Collection<SampleStorage> collection = study
             .getSampleStorageCollection();
-        if ((collection != null) && (collection.size() > 0))
+        if ((collection != null) && (collection.size() == 0))
             return null;
 
         int count = 0;
         SampleStorage[] arr = new SampleStorage[collection.size()];
         for (SampleStorage ss : collection) {
             arr[count] = ss;
+            ++count;
         }
         return arr;
     }

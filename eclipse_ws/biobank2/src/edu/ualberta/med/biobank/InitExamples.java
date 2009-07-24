@@ -128,7 +128,7 @@ public class InitExamples {
 
     private void insertStudyInSite() throws ApplicationException {
         study = new Study();
-        study.setName("Study Test");
+        study.setName("Blood Borne Pathogens");
         study.setNameShort("BBP");
         study.setSite(site);
         study.setClinicCollection(site.getClinicCollection());
@@ -261,7 +261,17 @@ public class InitExamples {
 
     private void insertSampleStorage() throws Exception {
         HQLCriteria c = new HQLCriteria(
-            "from edu.ualberta.med.biobank.model.SampleType");
+            "from edu.ualberta.med.biobank.model.Study as study "
+                + "where study.nameShort=?");
+        c.setParameters(Arrays.asList(new Object[] { "BBP" }));
+        List<Study> studies = appService.query(c);
+        if (studies.size() != 1) {
+            throw new Exception("BBP study not found");
+        }
+
+        Study bbpStudy = studies.get(0);
+
+        c = new HQLCriteria("from edu.ualberta.med.biobank.model.SampleType");
         List<SampleType> results = appService.query(c);
         if (results.size() == 0) {
             throw new Exception("not sample types in database");
@@ -289,9 +299,27 @@ public class InitExamples {
             }
 
             ss.setSampleType(type);
-            ss.setStudy(study);
+            ss.setStudy(bbpStudy);
 
-            appService.executeQuery(new InsertExampleQuery(ss));
+            SDKQueryResult res = appService
+                .executeQuery(new InsertExampleQuery(ss));
+            ss = (SampleStorage) res.getObjectResult();
+
+            System.out.println("sample storage study: "
+                + ss.getStudy().getName());
+        }
+
+        c = new HQLCriteria(
+            "from edu.ualberta.med.biobank.model.Study as study "
+                + "where study.nameShort=?");
+        c.setParameters(Arrays.asList(new Object[] { "BBP" }));
+        List<Study> studies2 = appService.query(c);
+        for (Study study : studies2) {
+            for (SampleStorage ss2 : study.getSampleStorageCollection()) {
+                System.out.println("sample storage: "
+                    + ss2.getSampleType().getName());
+            }
+
         }
     }
 
