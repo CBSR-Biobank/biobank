@@ -27,6 +27,7 @@ import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.PvInfo;
 import edu.ualberta.med.biobank.model.PvInfoPossible;
+import edu.ualberta.med.biobank.model.SampleStorage;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.Node;
@@ -139,6 +140,7 @@ public class StudyEntryForm extends BiobankEntryForm {
         // comments.setLayoutData(gd);
 
         createClinicSection();
+        createSampleStorageSection();
         createPvInfoSection();
         createButtonsSection();
     }
@@ -165,6 +167,14 @@ public class StudyEntryForm extends BiobankEntryForm {
             "Selected Clinics", "Available Clinics", 100);
         clinicsMultiSelect.adaptToToolkit(toolkit);
         clinicsMultiSelect.addSelections(availClinics, selClinics);
+    }
+
+    private void createSampleStorageSection() {
+        // SampleStorageWidget
+        Composite client = createSectionWithClient("Sample Storage");
+        Collection<SampleStorage> storageCollection = study
+            .getSampleStorageCollection();
+
     }
 
     private void createPvInfoSection() {

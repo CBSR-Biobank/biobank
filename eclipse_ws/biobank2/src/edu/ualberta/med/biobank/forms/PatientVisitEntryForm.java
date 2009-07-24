@@ -252,7 +252,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
                 ComboAndQuantity c = new ComboAndQuantity(client, SWT.BORDER);
                 c.adaptToToolkit(toolkit);
                 if (pvalArr != null) {
-                    c.addValues(pvalArr, 1, 5, 1);
+                    c.addValues(pvalArr);
                 }
                 if (value != null) {
                     String[] values = value.split(" ");

@@ -73,6 +73,7 @@ public class StudyGroup extends Node {
                 StudyAdapter node = (StudyAdapter) getChild(study.getId());
 
                 if (node == null) {
+                    // first time building the tree
                     node = new StudyAdapter(this, study);
                     addChild(node);
                 }
