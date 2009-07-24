@@ -176,6 +176,14 @@ public class BioBankPlugin extends AbstractUIPlugin {
             "Could not connect to server. Make sure server is running.");
     }
 
+    /**
+     * Display remote access error message
+     */
+    public static void openAccessDeniedErrorMessage() {
+        openAsyncError("Access Denied",
+            "You don't have rights to do this action.");
+    }
+
     public boolean isCancelBarcode(String code) {
         return getPreferenceStore().getString(
             PreferenceConstants.GENERAL_CANCEL).equals(code);

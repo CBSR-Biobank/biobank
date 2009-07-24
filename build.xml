@@ -210,8 +210,7 @@
 	 url="jdbc:mysql://${database.host}:${database.port}/${database.name}"
 	 userid="${database.username}"
 	 password="${database.password}">
-      <transaction src="${security.dir}/AuthSchemaMySQL.sql" />
-      <transaction src="${security.dir}/DataPrimingMySQL.sql" />
+      <transaction src="${security.dir}/schemaSecurityDump.sql" />
       <transaction>commit;</transaction>
       <classpath>
 	<fileset dir="${cacore.sdk.dir}/system/lib">

@@ -15,7 +15,6 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
-import org.springframework.remoting.RemoteAccessException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.forms.input.FormInput;
@@ -154,50 +153,44 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
     }
 
     @Override
-    public void saveForm() {
+    public void saveForm() throws Exception {
         clinic.setAddress(address);
         SiteAdapter siteAdapter = (SiteAdapter) clinicAdapter
             .getParentFromClass(SiteAdapter.class);
         clinic.setSite(siteAdapter.getSite());
 
-        try {
-            SDKQuery query;
-            SDKQueryResult result;
+        SDKQuery query;
+        SDKQueryResult result;
 
-            if ((clinic.getId() == null) && !checkClinicNameUnique()) {
-                setDirty(true);
-                return;
-            }
-
-            clinic.setAddress(address);
-            if ((clinic.getId() == null) || (clinic.getId() == 0)) {
-                Assert.isTrue(clinic.getAddress().getId() == null,
-                    "insert invoked on address already in database");
-
-                query = new InsertExampleQuery(clinic.getAddress());
-                result = appService.executeQuery(query);
-                clinic.setAddress((Address) result.getObjectResult());
-                query = new InsertExampleQuery(clinic);
-            } else {
-                Assert.isNotNull(clinic.getAddress().getId(),
-                    "update invoked on address not in database");
-
-                query = new UpdateExampleQuery(clinic.getAddress());
-                result = appService.executeQuery(query);
-                clinic.setAddress((Address) result.getObjectResult());
-                query = new UpdateExampleQuery(clinic);
-            }
-
-            result = appService.executeQuery(query);
-            clinic = (Clinic) result.getObjectResult();
-
-            clinicAdapter.getParent().performExpand();
-            getSite().getPage().closeEditor(this, false);
-        } catch (final RemoteAccessException exp) {
-            BioBankPlugin.openRemoteAccessErrorMessage();
-        } catch (Exception exp) {
-            exp.printStackTrace();
+        if ((clinic.getId() == null) && !checkClinicNameUnique()) {
+            setDirty(true);
+            return;
         }
+
+        clinic.setAddress(address);
+        if ((clinic.getId() == null) || (clinic.getId() == 0)) {
+            Assert.isTrue(clinic.getAddress().getId() == null,
+                "insert invoked on address already in database");
+
+            query = new InsertExampleQuery(clinic.getAddress());
+            result = appService.executeQuery(query);
+            clinic.setAddress((Address) result.getObjectResult());
+            query = new InsertExampleQuery(clinic);
+        } else {
+            Assert.isNotNull(clinic.getAddress().getId(),
+                "update invoked on address not in database");
+
+            query = new UpdateExampleQuery(clinic.getAddress());
+            result = appService.executeQuery(query);
+            clinic.setAddress((Address) result.getObjectResult());
+            query = new UpdateExampleQuery(clinic);
+        }
+
+        result = appService.executeQuery(query);
+        clinic = (Clinic) result.getObjectResult();
+
+        clinicAdapter.getParent().performExpand();
+        getSite().getPage().closeEditor(this, false);
     }
 
     private boolean checkClinicNameUnique() throws ApplicationException {
