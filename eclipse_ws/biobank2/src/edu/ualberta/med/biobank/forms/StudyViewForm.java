@@ -107,9 +107,9 @@ public class StudyViewForm extends BiobankViewForm {
     private void createSampleStorageSection() {
         Section section = createSection("Sample Storage");
 
-        String[] headings = new String[] { "Sample type", "Quantity", "Volume" };
+        String[] headings = new String[] { "Sample type", "Volume", "Quantity" };
         sampleStorageTable = new BiobankCollectionTable(section, SWT.NONE,
-            headings, FormUtils.toArray(study.getSampleStorageCollection()));
+            headings, ModelUtils.toArray(study.getSampleStorageCollection()));
         section.setClient(sampleStorageTable);
         sampleStorageTable.adaptToToolkit(toolkit);
         toolkit.paintBordersFor(sampleStorageTable);

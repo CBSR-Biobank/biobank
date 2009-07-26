@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.model;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
+import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
@@ -129,5 +130,21 @@ public class ModelUtils {
             query += " like '%" + text + "%'";
         }
         return appService.query(new HQLCriteria(query));
+    }
+
+    public static SampleStorage[] toArray(Collection<SampleStorage> collection) {
+        // hack required here because xxx.getXxxxCollection().toArray(new
+        // Xxx[0])
+        // returns Object[].
+        if ((collection != null) && (collection.size() == 0))
+            return null;
+
+        int count = 0;
+        SampleStorage[] arr = new SampleStorage[collection.size()];
+        for (SampleStorage ss : collection) {
+            arr[count] = ss;
+            ++count;
+        }
+        return arr;
     }
 }

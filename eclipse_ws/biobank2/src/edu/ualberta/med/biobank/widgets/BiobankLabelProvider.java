@@ -143,9 +143,9 @@ public class BiobankLabelProvider extends LabelProvider implements
             case 0:
                 return ss.getSampleType().getName();
             case 1:
-                return "" + ss.getQuantity();
-            case 2:
                 return "" + ss.getVolume();
+            case 2:
+                return "" + ss.getQuantity();
             }
         } else {
             Assert.isTrue(false, "invalid object type");

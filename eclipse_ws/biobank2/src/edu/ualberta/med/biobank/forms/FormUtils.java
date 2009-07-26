@@ -21,7 +21,6 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.model.Clinic;
-import edu.ualberta.med.biobank.model.SampleStorage;
 import edu.ualberta.med.biobank.treeview.ClinicAdapter;
 import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.widgets.BiobankCollectionTable;
@@ -132,21 +131,5 @@ public class FormUtils {
         if (value != null) {
             button.setSelection(value.booleanValue());
         }
-    }
-
-    public static SampleStorage[] toArray(Collection<SampleStorage> collection) {
-        // hack required here because xxx.getXxxxCollection().toArray(new
-        // Xxx[0])
-        // returns Object[].
-        if ((collection != null) && (collection.size() == 0))
-            return null;
-
-        int count = 0;
-        SampleStorage[] arr = new SampleStorage[collection.size()];
-        for (SampleStorage ss : collection) {
-            arr[count] = ss;
-            ++count;
-        }
-        return arr;
     }
 }

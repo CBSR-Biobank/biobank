@@ -1,10 +1,10 @@
-
 package edu.ualberta.med.biobank.widgets;
 
 import java.util.ArrayList;
 
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -51,8 +51,7 @@ public class PvInfoWidget extends BiobankWidget {
             if (pvInfoPossible.getIsDefault()) {
                 checkButton.setEnabled(false);
                 checkButton.setSelection(true);
-            }
-            else {
+            } else {
                 checkButton.setSelection(selected);
             }
 
@@ -81,60 +80,58 @@ public class PvInfoWidget extends BiobankWidget {
                         title = "Allowed Aliquot Volumes";
                         prompt = "Please enter a new volume:";
                         helpText = "To enter multiple volumes, separate with semicolon.";
-                    }
-                    else if (label.equals("Blood Received")) {
+                    } else if (label.equals("Blood Received")) {
                         title = "Allowed Blood Received Volumes";
                         prompt = "Please enter a new volume:";
                         helpText = "To enter multiple volumes, separate with semicolon.";
-                    }
-                    else if (label.equals("Visit Type")) {
+                    } else if (label.equals("Visit Type")) {
                         title = "Visit Type Values";
                         prompt = "Please enter a visit type:";
                         helpText = "To enter multiple visit type values, separate with semicolon.";
-                    }
-                    else if (label.equals("Consent")) {
+                    } else if (label.equals("Consent")) {
                         title = "Consent Types";
                         prompt = "Please enter a consent type:";
                         helpText = "To enter multiple consent values, separate with semicolon.";
-                    }
-                    else {
-                        Assert.isTrue(false, "invalid value for label " + label);
+                    } else {
+                        Assert
+                            .isTrue(false, "invalid value for label " + label);
                     }
 
-                    ListAddDialog dlg = new ListAddDialog(
-                        PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
+                    ListAddDialog dlg = new ListAddDialog(PlatformUI
+                        .getWorkbench().getActiveWorkbenchWindow().getShell(),
                         title, prompt, helpText);
-                    dlg.open();
+                    if (dlg.open() == Dialog.OK) {
+                        // make sure there are no duplicates
+                        String[] newItems = dlg.getResult();
+                        String[] currentItems = list.getItems();
+                        ArrayList<String> duplicates = new ArrayList<String>();
 
-                    // make sure there are no duplicates
-                    String [] newItems = dlg.getResult();
-                    String [] currentItems = list.getItems();
-                    ArrayList<String> duplicates = new ArrayList<String>();
-
-                    for (String newItem : newItems) {
-                        boolean found = false;
-                        for (String currentItem : currentItems) {
-                            if (currentItem.equals(newItem)) {
-                                found = true;
-                                duplicates.add(newItem);
-                                break;
+                        for (String newItem : newItems) {
+                            boolean found = false;
+                            for (String currentItem : currentItems) {
+                                if (currentItem.equals(newItem)) {
+                                    found = true;
+                                    duplicates.add(newItem);
+                                    break;
+                                }
                             }
+
+                            if (!found)
+                                list.add(newItem.trim());
                         }
 
-                        if (!found) list.add(newItem.trim());
-                    }
-
-                    int numDuplicates = duplicates.size();
-                    if (numDuplicates > 0) {
-                        String msg = "Value " + duplicates.get(0)
-                            + " already in " + title;
-                        if (numDuplicates > 1) {
-                            msg = "Values " + duplicates.toString()
+                        int numDuplicates = duplicates.size();
+                        if (numDuplicates > 0) {
+                            String msg = "Value " + duplicates.get(0)
                                 + " already in " + title;
+                            if (numDuplicates > 1) {
+                                msg = "Values " + duplicates.toString()
+                                    + " already in " + title;
+                            }
+                            BioBankPlugin.openError(title, msg);
                         }
-                        BioBankPlugin.openError(title, msg);
+                        checkButton.setSelection(true);
                     }
-                    checkButton.setSelection(true);
                 }
             });
 
@@ -158,18 +155,18 @@ public class PvInfoWidget extends BiobankWidget {
                     list.add(item);
                 }
             }
-            Menu m = new Menu(
-                PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
-                SWT.POP_UP);
+            Menu m = new Menu(PlatformUI.getWorkbench()
+                .getActiveWorkbenchWindow().getShell(), SWT.POP_UP);
 
             MenuItem mi = new MenuItem(m, SWT.CASCADE);
             mi.setText("Move to Top");
             mi.addSelectionListener(new SelectionListener() {
                 public void widgetSelected(SelectionEvent event) {
                     int index = list.getSelectionIndex();
-                    if (index <= 0) return;
-                    String [] items = list.getItems();
-                    String [] newList = new String [items.length];
+                    if (index <= 0)
+                        return;
+                    String[] items = list.getItems();
+                    String[] newList = new String[items.length];
                     newList[0] = items[index];
                     int i = 1;
                     for (String item : items) {
@@ -182,7 +179,8 @@ public class PvInfoWidget extends BiobankWidget {
                 }
 
                 @Override
-                public void widgetDefaultSelected(SelectionEvent e) {}
+                public void widgetDefaultSelected(SelectionEvent e) {
+                }
             });
 
             mi = new MenuItem(m, SWT.CASCADE);
@@ -190,9 +188,10 @@ public class PvInfoWidget extends BiobankWidget {
             mi.addSelectionListener(new SelectionListener() {
                 public void widgetSelected(SelectionEvent event) {
                     int index = list.getSelectionIndex();
-                    if (index <= 0) return;
-                    String [] items = list.getItems();
-                    String [] newList = new String [items.length];
+                    if (index <= 0)
+                        return;
+                    String[] items = list.getItems();
+                    String[] newList = new String[items.length];
                     int i = 0;
                     for (String item : items) {
                         if ((i < index - 1) || (i > index)) {
@@ -206,7 +205,8 @@ public class PvInfoWidget extends BiobankWidget {
                 }
 
                 @Override
-                public void widgetDefaultSelected(SelectionEvent e) {}
+                public void widgetDefaultSelected(SelectionEvent e) {
+                }
             });
 
             mi = new MenuItem(m, SWT.CASCADE);
@@ -214,9 +214,10 @@ public class PvInfoWidget extends BiobankWidget {
             mi.addSelectionListener(new SelectionListener() {
                 public void widgetSelected(SelectionEvent event) {
                     int index = list.getSelectionIndex();
-                    String [] items = list.getItems();
-                    if (index >= items.length - 1) return;
-                    String [] newList = new String [items.length];
+                    String[] items = list.getItems();
+                    if (index >= items.length - 1)
+                        return;
+                    String[] newList = new String[items.length];
                     int i = 0;
                     for (String item : items) {
                         if ((i < index) || (i > index + 1)) {
@@ -230,7 +231,8 @@ public class PvInfoWidget extends BiobankWidget {
                 }
 
                 @Override
-                public void widgetDefaultSelected(SelectionEvent e) {}
+                public void widgetDefaultSelected(SelectionEvent e) {
+                }
             });
 
             mi = new MenuItem(m, SWT.CASCADE);
@@ -238,9 +240,10 @@ public class PvInfoWidget extends BiobankWidget {
             mi.addSelectionListener(new SelectionListener() {
                 public void widgetSelected(SelectionEvent event) {
                     int index = list.getSelectionIndex();
-                    String [] items = list.getItems();
-                    if (index >= items.length - 1) return;
-                    String [] newList = new String [items.length];
+                    String[] items = list.getItems();
+                    if (index >= items.length - 1)
+                        return;
+                    String[] newList = new String[items.length];
                     int i = 0;
                     for (String item : items) {
                         if (!item.equals(items[index])) {
@@ -253,12 +256,12 @@ public class PvInfoWidget extends BiobankWidget {
                 }
 
                 @Override
-                public void widgetDefaultSelected(SelectionEvent e) {}
+                public void widgetDefaultSelected(SelectionEvent e) {
+                }
             });
 
             list.setMenu(m);
-        }
-        else {
+        } else {
             checkButton = new Button(this, SWT.CHECK);
             checkButton.setText(pvInfoPossible.getLabel());
             GridData gd = new GridData(GridData.VERTICAL_ALIGN_BEGINNING
@@ -268,8 +271,7 @@ public class PvInfoWidget extends BiobankWidget {
             if (pvInfoPossible.getIsDefault()) {
                 checkButton.setEnabled(false);
                 checkButton.setSelection(true);
-            }
-            else {
+            } else {
                 checkButton.setSelection(selected);
             }
         }

@@ -10,6 +10,7 @@ import java.util.Set;
 import org.apache.commons.collections.MapIterator;
 import org.apache.commons.collections.map.ListOrderedMap;
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -23,14 +24,17 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
 import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.dialogs.SampleStorageDialog;
 import edu.ualberta.med.biobank.forms.input.FormInput;
-import edu.ualberta.med.biobank.helpers.GetHelper;
 import edu.ualberta.med.biobank.model.Clinic;
+import edu.ualberta.med.biobank.model.ModelUtils;
 import edu.ualberta.med.biobank.model.PvInfo;
 import edu.ualberta.med.biobank.model.PvInfoPossible;
+import edu.ualberta.med.biobank.model.SampleStorage;
 import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
@@ -93,7 +97,7 @@ public class StudyEntryForm extends BiobankEntryForm {
 
     private ListOrderedMap combinedPvInfoMap;
 
-    private String[] sampleTypeNames;
+    private Collection<SampleType> sampleTypes;
 
     private BiobankCollectionTable sampleStorageTable;
 
@@ -182,41 +186,59 @@ public class StudyEntryForm extends BiobankEntryForm {
     }
 
     private void createSampleStorageSection() {
-        Composite client = createSectionWithClient("Sample Storage");
-        GetHelper<SampleType> helper = new GetHelper<SampleType>();
-        List<SampleType> sampleTypes = helper.getModelObjects(appService,
-            SampleType.class);
+        try {
+            Composite client = createSectionWithClient("Sample Storage");
+            SampleType searchObj = new SampleType();
+            sampleTypes = appService.search(SampleType.class, searchObj);
 
-        if (sampleTypes.size() == 0) {
-            toolkit.createLabel(client,
-                "*** no sample types defined for study ***");
-            return;
-        }
+            // TODO: from sampleTypes remove sample types already in
+            // study.getSampleStorageCollection()
 
-        int count = 0;
-        sampleTypeNames = new String[sampleTypes.size()];
-        for (SampleType sampleType : sampleTypes) {
-            sampleTypeNames[count] = sampleType.getName();
-            ++count;
-        }
-
-        GridLayout layout = new GridLayout(1, false);
-        client.setLayout(layout);
-        client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-
-        addSampleStorageButton = toolkit.createButton(client,
-            "Add Sample Storage", SWT.PUSH);
-        addSampleStorageButton.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
+            if (sampleTypes.size() == 0) {
+                toolkit.createLabel(client,
+                    "*** no sample types defined for study ***");
+                return;
             }
-        });
 
-        String[] headings = new String[] { "Sample type", "Quantity", "Volume" };
-        sampleStorageTable = new BiobankCollectionTable(client, SWT.NONE,
-            headings, FormUtils.toArray(study.getSampleStorageCollection()));
-        sampleStorageTable.adaptToToolkit(toolkit);
-        toolkit.paintBordersFor(sampleStorageTable);
+            GridLayout layout = new GridLayout(1, false);
+            client.setLayout(layout);
+            client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+            addSampleStorageButton = toolkit.createButton(client,
+                "Add Sample Storage", SWT.PUSH);
+            addSampleStorageButton.addSelectionListener(new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent e) {
+                    SampleStorageDialog dlg = new SampleStorageDialog(
+                        PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+                            .getShell(), new SampleStorage(), sampleTypes);
+                    if (dlg.open() == Dialog.OK) {
+                        SampleStorage ss = dlg.getSampleStorage();
+                        Collection<SampleStorage> collection = study
+                            .getSampleStorageCollection();
+                        if (collection == null) {
+                            collection = new HashSet<SampleStorage>();
+                        }
+                        collection.add(ss);
+                        sampleStorageTable.update();
+
+                        // TODO: table does not update due to model not managed
+                    }
+                }
+            });
+
+            String[] headings = new String[] { "Sample type", "Volume",
+                "Quantity" };
+            sampleStorageTable = new BiobankCollectionTable(client, SWT.NONE,
+                headings, ModelUtils
+                    .toArray(study.getSampleStorageCollection()));
+            sampleStorageTable.adaptToToolkit(toolkit);
+        } catch (final RemoteConnectFailureException exp) {
+            BioBankPlugin.openRemoteConnectErrorMessage();
+            toolkit.paintBordersFor(sampleStorageTable);
+        } catch (ApplicationException e1) {
+            e1.printStackTrace();
+        }
     }
 
     private void createPvInfoSection() {
