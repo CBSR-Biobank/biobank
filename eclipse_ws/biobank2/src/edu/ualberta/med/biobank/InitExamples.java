@@ -197,8 +197,8 @@ public class InitExamples {
             Arrays.asList(new ContainerType[] { paletteType }));
         hotel19Type = insertContainerTypeInSite("Hotel-19", "Row", "", 19, 1,
             Arrays.asList(new ContainerType[] { paletteType }));
-        freezerType = insertContainerTypeInSite("Freezer", "Row", "Column", 5,
-            6, Arrays.asList(new ContainerType[] { hotel13Type, hotel19Type }));
+        freezerType = insertContainerTypeInSite("Freezer", "Row", "Column", 3,
+            10, Arrays.asList(new ContainerType[] { hotel13Type, hotel19Type }));
         binType = insertContainerTypeInSite("Bin", "Row", "", 120, 1, null);
         drawerType = insertContainerTypeInSite("Drawer", "Row", "", 36, 1,
             Arrays.asList(new ContainerType[] { binType }));
@@ -229,34 +229,32 @@ public class InitExamples {
 
     private Container insertContainer(String name, ContainerType ct,
         Container parent, int pos1, int pos2) throws ApplicationException {
-        Container sc = new Container();
-        sc.setPositionCode(name);
-        sc.setProductBarcode(name);
-        sc.setSite(site);
-        sc.setContainerType(ct);
-        ContainerPosition cp = new ContainerPosition();
-        cp.setContainer(sc);
+        Container container = new Container();
+        container.setPositionCode(name);
+        container.setProductBarcode(name);
+        container.setSite(site);
+        container.setContainerType(ct);
         if (parent != null) {
-            cp.setParentContainer(parent);
-            cp.setPositionDimensionOne(pos1);
-            cp.setPositionDimensionTwo(pos2);
+            ContainerPosition pos = new ContainerPosition();
+            pos.setContainer(container);
+            pos.setParentContainer(parent);
+            pos.setPositionDimensionOne(pos1);
+            pos.setPositionDimensionTwo(pos2);
+            container.setPosition(pos);
         }
-        sc.setPosition(cp);
-        SDKQueryResult res = appService
-            .executeQuery(new InsertExampleQuery(sc));
+        SDKQueryResult res = appService.executeQuery(new InsertExampleQuery(
+            container));
         return (Container) res.getObjectResult();
     }
 
     private void insertContainers() throws ApplicationException {
-        Container freezer = insertContainer("Freezer1", freezerType, null, 0, 0);
-        Container hotel1 = insertContainer("Hotelaa", hotel19Type, freezer, 1,
-            1);
-        insertContainer("Palette1", paletteType, hotel1, 1, 1);
-        insertContainer("Palette2", paletteType, hotel1, 3, 1);
-        Container hotel2 = insertContainer("Hotelbb", hotel13Type, freezer, 2,
-            2);
-        insertContainer("Palette3", paletteType, hotel2, 1, 1);
-        insertContainer("Palette4", paletteType, hotel2, 5, 1);
+        Container freezer = insertContainer("FR01", freezerType, null, 0, 0);
+        Container hotel1 = insertContainer("AA", hotel19Type, freezer, 1, 1);
+        insertContainer("01", paletteType, hotel1, 1, 1);
+        insertContainer("03", paletteType, hotel1, 3, 1);
+        Container hotel2 = insertContainer("AE", hotel13Type, freezer, 2, 2);
+        insertContainer("01", paletteType, hotel2, 1, 1);
+        insertContainer("05", paletteType, hotel2, 5, 1);
     }
 
     private void insertSampleStorage() throws Exception {

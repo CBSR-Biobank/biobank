@@ -275,7 +275,7 @@ public class AddCabinetSampleEntryForm extends BiobankEntryForm implements
                     String positionString = cabinetPosition.getValue()
                         .toString();
 
-                    Container sc = ModelUtils.getContainerWithBarcode(
+                    Container sc = ModelUtils.getContainerWithPositionCode(
                         appService, positionString);
                     if (sc == null) {
                         SamplePosition sp = getSamplePosition(positionString);
@@ -324,13 +324,13 @@ public class AddCabinetSampleEntryForm extends BiobankEntryForm implements
         throws ApplicationException {
         int end = 2;
         String cabinetString = positionString.substring(0, end);
-        cabinet = ModelUtils.getContainerWithBarcode(appService, cabinetString);
+        cabinet = ModelUtils.getContainerWithPositionCode(appService, cabinetString);
         if (cabinet == null) {
             return null;
         }
         end += 2;
         String drawerString = positionString.substring(0, end);
-        drawer = ModelUtils.getContainerWithBarcode(appService, drawerString);
+        drawer = ModelUtils.getContainerWithPositionCode(appService, drawerString);
         if (drawer == null
             || !drawer.getPosition().getParentContainer().getId().equals(
                 cabinet.getId())) {
@@ -338,7 +338,7 @@ public class AddCabinetSampleEntryForm extends BiobankEntryForm implements
         }
         end += 2;
         String binString = positionString.substring(0, end);
-        bin = ModelUtils.getContainerWithBarcode(appService, binString);
+        bin = ModelUtils.getContainerWithPositionCode(appService, binString);
         if (bin == null
             || !bin.getPosition().getParentContainer().getId().equals(
                 drawer.getId())) {

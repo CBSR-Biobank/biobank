@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.model;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -17,8 +18,10 @@ public class ModelUtils {
         WritableApplicationService appService, Site site)
         throws ApplicationException {
         HQLCriteria criteria = new HQLCriteria("from "
-            + Container.class.getName() + " where site.id = " + site.getId()
-            + " and position.parentContainer is null");
+            + Container.class.getName()
+            + " where site.id=? and position is null");
+
+        criteria.setParameters(Arrays.asList(new Object[] { site.getId() }));
         return appService.query(criteria);
     }
 
@@ -58,7 +61,7 @@ public class ModelUtils {
         return null;
     }
 
-    public static Container getContainerWithBarcode(
+    public static Container getContainerWithPositionCode(
         WritableApplicationService appService, String barcode)
         throws ApplicationException {
         Container container = new Container();

@@ -665,7 +665,7 @@ public class AssignSamplesLocationEntryForm extends BiobankEntryForm implements
         currentPaletteSamples = null;
         String barcode = (String) paletteCodeValue.getValue();
         currentPalette = ModelUtils
-            .getContainerWithBarcode(appService, barcode);
+            .getContainerWithPositionCode(appService, barcode);
         if (currentPalette != null) {
             boolean result = MessageDialog
                 .openConfirm(PlatformUI.getWorkbench()

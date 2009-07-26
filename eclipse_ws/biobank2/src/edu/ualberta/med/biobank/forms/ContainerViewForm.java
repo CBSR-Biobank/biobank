@@ -1,7 +1,5 @@
 package edu.ualberta.med.biobank.forms;
 
-import java.util.List;
-
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -19,12 +17,12 @@ import edu.ualberta.med.biobank.model.ContainerCell;
 import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.ContainerStatus;
 import edu.ualberta.med.biobank.model.ContainerType;
+import edu.ualberta.med.biobank.model.ModelUtils;
 import edu.ualberta.med.biobank.treeview.ContainerAdapter;
 import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.widgets.CabinetDrawerWidget;
 import edu.ualberta.med.biobank.widgets.ChooseContainerWidget;
 import edu.ualberta.med.biobank.widgets.SamplesListWidget;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ContainerViewForm extends BiobankViewForm {
 
@@ -34,11 +32,15 @@ public class ContainerViewForm extends BiobankViewForm {
 
     private Container container;
 
+    private ContainerPosition position;
+
+    private Container parentContainer;
+
     private SamplesListWidget samplesWidget;
 
-    private Label nameLabel;
+    private Label positionCodeLabel;
 
-    private Label barCodeLabel;
+    private Label productBarcodeLabel;
 
     private Label activityStatusLabel;
 
@@ -65,6 +67,7 @@ public class ContainerViewForm extends BiobankViewForm {
             appService = containerAdapter.getAppService();
             retrieveContainer();
             setPartName("Container " + container.getPositionCode());
+            parentContainer = null;
         } else {
             Assert.isTrue(false, "Invalid editor input: object of type "
                 + node.getClass().getName());
@@ -72,15 +75,11 @@ public class ContainerViewForm extends BiobankViewForm {
     }
 
     private void retrieveContainer() {
-        List<Container> result;
-        Container searchContainer = new Container();
-        searchContainer.setId(containerAdapter.getContainer().getId());
         try {
-            result = appService.search(Container.class, searchContainer);
-            Assert.isTrue(result.size() == 1);
-            container = result.get(0);
+            container = (Container) ModelUtils.getObjectWithId(appService,
+                Container.class, containerAdapter.getContainer().getId());
             containerAdapter.setContainer(container);
-        } catch (ApplicationException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -110,9 +109,10 @@ public class ContainerViewForm extends BiobankViewForm {
         client.setLayoutData(gridData);
         toolkit.paintBordersFor(client);
 
-        nameLabel = (Label) createWidget(client, Label.class, SWT.NONE, "Name");
-        barCodeLabel = (Label) createWidget(client, Label.class, SWT.NONE,
-            "Bar Code");
+        positionCodeLabel = (Label) createWidget(client, Label.class, SWT.NONE,
+            "Position Code");
+        productBarcodeLabel = (Label) createWidget(client, Label.class,
+            SWT.NONE, "Product Bar Code");
         activityStatusLabel = (Label) createWidget(client, Label.class,
             SWT.NONE, "Activity Status");
         commentsLabel = (Label) createWidget(client, Label.class, SWT.NONE,
@@ -122,20 +122,28 @@ public class ContainerViewForm extends BiobankViewForm {
         temperatureLabel = (Label) createWidget(client, Label.class, SWT.NONE,
             "Temperature");
 
-        ContainerType containerType = container.getContainerType();
-        String label = containerType.getDimensionOneLabel();
-        if ((label != null) && (label.length() > 0)) {
-            positionDimOneLabel = (Label) createWidget(client, Label.class,
-                SWT.NONE, label);
-        }
+        position = container.getPosition();
 
-        label = containerType.getDimensionTwoLabel();
-        if ((label != null) && (label.length() > 0)) {
-            positionDimTwoLabel = (Label) createWidget(client, Label.class,
-                SWT.NONE, label);
+        if (position != null) {
+            parentContainer = position.getParentContainer();
+            Assert.isNotNull(parentContainer);
+            ContainerType parentContainerType = parentContainer
+                .getContainerType();
+            String label = parentContainerType.getDimensionOneLabel();
+            if ((label != null) && (label.length() > 0)) {
+                positionDimOneLabel = (Label) createWidget(client, Label.class,
+                    SWT.NONE, label);
+            }
+
+            label = parentContainerType.getDimensionTwoLabel();
+            if ((label != null) && (label.length() > 0)) {
+                positionDimTwoLabel = (Label) createWidget(client, Label.class,
+                    SWT.NONE, label);
+            }
         }
 
         setContainerValues();
+        ContainerType containerType = container.getContainerType();
         if (containerType.getChildContainerTypeCollection().size() > 0) {
             visualizeContainer();
         }
@@ -199,15 +207,15 @@ public class ContainerViewForm extends BiobankViewForm {
     }
 
     private void setContainerValues() {
-        FormUtils.setTextValue(nameLabel, container.getPositionCode());
-        FormUtils.setTextValue(barCodeLabel, container.getProductBarcode());
+        FormUtils.setTextValue(positionCodeLabel, container.getPositionCode());
+        FormUtils.setTextValue(productBarcodeLabel, container
+            .getProductBarcode());
         FormUtils.setTextValue(activityStatusLabel, container
             .getActivityStatus());
         FormUtils.setTextValue(commentsLabel, container.getComment());
         FormUtils.setTextValue(containerTypeLabel, container.getContainerType()
             .getName());
         FormUtils.setTextValue(temperatureLabel, container.getTemperature());
-        ContainerPosition position = container.getPosition();
         if (position != null) {
             if (positionDimOneLabel != null) {
                 FormUtils.setTextValue(positionDimOneLabel, position
