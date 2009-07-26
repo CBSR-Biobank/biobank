@@ -1,294 +1,298 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="biobank2" basedir="." default="sdk-and-scripts">
 
-  <!--
+	<!--
      Overall build file
      use command "ant -projecthelp" to display the targets.
     -->
 
-  <property environment="env" />
-  <property name="cacore.sdk.dir" location="caCORE_SDK/sdk" />
-  <property name="eclipse.proj.dir" location="eclipse_ws/biobank2" />
-  <property name="eclipse.proj.dir.importer"
+	<property environment="env" />
+	<property name="cacore.sdk.dir" location="caCORE_SDK/sdk" />
+	<property name="eclipse.proj.dir" location="eclipse_ws/biobank2" />
+	<property name="eclipse.proj.dir.importer"
 	    location="eclipse_ws/biobank2.importer" />
-  <property name="eclipse.proj.dir.junit"
+	<property name="eclipse.proj.dir.junit"
 	    location="eclipse_ws/biobank2.tests" />
-  <property name="scripts.proj.dir" location="scripts" />
-  <!--tp-->
-  <property name="model.proj.dir" location="model" />
-  <!--tp-->
-  <property name="data.dir" location="data" />
-  <property name="data.sql.dir" location="${data.dir}/sql" />
-  <property name="schema.dir" location="schema" />
-  <property name="security.dir" location="security" />
-  <property name="mysql.driver.string" value="org.gjt.mm.mysql.Driver" />
-  <property name="database.host" value="localhost" />
-  <property name="database.port" value="3306" />
-  <property name="database.name" value="biobank2" />
-  <property name="database.username" value="dummy" />
-  <property name="database.password" value="ozzy498" />
+	<property name="scripts.proj.dir" location="scripts" />
+	<!--tp-->
+	<property name="model.proj.dir" location="model" />
+	<!--tp-->
+	<property name="data.dir" location="data" />
+	<property name="data.sql.dir" location="${data.dir}/sql" />
+	<property name="schema.dir" location="schema" />
+	<property name="security.dir" location="security" />
+	<property name="mysql.driver.string" value="org.gjt.mm.mysql.Driver" />
+	<property name="database.host" value="localhost" />
+	<property name="database.port" value="3306" />
+	<property name="database.name" value="biobank2" />
+	<property name="database.username" value="dummy" />
+	<property name="database.password" value="ozzy498" />
 
-  <!--
+    <condition property="perl" value="perl" else="/usr/bin/perl">
+         <os family="windows" />
+     </condition>
+
+	<!--
      files included in the sdk build.xml - necessary to be sure that we have
      all the keys for the target we redefined
     -->
-  <property file="${cacore.sdk.dir}/installer.properties" />
-  <property file="${cacore.sdk.dir}/local.properties" />
-  <property file="${cacore.sdk.dir}/conf/deploy.properties" />
-  <property file="${cacore.sdk.dir}/build.properties" />
-  <property file="${cacore.sdk.dir}/${codegen.dir}/build.properties"
+	<property file="${cacore.sdk.dir}/installer.properties" />
+	<property file="${cacore.sdk.dir}/local.properties" />
+	<property file="${cacore.sdk.dir}/conf/deploy.properties" />
+	<property file="${cacore.sdk.dir}/build.properties" />
+	<property file="${cacore.sdk.dir}/${codegen.dir}/build.properties"
 	    prefix="codegen" />
-  <property file="${cacore.sdk.dir}/${codegen.validator.dir}/build.properties"
+	<property file="${cacore.sdk.dir}/${codegen.validator.dir}/build.properties"
 	    prefix="validator" />
-  <property file="${cacore.sdk.dir}/${system.dir}/build.properties"
+	<property file="${cacore.sdk.dir}/${system.dir}/build.properties"
 	    prefix="system" />
-  <property file="${cacore.sdk.dir}/${writable-api.dir}/build.properties"
+	<property file="${cacore.sdk.dir}/${writable-api.dir}/build.properties"
 	    prefix="writable-api" />
-  <property file="${cacore.sdk.dir}/${security.dir}/build.properties"
+	<property file="${cacore.sdk.dir}/${security.dir}/build.properties"
 	    prefix="security" />
-  <property file="${cacore.sdk.dir}/${grid-remoting.dir}/build.properties"
+	<property file="${cacore.sdk.dir}/${grid-remoting.dir}/build.properties"
 	    prefix="grid-remoting" />
-  <property file="${cacore.sdk.dir}/${grid-jaas.dir}/build.properties"
+	<property file="${cacore.sdk.dir}/${grid-jaas.dir}/build.properties"
 	    prefix="grid-jaas" />
-
-  <condition property="server-exclude-commons-logging"
+		
+	<condition property="server-exclude-commons-logging"
 	     value="commons-logging*.*"
 	     else="">
-    <equals arg1="${SERVER_TYPE}"
+		<equals arg1="${SERVER_TYPE}"
 	    arg2="jboss"
 	    casesensitive="false"
 	    trim="true" />
-  </condition>
-  <condition property="server-exclude-log4j" value="log4j*.*" else="">
-    <equals arg1="${SERVER_TYPE}"
+	</condition>
+	<condition property="server-exclude-log4j" value="log4j*.*" else="">
+		<equals arg1="${SERVER_TYPE}"
 	    arg2="jboss"
 	    casesensitive="false"
 	    trim="true" />
-  </condition>
-  <condition property="server-exclude-classes-list"
+	</condition>
+	<condition property="server-exclude-classes-list"
 	     value="**/log4j*.*"
 	     else="">
-    <equals arg1="${SERVER_TYPE}"
+		<equals arg1="${SERVER_TYPE}"
 	    arg2="jboss"
 	    casesensitive="false"
 	    trim="true" />
-  </condition>
-  <condition property="WRITABLE_API_EXTENSION_ENABLED"
+	</condition>
+	<condition property="WRITABLE_API_EXTENSION_ENABLED"
 	     value="true"
 	     else="false">
-    <or>
-      <equals arg1="${ENABLE_WRITABLE_API_EXTENSION}"
+		<or>
+			<equals arg1="${ENABLE_WRITABLE_API_EXTENSION}"
 	      arg2="true"
 	      casesensitive="false"
 	      trim="true" />
-      <equals arg1="${ENABLE_WRITABLE_API_EXTENSION}"
+			<equals arg1="${ENABLE_WRITABLE_API_EXTENSION}"
 	      arg2="yes"
 	      casesensitive="false"
 	      trim="true" />
-    </or>
-  </condition>
-  <condition property="read-api-exclude-list" value="" else="*.jar">
-    <equals arg1="${WRITABLE_API_EXTENSION_ENABLED}"
+		</or>
+	</condition>
+	<condition property="read-api-exclude-list" value="" else="*.jar">
+		<equals arg1="${WRITABLE_API_EXTENSION_ENABLED}"
 	    arg2="true"
 	    casesensitive="false"
 	    trim="true" />
-  </condition>
-  <condition property="SECURITY_ENABLED" value="true" else="false">
-    <or>
-      <equals arg1="${ENABLE_SECURITY}"
+	</condition>
+	<condition property="SECURITY_ENABLED" value="true" else="false">
+		<or>
+			<equals arg1="${ENABLE_SECURITY}"
 	      arg2="true"
 	      casesensitive="false"
 	      trim="true" />
-      <equals arg1="${ENABLE_SECURITY}"
+			<equals arg1="${ENABLE_SECURITY}"
 	      arg2="yes"
 	      casesensitive="false"
 	      trim="true" />
-    </or>
-  </condition>
-  <!-- end of copied part -->
+		</or>
+	</condition>
+	<!-- end of copied part -->
 
 
-  <target name="sdk" description="builds the caCORE SDK from the data model">
-    <copy file="sdk_conf/deploy.properties" tofile="${cacore.sdk.dir}/conf/deploy.properties" />
-    <ant dir="${cacore.sdk.dir}" target="build-system" inheritRefs="false" />
-    <fileset dir="${cacore.sdk.dir}/output/biobank2/package/remote-client/lib" id="sdk.jar.files">
-      <include name="*.jar" />
-    </fileset>
+	<target name="sdk" description="builds the caCORE SDK from the data model">
+		<copy file="sdk_conf/deploy.properties" tofile="${cacore.sdk.dir}/conf/deploy.properties" />
+		<ant dir="${cacore.sdk.dir}" target="build-system" inheritRefs="false" />
+		<fileset dir="${cacore.sdk.dir}/output/biobank2/package/remote-client/lib" id="sdk.jar.files">
+			<include name="*.jar" />
+		</fileset>
 
-    <pathconvert pathsep="," property="sdk.jar.files.basename" refid="sdk.jar.files">
-      <map from="${cacore.sdk.dir}/output/biobank2/package/remote-client/lib/" to="" />
-    </pathconvert>
+		<pathconvert pathsep="," property="sdk.jar.files.basename" refid="sdk.jar.files">
+			<map from="${cacore.sdk.dir}/output/biobank2/package/remote-client/lib/" to="" />
+		</pathconvert>
 
-  </target>
+	</target>
 
-  <target name="sdk-and-scripts" depends="sdk, package-webapp-orm" />
+	<target name="sdk-and-scripts" depends="sdk" />
 
-  <target name="deploy-eclipse"
+	<target name="deploy-eclipse"
 	  description="deploys the caCORE SDK beans to the eclipse project"
 	  depends="sdk-and-scripts">
-    <dependset>
-      <srcfilelist
+		<dependset>
+			<srcfilelist
          dir="${cacore.sdk.dir}/output/biobank2/package/remote-client/lib"
          files="*.jar" />
-      <targetfilelist dir="${eclipse.proj.dir}/lib" files="${sdk.jar.files.basename}"/>
-      <targetfilelist dir="${eclipse.proj.dir.importer}/lib" files="${sdk.jar.files.basename}"/>
-      <targetfilelist dir="${eclipse.proj.dir.test}/lib" files="${sdk.jar.files.basename}"/>
-    </dependset>
-    <copy todir="${eclipse.proj.dir}/lib">
-      <fileset dir="${cacore.sdk.dir}/output/biobank2/package/remote-client/lib" />
-    </copy>
-    <copy todir="${eclipse.proj.dir}/conf">
-      <fileset dir="${cacore.sdk.dir}/output/biobank2/package/remote-client/conf">
-	<include name="application-config-client*.xml" />
-      </fileset>
-    </copy>
-    <copy file="${cacore.sdk.dir}/output/biobank2/src/hibernate.cfg.xml"
+			<targetfilelist dir="${eclipse.proj.dir}/lib" files="${sdk.jar.files.basename}"/>
+			<targetfilelist dir="${eclipse.proj.dir.importer}/lib" files="${sdk.jar.files.basename}"/>
+			<targetfilelist dir="${eclipse.proj.dir.test}/lib" files="${sdk.jar.files.basename}"/>
+		</dependset>
+		<copy todir="${eclipse.proj.dir}/lib">
+			<fileset dir="${cacore.sdk.dir}/output/biobank2/package/remote-client/lib" />
+		</copy>
+		<copy todir="${eclipse.proj.dir}/conf">
+			<fileset dir="${cacore.sdk.dir}/output/biobank2/package/remote-client/conf">
+				<include name="application-config-client*.xml" />
+			</fileset>
+		</copy>
+		<copy file="${cacore.sdk.dir}/output/biobank2/src/hibernate.cfg.xml"
 	  tofile="${eclipse.proj.dir}/lib/hibernate.cfg.xml" />
-    <copy todir="${eclipse.proj.dir.importer}/lib" >
-      <fileset dir="${cacore.sdk.dir}/output/biobank2/package/remote-client/lib" />
-    </copy>
-    <copy todir="${eclipse.proj.dir.importer}/conf">
-      <fileset dir="${cacore.sdk.dir}/output/biobank2/package/remote-client/conf">
-	<include name="application-config-client*.xml" />
-      </fileset>
-    </copy>
+		<copy todir="${eclipse.proj.dir.importer}/lib" >
+			<fileset dir="${cacore.sdk.dir}/output/biobank2/package/remote-client/lib" />
+		</copy>
+		<copy todir="${eclipse.proj.dir.importer}/conf">
+			<fileset dir="${cacore.sdk.dir}/output/biobank2/package/remote-client/conf">
+				<include name="application-config-client*.xml" />
+			</fileset>
+		</copy>
 
-    <copy todir="${eclipse.proj.dir.junit}/lib">
-      <fileset dir="${cacore.sdk.dir}/output/biobank2/package/remote-client/lib" />
-    </copy>
-    <copy todir="${eclipse.proj.dir.junit}/conf">
-      <fileset dir="${cacore.sdk.dir}/output/biobank2/package/remote-client/conf">
-	<include name="application-config-client*.xml" />
-      </fileset>
-    </copy>
-  </target>
+		<copy todir="${eclipse.proj.dir.junit}/lib">
+			<fileset dir="${cacore.sdk.dir}/output/biobank2/package/remote-client/lib" />
+		</copy>
+		<copy todir="${eclipse.proj.dir.junit}/conf">
+			<fileset dir="${cacore.sdk.dir}/output/biobank2/package/remote-client/conf">
+				<include name="application-config-client*.xml" />
+			</fileset>
+		</copy>
+	</target>
 
-  <target name="deploy-jboss"
+	<target name="deploy-jboss"  depends="package-webapp-orm"
 	  description="deploys the caCORE SDK webapp to JBoss">
-    <fail unless="env.JBOSS_HOME" message="$JBOSS_HOME not defined" />
-    <copy file="${security.dir}/jboss/login-config.xml"
+		<fail unless="env.JBOSS_HOME" message="$JBOSS_HOME not defined" />
+		<copy file="${security.dir}/jboss/login-config.xml"
 	  tofile="${env.JBOSS_HOME}/server/default/conf/login-config.xml" overwrite="true" />
-    <copy file="${security.dir}/jboss/mysql-ds.xml"
+		<copy file="${security.dir}/jboss/mysql-ds.xml"
 	  tofile="${env.JBOSS_HOME}/server/default/deploy/mysql-ds.xml" overwrite="true"/>
-    <copy file="${security.dir}/jboss/upt.war"
+		<copy file="${security.dir}/jboss/upt.war"
 	  tofile="${env.JBOSS_HOME}/server/default/deploy/upt.war" overwrite="true"/>
-    <copy file="${cacore.sdk.dir}/output/biobank2/package/webapp/biobank2.war"
+		<copy file="${cacore.sdk.dir}/output/biobank2/package/webapp/biobank2.war"
 	  tofile="${env.JBOSS_HOME}/server/default/deploy/biobank2.war" overwrite="true"/>
-  </target>
+	</target>
 
-  <target name="deploy" description="deploys to JBoss and Eclipse project">
-    <antcall target="deploy-eclipse" />
-    <antcall target="deploy-jboss" />
-  </target>
+	<target name="deploy" description="deploys to JBoss and Eclipse project">
+		<antcall target="deploy-eclipse" />
+		<antcall target="deploy-jboss" />
+	</target>
 
-  <target name="schema"
+	<target name="schema"
 	  description="generates the database schema for the caCORE SDK data model">
-    <ant dir="${schema.dir}" target="schemaexport" inheritRefs="false" />
-  </target>
+		<ant dir="${schema.dir}" target="schemaexport" inheritRefs="false" />
+	</target>
 
-  <target name="dbcreate" description="creates the default tables">
-    <antcall target="schema" />
-    <sql driver="${mysql.driver.string}"
+	<target name="dbcreate" description="creates the default tables">
+		<antcall target="schema" />
+		<sql driver="${mysql.driver.string}"
 	 url="jdbc:mysql://${database.host}:${database.port}/${database.name}"
 	 userid="${database.username}"
 	 password="${database.password}">
-      <transaction src="${data.sql.dir}/pvInfoPossible.sql" />
-      <transaction src="${data.sql.dir}/sampleSources.sql" />
-      <transaction src="${data.sql.dir}/sampleTypes.sql" />
-      <transaction src="${security.dir}/schemaSecurityDump.sql" />
-      <transaction>commit;</transaction>
-      <classpath>
-	<fileset dir="${cacore.sdk.dir}/system/lib">
-	  <include name="*.jar" />
-	</fileset>
-      </classpath>
-    </sql>
-  </target>
+			<transaction src="${data.sql.dir}/pvInfoPossible.sql" />
+			<transaction src="${data.sql.dir}/sampleSources.sql" />
+			<transaction src="${data.sql.dir}/sampleTypes.sql" />
+			<transaction src="${security.dir}/schemaSecurityDump.sql" />
+			<transaction>commit;</transaction>
+			<classpath>
+				<fileset dir="${cacore.sdk.dir}/system/lib">
+					<include name="*.jar" />
+				</fileset>
+			</classpath>
+		</sql>
+	</target>
 
-  <!--Add the length="#" field into .hbm.xml, references the biobank.uml file for the VARCHAR(#) -->
-  <target name="string-length-field-addition"
+	<!--Add the length="#" field into .hbm.xml, references the biobank.uml file for the VARCHAR(#) -->
+	<target name="string-length-field-addition"
 	  description="Add the length='#' field into .hbm.xml, references the biobank.uml file for the VARCHAR(#)">
-    <exec executable="/usr/bin/perl">
-      <env key="PATH" path="${scripts.proj.dir}" />
-      <arg value="${scripts.proj.dir}/hbmstringlength.pl" />
-      <arg value="${model.proj.dir}/biobank2.uml" />
-      <arg value="${cacore.sdk.dir}/output/biobank2/src/edu/ualberta/med/biobank/model" />
-      <arg value="0" />
-      <!--Verbose-->
-    </exec>
-  </target>
+		<exec executable="${perl}">
+			<env key="PATH" path="${scripts.proj.dir}" />
+			<arg value="${scripts.proj.dir}/hbmstringlength.pl" />
+			<arg value="${model.proj.dir}/biobank2.uml" />
+			<arg value="${cacore.sdk.dir}/output/biobank2/src/edu/ualberta/med/biobank/model" />
+			<arg value="0" />
+			<!--Verbose-->
+		</exec>
+	</target>
 
-  <target name="package-codegen-orm"
+	<target name="package-codegen-orm"
 	  description="REDO:: Packages the generated ORM and bean artifacts"
 	  depends="string-length-field-addition">
-    <jar destfile="${cacore.sdk.dir}\${build.jar.dir}\${orm.file}"
+		<jar destfile="${cacore.sdk.dir}\${build.jar.dir}\${orm.file}"
 	 basedir="${cacore.sdk.dir}\${output.src.dir}">
-      <manifest>
-	<attribute name="Generated-By"
+			<manifest>
+				<attribute name="Generated-By"
 		   value="caCORE SDK Code Generator" />
-	<attribute name="Version" value="${VERSION}" />
-      </manifest>
-      <include name="**/*.hbm.xml" />
-      <include name="*.cfg.xml" />
-      <include name="ehcache.xml" />
-      <exclude name="${csm.security.config.file}" />
-    </jar>
-  </target>
+				<attribute name="Version" value="${VERSION}" />
+			</manifest>
+			<include name="**/*.hbm.xml" />
+			<include name="*.cfg.xml" />
+			<include name="ehcache.xml" />
+			<exclude name="${csm.security.config.file}" />
+		</jar>
+	</target>
 
-  <!-- copied from sdk build.xml -->
-  <target name="package-webapp-orm" depends="package-codegen-orm">
-    <war destfile="${cacore.sdk.dir}\${package.system.dir}\${PROJECT_NAME}.war"
+	<!-- copied from sdk build.xml -->
+	<target name="package-webapp-orm" depends="package-codegen-orm">
+		<war destfile="${cacore.sdk.dir}\${package.system.dir}\${PROJECT_NAME}.war"
 	 webxml="${cacore.sdk.dir}\${build.conf.web-inf.dir}\web.xml">
-      <manifest>
-	<attribute name="Generated-By"
+			<manifest>
+				<attribute name="Generated-By"
 		   value="biobank2 caCORE SDK Code Generator" />
-	<attribute name="Version" value="${VERSION}" />
-      </manifest>
-      <lib dir="${cacore.sdk.dir}\${system.dir}\${system.dist.dir}"
+				<attribute name="Version" value="${VERSION}" />
+			</manifest>
+			<lib dir="${cacore.sdk.dir}\${system.dir}\${system.dist.dir}"
 	   includes="*.jar" />
-      <lib dir="${cacore.sdk.dir}\${writable-api.dir}\${writable-api.dist.dir}"
+			<lib dir="${cacore.sdk.dir}\${writable-api.dir}\${writable-api.dist.dir}"
 	   includes="*.jar">
-	<exclude name="${read-api-exclude-list}" />
-      </lib>
-      <lib dir="${cacore.sdk.dir}\${build.jar.dir}"
+				<exclude name="${read-api-exclude-list}" />
+			</lib>
+			<lib dir="${cacore.sdk.dir}\${build.jar.dir}"
 	   includes="${bean.file}" />
-      <lib dir="${cacore.sdk.dir}\${build.jar.dir}"
+			<lib dir="${cacore.sdk.dir}\${build.jar.dir}"
 	   includes="${orm.file}" />
-      <lib dir="${cacore.sdk.dir}\${system.dir}\${system.lib.dir}"
+			<lib dir="${cacore.sdk.dir}\${system.dir}\${system.lib.dir}"
 	   includes="*.jar">
-	<exclude name="${server-exclude-commons-logging}" />
-	<exclude name="${server-exclude-log4j}" />
-	<exclude name="servlet.jar" />
-	<exclude name="xercesImpl*.*" />
-	<exclude name="cog*.*" />
-      </lib>
-      <lib dir="${cacore.sdk.dir}\${grid-jaas.dir}\${grid-jaas.dist.dir}"
+				<exclude name="${server-exclude-commons-logging}" />
+				<exclude name="${server-exclude-log4j}" />
+				<exclude name="servlet.jar" />
+				<exclude name="xercesImpl*.*" />
+				<exclude name="cog*.*" />
+			</lib>
+			<lib dir="${cacore.sdk.dir}\${grid-jaas.dir}\${grid-jaas.dist.dir}"
 	   includes="*.*"
 	   excludes="${grid-jaas.file.output.jaas.jndibinder.name}" />
-      <fileset dir="${cacore.sdk.dir}\${build.conf.system.web.dir}">
-	<include name="**/*" />
-	<exclude name="**/web.xml" />
-	<exclude name="${server-exclude-classes-list}" />
-      </fileset>
-      <fileset dir="${cacore.sdk.dir}\${system.dir}\${system.web.dir}">
-	<include name="**/*" />
-      </fileset>
-      <fileset dir="${cacore.sdk.dir}\${build.dir}">
-	<include name="docs/**/*" />
-      </fileset>
-      <classes dir="${cacore.sdk.dir}\${output.src.dir}">
-	<include name="${csm.security.config.file}" />
-	<include name="${csm.ehcache.file}" />
-	<include name="${clm.object.state.logger.config}" />
-      </classes>
-      <webinf dir="${cacore.sdk.dir}\${output.src.dir}">
-	<include name="server-config.wsdd" />
-      </webinf>
-    </war>
-  </target>
+			<fileset dir="${cacore.sdk.dir}\${build.conf.system.web.dir}">
+				<include name="**/*" />
+				<exclude name="**/web.xml" />
+				<exclude name="${server-exclude-classes-list}" />
+			</fileset>
+			<fileset dir="${cacore.sdk.dir}\${system.dir}\${system.web.dir}">
+				<include name="**/*" />
+			</fileset>
+			<fileset dir="${cacore.sdk.dir}\${build.dir}">
+				<include name="docs/**/*" />
+			</fileset>
+			<classes dir="${cacore.sdk.dir}\${output.src.dir}">
+				<include name="${csm.security.config.file}" />
+				<include name="${csm.ehcache.file}" />
+				<include name="${clm.object.state.logger.config}" />
+			</classes>
+			<webinf dir="${cacore.sdk.dir}\${output.src.dir}">
+				<include name="server-config.wsdd" />
+			</webinf>
+		</war>
+	</target>
 
-  <target name="clean">
-    <ant dir="${cacore.sdk.dir}" target="clean" inheritRefs="false" />
-  </target>
+	<target name="clean">
+		<ant dir="${cacore.sdk.dir}" target="clean" inheritRefs="false" />
+	</target>
 
 </project>
