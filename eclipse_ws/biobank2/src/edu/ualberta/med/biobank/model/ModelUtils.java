@@ -62,7 +62,7 @@ public class ModelUtils {
         WritableApplicationService appService, String barcode)
         throws ApplicationException {
         Container container = new Container();
-        container.setBarcode(barcode);
+        container.setProductBarcode(barcode);
         List<Container> containers = appService.search(Container.class,
             container);
         if (containers.size() == 1) {
@@ -87,9 +87,11 @@ public class ModelUtils {
             // containerPosition = parent.getPosition();
             // parent = containerPosition.getParentContainer();
             // }
-            // positionString = container.getBarcode() + ":" + positionString;
+            // positionString = container.getProductBarcode() + ":" +
+            // positionString;
             // return positionString;
-            String containerPositionBarcode = position.getContainer().getName();
+            String containerPositionBarcode = position.getContainer()
+                .getPositionCode();
             return containerPositionBarcode + getPositionString(position);
         }
     }

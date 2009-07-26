@@ -230,8 +230,8 @@ public class InitExamples {
     private Container insertContainer(String name, ContainerType ct,
         Container parent, int pos1, int pos2) throws ApplicationException {
         Container sc = new Container();
-        sc.setName(name);
-        sc.setBarcode(name);
+        sc.setPositionCode(name);
+        sc.setProductBarcode(name);
         sc.setSite(site);
         sc.setContainerType(ct);
         ContainerPosition cp = new ContainerPosition();
@@ -301,8 +301,7 @@ public class InitExamples {
             ss.setSampleType(type);
             ss.setStudy(bbpStudy);
 
-            SDKQueryResult res = appService
-                .executeQuery(new InsertExampleQuery(ss));
+            appService.executeQuery(new InsertExampleQuery(ss));
         }
     }
 

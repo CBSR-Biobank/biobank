@@ -64,7 +64,7 @@ public class ContainerViewForm extends BiobankViewForm {
             containerAdapter = (ContainerAdapter) node;
             appService = containerAdapter.getAppService();
             retrieveContainer();
-            setPartName("Container " + container.getName());
+            setPartName("Container " + container.getPositionCode());
         } else {
             Assert.isTrue(false, "Invalid editor input: object of type "
                 + node.getClass().getName());
@@ -87,7 +87,7 @@ public class ContainerViewForm extends BiobankViewForm {
 
     @Override
     protected void createFormContent() {
-        form.setText("Container " + container.getName());
+        form.setText("Container " + container.getPositionCode());
         form.getBody().setLayout(new GridLayout(1, false));
 
         addRefreshToolbarAction();
@@ -199,8 +199,8 @@ public class ContainerViewForm extends BiobankViewForm {
     }
 
     private void setContainerValues() {
-        FormUtils.setTextValue(nameLabel, container.getName());
-        FormUtils.setTextValue(barCodeLabel, container.getBarcode());
+        FormUtils.setTextValue(nameLabel, container.getPositionCode());
+        FormUtils.setTextValue(barCodeLabel, container.getProductBarcode());
         FormUtils.setTextValue(activityStatusLabel, container
             .getActivityStatus());
         FormUtils.setTextValue(commentsLabel, container.getComment());
@@ -232,8 +232,8 @@ public class ContainerViewForm extends BiobankViewForm {
     @Override
     protected void reload() {
         retrieveContainer();
-        setPartName("Container " + container.getName());
-        form.setText("Container " + container.getName());
+        setPartName("Container " + container.getPositionCode());
+        form.setText("Container " + container.getPositionCode());
         setContainerValues();
     }
 

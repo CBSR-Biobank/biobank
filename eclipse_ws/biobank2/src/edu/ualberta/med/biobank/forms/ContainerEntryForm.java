@@ -88,7 +88,7 @@ public class ContainerEntryForm extends BiobankEntryForm {
         if (container.getId() == null) {
             setPartName("Container");
         } else {
-            setPartName("Container " + container.getName());
+            setPartName("Container " + container.getPositionCode());
         }
     }
 
@@ -305,16 +305,17 @@ public class ContainerEntryForm extends BiobankEntryForm {
         HQLCriteria c = new HQLCriteria(
             "from edu.ualberta.med.biobank.model.Container as sc "
                 + "inner join fetch sc.site " + "where sc.site.id='"
-                + site.getId() + "' " + "and (sc.name = '"
-                + container.getName() + "' " + "or sc.barcode = '"
-                + container.getBarcode() + "')");
+                + site.getId() + "' " + "and (sc.positionCode = '"
+                + container.getPositionCode() + "' "
+                + "or sc.productBarcode = '" + container.getProductBarcode()
+                + "')");
 
         List<Object> results = appService.query(c);
         if (results.size() == 0)
             return true;
 
         BioBankPlugin.openAsyncError("Site Name Problem",
-            "A storage container with name \"" + container.getName()
+            "A storage container with name \"" + container.getPositionCode()
                 + "\" already exists.");
         return false;
     }

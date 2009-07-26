@@ -35,13 +35,13 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.forms.listener.CancelConfirmKeyListener;
 import edu.ualberta.med.biobank.forms.listener.EnterKeyToNextFieldListener;
+import edu.ualberta.med.biobank.model.Container;
+import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.ModelUtils;
 import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.Sample;
 import edu.ualberta.med.biobank.model.SamplePosition;
 import edu.ualberta.med.biobank.model.SampleType;
-import edu.ualberta.med.biobank.model.Container;
-import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.PatientVisitAdapter;
 import edu.ualberta.med.biobank.validators.CabinetPositionCodeValidator;
@@ -275,9 +275,8 @@ public class AddCabinetSampleEntryForm extends BiobankEntryForm implements
                     String positionString = cabinetPosition.getValue()
                         .toString();
 
-                    Container sc = ModelUtils
-                        .getContainerWithBarcode(appService,
-                            positionString);
+                    Container sc = ModelUtils.getContainerWithBarcode(
+                        appService, positionString);
                     if (sc == null) {
                         SamplePosition sp = getSamplePosition(positionString);
                         if (sp == null) {
@@ -285,16 +284,16 @@ public class AddCabinetSampleEntryForm extends BiobankEntryForm implements
                                 "Parent containers not found");
                             return;
                         }
-                        Point drawerPosition = new Point(
-                            drawer.getPosition()
-                                .getPositionDimensionOne() - 1, drawer
-                                .getPosition()
-                                .getPositionDimensionTwo() - 1);
+                        Point drawerPosition = new Point(drawer.getPosition()
+                            .getPositionDimensionOne() - 1, drawer
+                            .getPosition().getPositionDimensionTwo() - 1);
                         cabinetWidget.setSelectedBox(drawerPosition);
-                        cabinetLabel.setText("Cabinet " + cabinet.getBarcode());
+                        cabinetLabel.setText("Cabinet "
+                            + cabinet.getPositionCode());
                         drawerWidget.setSelectedBin(bin.getPosition()
                             .getPositionDimensionTwo());
-                        drawerLabel.setText("Drawer " + drawer.getBarcode());
+                        drawerLabel.setText("Drawer "
+                            + drawer.getPositionCode());
 
                         sp.setSample(sample);
                         sample.setSamplePosition(sp);
@@ -325,18 +324,16 @@ public class AddCabinetSampleEntryForm extends BiobankEntryForm implements
         throws ApplicationException {
         int end = 2;
         String cabinetString = positionString.substring(0, end);
-        cabinet = ModelUtils.getContainerWithBarcode(appService,
-            cabinetString);
+        cabinet = ModelUtils.getContainerWithBarcode(appService, cabinetString);
         if (cabinet == null) {
             return null;
         }
         end += 2;
         String drawerString = positionString.substring(0, end);
-        drawer = ModelUtils.getContainerWithBarcode(appService,
-            drawerString);
+        drawer = ModelUtils.getContainerWithBarcode(appService, drawerString);
         if (drawer == null
-            || !drawer.getPosition().getParentContainer().getId()
-                .equals(cabinet.getId())) {
+            || !drawer.getPosition().getParentContainer().getId().equals(
+                cabinet.getId())) {
             return null;
         }
         end += 2;

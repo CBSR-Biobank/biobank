@@ -38,7 +38,7 @@ public class ContainerAdapter extends Node {
     @Override
     public String getName() {
         Assert.isNotNull(container, "container is null");
-        return container.getName();
+        return container.getPositionCode();
     }
 
     @Override
@@ -124,7 +124,7 @@ public class ContainerAdapter extends Node {
         } catch (Exception e) {
             SessionManager.getLogger().error(
                 "Error while loading storage container group children for storage container "
-                    + container.getName(), e);
+                    + container.getPositionCode(), e);
         }
     }
 
