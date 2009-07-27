@@ -25,21 +25,26 @@ public class ModelUtils {
         return appService.query(criteria);
     }
 
-    public static Container newContainer(Container parent) {
-        Container newContainer = new Container();
-        ContainerPosition position = new ContainerPosition();
-        position.setParentContainer(parent);
-        position.setContainer(newContainer);
-        newContainer.setPosition(position);
-        return newContainer;
-    }
-
     public static Object getObjectWithId(WritableApplicationService appService,
         Class<?> classType, Integer id) throws Exception {
         Constructor<?> constructor = classType.getConstructor();
         Object instance = constructor.newInstance();
         Method setIdMethod = classType.getMethod("setId", Integer.class);
         setIdMethod.invoke(instance, id);
+
+        List<?> list = appService.search(classType, instance);
+        Assert.isTrue(list.size() == 1);
+        return list.get(0);
+    }
+
+    public static Object getObjectWithAttr(
+        WritableApplicationService appService, Class<?> classType, String attr,
+        Object value) throws Exception {
+        Constructor<?> constructor = classType.getConstructor();
+        Object instance = constructor.newInstance();
+        attr = "set" + attr.substring(0, 1).toUpperCase() + attr.substring(1);
+        Method setIdMethod = classType.getMethod(attr, Integer.class);
+        setIdMethod.invoke(instance, value);
 
         List<?> list = appService.search(classType, instance);
         Assert.isTrue(list.size() == 1);
@@ -61,7 +66,7 @@ public class ModelUtils {
         return null;
     }
 
-    public static Container getContainerWithProductCode(
+    public static Container getContainerWithLabel(
         WritableApplicationService appService, String barcode)
         throws ApplicationException {
         Container container = new Container();
@@ -83,7 +88,7 @@ public class ModelUtils {
             int dim2 = position.getPositionDimensionTwo();
             String dim1String = String.valueOf((char) ('A' + dim1));
             String dim2String = String.valueOf(dim2);
-            return position.getContainer().getPositionCode() + dim1String
+            return position.getContainer().getLabel() + dim1String
                 + dim2String;
         }
     }

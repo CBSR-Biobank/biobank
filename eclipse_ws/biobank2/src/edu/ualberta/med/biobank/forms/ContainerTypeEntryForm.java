@@ -2,7 +2,6 @@ package edu.ualberta.med.biobank.forms;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -12,8 +11,9 @@ import org.apache.log4j.Logger;
 import org.eclipse.core.databinding.beans.PojoObservables;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.IMessageProvider;
+import org.eclipse.jface.viewers.ComboViewer;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
@@ -28,7 +28,7 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.helpers.GetHelper;
 import edu.ualberta.med.biobank.model.Capacity;
-import edu.ualberta.med.biobank.model.ContainerNumScheme;
+import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.model.Site;
@@ -56,7 +56,9 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
 
     private static final String MSG_STORAGE_TYPE_OK = "Editing an existing storage type.";
 
-    private static final String MSG_NO_STORAGE_TYPE_NAME = "Storage type must have a name";
+    private static final String MSG_NO_CONTAINER_TYPE_NAME = "Container type must have a name";
+
+    public static final String MSG_CHILD_LABELING_SCHEME_EMPTY = "Select a child labeling scheme";
 
     static Logger log4j = Logger.getLogger(SessionManager.class.getName());
 
@@ -78,9 +80,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
 
     private MultiSelectListener multiSelectListener;
 
-    private CCombo numSchemeCombo;
-
-    private HashMap<String, ContainerNumScheme> numSchemeMap;
+    private ComboViewer labelingSchemeComboViewer;
 
     public ContainerTypeEntryForm() {
         super();
@@ -130,57 +130,53 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
     }
 
     protected void createContainerTypeSection() {
-        Composite client = toolkit.createComposite(form.getBody());
-        GridLayout layout = new GridLayout(2, false);
-        layout.horizontalSpacing = 10;
-        client.setLayout(layout);
-        client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        toolkit.paintBordersFor(client);
-
-        createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Name", null,
-            PojoObservables.observeValue(containerType, "name"),
-            NonEmptyString.class, MSG_NO_STORAGE_TYPE_NAME);
-
-        createBoundWidgetWithLabel(client, Text.class, SWT.NONE,
-            "Default Temperature\n(Celcius)", null, PojoObservables
-                .observeValue(containerType, "defaultTemperature"),
-            DoubleNumber.class, "Default temperature is not a valid number");
-
-        getNuberingSchemes();
-        Assert.isTrue(numSchemeMap.size() > 0);
-        toolkit.createLabel(client, "Numbering Scheme:");
-        numSchemeCombo = new CCombo(client, SWT.READ_ONLY);
-        numSchemeCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        for (String schemeName : numSchemeMap.keySet()) {
-            numSchemeCombo.add(schemeName);
-        }
-        ContainerNumScheme scheme = containerType.getNumberingScheme();
-        if (scheme != null) {
-            numSchemeCombo.setText(scheme.getName());
-        }
-
-        createBoundWidgetWithLabel(client, Combo.class, SWT.NONE,
-            "Activity Status", FormConstants.ACTIVITY_STATUS, PojoObservables
-                .observeValue(containerType, "activityStatus"), null, null);
-
-        Text comment = (Text) createBoundWidgetWithLabel(client, Text.class,
-            SWT.MULTI, "Comments", null, PojoObservables.observeValue(
-                containerType, "comment"), null, null);
-        GridData gd = new GridData(GridData.FILL_HORIZONTAL);
-        gd.heightHint = 40;
-        comment.setLayoutData(gd);
-    }
-
-    private void getNuberingSchemes() {
         try {
-            numSchemeMap = new HashMap<String, ContainerNumScheme>();
-            List<ContainerNumScheme> numSchemes;
-            numSchemes = appService.search(ContainerNumScheme.class,
-                new ContainerNumScheme());
-            Assert.isNotNull(numSchemes);
-            for (ContainerNumScheme scheme : numSchemes) {
-                numSchemeMap.put(scheme.getName(), scheme);
+            Composite client = toolkit.createComposite(form.getBody());
+            GridLayout layout = new GridLayout(2, false);
+            layout.horizontalSpacing = 10;
+            client.setLayout(layout);
+            client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+            toolkit.paintBordersFor(client);
+
+            createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Name",
+                null, PojoObservables.observeValue(containerType, "name"),
+                NonEmptyString.class, MSG_NO_CONTAINER_TYPE_NAME);
+
+            createBoundWidgetWithLabel(client, Text.class, SWT.NONE,
+                "Default Temperature\n(Celcius)", null, PojoObservables
+                    .observeValue(containerType, "defaultTemperature"),
+                DoubleNumber.class, "Default temperature is not a valid number");
+
+            List<ContainerLabelingScheme> schemes = appService.search(
+                ContainerLabelingScheme.class, new ContainerLabelingScheme());
+
+            labelingSchemeComboViewer = createComboViewerWithNoSelectionValidator(
+                client, "Child Labeling Scheme", schemes,
+                MSG_CHILD_LABELING_SCHEME_EMPTY);
+            ContainerLabelingScheme currentScheme = containerType
+                .getChildLabelingScheme();
+            if (currentScheme != null) {
+                for (ContainerLabelingScheme scheme : schemes) {
+                    if (currentScheme.getId().equals(scheme.getId())) {
+                        currentScheme = scheme;
+                        break;
+                    }
+                }
+                labelingSchemeComboViewer.setSelection(new StructuredSelection(
+                    currentScheme));
             }
+
+            createBoundWidgetWithLabel(client, Combo.class, SWT.NONE,
+                "Activity Status", FormConstants.ACTIVITY_STATUS,
+                PojoObservables.observeValue(containerType, "activityStatus"),
+                null, null);
+
+            Text comment = (Text) createBoundWidgetWithLabel(client,
+                Text.class, SWT.MULTI, "Comments", null, PojoObservables
+                    .observeValue(containerType, "comment"), null, null);
+            GridData gd = new GridData(GridData.FILL_HORIZONTAL);
+            gd.heightHint = 40;
+            comment.setLayoutData(gd);
         } catch (ApplicationException e) {
             e.printStackTrace();
         }
@@ -196,17 +192,9 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         toolkit.paintBordersFor(client);
 
         createBoundWidgetWithLabel(client, Text.class, SWT.NONE,
-            "Dimension One Label", null, PojoObservables.observeValue(
-                containerType, "dimensionOneLabel"), null, null);
-
-        createBoundWidgetWithLabel(client, Text.class, SWT.NONE,
             "Dimension One Capacity", null, PojoObservables.observeValue(
                 capacity, "dimensionOneCapacity"), IntegerNumber.class,
             "Dimension one capacity is not a valid number");
-
-        createBoundWidgetWithLabel(client, Text.class, SWT.NONE,
-            "Dimension Two Label", null, PojoObservables.observeValue(
-                containerType, "dimensionTwoLabel"), null, null);
 
         createBoundWidgetWithLabel(client, Text.class, SWT.NONE,
             "Dimension Two Capacity", null, PojoObservables.observeValue(
@@ -327,9 +315,11 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         // associate the storage type to it's site
         containerType.setSite(site);
 
-        ContainerNumScheme scheme = numSchemeMap.get(numSchemeCombo.getText());
+        ContainerLabelingScheme scheme = (ContainerLabelingScheme) ((StructuredSelection) labelingSchemeComboViewer
+            .getSelection()).getFirstElement();
+
         Assert.isNotNull(scheme);
-        containerType.setNumberingScheme(scheme);
+        containerType.setChildLabelingScheme(scheme);
 
         if ((containerType.getId() == null) || (containerType.getId() == 0)) {
             query = new InsertExampleQuery(containerType);

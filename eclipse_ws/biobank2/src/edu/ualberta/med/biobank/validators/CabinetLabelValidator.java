@@ -8,12 +8,12 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.fieldassist.ControlDecoration;
 
-public class CabinetPositionCodeValidator extends AbstractValidator {
+public class CabinetLabelValidator extends AbstractValidator {
 
 	private static final Pattern PATTERN = Pattern
 		.compile("^\\d{2}[A-Z]{2}\\d{2}[A-Z]{2}$");
 
-	public CabinetPositionCodeValidator(String message,
+	public CabinetLabelValidator(String message,
 			ControlDecoration controlDecoration) {
 		super(message, controlDecoration);
 	}

@@ -41,7 +41,7 @@ public class TopContainerChooserPage extends AbstractContainerChooserPage {
             @Override
             public String getText(Object element) {
                 Container sc = (Container) element;
-                return sc.getPositionCode();
+                return sc.getLabel();
             }
         });
         try {
