@@ -8,7 +8,7 @@ import edu.ualberta.med.biobank.model.ContainerType;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class ContainerChooserWizard extends Wizard {
-	private ContainerChooserPage containerChooserPage;
+	private TopContainerChooserPage containerChooserPage;
 	private PalettePositionChooserPage paletteChooserPage;
 	private Site site;
 	private WritableApplicationService appService;
@@ -23,7 +23,7 @@ public class ContainerChooserWizard extends Wizard {
 
 	@Override
 	public void addPages() {
-		containerChooserPage = new ContainerChooserPage();
+		containerChooserPage = new TopContainerChooserPage();
 		paletteChooserPage = new PalettePositionChooserPage();
 		addPage(containerChooserPage);
 		addPage(paletteChooserPage);
