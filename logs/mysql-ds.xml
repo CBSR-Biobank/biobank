@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- ===================================================================== -->
+<!--                                                                       -->
+<!--  JBoss Server Configuration                                           -->
+<!--                                                                       -->
+<!-- ===================================================================== -->
+
+<!-- $Id: mysql-ds.xml,v 1.8 2007/09/18 18:26:03 modik Exp $ -->
+<!-- ==================================================================== -->
+<!--  Datasource config for MySQL using 2.0.11 driver                     -->
+<!-- ==================================================================== -->
+
+
+<datasources>
+  <local-tx-datasource>
+    <jndi-name>csmupt</jndi-name>
+    <connection-url>jdbc:mysql://localhost:3306/biobank2</connection-url>
+    <user-name>dummy</user-name>
+    <password>ozzy498</password>
+    <driver-class>com.mysql.jdbc.Driver</driver-class>
+  </local-tx-datasource>
+  <local-tx-datasource>
+    <jndi-name>CLMDS</jndi-name>
+    <connection-url>jdbc:mysql://localhost:3306/biobank2</connection-url>
+    <user-name>dummy</user-name>
+    <password>ozzy498</password>
+    <driver-class>com.mysql.jdbc.Driver</driver-class>
+    <exception-sorter-class-name>org.jboss.resource.adapter.jdbc.vendor.MySQLExceptionSorter</exception-sorter-class-name>
+  </local-tx-datasource>
+  <local-tx-datasource>
+    <jndi-name>CLMCSMDS</jndi-name>
+    <connection-url>jdbc:mysql://localhost:3306/biobank2</connection-url>
+    <user-name>dummy</user-name>
+    <password>ozzy498</password>
+    <driver-class>com.mysql.jdbc.Driver</driver-class>
+    <exception-sorter-class-name>org.jboss.resource.adapter.jdbc.vendor.MySQLExceptionSorter</exception-sorter-class-name>
+  </local-tx-datasource>
+<local-tx-datasource>
+  <jndi-name>LogLocatorDS</jndi-name>
+ <connection-url>jdbc:mysql://localhost:3306/biobank2</connection-url>
+    <user-name>dummy</user-name>
+    <password>ozzy498</password>
+    <driver-class>com.mysql.jdbc.Driver</driver-class>
+</local-tx-datasource>
+
+</datasources>

@@ -1,5 +1,8 @@
 package edu.ualberta.med.biobank.wizard;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
@@ -65,6 +68,12 @@ public abstract class AbstractContainerChooserPage extends WizardPage {
         gd.horizontalSpan = 2;
         gridParent.setLayoutData(gd);
         containerWidget = new ChooseContainerWidget(gridParent);
+        List<ContainerStatus> legend = new ArrayList<ContainerStatus>();
+        legend.add(ContainerStatus.FREE_LOCATIONS);
+        legend.add(ContainerStatus.FULL);
+        legend.add(ContainerStatus.NOT_INITIALIZED);
+        containerWidget.setLegend(legend);
+        containerWidget.setDefaultStatus(ContainerStatus.NOT_INITIALIZED);
         containerWidget.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseDown(MouseEvent e) {
@@ -90,7 +99,7 @@ public abstract class AbstractContainerChooserPage extends WizardPage {
         } else {
             ContainerPosition cp = cell.getPosition();
             if (cp != null && cp.getContainer() != null) {
-                String code = cp.getContainer().getProductBarcode();
+                String code = cp.getContainer().getLabel();
                 if (code != null) {
                     textPosition.setText(code);
                 } else {

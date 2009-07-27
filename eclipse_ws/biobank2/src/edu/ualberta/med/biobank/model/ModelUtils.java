@@ -84,32 +84,13 @@ public class ModelUtils {
         if (position == null) {
             return "none";
         } else {
-            // String positionString = getPositionString(position);
-            // Container container = position.getContainer();
-            // ContainerPosition containerPosition = container.getPosition();
-            // Container parent = containerPosition.getParentContainer();
-            // while (parent != null) {
-            // positionString = getPositionString(containerPosition) + ":"
-            // + positionString;
-            // container = parent;
-            // containerPosition = parent.getPosition();
-            // parent = containerPosition.getParentContainer();
-            // }
-            // positionString = container.getProductBarcode() + ":" +
-            // positionString;
-            // return positionString;
-            String containerPositionBarcode = position.getContainer()
-                .getLabel();
-            return containerPositionBarcode + getPositionString(position);
+            int dim1 = position.getPositionDimensionOne();
+            int dim2 = position.getPositionDimensionTwo();
+            String dim1String = String.valueOf((char) ('A' + dim1));
+            String dim2String = String.valueOf(dim2);
+            return position.getContainer().getLabel() + dim1String
+                + dim2String;
         }
-    }
-
-    public static String getPositionString(AbstractPosition position) {
-        int dim1 = position.getPositionDimensionOne();
-        int dim2 = position.getPositionDimensionTwo();
-        String dim1String = String.valueOf(dim1);
-        String dim2String = String.valueOf(dim2);
-        return dim1String + dim2String;
     }
 
     public static boolean getBooleanValue(Boolean value, boolean defaultValue) {

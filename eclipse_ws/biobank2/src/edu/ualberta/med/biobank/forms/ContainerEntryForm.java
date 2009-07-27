@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.forms;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -134,10 +135,26 @@ public class ContainerEntryForm extends BiobankEntryForm {
         createContainerTypesSection(client);
     }
 
+    private List<ContainerType> getTopContainerTypes() {
+        List<ContainerType> results = new ArrayList<ContainerType>();
+        HQLCriteria c = new HQLCriteria(
+            "from edu.ualberta.med.biobank.model.ContainerType as cttop"
+                + " where cttop.id not in (select child.id"
+                + " from edu.ualberta.med.biobank.model.ContainerType as ct"
+                + " left join ct.childContainerTypeCollection as child "
+                + " where child.id!=null)");
+        try {
+            results = appService.query(c);
+        } catch (Exception e) {
+            System.out.println("Query Failed.");
+        }
+        return results;
+    }
+
     private void createContainerTypesSection(Composite client) {
         Collection<ContainerType> containerTypes;
         if ((position == null) || (position.getParentContainer() == null)) {
-            containerTypes = site.getContainerTypeCollection();
+            containerTypes = getTopContainerTypes();
         } else {
             containerTypes = position.getParentContainer().getContainerType()
                 .getChildContainerTypeCollection();

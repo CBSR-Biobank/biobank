@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.forms;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -76,7 +77,7 @@ public class AssignSamplesLocationEntryForm extends BiobankEntryForm implements
 
     private IObservableValue plateToScanValue = new WritableValue("",
         String.class);
-    private IObservableValue paletteCodeValue = new WritableValue("",
+    private IObservableValue paletteProductCodeValue = new WritableValue("",
         String.class);
     private IObservableValue scanLaunchedValue = new WritableValue(
         Boolean.FALSE, Boolean.class);
@@ -235,8 +236,9 @@ public class AssignSamplesLocationEntryForm extends BiobankEntryForm implements
         plateToScanText.addKeyListener(EnterKeyToNextFieldListener.INSTANCE);
 
         paletteCodeText = (Text) createBoundWidgetWithLabel(client, Text.class,
-            SWT.NONE, "Palette barcode", new String[0], paletteCodeValue,
-            NonEmptyString.class, "Enter palette barcode");
+            SWT.NONE, "Palette product barcode", new String[0],
+            paletteProductCodeValue, NonEmptyString.class,
+            "Enter palette barcode");
         paletteCodeText.removeKeyListener(keyListener);
         paletteCodeText.addKeyListener(EnterKeyToNextFieldListener.INSTANCE);
 
@@ -334,10 +336,28 @@ public class AssignSamplesLocationEntryForm extends BiobankEntryForm implements
     private void initNewPalette(ContainerPosition position, ContainerType type) {
         currentPalette.setPosition(position);
         currentPalette.setContainerType(type);
-        currentPalette.setLabel(paletteCodeValue.getValue().toString());
-        currentPalette
-            .setProductBarcode(paletteCodeValue.getValue().toString());
+        currentPalette.setLabel(getPalettePositionString(position));
+        currentPalette.setProductBarcode(paletteProductCodeValue.getValue()
+            .toString());
         currentPalette.setSite(currentStudy.getSite());
+    }
+
+    public String getPalettePositionString(ContainerPosition position) {
+        Container parent = position.getParentContainer();
+        String positionString = parent.getLabel();
+        // FIXME generalize using numbering scheme
+        int dim1Capacity = parent.getContainerType().getCapacity()
+            .getDimensionOneCapacity();
+        int pos;
+        // For hotel, use the dim with for than one size
+        // FIXME generalize !
+        if (dim1Capacity > 1) {
+            pos = position.getPositionDimensionOne();
+        } else {
+            pos = position.getPositionDimensionTwo();
+        }
+        DecimalFormat df1 = new DecimalFormat("00");
+        return positionString + df1.format(pos);
     }
 
     protected void scan() {
@@ -663,13 +683,13 @@ public class AssignSamplesLocationEntryForm extends BiobankEntryForm implements
      */
     private boolean getPaletteInformation() throws ApplicationException {
         currentPaletteSamples = null;
-        String barcode = (String) paletteCodeValue.getValue();
-        currentPalette = ModelUtils
-            .getContainerWithLabel(appService, barcode);
+        String barcode = (String) paletteProductCodeValue.getValue();
+        currentPalette = ModelUtils.getContainerWithLabel(appService, barcode);
         if (currentPalette != null) {
             boolean result = MessageDialog
                 .openConfirm(PlatformUI.getWorkbench()
-                    .getActiveWorkbenchWindow().getShell(), "Palette barcode",
+                    .getActiveWorkbenchWindow().getShell(),
+                    "Palette product barcode",
                     "This palette is already registered in the database. Do you want to continue ?");
             if (!result) {
                 return false;

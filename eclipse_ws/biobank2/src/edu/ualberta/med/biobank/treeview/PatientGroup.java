@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.treeview;
 
-import java.util.Collection;
+import java.util.Arrays;
+import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.TreeViewer;
@@ -17,6 +18,8 @@ import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.ModelUtils;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.Study;
+import gov.nih.nci.system.applicationservice.WritableApplicationService;
+import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class PatientGroup extends Node {
 
@@ -45,6 +48,18 @@ public class PatientGroup extends Node {
         });
     }
 
+    private List<Integer> getPatientIDs(int studyID) throws Exception {
+        WritableApplicationService appService = ((StudyAdapter) getParent())
+            .getAppService();
+
+        HQLCriteria c = new HQLCriteria("select patients.id"
+            + " from edu.ualberta.med.biobank.model.Patient as patients"
+            + " inner join patients.study as study" + " where study.id=?");
+        c.setParameters(Arrays.asList(new Object[] { studyID }));
+
+        return (appService.query(c));
+    }
+
     @Override
     public void loadChildren(boolean updateNode) {
         Study parentStudy = ((StudyAdapter) getParent()).getStudy();
@@ -55,16 +70,39 @@ public class PatientGroup extends Node {
                 Study.class, parentStudy.getId());
             ((StudyAdapter) getParent()).setStudy(parentStudy);
 
-            Collection<Patient> patients = parentStudy.getPatientCollection();
+            List<Integer> patientIDs = getPatientIDs(parentStudy.getId());
 
-            for (Patient patient : patients) {
-                PatientAdapter node = (PatientAdapter) getChild(patient.getId());
+            Boolean found = false;
 
-                if (node == null) {
-                    node = new PatientAdapter(this, patient);
-                    addChild(node);
+            for (Integer patient : patientIDs) {
+                List<Node> nodes = getChildren();
+                for (Node node : nodes) {
+                    if (node.getChild(patient) != null) {
+                        found = true;
+                        break;
+                    }
                 }
-                if (updateNode) {
+                Boolean inserted = false;
+                if (!found) {
+                    for (Node node : nodes) {
+                        if (!((PatientSubGroup) node).full()) {
+                            ((PatientSubGroup) node).addID(patient);
+                            inserted = true;
+                            break;
+                        }
+                    }
+
+                }
+                if (!inserted) {
+                    PatientSubGroup newNode = new PatientSubGroup(this, nodes
+                        .size());
+                    newNode.addID(patient);
+                    addChild(newNode);
+                }
+
+            }
+            if (updateNode) {
+                for (Node node : getChildren()) {
                     SessionManager.getInstance().getTreeViewer().update(node,
                         null);
                 }
