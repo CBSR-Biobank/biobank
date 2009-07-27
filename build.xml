@@ -21,7 +21,8 @@
 	<property name="data.sql.dir" location="${data.dir}/sql" />
 	<property name="schema.dir" location="schema" />
 	<property name="security.dir" location="security" />
-	<property name="mysql.driver.string" value="org.gjt.mm.mysql.Driver" />
+	<property name="logs.dir" location="logs" />
+	<property name="mysql.driver.string" value="com.mysql.jdbc.Driver" />
 	<property name="database.host" value="localhost" />
 	<property name="database.port" value="3306" />
 	<property name="database.name" value="biobank2" />
@@ -168,8 +169,8 @@
 		<fail unless="env.JBOSS_HOME" message="$JBOSS_HOME not defined" />
 		<copy file="${security.dir}/jboss/login-config.xml"
 	  tofile="${env.JBOSS_HOME}/server/default/conf/login-config.xml" overwrite="true" />
-		<copy file="${security.dir}/jboss/mysql-ds.xml"
-	  tofile="${env.JBOSS_HOME}/server/default/deploy/mysql-ds.xml" overwrite="true"/>
+		<copy file="${security.dir}/jboss/upt-ds.xml"
+	  tofile="${env.JBOSS_HOME}/server/default/deploy/upt-ds.xml" overwrite="true"/>
 		<copy file="${security.dir}/jboss/upt.war"
 	  tofile="${env.JBOSS_HOME}/server/default/deploy/upt.war" overwrite="true"/>
 		<copy file="${cacore.sdk.dir}/output/biobank2/package/webapp/biobank2.war"

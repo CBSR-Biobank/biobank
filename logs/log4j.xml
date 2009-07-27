@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+
+<!DOCTYPE log4j:configuration SYSTEM ".\log4j.dtd">
+
+<log4j:configuration xmlns:log4j='http://jakarta.apache.org/log4j/'>
+    <appender name="CLM_APPENDER" class="gov.nih.nci.logging.api.appender.jdbc.JDBCAppender">
+      <param name="application" value="csm" />
+      <param name="maxBufferSize" value="1" />
+      <param name="dbDriverClass" value="com.mysql.jdbc.Driver" />
+      <param name="dbUrl" value="jdbc:mysql://localhost:3306/biobank2" />
+      <param name="dbUser" value="dummy" />
+      <param name="dbPwd" value="ozzy498" />
+      <param name="useFilter" value="true" />
+      <layout class="org.apache.log4j.PatternLayout">
+           <param name="ConversionPattern" value=":: [%d{ISO8601}] %-5p %c{1}.%M() %x - %m%n" />
+      </layout>
+    </appender>
+
+    <category name="CSM.Audit.Logging.Event.Authentication">
+      <level value="info" />
+      <appender-ref ref="CLM_APPENDER" />
+    </category>
+	
+    <category name="CSM.Audit.Logging.Event.Authorization">
+      <level value="info" />
+      <appender-ref ref="CLM_APPENDER" />
+    </category>
+
+    <category name="CSM.Audit.Logging.ObjectState.Authorization">
+      <level value="info" />
+      <appender-ref ref="CLM_APPENDER" />
+    </category>
+
+</log4j:configuration>

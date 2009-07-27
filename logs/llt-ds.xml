@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- ===================================================================== -->
+<!--                                                                       -->
+<!--  JBoss Server Configuration                                           -->
+<!--                                                                       -->
+<!-- ===================================================================== -->
+
+<!-- $Id$ -->
+<!-- ==================================================================== -->
+<!--  Datasource config for MySQL using 2.0.11 driver                     -->
+<!-- ==================================================================== -->
+
+
+<datasources>
+ <local-tx-datasource>
+    <jndi-name>CLMCSMDS</jndi-name>
+    <connection-url>jdbc:mysql://localhost:3306/biobank2</connection-url>
+    <user-name>dummy</user-name>
+    <password>ozzy498</password>
+    <driver-class>org.gjt.mm.mysql.Driver</driver-class>
+    <exception-sorter-class-name>org.jboss.resource.adapter.jdbc.vendor.MySQLExceptionSorter</exception-sorter-class-name>
+  </local-tx-datasource>
+</datasources>
