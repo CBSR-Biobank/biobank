@@ -19,11 +19,11 @@ import edu.ualberta.med.biobank.model.ContainerStatus;
 import edu.ualberta.med.biobank.model.ModelUtils;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
-public class ContainerChooserPage extends AbstractContainerChooserPage {
+public class TopContainerChooserPage extends AbstractContainerChooserPage {
 
     public static final String NAME = "FIRST_CONTAINER";
 
-    public ContainerChooserPage() {
+    public TopContainerChooserPage() {
         super(NAME);
         setTitle("Main container");
         setDescription("Choose main container");
@@ -102,9 +102,9 @@ public class ContainerChooserPage extends AbstractContainerChooserPage {
             full = (total == capacityTotal);
         }
         if (full) {
-            cell.setStatus(ContainerStatus.FILLED);
+            cell.setStatus(ContainerStatus.FULL);
         } else {
-            cell.setStatus(ContainerStatus.EMPTY);
+            cell.setStatus(ContainerStatus.FREE_LOCATIONS);
         }
     }
 }

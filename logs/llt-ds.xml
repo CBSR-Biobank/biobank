@@ -13,12 +13,27 @@
 
 
 <datasources>
- <local-tx-datasource>
+  <local-tx-datasource>
+    <jndi-name>CLMDS</jndi-name>
+    <connection-url>jdbc:mysql://localhost:3306/biobank2</connection-url>
+    <user-name>dummy</user-name>
+    <password>ozzy498</password>
+    <driver-class>com.mysql.jdbc.Driver</driver-class>
+    <exception-sorter-class-name>org.jboss.resource.adapter.jdbc.vendor.MySQLExceptionSorter</exception-sorter-class-name>
+  </local-tx-datasource>
+  <local-tx-datasource>
     <jndi-name>CLMCSMDS</jndi-name>
     <connection-url>jdbc:mysql://localhost:3306/biobank2</connection-url>
     <user-name>dummy</user-name>
     <password>ozzy498</password>
-    <driver-class>org.gjt.mm.mysql.Driver</driver-class>
+    <driver-class>com.mysql.jdbc.Driver</driver-class>
     <exception-sorter-class-name>org.jboss.resource.adapter.jdbc.vendor.MySQLExceptionSorter</exception-sorter-class-name>
+  </local-tx-datasource>
+  <local-tx-datasource>
+    <jndi-name>LogLocatorDS</jndi-name>
+    <connection-url>jdbc:mysql://localhost:3306/biobank2</connection-url>
+    <user-name>dummy</user-name>
+    <password>ozzy498</password>
+    <driver-class>com.mysql.jdbc.Driver</driver-class>
   </local-tx-datasource>
 </datasources>

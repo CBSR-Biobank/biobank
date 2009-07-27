@@ -24,7 +24,7 @@ import edu.ualberta.med.biobank.treeview.SiteAdapter;
 public class SamplesListWidget extends BiobankCollectionTable {
 
     private static final String[] headings = new String[] { "Inventory ID",
-        "Type", "Position", "Process Date", "Available", "Quantity", "Comment" };
+        "Type", "Position", "Link Date", "Available", "Quantity", "Comment" };
 
     private static final int[] bounds = new int[] { 130, 130, 150, 150, -1, -1,
         -1 };

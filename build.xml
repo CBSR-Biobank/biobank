@@ -147,8 +147,6 @@
 				<include name="application-config-client*.xml" />
 			</fileset>
 		</copy>
-		<copy file="${cacore.sdk.dir}/output/biobank2/src/hibernate.cfg.xml"
-	  tofile="${eclipse.proj.dir}/lib/hibernate.cfg.xml" />
 		<copy todir="${eclipse.proj.dir.importer}/lib" >
 			<fileset dir="${cacore.sdk.dir}/output/biobank2/package/remote-client/lib" />
 		</copy>
@@ -173,10 +171,16 @@
 		<fail unless="env.JBOSS_HOME" message="$JBOSS_HOME not defined" />
 		<copy file="${security.dir}/jboss/login-config.xml"
 	  tofile="${env.JBOSS_HOME}/server/default/conf/login-config.xml" overwrite="true" />
+		<delete file="${env.JBOSS_HOME}/server/default/deploy/mysql-ds.xml"/>
 		<copy file="${security.dir}/jboss/upt-ds.xml"
 	  tofile="${env.JBOSS_HOME}/server/default/deploy/upt-ds.xml" overwrite="true"/>
 		<copy file="${security.dir}/jboss/upt.war"
 	  tofile="${env.JBOSS_HOME}/server/default/deploy/upt.war" overwrite="true"/>
+		<copy file="${logs.dir}/llt-ds.xml"
+	  tofile="${env.JBOSS_HOME}/server/default/deploy/llt-ds.xml" overwrite="true"/>
+		<copy file="${logs.dir}/llt.war"
+	  tofile="${env.JBOSS_HOME}/server/default/deploy/llt.war" overwrite="true"/>
+
 		<copy file="${cacore.sdk.dir}/output/biobank2/package/webapp/biobank2.war"
 	  tofile="${env.JBOSS_HOME}/server/default/deploy/biobank2.war" overwrite="true"/>
 	</target>
