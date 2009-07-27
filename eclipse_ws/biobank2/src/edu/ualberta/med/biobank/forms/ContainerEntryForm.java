@@ -111,13 +111,13 @@ public class ContainerEntryForm extends BiobankEntryForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Name", null,
-            PojoObservables.observeValue(container, "name"),
-            NonEmptyString.class, MSG_CONTAINER_NAME_EMPTY);
+        createBoundWidgetWithLabel(client, Text.class, SWT.NONE,
+            "Position Code", null, PojoObservables.observeValue(container,
+                "positionCode"), NonEmptyString.class, MSG_CONTAINER_NAME_EMPTY);
 
-        createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Barcode",
-            null, PojoObservables.observeValue(container, "barcode"), null,
-            null);
+        createBoundWidgetWithLabel(client, Text.class, SWT.NONE,
+            "Product Barcode", null, PojoObservables.observeValue(container,
+                "productBarcode"), null, null);
 
         createBoundWidgetWithLabel(client, Combo.class, SWT.NONE,
             "Activity Status", FormConstants.ACTIVITY_STATUS, PojoObservables
@@ -135,7 +135,7 @@ public class ContainerEntryForm extends BiobankEntryForm {
 
     private void createContainerTypesSection(Composite client) {
         Collection<ContainerType> containerTypes = new ArrayList<ContainerType>();
-        if (position.getParentContainer() == null) {
+        if ((position == null) || (position.getParentContainer() == null)) {
             containerTypes = site.getContainerTypeCollection();
         } else {
             containerTypes = position.getParentContainer().getContainerType()
@@ -179,6 +179,9 @@ public class ContainerEntryForm extends BiobankEntryForm {
     }
 
     private void createLocationSection() {
+        if (position == null)
+            return;
+
         Container parentContainer = position.getParentContainer();
         if (parentContainer != null) {
             String dim1Label = null, dim2Label = null;

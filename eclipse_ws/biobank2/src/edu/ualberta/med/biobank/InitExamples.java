@@ -207,13 +207,13 @@ public class InitExamples {
 
         // Freezer Types
         paletteType = insertContainerTypeInSite("Palette", "Row", "Column", 8,
-            12, null, numSchemeMap.get("palette"));
+            12, null, numSchemeMap.get("SBS Standard"));
         hotel13Type = insertContainerTypeInSite("Hotel-13", "Row", "", 13, 1,
             Arrays.asList(new ContainerType[] { paletteType }), numSchemeMap
-                .get("2 char numeric"));
+                .get("CBSR 2 char alphabetic"));
         hotel19Type = insertContainerTypeInSite("Hotel-19", "Row", "", 19, 1,
             Arrays.asList(new ContainerType[] { paletteType }), numSchemeMap
-                .get("2 char numeric"));
+                .get("CBSR 2 char alphabetic"));
         freezerType = insertContainerTypeInSite("Freezer", "Row", "Column", 3,
             10,
             Arrays.asList(new ContainerType[] { hotel13Type, hotel19Type }),
@@ -275,7 +275,7 @@ public class InitExamples {
     }
 
     private void insertContainers() throws ApplicationException {
-        Container freezer = insertContainer("FR01", freezerType, null, 0, 0);
+        Container freezer = insertContainer("01", freezerType, null, 0, 0);
         Container hotel1 = insertContainer("AA", hotel19Type, freezer, 1, 1);
         insertContainer("01", paletteType, hotel1, 1, 1);
         insertContainer("03", paletteType, hotel1, 3, 1);

@@ -123,7 +123,7 @@ public class ContainerTypeViewForm extends BiobankViewForm {
         defaultTempLabel = (Label) createWidget(client, Label.class, SWT.NONE,
             "Default Temperature\n(Celcius)");
         numSchemeLabel = (Label) createWidget(client, Label.class, SWT.NONE,
-            "Activity Status");
+            "Numbering Scheme");
         activityStatusLabel = (Label) createWidget(client, Label.class,
             SWT.NONE, "Activity Status");
         commentLabel = (Label) createWidget(client, Label.class, SWT.NONE,
