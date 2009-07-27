@@ -38,6 +38,8 @@ public class ContainerTypeViewForm extends BiobankViewForm {
 
     private Label defaultTempLabel;
 
+    private Label numSchemeLabel;
+
     private Label activityStatusLabel;
 
     private Label commentLabel;
@@ -120,6 +122,8 @@ public class ContainerTypeViewForm extends BiobankViewForm {
         nameLabel = (Label) createWidget(client, Label.class, SWT.NONE, "Name");
         defaultTempLabel = (Label) createWidget(client, Label.class, SWT.NONE,
             "Default Temperature\n(Celcius)");
+        numSchemeLabel = (Label) createWidget(client, Label.class, SWT.NONE,
+            "Activity Status");
         activityStatusLabel = (Label) createWidget(client, Label.class,
             SWT.NONE, "Activity Status");
         commentLabel = (Label) createWidget(client, Label.class, SWT.NONE,
@@ -132,6 +136,8 @@ public class ContainerTypeViewForm extends BiobankViewForm {
         FormUtils.setTextValue(nameLabel, containerType.getName());
         FormUtils.setTextValue(defaultTempLabel, containerType
             .getDefaultTemperature());
+        FormUtils.setTextValue(numSchemeLabel, containerType
+            .getNumberingScheme().getName());
         FormUtils.setTextValue(activityStatusLabel, containerType
             .getActivityStatus());
         FormUtils.setTextValue(commentLabel, containerType.getComment());

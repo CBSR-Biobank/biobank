@@ -4,6 +4,7 @@ import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Container;
+import edu.ualberta.med.biobank.model.ContainerNumScheme;
 import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.Patient;
@@ -26,8 +27,11 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+
+import org.eclipse.core.runtime.Assert;
 
 /**
  * After re-generation : init some storagetype and storage containers for one
@@ -56,6 +60,8 @@ public class InitExamples {
 
     private ContainerType drawerType;
 
+    private HashMap<String, ContainerNumScheme> numSchemeMap;
+
     /**
      * @param args
      * @throws Exception
@@ -66,6 +72,7 @@ public class InitExamples {
 
     public InitExamples() throws Exception {
         clinics = new Clinic[MAX_CLINICS];
+        numSchemeMap = new HashMap<String, ContainerNumScheme>();
 
         // appService = (WritableApplicationService)
         // ApplicationServiceProvider
@@ -191,27 +198,47 @@ public class InitExamples {
     }
 
     private void insertContainerTypesInSite() throws ApplicationException {
+        List<ContainerNumScheme> numSchemes = appService.search(
+            ContainerNumScheme.class, new ContainerNumScheme());
+        Assert.isNotNull(numSchemes);
+        for (ContainerNumScheme scheme : numSchemes) {
+            numSchemeMap.put(scheme.getName(), scheme);
+        }
+
+        // Freezer Types
         paletteType = insertContainerTypeInSite("Palette", "Row", "Column", 8,
-            12, null);
+            12, null, numSchemeMap.get("palette"));
         hotel13Type = insertContainerTypeInSite("Hotel-13", "Row", "", 13, 1,
-            Arrays.asList(new ContainerType[] { paletteType }));
+            Arrays.asList(new ContainerType[] { paletteType }), numSchemeMap
+                .get("2 char numeric"));
         hotel19Type = insertContainerTypeInSite("Hotel-19", "Row", "", 19, 1,
-            Arrays.asList(new ContainerType[] { paletteType }));
+            Arrays.asList(new ContainerType[] { paletteType }), numSchemeMap
+                .get("2 char numeric"));
         freezerType = insertContainerTypeInSite("Freezer", "Row", "Column", 3,
-            10, Arrays.asList(new ContainerType[] { hotel13Type, hotel19Type }));
-        binType = insertContainerTypeInSite("Bin", "Row", "", 120, 1, null);
+            10,
+            Arrays.asList(new ContainerType[] { hotel13Type, hotel19Type }),
+            null);
+
+        // Cabinet Types
+        binType = insertContainerTypeInSite("Bin", "Row", "", 120, 1, null,
+            numSchemeMap.get("2 char numeric"));
         drawerType = insertContainerTypeInSite("Drawer", "Row", "", 36, 1,
-            Arrays.asList(new ContainerType[] { binType }));
+            Arrays.asList(new ContainerType[] { binType }), numSchemeMap
+                .get("CBSR 2 char alphabetic"));
         insertContainerTypeInSite("Cabinet", "Row", "", 4, 1, Arrays
-            .asList(new ContainerType[] { drawerType }));
+            .asList(new ContainerType[] { drawerType }), null);
     }
 
     private ContainerType insertContainerTypeInSite(String name,
         String dim1label, String dim2label, int dim1, int dim2,
-        List<ContainerType> children) throws ApplicationException {
+        List<ContainerType> children, ContainerNumScheme numScheme)
+        throws ApplicationException {
         ContainerType ct = new ContainerType();
         ct.setName(name);
         ct.setSite(site);
+        if (numScheme != null) {
+            ct.setNumberingScheme(numScheme);
+        }
         Capacity capacity = new Capacity();
         capacity.setDimensionOneCapacity(dim1);
         capacity.setDimensionTwoCapacity(dim2);
