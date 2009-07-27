@@ -22,7 +22,9 @@ import gov.nih.nci.system.query.example.InsertExampleQuery;
 import java.lang.reflect.Constructor;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -46,9 +48,9 @@ public class InitExamples {
     private ContainerType hotel13Type;
     private ContainerType freezerType;
 
-    private Patient patient;
+    private Collection<Patient> patients;
 
-    private PatientVisit patientVisit;
+    private Collection<PatientVisit> patientVisits;
 
     private ContainerType binType;
 
@@ -59,13 +61,12 @@ public class InitExamples {
      */
     public static void main(String[] args) throws Exception {
         InitExamples init = new InitExamples();
-        // appService = (WritableApplicationService)
-        // ApplicationServiceProvider
-        // .getApplicationServiceFromUrl("http://aicml-med.cs.ualberta.ca:8080/biobank2");
-
         appService = (WritableApplicationService) ApplicationServiceProvider
-            .getApplicationServiceFromUrl("http://localhost:8080/biobank2",
-                "testuser", "test");
+            .getApplicationServiceFromUrl("http://aicml-med.cs.ualberta.ca:8080/biobank2");
+
+        // appService = (WritableApplicationService) ApplicationServiceProvider
+        // .getApplicationServiceFromUrl("http://localhost:8080/biobank2",
+        // "testuser", "test");
 
         init.deleteAll(Container.class);
         init.deleteAll(ContainerType.class);
@@ -133,14 +134,16 @@ public class InitExamples {
     }
 
     private void insertSampleInPatientVisit() throws ApplicationException {
-        Sample sample = new Sample();
-        sample.setInventoryId("123");
-        sample.setPatientVisit(patientVisit);
-        sample.setProcessDate(new Date());
-        sample.setSampleType(getSampleType());
-        SDKQueryResult res = appService.executeQuery(new InsertExampleQuery(
-            sample));
-        sample = (Sample) res.getObjectResult();
+        for (PatientVisit patientVisit : patientVisits) {
+            Sample sample = new Sample();
+            sample.setInventoryId("123");
+            sample.setPatientVisit(patientVisit);
+            sample.setProcessDate(new Date());
+            sample.setSampleType(getSampleType());
+            SDKQueryResult res = appService
+                .executeQuery(new InsertExampleQuery(sample));
+            sample = (Sample) res.getObjectResult();
+        }
     }
 
     private SampleType getSampleType() throws ApplicationException {
@@ -149,30 +152,38 @@ public class InitExamples {
     }
 
     private void insertPatientVisitInPatient() throws ApplicationException {
-        patientVisit = new PatientVisit();
+        patientVisits = new ArrayList<PatientVisit>();
+        for (Patient patient : patients) {
+            PatientVisit patientVisit = new PatientVisit();
+            patientVisit.setClinic(clinics[0]);
+            SimpleDateFormat df = new SimpleDateFormat(
+                BioBankPlugin.DATE_FORMAT);
+            try {
+                patientVisit.setDateDrawn(df.parse("2009-01-01 00:00"));
+            } catch (ParseException e1) {
+                e1.printStackTrace();
+            }
 
-        patientVisit.setClinic(clinics[0]);
-
-        SimpleDateFormat df = new SimpleDateFormat(BioBankPlugin.DATE_FORMAT);
-        try {
-            patientVisit.setDateDrawn(df.parse("2009-01-01 00:00"));
-        } catch (ParseException e1) {
-            e1.printStackTrace();
+            patientVisit.setPatient(patient);
+            SDKQueryResult res = appService
+                .executeQuery(new InsertExampleQuery(patientVisit));
+            patientVisit = (PatientVisit) res.getObjectResult();
+            patientVisits.add(patientVisit);
         }
-
-        patientVisit.setPatient(patient);
-        SDKQueryResult res = appService.executeQuery(new InsertExampleQuery(
-            patientVisit));
-        patientVisit = (PatientVisit) res.getObjectResult();
     }
 
     private void insertPatientInStudy() throws ApplicationException {
-        patient = new Patient();
-        patient.setNumber("1111");
-        patient.setStudy(study);
-        SDKQueryResult res = appService.executeQuery(new InsertExampleQuery(
-            patient));
-        patient = (Patient) res.getObjectResult();
+        patients = new ArrayList<Patient>();
+        for (int i = 0; i < 50; i++) {
+            Patient patient = new Patient();
+            patient.setNumber(Integer.toString(i));
+            patient.setStudy(study);
+
+            SDKQueryResult res = appService
+                .executeQuery(new InsertExampleQuery(patient));
+            patient = (Patient) res.getObjectResult();
+            patients.add(patient);
+        }
     }
 
     private void deleteAll(Class<?> classType) throws Exception {
