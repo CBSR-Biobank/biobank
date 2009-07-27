@@ -2,6 +2,8 @@ package edu.ualberta.med.biobank.model;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
@@ -16,8 +18,10 @@ public class ModelUtils {
         WritableApplicationService appService, Site site)
         throws ApplicationException {
         HQLCriteria criteria = new HQLCriteria("from "
-            + Container.class.getName() + " where site.id = " + site.getId()
-            + " and position.parentContainer is null");
+            + Container.class.getName()
+            + " where site.id=? and position is null");
+
+        criteria.setParameters(Arrays.asList(new Object[] { site.getId() }));
         return appService.query(criteria);
     }
 
@@ -57,11 +61,11 @@ public class ModelUtils {
         return null;
     }
 
-    public static Container getContainerWithBarcode(
+    public static Container getContainerWithPositionCode(
         WritableApplicationService appService, String barcode)
         throws ApplicationException {
         Container container = new Container();
-        container.setBarcode(barcode);
+        container.setProductBarcode(barcode);
         List<Container> containers = appService.search(Container.class,
             container);
         if (containers.size() == 1) {
@@ -86,9 +90,11 @@ public class ModelUtils {
             // containerPosition = parent.getPosition();
             // parent = containerPosition.getParentContainer();
             // }
-            // positionString = container.getBarcode() + ":" + positionString;
+            // positionString = container.getProductBarcode() + ":" +
+            // positionString;
             // return positionString;
-            String containerPositionBarcode = position.getContainer().getName();
+            String containerPositionBarcode = position.getContainer()
+                .getPositionCode();
             return containerPositionBarcode + getPositionString(position);
         }
     }
@@ -129,5 +135,21 @@ public class ModelUtils {
             query += " like '%" + text + "%'";
         }
         return appService.query(new HQLCriteria(query));
+    }
+
+    public static SampleStorage[] toArray(Collection<SampleStorage> collection) {
+        // hack required here because xxx.getXxxxCollection().toArray(new
+        // Xxx[0])
+        // returns Object[].
+        if ((collection != null) && (collection.size() == 0))
+            return null;
+
+        int count = 0;
+        SampleStorage[] arr = new SampleStorage[collection.size()];
+        for (SampleStorage ss : collection) {
+            arr[count] = ss;
+            ++count;
+        }
+        return arr;
     }
 }

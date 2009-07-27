@@ -62,11 +62,12 @@ public class SiteContainers {
         }
     }
 
-    private Container insertContainer(Site site, String name, ContainerType st,
-        Container parent, int pos1, int pos2) throws Exception {
+    private Container insertContainer(Site site, String positionCode,
+        ContainerType st, Container parent, int pos1, int pos2)
+        throws Exception {
         Container sc = new Container();
-        sc.setName(name);
-        sc.setBarcode(name);
+        sc.setPositionCode(positionCode);
+        sc.setProductBarcode(positionCode);
         sc.setSite(site);
         sc.setContainerType(st);
         sc.setActivityStatus("Active");

@@ -100,11 +100,11 @@ public class BiobankLabelProvider extends LabelProvider implements
             final Container container = (Container) element;
             switch (columnIndex) {
             case 0:
-                return container.getName();
+                return container.getPositionCode();
             case 1:
                 return container.getActivityStatus();
             case 2:
-                return container.getBarcode();
+                return container.getProductBarcode();
             case 3:
                 Object o = container.getFull();
                 if (o == null)
@@ -143,9 +143,9 @@ public class BiobankLabelProvider extends LabelProvider implements
             case 0:
                 return ss.getSampleType().getName();
             case 1:
-                return "" + ss.getQuantity();
-            case 2:
                 return "" + ss.getVolume();
+            case 2:
+                return "" + ss.getQuantity();
             }
         } else {
             Assert.isTrue(false, "invalid object type");

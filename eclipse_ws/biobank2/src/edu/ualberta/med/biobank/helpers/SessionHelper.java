@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.helpers;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.model.Site;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.client.ApplicationServiceProvider;
 
@@ -48,8 +49,12 @@ public class SessionHelper implements Runnable {
 
             Site site = new Site();
             sites = appService.search(Site.class, site);
-        } catch (RemoteAccessException exp) {
+        } catch (ApplicationException exp) {
             BioBankPlugin.openRemoteConnectErrorMessage();
+        } catch (RemoteAccessException exp) {
+            exp.printStackTrace();
+            BioBankPlugin.openAsyncError(
+                "Login Failed - Remote Access Exception", exp.getMessage());
         } catch (Exception exp) {
             exp.printStackTrace();
             BioBankPlugin.openAsyncError("Login Failed", exp.getMessage());

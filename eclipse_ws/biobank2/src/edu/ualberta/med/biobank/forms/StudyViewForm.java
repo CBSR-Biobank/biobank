@@ -18,7 +18,6 @@ import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.ModelUtils;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.PvInfo;
-import edu.ualberta.med.biobank.model.SampleStorage;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.PatientAdapter;
@@ -108,27 +107,12 @@ public class StudyViewForm extends BiobankViewForm {
     private void createSampleStorageSection() {
         Section section = createSection("Sample Storage");
 
-        String[] headings = new String[] { "Sample type", "Quantity", "Volume" };
+        String[] headings = new String[] { "Sample type", "Volume", "Quantity" };
         sampleStorageTable = new BiobankCollectionTable(section, SWT.NONE,
-            headings, getSampleStorageAsArr());
+            headings, ModelUtils.toArray(study.getSampleStorageCollection()));
         section.setClient(sampleStorageTable);
         sampleStorageTable.adaptToToolkit(toolkit);
         toolkit.paintBordersFor(sampleStorageTable);
-    }
-
-    private SampleStorage[] getSampleStorageAsArr() {
-        Collection<SampleStorage> collection = study
-            .getSampleStorageCollection();
-        if ((collection != null) && (collection.size() == 0))
-            return null;
-
-        int count = 0;
-        SampleStorage[] arr = new SampleStorage[collection.size()];
-        for (SampleStorage ss : collection) {
-            arr[count] = ss;
-            ++count;
-        }
-        return arr;
     }
 
     private void createPatientsSection() {
