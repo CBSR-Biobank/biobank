@@ -71,10 +71,11 @@ public class PatientGroup extends Node {
             ((StudyAdapter) getParent()).setStudy(parentStudy);
 
             List<Integer> patientIDs = getPatientIDs(parentStudy.getId());
-            List<Node> nodes = getChildren();
+
             Boolean found = false;
 
             for (Integer patient : patientIDs) {
+                List<Node> nodes = getChildren();
                 for (Node node : nodes) {
                     if (node.getChild(patient) != null) {
                         found = true;
@@ -101,7 +102,7 @@ public class PatientGroup extends Node {
 
             }
             if (updateNode) {
-                for (Node node : nodes) {
+                for (Node node : getChildren()) {
                     SessionManager.getInstance().getTreeViewer().update(node,
                         null);
                 }
