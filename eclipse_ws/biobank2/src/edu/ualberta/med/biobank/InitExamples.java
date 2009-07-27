@@ -81,9 +81,8 @@ public class InitExamples {
         // .getApplicationServiceFromUrl("http://aicml-med.cs.ualberta.ca:8080/biobank2");
 
         appService = (WritableApplicationService) ApplicationServiceProvider
-            .getApplicationServiceFromUrl(
-                "http://aicml-med.cs.ualberta.ca:8080/biobank2", "testuser",
-                "test");
+            .getApplicationServiceFromUrl("http://localhost:8080/biobank2",
+                "testuser", "test");
 
         // appService = (WritableApplicationService) ApplicationServiceProvider
         // .getApplicationServiceFromUrl("http://localhost:8080/biobank2",
