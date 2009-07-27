@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.forms;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -9,29 +10,39 @@ import java.util.Set;
 import org.apache.commons.collections.MapIterator;
 import org.apache.commons.collections.map.ListOrderedMap;
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
 import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.dialogs.SampleStorageDialog;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Clinic;
+import edu.ualberta.med.biobank.model.ModelUtils;
 import edu.ualberta.med.biobank.model.PvInfo;
 import edu.ualberta.med.biobank.model.PvInfoPossible;
+import edu.ualberta.med.biobank.model.SampleStorage;
+import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
+import edu.ualberta.med.biobank.widgets.BiobankCollectionTable;
 import edu.ualberta.med.biobank.widgets.MultiSelect;
 import edu.ualberta.med.biobank.widgets.PvInfoWidget;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -86,6 +97,12 @@ public class StudyEntryForm extends BiobankEntryForm {
 
     private ListOrderedMap combinedPvInfoMap;
 
+    private Collection<SampleType> sampleTypes;
+
+    private BiobankCollectionTable sampleStorageTable;
+
+    private Button addSampleStorageButton;
+
     public StudyEntryForm() {
         super();
         combinedPvInfoMap = new ListOrderedMap();
@@ -109,6 +126,7 @@ public class StudyEntryForm extends BiobankEntryForm {
         study = studyAdapter.getStudy();
         site = ((SiteAdapter) studyAdapter
             .getParentFromClass(SiteAdapter.class)).getSite();
+        appService = studyAdapter.getAppService();
 
         if (study.getId() == null) {
             setPartName("New Study");
@@ -138,6 +156,7 @@ public class StudyEntryForm extends BiobankEntryForm {
         // comments.setLayoutData(gd);
 
         createClinicSection();
+        createSampleStorageSection();
         createPvInfoSection();
         createButtonsSection();
     }
@@ -164,6 +183,62 @@ public class StudyEntryForm extends BiobankEntryForm {
             "Selected Clinics", "Available Clinics", 100);
         clinicsMultiSelect.adaptToToolkit(toolkit);
         clinicsMultiSelect.addSelections(availClinics, selClinics);
+    }
+
+    private void createSampleStorageSection() {
+        try {
+            Composite client = createSectionWithClient("Sample Storage");
+            SampleType searchObj = new SampleType();
+            sampleTypes = appService.search(SampleType.class, searchObj);
+
+            // TODO: from sampleTypes remove sample types already in
+            // study.getSampleStorageCollection()
+
+            if (sampleTypes.size() == 0) {
+                toolkit.createLabel(client,
+                    "*** no sample types defined for study ***");
+                return;
+            }
+
+            GridLayout layout = new GridLayout(1, false);
+            client.setLayout(layout);
+            client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+            addSampleStorageButton = toolkit.createButton(client,
+                "Add Sample Storage", SWT.PUSH);
+            addSampleStorageButton.addSelectionListener(new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent e) {
+                    SampleStorageDialog dlg = new SampleStorageDialog(
+                        PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+                            .getShell(), new SampleStorage(), sampleTypes);
+                    if (dlg.open() == Dialog.OK) {
+                        SampleStorage ss = dlg.getSampleStorage();
+                        Collection<SampleStorage> collection = study
+                            .getSampleStorageCollection();
+                        if (collection == null) {
+                            collection = new HashSet<SampleStorage>();
+                        }
+                        collection.add(ss);
+                        sampleStorageTable.update();
+
+                        // TODO: table does not update due to model not managed
+                    }
+                }
+            });
+
+            String[] headings = new String[] { "Sample type", "Volume",
+                "Quantity" };
+            sampleStorageTable = new BiobankCollectionTable(client, SWT.NONE,
+                headings, ModelUtils
+                    .toArray(study.getSampleStorageCollection()));
+            sampleStorageTable.adaptToToolkit(toolkit);
+        } catch (final RemoteConnectFailureException exp) {
+            BioBankPlugin.openRemoteConnectErrorMessage();
+            toolkit.paintBordersFor(sampleStorageTable);
+        } catch (ApplicationException e1) {
+            e1.printStackTrace();
+        }
     }
 
     private void createPvInfoSection() {
@@ -334,10 +409,13 @@ public class StudyEntryForm extends BiobankEntryForm {
         Site site = ((SiteAdapter) studyAdapter
             .getParentFromClass(SiteAdapter.class)).getSite();
 
-        HQLCriteria c = new HQLCriteria("from edu.ualberta.med.biobank.model."
-            + "Study as study inner join fetch study.site "
-            + "where study.site.id='" + site.getId() + "' "
-            + "and study.name = '" + study.getName() + "'");
+        HQLCriteria c = new HQLCriteria(
+            "from edu.ualberta.med.biobank.model.Study as study "
+                + "inner join fetch study.site where study.site.id=? "
+                + "and study.name=?");
+
+        c.setParameters(Arrays.asList(new Object[] { site.getId(),
+            study.getName(), study.getNameShort() }));
 
         List<Object> results = appService.query(c);
 
@@ -348,10 +426,13 @@ public class StudyEntryForm extends BiobankEntryForm {
             return false;
         }
 
-        c = new HQLCriteria("from edu.ualberta.med.biobank.model.Study "
-            + " as study inner join fetch study.site where study.site.id='"
-            + site.getId() + "' " + "and study.nameShort = '"
-            + study.getNameShort() + "'");
+        c = new HQLCriteria(
+            "from edu.ualberta.med.biobank.model.Study as study "
+                + "inner join fetch study.site where study.site.id=?"
+                + "and study.nameShort=?");
+
+        c.setParameters(Arrays.asList(new Object[] { site.getId(),
+            study.getNameShort() }));
 
         results = appService.query(c);
 

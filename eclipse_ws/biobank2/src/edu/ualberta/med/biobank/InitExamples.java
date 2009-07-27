@@ -4,11 +4,13 @@ import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Container;
+import edu.ualberta.med.biobank.model.ContainerNumScheme;
 import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.Sample;
+import edu.ualberta.med.biobank.model.SampleStorage;
 import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
@@ -18,14 +20,18 @@ import gov.nih.nci.system.client.ApplicationServiceProvider;
 import gov.nih.nci.system.query.SDKQueryResult;
 import gov.nih.nci.system.query.example.DeleteExampleQuery;
 import gov.nih.nci.system.query.example.InsertExampleQuery;
+import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 import java.lang.reflect.Constructor;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+
+import org.eclipse.core.runtime.Assert;
 
 /**
  * After re-generation : init some storagetype and storage containers for one
@@ -54,11 +60,20 @@ public class InitExamples {
 
     private ContainerType drawerType;
 
+    private HashMap<String, ContainerNumScheme> numSchemeMap;
+
     /**
      * @param args
+     * @throws Exception
      */
     public static void main(String[] args) throws Exception {
-        InitExamples init = new InitExamples();
+        new InitExamples();
+    }
+
+    public InitExamples() throws Exception {
+        clinics = new Clinic[MAX_CLINICS];
+        numSchemeMap = new HashMap<String, ContainerNumScheme>();
+
         // appService = (WritableApplicationService)
         // ApplicationServiceProvider
         // .getApplicationServiceFromUrl("http://aicml-med.cs.ualberta.ca:8080/biobank2");
@@ -67,31 +82,28 @@ public class InitExamples {
             .getApplicationServiceFromUrl("http://localhost:8080/biobank2",
                 "testuser", "test");
 
-        init.deleteAll(Container.class);
-        init.deleteAll(ContainerType.class);
-        init.deleteAll(PatientVisit.class);
-        init.deleteAll(Patient.class);
-        init.deleteAll(Study.class);
-        init.deleteAll(Clinic.class);
-        init.deleteAll(Site.class);
+        deleteAll(Container.class);
+        deleteAll(ContainerType.class);
+        deleteAll(PatientVisit.class);
+        deleteAll(Patient.class);
+        deleteAll(Study.class);
+        deleteAll(Clinic.class);
+        deleteAll(Site.class);
 
-        init.insertSite();
+        insertSite();
 
-        init.insertClinicsInSite();
-        init.insertStudyInSite();
-        init.insertPatientInStudy();
-        init.insertPatientVisitInPatient();
-        init.insertSampleInPatientVisit();
+        insertClinicsInSite();
+        insertStudyInSite();
+        insertPatientInStudy();
+        insertPatientVisitInPatient();
+        insertSampleInPatientVisit();
 
-        init.insertContainerTypesInSite();
+        insertContainerTypesInSite();
 
-        init.insertContainers();
+        insertContainers();
+        insertSampleStorage();
 
         System.out.println("Init done.");
-    }
-
-    public InitExamples() {
-        clinics = new Clinic[MAX_CLINICS];
     }
 
     private void insertSite() throws ApplicationException {
@@ -123,8 +135,8 @@ public class InitExamples {
 
     private void insertStudyInSite() throws ApplicationException {
         study = new Study();
-        study.setName("Study Test");
-        study.setNameShort("ST");
+        study.setName("Blood Borne Pathogens");
+        study.setNameShort("BBP");
         study.setSite(site);
         study.setClinicCollection(site.getClinicCollection());
         SDKQueryResult res = appService.executeQuery(new InsertExampleQuery(
@@ -186,27 +198,47 @@ public class InitExamples {
     }
 
     private void insertContainerTypesInSite() throws ApplicationException {
+        List<ContainerNumScheme> numSchemes = appService.search(
+            ContainerNumScheme.class, new ContainerNumScheme());
+        Assert.isNotNull(numSchemes);
+        for (ContainerNumScheme scheme : numSchemes) {
+            numSchemeMap.put(scheme.getName(), scheme);
+        }
+
+        // Freezer Types
         paletteType = insertContainerTypeInSite("Palette", "Row", "Column", 8,
-            12, null);
+            12, null, numSchemeMap.get("SBS Standard"));
         hotel13Type = insertContainerTypeInSite("Hotel-13", "Row", "", 13, 1,
-            Arrays.asList(new ContainerType[] { paletteType }));
+            Arrays.asList(new ContainerType[] { paletteType }), numSchemeMap
+                .get("CBSR 2 char alphabetic"));
         hotel19Type = insertContainerTypeInSite("Hotel-19", "Row", "", 19, 1,
-            Arrays.asList(new ContainerType[] { paletteType }));
-        freezerType = insertContainerTypeInSite("Freezer", "Row", "Column", 5,
-            6, Arrays.asList(new ContainerType[] { hotel13Type, hotel19Type }));
-        binType = insertContainerTypeInSite("Bin", "Row", "", 120, 1, null);
+            Arrays.asList(new ContainerType[] { paletteType }), numSchemeMap
+                .get("CBSR 2 char alphabetic"));
+        freezerType = insertContainerTypeInSite("Freezer", "Row", "Column", 3,
+            10,
+            Arrays.asList(new ContainerType[] { hotel13Type, hotel19Type }),
+            null);
+
+        // Cabinet Types
+        binType = insertContainerTypeInSite("Bin", "Row", "", 120, 1, null,
+            numSchemeMap.get("2 char numeric"));
         drawerType = insertContainerTypeInSite("Drawer", "Row", "", 36, 1,
-            Arrays.asList(new ContainerType[] { binType }));
+            Arrays.asList(new ContainerType[] { binType }), numSchemeMap
+                .get("CBSR 2 char alphabetic"));
         insertContainerTypeInSite("Cabinet", "Row", "", 4, 1, Arrays
-            .asList(new ContainerType[] { drawerType }));
+            .asList(new ContainerType[] { drawerType }), null);
     }
 
     private ContainerType insertContainerTypeInSite(String name,
         String dim1label, String dim2label, int dim1, int dim2,
-        List<ContainerType> children) throws ApplicationException {
+        List<ContainerType> children, ContainerNumScheme numScheme)
+        throws ApplicationException {
         ContainerType ct = new ContainerType();
         ct.setName(name);
         ct.setSite(site);
+        if (numScheme != null) {
+            ct.setNumberingScheme(numScheme);
+        }
         Capacity capacity = new Capacity();
         capacity.setDimensionOneCapacity(dim1);
         capacity.setDimensionTwoCapacity(dim2);
@@ -224,33 +256,78 @@ public class InitExamples {
 
     private Container insertContainer(String name, ContainerType ct,
         Container parent, int pos1, int pos2) throws ApplicationException {
-        Container sc = new Container();
-        sc.setName(name);
-        sc.setBarcode(name);
-        sc.setSite(site);
-        sc.setContainerType(ct);
-        ContainerPosition cp = new ContainerPosition();
-        cp.setContainer(sc);
+        Container container = new Container();
+        container.setPositionCode(name);
+        container.setProductBarcode(name);
+        container.setSite(site);
+        container.setContainerType(ct);
         if (parent != null) {
-            cp.setParentContainer(parent);
-            cp.setPositionDimensionOne(pos1);
-            cp.setPositionDimensionTwo(pos2);
+            ContainerPosition pos = new ContainerPosition();
+            pos.setContainer(container);
+            pos.setParentContainer(parent);
+            pos.setPositionDimensionOne(pos1);
+            pos.setPositionDimensionTwo(pos2);
+            container.setPosition(pos);
         }
-        sc.setPosition(cp);
-        SDKQueryResult res = appService
-            .executeQuery(new InsertExampleQuery(sc));
+        SDKQueryResult res = appService.executeQuery(new InsertExampleQuery(
+            container));
         return (Container) res.getObjectResult();
     }
 
     private void insertContainers() throws ApplicationException {
-        Container freezer = insertContainer("Freezer1", freezerType, null, 0, 0);
-        Container hotel1 = insertContainer("Hotelaa", hotel19Type, freezer, 1,
-            1);
-        insertContainer("Palette1", paletteType, hotel1, 1, 1);
-        insertContainer("Palette2", paletteType, hotel1, 3, 1);
-        Container hotel2 = insertContainer("Hotelbb", hotel13Type, freezer, 2,
-            2);
-        insertContainer("Palette3", paletteType, hotel2, 1, 1);
-        insertContainer("Palette4", paletteType, hotel2, 5, 1);
+        Container freezer = insertContainer("01", freezerType, null, 0, 0);
+        Container hotel1 = insertContainer("AA", hotel19Type, freezer, 1, 1);
+        insertContainer("01", paletteType, hotel1, 1, 1);
+        insertContainer("03", paletteType, hotel1, 3, 1);
+        Container hotel2 = insertContainer("AE", hotel13Type, freezer, 2, 2);
+        insertContainer("01", paletteType, hotel2, 1, 1);
+        insertContainer("05", paletteType, hotel2, 5, 1);
     }
+
+    private void insertSampleStorage() throws Exception {
+        HQLCriteria c = new HQLCriteria(
+            "from edu.ualberta.med.biobank.model.Study as study "
+                + "where study.nameShort=?");
+        c.setParameters(Arrays.asList(new Object[] { "BBP" }));
+        List<Study> studies = appService.query(c);
+        if (studies.size() != 1) {
+            throw new Exception("BBP study not found");
+        }
+
+        Study bbpStudy = studies.get(0);
+
+        c = new HQLCriteria("from edu.ualberta.med.biobank.model.SampleType");
+        List<SampleType> results = appService.query(c);
+        if (results.size() == 0) {
+            throw new Exception("not sample types in database");
+        }
+
+        SampleStorage ss;
+
+        for (SampleType type : results) {
+            if (type.getName().equals("DNA (Blood)")) {
+                ss = new SampleStorage();
+                ss.setQuantity(2);
+                ss.setVolume(0.4);
+            } else if (type.getName().equals("Plasma (Na Heparin) - DAD")) {
+                ss = new SampleStorage();
+                ss.setQuantity(15);
+                ss.setVolume(0.2);
+                ss.setSampleType(type);
+            } else if (type.getName().equals("Duodenum")) {
+                ss = new SampleStorage();
+                ss.setQuantity(10);
+                ss.setVolume(0.6);
+                ss.setSampleType(type);
+            } else {
+                continue;
+            }
+
+            ss.setSampleType(type);
+            ss.setStudy(bbpStudy);
+
+            appService.executeQuery(new InsertExampleQuery(ss));
+        }
+    }
+
 }

@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.forms;
 
 import java.util.Collection;
-import java.util.Iterator;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -38,6 +37,7 @@ public class StudyViewForm extends BiobankViewForm {
     private Label commentLabel;
 
     private BiobankCollectionTable clinicsTable;
+    private BiobankCollectionTable sampleStorageTable;
     private BiobankCollectionTable patientsTable;
     private BiobankCollectionTable pvInfosTable;
 
@@ -93,6 +93,7 @@ public class StudyViewForm extends BiobankViewForm {
         clinicsTable = FormUtils.createClinicSection(toolkit, form.getBody(),
             clinicGroupNode, study.getClinicCollection());
 
+        createSampleStorageSection();
         createPatientsSection();
         createPvDataSection();
     }
@@ -101,6 +102,17 @@ public class StudyViewForm extends BiobankViewForm {
         FormUtils.setTextValue(nameShortLabel, study.getNameShort());
         FormUtils.setTextValue(activityStatusLabel, study.getActivityStatus());
         FormUtils.setTextValue(commentLabel, study.getComment());
+    }
+
+    private void createSampleStorageSection() {
+        Section section = createSection("Sample Storage");
+
+        String[] headings = new String[] { "Sample type", "Volume", "Quantity" };
+        sampleStorageTable = new BiobankCollectionTable(section, SWT.NONE,
+            headings, ModelUtils.toArray(study.getSampleStorageCollection()));
+        section.setClient(sampleStorageTable);
+        sampleStorageTable.adaptToToolkit(toolkit);
+        toolkit.paintBordersFor(sampleStorageTable);
     }
 
     private void createPatientsSection() {
@@ -146,16 +158,18 @@ public class StudyViewForm extends BiobankViewForm {
     }
 
     private PvInfo[] getStudyPvInfo() {
-        // hack required here because site.getStudyCollection().toArray(new
-        // Study[0]) returns Object[].
-        int count = 0;
+        // hack required here because study.getXxxCollection().toArray(new
+        // Xxx[0]) returns Object[].
         Collection<PvInfo> pvInfos = study.getPvInfoCollection();
+        if ((pvInfos == null) || (pvInfos.size() == 0))
+            return null;
+        int count = 0;
         if (pvInfos == null)
             return null;
+
         PvInfo[] arr = new PvInfo[pvInfos.size()];
-        Iterator<PvInfo> it = pvInfos.iterator();
-        while (it.hasNext()) {
-            arr[count] = it.next();
+        for (PvInfo p : pvInfos) {
+            arr[count] = p;
             ++count;
         }
         return arr;

@@ -16,6 +16,7 @@ import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.PvInfo;
 import edu.ualberta.med.biobank.model.Sample;
+import edu.ualberta.med.biobank.model.SampleStorage;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.ClinicAdapter;
 import edu.ualberta.med.biobank.treeview.ContainerTypeAdapter;
@@ -99,11 +100,11 @@ public class BiobankLabelProvider extends LabelProvider implements
             final Container container = (Container) element;
             switch (columnIndex) {
             case 0:
-                return container.getName();
+                return container.getPositionCode();
             case 1:
                 return container.getActivityStatus();
             case 2:
-                return container.getBarcode();
+                return container.getProductBarcode();
             case 3:
                 Object o = container.getFull();
                 if (o == null)
@@ -135,6 +136,16 @@ public class BiobankLabelProvider extends LabelProvider implements
                     .toString();
             case 6:
                 return sample.getComment() == null ? "" : sample.getComment();
+            }
+        } else if (element instanceof SampleStorage) {
+            final SampleStorage ss = (SampleStorage) element;
+            switch (columnIndex) {
+            case 0:
+                return ss.getSampleType().getName();
+            case 1:
+                return "" + ss.getVolume();
+            case 2:
+                return "" + ss.getQuantity();
             }
         } else {
             Assert.isTrue(false, "invalid object type");

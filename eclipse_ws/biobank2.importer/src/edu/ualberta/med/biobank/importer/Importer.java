@@ -578,9 +578,9 @@ public class Importer {
         for (ContainerPosition pos : positions) {
             System.out.println(String.format(
                 "%-12s %-12s %-12s %2d  %2d    %3d",
-                pos.getContainer().getName(),
+                pos.getContainer().getPositionCode(),
                 pos.getContainer().getContainerType().getName(),
-                pos.getParentContainer().getName(),
+                pos.getParentContainer().getPositionCode(),
                 pos.getPositionDimensionOne(), pos.getPositionDimensionTwo(),
                 pos.getContainer().getSamplePositionCollection().size()));
         }

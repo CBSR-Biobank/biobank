@@ -29,6 +29,10 @@
 	<property name="database.username" value="dummy" />
 	<property name="database.password" value="ozzy498" />
 
+    <condition property="perl" value="perl" else="/usr/bin/perl">
+         <os family="windows" />
+     </condition>
+
 	<!--
      files included in the sdk build.xml - necessary to be sure that we have
      all the keys for the target we redefined
@@ -122,7 +126,7 @@
 
 	</target>
 
-	<target name="sdk-and-scripts" depends="sdk, package-webapp-orm" />
+	<target name="sdk-and-scripts" depends="sdk" />
 
 	<target name="deploy-eclipse"
 	  description="deploys the caCORE SDK beans to the eclipse project"
@@ -164,7 +168,7 @@
 		</copy>
 	</target>
 
-	<target name="deploy-jboss"
+	<target name="deploy-jboss"  depends="package-webapp-orm"
 	  description="deploys the caCORE SDK webapp to JBoss">
 		<fail unless="env.JBOSS_HOME" message="$JBOSS_HOME not defined" />
 		<copy file="${security.dir}/jboss/login-config.xml"
@@ -193,23 +197,10 @@
 	 url="jdbc:mysql://${database.host}:${database.port}/${database.name}"
 	 userid="${database.username}"
 	 password="${database.password}">
-			<transaction src="${data.sql.dir}/sampleTypes.sql" />
 			<transaction src="${data.sql.dir}/pvInfoPossible.sql" />
-			<transaction>commit;</transaction>
-			<classpath>
-				<fileset dir="${cacore.sdk.dir}/system/lib">
-					<include name="*.jar" />
-				</fileset>
-			</classpath>
-		</sql>
-	</target>
-
-	<target name="securityDBcreate"
-	  description="creates the default tables and datas for the security">
-		<sql driver="${mysql.driver.string}"
-	 url="jdbc:mysql://${database.host}:${database.port}/${database.name}"
-	 userid="${database.username}"
-	 password="${database.password}">
+			<transaction src="${data.sql.dir}/sampleSources.sql" />
+			<transaction src="${data.sql.dir}/sampleTypes.sql" />
+                        <transaction src="${data.sql.dir}/containerNumScheme.sql" />
 			<transaction src="${security.dir}/schemaSecurityDump.sql" />
 			<transaction>commit;</transaction>
 			<classpath>
@@ -223,7 +214,7 @@
 	<!--Add the length="#" field into .hbm.xml, references the biobank.uml file for the VARCHAR(#) -->
 	<target name="string-length-field-addition"
 	  description="Add the length='#' field into .hbm.xml, references the biobank.uml file for the VARCHAR(#)">
-		<exec executable="/usr/bin/perl">
+		<exec executable="${perl}">
 			<env key="PATH" path="${scripts.proj.dir}" />
 			<arg value="${scripts.proj.dir}/hbmstringlength.pl" />
 			<arg value="${model.proj.dir}/biobank2.uml" />

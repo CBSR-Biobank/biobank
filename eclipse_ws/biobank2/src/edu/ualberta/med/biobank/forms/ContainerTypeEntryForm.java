@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.forms;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -12,9 +13,9 @@ import org.eclipse.core.databinding.beans.PojoObservables;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
@@ -27,6 +28,7 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.helpers.GetHelper;
 import edu.ualberta.med.biobank.model.Capacity;
+import edu.ualberta.med.biobank.model.ContainerNumScheme;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.model.Site;
@@ -56,8 +58,6 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
 
     private static final String MSG_NO_STORAGE_TYPE_NAME = "Storage type must have a name";
 
-    private static final String MSG_NO_DIMENSION_LABEL = "Dimension labels must be assigned";
-
     static Logger log4j = Logger.getLogger(SessionManager.class.getName());
 
     private ContainerTypeAdapter containerTypeAdapter;
@@ -77,6 +77,10 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
     private Site site;
 
     private MultiSelectListener multiSelectListener;
+
+    private CCombo numSchemeCombo;
+
+    private HashMap<String, ContainerNumScheme> numSchemeMap;
 
     public ContainerTypeEntryForm() {
         super();
@@ -142,6 +146,19 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
                 .observeValue(containerType, "defaultTemperature"),
             DoubleNumber.class, "Default temperature is not a valid number");
 
+        getNuberingSchemes();
+        Assert.isTrue(numSchemeMap.size() > 0);
+        toolkit.createLabel(client, "Numbering Scheme:");
+        numSchemeCombo = new CCombo(client, SWT.READ_ONLY);
+        numSchemeCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        for (String schemeName : numSchemeMap.keySet()) {
+            numSchemeCombo.add(schemeName);
+        }
+        ContainerNumScheme scheme = containerType.getNumberingScheme();
+        if (scheme != null) {
+            numSchemeCombo.setText(scheme.getName());
+        }
+
         createBoundWidgetWithLabel(client, Combo.class, SWT.NONE,
             "Activity Status", FormConstants.ACTIVITY_STATUS, PojoObservables
                 .observeValue(containerType, "activityStatus"), null, null);
@@ -152,6 +169,21 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         GridData gd = new GridData(GridData.FILL_HORIZONTAL);
         gd.heightHint = 40;
         comment.setLayoutData(gd);
+    }
+
+    private void getNuberingSchemes() {
+        try {
+            numSchemeMap = new HashMap<String, ContainerNumScheme>();
+            List<ContainerNumScheme> numSchemes;
+            numSchemes = appService.search(ContainerNumScheme.class,
+                new ContainerNumScheme());
+            Assert.isNotNull(numSchemes);
+            for (ContainerNumScheme scheme : numSchemes) {
+                numSchemeMap.put(scheme.getName(), scheme);
+            }
+        } catch (ApplicationException e) {
+            e.printStackTrace();
+        }
     }
 
     private void createDimensionsSection() {
@@ -165,31 +197,21 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
 
         createBoundWidgetWithLabel(client, Text.class, SWT.NONE,
             "Dimension One Label", null, PojoObservables.observeValue(
-                containerType, "dimensionOneLabel"), NonEmptyString.class,
-            MSG_NO_DIMENSION_LABEL);
+                containerType, "dimensionOneLabel"), null, null);
 
         createBoundWidgetWithLabel(client, Text.class, SWT.NONE,
             "Dimension One Capacity", null, PojoObservables.observeValue(
                 capacity, "dimensionOneCapacity"), IntegerNumber.class,
             "Dimension one capacity is not a valid number");
 
-        createBoundWidgetWithLabel(client, Button.class, SWT.NONE,
-            "Dimension One is Letter", null, PojoObservables.observeValue(
-                containerType, "dimensionOneIsLetter"), null, null);
-
         createBoundWidgetWithLabel(client, Text.class, SWT.NONE,
             "Dimension Two Label", null, PojoObservables.observeValue(
-                containerType, "dimensionTwoLabel"), NonEmptyString.class,
-            MSG_NO_DIMENSION_LABEL);
+                containerType, "dimensionTwoLabel"), null, null);
 
         createBoundWidgetWithLabel(client, Text.class, SWT.NONE,
             "Dimension Two Capacity", null, PojoObservables.observeValue(
                 capacity, "dimensionTwoCapacity"), IntegerNumber.class,
             "Dimension two capacity is not a valid nubmer");
-
-        createBoundWidgetWithLabel(client, Button.class, SWT.NONE,
-            "Dimension Two is Letter", null, PojoObservables.observeValue(
-                containerType, "dimensionTwoIsLetter"), null, null);
     }
 
     private void createSampleDerivTypesSection() {
@@ -304,6 +326,10 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
 
         // associate the storage type to it's site
         containerType.setSite(site);
+
+        ContainerNumScheme scheme = numSchemeMap.get(numSchemeCombo.getText());
+        Assert.isNotNull(scheme);
+        containerType.setNumberingScheme(scheme);
 
         if ((containerType.getId() == null) || (containerType.getId() == 0)) {
             query = new InsertExampleQuery(containerType);
