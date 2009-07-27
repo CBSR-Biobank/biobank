@@ -94,7 +94,7 @@ public abstract class AbstractContainerChooserPage extends WizardPage {
                 if (code != null) {
                     textPosition.setText(code);
                 } else {
-                    textPosition.setText(cp.getContainer().getPositionCode());
+                    textPosition.setText(cp.getContainer().getLabel());
                 }
                 setPageComplete(true);
             }

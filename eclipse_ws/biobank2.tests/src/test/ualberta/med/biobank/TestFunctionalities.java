@@ -581,7 +581,7 @@ public class TestFunctionalities {
             st = (ContainerType) result.getObjectResult();
 
             Container sc = new Container();
-            sc.setPositionCode("scTest");
+            sc.setLabel("scTest");
             sc.setSite(site);
             sc.setContainerType(st);
             result = appService.executeQuery(new InsertExampleQuery(sc));
@@ -611,13 +611,13 @@ public class TestFunctionalities {
         System.out.println("st=" + st.getId());
 
         Container sc = new Container();
-        sc.setPositionCode(String.format("%02d", r.nextInt()));
+        sc.setLabel(String.format("%02d", r.nextInt()));
         sc.setSite(site);
         sc.setContainerType(st);
         queries.add(new InsertExampleQuery(sc));
 
         sc = new Container();
-        sc.setPositionCode(String.format("%02d", r.nextInt()));
+        sc.setLabel(String.format("%02d", r.nextInt()));
         // no site !!
         queries.add(new InsertExampleQuery(sc));
         try {

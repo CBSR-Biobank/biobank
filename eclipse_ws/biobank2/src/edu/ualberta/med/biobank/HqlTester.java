@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank;
 
+import edu.ualberta.med.biobank.model.ContainerType;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.client.ApplicationServiceProvider;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -20,9 +21,11 @@ public class HqlTester {
             .getApplicationServiceFromUrl("http://localhost:8080/biobank2",
                 "testuser", "test");
 
-        getPatientIds();
+        geTopContainerTypes();
+        // getPatientIds();
     }
 
+    @SuppressWarnings("unused")
     private void getPatientIds() throws Exception {
         HQLCriteria c = new HQLCriteria("select patients.id"
             + " from edu.ualberta.med.biobank.model.Patient as patients"
@@ -34,6 +37,20 @@ public class HqlTester {
         List<Integer> results = appService.query(c);
         for (Integer id : results) {
             System.out.println("getPatientIds: id: " + id);
+        }
+    }
+
+    private void geTopContainerTypes() throws Exception {
+        HQLCriteria c = new HQLCriteria(
+            "from edu.ualberta.med.biobank.model.ContainerType as cttop"
+                + " where cttop.id not in (select child.id"
+                + " from edu.ualberta.med.biobank.model.ContainerType as ct"
+                + " left join ct.childContainerTypeCollection as child "
+                + " where child.id!=null)");
+
+        List<ContainerType> results = appService.query(c);
+        for (ContainerType ct : results) {
+            System.out.println("geTopContainerTypes: " + ct.getName());
         }
     }
 

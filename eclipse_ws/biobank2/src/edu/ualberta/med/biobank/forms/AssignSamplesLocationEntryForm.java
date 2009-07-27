@@ -334,7 +334,7 @@ public class AssignSamplesLocationEntryForm extends BiobankEntryForm implements
     private void initNewPalette(ContainerPosition position, ContainerType type) {
         currentPalette.setPosition(position);
         currentPalette.setContainerType(type);
-        currentPalette.setPositionCode(paletteCodeValue.getValue().toString());
+        currentPalette.setLabel(paletteCodeValue.getValue().toString());
         currentPalette
             .setProductBarcode(paletteCodeValue.getValue().toString());
         currentPalette.setSite(currentStudy.getSite());
@@ -427,7 +427,7 @@ public class AssignSamplesLocationEntryForm extends BiobankEntryForm implements
             ContainerPosition hotelPosition = hotelContainer.getPosition();
             Container freezerContainer = hotelPosition.getParentContainer();
 
-            freezerLabel.setText(freezerContainer.getPositionCode());
+            freezerLabel.setText(freezerContainer.getLabel());
             int dim1 = freezerContainer.getContainerType().getCapacity()
                 .getDimensionOneCapacity();
             int dim2 = freezerContainer.getContainerType().getCapacity()
@@ -437,7 +437,7 @@ public class AssignSamplesLocationEntryForm extends BiobankEntryForm implements
                 .getPositionDimensionOne() - 1, hotelPosition
                 .getPositionDimensionTwo() - 1));
 
-            hotelLabel.setText(hotelContainer.getPositionCode());
+            hotelLabel.setText(hotelContainer.getLabel());
             dim1 = hotelContainer.getContainerType().getCapacity()
                 .getDimensionOneCapacity();
             dim2 = hotelContainer.getContainerType().getCapacity()
@@ -447,7 +447,7 @@ public class AssignSamplesLocationEntryForm extends BiobankEntryForm implements
                 .getPositionDimensionOne() - 1, palettePosition
                 .getPositionDimensionTwo() - 1));
 
-            paletteLabel.setText(palette.getPositionCode());
+            paletteLabel.setText(palette.getLabel());
             hasLocationValue.setValue(Boolean.TRUE);
         } else {
             hasLocationValue.setValue(Boolean.FALSE);
@@ -514,11 +514,11 @@ public class AssignSamplesLocationEntryForm extends BiobankEntryForm implements
                     scanCell.setStatus(SampleCellStatus.ERROR);
                     Container samplePalette = sample.getSamplePosition()
                         .getContainer();
-                    String posString = samplePalette.getPositionCode();
+                    String posString = samplePalette.getLabel();
                     Container parent = samplePalette.getPosition()
                         .getParentContainer();
                     while (parent != null) {
-                        posString = parent.getPositionCode() + "-" + posString;
+                        posString = parent.getLabel() + "-" + posString;
                         parent = parent.getPosition().getParentContainer();
                     }
                     scanCell
@@ -665,7 +665,7 @@ public class AssignSamplesLocationEntryForm extends BiobankEntryForm implements
         currentPaletteSamples = null;
         String barcode = (String) paletteCodeValue.getValue();
         currentPalette = ModelUtils
-            .getContainerWithPositionCode(appService, barcode);
+            .getContainerWithLabel(appService, barcode);
         if (currentPalette != null) {
             boolean result = MessageDialog
                 .openConfirm(PlatformUI.getWorkbench()

@@ -199,7 +199,7 @@
 			<transaction src="${data.sql.dir}/pvInfoPossible.sql" />
 			<transaction src="${data.sql.dir}/sampleSources.sql" />
 			<transaction src="${data.sql.dir}/sampleTypes.sql" />
-                        <transaction src="${data.sql.dir}/containerNumScheme.sql" />
+                        <transaction src="${data.sql.dir}/containerLabelingScheme.sql" />
 			<transaction src="${security.dir}/schemaSecurityDump.sql" />
 			<transaction>commit;</transaction>
 			<classpath>

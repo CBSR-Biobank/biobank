@@ -131,7 +131,7 @@ public class BioBank2Db {
 
     public Container getContainer(String name) throws Exception {
         Container sc = new Container();
-        sc.setPositionCode(name);
+        sc.setLabel(name);
 
         List<Container> list = appService.search(Container.class, sc);
         if (list.size() != 1) throw new Exception();
@@ -164,9 +164,9 @@ public class BioBank2Db {
         List<Container> results = appService.query(c);
         if (results.size() != 1) {
             if (results.size() != 0) throw new Exception("Container "
-                + container.getPositionCode() + " has no child containers");
+                + container.getLabel() + " has no child containers");
             else
-                throw new Exception("Container " + container.getPositionCode()
+                throw new Exception("Container " + container.getLabel()
                     + " has no child container at position " + dim1pos + ","
                     + dim2pos);
         }
@@ -178,7 +178,7 @@ public class BioBank2Db {
         ContainerType stype = container.getContainerType();
         Collection<SampleType> st = stype.getSampleTypeCollection();
         if ((st == null) || (st.size() == 0)) {
-            throw new Exception("Container " + container.getPositionCode()
+            throw new Exception("Container " + container.getLabel()
                 + " cannot hold any sample types: " + sampleType.getName());
         }
         HQLCriteria c = new HQLCriteria("select count(sampleTypes)"
@@ -192,7 +192,7 @@ public class BioBank2Db {
         List<Long> results = appService.query(c);
         if (results.get(0) != 1) {
             throw new Exception("Sample type " + sampleType.getName()
-                + " is not valid for container " + container.getPositionCode());
+                + " is not valid for container " + container.getLabel());
         }
     }
 

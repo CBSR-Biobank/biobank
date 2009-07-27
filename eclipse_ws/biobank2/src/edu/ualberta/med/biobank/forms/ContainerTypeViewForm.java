@@ -44,11 +44,7 @@ public class ContainerTypeViewForm extends BiobankViewForm {
 
     private Label commentLabel;
 
-    private Label dimOneLabelLabel;
-
     private Label dimOneCapacityLabel;
-
-    private Label dimTwoLabelLabel;
 
     private Label dimTwoCapacityLabel;
 
@@ -123,7 +119,7 @@ public class ContainerTypeViewForm extends BiobankViewForm {
         defaultTempLabel = (Label) createWidget(client, Label.class, SWT.NONE,
             "Default Temperature\n(Celcius)");
         numSchemeLabel = (Label) createWidget(client, Label.class, SWT.NONE,
-            "Numbering Scheme");
+            "Child Labeling Scheme");
         activityStatusLabel = (Label) createWidget(client, Label.class,
             SWT.NONE, "Activity Status");
         commentLabel = (Label) createWidget(client, Label.class, SWT.NONE,
@@ -137,7 +133,7 @@ public class ContainerTypeViewForm extends BiobankViewForm {
         FormUtils.setTextValue(defaultTempLabel, containerType
             .getDefaultTemperature());
         FormUtils.setTextValue(numSchemeLabel, containerType
-            .getNumberingScheme().getName());
+            .getChildLabelingScheme().getName());
         FormUtils.setTextValue(activityStatusLabel, containerType
             .getActivityStatus());
         FormUtils.setTextValue(commentLabel, containerType.getComment());
@@ -150,12 +146,8 @@ public class ContainerTypeViewForm extends BiobankViewForm {
         layout.horizontalSpacing = 10;
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-        dimOneLabelLabel = (Label) createWidget(client, Label.class, SWT.NONE,
-            "Dimension One Label");
         dimOneCapacityLabel = (Label) createWidget(client, Label.class,
             SWT.NONE, "Dimension One Capacity");
-        dimTwoLabelLabel = (Label) createWidget(client, Label.class, SWT.NONE,
-            "Dimension Two Label");
         dimTwoCapacityLabel = (Label) createWidget(client, Label.class,
             SWT.NONE, "Dimension Two Capacity");
 
@@ -163,12 +155,8 @@ public class ContainerTypeViewForm extends BiobankViewForm {
     }
 
     private void setDimensionsValues() {
-        FormUtils.setTextValue(dimOneLabelLabel, containerType
-            .getDimensionOneLabel());
         FormUtils.setTextValue(dimOneCapacityLabel, capacity
             .getDimensionOneCapacity());
-        FormUtils.setTextValue(dimTwoLabelLabel, containerType
-            .getDimensionTwoLabel());
         FormUtils.setTextValue(dimTwoCapacityLabel, capacity
             .getDimensionTwoCapacity());
     }
