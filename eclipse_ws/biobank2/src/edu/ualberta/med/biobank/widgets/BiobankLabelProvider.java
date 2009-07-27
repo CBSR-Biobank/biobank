@@ -16,6 +16,7 @@ import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.PvInfo;
 import edu.ualberta.med.biobank.model.Sample;
+import edu.ualberta.med.biobank.model.SampleStorage;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.ClinicAdapter;
 import edu.ualberta.med.biobank.treeview.ContainerTypeAdapter;
@@ -135,6 +136,16 @@ public class BiobankLabelProvider extends LabelProvider implements
                     .toString();
             case 6:
                 return sample.getComment() == null ? "" : sample.getComment();
+            }
+        } else if (element instanceof SampleStorage) {
+            final SampleStorage ss = (SampleStorage) element;
+            switch (columnIndex) {
+            case 0:
+                return ss.getSampleType().getName();
+            case 1:
+                return "" + ss.getQuantity();
+            case 2:
+                return "" + ss.getVolume();
             }
         } else {
             Assert.isTrue(false, "invalid object type");

@@ -16,6 +16,7 @@ public class ChooseContainerWidget extends AbstractGridContainerWidget {
 
     private List<ContainerStatus> legendStatus;
 
+    @SuppressWarnings("unused")
     private boolean showNullStatusAsEmpty = false;
 
     public ChooseContainerWidget(Composite parent) {
