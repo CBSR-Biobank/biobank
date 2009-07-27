@@ -1,0 +1,6 @@
+LOCK TABLES `CONTAINER_NUM_SCHEME` WRITE;
+INSERT INTO `CONTAINER_NUM_SCHEME` VALUES
+( 1, "pallete"),
+( 2, "CBSR 2 char alphabetic"),
+( 3, "2 char numeric");
+UNLOCK TABLES;
