@@ -2,6 +2,8 @@ package edu.ualberta.med.biobank.forms;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -203,6 +205,27 @@ public class ContainerViewForm extends BiobankViewForm {
             containerWidget.setGridSizes(dim1, dim2, colWidth * dim2, rowHeight
                 * dim1);
             containerWidget.setContainersStatus(cells);
+            containerWidget.addMouseListener(new MouseListener() {
+                @Override
+                public void mouseDoubleClick(MouseEvent e) {
+                    Object source = e.getSource();
+                    // openForm(new FormInput(adapter),
+                    // ContainerTypeEntryForm.ID);
+
+                }
+
+                @Override
+                public void mouseDown(MouseEvent e) {
+                    // TODO Auto-generated method stub
+
+                }
+
+                @Override
+                public void mouseUp(MouseEvent e) {
+                    // TODO Auto-generated method stub
+
+                }
+            });
         }
     }
 
