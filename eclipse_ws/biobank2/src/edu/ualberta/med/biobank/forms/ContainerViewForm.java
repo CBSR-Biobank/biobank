@@ -1,9 +1,11 @@
 package edu.ualberta.med.biobank.forms;
 
+import java.util.Collection;
+
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -54,6 +56,8 @@ public class ContainerViewForm extends BiobankViewForm {
 
     private Label positionDimTwoLabel;
 
+    ContainerCell[][] cells;
+
     @Override
     public void init(IEditorSite editorSite, IEditorInput input)
         throws PartInitException {
@@ -67,26 +71,19 @@ public class ContainerViewForm extends BiobankViewForm {
             appService = containerAdapter.getAppService();
             retrieveContainer();
             position = container.getPosition();
-            setPartName("Container " + container.getLabel());
+            setPartName(container.getLabel() + " ("
+                + container.getContainerType().getName() + ")");
+            initCells();
         } else {
             Assert.isTrue(false, "Invalid editor input: object of type "
                 + node.getClass().getName());
         }
     }
 
-    private void retrieveContainer() {
-        try {
-            container = (Container) ModelUtils.getObjectWithId(appService,
-                Container.class, containerAdapter.getContainer().getId());
-            containerAdapter.setContainer(container);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
     @Override
     protected void createFormContent() {
-        form.setText("Container " + container.getLabel());
+        form.setText("Container " + container.getLabel() + " ("
+            + container.getContainerType().getName() + ")");
         form.getBody().setLayout(new GridLayout(1, false));
 
         addRefreshToolbarAction();
@@ -129,24 +126,54 @@ public class ContainerViewForm extends BiobankViewForm {
         }
     }
 
+    private void initCells() {
+        ContainerType containerType = container.getContainerType();
+        Capacity cap = containerType.getCapacity();
+        int dim1 = cap.getDimensionOneCapacity().intValue();
+        int dim2 = cap.getDimensionTwoCapacity().intValue();
+        if (dim1 == 0)
+            dim1 = 1;
+        if (dim2 == 0)
+            dim2 = 1;
+        cells = new ContainerCell[dim1][dim2];
+        for (int i = 0; i < dim1; i++) {
+            for (int j = 0; j < dim2; j++) {
+                ContainerPosition pos = new ContainerPosition();
+                pos.setPositionDimensionOne(i);
+                pos.setPositionDimensionTwo(j);
+                ContainerCell cell = new ContainerCell(pos);
+                cell.setStatus(ContainerStatus.EMPTY);
+                cells[i][j] = cell;
+            }
+        }
+        for (ContainerPosition position : container
+            .getChildPositionCollection()) {
+            int positionDim1 = position.getPositionDimensionOne().intValue();
+            int positionDim2 = position.getPositionDimensionTwo().intValue();
+            ContainerCell cell = new ContainerCell(position);
+            cell.setStatus(ContainerStatus.FILLED);
+            cells[positionDim1][positionDim2] = cell;
+        }
+    }
+
+    private void retrieveContainer() {
+        try {
+            container = (Container) ModelUtils.getObjectWithId(appService,
+                Container.class, containerAdapter.getContainer().getId());
+            containerAdapter.setContainer(container);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     protected void visualizeContainer() {
         // default 2 dimensional grid
         int rowHeight = 40, colWidth = 40;
         Composite client = createSectionWithClient("Container Visual");
 
-        ContainerType containerType = container.getContainerType();
-        Capacity cap = containerType.getCapacity();
-        Integer dim1 = cap.getDimensionOneCapacity();
-        Integer dim2 = cap.getDimensionTwoCapacity();
-        if (dim1 == null || dim1.intValue() == 0)
-            dim1 = new Integer(1);
-        if (dim2 == null || dim2.intValue() == 0)
-            dim2 = new Integer(1);
-
         // get occupied positions
-        ContainerCell[][] cells = new ContainerCell[dim1][dim2];
 
-        if (containerType.getName().equalsIgnoreCase("Drawer")) {
+        if (container.getContainerType().getName().equalsIgnoreCase("Drawer")) {
             // if Drawer, requires special grid
             CabinetDrawerWidget containerWidget = new CabinetDrawerWidget(
                 client);
@@ -161,20 +188,13 @@ public class ContainerViewForm extends BiobankViewForm {
                 .getChildPositionCollection());
         } else {
             // otherwise, normal grid
-            for (ContainerPosition position : container
-                .getChildPositionCollection()) {
-                int positionDim1 = position.getPositionDimensionOne()
-                    .intValue();
-                int positionDim2 = position.getPositionDimensionTwo()
-                    .intValue();
-                ContainerCell cell = new ContainerCell(position);
-                cell.setStatus(ContainerStatus.FILLED);
-                cells[positionDim1][positionDim2] = cell;
-            }
+
             ChooseContainerWidget containerWidget = new ChooseContainerWidget(
                 client);
             containerWidget.initDefaultLegend();
-            if (dim2.compareTo(new Integer(1)) == 0) {
+            int dim1 = cells.length;
+            int dim2 = cells[0].length;
+            if (dim2 <= 1) {
                 // single dimension size
                 rowHeight = 40;
                 colWidth = 150;
@@ -183,28 +203,50 @@ public class ContainerViewForm extends BiobankViewForm {
             containerWidget.setGridSizes(dim1, dim2, colWidth * dim2, rowHeight
                 * dim1);
             containerWidget.setContainersStatus(cells);
-            containerWidget.addMouseListener(new MouseListener() {
-                @Override
-                public void mouseDoubleClick(MouseEvent e) {
-                    // anObject source = e.getSource();
-                    // openForm(new FormInput(adapter),
-                    // ContainerTypeEntryForm.ID);
-
-                }
-
+            containerWidget.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseDown(MouseEvent e) {
-                    // TODO Auto-generated method stub
-
-                }
-
-                @Override
-                public void mouseUp(MouseEvent e) {
-                    // TODO Auto-generated method stub
+                    ContainerCell cell = ((ChooseContainerWidget) e.widget)
+                        .getPositionAtCoordinates(e.x, e.y);
+                    openFormFor(cell.getPosition());
 
                 }
             });
         }
+    }
+
+    private void openFormFor(ContainerPosition pos) {
+        ContainerAdapter newAdapter = null;
+
+        if (cells[pos.getPositionDimensionOne()][pos.getPositionDimensionTwo()]
+            .getStatus() == ContainerStatus.EMPTY) {
+            Container newContainer = new Container();
+            ContainerPosition contPos = pos;
+            contPos.setParentContainer(container);
+            newContainer.setPosition(contPos);
+            newAdapter = new ContainerAdapter(containerAdapter, newContainer);
+            Node.openForm(new FormInput(newAdapter), ContainerEntryForm.ID);
+        } else {
+            Container childContainer;
+            Collection<ContainerPosition> childPositions = container
+                .getChildPositionCollection();
+            Assert.isNotNull(childPositions);
+            for (ContainerPosition childPos : childPositions) {
+                childContainer = childPos.getContainer();
+                Assert.isNotNull(childContainer);
+                if (childPos.getPositionDimensionOne().compareTo(
+                    pos.getPositionDimensionOne()) == 0
+                    && childPos.getPositionDimensionTwo().compareTo(
+                        pos.getPositionDimensionTwo()) == 0) {
+                    newAdapter = new ContainerAdapter(containerAdapter,
+                        childContainer);
+                }
+            }
+            Assert.isNotNull(newAdapter);
+            Node.openForm(new FormInput(newAdapter), ContainerViewForm.ID);
+        }
+
+        containerAdapter.performExpand();
     }
 
     private void setContainerValues() {

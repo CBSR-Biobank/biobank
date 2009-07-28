@@ -26,7 +26,6 @@ public class ChooseContainerWidget extends AbstractGridContainerWidget {
 
     public ChooseContainerWidget(Composite parent) {
         super(parent);
-        initDefaultLegend();
     }
 
     public ContainerCell getPositionAtCoordinates(int x, int y) {
@@ -42,10 +41,10 @@ public class ChooseContainerWidget extends AbstractGridContainerWidget {
     }
 
     public void initDefaultLegend() {
-        List<ContainerStatus> legend = new ArrayList<ContainerStatus>();
-        legend.add(ContainerStatus.EMPTY);
-        legend.add(ContainerStatus.FILLED);
-        setLegend(legend);
+        List<ContainerStatus> legendStatus = new ArrayList<ContainerStatus>();
+        legendStatus.add(ContainerStatus.EMPTY);
+        legendStatus.add(ContainerStatus.FILLED);
+        setLegend(legendStatus);
     }
 
     public void setContainersStatus(ContainerCell[][] cells) {
