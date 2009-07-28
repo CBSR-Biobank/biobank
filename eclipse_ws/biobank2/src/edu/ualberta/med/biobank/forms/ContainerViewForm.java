@@ -1,5 +1,7 @@
 package edu.ualberta.med.biobank.forms;
 
+import java.util.Collection;
+
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseAdapter;
@@ -61,24 +63,6 @@ public class ContainerViewForm extends BiobankViewForm {
         throws PartInitException {
         super.init(editorSite, input);
 
-        ContainerType containerType = container.getContainerType();
-        Capacity cap = containerType.getCapacity();
-        Integer dim1 = cap.getDimensionOneCapacity();
-        Integer dim2 = cap.getDimensionTwoCapacity();
-        if (dim1 == null || dim1.intValue() == 0)
-            dim1 = new Integer(1);
-        if (dim2 == null || dim2.intValue() == 0)
-            dim2 = new Integer(1);
-        cells = new ContainerCell[dim1][dim2];
-        for (int i = 0; i < dim1; i++) {
-            for (int j = 0; j < dim2; j++) {
-                ContainerPosition pos = new ContainerPosition();
-                pos.setPositionDimensionOne(i);
-                pos.setPositionDimensionTwo(j);
-                cells[i][j] = new ContainerCell(pos);
-            }
-        }
-
         Node node = ((FormInput) input).getNode();
         Assert.isNotNull(node, "Null editor input");
 
@@ -88,9 +72,40 @@ public class ContainerViewForm extends BiobankViewForm {
             retrieveContainer();
             position = container.getPosition();
             setPartName("Container " + container.getLabel());
+            initCells();
         } else {
             Assert.isTrue(false, "Invalid editor input: object of type "
                 + node.getClass().getName());
+        }
+    }
+
+    private void initCells() {
+        ContainerType containerType = container.getContainerType();
+        Capacity cap = containerType.getCapacity();
+        int dim1 = cap.getDimensionOneCapacity().intValue();
+        int dim2 = cap.getDimensionTwoCapacity().intValue();
+        if (dim1 == 0)
+            dim1 = 1;
+        if (dim2 == 0)
+            dim2 = 1;
+        cells = new ContainerCell[dim1][dim2];
+        for (int i = 0; i < dim1; i++) {
+            for (int j = 0; j < dim2; j++) {
+                ContainerPosition pos = new ContainerPosition();
+                pos.setPositionDimensionOne(i);
+                pos.setPositionDimensionTwo(j);
+                ContainerCell cell = new ContainerCell(pos);
+                cell.setStatus(ContainerStatus.EMPTY);
+                cells[i][j] = cell;
+            }
+        }
+        for (ContainerPosition position : container
+            .getChildPositionCollection()) {
+            int positionDim1 = position.getPositionDimensionOne().intValue();
+            int positionDim2 = position.getPositionDimensionTwo().intValue();
+            ContainerCell cell = new ContainerCell(position);
+            cell.setStatus(ContainerStatus.FILLED);
+            cells[positionDim1][positionDim2] = cell;
         }
     }
 
@@ -171,22 +186,13 @@ public class ContainerViewForm extends BiobankViewForm {
                 .getChildPositionCollection());
         } else {
             // otherwise, normal grid
-            for (ContainerPosition position : container
-                .getChildPositionCollection()) {
-                int positionDim1 = position.getPositionDimensionOne()
-                    .intValue() - 1;
-                int positionDim2 = position.getPositionDimensionTwo()
-                    .intValue() - 1;
-                ContainerCell cell = new ContainerCell(position);
-                cell.setStatus(ContainerStatus.FILLED);
-                cells[positionDim1][positionDim2] = cell;
-            }
+
             ChooseContainerWidget containerWidget = new ChooseContainerWidget(
                 client);
             containerWidget.initLegend();
             int dim1 = cells.length;
             int dim2 = cells[0].length;
-            if (dim2 == 1) {
+            if (dim2 <= 1) {
                 // single dimension size
                 rowHeight = 40;
                 colWidth = 150;
@@ -208,12 +214,30 @@ public class ContainerViewForm extends BiobankViewForm {
     }
 
     private void openFormFor(ContainerPosition pos) {
-        FormInput fi = new FormInput(containerAdapter);
+        ContainerAdapter newAdapter = null;
+        FormInput fi;
         if (cells[pos.getPositionDimensionOne()][pos.getPositionDimensionTwo()]
-            .getStatus() == ContainerStatus.EMPTY)
+            .getStatus() == ContainerStatus.EMPTY) {
+            Container newContainer = new Container();
+            newAdapter = new ContainerAdapter(containerAdapter, newContainer);
+            fi = new FormInput(newAdapter);
             Node.openForm(fi, ContainerEntryForm.ID);
-        else
+        } else {
+            Collection<Node> children = containerAdapter.getChildren();
+            Container cont;
+            for (Node child : children) {
+                cont = ((ContainerAdapter) child).getContainer();
+                ContainerPosition contPos = cont.getPosition();
+                if (contPos.getPositionDimensionOne().compareTo(
+                    pos.getPositionDimensionOne()) == 0
+                    && contPos.getPositionDimensionTwo().compareTo(
+                        pos.getPositionDimensionTwo()) == 0) {
+                    newAdapter = (ContainerAdapter) child;
+                }
+            }
+            fi = new FormInput(newAdapter);
             Node.openForm(fi, ContainerViewForm.ID);
+        }
     }
 
     private void setContainerValues() {

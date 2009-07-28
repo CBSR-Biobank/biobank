@@ -76,14 +76,10 @@ public class InitExamples {
         clinics = new Clinic[MAX_CLINICS];
         numSchemeMap = new HashMap<String, ContainerLabelingScheme>();
 
-        // appService = (WritableApplicationService) ApplicationServiceProvider
-        // .getApplicationServiceFromUrl(
-        // "http://aicml-med.cs.ualberta.ca:8080/biobank2", "testuser",
-        // "test");
-
         appService = (WritableApplicationService) ApplicationServiceProvider
-            .getApplicationServiceFromUrl("http://localhost:8080/biobank2",
-                "testuser", "test");
+            .getApplicationServiceFromUrl(
+                "http://aicml-med.cs.ualberta.ca:8080/biobank2", "testuser",
+                "test");
 
         // appService = (WritableApplicationService) ApplicationServiceProvider
         // .getApplicationServiceFromUrl("http://localhost:8080/biobank2",
