@@ -2,8 +2,8 @@ package edu.ualberta.med.biobank.forms;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -56,10 +56,30 @@ public class ContainerViewForm extends BiobankViewForm {
 
     private Label positionDimTwoLabel;
 
+    ContainerCell[][] cells;
+
     @Override
     public void init(IEditorSite editorSite, IEditorInput input)
         throws PartInitException {
         super.init(editorSite, input);
+
+        ContainerType containerType = container.getContainerType();
+        Capacity cap = containerType.getCapacity();
+        Integer dim1 = cap.getDimensionOneCapacity();
+        Integer dim2 = cap.getDimensionTwoCapacity();
+        if (dim1 == null || dim1.intValue() == 0)
+            dim1 = new Integer(1);
+        if (dim2 == null || dim2.intValue() == 0)
+            dim2 = new Integer(1);
+        cells = new ContainerCell[dim1][dim2];
+        for (int i = 0; i < dim1; i++) {
+            for (int j = 0; j < dim2; j++) {
+                ContainerPosition pos = new ContainerPosition();
+                pos.setPositionDimensionOne(i);
+                pos.setPositionDimensionTwo(j);
+                cells[i][j] = new ContainerCell(pos);
+            }
+        }
 
         Node node = ((FormInput) input).getNode();
         Assert.isNotNull(node, "Null editor input");
@@ -156,19 +176,9 @@ public class ContainerViewForm extends BiobankViewForm {
         int rowHeight = 40, colWidth = 40;
         Composite client = createSectionWithClient("Container Visual");
 
-        ContainerType containerType = container.getContainerType();
-        Capacity cap = containerType.getCapacity();
-        Integer dim1 = cap.getDimensionOneCapacity();
-        Integer dim2 = cap.getDimensionTwoCapacity();
-        if (dim1 == null || dim1.intValue() == 0)
-            dim1 = new Integer(1);
-        if (dim2 == null || dim2.intValue() == 0)
-            dim2 = new Integer(1);
-
         // get occupied positions
-        ContainerCell[][] cells = new ContainerCell[dim1][dim2];
 
-        if (containerType.getName().equalsIgnoreCase("Drawer")) {
+        if (container.getContainerType().getName().equalsIgnoreCase("Drawer")) {
             // if Drawer, requires special grid
             CabinetDrawerWidget containerWidget = new CabinetDrawerWidget(
                 client);
@@ -196,7 +206,9 @@ public class ContainerViewForm extends BiobankViewForm {
             ChooseContainerWidget containerWidget = new ChooseContainerWidget(
                 client);
             containerWidget.initLegend();
-            if (dim2.compareTo(new Integer(1)) == 0) {
+            int dim1 = cells.length;
+            int dim2 = cells[0].length;
+            if (dim2 == 1) {
                 // single dimension size
                 rowHeight = 40;
                 colWidth = 150;
@@ -205,28 +217,25 @@ public class ContainerViewForm extends BiobankViewForm {
             containerWidget.setGridSizes(dim1, dim2, colWidth * dim2, rowHeight
                 * dim1);
             containerWidget.setContainersStatus(cells);
-            containerWidget.addMouseListener(new MouseListener() {
-                @Override
-                public void mouseDoubleClick(MouseEvent e) {
-                    Object source = e.getSource();
-                    // openForm(new FormInput(adapter),
-                    // ContainerTypeEntryForm.ID);
-
-                }
-
+            containerWidget.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseDown(MouseEvent e) {
-                    // TODO Auto-generated method stub
-
-                }
-
-                @Override
-                public void mouseUp(MouseEvent e) {
-                    // TODO Auto-generated method stub
+                    ContainerCell cell = ((ChooseContainerWidget) e.widget)
+                        .getPositionAtCoordinates(e.x, e.y);
+                    openFormFor(cell.getPosition());
 
                 }
             });
         }
+    }
+
+    private void openFormFor(ContainerPosition pos) {
+        FormInput fi = new FormInput(containerAdapter);
+        if (cells[pos.getPositionDimensionOne()][pos.getPositionDimensionTwo()]
+            .getStatus() == ContainerStatus.EMPTY)
+            Node.openForm(fi, ContainerEntryForm.ID);
+        else
+            Node.openForm(fi, ContainerViewForm.ID);
     }
 
     private void setContainerValues() {
