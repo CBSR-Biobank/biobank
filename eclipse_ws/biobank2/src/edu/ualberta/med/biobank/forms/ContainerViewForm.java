@@ -189,7 +189,7 @@ public class ContainerViewForm extends BiobankViewForm {
 
             ChooseContainerWidget containerWidget = new ChooseContainerWidget(
                 client);
-            containerWidget.initLegend();
+            containerWidget.initDefaultLegend();
             int dim1 = cells.length;
             int dim2 = cells[0].length;
             if (dim2 <= 1) {
@@ -219,6 +219,9 @@ public class ContainerViewForm extends BiobankViewForm {
         if (cells[pos.getPositionDimensionOne()][pos.getPositionDimensionTwo()]
             .getStatus() == ContainerStatus.EMPTY) {
             Container newContainer = new Container();
+            ContainerPosition contPos = pos;
+            contPos.setParentContainer(container);
+            newContainer.setPosition(contPos);
             newAdapter = new ContainerAdapter(containerAdapter, newContainer);
             fi = new FormInput(newAdapter);
             Node.openForm(fi, ContainerEntryForm.ID);
