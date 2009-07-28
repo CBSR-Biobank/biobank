@@ -70,13 +70,13 @@ public class SiteContainerTypes {
         containerTypeMap.put("Hotel-19", hotel19);
 
         containerTypeMap.put("Freezer-3x10", assignContainerType(site,
-            "Freezer", 3, 10, Arrays.asList(new ContainerType [] {
+            "Freezer-3x10", 3, 10, Arrays.asList(new ContainerType [] {
                 hotel13, hotel19 }), null));
         containerTypeMap.put("Freezer-4x12", assignContainerType(site,
-            "Freezer", 4, 12, Arrays.asList(new ContainerType [] {
+            "Freezer-4x12", 4, 12, Arrays.asList(new ContainerType [] {
                 hotel13, hotel19 }), null));
         containerTypeMap.put("Freezer-5x9", assignContainerType(site,
-            "Freezer", 4, 12, Arrays.asList(new ContainerType [] {
+            "Freezer-5x9", 4, 12, Arrays.asList(new ContainerType [] {
                 hotel13, hotel19 }), null));
 
         // Cabinet Types

@@ -291,12 +291,12 @@ public class InitExamples {
 
     private void insertContainers() throws ApplicationException {
         Container freezer = insertContainer("01", freezerType, null, 0, 0);
-        Container hotel1 = insertContainer("AA", hotel19Type, freezer, 1, 1);
-        insertContainer("01", paletteType, hotel1, 1, 1);
-        insertContainer("03", paletteType, hotel1, 3, 1);
-        Container hotel2 = insertContainer("AE", hotel13Type, freezer, 2, 2);
-        insertContainer("01", paletteType, hotel2, 1, 1);
-        insertContainer("05", paletteType, hotel2, 5, 1);
+        Container hotel1 = insertContainer("01AA", hotel19Type, freezer, 1, 1);
+        insertContainer("01AA01", paletteType, hotel1, 1, 1);
+        insertContainer("01AA03", paletteType, hotel1, 3, 1);
+        Container hotel2 = insertContainer("01AE", hotel13Type, freezer, 2, 2);
+        insertContainer("01AE01", paletteType, hotel2, 1, 1);
+        insertContainer("01AE05", paletteType, hotel2, 5, 1);
     }
 
     private void insertSampleStorage() throws Exception {

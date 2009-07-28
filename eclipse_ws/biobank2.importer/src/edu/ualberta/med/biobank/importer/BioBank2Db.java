@@ -129,15 +129,6 @@ public class BioBank2Db {
         return list.get(0);
     }
 
-    public Container getContainer(String name) throws Exception {
-        Container sc = new Container();
-        sc.setLabel(name);
-
-        List<Container> list = appService.search(Container.class, sc);
-        if (list.size() != 1) throw new Exception();
-        return list.get(0);
-    }
-
     public SampleType getSampleType(String nameShort) throws Exception {
         SampleType st = new SampleType();
         st.setNameShort(nameShort);
@@ -146,6 +137,25 @@ public class BioBank2Db {
         if (list.size() != 1) throw new Exception(
             "Sample type with short name \"" + nameShort + "\" not found");
         return list.get(0);
+    }
+
+    public Container getContainer(String label, String type) throws Exception {
+        HQLCriteria c = new HQLCriteria("select c"
+            + " from edu.ualberta.med.biobank.model.Container as c"
+            + " inner join c.containerType as ct"
+            + " where c.label=? and ct.name=?");
+
+        c.setParameters(Arrays.asList(new Object [] { label, type }));
+
+        List<Container> results = appService.query(c);
+        if (results.size() != 1) {
+            if (results.size() > 1) throw new Exception(
+                "too many containers with label " + label + " and type " + type);
+            else
+                throw new Exception("no containers with label " + label
+                    + " and type " + type);
+        }
+        return results.get(0);
     }
 
     public Container getChildContainer(Container container, int dim1pos,
