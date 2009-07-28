@@ -183,7 +183,7 @@ public class InitExamples {
 
     private void insertPatientInStudy() throws ApplicationException {
         patients = new ArrayList<Patient>();
-        for (int i = 0; i < 150; i++) {
+        for (int i = 0; i < 100; i++) {
             Patient patient = new Patient();
             patient.setNumber(Integer.toString(i));
             patient.setStudy(study);

@@ -412,7 +412,7 @@ public class StudyEntryForm extends BiobankEntryForm {
         HQLCriteria c = new HQLCriteria(
             "from edu.ualberta.med.biobank.model.Study as study "
                 + "inner join fetch study.site where study.site.id=? "
-                + "and study.name=?");
+                + "and study.name=? and study.nameShort=?");
 
         c.setParameters(Arrays.asList(new Object[] { site.getId(),
             study.getName(), study.getNameShort() }));
