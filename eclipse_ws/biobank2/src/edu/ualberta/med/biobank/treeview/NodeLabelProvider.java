@@ -14,7 +14,7 @@ public class NodeLabelProvider implements ILabelProvider {
 
     public Image getImage(Object element) {
         Image image;
-        String imagePath = "D:/proj/biobank2/icons/";
+        String imagePath = "icons/";
 
         if (element instanceof SessionAdapter) {
             image = imageCollection.get("session");
@@ -73,7 +73,7 @@ public class NodeLabelProvider implements ILabelProvider {
     public void addListener(ILabelProviderListener listener) {
         Display d = PlatformUI.getWorkbench().getActiveWorkbenchWindow()
             .getShell().getDisplay();
-        String imagePath = "D:/proj/biobank2/icons/";
+        String imagePath = "icons/";
 
         imageCollection = new HashMap<String, Image>();
         imageCollection.put("debug", new Image(d, imagePath + "rainbow.png"));
