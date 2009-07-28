@@ -399,7 +399,7 @@ public class Importer {
                     "Invalid cabinet number: " + cabinetNum);
 
                 drawerName = rs.getString(6);
-                drawerNum = NumberingScheme.pos2Int(drawerName.substring(1));
+                drawerNum = LabelingScheme.pos2Int(drawerName.substring(1));
 
                 if (drawerNum > 4) {
                     // no such drawer in real cabinet - was used only for
@@ -434,7 +434,7 @@ public class Importer {
 
                 SamplePosition spos = new SamplePosition();
                 spos.setPositionDimensionOne(1);
-                spos.setPositionDimensionTwo(NumberingScheme.binPos2Int(binPos));
+                spos.setPositionDimensionTwo(LabelingScheme.binPos2Int(binPos));
                 spos.setContainer(bin);
 
                 Sample sample = new Sample();
@@ -491,7 +491,7 @@ public class Importer {
                 }
 
                 hotelName = rs.getString(5);
-                hotelPos = NumberingScheme.hotelPos2RowCol(freezerType,
+                hotelPos = LabelingScheme.hotelPos2RowCol(freezerType,
                     hotelName);
 
                 paletteNum = rs.getInt(6) - 1;
@@ -525,7 +525,7 @@ public class Importer {
 
                 SamplePosition spos = new SamplePosition();
                 spos.setPositionDimensionOne(1);
-                spos.setPositionDimensionTwo(NumberingScheme.palettePos2Int(palettePos));
+                spos.setPositionDimensionTwo(LabelingScheme.palettePos2Int(palettePos));
                 spos.setContainer(palette);
 
                 Sample sample = new Sample();

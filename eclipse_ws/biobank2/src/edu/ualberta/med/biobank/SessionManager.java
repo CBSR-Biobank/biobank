@@ -161,7 +161,6 @@ public class SessionManager {
             appService, id, name, userName);
         sessionsByName.put(name, sessionNode);
         rootNode.addChild(sessionNode);
-
         for (Object o : sites) {
             Site site = (Site) o;
             SiteAdapter siteNode = new SiteAdapter(sessionNode, site);

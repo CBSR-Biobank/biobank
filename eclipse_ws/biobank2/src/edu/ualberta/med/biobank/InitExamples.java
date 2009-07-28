@@ -260,19 +260,34 @@ public class InitExamples {
         return (ContainerType) res.getObjectResult();
     }
 
-    private Container insertContainer(String name, ContainerType ct,
-        Container parent, int pos1, int pos2) throws ApplicationException {
+    private Container insertContainer(String label, ContainerType ct,
+        Container parent) throws Exception {
         Container container = new Container();
-        container.setLabel(name);
-        container.setProductBarcode(name);
+        container.setLabel(label);
+        container.setProductBarcode(label);
         container.setSite(site);
         container.setContainerType(ct);
         if (parent != null) {
+            String labelingScheme = parent.getContainerType()
+                .getChildLabelingScheme().getName();
+
+            RowColPos rc;
+            if (labelingScheme.equals("2 char numeric")) {
+                rc = LabelingScheme.twoCharNumericToRowCol(parent
+                    .getContainerType(), container.getLabel());
+            } else if (labelingScheme.equals("CBSR 2 char alphabetic")) {
+                rc = LabelingScheme.twoCharAlphaToRowCol(parent
+                    .getContainerType(), container.getLabel());
+            } else {
+                throw new Exception("Invalid child labeling scheme: "
+                    + labelingScheme);
+            }
+
             ContainerPosition pos = new ContainerPosition();
             pos.setContainer(container);
             pos.setParentContainer(parent);
-            pos.setPositionDimensionOne(pos1);
-            pos.setPositionDimensionTwo(pos2);
+            pos.setPositionDimensionOne(rc.row);
+            pos.setPositionDimensionTwo(rc.col);
             container.setPosition(pos);
         }
         SDKQueryResult res = appService.executeQuery(new InsertExampleQuery(
@@ -280,14 +295,14 @@ public class InitExamples {
         return (Container) res.getObjectResult();
     }
 
-    private void insertContainers() throws ApplicationException {
-        Container freezer = insertContainer("01", freezerType, null, 0, 0);
-        Container hotel1 = insertContainer("01AA", hotel19Type, freezer, 1, 1);
-        insertContainer("01AA01", paletteType, hotel1, 1, 1);
-        insertContainer("01AA03", paletteType, hotel1, 3, 1);
-        Container hotel2 = insertContainer("01AE", hotel13Type, freezer, 2, 2);
-        insertContainer("01AE01", paletteType, hotel2, 1, 1);
-        insertContainer("01AE05", paletteType, hotel2, 5, 1);
+    private void insertContainers() throws Exception {
+        Container freezer = insertContainer("01", freezerType, null);
+        Container hotel1 = insertContainer("01AA", hotel19Type, freezer);
+        insertContainer("01AA01", paletteType, hotel1);
+        insertContainer("01AA03", paletteType, hotel1);
+        Container hotel2 = insertContainer("01AE", hotel13Type, freezer);
+        insertContainer("01AE01", paletteType, hotel2);
+        insertContainer("01AE05", paletteType, hotel2);
     }
 
     private void insertSampleStorage() throws Exception {
