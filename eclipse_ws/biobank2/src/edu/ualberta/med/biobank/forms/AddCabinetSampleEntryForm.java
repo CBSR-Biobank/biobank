@@ -44,7 +44,7 @@ import edu.ualberta.med.biobank.model.SamplePosition;
 import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.PatientVisitAdapter;
-import edu.ualberta.med.biobank.validators.CabinetPositionCodeValidator;
+import edu.ualberta.med.biobank.validators.CabinetLabelValidator;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
 import edu.ualberta.med.biobank.widgets.CabinetDrawerWidget;
 import edu.ualberta.med.biobank.widgets.ViewContainerWidget;
@@ -216,7 +216,7 @@ public class AddCabinetSampleEntryForm extends BiobankEntryForm implements
 
         positionText = (Text) createBoundWidgetWithLabel(client, Text.class,
             SWT.NONE, "Position", new String[0], cabinetPosition,
-            CabinetPositionCodeValidator.class,
+            CabinetLabelValidator.class,
             "Enter a position (eg 01AA01AB)");
         positionText.removeKeyListener(keyListener);
         positionText.addKeyListener(EnterKeyToNextFieldListener.INSTANCE);
@@ -275,7 +275,7 @@ public class AddCabinetSampleEntryForm extends BiobankEntryForm implements
                     String positionString = cabinetPosition.getValue()
                         .toString();
 
-                    Container sc = ModelUtils.getContainerWithPositionCode(
+                    Container sc = ModelUtils.getContainerWithLabel(
                         appService, positionString);
                     if (sc == null) {
                         SamplePosition sp = getSamplePosition(positionString);
@@ -289,11 +289,11 @@ public class AddCabinetSampleEntryForm extends BiobankEntryForm implements
                             .getPosition().getPositionDimensionTwo() - 1);
                         cabinetWidget.setSelectedBox(drawerPosition);
                         cabinetLabel.setText("Cabinet "
-                            + cabinet.getPositionCode());
+                            + cabinet.getLabel());
                         drawerWidget.setSelectedBin(bin.getPosition()
                             .getPositionDimensionTwo());
                         drawerLabel.setText("Drawer "
-                            + drawer.getPositionCode());
+                            + drawer.getLabel());
 
                         sp.setSample(sample);
                         sample.setSamplePosition(sp);
@@ -324,13 +324,13 @@ public class AddCabinetSampleEntryForm extends BiobankEntryForm implements
         throws ApplicationException {
         int end = 2;
         String cabinetString = positionString.substring(0, end);
-        cabinet = ModelUtils.getContainerWithPositionCode(appService, cabinetString);
+        cabinet = ModelUtils.getContainerWithLabel(appService, cabinetString);
         if (cabinet == null) {
             return null;
         }
         end += 2;
         String drawerString = positionString.substring(0, end);
-        drawer = ModelUtils.getContainerWithPositionCode(appService, drawerString);
+        drawer = ModelUtils.getContainerWithLabel(appService, drawerString);
         if (drawer == null
             || !drawer.getPosition().getParentContainer().getId().equals(
                 cabinet.getId())) {
@@ -338,7 +338,7 @@ public class AddCabinetSampleEntryForm extends BiobankEntryForm implements
         }
         end += 2;
         String binString = positionString.substring(0, end);
-        bin = ModelUtils.getContainerWithPositionCode(appService, binString);
+        bin = ModelUtils.getContainerWithLabel(appService, binString);
         if (bin == null
             || !bin.getPosition().getParentContainer().getId().equals(
                 drawer.getId())) {

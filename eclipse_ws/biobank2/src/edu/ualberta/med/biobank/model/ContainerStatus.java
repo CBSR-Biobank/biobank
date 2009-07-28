@@ -6,7 +6,9 @@ import org.eclipse.swt.graphics.Color;
 import edu.ualberta.med.biobank.BioBankPlugin;
 
 public enum ContainerStatus {
-    EMPTY(SWT.COLOR_WHITE, "Empty"), FILLED(SWT.COLOR_DARK_GRAY, "Filled");
+    EMPTY(SWT.COLOR_WHITE, "Empty"), FILLED(SWT.COLOR_DARK_GRAY, "Filled"), FULL(
+        SWT.COLOR_DARK_GRAY, "Full"), NOT_INITIALIZED(SWT.COLOR_DARK_GREEN,
+        "Not Initialized"), FREE_LOCATIONS(SWT.COLOR_WHITE, "Free locations");
 
     private Color color;
     private String legend;

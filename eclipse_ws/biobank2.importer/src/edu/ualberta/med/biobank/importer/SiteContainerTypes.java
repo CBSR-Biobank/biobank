@@ -57,44 +57,42 @@ public class SiteContainerTypes {
         }
 
         // Freezer Types
-        ContainerType palette = assignContainerType(site, "Palette", "Row",
-            "Column", 8, 12, null, freezerSampleTypes);
+        ContainerType palette = assignContainerType(site, "Palette", 8, 12,
+            null, freezerSampleTypes);
         containerTypeMap.put("Palette", palette);
 
-        ContainerType hotel13 = assignContainerType(site, "Hotel-13", "Row",
-            "", 13, 1, Arrays.asList(new ContainerType [] { palette }), null);
+        ContainerType hotel13 = assignContainerType(site, "Hotel-13", 13, 1,
+            Arrays.asList(new ContainerType [] { palette }), null);
         containerTypeMap.put("Hotel-13", hotel13);
 
-        ContainerType hotel19 = assignContainerType(site, "Hotel-19", "Row",
-            "", 19, 1, Arrays.asList(new ContainerType [] { palette }), null);
+        ContainerType hotel19 = assignContainerType(site, "Hotel-19", 19, 1,
+            Arrays.asList(new ContainerType [] { palette }), null);
         containerTypeMap.put("Hotel-19", hotel19);
 
         containerTypeMap.put("Freezer-3x10", assignContainerType(site,
-            "Freezer", "Row", "Column", 3, 10,
-            Arrays.asList(new ContainerType [] { hotel13, hotel19 }), null));
+            "Freezer", 3, 10, Arrays.asList(new ContainerType [] {
+                hotel13, hotel19 }), null));
         containerTypeMap.put("Freezer-4x12", assignContainerType(site,
-            "Freezer", "Row", "Column", 4, 12,
-            Arrays.asList(new ContainerType [] { hotel13, hotel19 }), null));
+            "Freezer", 4, 12, Arrays.asList(new ContainerType [] {
+                hotel13, hotel19 }), null));
         containerTypeMap.put("Freezer-5x9", assignContainerType(site,
-            "Freezer", "Row", "Column", 4, 12,
-            Arrays.asList(new ContainerType [] { hotel13, hotel19 }), null));
+            "Freezer", 4, 12, Arrays.asList(new ContainerType [] {
+                hotel13, hotel19 }), null));
 
         // Cabinet Types
-        ContainerType bin = assignContainerType(site, "Bin", "Row", "", 120, 1,
-            null, cabinetSampleTypes);
+        ContainerType bin = assignContainerType(site, "Bin", 120, 1, null,
+            cabinetSampleTypes);
         containerTypeMap.put("Bin", bin);
-        ContainerType drawer = assignContainerType(site, "Drawer", "Row", "",
-            36, 1, Arrays.asList(new ContainerType [] { bin }), null);
+        ContainerType drawer = assignContainerType(site, "Drawer", 36, 1,
+            Arrays.asList(new ContainerType [] { bin }), null);
         containerTypeMap.put("Drawer", drawer);
-        containerTypeMap.put("Cabinet", assignContainerType(site, "Cabinet",
-            "Row", "", 4, 1, Arrays.asList(new ContainerType [] { drawer }),
-            null));
+        containerTypeMap.put("Cabinet", assignContainerType(site, "Cabinet", 4,
+            1, Arrays.asList(new ContainerType [] { drawer }), null));
     }
 
-    private ContainerType assignContainerType(Site site, String name,
-        String dim1Label, String dim2Label, int dim1, int dim2,
-        List<ContainerType> children, Collection<SampleType> sampleTypes)
-        throws Exception {
+    private ContainerType assignContainerType(Site site, String name, int dim1,
+        int dim2, List<ContainerType> children,
+        Collection<SampleType> sampleTypes) throws Exception {
         ContainerType st = new ContainerType();
         st.setName(name);
         st.setSite(site);
@@ -102,8 +100,6 @@ public class SiteContainerTypes {
         capacity.setDimensionOneCapacity(dim1);
         capacity.setDimensionTwoCapacity(dim2);
         st.setCapacity(capacity);
-        st.setDimensionOneLabel(dim1Label);
-        st.setDimensionTwoLabel(dim2Label);
         st.setActivityStatus("Active");
         if (children != null) {
             st.setChildContainerTypeCollection(new HashSet<ContainerType>(

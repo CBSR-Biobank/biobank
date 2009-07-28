@@ -38,7 +38,7 @@ public class ContainerAdapter extends Node {
     @Override
     public String getName() {
         Assert.isNotNull(container, "container is null");
-        return container.getPositionCode();
+        return container.getLabel();
     }
 
     @Override
@@ -85,19 +85,6 @@ public class ContainerAdapter extends Node {
             public void widgetDefaultSelected(SelectionEvent e) {
             }
         });
-
-        mi = new MenuItem(menu, SWT.PUSH);
-        mi.setText("Add a Child Container");
-        mi.addSelectionListener(new SelectionListener() {
-            public void widgetSelected(SelectionEvent event) {
-                ContainerAdapter adapter = new ContainerAdapter(
-                    ContainerAdapter.this, ModelUtils.newContainer(container));
-                openForm(new FormInput(adapter), ContainerEntryForm.ID);
-            }
-
-            public void widgetDefaultSelected(SelectionEvent e) {
-            }
-        });
     }
 
     @Override
@@ -124,7 +111,7 @@ public class ContainerAdapter extends Node {
         } catch (Exception e) {
             SessionManager.getLogger().error(
                 "Error while loading storage container group children for storage container "
-                    + container.getPositionCode(), e);
+                    + container.getLabel(), e);
         }
     }
 

@@ -36,11 +36,9 @@ public class ContainerViewForm extends BiobankViewForm {
 
     private ContainerPosition position;
 
-    private Container parentContainer;
-
     private SamplesListWidget samplesWidget;
 
-    private Label positionCodeLabel;
+    private Label containerLabelLabel;
 
     private Label productBarcodeLabel;
 
@@ -88,8 +86,8 @@ public class ContainerViewForm extends BiobankViewForm {
             containerAdapter = (ContainerAdapter) node;
             appService = containerAdapter.getAppService();
             retrieveContainer();
-            setPartName("Container " + container.getPositionCode());
-            parentContainer = null;
+            position = container.getPosition();
+            setPartName("Container " + container.getLabel());
         } else {
             Assert.isTrue(false, "Invalid editor input: object of type "
                 + node.getClass().getName());
@@ -108,7 +106,7 @@ public class ContainerViewForm extends BiobankViewForm {
 
     @Override
     protected void createFormContent() {
-        form.setText("Container " + container.getPositionCode());
+        form.setText("Container " + container.getLabel());
         form.getBody().setLayout(new GridLayout(1, false));
 
         addRefreshToolbarAction();
@@ -131,8 +129,8 @@ public class ContainerViewForm extends BiobankViewForm {
         client.setLayoutData(gridData);
         toolkit.paintBordersFor(client);
 
-        positionCodeLabel = (Label) createWidget(client, Label.class, SWT.NONE,
-            "Position Code");
+        containerLabelLabel = (Label) createWidget(client, Label.class,
+            SWT.NONE, "Label");
         productBarcodeLabel = (Label) createWidget(client, Label.class,
             SWT.NONE, "Product Bar Code");
         activityStatusLabel = (Label) createWidget(client, Label.class,
@@ -143,26 +141,6 @@ public class ContainerViewForm extends BiobankViewForm {
             SWT.NONE, "Container Type");
         temperatureLabel = (Label) createWidget(client, Label.class, SWT.NONE,
             "Temperature");
-
-        position = container.getPosition();
-
-        if (position != null) {
-            parentContainer = position.getParentContainer();
-            Assert.isNotNull(parentContainer);
-            ContainerType parentContainerType = parentContainer
-                .getContainerType();
-            String label = parentContainerType.getDimensionOneLabel();
-            if ((label != null) && (label.length() > 0)) {
-                positionDimOneLabel = (Label) createWidget(client, Label.class,
-                    SWT.NONE, label);
-            }
-
-            label = parentContainerType.getDimensionTwoLabel();
-            if ((label != null) && (label.length() > 0)) {
-                positionDimTwoLabel = (Label) createWidget(client, Label.class,
-                    SWT.NONE, label);
-            }
-        }
 
         setContainerValues();
         ContainerType containerType = container.getContainerType();
@@ -239,7 +217,7 @@ public class ContainerViewForm extends BiobankViewForm {
     }
 
     private void setContainerValues() {
-        FormUtils.setTextValue(positionCodeLabel, container.getPositionCode());
+        FormUtils.setTextValue(containerLabelLabel, container.getLabel());
         FormUtils.setTextValue(productBarcodeLabel, container
             .getProductBarcode());
         FormUtils.setTextValue(activityStatusLabel, container
@@ -272,8 +250,8 @@ public class ContainerViewForm extends BiobankViewForm {
     @Override
     protected void reload() {
         retrieveContainer();
-        setPartName("Container " + container.getPositionCode());
-        form.setText("Container " + container.getPositionCode());
+        setPartName("Container " + container.getLabel());
+        form.setText("Container " + container.getLabel());
         setContainerValues();
     }
 

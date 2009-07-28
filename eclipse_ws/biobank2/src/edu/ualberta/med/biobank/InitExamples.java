@@ -4,7 +4,7 @@ import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Container;
-import edu.ualberta.med.biobank.model.ContainerNumScheme;
+import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
 import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.Patient;
@@ -62,28 +62,28 @@ public class InitExamples {
 
     private ContainerType drawerType;
 
-    private HashMap<String, ContainerNumScheme> numSchemeMap;
+    private HashMap<String, ContainerLabelingScheme> numSchemeMap;
 
     /**
      * @param args
      * @throws Exception
      */
     public static void main(String[] args) throws Exception {
-        InitExamples init = new InitExamples();
+        new InitExamples();
     }
 
     public InitExamples() throws Exception {
         clinics = new Clinic[MAX_CLINICS];
-        numSchemeMap = new HashMap<String, ContainerNumScheme>();
+        numSchemeMap = new HashMap<String, ContainerLabelingScheme>();
 
-        // appService = (WritableApplicationService)
-        // ApplicationServiceProvider
-        // .getApplicationServiceFromUrl("http://aicml-med.cs.ualberta.ca:8080/biobank2");
+        // appService = (WritableApplicationService) ApplicationServiceProvider
+        // .getApplicationServiceFromUrl(
+        // "http://aicml-med.cs.ualberta.ca:8080/biobank2", "testuser",
+        // "test");
 
         appService = (WritableApplicationService) ApplicationServiceProvider
-            .getApplicationServiceFromUrl(
-                "http://aicml-med.cs.ualberta.ca:8080/biobank2", "testuser",
-                "test");
+            .getApplicationServiceFromUrl("http://localhost:8080/biobank2",
+                "testuser", "test");
 
         // appService = (WritableApplicationService) ApplicationServiceProvider
         // .getApplicationServiceFromUrl("http://localhost:8080/biobank2",
@@ -215,53 +215,51 @@ public class InitExamples {
     }
 
     private void insertContainerTypesInSite() throws ApplicationException {
-        List<ContainerNumScheme> numSchemes = appService.search(
-            ContainerNumScheme.class, new ContainerNumScheme());
+        List<ContainerLabelingScheme> numSchemes = appService.search(
+            ContainerLabelingScheme.class, new ContainerLabelingScheme());
         Assert.isNotNull(numSchemes);
-        for (ContainerNumScheme scheme : numSchemes) {
+        for (ContainerLabelingScheme scheme : numSchemes) {
             numSchemeMap.put(scheme.getName(), scheme);
         }
 
         // Freezer Types
-        paletteType = insertContainerTypeInSite("Palette", "Row", "Column", 8,
-            12, null, numSchemeMap.get("SBS Standard"));
-        hotel13Type = insertContainerTypeInSite("Hotel-13", "Row", "", 13, 1,
-            Arrays.asList(new ContainerType[] { paletteType }), numSchemeMap
-                .get("CBSR 2 char alphabetic"));
-        hotel19Type = insertContainerTypeInSite("Hotel-19", "Row", "", 19, 1,
-            Arrays.asList(new ContainerType[] { paletteType }), numSchemeMap
-                .get("CBSR 2 char alphabetic"));
-        freezerType = insertContainerTypeInSite("Freezer", "Row", "Column", 3,
-            10,
-            Arrays.asList(new ContainerType[] { hotel13Type, hotel19Type }),
-            null);
+        paletteType = insertContainerTypeInSite("Palette", 8, 12, null,
+            numSchemeMap.get("SBS Standard"));
+        hotel13Type = insertContainerTypeInSite("Hotel-13", 13, 1, Arrays
+            .asList(new ContainerType[] { paletteType }), numSchemeMap
+            .get("CBSR 2 char alphabetic"));
+        hotel19Type = insertContainerTypeInSite("Hotel-19", 19, 1, Arrays
+            .asList(new ContainerType[] { paletteType }), numSchemeMap
+            .get("CBSR 2 char alphabetic"));
+        freezerType = insertContainerTypeInSite("Freezer", 3, 10, Arrays
+            .asList(new ContainerType[] { hotel13Type, hotel19Type }),
+            numSchemeMap.get("2 char numeric"));
 
         // Cabinet Types
-        binType = insertContainerTypeInSite("Bin", "Row", "", 120, 1, null,
-            numSchemeMap.get("2 char numeric"));
-        drawerType = insertContainerTypeInSite("Drawer", "Row", "", 36, 1,
-            Arrays.asList(new ContainerType[] { binType }), numSchemeMap
-                .get("CBSR 2 char alphabetic"));
-        insertContainerTypeInSite("Cabinet", "Row", "", 4, 1, Arrays
-            .asList(new ContainerType[] { drawerType }), null);
+        binType = insertContainerTypeInSite("Bin", 120, 1, null, numSchemeMap
+            .get("2 char numeric"));
+        drawerType = insertContainerTypeInSite("Drawer", 36, 1, Arrays
+            .asList(new ContainerType[] { binType }), numSchemeMap
+            .get("CBSR 2 char alphabetic"));
+        insertContainerTypeInSite("Cabinet", 4, 1, Arrays
+            .asList(new ContainerType[] { drawerType }), numSchemeMap
+            .get("2 char numeric"));
     }
 
-    private ContainerType insertContainerTypeInSite(String name,
-        String dim1label, String dim2label, int dim1, int dim2,
-        List<ContainerType> children, ContainerNumScheme numScheme)
+    private ContainerType insertContainerTypeInSite(String name, int dim1,
+        int dim2, List<ContainerType> children,
+        ContainerLabelingScheme childLabelingScheme)
         throws ApplicationException {
         ContainerType ct = new ContainerType();
         ct.setName(name);
         ct.setSite(site);
-        if (numScheme != null) {
-            ct.setNumberingScheme(numScheme);
+        if (childLabelingScheme != null) {
+            ct.setChildLabelingScheme(childLabelingScheme);
         }
         Capacity capacity = new Capacity();
         capacity.setDimensionOneCapacity(dim1);
         capacity.setDimensionTwoCapacity(dim2);
         ct.setCapacity(capacity);
-        ct.setDimensionOneLabel(dim1label);
-        ct.setDimensionTwoLabel(dim2label);
         if (children != null) {
             ct.setChildContainerTypeCollection(new HashSet<ContainerType>(
                 children));
@@ -274,7 +272,7 @@ public class InitExamples {
     private Container insertContainer(String name, ContainerType ct,
         Container parent, int pos1, int pos2) throws ApplicationException {
         Container container = new Container();
-        container.setPositionCode(name);
+        container.setLabel(name);
         container.setProductBarcode(name);
         container.setSite(site);
         container.setContainerType(ct);

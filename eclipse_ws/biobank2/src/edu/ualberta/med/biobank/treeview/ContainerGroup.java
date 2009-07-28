@@ -36,7 +36,7 @@ public class ContainerGroup extends Node {
         mi.addSelectionListener(new SelectionListener() {
             public void widgetSelected(SelectionEvent event) {
                 ContainerAdapter adapter = new ContainerAdapter(
-                    ContainerGroup.this, ModelUtils.newContainer(null));
+                    ContainerGroup.this, new Container());
                 openForm(new FormInput(adapter), ContainerEntryForm.ID);
             }
 

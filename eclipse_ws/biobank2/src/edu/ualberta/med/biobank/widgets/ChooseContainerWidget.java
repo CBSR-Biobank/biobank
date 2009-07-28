@@ -16,11 +16,17 @@ public class ChooseContainerWidget extends AbstractGridContainerWidget {
 
     private List<ContainerStatus> legendStatus;
 
+    /**
+     * Default status when cell doesn't have any status
+     */
+    private ContainerStatus defaultStatus = ContainerStatus.EMPTY;
+
     @SuppressWarnings("unused")
     private boolean showNullStatusAsEmpty = false;
 
     public ChooseContainerWidget(Composite parent) {
         super(parent);
+        initLegend();
     }
 
     public ContainerCell getPositionAtCoordinates(int x, int y) {
@@ -69,7 +75,7 @@ public class ChooseContainerWidget extends AbstractGridContainerWidget {
             }
             ContainerStatus status = cell.getStatus();
             if (status == null)
-                status = ContainerStatus.EMPTY;
+                status = defaultStatus;
             e.gc.setBackground(status.getColor());
             e.gc.fillRectangle(rectangle);
         }
@@ -80,4 +86,11 @@ public class ChooseContainerWidget extends AbstractGridContainerWidget {
         this.showNullStatusAsEmpty = showNullStatusAsEmpty;
     }
 
+    public void setLegend(List<ContainerStatus> legendStatus) {
+        this.legendStatus = legendStatus;
+    }
+
+    public void setDefaultStatus(ContainerStatus status) {
+        this.defaultStatus = status;
+    }
 }

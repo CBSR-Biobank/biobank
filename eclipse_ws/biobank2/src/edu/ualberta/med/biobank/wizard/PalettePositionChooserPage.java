@@ -82,7 +82,7 @@ public class PalettePositionChooserPage extends AbstractContainerChooserPage {
     @Override
     public void setCurrentContainer(Container container) {
         super.setCurrentContainer(container);
-        setTitle("Container " + container.getPositionCode());
+        setTitle("Container " + container.getLabel());
         updateFreezerGrid();
         textPosition.setText("");
         selectedPosition = null;

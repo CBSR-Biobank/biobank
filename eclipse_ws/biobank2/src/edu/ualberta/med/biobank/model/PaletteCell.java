@@ -98,9 +98,11 @@ public class PaletteCell {
                 + SamplePosition.class.getName() + " as sp) "
                 + "and s.inventoryId <> '123'");
             List<Sample> samples = appService.query(criteria);
-            if (samples.size() > 0) {
+            if (samples.size() > 1) {
                 paletteScanned[0][0] = new PaletteCell(new ScanCell(0, 0,
                     samples.get(0).getInventoryId()));
+                paletteScanned[2][4] = new PaletteCell(new ScanCell(2, 4,
+                    samples.get(1).getInventoryId()));
             }
         } catch (ApplicationException e) {
             // TODO Auto-generated catch block

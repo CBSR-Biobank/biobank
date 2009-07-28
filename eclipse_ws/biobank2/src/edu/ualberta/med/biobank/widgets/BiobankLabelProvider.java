@@ -10,6 +10,7 @@ import org.springframework.util.Assert;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Container;
+import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.ModelUtils;
 import edu.ualberta.med.biobank.model.Patient;
@@ -100,7 +101,7 @@ public class BiobankLabelProvider extends LabelProvider implements
             final Container container = (Container) element;
             switch (columnIndex) {
             case 0:
-                return container.getPositionCode();
+                return container.getLabel();
             case 1:
                 return container.getActivityStatus();
             case 2:
@@ -159,6 +160,8 @@ public class BiobankLabelProvider extends LabelProvider implements
             return ((ContainerType) element).getName();
         } else if (element instanceof Clinic) {
             return ((Clinic) element).getName();
+        } else if (element instanceof ContainerLabelingScheme) {
+            return ((ContainerLabelingScheme) element).getName();
         }
         return ((Node) element).getName();
     }
