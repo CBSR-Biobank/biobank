@@ -59,4 +59,18 @@ public class LabelingScheme {
         return rowColPos;
 
     }
+
+    public static String rowColToTwoCharAlpha(RowColPos rc) {
+        return (String.valueOf(int2pos(rc.row)) + String
+            .valueOf(int2pos(rc.col)));
+    }
+
+    public static String rowColToTwoCharNumeric(RowColPos rc) {
+        return (Integer.toString(rc.row) + Integer.toString(rc.col));
+    }
+
+    public static int rowColToInt(RowColPos rc, ContainerType container) {
+        Integer numCols = container.getCapacity().getDimensionTwoCapacity();
+        return rc.row * numCols + rc.col;
+    }
 }
