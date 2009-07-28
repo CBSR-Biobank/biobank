@@ -19,16 +19,16 @@ public class SiteContainers {
     }
 
     public void insertContainers(Site site) throws Exception {
-        System.out.println("adding storage containers ...");
+        System.out.println("adding containers ...");
 
         // only set up one freezer
-        Container freezer3x10 = insertContainer(site, "FR01",
+        Container freezer3x10 = insertContainer(site, "01",
             SiteContainerTypes.getInstance().getContainerType("Freezer-3x10"),
             null, 0, 0);
 
         Container hotel;
         for (int i = 0; i < 10; ++i) {
-            hotel = insertContainer(site, String.format("A%c",
+            hotel = insertContainer(site, String.format("01A%c",
                 NumberingScheme.int2pos(i)),
                 SiteContainerTypes.getInstance().getContainerType("Hotel-19"),
                 freezer3x10, i % 3, i / 3);
@@ -36,26 +36,28 @@ public class SiteContainers {
             for (int j = 0; j < 17; ++j) {
                 insertContainer(
                     site,
-                    String.format("%02d", j + 1),
+                    String.format("01A%c%02d", NumberingScheme.int2pos(i),
+                        j + 1),
                     SiteContainerTypes.getInstance().getContainerType("Palette"),
                     hotel, j, 0);
             }
         }
 
         // cabinet
-        Container cabinet = insertContainer(site, "Cabinet",
+        Container cabinet = insertContainer(site, "01",
             SiteContainerTypes.getInstance().getContainerType("Cabinet"), null,
             0, 0);
 
         Container drawer;
         for (int i = 0; i < 4; ++i) {
-            drawer = insertContainer(site, String.format("A%c",
+            drawer = insertContainer(site, String.format("01A%c",
                 NumberingScheme.int2pos(i)),
                 SiteContainerTypes.getInstance().getContainerType("Drawer"),
                 cabinet, i, 0);
 
             for (int j = 0; j < 36; ++j) {
-                insertContainer(site, String.format("%02d", j + 1),
+                insertContainer(site, String.format("01A%c%02d",
+                    NumberingScheme.int2pos(i), j + 1),
                     SiteContainerTypes.getInstance().getContainerType("Bin"),
                     drawer, j, 0);
             }
@@ -71,14 +73,15 @@ public class SiteContainers {
         sc.setSite(site);
         sc.setContainerType(st);
         sc.setActivityStatus("Active");
-        ContainerPosition cp = new ContainerPosition();
-        cp.setContainer(sc);
+
         if (parent != null) {
+            ContainerPosition cp = new ContainerPosition();
+            cp.setContainer(sc);
             cp.setParentContainer(parent);
             cp.setPositionDimensionOne(pos1);
             cp.setPositionDimensionTwo(pos2);
+            sc.setPosition(cp);
         }
-        sc.setPosition(cp);
 
         return (Container) BioBank2Db.getInstance().setObject(sc);
     }

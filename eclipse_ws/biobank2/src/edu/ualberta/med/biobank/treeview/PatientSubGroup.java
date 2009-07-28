@@ -19,23 +19,27 @@ public class PatientSubGroup extends Node {
     private static final int maxSize = 100;
 
     public PatientSubGroup(PatientGroup parent, int id) {
-        super(parent, id, "Group " + id + 1, true);
+        super(parent, id, "Group " + (id + 1), true);
         patientIDs = new ArrayList<Integer>();
     }
 
-    public Boolean full() {
+    public boolean full() {
         if (patientIDs != null)
             return (patientIDs.size() >= maxSize);
         else
             return false;
     }
 
-    public Boolean addID(Integer id) {
-        if (!full())
+    public boolean addID(Integer id) {
+        if (!full()) {
             patientIDs.add(id);
-        else
-            return false;
-        return true;
+            return true;
+        }
+        return false;
+    }
+
+    public boolean hasId(Integer i) {
+        return patientIDs.contains(i);
     }
 
     @Override

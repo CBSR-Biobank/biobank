@@ -23,8 +23,6 @@ import gov.nih.nci.system.query.example.InsertExampleQuery;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 import java.lang.reflect.Constructor;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -32,6 +30,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Random;
 
 import org.eclipse.core.runtime.Assert;
 
@@ -98,7 +97,7 @@ public class InitExamples {
         insertClinicsInSite();
         insertStudyInSite();
         insertPatientInStudy();
-        insertPatientVisitInPatient();
+        insertPatientVisitsInPatient();
         insertSampleInPatientVisit();
 
         insertContainerTypesInSite();
@@ -165,18 +164,14 @@ public class InitExamples {
             new SampleType()).get(0);
     }
 
-    private void insertPatientVisitInPatient() throws ApplicationException {
+    private void insertPatientVisitsInPatient() throws ApplicationException {
         patientVisits = new ArrayList<PatientVisit>();
+        Random r = new Random();
         for (Patient patient : patients) {
             PatientVisit patientVisit = new PatientVisit();
             patientVisit.setClinic(clinics[0]);
-            SimpleDateFormat df = new SimpleDateFormat(
-                BioBankPlugin.DATE_FORMAT);
-            try {
-                patientVisit.setDateDrawn(df.parse("2009-01-01 00:00"));
-            } catch (ParseException e1) {
-                e1.printStackTrace();
-            }
+            patientVisit.setDateDrawn(new Date(2009 - 1900, 01, 25, r
+                .nextInt(24), r.nextInt(60)));
 
             patientVisit.setPatient(patient);
             SDKQueryResult res = appService
@@ -188,7 +183,7 @@ public class InitExamples {
 
     private void insertPatientInStudy() throws ApplicationException {
         patients = new ArrayList<Patient>();
-        for (int i = 0; i < 50; i++) {
+        for (int i = 0; i < 150; i++) {
             Patient patient = new Patient();
             patient.setNumber(Integer.toString(i));
             patient.setStudy(study);
@@ -287,12 +282,12 @@ public class InitExamples {
 
     private void insertContainers() throws ApplicationException {
         Container freezer = insertContainer("01", freezerType, null, 0, 0);
-        Container hotel1 = insertContainer("AA", hotel19Type, freezer, 1, 1);
-        insertContainer("01", paletteType, hotel1, 1, 1);
-        insertContainer("03", paletteType, hotel1, 3, 1);
-        Container hotel2 = insertContainer("AE", hotel13Type, freezer, 2, 2);
-        insertContainer("01", paletteType, hotel2, 1, 1);
-        insertContainer("05", paletteType, hotel2, 5, 1);
+        Container hotel1 = insertContainer("01AA", hotel19Type, freezer, 1, 1);
+        insertContainer("01AA01", paletteType, hotel1, 1, 1);
+        insertContainer("01AA03", paletteType, hotel1, 3, 1);
+        Container hotel2 = insertContainer("01AE", hotel13Type, freezer, 2, 2);
+        insertContainer("01AE01", paletteType, hotel2, 1, 1);
+        insertContainer("01AE05", paletteType, hotel2, 5, 1);
     }
 
     private void insertSampleStorage() throws Exception {

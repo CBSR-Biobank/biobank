@@ -52,7 +52,7 @@ public class PatientVisitAdapter extends Node {
         // Assert.isNotNull(date, "patient visid drawn date is null");
         if (date != null) {
             SimpleDateFormat sdf = new SimpleDateFormat(
-                BioBankPlugin.DATE_FORMAT);
+                BioBankPlugin.DATE_TIME_FORMAT);
             return sdf.format(date);
         }
         return null;

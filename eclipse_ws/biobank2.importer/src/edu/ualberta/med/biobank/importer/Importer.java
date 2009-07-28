@@ -98,7 +98,7 @@ public class Importer {
 
             String [] reqdTables = {
                 "clinics", "study_list", "patient", "patient_visit", "cabinet",
-                "sample_list" };
+                "freezer", "sample_list" };
 
             for (String table : reqdTables) {
                 if (!tableExists(table)) throw new Exception("Table " + table
@@ -381,7 +381,7 @@ public class Importer {
 
         ResultSet rs = s.getResultSet();
         if (rs != null) {
-            Container cabinet = bioBank2Db.getContainer("cabinet");
+            Container cabinet = bioBank2Db.getContainer("01", "cabinet");
             int cabinetNum;
             Container drawer;
             Container bin;
@@ -466,7 +466,7 @@ public class Importer {
 
         ResultSet rs = s.getResultSet();
         if (rs != null) {
-            Container freezer = bioBank2Db.getContainer("FR01");
+            Container freezer = bioBank2Db.getContainer("01", "Freezer-3x10");
             ContainerType freezerType = freezer.getContainerType();
             int freezerNum;
             Container hotel;
