@@ -106,22 +106,23 @@ public class SiteContainerTypes {
         ContainerLabelingScheme childLabelingScheme, int dim1, int dim2,
         List<ContainerType> children, Collection<SampleType> sampleTypes)
         throws Exception {
-        ContainerType st = new ContainerType();
-        st.setName(name);
-        st.setSite(site);
+        ContainerType ct = new ContainerType();
+        ct.setName(name);
+        ct.setSite(site);
         Capacity capacity = new Capacity();
         capacity.setDimensionOneCapacity(dim1);
         capacity.setDimensionTwoCapacity(dim2);
-        st.setCapacity(capacity);
-        st.setActivityStatus("Active");
+        ct.setCapacity(capacity);
+        ct.setActivityStatus("Active");
+        ct.setChildLabelingScheme(childLabelingScheme);
         if (children != null) {
-            st.setChildContainerTypeCollection(new HashSet<ContainerType>(
+            ct.setChildContainerTypeCollection(new HashSet<ContainerType>(
                 children));
         }
         if (sampleTypes != null) {
-            st.setSampleTypeCollection(sampleTypes);
+            ct.setSampleTypeCollection(sampleTypes);
         }
 
-        return (ContainerType) BioBank2Db.getInstance().setObject(st);
+        return (ContainerType) BioBank2Db.getInstance().setObject(ct);
     }
 }
