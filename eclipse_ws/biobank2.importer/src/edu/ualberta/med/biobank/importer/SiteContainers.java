@@ -29,14 +29,14 @@ public class SiteContainers {
         Container hotel;
         for (int i = 0; i < 10; ++i) {
             hotel = insertContainer(site, String.format("01A%c",
-                NumberingScheme.int2pos(i)),
+                LabelingScheme.int2pos(i)),
                 SiteContainerTypes.getInstance().getContainerType("Hotel-19"),
                 freezer3x10, i % 3, i / 3);
 
             for (int j = 0; j < 17; ++j) {
                 insertContainer(
                     site,
-                    String.format("01A%c%02d", NumberingScheme.int2pos(i),
+                    String.format("01A%c%02d", LabelingScheme.int2pos(i),
                         j + 1),
                     SiteContainerTypes.getInstance().getContainerType("Palette"),
                     hotel, j, 0);
@@ -51,13 +51,13 @@ public class SiteContainers {
         Container drawer;
         for (int i = 0; i < 4; ++i) {
             drawer = insertContainer(site, String.format("01A%c",
-                NumberingScheme.int2pos(i)),
+                LabelingScheme.int2pos(i)),
                 SiteContainerTypes.getInstance().getContainerType("Drawer"),
                 cabinet, i, 0);
 
             for (int j = 0; j < 36; ++j) {
                 insertContainer(site, String.format("01A%c%02d",
-                    NumberingScheme.int2pos(i), j + 1),
+                    LabelingScheme.int2pos(i), j + 1),
                     SiteContainerTypes.getInstance().getContainerType("Bin"),
                     drawer, j, 0);
             }
