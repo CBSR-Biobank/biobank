@@ -38,6 +38,9 @@ public class ContainerAdapter extends Node {
     @Override
     public String getName() {
         Assert.isNotNull(container, "container is null");
+        if (container.getContainerType() == null) {
+            return container.getLabel();
+        }
         return container.getLabel() + " ("
             + container.getContainerType().getName() + ")";
     }
