@@ -6,8 +6,8 @@ import java.util.HashMap;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.ui.PlatformUI;
+
+import edu.ualberta.med.biobank.BioBankPlugin;
 
 public class NodeLabelProvider implements ILabelProvider {
     private HashMap<String, Image> imageCollection = null;
@@ -49,9 +49,8 @@ public class NodeLabelProvider implements ILabelProvider {
             }
             if (!imageCollection.containsKey(ct)) {
                 if (new File(imagePath + ct.toLowerCase() + ".png").exists()) {
-                    imageCollection.put(ct, new Image(PlatformUI.getWorkbench()
-                        .getActiveWorkbenchWindow().getShell().getDisplay(),
-                        imagePath + ct.toLowerCase() + ".png"));
+                    imageCollection.put(ct, BioBankPlugin.getImage(imagePath
+                        + ct.toLowerCase() + ".png"));
                 } else {
                     imageCollection.put(ct, null);
                 }
@@ -71,27 +70,33 @@ public class NodeLabelProvider implements ILabelProvider {
     }
 
     public void addListener(ILabelProviderListener listener) {
-        Display d = PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-            .getShell().getDisplay();
         String imagePath = "icons/";
 
         imageCollection = new HashMap<String, Image>();
-        imageCollection.put("debug", new Image(d, imagePath + "rainbow.png"));
-        imageCollection.put("session", new Image(d, imagePath
+
+        imageCollection.put("debug", BioBankPlugin.getImage(imagePath
+            + "rainbow.png"));
+        imageCollection.put("session", BioBankPlugin.getImage(imagePath
             + "book_addresses.png"));
-        imageCollection.put("clinics", new Image(d, imagePath + "bricks.png"));
-        imageCollection.put("study", new Image(d, imagePath + "book_open.png"));
-        imageCollection.put("studies", new Image(d, imagePath + "book.png"));
-        imageCollection.put("site", new Image(d, imagePath + "brick.png"));
-        imageCollection.put("dude", new Image(d, imagePath + "user_red.png"));
-        imageCollection.put("dudes", new Image(d, imagePath + "user_go.png"));
-        imageCollection
-            .put("container", new Image(d, imagePath + "basket.png"));
-        imageCollection.put("clinic", new Image(d, imagePath
+        imageCollection.put("clinics", BioBankPlugin.getImage(imagePath
+            + "bricks.png"));
+        imageCollection.put("study", BioBankPlugin.getImage(imagePath
+            + "book_open.png"));
+        imageCollection.put("studies", BioBankPlugin.getImage(imagePath
+            + "book.png"));
+        imageCollection.put("site", BioBankPlugin.getImage(imagePath
+            + "brick.png"));
+        imageCollection.put("dude", BioBankPlugin.getImage(imagePath
+            + "user_red.png"));
+        imageCollection.put("dudes", BioBankPlugin.getImage(imagePath
+            + "user_go.png"));
+        imageCollection.put("container", BioBankPlugin.getImage(imagePath
+            + "basket.png"));
+        imageCollection.put("clinic", BioBankPlugin.getImage(imagePath
             + "transmit_blue.png"));
-        imageCollection.put("dudeplus",
-            new Image(d, imagePath + "user_add.png"));
-        imageCollection.put("containertype", new Image(d, imagePath
+        imageCollection.put("dudeplus", BioBankPlugin.getImage(imagePath
+            + "user_add.png"));
+        imageCollection.put("containertype", BioBankPlugin.getImage(imagePath
             + "basket_edit.png"));
     }
 
