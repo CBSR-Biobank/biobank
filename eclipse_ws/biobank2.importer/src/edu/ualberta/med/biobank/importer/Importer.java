@@ -60,7 +60,7 @@ public class Importer {
 
     private ArrayList<String> tables;
 
-    private Site cbrSite;
+    private Site cbsrSite;
 
     public static void main(String [] args) throws Exception {
         Importer.getInstance();
@@ -115,10 +115,10 @@ public class Importer {
             bioBank2Db.deleteAll(Study.class);
             bioBank2Db.deleteAll(Site.class);
 
-            cbrSite = bioBank2Db.createSite();
+            cbsrSite = bioBank2Db.createSite();
 
-            SiteContainerTypes.getInstance().insertContainerTypes(cbrSite);
-            SiteContainers.getInstance().insertContainers(cbrSite);
+            SiteContainerTypes.getInstance().insertContainerTypes(cbsrSite);
+            SiteContainers.getInstance().insertContainers(cbsrSite);
 
             importStudies();
             importClinics();
@@ -200,7 +200,7 @@ public class Importer {
                 study = new Study();
                 study.setName(rs.getString(2));
                 study.setNameShort(studyNameShort);
-                study.setSite(cbrSite);
+                study.setSite(cbsrSite);
                 study.setActivityStatus("Active");
                 study = (Study) bioBank2Db.setObject(study);
 
@@ -247,7 +247,7 @@ public class Importer {
                 clinic = new Clinic();
                 clinic.setName(rs.getString(1));
                 clinic.setComment(rs.getString(2));
-                clinic.setSite(cbrSite);
+                clinic.setSite(cbsrSite);
                 clinic.setActivityStatus("Active");
 
                 Address address = new Address();
@@ -399,7 +399,7 @@ public class Importer {
                     "Invalid cabinet number: " + cabinetNum);
 
                 drawerName = rs.getString(6);
-                drawerNum = NumberingScheme.pos2Int(drawerName.substring(1));
+                drawerNum = LabelingScheme.pos2Int(drawerName.substring(1));
 
                 if (drawerNum > 4) {
                     // no such drawer in real cabinet - was used only for
@@ -434,7 +434,7 @@ public class Importer {
 
                 SamplePosition spos = new SamplePosition();
                 spos.setPositionDimensionOne(1);
-                spos.setPositionDimensionTwo(NumberingScheme.binPos2Int(binPos));
+                spos.setPositionDimensionTwo(LabelingScheme.binPos2Int(binPos));
                 spos.setContainer(bin);
 
                 Sample sample = new Sample();
@@ -491,7 +491,7 @@ public class Importer {
                 }
 
                 hotelName = rs.getString(5);
-                hotelPos = NumberingScheme.hotelPos2RowCol(freezerType,
+                hotelPos = LabelingScheme.hotelPos2RowCol(freezerType,
                     hotelName);
 
                 paletteNum = rs.getInt(6) - 1;
@@ -525,7 +525,7 @@ public class Importer {
 
                 SamplePosition spos = new SamplePosition();
                 spos.setPositionDimensionOne(1);
-                spos.setPositionDimensionTwo(NumberingScheme.palettePos2Int(palettePos));
+                spos.setPositionDimensionTwo(LabelingScheme.palettePos2Int(palettePos));
                 spos.setContainer(palette);
 
                 Sample sample = new Sample();

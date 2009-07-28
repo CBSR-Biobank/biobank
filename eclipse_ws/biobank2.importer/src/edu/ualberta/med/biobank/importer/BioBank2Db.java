@@ -69,7 +69,7 @@ public class BioBank2Db {
 
     public Site createSite() throws ApplicationException {
         Site site = new Site();
-        site.setName("CBR");
+        site.setName("CBSR");
         Address address = new Address();
         site.setAddress(address);
 

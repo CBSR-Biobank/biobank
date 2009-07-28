@@ -3,7 +3,7 @@ package edu.ualberta.med.biobank.importer;
 
 import edu.ualberta.med.biobank.model.ContainerType;
 
-public class NumberingScheme {
+public class LabelingScheme {
 
     private static final String posAlpha = "ABCDEFGHJKLMNPQRSTUVWXYZ";
 
