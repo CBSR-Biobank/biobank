@@ -41,10 +41,10 @@ public class ChooseContainerWidget extends AbstractGridContainerWidget {
     }
 
     public void initDefaultLegend() {
-        List<ContainerStatus> legend = new ArrayList<ContainerStatus>();
+        List<ContainerStatus> legendStatus = new ArrayList<ContainerStatus>();
         legendStatus.add(ContainerStatus.EMPTY);
         legendStatus.add(ContainerStatus.FILLED);
-        setLegend(legend);
+        setLegend(legendStatus);
     }
 
     public void setContainersStatus(ContainerCell[][] cells) {

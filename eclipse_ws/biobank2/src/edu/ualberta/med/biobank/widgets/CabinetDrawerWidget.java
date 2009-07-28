@@ -150,7 +150,7 @@ public class CabinetDrawerWidget extends Canvas {
     public void setContainersStatus(
         Collection<ContainerPosition> childPositionCollection) {
         for (ContainerPosition position : childPositionCollection) {
-            int pos = position.getPositionDimensionOne().intValue() - 1;
+            int pos = position.getPositionDimensionOne().intValue();
             cells[pos] = new ContainerCell(position);
             cells[pos].setStatus(ContainerStatus.FILLED);
         }
