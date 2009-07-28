@@ -88,8 +88,7 @@ public class ModelUtils {
             int dim2 = position.getPositionDimensionTwo();
             String dim1String = String.valueOf((char) ('A' + dim1));
             String dim2String = String.valueOf(dim2);
-            return position.getContainer().getLabel() + dim1String
-                + dim2String;
+            return position.getContainer().getLabel() + dim1String + dim2String;
         }
     }
 
@@ -124,18 +123,21 @@ public class ModelUtils {
     }
 
     public static SampleStorage[] toArray(Collection<SampleStorage> collection) {
-        // hack required here because xxx.getXxxxCollection().toArray(new
-        // Xxx[0])
-        // returns Object[].
-        if ((collection != null) && (collection.size() == 0))
-            return null;
+        if (collection != null) {
+            // hack required here because xxx.getXxxxCollection().toArray(new
+            // Xxx[0])
+            // returns Object[].
+            if ((collection != null) && (collection.size() == 0))
+                return null;
 
-        int count = 0;
-        SampleStorage[] arr = new SampleStorage[collection.size()];
-        for (SampleStorage ss : collection) {
-            arr[count] = ss;
-            ++count;
+            int count = 0;
+            SampleStorage[] arr = new SampleStorage[collection.size()];
+            for (SampleStorage ss : collection) {
+                arr[count] = ss;
+                ++count;
+            }
+            return arr;
         }
-        return arr;
+        return null;
     }
 }

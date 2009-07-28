@@ -390,14 +390,16 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
             if (combinedPvInfo.control instanceof Text) {
                 value = ((Text) combinedPvInfo.control).getText();
             } else if (combinedPvInfo.control instanceof Combo) {
-                String[] options = combinedPvInfo.pvInfo.getPossibleValues()
-                    .split(";");
-                int index = ((Combo) combinedPvInfo.control)
-                    .getSelectionIndex();
-                if (index >= 0) {
-                    Assert.isTrue(index < options.length,
-                        "Invalid combo box selection " + index);
-                    value = options[index];
+                if (combinedPvInfo.pvInfo.getPossibleValues() != null) {
+                    String[] options = combinedPvInfo.pvInfo
+                        .getPossibleValues().split(";");
+                    int index = ((Combo) combinedPvInfo.control)
+                        .getSelectionIndex();
+                    if (index >= 0) {
+                        Assert.isTrue(index < options.length,
+                            "Invalid combo box selection " + index);
+                        value = options[index];
+                    }
                 }
             } else if (combinedPvInfo.control instanceof DateTimeWidget) {
                 value = ((DateTimeWidget) combinedPvInfo.control).getText();
