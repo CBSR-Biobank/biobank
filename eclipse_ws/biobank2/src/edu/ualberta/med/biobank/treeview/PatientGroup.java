@@ -54,7 +54,8 @@ public class PatientGroup extends Node {
 
         HQLCriteria c = new HQLCriteria("select patients.id"
             + " from edu.ualberta.med.biobank.model.Patient as patients"
-            + " inner join patients.study as study" + " where study.id=?");
+            + " inner join patients.study as study"
+            + " where study.id=? order by patients.id");
         c.setParameters(Arrays.asList(new Object[] { studyID }));
 
         return (appService.query(c));
@@ -72,34 +73,36 @@ public class PatientGroup extends Node {
 
             List<Integer> patientIDs = getPatientIDs(parentStudy.getId());
 
-            Boolean found = false;
-
-            for (Integer patient : patientIDs) {
+            for (int i = 0; i < patientIDs.size(); i++) {
+                Integer patientId = patientIDs.get(i);
+                boolean found = false;
+                // check if the patientId is already in one of the children
                 List<Node> nodes = getChildren();
                 for (Node node : nodes) {
-                    if (node.getChild(patient) != null) {
+                    if (((PatientSubGroup) node).hasId(patientId)) {
                         found = true;
                         break;
                     }
                 }
-                Boolean inserted = false;
                 if (!found) {
+                    // patient has not been found in one child
+                    boolean inserted = false;
+                    // try to insert it into one of the existing child
                     for (Node node : nodes) {
                         if (!((PatientSubGroup) node).full()) {
-                            ((PatientSubGroup) node).addID(patient);
+                            ((PatientSubGroup) node).addID(patientId);
                             inserted = true;
                             break;
                         }
                     }
-
+                    if (!inserted) {
+                        // not inserted : create a new node
+                        PatientSubGroup newNode = new PatientSubGroup(this,
+                            nodes.size());
+                        newNode.addID(patientId);
+                        addChild(newNode);
+                    }
                 }
-                if (!inserted) {
-                    PatientSubGroup newNode = new PatientSubGroup(this, nodes
-                        .size());
-                    newNode.addID(patient);
-                    addChild(newNode);
-                }
-
             }
             if (updateNode) {
                 for (Node node : getChildren()) {

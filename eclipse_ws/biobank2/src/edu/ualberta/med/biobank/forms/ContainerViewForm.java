@@ -173,6 +173,7 @@ public class ContainerViewForm extends BiobankViewForm {
             }
             ChooseContainerWidget containerWidget = new ChooseContainerWidget(
                 client);
+            containerWidget.initDefaultLegend();
             if (dim2.compareTo(new Integer(1)) == 0) {
                 // single dimension size
                 rowHeight = 40;

@@ -133,6 +133,7 @@ public class ContainerTypeViewForm extends BiobankViewForm {
         FormUtils.setTextValue(defaultTempLabel, containerType
             .getDefaultTemperature());
         FormUtils.setTextValue(numSchemeLabel, containerType
+            .getChildLabelingScheme() == null ? "" : containerType
             .getChildLabelingScheme().getName());
         FormUtils.setTextValue(activityStatusLabel, containerType
             .getActivityStatus());
