@@ -21,8 +21,8 @@ import org.eclipse.ui.part.ViewPart;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.exception.MultipleSearchResultException;
 import edu.ualberta.med.biobank.treeview.Node;
-import edu.ualberta.med.biobank.treeview.SessionAdapter;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class SearchView extends ViewPart {
@@ -96,14 +96,12 @@ public class SearchView extends ViewPart {
             public void run() {
                 try {
                     WritableApplicationService appService = null;
-                    SessionAdapter sessionAdapter = null;
+                    Node node;
                     IStructuredSelection treeSelection = (IStructuredSelection) SessionManager
                         .getInstance().getTreeViewer().getSelection();
                     if (treeSelection != null && treeSelection.size() > 0) {
-                        Node node = (Node) treeSelection.getFirstElement();
+                        node = (Node) treeSelection.getFirstElement();
                         appService = node.getAppService();
-                        sessionAdapter = (SessionAdapter) node
-                            .getParentFromClass(SessionAdapter.class);
                     } else {
                         BioBankPlugin.openMessage("Search",
                             "No selection available for search");
@@ -120,17 +118,20 @@ public class SearchView extends ViewPart {
                             SearchType searchType = (SearchType) selection
                                 .getFirstElement();
                             String id = searchField.getText();
-                            Node node = searchType.search(appService, id,
-                                sessionAdapter);
-                            if (node != null) {
-                                SessionManager
-                                    .getInstance()
-                                    .getTreeViewer()
-                                    .setSelection(new StructuredSelection(node));
-                                node.performDoubleClick();
+                            Node nodeFound = searchType.search(appService, id,
+                                node);
+                            if (nodeFound != null) {
+                                SessionManager.getInstance().getTreeViewer()
+                                    .setSelection(
+                                        new StructuredSelection(nodeFound));
+                                nodeFound.performDoubleClick();
                             }
                         }
                     }
+                } catch (MultipleSearchResultException msre) {
+                    BioBankPlugin
+                        .openError("Search result",
+                            "More than one result found : select a more appropriate node in the tree");
                 } catch (Exception ex) {
                     SessionManager.getLogger().error("Error for search", ex);
                 }

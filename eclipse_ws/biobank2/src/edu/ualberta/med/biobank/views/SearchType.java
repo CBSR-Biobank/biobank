@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.views;
 import java.util.List;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.exception.MultipleSearchResultException;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ModelUtils;
 import edu.ualberta.med.biobank.model.Patient;
@@ -13,14 +14,13 @@ import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.NodeSearchVisitor;
 import edu.ualberta.med.biobank.treeview.PatientVisitAdapter;
-import edu.ualberta.med.biobank.treeview.SessionAdapter;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public enum SearchType {
     Site {
         @Override
         public Node search(WritableApplicationService appService,
-            String searchValue, SessionAdapter sessionAdapter) throws Exception {
+            String searchValue, Node node) throws Exception {
             List<Site> sites = ModelUtils.queryProperty(appService, Site.class,
                 "name", searchValue, true);
             if (sites.size() == 0) {
@@ -28,10 +28,10 @@ public enum SearchType {
                     + searchValue);
             } else if (sites.size() == 1) {
                 Site site = sites.get(0);
-                return sessionAdapter.accept(new NodeSearchVisitor(Site.class,
-                    site.getId()));
+                return node.accept(new NodeSearchVisitor(Site.class, site
+                    .getId()));
             } else {
-                throw new Exception("Should not find more than one entry ?");
+                throw new MultipleSearchResultException();
             }
             return null;
         }
@@ -39,18 +39,18 @@ public enum SearchType {
     Study {
         @Override
         public Node search(WritableApplicationService appService,
-            String searchValue, SessionAdapter sessionAdapter) throws Exception {
+            String searchValue, Node node) throws Exception {
             List<Study> studies = ModelUtils.queryProperty(appService,
-                Study.class, "name", searchValue, true);
+                Study.class, "nameShort", searchValue, true);
             if (studies.size() == 0) {
                 BioBankPlugin.openMessage("Search", "No study found with name "
                     + searchValue);
             } else if (studies.size() == 1) {
                 Study study = studies.get(0);
-                return sessionAdapter.accept(new NodeSearchVisitor(Study.class,
-                    study.getId()));
+                return node.accept(new NodeSearchVisitor(Study.class, study
+                    .getId()));
             } else {
-                throw new Exception("Should not find more than one entry ?");
+                throw new MultipleSearchResultException();
             }
             return null;
         }
@@ -58,7 +58,7 @@ public enum SearchType {
     Patient {
         @Override
         public Node search(WritableApplicationService appService,
-            String searchValue, SessionAdapter sessionAdapter) throws Exception {
+            String searchValue, Node node) throws Exception {
             List<Patient> patients = ModelUtils.queryProperty(appService,
                 Patient.class, "number", searchValue, true);
             if (patients.size() == 0) {
@@ -66,10 +66,10 @@ public enum SearchType {
                     "No patient found with number " + searchValue);
             } else if (patients.size() == 1) {
                 Patient patient = patients.get(0);
-                return sessionAdapter.accept(new NodeSearchVisitor(
-                    Patient.class, patient.getId()));
+                return node.accept(new NodeSearchVisitor(Patient.class, patient
+                    .getId()));
             } else {
-                throw new Exception("Should not find more than one entry ?");
+                throw new MultipleSearchResultException();
             }
             return null;
         }
@@ -77,7 +77,7 @@ public enum SearchType {
     Sample {
         @Override
         public Node search(WritableApplicationService appService,
-            String searchValue, SessionAdapter sessionAdapter) throws Exception {
+            String searchValue, Node node) throws Exception {
             List<Sample> samples = ModelUtils.queryProperty(appService,
                 Sample.class, "inventoryId", searchValue, true);
             if (samples.size() == 0) {
@@ -85,13 +85,13 @@ public enum SearchType {
                     "No sample found with inventoryId " + searchValue);
             } else if (samples.size() == 1) {
                 Sample sample = samples.get(0);
-                PatientVisitAdapter pvAdapter = (PatientVisitAdapter) sessionAdapter
+                PatientVisitAdapter pvAdapter = (PatientVisitAdapter) node
                     .accept(new NodeSearchVisitor(PatientVisit.class, sample
                         .getPatientVisit().getId()));
                 pvAdapter.setSelectedSample(sample);
                 return pvAdapter;
             } else {
-                throw new Exception("Should not find more than one entry ?");
+                throw new MultipleSearchResultException();
             }
             return null;
         }
@@ -99,7 +99,8 @@ public enum SearchType {
     Container {
         @Override
         public Node search(WritableApplicationService appService,
-            String searchValue, SessionAdapter sessionAdapter) throws Exception {
+            String searchValue, Node node)
+            throws MultipleSearchResultException, Exception {
             List<Container> containers = ModelUtils.queryProperty(appService,
                 Container.class, "name", searchValue, true);
             if (containers.size() == 0) {
@@ -107,16 +108,17 @@ public enum SearchType {
                     "No storage container found with barcode " + searchValue);
             } else if (containers.size() == 1) {
                 Container container = containers.get(0);
-                return sessionAdapter.accept(new NodeSearchVisitor(
-                    Container.class, container.getId()));
+                return node.accept(new NodeSearchVisitor(Container.class,
+                    container.getId()));
             } else {
-                throw new Exception("Should not find more than one entry ?");
+                throw new MultipleSearchResultException();
             }
             return null;
         }
     };
 
     public abstract Node search(WritableApplicationService appService,
-        String searchValue, SessionAdapter sessionAdapter) throws Exception;
+        String searchValue, Node node) throws MultipleSearchResultException,
+        Exception;
 
 }
