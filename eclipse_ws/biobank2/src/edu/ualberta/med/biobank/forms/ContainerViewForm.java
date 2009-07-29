@@ -221,9 +221,8 @@ public class ContainerViewForm extends BiobankViewForm {
         if (cells[pos.getPositionDimensionOne()][pos.getPositionDimensionTwo()]
             .getStatus() == ContainerStatus.EMPTY) {
             Container newContainer = new Container();
-            ContainerPosition contPos = pos;
-            contPos.setParentContainer(container);
-            newContainer.setPosition(contPos);
+            pos.setParentContainer(container);
+            newContainer.setPosition(pos);
             newAdapter = new ContainerAdapter(containerAdapter, newContainer);
             Node.openForm(new FormInput(newAdapter), ContainerEntryForm.ID);
         } else {

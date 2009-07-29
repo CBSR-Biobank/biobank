@@ -24,6 +24,8 @@ import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.LabelingScheme;
+import edu.ualberta.med.biobank.RowColPos;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerPosition;
@@ -79,6 +81,14 @@ public class ContainerEntryForm extends BiobankEntryForm {
         container = containerAdapter.getContainer();
         site = containerAdapter.getSite();
         position = container.getPosition();
+
+        RowColPos rcp = new RowColPos();
+        rcp.row = position.getPositionDimensionOne();
+        rcp.col = position.getPositionDimensionTwo();
+
+        container.setLabel(position.getParentContainer().getLabel()
+            + LabelingScheme.rowColToTwoCharAlpha(rcp, position
+                .getParentContainer().getContainerType()));
 
         if (container.getId() == null) {
             setPartName("Container");
