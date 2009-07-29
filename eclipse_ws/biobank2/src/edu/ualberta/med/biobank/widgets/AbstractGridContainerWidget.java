@@ -146,11 +146,22 @@ public abstract class AbstractGridContainerWidget extends Canvas {
         RowColPos rowcol = new RowColPos();
         rowcol.row = indexRow;
         rowcol.col = indexCol;
-        ContainerLabelingScheme ls = containerType.getChildLabelingScheme();
-        if (ls.getId() == 0)
-            return LabelingScheme.rowColToTwoCharAlpha(rowcol);
-        else
-            return LabelingScheme.rowColToTwoCharNumeric(rowcol);
+        if (containerType != null) {
+            ContainerLabelingScheme ls = containerType.getChildLabelingScheme();
+            if (ls.getId() == 2)
+                return LabelingScheme.rowColToTwoCharAlpha(containerType,
+                    rowcol);
+            else if (ls.getId() == 3)
+                return LabelingScheme.rowColToTwoCharNumeric(rowcol);
+            else
+                return Integer.toString(LabelingScheme.rowColToInt(rowcol,
+                    containerType));
+        } else
+            return "?";
+    }
+
+    public void setContainerType(ContainerType type) {
+        this.containerType = type;
     }
 
     private String getValueForCell(Object firstSign, int addValue,

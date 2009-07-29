@@ -159,6 +159,7 @@ public class ContainerViewForm extends BiobankViewForm {
 
         setContainerValues();
         ContainerType containerType = container.getContainerType();
+
         if (containerType.getChildContainerTypeCollection().size() > 0) {
             visualizeContainer();
         }
@@ -189,6 +190,7 @@ public class ContainerViewForm extends BiobankViewForm {
 
             ChooseContainerWidget containerWidget = new ChooseContainerWidget(
                 client);
+            containerWidget.setContainerType(container.getContainerType());
             containerWidget.initDefaultLegend();
             int dim1 = cells.length;
             int dim2 = cells[0].length;
