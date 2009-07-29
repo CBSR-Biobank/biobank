@@ -523,9 +523,10 @@ public class Importer {
                 sampleType = bioBank2Db.getSampleType(sampleTypeNameShort);
                 bioBank2Db.containerCheckSampleTypeValid(palette, sampleType);
 
+                RowColPos rowColPos = LabelingScheme.palettePos2RowCol(palettePos);
                 SamplePosition spos = new SamplePosition();
-                spos.setPositionDimensionOne(1);
-                spos.setPositionDimensionTwo(LabelingScheme.palettePos2Int(palettePos));
+                spos.setPositionDimensionOne(rowColPos.row);
+                spos.setPositionDimensionTwo(rowColPos.col);
                 spos.setContainer(palette);
 
                 Sample sample = new Sample();
