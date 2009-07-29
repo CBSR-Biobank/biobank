@@ -8,6 +8,8 @@ import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
 
+import edu.ualberta.med.biobank.LabelingScheme;
+import edu.ualberta.med.biobank.RowColPos;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -51,10 +53,9 @@ public class ModelUtils {
         return list.get(0);
     }
 
-    public static ContainerType getCabinetType(
-        WritableApplicationService appService) {
+    public static ContainerType getBinType(WritableApplicationService appService) {
         ContainerType type = new ContainerType();
-        type.setName("Cabinet");
+        type.setName("Bin");
         List<ContainerType> types;
         try {
             types = appService.search(ContainerType.class, type);
@@ -67,14 +68,27 @@ public class ModelUtils {
     }
 
     public static Container getContainerWithLabel(
-        WritableApplicationService appService, String barcode)
-        throws ApplicationException {
+        WritableApplicationService appService, String barcode, String type)
+        throws Exception {
         Container container = new Container();
-        container.setProductBarcode(barcode);
+        container.setLabel(barcode);
         List<Container> containers = appService.search(Container.class,
             container);
         if (containers.size() == 1) {
             return containers.get(0);
+        } else {
+            if (type != null) {
+                List<ContainerType> cTypes = ModelUtils.queryProperty(
+                    appService, ContainerType.class, "name", type, true);
+                if (cTypes.size() > 0) {
+                    for (Container c : containers) {
+                        if (c.getContainerType().getId().equals(
+                            cTypes.get(0).getId())) {
+                            return c;
+                        }
+                    }
+                }
+            }
         }
         return null;
     }
@@ -92,7 +106,9 @@ public class ModelUtils {
             ContainerType type = container.getContainerType();
             // FIXME use the labelling of the container !
             if (type.getName().equals("Bin")) {
-                return position.getContainer().getLabel() + dim1 + dim2;
+                String binPosition = LabelingScheme.rowColToTwoCharAlpha(
+                    new RowColPos(dim1, dim2), type);
+                return position.getContainer().getLabel() + binPosition;
             } else if (type.getName().equals("Palette")) {
                 return position.getContainer().getLabel() + dim1String
                     + dim2String;
