@@ -88,7 +88,16 @@ public class ModelUtils {
             int dim2 = position.getPositionDimensionTwo();
             String dim1String = String.valueOf((char) ('A' + dim1));
             String dim2String = String.valueOf(dim2);
-            return position.getContainer().getLabel() + dim1String + dim2String;
+            Container container = position.getContainer();
+            ContainerType type = container.getContainerType();
+            // FIXME use the labelling of the container !
+            if (type.getName().equals("Bin")) {
+                return position.getContainer().getLabel() + dim1 + dim2;
+            } else if (type.getName().equals("Palette")) {
+                return position.getContainer().getLabel() + dim1String
+                    + dim2String;
+            }
+            return "error in types";
         }
     }
 
