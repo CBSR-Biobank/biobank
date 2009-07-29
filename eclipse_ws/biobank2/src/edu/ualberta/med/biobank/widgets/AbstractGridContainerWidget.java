@@ -156,8 +156,16 @@ public abstract class AbstractGridContainerWidget extends Canvas {
                     containerType);
             else
                 return LabelingScheme.rowColToInt(rowcol, containerType);
-        } else
-            return "?";
+        } else {
+            String row = getValueForCell(firstRowSign, indexRow,
+                firstColSign == null);
+            String col = getValueForCell(firstColSign, indexCol,
+                firstRowSign == null);
+            if (showColumnFirst) {
+                return col + row;
+            }
+            return row + col;
+        }
     }
 
     public void setContainerType(ContainerType type) {

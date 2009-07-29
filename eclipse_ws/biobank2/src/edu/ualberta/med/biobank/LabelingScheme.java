@@ -1,5 +1,7 @@
 package edu.ualberta.med.biobank;
 
+import java.text.DecimalFormat;
+
 import edu.ualberta.med.biobank.model.ContainerType;
 
 public class LabelingScheme {
@@ -85,20 +87,22 @@ public class LabelingScheme {
         int totalRows = containerType.getCapacity().getDimensionOneCapacity();
         // int totalColumns = containerType.getCapacity()
         // .getDimensionTwoCapacity();
-
-        char letter1 = 'A';
-        char letter2 = 'A';
-
-        int total1 = totalRows * rcp.col + rcp.row;
-        letter1 = (char) (letter1 + (total1 / 24));
-        letter1 = correctPositionLetter(letter1);
-
-        // int total2 = (row + 1) * totalRows * column + row; // + 1 because
-        // start at zero
-        letter2 = (char) (letter2 + (total1 % 24));
-        letter2 = correctPositionLetter(letter2);
-
-        return String.valueOf(letter1) + String.valueOf(letter2);
+        DecimalFormat df1 = new DecimalFormat("00");
+        return df1.format(rcp.row + 1);
+        // char num1 = '0';
+        // char num2 = '1';
+        //
+        // int total1 = totalRows * rcp.col + rcp.row;
+        // num1 = (char) (num1 + (total1 / 10));
+        // num1 = correctPositionLetter(num1);
+        //
+        // // int total2 = (row + 1) * totalRows * column + row; // + 1 because
+        // // start at zero
+        //
+        // num2 = (char) (num2 + (total1 % 10));
+        // num2 = correctPositionLetter(num2);
+        //
+        // return String.valueOf(num1) + String.valueOf(num2);
     }
 
     public static String rowColToInt(RowColPos rcp, ContainerType containerType) {
@@ -122,6 +126,8 @@ public class LabelingScheme {
     }
 
     public static char correctPositionLetter(char letter) {
+        if (letter == ':')
+            return (char) (letter - 10);
         if (letter < 'I') {
             return letter;
         }
