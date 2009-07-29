@@ -1,5 +1,7 @@
 package edu.ualberta.med.biobank;
 
+import java.text.DecimalFormat;
+
 import edu.ualberta.med.biobank.model.ContainerType;
 
 public class LabelingScheme {
@@ -79,6 +81,43 @@ public class LabelingScheme {
         pos1 = index / 24;
         pos2 = index % 24;
 
-        return "" + posAlpha.charAt(pos1) + posAlpha.charAt(pos2);
+        return String.valueOf(int2pos(pos1)) + String.valueOf(int2pos(pos2));
+    }
+
+    public static String rowColToTwoCharNumeric(RowColPos rcp) {
+        DecimalFormat df1 = new DecimalFormat("00");
+        return df1.format(rcp.row + 1);
+    }
+
+    public static String rowColToInt(RowColPos rcp, ContainerType containerType) {
+        int totalRows = containerType.getCapacity().getDimensionOneCapacity();
+        // int totalColumns = containerType.getCapacity()
+        // .getDimensionTwoCapacity();
+
+        char letter1 = 'A';
+        char letter2 = 'A';
+
+        int total1 = totalRows * rcp.col + rcp.row;
+        letter1 = (char) (letter1 + (total1 / 24));
+        letter1 = correctPositionLetter(letter1);
+
+        // int total2 = (row + 1) * totalRows * column + row; // + 1 because
+        // start at zero
+        letter2 = (char) (letter2 + (total1 % 24));
+        letter2 = correctPositionLetter(letter2);
+
+        return String.valueOf(letter1) + String.valueOf(letter2);
+    }
+
+    public static char correctPositionLetter(char letter) {
+        if (letter == ':')
+            return (char) (letter - 10);
+        if (letter < 'I') {
+            return letter;
+        }
+        if (letter >= 'I' && letter < 'O') {
+            return (char) (letter + 1);
+        }
+        return (char) (letter + 2);
     }
 }
