@@ -189,6 +189,17 @@ public class AssignSamplesLocationEntryForm extends BiobankEntryForm implements
         freezerWidget = new ViewContainerWidget(freezerComposite);
         toolkit.adapt(freezerWidget);
         freezerWidget.setGridSizes(5, 10, ScanPaletteWidget.PALETTE_WIDTH, 100);
+        try {
+            // FIXME - homogenise
+            List<ContainerType> types = ModelUtils.queryProperty(appService,
+                ContainerType.class, "name", "Freezer", false);
+            if (types.size() > 0) {
+                freezerWidget.setParams(types.get(0), null);
+            }
+        } catch (ApplicationException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
 
         Composite hotelComposite = toolkit.createComposite(containersComposite);
         hotelComposite.setLayout(getNeutralGridLayout());
@@ -352,9 +363,9 @@ public class AssignSamplesLocationEntryForm extends BiobankEntryForm implements
         // For hotel, use the dim with for than one size
         // FIXME generalize !
         if (dim1Capacity > 1) {
-            pos = position.getPositionDimensionOne();
+            pos = position.getPositionDimensionOne() + 1;
         } else {
-            pos = position.getPositionDimensionTwo();
+            pos = position.getPositionDimensionTwo() + 1;
         }
         DecimalFormat df1 = new DecimalFormat("00");
         return positionString + df1.format(pos);
@@ -454,8 +465,8 @@ public class AssignSamplesLocationEntryForm extends BiobankEntryForm implements
                 .getDimensionTwoCapacity();
             freezerWidget.setStorageSize(dim1, dim2);
             freezerWidget.setSelectedBox(new Point(hotelPosition
-                .getPositionDimensionOne() - 1, hotelPosition
-                .getPositionDimensionTwo() - 1));
+                .getPositionDimensionOne(), hotelPosition
+                .getPositionDimensionTwo()));
 
             hotelLabel.setText(hotelContainer.getLabel());
             dim1 = hotelContainer.getContainerType().getCapacity()
@@ -464,8 +475,8 @@ public class AssignSamplesLocationEntryForm extends BiobankEntryForm implements
                 .getDimensionTwoCapacity();
             hotelWidget.setStorageSize(dim1, dim2);
             hotelWidget.setSelectedBox(new Point(palettePosition
-                .getPositionDimensionOne() - 1, palettePosition
-                .getPositionDimensionTwo() - 1));
+                .getPositionDimensionOne(), palettePosition
+                .getPositionDimensionTwo()));
 
             paletteLabel.setText(palette.getLabel());
             hasLocationValue.setValue(Boolean.TRUE);
@@ -681,10 +692,11 @@ public class AssignSamplesLocationEntryForm extends BiobankEntryForm implements
     /**
      * From the palette barcode, get existing information form database
      */
-    private boolean getPaletteInformation() throws ApplicationException {
+    private boolean getPaletteInformation() throws Exception {
         currentPaletteSamples = null;
         String barcode = (String) paletteProductCodeValue.getValue();
-        currentPalette = ModelUtils.getContainerWithLabel(appService, barcode);
+        currentPalette = ModelUtils.getContainerWithLabel(appService, barcode,
+            "Palette");
         if (currentPalette != null) {
             boolean result = MessageDialog
                 .openConfirm(PlatformUI.getWorkbench()

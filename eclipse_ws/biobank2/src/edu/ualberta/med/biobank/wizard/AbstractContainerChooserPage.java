@@ -120,8 +120,8 @@ public abstract class AbstractContainerChooserPage extends WizardPage {
             // get cells informations
             for (ContainerPosition position : currentContainer
                 .getChildPositionCollection()) {
-                int positionDim1 = position.getPositionDimensionOne() - 1;
-                int positionDim2 = position.getPositionDimensionTwo() - 1;
+                int positionDim1 = position.getPositionDimensionOne();
+                int positionDim2 = position.getPositionDimensionTwo();
                 ContainerCell cell = new ContainerCell(position);
                 Container occupiedContainer = position.getContainer();
                 setStatus(cell, occupiedContainer);

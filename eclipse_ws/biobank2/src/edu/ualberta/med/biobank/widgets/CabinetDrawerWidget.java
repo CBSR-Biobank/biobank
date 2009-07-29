@@ -37,7 +37,7 @@ public class CabinetDrawerWidget extends Canvas {
 
     private int boxNumber = 36;
 
-    private int selectedBin;
+    private int selectedBin = -1;
 
     private Boolean hasLegend = false;
 
@@ -109,7 +109,7 @@ public class CabinetDrawerWidget extends Canvas {
             gc.setBackground(status.getColor());
             gc.fillRectangle(rectangle);
             gc.drawRectangle(rectangle);
-            if (selectedBin == boxIndex) {
+            if ((selectedBin + 1) == boxIndex) {
                 gc.setBackground(new Color(e.display, 123, 11, 25));
                 gc.fillRectangle(rectangle);
             }

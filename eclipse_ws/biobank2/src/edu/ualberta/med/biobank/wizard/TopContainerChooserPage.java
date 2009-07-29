@@ -1,5 +1,7 @@
 package edu.ualberta.med.biobank.wizard;
 
+import java.util.List;
+
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -16,6 +18,7 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerCell;
 import edu.ualberta.med.biobank.model.ContainerStatus;
+import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.ModelUtils;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
@@ -41,7 +44,8 @@ public class TopContainerChooserPage extends AbstractContainerChooserPage {
             @Override
             public String getText(Object element) {
                 Container sc = (Container) element;
-                return sc.getLabel();
+                return sc.getLabel() + " (" + sc.getContainerType().getName()
+                    + ')';
             }
         });
         try {
@@ -66,6 +70,17 @@ public class TopContainerChooserPage extends AbstractContainerChooserPage {
 
         super.initComponent();
         containerWidget.setVisible(false);
+        try {
+            // FIXME - homogenise
+            List<ContainerType> types = ModelUtils.queryProperty(
+                getAppService(), ContainerType.class, "name", "Freezer", false);
+            if (types.size() > 0) {
+                containerWidget.setParams(types.get(0), null);
+            }
+        } catch (ApplicationException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 
     @Override

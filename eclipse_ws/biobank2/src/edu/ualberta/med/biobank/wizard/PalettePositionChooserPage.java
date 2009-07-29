@@ -35,7 +35,7 @@ public class PalettePositionChooserPage extends AbstractContainerChooserPage {
         setDescription("Choose position in container");
         gridWidth = 60;
         defaultDim1 = 19;
-        defaultDim2 = 13;
+        defaultDim2 = 1;
     }
 
     @Override
@@ -103,8 +103,8 @@ public class PalettePositionChooserPage extends AbstractContainerChooserPage {
         ContainerCell cell = containerWidget.getPositionAtCoordinates(e.x, e.y);
         if (cell.getStatus() == ContainerStatus.EMPTY) {
             this.selectedPosition = cell.getPosition();
-            textPosition.setText(selectedPosition.getPositionDimensionOne()
-                .toString());
+            int positionText = selectedPosition.getPositionDimensionOne() + 1;
+            textPosition.setText(String.valueOf(positionText));
             complete = true;
         } else {
             textPosition.setText("");
@@ -144,7 +144,7 @@ public class PalettePositionChooserPage extends AbstractContainerChooserPage {
             for (int j = 0; j < cells[i].length; j++) {
                 if (cells[i][j] == null) {
                     ContainerCell cell = new ContainerCell(
-                        newContainerPosition(i + 1, j + 1));
+                        newContainerPosition(i, j));
                     cell.setStatus(ContainerStatus.EMPTY);
                     cells[i][j] = cell;
                 }
