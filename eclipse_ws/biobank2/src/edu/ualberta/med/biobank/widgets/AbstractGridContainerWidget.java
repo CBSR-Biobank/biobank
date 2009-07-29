@@ -149,13 +149,13 @@ public abstract class AbstractGridContainerWidget extends Canvas {
         if (containerType != null) {
             ContainerLabelingScheme ls = containerType.getChildLabelingScheme();
             if (ls.getId() == 2)
-                return LabelingScheme.rowColToTwoCharAlpha(containerType,
-                    rowcol);
+                return LabelingScheme.rowColToTwoCharAlpha(rowcol,
+                    containerType);
             else if (ls.getId() == 3)
-                return LabelingScheme.rowColToTwoCharNumeric(rowcol);
+                return LabelingScheme.rowColToTwoCharNumeric(rowcol,
+                    containerType);
             else
-                return Integer.toString(LabelingScheme.rowColToInt(rowcol,
-                    containerType));
+                return LabelingScheme.rowColToInt(rowcol, containerType);
         } else
             return "?";
     }
