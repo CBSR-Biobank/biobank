@@ -2,6 +2,8 @@ package edu.ualberta.med.biobank;
 
 import java.text.DecimalFormat;
 
+import org.eclipse.core.runtime.Assert;
+
 import edu.ualberta.med.biobank.model.ContainerType;
 
 public class LabelingScheme {
@@ -25,12 +27,6 @@ public class LabelingScheme {
         }
         return posAlpha.indexOf(pos.charAt(0)) * 12
             + Integer.parseInt(pos.substring(1)) - 1;
-    }
-
-    public static int twoCharAlphaToInt(String label) {
-        int len = label.length();
-        return posAlpha.indexOf(label.charAt(len - 2)) * 24
-            + posAlpha.indexOf(label.charAt(len - 1));
     }
 
     public static RowColPos twoCharAlphaToRowCol(ContainerType container,
@@ -75,6 +71,7 @@ public class LabelingScheme {
             index = totalRows * rcp.col + rcp.row;
         }
 
+        Assert.isTrue(index < 24 * 24);
         pos1 = index / 24;
         pos2 = index % 24;
 
@@ -86,24 +83,15 @@ public class LabelingScheme {
         return df1.format(rcp.row + 1);
     }
 
+    public static int twoCharAlphaToInt(String label) {
+        int len = label.length();
+        return posAlpha.indexOf(label.charAt(len - 2)) * 24
+            + posAlpha.indexOf(label.charAt(len - 1));
+    }
+
     public static String rowColToInt(RowColPos rcp, ContainerType containerType) {
-        int totalRows = containerType.getCapacity().getDimensionOneCapacity();
-        // int totalColumns = containerType.getCapacity()
-        // .getDimensionTwoCapacity();
-
-        char letter1 = 'A';
-        char letter2 = 'A';
-
-        int total1 = totalRows * rcp.col + rcp.row;
-        letter1 = (char) (letter1 + (total1 / 24));
-        letter1 = correctPositionLetter(letter1);
-
-        // int total2 = (row + 1) * totalRows * column + row; // + 1 because
-        // start at zero
-        letter2 = (char) (letter2 + (total1 % 24));
-        letter2 = correctPositionLetter(letter2);
-
-        return String.valueOf(letter1) + String.valueOf(letter2);
+        int totalCols = containerType.getCapacity().getDimensionOneCapacity();
+        return String.format("%02d", totalCols * rcp.row + rcp.col);
     }
 
     public static char correctPositionLetter(char letter) {
