@@ -63,46 +63,27 @@ public class LabelingScheme {
 
     public static String rowColToTwoCharAlpha(RowColPos rcp,
         ContainerType containerType) {
+        int pos1, pos2, index;
         int totalRows = containerType.getCapacity().getDimensionOneCapacity();
-        // int totalColumns = containerType.getCapacity()
-        // .getDimensionTwoCapacity();
+        int totalCols = containerType.getCapacity().getDimensionOneCapacity();
 
-        char letter1 = 'A';
-        char letter2 = 'A';
+        if (totalRows == 1) {
+            index = rcp.col;
+        } else if (totalCols == 1) {
+            index = rcp.row;
+        } else {
+            index = totalRows * rcp.col + rcp.row;
+        }
 
-        int total1 = totalRows * rcp.col + rcp.row;
-        letter1 = (char) (letter1 + (total1 / 24));
-        letter1 = correctPositionLetter(letter1);
+        pos1 = index / 24;
+        pos2 = index % 24;
 
-        // int total2 = (row + 1) * totalRows * column + row; // + 1 because
-        // start at zero
-        letter2 = (char) (letter2 + (total1 % 24));
-        letter2 = correctPositionLetter(letter2);
-
-        return String.valueOf(letter1) + String.valueOf(letter2);
+        return String.valueOf(int2pos(pos1)) + String.valueOf(int2pos(pos2));
     }
 
-    public static String rowColToTwoCharNumeric(RowColPos rcp,
-        ContainerType containerType) {
-        int totalRows = containerType.getCapacity().getDimensionOneCapacity();
-        // int totalColumns = containerType.getCapacity()
-        // .getDimensionTwoCapacity();
+    public static String rowColToTwoCharNumeric(RowColPos rcp) {
         DecimalFormat df1 = new DecimalFormat("00");
         return df1.format(rcp.row + 1);
-        // char num1 = '0';
-        // char num2 = '1';
-        //
-        // int total1 = totalRows * rcp.col + rcp.row;
-        // num1 = (char) (num1 + (total1 / 10));
-        // num1 = correctPositionLetter(num1);
-        //
-        // // int total2 = (row + 1) * totalRows * column + row; // + 1 because
-        // // start at zero
-        //
-        // num2 = (char) (num2 + (total1 % 10));
-        // num2 = correctPositionLetter(num2);
-        //
-        // return String.valueOf(num1) + String.valueOf(num2);
     }
 
     public static String rowColToInt(RowColPos rcp, ContainerType containerType) {

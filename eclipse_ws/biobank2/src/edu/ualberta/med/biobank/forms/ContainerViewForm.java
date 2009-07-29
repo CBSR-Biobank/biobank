@@ -71,11 +71,58 @@ public class ContainerViewForm extends BiobankViewForm {
             appService = containerAdapter.getAppService();
             retrieveContainer();
             position = container.getPosition();
-            setPartName("Container " + container.getLabel());
+            setPartName(container.getLabel() + " ("
+                + container.getContainerType().getName() + ")");
             initCells();
         } else {
             Assert.isTrue(false, "Invalid editor input: object of type "
                 + node.getClass().getName());
+        }
+    }
+
+    @Override
+    protected void createFormContent() {
+        form.setText("Container " + container.getLabel() + " ("
+            + container.getContainerType().getName() + ")");
+        form.getBody().setLayout(new GridLayout(1, false));
+
+        addRefreshToolbarAction();
+        createContainerSection();
+
+        if (container.getContainerType().getChildContainerTypeCollection()
+            .size() == 0) {
+            // only show samples section this if this container type does not
+            // have child containers
+            createSamplesSection();
+        }
+    }
+
+    private void createContainerSection() {
+        Composite client = toolkit.createComposite(form.getBody());
+        GridLayout layout = new GridLayout(2, false);
+        layout.horizontalSpacing = 10;
+        client.setLayout(layout);
+        GridData gridData = new GridData(GridData.FILL_HORIZONTAL);
+        client.setLayoutData(gridData);
+        toolkit.paintBordersFor(client);
+
+        containerLabelLabel = (Label) createWidget(client, Label.class,
+            SWT.NONE, "Label");
+        productBarcodeLabel = (Label) createWidget(client, Label.class,
+            SWT.NONE, "Product Bar Code");
+        activityStatusLabel = (Label) createWidget(client, Label.class,
+            SWT.NONE, "Activity Status");
+        commentsLabel = (Label) createWidget(client, Label.class, SWT.NONE,
+            "Comments");
+        containerTypeLabel = (Label) createWidget(client, Label.class,
+            SWT.NONE, "Container Type");
+        temperatureLabel = (Label) createWidget(client, Label.class, SWT.NONE,
+            "Temperature");
+
+        setContainerValues();
+        ContainerType containerType = container.getContainerType();
+        if (containerType.getChildContainerTypeCollection().size() > 0) {
+            visualizeContainer();
         }
     }
 
@@ -119,52 +166,6 @@ public class ContainerViewForm extends BiobankViewForm {
         }
     }
 
-    @Override
-    protected void createFormContent() {
-        form.setText("Container " + container.getLabel());
-        form.getBody().setLayout(new GridLayout(1, false));
-
-        addRefreshToolbarAction();
-        createContainerSection();
-
-        if (container.getContainerType().getChildContainerTypeCollection()
-            .size() == 0) {
-            // only show samples section this if this container type does not
-            // have child containers
-            createSamplesSection();
-        }
-    }
-
-    private void createContainerSection() {
-        Composite client = toolkit.createComposite(form.getBody());
-        GridLayout layout = new GridLayout(2, false);
-        layout.horizontalSpacing = 10;
-        client.setLayout(layout);
-        GridData gridData = new GridData(GridData.FILL_HORIZONTAL);
-        client.setLayoutData(gridData);
-        toolkit.paintBordersFor(client);
-
-        containerLabelLabel = (Label) createWidget(client, Label.class,
-            SWT.NONE, "Label");
-        productBarcodeLabel = (Label) createWidget(client, Label.class,
-            SWT.NONE, "Product Bar Code");
-        activityStatusLabel = (Label) createWidget(client, Label.class,
-            SWT.NONE, "Activity Status");
-        commentsLabel = (Label) createWidget(client, Label.class, SWT.NONE,
-            "Comments");
-        containerTypeLabel = (Label) createWidget(client, Label.class,
-            SWT.NONE, "Container Type");
-        temperatureLabel = (Label) createWidget(client, Label.class, SWT.NONE,
-            "Temperature");
-
-        setContainerValues();
-        ContainerType containerType = container.getContainerType();
-
-        if (containerType.getChildContainerTypeCollection().size() > 0) {
-            visualizeContainer();
-        }
-    }
-
     protected void visualizeContainer() {
         // default 2 dimensional grid
         int rowHeight = 40, colWidth = 40;
@@ -190,7 +191,6 @@ public class ContainerViewForm extends BiobankViewForm {
 
             ChooseContainerWidget containerWidget = new ChooseContainerWidget(
                 client);
-            containerWidget.setContainerType(container.getContainerType());
             containerWidget.initDefaultLegend();
             int dim1 = cells.length;
             int dim2 = cells[0].length;
@@ -217,32 +217,35 @@ public class ContainerViewForm extends BiobankViewForm {
 
     private void openFormFor(ContainerPosition pos) {
         ContainerAdapter newAdapter = null;
-        FormInput fi;
+
         if (cells[pos.getPositionDimensionOne()][pos.getPositionDimensionTwo()]
             .getStatus() == ContainerStatus.EMPTY) {
             Container newContainer = new Container();
-            ContainerPosition contPos = pos;
-            contPos.setParentContainer(container);
-            newContainer.setPosition(contPos);
+            pos.setParentContainer(container);
+            newContainer.setPosition(pos);
             newAdapter = new ContainerAdapter(containerAdapter, newContainer);
-            fi = new FormInput(newAdapter);
-            Node.openForm(fi, ContainerEntryForm.ID);
+            Node.openForm(new FormInput(newAdapter), ContainerEntryForm.ID);
         } else {
-            Collection<Node> children = containerAdapter.getChildren();
-            Container cont;
-            for (Node child : children) {
-                cont = ((ContainerAdapter) child).getContainer();
-                ContainerPosition contPos = cont.getPosition();
-                if (contPos.getPositionDimensionOne().compareTo(
+            Container childContainer;
+            Collection<ContainerPosition> childPositions = container
+                .getChildPositionCollection();
+            Assert.isNotNull(childPositions);
+            for (ContainerPosition childPos : childPositions) {
+                childContainer = childPos.getContainer();
+                Assert.isNotNull(childContainer);
+                if (childPos.getPositionDimensionOne().compareTo(
                     pos.getPositionDimensionOne()) == 0
-                    && contPos.getPositionDimensionTwo().compareTo(
+                    && childPos.getPositionDimensionTwo().compareTo(
                         pos.getPositionDimensionTwo()) == 0) {
-                    newAdapter = (ContainerAdapter) child;
+                    newAdapter = new ContainerAdapter(containerAdapter,
+                        childContainer);
                 }
             }
-            fi = new FormInput(newAdapter);
-            Node.openForm(fi, ContainerViewForm.ID);
+            Assert.isNotNull(newAdapter);
+            Node.openForm(new FormInput(newAdapter), ContainerViewForm.ID);
         }
+
+        containerAdapter.performExpand();
     }
 
     private void setContainerValues() {

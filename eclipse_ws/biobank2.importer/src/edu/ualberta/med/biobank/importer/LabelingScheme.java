@@ -30,8 +30,18 @@ public class LabelingScheme {
         if (pos.length() != 2) {
             throw new Exception("binPos has an invalid length: " + pos);
         }
-        return posAlpha.indexOf(pos.charAt(0)) * 12
+        return 12 * posAlpha.indexOf(pos.charAt(0))
             + Integer.parseInt(pos.substring(1)) - 1;
+    }
+
+    public static RowColPos palettePos2RowCol(String pos) throws Exception {
+        if (pos.length() != 2) {
+            throw new Exception("binPos has an invalid length: " + pos);
+        }
+        RowColPos rowColPos = new RowColPos();
+        rowColPos.row = posAlpha.indexOf(pos.charAt(0));
+        rowColPos.col = Integer.parseInt(pos.substring(1)) - 1;
+        return rowColPos;
     }
 
     public static RowColPos hotelPos2RowCol(ContainerType freezer, String pos)
