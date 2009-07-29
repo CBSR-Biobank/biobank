@@ -103,8 +103,8 @@ public class PalettePositionChooserPage extends AbstractContainerChooserPage {
         ContainerCell cell = containerWidget.getPositionAtCoordinates(e.x, e.y);
         if (cell.getStatus() == ContainerStatus.EMPTY) {
             this.selectedPosition = cell.getPosition();
-            textPosition.setText(selectedPosition.getPositionDimensionOne()
-                .toString());
+            int positionText = selectedPosition.getPositionDimensionOne() + 1;
+            textPosition.setText(String.valueOf(positionText));
             complete = true;
         } else {
             textPosition.setText("");

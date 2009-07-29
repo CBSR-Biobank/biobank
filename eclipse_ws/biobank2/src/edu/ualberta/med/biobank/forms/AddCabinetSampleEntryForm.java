@@ -48,7 +48,6 @@ import edu.ualberta.med.biobank.validators.CabinetLabelValidator;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
 import edu.ualberta.med.biobank.widgets.CabinetDrawerWidget;
 import edu.ualberta.med.biobank.widgets.ViewContainerWidget;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.query.example.InsertExampleQuery;
 
 public class AddCabinetSampleEntryForm extends BiobankEntryForm implements
@@ -78,7 +77,7 @@ public class AddCabinetSampleEntryForm extends BiobankEntryForm implements
     private IObservableValue selectedSampleType = new WritableValue("",
         String.class);
 
-    private ContainerType cabinetType;
+    private ContainerType binType;
     private Sample sample = new Sample();
     private Container cabinet;
     private Container drawer;
@@ -142,10 +141,10 @@ public class AddCabinetSampleEntryForm extends BiobankEntryForm implements
 
     private void createLocationSection() {
         // get storage type Cabinet from database
-        cabinetType = ModelUtils.getCabinetType(appService);
-        if (cabinetType == null) {
+        binType = ModelUtils.getBinType(appService);
+        if (binType == null) {
             BioBankPlugin.openAsyncError("Cabinet error",
-                "Cannot find a storage type for cabinet !");
+                "Cannot find a storage type for bin !");
             form.setEnabled(false);
         }
 
@@ -203,9 +202,8 @@ public class AddCabinetSampleEntryForm extends BiobankEntryForm implements
                 return st.getName();
             }
         });
-        if (cabinetType != null) {
-            comboViewerSampleTypes.setInput(cabinetType
-                .getSampleTypeCollection());
+        if (binType != null) {
+            comboViewerSampleTypes.setInput(binType.getSampleTypeCollection());
         }
 
         inventoryIdText = (Text) createBoundWidgetWithLabel(client, Text.class,
@@ -216,8 +214,7 @@ public class AddCabinetSampleEntryForm extends BiobankEntryForm implements
 
         positionText = (Text) createBoundWidgetWithLabel(client, Text.class,
             SWT.NONE, "Position", new String[0], cabinetPosition,
-            CabinetLabelValidator.class,
-            "Enter a position (eg 01AA01AB)");
+            CabinetLabelValidator.class, "Enter a position (eg 01AA01AB)");
         positionText.removeKeyListener(keyListener);
         positionText.addKeyListener(EnterKeyToNextFieldListener.INSTANCE);
 
@@ -275,8 +272,10 @@ public class AddCabinetSampleEntryForm extends BiobankEntryForm implements
                     String positionString = cabinetPosition.getValue()
                         .toString();
 
-                    Container sc = ModelUtils.getContainerWithLabel(
-                        appService, positionString);
+                    // FIXME this test doesn't work, no container has this
+                    // position, this is the sample position !
+                    Container sc = ModelUtils.getContainerWithLabel(appService,
+                        positionString, null);
                     if (sc == null) {
                         SamplePosition sp = getSamplePosition(positionString);
                         if (sp == null) {
@@ -285,15 +284,13 @@ public class AddCabinetSampleEntryForm extends BiobankEntryForm implements
                             return;
                         }
                         Point drawerPosition = new Point(drawer.getPosition()
-                            .getPositionDimensionOne() - 1, drawer
-                            .getPosition().getPositionDimensionTwo() - 1);
-                        cabinetWidget.setSelectedBox(drawerPosition);
-                        cabinetLabel.setText("Cabinet "
-                            + cabinet.getLabel());
-                        drawerWidget.setSelectedBin(bin.getPosition()
+                            .getPositionDimensionOne(), drawer.getPosition()
                             .getPositionDimensionTwo());
-                        drawerLabel.setText("Drawer "
-                            + drawer.getLabel());
+                        cabinetWidget.setSelectedBox(drawerPosition);
+                        cabinetLabel.setText("Cabinet " + cabinet.getLabel());
+                        drawerWidget.setSelectedBin(bin.getPosition()
+                            .getPositionDimensionOne());
+                        drawerLabel.setText("Drawer " + drawer.getLabel());
 
                         sp.setSample(sample);
                         sample.setSamplePosition(sp);
@@ -321,16 +318,18 @@ public class AddCabinetSampleEntryForm extends BiobankEntryForm implements
     }
 
     protected SamplePosition getSamplePosition(String positionString)
-        throws ApplicationException {
+        throws Exception {
         int end = 2;
         String cabinetString = positionString.substring(0, end);
-        cabinet = ModelUtils.getContainerWithLabel(appService, cabinetString);
+        cabinet = ModelUtils.getContainerWithLabel(appService, cabinetString,
+            "Cabinet");
         if (cabinet == null) {
             return null;
         }
         end += 2;
         String drawerString = positionString.substring(0, end);
-        drawer = ModelUtils.getContainerWithLabel(appService, drawerString);
+        drawer = ModelUtils.getContainerWithLabel(appService, drawerString,
+            "Drawer");
         if (drawer == null
             || !drawer.getPosition().getParentContainer().getId().equals(
                 cabinet.getId())) {
@@ -338,7 +337,7 @@ public class AddCabinetSampleEntryForm extends BiobankEntryForm implements
         }
         end += 2;
         String binString = positionString.substring(0, end);
-        bin = ModelUtils.getContainerWithLabel(appService, binString);
+        bin = ModelUtils.getContainerWithLabel(appService, binString, "Bin");
         if (bin == null
             || !bin.getPosition().getParentContainer().getId().equals(
                 drawer.getId())) {
@@ -348,9 +347,9 @@ public class AddCabinetSampleEntryForm extends BiobankEntryForm implements
         sp.setContainer(bin);
         char letter = positionString.substring(6, 7).toCharArray()[0];
         // positions start at A
-        sp.setPositionDimensionOne(letter - 'A' + 1);
+        sp.setPositionDimensionOne(letter - 'A');
         letter = positionString.substring(7).toCharArray()[0];
-        sp.setPositionDimensionTwo(letter - 'A' + 1);
+        sp.setPositionDimensionTwo(letter - 'A');
         return sp;
     }
 
