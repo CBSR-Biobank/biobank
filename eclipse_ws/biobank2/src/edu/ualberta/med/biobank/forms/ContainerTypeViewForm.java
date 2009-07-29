@@ -235,7 +235,7 @@ public class ContainerTypeViewForm extends BiobankViewForm {
             // otherwise, normal grid
             ChooseContainerWidget containerWidget = new ChooseContainerWidget(
                 client);
-            containerWidget.setContainerType(containerType);
+            containerWidget.setParams(containerType, null);
             if (dim2.compareTo(new Integer(1)) == 0) {
                 // single dimension size
                 rowHeight = 40;
