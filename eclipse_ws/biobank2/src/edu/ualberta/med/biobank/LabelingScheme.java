@@ -57,6 +57,36 @@ public class LabelingScheme {
         rowColPos.row = pos % rowCap;
         rowColPos.col = pos / rowCap;
         return rowColPos;
+    }
 
+    public static String rowColToTwoCharAlpha(RowColPos rcp,
+        ContainerType containerType) {
+        int totalRows = containerType.getCapacity().getDimensionOneCapacity();
+        // int totalColumns = containerType.getCapacity()
+        // .getDimensionTwoCapacity();
+
+        char letter1 = 'A';
+        char letter2 = 'A';
+
+        int total1 = totalRows * rcp.col + rcp.row;
+        letter1 = (char) (letter1 + (total1 / 24));
+        letter1 = correctPositionLetter(letter1);
+
+        // int total2 = (row + 1) * totalRows * column + row; // + 1 because
+        // start at zero
+        letter2 = (char) (letter2 + (total1 % 24));
+        letter2 = correctPositionLetter(letter2);
+
+        return String.valueOf(letter1) + String.valueOf(letter2);
+    }
+
+    public static char correctPositionLetter(char letter) {
+        if (letter < 'I') {
+            return letter;
+        }
+        if (letter >= 'I' && letter < 'O') {
+            return (char) (letter + 1);
+        }
+        return (char) (letter + 2);
     }
 }
