@@ -194,7 +194,7 @@ public class AssignSamplesLocationEntryForm extends BiobankEntryForm implements
             List<ContainerType> types = ModelUtils.queryProperty(appService,
                 ContainerType.class, "name", "Freezer", false);
             if (types.size() > 0) {
-                freezerWidget.setContainerType(types.get(0));
+                freezerWidget.setParams(types.get(0), null);
             }
         } catch (ApplicationException e) {
             // TODO Auto-generated catch block
