@@ -82,13 +82,15 @@ public class ContainerEntryForm extends BiobankEntryForm {
         site = containerAdapter.getSite();
         position = container.getPosition();
 
-        RowColPos rcp = new RowColPos();
-        rcp.row = position.getPositionDimensionOne();
-        rcp.col = position.getPositionDimensionTwo();
+        if (position != null) {
+            RowColPos rcp = new RowColPos();
+            rcp.row = position.getPositionDimensionOne();
+            rcp.col = position.getPositionDimensionTwo();
 
-        container.setLabel(position.getParentContainer().getLabel()
-            + LabelingScheme.rowColToTwoCharAlpha(rcp, position
-                .getParentContainer().getContainerType()));
+            container.setLabel(position.getParentContainer().getLabel()
+                + LabelingScheme.rowColToTwoCharAlpha(rcp, position
+                    .getParentContainer().getContainerType()));
+        }
 
         if (container.getId() == null) {
             setPartName("Container");
