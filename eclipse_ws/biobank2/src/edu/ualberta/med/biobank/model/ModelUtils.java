@@ -8,6 +8,8 @@ import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
 
+import edu.ualberta.med.biobank.LabelingScheme;
+import edu.ualberta.med.biobank.RowColPos;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -92,7 +94,9 @@ public class ModelUtils {
             ContainerType type = container.getContainerType();
             // FIXME use the labelling of the container !
             if (type.getName().equals("Bin")) {
-                return position.getContainer().getLabel() + dim1 + dim2;
+                String binPosition = LabelingScheme.rowColToTwoCharAlpha(
+                    new RowColPos(dim1, dim2), type);
+                return position.getContainer().getLabel() + binPosition;
             } else if (type.getName().equals("Palette")) {
                 return position.getContainer().getLabel() + dim1String
                     + dim2String;

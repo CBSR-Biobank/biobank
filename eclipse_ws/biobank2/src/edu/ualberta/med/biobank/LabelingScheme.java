@@ -59,11 +59,18 @@ public class LabelingScheme {
         return rowColPos;
     }
 
+    /**
+     * convert a position in row*column to two letter (in the cbsr way)
+     */
     public static String rowColToTwoCharAlpha(RowColPos rcp,
         ContainerType containerType) {
         int totalRows = containerType.getCapacity().getDimensionOneCapacity();
-        // int totalColumns = containerType.getCapacity()
-        // .getDimensionTwoCapacity();
+        int totalColumns = containerType.getCapacity()
+            .getDimensionTwoCapacity();
+        if (totalColumns == 1) { // if we got 120*1, we wan't only to act like a
+                                 // 1*120
+            totalRows = 1;
+        }
 
         char letter1 = 'A';
         char letter2 = 'A';
