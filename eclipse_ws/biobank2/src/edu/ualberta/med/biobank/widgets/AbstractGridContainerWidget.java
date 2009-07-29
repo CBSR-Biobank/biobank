@@ -12,6 +12,7 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Label;
 
 import edu.ualberta.med.biobank.LabelingScheme;
 import edu.ualberta.med.biobank.RowColPos;
@@ -37,6 +38,8 @@ public abstract class AbstractGridContainerWidget extends Canvas {
     private int columns;
 
     private ContainerType containerType;
+
+    private Label parentLabel;
 
     /**
      * First character or int used for the cells row labels
@@ -148,13 +151,17 @@ public abstract class AbstractGridContainerWidget extends Canvas {
         rowcol.col = indexCol;
         if (containerType != null) {
             ContainerLabelingScheme ls = containerType.getChildLabelingScheme();
+            String text = "";
+            if (parentLabel != null)
+                text = parentLabel.getText();
             if (ls.getId() == 2)
-                return LabelingScheme.rowColToTwoCharAlpha(rowcol,
-                    containerType);
+                return text
+                    + LabelingScheme
+                        .rowColToTwoCharAlpha(rowcol, containerType);
             else if (ls.getId() == 3)
-                return LabelingScheme.rowColToTwoCharNumeric(rowcol);
+                return text + LabelingScheme.rowColToTwoCharNumeric(rowcol);
             else
-                return LabelingScheme.rowColToInt(rowcol, containerType);
+                return text + LabelingScheme.rowColToInt(rowcol, containerType);
         } else {
             String row = getValueForCell(firstRowSign, indexRow,
                 firstColSign == null);
@@ -167,8 +174,9 @@ public abstract class AbstractGridContainerWidget extends Canvas {
         }
     }
 
-    public void setContainerType(ContainerType type) {
+    public void setParams(ContainerType type, Label parent) {
         this.containerType = type;
+        this.parentLabel = parent;
     }
 
     private String getValueForCell(Object firstSign, int addValue,

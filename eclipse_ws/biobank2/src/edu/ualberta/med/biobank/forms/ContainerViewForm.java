@@ -191,6 +191,8 @@ public class ContainerViewForm extends BiobankViewForm {
 
             ChooseContainerWidget containerWidget = new ChooseContainerWidget(
                 client);
+            containerWidget.setParams(container.getContainerType(),
+                containerLabelLabel);
             containerWidget.initDefaultLegend();
             int dim1 = cells.length;
             int dim2 = cells[0].length;
