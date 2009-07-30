@@ -78,6 +78,11 @@
             id="edu.ualberta.med.biobank.commands.scanner.default"
             name="Select Default Scanner">
       </command>
+      <command
+            defaultHandler="edu.ualberta.med.biobank.handler.ScannerSettingsHandler"
+            id="edu.ualberta.med.biobank.commands.scanner.settings"
+            name="Scanner Settings">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.menus">
@@ -150,6 +155,12 @@
                   commandId="edu.ualberta.med.biobank.commands.scanner.calibrate"
                   id="edu.ualberta.med.biobank.commands.scanner.calibrate"
                   label="Calibrate"
+                  style="push">
+            </command>
+            <command
+                  commandId="edu.ualberta.med.biobank.commands.scanner.settings"
+                  id="edu.ualberta.med.biobank.commands.scanner.settings"
+                  label="Settings"
                   style="push">
             </command>
          </menu>

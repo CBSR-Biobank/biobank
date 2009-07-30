@@ -42,4 +42,5 @@ Bundle-ClassPath: lib/acegi-security-1.0.4.jar,
  lib/commons-lang-2.4.jar,
  lib/gface_0.9.1.jar,
  lib/gluegen.jar,
- lib/scanlib.jar
+ lib/scanlib.jar,
+ lib/ini4j-0.5.1.jar
