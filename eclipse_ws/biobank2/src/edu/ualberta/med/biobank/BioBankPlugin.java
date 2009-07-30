@@ -50,10 +50,6 @@ public class BioBankPlugin extends AbstractUIPlugin {
      * The constructor
      */
     public BioBankPlugin() {
-        String osname = System.getProperty("os.name");
-        if (osname.startsWith("Windows")) {
-            System.loadLibrary("scanlib");
-        }
     }
 
     /*
@@ -229,7 +225,7 @@ public class BioBankPlugin extends AbstractUIPlugin {
             return Boolean.valueOf(Platform
                 .getDebugOption(BioBankPlugin.PLUGIN_ID + "/realScan"));
         }
-        return false;
+        return true;
     }
 
     public static SimpleDateFormat getDateFormatter() {

@@ -11,7 +11,8 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.core.databinding.beans;bundle-version="1.1.1",
  org.eclipse.jface.databinding;bundle-version="1.2.1",
  org.eclipse.ui.forms;bundle-version="3.3.101",
- org.eclipse.ui.ide;bundle-version="3.4.1"
+ org.eclipse.ui.ide;bundle-version="3.4.1",
+ scannerConfig;bundle-version="1.0.0"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ClassPath: lib/acegi-security-1.0.4.jar,
@@ -42,4 +43,5 @@ Bundle-ClassPath: lib/acegi-security-1.0.4.jar,
  lib/commons-lang-2.4.jar,
  lib/gface_0.9.1.jar,
  lib/gluegen.jar,
- lib/scanlib.jar
+ lib/scanlib.jar,
+ lib/ini4j-0.5.1.jar
