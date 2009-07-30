@@ -229,7 +229,7 @@ public class BioBankPlugin extends AbstractUIPlugin {
             return Boolean.valueOf(Platform
                 .getDebugOption(BioBankPlugin.PLUGIN_ID + "/realScan"));
         }
-        return false;
+        return true;
     }
 
     public static SimpleDateFormat getDateFormatter() {
