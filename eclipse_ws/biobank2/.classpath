@@ -37,5 +37,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/scanlib.jar"/>
 	<classpathentry kind="lib" path="lib/csmapi-4.1.jar" sourcepath="/usr/scratch/degrisda/frameworks/CSM_API_4_1_Source/src"/>
 	<classpathentry kind="lib" path="lib/jdom.jar"/>
+	<classpathentry kind="lib" path="/scannerConfig/lib/scanlib.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
