@@ -158,6 +158,31 @@ public class CabinetDrawerWidget extends Canvas {
         redraw();
     }
 
+    public ContainerCell getPositionAtCoordinates(int x, int y) {
+        if (cells == null) {
+            return null;
+        }
+        int gridCellWidth = RECTANGLE_CELL_WIDTH;
+        int gridCellHeight = SQUARE_CELL_WIDTH + RECTANGLE_CELL_HEIGHT;
+        // get high level position
+        int xGrid = x / (gridCellWidth);
+        int yGrid = y / (gridCellHeight);
+        int cellNum;
+        // get subcell position
+        if (y % gridCellHeight < SQUARE_CELL_WIDTH)
+            cellNum = 9;
+        else if (x % gridCellWidth > SQUARE_CELL_WIDTH)
+            cellNum = 8;
+        else
+            cellNum = 7;
+        // convert subcell to real cell
+        int xGridCellNumOffset = 9;
+        int yGridCellNumOffset = 3;
+        return cells[cellNum + xGrid * xGridCellNumOffset - yGrid
+            * yGridCellNumOffset - 1];
+
+    }
+
     protected void drawLegend(PaintEvent e, Color color, int index, String text) {
         e.gc.setBackground(color);
         int width = LEGEND_WIDTH;
