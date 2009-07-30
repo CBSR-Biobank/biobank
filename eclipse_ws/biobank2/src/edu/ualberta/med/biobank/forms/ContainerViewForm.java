@@ -186,6 +186,15 @@ public class ContainerViewForm extends BiobankViewForm {
             containerWidget.setLayoutData(gdBin);
             containerWidget.setContainersStatus(container
                 .getChildPositionCollection());
+            containerWidget.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseDown(MouseEvent e) {
+                    ContainerCell cell = ((CabinetDrawerWidget) e.widget)
+                        .getPositionAtCoordinates(e.x, e.y);
+                    openFormFor(cell.getPosition());
+
+                }
+            });
         } else {
             // otherwise, normal grid
 
