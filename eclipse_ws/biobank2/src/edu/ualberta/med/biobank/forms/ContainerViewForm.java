@@ -255,7 +255,7 @@ public class ContainerViewForm extends BiobankViewForm {
             Assert.isNotNull(newAdapter);
             Node.openForm(new FormInput(newAdapter), ContainerViewForm.ID);
         }
-
+        ContainerAdapter.closeEditor(new FormInput(containerAdapter));
         containerAdapter.performExpand();
     }
 
