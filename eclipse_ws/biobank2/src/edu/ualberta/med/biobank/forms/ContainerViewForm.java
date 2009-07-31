@@ -228,7 +228,7 @@ public class ContainerViewForm extends BiobankViewForm {
 
     private void openFormFor(ContainerPosition pos) {
         ContainerAdapter newAdapter = null;
-
+        ContainerAdapter.closeEditor(new FormInput(containerAdapter));
         if (cells[pos.getPositionDimensionOne()][pos.getPositionDimensionTwo()]
             .getStatus() == ContainerStatus.EMPTY) {
             Container newContainer = new Container();
@@ -255,7 +255,7 @@ public class ContainerViewForm extends BiobankViewForm {
             Assert.isNotNull(newAdapter);
             Node.openForm(new FormInput(newAdapter), ContainerViewForm.ID);
         }
-        ContainerAdapter.closeEditor(new FormInput(containerAdapter));
+
         containerAdapter.performExpand();
     }
 
