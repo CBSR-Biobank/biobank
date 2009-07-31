@@ -213,12 +213,6 @@ public class ContainerTypeViewForm extends BiobankViewForm {
         Composite client = createSectionWithClient("Container Visual");
 
         Capacity cap = containerType.getCapacity();
-        Integer dim1 = cap.getDimensionOneCapacity();
-        Integer dim2 = cap.getDimensionTwoCapacity();
-        if (dim1 == null || dim1.intValue() == 0)
-            dim1 = new Integer(1);
-        if (dim2 == null || dim2.intValue() == 0)
-            dim2 = new Integer(1);
 
         // get occupied positions
 
@@ -236,11 +230,17 @@ public class ContainerTypeViewForm extends BiobankViewForm {
             ChooseContainerWidget containerWidget = new ChooseContainerWidget(
                 client);
             containerWidget.setParams(containerType, null);
-            if (dim2.compareTo(new Integer(1)) == 0) {
+            int dim1 = containerType.getCapacity().getDimensionOneCapacity()
+                .intValue();
+            int dim2 = containerType.getCapacity().getDimensionTwoCapacity()
+                .intValue();
+            if (dim2 <= 1) {
                 // single dimension size
                 rowHeight = 40;
                 colWidth = 150;
+                containerWidget.setLegendOnSide(true);
             }
+
             containerWidget.setGridSizes(dim1, dim2, colWidth * dim2, rowHeight
                 * dim1);
         }
