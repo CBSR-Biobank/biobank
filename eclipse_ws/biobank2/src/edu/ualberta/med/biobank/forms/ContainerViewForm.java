@@ -56,6 +56,10 @@ public class ContainerViewForm extends BiobankViewForm {
 
     private Label positionDimTwoLabel;
 
+    private CabinetDrawerWidget cabWidget;
+
+    private ChooseContainerWidget containerWidget;
+
     ContainerCell[][] cells;
 
     @Override
@@ -166,6 +170,16 @@ public class ContainerViewForm extends BiobankViewForm {
         }
     }
 
+    private void refreshVis(String name) {
+        if (name.equalsIgnoreCase("Drawer"))
+            cabWidget.setContainersStatus(container
+                .getChildPositionCollection());
+        else {
+            initCells();
+            containerWidget.setContainersStatus(cells);
+        }
+    }
+
     protected void visualizeContainer() {
         // default 2 dimensional grid
         int rowHeight = 40, colWidth = 40;
@@ -175,18 +189,17 @@ public class ContainerViewForm extends BiobankViewForm {
 
         if (container.getContainerType().getName().equalsIgnoreCase("Drawer")) {
             // if Drawer, requires special grid
-            CabinetDrawerWidget containerWidget = new CabinetDrawerWidget(
-                client);
-            containerWidget.initLegend();
+            cabWidget = new CabinetDrawerWidget(client);
+            cabWidget.initLegend();
             GridData gdBin = new GridData();
             gdBin.widthHint = CabinetDrawerWidget.WIDTH;
             gdBin.heightHint = CabinetDrawerWidget.HEIGHT
                 + CabinetDrawerWidget.LEGEND_HEIGHT;
             gdBin.verticalSpan = 2;
-            containerWidget.setLayoutData(gdBin);
-            containerWidget.setContainersStatus(container
+            cabWidget.setLayoutData(gdBin);
+            cabWidget.setContainersStatus(container
                 .getChildPositionCollection());
-            containerWidget.addMouseListener(new MouseAdapter() {
+            cabWidget.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseDown(MouseEvent e) {
                     ContainerCell cell = ((CabinetDrawerWidget) e.widget)
@@ -198,8 +211,7 @@ public class ContainerViewForm extends BiobankViewForm {
         } else {
             // otherwise, normal grid
 
-            ChooseContainerWidget containerWidget = new ChooseContainerWidget(
-                client);
+            containerWidget = new ChooseContainerWidget(client);
             containerWidget.setParams(container.getContainerType(),
                 containerLabelLabel);
             containerWidget.initDefaultLegend();
@@ -295,6 +307,7 @@ public class ContainerViewForm extends BiobankViewForm {
         retrieveContainer();
         setPartName("Container " + container.getLabel());
         form.setText("Container " + container.getLabel());
+        refreshVis(container.getContainerType().getName());
         setContainerValues();
     }
 
