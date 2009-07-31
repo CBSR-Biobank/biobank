@@ -307,7 +307,9 @@ public class ContainerViewForm extends BiobankViewForm {
         retrieveContainer();
         setPartName("Container " + container.getLabel());
         form.setText("Container " + container.getLabel());
-        refreshVis(container.getContainerType().getName());
+        if (container.getContainerType().getChildContainerTypeCollection()
+            .size() > 0)
+            refreshVis(container.getContainerType().getName());
         setContainerValues();
     }
 
