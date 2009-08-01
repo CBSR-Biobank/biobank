@@ -20,7 +20,7 @@ import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.ClinicAdapter;
-import edu.ualberta.med.biobank.treeview.Node;
+import edu.ualberta.med.biobank.treeview.AdaptorBase;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankCollectionTable;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -42,7 +42,7 @@ public class ClinicViewForm extends AddressViewFormCommon {
 			throws PartInitException {
 		super.init(editorSite, input);
 
-		Node node = ((FormInput) input).getNode();
+		AdaptorBase node = ((FormInput) input).getNode();
 		if (node instanceof ClinicAdapter) {
 			clinicAdapter = (ClinicAdapter) node;
 			retrieveClinic();
@@ -142,7 +142,7 @@ public class ClinicViewForm extends AddressViewFormCommon {
 		edit.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				Node.openForm(new FormInput(clinicAdapter), ClinicEntryForm.ID);
+				AdaptorBase.openForm(new FormInput(clinicAdapter), ClinicEntryForm.ID);
 			}
 		});
 	}

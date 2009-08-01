@@ -14,12 +14,12 @@ import edu.ualberta.med.biobank.forms.StudyViewForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Study;
 
-public class StudyAdapter extends Node {
+public class StudyAdapter extends AdaptorBase {
     public static final int PATIENTS_NODE_ID = 0;
 
     private Study study;
 
-    public StudyAdapter(Node parent, Study study) {
+    public StudyAdapter(AdaptorBase parent, Study study) {
         super(parent);
         this.setStudy(study);
 
@@ -91,7 +91,7 @@ public class StudyAdapter extends Node {
     }
 
     @Override
-    public Node accept(NodeSearchVisitor visitor) {
+    public AdaptorBase accept(NodeSearchVisitor visitor) {
         return visitor.visit(this);
     }
 }

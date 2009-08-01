@@ -20,7 +20,7 @@ import edu.ualberta.med.biobank.model.ContainerStatus;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.ModelUtils;
 import edu.ualberta.med.biobank.treeview.ContainerAdapter;
-import edu.ualberta.med.biobank.treeview.Node;
+import edu.ualberta.med.biobank.treeview.AdaptorBase;
 import edu.ualberta.med.biobank.widgets.CabinetDrawerWidget;
 import edu.ualberta.med.biobank.widgets.ChooseContainerWidget;
 import edu.ualberta.med.biobank.widgets.SamplesListWidget;
@@ -60,7 +60,7 @@ public class ContainerViewForm extends BiobankViewForm {
     ContainerCell[][] cells;
 
     @Override
-    public void init(Node adapter) {
+    public void init(AdaptorBase adapter) {
         Assert.isTrue(adapter instanceof ContainerAdapter,
             "Invalid editor input: object of type "
                 + adapter.getClass().getName());
@@ -245,7 +245,7 @@ public class ContainerViewForm extends BiobankViewForm {
             pos.setParentContainer(container);
             newContainer.setPosition(pos);
             newAdapter = new ContainerAdapter(containerAdapter, newContainer);
-            Node.openForm(new FormInput(newAdapter), ContainerEntryForm.ID);
+            AdaptorBase.openForm(new FormInput(newAdapter), ContainerEntryForm.ID);
         } else {
             Container childContainer;
             Collection<ContainerPosition> childPositions = container
@@ -263,7 +263,7 @@ public class ContainerViewForm extends BiobankViewForm {
                 }
             }
             Assert.isNotNull(newAdapter);
-            Node.openForm(new FormInput(newAdapter), ContainerViewForm.ID);
+            AdaptorBase.openForm(new FormInput(newAdapter), ContainerViewForm.ID);
         }
 
         containerAdapter.performExpand();

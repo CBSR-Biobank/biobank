@@ -26,7 +26,7 @@ import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.ClinicAdapter;
 import edu.ualberta.med.biobank.treeview.ContainerTypeAdapter;
-import edu.ualberta.med.biobank.treeview.Node;
+import edu.ualberta.med.biobank.treeview.AdaptorBase;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankCollectionTable;
@@ -53,7 +53,7 @@ public class SiteViewForm extends AddressViewFormCommon {
         throws PartInitException {
         super.init(editorSite, input);
 
-        Node node = ((FormInput) input).getNode();
+        AdaptorBase node = ((FormInput) input).getNode();
         Assert.notNull(node, "Null editor input");
 
         if (node instanceof SiteAdapter) {
@@ -219,7 +219,7 @@ public class SiteViewForm extends AddressViewFormCommon {
             public void widgetSelected(SelectionEvent e) {
                 try {
                     Study study = new Study();
-                    Node studiesNode = siteAdapter.getStudiesGroupNode();
+                    AdaptorBase studiesNode = siteAdapter.getStudiesGroupNode();
                     StudyAdapter studyAdapter = new StudyAdapter(studiesNode,
                         study);
                     getSite().getPage().openEditor(new FormInput(studyAdapter),

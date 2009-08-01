@@ -12,15 +12,12 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.ui.IEditorInput;
-import org.eclipse.ui.IEditorSite;
-import org.eclipse.ui.PartInitException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
-import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.treeview.AdaptorBase;
 import edu.ualberta.med.biobank.treeview.ClinicAdapter;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
@@ -48,13 +45,21 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
     private Text name;
 
     @Override
-    public void init(IEditorSite editorSite, IEditorInput input)
-        throws PartInitException {
-        super.init(editorSite, input);
+    protected String getFormName() {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
-        FormInput clinicInput = (FormInput) input;
+    @Override
+    protected String getTabName() {
+        if (clinic.getId() == null)
+            return "New Clinic";
+        return "Clinic " + clinic.getName();
+    }
 
-        clinicAdapter = (ClinicAdapter) clinicInput.getNode();
+    @Override
+    protected void init(AdaptorBase adapter) {
+        clinicAdapter = (ClinicAdapter) adapter;
         clinic = clinicAdapter.getClinic();
         setAppService(clinicAdapter.getAppService());
 
@@ -62,12 +67,6 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
         if (address == null) {
             address = new Address();
             clinic.setAddress(address);
-        }
-
-        if (clinic.getId() == null) {
-            setPartName("New Clinic");
-        } else {
-            setPartName("Clinic " + clinic.getName());
         }
     }
 

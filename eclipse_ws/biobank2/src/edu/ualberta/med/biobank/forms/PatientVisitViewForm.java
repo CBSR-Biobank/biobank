@@ -22,7 +22,7 @@ import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.PvInfo;
 import edu.ualberta.med.biobank.model.PvInfoData;
 import edu.ualberta.med.biobank.model.Study;
-import edu.ualberta.med.biobank.treeview.Node;
+import edu.ualberta.med.biobank.treeview.AdaptorBase;
 import edu.ualberta.med.biobank.treeview.PatientVisitAdapter;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
@@ -65,7 +65,7 @@ public class PatientVisitViewForm extends BiobankViewForm {
         throws PartInitException {
         super.init(editorSite, input);
 
-        Node node = ((FormInput) input).getNode();
+        AdaptorBase node = ((FormInput) input).getNode();
         Assert.isNotNull(node, "Null editor input");
 
         patientVisitAdapter = (PatientVisitAdapter) node;

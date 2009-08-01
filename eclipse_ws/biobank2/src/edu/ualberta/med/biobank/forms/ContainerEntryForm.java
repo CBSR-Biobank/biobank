@@ -32,7 +32,7 @@ import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.treeview.ContainerAdapter;
-import edu.ualberta.med.biobank.treeview.Node;
+import edu.ualberta.med.biobank.treeview.AdaptorBase;
 import edu.ualberta.med.biobank.validators.DoubleNumber;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
 import gov.nih.nci.system.query.SDKQuery;
@@ -73,7 +73,7 @@ public class ContainerEntryForm extends BiobankEntryForm {
         throws PartInitException {
         super.init(editorSite, input);
 
-        Node node = ((FormInput) input).getNode();
+        AdaptorBase node = ((FormInput) input).getNode();
         Assert.isNotNull(node, "Null editor input");
 
         containerAdapter = (ContainerAdapter) node;

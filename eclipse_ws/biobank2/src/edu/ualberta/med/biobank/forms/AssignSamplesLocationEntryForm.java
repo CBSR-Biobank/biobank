@@ -24,9 +24,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.ui.IEditorInput;
-import org.eclipse.ui.IEditorSite;
-import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.springframework.remoting.RemoteConnectFailureException;
 
@@ -45,7 +42,7 @@ import edu.ualberta.med.biobank.model.Sample;
 import edu.ualberta.med.biobank.model.SampleCellStatus;
 import edu.ualberta.med.biobank.model.SamplePosition;
 import edu.ualberta.med.biobank.model.Study;
-import edu.ualberta.med.biobank.treeview.Node;
+import edu.ualberta.med.biobank.treeview.AdaptorBase;
 import edu.ualberta.med.biobank.treeview.SessionAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
 import edu.ualberta.med.biobank.validators.ScannerBarcodeValidator;
@@ -116,22 +113,25 @@ public class AssignSamplesLocationEntryForm extends BiobankEntryForm implements
     private static boolean testDisposeOn = true;
 
     @Override
-    public void init(IEditorSite editorSite, IEditorInput input)
-        throws PartInitException {
-        super.init(editorSite, input);
+    protected String getFormName() {
+        return getTabName();
+    }
 
-        Node node = ((FormInput) input).getNode();
-        Assert.isNotNull(node, "Null editor input");
+    @Override
+    protected String getTabName() {
+        return "Assign locations for samples";
+    }
 
-        Assert
-            .isTrue((node instanceof SessionAdapter),
-                "Invalid editor input: object of type "
-                    + node.getClass().getName());
+    @Override
+    protected void init(AdaptorBase adapter) {
+        Assert.isNotNull(adapter, "Null editor input");
 
-        sessionAdapter = (SessionAdapter) node;
-        appService = node.getAppService();
+        Assert.isTrue((adapter instanceof SessionAdapter),
+            "Invalid editor input: object of type "
+                + adapter.getClass().getName());
 
-        setPartName("Assign samples location");
+        sessionAdapter = (SessionAdapter) adapter;
+        appService = adapter.getAppService();
 
         testDisposeOn = true;
     }
@@ -145,8 +145,6 @@ public class AssignSamplesLocationEntryForm extends BiobankEntryForm implements
 
     @Override
     protected void createFormContent() {
-        form.setText("Assign samples location");
-
         GridLayout layout = new GridLayout(1, false);
         form.getBody().setLayout(layout);
 
@@ -733,7 +731,7 @@ public class AssignSamplesLocationEntryForm extends BiobankEntryForm implements
         doSaveInternal();
         getSite().getPage().closeEditor(AssignSamplesLocationEntryForm.this,
             false);
-        Node.openForm(new FormInput(sessionAdapter),
+        AdaptorBase.openForm(new FormInput(sessionAdapter),
             AssignSamplesLocationEntryForm.ID);
     }
 

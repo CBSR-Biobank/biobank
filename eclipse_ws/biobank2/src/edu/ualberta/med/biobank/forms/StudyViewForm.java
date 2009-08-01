@@ -19,7 +19,7 @@ import edu.ualberta.med.biobank.model.ModelUtils;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.PvInfo;
 import edu.ualberta.med.biobank.model.Study;
-import edu.ualberta.med.biobank.treeview.Node;
+import edu.ualberta.med.biobank.treeview.AdaptorBase;
 import edu.ualberta.med.biobank.treeview.PatientAdapter;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
@@ -46,7 +46,7 @@ public class StudyViewForm extends BiobankViewForm {
         throws PartInitException {
         super.init(editorSite, input);
 
-        Node node = ((FormInput) input).getNode();
+        AdaptorBase node = ((FormInput) input).getNode();
         Assert.notNull(node, "Null editor input");
 
         if (node instanceof StudyAdapter) {
@@ -88,7 +88,7 @@ public class StudyViewForm extends BiobankViewForm {
 
         setStudySectionValues();
 
-        Node clinicGroupNode = ((SiteAdapter) studyAdapter.getParent()
+        AdaptorBase clinicGroupNode = ((SiteAdapter) studyAdapter.getParent()
             .getParent()).getClinicGroupNode();
         clinicsTable = FormUtils.createClinicSection(toolkit, form.getBody(),
             clinicGroupNode, study.getClinicCollection());
@@ -181,7 +181,7 @@ public class StudyViewForm extends BiobankViewForm {
         setPartName("Study " + study.getName());
         form.setText("Study: " + study.getName());
         setStudySectionValues();
-        Node clinicGroupNode = ((SiteAdapter) studyAdapter.getParent()
+        AdaptorBase clinicGroupNode = ((SiteAdapter) studyAdapter.getParent()
             .getParent()).getClinicGroupNode();
         clinicsTable.getTableViewer().setInput(
             FormUtils.getClinicsAdapters(clinicGroupNode, study

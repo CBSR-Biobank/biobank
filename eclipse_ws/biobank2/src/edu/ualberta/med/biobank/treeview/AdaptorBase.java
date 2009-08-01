@@ -21,7 +21,11 @@ import edu.ualberta.med.biobank.forms.AssignSamplesLocationEntryForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
-public abstract class Node {
+/**
+ * Base class for all "Session" tree view nodes. Generally, most of the nodes in
+ * the tree are adaptors for classes in the ORM model.
+ */
+public abstract class AdaptorBase {
 
     protected IDeltaListener listener = NullDeltaListener.getSoleInstance();
 
@@ -29,36 +33,37 @@ public abstract class Node {
 
     private String name;
 
-    protected Node parent;
+    protected AdaptorBase parent;
 
     protected boolean hasChildren;
 
-    protected List<Node> children;
+    protected List<AdaptorBase> children;
 
-    public Node(Node parent) {
+    public AdaptorBase(AdaptorBase parent) {
         this.parent = parent;
-        children = new ArrayList<Node>();
+        children = new ArrayList<AdaptorBase>();
         if (parent != null) {
             addListener(parent.listener);
         }
     }
 
-    public Node(Node parent, int id, String name) {
+    public AdaptorBase(AdaptorBase parent, int id, String name) {
         this(parent);
         setId(id);
         setName(name);
     }
 
-    public Node(Node parent, int id, String name, boolean hasChildren) {
+    public AdaptorBase(AdaptorBase parent, int id, String name,
+        boolean hasChildren) {
         this(parent, id, name);
         setHasChildren(hasChildren);
     }
 
-    public void setParent(Node parent) {
+    public void setParent(AdaptorBase parent) {
         this.parent = parent;
     }
 
-    public Node getParent() {
+    public AdaptorBase getParent() {
         return parent;
     }
 
@@ -88,41 +93,41 @@ public abstract class Node {
         return string + " " + name;
     }
 
-    public List<Node> getItems() {
+    public List<AdaptorBase> getItems() {
         return children;
     }
 
-    public List<Node> getChildren() {
+    public List<AdaptorBase> getChildren() {
         return children;
     }
 
-    public Node getChild(int id) {
+    public AdaptorBase getChild(int id) {
         return getChild(id, false);
     }
 
-    public Node getChild(int id, boolean reloadChildren) {
+    public AdaptorBase getChild(int id, boolean reloadChildren) {
         if (reloadChildren) {
             loadChildren(false);
         }
         if (children.size() == 0)
             return null;
 
-        for (Node child : children) {
+        for (AdaptorBase child : children) {
             if (child.getId() == id)
                 return child;
         }
         return null;
     }
 
-    public void addChild(Node child) {
+    public void addChild(AdaptorBase child) {
         hasChildren = true;
-        Node existingNode = contains(child);
+        AdaptorBase existingNode = contains(child);
         if (existingNode != null) {
             // don't add - assume our model is up to date
             return;
         }
 
-        Node namedChild = getChildByName(child.getName());
+        AdaptorBase namedChild = getChildByName(child.getName());
         if (namedChild != null) {
             // may have inserted a new object into database
             // replace current object with new one
@@ -136,7 +141,7 @@ public abstract class Node {
         fireAdd(child);
     }
 
-    public void insertAfter(Node existingNode, Node newNode) {
+    public void insertAfter(AdaptorBase existingNode, AdaptorBase newNode) {
         int pos = children.indexOf(existingNode);
         Assert.isTrue(pos >= 0, "existing node not found: "
             + existingNode.getName());
@@ -146,13 +151,13 @@ public abstract class Node {
         fireAdd(newNode);
     }
 
-    public void removeChild(Node item) {
+    public void removeChild(AdaptorBase item) {
         if (children.size() == 0)
             return;
 
-        Node itemToRemove = null;
+        AdaptorBase itemToRemove = null;
 
-        for (Node child : children) {
+        for (AdaptorBase child : children) {
             if ((child.getId() == item.getId())
                 && child.getName().equals(item.getName()))
                 itemToRemove = child;
@@ -168,9 +173,9 @@ public abstract class Node {
         if (children.size() == 0)
             return;
 
-        Node itemToRemove = null;
+        AdaptorBase itemToRemove = null;
 
-        for (Node child : children) {
+        for (AdaptorBase child : children) {
             if (child.getName().equals(name))
                 itemToRemove = child;
         }
@@ -181,11 +186,11 @@ public abstract class Node {
         }
     }
 
-    public Node contains(Node item) {
+    public AdaptorBase contains(AdaptorBase item) {
         if (children.size() == 0)
             return null;
 
-        for (Node child : children) {
+        for (AdaptorBase child : children) {
             if ((child.getId() == item.getId())
                 && child.getName().equals(item.getName()))
                 return child;
@@ -193,11 +198,11 @@ public abstract class Node {
         return null;
     }
 
-    public Node getChildByName(String name) {
+    public AdaptorBase getChildByName(String name) {
         if (children.size() == 0)
             return null;
 
-        for (Node child : children) {
+        for (AdaptorBase child : children) {
             if (child.getName() != null && child.getName().equals(name))
                 return child;
         }
@@ -242,7 +247,7 @@ public abstract class Node {
             public void run() {
                 loadChildren(true);
                 SessionManager.getInstance().getTreeViewer().expandToLevel(
-                    Node.this, 1);
+                    AdaptorBase.this, 1);
             }
         });
     }
@@ -298,8 +303,8 @@ public abstract class Node {
         }
     }
 
-    public Node getParentFromClass(Class<?> parentClass) {
-        Node node = this;
+    public AdaptorBase getParentFromClass(Class<?> parentClass) {
+        AdaptorBase node = this;
         while (node != null) {
             if (node.getClass().equals(parentClass)) {
                 return node;
@@ -310,7 +315,7 @@ public abstract class Node {
         return null;
     }
 
-    public abstract Node accept(NodeSearchVisitor visitor);
+    public abstract AdaptorBase accept(NodeSearchVisitor visitor);
 
     public String getTreeText() {
         return getName();

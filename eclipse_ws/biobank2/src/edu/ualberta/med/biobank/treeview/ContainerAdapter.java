@@ -18,11 +18,11 @@ import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.ModelUtils;
 import edu.ualberta.med.biobank.model.Site;
 
-public class ContainerAdapter extends Node {
+public class ContainerAdapter extends AdaptorBase {
 
     private Container container;
 
-    public ContainerAdapter(Node parent, Container container) {
+    public ContainerAdapter(AdaptorBase parent, Container container) {
         super(parent);
         this.container = container;
         setHasChildren(container.getChildPositionCollection() != null
@@ -120,12 +120,12 @@ public class ContainerAdapter extends Node {
     }
 
     @Override
-    public Node accept(NodeSearchVisitor visitor) {
+    public AdaptorBase accept(NodeSearchVisitor visitor) {
         return visitor.visit(this);
     }
 
     public Site getSite() {
-        Node parent = getParent();
+        AdaptorBase parent = getParent();
         if (parent instanceof ContainerAdapter) {
             return ((ContainerAdapter) parent).getSite();
         } else if (parent instanceof ContainerGroup) {

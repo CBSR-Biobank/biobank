@@ -22,7 +22,7 @@ import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.treeview.ClinicAdapter;
-import edu.ualberta.med.biobank.treeview.Node;
+import edu.ualberta.med.biobank.treeview.AdaptorBase;
 import edu.ualberta.med.biobank.widgets.BiobankCollectionTable;
 
 public class FormUtils {
@@ -69,7 +69,7 @@ public class FormUtils {
     }
 
     public static BiobankCollectionTable createClinicSection(
-        FormToolkit toolkit, Composite parent, Node clinicGroupParent,
+        FormToolkit toolkit, Composite parent, AdaptorBase clinicGroupParent,
         Collection<Clinic> clinics) {
         Section section = toolkit.createSection(parent, Section.TWISTIE
             | Section.TITLE_BAR | Section.EXPANDED);
@@ -88,7 +88,7 @@ public class FormUtils {
         return comp;
     }
 
-    public static ClinicAdapter[] getClinicsAdapters(Node clinicGroupParent,
+    public static ClinicAdapter[] getClinicsAdapters(AdaptorBase clinicGroupParent,
         Collection<Clinic> clinics) {
         ClinicAdapter[] clinicAdapters = new ClinicAdapter[clinics.size()];
 
@@ -110,7 +110,7 @@ public class FormUtils {
                 Object selection = event.getSelection();
                 Object element = ((StructuredSelection) selection)
                     .getFirstElement();
-                ((Node) element).performDoubleClick();
+                ((AdaptorBase) element).performDoubleClick();
             }
         };
     }

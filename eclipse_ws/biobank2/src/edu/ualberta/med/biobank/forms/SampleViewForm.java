@@ -12,7 +12,7 @@ import org.springframework.util.Assert;
 
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Sample;
-import edu.ualberta.med.biobank.treeview.Node;
+import edu.ualberta.med.biobank.treeview.AdaptorBase;
 import edu.ualberta.med.biobank.treeview.SampleAdapter;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
@@ -28,7 +28,7 @@ public class SampleViewForm extends BiobankViewForm {
 			throws PartInitException {
 		super.init(editorSite, input);
 
-		Node node = ((FormInput) input).getNode();
+		AdaptorBase node = ((FormInput) input).getNode();
 		if (node instanceof SampleAdapter) {
 			sampleAdapter = (SampleAdapter) node;
 			retrieveSample();

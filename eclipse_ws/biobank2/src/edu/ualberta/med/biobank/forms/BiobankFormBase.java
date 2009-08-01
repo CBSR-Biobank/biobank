@@ -28,13 +28,12 @@ import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.part.EditorPart;
 
 import edu.ualberta.med.biobank.forms.input.FormInput;
-import edu.ualberta.med.biobank.treeview.Node;
+import edu.ualberta.med.biobank.treeview.AdaptorBase;
 
 /**
  * Base class for data all BioBank2 view and entry forms. These forms are
- * usually displayed when the user selects a node in the "Session" tree view.
- * 
- * @see {@link edu.ualberta.med.biobank.views.SessionsView}.
+ * usually displayed when the user selects a node in the
+ * <code>SessionView</code> tree view.
  * 
  * @note createFormContent() is called in it's own thread so making calls to the
  *       database is possible.
@@ -63,7 +62,7 @@ public abstract class BiobankFormBase extends EditorPart {
      * 
      * @param adapter the corresponding model object adapter.
      */
-    protected abstract void init(Node adapter);
+    protected abstract void init(AdaptorBase adapter);
 
     @Override
     public void init(IEditorSite editorSite, IEditorInput input)
@@ -72,7 +71,7 @@ public abstract class BiobankFormBase extends EditorPart {
             throw new PartInitException("Invalid editor input");
         setSite(editorSite);
         setInput(input);
-        Node adapter = ((FormInput) input).getNode();
+        AdaptorBase adapter = ((FormInput) input).getNode();
         Assert.isNotNull(adapter, "Bad editor input (null value)");
         init(adapter);
         setPartName(getFormName());
@@ -109,10 +108,23 @@ public abstract class BiobankFormBase extends EditorPart {
         });
     }
 
+    /**
+     * Called to get string tn n n o display for the form name.
+     * 
+     * @return the name used for the form.
+     */
     protected abstract String getFormName();
 
+    /**
+     * Called to get the string to display for the tab name.
+     * 
+     * @return the name used in the tab.
+     */
     protected abstract String getTabName();
 
+    /**
+     * Called in a non-UI thread to create the widgets that make up the form.
+     */
     protected abstract void createFormContent();
 
     protected Section createSection(String title) {
