@@ -94,21 +94,7 @@ public class AddPaletteSamplesEntryForm extends BiobankEntryForm {
     private static boolean testDisposeOn = true;
 
     @Override
-    protected String getFormName() {
-        return "Adding samples for patient "
-            + patientVisit.getPatient().getNumber() + " for visit "
-            + patientVisit.getDateDrawn();
-    }
-
-    @Override
-    protected String getTabName() {
-        return "Add samples for " + patientVisit.getPatient().getNumber();
-    }
-
-    @Override
     protected void init(AdaptorBase adapter) {
-        Assert.isNotNull(adapter, "Null editor input");
-
         Assert.isTrue((adapter instanceof PatientVisitAdapter),
             "Invalid editor input: object of type "
                 + adapter.getClass().getName());
@@ -116,6 +102,9 @@ public class AddPaletteSamplesEntryForm extends BiobankEntryForm {
         pvAdapter = (PatientVisitAdapter) adapter;
         patientVisit = pvAdapter.getPatientVisit();
         appService = pvAdapter.getAppService();
+        setPartName("Adding samples for patient "
+            + patientVisit.getPatient().getNumber() + " for visit "
+            + patientVisit.getDateDrawn());
     }
 
     @Override
@@ -151,6 +140,8 @@ public class AddPaletteSamplesEntryForm extends BiobankEntryForm {
 
     @Override
     protected void createFormContent() {
+        form
+            .setText("Add samples for " + patientVisit.getPatient().getNumber());
         GridLayout layout = new GridLayout(1, false);
         form.getBody().setLayout(layout);
 

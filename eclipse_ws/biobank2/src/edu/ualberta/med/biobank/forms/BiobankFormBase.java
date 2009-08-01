@@ -31,13 +31,12 @@ import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.treeview.AdaptorBase;
 
 /**
- * Base class for data all BioBank2 view and entry forms. These forms are
- * usually displayed when the user selects a node in the
- * <code>SessionView</code> tree view.
- * 
- * @note createFormContent() is called in it's own thread so making calls to the
- *       database is possible.
- * 
+ * Base class for data all BioBank2 view and entry forms. This class is the
+ * superclass for {@link BiobankEntryForm} and {@link BiobankViewForm}. Please
+ * extend from these two classes instead of <code>BiobankFormBase</code>.
+ * <p>
+ * Form creation is called in a non-UI thread so making calls to the ORM layer
+ * possible. See {@link #createFormContent()}
  */
 public abstract class BiobankFormBase extends EditorPart {
 
@@ -58,9 +57,10 @@ public abstract class BiobankFormBase extends EditorPart {
     }
 
     /**
-     * The initialisation function for the derived form.
+     * The initialisation method for the derived form.
      * 
-     * @param adapter the corresponding model object adapter.
+     * @param adapter the corresponding model adapter the form is to edit /
+     *            view.
      */
     protected abstract void init(AdaptorBase adapter);
 
@@ -74,7 +74,6 @@ public abstract class BiobankFormBase extends EditorPart {
         AdaptorBase adapter = ((FormInput) input).getNode();
         Assert.isNotNull(adapter, "Bad editor input (null value)");
         init(adapter);
-        setPartName(getFormName());
     }
 
     @Override
@@ -98,7 +97,6 @@ public abstract class BiobankFormBase extends EditorPart {
         BusyIndicator.showWhile(parent.getDisplay(), new Runnable() {
             public void run() {
                 try {
-                    form.setText(getFormName());
                     createFormContent();
                     form.reflow(true);
                 } catch (Exception e) {
@@ -107,20 +105,6 @@ public abstract class BiobankFormBase extends EditorPart {
             }
         });
     }
-
-    /**
-     * Called to get string tn n n o display for the form name.
-     * 
-     * @return the name used for the form.
-     */
-    protected abstract String getFormName();
-
-    /**
-     * Called to get the string to display for the tab name.
-     * 
-     * @return the name used in the tab.
-     */
-    protected abstract String getTabName();
 
     /**
      * Called in a non-UI thread to create the widgets that make up the form.

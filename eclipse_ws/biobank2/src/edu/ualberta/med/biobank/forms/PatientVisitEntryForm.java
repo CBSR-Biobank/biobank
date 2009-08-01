@@ -27,13 +27,9 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.ui.IEditorInput;
-import org.eclipse.ui.IEditorSite;
-import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
-import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.PatientVisit;
@@ -92,24 +88,24 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
     }
 
     @Override
-    public void init(IEditorSite editorSite, IEditorInput input)
-        throws PartInitException {
-        super.init(editorSite, input);
+    public void init(AdaptorBase adaptor) {
+        Assert.isTrue(adaptor instanceof PatientVisitAdapter,
+            "Invalid editor input: object of type "
+                + adaptor.getClass().getName());
 
-        AdaptorBase node = ((FormInput) input).getNode();
-        Assert.isNotNull(node, "Null editor input");
-
-        patientVisitAdapter = (PatientVisitAdapter) node;
+        patientVisitAdapter = (PatientVisitAdapter) adaptor;
         patientVisit = patientVisitAdapter.getPatientVisit();
         appService = patientVisitAdapter.getAppService();
 
+        String tabName;
         if (patientVisit.getId() == null) {
-            setPartName("New Patient Visit");
+            tabName = "New Patient Visit";
         } else {
             SimpleDateFormat sdf = new SimpleDateFormat(
                 BioBankPlugin.DATE_FORMAT);
-            setPartName("Visit " + sdf.format(patientVisit.getDateDrawn()));
+            tabName = "Visit " + sdf.format(patientVisit.getDateDrawn());
         }
+        setPartName(tabName);
     }
 
     @Override

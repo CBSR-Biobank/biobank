@@ -73,7 +73,6 @@ public abstract class BiobankViewForm extends BiobankFormBase {
                 BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
                     public void run() {
                         reload();
-                        setPartName(getFormName());
                     }
                 });
             }

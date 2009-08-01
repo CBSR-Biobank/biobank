@@ -11,12 +11,8 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.ui.IEditorInput;
-import org.eclipse.ui.IEditorSite;
-import org.eclipse.ui.PartInitException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
-import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.AdaptorBase;
@@ -45,22 +41,22 @@ public class PatientEntryForm extends BiobankEntryForm {
     private Patient patient;
 
     @Override
-    public void init(IEditorSite editorSite, IEditorInput input)
-        throws PartInitException {
-        super.init(editorSite, input);
+    public void init(AdaptorBase adaptor) {
+        Assert.isTrue((adaptor instanceof PatientAdapter),
+            "Invalid editor input: object of type "
+                + adaptor.getClass().getName());
 
-        AdaptorBase node = ((FormInput) input).getNode();
-        Assert.isNotNull(node, "Null editor input");
-
-        patientAdapter = (PatientAdapter) node;
+        patientAdapter = (PatientAdapter) adaptor;
         appService = patientAdapter.getAppService();
         patient = patientAdapter.getPatient();
 
+        String tabName;
         if (patient.getId() == null) {
-            setPartName("New Patient");
+            tabName = "New Patient";
         } else {
-            setPartName("Patient " + patient.getNumber());
+            tabName = "Patient " + patient.getNumber();
         }
+        setPartName(tabName);
     }
 
     @Override

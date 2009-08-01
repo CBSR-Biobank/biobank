@@ -2,19 +2,15 @@ package edu.ualberta.med.biobank.forms;
 
 import java.util.Collection;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.ui.IEditorInput;
-import org.eclipse.ui.IEditorSite;
-import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.forms.widgets.Section;
-import org.springframework.util.Assert;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.ModelUtils;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.PvInfo;
@@ -42,24 +38,17 @@ public class StudyViewForm extends BiobankViewForm {
     private BiobankCollectionTable pvInfosTable;
 
     @Override
-    public void init(IEditorSite editorSite, IEditorInput input)
-        throws PartInitException {
-        super.init(editorSite, input);
+    public void init(AdaptorBase adaptor) {
+        Assert.isTrue((adaptor instanceof StudyAdapter),
+            "Invalid editor input: object of type "
+                + adaptor.getClass().getName());
 
-        AdaptorBase node = ((FormInput) input).getNode();
-        Assert.notNull(node, "Null editor input");
+        studyAdapter = (StudyAdapter) adaptor;
 
-        if (node instanceof StudyAdapter) {
-            studyAdapter = (StudyAdapter) node;
-
-            // retrieve info from database because could have been modified
-            // after first opening
-            retrieveStudy();
-            setPartName("Study " + study.getName());
-        } else {
-            Assert.isTrue(false, "Invalid editor input: object of type "
-                + node.getClass().getName());
-        }
+        // retrieve info from database because could have been modified
+        // after first opening
+        retrieveStudy();
+        setPartName("Study " + study.getName());
     }
 
     @Override

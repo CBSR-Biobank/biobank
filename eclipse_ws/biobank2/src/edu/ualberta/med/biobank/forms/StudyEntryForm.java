@@ -21,15 +21,11 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.ui.IEditorInput;
-import org.eclipse.ui.IEditorSite;
-import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.dialogs.SampleStorageDialog;
-import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.ModelUtils;
 import edu.ualberta.med.biobank.model.PvInfo;
@@ -109,30 +105,24 @@ public class StudyEntryForm extends BiobankEntryForm {
     }
 
     @Override
-    public void init(IEditorSite editorSite, IEditorInput input)
-        throws PartInitException {
+    public void init(AdaptorBase adaptor) {
+        Assert.isTrue((adaptor instanceof StudyAdapter),
+            "Invalid editor input: object of type "
+                + adaptor.getClass().getName());
 
-        super.init(editorSite, input);
-
-        AdaptorBase node = ((FormInput) input).getNode();
-        Assert.isNotNull(node, "Null editor input");
-
-        Assert
-            .isTrue((node instanceof StudyAdapter),
-                "Invalid editor input: object of type "
-                    + node.getClass().getName());
-
-        studyAdapter = (StudyAdapter) node;
+        studyAdapter = (StudyAdapter) adaptor;
         study = studyAdapter.getStudy();
         site = ((SiteAdapter) studyAdapter
             .getParentFromClass(SiteAdapter.class)).getSite();
         appService = studyAdapter.getAppService();
 
+        String tabName;
         if (study.getId() == null) {
-            setPartName("New Study");
+            tabName = "New Study";
         } else {
-            setPartName("Study " + study.getName());
+            tabName = "Study " + study.getName();
         }
+        setPartName(tabName);
     }
 
     @Override

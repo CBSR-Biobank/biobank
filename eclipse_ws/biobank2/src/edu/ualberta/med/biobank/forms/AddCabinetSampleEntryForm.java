@@ -88,30 +88,18 @@ public class AddCabinetSampleEntryForm extends BiobankEntryForm implements
     private static boolean testDisposeOn = true;
 
     @Override
-    protected String getFormName() {
-        return "Add cabinet samples for patient "
-            + patientVisit.getPatient().getNumber() + " for visit "
-            + patientVisit.getDateDrawn();
-    }
-
-    @Override
-    protected String getTabName() {
-        return "Add cabinet sample for "
-            + patientVisit.getPatient().getNumber();
-    }
-
-    @Override
-    protected void init(AdaptorBase adapter) {
-        Assert.isNotNull(adapter, "Null editor input");
-
-        Assert.isTrue((adapter instanceof PatientVisitAdapter),
+    protected void init(AdaptorBase adaptor) {
+        Assert.isTrue((adaptor instanceof PatientVisitAdapter),
             "Invalid editor input: object of type "
-                + adapter.getClass().getName());
+                + adaptor.getClass().getName());
 
-        pvAdapter = (PatientVisitAdapter) adapter;
+        pvAdapter = (PatientVisitAdapter) adaptor;
         patientVisit = pvAdapter.getPatientVisit();
         appService = pvAdapter.getAppService();
         testDisposeOn = true;
+        setPartName("Add cabinet samples for patient "
+            + patientVisit.getPatient().getNumber() + " for visit "
+            + patientVisit.getDateDrawn());
     }
 
     @Override
@@ -123,6 +111,8 @@ public class AddCabinetSampleEntryForm extends BiobankEntryForm implements
 
     @Override
     protected void createFormContent() {
+        form.setText("Add cabinet sample for "
+            + patientVisit.getPatient().getNumber());
         GridLayout layout = new GridLayout(1, false);
         form.getBody().setLayout(layout);
 

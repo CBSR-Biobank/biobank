@@ -21,10 +21,14 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.model.Clinic;
-import edu.ualberta.med.biobank.treeview.ClinicAdapter;
 import edu.ualberta.med.biobank.treeview.AdaptorBase;
+import edu.ualberta.med.biobank.treeview.ClinicAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankCollectionTable;
 
+/**
+ * Static methods for constructing the forms that allow the user to edit / view
+ * the information stored in the ORM model objects.
+ */
 public class FormUtils {
 
     public static Label createLabelledField(FormToolkit toolkit,
@@ -88,8 +92,8 @@ public class FormUtils {
         return comp;
     }
 
-    public static ClinicAdapter[] getClinicsAdapters(AdaptorBase clinicGroupParent,
-        Collection<Clinic> clinics) {
+    public static ClinicAdapter[] getClinicsAdapters(
+        AdaptorBase clinicGroupParent, Collection<Clinic> clinics) {
         ClinicAdapter[] clinicAdapters = new ClinicAdapter[clinics.size()];
 
         int count = 0;

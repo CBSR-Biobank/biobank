@@ -45,21 +45,11 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
     private Text name;
 
     @Override
-    protected String getFormName() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    protected String getTabName() {
-        if (clinic.getId() == null)
-            return "New Clinic";
-        return "Clinic " + clinic.getName();
-    }
-
-    @Override
-    protected void init(AdaptorBase adapter) {
-        clinicAdapter = (ClinicAdapter) adapter;
+    protected void init(AdaptorBase adaptor) {
+        Assert.isTrue((adaptor instanceof ClinicAdapter),
+            "Invalid editor input: object of type "
+                + adaptor.getClass().getName());
+        clinicAdapter = (ClinicAdapter) adaptor;
         clinic = clinicAdapter.getClinic();
         setAppService(clinicAdapter.getAppService());
 
@@ -68,6 +58,13 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
             address = new Address();
             clinic.setAddress(address);
         }
+
+        String tabName;
+        if (clinic.getId() == null)
+            tabName = "New Clinic";
+        else
+            tabName = "Clinic " + clinic.getName();
+        setPartName(tabName);
     }
 
     @Override
@@ -81,7 +78,6 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
     @Override
     protected void createFormContent() {
         form.setText("Clinic Information");
-
         GridLayout layout = new GridLayout(1, false);
         form.getBody().setLayout(layout);
 

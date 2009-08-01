@@ -10,13 +10,9 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.ui.IEditorInput;
-import org.eclipse.ui.IEditorSite;
-import org.eclipse.ui.PartInitException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.ModelUtils;
 import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.PvInfo;
@@ -61,14 +57,12 @@ public class PatientVisitViewForm extends BiobankViewForm {
     }
 
     @Override
-    public void init(IEditorSite editorSite, IEditorInput input)
-        throws PartInitException {
-        super.init(editorSite, input);
+    public void init(AdaptorBase adaptor) {
+        Assert.isTrue((adaptor instanceof PatientVisitAdapter),
+            "Invalid editor input: object of type "
+                + adaptor.getClass().getName());
 
-        AdaptorBase node = ((FormInput) input).getNode();
-        Assert.isNotNull(node, "Null editor input");
-
-        patientVisitAdapter = (PatientVisitAdapter) node;
+        patientVisitAdapter = (PatientVisitAdapter) adaptor;
         appService = patientVisitAdapter.getAppService();
         retrievePatientVisit();
 
@@ -84,13 +78,9 @@ public class PatientVisitViewForm extends BiobankViewForm {
                 patientVisit.getDateDrawn()));
         form.getBody().setLayout(new GridLayout(1, false));
         form.getBody().setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-
         addRefreshToolbarAction();
-
         createVisitSection();
-
         createSamplesSection();
-
     }
 
     private void createVisitSection() {

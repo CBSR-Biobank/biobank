@@ -113,27 +113,15 @@ public class AssignSamplesLocationEntryForm extends BiobankEntryForm implements
     private static boolean testDisposeOn = true;
 
     @Override
-    protected String getFormName() {
-        return getTabName();
-    }
-
-    @Override
-    protected String getTabName() {
-        return "Assign locations for samples";
-    }
-
-    @Override
     protected void init(AdaptorBase adapter) {
-        Assert.isNotNull(adapter, "Null editor input");
-
         Assert.isTrue((adapter instanceof SessionAdapter),
             "Invalid editor input: object of type "
                 + adapter.getClass().getName());
 
         sessionAdapter = (SessionAdapter) adapter;
         appService = adapter.getAppService();
-
         testDisposeOn = true;
+        setPartName("Assign locations for samples");
     }
 
     @Override
@@ -145,6 +133,7 @@ public class AssignSamplesLocationEntryForm extends BiobankEntryForm implements
 
     @Override
     protected void createFormContent() {
+        form.setText("Assign locations for samples");
         GridLayout layout = new GridLayout(1, false);
         form.getBody().setLayout(layout);
 
@@ -488,9 +477,9 @@ public class AssignSamplesLocationEntryForm extends BiobankEntryForm implements
      */
     protected void showStudyInformation() {
         if (currentStudy == null) {
-            form.setText("Assigning samples location");
+            setPartName("Assigning samples location");
         } else {
-            form.setText("Assigning samples location for study "
+            setPartName("Assigning samples location for study "
                 + currentStudy.getNameShort());
         }
     }

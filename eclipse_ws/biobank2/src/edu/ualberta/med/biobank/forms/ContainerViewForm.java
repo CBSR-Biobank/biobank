@@ -19,8 +19,8 @@ import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.ContainerStatus;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.ModelUtils;
-import edu.ualberta.med.biobank.treeview.ContainerAdapter;
 import edu.ualberta.med.biobank.treeview.AdaptorBase;
+import edu.ualberta.med.biobank.treeview.ContainerAdapter;
 import edu.ualberta.med.biobank.widgets.CabinetDrawerWidget;
 import edu.ualberta.med.biobank.widgets.ChooseContainerWidget;
 import edu.ualberta.med.biobank.widgets.SamplesListWidget;
@@ -69,23 +69,15 @@ public class ContainerViewForm extends BiobankViewForm {
         appService = containerAdapter.getAppService();
         retrieveContainer();
         position = container.getPosition();
+        setPartName(container.getLabel() + " ("
+            + container.getContainerType().getName() + ")");
         initCells();
     }
 
     @Override
-    protected String getFormName() {
-        return "Container " + getTabName();
-    }
-
-    @Override
-    protected String getTabName() {
-        return container.getLabel() + " ("
-            + container.getContainerType().getName() + ")";
-
-    }
-
-    @Override
     protected void createFormContent() {
+        form.setText("Container " + container.getLabel() + " ("
+            + container.getContainerType().getName() + ")");
         form.getBody().setLayout(new GridLayout(1, false));
 
         addRefreshToolbarAction();
@@ -245,7 +237,8 @@ public class ContainerViewForm extends BiobankViewForm {
             pos.setParentContainer(container);
             newContainer.setPosition(pos);
             newAdapter = new ContainerAdapter(containerAdapter, newContainer);
-            AdaptorBase.openForm(new FormInput(newAdapter), ContainerEntryForm.ID);
+            AdaptorBase.openForm(new FormInput(newAdapter),
+                ContainerEntryForm.ID);
         } else {
             Container childContainer;
             Collection<ContainerPosition> childPositions = container
@@ -263,7 +256,8 @@ public class ContainerViewForm extends BiobankViewForm {
                 }
             }
             Assert.isNotNull(newAdapter);
-            AdaptorBase.openForm(new FormInput(newAdapter), ContainerViewForm.ID);
+            AdaptorBase.openForm(new FormInput(newAdapter),
+                ContainerViewForm.ID);
         }
 
         containerAdapter.performExpand();
@@ -303,7 +297,8 @@ public class ContainerViewForm extends BiobankViewForm {
     @Override
     protected void reload() {
         retrieveContainer();
-        form.setText("Container " + container.getLabel());
+        form.setText("Container " + container.getLabel() + " ("
+            + container.getContainerType().getName() + ")");
         if (container.getContainerType().getChildContainerTypeCollection()
             .size() > 0)
             refreshVis(container.getContainerType().getName());
