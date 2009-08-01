@@ -19,6 +19,10 @@ import org.eclipse.swt.widgets.Text;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
+/**
+ * The base class for all BioBank2 Java Client view forms. The forms are usually
+ * created when the user selects a node in the "Session" tree view.
+ */
 public abstract class BiobankViewForm extends BiobankFormBase {
 
     protected WritableApplicationService appService;
@@ -68,6 +72,7 @@ public abstract class BiobankViewForm extends BiobankFormBase {
                 BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
                     public void run() {
                         reload();
+                        setPartName(getFormName());
                     }
                 });
             }

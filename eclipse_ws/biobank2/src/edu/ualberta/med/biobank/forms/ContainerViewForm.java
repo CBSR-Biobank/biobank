@@ -10,9 +10,6 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.ui.IEditorInput;
-import org.eclipse.ui.IEditorSite;
-import org.eclipse.ui.PartInitException;
 
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Capacity;
@@ -63,31 +60,32 @@ public class ContainerViewForm extends BiobankViewForm {
     ContainerCell[][] cells;
 
     @Override
-    public void init(IEditorSite editorSite, IEditorInput input)
-        throws PartInitException {
-        super.init(editorSite, input);
+    public void init(Node adapter) {
+        Assert.isTrue(adapter instanceof ContainerAdapter,
+            "Invalid editor input: object of type "
+                + adapter.getClass().getName());
 
-        Node node = ((FormInput) input).getNode();
-        Assert.isNotNull(node, "Null editor input");
+        containerAdapter = (ContainerAdapter) adapter;
+        appService = containerAdapter.getAppService();
+        retrieveContainer();
+        position = container.getPosition();
+        initCells();
+    }
 
-        if (node instanceof ContainerAdapter) {
-            containerAdapter = (ContainerAdapter) node;
-            appService = containerAdapter.getAppService();
-            retrieveContainer();
-            position = container.getPosition();
-            setPartName(container.getLabel() + " ("
-                + container.getContainerType().getName() + ")");
-            initCells();
-        } else {
-            Assert.isTrue(false, "Invalid editor input: object of type "
-                + node.getClass().getName());
-        }
+    @Override
+    protected String getFormName() {
+        return "Container " + getTabName();
+    }
+
+    @Override
+    protected String getTabName() {
+        return container.getLabel() + " ("
+            + container.getContainerType().getName() + ")";
+
     }
 
     @Override
     protected void createFormContent() {
-        form.setText("Container " + container.getLabel() + " ("
-            + container.getContainerType().getName() + ")");
         form.getBody().setLayout(new GridLayout(1, false));
 
         addRefreshToolbarAction();
@@ -305,7 +303,6 @@ public class ContainerViewForm extends BiobankViewForm {
     @Override
     protected void reload() {
         retrieveContainer();
-        setPartName("Container " + container.getLabel());
         form.setText("Container " + container.getLabel());
         if (container.getContainerType().getChildContainerTypeCollection()
             .size() > 0)

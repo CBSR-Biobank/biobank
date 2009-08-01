@@ -28,12 +28,16 @@ import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.part.EditorPart;
 
 import edu.ualberta.med.biobank.forms.input.FormInput;
+import edu.ualberta.med.biobank.treeview.Node;
 
 /**
- * Base class for data entry forms.
+ * Base class for data all BioBank2 view and entry forms. These forms are
+ * usually displayed when the user selects a node in the "Session" tree view.
  * 
- * Notes: - createFormContent() is called in it's own thread so making calls to
- * the database is possible.
+ * @see {@link edu.ualberta.med.biobank.views.SessionsView}.
+ * 
+ * @note createFormContent() is called in it's own thread so making calls to the
+ *       database is possible.
  * 
  */
 public abstract class BiobankFormBase extends EditorPart {
@@ -54,6 +58,13 @@ public abstract class BiobankFormBase extends EditorPart {
     public void doSaveAs() {
     }
 
+    /**
+     * The initialisation function for the derived form.
+     * 
+     * @param adapter the corresponding model object adapter.
+     */
+    protected abstract void init(Node adapter);
+
     @Override
     public void init(IEditorSite editorSite, IEditorInput input)
         throws PartInitException {
@@ -61,6 +72,10 @@ public abstract class BiobankFormBase extends EditorPart {
             throw new PartInitException("Invalid editor input");
         setSite(editorSite);
         setInput(input);
+        Node adapter = ((FormInput) input).getNode();
+        Assert.isNotNull(adapter, "Bad editor input (null value)");
+        init(adapter);
+        setPartName(getFormName());
     }
 
     @Override
@@ -84,6 +99,7 @@ public abstract class BiobankFormBase extends EditorPart {
         BusyIndicator.showWhile(parent.getDisplay(), new Runnable() {
             public void run() {
                 try {
+                    form.setText(getFormName());
                     createFormContent();
                     form.reflow(true);
                 } catch (Exception e) {
@@ -93,7 +109,11 @@ public abstract class BiobankFormBase extends EditorPart {
         });
     }
 
-    abstract protected void createFormContent();
+    protected abstract String getFormName();
+
+    protected abstract String getTabName();
+
+    protected abstract void createFormContent();
 
     protected Section createSection(String title) {
         Section section = toolkit.createSection(form.getBody(), Section.TWISTIE
