@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="biobank2" basedir="." default="sdk-and-scripts">
+<project name="biobank2" basedir="." default="deploy">
 
 	<!--
      Overall build file
@@ -13,6 +13,7 @@
 	<property name="cacore.sdk.filename" value="caCORE_SDK_411.tar.gz" />
 	<property name="eclipse.proj.dir" location="eclipse_ws/biobank2" />
 	<property name="eclipse.proj.dir.importer" location="eclipse_ws/biobank2.importer" />
+	<property name="eclipse.proj.dir.tests" location="eclipse_ws/biobank2.importer" />
 	<property name="eclipse.proj.dir.junit" location="eclipse_ws/biobank2.tests" />
 	<property name="scripts.proj.dir" location="scripts" />
 	<!--tp-->
@@ -77,11 +78,10 @@
 	<!-- end of copied part -->
 
 	<target name="check-cacore-sdk-available">
-		<available file="${cacore.sdk.dir}/build.xml" type="dir" property="cacore.sdk.available" />
+		<available file="${cacore.sdk.dir}/build.xml" property="cacore.sdk.available" />
 	</target>
 
-	<target name="cacore-download" depends="check-cacore-sdk-available" unless="cacore.sdk.available" 
-		description="downloads caCORE SDK from the host machine">
+	<target name="cacore-download" depends="check-cacore-sdk-available" unless="cacore.sdk.available" description="downloads caCORE SDK from the host machine">
 		<echo message="downloading caCORE SDK..." />
 		<mkdir dir="caCORE_SDK" />
 		<exec executable="curl">
@@ -89,13 +89,23 @@
 			<arg value="-o${cacore.sdk.filename}" />
 			<arg value="http://${host}/${cacore.sdk.filename}" />
 		</exec>
-        <mkdir dir="${cacore.sdk.dir}" />
-		<untar src="${cacore.sdk.filename}" compression="gzip" dest="${cacore.sdk.dir}"/>
+		<mkdir dir="${cacore.sdk.dir}" />
+		<untar src="${cacore.sdk.filename}" compression="gzip" dest="${cacore.sdk.dir}" />
 	</target>
 
-	<target name="sdk" depends="cacore-download" description="builds the caCORE SDK from the data model">
+	<target name="check-cacore-sdk-uptodate">
+		<uptodate property="cacore.sdk.uptodate" targetfile="${cacore.sdk.dir}/output/biobank2">
+			<srcfiles file="sdk_conf/deploy.properties" />
+			<srcfiles file="model/biobank2.uml" />
+		</uptodate>
+	</target>
+
+	<target name="sdk" depends="cacore-download,check-cacore-sdk-uptodate" unless="cacore.sdk.uptodate" description="builds the caCORE SDK from the data model">
 		<copy file="sdk_conf/deploy.properties" tofile="${cacore.sdk.dir}/conf/deploy.properties" />
 		<ant dir="${cacore.sdk.dir}" target="build-system" inheritRefs="false" />
+	</target>
+
+	<target name="sdk-files" depends="sdk">
 		<fileset dir="${cacore.sdk.dir}/output/biobank2/package/remote-client/lib" id="sdk.jar.files">
 			<include name="*.jar" />
 		</fileset>
@@ -103,17 +113,16 @@
 		<pathconvert pathsep="," property="sdk.jar.files.basename" refid="sdk.jar.files">
 			<map from="${cacore.sdk.dir}/output/biobank2/package/remote-client/lib/" to="" />
 		</pathconvert>
-
 	</target>
 
-	<target name="sdk-and-scripts" depends="sdk" />
-
-	<target name="deploy-eclipse" description="deploys the caCORE SDK beans to the eclipse project" depends="sdk-and-scripts">
+	<target name="deploy-eclipse" 
+		description="deploys the caCORE SDK beans to the eclipse project" 
+		depends="sdk-files">
 		<dependset>
-			<srcfilelist dir="${cacore.sdk.dir}/output/biobank2/package/remote-client/lib" files="*.jar" />
+			<srcfilelist dir="${cacore.sdk.dir}/output/biobank2/package/remote-client/lib" files="${sdk.jar.files.basename}" />
 			<targetfilelist dir="${eclipse.proj.dir}/lib" files="${sdk.jar.files.basename}" />
 			<targetfilelist dir="${eclipse.proj.dir.importer}/lib" files="${sdk.jar.files.basename}" />
-			<targetfilelist dir="${eclipse.proj.dir.test}/lib" files="${sdk.jar.files.basename}" />
+			<targetfilelist dir="${eclipse.proj.dir.tests}/lib" files="${sdk.jar.files.basename}" />
 		</dependset>
 		<copy todir="${eclipse.proj.dir}/lib">
 			<fileset dir="${cacore.sdk.dir}/output/biobank2/package/remote-client/lib" />
@@ -142,7 +151,11 @@
 		</copy>
 	</target>
 
-	<target name="deploy-jboss" depends="package-webapp-orm" description="deploys the caCORE SDK webapp to JBoss">
+	<target name="check-jboss-uptodate">
+		<uptodate property="jboss.uptodate" targetfile="${env.JBOSS_HOME}/server/default/deploy/biobank2.war" srcfile="${cacore.sdk.dir}/output/biobank2/package/webapp/biobank2.war" />
+	</target>
+
+	<target name="deploy-jboss" depends="check-jboss-uptodate,package-webapp-orm" description="deploys the caCORE SDK webapp to JBoss" unless="jboss.uptodate">
 		<fail unless="env.JBOSS_HOME" message="$JBOSS_HOME not defined" />
 		<copy file="${secu-log.dir}/jboss/login-config.xml" tofile="${env.JBOSS_HOME}/server/default/conf/login-config.xml" overwrite="true" />
 		<delete file="${env.JBOSS_HOME}/server/default/deploy/mysql-ds.xml" />
@@ -182,7 +195,7 @@
 	</target>
 
 	<!--Add the length="#" field into .hbm.xml, references the biobank.uml file for the VARCHAR(#) -->
-	<target name="string-length-field-addition" description="Add the length='#' field into .hbm.xml, references the biobank.uml file for the VARCHAR(#)">
+	<target name="string-length-field-addition" description="Add the length='#' field into .hbm.xml, references the biobank.uml file for the VARCHAR(#)" depends="check-cacore-sdk-uptodate" unless="cacore.sdk.uptodate">
 		<exec executable="${perl}">
 			<env key="PATH" path="${scripts.proj.dir}" />
 			<arg value="${scripts.proj.dir}/hbmstringlength.pl" />
