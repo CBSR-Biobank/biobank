@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.helpers;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.model.Site;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -8,6 +9,7 @@ import gov.nih.nci.system.client.ApplicationServiceProvider;
 
 import java.util.List;
 
+import org.acegisecurity.providers.rcp.RemoteAuthenticationException;
 import org.springframework.remoting.RemoteAccessException;
 
 public class SessionHelper implements Runnable {
@@ -50,13 +52,23 @@ public class SessionHelper implements Runnable {
             Site site = new Site();
             sites = appService.search(Site.class, site);
         } catch (ApplicationException exp) {
+            SessionManager.getLogger().error(
+                "Error while logging to application", exp);
+            if (exp.getCause() != null
+                && exp.getCause() instanceof RemoteAuthenticationException) {
+                BioBankPlugin.openAsyncError("Login Failed",
+                    "Error authenticating user " + userName);
+                return;
+            }
             BioBankPlugin.openRemoteConnectErrorMessage();
         } catch (RemoteAccessException exp) {
-            exp.printStackTrace();
+            SessionManager.getLogger().error(
+                "Error while logging to application", exp);
             BioBankPlugin.openAsyncError(
                 "Login Failed - Remote Access Exception", exp.getMessage());
         } catch (Exception exp) {
-            exp.printStackTrace();
+            SessionManager.getLogger().error(
+                "Error while logging to application", exp);
             BioBankPlugin.openAsyncError("Login Failed", exp.getMessage());
         }
     }
