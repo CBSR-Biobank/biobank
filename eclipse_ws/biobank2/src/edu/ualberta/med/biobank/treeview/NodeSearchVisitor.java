@@ -21,10 +21,10 @@ public class NodeSearchVisitor {
         this.id = id;
     }
 
-    private Node visitChildren(Node node) {
+    private AdaptorBase visitChildren(AdaptorBase node) {
         node.loadChildren(true);
-        for (Node child : node.getChildren()) {
-            Node foundChild = child.accept(this);
+        for (AdaptorBase child : node.getChildren()) {
+            AdaptorBase foundChild = child.accept(this);
             if (foundChild != null) {
                 return foundChild;
             }
@@ -32,14 +32,14 @@ public class NodeSearchVisitor {
         return null;
     }
 
-    public Node visit(SessionAdapter session) {
+    public AdaptorBase visit(SessionAdapter session) {
         if (typeSearched == Site.class) {
             return session.getChild(id);
         }
         return visitChildren(session);
     }
 
-    public Node visit(SiteAdapter siteAdapter) {
+    public AdaptorBase visit(SiteAdapter siteAdapter) {
         if (typeSearched == Study.class || typeSearched == Patient.class
             || typeSearched == PatientVisit.class
             || typeSearched == Sample.class) {
@@ -61,69 +61,69 @@ public class NodeSearchVisitor {
         return null;
     }
 
-    public Node visit(StudyGroup sGroup) {
+    public AdaptorBase visit(StudyGroup sGroup) {
         if (typeSearched == Study.class) {
             return sGroup.getChild(id, true);
         }
         return visitChildren(sGroup);
     }
 
-    public Node visit(StudyAdapter study) {
+    public AdaptorBase visit(StudyAdapter study) {
         if (typeSearched == Patient.class) {
             return study.getChild(StudyAdapter.PATIENTS_NODE_ID).accept(this);
         }
         return visitChildren(study);
     }
 
-    public Node visit(PatientGroup pGroup) {
+    public AdaptorBase visit(PatientGroup pGroup) {
         return visitChildren(pGroup);
     }
 
-    public Node visit(PatientSubGroup pGroup) {
+    public AdaptorBase visit(PatientSubGroup pGroup) {
         if (typeSearched == Patient.class) {
             return pGroup.getChild(id, true);
         }
         return visitChildren(pGroup);
     }
 
-    public Node visit(PatientAdapter patient) {
+    public AdaptorBase visit(PatientAdapter patient) {
         if (typeSearched == PatientVisit.class) {
             return patient.getChild(id, true);
         }
         return visitChildren(patient);
     }
 
-    public Node visit(PatientVisitAdapter patientVisit) {
+    public AdaptorBase visit(PatientVisitAdapter patientVisit) {
         if (typeSearched == Sample.class) {
             return visitChildren(patientVisit);
         }
         return null;
     }
 
-    public Node visit(SampleTypeAdapter sampleType) {
+    public AdaptorBase visit(SampleTypeAdapter sampleType) {
         if (typeSearched == Sample.class) {
             return sampleType.getChild(id, true);
         }
         return null;
     }
 
-    public Node visit(ClinicGroup clinics) {
+    public AdaptorBase visit(ClinicGroup clinics) {
         if (typeSearched == Clinic.class) {
             return clinics.getChild(id, true);
         }
         return null;
     }
 
-    public Node visit(ContainerTypeGroup stGroup) {
+    public AdaptorBase visit(ContainerTypeGroup stGroup) {
         if (typeSearched == ContainerType.class) {
             return stGroup.getChild(id, true);
         }
         return null;
     }
 
-    public Node visit(ContainerGroup scGroup) {
+    public AdaptorBase visit(ContainerGroup scGroup) {
         if (typeSearched == Container.class) {
-            Node child = scGroup.getChild(id, true);
+            AdaptorBase child = scGroup.getChild(id, true);
             if (child == null) {
                 return visitChildren(scGroup);
             }
@@ -132,9 +132,9 @@ public class NodeSearchVisitor {
         return null;
     }
 
-    public Node visit(ContainerAdapter container) {
+    public AdaptorBase visit(ContainerAdapter container) {
         if (typeSearched == Container.class) {
-            Node child = container.getChild(id, true);
+            AdaptorBase child = container.getChild(id, true);
             if (child == null) {
                 return visitChildren(container);
             }

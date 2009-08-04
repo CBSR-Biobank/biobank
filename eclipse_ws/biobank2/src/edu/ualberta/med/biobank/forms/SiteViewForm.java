@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -12,11 +13,8 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.ui.IEditorInput;
-import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.forms.widgets.Section;
-import org.springframework.util.Assert;
 
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Clinic;
@@ -24,9 +22,9 @@ import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
+import edu.ualberta.med.biobank.treeview.AdaptorBase;
 import edu.ualberta.med.biobank.treeview.ClinicAdapter;
 import edu.ualberta.med.biobank.treeview.ContainerTypeAdapter;
-import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankCollectionTable;
@@ -49,31 +47,20 @@ public class SiteViewForm extends AddressViewFormCommon {
     private Label commentLabel;
 
     @Override
-    public void init(IEditorSite editorSite, IEditorInput input)
-        throws PartInitException {
-        super.init(editorSite, input);
+    public void init(AdaptorBase adaptor) {
+        Assert.isTrue((adaptor instanceof SiteAdapter),
+            "Invalid editor input: object of type "
+                + adaptor.getClass().getName());
 
-        Node node = ((FormInput) input).getNode();
-        Assert.notNull(node, "Null editor input");
-
-        if (node instanceof SiteAdapter) {
-            siteAdapter = (SiteAdapter) node;
-            retrieveSite();
-            setPartName("Repository Site " + site.getName());
-        } else {
-            Assert.isTrue(false, "Invalid editor input: object of type "
-                + node.getClass().getName());
-        }
+        siteAdapter = (SiteAdapter) adaptor;
+        retrieveSite();
+        setPartName("Repository Site " + site.getName());
     }
 
     @Override
     protected void createFormContent() {
+        form.setText("Repository Site: " + site.getName());
         address = site.getAddress();
-
-        if (site.getName() != null) {
-            form.setText("Repository Site: " + site.getName());
-        }
-
         addRefreshToolbarAction();
 
         form.getBody().setLayout(new GridLayout(1, false));
@@ -219,7 +206,7 @@ public class SiteViewForm extends AddressViewFormCommon {
             public void widgetSelected(SelectionEvent e) {
                 try {
                     Study study = new Study();
-                    Node studiesNode = siteAdapter.getStudiesGroupNode();
+                    AdaptorBase studiesNode = siteAdapter.getStudiesGroupNode();
                     StudyAdapter studyAdapter = new StudyAdapter(studiesNode,
                         study);
                     getSite().getPage().openEditor(new FormInput(studyAdapter),
@@ -266,8 +253,8 @@ public class SiteViewForm extends AddressViewFormCommon {
         clinicsTable.getTableViewer().setInput(
             FormUtils.getClinicsAdapters(siteAdapter.getClinicGroupNode(), site
                 .getClinicCollection()));
-        containerTypesTable.getTableViewer()
-            .setInput(getContainerTypesAdapters());
+        containerTypesTable.getTableViewer().setInput(
+            getContainerTypesAdapters());
         sContainersTable.getTableViewer().setInput(getContainers());
     }
 

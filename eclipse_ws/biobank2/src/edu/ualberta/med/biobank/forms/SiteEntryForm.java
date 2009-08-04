@@ -10,17 +10,13 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.ui.IEditorInput;
-import org.eclipse.ui.IEditorSite;
-import org.eclipse.ui.PartInitException;
 import org.springframework.remoting.RemoteAccessException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Site;
-import edu.ualberta.med.biobank.treeview.Node;
+import edu.ualberta.med.biobank.treeview.AdaptorBase;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -45,32 +41,27 @@ public class SiteEntryForm extends AddressEntryFormCommon {
     protected Combo session;
 
     @Override
-    public void init(IEditorSite editorSite, IEditorInput input)
-        throws PartInitException {
-        super.init(editorSite, input);
+    public void init(AdaptorBase adaptor) {
+        Assert.isTrue((adaptor instanceof SiteAdapter),
+            "Invalid editor input: object of type "
+                + adaptor.getClass().getName());
 
-        Node node = ((FormInput) input).getNode();
-        Assert.isNotNull(node, "Null editor input");
-
-        Assert
-            .isTrue((node instanceof SiteAdapter),
-                "Invalid editor input: object of type "
-                    + node.getClass().getName());
-
-        siteAdapter = (SiteAdapter) node;
+        siteAdapter = (SiteAdapter) adaptor;
         site = siteAdapter.getSite();
 
+        String tabName;
         if (site.getId() == null) {
-            setPartName("New Repository Site");
+            tabName = "New Repository Site";
         } else {
-            setPartName("Repository Site " + site.getName());
+            tabName = "Repository Site " + site.getName();
         }
+        setPartName(tabName);
     }
 
     @Override
     protected void createFormContent() {
-        address = site.getAddress();
         form.setText("Repository Site Information");
+        address = site.getAddress();
         form.getBody().setLayout(new GridLayout(1, false));
         createSiteSection();
         createAddressArea();

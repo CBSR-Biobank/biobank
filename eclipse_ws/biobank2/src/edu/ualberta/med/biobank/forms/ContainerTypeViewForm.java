@@ -11,16 +11,14 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.ui.IEditorInput;
-import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
 
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.SampleType;
+import edu.ualberta.med.biobank.treeview.AdaptorBase;
 import edu.ualberta.med.biobank.treeview.ContainerTypeAdapter;
-import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.widgets.CabinetDrawerWidget;
 import edu.ualberta.med.biobank.widgets.ChooseContainerWidget;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -57,22 +55,15 @@ public class ContainerTypeViewForm extends BiobankViewForm {
     }
 
     @Override
-    public void init(IEditorSite editorSite, IEditorInput input)
-        throws PartInitException {
-        super.init(editorSite, input);
+    public void init(AdaptorBase adaptor) {
+        Assert.isTrue(adaptor instanceof ContainerTypeAdapter,
+            "Invalid editor input: object of type "
+                + adaptor.getClass().getName());
 
-        Node node = ((FormInput) input).getNode();
-        Assert.isNotNull(node, "Null editor input");
-
-        if (node instanceof ContainerTypeAdapter) {
-            containerTypeAdapter = (ContainerTypeAdapter) node;
-            appService = containerTypeAdapter.getAppService();
-            retrieveContainerType();
-            setPartName("Container Type " + containerType.getName());
-        } else {
-            Assert.isTrue(false, "Invalid editor input: object of type "
-                + node.getClass().getName());
-        }
+        containerTypeAdapter = (ContainerTypeAdapter) adaptor;
+        appService = containerTypeAdapter.getAppService();
+        retrieveContainerType();
+        setPartName("Container Type " + containerType.getName());
     }
 
     private void retrieveContainerType() {
@@ -95,9 +86,7 @@ public class ContainerTypeViewForm extends BiobankViewForm {
     @Override
     protected void createFormContent() {
         form.setText("Container Type: " + containerType.getName());
-
         addRefreshToolbarAction();
-
         form.getBody().setLayout(new GridLayout(1, false));
         createContainerTypeSection();
         if (containerType.getChildContainerTypeCollection().size() > 0) {
@@ -212,16 +201,7 @@ public class ContainerTypeViewForm extends BiobankViewForm {
         int rowHeight = 40, colWidth = 40;
         Composite client = createSectionWithClient("Container Visual");
 
-        Capacity cap = containerType.getCapacity();
-        Integer dim1 = cap.getDimensionOneCapacity();
-        Integer dim2 = cap.getDimensionTwoCapacity();
-        if (dim1 == null || dim1.intValue() == 0)
-            dim1 = new Integer(1);
-        if (dim2 == null || dim2.intValue() == 0)
-            dim2 = new Integer(1);
-
         // get occupied positions
-
         if (containerType.getName().equalsIgnoreCase("Drawer")) {
             // if Drawer, requires special grid
             CabinetDrawerWidget containerWidget = new CabinetDrawerWidget(
@@ -236,11 +216,17 @@ public class ContainerTypeViewForm extends BiobankViewForm {
             ChooseContainerWidget containerWidget = new ChooseContainerWidget(
                 client);
             containerWidget.setParams(containerType, null);
-            if (dim2.compareTo(new Integer(1)) == 0) {
+            int dim1 = containerType.getCapacity().getDimensionOneCapacity()
+                .intValue();
+            int dim2 = containerType.getCapacity().getDimensionTwoCapacity()
+                .intValue();
+            if (dim2 <= 1) {
                 // single dimension size
                 rowHeight = 40;
                 colWidth = 150;
+                containerWidget.setLegendOnSide(true);
             }
+
             containerWidget.setGridSizes(dim1, dim2, colWidth * dim2, rowHeight
                 * dim1);
         }

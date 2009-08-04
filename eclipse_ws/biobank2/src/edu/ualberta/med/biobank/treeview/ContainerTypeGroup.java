@@ -18,7 +18,7 @@ import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.ModelUtils;
 import edu.ualberta.med.biobank.model.Site;
 
-public class ContainerTypeGroup extends Node {
+public class ContainerTypeGroup extends AdaptorBase {
 
     public ContainerTypeGroup(SiteAdapter parent, int id) {
         super(parent, id, "Container Types", true);
@@ -87,7 +87,7 @@ public class ContainerTypeGroup extends Node {
     }
 
     @Override
-    public Node accept(NodeSearchVisitor visitor) {
+    public AdaptorBase accept(NodeSearchVisitor visitor) {
         return visitor.visit(this);
     }
 

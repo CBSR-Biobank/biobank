@@ -7,15 +7,11 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.ui.IEditorInput;
-import org.eclipse.ui.IEditorSite;
-import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.forms.widgets.Section;
 
-import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.PatientVisit;
-import edu.ualberta.med.biobank.treeview.Node;
+import edu.ualberta.med.biobank.treeview.AdaptorBase;
 import edu.ualberta.med.biobank.treeview.PatientAdapter;
 import edu.ualberta.med.biobank.treeview.PatientVisitAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankCollectionTable;
@@ -32,22 +28,15 @@ public class PatientViewForm extends BiobankViewForm {
     private BiobankCollectionTable visitsTable;
 
     @Override
-    public void init(IEditorSite editorSite, IEditorInput input)
-        throws PartInitException {
-        super.init(editorSite, input);
+    public void init(AdaptorBase adaptor) {
+        Assert.isTrue(adaptor instanceof PatientAdapter,
+            "Invalid editor input: object of type "
+                + adaptor.getClass().getName());
 
-        Node node = ((FormInput) input).getNode();
-        Assert.isNotNull(node, "Null editor input");
-
-        if (node instanceof PatientAdapter) {
-            patientAdapter = (PatientAdapter) node;
-            appService = patientAdapter.getAppService();
-            retrievePatient();
-            setPartName("Patient " + patient.getNumber());
-        } else {
-            Assert.isTrue(false, "Invalid editor input: object of type "
-                + node.getClass().getName());
-        }
+        patientAdapter = (PatientAdapter) adaptor;
+        appService = patientAdapter.getAppService();
+        retrievePatient();
+        setPartName("Patient " + patient.getNumber());
     }
 
     private void retrievePatient() {

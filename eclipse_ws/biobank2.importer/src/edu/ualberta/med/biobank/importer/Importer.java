@@ -157,7 +157,7 @@ public class Importer {
         return DriverManager.getConnection(database, "", "");
     }
 
-    private Connection getMysqlConnection() throws Exception {
+    public static Connection getMysqlConnection() throws Exception {
         // Class.forName("com.mysql.jdbc.Driver");
         return DriverManager.getConnection("jdbc:mysql://localhost:3306/bbpdb",
             "dummy", "ozzy498");

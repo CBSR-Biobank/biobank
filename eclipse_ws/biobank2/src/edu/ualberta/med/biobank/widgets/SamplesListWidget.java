@@ -17,7 +17,7 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.Sample;
 import edu.ualberta.med.biobank.model.SamplePosition;
-import edu.ualberta.med.biobank.treeview.Node;
+import edu.ualberta.med.biobank.treeview.AdaptorBase;
 import edu.ualberta.med.biobank.treeview.NodeSearchVisitor;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 
@@ -50,7 +50,7 @@ public class SamplesListWidget extends BiobankCollectionTable {
                     SamplePosition sp = sample.getSamplePosition();
                     if (sp != null) {
                         Container sc = sp.getContainer();
-                        Node node = siteAdapter.accept(new NodeSearchVisitor(
+                        AdaptorBase node = siteAdapter.accept(new NodeSearchVisitor(
                             Container.class, sc.getId()));
                         if (node != null) {
                             SessionManager.getInstance().getTreeViewer()

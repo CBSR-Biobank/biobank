@@ -22,7 +22,7 @@ import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.model.Site;
-import edu.ualberta.med.biobank.treeview.Node;
+import edu.ualberta.med.biobank.treeview.AdaptorBase;
 import edu.ualberta.med.biobank.treeview.RootNode;
 import edu.ualberta.med.biobank.treeview.SessionAdapter;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
@@ -40,7 +40,7 @@ public class SessionManager {
 
     private HashMap<String, SessionAdapter> sessionsByName;
 
-    private Node rootNode;
+    private AdaptorBase rootNode;
 
     public boolean inactiveTimeout = false;
 
@@ -74,7 +74,7 @@ public class SessionManager {
         }
     };
 
-    public Node getRootNode() {
+    public AdaptorBase getRootNode() {
         return rootNode;
     }
 
@@ -87,7 +87,7 @@ public class SessionManager {
 
             Object element = ((StructuredSelection) selection)
                 .getFirstElement();
-            ((Node) element).performDoubleClick();
+            ((AdaptorBase) element).performDoubleClick();
             view.getTreeViewer().expandToLevel(element, 1);
         }
     };
@@ -103,7 +103,7 @@ public class SessionManager {
 
         @Override
         public void treeExpanded(TreeExpansionEvent e) {
-            ((Node) e.getElement()).performExpand();
+            ((AdaptorBase) e.getElement()).performExpand();
         }
     };
 
@@ -124,7 +124,7 @@ public class SessionManager {
             Object element = ((StructuredSelection) tv.getSelection())
                 .getFirstElement();
             if (element != null) {
-                ((Node) element).popupMenu(tv, tree, menu);
+                ((AdaptorBase) element).popupMenu(tv, tree, menu);
             }
         }
     };
@@ -211,7 +211,7 @@ public class SessionManager {
     }
 
     public SessionAdapter getSessionAdapter(int count) {
-        List<Node> nodes = rootNode.getChildren();
+        List<AdaptorBase> nodes = rootNode.getChildren();
         Assert.isTrue(count < nodes.size(), "Invalid session node count: "
             + count);
         return (SessionAdapter) nodes.get(count);

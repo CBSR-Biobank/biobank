@@ -7,11 +7,11 @@ import org.eclipse.swt.widgets.Tree;
 
 import edu.ualberta.med.biobank.model.SampleType;
 
-public class SampleTypeAdapter extends Node {
+public class SampleTypeAdapter extends AdaptorBase {
 
     private SampleType sampleType;
 
-    public SampleTypeAdapter(Node parent, SampleType sampleType) {
+    public SampleTypeAdapter(AdaptorBase parent, SampleType sampleType) {
         super(parent);
         this.sampleType = sampleType;
         setHasChildren(true);
@@ -51,7 +51,7 @@ public class SampleTypeAdapter extends Node {
     }
 
     @Override
-    public Node accept(NodeSearchVisitor visitor) {
+    public AdaptorBase accept(NodeSearchVisitor visitor) {
         return visitor.visit(this);
     }
 

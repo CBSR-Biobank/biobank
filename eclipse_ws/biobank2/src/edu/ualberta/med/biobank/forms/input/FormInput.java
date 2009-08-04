@@ -4,12 +4,12 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPersistableElement;
 
-import edu.ualberta.med.biobank.treeview.Node;
+import edu.ualberta.med.biobank.treeview.AdaptorBase;
 
 public class FormInput implements IEditorInput {
-	private Node node;
+	private AdaptorBase node;
 
-	public FormInput(Node o) {
+	public FormInput(AdaptorBase o) {
 		node = o;
 	}
 
@@ -19,7 +19,7 @@ public class FormInput implements IEditorInput {
 		return 0;
 	}
 
-	public Node getNode() {
+	public AdaptorBase getNode() {
 		return node;
 	}
 

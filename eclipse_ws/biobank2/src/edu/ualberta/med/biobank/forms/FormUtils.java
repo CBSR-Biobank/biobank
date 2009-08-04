@@ -21,10 +21,14 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.model.Clinic;
+import edu.ualberta.med.biobank.treeview.AdaptorBase;
 import edu.ualberta.med.biobank.treeview.ClinicAdapter;
-import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.widgets.BiobankCollectionTable;
 
+/**
+ * Static methods for constructing the forms that allow the user to edit / view
+ * the information stored in the ORM model objects.
+ */
 public class FormUtils {
 
     public static Label createLabelledField(FormToolkit toolkit,
@@ -69,7 +73,7 @@ public class FormUtils {
     }
 
     public static BiobankCollectionTable createClinicSection(
-        FormToolkit toolkit, Composite parent, Node clinicGroupParent,
+        FormToolkit toolkit, Composite parent, AdaptorBase clinicGroupParent,
         Collection<Clinic> clinics) {
         Section section = toolkit.createSection(parent, Section.TWISTIE
             | Section.TITLE_BAR | Section.EXPANDED);
@@ -88,8 +92,8 @@ public class FormUtils {
         return comp;
     }
 
-    public static ClinicAdapter[] getClinicsAdapters(Node clinicGroupParent,
-        Collection<Clinic> clinics) {
+    public static ClinicAdapter[] getClinicsAdapters(
+        AdaptorBase clinicGroupParent, Collection<Clinic> clinics) {
         ClinicAdapter[] clinicAdapters = new ClinicAdapter[clinics.size()];
 
         int count = 0;
@@ -110,7 +114,7 @@ public class FormUtils {
                 Object selection = event.getSelection();
                 Object element = ((StructuredSelection) selection)
                     .getFirstElement();
-                ((Node) element).performDoubleClick();
+                ((AdaptorBase) element).performDoubleClick();
             }
         };
     }

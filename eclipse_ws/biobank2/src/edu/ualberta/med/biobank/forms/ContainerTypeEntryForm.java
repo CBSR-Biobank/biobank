@@ -19,21 +19,17 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.ui.IEditorInput;
-import org.eclipse.ui.IEditorSite;
-import org.eclipse.ui.PartInitException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.helpers.GetHelper;
 import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.treeview.AdaptorBase;
 import edu.ualberta.med.biobank.treeview.ContainerTypeAdapter;
-import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.validators.DoubleNumber;
 import edu.ualberta.med.biobank.validators.IntegerNumber;
@@ -93,27 +89,28 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
     }
 
     @Override
-    public void init(IEditorSite editorSite, IEditorInput input)
-        throws PartInitException {
-        super.init(editorSite, input);
+    public void init(AdaptorBase adaptor) {
+        Assert.isTrue((adaptor instanceof ContainerTypeAdapter),
+            "Invalid editor input: object of type "
+                + adaptor.getClass().getName());
 
-        Node node = ((FormInput) input).getNode();
-        Assert.isNotNull(node, "Null editor input");
-
-        containerTypeAdapter = (ContainerTypeAdapter) node;
+        containerTypeAdapter = (ContainerTypeAdapter) adaptor;
         appService = containerTypeAdapter.getAppService();
         containerType = containerTypeAdapter.getContainerType();
         site = ((SiteAdapter) containerTypeAdapter
             .getParentFromClass(SiteAdapter.class)).getSite();
         allContainerTypes = site.getContainerTypeCollection();
 
+        String tabName;
         if (containerType.getId() == null) {
-            setPartName("New Container Type");
+            tabName = "New Container Type";
             capacity = new Capacity();
         } else {
-            setPartName("Container Type " + containerType.getName());
+            tabName = "Container Type " + containerType.getName();
             capacity = containerType.getCapacity();
         }
+
+        setPartName(tabName);
     }
 
     @Override

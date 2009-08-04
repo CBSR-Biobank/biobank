@@ -20,7 +20,7 @@ import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.ModelUtils;
 import edu.ualberta.med.biobank.model.Site;
 
-public class ClinicGroup extends Node {
+public class ClinicGroup extends AdaptorBase {
 
     public ClinicGroup(SiteAdapter parent, int id) {
         super(parent, id, "Clinics", true);
@@ -95,7 +95,7 @@ public class ClinicGroup extends Node {
     }
 
     @Override
-    public Node accept(NodeSearchVisitor visitor) {
+    public AdaptorBase accept(NodeSearchVisitor visitor) {
         return visitor.visit(this);
     }
 

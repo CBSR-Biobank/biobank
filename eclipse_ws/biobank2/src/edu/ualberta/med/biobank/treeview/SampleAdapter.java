@@ -13,11 +13,11 @@ import edu.ualberta.med.biobank.forms.SampleViewForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Sample;
 
-public class SampleAdapter extends Node {
+public class SampleAdapter extends AdaptorBase {
 
 	private Sample sample;
 
-	public SampleAdapter(Node parent, Sample sample) {
+	public SampleAdapter(AdaptorBase parent, Sample sample) {
 		super(parent);
 		this.sample = sample;
 	}
@@ -31,7 +31,7 @@ public class SampleAdapter extends Node {
 	}
 
 	@Override
-	public void addChild(Node child) {
+	public void addChild(AdaptorBase child) {
 		Assert.isTrue(false, "Cannot add children to this adapter");
 	}
 
@@ -76,7 +76,7 @@ public class SampleAdapter extends Node {
 	}
 
 	@Override
-	public Node accept(NodeSearchVisitor visitor) {
+	public AdaptorBase accept(NodeSearchVisitor visitor) {
 		return null;
 	}
 
