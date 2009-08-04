@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.widgets;
 
 import java.text.DecimalFormat;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
@@ -154,14 +155,17 @@ public abstract class AbstractGridContainerWidget extends Canvas {
             String text = "";
             if (parentLabel != null)
                 text = parentLabel.getText();
-            if (ls.getId() == 2)
+            switch (ls.getId()) {
+            case 2:
                 return text
                     + LabelingScheme
                         .rowColToTwoCharAlpha(rowcol, containerType);
-            else if (ls.getId() == 3)
-                return text + LabelingScheme.rowColToTwoCharNumeric(rowcol);
-            else
+            case 3:
                 return text + LabelingScheme.rowColToInt(rowcol, containerType);
+            default:
+                Assert.isTrue(false, "invalid labeling scheme for container: ");
+                return null;
+            }
         } else {
             String row = getValueForCell(firstRowSign, indexRow,
                 firstColSign == null);
