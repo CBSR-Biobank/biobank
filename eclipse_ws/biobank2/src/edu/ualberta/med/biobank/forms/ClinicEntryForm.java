@@ -12,15 +12,12 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.ui.IEditorInput;
-import org.eclipse.ui.IEditorSite;
-import org.eclipse.ui.PartInitException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
-import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.treeview.AdaptorBase;
 import edu.ualberta.med.biobank.treeview.ClinicAdapter;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
@@ -48,13 +45,11 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
     private Text name;
 
     @Override
-    public void init(IEditorSite editorSite, IEditorInput input)
-        throws PartInitException {
-        super.init(editorSite, input);
-
-        FormInput clinicInput = (FormInput) input;
-
-        clinicAdapter = (ClinicAdapter) clinicInput.getNode();
+    protected void init(AdaptorBase adaptor) {
+        Assert.isTrue((adaptor instanceof ClinicAdapter),
+            "Invalid editor input: object of type "
+                + adaptor.getClass().getName());
+        clinicAdapter = (ClinicAdapter) adaptor;
         clinic = clinicAdapter.getClinic();
         setAppService(clinicAdapter.getAppService());
 
@@ -64,11 +59,12 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
             clinic.setAddress(address);
         }
 
-        if (clinic.getId() == null) {
-            setPartName("New Clinic");
-        } else {
-            setPartName("Clinic " + clinic.getName());
-        }
+        String tabName;
+        if (clinic.getId() == null)
+            tabName = "New Clinic";
+        else
+            tabName = "Clinic " + clinic.getName();
+        setPartName(tabName);
     }
 
     @Override
@@ -82,7 +78,6 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
     @Override
     protected void createFormContent() {
         form.setText("Clinic Information");
-
         GridLayout layout = new GridLayout(1, false);
         form.getBody().setLayout(layout);
 

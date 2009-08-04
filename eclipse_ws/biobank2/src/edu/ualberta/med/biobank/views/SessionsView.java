@@ -14,10 +14,14 @@ import org.eclipse.ui.dialogs.FilteredTree;
 import org.eclipse.ui.part.ViewPart;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.treeview.Node;
+import edu.ualberta.med.biobank.treeview.AdaptorBase;
 import edu.ualberta.med.biobank.treeview.NodeContentProvider;
 import edu.ualberta.med.biobank.treeview.NodeLabelProvider;
 
+/**
+ * This view contains a tree view that represents the link to the server and the
+ * ORM model objects in the database.
+ */
 public class SessionsView extends ViewPart {
 
     public static final String ID = "edu.ualberta.med.biobank.views.SessionsView";
@@ -62,7 +66,7 @@ public class SessionsView extends ViewPart {
                 ISelection selection = event.getSelection();
                 if (!selection.isEmpty()
                     && selection instanceof IStructuredSelection) {
-                    Node node = (Node) ((IStructuredSelection) selection)
+                    AdaptorBase node = (AdaptorBase) ((IStructuredSelection) selection)
                         .getFirstElement();
                     getViewSite().getActionBars().getStatusLineManager()
                         .setMessage(node.getName());

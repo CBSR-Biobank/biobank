@@ -10,9 +10,6 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.ui.IEditorInput;
-import org.eclipse.ui.IEditorSite;
-import org.eclipse.ui.PartInitException;
 
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Capacity;
@@ -22,8 +19,8 @@ import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.ContainerStatus;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.ModelUtils;
+import edu.ualberta.med.biobank.treeview.AdaptorBase;
 import edu.ualberta.med.biobank.treeview.ContainerAdapter;
-import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.widgets.CabinetDrawerWidget;
 import edu.ualberta.med.biobank.widgets.ChooseContainerWidget;
 import edu.ualberta.med.biobank.widgets.SamplesListWidget;
@@ -56,28 +53,25 @@ public class ContainerViewForm extends BiobankViewForm {
 
     private Label positionDimTwoLabel;
 
+    private CabinetDrawerWidget cabWidget;
+
+    private ChooseContainerWidget containerWidget;
+
     ContainerCell[][] cells;
 
     @Override
-    public void init(IEditorSite editorSite, IEditorInput input)
-        throws PartInitException {
-        super.init(editorSite, input);
+    public void init(AdaptorBase adapter) {
+        Assert.isTrue(adapter instanceof ContainerAdapter,
+            "Invalid editor input: object of type "
+                + adapter.getClass().getName());
 
-        Node node = ((FormInput) input).getNode();
-        Assert.isNotNull(node, "Null editor input");
-
-        if (node instanceof ContainerAdapter) {
-            containerAdapter = (ContainerAdapter) node;
-            appService = containerAdapter.getAppService();
-            retrieveContainer();
-            position = container.getPosition();
-            setPartName(container.getLabel() + " ("
-                + container.getContainerType().getName() + ")");
-            initCells();
-        } else {
-            Assert.isTrue(false, "Invalid editor input: object of type "
-                + node.getClass().getName());
-        }
+        containerAdapter = (ContainerAdapter) adapter;
+        appService = containerAdapter.getAppService();
+        retrieveContainer();
+        position = container.getPosition();
+        setPartName(container.getLabel() + " ("
+            + container.getContainerType().getName() + ")");
+        initCells();
     }
 
     @Override
@@ -166,6 +160,16 @@ public class ContainerViewForm extends BiobankViewForm {
         }
     }
 
+    private void refreshVis(String name) {
+        if (name.equalsIgnoreCase("Drawer"))
+            cabWidget.setContainersStatus(container
+                .getChildPositionCollection());
+        else {
+            initCells();
+            containerWidget.setContainersStatus(cells);
+        }
+    }
+
     protected void visualizeContainer() {
         // default 2 dimensional grid
         int rowHeight = 40, colWidth = 40;
@@ -175,18 +179,17 @@ public class ContainerViewForm extends BiobankViewForm {
 
         if (container.getContainerType().getName().equalsIgnoreCase("Drawer")) {
             // if Drawer, requires special grid
-            CabinetDrawerWidget containerWidget = new CabinetDrawerWidget(
-                client);
-            containerWidget.initLegend();
+            cabWidget = new CabinetDrawerWidget(client);
+            cabWidget.initLegend();
             GridData gdBin = new GridData();
             gdBin.widthHint = CabinetDrawerWidget.WIDTH;
             gdBin.heightHint = CabinetDrawerWidget.HEIGHT
                 + CabinetDrawerWidget.LEGEND_HEIGHT;
             gdBin.verticalSpan = 2;
-            containerWidget.setLayoutData(gdBin);
-            containerWidget.setContainersStatus(container
+            cabWidget.setLayoutData(gdBin);
+            cabWidget.setContainersStatus(container
                 .getChildPositionCollection());
-            containerWidget.addMouseListener(new MouseAdapter() {
+            cabWidget.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseDown(MouseEvent e) {
                     ContainerCell cell = ((CabinetDrawerWidget) e.widget)
@@ -198,8 +201,7 @@ public class ContainerViewForm extends BiobankViewForm {
         } else {
             // otherwise, normal grid
 
-            ChooseContainerWidget containerWidget = new ChooseContainerWidget(
-                client);
+            containerWidget = new ChooseContainerWidget(client);
             containerWidget.setParams(container.getContainerType(),
                 containerLabelLabel);
             containerWidget.initDefaultLegend();
@@ -228,14 +230,15 @@ public class ContainerViewForm extends BiobankViewForm {
 
     private void openFormFor(ContainerPosition pos) {
         ContainerAdapter newAdapter = null;
-
+        ContainerAdapter.closeEditor(new FormInput(containerAdapter));
         if (cells[pos.getPositionDimensionOne()][pos.getPositionDimensionTwo()]
             .getStatus() == ContainerStatus.EMPTY) {
             Container newContainer = new Container();
             pos.setParentContainer(container);
             newContainer.setPosition(pos);
             newAdapter = new ContainerAdapter(containerAdapter, newContainer);
-            Node.openForm(new FormInput(newAdapter), ContainerEntryForm.ID);
+            AdaptorBase.openForm(new FormInput(newAdapter),
+                ContainerEntryForm.ID);
         } else {
             Container childContainer;
             Collection<ContainerPosition> childPositions = container
@@ -253,7 +256,8 @@ public class ContainerViewForm extends BiobankViewForm {
                 }
             }
             Assert.isNotNull(newAdapter);
-            Node.openForm(new FormInput(newAdapter), ContainerViewForm.ID);
+            AdaptorBase.openForm(new FormInput(newAdapter),
+                ContainerViewForm.ID);
         }
 
         containerAdapter.performExpand();
@@ -293,8 +297,11 @@ public class ContainerViewForm extends BiobankViewForm {
     @Override
     protected void reload() {
         retrieveContainer();
-        setPartName("Container " + container.getLabel());
-        form.setText("Container " + container.getLabel());
+        form.setText("Container " + container.getLabel() + " ("
+            + container.getContainerType().getName() + ")");
+        if (container.getContainerType().getChildContainerTypeCollection()
+            .size() > 0)
+            refreshVis(container.getContainerType().getName());
         setContainerValues();
     }
 

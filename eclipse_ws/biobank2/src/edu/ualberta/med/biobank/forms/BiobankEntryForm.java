@@ -411,6 +411,12 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
         }
     }
 
+    /**
+     * Called to get the string to display when the for is not in an error
+     * state.
+     * 
+     * @return the string to display at the top of the form.
+     */
     protected abstract String getOkMessage();
 
     protected void addSeparator() {

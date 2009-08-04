@@ -24,9 +24,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.ui.IEditorInput;
-import org.eclipse.ui.IEditorSite;
-import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.springframework.remoting.RemoteConnectFailureException;
 
@@ -42,7 +39,7 @@ import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.Sample;
 import edu.ualberta.med.biobank.model.SamplePosition;
 import edu.ualberta.med.biobank.model.SampleType;
-import edu.ualberta.med.biobank.treeview.Node;
+import edu.ualberta.med.biobank.treeview.AdaptorBase;
 import edu.ualberta.med.biobank.treeview.PatientVisitAdapter;
 import edu.ualberta.med.biobank.validators.CabinetLabelValidator;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
@@ -91,26 +88,18 @@ public class AddCabinetSampleEntryForm extends BiobankEntryForm implements
     private static boolean testDisposeOn = true;
 
     @Override
-    public void init(IEditorSite editorSite, IEditorInput input)
-        throws PartInitException {
-        super.init(editorSite, input);
+    protected void init(AdaptorBase adaptor) {
+        Assert.isTrue((adaptor instanceof PatientVisitAdapter),
+            "Invalid editor input: object of type "
+                + adaptor.getClass().getName());
 
-        Node node = ((FormInput) input).getNode();
-        Assert.isNotNull(node, "Null editor input");
-
-        Assert
-            .isTrue((node instanceof PatientVisitAdapter),
-                "Invalid editor input: object of type "
-                    + node.getClass().getName());
-
-        pvAdapter = (PatientVisitAdapter) node;
+        pvAdapter = (PatientVisitAdapter) adaptor;
         patientVisit = pvAdapter.getPatientVisit();
         appService = pvAdapter.getAppService();
-
-        setPartName("Add cabinet sample for "
-            + patientVisit.getPatient().getNumber());
-
         testDisposeOn = true;
+        setPartName("Add cabinet samples for patient "
+            + patientVisit.getPatient().getNumber() + " for visit "
+            + patientVisit.getDateDrawn());
     }
 
     @Override
@@ -122,10 +111,8 @@ public class AddCabinetSampleEntryForm extends BiobankEntryForm implements
 
     @Override
     protected void createFormContent() {
-        form.setText("Add cabinet samples for patient "
-            + patientVisit.getPatient().getNumber() + " for visit "
-            + patientVisit.getDateDrawn());
-
+        form.setText("Add cabinet sample for "
+            + patientVisit.getPatient().getNumber());
         GridLayout layout = new GridLayout(1, false);
         form.getBody().setLayout(layout);
 
@@ -429,7 +416,8 @@ public class AddCabinetSampleEntryForm extends BiobankEntryForm implements
         testDisposeOn = false;
         doSaveInternal();
         getSite().getPage().closeEditor(AddCabinetSampleEntryForm.this, false);
-        Node.openForm(new FormInput(pvAdapter), AddCabinetSampleEntryForm.ID);
+        AdaptorBase.openForm(new FormInput(pvAdapter),
+            AddCabinetSampleEntryForm.ID);
     }
 
     private void saveAndClose() {

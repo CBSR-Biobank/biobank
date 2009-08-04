@@ -21,7 +21,7 @@ import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.Sample;
 
-public class PatientVisitAdapter extends Node {
+public class PatientVisitAdapter extends AdaptorBase {
 
     private PatientVisit patientVisit;
 
@@ -30,7 +30,7 @@ public class PatientVisitAdapter extends Node {
      */
     private Sample selectedSample;
 
-    public PatientVisitAdapter(Node parent, PatientVisit patientVisit) {
+    public PatientVisitAdapter(AdaptorBase parent, PatientVisit patientVisit) {
         super(parent);
         this.patientVisit = patientVisit;
     }
@@ -126,7 +126,7 @@ public class PatientVisitAdapter extends Node {
     }
 
     @Override
-    public Node accept(NodeSearchVisitor visitor) {
+    public AdaptorBase accept(NodeSearchVisitor visitor) {
         return visitor.visit(this);
     }
 

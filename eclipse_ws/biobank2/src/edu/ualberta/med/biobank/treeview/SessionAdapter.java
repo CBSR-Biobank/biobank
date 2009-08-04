@@ -20,13 +20,13 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
-public class SessionAdapter extends Node {
+public class SessionAdapter extends AdaptorBase {
 
     private WritableApplicationService appService;
 
     private String userName;
 
-    public SessionAdapter(Node parent, WritableApplicationService appService,
+    public SessionAdapter(AdaptorBase parent, WritableApplicationService appService,
         int sessionId, String name, String userName) {
         super(parent);
         this.appService = appService;
@@ -130,7 +130,7 @@ public class SessionAdapter extends Node {
     }
 
     @Override
-    public Node accept(NodeSearchVisitor visitor) {
+    public AdaptorBase accept(NodeSearchVisitor visitor) {
         return visitor.visit(this);
     }
 

@@ -19,20 +19,16 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.ui.IEditorInput;
-import org.eclipse.ui.IEditorSite;
-import org.eclipse.ui.PartInitException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.LabelingScheme;
 import edu.ualberta.med.biobank.RowColPos;
-import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.treeview.AdaptorBase;
 import edu.ualberta.med.biobank.treeview.ContainerAdapter;
-import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.validators.DoubleNumber;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
 import gov.nih.nci.system.query.SDKQuery;
@@ -69,14 +65,11 @@ public class ContainerEntryForm extends BiobankEntryForm {
     private ComboViewer containerTypeComboViewer;
 
     @Override
-    public void init(IEditorSite editorSite, IEditorInput input)
-        throws PartInitException {
-        super.init(editorSite, input);
-
-        Node node = ((FormInput) input).getNode();
-        Assert.isNotNull(node, "Null editor input");
-
-        containerAdapter = (ContainerAdapter) node;
+    public void init(AdaptorBase adaptor) {
+        Assert.isTrue((adaptor instanceof ContainerAdapter),
+            "Invalid editor input: object of type "
+                + adaptor.getClass().getName());
+        containerAdapter = (ContainerAdapter) adaptor;
         appService = containerAdapter.getAppService();
         container = containerAdapter.getContainer();
         site = containerAdapter.getSite();
@@ -92,20 +85,20 @@ public class ContainerEntryForm extends BiobankEntryForm {
                     .getParentContainer().getContainerType()));
         }
 
+        String tabName;
         if (container.getId() == null) {
-            setPartName("Container");
+            tabName = "Container";
         } else {
-            setPartName("Container " + container.getLabel());
+            tabName = "Container " + container.getLabel();
         }
+        setPartName(tabName);
     }
 
     @Override
     protected void createFormContent() {
-        currentContainerType = container.getContainerType();
-
         form.setText("Container");
+        currentContainerType = container.getContainerType();
         form.getBody().setLayout(new GridLayout(1, false));
-
         createContainerSection();
         createButtonsSection();
     }

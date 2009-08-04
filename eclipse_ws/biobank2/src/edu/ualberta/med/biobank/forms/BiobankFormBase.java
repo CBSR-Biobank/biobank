@@ -28,13 +28,15 @@ import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.part.EditorPart;
 
 import edu.ualberta.med.biobank.forms.input.FormInput;
+import edu.ualberta.med.biobank.treeview.AdaptorBase;
 
 /**
- * Base class for data entry forms.
- * 
- * Notes: - createFormContent() is called in it's own thread so making calls to
- * the database is possible.
- * 
+ * Base class for data all BioBank2 view and entry forms. This class is the
+ * superclass for {@link BiobankEntryForm} and {@link BiobankViewForm}. Please
+ * extend from these two classes instead of <code>BiobankFormBase</code>.
+ * <p>
+ * Form creation is called in a non-UI thread so making calls to the ORM layer
+ * possible. See {@link #createFormContent()}
  */
 public abstract class BiobankFormBase extends EditorPart {
 
@@ -54,6 +56,14 @@ public abstract class BiobankFormBase extends EditorPart {
     public void doSaveAs() {
     }
 
+    /**
+     * The initialisation method for the derived form.
+     * 
+     * @param adapter the corresponding model adapter the form is to edit /
+     *            view.
+     */
+    protected abstract void init(AdaptorBase adapter);
+
     @Override
     public void init(IEditorSite editorSite, IEditorInput input)
         throws PartInitException {
@@ -61,6 +71,9 @@ public abstract class BiobankFormBase extends EditorPart {
             throw new PartInitException("Invalid editor input");
         setSite(editorSite);
         setInput(input);
+        AdaptorBase adapter = ((FormInput) input).getNode();
+        Assert.isNotNull(adapter, "Bad editor input (null value)");
+        init(adapter);
     }
 
     @Override
@@ -93,7 +106,10 @@ public abstract class BiobankFormBase extends EditorPart {
         });
     }
 
-    abstract protected void createFormContent();
+    /**
+     * Called in a non-UI thread to create the widgets that make up the form.
+     */
+    protected abstract void createFormContent();
 
     protected Section createSection(String title) {
         Section section = toolkit.createSection(form.getBody(), Section.TWISTIE

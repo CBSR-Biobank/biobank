@@ -42,7 +42,7 @@ public class CabinetDrawerWidget extends Canvas {
     private Boolean hasLegend = false;
 
     // single dimension format, (boxNumber slots)
-    private ContainerCell[] cells;
+    private ContainerCell[][] cells;
 
     private ArrayList<ContainerStatus> legendStatus;
 
@@ -52,9 +52,16 @@ public class CabinetDrawerWidget extends Canvas {
 
     public CabinetDrawerWidget(Composite parent) {
         super(parent, SWT.DOUBLE_BUFFERED);
-        cells = new ContainerCell[boxNumber];
+        cells = new ContainerCell[boxNumber][1];
         for (int i = 0; i < boxNumber; i++) {
-            cells[i] = new ContainerCell();
+            ContainerPosition pos = new ContainerPosition();
+            pos.setPositionDimensionOne(i);
+            pos.setPositionDimensionTwo(0);
+            ContainerStatus stat = ContainerStatus.EMPTY;
+            ContainerCell cell = new ContainerCell();
+            cell.setPosition(pos);
+            cell.setStatus(stat);
+            cells[i][0] = cell;
         }
         addPaintListener(new PaintListener() {
             @Override
@@ -103,7 +110,7 @@ public class CabinetDrawerWidget extends Canvas {
                 width, height);
             gc.setForeground(e.display.getSystemColor(SWT.COLOR_BLACK));
 
-            ContainerStatus status = cells[boxIndex - 1].getStatus();
+            ContainerStatus status = cells[boxIndex - 1][0].getStatus();
             if (status == null)
                 status = ContainerStatus.EMPTY;
             gc.setBackground(status.getColor());
@@ -151,8 +158,8 @@ public class CabinetDrawerWidget extends Canvas {
         Collection<ContainerPosition> childPositionCollection) {
         for (ContainerPosition position : childPositionCollection) {
             int pos = position.getPositionDimensionOne().intValue();
-            cells[pos] = new ContainerCell(position);
-            cells[pos].setStatus(ContainerStatus.FILLED);
+            cells[pos][0] = new ContainerCell(position);
+            cells[pos][0].setStatus(ContainerStatus.FILLED);
         }
         LEGEND_WIDTH = WIDTH / legendStatus.size();
         redraw();
@@ -179,7 +186,7 @@ public class CabinetDrawerWidget extends Canvas {
         int xGridCellNumOffset = 9;
         int yGridCellNumOffset = 3;
         return cells[cellNum + xGrid * xGridCellNumOffset - yGrid
-            * yGridCellNumOffset - 1];
+            * yGridCellNumOffset - 1][0];
 
     }
 

@@ -20,11 +20,11 @@ import edu.ualberta.med.biobank.model.ModelUtils;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.PatientVisit;
 
-public class PatientAdapter extends Node {
+public class PatientAdapter extends AdaptorBase {
 
 	private Patient patient;
 
-	public PatientAdapter(Node parent, Patient patient) {
+	public PatientAdapter(AdaptorBase parent, Patient patient) {
 		super(parent);
 		this.patient = patient;
 		setHasChildren(true);
@@ -131,7 +131,7 @@ public class PatientAdapter extends Node {
 	}
 
 	@Override
-	public Node accept(NodeSearchVisitor visitor) {
+	public AdaptorBase accept(NodeSearchVisitor visitor) {
 		return visitor.visit(this);
 	}
 }

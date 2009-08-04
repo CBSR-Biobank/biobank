@@ -22,7 +22,7 @@ import org.eclipse.ui.part.ViewPart;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.exception.MultipleSearchResultException;
-import edu.ualberta.med.biobank.treeview.Node;
+import edu.ualberta.med.biobank.treeview.AdaptorBase;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class SearchView extends ViewPart {
@@ -96,11 +96,11 @@ public class SearchView extends ViewPart {
             public void run() {
                 try {
                     WritableApplicationService appService = null;
-                    Node node;
+                    AdaptorBase node;
                     IStructuredSelection treeSelection = (IStructuredSelection) SessionManager
                         .getInstance().getTreeViewer().getSelection();
                     if (treeSelection != null && treeSelection.size() > 0) {
-                        node = (Node) treeSelection.getFirstElement();
+                        node = (AdaptorBase) treeSelection.getFirstElement();
                         appService = node.getAppService();
                     } else {
                         BioBankPlugin.openMessage("Search",
@@ -118,7 +118,7 @@ public class SearchView extends ViewPart {
                             SearchType searchType = (SearchType) selection
                                 .getFirstElement();
                             String id = searchField.getText();
-                            Node nodeFound = searchType.search(appService, id,
+                            AdaptorBase nodeFound = searchType.search(appService, id,
                                 node);
                             if (nodeFound != null) {
                                 SessionManager.getInstance().getTreeViewer()

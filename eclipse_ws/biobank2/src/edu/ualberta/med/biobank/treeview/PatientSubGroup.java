@@ -13,7 +13,7 @@ import edu.ualberta.med.biobank.model.Patient;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
-public class PatientSubGroup extends Node {
+public class PatientSubGroup extends AdaptorBase {
 
     private List<Integer> patientIDs;
     private static final int maxSize = 100;
@@ -106,7 +106,7 @@ public class PatientSubGroup extends Node {
     }
 
     @Override
-    public Node accept(NodeSearchVisitor visitor) {
+    public AdaptorBase accept(NodeSearchVisitor visitor) {
         return visitor.visit(this);
     }
 
