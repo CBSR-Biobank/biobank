@@ -226,15 +226,9 @@ public class AssignSamplesLocationEntryForm extends BiobankEntryForm implements
         layout.horizontalSpacing = 10;
         client.setLayout(layout);
         GridData gd = new GridData();
-        gd.widthHint = 200;
+        gd.widthHint = 300;
         client.setLayoutData(gd);
         toolkit.paintBordersFor(client);
-
-        plateToScanText = (Text) createBoundWidgetWithLabel(client, Text.class,
-            SWT.NONE, "Plate to scan", new String[0], plateToScanValue,
-            ScannerBarcodeValidator.class, "Enter a valid plate barcode");
-        plateToScanText.removeKeyListener(keyListener);
-        plateToScanText.addKeyListener(EnterKeyToNextFieldListener.INSTANCE);
 
         palletCodeText = (Text) createBoundWidgetWithLabel(client, Text.class,
             SWT.NONE, "Pallet product barcode", new String[0],
@@ -248,6 +242,12 @@ public class AssignSamplesLocationEntryForm extends BiobankEntryForm implements
             palletPositionValue, NonEmptyString.class, "Enter position code");
         palletPositionText.removeKeyListener(keyListener);
         palletPositionText.addKeyListener(EnterKeyToNextFieldListener.INSTANCE);
+
+        plateToScanText = (Text) createBoundWidgetWithLabel(client, Text.class,
+            SWT.NONE, "Plate to scan", new String[0], plateToScanValue,
+            ScannerBarcodeValidator.class, "Enter a valid plate barcode");
+        plateToScanText.removeKeyListener(keyListener);
+        plateToScanText.addKeyListener(EnterKeyToNextFieldListener.INSTANCE);
 
         if (!BioBankPlugin.isRealScanEnabled()) {
             gd.widthHint = 250;
@@ -281,22 +281,22 @@ public class AssignSamplesLocationEntryForm extends BiobankEntryForm implements
         client.setLayout(layout);
         toolkit.paintBordersFor(client);
 
-        locateButton = toolkit
-            .createButton(client, "Choose Location", SWT.PUSH);
-        locateButton.setVisible(false);
-        GridData gd = new GridData();
-        gd.horizontalSpan = columns;
-        locateButton.setLayoutData(gd);
-        locateButton.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                chooseLocation();
-            }
-        });
+        // locateButton = toolkit
+        // .createButton(client, "Choose Location", SWT.PUSH);
+        // locateButton.setVisible(false);
+        // GridData gd = new GridData();
+        // gd.horizontalSpan = columns;
+        // locateButton.setLayoutData(gd);
+        // locateButton.addSelectionListener(new SelectionAdapter() {
+        // @Override
+        // public void widgetSelected(SelectionEvent e) {
+        // chooseLocation();
+        // }
+        // });
 
         confirmCancelText = toolkit.createText(client, "");
         confirmCancelText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        gd = new GridData();
+        GridData gd = new GridData();
         gd.widthHint = 100;
         confirmCancelText.setLayoutData(gd);
         confirmCancelText.addKeyListener(new CancelConfirmKeyListener(this));
@@ -652,7 +652,8 @@ public class AssignSamplesLocationEntryForm extends BiobankEntryForm implements
                 plateToScanText.getText())) {
                 scanButton.setEnabled(false);
             } else {
-                scanButton.setEnabled(!palletCodeText.getText().isEmpty());
+                scanButton.setEnabled(!palletCodeText.getText().isEmpty()
+                    && !palletPositionText.getText().isEmpty());
             }
             locateButton.setEnabled((Boolean) scanValidValue.getValue());
         }

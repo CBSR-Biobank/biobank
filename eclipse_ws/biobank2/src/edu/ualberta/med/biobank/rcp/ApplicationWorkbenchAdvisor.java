@@ -7,29 +7,20 @@ import org.eclipse.ui.application.WorkbenchWindowAdvisor;
 
 public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
 
-	private static final String PERSPECTIVE_ID = "edu.ualberta.med.biobank.perspective";
+    @Override
+    public WorkbenchWindowAdvisor createWorkbenchWindowAdvisor(
+        IWorkbenchWindowConfigurer configurer) {
+        return new ApplicationWorkbenchWindowAdvisor(configurer);
+    }
 
-	@Override
-	public WorkbenchWindowAdvisor createWorkbenchWindowAdvisor(
-			IWorkbenchWindowConfigurer configurer) {
-		return new ApplicationWorkbenchWindowAdvisor(configurer);
-	}
+    @Override
+    public String getInitialWindowPerspectiveId() {
+        return MainPerspective.ID;
+    }
 
-	@Override
-	public String getInitialWindowPerspectiveId() {
-		return PERSPECTIVE_ID;
-	}
+    @Override
+    public void initialize(IWorkbenchConfigurer configurer) {
+        configurer.setSaveAndRestore(true);
+    }
 
-	@Override
-	public void initialize(IWorkbenchConfigurer configurer) {
-		configurer.setSaveAndRestore(true);
-	}
-
-	// @Override
-	// public void postStartup() {
-	// PreferenceManager pm = PlatformUI.getWorkbench().getPreferenceManager();
-	// pm.remove("org.eclipse.help.ui.browsersPreferencePage");
-	// pm
-	// .remove("org.eclipse.update.internal.ui.preferences.MainPreferencePage");
-	// }
 }

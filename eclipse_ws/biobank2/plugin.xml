@@ -26,9 +26,15 @@
    <extension
          point="org.eclipse.ui.perspectives">
       <perspective
-            class="edu.ualberta.med.biobank.rcp.Perspective"
-            id="edu.ualberta.med.biobank.perspective"
+            class="edu.ualberta.med.biobank.rcp.MainPerspective"
+            id="edu.ualberta.med.biobank.perspective.main"
             name="Biobank Perspective">
+      </perspective>
+      <perspective
+            class="edu.ualberta.med.biobank.rcp.PatientsAdministrationPerspective"
+            fixed="true"
+            id="edu.ualberta.med.biobank.perspective.patients"
+            name="Patients Administration">
       </perspective>
    </extension>
    <extension
@@ -67,6 +73,16 @@
             defaultHandler="edu.ualberta.med.biobank.handler.SearchHandler"
             id="edu.ualberta.med.biobank.commands.search"
             name="Search">
+      </command>
+      <command
+            defaultHandler="edu.ualberta.med.biobank.handler.PatientAdministrationHandler"
+            id="edu.ualberta.med.biobank.commands.patientAdmin"
+            name="Patient administration">
+      </command>
+      <command
+            defaultHandler="edu.ualberta.med.biobank.handler.MainAdministrationHanlder"
+            id="edu.ualberta.med.biobank.commands.mainAdmin"
+            name="Main Administration">
       </command>
    </extension>
    <extension
@@ -128,6 +144,36 @@
             </command>
          </menu>
       </menuContribution>
+      <menuContribution
+            locationURI="toolbar:org.eclipse.ui.main.toolbar">
+         <toolbar
+               id="edu.ualberta.med.biobank.toolbar">
+            <command
+                  commandId="edu.ualberta.med.biobank.commands.mainAdmin"
+                  icon="icons/mainPerspective.png"
+                  label="Main Administration"
+                  style="push">
+               <visibleWhen
+                     checkEnabled="true">
+                  <reference
+                        definitionId="biobank2.mainPerpectiveSelected">
+                  </reference>
+               </visibleWhen>
+            </command>
+            <command
+                  commandId="edu.ualberta.med.biobank.commands.patientAdmin"
+                  icon="icons/patientPerspective.png"
+                  label="Patients Administration"
+                  style="push">
+               <visibleWhen
+                     checkEnabled="true">
+                  <reference
+                        definitionId="biobank2.patientsPerpectiveSelected">
+                  </reference>
+               </visibleWhen>
+            </command>
+         </toolbar>
+      </menuContribution>
    </extension>
    <extension
          point="org.eclipse.ui.views">
@@ -145,11 +191,18 @@
             name="Search"
             restorable="true">
       </view>
+      <view
+            allowMultiple="false"
+            class="edu.ualberta.med.biobank.views.PatientAdministrationView"
+            id="edu.ualberta.med.biobank.views.patientsAdmin"
+            name="Patients administration"
+            restorable="true">
+      </view>
    </extension>
    <extension
          point="org.eclipse.ui.perspectiveExtensions">
       <perspectiveExtension
-            targetID="edu.ualberta.med.biobank.perspective">
+            targetID="edu.ualberta.med.biobank.perspective.main">
          <view
                closeable="false"
                id="edu.ualberta.med.biobank.views.SessionsView"
@@ -158,13 +211,30 @@
                ratio="0.5"
                relationship="left"
                relative="org.eclipse.ui.editorss"
-               showTitle="false">
+               showTitle="false"
+               standalone="true"
+               visible="true">
          </view>
          <view
                closeable="true"
                id="edu.ualberta.med.biobank.views.SearchView"
                minimized="false"
                moveable="true"
+               relationship="top"
+               relative="org.eclipse.ui.editorss"
+               showTitle="true"
+               standalone="true"
+               visible="true">
+         </view>
+      </perspectiveExtension>
+      <perspectiveExtension
+            targetID="edu.ualberta.med.biobank.perspective.patients">
+         <view
+               closeable="false"
+               id="edu.ualberta.med.biobank.views.patientsAdmin"
+               minimized="false"
+               moveable="false"
+               ratio="0.95"
                relationship="top"
                relative="org.eclipse.ui.editorss"
                showTitle="true"
@@ -346,5 +416,29 @@
             activityId="edu.ualberta.med.biobank.activity.eclipseide"
             pattern="org\.eclipse\.ui\.ide/org\.eclipse\.ui\.preferencePages\.Workbench">
       </activityPatternBinding>
+   </extension>
+   <extension
+         point="org.eclipse.core.expressions.definitions">
+      <definition
+            id="biobank2.mainPerpectiveSelected">
+         <with
+               variable="activeWorkbenchWindow.activePerspective">
+            <not>
+               <equals
+                     value="edu.ualberta.med.biobank.perspective.main">
+               </equals></not>
+         </with>
+      </definition>
+      <definition
+            id="biobank2.patientsPerpectiveSelected">
+         <with
+               variable="activeWorkbenchWindow.activePerspective">
+            <not>
+               <equals
+                     value="edu.ualberta.med.biobank.perspective.patients">
+               </equals>
+            </not>
+         </with>
+      </definition>
    </extension>
 </plugin>

@@ -6,11 +6,9 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.dialogs.FilteredTree;
 import org.eclipse.ui.part.ViewPart;
 
 import edu.ualberta.med.biobank.SessionManager;
@@ -44,14 +42,14 @@ public class SessionsView extends ViewPart {
 
     @Override
     public void createPartControl(Composite parent) {
-        FilteredTree filteredTree = new FilteredTree(parent, SWT.BORDER
-            | SWT.MULTI | SWT.V_SCROLL, new TreeFilter(), true);
-        filteredTree.setBackground(parent.getDisplay().getSystemColor(
-            SWT.COLOR_LIST_BACKGROUND));
-        filteredTree
-            .setCursor(new Cursor(parent.getDisplay(), SWT.CURSOR_HAND));
+        // FilteredTree filteredTree = new FilteredTree(parent, SWT.BORDER
+        // | SWT.MULTI | SWT.V_SCROLL, new TreeFilter(), true);
+        // filteredTree.setBackground(parent.getDisplay().getSystemColor(
+        // SWT.COLOR_LIST_BACKGROUND));
+        // filteredTree
+        // .setCursor(new Cursor(parent.getDisplay(), SWT.CURSOR_HAND));
 
-        treeViewer = filteredTree.getViewer();
+        treeViewer = new TreeViewer(parent);
         getSite().setSelectionProvider(treeViewer);
         treeViewer.setLabelProvider(new NodeLabelProvider());
         treeViewer.setContentProvider(new NodeContentProvider());
