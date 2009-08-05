@@ -48,7 +48,7 @@ public class InitExamples {
     private Study study;
     private Clinic[] clinics;
 
-    private ContainerType paletteType;
+    private ContainerType palletType;
     private ContainerType hotel19Type;
     private ContainerType hotel13Type;
     private ContainerType freezerType;
@@ -214,13 +214,13 @@ public class InitExamples {
         }
 
         // Freezer Types
-        paletteType = insertContainerTypeInSite("Palette", 8, 12, null,
+        palletType = insertContainerTypeInSite("Pallet", 8, 12, null,
             numSchemeMap.get("SBS Standard"));
         hotel13Type = insertContainerTypeInSite("Hotel-13", 13, 1, Arrays
-            .asList(new ContainerType[] { paletteType }), numSchemeMap
+            .asList(new ContainerType[] { palletType }), numSchemeMap
             .get("CBSR 2 char alphabetic"));
         hotel19Type = insertContainerTypeInSite("Hotel-19", 19, 1, Arrays
-            .asList(new ContainerType[] { paletteType }), numSchemeMap
+            .asList(new ContainerType[] { palletType }), numSchemeMap
             .get("CBSR 2 char alphabetic"));
         freezerType = insertContainerTypeInSite("Freezer", 3, 10, Arrays
             .asList(new ContainerType[] { hotel13Type, hotel19Type }),
@@ -298,11 +298,11 @@ public class InitExamples {
     private void insertContainers() throws Exception {
         Container freezer = insertContainer("01", freezerType, null);
         Container hotel1 = insertContainer("01AA", hotel19Type, freezer);
-        insertContainer("01AA01", paletteType, hotel1);
-        insertContainer("01AA03", paletteType, hotel1);
+        insertContainer("01AA01", palletType, hotel1);
+        insertContainer("01AA03", palletType, hotel1);
         Container hotel2 = insertContainer("01AE", hotel13Type, freezer);
-        insertContainer("01AE01", paletteType, hotel2);
-        insertContainer("01AE05", paletteType, hotel2);
+        insertContainer("01AE01", palletType, hotel2);
+        insertContainer("01AE05", palletType, hotel2);
     }
 
     private void insertSampleStorage() throws Exception {

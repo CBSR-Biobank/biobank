@@ -91,12 +91,12 @@ public abstract class AbstractGridContainerWidget extends Canvas {
         addPaintListener(new PaintListener() {
             @Override
             public void paintControl(PaintEvent e) {
-                paintPalette(e);
+                paintGrid(e);
             }
         });
     }
 
-    protected void paintPalette(PaintEvent e) {
+    protected void paintGrid(PaintEvent e) {
         for (int indexRow = 0; indexRow < rows; indexRow++) {
             for (int indexCol = 0; indexCol < columns; indexCol++) {
                 int xPosition = cellWidth * indexCol;

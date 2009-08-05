@@ -37,7 +37,7 @@ import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.forms.listener.EnterKeyToNextFieldListener;
-import edu.ualberta.med.biobank.model.PaletteCell;
+import edu.ualberta.med.biobank.model.PalletCell;
 import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.Sample;
 import edu.ualberta.med.biobank.model.SampleCellStatus;
@@ -45,19 +45,19 @@ import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.treeview.AdaptorBase;
 import edu.ualberta.med.biobank.treeview.PatientVisitAdapter;
 import edu.ualberta.med.biobank.validators.ScannerBarcodeValidator;
-import edu.ualberta.med.biobank.widgets.AddSamplesScanPaletteWidget;
+import edu.ualberta.med.biobank.widgets.AddSamplesScanPalletWidget;
 import edu.ualberta.med.biobank.widgets.SampleTypeSelectionWidget;
-import edu.ualberta.med.biobank.widgets.listener.ScanPaletteModificationEvent;
-import edu.ualberta.med.biobank.widgets.listener.ScanPaletteModificationListener;
+import edu.ualberta.med.biobank.widgets.listener.ScanPalletModificationEvent;
+import edu.ualberta.med.biobank.widgets.listener.ScanPalletModificationListener;
 import edu.ualberta.med.scanlib.ScanCell;
 import edu.ualberta.med.scanlib.ScanLib;
 import edu.ualberta.med.scanlib.ScanLibFactory;
 import gov.nih.nci.system.query.SDKQuery;
 import gov.nih.nci.system.query.example.InsertExampleQuery;
 
-public class AddPaletteSamplesEntryForm extends BiobankEntryForm {
+public class AddPalletSamplesEntryForm extends BiobankEntryForm {
 
-    public static final String ID = "edu.ualberta.med.biobank.forms.AddPaletteSamplesEntryForm";
+    public static final String ID = "edu.ualberta.med.biobank.forms.AddPalletSamplesEntryForm";
 
     private Button scan;
 
@@ -67,7 +67,7 @@ public class AddPaletteSamplesEntryForm extends BiobankEntryForm {
 
     private Composite typesSelectionPerRowComposite;
 
-    private AddSamplesScanPaletteWidget spw;
+    private AddSamplesScanPalletWidget spw;
 
     private List<SampleTypeSelectionWidget> sampleTypeWidgets;
 
@@ -145,7 +145,7 @@ public class AddPaletteSamplesEntryForm extends BiobankEntryForm {
         GridLayout layout = new GridLayout(1, false);
         form.getBody().setLayout(layout);
 
-        createPaletteSection();
+        createPalletSection();
         createFieldsSection();
         createTypesSelectionSection();
         createButtonsSection();
@@ -182,7 +182,7 @@ public class AddPaletteSamplesEntryForm extends BiobankEntryForm {
         dbc.bindValue(wv, typesFilled, uvs, uvs);
     }
 
-    private void createPaletteSection() {
+    private void createPalletSection() {
         Composite client = toolkit.createComposite(form.getBody());
         GridLayout layout = new GridLayout(1, false);
         client.setLayout(layout);
@@ -191,7 +191,7 @@ public class AddPaletteSamplesEntryForm extends BiobankEntryForm {
         gd.grabExcessHorizontalSpace = true;
         client.setLayoutData(gd);
 
-        spw = new AddSamplesScanPaletteWidget(client);
+        spw = new AddSamplesScanPalletWidget(client);
         spw.setVisible(true);
         toolkit.adapt(spw);
         spw.setLayoutData(new GridData(SWT.CENTER, SWT.TOP, true, false));
@@ -280,7 +280,7 @@ public class AddPaletteSamplesEntryForm extends BiobankEntryForm {
             public void widgetSelected(SelectionEvent e) {
                 SampleType type = customSelection.getSelection();
                 if (type != null) {
-                    for (PaletteCell cell : spw.getSelectedCells()) {
+                    for (PalletCell cell : spw.getSelectedCells()) {
                         cell.setType(type);
                         cell.setStatus(SampleCellStatus.TYPE);
                     }
@@ -291,9 +291,9 @@ public class AddPaletteSamplesEntryForm extends BiobankEntryForm {
                 }
             }
         });
-        spw.addModificationListener(new ScanPaletteModificationListener() {
+        spw.addModificationListener(new ScanPalletModificationListener() {
             @Override
-            public void modification(ScanPaletteModificationEvent spme) {
+            public void modification(ScanPalletModificationEvent spme) {
                 customSelection.setNumber(spme.selections);
             }
         });
@@ -393,7 +393,7 @@ public class AddPaletteSamplesEntryForm extends BiobankEntryForm {
         BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
             public void run() {
                 try {
-                    PaletteCell[][] cells;
+                    PalletCell[][] cells;
                     if (BioBankPlugin.isRealScanEnabled()) {
                         int plateNum = BioBankPlugin.getDefault()
                             .getPlateNumber(plateToScan.getValue().toString());
@@ -405,9 +405,9 @@ public class AddPaletteSamplesEntryForm extends BiobankEntryForm {
                                 "Could not decode image. Return code is: " + r);
                             return;
                         }
-                        cells = PaletteCell.getScanLibResults();
+                        cells = PalletCell.getScanLibResults();
                     } else {
-                        cells = PaletteCell.getRandomScanLink();
+                        cells = PalletCell.getRandomScanLink();
                     }
 
                     enabledOthersComponents();
@@ -462,11 +462,11 @@ public class AddPaletteSamplesEntryForm extends BiobankEntryForm {
             public void run() {
                 try {
                     List<SDKQuery> queries = new ArrayList<SDKQuery>();
-                    PaletteCell[][] cells = spw.getScannedElements();
+                    PalletCell[][] cells = spw.getScannedElements();
                     for (int indexRow = 0; indexRow < cells.length; indexRow++) {
                         for (int indexColumn = 0; indexColumn < cells[indexRow].length; indexColumn++) {
-                            PaletteCell cell = cells[indexRow][indexColumn];
-                            if (PaletteCell.hasValue(cell)
+                            PalletCell cell = cells[indexRow][indexColumn];
+                            if (PalletCell.hasValue(cell)
                                 && cell.getStatus().equals(
                                     SampleCellStatus.TYPE)) {
                                 // add new samples
@@ -497,10 +497,10 @@ public class AddPaletteSamplesEntryForm extends BiobankEntryForm {
         int indexRow) {
         if (typeWidget.needToSave()) {
             SampleType type = typeWidget.getSelection();
-            PaletteCell[][] cells = spw.getScannedElements();
+            PalletCell[][] cells = spw.getScannedElements();
             for (int indexColumn = 0; indexColumn < cells[indexRow].length; indexColumn++) {
-                PaletteCell cell = cells[indexRow][indexColumn];
-                if (PaletteCell.hasValue(cell)) {
+                PalletCell cell = cells[indexRow][indexColumn];
+                if (PalletCell.hasValue(cell)) {
                     cell.setType(type);
                     cell.setStatus(SampleCellStatus.TYPE);
                     spw.redraw();
@@ -527,7 +527,7 @@ public class AddPaletteSamplesEntryForm extends BiobankEntryForm {
     private void saveAndClose() {
         testDisposeOn = true;
         doSaveInternal();
-        getSite().getPage().closeEditor(AddPaletteSamplesEntryForm.this, false);
+        getSite().getPage().closeEditor(AddPalletSamplesEntryForm.this, false);
         pvAdapter.performExpand();
         AdaptorBase.openForm(new FormInput(pvAdapter), PatientVisitViewForm.ID);
     }
@@ -547,9 +547,9 @@ public class AddPaletteSamplesEntryForm extends BiobankEntryForm {
     private void saveAndNext() {
         testDisposeOn = false;
         doSaveInternal();
-        getSite().getPage().closeEditor(AddPaletteSamplesEntryForm.this, false);
+        getSite().getPage().closeEditor(AddPalletSamplesEntryForm.this, false);
         AdaptorBase.openForm(new FormInput(pvAdapter),
-            AddPaletteSamplesEntryForm.ID);
+            AddPalletSamplesEntryForm.ID);
     }
 
 }

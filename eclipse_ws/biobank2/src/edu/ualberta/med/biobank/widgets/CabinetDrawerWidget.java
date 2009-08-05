@@ -66,7 +66,7 @@ public class CabinetDrawerWidget extends Canvas {
         addPaintListener(new PaintListener() {
             @Override
             public void paintControl(PaintEvent e) {
-                paintPalette(e);
+                paintDrawer(e);
             }
         });
     }
@@ -78,7 +78,7 @@ public class CabinetDrawerWidget extends Canvas {
         legendStatus.add(ContainerStatus.FILLED);
     }
 
-    protected void paintPalette(PaintEvent e) {
+    protected void paintDrawer(PaintEvent e) {
         setSize(WIDTH, HEIGHT + LEGEND_HEIGHT);
         GC gc = e.gc;
         int currentX = 0;

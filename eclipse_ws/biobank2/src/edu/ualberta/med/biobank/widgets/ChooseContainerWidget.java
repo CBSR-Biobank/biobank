@@ -54,8 +54,8 @@ public class ChooseContainerWidget extends AbstractGridContainerWidget {
     }
 
     @Override
-    protected void paintPalette(PaintEvent e) {
-        super.paintPalette(e);
+    protected void paintGrid(PaintEvent e) {
+        super.paintGrid(e);
         if (hasLegend) {
             for (int i = 0; i < legendStatus.size(); i++) {
                 ContainerStatus status = legendStatus.get(i);

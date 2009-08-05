@@ -109,7 +109,7 @@ public class ModelUtils {
                 String binPosition = LabelingScheme.rowColToTwoCharAlpha(
                     new RowColPos(dim1, dim2), type);
                 return position.getContainer().getLabel() + binPosition;
-            } else if (type.getName().equals("Palette")) {
+            } else if (type.getName().equals("Pallet")) {
                 return position.getContainer().getLabel() + dim1String
                     + dim2String;
             }
