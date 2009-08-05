@@ -83,8 +83,7 @@ public class ContainerViewForm extends BiobankViewForm {
         addRefreshToolbarAction();
         createContainerSection();
 
-        if (container.getContainerType().getChildContainerTypeCollection()
-            .size() == 0) {
+        if (container.getContainerType().getSampleTypeCollection().size() > 0) {
             // only show samples section this if this container type does not
             // have child containers
             createSamplesSection();
