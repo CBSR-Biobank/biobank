@@ -260,9 +260,9 @@
             name="Container View">
       </editor>
       <editor
-            class="edu.ualberta.med.biobank.forms.AddPaletteSamplesEntryForm"
+            class="edu.ualberta.med.biobank.forms.AddPalletSamplesEntryForm"
             default="false"
-            id="edu.ualberta.med.biobank.forms.AddPaletteSamplesEntryForm"
+            id="edu.ualberta.med.biobank.forms.AddPalletSamplesEntryForm"
             name="Add Palette Samples Entry">
       </editor>
       <editor

@@ -87,7 +87,7 @@ public class TopContainerChooserPage extends AbstractContainerChooserPage {
     protected ContainerCell positionSelection(MouseEvent e) {
         ContainerCell cell = super.positionSelection(e);
         if (cell != null) {
-            PalettePositionChooserPage nextPage = (PalettePositionChooserPage) getNextPage();
+            PalletPositionChooserPage nextPage = (PalletPositionChooserPage) getNextPage();
             try {
                 nextPage.setCurrentContainer(cell.getPosition().getContainer());
             } catch (ArrayIndexOutOfBoundsException aiobe) {
@@ -106,7 +106,7 @@ public class TopContainerChooserPage extends AbstractContainerChooserPage {
         }
         int total = 0;
         if (!full) {
-            // check if we can add a palette in the hotel
+            // check if we can add a pallet in the hotel
             if (occupiedContainer.getChildPositionCollection() != null) {
                 total = occupiedContainer.getChildPositionCollection().size();
             }

@@ -21,7 +21,7 @@ import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.ContainerStatus;
 import edu.ualberta.med.biobank.model.ContainerType;
 
-public class PalettePositionChooserPage extends AbstractContainerChooserPage {
+public class PalletPositionChooserPage extends AbstractContainerChooserPage {
 
     public static final String NAME = "HOTEL_CONTAINER";
     private ContainerPosition selectedPosition;
@@ -30,7 +30,7 @@ public class PalettePositionChooserPage extends AbstractContainerChooserPage {
     private ComboViewer comboViewer;
     private Combo combo;
 
-    protected PalettePositionChooserPage() {
+    protected PalletPositionChooserPage() {
         super(NAME);
         setDescription("Choose position in container");
         gridWidth = 60;

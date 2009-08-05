@@ -16,18 +16,18 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 
-import edu.ualberta.med.biobank.model.PaletteCell;
+import edu.ualberta.med.biobank.model.PalletCell;
 import edu.ualberta.med.biobank.model.SampleCellStatus;
-import edu.ualberta.med.biobank.widgets.listener.ScanPaletteModificationEvent;
+import edu.ualberta.med.biobank.widgets.listener.ScanPalletModificationEvent;
 
 /**
- * Widget to draw a palette for add palette samples screen. Can do selections
- * inside the palette to assign a type
+ * Widget to draw a pallet for add pallet samples screen. Can do selections
+ * inside the pallet to assign a type
  */
-public class AddSamplesScanPaletteWidget extends ScanPaletteWidget {
+public class AddSamplesScanPalletWidget extends ScanPalletWidget {
 
-    private List<PaletteCell> selectedCells;
-    private PaletteCell lastSelectedCell;
+    private List<PalletCell> selectedCells;
+    private PalletCell lastSelectedCell;
     private boolean selectionTrackOn = false;
     private SelectionMode selectionMode = SelectionMode.NONE;
 
@@ -38,9 +38,9 @@ public class AddSamplesScanPaletteWidget extends ScanPaletteWidget {
         NONE, MULTI, RANGE;
     }
 
-    public AddSamplesScanPaletteWidget(Composite parent) {
+    public AddSamplesScanPalletWidget(Composite parent) {
         super(parent);
-        selectedCells = new ArrayList<PaletteCell>();
+        selectedCells = new ArrayList<PalletCell>();
         initListeners();
     }
 
@@ -51,11 +51,11 @@ public class AddSamplesScanPaletteWidget extends ScanPaletteWidget {
         statusAvailable.add(SampleCellStatus.EMPTY);
         statusAvailable.add(SampleCellStatus.NO_TYPE);
         statusAvailable.add(SampleCellStatus.TYPE);
-        legendWidth = PALETTE_WIDTH / statusAvailable.size();
+        legendWidth = PALLET_WIDTH / statusAvailable.size();
     }
 
     public void clearSelection() {
-        for (PaletteCell cell : selectedCells) {
+        for (PalletCell cell : selectedCells) {
             cell.setSelected(false);
         }
         notifyListeners();
@@ -63,12 +63,12 @@ public class AddSamplesScanPaletteWidget extends ScanPaletteWidget {
     }
 
     private void notifyListeners() {
-        notifyListeners(new ScanPaletteModificationEvent(this, selectedCells
+        notifyListeners(new ScanPalletModificationEvent(this, selectedCells
             .size()));
     }
 
-    private void addAllCellsInRange(PaletteCell cell) {
-        PaletteCell lastSelected = selectedCells.get(selectedCells.size() - 1);
+    private void addAllCellsInRange(PalletCell cell) {
+        PalletCell lastSelected = selectedCells.get(selectedCells.size() - 1);
         int startRow = lastSelected.getRow();
         int endRow = cell.getRow();
         if (startRow > endRow) {
@@ -83,7 +83,7 @@ public class AddSamplesScanPaletteWidget extends ScanPaletteWidget {
                 endCol = lastSelected.getColumn();
             }
             for (int indexCol = startCol; indexCol <= endCol; indexCol++) {
-                PaletteCell cellToAdd = scannedElements[indexRow][indexCol];
+                PalletCell cellToAdd = scannedElements[indexRow][indexCol];
                 if (cellToAdd != null && cellToAdd.getValue() != null) {
                     if (!selectedCells.contains(cellToAdd)) {
                         cellToAdd.setSelected(true);
@@ -109,7 +109,7 @@ public class AddSamplesScanPaletteWidget extends ScanPaletteWidget {
         }
     }
 
-    public List<PaletteCell> getSelectedCells() {
+    public List<PalletCell> getSelectedCells() {
         return selectedCells;
     }
 
@@ -122,9 +122,9 @@ public class AddSamplesScanPaletteWidget extends ScanPaletteWidget {
         removeMouseListener(selectionMouseListener);
         removeMouseTrackListener(selectionMouseTrackListener);
         clearSelection();
-        for (PaletteCell[] rowCells : scannedElements) {
-            for (PaletteCell cell : rowCells) {
-                if (PaletteCell.hasValue(cell)) {
+        for (PalletCell[] rowCells : scannedElements) {
+            for (PalletCell cell : rowCells) {
+                if (PalletCell.hasValue(cell)) {
                     cell.setType(null);
                     cell.setStatus(SampleCellStatus.NEW);
                 }
@@ -138,7 +138,7 @@ public class AddSamplesScanPaletteWidget extends ScanPaletteWidget {
             public void mouseDown(MouseEvent e) {
                 selectionTrackOn = true;
                 if (scannedElements != null) {
-                    PaletteCell cell = getCellAtCoordinates(e.x, e.y);
+                    PalletCell cell = getCellAtCoordinates(e.x, e.y);
                     if (cell != null && cell.getValue() != null) {
                         switch (selectionMode) {
                         case MULTI:
@@ -180,7 +180,7 @@ public class AddSamplesScanPaletteWidget extends ScanPaletteWidget {
             @Override
             public void mouseHover(MouseEvent e) {
                 if (selectionTrackOn) {
-                    PaletteCell cell = getCellAtCoordinates(e.x, e.y);
+                    PalletCell cell = getCellAtCoordinates(e.x, e.y);
                     if (cell != null && !cell.equals(lastSelectedCell)) {
                         selectedCells.add(cell);
                         cell.setSelected(true);
@@ -211,9 +211,9 @@ public class AddSamplesScanPaletteWidget extends ScanPaletteWidget {
     }
 
     public boolean isEverythingTyped() {
-        for (PaletteCell[] rowCells : scannedElements) {
-            for (PaletteCell cell : rowCells) {
-                if (PaletteCell.hasValue(cell) && cell.getType() == null) {
+        for (PalletCell[] rowCells : scannedElements) {
+            for (PalletCell cell : rowCells) {
+                if (PalletCell.hasValue(cell) && cell.getType() == null) {
                     return false;
                 }
             }

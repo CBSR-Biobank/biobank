@@ -9,7 +9,7 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class ContainerChooserWizard extends Wizard {
 	private TopContainerChooserPage containerChooserPage;
-	private PalettePositionChooserPage paletteChooserPage;
+	private PalletPositionChooserPage palletChooserPage;
 	private Site site;
 	private WritableApplicationService appService;
 
@@ -24,9 +24,9 @@ public class ContainerChooserWizard extends Wizard {
 	@Override
 	public void addPages() {
 		containerChooserPage = new TopContainerChooserPage();
-		paletteChooserPage = new PalettePositionChooserPage();
+		palletChooserPage = new PalletPositionChooserPage();
 		addPage(containerChooserPage);
-		addPage(paletteChooserPage);
+		addPage(palletChooserPage);
 	}
 
 	@Override
@@ -43,10 +43,10 @@ public class ContainerChooserWizard extends Wizard {
 	}
 
 	public ContainerPosition getSelectedPosition() {
-		return paletteChooserPage.getSelectedPosition();
+		return palletChooserPage.getSelectedPosition();
 	}
 
 	public ContainerType getContainerType() {
-		return paletteChooserPage.getContainerType();
+		return palletChooserPage.getContainerType();
 	}
 }

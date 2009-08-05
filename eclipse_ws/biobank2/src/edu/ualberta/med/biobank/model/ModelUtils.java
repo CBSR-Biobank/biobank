@@ -39,16 +39,16 @@ public class ModelUtils {
         return list.get(0);
     }
 
-    public static Object getObjectWithAttr(
-        WritableApplicationService appService, Class<?> classType, String attr,
-        Object value) throws Exception {
+    public static <E> E getObjectWithAttr(
+        WritableApplicationService appService, Class<E> classType, String attr,
+        Class<?> attrType, Object value) throws Exception {
         Constructor<?> constructor = classType.getConstructor();
         Object instance = constructor.newInstance();
         attr = "set" + attr.substring(0, 1).toUpperCase() + attr.substring(1);
-        Method setIdMethod = classType.getMethod(attr, Integer.class);
-        setIdMethod.invoke(instance, value);
+        Method setMethod = classType.getMethod(attr, attrType);
+        setMethod.invoke(instance, value);
 
-        List<?> list = appService.search(classType, instance);
+        List<E> list = appService.search(classType, instance);
         Assert.isTrue(list.size() == 1);
         return list.get(0);
     }
@@ -109,7 +109,7 @@ public class ModelUtils {
                 String binPosition = LabelingScheme.rowColToTwoCharAlpha(
                     new RowColPos(dim1, dim2), type);
                 return position.getContainer().getLabel() + binPosition;
-            } else if (type.getName().equals("Palette")) {
+            } else if (type.getName().equals("Pallet")) {
                 return position.getContainer().getLabel() + dim1String
                     + dim2String;
             }
