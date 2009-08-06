@@ -288,10 +288,9 @@ public class ContainerViewForm extends BiobankViewForm {
 
     private void createSamplesSection() {
         Composite parent = createSectionWithClient("Samples");
-        samplesWidget = new SamplesListWidget(parent, null);
-        samplesWidget.adaptToToolkit(toolkit, true);
-        samplesWidget.setSamplePositions(container
+        samplesWidget = new SamplesListWidget(parent, container
             .getSamplePositionCollection());
+        samplesWidget.adaptToToolkit(toolkit, true);
     }
 
     @Override

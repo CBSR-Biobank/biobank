@@ -23,6 +23,7 @@ import org.eclipse.ui.forms.widgets.Section;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.treeview.AdaptorBase;
 import edu.ualberta.med.biobank.treeview.ClinicAdapter;
+import edu.ualberta.med.biobank.widgets.BiobankCollectionModel;
 import edu.ualberta.med.biobank.widgets.BiobankCollectionTable;
 
 /**
@@ -73,22 +74,56 @@ public class FormUtils {
     }
 
     public static BiobankCollectionTable createClinicSection(
-        FormToolkit toolkit, Composite parent, AdaptorBase clinicGroupParent,
-        Collection<Clinic> clinics) {
+        FormToolkit toolkit, Composite parent,
+        final AdaptorBase clinicGroupParent, final Collection<Clinic> clinics) {
         Section section = toolkit.createSection(parent, Section.TWISTIE
             | Section.TITLE_BAR | Section.EXPANDED);
         section.setText("Clinics");
         section.setLayout(new GridLayout(1, false));
         section.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
+        final BiobankCollectionModel[] model = new BiobankCollectionModel[clinics
+            .size()];
+        for (int i = 0, n = clinics.size(); i < n; ++i) {
+            model[i] = new BiobankCollectionModel();
+        }
+
         String[] headings = { "Name", "Num Studies" };
-        BiobankCollectionTable comp = new BiobankCollectionTable(section,
-            SWT.NONE, headings, getClinicsAdapters(clinicGroupParent, clinics));
+        final BiobankCollectionTable comp = new BiobankCollectionTable(section,
+            SWT.NONE, headings, model);
         section.setClient(comp);
         comp.adaptToToolkit(toolkit);
         toolkit.paintBordersFor(comp);
         comp.getTableViewer().addDoubleClickListener(
             getBiobankCollectionDoubleClickListener());
+
+        // getClinicsAdapters(clinicGroupParent, clinics)
+        Thread t = new Thread() {
+            @Override
+            public void run() {
+                int count = 0;
+                for (Clinic clinic : clinics) {
+                    if (comp.getTableViewer().getTable().isDisposed()) {
+                        return;
+                    }
+                    final int j = count;
+                    final Clinic c = clinic;
+                    comp.getTableViewer().getTable().getDisplay().asyncExec(
+                        new Runnable() {
+
+                            public void run() {
+                                model[j].o = new ClinicAdapter(
+                                    clinicGroupParent, c);
+                                comp.getTableViewer().update(model[j], null);
+                            }
+
+                        });
+                    ++count;
+                }
+            }
+        };
+        t.start();
+
         return comp;
     }
 

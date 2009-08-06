@@ -160,9 +160,9 @@ public class PatientVisitViewForm extends BiobankViewForm {
         Composite parent = createSectionWithClient("Samples");
         samplesWidget = new SamplesListWidget(parent,
             (SiteAdapter) patientVisitAdapter
-                .getParentFromClass(SiteAdapter.class));
+                .getParentFromClass(SiteAdapter.class), patientVisit
+                .getSampleCollection());
         samplesWidget.adaptToToolkit(toolkit, true);
-        samplesWidget.setSamples(patientVisit.getSampleCollection());
         samplesWidget.setSelection(patientVisitAdapter.getSelectedSample());
     }
 
@@ -176,7 +176,6 @@ public class PatientVisitViewForm extends BiobankViewForm {
             + BioBankPlugin.getDateTimeFormatter().format(
                 patientVisit.getDateDrawn()));
         setPatientVisitValues();
-        samplesWidget.setSamples(patientVisit.getSampleCollection());
     }
 
     private void retrievePatientVisit() {
