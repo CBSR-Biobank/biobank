@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -42,8 +41,6 @@ public class SamplesListWidget extends BiobankCollectionTable {
         super(parent, SWT.NONE, headings, bounds, null);
         GridData tableData = ((GridData) getLayoutData());
         tableData.heightHint = 500;
-
-        getTableViewer().setContentProvider(new ArrayContentProvider());
 
         samples = new HashMap<Integer, Sample>();
         model = new BiobankCollectionModel[sampleSize];
