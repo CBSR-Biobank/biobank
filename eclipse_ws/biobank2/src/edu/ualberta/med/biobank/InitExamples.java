@@ -222,23 +222,23 @@ public class InitExamples {
             numSchemeMap.get("SBS Standard"));
         hotel13Type = insertContainerTypeInSite("Hotel-13", 13, 1, Arrays
             .asList(new ContainerType[] { palletType }), numSchemeMap
-            .get("CBSR 2 char alphabetic"));
+            .get("2 char numeric"));
         hotel19Type = insertContainerTypeInSite("Hotel-19", 19, 1, Arrays
             .asList(new ContainerType[] { palletType }), numSchemeMap
-            .get("CBSR 2 char alphabetic"));
+            .get("2 char numeric"));
         freezerType = insertContainerTypeInSite("Freezer", 3, 10, Arrays
             .asList(new ContainerType[] { hotel13Type, hotel19Type }),
-            numSchemeMap.get("2 char numeric"));
+            numSchemeMap.get("CBSR 2 char alphabetic"));
 
         // Cabinet Types
         binType = insertContainerTypeInSite("Bin", 120, 1, null, numSchemeMap
-            .get("2 char numeric"));
+            .get("CBSR 2 char alphabetic"));
         drawerType = insertContainerTypeInSite("Drawer", 36, 1, Arrays
             .asList(new ContainerType[] { binType }), numSchemeMap
-            .get("CBSR 2 char alphabetic"));
+            .get("2 char numeric"));
         insertContainerTypeInSite("Cabinet", 4, 1, Arrays
             .asList(new ContainerType[] { drawerType }), numSchemeMap
-            .get("2 char numeric"));
+            .get("CBSR 2 char alphabetic"));
     }
 
     private ContainerType insertContainerTypeInSite(String name, int dim1,
