@@ -96,7 +96,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         patientVisitAdapter = (PatientVisitAdapter) adaptor;
         patientVisit = patientVisitAdapter.getPatientVisit();
         appService = patientVisitAdapter.getAppService();
-
+        viewFormId = PatientVisitViewForm.ID;
         String tabName;
         if (patientVisit.getId() == null) {
             tabName = "New Patient Visit";
@@ -371,7 +371,6 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         savePvInfoData();
 
         patientAdapter.performExpand();
-        getSite().getPage().closeEditor(this, false);
     }
 
     private void savePvInfoData() throws Exception {

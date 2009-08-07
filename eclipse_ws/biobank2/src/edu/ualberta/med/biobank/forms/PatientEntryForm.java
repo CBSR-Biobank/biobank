@@ -49,7 +49,7 @@ public class PatientEntryForm extends BiobankEntryForm {
         patientAdapter = (PatientAdapter) adaptor;
         appService = patientAdapter.getAppService();
         patient = patientAdapter.getPatient();
-
+        viewFormId = PatientViewForm.ID;
         String tabName;
         if (patient.getId() == null) {
             tabName = "New Patient";
@@ -136,7 +136,6 @@ public class PatientEntryForm extends BiobankEntryForm {
         patient = (Patient) result.getObjectResult();
 
         patientAdapter.getParent().performExpand();
-        getSite().getPage().closeEditor(this, false);
     }
 
     private boolean checkPatientNumberUnique() throws ApplicationException {

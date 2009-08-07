@@ -48,6 +48,7 @@ public class SiteEntryForm extends AddressEntryFormCommon {
 
         siteAdapter = (SiteAdapter) adaptor;
         site = siteAdapter.getSite();
+        viewFormId = SiteViewForm.ID;
 
         String tabName;
         if (site.getId() == null) {
@@ -163,7 +164,7 @@ public class SiteEntryForm extends AddressEntryFormCommon {
             site = (Site) result.getObjectResult();
 
             siteAdapter.getParent().performExpand();
-            getSite().getPage().closeEditor(this, false);
+
         } catch (final RemoteAccessException exp) {
             BioBankPlugin.openRemoteAccessErrorMessage();
         } catch (Exception e) {
