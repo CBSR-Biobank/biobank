@@ -101,7 +101,7 @@ public class PalletPositionChooserPage extends AbstractContainerChooserPage {
     protected ContainerCell positionSelection(MouseEvent e) {
         boolean complete = false;
         ContainerCell cell = containerWidget.getPositionAtCoordinates(e.x, e.y);
-        if (cell.getStatus() == ContainerStatus.EMPTY) {
+        if (cell.getStatus() == ContainerStatus.NOT_INITIALIZED) {
             this.selectedPosition = cell.getPosition();
             int positionText = selectedPosition.getPositionDimensionOne() + 1;
             textPosition.setText(String.valueOf(positionText));
@@ -132,9 +132,9 @@ public class PalletPositionChooserPage extends AbstractContainerChooserPage {
     @Override
     protected void setStatus(ContainerCell cell, Container occupiedContainer) {
         if (occupiedContainer == null) {
-            cell.setStatus(ContainerStatus.EMPTY);
+            cell.setStatus(ContainerStatus.NOT_INITIALIZED);
         } else {
-            cell.setStatus(ContainerStatus.FILLED);
+            cell.setStatus(ContainerStatus.INITIALIZED);
         }
     }
 
@@ -145,7 +145,7 @@ public class PalletPositionChooserPage extends AbstractContainerChooserPage {
                 if (cells[i][j] == null) {
                     ContainerCell cell = new ContainerCell(
                         newContainerPosition(i, j));
-                    cell.setStatus(ContainerStatus.EMPTY);
+                    cell.setStatus(ContainerStatus.NOT_INITIALIZED);
                     cells[i][j] = cell;
                 }
             }
