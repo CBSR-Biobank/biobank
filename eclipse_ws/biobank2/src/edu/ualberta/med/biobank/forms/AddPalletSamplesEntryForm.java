@@ -51,7 +51,6 @@ import edu.ualberta.med.biobank.widgets.listener.ScanPalletModificationEvent;
 import edu.ualberta.med.biobank.widgets.listener.ScanPalletModificationListener;
 import edu.ualberta.med.scanlib.ScanCell;
 import edu.ualberta.med.scanlib.ScanLib;
-import edu.ualberta.med.scanlib.ScanLibFactory;
 import gov.nih.nci.system.query.SDKQuery;
 import gov.nih.nci.system.query.example.InsertExampleQuery;
 
@@ -396,9 +395,8 @@ public class AddPalletSamplesEntryForm extends BiobankEntryForm {
                     if (BioBankPlugin.isRealScanEnabled()) {
                         int plateNum = BioBankPlugin.getDefault()
                             .getPlateNumber(plateToScan.getValue().toString());
-                        ScanLib scanLib = ScanLibFactory.getScanLib();
-                        int r = scanLib
-                            .slDecodePlate(ScanLib.DPI_300, plateNum);
+                        int r = ScanLib.getInstance().slDecodePlate(
+                            ScanLib.DPI_300, plateNum);
                         if (r < 0) {
                             BioBankPlugin.openError("Scanner",
                                 "Could not decode image. Return code is: " + r);

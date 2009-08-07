@@ -23,6 +23,7 @@ import gov.nih.nci.system.query.example.InsertExampleQuery;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 import java.lang.reflect.Constructor;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -164,14 +165,17 @@ public class InitExamples {
             new SampleType()).get(0);
     }
 
-    private void insertPatientVisitsInPatient() throws ApplicationException {
+    private void insertPatientVisitsInPatient() throws Exception {
         patientVisits = new ArrayList<PatientVisit>();
         Random r = new Random();
         for (Patient patient : patients) {
             PatientVisit patientVisit = new PatientVisit();
             patientVisit.setClinic(clinics[0]);
-            patientVisit.setDateDrawn(new Date(2009 - 1900, 01, 25, r
-                .nextInt(24), r.nextInt(60)));
+            String dateStr = String.format("2009-%02d-25 %02d:%02d", r
+                .nextInt(12) + 1, r.nextInt(24), r.nextInt(60));
+            SimpleDateFormat sdf = new SimpleDateFormat(
+                BioBankPlugin.DATE_TIME_FORMAT);
+            patientVisit.setDateDrawn(sdf.parse(dateStr));
 
             patientVisit.setPatient(patient);
             SDKQueryResult res = appService
