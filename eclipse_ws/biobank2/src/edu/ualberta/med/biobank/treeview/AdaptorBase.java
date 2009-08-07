@@ -254,6 +254,11 @@ public abstract class AdaptorBase {
 
     public abstract void popupMenu(TreeViewer tv, Tree tree, Menu menu);
 
+    /**
+     * Called to load it's children;
+     * 
+     * @param updateNode If not null, the node in the treeview to update.
+     */
     public abstract void loadChildren(boolean updateNode);
 
     public static void closeEditor(FormInput input) {

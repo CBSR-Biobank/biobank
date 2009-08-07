@@ -97,7 +97,6 @@ public class FormUtils {
         comp.getTableViewer().addDoubleClickListener(
             getBiobankCollectionDoubleClickListener());
 
-        // getClinicsAdapters(clinicGroupParent, clinics)
         Thread t = new Thread() {
             @Override
             public void run() {
@@ -107,13 +106,13 @@ public class FormUtils {
                         return;
                     }
                     final int j = count;
-                    final Clinic c = clinic;
+                    final ClinicAdapter clinicAdapter = new ClinicAdapter(
+                        clinicGroupParent, clinic);
                     comp.getTableViewer().getTable().getDisplay().asyncExec(
                         new Runnable() {
 
                             public void run() {
-                                model[j].o = new ClinicAdapter(
-                                    clinicGroupParent, c);
+                                model[j].o = clinicAdapter;
                                 comp.getTableViewer().update(model[j], null);
                             }
 
@@ -149,7 +148,16 @@ public class FormUtils {
                 Object selection = event.getSelection();
                 Object element = ((StructuredSelection) selection)
                     .getFirstElement();
-                ((AdaptorBase) element).performDoubleClick();
+                if (element instanceof AdaptorBase) {
+                    ((AdaptorBase) element).performDoubleClick();
+                } else if (element instanceof BiobankCollectionModel) {
+                    BiobankCollectionModel item = (BiobankCollectionModel) element;
+                    if (item.o != null) {
+                        if (item.o instanceof AdaptorBase) {
+                            ((AdaptorBase) item.o).performDoubleClick();
+                        }
+                    }
+                }
             }
         };
     }

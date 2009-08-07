@@ -60,16 +60,7 @@ public class StudyGroup extends AdaptorBase {
             ((SiteAdapter) getParent()).setSite(currentSite);
 
             Collection<Study> studies = currentSite.getStudyCollection();
-            SessionManager.getLogger().trace(
-                "updateStudies: Site " + currentSite.getName() + " has "
-                    + studies.size() + " studies");
-
             for (Study study : studies) {
-                SessionManager.getLogger().trace(
-                    "updateStudies: Study " + study.getId() + ": "
-                        + study.getName() + ", short name: "
-                        + study.getNameShort());
-
                 StudyAdapter node = (StudyAdapter) getChild(study.getId());
 
                 if (node == null) {

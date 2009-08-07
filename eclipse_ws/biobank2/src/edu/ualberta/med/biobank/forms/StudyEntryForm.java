@@ -120,7 +120,7 @@ public class StudyEntryForm extends BiobankEntryForm {
         if (study.getId() == null) {
             tabName = "New Study";
         } else {
-            tabName = "Study " + study.getName();
+            tabName = "Study " + study.getNameShort();
         }
         setPartName(tabName);
     }

@@ -48,7 +48,7 @@ public class StudyViewForm extends BiobankViewForm {
         // retrieve info from database because could have been modified
         // after first opening
         retrieveStudy();
-        setPartName("Study " + study.getName());
+        setPartName("Study " + study.getNameShort());
     }
 
     @Override
@@ -167,7 +167,7 @@ public class StudyViewForm extends BiobankViewForm {
     @Override
     protected void reload() {
         retrieveStudy();
-        setPartName("Study " + study.getName());
+        setPartName("Study " + study.getNameShort());
         form.setText("Study: " + study.getName());
         setStudySectionValues();
         AdaptorBase clinicGroupNode = ((SiteAdapter) studyAdapter.getParent()
