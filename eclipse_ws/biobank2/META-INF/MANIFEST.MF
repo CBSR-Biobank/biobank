@@ -16,7 +16,7 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.core.expressions;bundle-version="3.4.100"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Bundle-NativeCode: scanlib.dll;selection-filter="(&(osgi.arch=x86)(osgi.os=win32))"
+Bundle-NativeCode: scanlib.dll;selection-filter="(&(osgi.arch=x86)(osgi.os=win32))",*
 Bundle-ClassPath: lib/acegi-security-1.0.4.jar,
  lib/antlr-2.7.6.jar,
  lib/asm.jar,
