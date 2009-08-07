@@ -14,11 +14,11 @@ import edu.ualberta.med.biobank.forms.ClinicViewForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Clinic;
 
-public class ClinicAdapter extends AdaptorBase {
+public class ClinicAdapter extends AdapterBase {
 
 	private Clinic clinic;
 
-	public ClinicAdapter(AdaptorBase parent, Clinic clinic) {
+	public ClinicAdapter(AdapterBase parent, Clinic clinic) {
 		super(parent);
 		this.clinic = clinic;
 	}
@@ -32,7 +32,7 @@ public class ClinicAdapter extends AdaptorBase {
 	}
 
 	@Override
-	public void addChild(AdaptorBase child) {
+	public void addChild(AdapterBase child) {
 		Assert.isTrue(false, "Cannot add children to this adapter");
 	}
 
@@ -89,7 +89,7 @@ public class ClinicAdapter extends AdaptorBase {
 	}
 
 	@Override
-	public AdaptorBase accept(NodeSearchVisitor visitor) {
+	public AdapterBase accept(NodeSearchVisitor visitor) {
 		return null;
 	}
 

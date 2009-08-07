@@ -21,7 +21,7 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.model.Clinic;
-import edu.ualberta.med.biobank.treeview.AdaptorBase;
+import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.ClinicAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankCollectionModel;
 import edu.ualberta.med.biobank.widgets.BiobankCollectionTable;
@@ -75,7 +75,7 @@ public class FormUtils {
 
     public static BiobankCollectionTable createClinicSection(
         FormToolkit toolkit, Composite parent,
-        final AdaptorBase clinicGroupParent, final Collection<Clinic> clinics) {
+        final AdapterBase clinicGroupParent, final Collection<Clinic> clinics) {
         Section section = toolkit.createSection(parent, Section.TWISTIE
             | Section.TITLE_BAR | Section.EXPANDED);
         section.setText("Clinics");
@@ -127,7 +127,7 @@ public class FormUtils {
     }
 
     public static ClinicAdapter[] getClinicsAdapters(
-        AdaptorBase clinicGroupParent, Collection<Clinic> clinics) {
+        AdapterBase clinicGroupParent, Collection<Clinic> clinics) {
         ClinicAdapter[] clinicAdapters = new ClinicAdapter[clinics.size()];
 
         int count = 0;
@@ -148,13 +148,13 @@ public class FormUtils {
                 Object selection = event.getSelection();
                 Object element = ((StructuredSelection) selection)
                     .getFirstElement();
-                if (element instanceof AdaptorBase) {
-                    ((AdaptorBase) element).performDoubleClick();
+                if (element instanceof AdapterBase) {
+                    ((AdapterBase) element).performDoubleClick();
                 } else if (element instanceof BiobankCollectionModel) {
                     BiobankCollectionModel item = (BiobankCollectionModel) element;
                     if (item.o != null) {
-                        if (item.o instanceof AdaptorBase) {
-                            ((AdaptorBase) item.o).performDoubleClick();
+                        if (item.o instanceof AdapterBase) {
+                            ((AdapterBase) item.o).performDoubleClick();
                         }
                     }
                 }

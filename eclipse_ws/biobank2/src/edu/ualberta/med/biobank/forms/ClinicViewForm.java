@@ -16,7 +16,7 @@ import org.springframework.util.Assert;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Study;
-import edu.ualberta.med.biobank.treeview.AdaptorBase;
+import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.ClinicAdapter;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankCollectionTable;
@@ -26,6 +26,7 @@ public class ClinicViewForm extends AddressViewFormCommon {
     public static final String ID = "edu.ualberta.med.biobank.forms.ClinicViewForm";
 
     private ClinicAdapter clinicAdapter;
+
     private Clinic clinic;
 
     private BiobankCollectionTable studiesTable;
@@ -35,7 +36,7 @@ public class ClinicViewForm extends AddressViewFormCommon {
     private Label commentLabel;
 
     @Override
-    protected void init(AdaptorBase adapter) {
+    protected void init() {
         Assert.isTrue(adapter instanceof ClinicAdapter,
             "Invalid editor input: object of type "
                 + adapter.getClass().getName());
@@ -131,7 +132,7 @@ public class ClinicViewForm extends AddressViewFormCommon {
         edit.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                AdaptorBase.openForm(new FormInput(clinicAdapter),
+                AdapterBase.openForm(new FormInput(clinicAdapter),
                     ClinicEntryForm.ID);
             }
         });

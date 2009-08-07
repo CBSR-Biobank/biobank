@@ -19,7 +19,7 @@ import edu.ualberta.med.biobank.model.PvInfo;
 import edu.ualberta.med.biobank.model.Sample;
 import edu.ualberta.med.biobank.model.SampleStorage;
 import edu.ualberta.med.biobank.model.Study;
-import edu.ualberta.med.biobank.treeview.AdaptorBase;
+import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.ClinicAdapter;
 import edu.ualberta.med.biobank.treeview.ContainerTypeAdapter;
 import edu.ualberta.med.biobank.treeview.PatientAdapter;
@@ -170,7 +170,7 @@ public class BiobankLabelProvider extends LabelProvider implements
         } else if (element instanceof ContainerLabelingScheme) {
             return ((ContainerLabelingScheme) element).getName();
         }
-        return ((AdaptorBase) element).getName();
+        return ((AdapterBase) element).getName();
     }
 
     @Override

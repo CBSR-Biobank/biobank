@@ -42,7 +42,7 @@ import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.Sample;
 import edu.ualberta.med.biobank.model.SampleCellStatus;
 import edu.ualberta.med.biobank.model.SampleType;
-import edu.ualberta.med.biobank.treeview.AdaptorBase;
+import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.PatientVisitAdapter;
 import edu.ualberta.med.biobank.validators.ScannerBarcodeValidator;
 import edu.ualberta.med.biobank.widgets.AddSamplesScanPalletWidget;
@@ -94,14 +94,13 @@ public class AddPalletSamplesEntryForm extends BiobankEntryForm {
     private static boolean testDisposeOn = true;
 
     @Override
-    protected void init(AdaptorBase adapter) {
+    protected void init() {
         Assert.isTrue((adapter instanceof PatientVisitAdapter),
             "Invalid editor input: object of type "
                 + adapter.getClass().getName());
 
         pvAdapter = (PatientVisitAdapter) adapter;
         patientVisit = pvAdapter.getPatientVisit();
-        appService = pvAdapter.getAppService();
         setPartName("Adding samples for patient "
             + patientVisit.getPatient().getNumber() + " for visit "
             + patientVisit.getDateDrawn());
@@ -529,7 +528,7 @@ public class AddPalletSamplesEntryForm extends BiobankEntryForm {
         doSaveInternal();
         getSite().getPage().closeEditor(AddPalletSamplesEntryForm.this, false);
         pvAdapter.performExpand();
-        AdaptorBase.openForm(new FormInput(pvAdapter), PatientVisitViewForm.ID);
+        AdapterBase.openForm(new FormInput(pvAdapter), PatientVisitViewForm.ID);
     }
 
     private void print() {
@@ -548,7 +547,7 @@ public class AddPalletSamplesEntryForm extends BiobankEntryForm {
         testDisposeOn = false;
         doSaveInternal();
         getSite().getPage().closeEditor(AddPalletSamplesEntryForm.this, false);
-        AdaptorBase.openForm(new FormInput(pvAdapter),
+        AdapterBase.openForm(new FormInput(pvAdapter),
             AddPalletSamplesEntryForm.ID);
     }
 

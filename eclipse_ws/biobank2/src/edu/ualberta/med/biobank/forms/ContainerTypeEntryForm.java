@@ -28,7 +28,6 @@ import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.model.Site;
-import edu.ualberta.med.biobank.treeview.AdaptorBase;
 import edu.ualberta.med.biobank.treeview.ContainerTypeAdapter;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.validators.DoubleNumber;
@@ -38,7 +37,6 @@ import edu.ualberta.med.biobank.widgets.MultiSelect;
 import edu.ualberta.med.biobank.widgets.listener.MultiSelectEvent;
 import edu.ualberta.med.biobank.widgets.listener.MultiSelectListener;
 import gov.nih.nci.system.applicationservice.ApplicationException;
-import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.SDKQuery;
 import gov.nih.nci.system.query.SDKQueryResult;
 import gov.nih.nci.system.query.example.InsertExampleQuery;
@@ -89,13 +87,12 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
     }
 
     @Override
-    public void init(AdaptorBase adaptor) {
-        Assert.isTrue((adaptor instanceof ContainerTypeAdapter),
+    public void init() {
+        Assert.isTrue((adapter instanceof ContainerTypeAdapter),
             "Invalid editor input: object of type "
-                + adaptor.getClass().getName());
+                + adapter.getClass().getName());
 
-        containerTypeAdapter = (ContainerTypeAdapter) adaptor;
-        appService = containerTypeAdapter.getAppService();
+        containerTypeAdapter = (ContainerTypeAdapter) adapter;
         containerType = containerTypeAdapter.getContainerType();
         site = ((SiteAdapter) containerTypeAdapter
             .getParentFromClass(SiteAdapter.class)).getSite();
@@ -385,8 +382,6 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
     }
 
     private boolean checkContainerTypeNameUnique() throws ApplicationException {
-        WritableApplicationService appService = containerTypeAdapter
-            .getAppService();
         HQLCriteria c = new HQLCriteria(
             "from edu.ualberta.med.biobank.model.ContainerType as st "
                 + "inner join fetch st.site " + "where st.site.id='"

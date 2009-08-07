@@ -17,7 +17,6 @@ import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.SampleType;
-import edu.ualberta.med.biobank.treeview.AdaptorBase;
 import edu.ualberta.med.biobank.treeview.ContainerTypeAdapter;
 import edu.ualberta.med.biobank.widgets.CabinetDrawerWidget;
 import edu.ualberta.med.biobank.widgets.ChooseContainerWidget;
@@ -55,13 +54,12 @@ public class ContainerTypeViewForm extends BiobankViewForm {
     }
 
     @Override
-    public void init(AdaptorBase adaptor) {
-        Assert.isTrue(adaptor instanceof ContainerTypeAdapter,
+    public void init() {
+        Assert.isTrue(adapter instanceof ContainerTypeAdapter,
             "Invalid editor input: object of type "
-                + adaptor.getClass().getName());
+                + adapter.getClass().getName());
 
-        containerTypeAdapter = (ContainerTypeAdapter) adaptor;
-        appService = containerTypeAdapter.getAppService();
+        containerTypeAdapter = (ContainerTypeAdapter) adapter;
         retrieveContainerType();
         setPartName("Container Type " + containerType.getName());
     }

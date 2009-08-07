@@ -15,7 +15,7 @@ import edu.ualberta.med.biobank.model.ModelUtils;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.PvInfo;
 import edu.ualberta.med.biobank.model.Study;
-import edu.ualberta.med.biobank.treeview.AdaptorBase;
+import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.PatientAdapter;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
@@ -38,12 +38,12 @@ public class StudyViewForm extends BiobankViewForm {
     private BiobankCollectionTable pvInfosTable;
 
     @Override
-    public void init(AdaptorBase adaptor) {
-        Assert.isTrue((adaptor instanceof StudyAdapter),
+    public void init() {
+        Assert.isTrue((adapter instanceof StudyAdapter),
             "Invalid editor input: object of type "
-                + adaptor.getClass().getName());
+                + adapter.getClass().getName());
 
-        studyAdapter = (StudyAdapter) adaptor;
+        studyAdapter = (StudyAdapter) adapter;
 
         // retrieve info from database because could have been modified
         // after first opening
@@ -77,7 +77,7 @@ public class StudyViewForm extends BiobankViewForm {
 
         setStudySectionValues();
 
-        AdaptorBase clinicGroupNode = ((SiteAdapter) studyAdapter.getParent()
+        AdapterBase clinicGroupNode = ((SiteAdapter) studyAdapter.getParent()
             .getParent()).getClinicGroupNode();
         clinicsTable = FormUtils.createClinicSection(toolkit, form.getBody(),
             clinicGroupNode, study.getClinicCollection());
@@ -170,7 +170,7 @@ public class StudyViewForm extends BiobankViewForm {
         setPartName("Study " + study.getNameShort());
         form.setText("Study: " + study.getName());
         setStudySectionValues();
-        AdaptorBase clinicGroupNode = ((SiteAdapter) studyAdapter.getParent()
+        AdapterBase clinicGroupNode = ((SiteAdapter) studyAdapter.getParent()
             .getParent()).getClinicGroupNode();
         clinicsTable.getTableViewer().setInput(
             FormUtils.getClinicsAdapters(clinicGroupNode, study

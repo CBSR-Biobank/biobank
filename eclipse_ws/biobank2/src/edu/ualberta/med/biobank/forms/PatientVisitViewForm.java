@@ -18,7 +18,6 @@ import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.PvInfo;
 import edu.ualberta.med.biobank.model.PvInfoData;
 import edu.ualberta.med.biobank.model.Study;
-import edu.ualberta.med.biobank.treeview.AdaptorBase;
 import edu.ualberta.med.biobank.treeview.PatientVisitAdapter;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
@@ -57,13 +56,12 @@ public class PatientVisitViewForm extends BiobankViewForm {
     }
 
     @Override
-    public void init(AdaptorBase adaptor) {
-        Assert.isTrue((adaptor instanceof PatientVisitAdapter),
+    public void init() {
+        Assert.isTrue((adapter instanceof PatientVisitAdapter),
             "Invalid editor input: object of type "
-                + adaptor.getClass().getName());
+                + adapter.getClass().getName());
 
-        patientVisitAdapter = (PatientVisitAdapter) adaptor;
-        appService = patientVisitAdapter.getAppService();
+        patientVisitAdapter = (PatientVisitAdapter) adapter;
         retrievePatientVisit();
 
         setPartName("Visit "

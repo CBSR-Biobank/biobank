@@ -22,7 +22,7 @@ import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.model.Site;
-import edu.ualberta.med.biobank.treeview.AdaptorBase;
+import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.RootNode;
 import edu.ualberta.med.biobank.treeview.SessionAdapter;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
@@ -40,7 +40,7 @@ public class SessionManager {
 
     private HashMap<String, SessionAdapter> sessionsByName;
 
-    private AdaptorBase rootNode;
+    private AdapterBase rootNode;
 
     public boolean inactiveTimeout = false;
 
@@ -74,7 +74,7 @@ public class SessionManager {
         }
     };
 
-    public AdaptorBase getRootNode() {
+    public AdapterBase getRootNode() {
         return rootNode;
     }
 
@@ -87,7 +87,7 @@ public class SessionManager {
 
             Object element = ((StructuredSelection) selection)
                 .getFirstElement();
-            ((AdaptorBase) element).performDoubleClick();
+            ((AdapterBase) element).performDoubleClick();
             view.getTreeViewer().expandToLevel(element, 1);
         }
     };
@@ -103,7 +103,7 @@ public class SessionManager {
 
         @Override
         public void treeExpanded(TreeExpansionEvent e) {
-            ((AdaptorBase) e.getElement()).performExpand();
+            ((AdapterBase) e.getElement()).performExpand();
         }
     };
 
@@ -124,7 +124,7 @@ public class SessionManager {
             Object element = ((StructuredSelection) tv.getSelection())
                 .getFirstElement();
             if (element != null) {
-                ((AdaptorBase) element).popupMenu(tv, tree, menu);
+                ((AdapterBase) element).popupMenu(tv, tree, menu);
             }
         }
     };
@@ -211,7 +211,7 @@ public class SessionManager {
     }
 
     public SessionAdapter getSessionAdapter(int count) {
-        List<AdaptorBase> nodes = rootNode.getChildren();
+        List<AdapterBase> nodes = rootNode.getChildren();
         Assert.isTrue(count < nodes.size(), "Invalid session node count: "
             + count);
         return (SessionAdapter) nodes.get(count);

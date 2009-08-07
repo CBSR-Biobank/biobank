@@ -18,7 +18,7 @@ import edu.ualberta.med.biobank.model.ModelUtils;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
 
-public class StudyGroup extends AdaptorBase {
+public class StudyGroup extends AdapterBase {
 
     public StudyGroup(SiteAdapter parent, int id) {
         super(parent, id, "Studies", true);
@@ -81,7 +81,7 @@ public class StudyGroup extends AdaptorBase {
     }
 
     @Override
-    public AdaptorBase accept(NodeSearchVisitor visitor) {
+    public AdapterBase accept(NodeSearchVisitor visitor) {
         return visitor.visit(this);
     }
 

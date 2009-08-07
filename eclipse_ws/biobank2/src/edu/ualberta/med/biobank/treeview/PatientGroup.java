@@ -21,7 +21,7 @@ import edu.ualberta.med.biobank.model.Study;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
-public class PatientGroup extends AdaptorBase {
+public class PatientGroup extends AdapterBase {
 
     public PatientGroup(StudyAdapter parent, int id) {
         super(parent, id, "Patients", true);
@@ -77,8 +77,8 @@ public class PatientGroup extends AdaptorBase {
                 Integer patientId = patientIDs.get(i);
                 boolean found = false;
                 // check if the patientId is already in one of the children
-                List<AdaptorBase> nodes = getChildren();
-                for (AdaptorBase node : nodes) {
+                List<AdapterBase> nodes = getChildren();
+                for (AdapterBase node : nodes) {
                     if (((PatientSubGroup) node).hasId(patientId)) {
                         found = true;
                         break;
@@ -88,7 +88,7 @@ public class PatientGroup extends AdaptorBase {
                     // patient has not been found in one child
                     boolean inserted = false;
                     // try to insert it into one of the existing child
-                    for (AdaptorBase node : nodes) {
+                    for (AdapterBase node : nodes) {
                         if (!((PatientSubGroup) node).full()) {
                             ((PatientSubGroup) node).addID(patientId);
                             inserted = true;
@@ -105,7 +105,7 @@ public class PatientGroup extends AdaptorBase {
                 }
             }
             if (updateNode) {
-                for (AdaptorBase node : getChildren()) {
+                for (AdapterBase node : getChildren()) {
                     SessionManager.getInstance().getTreeViewer().update(node,
                         null);
                 }
@@ -119,7 +119,7 @@ public class PatientGroup extends AdaptorBase {
     }
 
     @Override
-    public AdaptorBase accept(NodeSearchVisitor visitor) {
+    public AdapterBase accept(NodeSearchVisitor visitor) {
         return visitor.visit(this);
     }
 
