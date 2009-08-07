@@ -15,12 +15,10 @@ import org.eclipse.swt.widgets.Text;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.Study;
-import edu.ualberta.med.biobank.treeview.AdaptorBase;
 import edu.ualberta.med.biobank.treeview.PatientAdapter;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
 import gov.nih.nci.system.applicationservice.ApplicationException;
-import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.SDKQuery;
 import gov.nih.nci.system.query.SDKQueryResult;
 import gov.nih.nci.system.query.example.InsertExampleQuery;
@@ -41,13 +39,12 @@ public class PatientEntryForm extends BiobankEntryForm {
     private Patient patient;
 
     @Override
-    public void init(AdaptorBase adaptor) {
-        Assert.isTrue((adaptor instanceof PatientAdapter),
+    public void init() {
+        Assert.isTrue((adapter instanceof PatientAdapter),
             "Invalid editor input: object of type "
-                + adaptor.getClass().getName());
+                + adapter.getClass().getName());
 
-        patientAdapter = (PatientAdapter) adaptor;
-        appService = patientAdapter.getAppService();
+        patientAdapter = (PatientAdapter) adapter;
         patient = patientAdapter.getPatient();
         viewFormId = PatientViewForm.ID;
         String tabName;
@@ -139,7 +136,6 @@ public class PatientEntryForm extends BiobankEntryForm {
     }
 
     private boolean checkPatientNumberUnique() throws ApplicationException {
-        WritableApplicationService appService = patientAdapter.getAppService();
         Study study = ((StudyAdapter) patientAdapter
             .getParentFromClass(StudyAdapter.class)).getStudy();
 

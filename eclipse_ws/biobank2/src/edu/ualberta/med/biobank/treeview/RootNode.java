@@ -4,15 +4,15 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 
-public class RootNode extends AdaptorBase {
+public class RootNode extends AdapterBase {
 
-    private static AdaptorBase instance;
+    private static AdapterBase instance;
 
     private RootNode() {
         super(null, 1, "root");
     }
 
-    public static AdaptorBase getRootNode() {
+    public static AdapterBase getRootNode() {
         if (instance == null) {
             instance = new RootNode();
         }
@@ -32,7 +32,7 @@ public class RootNode extends AdaptorBase {
     }
 
     @Override
-    public AdaptorBase accept(NodeSearchVisitor visitor) {
+    public AdapterBase accept(NodeSearchVisitor visitor) {
         return null;
     }
 

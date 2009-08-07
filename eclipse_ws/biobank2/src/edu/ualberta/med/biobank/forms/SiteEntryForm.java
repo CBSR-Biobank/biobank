@@ -16,11 +16,9 @@ import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Site;
-import edu.ualberta.med.biobank.treeview.AdaptorBase;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
 import gov.nih.nci.system.applicationservice.ApplicationException;
-import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.SDKQuery;
 import gov.nih.nci.system.query.SDKQueryResult;
 import gov.nih.nci.system.query.example.InsertExampleQuery;
@@ -41,12 +39,12 @@ public class SiteEntryForm extends AddressEntryFormCommon {
     protected Combo session;
 
     @Override
-    public void init(AdaptorBase adaptor) {
-        Assert.isTrue((adaptor instanceof SiteAdapter),
+    public void init() {
+        Assert.isTrue((adapter instanceof SiteAdapter),
             "Invalid editor input: object of type "
-                + adaptor.getClass().getName());
+                + adapter.getClass().getName());
 
-        siteAdapter = (SiteAdapter) adaptor;
+        siteAdapter = (SiteAdapter) adapter;
         site = siteAdapter.getSite();
         viewFormId = SiteViewForm.ID;
 
@@ -140,7 +138,6 @@ public class SiteEntryForm extends AddressEntryFormCommon {
                 return;
             }
 
-            WritableApplicationService appService = siteAdapter.getAppService();
             site.setAddress(address);
             if ((site.getId() == null) || (site.getId() == 0)) {
                 Assert.isTrue(site.getAddress().getId() == null,
@@ -174,8 +171,6 @@ public class SiteEntryForm extends AddressEntryFormCommon {
     }
 
     private boolean checkSiteNameUnique() throws ApplicationException {
-        WritableApplicationService appService = siteAdapter.getAppService();
-
         HQLCriteria c = new HQLCriteria(
             "from edu.ualberta.med.biobank.model.Site where name = '"
                 + site.getName() + "'");

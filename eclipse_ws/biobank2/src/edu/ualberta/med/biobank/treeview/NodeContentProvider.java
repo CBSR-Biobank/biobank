@@ -12,24 +12,24 @@ public class NodeContentProvider implements ITreeContentProvider, IDeltaListener
 	 * @see org.eclipse.jface.viewers.ITreeContentProvider#getChildren(java.lang.Object)
 	 */
 	public Object[] getChildren(Object element) {
-        Assert.isTrue(element instanceof AdaptorBase, "Invalid object");
-        return ((AdaptorBase) element).getChildren().toArray();
+        Assert.isTrue(element instanceof AdapterBase, "Invalid object");
+        return ((AdapterBase) element).getChildren().toArray();
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.viewers.ITreeContentProvider#getParent(java.lang.Object)
 	 */
 	public Object getParent(Object element) {
-        Assert.isTrue(element instanceof AdaptorBase, "Invalid object");
-        return ((AdaptorBase) element).getParent();
+        Assert.isTrue(element instanceof AdapterBase, "Invalid object");
+        return ((AdapterBase) element).getParent();
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.viewers.ITreeContentProvider#hasChildren(java.lang.Object)
 	 */
 	public boolean hasChildren(Object element) {
-        Assert.isTrue(element instanceof AdaptorBase, "Invalid object");
-        return ((AdaptorBase) element).hasChildren();
+        Assert.isTrue(element instanceof AdapterBase, "Invalid object");
+        return ((AdapterBase) element).hasChildren();
 	}
 
 	/* (non-Javadoc)
@@ -52,30 +52,30 @@ public class NodeContentProvider implements ITreeContentProvider, IDeltaListener
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 		this.viewer = (TreeViewer)viewer;
 		if (oldInput != null) {
-			removeListenerFrom((AdaptorBase) oldInput);
+			removeListenerFrom((AdapterBase) oldInput);
 		}
 		if (newInput != null) {
-			addListenerTo((AdaptorBase) newInput);
+			addListenerTo((AdapterBase) newInput);
 		}
 	}
 	
-	protected void addListenerTo(AdaptorBase node) {
+	protected void addListenerTo(AdapterBase node) {
 		node.addListener(this);
-		for (AdaptorBase child : node.getChildren()) {
+		for (AdapterBase child : node.getChildren()) {
 			addListenerTo(child);
 		}
 	}
 	
-	protected void removeListenerFrom(AdaptorBase node) {
+	protected void removeListenerFrom(AdapterBase node) {
 		node.removeListener(this);
-		for (AdaptorBase child : node.getChildren()) {
+		for (AdapterBase child : node.getChildren()) {
 			removeListenerFrom(child);
 		}
 	}
 
 	@Override
 	public void add(DeltaEvent event) {
-		AdaptorBase node = ((AdaptorBase)event.receiver()).getParent();
+		AdapterBase node = ((AdapterBase)event.receiver()).getParent();
 		viewer.refresh(node, false);
 	}
 

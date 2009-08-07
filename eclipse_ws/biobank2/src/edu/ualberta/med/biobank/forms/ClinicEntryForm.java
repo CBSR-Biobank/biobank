@@ -17,12 +17,10 @@ import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Site;
-import edu.ualberta.med.biobank.treeview.AdaptorBase;
 import edu.ualberta.med.biobank.treeview.ClinicAdapter;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
 import gov.nih.nci.system.applicationservice.ApplicationException;
-import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.SDKQuery;
 import gov.nih.nci.system.query.SDKQueryResult;
 import gov.nih.nci.system.query.example.InsertExampleQuery;
@@ -45,14 +43,13 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
     private Text name;
 
     @Override
-    protected void init(AdaptorBase adaptor) {
-        Assert.isTrue((adaptor instanceof ClinicAdapter),
+    protected void init() {
+        Assert.isTrue((adapter instanceof ClinicAdapter),
             "Invalid editor input: object of type "
-                + adaptor.getClass().getName());
-        clinicAdapter = (ClinicAdapter) adaptor;
+                + adapter.getClass().getName());
+        clinicAdapter = (ClinicAdapter) adapter;
         viewFormId = ClinicViewForm.ID;
         clinic = clinicAdapter.getClinic();
-        setAppService(clinicAdapter.getAppService());
 
         address = clinic.getAddress();
         if (address == null) {
@@ -189,7 +186,6 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
     }
 
     private boolean checkClinicNameUnique() throws ApplicationException {
-        WritableApplicationService appService = clinicAdapter.getAppService();
         Site site = ((SiteAdapter) clinicAdapter
             .getParentFromClass(SiteAdapter.class)).getSite();
 

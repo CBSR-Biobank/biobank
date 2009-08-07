@@ -25,7 +25,7 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.SDKQuery;
 import gov.nih.nci.system.query.example.DeleteExampleQuery;
 
-public class SiteAdapter extends AdaptorBase {
+public class SiteAdapter extends AdapterBase {
 	public static final int STUDIES_NODE_ID = 0;
 	public static final int CLINICS_NODE_ID = 1;
 	public static final int STORAGE_TYPES_NODE_ID = 2;
@@ -50,15 +50,15 @@ public class SiteAdapter extends AdaptorBase {
 		return site;
 	}
 
-	public AdaptorBase getStudiesGroupNode() {
+	public AdapterBase getStudiesGroupNode() {
 		return children.get(STUDIES_NODE_ID);
 	}
 
-	public AdaptorBase getClinicGroupNode() {
+	public AdapterBase getClinicGroupNode() {
 		return children.get(CLINICS_NODE_ID);
 	}
 
-	public AdaptorBase getContainerTypesGroupNode() {
+	public AdapterBase getContainerTypesGroupNode() {
 		return children.get(STORAGE_TYPES_NODE_ID);
 	}
 
@@ -170,7 +170,7 @@ public class SiteAdapter extends AdaptorBase {
 	}
 
 	@Override
-	public AdaptorBase accept(NodeSearchVisitor visitor) {
+	public AdapterBase accept(NodeSearchVisitor visitor) {
 		return visitor.visit(this);
 	}
 }

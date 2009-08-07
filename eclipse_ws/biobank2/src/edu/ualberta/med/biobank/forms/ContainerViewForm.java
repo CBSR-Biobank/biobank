@@ -23,7 +23,7 @@ import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.ContainerStatus;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.ModelUtils;
-import edu.ualberta.med.biobank.treeview.AdaptorBase;
+import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.ContainerAdapter;
 import edu.ualberta.med.biobank.widgets.CabinetDrawerWidget;
 import edu.ualberta.med.biobank.widgets.ChooseContainerWidget;
@@ -64,14 +64,17 @@ public class ContainerViewForm extends BiobankViewForm {
     ContainerCell[][] cells;
 
     @Override
-    public void init(AdaptorBase adapter) {
+    public void init() {
         Assert.isTrue(adapter instanceof ContainerAdapter,
             "Invalid editor input: object of type "
                 + adapter.getClass().getName());
 
         containerAdapter = (ContainerAdapter) adapter;
-        appService = containerAdapter.getAppService();
-        retrieveContainer();
+        if (containerAdapter.getContainer().getId() != null) {
+            retrieveContainer();
+        } else {
+            container = containerAdapter.getContainer();
+        }
         position = container.getPosition();
         setPartName(container.getLabel() + " ("
             + container.getContainerType().getName() + ")");
@@ -255,7 +258,7 @@ public class ContainerViewForm extends BiobankViewForm {
             pos.setParentContainer(container);
             newContainer.setPosition(pos);
             newAdapter = new ContainerAdapter(containerAdapter, newContainer);
-            AdaptorBase.openForm(new FormInput(newAdapter),
+            AdapterBase.openForm(new FormInput(newAdapter),
                 ContainerEntryForm.ID);
         } else {
             Container childContainer;
@@ -274,7 +277,7 @@ public class ContainerViewForm extends BiobankViewForm {
                 }
             }
             Assert.isNotNull(newAdapter);
-            AdaptorBase.openForm(new FormInput(newAdapter),
+            AdapterBase.openForm(new FormInput(newAdapter),
                 ContainerViewForm.ID);
         }
 
@@ -306,10 +309,9 @@ public class ContainerViewForm extends BiobankViewForm {
 
     private void createSamplesSection() {
         Composite parent = createSectionWithClient("Samples");
-        samplesWidget = new SamplesListWidget(parent, null);
-        samplesWidget.adaptToToolkit(toolkit, true);
-        samplesWidget.setSamplePositions(container
+        samplesWidget = new SamplesListWidget(parent, container
             .getSamplePositionCollection());
+        samplesWidget.adaptToToolkit(toolkit, true);
     }
 
     @Override
