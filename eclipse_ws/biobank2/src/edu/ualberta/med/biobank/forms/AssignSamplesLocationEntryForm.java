@@ -42,7 +42,7 @@ import edu.ualberta.med.biobank.model.Sample;
 import edu.ualberta.med.biobank.model.SampleCellStatus;
 import edu.ualberta.med.biobank.model.SamplePosition;
 import edu.ualberta.med.biobank.model.Study;
-import edu.ualberta.med.biobank.treeview.AdaptorBase;
+import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.SessionAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
 import edu.ualberta.med.biobank.validators.ScannerBarcodeValidator;
@@ -116,13 +116,12 @@ public class AssignSamplesLocationEntryForm extends BiobankEntryForm implements
     private static boolean testDisposeOn = true;
 
     @Override
-    protected void init(AdaptorBase adapter) {
+    protected void init() {
         Assert.isTrue((adapter instanceof SessionAdapter),
             "Invalid editor input: object of type "
                 + adapter.getClass().getName());
 
         sessionAdapter = (SessionAdapter) adapter;
-        appService = adapter.getAppService();
         testDisposeOn = true;
         setPartName("Assign locations for samples");
     }
@@ -730,7 +729,7 @@ public class AssignSamplesLocationEntryForm extends BiobankEntryForm implements
         doSaveInternal();
         getSite().getPage().closeEditor(AssignSamplesLocationEntryForm.this,
             false);
-        AdaptorBase.openForm(new FormInput(sessionAdapter),
+        AdapterBase.openForm(new FormInput(sessionAdapter),
             AssignSamplesLocationEntryForm.ID);
     }
 

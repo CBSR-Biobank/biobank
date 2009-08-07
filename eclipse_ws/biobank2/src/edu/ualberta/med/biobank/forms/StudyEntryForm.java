@@ -34,7 +34,6 @@ import edu.ualberta.med.biobank.model.SampleStorage;
 import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
-import edu.ualberta.med.biobank.treeview.AdaptorBase;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
@@ -42,7 +41,6 @@ import edu.ualberta.med.biobank.widgets.BiobankCollectionTable;
 import edu.ualberta.med.biobank.widgets.MultiSelect;
 import edu.ualberta.med.biobank.widgets.PvInfoWidget;
 import gov.nih.nci.system.applicationservice.ApplicationException;
-import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.SDKQuery;
 import gov.nih.nci.system.query.SDKQueryResult;
 import gov.nih.nci.system.query.example.InsertExampleQuery;
@@ -105,22 +103,21 @@ public class StudyEntryForm extends BiobankEntryForm {
     }
 
     @Override
-    public void init(AdaptorBase adaptor) {
-        Assert.isTrue((adaptor instanceof StudyAdapter),
+    public void init() {
+        Assert.isTrue((adapter instanceof StudyAdapter),
             "Invalid editor input: object of type "
-                + adaptor.getClass().getName());
+                + adapter.getClass().getName());
 
-        studyAdapter = (StudyAdapter) adaptor;
+        studyAdapter = (StudyAdapter) adapter;
         study = studyAdapter.getStudy();
         site = ((SiteAdapter) studyAdapter
             .getParentFromClass(SiteAdapter.class)).getSite();
-        appService = studyAdapter.getAppService();
 
         String tabName;
         if (study.getId() == null) {
             tabName = "New Study";
         } else {
-            tabName = "Study " + study.getName();
+            tabName = "Study " + study.getNameShort();
         }
         setPartName(tabName);
     }
@@ -395,7 +392,6 @@ public class StudyEntryForm extends BiobankEntryForm {
     }
 
     private boolean checkStudyNameUnique() throws Exception {
-        WritableApplicationService appService = studyAdapter.getAppService();
         Site site = ((SiteAdapter) studyAdapter
             .getParentFromClass(SiteAdapter.class)).getSite();
 

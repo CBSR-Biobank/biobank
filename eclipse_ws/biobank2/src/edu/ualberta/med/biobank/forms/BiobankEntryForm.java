@@ -57,7 +57,6 @@ import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
-import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 /**
  * Base class for data entry forms.
@@ -67,8 +66,6 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
  * 
  */
 public abstract class BiobankEntryForm extends BiobankFormBase {
-
-    protected WritableApplicationService appService;
 
     protected String sessionName;
 
@@ -81,6 +78,9 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
     private Button confirmButton;
 
     private Button cancelButton;
+
+    // used by edit forms to open up the view form on confirm
+    protected String viewFormId = null;
 
     protected KeyListener keyListener = new KeyListener() {
         @Override
@@ -213,11 +213,6 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
 
     public void setSessionName(String sessionName) {
         this.sessionName = sessionName;
-    }
-
-    public void setAppService(WritableApplicationService appService) {
-        Assert.isNotNull(appService, "appService is null");
-        this.appService = appService;
     }
 
     protected Control createBoundWidgetWithLabel(Composite composite,
