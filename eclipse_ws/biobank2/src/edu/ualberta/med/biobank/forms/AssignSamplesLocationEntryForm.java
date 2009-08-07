@@ -50,7 +50,6 @@ import edu.ualberta.med.biobank.widgets.ScanPalletWidget;
 import edu.ualberta.med.biobank.widgets.ViewContainerWidget;
 import edu.ualberta.med.biobank.wizard.ContainerChooserWizard;
 import edu.ualberta.med.scanlib.ScanLib;
-import edu.ualberta.med.scanlib.ScanLibFactory;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.query.SDKQuery;
 import gov.nih.nci.system.query.SDKQueryResult;
@@ -376,9 +375,8 @@ public class AssignSamplesLocationEntryForm extends BiobankEntryForm implements
                             int plateNum = BioBankPlugin.getDefault()
                                 .getPlateNumber(
                                     plateToScanValue.getValue().toString());
-                            ScanLib scanLib = ScanLibFactory.getScanLib();
-                            int r = scanLib.slDecodePlate(ScanLib.DPI_300,
-                                plateNum);
+                            int r = ScanLib.getInstance().slDecodePlate(
+                                ScanLib.DPI_300, plateNum);
                             if (r < ScanLib.SC_SUCCESS) {
                                 BioBankPlugin.openError("Scanner",
                                     "Could not decode image. Return code is: "
@@ -442,8 +440,8 @@ public class AssignSamplesLocationEntryForm extends BiobankEntryForm implements
         ((GridData) freezerLabel.getParent().getLayoutData()).exclude = show;
         hotelLabel.getParent().setVisible(!show);
         ((GridData) hotelLabel.getParent().getLayoutData()).exclude = show;
-        locateButton.setVisible(show);
-        ((GridData) locateButton.getLayoutData()).exclude = !show;
+        // locateButton.setVisible(show);
+        // ((GridData) locateButton.getLayoutData()).exclude = !show;
     }
 
     protected void showPalletPosition(Container pallet) {
