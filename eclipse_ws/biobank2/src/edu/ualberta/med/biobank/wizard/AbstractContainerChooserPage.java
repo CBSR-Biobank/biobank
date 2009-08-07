@@ -93,7 +93,7 @@ public abstract class AbstractContainerChooserPage extends WizardPage {
 
     protected ContainerCell positionSelection(MouseEvent e) {
         ContainerCell cell = containerWidget.getPositionAtCoordinates(e.x, e.y);
-        if (cell == null || cell.getStatus() == ContainerStatus.FILLED) {
+        if (cell == null || cell.getStatus() == ContainerStatus.NOT_INITIALIZED) {
             textPosition.setText("");
             setPageComplete(false);
         } else {

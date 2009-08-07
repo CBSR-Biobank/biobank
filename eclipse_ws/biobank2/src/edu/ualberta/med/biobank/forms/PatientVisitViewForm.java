@@ -6,13 +6,18 @@ import org.apache.commons.collections.MapIterator;
 import org.apache.commons.collections.map.ListOrderedMap;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.ui.PartInitException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.ModelUtils;
 import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.PvInfo;
@@ -81,6 +86,7 @@ public class PatientVisitViewForm extends BiobankViewForm {
         addRefreshToolbarAction();
         createVisitSection();
         createSamplesSection();
+
     }
 
     private void createVisitSection() {
@@ -164,6 +170,23 @@ public class PatientVisitViewForm extends BiobankViewForm {
         samplesWidget.adaptToToolkit(toolkit, true);
         samplesWidget.setSamples(patientVisit.getSampleCollection());
         samplesWidget.setSelection(patientVisitAdapter.getSelectedSample());
+
+        final Button edit = toolkit.createButton(parent,
+            "Edit this information", SWT.PUSH);
+        edit.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                getSite().getPage().closeEditor(PatientVisitViewForm.this,
+                    false);
+                try {
+                    getSite().getPage().openEditor(
+                        new FormInput(patientVisitAdapter),
+                        PatientVisitEntryForm.ID, true);
+                } catch (PartInitException exp) {
+                    exp.printStackTrace();
+                }
+            }
+        });
     }
 
     @Override
