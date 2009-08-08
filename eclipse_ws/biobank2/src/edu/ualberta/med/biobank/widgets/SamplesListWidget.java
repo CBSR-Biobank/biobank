@@ -123,8 +123,6 @@ public class SamplesListWidget extends BiobankCollectionTable {
     }
 
     private void setSamplePositions() {
-
-        // getClinicsAdapters(clinicGroupParent, clinics)
         Thread t = new Thread() {
             @Override
             public void run() {
