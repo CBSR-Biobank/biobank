@@ -27,7 +27,6 @@ import org.springframework.remoting.RemoteConnectFailureException;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.dialogs.SampleStorageDialog;
 import edu.ualberta.med.biobank.model.Clinic;
-import edu.ualberta.med.biobank.model.ModelUtils;
 import edu.ualberta.med.biobank.model.PvInfo;
 import edu.ualberta.med.biobank.model.PvInfoPossible;
 import edu.ualberta.med.biobank.model.SampleStorage;
@@ -37,9 +36,9 @@ import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
-import edu.ualberta.med.biobank.widgets.BiobankCollectionTable;
 import edu.ualberta.med.biobank.widgets.MultiSelect;
 import edu.ualberta.med.biobank.widgets.PvInfoWidget;
+import edu.ualberta.med.biobank.widgets.SampleStorageInfoTable;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.query.SDKQuery;
 import gov.nih.nci.system.query.SDKQueryResult;
@@ -93,7 +92,7 @@ public class StudyEntryForm extends BiobankEntryForm {
 
     private Collection<SampleType> sampleTypes;
 
-    private BiobankCollectionTable sampleStorageTable;
+    private SampleStorageInfoTable sampleStorageTable;
 
     private Button addSampleStorageButton;
 
@@ -178,14 +177,14 @@ public class StudyEntryForm extends BiobankEntryForm {
             SampleType searchObj = new SampleType();
             sampleTypes = appService.search(SampleType.class, searchObj);
 
-            // TODO: from sampleTypes remove sample types already in
-            // study.getSampleStorageCollection()
-
             if (sampleTypes.size() == 0) {
                 toolkit.createLabel(client,
-                    "*** no sample types defined for study ***");
+                    "*** no sample storage defined for study ***");
                 return;
             }
+
+            // TODO: from sampleTypes remove sample types already in
+            // study.getSampleStorageCollection()
 
             GridLayout layout = new GridLayout(1, false);
             client.setLayout(layout);
@@ -207,24 +206,19 @@ public class StudyEntryForm extends BiobankEntryForm {
                             collection = new HashSet<SampleStorage>();
                         }
                         collection.add(ss);
-                        sampleStorageTable.update();
-
-                        // TODO: table does not update due to model not managed
+                        sampleStorageTable.setSampleStorage(collection);
                     }
                 }
             });
 
-            String[] headings = new String[] { "Sample type", "Volume",
-                "Quantity" };
-            sampleStorageTable = new BiobankCollectionTable(client, SWT.NONE,
-                headings, ModelUtils
-                    .toArray(study.getSampleStorageCollection()));
+            sampleStorageTable = new SampleStorageInfoTable(client, study
+                .getSampleStorageCollection());
             sampleStorageTable.adaptToToolkit(toolkit);
+            toolkit.paintBordersFor(sampleStorageTable);
         } catch (final RemoteConnectFailureException exp) {
             BioBankPlugin.openRemoteConnectErrorMessage();
-            toolkit.paintBordersFor(sampleStorageTable);
-        } catch (ApplicationException e1) {
-            e1.printStackTrace();
+        } catch (ApplicationException e) {
+            e.printStackTrace();
         }
     }
 
