@@ -20,6 +20,7 @@ import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.ClinicAdapter;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankCollectionTable;
+import edu.ualberta.med.biobank.widgets.ClinicStudyInfoTable;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ClinicViewForm extends AddressViewFormCommon {
@@ -98,10 +99,7 @@ public class ClinicViewForm extends AddressViewFormCommon {
     protected void createStudiesSection() {
         Composite client = createSectionWithClient("Studies");
 
-        String[] headings = new String[] { "Name", "Short Name",
-            "Num. Patients" };
-        studiesTable = new BiobankCollectionTable(client, SWT.NONE, headings,
-            getStudiesAdapters());
+        studiesTable = new ClinicStudyInfoTable(client, appService, clinic);
         studiesTable.adaptToToolkit(toolkit);
         toolkit.paintBordersFor(studiesTable);
 

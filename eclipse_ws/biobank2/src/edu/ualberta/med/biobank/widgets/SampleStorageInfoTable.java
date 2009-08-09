@@ -13,7 +13,7 @@ import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.model.SampleStorage;
 
-public class SampleStorageListWidget extends BiobankCollectionTable {
+public class SampleStorageInfoTable extends BiobankCollectionTable {
 
     private static final String[] headings = new String[] { "Sample type",
         "Volume", "Quantity" };
@@ -25,7 +25,7 @@ public class SampleStorageListWidget extends BiobankCollectionTable {
 
     private List<BiobankCollectionModel> model;
 
-    public SampleStorageListWidget(Composite parent,
+    public SampleStorageInfoTable(Composite parent,
         Collection<SampleStorage> sampleStorageCollection) {
         super(parent, SWT.NONE, headings, bounds, null);
         int size = sampleStorageCollection.size();

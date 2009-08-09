@@ -38,7 +38,7 @@ import edu.ualberta.med.biobank.treeview.StudyAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
 import edu.ualberta.med.biobank.widgets.MultiSelect;
 import edu.ualberta.med.biobank.widgets.PvInfoWidget;
-import edu.ualberta.med.biobank.widgets.SampleStorageListWidget;
+import edu.ualberta.med.biobank.widgets.SampleStorageInfoTable;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.query.SDKQuery;
 import gov.nih.nci.system.query.SDKQueryResult;
@@ -92,7 +92,7 @@ public class StudyEntryForm extends BiobankEntryForm {
 
     private Collection<SampleType> sampleTypes;
 
-    private SampleStorageListWidget sampleStorageTable;
+    private SampleStorageInfoTable sampleStorageTable;
 
     private Button addSampleStorageButton;
 
@@ -177,14 +177,14 @@ public class StudyEntryForm extends BiobankEntryForm {
             SampleType searchObj = new SampleType();
             sampleTypes = appService.search(SampleType.class, searchObj);
 
-            // TODO: from sampleTypes remove sample types already in
-            // study.getSampleStorageCollection()
-
             if (sampleTypes.size() == 0) {
                 toolkit.createLabel(client,
-                    "*** no sample types defined for study ***");
+                    "*** no sample storage defined for study ***");
                 return;
             }
+
+            // TODO: from sampleTypes remove sample types already in
+            // study.getSampleStorageCollection()
 
             GridLayout layout = new GridLayout(1, false);
             client.setLayout(layout);
@@ -211,7 +211,7 @@ public class StudyEntryForm extends BiobankEntryForm {
                 }
             });
 
-            sampleStorageTable = new SampleStorageListWidget(client, study
+            sampleStorageTable = new SampleStorageInfoTable(client, study
                 .getSampleStorageCollection());
             sampleStorageTable.adaptToToolkit(toolkit);
             toolkit.paintBordersFor(sampleStorageTable);
