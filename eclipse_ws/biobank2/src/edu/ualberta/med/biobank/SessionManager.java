@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.Semaphore;
 
@@ -38,7 +37,7 @@ public class SessionManager {
 
     private SessionsView view;
 
-    private HashMap<String, SessionAdapter> sessionsByName;
+    private SessionAdapter sessionAdapter;
 
     private AdapterBase rootNode;
 
@@ -63,9 +62,9 @@ public class SessionManager {
                         + " seconds.\n Do you want to log out?");
 
                 if (logout) {
-                    for (SessionAdapter adapter : sessionsByName.values()) {
-                        deleteSession(adapter.getName());
-                    }
+                    deleteSession();
+                    PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+                        .getActivePage().closeAllEditors(true);
                 }
                 timeoutSem.release();
             } catch (InterruptedException e) {
@@ -132,7 +131,6 @@ public class SessionManager {
     private SessionManager() {
         super();
         rootNode = RootNode.getRootNode();
-        sessionsByName = new HashMap<String, SessionAdapter>();
     }
 
     public ITreeViewerListener getTreeViewerListener() {
@@ -156,15 +154,13 @@ public class SessionManager {
 
     public void addSession(final WritableApplicationService appService,
         String name, String userName, List<Site> sites) {
-        int id = sessionsByName.size();
-        final SessionAdapter sessionNode = new SessionAdapter(rootNode,
-            appService, id, name, userName);
-        sessionsByName.put(name, sessionNode);
-        rootNode.addChild(sessionNode);
+        sessionAdapter = new SessionAdapter(rootNode, appService, 0, name,
+            userName);
+        rootNode.addChild(sessionAdapter);
         for (Object o : sites) {
             Site site = (Site) o;
-            SiteAdapter siteNode = new SiteAdapter(sessionNode, site);
-            sessionNode.addChild(siteNode);
+            SiteAdapter siteNode = new SiteAdapter(sessionAdapter, site);
+            sessionAdapter.addChild(siteNode);
         }
         view.getTreeViewer().expandToLevel(2);
         log4j.debug("addSession: " + name);
@@ -189,7 +185,7 @@ public class SessionManager {
                         // System.out
                         // .println("startInactivityTimer_idleListener: inactiveTimeout/"
                         // + inactiveTimeout);
-                        if (!inactiveTimeout && (sessionsByName.size() > 0)) {
+                        if (!inactiveTimeout && (sessionAdapter != null)) {
                             display.timerExec(TIME_OUT, timeoutRunnable);
                         }
                         timeoutSem.release();
@@ -217,25 +213,13 @@ public class SessionManager {
         return (SessionAdapter) nodes.get(count);
     }
 
-    public void deleteSession(String name) {
-        rootNode.removeByName(name);
-        // treeViewer.refresh();
+    public void deleteSession() {
+        rootNode.removeChild(sessionAdapter);
+        sessionAdapter = null;
     }
 
-    public int getSessionCount() {
-        return rootNode.getChildren().size();
-    }
-
-    public String[] getSessionNames() {
-        return sessionsByName.keySet().toArray(
-            new String[sessionsByName.size()]);
-    }
-
-    public SessionAdapter getSessionSingle() {
-        int count = sessionsByName.size();
-        Assert.isTrue(count == 1,
-            "No sessions or more than 1 session connected");
-        return getSessionAdapter(0);
+    public SessionAdapter getSession() {
+        return sessionAdapter;
     }
 
     public TreeViewer getTreeViewer() {
