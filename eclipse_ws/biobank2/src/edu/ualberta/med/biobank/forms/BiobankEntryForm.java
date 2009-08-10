@@ -55,7 +55,8 @@ import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.treeview.AdaptorBase;
+import edu.ualberta.med.biobank.forms.input.FormInput;
+import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
@@ -194,7 +195,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
                     PlatformUI.getWorkbench().getActiveWorkbenchWindow()
                         .getActivePage().closeEditor(BiobankEntryForm.this,
                             false);
-                    AdaptorBase.openForm(adaptor, viewFormId);
+                    AdapterBase.openForm(new FormInput(adapter), viewFormId);
                 }
             });
         }
