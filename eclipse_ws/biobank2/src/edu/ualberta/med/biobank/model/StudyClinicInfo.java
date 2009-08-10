@@ -2,18 +2,18 @@ package edu.ualberta.med.biobank.model;
 
 import edu.ualberta.med.biobank.SessionManager;
 
-public class ClinicStudyInfo {
+public class StudyClinicInfo {
 
-    public Study study;
+    public Clinic clinic;
 
-    public String studyShortName;
+    public String clinicName;
 
     public int patients;
 
     public Long patientVisits;
 
     public void performDoubleClick() {
-        SessionManager.getInstance().openViewForm(study);
+        SessionManager.getInstance().openViewForm(clinic);
     }
 
 }
