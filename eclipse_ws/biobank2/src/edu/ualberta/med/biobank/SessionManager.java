@@ -22,7 +22,6 @@ import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.model.Site;
-import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.RootNode;
 import edu.ualberta.med.biobank.treeview.SessionAdapter;
@@ -251,7 +250,7 @@ public class SessionManager {
         return log4j;
     }
 
-    public void openViewForm(Study study) {
+    public void openViewForm(Object o) {
 
     }
 }
