@@ -12,7 +12,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.treeview.AdaptorBase;
+import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.NodeContentProvider;
 import edu.ualberta.med.biobank.treeview.NodeLabelProvider;
 
@@ -64,7 +64,7 @@ public class SessionsView extends ViewPart {
                 ISelection selection = event.getSelection();
                 if (!selection.isEmpty()
                     && selection instanceof IStructuredSelection) {
-                    AdaptorBase node = (AdaptorBase) ((IStructuredSelection) selection)
+                    AdapterBase node = (AdapterBase) ((IStructuredSelection) selection)
                         .getFirstElement();
                     getViewSite().getActionBars().getStatusLineManager()
                         .setMessage(node.getName());

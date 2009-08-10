@@ -39,7 +39,7 @@ import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.Sample;
 import edu.ualberta.med.biobank.model.SamplePosition;
 import edu.ualberta.med.biobank.model.SampleType;
-import edu.ualberta.med.biobank.treeview.AdaptorBase;
+import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.PatientVisitAdapter;
 import edu.ualberta.med.biobank.validators.CabinetLabelValidator;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
@@ -88,14 +88,13 @@ public class AddCabinetSampleEntryForm extends BiobankEntryForm implements
     private static boolean testDisposeOn = true;
 
     @Override
-    protected void init(AdaptorBase adaptor) {
-        Assert.isTrue((adaptor instanceof PatientVisitAdapter),
+    protected void init() {
+        Assert.isTrue((adapter instanceof PatientVisitAdapter),
             "Invalid editor input: object of type "
-                + adaptor.getClass().getName());
+                + adapter.getClass().getName());
 
-        pvAdapter = (PatientVisitAdapter) adaptor;
+        pvAdapter = (PatientVisitAdapter) adapter;
         patientVisit = pvAdapter.getPatientVisit();
-        appService = pvAdapter.getAppService();
         testDisposeOn = true;
         setPartName("Add cabinet samples for patient "
             + patientVisit.getPatient().getNumber() + " for visit "
@@ -416,7 +415,7 @@ public class AddCabinetSampleEntryForm extends BiobankEntryForm implements
         testDisposeOn = false;
         doSaveInternal();
         getSite().getPage().closeEditor(AddCabinetSampleEntryForm.this, false);
-        AdaptorBase.openForm(new FormInput(pvAdapter),
+        AdapterBase.openForm(new FormInput(pvAdapter),
             AddCabinetSampleEntryForm.ID);
     }
 

@@ -28,7 +28,8 @@ import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.part.EditorPart;
 
 import edu.ualberta.med.biobank.forms.input.FormInput;
-import edu.ualberta.med.biobank.treeview.AdaptorBase;
+import edu.ualberta.med.biobank.treeview.AdapterBase;
+import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 /**
  * Base class for data all BioBank2 view and entry forms. This class is the
@@ -39,6 +40,10 @@ import edu.ualberta.med.biobank.treeview.AdaptorBase;
  * possible. See {@link #createFormContent()}
  */
 public abstract class BiobankFormBase extends EditorPart {
+
+    protected WritableApplicationService appService;
+
+    protected AdapterBase adapter;
 
     protected ManagedForm mform;
 
@@ -62,7 +67,7 @@ public abstract class BiobankFormBase extends EditorPart {
      * @param adapter the corresponding model adapter the form is to edit /
      *            view.
      */
-    protected abstract void init(AdaptorBase adapter);
+    protected abstract void init();
 
     @Override
     public void init(IEditorSite editorSite, IEditorInput input)
@@ -71,9 +76,10 @@ public abstract class BiobankFormBase extends EditorPart {
             throw new PartInitException("Invalid editor input");
         setSite(editorSite);
         setInput(input);
-        AdaptorBase adapter = ((FormInput) input).getNode();
+        adapter = ((FormInput) input).getNode();
         Assert.isNotNull(adapter, "Bad editor input (null value)");
-        init(adapter);
+        appService = adapter.getAppService();
+        init();
     }
 
     @Override

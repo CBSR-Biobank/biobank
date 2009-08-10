@@ -8,7 +8,6 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.model.Sample;
-import edu.ualberta.med.biobank.treeview.AdaptorBase;
 import edu.ualberta.med.biobank.treeview.SampleAdapter;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
@@ -20,12 +19,12 @@ public class SampleViewForm extends BiobankViewForm {
     private Sample sample;
 
     @Override
-    public void init(AdaptorBase adaptor) {
-        Assert.isTrue((adaptor instanceof SampleAdapter),
+    public void init() {
+        Assert.isTrue((adapter instanceof SampleAdapter),
             "Invalid editor input: object of type "
-                + adaptor.getClass().getName());
+                + adapter.getClass().getName());
 
-        sampleAdapter = (SampleAdapter) adaptor;
+        sampleAdapter = (SampleAdapter) adapter;
         retrieveSample();
         setPartName("Sample: " + sample.getInventoryId());
     }

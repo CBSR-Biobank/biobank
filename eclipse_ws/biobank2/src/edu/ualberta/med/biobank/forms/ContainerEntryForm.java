@@ -27,7 +27,6 @@ import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.Site;
-import edu.ualberta.med.biobank.treeview.AdaptorBase;
 import edu.ualberta.med.biobank.treeview.ContainerAdapter;
 import edu.ualberta.med.biobank.validators.DoubleNumber;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
@@ -65,12 +64,11 @@ public class ContainerEntryForm extends BiobankEntryForm {
     private ComboViewer containerTypeComboViewer;
 
     @Override
-    public void init(AdaptorBase adaptor) {
-        Assert.isTrue((adaptor instanceof ContainerAdapter),
+    public void init() {
+        Assert.isTrue((adapter instanceof ContainerAdapter),
             "Invalid editor input: object of type "
-                + adaptor.getClass().getName());
-        containerAdapter = (ContainerAdapter) adaptor;
-        appService = containerAdapter.getAppService();
+                + adapter.getClass().getName());
+        containerAdapter = (ContainerAdapter) adapter;
         container = containerAdapter.getContainer();
         site = containerAdapter.getSite();
         position = container.getPosition();

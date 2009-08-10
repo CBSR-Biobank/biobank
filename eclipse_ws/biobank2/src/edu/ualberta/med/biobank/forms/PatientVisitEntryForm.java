@@ -36,7 +36,6 @@ import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.PvInfo;
 import edu.ualberta.med.biobank.model.PvInfoData;
 import edu.ualberta.med.biobank.model.Study;
-import edu.ualberta.med.biobank.treeview.AdaptorBase;
 import edu.ualberta.med.biobank.treeview.PatientAdapter;
 import edu.ualberta.med.biobank.treeview.PatientVisitAdapter;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
@@ -44,7 +43,6 @@ import edu.ualberta.med.biobank.widgets.ComboAndQuantity;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.widgets.SelectMultiple;
 import gov.nih.nci.system.applicationservice.ApplicationException;
-import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.SDKQuery;
 import gov.nih.nci.system.query.SDKQueryResult;
 import gov.nih.nci.system.query.example.InsertExampleQuery;
@@ -88,14 +86,14 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
     }
 
     @Override
-    public void init(AdaptorBase adaptor) {
-        Assert.isTrue(adaptor instanceof PatientVisitAdapter,
+    public void init() {
+        Assert.isTrue(adapter instanceof PatientVisitAdapter,
             "Invalid editor input: object of type "
-                + adaptor.getClass().getName());
+                + adapter.getClass().getName());
 
-        patientVisitAdapter = (PatientVisitAdapter) adaptor;
+        patientVisitAdapter = (PatientVisitAdapter) adapter;
         patientVisit = patientVisitAdapter.getPatientVisit();
-        appService = patientVisitAdapter.getAppService();
+        
         viewFormId = PatientVisitViewForm.ID;
         String tabName;
         if (patientVisit.getId() == null) {
@@ -446,8 +444,6 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
     }
 
     private boolean checkVisitDateDrawnUnique() throws ApplicationException {
-        WritableApplicationService appService = patientVisitAdapter
-            .getAppService();
         Patient patient = ((PatientAdapter) patientVisitAdapter.getParent())
             .getPatient();
 

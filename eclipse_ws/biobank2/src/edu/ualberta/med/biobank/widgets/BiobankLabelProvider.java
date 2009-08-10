@@ -19,9 +19,9 @@ import edu.ualberta.med.biobank.model.PvInfo;
 import edu.ualberta.med.biobank.model.Sample;
 import edu.ualberta.med.biobank.model.SampleStorage;
 import edu.ualberta.med.biobank.model.Study;
+import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.ClinicAdapter;
 import edu.ualberta.med.biobank.treeview.ContainerTypeAdapter;
-import edu.ualberta.med.biobank.treeview.AdaptorBase;
 import edu.ualberta.med.biobank.treeview.PatientAdapter;
 import edu.ualberta.med.biobank.treeview.PatientVisitAdapter;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
@@ -148,6 +148,13 @@ public class BiobankLabelProvider extends LabelProvider implements
             case 2:
                 return "" + ss.getQuantity();
             }
+        } else if (element instanceof BiobankCollectionModel) {
+            BiobankCollectionModel m = (BiobankCollectionModel) element;
+            if (m.o != null) {
+                return getColumnText(m.o, columnIndex);
+            } else if (columnIndex == 0) {
+                return "loading ...";
+            }
         } else {
             Assert.isTrue(false, "invalid object type");
         }
@@ -163,7 +170,7 @@ public class BiobankLabelProvider extends LabelProvider implements
         } else if (element instanceof ContainerLabelingScheme) {
             return ((ContainerLabelingScheme) element).getName();
         }
-        return ((AdaptorBase) element).getName();
+        return ((AdapterBase) element).getName();
     }
 
     @Override

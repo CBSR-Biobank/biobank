@@ -18,7 +18,7 @@ import edu.ualberta.med.biobank.model.ModelUtils;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
 
-public class StudyGroup extends AdaptorBase {
+public class StudyGroup extends AdapterBase {
 
     public StudyGroup(SiteAdapter parent, int id) {
         super(parent, id, "Studies", true);
@@ -60,16 +60,7 @@ public class StudyGroup extends AdaptorBase {
             ((SiteAdapter) getParent()).setSite(currentSite);
 
             Collection<Study> studies = currentSite.getStudyCollection();
-            SessionManager.getLogger().trace(
-                "updateStudies: Site " + currentSite.getName() + " has "
-                    + studies.size() + " studies");
-
             for (Study study : studies) {
-                SessionManager.getLogger().trace(
-                    "updateStudies: Study " + study.getId() + ": "
-                        + study.getName() + ", short name: "
-                        + study.getNameShort());
-
                 StudyAdapter node = (StudyAdapter) getChild(study.getId());
 
                 if (node == null) {
@@ -90,7 +81,7 @@ public class StudyGroup extends AdaptorBase {
     }
 
     @Override
-    public AdaptorBase accept(NodeSearchVisitor visitor) {
+    public AdapterBase accept(NodeSearchVisitor visitor) {
         return visitor.visit(this);
     }
 
