@@ -72,6 +72,7 @@ public class ContainerEntryForm extends BiobankEntryForm {
         container = containerAdapter.getContainer();
         site = containerAdapter.getSite();
         position = container.getPosition();
+        viewFormId = ContainerViewForm.ID;
 
         if (position != null) {
             RowColPos rcp = new RowColPos();
@@ -242,7 +243,6 @@ public class ContainerEntryForm extends BiobankEntryForm {
         container = (Container) result.getObjectResult();
 
         containerAdapter.getParent().performExpand();
-        getSite().getPage().closeEditor(this, false);
 
     }
 

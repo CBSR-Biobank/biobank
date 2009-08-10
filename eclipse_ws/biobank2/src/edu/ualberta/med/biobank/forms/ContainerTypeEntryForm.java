@@ -97,6 +97,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         site = ((SiteAdapter) containerTypeAdapter
             .getParentFromClass(SiteAdapter.class)).getSite();
         allContainerTypes = site.getContainerTypeCollection();
+        viewFormId = ContainerTypeViewForm.ID;
 
         String tabName;
         if (containerType.getId() == null) {
@@ -330,7 +331,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         site.setContainerTypeCollection(allContainerTypes);
 
         containerTypeAdapter.getParent().performExpand();
-        getSite().getPage().closeEditor(this, false);
+
     }
 
     // private void saveCapacity() throws Exception {

@@ -17,10 +17,12 @@ import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.ClinicAdapter;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
 import gov.nih.nci.system.applicationservice.ApplicationException;
+import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.SDKQuery;
 import gov.nih.nci.system.query.SDKQueryResult;
 import gov.nih.nci.system.query.example.InsertExampleQuery;
@@ -48,6 +50,7 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
             "Invalid editor input: object of type "
                 + adapter.getClass().getName());
         clinicAdapter = (ClinicAdapter) adapter;
+        viewFormId = ClinicViewForm.ID;
         clinic = clinicAdapter.getClinic();
 
         address = clinic.getAddress();
@@ -182,7 +185,6 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
         clinic = (Clinic) result.getObjectResult();
 
         clinicAdapter.getParent().performExpand();
-        getSite().getPage().closeEditor(this, false);
     }
 
     private boolean checkClinicNameUnique() throws ApplicationException {

@@ -111,6 +111,8 @@ public class StudyEntryForm extends BiobankEntryForm {
         study = studyAdapter.getStudy();
         site = ((SiteAdapter) studyAdapter
             .getParentFromClass(SiteAdapter.class)).getSite();
+        
+        viewFormId = StudyViewForm.ID;
 
         String tabName;
         if (study.getId() == null) {
@@ -337,7 +339,6 @@ public class StudyEntryForm extends BiobankEntryForm {
         study.setPvInfoCollection(pvInfoList);
         saveStudy(study);
         studyAdapter.getParent().performExpand();
-        getSite().getPage().closeEditor(this, false);
     }
 
     private void saveStudy(Study study) throws ApplicationException {
