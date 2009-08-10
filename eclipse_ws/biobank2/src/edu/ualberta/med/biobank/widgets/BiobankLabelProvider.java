@@ -165,9 +165,7 @@ public class BiobankLabelProvider extends LabelProvider implements
                     return info.studyShortName;
                 return "";
             case 1:
-                if (info.patients != null)
-                    return "" + info.patients;
-                return "";
+                return "" + info.patients;
             case 2:
                 if (info.patientVisits != null)
                     return "" + info.patientVisits;
@@ -181,9 +179,7 @@ public class BiobankLabelProvider extends LabelProvider implements
                     return info.clinicName;
                 return "";
             case 1:
-                if (info.patients != null)
-                    return "" + info.patients;
-                return "";
+                return "" + info.patients;
             case 2:
                 if (info.patientVisits != null)
                     return "" + info.patientVisits;

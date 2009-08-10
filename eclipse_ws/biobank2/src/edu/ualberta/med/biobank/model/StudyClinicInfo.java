@@ -8,7 +8,7 @@ public class StudyClinicInfo {
 
     public String clinicName;
 
-    public Long patients;
+    public int patients;
 
     public Long patientVisits;
 

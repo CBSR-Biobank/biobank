@@ -11,6 +11,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.model.Clinic;
+import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.StudyClinicInfo;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -70,7 +71,7 @@ public class StudyClinicInfoTable extends BiobankCollectionTable {
                         info.clinicName = clinic.getName();
 
                         HQLCriteria c = new HQLCriteria(
-                            "select distinct count(patients)"
+                            "select distinct patients"
                                 + " from edu.ualberta.med.biobank.model.Study as study"
                                 + " inner join study.patientCollection as patients"
                                 + " inner join patients.patientVisitCollection as visits"
@@ -81,13 +82,11 @@ public class StudyClinicInfoTable extends BiobankCollectionTable {
                         c.setParameters(Arrays.asList(new Object[] {
                             study.getId(), clinic.getId() }));
 
-                        List<Long> results = appService.query(c);
-                        Assert.isTrue(results.size() == 1,
-                            "Invalid size for HQL query");
-                        info.patients = results.get(0);
+                        List<Patient> result1 = appService.query(c);
+                        info.patients = result1.size();
 
                         c = new HQLCriteria(
-                            "select distinct count(visits)"
+                            "select count(visits)"
                                 + " from edu.ualberta.med.biobank.model.Study as study"
                                 + " inner join study.patientCollection as patients"
                                 + " inner join patients.patientVisitCollection as visits"
@@ -97,7 +96,7 @@ public class StudyClinicInfoTable extends BiobankCollectionTable {
                         c.setParameters(Arrays.asList(new Object[] {
                             study.getId(), clinic.getId() }));
 
-                        results = appService.query(c);
+                        List<Long> results = appService.query(c);
                         Assert.isTrue(results.size() == 1,
                             "Invalid size for HQL query");
                         info.patientVisits = results.get(0);
