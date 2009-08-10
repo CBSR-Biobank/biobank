@@ -93,7 +93,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
 
         patientVisitAdapter = (PatientVisitAdapter) adapter;
         patientVisit = patientVisitAdapter.getPatientVisit();
-        appService = patientVisitAdapter.getAppService();
+        
         viewFormId = PatientVisitViewForm.ID;
 
         String tabName;

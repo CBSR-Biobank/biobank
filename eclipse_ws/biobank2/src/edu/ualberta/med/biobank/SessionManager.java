@@ -249,4 +249,8 @@ public class SessionManager {
     public static Logger getLogger() {
         return log4j;
     }
+
+    public void openViewForm(Object o) {
+
+    }
 }
