@@ -20,6 +20,7 @@ import edu.ualberta.med.biobank.model.PvInfo;
 import edu.ualberta.med.biobank.model.Sample;
 import edu.ualberta.med.biobank.model.SampleStorage;
 import edu.ualberta.med.biobank.model.Study;
+import edu.ualberta.med.biobank.model.StudyClinicInfo;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.ClinicAdapter;
 import edu.ualberta.med.biobank.treeview.ContainerTypeAdapter;
@@ -162,6 +163,22 @@ public class BiobankLabelProvider extends LabelProvider implements
             case 0:
                 if (info.studyShortName != null)
                     return info.studyShortName;
+                return "";
+            case 1:
+                if (info.patients != null)
+                    return "" + info.patients;
+                return "";
+            case 2:
+                if (info.patientVisits != null)
+                    return "" + info.patientVisits;
+                return "";
+            }
+        } else if (element instanceof StudyClinicInfo) {
+            StudyClinicInfo info = (StudyClinicInfo) element;
+            switch (columnIndex) {
+            case 0:
+                if (info.clinicName != null)
+                    return info.clinicName;
                 return "";
             case 1:
                 if (info.patients != null)

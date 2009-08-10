@@ -26,6 +26,7 @@ import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankCollectionTable;
 import edu.ualberta.med.biobank.widgets.SampleStorageInfoTable;
+import edu.ualberta.med.biobank.widgets.StudyClinicInfoTable;
 
 public class StudyViewForm extends BiobankViewForm {
 
@@ -82,15 +83,11 @@ public class StudyViewForm extends BiobankViewForm {
             "Comments");
 
         setStudySectionValues();
-
-        AdapterBase clinicGroupNode = ((SiteAdapter) studyAdapter.getParent()
-            .getParent()).getClinicGroupNode();
-        clinicsTable = FormUtils.createClinicSection(toolkit, form.getBody(),
-            clinicGroupNode, study.getClinicCollection());
-
+        createClinicSection();
         createSampleStorageSection();
         createPatientsSection();
         createPvDataSection();
+
         final Button edit = toolkit.createButton(client,
             "Edit this information", SWT.PUSH);
         edit.addSelectionListener(new SelectionAdapter() {
@@ -105,6 +102,17 @@ public class StudyViewForm extends BiobankViewForm {
                 }
             }
         });
+    }
+
+    private void createClinicSection() {
+        Composite client = createSectionWithClient("Clinics");
+
+        clinicsTable = new StudyClinicInfoTable(client, appService, study);
+        clinicsTable.adaptToToolkit(toolkit);
+        toolkit.paintBordersFor(clinicsTable);
+
+        clinicsTable.getTableViewer().addDoubleClickListener(
+            FormUtils.getBiobankCollectionDoubleClickListener());
     }
 
     private void setStudySectionValues() {

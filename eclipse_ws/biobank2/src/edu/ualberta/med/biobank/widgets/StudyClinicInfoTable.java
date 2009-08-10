@@ -11,32 +11,32 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.model.Clinic;
-import edu.ualberta.med.biobank.model.ClinicStudyInfo;
 import edu.ualberta.med.biobank.model.Study;
+import edu.ualberta.med.biobank.model.StudyClinicInfo;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
-public class ClinicStudyInfoTable extends BiobankCollectionTable {
+public class StudyClinicInfoTable extends BiobankCollectionTable {
 
-    private static final String[] headings = new String[] { "Study",
+    private static final String[] headings = new String[] { "Clinic",
         "No. Patients", "No. Patient Visits" };
 
     private static final int[] bounds = new int[] { 200, 130, 100, -1, -1, -1,
         -1 };
 
-    private Clinic clinic;
+    private Study study;
 
     private List<BiobankCollectionModel> model;
 
     private WritableApplicationService appService;
 
-    public ClinicStudyInfoTable(Composite parent,
-        WritableApplicationService appService, Clinic clinic) {
+    public StudyClinicInfoTable(Composite parent,
+        WritableApplicationService appService, Study study) {
         super(parent, SWT.NONE, headings, bounds, null);
         this.appService = appService;
-        this.clinic = clinic;
-        int size = clinic.getStudyCollection().size();
+        this.study = study;
+        int size = study.getClinicCollection().size();
 
         model = new ArrayList<BiobankCollectionModel>();
         for (int i = 0; i < size; ++i) {
@@ -49,32 +49,34 @@ public class ClinicStudyInfoTable extends BiobankCollectionTable {
             public void doubleClick(DoubleClickEvent event) {
             }
         });
-        setClinicInfo();
+        setStudyInfo();
     }
 
-    public void setClinicInfo() {
+    public void setStudyInfo() {
         Thread t = new Thread() {
             @Override
             public void run() {
                 try {
                     BiobankCollectionModel item;
                     int count = 0;
-                    for (Study study : clinic.getStudyCollection()) {
+                    for (Clinic clinic : study.getClinicCollection()) {
                         if (getTableViewer().getTable().isDisposed()) {
                             return;
                         }
                         item = model.get(count);
-                        ClinicStudyInfo info = new ClinicStudyInfo();
+                        StudyClinicInfo info = new StudyClinicInfo();
                         item.o = info;
-                        info.study = study;
-                        info.studyShortName = study.getNameShort();
+                        info.clinic = clinic;
+                        info.clinicName = clinic.getName();
 
                         HQLCriteria c = new HQLCriteria(
-                            "select count(patients)"
+                            "select distinct count(patients)"
                                 + " from edu.ualberta.med.biobank.model.Study as study"
-                                + " inner join study.clinicCollection as clinics"
                                 + " inner join study.patientCollection as patients"
-                                + " where study.id=? and clinics.id=?");
+                                + " inner join patients.patientVisitCollection as visits"
+                                + " inner join visits.clinic as clinic"
+                                + " where study.id=? and clinic.id=?"
+                                + " group by patients");
 
                         c.setParameters(Arrays.asList(new Object[] {
                             study.getId(), clinic.getId() }));
@@ -85,11 +87,11 @@ public class ClinicStudyInfoTable extends BiobankCollectionTable {
                         info.patients = results.get(0);
 
                         c = new HQLCriteria(
-                            "select count(patients)"
+                            "select distinct count(visits)"
                                 + " from edu.ualberta.med.biobank.model.Study as study"
                                 + " inner join study.patientCollection as patients"
-                                + " inner join patients.patientVisitCollection as visit"
-                                + " inner join visit.clinic as clinic"
+                                + " inner join patients.patientVisitCollection as visits"
+                                + " inner join visits.clinic as clinic"
                                 + " where study.id=? and clinic.id=?");
 
                         c.setParameters(Arrays.asList(new Object[] {
