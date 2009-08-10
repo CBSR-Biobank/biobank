@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.handler;
+package edu.ualberta.med.biobank.handlers;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
@@ -16,10 +16,5 @@ public class LogoutHandler extends AbstractHandler {
         PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage()
             .closeAllEditors(true);
         return null;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return (SessionManager.getInstance().getSession() != null);
     }
 }

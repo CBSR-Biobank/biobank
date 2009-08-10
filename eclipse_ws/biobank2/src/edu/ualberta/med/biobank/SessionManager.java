@@ -18,7 +18,9 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
+import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.services.ISourceProviderService;
 
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
@@ -150,6 +152,7 @@ public class SessionManager {
 
     public void setSessionsView(SessionsView view) {
         this.view = view;
+        updateMenus();
     }
 
     public void addSession(final WritableApplicationService appService,
@@ -165,6 +168,7 @@ public class SessionManager {
         view.getTreeViewer().expandToLevel(2);
         log4j.debug("addSession: " + name);
         startInactivityTimer();
+        updateMenus();
     }
 
     private void startInactivityTimer() {
@@ -216,6 +220,17 @@ public class SessionManager {
     public void deleteSession() {
         rootNode.removeChild(sessionAdapter);
         sessionAdapter = null;
+        updateMenus();
+    }
+
+    private void updateMenus() {
+        IWorkbenchWindow window = PlatformUI.getWorkbench()
+            .getActiveWorkbenchWindow();
+        ISourceProviderService service = (ISourceProviderService) window
+            .getService(ISourceProviderService.class);
+        SessionState sessionSourceProvider = (SessionState) service
+            .getSourceProvider(SessionState.SESSION_STATE);
+        sessionSourceProvider.setLoggedIn(sessionAdapter != null);
     }
 
     public SessionAdapter getSession() {
