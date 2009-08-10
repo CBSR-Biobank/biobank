@@ -138,6 +138,11 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
                 NonEmptyString.class, MSG_NO_CONTAINER_TYPE_NAME);
 
             createBoundWidgetWithLabel(client, Text.class, SWT.NONE,
+                "Short Name", null, PojoObservables.observeValue(containerType,
+                    "nameShort"), NonEmptyString.class,
+                MSG_NO_CONTAINER_TYPE_NAME);
+
+            createBoundWidgetWithLabel(client, Text.class, SWT.NONE,
                 "Default Temperature\n(Celcius)", null, PojoObservables
                     .observeValue(containerType, "defaultTemperature"),
                 DoubleNumber.class, "Default temperature is not a valid number");

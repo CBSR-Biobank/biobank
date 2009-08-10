@@ -93,12 +93,10 @@
    <extension
          point="org.eclipse.ui.commands">
       <command
-            defaultHandler="edu.ualberta.med.biobank.handlers.LoginHandler"
             id="edu.ualberta.med.biobank.commands.login"
             name="Login">
       </command>
       <command
-            defaultHandler="edu.ualberta.med.biobank.handlers.LogoutHandler"
             id="edu.ualberta.med.biobank.commands.logout"
             name="Logout">
       </command>
@@ -145,7 +143,7 @@
             commandId="edu.ualberta.med.biobank.commands.login">
          <activeWhen>
              <with variable="edu.ualberta.med.biobank.sourceprovider.loginState">
-                 <equals value="loggedIn">
+                 <equals value="loggedOut">
                  </equals>
              </with>
          </activeWhen>
@@ -157,7 +155,7 @@
             <with
                   variable="edu.ualberta.med.biobank.sourceprovider.loginState">
                <equals
-                     value="loggedOut">
+                     value="loggedIn">
                </equals>
             </with>
          </activeWhen>
@@ -445,7 +443,7 @@
    <extension
          point="org.eclipse.ui.services">
       <sourceProvider
-            provider="edu.ualberta.med.biobank.SessionState">
+            provider="edu.ualberta.med.biobank.sourceproviders.SessionState">
          <variable
                name="edu.ualberta.med.biobank.commands.sourceprovider.active"
                priorityLevel="workbench">
@@ -479,7 +477,7 @@
    <extension
          point="org.eclipse.ui.services">
       <sourceProvider
-            provider="edu.ualberta.med.biobank.SessionState">
+            provider="edu.ualberta.med.biobank.sourceproviders.SessionState">
          <variable
                name="edu.ualberta.med.biobank.sourceprovider.loginState"
                priorityLevel="workbench">
