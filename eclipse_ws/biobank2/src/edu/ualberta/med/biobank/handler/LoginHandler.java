@@ -24,7 +24,7 @@ public class LoginHandler extends AbstractHandler implements IHandler {
     }
 
     @Override
-    public boolean isHandled() {
-        return isEnabled();
+    public void setEnabled(Object evaluationContext) {
+        isEnabled();
     }
 }

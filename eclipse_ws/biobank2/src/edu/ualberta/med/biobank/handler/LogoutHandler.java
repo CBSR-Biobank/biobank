@@ -22,10 +22,4 @@ public class LogoutHandler extends AbstractHandler {
     public boolean isEnabled() {
         return (SessionManager.getInstance().getSession() != null);
     }
-
-    @Override
-    public boolean isHandled() {
-        return isEnabled();
-    }
-
 }
