@@ -45,13 +45,13 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
     private Text name;
 
     @Override
-    protected void init(AdaptorBase adaptor) {
-        Assert.isTrue((adaptor instanceof ClinicAdapter),
+    protected void init() {
+        Assert.isTrue((adapter instanceof ClinicAdapter),
             "Invalid editor input: object of type "
-                + adaptor.getClass().getName());
-        clinicAdapter = (ClinicAdapter) adaptor;
+                + adapter.getClass().getName());
+        clinicAdapter = (ClinicAdapter) adapter;
+        viewFormId = ClinicViewForm.ID;
         clinic = clinicAdapter.getClinic();
-        setAppService(clinicAdapter.getAppService());
 
         address = clinic.getAddress();
         if (address == null) {
@@ -185,11 +185,9 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
         clinic = (Clinic) result.getObjectResult();
 
         clinicAdapter.getParent().performExpand();
-        getSite().getPage().closeEditor(this, false);
     }
 
     private boolean checkClinicNameUnique() throws ApplicationException {
-        WritableApplicationService appService = clinicAdapter.getAppService();
         Site site = ((SiteAdapter) clinicAdapter
             .getParentFromClass(SiteAdapter.class)).getSite();
 

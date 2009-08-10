@@ -19,7 +19,7 @@ public class ChooseContainerWidget extends AbstractGridContainerWidget {
     /**
      * Default status when cell doesn't have any status
      */
-    private ContainerStatus defaultStatus = ContainerStatus.EMPTY;
+    private ContainerStatus defaultStatus = ContainerStatus.NOT_INITIALIZED;
 
     @SuppressWarnings("unused")
     private boolean showNullStatusAsEmpty = false;
@@ -42,8 +42,8 @@ public class ChooseContainerWidget extends AbstractGridContainerWidget {
 
     public void initDefaultLegend() {
         List<ContainerStatus> legendStatus = new ArrayList<ContainerStatus>();
-        legendStatus.add(ContainerStatus.EMPTY);
-        legendStatus.add(ContainerStatus.FILLED);
+        legendStatus.add(ContainerStatus.NOT_INITIALIZED);
+        legendStatus.add(ContainerStatus.INITIALIZED);
         setLegend(legendStatus);
     }
 

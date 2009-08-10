@@ -22,7 +22,7 @@ import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
-import edu.ualberta.med.biobank.treeview.AdaptorBase;
+import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.ClinicAdapter;
 import edu.ualberta.med.biobank.treeview.ContainerTypeAdapter;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
@@ -47,12 +47,12 @@ public class SiteViewForm extends AddressViewFormCommon {
     private Label commentLabel;
 
     @Override
-    public void init(AdaptorBase adaptor) {
-        Assert.isTrue((adaptor instanceof SiteAdapter),
+    public void init() {
+        Assert.isTrue((adapter instanceof SiteAdapter),
             "Invalid editor input: object of type "
-                + adaptor.getClass().getName());
+                + adapter.getClass().getName());
 
-        siteAdapter = (SiteAdapter) adaptor;
+        siteAdapter = (SiteAdapter) adapter;
         retrieveSite();
         setPartName("Repository Site " + site.getName());
     }
@@ -206,7 +206,7 @@ public class SiteViewForm extends AddressViewFormCommon {
             public void widgetSelected(SelectionEvent e) {
                 try {
                     Study study = new Study();
-                    AdaptorBase studiesNode = siteAdapter.getStudiesGroupNode();
+                    AdapterBase studiesNode = siteAdapter.getStudiesGroupNode();
                     StudyAdapter studyAdapter = new StudyAdapter(studiesNode,
                         study);
                     getSite().getPage().openEditor(new FormInput(studyAdapter),

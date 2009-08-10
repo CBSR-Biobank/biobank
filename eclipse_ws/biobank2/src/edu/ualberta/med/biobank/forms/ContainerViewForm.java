@@ -6,10 +6,14 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.ui.PartInitException;
 
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Capacity;
@@ -19,7 +23,7 @@ import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.ContainerStatus;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.ModelUtils;
-import edu.ualberta.med.biobank.treeview.AdaptorBase;
+import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.ContainerAdapter;
 import edu.ualberta.med.biobank.widgets.CabinetDrawerWidget;
 import edu.ualberta.med.biobank.widgets.ChooseContainerWidget;
@@ -60,13 +64,12 @@ public class ContainerViewForm extends BiobankViewForm {
     ContainerCell[][] cells;
 
     @Override
-    public void init(AdaptorBase adapter) {
+    public void init() {
         Assert.isTrue(adapter instanceof ContainerAdapter,
             "Invalid editor input: object of type "
                 + adapter.getClass().getName());
 
         containerAdapter = (ContainerAdapter) adapter;
-        appService = containerAdapter.getAppService();
         retrieveContainer();
         position = container.getPosition();
         setPartName(container.getLabel() + " ("
@@ -83,8 +86,7 @@ public class ContainerViewForm extends BiobankViewForm {
         addRefreshToolbarAction();
         createContainerSection();
 
-        if (container.getContainerType().getChildContainerTypeCollection()
-            .size() == 0) {
+        if (container.getContainerType().getSampleTypeCollection().size() > 0) {
             // only show samples section this if this container type does not
             // have child containers
             createSamplesSection();
@@ -115,6 +117,21 @@ public class ContainerViewForm extends BiobankViewForm {
 
         setContainerValues();
         ContainerType containerType = container.getContainerType();
+        final Button edit = toolkit.createButton(client,
+            "Edit this information", SWT.PUSH);
+        edit.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                getSite().getPage().closeEditor(ContainerViewForm.this, false);
+                try {
+                    getSite().getPage().openEditor(
+                        new FormInput(containerAdapter), ContainerEntryForm.ID,
+                        true);
+                } catch (PartInitException exp) {
+                    exp.printStackTrace();
+                }
+            }
+        });
         if (containerType.getChildContainerTypeCollection().size() > 0) {
             visualizeContainer();
         }
@@ -136,7 +153,7 @@ public class ContainerViewForm extends BiobankViewForm {
                 pos.setPositionDimensionOne(i);
                 pos.setPositionDimensionTwo(j);
                 ContainerCell cell = new ContainerCell(pos);
-                cell.setStatus(ContainerStatus.EMPTY);
+                cell.setStatus(ContainerStatus.NOT_INITIALIZED);
                 cells[i][j] = cell;
             }
         }
@@ -145,7 +162,7 @@ public class ContainerViewForm extends BiobankViewForm {
             int positionDim1 = position.getPositionDimensionOne().intValue();
             int positionDim2 = position.getPositionDimensionTwo().intValue();
             ContainerCell cell = new ContainerCell(position);
-            cell.setStatus(ContainerStatus.FILLED);
+            cell.setStatus(ContainerStatus.INITIALIZED);
             cells[positionDim1][positionDim2] = cell;
         }
     }
@@ -232,12 +249,12 @@ public class ContainerViewForm extends BiobankViewForm {
         ContainerAdapter newAdapter = null;
         ContainerAdapter.closeEditor(new FormInput(containerAdapter));
         if (cells[pos.getPositionDimensionOne()][pos.getPositionDimensionTwo()]
-            .getStatus() == ContainerStatus.EMPTY) {
+            .getStatus() == ContainerStatus.NOT_INITIALIZED) {
             Container newContainer = new Container();
             pos.setParentContainer(container);
             newContainer.setPosition(pos);
             newAdapter = new ContainerAdapter(containerAdapter, newContainer);
-            AdaptorBase.openForm(new FormInput(newAdapter),
+            AdapterBase.openForm(new FormInput(newAdapter),
                 ContainerEntryForm.ID);
         } else {
             Container childContainer;
@@ -256,7 +273,7 @@ public class ContainerViewForm extends BiobankViewForm {
                 }
             }
             Assert.isNotNull(newAdapter);
-            AdaptorBase.openForm(new FormInput(newAdapter),
+            AdapterBase.openForm(new FormInput(newAdapter),
                 ContainerViewForm.ID);
         }
 
@@ -288,10 +305,9 @@ public class ContainerViewForm extends BiobankViewForm {
 
     private void createSamplesSection() {
         Composite parent = createSectionWithClient("Samples");
-        samplesWidget = new SamplesListWidget(parent, null);
-        samplesWidget.adaptToToolkit(toolkit, true);
-        samplesWidget.setSamplePositions(container
+        samplesWidget = new SamplesListWidget(parent, container
             .getSamplePositionCollection());
+        samplesWidget.adaptToToolkit(toolkit, true);
     }
 
     @Override

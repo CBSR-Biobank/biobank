@@ -11,7 +11,7 @@ import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.Sample;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
-import edu.ualberta.med.biobank.treeview.AdaptorBase;
+import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.NodeSearchVisitor;
 import edu.ualberta.med.biobank.treeview.PatientVisitAdapter;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -19,8 +19,8 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 public enum SearchType {
     Site {
         @Override
-        public AdaptorBase search(WritableApplicationService appService,
-            String searchValue, AdaptorBase node) throws Exception {
+        public AdapterBase search(WritableApplicationService appService,
+            String searchValue, AdapterBase node) throws Exception {
             List<Site> sites = ModelUtils.queryProperty(appService, Site.class,
                 "name", searchValue, true);
             if (sites.size() == 0) {
@@ -38,8 +38,8 @@ public enum SearchType {
     },
     Study {
         @Override
-        public AdaptorBase search(WritableApplicationService appService,
-            String searchValue, AdaptorBase node) throws Exception {
+        public AdapterBase search(WritableApplicationService appService,
+            String searchValue, AdapterBase node) throws Exception {
             List<Study> studies = ModelUtils.queryProperty(appService,
                 Study.class, "nameShort", searchValue, true);
             if (studies.size() == 0) {
@@ -57,8 +57,8 @@ public enum SearchType {
     },
     Patient {
         @Override
-        public AdaptorBase search(WritableApplicationService appService,
-            String searchValue, AdaptorBase node) throws Exception {
+        public AdapterBase search(WritableApplicationService appService,
+            String searchValue, AdapterBase node) throws Exception {
             List<Patient> patients = ModelUtils.queryProperty(appService,
                 Patient.class, "number", searchValue, true);
             if (patients.size() == 0) {
@@ -76,8 +76,8 @@ public enum SearchType {
     },
     Sample {
         @Override
-        public AdaptorBase search(WritableApplicationService appService,
-            String searchValue, AdaptorBase node) throws Exception {
+        public AdapterBase search(WritableApplicationService appService,
+            String searchValue, AdapterBase node) throws Exception {
             List<Sample> samples = ModelUtils.queryProperty(appService,
                 Sample.class, "inventoryId", searchValue, true);
             if (samples.size() == 0) {
@@ -98,8 +98,8 @@ public enum SearchType {
     },
     Container {
         @Override
-        public AdaptorBase search(WritableApplicationService appService,
-            String searchValue, AdaptorBase node)
+        public AdapterBase search(WritableApplicationService appService,
+            String searchValue, AdapterBase node)
             throws MultipleSearchResultException, Exception {
             List<Container> containers = ModelUtils.queryProperty(appService,
                 Container.class, "name", searchValue, true);
@@ -117,8 +117,8 @@ public enum SearchType {
         }
     };
 
-    public abstract AdaptorBase search(WritableApplicationService appService,
-        String searchValue, AdaptorBase node) throws MultipleSearchResultException,
+    public abstract AdapterBase search(WritableApplicationService appService,
+        String searchValue, AdapterBase node) throws MultipleSearchResultException,
         Exception;
 
 }

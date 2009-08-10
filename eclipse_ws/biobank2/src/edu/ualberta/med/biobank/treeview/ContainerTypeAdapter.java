@@ -14,11 +14,11 @@ import edu.ualberta.med.biobank.forms.ContainerTypeViewForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.ContainerType;
 
-public class ContainerTypeAdapter extends AdaptorBase {
+public class ContainerTypeAdapter extends AdapterBase {
 
     private ContainerType containerType;
 
-    public ContainerTypeAdapter(AdaptorBase parent, ContainerType containerType) {
+    public ContainerTypeAdapter(AdapterBase parent, ContainerType containerType) {
         super(parent);
         this.setContainerType(containerType);
     }
@@ -86,7 +86,7 @@ public class ContainerTypeAdapter extends AdaptorBase {
     }
 
     @Override
-    public AdaptorBase accept(NodeSearchVisitor visitor) {
+    public AdapterBase accept(NodeSearchVisitor visitor) {
         return null;
     }
 

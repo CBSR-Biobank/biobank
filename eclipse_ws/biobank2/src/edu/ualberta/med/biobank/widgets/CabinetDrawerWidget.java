@@ -57,7 +57,7 @@ public class CabinetDrawerWidget extends Canvas {
             ContainerPosition pos = new ContainerPosition();
             pos.setPositionDimensionOne(i);
             pos.setPositionDimensionTwo(0);
-            ContainerStatus stat = ContainerStatus.EMPTY;
+            ContainerStatus stat = ContainerStatus.NOT_INITIALIZED;
             ContainerCell cell = new ContainerCell();
             cell.setPosition(pos);
             cell.setStatus(stat);
@@ -74,8 +74,8 @@ public class CabinetDrawerWidget extends Canvas {
     public void initLegend() {
         hasLegend = true;
         legendStatus = new ArrayList<ContainerStatus>();
-        legendStatus.add(ContainerStatus.EMPTY);
-        legendStatus.add(ContainerStatus.FILLED);
+        legendStatus.add(ContainerStatus.NOT_INITIALIZED);
+        legendStatus.add(ContainerStatus.INITIALIZED);
     }
 
     protected void paintDrawer(PaintEvent e) {
@@ -112,7 +112,7 @@ public class CabinetDrawerWidget extends Canvas {
 
             ContainerStatus status = cells[boxIndex - 1][0].getStatus();
             if (status == null)
-                status = ContainerStatus.EMPTY;
+                status = ContainerStatus.NOT_INITIALIZED;
             gc.setBackground(status.getColor());
             gc.fillRectangle(rectangle);
             gc.drawRectangle(rectangle);
@@ -159,7 +159,7 @@ public class CabinetDrawerWidget extends Canvas {
         for (ContainerPosition position : childPositionCollection) {
             int pos = position.getPositionDimensionOne().intValue();
             cells[pos][0] = new ContainerCell(position);
-            cells[pos][0].setStatus(ContainerStatus.FILLED);
+            cells[pos][0].setStatus(ContainerStatus.INITIALIZED);
         }
         LEGEND_WIDTH = WIDTH / legendStatus.size();
         redraw();

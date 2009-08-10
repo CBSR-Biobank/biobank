@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.widgets;
 
+import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.TableLayout;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.SWT;
@@ -10,7 +11,11 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.ui.forms.widgets.FormToolkit;
 
+/**
+ * Widget used to display tabular data. Used mostly by view forms.
+ */
 public class BiobankCollectionTable extends BiobankWidget {
 
     private TableViewer tableViewer;
@@ -30,7 +35,7 @@ public class BiobankCollectionTable extends BiobankWidget {
         tableViewer = new TableViewer(this, SWT.BORDER | SWT.MULTI
             | SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION | SWT.VIRTUAL);
         tableViewer.setLabelProvider(new BiobankLabelProvider());
-        tableViewer.setContentProvider(new BiobankContentProvider(tableViewer));
+        tableViewer.setContentProvider(new ArrayContentProvider());
 
         Table table = tableViewer.getTable();
         table.setLayout(new TableLayout());
@@ -62,12 +67,18 @@ public class BiobankCollectionTable extends BiobankWidget {
         tableViewer.setUseHashlookup(true);
         if (data != null) {
             tableViewer.setInput(data);
-            tableViewer.setItemCount(data.length);
         }
     }
 
     public TableViewer getTableViewer() {
         return tableViewer;
+    }
+
+    public void adaptToToolkit(FormToolkit toolkit, boolean paintBorder) {
+        adaptToToolkit(toolkit);
+        if (paintBorder) {
+            toolkit.paintBordersFor(this);
+        }
     }
 
 }

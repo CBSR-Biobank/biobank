@@ -42,7 +42,7 @@ import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.Sample;
 import edu.ualberta.med.biobank.model.SampleCellStatus;
 import edu.ualberta.med.biobank.model.SampleType;
-import edu.ualberta.med.biobank.treeview.AdaptorBase;
+import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.PatientVisitAdapter;
 import edu.ualberta.med.biobank.validators.ScannerBarcodeValidator;
 import edu.ualberta.med.biobank.widgets.AddSamplesScanPalletWidget;
@@ -51,7 +51,6 @@ import edu.ualberta.med.biobank.widgets.listener.ScanPalletModificationEvent;
 import edu.ualberta.med.biobank.widgets.listener.ScanPalletModificationListener;
 import edu.ualberta.med.scanlib.ScanCell;
 import edu.ualberta.med.scanlib.ScanLib;
-import edu.ualberta.med.scanlib.ScanLibFactory;
 import gov.nih.nci.system.query.SDKQuery;
 import gov.nih.nci.system.query.example.InsertExampleQuery;
 
@@ -94,14 +93,13 @@ public class AddPalletSamplesEntryForm extends BiobankEntryForm {
     private static boolean testDisposeOn = true;
 
     @Override
-    protected void init(AdaptorBase adapter) {
+    protected void init() {
         Assert.isTrue((adapter instanceof PatientVisitAdapter),
             "Invalid editor input: object of type "
                 + adapter.getClass().getName());
 
         pvAdapter = (PatientVisitAdapter) adapter;
         patientVisit = pvAdapter.getPatientVisit();
-        appService = pvAdapter.getAppService();
         setPartName("Adding samples for patient "
             + patientVisit.getPatient().getNumber() + " for visit "
             + patientVisit.getDateDrawn());
@@ -397,9 +395,8 @@ public class AddPalletSamplesEntryForm extends BiobankEntryForm {
                     if (BioBankPlugin.isRealScanEnabled()) {
                         int plateNum = BioBankPlugin.getDefault()
                             .getPlateNumber(plateToScan.getValue().toString());
-                        ScanLib scanLib = ScanLibFactory.getScanLib();
-                        int r = scanLib
-                            .slDecodePlate(ScanLib.DPI_300, plateNum);
+                        int r = ScanLib.getInstance().slDecodePlate(
+                            ScanLib.DPI_300, plateNum);
                         if (r < 0) {
                             BioBankPlugin.openError("Scanner",
                                 "Could not decode image. Return code is: " + r);
@@ -529,7 +526,7 @@ public class AddPalletSamplesEntryForm extends BiobankEntryForm {
         doSaveInternal();
         getSite().getPage().closeEditor(AddPalletSamplesEntryForm.this, false);
         pvAdapter.performExpand();
-        AdaptorBase.openForm(new FormInput(pvAdapter), PatientVisitViewForm.ID);
+        AdapterBase.openForm(new FormInput(pvAdapter), PatientVisitViewForm.ID);
     }
 
     private void print() {
@@ -548,7 +545,7 @@ public class AddPalletSamplesEntryForm extends BiobankEntryForm {
         testDisposeOn = false;
         doSaveInternal();
         getSite().getPage().closeEditor(AddPalletSamplesEntryForm.this, false);
-        AdaptorBase.openForm(new FormInput(pvAdapter),
+        AdapterBase.openForm(new FormInput(pvAdapter),
             AddPalletSamplesEntryForm.ID);
     }
 
