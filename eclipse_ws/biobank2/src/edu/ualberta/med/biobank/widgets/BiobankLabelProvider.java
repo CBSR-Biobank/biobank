@@ -9,6 +9,7 @@ import org.springframework.util.Assert;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.model.Clinic;
+import edu.ualberta.med.biobank.model.ClinicStudyInfo;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
 import edu.ualberta.med.biobank.model.ContainerType;
@@ -155,6 +156,23 @@ public class BiobankLabelProvider extends LabelProvider implements
             } else if (columnIndex == 0) {
                 return "loading ...";
             }
+        } else if (element instanceof ClinicStudyInfo) {
+            ClinicStudyInfo info = (ClinicStudyInfo) element;
+            switch (columnIndex) {
+            case 0:
+                if (info.studyShortName != null)
+                    return info.studyShortName;
+                return "";
+            case 1:
+                if (info.patients != null)
+                    return "" + info.patients;
+                return "";
+            case 2:
+                if (info.patientVisits != null)
+                    return "" + info.patientVisits;
+                return "";
+            }
+
         } else {
             Assert.isTrue(false, "invalid object type");
         }

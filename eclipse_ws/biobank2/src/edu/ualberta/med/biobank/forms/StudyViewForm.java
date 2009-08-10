@@ -25,6 +25,7 @@ import edu.ualberta.med.biobank.treeview.PatientAdapter;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankCollectionTable;
+import edu.ualberta.med.biobank.widgets.SampleStorageInfoTable;
 
 public class StudyViewForm extends BiobankViewForm {
 
@@ -38,7 +39,7 @@ public class StudyViewForm extends BiobankViewForm {
     private Label commentLabel;
 
     private BiobankCollectionTable clinicsTable;
-    private BiobankCollectionTable sampleStorageTable;
+    private SampleStorageInfoTable sampleStorageTable;
     private BiobankCollectionTable patientsTable;
     private BiobankCollectionTable pvInfosTable;
 
@@ -115,9 +116,8 @@ public class StudyViewForm extends BiobankViewForm {
     private void createSampleStorageSection() {
         Section section = createSection("Sample Storage");
 
-        String[] headings = new String[] { "Sample type", "Volume", "Quantity" };
-        sampleStorageTable = new BiobankCollectionTable(section, SWT.NONE,
-            headings, ModelUtils.toArray(study.getSampleStorageCollection()));
+        sampleStorageTable = new SampleStorageInfoTable(section, study
+            .getSampleStorageCollection());
         section.setClient(sampleStorageTable);
         sampleStorageTable.adaptToToolkit(toolkit);
         toolkit.paintBordersFor(sampleStorageTable);

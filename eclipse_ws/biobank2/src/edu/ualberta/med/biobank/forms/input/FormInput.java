@@ -13,10 +13,13 @@ public class FormInput implements IEditorInput {
         node = o;
     }
 
-    public Integer getIndex() {
-        if (node != null)
-            return node.getId();
-        return 0;
+    public int getIndex() {
+        if (node != null) {
+            Integer id = node.getId();
+            if (id != null)
+                return id.intValue();
+        }
+        return -1;
     }
 
     public AdapterBase getNode() {
@@ -65,7 +68,10 @@ public class FormInput implements IEditorInput {
             if (node.getClass() != ((FormInput) o).node.getClass())
                 return false;
 
-            return (getIndex() == ((FormInput) o).getIndex());
+            int myIndex = getIndex();
+            int oIndex = ((FormInput) o).getIndex();
+
+            return ((myIndex != -1) && (oIndex != -1) && (myIndex == oIndex));
         }
         return false;
     }
