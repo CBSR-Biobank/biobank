@@ -16,9 +16,6 @@ import edu.ualberta.med.biobank.treeview.SiteAdapter;
 public class SiteAddHandler extends AbstractHandler {
 
     public Object execute(ExecutionEvent event) throws ExecutionException {
-        int numSessions = SessionManager.getInstance().getSessionCount();
-
-        Assert.isTrue(numSessions >= 1);
 
         Site site = new Site();
         site.setAddress(new Address());
@@ -33,10 +30,5 @@ public class SiteAddHandler extends AbstractHandler {
         }
 
         return null;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return (SessionManager.getInstance().getSessionCount() > 0);
     }
 }
