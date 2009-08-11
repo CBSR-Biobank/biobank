@@ -16,7 +16,7 @@
             class="edu.ualberta.med.biobank.preferences.PreferenceInitializer">
       </initializer>
    </extension>
-     <extension
+   <extension
          id="product"
          point="org.eclipse.core.runtime.products">
       <product
@@ -142,6 +142,16 @@
             id="edu.ualberta.med.biobank.commands.patients.defaultLink"
             name="Default Link">
       </command>
+      <command
+            defaultHandler="edu.ualberta.med.biobank.handlers.ContainerTypeAddHandler"
+            id="edu.ualberta.med.biobank.commands.addContainerType"
+            name="Add Container Type">
+      </command>
+      <command
+            defaultHandler="edu.ualberta.med.biobank.handlers.ContainerAddHandler"
+            id="edu.ualberta.med.biobank.commands.addContainer"
+            name="Add Container">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.handlers">
@@ -167,7 +177,7 @@
             </with>
          </activeWhen>
       </handler>
-            <handler
+      <handler
             class="edu.ualberta.med.biobank.handlers.ScanLinkHandler"
             commandId="edu.ualberta.med.biobank.commands.patients.scanLink">
          <activeWhen>
@@ -245,9 +255,27 @@
                   label="Repository Site"
                   mnemonic="i">
                <command
-                     commandId="edu.ualberta.med.biobank.commands.addSite"
-                     id="edu.ualberta.med.biobank.menu.addSite"
-                     label="Add"
+                     commandId="edu.ualberta.med.biobank.commands.addStudy"
+                     id="edu.ualberta.med.biobank.menu.addStudy"
+                     label="Add Study"
+                     style="push">
+               </command>
+               <command
+                     commandId="edu.ualberta.med.biobank.commands.addStudy"
+                     id="edu.ualberta.med.biobank.menu.addStudy"
+                     label="Add Study"
+                     style="push">
+               </command>
+               <command
+                     commandId="edu.ualberta.med.biobank.commands.addContainerType"
+                     id="edu.ualberta.med.biobank.menu.addContainerType"
+                     label="Add Container Type"
+                     style="push">
+               </command>
+               <command
+                     commandId="edu.ualberta.med.biobank.commands.addContainer"
+                     id="edu.ualberta.med.biobank.menu.addContainer"
+                     label="Add Container"
                      style="push">
                </command>
             </menu>
@@ -307,6 +335,30 @@
                         definitionId="biobank2.patientsPerpectiveSelected">
                   </reference>
                </visibleWhen>
+            </command>
+            <command
+                  commandId="edu.ualberta.med.biobank.commands.addStudy"
+                  icon="icons/book_open.png"
+                  label="Add Study"
+                  style="push">
+            </command>
+            <command
+                  commandId="edu.ualberta.med.biobank.commands.addClinic"
+                  icon="icons/transmit_blue.png"
+                  label="Add Clinic"
+                  style="push">
+            </command>
+            <command
+                  commandId="edu.ualberta.med.biobank.commands.addContainerType"
+                  icon="icons/basket_edit.png"
+                  label="Add Container Type"
+                  style="push">
+            </command>
+            <command
+                  commandId="edu.ualberta.med.biobank.commands.addContainer"
+                  icon="icons/basket.png"
+                  label="Add Container"
+                  style="push">
             </command>
             <command
                   commandId="edu.ualberta.med.biobank.commands.patients.defaultLink"
@@ -510,6 +562,16 @@
       </page>
    </extension>
    <extension
+         point="org.eclipse.ui.services">
+      <sourceProvider
+            provider="edu.ualberta.med.biobank.sourceproviders.SessionState">
+         <variable
+               name="edu.ualberta.med.biobank.commands.sourceprovider.active"
+               priorityLevel="workbench">
+         </variable>
+      </sourceProvider>
+   </extension>
+   <extension
          point="org.eclipse.ui.views">
       <view
             allowMultiple="false"
@@ -561,15 +623,5 @@
             </equals>
          </with>
       </definition>
-   </extension>
-   <extension
-         point="org.eclipse.ui.services">
-      <sourceProvider
-            provider="edu.ualberta.med.biobank.sourceproviders.SessionState">
-         <variable
-               name="edu.ualberta.med.biobank.commands.sourceprovider.active"
-               priorityLevel="workbench">
-         </variable>
-      </sourceProvider>
    </extension>
 </plugin>
