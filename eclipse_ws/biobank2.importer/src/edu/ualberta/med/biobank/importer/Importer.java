@@ -497,6 +497,11 @@ public class Importer {
                 paletteNum = rs.getInt(6) - 1;
                 palettePos = rs.getString(14);
 
+                if (palettePos.substring(0, 1).equals("J")) {
+                    System.out.println("ignoring sample at " + palettePos);
+                    continue;
+                }
+
                 System.out.println("importing FR01 sample at position "
                     + hotelName + String.format("%02d", paletteNum)
                     + palettePos);

@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.2"?>
 <plugin>
-
    <extension
          id="biobank2"
          point="org.eclipse.core.runtime.applications">
@@ -12,75 +11,90 @@
       </application>
    </extension>
    <extension
-         id="product"
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="edu.ualberta.med.biobank.preferences.PreferenceInitializer">
+      </initializer>
+   </extension>
+   <extension
+         id="product1"
          point="org.eclipse.core.runtime.products">
       <product
-            application="edu.ualberta.med.biobank.application"
+            application="biobank2.biobank2"
             name="BioBank2">
          <property
                name="windowImages"
                value="icons/alt_window_16.gif,icons/alt_window_32.gif">
          </property>
+         <property
+               name="appName"
+               value="BioBank2">
+         </property>
       </product>
    </extension>
    <extension
-         point="org.eclipse.ui.perspectives">
-      <perspective
-            class="edu.ualberta.med.biobank.rcp.MainPerspective"
-            id="edu.ualberta.med.biobank.perspective.main"
-            name="Biobank Perspective">
-      </perspective>
-      <perspective
-            class="edu.ualberta.med.biobank.rcp.PatientsAdministrationPerspective"
-            fixed="true"
-            id="edu.ualberta.med.biobank.perspective.patients"
-            name="Patients Administration">
-      </perspective>
+         point="org.eclipse.ui.activities">
+      <activity
+            description="Preferences from Eclipse Update UI"
+            id="edu.ualberta.med.biobank.activity.updateui"
+            name="Update Preferences">
+      </activity>
+      <activityPatternBinding
+            activityId="edu.ualberta.med.biobank.activity.updateui"
+            pattern="org\.eclipse\.update\.ui/org\.eclipse\.update\..*PreferencePage">
+      </activityPatternBinding>
+      <activity
+            description="Preferences from Eclipse IDE UI"
+            id="edu.ualberta.med.biobank.activity.eclipseide"
+            name="IDE General Preferences">
+      </activity>
+      <activityPatternBinding
+            activityId="edu.ualberta.med.biobank.activity.eclipseide"
+            pattern="org\.eclipse\.ui\.ide/org\.eclipse\.ui\.preferencePages\.Workbench">
+      </activityPatternBinding>
    </extension>
    <extension
          point="org.eclipse.ui.commands">
       <command
-            defaultHandler="edu.ualberta.med.biobank.handler.LoginHandler"
             id="edu.ualberta.med.biobank.commands.login"
             name="Login">
       </command>
       <command
-            defaultHandler="edu.ualberta.med.biobank.handler.LogoutHandler"
             id="edu.ualberta.med.biobank.commands.logout"
             name="Logout">
       </command>
       <command
-            defaultHandler="edu.ualberta.med.biobank.handler.QuitHandler"
+            defaultHandler="edu.ualberta.med.biobank.handlers.QuitHandler"
             id="edu.ualberta.med.biobank.commands.quit"
             name="Quit">
       </command>
       <command
-            defaultHandler="edu.ualberta.med.biobank.handler.SiteAddHandler"
+            defaultHandler="edu.ualberta.med.biobank.handlers.SiteAddHandler"
             id="edu.ualberta.med.biobank.commands.addSite"
             name="Add Repository Site">
       </command>
       <command
-            defaultHandler="edu.ualberta.med.biobank.handler.StudyAddHandler"
+            defaultHandler="edu.ualberta.med.biobank.handlers.StudyAddHandler"
             id="edu.ualberta.med.biobank.commands.addStudy"
             name="Add Study">
       </command>
       <command
-            defaultHandler="edu.ualberta.med.biobank.handler.ClinicAddHandler"
+            defaultHandler="edu.ualberta.med.biobank.handlers.ClinicAddHandler"
             id="edu.ualberta.med.biobank.commands.addClinic"
             name="Add Clinic">
       </command>
       <command
-            defaultHandler="edu.ualberta.med.biobank.handler.SearchHandler"
+            defaultHandler="edu.ualberta.med.biobank.handlers.SearchHandler"
             id="edu.ualberta.med.biobank.commands.search"
             name="Search">
       </command>
       <command
-            defaultHandler="edu.ualberta.med.biobank.handler.PatientAdministrationHandler"
+            defaultHandler="edu.ualberta.med.biobank.handlers.PatientAdministrationHandler"
             id="edu.ualberta.med.biobank.commands.patientAdmin"
             name="Patient administration">
       </command>
       <command
-            defaultHandler="edu.ualberta.med.biobank.handler.MainAdministrationHandler"
+            defaultHandler="edu.ualberta.med.biobank.handlers.MainAdministrationHandler"
             id="edu.ualberta.med.biobank.commands.mainAdmin"
             name="Main Administration">
       </command>
@@ -91,17 +105,80 @@
       <command
             category="edu.ualberta.med.biobank.category.patientsAdmin"
             categoryId="edu.ualberta.med.biobank.category.patientsAdmin"
-            defaultHandler="edu.ualberta.med.biobank.handler.ScanLinkHandler"
+            defaultHandler="edu.ualberta.med.biobank.handlers.ScanLinkHandler"
             id="edu.ualberta.med.biobank.commands.patients.scanLink"
             name="Scan Link">
       </command>
       <command
             category="edu.ualberta.med.biobank.category.patientsAdmin"
             categoryId="edu.ualberta.med.biobank.category.patientsAdmin"
-            defaultHandler="edu.ualberta.med.biobank.handler.DefaultLinkHandler"
+            defaultHandler="edu.ualberta.med.biobank.handlers.DefaultLinkHandler"
             id="edu.ualberta.med.biobank.commands.patients.defaultLink"
             name="Default Link">
       </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.handlers">
+      <handler
+            class="edu.ualberta.med.biobank.handlers.LoginHandler"
+            commandId="edu.ualberta.med.biobank.commands.login">
+         <activeWhen>
+             <with variable="edu.ualberta.med.biobank.sourceprovider.loginState">
+                 <equals value="loggedOut">
+                 </equals>
+             </with>
+         </activeWhen>
+      </handler>
+      <handler
+            class="edu.ualberta.med.biobank.handlers.LogoutHandler"
+            commandId="edu.ualberta.med.biobank.commands.logout">
+         <activeWhen>
+            <with
+                  variable="edu.ualberta.med.biobank.sourceprovider.loginState">
+               <equals
+                     value="loggedIn">
+               </equals>
+            </with>
+         </activeWhen>
+      </handler>
+            <handler
+            class="edu.ualberta.med.biobank.handlers.ScanLinkHandler"
+            commandId="edu.ualberta.med.biobank.commands.patients.scanLink">
+         <activeWhen>
+            <reference
+                  definitionId="biobank2.patientsPerpectiveSelected">
+            </reference>
+         </activeWhen>
+         <enabledWhen>
+            <with
+                  variable="activePartId">
+               <not>
+                  <equals
+                        value="edu.ualberta.med.biobank.views.patients.ScanLink">
+                  </equals>
+               </not>
+            </with>
+         </enabledWhen>
+      </handler>
+      <handler
+            class="edu.ualberta.med.biobank.handlers.DefaultLinkHandler"
+            commandId="edu.ualberta.med.biobank.commands.patients.defaultLink">
+         <activeWhen>
+            <reference
+                  definitionId="biobank2.patientsPerpectiveSelected">
+            </reference>
+         </activeWhen>
+         <enabledWhen>
+            <with
+                  variable="activePartId">
+               <not>
+                  <equals
+                        value="edu.ualberta.med.biobank.views.patients.ScanLink">
+                  </equals>
+               </not>
+            </with>
+         </enabledWhen>
+      </handler>
    </extension>
    <extension
          point="org.eclipse.ui.menus">
@@ -221,32 +298,7 @@
       </menuContribution>
    </extension>
    <extension
-         point="org.eclipse.ui.views">
-      <view
-            allowMultiple="false"
-            class="edu.ualberta.med.biobank.views.SessionsView"
-            id="edu.ualberta.med.biobank.views.SessionsView"
-            name="Sessions"
-            restorable="true">
-      </view>
-      <view
-            allowMultiple="false"
-            class="edu.ualberta.med.biobank.views.SearchView"
-            id="edu.ualberta.med.biobank.views.SearchView"
-            name="Search"
-            restorable="true">
-      </view>
-      <view
-            allowMultiple="false"
-            class="edu.ualberta.med.biobank.views.PatientAdministrationView"
-            icon="icons/patientPerspective.png"
-            id="edu.ualberta.med.biobank.views.patientsAdmin"
-            name="Patients administration"
-            restorable="true">
-      </view>
-   </extension>
-   <extension
-         point="org.eclipse.ui.perspectiveExtensions">
+        point="org.eclipse.ui.perspectiveExtensions">
       <perspectiveExtension
             targetID="edu.ualberta.med.biobank.perspective.main">
          <view
@@ -299,6 +351,27 @@
                visible="false">
          </view>
       </perspectiveExtension>
+      </extension>
+      <extension
+         point="org.eclipse.ui.perspectives">
+      <perspective
+            class="edu.ualberta.med.biobank.rcp.MainPerspective"
+            id="edu.ualberta.med.biobank.perspective.main"
+            name="Biobank Perspective">
+      </perspective>
+      <perspective
+            class="edu.ualberta.med.biobank.rcp.PatientsAdministrationPerspective"
+            fixed="true"
+            id="edu.ualberta.med.biobank.perspective.patients"
+            name="Patients Administration">
+      </perspective>
+   </extension>
+   <extension
+         point="org.eclipse.ui.bindings">
+      <scheme
+            id="org.eclipse.ui.examples.contributions.scheme"
+            name="%scheme.info.name">
+      </scheme>
    </extension>
    <extension
          point="org.eclipse.ui.editors">
@@ -412,29 +485,6 @@
       </editor>
    </extension>
    <extension
-         point="org.eclipse.ui.bindings">
-      <scheme
-            id="org.eclipse.ui.examples.contributions.scheme"
-            name="%scheme.info.name">
-      </scheme>
-   </extension>
-   <extension
-         id="product1"
-         point="org.eclipse.core.runtime.products">
-      <product
-            application="biobank2.biobank2"
-            name="BioBank2">
-         <property
-               name="windowImages"
-               value="icons/alt_window_16.gif,icons/alt_window_32.gif">
-         </property>
-         <property
-               name="appName"
-               value="BioBank2">
-         </property>
-      </product>
-   </extension>
-   <extension
          point="org.eclipse.ui.preferencePages">
       <page
             class="edu.ualberta.med.biobank.preferences.GeneralConfigurationPreferencePage"
@@ -448,31 +498,46 @@
       </page>
    </extension>
    <extension
-         point="org.eclipse.core.runtime.preferences">
-      <initializer
-            class="edu.ualberta.med.biobank.preferences.PreferenceInitializer">
-      </initializer>
+         point="org.eclipse.ui.services">
+      <sourceProvider
+            provider="edu.ualberta.med.biobank.sourceproviders.SessionState">
+         <variable
+               name="edu.ualberta.med.biobank.commands.sourceprovider.active"
+               priorityLevel="workbench">
+         </variable>
+      </sourceProvider>
    </extension>
    <extension
-         point="org.eclipse.ui.activities">
-      <activity
-            description="Preferences from Eclipse Update UI"
-            id="edu.ualberta.med.biobank.activity.updateui"
-            name="Update Preferences">
-      </activity>
-      <activityPatternBinding
-            activityId="edu.ualberta.med.biobank.activity.updateui"
-            pattern="org\.eclipse\.update\.ui/org\.eclipse\.update\..*PreferencePage">
-      </activityPatternBinding>
-      <activity
-            description="Preferences from Eclipse IDE UI"
-            id="edu.ualberta.med.biobank.activity.eclipseide"
-            name="IDE General Preferences">
-      </activity>
-      <activityPatternBinding
-            activityId="edu.ualberta.med.biobank.activity.eclipseide"
-            pattern="org\.eclipse\.ui\.ide/org\.eclipse\.ui\.preferencePages\.Workbench">
-      </activityPatternBinding>
+         point="org.eclipse.ui.views">
+      <view
+            allowMultiple="false"
+            class="edu.ualberta.med.biobank.views.SessionsView"
+            id="edu.ualberta.med.biobank.views.SessionsView"
+            name="Sessions"
+            restorable="true">
+      </view>
+      <view
+            allowMultiple="false"
+            class="edu.ualberta.med.biobank.views.SearchView"
+            id="edu.ualberta.med.biobank.views.SearchView"
+            name="Search"
+            restorable="true">
+      </view>
+      <view
+            allowMultiple="false"
+            class="edu.ualberta.med.biobank.views.PatientAdministrationView"
+            id="edu.ualberta.med.biobank.views.patientsAdmin"
+            name="Patients administration"
+            restorable="true">
+      </view>
+      <view
+            allowMultiple="false"
+            class="edu.ualberta.med.biobank.views.patients.ScanLinkView"
+            icon="icons/scanLink.png"
+            id="edu.ualberta.med.biobank.views.patients.ScanLink"
+            name="Scan Link"
+            restorable="true">
+      </view>
    </extension>
    <extension
          point="org.eclipse.core.expressions.definitions">
@@ -494,46 +559,5 @@
             </equals>
          </with>
       </definition>
-   </extension>
-   <extension
-         point="org.eclipse.ui.handlers">
-      <handler
-            class="edu.ualberta.med.biobank.handler.ScanLinkHandler"
-            commandId="edu.ualberta.med.biobank.commands.patients.scanLink">
-         <activeWhen>
-            <reference
-                  definitionId="biobank2.patientsPerpectiveSelected">
-            </reference>
-         </activeWhen>
-         <enabledWhen>
-            <with
-                  variable="activePartId">
-               <not>
-                  <equals
-                        value="edu.ualberta.med.biobank.views.patients.ScanLink">
-                  </equals>
-               </not>
-            </with>
-         </enabledWhen>
-      </handler>
-      <handler
-            class="edu.ualberta.med.biobank.handler.DefaultLinkHandler"
-            commandId="edu.ualberta.med.biobank.commands.patients.defaultLink">
-         <activeWhen>
-            <reference
-                  definitionId="biobank2.patientsPerpectiveSelected">
-            </reference>
-         </activeWhen>
-         <enabledWhen>
-            <with
-                  variable="activePartId">
-               <not>
-                  <equals
-                        value="edu.ualberta.med.biobank.views.patients.ScanLink">
-                  </equals>
-               </not>
-            </with>
-         </enabledWhen>
-      </handler>
    </extension>
 </plugin>

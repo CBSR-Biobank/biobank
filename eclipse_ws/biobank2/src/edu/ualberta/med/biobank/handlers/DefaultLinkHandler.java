@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.handler;
+package edu.ualberta.med.biobank.handlers;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;

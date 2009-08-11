@@ -165,7 +165,7 @@ public class ScanLinkView extends ViewPart {
 
     private WritableApplicationService getAppService() {
         if (appService == null) {
-            appService = SessionManager.getInstance().getSessionSingle()
+            appService = SessionManager.getInstance().getSessionAdapter()
                 .getAppService();
         }
         return appService;
