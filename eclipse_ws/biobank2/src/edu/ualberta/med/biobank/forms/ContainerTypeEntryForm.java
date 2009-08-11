@@ -350,8 +350,8 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
             setDirty(true);
             return;
         }
-
         saveSampleTypes();
+
         saveChildContainerTypes();
         // saveCapacity();
         containerType.setCapacity(capacity);
@@ -378,7 +378,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         }
         allContainerTypes.add(containerType);
         site.setContainerTypeCollection(allContainerTypes);
-
+        containerTypeAdapter.setContainerType(containerType);
         containerTypeAdapter.getParent().performExpand();
 
     }
