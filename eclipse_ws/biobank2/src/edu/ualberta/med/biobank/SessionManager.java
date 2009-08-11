@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.concurrent.Semaphore;
 
 import org.apache.log4j.Logger;
-import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ITreeViewerListener;
@@ -211,11 +210,11 @@ public class SessionManager {
         }
     }
 
-    public SessionAdapter getSessionAdapter(int count) {
+    public SessionAdapter getSessionAdapter() {
+        if (sessionAdapter == null)
+            return null;
         List<AdapterBase> nodes = rootNode.getChildren();
-        Assert.isTrue(count < nodes.size(), "Invalid session node count: "
-            + count);
-        return (SessionAdapter) nodes.get(count);
+        return (SessionAdapter) nodes.get(0);
     }
 
     public void deleteSession() {
