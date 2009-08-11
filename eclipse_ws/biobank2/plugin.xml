@@ -80,7 +80,7 @@
             name="Patient administration">
       </command>
       <command
-            defaultHandler="edu.ualberta.med.biobank.handler.MainAdministrationHanlder"
+            defaultHandler="edu.ualberta.med.biobank.handler.MainAdministrationHandler"
             id="edu.ualberta.med.biobank.commands.mainAdmin"
             name="Main Administration">
       </command>
@@ -89,13 +89,16 @@
             name="Patients Administration">
       </category>
       <command
+            category="edu.ualberta.med.biobank.category.patientsAdmin"
             categoryId="edu.ualberta.med.biobank.category.patientsAdmin"
             defaultHandler="edu.ualberta.med.biobank.handler.ScanLinkHandler"
             id="edu.ualberta.med.biobank.commands.patients.scanLink"
             name="Scan Link">
       </command>
       <command
+            category="edu.ualberta.med.biobank.category.patientsAdmin"
             categoryId="edu.ualberta.med.biobank.category.patientsAdmin"
+            defaultHandler="edu.ualberta.med.biobank.handler.DefaultLinkHandler"
             id="edu.ualberta.med.biobank.commands.patients.defaultLink"
             name="Default Link">
       </command>
@@ -163,44 +166,56 @@
             locationURI="toolbar:org.eclipse.ui.main.toolbar">
          <toolbar
                id="edu.ualberta.med.biobank.toolbar.mainPerpective">
-            <visibleWhen
-                  checkEnabled="false">
-               <reference
-                     definitionId="biobank2.mainPerpectiveSelected">
-               </reference>
-            </visibleWhen>
             <command
                commandId="edu.ualberta.med.biobank.commands.patientAdmin"
                icon="icons/patientPerspective.png"
                label="Patients Administration"
                style="push">
+               <visibleWhen
+                     checkEnabled="false">
+                  <reference
+                        definitionId="biobank2.mainPerpectiveSelected">
+                  </reference>
+               </visibleWhen>
             </command>
          </toolbar>         
          <toolbar
                id="edu.ualberta.med.biobank.toolbar.patientsPerspective">
-            <visibleWhen
-                  checkEnabled="false">
-               <reference
-                     definitionId="biobank2.patientsPerpectiveSelected">
-               </reference>
-            </visibleWhen>
             <command
                   commandId="edu.ualberta.med.biobank.commands.mainAdmin"
                   icon="icons/mainPerspective.png"
                   label="Main Administration"
                   style="push">
+               <visibleWhen
+                     checkEnabled="false">
+                  <reference
+                        definitionId="biobank2.patientsPerpectiveSelected">
+                  </reference>
+               </visibleWhen>
             </command>
             <command
                   commandId="edu.ualberta.med.biobank.commands.patients.scanLink"
                   icon="icons/scanLink.png"
                   label="Scan Link"
                   style="push">
+               <visibleWhen
+                     checkEnabled="false">
+                  <reference
+                        definitionId="biobank2.patientsPerpectiveSelected">
+                  </reference>
+               </visibleWhen>
             </command>
             <command
                   commandId="edu.ualberta.med.biobank.commands.patients.defaultLink"
                   icon="icons/defaultLink.png"
                   label="Default link"
                   style="push">
+               <visibleWhen
+                     checkEnabled="false">
+                  <reference
+                        definitionId="biobank2.patientsPerpectiveSelected">
+                  </reference>
+               </visibleWhen>
             </command>            
          </toolbar>
       </menuContribution>
@@ -224,6 +239,7 @@
       <view
             allowMultiple="false"
             class="edu.ualberta.med.biobank.views.PatientAdministrationView"
+            icon="icons/patientPerspective.png"
             id="edu.ualberta.med.biobank.views.patientsAdmin"
             name="Patients administration"
             restorable="true">
@@ -267,9 +283,20 @@
                ratio="0.95"
                relationship="top"
                relative="org.eclipse.ui.editorss"
-               showTitle="true"
-               standalone="true"
+               showTitle="false"
+               standalone="false"
                visible="true">
+         </view>
+         <view
+               closeable="false"
+               id="edu.ualberta.med.biobank.views.patients.ScanLink"
+               minimized="false"
+               moveable="false"
+               relationship="stack"
+               relative="edu.ualberta.med.biobank.views.patientsAdmin"
+               showTitle="false"
+               standalone="false"
+               visible="false">
          </view>
       </perspectiveExtension>
    </extension>
@@ -467,5 +494,46 @@
             </equals>
          </with>
       </definition>
+   </extension>
+   <extension
+         point="org.eclipse.ui.handlers">
+      <handler
+            class="edu.ualberta.med.biobank.handler.ScanLinkHandler"
+            commandId="edu.ualberta.med.biobank.commands.patients.scanLink">
+         <activeWhen>
+            <reference
+                  definitionId="biobank2.patientsPerpectiveSelected">
+            </reference>
+         </activeWhen>
+         <enabledWhen>
+            <with
+                  variable="activePartId">
+               <not>
+                  <equals
+                        value="edu.ualberta.med.biobank.views.patients.ScanLink">
+                  </equals>
+               </not>
+            </with>
+         </enabledWhen>
+      </handler>
+      <handler
+            class="edu.ualberta.med.biobank.handler.DefaultLinkHandler"
+            commandId="edu.ualberta.med.biobank.commands.patients.defaultLink">
+         <activeWhen>
+            <reference
+                  definitionId="biobank2.patientsPerpectiveSelected">
+            </reference>
+         </activeWhen>
+         <enabledWhen>
+            <with
+                  variable="activePartId">
+               <not>
+                  <equals
+                        value="edu.ualberta.med.biobank.views.patients.ScanLink">
+                  </equals>
+               </not>
+            </with>
+         </enabledWhen>
+      </handler>
    </extension>
 </plugin>
