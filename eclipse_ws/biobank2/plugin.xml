@@ -135,6 +135,16 @@
             id="edu.ualberta.med.biobank.commands.mainAdmin"
             name="Main Administration">
       </command>
+      <command
+            defaultHandler="edu.ualberta.med.biobank.handlers.ContainerTypeAddHandler"
+            id="edu.ualberta.med.biobank.commands.addContainerType"
+            name="Add Container Type">
+      </command>
+      <command
+            defaultHandler="edu.ualberta.med.biobank.handlers.ContainerAddHandler"
+            id="edu.ualberta.med.biobank.commands.addContainer"
+            name="Add Container">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.handlers">
@@ -200,9 +210,27 @@
                   label="Repository Site"
                   mnemonic="i">
                <command
-                     commandId="edu.ualberta.med.biobank.commands.addSite"
-                     id="edu.ualberta.med.biobank.menu.addSite"
-                     label="Add"
+                     commandId="edu.ualberta.med.biobank.commands.addStudy"
+                     id="edu.ualberta.med.biobank.menu.addStudy"
+                     label="Add Study"
+                     style="push">
+               </command>
+               <command
+                     commandId="edu.ualberta.med.biobank.commands.addStudy"
+                     id="edu.ualberta.med.biobank.menu.addStudy"
+                     label="Add Study"
+                     style="push">
+               </command>
+               <command
+                     commandId="edu.ualberta.med.biobank.commands.addContainerType"
+                     id="edu.ualberta.med.biobank.menu.addContainerType"
+                     label="Add Container Type"
+                     style="push">
+               </command>
+               <command
+                     commandId="edu.ualberta.med.biobank.commands.addContainer"
+                     id="edu.ualberta.med.biobank.menu.addContainer"
+                     label="Add Container"
                      style="push">
                </command>
             </menu>
@@ -229,24 +257,36 @@
                   icon="icons/mainPerspective.png"
                   label="Main Administration"
                   style="push">
-               <visibleWhen
-                     checkEnabled="true">
-                  <reference
-                        definitionId="biobank2.mainPerpectiveSelected">
-                  </reference>
-               </visibleWhen>
             </command>
             <command
                   commandId="edu.ualberta.med.biobank.commands.patientAdmin"
                   icon="icons/patientPerspective.png"
                   label="Patients Administration"
                   style="push">
-               <visibleWhen
-                     checkEnabled="true">
-                  <reference
-                        definitionId="biobank2.patientsPerpectiveSelected">
-                  </reference>
-               </visibleWhen>
+            </command>
+            <command
+                  commandId="edu.ualberta.med.biobank.commands.addStudy"
+                  icon="icons/book_open.png"
+                  label="Add Study"
+                  style="push">
+            </command>
+            <command
+                  commandId="edu.ualberta.med.biobank.commands.addClinic"
+                  icon="icons/transmit_blue.png"
+                  label="Add Clinic"
+                  style="push">
+            </command>
+            <command
+                  commandId="edu.ualberta.med.biobank.commands.addContainerType"
+                  icon="icons/basket_edit.png"
+                  label="Add Container Type"
+                  style="push">
+            </command>
+            <command
+                  commandId="edu.ualberta.med.biobank.commands.addContainer"
+                  icon="icons/basket.png"
+                  label="Add Container"
+                  style="push">
             </command>
          </toolbar>
       </menuContribution>
