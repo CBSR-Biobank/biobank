@@ -17,7 +17,6 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
-import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 /**
  * The base class for all BioBank2 Java Client view forms. The forms are usually
@@ -25,8 +24,6 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
  * view.
  */
 public abstract class BiobankViewForm extends BiobankFormBase {
-
-    protected WritableApplicationService appService;
 
     protected String sessionName;
 
@@ -42,10 +39,6 @@ public abstract class BiobankViewForm extends BiobankFormBase {
 
     @Override
     public void setFocus() {
-    }
-
-    public void setAppService(WritableApplicationService appService) {
-        this.appService = appService;
     }
 
     protected void setWidgetsValues(ListOrderedMap fieldsMap, Object bean) {

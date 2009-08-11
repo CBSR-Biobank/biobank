@@ -23,6 +23,7 @@ import gov.nih.nci.system.query.example.InsertExampleQuery;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 import java.lang.reflect.Constructor;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -75,14 +76,14 @@ public class InitExamples {
         clinics = new Clinic[MAX_CLINICS];
         numSchemeMap = new HashMap<String, ContainerLabelingScheme>();
 
-        appService = (WritableApplicationService) ApplicationServiceProvider
-            .getApplicationServiceFromUrl(
-                "http://aicml-med.cs.ualberta.ca:8080/biobank2", "testuser",
-                "test");
-
         // appService = (WritableApplicationService) ApplicationServiceProvider
-        // .getApplicationServiceFromUrl("http://localhost:8080/biobank2",
-        // "testuser", "test");
+        // .getApplicationServiceFromUrl(
+        // "http://aicml-med.cs.ualberta.ca:8080/biobank2", "testuser",
+        // "test");
+
+        appService = (WritableApplicationService) ApplicationServiceProvider
+            .getApplicationServiceFromUrl("http://localhost:8080/biobank2",
+                "testuser", "test");
 
         deleteAll(Container.class);
         deleteAll(ContainerType.class);
@@ -164,14 +165,17 @@ public class InitExamples {
             new SampleType()).get(0);
     }
 
-    private void insertPatientVisitsInPatient() throws ApplicationException {
+    private void insertPatientVisitsInPatient() throws Exception {
         patientVisits = new ArrayList<PatientVisit>();
         Random r = new Random();
         for (Patient patient : patients) {
             PatientVisit patientVisit = new PatientVisit();
             patientVisit.setClinic(clinics[0]);
-            patientVisit.setDateDrawn(new Date(2009 - 1900, 01, 25, r
-                .nextInt(24), r.nextInt(60)));
+            String dateStr = String.format("2009-%02d-25 %02d:%02d", r
+                .nextInt(12) + 1, r.nextInt(24), r.nextInt(60));
+            SimpleDateFormat sdf = new SimpleDateFormat(
+                BioBankPlugin.DATE_TIME_FORMAT);
+            patientVisit.setDateDrawn(sdf.parse(dateStr));
 
             patientVisit.setPatient(patient);
             SDKQueryResult res = appService
@@ -218,23 +222,23 @@ public class InitExamples {
             numSchemeMap.get("SBS Standard"));
         hotel13Type = insertContainerTypeInSite("Hotel-13", 13, 1, Arrays
             .asList(new ContainerType[] { palletType }), numSchemeMap
-            .get("CBSR 2 char alphabetic"));
+            .get("2 char numeric"));
         hotel19Type = insertContainerTypeInSite("Hotel-19", 19, 1, Arrays
             .asList(new ContainerType[] { palletType }), numSchemeMap
-            .get("CBSR 2 char alphabetic"));
+            .get("2 char numeric"));
         freezerType = insertContainerTypeInSite("Freezer", 3, 10, Arrays
             .asList(new ContainerType[] { hotel13Type, hotel19Type }),
-            numSchemeMap.get("2 char numeric"));
+            numSchemeMap.get("CBSR 2 char alphabetic"));
 
         // Cabinet Types
         binType = insertContainerTypeInSite("Bin", 120, 1, null, numSchemeMap
-            .get("2 char numeric"));
+            .get("CBSR 2 char alphabetic"));
         drawerType = insertContainerTypeInSite("Drawer", 36, 1, Arrays
             .asList(new ContainerType[] { binType }), numSchemeMap
-            .get("CBSR 2 char alphabetic"));
+            .get("2 char numeric"));
         insertContainerTypeInSite("Cabinet", 4, 1, Arrays
             .asList(new ContainerType[] { drawerType }), numSchemeMap
-            .get("2 char numeric"));
+            .get("CBSR 2 char alphabetic"));
     }
 
     private ContainerType insertContainerTypeInSite(String name, int dim1,

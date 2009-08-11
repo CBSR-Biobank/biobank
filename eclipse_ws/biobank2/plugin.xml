@@ -84,16 +84,6 @@
             id="edu.ualberta.med.biobank.commands.mainAdmin"
             name="Main Administration">
       </command>
-      <command
-            defaultHandler="edu.ualberta.med.biobank.handler.ContainerTypeAddHandler"
-            id="edu.ualberta.med.biobank.commands.addContainerType"
-            name="Add Container Type">
-      </command>
-      <command
-            defaultHandler="edu.ualberta.med.biobank.handler.ContainerAddHandler"
-            id="edu.ualberta.med.biobank.commands.addContainer"
-            name="Add Container">
-      </command>
    </extension>
    <extension
          point="org.eclipse.ui.menus">
@@ -131,30 +121,12 @@
                mnemonic="A">
             <menu
                   id="edu.ualberta.med.biobank.menu.site"
-                  label="Active Site"
+                  label="Repository Site"
                   mnemonic="i">
                <command
-                     commandId="edu.ualberta.med.biobank.commands.addStudy"
-                     icon="icons/book.png"
-                     label="Add Study"
-                     style="push">
-               </command>
-               <command
-                     commandId="edu.ualberta.med.biobank.commands.addClinic"
-                     icon="icons/transmit_blue.png"
-                     label="Add Clinic"
-                     style="push">
-               </command>
-               <command
-                     commandId="edu.ualberta.med.biobank.commands.addContainerType"
-                     icon="icons/basket_edit.png"
-                     label="Add Container Type"
-                     style="push">
-               </command>
-               <command
-                     commandId="edu.ualberta.med.biobank.commands.addContainer"
-                     icon="icons/basket.png"
-                     label="Add Container"
+                     commandId="edu.ualberta.med.biobank.commands.addSite"
+                     id="edu.ualberta.med.biobank.menu.addSite"
+                     label="Add"
                      style="push">
                </command>
             </menu>
@@ -181,34 +153,12 @@
                   icon="icons/mainPerspective.png"
                   label="Main Administration"
                   style="push">
-            </command>
-            <separator
-                  name="edu.ualberta.med.biobank.seperator.toolbar.one"
-                  visible="true">
-            </separator>
-            <command
-                  commandId="edu.ualberta.med.biobank.commands.addStudy"
-                  icon="icons/book.png"
-                  label="Add Study"
-                  style="push">
-            </command>
-            <command
-                  commandId="edu.ualberta.med.biobank.commands.addClinic"
-                  icon="icons/transmit_blue.png"
-                  label="Add Clinic"
-                  style="push">
-            </command>
-            <command
-                  commandId="edu.ualberta.med.biobank.commands.addContainerType"
-                  icon="icons/basket_edit.png"
-                  label="Add Container Type"
-                  style="push">
-            </command>
-            <command
-                  commandId="edu.ualberta.med.biobank.commands.addContainer"
-                  icon="icons/basket.png"
-                  label="Add Container"
-                  style="push">
+               <visibleWhen
+                     checkEnabled="true">
+                  <reference
+                        definitionId="biobank2.mainPerpectiveSelected">
+                  </reference>
+               </visibleWhen>
             </command>
             <command
                   commandId="edu.ualberta.med.biobank.commands.patientAdmin"
@@ -473,18 +423,21 @@
             id="biobank2.mainPerpectiveSelected">
          <with
                variable="activeWorkbenchWindow.activePerspective">
-            <equals
-                  value="edu.ualberta.med.biobank.perspective.main">
-            </equals>
+            <not>
+               <equals
+                     value="edu.ualberta.med.biobank.perspective.main">
+               </equals></not>
          </with>
       </definition>
       <definition
             id="biobank2.patientsPerpectiveSelected">
          <with
                variable="activeWorkbenchWindow.activePerspective">
-            <equals
-                  value="edu.ualberta.med.biobank.perspective.patients">
-            </equals>
+            <not>
+               <equals
+                     value="edu.ualberta.med.biobank.perspective.patients">
+               </equals>
+            </not>
          </with>
       </definition>
    </extension>

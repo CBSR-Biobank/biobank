@@ -17,7 +17,6 @@ import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.SampleType;
-import edu.ualberta.med.biobank.treeview.AdaptorBase;
 import edu.ualberta.med.biobank.treeview.ContainerTypeAdapter;
 import edu.ualberta.med.biobank.widgets.CabinetDrawerWidget;
 import edu.ualberta.med.biobank.widgets.ChooseContainerWidget;
@@ -33,6 +32,8 @@ public class ContainerTypeViewForm extends BiobankViewForm {
     private Capacity capacity;
 
     private Label nameLabel;
+
+    private Label nameShortLabel;
 
     private Label defaultTempLabel;
 
@@ -55,13 +56,12 @@ public class ContainerTypeViewForm extends BiobankViewForm {
     }
 
     @Override
-    public void init(AdaptorBase adaptor) {
-        Assert.isTrue(adaptor instanceof ContainerTypeAdapter,
+    public void init() {
+        Assert.isTrue(adapter instanceof ContainerTypeAdapter,
             "Invalid editor input: object of type "
-                + adaptor.getClass().getName());
+                + adapter.getClass().getName());
 
-        containerTypeAdapter = (ContainerTypeAdapter) adaptor;
-        appService = containerTypeAdapter.getAppService();
+        containerTypeAdapter = (ContainerTypeAdapter) adapter;
         retrieveContainerType();
         setPartName("Container Type " + containerType.getName());
     }
@@ -105,6 +105,8 @@ public class ContainerTypeViewForm extends BiobankViewForm {
         toolkit.paintBordersFor(client);
 
         nameLabel = (Label) createWidget(client, Label.class, SWT.NONE, "Name");
+        nameShortLabel = (Label) createWidget(client, Label.class, SWT.NONE,
+            "Short Name");
         defaultTempLabel = (Label) createWidget(client, Label.class, SWT.NONE,
             "Default Temperature\n(Celcius)");
         numSchemeLabel = (Label) createWidget(client, Label.class, SWT.NONE,
@@ -119,6 +121,7 @@ public class ContainerTypeViewForm extends BiobankViewForm {
 
     private void setContainerTypeValues() {
         FormUtils.setTextValue(nameLabel, containerType.getName());
+        FormUtils.setTextValue(nameShortLabel, containerType.getNameShort());
         FormUtils.setTextValue(defaultTempLabel, containerType
             .getDefaultTemperature());
         FormUtils.setTextValue(numSchemeLabel, containerType

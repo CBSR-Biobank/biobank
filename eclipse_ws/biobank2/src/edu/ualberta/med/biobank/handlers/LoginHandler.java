@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.handler;
+package edu.ualberta.med.biobank.handlers;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
@@ -10,10 +10,10 @@ import edu.ualberta.med.biobank.dialogs.LoginDialog;
 
 public class LoginHandler extends AbstractHandler implements IHandler {
 
-	public Object execute(ExecutionEvent event) throws ExecutionException {
-		LoginDialog loginDialog = new LoginDialog(PlatformUI.getWorkbench()
-				.getActiveWorkbenchWindow().getShell());
-		loginDialog.open();
-		return null;
-	}
+    public Object execute(ExecutionEvent event) throws ExecutionException {
+        LoginDialog loginDialog = new LoginDialog(PlatformUI.getWorkbench()
+            .getActiveWorkbenchWindow().getShell());
+        loginDialog.open();
+        return null;
+    }
 }

@@ -63,8 +63,8 @@ public class NodeLabelProvider implements ILabelProvider {
     }
 
     public String getText(Object element) {
-        if (element instanceof AdaptorBase) {
-            return ((AdaptorBase) element).getTreeText();
+        if (element instanceof AdapterBase) {
+            return ((AdapterBase) element).getTreeText();
         }
         return new String();
     }

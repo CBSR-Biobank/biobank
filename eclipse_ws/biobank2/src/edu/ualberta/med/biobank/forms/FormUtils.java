@@ -21,8 +21,10 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.model.Clinic;
-import edu.ualberta.med.biobank.treeview.AdaptorBase;
+import edu.ualberta.med.biobank.model.ClinicStudyInfo;
+import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.ClinicAdapter;
+import edu.ualberta.med.biobank.widgets.BiobankCollectionModel;
 import edu.ualberta.med.biobank.widgets.BiobankCollectionTable;
 
 /**
@@ -73,27 +75,60 @@ public class FormUtils {
     }
 
     public static BiobankCollectionTable createClinicSection(
-        FormToolkit toolkit, Composite parent, AdaptorBase clinicGroupParent,
-        Collection<Clinic> clinics) {
+        FormToolkit toolkit, Composite parent,
+        final AdapterBase clinicGroupParent, final Collection<Clinic> clinics) {
         Section section = toolkit.createSection(parent, Section.TWISTIE
             | Section.TITLE_BAR | Section.EXPANDED);
         section.setText("Clinics");
         section.setLayout(new GridLayout(1, false));
         section.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
+        final BiobankCollectionModel[] model = new BiobankCollectionModel[clinics
+            .size()];
+        for (int i = 0, n = clinics.size(); i < n; ++i) {
+            model[i] = new BiobankCollectionModel();
+        }
+
         String[] headings = { "Name", "Num Studies" };
-        BiobankCollectionTable comp = new BiobankCollectionTable(section,
-            SWT.NONE, headings, getClinicsAdapters(clinicGroupParent, clinics));
+        final BiobankCollectionTable comp = new BiobankCollectionTable(section,
+            SWT.NONE, headings, model);
         section.setClient(comp);
         comp.adaptToToolkit(toolkit);
         toolkit.paintBordersFor(comp);
         comp.getTableViewer().addDoubleClickListener(
             getBiobankCollectionDoubleClickListener());
+
+        Thread t = new Thread() {
+            @Override
+            public void run() {
+                int count = 0;
+                for (Clinic clinic : clinics) {
+                    if (comp.getTableViewer().getTable().isDisposed()) {
+                        return;
+                    }
+                    final int j = count;
+                    final ClinicAdapter clinicAdapter = new ClinicAdapter(
+                        clinicGroupParent, clinic);
+                    comp.getTableViewer().getTable().getDisplay().asyncExec(
+                        new Runnable() {
+
+                            public void run() {
+                                model[j].o = clinicAdapter;
+                                comp.getTableViewer().update(model[j], null);
+                            }
+
+                        });
+                    ++count;
+                }
+            }
+        };
+        t.start();
+
         return comp;
     }
 
     public static ClinicAdapter[] getClinicsAdapters(
-        AdaptorBase clinicGroupParent, Collection<Clinic> clinics) {
+        AdapterBase clinicGroupParent, Collection<Clinic> clinics) {
         ClinicAdapter[] clinicAdapters = new ClinicAdapter[clinics.size()];
 
         int count = 0;
@@ -114,7 +149,19 @@ public class FormUtils {
                 Object selection = event.getSelection();
                 Object element = ((StructuredSelection) selection)
                     .getFirstElement();
-                ((AdaptorBase) element).performDoubleClick();
+                if (element instanceof AdapterBase) {
+                    ((AdapterBase) element).performDoubleClick();
+                } else if (element instanceof BiobankCollectionModel) {
+                    BiobankCollectionModel item = (BiobankCollectionModel) element;
+                    if (item.o != null) {
+                        if (item.o instanceof AdapterBase) {
+                            ((AdapterBase) item.o).performDoubleClick();
+                        } else if (item.o instanceof ClinicStudyInfo) {
+                            ((ClinicStudyInfo) item.o).performDoubleClick();
+
+                        }
+                    }
+                }
             }
         };
     }

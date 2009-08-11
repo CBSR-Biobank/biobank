@@ -42,7 +42,7 @@ import edu.ualberta.med.biobank.model.Sample;
 import edu.ualberta.med.biobank.model.SampleCellStatus;
 import edu.ualberta.med.biobank.model.SamplePosition;
 import edu.ualberta.med.biobank.model.Study;
-import edu.ualberta.med.biobank.treeview.AdaptorBase;
+import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.SessionAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
 import edu.ualberta.med.biobank.validators.ScannerBarcodeValidator;
@@ -50,7 +50,6 @@ import edu.ualberta.med.biobank.widgets.ScanPalletWidget;
 import edu.ualberta.med.biobank.widgets.ViewContainerWidget;
 import edu.ualberta.med.biobank.wizard.ContainerChooserWizard;
 import edu.ualberta.med.scanlib.ScanLib;
-import edu.ualberta.med.scanlib.ScanLibFactory;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.query.SDKQuery;
 import gov.nih.nci.system.query.SDKQueryResult;
@@ -116,13 +115,12 @@ public class AssignSamplesLocationEntryForm extends BiobankEntryForm implements
     private static boolean testDisposeOn = true;
 
     @Override
-    protected void init(AdaptorBase adapter) {
+    protected void init() {
         Assert.isTrue((adapter instanceof SessionAdapter),
             "Invalid editor input: object of type "
                 + adapter.getClass().getName());
 
         sessionAdapter = (SessionAdapter) adapter;
-        appService = adapter.getAppService();
         testDisposeOn = true;
         setPartName("Assign locations for samples");
     }
@@ -377,9 +375,8 @@ public class AssignSamplesLocationEntryForm extends BiobankEntryForm implements
                             int plateNum = BioBankPlugin.getDefault()
                                 .getPlateNumber(
                                     plateToScanValue.getValue().toString());
-                            ScanLib scanLib = ScanLibFactory.getScanLib();
-                            int r = scanLib.slDecodePlate(ScanLib.DPI_300,
-                                plateNum);
+                            int r = ScanLib.getInstance().slDecodePlate(
+                                ScanLib.DPI_300, plateNum);
                             if (r < ScanLib.SC_SUCCESS) {
                                 BioBankPlugin.openError("Scanner",
                                     "Could not decode image. Return code is: "
@@ -443,8 +440,8 @@ public class AssignSamplesLocationEntryForm extends BiobankEntryForm implements
         ((GridData) freezerLabel.getParent().getLayoutData()).exclude = show;
         hotelLabel.getParent().setVisible(!show);
         ((GridData) hotelLabel.getParent().getLayoutData()).exclude = show;
-        locateButton.setVisible(show);
-        ((GridData) locateButton.getLayoutData()).exclude = !show;
+        // locateButton.setVisible(show);
+        // ((GridData) locateButton.getLayoutData()).exclude = !show;
     }
 
     protected void showPalletPosition(Container pallet) {
@@ -730,7 +727,7 @@ public class AssignSamplesLocationEntryForm extends BiobankEntryForm implements
         doSaveInternal();
         getSite().getPage().closeEditor(AssignSamplesLocationEntryForm.this,
             false);
-        AdaptorBase.openForm(new FormInput(sessionAdapter),
+        AdapterBase.openForm(new FormInput(sessionAdapter),
             AssignSamplesLocationEntryForm.ID);
     }
 

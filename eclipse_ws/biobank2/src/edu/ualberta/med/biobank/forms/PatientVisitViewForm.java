@@ -6,19 +6,23 @@ import org.apache.commons.collections.MapIterator;
 import org.apache.commons.collections.map.ListOrderedMap;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.ui.PartInitException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.ModelUtils;
 import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.PvInfo;
 import edu.ualberta.med.biobank.model.PvInfoData;
 import edu.ualberta.med.biobank.model.Study;
-import edu.ualberta.med.biobank.treeview.AdaptorBase;
 import edu.ualberta.med.biobank.treeview.PatientVisitAdapter;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
@@ -57,13 +61,12 @@ public class PatientVisitViewForm extends BiobankViewForm {
     }
 
     @Override
-    public void init(AdaptorBase adaptor) {
-        Assert.isTrue((adaptor instanceof PatientVisitAdapter),
+    public void init() {
+        Assert.isTrue((adapter instanceof PatientVisitAdapter),
             "Invalid editor input: object of type "
-                + adaptor.getClass().getName());
+                + adapter.getClass().getName());
 
-        patientVisitAdapter = (PatientVisitAdapter) adaptor;
-        appService = patientVisitAdapter.getAppService();
+        patientVisitAdapter = (PatientVisitAdapter) adapter;
         retrievePatientVisit();
 
         setPartName("Visit "
@@ -81,6 +84,7 @@ public class PatientVisitViewForm extends BiobankViewForm {
         addRefreshToolbarAction();
         createVisitSection();
         createSamplesSection();
+
     }
 
     private void createVisitSection() {
@@ -160,10 +164,27 @@ public class PatientVisitViewForm extends BiobankViewForm {
         Composite parent = createSectionWithClient("Samples");
         samplesWidget = new SamplesListWidget(parent,
             (SiteAdapter) patientVisitAdapter
-                .getParentFromClass(SiteAdapter.class));
+                .getParentFromClass(SiteAdapter.class), patientVisit
+                .getSampleCollection());
         samplesWidget.adaptToToolkit(toolkit, true);
-        samplesWidget.setSamples(patientVisit.getSampleCollection());
         samplesWidget.setSelection(patientVisitAdapter.getSelectedSample());
+
+        final Button edit = toolkit.createButton(parent,
+            "Edit this information", SWT.PUSH);
+        edit.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                getSite().getPage().closeEditor(PatientVisitViewForm.this,
+                    false);
+                try {
+                    getSite().getPage().openEditor(
+                        new FormInput(patientVisitAdapter),
+                        PatientVisitEntryForm.ID, true);
+                } catch (PartInitException exp) {
+                    exp.printStackTrace();
+                }
+            }
+        });
     }
 
     @Override
@@ -176,7 +197,6 @@ public class PatientVisitViewForm extends BiobankViewForm {
             + BioBankPlugin.getDateTimeFormatter().format(
                 patientVisit.getDateDrawn()));
         setPatientVisitValues();
-        samplesWidget.setSamples(patientVisit.getSampleCollection());
     }
 
     private void retrievePatientVisit() {

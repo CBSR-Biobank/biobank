@@ -11,7 +11,6 @@ import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.PatientVisit;
-import edu.ualberta.med.biobank.treeview.AdaptorBase;
 import edu.ualberta.med.biobank.treeview.PatientAdapter;
 import edu.ualberta.med.biobank.treeview.PatientVisitAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankCollectionTable;
@@ -28,13 +27,12 @@ public class PatientViewForm extends BiobankViewForm {
     private BiobankCollectionTable visitsTable;
 
     @Override
-    public void init(AdaptorBase adaptor) {
-        Assert.isTrue(adaptor instanceof PatientAdapter,
+    public void init() {
+        Assert.isTrue(adapter instanceof PatientAdapter,
             "Invalid editor input: object of type "
-                + adaptor.getClass().getName());
+                + adapter.getClass().getName());
 
-        patientAdapter = (PatientAdapter) adaptor;
-        appService = patientAdapter.getAppService();
+        patientAdapter = (PatientAdapter) adapter;
         retrievePatient();
         setPartName("Patient " + patient.getNumber());
     }

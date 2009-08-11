@@ -63,19 +63,24 @@ public class SiteContainerTypes {
         }
 
         // Freezer Types
-        ContainerType palette = assignContainerType(site, "Palette",
+        ContainerType palette96 = assignContainerType(site, "Palette-96",
             labelingSchemeMap.get("SBS Standard"), 8, 12, null,
             freezerSampleTypes);
-        containerTypeMap.put("Palette", palette);
+        containerTypeMap.put("Palette-96", palette96);
+
+        ContainerType palette384 = assignContainerType(site, "Palette-384",
+            labelingSchemeMap.get("SBS Standard"), 16, 24, null,
+            freezerSampleTypes);
+        containerTypeMap.put("Palette-96", palette384);
 
         ContainerType hotel13 = assignContainerType(site, "Hotel-13",
             labelingSchemeMap.get("2 char numeric"), 13, 1,
-            Arrays.asList(new ContainerType [] { palette }), null);
+            Arrays.asList(new ContainerType [] { palette96 }), null);
         containerTypeMap.put("Hotel-13", hotel13);
 
         ContainerType hotel19 = assignContainerType(site, "Hotel-19",
             labelingSchemeMap.get("2 char numeric"), 19, 1,
-            Arrays.asList(new ContainerType [] { palette }), null);
+            Arrays.asList(new ContainerType [] { palette96 }), null);
         containerTypeMap.put("Hotel-19", hotel19);
 
         containerTypeMap.put("Freezer-3x10", assignContainerType(site,

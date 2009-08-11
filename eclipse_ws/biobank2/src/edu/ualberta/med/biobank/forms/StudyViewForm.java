@@ -4,22 +4,29 @@ import java.util.Collection;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.ModelUtils;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.PvInfo;
 import edu.ualberta.med.biobank.model.Study;
-import edu.ualberta.med.biobank.treeview.AdaptorBase;
+import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.PatientAdapter;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankCollectionTable;
+import edu.ualberta.med.biobank.widgets.SampleStorageInfoTable;
+import edu.ualberta.med.biobank.widgets.StudyClinicInfoTable;
 
 public class StudyViewForm extends BiobankViewForm {
 
@@ -33,22 +40,22 @@ public class StudyViewForm extends BiobankViewForm {
     private Label commentLabel;
 
     private BiobankCollectionTable clinicsTable;
-    private BiobankCollectionTable sampleStorageTable;
+    private SampleStorageInfoTable sampleStorageTable;
     private BiobankCollectionTable patientsTable;
     private BiobankCollectionTable pvInfosTable;
 
     @Override
-    public void init(AdaptorBase adaptor) {
-        Assert.isTrue((adaptor instanceof StudyAdapter),
+    public void init() {
+        Assert.isTrue((adapter instanceof StudyAdapter),
             "Invalid editor input: object of type "
-                + adaptor.getClass().getName());
+                + adapter.getClass().getName());
 
-        studyAdapter = (StudyAdapter) adaptor;
+        studyAdapter = (StudyAdapter) adapter;
 
         // retrieve info from database because could have been modified
         // after first opening
         retrieveStudy();
-        setPartName("Study " + study.getName());
+        setPartName("Study " + study.getNameShort());
     }
 
     @Override
@@ -76,15 +83,36 @@ public class StudyViewForm extends BiobankViewForm {
             "Comments");
 
         setStudySectionValues();
-
-        AdaptorBase clinicGroupNode = ((SiteAdapter) studyAdapter.getParent()
-            .getParent()).getClinicGroupNode();
-        clinicsTable = FormUtils.createClinicSection(toolkit, form.getBody(),
-            clinicGroupNode, study.getClinicCollection());
-
+        createClinicSection();
         createSampleStorageSection();
         createPatientsSection();
         createPvDataSection();
+
+        final Button edit = toolkit.createButton(client,
+            "Edit this information", SWT.PUSH);
+        edit.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                getSite().getPage().closeEditor(StudyViewForm.this, false);
+                try {
+                    getSite().getPage().openEditor(new FormInput(studyAdapter),
+                        StudyEntryForm.ID, true);
+                } catch (PartInitException exp) {
+                    exp.printStackTrace();
+                }
+            }
+        });
+    }
+
+    private void createClinicSection() {
+        Composite client = createSectionWithClient("Clinics");
+
+        clinicsTable = new StudyClinicInfoTable(client, appService, study);
+        clinicsTable.adaptToToolkit(toolkit);
+        toolkit.paintBordersFor(clinicsTable);
+
+        clinicsTable.getTableViewer().addDoubleClickListener(
+            FormUtils.getBiobankCollectionDoubleClickListener());
     }
 
     private void setStudySectionValues() {
@@ -96,9 +124,8 @@ public class StudyViewForm extends BiobankViewForm {
     private void createSampleStorageSection() {
         Section section = createSection("Sample Storage");
 
-        String[] headings = new String[] { "Sample type", "Volume", "Quantity" };
-        sampleStorageTable = new BiobankCollectionTable(section, SWT.NONE,
-            headings, ModelUtils.toArray(study.getSampleStorageCollection()));
+        sampleStorageTable = new SampleStorageInfoTable(section, study
+            .getSampleStorageCollection());
         section.setClient(sampleStorageTable);
         sampleStorageTable.adaptToToolkit(toolkit);
         toolkit.paintBordersFor(sampleStorageTable);
@@ -167,10 +194,10 @@ public class StudyViewForm extends BiobankViewForm {
     @Override
     protected void reload() {
         retrieveStudy();
-        setPartName("Study " + study.getName());
+        setPartName("Study " + study.getNameShort());
         form.setText("Study: " + study.getName());
         setStudySectionValues();
-        AdaptorBase clinicGroupNode = ((SiteAdapter) studyAdapter.getParent()
+        AdapterBase clinicGroupNode = ((SiteAdapter) studyAdapter.getParent()
             .getParent()).getClinicGroupNode();
         clinicsTable.getTableViewer().setInput(
             FormUtils.getClinicsAdapters(clinicGroupNode, study
