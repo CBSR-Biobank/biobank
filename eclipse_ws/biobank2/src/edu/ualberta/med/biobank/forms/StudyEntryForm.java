@@ -10,27 +10,19 @@ import java.util.Set;
 import org.apache.commons.collections.MapIterator;
 import org.apache.commons.collections.map.ListOrderedMap;
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.ui.PlatformUI;
 import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
-import edu.ualberta.med.biobank.dialogs.SampleStorageDialog;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.PvInfo;
 import edu.ualberta.med.biobank.model.PvInfoPossible;
-import edu.ualberta.med.biobank.model.SampleStorage;
-import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
@@ -38,7 +30,7 @@ import edu.ualberta.med.biobank.treeview.StudyAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
 import edu.ualberta.med.biobank.widgets.MultiSelect;
 import edu.ualberta.med.biobank.widgets.PvInfoWidget;
-import edu.ualberta.med.biobank.widgets.SampleStorageInfoTable;
+import edu.ualberta.med.biobank.widgets.SampleStorageEntryWidget;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.query.SDKQuery;
 import gov.nih.nci.system.query.SDKQueryResult;
@@ -90,11 +82,7 @@ public class StudyEntryForm extends BiobankEntryForm {
 
     private ListOrderedMap combinedPvInfoMap;
 
-    private Collection<SampleType> sampleTypes;
-
-    private SampleStorageInfoTable sampleStorageTable;
-
-    private Button addSampleStorageButton;
+    private SampleStorageEntryWidget sampleStorageEntryWidget;
 
     public StudyEntryForm() {
         super();
@@ -111,7 +99,7 @@ public class StudyEntryForm extends BiobankEntryForm {
         study = studyAdapter.getStudy();
         site = ((SiteAdapter) studyAdapter
             .getParentFromClass(SiteAdapter.class)).getSite();
-        
+
         viewFormId = StudyViewForm.ID;
 
         String tabName;
@@ -174,54 +162,14 @@ public class StudyEntryForm extends BiobankEntryForm {
     }
 
     private void createSampleStorageSection() {
-        try {
-            Composite client = createSectionWithClient("Sample Storage");
-            SampleType searchObj = new SampleType();
-            sampleTypes = appService.search(SampleType.class, searchObj);
+        Composite client = createSectionWithClient("Sample Storage");
 
-            if (sampleTypes.size() == 0) {
-                toolkit.createLabel(client,
-                    "*** no sample storage defined for study ***");
-                return;
-            }
+        GridLayout layout = new GridLayout(1, false);
+        client.setLayout(layout);
+        client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-            // TODO: from sampleTypes remove sample types already in
-            // study.getSampleStorageCollection()
-
-            GridLayout layout = new GridLayout(1, false);
-            client.setLayout(layout);
-            client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-
-            addSampleStorageButton = toolkit.createButton(client,
-                "Add Sample Storage", SWT.PUSH);
-            addSampleStorageButton.addSelectionListener(new SelectionAdapter() {
-                @Override
-                public void widgetSelected(SelectionEvent e) {
-                    SampleStorageDialog dlg = new SampleStorageDialog(
-                        PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-                            .getShell(), new SampleStorage(), sampleTypes);
-                    if (dlg.open() == Dialog.OK) {
-                        SampleStorage ss = dlg.getSampleStorage();
-                        Collection<SampleStorage> collection = study
-                            .getSampleStorageCollection();
-                        if (collection == null) {
-                            collection = new HashSet<SampleStorage>();
-                        }
-                        collection.add(ss);
-                        sampleStorageTable.setSampleStorage(collection);
-                    }
-                }
-            });
-
-            sampleStorageTable = new SampleStorageInfoTable(client, study
-                .getSampleStorageCollection());
-            sampleStorageTable.adaptToToolkit(toolkit);
-            toolkit.paintBordersFor(sampleStorageTable);
-        } catch (final RemoteConnectFailureException exp) {
-            BioBankPlugin.openRemoteConnectErrorMessage();
-        } catch (ApplicationException e) {
-            e.printStackTrace();
-        }
+        sampleStorageEntryWidget = new SampleStorageEntryWidget(client,
+            SWT.NONE, study.getSampleStorageCollection(), toolkit);
     }
 
     private void createPvInfoSection() {
