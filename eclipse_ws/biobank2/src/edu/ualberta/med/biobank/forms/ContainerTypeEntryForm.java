@@ -58,6 +58,8 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
 
     private static final String MSG_NO_CONTAINER_TYPE_NAME = "Container type must have a name";
 
+    private static final String MSG_NO_CONTAINER_TYPE_NAME_SHORT = "Container type must have a short name";
+
     public static final String MSG_CHILD_LABELING_SCHEME_EMPTY = "Select a child labeling scheme";
 
     static Logger log4j = Logger.getLogger(SessionManager.class.getName());
@@ -142,6 +144,11 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
             createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Name",
                 null, PojoObservables.observeValue(containerType, "name"),
                 NonEmptyString.class, MSG_NO_CONTAINER_TYPE_NAME);
+
+            createBoundWidgetWithLabel(client, Text.class, SWT.NONE,
+                "Short Name", null, PojoObservables.observeValue(containerType,
+                    "nameShort"), NonEmptyString.class,
+                MSG_NO_CONTAINER_TYPE_NAME_SHORT);
 
             createBoundWidgetWithLabel(client, Text.class, SWT.NONE,
                 "Default Temperature\n(Celcius)", null, PojoObservables
