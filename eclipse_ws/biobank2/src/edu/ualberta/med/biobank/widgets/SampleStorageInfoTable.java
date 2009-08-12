@@ -82,4 +82,12 @@ public class SampleStorageInfoTable extends BiobankCollectionTable {
         };
         t.start();
     }
+
+    public Collection<SampleStorage> getSampleStorage() {
+        Collection<SampleStorage> sampleStorage = new ArrayList<SampleStorage>();
+        for (BiobankCollectionModel item : model) {
+            sampleStorage.add((SampleStorage) item.o);
+        }
+        return sampleStorage;
+    }
 }
