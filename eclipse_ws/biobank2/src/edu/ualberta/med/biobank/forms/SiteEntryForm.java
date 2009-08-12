@@ -85,6 +85,8 @@ public class SiteEntryForm extends AddressEntryFormCommon {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
+        createSessionSelectionWidget(client);
+
         createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Name", null,
             PojoObservables.observeValue(site, "name"), NonEmptyString.class,
             MSG_NO_SITE_NAME);
@@ -123,7 +125,8 @@ public class SiteEntryForm extends AddressEntryFormCommon {
     @Override
     protected void saveForm() {
         if (siteAdapter.getParent() == null) {
-            siteAdapter.setParent(SessionManager.getInstance().getSession());
+            siteAdapter.setParent(SessionManager.getInstance()
+                .getSessionSingle());
         }
 
         try {

@@ -40,6 +40,6 @@ public class ClinicAddHandler extends AbstractHandler {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return (SessionManager.getInstance().getSession() != null);
     }
 }

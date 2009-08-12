@@ -34,10 +34,12 @@ public class SiteContainers {
                 freezer3x10, i % 3, i / 3);
 
             for (int j = 0; j < 17; ++j) {
-                insertContainer(site, String.format("01A%c%02d",
-                    LabelingScheme.int2pos(i), j + 1),
-                    SiteContainerTypes.getInstance().getContainerType(
-                        "Palette-96"), hotel, j, 0);
+                insertContainer(
+                    site,
+                    String.format("01A%c%02d", LabelingScheme.int2pos(i),
+                        j + 1),
+                    SiteContainerTypes.getInstance().getContainerType("Palette"),
+                    hotel, j, 0);
             }
         }
 

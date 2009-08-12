@@ -33,8 +33,6 @@ public class ContainerTypeViewForm extends BiobankViewForm {
 
     private Label nameLabel;
 
-    private Label nameShortLabel;
-
     private Label defaultTempLabel;
 
     private Label numSchemeLabel;
@@ -105,8 +103,6 @@ public class ContainerTypeViewForm extends BiobankViewForm {
         toolkit.paintBordersFor(client);
 
         nameLabel = (Label) createWidget(client, Label.class, SWT.NONE, "Name");
-        nameShortLabel = (Label) createWidget(client, Label.class, SWT.NONE,
-            "Short Name");
         defaultTempLabel = (Label) createWidget(client, Label.class, SWT.NONE,
             "Default Temperature\n(Celcius)");
         numSchemeLabel = (Label) createWidget(client, Label.class, SWT.NONE,
@@ -121,7 +117,6 @@ public class ContainerTypeViewForm extends BiobankViewForm {
 
     private void setContainerTypeValues() {
         FormUtils.setTextValue(nameLabel, containerType.getName());
-        FormUtils.setTextValue(nameShortLabel, containerType.getNameShort());
         FormUtils.setTextValue(defaultTempLabel, containerType
             .getDefaultTemperature());
         FormUtils.setTextValue(numSchemeLabel, containerType
@@ -219,6 +214,7 @@ public class ContainerTypeViewForm extends BiobankViewForm {
             ChooseContainerWidget containerWidget = new ChooseContainerWidget(
                 client);
             containerWidget.setParams(containerType, null);
+
             int dim1 = containerType.getCapacity().getDimensionOneCapacity()
                 .intValue();
             int dim2 = containerType.getCapacity().getDimensionTwoCapacity()

@@ -37,6 +37,6 @@ public class StudyAddHandler extends AbstractHandler {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return (SessionManager.getInstance().getSession() != null);
     }
 }

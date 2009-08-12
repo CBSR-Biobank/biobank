@@ -79,7 +79,7 @@ public class LabelingScheme {
     }
 
     public static String rowColToInt(RowColPos rcp, ContainerType containerType) {
-        int totalCols = containerType.getCapacity().getDimensionTwoCapacity();
+        int totalCols = containerType.getCapacity().getDimensionOneCapacity();
         return String.format("%02d", totalCols * rcp.row + rcp.col + 1);
     }
 }

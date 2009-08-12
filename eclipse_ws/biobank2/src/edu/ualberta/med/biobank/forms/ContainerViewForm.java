@@ -70,7 +70,11 @@ public class ContainerViewForm extends BiobankViewForm {
                 + adapter.getClass().getName());
 
         containerAdapter = (ContainerAdapter) adapter;
-        retrieveContainer();
+        if (containerAdapter.getContainer().getId() != null) {
+            retrieveContainer();
+        } else {
+            container = containerAdapter.getContainer();
+        }
         position = container.getPosition();
         setPartName(container.getLabel() + " ("
             + container.getContainerType().getName() + ")");

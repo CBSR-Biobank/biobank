@@ -95,6 +95,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         patientVisit = patientVisitAdapter.getPatientVisit();
         
         viewFormId = PatientVisitViewForm.ID;
+
         String tabName;
         if (patientVisit.getId() == null) {
             tabName = "New Patient Visit";

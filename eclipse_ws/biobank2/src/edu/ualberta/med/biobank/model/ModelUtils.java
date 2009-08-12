@@ -10,7 +10,6 @@ import org.eclipse.core.runtime.Assert;
 
 import edu.ualberta.med.biobank.LabelingScheme;
 import edu.ualberta.med.biobank.RowColPos;
-import edu.ualberta.med.biobank.SessionManager;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -40,52 +39,18 @@ public class ModelUtils {
         return list.get(0);
     }
 
-    /**
-     * Return the object from the database with the given class type and
-     * attribute value
-     */
     public static <E> E getObjectWithAttr(
         WritableApplicationService appService, Class<E> classType, String attr,
-        Class<?> attrType, Object value) {
-        try {
-            Constructor<?> constructor = classType.getConstructor();
-            Object instance = constructor.newInstance();
-            attr = "set" + attr.substring(0, 1).toUpperCase()
-                + attr.substring(1);
-            Method setMethod = classType.getMethod(attr, attrType);
-            setMethod.invoke(instance, value);
+        Class<?> attrType, Object value) throws Exception {
+        Constructor<?> constructor = classType.getConstructor();
+        Object instance = constructor.newInstance();
+        attr = "set" + attr.substring(0, 1).toUpperCase() + attr.substring(1);
+        Method setMethod = classType.getMethod(attr, attrType);
+        setMethod.invoke(instance, value);
 
-            List<E> list = appService.search(classType, instance);
-            Assert.isTrue(list.size() == 1);
-            return list.get(0);
-        } catch (Exception ex) {
-            SessionManager.getLogger().error(
-                "Error in getObjectWithAttr method", ex);
-            return null;
-        }
-    }
-
-    /**
-     * Return a list of objects from the database a given classType and
-     * attribute value
-     */
-    public static <E> List<E> getObjectsWithAttr(
-        WritableApplicationService appService, Class<E> classType, String attr,
-        Class<?> attrType, Object value) {
-        try {
-            Constructor<?> constructor = classType.getConstructor();
-            Object instance = constructor.newInstance();
-            attr = "set" + attr.substring(0, 1).toUpperCase()
-                + attr.substring(1);
-            Method setMethod = classType.getMethod(attr, attrType);
-            setMethod.invoke(instance, value);
-
-            return appService.search(classType, instance);
-        } catch (Exception ex) {
-            SessionManager.getLogger().error(
-                "Error in getObjectsWithAttr method", ex);
-            return null;
-        }
+        List<E> list = appService.search(classType, instance);
+        Assert.isTrue(list.size() == 1);
+        return list.get(0);
     }
 
     public static ContainerType getBinType(WritableApplicationService appService) {
