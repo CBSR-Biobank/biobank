@@ -24,6 +24,10 @@ import edu.ualberta.med.biobank.model.SampleStorage;
 import edu.ualberta.med.biobank.model.SampleType;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
+/**
+ * Displays the current sample storage collection and allows the user to add
+ * additional sample storage to the collection.
+ */
 public class SampleStorageEntryWidget extends BiobankWidget {
 
     private SampleStorageInfoTable sampleStorageTable;
@@ -31,8 +35,6 @@ public class SampleStorageEntryWidget extends BiobankWidget {
     private Button addSampleStorageButton;
 
     private Collection<SampleType> allSampleTypes;
-
-    private Set<SampleType> selectedSampleTypes;
 
     private Collection<SampleStorage> selectedSampleStorage;
 
@@ -51,11 +53,24 @@ public class SampleStorageEntryWidget extends BiobankWidget {
         addSampleStorageButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
+
+                // need to display sample types that have not yet been selected
                 Set<SampleType> sampleTypes = new HashSet<SampleType>(
                     allSampleTypes);
-                for (SampleStorage ss : sampleStorageTable.getSampleStorage()) {
-                    sampleTypes.remove(ss.getSampleType());
+                Set<SampleType> dupSampleTypes = new HashSet<SampleType>();
+                Collection<SampleStorage> currentSampleStorage = sampleStorageTable
+                    .getSampleStorage();
+
+                for (SampleType stype : sampleTypes) {
+                    for (SampleStorage ss : currentSampleStorage) {
+                        if (stype.getId() == ss.getSampleType().getId()) {
+                            dupSampleTypes.add(stype);
+                            break;
+                        }
+                    }
                 }
+                sampleTypes.removeAll(dupSampleTypes);
+
                 SampleStorageDialog dlg = new SampleStorageDialog(PlatformUI
                     .getWorkbench().getActiveWorkbenchWindow().getShell(),
                     new SampleStorage(), sampleTypes);
@@ -85,5 +100,9 @@ public class SampleStorageEntryWidget extends BiobankWidget {
         } catch (ApplicationException e) {
             e.printStackTrace();
         }
+    }
+
+    public Collection<SampleStorage> getSampleStorage() {
+        return sampleStorageTable.getSampleStorage();
     }
 }

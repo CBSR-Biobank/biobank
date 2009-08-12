@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.widgets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -84,7 +85,7 @@ public class SampleStorageInfoTable extends BiobankCollectionTable {
     }
 
     public Collection<SampleStorage> getSampleStorage() {
-        Collection<SampleStorage> sampleStorage = new ArrayList<SampleStorage>();
+        Collection<SampleStorage> sampleStorage = new HashSet<SampleStorage>();
         for (BiobankCollectionModel item : model) {
             sampleStorage.add((SampleStorage) item.o);
         }

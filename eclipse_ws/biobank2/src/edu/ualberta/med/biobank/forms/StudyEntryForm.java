@@ -23,6 +23,7 @@ import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.PvInfo;
 import edu.ualberta.med.biobank.model.PvInfoPossible;
+import edu.ualberta.med.biobank.model.SampleStorage;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
@@ -295,6 +296,22 @@ public class StudyEntryForm extends BiobankEntryForm {
         Set<PvInfo> savedPvInfoList = new HashSet<PvInfo>();
 
         study.setSite(site);
+
+        Collection<SampleStorage> savedSsCollection = new HashSet<SampleStorage>();
+        Collection<SampleStorage> ssCollection = sampleStorageEntryWidget
+            .getSampleStorage();
+        for (SampleStorage ss : ssCollection) {
+            if ((ss.getId() == null) || (ss.getId() == 0)) {
+                query = new InsertExampleQuery(ss);
+            } else {
+                query = new UpdateExampleQuery(ss);
+            }
+
+            ss.setStudy(study);
+            result = studyAdapter.getAppService().executeQuery(query);
+            savedSsCollection.add((SampleStorage) result.getObjectResult());
+        }
+        study.setSampleStorageCollection(savedSsCollection);
 
         if (study.getPvInfoCollection().size() > 0) {
             for (PvInfo pvInfo : study.getPvInfoCollection()) {
