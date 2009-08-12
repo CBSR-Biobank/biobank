@@ -9,18 +9,19 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
-import org.eclipse.swt.events.KeyAdapter;
-import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.part.ViewPart;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.forms.listener.EnterKeyToNextFieldListener;
 import edu.ualberta.med.biobank.model.ModelUtils;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.PatientVisit;
@@ -81,14 +82,12 @@ public class ScanLinkView extends ViewPart {
         labelPatientNumber = new Label(compositeFields, SWT.NONE);
         labelPatientNumber.setText("Patient Number:");
         textPatientNumber = new Text(compositeFields, SWT.BORDER);
-        textPatientNumber.addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyPressed(KeyEvent e) {
-                if (e.keyCode == 13) {
-                    setVisitsList();
-                }
+        textPatientNumber.addListener(SWT.DefaultSelection, new Listener() {
+            public void handleEvent(Event e) {
+                setVisitsList();
             }
         });
+        textPatientNumber.addKeyListener(EnterKeyToNextFieldListener.INSTANCE);
         textPatientNumber.addFocusListener(new FocusAdapter() {
             @Override
             public void focusLost(FocusEvent e) {
@@ -127,6 +126,7 @@ public class ScanLinkView extends ViewPart {
                     pv.getDateDrawn());
             }
         });
+        comboVisits.addKeyListener(EnterKeyToNextFieldListener.INSTANCE);
     }
 
     protected void setVisitsList() {

@@ -129,14 +129,12 @@
             name="Patients Administration">
       </category>
       <command
-            category="edu.ualberta.med.biobank.category.patientsAdmin"
             categoryId="edu.ualberta.med.biobank.category.patientsAdmin"
             defaultHandler="edu.ualberta.med.biobank.handlers.ScanLinkHandler"
             id="edu.ualberta.med.biobank.commands.patients.scanLink"
             name="Scan Link">
       </command>
       <command
-            category="edu.ualberta.med.biobank.category.patientsAdmin"
             categoryId="edu.ualberta.med.biobank.category.patientsAdmin"
             defaultHandler="edu.ualberta.med.biobank.handlers.DefaultLinkHandler"
             id="edu.ualberta.med.biobank.commands.patients.defaultLink"
