@@ -219,6 +219,7 @@ public class ContainerTypeViewForm extends BiobankViewForm {
             ChooseContainerWidget containerWidget = new ChooseContainerWidget(
                 client);
             containerWidget.setParams(containerType, null);
+
             int dim1 = containerType.getCapacity().getDimensionOneCapacity()
                 .intValue();
             int dim2 = containerType.getCapacity().getDimensionTwoCapacity()

@@ -20,7 +20,7 @@ public class ClinicAddHandler extends AbstractHandler {
 
     public Object execute(ExecutionEvent event) throws ExecutionException {
         SessionAdapter sessionAdapter = SessionManager.getInstance()
-            .getSession();
+            .getSessionAdapter();
         Assert.isNotNull(sessionAdapter);
 
         Clinic clinic = new Clinic();
@@ -40,6 +40,6 @@ public class ClinicAddHandler extends AbstractHandler {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return (SessionManager.getInstance().getSession() != null);
     }
 }

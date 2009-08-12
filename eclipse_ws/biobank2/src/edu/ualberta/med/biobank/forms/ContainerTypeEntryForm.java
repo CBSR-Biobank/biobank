@@ -14,20 +14,26 @@ import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.helpers.GetHelper;
 import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.ContainerTypeAdapter;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.validators.DoubleNumber;
@@ -286,6 +292,49 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         toolkit.paintBordersFor(client);
 
         initConfirmButton(client, false, true);
+        // initConfirmAddButton(client, false, true);
+    }
+
+    protected void initConfirmAddButton(Composite parent,
+        boolean doSaveInternalAction, boolean doSaveEditorAction) {
+        Button confirmAddButton = toolkit.createButton(parent,
+            "Confirm and Add Child", SWT.PUSH);
+        if (doSaveInternalAction) {
+            confirmAddButton.addSelectionListener(new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent e) {
+                    doSaveInternal();
+                }
+            });
+        }
+        if (doSaveEditorAction) {
+            confirmAddButton.addSelectionListener(new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent e) {
+
+                    Collection<ContainerType> children = containerType
+                        .getChildContainerTypeCollection();
+                    if (children == null)
+                        children = new ArrayList<ContainerType>();
+                    ContainerType childContainerType = new ContainerType();
+                    children.add(childContainerType);
+                    containerType.setChildContainerTypeCollection(children);
+                    ContainerTypeAdapter childAdapter = new ContainerTypeAdapter(
+                        containerTypeAdapter.getParent(), childContainerType);
+
+                    PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+                        .getActivePage().saveEditor(
+                            ContainerTypeEntryForm.this, false);
+                    PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+                        .getActivePage().closeEditor(
+                            ContainerTypeEntryForm.this, false);
+
+                    AdapterBase.openForm(new FormInput(childAdapter),
+                        ContainerTypeEntryForm.ID);
+                    containerTypeAdapter.getParent().performExpand();
+                }
+            });
+        }
     }
 
     @Override
@@ -308,8 +357,8 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
             setDirty(true);
             return;
         }
-
         saveSampleTypes();
+
         saveChildContainerTypes();
         // saveCapacity();
         containerType.setCapacity(capacity);
@@ -336,7 +385,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         }
         allContainerTypes.add(containerType);
         site.setContainerTypeCollection(allContainerTypes);
-
+        containerTypeAdapter.setContainerType(containerType);
         containerTypeAdapter.getParent().performExpand();
 
     }
@@ -375,7 +424,12 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
     private void saveChildContainerTypes() {
         List<Integer> selContainerTypeIds = childContainerTypesMultiSelect
             .getSelected();
-        Set<ContainerType> selContainerTypes = new HashSet<ContainerType>();
+
+        Collection<ContainerType> selContainerTypes = containerType
+            .getChildContainerTypeCollection();
+        if (selContainerTypes == null)
+            selContainerTypes = new HashSet<ContainerType>();
+
         if (allContainerTypes != null) {
             for (ContainerType containerType : allContainerTypes) {
                 int id = containerType.getId();
@@ -384,8 +438,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
                 }
             }
         }
-        Assert.isTrue(selContainerTypes.size() == selContainerTypeIds.size(),
-            "problem with sample type selections");
+
         containerType.setChildContainerTypeCollection(selContainerTypes);
     }
 

@@ -150,7 +150,6 @@ public abstract class AbstractGridContainerWidget extends Canvas {
         RowColPos rowcol = new RowColPos();
         rowcol.row = indexRow;
         rowcol.col = indexCol;
-
         if (containerType != null) {
             ContainerLabelingScheme ls = containerType.getChildLabelingScheme();
             String text = "";

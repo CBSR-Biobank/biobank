@@ -29,7 +29,6 @@ public class PatientAdministrationHandler extends AbstractHandler implements
 
     @Override
     public boolean isEnabled() {
-       return true;
+        return true;
     }
-    
 }
