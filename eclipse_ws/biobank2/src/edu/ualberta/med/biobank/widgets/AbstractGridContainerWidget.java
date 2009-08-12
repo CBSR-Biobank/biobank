@@ -164,18 +164,18 @@ public abstract class AbstractGridContainerWidget extends Canvas {
                 return text + LabelingScheme.rowColToInt(rowcol, containerType);
             default:
                 Assert.isTrue(false, "invalid labeling scheme for container: ");
-                return null;
             }
-        } else {
-            String row = getValueForCell(firstRowSign, indexRow,
-                firstColSign == null);
-            String col = getValueForCell(firstColSign, indexCol,
-                firstRowSign == null);
-            if (showColumnFirst) {
-                return col + row;
-            }
-            return row + col;
+            return null;
         }
+
+        String row = getValueForCell(firstRowSign, indexRow,
+            firstColSign == null);
+        String col = getValueForCell(firstColSign, indexCol,
+            firstRowSign == null);
+        if (showColumnFirst) {
+            return col + row;
+        }
+        return row + col;
     }
 
     public void setParams(ContainerType type, Label parent) {

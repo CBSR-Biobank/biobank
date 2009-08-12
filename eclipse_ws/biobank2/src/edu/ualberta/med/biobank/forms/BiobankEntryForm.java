@@ -54,7 +54,6 @@ import org.springframework.remoting.RemoteAccessException;
 import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
-import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
@@ -371,19 +370,6 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
                 fi.errMsg);
             controls.put(key, control);
         }
-    }
-
-    protected Combo createSessionSelectionWidget(Composite client) {
-        String[] sessionNames = SessionManager.getInstance().getSessionNames();
-
-        if (sessionNames.length > 1) {
-            toolkit.createLabel(client, "Session:", SWT.LEFT);
-            Combo session = new Combo(client, SWT.READ_ONLY);
-            session.setItems(sessionNames);
-            session.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-            return session;
-        }
-        return null;
     }
 
     protected void bindChangeListener() {
