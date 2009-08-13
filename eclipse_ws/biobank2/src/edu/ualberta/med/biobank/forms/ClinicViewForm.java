@@ -1,8 +1,8 @@
 package edu.ualberta.med.biobank.forms;
 
 import java.util.Collection;
-import java.util.List;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -11,17 +11,18 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
-import org.springframework.util.Assert;
+import org.springframework.remoting.RemoteConnectFailureException;
 
+import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Clinic;
+import edu.ualberta.med.biobank.model.ModelUtils;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.ClinicAdapter;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankCollectionTable;
 import edu.ualberta.med.biobank.widgets.ClinicStudyInfoTable;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ClinicViewForm extends AddressViewFormCommon {
     public static final String ID = "edu.ualberta.med.biobank.forms.ClinicViewForm";
@@ -49,16 +50,14 @@ public class ClinicViewForm extends AddressViewFormCommon {
     }
 
     private void retrieveClinic() {
-        List<Clinic> result;
-        Clinic searchClinic = new Clinic();
-        searchClinic.setId(clinicAdapter.getClinic().getId());
         try {
-            result = clinicAdapter.getAppService().search(Clinic.class,
-                searchClinic);
-            Assert.isTrue(result.size() == 1);
-            clinic = result.get(0);
+            clinic = ModelUtils.getObjectWithId(appService, Clinic.class,
+                clinicAdapter.getClinic().getId());
+            Assert.isNotNull(clinic, "clinic not in database");
             clinicAdapter.setClinic(clinic);
-        } catch (ApplicationException e) {
+        } catch (final RemoteConnectFailureException exp) {
+            BioBankPlugin.openRemoteConnectErrorMessage();
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

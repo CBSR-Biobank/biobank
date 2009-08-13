@@ -36,6 +36,8 @@ public class ModelUtils {
         setIdMethod.invoke(instance, id);
 
         List<E> list = appService.search(classType, instance);
+        if (list.size() == 0)
+            return null;
         Assert.isTrue(list.size() == 1);
         return list.get(0);
     }
