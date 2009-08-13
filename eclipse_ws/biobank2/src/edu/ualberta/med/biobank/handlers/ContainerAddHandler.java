@@ -5,6 +5,8 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.IHandler;
 import org.eclipse.core.commands.IHandlerListener;
 
+import edu.ualberta.med.biobank.SessionManager;
+
 public class ContainerAddHandler implements IHandler {
 
     @Override
@@ -27,8 +29,7 @@ public class ContainerAddHandler implements IHandler {
 
     @Override
     public boolean isEnabled() {
-        // TODO Auto-generated method stub
-        return true;
+        return (SessionManager.getInstance().getSession() != null);
     }
 
     @Override

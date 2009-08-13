@@ -30,6 +30,7 @@ import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
+import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.ModifyEvent;
@@ -255,6 +256,19 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
             return text;
         } else if (widgetClass == Combo.class) {
             Combo combo = new Combo(composite, SWT.READ_ONLY);
+            combo.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
+            Assert.isNotNull(widgetValues, "combo values not assigned");
+            combo.setItems(widgetValues);
+            toolkit.adapt(combo, true, true);
+
+            dbc.bindValue(SWTObservables.observeSelection(combo),
+                modelObservableValue, uvs, null);
+
+            combo.addSelectionListener(selectionListener);
+            combo.addModifyListener(modifyListener);
+            return combo;
+        } else if (widgetClass == CCombo.class) {
+            CCombo combo = new CCombo(composite, SWT.READ_ONLY);
             combo.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
             Assert.isNotNull(widgetValues, "combo values not assigned");
             combo.setItems(widgetValues);
