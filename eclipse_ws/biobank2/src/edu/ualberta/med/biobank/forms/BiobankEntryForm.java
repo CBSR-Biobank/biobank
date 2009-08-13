@@ -189,11 +189,13 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
                     PlatformUI.getWorkbench().getActiveWorkbenchWindow()
                         .getActivePage().saveEditor(BiobankEntryForm.this,
                             false);
-                    PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-                        .getActivePage().closeEditor(BiobankEntryForm.this,
-                            false);
-                    AdapterBase.openForm(new FormInput(adapter),
-                        getNextOpenedFormID());
+                    if (!BiobankEntryForm.this.isDirty()) {
+                        PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+                            .getActivePage().closeEditor(BiobankEntryForm.this,
+                                false);
+                        AdapterBase.openForm(new FormInput(adapter),
+                            getNextOpenedFormID());
+                    }
                 }
             });
         }
