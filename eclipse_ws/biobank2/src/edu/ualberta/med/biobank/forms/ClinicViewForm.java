@@ -13,6 +13,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.springframework.util.Assert;
 
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Study;
@@ -59,7 +60,8 @@ public class ClinicViewForm extends AddressViewFormCommon {
             clinic = result.get(0);
             clinicAdapter.setClinic(clinic);
         } catch (ApplicationException e) {
-            e.printStackTrace();
+            SessionManager.getLogger().error(
+                "Error while retrieving the clinic", e);
         }
     }
 

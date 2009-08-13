@@ -99,7 +99,7 @@
             name="Add Repository Site">
       </command>
       <command
-            id="edu.ualberta.med.biobank.commands.addStite"
+            id="edu.ualberta.med.biobank.commands.siteAdd"
             name="Add Site">
       </command>
       <command
@@ -184,60 +184,45 @@
             class="edu.ualberta.med.biobank.handlers.SiteAddHandler"
             commandId="edu.ualberta.med.biobank.commands.siteAdd">
          <activeWhen>
-            <with
-                  variable="edu.ualberta.med.biobank.sourceprovider.loginState">
-               <equals
-                     value="loggedIn">
-               </equals>
-            </with>
+            <reference
+                  definitionId="biobank2.loggedIn">
+            </reference>
          </activeWhen>
       </handler>
       <handler
             class="edu.ualberta.med.biobank.handlers.StudyAddHandler"
             commandId="edu.ualberta.med.biobank.commands.studyAdd">
          <activeWhen>
-            <with
-                  variable="edu.ualberta.med.biobank.sourceprovider.loginState">
-               <equals
-                     value="loggedIn">
-               </equals>
-            </with>
+            <reference
+                  definitionId="biobank2.loggedIn">
+            </reference>
          </activeWhen>
       </handler>
       <handler
             class="edu.ualberta.med.biobank.handlers.ClinicAddHandler"
             commandId="edu.ualberta.med.biobank.commands.clinicAdd">
          <activeWhen>
-            <with
-                  variable="edu.ualberta.med.biobank.sourceprovider.loginState">
-               <equals
-                     value="loggedIn">
-               </equals>
-            </with>
+            <reference
+                  definitionId="biobank2.loggedIn">
+            </reference>
          </activeWhen>
       </handler>
       <handler
             class="edu.ualberta.med.biobank.handlers.ContainerTypeAddHandler"
             commandId="edu.ualberta.med.biobank.commands.containerTypeAdd">
          <activeWhen>
-            <with
-                  variable="edu.ualberta.med.biobank.sourceprovider.loginState">
-               <equals
-                     value="loggedIn">
-               </equals>
-            </with>
+            <reference
+                  definitionId="biobank2.loggedIn">
+            </reference>
          </activeWhen>
       </handler>
       <handler
             class="edu.ualberta.med.biobank.handlers.ContainerAddHandler"
             commandId="edu.ualberta.med.biobank.commands.containerAdd">
          <activeWhen>
-            <with
-                  variable="edu.ualberta.med.biobank.sourceprovider.loginState">
-               <equals
-                     value="loggedIn">
-               </equals>
-            </with>
+            <reference
+                  definitionId="biobank2.loggedIn">
+            </reference>
          </activeWhen>
       </handler>
       <handler

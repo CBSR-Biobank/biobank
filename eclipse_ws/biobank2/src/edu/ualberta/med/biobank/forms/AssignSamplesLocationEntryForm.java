@@ -30,7 +30,6 @@ import org.springframework.remoting.RemoteConnectFailureException;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.forms.input.FormInput;
-import edu.ualberta.med.biobank.forms.listener.CancelConfirmKeyListener;
 import edu.ualberta.med.biobank.forms.listener.EnterKeyToNextFieldListener;
 import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.Container;
@@ -46,6 +45,7 @@ import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.SessionAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
 import edu.ualberta.med.biobank.validators.ScannerBarcodeValidator;
+import edu.ualberta.med.biobank.widgets.CancelConfirmWidget;
 import edu.ualberta.med.biobank.widgets.ScanPalletWidget;
 import edu.ualberta.med.biobank.widgets.ViewContainerWidget;
 import edu.ualberta.med.biobank.wizard.ContainerChooserWizard;
@@ -56,8 +56,7 @@ import gov.nih.nci.system.query.SDKQueryResult;
 import gov.nih.nci.system.query.example.InsertExampleQuery;
 import gov.nih.nci.system.query.example.UpdateExampleQuery;
 
-public class AssignSamplesLocationEntryForm extends BiobankEntryForm implements
-    CancelConfirmForm {
+public class AssignSamplesLocationEntryForm extends BiobankEntryForm {
 
     public static final String ID = "edu.ualberta.med.biobank.forms.AssignSamplesLocationEntryForm";
 
@@ -110,6 +109,8 @@ public class AssignSamplesLocationEntryForm extends BiobankEntryForm implements
     private Button confirmAndNextButton;
 
     private Button confirmAndClose;
+
+    private CancelConfirmWidget cancelConfirmWidget;
 
     private static boolean activityToPrint = false;
     private static boolean testDisposeOn = true;
@@ -292,31 +293,7 @@ public class AssignSamplesLocationEntryForm extends BiobankEntryForm implements
         // }
         // });
 
-        confirmCancelText = toolkit.createText(client, "");
-        confirmCancelText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        GridData gd = new GridData();
-        gd.widthHint = 100;
-        confirmCancelText.setLayoutData(gd);
-        confirmCancelText.addKeyListener(new CancelConfirmKeyListener(this));
-
-        initCancelButton(client);
-
-        confirmAndNextButton = toolkit.createButton(client,
-            "Confirm and scan next", SWT.PUSH);
-        confirmAndNextButton.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                saveAndNext();
-            }
-        });
-        confirmAndClose = toolkit.createButton(client, "Confirm  Close",
-            SWT.PUSH);
-        confirmAndClose.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                saveAndClose();
-            }
-        });
+        cancelConfirmWidget = new CancelConfirmWidget(client, this, true);
     }
 
     protected void chooseLocation() {
@@ -623,7 +600,7 @@ public class AssignSamplesLocationEntryForm extends BiobankEntryForm implements
     }
 
     @Override
-    protected void cancelForm() {
+    public void cancelForm() {
         freezerWidget.setSelectedBox(null);
         hotelWidget.setSelectedBox(null);
         palletWidget.setScannedElements(null);
@@ -667,21 +644,6 @@ public class AssignSamplesLocationEntryForm extends BiobankEntryForm implements
             plateToScanText.setFocus();
         }
     }
-
-    // CancelConfirmForm implementation
-    public void cancel() throws Exception {
-        cancelForm();
-    }
-
-    public void confirm() throws Exception {
-        saveAndNext();
-    }
-
-    public boolean isConfirmEnabled() {
-        return confirmAndNextButton.isEnabled();
-    }
-
-    // End CancelConfirmForm implementation
 
     /**
      * From the pallet barcode, get existing information form database
@@ -755,6 +717,11 @@ public class AssignSamplesLocationEntryForm extends BiobankEntryForm implements
             }
         }
         activityToPrint = false;
+    }
+
+    @Override
+    public String getNextOpenedFormID() {
+        return null;
     }
 
 }

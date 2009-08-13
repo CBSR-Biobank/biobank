@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
-import org.acegisecurity.AccessDeniedException;
 import org.eclipse.core.databinding.UpdateValueStrategy;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.observable.value.WritableValue;
@@ -18,6 +17,7 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.SWT;
@@ -26,6 +26,8 @@ import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.custom.StackLayout;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.events.KeyAdapter;
+import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
@@ -43,7 +45,6 @@ import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.forms.listener.EnterKeyToNextFieldListener;
 import edu.ualberta.med.biobank.model.ModelUtils;
 import edu.ualberta.med.biobank.model.PalletCell;
@@ -52,10 +53,10 @@ import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.Sample;
 import edu.ualberta.med.biobank.model.SampleCellStatus;
 import edu.ualberta.med.biobank.model.SampleType;
-import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
 import edu.ualberta.med.biobank.validators.ScannerBarcodeValidator;
 import edu.ualberta.med.biobank.widgets.AddSamplesScanPalletWidget;
+import edu.ualberta.med.biobank.widgets.CancelConfirmWidget;
 import edu.ualberta.med.biobank.widgets.SampleTypeSelectionWidget;
 import edu.ualberta.med.biobank.widgets.listener.ScanPalletModificationEvent;
 import edu.ualberta.med.biobank.widgets.listener.ScanPalletModificationListener;
@@ -69,8 +70,6 @@ public class ScanLinkEntryForm extends BiobankEntryForm {
     public static final String ID = "edu.ualberta.med.biobank.forms.ScanLinkEntryForm";
 
     private Button scanButton;
-
-    private PatientVisit patientVisit;
 
     private Composite typesSelectionPerRowComposite;
 
@@ -94,16 +93,18 @@ public class ScanLinkEntryForm extends BiobankEntryForm {
     private CCombo comboVisits;
     private ComboViewer viewerVisits;
 
+    private CancelConfirmWidget cancelConfirmWidget;
+
     private Composite typesSelectionCustomComposite;
 
     private SampleTypeSelectionWidget customSelection;
 
     private Composite radioComponents;
 
-    private Button confirmAndNextButton;
-
-    private static boolean activityToPrint = false;
-    private static boolean testDisposeOn = true;
+    /**
+     * Indicate if this form has been saved
+     */
+    private boolean isSaved = false;
 
     private Patient currentPatient;
 
@@ -116,9 +117,17 @@ public class ScanLinkEntryForm extends BiobankEntryForm {
      * Called from the BiobankPartListener
      */
     public void onClose() {
-        // FIXME check it works all the time !
-        if (testDisposeOn && activityToPrint) {
-            print();
+        if (!isSaved && BioBankPlugin.isAskPrint()) {
+            // ask print only if this for is not saved. If it is saved, a new
+            // form is opened. The printing only occurs when the form is close
+            // with the close button
+            boolean doPrint = MessageDialog.openQuestion(PlatformUI
+                .getWorkbench().getActiveWorkbenchWindow().getShell(), "Print",
+                "Do you want to print information ?");
+            if (doPrint) {
+                // FIXME implement print functionality
+                System.out.println("PRINT ACTIVITY");
+            }
         }
     }
 
@@ -126,10 +135,10 @@ public class ScanLinkEntryForm extends BiobankEntryForm {
     protected void handleStatusChanged(IStatus status) {
         if (status.getSeverity() == IStatus.OK) {
             form.setMessage(getOkMessage(), IMessageProvider.NONE);
-            confirmAndNextButton.setEnabled(true);
+            cancelConfirmWidget.setConfirmEnabled(true);
         } else {
             form.setMessage(status.getMessage(), IMessageProvider.ERROR);
-            confirmAndNextButton.setEnabled(false);
+            cancelConfirmWidget.setConfirmEnabled(false);
             if (!BioBankPlugin.getDefault().isValidPlateBarcode(
                 plateToScanText.getText())) {
                 scanButton.setEnabled(false);
@@ -153,7 +162,8 @@ public class ScanLinkEntryForm extends BiobankEntryForm {
         createFieldsComposite();
         createPalletSection();
 
-        createButtonsSection();
+        cancelConfirmWidget = new CancelConfirmWidget(form.getBody(), this,
+            true);
 
         WritableValue wv = new WritableValue(Boolean.FALSE, Boolean.class);
         UpdateValueStrategy uvs = new UpdateValueStrategy();
@@ -224,6 +234,7 @@ public class ScanLinkEntryForm extends BiobankEntryForm {
             "Row choice", SWT.RADIO);
         final Button radioCustomSelection = toolkit.createButton(
             radioComponents, "Custom Selection choice", SWT.RADIO);
+        radioComponents.setVisible(false);
 
         // stackLayout
         final Composite selectionComp = toolkit.createComposite(parent);
@@ -401,7 +412,6 @@ public class ScanLinkEntryForm extends BiobankEntryForm {
         gridData.grabExcessHorizontalSpace = true;
         gridData.horizontalAlignment = SWT.FILL;
         comboVisits.setLayoutData(gridData);
-        comboVisits.setEnabled(false);
 
         viewerVisits = new ComboViewer(comboVisits);
         viewerVisits.setContentProvider(new ArrayContentProvider());
@@ -413,28 +423,12 @@ public class ScanLinkEntryForm extends BiobankEntryForm {
                     pv.getDateDrawn());
             }
         });
-        comboVisits.addKeyListener(EnterKeyToNextFieldListener.INSTANCE);
-    }
-
-    private void createButtonsSection() {
-        Composite client = toolkit.createComposite(form.getBody());
-        GridLayout layout = new GridLayout(4, false);
-        layout.horizontalSpacing = 10;
-        client.setLayout(layout);
-        client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        toolkit.paintBordersFor(client);
-        GridData gd = new GridData();
-        gd.horizontalSpan = 2;
-        client.setLayoutData(gd);
-
-        initCancelButton(client);
-
-        confirmAndNextButton = toolkit
-            .createButton(client, "Confirm", SWT.PUSH);
-        confirmAndNextButton.addSelectionListener(new SelectionAdapter() {
+        comboVisits.addKeyListener(new KeyAdapter() {
             @Override
-            public void widgetSelected(SelectionEvent e) {
-                saveAndNext();
+            public void keyReleased(KeyEvent e) {
+                if (e.keyCode == 13) {
+                    plateToScanText.setFocus();
+                }
             }
         });
     }
@@ -448,10 +442,8 @@ public class ScanLinkEntryForm extends BiobankEntryForm {
             Collection<PatientVisit> collection = currentPatient
                 .getPatientVisitCollection();
             viewerVisits.setInput(collection);
-            comboVisits.setEnabled(true);
-            if (collection.size() == 1) {
-                comboVisits.setListVisible(true);
-            }
+            comboVisits.select(0);
+            comboVisits.setListVisible(true);
         }
     }
 
@@ -523,40 +515,38 @@ public class ScanLinkEntryForm extends BiobankEntryForm {
     }
 
     @Override
-    protected void saveForm() {
-        BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
-            public void run() {
-                try {
-                    List<SDKQuery> queries = new ArrayList<SDKQuery>();
-                    PalletCell[][] cells = spw.getScannedElements();
-                    for (int indexRow = 0; indexRow < cells.length; indexRow++) {
-                        for (int indexColumn = 0; indexColumn < cells[indexRow].length; indexColumn++) {
-                            PalletCell cell = cells[indexRow][indexColumn];
-                            if (PalletCell.hasValue(cell)
-                                && cell.getStatus().equals(
-                                    SampleCellStatus.TYPE)) {
-                                // add new samples
-                                Sample sample = new Sample();
-                                sample.setInventoryId(cell.getValue());
-                                sample.setPatientVisit(patientVisit);
-                                sample.setProcessDate(new Date());
-                                sample.setSampleType(cell.getType());
-                                queries.add(new InsertExampleQuery(sample));
-                            }
-                        }
-                    }
-                    appService.executeBatchQuery(queries);
-                    activityToPrint = true;
-                } catch (RemoteConnectFailureException exp) {
-                    BioBankPlugin.openRemoteConnectErrorMessage();
-                } catch (AccessDeniedException ade) {
-                    BioBankPlugin.openAccessDeniedErrorMessage();
-                } catch (Exception e) {
-                    SessionManager.getLogger().error(
-                        "Error when adding samples", e);
+    protected void saveForm() throws Exception {
+        List<SDKQuery> queries = new ArrayList<SDKQuery>();
+        PalletCell[][] cells = spw.getScannedElements();
+        for (int indexRow = 0; indexRow < cells.length; indexRow++) {
+            for (int indexColumn = 0; indexColumn < cells[indexRow].length; indexColumn++) {
+                PalletCell cell = cells[indexRow][indexColumn];
+                if (PalletCell.hasValue(cell)
+                    && cell.getStatus().equals(SampleCellStatus.TYPE)) {
+                    // add new samples
+                    Sample sample = new Sample();
+                    sample.setInventoryId(cell.getValue());
+                    PatientVisit patientVisit = getSelectedPatientVisit();
+                    sample.setPatientVisit(patientVisit);
+                    sample.setProcessDate(new Date());
+                    sample.setSampleType(cell.getType());
+                    queries.add(new InsertExampleQuery(sample));
                 }
             }
-        });
+        }
+        appService.executeBatchQuery(queries);
+        isSaved = true;
+    }
+
+    private PatientVisit getSelectedPatientVisit() {
+        if (viewerVisits.getSelection() != null
+            && viewerVisits.getSelection() instanceof IStructuredSelection) {
+            IStructuredSelection selection = (IStructuredSelection) viewerVisits
+                .getSelection();
+            if (selection.size() == 1)
+                return (PatientVisit) selection.getFirstElement();
+        }
+        return null;
     }
 
     private void setTypeForRow(SampleTypeSelectionWidget typeWidget,
@@ -576,7 +566,7 @@ public class ScanLinkEntryForm extends BiobankEntryForm {
     }
 
     @Override
-    protected void cancelForm() {
+    public void cancelForm() {
         spw.setScannedElements(null);
         for (SampleTypeSelectionWidget stw : sampleTypeWidgets) {
             stw.resetValues(true);
@@ -584,28 +574,8 @@ public class ScanLinkEntryForm extends BiobankEntryForm {
     }
 
     @Override
-    public void setFocus() {
-        // FIXME doesn't work !
-        patientNumberText.setFocus();
-    }
-
-    private void print() {
-        if (BioBankPlugin.isAskPrint()) {
-            boolean doPrint = MessageDialog.openQuestion(PlatformUI
-                .getWorkbench().getActiveWorkbenchWindow().getShell(), "Print",
-                "Do you want to print information ?");
-            if (doPrint) {
-                // FIXME implement print functionality
-            }
-        }
-        activityToPrint = false;
-    }
-
-    private void saveAndNext() {
-        testDisposeOn = false;
-        doSaveInternal();
-        getSite().getPage().closeEditor(ScanLinkEntryForm.this, false);
-        AdapterBase.openForm(new FormInput(adapter), ScanLinkEntryForm.ID);
+    public String getNextOpenedFormID() {
+        return ID;
     }
 
 }

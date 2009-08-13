@@ -14,13 +14,14 @@ public class EnterKeyToNextFieldListener implements KeyListener {
 
     @Override
     public void keyPressed(KeyEvent e) {
-        if (e.keyCode == 13) {
-            ((Control) e.widget).traverse(SWT.TRAVERSE_TAB_NEXT);
-        }
+
     }
 
     @Override
     public void keyReleased(KeyEvent e) {
+        if (e.keyCode == 13) {
+            ((Control) e.widget).traverse(SWT.TRAVERSE_TAB_NEXT);
+        }
     }
 
 }

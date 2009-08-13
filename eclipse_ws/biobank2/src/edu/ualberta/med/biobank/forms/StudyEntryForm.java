@@ -100,8 +100,6 @@ public class StudyEntryForm extends BiobankEntryForm {
         site = ((SiteAdapter) studyAdapter
             .getParentFromClass(SiteAdapter.class)).getSite();
 
-        viewFormId = StudyViewForm.ID;
-
         String tabName;
         if (study.getId() == null) {
             tabName = "New Study";
@@ -376,8 +374,13 @@ public class StudyEntryForm extends BiobankEntryForm {
     }
 
     @Override
-    protected void cancelForm() {
+    public void cancelForm() {
         // TODO Auto-generated method stub
 
+    }
+
+    @Override
+    public String getNextOpenedFormID() {
+        return StudyViewForm.ID;
     }
 }
