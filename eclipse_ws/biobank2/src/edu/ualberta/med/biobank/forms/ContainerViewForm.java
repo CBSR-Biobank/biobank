@@ -169,8 +169,8 @@ public class ContainerViewForm extends BiobankViewForm {
 
     private void retrieveContainer() {
         try {
-            container = (Container) ModelUtils.getObjectWithId(appService,
-                Container.class, containerAdapter.getContainer().getId());
+            container = ModelUtils.getObjectWithId(appService, Container.class,
+                containerAdapter.getContainer().getId());
             containerAdapter.setContainer(container);
         } catch (Exception e) {
             e.printStackTrace();

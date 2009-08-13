@@ -51,7 +51,7 @@ public class ContainerGroup extends AdapterBase {
         Assert.isNotNull(parentSite, "site null");
         try {
             // read from database again
-            parentSite = (Site) ModelUtils.getObjectWithId(getAppService(),
+            parentSite = ModelUtils.getObjectWithId(getAppService(),
                 Site.class, parentSite.getId());
             ((SiteAdapter) getParent()).setSite(parentSite);
 

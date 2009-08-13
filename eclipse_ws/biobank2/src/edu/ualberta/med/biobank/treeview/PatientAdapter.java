@@ -22,116 +22,116 @@ import edu.ualberta.med.biobank.model.PatientVisit;
 
 public class PatientAdapter extends AdapterBase {
 
-	private Patient patient;
+    private Patient patient;
 
-	public PatientAdapter(AdapterBase parent, Patient patient) {
-		super(parent);
-		this.patient = patient;
-		setHasChildren(true);
-	}
+    public PatientAdapter(AdapterBase parent, Patient patient) {
+        super(parent);
+        this.patient = patient;
+        setHasChildren(true);
+    }
 
-	public Patient getPatient() {
-		return patient;
-	}
+    public Patient getPatient() {
+        return patient;
+    }
 
-	public void setPatient(Patient patient) {
-		this.patient = patient;
-	}
+    public void setPatient(Patient patient) {
+        this.patient = patient;
+    }
 
-	@Override
-	public Integer getId() {
-		Assert.isNotNull(patient, "patient is null");
-		return patient.getId();
-	}
+    @Override
+    public Integer getId() {
+        Assert.isNotNull(patient, "patient is null");
+        return patient.getId();
+    }
 
-	@Override
-	public String getName() {
-		Assert.isNotNull(patient, "storage type is null");
-		return patient.getNumber();
-	}
+    @Override
+    public String getName() {
+        Assert.isNotNull(patient, "storage type is null");
+        return patient.getNumber();
+    }
 
-	@Override
-	public String getTitle() {
-		return getTitle("Patient");
-	}
+    @Override
+    public String getTitle() {
+        return getTitle("Patient");
+    }
 
-	@Override
-	public void performDoubleClick() {
-		performExpand();
-		openForm(new FormInput(this), PatientViewForm.ID);
-	}
+    @Override
+    public void performDoubleClick() {
+        performExpand();
+        openForm(new FormInput(this), PatientViewForm.ID);
+    }
 
-	@Override
-	public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-		MenuItem mi = new MenuItem(menu, SWT.PUSH);
-		mi.setText("Edit Patient");
-		mi.addSelectionListener(new SelectionListener() {
-			public void widgetSelected(SelectionEvent event) {
-				openForm(new FormInput(PatientAdapter.this),
-					PatientEntryForm.ID);
-			}
+    @Override
+    public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
+        MenuItem mi = new MenuItem(menu, SWT.PUSH);
+        mi.setText("Edit Patient");
+        mi.addSelectionListener(new SelectionListener() {
+            public void widgetSelected(SelectionEvent event) {
+                openForm(new FormInput(PatientAdapter.this),
+                    PatientEntryForm.ID);
+            }
 
-			public void widgetDefaultSelected(SelectionEvent e) {
-			}
-		});
+            public void widgetDefaultSelected(SelectionEvent e) {
+            }
+        });
 
-		mi = new MenuItem(menu, SWT.PUSH);
-		mi.setText("View Patient");
-		mi.addSelectionListener(new SelectionListener() {
-			public void widgetSelected(SelectionEvent event) {
-				openForm(new FormInput(PatientAdapter.this), PatientViewForm.ID);
-			}
+        mi = new MenuItem(menu, SWT.PUSH);
+        mi.setText("View Patient");
+        mi.addSelectionListener(new SelectionListener() {
+            public void widgetSelected(SelectionEvent event) {
+                openForm(new FormInput(PatientAdapter.this), PatientViewForm.ID);
+            }
 
-			public void widgetDefaultSelected(SelectionEvent e) {
-			}
-		});
+            public void widgetDefaultSelected(SelectionEvent e) {
+            }
+        });
 
-		mi = new MenuItem(menu, SWT.PUSH);
-		mi.setText("Add Patient Visit");
-		mi.addSelectionListener(new SelectionListener() {
-			public void widgetSelected(SelectionEvent event) {
-				PatientVisitAdapter adapter = new PatientVisitAdapter(
-					PatientAdapter.this, new PatientVisit());
-				openForm(new FormInput(adapter), PatientVisitEntryForm.ID);
-			}
+        mi = new MenuItem(menu, SWT.PUSH);
+        mi.setText("Add Patient Visit");
+        mi.addSelectionListener(new SelectionListener() {
+            public void widgetSelected(SelectionEvent event) {
+                PatientVisitAdapter adapter = new PatientVisitAdapter(
+                    PatientAdapter.this, new PatientVisit());
+                openForm(new FormInput(adapter), PatientVisitEntryForm.ID);
+            }
 
-			public void widgetDefaultSelected(SelectionEvent e) {
-			}
-		});
-	}
+            public void widgetDefaultSelected(SelectionEvent e) {
+            }
+        });
+    }
 
-	@Override
-	public void loadChildren(boolean updateNode) {
-		try {
-			// read from database again
-			patient = (Patient) ModelUtils.getObjectWithId(getAppService(),
-				Patient.class, patient.getId());
+    @Override
+    public void loadChildren(boolean updateNode) {
+        try {
+            // read from database again
+            patient = ModelUtils.getObjectWithId(getAppService(),
+                Patient.class, patient.getId());
 
-			Collection<PatientVisit> visits = patient
-				.getPatientVisitCollection();
+            Collection<PatientVisit> visits = patient
+                .getPatientVisitCollection();
 
-			for (PatientVisit visit : visits) {
-				PatientVisitAdapter node = (PatientVisitAdapter) getChild(visit
-					.getId());
+            for (PatientVisit visit : visits) {
+                PatientVisitAdapter node = (PatientVisitAdapter) getChild(visit
+                    .getId());
 
-				if (node == null) {
-					node = new PatientVisitAdapter(this, visit);
-					addChild(node);
-				}
-				if (updateNode) {
-					SessionManager.getInstance().getTreeViewer().update(node,
-						null);
-				}
-			}
-		} catch (Exception e) {
-			SessionManager.getLogger().error(
-				"Error while loading children of patient "
-						+ patient.getNumber(), e);
-		}
-	}
+                if (node == null) {
+                    node = new PatientVisitAdapter(this, visit);
+                    addChild(node);
+                }
+                if (updateNode) {
+                    SessionManager.getInstance().getTreeViewer().update(node,
+                        null);
+                }
+            }
+        } catch (Exception e) {
+            SessionManager.getLogger().error(
+                "Error while loading children of patient "
+                    + patient.getNumber(), e);
+        }
+    }
 
-	@Override
-	public AdapterBase accept(NodeSearchVisitor visitor) {
-		return visitor.visit(this);
-	}
+    @Override
+    public AdapterBase accept(NodeSearchVisitor visitor) {
+        return visitor.visit(this);
+    }
 }

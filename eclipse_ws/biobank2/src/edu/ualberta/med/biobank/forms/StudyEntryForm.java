@@ -21,8 +21,10 @@ import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.model.Clinic;
+import edu.ualberta.med.biobank.model.ModelUtils;
 import edu.ualberta.med.biobank.model.PvInfo;
 import edu.ualberta.med.biobank.model.PvInfoPossible;
+import edu.ualberta.med.biobank.model.SampleStorage;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
@@ -34,6 +36,7 @@ import edu.ualberta.med.biobank.widgets.SampleStorageEntryWidget;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.query.SDKQuery;
 import gov.nih.nci.system.query.SDKQueryResult;
+import gov.nih.nci.system.query.example.DeleteExampleQuery;
 import gov.nih.nci.system.query.example.InsertExampleQuery;
 import gov.nih.nci.system.query.example.UpdateExampleQuery;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -225,8 +228,7 @@ public class StudyEntryForm extends BiobankEntryForm {
         client.setLayout(layout);
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
-
-        initConfirmButton(client, true, false);
+        initConfirmButton(client, false, true);
     }
 
     @Override
@@ -285,11 +287,14 @@ public class StudyEntryForm extends BiobankEntryForm {
             pvInfoList.add(pvInfo);
         }
         study.setPvInfoCollection(pvInfoList);
-        saveStudy(study);
+        saveStudy();
+        saveSampleStorage();
+        studyAdapter.setStudy(study);
+
         studyAdapter.getParent().performExpand();
     }
 
-    private void saveStudy(Study study) throws ApplicationException {
+    private void saveStudy() throws ApplicationException {
         SDKQuery query;
         SDKQueryResult result;
         Set<PvInfo> savedPvInfoList = new HashSet<PvInfo>();
@@ -316,8 +321,62 @@ public class StudyEntryForm extends BiobankEntryForm {
             query = new UpdateExampleQuery(study);
         }
 
-        result = studyAdapter.getAppService().executeQuery(query);
+        result = appService.executeQuery(query);
         study = (Study) result.getObjectResult();
+    }
+
+    private void saveSampleStorage() throws Exception {
+        Collection<SampleStorage> ssCollection = sampleStorageEntryWidget
+            .getSampleStorage();
+        SDKQuery query;
+        SDKQueryResult result;
+
+        removeDeletedSampleStorage(ssCollection);
+
+        Collection<SampleStorage> savedSsCollection = new HashSet<SampleStorage>();
+        for (SampleStorage ss : ssCollection) {
+            ss.setStudy(study);
+            if ((ss.getId() == null) || (ss.getId() == 0)) {
+                query = new InsertExampleQuery(ss);
+            } else {
+                query = new UpdateExampleQuery(ss);
+            }
+
+            result = appService.executeQuery(query);
+            savedSsCollection.add((SampleStorage) result.getObjectResult());
+        }
+        study.setSampleStorageCollection(savedSsCollection);
+    }
+
+    private void removeDeletedSampleStorage(
+        Collection<SampleStorage> ssCollection) {
+        // no need to remove if study is not yet in the database
+        if (study.getId() == null)
+            return;
+
+        List<Integer> selectedStampleStorageIds = new ArrayList<Integer>();
+        for (SampleStorage ss : ssCollection) {
+            selectedStampleStorageIds.add(ss.getId());
+        }
+
+        SDKQuery query;
+
+        try {
+            // query from database again
+            Study dbStudy = ModelUtils.getObjectWithId(appService, Study.class,
+                study.getId());
+
+            for (SampleStorage ss : dbStudy.getSampleStorageCollection()) {
+                if (!selectedStampleStorageIds.contains(ss.getId())) {
+                    query = new DeleteExampleQuery(ss);
+                    appService.executeQuery(query);
+                }
+            }
+        } catch (final RemoteConnectFailureException exp) {
+            BioBankPlugin.openRemoteConnectErrorMessage();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private List<PvInfoPossible> getPossiblePvInfos() {

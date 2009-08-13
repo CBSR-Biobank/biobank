@@ -201,9 +201,9 @@ public class PatientVisitViewForm extends BiobankViewForm {
 
     private void retrievePatientVisit() {
         try {
-            patientVisit = (PatientVisit) ModelUtils.getObjectWithId(
-                patientVisitAdapter.getAppService(), PatientVisit.class,
-                patientVisitAdapter.getPatientVisit().getId());
+            patientVisit = ModelUtils.getObjectWithId(patientVisitAdapter
+                .getAppService(), PatientVisit.class, patientVisitAdapter
+                .getPatientVisit().getId());
             patientVisitAdapter.setPatientVisit(patientVisit);
         } catch (Exception ex) {
             SessionManager.getLogger().error(

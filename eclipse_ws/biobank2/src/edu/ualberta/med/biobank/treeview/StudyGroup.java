@@ -55,7 +55,7 @@ public class StudyGroup extends AdapterBase {
         Assert.isNotNull(currentSite, "null site");
         try {
             // read from database again
-            currentSite = (Site) ModelUtils.getObjectWithId(getAppService(),
+            currentSite = ModelUtils.getObjectWithId(getAppService(),
                 Site.class, currentSite.getId());
             ((SiteAdapter) getParent()).setSite(currentSite);
 
