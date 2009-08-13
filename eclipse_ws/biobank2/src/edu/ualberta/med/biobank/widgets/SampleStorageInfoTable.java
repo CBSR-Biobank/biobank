@@ -91,13 +91,4 @@ public class SampleStorageInfoTable extends BiobankCollectionTable {
         }
         return sampleStorage;
     }
-
-    public Map<Integer, SampleStorage> getSampleStorageMap() {
-        Map<Integer, SampleStorage> sampleStorageMap = new HashMap<Integer, SampleStorage>();
-        for (BiobankCollectionModel item : model) {
-            SampleStorage ss = (SampleStorage) item.o;
-            sampleStorageMap.put(ss.getId(), ss);
-        }
-        return sampleStorageMap;
-    }
 }

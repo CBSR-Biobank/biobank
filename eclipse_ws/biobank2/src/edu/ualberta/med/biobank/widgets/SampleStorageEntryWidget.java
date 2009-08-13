@@ -1,8 +1,9 @@
 package edu.ualberta.med.biobank.widgets;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Map;
+import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.runtime.Assert;
@@ -70,11 +71,21 @@ public class SampleStorageEntryWidget extends BiobankWidget {
                 Set<SampleType> sampleTypes = new HashSet<SampleType>(
                     allSampleTypes);
                 Set<SampleType> dupSampleTypes = new HashSet<SampleType>();
-                Map<Integer, SampleStorage> currentSampleStorageMap = sampleStorageTable
-                    .getSampleStorageMap();
+                Collection<SampleStorage> currentSampleStorage = sampleStorageTable
+                    .getSampleStorage();
+
+                // get the IDs of the selected sample types
+                List<Integer> sampleTypeIds = new ArrayList<Integer>();
+                for (SampleStorage ss : currentSampleStorage) {
+                    System.out.println("cotains id: "
+                        + ss.getSampleType().getId());
+                    sampleTypeIds.add(ss.getSampleType().getId());
+                }
 
                 for (SampleType stype : sampleTypes) {
-                    if (currentSampleStorageMap.containsKey(stype.getId())) {
+                    if (sampleTypeIds.contains(stype.getId())) {
+                        System.out.println("dup found: " + stype.getName()
+                            + " id/" + stype.getId());
                         dupSampleTypes.add(stype);
                     }
                 }
