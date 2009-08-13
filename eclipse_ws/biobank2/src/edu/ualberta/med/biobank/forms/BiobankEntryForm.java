@@ -30,6 +30,7 @@ import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
+import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.ModifyEvent;
@@ -80,9 +81,6 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
 
     private Button cancelButton;
 
-    // used by edit forms to open up the view form on confirm
-    protected String viewFormId = null;
-
     protected KeyListener keyListener = new KeyListener() {
         @Override
         public void keyPressed(KeyEvent e) {
@@ -128,19 +126,19 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
                     saveForm();
                 } catch (final RemoteConnectFailureException exp) {
                     BioBankPlugin.openRemoteConnectErrorMessage();
+                    setDirty(true);
                 } catch (final RemoteAccessException exp) {
                     BioBankPlugin.openRemoteAccessErrorMessage();
+                    setDirty(true);
                 } catch (final AccessDeniedException ade) {
                     BioBankPlugin.openAccessDeniedErrorMessage();
+                    setDirty(true);
                 } catch (Exception e) {
+                    setDirty(true);
                     throw new RuntimeException(e);
                 }
             }
         });
-    }
-
-    @Override
-    public void doSaveAs() {
     }
 
     @Override
@@ -158,11 +156,6 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
     protected void setDirty(boolean d) {
         dirty = d;
         firePropertyChange(ISaveablePart.PROP_DIRTY);
-    }
-
-    @Override
-    public boolean isSaveAsAllowed() {
-        return false;
     }
 
     @Override
@@ -196,10 +189,13 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
                     PlatformUI.getWorkbench().getActiveWorkbenchWindow()
                         .getActivePage().saveEditor(BiobankEntryForm.this,
                             false);
-                    PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-                        .getActivePage().closeEditor(BiobankEntryForm.this,
-                            false);
-                    AdapterBase.openForm(new FormInput(adapter), viewFormId);
+                    if (!BiobankEntryForm.this.isDirty()) {
+                        PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+                            .getActivePage().closeEditor(BiobankEntryForm.this,
+                                false);
+                        AdapterBase.openForm(new FormInput(adapter),
+                            getNextOpenedFormID());
+                    }
                 }
             });
         }
@@ -215,7 +211,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
         });
     }
 
-    protected abstract void cancelForm();
+    public abstract void cancelForm();
 
     public String getSessionName() {
         return sessionName;
@@ -260,6 +256,19 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
             return text;
         } else if (widgetClass == Combo.class) {
             Combo combo = new Combo(composite, SWT.READ_ONLY);
+            combo.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
+            Assert.isNotNull(widgetValues, "combo values not assigned");
+            combo.setItems(widgetValues);
+            toolkit.adapt(combo, true, true);
+
+            dbc.bindValue(SWTObservables.observeSelection(combo),
+                modelObservableValue, uvs, null);
+
+            combo.addSelectionListener(selectionListener);
+            combo.addModifyListener(modifyListener);
+            return combo;
+        } else if (widgetClass == CCombo.class) {
+            CCombo combo = new CCombo(composite, SWT.READ_ONLY);
             combo.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
             Assert.isNotNull(widgetValues, "combo values not assigned");
             combo.setItems(widgetValues);
@@ -444,4 +453,10 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
     public Button getCancelButton() {
         return cancelButton;
     }
+
+    /**
+     * Return the ID of the form that should be opened after the save action is
+     * performed and the current form closed
+     */
+    public abstract String getNextOpenedFormID();
 }

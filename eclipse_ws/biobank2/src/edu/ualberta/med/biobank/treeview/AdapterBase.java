@@ -16,7 +16,7 @@ import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.forms.AddCabinetSampleEntryForm;
-import edu.ualberta.med.biobank.forms.AddPalletSamplesEntryForm;
+import edu.ualberta.med.biobank.forms.ScanLinkEntryForm;
 import edu.ualberta.med.biobank.forms.AssignSamplesLocationEntryForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -289,7 +289,7 @@ public abstract class AdapterBase {
         for (IEditorReference editorRef : editors) {
             IEditorPart editor = editorRef.getEditor(false);
             if (editor != null
-                && (editor instanceof AddPalletSamplesEntryForm || editor instanceof AssignSamplesLocationEntryForm)) {
+                && (editor instanceof ScanLinkEntryForm || editor instanceof AssignSamplesLocationEntryForm)) {
                 page.closeEditor(editor, true);
             }
         }

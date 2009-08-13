@@ -99,7 +99,7 @@
             name="Add Repository Site">
       </command>
       <command
-            id="edu.ualberta.med.biobank.commands.addStite"
+            id="edu.ualberta.med.biobank.commands.siteAdd"
             name="Add Site">
       </command>
       <command
@@ -138,14 +138,12 @@
             name="Patients Administration">
       </category>
       <command
-            category="edu.ualberta.med.biobank.category.patientsAdmin"
             categoryId="edu.ualberta.med.biobank.category.patientsAdmin"
             defaultHandler="edu.ualberta.med.biobank.handlers.ScanLinkHandler"
             id="edu.ualberta.med.biobank.commands.patients.scanLink"
             name="Scan Link">
       </command>
       <command
-            category="edu.ualberta.med.biobank.category.patientsAdmin"
             categoryId="edu.ualberta.med.biobank.category.patientsAdmin"
             defaultHandler="edu.ualberta.med.biobank.handlers.DefaultLinkHandler"
             id="edu.ualberta.med.biobank.commands.patients.defaultLink"
@@ -168,82 +166,63 @@
             class="edu.ualberta.med.biobank.handlers.LoginHandler"
             commandId="edu.ualberta.med.biobank.commands.login">
          <activeWhen>
-             <with variable="edu.ualberta.med.biobank.sourceprovider.loginState">
-                 <equals value="loggedOut">
-                 </equals>
-             </with>
+            <reference
+                  definitionId="biobank2.loggedOut">
+            </reference>
          </activeWhen>
       </handler>
       <handler
             class="edu.ualberta.med.biobank.handlers.LogoutHandler"
             commandId="edu.ualberta.med.biobank.commands.logout">
          <activeWhen>
-            <with
-                  variable="edu.ualberta.med.biobank.sourceprovider.loginState">
-               <equals
-                     value="loggedIn">
-               </equals>
-            </with>
+            <reference
+                  definitionId="biobank2.loggedIn">
+            </reference>
          </activeWhen>
       </handler>
       <handler
             class="edu.ualberta.med.biobank.handlers.SiteAddHandler"
             commandId="edu.ualberta.med.biobank.commands.siteAdd">
          <activeWhen>
-            <with
-                  variable="edu.ualberta.med.biobank.sourceprovider.loginState">
-               <equals
-                     value="loggedIn">
-               </equals>
-            </with>
+            <reference
+                  definitionId="biobank2.loggedIn">
+            </reference>
          </activeWhen>
       </handler>
       <handler
             class="edu.ualberta.med.biobank.handlers.StudyAddHandler"
             commandId="edu.ualberta.med.biobank.commands.studyAdd">
          <activeWhen>
-            <with
-                  variable="edu.ualberta.med.biobank.sourceprovider.loginState">
-               <equals
-                     value="loggedIn">
-               </equals>
-            </with>
+            <reference
+                  definitionId="biobank2.loggedIn">
+            </reference>
          </activeWhen>
       </handler>
       <handler
             class="edu.ualberta.med.biobank.handlers.ClinicAddHandler"
             commandId="edu.ualberta.med.biobank.commands.clinicAdd">
          <activeWhen>
-            <with
-                  variable="edu.ualberta.med.biobank.sourceprovider.loginState">
-               <equals
-                     value="loggedIn">
-               </equals>
-            </with>
+            <reference
+                  definitionId="biobank2.loggedIn">
+            </reference>
          </activeWhen>
       </handler>
       <handler
             class="edu.ualberta.med.biobank.handlers.ContainerTypeAddHandler"
             commandId="edu.ualberta.med.biobank.commands.containerTypeAdd">
          <activeWhen>
-            <with
-                  variable="edu.ualberta.med.biobank.sourceprovider.loginState">
-               <equals
-                     value="loggedIn">
-               </equals>
-            </with>
+            <reference
+                  definitionId="biobank2.loggedIn">
+            </reference>
          </activeWhen>
       </handler>
       <handler
             class="edu.ualberta.med.biobank.handlers.ContainerAddHandler"
             commandId="edu.ualberta.med.biobank.commands.containerAdd">
          <activeWhen>
-            <with
-                  variable="edu.ualberta.med.biobank.sourceprovider.loginState">
-               <equals
-                     value="loggedIn">
-               </equals>
-            </with>
+            <reference
+                  definitionId="biobank2.loggedIn">
+            </reference>
          </activeWhen>
       </handler>
       <handler
@@ -257,11 +236,9 @@
          <enabledWhen>
             <with
                   variable="activePartId">
-               <not>
-                  <equals
-                        value="edu.ualberta.med.biobank.views.patients.ScanLink">
-                  </equals>
-               </not>
+               <equals
+                     value="edu.ualberta.med.biobank.views.patientsAdmin">
+               </equals>
             </with>
          </enabledWhen>
       </handler>
@@ -276,11 +253,9 @@
          <enabledWhen>
             <with
                   variable="activePartId">
-               <not>
-                  <equals
-                        value="edu.ualberta.med.biobank.views.patients.ScanLink">
-                  </equals>
-               </not>
+               <equals
+                     value="edu.ualberta.med.biobank.views.patientsAdmin">
+               </equals>
             </with>
          </enabledWhen>
       </handler>
@@ -384,6 +359,54 @@
                   </reference>
                </visibleWhen>
             </command>
+            <command
+                  commandId="edu.ualberta.med.biobank.commands.studyAdd"
+                  icon="icons/book_open.png"
+                  label="Add Study"
+                  style="push">
+               <visibleWhen
+                     checkEnabled="false">
+                  <reference
+                        definitionId="biobank2.mainPerpectiveSelected">
+                  </reference>
+               </visibleWhen>                  
+            </command>
+            <command
+                  commandId="edu.ualberta.med.biobank.commands.clinicAdd"
+                  icon="icons/transmit_blue.png"
+                  label="Add Clinic"
+                  style="push">
+               <visibleWhen
+                     checkEnabled="false">
+                  <reference
+                        definitionId="biobank2.mainPerpectiveSelected">
+                  </reference>
+               </visibleWhen>                  
+            </command>
+            <command
+                  commandId="edu.ualberta.med.biobank.commands.addContainerType"
+                  icon="icons/basket_edit.png"
+                  label="Add Container Type"
+                  style="push">
+               <visibleWhen
+                     checkEnabled="false">
+                  <reference
+                        definitionId="biobank2.mainPerpectiveSelected">
+                  </reference>
+               </visibleWhen>                  
+            </command>
+            <command
+                  commandId="edu.ualberta.med.biobank.commands.addContainer"
+                  icon="icons/basket.png"
+                  label="Add Container"
+                  style="push">
+               <visibleWhen
+                     checkEnabled="false">
+                  <reference
+                        definitionId="biobank2.mainPerpectiveSelected">
+                  </reference>
+               </visibleWhen>                  
+            </command>
          </toolbar>         
          <toolbar
                id="edu.ualberta.med.biobank.toolbar.patientsPerspective">
@@ -410,30 +433,6 @@
                         definitionId="biobank2.patientsPerpectiveSelected">
                   </reference>
                </visibleWhen>
-            </command>
-            <command
-                  commandId="edu.ualberta.med.biobank.commands.studyAdd"
-                  icon="icons/book_open.png"
-                  label="Add Study"
-                  style="push">
-            </command>
-            <command
-                  commandId="edu.ualberta.med.biobank.commands.clinicAdd"
-                  icon="icons/transmit_blue.png"
-                  label="Add Clinic"
-                  style="push">
-            </command>
-            <command
-                  commandId="edu.ualberta.med.biobank.commands.containerTypeAdd"
-                  icon="icons/basket_edit.png"
-                  label="Add Container Type"
-                  style="push">
-            </command>
-            <command
-                  commandId="edu.ualberta.med.biobank.commands.containerAdd"
-                  icon="icons/basket.png"
-                  label="Add Container"
-                  style="push">
             </command>
             <command
                   commandId="edu.ualberta.med.biobank.commands.patients.defaultLink"
@@ -491,17 +490,6 @@
                showTitle="false"
                standalone="false"
                visible="true">
-         </view>
-         <view
-               closeable="false"
-               id="edu.ualberta.med.biobank.views.patients.ScanLink"
-               minimized="false"
-               moveable="false"
-               relationship="stack"
-               relative="edu.ualberta.med.biobank.views.patientsAdmin"
-               showTitle="false"
-               standalone="false"
-               visible="false">
          </view>
       </perspectiveExtension>
       </extension>
@@ -592,10 +580,11 @@
             name="Container View">
       </editor>
       <editor
-            class="edu.ualberta.med.biobank.forms.AddPalletSamplesEntryForm"
+            class="edu.ualberta.med.biobank.forms.ScanLinkEntryForm"
             default="false"
-            id="edu.ualberta.med.biobank.forms.AddPalletSamplesEntryForm"
-            name="Add Palette Samples Entry">
+            icon="icons/scanLink.png"
+            id="edu.ualberta.med.biobank.forms.ScanLinkEntryForm"
+            name="Scan Link">
       </editor>
       <editor
             class="edu.ualberta.med.biobank.forms.AssignSamplesLocationEntryForm"
@@ -665,16 +654,9 @@
       <view
             allowMultiple="false"
             class="edu.ualberta.med.biobank.views.PatientAdministrationView"
+            icon="icons/patientPerspective.png"
             id="edu.ualberta.med.biobank.views.patientsAdmin"
             name="Patients administration"
-            restorable="true">
-      </view>
-      <view
-            allowMultiple="false"
-            class="edu.ualberta.med.biobank.views.patients.ScanLinkView"
-            icon="icons/scanLink.png"
-            id="edu.ualberta.med.biobank.views.patients.ScanLink"
-            name="Scan Link"
             restorable="true">
       </view>
    </extension>
@@ -695,6 +677,24 @@
                variable="activeWorkbenchWindow.activePerspective">
             <equals
                   value="edu.ualberta.med.biobank.perspective.patients">
+            </equals>
+         </with>
+      </definition>
+      <definition
+            id="biobank2.loggedIn">
+         <with
+               variable="edu.ualberta.med.biobank.sourceprovider.loginState">
+            <equals
+                  value="loggedIn">
+            </equals>
+         </with>
+      </definition>
+      <definition
+            id="biobank2.loggedOut">
+         <with
+               variable="edu.ualberta.med.biobank.sourceprovider.loginState">
+            <equals
+                  value="loggedOut">
             </equals>
          </with>
       </definition>

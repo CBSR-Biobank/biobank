@@ -14,6 +14,7 @@ import org.eclipse.swt.widgets.Label;
 import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.ModelUtils;
@@ -58,7 +59,8 @@ public class ClinicViewForm extends AddressViewFormCommon {
         } catch (final RemoteConnectFailureException exp) {
             BioBankPlugin.openRemoteConnectErrorMessage();
         } catch (Exception e) {
-            e.printStackTrace();
+            SessionManager.getLogger().error(
+                "Error while retrieving the clinic", e);
         }
     }
 

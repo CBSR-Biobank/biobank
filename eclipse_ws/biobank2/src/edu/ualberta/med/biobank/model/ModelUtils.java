@@ -58,6 +58,9 @@ public class ModelUtils {
             setMethod.invoke(instance, value);
 
             List<E> list = appService.search(classType, instance);
+            if (list.isEmpty()) {
+                return null;
+            }
             Assert.isTrue(list.size() == 1);
             return list.get(0);
         } catch (Exception ex) {

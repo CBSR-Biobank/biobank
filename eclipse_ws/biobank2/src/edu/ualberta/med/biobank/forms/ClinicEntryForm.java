@@ -48,7 +48,6 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
             "Invalid editor input: object of type "
                 + adapter.getClass().getName());
         clinicAdapter = (ClinicAdapter) adapter;
-        viewFormId = ClinicViewForm.ID;
         clinic = clinicAdapter.getClinic();
 
         address = clinic.getAddress();
@@ -181,7 +180,7 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
 
         result = appService.executeQuery(query);
         clinic = (Clinic) result.getObjectResult();
-
+        clinicAdapter.setClinic(clinic);
         clinicAdapter.getParent().performExpand();
     }
 
@@ -205,8 +204,13 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
     }
 
     @Override
-    protected void cancelForm() {
+    public void cancelForm() {
         // TODO Auto-generated method stub
 
+    }
+
+    @Override
+    public String getNextOpenedFormID() {
+        return ClinicViewForm.ID;
     }
 }

@@ -14,7 +14,7 @@ import org.eclipse.swt.widgets.Tree;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.forms.AddCabinetSampleEntryForm;
-import edu.ualberta.med.biobank.forms.AddPalletSamplesEntryForm;
+import edu.ualberta.med.biobank.forms.ScanLinkEntryForm;
 import edu.ualberta.med.biobank.forms.PatientVisitEntryForm;
 import edu.ualberta.med.biobank.forms.PatientVisitViewForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
@@ -100,7 +100,7 @@ public class PatientVisitAdapter extends AdapterBase {
             public void widgetSelected(SelectionEvent event) {
                 closeScannersEditors();
                 openForm(new FormInput(PatientVisitAdapter.this),
-                    AddPalletSamplesEntryForm.ID);
+                    ScanLinkEntryForm.ID);
             }
 
             public void widgetDefaultSelected(SelectionEvent e) {

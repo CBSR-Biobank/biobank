@@ -45,7 +45,6 @@ public class SiteEntryForm extends AddressEntryFormCommon {
 
         siteAdapter = (SiteAdapter) adapter;
         site = siteAdapter.getSite();
-        viewFormId = SiteViewForm.ID;
 
         String tabName;
         if (site.getId() == null) {
@@ -179,8 +178,13 @@ public class SiteEntryForm extends AddressEntryFormCommon {
     }
 
     @Override
-    protected void cancelForm() {
+    public void cancelForm() {
         // TODO Auto-generated method stub
 
+    }
+
+    @Override
+    public String getNextOpenedFormID() {
+        return SiteViewForm.ID;
     }
 }

@@ -11,6 +11,7 @@ public class PatientAdministrationView extends ViewPart {
 
     public PatientAdministrationView() {
         // TODO Auto-generated constructor stub
+
     }
 
     @Override

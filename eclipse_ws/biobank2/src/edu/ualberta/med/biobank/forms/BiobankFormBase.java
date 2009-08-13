@@ -186,4 +186,13 @@ public abstract class BiobankFormBase extends EditorPart {
             controls.put(key, control);
         }
     }
+
+    public FormToolkit getToolkit() {
+        return toolkit;
+    }
+
+    public AdapterBase getAdapter() {
+        return adapter;
+    }
+
 }
