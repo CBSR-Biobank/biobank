@@ -95,19 +95,28 @@
             name="Quit">
       </command>
       <command
-            defaultHandler="edu.ualberta.med.biobank.handlers.SiteAddHandler"
-            id="edu.ualberta.med.biobank.commands.addSite"
+            id="edu.ualberta.med.biobank.commands.siteAdd"
             name="Add Repository Site">
       </command>
       <command
-            defaultHandler="edu.ualberta.med.biobank.handlers.StudyAddHandler"
-            id="edu.ualberta.med.biobank.commands.addStudy"
+            id="edu.ualberta.med.biobank.commands.addStite"
+            name="Add Site">
+      </command>
+      <command
+            id="edu.ualberta.med.biobank.commands.studyAdd"
             name="Add Study">
       </command>
       <command
-            defaultHandler="edu.ualberta.med.biobank.handlers.ClinicAddHandler"
-            id="edu.ualberta.med.biobank.commands.addClinic"
+            id="edu.ualberta.med.biobank.commands.clinicAdd"
             name="Add Clinic">
+      </command>
+      <command
+            id="edu.ualberta.med.biobank.commands.containerTypeAdd"
+            name="Add Container Type">
+      </command>
+      <command
+            id="edu.ualberta.med.biobank.commands.containerAdd"
+            name="Add Container">
       </command>
       <command
             defaultHandler="edu.ualberta.med.biobank.handlers.SearchHandler"
@@ -169,6 +178,66 @@
             <reference
                   definitionId="biobank2.loggedIn">
             </reference>
+         </activeWhen>
+      </handler>
+      <handler
+            class="edu.ualberta.med.biobank.handlers.SiteAddHandler"
+            commandId="edu.ualberta.med.biobank.commands.siteAdd">
+         <activeWhen>
+            <with
+                  variable="edu.ualberta.med.biobank.sourceprovider.loginState">
+               <equals
+                     value="loggedIn">
+               </equals>
+            </with>
+         </activeWhen>
+      </handler>
+      <handler
+            class="edu.ualberta.med.biobank.handlers.StudyAddHandler"
+            commandId="edu.ualberta.med.biobank.commands.studyAdd">
+         <activeWhen>
+            <with
+                  variable="edu.ualberta.med.biobank.sourceprovider.loginState">
+               <equals
+                     value="loggedIn">
+               </equals>
+            </with>
+         </activeWhen>
+      </handler>
+      <handler
+            class="edu.ualberta.med.biobank.handlers.ClinicAddHandler"
+            commandId="edu.ualberta.med.biobank.commands.clinicAdd">
+         <activeWhen>
+            <with
+                  variable="edu.ualberta.med.biobank.sourceprovider.loginState">
+               <equals
+                     value="loggedIn">
+               </equals>
+            </with>
+         </activeWhen>
+      </handler>
+      <handler
+            class="edu.ualberta.med.biobank.handlers.ContainerTypeAddHandler"
+            commandId="edu.ualberta.med.biobank.commands.containerTypeAdd">
+         <activeWhen>
+            <with
+                  variable="edu.ualberta.med.biobank.sourceprovider.loginState">
+               <equals
+                     value="loggedIn">
+               </equals>
+            </with>
+         </activeWhen>
+      </handler>
+      <handler
+            class="edu.ualberta.med.biobank.handlers.ContainerAddHandler"
+            commandId="edu.ualberta.med.biobank.commands.containerAdd">
+         <activeWhen>
+            <with
+                  variable="edu.ualberta.med.biobank.sourceprovider.loginState">
+               <equals
+                     value="loggedIn">
+               </equals>
+            </with>
          </activeWhen>
       </handler>
       <handler
@@ -241,30 +310,36 @@
                label="Administration"
                mnemonic="A">
             <menu
-                  id="edu.ualberta.med.biobank.menu.site"
-                  label="Repository Site"
+                  id="edu.ualberta.med.biobank.menu.session"
+                  label="Session"
                   mnemonic="i">
                <command
-                     commandId="edu.ualberta.med.biobank.commands.addStudy"
-                     id="edu.ualberta.med.biobank.menu.addStudy"
+                     commandId="edu.ualberta.med.biobank.commands.siteAdd"
+                     id="edu.ualberta.med.biobank.menu.siteAdd"
+                     label="Add Site"
+                     style="push">
+               </command>
+               <command
+                     commandId="edu.ualberta.med.biobank.commands.studyAdd"
+                     id="edu.ualberta.med.biobank.menu.studyAdd"
                      label="Add Study"
                      style="push">
                </command>
                <command
-                     commandId="edu.ualberta.med.biobank.commands.addStudy"
-                     id="edu.ualberta.med.biobank.menu.addStudy"
+                     commandId="edu.ualberta.med.biobank.commands.clinicAdd"
+                     id="edu.ualberta.med.biobank.menu.clinicAdd"
                      label="Add Study"
                      style="push">
                </command>
                <command
-                     commandId="edu.ualberta.med.biobank.commands.addContainerType"
-                     id="edu.ualberta.med.biobank.menu.addContainerType"
+                     commandId="edu.ualberta.med.biobank.commands.containerTypeAdd"
+                     id="edu.ualberta.med.biobank.menu.containerTypeAdd"
                      label="Add Container Type"
                      style="push">
                </command>
                <command
-                     commandId="edu.ualberta.med.biobank.commands.addContainer"
-                     id="edu.ualberta.med.biobank.menu.addContainer"
+                     commandId="edu.ualberta.med.biobank.commands.containerAdd"
+                     id="edu.ualberta.med.biobank.menu.containerAdd"
                      label="Add Container"
                      style="push">
                </command>
@@ -300,7 +375,7 @@
                </visibleWhen>
             </command>
             <command
-                  commandId="edu.ualberta.med.biobank.commands.addStudy"
+                  commandId="edu.ualberta.med.biobank.commands.studyAdd"
                   icon="icons/book_open.png"
                   label="Add Study"
                   style="push">
@@ -312,7 +387,7 @@
                </visibleWhen>                  
             </command>
             <command
-                  commandId="edu.ualberta.med.biobank.commands.addClinic"
+                  commandId="edu.ualberta.med.biobank.commands.clinicAdd"
                   icon="icons/transmit_blue.png"
                   label="Add Clinic"
                   style="push">
