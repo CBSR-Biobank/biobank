@@ -77,15 +77,11 @@ public class SampleStorageEntryWidget extends BiobankWidget {
                 // get the IDs of the selected sample types
                 List<Integer> sampleTypeIds = new ArrayList<Integer>();
                 for (SampleStorage ss : currentSampleStorage) {
-                    System.out.println("cotains id: "
-                        + ss.getSampleType().getId());
                     sampleTypeIds.add(ss.getSampleType().getId());
                 }
 
                 for (SampleType stype : sampleTypes) {
                     if (sampleTypeIds.contains(stype.getId())) {
-                        System.out.println("dup found: " + stype.getName()
-                            + " id/" + stype.getId());
                         dupSampleTypes.add(stype);
                     }
                 }
