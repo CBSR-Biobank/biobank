@@ -80,36 +80,46 @@ public class SampleStorageEntryWidget extends BiobankWidget {
         addSampleStorageButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-
-                // need to display sample types that have not yet been selected
-                Set<SampleType> sampleTypes = new HashSet<SampleType>(
-                    allSampleTypes);
-                Set<SampleType> dupSampleTypes = new HashSet<SampleType>();
-                Collection<SampleStorage> currentSampleStorage = sampleStorageTable
-                    .getSampleStorage();
-
-                // get the IDs of the selected sample types
-                List<Integer> sampleTypeIds = new ArrayList<Integer>();
-                for (SampleStorage ss : currentSampleStorage) {
-                    sampleTypeIds.add(ss.getSampleType().getId());
-                }
-
-                for (SampleType stype : sampleTypes) {
-                    if (sampleTypeIds.contains(stype.getId())) {
-                        dupSampleTypes.add(stype);
-                    }
-                }
-                sampleTypes.removeAll(dupSampleTypes);
-
-                SampleStorageDialog dlg = new SampleStorageDialog(PlatformUI
-                    .getWorkbench().getActiveWorkbenchWindow().getShell(),
-                    new SampleStorage(), sampleTypes);
-                if (dlg.open() == Dialog.OK) {
-                    selectedSampleStorage.add(dlg.getSampleStorage());
-                    sampleStorageTable.setSampleStorage(selectedSampleStorage);
-                }
+                addOrEditSampleStorage(true, new SampleStorage(),
+                    getNonDuplicateSampleTypes());
             }
         });
+    }
+
+    public void addOrEditSampleStorage(boolean add,
+        SampleStorage sampleStorage, Set<SampleType> availSampleTypes) {
+        SampleStorageDialog dlg = new SampleStorageDialog(PlatformUI
+            .getWorkbench().getActiveWorkbenchWindow().getShell(),
+            sampleStorage, availSampleTypes);
+        if (dlg.open() == Dialog.OK) {
+            if (add) {
+                // only add to the collection when adding and not editing
+                selectedSampleStorage.add(dlg.getSampleStorage());
+            }
+            sampleStorageTable.setSampleStorage(selectedSampleStorage);
+        }
+    }
+
+    // need sample types that have not yet been selected in sampleStorageTable
+    private Set<SampleType> getNonDuplicateSampleTypes() {
+        Set<SampleType> sampleTypes = new HashSet<SampleType>(allSampleTypes);
+        Set<SampleType> dupSampleTypes = new HashSet<SampleType>();
+        Collection<SampleStorage> currentSampleStorage = sampleStorageTable
+            .getSampleStorage();
+
+        // get the IDs of the selected sample types
+        List<Integer> sampleTypeIds = new ArrayList<Integer>();
+        for (SampleStorage ss : currentSampleStorage) {
+            sampleTypeIds.add(ss.getSampleType().getId());
+        }
+
+        for (SampleType stype : sampleTypes) {
+            if (sampleTypeIds.contains(stype.getId())) {
+                dupSampleTypes.add(stype);
+            }
+        }
+        sampleTypes.removeAll(dupSampleTypes);
+        return sampleTypes;
     }
 
     private void addTableMenu() {
@@ -119,6 +129,23 @@ public class SampleStorageEntryWidget extends BiobankWidget {
 
         MenuItem item = new MenuItem(menu, SWT.PUSH);
         item.setText("Edit");
+        item.addSelectionListener(new SelectionListener() {
+            public void widgetSelected(SelectionEvent event) {
+                IStructuredSelection stSelection = (IStructuredSelection) sampleStorageTable
+                    .getTableViewer().getSelection();
+
+                BiobankCollectionModel item = (BiobankCollectionModel) stSelection
+                    .getFirstElement();
+                SampleStorage sampleStorage = (SampleStorage) item.o;
+
+                Set<SampleType> allowedSampleTypes = getNonDuplicateSampleTypes();
+                allowedSampleTypes.add(sampleStorage.getSampleType());
+                addOrEditSampleStorage(false, sampleStorage, allowedSampleTypes);
+            }
+
+            public void widgetDefaultSelected(SelectionEvent e) {
+            }
+        });
 
         item = new MenuItem(menu, SWT.PUSH);
         item.setText("Delete");
