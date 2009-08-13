@@ -208,8 +208,8 @@ public class StudyViewForm extends BiobankViewForm {
 
     private void retrieveStudy() {
         try {
-            study = (Study) ModelUtils.getObjectWithId(studyAdapter
-                .getAppService(), Study.class, studyAdapter.getStudy().getId());
+            study = ModelUtils.getObjectWithId(studyAdapter.getAppService(),
+                Study.class, studyAdapter.getStudy().getId());
             studyAdapter.setStudy(study);
         } catch (Exception e) {
             SessionManager.getLogger().error(

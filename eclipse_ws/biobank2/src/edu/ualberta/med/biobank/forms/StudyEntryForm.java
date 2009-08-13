@@ -21,6 +21,7 @@ import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.model.Clinic;
+import edu.ualberta.med.biobank.model.ModelUtils;
 import edu.ualberta.med.biobank.model.PvInfo;
 import edu.ualberta.med.biobank.model.PvInfoPossible;
 import edu.ualberta.med.biobank.model.SampleStorage;
@@ -35,6 +36,7 @@ import edu.ualberta.med.biobank.widgets.SampleStorageEntryWidget;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.query.SDKQuery;
 import gov.nih.nci.system.query.SDKQueryResult;
+import gov.nih.nci.system.query.example.DeleteExampleQuery;
 import gov.nih.nci.system.query.example.InsertExampleQuery;
 import gov.nih.nci.system.query.example.UpdateExampleQuery;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -296,9 +298,12 @@ public class StudyEntryForm extends BiobankEntryForm {
 
         study.setSite(site);
 
-        Collection<SampleStorage> savedSsCollection = new HashSet<SampleStorage>();
         Collection<SampleStorage> ssCollection = sampleStorageEntryWidget
             .getSampleStorage();
+
+        removeDeletedSampleStorage(ssCollection);
+
+        Collection<SampleStorage> savedSsCollection = new HashSet<SampleStorage>();
         for (SampleStorage ss : ssCollection) {
             if ((ss.getId() == null) || (ss.getId() == 0)) {
                 query = new InsertExampleQuery(ss);
@@ -307,7 +312,7 @@ public class StudyEntryForm extends BiobankEntryForm {
             }
 
             ss.setStudy(study);
-            result = studyAdapter.getAppService().executeQuery(query);
+            result = appService.executeQuery(query);
             savedSsCollection.add((SampleStorage) result.getObjectResult());
         }
         study.setSampleStorageCollection(savedSsCollection);
@@ -334,6 +339,33 @@ public class StudyEntryForm extends BiobankEntryForm {
 
         result = studyAdapter.getAppService().executeQuery(query);
         study = (Study) result.getObjectResult();
+    }
+
+    private void removeDeletedSampleStorage(
+        Collection<SampleStorage> ssCollection) {
+        List<Integer> selectedStampleStorageIds = new ArrayList<Integer>();
+        for (SampleStorage ss : ssCollection) {
+            selectedStampleStorageIds.add(ss.getId());
+        }
+
+        SDKQuery query;
+
+        try {
+            // query from database again
+            Study dbStudy = ModelUtils.getObjectWithId(appService, Study.class,
+                study.getId());
+
+            for (SampleStorage ss : dbStudy.getSampleStorageCollection()) {
+                if (!selectedStampleStorageIds.contains(ss.getId())) {
+                    query = new DeleteExampleQuery(ss);
+                    appService.executeQuery(query);
+                }
+            }
+        } catch (final RemoteConnectFailureException exp) {
+            BioBankPlugin.openRemoteConnectErrorMessage();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private List<PvInfoPossible> getPossiblePvInfos() {

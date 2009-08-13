@@ -61,7 +61,7 @@ public class ClinicGroup extends AdapterBase {
 
         try {
             // read from database again
-            currentSite = (Site) ModelUtils.getObjectWithId(getAppService(),
+            currentSite = ModelUtils.getObjectWithId(getAppService(),
                 Site.class, currentSite.getId());
             ((SiteAdapter) getParent()).setSite(currentSite);
 

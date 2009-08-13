@@ -28,14 +28,14 @@ public class ModelUtils {
         return appService.query(criteria);
     }
 
-    public static Object getObjectWithId(WritableApplicationService appService,
-        Class<?> classType, Integer id) throws Exception {
+    public static <E> E getObjectWithId(WritableApplicationService appService,
+        Class<E> classType, Integer id) throws Exception {
         Constructor<?> constructor = classType.getConstructor();
         Object instance = constructor.newInstance();
         Method setIdMethod = classType.getMethod("setId", Integer.class);
         setIdMethod.invoke(instance, id);
 
-        List<?> list = appService.search(classType, instance);
+        List<E> list = appService.search(classType, instance);
         Assert.isTrue(list.size() == 1);
         return list.get(0);
     }

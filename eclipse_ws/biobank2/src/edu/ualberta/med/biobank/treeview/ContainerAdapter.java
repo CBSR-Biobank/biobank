@@ -95,7 +95,7 @@ public class ContainerAdapter extends AdapterBase {
     public void loadChildren(boolean updateNode) {
         try {
             // read from database again
-            container = (Container) ModelUtils.getObjectWithId(getAppService(),
+            container = ModelUtils.getObjectWithId(getAppService(),
                 Container.class, container.getId());
             for (ContainerPosition childPosition : container
                 .getChildPositionCollection()) {

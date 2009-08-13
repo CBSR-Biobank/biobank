@@ -67,7 +67,7 @@ public class PatientGroup extends AdapterBase {
         Assert.isNotNull(parentStudy, "null study");
         try {
             // read from database again
-            parentStudy = (Study) ModelUtils.getObjectWithId(getAppService(),
+            parentStudy = ModelUtils.getObjectWithId(getAppService(),
                 Study.class, parentStudy.getId());
             ((StudyAdapter) getParent()).setStudy(parentStudy);
 
