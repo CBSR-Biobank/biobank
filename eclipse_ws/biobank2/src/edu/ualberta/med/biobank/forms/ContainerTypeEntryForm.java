@@ -16,6 +16,7 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -30,6 +31,7 @@ import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.helpers.GetHelper;
 import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
+import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.model.Site;
@@ -127,9 +129,26 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
 
         createContainerTypeSection();
         createDimensionsSection();
-        createSampleDerivTypesSection();
-        createChildContainerTypesSection();
+        createContainerChildSection();
         createButtons();
+    }
+
+    protected void createContainerChildSection() {
+        Composite client = toolkit.createComposite(form.getBody());
+        Button topBox = new Button(client, SWT.CHECK);
+        topBox.setText("Top Level Container");
+        Button sampleBox = new Button(client, SWT.CHECK);
+        sampleBox.setText("Holds Samples");
+        sampleBox.addSelectionListener(new SelectionListener() {
+            public void widgetSelected(SelectionEvent event) {
+                createSampleDerivTypesSection();
+            }
+
+            @Override
+            public void widgetDefaultSelected(SelectionEvent e) {
+            }
+        });
+        createChildContainerTypesSection();
     }
 
     protected void createContainerTypeSection() {
@@ -466,9 +485,10 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
             missingString += "OR cp.container.id='" + missing.get(i).toString()
                 + "'";
         }
-        HQLCriteria c = new HQLCriteria(
-            "from edu.ualberta.biobank.model.ContainerPosition as cp inner join on cp.parentContainer.id='"
-                + containerType.getId() + "'" + missingString);
+        HQLCriteria c = new HQLCriteria("from "
+            + ContainerPosition.class.getName()
+            + " as cp inner join on cp.parentContainer.id='"
+            + containerType.getId() + "'" + missingString);
         List<Object> results = appService.query(c);
         if (results.size() == 0)
             return true;
