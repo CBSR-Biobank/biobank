@@ -287,35 +287,19 @@ public class StudyEntryForm extends BiobankEntryForm {
             pvInfoList.add(pvInfo);
         }
         study.setPvInfoCollection(pvInfoList);
-        saveStudy(study);
+        saveStudy();
+        saveSampleStorage();
+        studyAdapter.setStudy(study);
+
         studyAdapter.getParent().performExpand();
     }
 
-    private void saveStudy(Study study) throws ApplicationException {
+    private void saveStudy() throws ApplicationException {
         SDKQuery query;
         SDKQueryResult result;
         Set<PvInfo> savedPvInfoList = new HashSet<PvInfo>();
 
         study.setSite(site);
-
-        Collection<SampleStorage> ssCollection = sampleStorageEntryWidget
-            .getSampleStorage();
-
-        removeDeletedSampleStorage(ssCollection);
-
-        Collection<SampleStorage> savedSsCollection = new HashSet<SampleStorage>();
-        for (SampleStorage ss : ssCollection) {
-            if ((ss.getId() == null) || (ss.getId() == 0)) {
-                query = new InsertExampleQuery(ss);
-            } else {
-                query = new UpdateExampleQuery(ss);
-            }
-
-            ss.setStudy(study);
-            result = appService.executeQuery(query);
-            savedSsCollection.add((SampleStorage) result.getObjectResult());
-        }
-        study.setSampleStorageCollection(savedSsCollection);
 
         if (study.getPvInfoCollection().size() > 0) {
             for (PvInfo pvInfo : study.getPvInfoCollection()) {
@@ -337,12 +321,39 @@ public class StudyEntryForm extends BiobankEntryForm {
             query = new UpdateExampleQuery(study);
         }
 
-        result = studyAdapter.getAppService().executeQuery(query);
+        result = appService.executeQuery(query);
         study = (Study) result.getObjectResult();
+    }
+
+    private void saveSampleStorage() throws Exception {
+        Collection<SampleStorage> ssCollection = sampleStorageEntryWidget
+            .getSampleStorage();
+        SDKQuery query;
+        SDKQueryResult result;
+
+        removeDeletedSampleStorage(ssCollection);
+
+        Collection<SampleStorage> savedSsCollection = new HashSet<SampleStorage>();
+        for (SampleStorage ss : ssCollection) {
+            ss.setStudy(study);
+            if ((ss.getId() == null) || (ss.getId() == 0)) {
+                query = new InsertExampleQuery(ss);
+            } else {
+                query = new UpdateExampleQuery(ss);
+            }
+
+            result = appService.executeQuery(query);
+            savedSsCollection.add((SampleStorage) result.getObjectResult());
+        }
+        study.setSampleStorageCollection(savedSsCollection);
     }
 
     private void removeDeletedSampleStorage(
         Collection<SampleStorage> ssCollection) {
+        // no need to remove if study is not yet in the database
+        if (study.getId() == null)
+            return;
+
         List<Integer> selectedStampleStorageIds = new ArrayList<Integer>();
         for (SampleStorage ss : ssCollection) {
             selectedStampleStorageIds.add(ss.getId());
