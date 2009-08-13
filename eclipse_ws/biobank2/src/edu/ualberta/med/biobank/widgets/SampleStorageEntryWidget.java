@@ -56,11 +56,15 @@ public class SampleStorageEntryWidget extends BiobankWidget {
         super(parent, style);
         Assert.isNotNull(toolkit, "toolkit is null");
         getSampleTypes();
+        this.selectedSampleStorage = selectedSampleStorage;
 
         setLayout(new GridLayout(1, false));
         setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-        this.selectedSampleStorage = selectedSampleStorage;
+        sampleStorageTable = new SampleStorageInfoTable(parent,
+            this.selectedSampleStorage);
+        sampleStorageTable.adaptToToolkit(toolkit);
+
         addSampleStorageButton = toolkit.createButton(parent,
             "Add Sample Storage", SWT.PUSH);
         addSampleStorageButton.addSelectionListener(new SelectionAdapter() {
@@ -101,10 +105,6 @@ public class SampleStorageEntryWidget extends BiobankWidget {
                 }
             }
         });
-
-        sampleStorageTable = new SampleStorageInfoTable(parent,
-            this.selectedSampleStorage);
-        sampleStorageTable.adaptToToolkit(toolkit);
     }
 
     private void getSampleTypes() {
@@ -120,5 +120,10 @@ public class SampleStorageEntryWidget extends BiobankWidget {
 
     public Collection<SampleStorage> getSampleStorage() {
         return sampleStorageTable.getSampleStorage();
+    }
+
+    @Override
+    public boolean setFocus() {
+        return addSampleStorageButton.setFocus();
     }
 }
