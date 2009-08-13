@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.widgets;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.runtime.Assert;
@@ -38,6 +39,17 @@ public class SampleStorageEntryWidget extends BiobankWidget {
 
     private Collection<SampleStorage> selectedSampleStorage;
 
+    /**
+     * 
+     * @param parent a composite control which will be the parent of the new
+     *            instance (cannot be null)
+     * @param style the style of control to construct
+     * @param selectedSampleStorage the sample storage already selected and to
+     *            be displayed in the table viewer (can be null).
+     * @param toolkit The toolkit is responsible for creating SWT controls
+     *            adapted to work in Eclipse forms. If widget is not used in a
+     *            form this parameter should be null.
+     */
     public SampleStorageEntryWidget(Composite parent, int style,
         Collection<SampleStorage> selectedSampleStorage, FormToolkit toolkit) {
         super(parent, style);
@@ -58,15 +70,12 @@ public class SampleStorageEntryWidget extends BiobankWidget {
                 Set<SampleType> sampleTypes = new HashSet<SampleType>(
                     allSampleTypes);
                 Set<SampleType> dupSampleTypes = new HashSet<SampleType>();
-                Collection<SampleStorage> currentSampleStorage = sampleStorageTable
-                    .getSampleStorage();
+                Map<Integer, SampleStorage> currentSampleStorageMap = sampleStorageTable
+                    .getSampleStorageMap();
 
                 for (SampleType stype : sampleTypes) {
-                    for (SampleStorage ss : currentSampleStorage) {
-                        if (stype.getId() == ss.getSampleType().getId()) {
-                            dupSampleTypes.add(stype);
-                            break;
-                        }
+                    if (currentSampleStorageMap.containsKey(stype.getId())) {
+                        dupSampleTypes.add(stype);
                     }
                 }
                 sampleTypes.removeAll(dupSampleTypes);
