@@ -10,7 +10,6 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
-import org.springframework.remoting.RemoteAccessException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
@@ -121,50 +120,43 @@ public class SiteEntryForm extends AddressEntryFormCommon {
     }
 
     @Override
-    protected void saveForm() {
+    protected void saveForm() throws Exception {
         if (siteAdapter.getParent() == null) {
             siteAdapter.setParent(SessionManager.getInstance().getSession());
         }
 
-        try {
-            SDKQuery query;
-            SDKQueryResult result;
+        SDKQuery query;
+        SDKQueryResult result;
 
-            if ((site.getName() == null) && !checkSiteNameUnique()) {
-                setDirty(true);
-                return;
-            }
-
-            site.setAddress(address);
-            if ((site.getId() == null) || (site.getId() == 0)) {
-                Assert.isTrue(site.getAddress().getId() == null,
-                    "insert invoked on address already in database");
-
-                query = new InsertExampleQuery(site.getAddress());
-                result = appService.executeQuery(query);
-                site.setAddress((Address) result.getObjectResult());
-                query = new InsertExampleQuery(site);
-            } else {
-                Assert.isNotNull(site.getAddress().getId(),
-                    "update invoked on address not in database");
-
-                query = new UpdateExampleQuery(site.getAddress());
-                result = appService.executeQuery(query);
-                site.setAddress((Address) result.getObjectResult());
-                query = new UpdateExampleQuery(site);
-            }
-
-            result = appService.executeQuery(query);
-            site = (Site) result.getObjectResult();
-
-            siteAdapter.getParent().performExpand();
-
-        } catch (final RemoteAccessException exp) {
-            BioBankPlugin.openRemoteAccessErrorMessage();
-        } catch (Exception e) {
-            SessionManager.getLogger().error(
-                "Error while creating site " + site.getName(), e);
+        if ((site.getName() == null) && !checkSiteNameUnique()) {
+            setDirty(true);
+            return;
         }
+
+        site.setAddress(address);
+        if ((site.getId() == null) || (site.getId() == 0)) {
+            Assert.isTrue(site.getAddress().getId() == null,
+                "insert invoked on address already in database");
+
+            query = new InsertExampleQuery(site.getAddress());
+            result = appService.executeQuery(query);
+            site.setAddress((Address) result.getObjectResult());
+            query = new InsertExampleQuery(site);
+        } else {
+            Assert.isNotNull(site.getAddress().getId(),
+                "update invoked on address not in database");
+
+            query = new UpdateExampleQuery(site.getAddress());
+            result = appService.executeQuery(query);
+            site.setAddress((Address) result.getObjectResult());
+            query = new UpdateExampleQuery(site);
+        }
+
+        result = appService.executeQuery(query);
+        site = (Site) result.getObjectResult();
+        siteAdapter.setSite(site);
+
+        siteAdapter.getParent().performExpand();
     }
 
     private boolean checkSiteNameUnique() throws ApplicationException {

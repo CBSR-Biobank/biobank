@@ -26,8 +26,9 @@ public class SessionAdapter extends AdapterBase {
 
     private String userName;
 
-    public SessionAdapter(AdapterBase parent, WritableApplicationService appService,
-        int sessionId, String name, String userName) {
+    public SessionAdapter(AdapterBase parent,
+        WritableApplicationService appService, int sessionId, String name,
+        String userName) {
         super(parent);
         this.appService = appService;
         setId(sessionId);
@@ -66,7 +67,7 @@ public class SessionAdapter extends AdapterBase {
 
                 try {
                     handlerService.executeCommand(
-                        "edu.ualberta.med.biobank.commands.addSite", null);
+                        "edu.ualberta.med.biobank.commands.siteAdd", null);
                 } catch (Exception ex) {
                     // throw new
                     // RuntimeException("edu.ualberta.med.biobank.commands.addSite not found");
