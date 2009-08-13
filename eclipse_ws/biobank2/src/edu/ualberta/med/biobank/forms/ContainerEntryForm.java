@@ -72,6 +72,7 @@ public class ContainerEntryForm extends BiobankEntryForm {
         container = containerAdapter.getContainer();
         site = containerAdapter.getSite();
         position = container.getPosition();
+        viewFormId = ContainerViewForm.ID;
 
         if (position != null) {
             RowColPos rcp = new RowColPos();
@@ -240,7 +241,7 @@ public class ContainerEntryForm extends BiobankEntryForm {
 
         SDKQueryResult result = appService.executeQuery(query);
         container = (Container) result.getObjectResult();
-
+        containerAdapter.setContainer(container);
         containerAdapter.getParent().performExpand();
 
     }
@@ -310,12 +311,7 @@ public class ContainerEntryForm extends BiobankEntryForm {
     }
 
     @Override
-    public void cancelForm() {
-        // TODO Auto-generated method stub
-    }
-
-    @Override
-    public String getNextOpenedFormID() {
-        return ContainerViewForm.ID;
+    protected void cancelForm() {
+       
     }
 }
