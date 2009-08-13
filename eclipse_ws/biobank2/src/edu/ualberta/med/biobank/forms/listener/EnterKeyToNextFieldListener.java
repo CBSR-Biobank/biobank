@@ -10,17 +10,18 @@ import org.eclipse.swt.widgets.Control;
  */
 public class EnterKeyToNextFieldListener implements KeyListener {
 
-	public static final EnterKeyToNextFieldListener INSTANCE = new EnterKeyToNextFieldListener();
+    public static final EnterKeyToNextFieldListener INSTANCE = new EnterKeyToNextFieldListener();
 
-	@Override
-	public void keyPressed(KeyEvent e) {
-		if (e.keyCode == 13) {
-			((Control) e.widget).traverse(SWT.TRAVERSE_TAB_NEXT);
-		}
-	}
+    @Override
+    public void keyPressed(KeyEvent e) {
 
-	@Override
-	public void keyReleased(KeyEvent e) {
-	}
+    }
+
+    @Override
+    public void keyReleased(KeyEvent e) {
+        if (e.keyCode == 13) {
+            ((Control) e.widget).traverse(SWT.TRAVERSE_TAB_NEXT);
+        }
+    }
 
 }

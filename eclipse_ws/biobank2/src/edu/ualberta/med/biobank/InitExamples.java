@@ -23,6 +23,7 @@ import gov.nih.nci.system.query.example.InsertExampleQuery;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 import java.lang.reflect.Constructor;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -150,7 +151,8 @@ public class InitExamples {
     private void insertSampleInPatientVisit() throws ApplicationException {
         for (PatientVisit patientVisit : patientVisits) {
             Sample sample = new Sample();
-            sample.setInventoryId("123");
+            sample.setInventoryId(Integer.valueOf(new Random().nextInt(10000))
+                .toString());
             sample.setPatientVisit(patientVisit);
             sample.setProcessDate(new Date());
             sample.setSampleType(getSampleType());
@@ -169,20 +171,27 @@ public class InitExamples {
         patientVisits = new ArrayList<PatientVisit>();
         Random r = new Random();
         for (Patient patient : patients) {
-            PatientVisit patientVisit = new PatientVisit();
-            patientVisit.setClinic(clinics[0]);
-            String dateStr = String.format("2009-%02d-25 %02d:%02d", r
-                .nextInt(12) + 1, r.nextInt(24), r.nextInt(60));
-            SimpleDateFormat sdf = new SimpleDateFormat(
-                BioBankPlugin.DATE_TIME_FORMAT);
-            patientVisit.setDateDrawn(sdf.parse(dateStr));
-
-            patientVisit.setPatient(patient);
-            SDKQueryResult res = appService
-                .executeQuery(new InsertExampleQuery(patientVisit));
-            patientVisit = (PatientVisit) res.getObjectResult();
-            patientVisits.add(patientVisit);
+            createPatientVisit(r, patient);
+            createPatientVisit(r, patient);
+            createPatientVisit(r, patient);
         }
+    }
+
+    private void createPatientVisit(Random r, Patient patient)
+        throws ParseException, ApplicationException {
+        PatientVisit patientVisit = new PatientVisit();
+        patientVisit.setClinic(clinics[0]);
+        String dateStr = String.format("2009-%02d-25 %02d:%02d",
+            r.nextInt(12) + 1, r.nextInt(24), r.nextInt(60));
+        SimpleDateFormat sdf = new SimpleDateFormat(
+            BioBankPlugin.DATE_TIME_FORMAT);
+        patientVisit.setDateDrawn(sdf.parse(dateStr));
+
+        patientVisit.setPatient(patient);
+        SDKQueryResult res = appService.executeQuery(new InsertExampleQuery(
+            patientVisit));
+        patientVisit = (PatientVisit) res.getObjectResult();
+        patientVisits.add(patientVisit);
     }
 
     private void insertPatientInStudy() throws ApplicationException {

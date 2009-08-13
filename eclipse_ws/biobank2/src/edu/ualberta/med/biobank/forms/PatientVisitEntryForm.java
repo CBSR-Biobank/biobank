@@ -93,8 +93,6 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
 
         patientVisitAdapter = (PatientVisitAdapter) adapter;
         patientVisit = patientVisitAdapter.getPatientVisit();
-        
-        viewFormId = PatientVisitViewForm.ID;
 
         String tabName;
         if (patientVisit.getId() == null) {
@@ -474,7 +472,12 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
     }
 
     @Override
-    protected void cancelForm() {
+    public void cancelForm() {
 
+    }
+
+    @Override
+    public String getNextOpenedFormID() {
+        return PatientVisitViewForm.ID;
     }
 }

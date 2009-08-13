@@ -46,7 +46,6 @@ public class PatientEntryForm extends BiobankEntryForm {
 
         patientAdapter = (PatientAdapter) adapter;
         patient = patientAdapter.getPatient();
-        viewFormId = PatientViewForm.ID;
         String tabName;
         if (patient.getId() == null) {
             tabName = "New Patient";
@@ -156,9 +155,14 @@ public class PatientEntryForm extends BiobankEntryForm {
     }
 
     @Override
-    protected void cancelForm() {
+    public void cancelForm() {
         // TODO Auto-generated method stub
 
+    }
+
+    @Override
+    public String getNextOpenedFormID() {
+        return PatientViewForm.ID;
     }
 
 }

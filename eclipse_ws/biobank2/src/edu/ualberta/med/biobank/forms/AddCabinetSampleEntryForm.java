@@ -30,7 +30,6 @@ import org.springframework.remoting.RemoteConnectFailureException;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.forms.input.FormInput;
-import edu.ualberta.med.biobank.forms.listener.CancelConfirmKeyListener;
 import edu.ualberta.med.biobank.forms.listener.EnterKeyToNextFieldListener;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerType;
@@ -47,8 +46,7 @@ import edu.ualberta.med.biobank.widgets.CabinetDrawerWidget;
 import edu.ualberta.med.biobank.widgets.ViewContainerWidget;
 import gov.nih.nci.system.query.example.InsertExampleQuery;
 
-public class AddCabinetSampleEntryForm extends BiobankEntryForm implements
-    CancelConfirmForm {
+public class AddCabinetSampleEntryForm extends BiobankEntryForm {
 
     public static final String ID = "edu.ualberta.med.biobank.forms.AddCabinetSampleEntryForm";
 
@@ -229,7 +227,7 @@ public class AddCabinetSampleEntryForm extends BiobankEntryForm implements
         GridData gd = new GridData();
         gd.widthHint = 100;
         confirmCancelText.setLayoutData(gd);
-        confirmCancelText.addKeyListener(new CancelConfirmKeyListener(this));
+        // confirmCancelText.addKeyListener(new CancelConfirmKeyListener(this));
 
         initCancelButton(client);
 
@@ -340,7 +338,7 @@ public class AddCabinetSampleEntryForm extends BiobankEntryForm implements
     }
 
     @Override
-    protected void cancelForm() {
+    public void cancelForm() {
         sample = null;
         cabinet = null;
         drawer = null;
@@ -396,21 +394,6 @@ public class AddCabinetSampleEntryForm extends BiobankEntryForm implements
         }
     }
 
-    // CancelConfirmForm implementation
-    public boolean isConfirmEnabled() {
-        return confirmAndNextButton.isEnabled();
-    }
-
-    public void confirm() throws Exception {
-        saveAndNext();
-    }
-
-    public void cancel() throws Exception {
-        cancelForm();
-    }
-
-    // End CancelConfirmForm implementation
-
     private void saveAndNext() {
         testDisposeOn = false;
         doSaveInternal();
@@ -435,6 +418,11 @@ public class AddCabinetSampleEntryForm extends BiobankEntryForm implements
             }
         }
         activityToPrint = false;
+    }
+
+    @Override
+    public String getNextOpenedFormID() {
+        return null;
     }
 
 }

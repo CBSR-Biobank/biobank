@@ -22,8 +22,8 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.forms.widgets.FormToolkit;
@@ -37,7 +37,7 @@ import edu.ualberta.med.biobank.model.SampleType;
  * found
  */
 public class SampleTypeSelectionWidget {
-    private Combo combo;
+    private CCombo combo;
     private ComboViewer cv;
     private ControlDecoration controlDecoration;
     private Label textNumber;
@@ -69,7 +69,7 @@ public class SampleTypeSelectionWidget {
     }
 
     private void createCombo(Composite parent, List<SampleType> types) {
-        combo = new Combo(parent, SWT.DROP_DOWN | SWT.READ_ONLY);
+        combo = new CCombo(parent, SWT.DROP_DOWN | SWT.READ_ONLY);
         combo.setLayoutData(new GridData(SWT.LEFT, SWT.TOP, true, false));
 
         cv = new ComboViewer(combo);

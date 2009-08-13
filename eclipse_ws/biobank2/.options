@@ -2,4 +2,4 @@
 
 # Turn on debugging for the plugin.
 biobank2/debug=true
-biobank2/realScan=true
+biobank2/realScan=false
