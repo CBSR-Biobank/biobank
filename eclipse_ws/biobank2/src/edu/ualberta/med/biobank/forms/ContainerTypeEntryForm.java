@@ -439,11 +439,12 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         Collection<ContainerType> children = containerType
             .getChildContainerTypeCollection();
         List<Integer> missing = new ArrayList<Integer>();
-
-        for (ContainerType child : children) {
-            int id = child.getId();
-            if (selContainerTypeIds.indexOf(id) < 0) {
-                missing.add(id);
+        if (children != null) {
+            for (ContainerType child : children) {
+                int id = child.getId();
+                if (selContainerTypeIds.indexOf(id) < 0) {
+                    missing.add(id);
+                }
             }
         }
 
