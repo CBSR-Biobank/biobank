@@ -3,6 +3,7 @@
 	<name>biobank2</name>
 	<comment></comment>
 	<projects>
+		<project>scannerConfig</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

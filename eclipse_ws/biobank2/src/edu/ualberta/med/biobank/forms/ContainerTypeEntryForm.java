@@ -420,14 +420,11 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         containerType.setSampleTypeCollection(selSampleTypes);
     }
 
-    private void saveChildContainerTypes() {
+    private void saveChildContainerTypes() throws Exception {
         List<Integer> selContainerTypeIds = childContainerTypesMultiSelect
             .getSelected();
 
-        Collection<ContainerType> selContainerTypes = containerType
-            .getChildContainerTypeCollection();
-        if (selContainerTypes == null)
-            selContainerTypes = new HashSet<ContainerType>();
+        Collection<ContainerType> selContainerTypes = new HashSet<ContainerType>();
 
         if (allContainerTypes != null) {
             for (ContainerType containerType : allContainerTypes) {
@@ -438,7 +435,44 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
             }
         }
 
-        containerType.setChildContainerTypeCollection(selContainerTypes);
+        Collection<ContainerType> children = containerType
+            .getChildContainerTypeCollection();
+        List<Integer> missing = new ArrayList<Integer>();
+        if (children != null) {
+            for (ContainerType child : children) {
+                int id = child.getId();
+                if (selContainerTypeIds.indexOf(id) < 0) {
+                    missing.add(id);
+                }
+            }
+        }
+
+        if (missing.size() == 0 || HQLSafeToRemove(missing)) {
+            containerType.setChildContainerTypeCollection(selContainerTypes);
+        } else {
+            BioBankPlugin
+                .openError(
+                    "ContainerType Removal Failed",
+                    "Unable to remove child type. This parent/child relationship exists in storage. Remove all instances before attempting to delete a child type.");
+        }
+    }
+
+    private boolean HQLSafeToRemove(List<Integer> missing)
+        throws ApplicationException {
+        String missingString = " where cp.container.id='"
+            + missing.get(0).toString() + "'";
+        for (int i = 1; i < missing.size(); i++) {
+            missingString += "OR cp.container.id='" + missing.get(i).toString()
+                + "'";
+        }
+        HQLCriteria c = new HQLCriteria(
+            "from edu.ualberta.biobank.model.ContainerPosition as cp inner join on cp.parentContainer.id='"
+                + containerType.getId() + "'" + missingString);
+        List<Object> results = appService.query(c);
+        if (results.size() == 0)
+            return true;
+        else
+            return false;
     }
 
     private boolean checkContainerTypeNameUnique() throws ApplicationException {

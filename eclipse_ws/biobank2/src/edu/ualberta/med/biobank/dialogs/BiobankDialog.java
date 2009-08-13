@@ -6,24 +6,31 @@ import java.util.Collection;
 
 import org.apache.commons.collections.MapIterator;
 import org.apache.commons.collections.map.ListOrderedMap;
+import org.eclipse.core.databinding.AggregateValidationStatus;
 import org.eclipse.core.databinding.DataBindingContext;
 import org.eclipse.core.databinding.UpdateValueStrategy;
 import org.eclipse.core.databinding.beans.PojoObservables;
+import org.eclipse.core.databinding.observable.ChangeEvent;
+import org.eclipse.core.databinding.observable.IChangeListener;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.observable.value.WritableValue;
 import org.eclipse.core.databinding.validation.IValidator;
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.databinding.swt.SWTObservables;
 import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.fieldassist.ControlDecoration;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
@@ -35,15 +42,33 @@ import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
 public class BiobankDialog extends Dialog {
 
-    protected DataBindingContext dbc = new DataBindingContext();
+    protected DataBindingContext dbc;
+
+    private Label errorLabel;
+
+    private IObservableValue uiElement;
 
     protected BiobankDialog(Shell parentShell) {
         super(parentShell);
+        dbc = new DataBindingContext();
     }
 
     @Override
     protected Control createContents(Composite parent) {
         Control contents = super.createContents(parent);
+        return contents;
+    }
+
+    @Override
+    protected Control createDialogArea(Composite parent) {
+        Composite parentComposite = (Composite) super.createDialogArea(parent);
+        Composite contents = new Composite(parentComposite, SWT.NONE);
+        contents.setLayout(new GridLayout(1, false));
+        contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+        errorLabel = new Label(contents, SWT.NONE);
+        errorLabel.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+
+        bindChangeListener();
         return contents;
     }
 
@@ -186,4 +211,29 @@ public class BiobankDialog extends Dialog {
         }
     }
 
+    protected void bindChangeListener() {
+        final IObservableValue statusObservable = new WritableValue();
+        dbc.bindValue(statusObservable, new AggregateValidationStatus(dbc
+            .getBindings(), AggregateValidationStatus.MAX_SEVERITY));
+
+        statusObservable.addChangeListener(new IChangeListener() {
+            public void handleChange(ChangeEvent event) {
+                IObservableValue validationStatus = (IObservableValue) event
+                    .getSource();
+                IStatus status = (IStatus) validationStatus.getValue();
+
+                if (status.getSeverity() == IStatus.OK) {
+                    errorLabel.setText("");
+                    errorLabel.setForeground(Display.getCurrent()
+                        .getSystemColor(SWT.COLOR_BLACK));
+                    getButton(IDialogConstants.OK_ID).setEnabled(true);
+                } else {
+                    errorLabel.setText(status.getMessage());
+                    errorLabel.setForeground(Display.getCurrent()
+                        .getSystemColor(SWT.COLOR_RED));
+                    getButton(IDialogConstants.OK_ID).setEnabled(false);
+                }
+            }
+        });
+    }
 }

@@ -75,7 +75,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
 
     protected IStatus currentStatus;
 
-    protected DataBindingContext dbc = new DataBindingContext();
+    protected DataBindingContext dbc;
 
     private Button confirmButton;
 
@@ -107,6 +107,11 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
             setDirty(true);
         }
     };
+
+    public BiobankEntryForm() {
+        super();
+        dbc = new DataBindingContext();
+    }
 
     @Override
     public void doSave(IProgressMonitor monitor) {
@@ -380,7 +385,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
     }
 
     protected void bindChangeListener() {
-        IObservableValue statusObservable = new WritableValue();
+        final IObservableValue statusObservable = new WritableValue();
         statusObservable.addChangeListener(new IChangeListener() {
             public void handleChange(ChangeEvent event) {
                 IObservableValue validationStatus = (IObservableValue) event
