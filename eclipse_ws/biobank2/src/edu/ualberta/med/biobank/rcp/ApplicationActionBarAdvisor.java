@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.rcp;
 
+import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IStatusLineManager;
 import org.eclipse.jface.action.StatusLineContributionItem;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -25,6 +26,10 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
         IWorkbenchAction resetView = ActionFactory.RESET_PERSPECTIVE
             .create(window);
         register(resetView);
+    }
+
+    @Override
+    protected void fillMenuBar(IMenuManager menuBar) {
     }
 
     @Override
