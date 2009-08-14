@@ -12,10 +12,10 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.handlers.HandlerUtil;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.forms.ScanLinkEntryForm;
+import edu.ualberta.med.biobank.forms.AddCabinetSampleEntryForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 
-public class ScanLinkHandler extends AbstractHandler implements IHandler {
+public class CabinetLinkHandler extends AbstractHandler implements IHandler {
 
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
@@ -32,10 +32,12 @@ public class ScanLinkHandler extends AbstractHandler implements IHandler {
             PlatformUI.getWorkbench().getActiveWorkbenchWindow()
                 .getActivePage().openEditor(
                     new FormInput(SessionManager.getInstance()
-                        .getSessionAdapter()), ScanLinkEntryForm.ID, true);
+                        .getSessionAdapter()), AddCabinetSampleEntryForm.ID,
+                    true);
         } catch (PartInitException e) {
             throw new ExecutionException("Part could not be initialized", e); //$NON-NLS-1$
         }
         return null;
     }
+
 }

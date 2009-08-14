@@ -139,14 +139,12 @@
       </category>
       <command
             categoryId="edu.ualberta.med.biobank.category.patientsAdmin"
-            defaultHandler="edu.ualberta.med.biobank.handlers.ScanLinkHandler"
             id="edu.ualberta.med.biobank.commands.patients.scanLink"
             name="Scan Link">
       </command>
       <command
             categoryId="edu.ualberta.med.biobank.category.patientsAdmin"
-            defaultHandler="edu.ualberta.med.biobank.handlers.DefaultLinkHandler"
-            id="edu.ualberta.med.biobank.commands.patients.defaultLink"
+            id="edu.ualberta.med.biobank.commands.patients.cabinetLink"
             name="Default Link">
       </command>
       <command
@@ -158,6 +156,10 @@
             defaultHandler="edu.ualberta.med.biobank.handlers.ContainerAddHandler"
             id="edu.ualberta.med.biobank.commands.addContainer"
             name="Add Container">
+      </command>
+      <command
+            id="edu.ualberta.med.biobank.commands.patients.assignScanSamples"
+            name="Assign Scan Samples">
       </command>
    </extension>
    <extension
@@ -243,9 +245,26 @@
          </enabledWhen>
       </handler>
       <handler
-            class="edu.ualberta.med.biobank.handlers.DefaultLinkHandler"
-            commandId="edu.ualberta.med.biobank.commands.patients.defaultLink">
+            class="edu.ualberta.med.biobank.handlers.CabinetLinkHandler"
+            commandId="edu.ualberta.med.biobank.commands.patients.cabinetLink">
          <activeWhen>
+            <reference
+                  definitionId="biobank2.patientsPerpectiveSelected">
+            </reference>
+         </activeWhen>
+         <enabledWhen>
+            <with
+                  variable="activePartId">
+               <equals
+                     value="edu.ualberta.med.biobank.views.patientsAdmin">
+               </equals>
+            </with>
+         </enabledWhen>
+      </handler>
+      <handler
+            class="edu.ualberta.med.biobank.handlers.AssignScanSamplesHandler"
+            commandId="edu.ualberta.med.biobank.commands.patients.assignScanSamples">
+             <activeWhen>
             <reference
                   definitionId="biobank2.patientsPerpectiveSelected">
             </reference>
@@ -435,9 +454,21 @@
                </visibleWhen>
             </command>
             <command
-                  commandId="edu.ualberta.med.biobank.commands.patients.defaultLink"
+                  commandId="edu.ualberta.med.biobank.commands.patients.cabinetLink"
                   icon="icons/defaultLink.png"
                   label="Default link"
+                  style="push">
+               <visibleWhen
+                     checkEnabled="false">
+                  <reference
+                        definitionId="biobank2.patientsPerpectiveSelected">
+                  </reference>
+               </visibleWhen>
+            </command>
+            <command
+                  commandId="edu.ualberta.med.biobank.commands.patients.assignScanSamples"
+                  icon="icons/scanAssign.png"
+                  label="Scan Assign"
                   style="push">
                <visibleWhen
                      checkEnabled="false">
@@ -595,8 +626,9 @@
       <editor
             class="edu.ualberta.med.biobank.forms.AddCabinetSampleEntryForm"
             default="false"
-            id="edu.ualberta.med.biobank.forms.AddCabinetSampleEntryForm"
-            name="Add Cabinet Samples Entry">
+            icon="icons/defaultLink.png"
+            id="edu.ualberta.med.biobank.forms.CabinetLinkEntryForm"
+            name="Cabinet Link Entry ">
       </editor>
       <editor
             class="edu.ualberta.med.biobank.forms.SampleViewForm"

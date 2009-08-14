@@ -3,7 +3,6 @@ package edu.ualberta.med.biobank.forms;
 import org.eclipse.core.databinding.beans.PojoObservables;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.observable.value.WritableValue;
-import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -29,29 +28,25 @@ import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.forms.listener.EnterKeyToNextFieldListener;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.ModelUtils;
-import edu.ualberta.med.biobank.model.PatientVisit;
+import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.Sample;
 import edu.ualberta.med.biobank.model.SamplePosition;
 import edu.ualberta.med.biobank.model.SampleType;
-import edu.ualberta.med.biobank.treeview.AdapterBase;
-import edu.ualberta.med.biobank.treeview.PatientVisitAdapter;
 import edu.ualberta.med.biobank.validators.CabinetLabelValidator;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
 import edu.ualberta.med.biobank.widgets.CabinetDrawerWidget;
+import edu.ualberta.med.biobank.widgets.CancelConfirmWidget;
 import edu.ualberta.med.biobank.widgets.ViewContainerWidget;
-import gov.nih.nci.system.query.example.InsertExampleQuery;
 
 public class AddCabinetSampleEntryForm extends BiobankEntryForm {
 
-    public static final String ID = "edu.ualberta.med.biobank.forms.AddCabinetSampleEntryForm";
+    public static final String ID = "edu.ualberta.med.biobank.forms.CabinetLinkEntryForm";
 
-    private PatientVisitAdapter pvAdapter;
-    private PatientVisit patientVisit;
+    private Patient currentPatient;
 
     private Label cabinetLabel;
     private Label drawerLabel;
@@ -63,7 +58,7 @@ public class AddCabinetSampleEntryForm extends BiobankEntryForm {
     private Text positionText;
     private Button showPosition;
 
-    private Text confirmCancelText;
+    private CancelConfirmWidget cancelConfirmWidget;
 
     private IObservableValue cabinetPosition = new WritableValue("",
         String.class);
@@ -78,38 +73,16 @@ public class AddCabinetSampleEntryForm extends BiobankEntryForm {
     private Container drawer;
     private Container bin;
 
-    private Button confirmAndNextButton;
-
-    private Button confirmAndEnd;
-
-    private static boolean activityToPrint = false;
-    private static boolean testDisposeOn = true;
+    private boolean isSaved = false;
 
     @Override
     protected void init() {
-        Assert.isTrue((adapter instanceof PatientVisitAdapter),
-            "Invalid editor input: object of type "
-                + adapter.getClass().getName());
-
-        pvAdapter = (PatientVisitAdapter) adapter;
-        patientVisit = pvAdapter.getPatientVisit();
-        testDisposeOn = true;
-        setPartName("Add cabinet samples for patient "
-            + patientVisit.getPatient().getNumber() + " for visit "
-            + patientVisit.getDateDrawn());
-    }
-
-    @Override
-    public void dispose() {
-        if (testDisposeOn && activityToPrint) {
-            print();
-        }
+        setPartName("Cabinet Link/Process");
     }
 
     @Override
     protected void createFormContent() {
-        form.setText("Add cabinet sample for "
-            + patientVisit.getPatient().getNumber());
+        form.setText("Link and Process Cabinet Samples");
         GridLayout layout = new GridLayout(1, false);
         form.getBody().setLayout(layout);
 
@@ -117,7 +90,8 @@ public class AddCabinetSampleEntryForm extends BiobankEntryForm {
         addSeparator();
         createFieldsSection();
         addSeparator();
-        createButtonsSection();
+        cancelConfirmWidget = new CancelConfirmWidget(form.getBody(), this,
+            true);
 
         addBooleanBinding(new WritableValue(Boolean.FALSE, Boolean.class),
             resultShown, "Show results to check values");
@@ -211,40 +185,6 @@ public class AddCabinetSampleEntryForm extends BiobankEntryForm {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 showPositionResult();
-            }
-        });
-    }
-
-    private void createButtonsSection() {
-        Composite client = toolkit.createComposite(form.getBody());
-        GridLayout layout = new GridLayout(4, false);
-        layout.horizontalSpacing = 10;
-        client.setLayout(layout);
-        toolkit.paintBordersFor(client);
-
-        confirmCancelText = toolkit.createText(client, "");
-        confirmCancelText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        GridData gd = new GridData();
-        gd.widthHint = 100;
-        confirmCancelText.setLayoutData(gd);
-        // confirmCancelText.addKeyListener(new CancelConfirmKeyListener(this));
-
-        initCancelButton(client);
-
-        confirmAndNextButton = toolkit.createButton(client,
-            "Confirm and scan next", SWT.PUSH);
-        confirmAndNextButton.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                saveAndNext();
-            }
-        });
-        confirmAndEnd = toolkit.createButton(client, "Confirm and End",
-            SWT.PUSH);
-        confirmAndEnd.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                saveAndClose();
             }
         });
     }
@@ -353,20 +293,21 @@ public class AddCabinetSampleEntryForm extends BiobankEntryForm {
 
     @Override
     protected void saveForm() throws RuntimeException {
-        BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
-            public void run() {
-                try {
-                    sample.setPatientVisit(patientVisit);
-                    appService.executeQuery(new InsertExampleQuery(sample));
-                    activityToPrint = true;
-                } catch (RemoteConnectFailureException exp) {
-                    BioBankPlugin.openRemoteConnectErrorMessage();
-                } catch (Exception e) {
-                    SessionManager.getLogger().error(
-                        "Error when saving cabinet position", e);
-                }
-            }
-        });
+        // BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
+        // public void run() {
+        // try {
+        // sample.setPatientVisit(patientVisit);
+        // appService.executeQuery(new InsertExampleQuery(sample));
+        // activityToPrint = true;
+        // } catch (RemoteConnectFailureException exp) {
+        // BioBankPlugin.openRemoteConnectErrorMessage();
+        // } catch (Exception e) {
+        // SessionManager.getLogger().error(
+        // "Error when saving cabinet position", e);
+        // }
+        // }
+        // });
+        isSaved = true;
     }
 
     @Override
@@ -378,13 +319,11 @@ public class AddCabinetSampleEntryForm extends BiobankEntryForm {
     protected void handleStatusChanged(IStatus status) {
         if (status.getSeverity() == IStatus.OK) {
             form.setMessage(getOkMessage(), IMessageProvider.NONE);
-            confirmAndNextButton.setEnabled(true);
-            confirmAndEnd.setEnabled(true);
+            cancelConfirmWidget.setConfirmEnabled(true);
             showPosition.setEnabled(true);
         } else {
             form.setMessage(status.getMessage(), IMessageProvider.ERROR);
-            confirmAndNextButton.setEnabled(false);
-            confirmAndEnd.setEnabled(false);
+            cancelConfirmWidget.setEnabled(false);
             if (status.getMessage() != null
                 && status.getMessage().contains("check values")) {
                 showPosition.setEnabled(true);
@@ -394,22 +333,11 @@ public class AddCabinetSampleEntryForm extends BiobankEntryForm {
         }
     }
 
-    private void saveAndNext() {
-        testDisposeOn = false;
-        doSaveInternal();
-        getSite().getPage().closeEditor(AddCabinetSampleEntryForm.this, false);
-        AdapterBase.openForm(new FormInput(pvAdapter),
-            AddCabinetSampleEntryForm.ID);
-    }
-
-    private void saveAndClose() {
-        testDisposeOn = true;
-        doSaveInternal();
-        getSite().getPage().closeEditor(AddCabinetSampleEntryForm.this, false);
-    }
-
-    private void print() {
-        if (BioBankPlugin.isAskPrint()) {
+    /**
+     * Called from the BiobankPartListener
+     */
+    public void onClose() {
+        if (!isSaved && BioBankPlugin.isAskPrint()) {
             boolean doPrint = MessageDialog.openQuestion(PlatformUI
                 .getWorkbench().getActiveWorkbenchWindow().getShell(), "Print",
                 "Do you want to print information ?");
@@ -417,7 +345,6 @@ public class AddCabinetSampleEntryForm extends BiobankEntryForm {
                 // FIXME implement print functionnality
             }
         }
-        activityToPrint = false;
     }
 
     @Override
