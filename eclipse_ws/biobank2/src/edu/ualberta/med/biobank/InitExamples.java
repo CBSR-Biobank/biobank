@@ -137,6 +137,8 @@ public class InitExamples {
             public void done(final IJobChangeEvent event) {
                 Display.getDefault().asyncExec(new Runnable() {
                     public void run() {
+                        SessionManager.getInstance().getSessionAdapter()
+                            .performExpand();
                         if (event.getResult().isOK()) {
                             if ((Boolean) event.getJob().getProperty(
                                 IProgressConstants.PROPERTY_IN_DIALOG))
@@ -278,35 +280,38 @@ public class InitExamples {
         }
 
         // Freezer Types
-        palletType = insertContainerTypeInSite("Pallet", 8, 12, null,
-            numSchemeMap.get("SBS Standard"));
-        hotel13Type = insertContainerTypeInSite("Hotel-13", 13, 1, Arrays
-            .asList(new ContainerType[] { palletType }), numSchemeMap
-            .get("2 char numeric"));
-        hotel19Type = insertContainerTypeInSite("Hotel-19", 19, 1, Arrays
-            .asList(new ContainerType[] { palletType }), numSchemeMap
-            .get("2 char numeric"));
-        freezerType = insertContainerTypeInSite("Freezer", 3, 10, Arrays
-            .asList(new ContainerType[] { hotel13Type, hotel19Type }),
+        palletType = insertContainerTypeInSite("Pallet-96", "P96", false, 8,
+            12, null, numSchemeMap.get("SBS Standard"));
+        hotel13Type = insertContainerTypeInSite("Hotel-13", "H13", false, 13,
+            1, Arrays.asList(new ContainerType[] { palletType }), numSchemeMap
+                .get("2 char numeric"));
+        hotel19Type = insertContainerTypeInSite("Hotel-19", "H19", false, 19,
+            1, Arrays.asList(new ContainerType[] { palletType }), numSchemeMap
+                .get("2 char numeric"));
+        freezerType = insertContainerTypeInSite("Freezer", "FR", true, 3, 10,
+            Arrays.asList(new ContainerType[] { hotel13Type, hotel19Type }),
             numSchemeMap.get("CBSR 2 char alphabetic"));
 
         // Cabinet Types
-        binType = insertContainerTypeInSite("Bin", 120, 1, null, numSchemeMap
-            .get("CBSR 2 char alphabetic"));
-        drawerType = insertContainerTypeInSite("Drawer", 36, 1, Arrays
-            .asList(new ContainerType[] { binType }), numSchemeMap
-            .get("2 char numeric"));
-        insertContainerTypeInSite("Cabinet", 4, 1, Arrays
+        binType = insertContainerTypeInSite("Bin", "Bin", false, 120, 1, null,
+            numSchemeMap.get("CBSR 2 char alphabetic"));
+        drawerType = insertContainerTypeInSite("Drawer", "Dr", false, 36, 1,
+            Arrays.asList(new ContainerType[] { binType }), numSchemeMap
+                .get("2 char numeric"));
+        insertContainerTypeInSite("Cabinet", "Cab", true, 4, 1, Arrays
             .asList(new ContainerType[] { drawerType }), numSchemeMap
             .get("CBSR 2 char alphabetic"));
     }
 
-    private ContainerType insertContainerTypeInSite(String name, int dim1,
-        int dim2, List<ContainerType> children,
+    private ContainerType insertContainerTypeInSite(String name,
+        String shortName, boolean topLevel, int dim1, int dim2,
+        List<ContainerType> children,
         ContainerLabelingScheme childLabelingScheme)
         throws ApplicationException {
         ContainerType ct = new ContainerType();
         ct.setName(name);
+        ct.setNameShort(shortName);
+        ct.setTopLevel(topLevel);
         ct.setSite(site);
         if (childLabelingScheme != null) {
             ct.setChildLabelingScheme(childLabelingScheme);
