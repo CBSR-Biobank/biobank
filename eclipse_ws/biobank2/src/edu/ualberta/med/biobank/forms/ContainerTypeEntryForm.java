@@ -72,6 +72,8 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
 
     private Capacity capacity;
 
+    private Button sampleBox;
+
     private MultiSelect samplesMultiSelect;
 
     private MultiSelect childContainerTypesMultiSelect;
@@ -92,6 +94,10 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
             @Override
             public void selectionChanged(MultiSelectEvent event) {
                 setDirty(true);
+                if (samplesMultiSelect.getSelected().size() == 0)
+                    sampleBox.setEnabled(true);
+                else
+                    sampleBox.setEnabled(false);
             }
         };
     }
@@ -128,26 +134,9 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
 
         createContainerTypeSection();
         createDimensionsSection();
-        createContainerChildSection();
-        createButtons();
-    }
-
-    protected void createContainerChildSection() {
-        Composite client = toolkit.createComposite(form.getBody());
-        Button topBox = new Button(client, SWT.CHECK);
-        topBox.setText("Top Level Container");
-        Button sampleBox = new Button(client, SWT.CHECK);
-        sampleBox.setText("Holds Samples");
-        sampleBox.addSelectionListener(new SelectionListener() {
-            public void widgetSelected(SelectionEvent event) {
-                createSampleDerivTypesSection();
-            }
-
-            @Override
-            public void widgetDefaultSelected(SelectionEvent e) {
-            }
-        });
+        createSampleDerivTypesSection();
         createChildContainerTypesSection();
+        createButtons();
     }
 
     protected void createContainerTypeSection() {
@@ -158,7 +147,6 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
             client.setLayout(layout);
             client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
             toolkit.paintBordersFor(client);
-
             createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Name",
                 null, PojoObservables.observeValue(containerType, "name"),
                 NonEmptyString.class, MSG_NO_CONTAINER_TYPE_NAME);
@@ -230,9 +218,25 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
 
     private void createSampleDerivTypesSection() {
         Composite client = createSectionWithClient("Contains Sample Derivative Types");
+        sampleBox = new Button(client, SWT.CHECK);
         GridLayout layout = (GridLayout) client.getLayout();
         layout.numColumns = 2;
+        sampleBox.setText("Holds Samples");
+        sampleBox.setSelection(true);
+        sampleBox.addSelectionListener(new SelectionListener() {
+            public void widgetSelected(SelectionEvent event) {
+                samplesMultiSelect.setEnabled(!samplesMultiSelect.getEnabled());
+                samplesMultiSelect.setVisible(!samplesMultiSelect.getVisible());
+                form.reflow(true);
+            }
 
+            @Override
+            public void widgetDefaultSelected(SelectionEvent e) {
+            }
+        });
+        GridData gd = new GridData(GridData.VERTICAL_ALIGN_BEGINNING
+            | GridData.GRAB_HORIZONTAL);
+        sampleBox.setLayoutData(gd);
         Collection<SampleType> stSamplesTypes = containerType
             .getSampleTypeCollection();
 
@@ -245,7 +249,6 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
             "Selected Sample Derivatives", "Available Sample Derivatives", 100);
         samplesMultiSelect.adaptToToolkit(toolkit);
         samplesMultiSelect.addSelectionChangedListener(multiSelectListener);
-
         ListOrderedMap availSampleDerivTypes = new ListOrderedMap();
         List<Integer> selSampleDerivTypes = new ArrayList<Integer>();
 
@@ -267,7 +270,21 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         Composite client = createSectionWithClient("Contains Container Types");
         GridLayout layout = (GridLayout) client.getLayout();
         layout.numColumns = 2;
+        Button topBox = new Button(client, SWT.CHECK);
+        topBox.setText("Top Level Container");
+        GridData gd = new GridData(GridData.VERTICAL_ALIGN_BEGINNING
+            | GridData.GRAB_HORIZONTAL);
+        topBox.setLayoutData(gd);
+        topBox.setSelection(false);
+        topBox.addSelectionListener(new SelectionListener() {
+            public void widgetSelected(SelectionEvent event) {
+                // topLevel = true;
+            }
 
+            @Override
+            public void widgetDefaultSelected(SelectionEvent e) {
+            }
+        });
         childContainerTypesMultiSelect = new MultiSelect(client, SWT.NONE,
             "Selected Container Types", "Available Container Types", 100);
         childContainerTypesMultiSelect.adaptToToolkit(toolkit);
@@ -299,6 +316,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
             }
         childContainerTypesMultiSelect.addSelections(availContainerTypes,
             selChildContainerTypes);
+
     }
 
     protected void createButtons() {
