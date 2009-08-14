@@ -496,16 +496,22 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
 
     private boolean HQLSafeToRemove(List<Integer> missing)
         throws ApplicationException {
-        String missingString = " where cp.container.id='"
-            + missing.get(0).toString() + "'";
-        for (int i = 1; i < missing.size(); i++) {
-            missingString += "OR cp.container.id='" + missing.get(i).toString()
-                + "'";
-        }
-        HQLCriteria c = new HQLCriteria("from "
+        String queryString = "from "
             + ContainerPosition.class.getName()
-            + " as cp inner join on cp.parentContainer.id='"
-            + containerType.getId() + "'" + missingString);
+            + " as cp inner join cp.parentContainer as cparent"
+            + " where cparent.containerType.id=? and cp.container.containerType.id in (select id from "
+            + ContainerType.class.getName() + " as ct where ct.id=?";
+        List<Object> params = new ArrayList<Object>();
+        params.add(containerType.getId());
+        params.add(missing.get(0));
+        for (int i = 1; i < missing.size(); i++) {
+            queryString += "OR ct.id=?";
+            params.add(missing.get(i));
+        }
+        queryString += ")";
+
+        HQLCriteria c = new HQLCriteria(queryString);
+        c.setParameters(params);
         List<Object> results = appService.query(c);
         if (results.size() == 0)
             return true;

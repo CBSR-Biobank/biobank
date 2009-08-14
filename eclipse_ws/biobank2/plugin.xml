@@ -119,6 +119,10 @@
             name="Add Container">
       </command>
       <command
+      		id="edu.ualberta.med.biobank.commands.editSampleTypes"
+      		name="Edit Sample Types">
+      		</command>
+      <command
             defaultHandler="edu.ualberta.med.biobank.handlers.SearchHandler"
             id="edu.ualberta.med.biobank.commands.search"
             name="Search">
@@ -159,6 +163,11 @@
             id="edu.ualberta.med.biobank.commands.addContainer"
             name="Add Container">
       </command>
+      <command
+      		defaultHandler="edu.ualberta.med.biobank.handlers.EditSampleTypesHandler"
+      		id="edu.ualberta.med.biobank.handlers.editSampleTypes"
+      		name="Edit Sample Types">
+      		</command>
    </extension>
    <extension
          point="org.eclipse.ui.handlers">
@@ -219,6 +228,15 @@
       <handler
             class="edu.ualberta.med.biobank.handlers.ContainerAddHandler"
             commandId="edu.ualberta.med.biobank.commands.containerAdd">
+         <activeWhen>
+            <reference
+                  definitionId="biobank2.loggedIn">
+            </reference>
+         </activeWhen>
+      </handler>
+      <handler
+            class="edu.ualberta.med.biobank.handlers.EditSampleTypesHandler"
+            commandId="edu.ualberta.med.biobank.commands.editSampleTypes">
          <activeWhen>
             <reference
                   definitionId="biobank2.loggedIn">
@@ -326,6 +344,12 @@
                      commandId="edu.ualberta.med.biobank.commands.containerAdd"
                      id="edu.ualberta.med.biobank.menu.containerAdd"
                      label="Add Container"
+                     style="push">
+               </command>
+               <command
+                     commandId="edu.ualberta.med.biobank.commands.editSampleTypes"
+                     id="edu.ualberta.med.biobank.menu.editSampleTypes"
+                     label="Edit Sample Types"
                      style="push">
                </command>
             </menu>
@@ -603,6 +627,12 @@
             default="false"
             id="edu.ualberta.med.biobank.forms.SampleViewForm"
             name="Sample View">
+      </editor>
+      <editor
+            class="edu.ualberta.med.biobank.forms.SampleTypesEntryForm"
+            default="false"
+            id="edu.ualberta.med.biobank.forms.SampleTypesEntryForm"
+            name="Edit Sample Types">
       </editor>
    </extension>
    <extension
