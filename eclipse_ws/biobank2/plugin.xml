@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?eclipse version="3.2"?>
 <plugin>
    <extension
          id="biobank2"
@@ -168,6 +167,10 @@
       		id="edu.ualberta.med.biobank.handlers.editSampleTypes"
       		name="Edit Sample Types">
       		</command>
+<command
+            id="edu.ualberta.med.biobank.commands.debug.initExamples"
+            name="Debug - Init Examples">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.handlers">
@@ -277,6 +280,15 @@
             </with>
          </enabledWhen>
       </handler>
+      <handler
+            class="edu.ualberta.med.biobank.handlers.InitExamplesHandler"
+            commandId="edu.ualberta.med.biobank.commands.debug.initExamples">
+         <activeWhen>
+            <reference
+                  definitionId="biobank2.loggedIn">
+            </reference>
+         </activeWhen>
+      </handler>
    </extension>
    <extension
          point="org.eclipse.ui.menus">
@@ -363,6 +375,22 @@
                   commandId="org.eclipse.ui.window.preferences"
                   id="edu.ualberta.med.biobank.menu.configuration"
                   label="Configuration"
+                  style="push">
+            </command>
+         </menu>
+         <menu
+               id="edu.ualberta.med.biobank.menu.debug"
+               label="**Debug**">
+            <visibleWhen
+                  checkEnabled="true">
+               <reference
+                     definitionId="biobank2.debugState">
+               </reference>
+            </visibleWhen>
+            <command
+                  commandId="edu.ualberta.med.biobank.commands.debug.initExamples"
+                  id="edu.ualberta.med.biobank.menu.debug.initExamples"
+                  label="Init Examples"
                   style="push">
             </command>
          </menu>
@@ -660,7 +688,14 @@
       <sourceProvider
             provider="edu.ualberta.med.biobank.sourceproviders.SessionState">
          <variable
-               name="edu.ualberta.med.biobank.commands.sourceprovider.active"
+               name="edu.ualberta.med.biobank.commands.sourceprovider.loginState"
+               priorityLevel="workbench">
+         </variable>
+      </sourceProvider>
+      <sourceProvider
+            provider="edu.ualberta.med.biobank.sourceproviders.DebugState">
+         <variable
+               name="edu.ualberta.med.biobank.sourceprovider.debugState"
                priorityLevel="workbench">
          </variable>
       </sourceProvider>
@@ -725,6 +760,24 @@
                variable="edu.ualberta.med.biobank.sourceprovider.loginState">
             <equals
                   value="loggedOut">
+            </equals>
+         </with>
+      </definition>
+      <definition
+            id="biobank2.debugState">
+         <with
+               variable="edu.ualberta.med.biobank.sourceprovider.debugState">
+            <equals
+                  value="debug">
+            </equals>
+         </with>
+      </definition>
+      <definition
+            id="biobank2.nonDebugState">
+         <with
+               variable="edu.ualberta.med.biobank.sourceprovider.debugState">
+            <equals
+                  value="nonDebug">
             </equals>
          </with>
       </definition>
