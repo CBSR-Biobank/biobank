@@ -41,7 +41,6 @@ public class StudyViewForm extends BiobankViewForm {
 
     private BiobankCollectionTable clinicsTable;
     private SampleStorageInfoTable sampleStorageTable;
-    private BiobankCollectionTable patientsTable;
     private BiobankCollectionTable pvInfosTable;
 
     @Override
@@ -85,7 +84,6 @@ public class StudyViewForm extends BiobankViewForm {
         setStudySectionValues();
         createClinicSection();
         createSampleStorageSection();
-        createPatientsSection();
         createPvDataSection();
 
         final Button edit = toolkit.createButton(client,
@@ -129,20 +127,6 @@ public class StudyViewForm extends BiobankViewForm {
         section.setClient(sampleStorageTable);
         sampleStorageTable.adaptToToolkit(toolkit);
         toolkit.paintBordersFor(sampleStorageTable);
-    }
-
-    private void createPatientsSection() {
-        Section section = createSection("Patients");
-
-        String[] headings = new String[] { "Patient Number" };
-        patientsTable = new BiobankCollectionTable(section, SWT.NONE, headings,
-            getPatientAdapters());
-        section.setClient(patientsTable);
-        patientsTable.adaptToToolkit(toolkit);
-        toolkit.paintBordersFor(patientsTable);
-
-        patientsTable.getTableViewer().addDoubleClickListener(
-            FormUtils.getBiobankCollectionDoubleClickListener());
     }
 
     private PatientAdapter[] getPatientAdapters() {
@@ -202,7 +186,6 @@ public class StudyViewForm extends BiobankViewForm {
         clinicsTable.getTableViewer().setInput(
             FormUtils.getClinicsAdapters(clinicGroupNode, study
                 .getClinicCollection()));
-        patientsTable.getTableViewer().setInput(getPatientAdapters());
         pvInfosTable.getTableViewer().setInput(getStudyPvInfo());
     }
 

@@ -29,7 +29,7 @@ public class SessionState extends AbstractSourceProvider {
     public void dispose() {
     }
 
-    public void setLoggedIn(boolean loggedIn) {
+    public void setLoggedInState(boolean loggedIn) {
         if (this.loggedIn == loggedIn)
             return; // no change
         this.loggedIn = loggedIn;
