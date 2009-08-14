@@ -15,7 +15,7 @@ import edu.ualberta.med.biobank.model.SampleStorage;
 public class SampleStorageInfoTable extends BiobankCollectionTable {
 
     private static final String[] headings = new String[] { "Sample type",
-        "Volume", "Quantity" };
+        "Volume (ml)", "Quantity" };
 
     private static final int[] bounds = new int[] { 300, 130, 100, -1, -1, -1,
         -1 };

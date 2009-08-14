@@ -2,6 +2,8 @@ package edu.ualberta.med.biobank.dialogs;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Set;
+import java.util.TreeSet;
 
 import org.eclipse.core.databinding.beans.PojoObservables;
 import org.eclipse.core.runtime.Assert;
@@ -67,8 +69,14 @@ public class SampleStorageDialog extends BiobankDialog {
         Label label = new Label(contents, SWT.NONE);
         label.setText("Sample Type:");
         sampleTypesCombo = new CCombo(contents, SWT.BORDER | SWT.READ_ONLY);
-        for (String stName : sampleTypeMap.keySet()) {
+        Set<String> sortedKeys = new TreeSet<String>(sampleTypeMap.keySet());
+        for (String stName : sortedKeys) {
             sampleTypesCombo.add(stName);
+        }
+
+        SampleType st = sampleStorage.getSampleType();
+        if (st != null) {
+            sampleTypesCombo.setText(st.getName());
         }
 
         createBoundWidgetWithLabel(contents, Text.class, SWT.BORDER, "Volume",
