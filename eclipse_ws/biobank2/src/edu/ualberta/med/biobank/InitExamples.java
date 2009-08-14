@@ -16,13 +16,13 @@ import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
-import gov.nih.nci.system.client.ApplicationServiceProvider;
 import gov.nih.nci.system.query.SDKQueryResult;
 import gov.nih.nci.system.query.example.DeleteExampleQuery;
 import gov.nih.nci.system.query.example.InsertExampleQuery;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -35,8 +35,20 @@ import java.util.List;
 import java.util.Random;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.OperationCanceledException;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.IJobChangeEvent;
+import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.core.runtime.jobs.JobChangeAdapter;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.progress.IProgressConstants;
 
 /**
+ * Accessed via the "**Debug**" main menu item. Invoked by the
+ * InitExamplesHandler to populate the database with sample objects.
+ * 
  * After re-generation : init some storagetype and storage containers for one
  * site
  */
@@ -65,51 +77,84 @@ public class InitExamples {
 
     private HashMap<String, ContainerLabelingScheme> numSchemeMap;
 
-    /**
-     * @param args
-     * @throws Exception
-     */
-    public static void main(String[] args) throws Exception {
-        new InitExamples();
+    public InitExamples() {
+        Job job = new Job("Init Examples") {
+            @Override
+            protected IStatus run(IProgressMonitor monitor) {
+                try {
+                    monitor.beginTask("Adding new objects to database...", 16);
+                    clinics = new Clinic[MAX_CLINICS];
+                    numSchemeMap = new HashMap<String, ContainerLabelingScheme>();
+
+                    appService = SessionManager.getInstance().getSession()
+                        .getAppService();
+
+                    // new classes should be added here
+                    Class<?>[] classTypes = new Class<?>[] { Container.class,
+                        ContainerType.class, PatientVisit.class, Patient.class,
+                        Study.class, Clinic.class, Site.class };
+
+                    for (Class<?> classType : classTypes) {
+                        monitor.subTask("deleting all " + classType.getName()
+                            + " objects");
+                        deleteAll(classType);
+                        monitor.worked(1);
+                        if (monitor.isCanceled())
+                            throw new OperationCanceledException();
+                    }
+
+                    // insert methods are listed here and order is important
+                    String[] insertMethodNames = new String[] { "insertSite",
+                        "insertClinicsInSite", "insertStudyInSite",
+                        "insertPatientInStudy", "insertPatientVisitsInPatient",
+                        "insertSampleInPatientVisit",
+                        "insertContainerTypesInSite", "insertContainers",
+                        "insertSampleStorage" };
+
+                    // invokes all methods starting with "insert"
+                    for (String methodName : insertMethodNames) {
+                        monitor.subTask("invoking " + methodName);
+                        Method method = InitExamples.class.getDeclaredMethod(
+                            methodName, new Class<?>[] {});
+                        method.setAccessible(true);
+                        method.invoke(InitExamples.this, new Object[] {});
+                        monitor.worked(1);
+                        method.setAccessible(false);
+                        if (monitor.isCanceled())
+                            throw new OperationCanceledException();
+                    }
+                } catch (Exception e) {
+                    return Status.CANCEL_STATUS;
+                } finally {
+                    monitor.done();
+                }
+
+                return Status.OK_STATUS;
+            }
+        };
+        job.addJobChangeListener(new JobChangeAdapter() {
+            @Override
+            public void done(final IJobChangeEvent event) {
+                Display.getDefault().asyncExec(new Runnable() {
+                    public void run() {
+                        if (event.getResult().isOK()) {
+                            if ((Boolean) event.getJob().getProperty(
+                                IProgressConstants.PROPERTY_IN_DIALOG))
+                                return;
+                            BioBankPlugin.openMessage("Init Examples",
+                                "successfully added all init examples");
+                        } else
+                            BioBankPlugin.openError("Init Examples",
+                                "Error encounted when adding init examples");
+                    }
+                });
+            }
+        });
+        job.setUser(true);
+        job.schedule();
     }
 
-    public InitExamples() throws Exception {
-        clinics = new Clinic[MAX_CLINICS];
-        numSchemeMap = new HashMap<String, ContainerLabelingScheme>();
-
-        // appService = (WritableApplicationService) ApplicationServiceProvider
-        // .getApplicationServiceFromUrl(
-        // "http://aicml-med.cs.ualberta.ca:8080/biobank2", "testuser",
-        // "test");
-
-        appService = (WritableApplicationService) ApplicationServiceProvider
-            .getApplicationServiceFromUrl("http://localhost:8080/biobank2",
-                "testuser", "test");
-
-        deleteAll(Container.class);
-        deleteAll(ContainerType.class);
-        deleteAll(PatientVisit.class);
-        deleteAll(Patient.class);
-        deleteAll(Study.class);
-        deleteAll(Clinic.class);
-        deleteAll(Site.class);
-
-        insertSite();
-
-        insertClinicsInSite();
-        insertStudyInSite();
-        insertPatientInStudy();
-        insertPatientVisitsInPatient();
-        insertSampleInPatientVisit();
-
-        insertContainerTypesInSite();
-
-        insertContainers();
-        insertSampleStorage();
-
-        System.out.println("Init done.");
-    }
-
+    @SuppressWarnings("unused")
     private void insertSite() throws ApplicationException {
         site = new Site();
         site.setName("Site Edmonton Test");
@@ -121,6 +166,7 @@ public class InitExamples {
         site = (Site) res.getObjectResult();
     }
 
+    @SuppressWarnings("unused")
     private void insertClinicsInSite() throws ApplicationException {
         for (int i = 0; i < 2; ++i) {
             Clinic clinic = new Clinic();
@@ -137,6 +183,7 @@ public class InitExamples {
         }
     }
 
+    @SuppressWarnings("unused")
     private void insertStudyInSite() throws ApplicationException {
         study = new Study();
         study.setName("Blood Borne Pathogens");
@@ -148,6 +195,7 @@ public class InitExamples {
         study = (Study) res.getObjectResult();
     }
 
+    @SuppressWarnings("unused")
     private void insertSampleInPatientVisit() throws ApplicationException {
         for (PatientVisit patientVisit : patientVisits) {
             Sample sample = new Sample();
@@ -167,6 +215,7 @@ public class InitExamples {
             new SampleType()).get(0);
     }
 
+    @SuppressWarnings("unused")
     private void insertPatientVisitsInPatient() throws Exception {
         patientVisits = new ArrayList<PatientVisit>();
         Random r = new Random();
@@ -194,6 +243,7 @@ public class InitExamples {
         patientVisits.add(patientVisit);
     }
 
+    @SuppressWarnings("unused")
     private void insertPatientInStudy() throws ApplicationException {
         patients = new ArrayList<Patient>();
         for (int i = 0; i < 100; i++) {
@@ -218,6 +268,7 @@ public class InitExamples {
 
     }
 
+    @SuppressWarnings("unused")
     private void insertContainerTypesInSite() throws ApplicationException {
         List<ContainerLabelingScheme> numSchemes = appService.search(
             ContainerLabelingScheme.class, new ContainerLabelingScheme());
@@ -308,6 +359,7 @@ public class InitExamples {
         return (Container) res.getObjectResult();
     }
 
+    @SuppressWarnings("unused")
     private void insertContainers() throws Exception {
         Container freezer = insertContainer("01", freezerType, null);
         Container hotel1 = insertContainer("01AA", hotel19Type, freezer);
@@ -318,6 +370,7 @@ public class InitExamples {
         insertContainer("01AE05", palletType, hotel2);
     }
 
+    @SuppressWarnings("unused")
     private void insertSampleStorage() throws Exception {
         HQLCriteria c = new HQLCriteria(
             "from edu.ualberta.med.biobank.model.Study as study "
