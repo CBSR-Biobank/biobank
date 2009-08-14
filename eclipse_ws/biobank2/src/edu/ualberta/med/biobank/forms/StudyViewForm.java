@@ -17,11 +17,9 @@ import org.eclipse.ui.forms.widgets.Section;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.ModelUtils;
-import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.PvInfo;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
-import edu.ualberta.med.biobank.treeview.PatientAdapter;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankCollectionTable;
@@ -41,6 +39,7 @@ public class StudyViewForm extends BiobankViewForm {
 
     private BiobankCollectionTable clinicsTable;
     private SampleStorageInfoTable sampleStorageTable;
+    private StudySampleSourceInfoTable sampleSourceTable;
     private BiobankCollectionTable pvInfosTable;
 
     @Override
@@ -84,6 +83,7 @@ public class StudyViewForm extends BiobankViewForm {
         setStudySectionValues();
         createClinicSection();
         createSampleStorageSection();
+        createSampleSourceSection();
         createPvDataSection();
 
         final Button edit = toolkit.createButton(client,
@@ -129,18 +129,13 @@ public class StudyViewForm extends BiobankViewForm {
         toolkit.paintBordersFor(sampleStorageTable);
     }
 
-    private PatientAdapter[] getPatientAdapters() {
-        // hack required here because xxx.getXxxxCollection().toArray(new
-        // Xxx[0])
-        // returns Object[].
-        int count = 0;
-        Collection<Patient> patients = study.getPatientCollection();
-        PatientAdapter[] arr = new PatientAdapter[patients.size()];
-        for (Patient patient : patients) {
-            arr[count] = new PatientAdapter(studyAdapter, patient);
-            ++count;
-        }
-        return arr;
+    private void createSampleSourceSection() {
+        Section section = createSection("Sample Source");
+        sampleSourceTable = new StudySampleSourceInfoTable(section, study
+            .getStudySampleSourceCollection());
+        section.setClient(sampleSourceTable);
+        sampleStorageTable.adaptToToolkit(toolkit);
+        toolkit.paintBordersFor(sampleStorageTable);
     }
 
     private void createPvDataSection() {

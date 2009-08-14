@@ -96,7 +96,7 @@ public class SampleStorageEntryWidget extends BiobankWidget {
                 // only add to the collection when adding and not editing
                 selectedSampleStorage.add(dlg.getSampleStorage());
             }
-            sampleStorageTable.setSampleStorage(selectedSampleStorage);
+            sampleStorageTable.setCollection(selectedSampleStorage);
         }
     }
 
@@ -105,7 +105,7 @@ public class SampleStorageEntryWidget extends BiobankWidget {
         Set<SampleType> sampleTypes = new HashSet<SampleType>(allSampleTypes);
         Set<SampleType> dupSampleTypes = new HashSet<SampleType>();
         Collection<SampleStorage> currentSampleStorage = sampleStorageTable
-            .getSampleStorage();
+            .getCollection();
 
         // get the IDs of the selected sample types
         List<Integer> sampleTypeIds = new ArrayList<Integer>();
@@ -176,7 +176,7 @@ public class SampleStorageEntryWidget extends BiobankWidget {
                         selectedSampleStorage.remove(ss);
                     }
 
-                    sampleStorageTable.setSampleStorage(selectedSampleStorage);
+                    sampleStorageTable.setCollection(selectedSampleStorage);
                 }
             }
 
@@ -197,7 +197,7 @@ public class SampleStorageEntryWidget extends BiobankWidget {
     }
 
     public Collection<SampleStorage> getSampleStorage() {
-        return sampleStorageTable.getSampleStorage();
+        return sampleStorageTable.getCollection();
     }
 
     @Override

@@ -24,6 +24,7 @@ import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.ModelUtils;
 import edu.ualberta.med.biobank.model.PvInfo;
 import edu.ualberta.med.biobank.model.PvInfoPossible;
+import edu.ualberta.med.biobank.model.PvInfoType;
 import edu.ualberta.med.biobank.model.SampleStorage;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
@@ -174,7 +175,7 @@ public class StudyEntryForm extends BiobankEntryForm {
     }
 
     private void createPvInfoSection() {
-        Composite client = createSectionWithClient("Additional Patient Visit Information Collected");
+        Composite client = createSectionWithClient("Patient Visit Information Collected");
         Collection<PvInfo> pviCollection = study.getPvInfoCollection();
         GridLayout gl = (GridLayout) client.getLayout();
         gl.numColumns = 1;
@@ -192,6 +193,22 @@ public class StudyEntryForm extends BiobankEntryForm {
 
         possiblePvInfos = getPossiblePvInfos();
         Assert.isNotNull(possiblePvInfos);
+
+        // START KLUDGE
+        //
+        // create "date drawn" - not really a pv info but we'll pretend
+        // we just want to show the user that this information is collected
+        // by default. Date drawn is already part of the PatientVisit class.
+        //
+        PvInfoType pvType = new PvInfoType();
+        pvType.setType("date_time");
+        PvInfoPossible pvInfoDateDrawn = new PvInfoPossible();
+        pvInfoDateDrawn.setIsDefault(true);
+        pvInfoDateDrawn.setLabel("Date Drawn");
+        pvInfoDateDrawn.setPvInfoType(pvType);
+        new PvInfoWidget(client, SWT.NONE, pvInfoDateDrawn, true, null);
+        //
+        // END KLUDGE
 
         for (PvInfoPossible possiblePvInfo : possiblePvInfos) {
             boolean selected = false;
@@ -215,8 +232,6 @@ public class StudyEntryForm extends BiobankEntryForm {
             combinedPvInfoMap.put(combinedPvInfo.pvInfoPossible.getId(),
                 combinedPvInfo);
         }
-
-        // now create the widgets in order listed in PvInfoPossible
     }
 
     private void createButtonsSection() {

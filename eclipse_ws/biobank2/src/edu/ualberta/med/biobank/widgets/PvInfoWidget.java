@@ -41,10 +41,9 @@ public class PvInfoWidget extends BiobankWidget {
         label = pvInfoPossible.getLabel();
         type = pvInfoPossible.getPvInfoType().getType();
         hasListValues = type.equals("select_single")
-            || type.startsWith("select_single_and_quantity")
             || type.equals("select_multiple");
-        if (hasListValues) {
 
+        if (hasListValues) {
             checkButton = new Button(this, SWT.CHECK);
             checkButton.setText(label);
 
