@@ -77,6 +77,8 @@ public class ScanLinkEntryForm extends BiobankEntryForm {
 
     private List<SampleTypeSelectionWidget> sampleTypeWidgets;
 
+    private static String PALLET_ROWS = "ABCDEFGH";
+
     private IObservableValue patientNumberValue = new WritableValue("",
         String.class);
     private IObservableValue visitSelectionValue = new WritableValue("",
@@ -234,7 +236,7 @@ public class ScanLinkEntryForm extends BiobankEntryForm {
             "Row choice", SWT.RADIO);
         final Button radioCustomSelection = toolkit.createButton(
             radioComponents, "Custom Selection choice", SWT.RADIO);
-        radioComponents.setVisible(false);
+        radioComponents.setVisible(false); // not used for the moment
 
         // stackLayout
         final Composite selectionComp = toolkit.createComposite(parent);
@@ -331,10 +333,10 @@ public class ScanLinkEntryForm extends BiobankEntryForm {
         toolkit.paintBordersFor(typesSelectionPerRowComposite);
 
         sampleTypeWidgets = new ArrayList<SampleTypeSelectionWidget>();
-        char letter = 'A';
         for (int i = 0; i < ScanCell.ROW_MAX; i++) {
             final SampleTypeSelectionWidget typeWidget = new SampleTypeSelectionWidget(
-                typesSelectionPerRowComposite, letter, sampleTypes, toolkit);
+                typesSelectionPerRowComposite, PALLET_ROWS.charAt(i),
+                sampleTypes, toolkit);
             final int indexRow = i;
             typeWidget
                 .addSelectionChangedListener(new ISelectionChangedListener() {
@@ -347,8 +349,23 @@ public class ScanLinkEntryForm extends BiobankEntryForm {
                 });
             typeWidget.addBinding(dbc);
             sampleTypeWidgets.add(typeWidget);
-            letter += 1;
         }
+        SampleTypeSelectionWidget lastWidget = sampleTypeWidgets
+            .get(sampleTypeWidgets.size() - 1);
+        lastWidget.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyReleased(KeyEvent e) {
+                if (e.keyCode == 13) {
+                    cancelConfirmWidget.setFocus();
+                }
+            }
+        });
+        lastWidget.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusLost(FocusEvent e) {
+                cancelConfirmWidget.setFocus();
+            }
+        });
     }
 
     private void createFieldsComposite() {
@@ -386,7 +403,9 @@ public class ScanLinkEntryForm extends BiobankEntryForm {
         plateToScanText.removeKeyListener(keyListener);
         plateToScanText.addListener(SWT.DefaultSelection, new Listener() {
             public void handleEvent(Event e) {
-                scan();
+                if (scanButton.isEnabled()) {
+                    scan();
+                }
             }
         });
         scanButton = toolkit.createButton(fieldsComposite, "Scan", SWT.PUSH);
@@ -554,12 +573,14 @@ public class ScanLinkEntryForm extends BiobankEntryForm {
         if (typeWidget.needToSave()) {
             SampleType type = typeWidget.getSelection();
             PalletCell[][] cells = spw.getScannedElements();
-            for (int indexColumn = 0; indexColumn < cells[indexRow].length; indexColumn++) {
-                PalletCell cell = cells[indexRow][indexColumn];
-                if (PalletCell.hasValue(cell)) {
-                    cell.setType(type);
-                    cell.setStatus(SampleCellStatus.TYPE);
-                    spw.redraw();
+            if (cells != null) {
+                for (int indexColumn = 0; indexColumn < cells[indexRow].length; indexColumn++) {
+                    PalletCell cell = cells[indexRow][indexColumn];
+                    if (PalletCell.hasValue(cell)) {
+                        cell.setType(type);
+                        cell.setStatus(SampleCellStatus.TYPE);
+                        spw.redraw();
+                    }
                 }
             }
         }
@@ -567,6 +588,14 @@ public class ScanLinkEntryForm extends BiobankEntryForm {
 
     @Override
     public void cancelForm() {
+        patientNumberText.setText("");
+        viewerVisits.setInput(null);
+        currentPatient = null;
+        plateToScanText.setText("");
+        cancelConfirmWidget.reset();
+        scanButton.setEnabled(false);
+        plateToScanValue.setValue("");
+        scannedValue.setValue(Boolean.FALSE);
         spw.setScannedElements(null);
         for (SampleTypeSelectionWidget stw : sampleTypeWidgets) {
             stw.resetValues(true);
