@@ -11,6 +11,10 @@ import org.eclipse.swt.widgets.Composite;
 
 public class InfoTableWidget<T> extends BiobankCollectionTable {
 
+    // FIXME - used to inform listeners of changes to the widget
+    // could be done in a better way
+    private int setCollectionCount;
+
     private List<BiobankCollectionModel> model;
 
     public InfoTableWidget(Composite parent, Collection<T> collection,
@@ -24,7 +28,9 @@ public class InfoTableWidget<T> extends BiobankCollectionTable {
                 model.add(new BiobankCollectionModel());
             }
             setCollection(collection);
-        }
+            setCollectionCount = 0;
+        } else
+            setCollectionCount = 1;
     }
 
     public void addDoubleClickListener(IDoubleClickListener listener) {
@@ -54,6 +60,12 @@ public class InfoTableWidget<T> extends BiobankCollectionTable {
                     new Runnable() {
                         public void run() {
                             getTableViewer().refresh();
+
+                            // only notify listeners if collection has been
+                            // assigned other than by constructor
+                            if (setCollectionCount > 0)
+                                InfoTableWidget.this.notifyListeners();
+                            ++setCollectionCount;
                         }
                     });
             }

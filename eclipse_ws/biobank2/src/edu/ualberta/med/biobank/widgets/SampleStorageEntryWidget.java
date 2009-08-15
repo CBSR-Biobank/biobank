@@ -29,6 +29,8 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.dialogs.SampleStorageDialog;
 import edu.ualberta.med.biobank.model.SampleStorage;
 import edu.ualberta.med.biobank.model.SampleType;
+import edu.ualberta.med.biobank.widgets.listener.BiobankEntryFormWidgetListener;
+import edu.ualberta.med.biobank.widgets.listener.MultiSelectEvent;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 /**
@@ -74,6 +76,13 @@ public class SampleStorageEntryWidget extends BiobankWidget {
             selectedSampleStorage);
         sampleStorageTable.adaptToToolkit(toolkit);
         addTableMenu();
+        sampleStorageTable
+            .addSelectionChangedListener(new BiobankEntryFormWidgetListener() {
+                @Override
+                public void selectionChanged(MultiSelectEvent event) {
+                    SampleStorageEntryWidget.this.notifyListeners();
+                }
+            });
 
         addSampleStorageButton = toolkit.createButton(parent,
             "Add Sample Storage", SWT.PUSH);

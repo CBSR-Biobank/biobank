@@ -9,7 +9,7 @@ import edu.ualberta.med.biobank.widgets.InfoTableWidget;
 
 public class SampleSourceInfoTable extends InfoTableWidget<SampleSource> {
 
-    private static final String[] headings = new String[] { "Sample vessel" };
+    private static final String[] headings = new String[] { "Source vessel" };
 
     private static final int[] bounds = new int[] { 300, -1, -1, -1, -1, -1, -1 };
 

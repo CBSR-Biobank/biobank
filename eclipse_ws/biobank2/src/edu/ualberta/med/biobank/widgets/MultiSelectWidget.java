@@ -1,4 +1,3 @@
-
 package edu.ualberta.med.biobank.widgets;
 
 import java.util.ArrayList;
@@ -15,8 +14,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 
 import edu.ualberta.med.biobank.forms.FormUtils;
-import edu.ualberta.med.biobank.widgets.listener.MultiSelectEvent;
-import edu.ualberta.med.biobank.widgets.listener.BiobankEntryFormWidgetListener;
 
 public class MultiSelectWidget extends BiobankWidget {
 
@@ -34,12 +31,9 @@ public class MultiSelectWidget extends BiobankWidget {
 
     private int minHeight;
 
-    List<BiobankEntryFormWidgetListener> listeners;
-
     public MultiSelectWidget(Composite parent, int style, String leftLabel,
         String rightLabel, int minHeight) {
         super(parent, style);
-        listeners = new ArrayList<BiobankEntryFormWidgetListener>();
 
         this.minHeight = minHeight;
 
@@ -94,8 +88,7 @@ public class MultiSelectWidget extends BiobankWidget {
             if (selected.contains(key)) {
                 selTreeRootNode.addChild(new MultiSelectNode(selTreeRootNode,
                     key, (String) it.getValue()));
-            }
-            else {
+            } else {
                 availTreeRootNode.addChild(new MultiSelectNode(
                     availTreeRootNode, key, (String) it.getValue()));
             }
@@ -112,23 +105,5 @@ public class MultiSelectWidget extends BiobankWidget {
             result.add(node.getId());
         }
         return result;
-    }
-
-    public void addSelectionChangedListener(BiobankEntryFormWidgetListener listener) {
-        listeners.add(listener);
-    }
-
-    public void removeSelectionChangedListener(BiobankEntryFormWidgetListener listener) {
-        listeners.remove(listener);
-    }
-
-    public void notifyListeners(MultiSelectEvent event) {
-        for (BiobankEntryFormWidgetListener listener : listeners) {
-            listener.selectionChanged(event);
-        }
-    }
-
-    public void notifyListeners() {
-        notifyListeners(new MultiSelectEvent(this));
     }
 }

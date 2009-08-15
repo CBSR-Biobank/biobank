@@ -130,7 +130,7 @@ public class StudyViewForm extends BiobankViewForm {
     }
 
     private void createSampleSourceSection() {
-        Section section = createSection("Sample Source Vessel");
+        Section section = createSection("Source Vessels");
         sampleSourceTable = new SampleSourceInfoTable(section, study
             .getSampleSourceCollection());
         section.setClient(sampleSourceTable);

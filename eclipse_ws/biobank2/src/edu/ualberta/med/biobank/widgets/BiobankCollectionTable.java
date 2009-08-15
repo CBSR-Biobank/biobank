@@ -1,8 +1,5 @@
 package edu.ualberta.med.biobank.widgets;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.TableLayout;
 import org.eclipse.jface.viewers.TableViewer;
@@ -16,17 +13,12 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
-import edu.ualberta.med.biobank.widgets.listener.BiobankEntryFormWidgetListener;
-import edu.ualberta.med.biobank.widgets.listener.MultiSelectEvent;
-
 /**
  * Widget used to display tabular data. Used mostly by view forms.
  */
 public class BiobankCollectionTable extends BiobankWidget {
 
     private TableViewer tableViewer;
-
-    List<BiobankEntryFormWidgetListener> listeners;
 
     public BiobankCollectionTable(Composite parent, int style,
         String[] headings, Object[] data) {
@@ -36,7 +28,6 @@ public class BiobankCollectionTable extends BiobankWidget {
     public BiobankCollectionTable(Composite parent, int style,
         String[] headings, int bounds[], Object[] data) {
         super(parent, style);
-        listeners = new ArrayList<BiobankEntryFormWidgetListener>();
 
         setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         setLayout(new GridLayout(1, false));
@@ -88,26 +79,6 @@ public class BiobankCollectionTable extends BiobankWidget {
         if (paintBorder) {
             toolkit.paintBordersFor(this);
         }
-    }
-
-    public void addSelectionChangedListener(
-        BiobankEntryFormWidgetListener listener) {
-        listeners.add(listener);
-    }
-
-    public void removeSelectionChangedListener(
-        BiobankEntryFormWidgetListener listener) {
-        listeners.remove(listener);
-    }
-
-    public void notifyListeners(MultiSelectEvent event) {
-        for (BiobankEntryFormWidgetListener listener : listeners) {
-            listener.selectionChanged(event);
-        }
-    }
-
-    public void notifyListeners() {
-        notifyListeners(new MultiSelectEvent(this));
     }
 
 }

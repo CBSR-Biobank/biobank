@@ -20,6 +20,7 @@ import org.eclipse.swt.widgets.Text;
 import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.ModelUtils;
 import edu.ualberta.med.biobank.model.PvInfo;
@@ -35,8 +36,8 @@ import edu.ualberta.med.biobank.validators.NonEmptyString;
 import edu.ualberta.med.biobank.widgets.MultiSelectWidget;
 import edu.ualberta.med.biobank.widgets.PvInfoWidget;
 import edu.ualberta.med.biobank.widgets.SampleStorageEntryWidget;
-import edu.ualberta.med.biobank.widgets.listener.MultiSelectEvent;
 import edu.ualberta.med.biobank.widgets.listener.BiobankEntryFormWidgetListener;
+import edu.ualberta.med.biobank.widgets.listener.MultiSelectEvent;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.query.SDKQuery;
 import gov.nih.nci.system.query.SDKQueryResult;
@@ -95,6 +96,13 @@ public class StudyEntryForm extends BiobankEntryForm {
 
     private SampleStorageEntryWidget sampleStorageEntryWidget;
 
+    private BiobankEntryFormWidgetListener listener = new BiobankEntryFormWidgetListener() {
+        @Override
+        public void selectionChanged(MultiSelectEvent event) {
+            setDirty(true);
+        }
+    };
+
     public StudyEntryForm() {
         super();
         combinedPvInfoMap = new ListOrderedMap();
@@ -107,9 +115,9 @@ public class StudyEntryForm extends BiobankEntryForm {
                 + adapter.getClass().getName());
 
         studyAdapter = (StudyAdapter) adapter;
-        study = studyAdapter.getStudy();
         site = ((SiteAdapter) studyAdapter
             .getParentFromClass(SiteAdapter.class)).getSite();
+        retrieveStudy();
 
         String tabName;
         if (study.getId() == null) {
@@ -169,13 +177,7 @@ public class StudyEntryForm extends BiobankEntryForm {
             "Selected Clinics", "Available Clinics", 100);
         clinicsMultiSelect.adaptToToolkit(toolkit);
         clinicsMultiSelect.addSelections(availClinics, selClinics);
-        clinicsMultiSelect
-            .addSelectionChangedListener(new BiobankEntryFormWidgetListener() {
-                @Override
-                public void selectionChanged(MultiSelectEvent event) {
-                    setDirty(true);
-                }
-            });
+        clinicsMultiSelect.addSelectionChangedListener(listener);
     }
 
     private void createSampleStorageSection() {
@@ -187,6 +189,7 @@ public class StudyEntryForm extends BiobankEntryForm {
 
         sampleStorageEntryWidget = new SampleStorageEntryWidget(client,
             SWT.NONE, study.getSampleStorageCollection(), toolkit);
+        sampleStorageEntryWidget.addSelectionChangedListener(listener);
     }
 
     private void createSourceVesselsSection() {
@@ -215,13 +218,7 @@ public class StudyEntryForm extends BiobankEntryForm {
             sampleSourceMultiSelect.adaptToToolkit(toolkit);
             sampleSourceMultiSelect.addSelections(availSampleSource,
                 selSampleSource);
-            sampleSourceMultiSelect
-                .addSelectionChangedListener(new BiobankEntryFormWidgetListener() {
-                    @Override
-                    public void selectionChanged(MultiSelectEvent event) {
-                        setDirty(true);
-                    }
-                });
+            sampleSourceMultiSelect.addSelectionChangedListener(listener);
         } catch (final RemoteConnectFailureException exp) {
             BioBankPlugin.openRemoteConnectErrorMessage();
         } catch (Exception e) {
@@ -513,6 +510,18 @@ public class StudyEntryForm extends BiobankEntryForm {
         }
 
         return true;
+    }
+
+    private void retrieveStudy() {
+        try {
+            study = ModelUtils.getObjectWithId(appService, Study.class,
+                studyAdapter.getStudy().getId());
+            studyAdapter.setStudy(study);
+        } catch (Exception e) {
+            SessionManager.getLogger().error(
+                "Error while retrieving study "
+                    + studyAdapter.getStudy().getName(), e);
+        }
     }
 
     @Override
