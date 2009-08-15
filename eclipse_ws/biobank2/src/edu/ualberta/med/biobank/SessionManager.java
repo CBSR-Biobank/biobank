@@ -22,6 +22,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.services.ISourceProviderService;
 
 import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.sourceproviders.DebugState;
 import edu.ualberta.med.biobank.sourceproviders.SessionState;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.RootNode;
@@ -228,9 +229,17 @@ public class SessionManager {
             .getActiveWorkbenchWindow();
         ISourceProviderService service = (ISourceProviderService) window
             .getService(ISourceProviderService.class);
+
+        // assign logged in state
         SessionState sessionSourceProvider = (SessionState) service
             .getSourceProvider(SessionState.SESSION_STATE);
-        sessionSourceProvider.setLoggedIn(sessionAdapter != null);
+        sessionSourceProvider.setLoggedInState(sessionAdapter != null);
+
+        // assign debug state
+        DebugState debugStateSourceProvider = (DebugState) service
+            .getSourceProvider(DebugState.SESSION_STATE);
+        debugStateSourceProvider.setState(BioBankPlugin.getDefault()
+            .isDebugging());
     }
 
     public SessionAdapter getSession() {
