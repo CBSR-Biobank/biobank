@@ -46,8 +46,6 @@ public class BiobankDialog extends Dialog {
 
     private Label errorLabel;
 
-    private IObservableValue uiElement;
-
     protected BiobankDialog(Shell parentShell) {
         super(parentShell);
         dbc = new DataBindingContext();

@@ -39,7 +39,7 @@ public class StudyViewForm extends BiobankViewForm {
 
     private BiobankCollectionTable clinicsTable;
     private SampleStorageInfoTable sampleStorageTable;
-    private StudySampleSourceInfoTable sampleSourceTable;
+    private SampleSourceInfoTable sampleSourceTable;
     private BiobankCollectionTable pvInfosTable;
 
     @Override
@@ -130,9 +130,9 @@ public class StudyViewForm extends BiobankViewForm {
     }
 
     private void createSampleSourceSection() {
-        Section section = createSection("Sample Source");
-        sampleSourceTable = new StudySampleSourceInfoTable(section, study
-            .getStudySampleSourceCollection());
+        Section section = createSection("Sample Source Vessel");
+        sampleSourceTable = new SampleSourceInfoTable(section, study
+            .getSampleSourceCollection());
         section.setClient(sampleSourceTable);
         sampleStorageTable.adaptToToolkit(toolkit);
         toolkit.paintBordersFor(sampleStorageTable);
