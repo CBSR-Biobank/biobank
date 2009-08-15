@@ -13,7 +13,6 @@ import org.eclipse.core.databinding.validation.ValidationStatus;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.IMessageProvider;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -40,7 +39,6 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.ui.PlatformUI;
 import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
@@ -65,7 +63,7 @@ import edu.ualberta.med.scanlib.ScanLib;
 import gov.nih.nci.system.query.SDKQuery;
 import gov.nih.nci.system.query.example.InsertExampleQuery;
 
-public class ScanLinkEntryForm extends BiobankEntryForm {
+public class ScanLinkEntryForm extends AbstractPatientAdminForm {
 
     public static final String ID = "edu.ualberta.med.biobank.forms.ScanLinkEntryForm";
 
@@ -103,34 +101,11 @@ public class ScanLinkEntryForm extends BiobankEntryForm {
 
     private Composite radioComponents;
 
-    /**
-     * Indicate if this form has been saved
-     */
-    private boolean isSaved = false;
-
     private Patient currentPatient;
 
     @Override
     protected void init() {
         setPartName("Scan Link");
-    }
-
-    /**
-     * Called from the BiobankPartListener
-     */
-    public void onClose() {
-        if (!isSaved && BioBankPlugin.isAskPrint()) {
-            // ask print only if this for is not saved. If it is saved, a new
-            // form is opened. The printing only occurs when the form is close
-            // with the close button
-            boolean doPrint = MessageDialog.openQuestion(PlatformUI
-                .getWorkbench().getActiveWorkbenchWindow().getShell(), "Print",
-                "Do you want to print information ?");
-            if (doPrint) {
-                // FIXME implement print functionality
-                System.out.println("PRINT ACTIVITY");
-            }
-        }
     }
 
     @Override
@@ -537,6 +512,7 @@ public class ScanLinkEntryForm extends BiobankEntryForm {
     protected void saveForm() throws Exception {
         List<SDKQuery> queries = new ArrayList<SDKQuery>();
         PalletCell[][] cells = spw.getScannedElements();
+        PatientVisit patientVisit = getSelectedPatientVisit();
         for (int indexRow = 0; indexRow < cells.length; indexRow++) {
             for (int indexColumn = 0; indexColumn < cells[indexRow].length; indexColumn++) {
                 PalletCell cell = cells[indexRow][indexColumn];
@@ -545,7 +521,6 @@ public class ScanLinkEntryForm extends BiobankEntryForm {
                     // add new samples
                     Sample sample = new Sample();
                     sample.setInventoryId(cell.getValue());
-                    PatientVisit patientVisit = getSelectedPatientVisit();
                     sample.setPatientVisit(patientVisit);
                     sample.setProcessDate(new Date());
                     sample.setSampleType(cell.getType());
@@ -554,7 +529,7 @@ public class ScanLinkEntryForm extends BiobankEntryForm {
             }
         }
         appService.executeBatchQuery(queries);
-        isSaved = true;
+        setSaved(true);
     }
 
     private PatientVisit getSelectedPatientVisit() {
@@ -605,6 +580,20 @@ public class ScanLinkEntryForm extends BiobankEntryForm {
     @Override
     public String getNextOpenedFormID() {
         return ID;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof ScanLinkEntryForm) {
+            return true;
+        }
+        return super.equals(o);
+    }
+
+    @Override
+    protected void print() {
+        // FIXME implement print functionality
+        System.out.println("PRINT ACTIVITY");
     }
 
 }

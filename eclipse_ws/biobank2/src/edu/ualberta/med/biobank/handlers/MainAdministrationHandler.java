@@ -11,7 +11,6 @@ import org.eclipse.ui.WorkbenchException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.rcp.MainPerspective;
-import edu.ualberta.med.biobank.rcp.PatientsAdministrationPerspective;
 import edu.ualberta.med.biobank.views.PatientAdministrationView;
 
 public class MainAdministrationHandler extends AbstractHandler implements
@@ -23,12 +22,12 @@ public class MainAdministrationHandler extends AbstractHandler implements
         IWorkbenchPage activePage = workbench.getActiveWorkbenchWindow()
             .getActivePage();
         boolean open = true;
-        if (activePage.getPerspective().getId().equals(
-            PatientsAdministrationPerspective.ID)) {
-            open = BioBankPlugin
-                .openConfirm("Quit patients management",
-                    "You are about to quit the patients management, are you sure ?");
-        }
+        // if (activePage.getPerspective().getId().equals(
+        // PatientsAdministrationPerspective.ID)) {
+        // open = BioBankPlugin
+        // .openConfirm("Quit patients management",
+        // "You are about to quit the patients management, are you sure ?");
+        // }
         if (open) {
             try {
                 for (IViewReference ref : activePage.getViewReferences()) {
@@ -44,8 +43,9 @@ public class MainAdministrationHandler extends AbstractHandler implements
         }
         return null;
     }
+
     @Override
     public boolean isEnabled() {
         return true;
-     }
+    }
 }

@@ -29,7 +29,6 @@ import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.forms.listener.EnterKeyToNextFieldListener;
 import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.Container;
@@ -41,8 +40,6 @@ import edu.ualberta.med.biobank.model.Sample;
 import edu.ualberta.med.biobank.model.SampleCellStatus;
 import edu.ualberta.med.biobank.model.SamplePosition;
 import edu.ualberta.med.biobank.model.Study;
-import edu.ualberta.med.biobank.treeview.AdapterBase;
-import edu.ualberta.med.biobank.treeview.SessionAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
 import edu.ualberta.med.biobank.validators.ScannerBarcodeValidator;
 import edu.ualberta.med.biobank.widgets.CancelConfirmWidget;
@@ -56,7 +53,7 @@ import gov.nih.nci.system.query.SDKQueryResult;
 import gov.nih.nci.system.query.example.InsertExampleQuery;
 import gov.nih.nci.system.query.example.UpdateExampleQuery;
 
-public class AssignSamplesLocationEntryForm extends BiobankEntryForm {
+public class AssignSamplesLocationEntryForm extends AbstractPatientAdminForm {
 
     public static final String ID = "edu.ualberta.med.biobank.forms.AssignSamplesLocationEntryForm";
 
@@ -68,8 +65,6 @@ public class AssignSamplesLocationEntryForm extends BiobankEntryForm {
     private Text palletCodeText;
     private Text palletPositionText;
     private Button scanButton;
-    private Text confirmCancelText;
-    private Button locateButton;
 
     private IObservableValue plateToScanValue = new WritableValue("",
         String.class);
@@ -92,8 +87,6 @@ public class AssignSamplesLocationEntryForm extends BiobankEntryForm {
 
     protected Sample[][] currentPalletSamples;
 
-    private SessionAdapter sessionAdapter;
-
     private Label freezerLabel;
 
     private Label palletLabel;
@@ -106,44 +99,25 @@ public class AssignSamplesLocationEntryForm extends BiobankEntryForm {
     private Button existsButton;
     private Button notexistsButton;
 
-    private Button confirmAndNextButton;
-
-    private Button confirmAndClose;
-
     private CancelConfirmWidget cancelConfirmWidget;
-
-    private static boolean activityToPrint = false;
-    private static boolean testDisposeOn = true;
 
     @Override
     protected void init() {
-        Assert.isTrue((adapter instanceof SessionAdapter),
-            "Invalid editor input: object of type "
-                + adapter.getClass().getName());
-
-        sessionAdapter = (SessionAdapter) adapter;
-        testDisposeOn = true;
         setPartName("Assign locations for samples");
-    }
-
-    @Override
-    public void dispose() {
-        if (testDisposeOn && activityToPrint) {
-            print();
-        }
     }
 
     @Override
     protected void createFormContent() {
         form.setText("Assign locations for samples");
-        GridLayout layout = new GridLayout(1, false);
+        GridLayout layout = new GridLayout(2, false);
         form.getBody().setLayout(layout);
 
         createFieldsSection();
 
         createContainersSection();
 
-        createButtonsSection();
+        cancelConfirmWidget = new CancelConfirmWidget(form.getBody(), this,
+            true);
 
         addBooleanBinding(new WritableValue(Boolean.FALSE, Boolean.class),
             scanLaunchedValue, "Scanner should be launched");
@@ -163,8 +137,6 @@ public class AssignSamplesLocationEntryForm extends BiobankEntryForm {
         gd.grabExcessHorizontalSpace = true;
         containersComposite.setLayoutData(gd);
         toolkit.paintBordersFor(containersComposite);
-
-        showAllContainers(false);
 
         Composite freezerComposite = toolkit
             .createComposite(containersComposite);
@@ -208,6 +180,8 @@ public class AssignSamplesLocationEntryForm extends BiobankEntryForm {
         palletLabel = toolkit.createLabel(palletComposite, "Pallet");
         palletWidget = new ScanPalletWidget(palletComposite);
         toolkit.adapt(palletWidget);
+
+        showOnlyPallet(true);
     }
 
     private GridLayout getNeutralGridLayout() {
@@ -220,37 +194,39 @@ public class AssignSamplesLocationEntryForm extends BiobankEntryForm {
     }
 
     private void createFieldsSection() {
-        Composite client = toolkit.createComposite(form.getBody());
+        Composite fieldsComposite = toolkit.createComposite(form.getBody());
         GridLayout layout = new GridLayout(2, false);
         layout.horizontalSpacing = 10;
-        client.setLayout(layout);
+        fieldsComposite.setLayout(layout);
+        toolkit.paintBordersFor(fieldsComposite);
         GridData gd = new GridData();
-        gd.widthHint = 300;
-        client.setLayoutData(gd);
-        toolkit.paintBordersFor(client);
+        gd.widthHint = 400;
+        gd.verticalAlignment = SWT.TOP;
+        fieldsComposite.setLayoutData(gd);
 
-        palletCodeText = (Text) createBoundWidgetWithLabel(client, Text.class,
-            SWT.NONE, "Pallet product barcode", new String[0],
+        palletCodeText = (Text) createBoundWidgetWithLabel(fieldsComposite,
+            Text.class, SWT.NONE, "Pallet product barcode", new String[0],
             palletProductCodeValue, NonEmptyString.class,
             "Enter pallet position code");
         palletCodeText.removeKeyListener(keyListener);
         palletCodeText.addKeyListener(EnterKeyToNextFieldListener.INSTANCE);
 
-        palletPositionText = (Text) createBoundWidgetWithLabel(client,
+        palletPositionText = (Text) createBoundWidgetWithLabel(fieldsComposite,
             Text.class, SWT.NONE, "Pallet position barcode", new String[0],
             palletPositionValue, NonEmptyString.class, "Enter position code");
         palletPositionText.removeKeyListener(keyListener);
         palletPositionText.addKeyListener(EnterKeyToNextFieldListener.INSTANCE);
 
-        plateToScanText = (Text) createBoundWidgetWithLabel(client, Text.class,
-            SWT.NONE, "Plate to scan", new String[0], plateToScanValue,
-            ScannerBarcodeValidator.class, "Enter a valid plate barcode");
+        plateToScanText = (Text) createBoundWidgetWithLabel(fieldsComposite,
+            Text.class, SWT.NONE, "Plate to scan", new String[0],
+            plateToScanValue, ScannerBarcodeValidator.class,
+            "Enter a valid plate barcode");
         plateToScanText.removeKeyListener(keyListener);
         plateToScanText.addKeyListener(EnterKeyToNextFieldListener.INSTANCE);
 
         if (!BioBankPlugin.isRealScanEnabled()) {
             gd.widthHint = 250;
-            Composite comp = toolkit.createComposite(client);
+            Composite comp = toolkit.createComposite(fieldsComposite);
             comp.setLayout(new GridLayout());
             gd = new GridData();
             gd.horizontalSpan = 2;
@@ -263,37 +239,16 @@ public class AssignSamplesLocationEntryForm extends BiobankEntryForm {
             toolkit.createButton(comp, "Default sample", SWT.RADIO);
         }
 
-        scanButton = toolkit.createButton(client, "Scan", SWT.PUSH);
+        scanButton = toolkit.createButton(fieldsComposite, "Scan", SWT.PUSH);
+        gd = new GridData();
+        gd.horizontalSpan = 2;
+        scanButton.setLayoutData(gd);
         scanButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 scan();
             }
         });
-    }
-
-    private void createButtonsSection() {
-        Composite client = toolkit.createComposite(form.getBody());
-        int columns = 4;
-        GridLayout layout = new GridLayout(columns, false);
-        layout.horizontalSpacing = 10;
-        client.setLayout(layout);
-        toolkit.paintBordersFor(client);
-
-        // locateButton = toolkit
-        // .createButton(client, "Choose Location", SWT.PUSH);
-        // locateButton.setVisible(false);
-        // GridData gd = new GridData();
-        // gd.horizontalSpan = columns;
-        // locateButton.setLayoutData(gd);
-        // locateButton.addSelectionListener(new SelectionAdapter() {
-        // @Override
-        // public void widgetSelected(SelectionEvent e) {
-        // chooseLocation();
-        // }
-        // });
-
-        cancelConfirmWidget = new CancelConfirmWidget(client, this, true);
     }
 
     protected void chooseLocation() {
@@ -391,9 +346,9 @@ public class AssignSamplesLocationEntryForm extends BiobankEntryForm {
                         scanLaunchedValue.setValue(true);
                         setDirty(true);
 
-                        showAllContainers(true);
+                        // showAllContainers(true);
                     } else {
-                        showAllContainers(false);
+                        // showAllContainers(false);
                     }
                     scanButton.traverse(SWT.TRAVERSE_TAB_NEXT);
                     form.reflow(true);
@@ -417,8 +372,6 @@ public class AssignSamplesLocationEntryForm extends BiobankEntryForm {
         ((GridData) freezerLabel.getParent().getLayoutData()).exclude = show;
         hotelLabel.getParent().setVisible(!show);
         ((GridData) hotelLabel.getParent().getLayoutData()).exclude = show;
-        // locateButton.setVisible(show);
-        // ((GridData) locateButton.getLayoutData()).exclude = !show;
     }
 
     protected void showPalletPosition(Container pallet) {
@@ -546,7 +499,8 @@ public class AssignSamplesLocationEntryForm extends BiobankEntryForm {
                 .setTitle(sample.getPatientVisit().getPatient().getNumber());
             return true;
         } else {
-            Assert.isTrue(false, "InventoryId should be unique !");
+            Assert
+                .isTrue(false, "InventoryId " + value + " should be unique !");
             return false;
         }
     }
@@ -557,46 +511,34 @@ public class AssignSamplesLocationEntryForm extends BiobankEntryForm {
 
     @Override
     protected void saveForm() throws Exception {
-        BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
-            public void run() {
-                try {
-                    SDKQuery query;
-                    if (isNewPallet()) {
-                        query = new InsertExampleQuery(currentPallet);
-                        SDKQueryResult res = appService.executeQuery(query);
-                        currentPallet = (Container) res.getObjectResult();
-                    }
+        SDKQuery query;
+        if (isNewPallet()) {
+            query = new InsertExampleQuery(currentPallet);
+            SDKQueryResult res = appService.executeQuery(query);
+            currentPallet = (Container) res.getObjectResult();
+        }
 
-                    List<SDKQuery> queries = new ArrayList<SDKQuery>();
-                    for (int i = 0; i < cells.length; i++) {
-                        for (int j = 0; j < cells[i].length; j++) {
-                            PalletCell cell = cells[i][j];
-                            // cell.getStatus()
-                            if (cell != null) {
-                                Sample sample = cell.getSample();
-                                if (sample != null
-                                    && sample.getSamplePosition() == null) {
-                                    SamplePosition samplePosition = new SamplePosition();
-                                    samplePosition.setPositionDimensionOne(i);
-                                    samplePosition.setPositionDimensionTwo(j);
-                                    samplePosition.setContainer(currentPallet);
-                                    samplePosition.setSample(sample);
-                                    sample.setSamplePosition(samplePosition);
-                                    queries.add(new UpdateExampleQuery(sample));
-                                }
-                            }
-                        }
+        List<SDKQuery> queries = new ArrayList<SDKQuery>();
+        for (int i = 0; i < cells.length; i++) {
+            for (int j = 0; j < cells[i].length; j++) {
+                PalletCell cell = cells[i][j];
+                // cell.getStatus()
+                if (cell != null) {
+                    Sample sample = cell.getSample();
+                    if (sample != null && sample.getSamplePosition() == null) {
+                        SamplePosition samplePosition = new SamplePosition();
+                        samplePosition.setPositionDimensionOne(i);
+                        samplePosition.setPositionDimensionTwo(j);
+                        samplePosition.setContainer(currentPallet);
+                        samplePosition.setSample(sample);
+                        sample.setSamplePosition(samplePosition);
+                        queries.add(new UpdateExampleQuery(sample));
                     }
-                    appService.executeBatchQuery(queries);
-                    activityToPrint = true;
-                } catch (RemoteConnectFailureException exp) {
-                    BioBankPlugin.openRemoteConnectErrorMessage();
-                } catch (Exception e) {
-                    SessionManager.getLogger().error(
-                        "Error when saving pallet location", e);
                 }
             }
-        });
+        }
+        appService.executeBatchQuery(queries);
+        setSaved(true);
     }
 
     @Override
@@ -614,14 +556,11 @@ public class AssignSamplesLocationEntryForm extends BiobankEntryForm {
     protected void handleStatusChanged(IStatus status) {
         if (status.getSeverity() == IStatus.OK) {
             form.setMessage(getOkMessage(), IMessageProvider.NONE);
-            confirmAndNextButton.setEnabled(true);
-            confirmAndClose.setEnabled(true);
+            cancelConfirmWidget.setConfirmEnabled(true);
             scanButton.setEnabled(true);
-            locateButton.setEnabled(true);
         } else {
             form.setMessage(status.getMessage(), IMessageProvider.ERROR);
-            confirmAndNextButton.setEnabled(false);
-            confirmAndClose.setEnabled(false);
+            cancelConfirmWidget.setConfirmEnabled(true);
             if (!BioBankPlugin.getDefault().isValidPlateBarcode(
                 plateToScanText.getText())) {
                 scanButton.setEnabled(false);
@@ -629,7 +568,6 @@ public class AssignSamplesLocationEntryForm extends BiobankEntryForm {
                 scanButton.setEnabled(!palletCodeText.getText().isEmpty()
                     && !palletPositionText.getText().isEmpty());
             }
-            locateButton.setEnabled((Boolean) scanValidValue.getValue());
         }
     }
 
@@ -684,44 +622,15 @@ public class AssignSamplesLocationEntryForm extends BiobankEntryForm {
         return true;
     }
 
-    private void saveAndNext() {
-        testDisposeOn = false;
-        doSaveInternal();
-        getSite().getPage().closeEditor(AssignSamplesLocationEntryForm.this,
-            false);
-        AdapterBase.openForm(new FormInput(sessionAdapter),
-            AssignSamplesLocationEntryForm.ID);
-    }
-
-    private void saveAndClose() {
-        testDisposeOn = true;
-        doSaveInternal();
-        getSite().getPage().closeEditor(AssignSamplesLocationEntryForm.this,
-            false);
-        // Node node = sessionAdapter.accept(new NodeSearchVisitor(
-        // Container.class, currentPallet.getId()));
-        // if (node != null) {
-        // SessionManager.getInstance().getTreeViewer().setSelection(
-        // new StructuredSelection(node));
-        // }
-        // node.performDoubleClick();
-    }
-
-    private void print() {
-        if (BioBankPlugin.isAskPrint()) {
-            boolean doPrint = MessageDialog.openQuestion(PlatformUI
-                .getWorkbench().getActiveWorkbenchWindow().getShell(), "Print",
-                "Do you want to print information ?");
-            if (doPrint) {
-                // FIXME implement print functionnality
-            }
-        }
-        activityToPrint = false;
+    @Override
+    public String getNextOpenedFormID() {
+        return ID;
     }
 
     @Override
-    public String getNextOpenedFormID() {
-        return null;
+    protected void print() {
+        // FIXME implement print functionnality
+        System.out.println("PRINT activity");
     }
 
 }

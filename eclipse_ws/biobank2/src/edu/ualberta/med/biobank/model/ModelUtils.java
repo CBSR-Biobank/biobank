@@ -93,20 +93,6 @@ public class ModelUtils {
         }
     }
 
-    public static ContainerType getBinType(WritableApplicationService appService) {
-        ContainerType type = new ContainerType();
-        type.setName("Bin");
-        List<ContainerType> types;
-        try {
-            types = appService.search(ContainerType.class, type);
-            if (types.size() == 1) {
-                return types.get(0);
-            }
-        } catch (ApplicationException e) {
-        }
-        return null;
-    }
-
     public static Container getContainerWithLabel(
         WritableApplicationService appService, String barcode, String type)
         throws Exception {
