@@ -71,7 +71,7 @@ public class SampleStorageEntryWidget extends BiobankWidget {
         setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         sampleStorageTable = new SampleStorageInfoTable(parent,
-            this.selectedSampleStorage);
+            selectedSampleStorage);
         sampleStorageTable.adaptToToolkit(toolkit);
         addTableMenu();
 
@@ -86,7 +86,7 @@ public class SampleStorageEntryWidget extends BiobankWidget {
         });
     }
 
-    public void addOrEditSampleStorage(boolean add,
+    private void addOrEditSampleStorage(boolean add,
         SampleStorage sampleStorage, Set<SampleType> availSampleTypes) {
         SampleStorageDialog dlg = new SampleStorageDialog(PlatformUI
             .getWorkbench().getActiveWorkbenchWindow().getShell(),

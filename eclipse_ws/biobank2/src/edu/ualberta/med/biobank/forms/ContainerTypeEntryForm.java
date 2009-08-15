@@ -39,9 +39,9 @@ import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.validators.DoubleNumber;
 import edu.ualberta.med.biobank.validators.IntegerNumber;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
-import edu.ualberta.med.biobank.widgets.MultiSelect;
+import edu.ualberta.med.biobank.widgets.MultiSelectWidget;
 import edu.ualberta.med.biobank.widgets.listener.MultiSelectEvent;
-import edu.ualberta.med.biobank.widgets.listener.MultiSelectListener;
+import edu.ualberta.med.biobank.widgets.listener.BiobankEntryFormWidgetListener;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.query.SDKQuery;
 import gov.nih.nci.system.query.SDKQueryResult;
@@ -70,9 +70,9 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
 
     private Capacity capacity;
 
-    private MultiSelect samplesMultiSelect;
+    private MultiSelectWidget samplesMultiSelect;
 
-    private MultiSelect childContainerTypesMultiSelect;
+    private MultiSelectWidget childContainerTypesMultiSelect;
 
     private List<SampleType> allSampleDerivTypes;
 
@@ -80,13 +80,13 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
 
     private Site site;
 
-    private MultiSelectListener multiSelectListener;
+    private BiobankEntryFormWidgetListener multiSelectListener;
 
     private ComboViewer labelingSchemeComboViewer;
 
     public ContainerTypeEntryForm() {
         super();
-        multiSelectListener = new MultiSelectListener() {
+        multiSelectListener = new BiobankEntryFormWidgetListener() {
             @Override
             public void selectionChanged(MultiSelectEvent event) {
                 setDirty(true);
@@ -222,7 +222,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         allSampleDerivTypes = helper.getModelObjects(appService,
             SampleType.class);
 
-        samplesMultiSelect = new MultiSelect(client, SWT.NONE,
+        samplesMultiSelect = new MultiSelectWidget(client, SWT.NONE,
             "Selected Sample Derivatives", "Available Sample Derivatives", 100);
         samplesMultiSelect.adaptToToolkit(toolkit);
         samplesMultiSelect.addSelectionChangedListener(multiSelectListener);
@@ -249,7 +249,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         GridLayout layout = (GridLayout) client.getLayout();
         layout.numColumns = 2;
 
-        childContainerTypesMultiSelect = new MultiSelect(client, SWT.NONE,
+        childContainerTypesMultiSelect = new MultiSelectWidget(client, SWT.NONE,
             "Selected Container Types", "Available Container Types", 100);
         childContainerTypesMultiSelect.adaptToToolkit(toolkit);
         childContainerTypesMultiSelect

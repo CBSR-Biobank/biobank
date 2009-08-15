@@ -25,15 +25,18 @@ import edu.ualberta.med.biobank.model.ModelUtils;
 import edu.ualberta.med.biobank.model.PvInfo;
 import edu.ualberta.med.biobank.model.PvInfoPossible;
 import edu.ualberta.med.biobank.model.PvInfoType;
+import edu.ualberta.med.biobank.model.SampleSource;
 import edu.ualberta.med.biobank.model.SampleStorage;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
-import edu.ualberta.med.biobank.widgets.MultiSelect;
+import edu.ualberta.med.biobank.widgets.MultiSelectWidget;
 import edu.ualberta.med.biobank.widgets.PvInfoWidget;
 import edu.ualberta.med.biobank.widgets.SampleStorageEntryWidget;
+import edu.ualberta.med.biobank.widgets.listener.MultiSelectEvent;
+import edu.ualberta.med.biobank.widgets.listener.BiobankEntryFormWidgetListener;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.query.SDKQuery;
 import gov.nih.nci.system.query.SDKQueryResult;
@@ -66,8 +69,6 @@ public class StudyEntryForm extends BiobankEntryForm {
         }
     };
 
-    private MultiSelect clinicsMultiSelect;
-
     private StudyAdapter studyAdapter;
 
     private Study study;
@@ -75,6 +76,12 @@ public class StudyEntryForm extends BiobankEntryForm {
     private Site site;
 
     private Collection<Clinic> allClinics;
+
+    private MultiSelectWidget clinicsMultiSelect;
+
+    private Collection<SampleSource> allSampleSources;
+
+    private MultiSelectWidget sampleSourceMultiSelect;
 
     private Collection<PvInfoPossible> possiblePvInfos;
 
@@ -135,6 +142,7 @@ public class StudyEntryForm extends BiobankEntryForm {
 
         createClinicSection();
         createSampleStorageSection();
+        createSourceVesselsSection();
         createPvInfoSection();
         createButtonsSection();
     }
@@ -157,10 +165,17 @@ public class StudyEntryForm extends BiobankEntryForm {
             availClinics.put(clinic.getId(), clinic.getName());
         }
 
-        clinicsMultiSelect = new MultiSelect(client, SWT.NONE,
+        clinicsMultiSelect = new MultiSelectWidget(client, SWT.NONE,
             "Selected Clinics", "Available Clinics", 100);
         clinicsMultiSelect.adaptToToolkit(toolkit);
         clinicsMultiSelect.addSelections(availClinics, selClinics);
+        clinicsMultiSelect
+            .addSelectionChangedListener(new BiobankEntryFormWidgetListener() {
+                @Override
+                public void selectionChanged(MultiSelectEvent event) {
+                    setDirty(true);
+                }
+            });
     }
 
     private void createSampleStorageSection() {
@@ -172,6 +187,46 @@ public class StudyEntryForm extends BiobankEntryForm {
 
         sampleStorageEntryWidget = new SampleStorageEntryWidget(client,
             SWT.NONE, study.getSampleStorageCollection(), toolkit);
+    }
+
+    private void createSourceVesselsSection() {
+        try {
+            Composite client = createSectionWithClient("Source Vessels");
+            Collection<SampleSource> studySampleSources = study
+                .getSampleSourceCollection();
+            allSampleSources = appService.search(SampleSource.class,
+                new SampleSource());
+
+            ListOrderedMap availSampleSource = new ListOrderedMap();
+            List<Integer> selSampleSource = new ArrayList<Integer>();
+
+            if (studySampleSources != null) {
+                for (SampleSource ss : studySampleSources) {
+                    selSampleSource.add(ss.getId());
+                }
+            }
+
+            for (SampleSource ss : allSampleSources) {
+                availSampleSource.put(ss.getId(), ss.getName());
+            }
+
+            sampleSourceMultiSelect = new MultiSelectWidget(client, SWT.NONE,
+                "Selected Source Vessels", "Available Source Vessels", 100);
+            sampleSourceMultiSelect.adaptToToolkit(toolkit);
+            sampleSourceMultiSelect.addSelections(availSampleSource,
+                selSampleSource);
+            sampleSourceMultiSelect
+                .addSelectionChangedListener(new BiobankEntryFormWidgetListener() {
+                    @Override
+                    public void selectionChanged(MultiSelectEvent event) {
+                        setDirty(true);
+                    }
+                });
+        } catch (final RemoteConnectFailureException exp) {
+            BioBankPlugin.openRemoteConnectErrorMessage();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void createPvInfoSection() {
@@ -261,17 +316,30 @@ public class StudyEntryForm extends BiobankEntryForm {
 
         // get the selected clinics from widget
         List<Integer> selClinicIds = clinicsMultiSelect.getSelected();
-        Set<Clinic> selClinics = new HashSet<Clinic>();
+        Collection<Clinic> selClinics = new HashSet<Clinic>();
         for (Clinic clinic : allClinics) {
             int id = clinic.getId();
             if (selClinicIds.indexOf(id) >= 0) {
                 selClinics.add(clinic);
             }
-
         }
         Assert.isTrue(selClinics.size() == selClinicIds.size(),
             "problem with clinic selections");
         study.setClinicCollection(selClinics);
+
+        // get the selected sample sources from widget
+        List<Integer> selSampleSourceIds = sampleSourceMultiSelect
+            .getSelected();
+        Collection<SampleSource> selSampleSource = new HashSet<SampleSource>();
+        for (SampleSource ss : allSampleSources) {
+            int id = ss.getId();
+            if (selSampleSourceIds.indexOf(id) >= 0) {
+                selSampleSource.add(ss);
+            }
+        }
+        Assert.isTrue(selSampleSource.size() == selSampleSourceIds.size(),
+            "problem with sample source selections");
+        study.setSampleSourceCollection(selSampleSource);
 
         List<PvInfo> pvInfoList = new ArrayList<PvInfo>();
         MapIterator it = combinedPvInfoMap.mapIterator();

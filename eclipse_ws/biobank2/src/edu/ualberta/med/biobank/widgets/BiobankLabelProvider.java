@@ -18,6 +18,7 @@ import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.PvInfo;
 import edu.ualberta.med.biobank.model.Sample;
+import edu.ualberta.med.biobank.model.SampleSource;
 import edu.ualberta.med.biobank.model.SampleStorage;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.StudyClinicInfo;
@@ -185,9 +186,15 @@ public class BiobankLabelProvider extends LabelProvider implements
                     return "" + info.patientVisits;
                 return "";
             }
-
+        } else if (element instanceof SampleSource) {
+            SampleSource info = (SampleSource) element;
+            if (columnIndex == 0) {
+                return info.getName();
+            } else {
+                Assert.isTrue(false, "invalid column index: " + columnIndex);
+            }
         } else {
-            Assert.isTrue(false, "invalid object type");
+            Assert.isTrue(false, "invalid object type: " + element.getClass());
         }
         return "";
     }
