@@ -129,7 +129,6 @@
             name="Patient administration">
       </command>
       <command
-            defaultHandler="edu.ualberta.med.biobank.handlers.MainAdministrationHandler"
             id="edu.ualberta.med.biobank.commands.mainAdmin"
             name="Main Administration">
       </command>
@@ -137,18 +136,6 @@
             id="edu.ualberta.med.biobank.category.patientsAdmin"
             name="Patients Administration">
       </category>
-      <command
-            categoryId="edu.ualberta.med.biobank.category.patientsAdmin"
-            defaultHandler="edu.ualberta.med.biobank.handlers.ScanLinkHandler"
-            id="edu.ualberta.med.biobank.commands.patients.scanLink"
-            name="Scan Link">
-      </command>
-      <command
-            categoryId="edu.ualberta.med.biobank.category.patientsAdmin"
-            defaultHandler="edu.ualberta.med.biobank.handlers.DefaultLinkHandler"
-            id="edu.ualberta.med.biobank.commands.patients.defaultLink"
-            name="Default Link">
-      </command>
       <command
             defaultHandler="edu.ualberta.med.biobank.handlers.ContainerTypeAddHandler"
             id="edu.ualberta.med.biobank.commands.addContainerType"
@@ -158,6 +145,21 @@
             defaultHandler="edu.ualberta.med.biobank.handlers.ContainerAddHandler"
             id="edu.ualberta.med.biobank.commands.addContainer"
             name="Add Container">
+      </command>
+      <command
+            defaultHandler="edu.ualberta.med.biobank.handlers.OpenPatientFormHandler"
+            id="edu.ualberta.med.biobank.commands.patients.openPatientForm"
+            name="Open Patient Form">
+         <commandParameter
+               id="edu.ualberta.med.biobank.commands.patients.openPatientForm.editorId"
+               name="edu.ualberta.med.biobank.commands.patients.openPatientForm.editorId"
+               optional="true">
+         </commandParameter>
+         <commandParameter
+               id="edu.ualberta.med.biobank.commands.patients.openPatientForm.viewId"
+               name="edu.ualberta.med.biobank.commands.patients.openPatientForm.viewId"
+               optional="true">
+         </commandParameter>
       </command>
       <command
             id="edu.ualberta.med.biobank.commands.debug.initExamples"
@@ -188,79 +190,115 @@
             class="edu.ualberta.med.biobank.handlers.SiteAddHandler"
             commandId="edu.ualberta.med.biobank.commands.siteAdd">
          <activeWhen>
-            <reference
-                  definitionId="biobank2.loggedIn">
-            </reference>
+            <and>
+               <reference
+                     definitionId="biobank2.loggedIn">
+               </reference>
+               <reference
+                     definitionId="biobank2.mainPerpectiveSelected">
+               </reference>
+            </and>
          </activeWhen>
       </handler>
       <handler
             class="edu.ualberta.med.biobank.handlers.StudyAddHandler"
             commandId="edu.ualberta.med.biobank.commands.studyAdd">
          <activeWhen>
-            <reference
-                  definitionId="biobank2.loggedIn">
-            </reference>
+            <and>
+               <reference
+                     definitionId="biobank2.loggedIn">
+               </reference>
+               <reference
+                     definitionId="biobank2.mainPerpectiveSelected">
+               </reference>
+            </and>
          </activeWhen>
       </handler>
       <handler
             class="edu.ualberta.med.biobank.handlers.ClinicAddHandler"
             commandId="edu.ualberta.med.biobank.commands.clinicAdd">
          <activeWhen>
-            <reference
-                  definitionId="biobank2.loggedIn">
-            </reference>
+            <and>
+               <reference
+                     definitionId="biobank2.loggedIn">
+               </reference>
+               <reference
+                     definitionId="biobank2.mainPerpectiveSelected">
+               </reference>
+            </and>
          </activeWhen>
       </handler>
       <handler
             class="edu.ualberta.med.biobank.handlers.ContainerTypeAddHandler"
             commandId="edu.ualberta.med.biobank.commands.containerTypeAdd">
          <activeWhen>
-            <reference
-                  definitionId="biobank2.loggedIn">
-            </reference>
+            <and>
+               <reference
+                     definitionId="biobank2.loggedIn">
+               </reference>
+               <reference
+                     definitionId="biobank2.mainPerpectiveSelected">
+               </reference>
+            </and>
          </activeWhen>
       </handler>
       <handler
             class="edu.ualberta.med.biobank.handlers.ContainerAddHandler"
             commandId="edu.ualberta.med.biobank.commands.containerAdd">
          <activeWhen>
-            <reference
-                  definitionId="biobank2.loggedIn">
-            </reference>
+            <and>
+               <reference
+                     definitionId="biobank2.loggedIn">
+               </reference>
+               <reference
+                     definitionId="biobank2.mainPerpectiveSelected">
+               </reference>
+            </and>
          </activeWhen>
       </handler>
       <handler
-            class="edu.ualberta.med.biobank.handlers.ScanLinkHandler"
-            commandId="edu.ualberta.med.biobank.commands.patients.scanLink">
-         <activeWhen>
-            <reference
-                  definitionId="biobank2.patientsPerpectiveSelected">
-            </reference>
-         </activeWhen>
+            class="org.eclipse.ui.internal.handlers.NewEditorHandler"
+            commandId="org.eclipse.ui.window.newEditor">
          <enabledWhen>
-            <with
-                  variable="activePartId">
-               <equals
-                     value="edu.ualberta.med.biobank.views.patientsAdmin">
-               </equals>
-            </with>
+            <and>
+               <with
+                  variable="activeEditor">
+                  <instanceof
+                     value="org.eclipse.ui.IEditorPart">
+                  </instanceof>
+               </with>
+               <with
+                  variable="activeEditor">
+                  <not>
+                     <instanceof
+                        value="edu.ualberta.med.biobank.forms.BiobankFormBase">
+                     </instanceof>
+                  </not>
+               </with>
+            </and>
          </enabledWhen>
       </handler>
       <handler
-            class="edu.ualberta.med.biobank.handlers.DefaultLinkHandler"
-            commandId="edu.ualberta.med.biobank.commands.patients.defaultLink">
-         <activeWhen>
+            class="edu.ualberta.med.biobank.handlers.MainAdministrationHandler"
+            commandId="edu.ualberta.med.biobank.commands.mainAdmin">
+         <enabledWhen>
+            <reference
+                  definitionId="biobank2.patientViewActive">
+            </reference>
+         </enabledWhen>
+      </handler>
+      <handler
+            class="edu.ualberta.med.biobank.handlers.OpenPatientFormHandler"
+            commandId="edu.ualberta.med.biobank.commands.patients.openPatientForm">
+                        <activeWhen>
             <reference
                   definitionId="biobank2.patientsPerpectiveSelected">
             </reference>
          </activeWhen>
          <enabledWhen>
-            <with
-                  variable="activePartId">
-               <equals
-                     value="edu.ualberta.med.biobank.views.patientsAdmin">
-               </equals>
-            </with>
+            <reference
+                  definitionId="biobank2.patientViewActive">
+            </reference>
          </enabledWhen>
       </handler>
       <handler
@@ -326,7 +364,7 @@
                <command
                      commandId="edu.ualberta.med.biobank.commands.clinicAdd"
                      id="edu.ualberta.med.biobank.menu.clinicAdd"
-                     label="Add Study"
+                     label="Add Clinic"
                      style="push">
                </command>
                <command
@@ -341,6 +379,12 @@
                      label="Add Container"
                      style="push">
                </command>
+               <visibleWhen
+                     checkEnabled="false">
+                  <reference
+                        definitionId="biobank2.mainPerpectiveSelected">
+                  </reference>
+               </visibleWhen>
             </menu>
             <command
                   commandId="edu.ualberta.med.biobank.commands.search"
@@ -452,7 +496,7 @@
                </visibleWhen>
             </command>
             <command
-                  commandId="edu.ualberta.med.biobank.commands.patients.scanLink"
+                  commandId="edu.ualberta.med.biobank.commands.patients.openPatientForm"
                   icon="icons/scanLink.png"
                   label="Scan Link"
                   style="push">
@@ -462,11 +506,15 @@
                         definitionId="biobank2.patientsPerpectiveSelected">
                   </reference>
                </visibleWhen>
+               <parameter
+                     name="edu.ualberta.med.biobank.commands.patients.openPatientForm.editorId"
+                     value="edu.ualberta.med.biobank.forms.ScanLinkEntryForm">
+               </parameter>
             </command>
             <command
-                  commandId="edu.ualberta.med.biobank.commands.patients.defaultLink"
+                  commandId="edu.ualberta.med.biobank.commands.patients.openPatientForm"
                   icon="icons/defaultLink.png"
-                  label="Default link"
+                  label="Cabinet Link/Assign"
                   style="push">
                <visibleWhen
                      checkEnabled="false">
@@ -474,7 +522,27 @@
                         definitionId="biobank2.patientsPerpectiveSelected">
                   </reference>
                </visibleWhen>
-            </command>            
+               <parameter
+                     name="edu.ualberta.med.biobank.commands.patients.openPatientForm.editorId"
+                     value="edu.ualberta.med.biobank.forms.CabinetLinkAssignEntryForm">
+               </parameter>
+            </command>
+            <command
+                  commandId="edu.ualberta.med.biobank.commands.patients.openPatientForm"
+                  icon="icons/scanAssign.png"
+                  label="Scan Assign"
+                  style="push">
+               <visibleWhen
+                     checkEnabled="false">
+                  <reference
+                        definitionId="biobank2.patientsPerpectiveSelected">
+                  </reference>
+               </visibleWhen>
+               <parameter
+                     name="edu.ualberta.med.biobank.commands.patients.openPatientForm.editorId"
+                     value="edu.ualberta.med.biobank.forms.AssignSamplesLocationEntryForm">
+               </parameter>
+            </command>
          </toolbar>
       </menuContribution>
    </extension>
@@ -622,10 +690,11 @@
             name="Assign Samples Location Entry">
       </editor>
       <editor
-            class="edu.ualberta.med.biobank.forms.AddCabinetSampleEntryForm"
+            class="edu.ualberta.med.biobank.forms.CabinetLinkAssignEntryForm"
             default="false"
-            id="edu.ualberta.med.biobank.forms.AddCabinetSampleEntryForm"
-            name="Add Cabinet Samples Entry">
+            icon="icons/defaultLink.png"
+            id="edu.ualberta.med.biobank.forms.CabinetLinkAssignEntryForm"
+            name="Cabinet Link/Assign Entry ">
       </editor>
       <editor
             class="edu.ualberta.med.biobank.forms.SampleViewForm"
@@ -735,7 +804,7 @@
          </with>
       </definition>
       <definition
-            id="biobank2.debugState">
+        id="biobank2.debugState">
          <with
                variable="edu.ualberta.med.biobank.sourceprovider.debugState">
             <equals
@@ -752,5 +821,26 @@
             </equals>
          </with>
       </definition>
+      <definition
+            id="biobank2.patientViewActive">
+         <with
+               variable="activePartId">
+            <equals
+                  value="edu.ualberta.med.biobank.views.patientsAdmin">
+            </equals>
+         </with>
+      </definition>
+   </extension>
+   <extension
+         point="org.eclipse.ui.activities">
+      <activity
+            id="biobank2.activity.neweditor"
+            name="Activity for New Editor action">
+      </activity>
+      <activityPatternBinding
+            activityId="biobank2.activity.neweditor"
+            isEqualityPattern="true"
+            pattern="org.eclipse.ui/org.eclipse.ui.window.newEditor">
+      </activityPatternBinding>
    </extension>
 </plugin>

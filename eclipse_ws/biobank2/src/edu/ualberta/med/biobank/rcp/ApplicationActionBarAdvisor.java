@@ -17,14 +17,14 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
     @Override
     protected void makeActions(IWorkbenchWindow window) {
-        // resetPerspective(window);
+        resetPerspective(window);
     }
 
     protected void resetPerspective(IWorkbenchWindow window) {
-        IWorkbenchAction quickStartAction = ActionFactory.INTRO.create(window);
-        register(quickStartAction);
-        IWorkbenchAction resetView = ActionFactory.RESET_PERSPECTIVE
-            .create(window);
+        // IWorkbenchAction quickStartAction =
+        // ActionFactory.INTRO.create(window);
+        // register(quickStartAction);
+        IWorkbenchAction resetView = ActionFactory.NEW_EDITOR.create(window);
         register(resetView);
     }
 
