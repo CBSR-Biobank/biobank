@@ -13,8 +13,6 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
-import edu.ualberta.med.biobank.forms.CabinetLinkAssignEntryForm;
-import edu.ualberta.med.biobank.forms.ScanLinkEntryForm;
 import edu.ualberta.med.biobank.forms.PatientVisitEntryForm;
 import edu.ualberta.med.biobank.forms.PatientVisitViewForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
@@ -88,32 +86,6 @@ public class PatientVisitAdapter extends AdapterBase {
             public void widgetSelected(SelectionEvent event) {
                 openForm(new FormInput(PatientVisitAdapter.this),
                     PatientVisitViewForm.ID);
-            }
-
-            public void widgetDefaultSelected(SelectionEvent e) {
-            }
-        });
-
-        mi = new MenuItem(menu, SWT.PUSH);
-        mi.setText("Add Pallet Samples");
-        mi.addSelectionListener(new SelectionListener() {
-            public void widgetSelected(SelectionEvent event) {
-                closeScannersEditors();
-                openForm(new FormInput(PatientVisitAdapter.this),
-                    ScanLinkEntryForm.ID);
-            }
-
-            public void widgetDefaultSelected(SelectionEvent e) {
-            }
-        });
-
-        mi = new MenuItem(menu, SWT.PUSH);
-        mi.setText("Add Cabinet Sample");
-        mi.addSelectionListener(new SelectionListener() {
-            public void widgetSelected(SelectionEvent event) {
-                closeCabinetsEditors();
-                openForm(new FormInput(PatientVisitAdapter.this),
-                    CabinetLinkAssignEntryForm.ID);
             }
 
             public void widgetDefaultSelected(SelectionEvent e) {

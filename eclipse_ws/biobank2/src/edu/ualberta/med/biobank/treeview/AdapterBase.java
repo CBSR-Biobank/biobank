@@ -9,15 +9,11 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.IEditorPart;
-import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.forms.CabinetLinkAssignEntryForm;
-import edu.ualberta.med.biobank.forms.ScanLinkEntryForm;
-import edu.ualberta.med.biobank.forms.AssignSamplesLocationEntryForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
@@ -276,35 +272,8 @@ public abstract class AdapterBase {
             PlatformUI.getWorkbench().getActiveWorkbenchWindow()
                 .getActivePage().openEditor(input, id, true);
         } catch (PartInitException e) {
-            // handle error
-            e.printStackTrace();
-        }
-    }
-
-    public void closeScannersEditors() {
-        IWorkbenchPage page = PlatformUI.getWorkbench()
-            .getActiveWorkbenchWindow().getActivePage();
-
-        IEditorReference[] editors = page.getEditorReferences();
-        for (IEditorReference editorRef : editors) {
-            IEditorPart editor = editorRef.getEditor(false);
-            if (editor != null
-                && (editor instanceof ScanLinkEntryForm || editor instanceof AssignSamplesLocationEntryForm)) {
-                page.closeEditor(editor, true);
-            }
-        }
-    }
-
-    protected void closeCabinetsEditors() {
-        IWorkbenchPage page = PlatformUI.getWorkbench()
-            .getActiveWorkbenchWindow().getActivePage();
-
-        IEditorReference[] editors = page.getEditorReferences();
-        for (IEditorReference editorRef : editors) {
-            IEditorPart editor = editorRef.getEditor(false);
-            if (editor != null && editor instanceof CabinetLinkAssignEntryForm) {
-                page.closeEditor(editor, true);
-            }
+            SessionManager.getLogger()
+                .error("Can't open form with id " + id, e);
         }
     }
 

@@ -513,22 +513,6 @@
             </command>
             <command
                   commandId="edu.ualberta.med.biobank.commands.patients.openPatientForm"
-                  icon="icons/defaultLink.png"
-                  label="Cabinet Link/Assign"
-                  style="push">
-               <visibleWhen
-                     checkEnabled="false">
-                  <reference
-                        definitionId="biobank2.patientsPerpectiveSelected">
-                  </reference>
-               </visibleWhen>
-               <parameter
-                     name="edu.ualberta.med.biobank.commands.patients.openPatientForm.editorId"
-                     value="edu.ualberta.med.biobank.forms.CabinetLinkAssignEntryForm">
-               </parameter>
-            </command>
-            <command
-                  commandId="edu.ualberta.med.biobank.commands.patients.openPatientForm"
                   icon="icons/scanAssign.png"
                   label="Scan Assign"
                   style="push">
@@ -541,6 +525,22 @@
                <parameter
                      name="edu.ualberta.med.biobank.commands.patients.openPatientForm.editorId"
                      value="edu.ualberta.med.biobank.forms.AssignSamplesLocationEntryForm">
+               </parameter>
+            </command>
+            <command
+                  commandId="edu.ualberta.med.biobank.commands.patients.openPatientForm"
+                  icon="icons/defaultLink.png"
+                  label="Cabinet Link/Assign"
+                  style="push">
+               <visibleWhen
+                     checkEnabled="false">
+                  <reference
+                        definitionId="biobank2.patientsPerpectiveSelected">
+                  </reference>
+               </visibleWhen>
+               <parameter
+                     name="edu.ualberta.med.biobank.commands.patients.openPatientForm.editorId"
+                     value="edu.ualberta.med.biobank.forms.CabinetLinkAssignEntryForm">
                </parameter>
             </command>
          </toolbar>
@@ -581,8 +581,8 @@
                id="edu.ualberta.med.biobank.views.patientsAdmin"
                minimized="false"
                moveable="false"
-               ratio="0.95"
-               relationship="top"
+               ratio="0.20"
+               relationship="left"
                relative="org.eclipse.ui.editorss"
                showTitle="false"
                standalone="false"

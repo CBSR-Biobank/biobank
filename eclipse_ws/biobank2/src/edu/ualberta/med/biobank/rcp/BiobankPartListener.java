@@ -33,7 +33,7 @@ public class BiobankPartListener implements IPartListener {
                         .getActiveWorkbenchWindow().getActivePage();
                     if (activePage != null) {
                         activePage.showView(PatientAdministrationView.ID);
-                        activePage.setEditorAreaVisible(false);
+                        // activePage.setEditorAreaVisible(false);
                     }
                 } catch (PartInitException e) {
                     SessionManager.getLogger().error(

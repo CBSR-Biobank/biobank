@@ -583,14 +583,6 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (o instanceof ScanLinkEntryForm) {
-            return true;
-        }
-        return super.equals(o);
-    }
-
-    @Override
     protected void print() {
         // FIXME implement print functionality
         System.out.println("PRINT ACTIVITY");

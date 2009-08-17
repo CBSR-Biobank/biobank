@@ -6,17 +6,12 @@ import java.util.concurrent.Semaphore;
 import org.apache.log4j.Logger;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
-import org.eclipse.jface.viewers.ITreeViewerListener;
 import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.jface.viewers.TreeExpansionEvent;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.MenuItem;
-import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.services.ISourceProviderService;
@@ -29,7 +24,6 @@ import edu.ualberta.med.biobank.treeview.RootNode;
 import edu.ualberta.med.biobank.treeview.SessionAdapter;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.views.SessionsView;
-import edu.ualberta.med.biobank.views.TreeFilter;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class SessionManager {
@@ -98,50 +92,9 @@ public class SessionManager {
         return doubleClickListener;
     }
 
-    private ITreeViewerListener treeViewerListener = new ITreeViewerListener() {
-        @Override
-        public void treeCollapsed(TreeExpansionEvent e) {
-        }
-
-        @Override
-        public void treeExpanded(TreeExpansionEvent e) {
-            ((AdapterBase) e.getElement()).performExpand();
-        }
-    };
-
-    /*
-     * Pop-up menu for the tree viewer.
-     */
-    private Listener treeViewMenuListener = new Listener() {
-        @Override
-        public void handleEvent(Event event) {
-            TreeViewer tv = view.getTreeViewer();
-            Tree tree = tv.getTree();
-            Menu menu = tree.getMenu();
-
-            for (MenuItem menuItem : menu.getItems()) {
-                menuItem.dispose();
-            }
-
-            Object element = ((StructuredSelection) tv.getSelection())
-                .getFirstElement();
-            if (element != null) {
-                ((AdapterBase) element).popupMenu(tv, tree, menu);
-            }
-        }
-    };
-
     private SessionManager() {
         super();
         rootNode = RootNode.getRootNode();
-    }
-
-    public ITreeViewerListener getTreeViewerListener() {
-        return treeViewerListener;
-    }
-
-    public Listener getTreeViewerMenuListener() {
-        return treeViewMenuListener;
     }
 
     public static SessionManager getInstance() {
@@ -250,9 +203,9 @@ public class SessionManager {
         return view.getTreeViewer();
     }
 
-    public TreeFilter getTreeFilter() {
-        return view.getFilter();
-    }
+    // public TreeFilter getTreeFilter() {
+    // return view.getFilter();
+    // }
 
     public static Logger getLogger() {
         return log4j;

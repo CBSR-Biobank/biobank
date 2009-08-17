@@ -9,7 +9,7 @@ public class PatientsAdministrationPerspective implements IPerspectiveFactory {
 
     @Override
     public void createInitialLayout(IPageLayout layout) {
-        layout.setEditorAreaVisible(false);
+        // layout.setEditorAreaVisible(false);
     }
 
 }
