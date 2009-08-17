@@ -17,6 +17,8 @@ public class BiobankPerspectiveListener extends PerspectiveAdapter {
     public void perspectiveDeactivated(IWorkbenchPage page,
         IPerspectiveDescriptor perspective) {
         if (perspective.getId().equals(PatientsAdministrationPerspective.ID)) {
+            // close all the editors opened in the patient perspective when the
+            // perspective is left
             for (IEditorReference ref : page.getEditorReferences()) {
                 IEditorPart part = ref.getEditor(false);
                 if (part != null) {
