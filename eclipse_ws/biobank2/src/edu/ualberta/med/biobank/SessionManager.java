@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Semaphore;
 
@@ -22,6 +23,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.services.ISourceProviderService;
 
 import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.rcp.SiteCombo;
 import edu.ualberta.med.biobank.sourceproviders.DebugState;
 import edu.ualberta.med.biobank.sourceproviders.SessionState;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
@@ -30,6 +32,7 @@ import edu.ualberta.med.biobank.treeview.SessionAdapter;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.views.SessionsView;
 import edu.ualberta.med.biobank.views.TreeFilter;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class SessionManager {
@@ -49,6 +52,16 @@ public class SessionManager {
     private final Semaphore timeoutSem = new Semaphore(100, true);
 
     final int TIME_OUT = 900000;
+
+    Site currentSite;
+
+    public void setCurrentSite(Site site) {
+        currentSite = site;
+    }
+
+    public Site getCurrentSite() {
+        return currentSite;
+    }
 
     final Runnable timeoutRunnable = new Runnable() {
         public void run() {
@@ -130,6 +143,8 @@ public class SessionManager {
             }
         }
     };
+
+    private SiteCombo siteCombo;
 
     private SessionManager() {
         super();
@@ -240,6 +255,23 @@ public class SessionManager {
             .getSourceProvider(DebugState.SESSION_STATE);
         debugStateSourceProvider.setState(BioBankPlugin.getDefault()
             .isDebugging());
+
+        List<Site> sites = new ArrayList<Site>();
+        if (sessionAdapter != null) {
+            try {
+                sites = sessionAdapter.getAppService().search(Site.class,
+                    new Site());
+            } catch (ApplicationException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+        siteCombo.loadChildren(sites);
+
+    }
+
+    public void setCombo(SiteCombo combo) {
+        this.siteCombo = combo;
     }
 
     public SessionAdapter getSession() {
