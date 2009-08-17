@@ -23,6 +23,7 @@ import org.eclipse.swt.widgets.Text;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.LabelingScheme;
 import edu.ualberta.med.biobank.RowColPos;
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.ContainerType;
@@ -70,7 +71,7 @@ public class ContainerEntryForm extends BiobankEntryForm {
                 + adapter.getClass().getName());
         containerAdapter = (ContainerAdapter) adapter;
         container = containerAdapter.getContainer();
-        site = containerAdapter.getSite();
+        site = SessionManager.getInstance().getCurrentSite();
         position = container.getPosition();
 
         if (position != null) {

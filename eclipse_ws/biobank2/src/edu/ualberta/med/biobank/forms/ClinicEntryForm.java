@@ -14,11 +14,11 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.treeview.ClinicAdapter;
-import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.query.SDKQuery;
@@ -147,9 +147,7 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
     @Override
     public void saveForm() throws Exception {
         clinic.setAddress(address);
-        SiteAdapter siteAdapter = (SiteAdapter) clinicAdapter
-            .getParentFromClass(SiteAdapter.class);
-        clinic.setSite(siteAdapter.getSite());
+        clinic.setSite(SessionManager.getInstance().getCurrentSite());
 
         SDKQuery query;
         SDKQueryResult result;
@@ -185,8 +183,7 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
     }
 
     private boolean checkClinicNameUnique() throws ApplicationException {
-        Site site = ((SiteAdapter) clinicAdapter
-            .getParentFromClass(SiteAdapter.class)).getSite();
+        Site site = SessionManager.getInstance().getCurrentSite();
 
         HQLCriteria c = new HQLCriteria(
             "from edu.ualberta.med.biobank.model.Clinic as clinic "

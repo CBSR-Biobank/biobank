@@ -37,7 +37,6 @@ import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.ContainerTypeAdapter;
-import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.validators.DoubleNumber;
 import edu.ualberta.med.biobank.validators.IntegerNumber;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
@@ -110,8 +109,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
 
         containerTypeAdapter = (ContainerTypeAdapter) adapter;
         containerType = containerTypeAdapter.getContainerType();
-        site = ((SiteAdapter) containerTypeAdapter
-            .getParentFromClass(SiteAdapter.class)).getSite();
+        site = SessionManager.getInstance().getCurrentSite();
         allContainerTypes = site.getContainerTypeCollection();
 
         String tabName;
