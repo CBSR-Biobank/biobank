@@ -18,15 +18,12 @@ import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.PvInfo;
 import edu.ualberta.med.biobank.model.Sample;
+import edu.ualberta.med.biobank.model.SampleSource;
 import edu.ualberta.med.biobank.model.SampleStorage;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.StudyClinicInfo;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
-import edu.ualberta.med.biobank.treeview.ClinicAdapter;
-import edu.ualberta.med.biobank.treeview.ContainerTypeAdapter;
-import edu.ualberta.med.biobank.treeview.PatientAdapter;
-import edu.ualberta.med.biobank.treeview.PatientVisitAdapter;
-import edu.ualberta.med.biobank.treeview.StudyAdapter;
+import edu.ualberta.med.biobank.widgets.infotables.BiobankCollectionModel;
 
 /**
  * This code must not run in the UI thread.
@@ -42,8 +39,8 @@ public class BiobankLabelProvider extends LabelProvider implements
 
     @Override
     public String getColumnText(Object element, int columnIndex) {
-        if (element instanceof StudyAdapter) {
-            final Study study = ((StudyAdapter) element).getStudy();
+        if (element instanceof Study) {
+            final Study study = (Study) element;
             switch (columnIndex) {
             case 0:
                 return study.getName();
@@ -52,25 +49,23 @@ public class BiobankLabelProvider extends LabelProvider implements
             case 2:
                 return "" + study.getPatientCollection().size();
             }
-        } else if (element instanceof ClinicAdapter) {
-            final ClinicAdapter clinicAdapter = (ClinicAdapter) element;
+        } else if (element instanceof Clinic) {
+            final Clinic clinic = (Clinic) element;
             switch (columnIndex) {
             case 0:
-                return clinicAdapter.getName();
+                return clinic.getName();
             case 1:
-                return ""
-                    + clinicAdapter.getClinic().getStudyCollection().size();
+                return "" + clinic.getStudyCollection().size();
             }
-        } else if (element instanceof PatientAdapter) {
-            final Patient patient = ((PatientAdapter) element).getPatient();
+        } else if (element instanceof Patient) {
+            final Patient patient = (Patient) element;
             switch (columnIndex) {
             case 0:
                 return patient.getNumber();
             }
-        } else if (element instanceof PatientVisitAdapter) {
+        } else if (element instanceof PatientVisit) {
             SimpleDateFormat sdf;
-            final PatientVisit visit = ((PatientVisitAdapter) element)
-                .getPatientVisit();
+            final PatientVisit visit = (PatientVisit) element;
             switch (columnIndex) {
             case 0:
                 sdf = new SimpleDateFormat(BioBankPlugin.DATE_FORMAT);
@@ -78,15 +73,15 @@ public class BiobankLabelProvider extends LabelProvider implements
             case 1:
                 return "" + visit.getSampleCollection().size();
             }
-        } else if (element instanceof ContainerTypeAdapter) {
-            final ContainerTypeAdapter adapter = (ContainerTypeAdapter) element;
+        } else if (element instanceof ContainerType) {
+            final ContainerType ct = (ContainerType) element;
             switch (columnIndex) {
             case 0:
-                return adapter.getName();
+                return ct.getName();
             case 1:
-                return adapter.getContainerType().getActivityStatus();
+                return ct.getActivityStatus();
             case 2:
-                return "" + adapter.getContainerType().getDefaultTemperature();
+                return "" + ct.getDefaultTemperature();
             }
         } else if (element instanceof PvInfo) {
             final PvInfo pvInfo = (PvInfo) element;
@@ -185,9 +180,15 @@ public class BiobankLabelProvider extends LabelProvider implements
                     return "" + info.patientVisits;
                 return "";
             }
-
+        } else if (element instanceof SampleSource) {
+            SampleSource info = (SampleSource) element;
+            if (columnIndex == 0) {
+                return info.getName();
+            } else {
+                Assert.isTrue(false, "invalid column index: " + columnIndex);
+            }
         } else {
-            Assert.isTrue(false, "invalid object type");
+            Assert.isTrue(false, "invalid object type: " + element.getClass());
         }
         return "";
     }

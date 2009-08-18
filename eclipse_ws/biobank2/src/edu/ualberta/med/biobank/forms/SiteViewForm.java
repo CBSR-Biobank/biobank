@@ -27,7 +27,10 @@ import edu.ualberta.med.biobank.treeview.ClinicAdapter;
 import edu.ualberta.med.biobank.treeview.ContainerTypeAdapter;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
-import edu.ualberta.med.biobank.widgets.BiobankCollectionTable;
+import edu.ualberta.med.biobank.widgets.infotables.ClinicInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.ContainerInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.ContainerTypeInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.StudyInfoTable;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class SiteViewForm extends AddressViewFormCommon {
@@ -37,10 +40,10 @@ public class SiteViewForm extends AddressViewFormCommon {
 
     private Site site;
 
-    private BiobankCollectionTable studiesTable;
-    private BiobankCollectionTable clinicsTable;
-    private BiobankCollectionTable containerTypesTable;
-    private BiobankCollectionTable sContainersTable;
+    private StudyInfoTable studiesTable;
+    private ClinicInfoTable clinicsTable;
+    private ContainerTypeInfoTable containerTypesTable;
+    private ContainerInfoTable sContainersTable;
 
     private Label activityStatusLabel;
 
@@ -70,7 +73,7 @@ public class SiteViewForm extends AddressViewFormCommon {
         createAddressSection();
         createStudySection();
         clinicsTable = FormUtils.createClinicSection(toolkit, form.getBody(),
-            siteAdapter.getClinicGroupNode(), site.getClinicCollection());
+            site.getClinicCollection());
         createContainerTypesSection();
         createContainerSection();
         createButtons();
@@ -97,15 +100,10 @@ public class SiteViewForm extends AddressViewFormCommon {
     private void createStudySection() {
         Composite client = createSectionWithClient("Studies");
 
-        String[] headings = new String[] { "Name", "Short Name",
-            "Num. Patients" };
-        studiesTable = new BiobankCollectionTable(client, SWT.NONE, headings,
-            getStudiesAdapters());
-        studiesTable.adaptToToolkit(toolkit);
-        toolkit.paintBordersFor(studiesTable);
-
-        studiesTable.getTableViewer().addDoubleClickListener(
-            FormUtils.getBiobankCollectionDoubleClickListener());
+        studiesTable = new StudyInfoTable(client, site.getStudyCollection());
+        studiesTable.adaptToToolkit(toolkit, true);
+        studiesTable.addDoubleClickListener(FormUtils
+            .getBiobankCollectionDoubleClickListener());
     }
 
     private StudyAdapter[] getStudiesAdapters() {
@@ -123,15 +121,12 @@ public class SiteViewForm extends AddressViewFormCommon {
     private void createContainerTypesSection() {
         Composite client = createSectionWithClient("Container Types");
 
-        String[] headings = new String[] { "Name", "Status",
-            "Default Temperature" };
-        containerTypesTable = new BiobankCollectionTable(client, SWT.NONE,
-            headings, getContainerTypesAdapters());
-        containerTypesTable.adaptToToolkit(toolkit);
-        toolkit.paintBordersFor(containerTypesTable);
+        containerTypesTable = new ContainerTypeInfoTable(client, site
+            .getContainerTypeCollection());
+        containerTypesTable.adaptToToolkit(toolkit, true);
 
-        containerTypesTable.getTableViewer().addDoubleClickListener(
-            FormUtils.getBiobankCollectionDoubleClickListener());
+        containerTypesTable.addDoubleClickListener(FormUtils
+            .getBiobankCollectionDoubleClickListener());
 
     }
 
@@ -152,16 +147,14 @@ public class SiteViewForm extends AddressViewFormCommon {
     private void createContainerSection() {
         Section section = createSection("Containers");
 
-        String[] headings = new String[] { "Name", "Status", "Bar Code",
-            "Full", "Temperature" };
-        sContainersTable = new BiobankCollectionTable(section, SWT.NONE,
-            headings, getContainers());
+        sContainersTable = new ContainerInfoTable(section, site
+            .getContainerCollection());
         section.setClient(sContainersTable);
-        sContainersTable.adaptToToolkit(toolkit);
+        sContainersTable.adaptToToolkit(toolkit, true);
         toolkit.paintBordersFor(sContainersTable);
 
-        sContainersTable.getTableViewer().addDoubleClickListener(
-            FormUtils.getBiobankCollectionDoubleClickListener());
+        sContainersTable.addDoubleClickListener(FormUtils
+            .getBiobankCollectionDoubleClickListener());
     }
 
     private Container[] getContainers() {

@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?eclipse version="3.2"?>
 <plugin>
    <extension
          id="biobank2"
@@ -126,6 +125,10 @@
             id="edu.ualberta.med.biobank.commands.containerAdd"
             name="Add Container">
       </command>
+      <command
+      		id="edu.ualberta.med.biobank.commands.editSampleTypes"
+      		name="Edit Sample Types">
+      		</command>
       <command
             defaultHandler="edu.ualberta.med.biobank.handlers.SearchHandler"
             id="edu.ualberta.med.biobank.commands.search"
@@ -256,6 +259,15 @@
                      definitionId="biobank2.mainPerpectiveSelected">
                </reference>
             </and>
+         </activeWhen>
+      </handler>
+      <handler
+            class="edu.ualberta.med.biobank.handlers.EditSampleTypesHandler"
+            commandId="edu.ualberta.med.biobank.commands.editSampleTypes">
+         <activeWhen>
+            <reference
+                  definitionId="biobank2.loggedIn">
+            </reference>
          </activeWhen>
       </handler>
       <handler
@@ -393,6 +405,12 @@
                      commandId="edu.ualberta.med.biobank.commands.containerAdd"
                      id="edu.ualberta.med.biobank.menu.containerAdd"
                      label="Add Container"
+                     style="push">
+               </command>
+                <command
+                     commandId="edu.ualberta.med.biobank.commands.editSampleTypes"
+                     id="edu.ualberta.med.biobank.menu.editSampleTypes"
+                     label="Edit Sample Types"
                      style="push">
                </command>
                <visibleWhen
@@ -729,6 +747,12 @@
             default="false"
             id="edu.ualberta.med.biobank.forms.SampleViewForm"
             name="Sample View">
+      </editor>
+      <editor
+            class="edu.ualberta.med.biobank.forms.SampleTypesEntryForm"
+            default="false"
+            id="edu.ualberta.med.biobank.forms.SampleTypesEntryForm"
+            name="Edit Sample Types">
       </editor>
    </extension>
    <extension

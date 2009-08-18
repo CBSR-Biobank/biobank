@@ -1,19 +1,15 @@
 package edu.ualberta.med.biobank.forms;
 
-import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.model.Patient;
-import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.treeview.PatientAdapter;
-import edu.ualberta.med.biobank.treeview.PatientVisitAdapter;
-import edu.ualberta.med.biobank.widgets.BiobankCollectionTable;
+import edu.ualberta.med.biobank.widgets.infotables.PatientVisitInfoTable;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class PatientViewForm extends BiobankViewForm {
@@ -23,7 +19,7 @@ public class PatientViewForm extends BiobankViewForm {
 
     private Patient patient;
 
-    private BiobankCollectionTable visitsTable;
+    private PatientVisitInfoTable visitsTable;
 
     @Override
     public void init() {
@@ -63,29 +59,12 @@ public class PatientViewForm extends BiobankViewForm {
     private void createPatientVisitSection() {
         Section section = createSection("Patient Visits");
 
-        String[] headings = new String[] { "Visit Number", "Num Samples" };
-        visitsTable = new BiobankCollectionTable(section, SWT.NONE, headings,
-            getPatientVisitAdapters());
+        visitsTable = new PatientVisitInfoTable(section, patient
+            .getPatientVisitCollection());
         section.setClient(visitsTable);
-        visitsTable.adaptToToolkit(toolkit);
-        toolkit.paintBordersFor(visitsTable);
-
+        visitsTable.adaptToToolkit(toolkit, true);
         visitsTable.getTableViewer().addDoubleClickListener(
             FormUtils.getBiobankCollectionDoubleClickListener());
-    }
-
-    private PatientVisitAdapter[] getPatientVisitAdapters() {
-        // hack required here because xxx.getXxxxCollection().toArray(new
-        // Xxx[0])
-        // returns Object[].
-        int count = 0;
-        Collection<PatientVisit> visits = patient.getPatientVisitCollection();
-        PatientVisitAdapter[] arr = new PatientVisitAdapter[visits.size()];
-        for (PatientVisit visit : visits) {
-            arr[count] = new PatientVisitAdapter(patientAdapter, visit);
-            ++count;
-        }
-        return arr;
     }
 
     @Override
@@ -94,6 +73,6 @@ public class PatientViewForm extends BiobankViewForm {
         setPartName("Patient " + patient.getNumber());
         form.setText("Patient: " + patient.getNumber());
         // FormUtils.setTextValue(patientNumberLabel, patient.getNumber());
-        visitsTable.getTableViewer().setInput(getPatientVisitAdapters());
+        visitsTable.setCollection(patient.getPatientVisitCollection());
     }
 }

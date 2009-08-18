@@ -26,7 +26,7 @@ import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.PatientVisitAdapter;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
-import edu.ualberta.med.biobank.widgets.SamplesListWidget;
+import edu.ualberta.med.biobank.widgets.infotables.SamplesListWidget;
 
 public class PatientVisitViewForm extends BiobankViewForm {
 
