@@ -1,13 +1,10 @@
-package edu.ualberta.med.biobank.widgets;
+package edu.ualberta.med.biobank.widgets.infotables;
 
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.jface.viewers.DoubleClickEvent;
-import org.eclipse.jface.viewers.IDoubleClickListener;
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.model.Clinic;
@@ -18,7 +15,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
-public class ClinicStudyInfoTable extends BiobankCollectionTable {
+public class ClinicStudyInfoTable extends InfoTableWidget<Study> {
 
     private static final String[] headings = new String[] { "Study",
         "No. Patients", "No. Patient Visits" };
@@ -34,26 +31,14 @@ public class ClinicStudyInfoTable extends BiobankCollectionTable {
 
     public ClinicStudyInfoTable(Composite parent,
         WritableApplicationService appService, Clinic clinic) {
-        super(parent, SWT.NONE, headings, bounds, null);
+        super(parent, null, headings, bounds);
         this.appService = appService;
         this.clinic = clinic;
-        int size = clinic.getStudyCollection().size();
-
-        model = new ArrayList<BiobankCollectionModel>();
-        for (int i = 0; i < size; ++i) {
-            model.add(new BiobankCollectionModel());
-        }
-
-        getTableViewer().setInput(model);
-        getTableViewer().addDoubleClickListener(new IDoubleClickListener() {
-            @Override
-            public void doubleClick(DoubleClickEvent event) {
-            }
-        });
-        setClinicInfo();
+        setCollection(clinic.getStudyCollection());
     }
 
-    public void setClinicInfo() {
+    @Override
+    public void setCollection(final Collection<Study> collection) {
         Thread t = new Thread() {
             @Override
             public void run() {
@@ -99,17 +84,17 @@ public class ClinicStudyInfoTable extends BiobankCollectionTable {
                         Assert.isTrue(results.size() == 1,
                             "Invalid size for HQL query");
                         info.patientVisits = results.get(0);
-
-                        getTableViewer().getTable().getDisplay().asyncExec(
-                            new Runnable() {
-
-                                public void run() {
-                                    getTableViewer().refresh();
-                                }
-
-                            });
                         ++count;
                     }
+
+                    getTableViewer().getTable().getDisplay().asyncExec(
+                        new Runnable() {
+
+                            public void run() {
+                                getTableViewer().refresh();
+                            }
+
+                        });
                 } catch (ApplicationException e) {
                     e.printStackTrace();
                 }

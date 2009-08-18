@@ -17,16 +17,14 @@ import org.eclipse.ui.forms.widgets.Section;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.ModelUtils;
-import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.PvInfo;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
-import edu.ualberta.med.biobank.treeview.PatientAdapter;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
-import edu.ualberta.med.biobank.widgets.BiobankCollectionTable;
-import edu.ualberta.med.biobank.widgets.SampleStorageInfoTable;
-import edu.ualberta.med.biobank.widgets.StudyClinicInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.SampleSourceInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.SampleStorageInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.StudyClinicInfoTable;
 
 public class StudyViewForm extends BiobankViewForm {
 
@@ -39,9 +37,11 @@ public class StudyViewForm extends BiobankViewForm {
     private Label activityStatusLabel;
     private Label commentLabel;
 
-    private BiobankCollectionTable clinicsTable;
+    private StudyClinicInfoTable clinicsTable;
     private SampleStorageInfoTable sampleStorageTable;
-    private BiobankCollectionTable pvInfosTable;
+    private SampleSourceInfoTable sampleSourceTable;
+
+    // private BiobankCollectionTable pvInfosTable;
 
     @Override
     public void init() {
@@ -84,6 +84,7 @@ public class StudyViewForm extends BiobankViewForm {
         setStudySectionValues();
         createClinicSection();
         createSampleStorageSection();
+        createSampleSourceSection();
         createPvDataSection();
 
         final Button edit = toolkit.createButton(client,
@@ -106,7 +107,7 @@ public class StudyViewForm extends BiobankViewForm {
         Composite client = createSectionWithClient("Clinics");
 
         clinicsTable = new StudyClinicInfoTable(client, appService, study);
-        clinicsTable.adaptToToolkit(toolkit);
+        clinicsTable.adaptToToolkit(toolkit, true);
         toolkit.paintBordersFor(clinicsTable);
 
         clinicsTable.getTableViewer().addDoubleClickListener(
@@ -125,36 +126,35 @@ public class StudyViewForm extends BiobankViewForm {
         sampleStorageTable = new SampleStorageInfoTable(section, study
             .getSampleStorageCollection());
         section.setClient(sampleStorageTable);
-        sampleStorageTable.adaptToToolkit(toolkit);
+        sampleStorageTable.adaptToToolkit(toolkit, true);
         toolkit.paintBordersFor(sampleStorageTable);
     }
 
-    private PatientAdapter[] getPatientAdapters() {
-        // hack required here because xxx.getXxxxCollection().toArray(new
-        // Xxx[0])
-        // returns Object[].
-        int count = 0;
-        Collection<Patient> patients = study.getPatientCollection();
-        PatientAdapter[] arr = new PatientAdapter[patients.size()];
-        for (Patient patient : patients) {
-            arr[count] = new PatientAdapter(studyAdapter, patient);
-            ++count;
-        }
-        return arr;
+    private void createSampleSourceSection() {
+        Section section = createSection("Source Vessels");
+        sampleSourceTable = new SampleSourceInfoTable(section, study
+            .getSampleSourceCollection());
+        section.setClient(sampleSourceTable);
+        sampleStorageTable.adaptToToolkit(toolkit, true);
+        toolkit.paintBordersFor(sampleStorageTable);
     }
 
     private void createPvDataSection() {
         Section section = createSection("Patient Visit Information Collected");
 
-        String[] headings = new String[] { "Name", "Valid Values (optional)" };
-        pvInfosTable = new BiobankCollectionTable(section, SWT.NONE, headings,
-            getStudyPvInfo());
-        section.setClient(pvInfosTable);
-        pvInfosTable.adaptToToolkit(toolkit);
-        toolkit.paintBordersFor(pvInfosTable);
-
-        pvInfosTable.getTableViewer().addDoubleClickListener(
-            FormUtils.getBiobankCollectionDoubleClickListener());
+        // FIXME this information can be displayed in a better way
+        //
+        // String[] headings = new String[] { "Name", "Valid Values (optional)"
+        // };
+        // pvInfosTable = new BiobankCollectionTable(section, SWT.NONE,
+        // headings,
+        // getStudyPvInfo());
+        // section.setClient(pvInfosTable);
+        // pvInfosTable.adaptToToolkit(toolkit, true);
+        // toolkit.paintBordersFor(pvInfosTable);
+        //
+        // pvInfosTable.getTableViewer().addDoubleClickListener(
+        // FormUtils.getBiobankCollectionDoubleClickListener());
     }
 
     private PvInfo[] getStudyPvInfo() {
@@ -186,7 +186,7 @@ public class StudyViewForm extends BiobankViewForm {
         clinicsTable.getTableViewer().setInput(
             FormUtils.getClinicsAdapters(clinicGroupNode, study
                 .getClinicCollection()));
-        pvInfosTable.getTableViewer().setInput(getStudyPvInfo());
+        // pvInfosTable.getTableViewer().setInput(getStudyPvInfo());
     }
 
     private void retrieveStudy() {

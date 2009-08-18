@@ -12,9 +12,9 @@ import org.eclipse.swt.dnd.TransferData;
  */
 public class TreeViewerDropListener extends ViewerDropAdapter {
 
-	private MultiSelect multiSelect;
+	private MultiSelectWidget multiSelect;
 
-	public TreeViewerDropListener(TreeViewer viewer, MultiSelect multiSelect) {
+	public TreeViewerDropListener(TreeViewer viewer, MultiSelectWidget multiSelect) {
 		super(viewer);
 		this.multiSelect = multiSelect;
 
@@ -26,7 +26,7 @@ public class TreeViewerDropListener extends ViewerDropAdapter {
 	public boolean performDrop(Object data) {
 		boolean result = true;
 
-		MultiSelect.log4j.trace("performDrop: event: " + data.toString());
+		MultiSelectWidget.log4j.trace("performDrop: event: " + data.toString());
 		MultiSelectNode target = (MultiSelectNode) getCurrentTarget();
 		if (target == null)
 			target = (MultiSelectNode) getViewer().getInput();
@@ -36,18 +36,18 @@ public class TreeViewerDropListener extends ViewerDropAdapter {
 		TreeViewer viewer = (TreeViewer) getViewer();
 
 		for (MultiSelectNode node : nodes) {
-			MultiSelect.log4j.trace("target: " + target + ", node_parent: "
+			MultiSelectWidget.log4j.trace("target: " + target + ", node_parent: "
 					+ node.getParent());
 
 			if (target.getParent() == null) {
 				target.addChild(node);
 
-				MultiSelect.log4j.trace("added " + node.getName() + " to "
+				MultiSelectWidget.log4j.trace("added " + node.getName() + " to "
 						+ target.getName());
 			} else {
 				target.getParent().insertAfter(target, node);
 
-				MultiSelect.log4j.trace("inserted " + node.getName()
+				MultiSelectWidget.log4j.trace("inserted " + node.getName()
 						+ " after " + target.getName() + " on "
 						+ target.getParent().getName());
 			}

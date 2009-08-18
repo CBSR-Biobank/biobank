@@ -16,7 +16,7 @@ INSERT INTO `PV_INFO_TYPE` VALUES
        ( 3,'date_time'),
        ( 4,'select_single'),
        ( 5,'select_multiple'),
-       ( 6,'select_single_and_quantity_1_5_1');
+       ( 6,'select_single');
 UNLOCK TABLES;
 
 LOCK TABLES `PV_INFO_POSSIBLE` WRITE;
@@ -25,12 +25,10 @@ INSERT INTO `PV_INFO_POSSIBLE` VALUES
        ( 2,'Clinic Shipped Date',b'0',3),
        ( 3,'Date Received',b'0',3),
        ( 4,'Date Processed',b'0',3),
-       ( 5,'Aliquot Volume',b'0',4),
-       ( 6,'Blood Received',b'0',6),
-       ( 7,'Consent',b'0',5),
-       ( 8,'PBMC Count',b'0',1),
-       ( 9,'Biopsy Length',b'0',1),
-       (10,'Worksheet',b'0',2),
+       ( 5,'Consent',b'0',5),
+       ( 6,'PBMC Count',b'0',1),
+       ( 7,'Biopsy Length',b'0',1),
+       ( 8,'Worksheet',b'0',2),
        -- comments should be last
        (11,'Comments',b'0',2);
 UNLOCK TABLES;

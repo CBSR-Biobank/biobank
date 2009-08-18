@@ -151,7 +151,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
             .getDateDrawn());
         dateDrawn.addSelectionListener(selectionListener);
         dateDrawn.addModifyListener(modifyListener);
-        dateDrawn.adaptToToolkit(toolkit);
+        dateDrawn.adaptToToolkit(toolkit, true);
 
         study = ((StudyAdapter) patientVisitAdapter
             .getParentFromClass(StudyAdapter.class)).getStudy();
@@ -222,7 +222,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
                 DateTimeWidget w = new DateTimeWidget(client, SWT.NONE, date);
                 w.addSelectionListener(selectionListener);
                 w.addModifyListener(modifyListener);
-                w.adaptToToolkit(toolkit);
+                w.adaptToToolkit(toolkit, true);
                 combinedPvInfo.control = w;
                 break;
 
@@ -234,7 +234,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
             case 5: // select_multiple
                 SelectMultiple s = new SelectMultiple(client, SWT.BORDER,
                     pvalArr);
-                s.adaptToToolkit(toolkit);
+                s.adaptToToolkit(toolkit, true);
                 if (value != null) {
                     s.setSelections(value.split(";"));
                 }
@@ -243,7 +243,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
 
             case 6: // select_single_and_quantity_1_5_1
                 ComboAndQuantity c = new ComboAndQuantity(client, SWT.BORDER);
-                c.adaptToToolkit(toolkit);
+                c.adaptToToolkit(toolkit, true);
                 if (pvalArr != null) {
                     c.addValues(pvalArr);
                 }

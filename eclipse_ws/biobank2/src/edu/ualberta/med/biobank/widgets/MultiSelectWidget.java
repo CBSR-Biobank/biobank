@@ -1,4 +1,3 @@
-
 package edu.ualberta.med.biobank.widgets;
 
 import java.util.ArrayList;
@@ -15,12 +14,10 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 
 import edu.ualberta.med.biobank.forms.FormUtils;
-import edu.ualberta.med.biobank.widgets.listener.MultiSelectEvent;
-import edu.ualberta.med.biobank.widgets.listener.MultiSelectListener;
 
-public class MultiSelect extends BiobankWidget {
+public class MultiSelectWidget extends BiobankWidget {
 
-    static Logger log4j = Logger.getLogger(MultiSelect.class.getName());
+    static Logger log4j = Logger.getLogger(MultiSelectWidget.class.getName());
 
     private TreeViewer selTree;
 
@@ -34,12 +31,9 @@ public class MultiSelect extends BiobankWidget {
 
     private int minHeight;
 
-    List<MultiSelectListener> listeners;
-
-    public MultiSelect(Composite parent, int style, String leftLabel,
+    public MultiSelectWidget(Composite parent, int style, String leftLabel,
         String rightLabel, int minHeight) {
         super(parent, style);
-        listeners = new ArrayList<MultiSelectListener>();
 
         this.minHeight = minHeight;
 
@@ -94,8 +88,7 @@ public class MultiSelect extends BiobankWidget {
             if (selected.contains(key)) {
                 selTreeRootNode.addChild(new MultiSelectNode(selTreeRootNode,
                     key, (String) it.getValue()));
-            }
-            else {
+            } else {
                 availTreeRootNode.addChild(new MultiSelectNode(
                     availTreeRootNode, key, (String) it.getValue()));
             }
@@ -112,23 +105,5 @@ public class MultiSelect extends BiobankWidget {
             result.add(node.getId());
         }
         return result;
-    }
-
-    public void addSelectionChangedListener(MultiSelectListener listener) {
-        listeners.add(listener);
-    }
-
-    public void removeSelectionChangedListener(MultiSelectListener listener) {
-        listeners.remove(listener);
-    }
-
-    public void notifyListeners(MultiSelectEvent event) {
-        for (MultiSelectListener listener : listeners) {
-            listener.selectionChanged(event);
-        }
-    }
-
-    public void notifyListeners() {
-        notifyListeners(new MultiSelectEvent(this));
     }
 }

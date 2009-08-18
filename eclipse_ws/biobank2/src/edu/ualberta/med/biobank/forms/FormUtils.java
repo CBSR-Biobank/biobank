@@ -24,8 +24,8 @@ import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.ClinicStudyInfo;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.ClinicAdapter;
-import edu.ualberta.med.biobank.widgets.BiobankCollectionModel;
-import edu.ualberta.med.biobank.widgets.BiobankCollectionTable;
+import edu.ualberta.med.biobank.widgets.infotables.BiobankCollectionModel;
+import edu.ualberta.med.biobank.widgets.infotables.ClinicInfoTable;
 
 /**
  * Static methods for constructing the forms that allow the user to edit / view
@@ -74,56 +74,19 @@ public class FormUtils {
         return new Font(null, "sans-serif", 8, SWT.BOLD);
     }
 
-    public static BiobankCollectionTable createClinicSection(
-        FormToolkit toolkit, Composite parent,
-        final AdapterBase clinicGroupParent, final Collection<Clinic> clinics) {
+    public static ClinicInfoTable createClinicSection(FormToolkit toolkit,
+        Composite parent, final Collection<Clinic> clinics) {
         Section section = toolkit.createSection(parent, Section.TWISTIE
             | Section.TITLE_BAR | Section.EXPANDED);
         section.setText("Clinics");
         section.setLayout(new GridLayout(1, false));
         section.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-        final BiobankCollectionModel[] model = new BiobankCollectionModel[clinics
-            .size()];
-        for (int i = 0, n = clinics.size(); i < n; ++i) {
-            model[i] = new BiobankCollectionModel();
-        }
-
-        String[] headings = { "Name", "Num Studies" };
-        final BiobankCollectionTable comp = new BiobankCollectionTable(section,
-            SWT.NONE, headings, model);
+        final ClinicInfoTable comp = new ClinicInfoTable(section, clinics);
         section.setClient(comp);
-        comp.adaptToToolkit(toolkit);
-        toolkit.paintBordersFor(comp);
+        comp.adaptToToolkit(toolkit, true);
         comp.getTableViewer().addDoubleClickListener(
             getBiobankCollectionDoubleClickListener());
-
-        Thread t = new Thread() {
-            @Override
-            public void run() {
-                int count = 0;
-                for (Clinic clinic : clinics) {
-                    if (comp.getTableViewer().getTable().isDisposed()) {
-                        return;
-                    }
-                    final int j = count;
-                    final ClinicAdapter clinicAdapter = new ClinicAdapter(
-                        clinicGroupParent, clinic);
-                    comp.getTableViewer().getTable().getDisplay().asyncExec(
-                        new Runnable() {
-
-                            public void run() {
-                                model[j].o = clinicAdapter;
-                                comp.getTableViewer().update(model[j], null);
-                            }
-
-                        });
-                    ++count;
-                }
-            }
-        };
-        t.start();
-
         return comp;
     }
 

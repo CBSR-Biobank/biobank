@@ -85,8 +85,7 @@ public class CancelConfirmWidget extends BiobankWidget {
                 confirm();
             }
         });
-        form.getToolkit().adapt(this, true, true);
-        form.getToolkit().paintBordersFor(this);
+        adaptToToolkit(form.getToolkit(), true);
     }
 
     private void confirm() {
