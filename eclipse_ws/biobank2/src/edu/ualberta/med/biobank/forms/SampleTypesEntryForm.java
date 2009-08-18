@@ -2,39 +2,66 @@ package edu.ualberta.med.biobank.forms;
 
 import java.util.Collection;
 
-import edu.ualberta.med.biobank.SessionManager;
+import org.eclipse.ui.forms.widgets.Section;
+
 import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.treeview.SiteAdapter;
+import edu.ualberta.med.biobank.widgets.infotables.SampleTypeInfoTable;
 
-public class SampleTypesEntryForm extends BiobankViewForm {
+public class SampleTypesEntryForm extends BiobankEntryForm {
 
     public static final String ID = "edu.ualberta.med.biobank.forms.SampleTypesEntryForm";
 
     private Site site;
     private Collection<SampleType> sampleTypes;
 
+    private SampleTypeInfoTable sampleTypeTable;
+
     @Override
     public void init() {
-        site = SessionManager.getInstance().getCurrentSite();
+        SiteAdapter siteAdapter = (SiteAdapter) adapter;
+        site = siteAdapter.getSite();
         sampleTypes = site.getSampleTypeCollection();
-        createFormContent();
+
     }
 
     @Override
     protected void createFormContent() {
-        // form.setText("Sample: " + sample.getInventoryId());
-        // addRefreshToolbarAction();
-        // GridLayout layout = new GridLayout(1, false);
-        // form.getBody().setLayout(layout);
-        // form.getBody().setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        // createInformationSection();
+        createSampleStorageSection();
+    }
+
+    private void createSampleStorageSection() {
+        Section section = createSection("Sample Types");
+
+        sampleTypeTable = new SampleTypeInfoTable(section, sampleTypes);
+        section.setClient(sampleTypeTable);
+        sampleTypeTable.adaptToToolkit(toolkit, true);
+        toolkit.paintBordersFor(sampleTypeTable);
     }
 
     @Override
-    protected void reload() {
-        // retrieveSample();
-        // setPartName("Sample: " + sample.getInventoryId());
-        // form.setText("Sample: " + sample.getInventoryId());
+    public void cancelForm() {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public String getNextOpenedFormID() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    protected String getOkMessage() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    protected void saveForm() throws Exception {
+        // TODO Auto-generated method stub
+
     }
 
 }

@@ -34,13 +34,9 @@ import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.ContainerAdapter;
 import edu.ualberta.med.biobank.widgets.CabinetDrawerWidget;
 import edu.ualberta.med.biobank.widgets.ChooseContainerWidget;
-<<<<<<< HEAD
-import edu.ualberta.med.biobank.widgets.SamplesListWidget;
+import edu.ualberta.med.biobank.widgets.infotables.SamplesListWidget;
 import edu.ualberta.med.biobank.widgets.listener.ScanPalletModificationEvent;
 import edu.ualberta.med.biobank.widgets.listener.ScanPalletModificationListener;
-=======
-import edu.ualberta.med.biobank.widgets.infotables.SamplesListWidget;
->>>>>>> master
 
 public class ContainerViewForm extends BiobankViewForm {
 
