@@ -1,13 +1,18 @@
 package edu.ualberta.med.biobank.rcp;
 
+import org.eclipse.jface.action.ICoolBarManager;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IStatusLineManager;
+import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.StatusLineContributionItem;
+import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.actions.ActionFactory;
 import org.eclipse.ui.actions.ActionFactory.IWorkbenchAction;
 import org.eclipse.ui.application.ActionBarAdvisor;
 import org.eclipse.ui.application.IActionBarConfigurer;
+
+import edu.ualberta.med.biobank.SessionManager;
 
 public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
@@ -39,4 +44,17 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
         statusLine.add(slci);
     }
 
+    @Override
+    protected void fillCoolBar(ICoolBarManager coolBar) {
+        IToolBarManager toolbar = new ToolBarManager(coolBar.getStyle());
+
+        coolBar.add(toolbar);
+
+        SiteCombo combo = new SiteCombo("Site Selection");
+        SessionManager.getInstance().setCombo(combo);
+        combo.setParent(toolbar);
+
+        toolbar.add(combo);
+
+    }
 }

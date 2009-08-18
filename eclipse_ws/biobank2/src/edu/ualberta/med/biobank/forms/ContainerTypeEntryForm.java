@@ -16,6 +16,7 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -30,6 +31,7 @@ import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.helpers.GetHelper;
 import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
+import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.model.Site;
@@ -70,7 +72,9 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
 
     private Capacity capacity;
 
-    private MultiSelectWidget samplesMultiSelect;
+    private Button sampleBox;
+
+    private MultiSelect samplesMultiSelect;
 
     private MultiSelectWidget childContainerTypesMultiSelect;
 
@@ -90,6 +94,10 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
             @Override
             public void selectionChanged(MultiSelectEvent event) {
                 setDirty(true);
+                if (samplesMultiSelect.getSelected().size() == 0)
+                    sampleBox.setEnabled(true);
+                else
+                    sampleBox.setEnabled(false);
             }
         };
     }
@@ -139,7 +147,6 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
             client.setLayout(layout);
             client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
             toolkit.paintBordersFor(client);
-
             createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Name",
                 null, PojoObservables.observeValue(containerType, "name"),
                 NonEmptyString.class, MSG_NO_CONTAINER_TYPE_NAME);
@@ -211,9 +218,25 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
 
     private void createSampleDerivTypesSection() {
         Composite client = createSectionWithClient("Contains Sample Derivative Types");
+        sampleBox = new Button(client, SWT.CHECK);
         GridLayout layout = (GridLayout) client.getLayout();
         layout.numColumns = 2;
+        sampleBox.setText("Holds Samples");
+        sampleBox.setSelection(true);
+        sampleBox.addSelectionListener(new SelectionListener() {
+            public void widgetSelected(SelectionEvent event) {
+                samplesMultiSelect.setEnabled(!samplesMultiSelect.getEnabled());
+                samplesMultiSelect.setVisible(!samplesMultiSelect.getVisible());
+                form.reflow(true);
+            }
 
+            @Override
+            public void widgetDefaultSelected(SelectionEvent e) {
+            }
+        });
+        GridData gd = new GridData(GridData.VERTICAL_ALIGN_BEGINNING
+            | GridData.GRAB_HORIZONTAL);
+        sampleBox.setLayoutData(gd);
         Collection<SampleType> stSamplesTypes = containerType
             .getSampleTypeCollection();
 
@@ -226,7 +249,6 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
             "Selected Sample Derivatives", "Available Sample Derivatives", 100);
         samplesMultiSelect.adaptToToolkit(toolkit, true);
         samplesMultiSelect.addSelectionChangedListener(multiSelectListener);
-
         ListOrderedMap availSampleDerivTypes = new ListOrderedMap();
         List<Integer> selSampleDerivTypes = new ArrayList<Integer>();
 
@@ -248,11 +270,24 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         Composite client = createSectionWithClient("Contains Container Types");
         GridLayout layout = (GridLayout) client.getLayout();
         layout.numColumns = 2;
+        Button topBox = new Button(client, SWT.CHECK);
+        topBox.setText("Top Level Container");
+        GridData gd = new GridData(GridData.VERTICAL_ALIGN_BEGINNING
+            | GridData.GRAB_HORIZONTAL);
+        topBox.setLayoutData(gd);
+        topBox.setSelection(false);
+        topBox.addSelectionListener(new SelectionListener() {
+            public void widgetSelected(SelectionEvent event) {
+                // topLevel = true;
+            }
 
-        childContainerTypesMultiSelect = new MultiSelectWidget(client,
-            SWT.NONE, "Selected Container Types", "Available Container Types",
-            100);
-        childContainerTypesMultiSelect.adaptToToolkit(toolkit, true);
+            @Override
+            public void widgetDefaultSelected(SelectionEvent e) {
+            }
+        });
+        childContainerTypesMultiSelect = new MultiSelect(client, SWT.NONE,
+            "Selected Container Types", "Available Container Types", 100);
+        childContainerTypesMultiSelect.adaptToToolkit(toolkit);
         childContainerTypesMultiSelect
             .addSelectionChangedListener(multiSelectListener);
 
@@ -281,6 +316,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
             }
         childContainerTypesMultiSelect.addSelections(availContainerTypes,
             selChildContainerTypes);
+
     }
 
     protected void createButtons() {
@@ -460,15 +496,22 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
 
     private boolean HQLSafeToRemove(List<Integer> missing)
         throws ApplicationException {
-        String missingString = " where cp.container.id='"
-            + missing.get(0).toString() + "'";
+        String queryString = "from "
+            + ContainerPosition.class.getName()
+            + " as cp inner join cp.parentContainer as cparent"
+            + " where cparent.containerType.id=? and cp.container.containerType.id in (select id from "
+            + ContainerType.class.getName() + " as ct where ct.id=?";
+        List<Object> params = new ArrayList<Object>();
+        params.add(containerType.getId());
+        params.add(missing.get(0));
         for (int i = 1; i < missing.size(); i++) {
-            missingString += "OR cp.container.id='" + missing.get(i).toString()
-                + "'";
+            queryString += "OR ct.id=?";
+            params.add(missing.get(i));
         }
-        HQLCriteria c = new HQLCriteria(
-            "from edu.ualberta.biobank.model.ContainerPosition as cp inner join on cp.parentContainer.id='"
-                + containerType.getId() + "'" + missingString);
+        queryString += ")";
+
+        HQLCriteria c = new HQLCriteria(queryString);
+        c.setParameters(params);
         List<Object> results = appService.query(c);
         if (results.size() == 0)
             return true;
