@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Common
+Bundle-SymbolicName: biobank.common; singleton:=true
+Bundle-Version: 1.0.0
+Bundle-Activator: edu.ualberta.med.biobank.common.Activator
+Bundle-Vendor: AICML
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-ActivationPolicy: lazy
+Require-Bundle: org.eclipse.core.runtime;bundle-version="3.5.0"
