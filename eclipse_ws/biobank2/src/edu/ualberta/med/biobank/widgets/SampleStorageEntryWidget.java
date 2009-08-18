@@ -74,7 +74,7 @@ public class SampleStorageEntryWidget extends BiobankWidget {
 
         sampleStorageTable = new SampleStorageInfoTable(parent,
             selectedSampleStorage);
-        sampleStorageTable.adaptToToolkit(toolkit);
+        sampleStorageTable.adaptToToolkit(toolkit, true);
         addTableMenu();
         sampleStorageTable
             .addSelectionChangedListener(new BiobankEntryFormWidgetListener() {

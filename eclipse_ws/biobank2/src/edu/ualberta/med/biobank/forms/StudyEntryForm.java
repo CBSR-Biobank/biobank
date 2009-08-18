@@ -175,7 +175,7 @@ public class StudyEntryForm extends BiobankEntryForm {
 
         clinicsMultiSelect = new MultiSelectWidget(client, SWT.NONE,
             "Selected Clinics", "Available Clinics", 100);
-        clinicsMultiSelect.adaptToToolkit(toolkit);
+        clinicsMultiSelect.adaptToToolkit(toolkit, true);
         clinicsMultiSelect.addSelections(availClinics, selClinics);
         clinicsMultiSelect.addSelectionChangedListener(listener);
     }
@@ -215,7 +215,7 @@ public class StudyEntryForm extends BiobankEntryForm {
 
             sampleSourceMultiSelect = new MultiSelectWidget(client, SWT.NONE,
                 "Selected Source Vessels", "Available Source Vessels", 100);
-            sampleSourceMultiSelect.adaptToToolkit(toolkit);
+            sampleSourceMultiSelect.adaptToToolkit(toolkit, true);
             sampleSourceMultiSelect.addSelections(availSampleSource,
                 selSampleSource);
             sampleSourceMultiSelect.addSelectionChangedListener(listener);

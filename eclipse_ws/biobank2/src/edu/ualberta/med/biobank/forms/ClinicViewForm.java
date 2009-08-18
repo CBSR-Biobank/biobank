@@ -101,7 +101,7 @@ public class ClinicViewForm extends AddressViewFormCommon {
         Composite client = createSectionWithClient("Studies");
 
         studiesTable = new ClinicStudyInfoTable(client, appService, clinic);
-        studiesTable.adaptToToolkit(toolkit);
+        studiesTable.adaptToToolkit(toolkit, true);
         toolkit.paintBordersFor(studiesTable);
 
         studiesTable.getTableViewer().addDoubleClickListener(

@@ -19,9 +19,12 @@ public class BiobankWidget extends Composite {
         listeners = new ArrayList<BiobankEntryFormWidgetListener>();
     }
 
-    public void adaptToToolkit(FormToolkit toolkit) {
+    public void adaptToToolkit(FormToolkit toolkit, boolean paintBorder) {
         toolkit.adapt(this, true, true);
         adaptAllChildren(this, toolkit);
+        if (paintBorder) {
+            toolkit.paintBordersFor(this);
+        }
     }
 
     private void adaptAllChildren(Composite container, FormToolkit toolkit) {

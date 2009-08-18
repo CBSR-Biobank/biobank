@@ -11,7 +11,6 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
-import org.eclipse.ui.forms.widgets.FormToolkit;
 
 /**
  * Widget used to display tabular data. Used mostly by view forms.
@@ -72,13 +71,6 @@ public class BiobankCollectionTable extends BiobankWidget {
 
     public TableViewer getTableViewer() {
         return tableViewer;
-    }
-
-    public void adaptToToolkit(FormToolkit toolkit, boolean paintBorder) {
-        adaptToToolkit(toolkit);
-        if (paintBorder) {
-            toolkit.paintBordersFor(this);
-        }
     }
 
 }

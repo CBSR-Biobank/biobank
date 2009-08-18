@@ -101,7 +101,7 @@ public class SiteViewForm extends AddressViewFormCommon {
             "Num. Patients" };
         studiesTable = new BiobankCollectionTable(client, SWT.NONE, headings,
             getStudiesAdapters());
-        studiesTable.adaptToToolkit(toolkit);
+        studiesTable.adaptToToolkit(toolkit, true);
         toolkit.paintBordersFor(studiesTable);
 
         studiesTable.getTableViewer().addDoubleClickListener(
@@ -127,7 +127,7 @@ public class SiteViewForm extends AddressViewFormCommon {
             "Default Temperature" };
         containerTypesTable = new BiobankCollectionTable(client, SWT.NONE,
             headings, getContainerTypesAdapters());
-        containerTypesTable.adaptToToolkit(toolkit);
+        containerTypesTable.adaptToToolkit(toolkit, true);
         toolkit.paintBordersFor(containerTypesTable);
 
         containerTypesTable.getTableViewer().addDoubleClickListener(
@@ -157,7 +157,7 @@ public class SiteViewForm extends AddressViewFormCommon {
         sContainersTable = new BiobankCollectionTable(section, SWT.NONE,
             headings, getContainers());
         section.setClient(sContainersTable);
-        sContainersTable.adaptToToolkit(toolkit);
+        sContainersTable.adaptToToolkit(toolkit, true);
         toolkit.paintBordersFor(sContainersTable);
 
         sContainersTable.getTableViewer().addDoubleClickListener(

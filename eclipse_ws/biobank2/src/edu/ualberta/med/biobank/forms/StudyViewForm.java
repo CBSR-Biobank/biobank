@@ -106,7 +106,7 @@ public class StudyViewForm extends BiobankViewForm {
         Composite client = createSectionWithClient("Clinics");
 
         clinicsTable = new StudyClinicInfoTable(client, appService, study);
-        clinicsTable.adaptToToolkit(toolkit);
+        clinicsTable.adaptToToolkit(toolkit, true);
         toolkit.paintBordersFor(clinicsTable);
 
         clinicsTable.getTableViewer().addDoubleClickListener(
@@ -125,7 +125,7 @@ public class StudyViewForm extends BiobankViewForm {
         sampleStorageTable = new SampleStorageInfoTable(section, study
             .getSampleStorageCollection());
         section.setClient(sampleStorageTable);
-        sampleStorageTable.adaptToToolkit(toolkit);
+        sampleStorageTable.adaptToToolkit(toolkit, true);
         toolkit.paintBordersFor(sampleStorageTable);
     }
 
@@ -134,7 +134,7 @@ public class StudyViewForm extends BiobankViewForm {
         sampleSourceTable = new SampleSourceInfoTable(section, study
             .getSampleSourceCollection());
         section.setClient(sampleSourceTable);
-        sampleStorageTable.adaptToToolkit(toolkit);
+        sampleStorageTable.adaptToToolkit(toolkit, true);
         toolkit.paintBordersFor(sampleStorageTable);
     }
 
@@ -145,7 +145,7 @@ public class StudyViewForm extends BiobankViewForm {
         pvInfosTable = new BiobankCollectionTable(section, SWT.NONE, headings,
             getStudyPvInfo());
         section.setClient(pvInfosTable);
-        pvInfosTable.adaptToToolkit(toolkit);
+        pvInfosTable.adaptToToolkit(toolkit, true);
         toolkit.paintBordersFor(pvInfosTable);
 
         pvInfosTable.getTableViewer().addDoubleClickListener(

@@ -93,7 +93,7 @@ public class FormUtils {
         final BiobankCollectionTable comp = new BiobankCollectionTable(section,
             SWT.NONE, headings, model);
         section.setClient(comp);
-        comp.adaptToToolkit(toolkit);
+        comp.adaptToToolkit(toolkit, true);
         toolkit.paintBordersFor(comp);
         comp.getTableViewer().addDoubleClickListener(
             getBiobankCollectionDoubleClickListener());

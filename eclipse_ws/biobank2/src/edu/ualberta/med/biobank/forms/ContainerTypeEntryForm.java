@@ -40,8 +40,8 @@ import edu.ualberta.med.biobank.validators.DoubleNumber;
 import edu.ualberta.med.biobank.validators.IntegerNumber;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
 import edu.ualberta.med.biobank.widgets.MultiSelectWidget;
-import edu.ualberta.med.biobank.widgets.listener.MultiSelectEvent;
 import edu.ualberta.med.biobank.widgets.listener.BiobankEntryFormWidgetListener;
+import edu.ualberta.med.biobank.widgets.listener.MultiSelectEvent;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.query.SDKQuery;
 import gov.nih.nci.system.query.SDKQueryResult;
@@ -224,7 +224,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
 
         samplesMultiSelect = new MultiSelectWidget(client, SWT.NONE,
             "Selected Sample Derivatives", "Available Sample Derivatives", 100);
-        samplesMultiSelect.adaptToToolkit(toolkit);
+        samplesMultiSelect.adaptToToolkit(toolkit, true);
         samplesMultiSelect.addSelectionChangedListener(multiSelectListener);
 
         ListOrderedMap availSampleDerivTypes = new ListOrderedMap();
@@ -249,9 +249,10 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         GridLayout layout = (GridLayout) client.getLayout();
         layout.numColumns = 2;
 
-        childContainerTypesMultiSelect = new MultiSelectWidget(client, SWT.NONE,
-            "Selected Container Types", "Available Container Types", 100);
-        childContainerTypesMultiSelect.adaptToToolkit(toolkit);
+        childContainerTypesMultiSelect = new MultiSelectWidget(client,
+            SWT.NONE, "Selected Container Types", "Available Container Types",
+            100);
+        childContainerTypesMultiSelect.adaptToToolkit(toolkit, true);
         childContainerTypesMultiSelect
             .addSelectionChangedListener(multiSelectListener);
 

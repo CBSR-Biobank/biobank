@@ -82,7 +82,7 @@ public class PatientViewForm extends BiobankViewForm {
         visitsTable = new BiobankCollectionTable(section, SWT.NONE, headings,
             getPatientVisitAdapters());
         section.setClient(visitsTable);
-        visitsTable.adaptToToolkit(toolkit);
+        visitsTable.adaptToToolkit(toolkit, true);
         toolkit.paintBordersFor(visitsTable);
 
         visitsTable.getTableViewer().addDoubleClickListener(
