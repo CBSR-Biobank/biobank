@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+   <extension
+         point="org.eclipse.ui.views">
+      <category
+            name="Sample Category"
+            id="sampleProcessingRobot">
+      </category>
+      <view
+            name="Sample View"
+            icon="icons/sample.gif"
+            category="sampleProcessingRobot"
+            class="edu.ualberta.med.sampleProcessingRobot.views.SampleView"
+            id="edu.ualberta.med.sampleProcessingRobot.views.SampleView">
+      </view>
+   </extension>
+   <extension
+         point="org.eclipse.help.contexts">
+      <contexts
+            file="contexts.xml">
+      </contexts>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            id="edu.ualberta.med.sampleProcessingRobot.commands.showPerspective"
+            name="Sample Processing Robot Administration">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.handlers">
+      <handler
+            class="edu.ualberta.med.sampleProcessingRobot.handlers.ShowPerspectiveHandler"
+            commandId="edu.ualberta.med.sampleProcessingRobot.commands.showPerspective">
+      </handler>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            locationURI="toolbar:org.eclipse.ui.main.toolbar">
+         <toolbar
+               id="edu.ualberta.med.sampleProcessingRobot.toolbar.mainPerpective">
+            <command
+                  commandId="edu.ualberta.med.sampleProcessingRobot.commands.showPerspective"
+                  icon="icons/robot.png"
+                  label="Sample Robot Processing Administration"
+                  style="push">
+            </command>
+         </toolbar>
+      </menuContribution>
+   </extension>
+   <extension
+         point="org.eclipse.ui.perspectives">
+      <perspective
+            class="edu.ualberta.med.sampleProcessingRobot.perspectives.MainPerspective"
+            icon="icons/robot.png"
+            id="edu.ualberta.med.sampleProcessingRobot.perspectives.MainPerspective"
+            name="Sample Processing Robot">
+      </perspective>
+   </extension>
+   <extension
+         point="org.eclipse.ui.perspectiveExtensions">
+      <perspectiveExtension
+            targetID="edu.ualberta.med.sampleProcessingRobot.perspectives.MainPerspective">
+         <view
+               closeable="false"
+               id="edu.ualberta.med.sampleProcessingRobot.views.SampleView"
+               minimized="false"
+               moveable="false"
+               ratio="0.5"
+               relationship="right"
+               relative="org.eclipse.ui.editorss"
+               showTitle="true"
+               standalone="true"
+               visible="true">
+         </view>
+      </perspectiveExtension>
+   </extension>
+
+</plugin>
