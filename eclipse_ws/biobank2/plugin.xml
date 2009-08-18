@@ -64,6 +64,14 @@
             activityId="edu.ualberta.med.biobank.activity.eclipseide"
             pattern="org\.eclipse\.ui\.ide/org\.eclipse\.ui\.preferencePages\.Workbench">
       </activityPatternBinding>
+      <activity
+            id="edu.ualberta.med.biobank.activity.neweditor"
+            name="Activity for New Editor action">
+      </activity>
+      <activityPatternBinding
+            activityId="edu.ualberta.med.biobank.activity.neweditor"
+            pattern="org\.eclipse\.ui\.ide/org\.eclipse\.ui\.window\.newEditor">
+      </activityPatternBinding>
    </extension>
    <extension
          point="org.eclipse.ui.perspectives">
@@ -137,16 +145,6 @@
             name="Patients Administration">
       </category>
       <command
-            defaultHandler="edu.ualberta.med.biobank.handlers.ContainerTypeAddHandler"
-            id="edu.ualberta.med.biobank.commands.addContainerType"
-            name="Add Container Type">
-      </command>
-      <command
-            defaultHandler="edu.ualberta.med.biobank.handlers.ContainerAddHandler"
-            id="edu.ualberta.med.biobank.commands.addContainer"
-            name="Add Container">
-      </command>
-      <command
             defaultHandler="edu.ualberta.med.biobank.handlers.OpenPatientFormHandler"
             id="edu.ualberta.med.biobank.commands.patients.openPatientForm"
             name="Open Patient Form">
@@ -164,6 +162,10 @@
       <command
             id="edu.ualberta.med.biobank.commands.debug.initExamples"
             name="Debug - Init Examples">
+      </command>
+      <command
+            id="edu.ualberta.med.biobank.commands.patients.patientAdd"
+            name="Add patient">
       </command>
    </extension>
    <extension
@@ -309,6 +311,20 @@
                   definitionId="biobank2.loggedIn">
             </reference>
          </activeWhen>
+      </handler>
+      <handler
+            class="edu.ualberta.med.biobank.handlers.PatientAddHandler"
+            commandId="edu.ualberta.med.biobank.commands.patients.patientAdd">
+         <activeWhen>
+            <reference
+                  definitionId="biobank2.patientsPerpectiveSelected">
+            </reference>
+         </activeWhen>
+         <enabledWhen>
+            <reference
+                  definitionId="biobank2.patientViewActive">
+            </reference>
+         </enabledWhen>
       </handler>
    </extension>
    <extension
@@ -457,7 +473,7 @@
                </visibleWhen>                  
             </command>
             <command
-                  commandId="edu.ualberta.med.biobank.commands.addContainerType"
+                  commandId="edu.ualberta.med.biobank.commands.containerTypeAdd"
                   icon="icons/basket_edit.png"
                   label="Add Container Type"
                   style="push">
@@ -469,7 +485,7 @@
                </visibleWhen>                  
             </command>
             <command
-                  commandId="edu.ualberta.med.biobank.commands.addContainer"
+                  commandId="edu.ualberta.med.biobank.commands.containerAdd"
                   icon="icons/basket.png"
                   label="Add Container"
                   style="push">
@@ -487,6 +503,18 @@
                   commandId="edu.ualberta.med.biobank.commands.mainAdmin"
                   icon="icons/mainPerspective.png"
                   label="Main Administration"
+                  style="push">
+               <visibleWhen
+                     checkEnabled="false">
+                  <reference
+                        definitionId="biobank2.patientsPerpectiveSelected">
+                  </reference>
+               </visibleWhen>
+            </command>
+            <command
+                  commandId="edu.ualberta.med.biobank.commands.patients.patientAdd"
+                  icon="icons/add.png"
+                  label="Add Patient"
                   style="push">
                <visibleWhen
                      checkEnabled="false">
@@ -830,17 +858,5 @@
             </equals>
          </with>
       </definition>
-   </extension>
-   <extension
-         point="org.eclipse.ui.activities">
-      <activity
-            id="biobank2.activity.neweditor"
-            name="Activity for New Editor action">
-      </activity>
-      <activityPatternBinding
-            activityId="biobank2.activity.neweditor"
-            isEqualityPattern="true"
-            pattern="org.eclipse.ui/org.eclipse.ui.window.newEditor">
-      </activityPatternBinding>
    </extension>
 </plugin>

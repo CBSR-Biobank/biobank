@@ -38,7 +38,6 @@ import edu.ualberta.med.biobank.model.PvInfoData;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.PatientAdapter;
 import edu.ualberta.med.biobank.treeview.PatientVisitAdapter;
-import edu.ualberta.med.biobank.treeview.StudyAdapter;
 import edu.ualberta.med.biobank.widgets.ComboAndQuantity;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.widgets.SelectMultiple;
@@ -122,8 +121,9 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        Study study = ((StudyAdapter) patientVisitAdapter
-            .getParentFromClass(StudyAdapter.class)).getStudy();
+        Patient patient = ((PatientAdapter) patientVisitAdapter
+            .getParentFromClass(PatientAdapter.class)).getPatient();
+        Study study = patient.getStudy();
         if (patientVisit.getId() == null) {
             // choose clinic for new visit
             Collection<Clinic> clinics = study.getClinicCollection();
@@ -152,9 +152,6 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         dateDrawn.addSelectionListener(selectionListener);
         dateDrawn.addModifyListener(modifyListener);
         dateDrawn.adaptToToolkit(toolkit);
-
-        study = ((StudyAdapter) patientVisitAdapter
-            .getParentFromClass(StudyAdapter.class)).getStudy();
 
         for (PvInfo pvInfo : study.getPvInfoCollection()) {
             CombinedPvInfo combinedPvInfo = new CombinedPvInfo();

@@ -31,9 +31,12 @@ public class OpenPatientFormHandler extends AbstractHandler implements IHandler 
             if (activePage == null) {
                 return null;
             }
+            // hide others view
             for (IViewReference ref : activePage.getViewReferences()) {
                 activePage.hideView(ref);
             }
+            // close opened editors
+            activePage.closeAllEditors(true);
             PlatformUI.getWorkbench().getActiveWorkbenchWindow()
                 .getActivePage().openEditor(
                     new FormInput(SessionManager.getInstance()

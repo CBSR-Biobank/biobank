@@ -182,6 +182,12 @@ public abstract class AdapterBase {
         }
     }
 
+    public void removeAll() {
+        for (AdapterBase child : new ArrayList<AdapterBase>(getChildren())) {
+            removeChild(child);
+        }
+    }
+
     public AdapterBase contains(AdapterBase item) {
         if (children.size() == 0)
             return null;

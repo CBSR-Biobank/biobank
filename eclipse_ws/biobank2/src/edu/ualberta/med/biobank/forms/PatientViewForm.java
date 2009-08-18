@@ -23,7 +23,6 @@ public class PatientViewForm extends BiobankViewForm {
 
     private Patient patient;
 
-    // private Label patientNumberLabel;
     private BiobankCollectionTable visitsTable;
 
     @Override
@@ -58,22 +57,8 @@ public class PatientViewForm extends BiobankViewForm {
         form.getBody().setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         addRefreshToolbarAction();
-        // createPatientSection();
         createPatientVisitSection();
     }
-
-    // private void createPatientSection() {
-    // Composite client = toolkit.createComposite(form.getBody());
-    // GridLayout layout = new GridLayout(2, false);
-    // layout.horizontalSpacing = 10;
-    // client.setLayout(layout);
-    // client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-    // toolkit.paintBordersFor(client);
-    //      
-    // patientNumberLabel = (Label)createWidget(client, Text.class, SWT.NONE,
-    // "Patient Number");
-    // FormUtils.setTextValue(patientNumberLabel, patient.getNumber());
-    // }
 
     private void createPatientVisitSection() {
         Section section = createSection("Patient Visits");

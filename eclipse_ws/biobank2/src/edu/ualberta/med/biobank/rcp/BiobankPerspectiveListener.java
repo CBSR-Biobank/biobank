@@ -1,7 +1,5 @@
 package edu.ualberta.med.biobank.rcp;
 
-import org.eclipse.ui.IEditorPart;
-import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IPerspectiveDescriptor;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PerspectiveAdapter;
@@ -19,12 +17,7 @@ public class BiobankPerspectiveListener extends PerspectiveAdapter {
         if (perspective.getId().equals(PatientsAdministrationPerspective.ID)) {
             // close all the editors opened in the patient perspective when the
             // perspective is left
-            for (IEditorReference ref : page.getEditorReferences()) {
-                IEditorPart part = ref.getEditor(false);
-                if (part != null) {
-                    page.closeEditor(part, true);
-                }
-            }
+            page.closeAllEditors(true);
         }
     }
 }

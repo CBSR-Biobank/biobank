@@ -2,22 +2,32 @@ package edu.ualberta.med.biobank.forms;
 
 import java.util.List;
 
+import org.eclipse.core.databinding.UpdateValueStrategy;
 import org.eclipse.core.databinding.beans.PojoObservables;
+import org.eclipse.core.databinding.observable.value.IObservableValue;
+import org.eclipse.core.databinding.observable.value.WritableValue;
+import org.eclipse.core.databinding.validation.IValidator;
+import org.eclipse.core.databinding.validation.ValidationStatus;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.FocusAdapter;
+import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.forms.listener.EnterKeyToNextFieldListener;
+import edu.ualberta.med.biobank.model.ModelUtils;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.PatientAdapter;
-import edu.ualberta.med.biobank.treeview.StudyAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
+import edu.ualberta.med.biobank.views.PatientAdministrationView;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.query.SDKQuery;
 import gov.nih.nci.system.query.SDKQueryResult;
@@ -34,9 +44,17 @@ public class PatientEntryForm extends BiobankEntryForm {
 
     public static final String MSG_NO_PATIENT_NUMBER = "Patient must have a patient number";
 
+    public static final String MSG_NO_STUDY = "Enter a valid study short name";
+
     private PatientAdapter patientAdapter;
 
-    private Patient patient;
+    private Text textStudy;
+
+    private IObservableValue studyValue = new WritableValue("", String.class);
+    private IObservableValue studyValidValue = new WritableValue(null,
+        String.class);
+
+    private Study currentStudy;
 
     @Override
     public void init() {
@@ -45,12 +63,11 @@ public class PatientEntryForm extends BiobankEntryForm {
                 + adapter.getClass().getName());
 
         patientAdapter = (PatientAdapter) adapter;
-        patient = patientAdapter.getPatient();
         String tabName;
-        if (patient.getId() == null) {
+        if (patientAdapter.getPatient().getId() == null) {
             tabName = "New Patient";
         } else {
-            tabName = "Patient " + patient.getNumber();
+            tabName = "Patient " + patientAdapter.getPatient().getNumber();
         }
         setPartName(tabName);
     }
@@ -73,9 +90,46 @@ public class PatientEntryForm extends BiobankEntryForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
+        textStudy = (Text) createBoundWidgetWithLabel(client, Text.class,
+            SWT.NONE, "Study short name", null, studyValue,
+            NonEmptyString.class, MSG_NO_STUDY);
+
+        textStudy.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusLost(FocusEvent e) {
+                String studyShortName = textStudy.getText();
+                currentStudy = ModelUtils.getObjectWithAttr(patientAdapter
+                    .getAppService(), Study.class, "nameShort", String.class,
+                    studyShortName);
+                if (currentStudy == null) {
+                    studyValidValue.setValue(studyShortName);
+                } else {
+                    studyValidValue.setValue(null);
+                }
+            }
+        });
+        textStudy.addKeyListener(EnterKeyToNextFieldListener.INSTANCE);
+
+        UpdateValueStrategy uvs = new UpdateValueStrategy();
+        uvs.setAfterConvertValidator(new IValidator() {
+            @Override
+            public IStatus validate(Object value) {
+                if (value instanceof String && value != null) {
+                    return ValidationStatus.error(value
+                        + " is not a valid study short name");
+                } else {
+                    return Status.OK_STATUS;
+                }
+            }
+        });
+        dbc.bindValue(new WritableValue(null, String.class), studyValidValue,
+            uvs, uvs);
+        studyValidValue.setValue(null);
+
         createBoundWidgetWithLabel(client, Text.class, SWT.NONE,
-            "Patient Number", null, PojoObservables.observeValue(patient,
-                "number"), NonEmptyString.class, MSG_NO_PATIENT_NUMBER);
+            "Patient Number", null, PojoObservables.observeValue(patientAdapter
+                .getPatient(), "number"), NonEmptyString.class,
+            MSG_NO_PATIENT_NUMBER);
     }
 
     protected void createButtons() {
@@ -91,7 +145,7 @@ public class PatientEntryForm extends BiobankEntryForm {
 
     @Override
     protected String getOkMessage() {
-        if (patient.getId() == null) {
+        if (patientAdapter.getPatient().getId() == null) {
             return MSG_NEW_PATIENT_OK;
         }
         return MSG_PATIENT_OK;
@@ -113,14 +167,13 @@ public class PatientEntryForm extends BiobankEntryForm {
         SDKQuery query;
         SDKQueryResult result;
 
+        Patient patient = patientAdapter.getPatient();
         if ((patient.getId() == null) && !checkPatientNumberUnique()) {
             setDirty(true);
             return;
         }
 
-        Study study = ((StudyAdapter) patientAdapter
-            .getParentFromClass(StudyAdapter.class)).getStudy();
-        patient.setStudy(study);
+        patient.setStudy(currentStudy);
 
         if ((patient.getId() == null) || (patient.getId() == 0)) {
             query = new InsertExampleQuery(patient);
@@ -129,28 +182,24 @@ public class PatientEntryForm extends BiobankEntryForm {
         }
 
         result = appService.executeQuery(query);
-        patient = (Patient) result.getObjectResult();
-
-        patientAdapter.getParent().performExpand();
+        patientAdapter.setPatient((Patient) result.getObjectResult());
+        PatientAdministrationView.showPatient(patientAdapter);
     }
 
     private boolean checkPatientNumberUnique() throws ApplicationException {
-        Study study = ((StudyAdapter) patientAdapter
-            .getParentFromClass(StudyAdapter.class)).getStudy();
-
+        String number = patientAdapter.getPatient().getNumber();
         HQLCriteria c = new HQLCriteria(
             "from edu.ualberta.med.biobank.model.Patient as p "
                 + "inner join fetch p.study " + "where p.study.id='"
-                + study.getId() + "' " + "and p.number = '"
-                + patient.getNumber() + "'");
+                + currentStudy.getId() + "' " + "and p.number = '" + number
+                + "'");
 
         List<Object> results = appService.query(c);
         if (results.size() == 0)
             return true;
 
         BioBankPlugin.openAsyncError("Patient Number Problem",
-            "A patient with number \"" + patient.getNumber()
-                + "\" already exists.");
+            "A patient with number \"" + number + "\" already exists.");
         return false;
     }
 

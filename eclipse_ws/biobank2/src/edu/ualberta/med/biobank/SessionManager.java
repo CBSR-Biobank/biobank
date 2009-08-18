@@ -94,7 +94,7 @@ public class SessionManager {
 
     private SessionManager() {
         super();
-        rootNode = RootNode.getRootNode();
+        rootNode = new RootNode();
     }
 
     public static SessionManager getInstance() {

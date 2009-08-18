@@ -1,7 +1,5 @@
 package edu.ualberta.med.biobank.views;
 
-import java.util.ArrayList;
-
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -20,8 +18,8 @@ import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.NodeSearchVisitor;
 import edu.ualberta.med.biobank.treeview.PatientAdapter;
+import edu.ualberta.med.biobank.treeview.RootNode;
 import edu.ualberta.med.biobank.widgets.AdapterTreeWidget;
-import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class PatientAdministrationView extends ViewPart {
 
@@ -31,38 +29,45 @@ public class PatientAdministrationView extends ViewPart {
 
     private AdapterTreeWidget adaptersTree;
 
-    private AdapterBase root;
+    private static RootNode rootNode;
 
-    public PatientAdministrationView() {
-        root = new AdapterBase(null) {
-            @Override
-            public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-            }
+    private static AdapterBase noPatientFoundAdapter;
 
-            @Override
-            public void performDoubleClick() {
-            }
+    public static RootNode getRootNode() {
+        if (rootNode == null) {
+            rootNode = new RootNode();
+        }
+        return rootNode;
+    }
 
-            @Override
-            public void loadChildren(boolean updateNode) {
-            }
+    private static AdapterBase getNoPatientFoundAdapter() {
+        if (noPatientFoundAdapter == null) {
+            noPatientFoundAdapter = new AdapterBase(getRootNode(), 0,
+                "No patient found") {
+                @Override
+                public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
+                }
 
-            @Override
-            public String getTitle() {
-                return "Root";
-            }
+                @Override
+                public void performDoubleClick() {
+                }
 
-            @Override
-            public AdapterBase accept(NodeSearchVisitor visitor) {
-                return null;
-            }
+                @Override
+                public void loadChildren(boolean updateNode) {
+                }
 
-            @Override
-            public WritableApplicationService getAppService() {
-                return SessionManager.getInstance().getSession()
-                    .getAppService();
-            }
-        };
+                @Override
+                public String getTitle() {
+                    return null;
+                }
+
+                @Override
+                public AdapterBase accept(NodeSearchVisitor visitor) {
+                    return null;
+                }
+            };
+        }
+        return noPatientFoundAdapter;
     }
 
     @Override
@@ -89,25 +94,33 @@ public class PatientAdministrationView extends ViewPart {
         gd.grabExcessVerticalSpace = true;
         adaptersTree.setLayoutData(gd);
 
-        adaptersTree.getTreeViewer().setInput(root);
+        adaptersTree.getTreeViewer().setInput(getRootNode());
         getSite().setSelectionProvider(adaptersTree.getTreeViewer());
     }
 
     protected void searchPatient() {
-        for (AdapterBase child : new ArrayList<AdapterBase>(root.getChildren())) {
-            root.removeChild(child);
-        }
+        getSite().getPage().closeAllEditors(true);
         Patient patient = ModelUtils.getObjectWithAttr(SessionManager
             .getInstance().getSession().getAppService(), Patient.class,
             "number", String.class, patientNumberText.getText());
-        PatientAdapter patientAdapter = new PatientAdapter(root, patient);
-        root.addChild(patientAdapter);
-        patientAdapter.performExpand();
+        if (patient != null) {
+            PatientAdapter patientAdapter = new PatientAdapter(getRootNode(),
+                patient);
+            showPatient(patientAdapter);
+            patientAdapter.performExpand();
+        } else {
+            showPatient(getNoPatientFoundAdapter());
+        }
     }
 
     @Override
     public void setFocus() {
 
+    }
+
+    public static void showPatient(AdapterBase adapter) {
+        getRootNode().removeAll();
+        getRootNode().addChild(adapter);
     }
 
 }

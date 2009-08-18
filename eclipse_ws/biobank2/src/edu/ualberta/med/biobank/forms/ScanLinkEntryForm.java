@@ -142,7 +142,6 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
         cancelConfirmWidget = new CancelConfirmWidget(form.getBody(), this,
             true);
 
-        WritableValue wv = new WritableValue(Boolean.FALSE, Boolean.class);
         UpdateValueStrategy uvs = new UpdateValueStrategy();
         uvs.setAfterConvertValidator(new IValidator() {
             @Override
@@ -153,12 +152,11 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
                     return Status.OK_STATUS;
                 }
             }
-
         });
-        dbc.bindValue(wv, scannedValue, uvs, uvs);
+        dbc.bindValue(new WritableValue(Boolean.FALSE, Boolean.class),
+            scannedValue, uvs, uvs);
         scannedValue.setValue(false);
 
-        wv = new WritableValue(Boolean.TRUE, Boolean.class);
         uvs = new UpdateValueStrategy();
         uvs.setAfterConvertValidator(new IValidator() {
             @Override
@@ -171,7 +169,8 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
             }
 
         });
-        dbc.bindValue(wv, typesFilledValue, uvs, uvs);
+        dbc.bindValue(new WritableValue(Boolean.TRUE, Boolean.class),
+            typesFilledValue, uvs, uvs);
     }
 
     private void createPalletSection() {

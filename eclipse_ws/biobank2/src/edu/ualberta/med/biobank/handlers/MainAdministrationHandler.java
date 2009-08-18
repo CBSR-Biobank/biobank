@@ -11,7 +11,6 @@ import org.eclipse.ui.WorkbenchException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.rcp.MainPerspective;
-import edu.ualberta.med.biobank.views.PatientAdministrationView;
 
 public class MainAdministrationHandler extends AbstractHandler implements
     IHandler {
@@ -33,7 +32,6 @@ public class MainAdministrationHandler extends AbstractHandler implements
                 for (IViewReference ref : activePage.getViewReferences()) {
                     activePage.hideView(ref);
                 }
-                activePage.showView(PatientAdministrationView.ID);
                 workbench.showPerspective(MainPerspective.ID, workbench
                     .getActiveWorkbenchWindow());
             } catch (WorkbenchException e) {

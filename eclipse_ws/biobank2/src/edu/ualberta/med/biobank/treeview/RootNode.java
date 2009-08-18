@@ -4,19 +4,18 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 
+import edu.ualberta.med.biobank.SessionManager;
+import gov.nih.nci.system.applicationservice.WritableApplicationService;
+
 public class RootNode extends AdapterBase {
 
-    private static AdapterBase instance;
-
-    private RootNode() {
+    public RootNode() {
         super(null, 1, "root");
     }
 
-    public static AdapterBase getRootNode() {
-        if (instance == null) {
-            instance = new RootNode();
-        }
-        return instance;
+    @Override
+    public WritableApplicationService getAppService() {
+        return SessionManager.getInstance().getSession().getAppService();
     }
 
     @Override
