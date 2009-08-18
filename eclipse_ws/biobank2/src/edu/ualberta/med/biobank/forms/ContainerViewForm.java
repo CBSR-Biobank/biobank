@@ -84,6 +84,15 @@ public class ContainerViewForm extends BiobankViewForm {
         NONE, MULTI, RANGE;
     }
 
+    public void addModificationListener(ScanPalletModificationListener listener) {
+        listeners.add(listener);
+    }
+
+    public void removeModificationListener(
+        ScanPalletModificationListener listener) {
+        listeners.remove(listener);
+    }
+
     @Override
     public void init() {
         Assert.isTrue(adapter instanceof ContainerAdapter,
@@ -96,6 +105,7 @@ public class ContainerViewForm extends BiobankViewForm {
         setPartName(container.getLabel() + " ("
             + container.getContainerType().getName() + ")");
         initCells();
+        List<ScanPalletModificationListener> listeners = new ArrayList<ScanPalletModificationListener>();
     }
 
     @Override
@@ -310,9 +320,10 @@ public class ContainerViewForm extends BiobankViewForm {
     }
 
     public void notifyListeners(ScanPalletModificationEvent event) {
-        for (ScanPalletModificationListener listener : listeners) {
-            listener.modification(event);
-        }
+        if (listeners != null && listeners.size() != 0)
+            for (ScanPalletModificationListener listener : listeners) {
+                listener.modification(event);
+            }
     }
 
     private void notifyListeners() {
@@ -388,6 +399,7 @@ public class ContainerViewForm extends BiobankViewForm {
             containerWidget.setGridSizes(dim1, dim2, colWidth * dim2, rowHeight
                 * dim1);
             containerWidget.setContainersStatus(cells);
+            enableSelection();
             /*
              * containerWidget.addMouseListener(new MouseAdapter() {
              * 
