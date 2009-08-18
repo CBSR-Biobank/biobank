@@ -93,7 +93,7 @@ public class CancelConfirmWidget extends BiobankWidget {
             .saveEditor(form, false);
         if (!form.isDirty()) {
             PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-                .getActivePage().closeEditor(form, false);
+                .getActivePage().closeEditor(form, true);
             if (form.getNextOpenedFormID() != null) {
                 AdapterBase.openForm(new FormInput(form.getAdapter()), form
                     .getNextOpenedFormID());
@@ -120,6 +120,10 @@ public class CancelConfirmWidget extends BiobankWidget {
 
     public void setTextEnabled(boolean enabled) {
         confirmCancelText.setEnabled(enabled);
+    }
+
+    public void reset() {
+        confirmCancelText.setText("");
     }
 
 }
