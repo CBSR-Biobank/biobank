@@ -1,11 +1,10 @@
-package edu.ualberta.med.biobank.forms;
+package edu.ualberta.med.biobank.widgets.infotables;
 
 import java.util.Collection;
 
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.model.SampleSource;
-import edu.ualberta.med.biobank.widgets.InfoTableWidget;
 
 public class SampleSourceInfoTable extends InfoTableWidget<SampleSource> {
 

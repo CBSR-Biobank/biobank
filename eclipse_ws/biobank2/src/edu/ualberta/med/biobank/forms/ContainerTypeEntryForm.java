@@ -74,7 +74,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
 
     private Button sampleBox;
 
-    private MultiSelect samplesMultiSelect;
+    private MultiSelectWidget samplesMultiSelect;
 
     private MultiSelectWidget childContainerTypesMultiSelect;
 
@@ -285,9 +285,10 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
             public void widgetDefaultSelected(SelectionEvent e) {
             }
         });
-        childContainerTypesMultiSelect = new MultiSelect(client, SWT.NONE,
-            "Selected Container Types", "Available Container Types", 100);
-        childContainerTypesMultiSelect.adaptToToolkit(toolkit);
+        childContainerTypesMultiSelect = new MultiSelectWidget(client,
+            SWT.NONE, "Selected Container Types", "Available Container Types",
+            100);
+        childContainerTypesMultiSelect.adaptToToolkit(toolkit, true);
         childContainerTypesMultiSelect
             .addSelectionChangedListener(multiSelectListener);
 

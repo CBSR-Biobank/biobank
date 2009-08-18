@@ -22,9 +22,9 @@ import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
-import edu.ualberta.med.biobank.widgets.BiobankCollectionTable;
-import edu.ualberta.med.biobank.widgets.SampleStorageInfoTable;
-import edu.ualberta.med.biobank.widgets.StudyClinicInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.SampleSourceInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.SampleStorageInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.StudyClinicInfoTable;
 
 public class StudyViewForm extends BiobankViewForm {
 
@@ -37,10 +37,11 @@ public class StudyViewForm extends BiobankViewForm {
     private Label activityStatusLabel;
     private Label commentLabel;
 
-    private BiobankCollectionTable clinicsTable;
+    private StudyClinicInfoTable clinicsTable;
     private SampleStorageInfoTable sampleStorageTable;
     private SampleSourceInfoTable sampleSourceTable;
-    private BiobankCollectionTable pvInfosTable;
+
+    // private BiobankCollectionTable pvInfosTable;
 
     @Override
     public void init() {
@@ -141,15 +142,19 @@ public class StudyViewForm extends BiobankViewForm {
     private void createPvDataSection() {
         Section section = createSection("Patient Visit Information Collected");
 
-        String[] headings = new String[] { "Name", "Valid Values (optional)" };
-        pvInfosTable = new BiobankCollectionTable(section, SWT.NONE, headings,
-            getStudyPvInfo());
-        section.setClient(pvInfosTable);
-        pvInfosTable.adaptToToolkit(toolkit, true);
-        toolkit.paintBordersFor(pvInfosTable);
-
-        pvInfosTable.getTableViewer().addDoubleClickListener(
-            FormUtils.getBiobankCollectionDoubleClickListener());
+        // FIXME this information can be displayed in a better way
+        //
+        // String[] headings = new String[] { "Name", "Valid Values (optional)"
+        // };
+        // pvInfosTable = new BiobankCollectionTable(section, SWT.NONE,
+        // headings,
+        // getStudyPvInfo());
+        // section.setClient(pvInfosTable);
+        // pvInfosTable.adaptToToolkit(toolkit, true);
+        // toolkit.paintBordersFor(pvInfosTable);
+        //
+        // pvInfosTable.getTableViewer().addDoubleClickListener(
+        // FormUtils.getBiobankCollectionDoubleClickListener());
     }
 
     private PvInfo[] getStudyPvInfo() {
@@ -181,7 +186,7 @@ public class StudyViewForm extends BiobankViewForm {
         clinicsTable.getTableViewer().setInput(
             FormUtils.getClinicsAdapters(clinicGroupNode, study
                 .getClinicCollection()));
-        pvInfosTable.getTableViewer().setInput(getStudyPvInfo());
+        // pvInfosTable.getTableViewer().setInput(getStudyPvInfo());
     }
 
     private void retrieveStudy() {

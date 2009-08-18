@@ -22,8 +22,7 @@ import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.ClinicAdapter;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
-import edu.ualberta.med.biobank.widgets.BiobankCollectionTable;
-import edu.ualberta.med.biobank.widgets.ClinicStudyInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.ClinicStudyInfoTable;
 
 public class ClinicViewForm extends AddressViewFormCommon {
     public static final String ID = "edu.ualberta.med.biobank.forms.ClinicViewForm";
@@ -32,7 +31,7 @@ public class ClinicViewForm extends AddressViewFormCommon {
 
     private Clinic clinic;
 
-    private BiobankCollectionTable studiesTable;
+    private ClinicStudyInfoTable studiesTable;
 
     private Label activityStatusLabel;
 

@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.widgets;
+package edu.ualberta.med.biobank.widgets.infotables;
 
 import java.util.Arrays;
 import java.util.Collection;

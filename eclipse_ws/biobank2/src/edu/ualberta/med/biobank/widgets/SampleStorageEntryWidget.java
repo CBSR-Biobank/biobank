@@ -29,6 +29,8 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.dialogs.SampleStorageDialog;
 import edu.ualberta.med.biobank.model.SampleStorage;
 import edu.ualberta.med.biobank.model.SampleType;
+import edu.ualberta.med.biobank.widgets.infotables.BiobankCollectionModel;
+import edu.ualberta.med.biobank.widgets.infotables.SampleStorageInfoTable;
 import edu.ualberta.med.biobank.widgets.listener.BiobankEntryFormWidgetListener;
 import edu.ualberta.med.biobank.widgets.listener.MultiSelectEvent;
 import gov.nih.nci.system.applicationservice.ApplicationException;

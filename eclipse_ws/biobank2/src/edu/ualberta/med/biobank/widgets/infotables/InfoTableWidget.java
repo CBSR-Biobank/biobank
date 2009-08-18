@@ -1,15 +1,29 @@
-package edu.ualberta.med.biobank.widgets;
+package edu.ualberta.med.biobank.widgets.infotables;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 
+import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.IDoubleClickListener;
+import org.eclipse.jface.viewers.TableLayout;
+import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableColumn;
 
-public class InfoTableWidget<T> extends BiobankCollectionTable {
+import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
+import edu.ualberta.med.biobank.widgets.BiobankWidget;
+
+public class InfoTableWidget<T> extends BiobankWidget {
+
+    private TableViewer tableViewer;
 
     // FIXME - used to inform listeners of changes to the widget
     // could be done in a better way
@@ -19,7 +33,45 @@ public class InfoTableWidget<T> extends BiobankCollectionTable {
 
     public InfoTableWidget(Composite parent, Collection<T> collection,
         String[] headings, int[] bounds) {
-        super(parent, SWT.NONE, headings, bounds, null);
+        super(parent, SWT.NONE);
+
+        setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        setLayout(new GridLayout(1, false));
+
+        tableViewer = new TableViewer(this, SWT.BORDER | SWT.MULTI
+            | SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION | SWT.VIRTUAL);
+        tableViewer.setLabelProvider(new BiobankLabelProvider());
+        tableViewer.setContentProvider(new ArrayContentProvider());
+
+        Table table = tableViewer.getTable();
+        table.setLayout(new TableLayout());
+        GridData gd = new GridData(GridData.FILL_BOTH);
+        gd.heightHint = 100;
+        table.setLayoutData(gd);
+        // table.setFont(getFont());
+        table.setHeaderVisible(true);
+        table.setLinesVisible(true);
+
+        int index = 0;
+        for (String name : headings) {
+            final TableColumn col = new TableColumn(table, SWT.NONE);
+            col.setText(name);
+            if (bounds == null || bounds[index] == -1) {
+                col.pack();
+            } else {
+                col.setWidth(bounds[index]);
+            }
+            col.setResizable(true);
+            col.addListener(SWT.SELECTED, new Listener() {
+                public void handleEvent(Event event) {
+                    col.pack();
+                }
+            });
+            index++;
+        }
+        tableViewer.setColumnProperties(headings);
+        tableViewer.setUseHashlookup(true);
+
         model = new ArrayList<BiobankCollectionModel>();
         getTableViewer().setInput(model);
 
@@ -34,7 +86,11 @@ public class InfoTableWidget<T> extends BiobankCollectionTable {
     }
 
     public void addDoubleClickListener(IDoubleClickListener listener) {
-        getTableViewer().addDoubleClickListener(listener);
+        tableViewer.addDoubleClickListener(listener);
+    }
+
+    public TableViewer getTableViewer() {
+        return tableViewer;
     }
 
     public void setCollection(final Collection<T> collection) {
