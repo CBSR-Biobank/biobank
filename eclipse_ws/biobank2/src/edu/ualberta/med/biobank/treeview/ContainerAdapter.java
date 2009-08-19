@@ -10,12 +10,12 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.ModelUtils;
 import edu.ualberta.med.biobank.forms.ContainerEntryForm;
 import edu.ualberta.med.biobank.forms.ContainerViewForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerPosition;
-import edu.ualberta.med.biobank.model.ModelUtils;
 import edu.ualberta.med.biobank.model.Site;
 
 public class ContainerAdapter extends AdapterBase {

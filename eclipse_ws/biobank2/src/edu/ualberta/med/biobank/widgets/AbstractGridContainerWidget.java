@@ -15,8 +15,8 @@ import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 
-import edu.ualberta.med.biobank.LabelingScheme;
-import edu.ualberta.med.biobank.RowColPos;
+import edu.ualberta.med.biobank.common.LabelingScheme;
+import edu.ualberta.med.biobank.common.RowColPos;
 import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
 import edu.ualberta.med.biobank.model.ContainerType;
 

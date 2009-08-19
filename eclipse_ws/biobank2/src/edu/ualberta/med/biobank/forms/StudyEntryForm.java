@@ -21,8 +21,8 @@ import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.ModelUtils;
 import edu.ualberta.med.biobank.model.Clinic;
-import edu.ualberta.med.biobank.model.ModelUtils;
 import edu.ualberta.med.biobank.model.PvInfo;
 import edu.ualberta.med.biobank.model.PvInfoPossible;
 import edu.ualberta.med.biobank.model.PvInfoType;

@@ -3,9 +3,9 @@ package edu.ualberta.med.biobank.views;
 import java.util.List;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.common.ModelUtils;
 import edu.ualberta.med.biobank.exception.MultipleSearchResultException;
 import edu.ualberta.med.biobank.model.Container;
-import edu.ualberta.med.biobank.model.ModelUtils;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.Sample;

@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.model;
+package edu.ualberta.med.biobank.common;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -6,16 +6,23 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import org.eclipse.core.runtime.Assert;
+import org.apache.log4j.Logger;
+import org.springframework.util.Assert;
 
-import edu.ualberta.med.biobank.LabelingScheme;
-import edu.ualberta.med.biobank.RowColPos;
-import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.model.Container;
+import edu.ualberta.med.biobank.model.ContainerType;
+import edu.ualberta.med.biobank.model.Sample;
+import edu.ualberta.med.biobank.model.SamplePosition;
+import edu.ualberta.med.biobank.model.SampleStorage;
+import edu.ualberta.med.biobank.model.Site;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class ModelUtils {
+
+    private static final Logger logger = Logger.getLogger(ModelUtils.class
+        .getName());
 
     public static List<Container> getTopContainersForSite(
         WritableApplicationService appService, Site site)
@@ -64,8 +71,7 @@ public class ModelUtils {
             Assert.isTrue(list.size() == 1);
             return list.get(0);
         } catch (Exception ex) {
-            SessionManager.getLogger().error(
-                "Error in getObjectWithAttr method", ex);
+            logger.error("Error in getObjectWithAttr method", ex);
             return null;
         }
     }
@@ -87,8 +93,7 @@ public class ModelUtils {
 
             return appService.search(classType, instance);
         } catch (Exception ex) {
-            SessionManager.getLogger().error(
-                "Error in getObjectsWithAttr method", ex);
+            logger.error("Error in getObjectsWithAttr method", ex);
             return null;
         }
     }

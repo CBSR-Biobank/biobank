@@ -13,7 +13,7 @@ import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.part.ViewPart;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.model.ModelUtils;
+import edu.ualberta.med.biobank.common.ModelUtils;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.NodeSearchVisitor;

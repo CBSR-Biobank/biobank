@@ -1,6 +1,6 @@
 package edu.ualberta.med.biobank.common;
 
-import org.eclipse.core.runtime.Assert;
+import org.springframework.util.Assert;
 
 import edu.ualberta.med.biobank.model.ContainerType;
 

@@ -1,5 +1,7 @@
 package edu.ualberta.med.biobank;
 
+import edu.ualberta.med.biobank.common.LabelingScheme;
+import edu.ualberta.med.biobank.common.RowColPos;
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.Clinic;
