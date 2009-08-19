@@ -14,7 +14,6 @@ import edu.ualberta.med.sampleProcessingRobot.perspectives.MainPerspective;
 
 public class ShowPerspectiveHandler extends AbstractHandler {
 
-    @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
         try {
             IWorkbench workbench = SampleProcessingRobotPlugin.getDefault()
