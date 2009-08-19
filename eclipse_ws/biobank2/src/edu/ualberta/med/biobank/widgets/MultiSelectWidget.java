@@ -84,7 +84,7 @@ public class MultiSelectWidget extends BiobankWidget {
         MapIterator it = available.mapIterator();
 
         while (it.hasNext()) {
-            int key = (Integer) it.next();
+            Integer key = (Integer) it.next();
             if (selected.contains(key)) {
                 selTreeRootNode.addChild(new MultiSelectNode(selTreeRootNode,
                     key, (String) it.getValue()));
@@ -102,7 +102,7 @@ public class MultiSelectWidget extends BiobankWidget {
     public List<Integer> getSelected() {
         List<Integer> result = new ArrayList<Integer>();
         for (MultiSelectNode node : selTreeRootNode.getChildren()) {
-            result.add(node.getId());
+            result.add(new Integer(node.getId()));
         }
         return result;
     }

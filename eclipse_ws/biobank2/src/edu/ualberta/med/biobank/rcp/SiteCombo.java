@@ -70,6 +70,7 @@ public class SiteCombo extends ControlContribution {
         for (Site site : sites) {
             combo.add(site.getName());
         }
+        combo.select(0);
 
     }
 
