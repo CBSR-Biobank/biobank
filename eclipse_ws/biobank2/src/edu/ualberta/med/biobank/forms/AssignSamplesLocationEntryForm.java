@@ -345,10 +345,7 @@ public class AssignSamplesLocationEntryForm extends AbstractPatientAdminForm {
                         showStudyInformation();
                         scanLaunchedValue.setValue(true);
                         setDirty(true);
-
-                        // showAllContainers(true);
                     } else {
-                        // showAllContainers(false);
                     }
                     scanButton.traverse(SWT.TRAVERSE_TAB_NEXT);
                     form.reflow(true);
@@ -360,11 +357,6 @@ public class AssignSamplesLocationEntryForm extends AbstractPatientAdminForm {
                 }
             }
         });
-    }
-
-    private void showAllContainers(boolean show) {
-        ((GridData) containersComposite.getLayoutData()).exclude = !show;
-        containersComposite.setVisible(show);
     }
 
     private void showOnlyPallet(boolean show) {
