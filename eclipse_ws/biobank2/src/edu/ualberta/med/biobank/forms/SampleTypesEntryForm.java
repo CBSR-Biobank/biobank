@@ -23,7 +23,7 @@ public class SampleTypesEntryForm extends BiobankEntryForm {
         SiteAdapter siteAdapter = (SiteAdapter) adapter;
         site = siteAdapter.getSite();
         sampleTypes = site.getSampleTypeCollection();
-
+        setPartName("Sample Types");
     }
 
     @Override

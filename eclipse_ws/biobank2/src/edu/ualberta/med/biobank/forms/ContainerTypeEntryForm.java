@@ -273,10 +273,10 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         GridData gd = new GridData(GridData.VERTICAL_ALIGN_BEGINNING
             | GridData.GRAB_HORIZONTAL);
         topBox.setLayoutData(gd);
-        topBox.setSelection(false);
+        topBox.setSelection(containerType.getTopLevel());
         topBox.addSelectionListener(new SelectionListener() {
             public void widgetSelected(SelectionEvent event) {
-                // topLevel = true;
+                containerType.setTopLevel(!containerType.getTopLevel());
             }
 
             @Override
@@ -301,16 +301,16 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
             }
         }
 
-        int myId = 0;
+        Integer myId = new Integer(0);
         if (containerType.getId() != null) {
             myId = containerType.getId();
         }
 
         if (allContainerTypes != null)
-            for (ContainerType containerType : allContainerTypes) {
-                int id = containerType.getId();
-                if (myId != id) {
-                    availContainerTypes.put(id, containerType.getName());
+            for (ContainerType type : allContainerTypes) {
+                Integer id = type.getId();
+                if (myId.compareTo(id) != 0 && type.getTopLevel() == false) {
+                    availContainerTypes.put(id, type.getName());
                 }
             }
         childContainerTypesMultiSelect.addSelections(availContainerTypes,
@@ -415,11 +415,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
 
         result = appService.executeQuery(query);
         containerType = (ContainerType) result.getObjectResult();
-        if (allContainerTypes == null) {
-            allContainerTypes = new ArrayList<ContainerType>();
-        }
-        allContainerTypes.add(containerType);
-        site.setContainerTypeCollection(allContainerTypes);
+
         containerTypeAdapter.setContainerType(containerType);
         containerTypeAdapter.getParent().performExpand();
 

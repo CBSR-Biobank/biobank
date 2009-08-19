@@ -143,10 +143,7 @@ public class ContainerEntryForm extends BiobankEntryForm {
         List<ContainerType> results = new ArrayList<ContainerType>();
         HQLCriteria c = new HQLCriteria(
             "from edu.ualberta.med.biobank.model.ContainerType as cttop"
-                + " where cttop.id not in (select child.id"
-                + " from edu.ualberta.med.biobank.model.ContainerType as ct"
-                + " left join ct.childContainerTypeCollection as child "
-                + " where child.id!=null)");
+                + " where cttop.topLevel=true");
         try {
             results = appService.query(c);
         } catch (Exception e) {

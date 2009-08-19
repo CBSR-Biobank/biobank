@@ -12,46 +12,48 @@ import org.eclipse.swt.dnd.Transfer;
  * 
  */
 public class TreeViewerDragListener implements DragSourceListener {
-	private TreeViewer viewer;
+    private TreeViewer viewer;
 
-	private MultiSelectNode[] dragData;
+    private MultiSelectNode[] dragData;
 
-	public TreeViewerDragListener(TreeViewer viewer) {
-		this.viewer = viewer;
+    public TreeViewerDragListener(TreeViewer viewer) {
+        this.viewer = viewer;
 
-		viewer.addDragSupport(DND.DROP_MOVE | DND.DROP_COPY,
-			new Transfer[] { MultiSelectNodeTransfer.getInstance() }, this);
-	}
+        viewer.addDragSupport(DND.DROP_MOVE | DND.DROP_COPY,
+            new Transfer[] { MultiSelectNodeTransfer.getInstance() }, this);
+    }
 
-	public void dragStart(DragSourceEvent event) {
-		event.doit = !viewer.getSelection().isEmpty();
-		MultiSelectWidget.log4j.trace("dragStart: " + event.toString());
-	}
+    public void dragStart(DragSourceEvent event) {
+        event.doit = !viewer.getSelection().isEmpty();
+        MultiSelectWidget.log4j.trace("dragStart: " + event.toString());
+    }
 
-	public void dragSetData(DragSourceEvent event) {
-		Object[] selections = ((IStructuredSelection) viewer.getSelection())
-			.toArray();
+    public void dragSetData(DragSourceEvent event) {
+        Object[] selections = ((IStructuredSelection) viewer.getSelection())
+            .toArray();
 
-		int count = 0;
-		MultiSelectNode[] nodes = new MultiSelectNode[selections.length];
-		for (Object sel : selections) {
-			nodes[count] = (MultiSelectNode) sel;
-			++count;
-		}
-		event.data = nodes;
-		dragData = nodes;
-		MultiSelectWidget.log4j.trace("dragSetData: " + event.toString());
-	}
+        int count = 0;
+        MultiSelectNode[] nodes = new MultiSelectNode[selections.length];
+        for (Object sel : selections) {
+            nodes[count] = (MultiSelectNode) sel;
+            count++;
+        }
+        event.data = nodes;
+        dragData = nodes;
+        MultiSelectWidget.log4j.trace("dragSetData: " + event.toString());
+        dragFinished(event);
+    }
 
-	public void dragFinished(DragSourceEvent event) {
-		if (!event.doit)
-			return;
+    public void dragFinished(DragSourceEvent event) {
+        if (!event.doit)
+            return;
 
-		MultiSelectNode rootNode = (MultiSelectNode) viewer.getInput();
-		for (MultiSelectNode node : dragData) {
-			rootNode.removeChild(node);
-			MultiSelectWidget.log4j.trace("removed " + node.getName() + " from "
-					+ rootNode.getName() + ", event: " + event.toString());
-		}
-	}
+        MultiSelectNode rootNode = (MultiSelectNode) viewer.getInput();
+        for (MultiSelectNode node : dragData) {
+            rootNode.removeChild(node);
+            MultiSelectWidget.log4j.trace("removed " + node.getName()
+                + " from " + rootNode.getName() + ", event: "
+                + event.toString());
+        }
+    }
 }
