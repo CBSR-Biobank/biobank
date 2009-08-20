@@ -23,7 +23,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.databinding.swt.SWTObservables;
 import org.eclipse.jface.dialogs.IMessageProvider;
-import org.eclipse.jface.fieldassist.ControlDecoration;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -46,6 +45,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.ISaveablePart;
@@ -54,6 +54,7 @@ import org.springframework.remoting.RemoteAccessException;
 import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.validators.AbstractValidator;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import edu.ualberta.med.biobank.widgets.CancelConfirmWidget;
@@ -187,21 +188,37 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
     }
 
     protected Control createBoundWidgetWithLabel(Composite composite,
-        Class<?> widgetClass, int widgetOptions, String fieldLabel,
-        String[] widgetValues, IObservableValue modelObservableValue,
-        Class<?> validatorClass, String validatorErrMsg) {
+        Class<? extends Widget> widgetClass, int widgetOptions,
+        String fieldLabel, String[] widgetValues,
+        IObservableValue modelObservableValue,
+        Class<? extends AbstractValidator> validatorClass,
+        String validatorErrMsg) {
+        AbstractValidator validator = null;
+        if (validatorClass != null) {
+            validator = createValidator(validatorClass, validatorErrMsg);
+        }
+        return createBoundWidgetWithLabel(composite, widgetClass,
+            widgetOptions, fieldLabel, widgetValues, modelObservableValue,
+            validator);
+    }
+
+    protected Control createBoundWidgetWithLabel(Composite composite,
+        Class<? extends Widget> widgetClass, int widgetOptions,
+        String fieldLabel, String[] widgetValues,
+        IObservableValue modelObservableValue, AbstractValidator validator) {
         Label label;
 
         label = toolkit.createLabel(composite, fieldLabel + ":", SWT.LEFT);
         label.setLayoutData(new GridData(GridData.VERTICAL_ALIGN_BEGINNING));
         return createBoundWidget(composite, widgetClass, widgetOptions, label,
-            widgetValues, modelObservableValue, validatorClass, validatorErrMsg);
+            widgetValues, modelObservableValue, validator);
 
     }
 
     protected Control createBoundWidget(Composite composite,
-        Class<?> widgetClass, int widgetOptions, String[] widgetValues,
-        IObservableValue modelObservableValue, IValidator validator) {
+        Class<? extends Widget> widgetClass, int widgetOptions,
+        String[] widgetValues, IObservableValue modelObservableValue,
+        IValidator validator) {
 
         UpdateValueStrategy uvs = null;
         if (validator != null) {
@@ -261,14 +278,13 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
     }
 
     protected Control createBoundWidget(Composite composite,
-        Class<?> widgetClass, int widgetOptions, Label label,
+        Class<? extends Widget> widgetClass, int widgetOptions, Label label,
         String[] widgetValues, IObservableValue modelObservableValue,
-        Class<?> validatorClass, String validatorErrMsg) {
-        IValidator validator = null;
+        AbstractValidator validator) {
 
-        if (validatorClass != null) {
-            validator = createValidator(validatorClass, FormUtils
-                .createDecorator(label, validatorErrMsg), validatorErrMsg);
+        if (validator != null) {
+            validator.setControlDecoration(FormUtils.createDecorator(label,
+                validator.getErrorMessage()));
         }
 
         return createBoundWidget(composite, widgetClass, widgetOptions,
@@ -303,8 +319,9 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
                     setDirty(true);
                 }
             });
-        IValidator validator = createValidator(NonEmptyString.class, FormUtils
-            .createDecorator(label, errorMessage), errorMessage);
+        AbstractValidator validator = new NonEmptyString(errorMessage);
+        validator.setControlDecoration(FormUtils.createDecorator(label,
+            errorMessage));
         UpdateValueStrategy uvs = new UpdateValueStrategy();
         uvs.setAfterGetValidator(validator);
         IObservableValue selectedValue = new WritableValue("", String.class);
@@ -313,14 +330,14 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
         return comboViewer;
     }
 
-    protected IValidator createValidator(Class<?> validatorClass,
-        ControlDecoration dec, String validatorErrMsg) {
+    protected AbstractValidator createValidator(
+        Class<? extends AbstractValidator> validatorClass,
+        String validatorErrMsg) {
         try {
-            Class<?>[] types = new Class[] { String.class,
-                ControlDecoration.class };
+            Class<?>[] types = new Class[] { String.class };
             Constructor<?> cons = validatorClass.getConstructor(types);
-            Object[] args = new Object[] { validatorErrMsg, dec };
-            return (IValidator) cons.newInstance(args);
+            Object[] args = new Object[] { validatorErrMsg };
+            return (AbstractValidator) cons.newInstance(args);
         } catch (NoSuchMethodException e) {
             throw new RuntimeException(e);
         } catch (InvocationTargetException e) {
@@ -369,15 +386,22 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
 
     protected void handleStatusChanged(IStatus status) {
         if (status.getSeverity() == IStatus.OK) {
-            form.setMessage(getOkMessage(), IMessageProvider.NONE);
+            setFormHeaderErrorMessage(getOkMessage(), IMessageProvider.NONE);
             if (cancelConfirmWidget != null) {
                 cancelConfirmWidget.setConfirmEnabled(true);
             }
         } else {
-            form.setMessage(status.getMessage(), IMessageProvider.ERROR);
+            setFormHeaderErrorMessage(status.getMessage(),
+                IMessageProvider.ERROR);
             if (cancelConfirmWidget != null) {
                 cancelConfirmWidget.setConfirmEnabled(false);
             }
+        }
+    }
+
+    public void setFormHeaderErrorMessage(String message, int type) {
+        if (!form.getForm().getHead().isDisposed()) {
+            form.setMessage(message, type);
         }
     }
 

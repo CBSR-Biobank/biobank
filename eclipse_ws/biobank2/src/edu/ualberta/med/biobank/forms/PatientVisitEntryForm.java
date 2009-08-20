@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.forms;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
@@ -27,6 +28,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.PlatformUI;
+import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.model.Clinic;
@@ -34,15 +36,20 @@ import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.PvInfo;
 import edu.ualberta.med.biobank.model.PvInfoData;
+import edu.ualberta.med.biobank.model.PvSampleSource;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.PatientAdapter;
 import edu.ualberta.med.biobank.treeview.PatientVisitAdapter;
 import edu.ualberta.med.biobank.widgets.ComboAndQuantity;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
+import edu.ualberta.med.biobank.widgets.PvSampleSourceEntryWidget;
 import edu.ualberta.med.biobank.widgets.SelectMultiple;
+import edu.ualberta.med.biobank.widgets.listener.BiobankEntryFormWidgetListener;
+import edu.ualberta.med.biobank.widgets.listener.MultiSelectEvent;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.query.SDKQuery;
 import gov.nih.nci.system.query.SDKQueryResult;
+import gov.nih.nci.system.query.example.DeleteExampleQuery;
 import gov.nih.nci.system.query.example.InsertExampleQuery;
 import gov.nih.nci.system.query.example.UpdateExampleQuery;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -59,6 +66,13 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
     private PatientVisitAdapter patientVisitAdapter;
 
     private PatientVisit patientVisit;
+
+    private BiobankEntryFormWidgetListener listener = new BiobankEntryFormWidgetListener() {
+        @Override
+        public void selectionChanged(MultiSelectEvent event) {
+            setDirty(true);
+        }
+    };
 
     class CombinedPvInfo {
         PvInfo pvInfo;
@@ -77,6 +91,8 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
     private DateTimeWidget dateDrawn;
 
     private ComboViewer clinicsComboViewer;
+
+    private PvSampleSourceEntryWidget pvSampleSourceEntryWidget;
 
     public PatientVisitEntryForm() {
         super();
@@ -108,11 +124,15 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         form.setText("Patient Visit Information");
         form.setMessage(getOkMessage(), IMessageProvider.NONE);
         form.getBody().setLayout(new GridLayout(1, false));
-        createPvSection();
+        Patient patient = patientVisitAdapter.getParentFromClass(
+            PatientAdapter.class).getWrapper().getPatient();
+        createMainSection(patient.getStudy());
+        createSourcesSection();
+        createDatasSection(patient.getStudy());
         initCancelConfirmWidget(form.getBody());
     }
 
-    private void createPvSection() {
+    private void createMainSection(Study study) {
         Composite client = toolkit.createComposite(form.getBody());
         GridLayout layout = new GridLayout(2, false);
         layout.horizontalSpacing = 10;
@@ -120,9 +140,6 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        Patient patient = patientVisitAdapter.getParentFromClass(
-            PatientAdapter.class).getWrapper().getPatient();
-        Study study = patient.getStudy();
         if (patientVisit.getId() == null) {
             // choose clinic for new visit
             Collection<Clinic> clinics = study.getClinicCollection();
@@ -152,117 +169,139 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         dateDrawn.addModifyListener(modifyListener);
         dateDrawn.adaptToToolkit(toolkit, true);
 
-        for (PvInfo pvInfo : study.getPvInfoCollection()) {
-            CombinedPvInfo combinedPvInfo = new CombinedPvInfo();
-            combinedPvInfo.pvInfo = pvInfo;
-            combinedPvInfoMap.put(pvInfo.getId(), combinedPvInfo);
-        }
+    }
 
-        Collection<PvInfoData> pvDataCollection = patientVisit
-            .getPvInfoDataCollection();
-        if (pvDataCollection != null) {
-            for (PvInfoData pvInfoData : pvDataCollection) {
-                Integer key = pvInfoData.getPvInfo().getId();
-                CombinedPvInfo combinedPvInfo = (CombinedPvInfo) combinedPvInfoMap
-                    .get(key);
-                Assert.isNotNull(combinedPvInfo);
-                combinedPvInfo.pvInfoData = pvInfoData;
-            }
-        }
+    private void createSourcesSection() {
+        Composite client = createSectionWithClient("Sample Storage");
 
-        MapIterator it = combinedPvInfoMap.mapIterator();
-        while (it.hasNext()) {
-            it.next();
-            CombinedPvInfo combinedPvInfo = (CombinedPvInfo) it.getValue();
-            int typeId = combinedPvInfo.pvInfo.getPvInfoType().getId();
-            String possibleValues = combinedPvInfo.pvInfo.getPossibleValues();
-            String value = null;
+        GridLayout layout = new GridLayout(1, false);
+        client.setLayout(layout);
+        client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-            String[] pvalArr = null;
-            if (possibleValues != null) {
-                pvalArr = possibleValues.split(";");
+        pvSampleSourceEntryWidget = new PvSampleSourceEntryWidget(client,
+            SWT.NONE, patientVisit.getPvSampleSourceCollection(), toolkit);
+        pvSampleSourceEntryWidget.addSelectionChangedListener(listener);
+    }
+
+    private void createDatasSection(Study study) {
+        if (study.getPvInfoCollection().size() > 0) {
+            Composite client = createSectionWithClient("Others informations");
+
+            for (PvInfo pvInfo : study.getPvInfoCollection()) {
+                CombinedPvInfo combinedPvInfo = new CombinedPvInfo();
+                combinedPvInfo.pvInfo = pvInfo;
+                combinedPvInfoMap.put(pvInfo.getId(), combinedPvInfo);
             }
 
-            if (combinedPvInfo.pvInfoData != null) {
-                value = combinedPvInfo.pvInfoData.getValue();
+            Collection<PvInfoData> pvDataCollection = patientVisit
+                .getPvInfoDataCollection();
+            if (pvDataCollection != null) {
+                for (PvInfoData pvInfoData : pvDataCollection) {
+                    Integer key = pvInfoData.getPvInfo().getId();
+                    CombinedPvInfo combinedPvInfo = (CombinedPvInfo) combinedPvInfoMap
+                        .get(key);
+                    Assert.isNotNull(combinedPvInfo);
+                    combinedPvInfo.pvInfoData = pvInfoData;
+                }
             }
 
-            Label labelWidget = toolkit.createLabel(client,
-                combinedPvInfo.pvInfo.getLabel() + ":", SWT.LEFT);
-            labelWidget.setLayoutData(new GridData(
-                GridData.VERTICAL_ALIGN_BEGINNING));
+            MapIterator it = combinedPvInfoMap.mapIterator();
+            while (it.hasNext()) {
+                it.next();
+                CombinedPvInfo combinedPvInfo = (CombinedPvInfo) it.getValue();
+                int typeId = combinedPvInfo.pvInfo.getPvInfoType().getId();
+                String possibleValues = combinedPvInfo.pvInfo
+                    .getPossibleValues();
+                String value = null;
 
-            switch (typeId) {
-            case 1: // number
-                combinedPvInfo.control = toolkit.createText(client, value,
-                    SWT.LEFT);
-                break;
+                String[] pvalArr = null;
+                if (possibleValues != null) {
+                    pvalArr = possibleValues.split(";");
+                }
 
-            case 2: // text
-                combinedPvInfo.control = toolkit.createText(client, value,
-                    SWT.LEFT | SWT.MULTI);
-                break;
+                if (combinedPvInfo.pvInfoData != null) {
+                    value = combinedPvInfo.pvInfoData.getValue();
+                }
 
-            case 3: // date_time
-                SimpleDateFormat sdf = new SimpleDateFormat(
-                    BioBankPlugin.DATE_TIME_FORMAT);
+                Label labelWidget = toolkit.createLabel(client,
+                    combinedPvInfo.pvInfo.getLabel() + ":", SWT.LEFT);
+                labelWidget.setLayoutData(new GridData(
+                    GridData.VERTICAL_ALIGN_BEGINNING));
 
-                Date date = new Date();
-                if (value != null) {
-                    try {
-                        date = sdf.parse(value);
-                    } catch (ParseException e) {
-                        e.printStackTrace();
+                switch (typeId) {
+                case 1: // number
+                    combinedPvInfo.control = toolkit.createText(client, value,
+                        SWT.LEFT);
+                    break;
+
+                case 2: // text
+                    combinedPvInfo.control = toolkit.createText(client, value,
+                        SWT.LEFT | SWT.MULTI);
+                    break;
+
+                case 3: // date_time
+                    SimpleDateFormat sdf = new SimpleDateFormat(
+                        BioBankPlugin.DATE_TIME_FORMAT);
+
+                    Date date = new Date();
+                    if (value != null) {
+                        try {
+                            date = sdf.parse(value);
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
                     }
-                }
-                DateTimeWidget w = new DateTimeWidget(client, SWT.NONE, date);
-                w.addSelectionListener(selectionListener);
-                w.addModifyListener(modifyListener);
-                w.adaptToToolkit(toolkit, true);
-                combinedPvInfo.control = w;
-                break;
+                    DateTimeWidget w = new DateTimeWidget(client, SWT.NONE,
+                        date);
+                    w.addSelectionListener(selectionListener);
+                    w.addModifyListener(modifyListener);
+                    w.adaptToToolkit(toolkit, true);
+                    combinedPvInfo.control = w;
+                    break;
 
-            case 4: // select_single
-                combinedPvInfo.control = createComboSection(client, pvalArr,
-                    value);
-                break;
+                case 4: // select_single
+                    combinedPvInfo.control = createComboSection(client,
+                        pvalArr, value);
+                    break;
 
-            case 5: // select_multiple
-                SelectMultiple s = new SelectMultiple(client, SWT.BORDER,
-                    pvalArr);
-                s.adaptToToolkit(toolkit, true);
-                if (value != null) {
-                    s.setSelections(value.split(";"));
-                }
-                combinedPvInfo.control = s;
-                break;
+                case 5: // select_multiple
+                    SelectMultiple s = new SelectMultiple(client, SWT.BORDER,
+                        pvalArr);
+                    s.adaptToToolkit(toolkit, true);
+                    if (value != null) {
+                        s.setSelections(value.split(";"));
+                    }
+                    combinedPvInfo.control = s;
+                    break;
 
-            case 6: // select_single_and_quantity_1_5_1
-                ComboAndQuantity c = new ComboAndQuantity(client, SWT.BORDER);
-                c.adaptToToolkit(toolkit, true);
-                if (pvalArr != null) {
-                    c.addValues(pvalArr);
-                }
-                if (value != null) {
-                    String[] values = value.split(" ");
-                    Assert.isTrue(values.length == 2);
-                    c.setText(values[0], Integer.parseInt(values[1]));
-                }
-                combinedPvInfo.control = c;
-                break;
+                case 6: // select_single_and_quantity_1_5_1
+                    ComboAndQuantity c = new ComboAndQuantity(client,
+                        SWT.BORDER);
+                    c.adaptToToolkit(toolkit, true);
+                    if (pvalArr != null) {
+                        c.addValues(pvalArr);
+                    }
+                    if (value != null) {
+                        String[] values = value.split(" ");
+                        Assert.isTrue(values.length == 2);
+                        c.setText(values[0], Integer.parseInt(values[1]));
+                    }
+                    combinedPvInfo.control = c;
+                    break;
 
-            default:
-                Assert.isTrue(false, "Invalid pvInfo type: " + typeId);
-            }
-
-            if (combinedPvInfo.control != null) {
-                GridData gd = new GridData(GridData.FILL_HORIZONTAL);
-                if (typeId == 2) {
-                    gd.heightHint = 40;
+                default:
+                    Assert.isTrue(false, "Invalid pvInfo type: " + typeId);
                 }
-                combinedPvInfo.control.setLayoutData(gd);
-                controls.put(combinedPvInfo.pvInfo.getLabel(),
-                    combinedPvInfo.control);
+
+                if (combinedPvInfo.control != null) {
+                    GridData gd = new GridData(GridData.FILL_HORIZONTAL);
+                    if (typeId == 2) {
+                        gd.heightHint = 40;
+                    }
+                    combinedPvInfo.control.setLayoutData(gd);
+                    controls.put(combinedPvInfo.pvInfo.getLabel(),
+                        combinedPvInfo.control);
+                }
             }
         }
     }
@@ -329,6 +368,8 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         }
         patientVisit.setDateDrawn(dateDrawn.getDate());
 
+        savePvSampleSources();
+
         // FIXME get csm_user_id and set it to the Patient Visit at insert
 
         if ((patientVisit.getId() == null) || (patientVisit.getId() == 0)) {
@@ -342,6 +383,54 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         savePvInfoData();
 
         patientAdapter.performExpand();
+    }
+
+    private void savePvSampleSources() throws Exception {
+        Collection<PvSampleSource> ssCollection = pvSampleSourceEntryWidget
+            .getPvSampleSources();
+        SDKQuery query;
+        SDKQueryResult result;
+
+        removeDeletedPvSampleSources(ssCollection);
+
+        Collection<PvSampleSource> savedSsCollection = new HashSet<PvSampleSource>();
+        for (PvSampleSource ss : ssCollection) {
+            ss.setPatientVisit(patientVisit);
+            if ((ss.getId() == null) || (ss.getId() == 0)) {
+                query = new InsertExampleQuery(ss);
+            } else {
+                query = new UpdateExampleQuery(ss);
+            }
+            result = appService.executeQuery(query);
+            savedSsCollection.add((PvSampleSource) result.getObjectResult());
+        }
+        patientVisit.setPvSampleSourceCollection(savedSsCollection);
+    }
+
+    private void removeDeletedPvSampleSources(
+        Collection<PvSampleSource> ssCollection) {
+        // no need to remove if patientVisit is not yet in the database
+        if (patientVisit.getId() == null)
+            return;
+
+        List<Integer> selectedPvSampleSourceIds = new ArrayList<Integer>();
+        for (PvSampleSource ss : ssCollection) {
+            selectedPvSampleSourceIds.add(ss.getId());
+        }
+
+        SDKQuery query;
+        try {
+            for (PvSampleSource ss : patientVisit.getPvSampleSourceCollection()) {
+                if (!selectedPvSampleSourceIds.contains(ss.getId())) {
+                    query = new DeleteExampleQuery(ss);
+                    appService.executeQuery(query);
+                }
+            }
+        } catch (final RemoteConnectFailureException exp) {
+            BioBankPlugin.openRemoteConnectErrorMessage();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void savePvInfoData() throws Exception {

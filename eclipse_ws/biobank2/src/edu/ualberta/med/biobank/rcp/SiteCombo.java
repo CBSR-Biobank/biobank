@@ -4,8 +4,8 @@ import java.util.List;
 
 import org.eclipse.jface.action.ControlContribution;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
@@ -37,11 +37,13 @@ public class SiteCombo extends ControlContribution {
         combo = new Combo(resizedComboPanel, SWT.NONE | SWT.DROP_DOWN
             | SWT.READ_ONLY);
 
-        combo.addSelectionListener(new SelectionAdapter() {
+        combo.addModifyListener(new ModifyListener() {
             @Override
-            public void widgetSelected(SelectionEvent e) {
-                SessionManager.getInstance().setCurrentSite(
-                    sites.get(combo.getSelectionIndex()));
+            public void modifyText(ModifyEvent e) {
+                if (combo.getSelectionIndex() < sites.size()) {
+                    SessionManager.getInstance().setCurrentSite(
+                        sites.get(combo.getSelectionIndex()));
+                }
             }
         });
         GridData gd = new GridData();

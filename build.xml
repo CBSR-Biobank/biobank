@@ -12,6 +12,7 @@
 	<property name="cacore.sdk.dir" location="caCORE_SDK/sdk" />
 	<property name="cacore.sdk.filename" value="caCORE_SDK_411.tar.gz" />
 	<property name="eclipse.proj.dir" location="eclipse_ws/biobank2" />
+	<property name="eclipse.proj.dir.common" location="eclipse_ws/biobank.common" />
 	<property name="eclipse.proj.dir.importer" location="eclipse_ws/biobank2.importer" />
 	<property name="eclipse.proj.dir.tests" location="eclipse_ws/biobank2.importer" />
 	<property name="eclipse.proj.dir.junit" location="eclipse_ws/biobank2.tests" />
@@ -120,14 +121,14 @@
 		depends="sdk-files">
 		<dependset>
 			<srcfilelist dir="${cacore.sdk.dir}/output/biobank2/package/remote-client/lib" files="${sdk.jar.files.basename}" />
-			<targetfilelist dir="${eclipse.proj.dir}/lib" files="${sdk.jar.files.basename}" />
+			<targetfilelist dir="${eclipse.proj.dir.common}/lib" files="${sdk.jar.files.basename}" />
 			<targetfilelist dir="${eclipse.proj.dir.importer}/lib" files="${sdk.jar.files.basename}" />
 			<targetfilelist dir="${eclipse.proj.dir.tests}/lib" files="${sdk.jar.files.basename}" />
 		</dependset>
-		<copy todir="${eclipse.proj.dir}/lib">
+		<copy todir="${eclipse.proj.dir.common}/lib">
 			<fileset dir="${cacore.sdk.dir}/output/biobank2/package/remote-client/lib" />
 		</copy>
-		<copy todir="${eclipse.proj.dir}/conf">
+		<copy todir="${eclipse.proj.dir.common}/conf">
 			<fileset dir="${cacore.sdk.dir}/output/biobank2/package/remote-client/conf">
 				<include name="application-config-client*.xml" />
 			</fileset>

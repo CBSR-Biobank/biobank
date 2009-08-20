@@ -173,8 +173,6 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
     }
 
     private boolean checkClinicNameUnique() throws ApplicationException {
-        // Site site = clinicAdapter.getParentFromClass(SiteAdapter.class)
-        // .getSite();
         Site site = SessionManager.getInstance().getCurrentSite();
 
         HQLCriteria c = new HQLCriteria(

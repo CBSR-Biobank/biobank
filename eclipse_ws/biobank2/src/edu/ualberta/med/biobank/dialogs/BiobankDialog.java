@@ -20,10 +20,11 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.databinding.swt.SWTObservables;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
-import org.eclipse.jface.fieldassist.ControlDecoration;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CCombo;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -37,6 +38,7 @@ import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.forms.FieldInfo;
 import edu.ualberta.med.biobank.forms.FormUtils;
+import edu.ualberta.med.biobank.validators.AbstractValidator;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
@@ -46,14 +48,20 @@ public class BiobankDialog extends Dialog {
 
     private Label errorLabel;
 
+    private Boolean enabledOkButton;
+
     protected BiobankDialog(Shell parentShell) {
         super(parentShell);
         dbc = new DataBindingContext();
     }
 
     @Override
-    protected Control createContents(Composite parent) {
-        Control contents = super.createContents(parent);
+    protected Control createButtonBar(Composite parent) {
+        Control contents = super.createButtonBar(parent);
+        if (enabledOkButton != null) {
+            // in case the binding wanted to modified it before its creation
+            setOkButtonEnabled(enabledOkButton);
+        }
         return contents;
     }
 
@@ -73,14 +81,28 @@ public class BiobankDialog extends Dialog {
     protected Control createBoundWidgetWithLabel(Composite composite,
         Class<?> widgetClass, int widgetOptions, String fieldLabel,
         String[] widgetValues, IObservableValue modelObservableValue,
-        Class<?> validatorClass, String validatorErrMsg) {
+        Class<? extends AbstractValidator> validatorClass,
+        String validatorErrMsg) {
+        AbstractValidator validator = null;
+        if (validatorClass != null) {
+            validator = createValidator(validatorClass, validatorErrMsg);
+        }
+        return createBoundWidgetWithLabel(composite, widgetClass,
+            widgetOptions, fieldLabel, widgetValues, modelObservableValue,
+            validator);
+    }
+
+    protected Control createBoundWidgetWithLabel(Composite composite,
+        Class<?> widgetClass, int widgetOptions, String fieldLabel,
+        String[] widgetValues, IObservableValue modelObservableValue,
+        AbstractValidator validator) {
         Label label;
 
         label = new Label(composite, SWT.LEFT);
         label.setText(fieldLabel + ":");
         label.setLayoutData(new GridData(GridData.VERTICAL_ALIGN_BEGINNING));
         return createBoundWidget(composite, widgetClass, widgetOptions, label,
-            widgetValues, modelObservableValue, validatorClass, validatorErrMsg);
+            widgetValues, modelObservableValue, validator);
 
     }
 
@@ -112,6 +134,15 @@ public class BiobankDialog extends Dialog {
             dbc.bindValue(SWTObservables.observeSelection(combo),
                 modelObservableValue, uvs, null);
             return combo;
+        } else if (widgetClass == CCombo.class) {
+            CCombo combo = new CCombo(composite, SWT.READ_ONLY);
+            combo.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
+            Assert.isNotNull(widgetValues, "combo values not assigned");
+            combo.setItems(widgetValues);
+
+            dbc.bindValue(SWTObservables.observeSelection(combo),
+                modelObservableValue, uvs, null);
+            return combo;
         } else if (widgetClass == Button.class) {
             Button button = new Button(composite, SWT.CHECK);
             dbc.bindValue(SWTObservables.observeSelection(button),
@@ -127,12 +158,11 @@ public class BiobankDialog extends Dialog {
     protected Control createBoundWidget(Composite composite,
         Class<?> widgetClass, int widgetOptions, Label label,
         String[] widgetValues, IObservableValue modelObservableValue,
-        Class<?> validatorClass, String validatorErrMsg) {
-        IValidator validator = null;
+        AbstractValidator validator) {
 
-        if (validatorClass != null) {
-            validator = createValidator(validatorClass, FormUtils
-                .createDecorator(label, validatorErrMsg), validatorErrMsg);
+        if (validator != null) {
+            validator.setControlDecoration(FormUtils.createDecorator(label,
+                validator.getErrorMessage()));
         }
 
         return createBoundWidget(composite, widgetClass, widgetOptions,
@@ -163,8 +193,9 @@ public class BiobankDialog extends Dialog {
 
         Combo combo = comboViewer.getCombo();
         combo.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
-        IValidator validator = createValidator(NonEmptyString.class, FormUtils
-            .createDecorator(label, errorMessage), errorMessage);
+        NonEmptyString validator = new NonEmptyString(errorMessage);
+        validator.setControlDecoration(FormUtils.createDecorator(label,
+            errorMessage));
         UpdateValueStrategy uvs = new UpdateValueStrategy();
         uvs.setAfterGetValidator(validator);
         IObservableValue selectedValue = new WritableValue("", String.class);
@@ -173,14 +204,14 @@ public class BiobankDialog extends Dialog {
         return comboViewer;
     }
 
-    protected IValidator createValidator(Class<?> validatorClass,
-        ControlDecoration dec, String validatorErrMsg) {
+    protected AbstractValidator createValidator(
+        Class<? extends AbstractValidator> validatorClass,
+        String validatorErrMsg) {
         try {
-            Class<?>[] types = new Class[] { String.class,
-                ControlDecoration.class };
+            Class<?>[] types = new Class[] { String.class };
             Constructor<?> cons = validatorClass.getConstructor(types);
-            Object[] args = new Object[] { validatorErrMsg, dec };
-            return (IValidator) cons.newInstance(args);
+            Object[] args = new Object[] { validatorErrMsg };
+            return (AbstractValidator) cons.newInstance(args);
         } catch (NoSuchMethodException e) {
             throw new RuntimeException(e);
         } catch (InvocationTargetException e) {
@@ -221,17 +252,31 @@ public class BiobankDialog extends Dialog {
                 IStatus status = (IStatus) validationStatus.getValue();
 
                 if (status.getSeverity() == IStatus.OK) {
-                    errorLabel.setText("");
-                    errorLabel.setForeground(Display.getCurrent()
+                    setErrorLabelValues("", Display.getCurrent()
                         .getSystemColor(SWT.COLOR_BLACK));
-                    getButton(IDialogConstants.OK_ID).setEnabled(true);
+                    setOkButtonEnabled(true);
                 } else {
-                    errorLabel.setText(status.getMessage());
-                    errorLabel.setForeground(Display.getCurrent()
-                        .getSystemColor(SWT.COLOR_RED));
-                    getButton(IDialogConstants.OK_ID).setEnabled(false);
+                    setErrorLabelValues(status.getMessage(), Display
+                        .getCurrent().getSystemColor(SWT.COLOR_RED));
+                    setOkButtonEnabled(false);
                 }
             }
         });
+    }
+
+    protected void setErrorLabelValues(String text, Color systemColor) {
+        if (errorLabel != null && !errorLabel.isDisposed()) {
+            errorLabel.setText(text);
+            errorLabel.setForeground(systemColor);
+        }
+    }
+
+    protected void setOkButtonEnabled(boolean enabled) {
+        Button okButton = getButton(IDialogConstants.OK_ID);
+        if (okButton != null && !okButton.isDisposed()) {
+            okButton.setEnabled(enabled);
+        } else {
+            enabledOkButton = enabled;
+        }
     }
 }
