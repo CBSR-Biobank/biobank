@@ -110,8 +110,8 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
 
         containerTypeAdapter = (ContainerTypeAdapter) adapter;
         containerType = containerTypeAdapter.getContainerType();
-        site = ((SiteAdapter) containerTypeAdapter
-            .getParentFromClass(SiteAdapter.class)).getSite();
+        site = containerTypeAdapter.getParentFromClass(SiteAdapter.class)
+            .getSite();
         allContainerTypes = site.getContainerTypeCollection();
 
         String tabName;
@@ -328,8 +328,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         client.setLayout(layout);
         toolkit.paintBordersFor(client);
 
-        initConfirmButton(client, false, true);
-        // initConfirmAddButton(client, false, true);
+        initCancelConfirmWidget(client);
     }
 
     protected void initConfirmAddButton(Composite parent,

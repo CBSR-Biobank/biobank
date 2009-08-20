@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.common;
+package edu.ualberta.med.biobank.common.utils;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -9,6 +9,8 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.springframework.util.Assert;
 
+import edu.ualberta.med.biobank.common.LabelingScheme;
+import edu.ualberta.med.biobank.common.RowColPos;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.Sample;

@@ -198,8 +198,8 @@ public class SampleStorageEntryWidget extends BiobankWidget {
 
     private void getSampleTypes() {
         try {
-            allSampleTypes = SessionManager.getInstance().getSessionAdapter()
-                .getAppService().search(SampleType.class, new SampleType());
+            allSampleTypes = SessionManager.getAppService().search(
+                SampleType.class, new SampleType());
         } catch (final RemoteConnectFailureException exp) {
             BioBankPlugin.openRemoteConnectErrorMessage();
         } catch (ApplicationException e) {

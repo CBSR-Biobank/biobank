@@ -12,7 +12,6 @@ import org.apache.commons.collections.MapIterator;
 import org.apache.commons.collections.map.ListOrderedMap;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ComboViewer;
@@ -95,7 +94,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
 
         String tabName;
         if (patientVisit.getId() == null) {
-            tabName = "New Patient Visit";
+            tabName = "New Patient Visit for patient ";
         } else {
             SimpleDateFormat sdf = new SimpleDateFormat(
                 BioBankPlugin.DATE_FORMAT);
@@ -110,7 +109,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         form.setMessage(getOkMessage(), IMessageProvider.NONE);
         form.getBody().setLayout(new GridLayout(1, false));
         createPvSection();
-        createButtonsSection();
+        initCancelConfirmWidget(form.getBody());
     }
 
     private void createPvSection() {
@@ -121,8 +120,8 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        Patient patient = ((PatientAdapter) patientVisitAdapter
-            .getParentFromClass(PatientAdapter.class)).getPatient();
+        Patient patient = patientVisitAdapter.getParentFromClass(
+            PatientAdapter.class).getWrapper().getPatient();
         Study study = patient.getStudy();
         if (patientVisit.getId() == null) {
             // choose clinic for new visit
@@ -297,34 +296,12 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         return combo;
     }
 
-    private void createButtonsSection() {
-        Composite client = toolkit.createComposite(form.getBody());
-        GridLayout layout = new GridLayout(2, false);
-        layout.horizontalSpacing = 10;
-        client.setLayout(layout);
-        client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        toolkit.paintBordersFor(client);
-
-        initConfirmButton(client, true, false);
-    }
-
     @Override
     protected String getOkMessage() {
         if (patientVisit.getId() == null) {
             return MSG_NEW_PATIENT_VISIT_OK;
         }
         return MSG_PATIENT_VISIT_OK;
-    }
-
-    @Override
-    protected void handleStatusChanged(IStatus status) {
-        if (status.getSeverity() == IStatus.OK) {
-            form.setMessage(getOkMessage(), IMessageProvider.NONE);
-            getConfirmButton().setEnabled(true);
-        } else {
-            form.setMessage(status.getMessage(), IMessageProvider.ERROR);
-            getConfirmButton().setEnabled(false);
-        }
     }
 
     @Override
@@ -339,7 +316,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
 
         PatientAdapter patientAdapter = (PatientAdapter) patientVisitAdapter
             .getParent();
-        patientVisit.setPatient(patientAdapter.getPatient());
+        patientVisit.setPatient(patientAdapter.getWrapper().getPatient());
         if (clinicsComboViewer != null) {
             IStructuredSelection clinicSelection = (IStructuredSelection) clinicsComboViewer
                 .getSelection();
@@ -441,7 +418,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
 
     private boolean checkVisitDateDrawnUnique() throws ApplicationException {
         Patient patient = ((PatientAdapter) patientVisitAdapter.getParent())
-            .getPatient();
+            .getWrapper().getPatient();
 
         HQLCriteria c = new HQLCriteria(
             "from edu.ualberta.med.biobank.model.PatientVisit as v "

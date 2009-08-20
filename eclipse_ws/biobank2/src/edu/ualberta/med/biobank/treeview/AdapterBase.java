@@ -283,11 +283,12 @@ public abstract class AdapterBase {
         }
     }
 
-    public AdapterBase getParentFromClass(Class<?> parentClass) {
+    @SuppressWarnings("unchecked")
+    public <E> E getParentFromClass(Class<E> parentClass) {
         AdapterBase node = this;
         while (node != null) {
             if (node.getClass().equals(parentClass)) {
-                return node;
+                return (E) node;
             } else {
                 node = node.getParent();
             }

@@ -17,7 +17,7 @@ import org.eclipse.ui.PartInitException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.ModelUtils;
+import edu.ualberta.med.biobank.common.utils.ModelUtils;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.PvInfo;
@@ -95,8 +95,8 @@ public class PatientVisitViewForm extends BiobankViewForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        Study study = ((StudyAdapter) patientVisitAdapter
-            .getParentFromClass(StudyAdapter.class)).getStudy();
+        Study study = patientVisitAdapter
+            .getParentFromClass(StudyAdapter.class).getStudy();
 
         clinicLabel = (Label) createWidget(client, Label.class, SWT.NONE,
             "Clinic");
@@ -162,10 +162,9 @@ public class PatientVisitViewForm extends BiobankViewForm {
 
     private void createSamplesSection() {
         Composite parent = createSectionWithClient("Samples");
-        samplesWidget = new SamplesListWidget(parent,
-            (SiteAdapter) patientVisitAdapter
-                .getParentFromClass(SiteAdapter.class), patientVisit
-                .getSampleCollection());
+        samplesWidget = new SamplesListWidget(parent, patientVisitAdapter
+            .getParentFromClass(SiteAdapter.class), patientVisit
+            .getSampleCollection());
         samplesWidget.adaptToToolkit(toolkit, true);
         samplesWidget.setSelection(patientVisitAdapter.getSelectedSample());
 

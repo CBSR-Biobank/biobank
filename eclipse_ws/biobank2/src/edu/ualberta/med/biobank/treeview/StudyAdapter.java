@@ -19,16 +19,24 @@ public class StudyAdapter extends AdapterBase {
 
     private Study study;
 
+    /**
+     * if true, enable normal actions of this adapter
+     */
+    private boolean enableActions = true;
+
     public StudyAdapter(AdapterBase parent, Study study) {
+        this(parent, study, true);
+    }
+
+    public StudyAdapter(AdapterBase parent, Study study, boolean enabledActions) {
         super(parent);
         this.setStudy(study);
+        this.enableActions = enabledActions;
 
         if (study.getId() != null) {
             setId(study.getId());
             setName(study.getName());
-
         }
-        // addChild(new PatientGroup(this, PATIENTS_NODE_ID));
     }
 
     public void setStudy(Study study) {
@@ -58,32 +66,38 @@ public class StudyAdapter extends AdapterBase {
 
     @Override
     public void performDoubleClick() {
-        openForm(new FormInput(this), StudyViewForm.ID);
+        if (enableActions) {
+            openForm(new FormInput(this), StudyViewForm.ID);
+        }
     }
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-        MenuItem mi = new MenuItem(menu, SWT.PUSH);
-        mi.setText("Edit Study");
-        mi.addSelectionListener(new SelectionListener() {
-            public void widgetSelected(SelectionEvent event) {
-                openForm(new FormInput(StudyAdapter.this), StudyEntryForm.ID);
-            }
+        if (enableActions) {
 
-            public void widgetDefaultSelected(SelectionEvent e) {
-            }
-        });
+            MenuItem mi = new MenuItem(menu, SWT.PUSH);
+            mi.setText("Edit Study");
+            mi.addSelectionListener(new SelectionListener() {
+                public void widgetSelected(SelectionEvent event) {
+                    openForm(new FormInput(StudyAdapter.this),
+                        StudyEntryForm.ID);
+                }
 
-        mi = new MenuItem(menu, SWT.PUSH);
-        mi.setText("View Study");
-        mi.addSelectionListener(new SelectionListener() {
-            public void widgetSelected(SelectionEvent event) {
-                openForm(new FormInput(StudyAdapter.this), StudyViewForm.ID);
-            }
+                public void widgetDefaultSelected(SelectionEvent e) {
+                }
+            });
 
-            public void widgetDefaultSelected(SelectionEvent e) {
-            }
-        });
+            mi = new MenuItem(menu, SWT.PUSH);
+            mi.setText("View Study");
+            mi.addSelectionListener(new SelectionListener() {
+                public void widgetSelected(SelectionEvent event) {
+                    openForm(new FormInput(StudyAdapter.this), StudyViewForm.ID);
+                }
+
+                public void widgetDefaultSelected(SelectionEvent e) {
+                }
+            });
+        }
     }
 
     @Override
@@ -94,4 +108,5 @@ public class StudyAdapter extends AdapterBase {
     public AdapterBase accept(NodeSearchVisitor visitor) {
         return visitor.visit(this);
     }
+
 }

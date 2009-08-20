@@ -25,8 +25,6 @@ public class StudyClinicInfoTable extends InfoTableWidget<Clinic> {
 
     private Study study;
 
-    private List<BiobankCollectionModel> model;
-
     private WritableApplicationService appService;
 
     public StudyClinicInfoTable(Composite parent,
@@ -43,15 +41,17 @@ public class StudyClinicInfoTable extends InfoTableWidget<Clinic> {
             @Override
             public void run() {
                 try {
+                    model.clear();
                     BiobankCollectionModel item;
-                    int count = 0;
                     for (Clinic clinic : study.getClinicCollection()) {
                         if (getTableViewer().getTable().isDisposed()) {
                             return;
                         }
-                        item = model.get(count);
+                        item = new BiobankCollectionModel();
                         StudyClinicInfo info = new StudyClinicInfo();
                         item.o = info;
+                        model.add(item);
+
                         info.clinic = clinic;
                         info.clinicName = clinic.getName();
 
@@ -85,7 +85,6 @@ public class StudyClinicInfoTable extends InfoTableWidget<Clinic> {
                         Assert.isTrue(results.size() == 1,
                             "Invalid size for HQL query");
                         info.patientVisits = results.get(0);
-                        ++count;
                     }
 
                     getTableViewer().getTable().getDisplay().asyncExec(

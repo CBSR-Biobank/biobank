@@ -139,7 +139,7 @@ public class InitExamples {
             public void done(final IJobChangeEvent event) {
                 Display.getDefault().asyncExec(new Runnable() {
                     public void run() {
-                        SessionManager.getInstance().getSessionAdapter()
+                        SessionManager.getInstance().getSession()
                             .performExpand();
                         if (event.getResult().isOK()) {
                             if ((Boolean) event.getJob().getProperty(

@@ -107,7 +107,7 @@ public class SiteEntryForm extends AddressEntryFormCommon {
         client.setLayout(layout);
         toolkit.paintBordersFor(client);
 
-        initConfirmButton(client, false, true);
+        initCancelConfirmWidget(client);
     }
 
     @Override

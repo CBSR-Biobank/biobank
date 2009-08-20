@@ -4,8 +4,6 @@ import java.util.List;
 
 import org.eclipse.core.databinding.beans.PojoObservables;
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -125,18 +123,7 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        initConfirmButton(client, false, true);
-    }
-
-    @Override
-    protected void handleStatusChanged(IStatus status) {
-        if (status.getSeverity() == IStatus.OK) {
-            form.setMessage(getOkMessage(), IMessageProvider.NONE);
-            getConfirmButton().setEnabled(true);
-        } else {
-            form.setMessage(status.getMessage(), IMessageProvider.ERROR);
-            getConfirmButton().setEnabled(false);
-        }
+        initCancelConfirmWidget(client);
     }
 
     @Override
@@ -147,7 +134,7 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
     @Override
     public void saveForm() throws Exception {
         clinic.setAddress(address);
-        SiteAdapter siteAdapter = (SiteAdapter) clinicAdapter
+        SiteAdapter siteAdapter = clinicAdapter
             .getParentFromClass(SiteAdapter.class);
         clinic.setSite(siteAdapter.getSite());
 
@@ -185,8 +172,8 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
     }
 
     private boolean checkClinicNameUnique() throws ApplicationException {
-        Site site = ((SiteAdapter) clinicAdapter
-            .getParentFromClass(SiteAdapter.class)).getSite();
+        Site site = clinicAdapter.getParentFromClass(SiteAdapter.class)
+            .getSite();
 
         HQLCriteria c = new HQLCriteria(
             "from edu.ualberta.med.biobank.model.Clinic as clinic "

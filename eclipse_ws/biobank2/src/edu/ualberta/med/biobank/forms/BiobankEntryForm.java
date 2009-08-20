@@ -50,15 +50,13 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.ISaveablePart;
 import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.PlatformUI;
 import org.springframework.remoting.RemoteAccessException;
 import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
-import edu.ualberta.med.biobank.forms.input.FormInput;
-import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
+import edu.ualberta.med.biobank.widgets.CancelConfirmWidget;
 
 /**
  * Base class for data entry forms.
@@ -77,9 +75,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
 
     protected DataBindingContext dbc;
 
-    private Button confirmButton;
-
-    private Button cancelButton;
+    private CancelConfirmWidget cancelConfirmWidget;
 
     protected KeyListener keyListener = new KeyListener() {
         @Override
@@ -171,44 +167,13 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
         form.setFocus();
     }
 
-    protected void initConfirmButton(Composite parent,
-        boolean doSaveInternalAction, boolean doSaveEditorAction) {
-        confirmButton = toolkit.createButton(parent, "Confirm", SWT.PUSH);
-        if (doSaveInternalAction) {
-            confirmButton.addSelectionListener(new SelectionAdapter() {
-                @Override
-                public void widgetSelected(SelectionEvent e) {
-                    doSaveInternal();
-                }
-            });
-        }
-        if (doSaveEditorAction) {
-            confirmButton.addSelectionListener(new SelectionAdapter() {
-                @Override
-                public void widgetSelected(SelectionEvent e) {
-                    PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-                        .getActivePage().saveEditor(BiobankEntryForm.this,
-                            false);
-                    if (!BiobankEntryForm.this.isDirty()) {
-                        PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-                            .getActivePage().closeEditor(BiobankEntryForm.this,
-                                false);
-                        AdapterBase.openForm(new FormInput(adapter),
-                            getNextOpenedFormID());
-                    }
-                }
-            });
-        }
+    protected void initCancelConfirmWidget(Composite parent) {
+        initConfirmButton(parent, false);
     }
 
-    protected void initCancelButton(Composite parent) {
-        cancelButton = toolkit.createButton(parent, "Cancel", SWT.PUSH);
-        cancelButton.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                cancelForm();
-            }
-        });
+    protected void initConfirmButton(Composite parent, boolean showtextField) {
+        cancelConfirmWidget = new CancelConfirmWidget(parent, this,
+            showtextField);
     }
 
     public abstract void cancelForm();
@@ -405,10 +370,14 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
     protected void handleStatusChanged(IStatus status) {
         if (status.getSeverity() == IStatus.OK) {
             form.setMessage(getOkMessage(), IMessageProvider.NONE);
-            confirmButton.setEnabled(true);
+            if (cancelConfirmWidget != null) {
+                cancelConfirmWidget.setConfirmEnabled(true);
+            }
         } else {
             form.setMessage(status.getMessage(), IMessageProvider.ERROR);
-            confirmButton.setEnabled(false);
+            if (cancelConfirmWidget != null) {
+                cancelConfirmWidget.setConfirmEnabled(false);
+            }
         }
     }
 
@@ -444,14 +413,6 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
 
         });
         dbc.bindValue(writableValue, observableValue, uvs, uvs);
-    }
-
-    public Button getConfirmButton() {
-        return confirmButton;
-    }
-
-    public Button getCancelButton() {
-        return cancelButton;
     }
 
     /**
