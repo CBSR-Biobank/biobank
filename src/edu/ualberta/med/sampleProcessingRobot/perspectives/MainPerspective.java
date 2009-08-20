@@ -7,7 +7,6 @@ public class MainPerspective implements IPerspectiveFactory {
 
     public static final String ID = "edu.ualberta.med.sampleProcessingRobot.perspectives.MainPerspective";
 
-    @Override
     public void createInitialLayout(IPageLayout layout) {
 
     }
