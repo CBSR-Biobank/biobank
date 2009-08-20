@@ -21,6 +21,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.LabelingScheme;
 import edu.ualberta.med.biobank.common.RowColPos;
 import edu.ualberta.med.biobank.model.Container;
@@ -70,7 +71,7 @@ public class ContainerEntryForm extends BiobankEntryForm {
                 + adapter.getClass().getName());
         containerAdapter = (ContainerAdapter) adapter;
         container = containerAdapter.getContainer();
-        site = containerAdapter.getSite();
+        site = SessionManager.getInstance().getCurrentSite();
         position = container.getPosition();
 
         if (position != null) {
@@ -142,10 +143,7 @@ public class ContainerEntryForm extends BiobankEntryForm {
         List<ContainerType> results = new ArrayList<ContainerType>();
         HQLCriteria c = new HQLCriteria(
             "from edu.ualberta.med.biobank.model.ContainerType as cttop"
-                + " where cttop.id not in (select child.id"
-                + " from edu.ualberta.med.biobank.model.ContainerType as ct"
-                + " left join ct.childContainerTypeCollection as child "
-                + " where child.id!=null)");
+                + " where cttop.topLevel=true");
         try {
             results = appService.query(c);
         } catch (Exception e) {
