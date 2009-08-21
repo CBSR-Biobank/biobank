@@ -35,7 +35,7 @@ import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.utils.ModelUtils;
+import edu.ualberta.med.biobank.common.utils.SiteUtils;
 import edu.ualberta.med.biobank.forms.listener.EnterKeyToNextFieldListener;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerType;
@@ -249,8 +249,8 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
 
     protected void setVisitsList() {
         String pNumber = patientNumberText.getText();
-        currentPatient = ModelUtils.getObjectWithAttr(adapter.getAppService(),
-            Patient.class, "number", String.class, pNumber);
+        currentPatient = SiteUtils.getPatientInSite(appService, pNumber,
+            SessionManager.getInstance().getCurrentSite());
         if (currentPatient != null) {
             // show visits list
             Collection<PatientVisit> collection = currentPatient
@@ -270,8 +270,9 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
 
                     // FIXME this test doesn't work, no container has this
                     // position, this is the sample position !
-                    Container sc = ModelUtils.getContainerWithLabel(appService,
-                        positionString, null);
+                    Container sc = SiteUtils.getContainerWithTypeInSite(
+                        appService, SessionManager.getInstance()
+                            .getCurrentSite(), positionString, null);
                     if (sc == null) {
                         SamplePosition sp = getSamplePosition(positionString);
                         if (sp == null) {
@@ -330,33 +331,12 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
     protected SamplePosition getSamplePosition(String positionString)
         throws Exception {
         // int end = 2;
-        bin = ModelUtils.getContainerWithLabel(appService, positionString
-            .substring(0, 6), null);
+        bin = SiteUtils.getContainerWithTypeInSite(appService, SessionManager
+            .getInstance().getCurrentSite(), positionString.substring(0, 6),
+            "Bin");
         drawer = bin.getPosition().getParentContainer();
         cabinet = drawer.getPosition().getParentContainer();
-        // String cabinetString = positionString.substring(0, end);
-        // cabinet = ModelUtils.getContainerWithLabel(appService, cabinetString,
-        // "Cabinet");
-        // if (cabinet == null) {
-        // return null;
-        // }
-        // end += 2;
-        // String drawerString = positionString.substring(0, end);
-        // drawer = ModelUtils.getContainerWithLabel(appService, drawerString,
-        // "Drawer");
-        // if (drawer == null
-        // || !drawer.getPosition().getParentContainer().getId().equals(
-        // cabinet.getId())) {
-        // return null;
-        // }
-        // end += 2;
-        // String binString = positionString.substring(0, end);
-        // bin = ModelUtils.getContainerWithLabel(appService, binString, "Bin");
-        // if (bin == null
-        // || !bin.getPosition().getParentContainer().getId().equals(
-        // drawer.getId())) {
-        // return null;
-        // }
+
         // FIXME use label scheme for position !!!!
         SamplePosition sp = new SamplePosition();
         sp.setContainer(bin);

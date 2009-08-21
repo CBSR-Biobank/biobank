@@ -13,7 +13,7 @@ import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.part.ViewPart;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.utils.PatientUtils;
+import edu.ualberta.med.biobank.common.utils.SiteUtils;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.NodeSearchVisitor;
@@ -102,11 +102,10 @@ public class PatientAdministrationView extends ViewPart {
 
     protected void searchPatient() {
         getSite().getPage().closeAllEditors(true);
-        Patient patient = PatientUtils.getPatientInSite(SessionManager
+        Patient patient = SiteUtils.getPatientInSite(SessionManager
             .getAppService(), patientNumberText.getText(), SessionManager
             .getInstance().getCurrentSite());
         showPatient(patient);
-        // patientAdapter.performExpand();
     }
 
     @Override

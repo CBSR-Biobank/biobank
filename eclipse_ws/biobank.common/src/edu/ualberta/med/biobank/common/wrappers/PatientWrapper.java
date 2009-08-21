@@ -21,11 +21,6 @@ public class PatientWrapper extends ModelWrapper<Patient> {
         return wrappedObject;
     }
 
-    @Override
-    public Integer getId() {
-        return wrappedObject.getId();
-    }
-
     public String getNumber() {
         return wrappedObject.getNumber();
     }
@@ -58,11 +53,6 @@ public class PatientWrapper extends ModelWrapper<Patient> {
             return results.size() == 0;
         }
         return true;
-    }
-
-    @Override
-    protected Patient getNewObject() {
-        return new Patient();
     }
 
     @Override

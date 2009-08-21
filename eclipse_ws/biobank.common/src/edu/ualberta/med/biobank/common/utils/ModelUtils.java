@@ -100,32 +100,6 @@ public class ModelUtils {
         }
     }
 
-    public static Container getContainerWithLabel(
-        WritableApplicationService appService, String barcode, String type)
-        throws Exception {
-        Container container = new Container();
-        container.setLabel(barcode);
-        List<Container> containers = appService.search(Container.class,
-            container);
-        if (containers.size() == 1) {
-            return containers.get(0);
-        } else {
-            if (type != null) {
-                List<ContainerType> cTypes = ModelUtils.queryProperty(
-                    appService, ContainerType.class, "name", type, true);
-                if (cTypes.size() > 0) {
-                    for (Container c : containers) {
-                        if (c.getContainerType().getId().equals(
-                            cTypes.get(0).getId())) {
-                            return c;
-                        }
-                    }
-                }
-            }
-        }
-        return null;
-    }
-
     public static String getSamplePosition(Sample sample) {
         SamplePosition position = sample.getSamplePosition();
         if (position == null) {

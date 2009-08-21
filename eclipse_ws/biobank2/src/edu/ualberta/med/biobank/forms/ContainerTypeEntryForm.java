@@ -37,6 +37,7 @@ import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.ContainerTypeAdapter;
+import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.validators.DoubleNumber;
 import edu.ualberta.med.biobank.validators.IntegerNumber;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
@@ -124,7 +125,8 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
 
     private void retrieveSite() {
         // to get last inserted types
-        site = SessionManager.getInstance().getCurrentSite();
+        site = containerTypeAdapter.getParentFromClass(SiteAdapter.class)
+            .getSite();
         try {
             site = ModelUtils.getObjectWithId(appService, Site.class, site
                 .getId());
@@ -217,22 +219,20 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        createBoundWidgetWithLabel(client, Text.class, SWT.NONE,
-            "Dimension One Capacity", null, PojoObservables.observeValue(
-                capacity, "dimensionOneCapacity"), new IntegerNumber(
-                "Dimension one capacity is not a valid number", false));
+        createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Rows", null,
+            PojoObservables.observeValue(capacity, "dimensionOneCapacity"),
+            new IntegerNumber("Rows capactiy is not a valid number", false));
 
-        createBoundWidgetWithLabel(client, Text.class, SWT.NONE,
-            "Dimension Two Capacity", null, PojoObservables.observeValue(
-                capacity, "dimensionTwoCapacity"), new IntegerNumber(
-                "Dimension two capacity is not a valid nubmer", false));
+        createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Columns",
+            null, PojoObservables
+                .observeValue(capacity, "dimensionTwoCapacity"),
+            new IntegerNumber("Columns capacity is not a valid nubmer", false));
     }
 
     private void createContainsSection() {
         Composite client = createSectionWithClient("Contains");
         hasContainers = toolkit.createButton(client, "Contains Containers",
             SWT.RADIO);
-        hasContainers.setSelection(true);
         hasSamples = toolkit
             .createButton(client, "Contains samples", SWT.RADIO);
         hasContainers.addSelectionListener(new SelectionAdapter() {
@@ -254,7 +254,11 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
 
         createChildContainerTypesSection(client);
         createSampleDerivTypesSection(client);
-        showSamples(false);
+        boolean containsSamples = containerType.getSampleTypeCollection() != null
+            && containerType.getSampleTypeCollection().size() > 0;
+        showSamples(containsSamples);
+        hasSamples.setSelection(containsSamples);
+        hasContainers.setSelection(!containsSamples);
     }
 
     protected void showSamples(boolean show) {

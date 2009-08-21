@@ -22,7 +22,7 @@ import org.eclipse.swt.widgets.Text;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.DatabaseResult;
-import edu.ualberta.med.biobank.common.utils.StudyUtils;
+import edu.ualberta.med.biobank.common.utils.SiteUtils;
 import edu.ualberta.med.biobank.forms.listener.EnterKeyToNextFieldListener;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
@@ -100,7 +100,7 @@ public class PatientEntryForm extends BiobankEntryForm {
                 @Override
                 public void focusLost(FocusEvent e) {
                     String studyShortName = textStudy.getText();
-                    currentStudy = StudyUtils.getStudyInSite(patientAdapter
+                    currentStudy = SiteUtils.getStudyInSite(patientAdapter
                         .getAppService(), studyShortName, site);
                     if (currentStudy == null) {
                         studyValidValue.setValue(studyShortName);
