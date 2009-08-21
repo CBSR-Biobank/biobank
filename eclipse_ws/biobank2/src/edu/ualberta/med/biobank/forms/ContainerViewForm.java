@@ -341,14 +341,18 @@ public class ContainerViewForm extends BiobankViewForm {
         }
     }
 
-    private void refreshVis(String name) {
-        if (name.equalsIgnoreCase("Drawer"))
+    private void refreshVis() {
+        if (isContainerDrawer())
             cabWidget.setContainersStatus(container
                 .getChildPositionCollection());
         else {
             initCells();
             containerWidget.setContainersStatus(cells);
         }
+    }
+
+    public boolean isContainerDrawer() {
+        return container.getContainerType().getName().startsWith("Drawer");
     }
 
     protected void visualizeContainer() {
@@ -358,7 +362,7 @@ public class ContainerViewForm extends BiobankViewForm {
 
         // get occupied positions
 
-        if (container.getContainerType().getName().equalsIgnoreCase("Drawer")) {
+        if (isContainerDrawer()) {
             // if Drawer, requires special grid
             cabWidget = new CabinetDrawerWidget(client);
             cabWidget.initLegend();
@@ -387,7 +391,7 @@ public class ContainerViewForm extends BiobankViewForm {
                 containerLabelLabel);
             containerWidget.initDefaultLegend();
             selectedCells = new ArrayList<ContainerCell>();
-            initListeners();
+            // initListeners();
             int dim1 = cells.length;
             int dim2 = cells[0].length;
             if (dim2 <= 1) {
@@ -399,17 +403,18 @@ public class ContainerViewForm extends BiobankViewForm {
             containerWidget.setGridSizes(dim1, dim2, colWidth * dim2, rowHeight
                 * dim1);
             containerWidget.setContainersStatus(cells);
-            enableSelection();
-            /*
-             * containerWidget.addMouseListener(new MouseAdapter() {
-             * 
-             * @Override public void mouseDown(MouseEvent e) { ContainerCell
-             * cell = ((ChooseContainerWidget) e.widget)
-             * .getPositionAtCoordinates(e.x, e.y);
-             * openFormFor(cell.getPosition());
-             * 
-             * } });
-             */
+            // enableSelection();
+
+            containerWidget.addMouseListener(new MouseAdapter() {
+
+                @Override
+                public void mouseDown(MouseEvent e) {
+                    ContainerCell cell = ((ChooseContainerWidget) e.widget)
+                        .getPositionAtCoordinates(e.x, e.y);
+                    openFormFor(cell.getPosition());
+
+                }
+            });
         }
     }
 
@@ -485,7 +490,7 @@ public class ContainerViewForm extends BiobankViewForm {
             + container.getContainerType().getName() + ")");
         if (container.getContainerType().getChildContainerTypeCollection()
             .size() > 0)
-            refreshVis(container.getContainerType().getName());
+            refreshVis();
         setContainerValues();
     }
 

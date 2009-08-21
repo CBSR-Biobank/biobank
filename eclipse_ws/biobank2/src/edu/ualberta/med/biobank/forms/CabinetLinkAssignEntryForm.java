@@ -1,8 +1,6 @@
 package edu.ualberta.med.biobank.forms;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 import org.eclipse.core.databinding.beans.PojoObservables;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
@@ -50,7 +48,6 @@ import edu.ualberta.med.biobank.validators.NonEmptyString;
 import edu.ualberta.med.biobank.widgets.CabinetDrawerWidget;
 import edu.ualberta.med.biobank.widgets.CancelConfirmWidget;
 import edu.ualberta.med.biobank.widgets.ViewContainerWidget;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.query.example.InsertExampleQuery;
 
 public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
@@ -110,49 +107,6 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
         addBooleanBinding(new WritableValue(Boolean.FALSE, Boolean.class),
             resultShown, "Show results to check values");
 
-        List<SampleType> sampleTypes = null;
-        try {
-            sampleTypes = getSampleTypes();
-            comboViewerSampleTypes.setInput(sampleTypes);
-        } catch (ApplicationException ae) {
-            SessionManager.getLogger()
-                .error("can't retrieve cabinets type", ae);
-        }
-        if (sampleTypes == null || sampleTypes.size() == 0) {
-            BioBankPlugin.openAsyncError("Cabinet error",
-                "Cannot find a storage type for bin !");
-            form.setEnabled(false);
-        }
-    }
-
-    private List<SampleType> getSampleTypes() throws ApplicationException {
-        List<ContainerType> cabinetTypes = ModelUtils.queryProperty(appService,
-            ContainerType.class, "name", "Cabinet", false);
-        List<SampleType> sampleTypes = new ArrayList<SampleType>();
-        for (ContainerType type : cabinetTypes) {
-            Collection<SampleType> collection = getSampleTypes(type);
-            if (collection != null) {
-                sampleTypes.addAll(collection);
-            }
-        }
-        return sampleTypes;
-    }
-
-    private Collection<SampleType> getSampleTypes(ContainerType type) {
-        Collection<ContainerType> children = type
-            .getChildContainerTypeCollection();
-        if (children == null || children.size() == 0) {
-            return type.getSampleTypeCollection();
-        } else {
-            Collection<SampleType> samples = new ArrayList<SampleType>();
-            for (ContainerType child : children) {
-                Collection<SampleType> collection = getSampleTypes(child);
-                if (collection != null) {
-                    samples.addAll(collection);
-                }
-            }
-            return samples;
-        }
     }
 
     private void createLocationSection() {
@@ -215,20 +169,6 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
         });
         createVisitCombo(fieldsComposite);
 
-        Combo comboSampleType = (Combo) createBoundWidgetWithLabel(
-            fieldsComposite, Combo.class, SWT.NONE, "Sample type",
-            new String[0], selectedSampleType, NonEmptyString.class,
-            "A sample type should be selected");
-        comboViewerSampleTypes = new ComboViewer(comboSampleType);
-        comboViewerSampleTypes.setContentProvider(new ArrayContentProvider());
-        comboViewerSampleTypes.setLabelProvider(new LabelProvider() {
-            @Override
-            public String getText(Object element) {
-                SampleType st = (SampleType) element;
-                return st.getName();
-            }
-        });
-
         inventoryIdText = (Text) createBoundWidgetWithLabel(fieldsComposite,
             Text.class, SWT.NONE, "Inventory ID", new String[0],
             PojoObservables.observeValue(sample, "inventoryId"),
@@ -245,6 +185,22 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
                 if (showPosition.isEnabled()) {
                     showPositionResult();
                 }
+            }
+        });
+
+        Combo comboSampleType = (Combo) createBoundWidgetWithLabel(
+            fieldsComposite, Combo.class, SWT.NONE, "Sample type",
+            new String[0], selectedSampleType, null,
+            "A sample type should be selected");
+        // FIXME the Validator should be there after the show position is set !
+        // FIXME change place of this combo ?
+        comboViewerSampleTypes = new ComboViewer(comboSampleType);
+        comboViewerSampleTypes.setContentProvider(new ArrayContentProvider());
+        comboViewerSampleTypes.setLabelProvider(new LabelProvider() {
+            @Override
+            public String getText(Object element) {
+                SampleType st = (SampleType) element;
+                return st.getName();
             }
         });
 
@@ -335,10 +291,7 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
                         sp.setSample(sample);
                         sample.setSamplePosition(sp);
 
-                        IStructuredSelection stSelection = (IStructuredSelection) comboViewerSampleTypes
-                            .getSelection();
-                        sample.setSampleType((SampleType) stSelection
-                            .getFirstElement());
+                        showSampleType();
 
                         resultShown.setValue(Boolean.TRUE);
                         cancelConfirmWidget.setFocus();
@@ -356,6 +309,22 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
             }
 
         });
+    }
+
+    protected void showSampleType() {
+        Collection<SampleType> sampleTypes = null;
+        ContainerType parentContainerType = sample.getSamplePosition()
+            .getContainer().getContainerType();
+        sampleTypes = parentContainerType.getSampleTypeCollection();
+        if (sampleTypes == null || sampleTypes.size() == 0) {
+            BioBankPlugin.openAsyncError("Cabinet error",
+                "Cannot find a sample types!");
+            form.setEnabled(false);
+        }
+        comboViewerSampleTypes.setInput(sampleTypes);
+        if (sampleTypes.size() == 1) {
+            comboViewerSampleTypes.getCombo().select(0);
+        }
     }
 
     protected SamplePosition getSamplePosition(String positionString)
@@ -417,6 +386,9 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
     protected void saveForm() throws Exception {
         PatientVisit patientVisit = getSelectedPatientVisit();
         sample.setPatientVisit(patientVisit);
+        IStructuredSelection stSelection = (IStructuredSelection) comboViewerSampleTypes
+            .getSelection();
+        sample.setSampleType((SampleType) stSelection.getFirstElement());
         appService.executeQuery(new InsertExampleQuery(sample));
         setSaved(true);
     }

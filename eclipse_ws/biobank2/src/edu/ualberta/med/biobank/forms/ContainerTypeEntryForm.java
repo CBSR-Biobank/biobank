@@ -16,7 +16,6 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -27,6 +26,7 @@ import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.utils.ModelUtils;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.helpers.GetHelper;
 import edu.ualberta.med.biobank.model.Capacity;
@@ -71,8 +71,6 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
 
     private Capacity capacity;
 
-    private Button sampleBox;
-
     private MultiSelectWidget samplesMultiSelect;
 
     private MultiSelectWidget childContainerTypesMultiSelect;
@@ -87,16 +85,16 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
 
     private ComboViewer labelingSchemeComboViewer;
 
+    private Button hasSamples;
+
+    private Button hasContainers;
+
     public ContainerTypeEntryForm() {
         super();
         multiSelectListener = new BiobankEntryFormWidgetListener() {
             @Override
             public void selectionChanged(MultiSelectEvent event) {
                 setDirty(true);
-                if (samplesMultiSelect.getSelected().size() == 0)
-                    sampleBox.setEnabled(true);
-                else
-                    sampleBox.setEnabled(false);
             }
         };
     }
@@ -109,7 +107,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
 
         containerTypeAdapter = (ContainerTypeAdapter) adapter;
         containerType = containerTypeAdapter.getContainerType();
-        site = SessionManager.getInstance().getCurrentSite();
+        retrieveSite();
         allContainerTypes = site.getContainerTypeCollection();
 
         String tabName;
@@ -124,6 +122,17 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         setPartName(tabName);
     }
 
+    private void retrieveSite() {
+        // to get last inserted types
+        site = SessionManager.getInstance().getCurrentSite();
+        try {
+            site = ModelUtils.getObjectWithId(appService, Site.class, site
+                .getId());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     @Override
     protected void createFormContent() {
         form.setText("Container Type Information");
@@ -132,9 +141,9 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
 
         createContainerTypeSection();
         createDimensionsSection();
-        createSampleDerivTypesSection();
-        createChildContainerTypesSection();
-        createButtons();
+        createContainsSection();
+
+        initCancelConfirmWidget(form.getBody());
     }
 
     protected void createContainerTypeSection() {
@@ -183,12 +192,17 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
                 PojoObservables.observeValue(containerType, "activityStatus"),
                 null, null);
 
+            createBoundWidgetWithLabel(client, Button.class, SWT.CHECK,
+                "Is top Level Container", null, PojoObservables.observeValue(
+                    containerType, "topLevel"), null);
+
             Text comment = (Text) createBoundWidgetWithLabel(client,
                 Text.class, SWT.MULTI, "Comments", null, PojoObservables
                     .observeValue(containerType, "comment"), null, null);
             GridData gd = new GridData(GridData.FILL_HORIZONTAL);
             gd.heightHint = 40;
             comment.setLayoutData(gd);
+
         } catch (ApplicationException e) {
             e.printStackTrace();
         }
@@ -205,36 +219,53 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
 
         createBoundWidgetWithLabel(client, Text.class, SWT.NONE,
             "Dimension One Capacity", null, PojoObservables.observeValue(
-                capacity, "dimensionOneCapacity"), IntegerNumber.class,
-            "Dimension one capacity is not a valid number");
+                capacity, "dimensionOneCapacity"), new IntegerNumber(
+                "Dimension one capacity is not a valid number", false));
 
         createBoundWidgetWithLabel(client, Text.class, SWT.NONE,
             "Dimension Two Capacity", null, PojoObservables.observeValue(
-                capacity, "dimensionTwoCapacity"), IntegerNumber.class,
-            "Dimension two capacity is not a valid nubmer");
+                capacity, "dimensionTwoCapacity"), new IntegerNumber(
+                "Dimension two capacity is not a valid nubmer", false));
     }
 
-    private void createSampleDerivTypesSection() {
-        Composite client = createSectionWithClient("Contains Sample Derivative Types");
-        sampleBox = new Button(client, SWT.CHECK);
-        GridLayout layout = (GridLayout) client.getLayout();
-        layout.numColumns = 2;
-        sampleBox.setText("Holds Samples");
-        sampleBox.setSelection(true);
-        sampleBox.addSelectionListener(new SelectionListener() {
-            public void widgetSelected(SelectionEvent event) {
-                samplesMultiSelect.setEnabled(!samplesMultiSelect.getEnabled());
-                samplesMultiSelect.setVisible(!samplesMultiSelect.getVisible());
-                form.reflow(true);
-            }
-
+    private void createContainsSection() {
+        Composite client = createSectionWithClient("Contains");
+        hasContainers = toolkit.createButton(client, "Contains Containers",
+            SWT.RADIO);
+        hasContainers.setSelection(true);
+        hasSamples = toolkit
+            .createButton(client, "Contains samples", SWT.RADIO);
+        hasContainers.addSelectionListener(new SelectionAdapter() {
             @Override
-            public void widgetDefaultSelected(SelectionEvent e) {
+            public void widgetSelected(SelectionEvent e) {
+                if (hasContainers.getSelection()) {
+                    showSamples(false);
+                }
             }
         });
-        GridData gd = new GridData(GridData.VERTICAL_ALIGN_BEGINNING
-            | GridData.GRAB_HORIZONTAL);
-        sampleBox.setLayoutData(gd);
+        hasSamples.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                if (hasSamples.getSelection()) {
+                    showSamples(true);
+                }
+            }
+        });
+
+        createChildContainerTypesSection(client);
+        createSampleDerivTypesSection(client);
+        showSamples(false);
+    }
+
+    protected void showSamples(boolean show) {
+        samplesMultiSelect.setVisible(show);
+        ((GridData) samplesMultiSelect.getLayoutData()).exclude = !show;
+        childContainerTypesMultiSelect.setVisible(!show);
+        ((GridData) childContainerTypesMultiSelect.getLayoutData()).exclude = show;
+        form.layout(true, true);
+    }
+
+    private void createSampleDerivTypesSection(Composite parent) {
         Collection<SampleType> stSamplesTypes = containerType
             .getSampleTypeCollection();
 
@@ -243,10 +274,14 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         allSampleDerivTypes = helper.getModelObjects(appService,
             SampleType.class);
 
-        samplesMultiSelect = new MultiSelectWidget(client, SWT.NONE,
+        samplesMultiSelect = new MultiSelectWidget(parent, SWT.NONE,
             "Selected Sample Derivatives", "Available Sample Derivatives", 100);
         samplesMultiSelect.adaptToToolkit(toolkit, true);
         samplesMultiSelect.addSelectionChangedListener(multiSelectListener);
+        GridData gd = new GridData(GridData.FILL_HORIZONTAL);
+        gd.horizontalSpan = 2;
+        samplesMultiSelect.setLayoutData(gd);
+
         ListOrderedMap availSampleDerivTypes = new ListOrderedMap();
         List<Integer> selSampleDerivTypes = new ArrayList<Integer>();
 
@@ -264,29 +299,15 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
             selSampleDerivTypes);
     }
 
-    private void createChildContainerTypesSection() {
-        Composite client = createSectionWithClient("Contains Container Types");
-        GridLayout layout = (GridLayout) client.getLayout();
-        layout.numColumns = 2;
-        Button topBox = new Button(client, SWT.CHECK);
-        topBox.setText("Top Level Container");
-        GridData gd = new GridData(GridData.VERTICAL_ALIGN_BEGINNING
-            | GridData.GRAB_HORIZONTAL);
-        topBox.setLayoutData(gd);
-        topBox.setSelection(containerType.getTopLevel());
-        topBox.addSelectionListener(new SelectionListener() {
-            public void widgetSelected(SelectionEvent event) {
-                containerType.setTopLevel(!containerType.getTopLevel());
-            }
-
-            @Override
-            public void widgetDefaultSelected(SelectionEvent e) {
-            }
-        });
-        childContainerTypesMultiSelect = new MultiSelectWidget(client,
+    private void createChildContainerTypesSection(Composite parent) {
+        childContainerTypesMultiSelect = new MultiSelectWidget(parent,
             SWT.NONE, "Selected Container Types", "Available Container Types",
             100);
         childContainerTypesMultiSelect.adaptToToolkit(toolkit, true);
+        GridData gd = new GridData(GridData.FILL_HORIZONTAL);
+        gd.horizontalSpan = 2;
+        childContainerTypesMultiSelect.setLayoutData(gd);
+
         childContainerTypesMultiSelect
             .addSelectionChangedListener(multiSelectListener);
 
@@ -309,24 +330,14 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         if (allContainerTypes != null)
             for (ContainerType type : allContainerTypes) {
                 Integer id = type.getId();
-                if (myId.compareTo(id) != 0 && type.getTopLevel() == false) {
+                if (myId.compareTo(id) != 0
+                    && (type.getTopLevel() == null || type.getTopLevel() == false)) {
                     availContainerTypes.put(id, type.getName());
                 }
             }
         childContainerTypesMultiSelect.addSelections(availContainerTypes,
             selChildContainerTypes);
 
-    }
-
-    protected void createButtons() {
-        Composite client = toolkit.createComposite(form.getBody());
-        GridLayout layout = new GridLayout();
-        layout.horizontalSpacing = 10;
-        layout.numColumns = 2;
-        client.setLayout(layout);
-        toolkit.paintBordersFor(client);
-
-        initCancelConfirmWidget(client);
     }
 
     protected void initConfirmAddButton(Composite parent,
@@ -394,7 +405,6 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         saveSampleTypes();
 
         saveChildContainerTypes();
-        // saveCapacity();
         containerType.setCapacity(capacity);
 
         // associate the storage type to it's site
@@ -417,51 +427,35 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
 
         containerTypeAdapter.setContainerType(containerType);
         containerTypeAdapter.getParent().performExpand();
-
     }
 
-    // private void saveCapacity() throws Exception {
-    // SDKQuery query;
-    // SDKQueryResult result;
-    //
-    // Integer id = capacity.getId();
-    //
-    // if ((id == null) || (id == 0)) {
-    // query = new InsertExampleQuery(capacity);
-    // } else {
-    // query = new UpdateExampleQuery(capacity);
-    // }
-    //
-    // result = appService.executeQuery(query);
-    // containerType.setCapacity((Capacity) result.getObjectResult());
-    // }
-
     private void saveSampleTypes() {
-        List<Integer> selSampleTypeIds = samplesMultiSelect.getSelected();
         Set<SampleType> selSampleTypes = new HashSet<SampleType>();
-        for (SampleType sampleType : allSampleDerivTypes) {
-            int id = sampleType.getId();
-            if (selSampleTypeIds.indexOf(id) >= 0) {
-                selSampleTypes.add(sampleType);
+        if (hasSamples.getSelection()) {
+            List<Integer> selSampleTypeIds = samplesMultiSelect.getSelected();
+            for (SampleType sampleType : allSampleDerivTypes) {
+                int id = sampleType.getId();
+                if (selSampleTypeIds.indexOf(id) >= 0) {
+                    selSampleTypes.add(sampleType);
+                }
             }
-
+            Assert.isTrue(selSampleTypes.size() == selSampleTypeIds.size(),
+                "problem with sample type selections");
         }
-        Assert.isTrue(selSampleTypes.size() == selSampleTypeIds.size(),
-            "problem with sample type selections");
         containerType.setSampleTypeCollection(selSampleTypes);
     }
 
     private void saveChildContainerTypes() throws Exception {
-        List<Integer> selContainerTypeIds = childContainerTypesMultiSelect
-            .getSelected();
-
         Collection<ContainerType> selContainerTypes = new HashSet<ContainerType>();
-
-        if (allContainerTypes != null) {
-            for (ContainerType containerType : allContainerTypes) {
-                int id = containerType.getId();
-                if (selContainerTypeIds.indexOf(id) >= 0) {
-                    selContainerTypes.add(containerType);
+        List<Integer> selContainerTypeIds = new ArrayList<Integer>();
+        if (hasContainers.getSelection()) {
+            selContainerTypeIds = childContainerTypesMultiSelect.getSelected();
+            if (allContainerTypes != null) {
+                for (ContainerType containerType : allContainerTypes) {
+                    int id = containerType.getId();
+                    if (selContainerTypeIds.indexOf(id) >= 0) {
+                        selContainerTypes.add(containerType);
+                    }
                 }
             }
         }

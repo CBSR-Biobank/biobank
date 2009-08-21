@@ -93,8 +93,8 @@ public class ContainerTypeViewForm extends BiobankViewForm {
             visualizeContainer();
         }
         createDimensionsSection();
-        createSampleTypesSection();
         createChildContainerTypesSection();
+        createSampleTypesSection();
         createButtons();
     }
 
