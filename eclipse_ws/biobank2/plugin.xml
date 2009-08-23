@@ -827,9 +827,10 @@
             name="General">
       </page>
       <page
+          category="Scanner"
             class="edu.ualberta.med.biobank.preferences.ScannerPreferencePage"
             id="edu.ualberta.med.biobank.preferences.gereral"
-            name="Scanner">
+            name="Plate Barcodes">
       </page>
    </extension>
    <extension
