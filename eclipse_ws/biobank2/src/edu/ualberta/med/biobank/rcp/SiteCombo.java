@@ -11,6 +11,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Label;
 import org.springframework.remoting.RemoteAccessException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
@@ -29,11 +30,13 @@ public class SiteCombo extends ControlContribution {
     @Override
     protected Control createControl(Composite parent) {
         Composite resizedComboPanel = new Composite(parent, SWT.NONE);
-        GridLayout layout = new GridLayout(1, false);
+        GridLayout layout = new GridLayout(2, false);
         layout.marginHeight = 0;
         layout.marginWidth = 0;
         // layout.horizontalSpacing = 5;
         resizedComboPanel.setLayout(layout);
+        Label siteLabel = new Label(resizedComboPanel, SWT.NONE);
+        siteLabel.setText("Working Site: ");
         combo = new Combo(resizedComboPanel, SWT.NONE | SWT.DROP_DOWN
             | SWT.READ_ONLY);
 
