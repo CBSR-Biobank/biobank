@@ -155,28 +155,36 @@ public class StudyEntryForm extends BiobankEntryForm {
     }
 
     private void createClinicSection() {
-        Composite client = createSectionWithClient("Available Clinics");
-        Collection<Clinic> studyClinics = study.getClinicCollection();
-        allClinics = site.getClinicCollection();
+        try {
+            Composite client = createSectionWithClient("Available Clinics");
+            Collection<Clinic> studyClinics = ModelUtils
+                .getStudyClinicCollection(appService, study);
+            allClinics = site.getClinicCollection();
 
-        ListOrderedMap availClinics = new ListOrderedMap();
-        List<Integer> selClinics = new ArrayList<Integer>();
+            ListOrderedMap availClinics = new ListOrderedMap();
+            List<Integer> selClinics = new ArrayList<Integer>();
 
-        if (studyClinics != null) {
-            for (Clinic clinic : studyClinics) {
-                selClinics.add(clinic.getId());
+            if (studyClinics != null) {
+                for (Clinic clinic : studyClinics) {
+                    selClinics.add(clinic.getId());
+                }
             }
-        }
 
-        for (Clinic clinic : allClinics) {
-            availClinics.put(clinic.getId(), clinic.getName());
-        }
+            for (Clinic clinic : allClinics) {
+                availClinics.put(clinic.getId(), clinic.getName());
+            }
 
-        clinicsMultiSelect = new MultiSelectWidget(client, SWT.NONE,
-            "Selected Clinics", "Available Clinics", 100);
-        clinicsMultiSelect.adaptToToolkit(toolkit, true);
-        clinicsMultiSelect.addSelections(availClinics, selClinics);
-        clinicsMultiSelect.addSelectionChangedListener(listener);
+            clinicsMultiSelect = new MultiSelectWidget(client, SWT.NONE,
+                "Selected Clinics", "Available Clinics", 100);
+            clinicsMultiSelect.adaptToToolkit(toolkit, true);
+            clinicsMultiSelect.addSelections(availClinics, selClinics);
+            clinicsMultiSelect.addSelectionChangedListener(listener);
+        } catch (final RemoteConnectFailureException exp) {
+            BioBankPlugin.openRemoteConnectErrorMessage();
+        } catch (Exception e) {
+            SessionManager.getLogger().error(
+                "Error while retrieving the clinic", e);
+        }
     }
 
     private void createSampleStorageSection() {
@@ -321,7 +329,9 @@ public class StudyEntryForm extends BiobankEntryForm {
         }
         Assert.isTrue(selClinics.size() == selClinicIds.size(),
             "problem with clinic selections");
-        study.setClinicCollection(selClinics);
+
+        // FIXME: should be a contact collection
+        // study.setClinicCollection(selClinics);
 
         // get the selected sample sources from widget
         List<Integer> selSampleSourceIds = sampleSourceMultiSelect

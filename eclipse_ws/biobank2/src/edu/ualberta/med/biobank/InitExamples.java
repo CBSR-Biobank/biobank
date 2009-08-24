@@ -193,7 +193,6 @@ public class InitExamples {
         study.setName("Blood Borne Pathogens");
         study.setNameShort("BBP");
         study.setSite(site);
-        study.setClinicCollection(site.getClinicCollection());
         SDKQueryResult res = appService.executeQuery(new InsertExampleQuery(
             study));
         study = (Study) res.getObjectResult();

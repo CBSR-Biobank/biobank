@@ -6,12 +6,15 @@ import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.widgets.Composite;
+import org.springframework.remoting.RemoteConnectFailureException;
 
+import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.utils.ModelUtils;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.StudyClinicInfo;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
@@ -28,11 +31,11 @@ public class StudyClinicInfoTable extends InfoTableWidget<Clinic> {
     private WritableApplicationService appService;
 
     public StudyClinicInfoTable(Composite parent,
-        WritableApplicationService appService, Study study) {
+        WritableApplicationService appService, Study study) throws Exception {
         super(parent, null, headings, bounds);
         this.appService = appService;
         this.study = study;
-        setCollection(study.getClinicCollection());
+        setCollection(ModelUtils.getStudyClinicCollection(appService, study));
     }
 
     @Override
@@ -43,7 +46,8 @@ public class StudyClinicInfoTable extends InfoTableWidget<Clinic> {
                 try {
                     model.clear();
                     BiobankCollectionModel item;
-                    for (Clinic clinic : study.getClinicCollection()) {
+                    for (Clinic clinic : ModelUtils.getStudyClinicCollection(
+                        appService, study)) {
                         if (getTableViewer().getTable().isDisposed()) {
                             return;
                         }
@@ -95,8 +99,11 @@ public class StudyClinicInfoTable extends InfoTableWidget<Clinic> {
                             }
 
                         });
-                } catch (ApplicationException e) {
-                    e.printStackTrace();
+                } catch (final RemoteConnectFailureException exp) {
+                    BioBankPlugin.openRemoteConnectErrorMessage();
+                } catch (Exception e) {
+                    SessionManager.getLogger().error(
+                        "Error while retrieving the clinic", e);
                 }
             }
         };
