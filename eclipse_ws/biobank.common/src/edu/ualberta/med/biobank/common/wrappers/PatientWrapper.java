@@ -46,8 +46,8 @@ public class PatientWrapper extends ModelWrapper<Patient> {
     public boolean checkPatientNumberUnique() throws ApplicationException {
         if (isNew()) {
             HQLCriteria c = new HQLCriteria("from " + Patient.class.getName()
-                + "where study = ? and number = ?", Arrays.asList(new Object[] {
-                wrappedObject.getStudy(), getNumber() }));
+                + " where study = ? and number = ?", Arrays
+                .asList(new Object[] { getStudy(), getNumber() }));
 
             List<Object> results = appService.query(c);
             return results.size() == 0;
