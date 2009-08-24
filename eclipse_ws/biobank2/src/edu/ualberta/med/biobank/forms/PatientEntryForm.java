@@ -28,6 +28,7 @@ import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.PatientAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
+import edu.ualberta.med.biobank.views.PatientAdministrationView;
 
 public class PatientEntryForm extends BiobankEntryForm {
     public static final String ID = "edu.ualberta.med.biobank.forms.PatientEntryForm";
@@ -155,6 +156,9 @@ public class PatientEntryForm extends BiobankEntryForm {
             BioBankPlugin.openAsyncError("Save Problem", res.getMessage());
             setDirty(true);
         }
+        PatientAdministrationView.currentInstance
+            .showPatientInTree(patientAdapter.getWrapper().getPatient());
+
     }
 
     @Override

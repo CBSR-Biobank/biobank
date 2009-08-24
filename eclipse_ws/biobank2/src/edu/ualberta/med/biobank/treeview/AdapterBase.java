@@ -248,8 +248,7 @@ public abstract class AdapterBase {
         Display.getDefault().asyncExec(new Runnable() {
             public void run() {
                 loadChildren(true);
-                SessionManager.getInstance().getTreeViewer().expandToLevel(
-                    AdapterBase.this, 1);
+                getRootNode().expandChild(AdapterBase.this);
             }
         });
     }
@@ -300,5 +299,9 @@ public abstract class AdapterBase {
 
     public String getTreeText() {
         return getName();
+    }
+
+    public RootNode getRootNode() {
+        return getParentFromClass(RootNode.class);
     }
 }

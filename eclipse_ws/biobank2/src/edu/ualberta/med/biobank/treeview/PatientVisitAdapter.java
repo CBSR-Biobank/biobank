@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.treeview;
 
 import java.text.SimpleDateFormat;
+import java.util.Collection;
 import java.util.Date;
 
 import org.eclipse.core.runtime.Assert;
@@ -54,6 +55,16 @@ public class PatientVisitAdapter extends AdapterBase {
             return sdf.format(date);
         }
         return null;
+    }
+
+    @Override
+    public String getTreeText() {
+        Collection<Sample> samples = patientVisit.getSampleCollection();
+        int total = 0;
+        if (samples != null) {
+            total = samples.size();
+        }
+        return getName() + " [" + total + "]";
     }
 
     @Override

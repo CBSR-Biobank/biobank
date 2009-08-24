@@ -9,8 +9,14 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class RootNode extends AdapterBase {
 
+    private TreeViewer treeViewer;
+
     public RootNode() {
         super(null, 1, "root");
+    }
+
+    public void setTreeViewer(TreeViewer treeViewer) {
+        this.treeViewer = treeViewer;
     }
 
     @Override
@@ -38,5 +44,11 @@ public class RootNode extends AdapterBase {
     @Override
     public String getTitle() {
         return null;
+    }
+
+    public void expandChild(AdapterBase child) {
+        if (treeViewer != null) {
+            treeViewer.expandToLevel(child, 1);
+        }
     }
 }
