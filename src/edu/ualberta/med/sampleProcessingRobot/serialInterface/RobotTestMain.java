@@ -16,7 +16,8 @@ public class RobotTestMain {
 		// New interface
 		RobotInterface robot = new RobotInterface();
 		try{
-			robot.initialize(SourceTubeSize.TEN_MIL, FluidLevelType.FLUID_TYPE_BLOOD);
+			robot.initialize(SourceTubeSize.TEN_MIL, 
+					FluidLevelType.FLUID_TYPE_BLOOD);
 		} catch (RobotInitException cbsre) {
 			System.out.println(cbsre);
 			System.exit(1);
@@ -33,7 +34,7 @@ public class RobotTestMain {
 			System.exit(1);
 		}
 		// Read barcode
-		try{
+		/*try{
 			barcode = robot.scanSourceTubeBarcode();
 		} catch(RobotException cbsre) {
 			System.out.println(cbsre);
@@ -44,7 +45,7 @@ public class RobotTestMain {
 			System.out.println("Couldn't read source tube barcode");
 			done(robot);
 			System.exit(1);
-		}
+		}*/
 		// Get fluid level
 		try{
 			volume = robot.scanSourceTubeLevel();
@@ -74,7 +75,7 @@ public class RobotTestMain {
 		while(volume > 2.0) {
 			// Get some liquid
 			try{
-				volume = robot.aspirateSample(0.8);
+				volume = robot.aspirateSample(800);
 			} catch(RobotException cbsre) {
 				System.out.println(cbsre);
 				done(robot);
@@ -82,8 +83,8 @@ public class RobotTestMain {
 			}
 			// Dispense to samples
 			try{
-				robot.dispensePallet(1, sampleID++, 0.4);
-				robot.dispensePallet(1, sampleID++, 0.4);
+				robot.dispensePallet(1, sampleID++, 400);
+				robot.dispensePallet(1, sampleID++, 400);
 			} catch(RobotException cbsre) {
 				System.out.println(cbsre);
 				done(robot);
