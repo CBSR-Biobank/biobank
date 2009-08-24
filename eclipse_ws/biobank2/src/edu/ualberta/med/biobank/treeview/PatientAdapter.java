@@ -12,7 +12,7 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.ModelUtils;
+import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.forms.PatientEntryForm;
 import edu.ualberta.med.biobank.forms.PatientViewForm;
 import edu.ualberta.med.biobank.forms.PatientVisitEntryForm;
@@ -22,32 +22,28 @@ import edu.ualberta.med.biobank.model.PatientVisit;
 
 public class PatientAdapter extends AdapterBase {
 
-    private Patient patient;
+    private PatientWrapper patientWrapper;
 
     public PatientAdapter(AdapterBase parent, Patient patient) {
         super(parent);
-        this.patient = patient;
+        this.patientWrapper = new PatientWrapper(getAppService(), patient);
         setHasChildren(true);
     }
 
-    public Patient getPatient() {
-        return patient;
-    }
-
-    public void setPatient(Patient patient) {
-        this.patient = patient;
+    public PatientWrapper getWrapper() {
+        return patientWrapper;
     }
 
     @Override
     public Integer getId() {
-        Assert.isNotNull(patient, "patient is null");
-        return patient.getId();
+        Assert.isNotNull(patientWrapper, "patient is null");
+        return patientWrapper.getId();
     }
 
     @Override
     public String getName() {
-        Assert.isNotNull(patient, "storage type is null");
-        return patient.getNumber();
+        Assert.isNotNull(patientWrapper.getPatient(), "storage type is null");
+        return patientWrapper.getPatient().getNumber();
     }
 
     @Override
@@ -104,10 +100,9 @@ public class PatientAdapter extends AdapterBase {
     public void loadChildren(boolean updateNode) {
         try {
             // read from database again
-            patient = ModelUtils.getObjectWithId(getAppService(),
-                Patient.class, patient.getId());
+            patientWrapper.reload();
 
-            Collection<PatientVisit> visits = patient
+            Collection<PatientVisit> visits = patientWrapper.getPatient()
                 .getPatientVisitCollection();
 
             for (PatientVisit visit : visits) {
@@ -126,7 +121,7 @@ public class PatientAdapter extends AdapterBase {
         } catch (Exception e) {
             SessionManager.getLogger().error(
                 "Error while loading children of patient "
-                    + patient.getNumber(), e);
+                    + patientWrapper.getPatient().getNumber(), e);
         }
     }
 

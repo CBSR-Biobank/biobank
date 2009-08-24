@@ -79,9 +79,9 @@ public class SampleStorageDialog extends BiobankDialog {
             sampleTypesCombo.setText(st.getName());
         }
 
-        createBoundWidgetWithLabel(contents, Text.class, SWT.BORDER, "Volume",
-            new String[0], PojoObservables
-                .observeValue(sampleStorage, "volume"), DoubleNumber.class,
+        createBoundWidgetWithLabel(contents, Text.class, SWT.BORDER,
+            "Volume (ml)", new String[0], PojoObservables.observeValue(
+                sampleStorage, "volume"), DoubleNumber.class,
             "volume should be a real number");
 
         createBoundWidgetWithLabel(contents, Text.class, SWT.BORDER,

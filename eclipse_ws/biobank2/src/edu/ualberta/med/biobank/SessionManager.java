@@ -21,6 +21,7 @@ import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.rcp.SiteCombo;
 import edu.ualberta.med.biobank.sourceproviders.DebugState;
 import edu.ualberta.med.biobank.sourceproviders.SessionState;
+import edu.ualberta.med.biobank.sourceproviders.SiteSelectionState;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.RootNode;
 import edu.ualberta.med.biobank.treeview.SessionAdapter;
@@ -167,13 +168,6 @@ public class SessionManager {
         }
     }
 
-    public SessionAdapter getSessionAdapter() {
-        if (sessionAdapter == null)
-            return null;
-        List<AdapterBase> nodes = rootNode.getChildren();
-        return (SessionAdapter) nodes.get(0);
-    }
-
     public void deleteSession() {
         rootNode.removeChild(sessionAdapter);
         sessionAdapter = null;
@@ -219,6 +213,10 @@ public class SessionManager {
         return sessionAdapter;
     }
 
+    public static WritableApplicationService getAppService() {
+        return getInstance().getSession().getAppService();
+    }
+
     public TreeViewer getTreeViewer() {
         return view.getTreeViewer();
     }
@@ -233,6 +231,13 @@ public class SessionManager {
 
     public void setCurrentSite(Site site) {
         currentSite = site;
+        IWorkbenchWindow window = PlatformUI.getWorkbench()
+            .getActiveWorkbenchWindow();
+        ISourceProviderService service = (ISourceProviderService) window
+            .getService(ISourceProviderService.class);
+        SiteSelectionState siteSelectionStateSourceProvider = (SiteSelectionState) service
+            .getSourceProvider(SiteSelectionState.SITE_SELECTION_STATE);
+        siteSelectionStateSourceProvider.setSiteSelectionState(true);
     }
 
     public Site getCurrentSite() {

@@ -32,13 +32,25 @@ public class SiteAdapter extends AdapterBase {
 
     private Site site;
 
-    public SiteAdapter(SessionAdapter parent, Site site) {
+    /**
+     * if true, enable normal actions of this adapter
+     */
+    private boolean enableActions = true;
+
+    public SiteAdapter(AdapterBase parent, Site site) {
+        this(parent, site, true);
+    }
+
+    public SiteAdapter(AdapterBase parent, Site site, boolean enableActions) {
         super(parent);
         this.site = site;
-        addChild(new StudyGroup(this, STUDIES_NODE_ID));
-        addChild(new ClinicGroup(this, CLINICS_NODE_ID));
-        addChild(new ContainerTypeGroup(this, STORAGE_TYPES_NODE_ID));
-        addChild(new ContainerGroup(this, STORAGE_CONTAINERS_NODE_ID));
+        this.enableActions = enableActions;
+        if (enableActions) {
+            addChild(new StudyGroup(this, STUDIES_NODE_ID));
+            addChild(new ClinicGroup(this, CLINICS_NODE_ID));
+            addChild(new ContainerTypeGroup(this, STORAGE_TYPES_NODE_ID));
+            addChild(new ContainerGroup(this, STORAGE_CONTAINERS_NODE_ID));
+        }
     }
 
     public void setSite(Site site) {
@@ -80,43 +92,47 @@ public class SiteAdapter extends AdapterBase {
 
     @Override
     public void performDoubleClick() {
-        openForm(new FormInput(this), SiteViewForm.ID);
+        if (enableActions) {
+            openForm(new FormInput(this), SiteViewForm.ID);
+        }
     }
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-        MenuItem mi = new MenuItem(menu, SWT.PUSH);
-        mi.setText("Edit Site");
-        mi.addSelectionListener(new SelectionListener() {
-            public void widgetSelected(SelectionEvent event) {
-                openForm(new FormInput(SiteAdapter.this), SiteEntryForm.ID);
-            }
+        if (enableActions) {
+            MenuItem mi = new MenuItem(menu, SWT.PUSH);
+            mi.setText("Edit Site");
+            mi.addSelectionListener(new SelectionListener() {
+                public void widgetSelected(SelectionEvent event) {
+                    openForm(new FormInput(SiteAdapter.this), SiteEntryForm.ID);
+                }
 
-            public void widgetDefaultSelected(SelectionEvent e) {
-            }
-        });
+                public void widgetDefaultSelected(SelectionEvent e) {
+                }
+            });
 
-        mi = new MenuItem(menu, SWT.PUSH);
-        mi.setText("View Site");
-        mi.addSelectionListener(new SelectionListener() {
-            public void widgetSelected(SelectionEvent event) {
-                openForm(new FormInput(SiteAdapter.this), SiteViewForm.ID);
-            }
+            mi = new MenuItem(menu, SWT.PUSH);
+            mi.setText("View Site");
+            mi.addSelectionListener(new SelectionListener() {
+                public void widgetSelected(SelectionEvent event) {
+                    openForm(new FormInput(SiteAdapter.this), SiteViewForm.ID);
+                }
 
-            public void widgetDefaultSelected(SelectionEvent e) {
-            }
-        });
+                public void widgetDefaultSelected(SelectionEvent e) {
+                }
+            });
 
-        mi = new MenuItem(menu, SWT.PUSH);
-        mi.setText("Delete Site");
-        mi.addSelectionListener(new SelectionListener() {
-            public void widgetSelected(SelectionEvent event) {
-                deleteSite();
-            }
+            mi = new MenuItem(menu, SWT.PUSH);
+            mi.setText("Delete Site");
+            mi.addSelectionListener(new SelectionListener() {
+                public void widgetSelected(SelectionEvent event) {
+                    deleteSite();
+                }
 
-            public void widgetDefaultSelected(SelectionEvent e) {
-            }
-        });
+                public void widgetDefaultSelected(SelectionEvent e) {
+                }
+            });
+        }
     }
 
     @Override
@@ -159,4 +175,5 @@ public class SiteAdapter extends AdapterBase {
     public AdapterBase accept(NodeSearchVisitor visitor) {
         return visitor.visit(this);
     }
+
 }

@@ -106,10 +106,6 @@
             name="Add Repository Site">
       </command>
       <command
-            id="edu.ualberta.med.biobank.commands.siteAdd"
-            name="Add Site">
-      </command>
-      <command
             id="edu.ualberta.med.biobank.commands.studyAdd"
             name="Add Study">
       </command>
@@ -135,7 +131,6 @@
             name="Search">
       </command>
       <command
-            defaultHandler="edu.ualberta.med.biobank.handlers.PatientAdministrationHandler"
             id="edu.ualberta.med.biobank.commands.patientAdmin"
             name="Patient administration">
       </command>
@@ -216,6 +211,9 @@
                <reference
                      definitionId="biobank2.mainPerpectiveSelected">
                </reference>
+               <reference
+                    definitionId="biobank2.siteSelected">
+               </reference>
             </and>
          </activeWhen>
       </handler>
@@ -229,6 +227,9 @@
                </reference>
                <reference
                      definitionId="biobank2.mainPerpectiveSelected">
+               </reference>
+               <reference
+                    definitionId="biobank2.siteSelected">
                </reference>
             </and>
          </activeWhen>
@@ -244,6 +245,9 @@
                <reference
                      definitionId="biobank2.mainPerpectiveSelected">
                </reference>
+               <reference
+                    definitionId="biobank2.siteSelected">
+               </reference>
             </and>
          </activeWhen>
       </handler>
@@ -258,6 +262,9 @@
                <reference
                      definitionId="biobank2.mainPerpectiveSelected">
                </reference>
+               <reference
+                    definitionId="biobank2.siteSelected">
+               </reference>
             </and>
          </activeWhen>
       </handler>
@@ -265,9 +272,14 @@
             class="edu.ualberta.med.biobank.handlers.EditSampleTypesHandler"
             commandId="edu.ualberta.med.biobank.commands.editSampleTypes">
          <activeWhen>
+           <and>
             <reference
                   definitionId="biobank2.loggedIn">
             </reference>
+            <reference
+                  definitionId="biobank2.siteSelected">
+            </reference>
+           </and>
          </activeWhen>
       </handler>
       <handler
@@ -296,18 +308,42 @@
             class="edu.ualberta.med.biobank.handlers.MainAdministrationHandler"
             commandId="edu.ualberta.med.biobank.commands.mainAdmin">
          <enabledWhen>
-            <reference
-                  definitionId="biobank2.patientViewActive">
-            </reference>
+            <or>
+               <and>
+                  <reference
+                        definitionId="biobank2.patientsPerpectiveSelected">
+                  </reference>
+                  <reference
+                        definitionId="biobank2.patientViewActive">
+                  </reference>
+               </and>
+               <and>
+                  <not>
+                     <reference
+                           definitionId="biobank2.patientsPerpectiveSelected">
+                     </reference>
+                  </not>
+                  <not>
+                     <reference
+                           definitionId="biobank2.mainPerpectiveSelected">
+                     </reference>
+                  </not>
+               </and>
+            </or>
          </enabledWhen>
       </handler>
       <handler
             class="edu.ualberta.med.biobank.handlers.OpenPatientFormHandler"
             commandId="edu.ualberta.med.biobank.commands.patients.openPatientForm">
-                        <activeWhen>
-            <reference
-                  definitionId="biobank2.patientsPerpectiveSelected">
-            </reference>
+         <activeWhen>
+            <and>
+              <reference
+                    definitionId="biobank2.patientsPerpectiveSelected">
+              </reference>
+              <reference
+                    definitionId="biobank2.siteSelected">
+              </reference>
+            </and>
          </activeWhen>
          <enabledWhen>
             <reference
@@ -328,15 +364,34 @@
             class="edu.ualberta.med.biobank.handlers.PatientAddHandler"
             commandId="edu.ualberta.med.biobank.commands.patients.patientAdd">
          <activeWhen>
-            <reference
-                  definitionId="biobank2.patientsPerpectiveSelected">
-            </reference>
+            <and>
+              <reference
+                    definitionId="biobank2.patientsPerpectiveSelected">
+              </reference>
+              <reference
+                    definitionId="biobank2.siteSelected">
+              </reference>
+            </and>
          </activeWhen>
          <enabledWhen>
             <reference
                   definitionId="biobank2.patientViewActive">
             </reference>
          </enabledWhen>
+      </handler>
+      <handler
+            class="edu.ualberta.med.biobank.handlers.PatientAdministrationHandler"
+            commandId="edu.ualberta.med.biobank.commands.patientAdmin">
+         <activeWhen>
+            <and>
+               <reference
+                     definitionId="biobank2.loggedIn">
+               </reference>
+               <reference
+                     definitionId="biobank2.siteSelected">
+               </reference>
+            </and>
+         </activeWhen>
       </handler>
    </extension>
    <extension
@@ -524,9 +579,11 @@
                   style="push">
                <visibleWhen
                      checkEnabled="false">
-                  <reference
-                        definitionId="biobank2.patientsPerpectiveSelected">
-                  </reference>
+                  <not>
+                     <reference
+                           definitionId="biobank2.mainPerpectiveSelected">
+                     </reference>
+                  </not>
                </visibleWhen>
             </command>
             <command
@@ -791,6 +848,13 @@
                priorityLevel="workbench">
          </variable>
       </sourceProvider>
+      <sourceProvider
+            provider="edu.ualberta.med.biobank.sourceproviders.SiteSelectionState">
+         <variable
+               name="edu.ualberta.med.biobank.sourceprovider.siteSelectionState"
+               priorityLevel="workbench">
+         </variable>
+      </sourceProvider>
    </extension>
    <extension
          point="org.eclipse.ui.views">
@@ -879,6 +943,15 @@
                variable="activePartId">
             <equals
                   value="edu.ualberta.med.biobank.views.patientsAdmin">
+            </equals>
+         </with>
+      </definition>
+      <definition
+            id="biobank2.siteSelected">
+         <with
+               variable="edu.ualberta.med.biobank.sourceprovider.siteSelectionState">
+            <equals
+                  value="true">
             </equals>
          </with>
       </definition>

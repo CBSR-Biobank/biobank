@@ -8,7 +8,7 @@ import org.eclipse.swt.graphics.Image;
 import org.springframework.util.Assert;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
-import edu.ualberta.med.biobank.common.ModelUtils;
+import edu.ualberta.med.biobank.common.utils.ModelUtils;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.ClinicStudyInfo;
 import edu.ualberta.med.biobank.model.Container;
@@ -17,6 +17,7 @@ import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.PvInfo;
+import edu.ualberta.med.biobank.model.PvSampleSource;
 import edu.ualberta.med.biobank.model.Sample;
 import edu.ualberta.med.biobank.model.SampleSource;
 import edu.ualberta.med.biobank.model.SampleStorage;
@@ -186,6 +187,14 @@ public class BiobankLabelProvider extends LabelProvider implements
                 return info.getName();
             } else {
                 Assert.isTrue(false, "invalid column index: " + columnIndex);
+            }
+        } else if (element instanceof PvSampleSource) {
+            PvSampleSource info = (PvSampleSource) element;
+            switch (columnIndex) {
+            case 0:
+                return info.getSampleSource().getName();
+            case 1:
+                return info.getQuantity().toString();
             }
         } else {
             Assert.isTrue(false, "invalid object type: " + element.getClass());

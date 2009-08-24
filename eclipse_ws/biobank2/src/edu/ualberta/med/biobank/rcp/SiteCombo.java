@@ -41,9 +41,12 @@ public class SiteCombo extends ControlContribution {
             | SWT.READ_ONLY);
 
         combo.addModifyListener(new ModifyListener() {
-            public void modifyText(final ModifyEvent e) {
-                SessionManager.getInstance().setCurrentSite(
-                    sites.get(combo.getSelectionIndex()));
+            @Override
+            public void modifyText(ModifyEvent e) {
+                if (combo.getSelectionIndex() < sites.size()) {
+                    SessionManager.getInstance().setCurrentSite(
+                        sites.get(combo.getSelectionIndex()));
+                }
             }
         });
         GridData gd = new GridData();

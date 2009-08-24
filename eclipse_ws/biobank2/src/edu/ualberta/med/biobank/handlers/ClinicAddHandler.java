@@ -20,7 +20,7 @@ public class ClinicAddHandler extends AbstractHandler {
 
     public Object execute(ExecutionEvent event) throws ExecutionException {
         SessionAdapter sessionAdapter = SessionManager.getInstance()
-            .getSessionAdapter();
+            .getSession();
         Assert.isNotNull(sessionAdapter);
 
         Clinic clinic = new Clinic();

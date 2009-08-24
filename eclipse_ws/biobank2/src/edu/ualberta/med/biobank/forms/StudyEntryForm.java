@@ -21,7 +21,7 @@ import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.ModelUtils;
+import edu.ualberta.med.biobank.common.utils.ModelUtils;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.PvInfo;
 import edu.ualberta.med.biobank.model.PvInfoPossible;
@@ -115,8 +115,7 @@ public class StudyEntryForm extends BiobankEntryForm {
                 + adapter.getClass().getName());
 
         studyAdapter = (StudyAdapter) adapter;
-        site = ((SiteAdapter) studyAdapter
-            .getParentFromClass(SiteAdapter.class)).getSite();
+        site = studyAdapter.getParentFromClass(SiteAdapter.class).getSite();
         retrieveStudy();
 
         String tabName;
@@ -293,7 +292,7 @@ public class StudyEntryForm extends BiobankEntryForm {
         client.setLayout(layout);
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
-        initConfirmButton(client, false, true);
+        initCancelConfirmWidget(client);
     }
 
     @Override
@@ -472,9 +471,6 @@ public class StudyEntryForm extends BiobankEntryForm {
     }
 
     private boolean checkStudyNameUnique() throws Exception {
-        Site site = ((SiteAdapter) studyAdapter
-            .getParentFromClass(SiteAdapter.class)).getSite();
-
         HQLCriteria c = new HQLCriteria(
             "from edu.ualberta.med.biobank.model.Study as study "
                 + "inner join fetch study.site where study.site.id=? "
@@ -513,14 +509,19 @@ public class StudyEntryForm extends BiobankEntryForm {
     }
 
     private void retrieveStudy() {
-        try {
-            study = ModelUtils.getObjectWithId(appService, Study.class,
-                studyAdapter.getStudy().getId());
-            studyAdapter.setStudy(study);
-        } catch (Exception e) {
-            SessionManager.getLogger().error(
-                "Error while retrieving study "
-                    + studyAdapter.getStudy().getName(), e);
+        if (studyAdapter.getStudy().getId() == null) {
+            // don't retrieve if this is a new study !
+            study = studyAdapter.getStudy();
+        } else {
+            try {
+                study = ModelUtils.getObjectWithId(appService, Study.class,
+                    studyAdapter.getStudy().getId());
+                studyAdapter.setStudy(study);
+            } catch (Exception e) {
+                SessionManager.getLogger().error(
+                    "Error while retrieving study "
+                        + studyAdapter.getStudy().getName(), e);
+            }
         }
     }
 

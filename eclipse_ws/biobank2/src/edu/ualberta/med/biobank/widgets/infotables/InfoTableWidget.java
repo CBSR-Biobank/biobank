@@ -29,7 +29,7 @@ public class InfoTableWidget<T> extends BiobankWidget {
     // could be done in a better way
     private int setCollectionCount;
 
-    private List<BiobankCollectionModel> model;
+    protected List<BiobankCollectionModel> model;
 
     public InfoTableWidget(Composite parent, Collection<T> collection,
         String[] headings, int[] bounds) {

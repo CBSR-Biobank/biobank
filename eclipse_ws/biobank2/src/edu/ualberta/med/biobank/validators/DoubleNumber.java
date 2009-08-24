@@ -6,15 +6,13 @@ import java.util.regex.Pattern;
 import org.eclipse.core.databinding.validation.ValidationStatus;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.jface.fieldassist.ControlDecoration;
 
 public class DoubleNumber extends AbstractValidator {
-    
-    private static final Pattern pattern = Pattern.compile(
-            "^[0-9\\.\\+-]*$");
-    
-    public DoubleNumber(String message, ControlDecoration controlDecoration) {
-        super(message, controlDecoration);
+
+    private static final Pattern pattern = Pattern.compile("^[0-9\\.\\+-]*$");
+
+    public DoubleNumber(String message) {
+        super(message);
     }
 
     @Override
@@ -29,8 +27,8 @@ public class DoubleNumber extends AbstractValidator {
             controlDecoration.hide();
             return Status.OK_STATUS;
         }
-        
+
         controlDecoration.show();
-        return ValidationStatus.error(message);
+        return ValidationStatus.error(errorMessage);
     }
 }

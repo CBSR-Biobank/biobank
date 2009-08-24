@@ -50,6 +50,8 @@ Export-Package: antlr;
    javax.swing",
  antlr.preprocessor;uses:="antlr.collections.impl,antlr",
  edu.ualberta.med.biobank.common,
+ edu.ualberta.med.biobank.common.utils,
+ edu.ualberta.med.biobank.common.wrappers,
  edu.ualberta.med.biobank.model,
  gov.nih.nci.cagrid.cqlquery;uses:="org.apache.axis.description,org.apache.axis.encoding,javax.xml.namespace",
  gov.nih.nci.cagrid.cqlresultset;

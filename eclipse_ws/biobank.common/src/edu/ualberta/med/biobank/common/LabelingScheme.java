@@ -2,6 +2,9 @@ package edu.ualberta.med.biobank.common;
 
 import org.springframework.util.Assert;
 
+import edu.ualberta.med.biobank.model.Capacity;
+import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
+import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.ContainerType;
 
 public class LabelingScheme {
@@ -57,11 +60,10 @@ public class LabelingScheme {
     /**
      * convert a position in row*column to two letter (in the cbsr way)
      */
-    public static String rowColToTwoCharAlpha(RowColPos rcp,
-        ContainerType containerType) {
+    public static String rowColToTwoCharAlpha(RowColPos rcp, Capacity capacity) {
         int pos1, pos2, index;
-        int totalRows = containerType.getCapacity().getDimensionOneCapacity();
-        int totalCols = containerType.getCapacity().getDimensionTwoCapacity();
+        int totalRows = capacity.getDimensionOneCapacity();
+        int totalCols = capacity.getDimensionTwoCapacity();
 
         if (totalRows == 1) {
             index = rcp.col;
@@ -78,8 +80,32 @@ public class LabelingScheme {
         return String.valueOf(int2pos(pos1)) + String.valueOf(int2pos(pos2));
     }
 
-    public static String rowColToInt(RowColPos rcp, ContainerType containerType) {
-        int totalCols = containerType.getCapacity().getDimensionTwoCapacity();
+    public static String rowColToInt(RowColPos rcp, Capacity capacity) {
+        int totalCols = capacity.getDimensionTwoCapacity();
         return String.format("%02d", totalCols * rcp.row + rcp.col + 1);
+    }
+
+    public static String getPositionString(RowColPos rcp,
+        ContainerType containerType) {
+        ContainerLabelingScheme scheme = containerType.getChildLabelingScheme();
+        Capacity capacity = containerType.getCapacity();
+        String posString = "";
+        switch (scheme.getId()) {
+        case 2:
+            posString = rowColToTwoCharAlpha(rcp, capacity);
+            break;
+        case 3:
+            posString = rowColToInt(rcp, capacity);
+            break;
+        }
+        return posString;
+    }
+
+    public static String getPositionString(ContainerPosition position) {
+        RowColPos rcp = new RowColPos();
+        rcp.row = position.getPositionDimensionOne();
+        rcp.col = position.getPositionDimensionTwo();
+        return getPositionString(rcp, position.getParentContainer()
+            .getContainerType());
     }
 }

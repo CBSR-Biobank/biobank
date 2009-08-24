@@ -13,12 +13,14 @@ import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.part.ViewPart;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.ModelUtils;
+import edu.ualberta.med.biobank.common.utils.PatientUtils;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.NodeSearchVisitor;
 import edu.ualberta.med.biobank.treeview.PatientAdapter;
 import edu.ualberta.med.biobank.treeview.RootNode;
+import edu.ualberta.med.biobank.treeview.SiteAdapter;
+import edu.ualberta.med.biobank.treeview.StudyAdapter;
 import edu.ualberta.med.biobank.widgets.AdapterTreeWidget;
 
 public class PatientAdministrationView extends ViewPart {
@@ -43,7 +45,7 @@ public class PatientAdministrationView extends ViewPart {
     private static AdapterBase getNoPatientFoundAdapter() {
         if (noPatientFoundAdapter == null) {
             noPatientFoundAdapter = new AdapterBase(getRootNode(), 0,
-                "No patient found") {
+                "- No patient found -") {
                 @Override
                 public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
                 }
@@ -100,17 +102,11 @@ public class PatientAdministrationView extends ViewPart {
 
     protected void searchPatient() {
         getSite().getPage().closeAllEditors(true);
-        Patient patient = ModelUtils.getObjectWithAttr(SessionManager
-            .getInstance().getSession().getAppService(), Patient.class,
-            "number", String.class, patientNumberText.getText());
-        if (patient != null) {
-            PatientAdapter patientAdapter = new PatientAdapter(getRootNode(),
-                patient);
-            showPatient(patientAdapter);
-            patientAdapter.performExpand();
-        } else {
-            showPatient(getNoPatientFoundAdapter());
-        }
+        Patient patient = PatientUtils.getPatientInSite(SessionManager
+            .getAppService(), patientNumberText.getText(), SessionManager
+            .getInstance().getCurrentSite());
+        showPatient(patient);
+        // patientAdapter.performExpand();
     }
 
     @Override
@@ -118,9 +114,23 @@ public class PatientAdministrationView extends ViewPart {
 
     }
 
-    public static void showPatient(AdapterBase adapter) {
+    public void showPatient(Patient patient) {
         getRootNode().removeAll();
-        getRootNode().addChild(adapter);
+        if (patient == null) {
+            getRootNode().addChild(getNoPatientFoundAdapter());
+        } else {
+            SiteAdapter siteAdapter = new SiteAdapter(getRootNode(), patient
+                .getStudy().getSite(), false);
+            getRootNode().addChild(siteAdapter);
+            StudyAdapter studyAdapter = new StudyAdapter(siteAdapter, patient
+                .getStudy(), false);
+            siteAdapter.addChild(studyAdapter);
+            PatientAdapter patientAdapter = new PatientAdapter(studyAdapter,
+                patient);
+            studyAdapter.addChild(patientAdapter);
+            patientAdapter.performExpand();
+            adaptersTree.getTreeViewer().expandAll();
+        }
     }
 
 }

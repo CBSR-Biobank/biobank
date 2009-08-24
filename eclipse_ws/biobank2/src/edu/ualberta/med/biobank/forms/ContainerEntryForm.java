@@ -23,7 +23,6 @@ import org.eclipse.swt.widgets.Text;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.LabelingScheme;
-import edu.ualberta.med.biobank.common.RowColPos;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.ContainerType;
@@ -75,13 +74,8 @@ public class ContainerEntryForm extends BiobankEntryForm {
         position = container.getPosition();
 
         if (position != null) {
-            RowColPos rcp = new RowColPos();
-            rcp.row = position.getPositionDimensionOne();
-            rcp.col = position.getPositionDimensionTwo();
-
             container.setLabel(position.getParentContainer().getLabel()
-                + LabelingScheme.rowColToTwoCharAlpha(rcp, position
-                    .getParentContainer().getContainerType()));
+                + LabelingScheme.getPositionString(position));
         }
 
         String tabName;
@@ -203,7 +197,7 @@ public class ContainerEntryForm extends BiobankEntryForm {
         client.setLayout(layout);
         toolkit.paintBordersFor(client);
 
-        initConfirmButton(client, false, true);
+        initCancelConfirmWidget(client);
     }
 
     @Override

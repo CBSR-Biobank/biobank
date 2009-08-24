@@ -1,16 +1,14 @@
 package edu.ualberta.med.biobank.forms;
 
-import java.util.List;
-
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.ui.forms.widgets.Section;
 
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.treeview.PatientAdapter;
 import edu.ualberta.med.biobank.widgets.infotables.PatientVisitInfoTable;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class PatientViewForm extends BiobankViewForm {
     public static final String ID = "edu.ualberta.med.biobank.forms.PatientViewForm";
@@ -33,16 +31,13 @@ public class PatientViewForm extends BiobankViewForm {
     }
 
     private void retrievePatient() {
-        List<Patient> result;
-        Patient searchPatient = new Patient();
-        searchPatient.setId(patientAdapter.getPatient().getId());
         try {
-            result = appService.search(Patient.class, searchPatient);
-            Assert.isTrue(result.size() == 1);
-            patient = result.get(0);
-            patientAdapter.setPatient(patient);
-        } catch (ApplicationException e) {
-            e.printStackTrace();
+            patientAdapter.getWrapper().reload();
+            patient = patientAdapter.getWrapper().getPatient();
+        } catch (Exception e) {
+            SessionManager.getLogger().error(
+                "Error while retrieving patient "
+                    + patientAdapter.getWrapper().getNumber(), e);
         }
     }
 
@@ -72,7 +67,6 @@ public class PatientViewForm extends BiobankViewForm {
         retrievePatient();
         setPartName("Patient " + patient.getNumber());
         form.setText("Patient: " + patient.getNumber());
-        // FormUtils.setTextValue(patientNumberLabel, patient.getNumber());
         visitsTable.setCollection(patient.getPatientVisitCollection());
     }
 }

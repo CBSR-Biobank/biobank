@@ -26,11 +26,11 @@ import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.dialogs.SampleStorageDialog;
-import edu.ualberta.med.biobank.model.SampleStorage;
-import edu.ualberta.med.biobank.model.SampleType;
+import edu.ualberta.med.biobank.dialogs.PvSampleSourceDialog;
+import edu.ualberta.med.biobank.model.PvSampleSource;
+import edu.ualberta.med.biobank.model.SampleSource;
 import edu.ualberta.med.biobank.widgets.infotables.BiobankCollectionModel;
-import edu.ualberta.med.biobank.widgets.infotables.SampleStorageInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.PvSampleSourceInfoTable;
 import edu.ualberta.med.biobank.widgets.listener.BiobankEntryFormWidgetListener;
 import edu.ualberta.med.biobank.widgets.listener.MultiSelectEvent;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -39,119 +39,119 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
  * Displays the current sample storage collection and allows the user to add
  * additional sample storage to the collection.
  */
-public class SampleStorageEntryWidget extends BiobankWidget {
+public class PvSampleSourceEntryWidget extends BiobankWidget {
 
-    private SampleStorageInfoTable sampleStorageTable;
+    private PvSampleSourceInfoTable pvSampleSourceTable;
 
-    private Button addSampleStorageButton;
+    private Button addPvSampleSourceButton;
 
-    private Collection<SampleType> allSampleTypes;
+    private Collection<SampleSource> allSampleSources;
 
-    private Collection<SampleStorage> selectedSampleStorage;
+    private Collection<PvSampleSource> selectedPvSampleSources;
 
     /**
      * 
      * @param parent a composite control which will be the parent of the new
      *            instance (cannot be null)
      * @param style the style of control to construct
-     * @param sampleStorageCollection the sample storage already selected and to
+     * @param pvSampleSourceCollection the sample storage already selected and to
      *            be displayed in the table viewer (can be null).
      * @param toolkit The toolkit is responsible for creating SWT controls
      *            adapted to work in Eclipse forms. If widget is not used in a
      *            form this parameter should be null.
      */
-    public SampleStorageEntryWidget(Composite parent, int style,
-        Collection<SampleStorage> sampleStorageCollection, FormToolkit toolkit) {
+    public PvSampleSourceEntryWidget(Composite parent, int style,
+        Collection<PvSampleSource> pvSampleSourceCollection, FormToolkit toolkit) {
         super(parent, style);
         Assert.isNotNull(toolkit, "toolkit is null");
-        getSampleTypes();
-        if (sampleStorageCollection == null) {
-            selectedSampleStorage = new HashSet<SampleStorage>();
+        getSampleSources();
+        if (pvSampleSourceCollection == null) {
+            selectedPvSampleSources = new HashSet<PvSampleSource>();
         } else {
-            selectedSampleStorage = sampleStorageCollection;
+            selectedPvSampleSources = pvSampleSourceCollection;
         }
 
         setLayout(new GridLayout(1, false));
         setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-        sampleStorageTable = new SampleStorageInfoTable(parent,
-            selectedSampleStorage);
-        sampleStorageTable.adaptToToolkit(toolkit, true);
+        pvSampleSourceTable = new PvSampleSourceInfoTable(parent,
+            selectedPvSampleSources);
+        pvSampleSourceTable.adaptToToolkit(toolkit, true);
         addTableMenu();
-        sampleStorageTable
+        pvSampleSourceTable
             .addSelectionChangedListener(new BiobankEntryFormWidgetListener() {
                 @Override
                 public void selectionChanged(MultiSelectEvent event) {
-                    SampleStorageEntryWidget.this.notifyListeners();
+                    PvSampleSourceEntryWidget.this.notifyListeners();
                 }
             });
 
-        addSampleStorageButton = toolkit.createButton(parent,
-            "Add Sample Storage", SWT.PUSH);
-        addSampleStorageButton.addSelectionListener(new SelectionAdapter() {
+        addPvSampleSourceButton = toolkit.createButton(parent,
+            "Add Sample Source", SWT.PUSH);
+        addPvSampleSourceButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                addOrEditSampleStorage(true, new SampleStorage(),
-                    getNonDuplicateSampleTypes());
+                addOrEditPvSampleSource(true, new PvSampleSource(),
+                    getNonDuplicateSampleSources());
             }
         });
     }
 
-    private void addOrEditSampleStorage(boolean add,
-        SampleStorage sampleStorage, Set<SampleType> availSampleTypes) {
-        SampleStorageDialog dlg = new SampleStorageDialog(PlatformUI
+    private void addOrEditPvSampleSource(boolean add,
+        PvSampleSource pvSampleSource, Set<SampleSource> availSampleSources) {
+        PvSampleSourceDialog dlg = new PvSampleSourceDialog(PlatformUI
             .getWorkbench().getActiveWorkbenchWindow().getShell(),
-            sampleStorage, availSampleTypes);
+            pvSampleSource, availSampleSources);
         if (dlg.open() == Dialog.OK) {
             if (add) {
                 // only add to the collection when adding and not editing
-                selectedSampleStorage.add(dlg.getSampleStorage());
+                selectedPvSampleSources.add(dlg.getPvSampleSource());
             }
-            sampleStorageTable.setCollection(selectedSampleStorage);
+            pvSampleSourceTable.setCollection(selectedPvSampleSources);
         }
     }
 
     // need sample types that have not yet been selected in sampleStorageTable
-    private Set<SampleType> getNonDuplicateSampleTypes() {
-        Set<SampleType> sampleTypes = new HashSet<SampleType>(allSampleTypes);
-        Set<SampleType> dupSampleTypes = new HashSet<SampleType>();
-        Collection<SampleStorage> currentSampleStorage = sampleStorageTable
+    private Set<SampleSource> getNonDuplicateSampleSources() {
+        Set<SampleSource> sampleSources = new HashSet<SampleSource>(
+            allSampleSources);
+        Set<SampleSource> nonDupSampleSources = new HashSet<SampleSource>();
+        Collection<PvSampleSource> currentSampleSources = pvSampleSourceTable
             .getCollection();
 
         // get the IDs of the selected sample types
-        List<Integer> sampleTypeIds = new ArrayList<Integer>();
-        for (SampleStorage ss : currentSampleStorage) {
-            sampleTypeIds.add(ss.getSampleType().getId());
+        List<Integer> sampleSourceIds = new ArrayList<Integer>();
+        for (PvSampleSource ss : currentSampleSources) {
+            sampleSourceIds.add(ss.getSampleSource().getId());
         }
 
-        for (SampleType stype : sampleTypes) {
-            if (sampleTypeIds.contains(stype.getId())) {
-                dupSampleTypes.add(stype);
+        for (SampleSource ss : sampleSources) {
+            if (!sampleSourceIds.contains(ss.getId())) {
+                nonDupSampleSources.add(ss);
             }
         }
-        sampleTypes.removeAll(dupSampleTypes);
-        return sampleTypes;
+        return nonDupSampleSources;
     }
 
     private void addTableMenu() {
         Menu menu = new Menu(PlatformUI.getWorkbench()
             .getActiveWorkbenchWindow().getShell(), SWT.NONE);
-        sampleStorageTable.getTableViewer().getTable().setMenu(menu);
+        pvSampleSourceTable.getTableViewer().getTable().setMenu(menu);
 
         MenuItem item = new MenuItem(menu, SWT.PUSH);
         item.setText("Edit");
         item.addSelectionListener(new SelectionListener() {
             public void widgetSelected(SelectionEvent event) {
-                IStructuredSelection stSelection = (IStructuredSelection) sampleStorageTable
+                IStructuredSelection stSelection = (IStructuredSelection) pvSampleSourceTable
                     .getTableViewer().getSelection();
 
                 BiobankCollectionModel item = (BiobankCollectionModel) stSelection
                     .getFirstElement();
-                SampleStorage sampleStorage = (SampleStorage) item.o;
+                PvSampleSource pvss = (PvSampleSource) item.o;
 
-                Set<SampleType> allowedSampleTypes = getNonDuplicateSampleTypes();
-                allowedSampleTypes.add(sampleStorage.getSampleType());
-                addOrEditSampleStorage(false, sampleStorage, allowedSampleTypes);
+                Set<SampleSource> allowedSampleSources = getNonDuplicateSampleSources();
+                allowedSampleSources.add(pvss.getSampleSource());
+                addOrEditPvSampleSource(false, pvss, allowedSampleSources);
             }
 
             public void widgetDefaultSelected(SelectionEvent e) {
@@ -162,32 +162,32 @@ public class SampleStorageEntryWidget extends BiobankWidget {
         item.setText("Delete");
         item.addSelectionListener(new SelectionListener() {
             public void widgetSelected(SelectionEvent event) {
-                IStructuredSelection stSelection = (IStructuredSelection) sampleStorageTable
+                IStructuredSelection stSelection = (IStructuredSelection) pvSampleSourceTable
                     .getTableViewer().getSelection();
 
                 BiobankCollectionModel item = (BiobankCollectionModel) stSelection
                     .getFirstElement();
-                SampleStorage sampleStorage = (SampleStorage) item.o;
+                PvSampleSource pvss = (PvSampleSource) item.o;
 
                 boolean confirm = MessageDialog.openConfirm(PlatformUI
                     .getWorkbench().getActiveWorkbenchWindow().getShell(),
                     "Delete Sample Storage",
-                    "Are you sure you want to delete sample storage \""
-                        + sampleStorage.getSampleType().getName() + "\"");
+                    "Are you sure you want to delete sample source \""
+                        + pvss.getSampleSource().getName() + "\"");
 
                 if (confirm) {
-                    Collection<SampleStorage> ssToDelete = new HashSet<SampleStorage>();
-                    for (SampleStorage ss : selectedSampleStorage) {
-                        if (ss.getSampleType().getName().equals(
-                            sampleStorage.getSampleType().getName()))
+                    Collection<PvSampleSource> ssToDelete = new HashSet<PvSampleSource>();
+                    for (PvSampleSource ss : selectedPvSampleSources) {
+                        if (ss.getSampleSource().getId().equals(
+                            pvss.getSampleSource().getId()))
                             ssToDelete.add(ss);
                     }
 
-                    for (SampleStorage ss : ssToDelete) {
-                        selectedSampleStorage.remove(ss);
+                    for (PvSampleSource pvssDel : ssToDelete) {
+                        selectedPvSampleSources.remove(pvssDel);
                     }
 
-                    sampleStorageTable.setCollection(selectedSampleStorage);
+                    pvSampleSourceTable.setCollection(selectedPvSampleSources);
                 }
             }
 
@@ -196,10 +196,10 @@ public class SampleStorageEntryWidget extends BiobankWidget {
         });
     }
 
-    private void getSampleTypes() {
+    private void getSampleSources() {
         try {
-            allSampleTypes = SessionManager.getAppService().search(
-                SampleType.class, new SampleType());
+            allSampleSources = SessionManager.getAppService().search(
+                SampleSource.class, new SampleSource());
         } catch (final RemoteConnectFailureException exp) {
             BioBankPlugin.openRemoteConnectErrorMessage();
         } catch (ApplicationException e) {
@@ -207,12 +207,12 @@ public class SampleStorageEntryWidget extends BiobankWidget {
         }
     }
 
-    public Collection<SampleStorage> getSampleStorage() {
-        return sampleStorageTable.getCollection();
+    public Collection<PvSampleSource> getPvSampleSources() {
+        return pvSampleSourceTable.getCollection();
     }
 
     @Override
     public boolean setFocus() {
-        return addSampleStorageButton.setFocus();
+        return addPvSampleSourceButton.setFocus();
     }
 }

@@ -40,8 +40,8 @@ public class OpenPatientFormHandler extends AbstractHandler implements IHandler 
             activePage.closeAllEditors(true);
             PlatformUI.getWorkbench().getActiveWorkbenchWindow()
                 .getActivePage().openEditor(
-                    new FormInput(SessionManager.getInstance()
-                        .getSessionAdapter()), editorId, true);
+                    new FormInput(SessionManager.getInstance().getSession()),
+                    editorId, true);
         } catch (PartInitException e) {
             throw new ExecutionException("Part could not be initialized", e); //$NON-NLS-1$
         }

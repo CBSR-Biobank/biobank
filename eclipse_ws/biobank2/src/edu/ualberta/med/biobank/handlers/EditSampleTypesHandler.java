@@ -19,7 +19,7 @@ public class EditSampleTypesHandler extends AbstractHandler {
 
     public Object execute(ExecutionEvent event) throws ExecutionException {
         SessionAdapter sessionAdapter = SessionManager.getInstance()
-            .getSessionAdapter();
+            .getSession();
         Assert.isNotNull(sessionAdapter);
         Site site = SessionManager.getInstance().getCurrentSite();
         SiteAdapter sa = new SiteAdapter(sessionAdapter, site);

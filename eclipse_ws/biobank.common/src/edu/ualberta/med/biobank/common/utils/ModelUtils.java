@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.common;
+package edu.ualberta.med.biobank.common.utils;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -9,6 +9,8 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.springframework.util.Assert;
 
+import edu.ualberta.med.biobank.common.LabelingScheme;
+import edu.ualberta.med.biobank.common.RowColPos;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.Sample;
@@ -138,7 +140,7 @@ public class ModelUtils {
             // FIXME use the labelling of the container !
             if (type.getName().equals("Bin")) {
                 String binPosition = LabelingScheme.rowColToTwoCharAlpha(
-                    new RowColPos(dim1, dim2), type);
+                    new RowColPos(dim1, dim2), type.getCapacity());
                 return position.getContainer().getLabel() + binPosition;
             } else if (type.getName().equals("Pallet")) {
                 return position.getContainer().getLabel() + dim1String
