@@ -1,6 +1,8 @@
 package edu.ualberta.med.sampleProcessingRobot;
 
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
@@ -52,4 +54,29 @@ public class SampleProcessingRobotPlugin extends AbstractUIPlugin {
     public static ImageDescriptor getImageDescriptor(String path) {
         return imageDescriptorFromPlugin(PLUGIN_ID, path);
     }
+
+    /**
+     * Display an information message
+     */
+    public static void openMessage(String title, String message) {
+        MessageDialog.openInformation(PlatformUI.getWorkbench()
+            .getActiveWorkbenchWindow().getShell(), title, message);
+    }
+
+    /**
+     * Display an information message
+     */
+    public static boolean openConfirm(String title, String message) {
+        return MessageDialog.openConfirm(PlatformUI.getWorkbench()
+            .getActiveWorkbenchWindow().getShell(), title, message);
+    }
+
+    /**
+     * Display an error message
+     */
+    public static void openError(String title, String message) {
+        MessageDialog.openError(PlatformUI.getWorkbench()
+            .getActiveWorkbenchWindow().getShell(), title, message);
+    }
+
 }

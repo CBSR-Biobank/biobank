@@ -1,1 +1,8 @@
 Plugin project for sample processing robot. The plugin works with the BioBank2 java client.
+
+cf config for MANIFEST ?
+Bundle-NativeCode: libs/rxtxSerial.dll;selection-filter="(&(osgi.arch=x86)(osg
+ i.os=win32))",*
+ 
+ and build.propertoies : 
+ Bundle-NativeCode: /libs/rxtxSerial.dll
