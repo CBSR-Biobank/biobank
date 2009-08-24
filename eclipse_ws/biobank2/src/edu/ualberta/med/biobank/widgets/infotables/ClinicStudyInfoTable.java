@@ -6,7 +6,10 @@ import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.widgets.Composite;
+import org.springframework.remoting.RemoteConnectFailureException;
 
+import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.common.utils.ModelUtils;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.ClinicStudyInfo;
 import edu.ualberta.med.biobank.model.Patient;
@@ -28,11 +31,11 @@ public class ClinicStudyInfoTable extends InfoTableWidget<Study> {
     private WritableApplicationService appService;
 
     public ClinicStudyInfoTable(Composite parent,
-        WritableApplicationService appService, Clinic clinic) {
+        WritableApplicationService appService, Clinic clinic) throws Exception {
         super(parent, null, headings, bounds);
         this.appService = appService;
         this.clinic = clinic;
-        setCollection(clinic.getStudyCollection());
+        setCollection(ModelUtils.getClinicStudyCollection(appService, clinic));
     }
 
     @Override
@@ -43,7 +46,8 @@ public class ClinicStudyInfoTable extends InfoTableWidget<Study> {
                 try {
                     BiobankCollectionModel item;
                     model.clear();
-                    for (Study study : clinic.getStudyCollection()) {
+                    for (Study study : ModelUtils.getClinicStudyCollection(
+                        appService, clinic)) {
                         if (getTableViewer().getTable().isDisposed()) {
                             return;
                         }
@@ -93,6 +97,8 @@ public class ClinicStudyInfoTable extends InfoTableWidget<Study> {
                             }
 
                         });
+                } catch (final RemoteConnectFailureException exp) {
+                    BioBankPlugin.openRemoteConnectErrorMessage();
                 } catch (ApplicationException e) {
                     e.printStackTrace();
                 }

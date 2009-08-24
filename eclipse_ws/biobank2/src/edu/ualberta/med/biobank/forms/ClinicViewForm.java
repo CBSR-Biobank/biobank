@@ -1,7 +1,5 @@
 package edu.ualberta.med.biobank.forms;
 
-import java.util.Collection;
-
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -18,10 +16,8 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.utils.ModelUtils;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Clinic;
-import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.ClinicAdapter;
-import edu.ualberta.med.biobank.treeview.StudyAdapter;
 import edu.ualberta.med.biobank.widgets.infotables.ClinicStudyInfoTable;
 
 public class ClinicViewForm extends AddressViewFormCommon {
@@ -97,27 +93,21 @@ public class ClinicViewForm extends AddressViewFormCommon {
     }
 
     protected void createStudiesSection() {
-        Composite client = createSectionWithClient("Studies");
+        try {
+            Composite client = createSectionWithClient("Studies");
 
-        studiesTable = new ClinicStudyInfoTable(client, appService, clinic);
-        studiesTable.adaptToToolkit(toolkit, true);
-        toolkit.paintBordersFor(studiesTable);
+            studiesTable = new ClinicStudyInfoTable(client, appService, clinic);
+            studiesTable.adaptToToolkit(toolkit, true);
+            toolkit.paintBordersFor(studiesTable);
 
-        studiesTable.getTableViewer().addDoubleClickListener(
-            FormUtils.getBiobankCollectionDoubleClickListener());
-    }
-
-    private StudyAdapter[] getStudiesAdapters() {
-        Collection<Study> studies = clinic.getStudyCollection();
-
-        StudyAdapter[] studyAdapters = new StudyAdapter[studies.size()];
-        int count = 0;
-        for (Study study : studies) {
-            studyAdapters[count] = new StudyAdapter(clinicAdapter.getParent(),
-                study);
-            count++;
+            studiesTable.getTableViewer().addDoubleClickListener(
+                FormUtils.getBiobankCollectionDoubleClickListener());
+        } catch (final RemoteConnectFailureException exp) {
+            BioBankPlugin.openRemoteConnectErrorMessage();
+        } catch (Exception e) {
+            SessionManager.getLogger().error(
+                "Error while retrieving the clinic", e);
         }
-        return studyAdapters;
     }
 
     protected void createButtonsSection() {
@@ -143,6 +133,6 @@ public class ClinicViewForm extends AddressViewFormCommon {
         form.setText("Clinic: " + clinic.getName());
         setClinicValues();
         setAdressValues();
-        studiesTable.getTableViewer().setInput(getStudiesAdapters());
+        studiesTable.setCollection(null);
     }
 }

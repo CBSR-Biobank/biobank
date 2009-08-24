@@ -55,8 +55,6 @@ public class BiobankLabelProvider extends LabelProvider implements
             switch (columnIndex) {
             case 0:
                 return clinic.getName();
-            case 1:
-                return "" + clinic.getStudyCollection().size();
             }
         } else if (element instanceof Patient) {
             final Patient patient = (Patient) element;
