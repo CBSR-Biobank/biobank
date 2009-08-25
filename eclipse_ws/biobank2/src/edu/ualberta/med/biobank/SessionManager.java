@@ -40,7 +40,7 @@ public class SessionManager {
 
     private SessionAdapter sessionAdapter;
 
-    private AdapterBase rootNode;
+    private RootNode rootNode;
 
     public boolean inactiveTimeout = false;
 
@@ -244,7 +244,7 @@ public class SessionManager {
         return currentSite;
     }
 
-    public AdapterBase getRootNode() {
+    public RootNode getRootNode() {
         return rootNode;
     }
 }

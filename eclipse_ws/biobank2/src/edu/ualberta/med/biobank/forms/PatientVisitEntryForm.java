@@ -379,9 +379,9 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         }
         result = appService.executeQuery(query);
         patientVisit = (PatientVisit) result.getObjectResult();
+        patientVisitAdapter.setPatientVisit(patientVisit);
 
         savePvInfoData();
-
         patientAdapter.performExpand();
     }
 

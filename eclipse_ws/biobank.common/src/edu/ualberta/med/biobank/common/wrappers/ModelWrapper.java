@@ -10,6 +10,8 @@ import gov.nih.nci.system.query.example.UpdateExampleQuery;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
 
 public abstract class ModelWrapper<E> {
 
@@ -38,7 +40,16 @@ public abstract class ModelWrapper<E> {
         return getId() == null;
     }
 
-    public abstract Integer getId();
+    public Integer getId() {
+        Class<?> wrappedClass = wrappedObject.getClass();
+        try {
+            Method methodGetId = wrappedClass.getMethod("getId");
+            return (Integer) methodGetId.invoke(wrappedObject);
+        } catch (Exception e) {
+
+        }
+        return null;
+    }
 
     public void reload() throws Exception {
         E oldValue = wrappedObject;
@@ -81,5 +92,14 @@ public abstract class ModelWrapper<E> {
         }
     }
 
-    protected abstract E getNewObject();
+    @SuppressWarnings("unchecked")
+    protected E getNewObject() {
+        Class<E> wrappedClass = (Class<E>) wrappedObject.getClass();
+        try {
+            Constructor<E> constructor = wrappedClass.getConstructor();
+            return constructor.newInstance();
+        } catch (Exception e) {
+        }
+        return null;
+    }
 }

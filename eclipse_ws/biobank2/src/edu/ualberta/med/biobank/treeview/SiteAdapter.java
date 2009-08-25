@@ -73,6 +73,10 @@ public class SiteAdapter extends AdapterBase {
         return children.get(STORAGE_TYPES_NODE_ID);
     }
 
+    public AdapterBase getContainersGroupNode() {
+        return children.get(STORAGE_CONTAINERS_NODE_ID);
+    }
+
     @Override
     public Integer getId() {
         Assert.isNotNull(site, "site is null");

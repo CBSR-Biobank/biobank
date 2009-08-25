@@ -1,4 +1,3 @@
-
 package edu.ualberta.med.biobank.common.utils;
 
 import java.lang.reflect.Constructor;
@@ -27,7 +26,8 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class ModelUtils {
 
-    private static final Logger logger = Logger.getLogger(ModelUtils.class.getName());
+    private static final Logger logger = Logger.getLogger(ModelUtils.class
+        .getName());
 
     public static List<Container> getTopContainersForSite(
         WritableApplicationService appService, Site site)
@@ -36,7 +36,7 @@ public class ModelUtils {
             + Container.class.getName()
             + " where site.id=? and position is null");
 
-        criteria.setParameters(Arrays.asList(new Object [] { site.getId() }));
+        criteria.setParameters(Arrays.asList(new Object[] { site.getId() }));
         return appService.query(criteria);
     }
 
@@ -48,7 +48,8 @@ public class ModelUtils {
         setIdMethod.invoke(instance, id);
 
         List<E> list = appService.search(classType, instance);
-        if (list.size() == 0) return null;
+        if (list.size() == 0)
+            return null;
         Assert.isTrue(list.size() == 1);
         return list.get(0);
     }
@@ -74,8 +75,7 @@ public class ModelUtils {
             }
             Assert.isTrue(list.size() == 1);
             return list.get(0);
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             logger.error("Error in getObjectWithAttr method", ex);
             return null;
         }
@@ -97,46 +97,17 @@ public class ModelUtils {
             setMethod.invoke(instance, value);
 
             return appService.search(classType, instance);
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             logger.error("Error in getObjectsWithAttr method", ex);
             return null;
         }
-    }
-
-    public static Container getContainerWithLabel(
-        WritableApplicationService appService, String barcode, String type)
-        throws Exception {
-        Container container = new Container();
-        container.setLabel(barcode);
-        List<Container> containers = appService.search(Container.class,
-            container);
-        if (containers.size() == 1) {
-            return containers.get(0);
-        }
-        else {
-            if (type != null) {
-                List<ContainerType> cTypes = ModelUtils.queryProperty(
-                    appService, ContainerType.class, "name", type, true);
-                if (cTypes.size() > 0) {
-                    for (Container c : containers) {
-                        if (c.getContainerType().getId().equals(
-                            cTypes.get(0).getId())) {
-                            return c;
-                        }
-                    }
-                }
-            }
-        }
-        return null;
     }
 
     public static String getSamplePosition(Sample sample) {
         SamplePosition position = sample.getSamplePosition();
         if (position == null) {
             return "none";
-        }
-        else {
+        } else {
             int dim1 = position.getPositionDimensionOne();
             int dim2 = position.getPositionDimensionTwo();
             String dim1String = String.valueOf((char) ('A' + dim1));
@@ -148,8 +119,7 @@ public class ModelUtils {
                 String binPosition = LabelingScheme.rowColToTwoCharAlpha(
                     new RowColPos(dim1, dim2), type.getCapacity());
                 return position.getContainer().getLabel() + binPosition;
-            }
-            else if (type.getName().equals("Pallet")) {
+            } else if (type.getName().equals("Pallet")) {
                 return position.getContainer().getLabel() + dim1String
                     + dim2String;
             }
@@ -163,8 +133,8 @@ public class ModelUtils {
         HQLCriteria c = new HQLCriteria("select distinct clinics from "
             + Contact.class.getName() + " as contacts"
             + " inner join contacts.clinic as clinics"
-            + " where contacts.studyCollection.id = ?",
-            Arrays.asList(new Object [] { study.getId() }));
+            + " where contacts.studyCollection.id = ?", Arrays
+            .asList(new Object[] { study.getId() }));
 
         return appService.query(c);
     }
@@ -175,8 +145,8 @@ public class ModelUtils {
         HQLCriteria c = new HQLCriteria("select distinct studies from "
             + Contact.class.getName() + " as contacts"
             + " inner join contacts.studyCollection as studies"
-            + " where contacts.clinic = ?",
-            Arrays.asList(new Object [] { clinic }));
+            + " where contacts.clinic = ?", Arrays
+            .asList(new Object[] { clinic }));
 
         return appService.query(c);
     }
@@ -205,22 +175,22 @@ public class ModelUtils {
         query += " where o." + property;
         if (strict) {
             query += " = '" + text + "'";
-        }
-        else {
+        } else {
             query += " like '%" + text + "%'";
         }
         return appService.query(new HQLCriteria(query));
     }
 
-    public static SampleStorage [] toArray(Collection<SampleStorage> collection) {
+    public static SampleStorage[] toArray(Collection<SampleStorage> collection) {
         if (collection != null) {
             // hack required here because xxx.getXxxxCollection().toArray(new
             // Xxx[0])
             // returns Object[].
-            if ((collection != null) && (collection.size() == 0)) return null;
+            if ((collection != null) && (collection.size() == 0))
+                return null;
 
             int count = 0;
-            SampleStorage [] arr = new SampleStorage [collection.size()];
+            SampleStorage[] arr = new SampleStorage[collection.size()];
             for (SampleStorage ss : collection) {
                 arr[count] = ss;
                 ++count;

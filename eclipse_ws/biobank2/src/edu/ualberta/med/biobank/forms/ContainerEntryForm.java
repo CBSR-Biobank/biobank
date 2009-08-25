@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.forms;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -21,13 +20,14 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
-import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.LabelingScheme;
+import edu.ualberta.med.biobank.common.utils.SiteUtils;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.treeview.ContainerAdapter;
+import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.validators.DoubleNumber;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
 import gov.nih.nci.system.query.SDKQuery;
@@ -70,7 +70,7 @@ public class ContainerEntryForm extends BiobankEntryForm {
                 + adapter.getClass().getName());
         containerAdapter = (ContainerAdapter) adapter;
         container = containerAdapter.getContainer();
-        site = SessionManager.getInstance().getCurrentSite();
+        site = containerAdapter.getParentFromClass(SiteAdapter.class).getSite();
         position = container.getPosition();
 
         if (position != null) {
@@ -133,23 +133,11 @@ public class ContainerEntryForm extends BiobankEntryForm {
         createContainerTypesSection(client);
     }
 
-    private List<ContainerType> getTopContainerTypes() {
-        List<ContainerType> results = new ArrayList<ContainerType>();
-        HQLCriteria c = new HQLCriteria(
-            "from edu.ualberta.med.biobank.model.ContainerType as cttop"
-                + " where cttop.topLevel=true");
-        try {
-            results = appService.query(c);
-        } catch (Exception e) {
-            System.out.println("Query Failed.");
-        }
-        return results;
-    }
-
     private void createContainerTypesSection(Composite client) {
         Collection<ContainerType> containerTypes;
         if ((position == null) || (position.getParentContainer() == null)) {
-            containerTypes = getTopContainerTypes();
+            containerTypes = SiteUtils.getTopContainerTypesInSite(appService,
+                site);
         } else {
             containerTypes = position.getParentContainer().getContainerType()
                 .getChildContainerTypeCollection();

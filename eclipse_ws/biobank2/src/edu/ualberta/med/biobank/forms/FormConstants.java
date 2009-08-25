@@ -1,11 +1,9 @@
 package edu.ualberta.med.biobank.forms;
 
-
 /**
  * Constants used by the various forms that allow the user to edit / view the
  * information stored in the ORM model objects.
  */
-@SuppressWarnings("serial")
 public class FormConstants {
 
     // used to select a list

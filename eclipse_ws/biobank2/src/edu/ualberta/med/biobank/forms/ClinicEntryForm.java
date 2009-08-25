@@ -21,6 +21,7 @@ import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.treeview.ClinicAdapter;
+import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
 import edu.ualberta.med.biobank.widgets.ContactEntryWidget;
 import edu.ualberta.med.biobank.widgets.listener.BiobankEntryFormWidgetListener;
@@ -164,7 +165,9 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
     @Override
     public void saveForm() throws Exception {
         clinic.setAddress(address);
-        clinic.setSite(SessionManager.getInstance().getCurrentSite());
+        SiteAdapter siteAdapter = clinicAdapter
+            .getParentFromClass(SiteAdapter.class);
+        clinic.setSite(siteAdapter.getSite());
 
         SDKQuery query;
         SDKQueryResult result;
@@ -247,8 +250,8 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
     }
 
     private boolean checkClinicNameUnique() throws ApplicationException {
-        Site site = SessionManager.getInstance().getCurrentSite();
-
+        Site site = clinicAdapter.getParentFromClass(SiteAdapter.class)
+            .getSite();
         HQLCriteria c = new HQLCriteria(
             "from edu.ualberta.med.biobank.model.Clinic as clinic "
                 + "inner join fetch clinic.site " + "where clinic.site.id='"

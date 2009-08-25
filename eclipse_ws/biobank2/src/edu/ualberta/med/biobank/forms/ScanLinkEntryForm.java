@@ -43,7 +43,7 @@ import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.utils.ModelUtils;
+import edu.ualberta.med.biobank.common.utils.SiteUtils;
 import edu.ualberta.med.biobank.forms.listener.EnterKeyToNextFieldListener;
 import edu.ualberta.med.biobank.model.PalletCell;
 import edu.ualberta.med.biobank.model.Patient;
@@ -132,7 +132,7 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
 
     @Override
     protected void createFormContent() throws Exception {
-        form.setText("Link sample to patient visit using the scanner");
+        form.setText("Link samples to patient visit using the scanner");
         GridLayout layout = new GridLayout(2, false);
         form.getBody().setLayout(layout);
 
@@ -427,9 +427,9 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
     }
 
     protected void setVisitsList() {
-        String pNumber = patientNumberText.getText();
-        currentPatient = ModelUtils.getObjectWithAttr(adapter.getAppService(),
-            Patient.class, "number", String.class, pNumber);
+        currentPatient = SiteUtils.getPatientInSite(appService,
+            patientNumberText.getText(), SessionManager.getInstance()
+                .getCurrentSite());
         if (currentPatient != null) {
             // show visits list
             Collection<PatientVisit> collection = currentPatient

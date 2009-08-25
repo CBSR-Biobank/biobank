@@ -30,6 +30,7 @@ import org.springframework.remoting.RemoteConnectFailureException;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.utils.ModelUtils;
+import edu.ualberta.med.biobank.common.utils.SiteUtils;
 import edu.ualberta.med.biobank.forms.listener.EnterKeyToNextFieldListener;
 import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.Container;
@@ -53,9 +54,9 @@ import gov.nih.nci.system.query.SDKQueryResult;
 import gov.nih.nci.system.query.example.InsertExampleQuery;
 import gov.nih.nci.system.query.example.UpdateExampleQuery;
 
-public class AssignSamplesLocationEntryForm extends AbstractPatientAdminForm {
+public class ScanAssignEntryForm extends AbstractPatientAdminForm {
 
-    public static final String ID = "edu.ualberta.med.biobank.forms.AssignSamplesLocationEntryForm";
+    public static final String ID = "edu.ualberta.med.biobank.forms.ScanAssignEntryForm";
 
     private ScanPalletWidget palletWidget;
     private ViewContainerWidget hotelWidget;
@@ -103,12 +104,12 @@ public class AssignSamplesLocationEntryForm extends AbstractPatientAdminForm {
 
     @Override
     protected void init() {
-        setPartName("Assign locations for samples");
+        setPartName("Scan Assign");
     }
 
     @Override
     protected void createFormContent() {
-        form.setText("Assign locations for samples");
+        form.setText("Assign samples locations using the scanner");
         GridLayout layout = new GridLayout(2, false);
         form.getBody().setLayout(layout);
 
@@ -212,7 +213,7 @@ public class AssignSamplesLocationEntryForm extends AbstractPatientAdminForm {
         palletCodeText.addKeyListener(EnterKeyToNextFieldListener.INSTANCE);
 
         palletPositionText = (Text) createBoundWidgetWithLabel(fieldsComposite,
-            Text.class, SWT.NONE, "Pallet position barcode", new String[0],
+            Text.class, SWT.NONE, "Pallet label", new String[0],
             palletPositionValue, NonEmptyString.class, "Enter position code");
         palletPositionText.removeKeyListener(keyListener);
         palletPositionText.addKeyListener(EnterKeyToNextFieldListener.INSTANCE);
@@ -404,16 +405,16 @@ public class AssignSamplesLocationEntryForm extends AbstractPatientAdminForm {
      * if a study is found, show the name in title
      */
     protected void showStudyInformation() {
-        if (currentStudy == null) {
-            setPartName("Assigning samples location");
-        } else {
-            setPartName("Assigning samples location for study "
-                + currentStudy.getNameShort());
-        }
+        // FIXME show the study in the nice place !
+        // if (currentStudy == null) {
+        // setPartName("Assigning samples location");
+        // } else {
+        // setPartName("Assigning samples location for study "
+        // + currentStudy.getNameShort());
+        // }
     }
 
-    protected boolean setStatus(PalletCell scanCell, Sample positionSample)
-        throws ApplicationException {
+    protected boolean setStatus(PalletCell scanCell, Sample positionSample) {
         String value = scanCell.getValue();
         if (value == null) {
             if (positionSample == null) {
@@ -431,16 +432,15 @@ public class AssignSamplesLocationEntryForm extends AbstractPatientAdminForm {
             scanCell.setTitle("?");
             return false;
         }
-        Sample sample = new Sample();
-        sample.setInventoryId(value);
-        List<Sample> samples = appService.search(Sample.class, sample);
+        List<Sample> samples = SiteUtils.getSamplesInSite(appService, value,
+            SessionManager.getInstance().getCurrentSite());
         if (samples.size() == 0) {
             scanCell.setStatus(SampleCellStatus.ERROR);
             scanCell.setInformation("Sample not found");
             scanCell.setTitle("-");
             return false;
         } else if (samples.size() == 1) {
-            sample = samples.get(0);
+            Sample sample = samples.get(0);
             if (positionSample != null
                 && !sample.getId().equals(positionSample.getId())) {
                 scanCell.setStatus(SampleCellStatus.ERROR);
@@ -581,8 +581,8 @@ public class AssignSamplesLocationEntryForm extends AbstractPatientAdminForm {
     private boolean getPalletInformation() throws Exception {
         currentPalletSamples = null;
         String barcode = (String) palletProductCodeValue.getValue();
-        currentPallet = ModelUtils.getContainerWithLabel(appService, barcode,
-            "Pallet");
+        currentPallet = SiteUtils.getContainerWithTypeInSite(appService,
+            SessionManager.getInstance().getCurrentSite(), barcode, "Pallet");
         if (currentPallet != null) {
             boolean result = MessageDialog
                 .openConfirm(PlatformUI.getWorkbench()

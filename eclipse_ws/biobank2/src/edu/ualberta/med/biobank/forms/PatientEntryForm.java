@@ -1,18 +1,16 @@
 package edu.ualberta.med.biobank.forms;
 
-import org.eclipse.core.databinding.UpdateValueStrategy;
 import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.observable.value.WritableValue;
-import org.eclipse.core.databinding.validation.IValidator;
-import org.eclipse.core.databinding.validation.ValidationStatus;
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.IMessageProvider;
+import org.eclipse.jface.viewers.ArrayContentProvider;
+import org.eclipse.jface.viewers.ComboViewer;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.FocusAdapter;
-import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -22,12 +20,11 @@ import org.eclipse.swt.widgets.Text;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.DatabaseResult;
-import edu.ualberta.med.biobank.common.utils.StudyUtils;
-import edu.ualberta.med.biobank.forms.listener.EnterKeyToNextFieldListener;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.PatientAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
+import edu.ualberta.med.biobank.views.PatientAdministrationView;
 
 public class PatientEntryForm extends BiobankEntryForm {
     public static final String ID = "edu.ualberta.med.biobank.forms.PatientEntryForm";
@@ -42,13 +39,12 @@ public class PatientEntryForm extends BiobankEntryForm {
 
     private PatientAdapter patientAdapter;
 
-    private IObservableValue studyValue = new WritableValue("", String.class);
-    private IObservableValue studyValidValue = new WritableValue(null,
+    private IObservableValue studySelectedValue = new WritableValue("",
         String.class);
 
-    private Study currentStudy;
-
     private Site site;
+
+    private ComboViewer studiesViewer;
 
     @Override
     public void init() {
@@ -91,47 +87,21 @@ public class PatientEntryForm extends BiobankEntryForm {
         site = SessionManager.getInstance().getCurrentSite();
         labelSite.setText(site.getName());
 
-        final Text textStudy = (Text) createBoundWidgetWithLabel(client,
-            Text.class, SWT.NONE, "Study short name", null, studyValue,
-            NonEmptyString.class, MSG_NO_STUDY);
+        CCombo comboStudies = (CCombo) createBoundWidgetWithLabel(client,
+            CCombo.class, SWT.READ_ONLY | SWT.BORDER | SWT.FLAT, "Study",
+            new String[0], studySelectedValue, NonEmptyString.class,
+            "A study should be selected");
 
-        if (patientAdapter.getWrapper().isNew()) {
-            textStudy.addFocusListener(new FocusAdapter() {
-                @Override
-                public void focusLost(FocusEvent e) {
-                    String studyShortName = textStudy.getText();
-                    currentStudy = StudyUtils.getStudyInSite(patientAdapter
-                        .getAppService(), studyShortName, site);
-                    if (currentStudy == null) {
-                        studyValidValue.setValue(studyShortName);
-                    } else {
-                        studyValidValue.setValue(null);
-                    }
-                }
-            });
-            textStudy.addKeyListener(EnterKeyToNextFieldListener.INSTANCE);
-
-            UpdateValueStrategy uvs = new UpdateValueStrategy();
-            uvs.setAfterConvertValidator(new IValidator() {
-                @Override
-                public IStatus validate(Object value) {
-                    if (value instanceof String && value != null) {
-                        return ValidationStatus.error(value
-                            + " is not a valid study short name");
-                    } else {
-                        return Status.OK_STATUS;
-                    }
-                }
-            });
-            dbc.bindValue(new WritableValue(null, String.class),
-                studyValidValue, uvs, uvs);
-            studyValidValue.setValue(null);
-        } else {
-            // edit a patient - can't modify the study !
-            currentStudy = patientAdapter.getWrapper().getStudy();
-            textStudy.setText(currentStudy.getNameShort());
-            textStudy.setEditable(false);
-        }
+        studiesViewer = new ComboViewer(comboStudies);
+        studiesViewer.setContentProvider(new ArrayContentProvider());
+        studiesViewer.setLabelProvider(new LabelProvider() {
+            @Override
+            public String getText(Object element) {
+                Study study = (Study) element;
+                return study.getNameShort() + " - " + study.getName();
+            }
+        });
+        studiesViewer.setInput(site.getStudyCollection());
 
         createBoundWidgetWithLabel(client, Text.class, SWT.NONE,
             "Patient Number", null, BeansObservables.observeValue(
@@ -149,12 +119,17 @@ public class PatientEntryForm extends BiobankEntryForm {
 
     @Override
     protected void saveForm() throws Exception {
-        patientAdapter.getWrapper().setStudy(currentStudy);
+        Study study = (Study) ((IStructuredSelection) studiesViewer
+            .getSelection()).getFirstElement();
+        patientAdapter.getWrapper().setStudy(study);
         DatabaseResult res = patientAdapter.getWrapper().persist();
         if (res != DatabaseResult.OK) {
             BioBankPlugin.openAsyncError("Save Problem", res.getMessage());
             setDirty(true);
         }
+        PatientAdministrationView.currentInstance
+            .showPatientInTree(patientAdapter.getWrapper().getPatient());
+
     }
 
     @Override

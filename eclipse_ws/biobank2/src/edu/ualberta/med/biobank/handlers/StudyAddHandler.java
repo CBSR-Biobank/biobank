@@ -9,8 +9,11 @@ import org.eclipse.ui.handlers.HandlerUtil;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.forms.StudyEntryForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
+import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
+import edu.ualberta.med.biobank.treeview.NodeSearchVisitor;
 import edu.ualberta.med.biobank.treeview.SessionAdapter;
+import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
 
 public class StudyAddHandler extends AbstractHandler {
@@ -20,9 +23,14 @@ public class StudyAddHandler extends AbstractHandler {
         SessionAdapter sessionAdapter = SessionManager.getInstance()
             .getSession();
         Assert.isNotNull(sessionAdapter);
+        SiteAdapter siteAdapter = (SiteAdapter) sessionAdapter
+            .accept(new NodeSearchVisitor(Site.class, SessionManager
+                .getInstance().getCurrentSite().getId()));
+        Assert.isNotNull(siteAdapter);
 
         Study study = new Study();
-        StudyAdapter studyNode = new StudyAdapter(sessionAdapter, study);
+        StudyAdapter studyNode = new StudyAdapter(siteAdapter
+            .getStudiesGroupNode(), study);
 
         FormInput input = new FormInput(studyNode);
         try {
