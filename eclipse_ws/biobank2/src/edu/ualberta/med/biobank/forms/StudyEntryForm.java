@@ -396,6 +396,12 @@ public class StudyEntryForm extends BiobankEntryForm {
                 query = new UpdateExampleQuery(c);
             }
 
+            Collection<Study> studyCollection = c.getStudyCollection();
+            if (studyCollection == null)
+                studyCollection = new HashSet<Study>();
+            studyCollection.add(study);
+            c.setStudyCollection(studyCollection);
+
             result = appService.executeQuery(query);
             savedContactCollection.add((Contact) result.getObjectResult());
         }
