@@ -28,10 +28,8 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.PlatformUI;
-import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
-import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.utils.ModelUtils;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Patient;
@@ -122,7 +120,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
     }
 
     @Override
-    protected void createFormContent() {
+    protected void createFormContent() throws Exception {
         form.setText("Patient Visit Information");
         form.setMessage(getOkMessage(), IMessageProvider.NONE);
         form.getBody().setLayout(new GridLayout(1, false));
@@ -134,51 +132,43 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         initCancelConfirmWidget(form.getBody());
     }
 
-    private void createMainSection(Study study) {
-        try {
-            Composite client = toolkit.createComposite(form.getBody());
-            GridLayout layout = new GridLayout(2, false);
-            layout.horizontalSpacing = 10;
-            client.setLayout(layout);
-            client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-            toolkit.paintBordersFor(client);
+    private void createMainSection(Study study) throws Exception {
+        Composite client = toolkit.createComposite(form.getBody());
+        GridLayout layout = new GridLayout(2, false);
+        layout.horizontalSpacing = 10;
+        client.setLayout(layout);
+        client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        toolkit.paintBordersFor(client);
 
-            if (patientVisit.getId() == null) {
-                // choose clinic for new visit
-                Collection<Clinic> clinics = ModelUtils
-                    .getStudyClinicCollection(appService, study);
-                clinicsComboViewer = createComboViewerWithNoSelectionValidator(
-                    client, "Clinic", clinics, "A clinic should be selected");
-                if (patientVisit.getClinic() != null) {
-                    for (Clinic clinic : clinics) {
-                        if (clinic.getId().equals(
-                            patientVisit.getClinic().getId())) {
-                            clinicsComboViewer
-                                .setSelection(new StructuredSelection(clinic));
-                            break;
-                        }
+        if (patientVisit.getId() == null) {
+            // choose clinic for new visit
+            Collection<Clinic> clinics = ModelUtils.getStudyClinicCollection(
+                appService, study);
+            clinicsComboViewer = createComboViewerWithNoSelectionValidator(
+                client, "Clinic", clinics, "A clinic should be selected");
+            if (patientVisit.getClinic() != null) {
+                for (Clinic clinic : clinics) {
+                    if (clinic.getId().equals(patientVisit.getClinic().getId())) {
+                        clinicsComboViewer
+                            .setSelection(new StructuredSelection(clinic));
+                        break;
                     }
                 }
-            } else {
-                Label clinicLabel = (Label) createWidget(client, Label.class,
-                    SWT.NONE, "Clinic");
-                if (patientVisit.getClinic() != null) {
-                    clinicLabel.setText(patientVisit.getClinic().getName());
-                }
             }
-
-            toolkit.createLabel(client, "Date Drawn:", SWT.NONE);
-            dateDrawn = new DateTimeWidget(client, SWT.BORDER, patientVisit
-                .getDateDrawn());
-            dateDrawn.addSelectionListener(selectionListener);
-            dateDrawn.addModifyListener(modifyListener);
-            dateDrawn.adaptToToolkit(toolkit, true);
-        } catch (final RemoteConnectFailureException exp) {
-            BioBankPlugin.openRemoteConnectErrorMessage();
-        } catch (Exception e) {
-            SessionManager.getLogger().error(
-                "Error while retrieving the clinic", e);
+        } else {
+            Label clinicLabel = (Label) createWidget(client, Label.class,
+                SWT.NONE, "Clinic");
+            if (patientVisit.getClinic() != null) {
+                clinicLabel.setText(patientVisit.getClinic().getName());
+            }
         }
+
+        toolkit.createLabel(client, "Date Drawn:", SWT.NONE);
+        dateDrawn = new DateTimeWidget(client, SWT.BORDER, patientVisit
+            .getDateDrawn());
+        dateDrawn.addSelectionListener(selectionListener);
+        dateDrawn.addModifyListener(modifyListener);
+        dateDrawn.adaptToToolkit(toolkit, true);
     }
 
     private void createSourcesSection() {
@@ -418,7 +408,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
     }
 
     private void removeDeletedPvSampleSources(
-        Collection<PvSampleSource> ssCollection) {
+        Collection<PvSampleSource> ssCollection) throws Exception {
         // no need to remove if patientVisit is not yet in the database
         if (patientVisit.getId() == null)
             return;
@@ -429,17 +419,11 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         }
 
         SDKQuery query;
-        try {
-            for (PvSampleSource ss : patientVisit.getPvSampleSourceCollection()) {
-                if (!selectedPvSampleSourceIds.contains(ss.getId())) {
-                    query = new DeleteExampleQuery(ss);
-                    appService.executeQuery(query);
-                }
+        for (PvSampleSource ss : patientVisit.getPvSampleSourceCollection()) {
+            if (!selectedPvSampleSourceIds.contains(ss.getId())) {
+                query = new DeleteExampleQuery(ss);
+                appService.executeQuery(query);
             }
-        } catch (final RemoteConnectFailureException exp) {
-            BioBankPlugin.openRemoteConnectErrorMessage();
-        } catch (Exception e) {
-            e.printStackTrace();
         }
     }
 

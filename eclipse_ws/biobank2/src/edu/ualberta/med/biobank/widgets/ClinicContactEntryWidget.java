@@ -23,7 +23,7 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
-import edu.ualberta.med.biobank.dialogs.ContactDialog;
+import edu.ualberta.med.biobank.dialogs.ClinicContactsDialog;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.model.Site;
@@ -72,9 +72,17 @@ public class ClinicContactEntryWidget extends BiobankWidget {
         addClinicButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                addOrEditContact(true, new Contact(), getNonDuplicateClinics());
+                // addOrEditContact(true, new Contact(),
+                // getNonDuplicateClinics());
+                createClinicContact();
             }
         });
+    }
+
+    private void createClinicContact() {
+        Dialog dlg = new ClinicContactsDialog(PlatformUI.getWorkbench()
+            .getActiveWorkbenchWindow().getShell(), allClinics);
+        dlg.open();
     }
 
     private void addTableMenu() {
@@ -95,7 +103,7 @@ public class ClinicContactEntryWidget extends BiobankWidget {
 
                 Set<Clinic> allowedClinics = getNonDuplicateClinics();
                 allowedClinics.add(contact.getClinic());
-                addOrEditContact(false, contact, allowedClinics);
+                // addOrEditContact(false, contact, allowedClinics);
             }
 
             public void widgetDefaultSelected(SelectionEvent e) {
@@ -138,19 +146,6 @@ public class ClinicContactEntryWidget extends BiobankWidget {
             public void widgetDefaultSelected(SelectionEvent e) {
             }
         });
-    }
-
-    private void addOrEditContact(boolean add, Contact contact,
-        Set<Clinic> availClinics) {
-        ContactDialog dlg = new ContactDialog(PlatformUI.getWorkbench()
-            .getActiveWorkbenchWindow().getShell(), contact, availClinics);
-        if (dlg.open() == Dialog.OK) {
-            if (add) {
-                // only add to the collection when adding and not editing
-                selectedContacts.add(dlg.getContact());
-            }
-            contactInfoTable.setCollection(selectedContacts);
-        }
     }
 
     // need sample types that have not yet been selected in sampleStorageTable

@@ -224,16 +224,14 @@ public class BiobankLabelProvider extends LabelProvider implements
             Contact contact = (Contact) element;
             switch (columnIndex) {
             case 0:
-                return contact.getClinic().getName();
-            case 1:
                 return contact.getName();
-            case 2:
+            case 1:
                 return contact.getTitle();
-            case 3:
+            case 2:
                 return contact.getEmailAddress();
-            case 4:
+            case 3:
                 return contact.getPhoneNumber();
-            case 5:
+            case 4:
                 return contact.getFaxNumber();
             }
         } else {

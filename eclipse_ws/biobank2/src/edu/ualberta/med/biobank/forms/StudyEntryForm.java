@@ -17,7 +17,6 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
-import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
@@ -127,7 +126,7 @@ public class StudyEntryForm extends BiobankEntryForm {
     }
 
     @Override
-    protected void createFormContent() {
+    protected void createFormContent() throws Exception {
         form.setText("Study Information");
         form.setMessage(getOkMessage(), IMessageProvider.NONE);
         form.getBody().setLayout(new GridLayout(1, false));
@@ -144,7 +143,6 @@ public class StudyEntryForm extends BiobankEntryForm {
         Text comments = (Text) controls.get("comment");
         GridData gd = (GridData) comments.getLayoutData();
         gd.heightHint = 40;
-        // comments.setLayoutData(gd);
 
         createClinicSection();
         createSampleStorageSection();
@@ -177,41 +175,35 @@ public class StudyEntryForm extends BiobankEntryForm {
         sampleStorageEntryWidget.addSelectionChangedListener(listener);
     }
 
-    private void createSourceVesselsSection() {
-        try {
-            Composite client = createSectionWithClient("Source Vessels");
-            Collection<SampleSource> studySampleSources = study
-                .getSampleSourceCollection();
-            allSampleSources = appService.search(SampleSource.class,
-                new SampleSource());
+    private void createSourceVesselsSection() throws Exception {
+        Composite client = createSectionWithClient("Source Vessels");
+        Collection<SampleSource> studySampleSources = study
+            .getSampleSourceCollection();
+        allSampleSources = appService.search(SampleSource.class,
+            new SampleSource());
 
-            ListOrderedMap availSampleSource = new ListOrderedMap();
-            List<Integer> selSampleSource = new ArrayList<Integer>();
+        ListOrderedMap availSampleSource = new ListOrderedMap();
+        List<Integer> selSampleSource = new ArrayList<Integer>();
 
-            if (studySampleSources != null) {
-                for (SampleSource ss : studySampleSources) {
-                    selSampleSource.add(ss.getId());
-                }
+        if (studySampleSources != null) {
+            for (SampleSource ss : studySampleSources) {
+                selSampleSource.add(ss.getId());
             }
-
-            for (SampleSource ss : allSampleSources) {
-                availSampleSource.put(ss.getId(), ss.getName());
-            }
-
-            sampleSourceMultiSelect = new MultiSelectWidget(client, SWT.NONE,
-                "Selected Source Vessels", "Available Source Vessels", 100);
-            sampleSourceMultiSelect.adaptToToolkit(toolkit, true);
-            sampleSourceMultiSelect.addSelections(availSampleSource,
-                selSampleSource);
-            sampleSourceMultiSelect.addSelectionChangedListener(listener);
-        } catch (final RemoteConnectFailureException exp) {
-            BioBankPlugin.openRemoteConnectErrorMessage();
-        } catch (Exception e) {
-            e.printStackTrace();
         }
+
+        for (SampleSource ss : allSampleSources) {
+            availSampleSource.put(ss.getId(), ss.getName());
+        }
+
+        sampleSourceMultiSelect = new MultiSelectWidget(client, SWT.NONE,
+            "Selected Source Vessels", "Available Source Vessels", 100);
+        sampleSourceMultiSelect.adaptToToolkit(toolkit, true);
+        sampleSourceMultiSelect.addSelections(availSampleSource,
+            selSampleSource);
+        sampleSourceMultiSelect.addSelectionChangedListener(listener);
     }
 
-    private void createPvInfoSection() {
+    private void createPvInfoSection() throws Exception {
         Composite client = createSectionWithClient("Patient Visit Information Collected");
         Collection<PvInfo> pviCollection = study.getPvInfoCollection();
         GridLayout gl = (GridLayout) client.getLayout();
@@ -481,18 +473,9 @@ public class StudyEntryForm extends BiobankEntryForm {
         }
     }
 
-    private List<PvInfoPossible> getPossiblePvInfos() {
-        PvInfoPossible criteria = new PvInfoPossible();
-
-        try {
-            return studyAdapter.getAppService().search(PvInfoPossible.class,
-                criteria);
-        } catch (final RemoteConnectFailureException exp) {
-            BioBankPlugin.openRemoteConnectErrorMessage();
-        } catch (Exception exp) {
-            exp.printStackTrace();
-        }
-        return null;
+    private List<PvInfoPossible> getPossiblePvInfos() throws Exception {
+        return studyAdapter.getAppService().search(PvInfoPossible.class,
+            new PvInfoPossible());
     }
 
     private boolean checkStudyNameUnique() throws Exception {

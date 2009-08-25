@@ -46,7 +46,7 @@ public class BiobankDialog extends Dialog {
 
     protected DataBindingContext dbc;
 
-    private Label errorLabel;
+    private Label statusLabel;
 
     private Boolean enabledOkButton;
 
@@ -59,7 +59,7 @@ public class BiobankDialog extends Dialog {
     protected Control createButtonBar(Composite parent) {
         Control contents = super.createButtonBar(parent);
         if (enabledOkButton != null) {
-            // in case the binding wanted to modified it before its creation
+            // in case the binding wanted to modify it before its creation
             setOkButtonEnabled(enabledOkButton);
         }
         return contents;
@@ -71,8 +71,8 @@ public class BiobankDialog extends Dialog {
         Composite contents = new Composite(parentComposite, SWT.NONE);
         contents.setLayout(new GridLayout(1, false));
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-        errorLabel = new Label(contents, SWT.NONE);
-        errorLabel.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+        statusLabel = new Label(contents, SWT.NONE);
+        statusLabel.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
         bindChangeListener();
         return contents;
@@ -252,23 +252,28 @@ public class BiobankDialog extends Dialog {
                 IStatus status = (IStatus) validationStatus.getValue();
 
                 if (status.getSeverity() == IStatus.OK) {
-                    setErrorLabelValues("", Display.getCurrent()
-                        .getSystemColor(SWT.COLOR_BLACK));
+                    setStatusMessage("", Display.getCurrent().getSystemColor(
+                        SWT.COLOR_BLACK));
                     setOkButtonEnabled(true);
                 } else {
-                    setErrorLabelValues(status.getMessage(), Display
-                        .getCurrent().getSystemColor(SWT.COLOR_RED));
+                    setStatusMessage(status.getMessage(), Display.getCurrent()
+                        .getSystemColor(SWT.COLOR_RED));
                     setOkButtonEnabled(false);
                 }
             }
         });
     }
 
-    protected void setErrorLabelValues(String text, Color systemColor) {
-        if (errorLabel != null && !errorLabel.isDisposed()) {
-            errorLabel.setText(text);
-            errorLabel.setForeground(systemColor);
+    protected void setStatusMessage(String text, Color systemColor) {
+        if ((statusLabel != null) && !statusLabel.isDisposed()) {
+            statusLabel.setText(text);
+            statusLabel.setForeground(systemColor);
         }
+    }
+
+    protected void setStatusMessage(String msg) {
+        setStatusMessage(msg, Display.getCurrent().getSystemColor(
+            SWT.COLOR_BLACK));
     }
 
     protected void setOkButtonEnabled(boolean enabled) {

@@ -25,8 +25,8 @@ import gov.nih.nci.system.query.SDKQuery;
 import gov.nih.nci.system.query.example.DeleteExampleQuery;
 
 public class SiteAdapter extends AdapterBase {
-    public static final int STUDIES_NODE_ID = 0;
-    public static final int CLINICS_NODE_ID = 1;
+    public static final int CLINICS_NODE_ID = 0;
+    public static final int STUDIES_NODE_ID = 1;
     public static final int STORAGE_TYPES_NODE_ID = 2;
     public static final int STORAGE_CONTAINERS_NODE_ID = 3;
 
@@ -46,8 +46,8 @@ public class SiteAdapter extends AdapterBase {
         this.site = site;
         this.enableActions = enableActions;
         if (enableActions) {
-            addChild(new StudyGroup(this, STUDIES_NODE_ID));
             addChild(new ClinicGroup(this, CLINICS_NODE_ID));
+            addChild(new StudyGroup(this, STUDIES_NODE_ID));
             addChild(new ContainerTypeGroup(this, STORAGE_TYPES_NODE_ID));
             addChild(new ContainerGroup(this, STORAGE_CONTAINERS_NODE_ID));
         }
