@@ -24,7 +24,7 @@ import edu.ualberta.med.biobank.validators.IntegerNumber;
 
 public class SampleStorageDialog extends BiobankDialog {
 
-    private static final String TITLE = " Sample Storage";
+    private static final String TITLE = "Sample Storage";
 
     private SampleStorage sampleStorage;
 

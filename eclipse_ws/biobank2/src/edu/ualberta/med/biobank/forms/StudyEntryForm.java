@@ -22,7 +22,7 @@ import org.springframework.remoting.RemoteConnectFailureException;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.utils.ModelUtils;
-import edu.ualberta.med.biobank.model.Clinic;
+import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.model.PvInfo;
 import edu.ualberta.med.biobank.model.PvInfoPossible;
 import edu.ualberta.med.biobank.model.PvInfoType;
@@ -33,6 +33,7 @@ import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
+import edu.ualberta.med.biobank.widgets.ClinicContactEntryWidget;
 import edu.ualberta.med.biobank.widgets.MultiSelectWidget;
 import edu.ualberta.med.biobank.widgets.PvInfoWidget;
 import edu.ualberta.med.biobank.widgets.SampleStorageEntryWidget;
@@ -76,9 +77,7 @@ public class StudyEntryForm extends BiobankEntryForm {
 
     private Site site;
 
-    private Collection<Clinic> allClinics;
-
-    private MultiSelectWidget clinicsMultiSelect;
+    private ClinicContactEntryWidget contactEntryWidget;
 
     private Collection<SampleSource> allSampleSources;
 
@@ -155,36 +154,15 @@ public class StudyEntryForm extends BiobankEntryForm {
     }
 
     private void createClinicSection() {
-        try {
-            Composite client = createSectionWithClient("Available Clinics");
-            Collection<Clinic> studyClinics = ModelUtils
-                .getStudyClinicCollection(appService, study);
-            allClinics = site.getClinicCollection();
+        Composite client = createSectionWithClient("Available Clinics");
 
-            ListOrderedMap availClinics = new ListOrderedMap();
-            List<Integer> selClinics = new ArrayList<Integer>();
+        GridLayout layout = new GridLayout(1, false);
+        client.setLayout(layout);
+        client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-            if (studyClinics != null) {
-                for (Clinic clinic : studyClinics) {
-                    selClinics.add(clinic.getId());
-                }
-            }
-
-            for (Clinic clinic : allClinics) {
-                availClinics.put(clinic.getId(), clinic.getName());
-            }
-
-            clinicsMultiSelect = new MultiSelectWidget(client, SWT.NONE,
-                "Selected Clinics", "Available Clinics", 100);
-            clinicsMultiSelect.adaptToToolkit(toolkit, true);
-            clinicsMultiSelect.addSelections(availClinics, selClinics);
-            clinicsMultiSelect.addSelectionChangedListener(listener);
-        } catch (final RemoteConnectFailureException exp) {
-            BioBankPlugin.openRemoteConnectErrorMessage();
-        } catch (Exception e) {
-            SessionManager.getLogger().error(
-                "Error while retrieving the clinic", e);
-        }
+        contactEntryWidget = new ClinicContactEntryWidget(client, SWT.NONE,
+            site, study, toolkit);
+        contactEntryWidget.addSelectionChangedListener(listener);
     }
 
     private void createSampleStorageSection() {
@@ -318,18 +296,7 @@ public class StudyEntryForm extends BiobankEntryForm {
             return;
         }
 
-        // get the selected clinics from widget
-        List<Integer> selClinicIds = clinicsMultiSelect.getSelected();
-        Collection<Clinic> selClinics = new HashSet<Clinic>();
-        for (Clinic clinic : allClinics) {
-            int id = clinic.getId();
-            if (selClinicIds.indexOf(id) >= 0) {
-                selClinics.add(clinic);
-            }
-        }
-        Assert.isTrue(selClinics.size() == selClinicIds.size(),
-            "problem with clinic selections");
-
+        // FIXEME: get the selected clinics from widget
         // FIXME: should be a contact collection
         // study.setClinicCollection(selClinics);
 
@@ -374,6 +341,7 @@ public class StudyEntryForm extends BiobankEntryForm {
             pvInfoList.add(pvInfo);
         }
         study.setPvInfoCollection(pvInfoList);
+        saveContacts();
         saveStudy();
         saveSampleStorage();
         studyAdapter.setStudy(study);
@@ -412,6 +380,53 @@ public class StudyEntryForm extends BiobankEntryForm {
         study = (Study) result.getObjectResult();
     }
 
+    private void saveContacts() throws Exception {
+        Collection<Contact> contactCollection = contactEntryWidget
+            .getContacts();
+        SDKQuery query;
+        SDKQueryResult result;
+
+        removeDeletedContacts(contactCollection);
+
+        Collection<Contact> savedContactCollection = new HashSet<Contact>();
+        for (Contact c : contactCollection) {
+            if ((c.getId() == null) || (c.getId() == 0)) {
+                query = new InsertExampleQuery(c);
+            } else {
+                query = new UpdateExampleQuery(c);
+            }
+
+            result = appService.executeQuery(query);
+            savedContactCollection.add((Contact) result.getObjectResult());
+        }
+        study.setContactCollection(savedContactCollection);
+    }
+
+    private void removeDeletedContacts(Collection<Contact> contactCollection)
+        throws Exception {
+        // no need to remove if study is not yet in the database
+        if (study.getId() == null)
+            return;
+
+        List<Integer> selectedContactIds = new ArrayList<Integer>();
+        for (Contact c : contactCollection) {
+            selectedContactIds.add(c.getId());
+        }
+
+        SDKQuery query;
+
+        // query from database again
+        Study dbStudy = ModelUtils.getObjectWithId(appService, Study.class,
+            study.getId());
+
+        for (Contact c : dbStudy.getContactCollection()) {
+            if (!selectedContactIds.contains(c.getId())) {
+                query = new DeleteExampleQuery(c);
+                appService.executeQuery(query);
+            }
+        }
+    }
+
     private void saveSampleStorage() throws Exception {
         Collection<SampleStorage> ssCollection = sampleStorageEntryWidget
             .getSampleStorage();
@@ -436,7 +451,7 @@ public class StudyEntryForm extends BiobankEntryForm {
     }
 
     private void removeDeletedSampleStorage(
-        Collection<SampleStorage> ssCollection) {
+        Collection<SampleStorage> ssCollection) throws Exception {
         // no need to remove if study is not yet in the database
         if (study.getId() == null)
             return;
@@ -448,21 +463,15 @@ public class StudyEntryForm extends BiobankEntryForm {
 
         SDKQuery query;
 
-        try {
-            // query from database again
-            Study dbStudy = ModelUtils.getObjectWithId(appService, Study.class,
-                study.getId());
+        // query from database again
+        Study dbStudy = ModelUtils.getObjectWithId(appService, Study.class,
+            study.getId());
 
-            for (SampleStorage ss : dbStudy.getSampleStorageCollection()) {
-                if (!selectedStampleStorageIds.contains(ss.getId())) {
-                    query = new DeleteExampleQuery(ss);
-                    appService.executeQuery(query);
-                }
+        for (SampleStorage ss : dbStudy.getSampleStorageCollection()) {
+            if (!selectedStampleStorageIds.contains(ss.getId())) {
+                query = new DeleteExampleQuery(ss);
+                appService.executeQuery(query);
             }
-        } catch (final RemoteConnectFailureException exp) {
-            BioBankPlugin.openRemoteConnectErrorMessage();
-        } catch (Exception e) {
-            e.printStackTrace();
         }
     }
 
