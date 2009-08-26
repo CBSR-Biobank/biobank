@@ -159,7 +159,7 @@ public class StudyEntryForm extends BiobankEntryForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         contactEntryWidget = new ClinicContactEntryWidget(client, SWT.NONE,
-            site, study, toolkit);
+            study, toolkit);
         contactEntryWidget.addSelectionChangedListener(listener);
     }
 

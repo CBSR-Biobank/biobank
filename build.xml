@@ -89,7 +89,7 @@
 			<arg value="-obiobank_jars.tar.bz2" />
 			<arg value="http://${host}/biobank_jars.tar.bz2" />
 		</exec>
-		<untar src="biobank_jars.tar.bz2" compression="bzip2" dest="jars" />
+		<untar src="biobank_jars.tar.bz2" compression="bzip2" dest="." />
 	</target>
 
 	<target name="check-cacore-sdk-available">
