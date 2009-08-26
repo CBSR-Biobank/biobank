@@ -94,7 +94,7 @@ public class SampleTypeEntryWidget extends BiobankWidget {
         });
     }
 
-    private void addOrEditSampleType(boolean add, SampleType sampleType,
+    private boolean addOrEditSampleType(boolean add, SampleType sampleType,
         Set<SampleType> restrictedTypes) {
         SampleTypeDialog dlg = new SampleTypeDialog(PlatformUI.getWorkbench()
             .getActiveWorkbenchWindow().getShell(), sampleType);
@@ -106,11 +106,14 @@ public class SampleTypeEntryWidget extends BiobankWidget {
                     selectedSampleTypes.add(dlg.getSampleType());
                 }
                 sampleTypeTable.setCollection(selectedSampleTypes);
+                return true;
             } else {
                 BioBankPlugin.openAsyncError("Name Problem",
                     "A type with the same name or short name already exists.");
+                return false;
             }
         }
+        return false;
     }
 
     // need sample types that have not yet been selected in sampleStorageTable
@@ -141,11 +144,18 @@ public class SampleTypeEntryWidget extends BiobankWidget {
 
                 BiobankCollectionModel item = (BiobankCollectionModel) stSelection
                     .getFirstElement();
-                SampleType pvss = (SampleType) item.o;
+                SampleType pvss = ((SampleType) item.o);
+                SampleType st = new SampleType();
+                st.setId(pvss.getId());
+                st.setName(pvss.getName());
+                st.setNameShort(pvss.getNameShort());
 
                 Set<SampleType> restrictedTypes = getRestrictedTypes();
                 restrictedTypes.remove(pvss);
-                addOrEditSampleType(false, pvss, restrictedTypes);
+                if (addOrEditSampleType(false, st, restrictedTypes)) {
+                    pvss.setName(st.getName());
+                    pvss.setNameShort(st.getNameShort());
+                }
             }
 
             public void widgetDefaultSelected(SelectionEvent e) {
