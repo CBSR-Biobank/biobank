@@ -173,7 +173,7 @@ public class SampleStorageEntryWidget extends BiobankWidget {
                     .getWorkbench().getActiveWorkbenchWindow().getShell(),
                     "Delete Sample Storage",
                     "Are you sure you want to delete sample storage \""
-                        + sampleStorage.getSampleType().getName() + "\"");
+                        + sampleStorage.getSampleType().getName() + "\"?");
 
                 if (confirm) {
                     Collection<SampleStorage> ssToDelete = new HashSet<SampleStorage>();

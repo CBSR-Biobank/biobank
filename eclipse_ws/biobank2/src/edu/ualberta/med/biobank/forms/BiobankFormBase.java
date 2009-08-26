@@ -62,7 +62,7 @@ public abstract class BiobankFormBase extends EditorPart {
     }
 
     /**
-     * The initialisation method for the derived form.
+     * The initialization method for the derived form.
      * 
      * @param adapter the corresponding model adapter the form is to edit /
      *            view.
