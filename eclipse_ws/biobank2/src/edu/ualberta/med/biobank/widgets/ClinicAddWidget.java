@@ -23,12 +23,12 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
-import edu.ualberta.med.biobank.dialogs.ClinicContactsDialog;
+import edu.ualberta.med.biobank.dialogs.SelectClinicContactDialog;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.widgets.infotables.BiobankCollectionModel;
-import edu.ualberta.med.biobank.widgets.infotables.ContactInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.StudyContactEntryInfoTable;
 import edu.ualberta.med.biobank.widgets.listener.BiobankEntryFormWidgetListener;
 import edu.ualberta.med.biobank.widgets.listener.MultiSelectEvent;
 
@@ -36,17 +36,17 @@ import edu.ualberta.med.biobank.widgets.listener.MultiSelectEvent;
  * Allows the user to select a clinic and a contact from a clinic. Note that
  * some clinics may have more than one contact.
  */
-public class ClinicContactEntryWidget extends BiobankWidget {
+public class ClinicAddWidget extends BiobankWidget {
 
     private Collection<Contact> selectedContacts;
 
     private Collection<Clinic> allClinics;
 
-    private ContactInfoTable contactInfoTable;
+    private StudyContactEntryInfoTable contactInfoTable;
 
     private Button addClinicButton;
 
-    public ClinicContactEntryWidget(Composite parent, int style, Study study,
+    public ClinicAddWidget(Composite parent, int style, Study study,
         FormToolkit toolkit) {
         super(parent, style);
         Assert.isNotNull(toolkit, "toolkit is null");
@@ -60,14 +60,14 @@ public class ClinicContactEntryWidget extends BiobankWidget {
         setLayout(new GridLayout(1, false));
         setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-        contactInfoTable = new ContactInfoTable(parent, selectedContacts);
+        contactInfoTable = new StudyContactEntryInfoTable(parent, study);
         contactInfoTable.adaptToToolkit(toolkit, true);
         addTableMenu();
         contactInfoTable
             .addSelectionChangedListener(new BiobankEntryFormWidgetListener() {
                 @Override
                 public void selectionChanged(MultiSelectEvent event) {
-                    ClinicContactEntryWidget.this.notifyListeners();
+                    ClinicAddWidget.this.notifyListeners();
                 }
             });
 
@@ -81,9 +81,13 @@ public class ClinicContactEntryWidget extends BiobankWidget {
     }
 
     private void createClinicContact() {
-        Dialog dlg = new ClinicContactsDialog(PlatformUI.getWorkbench()
-            .getActiveWorkbenchWindow().getShell(), allClinics);
-        dlg.open();
+        SelectClinicContactDialog dlg = new SelectClinicContactDialog(
+            PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
+            allClinics);
+        if (dlg.open() == Dialog.OK) {
+            selectedContacts.add(dlg.getSelection());
+            contactInfoTable.setCollection(selectedContacts);
+        }
     }
 
     private void addTableMenu() {
@@ -170,6 +174,6 @@ public class ClinicContactEntryWidget extends BiobankWidget {
     }
 
     public Collection<Contact> getContacts() {
-        return contactInfoTable.getCollection();
+        return selectedContacts;
     }
 }

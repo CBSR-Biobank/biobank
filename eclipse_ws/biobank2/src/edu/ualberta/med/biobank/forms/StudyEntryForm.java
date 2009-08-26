@@ -32,7 +32,7 @@ import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
-import edu.ualberta.med.biobank.widgets.ClinicContactEntryWidget;
+import edu.ualberta.med.biobank.widgets.ClinicAddWidget;
 import edu.ualberta.med.biobank.widgets.MultiSelectWidget;
 import edu.ualberta.med.biobank.widgets.PvInfoWidget;
 import edu.ualberta.med.biobank.widgets.SampleStorageEntryWidget;
@@ -76,7 +76,7 @@ public class StudyEntryForm extends BiobankEntryForm {
 
     private Site site;
 
-    private ClinicContactEntryWidget contactEntryWidget;
+    private ClinicAddWidget contactEntryWidget;
 
     private Collection<SampleSource> allSampleSources;
 
@@ -158,8 +158,8 @@ public class StudyEntryForm extends BiobankEntryForm {
         client.setLayout(layout);
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-        contactEntryWidget = new ClinicContactEntryWidget(client, SWT.NONE,
-            study, toolkit);
+        contactEntryWidget = new ClinicAddWidget(client, SWT.NONE, study,
+            toolkit);
         contactEntryWidget.addSelectionChangedListener(listener);
     }
 

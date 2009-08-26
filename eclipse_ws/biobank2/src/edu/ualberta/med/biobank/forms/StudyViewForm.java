@@ -24,7 +24,7 @@ import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
 import edu.ualberta.med.biobank.widgets.infotables.SampleSourceInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.SampleStorageInfoTable;
-import edu.ualberta.med.biobank.widgets.infotables.StudyClinicInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.StudyContactInfoTable;
 
 public class StudyViewForm extends BiobankViewForm {
 
@@ -37,7 +37,7 @@ public class StudyViewForm extends BiobankViewForm {
     private Label activityStatusLabel;
     private Label commentLabel;
 
-    private StudyClinicInfoTable clinicsTable;
+    private StudyContactInfoTable clinicsTable;
     private SampleStorageInfoTable sampleStorageTable;
     private SampleSourceInfoTable sampleSourceTable;
 
@@ -106,7 +106,7 @@ public class StudyViewForm extends BiobankViewForm {
     private void createClinicSection() throws Exception {
         Composite client = createSectionWithClient("Clinics");
 
-        clinicsTable = new StudyClinicInfoTable(client, appService, study);
+        clinicsTable = new StudyContactInfoTable(client, appService, study);
         clinicsTable.adaptToToolkit(toolkit, true);
         toolkit.paintBordersFor(clinicsTable);
 

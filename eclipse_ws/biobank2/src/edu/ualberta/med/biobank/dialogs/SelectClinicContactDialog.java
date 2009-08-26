@@ -18,9 +18,12 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 
 import edu.ualberta.med.biobank.model.Clinic;
+import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.widgets.infotables.ContactInfoTable;
 
-public class ClinicContactsDialog extends BiobankDialog {
+public class SelectClinicContactDialog extends BiobankDialog {
+
+    public static final int ADD_BTN_ID = 100;
 
     private static final String TITLE = "Clinic Contacts";
 
@@ -30,9 +33,9 @@ public class ClinicContactsDialog extends BiobankDialog {
 
     private ContactInfoTable contactInfoTable;
 
-    public static final int ADD_BTN_ID = 100;
+    private Contact selectedContact;
 
-    public ClinicContactsDialog(Shell parent,
+    public SelectClinicContactDialog(Shell parent,
         Collection<Clinic> clinicCollection) {
         super(parent);
         clinicMap = new HashMap<String, Clinic>();
@@ -86,6 +89,16 @@ public class ClinicContactsDialog extends BiobankDialog {
         Assert.isNotNull(clinic, "no clinic with name \"" + name + "\"");
         contactInfoTable.setCollection(clinic.getContactCollection());
         contactInfoTable.setEnabled(true);
+    }
+
+    @Override
+    protected void okPressed() {
+        selectedContact = contactInfoTable.getSelection();
+        super.okPressed();
+    }
+
+    public Contact getSelection() {
+        return selectedContact;
     }
 
 }

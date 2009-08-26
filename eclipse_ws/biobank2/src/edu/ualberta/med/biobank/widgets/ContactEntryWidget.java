@@ -6,7 +6,6 @@ import java.util.HashSet;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -22,7 +21,6 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 
 import edu.ualberta.med.biobank.dialogs.ContactAddDialog;
 import edu.ualberta.med.biobank.model.Contact;
-import edu.ualberta.med.biobank.widgets.infotables.BiobankCollectionModel;
 import edu.ualberta.med.biobank.widgets.infotables.ContactInfoTable;
 import edu.ualberta.med.biobank.widgets.listener.BiobankEntryFormWidgetListener;
 import edu.ualberta.med.biobank.widgets.listener.MultiSelectEvent;
@@ -77,12 +75,7 @@ public class ContactEntryWidget extends BiobankWidget {
         item.setText("Edit");
         item.addSelectionListener(new SelectionListener() {
             public void widgetSelected(SelectionEvent event) {
-                IStructuredSelection stSelection = (IStructuredSelection) contactInfoTable
-                    .getTableViewer().getSelection();
-
-                BiobankCollectionModel item = (BiobankCollectionModel) stSelection
-                    .getFirstElement();
-                addOrEditContact(false, (Contact) item.o);
+                addOrEditContact(false, contactInfoTable.getSelection());
             }
 
             public void widgetDefaultSelected(SelectionEvent e) {
@@ -93,12 +86,7 @@ public class ContactEntryWidget extends BiobankWidget {
         item.setText("Delete");
         item.addSelectionListener(new SelectionListener() {
             public void widgetSelected(SelectionEvent event) {
-                IStructuredSelection stSelection = (IStructuredSelection) contactInfoTable
-                    .getTableViewer().getSelection();
-
-                BiobankCollectionModel item = (BiobankCollectionModel) stSelection
-                    .getFirstElement();
-                Contact contact = (Contact) item.o;
+                Contact contact = contactInfoTable.getSelection();
 
                 boolean confirm = MessageDialog.openConfirm(PlatformUI
                     .getWorkbench().getActiveWorkbenchWindow().getShell(),

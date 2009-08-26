@@ -5,8 +5,10 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.IDoubleClickListener;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TableLayout;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.SWT;
@@ -38,7 +40,7 @@ public class InfoTableWidget<T> extends BiobankWidget {
         setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         setLayout(new GridLayout(1, false));
 
-        tableViewer = new TableViewer(this, SWT.BORDER | SWT.MULTI
+        tableViewer = new TableViewer(this, SWT.BORDER // | SWT.MULTI
             | SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION | SWT.VIRTUAL);
         tableViewer.setLabelProvider(new BiobankLabelProvider());
         tableViewer.setContentProvider(new ArrayContentProvider());
@@ -141,6 +143,19 @@ public class InfoTableWidget<T> extends BiobankWidget {
     @Override
     public void setEnabled(boolean enabled) {
         tableViewer.getTable().setEnabled(enabled);
+    }
+
+    @SuppressWarnings("unchecked")
+    public T getSelection() {
+        Assert.isTrue(!tableViewer.getTable().isDisposed(),
+            "widget is disposed");
+        IStructuredSelection stSelection = (IStructuredSelection) tableViewer
+            .getSelection();
+
+        BiobankCollectionModel item = (BiobankCollectionModel) stSelection
+            .getFirstElement();
+        Assert.isNotNull(item, "no selection");
+        return (T) item.o;
     }
 
 }

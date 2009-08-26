@@ -23,7 +23,8 @@ import edu.ualberta.med.biobank.model.Sample;
 import edu.ualberta.med.biobank.model.SampleSource;
 import edu.ualberta.med.biobank.model.SampleStorage;
 import edu.ualberta.med.biobank.model.Study;
-import edu.ualberta.med.biobank.model.StudyClinicInfo;
+import edu.ualberta.med.biobank.model.StudyContactAndPatientInfo;
+import edu.ualberta.med.biobank.model.StudyContactInfo;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.widgets.infotables.BiobankCollectionModel;
 
@@ -166,8 +167,8 @@ public class BiobankLabelProvider extends LabelProvider implements
                     return "" + info.patientVisits;
                 return "";
             }
-        } else if (element instanceof StudyClinicInfo) {
-            StudyClinicInfo info = (StudyClinicInfo) element;
+        } else if (element instanceof StudyContactAndPatientInfo) {
+            StudyContactAndPatientInfo info = (StudyContactAndPatientInfo) element;
             switch (columnIndex) {
             case 0:
                 if (info.clinicName != null)
@@ -202,6 +203,37 @@ public class BiobankLabelProvider extends LabelProvider implements
 
             case 7:
                 if (info.contact != null)
+                    return "" + info.contact.getFaxNumber();
+                return "";
+            }
+        } else if (element instanceof StudyContactInfo) {
+            StudyContactInfo info = (StudyContactInfo) element;
+            switch (columnIndex) {
+            case 0:
+                if (info.clinicName != null)
+                    return info.clinicName;
+                return "";
+            case 1:
+                if ((info.contact != null) && (info.contact.getName() != null))
+                    return "" + info.contact.getName();
+                return "";
+            case 2:
+                if ((info.contact != null) && (info.contact.getTitle() != null))
+                    return "" + info.contact.getTitle();
+                return "";
+            case 3:
+                if ((info.contact != null)
+                    && (info.contact.getEmailAddress() != null))
+                    return "" + info.contact.getEmailAddress();
+                return "";
+            case 4:
+                if ((info.contact != null)
+                    && (info.contact.getPhoneNumber() != null))
+                    return "" + info.contact.getPhoneNumber();
+                return "";
+            case 5:
+                if ((info.contact != null)
+                    && (info.contact.getFaxNumber() != null))
                     return "" + info.contact.getFaxNumber();
                 return "";
             }
