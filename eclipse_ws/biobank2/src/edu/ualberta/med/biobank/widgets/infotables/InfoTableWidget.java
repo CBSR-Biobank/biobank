@@ -138,4 +138,9 @@ public class InfoTableWidget<T> extends BiobankWidget {
         return collection;
     }
 
+    @Override
+    public void setEnabled(boolean enabled) {
+        tableViewer.getTable().setEnabled(enabled);
+    }
+
 }

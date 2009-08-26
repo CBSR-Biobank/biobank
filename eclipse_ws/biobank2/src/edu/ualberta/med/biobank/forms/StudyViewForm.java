@@ -58,7 +58,7 @@ public class StudyViewForm extends BiobankViewForm {
     }
 
     @Override
-    protected void createFormContent() {
+    protected void createFormContent() throws Exception {
         if (study.getName() != null) {
             form.setText("Study: " + study.getName());
         }
@@ -103,7 +103,7 @@ public class StudyViewForm extends BiobankViewForm {
         });
     }
 
-    private void createClinicSection() {
+    private void createClinicSection() throws Exception {
         Composite client = createSectionWithClient("Clinics");
 
         clinicsTable = new StudyClinicInfoTable(client, appService, study);
@@ -176,7 +176,7 @@ public class StudyViewForm extends BiobankViewForm {
     }
 
     @Override
-    protected void reload() {
+    protected void reload() throws Exception {
         retrieveStudy();
         setPartName("Study " + study.getNameShort());
         form.setText("Study: " + study.getName());
@@ -184,8 +184,8 @@ public class StudyViewForm extends BiobankViewForm {
         AdapterBase clinicGroupNode = ((SiteAdapter) studyAdapter.getParent()
             .getParent()).getClinicGroupNode();
         clinicsTable.getTableViewer().setInput(
-            FormUtils.getClinicsAdapters(clinicGroupNode, study
-                .getClinicCollection()));
+            FormUtils.getClinicsAdapters(clinicGroupNode, ModelUtils
+                .getStudyClinicCollection(appService, study)));
         // pvInfosTable.getTableViewer().setInput(getStudyPvInfo());
     }
 

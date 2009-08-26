@@ -31,6 +31,8 @@ public class SessionsView extends ViewPart {
 
         getSite().setSelectionProvider(getTreeViewer());
         getTreeViewer().setInput(SessionManager.getInstance().getRootNode());
+        SessionManager.getInstance().getRootNode().setTreeViewer(
+            getTreeViewer());
     }
 
     @Override

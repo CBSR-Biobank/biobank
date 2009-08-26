@@ -11,6 +11,7 @@ import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.utils.ModelUtils;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.ClinicStudyInfo;
+import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
 import edu.ualberta.med.biobank.model.ContainerType;
@@ -56,8 +57,6 @@ public class BiobankLabelProvider extends LabelProvider implements
             switch (columnIndex) {
             case 0:
                 return clinic.getName();
-            case 1:
-                return "" + clinic.getStudyCollection().size();
             }
         } else if (element instanceof Patient) {
             final Patient patient = (Patient) element;
@@ -191,6 +190,31 @@ public class BiobankLabelProvider extends LabelProvider implements
                 if (info.patientVisits != null)
                     return "" + info.patientVisits;
                 return "";
+
+            case 3:
+                if (info.contact != null)
+                    return "" + info.contact.getName();
+                return "";
+
+            case 4:
+                if (info.contact != null)
+                    return "" + info.contact.getTitle();
+                return "";
+
+            case 5:
+                if (info.contact != null)
+                    return "" + info.contact.getEmailAddress();
+                return "";
+
+            case 6:
+                if (info.contact != null)
+                    return "" + info.contact.getPhoneNumber();
+                return "";
+
+            case 7:
+                if (info.contact != null)
+                    return "" + info.contact.getFaxNumber();
+                return "";
             }
         } else if (element instanceof SampleSource) {
             SampleSource info = (SampleSource) element;
@@ -206,6 +230,20 @@ public class BiobankLabelProvider extends LabelProvider implements
                 return info.getSampleSource().getName();
             case 1:
                 return info.getQuantity().toString();
+            }
+        } else if (element instanceof Contact) {
+            Contact contact = (Contact) element;
+            switch (columnIndex) {
+            case 0:
+                return contact.getName();
+            case 1:
+                return contact.getTitle();
+            case 2:
+                return contact.getEmailAddress();
+            case 3:
+                return contact.getPhoneNumber();
+            case 4:
+                return contact.getFaxNumber();
             }
         } else {
             Assert.isTrue(false, "invalid object type: " + element.getClass());

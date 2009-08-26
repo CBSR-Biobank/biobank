@@ -105,7 +105,8 @@ public class ContainerViewForm extends BiobankViewForm {
         setPartName(container.getLabel() + " ("
             + container.getContainerType().getName() + ")");
         initCells();
-        List<ScanPalletModificationListener> listeners = new ArrayList<ScanPalletModificationListener>();
+        // List<ScanPalletModificationListener> listeners = new
+        // ArrayList<ScanPalletModificationListener>();
     }
 
     @Override

@@ -43,7 +43,7 @@ import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.utils.ModelUtils;
+import edu.ualberta.med.biobank.common.utils.SiteUtils;
 import edu.ualberta.med.biobank.forms.listener.EnterKeyToNextFieldListener;
 import edu.ualberta.med.biobank.model.PalletCell;
 import edu.ualberta.med.biobank.model.Patient;
@@ -131,8 +131,8 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
     }
 
     @Override
-    protected void createFormContent() {
-        form.setText("Link sample to patient visit using the scanner");
+    protected void createFormContent() throws Exception {
+        form.setText("Link samples to patient visit using the scanner");
         GridLayout layout = new GridLayout(2, false);
         form.getBody().setLayout(layout);
 
@@ -195,7 +195,7 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
         });
     }
 
-    private void createTypesSelectionSection(Composite parent) {
+    private void createTypesSelectionSection(Composite parent) throws Exception {
         // Radio buttons
         radioComponents = toolkit.createComposite(parent);
         RowLayout compLayout = new RowLayout();
@@ -342,7 +342,7 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
         });
     }
 
-    private void createFieldsComposite() {
+    private void createFieldsComposite() throws Exception {
         Composite fieldsComposite = toolkit.createComposite(form.getBody());
         GridLayout layout = new GridLayout(2, false);
         layout.horizontalSpacing = 10;
@@ -427,9 +427,9 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
     }
 
     protected void setVisitsList() {
-        String pNumber = patientNumberText.getText();
-        currentPatient = ModelUtils.getObjectWithAttr(adapter.getAppService(),
-            Patient.class, "number", String.class, pNumber);
+        currentPatient = SiteUtils.getPatientInSite(appService,
+            patientNumberText.getText(), SessionManager.getInstance()
+                .getCurrentSite());
         if (currentPatient != null) {
             // show visits list
             Collection<PatientVisit> collection = currentPatient
@@ -497,14 +497,8 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
 
     }
 
-    private List<SampleType> getAllSampleTypes() {
-        try {
-            return appService.search(SampleType.class, new SampleType());
-        } catch (final RemoteConnectFailureException exp) {
-            BioBankPlugin.openRemoteConnectErrorMessage();
-        } catch (Exception exp) {
-        }
-        return null;
+    private List<SampleType> getAllSampleTypes() throws Exception {
+        return appService.search(SampleType.class, new SampleType());
     }
 
     @Override

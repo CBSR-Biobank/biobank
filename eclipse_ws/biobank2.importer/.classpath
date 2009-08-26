@@ -7,7 +7,6 @@
 	<classpathentry kind="lib" path="lib/asm.jar"/>
 	<classpathentry kind="lib" path="lib/axis.jar"/>
 	<classpathentry kind="lib" path="lib/biobank2-beans.jar"/>
-	<classpathentry kind="lib" path="lib/biobank2-orm.jar"/>
 	<classpathentry kind="lib" path="lib/caGrid-CQL-cql.1.0-1.2.jar"/>
 	<classpathentry kind="lib" path="lib/castor-1.0.2.jar"/>
 	<classpathentry kind="lib" path="lib/cglib-2.1.3.jar"/>
@@ -28,5 +27,6 @@
 	<classpathentry kind="lib" path="lib/mysql-connector-java-5.1.7-bin.jar"/>
 	<classpathentry kind="lib" path="lib/commons-lang-2.4.jar"/>
 	<classpathentry kind="lib" path="conf"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/biobank.common"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

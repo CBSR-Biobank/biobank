@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.importer;
 
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Clinic;
+import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.ContainerType;
@@ -234,7 +235,7 @@ public class Importer {
 
     private void importClinics() throws Exception {
         Clinic clinic;
-        Collection<Clinic> clinicCollection;
+        Collection<Contact> contactCollection;
 
         System.out.println("importing clinics ...");
 
@@ -254,16 +255,20 @@ public class Importer {
                 clinic.setAddress(address);
                 clinic = (Clinic) bioBank2Db.setObject(clinic);
 
-                // assign clinic to study now
-                Study study = bioBank2Db.getStudy(rs.getString(5));
-                clinicCollection = study.getClinicCollection();
+                Contact contact = new Contact();
+                contact.setClinic(clinic);
+                contact = (Contact) bioBank2Db.setObject(contact);
 
-                if (clinicCollection == null) {
-                    clinicCollection = new HashSet<Clinic>();
+                // assign contact to study now
+                Study study = bioBank2Db.getStudy(rs.getString(5));
+                contactCollection = study.getContactCollection();
+
+                if (contactCollection == null) {
+                    contactCollection = new HashSet<Contact>();
                 }
 
-                clinicCollection.add(clinic);
-                study.setClinicCollection(clinicCollection);
+                contactCollection.add(contact);
+                study.setContactCollection(contactCollection);
                 study = (Study) bioBank2Db.setObject(study);
             }
         }

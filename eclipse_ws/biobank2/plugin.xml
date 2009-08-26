@@ -627,7 +627,7 @@
                </visibleWhen>
                <parameter
                      name="edu.ualberta.med.biobank.commands.patients.openPatientForm.editorId"
-                     value="edu.ualberta.med.biobank.forms.AssignSamplesLocationEntryForm">
+                     value="edu.ualberta.med.biobank.forms.ScanAssignEntryForm">
                </parameter>
             </command>
             <command
@@ -784,13 +784,13 @@
             default="false"
             icon="icons/scanLink.png"
             id="edu.ualberta.med.biobank.forms.ScanLinkEntryForm"
-            name="Scan Link">
+            name="Scan Link Entry">
       </editor>
       <editor
-            class="edu.ualberta.med.biobank.forms.AssignSamplesLocationEntryForm"
+            class="edu.ualberta.med.biobank.forms.ScanAssignEntryForm"
             default="false"
-            id="edu.ualberta.med.biobank.forms.AssignSamplesLocationEntryForm"
-            name="Assign Samples Location Entry">
+            id="edu.ualberta.med.biobank.forms.ScanAssignEntryForm"
+            name="Scan Assign Entry">
       </editor>
       <editor
             class="edu.ualberta.med.biobank.forms.CabinetLinkAssignEntryForm"
@@ -833,9 +833,10 @@
             name="General">
       </page>
       <page
+          category="Scanner"
             class="edu.ualberta.med.biobank.preferences.ScannerPreferencePage"
             id="edu.ualberta.med.biobank.preferences.gereral"
-            name="Scanner">
+            name="Plate Barcodes">
       </page>
    </extension>
    <extension

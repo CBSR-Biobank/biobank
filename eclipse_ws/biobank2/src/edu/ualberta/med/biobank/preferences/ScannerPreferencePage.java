@@ -1,8 +1,6 @@
-
 package edu.ualberta.med.biobank.preferences;
 
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
-import org.eclipse.jface.preference.IntegerFieldEditor;
 import org.eclipse.jface.preference.StringFieldEditor;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
@@ -28,8 +26,6 @@ public class ScannerPreferencePage extends FieldEditorPreferencePage implements
             addField(new StringFieldEditor(PreferenceConstants.SCANNER_PLATE
                 + i, "Plate " + i + " barcode", getFieldEditorParent()));
         }
-        addField(new IntegerFieldEditor(PreferenceConstants.SCANNER_DPI,
-            "Scanner dpi", getFieldEditorParent()));
     }
 
     /*
@@ -38,6 +34,7 @@ public class ScannerPreferencePage extends FieldEditorPreferencePage implements
      * @see
      * org.eclipse.ui.IWorkbenchPreferencePage#init(org.eclipse.ui.IWorkbench)
      */
-    public void init(IWorkbench workbench) {}
+    public void init(IWorkbench workbench) {
+    }
 
 }

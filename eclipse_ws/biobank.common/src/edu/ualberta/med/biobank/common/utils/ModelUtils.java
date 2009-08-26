@@ -11,12 +11,15 @@ import org.springframework.util.Assert;
 
 import edu.ualberta.med.biobank.common.LabelingScheme;
 import edu.ualberta.med.biobank.common.RowColPos;
+import edu.ualberta.med.biobank.model.Clinic;
+import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.Sample;
 import edu.ualberta.med.biobank.model.SamplePosition;
 import edu.ualberta.med.biobank.model.SampleStorage;
 import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.model.Study;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -100,32 +103,6 @@ public class ModelUtils {
         }
     }
 
-    public static Container getContainerWithLabel(
-        WritableApplicationService appService, String barcode, String type)
-        throws Exception {
-        Container container = new Container();
-        container.setLabel(barcode);
-        List<Container> containers = appService.search(Container.class,
-            container);
-        if (containers.size() == 1) {
-            return containers.get(0);
-        } else {
-            if (type != null) {
-                List<ContainerType> cTypes = ModelUtils.queryProperty(
-                    appService, ContainerType.class, "name", type, true);
-                if (cTypes.size() > 0) {
-                    for (Container c : containers) {
-                        if (c.getContainerType().getId().equals(
-                            cTypes.get(0).getId())) {
-                            return c;
-                        }
-                    }
-                }
-            }
-        }
-        return null;
-    }
-
     public static String getSamplePosition(Sample sample) {
         SamplePosition position = sample.getSamplePosition();
         if (position == null) {
@@ -148,6 +125,30 @@ public class ModelUtils {
             }
             return "error in types";
         }
+    }
+
+    public static List<Clinic> getStudyClinicCollection(
+        WritableApplicationService appService, Study study)
+        throws ApplicationException {
+        HQLCriteria c = new HQLCriteria("select distinct clinics from "
+            + Contact.class.getName() + " as contacts"
+            + " inner join contacts.clinic as clinics"
+            + " where contacts.studyCollection.id = ?", Arrays
+            .asList(new Object[] { study.getId() }));
+
+        return appService.query(c);
+    }
+
+    public static List<Study> getClinicStudyCollection(
+        WritableApplicationService appService, Clinic clinic)
+        throws ApplicationException {
+        HQLCriteria c = new HQLCriteria("select distinct studies from "
+            + Contact.class.getName() + " as contacts"
+            + " inner join contacts.studyCollection as studies"
+            + " where contacts.clinic = ?", Arrays
+            .asList(new Object[] { clinic }));
+
+        return appService.query(c);
     }
 
     public static boolean getBooleanValue(Boolean value, boolean defaultValue) {
