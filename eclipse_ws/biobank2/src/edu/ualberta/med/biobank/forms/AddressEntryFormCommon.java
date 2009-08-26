@@ -12,6 +12,7 @@ import org.eclipse.ui.PartInitException;
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.validators.PostalCode;
 
+@SuppressWarnings("serial")
 public abstract class AddressEntryFormCommon extends BiobankEntryForm {
 
     protected Address address;

@@ -89,7 +89,7 @@
 			<arg value="-obiobank_jars.tar.bz2" />
 			<arg value="http://${host}/biobank_jars.tar.bz2" />
 		</exec>
-		<untar src="biobank_jars.tar.bz2" compression="bzip2" dest="jars" />
+		<untar src="biobank_jars.tar.bz2" compression="bzip2" dest="." />
 	</target>
 
 	<target name="check-cacore-sdk-available">
@@ -146,7 +146,6 @@
 		<copy todir="${eclipse.proj.dir.common}/lib" file="${cacore.sdk.dir}/system/security/dist/sdk-security.jar" />
 		<copy todir="${eclipse.proj.dir.importer}/lib" file="${cacore.sdk.dir}/system/security/dist/sdk-security.jar" />
 		<copy todir="${eclipse.proj.dir.junit}/lib" file="${cacore.sdk.dir}/system/security/dist/sdk-security.jar" />
-		<copy todir="${eclipse.proj.dir.junit}/lib" file="${cacore.sdk.dir}/writable-api/dist/sdk-writable-client-framework.jar" />
 		<copy todir="${eclipse.proj.dir.common}/lib">
 			<fileset dir="${cacore.sdk.dir}/output/biobank2/package/remote-client/conf">
 				<include name="application-config-client*.xml" />
@@ -314,8 +313,18 @@
 		</war>
 	</target>
 
-	<target name="clean">
+	<target name="clean-jars" description="deletes jars from eclipse projects">
+		<delete>
+			<fileset dir="${eclipse.proj.dir}/lib" includes="**/*.jar" />
+			<fileset dir="${eclipse.proj.dir.common}/lib" includes="**/*.jar" />
+			<fileset dir="${eclipse.proj.dir.importer}/lib" includes="**/*.jar" />
+			<fileset dir="${eclipse.proj.dir.junit}/lib" includes="**/*.jar" />
+		</delete>
+	</target>
+
+	<target name="clean" description="cleans caCORE SDK and deletes jars from eclipse projects">
 		<ant dir="${cacore.sdk.dir}" target="clean" inheritRefs="false" />
+		<ant target="clean-jars" />
 	</target>
 
 </project>
