@@ -52,7 +52,7 @@ public class ClinicContactsDialog extends BiobankDialog {
     @Override
     protected Control createDialogArea(Composite parent) {
         Composite parentComposite = (Composite) super.createDialogArea(parent);
-        setStatusMessage("Select a clinic and then a contact or add a new contact");
+        setStatusMessage("Select a clinic and then a contact");
         Composite contents = new Composite(parentComposite, SWT.NONE);
         contents.setLayout(new GridLayout(1, false));
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));

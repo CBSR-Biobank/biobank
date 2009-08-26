@@ -26,13 +26,16 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import edu.ualberta.med.biobank.dialogs.ClinicContactsDialog;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Contact;
-import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.widgets.infotables.BiobankCollectionModel;
 import edu.ualberta.med.biobank.widgets.infotables.ContactInfoTable;
 import edu.ualberta.med.biobank.widgets.listener.BiobankEntryFormWidgetListener;
 import edu.ualberta.med.biobank.widgets.listener.MultiSelectEvent;
 
+/**
+ * Allows the user to select a clinic and a contact from a clinic. Note that
+ * some clinics may have more than one contact.
+ */
 public class ClinicContactEntryWidget extends BiobankWidget {
 
     private Collection<Contact> selectedContacts;
@@ -43,11 +46,11 @@ public class ClinicContactEntryWidget extends BiobankWidget {
 
     private Button addClinicButton;
 
-    public ClinicContactEntryWidget(Composite parent, int style, Site site,
-        Study study, FormToolkit toolkit) {
+    public ClinicContactEntryWidget(Composite parent, int style, Study study,
+        FormToolkit toolkit) {
         super(parent, style);
         Assert.isNotNull(toolkit, "toolkit is null");
-        allClinics = site.getClinicCollection();
+        allClinics = study.getSite().getClinicCollection();
 
         selectedContacts = study.getContactCollection();
         if (selectedContacts == null) {
@@ -72,8 +75,6 @@ public class ClinicContactEntryWidget extends BiobankWidget {
         addClinicButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                // addOrEditContact(true, new Contact(),
-                // getNonDuplicateClinics());
                 createClinicContact();
             }
         });
@@ -148,7 +149,7 @@ public class ClinicContactEntryWidget extends BiobankWidget {
         });
     }
 
-    // need sample types that have not yet been selected in sampleStorageTable
+    // need clinics that have not yet been selected in contactInfoTable
     private Set<Clinic> getNonDuplicateClinics() {
         Set<Clinic> clinics = new HashSet<Clinic>(allClinics);
         Set<Clinic> dupClinics = new HashSet<Clinic>();
