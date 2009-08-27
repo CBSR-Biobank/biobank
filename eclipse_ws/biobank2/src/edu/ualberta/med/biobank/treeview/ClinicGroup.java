@@ -67,10 +67,6 @@ public class ClinicGroup extends AdapterBase {
 
             Collection<Clinic> clinics = currentSite.getClinicCollection();
             for (Clinic clinic : clinics) {
-                SessionManager.getLogger().trace(
-                    "updateStudies: Clinic " + clinic.getId() + ": "
-                        + clinic.getName());
-
                 ClinicAdapter node = (ClinicAdapter) getChild(clinic.getId());
 
                 if (node == null) {

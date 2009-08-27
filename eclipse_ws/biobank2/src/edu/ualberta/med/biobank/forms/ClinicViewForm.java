@@ -33,7 +33,7 @@ public class ClinicViewForm extends AddressViewFormCommon {
     private Label commentLabel;
 
     @Override
-    protected void init() {
+    protected void init() throws Exception {
         Assert.isTrue(adapter instanceof ClinicAdapter,
             "Invalid editor input: object of type "
                 + adapter.getClass().getName());
@@ -118,7 +118,7 @@ public class ClinicViewForm extends AddressViewFormCommon {
     }
 
     @Override
-    protected void reload() {
+    protected void reload() throws Exception {
         clinic = clinicAdapter.loadClinic();
         setPartName("Clinic: " + clinic.getName());
         form.setText("Clinic: " + clinic.getName());
