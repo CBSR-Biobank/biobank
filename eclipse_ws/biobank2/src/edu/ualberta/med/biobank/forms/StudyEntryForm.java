@@ -21,7 +21,6 @@ import org.eclipse.swt.widgets.Text;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.utils.ModelUtils;
-import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.model.PvInfo;
 import edu.ualberta.med.biobank.model.PvInfoPossible;
 import edu.ualberta.med.biobank.model.PvInfoType;
@@ -152,7 +151,7 @@ public class StudyEntryForm extends BiobankEntryForm {
     }
 
     private void createClinicSection() {
-        Composite client = createSectionWithClient("Available Clinics");
+        Composite client = createSectionWithClient("Clinics");
 
         GridLayout layout = new GridLayout(1, false);
         client.setLayout(layout);
@@ -288,10 +287,6 @@ public class StudyEntryForm extends BiobankEntryForm {
             return;
         }
 
-        // FIXEME: get the selected clinics from widget
-        // FIXME: should be a contact collection
-        // study.setClinicCollection(selClinics);
-
         // get the selected sample sources from widget
         List<Integer> selSampleSourceIds = sampleSourceMultiSelect
             .getSelected();
@@ -333,7 +328,6 @@ public class StudyEntryForm extends BiobankEntryForm {
             pvInfoList.add(pvInfo);
         }
         study.setPvInfoCollection(pvInfoList);
-        saveContacts();
         saveStudy();
         saveSampleStorage();
         studyAdapter.setStudy(study);
@@ -347,6 +341,7 @@ public class StudyEntryForm extends BiobankEntryForm {
         Set<PvInfo> savedPvInfoList = new HashSet<PvInfo>();
 
         study.setSite(site);
+        study.setContactCollection(contactEntryWidget.getContacts());
 
         if (study.getPvInfoCollection().size() > 0) {
             for (PvInfo pvInfo : study.getPvInfoCollection()) {
@@ -370,59 +365,6 @@ public class StudyEntryForm extends BiobankEntryForm {
 
         result = appService.executeQuery(query);
         study = (Study) result.getObjectResult();
-    }
-
-    private void saveContacts() throws Exception {
-        Collection<Contact> contactCollection = contactEntryWidget
-            .getContacts();
-        SDKQuery query;
-        SDKQueryResult result;
-
-        removeDeletedContacts(contactCollection);
-
-        Collection<Contact> savedContactCollection = new HashSet<Contact>();
-        for (Contact c : contactCollection) {
-            if ((c.getId() == null) || (c.getId() == 0)) {
-                query = new InsertExampleQuery(c);
-            } else {
-                query = new UpdateExampleQuery(c);
-            }
-
-            Collection<Study> studyCollection = c.getStudyCollection();
-            if (studyCollection == null)
-                studyCollection = new HashSet<Study>();
-            studyCollection.add(study);
-            c.setStudyCollection(studyCollection);
-
-            result = appService.executeQuery(query);
-            savedContactCollection.add((Contact) result.getObjectResult());
-        }
-        study.setContactCollection(savedContactCollection);
-    }
-
-    private void removeDeletedContacts(Collection<Contact> contactCollection)
-        throws Exception {
-        // no need to remove if study is not yet in the database
-        if (study.getId() == null)
-            return;
-
-        List<Integer> selectedContactIds = new ArrayList<Integer>();
-        for (Contact c : contactCollection) {
-            selectedContactIds.add(c.getId());
-        }
-
-        SDKQuery query;
-
-        // query from database again
-        Study dbStudy = ModelUtils.getObjectWithId(appService, Study.class,
-            study.getId());
-
-        for (Contact c : dbStudy.getContactCollection()) {
-            if (!selectedContactIds.contains(c.getId())) {
-                query = new DeleteExampleQuery(c);
-                appService.executeQuery(query);
-            }
-        }
     }
 
     private void saveSampleStorage() throws Exception {

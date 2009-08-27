@@ -6,10 +6,12 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -79,6 +81,21 @@ public class SelectClinicContactDialog extends BiobankDialog {
 
         contactInfoTable = new ContactInfoTable(contents, null);
         contactInfoTable.setEnabled(false);
+        contactInfoTable.addSelectionListener(new SelectionListener() {
+
+            @Override
+            public void widgetDefaultSelected(SelectionEvent e) {
+
+            }
+
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                if (contactInfoTable.getSelection() != null)
+                    SelectClinicContactDialog.this.getButton(
+                        IDialogConstants.OK_ID).setEnabled(true);
+
+            }
+        });
         return contents;
     }
 
@@ -99,6 +116,12 @@ public class SelectClinicContactDialog extends BiobankDialog {
 
     public Contact getSelection() {
         return selectedContact;
+    }
+
+    @Override
+    protected void createButtonsForButtonBar(Composite parent) {
+        super.createButtonsForButtonBar(parent);
+        getButton(IDialogConstants.OK_ID).setEnabled(false);
     }
 
 }

@@ -23,14 +23,14 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
+import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.dialogs.SelectClinicContactDialog;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.model.Study;
+import edu.ualberta.med.biobank.model.StudyContactInfo;
 import edu.ualberta.med.biobank.widgets.infotables.BiobankCollectionModel;
 import edu.ualberta.med.biobank.widgets.infotables.StudyContactEntryInfoTable;
-import edu.ualberta.med.biobank.widgets.listener.BiobankEntryFormWidgetListener;
-import edu.ualberta.med.biobank.widgets.listener.MultiSelectEvent;
 
 /**
  * Allows the user to select a clinic and a contact from a clinic. Note that
@@ -63,19 +63,17 @@ public class ClinicAddWidget extends BiobankWidget {
         contactInfoTable = new StudyContactEntryInfoTable(parent, study);
         contactInfoTable.adaptToToolkit(toolkit, true);
         addTableMenu();
-        contactInfoTable
-            .addSelectionChangedListener(new BiobankEntryFormWidgetListener() {
-                @Override
-                public void selectionChanged(MultiSelectEvent event) {
-                    ClinicAddWidget.this.notifyListeners();
-                }
-            });
 
         addClinicButton = toolkit.createButton(parent, "Add Clinic", SWT.PUSH);
         addClinicButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                createClinicContact();
+                if (allClinics.size() == selectedContacts.size()) {
+                    BioBankPlugin.openInformation("All Clinics Selected",
+                        "No more clinics available.");
+                } else {
+                    createClinicContact();
+                }
             }
         });
     }
@@ -83,8 +81,9 @@ public class ClinicAddWidget extends BiobankWidget {
     private void createClinicContact() {
         SelectClinicContactDialog dlg = new SelectClinicContactDialog(
             PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
-            allClinics);
+            getNonDuplicateClinics());
         if (dlg.open() == Dialog.OK) {
+            notifyListeners();
             selectedContacts.add(dlg.getSelection());
             contactInfoTable.setCollection(selectedContacts);
         }
@@ -96,26 +95,6 @@ public class ClinicAddWidget extends BiobankWidget {
         contactInfoTable.getTableViewer().getTable().setMenu(menu);
 
         MenuItem item = new MenuItem(menu, SWT.PUSH);
-        item.setText("Edit");
-        item.addSelectionListener(new SelectionListener() {
-            public void widgetSelected(SelectionEvent event) {
-                IStructuredSelection stSelection = (IStructuredSelection) contactInfoTable
-                    .getTableViewer().getSelection();
-
-                BiobankCollectionModel item = (BiobankCollectionModel) stSelection
-                    .getFirstElement();
-                Contact contact = (Contact) item.o;
-
-                Set<Clinic> allowedClinics = getNonDuplicateClinics();
-                allowedClinics.add(contact.getClinic());
-                // addOrEditContact(false, contact, allowedClinics);
-            }
-
-            public void widgetDefaultSelected(SelectionEvent e) {
-            }
-        });
-
-        item = new MenuItem(menu, SWT.PUSH);
         item.setText("Delete");
         item.addSelectionListener(new SelectionListener() {
             public void widgetSelected(SelectionEvent event) {
@@ -124,7 +103,7 @@ public class ClinicAddWidget extends BiobankWidget {
 
                 BiobankCollectionModel item = (BiobankCollectionModel) stSelection
                     .getFirstElement();
-                Contact contact = (Contact) item.o;
+                Contact contact = ((StudyContactInfo) item.o).contact;
 
                 boolean confirm = MessageDialog.openConfirm(PlatformUI
                     .getWorkbench().getActiveWorkbenchWindow().getShell(),
@@ -145,6 +124,7 @@ public class ClinicAddWidget extends BiobankWidget {
                     }
 
                     contactInfoTable.setCollection(selectedContacts);
+                    notifyListeners();
                 }
             }
 

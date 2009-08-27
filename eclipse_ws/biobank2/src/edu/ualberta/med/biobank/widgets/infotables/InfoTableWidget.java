@@ -12,6 +12,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TableLayout;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -91,6 +92,10 @@ public class InfoTableWidget<T> extends BiobankWidget {
         tableViewer.addDoubleClickListener(listener);
     }
 
+    public void addSelectionListener(SelectionListener listener) {
+        tableViewer.getTable().addSelectionListener(listener);
+    }
+
     public TableViewer getTableViewer() {
         return tableViewer;
     }
@@ -154,7 +159,8 @@ public class InfoTableWidget<T> extends BiobankWidget {
 
         BiobankCollectionModel item = (BiobankCollectionModel) stSelection
             .getFirstElement();
-        Assert.isNotNull(item, "no selection");
+        if (item == null)
+            return null;
         return (T) item.o;
     }
 

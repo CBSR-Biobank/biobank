@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.widgets.infotables;
 
 import java.util.Collection;
+import java.util.HashSet;
 
 import org.eclipse.swt.widgets.Composite;
 import org.springframework.remoting.RemoteConnectFailureException;
@@ -62,5 +63,14 @@ public class StudyContactEntryInfoTable extends InfoTableWidget<Contact> {
             }
         };
         t.start();
+    }
+
+    @Override
+    public Collection<Contact> getCollection() {
+        Collection<Contact> collection = new HashSet<Contact>();
+        for (BiobankCollectionModel item : model) {
+            collection.add(((StudyContactInfo) item.o).contact);
+        }
+        return collection;
     }
 }

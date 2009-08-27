@@ -26,15 +26,15 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class ModelUtils {
 
-    private static final Logger logger = Logger.getLogger(ModelUtils.class
-        .getName());
+    private static final Logger logger =
+        Logger.getLogger(ModelUtils.class.getName());
 
     public static List<Container> getTopContainersForSite(
         WritableApplicationService appService, Site site)
         throws ApplicationException {
-        HQLCriteria criteria = new HQLCriteria("from "
-            + Container.class.getName()
-            + " where site.id=? and position is null");
+        HQLCriteria criteria =
+            new HQLCriteria("from " + Container.class.getName()
+                + " where site.id=? and position is null");
 
         criteria.setParameters(Arrays.asList(new Object[] { site.getId() }));
         return appService.query(criteria);
@@ -64,8 +64,8 @@ public class ModelUtils {
         try {
             Constructor<?> constructor = classType.getConstructor();
             Object instance = constructor.newInstance();
-            attr = "set" + attr.substring(0, 1).toUpperCase()
-                + attr.substring(1);
+            attr =
+                "set" + attr.substring(0, 1).toUpperCase() + attr.substring(1);
             Method setMethod = classType.getMethod(attr, attrType);
             setMethod.invoke(instance, value);
 
@@ -75,7 +75,8 @@ public class ModelUtils {
             }
             Assert.isTrue(list.size() == 1);
             return list.get(0);
-        } catch (Exception ex) {
+        }
+        catch (Exception ex) {
             logger.error("Error in getObjectWithAttr method", ex);
             return null;
         }
@@ -91,13 +92,14 @@ public class ModelUtils {
         try {
             Constructor<?> constructor = classType.getConstructor();
             Object instance = constructor.newInstance();
-            attr = "set" + attr.substring(0, 1).toUpperCase()
-                + attr.substring(1);
+            attr =
+                "set" + attr.substring(0, 1).toUpperCase() + attr.substring(1);
             Method setMethod = classType.getMethod(attr, attrType);
             setMethod.invoke(instance, value);
 
             return appService.search(classType, instance);
-        } catch (Exception ex) {
+        }
+        catch (Exception ex) {
             logger.error("Error in getObjectsWithAttr method", ex);
             return null;
         }
@@ -107,7 +109,8 @@ public class ModelUtils {
         SamplePosition position = sample.getSamplePosition();
         if (position == null) {
             return "none";
-        } else {
+        }
+        else {
             int dim1 = position.getPositionDimensionOne();
             int dim2 = position.getPositionDimensionTwo();
             String dim1String = String.valueOf((char) ('A' + dim1));
@@ -116,10 +119,12 @@ public class ModelUtils {
             ContainerType type = container.getContainerType();
             // FIXME use the labelling of the container !
             if (type.getName().equals("Bin")) {
-                String binPosition = LabelingScheme.rowColToTwoCharAlpha(
-                    new RowColPos(dim1, dim2), type.getCapacity());
+                String binPosition =
+                    LabelingScheme.rowColToTwoCharAlpha(new RowColPos(dim1,
+                        dim2), type.getCapacity());
                 return position.getContainer().getLabel() + binPosition;
-            } else if (type.getName().equals("Pallet")) {
+            }
+            else if (type.getName().equals("Pallet")) {
                 return position.getContainer().getLabel() + dim1String
                     + dim2String;
             }
@@ -130,11 +135,12 @@ public class ModelUtils {
     public static List<Clinic> getStudyClinicCollection(
         WritableApplicationService appService, Study study)
         throws ApplicationException {
-        HQLCriteria c = new HQLCriteria("select distinct clinics from "
-            + Contact.class.getName() + " as contacts"
-            + " inner join contacts.clinic as clinics"
-            + " where contacts.studyCollection.id = ?", Arrays
-            .asList(new Object[] { study.getId() }));
+        HQLCriteria c =
+            new HQLCriteria("select distinct clinics from "
+                + Contact.class.getName() + " as contacts"
+                + " inner join contacts.clinic as clinics"
+                + " where contacts.studyCollection.id = ?", Arrays
+                .asList(new Object[] { study.getId() }));
 
         return appService.query(c);
     }
@@ -142,11 +148,12 @@ public class ModelUtils {
     public static List<Study> getClinicStudyCollection(
         WritableApplicationService appService, Clinic clinic)
         throws ApplicationException {
-        HQLCriteria c = new HQLCriteria("select distinct studies from "
-            + Contact.class.getName() + " as contacts"
-            + " inner join contacts.studyCollection as studies"
-            + " where contacts.clinic = ?", Arrays
-            .asList(new Object[] { clinic }));
+        HQLCriteria c =
+            new HQLCriteria("select distinct studies from "
+                + Contact.class.getName() + " as contacts"
+                + " inner join contacts.studyCollection as studies"
+                + " where contacts.clinic = ?", Arrays
+                .asList(new Object[] { clinic }));
 
         return appService.query(c);
     }
@@ -175,7 +182,8 @@ public class ModelUtils {
         query += " where o." + property;
         if (strict) {
             query += " = '" + text + "'";
-        } else {
+        }
+        else {
             query += " like '%" + text + "%'";
         }
         return appService.query(new HQLCriteria(query));

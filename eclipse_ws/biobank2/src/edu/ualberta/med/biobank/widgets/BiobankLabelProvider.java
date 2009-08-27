@@ -180,63 +180,17 @@ public class BiobankLabelProvider extends LabelProvider implements
                 if (info.patientVisits != null)
                     return "" + info.patientVisits;
                 return "";
-
-            case 3:
-                if (info.contact != null)
-                    return "" + info.contact.getName();
-                return "";
-
-            case 4:
-                if (info.contact != null)
-                    return "" + info.contact.getTitle();
-                return "";
-
-            case 5:
-                if (info.contact != null)
-                    return "" + info.contact.getEmailAddress();
-                return "";
-
-            case 6:
-                if (info.contact != null)
-                    return "" + info.contact.getPhoneNumber();
-                return "";
-
-            case 7:
-                if (info.contact != null)
-                    return "" + info.contact.getFaxNumber();
-                return "";
+            default:
             }
+            return getContactColumnIndex(info.contact, columnIndex - 2);
         } else if (element instanceof StudyContactInfo) {
             StudyContactInfo info = (StudyContactInfo) element;
-            switch (columnIndex) {
-            case 0:
+            if (columnIndex == 0) {
                 if (info.clinicName != null)
                     return info.clinicName;
                 return "";
-            case 1:
-                if ((info.contact != null) && (info.contact.getName() != null))
-                    return "" + info.contact.getName();
-                return "";
-            case 2:
-                if ((info.contact != null) && (info.contact.getTitle() != null))
-                    return "" + info.contact.getTitle();
-                return "";
-            case 3:
-                if ((info.contact != null)
-                    && (info.contact.getEmailAddress() != null))
-                    return "" + info.contact.getEmailAddress();
-                return "";
-            case 4:
-                if ((info.contact != null)
-                    && (info.contact.getPhoneNumber() != null))
-                    return "" + info.contact.getPhoneNumber();
-                return "";
-            case 5:
-                if ((info.contact != null)
-                    && (info.contact.getFaxNumber() != null))
-                    return "" + info.contact.getFaxNumber();
-                return "";
             }
+            return getContactColumnIndex(info.contact, columnIndex);
         } else if (element instanceof SampleSource) {
             SampleSource info = (SampleSource) element;
             if (columnIndex == 0) {
@@ -288,4 +242,31 @@ public class BiobankLabelProvider extends LabelProvider implements
     public boolean isLabelProperty(Object element, String property) {
         return false;
     }
+
+    private String getContactColumnIndex(Contact contact, int columnIndex) {
+        switch (columnIndex) {
+        case 1:
+            if ((contact != null) && (contact.getName() != null))
+                return "" + contact.getName();
+            break;
+        case 2:
+            if ((contact != null) && (contact.getTitle() != null))
+                return "" + contact.getTitle();
+            break;
+        case 3:
+            if ((contact != null) && (contact.getEmailAddress() != null))
+                return "" + contact.getEmailAddress();
+            break;
+        case 4:
+            if ((contact != null) && (contact.getPhoneNumber() != null))
+                return "" + contact.getPhoneNumber();
+            break;
+        case 5:
+            if ((contact != null) && (contact.getFaxNumber() != null))
+                return "" + contact.getFaxNumber();
+            break;
+        }
+        return "";
+    }
+
 }
