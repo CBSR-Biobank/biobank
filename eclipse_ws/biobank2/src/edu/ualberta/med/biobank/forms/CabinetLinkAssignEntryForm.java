@@ -95,7 +95,7 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
     }
 
     @Override
-    protected void createFormContent() {
+    protected void createFormContent() throws Exception {
         form.setText("Link and Process Cabinet Samples");
         GridLayout layout = new GridLayout(2, false);
         form.getBody().setLayout(layout);
@@ -144,7 +144,7 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
 
     }
 
-    private void createFieldsSection() {
+    private void createFieldsSection() throws Exception {
         Composite fieldsComposite = toolkit.createComposite(form.getBody());
         GridLayout layout = new GridLayout(2, false);
         layout.horizontalSpacing = 10;
@@ -220,7 +220,7 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
         });
     }
 
-    private void createVisitCombo(Composite client) {
+    private void createVisitCombo(Composite client) throws Exception {
         comboVisits = (CCombo) createBoundWidgetWithLabel(client, CCombo.class,
             SWT.READ_ONLY | SWT.BORDER | SWT.FLAT, "Visits", new String[0],
             visitSelectionValue, NonEmptyString.class,

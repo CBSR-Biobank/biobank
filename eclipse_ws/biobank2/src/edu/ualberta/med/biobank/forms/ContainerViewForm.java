@@ -13,14 +13,10 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.MouseTrackAdapter;
 import org.eclipse.swt.events.MouseTrackListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.ui.PartInitException;
 
 import edu.ualberta.med.biobank.common.utils.ModelUtils;
 import edu.ualberta.med.biobank.forms.input.FormInput;
@@ -149,21 +145,8 @@ public class ContainerViewForm extends BiobankViewForm {
 
         setContainerValues();
         ContainerType containerType = container.getContainerType();
-        final Button edit = toolkit.createButton(client,
-            "Edit this information", SWT.PUSH);
-        edit.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                getSite().getPage().closeEditor(ContainerViewForm.this, false);
-                try {
-                    getSite().getPage().openEditor(
-                        new FormInput(containerAdapter), ContainerEntryForm.ID,
-                        true);
-                } catch (PartInitException exp) {
-                    exp.printStackTrace();
-                }
-            }
-        });
+        initEditButton(client, containerAdapter);
+
         if (containerType.getChildContainerTypeCollection().size() > 0) {
             visualizeContainer();
         }
@@ -485,6 +468,11 @@ public class ContainerViewForm extends BiobankViewForm {
             .size() > 0)
             refreshVis();
         setContainerValues();
+    }
+
+    @Override
+    protected String getEntryFormId() {
+        return ContainerEntryForm.ID;
     }
 
 }

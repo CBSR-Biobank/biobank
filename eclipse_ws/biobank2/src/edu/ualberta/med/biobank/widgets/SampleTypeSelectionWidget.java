@@ -133,6 +133,9 @@ public class SampleTypeSelectionWidget {
         textNumber.setText(text);
     }
 
+    /**
+     * return true if this selection need to be save, i.e. number > 0
+     */
     public boolean needToSave() {
         if (number == null) {
             return false;

@@ -6,19 +6,14 @@ import org.apache.commons.collections.MapIterator;
 import org.apache.commons.collections.map.ListOrderedMap;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
-import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.PvInfo;
 import edu.ualberta.med.biobank.model.PvInfoData;
 import edu.ualberta.med.biobank.model.PvSampleSource;
@@ -86,22 +81,7 @@ public class PatientVisitViewForm extends BiobankViewForm {
         createDatasSection();
         createSamplesSection();
 
-        final Button edit = toolkit.createButton(form.getBody(),
-            "Edit this information", SWT.PUSH);
-        edit.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                getSite().getPage().closeEditor(PatientVisitViewForm.this,
-                    false);
-                try {
-                    getSite().getPage().openEditor(
-                        new FormInput(patientVisitAdapter),
-                        PatientVisitEntryForm.ID, true);
-                } catch (PartInitException exp) {
-                    exp.printStackTrace();
-                }
-            }
-        });
+        initEditButton(form.getBody(), patientVisitAdapter);
     }
 
     private void createMainSection() {
@@ -222,5 +202,10 @@ public class PatientVisitViewForm extends BiobankViewForm {
                 "Error while retrieving patient visit "
                     + patientVisitWrapper.getDateDrawn(), ex);
         }
+    }
+
+    @Override
+    protected String getEntryFormId() {
+        return PatientVisitEntryForm.ID;
     }
 }

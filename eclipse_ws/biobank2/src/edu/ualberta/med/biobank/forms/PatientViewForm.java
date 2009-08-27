@@ -49,6 +49,7 @@ public class PatientViewForm extends BiobankViewForm {
 
         addRefreshToolbarAction();
         createPatientVisitSection();
+        initEditButton(form.getBody(), patientAdapter);
     }
 
     private void createPatientVisitSection() {
@@ -68,5 +69,10 @@ public class PatientViewForm extends BiobankViewForm {
         setPartName("Patient " + patientWrapper.getNumber());
         form.setText("Patient: " + patientWrapper.getNumber());
         visitsTable.setCollection(patientWrapper.getPatientVisitCollection());
+    }
+
+    @Override
+    protected String getEntryFormId() {
+        return PatientEntryForm.ID;
     }
 }

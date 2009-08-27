@@ -25,7 +25,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
-import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
@@ -126,7 +125,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
     }
 
     @Override
-    protected void createFormContent() {
+    protected void createFormContent() throws Exception {
         form.setText("Patient Visit Information");
         form.setMessage(getOkMessage(), IMessageProvider.NONE);
         form.getBody().setLayout(new GridLayout(1, false));
@@ -140,66 +139,54 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         }
     }
 
-    private PatientWrapper retrievePatient() {
+    private PatientWrapper retrievePatient() throws Exception {
         PatientWrapper patientWrapper = patientVisitAdapter.getParentFromClass(
             PatientAdapter.class).getWrapper();
-        try {
-            patientWrapper.reload();
-        } catch (Exception e) {
-            // FIXME
-        }
+        patientWrapper.reload();
         return patientWrapper;
     }
 
-    private void createMainSection(Study study) {
-        try {
-            Composite client = toolkit.createComposite(form.getBody());
-            GridLayout layout = new GridLayout(2, false);
-            layout.horizontalSpacing = 10;
-            client.setLayout(layout);
-            client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-            toolkit.paintBordersFor(client);
+    private void createMainSection(Study study) throws Exception {
+        Composite client = toolkit.createComposite(form.getBody());
+        GridLayout layout = new GridLayout(2, false);
+        layout.horizontalSpacing = 10;
+        client.setLayout(layout);
+        client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        toolkit.paintBordersFor(client);
 
-            if (patientVisitWrapper.getId() == null) {
-                // choose clinic for new visit
-                Collection<Clinic> clinics = ModelUtils
-                    .getStudyClinicCollection(appService, study);
-                clinicsComboViewer = createCComboViewerWithNoSelectionValidator(
-                    client, "Clinic", clinics, "A clinic should be selected");
-                if (clinics.size() == 1) {
-                    clinicsComboViewer.getCCombo().select(0);
-                }
-                if (patientVisitWrapper.getClinic() != null) {
-                    for (Clinic clinic : clinics) {
-                        if (clinic.getId().equals(
-                            patientVisitWrapper.getClinic().getId())) {
-                            clinicsComboViewer
-                                .setSelection(new StructuredSelection(clinic));
-                            break;
-                        }
+        if (patientVisitWrapper.getId() == null) {
+            // choose clinic for new visit
+            Collection<Clinic> clinics = ModelUtils.getStudyClinicCollection(
+                appService, study);
+            clinicsComboViewer = createCComboViewerWithNoSelectionValidator(
+                client, "Clinic", clinics, "A clinic should be selected");
+            if (clinics.size() == 1) {
+                clinicsComboViewer.getCCombo().select(0);
+            }
+            if (patientVisitWrapper.getClinic() != null) {
+                for (Clinic clinic : clinics) {
+                    if (clinic.getId().equals(
+                        patientVisitWrapper.getClinic().getId())) {
+                        clinicsComboViewer
+                            .setSelection(new StructuredSelection(clinic));
+                        break;
                     }
                 }
-            } else {
-                Label clinicLabel = (Label) createWidget(client, Label.class,
-                    SWT.NONE, "Clinic");
-                if (patientVisitWrapper.getClinic() != null) {
-                    clinicLabel.setText(patientVisitWrapper.getClinic()
-                        .getName());
-                }
             }
-
-            toolkit.createLabel(client, "Date Drawn:", SWT.NONE);
-            dateDrawn = new DateTimeWidget(client, SWT.BORDER,
-                patientVisitWrapper.getDateDrawn());
-            dateDrawn.addSelectionListener(selectionListener);
-            dateDrawn.addModifyListener(modifyListener);
-            dateDrawn.adaptToToolkit(toolkit, true);
-        } catch (final RemoteConnectFailureException exp) {
-            BioBankPlugin.openRemoteConnectErrorMessage();
-        } catch (Exception e) {
-            SessionManager.getLogger().error(
-                "Error while retrieving the clinic", e);
+        } else {
+            Label clinicLabel = (Label) createWidget(client, Label.class,
+                SWT.NONE, "Clinic");
+            if (patientVisitWrapper.getClinic() != null) {
+                clinicLabel.setText(patientVisitWrapper.getClinic().getName());
+            }
         }
+
+        toolkit.createLabel(client, "Date Drawn:", SWT.NONE);
+        dateDrawn = new DateTimeWidget(client, SWT.BORDER, patientVisitWrapper
+            .getDateDrawn());
+        dateDrawn.addSelectionListener(selectionListener);
+        dateDrawn.addModifyListener(modifyListener);
+        dateDrawn.adaptToToolkit(toolkit, true);
     }
 
     private void createSourcesSection() {
@@ -431,7 +418,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
     }
 
     private void removeDeletedPvSampleSources(
-        Collection<PvSampleSource> ssCollection) {
+        Collection<PvSampleSource> ssCollection) throws Exception {
         // no need to remove if patientVisit is not yet in the database
         if (patientVisitWrapper.getId() == null)
             return;
@@ -442,18 +429,12 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         }
 
         SDKQuery query;
-        try {
-            for (PvSampleSource ss : patientVisitWrapper
-                .getPvSampleSourceCollection()) {
-                if (!selectedPvSampleSourceIds.contains(ss.getId())) {
-                    query = new DeleteExampleQuery(ss);
-                    appService.executeQuery(query);
-                }
+        for (PvSampleSource ss : patientVisitWrapper
+            .getPvSampleSourceCollection()) {
+            if (!selectedPvSampleSourceIds.contains(ss.getId())) {
+                query = new DeleteExampleQuery(ss);
+                appService.executeQuery(query);
             }
-        } catch (final RemoteConnectFailureException exp) {
-            BioBankPlugin.openRemoteConnectErrorMessage();
-        } catch (Exception e) {
-            e.printStackTrace();
         }
     }
 

@@ -13,6 +13,7 @@ import org.eclipse.core.databinding.validation.ValidationStatus;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.IMessageProvider;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -41,6 +42,7 @@ import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.LabelingScheme;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.forms.listener.EnterKeyToNextFieldListener;
 import edu.ualberta.med.biobank.model.PalletCell;
@@ -49,6 +51,7 @@ import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.Sample;
 import edu.ualberta.med.biobank.model.SampleCellStatus;
 import edu.ualberta.med.biobank.model.SampleType;
+import edu.ualberta.med.biobank.preferences.PreferenceConstants;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
 import edu.ualberta.med.biobank.validators.ScannerBarcodeValidator;
 import edu.ualberta.med.biobank.widgets.AddSamplesScanPalletWidget;
@@ -57,11 +60,14 @@ import edu.ualberta.med.biobank.widgets.SampleTypeSelectionWidget;
 import edu.ualberta.med.biobank.widgets.listener.ScanPalletModificationEvent;
 import edu.ualberta.med.biobank.widgets.listener.ScanPalletModificationListener;
 import edu.ualberta.med.scanlib.ScanCell;
-import edu.ualberta.med.scanlib.ScanLib;
+import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.query.SDKQuery;
 import gov.nih.nci.system.query.example.InsertExampleQuery;
 
+/**
+ * Link samples to a patient visit
+ */
 public class ScanLinkEntryForm extends AbstractPatientAdminForm {
 
     public static final String ID = "edu.ualberta.med.biobank.forms.ScanLinkEntryForm";
@@ -74,16 +80,17 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
 
     private List<SampleTypeSelectionWidget> sampleTypeWidgets;
 
-    private static String PALLET_ROWS = "ABCDEFGH";
-
     private IObservableValue patientNumberValue = new WritableValue("",
         String.class);
     private IObservableValue plateToScanValue = new WritableValue("",
         String.class);
     private IObservableValue scannedValue = new WritableValue(Boolean.FALSE,
         Boolean.class);
+    private IObservableValue scanOkValue = new WritableValue(Boolean.TRUE,
+        Boolean.class);
     private IObservableValue typesFilledValue = new WritableValue(Boolean.TRUE,
         Boolean.class);
+    private boolean scanOk;
 
     private Text patientNumberText;
     private Text plateToScanText;
@@ -133,13 +140,29 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
         form.getBody().setLayout(layout);
 
         createFieldsComposite();
+
+        UpdateValueStrategy uvs = new UpdateValueStrategy();
+        uvs.setAfterConvertValidator(new IValidator() {
+            @Override
+            public IStatus validate(Object value) {
+                if (value instanceof Boolean && !(Boolean) value) {
+                    return ValidationStatus.error("Errors in scan !");
+                } else {
+                    return Status.OK_STATUS;
+                }
+            }
+        });
+        dbc.bindValue(new WritableValue(Boolean.FALSE, Boolean.class),
+            scanOkValue, uvs, uvs);
+        scanOkValue.setValue(false);
+
         createPalletSection();
 
         cancelConfirmWidget = new CancelConfirmWidget(form.getBody(), this,
             true);
         cancelConfirmWidget.showCloseButton(true);
 
-        UpdateValueStrategy uvs = new UpdateValueStrategy();
+        uvs = new UpdateValueStrategy();
         uvs.setAfterConvertValidator(new IValidator() {
             @Override
             public IStatus validate(Object value) {
@@ -170,6 +193,9 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
             typesFilledValue, uvs, uvs);
     }
 
+    /**
+     * Pallet visualization
+     */
     private void createPalletSection() {
         Composite client = toolkit.createComposite(form.getBody());
         GridLayout layout = new GridLayout(1, false);
@@ -192,6 +218,9 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
         });
     }
 
+    /**
+     * Sample types selection.
+     */
     private void createTypesSelectionSection(Composite parent) throws Exception {
         // Radio buttons
         radioComponents = toolkit.createComposite(parent);
@@ -203,11 +232,16 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
         radioComponents.setLayoutData(gd);
         radioComponents.setEnabled(false);
 
+        // radio button to choose how the sample types are selected
         final Button radioRowSelection = toolkit.createButton(radioComponents,
             "Row choice", SWT.RADIO);
         final Button radioCustomSelection = toolkit.createButton(
             radioComponents, "Custom Selection choice", SWT.RADIO);
-        radioComponents.setVisible(false); // not used for the moment
+        IPreferenceStore store = BioBankPlugin.getDefault()
+            .getPreferenceStore();
+        boolean hideRadio = store
+            .getBoolean(PreferenceConstants.SCAN_LINK_ROW_SELECT_ONLY);
+        radioComponents.setVisible(!hideRadio);
 
         // stackLayout
         final Composite selectionComp = toolkit.createComposite(parent);
@@ -217,7 +251,8 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
         gd.horizontalSpan = 2;
         selectionComp.setLayoutData(gd);
 
-        List<SampleType> sampleTypes = getAllSampleTypes();
+        List<SampleType> sampleTypes = appService.search(SampleType.class,
+            new SampleType());
         createTypeSelectionPerRowComposite(selectionComp, sampleTypes);
         createTypeSelectionCustom(selectionComp, sampleTypes);
         radioRowSelection.setSelection(true);
@@ -258,6 +293,9 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
         });
     }
 
+    /**
+     * Give a sample type to selected samples
+     */
     private void createTypeSelectionCustom(Composite parent,
         List<SampleType> sampleTypes) {
         typesSelectionCustomComposite = toolkit.createComposite(parent);
@@ -295,6 +333,9 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
         });
     }
 
+    /**
+     * give sample type row per row (default)
+     */
     private void createTypeSelectionPerRowComposite(Composite parent,
         List<SampleType> sampleTypes) {
         typesSelectionPerRowComposite = toolkit.createComposite(parent);
@@ -306,7 +347,8 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
         sampleTypeWidgets = new ArrayList<SampleTypeSelectionWidget>();
         for (int i = 0; i < ScanCell.ROW_MAX; i++) {
             final SampleTypeSelectionWidget typeWidget = new SampleTypeSelectionWidget(
-                typesSelectionPerRowComposite, PALLET_ROWS.charAt(i),
+                typesSelectionPerRowComposite,
+                LabelingScheme.SBS_ROW_LABELLING_PATTERN.charAt(i),
                 sampleTypes, toolkit);
             final int indexRow = i;
             typeWidget
@@ -396,7 +438,8 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
 
     private void createVisitCombo(Composite compositeFields) {
         viewerVisits = createCComboViewerWithNoSelectionValidator(
-            compositeFields, "Visits", null, "A visit should be selected");
+            compositeFields, "Visit date drawn", null,
+            "A visit should be selected");
         GridData gridData = new GridData();
         gridData.grabExcessHorizontalSpace = true;
         gridData.horizontalAlignment = SWT.FILL;
@@ -418,6 +461,21 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
                 }
             }
         });
+        viewerVisits
+            .addSelectionChangedListener(new ISelectionChangedListener() {
+                @Override
+                public void selectionChanged(SelectionChangedEvent event) {
+                    PatientVisit pv = getSelectedPatientVisit();
+                    if (pv != null) {
+
+                    }
+                }
+            });
+
+        // TODO need the field date processed in patient visit
+        // dateProcessedLabel = (Label) createWidget(compositeFields,
+        // Label.class,
+        // SWT.NONE, "Date processed");
     }
 
     protected void setVisitsList() {
@@ -445,61 +503,76 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
         BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
             public void run() {
                 try {
+                    scanOk = true;
                     PalletCell[][] cells;
                     if (BioBankPlugin.isRealScanEnabled()) {
                         int plateNum = BioBankPlugin.getDefault()
                             .getPlateNumber(
                                 plateToScanValue.getValue().toString());
-                        int r = ScanLib.getInstance().slDecodePlate(
-                            ScanLib.DPI_300, plateNum);
-                        if (r < 0) {
-                            BioBankPlugin.openError("Scanner",
-                                "Could not decode image. Return code is: " + r);
-                            return;
-                        }
-                        cells = PalletCell.getScanLibResults();
+                        cells = PalletCell.convertArray(ScannerConfigPlugin
+                            .scan(plateNum));
                     } else {
                         cells = PalletCell.getRandomScanLink();
                     }
 
-                    enabledOthersComponents();
+                    scannedValue.setValue(true);
+                    radioComponents.setEnabled(true);
 
                     for (int i = 0; i < cells.length; i++) { // rows
                         int samplesNumber = 0;
                         sampleTypeWidgets.get(i).resetValues(true);
                         for (int j = 0; j < cells[i].length; j++) { // columns
-                            if (cells[i][j] != null) {
-                                if (cells[i][j].getValue() != null) {
-                                    samplesNumber++;
-                                    cells[i][j].setStatus(SampleCellStatus.NEW);
-                                } else {
-                                    cells[i][j]
-                                        .setStatus(SampleCellStatus.EMPTY);
-                                }
+                            boolean addSampleNumber = setCellStatus(cells[i][j]);
+                            if (addSampleNumber) {
+                                samplesNumber++;
                             }
                         }
                         sampleTypeWidgets.get(i).setNumber(samplesNumber);
                     }
+                    scanOkValue.setValue(scanOk);
+                    radioComponents.setEnabled(scanOk);
+                    typesSelectionPerRowComposite.setEnabled(scanOk);
 
                     // Show result in grid
                     spw.setScannedElements(cells);
                 } catch (RemoteConnectFailureException exp) {
                     BioBankPlugin.openRemoteConnectErrorMessage();
                 } catch (Exception e) {
-                    SessionManager.getLogger().error("Error while scanning", e);
+                    BioBankPlugin.openError("Error while scanning", e);
                 }
             }
         });
     }
 
-    protected void enabledOthersComponents() {
-        scannedValue.setValue(true);
-        radioComponents.setEnabled(true);
-
+    private boolean setCellStatus(PalletCell cell) throws ApplicationException {
+        if (cell != null) {
+            String value = cell.getValue();
+            if (value != null) {
+                boolean exists = checkSampleExists(value);
+                if (exists) {
+                    cell.setStatus(SampleCellStatus.ERROR);
+                    cell.setInformation("Aliquot already in database");
+                    scanOk = false;
+                } else {
+                    cell.setStatus(SampleCellStatus.NEW);
+                }
+                return true;
+            } else {
+                cell.setStatus(SampleCellStatus.EMPTY);
+            }
+        }
+        return false;
     }
 
-    private List<SampleType> getAllSampleTypes() throws Exception {
-        return appService.search(SampleType.class, new SampleType());
+    protected boolean checkSampleExists(String inventoryId)
+        throws ApplicationException {
+        Sample sample = new Sample();
+        sample.setInventoryId(inventoryId);
+        List<Sample> samples = appService.search(Sample.class, sample);
+        if (samples.size() == 0) {
+            return false;
+        }
+        return true;
     }
 
     @Override
@@ -526,6 +599,9 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
         setSaved(true);
     }
 
+    /**
+     * get selected patient visit
+     */
     private PatientVisit getSelectedPatientVisit() {
         if (viewerVisits.getSelection() != null
             && viewerVisits.getSelection() instanceof IStructuredSelection) {
@@ -537,6 +613,9 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
         return null;
     }
 
+    /**
+     * set the sample type to the samples of the given row
+     */
     private void setTypeForRow(SampleTypeSelectionWidget typeWidget,
         int indexRow) {
         if (typeWidget.needToSave()) {

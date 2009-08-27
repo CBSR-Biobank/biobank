@@ -1,4 +1,3 @@
-
 package edu.ualberta.med.biobank.preferences;
 
 /**
@@ -19,5 +18,7 @@ public class PreferenceConstants {
     public static final int SCANNER_PLATE_NUMBER = 3;
 
     public static final String SCANNER_DPI = "scanner.dpi";
+
+    public static final String SCAN_LINK_ROW_SELECT_ONLY = "scan.link.row.select.only";
 
 }

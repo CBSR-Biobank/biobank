@@ -836,8 +836,19 @@
       <page
           category="Scanner"
             class="edu.ualberta.med.biobank.preferences.ScannerPreferencePage"
-            id="edu.ualberta.med.biobank.preferences.gereral"
+            id="edu.ualberta.med.biobank.preferences.plateBarcodes"
             name="Plate Barcodes">
+      </page>
+      <page
+            class="edu.ualberta.med.biobank.preferences.LinkAssignPreferencePage"
+            id="edu.ualberta.med.biobank.preferences.linkAssign"
+            name="Link / Assign">
+      </page>
+      <page
+            category="edu.ualberta.med.biobank.preferences.linkAssign"
+            class="edu.ualberta.med.biobank.preferences.ScanLinkPreferencePage"
+            id="edu.ualberta.med.biobank.preferences.scanLink"
+            name="ScanLink">
       </page>
    </extension>
    <extension

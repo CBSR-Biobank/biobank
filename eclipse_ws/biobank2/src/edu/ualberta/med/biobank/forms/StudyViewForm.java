@@ -4,19 +4,14 @@ import java.util.Collection;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.utils.ModelUtils;
-import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.PvInfo;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
@@ -87,20 +82,7 @@ public class StudyViewForm extends BiobankViewForm {
         createSampleSourceSection();
         createPvDataSection();
 
-        final Button edit = toolkit.createButton(client,
-            "Edit this information", SWT.PUSH);
-        edit.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                getSite().getPage().closeEditor(StudyViewForm.this, false);
-                try {
-                    getSite().getPage().openEditor(new FormInput(studyAdapter),
-                        StudyEntryForm.ID, true);
-                } catch (PartInitException exp) {
-                    exp.printStackTrace();
-                }
-            }
-        });
+        initEditButton(client, studyAdapter);
     }
 
     private void createClinicSection() throws Exception {
@@ -199,5 +181,10 @@ public class StudyViewForm extends BiobankViewForm {
                 "Error while retrieving study "
                     + studyAdapter.getStudy().getName(), e);
         }
+    }
+
+    @Override
+    protected String getEntryFormId() {
+        return StudyEntryForm.ID;
     }
 }

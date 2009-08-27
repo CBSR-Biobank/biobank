@@ -4,16 +4,11 @@ import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.ui.PartInitException;
 
-import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.SampleType;
@@ -241,22 +236,7 @@ public class ContainerTypeViewForm extends BiobankViewForm {
         client.setLayout(new GridLayout(4, false));
         toolkit.paintBordersFor(client);
 
-        final Button edit = toolkit.createButton(client,
-            "Edit this information", SWT.PUSH);
-        edit.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                getSite().getPage().closeEditor(ContainerTypeViewForm.this,
-                    false);
-                try {
-                    getSite().getPage().openEditor(
-                        new FormInput(containerTypeAdapter),
-                        ContainerTypeEntryForm.ID, true);
-                } catch (PartInitException exp) {
-                    exp.printStackTrace();
-                }
-            }
-        });
+        initEditButton(client, containerTypeAdapter);
     }
 
     @Override
@@ -268,5 +248,10 @@ public class ContainerTypeViewForm extends BiobankViewForm {
         setDimensionsValues();
         // setSampleDerivTypesValues();
         setChildContainerTypesValues();
+    }
+
+    @Override
+    protected String getEntryFormId() {
+        return ContainerTypeEntryForm.ID;
     }
 }

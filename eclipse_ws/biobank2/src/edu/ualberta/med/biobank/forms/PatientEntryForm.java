@@ -8,6 +8,7 @@ import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.LabelProvider;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -59,7 +60,7 @@ public class PatientEntryForm extends BiobankEntryForm {
     }
 
     @Override
-    protected void createFormContent() {
+    protected void createFormContent() throws Exception {
         form.setText("Patient Information");
         form.setMessage(getOkMessage(), IMessageProvider.NONE);
         form.getBody().setLayout(new GridLayout(1, false));
@@ -96,8 +97,22 @@ public class PatientEntryForm extends BiobankEntryForm {
         });
         Collection<Study> studies = site.getStudyCollection();
         studiesViewer.setInput(studies);
-        if (patientAdapter.getWrapper().isNew() && studies.size() == 1) {
-            studiesViewer.getCCombo().select(0);
+        if (patientAdapter.getWrapper().isNew()) {
+            if (studies.size() == 1) {
+                studiesViewer.getCCombo().select(0);
+            }
+        } else {
+            Study currentStudy = patientAdapter.getWrapper().getStudy();
+            if (currentStudy != null) {
+                for (Study study : studies) {
+                    if (currentStudy.getId().equals(study.getId())) {
+                        currentStudy = study;
+                        break;
+                    }
+                }
+                studiesViewer
+                    .setSelection(new StructuredSelection(currentStudy));
+            }
         }
 
         createBoundWidgetWithLabel(client, Text.class, SWT.NONE,

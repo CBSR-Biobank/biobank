@@ -69,7 +69,7 @@ public class StudyClinicInfoTable extends InfoTableWidget<Clinic> {
                                 + " inner join study.patientCollection as patients"
                                 + " inner join patients.patientVisitCollection as visits"
                                 + " inner join visits.clinic as clinic"
-                                + " where study? and clinic=?"
+                                + " where study=? and clinic=?"
                                 + " group by patients", Arrays
                                 .asList(new Object[] { study, clinic }));
 
