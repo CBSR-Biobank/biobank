@@ -106,20 +106,23 @@ public class SessionAdapter extends AdapterBase {
             // read from database again
             Site siteSearch = new Site();
             List<Site> result = appService.search(Site.class, siteSearch);
+            Site currentSite = SessionManager.getInstance().getCurrentSite();
             for (Site site : result) {
-                SessionManager.getLogger()
-                    .trace(
+                if (currentSite == null
+                    || site.getName().equals(currentSite.getName())) {
+                    SessionManager.getLogger().trace(
                         "updateSites: Site " + site.getId() + ": "
                             + site.getName());
 
-                SiteAdapter node = (SiteAdapter) getChild(site.getId());
-                if (node == null) {
-                    node = new SiteAdapter(this, site);
-                    addChild(node);
-                }
-                if (updateNode) {
-                    SessionManager.getInstance().getTreeViewer().update(node,
-                        null);
+                    SiteAdapter node = (SiteAdapter) getChild(site.getId());
+                    if (node == null) {
+                        node = new SiteAdapter(this, site);
+                        addChild(node);
+                    }
+                    if (updateNode) {
+                        SessionManager.getInstance().getTreeViewer().update(
+                            node, null);
+                    }
                 }
             }
         } catch (final RemoteAccessException exp) {
@@ -133,6 +136,11 @@ public class SessionAdapter extends AdapterBase {
     @Override
     public AdapterBase accept(NodeSearchVisitor visitor) {
         return visitor.visit(this);
+    }
+
+    public void rebuild() {
+        removeAll();
+        loadChildren(false);
     }
 
     @Override

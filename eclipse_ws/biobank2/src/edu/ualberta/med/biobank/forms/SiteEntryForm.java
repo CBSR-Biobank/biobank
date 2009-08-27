@@ -154,7 +154,7 @@ public class SiteEntryForm extends AddressEntryFormCommon {
         result = appService.executeQuery(query);
         site = (Site) result.getObjectResult();
         siteAdapter.setSite(site);
-
+        SessionManager.getInstance().getCombo().addChild(site);
         siteAdapter.getParent().performExpand();
     }
 

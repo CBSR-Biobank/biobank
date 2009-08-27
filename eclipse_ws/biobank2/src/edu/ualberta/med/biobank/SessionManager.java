@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Semaphore;
 
@@ -27,7 +26,6 @@ import edu.ualberta.med.biobank.treeview.RootNode;
 import edu.ualberta.med.biobank.treeview.SessionAdapter;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.views.SessionsView;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class SessionManager {
@@ -123,6 +121,8 @@ public class SessionManager {
             SiteAdapter siteNode = new SiteAdapter(sessionAdapter, site);
             sessionAdapter.addChild(siteNode);
         }
+        siteCombo.loadChildren(sites);
+        siteCombo.setSession(sessionAdapter);
         view.getTreeViewer().expandToLevel(2);
         log4j.debug("addSession: " + name);
         startInactivityTimer();
@@ -190,23 +190,14 @@ public class SessionManager {
             .getSourceProvider(DebugState.SESSION_STATE);
         debugStateSourceProvider.setState(BioBankPlugin.getDefault()
             .isDebugging());
-
-        List<Site> sites = new ArrayList<Site>();
-        if (sessionAdapter != null) {
-            try {
-                sites = sessionAdapter.getAppService().search(Site.class,
-                    new Site());
-            } catch (ApplicationException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-        }
-        siteCombo.loadChildren(sites);
-
     }
 
     public void setCombo(SiteCombo combo) {
         this.siteCombo = combo;
+    }
+
+    public SiteCombo getCombo() {
+        return this.siteCombo;
     }
 
     public SessionAdapter getSession() {
@@ -237,7 +228,10 @@ public class SessionManager {
             .getService(ISourceProviderService.class);
         SiteSelectionState siteSelectionStateSourceProvider = (SiteSelectionState) service
             .getSourceProvider(SiteSelectionState.SITE_SELECTION_STATE);
-        siteSelectionStateSourceProvider.setSiteSelectionState(true);
+        if (site == null)
+            siteSelectionStateSourceProvider.setSiteSelectionState(false);
+        else
+            siteSelectionStateSourceProvider.setSiteSelectionState(true);
     }
 
     public Site getCurrentSite() {

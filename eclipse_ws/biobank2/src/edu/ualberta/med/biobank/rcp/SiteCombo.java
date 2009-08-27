@@ -17,14 +17,21 @@ import org.springframework.remoting.RemoteAccessException;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.treeview.SessionAdapter;
 
 public class SiteCombo extends ControlContribution {
 
     private List<Site> sites;
+    private SessionAdapter session;
     public Combo combo;
 
     public SiteCombo(String str) {
         super(str);
+
+    }
+
+    public void setSession(SessionAdapter session) {
+        this.session = session;
     }
 
     @Override
@@ -43,9 +50,14 @@ public class SiteCombo extends ControlContribution {
         combo.addModifyListener(new ModifyListener() {
             @Override
             public void modifyText(ModifyEvent e) {
-                if (combo.getSelectionIndex() < sites.size()) {
-                    SessionManager.getInstance().setCurrentSite(
-                        sites.get(combo.getSelectionIndex()));
+                if (combo.getSelectionIndex() <= sites.size()) {
+                    if (combo.getSelectionIndex() == 0)
+                        SessionManager.getInstance().setCurrentSite(null);
+                    else if (combo.getSelectionIndex() > 0)
+                        SessionManager.getInstance().setCurrentSite(
+                            sites.get(combo.getSelectionIndex() - 1));
+                    if (session != null)
+                        session.rebuild();
                 }
             }
         });
@@ -73,6 +85,8 @@ public class SiteCombo extends ControlContribution {
             SessionManager.getLogger().error(
                 "Error while loading sites for SiteCombo");
         }
+        combo.removeAll();
+        combo.add("All Sites");
         for (Site site : sites) {
             combo.add(site.getName());
         }
@@ -82,6 +96,11 @@ public class SiteCombo extends ControlContribution {
 
     public void setValue(int index) {
         combo.select(index);
+    }
+
+    public void addChild(Site site) {
+        sites.add(site);
+        loadChildren(sites);
     }
 
 }
