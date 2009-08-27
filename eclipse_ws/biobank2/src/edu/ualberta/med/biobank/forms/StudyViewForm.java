@@ -103,7 +103,7 @@ public class StudyViewForm extends BiobankViewForm {
         });
     }
 
-    private void createClinicSection() throws Exception {
+    private void createClinicSection() {
         Composite client = createSectionWithClient("Clinics");
 
         clinicsTable = new StudyContactInfoTable(client, appService, study);

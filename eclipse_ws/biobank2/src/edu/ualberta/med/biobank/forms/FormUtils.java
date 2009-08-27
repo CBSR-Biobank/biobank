@@ -22,6 +22,7 @@ import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.ClinicStudyInfo;
+import edu.ualberta.med.biobank.model.StudyContactAndPatientInfo;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.ClinicAdapter;
 import edu.ualberta.med.biobank.widgets.infotables.BiobankCollectionModel;
@@ -121,7 +122,9 @@ public class FormUtils {
                             ((AdapterBase) item.o).performDoubleClick();
                         } else if (item.o instanceof ClinicStudyInfo) {
                             ((ClinicStudyInfo) item.o).performDoubleClick();
-
+                        } else if (item.o instanceof StudyContactAndPatientInfo) {
+                            ((StudyContactAndPatientInfo) item.o)
+                                .performDoubleClick();
                         }
                     }
                 }
