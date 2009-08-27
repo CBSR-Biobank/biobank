@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.rcp;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.jface.action.ControlContribution;
@@ -15,6 +16,7 @@ import org.eclipse.swt.widgets.Label;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.model.SiteComparator;
 import edu.ualberta.med.biobank.treeview.SessionAdapter;
 
 public class SiteCombo extends ControlContribution {
@@ -73,6 +75,7 @@ public class SiteCombo extends ControlContribution {
 
     public void loadChildren(List<Site> updatedSites) {
         sites = updatedSites;
+        Collections.sort(sites, new SiteComparator());
         for (Site site : sites) {
             SessionManager.getLogger().trace(
                 "updateSites: Site " + site.getId() + ": " + site.getName());

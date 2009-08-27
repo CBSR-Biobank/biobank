@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Semaphore;
 
@@ -18,6 +19,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.services.ISourceProviderService;
 
 import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.model.SiteComparator;
 import edu.ualberta.med.biobank.rcp.SiteCombo;
 import edu.ualberta.med.biobank.sourceproviders.DebugState;
 import edu.ualberta.med.biobank.sourceproviders.SessionState;
@@ -26,7 +28,6 @@ import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.NodeSearchVisitor;
 import edu.ualberta.med.biobank.treeview.RootNode;
 import edu.ualberta.med.biobank.treeview.SessionAdapter;
-import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.views.SessionsView;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
@@ -118,11 +119,8 @@ public class SessionManager {
         sessionAdapter = new SessionAdapter(rootNode, appService, 0, name,
             userName);
         rootNode.addChild(sessionAdapter);
-        for (Object o : sites) {
-            Site site = (Site) o;
-            SiteAdapter siteNode = new SiteAdapter(sessionAdapter, site);
-            sessionAdapter.addChild(siteNode);
-        }
+        Collections.sort(sites, new SiteComparator());
+        sessionAdapter.loadChildren(true);
         siteCombo.loadChildren(sites);
         siteCombo.setSession(sessionAdapter);
         view.getTreeViewer().expandToLevel(2);
