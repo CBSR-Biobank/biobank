@@ -5,6 +5,7 @@ import edu.ualberta.med.biobank.common.RowColPos;
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.Clinic;
+import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
 import edu.ualberta.med.biobank.model.ContainerPosition;
@@ -175,7 +176,7 @@ public class InitExamples {
     private void insertClinicsInSite() throws ApplicationException {
         for (int i = 0; i < 2; ++i) {
             Clinic clinic = new Clinic();
-            clinic.setName("Clinic " + i);
+            clinic.setName("Clinic " + (i + 1));
             clinic.setSite(site);
 
             Address address = new Address();
@@ -185,6 +186,14 @@ public class InitExamples {
             SDKQueryResult res = appService
                 .executeQuery(new InsertExampleQuery(clinic));
             clinics[i] = (Clinic) res.getObjectResult();
+
+            for (int j = 0; j < 2; ++j) {
+                Contact contact = new Contact();
+                contact.setName("Contact " + (i + 1) + "-" + (j + 1));
+                contact.setClinic(clinics[i]);
+
+                res = appService.executeQuery(new InsertExampleQuery(contact));
+            }
         }
     }
 

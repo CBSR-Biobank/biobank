@@ -1,6 +1,8 @@
 package edu.ualberta.med.biobank.forms;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
@@ -24,7 +26,7 @@ import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
 import edu.ualberta.med.biobank.widgets.infotables.SampleSourceInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.SampleStorageInfoTable;
-import edu.ualberta.med.biobank.widgets.infotables.StudyClinicInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.StudyContactInfoTable;
 
 public class StudyViewForm extends BiobankViewForm {
 
@@ -37,11 +39,11 @@ public class StudyViewForm extends BiobankViewForm {
     private Label activityStatusLabel;
     private Label commentLabel;
 
-    private StudyClinicInfoTable clinicsTable;
+    private StudyContactInfoTable clinicsTable;
     private SampleStorageInfoTable sampleStorageTable;
     private SampleSourceInfoTable sampleSourceTable;
 
-    // private BiobankCollectionTable pvInfosTable;
+    private List<PvInfoLabelPair> pvInfoControlList;
 
     @Override
     public void init() {
@@ -55,6 +57,7 @@ public class StudyViewForm extends BiobankViewForm {
         // after first opening
         retrieveStudy();
         setPartName("Study " + study.getNameShort());
+        pvInfoControlList = new ArrayList<PvInfoLabelPair>();
     }
 
     @Override
@@ -81,11 +84,13 @@ public class StudyViewForm extends BiobankViewForm {
         commentLabel = (Label) createWidget(client, Label.class, SWT.WRAP,
             "Comments");
 
-        setStudySectionValues();
         createClinicSection();
         createSampleStorageSection();
         createSampleSourceSection();
         createPvDataSection();
+
+        setStudySectionValues();
+        setPvDataSectionValues();
 
         final Button edit = toolkit.createButton(client,
             "Edit this information", SWT.PUSH);
@@ -103,10 +108,10 @@ public class StudyViewForm extends BiobankViewForm {
         });
     }
 
-    private void createClinicSection() throws Exception {
+    private void createClinicSection() {
         Composite client = createSectionWithClient("Clinics");
 
-        clinicsTable = new StudyClinicInfoTable(client, appService, study);
+        clinicsTable = new StudyContactInfoTable(client, appService, study);
         clinicsTable.adaptToToolkit(toolkit, true);
         toolkit.paintBordersFor(clinicsTable);
 
@@ -140,39 +145,41 @@ public class StudyViewForm extends BiobankViewForm {
     }
 
     private void createPvDataSection() {
-        createSection("Patient Visit Information Collected");
+        Composite client = createSectionWithClient("Patient Visit Information Collected");
+        client.setLayout(new GridLayout(1, false));
 
-        // FIXME this information can be displayed in a better way
-        //
-        // String[] headings = new String[] { "Name", "Valid Values (optional)"
-        // };
-        // pvInfosTable = new BiobankCollectionTable(section, SWT.NONE,
-        // headings,
-        // getStudyPvInfo());
-        // section.setClient(pvInfosTable);
-        // pvInfosTable.adaptToToolkit(toolkit, true);
-        // toolkit.paintBordersFor(pvInfosTable);
-        //
-        // pvInfosTable.getTableViewer().addDoubleClickListener(
-        // FormUtils.getBiobankCollectionDoubleClickListener());
+        Collection<PvInfo> pvInfos = study.getPvInfoCollection();
+        if ((pvInfos == null) || (pvInfos.size() == 0)) {
+            toolkit.createLabel(client,
+                "Study does not collect additional patient visit information");
+            return;
+        }
+
+        Composite subcomp;
+        for (PvInfo pvInfo : pvInfos) {
+            subcomp = toolkit.createComposite(client);
+            subcomp.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+            if (pvInfo.getPossibleValues() != null) {
+                subcomp.setLayout(new GridLayout(2, false));
+
+                PvInfoLabelPair pair = new PvInfoLabelPair();
+                pair.pvInfo = pvInfo;
+                pair.label = (Label) createWidget(subcomp, Label.class,
+                    SWT.NONE, pvInfo.getLabel());
+                pvInfoControlList.add(pair);
+            } else {
+                subcomp.setLayout(new GridLayout(1, false));
+                toolkit.createLabel(subcomp, pvInfo.getLabel());
+            }
+        }
     }
 
-    private PvInfo[] getStudyPvInfo() {
-        // hack required here because study.getXxxCollection().toArray(new
-        // Xxx[0]) returns Object[].
-        Collection<PvInfo> pvInfos = study.getPvInfoCollection();
-        if ((pvInfos == null) || (pvInfos.size() == 0))
-            return null;
-        int count = 0;
-        if (pvInfos == null)
-            return null;
-
-        PvInfo[] arr = new PvInfo[pvInfos.size()];
-        for (PvInfo p : pvInfos) {
-            arr[count] = p;
-            ++count;
+    private void setPvDataSectionValues() {
+        for (PvInfoLabelPair pair : pvInfoControlList) {
+            FormUtils.setTextValue(pair.label, pair.pvInfo.getPossibleValues()
+                .replaceAll(";", "; "));
         }
-        return arr;
     }
 
     @Override
@@ -181,12 +188,13 @@ public class StudyViewForm extends BiobankViewForm {
         setPartName("Study " + study.getNameShort());
         form.setText("Study: " + study.getName());
         setStudySectionValues();
+        setPvDataSectionValues();
+
         AdapterBase clinicGroupNode = ((SiteAdapter) studyAdapter.getParent()
             .getParent()).getClinicGroupNode();
         clinicsTable.getTableViewer().setInput(
             FormUtils.getClinicsAdapters(clinicGroupNode, ModelUtils
                 .getStudyClinicCollection(appService, study)));
-        // pvInfosTable.getTableViewer().setInput(getStudyPvInfo());
     }
 
     private void retrieveStudy() {

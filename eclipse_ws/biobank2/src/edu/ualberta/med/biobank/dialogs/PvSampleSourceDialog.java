@@ -25,7 +25,7 @@ import edu.ualberta.med.biobank.validators.NonEmptyString;
 
 public class PvSampleSourceDialog extends BiobankDialog {
 
-    private static final String TITLE = " Sample Source";
+    private static final String TITLE = "Sample Source";
 
     private PvSampleSource pvSampleSource;
 

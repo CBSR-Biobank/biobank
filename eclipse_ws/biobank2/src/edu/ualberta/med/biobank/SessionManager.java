@@ -1,9 +1,11 @@
 package edu.ualberta.med.biobank;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Semaphore;
 
 import org.apache.log4j.Logger;
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -17,14 +19,15 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.services.ISourceProviderService;
 
 import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.model.SiteComparator;
 import edu.ualberta.med.biobank.rcp.SiteCombo;
 import edu.ualberta.med.biobank.sourceproviders.DebugState;
 import edu.ualberta.med.biobank.sourceproviders.SessionState;
 import edu.ualberta.med.biobank.sourceproviders.SiteSelectionState;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
+import edu.ualberta.med.biobank.treeview.NodeSearchVisitor;
 import edu.ualberta.med.biobank.treeview.RootNode;
 import edu.ualberta.med.biobank.treeview.SessionAdapter;
-import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.views.SessionsView;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
@@ -116,11 +119,8 @@ public class SessionManager {
         sessionAdapter = new SessionAdapter(rootNode, appService, 0, name,
             userName);
         rootNode.addChild(sessionAdapter);
-        for (Object o : sites) {
-            Site site = (Site) o;
-            SiteAdapter siteNode = new SiteAdapter(sessionAdapter, site);
-            sessionAdapter.addChild(siteNode);
-        }
+        Collections.sort(sites, new SiteComparator());
+        sessionAdapter.loadChildren(true);
         siteCombo.loadChildren(sites);
         siteCombo.setSession(sessionAdapter);
         view.getTreeViewer().expandToLevel(2);
@@ -216,8 +216,12 @@ public class SessionManager {
         return log4j;
     }
 
-    public void openViewForm(Object o) {
-
+    public void openViewForm(Class<?> klass, int id) {
+        NodeSearchVisitor v = new NodeSearchVisitor(klass, id);
+        AdapterBase adapter = sessionAdapter.accept(v);
+        Assert.isNotNull(adapter, "could not find adapter for class "
+            + klass.getName() + " id " + id);
+        adapter.performDoubleClick();
     }
 
     public void setCurrentSite(Site site) {
@@ -228,10 +232,8 @@ public class SessionManager {
             .getService(ISourceProviderService.class);
         SiteSelectionState siteSelectionStateSourceProvider = (SiteSelectionState) service
             .getSourceProvider(SiteSelectionState.SITE_SELECTION_STATE);
-        if (site == null)
-            siteSelectionStateSourceProvider.setSiteSelectionState(false);
-        else
-            siteSelectionStateSourceProvider.setSiteSelectionState(true);
+        siteSelectionStateSourceProvider.setSiteSelectionState(site != null);
+        getSession().performExpand();
     }
 
     public Site getCurrentSite() {

@@ -70,7 +70,7 @@ public abstract class BiobankFormBase extends EditorPart {
      * @param adapter the corresponding model adapter the form is to edit /
      *            view.
      */
-    protected abstract void init();
+    protected abstract void init() throws Exception;
 
     @Override
     public void init(IEditorSite editorSite, IEditorInput input)
@@ -82,7 +82,15 @@ public abstract class BiobankFormBase extends EditorPart {
         adapter = ((FormInput) input).getNode();
         Assert.isNotNull(adapter, "Bad editor input (null value)");
         appService = adapter.getAppService();
-        init();
+
+        try {
+            init();
+        } catch (final RemoteConnectFailureException exp) {
+            BioBankPlugin.openRemoteConnectErrorMessage();
+        } catch (Exception e) {
+            SessionManager.getLogger().error(
+                "BioBankFormBase.createPartControl Error", e);
+        }
     }
 
     @Override

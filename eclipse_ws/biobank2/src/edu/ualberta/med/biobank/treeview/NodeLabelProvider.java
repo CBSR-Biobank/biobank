@@ -28,10 +28,6 @@ public class NodeLabelProvider implements ILabelProvider {
             image = imageCollection.get("study");
         } else if (element instanceof SiteAdapter) {
             image = imageCollection.get("site");
-        } else if (element instanceof PatientGroup) {
-            image = imageCollection.get("dudes");
-        } else if (element instanceof PatientSubGroup) {
-            image = imageCollection.get("dudeplus");
         } else if (element instanceof PatientAdapter) {
             image = imageCollection.get("dude");
         } else if (element instanceof ContainerGroup) {

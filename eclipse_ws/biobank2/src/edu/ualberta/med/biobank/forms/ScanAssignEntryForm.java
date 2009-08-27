@@ -476,7 +476,7 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
 
     @Override
     protected void saveForm() throws Exception {
-
+        // SDKQuery query;
         // if (currentPalletWrapper.isNew()) {
         // query = new
         // InsertExampleQuery(currentPalletWrapper.getWrappedObject());

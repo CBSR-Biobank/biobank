@@ -80,9 +80,9 @@ public class PatientAdministrationView extends ViewPart {
         getSite().getPage().closeAllEditors(true);
         String number = patientNumberText.getText();
         try {
-            PatientWrapper patientWrapper = PatientWrapper.getPatientWrapperInSite(
-                SessionManager.getAppService(), number, SessionManager
-                    .getInstance().getCurrentSite());
+            PatientWrapper patientWrapper = PatientWrapper
+                .getPatientWrapperInSite(SessionManager.getAppService(),
+                    number, SessionManager.getInstance().getCurrentSite());
             if (patientWrapper == null) {
                 notFoundPatient(number);
             } else {

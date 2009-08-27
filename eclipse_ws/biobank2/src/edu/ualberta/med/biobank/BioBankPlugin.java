@@ -166,6 +166,14 @@ public class BioBankPlugin extends AbstractUIPlugin {
     }
 
     /**
+     * Display an info message
+     */
+    public static void openInformation(String title, String message) {
+        MessageDialog.openInformation(PlatformUI.getWorkbench()
+            .getActiveWorkbenchWindow().getShell(), title, message);
+    }
+
+    /**
      * Display an error message asynchronously
      */
     public static void openAsyncError(final String title, final String message) {

@@ -1,6 +1,8 @@
 package edu.ualberta.med.biobank.treeview;
 
-import java.util.Collection;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.TreeViewer;
@@ -19,6 +21,7 @@ import edu.ualberta.med.biobank.forms.PatientVisitEntryForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.PatientVisit;
+import edu.ualberta.med.biobank.model.PatientVisitComparator;
 
 public class PatientAdapter extends AdapterBase {
 
@@ -108,8 +111,9 @@ public class PatientAdapter extends AdapterBase {
             // read from database again
             patientWrapper.reload();
 
-            Collection<PatientVisit> visits = patientWrapper
-                .getPatientVisitCollection();
+            List<PatientVisit> visits = new ArrayList<PatientVisit>(
+                patientWrapper.getPatientVisitCollection());
+            Collections.sort(visits, new PatientVisitComparator());
 
             for (PatientVisit visit : visits) {
                 PatientVisitAdapter node = (PatientVisitAdapter) getChild(visit

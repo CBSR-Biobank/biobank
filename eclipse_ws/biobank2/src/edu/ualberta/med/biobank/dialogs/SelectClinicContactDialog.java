@@ -6,10 +6,12 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -18,9 +20,12 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 
 import edu.ualberta.med.biobank.model.Clinic;
+import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.widgets.infotables.ContactInfoTable;
 
-public class ClinicContactsDialog extends BiobankDialog {
+public class SelectClinicContactDialog extends BiobankDialog {
+
+    public static final int ADD_BTN_ID = 100;
 
     private static final String TITLE = "Clinic Contacts";
 
@@ -30,9 +35,9 @@ public class ClinicContactsDialog extends BiobankDialog {
 
     private ContactInfoTable contactInfoTable;
 
-    public static final int ADD_BTN_ID = 100;
+    private Contact selectedContact;
 
-    public ClinicContactsDialog(Shell parent,
+    public SelectClinicContactDialog(Shell parent,
         Collection<Clinic> clinicCollection) {
         super(parent);
         clinicMap = new HashMap<String, Clinic>();
@@ -76,6 +81,21 @@ public class ClinicContactsDialog extends BiobankDialog {
 
         contactInfoTable = new ContactInfoTable(contents, null);
         contactInfoTable.setEnabled(false);
+        contactInfoTable.addSelectionListener(new SelectionListener() {
+
+            @Override
+            public void widgetDefaultSelected(SelectionEvent e) {
+
+            }
+
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                if (contactInfoTable.getSelection() != null)
+                    SelectClinicContactDialog.this.getButton(
+                        IDialogConstants.OK_ID).setEnabled(true);
+
+            }
+        });
         return contents;
     }
 
@@ -86,6 +106,22 @@ public class ClinicContactsDialog extends BiobankDialog {
         Assert.isNotNull(clinic, "no clinic with name \"" + name + "\"");
         contactInfoTable.setCollection(clinic.getContactCollection());
         contactInfoTable.setEnabled(true);
+    }
+
+    @Override
+    protected void okPressed() {
+        selectedContact = contactInfoTable.getSelection();
+        super.okPressed();
+    }
+
+    public Contact getSelection() {
+        return selectedContact;
+    }
+
+    @Override
+    protected void createButtonsForButtonBar(Composite parent) {
+        super.createButtonsForButtonBar(parent);
+        getButton(IDialogConstants.OK_ID).setEnabled(false);
     }
 
 }

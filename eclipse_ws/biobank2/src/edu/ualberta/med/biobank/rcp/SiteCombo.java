@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.rcp;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.jface.action.ControlContribution;
@@ -12,11 +13,10 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
-import org.springframework.remoting.RemoteAccessException;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.model.SiteComparator;
 import edu.ualberta.med.biobank.treeview.SessionAdapter;
 
 public class SiteCombo extends ControlContribution {
@@ -74,20 +74,11 @@ public class SiteCombo extends ControlContribution {
     }
 
     public void loadChildren(List<Site> updatedSites) {
-        try {
-            // read from database again
-            this.sites = updatedSites;
-            for (Site site : sites) {
-                SessionManager.getLogger()
-                    .trace(
-                        "updateSites: Site " + site.getId() + ": "
-                            + site.getName());
-            }
-        } catch (final RemoteAccessException exp) {
-            BioBankPlugin.openRemoteAccessErrorMessage();
-        } catch (Exception e) {
-            SessionManager.getLogger().error(
-                "Error while loading sites for SiteCombo");
+        sites = updatedSites;
+        Collections.sort(sites, new SiteComparator());
+        for (Site site : sites) {
+            SessionManager.getLogger().trace(
+                "updateSites: Site " + site.getId() + ": " + site.getName());
         }
         combo.removeAll();
         combo.add("All Sites");
@@ -95,17 +86,15 @@ public class SiteCombo extends ControlContribution {
             combo.add(site.getName());
         }
         combo.select(0);
-
     }
 
     public void setValue(int index) {
         combo.select(index);
     }
- 
-public void setEnabled(boolean enabled) {
+
+    public void setEnabled(boolean enabled) {
         combo.setEnabled(enabled);
     }
-
 
     public void addChild(Site site) {
         sites.add(site);

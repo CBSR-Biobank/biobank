@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.treeview;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
@@ -16,6 +17,7 @@ import edu.ualberta.med.biobank.common.utils.ModelUtils;
 import edu.ualberta.med.biobank.forms.ContainerEntryForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Container;
+import edu.ualberta.med.biobank.model.ContainerComparator;
 import edu.ualberta.med.biobank.model.Site;
 
 public class ContainerGroup extends AdapterBase {
@@ -57,6 +59,7 @@ public class ContainerGroup extends AdapterBase {
 
             List<Container> containers = ModelUtils.getTopContainersForSite(
                 getAppService(), parentSite);
+            Collections.sort(containers, new ContainerComparator());
             for (Container container : containers) {
                 ContainerAdapter node = (ContainerAdapter) getChild(container
                     .getId());
