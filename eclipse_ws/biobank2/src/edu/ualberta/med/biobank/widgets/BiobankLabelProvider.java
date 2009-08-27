@@ -197,8 +197,8 @@ public class BiobankLabelProvider extends LabelProvider implements
         } else if (element instanceof StudyContactInfo) {
             StudyContactInfo info = (StudyContactInfo) element;
             if (columnIndex == 0) {
-                if (info.clinicName != null)
-                    return info.clinicName;
+                if (info.contact != null)
+                    return info.contact.getClinic().getName();
                 return "";
             }
             return getContactColumnIndex(info.contact, columnIndex);

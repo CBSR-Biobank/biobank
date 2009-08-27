@@ -41,9 +41,7 @@ public class StudyContactEntryInfoTable extends InfoTableWidget<Contact> {
                         StudyContactInfo info = new StudyContactInfo();
                         item.o = info;
                         model.add(item);
-
                         info.contact = contact;
-                        info.clinicName = contact.getClinic().getName();
                     }
 
                     getTableViewer().getTable().getDisplay().asyncExec(

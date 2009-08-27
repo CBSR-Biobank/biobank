@@ -24,11 +24,9 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 public class StudyContactInfoTable extends InfoTableWidget<Contact> {
 
     private static final String[] headings = new String[] { "Clinic",
-        "#Patients", "#Patient Visits", "Contact Name", "Title", "Email",
-        "Phone #", "Fax #" };
+        "#Patients", "#Patient Visits", "Contact Name", "Title" };
 
-    private static final int[] bounds = new int[] { 100, 80, 100, 150, 150,
-        100, 100, 100 };
+    private static final int[] bounds = new int[] { 100, 80, 100, 150, 150 };
 
     private Study study;
 

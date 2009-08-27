@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.concurrent.Semaphore;
 
 import org.apache.log4j.Logger;
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -217,9 +218,11 @@ public class SessionManager {
         return log4j;
     }
 
-    public void openViewForm(Object o, int id) {
-        NodeSearchVisitor v = new NodeSearchVisitor(o.getClass(), id);
+    public void openViewForm(Class<?> klass, int id) {
+        NodeSearchVisitor v = new NodeSearchVisitor(klass, id);
         AdapterBase adapter = sessionAdapter.accept(v);
+        Assert.isNotNull(adapter, "could not find adapter for class "
+            + klass.getName() + " id " + id);
         adapter.performDoubleClick();
     }
 

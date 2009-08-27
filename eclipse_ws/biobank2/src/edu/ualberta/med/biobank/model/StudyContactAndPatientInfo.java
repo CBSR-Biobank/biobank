@@ -18,7 +18,7 @@ public class StudyContactAndPatientInfo {
         Assert.isNotNull(contact, "contact is null");
         Clinic clinic = contact.getClinic();
         Assert.isNotNull(clinic, "clinic is null");
-        SessionManager.getInstance().openViewForm(clinic, clinic.getId());
+        SessionManager.getInstance().openViewForm(Clinic.class, clinic.getId());
     }
 
 }
