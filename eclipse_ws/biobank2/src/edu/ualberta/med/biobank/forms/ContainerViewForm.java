@@ -6,12 +6,9 @@ import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.KeyEvent;
-import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
-import org.eclipse.swt.events.MouseTrackAdapter;
 import org.eclipse.swt.events.MouseTrackListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -73,16 +70,9 @@ public class ContainerViewForm extends BiobankViewForm {
     ContainerCell[][] cells;
 
     private List<ContainerCell> selectedCells;
-    private ContainerCell lastSelectedCell;
-    private SelectionMode selectionMode = SelectionMode.NONE;
-    private boolean selectionTrackOn = false;
     List<ScanPalletModificationListener> listeners;
     private MouseListener selectionMouseListener;
     private MouseTrackListener selectionMouseTrackListener;
-
-    private enum SelectionMode {
-        NONE, MULTI, RANGE;
-    }
 
     public void addModificationListener(ScanPalletModificationListener listener) {
         listeners.add(listener);
@@ -199,117 +189,9 @@ public class ContainerViewForm extends BiobankViewForm {
         }
     }
 
-    private void addAllCellsInRange(ContainerCell cell) {
-        ContainerCell lastSelected = selectedCells
-            .get(selectedCells.size() - 1);
-        int startRow = lastSelected.getPosition().getPositionDimensionOne();
-        int endRow = cell.getPosition().getPositionDimensionOne();
-        if (startRow > endRow) {
-            startRow = cell.getPosition().getPositionDimensionOne();
-            endRow = lastSelected.getPosition().getPositionDimensionOne();
-        }
-        for (int indexRow = startRow; indexRow <= endRow; indexRow++) {
-            int startCol = lastSelected.getPosition().getPositionDimensionTwo();
-            int endCol = cell.getPosition().getPositionDimensionTwo();
-            if (startCol > endCol) {
-                startCol = cell.getPosition().getPositionDimensionTwo();
-                endCol = lastSelected.getPosition().getPositionDimensionTwo();
-            }
-            for (int indexCol = startCol; indexCol <= endCol; indexCol++) {
-                ContainerCell cellToAdd = cells[indexRow][indexCol];
-                if (cellToAdd != null && cellToAdd.getPosition() != null) {
-                    if (!selectedCells.contains(cellToAdd)) {
-                        cellToAdd.setStatus(ContainerStatus.FREE_LOCATIONS);
-                        selectedCells.add(cellToAdd);
-                    }
-                }
-            }
-        }
-    }
-
     public void enableSelection() {
         containerWidget.addMouseListener(selectionMouseListener);
         containerWidget.addMouseTrackListener(selectionMouseTrackListener);
-    }
-
-    private void initListeners() {
-        selectionMouseListener = new MouseAdapter() {
-            @Override
-            public void mouseDown(MouseEvent e) {
-                selectionTrackOn = true;
-                if (cells != null) {
-                    ContainerCell cell = ((ChooseContainerWidget) e.widget)
-                        .getPositionAtCoordinates(e.x, e.y);
-                    if (cell != null && cell.getPosition() != null) {
-                        switch (selectionMode) {
-                        case MULTI:
-                            if (selectedCells.contains(cell)) {
-                                selectedCells.remove(cell);
-                                cell.setStatus(ContainerStatus.NOT_INITIALIZED);
-                            } else {
-                                selectedCells.add(cell);
-                                cell.setStatus(ContainerStatus.FREE_LOCATIONS);
-                            }
-                            break;
-                        case RANGE:
-                            if (selectedCells.size() > 0) {
-                                addAllCellsInRange(cell);
-                            } else {
-                                selectedCells.add(cell);
-                                cell.setStatus(ContainerStatus.FREE_LOCATIONS);
-                            }
-                            break;
-                        default:
-                            clearSelection();
-                            selectedCells.add(cell);
-                            cell.setStatus(ContainerStatus.FREE_LOCATIONS);
-                            break;
-                        }
-                        notifyListeners();
-                        ((ChooseContainerWidget) e.widget).redraw();
-                    }
-                }
-            }
-
-            @Override
-            public void mouseUp(MouseEvent e) {
-                selectionTrackOn = false;
-            }
-        };
-        selectionMouseTrackListener = new MouseTrackAdapter() {
-
-            @Override
-            public void mouseHover(MouseEvent e) {
-                if (selectionTrackOn) {
-                    ContainerCell cell = ((ChooseContainerWidget) e.widget)
-                        .getPositionAtCoordinates(e.x, e.y);
-                    if (cell != null && !cell.equals(lastSelectedCell)) {
-                        selectedCells.add(cell);
-                        cell.setStatus(ContainerStatus.FREE_LOCATIONS);
-                        notifyListeners();
-                        ((ChooseContainerWidget) e.widget).redraw();
-                    }
-                }
-            }
-        };
-
-        containerWidget.addKeyListener(new KeyListener() {
-            @Override
-            public void keyPressed(KeyEvent e) {
-                if (e.keyCode == SWT.SHIFT) {
-                    selectionMode = SelectionMode.RANGE;
-                } else if (e.keyCode == SWT.CTRL) {
-                    selectionMode = SelectionMode.MULTI;
-                }
-            }
-
-            @Override
-            public void keyReleased(KeyEvent e) {
-                if (e.keyCode == SWT.SHIFT || e.keyCode == SWT.CTRL) {
-                    selectionMode = SelectionMode.NONE;
-                }
-            }
-        });
     }
 
     public void clearSelection() {
