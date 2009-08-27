@@ -33,16 +33,17 @@ public class StudyContactEntryInfoTable extends InfoTableWidget<Contact> {
                 try {
                     model.clear();
                     BiobankCollectionModel item;
-                    for (Contact contact : collection) {
-                        if (getTableViewer().getTable().isDisposed()) {
-                            return;
+                    if (collection != null)
+                        for (Contact contact : collection) {
+                            if (getTableViewer().getTable().isDisposed()) {
+                                return;
+                            }
+                            item = new BiobankCollectionModel();
+                            StudyContactInfo info = new StudyContactInfo();
+                            item.o = info;
+                            model.add(item);
+                            info.contact = contact;
                         }
-                        item = new BiobankCollectionModel();
-                        StudyContactInfo info = new StudyContactInfo();
-                        item.o = info;
-                        model.add(item);
-                        info.contact = contact;
-                    }
 
                     getTableViewer().getTable().getDisplay().asyncExec(
                         new Runnable() {

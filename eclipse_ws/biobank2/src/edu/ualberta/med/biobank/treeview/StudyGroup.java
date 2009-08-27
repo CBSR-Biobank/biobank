@@ -40,6 +40,7 @@ public class StudyGroup extends AdapterBase {
         mi.addSelectionListener(new SelectionListener() {
             public void widgetSelected(SelectionEvent event) {
                 Study study = new Study();
+                study.setSite(getParentFromClass(SiteAdapter.class).getSite());
                 StudyAdapter adapter = new StudyAdapter(StudyGroup.this, study);
                 openForm(new FormInput(adapter), StudyEntryForm.ID);
             }

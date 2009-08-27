@@ -53,13 +53,16 @@ public class SampleTypeDialog extends BiobankDialog {
         client.setLayout(layout);
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-        createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Name", null,
-            PojoObservables.observeValue(sampleType, "name"),
+        Control c = createBoundWidgetWithLabel(client, Text.class, SWT.BORDER,
+            "Name", null, PojoObservables.observeValue(sampleType, "name"),
             NonEmptyString.class, MSG_NO_ST_NAME);
+        GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
+        gd.widthHint = 200;
+        c.setLayoutData(gd);
 
-        createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Short Name",
-            null, PojoObservables.observeValue(sampleType, "nameShort"),
-            NonEmptyString.class, MSG_NO_ST_SNAME);
+        createBoundWidgetWithLabel(client, Text.class, SWT.BORDER,
+            "Short Name", null, PojoObservables.observeValue(sampleType,
+                "nameShort"), NonEmptyString.class, MSG_NO_ST_SNAME);
 
         return client;
     }

@@ -8,10 +8,7 @@ import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
-import org.springframework.remoting.RemoteConnectFailureException;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
-import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.utils.ModelUtils;
 import edu.ualberta.med.biobank.forms.ClinicEntryForm;
 import edu.ualberta.med.biobank.forms.ClinicViewForm;
@@ -97,19 +94,15 @@ public class ClinicAdapter extends AdapterBase {
         return null;
     }
 
-    public Clinic loadClinic() {
-        try {
-            clinic = ModelUtils.getObjectWithId(getAppService(), Clinic.class,
-                clinic.getId());
-            Assert.isNotNull(clinic, "clinic not in database");
+    public Clinic loadClinic() throws Exception {
+        // if clinic is not a database object it cannot be loaded
+        if (clinic.getId() == null)
             return clinic;
-        } catch (final RemoteConnectFailureException exp) {
-            BioBankPlugin.openRemoteConnectErrorMessage();
-        } catch (Exception e) {
-            SessionManager.getLogger().error(
-                "Error while retrieving the clinic", e);
-        }
-        return null;
+
+        clinic = ModelUtils.getObjectWithId(getAppService(), Clinic.class,
+            clinic.getId());
+        Assert.isNotNull(clinic, "clinic not in database");
+        return clinic;
     }
 
 }

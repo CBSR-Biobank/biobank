@@ -234,10 +234,8 @@ public class SessionManager {
             .getService(ISourceProviderService.class);
         SiteSelectionState siteSelectionStateSourceProvider = (SiteSelectionState) service
             .getSourceProvider(SiteSelectionState.SITE_SELECTION_STATE);
-        if (site == null)
-            siteSelectionStateSourceProvider.setSiteSelectionState(false);
-        else
-            siteSelectionStateSourceProvider.setSiteSelectionState(true);
+        siteSelectionStateSourceProvider.setSiteSelectionState(site != null);
+        getSession().performExpand();
     }
 
     public Site getCurrentSite() {

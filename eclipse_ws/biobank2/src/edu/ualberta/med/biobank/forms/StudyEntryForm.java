@@ -256,6 +256,7 @@ public class StudyEntryForm extends BiobankEntryForm {
 
             combinedPvInfo.wiget = new PvInfoWidget(client, SWT.NONE,
                 possiblePvInfo, selected, value);
+            combinedPvInfo.wiget.addSelectionChangedListener(listener);
 
             combinedPvInfoMap.put(combinedPvInfo.pvInfoPossible.getId(),
                 combinedPvInfo);

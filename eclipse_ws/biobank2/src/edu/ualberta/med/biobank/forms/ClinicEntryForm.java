@@ -58,7 +58,7 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
     };
 
     @Override
-    protected void init() {
+    protected void init() throws Exception {
         Assert.isTrue((adapter instanceof ClinicAdapter),
             "Invalid editor input: object of type "
                 + adapter.getClass().getName());

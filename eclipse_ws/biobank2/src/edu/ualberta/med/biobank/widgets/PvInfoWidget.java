@@ -46,6 +46,19 @@ public class PvInfoWidget extends BiobankWidget {
         if (hasListValues) {
             checkButton = new Button(this, SWT.CHECK);
             checkButton.setText(label);
+            checkButton.addSelectionListener(new SelectionListener() {
+
+                @Override
+                public void widgetDefaultSelected(SelectionEvent e) {
+                    notifyListeners();
+                }
+
+                @Override
+                public void widgetSelected(SelectionEvent e) {
+                    notifyListeners();
+                }
+
+            });
 
             if (pvInfoPossible.getIsDefault()) {
                 checkButton.setEnabled(false);
@@ -71,6 +84,7 @@ public class PvInfoWidget extends BiobankWidget {
             addButton.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent e) {
+                    notifyListeners();
                     String title = "";
                     String prompt = "";
                     String helpText = "";
@@ -143,6 +157,7 @@ public class PvInfoWidget extends BiobankWidget {
                 public void widgetSelected(SelectionEvent e) {
                     for (String selection : list.getSelection()) {
                         list.remove(selection);
+                        notifyListeners();
                     }
                 }
             });
@@ -266,6 +281,19 @@ public class PvInfoWidget extends BiobankWidget {
             GridData gd = new GridData(GridData.VERTICAL_ALIGN_BEGINNING
                 | GridData.GRAB_HORIZONTAL);
             checkButton.setLayoutData(gd);
+            checkButton.addSelectionListener(new SelectionListener() {
+
+                @Override
+                public void widgetDefaultSelected(SelectionEvent e) {
+                    notifyListeners();
+                }
+
+                @Override
+                public void widgetSelected(SelectionEvent e) {
+                    notifyListeners();
+                }
+
+            });
 
             if (pvInfoPossible.getIsDefault()) {
                 checkButton.setEnabled(false);
