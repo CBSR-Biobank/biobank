@@ -22,6 +22,7 @@ import edu.ualberta.med.biobank.model.PvSampleSource;
 import edu.ualberta.med.biobank.model.Sample;
 import edu.ualberta.med.biobank.model.SampleSource;
 import edu.ualberta.med.biobank.model.SampleStorage;
+import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.StudyContactAndPatientInfo;
 import edu.ualberta.med.biobank.model.StudyContactInfo;
@@ -145,6 +146,16 @@ public class BiobankLabelProvider extends LabelProvider implements
                 return "" + ss.getVolume();
             case 2:
                 return "" + ss.getQuantity();
+            }
+        } else if (element instanceof SampleType) {
+            final SampleType st = (SampleType) element;
+            switch (columnIndex) {
+            case 0:
+                return st.getName();
+            case 1:
+                return "" + st.getNameShort();
+            case 2:
+                return "" + st.getId();
             }
         } else if (element instanceof BiobankCollectionModel) {
             BiobankCollectionModel m = (BiobankCollectionModel) element;
