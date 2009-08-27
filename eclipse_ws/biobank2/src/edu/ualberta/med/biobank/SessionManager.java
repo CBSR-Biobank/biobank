@@ -201,12 +201,18 @@ public class SessionManager {
                 e.printStackTrace();
             }
         }
-        siteCombo.loadChildren(sites);
+        if (siteCombo != null) {
+            siteCombo.loadChildren(sites);
+        }
 
     }
 
-    public void setCombo(SiteCombo combo) {
+    public void setSiteCombo(SiteCombo combo) {
         this.siteCombo = combo;
+    }
+
+    public SiteCombo getSiteCombo() {
+        return siteCombo;
     }
 
     public SessionAdapter getSession() {

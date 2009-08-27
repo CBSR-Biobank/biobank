@@ -12,10 +12,10 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Label;
 
 import edu.ualberta.med.biobank.common.LabelingScheme;
 import edu.ualberta.med.biobank.common.RowColPos;
+import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.ContainerType;
 
 /**
@@ -38,7 +38,7 @@ public abstract class AbstractGridContainerWidget extends Canvas {
 
     private ContainerType containerType;
 
-    private Label parentLabel;
+    private String parentLabel;
 
     /**
      * First character or int used for the cells row labels
@@ -92,6 +92,7 @@ public abstract class AbstractGridContainerWidget extends Canvas {
                 paintGrid(e);
             }
         });
+        parentLabel = "";
     }
 
     protected void paintGrid(PaintEvent e) {
@@ -149,10 +150,7 @@ public abstract class AbstractGridContainerWidget extends Canvas {
         rowcol.row = indexRow;
         rowcol.col = indexCol;
         if (containerType != null) {
-            String text = "";
-            if (parentLabel != null)
-                text = parentLabel.getText();
-            return text
+            return parentLabel
                 + LabelingScheme.getPositionString(rowcol, containerType);
         }
 
@@ -166,9 +164,16 @@ public abstract class AbstractGridContainerWidget extends Canvas {
         return row + col;
     }
 
-    public void setParams(ContainerType type, Label parent) {
+    public void setContainerType(ContainerType type) {
         this.containerType = type;
-        this.parentLabel = parent;
+        Capacity capacity = containerType.getCapacity();
+        int dim1 = capacity.getDimensionOneCapacity();
+        int dim2 = capacity.getDimensionTwoCapacity();
+        setStorageSize(dim1, dim2);
+    }
+
+    public void setParentLabel(String parentLabel) {
+        this.parentLabel = parentLabel;
     }
 
     private String getValueForCell(Object firstSign, int addValue,

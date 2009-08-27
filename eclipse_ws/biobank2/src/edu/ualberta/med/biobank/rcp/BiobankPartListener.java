@@ -7,6 +7,7 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.forms.AbstractPatientAdminForm;
 import edu.ualberta.med.biobank.forms.CloseForm;
 import edu.ualberta.med.biobank.views.PatientAdministrationView;
 
@@ -14,7 +15,6 @@ public class BiobankPartListener implements IPartListener {
 
     @Override
     public void partActivated(IWorkbenchPart part) {
-
     }
 
     @Override
@@ -40,16 +40,20 @@ public class BiobankPartListener implements IPartListener {
                 }
             }
         }
+        if (part instanceof AbstractPatientAdminForm) {
+            SessionManager.getInstance().getSiteCombo().setEnabled(true);
+        }
     }
 
     @Override
     public void partDeactivated(IWorkbenchPart part) {
-
     }
 
     @Override
     public void partOpened(IWorkbenchPart part) {
-
+        if (part instanceof AbstractPatientAdminForm) {
+            SessionManager.getInstance().getSiteCombo().setEnabled(false);
+        }
     }
 
 }

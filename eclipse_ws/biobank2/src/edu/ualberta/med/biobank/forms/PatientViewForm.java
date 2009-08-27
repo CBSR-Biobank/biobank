@@ -6,7 +6,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.model.Patient;
+import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.treeview.PatientAdapter;
 import edu.ualberta.med.biobank.widgets.infotables.PatientVisitInfoTable;
 
@@ -15,7 +15,7 @@ public class PatientViewForm extends BiobankViewForm {
 
     private PatientAdapter patientAdapter;
 
-    private Patient patient;
+    private PatientWrapper patientWrapper;
 
     private PatientVisitInfoTable visitsTable;
 
@@ -26,14 +26,14 @@ public class PatientViewForm extends BiobankViewForm {
                 + adapter.getClass().getName());
 
         patientAdapter = (PatientAdapter) adapter;
+        patientWrapper = patientAdapter.getWrapper();
         retrievePatient();
-        setPartName("Patient " + patient.getNumber());
+        setPartName("Patient " + patientWrapper.getNumber());
     }
 
     private void retrievePatient() {
         try {
-            patientAdapter.getWrapper().reload();
-            patient = patientAdapter.getWrapper().getPatient();
+            patientWrapper.reload();
         } catch (Exception e) {
             SessionManager.getLogger().error(
                 "Error while retrieving patient "
@@ -43,7 +43,7 @@ public class PatientViewForm extends BiobankViewForm {
 
     @Override
     protected void createFormContent() {
-        form.setText("Patient: " + patient.getNumber());
+        form.setText("Patient: " + patientWrapper.getNumber());
         form.getBody().setLayout(new GridLayout(1, false));
         form.getBody().setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
@@ -54,7 +54,7 @@ public class PatientViewForm extends BiobankViewForm {
     private void createPatientVisitSection() {
         Section section = createSection("Patient Visits");
 
-        visitsTable = new PatientVisitInfoTable(section, patient
+        visitsTable = new PatientVisitInfoTable(section, patientWrapper
             .getPatientVisitCollection());
         section.setClient(visitsTable);
         visitsTable.adaptToToolkit(toolkit, true);
@@ -65,8 +65,8 @@ public class PatientViewForm extends BiobankViewForm {
     @Override
     protected void reload() {
         retrievePatient();
-        setPartName("Patient " + patient.getNumber());
-        form.setText("Patient: " + patient.getNumber());
-        visitsTable.setCollection(patient.getPatientVisitCollection());
+        setPartName("Patient " + patientWrapper.getNumber());
+        form.setText("Patient: " + patientWrapper.getNumber());
+        visitsTable.setCollection(patientWrapper.getPatientVisitCollection());
     }
 }

@@ -13,7 +13,6 @@ import org.eclipse.core.databinding.validation.ValidationStatus;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.IMessageProvider;
-import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -21,7 +20,6 @@ import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
-import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.custom.StackLayout;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
@@ -43,7 +41,7 @@ import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.utils.SiteUtils;
+import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.forms.listener.EnterKeyToNextFieldListener;
 import edu.ualberta.med.biobank.model.PalletCell;
 import edu.ualberta.med.biobank.model.Patient;
@@ -60,6 +58,7 @@ import edu.ualberta.med.biobank.widgets.listener.ScanPalletModificationEvent;
 import edu.ualberta.med.biobank.widgets.listener.ScanPalletModificationListener;
 import edu.ualberta.med.scanlib.ScanCell;
 import edu.ualberta.med.scanlib.ScanLib;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.query.SDKQuery;
 import gov.nih.nci.system.query.example.InsertExampleQuery;
 
@@ -79,8 +78,6 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
 
     private IObservableValue patientNumberValue = new WritableValue("",
         String.class);
-    private IObservableValue visitSelectionValue = new WritableValue("",
-        String.class);
     private IObservableValue plateToScanValue = new WritableValue("",
         String.class);
     private IObservableValue scannedValue = new WritableValue(Boolean.FALSE,
@@ -90,7 +87,6 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
 
     private Text patientNumberText;
     private Text plateToScanText;
-    private CCombo comboVisits;
     private ComboViewer viewerVisits;
 
     private CancelConfirmWidget cancelConfirmWidget;
@@ -141,6 +137,7 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
 
         cancelConfirmWidget = new CancelConfirmWidget(form.getBody(), this,
             true);
+        cancelConfirmWidget.showCloseButton(true);
 
         UpdateValueStrategy uvs = new UpdateValueStrategy();
         uvs.setAfterConvertValidator(new IValidator() {
@@ -361,6 +358,7 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
                 setVisitsList();
             }
         });
+
         patientNumberText.addKeyListener(EnterKeyToNextFieldListener.INSTANCE);
         patientNumberText.addFocusListener(new FocusAdapter() {
             @Override
@@ -397,17 +395,13 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
     }
 
     private void createVisitCombo(Composite compositeFields) {
-        comboVisits = (CCombo) createBoundWidgetWithLabel(compositeFields,
-            CCombo.class, SWT.READ_ONLY | SWT.BORDER | SWT.FLAT, "Visits",
-            new String[0], visitSelectionValue, NonEmptyString.class,
-            "A visit should be selected");
+        viewerVisits = createCComboViewerWithNoSelectionValidator(
+            compositeFields, "Visits", null, "A visit should be selected");
         GridData gridData = new GridData();
         gridData.grabExcessHorizontalSpace = true;
         gridData.horizontalAlignment = SWT.FILL;
-        comboVisits.setLayoutData(gridData);
+        viewerVisits.getCCombo().setLayoutData(gridData);
 
-        viewerVisits = new ComboViewer(comboVisits);
-        viewerVisits.setContentProvider(new ArrayContentProvider());
         viewerVisits.setLabelProvider(new LabelProvider() {
             @Override
             public String getText(Object element) {
@@ -416,7 +410,7 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
                     pv.getDateDrawn());
             }
         });
-        comboVisits.addKeyListener(new KeyAdapter() {
+        viewerVisits.getCCombo().addKeyListener(new KeyAdapter() {
             @Override
             public void keyReleased(KeyEvent e) {
                 if (e.keyCode == 13) {
@@ -427,16 +421,23 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
     }
 
     protected void setVisitsList() {
-        currentPatient = SiteUtils.getPatientInSite(appService,
-            patientNumberText.getText(), SessionManager.getInstance()
-                .getCurrentSite());
+        currentPatient = null;
+        try {
+            currentPatient = PatientWrapper.getPatientInSite(appService,
+                patientNumberText.getText(), SessionManager.getInstance()
+                    .getCurrentSite());
+        } catch (ApplicationException e) {
+            BioBankPlugin.openError("Error getting the patient", e);
+        }
         if (currentPatient != null) {
             // show visits list
             Collection<PatientVisit> collection = currentPatient
                 .getPatientVisitCollection();
             viewerVisits.setInput(collection);
-            comboVisits.select(0);
-            comboVisits.setListVisible(true);
+            viewerVisits.getCCombo().select(0);
+            viewerVisits.getCCombo().setListVisible(true);
+        } else {
+            viewerVisits.setInput(null);
         }
     }
 

@@ -22,6 +22,10 @@ public class SiteCombo extends ControlContribution {
     private List<Site> sites;
     public Combo combo;
 
+    public SiteCombo() {
+        super("Site Selection");
+    }
+
     public SiteCombo(String str) {
         super(str);
     }
@@ -74,11 +78,14 @@ public class SiteCombo extends ControlContribution {
             combo.add(site.getName());
         }
         combo.select(0);
-
     }
 
     public void setValue(int index) {
         combo.select(index);
+    }
+
+    public void setEnabled(boolean enabled) {
+        combo.setEnabled(enabled);
     }
 
 }

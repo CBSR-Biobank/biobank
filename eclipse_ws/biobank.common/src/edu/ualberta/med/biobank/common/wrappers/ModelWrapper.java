@@ -12,12 +12,19 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
+import java.util.List;
+
+import org.springframework.util.Assert;
 
 public abstract class ModelWrapper<E> {
 
     protected WritableApplicationService appService;
 
     protected E wrappedObject;
+
+    public E getWrappedObject() {
+        return wrappedObject;
+    }
 
     protected PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(
         this);
@@ -59,10 +66,32 @@ public abstract class ModelWrapper<E> {
         }
     }
 
-    protected abstract void firePropertyChanges(E oldValue, E wrappedObject2);
+    /**
+     * When retrieve the values from the database, need to fire the
+     * modifications for the different objects contained in the wrapped object
+     */
+    protected abstract void firePropertyChanges(E oldWrappedObject,
+        E newWrappedObject);
 
-    protected abstract void internalReload() throws Exception;
+    private void internalReload() throws Exception {
+        Class<E> classType = getWrappedClass();
+        Constructor<E> constructor = classType.getConstructor();
+        Object instance = constructor.newInstance();
+        Method setIdMethod = classType.getMethod("setId", Integer.class);
+        setIdMethod.invoke(instance, getId());
 
+        List<E> list = appService.search(classType, instance);
+        if (list.size() == 0)
+            wrappedObject = null;
+        Assert.isTrue(list.size() == 1);
+        wrappedObject = list.get(0);
+    }
+
+    protected abstract Class<E> getWrappedClass();
+
+    /**
+     * insert or update the object into the database
+     */
     @SuppressWarnings("unchecked")
     public DatabaseResult persist() throws ApplicationException {
         DatabaseResult checkResult = persistChecks();
@@ -93,13 +122,9 @@ public abstract class ModelWrapper<E> {
     }
 
     @SuppressWarnings("unchecked")
-    protected E getNewObject() {
+    protected E getNewObject() throws Exception {
         Class<E> wrappedClass = (Class<E>) wrappedObject.getClass();
-        try {
-            Constructor<E> constructor = wrappedClass.getConstructor();
-            return constructor.newInstance();
-        } catch (Exception e) {
-        }
-        return null;
+        Constructor<E> constructor = wrappedClass.getConstructor();
+        return constructor.newInstance();
     }
 }
