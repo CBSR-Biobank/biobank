@@ -140,7 +140,7 @@ public class StudyViewForm extends BiobankViewForm {
     }
 
     private void createPvDataSection() {
-        Section section = createSection("Patient Visit Information Collected");
+        createSection("Patient Visit Information Collected");
 
         // FIXME this information can be displayed in a better way
         //

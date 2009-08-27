@@ -1,7 +1,5 @@
 package edu.ualberta.med.biobank.dialogs;
 
-import java.util.HashMap;
-
 import org.eclipse.core.databinding.beans.PojoObservables;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
@@ -18,15 +16,10 @@ import edu.ualberta.med.biobank.validators.NonEmptyString;
 public class SampleTypeDialog extends BiobankDialog {
 
     private static final String TITLE = " Sample Type ";
-
-    private static final String MSG_NEW_ST_OK = "Create a new sample type.";
-    private static final String MSG_ST_OK = "Edit a sample type.";
     private static final String MSG_NO_ST_NAME = "Sample type must have a name.";
     private static final String MSG_NO_ST_SNAME = "Sample type must have a short name.";
 
     private SampleType sampleType;
-
-    private HashMap<String, SampleType> sampleTypeMap;
 
     public SampleTypeDialog(Shell parent, SampleType sampleType) {
         super(parent);
