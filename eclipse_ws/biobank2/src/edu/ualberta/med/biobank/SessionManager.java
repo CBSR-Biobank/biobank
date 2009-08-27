@@ -226,7 +226,7 @@ public class SessionManager {
     }
 
     public void openViewForm(Object o) {
-
+        rootNode.findModelObject(o);
     }
 
     public void setCurrentSite(Site site) {

@@ -129,4 +129,9 @@ public class PatientAdapter extends AdapterBase {
     public AdapterBase accept(NodeSearchVisitor visitor) {
         return visitor.visit(this);
     }
+
+    @Override
+    protected Object getModelObject() {
+        return patientWrapper.getPatient();
+    }
 }

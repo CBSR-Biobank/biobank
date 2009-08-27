@@ -180,4 +180,9 @@ public class SiteAdapter extends AdapterBase {
         return visitor.visit(this);
     }
 
+    @Override
+    protected Object getModelObject() {
+        return site;
+    }
+
 }

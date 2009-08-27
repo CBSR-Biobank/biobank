@@ -75,17 +75,6 @@ public class NodeSearchVisitor {
         return visitChildren(study);
     }
 
-    public AdapterBase visit(PatientGroup pGroup) {
-        return visitChildren(pGroup);
-    }
-
-    public AdapterBase visit(PatientSubGroup pGroup) {
-        if (typeSearched == Patient.class) {
-            return pGroup.getChild(id, true);
-        }
-        return visitChildren(pGroup);
-    }
-
     public AdapterBase visit(PatientAdapter patient) {
         if (typeSearched == PatientVisit.class) {
             return patient.getChild(id, true);

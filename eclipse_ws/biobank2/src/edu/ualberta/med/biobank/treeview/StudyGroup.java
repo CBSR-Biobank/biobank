@@ -89,4 +89,9 @@ public class StudyGroup extends AdapterBase {
     public String getTitle() {
         return null;
     }
+
+    @Override
+    protected Object getModelObject() {
+        return null;
+    }
 }

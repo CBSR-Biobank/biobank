@@ -112,4 +112,9 @@ public class ClinicAdapter extends AdapterBase {
         return null;
     }
 
+    @Override
+    protected Object getModelObject() {
+        return clinic;
+    }
+
 }

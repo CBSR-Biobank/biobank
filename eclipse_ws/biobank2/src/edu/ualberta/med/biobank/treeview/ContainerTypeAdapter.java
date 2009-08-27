@@ -90,4 +90,9 @@ public class ContainerTypeAdapter extends AdapterBase {
         return null;
     }
 
+    @Override
+    protected Object getModelObject() {
+        return containerType;
+    }
+
 }

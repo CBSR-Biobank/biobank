@@ -162,4 +162,9 @@ public class SessionAdapter extends AdapterBase {
         }
         return "";
     }
+
+    @Override
+    protected Object getModelObject() {
+        return null;
+    }
 }

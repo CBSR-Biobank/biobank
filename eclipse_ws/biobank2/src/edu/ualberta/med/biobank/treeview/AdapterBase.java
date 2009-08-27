@@ -205,7 +205,7 @@ public abstract class AdapterBase {
             return null;
 
         for (AdapterBase child : children) {
-            if (child.getName() != null && child.getName().equals(name))
+            if ((child.getName() != null) && child.getName().equals(name))
                 return child;
         }
         return null;
@@ -304,4 +304,10 @@ public abstract class AdapterBase {
     public RootNode getRootNode() {
         return getParentFromClass(RootNode.class);
     }
+
+    public AdapterBase findModelObject(Object o) {
+        return null;
+    }
+
+    protected abstract Object getModelObject();
 }

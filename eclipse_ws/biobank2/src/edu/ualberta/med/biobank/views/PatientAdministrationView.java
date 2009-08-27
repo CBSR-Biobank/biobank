@@ -164,6 +164,11 @@ public class PatientAdministrationView extends ViewPart {
                 public AdapterBase accept(NodeSearchVisitor visitor) {
                     return null;
                 }
+
+                @Override
+                protected Object getModelObject() {
+                    return null;
+                }
             };
         }
         return noPatientFoundAdapter;

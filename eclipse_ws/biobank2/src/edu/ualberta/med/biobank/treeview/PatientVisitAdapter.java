@@ -125,4 +125,9 @@ public class PatientVisitAdapter extends AdapterBase {
         return selectedSample;
     }
 
+    @Override
+    protected Object getModelObject() {
+        return patientVisit;
+    }
+
 }

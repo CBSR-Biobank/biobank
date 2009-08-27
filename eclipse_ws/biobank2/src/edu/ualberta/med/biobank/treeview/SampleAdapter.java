@@ -15,69 +15,74 @@ import edu.ualberta.med.biobank.model.Sample;
 
 public class SampleAdapter extends AdapterBase {
 
-	private Sample sample;
+    private Sample sample;
 
-	public SampleAdapter(AdapterBase parent, Sample sample) {
-		super(parent);
-		this.sample = sample;
-	}
+    public SampleAdapter(AdapterBase parent, Sample sample) {
+        super(parent);
+        this.sample = sample;
+    }
 
-	public void setSample(Sample sample) {
-		this.sample = sample;
-	}
+    public void setSample(Sample sample) {
+        this.sample = sample;
+    }
 
-	public Sample getSample() {
-		return sample;
-	}
+    public Sample getSample() {
+        return sample;
+    }
 
-	@Override
-	public void addChild(AdapterBase child) {
-		Assert.isTrue(false, "Cannot add children to this adapter");
-	}
+    @Override
+    public void addChild(AdapterBase child) {
+        Assert.isTrue(false, "Cannot add children to this adapter");
+    }
 
-	@Override
-	public Integer getId() {
-		Assert.isNotNull(sample, "Sample is null");
-		return sample.getId();
-	}
+    @Override
+    public Integer getId() {
+        Assert.isNotNull(sample, "Sample is null");
+        return sample.getId();
+    }
 
-	@Override
-	public String getName() {
-		Assert.isNotNull(sample, "Clinic is null");
-		return sample.getInventoryId();
-	}
+    @Override
+    public String getName() {
+        Assert.isNotNull(sample, "Clinic is null");
+        return sample.getInventoryId();
+    }
 
-	@Override
-	public String getTitle() {
-		return getTitle("Sample");
-	}
+    @Override
+    public String getTitle() {
+        return getTitle("Sample");
+    }
 
-	@Override
-	public void performDoubleClick() {
-		openForm(new FormInput(this), SampleViewForm.ID);
-	}
+    @Override
+    public void performDoubleClick() {
+        openForm(new FormInput(this), SampleViewForm.ID);
+    }
 
-	@Override
-	public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-		MenuItem mi = new MenuItem(menu, SWT.PUSH);
-		mi.setText("View Sample");
-		mi.addSelectionListener(new SelectionListener() {
-			public void widgetSelected(SelectionEvent event) {
-				openForm(new FormInput(SampleAdapter.this), SampleViewForm.ID);
-			}
+    @Override
+    public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
+        MenuItem mi = new MenuItem(menu, SWT.PUSH);
+        mi.setText("View Sample");
+        mi.addSelectionListener(new SelectionListener() {
+            public void widgetSelected(SelectionEvent event) {
+                openForm(new FormInput(SampleAdapter.this), SampleViewForm.ID);
+            }
 
-			public void widgetDefaultSelected(SelectionEvent e) {
-			}
-		});
-	}
+            public void widgetDefaultSelected(SelectionEvent e) {
+            }
+        });
+    }
 
-	@Override
-	public void loadChildren(boolean updateNode) {
-	}
+    @Override
+    public void loadChildren(boolean updateNode) {
+    }
 
-	@Override
-	public AdapterBase accept(NodeSearchVisitor visitor) {
-		return null;
-	}
+    @Override
+    public AdapterBase accept(NodeSearchVisitor visitor) {
+        return null;
+    }
+
+    @Override
+    protected Object getModelObject() {
+        return sample;
+    }
 
 }

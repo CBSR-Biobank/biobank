@@ -51,4 +51,9 @@ public class RootNode extends AdapterBase {
             treeViewer.expandToLevel(child, 1);
         }
     }
+
+    @Override
+    protected Object getModelObject() {
+        return null;
+    }
 }
