@@ -26,6 +26,10 @@ public abstract class ModelWrapper<E> {
         this.appService = appService;
         this.wrappedObject = wrappedObject;
     }
+    
+    public E getWrappedObject() {
+        return wrappedObject;
+    }
 
     public void addPropertyChangeListener(String propertyName,
         PropertyChangeListener listener) {
