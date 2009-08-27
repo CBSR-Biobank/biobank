@@ -205,7 +205,7 @@ public abstract class AdapterBase {
             return null;
 
         for (AdapterBase child : children) {
-            if (child.getName() != null && child.getName().equals(name))
+            if ((child.getName() != null) && child.getName().equals(name))
                 return child;
         }
         return null;

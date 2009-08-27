@@ -48,7 +48,6 @@ import edu.ualberta.med.biobank.widgets.ScanPalletWidget;
 import edu.ualberta.med.biobank.widgets.ViewContainerWidget;
 import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
 import gov.nih.nci.system.applicationservice.ApplicationException;
-import gov.nih.nci.system.query.SDKQuery;
 
 public class ScanAssignEntryForm extends AbstractPatientAdminForm {
 
@@ -471,7 +470,7 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
 
     @Override
     protected void saveForm() throws Exception {
-        SDKQuery query;
+        // SDKQuery query;
         // if (currentPalletWrapper.isNew()) {
         // query = new
         // InsertExampleQuery(currentPalletWrapper.getWrappedObject());

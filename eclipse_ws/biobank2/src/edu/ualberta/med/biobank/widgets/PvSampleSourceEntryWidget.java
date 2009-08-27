@@ -9,7 +9,6 @@ import java.util.Set;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -29,7 +28,6 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.dialogs.PvSampleSourceDialog;
 import edu.ualberta.med.biobank.model.PvSampleSource;
 import edu.ualberta.med.biobank.model.SampleSource;
-import edu.ualberta.med.biobank.widgets.infotables.BiobankCollectionModel;
 import edu.ualberta.med.biobank.widgets.infotables.PvSampleSourceInfoTable;
 import edu.ualberta.med.biobank.widgets.listener.BiobankEntryFormWidgetListener;
 import edu.ualberta.med.biobank.widgets.listener.MultiSelectEvent;
@@ -54,8 +52,8 @@ public class PvSampleSourceEntryWidget extends BiobankWidget {
      * @param parent a composite control which will be the parent of the new
      *            instance (cannot be null)
      * @param style the style of control to construct
-     * @param pvSampleSourceCollection the sample storage already selected and to
-     *            be displayed in the table viewer (can be null).
+     * @param pvSampleSourceCollection the sample storage already selected and
+     *            to be displayed in the table viewer (can be null).
      * @param toolkit The toolkit is responsible for creating SWT controls
      *            adapted to work in Eclipse forms. If widget is not used in a
      *            form this parameter should be null.
@@ -142,12 +140,7 @@ public class PvSampleSourceEntryWidget extends BiobankWidget {
         item.setText("Edit");
         item.addSelectionListener(new SelectionListener() {
             public void widgetSelected(SelectionEvent event) {
-                IStructuredSelection stSelection = (IStructuredSelection) pvSampleSourceTable
-                    .getTableViewer().getSelection();
-
-                BiobankCollectionModel item = (BiobankCollectionModel) stSelection
-                    .getFirstElement();
-                PvSampleSource pvss = (PvSampleSource) item.o;
+                PvSampleSource pvss = pvSampleSourceTable.getSelection();
 
                 Set<SampleSource> allowedSampleSources = getNonDuplicateSampleSources();
                 allowedSampleSources.add(pvss.getSampleSource());
@@ -162,12 +155,7 @@ public class PvSampleSourceEntryWidget extends BiobankWidget {
         item.setText("Delete");
         item.addSelectionListener(new SelectionListener() {
             public void widgetSelected(SelectionEvent event) {
-                IStructuredSelection stSelection = (IStructuredSelection) pvSampleSourceTable
-                    .getTableViewer().getSelection();
-
-                BiobankCollectionModel item = (BiobankCollectionModel) stSelection
-                    .getFirstElement();
-                PvSampleSource pvss = (PvSampleSource) item.o;
+                PvSampleSource pvss = pvSampleSourceTable.getSelection();
 
                 boolean confirm = MessageDialog.openConfirm(PlatformUI
                     .getWorkbench().getActiveWorkbenchWindow().getShell(),

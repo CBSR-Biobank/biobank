@@ -1,7 +1,5 @@
 package edu.ualberta.med.biobank.dialogs;
 
-import java.util.HashMap;
-
 import org.eclipse.core.databinding.beans.PojoObservables;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
@@ -17,16 +15,12 @@ import edu.ualberta.med.biobank.validators.NonEmptyString;
 
 public class SampleTypeDialog extends BiobankDialog {
 
-    private static final String TITLE = " Sample Type ";
+    private static final String TITLE = "Sample Type ";
 
-    private static final String MSG_NEW_ST_OK = "Create a new sample type.";
-    private static final String MSG_ST_OK = "Edit a sample type.";
     private static final String MSG_NO_ST_NAME = "Sample type must have a name.";
     private static final String MSG_NO_ST_SNAME = "Sample type must have a short name.";
 
     private SampleType sampleType;
-
-    private HashMap<String, SampleType> sampleTypeMap;
 
     public SampleTypeDialog(Shell parent, SampleType sampleType) {
         super(parent);
@@ -59,13 +53,16 @@ public class SampleTypeDialog extends BiobankDialog {
         client.setLayout(layout);
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-        createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Name", null,
-            PojoObservables.observeValue(sampleType, "name"),
+        Control c = createBoundWidgetWithLabel(client, Text.class, SWT.BORDER,
+            "Name", null, PojoObservables.observeValue(sampleType, "name"),
             NonEmptyString.class, MSG_NO_ST_NAME);
+        GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
+        gd.widthHint = 200;
+        c.setLayoutData(gd);
 
-        createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Short Name",
-            null, PojoObservables.observeValue(sampleType, "nameShort"),
-            NonEmptyString.class, MSG_NO_ST_SNAME);
+        createBoundWidgetWithLabel(client, Text.class, SWT.BORDER,
+            "Short Name", null, PojoObservables.observeValue(sampleType,
+                "nameShort"), NonEmptyString.class, MSG_NO_ST_SNAME);
 
         return client;
     }

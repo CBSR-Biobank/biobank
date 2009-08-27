@@ -10,56 +10,55 @@ import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.utils.ModelUtils;
-import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.Study;
-import edu.ualberta.med.biobank.model.StudyClinicInfo;
+import edu.ualberta.med.biobank.model.StudyContactAndPatientInfo;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
-public class StudyClinicInfoTable extends InfoTableWidget<Clinic> {
+/**
+ * Used to display clinic and contact information. Meant to be used by
+ * StudyViewForm only.
+ */
+public class StudyContactInfoTable extends InfoTableWidget<Contact> {
 
     private static final String[] headings = new String[] { "Clinic",
-        "#Patients", "#Patient Visits", "Contact Name", "Title", "Email",
-        "Phone #", "Fax #" };
+        "#Patients", "#Patient Visits", "Contact Name", "Title" };
 
-    private static final int[] bounds = new int[] { 100, 80, 100, 150, 150,
-        100, 100, 100 };
+    private static final int[] bounds = new int[] { 100, 80, 100, 150, 150 };
 
     private Study study;
 
     private WritableApplicationService appService;
 
-    public StudyClinicInfoTable(Composite parent,
-        WritableApplicationService appService, Study study) throws Exception {
+    public StudyContactInfoTable(Composite parent,
+        WritableApplicationService appService, Study study) {
         super(parent, null, headings, bounds);
         this.appService = appService;
         this.study = study;
-        setCollection(ModelUtils.getStudyClinicCollection(appService, study));
+        setCollection(study.getContactCollection());
     }
 
     @Override
-    public void setCollection(final Collection<Clinic> collection) {
+    public void setCollection(final Collection<Contact> collection) {
         Thread t = new Thread() {
             @Override
             public void run() {
                 try {
                     model.clear();
                     BiobankCollectionModel item;
-                    for (Clinic clinic : ModelUtils.getStudyClinicCollection(
-                        appService, study)) {
+                    for (Contact contact : collection) {
                         if (getTableViewer().getTable().isDisposed()) {
                             return;
                         }
                         item = new BiobankCollectionModel();
-                        StudyClinicInfo info = new StudyClinicInfo();
+                        StudyContactAndPatientInfo info = new StudyContactAndPatientInfo();
                         item.o = info;
                         model.add(item);
 
-                        info.clinic = clinic;
-                        info.clinicName = clinic.getName();
+                        info.contact = contact;
+                        info.clinicName = contact.getClinic().getName();
 
                         HQLCriteria c = new HQLCriteria(
                             "select distinct patients"
@@ -71,7 +70,8 @@ public class StudyClinicInfoTable extends InfoTableWidget<Clinic> {
                                 + " inner join visits.clinic as clinic"
                                 + " where study=? and clinic=?"
                                 + " group by patients", Arrays
-                                .asList(new Object[] { study, clinic }));
+                                .asList(new Object[] { study,
+                                    contact.getClinic() }));
 
                         List<Patient> result1 = appService.query(c);
                         info.patients = result1.size();
@@ -85,26 +85,13 @@ public class StudyClinicInfoTable extends InfoTableWidget<Clinic> {
                                 + " inner join patients.patientVisitCollection as visits"
                                 + " inner join visits.clinic as clinic"
                                 + " where study=? and clinic=?", Arrays
-                                .asList(new Object[] { study, clinic }));
+                                .asList(new Object[] { study,
+                                    contact.getClinic() }));
 
                         List<Long> results = appService.query(c);
                         Assert.isTrue(results.size() == 1,
                             "Invalid size for HQL query");
                         info.patientVisits = results.get(0);
-
-                        c = new HQLCriteria(
-                            "select clinic from "
-                                + Contact.class.getName()
-                                + " as contacts"
-                                + " inner join contacts.clinic as clinic"
-                                + " where clinic = ? and contacts.studyCollection.id = ?",
-                            Arrays
-                                .asList(new Object[] { clinic, study.getId() }));
-
-                        List<Contact> cresults = appService.query(c);
-                        Assert.isTrue(cresults.size() == 1,
-                            "Invalid size for HQL query");
-                        info.contact = cresults.get(0);
                     }
 
                     getTableViewer().getTable().getDisplay().asyncExec(

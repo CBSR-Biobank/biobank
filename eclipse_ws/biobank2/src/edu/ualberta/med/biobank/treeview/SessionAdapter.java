@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.treeview;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.jface.viewers.TreeViewer;
@@ -16,6 +17,7 @@ import org.springframework.remoting.RemoteAccessException;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.model.SiteComparator;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -106,20 +108,24 @@ public class SessionAdapter extends AdapterBase {
             // read from database again
             Site siteSearch = new Site();
             List<Site> result = appService.search(Site.class, siteSearch);
+            Collections.sort(result, new SiteComparator());
+            Site currentSite = SessionManager.getInstance().getCurrentSite();
             for (Site site : result) {
-                SessionManager.getLogger()
-                    .trace(
+                if (currentSite == null
+                    || site.getName().equals(currentSite.getName())) {
+                    SessionManager.getLogger().trace(
                         "updateSites: Site " + site.getId() + ": "
                             + site.getName());
 
-                SiteAdapter node = (SiteAdapter) getChild(site.getId());
-                if (node == null) {
-                    node = new SiteAdapter(this, site);
-                    addChild(node);
-                }
-                if (updateNode) {
-                    SessionManager.getInstance().getTreeViewer().update(node,
-                        null);
+                    SiteAdapter node = (SiteAdapter) getChild(site.getId());
+                    if (node == null) {
+                        node = new SiteAdapter(this, site);
+                        addChild(node);
+                    }
+                    if (updateNode) {
+                        SessionManager.getInstance().getTreeViewer().update(
+                            node, null);
+                    }
                 }
             }
         } catch (final RemoteAccessException exp) {
@@ -133,6 +139,11 @@ public class SessionAdapter extends AdapterBase {
     @Override
     public AdapterBase accept(NodeSearchVisitor visitor) {
         return visitor.visit(this);
+    }
+
+    public void rebuild() {
+        removeAll();
+        loadChildren(false);
     }
 
     @Override

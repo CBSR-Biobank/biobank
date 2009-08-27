@@ -56,7 +56,8 @@ public class SampleTypeEntryWidget extends BiobankWidget {
      */
     public SampleTypeEntryWidget(Composite parent, int style,
         Collection<SampleType> sampleTypeCollection,
-        Collection<SampleType> conflictTypes, FormToolkit toolkit) {
+        Collection<SampleType> conflictTypes, String buttonLabel,
+        FormToolkit toolkit) {
         super(parent, style);
         Assert.isNotNull(toolkit, "toolkit is null");
 
@@ -73,6 +74,8 @@ public class SampleTypeEntryWidget extends BiobankWidget {
 
         sampleTypeTable = new SampleTypeInfoTable(parent, selectedSampleTypes);
         sampleTypeTable.adaptToToolkit(toolkit, true);
+        GridData gd = (GridData) sampleTypeTable.getLayoutData();
+        gd.heightHint = 230;
 
         addTableMenu();
         sampleTypeTable
@@ -83,7 +86,7 @@ public class SampleTypeEntryWidget extends BiobankWidget {
                 }
             });
 
-        addSampleTypeButton = toolkit.createButton(parent, "Add Sample Type",
+        addSampleTypeButton = toolkit.createButton(parent, buttonLabel,
             SWT.PUSH);
         addSampleTypeButton.addSelectionListener(new SelectionAdapter() {
             @Override

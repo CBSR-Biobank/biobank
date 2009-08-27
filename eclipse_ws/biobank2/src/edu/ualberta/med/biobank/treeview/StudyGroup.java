@@ -1,6 +1,8 @@
 package edu.ualberta.med.biobank.treeview;
 
-import java.util.Collection;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.TreeViewer;
@@ -17,6 +19,7 @@ import edu.ualberta.med.biobank.forms.StudyEntryForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
+import edu.ualberta.med.biobank.model.StudyComparator;
 
 public class StudyGroup extends AdapterBase {
 
@@ -40,6 +43,7 @@ public class StudyGroup extends AdapterBase {
         mi.addSelectionListener(new SelectionListener() {
             public void widgetSelected(SelectionEvent event) {
                 Study study = new Study();
+                study.setSite(getParentFromClass(SiteAdapter.class).getSite());
                 StudyAdapter adapter = new StudyAdapter(StudyGroup.this, study);
                 openForm(new FormInput(adapter), StudyEntryForm.ID);
             }
@@ -59,7 +63,9 @@ public class StudyGroup extends AdapterBase {
                 Site.class, currentSite.getId());
             ((SiteAdapter) getParent()).setSite(currentSite);
 
-            Collection<Study> studies = currentSite.getStudyCollection();
+            List<Study> studies = new ArrayList<Study>(currentSite
+                .getStudyCollection());
+            Collections.sort(studies, new StudyComparator());
             for (Study study : studies) {
                 StudyAdapter node = (StudyAdapter) getChild(study.getId());
 

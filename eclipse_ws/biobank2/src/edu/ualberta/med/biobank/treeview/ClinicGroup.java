@@ -1,6 +1,8 @@
 package edu.ualberta.med.biobank.treeview;
 
-import java.util.Collection;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.TreeViewer;
@@ -18,6 +20,7 @@ import edu.ualberta.med.biobank.common.utils.ModelUtils;
 import edu.ualberta.med.biobank.forms.ClinicEntryForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Clinic;
+import edu.ualberta.med.biobank.model.ClinicComparator;
 import edu.ualberta.med.biobank.model.Site;
 
 public class ClinicGroup extends AdapterBase {
@@ -65,12 +68,10 @@ public class ClinicGroup extends AdapterBase {
                 Site.class, currentSite.getId());
             ((SiteAdapter) getParent()).setSite(currentSite);
 
-            Collection<Clinic> clinics = currentSite.getClinicCollection();
+            List<Clinic> clinics = new ArrayList<Clinic>(currentSite
+                .getClinicCollection());
+            Collections.sort(clinics, new ClinicComparator());
             for (Clinic clinic : clinics) {
-                SessionManager.getLogger().trace(
-                    "updateStudies: Clinic " + clinic.getId() + ": "
-                        + clinic.getName());
-
                 ClinicAdapter node = (ClinicAdapter) getChild(clinic.getId());
 
                 if (node == null) {

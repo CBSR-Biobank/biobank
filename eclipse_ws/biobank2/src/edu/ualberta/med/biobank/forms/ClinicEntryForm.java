@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.forms;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -58,7 +59,7 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
     };
 
     @Override
-    protected void init() {
+    protected void init() throws Exception {
         Assert.isTrue((adapter instanceof ClinicAdapter),
             "Invalid editor input: object of type "
                 + adapter.getClass().getName());
@@ -251,11 +252,9 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
     private boolean checkClinicNameUnique() throws ApplicationException {
         Site site = clinicAdapter.getParentFromClass(SiteAdapter.class)
             .getSite();
-        HQLCriteria c = new HQLCriteria(
-            "from edu.ualberta.med.biobank.model.Clinic as clinic "
-                + "inner join fetch clinic.site " + "where clinic.site.id='"
-                + site.getId() + "' " + "and clinic.name = '"
-                + clinic.getName() + "'");
+        HQLCriteria c = new HQLCriteria("from " + Clinic.class.getName()
+            + " where site= ? and clinic.name = ?", Arrays.asList(new Object[] {
+            site, clinic.getName() }));
 
         List<Object> results = appService.query(c);
         if (results.size() == 0)

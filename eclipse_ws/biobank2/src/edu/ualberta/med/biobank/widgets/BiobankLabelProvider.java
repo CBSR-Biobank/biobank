@@ -24,7 +24,8 @@ import edu.ualberta.med.biobank.model.SampleSource;
 import edu.ualberta.med.biobank.model.SampleStorage;
 import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.model.Study;
-import edu.ualberta.med.biobank.model.StudyClinicInfo;
+import edu.ualberta.med.biobank.model.StudyContactAndPatientInfo;
+import edu.ualberta.med.biobank.model.StudyContactInfo;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.widgets.infotables.BiobankCollectionModel;
 
@@ -177,8 +178,8 @@ public class BiobankLabelProvider extends LabelProvider implements
                     return "" + info.patientVisits;
                 return "";
             }
-        } else if (element instanceof StudyClinicInfo) {
-            StudyClinicInfo info = (StudyClinicInfo) element;
+        } else if (element instanceof StudyContactAndPatientInfo) {
+            StudyContactAndPatientInfo info = (StudyContactAndPatientInfo) element;
             switch (columnIndex) {
             case 0:
                 if (info.clinicName != null)
@@ -190,32 +191,17 @@ public class BiobankLabelProvider extends LabelProvider implements
                 if (info.patientVisits != null)
                     return "" + info.patientVisits;
                 return "";
-
-            case 3:
+            default:
+            }
+            return getContactColumnIndex(info.contact, columnIndex - 2);
+        } else if (element instanceof StudyContactInfo) {
+            StudyContactInfo info = (StudyContactInfo) element;
+            if (columnIndex == 0) {
                 if (info.contact != null)
-                    return "" + info.contact.getName();
-                return "";
-
-            case 4:
-                if (info.contact != null)
-                    return "" + info.contact.getTitle();
-                return "";
-
-            case 5:
-                if (info.contact != null)
-                    return "" + info.contact.getEmailAddress();
-                return "";
-
-            case 6:
-                if (info.contact != null)
-                    return "" + info.contact.getPhoneNumber();
-                return "";
-
-            case 7:
-                if (info.contact != null)
-                    return "" + info.contact.getFaxNumber();
+                    return info.contact.getClinic().getName();
                 return "";
             }
+            return getContactColumnIndex(info.contact, columnIndex);
         } else if (element instanceof SampleSource) {
             SampleSource info = (SampleSource) element;
             if (columnIndex == 0) {
@@ -267,4 +253,31 @@ public class BiobankLabelProvider extends LabelProvider implements
     public boolean isLabelProperty(Object element, String property) {
         return false;
     }
+
+    private String getContactColumnIndex(Contact contact, int columnIndex) {
+        switch (columnIndex) {
+        case 1:
+            if ((contact != null) && (contact.getName() != null))
+                return "" + contact.getName();
+            break;
+        case 2:
+            if ((contact != null) && (contact.getTitle() != null))
+                return "" + contact.getTitle();
+            break;
+        case 3:
+            if ((contact != null) && (contact.getEmailAddress() != null))
+                return "" + contact.getEmailAddress();
+            break;
+        case 4:
+            if ((contact != null) && (contact.getPhoneNumber() != null))
+                return "" + contact.getPhoneNumber();
+            break;
+        case 5:
+            if ((contact != null) && (contact.getFaxNumber() != null))
+                return "" + contact.getFaxNumber();
+            break;
+        }
+        return "";
+    }
+
 }

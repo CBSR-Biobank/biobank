@@ -68,7 +68,9 @@ public class SampleTypesEntryForm extends BiobankEntryForm {
     protected void createFormContent() {
         form.setText("Sample Type Information");
         form.getBody().setLayout(new GridLayout(1, false));
-        createSampleTypeSection();
+        createSiteSampleTypeSection();
+        createGlobalSampleTypeSection();
+        initCancelConfirmWidget(form.getBody());
     }
 
     @Override
@@ -153,26 +155,30 @@ public class SampleTypesEntryForm extends BiobankEntryForm {
         }
     }
 
-    private void createSampleTypeSection() {
-        Composite client = createSectionWithClient("Sample Types");
+    private void createSiteSampleTypeSection() {
+        Composite client = createSectionWithClient("Site Sample Types");
         GridLayout layout = new GridLayout(1, true);
         client.setLayout(layout);
 
         siteSampleWidget = new SampleTypeEntryWidget(client, SWT.NONE,
             new HashSet<SampleType>(siteSampleTypes), globalSampleTypes,
-            toolkit);
+            "Add Site Sample Type", toolkit);
         siteSampleWidget.adaptToToolkit(toolkit, true);
         siteSampleWidget.addSelectionChangedListener(listener);
-
         toolkit.paintBordersFor(siteSampleWidget);
+    }
+
+    private void createGlobalSampleTypeSection() {
+        Composite client = createSectionWithClient("Global Sample Types");
+        GridLayout layout = new GridLayout(1, true);
+        client.setLayout(layout);
 
         globalSampleWidget = new SampleTypeEntryWidget(client, SWT.NONE,
             new HashSet<SampleType>(globalSampleTypes), siteSampleTypes,
-            toolkit);
+            "Add Global Sample Type", toolkit);
         globalSampleWidget.adaptToToolkit(toolkit, true);
         globalSampleWidget.addSelectionChangedListener(listener);
-
-        initCancelConfirmWidget(client);
+        toolkit.paintBordersFor(globalSampleWidget);
     }
 
     @Override

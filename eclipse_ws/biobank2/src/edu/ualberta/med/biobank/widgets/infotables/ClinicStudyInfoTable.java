@@ -64,10 +64,9 @@ public class ClinicStudyInfoTable extends InfoTableWidget<Study> {
                                 + " inner join study.patientCollection as patients"
                                 + " inner join patients.patientVisitCollection as visits"
                                 + " inner join visits.clinic as clinic"
-                                + " where study.id=? and clinic.id=?");
-
-                        c.setParameters(Arrays.asList(new Object[] {
-                            study.getId(), clinic.getId() }));
+                                + " where study.id=? and clinic.id=?", Arrays
+                                .asList(new Object[] { study.getId(),
+                                    clinic.getId() }));
 
                         List<Patient> result1 = appService.query(c);
                         info.patients = result1.size();
@@ -78,10 +77,9 @@ public class ClinicStudyInfoTable extends InfoTableWidget<Study> {
                                 + " inner join study.patientCollection as patients"
                                 + " inner join patients.patientVisitCollection as visit"
                                 + " inner join visit.clinic as clinic"
-                                + " where study.id=? and clinic.id=?");
-
-                        c.setParameters(Arrays.asList(new Object[] {
-                            study.getId(), clinic.getId() }));
+                                + " where study.id=? and clinic.id=?", Arrays
+                                .asList(new Object[] { study.getId(),
+                                    clinic.getId() }));
 
                         List<Long> results = appService.query(c);
                         Assert.isTrue(results.size() == 1,
