@@ -15,10 +15,12 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.PartInitException;
 
+import edu.ualberta.med.biobank.common.LabelingScheme;
 import edu.ualberta.med.biobank.common.utils.ModelUtils;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Capacity;
@@ -34,6 +36,9 @@ import edu.ualberta.med.biobank.widgets.ChooseContainerWidget;
 import edu.ualberta.med.biobank.widgets.infotables.SamplesListWidget;
 import edu.ualberta.med.biobank.widgets.listener.ScanPalletModificationEvent;
 import edu.ualberta.med.biobank.widgets.listener.ScanPalletModificationListener;
+import gov.nih.nci.system.applicationservice.ApplicationException;
+import gov.nih.nci.system.query.SDKQuery;
+import gov.nih.nci.system.query.example.InsertExampleQuery;
 
 public class ContainerViewForm extends BiobankViewForm {
 
@@ -66,6 +71,8 @@ public class ContainerViewForm extends BiobankViewForm {
     private CabinetDrawerWidget cabWidget;
 
     private ChooseContainerWidget containerWidget;
+
+    private ContainerType initType;
 
     ContainerCell[][] cells;
 
@@ -241,7 +248,9 @@ public class ContainerViewForm extends BiobankViewForm {
     protected void visualizeContainer() {
         // default 2 dimensional grid
         Composite client = createSectionWithClient("Container Visual");
-
+        GridLayout gl = new GridLayout();
+        gl.numColumns = 1;
+        client.setLayout(gl);
         // get occupied positions
         if (isContainerDrawer()) {
             // if Drawer, requires special grid
@@ -291,6 +300,91 @@ public class ContainerViewForm extends BiobankViewForm {
                 }
             });
         }
+        Composite initSection = toolkit.createComposite(client);
+        GridLayout gli = new GridLayout();
+        gli.numColumns = 3;
+        initSection.setLayout(gli);
+        Label comboLabel = new Label(initSection, SWT.NONE);
+        comboLabel.setText("Initialize all available containers to:");
+        final Combo init = new Combo(initSection, SWT.NONE);
+        Collection<ContainerType> containerTypes = container.getContainerType()
+            .getChildContainerTypeCollection();
+        for (ContainerType ct : containerTypes) {
+            init.add(ct.getName());
+        }
+        init.select(0);
+
+        final Button initialize = toolkit.createButton(initSection,
+            "Initialize", SWT.PUSH);
+        initialize.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                setInitType(init.getItem(init.getSelectionIndex()));
+                initContainers();
+            }
+        });
+    }
+
+    protected void setInitType(String name) {
+        Collection<ContainerType> containerTypes = container.getContainerType()
+            .getChildContainerTypeCollection();
+        for (ContainerType ct : containerTypes) {
+            if (name.compareTo(ct.getName()) == 0) {
+                initType = ct;
+                break;
+            }
+        }
+    }
+
+    public void initContainers() {
+        Collection<ContainerPosition> positions = container
+            .getChildPositionCollection();
+        int rows = container.getContainerType().getCapacity()
+            .getDimensionOneCapacity().intValue();
+        int cols = container.getContainerType().getCapacity()
+            .getDimensionTwoCapacity().intValue();
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                Boolean filled = false;
+                for (ContainerPosition pos : positions) {
+                    if (pos.getPositionDimensionOne().intValue() == i
+                        && pos.getPositionDimensionTwo().intValue() == j)
+                        filled = true;
+                }
+                if (!filled) {
+                    Container newContainer = new Container();
+
+                    newContainer.setContainerType(initType);
+                    newContainer.setFull(false);
+                    newContainer.setSite(container.getSite());
+                    newContainer.setTemperature(container.getTemperature());
+
+                    ContainerPosition newPos = new ContainerPosition();
+                    newPos.setPositionDimensionOne(new Integer(i));
+                    newPos.setPositionDimensionTwo(new Integer(j));
+                    newPos.setParentContainer(container);
+                    newContainer.setPosition(newPos);
+                    newContainer.setLabel(container.getLabel()
+                        + LabelingScheme.getPositionString(newPos));
+
+                    // insert containers/positions to db
+                    SDKQuery query;
+                    try {
+                        query = new InsertExampleQuery(newContainer);
+                        appService.executeQuery(query);
+                        containerAdapter.performExpand();
+
+                    } catch (ApplicationException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+        // refresh
+        positions = container.getChildPositionCollection();
+        container.setFull(true);
+        reload();
     }
 
     private void openFormFor(ContainerPosition pos) {
