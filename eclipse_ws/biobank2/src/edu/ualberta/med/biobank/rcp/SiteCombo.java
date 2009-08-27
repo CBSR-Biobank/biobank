@@ -25,6 +25,10 @@ public class SiteCombo extends ControlContribution {
     private SessionAdapter session;
     public Combo combo;
 
+    public SiteCombo() {
+        super("Site Selection");
+    }
+
     public SiteCombo(String str) {
         super(str);
 
@@ -97,6 +101,11 @@ public class SiteCombo extends ControlContribution {
     public void setValue(int index) {
         combo.select(index);
     }
+ 
+public void setEnabled(boolean enabled) {
+        combo.setEnabled(enabled);
+    }
+
 
     public void addChild(Site site) {
         sites.add(site);

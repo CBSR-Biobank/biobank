@@ -358,11 +358,9 @@ public class ContainerViewForm extends BiobankViewForm {
 
     protected void visualizeContainer() {
         // default 2 dimensional grid
-        int rowHeight = 40, colWidth = 40;
         Composite client = createSectionWithClient("Container Visual");
 
         // get occupied positions
-
         if (isContainerDrawer()) {
             // if Drawer, requires special grid
             cabWidget = new CabinetDrawerWidget(client);
@@ -386,28 +384,22 @@ public class ContainerViewForm extends BiobankViewForm {
             });
         } else {
             // otherwise, normal grid
-
             containerWidget = new ChooseContainerWidget(client);
-            containerWidget.setParams(container.getContainerType(),
-                containerLabelLabel);
+            containerWidget.setContainerType(container.getContainerType());
+            containerWidget.setParentLabel(containerLabelLabel.getText());
             containerWidget.initDefaultLegend();
             selectedCells = new ArrayList<ContainerCell>();
             // initListeners();
-            int dim1 = cells.length;
             int dim2 = cells[0].length;
             if (dim2 <= 1) {
                 // single dimension size
-                rowHeight = 40;
-                colWidth = 150;
+                containerWidget.setCellWidth(150);
+                containerWidget.setCellHeight(20);
                 containerWidget.setLegendOnSide(true);
             }
-            containerWidget.setGridSizes(dim1, dim2, colWidth * dim2, rowHeight
-                * dim1);
             containerWidget.setContainersStatus(cells);
             // enableSelection();
-
             containerWidget.addMouseListener(new MouseAdapter() {
-
                 @Override
                 public void mouseDown(MouseEvent e) {
                     ContainerCell cell = ((ChooseContainerWidget) e.widget)

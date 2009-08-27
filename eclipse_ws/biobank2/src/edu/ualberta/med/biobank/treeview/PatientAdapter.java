@@ -24,6 +24,12 @@ public class PatientAdapter extends AdapterBase {
 
     private PatientWrapper patientWrapper;
 
+    public PatientAdapter(AdapterBase parent, PatientWrapper patientWrapper) {
+        super(parent);
+        this.patientWrapper = patientWrapper;
+        setHasChildren(true);
+    }
+
     public PatientAdapter(AdapterBase parent, Patient patient) {
         super(parent);
         this.patientWrapper = new PatientWrapper(getAppService(), patient);
@@ -36,14 +42,14 @@ public class PatientAdapter extends AdapterBase {
 
     @Override
     public Integer getId() {
-        Assert.isNotNull(patientWrapper, "patient is null");
+        Assert.isNotNull(patientWrapper.getWrappedObject(), "patient is null");
         return patientWrapper.getId();
     }
 
     @Override
     public String getName() {
-        Assert.isNotNull(patientWrapper.getPatient(), "storage type is null");
-        return patientWrapper.getPatient().getNumber();
+        Assert.isNotNull(patientWrapper.getWrappedObject(), "patient is null");
+        return patientWrapper.getNumber();
     }
 
     @Override
@@ -102,7 +108,7 @@ public class PatientAdapter extends AdapterBase {
             // read from database again
             patientWrapper.reload();
 
-            Collection<PatientVisit> visits = patientWrapper.getPatient()
+            Collection<PatientVisit> visits = patientWrapper
                 .getPatientVisitCollection();
 
             for (PatientVisit visit : visits) {
@@ -121,7 +127,8 @@ public class PatientAdapter extends AdapterBase {
         } catch (Exception e) {
             SessionManager.getLogger().error(
                 "Error while loading children of patient "
-                    + patientWrapper.getPatient().getNumber(), e);
+                    + patientWrapper.getNumber(), e);
+            throw new RuntimeException(e);
         }
     }
 

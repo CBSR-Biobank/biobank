@@ -154,6 +154,18 @@ public class BioBankPlugin extends AbstractUIPlugin {
     }
 
     /**
+     * Display an error message with exception message and log the exception
+     */
+    public static void openError(String title, Exception e) {
+        String msg = e.getMessage();
+        if ((msg == null || msg.isEmpty()) && e.getCause() != null) {
+            msg = e.getCause().getMessage();
+        }
+        openError(title, e.getMessage());
+        log4j.error(e.getMessage(), e);
+    }
+
+    /**
      * Display an error message asynchronously
      */
     public static void openAsyncError(final String title, final String message) {
@@ -246,4 +258,5 @@ public class BioBankPlugin extends AbstractUIPlugin {
         }
         return getDefault().dateTimeFormatter;
     }
+
 }

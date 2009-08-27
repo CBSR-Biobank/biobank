@@ -16,11 +16,9 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.forms.widgets.Section;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.utils.ModelUtils;
+import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.forms.input.FormInput;
-import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.PvInfo;
 import edu.ualberta.med.biobank.model.PvInfoData;
 import edu.ualberta.med.biobank.model.PvSampleSource;
@@ -37,7 +35,7 @@ public class PatientVisitViewForm extends BiobankViewForm {
 
     private PatientVisitAdapter patientVisitAdapter;
 
-    private PatientVisit patientVisit;
+    private PatientVisitWrapper patientVisitWrapper;
 
     private SamplesListWidget samplesWidget;
 
@@ -70,18 +68,16 @@ public class PatientVisitViewForm extends BiobankViewForm {
                 + adapter.getClass().getName());
 
         patientVisitAdapter = (PatientVisitAdapter) adapter;
+        patientVisitWrapper = patientVisitAdapter.getWrapper();
         retrievePatientVisit();
 
-        setPartName("Visit "
-            + BioBankPlugin.getDateFormatter().format(
-                patientVisit.getDateDrawn()));
+        setPartName("Visit " + patientVisitWrapper.getFormattedDateDrawn());
     }
 
     @Override
     protected void createFormContent() {
         form.setText("Visit Drawn Date: "
-            + BioBankPlugin.getDateTimeFormatter().format(
-                patientVisit.getDateDrawn()));
+            + patientVisitWrapper.getFormattedDateDrawn());
         form.getBody().setLayout(new GridLayout(1, false));
         form.getBody().setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         addRefreshToolbarAction();
@@ -139,7 +135,7 @@ public class PatientVisitViewForm extends BiobankViewForm {
             combinedPvInfoMap.put(pvInfo.getId(), combinedPvInfo);
         }
 
-        Collection<PvInfoData> pvInfoDataCollection = patientVisit
+        Collection<PvInfoData> pvInfoDataCollection = patientVisitWrapper
             .getPvInfoDataCollection();
         if (pvInfoDataCollection != null) {
             for (PvInfoData pvInfoData : pvInfoDataCollection) {
@@ -186,7 +182,7 @@ public class PatientVisitViewForm extends BiobankViewForm {
     private void createSourcesSection() {
         Section section = createSection("Sources");
 
-        Collection<PvSampleSource> sources = patientVisit
+        Collection<PvSampleSource> sources = patientVisitWrapper
             .getPvSampleSourceCollection();
         PvSampleSourceInfoTable pvInfoTable = new PvSampleSourceInfoTable(
             section, sources);
@@ -195,15 +191,15 @@ public class PatientVisitViewForm extends BiobankViewForm {
 
     private void setPatientVisitValues() {
         FormUtils.setTextValue(clinicLabel,
-            patientVisit.getClinic() == null ? "" : patientVisit.getClinic()
-                .getName());
+            patientVisitWrapper.getClinic() == null ? "" : patientVisitWrapper
+                .getClinic().getName());
         // FIXME update all pvinfos ?
     }
 
     private void createSamplesSection() {
         Composite parent = createSectionWithClient("Samples");
         samplesWidget = new SamplesListWidget(parent, patientVisitAdapter
-            .getParentFromClass(SiteAdapter.class), patientVisit
+            .getParentFromClass(SiteAdapter.class), patientVisitWrapper
             .getSampleCollection());
         samplesWidget.adaptToToolkit(toolkit, true);
         samplesWidget.setSelection(patientVisitAdapter.getSelectedSample());
@@ -212,26 +208,19 @@ public class PatientVisitViewForm extends BiobankViewForm {
     @Override
     protected void reload() {
         retrievePatientVisit();
-        setPartName("Visit "
-            + BioBankPlugin.getDateFormatter().format(
-                patientVisit.getDateDrawn()));
+        setPartName("Visit " + patientVisitWrapper.getFormattedDateDrawn());
         form.setText("Visit Drawn Date: "
-            + BioBankPlugin.getDateTimeFormatter().format(
-                patientVisit.getDateDrawn()));
+            + patientVisitWrapper.getFormattedDateDrawn());
         setPatientVisitValues();
     }
 
     private void retrievePatientVisit() {
         try {
-            patientVisit = ModelUtils.getObjectWithId(patientVisitAdapter
-                .getAppService(), PatientVisit.class, patientVisitAdapter
-                .getPatientVisit().getId());
-            patientVisitAdapter.setPatientVisit(patientVisit);
+            patientVisitWrapper.reload();
         } catch (Exception ex) {
             SessionManager.getLogger().error(
                 "Error while retrieving patient visit "
-                    + patientVisitAdapter.getPatientVisit().getDateDrawn(), ex);
+                    + patientVisitWrapper.getDateDrawn(), ex);
         }
     }
-
 }

@@ -177,7 +177,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
             showtextField);
     }
 
-    public abstract void cancelForm();
+    public abstract void cancelForm() throws Exception;
 
     public String getSessionName() {
         return sessionName;
@@ -298,19 +298,19 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
      * 
      * @see BiobankLabelProvider#getColumnText
      */
-    protected ComboViewer createComboViewerWithNoSelectionValidator(
+    protected ComboViewer createCComboViewerWithNoSelectionValidator(
         Composite parent, String fieldLabel, Collection<?> input,
         String errorMessage) {
         Label label = toolkit.createLabel(parent, fieldLabel + ":", SWT.LEFT);
 
-        ComboViewer comboViewer = new ComboViewer(parent, SWT.READ_ONLY);
+        CCombo combo = new CCombo(parent, SWT.READ_ONLY);
+        ComboViewer comboViewer = new ComboViewer(combo);
         comboViewer.setContentProvider(new ArrayContentProvider());
         comboViewer.setLabelProvider(new BiobankLabelProvider());
         if (input != null) {
             comboViewer.setInput(input);
         }
 
-        Combo combo = comboViewer.getCombo();
         combo.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
         comboViewer
             .addSelectionChangedListener(new ISelectionChangedListener() {

@@ -50,11 +50,10 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
         coolBar.add(toolbar);
 
-        SiteCombo combo = new SiteCombo("Site Selection");
-        SessionManager.getInstance().setCombo(combo);
+        SiteCombo combo = new SiteCombo();
+        SessionManager.getInstance().setSiteCombo(combo);
         combo.setParent(toolbar);
 
         toolbar.add(combo);
-
     }
 }
