@@ -127,7 +127,7 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
     }
 
     @Override
-    protected void createFormContent() {
+    protected void createFormContent() throws Exception {
         form.setText("Link samples to patient visit using the scanner");
         GridLayout layout = new GridLayout(2, false);
         form.getBody().setLayout(layout);
@@ -192,7 +192,7 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
         });
     }
 
-    private void createTypesSelectionSection(Composite parent) {
+    private void createTypesSelectionSection(Composite parent) throws Exception {
         // Radio buttons
         radioComponents = toolkit.createComposite(parent);
         RowLayout compLayout = new RowLayout();
@@ -339,7 +339,7 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
         });
     }
 
-    private void createFieldsComposite() {
+    private void createFieldsComposite() throws Exception {
         Composite fieldsComposite = toolkit.createComposite(form.getBody());
         GridLayout layout = new GridLayout(2, false);
         layout.horizontalSpacing = 10;
@@ -498,14 +498,8 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
 
     }
 
-    private List<SampleType> getAllSampleTypes() {
-        try {
-            return appService.search(SampleType.class, new SampleType());
-        } catch (final RemoteConnectFailureException exp) {
-            BioBankPlugin.openRemoteConnectErrorMessage();
-        } catch (Exception exp) {
-        }
-        return null;
+    private List<SampleType> getAllSampleTypes() throws Exception {
+        return appService.search(SampleType.class, new SampleType());
     }
 
     @Override

@@ -104,10 +104,12 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
                 + adapter.getClass().getName());
 
         patientVisitAdapter = (PatientVisitAdapter) adapter;
+        patientVisitWrapper = patientVisitAdapter.getWrapper();
         retrievePatientVisit();
         String tabName;
         if (patientVisitWrapper.isNew()) {
             tabName = "New Patient Visit for patient ";
+            setDirty(true);
         } else {
             tabName = "Visit " + patientVisitWrapper.getFormattedDateDrawn();
         }
@@ -116,7 +118,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
 
     private void retrievePatientVisit() {
         try {
-            patientVisitAdapter.getWrapper().reload();
+            patientVisitWrapper.reload();
         } catch (Exception e) {
             SessionManager.getLogger().error(
                 "Error while retrieving patient visit "

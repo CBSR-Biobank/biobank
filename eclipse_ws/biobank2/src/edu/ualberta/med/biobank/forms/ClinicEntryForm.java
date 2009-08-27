@@ -1,5 +1,7 @@
 package edu.ualberta.med.biobank.forms;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.core.databinding.beans.PojoObservables;
@@ -12,15 +14,21 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.common.utils.ModelUtils;
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Clinic;
+import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.treeview.ClinicAdapter;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
+import edu.ualberta.med.biobank.widgets.ContactEntryWidget;
+import edu.ualberta.med.biobank.widgets.listener.BiobankEntryFormWidgetListener;
+import edu.ualberta.med.biobank.widgets.listener.MultiSelectEvent;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.query.SDKQuery;
 import gov.nih.nci.system.query.SDKQueryResult;
+import gov.nih.nci.system.query.example.DeleteExampleQuery;
 import gov.nih.nci.system.query.example.InsertExampleQuery;
 import gov.nih.nci.system.query.example.UpdateExampleQuery;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -37,8 +45,17 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
     private ClinicAdapter clinicAdapter;
     private Clinic clinic;
 
+    private ContactEntryWidget contactEntryWidget;
+
     protected Combo session;
     private Text name;
+
+    private BiobankEntryFormWidgetListener listener = new BiobankEntryFormWidgetListener() {
+        @Override
+        public void selectionChanged(MultiSelectEvent event) {
+            setDirty(true);
+        }
+    };
 
     @Override
     protected void init() {
@@ -46,7 +63,7 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
             "Invalid editor input: object of type "
                 + adapter.getClass().getName());
         clinicAdapter = (ClinicAdapter) adapter;
-        clinic = clinicAdapter.getClinic();
+        clinic = clinicAdapter.loadClinic();
 
         address = clinic.getAddress();
         if (address == null) {
@@ -83,6 +100,7 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
                 SWT.LEFT);
         createClinicInfoSection();
         createAddressArea();
+        createContactSection();
         createButtonsSection();
 
         // When adding help uncomment line below
@@ -113,6 +131,18 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
         GridData gd = new GridData(GridData.FILL_HORIZONTAL);
         gd.heightHint = 40;
         comment.setLayoutData(gd);
+    }
+
+    private void createContactSection() {
+        Composite client = createSectionWithClient("Contacts");
+
+        GridLayout layout = new GridLayout(1, false);
+        client.setLayout(layout);
+        client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+        contactEntryWidget = new ContactEntryWidget(client, SWT.NONE, clinic
+            .getContactCollection(), toolkit);
+        contactEntryWidget.addSelectionChangedListener(listener);
     }
 
     private void createButtonsSection() {
@@ -146,7 +176,9 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
             return;
         }
 
+        saveContacts();
         clinic.setAddress(address);
+
         if ((clinic.getId() == null) || (clinic.getId() == 0)) {
             Assert.isTrue(clinic.getAddress().getId() == null,
                 "insert invoked on address already in database");
@@ -167,8 +199,53 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
 
         result = appService.executeQuery(query);
         clinic = (Clinic) result.getObjectResult();
+
         clinicAdapter.setClinic(clinic);
         clinicAdapter.getParent().performExpand();
+    }
+
+    private void saveContacts() throws Exception {
+        SDKQuery query;
+
+        Collection<Contact> contactCollection = contactEntryWidget
+            .getContacts();
+        removeDeletedContacts(contactCollection);
+
+        for (Contact c : contactCollection) {
+            c.setClinic(clinic);
+            if ((c.getId() == null) || (c.getId() == 0)) {
+                query = new InsertExampleQuery(c);
+            } else {
+                query = new UpdateExampleQuery(c);
+            }
+
+            appService.executeQuery(query);
+        }
+    }
+
+    private void removeDeletedContacts(Collection<Contact> contactCollection)
+        throws Exception {
+        // no need to remove if clinic is not yet in the database
+        if (clinic.getId() == null)
+            return;
+
+        List<Integer> selectedContactIds = new ArrayList<Integer>();
+        for (Contact c : contactCollection) {
+            selectedContactIds.add(c.getId());
+        }
+
+        SDKQuery query;
+
+        // query from database again
+        Clinic dbClinic = ModelUtils.getObjectWithId(appService, Clinic.class,
+            clinic.getId());
+
+        for (Contact c : dbClinic.getContactCollection()) {
+            if (!selectedContactIds.contains(c.getId())) {
+                query = new DeleteExampleQuery(c);
+                appService.executeQuery(query);
+            }
+        }
     }
 
     private boolean checkClinicNameUnique() throws ApplicationException {

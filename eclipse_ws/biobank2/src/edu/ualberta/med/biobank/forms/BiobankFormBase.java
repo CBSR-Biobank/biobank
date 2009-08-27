@@ -26,7 +26,10 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.part.EditorPart;
+import org.springframework.remoting.RemoteConnectFailureException;
 
+import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -62,7 +65,7 @@ public abstract class BiobankFormBase extends EditorPart {
     }
 
     /**
-     * The initialisation method for the derived form.
+     * The initialization method for the derived form.
      * 
      * @param adapter the corresponding model adapter the form is to edit /
      *            view.
@@ -105,8 +108,11 @@ public abstract class BiobankFormBase extends EditorPart {
                 try {
                     createFormContent();
                     form.reflow(true);
+                } catch (final RemoteConnectFailureException exp) {
+                    BioBankPlugin.openRemoteConnectErrorMessage();
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    SessionManager.getLogger().error(
+                        "BioBankFormBase.createPartControl Error", e);
                 }
             }
         });
@@ -115,7 +121,7 @@ public abstract class BiobankFormBase extends EditorPart {
     /**
      * Called in a non-UI thread to create the widgets that make up the form.
      */
-    protected abstract void createFormContent();
+    protected abstract void createFormContent() throws Exception;
 
     protected Section createSection(String title) {
         Section section = toolkit.createSection(form.getBody(), Section.TWISTIE

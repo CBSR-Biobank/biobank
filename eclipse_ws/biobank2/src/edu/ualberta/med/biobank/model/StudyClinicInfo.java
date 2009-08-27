@@ -12,6 +12,8 @@ public class StudyClinicInfo {
 
     public Long patientVisits;
 
+    public Contact contact;
+
     public void performDoubleClick() {
         SessionManager.getInstance().openViewForm(clinic);
     }

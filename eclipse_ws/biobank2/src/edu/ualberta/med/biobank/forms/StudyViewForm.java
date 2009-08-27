@@ -13,9 +13,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.forms.widgets.Section;
-import org.springframework.remoting.RemoteConnectFailureException;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.utils.ModelUtils;
 import edu.ualberta.med.biobank.forms.input.FormInput;
@@ -60,7 +58,7 @@ public class StudyViewForm extends BiobankViewForm {
     }
 
     @Override
-    protected void createFormContent() {
+    protected void createFormContent() throws Exception {
         if (study.getName() != null) {
             form.setText("Study: " + study.getName());
         }
@@ -105,22 +103,15 @@ public class StudyViewForm extends BiobankViewForm {
         });
     }
 
-    private void createClinicSection() {
-        try {
-            Composite client = createSectionWithClient("Clinics");
+    private void createClinicSection() throws Exception {
+        Composite client = createSectionWithClient("Clinics");
 
-            clinicsTable = new StudyClinicInfoTable(client, appService, study);
-            clinicsTable.adaptToToolkit(toolkit, true);
-            toolkit.paintBordersFor(clinicsTable);
+        clinicsTable = new StudyClinicInfoTable(client, appService, study);
+        clinicsTable.adaptToToolkit(toolkit, true);
+        toolkit.paintBordersFor(clinicsTable);
 
-            clinicsTable.getTableViewer().addDoubleClickListener(
-                FormUtils.getBiobankCollectionDoubleClickListener());
-        } catch (final RemoteConnectFailureException exp) {
-            BioBankPlugin.openRemoteConnectErrorMessage();
-        } catch (Exception e) {
-            SessionManager.getLogger().error(
-                "Error while retrieving the clinic", e);
-        }
+        clinicsTable.getTableViewer().addDoubleClickListener(
+            FormUtils.getBiobankCollectionDoubleClickListener());
     }
 
     private void setStudySectionValues() {
@@ -185,24 +176,17 @@ public class StudyViewForm extends BiobankViewForm {
     }
 
     @Override
-    protected void reload() {
-        try {
-            retrieveStudy();
-            setPartName("Study " + study.getNameShort());
-            form.setText("Study: " + study.getName());
-            setStudySectionValues();
-            AdapterBase clinicGroupNode = ((SiteAdapter) studyAdapter
-                .getParent().getParent()).getClinicGroupNode();
-            clinicsTable.getTableViewer().setInput(
-                FormUtils.getClinicsAdapters(clinicGroupNode, ModelUtils
-                    .getStudyClinicCollection(appService, study)));
-            // pvInfosTable.getTableViewer().setInput(getStudyPvInfo());
-        } catch (final RemoteConnectFailureException exp) {
-            BioBankPlugin.openRemoteConnectErrorMessage();
-        } catch (Exception e) {
-            SessionManager.getLogger().error(
-                "Error while retrieving the clinic", e);
-        }
+    protected void reload() throws Exception {
+        retrieveStudy();
+        setPartName("Study " + study.getNameShort());
+        form.setText("Study: " + study.getName());
+        setStudySectionValues();
+        AdapterBase clinicGroupNode = ((SiteAdapter) studyAdapter.getParent()
+            .getParent()).getClinicGroupNode();
+        clinicsTable.getTableViewer().setInput(
+            FormUtils.getClinicsAdapters(clinicGroupNode, ModelUtils
+                .getStudyClinicCollection(appService, study)));
+        // pvInfosTable.getTableViewer().setInput(getStudyPvInfo());
     }
 
     private void retrieveStudy() {

@@ -115,16 +115,14 @@ public class SampleStorageEntryWidget extends BiobankWidget {
     private Set<SampleType> getNonDuplicateSampleTypes() {
         Set<SampleType> sampleTypes = new HashSet<SampleType>(allSampleTypes);
         Set<SampleType> dupSampleTypes = new HashSet<SampleType>();
-        Collection<SampleStorage> currentSampleStorage = sampleStorageTable
-            .getCollection();
 
         // get the IDs of the selected sample types
         List<Integer> sampleTypeIds = new ArrayList<Integer>();
-        for (SampleStorage ss : currentSampleStorage) {
+        for (SampleStorage ss : sampleStorageTable.getCollection()) {
             sampleTypeIds.add(ss.getSampleType().getId());
         }
 
-        for (SampleType stype : sampleTypes) {
+        for (SampleType stype : allSampleTypes) {
             if (sampleTypeIds.contains(stype.getId())) {
                 dupSampleTypes.add(stype);
             }
@@ -173,7 +171,7 @@ public class SampleStorageEntryWidget extends BiobankWidget {
                     .getWorkbench().getActiveWorkbenchWindow().getShell(),
                     "Delete Sample Storage",
                     "Are you sure you want to delete sample storage \""
-                        + sampleStorage.getSampleType().getName() + "\"");
+                        + sampleStorage.getSampleType().getName() + "\"?");
 
                 if (confirm) {
                     Collection<SampleStorage> ssToDelete = new HashSet<SampleStorage>();

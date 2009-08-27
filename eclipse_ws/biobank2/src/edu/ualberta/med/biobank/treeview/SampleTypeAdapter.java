@@ -57,6 +57,6 @@ public class SampleTypeAdapter extends AdapterBase {
 
     @Override
     public String getTitle() {
-        return null;
+        return getTitle("Sample Type");
     }
 }
