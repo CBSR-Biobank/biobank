@@ -75,7 +75,7 @@ public class TopContainerChooserPage extends AbstractContainerChooserPage {
             List<ContainerType> types = ModelUtils.queryProperty(
                 getAppService(), ContainerType.class, "name", "Freezer", false);
             if (types.size() > 0) {
-                containerWidget.setParams(types.get(0), null);
+                containerWidget.setContainerType(types.get(0));
             }
         } catch (ApplicationException e) {
             // TODO Auto-generated catch block

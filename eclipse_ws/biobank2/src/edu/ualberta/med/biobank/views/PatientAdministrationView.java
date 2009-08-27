@@ -15,7 +15,7 @@ import org.eclipse.ui.part.ViewPart;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.utils.SiteUtils;
+import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.forms.PatientEntryForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Patient;
@@ -26,6 +26,7 @@ import edu.ualberta.med.biobank.treeview.RootNode;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
 import edu.ualberta.med.biobank.widgets.AdapterTreeWidget;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class PatientAdministrationView extends ViewPart {
 
@@ -78,26 +79,31 @@ public class PatientAdministrationView extends ViewPart {
     protected void searchPatient() {
         getSite().getPage().closeAllEditors(true);
         String number = patientNumberText.getText();
-        Patient patient = SiteUtils.getPatientInSite(SessionManager
-            .getAppService(), number, SessionManager.getInstance()
-            .getCurrentSite());
-        if (patient == null) {
+        try {
+            PatientWrapper patientWrapper = PatientWrapper
+                .getPatientWrapperInSite(SessionManager.getAppService(),
+                    number, SessionManager.getInstance().getCurrentSite());
+            if (patientWrapper == null) {
+                notFoundPatient(number);
+            } else {
+                showPatientInTree(patientWrapper);
+            }
+        } catch (ApplicationException ae) {
+            BioBankPlugin.openError("Search error", ae);
             notFoundPatient(number);
-        } else {
-            showPatientInTree(patient);
         }
     }
 
-    public void showPatientInTree(Patient patient) {
+    public void showPatientInTree(PatientWrapper patientWrapper) {
         getRootNode().removeAll();
-        SiteAdapter siteAdapter = new SiteAdapter(getRootNode(), patient
+        SiteAdapter siteAdapter = new SiteAdapter(getRootNode(), patientWrapper
             .getStudy().getSite(), false);
         getRootNode().addChild(siteAdapter);
-        StudyAdapter studyAdapter = new StudyAdapter(siteAdapter, patient
-            .getStudy(), false);
+        StudyAdapter studyAdapter = new StudyAdapter(siteAdapter,
+            patientWrapper.getStudy(), false);
         siteAdapter.addChild(studyAdapter);
         PatientAdapter patientAdapter = new PatientAdapter(studyAdapter,
-            patient);
+            patientWrapper);
         studyAdapter.addChild(patientAdapter);
         patientAdapter.performExpand();
     }
@@ -162,11 +168,6 @@ public class PatientAdministrationView extends ViewPart {
 
                 @Override
                 public AdapterBase accept(NodeSearchVisitor visitor) {
-                    return null;
-                }
-
-                @Override
-                protected Object getModelObject() {
                     return null;
                 }
             };

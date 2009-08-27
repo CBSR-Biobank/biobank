@@ -7,9 +7,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
-import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerType;
-import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.Sample;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
@@ -52,57 +50,14 @@ public class SiteUtils {
         return null;
     }
 
-    public static Patient getPatientInSite(
-        WritableApplicationService appService, String patientNumber, Site site) {
-        HQLCriteria criteria = new HQLCriteria("from "
-            + Patient.class.getName() + " where study.site = ? and number = ?",
-            Arrays.asList(new Object[] { site, patientNumber }));
-        List<Patient> patients;
-        try {
-            patients = appService.query(criteria);
-            if (patients.size() == 1) {
-                return patients.get(0);
-            }
-        } catch (ApplicationException e) {
-            logger.error("Problem while queriyng a patient", e);
-        }
-        return null;
-    }
-
-    public static List<Container> getContainersInSite(
-        WritableApplicationService appService, Site site, String label)
+    public static List<ContainerType> getContainerTypesInSite(
+        WritableApplicationService appService, Site site, String nameStartWith)
         throws ApplicationException {
-        HQLCriteria criteria = new HQLCriteria("from "
-            + Container.class.getName() + " where site = ? and label = ?",
-            Arrays.asList(new Object[] { site, label }));
+        HQLCriteria criteria = new HQLCriteria(
+            "from " + ContainerType.class.getName()
+                + " where name like ? and site = ?", Arrays
+                .asList(new Object[] { nameStartWith + "%", site }));
         return appService.query(criteria);
-    }
-
-    public static Container getContainerWithTypeInSite(
-        WritableApplicationService appService, Site site, String label,
-        String startWithTypeName) throws ApplicationException {
-        List<Container> containers = getContainersInSite(appService, site,
-            label);
-        if (containers.size() == 1) {
-            return containers.get(0);
-        } else {
-            // this is start of the container type name
-            if (startWithTypeName != null) {
-                HQLCriteria criteria = new HQLCriteria("from "
-                    + ContainerType.class.getName() + " where name like '"
-                    + startWithTypeName + "%'");
-                List<ContainerType> cTypes = appService.query(criteria);
-                if (cTypes.size() > 0) {
-                    for (Container c : containers) {
-                        if (c.getContainerType().getId().equals(
-                            cTypes.get(0).getId())) {
-                            return c;
-                        }
-                    }
-                }
-            }
-        }
-        return null;
     }
 
     public static Collection<ContainerType> getTopContainerTypesInSite(
@@ -118,4 +73,5 @@ public class SiteUtils {
         }
         return Collections.emptyList();
     }
+
 }

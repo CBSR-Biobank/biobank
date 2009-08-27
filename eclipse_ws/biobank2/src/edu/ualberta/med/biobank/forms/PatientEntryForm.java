@@ -1,16 +1,14 @@
 package edu.ualberta.med.biobank.forms;
 
+import java.util.Collection;
+
 import org.eclipse.core.databinding.beans.BeansObservables;
-import org.eclipse.core.databinding.observable.value.IObservableValue;
-import org.eclipse.core.databinding.observable.value.WritableValue;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.IMessageProvider;
-import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -39,9 +37,6 @@ public class PatientEntryForm extends BiobankEntryForm {
 
     private PatientAdapter patientAdapter;
 
-    private IObservableValue studySelectedValue = new WritableValue("",
-        String.class);
-
     private Site site;
 
     private ComboViewer studiesViewer;
@@ -58,8 +53,7 @@ public class PatientEntryForm extends BiobankEntryForm {
         if (patientAdapter.getWrapper().isNew()) {
             tabName = "New Patient";
         } else {
-            tabName = "Patient "
-                + patientAdapter.getWrapper().getPatient().getNumber();
+            tabName = "Patient " + patientAdapter.getWrapper().getNumber();
         }
         setPartName(tabName);
     }
@@ -72,6 +66,10 @@ public class PatientEntryForm extends BiobankEntryForm {
 
         createPatientSection();
         initCancelConfirmWidget(form.getBody());
+
+        if (patientAdapter.getWrapper().isNew()) {
+            setDirty(true);
+        }
     }
 
     private void createPatientSection() {
@@ -87,13 +85,8 @@ public class PatientEntryForm extends BiobankEntryForm {
         site = SessionManager.getInstance().getCurrentSite();
         labelSite.setText(site.getName());
 
-        CCombo comboStudies = (CCombo) createBoundWidgetWithLabel(client,
-            CCombo.class, SWT.READ_ONLY | SWT.BORDER | SWT.FLAT, "Study",
-            new String[0], studySelectedValue, NonEmptyString.class,
-            "A study should be selected");
-
-        studiesViewer = new ComboViewer(comboStudies);
-        studiesViewer.setContentProvider(new ArrayContentProvider());
+        studiesViewer = createCComboViewerWithNoSelectionValidator(client,
+            "Study", null, "A study should be selected");
         studiesViewer.setLabelProvider(new LabelProvider() {
             @Override
             public String getText(Object element) {
@@ -101,7 +94,11 @@ public class PatientEntryForm extends BiobankEntryForm {
                 return study.getNameShort() + " - " + study.getName();
             }
         });
-        studiesViewer.setInput(site.getStudyCollection());
+        Collection<Study> studies = site.getStudyCollection();
+        studiesViewer.setInput(studies);
+        if (patientAdapter.getWrapper().isNew() && studies.size() == 1) {
+            studiesViewer.getCCombo().select(0);
+        }
 
         createBoundWidgetWithLabel(client, Text.class, SWT.NONE,
             "Patient Number", null, BeansObservables.observeValue(
@@ -128,18 +125,13 @@ public class PatientEntryForm extends BiobankEntryForm {
             setDirty(true);
         }
         PatientAdministrationView.currentInstance
-            .showPatientInTree(patientAdapter.getWrapper().getPatient());
+            .showPatientInTree(patientAdapter.getWrapper());
 
     }
 
     @Override
-    public void cancelForm() {
-        try {
-            patientAdapter.getWrapper().reset();
-        } catch (Exception e) {
-            SessionManager.getLogger().error(
-                "can't reset the patient with id " + patientAdapter.getId());
-        }
+    public void cancelForm() throws Exception {
+        patientAdapter.getWrapper().reset();
     }
 
     @Override

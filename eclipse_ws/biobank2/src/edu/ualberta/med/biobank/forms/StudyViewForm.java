@@ -140,7 +140,9 @@ public class StudyViewForm extends BiobankViewForm {
     }
 
     private void createPvDataSection() {
-        Section section = createSection("Patient Visit Information Collected");
+        // Section section =
+        // createSection("Patient Visit Information Collected");
+        createSection("Patient Visit Information Collected");
 
         // FIXME this information can be displayed in a better way
         //
@@ -157,6 +159,8 @@ public class StudyViewForm extends BiobankViewForm {
         // FormUtils.getBiobankCollectionDoubleClickListener());
     }
 
+    // FIXME remove suppress warnings when code is change to use this method
+    @SuppressWarnings("unused")
     private PvInfo[] getStudyPvInfo() {
         // hack required here because study.getXxxCollection().toArray(new
         // Xxx[0]) returns Object[].

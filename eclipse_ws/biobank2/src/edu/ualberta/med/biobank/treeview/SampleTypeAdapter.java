@@ -59,9 +59,4 @@ public class SampleTypeAdapter extends AdapterBase {
     public String getTitle() {
         return getTitle("Sample Type");
     }
-
-    @Override
-    protected Object getModelObject() {
-        return sampleType;
-    }
 }

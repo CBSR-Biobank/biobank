@@ -200,12 +200,9 @@ public class ContainerTypeViewForm extends BiobankViewForm {
     }
 
     protected void visualizeContainer() {
-        // default 2 dimensional grid
-        int rowHeight = 40, colWidth = 40;
         Composite client = createSectionWithClient("Container Visual");
-
         // get occupied positions
-        if (containerType.getName().equalsIgnoreCase("Drawer")) {
+        if (containerType.getName().startsWith("Drawer")) {
             // if Drawer, requires special grid
             CabinetDrawerWidget containerWidget = new CabinetDrawerWidget(
                 client);
@@ -218,21 +215,16 @@ public class ContainerTypeViewForm extends BiobankViewForm {
             // otherwise, normal grid
             ChooseContainerWidget containerWidget = new ChooseContainerWidget(
                 client);
-            containerWidget.setParams(containerType, null);
+            containerWidget.setContainerType(containerType);
 
-            int dim1 = containerType.getCapacity().getDimensionOneCapacity()
-                .intValue();
             int dim2 = containerType.getCapacity().getDimensionTwoCapacity()
                 .intValue();
             if (dim2 <= 1) {
                 // single dimension size
-                rowHeight = 40;
-                colWidth = 150;
+                containerWidget.setCellWidth(150);
+                containerWidget.setCellHeight(20);
                 containerWidget.setLegendOnSide(true);
             }
-
-            containerWidget.setGridSizes(dim1, dim2, colWidth * dim2, rowHeight
-                * dim1);
         }
     }
 

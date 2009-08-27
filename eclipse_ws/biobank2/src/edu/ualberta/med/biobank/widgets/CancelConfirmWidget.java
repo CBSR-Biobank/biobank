@@ -13,6 +13,7 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.forms.BiobankEntryForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
@@ -25,6 +26,8 @@ public class CancelConfirmWidget extends BiobankWidget {
 
     private Button cancelButton;
 
+    private Button closeButton;
+
     private BiobankEntryForm form;
 
     public CancelConfirmWidget(Composite parent, BiobankEntryForm form) {
@@ -34,12 +37,13 @@ public class CancelConfirmWidget extends BiobankWidget {
     public CancelConfirmWidget(Composite parent, BiobankEntryForm form,
         boolean showTextField) {
         super(parent, SWT.NONE);
-        setLayout(new GridLayout(3, false));
+        setLayout(new GridLayout(4, false));
         this.form = form;
 
         createContents();
 
         showTextField(showTextField);
+        showCloseButton(false);
     }
 
     private void createContents() {
@@ -53,21 +57,15 @@ public class CancelConfirmWidget extends BiobankWidget {
             public void keyPressed(KeyEvent e) {
                 if (e.keyCode == 13) {
                     String text = ((Text) e.widget).getText();
-                    try {
-                        if (BioBankPlugin.getDefault().isConfirmBarcode(text)
-                            && confirmButton.isEnabled()) {
-                            confirm();
-                        } else if (BioBankPlugin.getDefault().isCancelBarcode(
-                            text)) {
-                            cancel();
-                        }
-                    } catch (Exception ex) {
-                        throw new RuntimeException(ex);
+                    if (BioBankPlugin.getDefault().isConfirmBarcode(text)
+                        && confirmButton.isEnabled()) {
+                        confirm();
+                    } else if (BioBankPlugin.getDefault().isCancelBarcode(text)) {
+                        cancel();
                     }
                 }
             }
         });
-        confirmCancelText.setVisible(false);
 
         cancelButton = form.getToolkit().createButton(this, "Cancel", SWT.PUSH);
         cancelButton.addSelectionListener(new SelectionAdapter() {
@@ -85,29 +83,57 @@ public class CancelConfirmWidget extends BiobankWidget {
                 confirm();
             }
         });
+
+        closeButton = form.getToolkit().createButton(this, "Close", SWT.PUSH);
+        gd = new GridData();
+        closeButton.setLayoutData(gd);
+        closeButton.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                close();
+            }
+        });
         adaptToToolkit(form.getToolkit(), true);
     }
 
-    private void confirm() {
+    protected void close() {
         PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage()
-            .saveEditor(form, false);
-        if (!form.isDirty()) {
+            .closeEditor(form, true);
+    }
+
+    private void confirm() {
+        try {
             PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-                .getActivePage().closeEditor(form, true);
-            if (form.getNextOpenedFormID() != null) {
-                AdapterBase.openForm(new FormInput(form.getAdapter()), form
-                    .getNextOpenedFormID());
+                .getActivePage().saveEditor(form, false);
+            if (!form.isDirty()) {
+                PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+                    .getActivePage().closeEditor(form, true);
+                if (form.getNextOpenedFormID() != null) {
+                    AdapterBase.openForm(new FormInput(form.getAdapter()), form
+                        .getNextOpenedFormID());
+                }
             }
+        } catch (Exception e) {
+            SessionManager.getLogger().error("Can't save the form", e);
         }
     }
 
     private void cancel() {
-        form.cancelForm();
+        try {
+            form.cancelForm();
+        } catch (Exception e) {
+            SessionManager.getLogger().error("Can't reset the form", e);
+        }
     }
 
     public void showTextField(boolean show) {
         ((GridData) confirmCancelText.getLayoutData()).exclude = !show;
         confirmCancelText.setVisible(show);
+    }
+
+    public void showCloseButton(boolean show) {
+        ((GridData) closeButton.getLayoutData()).exclude = !show;
+        closeButton.setVisible(show);
     }
 
     public void setConfirmEnabled(boolean enabled) {

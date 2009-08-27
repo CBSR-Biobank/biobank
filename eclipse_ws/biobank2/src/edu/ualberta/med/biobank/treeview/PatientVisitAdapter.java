@@ -1,8 +1,6 @@
 package edu.ualberta.med.biobank.treeview;
 
-import java.text.SimpleDateFormat;
 import java.util.Collection;
-import java.util.Date;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.TreeViewer;
@@ -13,7 +11,7 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.forms.PatientVisitEntryForm;
 import edu.ualberta.med.biobank.forms.PatientVisitViewForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
@@ -22,7 +20,7 @@ import edu.ualberta.med.biobank.model.Sample;
 
 public class PatientVisitAdapter extends AdapterBase {
 
-    private PatientVisit patientVisit;
+    private PatientVisitWrapper patientVisitWrapper;
 
     /**
      * Sample selected in this patient visit
@@ -31,35 +29,37 @@ public class PatientVisitAdapter extends AdapterBase {
 
     public PatientVisitAdapter(AdapterBase parent, PatientVisit patientVisit) {
         super(parent);
-        this.patientVisit = patientVisit;
+        this.patientVisitWrapper = new PatientVisitWrapper(getAppService(),
+            patientVisit);
     }
 
-    public PatientVisit getPatientVisit() {
-        return patientVisit;
+    public PatientVisitAdapter(AdapterBase parent,
+        PatientVisitWrapper patientVisitWrapper) {
+        super(parent);
+        this.patientVisitWrapper = patientVisitWrapper;
+    }
+
+    public PatientVisitWrapper getWrapper() {
+        return patientVisitWrapper;
     }
 
     @Override
     public Integer getId() {
-        Assert.isNotNull(patientVisit, "patientVisit is null");
-        return patientVisit.getId();
+        Assert.isNotNull(patientVisitWrapper.getWrappedObject(),
+            "patientVisit is null");
+        return patientVisitWrapper.getId();
     }
 
     @Override
     public String getName() {
-        Assert.isNotNull(patientVisit, "patientVisit is null");
-        Date date = patientVisit.getDateDrawn();
-        // Assert.isNotNull(date, "patient visid drawn date is null");
-        if (date != null) {
-            SimpleDateFormat sdf = new SimpleDateFormat(
-                BioBankPlugin.DATE_TIME_FORMAT);
-            return sdf.format(date);
-        }
-        return null;
+        Assert.isNotNull(patientVisitWrapper.getWrappedObject(),
+            "patientVisit is null");
+        return patientVisitWrapper.getFormattedDateDrawn();
     }
 
     @Override
     public String getTreeText() {
-        Collection<Sample> samples = patientVisit.getSampleCollection();
+        Collection<Sample> samples = patientVisitWrapper.getSampleCollection();
         int total = 0;
         if (samples != null) {
             total = samples.size();
@@ -113,21 +113,12 @@ public class PatientVisitAdapter extends AdapterBase {
         return visitor.visit(this);
     }
 
-    public void setPatientVisit(PatientVisit patientVisit) {
-        this.patientVisit = patientVisit;
-    }
-
     public void setSelectedSample(Sample sample) {
         this.selectedSample = sample;
     }
 
     public Sample getSelectedSample() {
         return selectedSample;
-    }
-
-    @Override
-    protected Object getModelObject() {
-        return patientVisit;
     }
 
 }

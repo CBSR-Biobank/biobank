@@ -128,9 +128,4 @@ public class ContainerAdapter extends AdapterBase {
         return getName();
     }
 
-    @Override
-    protected Object getModelObject() {
-        return container;
-    }
-
 }

@@ -119,9 +119,8 @@ public class ModelUtils {
             ContainerType type = container.getContainerType();
             // FIXME use the labelling of the container !
             if (type.getName().equals("Bin")) {
-                String binPosition =
-                    LabelingScheme.rowColToTwoCharAlpha(new RowColPos(dim1,
-                        dim2), type.getCapacity());
+                String binPosition = LabelingScheme.rowColToCBSRTwoChar(
+                    new RowColPos(dim1, dim2), type.getCapacity());
                 return position.getContainer().getLabel() + binPosition;
             }
             else if (type.getName().equals("Pallet")) {

@@ -127,6 +127,7 @@ public class InitExamples {
                             throw new OperationCanceledException();
                     }
                 } catch (Exception e) {
+                    e.printStackTrace();
                     return Status.CANCEL_STATUS;
                 } finally {
                     monitor.done();
@@ -347,21 +348,12 @@ public class InitExamples {
         container.setSite(site);
         container.setContainerType(ct);
         if (parent != null) {
-            String labelingScheme = parent.getContainerType()
-                .getChildLabelingScheme().getName();
-
-            RowColPos rc;
-            if (labelingScheme.equals("2 char numeric")) {
-                rc = LabelingScheme.twoCharNumericToRowCol(parent
-                    .getContainerType(), container.getLabel());
-            } else if (labelingScheme.equals("CBSR 2 char alphabetic")) {
-                rc = LabelingScheme.twoCharAlphaToRowCol(parent
-                    .getContainerType(), container.getLabel());
-            } else {
-                throw new Exception("Invalid child labeling scheme: "
-                    + labelingScheme);
+            RowColPos rc = LabelingScheme.getRowColFromPositionString(container
+                .getLabel(), parent.getContainerType());
+            if (rc == null) {
+                throw new Exception(
+                    "error while getting the position from string");
             }
-
             ContainerPosition pos = new ContainerPosition();
             pos.setContainer(container);
             pos.setParentContainer(parent);

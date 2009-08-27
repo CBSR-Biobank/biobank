@@ -49,7 +49,8 @@ public class ChooseContainerWidget extends AbstractGridContainerWidget {
 
     public void setContainersStatus(ContainerCell[][] cells) {
         this.cells = cells;
-        legendWidth = maxWidth / legendStatus.size();
+        computeSize(-1, -1);
+        legendWidth = gridWidth / legendStatus.size();
         redraw();
     }
 

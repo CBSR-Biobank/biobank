@@ -13,7 +13,7 @@ public class ClinicStudyInfo {
     public Long patientVisits;
 
     public void performDoubleClick() {
-        SessionManager.getInstance().openViewForm(study);
+        SessionManager.getInstance().openViewForm(study, study.getId());
     }
 
 }

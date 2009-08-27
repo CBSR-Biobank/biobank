@@ -109,9 +109,4 @@ public class StudyAdapter extends AdapterBase {
         return visitor.visit(this);
     }
 
-    @Override
-    protected Object getModelObject() {
-        return study;
-    }
-
 }

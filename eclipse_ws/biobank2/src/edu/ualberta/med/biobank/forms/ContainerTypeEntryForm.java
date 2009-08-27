@@ -173,7 +173,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
             List<ContainerLabelingScheme> schemes = appService.search(
                 ContainerLabelingScheme.class, new ContainerLabelingScheme());
 
-            labelingSchemeComboViewer = createComboViewerWithNoSelectionValidator(
+            labelingSchemeComboViewer = createCComboViewerWithNoSelectionValidator(
                 client, "Child Labeling Scheme", schemes,
                 MSG_CHILD_LABELING_SCHEME_EMPTY);
             ContainerLabelingScheme currentScheme = containerType

@@ -80,9 +80,4 @@ public class SampleAdapter extends AdapterBase {
         return null;
     }
 
-    @Override
-    protected Object getModelObject() {
-        return sample;
-    }
-
 }

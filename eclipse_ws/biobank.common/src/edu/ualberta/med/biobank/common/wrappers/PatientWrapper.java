@@ -1,11 +1,13 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.DatabaseResult;
-import edu.ualberta.med.biobank.common.utils.ModelUtils;
 import edu.ualberta.med.biobank.model.Patient;
+import edu.ualberta.med.biobank.model.PatientVisit;
+import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -26,7 +28,9 @@ public class PatientWrapper extends ModelWrapper<Patient> {
     }
 
     public void setNumber(String number) {
+        String oldNumber = getNumber();
         wrappedObject.setNumber(number);
+        propertyChangeSupport.firePropertyChange("number", oldNumber, number);
     }
 
     public Study getStudy() {
@@ -34,13 +38,9 @@ public class PatientWrapper extends ModelWrapper<Patient> {
     }
 
     public void setStudy(Study study) {
+        String oldStudy = getNumber();
         wrappedObject.setStudy(study);
-    }
-
-    @Override
-    protected void internalReload() throws Exception {
-        wrappedObject = ModelUtils.getObjectWithId(appService, Patient.class,
-            getId());
+        propertyChangeSupport.firePropertyChange("study", oldStudy, study);
     }
 
     public boolean checkPatientNumberUnique() throws ApplicationException {
@@ -55,10 +55,16 @@ public class PatientWrapper extends ModelWrapper<Patient> {
         return true;
     }
 
+    /**
+     * When retrieve the values from the database, need to fire the
+     * modifications for the different objects contained in the wrapped object
+     */
     @Override
-    protected void firePropertyChanges(Patient oldValue, Patient wrappedObject) {
-        propertyChangeSupport.firePropertyChange("number",
-            oldValue.getNumber(), wrappedObject.getNumber());
+    protected void firePropertyChanges(Patient oldPatient, Patient newpatient) {
+        propertyChangeSupport.firePropertyChange("number", oldPatient
+            .getNumber(), newpatient.getNumber());
+        propertyChangeSupport.firePropertyChange("study",
+            oldPatient.getStudy(), newpatient.getStudy());
     }
 
     @Override
@@ -70,4 +76,36 @@ public class PatientWrapper extends ModelWrapper<Patient> {
             + "\" already exists.");
     }
 
+    public Collection<PatientVisit> getPatientVisitCollection() {
+        return wrappedObject.getPatientVisitCollection();
+    }
+
+    public static PatientWrapper getPatientWrapperInSite(
+        WritableApplicationService appService, String patientNumber, Site site)
+        throws ApplicationException {
+        Patient patient = getPatientInSite(appService, patientNumber, site);
+        if (patient != null) {
+            return new PatientWrapper(appService, patient);
+        }
+        return null;
+    }
+
+    public static Patient getPatientInSite(
+        WritableApplicationService appService, String patientNumber, Site site)
+        throws ApplicationException {
+        HQLCriteria criteria = new HQLCriteria("from "
+            + Patient.class.getName() + " where study.site = ? and number = ?",
+            Arrays.asList(new Object[] { site, patientNumber }));
+        List<Patient> patients;
+        patients = appService.query(criteria);
+        if (patients.size() == 1) {
+            return patients.get(0);
+        }
+        return null;
+    }
+
+    @Override
+    protected Class<Patient> getWrappedClass() {
+        return Patient.class;
+    }
 }

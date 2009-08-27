@@ -569,7 +569,7 @@
                   </reference>
                </visibleWhen>                  
             </command>
-         </toolbar>         
+         </toolbar>  
          <toolbar
                id="edu.ualberta.med.biobank.toolbar.patientsPerspective">
             <command
@@ -789,6 +789,7 @@
       <editor
             class="edu.ualberta.med.biobank.forms.ScanAssignEntryForm"
             default="false"
+            icon="icons/scanAssign.png"
             id="edu.ualberta.med.biobank.forms.ScanAssignEntryForm"
             name="Scan Assign Entry">
       </editor>
@@ -810,12 +811,6 @@
             default="false"
             id="edu.ualberta.med.biobank.forms.SampleTypesEntryForm"
             name="View Sample Types">
-      </editor>
-      <editor
-            class="edu.ualberta.med.biobank.forms.SampleTypeEntryForm"
-            default="false"
-            id="edu.ualberta.med.biobank.forms.SampleTypeEntryForm"
-            name="Edit Sample Types">
       </editor>
    </extension>
    <extension
@@ -959,6 +954,33 @@
                variable="edu.ualberta.med.biobank.sourceprovider.siteSelectionState">
             <equals
                   value="true">
+            </equals>
+         </with>
+      </definition>
+      <definition
+            id="biobank2.scanLinkEditorActive">
+         <with
+               variable="activeEditorId">
+            <equals
+                  value="edu.ualberta.med.biobank.forms.ScanLinkEntryForm">
+            </equals>
+         </with>
+      </definition>
+      <definition
+            id="biobank2.scanAssignEditorActive">
+         <with
+               variable="activeEditorId">
+            <equals
+                  value="edu.ualberta.med.biobank.forms.ScanAssignEntryForm">
+            </equals>
+         </with>
+      </definition>
+      <definition
+            id="biobank2.cabinetLinkAssignEditorActive">
+         <with
+               variable="activeEditorId">
+            <equals
+                  value="edu.ualberta.med.biobank.forms.CabinetLinkAssignEntryForm">
             </equals>
          </with>
       </definition>

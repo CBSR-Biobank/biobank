@@ -304,10 +304,4 @@ public abstract class AdapterBase {
     public RootNode getRootNode() {
         return getParentFromClass(RootNode.class);
     }
-
-    public AdapterBase findModelObject(Object o) {
-        return null;
-    }
-
-    protected abstract Object getModelObject();
 }

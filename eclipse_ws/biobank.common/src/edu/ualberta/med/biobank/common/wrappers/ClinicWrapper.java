@@ -4,7 +4,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.DatabaseResult;
-import edu.ualberta.med.biobank.common.utils.ModelUtils;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Site;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -42,12 +41,6 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
         wrappedObject.setSite(site);
     }
 
-    @Override
-    protected void internalReload() throws Exception {
-        wrappedObject = ModelUtils.getObjectWithId(appService, Clinic.class,
-            getId());
-    }
-
     public boolean checkClinicNameUnique() throws ApplicationException {
         if (isNew()) {
             HQLCriteria c = new HQLCriteria("from " + Clinic.class.getName()
@@ -74,6 +67,11 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
         }
         return new DatabaseResult("A clinic with name \"" + getName()
             + "\" already exists.");
+    }
+
+    @Override
+    protected Class<Clinic> getWrappedClass() {
+        return Clinic.class;
     }
 
 }

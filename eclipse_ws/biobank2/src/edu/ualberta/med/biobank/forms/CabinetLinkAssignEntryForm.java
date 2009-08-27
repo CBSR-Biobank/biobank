@@ -35,7 +35,8 @@ import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.utils.SiteUtils;
+import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
+import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.forms.listener.EnterKeyToNextFieldListener;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerType;
@@ -48,6 +49,7 @@ import edu.ualberta.med.biobank.validators.NonEmptyString;
 import edu.ualberta.med.biobank.widgets.CabinetDrawerWidget;
 import edu.ualberta.med.biobank.widgets.CancelConfirmWidget;
 import edu.ualberta.med.biobank.widgets.ViewContainerWidget;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.query.example.InsertExampleQuery;
 
 public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
@@ -104,9 +106,10 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
         cancelConfirmWidget = new CancelConfirmWidget(form.getBody(), this,
             true);
 
+        cancelConfirmWidget.showCloseButton(true);
+
         addBooleanBinding(new WritableValue(Boolean.FALSE, Boolean.class),
             resultShown, "Show results to check values");
-
     }
 
     private void createLocationSection() {
@@ -249,8 +252,13 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
 
     protected void setVisitsList() {
         String pNumber = patientNumberText.getText();
-        currentPatient = SiteUtils.getPatientInSite(appService, pNumber,
-            SessionManager.getInstance().getCurrentSite());
+        currentPatient = null;
+        try {
+            currentPatient = PatientWrapper.getPatientInSite(appService,
+                pNumber, SessionManager.getInstance().getCurrentSite());
+        } catch (ApplicationException e) {
+            BioBankPlugin.openError("Error getting the patient", e);
+        }
         if (currentPatient != null) {
             // show visits list
             Collection<PatientVisit> collection = currentPatient
@@ -270,7 +278,7 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
 
                     // FIXME this test doesn't work, no container has this
                     // position, this is the sample position !
-                    Container sc = SiteUtils.getContainerWithTypeInSite(
+                    Container sc = ContainerWrapper.getContainerWithTypeInSite(
                         appService, SessionManager.getInstance()
                             .getCurrentSite(), positionString, null);
                     if (sc == null) {
@@ -331,9 +339,9 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
     protected SamplePosition getSamplePosition(String positionString)
         throws Exception {
         // int end = 2;
-        bin = SiteUtils.getContainerWithTypeInSite(appService, SessionManager
-            .getInstance().getCurrentSite(), positionString.substring(0, 6),
-            "Bin");
+        bin = ContainerWrapper.getContainerWithTypeInSite(appService,
+            SessionManager.getInstance().getCurrentSite(), positionString
+                .substring(0, 6), "Bin");
         drawer = bin.getPosition().getParentContainer();
         cabinet = drawer.getPosition().getParentContainer();
 
