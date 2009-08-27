@@ -1,8 +1,8 @@
 package edu.ualberta.med.biobank.forms;
 
+import java.util.Collection;
+
 import org.eclipse.core.databinding.beans.BeansObservables;
-import org.eclipse.core.databinding.observable.value.IObservableValue;
-import org.eclipse.core.databinding.observable.value.WritableValue;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.viewers.ComboViewer;
@@ -37,9 +37,6 @@ public class PatientEntryForm extends BiobankEntryForm {
 
     private PatientAdapter patientAdapter;
 
-    private IObservableValue studySelectedValue = new WritableValue("",
-        String.class);
-
     private Site site;
 
     private ComboViewer studiesViewer;
@@ -69,6 +66,10 @@ public class PatientEntryForm extends BiobankEntryForm {
 
         createPatientSection();
         initCancelConfirmWidget(form.getBody());
+
+        if (patientAdapter.getWrapper().isNew()) {
+            setDirty(true);
+        }
     }
 
     private void createPatientSection() {
@@ -93,7 +94,11 @@ public class PatientEntryForm extends BiobankEntryForm {
                 return study.getNameShort() + " - " + study.getName();
             }
         });
-        studiesViewer.setInput(site.getStudyCollection());
+        Collection<Study> studies = site.getStudyCollection();
+        studiesViewer.setInput(studies);
+        if (patientAdapter.getWrapper().isNew() && studies.size() == 1) {
+            studiesViewer.getCCombo().select(0);
+        }
 
         createBoundWidgetWithLabel(client, Text.class, SWT.NONE,
             "Patient Number", null, BeansObservables.observeValue(

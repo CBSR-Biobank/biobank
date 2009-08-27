@@ -91,7 +91,7 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
         if (isNew()) {
             HQLCriteria c = new HQLCriteria("from "
                 + PatientVisit.class.getName()
-                + " where v.patient=? and v.dateDrawn = ?", Arrays
+                + " where patient=? and dateDrawn = ?", Arrays
                 .asList(new Object[] { getPatientWrapper().getWrappedObject(),
                     getDateDrawn() }));
 

@@ -109,7 +109,6 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         String tabName;
         if (patientVisitWrapper.isNew()) {
             tabName = "New Patient Visit for patient ";
-            setDirty(true);
         } else {
             tabName = "Visit " + patientVisitWrapper.getFormattedDateDrawn();
         }
@@ -136,6 +135,9 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         createSourcesSection();
         createDatasSection(patientWrapper.getStudy());
         initCancelConfirmWidget(form.getBody());
+        if (patientVisitWrapper.isNew()) {
+            setDirty(true);
+        }
     }
 
     private PatientWrapper retrievePatient() {
