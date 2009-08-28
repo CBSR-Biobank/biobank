@@ -97,6 +97,7 @@ public class PatientAdapter extends AdapterBase {
             public void widgetSelected(SelectionEvent event) {
                 PatientVisitAdapter adapter = new PatientVisitAdapter(
                     PatientAdapter.this, new PatientVisit());
+                adapter.getWrapper().setPatientWrapper(patientWrapper);
                 openForm(new FormInput(adapter), PatientVisitEntryForm.ID);
             }
 

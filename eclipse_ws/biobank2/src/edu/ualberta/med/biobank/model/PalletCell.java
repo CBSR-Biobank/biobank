@@ -29,10 +29,6 @@ public class PalletCell {
         this.scanCell = scanCell;
     }
 
-    public static PalletCell[][] getScanLibResults() throws Exception {
-        return convertArray(ScanCell.getScanLibResults());
-    }
-
     public static PalletCell[][] convertArray(ScanCell[][] scancells) {
         PalletCell[][] palletScanned = new PalletCell[ScanCell.ROW_MAX][ScanCell.COL_MAX];
         for (int i = 0; i < ScanCell.ROW_MAX; i++) {
@@ -45,6 +41,10 @@ public class PalletCell {
 
     public static PalletCell[][] getRandomScanLink() {
         return convertArray(ScanCell.getRandom());
+        // ScanCell[][] paletteScanned = new ScanCell[8][12];
+        // paletteScanned[0][0] = new ScanCell(0, 0, "titi");
+        // paletteScanned[1][3] = new ScanCell(1, 3, "toto");
+        // return convertArray(paletteScanned);
     }
 
     @SuppressWarnings("unused")

@@ -9,9 +9,9 @@ import edu.ualberta.med.biobank.model.ContainerType;
 
 public class LabelingScheme {
 
-    private static final String CBSR_LABELLING_PATTERN = "ABCDEFGHJKLMNPQRSTUVWXYZ";
+    public static final String CBSR_LABELLING_PATTERN = "ABCDEFGHJKLMNPQRSTUVWXYZ";
 
-    private static final String SBS_ROW_LABELLING_PATTERN = "ABCDEFGH";
+    public static final String SBS_ROW_LABELLING_PATTERN = "ABCDEFGH";
 
     /**
      * Get the rowColPos corresponding to the given sbs standard 2 char string

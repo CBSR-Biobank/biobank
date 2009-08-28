@@ -8,17 +8,24 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.PartInitException;
 import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.forms.input.FormInput;
+import edu.ualberta.med.biobank.treeview.AdapterBase;
 
 /**
  * The base class for all BioBank2 Java Client view forms. The forms are usually
@@ -94,4 +101,24 @@ public abstract class BiobankViewForm extends BiobankFormBase {
 
     protected abstract void reload() throws Exception;
 
+    protected void initEditButton(Composite parent, final AdapterBase adapter) {
+        Button editButton = toolkit.createButton(parent,
+            "Edit this information", SWT.PUSH);
+        editButton.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                getSite().getPage().closeEditor(BiobankViewForm.this, false);
+                try {
+                    getSite().getPage().openEditor(new FormInput(adapter),
+                        getEntryFormId(), true);
+                } catch (PartInitException exp) {
+                    SessionManager.getLogger().error(
+                        "Can't open the entry form", exp);
+                }
+            }
+        });
+
+    }
+
+    protected abstract String getEntryFormId();
 }

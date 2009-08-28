@@ -46,7 +46,7 @@ import edu.ualberta.med.biobank.validators.ScannerBarcodeValidator;
 import edu.ualberta.med.biobank.widgets.CancelConfirmWidget;
 import edu.ualberta.med.biobank.widgets.ScanPalletWidget;
 import edu.ualberta.med.biobank.widgets.ViewContainerWidget;
-import edu.ualberta.med.scanlib.ScanLib;
+import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ScanAssignEntryForm extends AbstractPatientAdminForm {
@@ -299,14 +299,8 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
             if (BioBankPlugin.isRealScanEnabled()) {
                 int plateNum = BioBankPlugin.getDefault().getPlateNumber(
                     plateToScanValue.getValue().toString());
-                int r = ScanLib.getInstance().slDecodePlate(ScanLib.DPI_300,
-                    plateNum);
-                if (r < ScanLib.SC_SUCCESS) {
-                    BioBankPlugin.openError("Scanner",
-                        "Could not decode image. Return code is: " + r);
-                    return;
-                }
-                cells = PalletCell.getScanLibResults();
+                cells = PalletCell.convertArray(ScannerConfigPlugin
+                    .scan(plateNum));
             } else {
                 if (notexistsButton.getSelection()) {
                     cells = PalletCell.getRandomScanProcessNotInPallet(

@@ -95,7 +95,7 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
     }
 
     @Override
-    protected void createFormContent() {
+    protected void createFormContent() throws Exception {
         form.setText("Link and Process Cabinet Samples");
         GridLayout layout = new GridLayout(2, false);
         form.getBody().setLayout(layout);

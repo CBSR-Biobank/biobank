@@ -6,19 +6,14 @@ import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.utils.ModelUtils;
-import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.PvInfo;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
@@ -35,6 +30,7 @@ public class StudyViewForm extends BiobankViewForm {
     private StudyAdapter studyAdapter;
     private Study study;
 
+    private Label siteLabel;
     private Label nameShortLabel;
     private Label activityStatusLabel;
     private Label commentLabel;
@@ -77,6 +73,7 @@ public class StudyViewForm extends BiobankViewForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
+        siteLabel = (Label) createWidget(client, Label.class, SWT.NONE, "Site");
         nameShortLabel = (Label) createWidget(client, Label.class, SWT.NONE,
             "Short Name");
         activityStatusLabel = (Label) createWidget(client, Label.class,
@@ -89,23 +86,10 @@ public class StudyViewForm extends BiobankViewForm {
         createSampleSourceSection();
         createPvDataSection();
 
+        initEditButton(client, studyAdapter);
         setStudySectionValues();
         setPvDataSectionValues();
 
-        final Button edit = toolkit.createButton(client,
-            "Edit this information", SWT.PUSH);
-        edit.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                getSite().getPage().closeEditor(StudyViewForm.this, false);
-                try {
-                    getSite().getPage().openEditor(new FormInput(studyAdapter),
-                        StudyEntryForm.ID, true);
-                } catch (PartInitException exp) {
-                    exp.printStackTrace();
-                }
-            }
-        });
     }
 
     private void createClinicSection() {
@@ -120,6 +104,7 @@ public class StudyViewForm extends BiobankViewForm {
     }
 
     private void setStudySectionValues() {
+        FormUtils.setTextValue(siteLabel, study.getSite().getName());
         FormUtils.setTextValue(nameShortLabel, study.getNameShort());
         FormUtils.setTextValue(activityStatusLabel, study.getActivityStatus());
         FormUtils.setTextValue(commentLabel, study.getComment());
@@ -207,5 +192,10 @@ public class StudyViewForm extends BiobankViewForm {
                 "Error while retrieving study "
                     + studyAdapter.getStudy().getName(), e);
         }
+    }
+
+    @Override
+    protected String getEntryFormId() {
+        return StudyEntryForm.ID;
     }
 }

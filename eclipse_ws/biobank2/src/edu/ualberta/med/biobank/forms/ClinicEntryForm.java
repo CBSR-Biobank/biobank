@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.forms;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -11,6 +12,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
@@ -48,7 +50,6 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
     private ContactEntryWidget contactEntryWidget;
 
     protected Combo session;
-    private Text name;
 
     private BiobankEntryFormWidgetListener listener = new BiobankEntryFormWidgetListener() {
         @Override
@@ -116,10 +117,13 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        name = (Text) createBoundWidgetWithLabel(client, Text.class, SWT.NONE,
-            "Name", null, PojoObservables.observeValue(clinic, "name"),
-            NonEmptyString.class, MSG_NO_CLINIC_NAME);
-        name.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        Label siteLabel = (Label) createWidget(client, Label.class, SWT.NONE,
+            "Site");
+        FormUtils.setTextValue(siteLabel, clinic.getSite().getName());
+
+        createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Name", null,
+            PojoObservables.observeValue(clinic, "name"), NonEmptyString.class,
+            MSG_NO_CLINIC_NAME);
 
         createBoundWidgetWithLabel(client, Combo.class, SWT.NONE,
             "Activity Status", FormConstants.ACTIVITY_STATUS, PojoObservables
@@ -251,11 +255,9 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
     private boolean checkClinicNameUnique() throws ApplicationException {
         Site site = clinicAdapter.getParentFromClass(SiteAdapter.class)
             .getSite();
-        HQLCriteria c = new HQLCriteria(
-            "from edu.ualberta.med.biobank.model.Clinic as clinic "
-                + "inner join fetch clinic.site " + "where clinic.site.id='"
-                + site.getId() + "' " + "and clinic.name = '"
-                + clinic.getName() + "'");
+        HQLCriteria c = new HQLCriteria("from " + Clinic.class.getName()
+            + " where site= ? and clinic.name = ?", Arrays.asList(new Object[] {
+            site, clinic.getName() }));
 
         List<Object> results = appService.query(c);
         if (results.size() == 0)

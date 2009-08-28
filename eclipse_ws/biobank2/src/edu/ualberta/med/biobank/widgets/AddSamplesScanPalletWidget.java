@@ -51,6 +51,7 @@ public class AddSamplesScanPalletWidget extends ScanPalletWidget {
         statusAvailable.add(SampleCellStatus.EMPTY);
         statusAvailable.add(SampleCellStatus.NO_TYPE);
         statusAvailable.add(SampleCellStatus.TYPE);
+        statusAvailable.add(SampleCellStatus.ERROR);
         legendWidth = PALLET_WIDTH / statusAvailable.size();
     }
 

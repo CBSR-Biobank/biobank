@@ -2,17 +2,12 @@ package edu.ualberta.med.biobank.forms;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 
-import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Clinic;
-import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.ClinicAdapter;
 import edu.ualberta.med.biobank.widgets.infotables.ClinicStudyInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.ContactInfoTable;
@@ -27,6 +22,8 @@ public class ClinicViewForm extends AddressViewFormCommon {
     private ContactInfoTable contactsTable;
 
     private ClinicStudyInfoTable studiesTable;
+
+    private Label siteLabel;
 
     private Label activityStatusLabel;
 
@@ -65,6 +62,7 @@ public class ClinicViewForm extends AddressViewFormCommon {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
+        siteLabel = (Label) createWidget(client, Label.class, SWT.NONE, "Site");
         activityStatusLabel = (Label) createWidget(client, Label.class,
             SWT.NONE, "Activity Status");
         commentLabel = (Label) createWidget(client, Label.class, SWT.NONE,
@@ -74,6 +72,7 @@ public class ClinicViewForm extends AddressViewFormCommon {
     }
 
     private void setClinicValues() {
+        FormUtils.setTextValue(siteLabel, clinic.getSite().getName());
         FormUtils.setTextValue(activityStatusLabel, clinic.getActivityStatus());
         FormUtils.setTextValue(commentLabel, clinic.getComment());
     }
@@ -106,15 +105,7 @@ public class ClinicViewForm extends AddressViewFormCommon {
         client.setLayout(new GridLayout(4, false));
         toolkit.paintBordersFor(client);
 
-        final Button edit = toolkit.createButton(client, "Edit Clinic Info",
-            SWT.PUSH);
-        edit.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                AdapterBase.openForm(new FormInput(clinicAdapter),
-                    ClinicEntryForm.ID);
-            }
-        });
+        initEditButton(client, clinicAdapter);
     }
 
     @Override
@@ -125,5 +116,10 @@ public class ClinicViewForm extends AddressViewFormCommon {
         setClinicValues();
         setAdressValues();
         studiesTable.setCollection(null);
+    }
+
+    @Override
+    protected String getEntryFormId() {
+        return ClinicEntryForm.ID;
     }
 }

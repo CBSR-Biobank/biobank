@@ -77,4 +77,9 @@ public class SampleViewForm extends BiobankViewForm {
         form.setText("Sample: " + sample.getInventoryId());
     }
 
+    @Override
+    protected String getEntryFormId() {
+        return null;
+    }
+
 }

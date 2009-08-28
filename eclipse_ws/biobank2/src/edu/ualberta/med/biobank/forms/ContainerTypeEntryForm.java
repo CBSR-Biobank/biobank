@@ -21,6 +21,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.PlatformUI;
 
@@ -136,7 +137,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
     }
 
     @Override
-    protected void createFormContent() {
+    protected void createFormContent() throws Exception {
         form.setText("Container Type Information");
         form.setMessage(getOkMessage(), IMessageProvider.NONE);
         form.getBody().setLayout(new GridLayout(1, false));
@@ -148,66 +149,63 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         initCancelConfirmWidget(form.getBody());
     }
 
-    protected void createContainerTypeSection() {
-        try {
-            Composite client = toolkit.createComposite(form.getBody());
-            GridLayout layout = new GridLayout(2, false);
-            layout.horizontalSpacing = 10;
-            client.setLayout(layout);
-            client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-            toolkit.paintBordersFor(client);
-            createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Name",
-                null, PojoObservables.observeValue(containerType, "name"),
-                NonEmptyString.class, MSG_NO_CONTAINER_TYPE_NAME);
+    protected void createContainerTypeSection() throws Exception {
+        Composite client = toolkit.createComposite(form.getBody());
+        GridLayout layout = new GridLayout(2, false);
+        layout.horizontalSpacing = 10;
+        client.setLayout(layout);
+        client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        toolkit.paintBordersFor(client);
 
-            createBoundWidgetWithLabel(client, Text.class, SWT.NONE,
-                "Short Name", null, PojoObservables.observeValue(containerType,
-                    "nameShort"), NonEmptyString.class,
-                MSG_NO_CONTAINER_TYPE_NAME_SHORT);
+        Label siteLabel = (Label) createWidget(client, Label.class, SWT.NONE,
+            "Site");
+        FormUtils.setTextValue(siteLabel, containerType.getSite().getName());
+        createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Name", null,
+            PojoObservables.observeValue(containerType, "name"),
+            NonEmptyString.class, MSG_NO_CONTAINER_TYPE_NAME);
 
-            createBoundWidgetWithLabel(client, Text.class, SWT.NONE,
-                "Default Temperature\n(Celcius)", null, PojoObservables
-                    .observeValue(containerType, "defaultTemperature"),
-                DoubleNumber.class, "Default temperature is not a valid number");
+        createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Short Name",
+            null, PojoObservables.observeValue(containerType, "nameShort"),
+            NonEmptyString.class, MSG_NO_CONTAINER_TYPE_NAME_SHORT);
 
-            List<ContainerLabelingScheme> schemes = appService.search(
-                ContainerLabelingScheme.class, new ContainerLabelingScheme());
+        createBoundWidgetWithLabel(client, Text.class, SWT.NONE,
+            "Default Temperature\n(Celcius)", null, PojoObservables
+                .observeValue(containerType, "defaultTemperature"),
+            DoubleNumber.class, "Default temperature is not a valid number");
 
-            labelingSchemeComboViewer = createCComboViewerWithNoSelectionValidator(
-                client, "Child Labeling Scheme", schemes,
-                MSG_CHILD_LABELING_SCHEME_EMPTY);
-            ContainerLabelingScheme currentScheme = containerType
-                .getChildLabelingScheme();
-            if (currentScheme != null) {
-                for (ContainerLabelingScheme scheme : schemes) {
-                    if (currentScheme.getId().equals(scheme.getId())) {
-                        currentScheme = scheme;
-                        break;
-                    }
+        List<ContainerLabelingScheme> schemes = appService.search(
+            ContainerLabelingScheme.class, new ContainerLabelingScheme());
+
+        labelingSchemeComboViewer = createCComboViewerWithNoSelectionValidator(
+            client, "Child Labeling Scheme", schemes,
+            MSG_CHILD_LABELING_SCHEME_EMPTY);
+        ContainerLabelingScheme currentScheme = containerType
+            .getChildLabelingScheme();
+        if (currentScheme != null) {
+            for (ContainerLabelingScheme scheme : schemes) {
+                if (currentScheme.getId().equals(scheme.getId())) {
+                    currentScheme = scheme;
+                    break;
                 }
-                labelingSchemeComboViewer.setSelection(new StructuredSelection(
-                    currentScheme));
             }
-
-            createBoundWidgetWithLabel(client, Combo.class, SWT.NONE,
-                "Activity Status", FormConstants.ACTIVITY_STATUS,
-                PojoObservables.observeValue(containerType, "activityStatus"),
-                null, null);
-
-            createBoundWidgetWithLabel(client, Button.class, SWT.CHECK,
-                "Is top Level Container", null, PojoObservables.observeValue(
-                    containerType, "topLevel"), null);
-
-            Text comment = (Text) createBoundWidgetWithLabel(client,
-                Text.class, SWT.MULTI, "Comments", null, PojoObservables
-                    .observeValue(containerType, "comment"), null, null);
-            GridData gd = new GridData(GridData.FILL_HORIZONTAL);
-            gd.heightHint = 40;
-            comment.setLayoutData(gd);
-
-        } catch (ApplicationException e) {
-            e.printStackTrace();
+            labelingSchemeComboViewer.setSelection(new StructuredSelection(
+                currentScheme));
         }
+
+        createBoundWidgetWithLabel(client, Combo.class, SWT.NONE,
+            "Activity Status", FormConstants.ACTIVITY_STATUS, PojoObservables
+                .observeValue(containerType, "activityStatus"), null, null);
+
+        createBoundWidgetWithLabel(client, Button.class, SWT.CHECK,
+            "Is top Level Container", null, PojoObservables.observeValue(
+                containerType, "topLevel"), null);
+
+        Text comment = (Text) createBoundWidgetWithLabel(client, Text.class,
+            SWT.MULTI, "Comments", null, PojoObservables.observeValue(
+                containerType, "comment"), null, null);
+        GridData gd = new GridData(GridData.FILL_HORIZONTAL);
+        gd.heightHint = 40;
+        comment.setLayoutData(gd);
     }
 
     private void createDimensionsSection() {

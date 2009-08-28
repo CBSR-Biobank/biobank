@@ -12,10 +12,11 @@ import org.apache.commons.collections.map.ListOrderedMap;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
@@ -62,8 +63,9 @@ public class StudyEntryForm extends BiobankEntryForm {
                 NonEmptyString.class, "Study name cannot be blank"));
             put("nameShort", new FieldInfo("Short Name", Text.class, SWT.NONE,
                 null, NonEmptyString.class, "Study short name cannot be blank"));
-            put("activityStatus", new FieldInfo("Activity Status", Combo.class,
-                SWT.NONE, FormConstants.ACTIVITY_STATUS, null, null));
+            put("activityStatus", new FieldInfo("Activity Status",
+                CCombo.class, SWT.NONE, FormConstants.ACTIVITY_STATUS, null,
+                null));
             put("comment", new FieldInfo("Comments", Text.class, SWT.MULTI,
                 null, null, null));
         }
@@ -114,6 +116,7 @@ public class StudyEntryForm extends BiobankEntryForm {
         studyAdapter = (StudyAdapter) adapter;
         site = studyAdapter.getParentFromClass(SiteAdapter.class).getSite();
         retrieveStudy();
+        study.setSite(site);
 
         String tabName;
         if (study.getId() == null) {
@@ -136,6 +139,10 @@ public class StudyEntryForm extends BiobankEntryForm {
         client.setLayout(layout);
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
+
+        Label siteLabel = (Label) createWidget(client, Label.class, SWT.NONE,
+            "Site");
+        FormUtils.setTextValue(siteLabel, study.getSite().getName());
 
         createBoundWidgetsFromMap(FIELDS, study, client);
 

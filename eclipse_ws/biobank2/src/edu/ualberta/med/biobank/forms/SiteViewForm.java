@@ -177,20 +177,7 @@ public class SiteViewForm extends AddressViewFormCommon {
         client.setLayout(new GridLayout(4, false));
         toolkit.paintBordersFor(client);
 
-        final Button edit = toolkit.createButton(client, "Edit Site Info",
-            SWT.PUSH);
-        edit.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                getSite().getPage().closeEditor(SiteViewForm.this, false);
-                try {
-                    getSite().getPage().openEditor(new FormInput(siteAdapter),
-                        SiteEntryForm.ID, true);
-                } catch (PartInitException exp) {
-                    exp.printStackTrace();
-                }
-            }
-        });
+        initEditButton(client, siteAdapter);
 
         final Button study = toolkit
             .createButton(client, "Add Study", SWT.PUSH);
@@ -264,5 +251,10 @@ public class SiteViewForm extends AddressViewFormCommon {
         } catch (ApplicationException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    protected String getEntryFormId() {
+        return SiteEntryForm.ID;
     }
 }

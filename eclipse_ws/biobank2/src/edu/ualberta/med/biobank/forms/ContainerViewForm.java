@@ -18,7 +18,6 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.ui.PartInitException;
 
 import edu.ualberta.med.biobank.common.LabelingScheme;
 import edu.ualberta.med.biobank.common.utils.ModelUtils;
@@ -52,6 +51,8 @@ public class ContainerViewForm extends BiobankViewForm {
     private ContainerPosition position;
 
     private SamplesListWidget samplesWidget;
+
+    private Label siteLabel;
 
     private Label containerLabelLabel;
 
@@ -134,6 +135,7 @@ public class ContainerViewForm extends BiobankViewForm {
         client.setLayoutData(gridData);
         toolkit.paintBordersFor(client);
 
+        siteLabel = (Label) createWidget(client, Label.class, SWT.NONE, "Site");
         containerLabelLabel = (Label) createWidget(client, Label.class,
             SWT.NONE, "Label");
         productBarcodeLabel = (Label) createWidget(client, Label.class,
@@ -149,21 +151,8 @@ public class ContainerViewForm extends BiobankViewForm {
 
         setContainerValues();
         ContainerType containerType = container.getContainerType();
-        final Button edit = toolkit.createButton(client,
-            "Edit this information", SWT.PUSH);
-        edit.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                getSite().getPage().closeEditor(ContainerViewForm.this, false);
-                try {
-                    getSite().getPage().openEditor(
-                        new FormInput(containerAdapter), ContainerEntryForm.ID,
-                        true);
-                } catch (PartInitException exp) {
-                    exp.printStackTrace();
-                }
-            }
-        });
+        initEditButton(client, containerAdapter);
+
         if (containerType.getChildContainerTypeCollection().size() > 0) {
             visualizeContainer();
         }
@@ -490,6 +479,7 @@ public class ContainerViewForm extends BiobankViewForm {
     }
 
     private void setContainerValues() {
+        FormUtils.setTextValue(siteLabel, container.getSite().getName());
         FormUtils.setTextValue(containerLabelLabel, container.getLabel());
         FormUtils.setTextValue(productBarcodeLabel, container
             .getProductBarcode());
@@ -528,6 +518,11 @@ public class ContainerViewForm extends BiobankViewForm {
             .size() > 0)
             refreshVis();
         setContainerValues();
+    }
+
+    @Override
+    protected String getEntryFormId() {
+        return ContainerEntryForm.ID;
     }
 
 }

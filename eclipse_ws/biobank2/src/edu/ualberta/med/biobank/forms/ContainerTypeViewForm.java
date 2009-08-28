@@ -4,23 +4,17 @@ import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.ui.PartInitException;
 
-import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.treeview.ContainerTypeAdapter;
 import edu.ualberta.med.biobank.widgets.CabinetDrawerWidget;
 import edu.ualberta.med.biobank.widgets.ChooseContainerWidget;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ContainerTypeViewForm extends BiobankViewForm {
     public static final String ID = "edu.ualberta.med.biobank.forms.ContainerTypeViewForm";
@@ -30,6 +24,8 @@ public class ContainerTypeViewForm extends BiobankViewForm {
     private ContainerType containerType;
 
     private Capacity capacity;
+
+    private Label siteLabel;
 
     private Label nameLabel;
 
@@ -56,7 +52,7 @@ public class ContainerTypeViewForm extends BiobankViewForm {
     }
 
     @Override
-    public void init() {
+    public void init() throws Exception {
         Assert.isTrue(adapter instanceof ContainerTypeAdapter,
             "Invalid editor input: object of type "
                 + adapter.getClass().getName());
@@ -66,21 +62,16 @@ public class ContainerTypeViewForm extends BiobankViewForm {
         setPartName("Container Type " + containerType.getName());
     }
 
-    private void retrieveContainerType() {
+    private void retrieveContainerType() throws Exception {
         List<ContainerType> result;
         ContainerType searchContainerType = new ContainerType();
         searchContainerType.setId(containerTypeAdapter.getContainerType()
             .getId());
-        try {
-            result = appService
-                .search(ContainerType.class, searchContainerType);
-            Assert.isTrue(result.size() == 1);
-            containerType = result.get(0);
-            containerTypeAdapter.setContainerType(containerType);
-            capacity = containerType.getCapacity();
-        } catch (ApplicationException e) {
-            e.printStackTrace();
-        }
+        result = appService.search(ContainerType.class, searchContainerType);
+        Assert.isTrue(result.size() == 1);
+        containerType = result.get(0);
+        containerTypeAdapter.setContainerType(containerType);
+        capacity = containerType.getCapacity();
     }
 
     @Override
@@ -104,6 +95,7 @@ public class ContainerTypeViewForm extends BiobankViewForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
+        siteLabel = (Label) createWidget(client, Label.class, SWT.NONE, "Site");
         nameLabel = (Label) createWidget(client, Label.class, SWT.NONE, "Name");
         nameShortLabel = (Label) createWidget(client, Label.class, SWT.NONE,
             "Short Name");
@@ -120,6 +112,7 @@ public class ContainerTypeViewForm extends BiobankViewForm {
     }
 
     private void setContainerTypeValues() {
+        FormUtils.setTextValue(siteLabel, containerType.getSite().getName());
         FormUtils.setTextValue(nameLabel, containerType.getName());
         FormUtils.setTextValue(nameShortLabel, containerType.getNameShort());
         FormUtils.setTextValue(defaultTempLabel, containerType
@@ -241,26 +234,11 @@ public class ContainerTypeViewForm extends BiobankViewForm {
         client.setLayout(new GridLayout(4, false));
         toolkit.paintBordersFor(client);
 
-        final Button edit = toolkit.createButton(client,
-            "Edit this information", SWT.PUSH);
-        edit.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                getSite().getPage().closeEditor(ContainerTypeViewForm.this,
-                    false);
-                try {
-                    getSite().getPage().openEditor(
-                        new FormInput(containerTypeAdapter),
-                        ContainerTypeEntryForm.ID, true);
-                } catch (PartInitException exp) {
-                    exp.printStackTrace();
-                }
-            }
-        });
+        initEditButton(client, containerTypeAdapter);
     }
 
     @Override
-    protected void reload() {
+    protected void reload() throws Exception {
         retrieveContainerType();
         setPartName("Container Type " + containerType.getName());
         form.setText("Container Type: " + containerType.getName());
@@ -268,5 +246,10 @@ public class ContainerTypeViewForm extends BiobankViewForm {
         setDimensionsValues();
         // setSampleDerivTypesValues();
         setChildContainerTypesValues();
+    }
+
+    @Override
+    protected String getEntryFormId() {
+        return ContainerTypeEntryForm.ID;
     }
 }

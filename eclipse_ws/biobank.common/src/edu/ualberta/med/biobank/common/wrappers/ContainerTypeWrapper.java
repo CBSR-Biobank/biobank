@@ -12,10 +12,6 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
         super(appService, wrappedObject);
     }
 
-    public ContainerType getContainerType() {
-        return wrappedObject;
-    }
-
     @Override
     protected void firePropertyChanges(ContainerType oldWrappedObject,
         ContainerType newWrappedObject) {
