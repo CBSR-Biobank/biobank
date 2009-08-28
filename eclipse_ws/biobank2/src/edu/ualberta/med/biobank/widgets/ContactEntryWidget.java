@@ -97,8 +97,7 @@ public class ContactEntryWidget extends BiobankWidget {
                 if (confirm) {
                     Collection<Contact> contactToDelete = new HashSet<Contact>();
                     for (Contact c : selectedContacts) {
-                        if (c.getClinic().getName().equals(
-                            contact.getClinic().getName()))
+                        if (c.getName().equals(contact.getName()))
                             contactToDelete.add(c);
                     }
 
