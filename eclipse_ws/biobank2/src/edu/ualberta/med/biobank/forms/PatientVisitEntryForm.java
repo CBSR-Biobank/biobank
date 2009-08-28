@@ -87,6 +87,8 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
 
     private DateTimeWidget dateDrawn;
 
+    private DateTimeWidget dateDrawn;
+
     private ComboViewer clinicsComboViewer;
 
     private PvSampleSourceEntryWidget pvSampleSourceEntryWidget;
