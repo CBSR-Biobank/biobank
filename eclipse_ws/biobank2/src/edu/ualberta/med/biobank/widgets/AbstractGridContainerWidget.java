@@ -82,7 +82,7 @@ public abstract class AbstractGridContainerWidget extends Canvas {
 
     protected boolean hasLegend = false;
 
-    protected boolean legendOnSide = false;
+    public boolean legendOnSide = false;
 
     public AbstractGridContainerWidget(Composite parent) {
         super(parent, SWT.DOUBLE_BUFFERED);
@@ -96,6 +96,7 @@ public abstract class AbstractGridContainerWidget extends Canvas {
     }
 
     protected void paintGrid(PaintEvent e) {
+
         for (int indexRow = 0; indexRow < rows; indexRow++) {
             for (int indexCol = 0; indexCol < columns; indexCol++) {
                 int xPosition = cellWidth * indexCol;

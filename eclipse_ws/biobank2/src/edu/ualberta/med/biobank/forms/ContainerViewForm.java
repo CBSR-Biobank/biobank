@@ -9,9 +9,11 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
+import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.events.MouseTrackListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -287,9 +289,35 @@ public class ContainerViewForm extends BiobankViewForm {
                 public void mouseDown(MouseEvent e) {
                     ContainerCell cell = ((ChooseContainerWidget) e.widget)
                         .getPositionAtCoordinates(e.x, e.y);
-                    openFormFor(cell.getPosition());
+                    if (cell != null)
+                        openFormFor(cell.getPosition());
 
                 }
+
+            });
+            containerWidget.addMouseMoveListener(new MouseMoveListener() {
+
+                @Override
+                public void mouseMove(MouseEvent e) {
+                    Rectangle widgetBounds = containerWidget.getBounds();
+                    int safetyPadding = 15;
+                    widgetBounds.height -= safetyPadding;
+                    widgetBounds.width -= safetyPadding;
+                    if (containerWidget.legendOnSide == false)
+                        widgetBounds.height -= ChooseContainerWidget.LEGEND_HEIGHT;
+                    else
+                        widgetBounds.width -= ChooseContainerWidget.LEGEND_WIDTH;
+
+                    if (widgetBounds.width > e.x && widgetBounds.height > e.y)
+                        ((ChooseContainerWidget) e.widget)
+                            .setCursor(containerWidget.getDisplay()
+                                .getSystemCursor(SWT.CURSOR_HAND));
+                    else
+                        ((ChooseContainerWidget) e.widget)
+                            .setCursor(containerWidget.getDisplay()
+                                .getSystemCursor(SWT.CURSOR_ARROW));
+                }
+
             });
         }
         Composite multiSection = toolkit.createComposite(client);
