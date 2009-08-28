@@ -40,8 +40,10 @@ public class ClinicGroup extends AdapterBase {
         mi.setText("Add Clinic");
         mi.addSelectionListener(new SelectionListener() {
             public void widgetSelected(SelectionEvent event) {
+                Clinic clinic = new Clinic();
+                clinic.setSite(getParentFromClass(SiteAdapter.class).getSite());
                 ClinicAdapter clinicAdapter = new ClinicAdapter(
-                    ClinicGroup.this, new Clinic());
+                    ClinicGroup.this, clinic);
                 FormInput input = new FormInput(clinicAdapter);
                 try {
                     PlatformUI.getWorkbench().getActiveWorkbenchWindow()

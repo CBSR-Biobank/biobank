@@ -37,8 +37,10 @@ public class ContainerGroup extends AdapterBase {
         mi.setText("Add a Container");
         mi.addSelectionListener(new SelectionListener() {
             public void widgetSelected(SelectionEvent event) {
+                Container c = new Container();
+                c.setSite(getParentFromClass(SiteAdapter.class).getSite());
                 ContainerAdapter adapter = new ContainerAdapter(
-                    ContainerGroup.this, new Container());
+                    ContainerGroup.this, c);
                 openForm(new FormInput(adapter), ContainerEntryForm.ID);
             }
 
