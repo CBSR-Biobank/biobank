@@ -38,6 +38,7 @@ import edu.ualberta.med.biobank.widgets.listener.ScanPalletModificationEvent;
 import edu.ualberta.med.biobank.widgets.listener.ScanPalletModificationListener;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.query.SDKQuery;
+import gov.nih.nci.system.query.example.DeleteExampleQuery;
 import gov.nih.nci.system.query.example.InsertExampleQuery;
 
 public class ContainerViewForm extends BiobankViewForm {
@@ -80,6 +81,8 @@ public class ContainerViewForm extends BiobankViewForm {
     List<ScanPalletModificationListener> listeners;
     private MouseListener selectionMouseListener;
     private MouseTrackListener selectionMouseTrackListener;
+
+    private ContainerType deleteType;
 
     public void addModificationListener(ScanPalletModificationListener listener) {
         listeners.add(listener);
@@ -300,13 +303,14 @@ public class ContainerViewForm extends BiobankViewForm {
                 }
             });
         }
-        Composite initSection = toolkit.createComposite(client);
+        Composite multiSection = toolkit.createComposite(client);
         GridLayout gli = new GridLayout();
         gli.numColumns = 3;
-        initSection.setLayout(gli);
-        Label comboLabel = new Label(initSection, SWT.NONE);
+
+        multiSection.setLayout(gli);
+        Label comboLabel = new Label(multiSection, SWT.NONE);
         comboLabel.setText("Initialize all available containers to:");
-        final Combo init = new Combo(initSection, SWT.NONE);
+        final Combo init = new Combo(multiSection, SWT.NONE);
         Collection<ContainerType> containerTypes = container.getContainerType()
             .getChildContainerTypeCollection();
         for (ContainerType ct : containerTypes) {
@@ -314,7 +318,7 @@ public class ContainerViewForm extends BiobankViewForm {
         }
         init.select(0);
 
-        final Button initialize = toolkit.createButton(initSection,
+        final Button initialize = toolkit.createButton(multiSection,
             "Initialize", SWT.PUSH);
         initialize.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -323,6 +327,23 @@ public class ContainerViewForm extends BiobankViewForm {
                 initContainers();
             }
         });
+        Label deleteLabel = new Label(multiSection, SWT.NONE);
+        deleteLabel.setText("Delete all initialized containers of type:");
+        final Combo delete = new Combo(multiSection, SWT.NONE);
+        for (ContainerType ct : containerTypes) {
+            delete.add(ct.getName());
+        }
+        delete.select(0);
+        final Button deleteButton = toolkit.createButton(multiSection,
+            "Delete", SWT.PUSH);
+        deleteButton.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                setDeleteType(delete.getItem(delete.getSelectionIndex()));
+                deleteContainers();
+            }
+        });
+
     }
 
     protected void setInitType(String name) {
@@ -336,7 +357,19 @@ public class ContainerViewForm extends BiobankViewForm {
         }
     }
 
+    protected void setDeleteType(String name) {
+        Collection<ContainerType> containerTypes = container.getContainerType()
+            .getChildContainerTypeCollection();
+        for (ContainerType ct : containerTypes) {
+            if (name.compareTo(ct.getName()) == 0) {
+                deleteType = ct;
+                break;
+            }
+        }
+    }
+
     public void initContainers() {
+        List<SDKQuery> queries = new ArrayList<SDKQuery>();
         Collection<ContainerPosition> positions = container
             .getChildPositionCollection();
         int rows = container.getContainerType().getCapacity()
@@ -368,23 +401,57 @@ public class ContainerViewForm extends BiobankViewForm {
                         + LabelingScheme.getPositionString(newPos));
 
                     // insert containers/positions to db
-                    SDKQuery query;
-                    try {
-                        query = new InsertExampleQuery(newContainer);
-                        appService.executeQuery(query);
-                        containerAdapter.performExpand();
 
-                    } catch (ApplicationException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                    }
+                    queries.add(new InsertExampleQuery(newContainer));
+
                 }
             }
         }
         // refresh
-        positions = container.getChildPositionCollection();
-        container.setFull(true);
-        reload();
+        if (queries.size() > 0) {
+            try {
+                appService.executeBatchQuery(queries);
+            } catch (ApplicationException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            containerAdapter.performExpand();
+            positions = container.getChildPositionCollection();
+            container.setFull(true);
+            reload();
+        }
+    }
+
+    public void deleteContainers() {
+        List<SDKQuery> queries = new ArrayList<SDKQuery>();
+        Collection<ContainerPosition> positions = container
+            .getChildPositionCollection();
+        for (ContainerPosition pos : positions) {
+            Container deletingContainer = pos.getContainer();
+            if (deletingContainer != null
+                && deletingContainer.getContainerType().getId().equals(
+                    deleteType.getId())) {
+                // insert containers/positions to db
+
+                queries.add(new DeleteExampleQuery(deletingContainer));
+
+            }
+        }
+        // refresh
+        if (queries.size() > 0) {
+            try {
+                appService.executeBatchQuery(queries);
+            } catch (ApplicationException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            containerAdapter.removeAll();
+            containerAdapter.loadChildren(false);
+
+            containerAdapter.performExpand();
+            positions = container.getChildPositionCollection();
+            reload();
+        }
     }
 
     private void openFormFor(ContainerPosition pos) {

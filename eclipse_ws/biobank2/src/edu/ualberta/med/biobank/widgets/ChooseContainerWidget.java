@@ -7,6 +7,8 @@ import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 
+import edu.ualberta.med.biobank.common.LabelingScheme;
+import edu.ualberta.med.biobank.common.RowColPos;
 import edu.ualberta.med.biobank.model.ContainerCell;
 import edu.ualberta.med.biobank.model.ContainerStatus;
 
@@ -70,6 +72,7 @@ public class ChooseContainerWidget extends AbstractGridContainerWidget {
         int indexRow, int indexCol) {
         if (cells != null) {
             ContainerCell cell = cells[indexRow][indexCol];
+
             if (cell == null) {
                 cell = new ContainerCell();
             }
@@ -80,6 +83,36 @@ public class ChooseContainerWidget extends AbstractGridContainerWidget {
             e.gc.fillRectangle(rectangle);
         }
         super.drawRectangle(e, rectangle, indexRow, indexCol);
+    }
+
+    @Override
+    protected String getTextForBox(int indexRow, int indexCol) {
+        String sname = "";
+        if (cells != null) {
+            ContainerCell cell = cells[indexRow][indexCol];
+
+            if (cell.getPosition().getContainer() != null)
+                sname += "-"
+                    + cell.getPosition().getContainer().getContainerType()
+                        .getNameShort();
+        }
+        RowColPos rowcol = new RowColPos();
+        rowcol.row = indexRow;
+        rowcol.col = indexCol;
+        if (super.getContainerType() != null) {
+            return parentLabel
+                + LabelingScheme.getPositionString(rowcol, super
+                    .getContainerType()) + sname;
+        }
+
+        String row = getValueForCell(firstRowSign, indexRow,
+            firstColSign == null);
+        String col = getValueForCell(firstColSign, indexCol,
+            firstRowSign == null);
+        if (showColumnFirst) {
+            return col + row;
+        }
+        return row + col;
     }
 
     public void setShowNullStatusAsEmpty(boolean showNullStatusAsEmpty) {

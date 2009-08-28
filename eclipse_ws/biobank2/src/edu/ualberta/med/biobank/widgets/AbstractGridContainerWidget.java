@@ -24,9 +24,9 @@ import edu.ualberta.med.biobank.model.ContainerType;
  */
 public abstract class AbstractGridContainerWidget extends Canvas {
 
-    private int cellWidth = 40;
+    private int cellWidth = 60;
 
-    private int cellHeight = 40;
+    private int cellHeight = 60;
 
     protected int gridWidth;
 
@@ -38,22 +38,22 @@ public abstract class AbstractGridContainerWidget extends Canvas {
 
     private ContainerType containerType;
 
-    private String parentLabel;
+    protected String parentLabel;
 
     /**
      * First character or int used for the cells row labels
      */
-    private Object firstRowSign = 'A';
+    protected Object firstRowSign = 'A';
 
     /**
      * First character or int used for the cells column labels
      */
-    private Object firstColSign = 1;
+    protected Object firstColSign = 1;
 
     /**
      * If yes, the first label in the box will be the column
      */
-    private boolean showColumnFirst = false;
+    protected boolean showColumnFirst = false;
 
     /**
      * max width this container will have : used to calculate cells width
@@ -176,7 +176,7 @@ public abstract class AbstractGridContainerWidget extends Canvas {
         this.parentLabel = parentLabel;
     }
 
-    private String getValueForCell(Object firstSign, int addValue,
+    protected String getValueForCell(Object firstSign, int addValue,
         boolean format) {
         if (firstSign != null) {
             Object total = null;
@@ -305,6 +305,10 @@ public abstract class AbstractGridContainerWidget extends Canvas {
 
     public int getColumns() {
         return columns;
+    }
+
+    public ContainerType getContainerType() {
+        return containerType;
     }
 
 }
