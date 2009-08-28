@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.forms;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -34,7 +35,9 @@ import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
 import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.ContainerType;
+import edu.ualberta.med.biobank.model.ContainerTypeComparator;
 import edu.ualberta.med.biobank.model.SampleType;
+import edu.ualberta.med.biobank.model.SampleTypeComparator;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.ContainerTypeAdapter;
@@ -77,9 +80,9 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
 
     private MultiSelectWidget childContainerTypesMultiSelect;
 
-    private List<SampleType> allSampleDerivTypes;
+    private List<SampleType> allSampleTypes;
 
-    private Collection<ContainerType> allContainerTypes;
+    private List<ContainerType> allContainerTypes;
 
     private Site site;
 
@@ -110,7 +113,9 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         containerTypeAdapter = (ContainerTypeAdapter) adapter;
         containerType = containerTypeAdapter.getContainerType();
         retrieveSite();
-        allContainerTypes = site.getContainerTypeCollection();
+        allContainerTypes = new ArrayList<ContainerType>(site
+            .getContainerTypeCollection());
+        Collections.sort(allContainerTypes, new ContainerTypeComparator());
 
         String tabName;
         if (containerType.getId() == null) {
@@ -218,12 +223,11 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         toolkit.paintBordersFor(client);
 
         createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Rows", null,
-            PojoObservables.observeValue(capacity, "dimensionOneCapacity"),
+            PojoObservables.observeValue(capacity, "rowCapacity"),
             new IntegerNumber("Rows capactiy is not a valid number", false));
 
         createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Columns",
-            null, PojoObservables
-                .observeValue(capacity, "dimensionTwoCapacity"),
+            null, PojoObservables.observeValue(capacity, "colCapacity"),
             new IntegerNumber("Columns capacity is not a valid nubmer", false));
     }
 
@@ -251,7 +255,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         });
 
         createChildContainerTypesSection(client);
-        createSampleDerivTypesSection(client);
+        createSampleTypesSection(client);
         boolean containsSamples = containerType.getSampleTypeCollection() != null
             && containerType.getSampleTypeCollection().size() > 0;
         showSamples(containsSamples);
@@ -267,14 +271,14 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         form.layout(true, true);
     }
 
-    private void createSampleDerivTypesSection(Composite parent) {
+    private void createSampleTypesSection(Composite parent) {
         Collection<SampleType> stSamplesTypes = containerType
             .getSampleTypeCollection();
 
         GetHelper<SampleType> helper = new GetHelper<SampleType>();
 
-        allSampleDerivTypes = helper.getModelObjects(appService,
-            SampleType.class);
+        allSampleTypes = helper.getModelObjects(appService, SampleType.class);
+        Collections.sort(allSampleTypes, new SampleTypeComparator());
 
         samplesMultiSelect = new MultiSelectWidget(parent, SWT.NONE,
             "Selected Sample Types", "Available Sample Types", 100);
@@ -284,21 +288,19 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         gd.horizontalSpan = 2;
         samplesMultiSelect.setLayoutData(gd);
 
-        ListOrderedMap availSampleDerivTypes = new ListOrderedMap();
-        List<Integer> selSampleDerivTypes = new ArrayList<Integer>();
+        ListOrderedMap availSampleTypes = new ListOrderedMap();
+        List<Integer> selSampleTypes = new ArrayList<Integer>();
 
         if (stSamplesTypes != null) {
             for (SampleType sampleType : stSamplesTypes) {
-                selSampleDerivTypes.add(sampleType.getId());
+                selSampleTypes.add(sampleType.getId());
             }
         }
 
-        for (SampleType sampleType : allSampleDerivTypes) {
-            availSampleDerivTypes.put(sampleType.getId(), sampleType
-                .getNameShort());
+        for (SampleType sampleType : allSampleTypes) {
+            availSampleTypes.put(sampleType.getId(), sampleType.getName());
         }
-        samplesMultiSelect.addSelections(availSampleDerivTypes,
-            selSampleDerivTypes);
+        samplesMultiSelect.addSelections(availSampleTypes, selSampleTypes);
     }
 
     private void createChildContainerTypesSection(Composite parent) {
@@ -435,7 +437,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         Set<SampleType> selSampleTypes = new HashSet<SampleType>();
         if (hasSamples.getSelection()) {
             List<Integer> selSampleTypeIds = samplesMultiSelect.getSelected();
-            for (SampleType sampleType : allSampleDerivTypes) {
+            for (SampleType sampleType : allSampleTypes) {
                 int id = sampleType.getId();
                 if (selSampleTypeIds.indexOf(id) >= 0) {
                     selSampleTypes.add(sampleType);

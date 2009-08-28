@@ -62,8 +62,7 @@ public class ContainerPositionWrapper extends ModelWrapper<ContainerPosition> {
     private void setCol(Integer col) {
         Integer oldCol = getCol();
         wrappedObject.setCol(col);
-        propertyChangeSupport.firePropertyChange("positionDimensionTwo",
-            oldCol, col);
+        propertyChangeSupport.firePropertyChange("col", oldCol, col);
     }
 
     private Integer getCol() {
@@ -77,8 +76,7 @@ public class ContainerPositionWrapper extends ModelWrapper<ContainerPosition> {
     private void setRow(Integer row) {
         Integer oldRow = getRow();
         wrappedObject.setRow(row);
-        propertyChangeSupport.firePropertyChange("positionDimensionOne",
-            oldRow, row);
+        propertyChangeSupport.firePropertyChange("row", oldRow, row);
     }
 
 }

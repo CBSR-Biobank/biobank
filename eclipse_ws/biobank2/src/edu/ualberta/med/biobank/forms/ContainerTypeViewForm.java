@@ -133,18 +133,16 @@ public class ContainerTypeViewForm extends BiobankViewForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         dimOneCapacityLabel = (Label) createWidget(client, Label.class,
-            SWT.NONE, "Dimension One Capacity");
+            SWT.NONE, "Maximum Rows");
         dimTwoCapacityLabel = (Label) createWidget(client, Label.class,
-            SWT.NONE, "Dimension Two Capacity");
+            SWT.NONE, "Maximum Columns");
 
         setDimensionsValues();
     }
 
     private void setDimensionsValues() {
-        FormUtils.setTextValue(dimOneCapacityLabel, capacity
-            .getRowCapacity());
-        FormUtils.setTextValue(dimTwoCapacityLabel, capacity
-            .getColCapacity());
+        FormUtils.setTextValue(dimOneCapacityLabel, capacity.getRowCapacity());
+        FormUtils.setTextValue(dimTwoCapacityLabel, capacity.getColCapacity());
     }
 
     private void createSampleTypesSection() {
@@ -210,8 +208,7 @@ public class ContainerTypeViewForm extends BiobankViewForm {
                 client);
             containerWidget.setContainerType(containerType);
 
-            int dim2 = containerType.getCapacity().getColCapacity()
-                .intValue();
+            int dim2 = containerType.getCapacity().getColCapacity().intValue();
             if (dim2 <= 1) {
                 // single dimension size
                 containerWidget.setCellWidth(150);

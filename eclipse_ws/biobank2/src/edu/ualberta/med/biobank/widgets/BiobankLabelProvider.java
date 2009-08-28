@@ -123,11 +123,11 @@ public class BiobankLabelProvider extends LabelProvider implements
                     : new SimpleDateFormat(BioBankPlugin.DATE_TIME_FORMAT)
                         .format(sample.getLinkDate());
             case 4:
-                return sample.getQuantityUsed() == null ? "" : sample
-                    .getQuantityUsed().toString();
-            case 5:
                 return sample.getQuantity() == null ? "" : sample.getQuantity()
                     .toString();
+            case 5:
+                return sample.getQuantityUsed() == null ? "" : sample
+                    .getQuantityUsed().toString();
             case 6:
                 return sample.getComment() == null ? "" : sample.getComment();
             }

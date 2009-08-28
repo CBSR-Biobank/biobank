@@ -165,8 +165,7 @@ public class BioBank2Db {
             + " from edu.ualberta.med.biobank.model.Container as sc"
             + " inner join sc.childPositionCollection as positions"
             + " inner join positions.container as occupied"
-            + " where sc.id=? and positions.positionDimensionOne=? "
-            + " and positions.positionDimensionTwo=?");
+            + " where sc.id=? and positions.row=? and positions.col=?");
 
         c.setParameters(Arrays.asList(new Object [] {
             container.getId(), dim1pos, dim2pos }));

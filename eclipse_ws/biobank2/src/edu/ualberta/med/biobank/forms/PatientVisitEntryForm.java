@@ -132,7 +132,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         PatientWrapper patientWrapper = retrievePatient();
         createMainSection(patientWrapper.getStudy());
         createSourcesSection();
-        createDatasSection(patientWrapper.getStudy());
+        createPvDataSection(patientWrapper.getStudy());
         initCancelConfirmWidget(form.getBody());
         if (patientVisitWrapper.isNew()) {
             setDirty(true);
@@ -208,7 +208,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         pvSampleSourceEntryWidget.addSelectionChangedListener(listener);
     }
 
-    private void createDatasSection(Study study) {
+    private void createPvDataSection(Study study) {
         if (study.getPvInfoCollection().size() > 0) {
             Composite client = createSectionWithClient("Others informations");
 

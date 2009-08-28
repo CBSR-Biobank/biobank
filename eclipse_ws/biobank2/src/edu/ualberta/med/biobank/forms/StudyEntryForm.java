@@ -235,13 +235,18 @@ public class StudyEntryForm extends BiobankEntryForm {
         // we just want to show the user that this information is collected
         // by default. Date drawn is already part of the PatientVisit class.
         //
-        PvInfoType pvType = new PvInfoType();
-        pvType.setType("date_time");
-        PvInfoPossible pvInfoDateDrawn = new PvInfoPossible();
-        pvInfoDateDrawn.setIsDefault(true);
-        pvInfoDateDrawn.setLabel("Date Drawn");
-        pvInfoDateDrawn.setPvInfoType(pvType);
-        new PvInfoWidget(client, SWT.NONE, pvInfoDateDrawn, true, null);
+        String[] defaultFields = new String[] { "Date Drawn", "Date Processed",
+            "Date Received" };
+
+        for (String field : defaultFields) {
+            PvInfoType pvType = new PvInfoType();
+            pvType.setType("date_time");
+            PvInfoPossible pvInfoDateDrawn = new PvInfoPossible();
+            pvInfoDateDrawn.setIsDefault(true);
+            pvInfoDateDrawn.setLabel(field);
+            pvInfoDateDrawn.setPvInfoType(pvType);
+            new PvInfoWidget(client, SWT.NONE, pvInfoDateDrawn, true, null);
+        }
         //
         // END KLUDGE
 

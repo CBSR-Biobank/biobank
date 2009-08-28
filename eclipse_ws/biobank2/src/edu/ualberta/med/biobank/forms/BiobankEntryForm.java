@@ -25,8 +25,6 @@ import org.eclipse.jface.databinding.swt.SWTObservables;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ComboViewer;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.custom.CCombo;
@@ -312,13 +310,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
         }
 
         combo.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
-        comboViewer
-            .addSelectionChangedListener(new ISelectionChangedListener() {
-                @Override
-                public void selectionChanged(SelectionChangedEvent event) {
-                    setDirty(true);
-                }
-            });
+        comboViewer.getCCombo().addModifyListener(modifyListener);
         AbstractValidator validator = new NonEmptyString(errorMessage);
         validator.setControlDecoration(FormUtils.createDecorator(label,
             errorMessage));

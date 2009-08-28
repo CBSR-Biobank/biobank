@@ -1,7 +1,10 @@
 package edu.ualberta.med.biobank.widgets;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.runtime.Assert;
@@ -24,6 +27,7 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.dialogs.SampleTypeDialog;
 import edu.ualberta.med.biobank.model.SampleType;
+import edu.ualberta.med.biobank.model.SampleTypeComparator;
 import edu.ualberta.med.biobank.widgets.infotables.BiobankCollectionModel;
 import edu.ualberta.med.biobank.widgets.infotables.SampleTypeInfoTable;
 import edu.ualberta.med.biobank.widgets.listener.BiobankEntryFormWidgetListener;
@@ -39,7 +43,7 @@ public class SampleTypeEntryWidget extends BiobankWidget {
 
     private Button addSampleTypeButton;
 
-    private Collection<SampleType> selectedSampleTypes;
+    private List<SampleType> selectedSampleTypes;
 
     private Collection<SampleType> conflictTypes;
 
@@ -64,11 +68,12 @@ public class SampleTypeEntryWidget extends BiobankWidget {
         this.conflictTypes = conflictTypes;
 
         if (sampleTypeCollection == null) {
-            selectedSampleTypes = new HashSet<SampleType>();
+            selectedSampleTypes = new ArrayList<SampleType>();
         } else {
-            selectedSampleTypes = sampleTypeCollection;
+            selectedSampleTypes = new ArrayList<SampleType>(
+                sampleTypeCollection);
         }
-
+        Collections.sort(selectedSampleTypes, new SampleTypeComparator());
         setLayout(new GridLayout(1, false));
         setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
