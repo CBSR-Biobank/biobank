@@ -154,6 +154,12 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
+        // FIXME cannot get valid site when adding a new patient visit
+        Label siteLabel = (Label) createWidget(client, Label.class, SWT.NONE,
+            "Site");
+        FormUtils.setTextValue(siteLabel, patientVisitWrapper
+            .getPatientWrapper().getPatient().getStudy().getSite().getName());
+
         if (patientVisitWrapper.getId() == null) {
             // choose clinic for new visit
             Collection<Clinic> clinics = ModelUtils.getStudyClinicCollection(

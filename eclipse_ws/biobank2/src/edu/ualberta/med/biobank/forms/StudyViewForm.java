@@ -30,6 +30,7 @@ public class StudyViewForm extends BiobankViewForm {
     private StudyAdapter studyAdapter;
     private Study study;
 
+    private Label siteLabel;
     private Label nameShortLabel;
     private Label activityStatusLabel;
     private Label commentLabel;
@@ -72,6 +73,7 @@ public class StudyViewForm extends BiobankViewForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
+        siteLabel = (Label) createWidget(client, Label.class, SWT.NONE, "Site");
         nameShortLabel = (Label) createWidget(client, Label.class, SWT.NONE,
             "Short Name");
         activityStatusLabel = (Label) createWidget(client, Label.class,
@@ -102,6 +104,7 @@ public class StudyViewForm extends BiobankViewForm {
     }
 
     private void setStudySectionValues() {
+        FormUtils.setTextValue(siteLabel, study.getSite().getName());
         FormUtils.setTextValue(nameShortLabel, study.getNameShort());
         FormUtils.setTextValue(activityStatusLabel, study.getActivityStatus());
         FormUtils.setTextValue(commentLabel, study.getComment());

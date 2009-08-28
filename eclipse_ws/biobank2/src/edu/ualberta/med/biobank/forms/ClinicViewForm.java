@@ -23,6 +23,8 @@ public class ClinicViewForm extends AddressViewFormCommon {
 
     private ClinicStudyInfoTable studiesTable;
 
+    private Label siteLabel;
+
     private Label activityStatusLabel;
 
     private Label commentLabel;
@@ -60,6 +62,7 @@ public class ClinicViewForm extends AddressViewFormCommon {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
+        siteLabel = (Label) createWidget(client, Label.class, SWT.NONE, "Site");
         activityStatusLabel = (Label) createWidget(client, Label.class,
             SWT.NONE, "Activity Status");
         commentLabel = (Label) createWidget(client, Label.class, SWT.NONE,
@@ -69,6 +72,7 @@ public class ClinicViewForm extends AddressViewFormCommon {
     }
 
     private void setClinicValues() {
+        FormUtils.setTextValue(siteLabel, clinic.getSite().getName());
         FormUtils.setTextValue(activityStatusLabel, clinic.getActivityStatus());
         FormUtils.setTextValue(commentLabel, clinic.getComment());
     }

@@ -1,11 +1,13 @@
 package edu.ualberta.med.biobank.forms;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.forms.widgets.Section;
 
-import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.treeview.PatientAdapter;
 import edu.ualberta.med.biobank.widgets.infotables.PatientVisitInfoTable;
@@ -17,10 +19,12 @@ public class PatientViewForm extends BiobankViewForm {
 
     private PatientWrapper patientWrapper;
 
+    private Label siteLabel;
+
     private PatientVisitInfoTable visitsTable;
 
     @Override
-    public void init() {
+    public void init() throws Exception {
         Assert.isTrue(adapter instanceof PatientAdapter,
             "Invalid editor input: object of type "
                 + adapter.getClass().getName());
@@ -31,14 +35,8 @@ public class PatientViewForm extends BiobankViewForm {
         setPartName("Patient " + patientWrapper.getNumber());
     }
 
-    private void retrievePatient() {
-        try {
-            patientWrapper.reload();
-        } catch (Exception e) {
-            SessionManager.getLogger().error(
-                "Error while retrieving patient "
-                    + patientAdapter.getWrapper().getNumber(), e);
-        }
+    private void retrievePatient() throws Exception {
+        patientWrapper.reload();
     }
 
     @Override
@@ -48,8 +46,21 @@ public class PatientViewForm extends BiobankViewForm {
         form.getBody().setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         addRefreshToolbarAction();
+        createPatientSection();
         createPatientVisitSection();
         initEditButton(form.getBody(), patientAdapter);
+        setValues();
+    }
+
+    private void createPatientSection() {
+        Composite client = toolkit.createComposite(form.getBody());
+        GridLayout layout = new GridLayout(2, false);
+        layout.horizontalSpacing = 10;
+        client.setLayout(layout);
+        client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        toolkit.paintBordersFor(client);
+
+        siteLabel = (Label) createWidget(client, Label.class, SWT.NONE, "Site");
     }
 
     private void createPatientVisitSection() {
@@ -63,8 +74,14 @@ public class PatientViewForm extends BiobankViewForm {
             FormUtils.getBiobankCollectionDoubleClickListener());
     }
 
+    private void setValues() {
+        FormUtils.setTextValue(siteLabel, patientWrapper.getStudy().getSite()
+            .getName());
+    }
+
     @Override
-    protected void reload() {
+    protected void reload() throws Exception {
+        setValues();
         retrievePatient();
         setPartName("Patient " + patientWrapper.getNumber());
         form.setText("Patient: " + patientWrapper.getNumber());

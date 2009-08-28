@@ -104,6 +104,10 @@ public class ContainerEntryForm extends BiobankEntryForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
+        Label siteLabel = (Label) createWidget(client, Label.class, SWT.NONE,
+            "Site");
+        FormUtils.setTextValue(siteLabel, container.getSite().getName());
+
         if (position == null) {
             // only allow edit to label on top level containers
             createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Label",

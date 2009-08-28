@@ -16,6 +16,7 @@ import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
@@ -138,6 +139,10 @@ public class StudyEntryForm extends BiobankEntryForm {
         client.setLayout(layout);
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
+
+        Label siteLabel = (Label) createWidget(client, Label.class, SWT.NONE,
+            "Site");
+        FormUtils.setTextValue(siteLabel, study.getSite().getName());
 
         createBoundWidgetsFromMap(FIELDS, study, client);
 
