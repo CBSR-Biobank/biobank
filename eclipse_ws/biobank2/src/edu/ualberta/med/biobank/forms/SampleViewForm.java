@@ -64,8 +64,8 @@ public class SampleViewForm extends BiobankViewForm {
             string += "No position - should be assign to a location";
         } else {
             string += "Position = "
-                + sample.getSamplePosition().getPositionDimensionOne() + ":"
-                + sample.getSamplePosition().getPositionDimensionTwo();
+                + sample.getSamplePosition().getRow() + ":"
+                + sample.getSamplePosition().getCol();
         }
         toolkit.createLabel(client, string);
     }

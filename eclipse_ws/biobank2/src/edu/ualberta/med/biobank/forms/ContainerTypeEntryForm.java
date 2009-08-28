@@ -277,7 +277,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
             SampleType.class);
 
         samplesMultiSelect = new MultiSelectWidget(parent, SWT.NONE,
-            "Selected Sample Derivatives", "Available Sample Derivatives", 100);
+            "Selected Sample Types", "Available Sample Types", 100);
         samplesMultiSelect.adaptToToolkit(toolkit, true);
         samplesMultiSelect.addSelectionChangedListener(multiSelectListener);
         GridData gd = new GridData(GridData.FILL_HORIZONTAL);

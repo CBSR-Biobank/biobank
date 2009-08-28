@@ -111,8 +111,8 @@ public class ModelUtils {
             return "none";
         }
         else {
-            int dim1 = position.getPositionDimensionOne();
-            int dim2 = position.getPositionDimensionTwo();
+            int dim1 = position.getRow();
+            int dim2 = position.getCol();
             String dim1String = String.valueOf((char) ('A' + dim1));
             String dim2String = String.valueOf(dim2);
             Container container = position.getContainer();

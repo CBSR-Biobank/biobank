@@ -167,8 +167,8 @@ public abstract class AbstractGridContainerWidget extends Canvas {
     public void setContainerType(ContainerType type) {
         this.containerType = type;
         Capacity capacity = containerType.getCapacity();
-        int dim1 = capacity.getDimensionOneCapacity();
-        int dim2 = capacity.getDimensionTwoCapacity();
+        int dim1 = capacity.getRowCapacity();
+        int dim2 = capacity.getColCapacity();
         setStorageSize(dim1, dim2);
     }
 
@@ -303,7 +303,7 @@ public abstract class AbstractGridContainerWidget extends Canvas {
         return rows;
     }
 
-    public int getColumns() {
+    public int getCols() {
         return columns;
     }
 

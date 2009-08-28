@@ -289,12 +289,12 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
                             return;
                         }
                         Point drawerPosition = new Point(drawer.getPosition()
-                            .getPositionDimensionOne(), drawer.getPosition()
-                            .getPositionDimensionTwo());
+                            .getRow(), drawer.getPosition()
+                            .getCol());
                         cabinetWidget.setSelectedBox(drawerPosition);
                         cabinetLabel.setText("Cabinet " + cabinet.getLabel());
                         drawerWidget.setSelectedBin(bin.getPosition()
-                            .getPositionDimensionOne());
+                            .getRow());
                         drawerLabel.setText("Drawer " + drawer.getLabel());
 
                         sp.setSample(sample);
@@ -350,9 +350,9 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
         sp.setContainer(bin);
         char letter = positionString.substring(6, 7).toCharArray()[0];
         // positions start at A
-        sp.setPositionDimensionOne(letter - 'A');
+        sp.setRow(letter - 'A');
         letter = positionString.substring(7).toCharArray()[0];
-        sp.setPositionDimensionTwo(letter - 'A');
+        sp.setCol(letter - 'A');
         return sp;
     }
 

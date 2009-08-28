@@ -77,11 +77,11 @@ public class AddSamplesScanPalletWidget extends ScanPalletWidget {
             endRow = lastSelected.getRow();
         }
         for (int indexRow = startRow; indexRow <= endRow; indexRow++) {
-            int startCol = lastSelected.getColumn();
-            int endCol = cell.getColumn();
+            int startCol = lastSelected.getCol();
+            int endCol = cell.getCol();
             if (startCol > endCol) {
-                startCol = cell.getColumn();
-                endCol = lastSelected.getColumn();
+                startCol = cell.getCol();
+                endCol = lastSelected.getCol();
             }
             for (int indexCol = startCol; indexCol <= endCol; indexCol++) {
                 PalletCell cellToAdd = scannedElements[indexRow][indexCol];

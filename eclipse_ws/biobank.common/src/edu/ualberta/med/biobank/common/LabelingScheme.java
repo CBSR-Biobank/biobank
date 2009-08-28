@@ -53,8 +53,8 @@ public class LabelingScheme {
      */
     public static RowColPos cbsrTwoCharToRowCol(ContainerType containerType,
         String label) throws Exception {
-        Integer rowCap = containerType.getCapacity().getDimensionOneCapacity();
-        Integer colCap = containerType.getCapacity().getDimensionTwoCapacity();
+        Integer rowCap = containerType.getCapacity().getRowCapacity();
+        Integer colCap = containerType.getCapacity().getColCapacity();
         return cbsrTwoCharToRowCol(label, rowCap, colCap, containerType
             .getName());
     }
@@ -86,7 +86,7 @@ public class LabelingScheme {
      */
     public static RowColPos twoCharNumericToRowCol(ContainerType containerType,
         String label) throws Exception {
-        Integer rowCap = containerType.getCapacity().getDimensionOneCapacity();
+        Integer rowCap = containerType.getCapacity().getRowCapacity();
         return twoCharNumericToRowCol(label, rowCap);
     }
 
@@ -110,8 +110,8 @@ public class LabelingScheme {
      * convert a position in row*column to two letter (in the CBSR way)
      */
     public static String rowColToCBSRTwoChar(RowColPos rcp, Capacity capacity) {
-        int totalRows = capacity.getDimensionOneCapacity();
-        int totalCols = capacity.getDimensionTwoCapacity();
+        int totalRows = capacity.getRowCapacity();
+        int totalCols = capacity.getColCapacity();
         return rowColToCBSRTwoChar(rcp, totalRows, totalCols);
     }
 
@@ -141,7 +141,7 @@ public class LabelingScheme {
      * Convert a position in row*column to two char numeric.
      */
     public static String rowColToTwoCharNumeric(RowColPos rcp, Capacity capacity) {
-        int totalRows = capacity.getDimensionOneCapacity();
+        int totalRows = capacity.getRowCapacity();
         return rowColToTwoCharNumeric(rcp, totalRows);
     }
 
@@ -179,8 +179,8 @@ public class LabelingScheme {
      */
     public static String getPositionString(ContainerPosition position) {
         RowColPos rcp = new RowColPos();
-        rcp.row = position.getPositionDimensionOne();
-        rcp.col = position.getPositionDimensionTwo();
+        rcp.row = position.getRow();
+        rcp.col = position.getCol();
         return getPositionString(rcp, position.getParentContainer()
             .getContainerType());
     }

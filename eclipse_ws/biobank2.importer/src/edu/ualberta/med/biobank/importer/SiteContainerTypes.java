@@ -105,8 +105,8 @@ public class SiteContainerTypes {
         ct.setName(name);
         ct.setSite(site);
         Capacity capacity = new Capacity();
-        capacity.setDimensionOneCapacity(dim1);
-        capacity.setDimensionTwoCapacity(dim2);
+        capacity.setRowCapacity(dim1);
+        capacity.setColCapacity(dim2);
         ct.setCapacity(capacity);
         ct.setActivityStatus("Active");
         ct.setChildLabelingScheme(childLabelingScheme);

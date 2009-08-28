@@ -213,14 +213,14 @@ public class ContainerWrapper extends ModelWrapper<Container> {
         RowColPos rcp = LabelingScheme.getRowColFromPositionString(position,
             type);
         Capacity capacity = type.getCapacity();
-        if (rcp.row < capacity.getDimensionOneCapacity()
-            && rcp.col < capacity.getDimensionTwoCapacity()) {
+        if (rcp.row < capacity.getRowCapacity()
+            && rcp.col < capacity.getColCapacity()) {
             return rcp;
         }
         throw new Exception("Can't use position " + position + " in container "
             + getFullInfoLabel() + "\nReason: capacity = "
-            + capacity.getDimensionOneCapacity() + "*"
-            + capacity.getDimensionTwoCapacity());
+            + capacity.getRowCapacity() + "*"
+            + capacity.getColCapacity());
     }
 
     public void setContainerType(ContainerType containerType) {

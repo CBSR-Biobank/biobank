@@ -119,8 +119,8 @@ public class TestFunctionalities {
     private void trySamplePositionInsert(Sample sample, Container sc) {
         try {
             SamplePosition samplePosition = new SamplePosition();
-            samplePosition.setPositionDimensionOne(3);
-            samplePosition.setPositionDimensionTwo(3);
+            samplePosition.setRow(3);
+            samplePosition.setCol(3);
             samplePosition.setSample(sample);
             samplePosition.setContainer(sc);
             SDKQueryResult res = appService.executeQuery(new InsertExampleQuery(
@@ -151,16 +151,16 @@ public class TestFunctionalities {
         System.out.println("Not used sample = " + sample.getId());
 
         SamplePosition samplePosition = new SamplePosition();
-        samplePosition.setPositionDimensionOne(1);
-        samplePosition.setPositionDimensionTwo(1);
+        samplePosition.setRow(1);
+        samplePosition.setCol(1);
         samplePosition.setSample(sample);
         samplePosition.setContainer(sc);
         queries.add(new InsertExampleQuery(samplePosition));
 
         samplePosition = new SamplePosition();
         samplePosition.setSample(sample);
-        samplePosition.setPositionDimensionOne(2);
-        samplePosition.setPositionDimensionTwo(2);
+        samplePosition.setRow(2);
+        samplePosition.setCol(2);
         samplePosition.setContainer(sc);
         // will failed because sample can't be link to 2 samplePosition
         // roll back should be launched
@@ -492,8 +492,8 @@ public class TestFunctionalities {
      */
     private Capacity getNewCapacity() throws ApplicationException {
         Capacity capacity = new Capacity();
-        capacity.setDimensionOneCapacity(r.nextInt(30));
-        capacity.setDimensionTwoCapacity(r.nextInt(30));
+        capacity.setRowCapacity(r.nextInt(30));
+        capacity.setColCapacity(r.nextInt(30));
         return (Capacity) appService.executeQuery(
             new InsertExampleQuery(capacity)).getObjectResult();
     }
@@ -512,8 +512,8 @@ public class TestFunctionalities {
         Container scParent = getAnotherContainer(sc.getId());
 
         ContainerPosition containerPosition = new ContainerPosition();
-        containerPosition.setPositionDimensionOne(8);
-        containerPosition.setPositionDimensionTwo(8);
+        containerPosition.setRow(8);
+        containerPosition.setCol(8);
         containerPosition.setContainer(sc);
         containerPosition.setParentContainer(scParent);
         queries.add(new InsertExampleQuery(containerPosition));
@@ -521,8 +521,8 @@ public class TestFunctionalities {
         containerPosition = new ContainerPosition();
         containerPosition.setContainer(sc); // same occupied container !
         containerPosition.setParentContainer(scParent);
-        containerPosition.setPositionDimensionOne(9);
-        containerPosition.setPositionDimensionTwo(9);
+        containerPosition.setRow(9);
+        containerPosition.setCol(9);
         queries.add(new InsertExampleQuery(containerPosition));
 
         try {
@@ -565,8 +565,8 @@ public class TestFunctionalities {
         }
         if (scs.size() == 0) {
             Capacity capacity = new Capacity();
-            capacity.setDimensionOneCapacity(8);
-            capacity.setDimensionTwoCapacity(12);
+            capacity.setRowCapacity(8);
+            capacity.setColCapacity(12);
             SDKQueryResult result = appService.executeQuery(new InsertExampleQuery(
                 capacity));
             capacity = (Capacity) result.getObjectResult();

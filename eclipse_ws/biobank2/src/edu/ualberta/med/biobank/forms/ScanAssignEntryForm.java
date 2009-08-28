@@ -358,14 +358,14 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
             freezerLabel.setText(freezerContainer.getFullInfoLabel());
             freezerWidget.setContainerType(freezerContainer.getContainerType());
             freezerWidget.setSelectedBox(new Point(hotelPosition
-                .getPositionDimensionOne(), hotelPosition
-                .getPositionDimensionTwo()));
+                .getRow(), hotelPosition
+                .getCol()));
 
             hotelLabel.setText(hotelContainer.getFullInfoLabel());
             hotelWidget.setContainerType(hotelContainer.getContainerType());
             hotelWidget.setSelectedBox(new Point(palletPosition
-                .getPositionDimensionOne(), palletPosition
-                .getPositionDimensionTwo()));
+                .getRow(), palletPosition
+                .getCol()));
 
             palletLabel.setText(currentPalletWrapper.getLabel());
         }
@@ -487,8 +487,8 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
         // Sample sample = cell.getSample();
         // if (sample != null && sample.getSamplePosition() == null) {
         // SamplePosition samplePosition = new SamplePosition();
-        // samplePosition.setPositionDimensionOne(i);
-        // samplePosition.setPositionDimensionTwo(j);
+        // samplePosition.setRow(i);
+        // samplePosition.setCol(j);
         // samplePosition.setContainer(currentPallet);
         // samplePosition.setSample(sample);
         // sample.setSamplePosition(samplePosition);
@@ -585,12 +585,12 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
                 Capacity palletCapacity = currentPalletWrapper
                     .getContainerType().getCapacity();
                 currentPalletSamples = new Sample[palletCapacity
-                    .getDimensionOneCapacity()][palletCapacity
-                    .getDimensionTwoCapacity()];
+                    .getRowCapacity()][palletCapacity
+                    .getColCapacity()];
                 for (SamplePosition position : currentPalletWrapper
                     .getSamplePositionCollection()) {
-                    currentPalletSamples[position.getPositionDimensionOne()][position
-                        .getPositionDimensionTwo()] = position.getSample();
+                    currentPalletSamples[position.getRow()][position
+                        .getCol()] = position.getSample();
                 }
             } else {
                 return false;

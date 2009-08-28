@@ -148,8 +148,8 @@ public class ContainerViewForm extends BiobankViewForm {
     private void initCells() {
         ContainerType containerType = container.getContainerType();
         Capacity cap = containerType.getCapacity();
-        int dim1 = cap.getDimensionOneCapacity().intValue();
-        int dim2 = cap.getDimensionTwoCapacity().intValue();
+        int dim1 = cap.getRowCapacity().intValue();
+        int dim2 = cap.getColCapacity().intValue();
         if (dim1 == 0)
             dim1 = 1;
         if (dim2 == 0)
@@ -158,8 +158,8 @@ public class ContainerViewForm extends BiobankViewForm {
         for (int i = 0; i < dim1; i++) {
             for (int j = 0; j < dim2; j++) {
                 ContainerPosition pos = new ContainerPosition();
-                pos.setPositionDimensionOne(i);
-                pos.setPositionDimensionTwo(j);
+                pos.setRow(i);
+                pos.setCol(j);
                 ContainerCell cell = new ContainerCell(pos);
                 cell.setStatus(ContainerStatus.NOT_INITIALIZED);
                 cells[i][j] = cell;
@@ -167,8 +167,8 @@ public class ContainerViewForm extends BiobankViewForm {
         }
         for (ContainerPosition position : container
             .getChildPositionCollection()) {
-            int positionDim1 = position.getPositionDimensionOne().intValue();
-            int positionDim2 = position.getPositionDimensionTwo().intValue();
+            int positionDim1 = position.getRow().intValue();
+            int positionDim2 = position.getCol().intValue();
             ContainerCell cell = new ContainerCell(position);
             cell.setStatus(ContainerStatus.INITIALIZED);
             cells[positionDim1][positionDim2] = cell;
@@ -282,7 +282,7 @@ public class ContainerViewForm extends BiobankViewForm {
     private void openFormFor(ContainerPosition pos) {
         ContainerAdapter newAdapter = null;
         ContainerAdapter.closeEditor(new FormInput(containerAdapter));
-        if (cells[pos.getPositionDimensionOne()][pos.getPositionDimensionTwo()]
+        if (cells[pos.getRow()][pos.getCol()]
             .getStatus() == ContainerStatus.NOT_INITIALIZED) {
             Container newContainer = new Container();
             pos.setParentContainer(container);
@@ -298,10 +298,10 @@ public class ContainerViewForm extends BiobankViewForm {
             for (ContainerPosition childPos : childPositions) {
                 childContainer = childPos.getContainer();
                 Assert.isNotNull(childContainer);
-                if (childPos.getPositionDimensionOne().compareTo(
-                    pos.getPositionDimensionOne()) == 0
-                    && childPos.getPositionDimensionTwo().compareTo(
-                        pos.getPositionDimensionTwo()) == 0) {
+                if (childPos.getRow().compareTo(
+                    pos.getRow()) == 0
+                    && childPos.getCol().compareTo(
+                        pos.getCol()) == 0) {
                     newAdapter = new ContainerAdapter(containerAdapter,
                         childContainer);
                 }
@@ -328,12 +328,12 @@ public class ContainerViewForm extends BiobankViewForm {
         if (position != null) {
             if (positionDimOneLabel != null) {
                 FormUtils.setTextValue(positionDimOneLabel, position
-                    .getPositionDimensionOne());
+                    .getRow());
             }
 
             if (positionDimTwoLabel != null) {
                 FormUtils.setTextValue(positionDimTwoLabel, position
-                    .getPositionDimensionTwo());
+                    .getCol());
             }
         }
     }

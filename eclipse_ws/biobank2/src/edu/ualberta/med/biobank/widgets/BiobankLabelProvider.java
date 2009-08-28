@@ -106,12 +106,6 @@ public class BiobankLabelProvider extends LabelProvider implements
             case 2:
                 return container.getProductBarcode();
             case 3:
-                Object o = container.getFull();
-                if (o == null)
-                    return "";
-                return (Boolean) o ? "Yes" : "No";
-
-            case 4:
                 return "" + container.getTemperature();
             }
         } else if (element instanceof Sample) {
@@ -125,12 +119,12 @@ public class BiobankLabelProvider extends LabelProvider implements
             case 2:
                 return ModelUtils.getSamplePosition(sample);
             case 3:
-                return sample.getProcessDate() == null ? ""
+                return sample.getLinkDate() == null ? ""
                     : new SimpleDateFormat(BioBankPlugin.DATE_TIME_FORMAT)
-                        .format(sample.getProcessDate());
+                        .format(sample.getLinkDate());
             case 4:
-                return sample.getAvailable() == null ? "" : sample
-                    .getAvailable().toString();
+                return sample.getQuantityUsed() == null ? "" : sample
+                    .getQuantityUsed().toString();
             case 5:
                 return sample.getQuantity() == null ? "" : sample.getQuantity()
                     .toString();

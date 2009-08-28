@@ -142,9 +142,9 @@ public class ContainerTypeViewForm extends BiobankViewForm {
 
     private void setDimensionsValues() {
         FormUtils.setTextValue(dimOneCapacityLabel, capacity
-            .getDimensionOneCapacity());
+            .getRowCapacity());
         FormUtils.setTextValue(dimTwoCapacityLabel, capacity
-            .getDimensionTwoCapacity());
+            .getColCapacity());
     }
 
     private void createSampleTypesSection() {
@@ -210,7 +210,7 @@ public class ContainerTypeViewForm extends BiobankViewForm {
                 client);
             containerWidget.setContainerType(containerType);
 
-            int dim2 = containerType.getCapacity().getDimensionTwoCapacity()
+            int dim2 = containerType.getCapacity().getColCapacity()
                 .intValue();
             if (dim2 <= 1) {
                 // single dimension size

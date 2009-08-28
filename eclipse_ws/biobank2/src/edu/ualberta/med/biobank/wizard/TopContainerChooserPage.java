@@ -100,22 +100,19 @@ public class TopContainerChooserPage extends AbstractContainerChooserPage {
 
     @Override
     protected void setStatus(ContainerCell cell, Container occupiedContainer) {
-        Boolean full = occupiedContainer.getFull();
-        if (full == null) {
-            full = Boolean.FALSE;
-        }
+        boolean full;
         int total = 0;
-        if (!full) {
-            // check if we can add a pallet in the hotel
-            if (occupiedContainer.getChildPositionCollection() != null) {
-                total = occupiedContainer.getChildPositionCollection().size();
-            }
-            int capacityTotal = occupiedContainer.getContainerType()
-                .getCapacity().getDimensionOneCapacity()
-                * occupiedContainer.getContainerType().getCapacity()
-                    .getDimensionTwoCapacity();
-            full = (total == capacityTotal);
+
+        // check if we can add a pallet in the hotel
+        if (occupiedContainer.getChildPositionCollection() != null) {
+            total = occupiedContainer.getChildPositionCollection().size();
         }
+        int capacityTotal = occupiedContainer.getContainerType().getCapacity()
+            .getRowCapacity()
+            * occupiedContainer.getContainerType().getCapacity()
+                .getColCapacity();
+        full = (total == capacityTotal);
+
         if (full) {
             cell.setStatus(ContainerStatus.FULL);
         } else {
