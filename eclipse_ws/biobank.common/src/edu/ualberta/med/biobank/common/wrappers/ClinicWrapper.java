@@ -17,10 +17,6 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
         super(appService, wrappedObject);
     }
 
-    public Clinic getClinic() {
-        return wrappedObject;
-    }
-
     public String getName() {
         return wrappedObject.getName();
     }

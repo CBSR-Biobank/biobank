@@ -12,8 +12,5 @@
 	<classpathentry exported="true" kind="lib" path="lib/gluegen.jar"/>
 	<classpathentry kind="lib" path="lib/jdom.jar"/>
 	<classpathentry kind="lib" path="lib/scanlib.jar"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/biobank.common"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/sampleProcessingRobot"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/scannerConfig"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -19,10 +19,6 @@ public class PatientWrapper extends ModelWrapper<Patient> {
         super(appService, patient);
     }
 
-    public Patient getPatient() {
-        return wrappedObject;
-    }
-
     public String getNumber() {
         return wrappedObject.getNumber();
     }
