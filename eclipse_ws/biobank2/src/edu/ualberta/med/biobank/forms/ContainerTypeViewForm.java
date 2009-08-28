@@ -20,7 +20,6 @@ import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.treeview.ContainerTypeAdapter;
 import edu.ualberta.med.biobank.widgets.CabinetDrawerWidget;
 import edu.ualberta.med.biobank.widgets.ChooseContainerWidget;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ContainerTypeViewForm extends BiobankViewForm {
     public static final String ID = "edu.ualberta.med.biobank.forms.ContainerTypeViewForm";
@@ -30,6 +29,8 @@ public class ContainerTypeViewForm extends BiobankViewForm {
     private ContainerType containerType;
 
     private Capacity capacity;
+
+    private Label siteLabel;
 
     private Label nameLabel;
 
@@ -56,7 +57,7 @@ public class ContainerTypeViewForm extends BiobankViewForm {
     }
 
     @Override
-    public void init() {
+    public void init() throws Exception {
         Assert.isTrue(adapter instanceof ContainerTypeAdapter,
             "Invalid editor input: object of type "
                 + adapter.getClass().getName());
@@ -66,21 +67,16 @@ public class ContainerTypeViewForm extends BiobankViewForm {
         setPartName("Container Type " + containerType.getName());
     }
 
-    private void retrieveContainerType() {
+    private void retrieveContainerType() throws Exception {
         List<ContainerType> result;
         ContainerType searchContainerType = new ContainerType();
         searchContainerType.setId(containerTypeAdapter.getContainerType()
             .getId());
-        try {
-            result = appService
-                .search(ContainerType.class, searchContainerType);
-            Assert.isTrue(result.size() == 1);
-            containerType = result.get(0);
-            containerTypeAdapter.setContainerType(containerType);
-            capacity = containerType.getCapacity();
-        } catch (ApplicationException e) {
-            e.printStackTrace();
-        }
+        result = appService.search(ContainerType.class, searchContainerType);
+        Assert.isTrue(result.size() == 1);
+        containerType = result.get(0);
+        containerTypeAdapter.setContainerType(containerType);
+        capacity = containerType.getCapacity();
     }
 
     @Override
@@ -104,6 +100,7 @@ public class ContainerTypeViewForm extends BiobankViewForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
+        siteLabel = (Label) createWidget(client, Label.class, SWT.NONE, "Site");
         nameLabel = (Label) createWidget(client, Label.class, SWT.NONE, "Name");
         nameShortLabel = (Label) createWidget(client, Label.class, SWT.NONE,
             "Short Name");
@@ -120,6 +117,7 @@ public class ContainerTypeViewForm extends BiobankViewForm {
     }
 
     private void setContainerTypeValues() {
+        FormUtils.setTextValue(siteLabel, containerType.getSite().getName());
         FormUtils.setTextValue(nameLabel, containerType.getName());
         FormUtils.setTextValue(nameShortLabel, containerType.getNameShort());
         FormUtils.setTextValue(defaultTempLabel, containerType
@@ -260,7 +258,7 @@ public class ContainerTypeViewForm extends BiobankViewForm {
     }
 
     @Override
-    protected void reload() {
+    protected void reload() throws Exception {
         retrieveContainerType();
         setPartName("Container Type " + containerType.getName());
         form.setText("Container Type: " + containerType.getName());

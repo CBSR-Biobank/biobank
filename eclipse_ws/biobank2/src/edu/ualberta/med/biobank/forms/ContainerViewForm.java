@@ -47,6 +47,8 @@ public class ContainerViewForm extends BiobankViewForm {
 
     private SamplesListWidget samplesWidget;
 
+    private Label siteLabel;
+
     private Label containerLabelLabel;
 
     private Label productBarcodeLabel;
@@ -124,6 +126,7 @@ public class ContainerViewForm extends BiobankViewForm {
         client.setLayoutData(gridData);
         toolkit.paintBordersFor(client);
 
+        siteLabel = (Label) createWidget(client, Label.class, SWT.NONE, "Site");
         containerLabelLabel = (Label) createWidget(client, Label.class,
             SWT.NONE, "Label");
         productBarcodeLabel = (Label) createWidget(client, Label.class,
@@ -329,6 +332,7 @@ public class ContainerViewForm extends BiobankViewForm {
     }
 
     private void setContainerValues() {
+        FormUtils.setTextValue(siteLabel, container.getSite().getName());
         FormUtils.setTextValue(containerLabelLabel, container.getLabel());
         FormUtils.setTextValue(productBarcodeLabel, container
             .getProductBarcode());

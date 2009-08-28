@@ -21,6 +21,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.PlatformUI;
 
@@ -156,6 +157,11 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
             client.setLayout(layout);
             client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
             toolkit.paintBordersFor(client);
+
+            Label siteLabel = (Label) createWidget(client, Label.class,
+                SWT.NONE, "Site");
+            FormUtils
+                .setTextValue(siteLabel, containerType.getSite().getName());
             createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Name",
                 null, PojoObservables.observeValue(containerType, "name"),
                 NonEmptyString.class, MSG_NO_CONTAINER_TYPE_NAME);

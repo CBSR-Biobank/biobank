@@ -11,6 +11,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
@@ -48,7 +49,6 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
     private ContactEntryWidget contactEntryWidget;
 
     protected Combo session;
-    private Text name;
 
     private BiobankEntryFormWidgetListener listener = new BiobankEntryFormWidgetListener() {
         @Override
@@ -116,10 +116,13 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        name = (Text) createBoundWidgetWithLabel(client, Text.class, SWT.NONE,
-            "Name", null, PojoObservables.observeValue(clinic, "name"),
-            NonEmptyString.class, MSG_NO_CLINIC_NAME);
-        name.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        Label siteLabel = (Label) createWidget(client, Label.class, SWT.NONE,
+            "Site");
+        FormUtils.setTextValue(siteLabel, clinic.getSite().getName());
+
+        createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Name", null,
+            PojoObservables.observeValue(clinic, "name"), NonEmptyString.class,
+            MSG_NO_CLINIC_NAME);
 
         createBoundWidgetWithLabel(client, Combo.class, SWT.NONE,
             "Activity Status", FormConstants.ACTIVITY_STATUS, PojoObservables

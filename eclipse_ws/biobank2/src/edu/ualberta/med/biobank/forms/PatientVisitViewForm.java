@@ -37,6 +37,8 @@ public class PatientVisitViewForm extends BiobankViewForm {
 
     private PatientVisitWrapper patientVisitWrapper;
 
+    private Label siteLabel;
+
     private SamplesListWidget samplesWidget;
 
     // used to keep track of which data has been entered or left blank for
@@ -112,6 +114,7 @@ public class PatientVisitViewForm extends BiobankViewForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
+        siteLabel = (Label) createWidget(client, Label.class, SWT.NONE, "Site");
         clinicLabel = (Label) createWidget(client, Label.class, SWT.NONE,
             "Clinic");
     }
@@ -190,6 +193,8 @@ public class PatientVisitViewForm extends BiobankViewForm {
     }
 
     private void setPatientVisitValues() {
+        FormUtils.setTextValue(siteLabel, patientVisitWrapper.getClinic()
+            .getSite().getName());
         FormUtils.setTextValue(clinicLabel,
             patientVisitWrapper.getClinic() == null ? "" : patientVisitWrapper
                 .getClinic().getName());
