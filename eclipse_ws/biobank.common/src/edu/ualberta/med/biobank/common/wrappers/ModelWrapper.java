@@ -26,6 +26,10 @@ public abstract class ModelWrapper<E> {
         return wrappedObject;
     }
 
+    public void setWrappedObject(E wrappedObject) {
+        this.wrappedObject = wrappedObject;
+    }
+
     protected PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(
         this);
 

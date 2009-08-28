@@ -33,8 +33,7 @@ public class ContainerWrapper extends ModelWrapper<Container> {
 
     @Override
     protected DatabaseResult persistChecks() throws ApplicationException {
-        // TODO Auto-generated method stub
-        return null;
+        return DatabaseResult.OK;
     }
 
     @Override
