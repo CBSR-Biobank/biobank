@@ -278,9 +278,10 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
 
                     // FIXME this test doesn't work, no container has this
                     // position, this is the sample position !
-                    Container sc = ContainerWrapper.getContainerWithTypeInSite(
-                        appService, SessionManager.getInstance()
-                            .getCurrentSite(), positionString, null);
+                    Container sc = ContainerWrapper
+                        .getContainerWithTypeAndLabelInSite(appService,
+                            SessionManager.getInstance().getCurrentSite(),
+                            positionString, null);
                     if (sc == null) {
                         SamplePosition sp = getSamplePosition(positionString);
                         if (sp == null) {
@@ -339,7 +340,7 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
     protected SamplePosition getSamplePosition(String positionString)
         throws Exception {
         // int end = 2;
-        bin = ContainerWrapper.getContainerWithTypeInSite(appService,
+        bin = ContainerWrapper.getContainerWithTypeAndLabelInSite(appService,
             SessionManager.getInstance().getCurrentSite(), positionString
                 .substring(0, 6), "Bin");
         drawer = bin.getPosition().getParentContainer();

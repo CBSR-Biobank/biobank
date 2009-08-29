@@ -82,6 +82,10 @@ public class PalletCell {
                 palletScanned[0][0] = new PalletCell(new ScanCell(0, 0, samples
                     .get(0).getInventoryId()));
             }
+            if (samples.size() > 1) {
+                palletScanned[2][4] = new PalletCell(new ScanCell(2, 4, samples
+                    .get(1).getInventoryId()));
+            }
         } catch (ApplicationException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -202,5 +206,9 @@ public class PalletCell {
 
     public static boolean hasValue(PalletCell cell) {
         return cell != null && cell.getValue() != null;
+    }
+
+    public static PalletCell[][] getEmptyCells() {
+        return new PalletCell[ScanCell.ROW_MAX][ScanCell.COL_MAX];
     }
 }

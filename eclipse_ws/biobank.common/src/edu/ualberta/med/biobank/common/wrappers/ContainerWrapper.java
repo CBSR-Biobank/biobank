@@ -66,7 +66,7 @@ public class ContainerWrapper extends ModelWrapper<Container> {
      * 
      * @throws Exception
      */
-    public static Container getContainerWithTypeInSite(
+    public static Container getContainerWithTypeAndLabelInSite(
         WritableApplicationService appService, Site site, String label,
         String startWithTypeName) throws Exception {
         List<Container> containers = getContainersWithLabelInSite(appService,
@@ -142,8 +142,9 @@ public class ContainerWrapper extends ModelWrapper<Container> {
         String parentContainerLabel = getLabel().substring(0,
             getLabel().length() - 2);
         String topParentContainerLabel = parentContainerLabel.substring(0, 2);
-        Container topParentContainer = getContainerWithTypeInSite(appService,
-            getSite(), topParentContainerLabel, topTypeNameStartWith);
+        Container topParentContainer = getContainerWithTypeAndLabelInSite(
+            appService, getSite(), topParentContainerLabel,
+            topTypeNameStartWith);
         if (topParentContainer != null) {
             // we got the top parent Container in which we want to create a new
             // position in one of its child container
@@ -168,8 +169,12 @@ public class ContainerWrapper extends ModelWrapper<Container> {
 
             // has the parent container. Can now find the position using the
             // parent labeling scheme
+            ContainerPosition position = getPosition();
+            if (position == null) {
+                position = new ContainerPosition();
+            }
             ContainerPositionWrapper positionWrapper = new ContainerPositionWrapper(
-                appService, new ContainerPosition());
+                appService, position);
             positionWrapper.setParentContainer(currentParentContainer);
             positionWrapper.setPosition(getLabel().substring(
                 getLabel().length() - 2));
@@ -280,6 +285,24 @@ public class ContainerWrapper extends ModelWrapper<Container> {
             return getLabel();
         }
         return getLabel() + "(" + getContainerType().getNameShort() + ")";
+    }
+
+    public static Container getContainerWithProductBarcodeInSite(
+        WritableApplicationService appService, Site site, String productBarcode)
+        throws Exception {
+        HQLCriteria criteria = new HQLCriteria("from "
+            + Container.class.getName()
+            + " where site = ? and productBarcode = ?", Arrays
+            .asList(new Object[] { site, productBarcode }));
+        List<Container> containers = appService.query(criteria);
+        if (containers.size() == 0) {
+            return null;
+        } else if (containers.size() > 1) {
+            throw new Exception(
+                "Multiples containers registered with product barcode "
+                    + productBarcode);
+        }
+        return containers.get(0);
     }
 
 }
