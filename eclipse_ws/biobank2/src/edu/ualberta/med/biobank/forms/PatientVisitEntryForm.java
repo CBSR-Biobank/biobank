@@ -87,9 +87,13 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
 
     private DateTimeWidget dateDrawn;
 
-    private DateTimeWidget dateDrawn;
+    private DateTimeWidget dateProcessed;
+
+    private DateTimeWidget dateReceived;
 
     private ComboViewer clinicsComboViewer;
+
+    private Text commentsText;
 
     private PvSampleSourceEntryWidget pvSampleSourceEntryWidget;
 
@@ -109,7 +113,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         retrievePatientVisit();
         String tabName;
         if (patientVisitWrapper.isNew()) {
-            tabName = "New Patient Visit for patient ";
+            tabName = "New Patient Visit";
         } else {
             tabName = "Visit " + patientVisitWrapper.getFormattedDateDrawn();
         }
@@ -189,12 +193,35 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
             }
         }
 
-        toolkit.createLabel(client, "Date Drawn:", SWT.NONE);
-        dateDrawn = new DateTimeWidget(client, SWT.BORDER, patientVisitWrapper
+        dateDrawn = createDateTimeWidget(client, "Date Drawn", patientVisitWrapper
             .getDateDrawn());
-        dateDrawn.addSelectionListener(selectionListener);
-        dateDrawn.addModifyListener(modifyListener);
-        dateDrawn.adaptToToolkit(toolkit, true);
+        dateProcessed = createDateTimeWidget(client, "Date Processed",
+            patientVisitWrapper.getDateProcessed());
+
+        Date receivedDate = patientVisitWrapper.getDateReceived();
+        if (receivedDate == null) {
+            receivedDate = new Date();
+        }
+        dateReceived = createDateTimeWidget(client, "Date Received", receivedDate);
+
+        Label label = toolkit.createLabel(client, "Comments:", SWT.NONE);
+        label.setLayoutData(new GridData(GridData.VERTICAL_ALIGN_BEGINNING));
+        commentsText = toolkit.createText(client, patientVisitWrapper
+            .getComments(), SWT.LEFT | SWT.MULTI);
+        GridData gd = new GridData(GridData.FILL_HORIZONTAL);
+        gd.heightHint = 40;
+        commentsText.setLayoutData(gd);
+    }
+
+    private DateTimeWidget createDateTimeWidget(Composite client, String nameLabel,
+        Date date) {
+        Label label = toolkit.createLabel(client, nameLabel + ":", SWT.NONE);
+        label.setLayoutData(new GridData(GridData.VERTICAL_ALIGN_BEGINNING));
+        DateTimeWidget widget = new DateTimeWidget(client, SWT.BORDER, date);
+        widget.addSelectionListener(selectionListener);
+        widget.addModifyListener(modifyListener);
+        widget.adaptToToolkit(toolkit, true);
+        return widget;
     }
 
     private void createSourcesSection() {
@@ -263,14 +290,14 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
 
                 case 2: // text
                     combinedPvInfo.control = toolkit.createText(client, value,
-                        SWT.LEFT | SWT.MULTI);
+                        SWT.LEFT);
                     break;
 
                 case 3: // date_time
                     SimpleDateFormat sdf = new SimpleDateFormat(
                         BioBankPlugin.DATE_TIME_FORMAT);
 
-                    Date date = new Date();
+                    Date date = null;
                     if (value != null) {
                         try {
                             date = sdf.parse(value);
@@ -385,7 +412,11 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
                 patientVisitWrapper.setClinic(null);
             }
         }
-        patientVisitWrapper.setDateDrawn(dateDrawn.getDate());
+
+        // patientVisitWrapper.setDateDrawn(dateDrawn.getDate());
+        patientVisitWrapper.setDateProcessed(dateProcessed.getDate());
+        patientVisitWrapper.setDateReceived(dateReceived.getDate());
+        patientVisitWrapper.setComments(commentsText.getText());
 
         savePvSampleSources();
 
