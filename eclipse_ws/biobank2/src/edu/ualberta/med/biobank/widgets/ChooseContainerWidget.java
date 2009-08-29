@@ -34,7 +34,7 @@ public class ChooseContainerWidget extends AbstractGridContainerWidget {
         }
         int col = x / getCellWidth();
         int row = y / getCellHeight();
-        if (col >= 0 && col < getColumns() && row >= 0 && row < getRows()) {
+        if (col >= 0 && col < getCols() && row >= 0 && row < getRows()) {
             return cells[row][col];
         }
         return null;

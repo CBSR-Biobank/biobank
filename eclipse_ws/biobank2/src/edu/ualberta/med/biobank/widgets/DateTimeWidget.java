@@ -1,116 +1,61 @@
 package edu.ualberta.med.biobank.widgets;
 
-import java.text.SimpleDateFormat;
+import java.text.ParseException;
 import java.util.Date;
 
+import org.eclipse.nebula.widgets.cdatetime.CDT;
+import org.eclipse.nebula.widgets.cdatetime.CDateTime;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Label;
-
-import com.gface.date.DatePickerCombo;
-import com.gface.date.DatePickerStyle;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 
 public class DateTimeWidget extends BiobankWidget {
 
-    private DatePickerCombo datePicker;
+    CDateTime cdt;
 
-    private Combo hour;
-
-    private Combo minutes;
-
+    /**
+     * Allow date to be null.
+     */
     public DateTimeWidget(Composite parent, int style, Date date) {
-        super(parent, style | SWT.BORDER);
+        super(parent, style);
 
-        if (date == null) {
-            date = new Date();
-        }
+        setLayout(new GridLayout(1, false));
+        setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
 
-        SimpleDateFormat hourFormat = new SimpleDateFormat("HH");
-        SimpleDateFormat minsFormat = new SimpleDateFormat("mm");
+        cdt = new CDateTime(this, CDT.BORDER | CDT.COMPACT | CDT.DROP_DOWN
+            | CDT.DATE_LONG | CDT.TIME_MEDIUM);
+        cdt.setPattern(BioBankPlugin.DATE_TIME_FORMAT);
+        cdt.setSelection(date);
+        cdt.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
 
-        String hourStr = date == null ? "" : hourFormat.format(date);
-        String minStr = date == null ? "" : minsFormat.format(date);
-
-        GridLayout layout = new GridLayout(6, false);
-        layout.horizontalSpacing = 5;
-        setLayout(layout);
-        setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-
-        datePicker = createDatePickerSection(this, "Date:", date);
-
-        Label l = new Label(this, SWT.NONE);
-        l.setText("Hour:");
-        hour = new Combo(this, SWT.NONE);
-        for (int h = 0; h < 24; ++h) {
-            hour.add(String.format("%02d", h));
-        }
-        hour.setText(hourStr);
-
-        l = new Label(this, SWT.NONE);
-        l.setText("min:");
-        minutes = new Combo(this, SWT.NONE);
-        minutes.add("00");
-        for (int m = 10; m < 60; m += 10) {
-            minutes.add(String.format("%02d", m));
-        }
-        minutes.setText(minStr);
     }
 
     public void addSelectionListener(SelectionListener listener) {
-        datePicker.addSelectionListener(listener);
-        hour.addSelectionListener(listener);
-        minutes.addSelectionListener(listener);
-    }
-
-    public void addModifyListener(ModifyListener listener) {
-        datePicker.addModifyListener(listener);
-        hour.addModifyListener(listener);
-        minutes.addModifyListener(listener);
-    }
-
-    private DatePickerCombo createDatePickerSection(Composite client,
-        String labelStr, Date date) {
-        Label l = new Label(client, SWT.NONE);
-        l.setText(labelStr);
-        DatePickerCombo datePicker = new DatePickerCombo(client, SWT.BORDER,
-            DatePickerStyle.BUTTONS_ON_BOTTOM | DatePickerStyle.YEAR_BUTTONS
-                | DatePickerStyle.HIDE_WHEN_NOT_IN_FOCUS);
-        // datePicker.setLayout(new GridLayout());
-        datePicker.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        datePicker
-            .setDateFormat(new SimpleDateFormat(BioBankPlugin.DATE_FORMAT));
-        datePicker.setDate(date);
-        return datePicker;
+        cdt.addSelectionListener(listener);
     }
 
     public String getText() {
-        Date date = datePicker.getDate();
-        if ((date == null) || (hour.getText().length() != 2)
-            && (minutes.getText().length() != 2)) {
+        String text = cdt.getText();
+        if (text.equals("<choose date>"))
             return null;
-        }
-        SimpleDateFormat sdf = new SimpleDateFormat(BioBankPlugin.DATE_FORMAT);
-        return sdf.format(date) + " " + hour.getText() + ":"
-            + minutes.getText();
+        return text;
     }
 
-    @SuppressWarnings("deprecation")
     public Date getDate() {
-        Date date = datePicker.getDate();
-        if ((date == null) || (hour.getText().length() != 2)
-            && (minutes.getText().length() != 2)) {
+        String text = cdt.getText();
+        if (text.equals("<choose date>"))
             return null;
+
+        try {
+            return BioBankPlugin.getDateFormatter().parse(cdt.getText());
+        } catch (ParseException e) {
+            e.printStackTrace();
         }
-        date.setHours(Integer.valueOf(hour.getText()));
-        date.setMinutes(Integer.valueOf(minutes.getText()));
-        return date;
+        return null;
     }
 
 }

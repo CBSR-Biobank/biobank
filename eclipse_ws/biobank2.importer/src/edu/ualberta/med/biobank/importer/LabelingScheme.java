@@ -46,8 +46,8 @@ public class LabelingScheme {
 
     public static RowColPos hotelPos2RowCol(ContainerType freezer, String pos)
         throws Exception {
-        Integer rowCap = freezer.getCapacity().getDimensionOneCapacity();
-        Integer colCap = freezer.getCapacity().getDimensionTwoCapacity();
+        Integer rowCap = freezer.getCapacity().getRowCapacity();
+        Integer colCap = freezer.getCapacity().getColCapacity();
 
         int alphaPos = binPos2Int(pos);
         if (alphaPos >= rowCap * colCap) {

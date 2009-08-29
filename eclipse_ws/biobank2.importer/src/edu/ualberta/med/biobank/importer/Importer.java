@@ -438,14 +438,14 @@ public class Importer {
                 bioBank2Db.containerCheckSampleTypeValid(bin, sampleType);
 
                 SamplePosition spos = new SamplePosition();
-                spos.setPositionDimensionOne(1);
-                spos.setPositionDimensionTwo(LabelingScheme.binPos2Int(binPos));
+                spos.setRow(1);
+                spos.setCol(LabelingScheme.binPos2Int(binPos));
                 spos.setContainer(bin);
 
                 Sample sample = new Sample();
                 sample.setSampleType(sampleType);
                 sample.setInventoryId(rs.getString(12));
-                sample.setProcessDate(rs.getDate(13));
+                sample.setLinkDate(rs.getDate(13));
                 sample.setQuantity(rs.getDouble(14));
                 sample.setSamplePosition(spos);
                 sample.setPatientVisit(visit);
@@ -535,14 +535,14 @@ public class Importer {
 
                 RowColPos rowColPos = LabelingScheme.palettePos2RowCol(palettePos);
                 SamplePosition spos = new SamplePosition();
-                spos.setPositionDimensionOne(rowColPos.row);
-                spos.setPositionDimensionTwo(rowColPos.col);
+                spos.setRow(rowColPos.row);
+                spos.setCol(rowColPos.col);
                 spos.setContainer(palette);
 
                 Sample sample = new Sample();
                 sample.setSampleType(sampleType);
                 sample.setInventoryId(rs.getString(10));
-                sample.setProcessDate(rs.getDate(11));
+                sample.setLinkDate(rs.getDate(11));
                 sample.setQuantity(rs.getDouble(15));
                 sample.setSamplePosition(spos);
                 sample.setPatientVisit(visit);
@@ -591,8 +591,8 @@ public class Importer {
                 "%-12s %-12s %-12s %2d  %2d    %3d",
                 pos.getContainer().getLabel(),
                 pos.getContainer().getContainerType().getName(),
-                pos.getParentContainer().getLabel(),
-                pos.getPositionDimensionOne(), pos.getPositionDimensionTwo(),
+                pos.getParentContainer().getLabel(), pos.getRow(),
+                pos.getCol(),
                 pos.getContainer().getSamplePositionCollection().size()));
         }
 

@@ -589,7 +589,7 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
                     Sample sample = new Sample();
                     sample.setInventoryId(cell.getValue());
                     sample.setPatientVisit(patientVisit);
-                    sample.setProcessDate(new Date());
+                    sample.setLinkDate(new Date());
                     sample.setSampleType(cell.getType());
                     queries.add(new InsertExampleQuery(sample));
                 }

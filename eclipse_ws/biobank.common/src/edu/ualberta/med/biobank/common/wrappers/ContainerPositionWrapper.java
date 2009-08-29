@@ -55,30 +55,28 @@ public class ContainerPositionWrapper extends ModelWrapper<ContainerPosition> {
         ContainerWrapper parent = new ContainerWrapper(appService,
             getParentContainer());
         RowColPos rowColPos = parent.getPositionFromLabelingScheme(position);
-        setPositionDimensionOne(rowColPos.row);
-        setPositionDimensionTwo(rowColPos.col);
+        setRow(rowColPos.row);
+        setCol(rowColPos.col);
     }
 
-    private void setPositionDimensionTwo(Integer col) {
-        Integer oldCol = getPositionDimensionTwo();
-        wrappedObject.setPositionDimensionTwo(col);
-        propertyChangeSupport.firePropertyChange("positionDimensionTwo",
-            oldCol, col);
+    private void setCol(Integer col) {
+        Integer oldCol = getCol();
+        wrappedObject.setCol(col);
+        propertyChangeSupport.firePropertyChange("col", oldCol, col);
     }
 
-    private Integer getPositionDimensionTwo() {
-        return wrappedObject.getPositionDimensionTwo();
+    private Integer getCol() {
+        return wrappedObject.getCol();
     }
 
-    private Integer getPositionDimensionOne() {
-        return wrappedObject.getPositionDimensionOne();
+    private Integer getRow() {
+        return wrappedObject.getRow();
     }
 
-    private void setPositionDimensionOne(Integer row) {
-        Integer oldRow = getPositionDimensionOne();
-        wrappedObject.setPositionDimensionOne(row);
-        propertyChangeSupport.firePropertyChange("positionDimensionOne",
-            oldRow, row);
+    private void setRow(Integer row) {
+        Integer oldRow = getRow();
+        wrappedObject.setRow(row);
+        propertyChangeSupport.firePropertyChange("row", oldRow, row);
     }
 
 }

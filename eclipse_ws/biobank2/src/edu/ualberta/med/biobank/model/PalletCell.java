@@ -197,7 +197,7 @@ public class PalletCell {
         return null;
     }
 
-    public Integer getColumn() {
+    public Integer getCol() {
         if (scanCell != null) {
             return scanCell.getColumn();
         }

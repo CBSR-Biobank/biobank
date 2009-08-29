@@ -244,7 +244,13 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
         Clinic dbClinic = ModelUtils.getObjectWithId(appService, Clinic.class,
             clinic.getId());
 
-        for (Contact c : dbClinic.getContactCollection()) {
+        Collection<Contact> dbContactCollection = dbClinic
+            .getContactCollection();
+
+        if (dbContactCollection == null)
+            return;
+
+        for (Contact c : dbContactCollection) {
             if (!selectedContactIds.contains(c.getId())) {
                 query = new DeleteExampleQuery(c);
                 appService.executeQuery(query);
@@ -256,14 +262,14 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
         Site site = clinicAdapter.getParentFromClass(SiteAdapter.class)
             .getSite();
         HQLCriteria c = new HQLCriteria("from " + Clinic.class.getName()
-            + " where site= ? and clinic.name = ?", Arrays.asList(new Object[] {
-            site, clinic.getName() }));
+            + " as clinic where site = ? and clinic.name = ?", Arrays
+            .asList(new Object[] { site, clinic.getName() }));
 
         List<Object> results = appService.query(c);
         if (results.size() == 0)
             return true;
 
-        BioBankPlugin.openAsyncError("Site Name Problem",
+        BioBankPlugin.openAsyncError("Clinic Name Problem",
             "A clinic with name \"" + clinic.getName() + "\" already exists.");
         return false;
     }

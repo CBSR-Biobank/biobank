@@ -43,6 +43,26 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
         return DateFormatter.formatAsDateTime(getDateDrawn());
     }
 
+    public Date getDateProcessed() {
+        return wrappedObject.getDateProcessed();
+    }
+
+    public String getFormattedDateProcessed() {
+        return DateFormatter.formatAsDateTime(getDateProcessed());
+    }
+
+    public Date getDateReceived() {
+        return wrappedObject.getDateReceived();
+    }
+
+    public String getFormattedDateReceived() {
+        return DateFormatter.formatAsDateTime(getDateReceived());
+    }
+
+    public String getComments() {
+        return wrappedObject.getComments();
+    }
+
     public PatientWrapper getPatientWrapper() {
         return new PatientWrapper(appService, wrappedObject.getPatient());
     }
@@ -75,6 +95,26 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
         Date oldDate = getDateDrawn();
         wrappedObject.setDateDrawn(date);
         propertyChangeSupport.firePropertyChange("dateDrawn", oldDate, date);
+    }
+
+    public void setDateProcessed(Date date) {
+        Date oldDate = getDateProcessed();
+        wrappedObject.setDateProcessed(date);
+        propertyChangeSupport
+            .firePropertyChange("dateProcessed", oldDate, date);
+    }
+
+    public void setDateReceived(Date date) {
+        Date oldDate = getDateReceived();
+        wrappedObject.setDateReceived(date);
+        propertyChangeSupport.firePropertyChange("dateReceived", oldDate, date);
+    }
+
+    public void setComments(String comments) {
+        String oldComments = getComments();
+        wrappedObject.setComments(comments);
+        propertyChangeSupport.firePropertyChange("dateReceived", oldComments,
+            comments);
     }
 
     @Override

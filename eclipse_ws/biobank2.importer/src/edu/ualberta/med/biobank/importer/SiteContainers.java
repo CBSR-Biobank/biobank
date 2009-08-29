@@ -76,8 +76,8 @@ public class SiteContainers {
             ContainerPosition cp = new ContainerPosition();
             cp.setContainer(sc);
             cp.setParentContainer(parent);
-            cp.setPositionDimensionOne(pos1);
-            cp.setPositionDimensionTwo(pos2);
+            cp.setRow(pos1);
+            cp.setCol(pos2);
             sc.setPosition(cp);
         }
 

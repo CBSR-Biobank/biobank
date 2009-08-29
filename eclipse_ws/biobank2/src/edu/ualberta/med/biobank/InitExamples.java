@@ -215,7 +215,7 @@ public class InitExamples {
             sample.setInventoryId(Integer.valueOf(new Random().nextInt(10000))
                 .toString());
             sample.setPatientVisit(patientVisit);
-            sample.setProcessDate(new Date());
+            sample.setLinkDate(new Date());
             sample.setSampleType(getSampleType());
             SDKQueryResult res = appService
                 .executeQuery(new InsertExampleQuery(sample));
@@ -328,8 +328,8 @@ public class InitExamples {
             ct.setChildLabelingScheme(childLabelingScheme);
         }
         Capacity capacity = new Capacity();
-        capacity.setDimensionOneCapacity(dim1);
-        capacity.setDimensionTwoCapacity(dim2);
+        capacity.setRowCapacity(dim1);
+        capacity.setColCapacity(dim2);
         ct.setCapacity(capacity);
         if (children != null) {
             ct.setChildContainerTypeCollection(new HashSet<ContainerType>(
@@ -357,8 +357,8 @@ public class InitExamples {
             ContainerPosition pos = new ContainerPosition();
             pos.setContainer(container);
             pos.setParentContainer(parent);
-            pos.setPositionDimensionOne(rc.row);
-            pos.setPositionDimensionTwo(rc.col);
+            pos.setRow(rc.row);
+            pos.setCol(rc.col);
             container.setPosition(pos);
         }
         SDKQueryResult res = appService.executeQuery(new InsertExampleQuery(

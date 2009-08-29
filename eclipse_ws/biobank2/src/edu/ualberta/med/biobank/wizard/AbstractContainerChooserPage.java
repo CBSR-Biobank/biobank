@@ -120,8 +120,8 @@ public abstract class AbstractContainerChooserPage extends WizardPage {
             // get cells informations
             for (ContainerPosition position : currentContainer
                 .getChildPositionCollection()) {
-                int positionDim1 = position.getPositionDimensionOne();
-                int positionDim2 = position.getPositionDimensionTwo();
+                int positionDim1 = position.getRow();
+                int positionDim2 = position.getCol();
                 ContainerCell cell = new ContainerCell(position);
                 Container occupiedContainer = position.getContainer();
                 setStatus(cell, occupiedContainer);
@@ -151,8 +151,8 @@ public abstract class AbstractContainerChooserPage extends WizardPage {
         } else {
             Capacity capacity = currentContainer.getContainerType()
                 .getCapacity();
-            dim1 = capacity.getDimensionOneCapacity();
-            dim2 = capacity.getDimensionTwoCapacity();
+            dim1 = capacity.getRowCapacity();
+            dim2 = capacity.getColCapacity();
         }
         int width;
         if (gridWidth == null) {
@@ -190,8 +190,8 @@ public abstract class AbstractContainerChooserPage extends WizardPage {
     protected ContainerPosition newContainerPosition(int dim1, int dim2) {
         ContainerPosition position = new ContainerPosition();
         position.setParentContainer(currentContainer);
-        position.setPositionDimensionOne(dim1);
-        position.setPositionDimensionTwo(dim2);
+        position.setRow(dim1);
+        position.setCol(dim2);
         return position;
     }
 

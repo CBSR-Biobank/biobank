@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -21,7 +22,8 @@ import edu.ualberta.med.biobank.treeview.SiteAdapter;
 public class SamplesListWidget extends InfoTableWidget<Sample> {
 
     private static final String[] headings = new String[] { "Inventory ID",
-        "Type", "Position", "Link Date", "Available", "Quantity", "Comment" };
+        "Type", "Position", "Link Date", "Quantity (ml)", "Quantity Used",
+        "Comment" };
 
     private static final int[] bounds = new int[] { 130, 130, 150, 150, -1, -1,
         -1 };
@@ -60,8 +62,14 @@ public class SamplesListWidget extends InfoTableWidget<Sample> {
             @Override
             public void doubleClick(DoubleClickEvent event) {
                 Object selection = event.getSelection();
-                Sample sample = (Sample) ((StructuredSelection) selection)
+                BiobankCollectionModel item = (BiobankCollectionModel) ((StructuredSelection) selection)
                     .getFirstElement();
+                Assert
+                    .isTrue(item.o instanceof Sample,
+                        "Invalid class where sample expected: "
+                            + item.o.getClass());
+
+                Sample sample = (Sample) item.o;
                 SamplePosition sp = sample.getSamplePosition();
                 if (sp != null) {
                     Container sc = sp.getContainer();
