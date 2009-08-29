@@ -357,15 +357,13 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
 
             freezerLabel.setText(freezerContainer.getFullInfoLabel());
             freezerWidget.setContainerType(freezerContainer.getContainerType());
-            freezerWidget.setSelectedBox(new Point(hotelPosition
-                .getRow(), hotelPosition
-                .getCol()));
+            freezerWidget.setSelectedBox(new Point(hotelPosition.getRow(),
+                hotelPosition.getCol()));
 
             hotelLabel.setText(hotelContainer.getFullInfoLabel());
             hotelWidget.setContainerType(hotelContainer.getContainerType());
-            hotelWidget.setSelectedBox(new Point(palletPosition
-                .getRow(), palletPosition
-                .getCol()));
+            hotelWidget.setSelectedBox(new Point(palletPosition.getRow(),
+                palletPosition.getCol()));
 
             palletLabel.setText(currentPalletWrapper.getLabel());
         }
@@ -564,9 +562,10 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
      */
     private boolean checkPallet() throws Exception {
         currentPalletSamples = null;
-        Container palletFound = ContainerWrapper.getContainerWithTypeInSite(
-            appService, SessionManager.getInstance().getCurrentSite(),
-            currentPalletWrapper.getProductBarcode(), "Pallet");
+        Container palletFound = ContainerWrapper
+            .getContainerWithTypeAndLabelInSite(appService, SessionManager
+                .getInstance().getCurrentSite(), currentPalletWrapper
+                .getProductBarcode(), "Pallet");
         if (palletFound == null) {
             if (currentPalletWrapper.getContainerType() == null
                 && palletTypesViewer != null) {
@@ -585,12 +584,11 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
                 Capacity palletCapacity = currentPalletWrapper
                     .getContainerType().getCapacity();
                 currentPalletSamples = new Sample[palletCapacity
-                    .getRowCapacity()][palletCapacity
-                    .getColCapacity()];
+                    .getRowCapacity()][palletCapacity.getColCapacity()];
                 for (SamplePosition position : currentPalletWrapper
                     .getSamplePositionCollection()) {
-                    currentPalletSamples[position.getRow()][position
-                        .getCol()] = position.getSample();
+                    currentPalletSamples[position.getRow()][position.getCol()] = position
+                        .getSample();
                 }
             } else {
                 return false;
@@ -608,8 +606,8 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
     private boolean checkAndSetPosition() throws Exception {
         String positionLabel = palletPositionValue.getValue().toString();
         Container containerAtPosition = ContainerWrapper
-            .getContainerWithTypeInSite(appService, currentPalletWrapper
-                .getSite(), positionLabel, "Pallet");
+            .getContainerWithTypeAndLabelInSite(appService,
+                currentPalletWrapper.getSite(), positionLabel, "Pallet");
         if (containerAtPosition == null) {
             currentPalletWrapper.setNewPositionFromLabel("Freezer");
             return true;

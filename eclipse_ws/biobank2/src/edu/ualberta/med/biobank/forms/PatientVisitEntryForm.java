@@ -346,7 +346,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
     }
 
     private void createSourcesSection() {
-        Composite client = createSectionWithClient("Sample Storage");
+        Composite client = createSectionWithClient("Source Vessels");
 
         GridLayout layout = new GridLayout(1, false);
         client.setLayout(layout);
@@ -389,10 +389,8 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
 
     @Override
     protected String getOkMessage() {
-        if (patientVisitWrapper.isNew()) {
-            return MSG_NEW_PATIENT_VISIT_OK;
-        }
-        return MSG_PATIENT_VISIT_OK;
+        return (patientVisitWrapper.isNew()) ? MSG_NEW_PATIENT_VISIT_OK
+            : MSG_PATIENT_VISIT_OK;
     }
 
     @Override
