@@ -193,8 +193,8 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
             }
         }
 
-        dateDrawn = createDateTimeWidget(client, "Date Drawn", patientVisitWrapper
-            .getDateDrawn());
+        dateDrawn = createDateTimeWidget(client, "Date Drawn",
+            patientVisitWrapper.getDateDrawn());
         dateProcessed = createDateTimeWidget(client, "Date Processed",
             patientVisitWrapper.getDateProcessed());
 
@@ -202,7 +202,8 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         if (receivedDate == null) {
             receivedDate = new Date();
         }
-        dateReceived = createDateTimeWidget(client, "Date Received", receivedDate);
+        dateReceived = createDateTimeWidget(client, "Date Received",
+            receivedDate);
 
         Label label = toolkit.createLabel(client, "Comments:", SWT.NONE);
         label.setLayoutData(new GridData(GridData.VERTICAL_ALIGN_BEGINNING));
@@ -213,13 +214,12 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         commentsText.setLayoutData(gd);
     }
 
-    private DateTimeWidget createDateTimeWidget(Composite client, String nameLabel,
-        Date date) {
+    private DateTimeWidget createDateTimeWidget(Composite client,
+        String nameLabel, Date date) {
         Label label = toolkit.createLabel(client, nameLabel + ":", SWT.NONE);
         label.setLayoutData(new GridData(GridData.VERTICAL_ALIGN_BEGINNING));
         DateTimeWidget widget = new DateTimeWidget(client, SWT.BORDER, date);
         widget.addSelectionListener(selectionListener);
-        widget.addModifyListener(modifyListener);
         widget.adaptToToolkit(toolkit, true);
         return widget;
     }
@@ -239,7 +239,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
 
     private void createPvDataSection(Study study) {
         if (study.getPvInfoCollection().size() > 0) {
-            Composite client = createSectionWithClient("Others informations");
+            Composite client = createSectionWithClient("Others information");
 
             for (PvInfo pvInfo : study.getPvInfoCollection()) {
                 CombinedPvInfo combinedPvInfo = new CombinedPvInfo();
@@ -308,7 +308,6 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
                     DateTimeWidget w = new DateTimeWidget(client, SWT.NONE,
                         date);
                     w.addSelectionListener(selectionListener);
-                    w.addModifyListener(modifyListener);
                     w.adaptToToolkit(toolkit, true);
                     combinedPvInfo.control = w;
                     break;
@@ -349,9 +348,6 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
 
                 if (combinedPvInfo.control != null) {
                     GridData gd = new GridData(GridData.FILL_HORIZONTAL);
-                    if (typeId == 2) {
-                        gd.heightHint = 40;
-                    }
                     combinedPvInfo.control.setLayoutData(gd);
                     controls.put(combinedPvInfo.pvInfo.getLabel(),
                         combinedPvInfo.control);
@@ -413,7 +409,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
             }
         }
 
-        // patientVisitWrapper.setDateDrawn(dateDrawn.getDate());
+        patientVisitWrapper.setDateDrawn(dateDrawn.getDate());
         patientVisitWrapper.setDateProcessed(dateProcessed.getDate());
         patientVisitWrapper.setDateReceived(dateReceived.getDate());
         patientVisitWrapper.setComments(commentsText.getText());
