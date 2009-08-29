@@ -13,6 +13,17 @@ import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 
+/**
+ * Wrapper for around Nebula's CDateTime widget.
+ * 
+ * HISTORY
+ * 
+ * Previously used gface Date Picker combo (http://gface.sourceforge.net/) but
+ * it did not display well on Windows and Linux.
+ * 
+ * Attempted to use SWT DateTime but at the time it did not support null dates
+ * and null times.
+ */
 public class DateTimeWidget extends BiobankWidget {
 
     CDateTime cdt;

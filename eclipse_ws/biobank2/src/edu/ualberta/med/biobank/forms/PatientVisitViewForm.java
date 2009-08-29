@@ -10,7 +10,6 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
@@ -86,7 +85,6 @@ public class PatientVisitViewForm extends BiobankViewForm {
         addRefreshToolbarAction();
         createMainSection();
         createSourcesSection();
-        createDatasSection();
         createSamplesSection();
 
         initEditButton(form.getBody(), patientVisitAdapter);
@@ -107,18 +105,16 @@ public class PatientVisitViewForm extends BiobankViewForm {
             SWT.NONE, "Date Processed");
         dateReceivedLabel = (Label) createWidget(client, Label.class, SWT.NONE,
             "Date Received");
+
+        createPvDataSection(client);
+
         commentsLabel = (Label) createWidget(client, Label.class, SWT.WRAP,
             "Comments");
+
+        setPatientVisitValues();
     }
 
-    private void createDatasSection() {
-        Composite client = toolkit.createComposite(form.getBody());
-        GridLayout layout = new GridLayout(2, false);
-        layout.horizontalSpacing = 10;
-        client.setLayout(layout);
-        client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        toolkit.paintBordersFor(client);
-
+    private void createPvDataSection(Composite client) {
         Study study = patientVisitAdapter
             .getParentFromClass(StudyAdapter.class).getStudy();
 
@@ -171,17 +167,14 @@ public class PatientVisitViewForm extends BiobankViewForm {
             GridData gd = new GridData(GridData.FILL_HORIZONTAL);
             widget.setLayoutData(gd);
         }
-        setPatientVisitValues();
     }
 
     private void createSourcesSection() {
-        Section section = createSection("Sources");
+        Composite client = createSectionWithClient("Sources");
 
         Collection<PvSampleSource> sources = patientVisitWrapper
             .getPvSampleSourceCollection();
-        PvSampleSourceInfoTable pvInfoTable = new PvSampleSourceInfoTable(
-            section, sources);
-        section.setClient(pvInfoTable);
+        new PvSampleSourceInfoTable(client, sources);
     }
 
     private void setPatientVisitValues() {

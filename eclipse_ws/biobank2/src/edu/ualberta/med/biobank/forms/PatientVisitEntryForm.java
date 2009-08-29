@@ -97,6 +97,8 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
 
     private PvSampleSourceEntryWidget pvSampleSourceEntryWidget;
 
+    private PatientWrapper patientWrapper;
+
     public PatientVisitEntryForm() {
         super();
         combinedPvInfoMap = new ListOrderedMap();
@@ -135,10 +137,9 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         form.setText("Patient Visit Information");
         form.setMessage(getOkMessage(), IMessageProvider.NONE);
         form.getBody().setLayout(new GridLayout(1, false));
-        PatientWrapper patientWrapper = retrievePatient();
+        patientWrapper = retrievePatient();
         createMainSection(patientWrapper.getStudy());
         createSourcesSection();
-        createPvDataSection(patientWrapper.getStudy());
         initCancelConfirmWidget(form.getBody());
         if (patientVisitWrapper.isNew()) {
             setDirty(true);
@@ -205,6 +206,8 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         dateReceived = createDateTimeWidget(client, "Date Received",
             receivedDate);
 
+        createPvDataSection(client, patientWrapper.getStudy());
+
         Label label = toolkit.createLabel(client, "Comments:", SWT.NONE);
         label.setLayoutData(new GridData(GridData.VERTICAL_ALIGN_BEGINNING));
         commentsText = toolkit.createText(client, patientVisitWrapper
@@ -214,32 +217,8 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         commentsText.setLayoutData(gd);
     }
 
-    private DateTimeWidget createDateTimeWidget(Composite client,
-        String nameLabel, Date date) {
-        Label label = toolkit.createLabel(client, nameLabel + ":", SWT.NONE);
-        label.setLayoutData(new GridData(GridData.VERTICAL_ALIGN_BEGINNING));
-        DateTimeWidget widget = new DateTimeWidget(client, SWT.NONE, date);
-        widget.addSelectionListener(selectionListener);
-        widget.adaptToToolkit(toolkit, true);
-        return widget;
-    }
-
-    private void createSourcesSection() {
-        Composite client = createSectionWithClient("Sample Storage");
-
-        GridLayout layout = new GridLayout(1, false);
-        client.setLayout(layout);
-        client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-
-        pvSampleSourceEntryWidget = new PvSampleSourceEntryWidget(client,
-            SWT.NONE, patientVisitWrapper.getPvSampleSourceCollection(),
-            toolkit);
-        pvSampleSourceEntryWidget.addSelectionChangedListener(listener);
-    }
-
-    private void createPvDataSection(Study study) {
+    private void createPvDataSection(Composite client, Study study) {
         if (study.getPvInfoCollection().size() > 0) {
-            Composite client = createSectionWithClient("Others information");
 
             for (PvInfo pvInfo : study.getPvInfoCollection()) {
                 CombinedPvInfo combinedPvInfo = new CombinedPvInfo();
@@ -354,6 +333,29 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
                 }
             }
         }
+    }
+
+    private DateTimeWidget createDateTimeWidget(Composite client,
+        String nameLabel, Date date) {
+        Label label = toolkit.createLabel(client, nameLabel + ":", SWT.NONE);
+        label.setLayoutData(new GridData(GridData.VERTICAL_ALIGN_BEGINNING));
+        DateTimeWidget widget = new DateTimeWidget(client, SWT.NONE, date);
+        widget.addSelectionListener(selectionListener);
+        widget.adaptToToolkit(toolkit, true);
+        return widget;
+    }
+
+    private void createSourcesSection() {
+        Composite client = createSectionWithClient("Sample Storage");
+
+        GridLayout layout = new GridLayout(1, false);
+        client.setLayout(layout);
+        client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+        pvSampleSourceEntryWidget = new PvSampleSourceEntryWidget(client,
+            SWT.NONE, patientVisitWrapper.getPvSampleSourceCollection(),
+            toolkit);
+        pvSampleSourceEntryWidget.addSelectionChangedListener(listener);
     }
 
     private Control createComboSection(Composite client, String[] values,
