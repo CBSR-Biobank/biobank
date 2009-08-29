@@ -218,7 +218,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         String nameLabel, Date date) {
         Label label = toolkit.createLabel(client, nameLabel + ":", SWT.NONE);
         label.setLayoutData(new GridData(GridData.VERTICAL_ALIGN_BEGINNING));
-        DateTimeWidget widget = new DateTimeWidget(client, SWT.BORDER, date);
+        DateTimeWidget widget = new DateTimeWidget(client, SWT.NONE, date);
         widget.addSelectionListener(selectionListener);
         widget.adaptToToolkit(toolkit, true);
         return widget;

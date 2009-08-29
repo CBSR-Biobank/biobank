@@ -170,8 +170,7 @@ public abstract class BiobankFormBase extends EditorPart {
             }
             Label field = toolkit.createLabel(parent, "", widgetOptions
                 | SWT.LEFT | SWT.BORDER);
-            field.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true,
-                false));
+            field.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
 
             return field;
         } else if (widgetClass == Button.class) {

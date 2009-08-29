@@ -1,10 +1,11 @@
 Manifest-Version: 1.0
 Bundle-Name: Biobank2 Plug-in
 Bundle-ClassPath: .,
- lib/gface_0.9.1.jar,
  lib/gluegen.jar,
  lib/scanlib.jar,
- lib/ini4j-0.5.1.jar
+ lib/ini4j-0.5.1.jar,
+ lib/org.eclipse.nebula.cwt_0.9.0.HEAD.jar,
+ lib/org.eclipse.nebula.widgets.cdatetime_0.14.0.HEAD.jar
 Bundle-NativeCode: scanlib.dll;selection-filter="(&(osgi.arch=x86)(osg
  i.os=win32))",*
 Bundle-Activator: edu.ualberta.med.biobank.BioBankPlugin

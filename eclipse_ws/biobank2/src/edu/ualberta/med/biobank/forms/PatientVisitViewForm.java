@@ -52,6 +52,12 @@ public class PatientVisitViewForm extends BiobankViewForm {
 
     private Label clinicLabel;
 
+    private Label dateProcessedLabel;
+
+    private Label dateReceivedLabel;
+
+    private Label commentsLabel;
+
     public PatientVisitViewForm() {
         super();
         combinedPvInfoMap = new ListOrderedMap();
@@ -97,6 +103,12 @@ public class PatientVisitViewForm extends BiobankViewForm {
         siteLabel = (Label) createWidget(client, Label.class, SWT.NONE, "Site");
         clinicLabel = (Label) createWidget(client, Label.class, SWT.NONE,
             "Clinic");
+        dateProcessedLabel = (Label) createWidget(client, Label.class,
+            SWT.NONE, "Date Processed");
+        dateReceivedLabel = (Label) createWidget(client, Label.class, SWT.NONE,
+            "Date Received");
+        commentsLabel = (Label) createWidget(client, Label.class, SWT.WRAP,
+            "Comments");
     }
 
     private void createDatasSection() {
@@ -178,6 +190,15 @@ public class PatientVisitViewForm extends BiobankViewForm {
         FormUtils.setTextValue(clinicLabel,
             patientVisitWrapper.getClinic() == null ? "" : patientVisitWrapper
                 .getClinic().getName());
+        FormUtils.setTextValue(dateProcessedLabel, patientVisitWrapper
+            .getDateProcessed() == null ? "" : patientVisitWrapper
+            .getDateProcessed());
+        FormUtils.setTextValue(dateReceivedLabel, patientVisitWrapper
+            .getDateReceived() == null ? "" : patientVisitWrapper
+            .getDateReceived());
+        FormUtils.setTextValue(commentsLabel,
+            patientVisitWrapper.getComments() == null ? ""
+                : patientVisitWrapper.getComments());
         // FIXME update all pvinfos ?
     }
 
