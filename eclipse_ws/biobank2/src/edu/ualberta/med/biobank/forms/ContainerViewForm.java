@@ -25,6 +25,7 @@ import edu.ualberta.med.biobank.model.ContainerStatus;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.ContainerAdapter;
+import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.widgets.CabinetDrawerWidget;
 import edu.ualberta.med.biobank.widgets.ChooseContainerWidget;
 import edu.ualberta.med.biobank.widgets.infotables.SamplesListWidget;
@@ -282,9 +283,10 @@ public class ContainerViewForm extends BiobankViewForm {
     private void openFormFor(ContainerPosition pos) {
         ContainerAdapter newAdapter = null;
         ContainerAdapter.closeEditor(new FormInput(containerAdapter));
-        if (cells[pos.getRow()][pos.getCol()]
-            .getStatus() == ContainerStatus.NOT_INITIALIZED) {
+        if (cells[pos.getRow()][pos.getCol()].getStatus() == ContainerStatus.NOT_INITIALIZED) {
             Container newContainer = new Container();
+            newContainer.setSite(containerAdapter.getParentFromClass(
+                SiteAdapter.class).getSite());
             pos.setParentContainer(container);
             newContainer.setPosition(pos);
             newAdapter = new ContainerAdapter(containerAdapter, newContainer);
@@ -298,10 +300,8 @@ public class ContainerViewForm extends BiobankViewForm {
             for (ContainerPosition childPos : childPositions) {
                 childContainer = childPos.getContainer();
                 Assert.isNotNull(childContainer);
-                if (childPos.getRow().compareTo(
-                    pos.getRow()) == 0
-                    && childPos.getCol().compareTo(
-                        pos.getCol()) == 0) {
+                if (childPos.getRow().compareTo(pos.getRow()) == 0
+                    && childPos.getCol().compareTo(pos.getCol()) == 0) {
                     newAdapter = new ContainerAdapter(containerAdapter,
                         childContainer);
                 }
@@ -327,13 +327,11 @@ public class ContainerViewForm extends BiobankViewForm {
         FormUtils.setTextValue(temperatureLabel, container.getTemperature());
         if (position != null) {
             if (positionDimOneLabel != null) {
-                FormUtils.setTextValue(positionDimOneLabel, position
-                    .getRow());
+                FormUtils.setTextValue(positionDimOneLabel, position.getRow());
             }
 
             if (positionDimTwoLabel != null) {
-                FormUtils.setTextValue(positionDimTwoLabel, position
-                    .getCol());
+                FormUtils.setTextValue(positionDimTwoLabel, position.getCol());
             }
         }
     }

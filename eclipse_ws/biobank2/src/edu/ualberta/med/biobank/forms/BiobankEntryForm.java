@@ -227,8 +227,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
             if (widgetOptions == SWT.NONE) {
                 widgetOptions = SWT.SINGLE;
             }
-            Text text = toolkit.createText(composite, "", widgetOptions
-                | SWT.TOP);
+            Text text = toolkit.createText(composite, "", widgetOptions);
             text.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
             text.addKeyListener(keyListener);
 

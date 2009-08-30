@@ -224,11 +224,11 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
 
         createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Rows", null,
             PojoObservables.observeValue(capacity, "rowCapacity"),
-            new IntegerNumber("Rows capactiy is not a valid number", false));
+            new IntegerNumber("Row capactiy is not a valid number", false));
 
         createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Columns",
             null, PojoObservables.observeValue(capacity, "colCapacity"),
-            new IntegerNumber("Columns capacity is not a valid nubmer", false));
+            new IntegerNumber("Column capacity is not a valid nubmer", false));
     }
 
     private void createContainsSection() {
