@@ -390,29 +390,28 @@ public class ContainerViewForm extends BiobankViewForm {
         List<SDKQuery> queries = new ArrayList<SDKQuery>();
         Collection<ContainerPosition> positions = container
             .getChildPositionCollection();
-        int rows = container.getContainerType().getCapacity()
-            .getDimensionOneCapacity().intValue();
-        int cols = container.getContainerType().getCapacity()
-            .getDimensionTwoCapacity().intValue();
+        int rows = container.getContainerType().getCapacity().getRowCapacity()
+            .intValue();
+        int cols = container.getContainerType().getCapacity().getColCapacity()
+            .intValue();
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
                 Boolean filled = false;
                 for (ContainerPosition pos : positions) {
-                    if (pos.getPositionDimensionOne().intValue() == i
-                        && pos.getPositionDimensionTwo().intValue() == j)
+                    if (pos.getRow().intValue() == i
+                        && pos.getCol().intValue() == j)
                         filled = true;
                 }
                 if (!filled) {
                     Container newContainer = new Container();
 
                     newContainer.setContainerType(initType);
-                    newContainer.setFull(false);
                     newContainer.setSite(container.getSite());
                     newContainer.setTemperature(container.getTemperature());
 
                     ContainerPosition newPos = new ContainerPosition();
-                    newPos.setPositionDimensionOne(new Integer(i));
-                    newPos.setPositionDimensionTwo(new Integer(j));
+                    newPos.setRow(new Integer(i));
+                    newPos.setCol(new Integer(j));
                     newPos.setParentContainer(container);
                     newContainer.setPosition(newPos);
                     newContainer.setLabel(container.getLabel()
@@ -430,12 +429,10 @@ public class ContainerViewForm extends BiobankViewForm {
             try {
                 appService.executeBatchQuery(queries);
             } catch (ApplicationException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
             containerAdapter.performExpand();
             positions = container.getChildPositionCollection();
-            container.setFull(true);
             reload();
         }
     }
@@ -460,7 +457,6 @@ public class ContainerViewForm extends BiobankViewForm {
             try {
                 appService.executeBatchQuery(queries);
             } catch (ApplicationException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
             containerAdapter.removeAll();
