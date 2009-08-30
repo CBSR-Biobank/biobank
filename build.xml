@@ -165,7 +165,8 @@
 		</copy>
 		<copy todir="${eclipse.proj.dir}/lib">
 			<fileset dir="jars">
-				<include name="gface_0.9.1.jar" />
+				<include name="org.eclipse.nebula.cwt_0.9.0.HEAD.jar" />
+                <include name="org.eclipse.nebula.widgets.cdatetime_0.14.0.HEAD.jar" />
 				<include name="gluegen.jar" />
 				<include name="ini4j-0.5.1.jar" />
 				<include name="jdom.jar" />
