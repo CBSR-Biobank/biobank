@@ -9,12 +9,19 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
+import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.events.MouseTrackListener;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 
+import edu.ualberta.med.biobank.common.LabelingScheme;
 import edu.ualberta.med.biobank.common.utils.ModelUtils;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Capacity;
@@ -31,6 +38,10 @@ import edu.ualberta.med.biobank.widgets.ChooseContainerWidget;
 import edu.ualberta.med.biobank.widgets.infotables.SamplesListWidget;
 import edu.ualberta.med.biobank.widgets.listener.ScanPalletModificationEvent;
 import edu.ualberta.med.biobank.widgets.listener.ScanPalletModificationListener;
+import gov.nih.nci.system.applicationservice.ApplicationException;
+import gov.nih.nci.system.query.SDKQuery;
+import gov.nih.nci.system.query.example.DeleteExampleQuery;
+import gov.nih.nci.system.query.example.InsertExampleQuery;
 
 public class ContainerViewForm extends BiobankViewForm {
 
@@ -66,12 +77,16 @@ public class ContainerViewForm extends BiobankViewForm {
 
     private ChooseContainerWidget containerWidget;
 
+    private ContainerType initType;
+
     ContainerCell[][] cells;
 
     private List<ContainerCell> selectedCells;
     List<ScanPalletModificationListener> listeners;
     private MouseListener selectionMouseListener;
     private MouseTrackListener selectionMouseTrackListener;
+
+    private ContainerType deleteType;
 
     public void addModificationListener(ScanPalletModificationListener listener) {
         listeners.add(listener);
@@ -228,7 +243,9 @@ public class ContainerViewForm extends BiobankViewForm {
     protected void visualizeContainer() {
         // default 2 dimensional grid
         Composite client = createSectionWithClient("Container Visual");
-
+        GridLayout gl = new GridLayout();
+        gl.numColumns = 1;
+        client.setLayout(gl);
         // get occupied positions
         if (isContainerDrawer()) {
             // if Drawer, requires special grid
@@ -273,10 +290,185 @@ public class ContainerViewForm extends BiobankViewForm {
                 public void mouseDown(MouseEvent e) {
                     ContainerCell cell = ((ChooseContainerWidget) e.widget)
                         .getPositionAtCoordinates(e.x, e.y);
-                    openFormFor(cell.getPosition());
+                    if (cell != null)
+                        openFormFor(cell.getPosition());
 
                 }
+
             });
+            containerWidget.addMouseMoveListener(new MouseMoveListener() {
+
+                @Override
+                public void mouseMove(MouseEvent e) {
+                    Rectangle widgetBounds = containerWidget.getBounds();
+                    int safetyPadding = 15;
+                    widgetBounds.height -= safetyPadding;
+                    widgetBounds.width -= safetyPadding;
+                    if (containerWidget.legendOnSide == false)
+                        widgetBounds.height -= ChooseContainerWidget.LEGEND_HEIGHT;
+                    else
+                        widgetBounds.width -= ChooseContainerWidget.LEGEND_WIDTH;
+
+                    if (widgetBounds.width > e.x && widgetBounds.height > e.y)
+                        ((ChooseContainerWidget) e.widget)
+                            .setCursor(containerWidget.getDisplay()
+                                .getSystemCursor(SWT.CURSOR_HAND));
+                    else
+                        ((ChooseContainerWidget) e.widget)
+                            .setCursor(containerWidget.getDisplay()
+                                .getSystemCursor(SWT.CURSOR_ARROW));
+                }
+
+            });
+        }
+        Composite multiSection = toolkit.createComposite(client);
+        GridLayout gli = new GridLayout();
+        gli.numColumns = 3;
+
+        multiSection.setLayout(gli);
+        Label comboLabel = new Label(multiSection, SWT.NONE);
+        comboLabel.setText("Initialize all available containers to:");
+        final Combo init = new Combo(multiSection, SWT.NONE);
+        Collection<ContainerType> containerTypes = container.getContainerType()
+            .getChildContainerTypeCollection();
+        for (ContainerType ct : containerTypes) {
+            init.add(ct.getName());
+        }
+        init.select(0);
+
+        final Button initialize = toolkit.createButton(multiSection,
+            "Initialize", SWT.PUSH);
+        initialize.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                setInitType(init.getItem(init.getSelectionIndex()));
+                initContainers();
+            }
+        });
+        Label deleteLabel = new Label(multiSection, SWT.NONE);
+        deleteLabel.setText("Delete all initialized containers of type:");
+        final Combo delete = new Combo(multiSection, SWT.NONE);
+        for (ContainerType ct : containerTypes) {
+            delete.add(ct.getName());
+        }
+        delete.select(0);
+        final Button deleteButton = toolkit.createButton(multiSection,
+            "Delete", SWT.PUSH);
+        deleteButton.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                setDeleteType(delete.getItem(delete.getSelectionIndex()));
+                deleteContainers();
+            }
+        });
+
+    }
+
+    protected void setInitType(String name) {
+        Collection<ContainerType> containerTypes = container.getContainerType()
+            .getChildContainerTypeCollection();
+        for (ContainerType ct : containerTypes) {
+            if (name.compareTo(ct.getName()) == 0) {
+                initType = ct;
+                break;
+            }
+        }
+    }
+
+    protected void setDeleteType(String name) {
+        Collection<ContainerType> containerTypes = container.getContainerType()
+            .getChildContainerTypeCollection();
+        for (ContainerType ct : containerTypes) {
+            if (name.compareTo(ct.getName()) == 0) {
+                deleteType = ct;
+                break;
+            }
+        }
+    }
+
+    public void initContainers() {
+        List<SDKQuery> queries = new ArrayList<SDKQuery>();
+        Collection<ContainerPosition> positions = container
+            .getChildPositionCollection();
+        int rows = container.getContainerType().getCapacity()
+            .getDimensionOneCapacity().intValue();
+        int cols = container.getContainerType().getCapacity()
+            .getDimensionTwoCapacity().intValue();
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                Boolean filled = false;
+                for (ContainerPosition pos : positions) {
+                    if (pos.getPositionDimensionOne().intValue() == i
+                        && pos.getPositionDimensionTwo().intValue() == j)
+                        filled = true;
+                }
+                if (!filled) {
+                    Container newContainer = new Container();
+
+                    newContainer.setContainerType(initType);
+                    newContainer.setFull(false);
+                    newContainer.setSite(container.getSite());
+                    newContainer.setTemperature(container.getTemperature());
+
+                    ContainerPosition newPos = new ContainerPosition();
+                    newPos.setPositionDimensionOne(new Integer(i));
+                    newPos.setPositionDimensionTwo(new Integer(j));
+                    newPos.setParentContainer(container);
+                    newContainer.setPosition(newPos);
+                    newContainer.setLabel(container.getLabel()
+                        + LabelingScheme.getPositionString(newPos));
+
+                    // insert containers/positions to db
+
+                    queries.add(new InsertExampleQuery(newContainer));
+
+                }
+            }
+        }
+        // refresh
+        if (queries.size() > 0) {
+            try {
+                appService.executeBatchQuery(queries);
+            } catch (ApplicationException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            containerAdapter.performExpand();
+            positions = container.getChildPositionCollection();
+            container.setFull(true);
+            reload();
+        }
+    }
+
+    public void deleteContainers() {
+        List<SDKQuery> queries = new ArrayList<SDKQuery>();
+        Collection<ContainerPosition> positions = container
+            .getChildPositionCollection();
+        for (ContainerPosition pos : positions) {
+            Container deletingContainer = pos.getContainer();
+            if (deletingContainer != null
+                && deletingContainer.getContainerType().getId().equals(
+                    deleteType.getId())) {
+                // insert containers/positions to db
+
+                queries.add(new DeleteExampleQuery(deletingContainer));
+
+            }
+        }
+        // refresh
+        if (queries.size() > 0) {
+            try {
+                appService.executeBatchQuery(queries);
+            } catch (ApplicationException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            containerAdapter.removeAll();
+            containerAdapter.loadChildren(false);
+
+            containerAdapter.performExpand();
+            positions = container.getChildPositionCollection();
+            reload();
         }
     }
 
