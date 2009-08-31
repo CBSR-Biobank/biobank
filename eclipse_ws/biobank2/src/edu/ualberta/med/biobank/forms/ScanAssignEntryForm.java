@@ -284,7 +284,7 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
             } else {
                 palletTypesViewer = createCComboViewerWithNoSelectionValidator(
                     parent, "Pallet Container Type", palletContainerTypes,
-                    "A pallet type should be selected");
+                    null, "A pallet type should be selected");
             }
         } catch (ApplicationException e1) {
             // TODO Auto-generated catch block

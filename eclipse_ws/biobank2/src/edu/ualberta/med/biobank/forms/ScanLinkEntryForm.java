@@ -438,7 +438,7 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
 
     private void createVisitCombo(Composite compositeFields) {
         viewerVisits = createCComboViewerWithNoSelectionValidator(
-            compositeFields, "Visit date drawn", null,
+            compositeFields, "Visit date drawn", null, null,
             "A visit should be selected");
         GridData gridData = new GridData();
         gridData.grabExcessHorizontalSpace = true;

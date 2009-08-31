@@ -16,7 +16,6 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -171,21 +170,24 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
             // choose clinic for new visit
             Collection<Clinic> clinics = ModelUtils.getStudyClinicCollection(
                 appService, study);
-            clinicsComboViewer = createCComboViewerWithNoSelectionValidator(
-                client, "Clinic", clinics, "A clinic should be selected");
+            Clinic selectedClinic = null;
+
             if (clinics.size() == 1) {
-                clinicsComboViewer.getCCombo().select(0);
+                selectedClinic = clinics.iterator().next();
             }
             if (patientVisitWrapper.getClinic() != null) {
                 for (Clinic clinic : clinics) {
                     if (clinic.getId().equals(
                         patientVisitWrapper.getClinic().getId())) {
-                        clinicsComboViewer
-                            .setSelection(new StructuredSelection(clinic));
+                        selectedClinic = clinic;
                         break;
                     }
                 }
             }
+
+            clinicsComboViewer = createCComboViewerWithNoSelectionValidator(
+                client, "Clinic", clinics, selectedClinic,
+                "A clinic should be selected");
         } else {
             Label clinicLabel = (Label) createWidget(client, Label.class,
                 SWT.NONE, "Clinic");
