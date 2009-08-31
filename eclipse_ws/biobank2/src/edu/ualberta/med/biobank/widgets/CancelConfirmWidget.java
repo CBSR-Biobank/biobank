@@ -120,7 +120,8 @@ public class CancelConfirmWidget extends BiobankWidget {
 
     private void cancel() {
         try {
-            form.cancelForm();
+            PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+                .getActivePage().closeEditor(form, false);
         } catch (Exception e) {
             SessionManager.getLogger().error("Can't reset the form", e);
         }
