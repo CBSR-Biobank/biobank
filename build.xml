@@ -206,7 +206,7 @@
 		<uptodate property="jboss.uptodate" targetfile="${env.JBOSS_HOME}/server/default/deploy/biobank2.war" srcfile="${cacore.sdk.dir}/output/biobank2/package/webapp/biobank2.war" />
 	</target>
 
-	<target name="deploy-jboss" depends="check-jboss-uptodate,package-webapp-orm" description="deploys the caCORE SDK webapp to JBoss" unless="jboss.uptodate">
+	<target name="deploy-jboss" depends="check-jboss-uptodate" description="deploys the caCORE SDK webapp to JBoss" unless="jboss.uptodate">
 		<fail unless="env.JBOSS_HOME" message="$JBOSS_HOME not defined" />
 		<copy file="${secu-log.dir}/jboss/login-config.xml" tofile="${env.JBOSS_HOME}/server/default/conf/login-config.xml" overwrite="true" />
 		<delete file="${env.JBOSS_HOME}/server/default/deploy/mysql-ds.xml" />

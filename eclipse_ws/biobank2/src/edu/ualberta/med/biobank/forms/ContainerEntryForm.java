@@ -76,6 +76,8 @@ public class ContainerEntryForm extends BiobankEntryForm {
         if (position != null) {
             container.setLabel(position.getParentContainer().getLabel()
                 + LabelingScheme.getPositionString(position));
+            container.setTemperature(position.getParentContainer()
+                .getTemperature());
         }
 
         String tabName;
@@ -170,12 +172,16 @@ public class ContainerEntryForm extends BiobankEntryForm {
                         .getSelection();
                     ContainerType containerType = (ContainerType) selection
                         .getFirstElement();
-                    Double temp = containerType.getDefaultTemperature();
-                    if (temp == null) {
-                        tempWidget.setText("");
-                    } else {
-                        tempWidget.setText(temp.toString());
+                    if (containerType.getTopLevel()) {
+                        Double temp = containerType.getDefaultTemperature();
+
+                        if (temp == null) {
+                            tempWidget.setText("");
+                        } else {
+                            tempWidget.setText(temp.toString());
+                        }
                     }
+
                 }
             });
 
@@ -183,6 +189,9 @@ public class ContainerEntryForm extends BiobankEntryForm {
             SWT.NONE, "Temperature (Celcius)", null, PojoObservables
                 .observeValue(container, "temperature"), DoubleNumber.class,
             "Default temperature is not a valid number");
+        if (container.getPosition() != null)
+            tempWidget.setEnabled(false);
+
     }
 
     private void createButtonsSection() {
