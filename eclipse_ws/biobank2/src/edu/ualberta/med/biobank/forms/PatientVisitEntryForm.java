@@ -12,12 +12,17 @@ import java.util.List;
 import org.apache.commons.collections.MapIterator;
 import org.apache.commons.collections.map.ListOrderedMap;
 import org.apache.commons.lang.StringUtils;
+import org.eclipse.core.databinding.UpdateValueStrategy;
+import org.eclipse.core.databinding.observable.value.IObservableValue;
+import org.eclipse.core.databinding.observable.value.WritableValue;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
@@ -39,6 +44,7 @@ import edu.ualberta.med.biobank.model.PvSampleSource;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.PatientAdapter;
 import edu.ualberta.med.biobank.treeview.PatientVisitAdapter;
+import edu.ualberta.med.biobank.validators.DateNotNulValidator;
 import edu.ualberta.med.biobank.widgets.ComboAndQuantity;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.widgets.PvSampleSourceEntryWidget;
@@ -161,7 +167,6 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        // FIXME cannot get valid site when adding a new patient visit
         Label siteLabel = (Label) createWidget(client, Label.class, SWT.NONE,
             "Site");
         FormUtils.setTextValue(siteLabel, patientVisitWrapper
@@ -195,7 +200,8 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         }
 
         dateDrawn = createDateTimeWidget(client, "Date Drawn",
-            patientVisitWrapper.getDateDrawn());
+            patientVisitWrapper.getDateDrawn(), false,
+            "Date drawn should be set");
         dateProcessed = createDateTimeWidget(client, "Date Processed",
             patientVisitWrapper.getDateProcessed());
 
@@ -336,13 +342,39 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
     }
 
     private DateTimeWidget createDateTimeWidget(Composite client,
-        String nameLabel, Date date) {
+        String nameLabel, Date date, boolean canBeEmpty,
+        final String emptyMessage) {
         Label label = toolkit.createLabel(client, nameLabel + ":", SWT.NONE);
         label.setLayoutData(new GridData(GridData.VERTICAL_ALIGN_BEGINNING));
-        DateTimeWidget widget = new DateTimeWidget(client, SWT.NONE, date);
+        final DateTimeWidget widget = new DateTimeWidget(client, SWT.NONE, date);
         widget.addSelectionListener(selectionListener);
         widget.adaptToToolkit(toolkit, true);
+
+        if (!canBeEmpty) {
+            final IObservableValue dateValue = new WritableValue(null,
+                Date.class);
+            DateNotNulValidator validator = new DateNotNulValidator(
+                emptyMessage);
+            validator.setControlDecoration(FormUtils.createDecorator(label,
+                validator.getErrorMessage()));
+            UpdateValueStrategy uvs = new UpdateValueStrategy();
+            uvs.setAfterConvertValidator(validator);
+            dbc.bindValue(new WritableValue(null, Date.class), dateValue, uvs,
+                uvs);
+            dateValue.setValue(date);
+            widget.addSelectionListener(new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent e) {
+                    dateValue.setValue(widget.getDate());
+                }
+            });
+        }
         return widget;
+    }
+
+    private DateTimeWidget createDateTimeWidget(Composite client,
+        String nameLabel, Date date) {
+        return createDateTimeWidget(client, nameLabel, date, true, "");
     }
 
     private void createSourcesSection() {
@@ -414,18 +446,18 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         patientVisitWrapper.setDateReceived(dateReceived.getDate());
         patientVisitWrapper.setComments(commentsText.getText());
 
-        savePvSampleSources();
-
         // FIXME get csm_user_id and set it to the Patient Visit at insert
 
         DatabaseResult res = patientVisitWrapper.persist();
         if (res != DatabaseResult.OK) {
             BioBankPlugin.openAsyncError("Save Problem", res.getMessage());
             setDirty(true);
+            return;
         }
 
         // FIXME samplesources and pv infos datas could be done in the patient
         // visit persists method (if we send the information in parameters)
+        savePvSampleSources();
         savePvInfoData();
         patientAdapter.performExpand();
     }
@@ -455,7 +487,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
     private void removeDeletedPvSampleSources(
         Collection<PvSampleSource> ssCollection) throws Exception {
         // no need to remove if patientVisit is not yet in the database
-        if (patientVisitWrapper.getId() == null)
+        if (patientVisitWrapper.isNew())
             return;
 
         List<Integer> selectedPvSampleSourceIds = new ArrayList<Integer>();
@@ -464,11 +496,13 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         }
 
         SDKQuery query;
-        for (PvSampleSource ss : patientVisitWrapper
-            .getPvSampleSourceCollection()) {
-            if (!selectedPvSampleSourceIds.contains(ss.getId())) {
-                query = new DeleteExampleQuery(ss);
-                appService.executeQuery(query);
+        if (patientVisitWrapper.getPvSampleSourceCollection() != null) {
+            for (PvSampleSource ss : patientVisitWrapper
+                .getPvSampleSourceCollection()) {
+                if (!selectedPvSampleSourceIds.contains(ss.getId())) {
+                    query = new DeleteExampleQuery(ss);
+                    appService.executeQuery(query);
+                }
             }
         }
     }
