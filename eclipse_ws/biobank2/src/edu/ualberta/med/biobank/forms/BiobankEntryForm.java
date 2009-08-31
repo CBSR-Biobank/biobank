@@ -25,6 +25,7 @@ import org.eclipse.jface.databinding.swt.SWTObservables;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ComboViewer;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.custom.CCombo;
@@ -296,8 +297,8 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
      * 
      * @see BiobankLabelProvider#getColumnText
      */
-    protected ComboViewer createCComboViewerWithNoSelectionValidator(
-        Composite parent, String fieldLabel, Collection<?> input,
+    protected <T> ComboViewer createCComboViewerWithNoSelectionValidator(
+        Composite parent, String fieldLabel, Collection<?> input, T selection,
         String errorMessage) {
         Label label = toolkit.createLabel(parent, fieldLabel + ":", SWT.LEFT);
 
@@ -310,7 +311,6 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
         }
 
         combo.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
-        comboViewer.getCCombo().addModifyListener(modifyListener);
         AbstractValidator validator = new NonEmptyString(errorMessage);
         validator.setControlDecoration(FormUtils.createDecorator(label,
             errorMessage));
@@ -319,6 +319,11 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
         IObservableValue selectedValue = new WritableValue("", String.class);
         dbc.bindValue(SWTObservables.observeSelection(combo), selectedValue,
             uvs, null);
+
+        if (selection != null) {
+            comboViewer.setSelection(new StructuredSelection(selection));
+        }
+        combo.addModifyListener(modifyListener);
         return comboViewer;
     }
 

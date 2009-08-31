@@ -235,6 +235,9 @@ public class BiobankLabelProvider extends LabelProvider implements
     public String getText(Object element) {
         if (element instanceof ContainerType) {
             return ((ContainerType) element).getName();
+        } else if (element instanceof Study) {
+            Study study = (Study) element;
+            return study.getNameShort() + " - " + study.getName();
         } else if (element instanceof Clinic) {
             return ((Clinic) element).getName();
         } else if (element instanceof ContainerLabelingScheme) {

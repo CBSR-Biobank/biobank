@@ -76,6 +76,8 @@ public class ContainerEntryForm extends BiobankEntryForm {
         if (position != null) {
             container.setLabel(position.getParentContainer().getLabel()
                 + LabelingScheme.getPositionString(position));
+            container.setTemperature(position.getParentContainer()
+                .getTemperature());
         }
 
         String tabName;
@@ -146,12 +148,16 @@ public class ContainerEntryForm extends BiobankEntryForm {
             containerTypes = position.getParentContainer().getContainerType()
                 .getChildContainerTypeCollection();
         }
-        containerTypeComboViewer = createCComboViewerWithNoSelectionValidator(
-            client, "Container Type", containerTypes, MSG_CONTAINER_TYPE_EMPTY);
+
+        ContainerType selection = null;
         if (containerTypes.size() == 1) {
-            containerTypeComboViewer.getCCombo().select(0);
+            selection = containerTypes.iterator().next();
             setDirty(true);
         }
+        containerTypeComboViewer = createCComboViewerWithNoSelectionValidator(
+            client, "Container Type", containerTypes, selection,
+            MSG_CONTAINER_TYPE_EMPTY);
+
         if (currentContainerType != null) {
             for (ContainerType type : containerTypes) {
                 if (currentContainerType.getId().equals(type.getId())) {
@@ -170,12 +176,16 @@ public class ContainerEntryForm extends BiobankEntryForm {
                         .getSelection();
                     ContainerType containerType = (ContainerType) selection
                         .getFirstElement();
-                    Double temp = containerType.getDefaultTemperature();
-                    if (temp == null) {
-                        tempWidget.setText("");
-                    } else {
-                        tempWidget.setText(temp.toString());
+                    if (containerType.getTopLevel()) {
+                        Double temp = containerType.getDefaultTemperature();
+
+                        if (temp == null) {
+                            tempWidget.setText("");
+                        } else {
+                            tempWidget.setText(temp.toString());
+                        }
                     }
+
                 }
             });
 
@@ -183,6 +193,9 @@ public class ContainerEntryForm extends BiobankEntryForm {
             SWT.NONE, "Temperature (Celcius)", null, PojoObservables
                 .observeValue(container, "temperature"), DoubleNumber.class,
             "Default temperature is not a valid number");
+        if (container.getPosition() != null)
+            tempWidget.setEnabled(false);
+
     }
 
     private void createButtonsSection() {
