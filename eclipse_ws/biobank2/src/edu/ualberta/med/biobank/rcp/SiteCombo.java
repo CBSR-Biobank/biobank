@@ -4,12 +4,12 @@ import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.jface.action.ControlContribution;
-import org.eclipse.jface.viewers.ComboViewer;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
@@ -23,7 +23,7 @@ public class SiteCombo extends ControlContribution {
 
     private List<Site> sites;
     private SessionAdapter session;
-    public ComboViewer combo;
+    public Combo combo;
 
     public SiteCombo() {
         super("Site Selection");
@@ -48,13 +48,13 @@ public class SiteCombo extends ControlContribution {
         resizedComboPanel.setLayout(layout);
         Label siteLabel = new Label(resizedComboPanel, SWT.NONE);
         siteLabel.setText("Working Site: ");
-        combo = new ComboViewer(resizedComboPanel, SWT.NONE | SWT.DROP_DOWN
+        combo = new Combo(resizedComboPanel, SWT.NONE | SWT.DROP_DOWN
             | SWT.READ_ONLY);
 
-        combo.addSelectionChangedListener(new ISelectionChangedListener() {
+        combo.addModifyListener(new ModifyListener() {
             @Override
-            public void selectionChanged(SelectionChangedEvent event) {
-                if (combo.getgetSelectionIndex() <= sites.size()) {
+            public void modifyText(ModifyEvent e) {
+                if (combo.getSelectionIndex() <= sites.size()) {
                     if (combo.getSelectionIndex() == 0)
                         SessionManager.getInstance().setCurrentSite(null);
                     else if (combo.getSelectionIndex() > 0)
