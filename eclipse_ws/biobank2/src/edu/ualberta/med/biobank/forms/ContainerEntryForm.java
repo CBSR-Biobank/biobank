@@ -148,7 +148,8 @@ public class ContainerEntryForm extends BiobankEntryForm {
         }
 
         ContainerType selection = null;
-        if (containerTypes.size() == 1) {
+        if ((container.getContainerType() == null)
+            && (containerTypes.size() == 1)) {
             selection = containerTypes.iterator().next();
             setDirty(true);
         }
