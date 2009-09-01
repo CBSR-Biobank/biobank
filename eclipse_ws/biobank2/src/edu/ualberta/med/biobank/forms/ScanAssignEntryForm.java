@@ -23,16 +23,18 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.PlatformUI;
 import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.utils.ModelUtils;
 import edu.ualberta.med.biobank.common.utils.SiteUtils;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
 import edu.ualberta.med.biobank.forms.listener.EnterKeyToNextFieldListener;
 import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.Container;
@@ -105,7 +107,6 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
 
         cancelConfirmWidget = new CancelConfirmWidget(form.getBody(), this,
             true);
-        cancelConfirmWidget.showCloseButton(true);
 
         addBooleanBinding(new WritableValue(Boolean.FALSE, Boolean.class),
             scanLaunchedValue, "Scanner should be launched");
@@ -131,22 +132,25 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
             PojoObservables
                 .observeValue(currentPalletWrapper, "productBarcode"),
             NonEmptyString.class, "Enter pallet position code");
-        palletCodeText.removeKeyListener(keyListener);
         palletCodeText.addKeyListener(EnterKeyToNextFieldListener.INSTANCE);
 
         palletPositionText = (Text) createBoundWidgetWithLabel(fieldsComposite,
             Text.class, SWT.NONE, "Pallet label", null, BeansObservables
                 .observeValue(currentPalletWrapper, "label"),
             NonEmptyString.class, "Enter position code");
-        palletPositionText.removeKeyListener(keyListener);
         palletPositionText.addKeyListener(EnterKeyToNextFieldListener.INSTANCE);
 
         plateToScanText = (Text) createBoundWidgetWithLabel(fieldsComposite,
             Text.class, SWT.NONE, "Plate to scan", new String[0],
             plateToScanValue, ScannerBarcodeValidator.class,
             "Enter a valid plate barcode");
-        plateToScanText.removeKeyListener(keyListener);
-        plateToScanText.addKeyListener(EnterKeyToNextFieldListener.INSTANCE);
+        plateToScanText.addListener(SWT.DefaultSelection, new Listener() {
+            public void handleEvent(Event e) {
+                if (scanButton.isEnabled()) {
+                    scan();
+                }
+            }
+        });
 
         if (!BioBankPlugin.isRealScanEnabled()) {
             gd.widthHint = 250;
@@ -255,51 +259,58 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
         }
     }
 
-    protected void scan() throws Exception {
-        boolean showResult = checkPallet();
-        if (showResult) {
-            showOnlyPallet(false);
-            if (BioBankPlugin.isRealScanEnabled()) {
-                int plateNum = BioBankPlugin.getDefault().getPlateNumber(
-                    plateToScanValue.getValue().toString());
-                cells = PalletCell.convertArray(ScannerConfigPlugin
-                    .scan(plateNum));
-            } else {
-                if (notexistsButton.getSelection()) {
-                    cells = PalletCell.getRandomScanProcessNotInPallet(
-                        appService, SessionManager.getInstance()
-                            .getCurrentSite());
-                } else if (existsButton.getSelection()) {
-                    cells = PalletCell.getRandomScanProcessAlreadyInPallet(
-                        appService, SessionManager.getInstance()
-                            .getCurrentSite());
+    protected void scan() {
+        try {
+            boolean showResult = checkPallet();
+            if (showResult) {
+                showOnlyPallet(false);
+                if (BioBankPlugin.isRealScanEnabled()) {
+                    int plateNum = BioBankPlugin.getDefault().getPlateNumber(
+                        plateToScanValue.getValue().toString());
+                    cells = PalletCell.convertArray(ScannerConfigPlugin
+                        .scan(plateNum));
                 } else {
-                    cells = PalletCell.getRandomScanProcess();
-                }
-            }
-            boolean result = true;
-            for (int i = 0; i < cells.length; i++) { // rows
-                for (int j = 0; j < cells[i].length; j++) { // columns
-                    Sample positionSample = null;
-                    if (currentPalletSamples != null) {
-                        positionSample = currentPalletSamples[i][j];
+                    if (notexistsButton.getSelection()) {
+                        cells = PalletCell.getRandomScanProcessNotInPallet(
+                            appService, SessionManager.getInstance()
+                                .getCurrentSite());
+                    } else if (existsButton.getSelection()) {
+                        cells = PalletCell.getRandomScanProcessAlreadyInPallet(
+                            appService, SessionManager.getInstance()
+                                .getCurrentSite());
+                    } else {
+                        cells = PalletCell.getRandomScanProcess();
                     }
-                    result = setStatus(cells[i][j], positionSample) && result;
                 }
-            }
+                boolean result = true;
+                for (int i = 0; i < cells.length; i++) { // rows
+                    for (int j = 0; j < cells[i].length; j++) { // columns
+                        Sample positionSample = null;
+                        if (currentPalletSamples != null) {
+                            positionSample = currentPalletSamples[i][j];
+                        }
+                        result = setStatus(cells[i][j], positionSample)
+                            && result;
+                    }
+                }
 
-            scanValidValue.setValue(result);
-            palletWidget.setScannedElements(cells);
-            scanLaunchedValue.setValue(true);
-            setDirty(true);
-        } else {
-            palletWidget.setScannedElements(PalletCell.getEmptyCells());
-            showOnlyPallet(true);
-            scanValidValue.setValue(false);
+                scanValidValue.setValue(result);
+                palletWidget.setScannedElements(cells);
+                scanLaunchedValue.setValue(true);
+                setDirty(true);
+            } else {
+                palletWidget.setScannedElements(PalletCell.getEmptyCells());
+                showOnlyPallet(true);
+                scanValidValue.setValue(false);
+            }
+            showPalletPosition();
+            scanButton.traverse(SWT.TRAVERSE_TAB_NEXT);
+            form.layout(true, true);
+        } catch (RemoteConnectFailureException exp) {
+            BioBankPlugin.openRemoteConnectErrorMessage();
+        } catch (Exception e) {
+            BioBankPlugin.openError("Error while scanning", e);
         }
-        showPalletPosition();
-        scanButton.traverse(SWT.TRAVERSE_TAB_NEXT);
-        form.layout(true, true);
     }
 
     private void showOnlyPallet(boolean show) {
@@ -376,7 +387,7 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
                     && !sample.getSamplePosition().getContainer().getId()
                         .equals(currentPalletWrapper.getId())) {
                     scanCell.setStatus(SampleCellStatus.ERROR);
-                    String posString = ModelUtils.getSamplePosition(sample);
+                    String posString = SampleWrapper.getPositionString(sample);
                     scanCell
                         .setInformation("Sample registered on another pallet with position "
                             + posString + "!");
@@ -486,9 +497,7 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
 
     @Override
     public void setFocus() {
-        if (plateToScanValue.getValue().toString().isEmpty()) {
-            plateToScanText.setFocus();
-        }
+        palletCodeText.setFocus();
     }
 
     /**

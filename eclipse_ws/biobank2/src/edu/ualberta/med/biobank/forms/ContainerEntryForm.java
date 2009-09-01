@@ -176,7 +176,8 @@ public class ContainerEntryForm extends BiobankEntryForm {
                         .getSelection();
                     ContainerType containerType = (ContainerType) selection
                         .getFirstElement();
-                    if (containerType.getTopLevel()) {
+                    if (containerType.getTopLevel() != null
+                        && containerType.getTopLevel()) {
                         Double temp = containerType.getDefaultTemperature();
 
                         if (temp == null) {

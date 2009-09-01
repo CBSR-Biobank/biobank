@@ -200,6 +200,9 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
             "Activity Status", FormConstants.ACTIVITY_STATUS, PojoObservables
                 .observeValue(containerType, "activityStatus"), null, null);
 
+        if (containerType.getTopLevel() == null) {
+            containerType.setTopLevel(false);
+        }
         createBoundWidgetWithLabel(client, Button.class, SWT.CHECK,
             "Is top Level Container", null, PojoObservables.observeValue(
                 containerType, "topLevel"), null);

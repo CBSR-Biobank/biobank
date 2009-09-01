@@ -127,7 +127,6 @@
             name="Patients Administration">
       </category>
       <command
-            defaultHandler="edu.ualberta.med.biobank.handlers.OpenPatientFormHandler"
             id="edu.ualberta.med.biobank.commands.patients.openPatientForm"
             name="Open Patient Form">
          <commandParameter
@@ -376,6 +375,15 @@
                </reference>
             </and>
          </activeWhen>
+      </handler>
+      <handler
+            class="edu.ualberta.med.biobank.handlers.OpenPatientFormHandler"
+            commandId="edu.ualberta.med.biobank.commands.patients.openPatientForm">
+         <activeWhen>
+              <reference
+                    definitionId="biobank2.siteSelected">
+              </reference>
+          </activeWhen>
       </handler>
    </extension>
    <extension

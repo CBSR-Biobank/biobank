@@ -28,8 +28,7 @@ public class ContainerPositionWrapper extends ModelWrapper<ContainerPosition> {
 
     @Override
     protected DatabaseResult persistChecks() throws ApplicationException {
-        // TODO Auto-generated method stub
-        return null;
+        return DatabaseResult.OK;
     }
 
     public void setParentContainer(Container parentContainer) {

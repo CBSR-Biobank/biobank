@@ -26,8 +26,6 @@ public class CancelConfirmWidget extends BiobankWidget {
 
     private Button cancelButton;
 
-    private Button closeButton;
-
     private BiobankEntryForm form;
 
     public CancelConfirmWidget(Composite parent, BiobankEntryForm form) {
@@ -43,7 +41,6 @@ public class CancelConfirmWidget extends BiobankWidget {
         createContents();
 
         showTextField(showTextField);
-        showCloseButton(false);
     }
 
     private void createContents() {
@@ -84,21 +81,7 @@ public class CancelConfirmWidget extends BiobankWidget {
             }
         });
 
-        closeButton = form.getToolkit().createButton(this, "Close", SWT.PUSH);
-        gd = new GridData();
-        closeButton.setLayoutData(gd);
-        closeButton.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                close();
-            }
-        });
         adaptToToolkit(form.getToolkit(), true);
-    }
-
-    protected void close() {
-        PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage()
-            .closeEditor(form, true);
     }
 
     private void confirm() {
@@ -123,18 +106,13 @@ public class CancelConfirmWidget extends BiobankWidget {
             PlatformUI.getWorkbench().getActiveWorkbenchWindow()
                 .getActivePage().closeEditor(form, false);
         } catch (Exception e) {
-            SessionManager.getLogger().error("Can't reset the form", e);
+            SessionManager.getLogger().error("Can't close the form", e);
         }
     }
 
     public void showTextField(boolean show) {
         ((GridData) confirmCancelText.getLayoutData()).exclude = !show;
         confirmCancelText.setVisible(show);
-    }
-
-    public void showCloseButton(boolean show) {
-        ((GridData) closeButton.getLayoutData()).exclude = !show;
-        closeButton.setVisible(show);
     }
 
     public void setConfirmEnabled(boolean enabled) {
