@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Semaphore;
@@ -50,7 +51,7 @@ public class SessionManager {
 
     final int TIME_OUT = 900000;
 
-    private int currentSite;
+    private Site currentSite;
     private SiteCombo siteCombo;
 
     private List<Site> currentSites;
@@ -98,6 +99,7 @@ public class SessionManager {
     private SessionManager() {
         super();
         rootNode = new RootNode();
+        currentSites = new ArrayList<Site>();
     }
 
     public static SessionManager getInstance() {
@@ -122,13 +124,14 @@ public class SessionManager {
             userName);
         rootNode.addChild(sessionAdapter);
         Collections.sort(sites, new SiteComparator());
+        updateSites();
         sessionAdapter.loadChildren(true);
         siteCombo.setSession(sessionAdapter);
         view.getTreeViewer().expandToLevel(2);
         log4j.debug("addSession: " + name);
         startInactivityTimer();
         updateMenus();
-        updateSites();
+
     }
 
     private void startInactivityTimer() {
@@ -174,6 +177,8 @@ public class SessionManager {
         rootNode.removeChild(sessionAdapter);
         sessionAdapter = null;
         updateMenus();
+        currentSites = new ArrayList<Site>();
+        siteCombo.combo.setInput(currentSites);
     }
 
     private void updateMenus() {
@@ -227,7 +232,7 @@ public class SessionManager {
     }
 
     public void setCurrentSite(Site site) {
-        currentSite = currentSites.indexOf(site);
+        currentSite = site;
         IWorkbenchWindow window = PlatformUI.getWorkbench()
             .getActiveWorkbenchWindow();
         ISourceProviderService service = (ISourceProviderService) window
@@ -243,7 +248,7 @@ public class SessionManager {
     }
 
     public Site getCurrentSite() {
-        return currentSites.get(currentSite);
+        return currentSite;
     }
 
     public List<Site> getCurrentSites() {
@@ -257,6 +262,10 @@ public class SessionManager {
             allSite.setName("All Sites");
             currentSites.add(0, allSite);
             siteCombo.combo.setInput(currentSites);
+            if (currentSite == null)
+                siteCombo.setSelection(allSite);
+            else
+                siteCombo.setSelection(currentSite);
         } catch (ApplicationException e) {
             e.printStackTrace();
         }

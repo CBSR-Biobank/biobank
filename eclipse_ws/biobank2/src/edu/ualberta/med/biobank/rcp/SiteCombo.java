@@ -3,9 +3,12 @@ package edu.ualberta.med.biobank.rcp;
 import org.eclipse.jface.action.ControlContribution;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ComboViewer;
+import org.eclipse.jface.viewers.IElementComparer;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -16,7 +19,6 @@ import org.eclipse.swt.widgets.Label;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.model.Site;
-import edu.ualberta.med.biobank.model.SiteComparator;
 import edu.ualberta.med.biobank.treeview.SessionAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
@@ -72,6 +74,27 @@ public class SiteCombo extends ControlContribution {
                 }
             }
         });
+        combo.setComparer(new IElementComparer() {
+            @Override
+            public boolean equals(Object a, Object b) {
+                if (a instanceof Site && b instanceof Site) {
+                    Integer ida = ((Site) a).getId();
+                    Integer idb = ((Site) b).getId();
+                    if (ida == null && idb == null)
+                        return true;
+                    else if (ida.equals(idb))
+                        return true;
+                }
+                return false;
+            }
+
+            @Override
+            public int hashCode(Object element) {
+                return element.hashCode();
+            }
+
+        });
+        combo.setComparator(new ViewerComparator());
         GridData gd = new GridData();
         gd.widthHint = 155;
         Combo realCombo = combo.getCombo();
@@ -82,8 +105,11 @@ public class SiteCombo extends ControlContribution {
     }
 
     public void setEnabled(boolean b) {
-        //
 
+    }
+
+    public void setSelection(Site site) {
+        combo.setSelection(new StructuredSelection(site));
     }
 
 }

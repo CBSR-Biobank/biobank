@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.treeview;
 
-import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.jface.viewers.TreeViewer;
@@ -17,7 +16,6 @@ import org.springframework.remoting.RemoteAccessException;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.model.Site;
-import edu.ualberta.med.biobank.model.SiteComparator;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -106,9 +104,8 @@ public class SessionAdapter extends AdapterBase {
     public void loadChildren(boolean updateNode) {
         try {
             // read from database again
-            Site siteSearch = new Site();
-            List<Site> result = appService.search(Site.class, siteSearch);
-            Collections.sort(result, new SiteComparator());
+            List<Site> result = SessionManager.getInstance().getCurrentSites();
+            result = result.subList(1, result.size());
             Site currentSite = SessionManager.getInstance().getCurrentSite();
             for (Site site : result) {
                 if (currentSite == null
