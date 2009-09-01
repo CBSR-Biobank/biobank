@@ -204,7 +204,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
             containerType.setTopLevel(false);
         }
         createBoundWidgetWithLabel(client, Button.class, SWT.CHECK,
-            "Is top Level Container", null, PojoObservables.observeValue(
+            "Top Level Container", null, PojoObservables.observeValue(
                 containerType, "topLevel"), null);
 
         Text comment = (Text) createBoundWidgetWithLabel(client, Text.class,

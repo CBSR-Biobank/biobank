@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
@@ -11,13 +12,16 @@ import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
+import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.utils.ModelUtils;
+import edu.ualberta.med.biobank.common.utils.SiteUtils;
 import edu.ualberta.med.biobank.forms.ContainerEntryForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerComparator;
+import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.Site;
 
 public class ContainerGroup extends AdapterBase {
@@ -37,11 +41,22 @@ public class ContainerGroup extends AdapterBase {
         mi.setText("Add a Container");
         mi.addSelectionListener(new SelectionListener() {
             public void widgetSelected(SelectionEvent event) {
-                Container c = new Container();
-                c.setSite(getParentFromClass(SiteAdapter.class).getSite());
-                ContainerAdapter adapter = new ContainerAdapter(
-                    ContainerGroup.this, c);
-                openForm(new FormInput(adapter), ContainerEntryForm.ID);
+                List<ContainerType> top = (List<ContainerType>) SiteUtils
+                    .getTopContainerTypesInSite(SessionManager.getAppService(),
+                        ((SiteAdapter) parent).getSite());
+                if (top.size() == 0) {
+                    MessageDialog
+                        .openError(PlatformUI.getWorkbench()
+                            .getActiveWorkbenchWindow().getShell(),
+                            "Unable to create container",
+                            "You must define a top-level container type before initializing storage.");
+                } else {
+                    Container c = new Container();
+                    c.setSite(getParentFromClass(SiteAdapter.class).getSite());
+                    ContainerAdapter adapter = new ContainerAdapter(
+                        ContainerGroup.this, c);
+                    openForm(new FormInput(adapter), ContainerEntryForm.ID);
+                }
             }
 
             public void widgetDefaultSelected(SelectionEvent e) {

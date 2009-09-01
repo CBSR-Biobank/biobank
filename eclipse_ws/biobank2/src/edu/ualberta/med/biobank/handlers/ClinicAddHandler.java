@@ -32,6 +32,7 @@ public class ClinicAddHandler extends AbstractHandler {
 
         Clinic clinic = new Clinic();
         clinic.setAddress(new Address());
+        clinic.setSite(siteAdapter.getSite());
         ClinicAdapter clinicNode = new ClinicAdapter(siteAdapter
             .getClinicGroupNode(), clinic);
         FormInput input = new FormInput(clinicNode);

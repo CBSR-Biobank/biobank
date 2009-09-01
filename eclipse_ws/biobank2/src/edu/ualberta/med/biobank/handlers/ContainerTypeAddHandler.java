@@ -20,6 +20,7 @@ public class ContainerTypeAddHandler extends AbstractHandler {
     public static final String ID = "edu.ualberta.med.biobank.commands.containerTypeAdd";
 
     public Object execute(ExecutionEvent event) throws ExecutionException {
+
         SessionAdapter sessionAdapter = SessionManager.getInstance()
             .getSession();
         Assert.isNotNull(sessionAdapter);
@@ -29,6 +30,7 @@ public class ContainerTypeAddHandler extends AbstractHandler {
         Assert.isNotNull(siteAdapter);
 
         ContainerType containerType = new ContainerType();
+        containerType.setSite(siteAdapter.getSite());
         ContainerTypeAdapter containerTypeNode = new ContainerTypeAdapter(
             siteAdapter.getContainerTypesGroupNode(), containerType);
 
@@ -39,7 +41,6 @@ public class ContainerTypeAddHandler extends AbstractHandler {
         } catch (Exception exp) {
             exp.printStackTrace();
         }
-
         return null;
     }
 
