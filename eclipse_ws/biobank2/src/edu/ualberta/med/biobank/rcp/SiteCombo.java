@@ -16,6 +16,7 @@ import org.eclipse.swt.widgets.Label;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.model.SiteComparator;
 import edu.ualberta.med.biobank.treeview.SessionAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 

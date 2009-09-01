@@ -2,10 +2,13 @@ package edu.ualberta.med.biobank.common;
 
 import org.springframework.util.Assert;
 
+import edu.ualberta.med.biobank.model.AbstractPosition;
 import edu.ualberta.med.biobank.model.Capacity;
+import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
 import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.ContainerType;
+import edu.ualberta.med.biobank.model.SamplePosition;
 
 public class LabelingScheme {
 
@@ -177,12 +180,18 @@ public class LabelingScheme {
     /**
      * Get the 2 char string corresponding to the given position
      */
-    public static String getPositionString(ContainerPosition position) {
+    public static String getPositionString(AbstractPosition position) {
         RowColPos rcp = new RowColPos();
         rcp.row = position.getRow();
         rcp.col = position.getCol();
-        return getPositionString(rcp, position.getParentContainer()
-            .getContainerType());
+        Container parentContainer = null;
+        if (position instanceof ContainerPosition) {
+            parentContainer = ((ContainerPosition) position)
+                .getParentContainer();
+        } else if (position instanceof SamplePosition) {
+            parentContainer = ((SamplePosition) position).getContainer();
+        }
+        return getPositionString(rcp, parentContainer.getContainerType());
     }
 
     /**

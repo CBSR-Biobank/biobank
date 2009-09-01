@@ -113,13 +113,15 @@ public class CabinetDrawerWidget extends Canvas {
             ContainerStatus status = cells[boxIndex - 1][0].getStatus();
             if (status == null)
                 status = ContainerStatus.NOT_INITIALIZED;
+
             gc.setBackground(status.getColor());
             gc.fillRectangle(rectangle);
-            gc.drawRectangle(rectangle);
             if ((selectedBin + 1) == boxIndex) {
-                gc.setBackground(new Color(e.display, 123, 11, 25));
+                gc.setBackground(e.display.getSystemColor(SWT.COLOR_RED));
                 gc.fillRectangle(rectangle);
             }
+            gc.drawRectangle(rectangle);
+
             DecimalFormat df1 = new DecimalFormat("00");
             String text = df1.format(boxIndex);
             if (text != null) {

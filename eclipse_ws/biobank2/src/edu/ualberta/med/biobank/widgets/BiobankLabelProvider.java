@@ -8,7 +8,7 @@ import org.eclipse.swt.graphics.Image;
 import org.springframework.util.Assert;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
-import edu.ualberta.med.biobank.common.utils.ModelUtils;
+import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.ClinicStudyInfo;
 import edu.ualberta.med.biobank.model.Contact;
@@ -124,7 +124,7 @@ public class BiobankLabelProvider extends LabelProvider implements
                 return sample.getSampleType() == null ? "" : sample
                     .getSampleType().getName();
             case 2:
-                return ModelUtils.getSamplePosition(sample);
+                return SampleWrapper.getPositionString(sample);
             case 3:
                 return sample.getLinkDate() == null ? ""
                     : new SimpleDateFormat(BioBankPlugin.DATE_TIME_FORMAT)
@@ -242,6 +242,9 @@ public class BiobankLabelProvider extends LabelProvider implements
     public String getText(Object element) {
         if (element instanceof ContainerType) {
             return ((ContainerType) element).getName();
+        } else if (element instanceof Study) {
+            Study study = (Study) element;
+            return study.getNameShort() + " - " + study.getName();
         } else if (element instanceof Clinic) {
             return ((Clinic) element).getName();
         } else if (element instanceof ContainerLabelingScheme) {

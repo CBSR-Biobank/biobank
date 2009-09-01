@@ -42,7 +42,6 @@ public class DateTimeWidget extends BiobankWidget {
         cdt.setPattern(BioBankPlugin.DATE_TIME_FORMAT);
         cdt.setSelection(date);
         cdt.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
-
     }
 
     public void addSelectionListener(SelectionListener listener) {
@@ -62,7 +61,7 @@ public class DateTimeWidget extends BiobankWidget {
             return null;
 
         try {
-            return BioBankPlugin.getDateFormatter().parse(cdt.getText());
+            return BioBankPlugin.getDateTimeFormatter().parse(cdt.getText());
         } catch (ParseException e) {
             e.printStackTrace();
         }

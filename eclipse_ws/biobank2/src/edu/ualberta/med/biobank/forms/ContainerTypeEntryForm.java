@@ -181,9 +181,6 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         List<ContainerLabelingScheme> schemes = appService.search(
             ContainerLabelingScheme.class, new ContainerLabelingScheme());
 
-        labelingSchemeComboViewer = createCComboViewerWithNoSelectionValidator(
-            client, "Child Labeling Scheme", schemes,
-            MSG_CHILD_LABELING_SCHEME_EMPTY);
         ContainerLabelingScheme currentScheme = containerType
             .getChildLabelingScheme();
         if (currentScheme != null) {
@@ -193,14 +190,19 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
                     break;
                 }
             }
-            labelingSchemeComboViewer.setSelection(new StructuredSelection(
-                currentScheme));
         }
+
+        labelingSchemeComboViewer = createCComboViewerWithNoSelectionValidator(
+            client, "Child Labeling Scheme", schemes, currentScheme,
+            MSG_CHILD_LABELING_SCHEME_EMPTY);
 
         createBoundWidgetWithLabel(client, Combo.class, SWT.NONE,
             "Activity Status", FormConstants.ACTIVITY_STATUS, PojoObservables
                 .observeValue(containerType, "activityStatus"), null, null);
 
+        if (containerType.getTopLevel() == null) {
+            containerType.setTopLevel(false);
+        }
         createBoundWidgetWithLabel(client, Button.class, SWT.CHECK,
             "Is top Level Container", null, PojoObservables.observeValue(
                 containerType, "topLevel"), null);

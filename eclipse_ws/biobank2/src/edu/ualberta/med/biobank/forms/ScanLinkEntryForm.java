@@ -160,7 +160,6 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
 
         cancelConfirmWidget = new CancelConfirmWidget(form.getBody(), this,
             true);
-        cancelConfirmWidget.showCloseButton(true);
 
         uvs = new UpdateValueStrategy();
         uvs.setAfterConvertValidator(new IValidator() {
@@ -414,7 +413,6 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
             Text.class, SWT.NONE, "Plate to Scan", new String[0],
             plateToScanValue, ScannerBarcodeValidator.class,
             "Enter a valid plate barcode");
-        plateToScanText.removeKeyListener(keyListener);
         plateToScanText.addListener(SWT.DefaultSelection, new Listener() {
             public void handleEvent(Event e) {
                 if (scanButton.isEnabled()) {
@@ -438,7 +436,7 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
 
     private void createVisitCombo(Composite compositeFields) {
         viewerVisits = createCComboViewerWithNoSelectionValidator(
-            compositeFields, "Visit date drawn", null,
+            compositeFields, "Visit date drawn", null, null,
             "A visit should be selected");
         GridData gridData = new GridData();
         gridData.grabExcessHorizontalSpace = true;
@@ -467,7 +465,7 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
                 public void selectionChanged(SelectionChangedEvent event) {
                     PatientVisit pv = getSelectedPatientVisit();
                     if (pv != null) {
-
+                        // set the processed date
                     }
                 }
             });

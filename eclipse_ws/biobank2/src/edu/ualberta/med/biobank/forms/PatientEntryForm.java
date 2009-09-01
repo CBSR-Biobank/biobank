@@ -7,8 +7,6 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.LabelProvider;
-import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -86,20 +84,11 @@ public class PatientEntryForm extends BiobankEntryForm {
         site = SessionManager.getInstance().getCurrentSite();
         labelSite.setText(site.getName());
 
-        studiesViewer = createCComboViewerWithNoSelectionValidator(client,
-            "Study", null, "A study should be selected");
-        studiesViewer.setLabelProvider(new LabelProvider() {
-            @Override
-            public String getText(Object element) {
-                Study study = (Study) element;
-                return study.getNameShort() + " - " + study.getName();
-            }
-        });
         Collection<Study> studies = site.getStudyCollection();
-        studiesViewer.setInput(studies);
+        Study selectedStudy = null;
         if (patientAdapter.getWrapper().isNew()) {
             if (studies.size() == 1) {
-                studiesViewer.getCCombo().select(0);
+                selectedStudy = studies.iterator().next();
             }
         } else {
             Study currentStudy = patientAdapter.getWrapper().getStudy();
@@ -110,10 +99,12 @@ public class PatientEntryForm extends BiobankEntryForm {
                         break;
                     }
                 }
-                studiesViewer
-                    .setSelection(new StructuredSelection(currentStudy));
+                selectedStudy = currentStudy;
             }
         }
+
+        studiesViewer = createCComboViewerWithNoSelectionValidator(client,
+            "Study", studies, selectedStudy, "A study should be selected");
 
         createBoundWidgetWithLabel(client, Text.class, SWT.NONE,
             "Patient Number", null, BeansObservables.observeValue(

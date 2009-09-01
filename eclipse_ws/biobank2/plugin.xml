@@ -28,22 +28,6 @@
       </product>
    </extension>
    <extension
-         id="product1"
-         point="org.eclipse.core.runtime.products">
-      <product
-            application="biobank2.biobank2"
-            name="BioBank2">
-         <property
-               name="windowImages"
-               value="icons/alt_window_16.gif,icons/alt_window_32.gif">
-         </property>
-         <property
-               name="appName"
-               value="BioBank2">
-         </property>
-      </product>
-   </extension>
-   <extension
          point="org.eclipse.ui.activities">
       <activity
             description="Preferences from Eclipse Update UI"
@@ -143,7 +127,6 @@
             name="Patients Administration">
       </category>
       <command
-            defaultHandler="edu.ualberta.med.biobank.handlers.OpenPatientFormHandler"
             id="edu.ualberta.med.biobank.commands.patients.openPatientForm"
             name="Open Patient Form">
          <commandParameter
@@ -392,6 +375,15 @@
                </reference>
             </and>
          </activeWhen>
+      </handler>
+      <handler
+            class="edu.ualberta.med.biobank.handlers.OpenPatientFormHandler"
+            commandId="edu.ualberta.med.biobank.commands.patients.openPatientForm">
+         <activeWhen>
+              <reference
+                    definitionId="biobank2.siteSelected">
+              </reference>
+          </activeWhen>
       </handler>
    </extension>
    <extension
