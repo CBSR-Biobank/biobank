@@ -23,6 +23,7 @@ import edu.ualberta.med.biobank.model.Sample;
 import edu.ualberta.med.biobank.model.SampleSource;
 import edu.ualberta.med.biobank.model.SampleStorage;
 import edu.ualberta.med.biobank.model.SampleType;
+import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.StudyContactAndPatientInfo;
 import edu.ualberta.med.biobank.model.StudyContactInfo;
@@ -58,6 +59,12 @@ public class BiobankLabelProvider extends LabelProvider implements
             switch (columnIndex) {
             case 0:
                 return clinic.getName();
+            }
+        } else if (element instanceof Site) {
+            final Site site = (Site) element;
+            switch (columnIndex) {
+            case 0:
+                return site.getName();
             }
         } else if (element instanceof Patient) {
             final Patient patient = (Patient) element;
@@ -239,6 +246,8 @@ public class BiobankLabelProvider extends LabelProvider implements
             return ((Clinic) element).getName();
         } else if (element instanceof ContainerLabelingScheme) {
             return ((ContainerLabelingScheme) element).getName();
+        } else if (element instanceof Site) {
+            return ((Site) element).getName();
         }
         return ((AdapterBase) element).getName();
     }

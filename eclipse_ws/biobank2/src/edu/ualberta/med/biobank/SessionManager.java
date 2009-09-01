@@ -29,6 +29,7 @@ import edu.ualberta.med.biobank.treeview.NodeSearchVisitor;
 import edu.ualberta.med.biobank.treeview.RootNode;
 import edu.ualberta.med.biobank.treeview.SessionAdapter;
 import edu.ualberta.med.biobank.views.SessionsView;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class SessionManager {
@@ -49,7 +50,10 @@ public class SessionManager {
 
     final int TIME_OUT = 900000;
 
-    private Site currentSite;
+    private int currentSite;
+    private SiteCombo siteCombo;
+
+    private List<Site> currentSites;
 
     final Runnable timeoutRunnable = new Runnable() {
         public void run() {
@@ -91,8 +95,6 @@ public class SessionManager {
         }
     };
 
-    private SiteCombo siteCombo;
-
     private SessionManager() {
         super();
         rootNode = new RootNode();
@@ -121,12 +123,12 @@ public class SessionManager {
         rootNode.addChild(sessionAdapter);
         Collections.sort(sites, new SiteComparator());
         sessionAdapter.loadChildren(true);
-        siteCombo.loadChildren(sites);
         siteCombo.setSession(sessionAdapter);
         view.getTreeViewer().expandToLevel(2);
         log4j.debug("addSession: " + name);
         startInactivityTimer();
         updateMenus();
+        updateSites();
     }
 
     private void startInactivityTimer() {
@@ -225,7 +227,7 @@ public class SessionManager {
     }
 
     public void setCurrentSite(Site site) {
-        currentSite = site;
+        currentSite = currentSites.indexOf(site);
         IWorkbenchWindow window = PlatformUI.getWorkbench()
             .getActiveWorkbenchWindow();
         ISourceProviderService service = (ISourceProviderService) window
@@ -236,11 +238,28 @@ public class SessionManager {
         getSession().performExpand();
     }
 
-    public Site getCurrentSite() {
-        return currentSite;
-    }
-
     public RootNode getRootNode() {
         return rootNode;
     }
+
+    public Site getCurrentSite() {
+        return currentSites.get(currentSite);
+    }
+
+    public List<Site> getCurrentSites() {
+        return currentSites;
+    }
+
+    public void updateSites() {
+        try {
+            currentSites = getAppService().search(Site.class, new Site());
+            Site allSite = new Site();
+            allSite.setName("All Sites");
+            currentSites.add(0, allSite);
+            siteCombo.combo.setInput(currentSites);
+        } catch (ApplicationException e) {
+            e.printStackTrace();
+        }
+    }
+
 }
