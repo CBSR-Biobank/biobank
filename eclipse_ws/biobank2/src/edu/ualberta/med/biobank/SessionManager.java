@@ -258,6 +258,7 @@ public class SessionManager {
     public void updateSites() {
         try {
             currentSites = getAppService().search(Site.class, new Site());
+            Collections.sort(currentSites, new SiteComparator());
             Site allSite = new Site();
             allSite.setName("All Sites");
             currentSites.add(0, allSite);
