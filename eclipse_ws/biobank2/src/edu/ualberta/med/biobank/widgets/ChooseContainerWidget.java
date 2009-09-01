@@ -91,7 +91,9 @@ public class ChooseContainerWidget extends AbstractGridContainerWidget {
         if (cells != null) {
             ContainerCell cell = cells[indexRow][indexCol];
 
-            if (cell.getPosition().getContainer() != null)
+            if ((cell.getPosition().getContainer() != null)
+                && (cell.getPosition().getContainer().getContainerType()
+                    .getNameShort() != null))
                 sname += "-"
                     + cell.getPosition().getContainer().getContainerType()
                         .getNameShort();
