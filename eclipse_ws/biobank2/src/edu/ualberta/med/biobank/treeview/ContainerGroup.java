@@ -23,7 +23,13 @@ import edu.ualberta.med.biobank.model.Site;
 public class ContainerGroup extends AdapterBase {
 
     public ContainerGroup(SiteAdapter parent, int id) {
-        super(parent, id, "Containers", true);
+        super(parent, null, null, id, "Containers", true);
+    }
+
+    @Override
+    protected Integer getModelObjectId() {
+        Assert.isTrue(false, "Should not be invoked for this type of adatper");
+        return null;
     }
 
     @Override
@@ -89,5 +95,10 @@ public class ContainerGroup extends AdapterBase {
     @Override
     public String getTitle() {
         return null;
+    }
+
+    @Override
+    protected boolean integrityCheck() {
+        return true;
     }
 }

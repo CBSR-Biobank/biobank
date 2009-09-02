@@ -12,7 +12,12 @@ public class RootNode extends AdapterBase {
     private TreeViewer treeViewer;
 
     public RootNode() {
-        super(null, 1, "root");
+        super(null, null, null, 1, "root");
+    }
+
+    @Override
+    protected Integer getModelObjectId() {
+        return null;
     }
 
     public void setTreeViewer(TreeViewer treeViewer) {
@@ -50,5 +55,10 @@ public class RootNode extends AdapterBase {
         if (treeViewer != null) {
             treeViewer.expandToLevel(child, 1);
         }
+    }
+
+    @Override
+    protected boolean integrityCheck() {
+        return true;
     }
 }

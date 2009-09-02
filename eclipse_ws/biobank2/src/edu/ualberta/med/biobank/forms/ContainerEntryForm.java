@@ -149,9 +149,11 @@ public class ContainerEntryForm extends BiobankEntryForm {
                 .getChildContainerTypeCollection();
         }
 
-        if ((currentContainerType == null) && (containerTypes.size() == 1)) {
-            currentContainerType = containerTypes.iterator().next();
-            setDirty(true);
+        if (currentContainerType == null) {
+            if (containerTypes.size() == 1) {
+                currentContainerType = containerTypes.iterator().next();
+                setDirty(true);
+            }
         } else {
             for (ContainerType type : containerTypes) {
                 if (currentContainerType.getId().equals(type.getId())) {

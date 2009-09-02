@@ -16,29 +16,34 @@ import edu.ualberta.med.biobank.model.ContainerType;
 
 public class ContainerTypeAdapter extends AdapterBase {
 
-    private ContainerType containerType;
-
     public ContainerTypeAdapter(AdapterBase parent, ContainerType containerType) {
-        super(parent);
+        super(parent, containerType, ContainerType.class);
         this.setContainerType(containerType);
     }
 
     public void setContainerType(ContainerType containerType) {
-        this.containerType = containerType;
+        setWrappedObject(containerType, ContainerType.class);
     }
 
     public ContainerType getContainerType() {
-        return containerType;
+        return (ContainerType) getWrappedObject();
+    }
+
+    @Override
+    protected Integer getModelObjectId() {
+        return getContainerType().getId();
     }
 
     @Override
     public Integer getId() {
+        ContainerType containerType = getContainerType();
         Assert.isNotNull(containerType, "storage type is null");
         return containerType.getId();
     }
 
     @Override
     public String getName() {
+        ContainerType containerType = getContainerType();
         Assert.isNotNull(containerType, "storage type is null");
         return containerType.getName();
     }
@@ -88,6 +93,11 @@ public class ContainerTypeAdapter extends AdapterBase {
     @Override
     public AdapterBase accept(NodeSearchVisitor visitor) {
         return null;
+    }
+
+    @Override
+    protected boolean integrityCheck() {
+        return true;
     }
 
 }

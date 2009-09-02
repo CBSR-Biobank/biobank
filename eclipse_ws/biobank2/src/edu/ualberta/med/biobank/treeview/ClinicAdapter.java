@@ -9,7 +9,6 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
 
-import edu.ualberta.med.biobank.common.utils.ModelUtils;
 import edu.ualberta.med.biobank.forms.ClinicEntryForm;
 import edu.ualberta.med.biobank.forms.ClinicViewForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
@@ -17,19 +16,21 @@ import edu.ualberta.med.biobank.model.Clinic;
 
 public class ClinicAdapter extends AdapterBase {
 
-    private Clinic clinic;
-
     public ClinicAdapter(AdapterBase parent, Clinic clinic) {
-        super(parent);
-        this.clinic = clinic;
+        super(parent, clinic, Clinic.class);
     }
 
     public void setClinic(Clinic clinic) {
-        this.clinic = clinic;
+        setWrappedObject(clinic, Clinic.class);
     }
 
     public Clinic getClinic() {
-        return clinic;
+        return (Clinic) getWrappedObject();
+    }
+
+    @Override
+    protected Integer getModelObjectId() {
+        return getClinic().getId();
     }
 
     @Override
@@ -39,12 +40,14 @@ public class ClinicAdapter extends AdapterBase {
 
     @Override
     public Integer getId() {
+        Clinic clinic = getClinic();
         Assert.isNotNull(clinic, "Clinic is null");
         return clinic.getId();
     }
 
     @Override
     public String getName() {
+        Clinic clinic = getClinic();
         Assert.isNotNull(clinic, "Clinic is null");
         return clinic.getName();
     }
@@ -95,14 +98,12 @@ public class ClinicAdapter extends AdapterBase {
     }
 
     public Clinic loadClinic() throws Exception {
-        // if clinic is not a database object it cannot be loaded
-        if (clinic.getId() == null)
-            return clinic;
+        return (Clinic) loadWrappedObject();
+    }
 
-        clinic = ModelUtils.getObjectWithId(getAppService(), Clinic.class,
-            clinic.getId());
-        Assert.isNotNull(clinic, "clinic not in database");
-        return clinic;
+    @Override
+    protected boolean integrityCheck() {
+        return true;
     }
 
 }

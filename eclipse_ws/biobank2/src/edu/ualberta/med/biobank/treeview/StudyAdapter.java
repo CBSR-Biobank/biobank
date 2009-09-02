@@ -15,9 +15,8 @@ import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Study;
 
 public class StudyAdapter extends AdapterBase {
-    public static final int PATIENTS_NODE_ID = 0;
 
-    private Study study;
+    public static final int PATIENTS_NODE_ID = 0;
 
     /**
      * if true, enable normal actions of this adapter
@@ -29,7 +28,7 @@ public class StudyAdapter extends AdapterBase {
     }
 
     public StudyAdapter(AdapterBase parent, Study study, boolean enabledActions) {
-        super(parent);
+        super(parent, study, Study.class);
         this.setStudy(study);
         this.enableActions = enabledActions;
 
@@ -40,21 +39,28 @@ public class StudyAdapter extends AdapterBase {
     }
 
     public void setStudy(Study study) {
-        this.study = study;
+        setWrappedObject(study, Study.class);
     }
 
     public Study getStudy() {
-        return study;
+        return (Study) getWrappedObject();
+    }
+
+    @Override
+    protected Integer getModelObjectId() {
+        return getStudy().getId();
     }
 
     @Override
     public Integer getId() {
+        Study study = getStudy();
         Assert.isNotNull(study, "study is null");
         return study.getId();
     }
 
     @Override
     public String getName() {
+        Study study = getStudy();
         Assert.isNotNull(study, "study is null");
         return study.getNameShort();
     }
@@ -107,6 +113,11 @@ public class StudyAdapter extends AdapterBase {
     @Override
     public AdapterBase accept(NodeSearchVisitor visitor) {
         return visitor.visit(this);
+    }
+
+    @Override
+    protected boolean integrityCheck() {
+        return true;
     }
 
 }
