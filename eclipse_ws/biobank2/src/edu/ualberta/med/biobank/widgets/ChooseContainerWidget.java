@@ -93,6 +93,8 @@ public class ChooseContainerWidget extends AbstractGridContainerWidget {
 
             if ((cell.getPosition().getContainer() != null)
                 && (cell.getPosition().getContainer().getContainerType()
+                    .getNameShort() != null)
+                && (cell.getPosition().getContainer().getContainerType()
                     .getNameShort() != null))
                 sname += "-"
                     + cell.getPosition().getContainer().getContainerType()
