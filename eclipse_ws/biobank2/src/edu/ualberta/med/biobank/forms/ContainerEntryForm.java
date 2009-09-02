@@ -149,25 +149,23 @@ public class ContainerEntryForm extends BiobankEntryForm {
                 .getChildContainerTypeCollection();
         }
 
-        ContainerType selection = null;
-        if (containerTypes.size() == 1) {
-            selection = containerTypes.iterator().next();
-            setDirty(true);
-        }
-        containerTypeComboViewer = createCComboViewerWithNoSelectionValidator(
-            client, "Container Type", containerTypes, selection,
-            MSG_CONTAINER_TYPE_EMPTY);
-
-        if (currentContainerType != null) {
+        if (currentContainerType == null) {
+            if (containerTypes.size() == 1) {
+                currentContainerType = containerTypes.iterator().next();
+                setDirty(true);
+            }
+        } else {
             for (ContainerType type : containerTypes) {
                 if (currentContainerType.getId().equals(type.getId())) {
                     currentContainerType = type;
                     break;
                 }
             }
-            containerTypeComboViewer.setSelection(new StructuredSelection(
-                currentContainerType));
         }
+
+        containerTypeComboViewer = createCComboViewerWithNoSelectionValidator(
+            client, "Container Type", containerTypes, currentContainerType,
+            MSG_CONTAINER_TYPE_EMPTY);
         containerTypeComboViewer
             .addSelectionChangedListener(new ISelectionChangedListener() {
                 @Override

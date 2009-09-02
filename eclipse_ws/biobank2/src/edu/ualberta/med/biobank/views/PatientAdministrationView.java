@@ -147,8 +147,8 @@ public class PatientAdministrationView extends ViewPart {
 
     private static AdapterBase getNoPatientFoundAdapter() {
         if (noPatientFoundAdapter == null) {
-            noPatientFoundAdapter = new AdapterBase(getRootNode(), 0,
-                "- No patient found -") {
+            noPatientFoundAdapter = new AdapterBase(getRootNode(), null, null,
+                0, "- No patient found -") {
                 @Override
                 public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
                 }
@@ -169,6 +169,16 @@ public class PatientAdministrationView extends ViewPart {
                 @Override
                 public AdapterBase accept(NodeSearchVisitor visitor) {
                     return null;
+                }
+
+                @Override
+                protected Integer getModelObjectId() {
+                    return null;
+                }
+
+                @Override
+                protected boolean integrityCheck() {
+                    return true;
                 }
             };
         }

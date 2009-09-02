@@ -25,32 +25,37 @@ import edu.ualberta.med.biobank.model.PatientVisitComparator;
 
 public class PatientAdapter extends AdapterBase {
 
-    private PatientWrapper patientWrapper;
-
     public PatientAdapter(AdapterBase parent, PatientWrapper patientWrapper) {
-        super(parent);
-        this.patientWrapper = patientWrapper;
+        super(parent, patientWrapper, PatientWrapper.class);
         setHasChildren(true);
     }
 
     public PatientAdapter(AdapterBase parent, Patient patient) {
-        super(parent);
-        this.patientWrapper = new PatientWrapper(getAppService(), patient);
+        super(parent, null, null);
+        setWrappedObject(new PatientWrapper(getAppService(), patient),
+            PatientWrapper.class);
         setHasChildren(true);
     }
 
     public PatientWrapper getWrapper() {
-        return patientWrapper;
+        return (PatientWrapper) getWrappedObject();
+    }
+
+    @Override
+    protected Integer getModelObjectId() {
+        return getWrapper().getId();
     }
 
     @Override
     public Integer getId() {
+        PatientWrapper patientWrapper = getWrapper();
         Assert.isNotNull(patientWrapper.getWrappedObject(), "patient is null");
         return patientWrapper.getId();
     }
 
     @Override
     public String getName() {
+        PatientWrapper patientWrapper = getWrapper();
         Assert.isNotNull(patientWrapper.getWrappedObject(), "patient is null");
         return patientWrapper.getNumber();
     }
@@ -97,7 +102,7 @@ public class PatientAdapter extends AdapterBase {
             public void widgetSelected(SelectionEvent event) {
                 PatientVisitAdapter adapter = new PatientVisitAdapter(
                     PatientAdapter.this, new PatientVisit());
-                adapter.getWrapper().setPatientWrapper(patientWrapper);
+                adapter.getWrapper().setPatientWrapper(getWrapper());
                 openForm(new FormInput(adapter), PatientVisitEntryForm.ID);
             }
 
@@ -109,6 +114,7 @@ public class PatientAdapter extends AdapterBase {
     @Override
     public void loadChildren(boolean updateNode) {
         try {
+            PatientWrapper patientWrapper = getWrapper();
             // read from database again
             patientWrapper.reload();
 
@@ -132,7 +138,7 @@ public class PatientAdapter extends AdapterBase {
         } catch (Exception e) {
             SessionManager.getLogger().error(
                 "Error while loading children of patient "
-                    + patientWrapper.getNumber(), e);
+                    + getWrapper().getNumber(), e);
             throw new RuntimeException(e);
         }
     }
@@ -140,5 +146,10 @@ public class PatientAdapter extends AdapterBase {
     @Override
     public AdapterBase accept(NodeSearchVisitor visitor) {
         return visitor.visit(this);
+    }
+
+    @Override
+    protected boolean integrityCheck() {
+        return true;
     }
 }

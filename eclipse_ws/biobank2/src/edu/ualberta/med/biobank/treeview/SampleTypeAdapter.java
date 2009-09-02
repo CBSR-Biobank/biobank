@@ -9,30 +9,34 @@ import edu.ualberta.med.biobank.model.SampleType;
 
 public class SampleTypeAdapter extends AdapterBase {
 
-    private SampleType sampleType;
-
     public SampleTypeAdapter(AdapterBase parent, SampleType sampleType) {
-        super(parent);
-        this.sampleType = sampleType;
+        super(parent, sampleType, SampleType.class);
         setHasChildren(true);
     }
 
     public SampleType getSampleType() {
-        return sampleType;
+        return (SampleType) getWrappedObject();
     }
 
     public void setSampleType(SampleType sampleType) {
-        this.sampleType = sampleType;
+        setWrappedObject(sampleType, SampleType.class);
+    }
+
+    @Override
+    protected Integer getModelObjectId() {
+        return getSampleType().getId();
     }
 
     @Override
     public Integer getId() {
+        SampleType sampleType = getSampleType();
         Assert.isNotNull(sampleType, "patient is null");
         return sampleType.getId();
     }
 
     @Override
     public String getName() {
+        SampleType sampleType = getSampleType();
         Assert.isNotNull(sampleType, "storage type is null");
         return sampleType.getNameShort();
     }
@@ -58,5 +62,10 @@ public class SampleTypeAdapter extends AdapterBase {
     @Override
     public String getTitle() {
         return getTitle("Sample Type");
+    }
+
+    @Override
+    protected boolean integrityCheck() {
+        return true;
     }
 }

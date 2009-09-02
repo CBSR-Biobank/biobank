@@ -15,19 +15,21 @@ import edu.ualberta.med.biobank.model.Sample;
 
 public class SampleAdapter extends AdapterBase {
 
-    private Sample sample;
-
     public SampleAdapter(AdapterBase parent, Sample sample) {
-        super(parent);
-        this.sample = sample;
+        super(parent, sample, Sample.class);
     }
 
     public void setSample(Sample sample) {
-        this.sample = sample;
+        setWrappedObject(sample, Sample.class);
     }
 
     public Sample getSample() {
-        return sample;
+        return (Sample) getWrappedObject();
+    }
+
+    @Override
+    protected Integer getModelObjectId() {
+        return getSample().getId();
     }
 
     @Override
@@ -37,12 +39,14 @@ public class SampleAdapter extends AdapterBase {
 
     @Override
     public Integer getId() {
+        Sample sample = getSample();
         Assert.isNotNull(sample, "Sample is null");
         return sample.getId();
     }
 
     @Override
     public String getName() {
+        Sample sample = getSample();
         Assert.isNotNull(sample, "Clinic is null");
         return sample.getInventoryId();
     }
@@ -78,6 +82,11 @@ public class SampleAdapter extends AdapterBase {
     @Override
     public AdapterBase accept(NodeSearchVisitor visitor) {
         return null;
+    }
+
+    @Override
+    protected boolean integrityCheck() {
+        return true;
     }
 
 }
