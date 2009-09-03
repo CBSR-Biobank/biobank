@@ -376,11 +376,6 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         return widget;
     }
 
-    private DateTimeWidget createDateTimeWidget(Composite client,
-        String nameLabel, Date date) {
-        return createDateTimeWidget(client, nameLabel, date, true, "");
-    }
-
     private void createSourcesSection() {
         Composite client = createSectionWithClient("Source Vessels");
 
