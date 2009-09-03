@@ -183,11 +183,11 @@ public class ContainerViewForm extends BiobankViewForm {
         }
         for (ContainerPosition position : container
             .getChildPositionCollection()) {
-            int positionDim1 = position.getRow().intValue();
-            int positionDim2 = position.getCol().intValue();
+            int row = position.getRow().intValue();
+            int col = position.getCol().intValue();
             ContainerCell cell = new ContainerCell(position);
             cell.setStatus(ContainerStatus.INITIALIZED);
-            cells[positionDim1][positionDim2] = cell;
+            cells[row][col] = cell;
         }
     }
 
