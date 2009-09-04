@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.treeview;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
@@ -8,14 +9,19 @@ import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
+import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.utils.ModelUtils;
+import edu.ualberta.med.biobank.dialogs.MoveContainerDialog;
 import edu.ualberta.med.biobank.forms.ContainerEntryForm;
 import edu.ualberta.med.biobank.forms.ContainerViewForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerPosition;
+import gov.nih.nci.system.applicationservice.ApplicationException;
+import gov.nih.nci.system.query.SDKQuery;
+import gov.nih.nci.system.query.example.UpdateExampleQuery;
 
 public class ContainerAdapter extends AdapterBase {
 
@@ -83,6 +89,32 @@ public class ContainerAdapter extends AdapterBase {
             public void widgetSelected(SelectionEvent event) {
                 openForm(new FormInput(ContainerAdapter.this),
                     ContainerViewForm.ID);
+            }
+
+            public void widgetDefaultSelected(SelectionEvent e) {
+            }
+        });
+
+        mi = new MenuItem(menu, SWT.PUSH);
+        mi.setText("Move Container");
+        mi.addSelectionListener(new SelectionListener() {
+            public void widgetSelected(SelectionEvent event) {
+                MoveContainerDialog mc = new MoveContainerDialog(PlatformUI
+                    .getWorkbench().getActiveWorkbenchWindow().getShell(),
+                    container);
+
+                if (mc.open() == Dialog.OK) {
+                    Container container = mc.getContainer();
+                    container.setLabel(mc.getAddress());
+                    SDKQuery c = new UpdateExampleQuery(mc.getContainer());
+                    try {
+                        ContainerAdapter.this.getAppService().executeQuery(c);
+                    } catch (ApplicationException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+                }
+
             }
 
             public void widgetDefaultSelected(SelectionEvent e) {
