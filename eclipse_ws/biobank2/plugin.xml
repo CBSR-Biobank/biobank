@@ -22,8 +22,12 @@
             application="biobank2.biobank2"
             name="BioBank2">
          <property
-               name="windowImages"
-               value="icons/alt_window_16.gif,icons/alt_window_32.gif">
+               name="appName"
+               value="BioBank2">
+         </property>
+         <property
+               name="aboutText"
+               value="BioBank2 version 1.05">
          </property>
       </product>
    </extension>

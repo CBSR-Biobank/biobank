@@ -204,7 +204,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
             containerType.setTopLevel(false);
         }
         createBoundWidgetWithLabel(client, Button.class, SWT.CHECK,
-            "Is top Level Container", null, PojoObservables.observeValue(
+            "Top Level Container", null, PojoObservables.observeValue(
                 containerType, "topLevel"), null);
 
         Text comment = (Text) createBoundWidgetWithLabel(client, Text.class,
@@ -307,8 +307,8 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
 
     private void createChildContainerTypesSection(Composite parent) {
         childContainerTypesMultiSelect = new MultiSelectWidget(parent,
-            SWT.NONE, "Selected Container Types", "Available Container Types",
-            100);
+            SWT.NONE, "Selected Sub-Container Types",
+            "Available Sub-Container Types", 100);
         childContainerTypesMultiSelect.adaptToToolkit(toolkit, true);
         GridData gd = new GridData(GridData.FILL_HORIZONTAL);
         gd.horizontalSpan = 2;

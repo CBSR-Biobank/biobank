@@ -1,12 +1,15 @@
 package edu.ualberta.med.biobank.rcp;
 
-import java.util.Collections;
-import java.util.List;
-
 import org.eclipse.jface.action.ControlContribution;
+import org.eclipse.jface.viewers.ArrayContentProvider;
+import org.eclipse.jface.viewers.ComboViewer;
+import org.eclipse.jface.viewers.IElementComparer;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
@@ -16,26 +19,26 @@ import org.eclipse.swt.widgets.Label;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.model.Site;
-import edu.ualberta.med.biobank.model.SiteComparator;
 import edu.ualberta.med.biobank.treeview.SessionAdapter;
+import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
 public class SiteCombo extends ControlContribution {
 
-    private List<Site> sites;
     private SessionAdapter session;
-    public Combo combo;
+    public ComboViewer combo;
 
     public SiteCombo() {
         super("Site Selection");
+
     }
 
     public SiteCombo(String str) {
         super(str);
-
     }
 
     public void setSession(SessionAdapter session) {
         this.session = session;
+
     }
 
     @Override
@@ -48,57 +51,65 @@ public class SiteCombo extends ControlContribution {
         resizedComboPanel.setLayout(layout);
         Label siteLabel = new Label(resizedComboPanel, SWT.NONE);
         siteLabel.setText("Working Site: ");
-        combo = new Combo(resizedComboPanel, SWT.NONE | SWT.DROP_DOWN
+        combo = new ComboViewer(resizedComboPanel, SWT.NONE | SWT.DROP_DOWN
             | SWT.READ_ONLY);
 
-        combo.addModifyListener(new ModifyListener() {
+        combo.setContentProvider(new ArrayContentProvider());
+        combo.setLabelProvider(new BiobankLabelProvider());
+
+        combo.addSelectionChangedListener(new ISelectionChangedListener() {
             @Override
-            public void modifyText(ModifyEvent e) {
-                if (combo.getSelectionIndex() <= sites.size()) {
-                    if (combo.getSelectionIndex() == 0)
+            public void selectionChanged(SelectionChangedEvent event) {
+                IStructuredSelection selection = (IStructuredSelection) event
+                    .getSelection();
+                Site site = (Site) selection.getFirstElement();
+
+                if (site != null) {
+                    if (site.getId() == null)
                         SessionManager.getInstance().setCurrentSite(null);
-                    else if (combo.getSelectionIndex() > 0)
-                        SessionManager.getInstance().setCurrentSite(
-                            sites.get(combo.getSelectionIndex() - 1));
+                    else
+                        SessionManager.getInstance().setCurrentSite(site);
                     if (session != null)
                         session.rebuild();
                 }
             }
         });
+        combo.setComparer(new IElementComparer() {
+            @Override
+            public boolean equals(Object a, Object b) {
+                if (a instanceof Site && b instanceof Site) {
+                    Integer ida = ((Site) a).getId();
+                    Integer idb = ((Site) b).getId();
+                    if (ida == null && idb == null)
+                        return true;
+                    else if (ida.equals(idb))
+                        return true;
+                }
+                return false;
+            }
+
+            @Override
+            public int hashCode(Object element) {
+                return element.hashCode();
+            }
+
+        });
+        combo.setComparator(new ViewerComparator());
         GridData gd = new GridData();
         gd.widthHint = 155;
-        combo.setLayoutData(gd);
-        combo.setTextLimit(50);
-        combo.select(0);
+        Combo realCombo = combo.getCombo();
+        realCombo.setLayoutData(gd);
+        realCombo.setTextLimit(50);
+
         return resizedComboPanel;
     }
 
-    public void loadChildren(List<Site> updatedSites) {
-        sites = updatedSites;
-        Collections.sort(sites, new SiteComparator());
-        for (Site site : sites) {
-            SessionManager.getLogger().trace(
-                "updateSites: Site " + site.getId() + ": " + site.getName());
-        }
-        combo.removeAll();
-        combo.add("All Sites");
-        for (Site site : sites) {
-            combo.add(site.getName());
-        }
-        combo.select(0);
+    public void setEnabled(boolean b) {
+
     }
 
-    public void setValue(int index) {
-        combo.select(index);
-    }
-
-    public void setEnabled(boolean enabled) {
-        combo.setEnabled(enabled);
-    }
-
-    public void addChild(Site site) {
-        sites.add(site);
-        loadChildren(sites);
+    public void setSelection(Site site) {
+        combo.setSelection(new StructuredSelection(site));
     }
 
 }

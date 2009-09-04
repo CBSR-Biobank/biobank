@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.treeview;
 import java.util.Collections;
 import java.util.List;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
@@ -31,12 +32,18 @@ public class SessionAdapter extends AdapterBase {
     public SessionAdapter(AdapterBase parent,
         WritableApplicationService appService, int sessionId, String name,
         String userName) {
-        super(parent);
+        super(parent, null, null);
         this.appService = appService;
         setId(sessionId);
         setName(name);
         this.userName = userName;
         // getUserCsmId();
+    }
+
+    @Override
+    protected Integer getModelObjectId() {
+        Assert.isTrue(false, "Should not be invoked for this type of adatper");
+        return null;
     }
 
     @Override
@@ -172,5 +179,10 @@ public class SessionAdapter extends AdapterBase {
             e.printStackTrace();
         }
         return "";
+    }
+
+    @Override
+    protected boolean integrityCheck() {
+        return true;
     }
 }

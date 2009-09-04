@@ -14,6 +14,7 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.utils.ModelUtils;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
@@ -25,6 +26,10 @@ public abstract class AdapterBase {
 
     protected IDeltaListener listener = NullDeltaListener.getSoleInstance();
 
+    private Object wrappedObject;
+
+    private Class<?> wrappedObjectClass;
+
     private Integer id;
 
     private String name;
@@ -35,25 +40,48 @@ public abstract class AdapterBase {
 
     protected List<AdapterBase> children;
 
-    public AdapterBase(AdapterBase parent) {
+    public AdapterBase(AdapterBase parent, Object wrappedObject,
+        Class<?> wrappedObjectClass) {
+        this.wrappedObject = wrappedObject;
+        this.wrappedObjectClass = wrappedObjectClass;
         this.parent = parent;
         children = new ArrayList<AdapterBase>();
         if (parent != null) {
             addListener(parent.listener);
         }
+
+        Assert.isTrue(integrityCheck(), "integrity checks failed");
     }
 
-    public AdapterBase(AdapterBase parent, int id, String name) {
-        this(parent);
+    public AdapterBase(AdapterBase parent, Object modelObject,
+        Class<?> modelClass, int id, String name) {
+        this(parent, modelObject, modelClass);
         setId(id);
         setName(name);
     }
 
-    public AdapterBase(AdapterBase parent, int id, String name,
-        boolean hasChildren) {
-        this(parent, id, name);
+    public AdapterBase(AdapterBase parent, Object modelObject,
+        Class<?> modelClass, int id, String name, boolean hasChildren) {
+        this(parent, modelObject, modelClass, id, name);
         setHasChildren(hasChildren);
     }
+
+    protected Object getWrappedObject() {
+        return wrappedObject;
+    }
+
+    protected void setWrappedObject(Object object, Class<?> klass) {
+        wrappedObject = object;
+        this.wrappedObjectClass = klass;
+    }
+
+    protected Class<?> getWrappedObjectClass() {
+        return wrappedObjectClass;
+    }
+
+    protected abstract Integer getModelObjectId();
+
+    protected abstract boolean integrityCheck();
 
     public void setParent(AdapterBase parent) {
         this.parent = parent;
@@ -303,5 +331,19 @@ public abstract class AdapterBase {
 
     public RootNode getRootNode() {
         return getParentFromClass(RootNode.class);
+    }
+
+    public Object loadWrappedObject() throws Exception {
+        Assert.isNotNull(wrappedObjectClass, "model class is null");
+
+        Integer id = getModelObjectId();
+        // if object is not stored in the database it cannot be loaded
+        if (id == null)
+            return wrappedObject;
+
+        wrappedObject = ModelUtils.getObjectWithId(getAppService(),
+            wrappedObjectClass, id);
+        Assert.isNotNull(wrappedObject, "model object not in database");
+        return wrappedObject;
     }
 }
