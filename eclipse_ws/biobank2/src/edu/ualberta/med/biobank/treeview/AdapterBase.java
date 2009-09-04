@@ -14,6 +14,7 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.utils.ModelUtils;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
