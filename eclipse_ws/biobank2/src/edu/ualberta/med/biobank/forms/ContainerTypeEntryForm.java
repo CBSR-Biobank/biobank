@@ -315,8 +315,8 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
 
     private void createChildContainerTypesSection(Composite parent) {
         childContainerTypesMultiSelect = new MultiSelectWidget(parent,
-            SWT.NONE, "Selected Container Types", "Available Container Types",
-            100);
+            SWT.NONE, "Selected Sub-Container Types",
+            "Available Sub-Container Types", 100);
         childContainerTypesMultiSelect.adaptToToolkit(toolkit, true);
         GridData gd = new GridData(GridData.FILL_HORIZONTAL);
         gd.horizontalSpan = 2;

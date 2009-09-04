@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.treeview;
 
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
@@ -9,39 +8,45 @@ import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
-import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.utils.ModelUtils;
-import edu.ualberta.med.biobank.dialogs.MoveContainerDialog;
 import edu.ualberta.med.biobank.forms.ContainerEntryForm;
 import edu.ualberta.med.biobank.forms.ContainerViewForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerPosition;
-import gov.nih.nci.system.applicationservice.ApplicationException;
-import gov.nih.nci.system.query.SDKQuery;
-import gov.nih.nci.system.query.example.UpdateExampleQuery;
 
 public class ContainerAdapter extends AdapterBase {
 
-    private Container container;
-
     public ContainerAdapter(AdapterBase parent, Container container) {
-        super(parent);
-        this.container = container;
+        super(parent, container, Container.class);
         setHasChildren(container.getChildPositionCollection() != null
             && container.getChildPositionCollection().size() > 0);
     }
 
     @Override
+    protected Integer getModelObjectId() {
+        return getContainer().getId();
+    }
+
+    public Container getContainer() {
+        return (Container) getWrappedObject();
+    }
+
+    public void setContainer(Container container) {
+        setWrappedObject(container, Container.class);
+    }
+
+    @Override
     public Integer getId() {
+        Container container = getContainer();
         Assert.isNotNull(container, "container is null");
         return container.getId();
     }
 
     @Override
     public String getName() {
+        Container container = getContainer();
         Assert.isNotNull(container, "container is null");
         if (container.getContainerType() == null) {
             return container.getLabel();
@@ -59,14 +64,6 @@ public class ContainerAdapter extends AdapterBase {
     public void performDoubleClick() {
         openForm(new FormInput(this), ContainerViewForm.ID);
         performExpand();
-    }
-
-    public Container getContainer() {
-        return container;
-    }
-
-    public void setContainer(Container container) {
-        this.container = container;
     }
 
     @Override
@@ -126,8 +123,7 @@ public class ContainerAdapter extends AdapterBase {
     public void loadChildren(boolean updateNode) {
         try {
             // read from database again
-            container = ModelUtils.getObjectWithId(getAppService(),
-                Container.class, container.getId());
+            Container container = (Container) loadWrappedObject();
             for (ContainerPosition childPosition : container
                 .getChildPositionCollection()) {
                 Container child = childPosition.getContainer();
@@ -146,7 +142,7 @@ public class ContainerAdapter extends AdapterBase {
         } catch (Exception e) {
             SessionManager.getLogger().error(
                 "Error while loading storage container group children for storage container "
-                    + container.getLabel(), e);
+                    + getContainer().getLabel(), e);
         }
     }
 
@@ -158,6 +154,11 @@ public class ContainerAdapter extends AdapterBase {
     @Override
     public String getTreeText() {
         return getName();
+    }
+
+    @Override
+    protected boolean integrityCheck() {
+        return true;
     }
 
 }

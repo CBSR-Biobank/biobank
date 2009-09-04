@@ -24,7 +24,13 @@ import edu.ualberta.med.biobank.model.StudyComparator;
 public class StudyGroup extends AdapterBase {
 
     public StudyGroup(SiteAdapter parent, int id) {
-        super(parent, id, "Studies", true);
+        super(parent, null, null, id, "Studies", true);
+    }
+
+    @Override
+    protected Integer getModelObjectId() {
+        Assert.isTrue(false, "Should not be invoked for this type of adatper");
+        return null;
     }
 
     public void openViewForm() {
@@ -94,5 +100,10 @@ public class StudyGroup extends AdapterBase {
     @Override
     public String getTitle() {
         return null;
+    }
+
+    @Override
+    protected boolean integrityCheck() {
+        return true;
     }
 }

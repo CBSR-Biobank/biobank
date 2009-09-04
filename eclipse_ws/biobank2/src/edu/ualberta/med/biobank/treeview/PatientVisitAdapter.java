@@ -20,31 +20,36 @@ import edu.ualberta.med.biobank.model.Sample;
 
 public class PatientVisitAdapter extends AdapterBase {
 
-    private PatientVisitWrapper patientVisitWrapper;
-
     /**
      * Sample selected in this patient visit
      */
     private Sample selectedSample;
 
     public PatientVisitAdapter(AdapterBase parent, PatientVisit patientVisit) {
-        super(parent);
-        this.patientVisitWrapper = new PatientVisitWrapper(getAppService(),
-            patientVisit);
+        super(parent, null, null);
+        setWrappedObject(
+            new PatientVisitWrapper(getAppService(), patientVisit),
+            PatientVisitWrapper.class);
     }
 
     public PatientVisitAdapter(AdapterBase parent,
         PatientVisitWrapper patientVisitWrapper) {
-        super(parent);
-        this.patientVisitWrapper = patientVisitWrapper;
+        super(parent, null, null);
+        setWrappedObject(patientVisitWrapper, PatientVisitWrapper.class);
     }
 
     public PatientVisitWrapper getWrapper() {
-        return patientVisitWrapper;
+        return (PatientVisitWrapper) getWrappedObject();
+    }
+
+    @Override
+    protected Integer getModelObjectId() {
+        return getWrapper().getId();
     }
 
     @Override
     public Integer getId() {
+        PatientVisitWrapper patientVisitWrapper = getWrapper();
         Assert.isNotNull(patientVisitWrapper.getWrappedObject(),
             "patientVisit is null");
         return patientVisitWrapper.getId();
@@ -52,6 +57,7 @@ public class PatientVisitAdapter extends AdapterBase {
 
     @Override
     public String getName() {
+        PatientVisitWrapper patientVisitWrapper = getWrapper();
         Assert.isNotNull(patientVisitWrapper.getWrappedObject(),
             "patientVisit is null");
         return patientVisitWrapper.getFormattedDateDrawn();
@@ -59,7 +65,7 @@ public class PatientVisitAdapter extends AdapterBase {
 
     @Override
     public String getTreeText() {
-        Collection<Sample> samples = patientVisitWrapper.getSampleCollection();
+        Collection<Sample> samples = getWrapper().getSampleCollection();
         int total = 0;
         if (samples != null) {
             total = samples.size();
@@ -119,6 +125,11 @@ public class PatientVisitAdapter extends AdapterBase {
 
     public Sample getSelectedSample() {
         return selectedSample;
+    }
+
+    @Override
+    protected boolean integrityCheck() {
+        return true;
     }
 
 }
