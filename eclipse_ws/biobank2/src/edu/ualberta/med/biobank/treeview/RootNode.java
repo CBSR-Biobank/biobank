@@ -16,7 +16,7 @@ public class RootNode extends AdapterBase {
     }
 
     @Override
-    protected Integer getModelObjectId() {
+    protected Integer getWrappedObjectId() {
         return null;
     }
 

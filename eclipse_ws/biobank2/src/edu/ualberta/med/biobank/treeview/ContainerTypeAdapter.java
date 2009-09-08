@@ -30,7 +30,7 @@ public class ContainerTypeAdapter extends AdapterBase {
     }
 
     @Override
-    protected Integer getModelObjectId() {
+    protected Integer getWrappedObjectId() {
         return getContainerType().getId();
     }
 
