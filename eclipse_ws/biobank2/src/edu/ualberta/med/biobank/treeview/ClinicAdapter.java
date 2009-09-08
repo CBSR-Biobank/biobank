@@ -29,7 +29,7 @@ public class ClinicAdapter extends AdapterBase {
     }
 
     @Override
-    protected Integer getModelObjectId() {
+    protected Integer getWrappedObjectId() {
         return getClinic().getId();
     }
 

@@ -47,7 +47,7 @@ public class StudyAdapter extends AdapterBase {
     }
 
     @Override
-    protected Integer getModelObjectId() {
+    protected Integer getWrappedObjectId() {
         return getStudy().getId();
     }
 

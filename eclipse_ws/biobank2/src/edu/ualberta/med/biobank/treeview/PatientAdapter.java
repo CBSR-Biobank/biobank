@@ -42,7 +42,7 @@ public class PatientAdapter extends AdapterBase {
     }
 
     @Override
-    protected Integer getModelObjectId() {
+    protected Integer getWrappedObjectId() {
         return getWrapper().getId();
     }
 

@@ -79,7 +79,7 @@ public abstract class AdapterBase {
         return wrappedObjectClass;
     }
 
-    protected abstract Integer getModelObjectId();
+    protected abstract Integer getWrappedObjectId();
 
     protected abstract boolean integrityCheck();
 
@@ -336,7 +336,7 @@ public abstract class AdapterBase {
     public Object loadWrappedObject() throws Exception {
         Assert.isNotNull(wrappedObjectClass, "model class is null");
 
-        Integer id = getModelObjectId();
+        Integer id = getWrappedObjectId();
         // if object is not stored in the database it cannot be loaded
         if (id == null)
             return wrappedObject;
