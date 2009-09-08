@@ -164,7 +164,18 @@ public class ContainerAdapter extends AdapterBase {
 
     @Override
     protected boolean integrityCheck() {
-        return true;
-    }
+        Container c = getContainer();
+        if (c != null)
+            if ((c.getContainerType() != null && c.getContainerType()
+                .getCapacity() != null)
+                || c.getContainerType() == null)
+                if ((c.getPosition() != null
+                    && c.getPosition().getRow() != null && c.getPosition()
+                    .getCol() != null)
+                    || c.getPosition() == null)
+                    if (c.getSite() != null)
+                        return true;
+        return false;
 
+    }
 }
