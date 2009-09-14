@@ -1,18 +1,26 @@
 package edu.ualberta.med.biobank.treeview;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
+import org.eclipse.ui.PlatformUI;
 
+import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.forms.SiteEntryForm;
 import edu.ualberta.med.biobank.forms.SiteViewForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Site;
+import gov.nih.nci.system.applicationservice.ApplicationException;
+import gov.nih.nci.system.query.SDKQuery;
+import gov.nih.nci.system.query.example.DeleteExampleQuery;
 
 public class SiteAdapter extends AdapterBase {
 
@@ -120,7 +128,55 @@ public class SiteAdapter extends AdapterBase {
                 public void widgetDefaultSelected(SelectionEvent e) {
                 }
             });
+            mi = new MenuItem(menu, SWT.PUSH);
+            mi.setText("Delete Site");
+            mi.addSelectionListener(new SelectionListener() {
+                public void widgetSelected(SelectionEvent event) {
+                    Boolean confirm = MessageDialog.openConfirm(PlatformUI
+                        .getWorkbench().getActiveWorkbenchWindow().getShell(),
+                        "Confirm Delete",
+                        "Are you sure you want to delete this site?");
+
+                    if (confirm) {
+                        delete();
+                    }
+
+                }
+
+                public void widgetDefaultSelected(SelectionEvent e) {
+                }
+            });
         }
+    }
+
+    public void delete() {
+        BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
+            Site site = getSite();
+            SDKQuery query = new DeleteExampleQuery(site);
+
+            public void run() {
+                if (site.getClinicCollection().size() > 0
+                    || site.getContainerCollection().size() > 0
+                    || site.getContainerTypeCollection().size() > 0
+                    || site.getStudyCollection().size() > 0) {
+                    BioBankPlugin
+                        .openError(
+                            "Error",
+                            "Unable to delete site "
+                                + site.getName()
+                                + ". All defined children (studies, clinics, container types, and containers) must be removed first.");
+                } else
+                    try {
+                        getAppService().executeQuery(query);
+                        SiteAdapter.this.getParent().removeChild(
+                            SiteAdapter.this);
+                    } catch (ApplicationException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+
+            }
+        });
     }
 
     @Override

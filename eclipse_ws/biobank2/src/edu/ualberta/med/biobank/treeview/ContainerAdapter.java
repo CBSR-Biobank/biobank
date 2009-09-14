@@ -4,10 +4,13 @@ import java.util.Collection;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
@@ -15,7 +18,6 @@ import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.wrappers.ContainerPositionWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.dialogs.MoveContainerDialog;
 import edu.ualberta.med.biobank.forms.ContainerEntryForm;
@@ -23,14 +25,16 @@ import edu.ualberta.med.biobank.forms.ContainerViewForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerPosition;
+import gov.nih.nci.system.applicationservice.ApplicationException;
+import gov.nih.nci.system.query.SDKQuery;
+import gov.nih.nci.system.query.example.DeleteExampleQuery;
 
 public class ContainerAdapter extends AdapterBase {
 
     public ContainerAdapter(AdapterBase parent, ContainerWrapper container) {
         super(parent, container, Container.class);
         setHasChildren(container.getChildPositionCollection() != null
-            && ((Collection<ContainerPosition>) container
-                .getChildPositionCollection()).size() > 0);
+            && (container.getChildPositionCollection()).size() > 0);
     }
 
     @Override
@@ -114,7 +118,9 @@ public class ContainerAdapter extends AdapterBase {
                         .getAppService(), mc.getContainer()));
                     try {
                         getContainer().setNewPositionFromLabel(mc.getAddress());
-                        // UPDATE TREE... difficult to know which adapter we
+
+                        // TODO UPDATE TREE... difficult to know which adapter
+                        // we
                         // need to update
                     } catch (Exception e) {
                         BioBankPlugin.openError(e.getMessage(), e);
@@ -125,6 +131,51 @@ public class ContainerAdapter extends AdapterBase {
             }
 
             public void widgetDefaultSelected(SelectionEvent e) {
+            }
+        });
+        mi = new MenuItem(menu, SWT.PUSH);
+        mi.setText("Delete Container");
+        mi.addSelectionListener(new SelectionListener() {
+            public void widgetSelected(SelectionEvent event) {
+                Boolean confirm = MessageDialog.openConfirm(PlatformUI
+                    .getWorkbench().getActiveWorkbenchWindow().getShell(),
+                    "Confirm Delete",
+                    "Are you sure you want to delete this container?");
+
+                if (confirm) {
+                    delete();
+                }
+
+            }
+
+            public void widgetDefaultSelected(SelectionEvent e) {
+            }
+        });
+    }
+
+    public void delete() {
+        BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
+            ContainerWrapper c = getContainer();
+            SDKQuery query = new DeleteExampleQuery(c.getWrappedObject());
+
+            public void run() {
+                if (c.getSamplePositionCollection().size() > 0
+                    || c.getChildPositionCollection().size() > 0) {
+                    BioBankPlugin
+                        .openError(
+                            "Error",
+                            "Unable to delete container "
+                                + c.getLabel()
+                                + ". All subcontainers/samples must be removed first.");
+                } else
+                    try {
+                        getAppService().executeQuery(query);
+                        ContainerAdapter.this.getParent().removeChild(
+                            ContainerAdapter.this);
+                    } catch (ApplicationException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
             }
         });
     }
@@ -138,8 +189,7 @@ public class ContainerAdapter extends AdapterBase {
                 // read from database again
                 for (ContainerPosition childPosition : positions) {
                     ContainerWrapper child = new ContainerWrapper(
-                        getAppService(), (new ContainerPositionWrapper(
-                            getAppService(), childPosition)).getContainer());
+                        getAppService(), childPosition.getContainer());
                     ContainerAdapter node = (ContainerAdapter) getChild(child
                         .getId());
 

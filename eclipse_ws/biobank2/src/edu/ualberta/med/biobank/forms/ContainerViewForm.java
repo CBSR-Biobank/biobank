@@ -25,6 +25,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.PlatformUI;
 
+import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.LabelingScheme;
 import edu.ualberta.med.biobank.common.utils.ModelUtils;
@@ -367,7 +368,14 @@ public class ContainerViewForm extends BiobankViewForm {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 setDeleteType(delete.getItem(delete.getSelectionIndex()));
-                deleteContainers();
+                Boolean confirm = MessageDialog.openConfirm(PlatformUI
+                    .getWorkbench().getActiveWorkbenchWindow().getShell(),
+                    "Confirm Delete",
+                    "Are you sure you want to delete these containers?");
+
+                if (confirm) {
+                    deleteContainers();
+                }
             }
         });
 
@@ -471,13 +479,23 @@ public class ContainerViewForm extends BiobankViewForm {
             public void run() {
                 for (ContainerPosition pos : positions) {
                     Container deletingContainer = pos.getContainer();
-                    if (deletingContainer != null
-                        && deletingContainer.getContainerType().getId().equals(
-                            deleteType.getId())) {
-                        // insert containers/positions to db
-
-                        queries.add(new DeleteExampleQuery(deletingContainer));
-
+                    if (deletingContainer.getContainerType().getId().equals(
+                        deleteType.getId())) {
+                        if (deletingContainer.getChildPositionCollection()
+                            .size() > 0
+                            || deletingContainer.getSamplePositionCollection()
+                                .size() > 0) {
+                            BioBankPlugin
+                                .openError(
+                                    "Error",
+                                    "Unable to delete container "
+                                        + deletingContainer.getLabel()
+                                        + ". Container must be empty before it can be deleted.");
+                        } else {
+                            // insert containers/positions to db
+                            queries.add(new DeleteExampleQuery(
+                                deletingContainer));
+                        }
                     }
                 }
                 // refresh
@@ -490,9 +508,7 @@ public class ContainerViewForm extends BiobankViewForm {
                     PlatformUI.getWorkbench().getDisplay().asyncExec(
                         new Runnable() {
                             public void run() {
-                                containerAdapter.removeAll();
-                                containerAdapter.loadChildren(false);
-
+                                containerAdapter.rebuild();
                                 containerAdapter.performExpand();
                                 positions = container
                                     .getChildPositionCollection();

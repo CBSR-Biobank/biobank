@@ -244,6 +244,7 @@ public class ContainerEntryForm extends BiobankEntryForm {
         SDKQueryResult result = appService.executeQuery(query);
         container.setWrappedObject((Container) result.getObjectResult());
         containerAdapter.setContainer(container);
+        containerAdapter.getParent().addChild(containerAdapter);
         containerAdapter.getParent().performExpand();
 
     }
