@@ -28,6 +28,7 @@ import org.eclipse.ui.PlatformUI;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.LabelingScheme;
 import edu.ualberta.med.biobank.common.utils.ModelUtils;
+import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.Container;
@@ -227,7 +228,8 @@ public class ContainerViewForm extends BiobankViewForm {
         try {
             container = ModelUtils.getObjectWithId(appService, Container.class,
                 containerAdapter.getContainer().getId());
-            containerAdapter.setContainer(container);
+            containerAdapter.setContainer(new ContainerWrapper(SessionManager
+                .getAppService(), container));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -506,7 +508,8 @@ public class ContainerViewForm extends BiobankViewForm {
         ContainerAdapter newAdapter = null;
         ContainerAdapter.closeEditor(new FormInput(containerAdapter));
         if (cells[pos.getRow()][pos.getCol()].getStatus() == ContainerStatus.NOT_INITIALIZED) {
-            Container newContainer = new Container();
+            ContainerWrapper newContainer = new ContainerWrapper(SessionManager
+                .getAppService(), new Container());
             newContainer.setSite(containerAdapter.getParentFromClass(
                 SiteAdapter.class).getSite());
             pos.setParentContainer(container);
@@ -515,12 +518,13 @@ public class ContainerViewForm extends BiobankViewForm {
             AdapterBase.openForm(new FormInput(newAdapter),
                 ContainerEntryForm.ID);
         } else {
-            Container childContainer;
+
             Collection<ContainerPosition> childPositions = container
                 .getChildPositionCollection();
             Assert.isNotNull(childPositions);
             for (ContainerPosition childPos : childPositions) {
-                childContainer = childPos.getContainer();
+                ContainerWrapper childContainer = new ContainerWrapper(
+                    SessionManager.getAppService(), childPos.getContainer());
                 Assert.isNotNull(childContainer);
                 if (childPos.getRow().compareTo(pos.getRow()) == 0
                     && childPos.getCol().compareTo(pos.getCol()) == 0) {

@@ -12,6 +12,7 @@ import org.eclipse.ui.handlers.HandlerUtil;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.utils.SiteUtils;
+import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.forms.ContainerEntryForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Container;
@@ -43,7 +44,8 @@ public class ContainerAddHandler extends AbstractHandler {
                     .getInstance().getCurrentSite().getId()));
             Assert.isNotNull(siteAdapter);
 
-            Container container = new Container();
+            ContainerWrapper container = new ContainerWrapper(SessionManager
+                .getAppService(), new Container());
             container.setSite(siteAdapter.getSite());
             ContainerAdapter containerNode = new ContainerAdapter(siteAdapter
                 .getContainerTypesGroupNode(), container);

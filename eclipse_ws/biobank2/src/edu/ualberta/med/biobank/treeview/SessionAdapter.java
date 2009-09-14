@@ -148,11 +148,6 @@ public class SessionAdapter extends AdapterBase {
         return visitor.visit(this);
     }
 
-    public void rebuild() {
-        removeAll();
-        loadChildren(false);
-    }
-
     @Override
     public String getTreeText() {
         if (userName.isEmpty()) {

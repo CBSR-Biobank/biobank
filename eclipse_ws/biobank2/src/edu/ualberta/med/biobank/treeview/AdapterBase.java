@@ -15,6 +15,7 @@ import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.utils.ModelUtils;
+import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
@@ -334,16 +335,23 @@ public abstract class AdapterBase {
     }
 
     public Object loadWrappedObject() throws Exception {
-        Assert.isNotNull(wrappedObjectClass, "model class is null");
+        Object realObject = (ModelWrapper<?>) wrappedObject;
+        Class<?> realObjectClass = wrappedObject.getClass();
+        Assert.isNotNull(realObjectClass, "model class is null");
 
         Integer id = getModelObjectId();
         // if object is not stored in the database it cannot be loaded
         if (id == null)
-            return wrappedObject;
+            return realObject;
 
         wrappedObject = ModelUtils.getObjectWithId(getAppService(),
             wrappedObjectClass, id);
-        Assert.isNotNull(wrappedObject, "model object not in database");
-        return wrappedObject;
+        Assert.isNotNull(realObject, "model object not in database");
+        return realObject;
+    }
+
+    public void rebuild() {
+        removeAll();
+        loadChildren(false);
     }
 }

@@ -22,6 +22,7 @@ import org.eclipse.swt.widgets.Text;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.LabelingScheme;
 import edu.ualberta.med.biobank.common.utils.SiteUtils;
+import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.ContainerType;
@@ -51,7 +52,7 @@ public class ContainerEntryForm extends BiobankEntryForm {
 
     private ContainerAdapter containerAdapter;
 
-    private Container container;
+    private ContainerWrapper container;
 
     private ContainerPosition position;
 
@@ -113,7 +114,8 @@ public class ContainerEntryForm extends BiobankEntryForm {
         if (position == null) {
             // only allow edit to label on top level containers
             createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Label",
-                null, PojoObservables.observeValue(container, "label"),
+                null, PojoObservables.observeValue(
+                    container.getWrappedObject(), "label"),
                 NonEmptyString.class, MSG_CONTAINER_NAME_EMPTY);
         } else {
             Label l = (Label) createWidget(client, Label.class, SWT.NONE,
@@ -122,16 +124,17 @@ public class ContainerEntryForm extends BiobankEntryForm {
         }
 
         createBoundWidgetWithLabel(client, Text.class, SWT.NONE,
-            "Product Barcode", null, PojoObservables.observeValue(container,
-                "productBarcode"), null, null);
+            "Product Barcode", null, PojoObservables.observeValue(container
+                .getWrappedObject(), "productBarcode"), null, null);
 
         createBoundWidgetWithLabel(client, Combo.class, SWT.NONE,
             "Activity Status", FormConstants.ACTIVITY_STATUS, PojoObservables
-                .observeValue(container, "activityStatus"), null, null);
+                .observeValue(container.getWrappedObject(), "activityStatus"),
+            null, null);
 
         Text comment = (Text) createBoundWidgetWithLabel(client, Text.class,
-            SWT.MULTI, "Comments", null, PojoObservables.observeValue(
-                container, "comment"), null, null);
+            SWT.MULTI, "Comments", null, PojoObservables.observeValue(container
+                .getWrappedObject(), "comment"), null, null);
         GridData gd = new GridData(GridData.FILL_HORIZONTAL);
         gd.heightHint = 40;
         comment.setLayoutData(gd);
@@ -190,8 +193,8 @@ public class ContainerEntryForm extends BiobankEntryForm {
 
         tempWidget = (Text) createBoundWidgetWithLabel(client, Text.class,
             SWT.NONE, "Temperature (Celcius)", null, PojoObservables
-                .observeValue(container, "temperature"), DoubleNumber.class,
-            "Default temperature is not a valid number");
+                .observeValue(container.getWrappedObject(), "temperature"),
+            DoubleNumber.class, "Default temperature is not a valid number");
         if (container.getPosition() != null)
             tempWidget.setEnabled(false);
 
@@ -233,13 +236,13 @@ public class ContainerEntryForm extends BiobankEntryForm {
 
         SDKQuery query;
         if (container.getId() == null) {
-            query = new InsertExampleQuery(container);
+            query = new InsertExampleQuery(container.getWrappedObject());
         } else {
-            query = new UpdateExampleQuery(container);
+            query = new UpdateExampleQuery(container.getWrappedObject());
         }
 
         SDKQueryResult result = appService.executeQuery(query);
-        container = (Container) result.getObjectResult();
+        container.setWrappedObject((Container) result.getObjectResult());
         containerAdapter.setContainer(container);
         containerAdapter.getParent().performExpand();
 
