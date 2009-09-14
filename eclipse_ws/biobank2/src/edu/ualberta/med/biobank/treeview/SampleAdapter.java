@@ -28,7 +28,7 @@ public class SampleAdapter extends AdapterBase {
     }
 
     @Override
-    protected Integer getModelObjectId() {
+    protected Integer getWrappedObjectId() {
         return getSample().getId();
     }
 

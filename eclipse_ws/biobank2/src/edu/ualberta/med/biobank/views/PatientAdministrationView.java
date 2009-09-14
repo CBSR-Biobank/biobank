@@ -172,7 +172,7 @@ public class PatientAdministrationView extends ViewPart {
                 }
 
                 @Override
-                protected Integer getModelObjectId() {
+                protected Integer getWrappedObjectId() {
                     return null;
                 }
 
