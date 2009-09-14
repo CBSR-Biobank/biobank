@@ -50,7 +50,7 @@ public class SiteAdapter extends AdapterBase {
     }
 
     @Override
-    protected Integer getModelObjectId() {
+    protected Integer getWrappedObjectId() {
         return getSite().getId();
     }
 

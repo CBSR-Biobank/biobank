@@ -30,7 +30,7 @@ public class ClinicGroup extends AdapterBase {
     }
 
     @Override
-    protected Integer getModelObjectId() {
+    protected Integer getWrappedObjectId() {
         Assert.isTrue(false, "Should not be invoked for this type of adatper");
         return null;
     }
