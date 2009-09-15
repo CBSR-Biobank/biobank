@@ -2,7 +2,6 @@ package edu.ualberta.med.biobank.model;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Random;
 
 import edu.ualberta.med.scanlib.ScanCell;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -45,24 +44,6 @@ public class PalletCell {
         // paletteScanned[0][0] = new ScanCell(0, 0, "titi");
         // paletteScanned[1][3] = new ScanCell(1, 3, "toto");
         // return convertArray(paletteScanned);
-    }
-
-    @SuppressWarnings("unused")
-    public static PalletCell[][] getRandomScanProcess() {
-        PalletCell[][] palletScanned = new PalletCell[ScanCell.ROW_MAX][ScanCell.COL_MAX];
-        Random random = new Random();
-        for (int indexRow = 0; indexRow < ScanCell.ROW_MAX; indexRow++) {
-            for (int indexCol = 0; indexCol < ScanCell.COL_MAX; indexCol++) {
-                if (indexRow == 0 && indexCol == 0) {
-                    palletScanned[indexRow][indexCol] = new PalletCell(
-                        new ScanCell(indexRow, indexCol, "123"));
-                } else {
-                    palletScanned[indexRow][indexCol] = new PalletCell(
-                        new ScanCell(indexRow, indexCol, null));
-                }
-            }
-        }
-        return palletScanned;
     }
 
     public static PalletCell[][] getRandomScanProcessAlreadyInPallet(

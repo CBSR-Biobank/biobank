@@ -241,9 +241,10 @@ public class BioBankPlugin extends AbstractUIPlugin {
     }
 
     public static boolean isRealScanEnabled() {
-        if (getDefault().isDebugging()) {
-            return Boolean.valueOf(Platform
-                .getDebugOption(BioBankPlugin.PLUGIN_ID + "/realScan"));
+        String realScan = Platform.getDebugOption(BioBankPlugin.PLUGIN_ID
+            + "/realScan");
+        if (realScan != null) {
+            return Boolean.valueOf(realScan);
         }
         return true;
     }
