@@ -1,18 +1,26 @@
 package edu.ualberta.med.biobank.treeview;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
+import org.eclipse.ui.PlatformUI;
 
+import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.forms.StudyEntryForm;
 import edu.ualberta.med.biobank.forms.StudyViewForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Study;
+import gov.nih.nci.system.applicationservice.ApplicationException;
+import gov.nih.nci.system.query.SDKQuery;
+import gov.nih.nci.system.query.example.DeleteExampleQuery;
 
 public class StudyAdapter extends AdapterBase {
 
@@ -103,7 +111,49 @@ public class StudyAdapter extends AdapterBase {
                 public void widgetDefaultSelected(SelectionEvent e) {
                 }
             });
+            mi = new MenuItem(menu, SWT.PUSH);
+            mi.setText("Delete Study");
+            mi.addSelectionListener(new SelectionListener() {
+                public void widgetSelected(SelectionEvent event) {
+                    Boolean confirm = MessageDialog.openConfirm(PlatformUI
+                        .getWorkbench().getActiveWorkbenchWindow().getShell(),
+                        "Confirm Delete",
+                        "Are you sure you want to delete this study?");
+
+                    if (confirm) {
+                        delete();
+                    }
+
+                }
+
+                public void widgetDefaultSelected(SelectionEvent e) {
+                }
+            });
         }
+    }
+
+    public void delete() {
+        BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
+            Study study = getStudy();
+            SDKQuery query = new DeleteExampleQuery(study);
+
+            public void run() {
+                if (study.getPatientCollection().size() > 0) {
+                    BioBankPlugin.openError("Error", "Unable to delete study "
+                        + study.getName()
+                        + ". All defined patients must be removed first.");
+                } else
+                    try {
+                        getAppService().executeQuery(query);
+                        StudyAdapter.this.getParent().removeChild(
+                            StudyAdapter.this);
+                    } catch (ApplicationException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+
+            }
+        });
     }
 
     @Override

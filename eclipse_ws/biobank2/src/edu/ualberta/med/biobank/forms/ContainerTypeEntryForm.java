@@ -32,6 +32,7 @@ import edu.ualberta.med.biobank.common.utils.ModelUtils;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.helpers.GetHelper;
 import edu.ualberta.med.biobank.model.Capacity;
+import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
 import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.ContainerType;
@@ -90,6 +91,8 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
 
     private ComboViewer labelingSchemeComboViewer;
 
+    private boolean topLevel;
+
     private Button hasSamples;
 
     private Button hasContainers;
@@ -116,14 +119,19 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         allContainerTypes = new ArrayList<ContainerType>(site
             .getContainerTypeCollection());
         Collections.sort(allContainerTypes, new ContainerTypeComparator());
-
+        capacity = new Capacity();
         String tabName;
         if (containerType.getId() == null) {
+            topLevel = false;
             tabName = "New Container Type";
-            capacity = new Capacity();
+
         } else {
             tabName = "Container Type " + containerType.getName();
-            capacity = containerType.getCapacity();
+            topLevel = new Boolean(containerType.getTopLevel());
+            capacity.setRowCapacity(new Integer(containerType.getCapacity()
+                .getRowCapacity()));
+            capacity.setColCapacity(new Integer(containerType.getCapacity()
+                .getColCapacity()));
         }
 
         setPartName(tabName);
@@ -411,7 +419,37 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         saveSampleTypes();
 
         saveChildContainerTypes();
-        containerType.setCapacity(capacity);
+
+        if (containerType.getId() != null) {
+            Integer localRows = capacity.getRowCapacity();
+            Integer localCols = capacity.getColCapacity();
+            Integer dbRows = containerType.getCapacity().getRowCapacity();
+            Integer dbCols = containerType.getCapacity().getColCapacity();
+
+            // if new type, set is ok, if unmodified, set is ok. if doesn't
+            // exist in
+            // db, set is ok
+
+            if (!(localRows.equals(dbRows) && localCols.equals(dbCols))
+                && !HQLSafeToChange())
+                BioBankPlugin
+                    .openError(
+                        "ContainerType Change Failed",
+                        "Unable to alter dimensions. A container of this type exists in storage. Remove all instances before attempting to modify this container type.");
+            else {
+                containerType.setCapacity(capacity);
+            }
+        } else {
+            containerType.setCapacity(capacity);
+        }
+
+        if (topLevel != containerType.getTopLevel() && !HQLSafeToChange()) {
+            containerType.setTopLevel(topLevel);
+            BioBankPlugin
+                .openError(
+                    "ContainerType Change Failed",
+                    "Unable to change the \"Top Level\" property. A container requiring this property exists in storage. Remove all instances before attempting to modify this container type.");
+        }
 
         // associate the storage type to it's site
         containerType.setSite(site);
@@ -485,6 +523,23 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
                 .openError(
                     "ContainerType Removal Failed",
                     "Unable to remove child type. This parent/child relationship exists in storage. Remove all instances before attempting to delete a child type.");
+        }
+
+    }
+
+    private boolean HQLSafeToChange() throws ApplicationException {
+        String queryString = "select c.containerType from "
+            + Container.class.getName() + " as c where c.containerType.id=?)";
+        List<Object> params = new ArrayList<Object>();
+        params.add(containerType.getId());
+        HQLCriteria c = new HQLCriteria(queryString);
+        c.setParameters(params);
+        List<Object> results = appService.query(c);
+        if (results.size() == 0)
+            return true;
+        else {
+            containerType = (ContainerType) results.get(0);
+            return false;
         }
     }
 
