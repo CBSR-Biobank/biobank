@@ -38,8 +38,12 @@ public class ContainerPositionWrapper extends ModelWrapper<ContainerPosition> {
             parentContainer);
     }
 
-    private Container getParentContainer() {
+    public Container getParentContainer() {
         return wrappedObject.getParentContainer();
+    }
+    
+    public Container getContainer() {
+        return wrappedObject.getContainer();
     }
 
     /**
