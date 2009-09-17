@@ -1,6 +1,8 @@
 package edu.ualberta.med.biobank.treeview;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.Dialog;
@@ -18,16 +20,21 @@ import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.wrappers.ContainerPositionWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.dialogs.MoveContainerDialog;
+import edu.ualberta.med.biobank.dialogs.SelectParentContainerDialog;
 import edu.ualberta.med.biobank.forms.ContainerEntryForm;
 import edu.ualberta.med.biobank.forms.ContainerViewForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerPosition;
+import edu.ualberta.med.biobank.model.ContainerType;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.query.SDKQuery;
 import gov.nih.nci.system.query.example.DeleteExampleQuery;
+import gov.nih.nci.system.query.example.UpdateExampleQuery;
+import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class ContainerAdapter extends AdapterBase {
 
@@ -117,7 +124,7 @@ public class ContainerAdapter extends AdapterBase {
                     setContainer(new ContainerWrapper(SessionManager
                         .getAppService(), mc.getContainer()));
                     try {
-                        getContainer().setNewPositionFromLabel(mc.getAddress());
+                        setNewPositionFromLabel(mc.getAddress());
 
                         // TODO UPDATE TREE... difficult to know which adapter
                         // we
@@ -219,6 +226,137 @@ public class ContainerAdapter extends AdapterBase {
     @Override
     public String getTreeText() {
         return getName();
+    }
+
+    /**
+     * if address exists if address is not full if type is valid for slot modify
+     * this object's position, label, children
+     */
+    public void setNewPositionFromLabel(String newAddress) throws Exception {
+        ContainerWrapper container = getContainer();
+        int selectedParent = 0;
+        if (newAddress.length() < 4)
+            throw new Exception(
+                "Destination address must be another container (4 character minimum).");
+        String newParentContainerLabel = newAddress.substring(0, newAddress
+            .length() - 2);
+
+        List<Container> newParents = ContainerWrapper
+            .getContainersWithLabelInSite(SessionManager.getAppService(),
+                container.getSite(), newParentContainerLabel);
+        String oldLabel = container.getLabel();
+
+        // remove unsuitable parents
+        List<Container> newParentContainers = new ArrayList<Container>();
+        for (Container c : newParents) {
+            Collection<ContainerType> childTypes = c.getContainerType()
+                .getChildContainerTypeCollection();
+            Boolean contains = false;
+            for (ContainerType ct : childTypes) {
+                if (ct.getId().equals(container.getContainerType().getId()))
+                    contains = true;
+            }
+            if (contains)
+                newParentContainers.add(c);
+        }
+
+        if (newParentContainers.size() == 0) {
+            // invalid parent
+            throw new Exception(
+                "Unable to find suitable parent container with label "
+                    + newParentContainerLabel + ".");
+        } else {
+            if (newParentContainers.size() > 1) {
+                SelectParentContainerDialog dlg = new SelectParentContainerDialog(
+                    PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+                        .getShell(), newParentContainers);
+                if (dlg.open() == Dialog.OK) {
+                    selectedParent = dlg.getSelectionIndex();
+                } else
+                    return;
+
+            }
+            Container newParent = newParentContainers.get(selectedParent);
+            List<ContainerPosition> positions = (List<ContainerPosition>) newParent
+                .getChildPositionCollection();
+            Boolean filled = false;
+            for (ContainerPosition pos : positions)
+                if (pos.getContainer().getLabel().compareToIgnoreCase(
+                    newAddress) == 0)
+                    filled = true;
+            if (filled) {
+                // filled
+                throw new Exception(
+                    "The destination "
+                        + newAddress
+                        + " has already been initialized. You can only move to an uninitialized location.");
+            } else {
+                // remove from old parent, add to new
+                Container oldParent = container.getPosition()
+                    .getParentContainer();
+                if (oldParent != null) {
+
+                    // remove from old
+                    Collection<ContainerPosition> oldPositions = oldParent
+                        .getChildPositionCollection();
+                    oldPositions.remove(container.getPosition());
+                    oldParent.setChildPositionCollection(oldPositions);
+
+                    // modify position object
+                    ContainerPositionWrapper positionWrapper = new ContainerPositionWrapper(
+                        SessionManager.getAppService(), container.getPosition());
+                    positionWrapper.setParentContainer(newParent);
+                    positionWrapper.setPosition(newAddress.substring(newAddress
+                        .length() - 2));
+                    container.setPosition(positionWrapper.getWrappedObject());
+
+                    // add to new
+                    Collection<ContainerPosition> newPositions = newParent
+                        .getChildPositionCollection();
+                    newPositions.add(container.getPosition());
+                    newParent.setChildPositionCollection(newPositions);
+
+                    // change label
+                    if (container.getLabel().equalsIgnoreCase(
+                        container.getProductBarcode()))
+                        container.setProductBarcode(newAddress);
+                    container.setLabel(newAddress);
+
+                    SDKQuery q = new UpdateExampleQuery(container
+                        .getWrappedObject());
+                    SessionManager.getAppService().executeQuery(q);
+                    // move children
+                    setChildLabels(oldLabel);
+                } else
+                    throw new Exception(
+                        "You cannot move a top level container.");
+            }
+        }
+    }
+
+    private void setChildLabels(String oldLabel) throws Exception {
+        // inefficient, should be improved
+        ContainerWrapper parentContainer = getContainer();
+        HQLCriteria criteria = new HQLCriteria("from "
+            + Container.class.getName() + " where label like '" + oldLabel
+            + "%'" + " and site= " + parentContainer.getSite().getId());
+
+        List<Container> containers = SessionManager.getAppService().query(
+            criteria);
+        for (Container c : containers) {
+            if (c.getLabel().compareToIgnoreCase(oldLabel) == 0)
+                continue;
+            ContainerWrapper temp = new ContainerWrapper(SessionManager
+                .getAppService(), c);
+
+            temp.setLabel(parentContainer.getLabel()
+                + c.getLabel().substring(parentContainer.getLabel().length()));
+            SDKQuery q = new UpdateExampleQuery(temp.getWrappedObject());
+            SessionManager.getAppService().executeQuery(q);
+            ContainerAdapter tempAdapter = new ContainerAdapter(this, temp);
+            tempAdapter.setChildLabels(oldLabel
+                + c.getLabel().substring(parentContainer.getLabel().length()));
+        }
     }
 
     @Override
