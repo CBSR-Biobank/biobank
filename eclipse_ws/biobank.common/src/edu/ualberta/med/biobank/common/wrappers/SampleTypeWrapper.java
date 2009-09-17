@@ -1,14 +1,14 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.DatabaseResult;
+import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.model.Site;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
-import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class SampleTypeWrapper extends ModelWrapper<SampleType> {
 
@@ -31,20 +31,19 @@ public class SampleTypeWrapper extends ModelWrapper<SampleType> {
 
     @Override
     protected DatabaseResult persistChecks() throws ApplicationException {
-        // TODO Auto-generated method stub
-        return null;
+        return DatabaseResult.OK;
     }
 
-    public static List<SampleType> getSampleTypeNotInPalletsOrBoxes(
-        WritableApplicationService appService, Site site)
-        throws ApplicationException {
-        HQLCriteria criteria = new HQLCriteria(
-            "select st from "
-                + SampleType.class.getName()
-                + " as st inner join st.containerTypeCollection as ct where (st.site = ? or st.site = null)"
-                + " and ct.name not like '%pallet%' and ct.name not like '%box%'",
-            Arrays.asList(new Object[] { site }));
-        return appService.query(criteria);
+    public static List<SampleType> getSampleTypeForContainerTypes(
+        WritableApplicationService appService, Site site,
+        String typeNameContains) throws ApplicationException {
+        List<ContainerType> types = ContainerTypeWrapper
+            .getContainerTypesInSite(appService, site, typeNameContains, false);
+        List<SampleType> sampleTypes = new ArrayList<SampleType>();
+        for (ContainerType type : types) {
+            sampleTypes.addAll(new ContainerTypeWrapper(appService, type)
+                .getSampleTypes(true));
+        }
+        return sampleTypes;
     }
-
 }

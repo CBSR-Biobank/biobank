@@ -10,6 +10,7 @@ import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.observable.value.WritableValue;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.dialogs.IMessageProvider;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -50,6 +51,7 @@ import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.Sample;
 import edu.ualberta.med.biobank.model.SampleType;
+import edu.ualberta.med.biobank.preferences.PreferenceConstants;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
 import edu.ualberta.med.biobank.widgets.CabinetDrawerWidget;
 import edu.ualberta.med.biobank.widgets.CancelConfirmWidget;
@@ -92,12 +94,18 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
     private Container drawer;
     private Container bin;
 
+    private String cabinetNameContains = "";
+
     private static final String CHECK_CLICK_MESSAGE = "Click on check";
 
     @Override
     protected void init() {
         setPartName("Cabinet Link/Assign");
         sampleWrapper = new SampleWrapper(appService, new Sample());
+        IPreferenceStore store = BioBankPlugin.getDefault()
+            .getPreferenceStore();
+        cabinetNameContains = store
+            .getString(PreferenceConstants.CABINET_CONTAINER_NAME_CONTAINS);
     }
 
     @Override
@@ -212,8 +220,9 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
     private void createTypeCombo(Composite fieldsComposite) {
         List<SampleType> sampleTypes;
         try {
-            sampleTypes = SampleTypeWrapper.getSampleTypeNotInPalletsOrBoxes(
-                appService, SessionManager.getInstance().getCurrentSite());
+            sampleTypes = SampleTypeWrapper.getSampleTypeForContainerTypes(
+                appService, SessionManager.getInstance().getCurrentSite(),
+                cabinetNameContains);
         } catch (ApplicationException e) {
             BioBankPlugin.openError("Initialisation failed", e);
             sampleTypes = new ArrayList<SampleType>();
@@ -359,7 +368,7 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
             drawer = bin.getPosition().getParentContainer();
             cabinet = drawer.getPosition().getParentContainer();
         } else if (containers.size() == 0) {
-            containers = ContainerWrapper.getContainersWithLabelInSite(
+            containers = ContainerWrapper.getContainersInSite(
                 appService, SessionManager.getInstance().getCurrentSite(),
                 binLabel);
             if (containers.size() > 0) {

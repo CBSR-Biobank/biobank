@@ -10,12 +10,6 @@ import edu.ualberta.med.biobank.BioBankPlugin;
  */
 public class PreferenceInitializer extends AbstractPreferenceInitializer {
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @seeorg.eclipse.core.runtime.preferences.AbstractPreferenceInitializer#
-     * initializeDefaultPreferences()
-     */
     @Override
     public void initializeDefaultPreferences() {
         IPreferenceStore store = BioBankPlugin.getDefault()
@@ -30,5 +24,10 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
         }
         store.setDefault(PreferenceConstants.SCANNER_DPI, 300);
         store.setDefault(PreferenceConstants.SCAN_LINK_ROW_SELECT_ONLY, true);
+        store.setDefault(
+            PreferenceConstants.PALLET_SCAN_CONTAINER_NAME_CONTAINS, "pallet");
+        store.setDefault(PreferenceConstants.CABINET_CONTAINER_NAME_CONTAINS,
+            "cabinet");
+
     }
 }

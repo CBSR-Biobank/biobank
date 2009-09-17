@@ -1,16 +1,16 @@
 package edu.ualberta.med.biobank.preferences;
 
-import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
+import org.eclipse.jface.preference.StringFieldEditor;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 
-public class ScanLinkPreferencePage extends FieldEditorPreferencePage implements
+public class CabinetPreferencePage extends FieldEditorPreferencePage implements
     IWorkbenchPreferencePage {
 
-    public ScanLinkPreferencePage() {
+    public CabinetPreferencePage() {
         super(GRID);
         setPreferenceStore(BioBankPlugin.getDefault().getPreferenceStore());
     }
@@ -22,9 +22,10 @@ public class ScanLinkPreferencePage extends FieldEditorPreferencePage implements
      */
     @Override
     public void createFieldEditors() {
-        addField(new BooleanFieldEditor(
-            PreferenceConstants.SCAN_LINK_ROW_SELECT_ONLY,
-            "Select sample type row/row only", getFieldEditorParent()));
+        addField(new StringFieldEditor(
+            PreferenceConstants.CABINET_CONTAINER_NAME_CONTAINS,
+            "Top cabinet container types name contains:",
+            getFieldEditorParent()));
     }
 
     public void init(IWorkbench workbench) {

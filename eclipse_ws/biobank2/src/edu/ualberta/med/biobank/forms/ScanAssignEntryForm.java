@@ -11,6 +11,7 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.SWT;
@@ -33,6 +34,7 @@ import org.springframework.remoting.RemoteConnectFailureException;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.utils.SiteUtils;
+import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
 import edu.ualberta.med.biobank.forms.listener.EnterKeyToNextFieldListener;
@@ -44,6 +46,7 @@ import edu.ualberta.med.biobank.model.PalletCell;
 import edu.ualberta.med.biobank.model.Sample;
 import edu.ualberta.med.biobank.model.SampleCellStatus;
 import edu.ualberta.med.biobank.model.SamplePosition;
+import edu.ualberta.med.biobank.preferences.PreferenceConstants;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
 import edu.ualberta.med.biobank.validators.PalletBarCodeValidator;
 import edu.ualberta.med.biobank.validators.ScannerBarcodeValidator;
@@ -89,11 +92,17 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
 
     private CancelConfirmWidget cancelConfirmWidget;
 
+    private String palletNameContains = "";
+
     @Override
     protected void init() {
         setPartName("Scan Assign");
         currentPalletWrapper = new ContainerWrapper(appService, new Container());
         initPalletValues();
+        IPreferenceStore store = BioBankPlugin.getDefault()
+            .getPreferenceStore();
+        palletNameContains = store
+            .getString(PreferenceConstants.PALLET_SCAN_CONTAINER_NAME_CONTAINS);
     }
 
     @Override
@@ -250,15 +259,16 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
      * If can't know which pallet type we need, add a combo
      */
     private void createContainerTypeSection(Composite parent) throws Exception {
-        List<ContainerType> palletContainerTypes = SiteUtils
+        List<ContainerType> palletContainerTypes = ContainerTypeWrapper
             .getContainerTypesInSite(appService,
-                currentPalletWrapper.getSite(), "pallet", false);
+                currentPalletWrapper.getSite(), palletNameContains, false);
         if (palletContainerTypes.size() == 1) {
             currentPalletWrapper.setContainerType(palletContainerTypes.get(0));
         } else {
             if (palletContainerTypes.size() == 0) {
                 BioBankPlugin.openError("No Pallet defined ?",
-                    "No container type found with name containing Pallet...");
+                    "No container type found with name containing "
+                        + palletNameContains + "...");
             }
             palletTypesViewer = createCComboViewerWithNoSelectionValidator(
                 parent, "Pallet Container Type", palletContainerTypes, null,

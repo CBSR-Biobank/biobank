@@ -21,4 +21,8 @@ public class PreferenceConstants {
 
     public static final String SCAN_LINK_ROW_SELECT_ONLY = "scan.link.row.select.only";
 
+    public static final String PALLET_SCAN_CONTAINER_NAME_CONTAINS = "scan.link.container_name_contains";
+
+    public static final String CABINET_CONTAINER_NAME_CONTAINS = "cabinet.container_name_contains";
+
 }

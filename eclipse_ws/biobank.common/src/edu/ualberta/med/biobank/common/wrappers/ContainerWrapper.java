@@ -72,8 +72,8 @@ public class ContainerWrapper extends ModelWrapper<Container> {
      * @param containerType the type of the container
      * @throws ApplicationException
      */
-    public Container getContainer(String label, ContainerType containerType)
-        throws ApplicationException {
+    public Container getContainer(String label,
+        ContainerType containerType) throws ApplicationException {
         HQLCriteria criteria = new HQLCriteria("from "
             + Container.class.getName()
             + " where site = ? and label = ? and containerType = ?", Arrays
@@ -153,7 +153,7 @@ public class ContainerWrapper extends ModelWrapper<Container> {
         return appService.query(criteria);
     }
 
-    public static List<Container> getContainersWithLabelInSite(
+    public static List<Container> getContainersInSite(
         WritableApplicationService appService, Site site, String label)
         throws ApplicationException {
         HQLCriteria criteria = new HQLCriteria("from "
@@ -173,7 +173,7 @@ public class ContainerWrapper extends ModelWrapper<Container> {
         String newParentContainerLabel = newAddress.substring(0, newAddress
             .length() - 2);
 
-        List<Container> newParentContainers = getContainersWithLabelInSite(
+        List<Container> newParentContainers = getContainersInSite(
             appService, getSite(), newParentContainerLabel);
         String oldLabel = getLabel();
 
@@ -182,7 +182,7 @@ public class ContainerWrapper extends ModelWrapper<Container> {
             throw new Exception("Unable to find parent container with label "
                 + newParentContainerLabel + ".");
         } else {
-            List<Container> samePositions = getContainersWithLabelInSite(
+            List<Container> samePositions = getContainersInSite(
                 appService, getSite(), newAddress);
             if (samePositions.size() != 0) {
                 // filled
@@ -192,7 +192,7 @@ public class ContainerWrapper extends ModelWrapper<Container> {
                         + " has already been initialized. You can only move to an uninitialized location.");
             } else {
                 // remove from old parent, add to new
-                List<Container> oldParentContainers = getContainersWithLabelInSite(
+                List<Container> oldParentContainers = getContainersInSite(
                     appService, getSite(), getLabel().substring(0,
                         getLabel().length() - 2));
                 if (oldParentContainers.size() > 0) {
