@@ -241,9 +241,9 @@ public class ContainerAdapter extends AdapterBase {
         String newParentContainerLabel = newAddress.substring(0, newAddress
             .length() - 2);
 
-        List<Container> newParents = ContainerWrapper
-            .getContainersWithLabelInSite(SessionManager.getAppService(),
-                container.getSite(), newParentContainerLabel);
+        List<Container> newParents = ContainerWrapper.getContainersInSite(
+            SessionManager.getAppService(), container.getSite(),
+            newParentContainerLabel);
         String oldLabel = container.getLabel();
 
         // remove unsuitable parents
