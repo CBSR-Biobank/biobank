@@ -26,5 +26,10 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
         store.setDefault(PreferenceConstants.GENERAL_TIME_OUT, 10);
         store.setDefault(PreferenceConstants.SCANNER_DPI, 300);
         store.setDefault(PreferenceConstants.SCAN_LINK_ROW_SELECT_ONLY, true);
+
+        for (int i = 0; i < PreferenceConstants.SCANNER_PLATE_BARCODES.length; i++) {
+            store.setDefault(PreferenceConstants.SCANNER_PLATE_BARCODES[i],
+                "PLATE" + (i + 1));
+        }
     }
 }
