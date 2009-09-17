@@ -13,11 +13,12 @@ public class PreferenceConstants {
 
     public static final String GENERAL_ASK_PRINT = "general.askprint";
 
-    public static final String SCANNER_PLATE = "scanner.plate";
-
-    public static final int SCANNER_PLATE_NUMBER = 3;
-
     public static final String SCANNER_DPI = "scanner.dpi";
+
+    public static final String[] SCANNER_PLATE_BARCODES = {
+        "scanner.plate.barcode.1", "scanner.plate.barcode.2",
+        "scanner.plate.barcode.3", "scanner.plate.barcode.4",
+        "scanner.plate.barcode.5" };
 
     public static final String SCAN_LINK_ROW_SELECT_ONLY = "scan.link.row.select.only";
 

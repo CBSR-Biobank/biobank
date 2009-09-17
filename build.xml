@@ -193,7 +193,7 @@
 		<copy todir="${eclipse.proj.dir.common}/lib" file="${cacore.sdk.dir}/system/security/dist/sdk-security.jar" />
 		<copy todir="${eclipse.proj.dir.importer}/lib" file="${cacore.sdk.dir}/system/security/dist/sdk-security.jar" />
 		<copy todir="${eclipse.proj.dir.junit}/lib" file="${cacore.sdk.dir}/system/security/dist/sdk-security.jar" />
-		<copy todir="${eclipse.proj.dir.common}/lib">
+		<copy todir="${eclipse.proj.dir.common}/conf">
 			<fileset dir="${cacore.sdk.dir}/output/biobank2/package/remote-client/conf">
 				<include name="application-config-client*.xml" />
 			</fileset>

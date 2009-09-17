@@ -114,9 +114,9 @@
       		name="Edit Sample Types">
       		</command>
       <command
-            defaultHandler="edu.ualberta.med.biobank.handlers.SearchHandler"
-            id="edu.ualberta.med.biobank.commands.search"
-            name="Search">
+            defaultHandler="edu.ualberta.med.biobank.handlers.ReportsHandler"
+            id="edu.ualberta.med.biobank.commands.reports"
+            name="Reports">
       </command>
       <command
             id="edu.ualberta.med.biobank.commands.patientAdmin"
@@ -151,6 +151,10 @@
       <command
             id="edu.ualberta.med.biobank.commands.patients.patientAdd"
             name="Add patient">
+      </command>
+      <command
+            id="edu.ualberta.med.biobank.commands.patients.patientVisitAdd"
+            name="Add Patient Visit">
       </command>
    </extension>
    <extension
@@ -389,6 +393,25 @@
               </reference>
           </activeWhen>
       </handler>
+      <handler
+            class="edu.ualberta.med.biobank.handlers.PatientVisitAddHandler"
+            commandId="edu.ualberta.med.biobank.commands.patients.patientVisitAdd">
+         <activeWhen>
+            <and>
+               <reference
+                     definitionId="biobank2.patientsPerpectiveSelected">
+               </reference>
+               <reference
+                     definitionId="biobank2.siteSelected">
+               </reference>
+            </and>
+         </activeWhen>
+         <enabledWhen>
+              <reference
+                    definitionId="oneElementSelected">
+              </reference>
+         </enabledWhen>
+      </handler>
    </extension>
    <extension
          point="org.eclipse.ui.menus">
@@ -472,9 +495,9 @@
                </visibleWhen>
             </menu>
             <command
-                  commandId="edu.ualberta.med.biobank.commands.search"
-                  id="edu.ualberta.med.biobank.menu.search"
-                  label="Search"
+                  commandId="edu.ualberta.med.biobank.commands.reports"
+                  id="edu.ualberta.med.biobank.menu.reports"
+                  label="Reports"
                   style="push">
             </command>
          </menu>
@@ -589,8 +612,20 @@
             </command>
             <command
                   commandId="edu.ualberta.med.biobank.commands.patients.patientAdd"
-                  icon="icons/add.png"
+                  icon="icons/patient_add.png"
                   label="Add Patient"
+                  style="push">
+               <visibleWhen
+                     checkEnabled="false">
+                  <reference
+                        definitionId="biobank2.patientsPerpectiveSelected">
+                  </reference>
+               </visibleWhen>
+            </command>
+            <command
+                  commandId="edu.ualberta.med.biobank.commands.patients.patientVisitAdd"
+                  icon="icons/patientvisit_add.png"
+                  label="Add Patient Visit"
                   style="push">
                <visibleWhen
                      checkEnabled="false">
@@ -663,17 +698,6 @@
                relationship="left"
                relative="org.eclipse.ui.editorss"
                showTitle="false"
-               standalone="true"
-               visible="true">
-         </view>
-         <view
-               closeable="true"
-               id="edu.ualberta.med.biobank.views.SearchView"
-               minimized="false"
-               moveable="true"
-               relationship="top"
-               relative="org.eclipse.ui.editorss"
-               showTitle="true"
                standalone="true"
                visible="true">
          </view>
@@ -881,13 +905,6 @@
       </view>
       <view
             allowMultiple="false"
-            class="edu.ualberta.med.biobank.views.SearchView"
-            id="edu.ualberta.med.biobank.views.SearchView"
-            name="Search"
-            restorable="true">
-      </view>
-      <view
-            allowMultiple="false"
             class="edu.ualberta.med.biobank.views.PatientAdministrationView"
             icon="icons/patientPerspective.png"
             id="edu.ualberta.med.biobank.views.patientsAdmin"
@@ -994,6 +1011,15 @@
             <equals
                   value="edu.ualberta.med.biobank.forms.CabinetLinkAssignEntryForm">
             </equals>
+         </with>
+      </definition>
+      <definition
+            id="oneElementSelected">
+         <with
+               variable="selection">
+            <count
+                  value="1">
+            </count>
          </with>
       </definition>
    </extension>

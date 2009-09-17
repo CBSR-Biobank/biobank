@@ -45,6 +45,7 @@ import edu.ualberta.med.biobank.model.Sample;
 import edu.ualberta.med.biobank.model.SampleCellStatus;
 import edu.ualberta.med.biobank.model.SamplePosition;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
+import edu.ualberta.med.biobank.validators.PalletBarCodeValidator;
 import edu.ualberta.med.biobank.validators.ScannerBarcodeValidator;
 import edu.ualberta.med.biobank.widgets.CancelConfirmWidget;
 import edu.ualberta.med.biobank.widgets.ScanPalletWidget;
@@ -82,9 +83,9 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
 
     protected Sample[][] currentPalletSamples;
 
-    // for debugging only :
-    private Button existsButton;
-    private Button notexistsButton;
+    // for debugging only (fake scan) :
+    private Button linkedOnlyButton;
+    private Button linkedAssignButton;
 
     private CancelConfirmWidget cancelConfirmWidget;
 
@@ -131,13 +132,13 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
             Text.class, SWT.NONE, "Pallet product barcode", null,
             PojoObservables
                 .observeValue(currentPalletWrapper, "productBarcode"),
-            NonEmptyString.class, "Enter pallet position code");
+            new NonEmptyString("Enter pallet position code"));
         palletCodeText.addKeyListener(EnterKeyToNextFieldListener.INSTANCE);
 
         palletPositionText = (Text) createBoundWidgetWithLabel(fieldsComposite,
             Text.class, SWT.NONE, "Pallet label", null, BeansObservables
                 .observeValue(currentPalletWrapper, "label"),
-            NonEmptyString.class, "Enter position code");
+            new PalletBarCodeValidator("Enter position code (ie. 01AA02)"));
         palletPositionText.addKeyListener(EnterKeyToNextFieldListener.INSTANCE);
 
         plateToScanText = (Text) createBoundWidgetWithLabel(fieldsComposite,
@@ -152,22 +153,24 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
             }
         });
 
+        String scanButtonTitle = "Launch scan";
         if (!BioBankPlugin.isRealScanEnabled()) {
-            gd.widthHint = 250;
+            gd.widthHint = 300;
             Composite comp = toolkit.createComposite(fieldsComposite);
             comp.setLayout(new GridLayout());
             gd = new GridData();
             gd.horizontalSpan = 2;
             comp.setLayoutData(gd);
-            notexistsButton = toolkit.createButton(comp,
-                "Scan non localised Samples", SWT.RADIO);
-            notexistsButton.setSelection(true);
-            existsButton = toolkit.createButton(comp, "Scan localised sample",
-                SWT.RADIO);
-            toolkit.createButton(comp, "Default sample", SWT.RADIO);
+            linkedAssignButton = toolkit.createButton(comp,
+                "Select linked only samples", SWT.RADIO);
+            linkedAssignButton.setSelection(true);
+            linkedOnlyButton = toolkit.createButton(comp,
+                "Select linked and assigned samples", SWT.RADIO);
+            scanButtonTitle = "Fake scan";
         }
 
-        scanButton = toolkit.createButton(fieldsComposite, "Scan", SWT.PUSH);
+        scanButton = toolkit.createButton(fieldsComposite, scanButtonTitle,
+            SWT.PUSH);
         gd = new GridData();
         gd.horizontalSpan = 2;
         scanButton.setLayoutData(gd);
@@ -270,16 +273,14 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
                     cells = PalletCell.convertArray(ScannerConfigPlugin
                         .scan(plateNum));
                 } else {
-                    if (notexistsButton.getSelection()) {
+                    if (linkedAssignButton.getSelection()) {
                         cells = PalletCell.getRandomScanProcessNotInPallet(
                             appService, SessionManager.getInstance()
                                 .getCurrentSite());
-                    } else if (existsButton.getSelection()) {
+                    } else if (linkedOnlyButton.getSelection()) {
                         cells = PalletCell.getRandomScanProcessAlreadyInPallet(
                             appService, SessionManager.getInstance()
                                 .getCurrentSite());
-                    } else {
-                        cells = PalletCell.getRandomScanProcess();
                     }
                 }
                 boolean result = true;

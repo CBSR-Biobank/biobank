@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.common.wrappers;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.DatabaseResult;
@@ -15,6 +16,8 @@ import edu.ualberta.med.biobank.model.SamplePosition;
 import edu.ualberta.med.biobank.model.Site;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
+import gov.nih.nci.system.query.SDKQuery;
+import gov.nih.nci.system.query.example.UpdateExampleQuery;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class ContainerWrapper extends ModelWrapper<Container> {
@@ -22,6 +25,7 @@ public class ContainerWrapper extends ModelWrapper<Container> {
     public ContainerWrapper(WritableApplicationService appService,
         Container wrappedObject) {
         super(appService, wrappedObject);
+        
     }
 
     @Override
@@ -134,57 +138,87 @@ public class ContainerWrapper extends ModelWrapper<Container> {
     }
 
     /**
-     * create the ContainerPosition for this container using its label and using
-     * as top parent a container which type name start with topTypeNameStartWith
+     * if address exists
+     * if address is not full
+     * if type is valid for slot
+     * modify this object's position, label, children
      */
-    public void setNewPositionFromLabel(String topTypeNameStartWith)
+    public void setNewPositionFromLabel(String newAddress)
         throws Exception {
-        String parentContainerLabel = getLabel().substring(0,
-            getLabel().length() - 2);
-        String topParentContainerLabel = parentContainerLabel.substring(0, 2);
-        Container topParentContainer = getContainerWithTypeAndLabelInSite(
-            appService, getSite(), topParentContainerLabel,
-            topTypeNameStartWith);
-        if (topParentContainer != null) {
-            // we got the top parent Container in which we want to create a new
-            // position in one of its child container
-            int labelIndex = 4;
-            Container currentParentContainer = topParentContainer;
-            String currentLabel = "";
-            // look for the parent container of this container
-            while (labelIndex <= parentContainerLabel.length()
-                && currentParentContainer != null) {
-                currentLabel = parentContainerLabel.substring(0, labelIndex);
-                currentParentContainer = new ContainerWrapper(appService,
-                    currentParentContainer).getChildWithLabel(currentLabel);
-                labelIndex += 2;
-            }
-            if (currentParentContainer == null) {
-                throw new Exception("Can't find parent container with label "
-                    + currentLabel + " under top container "
-                    + topParentContainer.getLabel() + "("
-                    + topParentContainer.getContainerType().getNameShort()
-                    + ")");
-            }
-
-            // has the parent container. Can now find the position using the
-            // parent labeling scheme
-            ContainerPosition position = getPosition();
-            if (position == null) {
-                position = new ContainerPosition();
-            }
-            ContainerPositionWrapper positionWrapper = new ContainerPositionWrapper(
-                appService, position);
-            positionWrapper.setParentContainer(currentParentContainer);
-            positionWrapper.setPosition(getLabel().substring(
-                getLabel().length() - 2));
-            setPosition(positionWrapper.getWrappedObject());
-        } else {
-            throw new Exception(
-                "wans't able to find a container with type starting with "
-                    + topTypeNameStartWith + " and label "
-                    + topParentContainerLabel);
+        if (newAddress.length()<2) throw new Exception("Destination address must be another container.");
+        String newParentContainerLabel= newAddress.substring(0, newAddress.length() - 2);
+        
+        List<Container> newParentContainers = getContainersWithLabelInSite(appService, getSite(), newParentContainerLabel);
+        String oldLabel=getLabel();
+        
+        if (newParentContainers.size()!=1) {
+            //invalid parent
+            throw new Exception("Unable to find parent container with label "
+                + newParentContainerLabel + ".");
         }
+        else {
+            List<Container> samePositions = getContainersWithLabelInSite(appService, getSite(), newAddress);
+            if (samePositions.size()!=0) {
+                //filled
+                throw new Exception("The destination " + newAddress + " has already been initialized. You can only move to an uninitialized location.");
+            }
+            else {
+                //remove from old parent, add to new
+                List<Container> oldParentContainers = getContainersWithLabelInSite(appService, getSite(), getLabel().substring(0, getLabel().length()-2));
+                if (oldParentContainers.size()>0) {
+                    //parents
+                    Container oldParent=oldParentContainers.get(0);
+                    Container newParent=newParentContainers.get(0);
+                    
+                    //remove from old
+                    Collection<ContainerPosition> oldPositions = oldParent.getChildPositionCollection();
+                    oldPositions.remove(getPosition());
+                    oldParent.setChildPositionCollection(oldPositions);
+                    
+                    //modify position object
+                    ContainerPositionWrapper positionWrapper = new ContainerPositionWrapper(
+                        appService, getPosition());
+                    positionWrapper.setParentContainer(newParent);
+                    positionWrapper.setPosition(newAddress.substring(newAddress.length()-2));
+                    setPosition(positionWrapper.getWrappedObject());
+                    
+                    //add to new
+                    Collection<ContainerPosition> newPositions = newParent.getChildPositionCollection();
+                    newPositions.add(getPosition());
+                    newParent.setChildPositionCollection(newPositions);    
+                                        
+                    //change label
+                    if (getLabel().equalsIgnoreCase(getProductBarcode())) 
+                        setProductBarcode(newAddress);
+                    setLabel(newAddress);
+                    
+                    SDKQuery q = new UpdateExampleQuery(wrappedObject);
+                    this.appService.executeQuery(q);
+                    //move children
+                    setChildLabels(oldLabel);  
+                } 
+                else throw new Exception("You cannot move a top level container.");
+            }
+        }
+    }
+    
+    private void setChildLabels(String oldLabel)
+        throws Exception {
+        //inefficient, should be improved
+        HQLCriteria criteria = new HQLCriteria("from "
+                + Container.class.getName()
+                + " where label like '" + oldLabel+ "%'"
+                + " and site= " + getSite().getId());
+
+            List<Container> containers = appService.query(criteria);
+            for (Container container: containers) {
+                    if (container.getLabel().compareToIgnoreCase(oldLabel)==0) continue;
+                    ContainerWrapper temp=new ContainerWrapper(appService, container);
+                    temp.setLabel(getLabel()+container.getLabel().substring(getLabel().length()));
+                    SDKQuery q = new UpdateExampleQuery(temp.getWrappedObject());
+                    this.appService.executeQuery(q);
+                    temp.setChildLabels(oldLabel+container.getLabel().substring(getLabel().length()));
+            }
     }
 
     /**
@@ -281,7 +315,7 @@ public class ContainerWrapper extends ModelWrapper<Container> {
      * type
      */
     public String getFullInfoLabel() {
-        if (getContainerType() == null) {
+        if (getContainerType() == null || getContainerType().getNameShort() == null) {
             return getLabel();
         }
         return getLabel() + "(" + getContainerType().getNameShort() + ")";
@@ -303,6 +337,22 @@ public class ContainerWrapper extends ModelWrapper<Container> {
                     + productBarcode);
         }
         return containers.get(0);
+    }
+
+    public void setTemperature(Double temperature) {
+        Double oldTemp = getTemperature();
+        wrappedObject.setTemperature(temperature);
+        propertyChangeSupport.firePropertyChange("position", oldTemp,
+            temperature);
+    }
+
+    private Double getTemperature() {
+            return getWrappedObject().getTemperature();
+
+    }
+
+    public Collection<ContainerPosition> getChildPositionCollection() {
+        return getWrappedObject().getChildPositionCollection();
     }
 
 }

@@ -17,6 +17,7 @@ import org.eclipse.ui.PlatformUI;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.utils.ModelUtils;
 import edu.ualberta.med.biobank.common.utils.SiteUtils;
+import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.forms.ContainerEntryForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Container;
@@ -57,7 +58,8 @@ public class ContainerGroup extends AdapterBase {
                             "Unable to create container",
                             "You must define a top-level container type before initializing storage.");
                 } else {
-                    Container c = new Container();
+                    ContainerWrapper c = new ContainerWrapper(SessionManager
+                        .getAppService(), new Container());
                     c.setSite(getParentFromClass(SiteAdapter.class).getSite());
                     ContainerAdapter adapter = new ContainerAdapter(
                         ContainerGroup.this, c);
@@ -87,7 +89,8 @@ public class ContainerGroup extends AdapterBase {
                 ContainerAdapter node = (ContainerAdapter) getChild(container
                     .getId());
                 if (node == null) {
-                    node = new ContainerAdapter(this, container);
+                    node = new ContainerAdapter(this, new ContainerWrapper(
+                        SessionManager.getAppService(), container));
                     addChild(node);
                 }
                 if (updateNode) {

@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.preferences.ConfigurationScope;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
@@ -62,8 +63,7 @@ public class LoginDialog extends TitleAreaDialog {
         servers = new ArrayList<String>();
         userNames = new ArrayList<String>();
 
-        Preferences prefs = new ConfigurationScope()
-            .getNode(Application.PLUGIN_ID);
+        Preferences prefs = new InstanceScope().getNode(Application.PLUGIN_ID);
         Preferences prefsServers = prefs.node(SAVED_SERVERS);
         Preferences prefsUserNames = prefs.node(SAVED_USER_NAMES);
 
@@ -163,7 +163,7 @@ public class LoginDialog extends TitleAreaDialog {
     protected void buttonPressed(int buttonId) {
         if ((buttonId == IDialogConstants.OK_ID)
             || (buttonId == IDialogConstants.CANCEL_ID)) {
-            Preferences prefs = new ConfigurationScope()
+            Preferences prefs = new InstanceScope()
                 .getNode(Application.PLUGIN_ID);
             prefs.put(LAST_SERVER, serverText.getText());
             prefs.put(LAST_USER_NAME, userNameText.getText());
