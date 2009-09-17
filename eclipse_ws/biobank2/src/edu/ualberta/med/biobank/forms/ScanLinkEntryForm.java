@@ -45,6 +45,7 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.LabelingScheme;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.forms.listener.EnterKeyToNextFieldListener;
 import edu.ualberta.med.biobank.model.PalletCell;
 import edu.ualberta.med.biobank.model.Patient;
@@ -109,9 +110,15 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
 
     private Label dateProcessedLabel;
 
+    private String palletNameContains;
+
     @Override
     protected void init() {
         setPartName("Scan Link");
+        IPreferenceStore store = BioBankPlugin.getDefault()
+            .getPreferenceStore();
+        palletNameContains = store
+            .getString(PreferenceConstants.PALLET_SCAN_CONTAINER_NAME_CONTAINS);
     }
 
     @Override
@@ -253,8 +260,9 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
         gd.horizontalSpan = 2;
         selectionComp.setLayoutData(gd);
 
-        List<SampleType> sampleTypes = appService.search(SampleType.class,
-            new SampleType());
+        List<SampleType> sampleTypes = SampleTypeWrapper
+            .getSampleTypeForContainerTypes(appService, SessionManager
+                .getInstance().getCurrentSite(), palletNameContains);
         createTypeSelectionPerRowComposite(selectionComp, sampleTypes);
         createTypeSelectionCustom(selectionComp, sampleTypes);
         radioRowSelection.setSelection(true);
