@@ -204,15 +204,17 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         dateDrawn = createDateTimeWidget(client, "Date Drawn",
             patientVisitWrapper.getDateDrawn(), false,
             "Date drawn should be set");
-        dateProcessed = createDateTimeWidget(client, "Date Processed",
-            patientVisitWrapper.getDateProcessed());
 
-        Date receivedDate = patientVisitWrapper.getDateReceived();
-        if (receivedDate == null) {
-            receivedDate = new Date();
+        Date processedDate = patientVisitWrapper.getDateProcessed();
+        if (processedDate == null) {
+            processedDate = new Date();
         }
+        dateProcessed = createDateTimeWidget(client, "Date Processed",
+            processedDate, false, "Date processed should be set");
+
         dateReceived = createDateTimeWidget(client, "Date Received",
-            receivedDate);
+            patientVisitWrapper.getDateReceived(), false,
+            "Date received should be set");
 
         createPvDataSection(client, patientWrapper.getStudy());
 
@@ -372,11 +374,6 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
             });
         }
         return widget;
-    }
-
-    private DateTimeWidget createDateTimeWidget(Composite client,
-        String nameLabel, Date date) {
-        return createDateTimeWidget(client, nameLabel, date, true, "");
     }
 
     private void createSourcesSection() {

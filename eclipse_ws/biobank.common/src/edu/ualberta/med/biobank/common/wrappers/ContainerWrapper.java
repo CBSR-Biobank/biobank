@@ -315,7 +315,7 @@ public class ContainerWrapper extends ModelWrapper<Container> {
      * type
      */
     public String getFullInfoLabel() {
-        if (getContainerType() == null) {
+        if (getContainerType() == null || getContainerType().getNameShort() == null) {
             return getLabel();
         }
         return getLabel() + "(" + getContainerType().getNameShort() + ")";

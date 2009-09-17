@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.views;
 
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -41,6 +42,8 @@ public class PatientAdministrationView extends ViewPart {
     private static AdapterBase noPatientFoundAdapter;
 
     public static PatientAdministrationView currentInstance;
+
+    private static PatientAdapter currentPatientAdapter = null;
 
     public PatientAdministrationView() {
         currentInstance = this;
@@ -104,11 +107,15 @@ public class PatientAdministrationView extends ViewPart {
         siteAdapter.addChild(studyAdapter);
         PatientAdapter patientAdapter = new PatientAdapter(studyAdapter,
             patientWrapper);
+        currentPatientAdapter = patientAdapter;
         studyAdapter.addChild(patientAdapter);
         patientAdapter.performExpand();
+        getSite().getSelectionProvider().setSelection(
+            new StructuredSelection(currentPatientAdapter));
     }
 
     private void notFoundPatient(String number) {
+        currentPatientAdapter = null;
         getRootNode().removeAll();
         getRootNode().addChild(getNoPatientFoundAdapter());
         boolean create = BioBankPlugin.openConfirm("Patient not found",
@@ -183,5 +190,9 @@ public class PatientAdministrationView extends ViewPart {
             };
         }
         return noPatientFoundAdapter;
+    }
+
+    public static PatientAdapter getCurrentPatientAdapter() {
+        return currentPatientAdapter;
     }
 }

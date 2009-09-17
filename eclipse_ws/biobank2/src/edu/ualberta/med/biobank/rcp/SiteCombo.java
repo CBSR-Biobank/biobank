@@ -25,7 +25,7 @@ import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 public class SiteCombo extends ControlContribution {
 
     private SessionAdapter session;
-    public ComboViewer combo;
+    public ComboViewer comboViewer;
 
     public SiteCombo() {
         super("Site Selection");
@@ -51,38 +51,37 @@ public class SiteCombo extends ControlContribution {
         resizedComboPanel.setLayout(layout);
         Label siteLabel = new Label(resizedComboPanel, SWT.NONE);
         siteLabel.setText("Working Site: ");
-        combo = new ComboViewer(resizedComboPanel, SWT.NONE | SWT.DROP_DOWN
-            | SWT.READ_ONLY);
+        comboViewer = new ComboViewer(resizedComboPanel, SWT.NONE
+            | SWT.DROP_DOWN | SWT.READ_ONLY);
 
-        combo.setContentProvider(new ArrayContentProvider());
-        combo.setLabelProvider(new BiobankLabelProvider());
+        comboViewer.setContentProvider(new ArrayContentProvider());
+        comboViewer.setLabelProvider(new BiobankLabelProvider());
 
-        combo.addSelectionChangedListener(new ISelectionChangedListener() {
-            @Override
-            public void selectionChanged(SelectionChangedEvent event) {
-                IStructuredSelection selection = (IStructuredSelection) event
-                    .getSelection();
-                Site site = (Site) selection.getFirstElement();
+        comboViewer
+            .addSelectionChangedListener(new ISelectionChangedListener() {
+                @Override
+                public void selectionChanged(SelectionChangedEvent event) {
+                    IStructuredSelection selection = (IStructuredSelection) event
+                        .getSelection();
+                    Site site = (Site) selection.getFirstElement();
 
-                if (site != null) {
-                    if (site.getId() == null)
-                        SessionManager.getInstance().setCurrentSite(null);
-                    else
-                        SessionManager.getInstance().setCurrentSite(site);
-                    if (session != null)
-                        session.rebuild();
+                    if (site != null) {
+                        if (site.getId() == null)
+                            SessionManager.getInstance().setCurrentSite(null);
+                        else
+                            SessionManager.getInstance().setCurrentSite(site);
+                        if (session != null)
+                            session.rebuild();
+                    }
                 }
-            }
-        });
-        combo.setComparer(new IElementComparer() {
+            });
+        comboViewer.setComparer(new IElementComparer() {
             @Override
             public boolean equals(Object a, Object b) {
                 if (a instanceof Site && b instanceof Site) {
                     Integer ida = ((Site) a).getId();
                     Integer idb = ((Site) b).getId();
-                    if (ida == null && idb == null)
-                        return true;
-                    else if (ida.equals(idb))
+                    if (((ida == null) && (idb == null)) || ida.equals(idb))
                         return true;
                 }
                 return false;
@@ -94,22 +93,22 @@ public class SiteCombo extends ControlContribution {
             }
 
         });
-        combo.setComparator(new ViewerComparator());
+        comboViewer.setComparator(new ViewerComparator());
         GridData gd = new GridData();
         gd.widthHint = 155;
-        Combo realCombo = combo.getCombo();
-        realCombo.setLayoutData(gd);
-        realCombo.setTextLimit(50);
+        Combo combo = comboViewer.getCombo();
+        combo.setLayoutData(gd);
+        combo.setTextLimit(50);
 
         return resizedComboPanel;
     }
 
-    public void setEnabled(boolean b) {
-
+    public void setEnabled(boolean enabled) {
+        comboViewer.getCombo().setEnabled(enabled);
     }
 
     public void setSelection(Site site) {
-        combo.setSelection(new StructuredSelection(site));
+        comboViewer.setSelection(new StructuredSelection(site));
     }
 
 }
