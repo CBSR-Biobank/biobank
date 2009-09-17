@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
@@ -151,14 +152,30 @@ public class ContainerWrapper extends ModelWrapper<Container> {
         List<Container> newParentContainers = getContainersWithLabelInSite(appService, getSite(), newParentContainerLabel);
         String oldLabel=getLabel();
         
-        if (newParentContainers.size()!=1) {
+        //remove unsuitable parents
+        List<Container> removeList = new ArrayList<Container>();
+        for (Container c: newParentContainers) {
+            Collection<ContainerType> childTypes = c.getContainerType().getChildContainerTypeCollection();
+            for (ContainerType ct: childTypes) {
+            if (!ct.getId().equals(this.getContainerType().getId())) removeList.add(c);
+            }
+        }
+        newParentContainers.remove(removeList);
+       
+        if (newParentContainers.size()<1) {
             //invalid parent
             throw new Exception("Unable to find parent container with label "
                 + newParentContainerLabel + ".");
         }
         else {
             List<Container> samePositions = getContainersWithLabelInSite(appService, getSite(), newAddress);
-            if (samePositions.size()!=0) {
+            //remove unsuitable positions
+            List<Container> removeList = new ArrayList<Container>();
+            for (Container c: samePositions) {
+                if (!c.getContainerType().getId().equals(this.getContainerType().getId())) removeList.add(c);
+            }
+            samePositions.remove(removeList);
+            if (samePositions.size()>0) {
                 //filled
                 throw new Exception("The destination " + newAddress + " has already been initialized. You can only move to an uninitialized location.");
             }
