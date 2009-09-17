@@ -7,7 +7,7 @@ import java.util.concurrent.Semaphore;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.core.runtime.preferences.ConfigurationScope;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -131,9 +131,8 @@ public class SessionManager {
             userName);
         rootNode.addChild(sessionAdapter);
         Collections.sort(sites, new SiteComparator());
-        Preferences prefs = new ConfigurationScope()
-            .getNode(Application.PLUGIN_ID);
-        Preferences lastSite = prefs.node(LAST_SITE);
+        Preferences prefs = new InstanceScope().getNode(Application.PLUGIN_ID);
+        Preferences lastSite = prefs.node("Site");
         String siteId = lastSite.get(LAST_SITE, "-1");
         if (siteId.equalsIgnoreCase("-1"))
             currentSite = null;
@@ -263,9 +262,8 @@ public class SessionManager {
         String saveVal = "-1";
         if (site != null && site.getId() != null)
             saveVal = site.getId().toString();
-        Preferences prefs = new ConfigurationScope()
-            .getNode(Application.PLUGIN_ID);
-        prefs.node(LAST_SITE).put(LAST_SITE, saveVal);
+        Preferences prefs = new InstanceScope().getNode(Application.PLUGIN_ID);
+        prefs.node("Site").put(LAST_SITE, saveVal);
 
         try {
             prefs.flush();
