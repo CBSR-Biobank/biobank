@@ -7,6 +7,7 @@ import java.util.concurrent.Semaphore;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.preferences.ConfigurationScope;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -18,9 +19,12 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.services.ISourceProviderService;
+import org.osgi.service.prefs.BackingStoreException;
+import org.osgi.service.prefs.Preferences;
 
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.SiteComparator;
+import edu.ualberta.med.biobank.rcp.Application;
 import edu.ualberta.med.biobank.rcp.SiteCombo;
 import edu.ualberta.med.biobank.sourceproviders.DebugState;
 import edu.ualberta.med.biobank.sourceproviders.SessionState;
@@ -55,6 +59,8 @@ public class SessionManager {
     private SiteCombo siteCombo;
 
     private List<Site> currentSites;
+
+    private static final String LAST_SITE = "lastSite";
 
     final Runnable timeoutRunnable = new Runnable() {
         public void run() {
@@ -100,6 +106,7 @@ public class SessionManager {
         super();
         rootNode = new RootNode();
         currentSites = new ArrayList<Site>();
+
     }
 
     public static SessionManager getInstance() {
@@ -124,6 +131,26 @@ public class SessionManager {
             userName);
         rootNode.addChild(sessionAdapter);
         Collections.sort(sites, new SiteComparator());
+        Preferences prefs = new ConfigurationScope()
+            .getNode(Application.PLUGIN_ID);
+        Preferences lastSite = prefs.node(LAST_SITE);
+        String siteId = lastSite.get(LAST_SITE, "-1");
+        if (siteId.equalsIgnoreCase("-1"))
+            currentSite = null;
+        else
+            try {
+                Site searchSite = new Site();
+                searchSite.setId(Integer.valueOf(siteId));
+                List<Site> query = getAppService().search(Site.class,
+                    searchSite);
+                if (query.size() == 1)
+                    currentSite = query.get(0);
+                else
+                    currentSite = null;
+            } catch (ApplicationException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
         updateSites();
         sessionAdapter.loadChildren(true);
         siteCombo.setSession(sessionAdapter);
@@ -233,6 +260,18 @@ public class SessionManager {
 
     public void setCurrentSite(Site site) {
         currentSite = site;
+        String saveVal = "-1";
+        if (site != null && site.getId() != null)
+            saveVal = site.getId().toString();
+        Preferences prefs = new ConfigurationScope()
+            .getNode(Application.PLUGIN_ID);
+        prefs.node(LAST_SITE).put(LAST_SITE, saveVal);
+
+        try {
+            prefs.flush();
+        } catch (BackingStoreException e) {
+            getLogger().error("Could not save site preferences", e);
+        }
         IWorkbenchWindow window = PlatformUI.getWorkbench()
             .getActiveWorkbenchWindow();
         ISourceProviderService service = (ISourceProviderService) window

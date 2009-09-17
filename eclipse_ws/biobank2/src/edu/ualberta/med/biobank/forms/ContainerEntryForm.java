@@ -269,7 +269,7 @@ public class ContainerEntryForm extends BiobankEntryForm {
     // }
 
     private boolean checkContainerUnique() throws Exception {
-        // FIXME set contraint directly into the model ?
+        // FIXME set constraint directly into the model ?
         HQLCriteria c;
         if (position == null) {
             ContainerType containerType = (ContainerType) ((StructuredSelection) containerTypeComboViewer
