@@ -142,7 +142,7 @@ public class SampleWrapper extends ModelWrapper<Sample> {
         propertyChangeSupport.firePropertyChange("sampleType", oldType, type);
     }
 
-    private SampleType getSampleType() {
+    public SampleType getSampleType() {
         return wrappedObject.getSampleType();
     }
 

@@ -251,6 +251,8 @@ public class BiobankLabelProvider extends LabelProvider implements
             return ((ContainerLabelingScheme) element).getName();
         } else if (element instanceof Site) {
             return ((Site) element).getName();
+        } else if (element instanceof SampleType) {
+            return ((SampleType) element).getName();
         }
         return ((AdapterBase) element).getName();
     }

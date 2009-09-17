@@ -50,13 +50,24 @@ public class SiteUtils {
         return null;
     }
 
+    /**
+     * Get containers types defined in a site. if useStrictName is true, then
+     * the container type name should be exactly containerName, otherwise, it
+     * will contains containerName.
+     */
     public static List<ContainerType> getContainerTypesInSite(
-        WritableApplicationService appService, Site site, String nameStartWith)
-        throws ApplicationException {
-        HQLCriteria criteria = new HQLCriteria(
-            "from " + ContainerType.class.getName()
-                + " where name like ? and site = ?", Arrays
-                .asList(new Object[] { nameStartWith + "%", site }));
+        WritableApplicationService appService, Site site, String containerName,
+        boolean useStrictName) throws ApplicationException {
+        String nameComparison = "=";
+        String containerNameParameter = containerName;
+        if (!useStrictName) {
+            nameComparison = "like";
+            containerNameParameter = "%" + containerName + "%";
+        }
+        String query = "from " + ContainerType.class.getName()
+            + " where site = ? and name " + nameComparison + " ?";
+        HQLCriteria criteria = new HQLCriteria(query, Arrays
+            .asList(new Object[] { site, containerNameParameter }));
         return appService.query(criteria);
     }
 

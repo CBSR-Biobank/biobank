@@ -1,5 +1,9 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 import edu.ualberta.med.biobank.common.DatabaseResult;
 import edu.ualberta.med.biobank.model.ContainerType;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -29,4 +33,17 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
         return ContainerType.class;
     }
 
+    public Collection<ContainerType> getChildContainerTypeCollection() {
+        return wrappedObject.getChildContainerTypeCollection();
+    }
+
+    public Collection<ContainerType> getAllChildren() {
+        List<ContainerType> allChildren = new ArrayList<ContainerType>();
+        for (ContainerType type : getChildContainerTypeCollection()) {
+            allChildren.addAll(new ContainerTypeWrapper(appService, type)
+                .getAllChildren());
+            allChildren.add(type);
+        }
+        return allChildren;
+    }
 }

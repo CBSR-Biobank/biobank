@@ -246,16 +246,20 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
         return layout;
     }
 
+    /**
+     * If can't know which pallet type we need, add a combo
+     */
     private void createContainerTypeSection(Composite parent) throws Exception {
         List<ContainerType> palletContainerTypes = SiteUtils
             .getContainerTypesInSite(appService,
-                currentPalletWrapper.getSite(), "Pallet");
-        if (palletContainerTypes.size() == 0) {
-            BioBankPlugin.openError("No Pallet defined ?",
-                "No container type found with name starting with Pallet...");
-        } else if (palletContainerTypes.size() == 1) {
+                currentPalletWrapper.getSite(), "pallet", false);
+        if (palletContainerTypes.size() == 1) {
             currentPalletWrapper.setContainerType(palletContainerTypes.get(0));
         } else {
+            if (palletContainerTypes.size() == 0) {
+                BioBankPlugin.openError("No Pallet defined ?",
+                    "No container type found with name containing Pallet...");
+            }
             palletTypesViewer = createCComboViewerWithNoSelectionValidator(
                 parent, "Pallet Container Type", palletContainerTypes, null,
                 "A pallet type should be selected");
@@ -502,7 +506,7 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
     }
 
     /**
-     * From the pallet product barcode, get existing information form database
+     * From the pallet product barcode, get existing information from database
      */
     private boolean checkPallet() throws Exception {
         currentPalletSamples = null;
@@ -524,7 +528,7 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
             if (palletFound.getLabel().equals(currentPalletWrapper.getLabel())) {
                 // in this case, the position already contains the same pallet.
                 // Don't need to check it
-                // need to use the container object retrieve from the
+                // need to use the container object retrieved from the
                 // database !
                 currentPalletWrapper.setWrappedObject(palletFound);
                 needToCheckPosition = false;
@@ -537,7 +541,7 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
                         + ". Do you want to move it to new position "
                         + currentPalletWrapper.getLabel() + "?");
                 if (pursue) {
-                    // need to use the container object retrieve from the
+                    // need to use the container object retrieved from the
                     // database !
                     palletFound.setLabel(currentPalletWrapper.getLabel());
                     currentPalletWrapper.setWrappedObject(palletFound);
@@ -573,16 +577,15 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
      * @return true if was able to create the ContainerPosition
      */
     private boolean checkAndSetPosition() throws Exception {
-        // TODO if moving, use the existing position ?
-        Container containerAtPosition = ContainerWrapper
-            .getContainerWithTypeAndLabelInSite(appService,
-                currentPalletWrapper.getSite(),
-                currentPalletWrapper.getLabel(), "Pallet");
+        // TODO if moving, use the existing position and modify it instead of
+        // create a new one (and the old one is probably not deleted) ?
+        Container containerAtPosition = currentPalletWrapper.getContainer(
+            currentPalletWrapper.getLabel(), currentPalletWrapper
+                .getContainerType());
         if (containerAtPosition == null) {
-            currentPalletWrapper.setNewPositionFromLabel("Freezer");
+            currentPalletWrapper.computePositionFromLabel();
             return true;
         } else {
-            // 
             BioBankPlugin.openError("Position error",
                 "There is already a different pallet (product barcode = "
                     + containerAtPosition.getProductBarcode()

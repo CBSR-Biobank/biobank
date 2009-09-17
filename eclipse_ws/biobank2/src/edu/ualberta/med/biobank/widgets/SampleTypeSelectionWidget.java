@@ -71,7 +71,7 @@ public class SampleTypeSelectionWidget {
     }
 
     private void createCombo(Composite parent, List<SampleType> types) {
-        combo = new CCombo(parent, SWT.DROP_DOWN | SWT.READ_ONLY);
+        combo = new CCombo(parent, SWT.DROP_DOWN | SWT.READ_ONLY | SWT.BORDER);
         combo.setLayoutData(new GridData(SWT.LEFT, SWT.TOP, true, false));
 
         cv = new ComboViewer(combo);
