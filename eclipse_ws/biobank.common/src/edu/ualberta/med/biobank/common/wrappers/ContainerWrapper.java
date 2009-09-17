@@ -25,7 +25,6 @@ public class ContainerWrapper extends ModelWrapper<Container> {
     public ContainerWrapper(WritableApplicationService appService,
         Container wrappedObject) {
         super(appService, wrappedObject);
-
     }
 
     @Override
@@ -72,8 +71,8 @@ public class ContainerWrapper extends ModelWrapper<Container> {
      * @param containerType the type of the container
      * @throws ApplicationException
      */
-    public Container getContainer(String label,
-        ContainerType containerType) throws ApplicationException {
+    public Container getContainer(String label, ContainerType containerType)
+        throws ApplicationException {
         HQLCriteria criteria = new HQLCriteria("from "
             + Container.class.getName()
             + " where site = ? and label = ? and containerType = ?", Arrays
@@ -173,8 +172,8 @@ public class ContainerWrapper extends ModelWrapper<Container> {
         String newParentContainerLabel = newAddress.substring(0, newAddress
             .length() - 2);
 
-        List<Container> newParentContainers = getContainersInSite(
-            appService, getSite(), newParentContainerLabel);
+        List<Container> newParentContainers = getContainersInSite(appService,
+            getSite(), newParentContainerLabel);
         String oldLabel = getLabel();
 
         if (newParentContainers.size() != 1) {
@@ -182,8 +181,8 @@ public class ContainerWrapper extends ModelWrapper<Container> {
             throw new Exception("Unable to find parent container with label "
                 + newParentContainerLabel + ".");
         } else {
-            List<Container> samePositions = getContainersInSite(
-                appService, getSite(), newAddress);
+            List<Container> samePositions = getContainersInSite(appService,
+                getSite(), newAddress);
             if (samePositions.size() != 0) {
                 // filled
                 throw new Exception(

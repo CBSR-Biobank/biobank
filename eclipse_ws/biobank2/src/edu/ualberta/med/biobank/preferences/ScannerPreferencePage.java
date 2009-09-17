@@ -22,9 +22,10 @@ public class ScannerPreferencePage extends FieldEditorPreferencePage implements
      */
     @Override
     public void createFieldEditors() {
-        for (int i = 1; i <= PreferenceConstants.SCANNER_PLATE_NUMBER; i++) {
-            addField(new StringFieldEditor(PreferenceConstants.SCANNER_PLATE
-                + i, "Plate " + i + " barcode", getFieldEditorParent()));
+        for (int i = 0; i < PreferenceConstants.SCANNER_PLATE_BARCODES.length; i++) {
+            addField(new StringFieldEditor(
+                PreferenceConstants.SCANNER_PLATE_BARCODES[i], "Plate "
+                    + (i + 1) + " barcode", getFieldEditorParent()));
         }
     }
 
