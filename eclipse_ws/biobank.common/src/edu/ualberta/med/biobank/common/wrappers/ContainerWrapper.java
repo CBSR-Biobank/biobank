@@ -11,6 +11,7 @@ import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.ContainerType;
+import edu.ualberta.med.biobank.model.Sample;
 import edu.ualberta.med.biobank.model.SamplePosition;
 import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.model.Site;
@@ -72,8 +73,8 @@ public class ContainerWrapper extends ModelWrapper<Container> {
      * @param containerType the type of the container
      * @throws ApplicationException
      */
-    public Container getContainer(String label,
-        ContainerType containerType) throws ApplicationException {
+    public Container getContainer(String label, ContainerType containerType)
+        throws ApplicationException {
         HQLCriteria criteria = new HQLCriteria("from "
             + Container.class.getName()
             + " where site = ? and label = ? and containerType = ?", Arrays
@@ -173,8 +174,8 @@ public class ContainerWrapper extends ModelWrapper<Container> {
         String newParentContainerLabel = newAddress.substring(0, newAddress
             .length() - 2);
 
-        List<Container> newParentContainers = getContainersInSite(
-            appService, getSite(), newParentContainerLabel);
+        List<Container> newParentContainers = getContainersInSite(appService,
+            getSite(), newParentContainerLabel);
         String oldLabel = getLabel();
 
         if (newParentContainers.size() != 1) {
@@ -182,8 +183,8 @@ public class ContainerWrapper extends ModelWrapper<Container> {
             throw new Exception("Unable to find parent container with label "
                 + newParentContainerLabel + ".");
         } else {
-            List<Container> samePositions = getContainersInSite(
-                appService, getSite(), newAddress);
+            List<Container> samePositions = getContainersInSite(appService,
+                getSite(), newAddress);
             if (samePositions.size() != 0) {
                 // filled
                 throw new Exception(
@@ -427,4 +428,14 @@ public class ContainerWrapper extends ModelWrapper<Container> {
         return getWrappedObject().getChildPositionCollection();
     }
 
+    public boolean canHold(Sample sample) throws ApplicationException {
+        SampleType type = sample.getSampleType();
+        HQLCriteria criteria = new HQLCriteria("select sampleType from "
+            + ContainerType.class.getName()
+            + " as ct inner join ct.sampleTypeCollection as sampleType"
+            + " where ct = ? and sampleType = ?", Arrays.asList(new Object[] {
+            getContainerType(), type }));
+        List<SampleType> types = appService.query(criteria);
+        return types.size() == 1;
+    }
 }
