@@ -225,8 +225,10 @@ public class ContainerAdapter extends AdapterBase {
     protected boolean integrityCheck() {
         ContainerWrapper c = getContainer();
         if (c != null)
-            if ((c.getContainerType() != null && c.getContainerType()
-                .getCapacity() != null)
+            if ((c.getContainerType() != null
+                && c.getContainerType().getCapacity() != null
+                && c.getContainerType().getCapacity().getRowCapacity() != null && c
+                .getContainerType().getCapacity().getColCapacity() != null)
                 || c.getContainerType() == null)
                 if ((c.getPosition() != null
                     && c.getPosition().getRow() != null && c.getPosition()
