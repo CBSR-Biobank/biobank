@@ -26,7 +26,6 @@ public class ContainerWrapper extends ModelWrapper<Container> {
     public ContainerWrapper(WritableApplicationService appService,
         Container wrappedObject) {
         super(appService, wrappedObject);
-
     }
 
     @Override

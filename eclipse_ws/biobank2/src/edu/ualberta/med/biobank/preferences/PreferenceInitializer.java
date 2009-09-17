@@ -18,10 +18,6 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
         store.setDefault(PreferenceConstants.GENERAL_CANCEL, "CANCEL");
         store.setDefault(PreferenceConstants.GENERAL_ASK_PRINT, true);
         store.setDefault(PreferenceConstants.GENERAL_TIME_OUT, 10);
-        for (int i = 1; i <= PreferenceConstants.SCANNER_PLATE_NUMBER; i++) {
-            store
-                .setDefault(PreferenceConstants.SCANNER_PLATE + i, "PLATE" + i);
-        }
         store.setDefault(PreferenceConstants.SCANNER_DPI, 300);
         store.setDefault(PreferenceConstants.SCAN_LINK_ROW_SELECT_ONLY, true);
         store.setDefault(
@@ -29,5 +25,9 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
         store.setDefault(PreferenceConstants.CABINET_CONTAINER_NAME_CONTAINS,
             "cabinet");
 
+        for (int i = 0; i < PreferenceConstants.SCANNER_PLATE_BARCODES.length; i++) {
+            store.setDefault(PreferenceConstants.SCANNER_PLATE_BARCODES[i],
+                "PLATE" + (i + 1));
+        }
     }
 }

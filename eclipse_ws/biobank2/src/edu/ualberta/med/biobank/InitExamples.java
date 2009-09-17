@@ -136,11 +136,13 @@ public class InitExamples {
                 return Status.OK_STATUS;
             }
         };
+
         job.addJobChangeListener(new JobChangeAdapter() {
             @Override
             public void done(final IJobChangeEvent event) {
                 Display.getDefault().asyncExec(new Runnable() {
                     public void run() {
+                        SessionManager.getInstance().updateSites();
                         SessionManager.getInstance().getSession()
                             .performExpand();
                         if (event.getResult().isOK()) {
