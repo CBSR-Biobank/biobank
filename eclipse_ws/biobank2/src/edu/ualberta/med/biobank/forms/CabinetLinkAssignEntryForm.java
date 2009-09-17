@@ -1,17 +1,22 @@
 package edu.ualberta.med.biobank.forms;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 
 import org.eclipse.core.databinding.beans.PojoObservables;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.observable.value.WritableValue;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.dialogs.IMessageProvider;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ComboViewer;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.LabelProvider;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.custom.CCombo;
@@ -25,7 +30,6 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
@@ -39,14 +43,15 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.DatabaseResult;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
 import edu.ualberta.med.biobank.forms.listener.EnterKeyToNextFieldListener;
 import edu.ualberta.med.biobank.model.Container;
-import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.Sample;
 import edu.ualberta.med.biobank.model.SampleType;
+import edu.ualberta.med.biobank.preferences.PreferenceConstants;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
 import edu.ualberta.med.biobank.widgets.CabinetDrawerWidget;
 import edu.ualberta.med.biobank.widgets.CancelConfirmWidget;
@@ -89,12 +94,18 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
     private Container drawer;
     private Container bin;
 
+    private String cabinetNameContains = "";
+
     private static final String CHECK_CLICK_MESSAGE = "Click on check";
 
     @Override
     protected void init() {
         setPartName("Cabinet Link/Assign");
         sampleWrapper = new SampleWrapper(appService, new Sample());
+        IPreferenceStore store = BioBankPlugin.getDefault()
+            .getPreferenceStore();
+        cabinetNameContains = store
+            .getString(PreferenceConstants.CABINET_CONTAINER_NAME_CONTAINS);
     }
 
     @Override
@@ -190,6 +201,8 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
             }
         });
 
+        createTypeCombo(fieldsComposite);
+
         checkPositionButton = toolkit.createButton(fieldsComposite, "Check",
             SWT.PUSH);
         gd = new GridData();
@@ -202,21 +215,35 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
             }
         });
 
-        Combo comboSampleType = (Combo) createBoundWidgetWithLabel(
-            fieldsComposite, Combo.class, SWT.NONE, "Sample type",
-            new String[0], selectedSampleTypeValue, null,
+    }
+
+    private void createTypeCombo(Composite fieldsComposite) {
+        List<SampleType> sampleTypes;
+        try {
+            sampleTypes = SampleTypeWrapper.getSampleTypeForContainerTypes(
+                appService, SessionManager.getInstance().getCurrentSite(),
+                cabinetNameContains);
+        } catch (ApplicationException e) {
+            BioBankPlugin.openError("Initialisation failed", e);
+            sampleTypes = new ArrayList<SampleType>();
+        }
+        comboViewerSampleTypes = createCComboViewerWithNoSelectionValidator(
+            fieldsComposite, "Sample type", sampleTypes, null,
             "A sample type should be selected");
-        // FIXME the Validator should be there after the show position is set !
-        // FIXME change place of this combo ?
-        comboViewerSampleTypes = new ComboViewer(comboSampleType);
-        comboViewerSampleTypes.setContentProvider(new ArrayContentProvider());
-        comboViewerSampleTypes.setLabelProvider(new LabelProvider() {
-            @Override
-            public String getText(Object element) {
-                SampleType st = (SampleType) element;
-                return st.getName();
-            }
-        });
+        comboViewerSampleTypes
+            .addSelectionChangedListener(new ISelectionChangedListener() {
+                @Override
+                public void selectionChanged(SelectionChangedEvent event) {
+                    IStructuredSelection stSelection = (IStructuredSelection) comboViewerSampleTypes
+                        .getSelection();
+                    sampleWrapper.setSampleType((SampleType) stSelection
+                        .getFirstElement());
+                }
+            });
+        if (sampleTypes.size() == 1) {
+            comboViewerSampleTypes.getCCombo().select(0);
+            sampleWrapper.setSampleType(sampleTypes.get(0));
+        }
     }
 
     private void createVisitCombo(Composite client) {
@@ -325,35 +352,38 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
         cabinetLabel.setText("Cabinet " + cabinet.getLabel());
         drawerWidget.setSelectedBin(bin.getPosition().getRow());
         drawerLabel.setText("Drawer " + drawer.getLabel());
-
-        Collection<SampleType> sampleTypes = null;
-        ContainerType parentContainerType = sampleWrapper.getSamplePosition()
-            .getContainer().getContainerType();
-        sampleTypes = parentContainerType.getSampleTypeCollection();
-        if (sampleTypes == null || sampleTypes.size() == 0) {
-            BioBankPlugin.openAsyncError("Cabinet error",
-                "Cannot find a sample types!");
-            form.setEnabled(false);
-        }
-        comboViewerSampleTypes.setInput(sampleTypes);
-        if (sampleTypes.size() == 1) {
-            comboViewerSampleTypes.getCombo().select(0);
-        }
         form.layout(true, true);
     }
 
     protected void initParentContainersFromPosition(String positionString)
         throws Exception {
         String binLabel = positionString.substring(0, 6);
-        bin = ContainerWrapper.getContainerWithTypeAndLabelInSite(appService,
-            SessionManager.getInstance().getCurrentSite(), binLabel, "Bin");
-        if (bin == null) {
-            BioBankPlugin.openError("Check position and sample",
-                "Can't find bin labelled " + binLabel);
+
+        List<Container> containers = ContainerWrapper
+            .getContainersHoldingSampleType(appService, SessionManager
+                .getInstance().getCurrentSite(), binLabel, sampleWrapper
+                .getSampleType());
+        if (containers.size() == 1) {
+            bin = containers.get(0);
+            drawer = bin.getPosition().getParentContainer();
+            cabinet = drawer.getPosition().getParentContainer();
+        } else if (containers.size() == 0) {
+            containers = ContainerWrapper.getContainersInSite(
+                appService, SessionManager.getInstance().getCurrentSite(),
+                binLabel);
+            if (containers.size() > 0) {
+                BioBankPlugin.openError("Check position and sample",
+                    "Bin labelled " + binLabel
+                        + " cannont hold samples of type "
+                        + sampleWrapper.getSampleType().getName());
+            } else {
+                BioBankPlugin.openError("Check position and sample",
+                    "Can't find bin labelled " + binLabel);
+            }
             return;
+        } else {
+            throw new Exception("should do something");
         }
-        drawer = bin.getPosition().getParentContainer();
-        cabinet = drawer.getPosition().getParentContainer();
     }
 
     @Override
@@ -372,9 +402,6 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
 
     @Override
     protected void saveForm() throws Exception {
-        IStructuredSelection stSelection = (IStructuredSelection) comboViewerSampleTypes
-            .getSelection();
-        sampleWrapper.setSampleType((SampleType) stSelection.getFirstElement());
         sampleWrapper.setLinkDate(new Date());
         DatabaseResult res = sampleWrapper.persist();
         if (res != DatabaseResult.OK) {

@@ -50,16 +50,6 @@ public class SiteUtils {
         return null;
     }
 
-    public static List<ContainerType> getContainerTypesInSite(
-        WritableApplicationService appService, Site site, String nameStartWith)
-        throws ApplicationException {
-        HQLCriteria criteria = new HQLCriteria(
-            "from " + ContainerType.class.getName()
-                + " where name like ? and site = ?", Arrays
-                .asList(new Object[] { nameStartWith + "%", site }));
-        return appService.query(criteria);
-    }
-
     public static Collection<ContainerType> getTopContainerTypesInSite(
         WritableApplicationService appService, Site site) {
         HQLCriteria criteria = new HQLCriteria("from "

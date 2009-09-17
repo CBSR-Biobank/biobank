@@ -17,8 +17,10 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
+import org.springframework.util.Assert;
 
 import edu.ualberta.med.biobank.preferences.PreferenceConstants;
+import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -217,13 +219,13 @@ public class BioBankPlugin extends AbstractUIPlugin {
     }
 
     public int getPlateNumber(String barcode) {
-        for (int i = 1; i <= PreferenceConstants.SCANNER_PLATE_NUMBER; i++) {
+        for (int i = 0; i < PreferenceConstants.SCANNER_PLATE_BARCODES.length; i++) {
+            if (!ScannerConfigPlugin.getDefault().palletEnabled(i))
+                continue;
+
             String pref = getPreferenceStore().getString(
-                PreferenceConstants.SCANNER_PLATE + i);
-            if (pref.isEmpty()) {
-                // should no be empty
-                return -1;
-            }
+                PreferenceConstants.SCANNER_PLATE_BARCODES[i]);
+            Assert.isTrue(!pref.isEmpty(), "preference not assigned");
             if (pref.equals(barcode)) {
                 return i;
             }

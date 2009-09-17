@@ -12,9 +12,12 @@ import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.SamplePosition;
+import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.model.Site;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
+import gov.nih.nci.system.query.SDKQuery;
+import gov.nih.nci.system.query.example.UpdateExampleQuery;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class ContainerWrapper extends ModelWrapper<Container> {
@@ -22,7 +25,6 @@ public class ContainerWrapper extends ModelWrapper<Container> {
     public ContainerWrapper(WritableApplicationService appService,
         Container wrappedObject) {
         super(appService, wrappedObject);
-        
     }
 
     @Override
@@ -62,49 +64,7 @@ public class ContainerWrapper extends ModelWrapper<Container> {
     }
 
     /**
-     * Get one container with given label. If several containers exist with this
-     * label, search for the one with type starting with startWithTypeName.
-     * 
-     * @throws Exception
-     */
-    public static Container getContainerWithTypeAndLabelInSite(
-        WritableApplicationService appService, Site site, String label,
-        String startWithTypeName) throws Exception {
-        List<Container> containers = getContainersWithLabelInSite(appService,
-            site, label);
-        if (containers.size() == 1) {
-            return containers.get(0);
-        } else {
-            // this is start of the container type name
-            if (startWithTypeName != null) {
-                HQLCriteria criteria = new HQLCriteria(
-                    "from "
-                        + Container.class.getName()
-                        + " where site = ? and label = ? and containerType in (select type from "
-                        + ContainerType.class.getName()
-                        + " as type where name like ? and site = ?)", Arrays
-                        .asList(new Object[] { site, label,
-                            startWithTypeName + "%", site }));
-
-                containers = appService.query(criteria);
-                if (containers.size() == 1) {
-                    return containers.get(0);
-                } else {
-                    if (containers.size() > 1) {
-                        throw new Exception(
-                            "Multiples containers registered in position "
-                                + label
-                                + " for container types name starting with "
-                                + startWithTypeName);
-                    }
-                }
-            }
-        }
-        return null;
-    }
-
-    /**
-     * get the container with label label and type container type and form same
+     * get the container with label label and type container type and from same
      * site that this containerWrapper
      * 
      * @param label label of the container
@@ -114,18 +74,85 @@ public class ContainerWrapper extends ModelWrapper<Container> {
     public Container getContainer(String label, ContainerType containerType)
         throws ApplicationException {
         HQLCriteria criteria = new HQLCriteria("from "
-            + Container.class.getName()
+                        + Container.class.getName()
             + " where site = ? and label = ? and containerType = ?", Arrays
             .asList(new Object[] { getSite(), label, containerType }));
-
         List<Container> containers = appService.query(criteria);
-        if (containers.size() == 1) {
-            return containers.get(0);
+                if (containers.size() == 1) {
+                    return containers.get(0);
         }
         return null;
     }
 
-    public static List<Container> getContainersWithLabelInSite(
+    /**
+     * get the containers with label label and from same site that this
+     * containerWrapper
+     * 
+     * @param label label of the container
+     * @throws ApplicationException
+     */
+    public List<Container> getContainers(String label)
+        throws ApplicationException {
+        HQLCriteria criteria = new HQLCriteria("from "
+            + Container.class.getName() + " where site = ? and label = ?",
+            Arrays.asList(new Object[] { getSite(), label }));
+        return appService.query(criteria);
+    }
+
+    /**
+     * get the containers with label label, with site site and container type
+     * type
+     */
+    public static List<Container> getContainersHoldingContainerType(
+        WritableApplicationService appService, String label, Site site,
+        ContainerType type) throws ApplicationException {
+        HQLCriteria criteria = new HQLCriteria(
+            "from "
+            + Container.class.getName()
+                + " where site = ? and label = ? and containerType in (select parent from "
+                + ContainerType.class.getName()
+                + " as parent where parent.id in (select ct.id" + " from "
+                + ContainerType.class.getName() + " as ct"
+                + " left join ct.childContainerTypeCollection as child "
+                + " where child = ?))", Arrays.asList(new Object[] { site,
+                label, type }));
+        return appService.query(criteria);
+    }
+
+    /**
+     * get the containers with label label and from same site that this
+     * containerWrapper and holding this container type
+     * 
+     * @param label label of the container
+     * @throws ApplicationException
+     */
+    public List<Container> getContainersHoldingContainerType(String label)
+        throws ApplicationException {
+        return getContainersHoldingContainerType(appService, label, getSite(),
+            getContainerType());
+        }
+
+    /**
+     * get the containers with label label and from same site that this
+     * containerWrapper and holding sample type
+     */
+    public static List<Container> getContainersHoldingSampleType(
+        WritableApplicationService appService, Site site, String label,
+        SampleType sampleType) throws ApplicationException {
+        HQLCriteria criteria = new HQLCriteria(
+            "from "
+                + Container.class.getName()
+                + " where site = ? and label = ? and containerType in (select parent from "
+                + ContainerType.class.getName()
+                + " as parent where parent.id in (select ct.id" + " from "
+                + ContainerType.class.getName() + " as ct"
+                + " left join ct.sampleTypeCollection as sampleType "
+                + " where sampleType = ?))", Arrays.asList(new Object[] { site,
+                label, sampleType }));
+        return appService.query(criteria);
+    }
+
+    public static List<Container> getContainersInSite(
         WritableApplicationService appService, Site site, String label)
         throws ApplicationException {
         HQLCriteria criteria = new HQLCriteria("from "
@@ -134,6 +161,42 @@ public class ContainerWrapper extends ModelWrapper<Container> {
         return appService.query(criteria);
     }
 
+    /**
+     * compute the ContainerPosition for this container using its label. If the
+     * parent container cannot hold the container type of this container, then
+     * an exception is launched
+     */
+    public void computePositionFromLabel() throws Exception {
+        String parentContainerLabel = getLabel().substring(0,
+            getLabel().length() - 2);
+        List<Container> containersWithLabel = getContainersHoldingContainerType(parentContainerLabel);
+        if (containersWithLabel.size() == 0) {
+            throw new Exception("Can't find container with label "
+                + parentContainerLabel + " holding containers of type "
+                + getContainerType().getName());
+        }
+        if (containersWithLabel.size() > 1) {
+            throw new Exception(
+                containersWithLabel.size()
+                    + " containers with label "
+                    + parentContainerLabel
+                    + " and holding container types "
+                    + getContainerType().getName()
+                    + " have been found. This is ambiguous: check containers definitions.");
+        }
+        // has the parent container. Can now find the position using the
+        // parent labelling scheme
+        ContainerPosition position = getPosition();
+        if (position == null) {
+            position = new ContainerPosition();
+        }
+        ContainerPositionWrapper positionWrapper = new ContainerPositionWrapper(
+            appService, position);
+        positionWrapper.setParentContainer(containersWithLabel.get(0));
+        positionWrapper.setPosition(getLabel().substring(
+            getLabel().length() - 2));
+        setPosition(positionWrapper.getWrappedObject());
+    }
 
     /**
      * Get the child container of this container with label label
@@ -171,8 +234,7 @@ public class ContainerWrapper extends ModelWrapper<Container> {
         }
         throw new Exception("Can't use position " + position + " in container "
             + getFullInfoLabel() + "\nReason: capacity = "
-            + capacity.getRowCapacity() + "*"
-            + capacity.getColCapacity());
+            + capacity.getRowCapacity() + "*" + capacity.getColCapacity());
     }
 
     public void setContainerType(ContainerType containerType) {
@@ -229,7 +291,8 @@ public class ContainerWrapper extends ModelWrapper<Container> {
      * type
      */
     public String getFullInfoLabel() {
-        if (getContainerType() == null || getContainerType().getNameShort() == null) {
+        if (getContainerType() == null
+            || getContainerType().getNameShort() == null) {
             return getLabel();
         }
         return getLabel() + "(" + getContainerType().getNameShort() + ")";

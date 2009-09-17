@@ -11,6 +11,7 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.SWT;
@@ -33,6 +34,7 @@ import org.springframework.remoting.RemoteConnectFailureException;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.utils.SiteUtils;
+import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
 import edu.ualberta.med.biobank.forms.listener.EnterKeyToNextFieldListener;
@@ -44,6 +46,7 @@ import edu.ualberta.med.biobank.model.PalletCell;
 import edu.ualberta.med.biobank.model.Sample;
 import edu.ualberta.med.biobank.model.SampleCellStatus;
 import edu.ualberta.med.biobank.model.SamplePosition;
+import edu.ualberta.med.biobank.preferences.PreferenceConstants;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
 import edu.ualberta.med.biobank.validators.PalletBarCodeValidator;
 import edu.ualberta.med.biobank.validators.ScannerBarcodeValidator;
@@ -89,11 +92,17 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
 
     private CancelConfirmWidget cancelConfirmWidget;
 
+    private String palletNameContains = "";
+
     @Override
     protected void init() {
         setPartName("Scan Assign");
         currentPalletWrapper = new ContainerWrapper(appService, new Container());
         initPalletValues();
+        IPreferenceStore store = BioBankPlugin.getDefault()
+            .getPreferenceStore();
+        palletNameContains = store
+            .getString(PreferenceConstants.PALLET_SCAN_CONTAINER_NAME_CONTAINS);
     }
 
     @Override
@@ -246,16 +255,21 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
         return layout;
     }
 
+    /**
+     * If can't know which pallet type we need, add a combo
+     */
     private void createContainerTypeSection(Composite parent) throws Exception {
-        List<ContainerType> palletContainerTypes = SiteUtils
+        List<ContainerType> palletContainerTypes = ContainerTypeWrapper
             .getContainerTypesInSite(appService,
-                currentPalletWrapper.getSite(), "Pallet");
-        if (palletContainerTypes.size() == 0) {
-            BioBankPlugin.openError("No Pallet defined ?",
-                "No container type found with name starting with Pallet...");
-        } else if (palletContainerTypes.size() == 1) {
+                currentPalletWrapper.getSite(), palletNameContains, false);
+        if (palletContainerTypes.size() == 1) {
             currentPalletWrapper.setContainerType(palletContainerTypes.get(0));
         } else {
+            if (palletContainerTypes.size() == 0) {
+                BioBankPlugin.openError("No Pallet defined ?",
+                    "No container type found with name containing "
+                        + palletNameContains + "...");
+            }
             palletTypesViewer = createCComboViewerWithNoSelectionValidator(
                 parent, "Pallet Container Type", palletContainerTypes, null,
                 "A pallet type should be selected");
@@ -502,7 +516,7 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
     }
 
     /**
-     * From the pallet product barcode, get existing information form database
+     * From the pallet product barcode, get existing information from database
      */
     private boolean checkPallet() throws Exception {
         currentPalletSamples = null;
@@ -524,7 +538,7 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
             if (palletFound.getLabel().equals(currentPalletWrapper.getLabel())) {
                 // in this case, the position already contains the same pallet.
                 // Don't need to check it
-                // need to use the container object retrieve from the
+                // need to use the container object retrieved from the
                 // database !
                 currentPalletWrapper.setWrappedObject(palletFound);
                 needToCheckPosition = false;
@@ -537,7 +551,7 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
                         + ". Do you want to move it to new position "
                         + currentPalletWrapper.getLabel() + "?");
                 if (pursue) {
-                    // need to use the container object retrieve from the
+                    // need to use the container object retrieved from the
                     // database !
                     palletFound.setLabel(currentPalletWrapper.getLabel());
                     currentPalletWrapper.setWrappedObject(palletFound);
@@ -573,16 +587,15 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
      * @return true if was able to create the ContainerPosition
      */
     private boolean checkAndSetPosition() throws Exception {
-        // TODO if moving, use the existing position ?
-        Container containerAtPosition = ContainerWrapper
-            .getContainerWithTypeAndLabelInSite(appService,
-                currentPalletWrapper.getSite(),
-                currentPalletWrapper.getLabel(), "Pallet");
+        // TODO if moving, use the existing position and modify it instead of
+        // create a new one (and the old one is probably not deleted) ?
+        Container containerAtPosition = currentPalletWrapper.getContainer(
+            currentPalletWrapper.getLabel(), currentPalletWrapper
+                .getContainerType());
         if (containerAtPosition == null) {
-            currentPalletWrapper.setNewPositionFromLabel("Freezer");
+            currentPalletWrapper.computePositionFromLabel();
             return true;
         } else {
-            // 
             BioBankPlugin.openError("Position error",
                 "There is already a different pallet (product barcode = "
                     + containerAtPosition.getProductBarcode()

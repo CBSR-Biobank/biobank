@@ -302,7 +302,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
         String errorMessage) {
         Label label = toolkit.createLabel(parent, fieldLabel + ":", SWT.LEFT);
 
-        CCombo combo = new CCombo(parent, SWT.READ_ONLY);
+        CCombo combo = new CCombo(parent, SWT.READ_ONLY | SWT.BORDER);
         ComboViewer comboViewer = new ComboViewer(combo);
         comboViewer.setContentProvider(new ArrayContentProvider());
         comboViewer.setLabelProvider(new BiobankLabelProvider());
