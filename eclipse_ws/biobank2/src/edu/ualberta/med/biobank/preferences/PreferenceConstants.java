@@ -13,8 +13,6 @@ public class PreferenceConstants {
 
     public static final String GENERAL_ASK_PRINT = "general.askprint";
 
-    public static final String SCANNER_PLATE = "scanner.plate";
-
     public static final int SCANNER_PLATE_NUMBER = 3;
 
     public static final String SCANNER_DPI = "scanner.dpi";

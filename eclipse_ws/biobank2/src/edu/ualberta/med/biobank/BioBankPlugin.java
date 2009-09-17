@@ -217,9 +217,10 @@ public class BioBankPlugin extends AbstractUIPlugin {
     }
 
     public int getPlateNumber(String barcode) {
-        for (int i = 1; i <= PreferenceConstants.SCANNER_PLATE_NUMBER; i++) {
-            String pref = getPreferenceStore().getString(
-                PreferenceConstants.SCANNER_PLATE + i);
+        for (int i = 0; i < edu.ualberta.med.scannerconfig.preferences.PreferenceConstants.SCANNER_PALLET_INFO.length; i++) {
+            String pref = getPreferenceStore()
+                .getString(
+                    edu.ualberta.med.scannerconfig.preferences.PreferenceConstants.SCANNER_PALLET_INFO[i][1]);
             if (pref.isEmpty()) {
                 // should no be empty
                 return -1;
