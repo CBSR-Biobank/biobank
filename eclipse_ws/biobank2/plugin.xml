@@ -500,10 +500,15 @@
                   label="Reports"
                   style="push">
             </command>
+         </menu>
+         <menu
+               id="edu.ualberta.med.biobank.menu.configuration"
+               label="Configuration"
+               mnemonic="C">
             <command
                   commandId="org.eclipse.ui.window.preferences"
-                  id="edu.ualberta.med.biobank.menu.configuration"
-                  label="Configuration"
+                  id="edu.ualberta.med.biobank.menu.preferences"
+                  label="Preferences"
                   style="push">
             </command>
          </menu>

@@ -178,7 +178,7 @@ public class SessionManager {
         sessionAdapter = null;
         updateMenus();
         currentSites = new ArrayList<Site>();
-        siteCombo.combo.setInput(currentSites);
+        siteCombo.comboViewer.setInput(currentSites);
     }
 
     private void updateMenus() {
@@ -262,7 +262,7 @@ public class SessionManager {
             Site allSite = new Site();
             allSite.setName("All Sites");
             currentSites.add(0, allSite);
-            siteCombo.combo.setInput(currentSites);
+            siteCombo.comboViewer.setInput(currentSites);
             if (currentSite == null)
                 siteCombo.setSelection(allSite);
             else
