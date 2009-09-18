@@ -48,7 +48,7 @@ public class BiobankDialog extends Dialog {
 
     private Label statusLabel;
 
-    private Boolean enabledOkButton;
+    private Boolean okButtonEnabled;
 
     protected BiobankDialog(Shell parentShell) {
         super(parentShell);
@@ -58,9 +58,9 @@ public class BiobankDialog extends Dialog {
     @Override
     protected Control createButtonBar(Composite parent) {
         Control contents = super.createButtonBar(parent);
-        if (enabledOkButton != null) {
+        if (okButtonEnabled != null) {
             // in case the binding wanted to modify it before its creation
-            setOkButtonEnabled(enabledOkButton);
+            setOkButtonEnabled(okButtonEnabled);
         }
         return contents;
     }
@@ -281,7 +281,7 @@ public class BiobankDialog extends Dialog {
         if (okButton != null && !okButton.isDisposed()) {
             okButton.setEnabled(enabled);
         } else {
-            enabledOkButton = enabled;
+            okButtonEnabled = enabled;
         }
     }
 }
