@@ -716,6 +716,18 @@
                standalone="false"
                visible="true">
          </view>
+         <view
+               closeable="false"
+               id="org.eclipse.ui.console.ConsoleView"
+               minimized="false"
+               moveable="false"
+               ratio="0.75"
+               relationship="bottom"
+               relative="org.eclipse.ui.editorss"
+               showTitle="true"
+               standalone="true"
+               visible="false">
+         </view>
       </perspectiveExtension>
       </extension>
    <extension

@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.model;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
 import edu.ualberta.med.scanlib.ScanCell;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -75,29 +76,28 @@ public class PalletCell {
     }
 
     public static PalletCell[][] getRandomScanProcessNotInPallet(
-        WritableApplicationService appService, Site site) {
+        WritableApplicationService appService, Site site)
+        throws ApplicationException {
         // FIXME check uml pour positionSample/sample comme pour
         // container/containerposition
         PalletCell[][] palletScanned = initArray();
-        try {
-            HQLCriteria criteria = new HQLCriteria(
-                "from "
-                    + Sample.class.getName()
-                    + " as s where s not in (select sp.sample from "
-                    + SamplePosition.class.getName()
-                    + " as sp) "
-                    + "and s.inventoryId <> '123' and s.patientVisit.patient.study.site = ?",
-                Arrays.asList(new Object[] { site }));
-            List<Sample> samples = appService.query(criteria);
-            if (samples.size() > 1) {
-                palletScanned[0][0] = new PalletCell(new ScanCell(0, 0, samples
-                    .get(0).getInventoryId()));
-                palletScanned[2][4] = new PalletCell(new ScanCell(2, 4, samples
-                    .get(1).getInventoryId()));
-            }
-        } catch (ApplicationException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+        HQLCriteria criteria = new HQLCriteria(
+            "from "
+                + Sample.class.getName()
+                + " as s where s not in (select sp.sample from "
+                + SamplePosition.class.getName()
+                + " as sp) "
+                + "and s.inventoryId <> '123' and s.patientVisit.patient.study.site = ?",
+            Arrays.asList(new Object[] { site }));
+        List<Sample> samples = appService.query(criteria);
+        if (samples.size() > 1) {
+            Random r = new Random();
+            // int sample1 = r.nextInt(samples.size());
+            // int sample2 = r.nextInt(samples.size());
+            palletScanned[0][0] = new PalletCell(new ScanCell(0, 0, samples
+                .get(0).getInventoryId()));
+            palletScanned[2][4] = new PalletCell(new ScanCell(2, 4, samples
+                .get(1).getInventoryId()));
         }
         return palletScanned;
     }
