@@ -99,6 +99,7 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
 
     @Override
     protected void init() {
+        super.init();
         setPartName("Scan Assign");
         currentPalletWrapper = new ContainerWrapper(appService, new Container());
         initPalletValues();
@@ -638,4 +639,8 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
         System.out.println("PRINT activity");
     }
 
+    @Override
+    protected String getActivityTitle() {
+        return "Scan assign activity";
+    }
 }

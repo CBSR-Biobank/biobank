@@ -114,6 +114,7 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
 
     @Override
     protected void init() {
+        super.init();
         setPartName("Scan Link");
         IPreferenceStore store = BioBankPlugin.getDefault()
             .getPreferenceStore();
@@ -203,7 +204,7 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
     }
 
     /**
-     * Pallet visualization
+     * Pallet visualisation
      */
     private void createPalletSection() {
         Composite client = toolkit.createComposite(form.getBody());
@@ -478,6 +479,9 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
                     if (pv != null) {
                         dateProcessedLabel.setText(pv
                             .getFormattedDateProcessed());
+                        appendLog("Visit selected "
+                            + pv.getFormattedDateProcessed() + " - "
+                            + pv.getClinic().getName());
                     }
                 }
             });
@@ -496,6 +500,7 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
             BioBankPlugin.openError("Error getting the patient", e);
         }
         if (currentPatient != null) {
+            appendLog("Found patient with number " + currentPatient.getNumber());
             // show visits list
             Collection<PatientVisit> collection = currentPatient
                 .getPatientVisitCollection();
@@ -513,16 +518,16 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
                 try {
                     scanOk = true;
                     PalletCell[][] cells;
+                    int plateNum = BioBankPlugin.getDefault().getPlateNumber(
+                        plateToScanValue.getValue().toString());
                     if (BioBankPlugin.isRealScanEnabled()) {
-                        int plateNum = BioBankPlugin.getDefault()
-                            .getPlateNumber(
-                                plateToScanValue.getValue().toString());
                         cells = PalletCell.convertArray(ScannerConfigPlugin
                             .scan(plateNum));
                     } else {
                         cells = PalletCell.getRandomScanLink();
                     }
-
+                    appendLog("Scanning plate "
+                        + plateToScanValue.getValue().toString());
                     scannedValue.setValue(true);
                     radioComponents.setEnabled(true);
 
@@ -543,6 +548,7 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
 
                     // Show result in grid
                     spw.setScannedElements(cells);
+                    appendLog("Scan done");
                 } catch (RemoteConnectFailureException exp) {
                     BioBankPlugin.openRemoteConnectErrorMessage();
                 } catch (Exception e) {
@@ -668,6 +674,11 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
     protected void print() {
         // FIXME implement print functionality
         System.out.println("PRINT ACTIVITY");
+    }
+
+    @Override
+    protected String getActivityTitle() {
+        return "Scan link activity";
     }
 
 }

@@ -100,6 +100,7 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
 
     @Override
     protected void init() {
+        super.init();
         setPartName("Cabinet Link/Assign");
         sampleWrapper = new SampleWrapper(appService, new Sample());
         IPreferenceStore store = BioBankPlugin.getDefault()
@@ -368,9 +369,8 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
             drawer = bin.getPosition().getParentContainer();
             cabinet = drawer.getPosition().getParentContainer();
         } else if (containers.size() == 0) {
-            containers = ContainerWrapper.getContainersInSite(
-                appService, SessionManager.getInstance().getCurrentSite(),
-                binLabel);
+            containers = ContainerWrapper.getContainersInSite(appService,
+                SessionManager.getInstance().getCurrentSite(), binLabel);
             if (containers.size() > 0) {
                 BioBankPlugin.openError("Check position and sample",
                     "Bin labelled " + binLabel
@@ -456,4 +456,8 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
         System.out.println("PRINT activity");
     }
 
+    @Override
+    protected String getActivityTitle() {
+        return "Cabinet link/assign activity";
+    }
 }
