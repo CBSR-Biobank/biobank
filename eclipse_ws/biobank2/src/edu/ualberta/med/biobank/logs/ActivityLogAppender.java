@@ -12,18 +12,23 @@ public class ActivityLogAppender extends AppenderSkeleton {
 
     private MessageConsole messageConsole;
     private MessageConsoleStream msg;
+    private StringBuffer logBuffer;
 
     public ActivityLogAppender(String name) {
+        setName(name);
         messageConsole = new MessageConsole(name, null);
         ConsolePlugin.getDefault().getConsoleManager().addConsoles(
             new IConsole[] { messageConsole });
         msg = messageConsole.newMessageStream();
         setLayout(new PatternLayout("%d{ABSOLUTE} %m%n"));
+        logBuffer = new StringBuffer();
     }
 
     @Override
     protected void append(LoggingEvent event) {
-        msg.print(this.layout.format(event));
+        String text = this.layout.format(event);
+        msg.print(text);
+        logBuffer.append(text);
     }
 
     @Override
@@ -35,6 +40,10 @@ public class ActivityLogAppender extends AppenderSkeleton {
     @Override
     public boolean requiresLayout() {
         return true;
+    }
+
+    public StringBuffer getLogBuffer() {
+        return logBuffer;
     }
 
 }

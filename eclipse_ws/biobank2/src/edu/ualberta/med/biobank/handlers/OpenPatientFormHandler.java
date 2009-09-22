@@ -6,12 +6,7 @@ import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.IHandler;
-import org.eclipse.jface.action.IContributionItem;
-import org.eclipse.jface.action.IToolBarManager;
-import org.eclipse.ui.IActionBars;
-import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IViewReference;
-import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
@@ -55,17 +50,18 @@ public class OpenPatientFormHandler extends AbstractHandler implements IHandler 
 
             // Remove buttons in the console view toolbar
             // TODO can we do something nicer ?
-            IViewPart viewPart = activePage
-                .findView(IConsoleConstants.ID_CONSOLE_VIEW);
-            IViewSite viewSite = viewPart.getViewSite();
-            IActionBars actionBars = viewSite.getActionBars();
-            IToolBarManager toolBarManager = actionBars.getToolBarManager();
-
-            IContributionItem[] contributionItems = toolBarManager.getItems();
-            contributionItems = toolBarManager.getItems();
-            for (int i = 0; i < contributionItems.length; i++)
-                if (i >= 2)
-                    toolBarManager.remove(contributionItems[i]);
+            // IViewPart viewPart = activePage
+            // .findView(IConsoleConstants.ID_CONSOLE_VIEW);
+            // IViewSite viewSite = viewPart.getViewSite();
+            // IActionBars actionBars = viewSite.getActionBars();
+            // IToolBarManager toolBarManager = actionBars.getToolBarManager();
+            //
+            // IContributionItem[] contributionItems =
+            // toolBarManager.getItems();
+            // contributionItems = toolBarManager.getItems();
+            // for (int i = 0; i < contributionItems.length; i++)
+            // if (i >= 2)
+            // toolBarManager.remove(contributionItems[i]);
         } catch (PartInitException e) {
             throw new ExecutionException("Part could not be initialized", e); //$NON-NLS-1$
         }

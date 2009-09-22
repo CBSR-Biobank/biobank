@@ -451,12 +451,6 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
     }
 
     @Override
-    protected void print() {
-        // FIXME implement print functionnality
-        System.out.println("PRINT activity");
-    }
-
-    @Override
     protected String getActivityTitle() {
         return "Cabinet link/assign activity";
     }

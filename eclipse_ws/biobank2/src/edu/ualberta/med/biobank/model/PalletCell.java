@@ -2,7 +2,6 @@ package edu.ualberta.med.biobank.model;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Random;
 
 import edu.ualberta.med.scanlib.ScanCell;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -91,7 +90,7 @@ public class PalletCell {
             Arrays.asList(new Object[] { site }));
         List<Sample> samples = appService.query(criteria);
         if (samples.size() > 1) {
-            Random r = new Random();
+            // Random r = new Random();
             // int sample1 = r.nextInt(samples.size());
             // int sample2 = r.nextInt(samples.size());
             palletScanned[0][0] = new PalletCell(new ScanCell(0, 0, samples

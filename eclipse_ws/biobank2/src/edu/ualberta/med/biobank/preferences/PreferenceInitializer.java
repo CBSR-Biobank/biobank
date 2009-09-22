@@ -16,7 +16,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
             .getPreferenceStore();
         store.setDefault(PreferenceConstants.GENERAL_CONFIRM, "CONFIRM");
         store.setDefault(PreferenceConstants.GENERAL_CANCEL, "CANCEL");
-        store.setDefault(PreferenceConstants.GENERAL_ASK_PRINT, true);
+        store.setDefault(PreferenceConstants.LINK_ASSIGN_ASK_PRINT, true);
         store.setDefault(PreferenceConstants.GENERAL_TIME_OUT, 10);
         store.setDefault(PreferenceConstants.SCANNER_DPI, 300);
         store.setDefault(PreferenceConstants.SCAN_LINK_ROW_SELECT_ONLY, true);

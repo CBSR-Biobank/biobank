@@ -240,7 +240,7 @@ public class BioBankPlugin extends AbstractUIPlugin {
 
     public static boolean isAskPrint() {
         IPreferenceStore store = getDefault().getPreferenceStore();
-        return store.getBoolean(PreferenceConstants.GENERAL_ASK_PRINT);
+        return store.getBoolean(PreferenceConstants.LINK_ASSIGN_ASK_PRINT);
     }
 
     public static boolean isRealScanEnabled() {
@@ -267,4 +267,8 @@ public class BioBankPlugin extends AbstractUIPlugin {
         return getDefault().dateTimeFormatter;
     }
 
+    public String getPrinter() {
+        return getPreferenceStore().getString(
+            PreferenceConstants.LINK_ASSIGN_PRINTER);
+    }
 }

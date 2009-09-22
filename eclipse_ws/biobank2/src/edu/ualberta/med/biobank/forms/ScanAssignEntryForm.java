@@ -634,12 +634,6 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
     }
 
     @Override
-    protected void print() {
-        // FIXME implement print functionnality
-        System.out.println("PRINT activity");
-    }
-
-    @Override
     protected String getActivityTitle() {
         return "Scan assign activity";
     }

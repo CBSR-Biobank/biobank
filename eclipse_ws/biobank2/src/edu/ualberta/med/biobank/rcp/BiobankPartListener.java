@@ -4,7 +4,6 @@ import org.eclipse.ui.IPartListener;
 import org.eclipse.ui.IViewReference;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
-import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.SessionManager;
@@ -25,10 +24,12 @@ public class BiobankPartListener implements IPartListener {
     @Override
     public void partClosed(IWorkbenchPart part) {
         if (part instanceof AbstractPatientAdminForm) {
-            // when the form is closed, call the method onClose
-            boolean reallyClose = ((AbstractPatientAdminForm) part).onClose();
-            if (reallyClose) {
-                try {
+            try {
+                // when the form is closed, call the method onClose
+                boolean reallyClose = ((AbstractPatientAdminForm) part)
+                    .onClose();
+                if (reallyClose) {
+
                     IWorkbenchPage activePage = PlatformUI.getWorkbench()
                         .getActiveWorkbenchWindow().getActivePage();
                     if (activePage != null) {
@@ -38,10 +39,11 @@ public class BiobankPartListener implements IPartListener {
                         }
                         activePage.showView(PatientAdministrationView.ID);
                     }
-                } catch (PartInitException e) {
-                    SessionManager.getLogger().error(
-                        "Error while opening PatientAdministrationView", e);
+
                 }
+            } catch (Exception e) {
+                SessionManager.getLogger().error(
+                    "Error while opening PatientAdministrationView", e);
             }
         }
         if (part instanceof AbstractPatientAdminForm) {

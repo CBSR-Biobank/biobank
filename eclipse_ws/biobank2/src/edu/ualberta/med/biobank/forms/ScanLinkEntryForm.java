@@ -475,14 +475,7 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
             .addSelectionChangedListener(new ISelectionChangedListener() {
                 @Override
                 public void selectionChanged(SelectionChangedEvent event) {
-                    PatientVisitWrapper pv = getSelectedPatientVisit();
-                    if (pv != null) {
-                        dateProcessedLabel.setText(pv
-                            .getFormattedDateProcessed());
-                        appendLog("Visit selected "
-                            + pv.getFormattedDateProcessed() + " - "
-                            + pv.getClinic().getName());
-                    }
+                    setDateProcessedField();
                 }
             });
 
@@ -500,6 +493,7 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
             BioBankPlugin.openError("Error getting the patient", e);
         }
         if (currentPatient != null) {
+            appendLog("-----");
             appendLog("Found patient with number " + currentPatient.getNumber());
             // show visits list
             Collection<PatientVisit> collection = currentPatient
@@ -507,8 +501,18 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
             viewerVisits.setInput(collection);
             viewerVisits.getCCombo().select(0);
             viewerVisits.getCCombo().setListVisible(true);
+            setDateProcessedField();
         } else {
             viewerVisits.setInput(null);
+        }
+    }
+
+    private void setDateProcessedField() {
+        PatientVisitWrapper pv = getSelectedPatientVisit();
+        if (pv != null) {
+            dateProcessedLabel.setText(pv.getFormattedDateProcessed());
+            appendLog("Visit selected " + pv.getFormattedDateProcessed()
+                + " - " + pv.getClinic().getName());
         }
     }
 
@@ -526,6 +530,7 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
                     } else {
                         cells = PalletCell.getRandomScanLink();
                     }
+                    appendLog("----");
                     appendLog("Scanning plate "
                         + plateToScanValue.getValue().toString());
                     scannedValue.setValue(true);
@@ -548,7 +553,6 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
 
                     // Show result in grid
                     spw.setScannedElements(cells);
-                    appendLog("Scan done");
                 } catch (RemoteConnectFailureException exp) {
                     BioBankPlugin.openRemoteConnectErrorMessage();
                 } catch (Exception e) {
@@ -565,8 +569,10 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
                 boolean exists = checkSampleExists(value);
                 if (exists) {
                     cell.setStatus(SampleCellStatus.ERROR);
-                    cell.setInformation("Aliquot already in database");
+                    String msg = "Aliquot already in database";
+                    cell.setInformation(msg);
                     scanOk = false;
+                    appendLog("ERROR: " + value + " - " + msg);
                 } else {
                     cell.setStatus(SampleCellStatus.NEW);
                 }
@@ -594,6 +600,8 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
         List<SDKQuery> queries = new ArrayList<SDKQuery>();
         PalletCell[][] cells = spw.getScannedElements();
         PatientVisitWrapper patientVisit = getSelectedPatientVisit();
+        StringBuffer sb = new StringBuffer("Samples linked:");
+        int nber = 0;
         for (int indexRow = 0; indexRow < cells.length; indexRow++) {
             for (int indexColumn = 0; indexColumn < cells[indexRow].length; indexColumn++) {
                 PalletCell cell = cells[indexRow][indexColumn];
@@ -606,10 +614,22 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
                     sample.setLinkDate(new Date());
                     sample.setSampleType(cell.getType());
                     queries.add(new InsertExampleQuery(sample));
+                    sb.append("\nLINKED: ").append(cell.getValue());
+                    sb.append(" - patient: ").append(
+                        patientVisit.getWrappedObject().getPatient()
+                            .getNumber());
+                    sb.append(" - Visit: ").append(
+                        patientVisit.getFormattedDateDrawn());
+                    sb.append(" - ").append(patientVisit.getClinic().getName());
+                    sb.append(" - ").append(cell.getType().getName());
+                    nber++;
                 }
             }
         }
         appService.executeBatchQuery(queries);
+        appendLog("----");
+        appendLog(sb.toString());
+        appendLog("SCAN-LINK: " + nber + " samples linked to visit");
         setSaved(true);
     }
 
@@ -668,12 +688,6 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
     @Override
     public String getNextOpenedFormID() {
         return ID;
-    }
-
-    @Override
-    protected void print() {
-        // FIXME implement print functionality
-        System.out.println("PRINT ACTIVITY");
     }
 
     @Override
