@@ -299,6 +299,9 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
             boolean showResult = checkPallet();
             if (showResult) {
                 showOnlyPallet(false);
+                appendLog("----");
+                appendLog("Scanning plate "
+                    + plateToScanValue.getValue().toString());
                 if (BioBankPlugin.isRealScanEnabled()) {
                     int plateNum = BioBankPlugin.getDefault().getPlateNumber(
                         plateToScanValue.getValue().toString());
@@ -390,6 +393,9 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
             scanCell.setInformation("Sample " + positionSample.getInventoryId()
                 + " missing");
             scanCell.setTitle("?");
+            appendLog("MISSING: " + positionSample.getInventoryId()
+                + " missing from "
+                + SampleWrapper.getPositionString(positionSample, false));
             return false;
         }
         if (value.isEmpty()) {
@@ -553,11 +559,16 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
         currentPalletSamples = null;
         boolean pursue = true;
         boolean needToCheckPosition = true;
+        appendLog("----");
+        appendLog("Checking product barcode "
+            + currentPalletWrapper.getProductBarcode());
         Container palletFound = ContainerWrapper
             .getContainerWithProductBarcodeInSite(appService, SessionManager
                 .getInstance().getCurrentSite(), currentPalletWrapper
                 .getProductBarcode());
         if (palletFound != null) {
+            appendLog("Checking label position "
+                + currentPalletWrapper.getLabel());
             // a pallet with this product barcode already exists in the database
             if (palletFound.getLabel().equals(currentPalletWrapper.getLabel())) {
                 // in this case, the position already contains the same pallet.
@@ -585,6 +596,8 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
             }
             // get the existing samples to be able to check added an missing
             // samples
+            appendLog("Pallet container type used: "
+                + currentPalletWrapper.getContainerType().getName());
             Capacity palletCapacity = currentPalletWrapper.getContainerType()
                 .getCapacity();
             currentPalletSamples = new Sample[palletCapacity.getRowCapacity()][palletCapacity

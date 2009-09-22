@@ -157,24 +157,33 @@ public class SampleWrapper extends ModelWrapper<Sample> {
     }
 
     public static String getPositionString(Sample sample) {
-        SampleWrapper wrapper = new SampleWrapper(null, sample);
-        return wrapper.getPositionString();
+        return getPositionString(sample, true);
     }
 
-    public String getPositionString() {
+    public static String getPositionString(Sample sample, boolean fullString) {
+        SampleWrapper wrapper = new SampleWrapper(null, sample);
+        return wrapper.getPositionString(fullString);
+    }
+
+    public String getPositionString(boolean fullString) {
         SamplePosition position = getSamplePosition();
         if (position == null) {
             return "none";
         } else {
-            Container container = position.getContainer();
-            Container topContainer = container;
-            while (topContainer.getPosition() != null
-                && topContainer.getPosition().getParentContainer() != null) {
-                topContainer = topContainer.getPosition().getParentContainer();
+            if (fullString) {
+                Container container = position.getContainer();
+                Container topContainer = container;
+                while (topContainer.getPosition() != null
+                    && topContainer.getPosition().getParentContainer() != null) {
+                    topContainer = topContainer.getPosition()
+                        .getParentContainer();
+                }
+                return topContainer.getContainerType().getNameShort() + "-"
+                    + container.getLabel()
+                    + LabelingScheme.getPositionString(position);
+            } else {
+                return LabelingScheme.getPositionString(position);
             }
-            return topContainer.getContainerType().getNameShort() + "-"
-                + container.getLabel()
-                + LabelingScheme.getPositionString(position);
         }
     }
 }

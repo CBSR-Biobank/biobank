@@ -522,6 +522,9 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
                 try {
                     scanOk = true;
                     PalletCell[][] cells;
+                    appendLog("----");
+                    appendLog("Scanning plate "
+                        + plateToScanValue.getValue().toString());
                     int plateNum = BioBankPlugin.getDefault().getPlateNumber(
                         plateToScanValue.getValue().toString());
                     if (BioBankPlugin.isRealScanEnabled()) {
@@ -530,12 +533,9 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
                     } else {
                         cells = PalletCell.getRandomScanLink();
                     }
-                    appendLog("----");
-                    appendLog("Scanning plate "
-                        + plateToScanValue.getValue().toString());
+
                     scannedValue.setValue(true);
                     radioComponents.setEnabled(true);
-
                     for (int i = 0; i < cells.length; i++) { // rows
                         int samplesNumber = 0;
                         sampleTypeWidgets.get(i).resetValues(true);

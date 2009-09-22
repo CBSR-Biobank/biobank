@@ -26,8 +26,9 @@ public class LabelingScheme {
             throw new Exception("binPos has an invalid length: " + pos);
         }
         int len = pos.length();
-        return new RowColPos(SBS_ROW_LABELLING_PATTERN.indexOf(pos
-            .charAt(len - 2)), pos.charAt(len - 1));
+        int row = SBS_ROW_LABELLING_PATTERN.indexOf(pos.charAt(len - 2));
+        int col = Integer.parseInt(String.valueOf(pos.charAt(len - 1))) - 1;
+        return new RowColPos(row, col);
     }
 
     /**
@@ -35,7 +36,7 @@ public class LabelingScheme {
      * standard
      */
     public static String RowColToSBS(RowColPos rcp) {
-        return "" + SBS_ROW_LABELLING_PATTERN.charAt(rcp.row) + rcp.col;
+        return "" + SBS_ROW_LABELLING_PATTERN.charAt(rcp.row) + (rcp.col + 1);
     }
 
     /**
@@ -218,6 +219,7 @@ public class LabelingScheme {
     public static void main(String[] args) throws Exception {
         testCBSR();
         testTwoCharNumeric();
+        testSBS();
     }
 
     private static void testTwoCharNumeric() throws Exception {
@@ -235,7 +237,7 @@ public class LabelingScheme {
 
     private static void testCBSR() throws Exception {
         // In a 3*5 container, 1:4=AL
-        int totalRows = 4;
+        int totalRows = 3;
         int totalCols = 5;
 
         String cbsrString = "AL";
@@ -248,6 +250,20 @@ public class LabelingScheme {
         System.out.println("CBSR: " + rcp.row + ":" + rcp.col + "=>"
             + rowColToCBSRTwoChar(rcp, totalRows, totalCols) + " in a "
             + totalRows + "*" + totalCols + " container");
+    }
+
+    private static void testSBS() throws Exception {
+        String sample = "D4";
+        RowColPos rcp = sbsToRowCol(sample);
+        System.out.println("SBS: " + sample + "=>" + rcp.row + ":" + rcp.col
+            + " in pallet");
+
+        rcp.row = 2;
+        rcp.col = 4;
+        String pos = RowColToSBS(rcp);
+        System.out.println("SBS: " + rcp.row + ":" + rcp.col + "=>" + pos
+            + " in pallet");
+
     }
 
 }

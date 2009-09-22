@@ -95,8 +95,8 @@ public class PalletCell {
             // int sample2 = r.nextInt(samples.size());
             palletScanned[0][0] = new PalletCell(new ScanCell(0, 0, samples
                 .get(0).getInventoryId()));
-            palletScanned[2][4] = new PalletCell(new ScanCell(2, 4, samples
-                .get(1).getInventoryId()));
+            // palletScanned[2][4] = new PalletCell(new ScanCell(2, 4, samples
+            // .get(1).getInventoryId()));
         }
         return palletScanned;
     }
