@@ -163,6 +163,15 @@ public class BioBankPlugin extends AbstractUIPlugin {
         log4j.error(e.getMessage(), e);
     }
 
+    public static void openAsyncError(String title, Exception e) {
+        String msg = e.getMessage();
+        if ((msg == null || msg.isEmpty()) && e.getCause() != null) {
+            msg = e.getCause().getMessage();
+        }
+        openAsyncError(title, e.getMessage());
+        log4j.error(e.getMessage(), e);
+    }
+
     /**
      * Display an info message
      */

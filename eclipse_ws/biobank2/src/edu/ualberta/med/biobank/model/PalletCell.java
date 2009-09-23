@@ -47,29 +47,21 @@ public class PalletCell {
     }
 
     public static PalletCell[][] getRandomScanProcessAlreadyInPallet(
-        WritableApplicationService appService, Site site) {
-        // FIXME check uml pour positionSample/sample comme pour
-        // container/containerposition
+        WritableApplicationService appService, Site site) throws Exception {
         PalletCell[][] palletScanned = initArray();
-        try {
-            HQLCriteria criteria = new HQLCriteria("from "
-                + Sample.class.getName()
-                + " as s where s in (select sp.sample from "
-                + SamplePosition.class.getName()
-                + " as sp) and s.patientVisit.patient.study.site = ?", Arrays
-                .asList(new Object[] { site }));
-            List<Sample> samples = appService.query(criteria);
-            if (samples.size() > 0) {
-                palletScanned[0][0] = new PalletCell(new ScanCell(0, 0, samples
-                    .get(0).getInventoryId()));
-            }
-            if (samples.size() > 1) {
-                palletScanned[2][4] = new PalletCell(new ScanCell(2, 4, samples
-                    .get(1).getInventoryId()));
-            }
-        } catch (ApplicationException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+        HQLCriteria criteria = new HQLCriteria("from " + Sample.class.getName()
+            + " as s where s in (select sp.sample from "
+            + SamplePosition.class.getName()
+            + " as sp) and s.patientVisit.patient.study.site = ?", Arrays
+            .asList(new Object[] { site }));
+        List<Sample> samples = appService.query(criteria);
+        if (samples.size() > 0) {
+            palletScanned[0][0] = new PalletCell(new ScanCell(0, 0, samples
+                .get(0).getInventoryId()));
+        }
+        if (samples.size() > 1) {
+            palletScanned[2][4] = new PalletCell(new ScanCell(2, 4, samples
+                .get(1).getInventoryId()));
         }
         return palletScanned;
     }
@@ -77,8 +69,6 @@ public class PalletCell {
     public static PalletCell[][] getRandomScanProcessNotInPallet(
         WritableApplicationService appService, Site site)
         throws ApplicationException {
-        // FIXME check uml pour positionSample/sample comme pour
-        // container/containerposition
         PalletCell[][] palletScanned = initArray();
         HQLCriteria criteria = new HQLCriteria(
             "from "

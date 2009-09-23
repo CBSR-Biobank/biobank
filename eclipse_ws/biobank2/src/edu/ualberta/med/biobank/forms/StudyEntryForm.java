@@ -490,7 +490,6 @@ public class StudyEntryForm extends BiobankEntryForm {
 
     @Override
     public void cancelForm() {
-        // TODO Auto-generated method stub
 
     }
 

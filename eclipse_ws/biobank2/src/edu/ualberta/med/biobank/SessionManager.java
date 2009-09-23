@@ -147,8 +147,8 @@ public class SessionManager {
                 else
                     currentSite = null;
             } catch (ApplicationException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                SessionManager.getLogger().error(
+                    "Error retrieving site " + siteId, e);
             }
         updateSites();
         sessionAdapter.loadChildren(true);

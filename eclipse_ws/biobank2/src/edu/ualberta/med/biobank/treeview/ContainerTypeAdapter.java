@@ -17,6 +17,7 @@ import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.forms.ContainerTypeEntryForm;
 import edu.ualberta.med.biobank.forms.ContainerTypeViewForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
@@ -130,16 +131,15 @@ public class ContainerTypeAdapter extends AdapterBase {
                             "Unable to delete container type "
                                 + ct.getName()
                                 + ". A container of this type exists in storage. Remove all instances before deleting this type.");
-                } else
+                } else {
                     try {
                         getAppService().executeQuery(query);
                         ContainerTypeAdapter.this.getParent().removeChild(
                             ContainerTypeAdapter.this);
                     } catch (ApplicationException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
+                        BioBankPlugin.openAsyncError("Delete error", e);
                     }
-
+                }
             }
         });
     }
@@ -155,8 +155,8 @@ public class ContainerTypeAdapter extends AdapterBase {
         try {
             results = getAppService().query(c);
         } catch (ApplicationException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            SessionManager.getLogger().error("HQLSafeToDelete error", e);
+            return false;
         }
         return (results.size() == 0);
     }

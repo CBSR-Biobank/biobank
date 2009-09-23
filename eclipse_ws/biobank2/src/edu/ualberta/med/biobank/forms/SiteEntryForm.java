@@ -179,7 +179,6 @@ public class SiteEntryForm extends AddressEntryFormCommon {
 
     @Override
     public void cancelForm() {
-        // TODO Auto-generated method stub
 
     }
 

@@ -20,7 +20,6 @@ public class SampleTypeWrapper extends ModelWrapper<SampleType> {
     @Override
     protected void firePropertyChanges(SampleType oldWrappedObject,
         SampleType newWrappedObject) {
-        // TODO Auto-generated method stub
 
     }
 

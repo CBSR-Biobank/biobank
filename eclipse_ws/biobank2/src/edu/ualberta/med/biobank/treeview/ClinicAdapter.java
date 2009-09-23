@@ -126,15 +126,14 @@ public class ClinicAdapter extends AdapterBase {
                             "Unable to delete clinic "
                                 + clinic.getName()
                                 + ". All defined patient visits must be removed first.");
-                } else
+                } else {
                     try {
                         getAppService().executeQuery(query);
                         // TODO update tree
                     } catch (ApplicationException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
+                        BioBankPlugin.openAsyncError("Delete error", e);
                     }
-
+                }
             }
         });
     }

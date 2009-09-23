@@ -276,7 +276,6 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
 
     @Override
     public void cancelForm() {
-        // TODO Auto-generated method stub
 
     }
 

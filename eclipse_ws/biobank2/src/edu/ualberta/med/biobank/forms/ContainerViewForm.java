@@ -614,8 +614,7 @@ public class ContainerViewForm extends BiobankViewForm {
             try {
                 appService.executeQuery(query);
             } catch (ApplicationException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                BioBankPlugin.openAsyncError("Delete error", e);
             }
         }
         try {

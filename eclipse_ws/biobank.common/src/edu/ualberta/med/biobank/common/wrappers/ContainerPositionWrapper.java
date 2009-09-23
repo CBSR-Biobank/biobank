@@ -17,7 +17,6 @@ public class ContainerPositionWrapper extends ModelWrapper<ContainerPosition> {
     @Override
     protected void firePropertyChanges(ContainerPosition oldWrappedObject,
         ContainerPosition newWrappedObject) {
-        // TODO Auto-generated method stub
 
     }
 
@@ -41,7 +40,7 @@ public class ContainerPositionWrapper extends ModelWrapper<ContainerPosition> {
     public Container getParentContainer() {
         return wrappedObject.getParentContainer();
     }
-    
+
     public Container getContainer() {
         return wrappedObject.getContainer();
     }

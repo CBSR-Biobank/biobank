@@ -95,16 +95,20 @@ public class SampleWrapper extends ModelWrapper<Sample> {
         Container parentContainer) throws Exception {
         RowColPos rcp = LabelingScheme.getRowColFromPositionString(
             positionString, parentContainer.getContainerType());
-        SamplePosition sp = getSamplePosition();
-        if (sp == null) {
-            sp = new SamplePosition();
-            setSamplePosition(sp);
+        if (rcp.row > -1 && rcp.col > -1) {
+            SamplePosition sp = getSamplePosition();
+            if (sp == null) {
+                sp = new SamplePosition();
+                setSamplePosition(sp);
+            }
+            sp.setSample(wrappedObject);
+            // TODO check if update works well when sampleposition already
+            // exists
+            sp.setRow(rcp.row);
+            sp.setCol(rcp.col);
+        } else {
+            throw new Exception("Position " + positionString + " not valid");
         }
-        sp.setSample(wrappedObject);
-        // TODO check if update works well when sampleposition already exists
-        sp.setRow(rcp.row);
-        sp.setCol(rcp.col);
-
     }
 
     private void setSamplePosition(SamplePosition sp) {
@@ -178,8 +182,12 @@ public class SampleWrapper extends ModelWrapper<Sample> {
                     topContainer = topContainer.getPosition()
                         .getParentContainer();
                 }
-                return topContainer.getContainerType().getNameShort() + "-"
-                    + container.getLabel()
+                String nameShort = topContainer.getContainerType()
+                    .getNameShort();
+                if (nameShort != null)
+                    return nameShort + "-" + container.getLabel()
+                        + LabelingScheme.getPositionString(position);
+                return container.getLabel()
                     + LabelingScheme.getPositionString(position);
             } else {
                 return LabelingScheme.getPositionString(position);

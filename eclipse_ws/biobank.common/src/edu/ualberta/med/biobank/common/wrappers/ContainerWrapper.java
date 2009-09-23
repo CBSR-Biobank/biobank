@@ -31,7 +31,6 @@ public class ContainerWrapper extends ModelWrapper<Container> {
     @Override
     protected void firePropertyChanges(Container oldWrappedObject,
         Container newWrappedObject) {
-        // TODO Auto-generated method stub
 
     }
 

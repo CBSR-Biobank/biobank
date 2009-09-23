@@ -721,7 +721,7 @@
                id="org.eclipse.ui.console.ConsoleView"
                minimized="false"
                moveable="false"
-               ratio="0.85"
+               ratio="0.80"
                relationship="bottom"
                relative="org.eclipse.ui.editorss"
                showTitle="true"

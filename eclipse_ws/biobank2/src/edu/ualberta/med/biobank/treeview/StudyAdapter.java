@@ -148,8 +148,7 @@ public class StudyAdapter extends AdapterBase {
                         StudyAdapter.this.getParent().removeChild(
                             StudyAdapter.this);
                     } catch (ApplicationException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
+                        BioBankPlugin.openAsyncError("Delete error", e);
                     }
 
             }

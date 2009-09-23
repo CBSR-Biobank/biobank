@@ -19,7 +19,6 @@ import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.SiteComparator;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
@@ -162,17 +161,12 @@ public class SessionAdapter extends AdapterBase {
         return userName;
     }
 
-    public String getUserCsmId() {
+    public String getUserCsmId() throws Exception {
         HQLCriteria criteria = new HQLCriteria(
             "from gov.nih.nci.security.authorization.domainobjects.User where loginName = '"
                 + userName + "'");
-        try {
-            List<Object> userCsmId = appService.query(criteria);
-            System.out.println(userCsmId);
-        } catch (ApplicationException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+        List<Object> userCsmId = appService.query(criteria);
+        System.out.println(userCsmId);
         return "";
     }
 

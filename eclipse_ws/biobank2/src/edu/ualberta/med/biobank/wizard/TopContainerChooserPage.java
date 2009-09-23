@@ -71,14 +71,14 @@ public class TopContainerChooserPage extends AbstractContainerChooserPage {
         super.initComponent();
         containerWidget.setVisible(false);
         try {
-            // FIXME - homogenise
+            // homogenise
             List<ContainerType> types = ModelUtils.queryProperty(
                 getAppService(), ContainerType.class, "name", "Freezer", false);
             if (types.size() > 0) {
                 containerWidget.setContainerType(types.get(0));
             }
         } catch (ApplicationException e) {
-            // TODO Auto-generated catch block
+            // Auto-generated catch block
             e.printStackTrace();
         }
     }

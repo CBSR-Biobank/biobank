@@ -587,7 +587,6 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
 
     @Override
     public void cancelForm() {
-        // TODO Auto-generated method stub
 
     }
 
