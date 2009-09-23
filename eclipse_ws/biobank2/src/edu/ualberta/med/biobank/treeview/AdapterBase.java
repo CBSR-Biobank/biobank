@@ -75,10 +75,6 @@ public abstract class AdapterBase {
         this.wrappedObjectClass = klass;
     }
 
-    protected Class<?> getWrappedObjectClass() {
-        return wrappedObjectClass;
-    }
-
     protected abstract Integer getWrappedObjectId();
 
     protected abstract boolean integrityCheck();

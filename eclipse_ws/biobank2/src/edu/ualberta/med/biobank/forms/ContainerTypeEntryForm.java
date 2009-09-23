@@ -91,7 +91,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
 
     private ComboViewer labelingSchemeComboViewer;
 
-    private boolean topLevel;
+    private Boolean initialTopLevel;
 
     private Button hasSamples;
 
@@ -122,12 +122,11 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         capacity = new Capacity();
         String tabName;
         if (containerType.getId() == null) {
-            topLevel = false;
+            initialTopLevel = Boolean.FALSE;
             tabName = "New Container Type";
-
         } else {
             tabName = "Container Type " + containerType.getName();
-            topLevel = new Boolean(containerType.getTopLevel());
+            initialTopLevel = containerType.getTopLevel();
             capacity.setRowCapacity(new Integer(containerType.getCapacity()
                 .getRowCapacity()));
             capacity.setColCapacity(new Integer(containerType.getCapacity()
@@ -416,9 +415,16 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
             setDirty(true);
             return;
         }
-        saveSampleTypes();
-
-        saveChildContainerTypes();
+        boolean pursue = saveSampleTypes();
+        if (!pursue) {
+            setDirty(true);
+            return;
+        }
+        pursue = saveChildContainerTypes();
+        if (!pursue) {
+            setDirty(true);
+            return;
+        }
 
         if (containerType.getId() != null) {
             Integer localRows = capacity.getRowCapacity();
@@ -443,8 +449,9 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
             containerType.setCapacity(capacity);
         }
 
-        if (topLevel != containerType.getTopLevel() && !HQLSafeToChange()) {
-            containerType.setTopLevel(topLevel);
+        if (initialTopLevel != containerType.getTopLevel()
+            && !HQLSafeToChange()) {
+            containerType.setTopLevel(initialTopLevel);
             BioBankPlugin
                 .openError(
                     "ContainerType Change Failed",
@@ -473,7 +480,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         containerTypeAdapter.getParent().performExpand();
     }
 
-    private void saveSampleTypes() {
+    private boolean saveSampleTypes() {
         Set<SampleType> selSampleTypes = new HashSet<SampleType>();
         if (hasSamples.getSelection()) {
             List<Integer> selSampleTypeIds = samplesMultiSelect.getSelected();
@@ -483,13 +490,17 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
                     selSampleTypes.add(sampleType);
                 }
             }
-            Assert.isTrue(selSampleTypes.size() == selSampleTypeIds.size(),
-                "problem with sample type selections");
+            if (selSampleTypes.size() != selSampleTypeIds.size()) {
+                BioBankPlugin.openAsyncError("Samples",
+                    "Problem with sample type selections");
+                return false;
+            }
         }
         containerType.setSampleTypeCollection(selSampleTypes);
+        return true;
     }
 
-    private void saveChildContainerTypes() throws Exception {
+    private boolean saveChildContainerTypes() throws Exception {
         Collection<ContainerType> selContainerTypes = new HashSet<ContainerType>();
         List<Integer> selContainerTypeIds = new ArrayList<Integer>();
         if (hasContainers.getSelection()) {
@@ -523,8 +534,9 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
                 .openError(
                     "ContainerType Removal Failed",
                     "Unable to remove child type. This parent/child relationship exists in storage. Remove all instances before attempting to delete a child type.");
+            return false;
         }
-
+        return true;
     }
 
     private boolean HQLSafeToChange() throws ApplicationException {
