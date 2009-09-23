@@ -21,10 +21,10 @@ import edu.ualberta.med.biobank.model.SampleCellStatus;
 import edu.ualberta.med.biobank.widgets.listener.ScanPalletModificationEvent;
 
 /**
- * Widget to draw a pallet for add pallet samples screen. Can do selections
- * inside the pallet to assign a type
+ * Widget to draw a pallet for scan link screen. Can do selections inside the
+ * pallet to assign a type
  */
-public class AddSamplesScanPalletWidget extends ScanPalletWidget {
+public class ScanLinkPalletWidget extends PalletWidget {
 
     private List<PalletCell> selectedCells;
     private PalletCell lastSelectedCell;
@@ -38,7 +38,7 @@ public class AddSamplesScanPalletWidget extends ScanPalletWidget {
         NONE, MULTI, RANGE;
     }
 
-    public AddSamplesScanPalletWidget(Composite parent) {
+    public ScanLinkPalletWidget(Composite parent) {
         super(parent);
         selectedCells = new ArrayList<PalletCell>();
         initListeners();
@@ -220,5 +220,10 @@ public class AddSamplesScanPalletWidget extends ScanPalletWidget {
             }
         }
         return true;
+    }
+
+    @Override
+    protected String getBottomTextForBox(int indexRow, int indexCol) {
+        return null;
     }
 }

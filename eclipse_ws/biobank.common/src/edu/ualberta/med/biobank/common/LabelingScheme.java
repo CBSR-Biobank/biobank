@@ -182,17 +182,20 @@ public class LabelingScheme {
      * Get the 2 char string corresponding to the given position
      */
     public static String getPositionString(AbstractPosition position) {
-        RowColPos rcp = new RowColPos();
-        rcp.row = position.getRow();
-        rcp.col = position.getCol();
-        Container parentContainer = null;
-        if (position instanceof ContainerPosition) {
-            parentContainer = ((ContainerPosition) position)
-                .getParentContainer();
-        } else if (position instanceof SamplePosition) {
-            parentContainer = ((SamplePosition) position).getContainer();
+        if (position != null) {
+            RowColPos rcp = new RowColPos();
+            rcp.row = position.getRow();
+            rcp.col = position.getCol();
+            Container parentContainer = null;
+            if (position instanceof ContainerPosition) {
+                parentContainer = ((ContainerPosition) position)
+                    .getParentContainer();
+            } else if (position instanceof SamplePosition) {
+                parentContainer = ((SamplePosition) position).getContainer();
+            }
+            return getPositionString(rcp, parentContainer.getContainerType());
         }
-        return getPositionString(rcp, parentContainer.getContainerType());
+        return null;
     }
 
     /**

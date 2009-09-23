@@ -56,7 +56,7 @@ import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.preferences.PreferenceConstants;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
 import edu.ualberta.med.biobank.validators.ScannerBarcodeValidator;
-import edu.ualberta.med.biobank.widgets.AddSamplesScanPalletWidget;
+import edu.ualberta.med.biobank.widgets.ScanLinkPalletWidget;
 import edu.ualberta.med.biobank.widgets.CancelConfirmWidget;
 import edu.ualberta.med.biobank.widgets.SampleTypeSelectionWidget;
 import edu.ualberta.med.biobank.widgets.listener.ScanPalletModificationEvent;
@@ -78,7 +78,7 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
 
     private Composite typesSelectionPerRowComposite;
 
-    private AddSamplesScanPalletWidget spw;
+    private ScanLinkPalletWidget spw;
 
     private List<SampleTypeSelectionWidget> sampleTypeWidgets;
 
@@ -215,7 +215,7 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
         gd.grabExcessHorizontalSpace = true;
         client.setLayoutData(gd);
 
-        spw = new AddSamplesScanPalletWidget(client);
+        spw = new ScanLinkPalletWidget(client);
         spw.setVisible(true);
         toolkit.adapt(spw);
         spw.setLayoutData(new GridData(SWT.CENTER, SWT.TOP, true, false));

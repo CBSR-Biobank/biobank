@@ -96,7 +96,6 @@ public abstract class AbstractGridContainerWidget extends Canvas {
     }
 
     protected void paintGrid(PaintEvent e) {
-
         for (int indexRow = 0; indexRow < rows; indexRow++) {
             for (int indexCol = 0; indexCol < columns; indexCol++) {
                 int xPosition = cellWidth * indexCol;
@@ -104,9 +103,17 @@ public abstract class AbstractGridContainerWidget extends Canvas {
                 Rectangle rectangle = new Rectangle(xPosition, yPosition,
                     cellWidth, cellHeight);
                 drawRectangle(e, rectangle, indexRow, indexCol);
-                String text = getTextForBox(indexRow, indexCol);
-                if (text != null) {
-                    drawTextOnCenter(e, text, rectangle);
+                String topText = getTopTextForBox(indexRow, indexCol);
+                if (topText != null) {
+                    drawText(e, topText, rectangle, SWT.TOP);
+                }
+                String middleText = getMiddleTextForBox(indexRow, indexCol);
+                if (middleText != null) {
+                    drawText(e, middleText, rectangle, SWT.CENTER);
+                }
+                String bottomText = getBottomTextForBox(indexRow, indexCol);
+                if (bottomText != null) {
+                    drawText(e, bottomText, rectangle, SWT.BOTTOM);
                 }
             }
         }
@@ -146,7 +153,7 @@ public abstract class AbstractGridContainerWidget extends Canvas {
      * Get the text to write inside the cell. This default implementation use
      * the row sign, the column sign and the cell position.
      */
-    protected String getTextForBox(int indexRow, int indexCol) {
+    protected String getDefaultTextForBox(int indexRow, int indexCol) {
         RowColPos rowcol = new RowColPos();
         rowcol.row = indexRow;
         rowcol.col = indexCol;
@@ -163,6 +170,20 @@ public abstract class AbstractGridContainerWidget extends Canvas {
             return col + row;
         }
         return row + col;
+    }
+
+    @SuppressWarnings("unused")
+    protected String getTopTextForBox(int indexRow, int indexCol) {
+        return null;
+    }
+
+    protected String getMiddleTextForBox(int indexRow, int indexCol) {
+        return getDefaultTextForBox(indexRow, indexCol);
+    }
+
+    @SuppressWarnings("unused")
+    protected String getBottomTextForBox(int indexRow, int indexCol) {
+        return null;
     }
 
     public void setContainerType(ContainerType type) {
@@ -197,10 +218,13 @@ public abstract class AbstractGridContainerWidget extends Canvas {
     }
 
     /**
-     * Draw the text on the middle of the rectangle
+     * Draw the text on the horizontal middle of the rectangle. Vertical
+     * alignment depend on the verticalPosition parameter.
      */
-    public void drawTextOnCenter(PaintEvent e, String text, Rectangle rectangle) {
+    private void drawText(PaintEvent e, String text, Rectangle rectangle,
+        int verticalPosition) {
         Font oldFont = e.gc.getFont();
+        Font tmpFont = null;
         Point textSize = e.gc.textExtent(text);
         if (textSize.x > rectangle.width) {
             // Try to find a smallest font to see the whole text
@@ -208,9 +232,13 @@ public abstract class AbstractGridContainerWidget extends Canvas {
             int height = fd.getHeight();
             Point currentTextSize = textSize;
             while (currentTextSize.x > rectangle.width && height > 3) {
+                if (tmpFont != null) {
+                    tmpFont.dispose();
+                }
                 height--;
                 FontData fd2 = new FontData(fd.getName(), height, fd.getStyle());
-                e.gc.setFont(new Font(e.display, fd2));
+                tmpFont = new Font(e.display, fd2);
+                e.gc.setFont(tmpFont);
                 currentTextSize = e.gc.textExtent(text);
             }
             if (height > 3) {
@@ -220,9 +248,22 @@ public abstract class AbstractGridContainerWidget extends Canvas {
             }
         }
         int xTextPosition = (rectangle.width - textSize.x) / 2 + rectangle.x;
-        int yTextPosition = (rectangle.height - textSize.y) / 2 + rectangle.y;
+        int yTextPosition = 0;
+        switch (verticalPosition) {
+        case SWT.CENTER:
+            yTextPosition = (rectangle.height - textSize.y) / 2 + rectangle.y;
+            break;
+        case SWT.TOP:
+            yTextPosition = rectangle.y + 3;
+            break;
+        case SWT.BOTTOM:
+            yTextPosition = rectangle.y + rectangle.height - textSize.y - 3;
+        }
         e.gc.drawText(text, xTextPosition, yTextPosition, true);
         e.gc.setFont(oldFont);
+        if (tmpFont != null) {
+            tmpFont.dispose();
+        }
     }
 
     protected void drawLegend(PaintEvent e, Color color, int index, String text) {
@@ -239,7 +280,7 @@ public abstract class AbstractGridContainerWidget extends Canvas {
             LEGEND_HEIGHT);
         e.gc.fillRectangle(rectangle);
         e.gc.drawRectangle(rectangle);
-        drawTextOnCenter(e, text, rectangle);
+        drawText(e, text, rectangle, SWT.CENTER);
     }
 
     /**

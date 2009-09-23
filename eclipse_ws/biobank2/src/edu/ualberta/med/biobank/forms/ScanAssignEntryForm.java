@@ -55,7 +55,7 @@ import edu.ualberta.med.biobank.validators.NonEmptyString;
 import edu.ualberta.med.biobank.validators.PalletBarCodeValidator;
 import edu.ualberta.med.biobank.validators.ScannerBarcodeValidator;
 import edu.ualberta.med.biobank.widgets.CancelConfirmWidget;
-import edu.ualberta.med.biobank.widgets.ScanPalletWidget;
+import edu.ualberta.med.biobank.widgets.PalletWidget;
 import edu.ualberta.med.biobank.widgets.ViewContainerWidget;
 import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -74,7 +74,7 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
     private Label freezerLabel;
     private ViewContainerWidget freezerWidget;
     private Label palletLabel;
-    private ScanPalletWidget palletWidget;
+    private PalletWidget palletWidget;
     private Label hotelLabel;
     private ViewContainerWidget hotelWidget;
 
@@ -230,7 +230,7 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
         freezerLabel.setLayoutData(new GridData());
         freezerWidget = new ViewContainerWidget(freezerComposite);
         toolkit.adapt(freezerWidget);
-        freezerWidget.setGridSizes(5, 10, ScanPalletWidget.PALLET_WIDTH, 100);
+        freezerWidget.setGridSizes(5, 10, PalletWidget.PALLET_WIDTH, 100);
 
         Composite hotelComposite = toolkit.createComposite(containersComposite);
         hotelComposite.setLayout(getNeutralGridLayout());
@@ -239,14 +239,14 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
         hotelWidget = new ViewContainerWidget(hotelComposite);
         toolkit.adapt(hotelWidget);
         hotelWidget.setGridSizes(11, 1, 100,
-            ScanPalletWidget.PALLET_HEIGHT_AND_LEGEND);
+            PalletWidget.PALLET_HEIGHT_AND_LEGEND);
 
         Composite palletComposite = toolkit
             .createComposite(containersComposite);
         palletComposite.setLayout(getNeutralGridLayout());
         palletComposite.setLayoutData(new GridData());
         palletLabel = toolkit.createLabel(palletComposite, "Pallet");
-        palletWidget = new ScanPalletWidget(palletComposite);
+        palletWidget = new PalletWidget(palletComposite);
         toolkit.adapt(palletWidget);
 
         showOnlyPallet(true);
@@ -323,12 +323,12 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
                 boolean result = true;
                 for (int i = 0; i < cells.length; i++) { // rows
                     for (int j = 0; j < cells[i].length; j++) { // columns
-                        Sample positionSample = null;
+                        Sample expectedSample = null;
                         if (currentPalletSamples != null) {
-                            positionSample = currentPalletSamples[i][j];
+                            expectedSample = currentPalletSamples[i][j];
                         }
-                        result = setStatus(cells[i][j], positionSample)
-                            && result;
+                        cells[i][j].setExpectedSample(expectedSample);
+                        result = setStatus(cells[i][j]) && result;
                     }
                 }
 
@@ -386,8 +386,9 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
         }
     }
 
-    protected boolean setStatus(PalletCell scanCell, Sample expectedSample)
+    protected boolean setStatus(PalletCell scanCell)
         throws ApplicationException {
+        Sample expectedSample = scanCell.getExpectedSample();
         String value = scanCell.getValue();
         String positionString = LabelingScheme.RowColToSBS(new RowColPos(
             scanCell.getRow(), scanCell.getCol()));

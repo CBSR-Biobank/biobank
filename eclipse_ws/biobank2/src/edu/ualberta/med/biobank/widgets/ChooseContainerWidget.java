@@ -86,7 +86,7 @@ public class ChooseContainerWidget extends AbstractGridContainerWidget {
     }
 
     @Override
-    protected String getTextForBox(int indexRow, int indexCol) {
+    protected String getDefaultTextForBox(int indexRow, int indexCol) {
         String sname = "";
         if (cells != null) {
             ContainerCell cell = cells[indexRow][indexCol];

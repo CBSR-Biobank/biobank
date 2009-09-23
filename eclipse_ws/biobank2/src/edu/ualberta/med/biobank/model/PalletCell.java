@@ -24,6 +24,8 @@ public class PalletCell {
 
     private ScanCell scanCell;
 
+    private Sample expectedSample;
+
     public PalletCell(ScanCell scanCell) {
         this.scanCell = scanCell;
     }
@@ -180,5 +182,13 @@ public class PalletCell {
 
     public static PalletCell[][] getEmptyCells() {
         return new PalletCell[ScanCell.ROW_MAX][ScanCell.COL_MAX];
+    }
+
+    public void setExpectedSample(Sample expectedSample) {
+        this.expectedSample = expectedSample;
+    }
+
+    public Sample getExpectedSample() {
+        return expectedSample;
     }
 }
