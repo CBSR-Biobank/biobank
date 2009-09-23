@@ -6,8 +6,6 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry exported="true" kind="lib" path="lib/ini4j-0.5.1.jar"/>
-	<classpathentry kind="lib" path="lib/net.sf.paperclips_1.0.4.200908120926.jar" sourcepath="/home/delphine/download/net.sf.paperclips.source_1.0.4.200908120926.jar"/>
-	<classpathentry kind="lib" path="lib/net.sf.paperclips.ui_1.0.4.200908120926.jar"/>
 	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
 	<classpathentry exported="true" kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry exported="true" kind="lib" path="lib/gluegen.jar"/>

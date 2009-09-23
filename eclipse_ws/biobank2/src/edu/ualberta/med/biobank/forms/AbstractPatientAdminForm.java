@@ -45,7 +45,7 @@ public abstract class AbstractPatientAdminForm extends BiobankEntryForm {
         }
     }
 
-    public boolean onClose() throws Exception {
+    public boolean onClose() {
         if (!isSaved) {
             if (BioBankPlugin.isAskPrint()) {
                 boolean doPrint = MessageDialog.openQuestion(PlatformUI
