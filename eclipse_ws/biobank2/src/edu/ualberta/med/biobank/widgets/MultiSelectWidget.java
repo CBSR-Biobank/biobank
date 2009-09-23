@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.apache.commons.collections.MapIterator;
 import org.apache.commons.collections.map.ListOrderedMap;
-import org.apache.log4j.Logger;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -16,8 +15,6 @@ import org.eclipse.swt.widgets.Label;
 import edu.ualberta.med.biobank.forms.FormUtils;
 
 public class MultiSelectWidget extends BiobankWidget {
-
-    static Logger log4j = Logger.getLogger(MultiSelectWidget.class.getName());
 
     private TreeViewer selTree;
 

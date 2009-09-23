@@ -25,6 +25,5 @@
 	<classpathentry kind="lib" path="lib/sdk-writable-client-framework.jar"/>
 	<classpathentry kind="lib" path="lib/spring.jar"/>
 	<classpathentry kind="lib" path="lib/xercesImpl.jar"/>
-	<classpathentry kind="lib" path="conf"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
