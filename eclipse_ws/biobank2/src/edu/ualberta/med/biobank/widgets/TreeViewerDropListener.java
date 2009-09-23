@@ -12,56 +12,47 @@ import org.eclipse.swt.dnd.TransferData;
  */
 public class TreeViewerDropListener extends ViewerDropAdapter {
 
-	private MultiSelectWidget multiSelect;
+    private MultiSelectWidget multiSelect;
 
-	public TreeViewerDropListener(TreeViewer viewer, MultiSelectWidget multiSelect) {
-		super(viewer);
-		this.multiSelect = multiSelect;
+    public TreeViewerDropListener(TreeViewer viewer,
+        MultiSelectWidget multiSelect) {
+        super(viewer);
+        this.multiSelect = multiSelect;
 
-		viewer.addDropSupport(DND.DROP_MOVE | DND.DROP_COPY,
-			new Transfer[] { MultiSelectNodeTransfer.getInstance() }, this);
-	}
+        viewer.addDropSupport(DND.DROP_MOVE | DND.DROP_COPY,
+            new Transfer[] { MultiSelectNodeTransfer.getInstance() }, this);
+    }
 
-	@Override
-	public boolean performDrop(Object data) {
-		boolean result = true;
+    @Override
+    public boolean performDrop(Object data) {
+        boolean result = true;
 
-		MultiSelectWidget.log4j.trace("performDrop: event: " + data.toString());
-		MultiSelectNode target = (MultiSelectNode) getCurrentTarget();
-		if (target == null)
-			target = (MultiSelectNode) getViewer().getInput();
+        MultiSelectNode target = (MultiSelectNode) getCurrentTarget();
+        if (target == null)
+            target = (MultiSelectNode) getViewer().getInput();
 
-		MultiSelectNode[] nodes = (MultiSelectNode[]) data;
+        MultiSelectNode[] nodes = (MultiSelectNode[]) data;
 
-		TreeViewer viewer = (TreeViewer) getViewer();
+        TreeViewer viewer = (TreeViewer) getViewer();
 
-		for (MultiSelectNode node : nodes) {
-			MultiSelectWidget.log4j.trace("target: " + target + ", node_parent: "
-					+ node.getParent());
+        for (MultiSelectNode node : nodes) {
+            if (target.getParent() == null) {
+                target.addChild(node);
 
-			if (target.getParent() == null) {
-				target.addChild(node);
+            } else {
+                target.getParent().insertAfter(target, node);
+            }
+            viewer.reveal(node);
+        }
+        multiSelect.notifyListeners();
+        return result;
+    }
 
-				MultiSelectWidget.log4j.trace("added " + node.getName() + " to "
-						+ target.getName());
-			} else {
-				target.getParent().insertAfter(target, node);
-
-				MultiSelectWidget.log4j.trace("inserted " + node.getName()
-						+ " after " + target.getName() + " on "
-						+ target.getParent().getName());
-			}
-			viewer.reveal(node);
-		}
-		multiSelect.notifyListeners();
-		return result;
-	}
-
-	@Override
-	public boolean validateDrop(Object target, int operation,
-			TransferData transferType) {
-		return MultiSelectNodeTransfer.getInstance().isSupportedType(
-			transferType);
-	}
+    @Override
+    public boolean validateDrop(Object target, int operation,
+        TransferData transferType) {
+        return MultiSelectNodeTransfer.getInstance().isSupportedType(
+            transferType);
+    }
 
 }
