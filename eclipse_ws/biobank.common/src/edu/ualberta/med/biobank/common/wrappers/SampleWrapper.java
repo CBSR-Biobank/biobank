@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -11,8 +12,10 @@ import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.Sample;
 import edu.ualberta.med.biobank.model.SamplePosition;
+import edu.ualberta.med.biobank.model.SampleStorage;
 import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.model.Study;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -73,7 +76,7 @@ public class SampleWrapper extends ModelWrapper<Sample> {
         return DatabaseResult.OK;
     }
 
-    private Site getSite() {
+    public Site getSite() {
         if (getPatientVisit() != null) {
             return getPatientVisit().getPatient().getStudy().getSite();
         }
@@ -111,7 +114,7 @@ public class SampleWrapper extends ModelWrapper<Sample> {
         }
     }
 
-    private void setSamplePosition(SamplePosition sp) {
+    public void setSamplePosition(SamplePosition sp) {
         SamplePosition old = getSamplePosition();
         wrappedObject.setSamplePosition(sp);
         propertyChangeSupport.firePropertyChange("samplePosition", old, sp);
@@ -128,8 +131,7 @@ public class SampleWrapper extends ModelWrapper<Sample> {
                 + Sample.class.getName()
                 + " where samplePosition.row=? and samplePosition.col=? and samplePosition.container=?",
             Arrays.asList(new Object[] { getSamplePosition().getRow(),
-                getSamplePosition().getCol(),
-                getSamplePosition().getContainer() }));
+                getSamplePosition().getCol(), parentContainer }));
         List<Sample> samples = appService.query(criteria);
         if (samples.size() == 0) {
             return DatabaseResult.OK;
@@ -156,8 +158,16 @@ public class SampleWrapper extends ModelWrapper<Sample> {
         propertyChangeSupport.firePropertyChange("linkDate", oldDate, date);
     }
 
-    private Date getLinkDate() {
+    public Date getLinkDate() {
         return wrappedObject.getLinkDate();
+    }
+
+    public void setQuantity(Double quantity) {
+        wrappedObject.setQuantity(quantity);
+    }
+
+    public Double getQuantity() {
+        return wrappedObject.getQuantity();
     }
 
     public static String getPositionString(Sample sample) {
@@ -193,5 +203,34 @@ public class SampleWrapper extends ModelWrapper<Sample> {
                 return LabelingScheme.getPositionString(position);
             }
         }
+    }
+
+    public static Sample createNewSample(String inventoryId,
+        PatientVisitWrapper pv, SampleType type,
+        Collection<SampleStorage> sampleStorages) {
+        Sample sample = new Sample();
+        sample.setInventoryId(inventoryId);
+        sample.setPatientVisit(pv.getWrappedObject());
+        sample.setLinkDate(new Date());
+        sample.setSampleType(type);
+        Double volume = null;
+        for (SampleStorage ss : sampleStorages) {
+            if (ss.getSampleType().getId().equals(type.getId())) {
+                volume = ss.getVolume();
+            }
+        }
+        sample.setQuantity(volume);
+        return sample;
+    }
+
+    public void setQuantityFromType() {
+        Study study = getPatientVisit().getPatient().getStudy();
+        Double volume = null;
+        for (SampleStorage ss : study.getSampleStorageCollection()) {
+            if (ss.getSampleType().getId().equals(getSampleType().getId())) {
+                volume = ss.getVolume();
+            }
+        }
+        setQuantity(volume);
     }
 }

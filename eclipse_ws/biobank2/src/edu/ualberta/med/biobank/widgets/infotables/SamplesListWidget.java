@@ -32,8 +32,6 @@ public class SamplesListWidget extends InfoTableWidget<Sample> {
 
     private Map<Integer, Sample> samples;
 
-    private BiobankCollectionModel[] model;
-
     private SamplesListWidget(Composite parent) {
         super(parent, null, headings, bounds);
         GridData tableData = ((GridData) getLayoutData());
@@ -88,28 +86,24 @@ public class SamplesListWidget extends InfoTableWidget<Sample> {
 
     private void setSamplePositions(
         final Collection<SamplePosition> samplePositionCollection) {
+        if (samplePositionCollection == null)
+            return;
+
         Thread t = new Thread() {
             @Override
             public void run() {
-                int count = 0;
-                for (SamplePosition samplePosition : samplePositionCollection) {
-                    if (getTableViewer().getTable().isDisposed()) {
-                        return;
-                    }
-                    final int j = count;
-                    final Sample sample = samplePosition.getSample();
-                    getTableViewer().getTable().getDisplay().asyncExec(
-                        new Runnable() {
+                if (getTableViewer().getTable().isDisposed())
+                    return;
 
-                            public void run() {
-                                model[j].o = sample;
-                                samples.put(sample.getId(), sample);
-                                getTableViewer().update(model[j], null);
-                            }
+                BiobankCollectionModel modelItem;
+                model.clear();
 
-                        });
-                    ++count;
+                for (SamplePosition position : samplePositionCollection) {
+                    modelItem = new BiobankCollectionModel();
+                    model.add(modelItem);
+                    modelItem.o = position.getSample();
                 }
+                launchAsyncRefresh();
             }
         };
         t.start();

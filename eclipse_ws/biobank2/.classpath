@@ -13,5 +13,6 @@
 	<classpathentry kind="lib" path="lib/scanlib.jar"/>
 	<classpathentry kind="lib" path="lib/org.eclipse.nebula.cwt_0.9.0.HEAD.jar"/>
 	<classpathentry kind="lib" path="lib/org.eclipse.nebula.widgets.cdatetime_0.14.0.HEAD.jar"/>
+	<classpathentry kind="con" path="org.eclipse.tptp.platform.instrumentation.ui.ContainerInitializer/Build to Manage Libraries"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

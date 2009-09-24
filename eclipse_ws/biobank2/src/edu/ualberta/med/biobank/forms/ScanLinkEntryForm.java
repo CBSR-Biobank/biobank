@@ -2,7 +2,6 @@ package edu.ualberta.med.biobank.forms;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 
 import org.eclipse.core.databinding.UpdateValueStrategy;
@@ -46,19 +45,22 @@ import edu.ualberta.med.biobank.common.LabelingScheme;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
 import edu.ualberta.med.biobank.forms.listener.EnterKeyToNextFieldListener;
 import edu.ualberta.med.biobank.model.PalletCell;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.Sample;
 import edu.ualberta.med.biobank.model.SampleCellStatus;
+import edu.ualberta.med.biobank.model.SampleStorage;
 import edu.ualberta.med.biobank.model.SampleType;
+import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.preferences.PreferenceConstants;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
 import edu.ualberta.med.biobank.validators.ScannerBarcodeValidator;
-import edu.ualberta.med.biobank.widgets.ScanLinkPalletWidget;
 import edu.ualberta.med.biobank.widgets.CancelConfirmWidget;
 import edu.ualberta.med.biobank.widgets.SampleTypeSelectionWidget;
+import edu.ualberta.med.biobank.widgets.ScanLinkPalletWidget;
 import edu.ualberta.med.biobank.widgets.listener.ScanPalletModificationEvent;
 import edu.ualberta.med.biobank.widgets.listener.ScanPalletModificationListener;
 import edu.ualberta.med.scanlib.ScanCell;
@@ -602,17 +604,18 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
         PatientVisitWrapper patientVisit = getSelectedPatientVisit();
         StringBuffer sb = new StringBuffer("Samples linked:");
         int nber = 0;
+        Study study = patientVisit.getPatientWrapper().getStudy();
+        Collection<SampleStorage> sampleStorages = study
+            .getSampleStorageCollection();
         for (int indexRow = 0; indexRow < cells.length; indexRow++) {
             for (int indexColumn = 0; indexColumn < cells[indexRow].length; indexColumn++) {
                 PalletCell cell = cells[indexRow][indexColumn];
                 if (PalletCell.hasValue(cell)
                     && cell.getStatus().equals(SampleCellStatus.TYPE)) {
                     // add new samples
-                    Sample sample = new Sample();
-                    sample.setInventoryId(cell.getValue());
-                    sample.setPatientVisit(patientVisit.getWrappedObject());
-                    sample.setLinkDate(new Date());
-                    sample.setSampleType(cell.getType());
+                    Sample sample = SampleWrapper.createNewSample(cell
+                        .getValue(), patientVisit, cell.getType(),
+                        sampleStorages);
                     queries.add(new InsertExampleQuery(sample));
                     sb.append("\nLINKED: ").append(cell.getValue());
                     sb.append(" - patient: ").append(

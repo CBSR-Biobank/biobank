@@ -439,6 +439,8 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
     @Override
     protected void saveForm() throws Exception {
         sampleWrapper.setLinkDate(new Date());
+        sampleWrapper.setPatientVisit(getSelectedPatientVisit());
+        sampleWrapper.setQuantityFromType();
         DatabaseResult res = sampleWrapper.persist();
         if (res != DatabaseResult.OK) {
             BioBankPlugin.openError("Cabinet sample save", res.getMessage());

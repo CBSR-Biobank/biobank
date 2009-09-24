@@ -137,8 +137,11 @@ public class LabelingScheme {
         pos1 = index / 24;
         pos2 = index % 24;
 
-        return String.valueOf(CBSR_LABELLING_PATTERN.charAt(pos1))
-            + String.valueOf(CBSR_LABELLING_PATTERN.charAt(pos2));
+        if (pos1 >= 0 && pos2 >= 0) {
+            return String.valueOf(CBSR_LABELLING_PATTERN.charAt(pos1))
+                + String.valueOf(CBSR_LABELLING_PATTERN.charAt(pos2));
+        }
+        return null;
     }
 
     /**
