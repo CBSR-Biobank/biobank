@@ -381,9 +381,8 @@ public class InitExamples {
 
     @SuppressWarnings("unused")
     private void insertSampleStorage() throws Exception {
-        HQLCriteria c = new HQLCriteria(
-            "from edu.ualberta.med.biobank.model.Study as study "
-                + "where study.nameShort=?");
+        HQLCriteria c = new HQLCriteria("from " + Study.class.getName()
+            + " as study " + "where study.nameShort=?");
         c.setParameters(Arrays.asList(new Object[] { "BBP" }));
         List<Study> studies = appService.query(c);
         if (studies.size() != 1) {
@@ -392,7 +391,7 @@ public class InitExamples {
 
         Study bbpStudy = studies.get(0);
 
-        c = new HQLCriteria("from edu.ualberta.med.biobank.model.SampleType");
+        c = new HQLCriteria("from " + SampleType.class.getName());
         List<SampleType> results = appService.query(c);
         if (results.size() == 0) {
             throw new Exception("not sample types in database");

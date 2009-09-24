@@ -275,8 +275,8 @@ public class ContainerWrapper extends ModelWrapper<Container> {
     private void setChildLabels(String oldLabel) throws Exception {
         // inefficient, should be improved
         HQLCriteria criteria = new HQLCriteria("from "
-            + Container.class.getName() + " where label like '" + oldLabel
-            + "%'" + " and site= " + getSite().getId());
+            + Container.class.getName() + " where label like ? and site= ?",
+            Arrays.asList(new Object[] { oldLabel + "%", getSite() }));
 
         List<Container> containers = appService.query(criteria);
         for (Container container : containers) {

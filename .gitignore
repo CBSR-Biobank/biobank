@@ -15,6 +15,7 @@ eclipse_ws/biobank2/src/edu/ualberta/med/biobank/test
 runtime-biobank2.biobank2
 schema/schema-export.sql
 eclipse_ws/biobank.common/bin
+eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/test
 eclipse_ws/biobank2.importer/bin
 eclipse_ws/biobank2.tests/bin
 eclipse_ws/biobank2/lib/*.jar

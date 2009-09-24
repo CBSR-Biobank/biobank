@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.forms;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.core.databinding.beans.PojoObservables;
@@ -159,9 +160,8 @@ public class SiteEntryForm extends AddressEntryFormCommon {
     }
 
     private boolean checkSiteNameUnique() throws ApplicationException {
-        HQLCriteria c = new HQLCriteria(
-            "from edu.ualberta.med.biobank.model.Site where name = '"
-                + site.getName() + "'");
+        HQLCriteria c = new HQLCriteria("from " + Site.class.getName()
+            + " where name = ?", Arrays.asList(new Object[] { site.getName() }));
 
         List<Object> results = appService.query(c);
         if (results.size() == 0)

@@ -60,7 +60,9 @@ public class ClinicStudyInfoTable extends InfoTableWidget<Study> {
 
                         HQLCriteria c = new HQLCriteria(
                             "select distinct patients"
-                                + " from edu.ualberta.med.biobank.model.Study as study"
+                                + " from "
+                                + Study.class.getName()
+                                + " as study"
                                 + " inner join study.patientCollection as patients"
                                 + " inner join patients.patientVisitCollection as visits"
                                 + " inner join visits.clinic as clinic"
@@ -73,7 +75,9 @@ public class ClinicStudyInfoTable extends InfoTableWidget<Study> {
 
                         c = new HQLCriteria(
                             "select count(patients)"
-                                + " from edu.ualberta.med.biobank.model.Study as study"
+                                + " from "
+                                + Study.class.getName()
+                                + " as study"
                                 + " inner join study.patientCollection as patients"
                                 + " inner join patients.patientVisitCollection as visit"
                                 + " inner join visit.clinic as clinic"

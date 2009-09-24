@@ -51,9 +51,8 @@ public class SampleTypesEntryForm extends BiobankEntryForm {
 
     private List<SampleType> getGlobalSampleTypes() throws Exception {
         List<SampleType> results = new ArrayList<SampleType>();
-        HQLCriteria c = new HQLCriteria(
-            "from edu.ualberta.med.biobank.model.SampleType "
-                + "where site = null");
+        HQLCriteria c = new HQLCriteria("from " + SampleType.class.getName()
+            + " where site = null");
         results = appService.query(c);
         return results;
     }

@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.forms;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -581,11 +582,9 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
     }
 
     private boolean checkContainerTypeNameUnique() throws ApplicationException {
-        HQLCriteria c = new HQLCriteria(
-            "from edu.ualberta.med.biobank.model.ContainerType as st "
-                + "inner join fetch st.site " + "where st.site.id='"
-                + site.getId() + "' " + "and st.name = '"
-                + containerType.getName() + "'");
+        HQLCriteria c = new HQLCriteria("from " + ContainerType.class.getName()
+            + " where site = ? and name = ?", Arrays.asList(new Object[] {
+            site, containerType.getName() }));
 
         List<Object> results = appService.query(c);
         if (results.size() == 0)

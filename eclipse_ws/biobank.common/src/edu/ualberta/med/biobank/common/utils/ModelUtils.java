@@ -29,9 +29,8 @@ public class ModelUtils {
         throws ApplicationException {
         HQLCriteria criteria = new HQLCriteria("from "
             + Container.class.getName()
-            + " where site.id=? and position is null");
-
-        criteria.setParameters(Arrays.asList(new Object[] { site.getId() }));
+            + " where site.id=? and position is null", Arrays
+            .asList(new Object[] { site.getId() }));
         return appService.query(criteria);
     }
 
@@ -144,12 +143,15 @@ public class ModelUtils {
         String text, boolean strict) throws ApplicationException {
         String query = "from " + clazz.getName() + " as o ";
         query += " where o." + property;
+        String textParam = text;
         if (strict) {
-            query += " = '" + text + "'";
+            query += " = ?";
         } else {
-            query += " like '%" + text + "%'";
+            query += " like ?";
+            textParam = "%" + text + "%";
         }
-        return appService.query(new HQLCriteria(query));
+        return appService.query(new HQLCriteria(query, Arrays
+            .asList(new Object[] { textParam })));
     }
 
     public static SampleStorage[] toArray(Collection<SampleStorage> collection) {
