@@ -1,14 +1,10 @@
 package edu.ualberta.med.biobank.rcp;
 
 import org.eclipse.ui.IPartListener;
-import org.eclipse.ui.IViewReference;
-import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
-import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.forms.AbstractPatientAdminForm;
-import edu.ualberta.med.biobank.views.PatientAdministrationView;
 
 public class BiobankPartListener implements IPartListener {
 
@@ -29,17 +25,7 @@ public class BiobankPartListener implements IPartListener {
                 boolean reallyClose = ((AbstractPatientAdminForm) part)
                     .onClose();
                 if (reallyClose) {
-
-                    IWorkbenchPage activePage = PlatformUI.getWorkbench()
-                        .getActiveWorkbenchWindow().getActivePage();
-                    if (activePage != null) {
-                        for (IViewReference ref : activePage
-                            .getViewReferences()) {
-                            activePage.hideView(ref);
-                        }
-                        activePage.showView(PatientAdministrationView.ID);
-                    }
-
+                    PatientsAdministrationPerspective.showOnlyPatientView();
                 }
             } catch (Exception e) {
                 SessionManager.getLogger().error(

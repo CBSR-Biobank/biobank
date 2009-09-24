@@ -554,7 +554,7 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
                 .getCurrentSite());
         } catch (Exception e) {
             SessionManager.getLogger().error(
-                "Error while reseting pallet values");
+                "Error while reseting pallet values", e);
         }
     }
 

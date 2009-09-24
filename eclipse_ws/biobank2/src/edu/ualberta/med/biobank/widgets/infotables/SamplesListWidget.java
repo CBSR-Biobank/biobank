@@ -75,8 +75,7 @@ public class SamplesListWidget extends InfoTableWidget<Sample> {
                         .accept(new NodeSearchVisitor(Container.class, sc
                             .getId()));
                     if (node != null) {
-                        SessionManager.getInstance().getTreeViewer()
-                            .setSelection(new StructuredSelection(node));
+                        SessionManager.getInstance().setSelectedNode(node);
                         node.performDoubleClick();
                     }
                 }

@@ -1,5 +1,7 @@
 package edu.ualberta.med.biobank.views;
 
+import java.util.Map;
+
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
@@ -11,8 +13,12 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tree;
+import org.eclipse.ui.ISourceProviderListener;
+import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
+import org.eclipse.ui.services.ISourceProviderService;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
@@ -20,6 +26,7 @@ import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.forms.PatientEntryForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Patient;
+import edu.ualberta.med.biobank.sourceproviders.SiteSelectionState;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.NodeSearchVisitor;
 import edu.ualberta.med.biobank.treeview.PatientAdapter;
@@ -29,7 +36,8 @@ import edu.ualberta.med.biobank.treeview.StudyAdapter;
 import edu.ualberta.med.biobank.widgets.AdapterTreeWidget;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
-public class PatientAdministrationView extends ViewPart {
+public class PatientAdministrationView extends ViewPart implements
+    AdapterTreeView {
 
     public static final String ID = "edu.ualberta.med.biobank.views.patientsAdmin";
 
@@ -53,7 +61,7 @@ public class PatientAdministrationView extends ViewPart {
     public void createPartControl(Composite parent) {
         parent.setLayout(new GridLayout(1, false));
 
-        patientNumberText = new Text(parent, SWT.SINGLE);
+        patientNumberText = new Text(parent, SWT.SINGLE | SWT.BORDER);
         Listener searchListener = new Listener() {
             public void handleEvent(Event e) {
                 searchPatient();
@@ -65,7 +73,7 @@ public class PatientAdministrationView extends ViewPart {
         gd.grabExcessHorizontalSpace = true;
         patientNumberText.setLayoutData(gd);
 
-        adaptersTree = new AdapterTreeWidget(parent);
+        adaptersTree = new AdapterTreeWidget(parent, this);
         gd = new GridData();
         gd.horizontalAlignment = SWT.FILL;
         gd.verticalAlignment = SWT.FILL;
@@ -77,6 +85,48 @@ public class PatientAdministrationView extends ViewPart {
         adaptersTree.getTreeViewer().setInput(getRootNode());
         getSite().setSelectionProvider(adaptersTree.getTreeViewer());
         adaptersTree.getTreeViewer().expandAll();
+
+        setSiteManagement();
+    }
+
+    private void setPatientTextEnablement(Object state) {
+        boolean siteSelected = Boolean.valueOf(state.toString());
+        patientNumberText.setEnabled(siteSelected);
+        if (!siteSelected) {
+            currentPatientAdapter = null;
+            getRootNode().removeAll();
+        }
+    }
+
+    private void setSiteManagement() {
+        IWorkbenchWindow window = PlatformUI.getWorkbench()
+            .getActiveWorkbenchWindow();
+        ISourceProviderService service = (ISourceProviderService) window
+            .getService(ISourceProviderService.class);
+        SiteSelectionState siteSelectionStateSourceProvider = (SiteSelectionState) service
+            .getSourceProvider(SiteSelectionState.SITE_SELECTION_STATE);
+
+        Object state = siteSelectionStateSourceProvider.getCurrentState().get(
+            SiteSelectionState.SITE_SELECTION_STATE);
+        setPatientTextEnablement(state);
+
+        siteSelectionStateSourceProvider
+            .addSourceProviderListener(new ISourceProviderListener() {
+                @Override
+                public void sourceChanged(int sourcePriority,
+                    String sourceName, Object sourceValue) {
+                    if (sourceName
+                        .equals(SiteSelectionState.SITE_SELECTION_STATE)) {
+                        setPatientTextEnablement(sourceValue);
+                    }
+                }
+
+                @SuppressWarnings("unchecked")
+                @Override
+                public void sourceChanged(int sourcePriority,
+                    Map sourceValuesByName) {
+                }
+            });
     }
 
     protected void searchPatient() {

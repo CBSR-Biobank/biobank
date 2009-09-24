@@ -8,10 +8,8 @@ import java.util.concurrent.Semaphore;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.preferences.InstanceScope;
-import org.eclipse.jface.viewers.DoubleClickEvent;
-import org.eclipse.jface.viewers.IDoubleClickListener;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
@@ -88,20 +86,6 @@ public class SessionManager {
         }
     };
 
-    private IDoubleClickListener doubleClickListener = new IDoubleClickListener() {
-        public void doubleClick(DoubleClickEvent event) {
-            Object selection = event.getSelection();
-
-            if (selection == null)
-                return;
-
-            Object element = ((StructuredSelection) selection)
-                .getFirstElement();
-            ((AdapterBase) element).performDoubleClick();
-            view.getTreeViewer().expandToLevel(element, 1);
-        }
-    };
-
     private SessionManager() {
         super();
         rootNode = new RootNode();
@@ -114,10 +98,6 @@ public class SessionManager {
             instance = new SessionManager();
         }
         return instance;
-    }
-
-    public IDoubleClickListener getDoubleClickListener() {
-        return doubleClickListener;
     }
 
     public void setSessionsView(SessionsView view) {
@@ -153,7 +133,9 @@ public class SessionManager {
         updateSites();
         sessionAdapter.loadChildren(true);
         siteCombo.setSession(sessionAdapter);
-        view.getTreeViewer().expandToLevel(2);
+        if (view != null) {
+            view.getTreeViewer().expandToLevel(3);
+        }
         log4j.debug("addSession: " + name);
         startInactivityTimer();
         updateMenus();
@@ -205,6 +187,7 @@ public class SessionManager {
         updateMenus();
         currentSites = new ArrayList<Site>();
         siteCombo.comboViewer.setInput(currentSites);
+        setCurrentSite(null);
     }
 
     private void updateMenus() {
@@ -241,8 +224,27 @@ public class SessionManager {
         return getInstance().getSession().getAppService();
     }
 
-    public TreeViewer getTreeViewer() {
-        return view.getTreeViewer();
+    public void updateTreeNode(AdapterBase node) {
+        if (view != null) {
+            view.getTreeViewer().update(node, null);
+        }
+    }
+
+    public void setSelectedNode(AdapterBase node) {
+        if (view != null) {
+            view.getTreeViewer().setSelection(new StructuredSelection(node));
+        }
+    }
+
+    public AdapterBase getSelectedNode() {
+        if (view != null) {
+            IStructuredSelection treeSelection = (IStructuredSelection) view
+                .getTreeViewer().getSelection();
+            if (treeSelection != null && treeSelection.size() > 0) {
+                return (AdapterBase) treeSelection.getFirstElement();
+            }
+        }
+        return null;
     }
 
     public static Logger getLogger() {
@@ -277,7 +279,9 @@ public class SessionManager {
         SiteSelectionState siteSelectionStateSourceProvider = (SiteSelectionState) service
             .getSourceProvider(SiteSelectionState.SITE_SELECTION_STATE);
         siteSelectionStateSourceProvider.setSiteSelectionState(site != null);
-        getSession().performExpand();
+        if (sessionAdapter != null) {
+            sessionAdapter.performExpand();
+        }
     }
 
     public RootNode getRootNode() {

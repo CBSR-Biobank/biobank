@@ -41,34 +41,38 @@ public class OpenPatientFormHandler extends AbstractHandler implements IHandler 
             if (activePage == null) {
                 return null;
             }
-            // hide others view
+            // hide others view and others editors
             for (IViewReference ref : activePage.getViewReferences()) {
                 activePage.hideView(ref);
             }
-            activePage.showView(IConsoleConstants.ID_CONSOLE_VIEW);
-
-            // close opened editors
             activePage.closeAllEditors(true);
+
+            // open the editor
             window.getActivePage().openEditor(
                 new FormInput(SessionManager.getInstance().getSession()),
                 editorId, true);
-
-            // Remove buttons in the console view toolbar
-            // TODO can we do something nicer ?
-            IViewPart viewPart = activePage
-                .findView(IConsoleConstants.ID_CONSOLE_VIEW);
-            IViewSite viewSite = viewPart.getViewSite();
-            IActionBars actionBars = viewSite.getActionBars();
-            IToolBarManager toolBarManager = actionBars.getToolBarManager();
-
-            IContributionItem[] contributionItems = toolBarManager.getItems();
-            contributionItems = toolBarManager.getItems();
-            for (int i = 0; i < contributionItems.length; i++)
-                if (i >= 2)
-                    toolBarManager.remove(contributionItems[i]);
+            // open the console view
+            activePage.showView(IConsoleConstants.ID_CONSOLE_VIEW);
+            hideConsoleViewIcons(activePage);
         } catch (PartInitException e) {
             throw new ExecutionException("Part could not be initialized", e); //$NON-NLS-1$
         }
         return null;
+    }
+
+    private void hideConsoleViewIcons(IWorkbenchPage activePage) {
+        // Remove buttons in the console view toolbar
+        // TODO can we do something nicer ?
+        IViewPart viewPart = activePage
+            .findView(IConsoleConstants.ID_CONSOLE_VIEW);
+        IViewSite viewSite = viewPart.getViewSite();
+        IActionBars actionBars = viewSite.getActionBars();
+        IToolBarManager toolBarManager = actionBars.getToolBarManager();
+
+        IContributionItem[] contributionItems = toolBarManager.getItems();
+        contributionItems = toolBarManager.getItems();
+        for (int i = 0; i < contributionItems.length; i++)
+            if (i >= 2)
+                toolBarManager.remove(contributionItems[i]);
     }
 }
