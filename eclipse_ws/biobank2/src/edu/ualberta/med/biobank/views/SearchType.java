@@ -118,7 +118,7 @@ public enum SearchType {
     };
 
     public abstract AdapterBase search(WritableApplicationService appService,
-        String searchValue, AdapterBase node) throws MultipleSearchResultException,
-        Exception;
+        String searchValue, AdapterBase node)
+        throws MultipleSearchResultException, Exception;
 
 }
