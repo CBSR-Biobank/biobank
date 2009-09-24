@@ -68,6 +68,11 @@
             name="Biobank Perspective">
       </perspective>
       <perspective
+            class="edu.ualberta.med.biobank.rcp.ReportsPerspective"
+            id="edu.ualberta.med.biobank.perspective.reports"
+            name="Reports Perspective">
+      </perspective>
+      <perspective
             class="edu.ualberta.med.biobank.rcp.PatientsAdministrationPerspective"
             fixed="true"
             id="edu.ualberta.med.biobank.perspective.patients"
@@ -114,7 +119,6 @@
       		name="Edit Sample Types">
       		</command>
       <command
-            defaultHandler="edu.ualberta.med.biobank.handlers.ReportsHandler"
             id="edu.ualberta.med.biobank.commands.reports"
             name="Reports">
       </command>
@@ -262,6 +266,20 @@
       <handler
             class="edu.ualberta.med.biobank.handlers.EditSampleTypesHandler"
             commandId="edu.ualberta.med.biobank.commands.editSampleTypes">
+         <activeWhen>
+           <and>
+            <reference
+                  definitionId="biobank2.loggedIn">
+            </reference>
+            <reference
+                  definitionId="biobank2.siteSelected">
+            </reference>
+           </and>
+         </activeWhen>
+      </handler>
+      <handler
+            class="edu.ualberta.med.biobank.handlers.ReportsHandler"
+            commandId="edu.ualberta.med.biobank.commands.reports">
          <activeWhen>
            <and>
             <reference
@@ -494,12 +512,7 @@
                   </reference>
                </visibleWhen>
             </menu>
-            <command
-                  commandId="edu.ualberta.med.biobank.commands.reports"
-                  id="edu.ualberta.med.biobank.menu.reports"
-                  label="Reports"
-                  style="push">
-            </command>
+           
          </menu>
          <menu
                id="edu.ualberta.med.biobank.menu.configuration"
@@ -537,6 +550,18 @@
                commandId="edu.ualberta.med.biobank.commands.patientAdmin"
                icon="icons/patientPerspective.png"
                label="Patients Administration"
+               style="push">
+               <visibleWhen
+                     checkEnabled="false">
+                  <reference
+                        definitionId="biobank2.mainPerpectiveSelected">
+                  </reference>
+               </visibleWhen>
+            </command>
+            <command
+               commandId="edu.ualberta.med.biobank.commands.reports"
+               icon="icons/page_white_find.png"
+               label="Reports"
                style="push">
                <visibleWhen
                      checkEnabled="false">
@@ -593,7 +618,7 @@
                   </reference>
                </visibleWhen>                  
             </command>
-         </toolbar>  
+         </toolbar> 
          <toolbar
                id="edu.ualberta.med.biobank.toolbar.patientsPerspective">
             <command
@@ -699,6 +724,22 @@
                relative="org.eclipse.ui.editorss"
                showTitle="false"
                standalone="true"
+               visible="true">
+         </view>
+         
+      </perspectiveExtension>
+      <perspectiveExtension
+            targetID="edu.ualberta.med.biobank.perspective.reports">
+         <view
+               closeable="false"
+               id="edu.ualberta.med.biobank.views.ReportsView"
+               minimized="false"
+               moveable="false"
+               ratio="0.5"
+               relationship="left"
+               relative="org.eclipse.ui.editorss"
+               showTitle="false"
+               standalone="false"
                visible="true">
          </view>
       </perspectiveExtension>
@@ -923,6 +964,14 @@
       </view>
       <view
             allowMultiple="false"
+            class="edu.ualberta.med.biobank.views.ReportsView"
+            id="edu.ualberta.med.biobank.views.ReportsView"
+            icon="icons/page_white_find.png"
+            name="Reports"
+            restorable="true">
+      </view>
+      <view
+            allowMultiple="false"
             class="edu.ualberta.med.biobank.views.PatientAdministrationView"
             icon="icons/patientPerspective.png"
             id="edu.ualberta.med.biobank.views.patientsAdmin"
@@ -938,6 +987,15 @@
                variable="activeWorkbenchWindow.activePerspective">
             <equals
                   value="edu.ualberta.med.biobank.perspective.main">
+            </equals>
+         </with>
+      </definition>
+      <definition
+            id="biobank2.reportsPerpectiveSelected">
+         <with
+               variable="activeWorkbenchWindow.activePerspective">
+            <equals
+                  value="edu.ualberta.med.biobank.perspective.reports">
             </equals>
          </with>
       </definition>

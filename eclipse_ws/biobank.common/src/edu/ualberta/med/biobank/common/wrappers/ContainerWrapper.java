@@ -17,8 +17,6 @@ import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.model.Site;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
-import gov.nih.nci.system.query.SDKQuery;
-import gov.nih.nci.system.query.example.UpdateExampleQuery;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class ContainerWrapper extends ModelWrapper<Container> {
@@ -162,80 +160,6 @@ public class ContainerWrapper extends ModelWrapper<Container> {
     }
 
     /**
-     * if address exists if address is not full if type is valid for slot modify
-     * this object's position, label, children
-     */
-    public void setNewPositionFromLabel(String newAddress) throws Exception {
-        if (newAddress.length() < 2)
-            throw new Exception(
-                "Destination address must be another container.");
-        String newParentContainerLabel = newAddress.substring(0, newAddress
-            .length() - 2);
-
-        List<Container> newParentContainers = getContainersInSite(appService,
-            getSite(), newParentContainerLabel);
-        String oldLabel = getLabel();
-
-        if (newParentContainers.size() != 1) {
-            // invalid parent
-            throw new Exception("Unable to find parent container with label "
-                + newParentContainerLabel + ".");
-        } else {
-            List<Container> samePositions = getContainersInSite(appService,
-                getSite(), newAddress);
-            if (samePositions.size() != 0) {
-                // filled
-                throw new Exception(
-                    "The destination "
-                        + newAddress
-                        + " has already been initialized. You can only move to an uninitialized location.");
-            } else {
-                // remove from old parent, add to new
-                List<Container> oldParentContainers = getContainersInSite(
-                    appService, getSite(), getLabel().substring(0,
-                        getLabel().length() - 2));
-                if (oldParentContainers.size() > 0) {
-                    // parents
-                    Container oldParent = oldParentContainers.get(0);
-                    Container newParent = newParentContainers.get(0);
-
-                    // remove from old
-                    Collection<ContainerPosition> oldPositions = oldParent
-                        .getChildPositionCollection();
-                    oldPositions.remove(getPosition());
-                    oldParent.setChildPositionCollection(oldPositions);
-
-                    // modify position object
-                    ContainerPositionWrapper positionWrapper = new ContainerPositionWrapper(
-                        appService, getPosition());
-                    positionWrapper.setParentContainer(newParent);
-                    positionWrapper.setPosition(newAddress.substring(newAddress
-                        .length() - 2));
-                    setPosition(positionWrapper.getWrappedObject());
-
-                    // add to new
-                    Collection<ContainerPosition> newPositions = newParent
-                        .getChildPositionCollection();
-                    newPositions.add(getPosition());
-                    newParent.setChildPositionCollection(newPositions);
-
-                    // change label
-                    if (getLabel().equalsIgnoreCase(getProductBarcode()))
-                        setProductBarcode(newAddress);
-                    setLabel(newAddress);
-
-                    SDKQuery q = new UpdateExampleQuery(wrappedObject);
-                    this.appService.executeQuery(q);
-                    // move children
-                    setChildLabels(oldLabel);
-                } else
-                    throw new Exception(
-                        "You cannot move a top level container.");
-            }
-        }
-    }
-
-    /**
      * compute the ContainerPosition for this container using its label. If the
      * parent container cannot hold the container type of this container, then
      * an exception is launched
@@ -270,26 +194,6 @@ public class ContainerWrapper extends ModelWrapper<Container> {
         positionWrapper.setPosition(getLabel().substring(
             getLabel().length() - 2));
         setPosition(positionWrapper.getWrappedObject());
-    }
-
-    private void setChildLabels(String oldLabel) throws Exception {
-        // inefficient, should be improved
-        HQLCriteria criteria = new HQLCriteria("from "
-            + Container.class.getName() + " where label like ? and site= ?",
-            Arrays.asList(new Object[] { oldLabel + "%", getSite() }));
-
-        List<Container> containers = appService.query(criteria);
-        for (Container container : containers) {
-            if (container.getLabel().compareToIgnoreCase(oldLabel) == 0)
-                continue;
-            ContainerWrapper temp = new ContainerWrapper(appService, container);
-            temp.setLabel(getLabel()
-                + container.getLabel().substring(getLabel().length()));
-            SDKQuery q = new UpdateExampleQuery(temp.getWrappedObject());
-            this.appService.executeQuery(q);
-            temp.setChildLabels(oldLabel
-                + container.getLabel().substring(getLabel().length()));
-        }
     }
 
     /**
