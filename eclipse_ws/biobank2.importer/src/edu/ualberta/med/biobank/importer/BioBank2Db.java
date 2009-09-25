@@ -95,7 +95,8 @@ public class BioBank2Db {
     public Clinic getClinic(Study study, String clinicName) throws Exception {
         HQLCriteria c = new HQLCriteria("select clinics"
             + " from edu.ualberta.med.biobank.model.Study as study"
-            + " inner join study.clinicCollection as clinics"
+            + " inner join study.contactCollection as contacts"
+            + " inner join contacts.clinic as clinics"
             + " where study.id=? and clinics.name=?");
 
         c.setParameters(Arrays.asList(new Object [] { study.getId(), clinicName }));
@@ -125,7 +126,8 @@ public class BioBank2Db {
 
         List<PvInfoPossible> list = appService.search(PvInfoPossible.class,
             pvInfoPossible);
-        if (list.size() != 1) throw new Exception();
+        if (list.size() != 1) throw new Exception(
+            "PvInfoPossible not found with label " + label);
         return list.get(0);
     }
 
@@ -205,8 +207,8 @@ public class BioBank2Db {
         }
     }
 
-    public PatientVisit getPatientVisit(String studyNameShort, int patientNum,
-        String dateDrawn) throws Exception {
+    public PatientVisit getPatientVisit(String studyNameShort,
+        String patientNum, String dateDrawn) throws Exception {
         Date date = biobank2DateFmt.parse(dateDrawn);
         HQLCriteria c = new HQLCriteria("select visits"
             + " from edu.ualberta.med.biobank.model.Study as study"
@@ -220,7 +222,7 @@ public class BioBank2Db {
         // + " patientNum/" + patientNum + " dateDrawn/" + dateDrawn);
 
         c.setParameters(Arrays.asList(new Object [] {
-            studyNameShort, String.format("%d", patientNum), date }));
+            studyNameShort, patientNum, date }));
 
         List<PatientVisit> results = appService.query(c);
         if (results.size() != 1) {

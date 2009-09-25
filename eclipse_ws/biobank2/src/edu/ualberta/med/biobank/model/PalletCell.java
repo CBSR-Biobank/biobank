@@ -42,10 +42,10 @@ public class PalletCell {
 
     public static PalletCell[][] getRandomScanLink() {
         return convertArray(ScanCell.getRandom());
-        // ScanCell[][] paletteScanned = new ScanCell[8][12];
-        // paletteScanned[0][0] = new ScanCell(0, 0, "titi");
-        // paletteScanned[1][3] = new ScanCell(1, 3, "toto");
-        // return convertArray(paletteScanned);
+        // ScanCell[][] palletScanned = new ScanCell[8][12];
+        // palletScanned[0][0] = new ScanCell(0, 0, "titi");
+        // palletScanned[1][3] = new ScanCell(1, 3, "toto");
+        // return convertArray(palletScanned);
     }
 
     public static PalletCell[][] getRandomScanProcessAlreadyInPallet(
