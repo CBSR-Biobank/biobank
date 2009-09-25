@@ -8,10 +8,8 @@ import java.util.concurrent.Semaphore;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.preferences.InstanceScope;
-import org.eclipse.jface.viewers.DoubleClickEvent;
-import org.eclipse.jface.viewers.IDoubleClickListener;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
@@ -60,7 +58,9 @@ public class SessionManager {
 
     private List<Site> currentSites;
 
-    private static final String LAST_SITE = "lastSite";
+    private static final String SITE_PREF_NODE = "Site";
+
+    private static final String LAST_SITE_PREF = "lastSite";
 
     final Runnable timeoutRunnable = new Runnable() {
         public void run() {
@@ -88,20 +88,6 @@ public class SessionManager {
         }
     };
 
-    private IDoubleClickListener doubleClickListener = new IDoubleClickListener() {
-        public void doubleClick(DoubleClickEvent event) {
-            Object selection = event.getSelection();
-
-            if (selection == null)
-                return;
-
-            Object element = ((StructuredSelection) selection)
-                .getFirstElement();
-            ((AdapterBase) element).performDoubleClick();
-            view.getTreeViewer().expandToLevel(element, 1);
-        }
-    };
-
     private SessionManager() {
         super();
         rootNode = new RootNode();
@@ -116,10 +102,6 @@ public class SessionManager {
         return instance;
     }
 
-    public IDoubleClickListener getDoubleClickListener() {
-        return doubleClickListener;
-    }
-
     public void setSessionsView(SessionsView view) {
         this.view = view;
         updateMenus();
@@ -132,8 +114,8 @@ public class SessionManager {
         rootNode.addChild(sessionAdapter);
         Collections.sort(sites, new SiteComparator());
         Preferences prefs = new InstanceScope().getNode(Application.PLUGIN_ID);
-        Preferences lastSite = prefs.node("Site");
-        String siteId = lastSite.get(LAST_SITE, "-1");
+        Preferences lastSite = prefs.node(SITE_PREF_NODE);
+        String siteId = lastSite.get(LAST_SITE_PREF, "-1");
         if (siteId.equalsIgnoreCase("-1"))
             currentSite = null;
         else
@@ -153,7 +135,9 @@ public class SessionManager {
         updateSites();
         sessionAdapter.loadChildren(true);
         siteCombo.setSession(sessionAdapter);
-        view.getTreeViewer().expandToLevel(2);
+        if (view != null) {
+            view.getTreeViewer().expandToLevel(3);
+        }
         log4j.debug("addSession: " + name);
         startInactivityTimer();
         updateMenus();
@@ -205,6 +189,7 @@ public class SessionManager {
         updateMenus();
         currentSites = new ArrayList<Site>();
         siteCombo.comboViewer.setInput(currentSites);
+        setCurrentSite(null);
     }
 
     private void updateMenus() {
@@ -241,8 +226,27 @@ public class SessionManager {
         return getInstance().getSession().getAppService();
     }
 
-    public TreeViewer getTreeViewer() {
-        return view.getTreeViewer();
+    public void updateTreeNode(AdapterBase node) {
+        if (view != null) {
+            view.getTreeViewer().update(node, null);
+        }
+    }
+
+    public void setSelectedNode(AdapterBase node) {
+        if (view != null) {
+            view.getTreeViewer().setSelection(new StructuredSelection(node));
+        }
+    }
+
+    public AdapterBase getSelectedNode() {
+        if (view != null) {
+            IStructuredSelection treeSelection = (IStructuredSelection) view
+                .getTreeViewer().getSelection();
+            if (treeSelection != null && treeSelection.size() > 0) {
+                return (AdapterBase) treeSelection.getFirstElement();
+            }
+        }
+        return null;
     }
 
     public static Logger getLogger() {
@@ -263,8 +267,7 @@ public class SessionManager {
         if (site != null && site.getId() != null)
             saveVal = site.getId().toString();
         Preferences prefs = new InstanceScope().getNode(Application.PLUGIN_ID);
-        prefs.node("Site").put(LAST_SITE, saveVal);
-
+        prefs.node(SITE_PREF_NODE).put(LAST_SITE_PREF, saveVal);
         try {
             prefs.flush();
         } catch (BackingStoreException e) {
@@ -275,9 +278,11 @@ public class SessionManager {
         ISourceProviderService service = (ISourceProviderService) window
             .getService(ISourceProviderService.class);
         SiteSelectionState siteSelectionStateSourceProvider = (SiteSelectionState) service
-            .getSourceProvider(SiteSelectionState.SITE_SELECTION_STATE);
-        siteSelectionStateSourceProvider.setSiteSelectionState(site != null);
-        getSession().performExpand();
+            .getSourceProvider(SiteSelectionState.SITE_SELECTION_ID);
+        siteSelectionStateSourceProvider.setSiteSelection(site);
+        if (sessionAdapter != null) {
+            sessionAdapter.performExpand();
+        }
     }
 
     public RootNode getRootNode() {

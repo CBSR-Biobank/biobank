@@ -160,7 +160,7 @@ public class BioBankPlugin extends AbstractUIPlugin {
             msg = e.getCause().getMessage();
         }
         openError(title, e.getMessage());
-        log4j.error(e.getMessage(), e);
+        log4j.error(title, e);
     }
 
     public static void openAsyncError(String title, Exception e) {
@@ -169,7 +169,7 @@ public class BioBankPlugin extends AbstractUIPlugin {
             msg = e.getCause().getMessage();
         }
         openAsyncError(title, e.getMessage());
-        log4j.error(e.getMessage(), e);
+        log4j.error(title, e);
     }
 
     /**

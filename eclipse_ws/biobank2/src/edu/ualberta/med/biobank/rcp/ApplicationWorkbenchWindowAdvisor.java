@@ -46,16 +46,19 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
         IWorkbench workbench = PlatformUI.getWorkbench();
         IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();
         IWorkbenchPage page = window.getActivePage();
-        // always start with the MainPerspective
-        try {
-            workbench.showPerspective(MainPerspective.ID, window);
-        } catch (WorkbenchException e) {
-            SessionManager.getLogger().error(
-                "Could not open the default main perspective", e);
+        if (page.getPerspective().getId()
+            .equals(SampleManagementPerspective.ID)) {
+            // can't start on this perspective: switch to patient perspective
+            try {
+                workbench.showPerspective(PatientsAdministrationPerspective.ID,
+                    workbench.getActiveWorkbenchWindow());
+            } catch (WorkbenchException e) {
+                SessionManager.getLogger().error(
+                    "Error while opening patients perpective", e);
+            }
         }
-
-        // add listeners
         page.addPartListener(new BiobankPartListener());
         window.addPerspectiveListener(new BiobankPerspectiveListener());
     }
+
 }

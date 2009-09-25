@@ -3,9 +3,7 @@ package edu.ualberta.med.biobank.handlers;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.WorkbenchException;
 import org.eclipse.ui.handlers.HandlerUtil;
 
@@ -18,15 +16,8 @@ public class ReportsHandler extends AbstractHandler {
         IWorkbenchWindow window = HandlerUtil
             .getActiveWorkbenchWindowChecked(event);
         try {
-            IWorkbenchPage activePage = window.getActivePage();
-            if (activePage == null) {
-                return null;
-            }
-            IWorkbenchPage page = window.getWorkbench().showPerspective(
-                ReportsPerspective.ID, window);
-            page.resetPerspective();
-        } catch (PartInitException e) {
-            throw new ExecutionException("Part could not be initialized", e); //$NON-NLS-1$
+            window.getWorkbench()
+                .showPerspective(ReportsPerspective.ID, window);
         } catch (WorkbenchException e) {
             throw new ExecutionException(
                 "Perspective could not be initialized", e);

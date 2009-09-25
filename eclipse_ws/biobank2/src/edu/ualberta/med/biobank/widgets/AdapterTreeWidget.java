@@ -1,5 +1,7 @@
 package edu.ualberta.med.biobank.widgets;
 
+import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -19,16 +21,16 @@ import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbenchPartSite;
 import org.eclipse.ui.PlatformUI;
 
-import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.NodeContentProvider;
 import edu.ualberta.med.biobank.treeview.NodeLabelProvider;
+import edu.ualberta.med.biobank.views.IAdapterTreeView;
 
 public class AdapterTreeWidget extends Composite {
 
     private TreeViewer treeViewer;
 
-    public AdapterTreeWidget(Composite parent) {
+    public AdapterTreeWidget(Composite parent, final IAdapterTreeView parentView) {
         super(parent, SWT.NONE);
 
         setLayout(new FillLayout());
@@ -43,8 +45,19 @@ public class AdapterTreeWidget extends Composite {
         treeViewer = new TreeViewer(this);
         treeViewer.setLabelProvider(new NodeLabelProvider());
         treeViewer.setContentProvider(new NodeContentProvider());
-        treeViewer.addDoubleClickListener(SessionManager.getInstance()
-            .getDoubleClickListener());
+        treeViewer.addDoubleClickListener(new IDoubleClickListener() {
+            public void doubleClick(DoubleClickEvent event) {
+                Object selection = event.getSelection();
+
+                if (selection == null)
+                    return;
+
+                Object element = ((StructuredSelection) selection)
+                    .getFirstElement();
+                ((AdapterBase) element).performDoubleClick();
+                parentView.getTreeViewer().expandToLevel(element, 1);
+            }
+        });
         treeViewer.addTreeListener(new ITreeViewerListener() {
             @Override
             public void treeCollapsed(TreeExpansionEvent e) {

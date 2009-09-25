@@ -9,7 +9,26 @@ public class PatientsAdministrationPerspective implements IPerspectiveFactory {
 
     @Override
     public void createInitialLayout(IPageLayout layout) {
-        // layout.setEditorAreaVisible(false);
     }
+
+    // public static void showOnlyPatientView() {
+    // IWorkbenchPage activePage = PlatformUI.getWorkbench()
+    // .getActiveWorkbenchWindow().getActivePage();
+    // if (activePage != null
+    // && activePage.findView(PatientAdministrationView.ID) == null) {
+    // // do that only if the patient view is hidden:
+    // if (activePage != null) {
+    // for (IViewReference ref : activePage.getViewReferences()) {
+    // activePage.hideView(ref);
+    // }
+    // try {
+    // activePage.showView(PatientAdministrationView.ID);
+    // } catch (PartInitException e) {
+    // SessionManager.getLogger().error(
+    // "Failed to show Administraction View", e);
+    // }
+    // }
+    // }
+    // }
 
 }

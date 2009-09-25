@@ -129,8 +129,7 @@ public class SessionAdapter extends AdapterBase {
                         addChild(node);
                     }
                     if (updateNode) {
-                        SessionManager.getInstance().getTreeViewer().update(
-                            node, null);
+                        SessionManager.getInstance().updateTreeNode(node);
                     }
                 }
             }
@@ -138,7 +137,7 @@ public class SessionAdapter extends AdapterBase {
             BioBankPlugin.openRemoteAccessErrorMessage();
         } catch (Exception e) {
             SessionManager.getLogger().error(
-                "Error while loading sites for session " + getName());
+                "Error while loading sites for session " + getName(), e);
         }
     }
 
