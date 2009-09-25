@@ -207,8 +207,8 @@ public class BioBank2Db {
         }
     }
 
-    public PatientVisit getPatientVisit(String studyNameShort, int patientNum,
-        String dateDrawn) throws Exception {
+    public PatientVisit getPatientVisit(String studyNameShort,
+        String patientNum, String dateDrawn) throws Exception {
         Date date = biobank2DateFmt.parse(dateDrawn);
         HQLCriteria c = new HQLCriteria("select visits"
             + " from edu.ualberta.med.biobank.model.Study as study"
@@ -222,7 +222,7 @@ public class BioBank2Db {
         // + " patientNum/" + patientNum + " dateDrawn/" + dateDrawn);
 
         c.setParameters(Arrays.asList(new Object [] {
-            studyNameShort, String.format("%d", patientNum), date }));
+            studyNameShort, patientNum, date }));
 
         List<PatientVisit> results = appService.query(c);
         if (results.size() != 1) {

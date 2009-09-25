@@ -1,6 +1,8 @@
 
 package edu.ualberta.med.biobank.importer;
 
+import edu.ualberta.med.biobank.common.LabelingScheme;
+import edu.ualberta.med.biobank.common.RowColPos;
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Contact;
@@ -408,18 +410,30 @@ public class Importer {
         System.out.println("importing cabinet samples ...");
 
         Statement s = con.createStatement();
+        s.execute("select count(*) from cabinet");
+        ResultSet rs = s.getResultSet();
+        int numSamples = 0;
+        if (rs != null) {
+            rs.next();
+            numSamples = rs.getInt(1);
+        }
+
+        s = con.createStatement();
         s.execute("select patient_visit.visit_nr, patient_visit.date_taken, "
-            + "study_list.study_name_short, sample_list.sample_name_short, cabinet.*  "
-            + "from cabinet, study_list, patient_visit, sample_list "
+            + "study_list.study_name_short, sample_list.sample_name_short, cabinet.*, patient.chr_nr "
+            + "from cabinet, study_list, patient_visit, sample_list, patient "
             + "where cabinet.study_nr=study_list.study_nr "
             + "and patient_visit.study_nr=study_list.study_nr "
             + "and cabinet.visit_nr=patient_visit.visit_nr "
             + "and cabinet.patient_nr=patient_visit.patient_nr "
-            + "and cabinet.sample_nr=sample_list.sample_nr");
+            + "and cabinet.sample_nr=sample_list.sample_nr "
+            + "and patient_visit.patient_nr=patient.patient_nr");
 
-        ResultSet rs = s.getResultSet();
+        rs = s.getResultSet();
         if (rs != null) {
             Container cabinet = bioBank2Db.getContainer("01", "cabinet");
+            ContainerType cabinetType = cabinet.getContainerType();
+
             int cabinetNum;
             Container drawer;
             Container bin;
@@ -428,16 +442,21 @@ public class Importer {
             int drawerNum;
             int binNum;
             String drawerName;
-            String binPos;
+            RowColPos binPos;
             String sampleTypeNameShort;
+            BlowfishCipher cipher = new BlowfishCipher();
 
+            int count = 0;
             while (rs.next()) {
+                ++count;
                 cabinetNum = rs.getInt(5);
                 if (cabinetNum != 1) throw new Exception(
                     "Invalid cabinet number: " + cabinetNum);
 
                 drawerName = rs.getString(6);
-                drawerNum = LabelingScheme.pos2Int(drawerName.substring(1));
+                RowColPos pos = LabelingScheme.cbsrTwoCharToRowCol(cabinetType,
+                    drawerName);
+                drawerNum = pos.row;
 
                 if (drawerNum > 4) {
                     // no such drawer in real cabinet - was used only for
@@ -446,13 +465,18 @@ public class Importer {
                 }
 
                 binNum = rs.getInt(7) - 1;
-                binPos = rs.getString(8);
+                String binPosStr = rs.getString(8);
+                binPos = LabelingScheme.cbsrTwoCharToRowCol(binPosStr, 120, 1,
+                    "bin");
 
                 System.out.println("importing Cabinet sample at position "
-                    + drawerName + String.format("%02d", binNum) + binPos);
+                    + drawerName + String.format("%02d", binNum) + binPosStr
+                    + " (" + count + "/" + numSamples + ")");
 
-                visit = bioBank2Db.getPatientVisit(rs.getString(3),
-                    rs.getInt(9), rs.getString(2));
+                String patientNo = cipher.decode(rs.getBytes(17));
+
+                visit = bioBank2Db.getPatientVisit(rs.getString(3), patientNo,
+                    rs.getString(2));
 
                 if (visit == null) {
                     continue;
@@ -471,8 +495,8 @@ public class Importer {
                 bioBank2Db.containerCheckSampleTypeValid(bin, sampleType);
 
                 SamplePosition spos = new SamplePosition();
-                spos.setRow(1);
-                spos.setCol(LabelingScheme.binPos2Int(binPos));
+                spos.setRow(binPos.row);
+                spos.setCol(0);
                 spos.setContainer(bin);
 
                 Sample sample = new Sample();
@@ -493,62 +517,81 @@ public class Importer {
         System.out.println("importing freezer samples ...");
 
         Statement s = con.createStatement();
+        s.execute("select count(*) from freezer");
+        ResultSet rs = s.getResultSet();
+        int numSamples = 0;
+        if (rs != null) {
+            rs.next();
+            numSamples = rs.getInt(1);
+        }
+
+        s = con.createStatement();
         s.execute("select patient_visit.date_taken, "
-            + "study_list.study_name_short, sample_list.sample_name_short, freezer.*  "
-            + "from freezer, study_list, patient_visit, sample_list "
+            + "study_list.study_name_short, sample_list.sample_name_short, freezer.*, patient.chr_nr "
+            + "from freezer, study_list, patient_visit, sample_list,patient "
             + "where freezer.study_nr=study_list.study_nr "
             + "and patient_visit.study_nr=study_list.study_nr "
             + "and freezer.visit_nr=patient_visit.visit_nr "
             + "and freezer.patient_nr=patient_visit.patient_nr "
-            + "and freezer.sample_nr=sample_list.sample_nr");
+            + "and freezer.sample_nr=sample_list.sample_nr "
+            + "and patient_visit.patient_nr=patient.patient_nr");
 
-        ResultSet rs = s.getResultSet();
+        rs = s.getResultSet();
         if (rs != null) {
-            Container freezer = bioBank2Db.getContainer("01", "Freezer-3x10");
-            ContainerType freezerType = freezer.getContainerType();
+            Container freezer01 = bioBank2Db.getContainer("01", "Freezer-3x10");
+            Container freezer03 = bioBank2Db.getContainer("01", "Freezer-3x10");
+            Container freezer;
+            ContainerType freezerType;
+
             int freezerNum;
             Container hotel;
-            Container palette;
+            Container pallet;
             PatientVisit visit;
             SampleType sampleType;
-            int patientNum;
             RowColPos hotelPos;
-            int paletteNum;
+            int palletNum;
             String studyName;
             String dateDrawn;
             String hotelName;
-            String palettePos;
+            String palletPos;
             String sampleTypeNameShort;
+            BlowfishCipher cipher = new BlowfishCipher();
 
+            int count = 0;
             while (rs.next()) {
+                ++count;
                 freezerNum = rs.getInt(4);
-                if (freezerNum != 1) {
+                hotelName = rs.getString(5);
+
+                if (freezerNum == 1) {
+                    freezer = freezer01;
+                }
+                else if (freezerNum == 3) {
+                    freezer = freezer03;
+                }
+                else {
                     System.out.println("Ignoring samples for freezer number "
                         + freezerNum);
                     continue;
                 }
 
-                hotelName = rs.getString(5);
-                hotelPos = LabelingScheme.hotelPos2RowCol(freezerType,
+                freezerType = freezer.getContainerType();
+                hotelPos = LabelingScheme.cbsrTwoCharToRowCol(freezerType,
                     hotelName);
 
-                paletteNum = rs.getInt(6) - 1;
-                palettePos = rs.getString(14);
+                palletNum = rs.getInt(6) - 1;
+                palletPos = rs.getString(14);
 
-                if (palettePos.substring(0, 1).equals("J")) {
-                    System.out.println("ignoring sample at " + palettePos);
-                    continue;
-                }
-
-                System.out.println("importing FR01 sample at position "
-                    + hotelName + String.format("%02d", paletteNum)
-                    + palettePos);
+                System.out.println("importing freezer sample at position "
+                    + String.format("%02d", freezerNum) + hotelName
+                    + String.format("%02d", palletNum + 1) + palletPos + " ("
+                    + count + "/" + numSamples + ")");
 
                 studyName = rs.getString(2);
-                patientNum = rs.getInt(7);
+                String patientNo = cipher.decode(rs.getBytes(16));
                 dateDrawn = rs.getString(1);
 
-                visit = bioBank2Db.getPatientVisit(studyName, patientNum,
+                visit = bioBank2Db.getPatientVisit(studyName, patientNo,
                     dateDrawn);
 
                 if (visit == null) continue;
@@ -557,20 +600,20 @@ public class Importer {
 
                 hotel = bioBank2Db.getChildContainer(freezer, hotelPos.row,
                     hotelPos.col);
-                palette = bioBank2Db.getChildContainer(hotel, paletteNum, 0);
+                pallet = bioBank2Db.getChildContainer(hotel, palletNum, 0);
 
                 if (sampleTypeNameShort.equals("RNA Later")) {
                     sampleTypeNameShort = "RNA Biopsy";
                 }
 
                 sampleType = bioBank2Db.getSampleType(sampleTypeNameShort);
-                bioBank2Db.containerCheckSampleTypeValid(palette, sampleType);
+                bioBank2Db.containerCheckSampleTypeValid(pallet, sampleType);
 
-                RowColPos rowColPos = LabelingScheme.palettePos2RowCol(palettePos);
+                RowColPos rowColPos = LabelingScheme.sbsToRowCol(palletPos);
                 SamplePosition spos = new SamplePosition();
                 spos.setRow(rowColPos.row);
                 spos.setCol(rowColPos.col);
-                spos.setContainer(palette);
+                spos.setContainer(pallet);
 
                 Sample sample = new Sample();
                 sample.setSampleType(sampleType);
