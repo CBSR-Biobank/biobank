@@ -24,13 +24,13 @@ import org.eclipse.ui.PlatformUI;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.NodeContentProvider;
 import edu.ualberta.med.biobank.treeview.NodeLabelProvider;
-import edu.ualberta.med.biobank.views.AdapterTreeView;
+import edu.ualberta.med.biobank.views.IAdapterTreeView;
 
 public class AdapterTreeWidget extends Composite {
 
     private TreeViewer treeViewer;
 
-    public AdapterTreeWidget(Composite parent, final AdapterTreeView parentView) {
+    public AdapterTreeWidget(Composite parent, final IAdapterTreeView parentView) {
         super(parent, SWT.NONE);
 
         setLayout(new FillLayout());

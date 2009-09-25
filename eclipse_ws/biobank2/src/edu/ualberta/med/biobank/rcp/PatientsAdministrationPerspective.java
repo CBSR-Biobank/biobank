@@ -2,12 +2,6 @@ package edu.ualberta.med.biobank.rcp;
 
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPerspectiveFactory;
-import org.eclipse.ui.IViewReference;
-import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.PlatformUI;
-
-import edu.ualberta.med.biobank.views.PatientAdministrationView;
 
 public class PatientsAdministrationPerspective implements IPerspectiveFactory {
 
@@ -15,18 +9,26 @@ public class PatientsAdministrationPerspective implements IPerspectiveFactory {
 
     @Override
     public void createInitialLayout(IPageLayout layout) {
-        // layout.setEditorAreaVisible(false);
     }
 
-    public static void showOnlyPatientView() throws PartInitException {
-        IWorkbenchPage activePage = PlatformUI.getWorkbench()
-            .getActiveWorkbenchWindow().getActivePage();
-        if (activePage != null) {
-            for (IViewReference ref : activePage.getViewReferences()) {
-                activePage.hideView(ref);
-            }
-            activePage.showView(PatientAdministrationView.ID);
-        }
-    }
+    // public static void showOnlyPatientView() {
+    // IWorkbenchPage activePage = PlatformUI.getWorkbench()
+    // .getActiveWorkbenchWindow().getActivePage();
+    // if (activePage != null
+    // && activePage.findView(PatientAdministrationView.ID) == null) {
+    // // do that only if the patient view is hidden:
+    // if (activePage != null) {
+    // for (IViewReference ref : activePage.getViewReferences()) {
+    // activePage.hideView(ref);
+    // }
+    // try {
+    // activePage.showView(PatientAdministrationView.ID);
+    // } catch (PartInitException e) {
+    // SessionManager.getLogger().error(
+    // "Failed to show Administraction View", e);
+    // }
+    // }
+    // }
+    // }
 
 }

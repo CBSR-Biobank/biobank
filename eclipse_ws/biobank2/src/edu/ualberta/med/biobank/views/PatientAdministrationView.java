@@ -13,6 +13,7 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tree;
+import org.eclipse.ui.ISourceProvider;
 import org.eclipse.ui.ISourceProviderListener;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
@@ -37,13 +38,15 @@ import edu.ualberta.med.biobank.widgets.AdapterTreeWidget;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class PatientAdministrationView extends ViewPart implements
-    AdapterTreeView {
+    IAdapterTreeView {
 
     public static final String ID = "edu.ualberta.med.biobank.views.patientsAdmin";
 
     private Text patientNumberText;
 
     private AdapterTreeWidget adaptersTree;
+
+    private ISourceProviderListener siteStateListener;
 
     private static RootNode rootNode;
 
@@ -89,13 +92,10 @@ public class PatientAdministrationView extends ViewPart implements
         setSiteManagement();
     }
 
-    private void setPatientTextEnablement(Object state) {
-        boolean siteSelected = Boolean.valueOf(state.toString());
-        patientNumberText.setEnabled(siteSelected);
-        if (!siteSelected) {
-            currentPatientAdapter = null;
-            getRootNode().removeAll();
-        }
+    private void setPatientTextEnablement(Integer siteId) {
+        patientNumberText.setEnabled(siteId != null);
+        currentPatientAdapter = null;
+        getRootNode().removeAll();
     }
 
     private void setSiteManagement() {
@@ -103,30 +103,30 @@ public class PatientAdministrationView extends ViewPart implements
             .getActiveWorkbenchWindow();
         ISourceProviderService service = (ISourceProviderService) window
             .getService(ISourceProviderService.class);
-        SiteSelectionState siteSelectionStateSourceProvider = (SiteSelectionState) service
-            .getSourceProvider(SiteSelectionState.SITE_SELECTION_STATE);
+        ISourceProvider siteSelectionStateSourceProvider = service
+            .getSourceProvider(SiteSelectionState.SITE_SELECTION_ID);
+        Integer siteId = (Integer) siteSelectionStateSourceProvider
+            .getCurrentState().get(SiteSelectionState.SITE_SELECTION_ID);
+        setPatientTextEnablement(siteId);
 
-        Object state = siteSelectionStateSourceProvider.getCurrentState().get(
-            SiteSelectionState.SITE_SELECTION_STATE);
-        setPatientTextEnablement(state);
+        siteStateListener = new ISourceProviderListener() {
+            @Override
+            public void sourceChanged(int sourcePriority, String sourceName,
+                Object sourceValue) {
+                if (sourceName.equals(SiteSelectionState.SITE_SELECTION_ID)) {
+                    setPatientTextEnablement((Integer) sourceValue);
+                    getSite().getPage().closeAllEditors(true);
+                }
+            }
+
+            @SuppressWarnings("unchecked")
+            @Override
+            public void sourceChanged(int sourcePriority, Map sourceValuesByName) {
+            }
+        };
 
         siteSelectionStateSourceProvider
-            .addSourceProviderListener(new ISourceProviderListener() {
-                @Override
-                public void sourceChanged(int sourcePriority,
-                    String sourceName, Object sourceValue) {
-                    if (sourceName
-                        .equals(SiteSelectionState.SITE_SELECTION_STATE)) {
-                        setPatientTextEnablement(sourceValue);
-                    }
-                }
-
-                @SuppressWarnings("unchecked")
-                @Override
-                public void sourceChanged(int sourcePriority,
-                    Map sourceValuesByName) {
-                }
-            });
+            .addSourceProviderListener(siteStateListener);
     }
 
     protected void searchPatient() {
@@ -244,5 +244,18 @@ public class PatientAdministrationView extends ViewPart implements
 
     public static PatientAdapter getCurrentPatientAdapter() {
         return currentPatientAdapter;
+    }
+
+    @Override
+    public void dispose() {
+        super.dispose();
+        IWorkbenchWindow window = PlatformUI.getWorkbench()
+            .getActiveWorkbenchWindow();
+        ISourceProviderService service = (ISourceProviderService) window
+            .getService(ISourceProviderService.class);
+        ISourceProvider siteSelectionStateSourceProvider = service
+            .getSourceProvider(SiteSelectionState.SITE_SELECTION_ID);
+        siteSelectionStateSourceProvider
+            .removeSourceProviderListener(siteStateListener);
     }
 }

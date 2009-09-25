@@ -58,7 +58,9 @@ public class SessionManager {
 
     private List<Site> currentSites;
 
-    private static final String LAST_SITE = "lastSite";
+    private static final String SITE_PREF_NODE = "Site";
+
+    private static final String LAST_SITE_PREF = "lastSite";
 
     final Runnable timeoutRunnable = new Runnable() {
         public void run() {
@@ -112,8 +114,8 @@ public class SessionManager {
         rootNode.addChild(sessionAdapter);
         Collections.sort(sites, new SiteComparator());
         Preferences prefs = new InstanceScope().getNode(Application.PLUGIN_ID);
-        Preferences lastSite = prefs.node("Site");
-        String siteId = lastSite.get(LAST_SITE, "-1");
+        Preferences lastSite = prefs.node(SITE_PREF_NODE);
+        String siteId = lastSite.get(LAST_SITE_PREF, "-1");
         if (siteId.equalsIgnoreCase("-1"))
             currentSite = null;
         else
@@ -265,8 +267,7 @@ public class SessionManager {
         if (site != null && site.getId() != null)
             saveVal = site.getId().toString();
         Preferences prefs = new InstanceScope().getNode(Application.PLUGIN_ID);
-        prefs.node("Site").put(LAST_SITE, saveVal);
-
+        prefs.node(SITE_PREF_NODE).put(LAST_SITE_PREF, saveVal);
         try {
             prefs.flush();
         } catch (BackingStoreException e) {
@@ -277,8 +278,8 @@ public class SessionManager {
         ISourceProviderService service = (ISourceProviderService) window
             .getService(ISourceProviderService.class);
         SiteSelectionState siteSelectionStateSourceProvider = (SiteSelectionState) service
-            .getSourceProvider(SiteSelectionState.SITE_SELECTION_STATE);
-        siteSelectionStateSourceProvider.setSiteSelectionState(site != null);
+            .getSourceProvider(SiteSelectionState.SITE_SELECTION_ID);
+        siteSelectionStateSourceProvider.setSiteSelection(site);
         if (sessionAdapter != null) {
             sessionAdapter.performExpand();
         }
