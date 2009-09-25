@@ -95,7 +95,8 @@ public class BioBank2Db {
     public Clinic getClinic(Study study, String clinicName) throws Exception {
         HQLCriteria c = new HQLCriteria("select clinics"
             + " from edu.ualberta.med.biobank.model.Study as study"
-            + " inner join study.clinicCollection as clinics"
+            + " inner join study.contactCollection as contacts"
+            + " inner join contacts.clinic as clinics"
             + " where study.id=? and clinics.name=?");
 
         c.setParameters(Arrays.asList(new Object [] { study.getId(), clinicName }));
@@ -125,7 +126,8 @@ public class BioBank2Db {
 
         List<PvInfoPossible> list = appService.search(PvInfoPossible.class,
             pvInfoPossible);
-        if (list.size() != 1) throw new Exception();
+        if (list.size() != 1) throw new Exception(
+            "PvInfoPossible not found with label " + label);
         return list.get(0);
     }
 

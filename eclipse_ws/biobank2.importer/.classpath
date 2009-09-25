@@ -27,5 +27,6 @@
 	<classpathentry kind="lib" path="lib/mysql-connector-java-5.1.7-bin.jar"/>
 	<classpathentry kind="lib" path="lib/commons-lang-2.4.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/biobank.common"/>
+	<classpathentry kind="lib" path="lib/bcprov-jdk16-143.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

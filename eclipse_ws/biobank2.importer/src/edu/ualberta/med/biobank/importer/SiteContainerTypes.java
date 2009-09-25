@@ -83,6 +83,16 @@ public class SiteContainerTypes {
             Arrays.asList(new ContainerType [] { palette96 }), null);
         containerTypeMap.put("Hotel-19", hotel19);
 
+        containerTypeMap.put("Freezer-3x10", assignContainerType(site,
+            "Freezer-3x10", labelingSchemeMap.get("CBSR 2 char alphabetic"), 3,
+            10, Arrays.asList(new ContainerType [] { hotel13, hotel19 }), null));
+        containerTypeMap.put("Freezer-4x12", assignContainerType(site,
+            "Freezer-4x12", labelingSchemeMap.get("CBSR 2 char alphabetic"), 4,
+            12, Arrays.asList(new ContainerType [] { hotel13, hotel19 }), null));
+        containerTypeMap.put("Freezer-5x9", assignContainerType(site,
+            "Freezer-5x9", labelingSchemeMap.get("CBSR 2 char alphabetic"), 4,
+            12, Arrays.asList(new ContainerType [] { hotel13, hotel19 }), null));
+
         // Cabinet Types
         ContainerType bin = assignContainerType(site, "Bin",
             labelingSchemeMap.get("CBSR 2 char alphabetic"), 120, 1, null,

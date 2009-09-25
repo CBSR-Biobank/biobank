@@ -256,6 +256,7 @@ public class Importer {
                 clinic = (Clinic) bioBank2Db.setObject(clinic);
 
                 Contact contact = new Contact();
+                contact.setName("assign me");
                 contact.setClinic(clinic);
                 contact = (Contact) bioBank2Db.setObject(contact);
 
@@ -275,23 +276,37 @@ public class Importer {
     }
 
     private void importPatients() throws Exception {
+        BlowfishCipher cipher = new BlowfishCipher();
         Patient patient;
         System.out.println("importing patients ...");
 
         Statement s = con.createStatement();
+        s.execute("select count(*) from patient");
+        ResultSet rs = s.getResultSet();
+        int numPatients = 0;
+        if (rs != null) {
+            rs.next();
+            numPatients = rs.getInt(1);
+        }
+
+        s = con.createStatement();
         s.execute("select patient.*, study_list.study_name_short "
             + "from patient, study_list where patient.study_nr=study_list.study_nr");
-        ResultSet rs = s.getResultSet();
+        rs = s.getResultSet();
+
+        int count = 1;
         if (rs != null) {
             while (rs.next()) {
                 String studyName = rs.getString(5);
                 Study study = bioBank2Db.getStudy(studyName);
-                String patientNo = rs.getString(1);
-                System.out.println("importing patient number " + patientNo);
+                String patientNo = cipher.decode(rs.getBytes(2));
+                System.out.println("importing patient number " + patientNo
+                    + " (" + count + "/" + numPatients + ")");
                 patient = new Patient();
                 patient.setNumber(patientNo);
                 patient.setStudy(study);
                 patient = (Patient) bioBank2Db.setObject(patient);
+                ++count;
                 // Thread.sleep(150);
             }
         }
@@ -303,13 +318,27 @@ public class Importer {
         String clinicName;
         PatientVisit pv;
         PvInfoData pvInfoData;
+        BlowfishCipher cipher = new BlowfishCipher();
 
         System.out.println("importing patient visits ...");
 
         Statement s = con.createStatement();
-        s.execute("select patient_visit.*, study_list.study_name_short "
-            + "from patient_visit, study_list where patient_visit.study_nr=study_list.study_nr");
+        s.execute("select count(*) from patient_visit");
         ResultSet rs = s.getResultSet();
+        int numPatientVisits = 0;
+        if (rs != null) {
+            rs.next();
+            numPatientVisits = rs.getInt(1);
+        }
+
+        s = con.createStatement();
+        s.execute("select patient_visit.*, study_list.study_name_short, patient.chr_nr "
+            + "from patient_visit, study_list, patient "
+            + "where patient_visit.study_nr=study_list.study_nr "
+            + "and patient_visit.patient_nr=patient.patient_nr");
+        rs = s.getResultSet();
+
+        int count = 1;
         if (rs != null) {
             while (rs.next()) {
                 study = bioBank2Db.getStudy(rs.getString(20));
@@ -320,7 +349,8 @@ public class Importer {
                     continue;
                 }
 
-                Patient patient = bioBank2Db.getPatient(rs.getString(2));
+                String patientNo = cipher.decode(rs.getBytes(21));
+                Patient patient = bioBank2Db.getPatient(patientNo);
 
                 pv = new PatientVisit();
                 pv.setDateDrawn(bbpdbDateFmt.parse(rs.getString(5)));
@@ -331,7 +361,8 @@ public class Importer {
 
                 System.out.println("importing patient visit: patient/"
                     + patient.getNumber() + " visit date/"
-                    + biobank2DateFmt.format(pv.getDateDrawn()));
+                    + biobank2DateFmt.format(pv.getDateDrawn()) + " (" + count
+                    + "/" + numPatientVisits + ")");
 
                 // make sure the study is correct
                 if (!patient.getStudy().getNameShort().equals(
@@ -367,6 +398,8 @@ public class Importer {
 
                     pvInfoData = (PvInfoData) bioBank2Db.setObject(pvInfoData);
                 }
+
+                ++count;
             }
         }
     }
