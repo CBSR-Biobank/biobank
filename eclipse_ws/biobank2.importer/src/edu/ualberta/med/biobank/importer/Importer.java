@@ -282,20 +282,16 @@ public class Importer {
         Patient patient;
         System.out.println("importing patients ...");
 
+        String qryPart = "from patient, study_list where patient.study_nr=study_list.study_nr";
+
         Statement s = con.createStatement();
-        s.execute("select count(*) from patient");
+        s.execute("select count(*) " + qryPart);
         ResultSet rs = s.getResultSet();
-        int numPatients = 0;
-        if (rs != null) {
-            rs.next();
-            numPatients = rs.getInt(1);
-        }
+        rs.next();
+        int numPatients = rs.getInt(1);
 
-        s = con.createStatement();
-        s.execute("select patient.*, study_list.study_name_short "
-            + "from patient, study_list where patient.study_nr=study_list.study_nr");
+        s.execute("select patient.*, study_list.study_name_short " + qryPart);
         rs = s.getResultSet();
-
         int count = 1;
         if (rs != null) {
             while (rs.next()) {
@@ -325,21 +321,13 @@ public class Importer {
         System.out.println("importing patient visits ...");
 
         Statement s = con.createStatement();
-        s.execute("select count(*) from patient_visit");
-        ResultSet rs = s.getResultSet();
-        int numPatientVisits = 0;
-        if (rs != null) {
-            rs.next();
-            numPatientVisits = rs.getInt(1);
-        }
-
-        s = con.createStatement();
         s.execute("select patient_visit.*, study_list.study_name_short, patient.chr_nr "
             + "from patient_visit, study_list, patient "
             + "where patient_visit.study_nr=study_list.study_nr "
             + "and patient_visit.patient_nr=patient.patient_nr");
-        rs = s.getResultSet();
 
+        int numPatientVisits = s.getMaxRows();
+        ResultSet rs = s.getResultSet();
         int count = 1;
         if (rs != null) {
             while (rs.next()) {
@@ -410,15 +398,6 @@ public class Importer {
         System.out.println("importing cabinet samples ...");
 
         Statement s = con.createStatement();
-        s.execute("select count(*) from cabinet");
-        ResultSet rs = s.getResultSet();
-        int numSamples = 0;
-        if (rs != null) {
-            rs.next();
-            numSamples = rs.getInt(1);
-        }
-
-        s = con.createStatement();
         s.execute("select patient_visit.visit_nr, patient_visit.date_taken, "
             + "study_list.study_name_short, sample_list.sample_name_short, cabinet.*, patient.chr_nr "
             + "from cabinet, study_list, patient_visit, sample_list, patient "
@@ -429,7 +408,8 @@ public class Importer {
             + "and cabinet.sample_nr=sample_list.sample_nr "
             + "and patient_visit.patient_nr=patient.patient_nr");
 
-        rs = s.getResultSet();
+        int numSamples = s.getMaxRows();
+        ResultSet rs = s.getResultSet();
         if (rs != null) {
             Container cabinet = bioBank2Db.getContainer("01", "cabinet");
             ContainerType cabinetType = cabinet.getContainerType();
@@ -517,15 +497,7 @@ public class Importer {
         System.out.println("importing freezer samples ...");
 
         Statement s = con.createStatement();
-        s.execute("select count(*) from freezer");
-        ResultSet rs = s.getResultSet();
-        int numSamples = 0;
-        if (rs != null) {
-            rs.next();
-            numSamples = rs.getInt(1);
-        }
-
-        s = con.createStatement();
+        int numSamples = s.getMaxRows();
         s.execute("select patient_visit.date_taken, "
             + "study_list.study_name_short, sample_list.sample_name_short, freezer.*, patient.chr_nr "
             + "from freezer, study_list, patient_visit, sample_list,patient "
@@ -536,7 +508,7 @@ public class Importer {
             + "and freezer.sample_nr=sample_list.sample_nr "
             + "and patient_visit.patient_nr=patient.patient_nr");
 
-        rs = s.getResultSet();
+        ResultSet rs = s.getResultSet();
         if (rs != null) {
             Container freezer01 = bioBank2Db.getContainer("01", "Freezer-3x10");
             Container freezer03 = bioBank2Db.getContainer("01", "Freezer-3x10");
