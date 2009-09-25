@@ -390,7 +390,7 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
         throws ApplicationException {
         Sample expectedSample = scanCell.getExpectedSample();
         String value = scanCell.getValue();
-        String positionString = LabelingScheme.RowColToSBS(new RowColPos(
+        String positionString = LabelingScheme.RowColToSbs(new RowColPos(
             scanCell.getRow(), scanCell.getCol()));
         if (value == null) {
             // no sample scanned
