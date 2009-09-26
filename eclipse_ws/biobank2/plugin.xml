@@ -559,7 +559,7 @@
             </separator>
             <command
                commandId="edu.ualberta.med.biobank.commands.reports"
-               icon="icons/page_white_find.png"
+               icon="icons/reports.png"
                label="Reports"
                style="push">
                <visibleWhen
@@ -571,7 +571,7 @@
             </command>
             <command
                   commandId="edu.ualberta.med.biobank.commands.studyAdd"
-                  icon="icons/book_open.png"
+                  icon="icons/study.png"
                   label="Add Study"
                   style="push">
                <visibleWhen
@@ -583,7 +583,7 @@
             </command>
             <command
                   commandId="edu.ualberta.med.biobank.commands.clinicAdd"
-                  icon="icons/transmit_blue.png"
+                  icon="icons/clinic.png"
                   label="Add Clinic"
                   style="push">
                <visibleWhen
@@ -595,7 +595,7 @@
             </command>
             <command
                   commandId="edu.ualberta.med.biobank.commands.containerTypeAdd"
-                  icon="icons/basket_edit.png"
+                  icon="icons/container_types.png"
                   label="Add Container Type"
                   style="push">
                <visibleWhen
@@ -607,7 +607,7 @@
             </command>
             <command
                   commandId="edu.ualberta.med.biobank.commands.containerAdd"
-                  icon="icons/basket.png"
+                  icon="icons/containers.png"
                   label="Add Container"
                   style="push">
                <visibleWhen
@@ -699,7 +699,7 @@
             </command>
             <command
                   commandId="edu.ualberta.med.biobank.commands.patients.openPatientForm"
-                  icon="icons/defaultLink.png"
+                  icon="icons/cabinetLinkAssign.png"
                   label="Cabinet Link/Assign"
                   style="push">
                <visibleWhen
@@ -883,7 +883,7 @@
       <editor
             class="edu.ualberta.med.biobank.forms.CabinetLinkAssignEntryForm"
             default="false"
-            icon="icons/defaultLink.png"
+            icon="icons/cabinetLinkAssign.png"
             id="edu.ualberta.med.biobank.forms.CabinetLinkAssignEntryForm"
             name="Cabinet Link/Assign Entry ">
       </editor>
@@ -975,7 +975,7 @@
             allowMultiple="false"
             class="edu.ualberta.med.biobank.views.ReportsView"
             id="edu.ualberta.med.biobank.views.ReportsView"
-            icon="icons/page_white_find.png"
+            icon="icons/reports.png"
             name="Reports"
             restorable="true">
       </view>

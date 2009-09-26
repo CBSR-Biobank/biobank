@@ -111,4 +111,5 @@ public class ClinicGroup extends AdapterBase {
     protected boolean integrityCheck() {
         return true;
     }
+
 }
