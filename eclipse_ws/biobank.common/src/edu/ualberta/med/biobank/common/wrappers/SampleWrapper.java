@@ -43,6 +43,9 @@ public class SampleWrapper extends ModelWrapper<Sample> {
             oldWrappedObject, newWrappedObject);
         propertyChangeSupport.firePropertyChange("samplePosition",
             oldWrappedObject, newWrappedObject);
+        propertyChangeSupport.firePropertyChange("linkDate", oldWrappedObject,
+            newWrappedObject);
+
     }
 
     @Override
@@ -232,5 +235,10 @@ public class SampleWrapper extends ModelWrapper<Sample> {
             }
         }
         setQuantity(volume);
+    }
+
+    @Override
+    public boolean checkIntegrity() {
+        return true;
     }
 }

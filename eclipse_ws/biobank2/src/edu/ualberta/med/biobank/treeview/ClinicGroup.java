@@ -26,7 +26,7 @@ import edu.ualberta.med.biobank.model.Site;
 public class ClinicGroup extends AdapterBase {
 
     public ClinicGroup(SiteAdapter parent, int id) {
-        super(parent, null, null, id, "Clinics", true);
+        super(parent, id, "Clinics", true);
     }
 
     @Override
@@ -105,11 +105,6 @@ public class ClinicGroup extends AdapterBase {
     @Override
     public String getTitle() {
         return null;
-    }
-
-    @Override
-    protected boolean integrityCheck() {
-        return true;
     }
 
 }

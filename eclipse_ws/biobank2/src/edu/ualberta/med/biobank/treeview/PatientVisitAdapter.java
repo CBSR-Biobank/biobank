@@ -15,7 +15,6 @@ import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.forms.PatientVisitEntryForm;
 import edu.ualberta.med.biobank.forms.PatientVisitViewForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
-import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.Sample;
 
 public class PatientVisitAdapter extends AdapterBase {
@@ -25,21 +24,14 @@ public class PatientVisitAdapter extends AdapterBase {
      */
     private Sample selectedSample;
 
-    public PatientVisitAdapter(AdapterBase parent, PatientVisit patientVisit) {
-        super(parent, null, null);
-        setWrappedObject(
-            new PatientVisitWrapper(getAppService(), patientVisit),
-            PatientVisitWrapper.class);
-    }
-
     public PatientVisitAdapter(AdapterBase parent,
         PatientVisitWrapper patientVisitWrapper) {
-        super(parent, null, null);
-        setWrappedObject(patientVisitWrapper, PatientVisitWrapper.class);
+        super(parent, null);
+        object = patientVisitWrapper;
     }
 
     public PatientVisitWrapper getWrapper() {
-        return (PatientVisitWrapper) getWrappedObject();
+        return (PatientVisitWrapper) object;
     }
 
     @Override
@@ -125,11 +117,6 @@ public class PatientVisitAdapter extends AdapterBase {
 
     public Sample getSelectedSample() {
         return selectedSample;
-    }
-
-    @Override
-    protected boolean integrityCheck() {
-        return true;
     }
 
 }

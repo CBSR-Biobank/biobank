@@ -24,7 +24,7 @@ import edu.ualberta.med.biobank.model.StudyComparator;
 public class StudyGroup extends AdapterBase {
 
     public StudyGroup(SiteAdapter parent, int id) {
-        super(parent, null, null, id, "Studies", true);
+        super(parent, id, "Studies", true);
     }
 
     @Override
@@ -101,8 +101,4 @@ public class StudyGroup extends AdapterBase {
         return null;
     }
 
-    @Override
-    protected boolean integrityCheck() {
-        return true;
-    }
 }

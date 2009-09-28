@@ -19,6 +19,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
+//FIXME to do by Delphine
 public class ContainerWrapper extends ModelWrapper<Container> {
 
     public ContainerWrapper(WritableApplicationService appService,
@@ -29,7 +30,26 @@ public class ContainerWrapper extends ModelWrapper<Container> {
     @Override
     protected void firePropertyChanges(Container oldWrappedObject,
         Container newWrappedObject) {
-
+        propertyChangeSupport.firePropertyChange("productBarcode",
+            oldWrappedObject, newWrappedObject);
+        propertyChangeSupport.firePropertyChange("position", oldWrappedObject,
+            newWrappedObject);
+        propertyChangeSupport.firePropertyChange("activityStatus",
+            oldWrappedObject, newWrappedObject);
+        propertyChangeSupport.firePropertyChange("site", oldWrappedObject,
+            newWrappedObject);
+        propertyChangeSupport.firePropertyChange("label", oldWrappedObject,
+            newWrappedObject);
+        propertyChangeSupport.firePropertyChange("temperature",
+            oldWrappedObject, newWrappedObject);
+        propertyChangeSupport.firePropertyChange("comment", oldWrappedObject,
+            newWrappedObject);
+        propertyChangeSupport.firePropertyChange("samplePositionCollection",
+            oldWrappedObject, newWrappedObject);
+        propertyChangeSupport.firePropertyChange("childPositionCollection",
+            oldWrappedObject, newWrappedObject);
+        propertyChangeSupport.firePropertyChange("containerType",
+            oldWrappedObject, newWrappedObject);
     }
 
     @Override
@@ -150,6 +170,9 @@ public class ContainerWrapper extends ModelWrapper<Container> {
         return appService.query(criteria);
     }
 
+    /**
+     * Get all containers form a given site with a given label
+     */
     public static List<Container> getContainersInSite(
         WritableApplicationService appService, Site site, String label)
         throws ApplicationException {
@@ -264,7 +287,7 @@ public class ContainerWrapper extends ModelWrapper<Container> {
             oldActivityStatus, activityStatus);
     }
 
-    private String getActivityStatus() {
+    public String getActivityStatus() {
         return wrappedObject.getActivityStatus();
     }
 
@@ -284,6 +307,14 @@ public class ContainerWrapper extends ModelWrapper<Container> {
         return wrappedObject.getSamplePositionCollection();
     }
 
+    public void setSamplePositionCollection(Collection<SamplePosition> positions) {
+        Collection<SamplePosition> oldPositions = wrappedObject
+            .getSamplePositionCollection();
+        wrappedObject.setSamplePositionCollection(positions);
+        propertyChangeSupport.firePropertyChange("samplePositionCollection",
+            oldPositions, positions);
+    }
+
     /**
      * return a string with the label of this container + the short name of its
      * type
@@ -296,6 +327,9 @@ public class ContainerWrapper extends ModelWrapper<Container> {
         return getLabel() + "(" + getContainerType().getNameShort() + ")";
     }
 
+    /**
+     * Get the container with the given productBarcode in a site
+     */
     public static Container getContainerWithProductBarcodeInSite(
         WritableApplicationService appService, Site site, String productBarcode)
         throws Exception {
@@ -317,19 +351,30 @@ public class ContainerWrapper extends ModelWrapper<Container> {
     public void setTemperature(Double temperature) {
         Double oldTemp = getTemperature();
         wrappedObject.setTemperature(temperature);
-        propertyChangeSupport.firePropertyChange("position", oldTemp,
+        propertyChangeSupport.firePropertyChange("temperature", oldTemp,
             temperature);
     }
 
-    private Double getTemperature() {
+    public Double getTemperature() {
         return getWrappedObject().getTemperature();
-
     }
 
     public Collection<ContainerPosition> getChildPositionCollection() {
         return getWrappedObject().getChildPositionCollection();
     }
 
+    public void setChildPositionCollection(
+        Collection<ContainerPosition> positions) {
+        Collection<ContainerPosition> oldPositions = wrappedObject
+            .getChildPositionCollection();
+        wrappedObject.setChildPositionCollection(positions);
+        propertyChangeSupport.firePropertyChange("childPositionCollection",
+            oldPositions, positions);
+    }
+
+    /**
+     * Return true if this container can hold the type of sample
+     */
     public boolean canHold(Sample sample) throws ApplicationException {
         SampleType type = sample.getSampleType();
         HQLCriteria criteria = new HQLCriteria("select sampleType from "
@@ -339,5 +384,33 @@ public class ContainerWrapper extends ModelWrapper<Container> {
             getContainerType(), type }));
         List<SampleType> types = appService.query(criteria);
         return types.size() == 1;
+    }
+
+    public String getComment() {
+        return wrappedObject.getComment();
+    }
+
+    public void setComment(String comment) {
+        String oldComment = wrappedObject.getComment();
+        wrappedObject.setComment(comment);
+        propertyChangeSupport
+            .firePropertyChange("comment", oldComment, comment);
+    }
+
+    @Override
+    public boolean checkIntegrity() {
+        if (wrappedObject != null)
+            if ((getContainerType() != null
+                && getContainerType().getCapacity() != null
+                && getContainerType().getCapacity().getRowCapacity() != null && getContainerType()
+                .getCapacity().getColCapacity() != null)
+                || getContainerType() == null)
+                if ((getPosition() != null && getPosition().getRow() != null && getPosition()
+                    .getCol() != null)
+                    || getPosition() == null)
+                    if (getSite() != null)
+                        return true;
+        return false;
+
     }
 }

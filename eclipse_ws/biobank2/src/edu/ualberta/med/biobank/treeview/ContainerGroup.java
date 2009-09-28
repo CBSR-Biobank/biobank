@@ -28,7 +28,7 @@ import edu.ualberta.med.biobank.model.Site;
 public class ContainerGroup extends AdapterBase {
 
     public ContainerGroup(SiteAdapter parent, int id) {
-        super(parent, null, null, id, "Containers", true);
+        super(parent, id, "Containers", true);
     }
 
     @Override
@@ -112,11 +112,6 @@ public class ContainerGroup extends AdapterBase {
     @Override
     public String getTitle() {
         return null;
-    }
-
-    @Override
-    protected boolean integrityCheck() {
-        return true;
     }
 
 }

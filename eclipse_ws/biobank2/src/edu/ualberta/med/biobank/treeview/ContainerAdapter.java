@@ -39,7 +39,7 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 public class ContainerAdapter extends AdapterBase {
 
     public ContainerAdapter(AdapterBase parent, ContainerWrapper container) {
-        super(parent, container, Container.class);
+        super(parent, container);
         setHasChildren(container.getChildPositionCollection() != null
             && (container.getChildPositionCollection()).size() > 0);
     }
@@ -50,11 +50,11 @@ public class ContainerAdapter extends AdapterBase {
     }
 
     public ContainerWrapper getContainer() {
-        return (ContainerWrapper) getWrappedObject();
+        return (ContainerWrapper) object;
     }
 
     public void setContainer(ContainerWrapper container) {
-        setWrappedObject(container, ContainerWrapper.class);
+        object = container;
     }
 
     @Override
@@ -355,25 +355,6 @@ public class ContainerAdapter extends AdapterBase {
             tempAdapter.setChildLabels(oldLabel
                 + c.getLabel().substring(parentContainer.getLabel().length()));
         }
-    }
-
-    @Override
-    protected boolean integrityCheck() {
-        ContainerWrapper c = getContainer();
-        if (c != null)
-            if ((c.getContainerType() != null
-                && c.getContainerType().getCapacity() != null
-                && c.getContainerType().getCapacity().getRowCapacity() != null && c
-                .getContainerType().getCapacity().getColCapacity() != null)
-                || c.getContainerType() == null)
-                if ((c.getPosition() != null
-                    && c.getPosition().getRow() != null && c.getPosition()
-                    .getCol() != null)
-                    || c.getPosition() == null)
-                    if (c.getSite() != null)
-                        return true;
-        return false;
-
     }
 
 }

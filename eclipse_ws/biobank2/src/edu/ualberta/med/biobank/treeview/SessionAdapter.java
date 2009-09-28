@@ -31,7 +31,7 @@ public class SessionAdapter extends AdapterBase {
     public SessionAdapter(AdapterBase parent,
         WritableApplicationService appService, int sessionId, String name,
         String userName) {
-        super(parent, null, null);
+        super(parent, null);
         this.appService = appService;
         setId(sessionId);
         setName(name);
@@ -169,8 +169,4 @@ public class SessionAdapter extends AdapterBase {
         return "";
     }
 
-    @Override
-    protected boolean integrityCheck() {
-        return true;
-    }
 }

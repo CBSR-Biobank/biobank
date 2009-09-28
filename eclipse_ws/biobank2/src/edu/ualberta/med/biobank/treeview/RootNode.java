@@ -12,7 +12,7 @@ public class RootNode extends AdapterBase {
     private TreeViewer treeViewer;
 
     public RootNode() {
-        super(null, null, null, 1, "root");
+        super(null, 1, "root");
     }
 
     @Override
@@ -57,8 +57,4 @@ public class RootNode extends AdapterBase {
         }
     }
 
-    @Override
-    protected boolean integrityCheck() {
-        return true;
-    }
 }

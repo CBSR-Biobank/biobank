@@ -125,10 +125,13 @@ public abstract class ModelWrapper<E> {
         }
     }
 
-    @SuppressWarnings("unchecked")
     protected E getNewObject() throws Exception {
-        Class<E> wrappedClass = (Class<E>) wrappedObject.getClass();
-        Constructor<E> constructor = wrappedClass.getConstructor();
+        Constructor<E> constructor = getWrappedClass().getConstructor();
         return constructor.newInstance();
     }
+
+    /**
+     * return true if integrity of this object is ok
+     */
+    public abstract boolean checkIntegrity();
 }

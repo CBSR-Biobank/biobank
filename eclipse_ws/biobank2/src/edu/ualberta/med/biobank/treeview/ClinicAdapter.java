@@ -25,15 +25,15 @@ import gov.nih.nci.system.query.example.DeleteExampleQuery;
 public class ClinicAdapter extends AdapterBase {
 
     public ClinicAdapter(AdapterBase parent, Clinic clinic) {
-        super(parent, clinic, Clinic.class);
+        super(parent, clinic);
     }
 
     public void setClinic(Clinic clinic) {
-        setWrappedObject(clinic, Clinic.class);
+        object = clinic;
     }
 
     public Clinic getClinic() {
-        return (Clinic) getWrappedObject();
+        return (Clinic) object;
     }
 
     @Override
@@ -150,11 +150,6 @@ public class ClinicAdapter extends AdapterBase {
 
     public Clinic loadClinic() throws Exception {
         return (Clinic) loadWrappedObject();
-    }
-
-    @Override
-    protected boolean integrityCheck() {
-        return true;
     }
 
 }
