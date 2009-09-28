@@ -171,7 +171,8 @@ public class PatientAdministrationView extends ViewPart implements
         boolean create = BioBankPlugin.openConfirm("Patient not found",
             "Do you want to create this patient ?");
         if (create) {
-            Patient patient = new Patient();
+            PatientWrapper patient = new PatientWrapper(SessionManager
+                .getAppService(), new Patient());
             patient.setNumber(number);
             PatientAdapter adapter = new PatientAdapter(getRootNode(), patient);
             try {
@@ -204,8 +205,8 @@ public class PatientAdministrationView extends ViewPart implements
 
     private static AdapterBase getNoPatientFoundAdapter() {
         if (noPatientFoundAdapter == null) {
-            noPatientFoundAdapter = new AdapterBase(getRootNode(), null, null,
-                0, "- No patient found -") {
+            noPatientFoundAdapter = new AdapterBase(getRootNode(), 0,
+                "- No patient found -") {
                 @Override
                 public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
                 }
@@ -233,10 +234,6 @@ public class PatientAdministrationView extends ViewPart implements
                     return null;
                 }
 
-                @Override
-                protected boolean integrityCheck() {
-                    return true;
-                }
             };
         }
         return noPatientFoundAdapter;

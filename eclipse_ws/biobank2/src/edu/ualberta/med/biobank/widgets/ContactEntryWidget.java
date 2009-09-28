@@ -5,7 +5,6 @@ import java.util.HashSet;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.Dialog;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -19,6 +18,7 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
+import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.dialogs.ContactAddDialog;
 import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.widgets.infotables.ContactInfoTable;
@@ -75,7 +75,12 @@ public class ContactEntryWidget extends BiobankWidget {
         item.setText("Edit");
         item.addSelectionListener(new SelectionListener() {
             public void widgetSelected(SelectionEvent event) {
-                addOrEditContact(false, contactInfoTable.getSelection());
+                Contact contact = contactInfoTable.getSelection();
+                if (contact == null) {
+                    BioBankPlugin.openError("Edit Clinic", "Invalid selection");
+                    return;
+                }
+                addOrEditContact(false, contact);
             }
 
             public void widgetDefaultSelected(SelectionEvent e) {
@@ -87,10 +92,13 @@ public class ContactEntryWidget extends BiobankWidget {
         item.addSelectionListener(new SelectionListener() {
             public void widgetSelected(SelectionEvent event) {
                 Contact contact = contactInfoTable.getSelection();
+                if (contact == null) {
+                    BioBankPlugin.openError("Delete Clinic",
+                        "Invalid selection");
+                    return;
+                }
 
-                boolean confirm = MessageDialog.openConfirm(PlatformUI
-                    .getWorkbench().getActiveWorkbenchWindow().getShell(),
-                    "Delete Clinic",
+                boolean confirm = BioBankPlugin.openConfirm("Delete Clinic",
                     "Are you sure you want to delete clinic \""
                         + contact.getClinic().getName() + "\"");
 
@@ -106,6 +114,7 @@ public class ContactEntryWidget extends BiobankWidget {
                     }
 
                     contactInfoTable.setCollection(selectedContacts);
+                    notifyListeners();
                 }
             }
 
@@ -123,6 +132,7 @@ public class ContactEntryWidget extends BiobankWidget {
                 selectedContacts.add(dlg.getContact());
             }
             contactInfoTable.setCollection(selectedContacts);
+            notifyListeners();
         }
     }
 

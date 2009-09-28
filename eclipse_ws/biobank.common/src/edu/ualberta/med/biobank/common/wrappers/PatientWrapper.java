@@ -13,6 +13,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
+//FIXME get/set for model object should use wrapper ?
 public class PatientWrapper extends ModelWrapper<Patient> {
 
     public PatientWrapper(WritableApplicationService appService, Patient patient) {
@@ -76,6 +77,11 @@ public class PatientWrapper extends ModelWrapper<Patient> {
         return wrappedObject.getPatientVisitCollection();
     }
 
+    public void setPatientVisitCollection(
+        Collection<PatientVisit> patientVisitCollection) {
+        wrappedObject.setPatientVisitCollection(patientVisitCollection);
+    }
+
     public static PatientWrapper getPatientWrapperInSite(
         WritableApplicationService appService, String patientNumber, Site site)
         throws ApplicationException {
@@ -103,5 +109,10 @@ public class PatientWrapper extends ModelWrapper<Patient> {
     @Override
     protected Class<Patient> getWrappedClass() {
         return Patient.class;
+    }
+
+    @Override
+    public boolean checkIntegrity() {
+        return true;
     }
 }

@@ -13,6 +13,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
+//FIXME todo by delphine
 public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
 
     public ContainerTypeWrapper(WritableApplicationService appService,
@@ -85,5 +86,10 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
         HQLCriteria criteria = new HQLCriteria(query, Arrays
             .asList(new Object[] { site, containerNameParameter }));
         return appService.query(criteria);
+    }
+
+    @Override
+    public boolean checkIntegrity() {
+        return true;
     }
 }

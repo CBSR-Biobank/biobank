@@ -143,6 +143,7 @@ public class SampleStorageEntryWidget extends BiobankWidget {
                 Set<SampleType> allowedSampleTypes = getNonDuplicateSampleTypes();
                 allowedSampleTypes.add(sampleStorage.getSampleType());
                 addOrEditSampleStorage(false, sampleStorage, allowedSampleTypes);
+                notifyListeners();
             }
 
             public void widgetDefaultSelected(SelectionEvent e) {
@@ -174,6 +175,7 @@ public class SampleStorageEntryWidget extends BiobankWidget {
                     }
 
                     sampleStorageTable.setCollection(selectedSampleStorage);
+                    notifyListeners();
                 }
             }
 

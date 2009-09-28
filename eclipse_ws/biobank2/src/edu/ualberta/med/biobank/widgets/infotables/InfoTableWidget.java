@@ -84,6 +84,7 @@ public class InfoTableWidget<T> extends BiobankWidget {
             for (int i = 0, n = collection.size(); i < n; ++i) {
                 model.add(new BiobankCollectionModel());
             }
+            getTableViewer().refresh();
             setCollection(collection);
             setCollectionCount = 0;
         } else
@@ -112,6 +113,19 @@ public class InfoTableWidget<T> extends BiobankWidget {
                 final TableViewer viewer = getTableViewer();
                 Display display = viewer.getTable().getDisplay();
                 int count = 0;
+
+                if (model.size() != collection.size()) {
+                    model.clear();
+                    for (int i = 0, n = collection.size(); i < n; ++i) {
+                        model.add(new BiobankCollectionModel());
+                    }
+                    display.asyncExec(new Runnable() {
+                        public void run() {
+                            if (!viewer.getTable().isDisposed())
+                                getTableViewer().refresh();
+                        }
+                    });
+                }
 
                 try {
                     for (T item : collection) {

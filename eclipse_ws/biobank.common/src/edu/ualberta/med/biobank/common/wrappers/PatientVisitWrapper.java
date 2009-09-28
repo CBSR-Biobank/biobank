@@ -18,6 +18,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
+//FIXME get/set for model object should use wrapper ?
 public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
 
     public PatientVisitWrapper(WritableApplicationService appService,
@@ -32,7 +33,13 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
             newWrappedObject);
         propertyChangeSupport.firePropertyChange("dateDrawn", oldWrappedObject,
             newWrappedObject);
+        propertyChangeSupport.firePropertyChange("dateProcessed",
+            oldWrappedObject, newWrappedObject);
+        propertyChangeSupport.firePropertyChange("dateReceived",
+            oldWrappedObject, newWrappedObject);
         propertyChangeSupport.firePropertyChange("clinic", oldWrappedObject,
+            newWrappedObject);
+        propertyChangeSupport.firePropertyChange("comments", oldWrappedObject,
             newWrappedObject);
     }
 
@@ -80,6 +87,10 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
         return wrappedObject.getSampleCollection();
     }
 
+    public void setSampleCollection(Collection<Sample> sampleCollection) {
+        wrappedObject.setSampleCollection(sampleCollection);
+    }
+
     public Collection<SampleWrapper> getSampleWrapperCollection() {
         Collection<SampleWrapper> collection = new HashSet<SampleWrapper>();
         for (Sample sample : wrappedObject.getSampleCollection()) {
@@ -122,7 +133,7 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
     public void setComments(String comments) {
         String oldComments = getComments();
         wrappedObject.setComments(comments);
-        propertyChangeSupport.firePropertyChange("dateReceived", oldComments,
+        propertyChangeSupport.firePropertyChange("comments", oldComments,
             comments);
     }
 
@@ -168,6 +179,11 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
     @Override
     protected Class<PatientVisit> getWrappedClass() {
         return PatientVisit.class;
+    }
+
+    @Override
+    public boolean checkIntegrity() {
+        return true;
     }
 
 }

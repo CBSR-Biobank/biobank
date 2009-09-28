@@ -66,4 +66,9 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
         return Clinic.class;
     }
 
+    @Override
+    public boolean checkIntegrity() {
+        return true;
+    }
+
 }

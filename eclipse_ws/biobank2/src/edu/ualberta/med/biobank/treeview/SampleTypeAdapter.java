@@ -10,16 +10,16 @@ import edu.ualberta.med.biobank.model.SampleType;
 public class SampleTypeAdapter extends AdapterBase {
 
     public SampleTypeAdapter(AdapterBase parent, SampleType sampleType) {
-        super(parent, sampleType, SampleType.class);
+        super(parent, sampleType);
         setHasChildren(true);
     }
 
     public SampleType getSampleType() {
-        return (SampleType) getWrappedObject();
+        return (SampleType) object;
     }
 
     public void setSampleType(SampleType sampleType) {
-        setWrappedObject(sampleType, SampleType.class);
+        object = sampleType;
     }
 
     @Override
@@ -64,8 +64,4 @@ public class SampleTypeAdapter extends AdapterBase {
         return getTitle("Sample Type");
     }
 
-    @Override
-    protected boolean integrityCheck() {
-        return true;
-    }
 }

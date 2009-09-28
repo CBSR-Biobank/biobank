@@ -104,7 +104,7 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
         createContactSection();
         createButtonsSection();
 
-        // When adding help uncomment line below
+        // TODO: When adding help uncomment line below
         // PlatformUI.getWorkbench().getHelpSystem().setHelp(composite,
         // IJavaHelpContextIds.XXXXX);
     }

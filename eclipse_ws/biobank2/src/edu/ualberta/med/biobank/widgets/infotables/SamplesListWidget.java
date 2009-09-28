@@ -116,6 +116,19 @@ public class SamplesListWidget extends InfoTableWidget<SampleWrapper> {
                 Display display = viewer.getTable().getDisplay();
                 int count = 0;
 
+                if (model.size() != samplePositionCollection.size()) {
+                    model.clear();
+                    for (int i = 0, n = samplePositionCollection.size(); i < n; ++i) {
+                        model.add(new BiobankCollectionModel());
+                    }
+                    display.asyncExec(new Runnable() {
+                        public void run() {
+                            if (!viewer.getTable().isDisposed())
+                                getTableViewer().refresh();
+                        }
+                    });
+                }
+
                 try {
                     for (SamplePosition position : samplePositionCollection) {
                         if (viewer.getTable().isDisposed())

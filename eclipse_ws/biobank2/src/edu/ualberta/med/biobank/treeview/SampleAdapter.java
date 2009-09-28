@@ -16,15 +16,15 @@ import edu.ualberta.med.biobank.model.Sample;
 public class SampleAdapter extends AdapterBase {
 
     public SampleAdapter(AdapterBase parent, Sample sample) {
-        super(parent, sample, Sample.class);
+        super(parent, sample);
     }
 
     public void setSample(Sample sample) {
-        setWrappedObject(sample, Sample.class);
+        object = sample;
     }
 
     public Sample getSample() {
-        return (Sample) getWrappedObject();
+        return (Sample) object;
     }
 
     @Override
@@ -82,11 +82,6 @@ public class SampleAdapter extends AdapterBase {
     @Override
     public AdapterBase accept(NodeSearchVisitor visitor) {
         return null;
-    }
-
-    @Override
-    protected boolean integrityCheck() {
-        return true;
     }
 
 }

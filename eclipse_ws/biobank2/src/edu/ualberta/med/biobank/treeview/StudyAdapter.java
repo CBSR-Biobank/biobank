@@ -36,7 +36,7 @@ public class StudyAdapter extends AdapterBase {
     }
 
     public StudyAdapter(AdapterBase parent, Study study, boolean enabledActions) {
-        super(parent, study, Study.class);
+        super(parent, study);
         this.setStudy(study);
         this.enableActions = enabledActions;
 
@@ -47,11 +47,11 @@ public class StudyAdapter extends AdapterBase {
     }
 
     public void setStudy(Study study) {
-        setWrappedObject(study, Study.class);
+        object = study;
     }
 
     public Study getStudy() {
-        return (Study) getWrappedObject();
+        return (Study) object;
     }
 
     @Override
@@ -162,11 +162,6 @@ public class StudyAdapter extends AdapterBase {
     @Override
     public AdapterBase accept(NodeSearchVisitor visitor) {
         return visitor.visit(this);
-    }
-
-    @Override
-    protected boolean integrityCheck() {
-        return true;
     }
 
 }

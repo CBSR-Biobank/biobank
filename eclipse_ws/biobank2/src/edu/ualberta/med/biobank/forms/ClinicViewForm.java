@@ -78,7 +78,7 @@ public class ClinicViewForm extends AddressViewFormCommon {
     }
 
     private void createContactsSection() {
-        Composite client = createSectionWithClient("Clinics");
+        Composite client = createSectionWithClient("Contacts");
 
         contactsTable = new ContactInfoTable(client, clinic
             .getContactCollection());

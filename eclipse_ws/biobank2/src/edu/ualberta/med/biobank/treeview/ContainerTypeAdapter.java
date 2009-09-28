@@ -31,16 +31,16 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 public class ContainerTypeAdapter extends AdapterBase {
 
     public ContainerTypeAdapter(AdapterBase parent, ContainerType containerType) {
-        super(parent, containerType, ContainerType.class);
+        super(parent, containerType);
         this.setContainerType(containerType);
     }
 
     public void setContainerType(ContainerType containerType) {
-        setWrappedObject(containerType, ContainerType.class);
+        object = containerType;
     }
 
     public ContainerType getContainerType() {
-        return (ContainerType) getWrappedObject();
+        return (ContainerType) object;
     }
 
     @Override
@@ -169,11 +169,6 @@ public class ContainerTypeAdapter extends AdapterBase {
     @Override
     public AdapterBase accept(NodeSearchVisitor visitor) {
         return null;
-    }
-
-    @Override
-    protected boolean integrityCheck() {
-        return true;
     }
 
 }

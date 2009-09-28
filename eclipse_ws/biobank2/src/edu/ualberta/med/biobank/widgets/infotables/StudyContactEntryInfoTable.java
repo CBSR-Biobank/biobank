@@ -3,7 +3,9 @@ package edu.ualberta.med.biobank.widgets.infotables;
 import java.util.Collection;
 import java.util.HashSet;
 
+import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
@@ -22,7 +24,12 @@ public class StudyContactEntryInfoTable extends InfoTableWidget<Contact> {
 
     public StudyContactEntryInfoTable(Composite parent, Study study) {
         super(parent, null, HEADINGS, BOUNDS);
-        setCollection(study.getContactCollection());
+        Collection<Contact> collection = study.getContactCollection();
+        for (int i = 0, n = collection.size(); i < n; ++i) {
+            model.add(new BiobankCollectionModel());
+        }
+        getTableViewer().refresh();
+        setCollection(collection);
     }
 
     @Override
@@ -31,28 +38,42 @@ public class StudyContactEntryInfoTable extends InfoTableWidget<Contact> {
             @Override
             public void run() {
                 try {
-                    model.clear();
-                    BiobankCollectionModel item;
+                    final TableViewer viewer = getTableViewer();
+                    Display display = viewer.getTable().getDisplay();
+                    int count = 0;
+
                     if (collection != null)
-                        for (Contact contact : collection) {
-                            if (getTableViewer().getTable().isDisposed()) {
-                                return;
+                        if (model.size() != collection.size()) {
+                            model.clear();
+                            for (int i = 0, n = collection.size(); i < n; ++i) {
+                                model.add(new BiobankCollectionModel());
                             }
-                            item = new BiobankCollectionModel();
-                            StudyContactInfo info = new StudyContactInfo();
-                            item.o = info;
-                            model.add(item);
-                            info.contact = contact;
+                            display.asyncExec(new Runnable() {
+                                public void run() {
+                                    if (!viewer.getTable().isDisposed())
+                                        getTableViewer().refresh();
+                                }
+                            });
                         }
 
-                    getTableViewer().getTable().getDisplay().asyncExec(
-                        new Runnable() {
+                    for (Contact contact : collection) {
+                        if (getTableViewer().getTable().isDisposed()) {
+                            return;
+                        }
+                        final BiobankCollectionModel item = model.get(count);
+                        StudyContactInfo info = new StudyContactInfo();
+                        item.o = info;
+                        model.add(item);
+                        info.contact = contact;
 
+                        display.asyncExec(new Runnable() {
                             public void run() {
-                                getTableViewer().refresh();
+                                if (!viewer.getTable().isDisposed())
+                                    viewer.refresh(item, false);
                             }
-
                         });
+                        ++count;
+                    }
                 } catch (final RemoteConnectFailureException exp) {
                     BioBankPlugin.openRemoteConnectErrorMessage();
                 } catch (Exception e) {

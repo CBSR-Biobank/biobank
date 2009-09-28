@@ -39,7 +39,7 @@ public class SiteAdapter extends AdapterBase {
     }
 
     public SiteAdapter(AdapterBase parent, Site site, boolean enableActions) {
-        super(parent, site, Site.class);
+        super(parent, site);
         this.enableActions = enableActions;
         if (enableActions) {
             addChild(new ClinicGroup(this, CLINICS_NODE_ID));
@@ -50,11 +50,11 @@ public class SiteAdapter extends AdapterBase {
     }
 
     public void setSite(Site site) {
-        setWrappedObject(site, Site.class);
+        object = site;
     }
 
     public Site getSite() {
-        return (Site) getWrappedObject();
+        return (Site) object;
     }
 
     @Override
@@ -186,11 +186,6 @@ public class SiteAdapter extends AdapterBase {
     @Override
     public AdapterBase accept(NodeSearchVisitor visitor) {
         return visitor.visit(this);
-    }
-
-    @Override
-    protected boolean integrityCheck() {
-        return true;
     }
 
 }

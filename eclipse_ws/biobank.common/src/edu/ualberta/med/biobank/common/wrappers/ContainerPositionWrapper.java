@@ -7,6 +7,7 @@ import edu.ualberta.med.biobank.model.ContainerPosition;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
+//FIXME to do by delphine
 public class ContainerPositionWrapper extends ModelWrapper<ContainerPosition> {
 
     public ContainerPositionWrapper(WritableApplicationService appService,
@@ -79,6 +80,11 @@ public class ContainerPositionWrapper extends ModelWrapper<ContainerPosition> {
         Integer oldRow = getRow();
         wrappedObject.setRow(row);
         propertyChangeSupport.firePropertyChange("row", oldRow, row);
+    }
+
+    @Override
+    public boolean checkIntegrity() {
+        return true;
     }
 
 }

@@ -49,4 +49,9 @@ public class SampleTypeWrapper extends ModelWrapper<SampleType> {
         }
         return sampleTypes;
     }
+
+    @Override
+    public boolean checkIntegrity() {
+        return true;
+    }
 }
