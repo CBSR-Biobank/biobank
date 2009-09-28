@@ -20,10 +20,10 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class ClinicStudyInfoTable extends InfoTableWidget<Study> {
 
-    private static final String[] headings = new String[] { "Study",
+    private static final String[] HEADINGS = new String[] { "Study",
         "No. Patients", "No. Patient Visits" };
 
-    private static final int[] bounds = new int[] { 200, 130, 100, -1, -1, -1,
+    private static final int[] BOUNDS = new int[] { 200, 130, 100, -1, -1, -1,
         -1 };
 
     private Clinic clinic;
@@ -32,7 +32,7 @@ public class ClinicStudyInfoTable extends InfoTableWidget<Study> {
 
     public ClinicStudyInfoTable(Composite parent,
         WritableApplicationService appService, Clinic clinic) throws Exception {
-        super(parent, null, headings, bounds);
+        super(parent, null, HEADINGS, BOUNDS);
         this.appService = appService;
         this.clinic = clinic;
         setCollection(ModelUtils.getClinicStudyCollection(appService, clinic));

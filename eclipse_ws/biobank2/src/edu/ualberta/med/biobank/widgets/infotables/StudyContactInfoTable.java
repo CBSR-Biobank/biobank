@@ -23,10 +23,10 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
  */
 public class StudyContactInfoTable extends InfoTableWidget<Contact> {
 
-    private static final String[] headings = new String[] { "Clinic",
+    private static final String[] HEADINGS = new String[] { "Clinic",
         "#Patients", "#Patient Visits", "Contact Name", "Title" };
 
-    private static final int[] bounds = new int[] { 100, 80, 100, 150, 150 };
+    private static final int[] BOUNDS = new int[] { 100, 80, 100, 150, 150 };
 
     private Study study;
 
@@ -34,7 +34,7 @@ public class StudyContactInfoTable extends InfoTableWidget<Contact> {
 
     public StudyContactInfoTable(Composite parent,
         WritableApplicationService appService, Study study) {
-        super(parent, null, headings, bounds);
+        super(parent, null, HEADINGS, BOUNDS);
         this.appService = appService;
         this.study = study;
         setCollection(study.getContactCollection());

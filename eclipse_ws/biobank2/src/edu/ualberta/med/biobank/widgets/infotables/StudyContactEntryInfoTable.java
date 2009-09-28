@@ -14,14 +14,14 @@ import edu.ualberta.med.biobank.model.StudyContactInfo;
 
 public class StudyContactEntryInfoTable extends InfoTableWidget<Contact> {
 
-    private static final String[] headings = new String[] { "Clinic",
+    private static final String[] HEADINGS = new String[] { "Clinic",
         "Contact Name", "Title", "Email", "Phone #", "Fax #" };
 
-    private static final int[] bounds = new int[] { 150, 150, 100, 100, 100,
+    private static final int[] BOUNDS = new int[] { 150, 150, 100, 100, 100,
         100 };
 
     public StudyContactEntryInfoTable(Composite parent, Study study) {
-        super(parent, null, headings, bounds);
+        super(parent, null, HEADINGS, BOUNDS);
         setCollection(study.getContactCollection());
     }
 

@@ -8,15 +8,15 @@ import edu.ualberta.med.biobank.model.PatientVisit;
 
 public class PatientVisitInfoTable extends InfoTableWidget<PatientVisit> {
 
-    private static final String[] headings = new String[] { "Visit Number",
+    private static final String[] HEADINGS = new String[] { "Visit Number",
         "Num Samples" };
 
-    private static final int[] bounds = new int[] { 200, 130, -1, -1, -1, -1,
+    private static final int[] BOUNDS = new int[] { 200, 130, -1, -1, -1, -1,
         -1 };
 
     public PatientVisitInfoTable(Composite parent,
         Collection<PatientVisit> collection) {
-        super(parent, collection, headings, bounds);
+        super(parent, collection, HEADINGS, BOUNDS);
     }
 
 }
