@@ -8,6 +8,7 @@ import org.eclipse.swt.graphics.Image;
 import org.springframework.util.Assert;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.ClinicStudyInfo;
@@ -232,6 +233,9 @@ public class BiobankLabelProvider extends LabelProvider implements
             case 4:
                 return contact.getFaxNumber();
             }
+        } else if (element instanceof ModelWrapper<?>) {
+            return getColumnText(
+                ((ModelWrapper<?>) element).getWrappedObject(), columnIndex);
         } else {
             Assert.isTrue(false, "invalid object type: " + element.getClass());
         }

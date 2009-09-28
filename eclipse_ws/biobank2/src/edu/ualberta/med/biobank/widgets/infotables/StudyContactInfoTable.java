@@ -5,7 +5,9 @@ import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
@@ -37,7 +39,12 @@ public class StudyContactInfoTable extends InfoTableWidget<Contact> {
         super(parent, null, HEADINGS, BOUNDS);
         this.appService = appService;
         this.study = study;
-        setCollection(study.getContactCollection());
+        Collection<Contact> collection = study.getContactCollection();
+        for (int i = 0, n = collection.size(); i < n; ++i) {
+            model.add(new BiobankCollectionModel());
+        }
+        getTableViewer().refresh();
+        setCollection(collection);
     }
 
     @Override
@@ -46,16 +53,17 @@ public class StudyContactInfoTable extends InfoTableWidget<Contact> {
             @Override
             public void run() {
                 try {
-                    model.clear();
-                    BiobankCollectionModel item;
+                    final TableViewer viewer = getTableViewer();
+                    Display display = viewer.getTable().getDisplay();
+                    int count = 0;
+
                     for (Contact contact : collection) {
                         if (getTableViewer().getTable().isDisposed()) {
                             return;
                         }
-                        item = new BiobankCollectionModel();
+                        final BiobankCollectionModel item = model.get(count);
                         StudyContactAndPatientInfo info = new StudyContactAndPatientInfo();
                         item.o = info;
-                        model.add(item);
 
                         info.contact = contact;
                         info.clinicName = contact.getClinic().getName();
@@ -92,16 +100,15 @@ public class StudyContactInfoTable extends InfoTableWidget<Contact> {
                         Assert.isTrue(results.size() == 1,
                             "Invalid size for HQL query");
                         info.patientVisits = results.get(0);
-                    }
 
-                    getTableViewer().getTable().getDisplay().asyncExec(
-                        new Runnable() {
-
+                        display.asyncExec(new Runnable() {
                             public void run() {
-                                getTableViewer().refresh();
+                                if (!viewer.getTable().isDisposed())
+                                    viewer.refresh(item, false);
                             }
-
                         });
+                        ++count;
+                    }
                 } catch (final RemoteConnectFailureException exp) {
                     BioBankPlugin.openRemoteConnectErrorMessage();
                 } catch (Exception e) {

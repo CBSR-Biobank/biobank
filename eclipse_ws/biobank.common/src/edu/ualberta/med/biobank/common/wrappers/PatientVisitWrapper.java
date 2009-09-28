@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.common.wrappers;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.DatabaseResult;
@@ -77,6 +78,14 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
 
     public Collection<Sample> getSampleCollection() {
         return wrappedObject.getSampleCollection();
+    }
+
+    public Collection<SampleWrapper> getSampleWrapperCollection() {
+        Collection<SampleWrapper> collection = new HashSet<SampleWrapper>();
+        for (Sample sample : wrappedObject.getSampleCollection()) {
+            collection.add(new SampleWrapper(appService, sample));
+        }
+        return collection;
     }
 
     public Clinic getClinic() {

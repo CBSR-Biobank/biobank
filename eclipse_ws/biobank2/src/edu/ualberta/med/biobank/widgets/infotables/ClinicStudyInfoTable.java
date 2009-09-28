@@ -5,7 +5,9 @@ import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
@@ -35,7 +37,13 @@ public class ClinicStudyInfoTable extends InfoTableWidget<Study> {
         super(parent, null, HEADINGS, BOUNDS);
         this.appService = appService;
         this.clinic = clinic;
-        setCollection(ModelUtils.getClinicStudyCollection(appService, clinic));
+        Collection<Study> collection = ModelUtils.getClinicStudyCollection(
+            appService, clinic);
+        for (int i = 0, n = collection.size(); i < n; ++i) {
+            model.add(new BiobankCollectionModel());
+        }
+        getTableViewer().refresh();
+        setCollection(collection);
     }
 
     @Override
@@ -44,17 +52,30 @@ public class ClinicStudyInfoTable extends InfoTableWidget<Study> {
             @Override
             public void run() {
                 try {
-                    BiobankCollectionModel item;
-                    model.clear();
-                    for (Study study : ModelUtils.getClinicStudyCollection(
-                        appService, clinic)) {
+                    final TableViewer viewer = getTableViewer();
+                    Display display = viewer.getTable().getDisplay();
+                    int count = 0;
+
+                    if (model.size() != collection.size()) {
+                        model.clear();
+                        for (int i = 0, n = collection.size(); i < n; ++i) {
+                            model.add(new BiobankCollectionModel());
+                        }
+                        display.asyncExec(new Runnable() {
+                            public void run() {
+                                if (!viewer.getTable().isDisposed())
+                                    getTableViewer().refresh();
+                            }
+                        });
+                    }
+
+                    for (Study study : collection) {
                         if (getTableViewer().getTable().isDisposed()) {
                             return;
                         }
-                        item = new BiobankCollectionModel();
+                        final BiobankCollectionModel item = model.get(count);
                         ClinicStudyInfo info = new ClinicStudyInfo();
                         item.o = info;
-                        model.add(item);
                         info.study = study;
                         info.studyShortName = study.getNameShort();
 
@@ -89,16 +110,15 @@ public class ClinicStudyInfoTable extends InfoTableWidget<Study> {
                         Assert.isTrue(results.size() == 1,
                             "Invalid size for HQL query");
                         info.patientVisits = results.get(0);
-                    }
 
-                    getTableViewer().getTable().getDisplay().asyncExec(
-                        new Runnable() {
-
+                        display.asyncExec(new Runnable() {
                             public void run() {
-                                getTableViewer().refresh();
+                                if (!viewer.getTable().isDisposed())
+                                    viewer.refresh(item, false);
                             }
-
                         });
+                        ++count;
+                    }
                 } catch (final RemoteConnectFailureException exp) {
                     BioBankPlugin.openRemoteConnectErrorMessage();
                 } catch (ApplicationException e) {

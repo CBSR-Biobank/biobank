@@ -98,7 +98,7 @@ public class SampleWrapper extends ModelWrapper<Sample> {
         Container parentContainer) throws Exception {
         RowColPos rcp = LabelingScheme.getRowColFromPositionString(
             positionString, parentContainer.getContainerType());
-        if (rcp.row > -1 && rcp.col > -1) {
+        if ((rcp.row > -1) && (rcp.col > -1)) {
             SamplePosition sp = getSamplePosition();
             if (sp == null) {
                 sp = new SamplePosition();
@@ -126,12 +126,11 @@ public class SampleWrapper extends ModelWrapper<Sample> {
 
     public DatabaseResult checkPosition(Container parentContainer)
         throws ApplicationException {
-        HQLCriteria criteria = new HQLCriteria(
-            "from "
-                + Sample.class.getName()
-                + " where samplePosition.row=? and samplePosition.col=? and samplePosition.container=?",
-            Arrays.asList(new Object[] { getSamplePosition().getRow(),
-                getSamplePosition().getCol(), parentContainer }));
+        SamplePosition sp = getSamplePosition();
+        HQLCriteria criteria = new HQLCriteria("from " + Sample.class.getName()
+            + " where samplePosition.row=? and samplePosition.col=?"
+            + " and samplePosition.container=?", Arrays.asList(new Object[] {
+            sp.getRow(), sp.getCol(), parentContainer }));
         List<Sample> samples = appService.query(criteria);
         if (samples.size() == 0) {
             return DatabaseResult.OK;
@@ -183,26 +182,24 @@ public class SampleWrapper extends ModelWrapper<Sample> {
         SamplePosition position = getSamplePosition();
         if (position == null) {
             return "none";
-        } else {
-            if (fullString) {
-                Container container = position.getContainer();
-                Container topContainer = container;
-                while (topContainer.getPosition() != null
-                    && topContainer.getPosition().getParentContainer() != null) {
-                    topContainer = topContainer.getPosition()
-                        .getParentContainer();
-                }
-                String nameShort = topContainer.getContainerType()
-                    .getNameShort();
-                if (nameShort != null)
-                    return nameShort + "-" + container.getLabel()
-                        + LabelingScheme.getPositionString(position);
-                return container.getLabel()
-                    + LabelingScheme.getPositionString(position);
-            } else {
-                return LabelingScheme.getPositionString(position);
-            }
         }
+
+        if (!fullString) {
+            return LabelingScheme.getPositionString(position);
+        }
+
+        Container container = position.getContainer();
+        Container topContainer = container;
+        while ((topContainer.getPosition() != null)
+            && (topContainer.getPosition().getParentContainer() != null)) {
+            topContainer = topContainer.getPosition().getParentContainer();
+        }
+        String nameShort = topContainer.getContainerType().getNameShort();
+        if (nameShort != null)
+            return nameShort + "-" + container.getLabel()
+                + LabelingScheme.getPositionString(position);
+        return container.getLabel()
+            + LabelingScheme.getPositionString(position);
     }
 
     public static Sample createNewSample(String inventoryId,
@@ -232,5 +229,12 @@ public class SampleWrapper extends ModelWrapper<Sample> {
             }
         }
         setQuantity(volume);
+    }
+
+    @Override
+    public void loadAttributes() throws Exception {
+        super.loadAttributes();
+        getPositionString(true);
+        wrappedObject.getSampleType().getName();
     }
 }

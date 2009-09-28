@@ -578,8 +578,8 @@ public class ContainerViewForm extends BiobankViewForm {
 
     private void createSamplesSection() {
         Composite parent = createSectionWithClient("Samples");
-        samplesWidget = new SamplesListWidget(parent, container
-            .getSamplePositionCollection());
+        samplesWidget = new SamplesListWidget(parent, containerAdapter
+            .getAppService(), container.getSamplePositionCollection());
         samplesWidget.adaptToToolkit(toolkit, true);
     }
 

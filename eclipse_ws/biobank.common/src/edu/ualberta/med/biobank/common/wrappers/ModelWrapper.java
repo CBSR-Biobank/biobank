@@ -22,19 +22,19 @@ public abstract class ModelWrapper<E> {
 
     protected E wrappedObject;
 
-    public E getWrappedObject() {
-        return wrappedObject;
-    }
-
-    public void setWrappedObject(E wrappedObject) {
-        this.wrappedObject = wrappedObject;
-    }
-
     protected PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(
         this);
 
     public ModelWrapper(WritableApplicationService appService, E wrappedObject) {
         this.appService = appService;
+        this.wrappedObject = wrappedObject;
+    }
+
+    public E getWrappedObject() {
+        return wrappedObject;
+    }
+
+    public void setWrappedObject(E wrappedObject) {
         this.wrappedObject = wrappedObject;
     }
 
@@ -48,7 +48,7 @@ public abstract class ModelWrapper<E> {
     }
 
     public boolean isNew() {
-        return getId() == null;
+        return (getId() == null);
     }
 
     public Integer getId() {
@@ -130,5 +130,18 @@ public abstract class ModelWrapper<E> {
         Class<E> wrappedClass = (Class<E>) wrappedObject.getClass();
         Constructor<E> constructor = wrappedClass.getConstructor();
         return constructor.newInstance();
+    }
+
+    public void loadAttributes() throws Exception {
+        Class<E> classType = getWrappedClass();
+
+        Method[] methods = classType.getMethods();
+        for (Method method : methods) {
+            if (method.getName().startsWith("get")
+                && !method.getName().equals("getClass")
+                && !method.getReturnType().getName().equals("java.util.Set")) {
+                method.invoke(wrappedObject, (Object[]) null);
+            }
+        }
     }
 }
