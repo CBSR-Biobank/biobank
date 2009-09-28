@@ -86,7 +86,7 @@ public class SiteContainerTypes {
         ContainerType pallet384 = assignContainerType(site, "Pallet-384",
             labelingSchemeMap.get("SBS Standard"), 16, 24, null,
             freezerSampleTypes);
-        containerTypeMap.put("Pallet-96", pallet384);
+        containerTypeMap.put("Pallet-384", pallet384);
 
         ContainerType hotel17 = assignContainerType(site, "Hotel-17",
             labelingSchemeMap.get("2 char numeric"), 17, 1,
