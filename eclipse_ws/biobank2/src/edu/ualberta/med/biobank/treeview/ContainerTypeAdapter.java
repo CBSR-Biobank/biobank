@@ -44,18 +44,6 @@ public class ContainerTypeAdapter extends AdapterBase {
     }
 
     @Override
-    protected Integer getWrappedObjectId() {
-        return getContainerType().getId();
-    }
-
-    @Override
-    public Integer getId() {
-        ContainerType containerType = getContainerType();
-        Assert.isNotNull(containerType, "storage type is null");
-        return containerType.getId();
-    }
-
-    @Override
     public String getName() {
         ContainerType containerType = getContainerType();
         Assert.isNotNull(containerType, "storage type is null");
@@ -117,7 +105,10 @@ public class ContainerTypeAdapter extends AdapterBase {
         });
     }
 
+    @Override
     public void delete() {
+        // FIXME when wrapper is used : remove this method to use the
+        // parent one
         BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
             ContainerType ct = getContainerType();
             SDKQuery query = new DeleteExampleQuery(ct);

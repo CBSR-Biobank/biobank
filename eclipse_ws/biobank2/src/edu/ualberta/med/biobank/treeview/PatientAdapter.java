@@ -34,17 +34,6 @@ public class PatientAdapter extends AdapterBase {
         return (PatientWrapper) object;
     }
 
-    @Override
-    protected Integer getWrappedObjectId() {
-        return getWrapper().getId();
-    }
-
-    @Override
-    public Integer getId() {
-        PatientWrapper patientWrapper = getWrapper();
-        Assert.isNotNull(patientWrapper.getWrappedObject(), "patient is null");
-        return patientWrapper.getId();
-    }
 
     @Override
     public String getName() {

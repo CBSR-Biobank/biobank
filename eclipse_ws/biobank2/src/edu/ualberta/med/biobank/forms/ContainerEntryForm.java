@@ -1,8 +1,6 @@
 package edu.ualberta.med.biobank.forms;
 
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 
 import org.eclipse.core.databinding.beans.PojoObservables;
 import org.eclipse.core.runtime.Assert;
@@ -20,10 +18,10 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.common.DatabaseResult;
 import edu.ualberta.med.biobank.common.LabelingScheme;
 import edu.ualberta.med.biobank.common.utils.SiteUtils;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
-import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.Site;
@@ -31,11 +29,6 @@ import edu.ualberta.med.biobank.treeview.ContainerAdapter;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.validators.DoubleNumber;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
-import gov.nih.nci.system.query.SDKQuery;
-import gov.nih.nci.system.query.SDKQueryResult;
-import gov.nih.nci.system.query.example.InsertExampleQuery;
-import gov.nih.nci.system.query.example.UpdateExampleQuery;
-import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class ContainerEntryForm extends BiobankEntryForm {
     public static final String ID = "edu.ualberta.med.biobank.forms.ContainerEntryForm";
@@ -54,8 +47,6 @@ public class ContainerEntryForm extends BiobankEntryForm {
 
     private ContainerWrapper container;
 
-    private ContainerPosition position;
-
     private Site site;
 
     private Text tempWidget;
@@ -72,18 +63,17 @@ public class ContainerEntryForm extends BiobankEntryForm {
         containerAdapter = (ContainerAdapter) adapter;
         container = containerAdapter.getContainer();
         site = containerAdapter.getParentFromClass(SiteAdapter.class).getSite();
-        position = container.getPosition();
-
-        if (position != null) {
-            container.setLabel(position.getParentContainer().getLabel()
-                + LabelingScheme.getPositionString(position));
-            container.setTemperature(position.getParentContainer()
-                .getTemperature());
-        }
 
         String tabName;
-        if (container.getId() == null) {
+        if (container.isNew()) {
             tabName = "Container";
+            if (container.getPosition() != null) {
+                ContainerPosition pos = container.getPosition();
+                container.setLabel(pos.getParentContainer().getLabel()
+                    + LabelingScheme.getPositionString(pos));
+                container.setTemperature(pos.getParentContainer()
+                    .getTemperature());
+            }
         } else {
             tabName = "Container " + container.getLabel();
         }
@@ -111,7 +101,7 @@ public class ContainerEntryForm extends BiobankEntryForm {
             "Site");
         FormUtils.setTextValue(siteLabel, container.getSite().getName());
 
-        if (position == null) {
+        if (container.getPosition() == null) {
             // only allow edit to label on top level containers
             createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Label",
                 null, PojoObservables.observeValue(
@@ -144,11 +134,12 @@ public class ContainerEntryForm extends BiobankEntryForm {
 
     private void createContainerTypesSection(Composite client) {
         Collection<ContainerType> containerTypes;
-        if ((position == null) || (position.getParentContainer() == null)) {
+        ContainerPosition pos = container.getPosition();
+        if ((pos == null) || (pos.getParentContainer() == null)) {
             containerTypes = SiteUtils.getTopContainerTypesInSite(appService,
                 site);
         } else {
-            containerTypes = position.getParentContainer().getContainerType()
+            containerTypes = pos.getParentContainer().getContainerType()
                 .getChildContainerTypeCollection();
         }
 
@@ -213,7 +204,7 @@ public class ContainerEntryForm extends BiobankEntryForm {
 
     @Override
     protected String getOkMessage() {
-        if (container.getId() == null) {
+        if (container.isNew()) {
             return MSG_STORAGE_CONTAINER_NEW_OK;
         }
         return MSG_STORAGE_CONTAINER_OK;
@@ -221,100 +212,18 @@ public class ContainerEntryForm extends BiobankEntryForm {
 
     @Override
     protected void saveForm() throws Exception {
-        if ((container.getId() == null) && !checkContainerUnique()) {
-            setDirty(true);
-            return;
-        }
-
         ContainerType containerType = (ContainerType) ((StructuredSelection) containerTypeComboViewer
             .getSelection()).getFirstElement();
         container.setContainerType(containerType);
-        if (position != null) {
-            container.setPosition(position);
-        }
         container.setSite(site);
-
-        SDKQuery query;
-        if (container.getId() == null) {
-            query = new InsertExampleQuery(container.getWrappedObject());
-        } else {
-            query = new UpdateExampleQuery(container.getWrappedObject());
+        DatabaseResult res = container.persist();
+        if (res != DatabaseResult.OK) {
+            BioBankPlugin.openAsyncError("Save Problem", res.getMessage());
+            setDirty(true);
+            return;
         }
-
-        SDKQueryResult result = appService.executeQuery(query);
-        container.setWrappedObject((Container) result.getObjectResult());
-        containerAdapter.setContainer(container);
         containerAdapter.getParent().addChild(containerAdapter);
         containerAdapter.getParent().performExpand();
-
-    }
-
-    // protected void savePosition() throws Exception {
-    // if (position != null) {
-    // SDKQuery query;
-    // SDKQueryResult result;
-    //
-    // Integer id = position.getId();
-    //
-    // if ((id == null) || (id == 0)) {
-    // query = new InsertExampleQuery(position);
-    // } else {
-    // query = new UpdateExampleQuery(position);
-    // }
-    //
-    // result = appService.executeQuery(query);
-    // container.setPosition((ContainerPosition) result
-    // .getObjectResult());
-    // }
-    // }
-
-    private boolean checkContainerUnique() throws Exception {
-        // FIXME set constraint directly into the model ?
-        HQLCriteria c;
-        if (position == null) {
-            ContainerType containerType = (ContainerType) ((StructuredSelection) containerTypeComboViewer
-                .getSelection()).getFirstElement();
-
-            c = new HQLCriteria(
-                "from edu.ualberta.med.biobank.model.Container as c "
-                    + "inner join fetch c.site where c.site.id=? "
-                    + "and c.position=null and c.label=? "
-                    + "and c.containerType.id=?");
-
-            c.setParameters(Arrays.asList(new Object[] { site.getId(),
-                container.getLabel(), containerType.getId() }));
-
-            List<Object> results = appService.query(c);
-            if (results.size() > 0) {
-                BioBankPlugin.openAsyncError("Site Name Problem",
-                    "A container with label \"" + container.getLabel()
-                        + "\" and type \"" + containerType.getName()
-                        + "\" already exists.");
-                return false;
-            }
-
-        }
-
-        c = new HQLCriteria(
-            "from edu.ualberta.med.biobank.model.Container as sc "
-                + "inner join fetch sc.site where sc.site.id=? "
-                + "and sc.productBarcode=?)");
-
-        c.setParameters(Arrays.asList(new Object[] { site.getId(),
-            container.getProductBarcode() }));
-
-        List<Object> results = appService.query(c);
-        if (results.size() == 0)
-            return true;
-
-        BioBankPlugin.openAsyncError("Site Name Problem",
-            "A container with product barcode \""
-                + container.getProductBarcode() + "\" already exists.");
-        return false;
-    }
-
-    @Override
-    public void cancelForm() {
 
     }
 

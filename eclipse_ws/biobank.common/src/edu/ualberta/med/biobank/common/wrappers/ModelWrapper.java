@@ -5,6 +5,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.SDKQuery;
 import gov.nih.nci.system.query.SDKQueryResult;
+import gov.nih.nci.system.query.example.DeleteExampleQuery;
 import gov.nih.nci.system.query.example.InsertExampleQuery;
 import gov.nih.nci.system.query.example.UpdateExampleQuery;
 
@@ -115,6 +116,23 @@ public abstract class ModelWrapper<E> {
     }
 
     protected abstract DatabaseResult persistChecks()
+        throws ApplicationException;
+
+    /**
+     * delete the object into the database
+     */
+    public DatabaseResult delete() throws ApplicationException {
+        DatabaseResult checkResult = DatabaseResult.OK;
+        if (!isNew()) {
+            checkResult = deleteChecks();
+            if (checkResult == DatabaseResult.OK) {
+                appService.executeQuery(new DeleteExampleQuery(wrappedObject));
+            }
+        }
+        return checkResult;
+    }
+
+    protected abstract DatabaseResult deleteChecks()
         throws ApplicationException;
 
     public void reset() throws Exception {

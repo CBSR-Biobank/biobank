@@ -184,9 +184,4 @@ public class SampleTypesEntryForm extends BiobankEntryForm {
         return null;
     }
 
-    @Override
-    public void cancelForm() {
-
-    }
-
 }

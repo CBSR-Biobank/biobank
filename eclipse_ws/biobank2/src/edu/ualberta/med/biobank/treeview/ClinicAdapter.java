@@ -37,20 +37,8 @@ public class ClinicAdapter extends AdapterBase {
     }
 
     @Override
-    protected Integer getWrappedObjectId() {
-        return getClinic().getId();
-    }
-
-    @Override
     public void addChild(AdapterBase child) {
         Assert.isTrue(false, "Cannot add children to this adapter");
-    }
-
-    @Override
-    public Integer getId() {
-        Clinic clinic = getClinic();
-        Assert.isNotNull(clinic, "Clinic is null");
-        return clinic.getId();
     }
 
     @Override
@@ -113,7 +101,10 @@ public class ClinicAdapter extends AdapterBase {
         });
     }
 
+    @Override
     public void delete() {
+        // FIXME when clinicwrapper is used : remove this method to use the
+        // parent one
         BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
             Clinic clinic = getClinic();
             SDKQuery query = new DeleteExampleQuery(clinic);

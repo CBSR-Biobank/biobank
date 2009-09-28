@@ -532,7 +532,6 @@ public class ContainerViewForm extends BiobankViewForm {
             AdapterBase.openForm(new FormInput(newAdapter),
                 ContainerEntryForm.ID);
         } else {
-
             Collection<ContainerPosition> childPositions = container
                 .getChildPositionCollection();
             Assert.isNotNull(childPositions);

@@ -28,20 +28,8 @@ public class SampleAdapter extends AdapterBase {
     }
 
     @Override
-    protected Integer getWrappedObjectId() {
-        return getSample().getId();
-    }
-
-    @Override
     public void addChild(AdapterBase child) {
         Assert.isTrue(false, "Cannot add children to this adapter");
-    }
-
-    @Override
-    public Integer getId() {
-        Sample sample = getSample();
-        Assert.isNotNull(sample, "Sample is null");
-        return sample.getId();
     }
 
     @Override

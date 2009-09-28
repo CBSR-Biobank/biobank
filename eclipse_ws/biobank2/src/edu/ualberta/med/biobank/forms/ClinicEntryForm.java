@@ -275,11 +275,6 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
     }
 
     @Override
-    public void cancelForm() {
-
-    }
-
-    @Override
     public String getNextOpenedFormID() {
         return ClinicViewForm.ID;
     }

@@ -1,9 +1,11 @@
 package edu.ualberta.med.biobank.treeview;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
@@ -13,9 +15,11 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 
+import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.forms.input.FormInput;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 /**
@@ -61,8 +65,6 @@ public abstract class AdapterBase {
         setHasChildren(hasChildren);
     }
 
-    protected abstract Integer getWrappedObjectId();
-
     /**
      * return true if the integrity of the object is ok
      */
@@ -86,6 +88,20 @@ public abstract class AdapterBase {
     }
 
     public Integer getId() {
+        if (object != null) {
+            if (object instanceof ModelWrapper<?>) {
+                return ((ModelWrapper<?>) object).getId();
+            }
+            // FIXME remove this when everything is moved to wrapped objects
+            try {
+                Method method = object.getClass().getDeclaredMethod("getId");
+                if (method != null) {
+                    return (Integer) method.invoke(object);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
         return id;
     }
 
@@ -343,5 +359,33 @@ public abstract class AdapterBase {
     public void rebuild() {
         removeAll();
         loadChildren(false);
+    }
+
+    public void resetObject() throws Exception {
+        if (object != null && object instanceof ModelWrapper<?>) {
+            ((ModelWrapper<?>) object).reset();
+        }
+    }
+
+    public void delete() {
+        delete(null);
+    }
+
+    public void delete(String message) {
+        boolean doDelete = true;
+        if (message != null)
+            doDelete = MessageDialog.openConfirm(PlatformUI.getWorkbench()
+                .getActiveWorkbenchWindow().getShell(), "Confirm Delete",
+                message);
+        if (doDelete) {
+            try {
+                if (object != null && object instanceof ModelWrapper<?>) {
+                    ((ModelWrapper<?>) object).delete();
+                    getParent().removeChild(this);
+                }
+            } catch (ApplicationException e) {
+                BioBankPlugin.openAsyncError("Delete error", e);
+            }
+        }
     }
 }

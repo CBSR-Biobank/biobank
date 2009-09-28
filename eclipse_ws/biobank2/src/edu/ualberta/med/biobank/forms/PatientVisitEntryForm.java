@@ -580,11 +580,6 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
     }
 
     @Override
-    public void cancelForm() {
-
-    }
-
-    @Override
     public String getNextOpenedFormID() {
         return PatientVisitViewForm.ID;
     }

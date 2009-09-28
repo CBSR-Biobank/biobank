@@ -23,18 +23,6 @@ public class SampleTypeAdapter extends AdapterBase {
     }
 
     @Override
-    protected Integer getWrappedObjectId() {
-        return getSampleType().getId();
-    }
-
-    @Override
-    public Integer getId() {
-        SampleType sampleType = getSampleType();
-        Assert.isNotNull(sampleType, "patient is null");
-        return sampleType.getId();
-    }
-
-    @Override
     public String getName() {
         SampleType sampleType = getSampleType();
         Assert.isNotNull(sampleType, "storage type is null");

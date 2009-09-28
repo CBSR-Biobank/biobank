@@ -597,11 +597,6 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
     }
 
     @Override
-    public void cancelForm() {
-
-    }
-
-    @Override
     public String getNextOpenedFormID() {
         return ContainerTypeViewForm.ID;
     }

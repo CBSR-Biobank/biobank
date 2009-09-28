@@ -55,18 +55,6 @@ public class StudyAdapter extends AdapterBase {
     }
 
     @Override
-    protected Integer getWrappedObjectId() {
-        return getStudy().getId();
-    }
-
-    @Override
-    public Integer getId() {
-        Study study = getStudy();
-        Assert.isNotNull(study, "study is null");
-        return study.getId();
-    }
-
-    @Override
     public String getName() {
         Study study = getStudy();
         Assert.isNotNull(study, "study is null");
@@ -132,7 +120,10 @@ public class StudyAdapter extends AdapterBase {
         }
     }
 
+    @Override
     public void delete() {
+        // FIXME when wrapper is used : remove this method to use the
+        // parent one
         BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
             Study study = getStudy();
             SDKQuery query = new DeleteExampleQuery(study);

@@ -536,7 +536,7 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
     }
 
     @Override
-    public void cancelForm() {
+    public void resetForm() {
         freezerWidget.setSelectedBox(null);
         hotelWidget.setSelectedBox(null);
         palletWidget.setScannedElements(null);

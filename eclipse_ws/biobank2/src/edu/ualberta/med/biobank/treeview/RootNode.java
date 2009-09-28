@@ -15,11 +15,6 @@ public class RootNode extends AdapterBase {
         super(null, 1, "root");
     }
 
-    @Override
-    protected Integer getWrappedObjectId() {
-        return null;
-    }
-
     public void setTreeViewer(TreeViewer treeViewer) {
         this.treeViewer = treeViewer;
     }

@@ -487,11 +487,6 @@ public class StudyEntryForm extends BiobankEntryForm {
     }
 
     @Override
-    public void cancelForm() {
-
-    }
-
-    @Override
     public String getNextOpenedFormID() {
         return StudyViewForm.ID;
     }

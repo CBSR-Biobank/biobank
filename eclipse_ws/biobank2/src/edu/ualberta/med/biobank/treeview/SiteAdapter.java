@@ -57,11 +57,6 @@ public class SiteAdapter extends AdapterBase {
         return (Site) object;
     }
 
-    @Override
-    protected Integer getWrappedObjectId() {
-        return getSite().getId();
-    }
-
     public AdapterBase getStudiesGroupNode() {
         return children.get(STUDIES_NODE_ID);
     }
@@ -76,13 +71,6 @@ public class SiteAdapter extends AdapterBase {
 
     public AdapterBase getContainersGroupNode() {
         return children.get(STORAGE_CONTAINERS_NODE_ID);
-    }
-
-    @Override
-    public Integer getId() {
-        Site site = getSite();
-        Assert.isNotNull(site, "site is null");
-        return site.getId();
     }
 
     @Override
@@ -149,7 +137,10 @@ public class SiteAdapter extends AdapterBase {
         }
     }
 
+    @Override
     public void delete() {
+        // FIXME when wrapper is used : remove this method to use the
+        // parent one
         BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
             Site site = getSite();
             SDKQuery query = new DeleteExampleQuery(site);
