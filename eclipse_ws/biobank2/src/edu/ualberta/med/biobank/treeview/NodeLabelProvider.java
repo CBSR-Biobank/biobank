@@ -1,7 +1,9 @@
 package edu.ualberta.med.biobank.treeview;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
+import java.util.Properties;
 
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ILabelProviderListener;
@@ -11,6 +13,21 @@ import org.eclipse.ui.PlatformUI;
 
 public class NodeLabelProvider implements ILabelProvider {
     private HashMap<String, Image> imageCollection = null;
+
+    private static String[] TYPE_ICON_NAMES = null;
+
+    static {
+        Properties properties = new Properties();
+        try {
+            properties.load(NodeLabelProvider.class
+                .getResourceAsStream("iconsTypesNames.properties"));
+            TYPE_ICON_NAMES = properties.keySet().toArray(
+                new String[properties.keySet().size()]);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
 
     public NodeLabelProvider() {
         String imagePath = "icons/";
@@ -41,9 +58,6 @@ public class NodeLabelProvider implements ILabelProvider {
         Image image = imageCollection.get(element.getClass().getName());
         if (image == null
             && (element instanceof ContainerAdapter || element instanceof ContainerTypeAdapter)) {
-            String imagePath = "icons/";
-            Display d = PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-                .getShell().getDisplay();
             String ctName;
             if (element instanceof ContainerAdapter) {
                 ctName = ((ContainerAdapter) element).getContainer()
@@ -51,16 +65,35 @@ public class NodeLabelProvider implements ILabelProvider {
             } else {
                 ctName = ((ContainerTypeAdapter) element).getName();
             }
-            if (!imageCollection.containsKey(ctName)) {
-                if (new File(imagePath + ctName.toLowerCase() + ".png")
-                    .exists()) {
-                    image = new Image(d, imagePath + ctName.toLowerCase()
-                        + ".png");
-                }
-                imageCollection.put(ctName, image);
-            }
+            return getIconForTypeName(ctName);
         }
         return image;
+    }
+
+    public Image getIconForTypeName(String typeName) {
+        if (imageCollection.containsKey(typeName)) {
+            return imageCollection.get(typeName);
+        } else {
+            String iconName = null;
+            for (String name : TYPE_ICON_NAMES) {
+                if (typeName.contains(name)) {
+                    iconName = name;
+                    break;
+                }
+            }
+            String imagePath = "icons/";
+            Image image = null;
+            if (iconName != null
+                && new File(imagePath + iconName.toLowerCase() + ".png")
+                    .exists()) {
+                Display d = PlatformUI.getWorkbench()
+                    .getActiveWorkbenchWindow().getShell().getDisplay();
+                image = new Image(d, imagePath + iconName.toLowerCase()
+                    + ".png");
+            }
+            imageCollection.put(typeName, image);
+            return image;
+        }
     }
 
     public String getText(Object element) {
