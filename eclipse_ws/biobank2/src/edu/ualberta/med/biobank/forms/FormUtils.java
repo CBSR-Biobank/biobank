@@ -20,6 +20,7 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
 
+import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.ClinicStudyInfo;
 import edu.ualberta.med.biobank.model.StudyContactAndPatientInfo;
@@ -97,7 +98,8 @@ public class FormUtils {
 
         int count = 0;
         for (Clinic clinic : clinics) {
-            clinicAdapters[count] = new ClinicAdapter(clinicGroupParent, clinic);
+            clinicAdapters[count] = new ClinicAdapter(clinicGroupParent,
+                new ClinicWrapper(clinicGroupParent.getAppService(), clinic));
             ++count;
         }
         return clinicAdapters;

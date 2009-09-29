@@ -14,6 +14,7 @@ import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.forms.ClinicEntryForm;
 import edu.ualberta.med.biobank.forms.ClinicViewForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
@@ -24,40 +25,31 @@ import gov.nih.nci.system.query.example.DeleteExampleQuery;
 
 public class ClinicAdapter extends AdapterBase {
 
-    public ClinicAdapter(AdapterBase parent, Clinic clinic) {
-        super(parent, clinic);
+    public ClinicAdapter(AdapterBase parent, ClinicWrapper clinicWrapper) {
+        super(parent, clinicWrapper);
     }
 
-    public void setClinic(Clinic clinic) {
-        object = clinic;
-    }
-
-    public Clinic getClinic() {
-        return (Clinic) object;
+    public ClinicWrapper getWrapper() {
+        return (ClinicWrapper) object;
     }
 
     @Override
     protected Integer getWrappedObjectId() {
-        return getClinic().getId();
-    }
-
-    @Override
-    public void addChild(AdapterBase child) {
-        Assert.isTrue(false, "Cannot add children to this adapter");
+        return getWrapper().getId();
     }
 
     @Override
     public Integer getId() {
-        Clinic clinic = getClinic();
-        Assert.isNotNull(clinic, "Clinic is null");
-        return clinic.getId();
+        ClinicWrapper wrapper = getWrapper();
+        Assert.isNotNull(wrapper.getWrappedObject(), "Clinic is null");
+        return wrapper.getId();
     }
 
     @Override
     public String getName() {
-        Clinic clinic = getClinic();
-        Assert.isNotNull(clinic, "Clinic is null");
-        return clinic.getName();
+        ClinicWrapper wrapper = getWrapper();
+        Assert.isNotNull(wrapper.getWrappedObject(), "Clinic is null");
+        return wrapper.getName();
     }
 
     @Override
@@ -114,8 +106,9 @@ public class ClinicAdapter extends AdapterBase {
     }
 
     public void delete() {
+        // TODO: delete should be implmemented in the wrapper object
         BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
-            Clinic clinic = getClinic();
+            Clinic clinic = getWrapper().getWrappedObject();
             SDKQuery query = new DeleteExampleQuery(clinic);
 
             public void run() {
@@ -140,7 +133,12 @@ public class ClinicAdapter extends AdapterBase {
 
     @Override
     public void loadChildren(boolean updateNode) {
+        Assert.isTrue(false, "Cannot add children to this adapter");
+    }
 
+    @Override
+    public void addChild(AdapterBase child) {
+        Assert.isTrue(false, "Cannot add children to this adapter");
     }
 
     @Override

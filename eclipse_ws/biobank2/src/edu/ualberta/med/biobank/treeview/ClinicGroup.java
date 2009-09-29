@@ -17,6 +17,7 @@ import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.utils.ModelUtils;
+import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.forms.ClinicEntryForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Clinic;
@@ -49,7 +50,8 @@ public class ClinicGroup extends AdapterBase {
                 Clinic clinic = new Clinic();
                 clinic.setSite(getParentFromClass(SiteAdapter.class).getSite());
                 ClinicAdapter clinicAdapter = new ClinicAdapter(
-                    ClinicGroup.this, clinic);
+                    ClinicGroup.this,
+                    new ClinicWrapper(getAppService(), clinic));
                 FormInput input = new FormInput(clinicAdapter);
                 try {
                     PlatformUI.getWorkbench().getActiveWorkbenchWindow()
@@ -83,7 +85,8 @@ public class ClinicGroup extends AdapterBase {
                 ClinicAdapter node = (ClinicAdapter) getChild(clinic.getId());
 
                 if (node == null) {
-                    node = new ClinicAdapter(this, clinic);
+                    node = new ClinicAdapter(this, new ClinicWrapper(
+                        getAppService(), clinic));
                     addChild(node);
                 }
                 if (updateNode) {

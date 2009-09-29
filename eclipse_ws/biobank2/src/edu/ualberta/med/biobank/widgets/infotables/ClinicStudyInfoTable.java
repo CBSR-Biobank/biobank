@@ -11,8 +11,7 @@ import org.eclipse.swt.widgets.Display;
 import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
-import edu.ualberta.med.biobank.common.utils.ModelUtils;
-import edu.ualberta.med.biobank.model.Clinic;
+import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.model.ClinicStudyInfo;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.Study;
@@ -28,17 +27,17 @@ public class ClinicStudyInfoTable extends InfoTableWidget<Study> {
     private static final int[] BOUNDS = new int[] { 200, 130, 100, -1, -1, -1,
         -1 };
 
-    private Clinic clinic;
+    private ClinicWrapper clinicWrapper;
 
     private WritableApplicationService appService;
 
     public ClinicStudyInfoTable(Composite parent,
-        WritableApplicationService appService, Clinic clinic) throws Exception {
+        WritableApplicationService appService, ClinicWrapper clinicWrapper)
+        throws Exception {
         super(parent, null, HEADINGS, BOUNDS);
         this.appService = appService;
-        this.clinic = clinic;
-        Collection<Study> collection = ModelUtils.getClinicStudyCollection(
-            appService, clinic);
+        this.clinicWrapper = clinicWrapper;
+        Collection<Study> collection = clinicWrapper.getStudyCollection();
         for (int i = 0, n = collection.size(); i < n; ++i) {
             model.add(new BiobankCollectionModel());
         }
@@ -89,7 +88,7 @@ public class ClinicStudyInfoTable extends InfoTableWidget<Study> {
                                 + " inner join visits.clinic as clinic"
                                 + " where study.id=? and clinic.id=?", Arrays
                                 .asList(new Object[] { study.getId(),
-                                    clinic.getId() }));
+                                    clinicWrapper.getId() }));
 
                         List<Patient> result1 = appService.query(c);
                         info.patients = result1.size();
@@ -104,7 +103,7 @@ public class ClinicStudyInfoTable extends InfoTableWidget<Study> {
                                 + " inner join visit.clinic as clinic"
                                 + " where study.id=? and clinic.id=?", Arrays
                                 .asList(new Object[] { study.getId(),
-                                    clinic.getId() }));
+                                    clinicWrapper.getId() }));
 
                         List<Long> results = appService.query(c);
                         Assert.isTrue(results.size() == 1,

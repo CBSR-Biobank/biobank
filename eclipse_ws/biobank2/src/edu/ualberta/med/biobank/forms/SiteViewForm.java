@@ -16,6 +16,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.forms.widgets.Section;
 
+import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Container;
@@ -204,7 +205,8 @@ public class SiteViewForm extends AddressViewFormCommon {
             public void widgetSelected(SelectionEvent e) {
                 try {
                     ClinicAdapter clinicAdapter = new ClinicAdapter(siteAdapter
-                        .getClinicGroupNode(), new Clinic());
+                        .getClinicGroupNode(), new ClinicWrapper(appService,
+                        new Clinic()));
                     getSite().getPage().openEditor(
                         new FormInput(clinicAdapter), ClinicEntryForm.ID, true);
                 } catch (PartInitException exp) {
