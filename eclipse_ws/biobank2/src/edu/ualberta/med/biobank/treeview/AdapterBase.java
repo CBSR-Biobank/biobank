@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
@@ -17,6 +16,7 @@ import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.DatabaseResult;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -374,14 +374,17 @@ public abstract class AdapterBase {
     public void delete(String message) {
         boolean doDelete = true;
         if (message != null)
-            doDelete = MessageDialog.openConfirm(PlatformUI.getWorkbench()
-                .getActiveWorkbenchWindow().getShell(), "Confirm Delete",
-                message);
+            doDelete = BioBankPlugin.openConfirm("Confirm Delete", message);
         if (doDelete) {
             try {
                 if (object != null && object instanceof ModelWrapper<?>) {
-                    ((ModelWrapper<?>) object).delete();
-                    getParent().removeChild(this);
+                    DatabaseResult res = ((ModelWrapper<?>) object).delete();
+                    if (res == DatabaseResult.OK) {
+                        getParent().removeChild(this);
+                    } else {
+                        BioBankPlugin.openError("Delete failed", res
+                            .getMessage());
+                    }
                 }
             } catch (ApplicationException e) {
                 BioBankPlugin.openAsyncError("Delete error", e);

@@ -28,7 +28,6 @@ import org.eclipse.ui.PlatformUI;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.LabelingScheme;
-import edu.ualberta.med.biobank.common.utils.ModelUtils;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Capacity;
@@ -56,7 +55,7 @@ public class ContainerViewForm extends BiobankViewForm {
 
     private ContainerAdapter containerAdapter;
 
-    private Container container;
+    private ContainerWrapper container;
 
     private ContainerPosition position;
 
@@ -105,13 +104,14 @@ public class ContainerViewForm extends BiobankViewForm {
     }
 
     @Override
-    public void init() {
+    public void init() throws Exception {
         Assert.isTrue(adapter instanceof ContainerAdapter,
             "Invalid editor input: object of type "
                 + adapter.getClass().getName());
 
         containerAdapter = (ContainerAdapter) adapter;
-        retrieveContainer();
+        container = containerAdapter.getContainer();
+        container.reload();
         position = container.getPosition();
         setPartName(container.getLabel() + " ("
             + container.getContainerType().getName() + ")");
@@ -221,17 +221,6 @@ public class ContainerViewForm extends BiobankViewForm {
     private void notifyListeners() {
         notifyListeners(new ScanPalletModificationEvent(this, selectedCells
             .size()));
-    }
-
-    private void retrieveContainer() {
-        try {
-            container = ModelUtils.getObjectWithId(appService, Container.class,
-                containerAdapter.getContainer().getId());
-            containerAdapter.setContainer(new ContainerWrapper(SessionManager
-                .getAppService(), container));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     private void refreshVis() {
@@ -432,7 +421,8 @@ public class ContainerViewForm extends BiobankViewForm {
                             ContainerPosition newPos = new ContainerPosition();
                             newPos.setRow(new Integer(i));
                             newPos.setCol(new Integer(j));
-                            newPos.setParentContainer(container);
+                            newPos.setParentContainer(container
+                                .getWrappedObject());
                             newContainer.setPosition(newPos);
                             newContainer.setLabel(container.getLabel()
                                 + LabelingScheme.getPositionString(newPos));
@@ -458,9 +448,13 @@ public class ContainerViewForm extends BiobankViewForm {
                                 containerAdapter.performExpand();
                                 positions = container
                                     .getChildPositionCollection();
-                                reload();
+                                try {
+                                    reload();
+                                } catch (Exception e) {
+                                    SessionManager.getLogger().error(
+                                        "Error loading", e);
+                                }
                             }
-
                         });
                 }
             }
@@ -510,7 +504,12 @@ public class ContainerViewForm extends BiobankViewForm {
                                 containerAdapter.performExpand();
                                 positions = container
                                     .getChildPositionCollection();
-                                reload();
+                                try {
+                                    reload();
+                                } catch (Exception e) {
+                                    SessionManager.getLogger().error(
+                                        "Error loading", e);
+                                }
                             }
                         });
                 }
@@ -526,7 +525,7 @@ public class ContainerViewForm extends BiobankViewForm {
                 .getAppService(), new Container());
             newContainer.setSite(containerAdapter.getParentFromClass(
                 SiteAdapter.class).getSite());
-            pos.setParentContainer(container);
+            pos.setParentContainer(container.getWrappedObject());
             newContainer.setPosition(pos);
             newAdapter = new ContainerAdapter(containerAdapter, newContainer);
             AdapterBase.openForm(new FormInput(newAdapter),
@@ -583,8 +582,8 @@ public class ContainerViewForm extends BiobankViewForm {
     }
 
     @Override
-    protected void reload() {
-        retrieveContainer();
+    protected void reload() throws Exception {
+        containerAdapter.getContainer().reload();
         form.setText("Container " + container.getLabel() + " ("
             + container.getContainerType().getName() + ")");
         if (container.getContainerType().getChildContainerTypeCollection()

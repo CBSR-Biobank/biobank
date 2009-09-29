@@ -18,7 +18,12 @@ public class ContainerPositionWrapper extends ModelWrapper<ContainerPosition> {
     @Override
     protected void firePropertyChanges(ContainerPosition oldWrappedObject,
         ContainerPosition newWrappedObject) {
-
+        propertyChangeSupport.firePropertyChange("col", oldWrappedObject,
+            newWrappedObject);
+        propertyChangeSupport.firePropertyChange("row", oldWrappedObject,
+            newWrappedObject);
+        propertyChangeSupport.firePropertyChange("parentContainer",
+            oldWrappedObject, newWrappedObject);
     }
 
     @Override

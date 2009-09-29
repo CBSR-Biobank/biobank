@@ -70,8 +70,11 @@ public class SiteCombo extends ControlContribution {
                             SessionManager.getInstance().setCurrentSite(null);
                         else
                             SessionManager.getInstance().setCurrentSite(site);
-                        if (session != null)
+                        if (session != null) {
                             session.rebuild();
+                            SessionManager.getInstance().getTreeViewer()
+                                .expandToLevel(3);
+                        }
                     }
                 }
             });

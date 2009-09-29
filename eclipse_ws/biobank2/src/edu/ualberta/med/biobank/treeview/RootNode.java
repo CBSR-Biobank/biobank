@@ -48,7 +48,7 @@ public class RootNode extends AdapterBase {
 
     public void expandChild(AdapterBase child) {
         if (treeViewer != null) {
-            treeViewer.expandToLevel(child, 2);
+            treeViewer.expandToLevel(child, 1);
         }
     }
 

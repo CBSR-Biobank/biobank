@@ -10,6 +10,7 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
@@ -310,8 +311,13 @@ public class SessionManager {
             else
                 siteCombo.setSelection(currentSite);
         } catch (ApplicationException e) {
-            e.printStackTrace();
+            getLogger().error("Cannot update Sites", e);
         }
     }
 
+    public TreeViewer getTreeViewer() {
+        if (view != null)
+            return view.getTreeViewer();
+        return null;
+    }
 }

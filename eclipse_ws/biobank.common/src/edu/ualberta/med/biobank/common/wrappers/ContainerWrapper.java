@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -17,6 +18,8 @@ import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.model.Site;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
+import gov.nih.nci.system.query.SDKQuery;
+import gov.nih.nci.system.query.example.UpdateExampleQuery;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 //FIXME to do by Delphine
@@ -54,7 +57,52 @@ public class ContainerWrapper extends ModelWrapper<Container> {
 
     @Override
     protected DatabaseResult persistChecks() throws ApplicationException {
-        return checkContainerUnique();
+        DatabaseResult res = checkLabelUniqueForType();
+        if (res != DatabaseResult.OK) {
+            return res;
+        }
+        return checkProductBarcodeUnique();
+    }
+
+    private DatabaseResult checkProductBarcodeUnique()
+        throws ApplicationException {
+        List<Object> parameters = new ArrayList<Object>(Arrays
+            .asList(new Object[] { getSite(), getProductBarcode() }));
+        String notSameContainer = "";
+        if (!isNew()) {
+            notSameContainer = " and id <> ?";
+            parameters.add(getId());
+        }
+        HQLCriteria criteria = new HQLCriteria("from "
+            + Container.class.getName() + " where site=? and productBarcode=?"
+            + notSameContainer, parameters);
+        List<Object> results = appService.query(criteria);
+        if (results.size() > 0) {
+            return new DatabaseResult("A container with product barcode \""
+                + getProductBarcode() + "\" already exists.");
+        }
+        return DatabaseResult.OK;
+    }
+
+    private DatabaseResult checkLabelUniqueForType()
+        throws ApplicationException {
+        String notSameContainer = "";
+        List<Object> parameters = new ArrayList<Object>(Arrays
+            .asList(new Object[] { getSite(), getLabel(), getContainerType() }));
+        if (!isNew()) {
+            notSameContainer = " and id <> ?";
+            parameters.add(getId());
+        }
+        HQLCriteria criteria = new HQLCriteria("from "
+            + Container.class.getName() + " where site=? and label=? "
+            + "and containerType=?" + notSameContainer, parameters);
+        List<Object> results = appService.query(criteria);
+        if (results.size() > 0) {
+            return new DatabaseResult("A container with label \"" + getLabel()
+                + "\" and type \"" + getContainerType().getName()
+                + "\" already exists.");
+        }
+        return DatabaseResult.OK;
     }
 
     @Override
@@ -414,33 +462,6 @@ public class ContainerWrapper extends ModelWrapper<Container> {
 
     }
 
-    private DatabaseResult checkContainerUnique() throws ApplicationException {
-        // FIXME set constraint directly into the model ?
-        HQLCriteria criteria;
-        if (getPosition() == null) {
-            criteria = new HQLCriteria("from " + Container.class.getName()
-                + " where site=? and position=null and label=? "
-                + "and containerType=?", Arrays.asList(new Object[] {
-                getSite(), getLabel(), getContainerType() }));
-            List<Object> results = appService.query(criteria);
-            if (results.size() > 0) {
-                return new DatabaseResult("A container with label \""
-                    + getLabel() + "\" and type \""
-                    + getContainerType().getName() + "\" already exists.");
-            }
-        }
-        criteria = new HQLCriteria("from " + Container.class.getName()
-            + " as where site=? and productBarcode=?", Arrays
-            .asList(new Object[] { getSite(), getProductBarcode() }));
-
-        List<Object> results = appService.query(criteria);
-        if (results.size() > 0) {
-            return new DatabaseResult("A container with product barcode \""
-                + getProductBarcode() + "\" already exists.");
-        }
-        return DatabaseResult.OK;
-    }
-
     @Override
     protected DatabaseResult deleteChecks() throws ApplicationException {
         if (getSamplePositionCollection().size() > 0
@@ -450,5 +471,92 @@ public class ContainerWrapper extends ModelWrapper<Container> {
                 + ". All subcontainers/samples must be removed first.");
         }
         return DatabaseResult.OK;
+    }
+
+    public void setNewParent(Container newParent, String newLabel)
+        throws Exception {
+        String oldLabel = getLabel();
+        List<ContainerPosition> positions = (List<ContainerPosition>) newParent
+            .getChildPositionCollection();
+        Boolean filled = false;
+        // check that the position is free
+        for (ContainerPosition pos : positions)
+            if (pos.getContainer().getLabel().compareToIgnoreCase(newLabel) == 0)
+                filled = true;
+        if (filled) {
+            // filled
+            throw new Exception(
+                "The destination "
+                    + newLabel
+                    + " has already been initialized. You can only move to an uninitialized location.");
+        } else {
+            // remove from old parent, add to new
+            Container oldParent = getPosition().getParentContainer();
+            if (oldParent != null) {
+                // remove from old
+                Collection<ContainerPosition> oldPositions = oldParent
+                    .getChildPositionCollection();
+                oldPositions.remove(getPosition());
+                oldParent.setChildPositionCollection(oldPositions);
+
+                // modify position object
+                ContainerPositionWrapper positionWrapper = new ContainerPositionWrapper(
+                    appService, getPosition());
+                positionWrapper.setParentContainer(newParent);
+                positionWrapper.setPosition(newLabel.substring(newLabel
+                    .length() - 2));
+                setPosition(positionWrapper.getWrappedObject());
+
+                // add to new
+                Collection<ContainerPosition> newPositions = newParent
+                    .getChildPositionCollection();
+                newPositions.add(getPosition());
+                newParent.setChildPositionCollection(newPositions);
+
+                // change label
+                if (getLabel().equalsIgnoreCase(getProductBarcode()))
+                    setProductBarcode(newLabel);
+                setLabel(newLabel);
+
+                persist();
+                // move children
+                setChildLabels(oldLabel);
+            } else
+                throw new Exception("You cannot move a top level container.");
+        }
+    }
+
+    private void setChildLabels(String oldLabel) throws Exception {
+        // inefficient, should be improved
+        HQLCriteria criteria = new HQLCriteria("from "
+            + Container.class.getName() + " where label like ? and site= ?",
+            Arrays.asList(new Object[] { oldLabel + "%", getSite() }));
+        List<Container> containers = appService.query(criteria);
+        for (Container c : containers) {
+            if (c.getLabel().compareToIgnoreCase(oldLabel) == 0)
+                continue;
+            String nameEnd = c.getLabel().substring(oldLabel.length());
+            c.setLabel(getLabel() + nameEnd);
+            SDKQuery q = new UpdateExampleQuery(c);
+            appService.executeQuery(q);
+            new ContainerWrapper(appService, c).setChildLabels(oldLabel
+                + nameEnd);
+        }
+    }
+
+    /**
+     * Get containers with a given label that can hold this type of container
+     * (in this container site)
+     */
+    public List<Container> getPossibleParents(String parentLabel)
+        throws ApplicationException {
+        HQLCriteria criteria = new HQLCriteria(
+            "select c from "
+                + Container.class.getName()
+                + " as c"
+                + " left join c.containerType.childContainerTypeCollection as ct where c.site = ? and c.label = ? and ct=?",
+            Arrays.asList(new Object[] { getSite(), parentLabel,
+                getContainerType() }));
+        return appService.query(criteria);
     }
 }
