@@ -46,6 +46,11 @@ public class ClinicAdapter extends AdapterBase {
     }
 
     @Override
+    public void addChild(AdapterBase child) {
+        Assert.isTrue(false, "Cannot add children to this adapter");
+    }
+
+    @Override
     public String getName() {
         ClinicWrapper wrapper = getWrapper();
         Assert.isNotNull(wrapper.getWrappedObject(), "Clinic is null");
@@ -105,8 +110,14 @@ public class ClinicAdapter extends AdapterBase {
         });
     }
 
+    @Override
     public void delete() {
+<<<<<<< HEAD:eclipse_ws/biobank2/src/edu/ualberta/med/biobank/treeview/ClinicAdapter.java
         // TODO: delete should be implmemented in the wrapper object
+=======
+        // FIXME when clinicwrapper is used : remove this method to use the
+        // parent one
+>>>>>>> 0ffd7d8d284193ff1d7fd90c7ac8a320bd4910ca:eclipse_ws/biobank2/src/edu/ualberta/med/biobank/treeview/ClinicAdapter.java
         BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
             Clinic clinic = getWrapper().getWrappedObject();
             SDKQuery query = new DeleteExampleQuery(clinic);

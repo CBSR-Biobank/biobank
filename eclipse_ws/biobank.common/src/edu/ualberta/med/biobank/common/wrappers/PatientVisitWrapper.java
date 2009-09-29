@@ -186,4 +186,10 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
         return true;
     }
 
+    @Override
+    protected DatabaseResult deleteChecks() throws ApplicationException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
 }

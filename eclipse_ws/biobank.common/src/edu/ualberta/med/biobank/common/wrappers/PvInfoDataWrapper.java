@@ -38,4 +38,10 @@ public class PvInfoDataWrapper extends ModelWrapper<PvInfoData> {
         return true;
     }
 
+    @Override
+    protected DatabaseResult deleteChecks() throws ApplicationException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
 }

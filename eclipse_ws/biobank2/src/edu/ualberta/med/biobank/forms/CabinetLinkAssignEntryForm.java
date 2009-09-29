@@ -423,7 +423,7 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
     }
 
     @Override
-    public void cancelForm() {
+    public void resetForm() {
         sampleWrapper.setWrappedObject(new Sample());
         cabinet = null;
         drawer = null;

@@ -178,11 +178,6 @@ public class SiteEntryForm extends AddressEntryFormCommon {
     }
 
     @Override
-    public void cancelForm() {
-
-    }
-
-    @Override
     public String getNextOpenedFormID() {
         return SiteViewForm.ID;
     }

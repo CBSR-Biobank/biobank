@@ -6,13 +6,10 @@ import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.Dialog;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
@@ -30,9 +27,7 @@ import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.ContainerType;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.query.SDKQuery;
-import gov.nih.nci.system.query.example.DeleteExampleQuery;
 import gov.nih.nci.system.query.example.UpdateExampleQuery;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
@@ -44,24 +39,12 @@ public class ContainerAdapter extends AdapterBase {
             && (container.getChildPositionCollection()).size() > 0);
     }
 
-    @Override
-    protected Integer getWrappedObjectId() {
-        return getContainer().getId();
-    }
-
     public ContainerWrapper getContainer() {
         return (ContainerWrapper) object;
     }
 
     public void setContainer(ContainerWrapper container) {
         object = container;
-    }
-
-    @Override
-    public Integer getId() {
-        ContainerWrapper container = getContainer();
-        Assert.isNotNull(container, "container is null");
-        return container.getId();
     }
 
     @Override
@@ -143,45 +126,10 @@ public class ContainerAdapter extends AdapterBase {
         mi.setText("Delete Container");
         mi.addSelectionListener(new SelectionListener() {
             public void widgetSelected(SelectionEvent event) {
-                Boolean confirm = MessageDialog.openConfirm(PlatformUI
-                    .getWorkbench().getActiveWorkbenchWindow().getShell(),
-                    "Confirm Delete",
-                    "Are you sure you want to delete this container?");
-
-                if (confirm) {
-                    delete();
-                }
-
+                delete("Are you sure you want to delete this container?");
             }
 
             public void widgetDefaultSelected(SelectionEvent e) {
-            }
-        });
-    }
-
-    public void delete() {
-        BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
-            ContainerWrapper c = getContainer();
-            SDKQuery query = new DeleteExampleQuery(c.getWrappedObject());
-
-            public void run() {
-                if (c.getSamplePositionCollection().size() > 0
-                    || c.getChildPositionCollection().size() > 0) {
-                    BioBankPlugin
-                        .openError(
-                            "Error",
-                            "Unable to delete container "
-                                + c.getLabel()
-                                + ". All subcontainers/samples must be removed first.");
-                } else {
-                    try {
-                        getAppService().executeQuery(query);
-                        ContainerAdapter.this.getParent().removeChild(
-                            ContainerAdapter.this);
-                    } catch (ApplicationException e) {
-                        BioBankPlugin.openAsyncError("Delete error", e);
-                    }
-                }
             }
         });
     }
@@ -219,11 +167,6 @@ public class ContainerAdapter extends AdapterBase {
     @Override
     public AdapterBase accept(NodeSearchVisitor visitor) {
         return visitor.visit(this);
-    }
-
-    @Override
-    public String getTreeText() {
-        return getName();
     }
 
     /**

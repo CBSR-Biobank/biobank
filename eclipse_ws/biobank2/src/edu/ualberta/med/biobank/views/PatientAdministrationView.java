@@ -228,12 +228,6 @@ public class PatientAdministrationView extends ViewPart implements
                 public AdapterBase accept(NodeSearchVisitor visitor) {
                     return null;
                 }
-
-                @Override
-                protected Integer getWrappedObjectId() {
-                    return null;
-                }
-
             };
         }
         return noPatientFoundAdapter;

@@ -27,12 +27,6 @@ public class StudyGroup extends AdapterBase {
         super(parent, id, "Studies", true);
     }
 
-    @Override
-    protected Integer getWrappedObjectId() {
-        Assert.isTrue(false, "Should not be invoked for this type of adatper");
-        return null;
-    }
-
     public void openViewForm() {
         Assert.isTrue(false, "should not be called");
     }

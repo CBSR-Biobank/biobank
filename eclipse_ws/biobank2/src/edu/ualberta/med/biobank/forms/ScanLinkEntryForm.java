@@ -673,7 +673,7 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
     }
 
     @Override
-    public void cancelForm() {
+    public void resetForm() {
         patientNumberText.setText("");
         viewerVisits.setInput(null);
         currentPatient = null;

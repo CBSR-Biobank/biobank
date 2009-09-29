@@ -28,12 +28,6 @@ public class ContainerTypeGroup extends AdapterBase {
     }
 
     @Override
-    protected Integer getWrappedObjectId() {
-        Assert.isTrue(false, "Should not be invoked for this type of adatper");
-        return null;
-    }
-
-    @Override
     public void performDoubleClick() {
         performExpand();
     }

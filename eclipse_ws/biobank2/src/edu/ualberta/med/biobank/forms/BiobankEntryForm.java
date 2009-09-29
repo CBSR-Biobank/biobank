@@ -176,7 +176,9 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
             showtextField);
     }
 
-    public abstract void cancelForm() throws Exception;
+    public void resetForm() throws Exception {
+        adapter.resetObject();
+    }
 
     public String getSessionName() {
         return sessionName;

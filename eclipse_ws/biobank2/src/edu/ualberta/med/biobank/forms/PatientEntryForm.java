@@ -136,11 +136,6 @@ public class PatientEntryForm extends BiobankEntryForm {
     }
 
     @Override
-    public void cancelForm() throws Exception {
-        patientAdapter.getWrapper().reset();
-    }
-
-    @Override
     public String getNextOpenedFormID() {
         return PatientViewForm.ID;
     }

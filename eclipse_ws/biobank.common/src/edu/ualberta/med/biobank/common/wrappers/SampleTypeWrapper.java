@@ -54,4 +54,10 @@ public class SampleTypeWrapper extends ModelWrapper<SampleType> {
     public boolean checkIntegrity() {
         return true;
     }
+
+    @Override
+    protected DatabaseResult deleteChecks() throws ApplicationException {
+        // TODO Auto-generated method stub
+        return null;
+    }
 }

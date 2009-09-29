@@ -54,7 +54,7 @@ public class ContainerWrapper extends ModelWrapper<Container> {
 
     @Override
     protected DatabaseResult persistChecks() throws ApplicationException {
-        return DatabaseResult.OK;
+        return checkContainerUnique();
     }
 
     @Override
@@ -412,5 +412,43 @@ public class ContainerWrapper extends ModelWrapper<Container> {
                         return true;
         return false;
 
+    }
+
+    private DatabaseResult checkContainerUnique() throws ApplicationException {
+        // FIXME set constraint directly into the model ?
+        HQLCriteria criteria;
+        if (getPosition() == null) {
+            criteria = new HQLCriteria("from " + Container.class.getName()
+                + " where site=? and position=null and label=? "
+                + "and containerType=?", Arrays.asList(new Object[] {
+                getSite(), getLabel(), getContainerType() }));
+            List<Object> results = appService.query(criteria);
+            if (results.size() > 0) {
+                return new DatabaseResult("A container with label \""
+                    + getLabel() + "\" and type \""
+                    + getContainerType().getName() + "\" already exists.");
+            }
+        }
+        criteria = new HQLCriteria("from " + Container.class.getName()
+            + " as where site=? and productBarcode=?", Arrays
+            .asList(new Object[] { getSite(), getProductBarcode() }));
+
+        List<Object> results = appService.query(criteria);
+        if (results.size() > 0) {
+            return new DatabaseResult("A container with product barcode \""
+                + getProductBarcode() + "\" already exists.");
+        }
+        return DatabaseResult.OK;
+    }
+
+    @Override
+    protected DatabaseResult deleteChecks() throws ApplicationException {
+        if (getSamplePositionCollection().size() > 0
+            || getChildPositionCollection().size() > 0) {
+            return new DatabaseResult("Unable to delete container "
+                + getLabel()
+                + ". All subcontainers/samples must be removed first.");
+        }
+        return DatabaseResult.OK;
     }
 }

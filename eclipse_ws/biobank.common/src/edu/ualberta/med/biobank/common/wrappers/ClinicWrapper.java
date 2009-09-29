@@ -98,6 +98,11 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
             .asList(new Object[] { wrappedObject }));
 
         return appService.query(c);
+
+    @Override
+    protected DatabaseResult deleteChecks() throws ApplicationException {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 }
