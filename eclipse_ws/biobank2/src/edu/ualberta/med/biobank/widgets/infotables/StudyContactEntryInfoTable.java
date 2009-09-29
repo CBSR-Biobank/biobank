@@ -10,11 +10,12 @@ import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.StudyContactInfo;
 
-public class StudyContactEntryInfoTable extends InfoTableWidget<Contact> {
+public class StudyContactEntryInfoTable extends InfoTableWidget<ContactWrapper> {
 
     private static final String[] HEADINGS = new String[] { "Clinic",
         "Contact Name", "Title", "Email", "Phone #", "Fax #" };
@@ -25,15 +26,21 @@ public class StudyContactEntryInfoTable extends InfoTableWidget<Contact> {
     public StudyContactEntryInfoTable(Composite parent, Study study) {
         super(parent, null, HEADINGS, BOUNDS);
         Collection<Contact> collection = study.getContactCollection();
-        for (int i = 0, n = collection.size(); i < n; ++i) {
+        if (collection == null)
+            return;
+
+        Collection<ContactWrapper> wrapperCollection = new HashSet<ContactWrapper>();
+        for (Contact contact : collection) {
             model.add(new BiobankCollectionModel());
+            wrapperCollection.add(new ContactWrapper(SessionManager
+                .getAppService(), contact));
         }
         getTableViewer().refresh();
-        setCollection(collection);
+        setCollection(wrapperCollection);
     }
 
     @Override
-    public void setCollection(final Collection<Contact> collection) {
+    public void setCollection(final Collection<ContactWrapper> collection) {
         Thread t = new Thread() {
             @Override
             public void run() {
@@ -56,7 +63,7 @@ public class StudyContactEntryInfoTable extends InfoTableWidget<Contact> {
                             });
                         }
 
-                    for (Contact contact : collection) {
+                    for (ContactWrapper contact : collection) {
                         if (getTableViewer().getTable().isDisposed()) {
                             return;
                         }
@@ -86,8 +93,8 @@ public class StudyContactEntryInfoTable extends InfoTableWidget<Contact> {
     }
 
     @Override
-    public Collection<Contact> getCollection() {
-        Collection<Contact> collection = new HashSet<Contact>();
+    public Collection<ContactWrapper> getCollection() {
+        Collection<ContactWrapper> collection = new HashSet<ContactWrapper>();
         for (BiobankCollectionModel item : model) {
             collection.add(((StudyContactInfo) item.o).contact);
         }

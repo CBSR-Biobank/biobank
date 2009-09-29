@@ -8,8 +8,10 @@ import org.eclipse.swt.graphics.Image;
 import org.springframework.util.Assert;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.ClinicStudyInfo;
 import edu.ualberta.med.biobank.model.Contact;
@@ -195,15 +197,15 @@ public class BiobankLabelProvider extends LabelProvider implements
                 return "";
             default:
             }
-            return getContactColumnIndex(info.contact, columnIndex - 2);
+            return getContactWrapperColumnIndex(info.contact, columnIndex - 2);
         } else if (element instanceof StudyContactInfo) {
             StudyContactInfo info = (StudyContactInfo) element;
             if (columnIndex == 0) {
                 if (info.contact != null)
-                    return info.contact.getClinic().getName();
+                    return info.contact.getClinicWrapper().getName();
                 return "";
             }
-            return getContactColumnIndex(info.contact, columnIndex);
+            return getContactWrapperColumnIndex(info.contact, columnIndex);
         } else if (element instanceof SampleSource) {
             SampleSource info = (SampleSource) element;
             if (columnIndex == 0) {
@@ -257,6 +259,8 @@ public class BiobankLabelProvider extends LabelProvider implements
             return ((Site) element).getName();
         } else if (element instanceof SampleType) {
             return ((SampleType) element).getName();
+        } else if (element instanceof SiteWrapper) {
+            return ((SiteWrapper) element).getName();
         }
         return ((AdapterBase) element).getName();
     }
@@ -266,7 +270,8 @@ public class BiobankLabelProvider extends LabelProvider implements
         return false;
     }
 
-    private String getContactColumnIndex(Contact contact, int columnIndex) {
+    private String getContactWrapperColumnIndex(ContactWrapper contact,
+        int columnIndex) {
         switch (columnIndex) {
         case 1:
             if ((contact != null) && (contact.getName() != null))

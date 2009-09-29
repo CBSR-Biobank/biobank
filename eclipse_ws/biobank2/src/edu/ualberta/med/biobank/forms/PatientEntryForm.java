@@ -17,7 +17,7 @@ import org.eclipse.swt.widgets.Text;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.DatabaseResult;
-import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.PatientAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
@@ -36,7 +36,7 @@ public class PatientEntryForm extends BiobankEntryForm {
 
     private PatientAdapter patientAdapter;
 
-    private Site site;
+    private SiteWrapper siteWrapper;
 
     private ComboViewer studiesViewer;
 
@@ -81,10 +81,10 @@ public class PatientEntryForm extends BiobankEntryForm {
 
         Label labelSite = (Label) createWidget(client, Label.class, SWT.NONE,
             "Site");
-        site = SessionManager.getInstance().getCurrentSite();
-        labelSite.setText(site.getName());
+        siteWrapper = SessionManager.getInstance().getCurrentSiteWrapper();
+        labelSite.setText(siteWrapper.getName());
 
-        Collection<Study> studies = site.getStudyCollection();
+        Collection<Study> studies = siteWrapper.getStudyCollection();
         Study selectedStudy = null;
         if (patientAdapter.getWrapper().isNew()) {
             if (studies.size() == 1) {

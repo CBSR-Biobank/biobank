@@ -18,6 +18,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.treeview.SessionAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
@@ -63,13 +64,15 @@ public class SiteCombo extends ControlContribution {
                 public void selectionChanged(SelectionChangedEvent event) {
                     IStructuredSelection selection = (IStructuredSelection) event
                         .getSelection();
-                    Site site = (Site) selection.getFirstElement();
+                    SiteWrapper siteWrapper = (SiteWrapper) selection
+                        .getFirstElement();
 
-                    if (site != null) {
-                        if (site.getId() == null)
+                    if (siteWrapper != null) {
+                        if (siteWrapper.getId() == null)
                             SessionManager.getInstance().setCurrentSite(null);
                         else
-                            SessionManager.getInstance().setCurrentSite(site);
+                            SessionManager.getInstance().setCurrentSite(
+                                siteWrapper);
                         if (session != null)
                             session.rebuild();
                     }
@@ -107,8 +110,8 @@ public class SiteCombo extends ControlContribution {
         comboViewer.getCombo().setEnabled(enabled);
     }
 
-    public void setSelection(Site site) {
-        comboViewer.setSelection(new StructuredSelection(site));
+    public void setSelection(SiteWrapper siteWrapper) {
+        comboViewer.setSelection(new StructuredSelection(siteWrapper));
     }
 
 }

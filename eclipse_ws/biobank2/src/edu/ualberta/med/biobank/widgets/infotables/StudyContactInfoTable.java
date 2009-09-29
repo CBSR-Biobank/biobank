@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.widgets.infotables;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
@@ -12,6 +13,7 @@ import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.Study;
@@ -23,7 +25,7 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
  * Used to display clinic and contact information. Meant to be used by
  * StudyViewForm only.
  */
-public class StudyContactInfoTable extends InfoTableWidget<Contact> {
+public class StudyContactInfoTable extends InfoTableWidget<ContactWrapper> {
 
     private static final String[] HEADINGS = new String[] { "Clinic",
         "#Patients", "#Patient Visits", "Contact Name", "Title" };
@@ -40,15 +42,21 @@ public class StudyContactInfoTable extends InfoTableWidget<Contact> {
         this.appService = appService;
         this.study = study;
         Collection<Contact> collection = study.getContactCollection();
-        for (int i = 0, n = collection.size(); i < n; ++i) {
+        if (collection == null)
+            return;
+
+        Collection<ContactWrapper> wrapperCollection = new HashSet<ContactWrapper>();
+        for (Contact contact : collection) {
             model.add(new BiobankCollectionModel());
+            wrapperCollection.add(new ContactWrapper(SessionManager
+                .getAppService(), contact));
         }
         getTableViewer().refresh();
-        setCollection(collection);
+        setCollection(wrapperCollection);
     }
 
     @Override
-    public void setCollection(final Collection<Contact> collection) {
+    public void setCollection(final Collection<ContactWrapper> collection) {
         Thread t = new Thread() {
             @Override
             public void run() {
@@ -70,7 +78,7 @@ public class StudyContactInfoTable extends InfoTableWidget<Contact> {
                         });
                     }
 
-                    for (Contact contact : collection) {
+                    for (ContactWrapper contact : collection) {
                         if (getTableViewer().getTable().isDisposed()) {
                             return;
                         }
@@ -79,7 +87,7 @@ public class StudyContactInfoTable extends InfoTableWidget<Contact> {
                         item.o = info;
 
                         info.contact = contact;
-                        info.clinicName = contact.getClinic().getName();
+                        info.clinicName = contact.getClinicWrapper().getName();
 
                         HQLCriteria c = new HQLCriteria(
                             "select distinct patients"
@@ -91,8 +99,10 @@ public class StudyContactInfoTable extends InfoTableWidget<Contact> {
                                 + " inner join visits.clinic as clinic"
                                 + " where study=? and clinic=?"
                                 + " group by patients", Arrays
-                                .asList(new Object[] { study,
-                                    contact.getClinic() }));
+                                .asList(new Object[] {
+                                    study,
+                                    contact.getClinicWrapper()
+                                        .getWrappedObject() }));
 
                         List<Patient> result1 = appService.query(c);
                         info.patients = result1.size();
@@ -106,8 +116,10 @@ public class StudyContactInfoTable extends InfoTableWidget<Contact> {
                                 + " inner join patients.patientVisitCollection as visits"
                                 + " inner join visits.clinic as clinic"
                                 + " where study=? and clinic=?", Arrays
-                                .asList(new Object[] { study,
-                                    contact.getClinic() }));
+                                .asList(new Object[] {
+                                    study,
+                                    contact.getClinicWrapper()
+                                        .getWrappedObject() }));
 
                         List<Long> results = appService.query(c);
                         Assert.isTrue(results.size() == 1,

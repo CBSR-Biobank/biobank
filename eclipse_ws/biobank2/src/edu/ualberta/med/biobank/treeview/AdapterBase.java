@@ -69,7 +69,7 @@ public abstract class AdapterBase {
      * return true if the integrity of the object is ok
      */
     private boolean checkIntegrity() {
-        if (object != null && object instanceof ModelWrapper<?>) {
+        if ((object != null) && (object instanceof ModelWrapper<?>)) {
             return ((ModelWrapper<?>) object).checkIntegrity();
         }
         return true;

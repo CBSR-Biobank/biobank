@@ -135,7 +135,8 @@ public class PatientAdministrationView extends ViewPart implements
         try {
             PatientWrapper patientWrapper = PatientWrapper
                 .getPatientWrapperInSite(SessionManager.getAppService(),
-                    number, SessionManager.getInstance().getCurrentSite());
+                    number, SessionManager.getInstance()
+                        .getCurrentSiteWrapper());
             if (patientWrapper == null) {
                 notFoundPatient(number);
             } else {
@@ -149,8 +150,8 @@ public class PatientAdministrationView extends ViewPart implements
 
     public void showPatientInTree(PatientWrapper patientWrapper) {
         getRootNode().removeAll();
-        SiteAdapter siteAdapter = new SiteAdapter(getRootNode(), patientWrapper
-            .getStudy().getSite(), false);
+        SiteAdapter siteAdapter = new SiteAdapter(getRootNode(), SessionManager
+            .getInstance().getCurrentSiteWrapper(), false);
         getRootNode().addChild(siteAdapter);
         StudyAdapter studyAdapter = new StudyAdapter(siteAdapter,
             patientWrapper.getStudy(), false);

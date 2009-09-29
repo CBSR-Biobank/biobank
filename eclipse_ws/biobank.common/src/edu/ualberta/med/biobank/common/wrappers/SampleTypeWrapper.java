@@ -6,7 +6,6 @@ import java.util.List;
 import edu.ualberta.med.biobank.common.DatabaseResult;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.SampleType;
-import edu.ualberta.med.biobank.model.Site;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
@@ -38,10 +37,11 @@ public class SampleTypeWrapper extends ModelWrapper<SampleType> {
      * "typeNameContains"
      */
     public static List<SampleType> getSampleTypeForContainerTypes(
-        WritableApplicationService appService, Site site,
+        WritableApplicationService appService, SiteWrapper siteWrapper,
         String typeNameContains) throws ApplicationException {
         List<ContainerType> types = ContainerTypeWrapper
-            .getContainerTypesInSite(appService, site, typeNameContains, false);
+            .getContainerTypesInSite(appService, siteWrapper, typeNameContains,
+                false);
         List<SampleType> sampleTypes = new ArrayList<SampleType>();
         for (ContainerType type : types) {
             sampleTypes.addAll(new ContainerTypeWrapper(appService, type)

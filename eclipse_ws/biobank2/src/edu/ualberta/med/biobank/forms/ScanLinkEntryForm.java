@@ -265,7 +265,7 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
 
         List<SampleType> sampleTypes = SampleTypeWrapper
             .getSampleTypeForContainerTypes(appService, SessionManager
-                .getInstance().getCurrentSite(), palletNameContains);
+                .getInstance().getCurrentSiteWrapper(), palletNameContains);
         createTypeSelectionPerRowComposite(selectionComp, sampleTypes);
         createTypeSelectionCustom(selectionComp, sampleTypes);
         radioRowSelection.setSelection(true);
@@ -490,7 +490,7 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
         try {
             currentPatient = PatientWrapper.getPatientInSite(appService,
                 patientNumberText.getText(), SessionManager.getInstance()
-                    .getCurrentSite());
+                    .getCurrentSiteWrapper());
         } catch (ApplicationException e) {
             BioBankPlugin.openError("Error getting the patient", e);
         }

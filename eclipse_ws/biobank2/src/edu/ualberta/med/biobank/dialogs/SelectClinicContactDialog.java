@@ -19,8 +19,8 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 
-import edu.ualberta.med.biobank.model.Clinic;
-import edu.ualberta.med.biobank.model.Contact;
+import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.widgets.infotables.ContactInfoTable;
 
 public class SelectClinicContactDialog extends BiobankDialog {
@@ -29,20 +29,20 @@ public class SelectClinicContactDialog extends BiobankDialog {
 
     private static final String TITLE = "Clinic Contacts";
 
-    private HashMap<String, Clinic> clinicMap;
+    private HashMap<String, ClinicWrapper> clinicMap;
 
     private CCombo clinicCombo;
 
     private ContactInfoTable contactInfoTable;
 
-    private Contact selectedContact;
+    private ContactWrapper selectedContact;
 
     public SelectClinicContactDialog(Shell parent,
-        Collection<Clinic> clinicCollection) {
+        Collection<ClinicWrapper> clinicCollection) {
         super(parent);
-        clinicMap = new HashMap<String, Clinic>();
+        clinicMap = new HashMap<String, ClinicWrapper>();
         if (clinicCollection != null) {
-            for (Clinic clinic : clinicCollection) {
+            for (ClinicWrapper clinic : clinicCollection) {
                 clinicMap.put(clinic.getName(), clinic);
             }
         }
@@ -102,7 +102,7 @@ public class SelectClinicContactDialog extends BiobankDialog {
     private void updateTable() {
         String name = clinicCombo.getText();
         Assert.isNotNull(name, "clinic combo selection error");
-        Clinic clinic = clinicMap.get(name);
+        ClinicWrapper clinic = clinicMap.get(name);
         Assert.isNotNull(clinic, "no clinic with name \"" + name + "\"");
         contactInfoTable.setCollection(clinic.getContactCollection());
         contactInfoTable.setEnabled(true);
@@ -114,7 +114,7 @@ public class SelectClinicContactDialog extends BiobankDialog {
         super.okPressed();
     }
 
-    public Contact getSelection() {
+    public ContactWrapper getSelection() {
         return selectedContact;
     }
 

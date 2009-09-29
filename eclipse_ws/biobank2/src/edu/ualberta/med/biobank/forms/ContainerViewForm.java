@@ -525,7 +525,7 @@ public class ContainerViewForm extends BiobankViewForm {
             ContainerWrapper newContainer = new ContainerWrapper(SessionManager
                 .getAppService(), new Container());
             newContainer.setSite(containerAdapter.getParentFromClass(
-                SiteAdapter.class).getSite());
+                SiteAdapter.class).getWrapper());
             pos.setParentContainer(container);
             newContainer.setPosition(pos);
             newAdapter = new ContainerAdapter(containerAdapter, newContainer);

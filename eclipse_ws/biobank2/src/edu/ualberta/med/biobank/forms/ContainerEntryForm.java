@@ -22,11 +22,10 @@ import edu.ualberta.med.biobank.common.DatabaseResult;
 import edu.ualberta.med.biobank.common.LabelingScheme;
 import edu.ualberta.med.biobank.common.utils.SiteUtils;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.ContainerType;
-import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.treeview.ContainerAdapter;
-import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.validators.DoubleNumber;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
 
@@ -45,9 +44,9 @@ public class ContainerEntryForm extends BiobankEntryForm {
 
     private ContainerAdapter containerAdapter;
 
-    private ContainerWrapper container;
+    private ContainerWrapper containerWrapper;
 
-    private Site site;
+    private SiteWrapper siteWrapper;
 
     private Text tempWidget;
 
@@ -61,21 +60,21 @@ public class ContainerEntryForm extends BiobankEntryForm {
             "Invalid editor input: object of type "
                 + adapter.getClass().getName());
         containerAdapter = (ContainerAdapter) adapter;
-        container = containerAdapter.getContainer();
-        site = containerAdapter.getParentFromClass(SiteAdapter.class).getSite();
+        containerWrapper = containerAdapter.getContainer();
+        siteWrapper = containerWrapper.getSiteWrapper();
 
         String tabName;
-        if (container.isNew()) {
+        if (containerWrapper.isNew()) {
             tabName = "Container";
-            if (container.getPosition() != null) {
-                ContainerPosition pos = container.getPosition();
-                container.setLabel(pos.getParentContainer().getLabel()
+            if (containerWrapper.getPosition() != null) {
+                ContainerPosition pos = containerWrapper.getPosition();
+                containerWrapper.setLabel(pos.getParentContainer().getLabel()
                     + LabelingScheme.getPositionString(pos));
-                container.setTemperature(pos.getParentContainer()
+                containerWrapper.setTemperature(pos.getParentContainer()
                     .getTemperature());
             }
         } else {
-            tabName = "Container " + container.getLabel();
+            tabName = "Container " + containerWrapper.getLabel();
         }
         setPartName(tabName);
     }
@@ -83,7 +82,7 @@ public class ContainerEntryForm extends BiobankEntryForm {
     @Override
     protected void createFormContent() {
         form.setText("Container");
-        currentContainerType = container.getContainerType();
+        currentContainerType = containerWrapper.getContainerType();
         form.getBody().setLayout(new GridLayout(1, false));
         createContainerSection();
         createButtonsSection();
@@ -99,32 +98,34 @@ public class ContainerEntryForm extends BiobankEntryForm {
 
         Label siteLabel = (Label) createWidget(client, Label.class, SWT.NONE,
             "Site");
-        FormUtils.setTextValue(siteLabel, container.getSite().getName());
+        FormUtils.setTextValue(siteLabel, containerWrapper.getSiteWrapper()
+            .getName());
 
-        if (container.getPosition() == null) {
+        if (containerWrapper.getPosition() == null) {
             // only allow edit to label on top level containers
             createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Label",
-                null, PojoObservables.observeValue(
-                    container.getWrappedObject(), "label"),
-                NonEmptyString.class, MSG_CONTAINER_NAME_EMPTY);
+                null, PojoObservables.observeValue(containerWrapper
+                    .getWrappedObject(), "label"), NonEmptyString.class,
+                MSG_CONTAINER_NAME_EMPTY);
         } else {
             Label l = (Label) createWidget(client, Label.class, SWT.NONE,
                 "Label");
-            FormUtils.setTextValue(l, container.getLabel());
+            FormUtils.setTextValue(l, containerWrapper.getLabel());
         }
 
         createBoundWidgetWithLabel(client, Text.class, SWT.NONE,
-            "Product Barcode", null, PojoObservables.observeValue(container
-                .getWrappedObject(), "productBarcode"), null, null);
+            "Product Barcode", null, PojoObservables.observeValue(
+                containerWrapper.getWrappedObject(), "productBarcode"), null,
+            null);
 
         createBoundWidgetWithLabel(client, Combo.class, SWT.NONE,
             "Activity Status", FormConstants.ACTIVITY_STATUS, PojoObservables
-                .observeValue(container.getWrappedObject(), "activityStatus"),
-            null, null);
+                .observeValue(containerWrapper.getWrappedObject(),
+                    "activityStatus"), null, null);
 
         Text comment = (Text) createBoundWidgetWithLabel(client, Text.class,
-            SWT.MULTI, "Comments", null, PojoObservables.observeValue(container
-                .getWrappedObject(), "comment"), null, null);
+            SWT.MULTI, "Comments", null, PojoObservables.observeValue(
+                containerWrapper.getWrappedObject(), "comment"), null, null);
         GridData gd = new GridData(GridData.FILL_HORIZONTAL);
         gd.heightHint = 40;
         comment.setLayoutData(gd);
@@ -134,10 +135,10 @@ public class ContainerEntryForm extends BiobankEntryForm {
 
     private void createContainerTypesSection(Composite client) {
         Collection<ContainerType> containerTypes;
-        ContainerPosition pos = container.getPosition();
+        ContainerPosition pos = containerWrapper.getPosition();
         if ((pos == null) || (pos.getParentContainer() == null)) {
             containerTypes = SiteUtils.getTopContainerTypesInSite(appService,
-                site);
+                siteWrapper);
         } else {
             containerTypes = pos.getParentContainer().getContainerType()
                 .getChildContainerTypeCollection();
@@ -184,9 +185,10 @@ public class ContainerEntryForm extends BiobankEntryForm {
 
         tempWidget = (Text) createBoundWidgetWithLabel(client, Text.class,
             SWT.NONE, "Temperature (Celcius)", null, PojoObservables
-                .observeValue(container.getWrappedObject(), "temperature"),
-            DoubleNumber.class, "Default temperature is not a valid number");
-        if (container.getPosition() != null)
+                .observeValue(containerWrapper.getWrappedObject(),
+                    "temperature"), DoubleNumber.class,
+            "Default temperature is not a valid number");
+        if (containerWrapper.getPosition() != null)
             tempWidget.setEnabled(false);
 
     }
@@ -204,7 +206,7 @@ public class ContainerEntryForm extends BiobankEntryForm {
 
     @Override
     protected String getOkMessage() {
-        if (container.isNew()) {
+        if (containerWrapper.isNew()) {
             return MSG_STORAGE_CONTAINER_NEW_OK;
         }
         return MSG_STORAGE_CONTAINER_OK;
@@ -214,9 +216,8 @@ public class ContainerEntryForm extends BiobankEntryForm {
     protected void saveForm() throws Exception {
         ContainerType containerType = (ContainerType) ((StructuredSelection) containerTypeComboViewer
             .getSelection()).getFirstElement();
-        container.setContainerType(containerType);
-        container.setSite(site);
-        DatabaseResult res = container.persist();
+        containerWrapper.setContainerType(containerType);
+        DatabaseResult res = containerWrapper.persist();
         if (res != DatabaseResult.OK) {
             BioBankPlugin.openAsyncError("Save Problem", res.getMessage());
             setDirty(true);

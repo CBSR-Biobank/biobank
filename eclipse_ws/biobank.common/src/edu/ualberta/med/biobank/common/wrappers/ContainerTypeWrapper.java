@@ -8,7 +8,6 @@ import java.util.List;
 import edu.ualberta.med.biobank.common.DatabaseResult;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.SampleType;
-import edu.ualberta.med.biobank.model.Site;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -73,8 +72,9 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
      * will contains containerName.
      */
     public static List<ContainerType> getContainerTypesInSite(
-        WritableApplicationService appService, Site site, String containerName,
-        boolean useStrictName) throws ApplicationException {
+        WritableApplicationService appService, SiteWrapper siteWrapper,
+        String containerName, boolean useStrictName)
+        throws ApplicationException {
         String nameComparison = "=";
         String containerNameParameter = containerName;
         if (!useStrictName) {
@@ -84,7 +84,8 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
         String query = "from " + ContainerType.class.getName()
             + " where site = ? and name " + nameComparison + " ?";
         HQLCriteria criteria = new HQLCriteria(query, Arrays
-            .asList(new Object[] { site, containerNameParameter }));
+            .asList(new Object[] { siteWrapper.getWrappedObject(),
+                containerNameParameter }));
         return appService.query(criteria);
     }
 

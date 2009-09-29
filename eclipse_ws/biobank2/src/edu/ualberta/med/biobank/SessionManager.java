@@ -20,6 +20,7 @@ import org.eclipse.ui.services.ISourceProviderService;
 import org.osgi.service.prefs.BackingStoreException;
 import org.osgi.service.prefs.Preferences;
 
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.SiteComparator;
 import edu.ualberta.med.biobank.rcp.Application;
@@ -53,10 +54,10 @@ public class SessionManager {
 
     final int TIME_OUT = 900000;
 
-    private Site currentSite;
+    private SiteWrapper currentSiteWrapper;
     private SiteCombo siteCombo;
 
-    private List<Site> currentSites;
+    private List<SiteWrapper> currentSiteWrappers;
 
     private static final String SITE_PREF_NODE = "Site";
 
@@ -91,7 +92,7 @@ public class SessionManager {
     private SessionManager() {
         super();
         rootNode = new RootNode();
-        currentSites = new ArrayList<Site>();
+        currentSiteWrappers = new ArrayList<SiteWrapper>();
 
     }
 
@@ -117,7 +118,7 @@ public class SessionManager {
         Preferences lastSite = prefs.node(SITE_PREF_NODE);
         String siteId = lastSite.get(LAST_SITE_PREF, "-1");
         if (siteId.equalsIgnoreCase("-1"))
-            currentSite = null;
+            currentSiteWrapper = null;
         else
             try {
                 Site searchSite = new Site();
@@ -125,9 +126,10 @@ public class SessionManager {
                 List<Site> query = getAppService().search(Site.class,
                     searchSite);
                 if (query.size() == 1)
-                    currentSite = query.get(0);
+                    currentSiteWrapper = new SiteWrapper(appService, query
+                        .get(0));
                 else
-                    currentSite = null;
+                    currentSiteWrapper = null;
             } catch (ApplicationException e) {
                 SessionManager.getLogger().error(
                     "Error retrieving site " + siteId, e);
@@ -187,8 +189,8 @@ public class SessionManager {
         rootNode.removeChild(sessionAdapter);
         sessionAdapter = null;
         updateMenus();
-        currentSites = new ArrayList<Site>();
-        siteCombo.comboViewer.setInput(currentSites);
+        currentSiteWrappers = new ArrayList<SiteWrapper>();
+        siteCombo.comboViewer.setInput(currentSiteWrappers);
         setCurrentSite(null);
     }
 
@@ -261,27 +263,31 @@ public class SessionManager {
         adapter.performDoubleClick();
     }
 
-    public void setCurrentSite(Site site) {
-        currentSite = site;
-        String saveVal = "-1";
-        if (site != null && site.getId() != null)
-            saveVal = site.getId().toString();
-        Preferences prefs = new InstanceScope().getNode(Application.PLUGIN_ID);
-        prefs.node(SITE_PREF_NODE).put(LAST_SITE_PREF, saveVal);
+    public void setCurrentSite(SiteWrapper siteWrapper) {
         try {
+            currentSiteWrapper = siteWrapper;
+            String saveVal = "-1";
+            if ((siteWrapper != null) && (siteWrapper.getId() != null))
+                saveVal = siteWrapper.getId().toString();
+            Preferences prefs = new InstanceScope()
+                .getNode(Application.PLUGIN_ID);
+            prefs.node(SITE_PREF_NODE).put(LAST_SITE_PREF, saveVal);
             prefs.flush();
+            IWorkbenchWindow window = PlatformUI.getWorkbench()
+                .getActiveWorkbenchWindow();
+            ISourceProviderService service = (ISourceProviderService) window
+                .getService(ISourceProviderService.class);
+            SiteSelectionState siteSelectionStateSourceProvider = (SiteSelectionState) service
+                .getSourceProvider(SiteSelectionState.SITE_SELECTION_ID);
+            Site site = null;
+            if (siteWrapper != null)
+                site = siteWrapper.getWrappedObject();
+            siteSelectionStateSourceProvider.setSiteSelection(site);
+            if (sessionAdapter != null) {
+                sessionAdapter.performExpand();
+            }
         } catch (BackingStoreException e) {
             getLogger().error("Could not save site preferences", e);
-        }
-        IWorkbenchWindow window = PlatformUI.getWorkbench()
-            .getActiveWorkbenchWindow();
-        ISourceProviderService service = (ISourceProviderService) window
-            .getService(ISourceProviderService.class);
-        SiteSelectionState siteSelectionStateSourceProvider = (SiteSelectionState) service
-            .getSourceProvider(SiteSelectionState.SITE_SELECTION_ID);
-        siteSelectionStateSourceProvider.setSiteSelection(site);
-        if (sessionAdapter != null) {
-            sessionAdapter.performExpand();
         }
     }
 
@@ -289,26 +295,31 @@ public class SessionManager {
         return rootNode;
     }
 
-    public Site getCurrentSite() {
-        return currentSite;
+    public SiteWrapper getCurrentSiteWrapper() {
+        return currentSiteWrapper;
     }
 
-    public List<Site> getCurrentSites() {
-        return currentSites;
+    public List<SiteWrapper> getCurrentSiteWrappers() {
+        return currentSiteWrappers;
     }
 
     public void updateSites() {
         try {
-            currentSites = getAppService().search(Site.class, new Site());
-            Collections.sort(currentSites, new SiteComparator());
-            Site allSite = new Site();
-            allSite.setName("All Sites");
-            currentSites.add(0, allSite);
-            siteCombo.comboViewer.setInput(currentSites);
-            if (currentSite == null)
-                siteCombo.setSelection(allSite);
+            List<Site> sites = getAppService().search(Site.class, new Site());
+            currentSiteWrappers.clear();
+            for (Site site : sites) {
+                currentSiteWrappers.add(new SiteWrapper(getAppService(), site));
+            }
+            Collections.sort(currentSiteWrappers);
+            SiteWrapper allSiteWrapper = new SiteWrapper(getAppService(),
+                new Site());
+            allSiteWrapper.setName("All Sites");
+            currentSiteWrappers.add(0, allSiteWrapper);
+            siteCombo.comboViewer.setInput(currentSiteWrappers);
+            if (currentSiteWrapper == null)
+                siteCombo.setSelection(allSiteWrapper);
             else
-                siteCombo.setSelection(currentSite);
+                siteCombo.setSelection(currentSiteWrapper);
         } catch (ApplicationException e) {
             e.printStackTrace();
         }

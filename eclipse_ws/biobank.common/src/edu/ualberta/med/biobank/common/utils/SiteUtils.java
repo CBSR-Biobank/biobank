@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.Sample;
 import edu.ualberta.med.biobank.model.Site;
@@ -38,10 +39,12 @@ public class SiteUtils {
     }
 
     public static List<Sample> getSamplesInSite(
-        WritableApplicationService appService, String inventoryId, Site site) {
+        WritableApplicationService appService, String inventoryId,
+        SiteWrapper siteWrapper) {
         HQLCriteria criteria = new HQLCriteria("from " + Sample.class.getName()
             + " where inventoryId = ? and patientVisit.patient.study.site = ?",
-            Arrays.asList(new Object[] { inventoryId, site }));
+            Arrays.asList(new Object[] { inventoryId,
+                siteWrapper.getWrappedObject() }));
         try {
             return appService.query(criteria);
         } catch (ApplicationException e) {
@@ -51,11 +54,11 @@ public class SiteUtils {
     }
 
     public static Collection<ContainerType> getTopContainerTypesInSite(
-        WritableApplicationService appService, Site site) {
+        WritableApplicationService appService, SiteWrapper siteWrapper) {
         HQLCriteria criteria = new HQLCriteria("from "
             + ContainerType.class.getName()
             + " where site = ? and topLevel=true", Arrays
-            .asList(new Object[] { site }));
+            .asList(new Object[] { siteWrapper.getWrappedObject() }));
         try {
             return appService.query(criteria);
         } catch (ApplicationException e) {

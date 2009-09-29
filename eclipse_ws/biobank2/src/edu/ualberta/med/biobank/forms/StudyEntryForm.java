@@ -354,7 +354,9 @@ public class StudyEntryForm extends BiobankEntryForm {
         Set<PvInfo> savedPvInfoList = new HashSet<PvInfo>();
 
         study.setSite(site);
-        study.setContactCollection(contactEntryWidget.getContacts());
+
+        // FIXME: change study to studyWrapper
+        // study.setContactCollection(contactEntryWidget.getContacts());
 
         if (study.getPvInfoCollection().size() > 0) {
             for (PvInfo pvInfo : study.getPvInfoCollection()) {

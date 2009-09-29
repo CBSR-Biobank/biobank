@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.treeview;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -183,7 +184,7 @@ public class ContainerAdapter extends AdapterBase {
             .length() - 2);
 
         List<Container> newParents = ContainerWrapper.getContainersInSite(
-            SessionManager.getAppService(), container.getSite(),
+            SessionManager.getAppService(), container.getSiteWrapper(),
             newParentContainerLabel);
         String oldLabel = container.getLabel();
 
@@ -279,8 +280,9 @@ public class ContainerAdapter extends AdapterBase {
         // inefficient, should be improved
         ContainerWrapper parentContainer = getContainer();
         HQLCriteria criteria = new HQLCriteria("from "
-            + Container.class.getName() + " where label like '" + oldLabel
-            + "%'" + " and site= " + parentContainer.getSite().getId());
+            + Container.class.getName() + " where label like ? and site = ?",
+            Arrays.asList(new Object[] { oldLabel + "%",
+                parentContainer.getSiteWrapper().getWrappedObject() }));
 
         List<Container> containers = SessionManager.getAppService().query(
             criteria);

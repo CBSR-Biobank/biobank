@@ -34,32 +34,20 @@ public class ClinicAdapter extends AdapterBase {
     }
 
     @Override
-    protected Integer getWrappedObjectId() {
-        return getWrapper().getId();
-    }
-
-    @Override
-    public Integer getId() {
-        ClinicWrapper wrapper = getWrapper();
-        Assert.isNotNull(wrapper.getWrappedObject(), "Clinic is null");
-        return wrapper.getId();
-    }
-
-    @Override
-    public void addChild(AdapterBase child) {
-        Assert.isTrue(false, "Cannot add children to this adapter");
-    }
-
-    @Override
     public String getName() {
         ClinicWrapper wrapper = getWrapper();
-        Assert.isNotNull(wrapper.getWrappedObject(), "Clinic is null");
+        Assert.isNotNull(wrapper.getWrappedObject(), "client is null");
         return wrapper.getName();
     }
 
     @Override
     public String getTitle() {
-        return getTitle("Clinic");
+        return getTitle("Patient");
+    }
+
+    @Override
+    public void addChild(AdapterBase child) {
+        Assert.isTrue(false, "Cannot add children to this adapter");
     }
 
     @Override
@@ -112,14 +100,10 @@ public class ClinicAdapter extends AdapterBase {
 
     @Override
     public void delete() {
-<<<<<<< HEAD:eclipse_ws/biobank2/src/edu/ualberta/med/biobank/treeview/ClinicAdapter.java
-        // TODO: delete should be implmemented in the wrapper object
-=======
         // FIXME when clinicwrapper is used : remove this method to use the
         // parent one
->>>>>>> 0ffd7d8d284193ff1d7fd90c7ac8a320bd4910ca:eclipse_ws/biobank2/src/edu/ualberta/med/biobank/treeview/ClinicAdapter.java
         BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
-            Clinic clinic = getWrapper().getWrappedObject();
+            Clinic clinic = ((ClinicWrapper) object).getWrappedObject();
             SDKQuery query = new DeleteExampleQuery(clinic);
 
             public void run() {
@@ -144,11 +128,6 @@ public class ClinicAdapter extends AdapterBase {
 
     @Override
     public void loadChildren(boolean updateNode) {
-        Assert.isTrue(false, "Cannot add children to this adapter");
-    }
-
-    @Override
-    public void addChild(AdapterBase child) {
         Assert.isTrue(false, "Cannot add children to this adapter");
     }
 

@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.common.wrappers;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.DatabaseResult;
@@ -15,9 +16,17 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class ClinicWrapper extends ModelWrapper<Clinic> {
 
+    private AddressWrapper addressWrapper;
+
     public ClinicWrapper(WritableApplicationService appService,
         Clinic wrappedObject) {
         super(appService, wrappedObject);
+        addressWrapper = new AddressWrapper(appService, wrappedObject
+            .getAddress());
+    }
+
+    public AddressWrapper getAddressWrapper() {
+        return addressWrapper;
     }
 
     public String getName() {
@@ -32,24 +41,24 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
         return wrappedObject.getSite();
     }
 
+    public void setSiteWrapper(SiteWrapper siteWrapper) {
+        Site oldSite = wrappedObject.getSite();
+        Site newSite = siteWrapper.getWrappedObject();
+        wrappedObject.setSite(newSite);
+        propertyChangeSupport.firePropertyChange("patient", oldSite, newSite);
+    }
+
     public void setStudy(Site site) {
         wrappedObject.setSite(site);
     }
 
-    public AddressWrapper getAddressWrapper() {
-        return new AddressWrapper(appService, wrappedObject.getAddress());
-    }
-
     public boolean checkClinicNameUnique() throws ApplicationException {
-        if (isNew()) {
-            HQLCriteria c = new HQLCriteria("from " + Clinic.class.getName()
-                + " where site = ? and name = ?", Arrays.asList(new Object[] {
-                getSite(), getName() }));
+        HQLCriteria c = new HQLCriteria("from " + Clinic.class.getName()
+            + " where site = ? and name = ?", Arrays.asList(new Object[] {
+            getSite(), getName() }));
 
-            List<Clinic> results = appService.query(c);
-            return results.size() == 0;
-        }
-        return true;
+        List<Clinic> results = appService.query(c);
+        return (results.size() == 0);
     }
 
     @Override
@@ -86,8 +95,12 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
         return wrappedObject.getComment();
     }
 
-    public Collection<Contact> getContactCollection() {
-        return wrappedObject.getContactCollection();
+    public Collection<ContactWrapper> getContactCollection() {
+        Collection<ContactWrapper> collection = new HashSet<ContactWrapper>();
+        for (Contact contact : wrappedObject.getContactCollection()) {
+            collection.add(new ContactWrapper(appService, contact));
+        }
+        return collection;
     }
 
     public List<Study> getStudyCollection() throws ApplicationException {
@@ -98,6 +111,7 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
             .asList(new Object[] { wrappedObject }));
 
         return appService.query(c);
+    }
 
     @Override
     protected DatabaseResult deleteChecks() throws ApplicationException {
