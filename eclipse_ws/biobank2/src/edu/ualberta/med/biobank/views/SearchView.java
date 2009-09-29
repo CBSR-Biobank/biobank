@@ -3,7 +3,6 @@ package edu.ualberta.med.biobank.views;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.KeyEvent;
@@ -97,16 +96,14 @@ public class SearchView extends ViewPart {
                 try {
                     WritableApplicationService appService = null;
                     AdapterBase node;
-                    IStructuredSelection treeSelection = (IStructuredSelection) SessionManager
-                        .getInstance().getTreeViewer().getSelection();
-                    if (treeSelection != null && treeSelection.size() > 0) {
-                        node = (AdapterBase) treeSelection.getFirstElement();
-                        appService = node.getAppService();
-                    } else {
+                    AdapterBase selectedNode = SessionManager.getInstance()
+                        .getSelectedNode();
+                    if (selectedNode == null) {
                         BioBankPlugin.openMessage("Search",
                             "No selection available for search");
                         return;
                     }
+                    appService = selectedNode.getAppService();
                     if (appService == null) {
                         BioBankPlugin.openError("Search",
                             "No connection available");
@@ -118,12 +115,11 @@ public class SearchView extends ViewPart {
                             SearchType searchType = (SearchType) selection
                                 .getFirstElement();
                             String id = searchField.getText();
-                            AdapterBase nodeFound = searchType.search(appService, id,
-                                node);
+                            AdapterBase nodeFound = searchType.search(
+                                appService, id, selectedNode);
                             if (nodeFound != null) {
-                                SessionManager.getInstance().getTreeViewer()
-                                    .setSelection(
-                                        new StructuredSelection(nodeFound));
+                                SessionManager.getInstance().setSelectedNode(
+                                    nodeFound);
                                 nodeFound.performDoubleClick();
                             }
                         }

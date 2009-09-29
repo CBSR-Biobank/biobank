@@ -78,6 +78,11 @@
             id="edu.ualberta.med.biobank.perspective.patients"
             name="Patients Administration">
       </perspective>
+      <perspective
+            class="edu.ualberta.med.biobank.rcp.SampleManagementPerspective"
+            id="edu.ualberta.med.biobank.perspective.samplesManagement"
+            name="Samples Management">
+      </perspective>
    </extension>
    <extension
          point="org.eclipse.ui.commands">
@@ -317,28 +322,18 @@
             class="edu.ualberta.med.biobank.handlers.MainAdministrationHandler"
             commandId="edu.ualberta.med.biobank.commands.mainAdmin">
          <enabledWhen>
-            <or>
                <and>
-                  <reference
-                        definitionId="biobank2.patientsPerpectiveSelected">
-                  </reference>
-                  <reference
-                        definitionId="biobank2.patientViewActive">
-                  </reference>
-               </and>
-               <and>
-                  <not>
-                     <reference
-                           definitionId="biobank2.patientsPerpectiveSelected">
-                     </reference>
-                  </not>
                   <not>
                      <reference
                            definitionId="biobank2.mainPerpectiveSelected">
                      </reference>
                   </not>
+                  <not>
+                     <reference
+                           definitionId="biobank2.sampleManagementPerspectiveSelected">
+                     </reference>
+                  </not>
                </and>
-            </or>
          </enabledWhen>
       </handler>
       <handler
@@ -356,7 +351,7 @@
          </activeWhen>
          <enabledWhen>
             <reference
-                  definitionId="biobank2.patientViewActive">
+                  definitionId="biobank2.patientsPerpectiveSelected">
             </reference>
          </enabledWhen>
       </handler>
@@ -384,7 +379,7 @@
          </activeWhen>
          <enabledWhen>
             <reference
-                  definitionId="biobank2.patientViewActive">
+                  definitionId="biobank2.patientsPerpectiveSelected">
             </reference>
          </enabledWhen>
       </handler>
@@ -558,9 +553,13 @@
                   </reference>
                </visibleWhen>
             </command>
+            <separator
+                  name="biobank2.separator1"
+                  visible="true">
+            </separator>
             <command
                commandId="edu.ualberta.med.biobank.commands.reports"
-               icon="icons/page_white_find.png"
+               icon="icons/reports.png"
                label="Reports"
                style="push">
                <visibleWhen
@@ -572,7 +571,7 @@
             </command>
             <command
                   commandId="edu.ualberta.med.biobank.commands.studyAdd"
-                  icon="icons/book_open.png"
+                  icon="icons/study.png"
                   label="Add Study"
                   style="push">
                <visibleWhen
@@ -584,7 +583,7 @@
             </command>
             <command
                   commandId="edu.ualberta.med.biobank.commands.clinicAdd"
-                  icon="icons/transmit_blue.png"
+                  icon="icons/clinic.png"
                   label="Add Clinic"
                   style="push">
                <visibleWhen
@@ -596,7 +595,7 @@
             </command>
             <command
                   commandId="edu.ualberta.med.biobank.commands.containerTypeAdd"
-                  icon="icons/basket_edit.png"
+                  icon="icons/container_types.png"
                   label="Add Container Type"
                   style="push">
                <visibleWhen
@@ -608,7 +607,7 @@
             </command>
             <command
                   commandId="edu.ualberta.med.biobank.commands.containerAdd"
-                  icon="icons/basket.png"
+                  icon="icons/containers.png"
                   label="Add Container"
                   style="push">
                <visibleWhen
@@ -628,11 +627,18 @@
                   style="push">
                <visibleWhen
                      checkEnabled="false">
-                  <not>
-                     <reference
-                           definitionId="biobank2.mainPerpectiveSelected">
-                     </reference>
-                  </not>
+                  <and>
+                     <not>
+                        <reference
+                              definitionId="biobank2.mainPerpectiveSelected">
+                        </reference>
+                     </not>
+                     <not>
+                        <reference
+                              definitionId="biobank2.sampleManagementPerspectiveSelected">
+                        </reference>
+                     </not>
+                  </and>
                </visibleWhen>
             </command>
             <command
@@ -693,7 +699,7 @@
             </command>
             <command
                   commandId="edu.ualberta.med.biobank.commands.patients.openPatientForm"
-                  icon="icons/defaultLink.png"
+                  icon="icons/cabinetLinkAssign.png"
                   label="Cabinet Link/Assign"
                   style="push">
                <visibleWhen
@@ -757,6 +763,9 @@
                standalone="false"
                visible="true">
          </view>
+      </perspectiveExtension>
+      <perspectiveExtension
+            targetID="edu.ualberta.med.biobank.perspective.samplesManagement">
          <view
                closeable="false"
                id="org.eclipse.ui.console.ConsoleView"
@@ -767,7 +776,7 @@
                relative="org.eclipse.ui.editorss"
                showTitle="true"
                standalone="true"
-               visible="false">
+               visible="true">
          </view>
       </perspectiveExtension>
       </extension>
@@ -874,7 +883,7 @@
       <editor
             class="edu.ualberta.med.biobank.forms.CabinetLinkAssignEntryForm"
             default="false"
-            icon="icons/defaultLink.png"
+            icon="icons/cabinetLinkAssign.png"
             id="edu.ualberta.med.biobank.forms.CabinetLinkAssignEntryForm"
             name="Cabinet Link/Assign Entry ">
       </editor>
@@ -948,7 +957,7 @@
       <sourceProvider
             provider="edu.ualberta.med.biobank.sourceproviders.SiteSelectionState">
          <variable
-               name="edu.ualberta.med.biobank.sourceprovider.siteSelectionState"
+               name="edu.ualberta.med.biobank.sourceprovider.siteSelectionId"
                priorityLevel="workbench">
          </variable>
       </sourceProvider>
@@ -966,7 +975,7 @@
             allowMultiple="false"
             class="edu.ualberta.med.biobank.views.ReportsView"
             id="edu.ualberta.med.biobank.views.ReportsView"
-            icon="icons/page_white_find.png"
+            icon="icons/reports.png"
             name="Reports"
             restorable="true">
       </view>
@@ -1009,6 +1018,15 @@
          </with>
       </definition>
       <definition
+            id="biobank2.sampleManagementPerspectiveSelected">
+         <with
+               variable="activeWorkbenchWindow.activePerspective">
+            <equals
+                  value="edu.ualberta.med.biobank.perspective.samplesManagement">
+            </equals>
+         </with>
+      </definition>
+      <definition
             id="biobank2.loggedIn">
          <with
                variable="edu.ualberta.med.biobank.sourceprovider.loginState">
@@ -1045,48 +1063,14 @@
          </with>
       </definition>
       <definition
-            id="biobank2.patientViewActive">
-         <with
-               variable="activePartId">
-            <equals
-                  value="edu.ualberta.med.biobank.views.patientsAdmin">
-            </equals>
-         </with>
-      </definition>
-      <definition
             id="biobank2.siteSelected">
          <with
-               variable="edu.ualberta.med.biobank.sourceprovider.siteSelectionState">
-            <equals
-                  value="true">
-            </equals>
-         </with>
-      </definition>
-      <definition
-            id="biobank2.scanLinkEditorActive">
-         <with
-               variable="activeEditorId">
-            <equals
-                  value="edu.ualberta.med.biobank.forms.ScanLinkEntryForm">
-            </equals>
-         </with>
-      </definition>
-      <definition
-            id="biobank2.scanAssignEditorActive">
-         <with
-               variable="activeEditorId">
-            <equals
-                  value="edu.ualberta.med.biobank.forms.ScanAssignEntryForm">
-            </equals>
-         </with>
-      </definition>
-      <definition
-            id="biobank2.cabinetLinkAssignEditorActive">
-         <with
-               variable="activeEditorId">
-            <equals
-                  value="edu.ualberta.med.biobank.forms.CabinetLinkAssignEntryForm">
-            </equals>
+               variable="edu.ualberta.med.biobank.sourceprovider.siteSelectionId">
+            <not>
+               <equals
+                     value="null">
+               </equals>
+            </not>
          </with>
       </definition>
       <definition

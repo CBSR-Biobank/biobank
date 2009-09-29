@@ -22,9 +22,7 @@ public class StudyPvInfo {
 
     public static HashSet<PvInfo> assignCommonPvInfo(Study study)
         throws Exception {
-        String [] labels = {
-            "Date Received", "Date Processed", "Worksheet", "Aliquot Volume",
-            "Blood Received", "PBMC Count", "Comments", };
+        String [] labels = { "Worksheet", "PBMC Count" };
         HashSet<PvInfo> pvInfoSet = new HashSet<PvInfo>();
 
         for (String label : labels) {

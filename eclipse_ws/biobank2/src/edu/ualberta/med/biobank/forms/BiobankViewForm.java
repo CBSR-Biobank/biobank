@@ -16,8 +16,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.PartInitException;
 import org.springframework.remoting.RemoteConnectFailureException;
@@ -35,6 +33,9 @@ import edu.ualberta.med.biobank.treeview.AdapterBase;
 public abstract class BiobankViewForm extends BiobankFormBase {
 
     protected String sessionName;
+
+    private static ImageDescriptor reloadActionImage = BioBankPlugin
+        .getImageDescriptor("icons/reload.png");
 
     @Override
     public boolean isDirty() {
@@ -86,17 +87,10 @@ public abstract class BiobankViewForm extends BiobankFormBase {
                 });
             }
         };
-        ImageDescriptor imgDesc = BioBankPlugin
-            .getImageDescriptor("icons/arrow_refresh.png");
-        reloadAction.setImageDescriptor(imgDesc);
+
+        reloadAction.setImageDescriptor(reloadActionImage);
         form.getToolBarManager().add(reloadAction);
         form.updateToolBar();
-
-        Menu menu = new Menu(form);
-        form.setMenu(menu);
-        MenuItem item = new MenuItem(menu, SWT.PUSH);
-        item.setText("Reload");
-        item.setImage(imgDesc.createImage());
     }
 
     protected abstract void reload() throws Exception;
