@@ -75,6 +75,8 @@ public class SiteCombo extends ControlContribution {
                                 siteWrapper);
                         if (session != null)
                             session.rebuild();
+                        SessionManager.getInstance().getTreeViewer()
+                            .expandToLevel(3);
                     }
                 }
             });
