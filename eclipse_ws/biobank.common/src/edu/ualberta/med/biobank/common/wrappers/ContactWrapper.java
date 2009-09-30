@@ -107,11 +107,11 @@ public class ContactWrapper extends ModelWrapper<Contact> {
         String[] members = new String[] { "name", "title", "phoneNumber",
             "faxNumber", "emailAddress", "clinic" };
 
-        for (String member : members) {
-            propertyChangeSupport.firePropertyChange(member, oldWrappedObject,
-                newWrappedObject);
+        try {
+            firePropertyChanges(members, oldWrappedObject, newWrappedObject);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-
     }
 
     @Override

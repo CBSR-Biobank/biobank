@@ -34,7 +34,31 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
     }
 
     public void setName(String name) {
+        String oldName = getName();
         wrappedObject.setName(name);
+        propertyChangeSupport.firePropertyChange("name", oldName, name);
+    }
+
+    public String getActivityStatus() {
+        return wrappedObject.getActivityStatus();
+    }
+
+    public void setActivityStatus(String activityStatus) {
+        String oldStatus = getActivityStatus();
+        wrappedObject.setActivityStatus(activityStatus);
+        propertyChangeSupport.firePropertyChange("activityStatus", oldStatus,
+            activityStatus);
+    }
+
+    public String getComment() {
+        return wrappedObject.getComment();
+    }
+
+    public void setComment(String comment) {
+        String oldComment = getComment();
+        wrappedObject.setName(comment);
+        propertyChangeSupport
+            .firePropertyChange("comment", oldComment, comment);
     }
 
     public Site getSite() {
@@ -85,14 +109,6 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
     @Override
     public boolean checkIntegrity() {
         return true;
-    }
-
-    public String getActivityStatus() {
-        return wrappedObject.getActivityStatus();
-    }
-
-    public String getComment() {
-        return wrappedObject.getComment();
     }
 
     public Collection<ContactWrapper> getContactCollection() {

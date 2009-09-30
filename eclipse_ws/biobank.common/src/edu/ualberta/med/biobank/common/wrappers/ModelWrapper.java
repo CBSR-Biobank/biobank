@@ -15,8 +15,6 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.List;
 
-import org.springframework.util.Assert;
-
 public abstract class ModelWrapper<E> {
 
     protected WritableApplicationService appService;
@@ -78,6 +76,17 @@ public abstract class ModelWrapper<E> {
     protected abstract void firePropertyChanges(E oldWrappedObject,
         E newWrappedObject);
 
+    protected void firePropertyChanges(String[] memberNames,
+        Object oldWrappedObject, Object newWrappedObject) throws Exception {
+        if (memberNames == null) {
+            throw new Exception("memberNames cannot be null");
+        }
+        for (String member : memberNames) {
+            propertyChangeSupport.firePropertyChange(member, oldWrappedObject,
+                newWrappedObject);
+        }
+    }
+
     private void internalReload() throws Exception {
         Class<E> classType = getWrappedClass();
         Constructor<E> constructor = classType.getConstructor();
@@ -88,7 +97,9 @@ public abstract class ModelWrapper<E> {
         List<E> list = appService.search(classType, instance);
         if (list.size() == 0)
             wrappedObject = null;
-        Assert.isTrue(list.size() == 1);
+        if (list.size() != 1) {
+            throw new Exception("expected size to be 1");
+        }
         wrappedObject = list.get(0);
     }
 
