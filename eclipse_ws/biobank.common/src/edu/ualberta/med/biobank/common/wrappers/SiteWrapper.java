@@ -1,7 +1,9 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 
@@ -145,6 +147,29 @@ public class SiteWrapper extends ModelWrapper<Site> implements
             collection.add(new ContainerWrapper(appService, c));
         }
         return collection;
+    }
+
+    public Collection<ContainerWrapper> getTopContainerWrapperCollection()
+        throws Exception {
+        HQLCriteria criteria = new HQLCriteria("from "
+            + Container.class.getName()
+            + " where site = ? and position is null", Arrays
+            .asList(new Object[] { wrappedObject }));
+        List<Container> containers = appService.query(criteria);
+
+        Collection<ContainerWrapper> wrappers = new HashSet<ContainerWrapper>();
+        for (Container c : containers) {
+            wrappers.add(new ContainerWrapper(appService, c));
+        }
+        return wrappers;
+    }
+
+    public List<ContainerWrapper> getTopContainerWrapperCollectionSorted()
+        throws Exception {
+        List<ContainerWrapper> result = new ArrayList<ContainerWrapper>(
+            getTopContainerWrapperCollection());
+        Collections.sort(result);
+        return result;
     }
 
 }

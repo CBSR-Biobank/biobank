@@ -55,7 +55,7 @@ public class BiobankLabelProvider extends LabelProvider implements
             case 1:
                 return study.getNameShort();
             case 2:
-                return "" + study.getPatientCollection().size();
+                return ""; // + study.getPatientCollection().size();
             }
         } else if (element instanceof Clinic) {
             final Clinic clinic = (Clinic) element;

@@ -23,7 +23,8 @@ import gov.nih.nci.system.query.example.UpdateExampleQuery;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 //FIXME to do by Delphine
-public class ContainerWrapper extends ModelWrapper<Container> {
+public class ContainerWrapper extends ModelWrapper<Container> implements
+    Comparable<ContainerWrapper> {
 
     public ContainerWrapper(WritableApplicationService appService,
         Container wrappedObject) {
@@ -564,5 +565,12 @@ public class ContainerWrapper extends ModelWrapper<Container> {
             .asList(new Object[] { getSiteWrapper().getWrappedObject(),
                 parentLabel, getContainerType() }));
         return appService.query(criteria);
+    }
+
+    public int compareTo(ContainerWrapper wrapper) {
+        String myLabel = wrappedObject.getLabel();
+        String wrapperLabel = wrapper.wrappedObject.getLabel();
+        return ((myLabel.compareTo(wrapperLabel) > 0) ? 1 : (myLabel
+            .equals(wrapperLabel) ? 0 : -1));
     }
 }

@@ -156,7 +156,7 @@ public class BioBankPlugin extends AbstractUIPlugin {
      */
     public static void openError(String title, Exception e) {
         String msg = e.getMessage();
-        if ((msg == null || msg.isEmpty()) && e.getCause() != null) {
+        if (((msg == null) || msg.isEmpty()) && (e.getCause() != null)) {
             msg = e.getCause().getMessage();
         }
         openError(title, e.getMessage());

@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.forms;
 
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -33,6 +34,9 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class SiteViewForm extends AddressViewFormCommon {
     public static final String ID = "edu.ualberta.med.biobank.forms.SiteViewForm";
+
+    private static final Logger logger = Logger.getLogger(SiteViewForm.class
+        .getName());
 
     private SiteAdapter siteAdapter;
 
@@ -118,16 +122,20 @@ public class SiteViewForm extends AddressViewFormCommon {
     }
 
     private void createContainerSection() {
-        Section section = createSection("Containers");
+        Section section = createSection("Top Level Containers");
 
-        sContainersTable = new ContainerInfoTable(section, siteWrapper
-            .getContainerWrapperCollection());
-        section.setClient(sContainersTable);
-        sContainersTable.adaptToToolkit(toolkit, true);
-        toolkit.paintBordersFor(sContainersTable);
+        try {
+            sContainersTable = new ContainerInfoTable(section, siteAdapter
+                .getWrapper().getTopContainerWrapperCollectionSorted());
+            section.setClient(sContainersTable);
+            sContainersTable.adaptToToolkit(toolkit, true);
+            toolkit.paintBordersFor(sContainersTable);
 
-        sContainersTable.addDoubleClickListener(FormUtils
-            .getBiobankCollectionDoubleClickListener());
+            sContainersTable.addDoubleClickListener(FormUtils
+                .getBiobankCollectionDoubleClickListener());
+        } catch (Exception e) {
+            logger.error("Problem while queriyng top level containers", e);
+        }
     }
 
     private void createButtons() {

@@ -55,8 +55,7 @@ public class StudyWrapper extends ModelWrapper<Study> implements
 
     @Override
     protected Class<Study> getWrappedClass() {
-        // TODO Auto-generated method stub
-        return null;
+        return Study.class;
     }
 
     @Override
