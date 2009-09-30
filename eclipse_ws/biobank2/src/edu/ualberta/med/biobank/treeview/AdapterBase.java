@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
@@ -16,7 +17,7 @@ import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.DatabaseResult;
+import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -376,19 +377,21 @@ public abstract class AdapterBase {
         if (message != null)
             doDelete = BioBankPlugin.openConfirm("Confirm Delete", message);
         if (doDelete) {
-            try {
-                if (object != null && object instanceof ModelWrapper<?>) {
-                    DatabaseResult res = ((ModelWrapper<?>) object).delete();
-                    if (res == DatabaseResult.OK) {
-                        getParent().removeChild(this);
-                    } else {
-                        BioBankPlugin.openError("Delete failed", res
-                            .getMessage());
+            BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        if (object != null && object instanceof ModelWrapper<?>) {
+                            ((ModelWrapper<?>) object).delete();
+                            getParent().removeChild(AdapterBase.this);
+                        }
+                    } catch (ApplicationException e) {
+                        BioBankPlugin.openAsyncError("Delete error", e);
+                    } catch (BiobankCheckException bce) {
+                        BioBankPlugin.openError("Delete failed", bce);
                     }
                 }
-            } catch (ApplicationException e) {
-                BioBankPlugin.openAsyncError("Delete error", e);
-            }
+            });
         }
     }
 }

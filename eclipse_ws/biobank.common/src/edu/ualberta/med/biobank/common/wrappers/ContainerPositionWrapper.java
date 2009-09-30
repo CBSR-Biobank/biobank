@@ -1,6 +1,6 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
-import edu.ualberta.med.biobank.common.DatabaseResult;
+import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.RowColPos;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerPosition;
@@ -32,8 +32,8 @@ public class ContainerPositionWrapper extends ModelWrapper<ContainerPosition> {
     }
 
     @Override
-    protected DatabaseResult persistChecks() throws ApplicationException {
-        return DatabaseResult.OK;
+    protected void persistChecks() throws BiobankCheckException,
+        ApplicationException {
     }
 
     public void setParentContainer(Container parentContainer) {
@@ -93,9 +93,9 @@ public class ContainerPositionWrapper extends ModelWrapper<ContainerPosition> {
     }
 
     @Override
-    protected DatabaseResult deleteChecks() throws ApplicationException {
+    protected void deleteChecks() throws BiobankCheckException,
+        ApplicationException {
         // TODO Auto-generated method stub
-        return null;
     }
 
 }

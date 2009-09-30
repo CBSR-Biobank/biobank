@@ -14,9 +14,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.DatabaseResult;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.PatientAdapter;
@@ -125,12 +123,7 @@ public class PatientEntryForm extends BiobankEntryForm {
         Study study = (Study) ((IStructuredSelection) studiesViewer
             .getSelection()).getFirstElement();
         patientAdapter.getWrapper().setStudy(study);
-        DatabaseResult res = patientAdapter.getWrapper().persist();
-        if (res != DatabaseResult.OK) {
-            BioBankPlugin.openAsyncError("Save Problem", res.getMessage());
-            setDirty(true);
-            return;
-        }
+        patientAdapter.getWrapper().persist();
         PatientAdministrationView.currentInstance
             .showPatientInTree(patientAdapter.getWrapper());
     }

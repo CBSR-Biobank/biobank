@@ -53,6 +53,7 @@ import org.springframework.remoting.RemoteAccessException;
 import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.validators.AbstractValidator;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
@@ -129,6 +130,9 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
                 } catch (final AccessDeniedException ade) {
                     BioBankPlugin.openAccessDeniedErrorMessage();
                     setDirty(true);
+                } catch (BiobankCheckException bce) {
+                    setDirty(true);
+                    BioBankPlugin.openError("Save error", bce.getMessage());
                 } catch (Exception e) {
                     setDirty(true);
                     throw new RuntimeException(e);

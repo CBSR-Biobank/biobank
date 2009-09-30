@@ -1,11 +1,10 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
-import edu.ualberta.med.biobank.common.DatabaseResult;
+import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
-//FIXME todo by delphine
 public class ContainerLabelingSchemeWrapper extends
     ModelWrapper<ContainerLabelingScheme> {
 
@@ -21,17 +20,16 @@ public class ContainerLabelingSchemeWrapper extends
     }
 
     @Override
-    protected DatabaseResult persistChecks() throws ApplicationException {
-        // TODO Auto-generated method stub
-        return null;
+    protected void persistChecks() throws BiobankCheckException,
+        ApplicationException {
     }
 
     @Override
     protected void firePropertyChanges(
         ContainerLabelingScheme oldWrappedObject,
         ContainerLabelingScheme newWrappedObject) {
-        // TODO Auto-generated method stub
-
+        propertyChangeSupport.firePropertyChange("name", oldWrappedObject,
+            newWrappedObject);
     }
 
     @Override
@@ -40,9 +38,17 @@ public class ContainerLabelingSchemeWrapper extends
     }
 
     @Override
-    protected DatabaseResult deleteChecks() throws ApplicationException {
-        // TODO Auto-generated method stub
-        return null;
+    protected void deleteChecks() throws BiobankCheckException,
+        ApplicationException {
     }
 
+    public void setName(String name) {
+        String oldName = name;
+        wrappedObject.setName(name);
+        propertyChangeSupport.firePropertyChange("name", oldName, name);
+    }
+
+    public String getName() {
+        return wrappedObject.getName();
+    }
 }

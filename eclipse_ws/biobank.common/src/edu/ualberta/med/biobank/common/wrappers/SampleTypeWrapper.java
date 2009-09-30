@@ -3,7 +3,7 @@ package edu.ualberta.med.biobank.common.wrappers;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.ualberta.med.biobank.common.DatabaseResult;
+import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.model.Site;
@@ -29,8 +29,8 @@ public class SampleTypeWrapper extends ModelWrapper<SampleType> {
     }
 
     @Override
-    protected DatabaseResult persistChecks() throws ApplicationException {
-        return DatabaseResult.OK;
+    protected void persistChecks() throws BiobankCheckException,
+        ApplicationException {
     }
 
     /**
@@ -56,8 +56,8 @@ public class SampleTypeWrapper extends ModelWrapper<SampleType> {
     }
 
     @Override
-    protected DatabaseResult deleteChecks() throws ApplicationException {
+    protected void deleteChecks() throws BiobankCheckException,
+        ApplicationException {
         // TODO Auto-generated method stub
-        return null;
     }
 }

@@ -40,7 +40,7 @@ import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.DatabaseResult;
+import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
@@ -318,14 +318,7 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
                     appendLog("----");
                     appendLog("Checking inventoryID "
                         + sampleWrapper.getInventoryId());
-                    DatabaseResult res = sampleWrapper.checkInventoryIdUnique();
-                    if (res != DatabaseResult.OK) {
-                        BioBankPlugin.openError("Check position and sample",
-                            res.getMessage());
-                        appendLog("ERROR: " + res.getMessage());
-                        resultShownValue.setValue(Boolean.FALSE);
-                        return;
-                    }
+                    sampleWrapper.checkInventoryIdUnique();
                     String positionString = positionText.getText();
                     initParentContainersFromPosition(positionString);
                     if (bin == null) {
@@ -333,18 +326,10 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
                         hidePositions();
                         return;
                     }
-
                     appendLog("Checking position " + positionString);
                     sampleWrapper.setSamplePositionFromString(positionString,
                         bin);
-                    res = sampleWrapper.checkPosition(bin);
-                    if (res != DatabaseResult.OK) {
-                        BioBankPlugin.openError("Check position and sample",
-                            res.getMessage());
-                        resultShownValue.setValue(Boolean.FALSE);
-                        appendLog("ERROR: " + res.getMessage());
-                        return;
-                    }
+                    sampleWrapper.checkPosition(bin);
                     sampleWrapper.getSamplePosition().setContainer(bin);
 
                     showPositions();
@@ -353,6 +338,11 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
                     cancelConfirmWidget.setFocus();
                 } catch (RemoteConnectFailureException exp) {
                     BioBankPlugin.openRemoteConnectErrorMessage();
+                } catch (BiobankCheckException bce) {
+                    BioBankPlugin.openError("Error while checking position",
+                        bce);
+                    appendLog("ERROR: " + bce.getMessage());
+                    resultShownValue.setValue(Boolean.FALSE);
                 } catch (Exception e) {
                     BioBankPlugin.openError("Error while checking position", e);
                 }
@@ -441,11 +431,7 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
         sampleWrapper.setLinkDate(new Date());
         sampleWrapper.setPatientVisit(getSelectedPatientVisit());
         sampleWrapper.setQuantityFromType();
-        DatabaseResult res = sampleWrapper.persist();
-        if (res != DatabaseResult.OK) {
-            BioBankPlugin.openError("Cabinet sample save", res.getMessage());
-            return;
-        }
+        sampleWrapper.persist();
         setSaved(true);
     }
 

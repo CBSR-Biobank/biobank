@@ -17,8 +17,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
-import edu.ualberta.med.biobank.common.DatabaseResult;
 import edu.ualberta.med.biobank.common.LabelingScheme;
 import edu.ualberta.med.biobank.common.utils.SiteUtils;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
@@ -216,12 +214,7 @@ public class ContainerEntryForm extends BiobankEntryForm {
             .getSelection()).getFirstElement();
         container.setContainerType(containerType);
         container.setSite(site);
-        DatabaseResult res = container.persist();
-        if (res != DatabaseResult.OK) {
-            BioBankPlugin.openAsyncError("Save Problem", res.getMessage());
-            setDirty(true);
-            return;
-        }
+        container.persist();
         containerAdapter.getParent().addChild(containerAdapter);
         containerAdapter.getParent().performExpand();
 

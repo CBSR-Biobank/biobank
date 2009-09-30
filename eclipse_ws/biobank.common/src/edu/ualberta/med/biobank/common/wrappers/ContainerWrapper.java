@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import edu.ualberta.med.biobank.common.DatabaseResult;
+import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.LabelingScheme;
 import edu.ualberta.med.biobank.common.RowColPos;
 import edu.ualberta.med.biobank.model.Capacity;
@@ -56,16 +56,14 @@ public class ContainerWrapper extends ModelWrapper<Container> {
     }
 
     @Override
-    protected DatabaseResult persistChecks() throws ApplicationException {
-        DatabaseResult res = checkLabelUniqueForType();
-        if (res != DatabaseResult.OK) {
-            return res;
-        }
-        return checkProductBarcodeUnique();
+    protected void persistChecks() throws BiobankCheckException,
+        ApplicationException {
+        checkLabelUniqueForType();
+        checkProductBarcodeUnique();
     }
 
-    private DatabaseResult checkProductBarcodeUnique()
-        throws ApplicationException {
+    private void checkProductBarcodeUnique() throws BiobankCheckException,
+        ApplicationException {
         List<Object> parameters = new ArrayList<Object>(Arrays
             .asList(new Object[] { getSite(), getProductBarcode() }));
         String notSameContainer = "";
@@ -78,14 +76,14 @@ public class ContainerWrapper extends ModelWrapper<Container> {
             + notSameContainer, parameters);
         List<Object> results = appService.query(criteria);
         if (results.size() > 0) {
-            return new DatabaseResult("A container with product barcode \""
-                + getProductBarcode() + "\" already exists.");
+            throw new BiobankCheckException(
+                "A container with product barcode \"" + getProductBarcode()
+                    + "\" already exists.");
         }
-        return DatabaseResult.OK;
     }
 
-    private DatabaseResult checkLabelUniqueForType()
-        throws ApplicationException {
+    private void checkLabelUniqueForType() throws BiobankCheckException,
+        ApplicationException {
         String notSameContainer = "";
         List<Object> parameters = new ArrayList<Object>(Arrays
             .asList(new Object[] { getSite(), getLabel(), getContainerType() }));
@@ -98,11 +96,10 @@ public class ContainerWrapper extends ModelWrapper<Container> {
             + "and containerType=?" + notSameContainer, parameters);
         List<Object> results = appService.query(criteria);
         if (results.size() > 0) {
-            return new DatabaseResult("A container with label \"" + getLabel()
-                + "\" and type \"" + getContainerType().getName()
+            throw new BiobankCheckException("A container with label \""
+                + getLabel() + "\" and type \"" + getContainerType().getName()
                 + "\" already exists.");
         }
-        return DatabaseResult.OK;
     }
 
     @Override
@@ -463,14 +460,14 @@ public class ContainerWrapper extends ModelWrapper<Container> {
     }
 
     @Override
-    protected DatabaseResult deleteChecks() throws ApplicationException {
+    protected void deleteChecks() throws BiobankCheckException,
+        ApplicationException {
         if (getSamplePositionCollection().size() > 0
             || getChildPositionCollection().size() > 0) {
-            return new DatabaseResult("Unable to delete container "
+            throw new BiobankCheckException("Unable to delete container "
                 + getLabel()
                 + ". All subcontainers/samples must be removed first.");
         }
-        return DatabaseResult.OK;
     }
 
     public void setNewParent(Container newParent, String newLabel)

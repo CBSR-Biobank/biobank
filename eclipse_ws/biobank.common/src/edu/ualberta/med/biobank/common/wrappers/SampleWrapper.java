@@ -5,7 +5,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
-import edu.ualberta.med.biobank.common.DatabaseResult;
+import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.LabelingScheme;
 import edu.ualberta.med.biobank.common.RowColPos;
 import edu.ualberta.med.biobank.model.Container;
@@ -54,29 +54,31 @@ public class SampleWrapper extends ModelWrapper<Sample> {
     }
 
     @Override
-    protected DatabaseResult persistChecks() throws ApplicationException {
-        return DatabaseResult.OK;
+    protected void persistChecks() throws BiobankCheckException,
+        ApplicationException {
     }
 
     public String getInventoryId() {
         return wrappedObject.getInventoryId();
     }
 
-    public DatabaseResult checkInventoryIdUnique() throws ApplicationException {
+    public void checkInventoryIdUnique() throws BiobankCheckException,
+        ApplicationException {
         HQLCriteria criteria = new HQLCriteria("from " + Sample.class.getName()
             + " where inventoryId  = ? and patientVisit.patient.study.site=?",
             Arrays.asList(new Object[] { getInventoryId(), getSite() }));
         List<Sample> samples = appService.query(criteria);
         if (samples.size() == 0) {
-            return DatabaseResult.OK;
+            return;
         }
         for (Sample sample : samples) {
+            // need to do that for the upper and lower letter (not taken into
+            // account in the sql query
             if (sample.getInventoryId().equals(getInventoryId())) {
-                return new DatabaseResult("A sample with inventoryId \""
+                throw new BiobankCheckException("A sample with inventoryId \""
                     + getInventoryId() + "\" already exists.");
             }
         }
-        return DatabaseResult.OK;
     }
 
     public Site getSite() {
@@ -127,8 +129,8 @@ public class SampleWrapper extends ModelWrapper<Sample> {
         return wrappedObject.getSamplePosition();
     }
 
-    public DatabaseResult checkPosition(Container parentContainer)
-        throws ApplicationException {
+    public void checkPosition(Container parentContainer)
+        throws BiobankCheckException, ApplicationException {
         HQLCriteria criteria = new HQLCriteria(
             "from "
                 + Sample.class.getName()
@@ -137,10 +139,10 @@ public class SampleWrapper extends ModelWrapper<Sample> {
                 getSamplePosition().getCol(), parentContainer }));
         List<Sample> samples = appService.query(criteria);
         if (samples.size() == 0) {
-            return DatabaseResult.OK;
+            return;
         }
         Sample sample = samples.get(0);
-        return new DatabaseResult("Position already in use in container "
+        throw new BiobankCheckException("Position already in use in container "
             + parentContainer.getLabel() + " by sample "
             + sample.getInventoryId());
     }
@@ -243,8 +245,8 @@ public class SampleWrapper extends ModelWrapper<Sample> {
     }
 
     @Override
-    protected DatabaseResult deleteChecks() throws ApplicationException {
+    protected void deleteChecks() throws BiobankCheckException,
+        ApplicationException {
         // TODO Auto-generated method stub
-        return null;
     }
 }

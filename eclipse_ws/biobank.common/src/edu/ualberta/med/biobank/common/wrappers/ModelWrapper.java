@@ -1,6 +1,6 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
-import edu.ualberta.med.biobank.common.DatabaseResult;
+import edu.ualberta.med.biobank.common.BiobankCheckException;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.SDKQuery;
@@ -98,42 +98,36 @@ public abstract class ModelWrapper<E> {
      * insert or update the object into the database
      */
     @SuppressWarnings("unchecked")
-    public DatabaseResult persist() throws ApplicationException {
-        DatabaseResult checkResult = persistChecks();
-
-        if (checkResult == DatabaseResult.OK) {
-            SDKQuery query;
-            if (isNew()) {
-                query = new InsertExampleQuery(wrappedObject);
-            } else {
-                query = new UpdateExampleQuery(wrappedObject);
-            }
-
-            SDKQueryResult result = appService.executeQuery(query);
-            wrappedObject = ((E) result.getObjectResult());
+    public void persist() throws BiobankCheckException, ApplicationException {
+        persistChecks();
+        SDKQuery query;
+        if (isNew()) {
+            query = new InsertExampleQuery(wrappedObject);
+        } else {
+            query = new UpdateExampleQuery(wrappedObject);
         }
-        return checkResult;
+
+        SDKQueryResult result = appService.executeQuery(query);
+        wrappedObject = ((E) result.getObjectResult());
     }
 
-    protected abstract DatabaseResult persistChecks()
-        throws ApplicationException;
+    protected abstract void persistChecks() throws BiobankCheckException,
+        ApplicationException;
 
     /**
      * delete the object into the database
+     * 
+     * @throws ApplicationException
      */
-    public DatabaseResult delete() throws ApplicationException {
-        DatabaseResult checkResult = DatabaseResult.OK;
+    public void delete() throws BiobankCheckException, ApplicationException {
         if (!isNew()) {
-            checkResult = deleteChecks();
-            if (checkResult == DatabaseResult.OK) {
-                appService.executeQuery(new DeleteExampleQuery(wrappedObject));
-            }
+            deleteChecks();
+            appService.executeQuery(new DeleteExampleQuery(wrappedObject));
         }
-        return checkResult;
     }
 
-    protected abstract DatabaseResult deleteChecks()
-        throws ApplicationException;
+    protected abstract void deleteChecks() throws BiobankCheckException,
+        ApplicationException;
 
     public void reset() throws Exception {
         if (isNew()) {

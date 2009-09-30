@@ -16,6 +16,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.forms.widgets.Section;
 
+import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Container;
@@ -138,7 +139,8 @@ public class SiteViewForm extends AddressViewFormCommon {
         int count = 0;
         for (ContainerType storage : stCollection) {
             adapters[count] = new ContainerTypeAdapter(siteAdapter
-                .getStudiesGroupNode(), storage);
+                .getStudiesGroupNode(), new ContainerTypeWrapper(appService,
+                storage));
             count++;
         }
         return adapters;

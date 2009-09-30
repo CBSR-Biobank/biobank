@@ -5,7 +5,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
-import edu.ualberta.med.biobank.common.DatabaseResult;
+import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Patient;
@@ -129,13 +129,13 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
     }
 
     @Override
-    protected DatabaseResult persistChecks() throws ApplicationException {
-        if (checkVisitDateDrawnUnique()) {
-            return DatabaseResult.OK;
+    protected void persistChecks() throws BiobankCheckException,
+        ApplicationException {
+        if (!checkVisitDateDrawnUnique()) {
+            throw new BiobankCheckException("A patient visit with date drawn "
+                + getDateDrawn() + " already exist in patient "
+                + getPatientWrapper().getNumber() + ".");
         }
-        return new DatabaseResult("A patient visit with date drawn "
-            + getDateDrawn() + " already exist in patient "
-            + getPatientWrapper().getNumber() + ".");
     }
 
     private boolean checkVisitDateDrawnUnique() throws ApplicationException {
@@ -178,9 +178,9 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
     }
 
     @Override
-    protected DatabaseResult deleteChecks() throws ApplicationException {
+    protected void deleteChecks() throws BiobankCheckException,
+        ApplicationException {
         // TODO Auto-generated method stub
-        return null;
     }
 
 }

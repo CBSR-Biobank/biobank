@@ -1,12 +1,9 @@
 package edu.ualberta.med.biobank.forms;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.commons.collections.map.ListOrderedMap;
 import org.apache.log4j.Logger;
@@ -25,23 +22,20 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.utils.ModelUtils;
-import edu.ualberta.med.biobank.forms.input.FormInput;
+import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.helpers.GetHelper;
 import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
-import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.ContainerTypeComparator;
 import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.model.SampleTypeComparator;
 import edu.ualberta.med.biobank.model.Site;
-import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.ContainerTypeAdapter;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.validators.DoubleNumber;
@@ -51,10 +45,6 @@ import edu.ualberta.med.biobank.widgets.MultiSelectWidget;
 import edu.ualberta.med.biobank.widgets.listener.BiobankEntryFormWidgetListener;
 import edu.ualberta.med.biobank.widgets.listener.MultiSelectEvent;
 import gov.nih.nci.system.applicationservice.ApplicationException;
-import gov.nih.nci.system.query.SDKQuery;
-import gov.nih.nci.system.query.SDKQueryResult;
-import gov.nih.nci.system.query.example.InsertExampleQuery;
-import gov.nih.nci.system.query.example.UpdateExampleQuery;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class ContainerTypeEntryForm extends BiobankEntryForm {
@@ -74,7 +64,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
 
     private ContainerTypeAdapter containerTypeAdapter;
 
-    private ContainerType containerType;
+    private ContainerTypeWrapper containerType;
 
     private Capacity capacity;
 
@@ -116,7 +106,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
 
         containerTypeAdapter = (ContainerTypeAdapter) adapter;
         containerType = containerTypeAdapter.getContainerType();
-        retrieveSite();
+        retrieveSiteAndType();
         allContainerTypes = new ArrayList<ContainerType>(site
             .getContainerTypeCollection());
         Collections.sort(allContainerTypes, new ContainerTypeComparator());
@@ -137,7 +127,8 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         setPartName(tabName);
     }
 
-    private void retrieveSite() {
+    private void retrieveSiteAndType() {
+        // FIXME once siteAdapter contains a wrapper, call reload on it
         // to get last inserted types
         site = containerTypeAdapter.getParentFromClass(SiteAdapter.class)
             .getSite();
@@ -145,7 +136,13 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
             site = ModelUtils.getObjectWithId(appService, Site.class, site
                 .getId());
         } catch (Exception e) {
-            e.printStackTrace();
+            SessionManager.getLogger().error("Can't retrieve site", e);
+        }
+        try {
+            containerType.reload();
+        } catch (Exception e) {
+            SessionManager.getLogger().error(
+                "Error while retrieving type " + containerType.getName(), e);
         }
     }
 
@@ -354,48 +351,6 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
 
     }
 
-    protected void initConfirmAddButton(Composite parent,
-        boolean doSaveInternalAction, boolean doSaveEditorAction) {
-        Button confirmAddButton = toolkit.createButton(parent,
-            "Confirm and Add Child", SWT.PUSH);
-        if (doSaveInternalAction) {
-            confirmAddButton.addSelectionListener(new SelectionAdapter() {
-                @Override
-                public void widgetSelected(SelectionEvent e) {
-                    doSaveInternal();
-                }
-            });
-        }
-        if (doSaveEditorAction) {
-            confirmAddButton.addSelectionListener(new SelectionAdapter() {
-                @Override
-                public void widgetSelected(SelectionEvent e) {
-
-                    Collection<ContainerType> children = containerType
-                        .getChildContainerTypeCollection();
-                    if (children == null)
-                        children = new ArrayList<ContainerType>();
-                    ContainerType childContainerType = new ContainerType();
-                    children.add(childContainerType);
-                    containerType.setChildContainerTypeCollection(children);
-                    ContainerTypeAdapter childAdapter = new ContainerTypeAdapter(
-                        containerTypeAdapter.getParent(), childContainerType);
-
-                    PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-                        .getActivePage().saveEditor(
-                            ContainerTypeEntryForm.this, false);
-                    PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-                        .getActivePage().closeEditor(
-                            ContainerTypeEntryForm.this, false);
-
-                    AdapterBase.openForm(new FormInput(childAdapter),
-                        ContainerTypeEntryForm.ID);
-                    containerTypeAdapter.getParent().performExpand();
-                }
-            });
-        }
-    }
-
     @Override
     protected String getOkMessage() {
         if (containerType.getId() == null) {
@@ -409,34 +364,24 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
      */
     @Override
     protected void saveForm() throws Exception {
-        SDKQuery query;
-        SDKQueryResult result;
-
-        if ((containerType.getId() == null) && !checkContainerTypeNameUnique()) {
-            setDirty(true);
-            return;
+        List<Integer> selectedIds = null;
+        if (hasSamples.getSelection()) {
+            selectedIds = samplesMultiSelect.getSelected();
         }
-        boolean pursue = saveSampleTypes();
-        if (!pursue) {
-            setDirty(true);
-            return;
+        containerType.setSampleTypes(selectedIds, allSampleTypes);
+        selectedIds = null;
+        if (hasContainers.getSelection()) {
+            selectedIds = childContainerTypesMultiSelect.getSelected();
         }
-        pursue = saveChildContainerTypes();
-        if (!pursue) {
-            setDirty(true);
-            return;
-        }
-
-        if (containerType.getId() != null) {
+        containerType.setChildContainerTypes(selectedIds, allContainerTypes);
+        if (!containerType.isNew()) {
             Integer localRows = capacity.getRowCapacity();
             Integer localCols = capacity.getColCapacity();
             Integer dbRows = containerType.getCapacity().getRowCapacity();
             Integer dbCols = containerType.getCapacity().getColCapacity();
 
             // if new type, set is ok, if unmodified, set is ok. if doesn't
-            // exist in
-            // db, set is ok
-
+            // exist in db, set is ok
             if (!(localRows.equals(dbRows) && localCols.equals(dbCols))
                 && !HQLSafeToChange())
                 BioBankPlugin
@@ -461,83 +406,12 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
 
         // associate the storage type to it's site
         containerType.setSite(site);
-
         ContainerLabelingScheme scheme = (ContainerLabelingScheme) ((StructuredSelection) labelingSchemeComboViewer
             .getSelection()).getFirstElement();
-
-        Assert.isNotNull(scheme);
         containerType.setChildLabelingScheme(scheme);
 
-        if ((containerType.getId() == null) || (containerType.getId() == 0)) {
-            query = new InsertExampleQuery(containerType);
-        } else {
-            query = new UpdateExampleQuery(containerType);
-        }
-
-        result = appService.executeQuery(query);
-        containerType = (ContainerType) result.getObjectResult();
-
-        containerTypeAdapter.setContainerType(containerType);
+        containerType.persist();
         containerTypeAdapter.getParent().performExpand();
-    }
-
-    private boolean saveSampleTypes() {
-        Set<SampleType> selSampleTypes = new HashSet<SampleType>();
-        if (hasSamples.getSelection()) {
-            List<Integer> selSampleTypeIds = samplesMultiSelect.getSelected();
-            for (SampleType sampleType : allSampleTypes) {
-                int id = sampleType.getId();
-                if (selSampleTypeIds.indexOf(id) >= 0) {
-                    selSampleTypes.add(sampleType);
-                }
-            }
-            if (selSampleTypes.size() != selSampleTypeIds.size()) {
-                BioBankPlugin.openAsyncError("Samples",
-                    "Problem with sample type selections");
-                return false;
-            }
-        }
-        containerType.setSampleTypeCollection(selSampleTypes);
-        return true;
-    }
-
-    private boolean saveChildContainerTypes() throws Exception {
-        Collection<ContainerType> selContainerTypes = new HashSet<ContainerType>();
-        List<Integer> selContainerTypeIds = new ArrayList<Integer>();
-        if (hasContainers.getSelection()) {
-            selContainerTypeIds = childContainerTypesMultiSelect.getSelected();
-            if (allContainerTypes != null) {
-                for (ContainerType containerType : allContainerTypes) {
-                    int id = containerType.getId();
-                    if (selContainerTypeIds.indexOf(id) >= 0) {
-                        selContainerTypes.add(containerType);
-                    }
-                }
-            }
-        }
-
-        Collection<ContainerType> children = containerType
-            .getChildContainerTypeCollection();
-        List<Integer> missing = new ArrayList<Integer>();
-        if (children != null) {
-            for (ContainerType child : children) {
-                int id = child.getId();
-                if (selContainerTypeIds.indexOf(id) < 0) {
-                    missing.add(id);
-                }
-            }
-        }
-
-        if (missing.size() == 0 || HQLSafeToRemove(missing)) {
-            containerType.setChildContainerTypeCollection(selContainerTypes);
-        } else {
-            BioBankPlugin
-                .openError(
-                    "ContainerType Removal Failed",
-                    "Unable to remove child type. This parent/child relationship exists in storage. Remove all instances before attempting to delete a child type.");
-            return false;
-        }
-        return true;
     }
 
     private boolean HQLSafeToChange() throws ApplicationException {
@@ -551,49 +425,9 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         if (results.size() == 0)
             return true;
         else {
-            containerType = (ContainerType) results.get(0);
+            containerType.setWrappedObject((ContainerType) results.get(0));
             return false;
         }
-    }
-
-    private boolean HQLSafeToRemove(List<Integer> missing)
-        throws ApplicationException {
-        String queryString = "from "
-            + ContainerPosition.class.getName()
-            + " as cp inner join cp.parentContainer as cparent"
-            + " where cparent.containerType.id=? and cp.container.containerType.id in (select id from "
-            + ContainerType.class.getName() + " as ct where ct.id=?";
-        List<Object> params = new ArrayList<Object>();
-        params.add(containerType.getId());
-        params.add(missing.get(0));
-        for (int i = 1; i < missing.size(); i++) {
-            queryString += "OR ct.id=?";
-            params.add(missing.get(i));
-        }
-        queryString += ")";
-
-        HQLCriteria c = new HQLCriteria(queryString);
-        c.setParameters(params);
-        List<Object> results = appService.query(c);
-        if (results.size() == 0)
-            return true;
-        else
-            return false;
-    }
-
-    private boolean checkContainerTypeNameUnique() throws ApplicationException {
-        HQLCriteria c = new HQLCriteria("from " + ContainerType.class.getName()
-            + " where site = ? and name = ?", Arrays.asList(new Object[] {
-            site, containerType.getName() }));
-
-        List<Object> results = appService.query(c);
-        if (results.size() == 0)
-            return true;
-
-        BioBankPlugin.openAsyncError("Site Name Problem",
-            "A storage type with name \"" + containerType.getName()
-                + "\" already exists.");
-        return false;
     }
 
     @Override

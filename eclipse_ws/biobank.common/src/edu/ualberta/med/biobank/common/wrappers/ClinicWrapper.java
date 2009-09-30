@@ -3,7 +3,7 @@ package edu.ualberta.med.biobank.common.wrappers;
 import java.util.Arrays;
 import java.util.List;
 
-import edu.ualberta.med.biobank.common.DatabaseResult;
+import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Site;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -53,12 +53,12 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
     }
 
     @Override
-    protected DatabaseResult persistChecks() throws ApplicationException {
-        if (checkClinicNameUnique()) {
-            return DatabaseResult.OK;
+    protected void persistChecks() throws BiobankCheckException,
+        ApplicationException {
+        if (!checkClinicNameUnique()) {
+            throw new BiobankCheckException("A clinic with name \"" + getName()
+                + "\" already exists.");
         }
-        return new DatabaseResult("A clinic with name \"" + getName()
-            + "\" already exists.");
     }
 
     @Override
@@ -72,9 +72,9 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
     }
 
     @Override
-    protected DatabaseResult deleteChecks() throws ApplicationException {
+    protected void deleteChecks() throws BiobankCheckException,
+        ApplicationException {
         // TODO Auto-generated method stub
-        return null;
     }
 
 }
