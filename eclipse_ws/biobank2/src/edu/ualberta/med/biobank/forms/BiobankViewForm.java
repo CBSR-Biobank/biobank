@@ -2,7 +2,7 @@ package edu.ualberta.med.biobank.forms;
 
 import org.apache.commons.collections.MapIterator;
 import org.apache.commons.collections.map.ListOrderedMap;
-import org.eclipse.core.databinding.beans.PojoObservables;
+import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -56,7 +56,7 @@ public abstract class BiobankViewForm extends BiobankFormBase {
         while (it.hasNext()) {
             String key = (String) it.next();
             FieldInfo fi = (FieldInfo) it.getValue();
-            IObservableValue ov = PojoObservables.observeValue(bean, key);
+            IObservableValue ov = BeansObservables.observeValue(bean, key);
             Object value = ov.getValue();
             if (value != null) {
                 Control control = controls.get(key);

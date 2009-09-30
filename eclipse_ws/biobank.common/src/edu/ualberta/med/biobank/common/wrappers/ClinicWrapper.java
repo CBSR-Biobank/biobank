@@ -14,7 +14,8 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
-public class ClinicWrapper extends ModelWrapper<Clinic> {
+public class ClinicWrapper extends ModelWrapper<Clinic> implements
+    Comparable<ClinicWrapper> {
 
     private AddressWrapper addressWrapper;
 
@@ -69,27 +70,20 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
         Site oldSite = wrappedObject.getSite();
         Site newSite = siteWrapper.getWrappedObject();
         wrappedObject.setSite(newSite);
-        propertyChangeSupport.firePropertyChange("patient", oldSite, newSite);
-    }
-
-    public void setStudy(Site site) {
-        wrappedObject.setSite(site);
-    }
-
-    public boolean checkClinicNameUnique() throws ApplicationException {
-        HQLCriteria c = new HQLCriteria("from " + Clinic.class.getName()
-            + " where site = ? and name = ?", Arrays.asList(new Object[] {
-            getSite(), getName() }));
-
-        List<Clinic> results = appService.query(c);
-        return (results.size() == 0);
+        propertyChangeSupport.firePropertyChange("site", oldSite, newSite);
     }
 
     @Override
-    protected void firePropertyChanges(Clinic oldValue, Clinic wrappedObject2) {
-        propertyChangeSupport.firePropertyChange("name", oldValue.getName(),
-            wrappedObject.getName());
+    protected void firePropertyChanges(Clinic oldWrappedObject,
+        Clinic newWrappedObject) {
+        String[] members = new String[] { "name", "activityStatus", "comment",
+            "site" };
 
+        try {
+            firePropertyChanges(members, oldWrappedObject, newWrappedObject);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -99,6 +93,15 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
         }
         return new DatabaseResult("A clinic with name \"" + getName()
             + "\" already exists.");
+    }
+
+    public boolean checkClinicNameUnique() throws ApplicationException {
+        HQLCriteria c = new HQLCriteria("from " + Clinic.class.getName()
+            + " where site = ? and name = ?", Arrays.asList(new Object[] {
+            getSite(), getName() }));
+
+        List<Clinic> results = appService.query(c);
+        return (results.size() == 0);
     }
 
     @Override
@@ -133,6 +136,13 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
     protected DatabaseResult deleteChecks() throws ApplicationException {
         // TODO Auto-generated method stub
         return null;
+    }
+
+    public int compareTo(ClinicWrapper wrapper) {
+        String myName = wrappedObject.getName();
+        String wrapperName = wrapper.wrappedObject.getName();
+        return ((myName.compareTo(wrapperName) > 0) ? 1 : (myName
+            .equals(wrapperName) ? 0 : -1));
     }
 
 }

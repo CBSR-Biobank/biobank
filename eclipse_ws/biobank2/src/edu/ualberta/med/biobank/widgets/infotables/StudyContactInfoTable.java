@@ -2,7 +2,6 @@ package edu.ualberta.med.biobank.widgets.infotables;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
@@ -14,7 +13,7 @@ import org.springframework.remoting.RemoteConnectFailureException;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
-import edu.ualberta.med.biobank.model.Contact;
+import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.StudyContactAndPatientInfo;
@@ -32,27 +31,25 @@ public class StudyContactInfoTable extends InfoTableWidget<ContactWrapper> {
 
     private static final int[] BOUNDS = new int[] { 100, 80, 100, 150, 150 };
 
-    private Study study;
+    private StudyWrapper studyWrapper;
 
     private WritableApplicationService appService;
 
     public StudyContactInfoTable(Composite parent,
-        WritableApplicationService appService, Study study) {
+        WritableApplicationService appService, StudyWrapper studyWrapper) {
         super(parent, null, HEADINGS, BOUNDS);
         this.appService = appService;
-        this.study = study;
-        Collection<Contact> collection = study.getContactCollection();
+        this.studyWrapper = studyWrapper;
+        Collection<ContactWrapper> collection = studyWrapper
+            .getContactWrapperCollection();
         if (collection == null)
             return;
 
-        Collection<ContactWrapper> wrapperCollection = new HashSet<ContactWrapper>();
-        for (Contact contact : collection) {
+        for (int i = 0, n = collection.size(); i < n; ++i) {
             model.add(new BiobankCollectionModel());
-            wrapperCollection.add(new ContactWrapper(SessionManager
-                .getAppService(), contact));
         }
         getTableViewer().refresh();
-        setCollection(wrapperCollection);
+        setCollection(collection);
     }
 
     @Override
@@ -100,7 +97,7 @@ public class StudyContactInfoTable extends InfoTableWidget<ContactWrapper> {
                                 + " where study=? and clinic=?"
                                 + " group by patients", Arrays
                                 .asList(new Object[] {
-                                    study,
+                                    studyWrapper,
                                     contact.getClinicWrapper()
                                         .getWrappedObject() }));
 
@@ -117,7 +114,7 @@ public class StudyContactInfoTable extends InfoTableWidget<ContactWrapper> {
                                 + " inner join visits.clinic as clinic"
                                 + " where study=? and clinic=?", Arrays
                                 .asList(new Object[] {
-                                    study,
+                                    studyWrapper,
                                     contact.getClinicWrapper()
                                         .getWrappedObject() }));
 

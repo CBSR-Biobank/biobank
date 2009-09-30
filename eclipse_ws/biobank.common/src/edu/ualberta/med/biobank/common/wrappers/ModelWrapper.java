@@ -162,6 +162,10 @@ public abstract class ModelWrapper<E> {
     public void loadAttributes() throws Exception {
         Class<E> classType = getWrappedClass();
 
+        if (classType == null) {
+            throw new Exception("wrapped class is null");
+        }
+
         Method[] methods = classType.getMethods();
         for (Method method : methods) {
             if (method.getName().startsWith("get")

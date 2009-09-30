@@ -1,6 +1,6 @@
 package edu.ualberta.med.biobank.forms;
 
-import org.eclipse.core.databinding.beans.PojoObservables;
+import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -74,15 +74,15 @@ public class SiteEntryForm extends AddressEntryFormCommon {
         toolkit.paintBordersFor(client);
 
         createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Name", null,
-            PojoObservables.observeValue(siteWrapper, "name"),
+            BeansObservables.observeValue(siteWrapper, "name"),
             NonEmptyString.class, MSG_NO_SITE_NAME);
 
         createBoundWidgetWithLabel(client, Combo.class, SWT.NONE,
-            "Activity Status", FormConstants.ACTIVITY_STATUS, PojoObservables
+            "Activity Status", FormConstants.ACTIVITY_STATUS, BeansObservables
                 .observeValue(siteWrapper, "activityStatus"), null, null);
 
         Text comment = (Text) createBoundWidgetWithLabel(client, Text.class,
-            SWT.MULTI, "Comments", null, PojoObservables.observeValue(
+            SWT.MULTI, "Comments", null, BeansObservables.observeValue(
                 siteWrapper, "comment"), null, null);
         GridData gd = new GridData(GridData.FILL_HORIZONTAL);
         gd.heightHint = 40;

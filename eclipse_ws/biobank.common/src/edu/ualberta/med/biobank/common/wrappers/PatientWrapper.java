@@ -39,6 +39,10 @@ public class PatientWrapper extends ModelWrapper<Patient> {
         propertyChangeSupport.firePropertyChange("study", oldStudy, study);
     }
 
+    public StudyWrapper getStudyWrapper() {
+        return new StudyWrapper(appService, wrappedObject.getStudy());
+    }
+
     public boolean checkPatientNumberUnique() throws ApplicationException {
         if (isNew()) {
             HQLCriteria c = new HQLCriteria("from " + Patient.class.getName()

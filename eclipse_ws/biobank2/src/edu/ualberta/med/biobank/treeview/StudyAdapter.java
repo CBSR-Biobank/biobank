@@ -14,6 +14,7 @@ import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.forms.StudyEntryForm;
 import edu.ualberta.med.biobank.forms.StudyViewForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
@@ -31,19 +32,19 @@ public class StudyAdapter extends AdapterBase {
      */
     private boolean enableActions = true;
 
-    public StudyAdapter(AdapterBase parent, Study study) {
-        this(parent, study, true);
-    }
-
-    public StudyAdapter(AdapterBase parent, Study study, boolean enabledActions) {
-        super(parent, study);
-        this.setStudy(study);
+    public StudyAdapter(AdapterBase parent, StudyWrapper studyWrapper,
+        boolean enabledActions) {
+        super(parent, studyWrapper);
         this.enableActions = enabledActions;
 
-        if (study.getId() != null) {
-            setId(study.getId());
-            setName(study.getName());
+        if (studyWrapper.getId() != null) {
+            setId(studyWrapper.getId());
+            setName(studyWrapper.getName());
         }
+    }
+
+    public StudyAdapter(AdapterBase parent, StudyWrapper studyWrapper) {
+        this(parent, studyWrapper, true);
     }
 
     public void setStudy(Study study) {

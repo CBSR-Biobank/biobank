@@ -18,6 +18,7 @@ import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.DatabaseResult;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.PatientAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
@@ -84,18 +85,19 @@ public class PatientEntryForm extends BiobankEntryForm {
         siteWrapper = SessionManager.getInstance().getCurrentSiteWrapper();
         labelSite.setText(siteWrapper.getName());
 
-        Collection<Study> studies = siteWrapper.getStudyCollection();
+        Collection<StudyWrapper> studies = siteWrapper
+            .getStudyWrapperCollection();
         Study selectedStudy = null;
         if (patientAdapter.getWrapper().isNew()) {
             if (studies.size() == 1) {
-                selectedStudy = studies.iterator().next();
+                selectedStudy = studies.iterator().next().getWrappedObject();
             }
         } else {
             Study currentStudy = patientAdapter.getWrapper().getStudy();
             if (currentStudy != null) {
-                for (Study study : studies) {
-                    if (currentStudy.getId().equals(study.getId())) {
-                        currentStudy = study;
+                for (StudyWrapper studyWrapper : studies) {
+                    if (currentStudy.getId().equals(studyWrapper.getId())) {
+                        currentStudy = studyWrapper.getWrappedObject();
                         break;
                     }
                 }

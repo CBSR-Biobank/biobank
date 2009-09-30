@@ -1,7 +1,5 @@
 package edu.ualberta.med.biobank.forms;
 
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
@@ -16,17 +14,15 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.forms.widgets.Section;
 
-import edu.ualberta.med.biobank.common.wrappers.AddressWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Clinic;
-import edu.ualberta.med.biobank.model.Container;
-import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.ClinicAdapter;
-import edu.ualberta.med.biobank.treeview.ContainerTypeAdapter;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
 import edu.ualberta.med.biobank.widgets.infotables.ClinicInfoTable;
@@ -40,7 +36,7 @@ public class SiteViewForm extends AddressViewFormCommon {
 
     private SiteAdapter siteAdapter;
 
-    private Site site;
+    private SiteWrapper siteWrapper;
 
     private StudyInfoTable studiesTable;
     private ClinicInfoTable clinicsTable;
@@ -59,14 +55,12 @@ public class SiteViewForm extends AddressViewFormCommon {
 
         siteAdapter = (SiteAdapter) adapter;
         retrieveSite();
-        setPartName("Repository Site " + site.getName());
+        setPartName("Repository Site " + siteWrapper.getName());
     }
 
     @Override
     protected void createFormContent() {
-        form.setText("Repository Site: " + site.getName());
-        addressWrapper = new AddressWrapper(siteAdapter.getAppService(), site
-            .getAddress());
+        form.setText("Repository Site: " + siteWrapper.getName());
         addRefreshToolbarAction();
 
         form.getBody().setLayout(new GridLayout(1, false));
@@ -76,7 +70,7 @@ public class SiteViewForm extends AddressViewFormCommon {
         createAddressSection();
         createStudySection();
         clinicsTable = FormUtils.createClinicSection(toolkit, form.getBody(),
-            site.getClinicCollection());
+            siteWrapper.getClinicWrapperCollection());
         createContainerTypesSection();
         createContainerSection();
         createButtons();
@@ -96,36 +90,26 @@ public class SiteViewForm extends AddressViewFormCommon {
     }
 
     private void setSiteSectionValues() {
-        FormUtils.setTextValue(activityStatusLabel, site.getActivityStatus());
-        FormUtils.setTextValue(commentLabel, site.getComment());
+        FormUtils.setTextValue(activityStatusLabel, siteWrapper
+            .getActivityStatus());
+        FormUtils.setTextValue(commentLabel, siteWrapper.getComment());
     }
 
     private void createStudySection() {
         Composite client = createSectionWithClient("Studies");
 
-        studiesTable = new StudyInfoTable(client, site.getStudyCollection());
+        studiesTable = new StudyInfoTable(client, siteWrapper
+            .getStudyWrapperCollection());
         studiesTable.adaptToToolkit(toolkit, true);
         studiesTable.addDoubleClickListener(FormUtils
             .getBiobankCollectionDoubleClickListener());
     }
 
-    private StudyAdapter[] getStudiesAdapters() {
-        Collection<Study> studies = site.getStudyCollection();
-        StudyAdapter[] studyAdapters = new StudyAdapter[studies.size()];
-        int count = 0;
-        for (Study study : studies) {
-            studyAdapters[count] = new StudyAdapter(siteAdapter
-                .getStudiesGroupNode(), study);
-            count++;
-        }
-        return studyAdapters;
-    }
-
     private void createContainerTypesSection() {
         Composite client = createSectionWithClient("Container Types");
 
-        containerTypesTable = new ContainerTypeInfoTable(client, site
-            .getContainerTypeCollection());
+        containerTypesTable = new ContainerTypeInfoTable(client, siteWrapper
+            .getContainerTypeWrapperCollection());
         containerTypesTable.adaptToToolkit(toolkit, true);
 
         containerTypesTable.addDoubleClickListener(FormUtils
@@ -133,46 +117,17 @@ public class SiteViewForm extends AddressViewFormCommon {
 
     }
 
-    private ContainerTypeAdapter[] getContainerTypesAdapters() {
-        Collection<ContainerType> stCollection = site
-            .getContainerTypeCollection();
-        ContainerTypeAdapter[] adapters = new ContainerTypeAdapter[stCollection
-            .size()];
-        int count = 0;
-        for (ContainerType storage : stCollection) {
-            adapters[count] = new ContainerTypeAdapter(siteAdapter
-                .getStudiesGroupNode(), storage);
-            count++;
-        }
-        return adapters;
-    }
-
     private void createContainerSection() {
         Section section = createSection("Containers");
 
-        sContainersTable = new ContainerInfoTable(section, site
-            .getContainerCollection());
+        sContainersTable = new ContainerInfoTable(section, siteWrapper
+            .getContainerWrapperCollection());
         section.setClient(sContainersTable);
         sContainersTable.adaptToToolkit(toolkit, true);
         toolkit.paintBordersFor(sContainersTable);
 
         sContainersTable.addDoubleClickListener(FormUtils
             .getBiobankCollectionDoubleClickListener());
-    }
-
-    private Container[] getContainers() {
-        // hack required here because site.getStudyCollection().toArray(new
-        // Study[0])
-        // returns Object[].
-        int count = 0;
-        Collection<Container> containers = site.getContainerCollection();
-        Container[] arr = new Container[containers.size()];
-        Iterator<Container> it = containers.iterator();
-        while (it.hasNext()) {
-            arr[count] = it.next();
-            ++count;
-        }
-        return arr;
     }
 
     private void createButtons() {
@@ -188,10 +143,10 @@ public class SiteViewForm extends AddressViewFormCommon {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 try {
-                    Study study = new Study();
                     AdapterBase studiesNode = siteAdapter.getStudiesGroupNode();
                     StudyAdapter studyAdapter = new StudyAdapter(studiesNode,
-                        study);
+                        new StudyWrapper(siteAdapter.getAppService(),
+                            new Study()));
                     getSite().getPage().openEditor(new FormInput(studyAdapter),
                         StudyEntryForm.ID, true);
                 } catch (PartInitException exp) {
@@ -229,17 +184,18 @@ public class SiteViewForm extends AddressViewFormCommon {
     @Override
     protected void reload() {
         retrieveSite();
-        setPartName("Repository Site " + site.getName());
-        form.setText("Repository Site: " + site.getName());
+        setPartName("Repository Site " + siteWrapper.getName());
+        form.setText("Repository Site: " + siteWrapper.getName());
         setSiteSectionValues();
         setAdressValues();
-        studiesTable.getTableViewer().setInput(getStudiesAdapters());
+        studiesTable.getTableViewer().setInput(
+            siteWrapper.getStudyWrapperCollection());
         clinicsTable.getTableViewer().setInput(
-            FormUtils.getClinicsAdapters(siteAdapter.getClinicGroupNode(), site
-                .getClinicCollection()));
+            siteWrapper.getClinicWrapperCollection());
         containerTypesTable.getTableViewer().setInput(
-            getContainerTypesAdapters());
-        sContainersTable.getTableViewer().setInput(getContainers());
+            siteWrapper.getContainerTypeWrapperCollection());
+        sContainersTable.getTableViewer().setInput(
+            siteWrapper.getContainerWrapperCollection());
     }
 
     private void retrieveSite() {
@@ -249,10 +205,10 @@ public class SiteViewForm extends AddressViewFormCommon {
         try {
             result = siteAdapter.getAppService().search(Site.class, searchSite);
             Assert.isTrue(result.size() == 1);
-            site = result.get(0);
-            siteAdapter.setSite(site);
-            addressWrapper = new AddressWrapper(siteAdapter.getAppService(),
-                site.getAddress());
+            siteWrapper = new SiteWrapper(siteAdapter.getAppService(), result
+                .get(0));
+            addressWrapper = siteWrapper.getAddressWrapper();
+            siteAdapter.setSite(siteWrapper.getWrappedObject());
         } catch (ApplicationException e) {
             e.printStackTrace();
         }

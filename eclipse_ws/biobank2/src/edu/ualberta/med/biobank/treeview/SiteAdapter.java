@@ -47,12 +47,12 @@ public class SiteAdapter extends AdapterBase {
         }
     }
 
-    public SiteAdapter(AdapterBase parent, SiteWrapper siteWrapper) {
-        this(parent, siteWrapper, true);
-    }
-
     public SiteWrapper getWrapper() {
         return (SiteWrapper) object;
+    }
+
+    public SiteAdapter(AdapterBase parent, SiteWrapper siteWrapper) {
+        this(parent, siteWrapper, true);
     }
 
     public void setSite(Site site) {

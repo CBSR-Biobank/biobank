@@ -154,7 +154,7 @@ public class PatientAdministrationView extends ViewPart implements
             .getInstance().getCurrentSiteWrapper(), false);
         getRootNode().addChild(siteAdapter);
         StudyAdapter studyAdapter = new StudyAdapter(siteAdapter,
-            patientWrapper.getStudy(), false);
+            patientWrapper.getStudyWrapper(), false);
         siteAdapter.addChild(studyAdapter);
         PatientAdapter patientAdapter = new PatientAdapter(studyAdapter,
             patientWrapper);

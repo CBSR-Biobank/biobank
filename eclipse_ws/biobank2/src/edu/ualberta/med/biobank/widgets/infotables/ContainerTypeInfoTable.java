@@ -4,9 +4,10 @@ import java.util.Collection;
 
 import org.eclipse.swt.widgets.Composite;
 
-import edu.ualberta.med.biobank.model.ContainerType;
+import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 
-public class ContainerTypeInfoTable extends InfoTableWidget<ContainerType> {
+public class ContainerTypeInfoTable extends
+    InfoTableWidget<ContainerTypeWrapper> {
 
     private static final String[] HEADINGS = new String[] { "Name", "Status",
         "Default Temperature" };
@@ -15,7 +16,7 @@ public class ContainerTypeInfoTable extends InfoTableWidget<ContainerType> {
         -1 };
 
     public ContainerTypeInfoTable(Composite parent,
-        Collection<ContainerType> collection) {
+        Collection<ContainerTypeWrapper> collection) {
         super(parent, collection, HEADINGS, BOUNDS);
     }
 
