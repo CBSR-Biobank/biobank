@@ -220,7 +220,7 @@ public class BioBankPlugin extends AbstractUIPlugin {
 
     public int getPlateNumber(String barcode) {
         for (int i = 0; i < PreferenceConstants.SCANNER_PLATE_BARCODES.length; i++) {
-            if (!ScannerConfigPlugin.getDefault().palletEnabled(i))
+            if (!ScannerConfigPlugin.getDefault().getPalletEnabled(i))
                 continue;
 
             String pref = getPreferenceStore().getString(

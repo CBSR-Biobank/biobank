@@ -16,8 +16,6 @@ import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.model.Site;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
-import gov.nih.nci.system.query.SDKQuery;
-import gov.nih.nci.system.query.example.UpdateExampleQuery;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class ContainerWrapper extends ModelWrapper<Container> {
@@ -74,12 +72,12 @@ public class ContainerWrapper extends ModelWrapper<Container> {
     public Container getContainer(String label, ContainerType containerType)
         throws ApplicationException {
         HQLCriteria criteria = new HQLCriteria("from "
-                        + Container.class.getName()
+            + Container.class.getName()
             + " where site = ? and label = ? and containerType = ?", Arrays
             .asList(new Object[] { getSite(), label, containerType }));
         List<Container> containers = appService.query(criteria);
-                if (containers.size() == 1) {
-                    return containers.get(0);
+        if (containers.size() == 1) {
+            return containers.get(0);
         }
         return null;
     }
@@ -108,7 +106,7 @@ public class ContainerWrapper extends ModelWrapper<Container> {
         ContainerType type) throws ApplicationException {
         HQLCriteria criteria = new HQLCriteria(
             "from "
-            + Container.class.getName()
+                + Container.class.getName()
                 + " where site = ? and label = ? and containerType in (select parent from "
                 + ContainerType.class.getName()
                 + " as parent where parent.id in (select ct.id" + " from "
@@ -130,7 +128,7 @@ public class ContainerWrapper extends ModelWrapper<Container> {
         throws ApplicationException {
         return getContainersHoldingContainerType(appService, label, getSite(),
             getContainerType());
-        }
+    }
 
     /**
      * get the containers with label label and from same site that this
@@ -324,7 +322,7 @@ public class ContainerWrapper extends ModelWrapper<Container> {
     }
 
     private Double getTemperature() {
-            return getWrappedObject().getTemperature();
+        return getWrappedObject().getTemperature();
 
     }
 
