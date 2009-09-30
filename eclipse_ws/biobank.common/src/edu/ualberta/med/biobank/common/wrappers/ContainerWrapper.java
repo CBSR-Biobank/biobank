@@ -22,8 +22,9 @@ import gov.nih.nci.system.query.SDKQuery;
 import gov.nih.nci.system.query.example.UpdateExampleQuery;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
-//FIXME to do by Delphine
 public class ContainerWrapper extends ModelWrapper<Container> {
+
+    private List<ContainerPositionWrapper> childPositionCollection;
 
     public ContainerWrapper(WritableApplicationService appService,
         Container wrappedObject) {
@@ -32,27 +33,18 @@ public class ContainerWrapper extends ModelWrapper<Container> {
 
     @Override
     protected void firePropertyChanges(Container oldWrappedObject,
-        Container newWrappedObject) {
-        propertyChangeSupport.firePropertyChange("productBarcode",
-            oldWrappedObject, newWrappedObject);
-        propertyChangeSupport.firePropertyChange("position", oldWrappedObject,
-            newWrappedObject);
-        propertyChangeSupport.firePropertyChange("activityStatus",
-            oldWrappedObject, newWrappedObject);
-        propertyChangeSupport.firePropertyChange("site", oldWrappedObject,
-            newWrappedObject);
-        propertyChangeSupport.firePropertyChange("label", oldWrappedObject,
-            newWrappedObject);
-        propertyChangeSupport.firePropertyChange("temperature",
-            oldWrappedObject, newWrappedObject);
-        propertyChangeSupport.firePropertyChange("comment", oldWrappedObject,
-            newWrappedObject);
-        propertyChangeSupport.firePropertyChange("samplePositionCollection",
-            oldWrappedObject, newWrappedObject);
-        propertyChangeSupport.firePropertyChange("childPositionCollection",
-            oldWrappedObject, newWrappedObject);
-        propertyChangeSupport.firePropertyChange("containerType",
-            oldWrappedObject, newWrappedObject);
+        Container newWrappedObject) throws Exception {
+        String[] members = new String[] { "productBarcode", "position",
+            "activityStatus", "site", "label", "temperature", "comment",
+            "samplePositionCollection", "childPositionCollection",
+            "containerType" };
+        firePropertyChanges(members, oldWrappedObject, newWrappedObject);
+    }
+
+    @Override
+    public void persist() throws BiobankCheckException, Exception {
+        super.persist();
+        childPositionCollection = null;
     }
 
     @Override
@@ -64,7 +56,7 @@ public class ContainerWrapper extends ModelWrapper<Container> {
     private void checkProductBarcodeUnique() throws BiobankCheckException,
         ApplicationException {
         List<Object> parameters = new ArrayList<Object>(Arrays
-            .asList(new Object[] { getSiteWrapper().getWrappedObject(),
+            .asList(new Object[] { getSite().getWrappedObject(),
                 getProductBarcode() }));
         String notSameContainer = "";
         if (!isNew()) {
@@ -86,8 +78,8 @@ public class ContainerWrapper extends ModelWrapper<Container> {
         ApplicationException {
         String notSameContainer = "";
         List<Object> parameters = new ArrayList<Object>(Arrays
-            .asList(new Object[] { getSiteWrapper().getWrappedObject(),
-                getLabel(), getContainerType() }));
+            .asList(new Object[] { getSite().getWrappedObject(), getLabel(),
+                getContainerType().getWrappedObject() }));
         if (!isNew()) {
             notSameContainer = " and id <> ?";
             parameters.add(getId());
@@ -108,8 +100,12 @@ public class ContainerWrapper extends ModelWrapper<Container> {
         return Container.class;
     }
 
-    public SiteWrapper getSiteWrapper() {
-        return new SiteWrapper(appService, wrappedObject.getSite());
+    public SiteWrapper getSite() {
+        Site site = wrappedObject.getSite();
+        if (site == null) {
+            return null;
+        }
+        return new SiteWrapper(appService, site);
     }
 
     public String getLabel() {
@@ -135,16 +131,16 @@ public class ContainerWrapper extends ModelWrapper<Container> {
      * @param containerType the type of the container
      * @throws ApplicationException
      */
-    public Container getContainer(String label, ContainerType containerType)
-        throws ApplicationException {
+    public ContainerWrapper getContainer(String label,
+        ContainerTypeWrapper containerType) throws ApplicationException {
         HQLCriteria criteria = new HQLCriteria("from "
             + Container.class.getName()
             + " where site = ? and label = ? and containerType = ?", Arrays
             .asList(new Object[] { wrappedObject.getSite(), label,
-                containerType }));
+                containerType.wrappedObject }));
         List<Container> containers = appService.query(criteria);
         if (containers.size() == 1) {
-            return containers.get(0);
+            return new ContainerWrapper(appService, containers.get(0));
         }
         return null;
     }
@@ -168,9 +164,9 @@ public class ContainerWrapper extends ModelWrapper<Container> {
      * get the containers with label label, with site site and container type
      * type
      */
-    public static List<Container> getContainersHoldingContainerType(
+    public static List<ContainerWrapper> getContainersHoldingContainerType(
         WritableApplicationService appService, String label, Site site,
-        ContainerType type) throws ApplicationException {
+        ContainerTypeWrapper type) throws ApplicationException {
         HQLCriteria criteria = new HQLCriteria(
             "from "
                 + Container.class.getName()
@@ -180,8 +176,9 @@ public class ContainerWrapper extends ModelWrapper<Container> {
                 + ContainerType.class.getName() + " as ct"
                 + " left join ct.childContainerTypeCollection as child "
                 + " where child = ?))", Arrays.asList(new Object[] { site,
-                label, type }));
-        return appService.query(criteria);
+                label, type.wrappedObject }));
+        List<Container> containers = appService.query(criteria);
+        return transformToWrapperList(appService, containers);
     }
 
     /**
@@ -191,7 +188,7 @@ public class ContainerWrapper extends ModelWrapper<Container> {
      * @param label label of the container
      * @throws ApplicationException
      */
-    public List<Container> getContainersHoldingContainerType(String label)
+    public List<ContainerWrapper> getContainersHoldingContainerType(String label)
         throws ApplicationException {
         return getContainersHoldingContainerType(appService, label,
             wrappedObject.getSite(), getContainerType());
@@ -238,7 +235,7 @@ public class ContainerWrapper extends ModelWrapper<Container> {
     public void computePositionFromLabel() throws Exception {
         String parentContainerLabel = getLabel().substring(0,
             getLabel().length() - 2);
-        List<Container> containersWithLabel = getContainersHoldingContainerType(parentContainerLabel);
+        List<ContainerWrapper> containersWithLabel = getContainersHoldingContainerType(parentContainerLabel);
         if (containersWithLabel.size() == 0) {
             throw new Exception("Can't find container with label "
                 + parentContainerLabel + " holding containers of type "
@@ -255,16 +252,14 @@ public class ContainerWrapper extends ModelWrapper<Container> {
         }
         // has the parent container. Can now find the position using the
         // parent labelling scheme
-        ContainerPosition position = getPosition();
+        ContainerPositionWrapper position = getPosition();
         if (position == null) {
-            position = new ContainerPosition();
+            position = new ContainerPositionWrapper(appService,
+                new ContainerPosition());
         }
-        ContainerPositionWrapper positionWrapper = new ContainerPositionWrapper(
-            appService, position);
-        positionWrapper.setParentContainer(containersWithLabel.get(0));
-        positionWrapper.setPosition(getLabel().substring(
-            getLabel().length() - 2));
-        setPosition(positionWrapper.getWrappedObject());
+        position.setParentContainer(containersWithLabel.get(0));
+        position.setPosition(getLabel().substring(getLabel().length() - 2));
+        setPosition(position);
     }
 
     /**
@@ -293,9 +288,9 @@ public class ContainerWrapper extends ModelWrapper<Container> {
      */
     public RowColPos getPositionFromLabelingScheme(String position)
         throws Exception {
-        ContainerType type = getContainerType();
+        ContainerTypeWrapper type = getContainerType();
         RowColPos rcp = LabelingScheme.getRowColFromPositionString(position,
-            type);
+            type.getWrappedObject());
         Capacity capacity = type.getCapacity();
         if (rcp.row < capacity.getRowCapacity()
             && rcp.col < capacity.getColCapacity()) {
@@ -306,23 +301,39 @@ public class ContainerWrapper extends ModelWrapper<Container> {
             + capacity.getRowCapacity() + "*" + capacity.getColCapacity());
     }
 
+    public void setContainerType(ContainerTypeWrapper containerType) {
+        setContainerType(containerType);
+    }
+
     public void setContainerType(ContainerType containerType) {
-        ContainerType oldType = getContainerType();
+        ContainerType oldType = wrappedObject.getContainerType();
         wrappedObject.setContainerType(containerType);
         propertyChangeSupport.firePropertyChange("containerType", oldType,
             containerType);
     }
 
-    public ContainerType getContainerType() {
-        return wrappedObject.getContainerType();
+    public ContainerTypeWrapper getContainerType() {
+        ContainerType type = wrappedObject.getContainerType();
+        if (type == null) {
+            return null;
+        }
+        return new ContainerTypeWrapper(appService, type);
     }
 
-    public ContainerPosition getPosition() {
-        return wrappedObject.getPosition();
+    public ContainerPositionWrapper getPosition() {
+        ContainerPosition pos = wrappedObject.getPosition();
+        if (pos == null) {
+            return null;
+        }
+        return new ContainerPositionWrapper(appService, pos);
+    }
+
+    public void setPosition(ContainerPositionWrapper position) {
+        setPosition(position.getWrappedObject());
     }
 
     public void setPosition(ContainerPosition position) {
-        ContainerPosition oldPosition = position;
+        ContainerPosition oldPosition = wrappedObject.getPosition();
         wrappedObject.setPosition(position);
         propertyChangeSupport.firePropertyChange("position", oldPosition,
             position);
@@ -409,17 +420,41 @@ public class ContainerWrapper extends ModelWrapper<Container> {
         return getWrappedObject().getTemperature();
     }
 
-    public Collection<ContainerPosition> getChildPositionCollection() {
-        return getWrappedObject().getChildPositionCollection();
+    public List<ContainerPositionWrapper> getChildPositionCollection() {
+        if (childPositionCollection == null) {
+            Collection<ContainerPosition> children = wrappedObject
+                .getChildPositionCollection();
+            if (children != null) {
+                childPositionCollection = new ArrayList<ContainerPositionWrapper>();
+                for (ContainerPosition position : children) {
+                    childPositionCollection.add(new ContainerPositionWrapper(
+                        appService, position));
+                }
+            }
+        }
+        return childPositionCollection;
     }
 
-    public void setChildPositionCollection(
-        Collection<ContainerPosition> positions) {
+    private void setChildPositionCollection(
+        Collection<ContainerPosition> positions, boolean setNull) {
         Collection<ContainerPosition> oldPositions = wrappedObject
             .getChildPositionCollection();
         wrappedObject.setChildPositionCollection(positions);
         propertyChangeSupport.firePropertyChange("childPositionCollection",
             oldPositions, positions);
+        if (setNull) {
+            childPositionCollection = null;
+        }
+    }
+
+    public void setChildPositionCollection(
+        List<ContainerPositionWrapper> positions) {
+        List<ContainerPosition> positionsObjects = new ArrayList<ContainerPosition>();
+        for (ContainerPositionWrapper pos : positions) {
+            positionsObjects.add(pos.getWrappedObject());
+        }
+        setChildPositionCollection(positionsObjects, false);
+        childPositionCollection = positions;
     }
 
     /**
@@ -474,14 +509,14 @@ public class ContainerWrapper extends ModelWrapper<Container> {
         }
     }
 
-    public void setNewParent(Container newParent, String newLabel)
+    public void setNewParent(ContainerWrapper newParent, String newLabel)
         throws Exception {
         String oldLabel = getLabel();
-        List<ContainerPosition> positions = (List<ContainerPosition>) newParent
+        List<ContainerPositionWrapper> positions = newParent
             .getChildPositionCollection();
         Boolean filled = false;
         // check that the position is free
-        for (ContainerPosition pos : positions)
+        for (ContainerPositionWrapper pos : positions)
             if (pos.getContainer().getLabel().compareToIgnoreCase(newLabel) == 0)
                 filled = true;
         if (filled) {
@@ -492,24 +527,23 @@ public class ContainerWrapper extends ModelWrapper<Container> {
                     + " has already been initialized. You can only move to an uninitialized location.");
         } else {
             // remove from old parent, add to new
-            Container oldParent = getPosition().getParentContainer();
+            ContainerWrapper oldParent = getPosition().getParentContainer();
             if (oldParent != null) {
                 // remove from old
-                Collection<ContainerPosition> oldPositions = oldParent
+                List<ContainerPositionWrapper> oldPositions = oldParent
                     .getChildPositionCollection();
                 oldPositions.remove(getPosition());
                 oldParent.setChildPositionCollection(oldPositions);
 
                 // modify position object
-                ContainerPositionWrapper positionWrapper = new ContainerPositionWrapper(
-                    appService, getPosition());
+                ContainerPositionWrapper positionWrapper = getPosition();
                 positionWrapper.setParentContainer(newParent);
                 positionWrapper.setPosition(newLabel.substring(newLabel
                     .length() - 2));
-                setPosition(positionWrapper.getWrappedObject());
+                setPosition(positionWrapper);
 
                 // add to new
-                Collection<ContainerPosition> newPositions = newParent
+                List<ContainerPositionWrapper> newPositions = newParent
                     .getChildPositionCollection();
                 newPositions.add(getPosition());
                 newParent.setChildPositionCollection(newPositions);
@@ -532,7 +566,7 @@ public class ContainerWrapper extends ModelWrapper<Container> {
         HQLCriteria criteria = new HQLCriteria("from "
             + Container.class.getName() + " where label like ? and site= ?",
             Arrays.asList(new Object[] { oldLabel + "%",
-                getSiteWrapper().getWrappedObject() }));
+                getSite().getWrappedObject() }));
         List<Container> containers = appService.query(criteria);
         for (Container c : containers) {
             if (c.getLabel().compareToIgnoreCase(oldLabel) == 0)
@@ -550,15 +584,16 @@ public class ContainerWrapper extends ModelWrapper<Container> {
      * Get containers with a given label that can hold this type of container
      * (in this container site)
      */
-    public List<Container> getPossibleParents(String parentLabel)
+    public List<ContainerWrapper> getPossibleParents(String parentLabel)
         throws ApplicationException {
         HQLCriteria criteria = new HQLCriteria("select c from "
             + Container.class.getName()
             + " as c left join c.containerType.childContainerTypeCollection "
             + "as ct where c.site = ? and c.label = ? and ct=?", Arrays
-            .asList(new Object[] { getSiteWrapper().getWrappedObject(),
-                parentLabel, getContainerType() }));
-        return appService.query(criteria);
+            .asList(new Object[] { getSite().getWrappedObject(), parentLabel,
+                getContainerType().getWrappedObject() }));
+        List<Container> containers = appService.query(criteria);
+        return transformToWrapperList(appService, containers);
     }
 
     public static List<Container> getTopContainersForSite(
@@ -568,5 +603,14 @@ public class ContainerWrapper extends ModelWrapper<Container> {
             + Container.class.getName() + " where site=? and position is null",
             Arrays.asList(new Object[] { site }));
         return appService.query(criteria);
+    }
+
+    public static List<ContainerWrapper> transformToWrapperList(
+        WritableApplicationService appService, List<Container> containers) {
+        List<ContainerWrapper> list = new ArrayList<ContainerWrapper>();
+        for (Object o : containers) {
+            list.add(new ContainerWrapper(appService, (Container) o));
+        }
+        return list;
     }
 }

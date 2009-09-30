@@ -1,32 +1,34 @@
 package edu.ualberta.med.biobank.model;
 
+import edu.ualberta.med.biobank.common.wrappers.ContainerPositionWrapper;
+
 public class ContainerCell {
 
-	private ContainerPosition position;
+    private ContainerPositionWrapper position;
 
-	private ContainerStatus status;
+    private ContainerStatus status;
 
-	public ContainerCell() {
-	}
+    public ContainerCell() {
+    }
 
-	public ContainerCell(ContainerPosition position) {
-		this.position = position;
-	}
+    public ContainerCell(ContainerPositionWrapper position) {
+        this.position = position;
+    }
 
-	public ContainerPosition getPosition() {
-		return position;
-	}
+    public ContainerPositionWrapper getPosition() {
+        return position;
+    }
 
-	public void setPosition(ContainerPosition position) {
-		this.position = position;
-	}
+    public void setPosition(ContainerPositionWrapper position) {
+        this.position = position;
+    }
 
-	public ContainerStatus getStatus() {
-		return status;
-	}
+    public ContainerStatus getStatus() {
+        return status;
+    }
 
-	public void setStatus(ContainerStatus status) {
-		this.status = status;
-	}
+    public void setStatus(ContainerStatus status) {
+        this.status = status;
+    }
 
 }

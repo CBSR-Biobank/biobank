@@ -75,15 +75,10 @@ public class ClinicWrapper extends ModelWrapper<Clinic> implements
 
     @Override
     protected void firePropertyChanges(Clinic oldWrappedObject,
-        Clinic newWrappedObject) {
+        Clinic newWrappedObject) throws Exception {
         String[] members = new String[] { "name", "activityStatus", "comment",
             "site" };
-
-        try {
-            firePropertyChanges(members, oldWrappedObject, newWrappedObject);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        firePropertyChanges(members, oldWrappedObject, newWrappedObject);
     }
 
     @Override

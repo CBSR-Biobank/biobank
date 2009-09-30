@@ -16,10 +16,10 @@ public class ContainerPositionWrapper extends
 
     @Override
     protected void firePropertyChanges(ContainerPosition oldWrappedObject,
-        ContainerPosition newWrappedObject) {
+        ContainerPosition newWrappedObject) throws Exception {
         super.firePropertyChanges(oldWrappedObject, newWrappedObject);
-        propertyChangeSupport.firePropertyChange("parentContainer",
-            oldWrappedObject, newWrappedObject);
+        String[] members = new String[] { "parentContainer", "container" };
+        firePropertyChanges(members, oldWrappedObject, newWrappedObject);
     }
 
     @Override
@@ -32,18 +32,41 @@ public class ContainerPositionWrapper extends
     }
 
     public void setParentContainer(Container parentContainer) {
-        Container oldParent = getParentContainer();
+        Container oldParent = wrappedObject.getParentContainer();
         wrappedObject.setParentContainer(parentContainer);
         propertyChangeSupport.firePropertyChange("parentContainer", oldParent,
             parentContainer);
     }
 
-    public Container getParentContainer() {
-        return wrappedObject.getParentContainer();
+    public void setParentContainer(ContainerWrapper parentContainer) {
+        setParentContainer(parentContainer.getWrappedObject());
     }
 
-    public Container getContainer() {
-        return wrappedObject.getContainer();
+    public ContainerWrapper getParentContainer() {
+        Container parent = wrappedObject.getParentContainer();
+        if (parent == null) {
+            return null;
+        }
+        return new ContainerWrapper(appService, parent);
+    }
+
+    public ContainerWrapper getContainer() {
+        Container container = wrappedObject.getContainer();
+        if (container == null) {
+            return null;
+        }
+        return new ContainerWrapper(appService, container);
+    }
+
+    public void setContainer(ContainerWrapper container) {
+        setContainer(container.getWrappedObject());
+    }
+
+    public void setContainer(Container container) {
+        Container oldContainer = wrappedObject.getContainer();
+        wrappedObject.setContainer(container);
+        propertyChangeSupport.firePropertyChange("container", oldContainer,
+            container);
     }
 
     /**
@@ -55,8 +78,7 @@ public class ContainerPositionWrapper extends
      * @throws Exception
      */
     public void setPosition(String position) throws Exception {
-        ContainerWrapper parent = new ContainerWrapper(appService,
-            getParentContainer());
+        ContainerWrapper parent = getParentContainer();
         RowColPos rowColPos = parent.getPositionFromLabelingScheme(position);
         setRow(rowColPos.row);
         setCol(rowColPos.col);

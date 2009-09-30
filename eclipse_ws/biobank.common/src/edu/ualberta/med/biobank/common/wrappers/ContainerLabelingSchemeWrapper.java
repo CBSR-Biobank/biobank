@@ -19,19 +19,11 @@ public class ContainerLabelingSchemeWrapper extends
     }
 
     @Override
-    protected void persistChecks() throws BiobankCheckException, Exception {
-    }
-
-    @Override
     protected void firePropertyChanges(
         ContainerLabelingScheme oldWrappedObject,
-        ContainerLabelingScheme newWrappedObject) {
-        propertyChangeSupport.firePropertyChange("name", oldWrappedObject,
-            newWrappedObject);
-    }
-
-    @Override
-    protected void deleteChecks() throws BiobankCheckException, Exception {
+        ContainerLabelingScheme newWrappedObject) throws Exception {
+        String[] members = new String[] { "name" };
+        firePropertyChanges(members, oldWrappedObject, newWrappedObject);
     }
 
     public void setName(String name) {
@@ -43,4 +35,17 @@ public class ContainerLabelingSchemeWrapper extends
     public String getName() {
         return wrappedObject.getName();
     }
+
+    @Override
+    protected void deleteChecks() throws BiobankCheckException, Exception {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    protected void persistChecks() throws BiobankCheckException, Exception {
+        // TODO Auto-generated method stub
+
+    }
+
 }

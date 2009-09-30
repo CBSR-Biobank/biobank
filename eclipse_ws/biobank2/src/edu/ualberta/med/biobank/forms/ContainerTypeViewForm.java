@@ -205,7 +205,7 @@ public class ContainerTypeViewForm extends BiobankViewForm {
             // otherwise, normal grid
             ChooseContainerWidget containerWidget = new ChooseContainerWidget(
                 client);
-            containerWidget.setContainerType(containerType.getWrappedObject());
+            containerWidget.setContainerType(containerType);
 
             int dim2 = containerType.getCapacity().getColCapacity().intValue();
             if (dim2 <= 1) {

@@ -90,8 +90,8 @@ public class ChooseContainerWidget extends AbstractGridContainerWidget {
         String sname = "";
         if (cells != null) {
             ContainerCell cell = cells[indexRow][indexCol];
-
-            if ((cell.getPosition().getContainer() != null)
+            if ((cell.getPosition() != null && cell.getPosition()
+                .getContainer() != null)
                 && (cell.getPosition().getContainer().getContainerType()
                     .getNameShort() != null)
                 && (cell.getPosition().getContainer().getContainerType()
@@ -106,7 +106,7 @@ public class ChooseContainerWidget extends AbstractGridContainerWidget {
         if (super.getContainerType() != null) {
             return parentLabel
                 + LabelingScheme.getPositionString(rowcol, super
-                    .getContainerType()) + sname;
+                    .getContainerType().getWrappedObject()) + sname;
         }
 
         String row = getValueForCell(firstRowSign, indexRow,

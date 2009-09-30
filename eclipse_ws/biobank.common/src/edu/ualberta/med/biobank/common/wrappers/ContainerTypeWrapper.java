@@ -29,29 +29,12 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
 
     @Override
     protected void firePropertyChanges(ContainerType oldWrappedObject,
-        ContainerType newWrappedObject) {
-        propertyChangeSupport.firePropertyChange("name", oldWrappedObject,
-            newWrappedObject);
-        propertyChangeSupport.firePropertyChange("comment", oldWrappedObject,
-            newWrappedObject);
-        propertyChangeSupport.firePropertyChange("nameShort", oldWrappedObject,
-            newWrappedObject);
-        propertyChangeSupport.firePropertyChange("topLevel", oldWrappedObject,
-            newWrappedObject);
-        propertyChangeSupport.firePropertyChange("defaultTemperature",
-            oldWrappedObject, newWrappedObject);
-        propertyChangeSupport.firePropertyChange("activityStatus",
-            oldWrappedObject, newWrappedObject);
-        propertyChangeSupport.firePropertyChange("sampleTypeCollection",
-            oldWrappedObject, newWrappedObject);
-        propertyChangeSupport.firePropertyChange(
-            "childContainerTypeCollection", oldWrappedObject, newWrappedObject);
-        propertyChangeSupport.firePropertyChange("site", oldWrappedObject,
-            newWrappedObject);
-        propertyChangeSupport.firePropertyChange("capacity", oldWrappedObject,
-            newWrappedObject);
-        propertyChangeSupport.firePropertyChange("childLabelingScheme",
-            oldWrappedObject, newWrappedObject);
+        ContainerType newWrappedObject) throws Exception {
+        String[] members = new String[] { "name", "comment", "nameShort",
+            "topLevel", "defaultTemperature", "activityStatus",
+            "sampleTypeCollection", "childContainerTypeCollection", "site",
+            "capacity", "childLabelingScheme" };
+        firePropertyChanges(members, oldWrappedObject, newWrappedObject);
     }
 
     @Override

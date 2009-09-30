@@ -57,13 +57,14 @@ public class PatientWrapper extends ModelWrapper<Patient> {
     /**
      * When retrieve the values from the database, need to fire the
      * modifications for the different objects contained in the wrapped object
+     * 
+     * @throws Exception
      */
     @Override
-    protected void firePropertyChanges(Patient oldPatient, Patient newpatient) {
-        propertyChangeSupport.firePropertyChange("number", oldPatient
-            .getNumber(), newpatient.getNumber());
-        propertyChangeSupport.firePropertyChange("study",
-            oldPatient.getStudy(), newpatient.getStudy());
+    protected void firePropertyChanges(Patient oldPatient, Patient newpatient)
+        throws Exception {
+        String[] members = new String[] { "number", "study" };
+        firePropertyChanges(members, oldPatient, newpatient);
     }
 
     @Override

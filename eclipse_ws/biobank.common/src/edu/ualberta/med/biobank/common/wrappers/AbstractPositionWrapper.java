@@ -12,11 +12,10 @@ public abstract class AbstractPositionWrapper<E extends AbstractPosition>
     }
 
     @Override
-    protected void firePropertyChanges(E oldWrappedObject, E newWrappedObject) {
-        propertyChangeSupport.firePropertyChange("row", oldWrappedObject,
-            newWrappedObject);
-        propertyChangeSupport.firePropertyChange("col", oldWrappedObject,
-            newWrappedObject);
+    protected void firePropertyChanges(E oldWrappedObject, E newWrappedObject)
+        throws Exception {
+        String[] members = new String[] { "row", "col" };
+        firePropertyChanges(members, oldWrappedObject, newWrappedObject);
     }
 
     public void setRow(Integer row) {

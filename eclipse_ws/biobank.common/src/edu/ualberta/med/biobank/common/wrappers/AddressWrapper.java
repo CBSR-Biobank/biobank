@@ -23,6 +23,7 @@ public class AddressWrapper extends ModelWrapper<Address> {
 
     @Override
     protected void persistChecks() throws BiobankCheckException, Exception {
+        // TODO Auto-generated method stub
     }
 
     public String getStreet1() {

@@ -14,8 +14,9 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
+import edu.ualberta.med.biobank.common.wrappers.ContainerPositionWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.model.Capacity;
-import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerCell;
 import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.ContainerStatus;
@@ -25,7 +26,7 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public abstract class AbstractContainerChooserPage extends WizardPage {
 
-    private Container currentContainer;
+    private ContainerWrapper currentContainer;
 
     protected ChooseContainerWidget containerWidget;
 
@@ -97,7 +98,7 @@ public abstract class AbstractContainerChooserPage extends WizardPage {
             textPosition.setText("");
             setPageComplete(false);
         } else {
-            ContainerPosition cp = cell.getPosition();
+            ContainerPositionWrapper cp = cell.getPosition();
             if (cp != null && cp.getContainer() != null) {
                 String code = cp.getContainer().getLabel();
                 if (code != null) {
@@ -118,12 +119,12 @@ public abstract class AbstractContainerChooserPage extends WizardPage {
         ContainerCell[][] cells = initGridSize();
         if (currentContainer != null) {
             // get cells informations
-            for (ContainerPosition position : currentContainer
+            for (ContainerPositionWrapper position : currentContainer
                 .getChildPositionCollection()) {
                 int positionDim1 = position.getRow();
                 int positionDim2 = position.getCol();
                 ContainerCell cell = new ContainerCell(position);
-                Container occupiedContainer = position.getContainer();
+                ContainerWrapper occupiedContainer = position.getContainer();
                 setStatus(cell, occupiedContainer);
                 cells[positionDim1][positionDim2] = cell;
             }
@@ -140,7 +141,7 @@ public abstract class AbstractContainerChooserPage extends WizardPage {
     }
 
     protected abstract void setStatus(ContainerCell cell,
-        Container occupiedContainer);
+        ContainerWrapper occupiedContainer);
 
     private ContainerCell[][] initGridSize() {
         int dim1;
@@ -171,11 +172,11 @@ public abstract class AbstractContainerChooserPage extends WizardPage {
         return new ContainerCell[dim1][dim2];
     }
 
-    public void setCurrentContainer(Container container) {
+    public void setCurrentContainer(ContainerWrapper container) {
         this.currentContainer = container;
     }
 
-    public Container getCurrentContainer() {
+    public ContainerWrapper getCurrentContainer() {
         return currentContainer;
     }
 
@@ -189,7 +190,7 @@ public abstract class AbstractContainerChooserPage extends WizardPage {
 
     protected ContainerPosition newContainerPosition(int dim1, int dim2) {
         ContainerPosition position = new ContainerPosition();
-        position.setParentContainer(currentContainer);
+        position.setParentContainer(currentContainer.getWrappedObject());
         position.setRow(dim1);
         position.setCol(dim2);
         return position;

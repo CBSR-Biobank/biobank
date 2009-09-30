@@ -74,7 +74,7 @@ public abstract class ModelWrapper<E> {
      * modifications for the different objects contained in the wrapped object
      */
     protected abstract void firePropertyChanges(E oldWrappedObject,
-        E newWrappedObject);
+        E newWrappedObject) throws Exception;
 
     protected void firePropertyChanges(String[] memberNames,
         Object oldWrappedObject, Object newWrappedObject) throws Exception {
@@ -184,5 +184,16 @@ public abstract class ModelWrapper<E> {
      */
     public boolean checkIntegrity() {
         return true;
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (object == null) {
+            return false;
+        }
+        if (getClass() != object.getClass()) {
+            return false;
+        }
+        return getId().equals(((ModelWrapper<?>) object).getId());
     }
 }
