@@ -15,7 +15,8 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.PatientAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
@@ -34,7 +35,7 @@ public class PatientEntryForm extends BiobankEntryForm {
 
     private PatientAdapter patientAdapter;
 
-    private Site site;
+    private SiteWrapper siteWrapper;
 
     private ComboViewer studiesViewer;
 
@@ -79,21 +80,22 @@ public class PatientEntryForm extends BiobankEntryForm {
 
         Label labelSite = (Label) createWidget(client, Label.class, SWT.NONE,
             "Site");
-        site = SessionManager.getInstance().getCurrentSite();
-        labelSite.setText(site.getName());
+        siteWrapper = SessionManager.getInstance().getCurrentSiteWrapper();
+        labelSite.setText(siteWrapper.getName());
 
-        Collection<Study> studies = site.getStudyCollection();
+        Collection<StudyWrapper> studies = siteWrapper
+            .getStudyWrapperCollection();
         Study selectedStudy = null;
         if (patientAdapter.getWrapper().isNew()) {
             if (studies.size() == 1) {
-                selectedStudy = studies.iterator().next();
+                selectedStudy = studies.iterator().next().getWrappedObject();
             }
         } else {
             Study currentStudy = patientAdapter.getWrapper().getStudy();
             if (currentStudy != null) {
-                for (Study study : studies) {
-                    if (currentStudy.getId().equals(study.getId())) {
-                        currentStudy = study;
+                for (StudyWrapper studyWrapper : studies) {
+                    if (currentStudy.getId().equals(studyWrapper.getId())) {
+                        currentStudy = studyWrapper.getWrappedObject();
                         break;
                     }
                 }

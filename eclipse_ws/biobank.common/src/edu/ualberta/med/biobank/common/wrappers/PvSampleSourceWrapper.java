@@ -22,18 +22,12 @@ public class PvSampleSourceWrapper extends ModelWrapper<PvSampleSource> {
 
     @Override
     protected Class<PvSampleSource> getWrappedClass() {
-        // TODO Auto-generated method stub
-        return null;
+        return PvSampleSource.class;
     }
 
     @Override
     protected void persistChecks() throws BiobankCheckException, Exception {
         // TODO Auto-generated method stub
-    }
-
-    @Override
-    public boolean checkIntegrity() {
-        return true;
     }
 
     @Override

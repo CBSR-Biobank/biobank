@@ -15,6 +15,7 @@ import org.eclipse.swt.widgets.Tree;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.utils.ModelUtils;
+import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.forms.StudyEntryForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Site;
@@ -44,7 +45,8 @@ public class StudyGroup extends AdapterBase {
             public void widgetSelected(SelectionEvent event) {
                 Study study = new Study();
                 study.setSite(getParentFromClass(SiteAdapter.class).getSite());
-                StudyAdapter adapter = new StudyAdapter(StudyGroup.this, study);
+                StudyAdapter adapter = new StudyAdapter(StudyGroup.this,
+                    new StudyWrapper(parent.getAppService(), study));
                 openForm(new FormInput(adapter), StudyEntryForm.ID);
             }
 
@@ -71,7 +73,8 @@ public class StudyGroup extends AdapterBase {
 
                 if (node == null) {
                     // first time building the tree
-                    node = new StudyAdapter(this, study);
+                    node = new StudyAdapter(this, new StudyWrapper(
+                        getAppService(), study));
                     addChild(node);
                 }
                 if (updateNode) {

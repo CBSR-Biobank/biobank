@@ -14,6 +14,7 @@ import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.forms.ClinicEntryForm;
 import edu.ualberta.med.biobank.forms.ClinicViewForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
@@ -24,33 +25,29 @@ import gov.nih.nci.system.query.example.DeleteExampleQuery;
 
 public class ClinicAdapter extends AdapterBase {
 
-    public ClinicAdapter(AdapterBase parent, Clinic clinic) {
-        super(parent, clinic);
+    public ClinicAdapter(AdapterBase parent, ClinicWrapper clinicWrapper) {
+        super(parent, clinicWrapper);
     }
 
-    public void setClinic(Clinic clinic) {
-        object = clinic;
+    public ClinicWrapper getWrapper() {
+        return (ClinicWrapper) object;
     }
 
-    public Clinic getClinic() {
-        return (Clinic) object;
+    @Override
+    public String getName() {
+        ClinicWrapper wrapper = getWrapper();
+        Assert.isNotNull(wrapper.getWrappedObject(), "client is null");
+        return wrapper.getName();
+    }
+
+    @Override
+    public String getTitle() {
+        return getTitle("Patient");
     }
 
     @Override
     public void addChild(AdapterBase child) {
         Assert.isTrue(false, "Cannot add children to this adapter");
-    }
-
-    @Override
-    public String getName() {
-        Clinic clinic = getClinic();
-        Assert.isNotNull(clinic, "Clinic is null");
-        return clinic.getName();
-    }
-
-    @Override
-    public String getTitle() {
-        return getTitle("Clinic");
     }
 
     @Override
@@ -106,7 +103,7 @@ public class ClinicAdapter extends AdapterBase {
         // FIXME when clinicwrapper is used : remove this method to use the
         // parent one
         BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
-            Clinic clinic = getClinic();
+            Clinic clinic = ((ClinicWrapper) object).getWrappedObject();
             SDKQuery query = new DeleteExampleQuery(clinic);
 
             public void run() {
@@ -131,7 +128,7 @@ public class ClinicAdapter extends AdapterBase {
 
     @Override
     public void loadChildren(boolean updateNode) {
-
+        Assert.isTrue(false, "Cannot add children to this adapter");
     }
 
     @Override

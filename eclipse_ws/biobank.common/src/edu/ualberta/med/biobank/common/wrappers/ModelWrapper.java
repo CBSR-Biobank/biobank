@@ -21,19 +21,19 @@ public abstract class ModelWrapper<E> {
 
     protected E wrappedObject;
 
-    public E getWrappedObject() {
-        return wrappedObject;
-    }
-
-    public void setWrappedObject(E wrappedObject) {
-        this.wrappedObject = wrappedObject;
-    }
-
     protected PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(
         this);
 
     public ModelWrapper(WritableApplicationService appService, E wrappedObject) {
         this.appService = appService;
+        this.wrappedObject = wrappedObject;
+    }
+
+    public E getWrappedObject() {
+        return wrappedObject;
+    }
+
+    public void setWrappedObject(E wrappedObject) {
         this.wrappedObject = wrappedObject;
     }
 
@@ -47,7 +47,7 @@ public abstract class ModelWrapper<E> {
     }
 
     public boolean isNew() {
-        return getId() == null;
+        return (getId() == null);
     }
 
     public Integer getId() {
@@ -75,6 +75,17 @@ public abstract class ModelWrapper<E> {
      */
     protected abstract void firePropertyChanges(E oldWrappedObject,
         E newWrappedObject);
+
+    protected void firePropertyChanges(String[] memberNames,
+        Object oldWrappedObject, Object newWrappedObject) throws Exception {
+        if (memberNames == null) {
+            throw new Exception("memberNames cannot be null");
+        }
+        for (String member : memberNames) {
+            propertyChangeSupport.firePropertyChange(member, oldWrappedObject,
+                newWrappedObject);
+        }
+    }
 
     private void internalReload() throws Exception {
         wrappedObject = getObjectFromDatabase();
@@ -151,8 +162,27 @@ public abstract class ModelWrapper<E> {
         return constructor.newInstance();
     }
 
+    public void loadAttributes() throws Exception {
+        Class<E> classType = getWrappedClass();
+
+        if (classType == null) {
+            throw new Exception("wrapped class is null");
+        }
+
+        Method[] methods = classType.getMethods();
+        for (Method method : methods) {
+            if (method.getName().startsWith("get")
+                && !method.getName().equals("getClass")
+                && !method.getReturnType().getName().equals("java.util.Set")) {
+                method.invoke(wrappedObject, (Object[]) null);
+            }
+        }
+    }
+
     /**
      * return true if integrity of this object is ok
      */
-    public abstract boolean checkIntegrity();
+    public boolean checkIntegrity() {
+        return true;
+    }
 }

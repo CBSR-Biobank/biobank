@@ -414,7 +414,8 @@ public class ContainerViewForm extends BiobankViewForm {
                             Container newContainer = new Container();
 
                             newContainer.setContainerType(initType);
-                            newContainer.setSite(container.getSite());
+                            newContainer.setSite(container.getSiteWrapper()
+                                .getWrappedObject());
                             newContainer.setTemperature(container
                                 .getTemperature());
 
@@ -524,7 +525,7 @@ public class ContainerViewForm extends BiobankViewForm {
             ContainerWrapper newContainer = new ContainerWrapper(SessionManager
                 .getAppService(), new Container());
             newContainer.setSite(containerAdapter.getParentFromClass(
-                SiteAdapter.class).getSite());
+                SiteAdapter.class).getWrapper());
             pos.setParentContainer(container.getWrappedObject());
             newContainer.setPosition(pos);
             newAdapter = new ContainerAdapter(containerAdapter, newContainer);
@@ -553,7 +554,7 @@ public class ContainerViewForm extends BiobankViewForm {
     }
 
     private void setContainerValues() {
-        FormUtils.setTextValue(siteLabel, container.getSite().getName());
+        FormUtils.setTextValue(siteLabel, container.getSiteWrapper().getName());
         FormUtils.setTextValue(containerLabelLabel, container.getLabel());
         FormUtils.setTextValue(productBarcodeLabel, container
             .getProductBarcode());
@@ -576,8 +577,8 @@ public class ContainerViewForm extends BiobankViewForm {
 
     private void createSamplesSection() {
         Composite parent = createSectionWithClient("Samples");
-        samplesWidget = new SamplesListWidget(parent, container
-            .getSamplePositionCollection());
+        samplesWidget = new SamplesListWidget(parent, containerAdapter
+            .getAppService(), container.getSamplePositionCollection());
         samplesWidget.adaptToToolkit(toolkit, true);
     }
 

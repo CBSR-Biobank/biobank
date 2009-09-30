@@ -8,14 +8,14 @@ import edu.ualberta.med.biobank.model.SampleType;
 
 public class SampleTypeInfoTable extends InfoTableWidget<SampleType> {
 
-    private static final String[] headings = new String[] { "Sample Type",
+    private static final String[] HEADINGS = new String[] { "Sample Type",
         "Short Name" };
 
-    private static final int[] bounds = new int[] { 300, 130, -1, -1, -1, -1,
+    private static final int[] BOUNDS = new int[] { 300, 130, -1, -1, -1, -1,
         -1 };
 
     public SampleTypeInfoTable(Composite parent,
         Collection<SampleType> sampleTypeCollection) {
-        super(parent, sampleTypeCollection, headings, bounds);
+        super(parent, sampleTypeCollection, HEADINGS, BOUNDS);
     }
 }

@@ -7,6 +7,7 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.ui.handlers.HandlerUtil;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.forms.StudyEntryForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Site;
@@ -25,12 +26,12 @@ public class StudyAddHandler extends AbstractHandler {
         Assert.isNotNull(sessionAdapter);
         SiteAdapter siteAdapter = (SiteAdapter) sessionAdapter
             .accept(new NodeSearchVisitor(Site.class, SessionManager
-                .getInstance().getCurrentSite().getId()));
+                .getInstance().getCurrentSiteWrapper().getId()));
         Assert.isNotNull(siteAdapter);
 
-        Study study = new Study();
         StudyAdapter studyNode = new StudyAdapter(siteAdapter
-            .getStudiesGroupNode(), study);
+            .getStudiesGroupNode(), new StudyWrapper(sessionAdapter
+            .getAppService(), new Study()));
 
         FormInput input = new FormInput(studyNode);
         try {

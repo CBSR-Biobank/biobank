@@ -118,8 +118,9 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
      * will contains containerName.
      */
     public static List<ContainerType> getContainerTypesInSite(
-        WritableApplicationService appService, Site site, String containerName,
-        boolean useStrictName) throws ApplicationException {
+        WritableApplicationService appService, SiteWrapper siteWrapper,
+        String containerName, boolean useStrictName)
+        throws ApplicationException {
         String nameComparison = "=";
         String containerNameParameter = containerName;
         if (!useStrictName) {
@@ -129,13 +130,9 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
         String query = "from " + ContainerType.class.getName()
             + " where site = ? and name " + nameComparison + " ?";
         HQLCriteria criteria = new HQLCriteria(query, Arrays
-            .asList(new Object[] { site, containerNameParameter }));
+            .asList(new Object[] { siteWrapper.getWrappedObject(),
+                containerNameParameter }));
         return appService.query(criteria);
-    }
-
-    @Override
-    public boolean checkIntegrity() {
-        return true;
     }
 
     @Override
@@ -394,12 +391,12 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
     }
 
     public static Collection<ContainerType> getTopContainerTypesInSite(
-        WritableApplicationService appService, Site site)
+        WritableApplicationService appService, SiteWrapper site)
         throws ApplicationException {
         HQLCriteria criteria = new HQLCriteria("from "
             + ContainerType.class.getName()
             + " where site = ? and topLevel=true", Arrays
-            .asList(new Object[] { site }));
+            .asList(new Object[] { site.getWrappedObject() }));
         return appService.query(criteria);
     }
 }

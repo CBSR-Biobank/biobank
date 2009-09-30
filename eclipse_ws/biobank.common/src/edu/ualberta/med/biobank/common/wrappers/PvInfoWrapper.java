@@ -22,18 +22,12 @@ public class PvInfoWrapper extends ModelWrapper<PvInfo> {
 
     @Override
     protected Class<PvInfo> getWrappedClass() {
-        // TODO Auto-generated method stub
-        return null;
+        return PvInfo.class;
     }
 
     @Override
     protected void persistChecks() throws BiobankCheckException, Exception {
         // TODO Auto-generated method stub
-    }
-
-    @Override
-    public boolean checkIntegrity() {
-        return true;
     }
 
     @Override

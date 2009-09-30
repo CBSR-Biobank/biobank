@@ -31,11 +31,6 @@ public class ContainerLabelingSchemeWrapper extends
     }
 
     @Override
-    public boolean checkIntegrity() {
-        return true;
-    }
-
-    @Override
     protected void deleteChecks() throws BiobankCheckException, Exception {
     }
 

@@ -266,8 +266,8 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
      */
     private void createContainerTypeSection(Composite parent) throws Exception {
         List<ContainerType> palletContainerTypes = ContainerTypeWrapper
-            .getContainerTypesInSite(appService,
-                currentPalletWrapper.getSite(), palletNameContains, false);
+            .getContainerTypesInSite(appService, currentPalletWrapper
+                .getSiteWrapper(), palletNameContains, false);
         if (palletContainerTypes.size() == 1) {
             currentPalletWrapper.setContainerType(palletContainerTypes.get(0));
         } else {
@@ -313,11 +313,11 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
                     if (linkedAssignButton.getSelection()) {
                         cells = PalletCell.getRandomScanProcessNotInPallet(
                             appService, SessionManager.getInstance()
-                                .getCurrentSite());
+                                .getCurrentSiteWrapper());
                     } else if (linkedOnlyButton.getSelection()) {
                         cells = PalletCell.getRandomScanProcessAlreadyInPallet(
                             appService, SessionManager.getInstance()
-                                .getCurrentSite());
+                                .getCurrentSiteWrapper());
                     }
                 }
                 boolean result = true;
@@ -415,7 +415,7 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
             return false;
         }
         List<Sample> samples = SiteUtils.getSamplesInSite(appService, value,
-            SessionManager.getInstance().getCurrentSite());
+            SessionManager.getInstance().getCurrentSiteWrapper());
         if (samples.size() == 0) {
             // sample not found in site (not yet linked ?)
             scanCell.setStatus(SampleCellStatus.ERROR);
@@ -530,7 +530,7 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
             + " samples assign to pallet "
             + LabelingScheme.getPositionString(currentPalletWrapper
                 .getPosition()));
-        // TODO got a accessdenied exception with this. why ?
+        // TODO got a access denied exception with this. why ?
         // appService.executeBatchQuery(queries);
         setSaved(true);
     }
@@ -551,7 +551,7 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
             currentPalletWrapper.reset();
             currentPalletWrapper.setActivityStatus("Active");
             currentPalletWrapper.setSite(SessionManager.getInstance()
-                .getCurrentSite());
+                .getCurrentSiteWrapper());
         } catch (Exception e) {
             SessionManager.getLogger().error(
                 "Error while reseting pallet values", e);
@@ -603,7 +603,7 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
             + currentPalletWrapper.getProductBarcode());
         Container palletFound = ContainerWrapper
             .getContainerWithProductBarcodeInSite(appService, SessionManager
-                .getInstance().getCurrentSite(), currentPalletWrapper
+                .getInstance().getCurrentSiteWrapper(), currentPalletWrapper
                 .getProductBarcode());
         if (palletFound != null) {
             appendLog("Checking label position "

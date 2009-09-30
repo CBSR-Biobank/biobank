@@ -16,6 +16,7 @@ import org.springframework.remoting.RemoteAccessException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.SiteComparator;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -103,22 +104,22 @@ public class SessionAdapter extends AdapterBase {
             Site siteSearch = new Site();
             List<Site> result = appService.search(Site.class, siteSearch);
             Collections.sort(result, new SiteComparator());
-            Site currentSite = SessionManager.getInstance().getCurrentSite();
+            SiteWrapper currentSite = SessionManager.getInstance()
+                .getCurrentSiteWrapper();
             for (Site site : result) {
-                if (currentSite == null
-                    || site.getName().equals(currentSite.getName())) {
-                    SessionManager.getLogger().trace(
-                        "updateSites: Site " + site.getId() + ": "
-                            + site.getName());
+                if ((currentSite != null)
+                    && !site.getName().equals(currentSite.getName()))
+                    continue;
 
-                    SiteAdapter node = (SiteAdapter) getChild(site.getId());
-                    if (node == null) {
-                        node = new SiteAdapter(this, site);
-                        addChild(node);
-                    }
-                    if (updateNode) {
-                        SessionManager.getInstance().updateTreeNode(node);
-                    }
+                SiteWrapper siteWrapper = new SiteWrapper(getAppService(), site);
+
+                SiteAdapter node = (SiteAdapter) getChild(siteWrapper.getId());
+                if (node == null) {
+                    node = new SiteAdapter(this, siteWrapper);
+                    addChild(node);
+                }
+                if (updateNode) {
+                    SessionManager.getInstance().updateTreeNode(node);
                 }
             }
         } catch (final RemoteAccessException exp) {

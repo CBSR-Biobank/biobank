@@ -224,8 +224,8 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
         List<SampleType> sampleTypes;
         try {
             sampleTypes = SampleTypeWrapper.getSampleTypeForContainerTypes(
-                appService, SessionManager.getInstance().getCurrentSite(),
-                cabinetNameContains);
+                appService, SessionManager.getInstance()
+                    .getCurrentSiteWrapper(), cabinetNameContains);
         } catch (ApplicationException e) {
             BioBankPlugin.openError("Initialisation failed", e);
             sampleTypes = new ArrayList<SampleType>();
@@ -291,15 +291,14 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
     }
 
     protected void setVisitsList() {
-        String pNumber = patientNumberText.getText();
-        currentPatient = null;
         try {
+            String pNumber = patientNumberText.getText();
             currentPatient = PatientWrapper.getPatientInSite(appService,
-                pNumber, SessionManager.getInstance().getCurrentSite());
-        } catch (ApplicationException e) {
-            BioBankPlugin.openError("Error getting the patient", e);
-        }
-        if (currentPatient != null) {
+                pNumber, SessionManager.getInstance().getCurrentSiteWrapper());
+
+            if (currentPatient == null)
+                return;
+
             appendLog("-----");
             appendLog("Found patient with number " + currentPatient.getNumber());
             // show visits list
@@ -308,6 +307,8 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
             viewerVisits.setInput(collection);
             comboVisits.select(0);
             comboVisits.setListVisible(true);
+        } catch (ApplicationException e) {
+            BioBankPlugin.openError("Error getting the patient", e);
         }
     }
 
@@ -385,7 +386,7 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
             + sampleWrapper.getSampleType().getName());
         List<Container> containers = ContainerWrapper
             .getContainersHoldingSampleType(appService, SessionManager
-                .getInstance().getCurrentSite(), binLabel, sampleWrapper
+                .getInstance().getCurrentSiteWrapper(), binLabel, sampleWrapper
                 .getSampleType());
         if (containers.size() == 1) {
             bin = containers.get(0);
@@ -393,7 +394,7 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
             cabinet = drawer.getPosition().getParentContainer();
         } else if (containers.size() == 0) {
             containers = ContainerWrapper.getContainersInSite(appService,
-                SessionManager.getInstance().getCurrentSite(), binLabel);
+                SessionManager.getInstance().getCurrentSiteWrapper(), binLabel);
             String errorMsg = null;
             if (containers.size() > 0) {
                 errorMsg = "Bin labelled " + binLabel

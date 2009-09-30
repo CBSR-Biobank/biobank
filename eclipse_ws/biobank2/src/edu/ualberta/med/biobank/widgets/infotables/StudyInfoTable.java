@@ -4,18 +4,18 @@ import java.util.Collection;
 
 import org.eclipse.swt.widgets.Composite;
 
-import edu.ualberta.med.biobank.model.Study;
+import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 
-public class StudyInfoTable extends InfoTableWidget<Study> {
+public class StudyInfoTable extends InfoTableWidget<StudyWrapper> {
 
-    private static final String[] headings = new String[] { "Name",
+    private static final String[] HEADINGS = new String[] { "Name",
         "Short Name", "Num. Patients" };
 
-    private static final int[] bounds = new int[] { 200, 130, 130, -1, -1, -1,
+    private static final int[] BOUNDS = new int[] { 200, 130, 130, -1, -1, -1,
         -1 };
 
-    public StudyInfoTable(Composite parent, Collection<Study> collection) {
-        super(parent, collection, headings, bounds);
+    public StudyInfoTable(Composite parent, Collection<StudyWrapper> collection) {
+        super(parent, collection, HEADINGS, BOUNDS);
     }
 
 }

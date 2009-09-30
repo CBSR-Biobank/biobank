@@ -18,6 +18,7 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.utils.ModelUtils;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.forms.ContainerEntryForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Container;
@@ -46,7 +47,8 @@ public class ContainerGroup extends AdapterBase {
                 try {
                     List<ContainerType> top = (List<ContainerType>) ContainerTypeWrapper
                         .getTopContainerTypesInSite(SessionManager
-                            .getAppService(), ((SiteAdapter) parent).getSite());
+                            .getAppService(), new SiteWrapper(SessionManager
+                            .getAppService(), ((SiteAdapter) parent).getSite()));
                     if (top.size() == 0) {
                         MessageDialog
                             .openError(PlatformUI.getWorkbench()
@@ -57,7 +59,7 @@ public class ContainerGroup extends AdapterBase {
                         ContainerWrapper c = new ContainerWrapper(
                             SessionManager.getAppService(), new Container());
                         c.setSite(getParentFromClass(SiteAdapter.class)
-                            .getSite());
+                            .getWrapper());
                         ContainerAdapter adapter = new ContainerAdapter(
                             ContainerGroup.this, c);
                         openForm(new FormInput(adapter), ContainerEntryForm.ID);

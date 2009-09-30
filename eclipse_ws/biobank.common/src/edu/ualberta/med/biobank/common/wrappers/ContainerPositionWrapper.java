@@ -63,11 +63,6 @@ public class ContainerPositionWrapper extends
     }
 
     @Override
-    public boolean checkIntegrity() {
-        return true;
-    }
-
-    @Override
     protected void deleteChecks() throws BiobankCheckException, Exception {
         // TODO Auto-generated method stub
     }

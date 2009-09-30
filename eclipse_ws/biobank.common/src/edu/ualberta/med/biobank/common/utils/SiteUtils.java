@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.model.Sample;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
@@ -35,10 +36,12 @@ public class SiteUtils {
     }
 
     public static List<Sample> getSamplesInSite(
-        WritableApplicationService appService, String inventoryId, Site site) {
+        WritableApplicationService appService, String inventoryId,
+        SiteWrapper siteWrapper) {
         HQLCriteria criteria = new HQLCriteria("from " + Sample.class.getName()
             + " where inventoryId = ? and patientVisit.patient.study.site = ?",
-            Arrays.asList(new Object[] { inventoryId, site }));
+            Arrays.asList(new Object[] { inventoryId,
+                siteWrapper.getWrappedObject() }));
         try {
             return appService.query(criteria);
         } catch (ApplicationException e) {

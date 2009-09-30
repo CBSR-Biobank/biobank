@@ -28,7 +28,7 @@ public class ContainerTypeAddHandler extends AbstractHandler {
         Assert.isNotNull(sessionAdapter);
         SiteAdapter siteAdapter = (SiteAdapter) sessionAdapter
             .accept(new NodeSearchVisitor(Site.class, SessionManager
-                .getInstance().getCurrentSite().getId()));
+                .getInstance().getCurrentSiteWrapper().getId()));
         Assert.isNotNull(siteAdapter);
 
         ContainerTypeWrapper containerType = new ContainerTypeWrapper(

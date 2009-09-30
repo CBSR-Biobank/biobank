@@ -10,7 +10,7 @@ import org.apache.commons.collections.map.ListOrderedMap;
 import org.eclipse.core.databinding.AggregateValidationStatus;
 import org.eclipse.core.databinding.DataBindingContext;
 import org.eclipse.core.databinding.UpdateValueStrategy;
-import org.eclipse.core.databinding.beans.PojoObservables;
+import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.databinding.observable.ChangeEvent;
 import org.eclipse.core.databinding.observable.IChangeListener;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
@@ -356,7 +356,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
     }
 
     protected void createBoundWidgetsFromMap(ListOrderedMap fieldsMap,
-        Object pojo, Composite client) {
+        Object bean, Composite client) {
         FieldInfo fi;
 
         MapIterator it = fieldsMap.mapIterator();
@@ -366,7 +366,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
 
             Control control = createBoundWidgetWithLabel(client,
                 fi.widgetClass, fi.widgetOptions, fi.label, fi.widgetValues,
-                PojoObservables.observeValue(pojo, key), fi.validatorClass,
+                BeansObservables.observeValue(bean, key), fi.validatorClass,
                 fi.errMsg);
             controls.put(key, control);
         }

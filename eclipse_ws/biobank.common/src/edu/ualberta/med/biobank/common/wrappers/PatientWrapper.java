@@ -7,7 +7,6 @@ import java.util.List;
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.PatientVisit;
-import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -37,6 +36,10 @@ public class PatientWrapper extends ModelWrapper<Patient> {
         String oldStudy = getNumber();
         wrappedObject.setStudy(study);
         propertyChangeSupport.firePropertyChange("study", oldStudy, study);
+    }
+
+    public StudyWrapper getStudyWrapper() {
+        return new StudyWrapper(appService, wrappedObject.getStudy());
     }
 
     public boolean checkPatientNumberUnique() throws ApplicationException {
@@ -81,9 +84,10 @@ public class PatientWrapper extends ModelWrapper<Patient> {
     }
 
     public static PatientWrapper getPatientWrapperInSite(
-        WritableApplicationService appService, String patientNumber, Site site)
-        throws ApplicationException {
-        Patient patient = getPatientInSite(appService, patientNumber, site);
+        WritableApplicationService appService, String patientNumber,
+        SiteWrapper siteWrapper) throws ApplicationException {
+        Patient patient = getPatientInSite(appService, patientNumber,
+            siteWrapper);
         if (patient != null) {
             return new PatientWrapper(appService, patient);
         }
@@ -91,11 +95,12 @@ public class PatientWrapper extends ModelWrapper<Patient> {
     }
 
     public static Patient getPatientInSite(
-        WritableApplicationService appService, String patientNumber, Site site)
-        throws ApplicationException {
+        WritableApplicationService appService, String patientNumber,
+        SiteWrapper siteWrapper) throws ApplicationException {
         HQLCriteria criteria = new HQLCriteria("from "
             + Patient.class.getName() + " where study.site = ? and number = ?",
-            Arrays.asList(new Object[] { site, patientNumber }));
+            Arrays.asList(new Object[] { siteWrapper.getWrappedObject(),
+                patientNumber }));
         List<Patient> patients;
         patients = appService.query(criteria);
         if (patients.size() == 1) {
@@ -107,11 +112,6 @@ public class PatientWrapper extends ModelWrapper<Patient> {
     @Override
     protected Class<Patient> getWrappedClass() {
         return Patient.class;
-    }
-
-    @Override
-    public boolean checkIntegrity() {
-        return true;
     }
 
     @Override

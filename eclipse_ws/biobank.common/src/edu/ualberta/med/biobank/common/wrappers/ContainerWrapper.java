@@ -64,7 +64,8 @@ public class ContainerWrapper extends ModelWrapper<Container> {
     private void checkProductBarcodeUnique() throws BiobankCheckException,
         ApplicationException {
         List<Object> parameters = new ArrayList<Object>(Arrays
-            .asList(new Object[] { getSite(), getProductBarcode() }));
+            .asList(new Object[] { getSiteWrapper().getWrappedObject(),
+                getProductBarcode() }));
         String notSameContainer = "";
         if (!isNew()) {
             notSameContainer = " and id <> ?";
@@ -85,7 +86,8 @@ public class ContainerWrapper extends ModelWrapper<Container> {
         ApplicationException {
         String notSameContainer = "";
         List<Object> parameters = new ArrayList<Object>(Arrays
-            .asList(new Object[] { getSite(), getLabel(), getContainerType() }));
+            .asList(new Object[] { getSiteWrapper().getWrappedObject(),
+                getLabel(), getContainerType() }));
         if (!isNew()) {
             notSameContainer = " and id <> ?";
             parameters.add(getId());
@@ -106,8 +108,8 @@ public class ContainerWrapper extends ModelWrapper<Container> {
         return Container.class;
     }
 
-    public Site getSite() {
-        return wrappedObject.getSite();
+    public SiteWrapper getSiteWrapper() {
+        return new SiteWrapper(appService, wrappedObject.getSite());
     }
 
     public String getLabel() {
@@ -138,7 +140,8 @@ public class ContainerWrapper extends ModelWrapper<Container> {
         HQLCriteria criteria = new HQLCriteria("from "
             + Container.class.getName()
             + " where site = ? and label = ? and containerType = ?", Arrays
-            .asList(new Object[] { getSite(), label, containerType }));
+            .asList(new Object[] { wrappedObject.getSite(), label,
+                containerType }));
         List<Container> containers = appService.query(criteria);
         if (containers.size() == 1) {
             return containers.get(0);
@@ -157,7 +160,7 @@ public class ContainerWrapper extends ModelWrapper<Container> {
         throws ApplicationException {
         HQLCriteria criteria = new HQLCriteria("from "
             + Container.class.getName() + " where site = ? and label = ?",
-            Arrays.asList(new Object[] { getSite(), label }));
+            Arrays.asList(new Object[] { wrappedObject.getSite(), label }));
         return appService.query(criteria);
     }
 
@@ -190,8 +193,8 @@ public class ContainerWrapper extends ModelWrapper<Container> {
      */
     public List<Container> getContainersHoldingContainerType(String label)
         throws ApplicationException {
-        return getContainersHoldingContainerType(appService, label, getSite(),
-            getContainerType());
+        return getContainersHoldingContainerType(appService, label,
+            wrappedObject.getSite(), getContainerType());
     }
 
     /**
@@ -199,8 +202,8 @@ public class ContainerWrapper extends ModelWrapper<Container> {
      * containerWrapper and holding sample type
      */
     public static List<Container> getContainersHoldingSampleType(
-        WritableApplicationService appService, Site site, String label,
-        SampleType sampleType) throws ApplicationException {
+        WritableApplicationService appService, SiteWrapper siteWrapper,
+        String label, SampleType sampleType) throws ApplicationException {
         HQLCriteria criteria = new HQLCriteria(
             "from "
                 + Container.class.getName()
@@ -209,8 +212,8 @@ public class ContainerWrapper extends ModelWrapper<Container> {
                 + " as parent where parent.id in (select ct.id" + " from "
                 + ContainerType.class.getName() + " as ct"
                 + " left join ct.sampleTypeCollection as sampleType "
-                + " where sampleType = ?))", Arrays.asList(new Object[] { site,
-                label, sampleType }));
+                + " where sampleType = ?))", Arrays.asList(new Object[] {
+                siteWrapper.getWrappedObject(), label, sampleType }));
         return appService.query(criteria);
     }
 
@@ -218,11 +221,12 @@ public class ContainerWrapper extends ModelWrapper<Container> {
      * Get all containers form a given site with a given label
      */
     public static List<Container> getContainersInSite(
-        WritableApplicationService appService, Site site, String label)
-        throws ApplicationException {
+        WritableApplicationService appService, SiteWrapper siteWrapper,
+        String label) throws ApplicationException {
         HQLCriteria criteria = new HQLCriteria("from "
             + Container.class.getName() + " where site = ? and label = ?",
-            Arrays.asList(new Object[] { site, label }));
+            Arrays
+                .asList(new Object[] { siteWrapper.getWrappedClass(), label }));
         return appService.query(criteria);
     }
 
@@ -335,10 +339,11 @@ public class ContainerWrapper extends ModelWrapper<Container> {
         return wrappedObject.getActivityStatus();
     }
 
-    public void setSite(Site site) {
-        Site oldSite = getSite();
-        wrappedObject.setSite(site);
-        propertyChangeSupport.firePropertyChange("site", oldSite, site);
+    public void setSite(SiteWrapper siteWrapper) {
+        Site oldSite = wrappedObject.getSite();
+        wrappedObject.setSite(siteWrapper.getWrappedObject());
+        propertyChangeSupport.firePropertyChange("site", oldSite, siteWrapper
+            .getWrappedObject());
     }
 
     public void setLabel(String label) {
@@ -375,12 +380,13 @@ public class ContainerWrapper extends ModelWrapper<Container> {
      * Get the container with the given productBarcode in a site
      */
     public static Container getContainerWithProductBarcodeInSite(
-        WritableApplicationService appService, Site site, String productBarcode)
-        throws Exception {
+        WritableApplicationService appService, SiteWrapper siteWrapper,
+        String productBarcode) throws Exception {
         HQLCriteria criteria = new HQLCriteria("from "
             + Container.class.getName()
             + " where site = ? and productBarcode = ?", Arrays
-            .asList(new Object[] { site, productBarcode }));
+            .asList(new Object[] { siteWrapper.getWrappedObject(),
+                productBarcode }));
         List<Container> containers = appService.query(criteria);
         if (containers.size() == 0) {
             return null;
@@ -452,7 +458,7 @@ public class ContainerWrapper extends ModelWrapper<Container> {
                 if ((getPosition() != null && getPosition().getRow() != null && getPosition()
                     .getCol() != null)
                     || getPosition() == null)
-                    if (getSite() != null)
+                    if (wrappedObject.getSite() != null)
                         return true;
         return false;
 
@@ -525,7 +531,8 @@ public class ContainerWrapper extends ModelWrapper<Container> {
         // inefficient, should be improved
         HQLCriteria criteria = new HQLCriteria("from "
             + Container.class.getName() + " where label like ? and site= ?",
-            Arrays.asList(new Object[] { oldLabel + "%", getSite() }));
+            Arrays.asList(new Object[] { oldLabel + "%",
+                getSiteWrapper().getWrappedObject() }));
         List<Container> containers = appService.query(criteria);
         for (Container c : containers) {
             if (c.getLabel().compareToIgnoreCase(oldLabel) == 0)
@@ -545,13 +552,12 @@ public class ContainerWrapper extends ModelWrapper<Container> {
      */
     public List<Container> getPossibleParents(String parentLabel)
         throws ApplicationException {
-        HQLCriteria criteria = new HQLCriteria(
-            "select c from "
-                + Container.class.getName()
-                + " as c"
-                + " left join c.containerType.childContainerTypeCollection as ct where c.site = ? and c.label = ? and ct=?",
-            Arrays.asList(new Object[] { getSite(), parentLabel,
-                getContainerType() }));
+        HQLCriteria criteria = new HQLCriteria("select c from "
+            + Container.class.getName()
+            + " as c left join c.containerType.childContainerTypeCollection "
+            + "as ct where c.site = ? and c.label = ? and ct=?", Arrays
+            .asList(new Object[] { getSiteWrapper().getWrappedObject(),
+                parentLabel, getContainerType() }));
         return appService.query(criteria);
     }
 

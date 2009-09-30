@@ -7,20 +7,20 @@ import java.util.List;
 
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.model.Clinic;
-import edu.ualberta.med.biobank.model.Contact;
+import edu.ualberta.med.biobank.model.Container;
+import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
-public class ClinicWrapper extends ModelWrapper<Clinic> implements
-    Comparable<ClinicWrapper> {
+public class SiteWrapper extends ModelWrapper<Site> implements
+    Comparable<SiteWrapper> {
 
     private AddressWrapper addressWrapper;
 
-    public ClinicWrapper(WritableApplicationService appService,
-        Clinic wrappedObject) {
+    public SiteWrapper(WritableApplicationService appService, Site wrappedObject) {
         super(appService, wrappedObject);
         addressWrapper = new AddressWrapper(appService, wrappedObject
             .getAddress());
@@ -62,20 +62,9 @@ public class ClinicWrapper extends ModelWrapper<Clinic> implements
             .firePropertyChange("comment", oldComment, comment);
     }
 
-    public Site getSite() {
-        return wrappedObject.getSite();
-    }
-
-    public void setSiteWrapper(SiteWrapper siteWrapper) {
-        Site oldSite = wrappedObject.getSite();
-        Site newSite = siteWrapper.getWrappedObject();
-        wrappedObject.setSite(newSite);
-        propertyChangeSupport.firePropertyChange("site", oldSite, newSite);
-    }
-
     @Override
-    protected void firePropertyChanges(Clinic oldWrappedObject,
-        Clinic newWrappedObject) {
+    protected void firePropertyChanges(Site oldWrappedObject,
+        Site newWrappedObject) {
         String[] members = new String[] { "name", "activityStatus", "comment",
             "site" };
 
@@ -88,42 +77,23 @@ public class ClinicWrapper extends ModelWrapper<Clinic> implements
 
     @Override
     protected void persistChecks() throws BiobankCheckException, Exception {
-        if (!checkClinicNameUnique()) {
-            throw new BiobankCheckException("A clinic with name \"" + getName()
+        if (!checkSiteNameUnique()) {
+            throw new BiobankCheckException("A site with name \"" + getName()
                 + "\" already exists.");
         }
     }
 
-    public boolean checkClinicNameUnique() throws ApplicationException {
-        HQLCriteria c = new HQLCriteria("from " + Clinic.class.getName()
-            + " where site = ? and name = ?", Arrays.asList(new Object[] {
-            getSite(), getName() }));
+    private boolean checkSiteNameUnique() throws ApplicationException {
+        HQLCriteria c = new HQLCriteria("from " + Site.class.getName()
+            + " where name = ?", Arrays.asList(new Object[] { getName() }));
 
-        List<Clinic> results = appService.query(c);
+        List<Object> results = appService.query(c);
         return (results.size() == 0);
     }
 
     @Override
-    protected Class<Clinic> getWrappedClass() {
-        return Clinic.class;
-    }
-
-    public Collection<ContactWrapper> getContactCollection() {
-        Collection<ContactWrapper> collection = new HashSet<ContactWrapper>();
-        for (Contact contact : wrappedObject.getContactCollection()) {
-            collection.add(new ContactWrapper(appService, contact));
-        }
-        return collection;
-    }
-
-    public List<Study> getStudyCollection() throws ApplicationException {
-        HQLCriteria c = new HQLCriteria("select distinct studies from "
-            + Contact.class.getName() + " as contacts"
-            + " inner join contacts.studyCollection as studies"
-            + " where contacts.clinic = ?", Arrays
-            .asList(new Object[] { wrappedObject }));
-
-        return appService.query(c);
+    protected Class<Site> getWrappedClass() {
+        return Site.class;
     }
 
     @Override
@@ -131,11 +101,43 @@ public class ClinicWrapper extends ModelWrapper<Clinic> implements
         // TODO Auto-generated method stub
     }
 
-    public int compareTo(ClinicWrapper wrapper) {
+    public int compareTo(SiteWrapper wrapper) {
         String myName = wrappedObject.getName();
         String wrapperName = wrapper.wrappedObject.getName();
         return ((myName.compareTo(wrapperName) > 0) ? 1 : (myName
             .equals(wrapperName) ? 0 : -1));
+    }
+
+    public Collection<StudyWrapper> getStudyWrapperCollection() {
+        Collection<StudyWrapper> collection = new HashSet<StudyWrapper>();
+        for (Study study : wrappedObject.getStudyCollection()) {
+            collection.add(new StudyWrapper(appService, study));
+        }
+        return collection;
+    }
+
+    public Collection<ClinicWrapper> getClinicWrapperCollection() {
+        Collection<ClinicWrapper> collection = new HashSet<ClinicWrapper>();
+        for (Clinic clinic : wrappedObject.getClinicCollection()) {
+            collection.add(new ClinicWrapper(appService, clinic));
+        }
+        return collection;
+    }
+
+    public Collection<ContainerTypeWrapper> getContainerTypeWrapperCollection() {
+        Collection<ContainerTypeWrapper> collection = new HashSet<ContainerTypeWrapper>();
+        for (ContainerType ct : wrappedObject.getContainerTypeCollection()) {
+            collection.add(new ContainerTypeWrapper(appService, ct));
+        }
+        return collection;
+    }
+
+    public Collection<ContainerWrapper> getContainerWrapperCollection() {
+        Collection<ContainerWrapper> collection = new HashSet<ContainerWrapper>();
+        for (Container c : wrappedObject.getContainerCollection()) {
+            collection.add(new ContainerWrapper(appService, c));
+        }
+        return collection;
     }
 
 }

@@ -295,6 +295,8 @@ public class StudyEntryForm extends BiobankEntryForm {
 
     @Override
     protected void saveForm() throws Exception {
+        // FIXME should be transfer to persitCheck method or others set Methods
+        // of the wrapper
         if ((study.getId() == null) && !checkStudyNameUnique()) {
             setDirty(true);
             return;
@@ -349,12 +351,16 @@ public class StudyEntryForm extends BiobankEntryForm {
     }
 
     private void saveStudy() throws ApplicationException {
+        // FIXME should be transfer to persitCheck method or others set Methods
+        // of the wrapper
         SDKQuery query;
         SDKQueryResult result;
         Set<PvInfo> savedPvInfoList = new HashSet<PvInfo>();
 
         study.setSite(site);
-        study.setContactCollection(contactEntryWidget.getContacts());
+
+        // FIXME: change study to studyWrapper
+        // study.setContactCollection(contactEntryWidget.getContacts());
 
         if (study.getPvInfoCollection().size() > 0) {
             for (PvInfo pvInfo : study.getPvInfoCollection()) {

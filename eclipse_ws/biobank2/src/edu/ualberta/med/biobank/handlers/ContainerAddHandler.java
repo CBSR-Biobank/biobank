@@ -30,37 +30,36 @@ public class ContainerAddHandler extends AbstractHandler {
         try {
             List<ContainerType> top = (List<ContainerType>) ContainerTypeWrapper
                 .getTopContainerTypesInSite(SessionManager.getAppService(),
-                    SessionManager.getInstance().getCurrentSite());
+                    SessionManager.getInstance().getCurrentSiteWrapper());
             if (top.size() == 0) {
                 MessageDialog
                     .openError(PlatformUI.getWorkbench()
                         .getActiveWorkbenchWindow().getShell(),
                         "Unable to create container",
                         "You must define a top-level container type before initializing storage.");
-            } else {
-                SessionAdapter sessionAdapter = SessionManager.getInstance()
-                    .getSession();
-                Assert.isNotNull(sessionAdapter);
-                SiteAdapter siteAdapter = (SiteAdapter) sessionAdapter
-                    .accept(new NodeSearchVisitor(Site.class, SessionManager
-                        .getInstance().getCurrentSite().getId()));
-                Assert.isNotNull(siteAdapter);
-
-                ContainerWrapper container = new ContainerWrapper(
-                    SessionManager.getAppService(), new Container());
-                container.setSite(siteAdapter.getSite());
-                ContainerAdapter containerNode = new ContainerAdapter(
-                    siteAdapter.getContainerTypesGroupNode(), container);
-
-                FormInput input = new FormInput(containerNode);
-                HandlerUtil.getActiveWorkbenchWindowChecked(event)
-                    .getActivePage().openEditor(input, ContainerEntryForm.ID,
-                        true);
+                return null;
             }
+
+            SessionAdapter sessionAdapter = SessionManager.getInstance()
+                .getSession();
+            Assert.isNotNull(sessionAdapter);
+            SiteAdapter siteAdapter = (SiteAdapter) sessionAdapter
+                .accept(new NodeSearchVisitor(Site.class, SessionManager
+                    .getInstance().getCurrentSiteWrapper().getId()));
+            Assert.isNotNull(siteAdapter);
+
+            ContainerWrapper containerWrapper = new ContainerWrapper(
+                SessionManager.getAppService(), new Container());
+            containerWrapper.setSite(siteAdapter.getWrapper());
+            ContainerAdapter containerNode = new ContainerAdapter(siteAdapter
+                .getContainerTypesGroupNode(), containerWrapper);
+
+            FormInput input = new FormInput(containerNode);
+            HandlerUtil.getActiveWorkbenchWindowChecked(event).getActivePage()
+                .openEditor(input, ContainerEntryForm.ID, true);
         } catch (Exception e) {
             throw new ExecutionException("Error on action Add Container", e);
         }
         return null;
     }
-
 }

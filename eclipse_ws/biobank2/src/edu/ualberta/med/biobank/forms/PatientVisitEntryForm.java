@@ -431,7 +431,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         if (clinicsComboViewer != null) {
             IStructuredSelection clinicSelection = (IStructuredSelection) clinicsComboViewer
                 .getSelection();
-            if (clinicSelection != null && clinicSelection.size() > 0) {
+            if ((clinicSelection != null) && (clinicSelection.size() > 0)) {
                 patientVisitWrapper.setClinic((Clinic) clinicSelection
                     .getFirstElement());
             } else {

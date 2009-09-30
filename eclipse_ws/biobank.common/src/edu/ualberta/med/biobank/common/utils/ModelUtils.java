@@ -97,18 +97,6 @@ public class ModelUtils {
         return appService.query(c);
     }
 
-    public static List<Study> getClinicStudyCollection(
-        WritableApplicationService appService, Clinic clinic)
-        throws ApplicationException {
-        HQLCriteria c = new HQLCriteria("select distinct studies from "
-            + Contact.class.getName() + " as contacts"
-            + " inner join contacts.studyCollection as studies"
-            + " where contacts.clinic = ?", Arrays
-            .asList(new Object[] { clinic }));
-
-        return appService.query(c);
-    }
-
     public static boolean getBooleanValue(Boolean value, boolean defaultValue) {
         if (value == null) {
             return defaultValue;

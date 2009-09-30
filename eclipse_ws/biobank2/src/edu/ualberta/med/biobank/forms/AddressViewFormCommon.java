@@ -3,20 +3,11 @@ package edu.ualberta.med.biobank.forms;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.Section;
 
-import edu.ualberta.med.biobank.model.Address;
+import edu.ualberta.med.biobank.common.wrappers.AddressWrapper;
 
 public abstract class AddressViewFormCommon extends BiobankViewForm {
 
-    protected Address address;
-
-    protected void createAddressArea(Composite parent) {
-        createWidgetsFromMap(AddressEntryFormCommon.ADDRESS_FIELDS, parent);
-        setAdressValues();
-    }
-
-    protected void setAdressValues() {
-        setWidgetsValues(AddressEntryFormCommon.ADDRESS_FIELDS, address);
-    }
+    protected AddressWrapper addressWrapper;
 
     protected void createAddressSection() {
         Composite client = createSectionWithClient("Address");
@@ -24,4 +15,14 @@ public abstract class AddressViewFormCommon extends BiobankViewForm {
         section.setExpanded(false);
         createAddressArea(client);
     }
+
+    protected void createAddressArea(Composite parent) {
+        createWidgetsFromMap(AddressEntryFormCommon.ADDRESS_FIELDS, parent);
+        setAdressValues();
+    }
+
+    protected void setAdressValues() {
+        setWidgetsValues(AddressEntryFormCommon.ADDRESS_FIELDS, addressWrapper);
+    }
+
 }
