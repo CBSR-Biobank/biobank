@@ -554,4 +554,13 @@ public class ContainerWrapper extends ModelWrapper<Container> {
                 getContainerType() }));
         return appService.query(criteria);
     }
+
+    public static List<Container> getTopContainersForSite(
+        WritableApplicationService appService, Site site)
+        throws ApplicationException {
+        HQLCriteria criteria = new HQLCriteria("from "
+            + Container.class.getName() + " where site=? and position is null",
+            Arrays.asList(new Object[] { site }));
+        return appService.query(criteria);
+    }
 }

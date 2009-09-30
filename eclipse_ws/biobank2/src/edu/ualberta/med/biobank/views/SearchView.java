@@ -95,7 +95,6 @@ public class SearchView extends ViewPart {
             public void run() {
                 try {
                     WritableApplicationService appService = null;
-                    AdapterBase node;
                     AdapterBase selectedNode = SessionManager.getInstance()
                         .getSelectedNode();
                     if (selectedNode == null) {

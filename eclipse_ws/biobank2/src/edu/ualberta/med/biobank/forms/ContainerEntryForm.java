@@ -18,7 +18,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.common.LabelingScheme;
-import edu.ualberta.med.biobank.common.utils.SiteUtils;
+import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.ContainerType;
@@ -79,7 +79,7 @@ public class ContainerEntryForm extends BiobankEntryForm {
     }
 
     @Override
-    protected void createFormContent() {
+    protected void createFormContent() throws Exception {
         form.setText("Container");
         currentContainerType = container.getContainerType();
         form.getBody().setLayout(new GridLayout(1, false));
@@ -87,7 +87,7 @@ public class ContainerEntryForm extends BiobankEntryForm {
         createButtonsSection();
     }
 
-    private void createContainerSection() {
+    private void createContainerSection() throws Exception {
         Composite client = toolkit.createComposite(form.getBody());
         GridLayout layout = new GridLayout(2, false);
         layout.horizontalSpacing = 10;
@@ -130,12 +130,12 @@ public class ContainerEntryForm extends BiobankEntryForm {
         createContainerTypesSection(client);
     }
 
-    private void createContainerTypesSection(Composite client) {
+    private void createContainerTypesSection(Composite client) throws Exception {
         Collection<ContainerType> containerTypes;
         ContainerPosition pos = container.getPosition();
         if ((pos == null) || (pos.getParentContainer() == null)) {
-            containerTypes = SiteUtils.getTopContainerTypesInSite(appService,
-                site);
+            containerTypes = ContainerTypeWrapper.getTopContainerTypesInSite(
+                appService, site);
         } else {
             containerTypes = pos.getParentContainer().getContainerType()
                 .getChildContainerTypeCollection();

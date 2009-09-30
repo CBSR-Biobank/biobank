@@ -16,7 +16,7 @@ import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.utils.ModelUtils;
-import edu.ualberta.med.biobank.common.utils.SiteUtils;
+import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.forms.ContainerEntryForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
@@ -24,6 +24,7 @@ import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerComparator;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.Site;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ContainerGroup extends AdapterBase {
 
@@ -42,22 +43,28 @@ public class ContainerGroup extends AdapterBase {
         mi.setText("Add a Container");
         mi.addSelectionListener(new SelectionListener() {
             public void widgetSelected(SelectionEvent event) {
-                List<ContainerType> top = (List<ContainerType>) SiteUtils
-                    .getTopContainerTypesInSite(SessionManager.getAppService(),
-                        ((SiteAdapter) parent).getSite());
-                if (top.size() == 0) {
-                    MessageDialog
-                        .openError(PlatformUI.getWorkbench()
-                            .getActiveWorkbenchWindow().getShell(),
-                            "Unable to create container",
-                            "You must define a top-level container type before initializing storage.");
-                } else {
-                    ContainerWrapper c = new ContainerWrapper(SessionManager
-                        .getAppService(), new Container());
-                    c.setSite(getParentFromClass(SiteAdapter.class).getSite());
-                    ContainerAdapter adapter = new ContainerAdapter(
-                        ContainerGroup.this, c);
-                    openForm(new FormInput(adapter), ContainerEntryForm.ID);
+                try {
+                    List<ContainerType> top = (List<ContainerType>) ContainerTypeWrapper
+                        .getTopContainerTypesInSite(SessionManager
+                            .getAppService(), ((SiteAdapter) parent).getSite());
+                    if (top.size() == 0) {
+                        MessageDialog
+                            .openError(PlatformUI.getWorkbench()
+                                .getActiveWorkbenchWindow().getShell(),
+                                "Unable to create container",
+                                "You must define a top-level container type before initializing storage.");
+                    } else {
+                        ContainerWrapper c = new ContainerWrapper(
+                            SessionManager.getAppService(), new Container());
+                        c.setSite(getParentFromClass(SiteAdapter.class)
+                            .getSite());
+                        ContainerAdapter adapter = new ContainerAdapter(
+                            ContainerGroup.this, c);
+                        openForm(new FormInput(adapter), ContainerEntryForm.ID);
+                    }
+                } catch (ApplicationException ae) {
+                    SessionManager.getLogger().error(
+                        "Problem executing add container", ae);
                 }
             }
 
@@ -76,8 +83,8 @@ public class ContainerGroup extends AdapterBase {
                 Site.class, parentSite.getId());
             ((SiteAdapter) getParent()).setSite(parentSite);
 
-            List<Container> containers = ModelUtils.getTopContainersForSite(
-                getAppService(), parentSite);
+            List<Container> containers = ContainerWrapper
+                .getTopContainersForSite(getAppService(), parentSite);
             Collections.sort(containers, new ContainerComparator());
             for (Container container : containers) {
                 ContainerAdapter node = (ContainerAdapter) getChild(container

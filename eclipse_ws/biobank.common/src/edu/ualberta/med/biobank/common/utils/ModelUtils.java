@@ -11,9 +11,7 @@ import org.springframework.util.Assert;
 
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Contact;
-import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.SampleStorage;
-import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -23,16 +21,6 @@ public class ModelUtils {
 
     private static final Logger logger = Logger.getLogger(ModelUtils.class
         .getName());
-
-    public static List<Container> getTopContainersForSite(
-        WritableApplicationService appService, Site site)
-        throws ApplicationException {
-        HQLCriteria criteria = new HQLCriteria("from "
-            + Container.class.getName()
-            + " where site.id=? and position is null", Arrays
-            .asList(new Object[] { site.getId() }));
-        return appService.query(criteria);
-    }
 
     public static <E> E getObjectWithId(WritableApplicationService appService,
         Class<E> classType, Integer id) throws Exception {

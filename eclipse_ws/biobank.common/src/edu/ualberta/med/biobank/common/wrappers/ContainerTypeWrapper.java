@@ -391,6 +391,15 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
             throw new BiobankCheckException(
                 "Unable to change the \"Child Labeling scheme\" property. A container requiring this property exists in storage. Remove all instances before attempting to modify this container type.");
         }
+    }
 
+    public static Collection<ContainerType> getTopContainerTypesInSite(
+        WritableApplicationService appService, Site site)
+        throws ApplicationException {
+        HQLCriteria criteria = new HQLCriteria("from "
+            + ContainerType.class.getName()
+            + " where site = ? and topLevel=true", Arrays
+            .asList(new Object[] { site }));
+        return appService.query(criteria);
     }
 }
