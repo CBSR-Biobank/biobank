@@ -20,7 +20,6 @@ public class SampleTypeWrapper extends ModelWrapper<SampleType> {
     @Override
     protected void firePropertyChanges(SampleType oldWrappedObject,
         SampleType newWrappedObject) {
-        // TODO Auto-generated method stub
 
     }
 
@@ -34,6 +33,10 @@ public class SampleTypeWrapper extends ModelWrapper<SampleType> {
         return DatabaseResult.OK;
     }
 
+    /**
+     * get all sample types in a site for containers which type name contains
+     * "typeNameContains"
+     */
     public static List<SampleType> getSampleTypeForContainerTypes(
         WritableApplicationService appService, Site site,
         String typeNameContains) throws ApplicationException {

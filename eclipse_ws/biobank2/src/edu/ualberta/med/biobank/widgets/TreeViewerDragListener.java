@@ -25,7 +25,6 @@ public class TreeViewerDragListener implements DragSourceListener {
 
     public void dragStart(DragSourceEvent event) {
         event.doit = !viewer.getSelection().isEmpty();
-        MultiSelectWidget.log4j.trace("dragStart: " + event.toString());
     }
 
     public void dragSetData(DragSourceEvent event) {
@@ -40,7 +39,6 @@ public class TreeViewerDragListener implements DragSourceListener {
         }
         event.data = nodes;
         dragData = nodes;
-        MultiSelectWidget.log4j.trace("dragSetData: " + event.toString());
         dragFinished(event);
     }
 
@@ -51,9 +49,6 @@ public class TreeViewerDragListener implements DragSourceListener {
         MultiSelectNode rootNode = (MultiSelectNode) viewer.getInput();
         for (MultiSelectNode node : dragData) {
             rootNode.removeChild(node);
-            MultiSelectWidget.log4j.trace("removed " + node.getName()
-                + " from " + rootNode.getName() + ", event: "
-                + event.toString());
         }
     }
 }

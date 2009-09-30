@@ -24,6 +24,8 @@ public class PalletCell {
 
     private ScanCell scanCell;
 
+    private Sample expectedSample;
+
     public PalletCell(ScanCell scanCell) {
         this.scanCell = scanCell;
     }
@@ -40,64 +42,53 @@ public class PalletCell {
 
     public static PalletCell[][] getRandomScanLink() {
         return convertArray(ScanCell.getRandom());
-        // ScanCell[][] paletteScanned = new ScanCell[8][12];
-        // paletteScanned[0][0] = new ScanCell(0, 0, "titi");
-        // paletteScanned[1][3] = new ScanCell(1, 3, "toto");
-        // return convertArray(paletteScanned);
+        // ScanCell[][] palletScanned = new ScanCell[8][12];
+        // palletScanned[0][0] = new ScanCell(0, 0, "titi");
+        // palletScanned[1][3] = new ScanCell(1, 3, "toto");
+        // return convertArray(palletScanned);
     }
 
     public static PalletCell[][] getRandomScanProcessAlreadyInPallet(
-        WritableApplicationService appService, Site site) {
-        // FIXME check uml pour positionSample/sample comme pour
-        // container/containerposition
+        WritableApplicationService appService, Site site) throws Exception {
         PalletCell[][] palletScanned = initArray();
-        try {
-            HQLCriteria criteria = new HQLCriteria("from "
-                + Sample.class.getName()
-                + " as s where s in (select sp.sample from "
-                + SamplePosition.class.getName()
-                + " as sp) and s.patientVisit.patient.study.site = ?", Arrays
-                .asList(new Object[] { site }));
-            List<Sample> samples = appService.query(criteria);
-            if (samples.size() > 0) {
-                palletScanned[0][0] = new PalletCell(new ScanCell(0, 0, samples
-                    .get(0).getInventoryId()));
-            }
-            if (samples.size() > 1) {
-                palletScanned[2][4] = new PalletCell(new ScanCell(2, 4, samples
-                    .get(1).getInventoryId()));
-            }
-        } catch (ApplicationException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+        HQLCriteria criteria = new HQLCriteria("from " + Sample.class.getName()
+            + " as s where s in (select sp.sample from "
+            + SamplePosition.class.getName()
+            + " as sp) and s.patientVisit.patient.study.site = ?", Arrays
+            .asList(new Object[] { site }));
+        List<Sample> samples = appService.query(criteria);
+        if (samples.size() > 0) {
+            palletScanned[0][0] = new PalletCell(new ScanCell(0, 0, samples
+                .get(0).getInventoryId()));
+        }
+        if (samples.size() > 1) {
+            palletScanned[2][4] = new PalletCell(new ScanCell(2, 4, samples
+                .get(1).getInventoryId()));
         }
         return palletScanned;
     }
 
     public static PalletCell[][] getRandomScanProcessNotInPallet(
-        WritableApplicationService appService, Site site) {
-        // FIXME check uml pour positionSample/sample comme pour
-        // container/containerposition
+        WritableApplicationService appService, Site site)
+        throws ApplicationException {
         PalletCell[][] palletScanned = initArray();
-        try {
-            HQLCriteria criteria = new HQLCriteria(
-                "from "
-                    + Sample.class.getName()
-                    + " as s where s not in (select sp.sample from "
-                    + SamplePosition.class.getName()
-                    + " as sp) "
-                    + "and s.inventoryId <> '123' and s.patientVisit.patient.study.site = ?",
-                Arrays.asList(new Object[] { site }));
-            List<Sample> samples = appService.query(criteria);
-            if (samples.size() > 1) {
-                palletScanned[0][0] = new PalletCell(new ScanCell(0, 0, samples
-                    .get(0).getInventoryId()));
-                palletScanned[2][4] = new PalletCell(new ScanCell(2, 4, samples
-                    .get(1).getInventoryId()));
-            }
-        } catch (ApplicationException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+        HQLCriteria criteria = new HQLCriteria(
+            "from "
+                + Sample.class.getName()
+                + " as s where s not in (select sp.sample from "
+                + SamplePosition.class.getName()
+                + " as sp) "
+                + "and s.inventoryId <> '123' and s.patientVisit.patient.study.site = ?",
+            Arrays.asList(new Object[] { site }));
+        List<Sample> samples = appService.query(criteria);
+        if (samples.size() > 1) {
+            // Random r = new Random();
+            // int sample1 = r.nextInt(samples.size());
+            // int sample2 = r.nextInt(samples.size());
+            palletScanned[0][0] = new PalletCell(new ScanCell(0, 0, samples
+                .get(0).getInventoryId()));
+            // palletScanned[2][4] = new PalletCell(new ScanCell(2, 4, samples
+            // .get(1).getInventoryId()));
         }
         return palletScanned;
     }
@@ -191,5 +182,13 @@ public class PalletCell {
 
     public static PalletCell[][] getEmptyCells() {
         return new PalletCell[ScanCell.ROW_MAX][ScanCell.COL_MAX];
+    }
+
+    public void setExpectedSample(Sample expectedSample) {
+        this.expectedSample = expectedSample;
+    }
+
+    public Sample getExpectedSample() {
+        return expectedSample;
     }
 }

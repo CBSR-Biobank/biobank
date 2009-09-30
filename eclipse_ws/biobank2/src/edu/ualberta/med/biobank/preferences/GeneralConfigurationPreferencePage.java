@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.preferences;
 
-import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.IntegerFieldEditor;
 import org.eclipse.jface.preference.StringFieldEditor;
@@ -30,8 +29,6 @@ public class GeneralConfigurationPreferencePage extends
             "Cancel barcode", getFieldEditorParent()));
         addField(new IntegerFieldEditor(PreferenceConstants.GENERAL_TIME_OUT,
             "Security time out (mins)", getFieldEditorParent()));
-        addField(new BooleanFieldEditor(PreferenceConstants.GENERAL_ASK_PRINT,
-            "Ask to print activity log", getFieldEditorParent()));
     }
 
     /*

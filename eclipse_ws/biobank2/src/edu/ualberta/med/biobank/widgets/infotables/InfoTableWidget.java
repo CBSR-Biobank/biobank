@@ -118,22 +118,25 @@ public class InfoTableWidget<T> extends BiobankWidget {
                     model.add(modelItem);
                     modelItem.o = item;
                 }
-
-                getTableViewer().getTable().getDisplay().asyncExec(
-                    new Runnable() {
-                        public void run() {
-                            getTableViewer().refresh();
-
-                            // only notify listeners if collection has been
-                            // assigned other than by constructor
-                            if (setCollectionCount > 0)
-                                InfoTableWidget.this.notifyListeners();
-                            ++setCollectionCount;
-                        }
-                    });
+                launchAsyncRefresh();
             }
+
         };
         t.start();
+    }
+
+    protected void launchAsyncRefresh() {
+        getTableViewer().getTable().getDisplay().asyncExec(new Runnable() {
+            public void run() {
+                getTableViewer().refresh();
+
+                // only notify listeners if collection has been
+                // assigned other than by constructor
+                if (setCollectionCount > 0)
+                    InfoTableWidget.this.notifyListeners();
+                ++setCollectionCount;
+            }
+        });
     }
 
     @SuppressWarnings("unchecked")

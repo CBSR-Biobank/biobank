@@ -88,7 +88,7 @@ public class PalletPositionChooserPage extends AbstractContainerChooserPage {
         selectedPosition = null;
         Collection<ContainerType> types = getCurrentContainer()
             .getContainerType().getChildContainerTypeCollection();
-        // TODO do not include type not active
+        // do not include type not active
         comboViewer.setInput(types);
         if (types.size() == 1) {
             comboViewer

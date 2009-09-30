@@ -1,76 +1,48 @@
 package edu.ualberta.med.biobank.preferences;
 
-import org.eclipse.jface.preference.PreferencePage;
-import org.eclipse.swt.custom.ScrolledComposite;
-import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Text;
+import org.eclipse.jface.preference.BooleanFieldEditor;
+import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
-public class LinkAssignPreferencePage extends PreferencePage implements
-    IWorkbenchPreferencePage {
-    private Composite createComposite(Composite parent, int numColumns) {
-        noDefaultAndApplyButton();
+import edu.ualberta.med.biobank.BioBankPlugin;
 
-        Composite composite = new Composite(parent, 0);
+public class LinkAssignPreferencePage extends FieldEditorPreferencePage
+    implements IWorkbenchPreferencePage {
 
-        GridLayout layout = new GridLayout();
-        layout.numColumns = numColumns;
-        composite.setLayout(layout);
-
-        GridData data = new GridData(4);
-        data.horizontalIndent = 0;
-        data.verticalAlignment = 4;
-        data.horizontalAlignment = 4;
-        composite.setLayoutData(data);
-
-        return composite;
+    public LinkAssignPreferencePage() {
+        super(GRID);
+        setPreferenceStore(BioBankPlugin.getDefault().getPreferenceStore());
     }
 
+    /**
+     * Creates the field editors. Field editors are abstractions of the common
+     * GUI blocks needed to manipulate various types of preferences. Each field
+     * editor knows how to save and restore itself.
+     */
     @Override
-    protected Control createContents(Composite parent) {
-        Composite composite = createScrolledComposite(parent);
-
-        String description = "Expand the tree to edit preferences for a specific feature.";
-        Text text = new Text(composite, 8);
-
-        text.setBackground(composite.getBackground());
-        text.setText(description);
-
-        setSize(composite);
-        return composite;
+    public void createFieldEditors() {
+        addField(new BooleanFieldEditor(
+            PreferenceConstants.LINK_ASSIGN_ASK_PRINT,
+            "Ask to print activity log", getFieldEditorParent()));
+        // PrinterData[] datas = Printer.getPrinterList();
+        // String[][] list = new String[datas.length][2];
+        // for (int i = 0; i < datas.length; i++) {
+        // list[i][0] = datas[i].name;
+        // list[i][1] = datas[i].name;
+        // }
+        // ComboFieldEditor printerCombo = new ComboFieldEditor(
+        // PreferenceConstants.LINK_ASSIGN_PRINTER, "Printer", list,
+        // getFieldEditorParent());
+        // addField(printerCombo);
     }
 
-    private Composite createScrolledComposite(Composite parent) {
-        ScrolledComposite sc1 = new ScrolledComposite(parent, 768);
-        sc1.setLayoutData(new GridData(1808));
-        Composite composite = createComposite(sc1, 1);
-        sc1.setContent(composite);
-
-        setSize(composite);
-        return composite;
-    }
-
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.eclipse.ui.IWorkbenchPreferencePage#init(org.eclipse.ui.IWorkbench)
+     */
     public void init(IWorkbench workbench) {
-    }
-
-    private void setSize(Composite composite) {
-        if (composite != null) {
-            applyDialogFont(composite);
-            Point minSize = composite.computeSize(-1, -1);
-            composite.setSize(minSize);
-
-            if (composite.getParent() instanceof ScrolledComposite) {
-                ScrolledComposite sc1 = (ScrolledComposite) composite
-                    .getParent();
-                sc1.setMinSize(minSize);
-                sc1.setExpandHorizontal(true);
-                sc1.setExpandVertical(true);
-            }
-        }
     }
 }

@@ -434,10 +434,9 @@ public class StudyEntryForm extends BiobankEntryForm {
     }
 
     private boolean checkStudyNameUnique() throws Exception {
-        HQLCriteria c = new HQLCriteria(
-            "from edu.ualberta.med.biobank.model.Study as study "
-                + "inner join fetch study.site where study.site.id=? "
-                + "and study.name=? and study.nameShort=?");
+        HQLCriteria c = new HQLCriteria("from " + Study.class.getName()
+            + " as study inner join fetch study.site where study.site.id=? "
+            + "and study.name=? and study.nameShort=?");
 
         c.setParameters(Arrays.asList(new Object[] { site.getId(),
             study.getName(), study.getNameShort() }));
@@ -451,10 +450,9 @@ public class StudyEntryForm extends BiobankEntryForm {
             return false;
         }
 
-        c = new HQLCriteria(
-            "from edu.ualberta.med.biobank.model.Study as study "
-                + "inner join fetch study.site where study.site.id=?"
-                + "and study.nameShort=?");
+        c = new HQLCriteria("from " + Study.class.getName() + " as study "
+            + "inner join fetch study.site where study.site.id=?"
+            + "and study.nameShort=?");
 
         c.setParameters(Arrays.asList(new Object[] { site.getId(),
             study.getNameShort() }));
@@ -490,7 +488,6 @@ public class StudyEntryForm extends BiobankEntryForm {
 
     @Override
     public void cancelForm() {
-        // TODO Auto-generated method stub
 
     }
 

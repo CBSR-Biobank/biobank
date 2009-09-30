@@ -5,7 +5,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.eclipse.core.runtime.preferences.ConfigurationScope;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -57,15 +56,17 @@ public class LoginDialog extends TitleAreaDialog {
     private static final Logger logger = Logger.getLogger(LoginDialog.class
         .getName());
 
+    public Preferences pluginPrefs = null;
+
     public LoginDialog(Shell parentShell) {
         super(parentShell);
 
         servers = new ArrayList<String>();
         userNames = new ArrayList<String>();
 
-        Preferences prefs = new InstanceScope().getNode(Application.PLUGIN_ID);
-        Preferences prefsServers = prefs.node(SAVED_SERVERS);
-        Preferences prefsUserNames = prefs.node(SAVED_USER_NAMES);
+        pluginPrefs = new InstanceScope().getNode(Application.PLUGIN_ID);
+        Preferences prefsServers = pluginPrefs.node(SAVED_SERVERS);
+        Preferences prefsUserNames = pluginPrefs.node(SAVED_USER_NAMES);
 
         try {
             String[] serverNodeNames = prefsServers.childrenNames();
@@ -106,9 +107,6 @@ public class LoginDialog extends TitleAreaDialog {
     protected Control createDialogArea(Composite parent) {
         Composite parentComposite = (Composite) super.createDialogArea(parent);
 
-        Preferences prefs = new ConfigurationScope()
-            .getNode(Application.PLUGIN_ID);
-
         Composite contents = new Composite(parentComposite, SWT.NONE);
         GridLayout layout = new GridLayout(2, false);
         contents.setLayout(layout);
@@ -126,7 +124,7 @@ public class LoginDialog extends TitleAreaDialog {
             serverText.add(it.next());
         }
 
-        serverText.select(serverText.indexOf(prefs.get(LAST_SERVER, "")));
+        serverText.select(serverText.indexOf(pluginPrefs.get(LAST_SERVER, "")));
 
         Label userNameLabel = new Label(contents, SWT.NONE);
         userNameLabel.setText("&User Name:");
@@ -144,8 +142,8 @@ public class LoginDialog extends TitleAreaDialog {
         for (Iterator<String> it = userNames.iterator(); it.hasNext();) {
             userNameText.add(it.next());
         }
-        userNameText
-            .select(userNameText.indexOf(prefs.get(LAST_USER_NAME, "")));
+        userNameText.select(userNameText.indexOf(pluginPrefs.get(
+            LAST_USER_NAME, "")));
 
         Label passwordLabel = new Label(contents, SWT.NONE);
         passwordLabel.setText("&Password:");
@@ -163,15 +161,13 @@ public class LoginDialog extends TitleAreaDialog {
     protected void buttonPressed(int buttonId) {
         if ((buttonId == IDialogConstants.OK_ID)
             || (buttonId == IDialogConstants.CANCEL_ID)) {
-            Preferences prefs = new InstanceScope()
-                .getNode(Application.PLUGIN_ID);
-            prefs.put(LAST_SERVER, serverText.getText());
-            prefs.put(LAST_USER_NAME, userNameText.getText());
+            pluginPrefs.put(LAST_SERVER, serverText.getText());
+            pluginPrefs.put(LAST_USER_NAME, userNameText.getText());
 
             if ((serverText.getText().length() > 0)
                 && (serverText.getSelectionIndex() == -1)
                 && !servers.contains(serverText.getText())) {
-                Preferences prefsServers = prefs.node(SAVED_SERVERS);
+                Preferences prefsServers = pluginPrefs.node(SAVED_SERVERS);
                 Preferences prefsServer = prefsServers.node(Integer
                     .toString(servers.size()));
                 prefsServer.put(SERVER, serverText.getText().trim());
@@ -180,14 +176,14 @@ public class LoginDialog extends TitleAreaDialog {
             if ((userNameText.getText().length() > 0)
                 && (userNameText.getSelectionIndex() == -1)
                 && !userNames.contains(userNameText.getText())) {
-                Preferences prefsUserNames = prefs.node(SAVED_USER_NAMES);
+                Preferences prefsUserNames = pluginPrefs.node(SAVED_USER_NAMES);
                 Preferences prefsUserName = prefsUserNames.node(Integer
                     .toString(userNames.size()));
                 prefsUserName.put(USER_NAME, userNameText.getText().trim());
             }
 
             try {
-                prefs.flush();
+                pluginPrefs.flush();
             } catch (BackingStoreException e) {
                 logger.error("Could not save loggin preferences", e);
             }

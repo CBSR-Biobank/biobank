@@ -14,6 +14,8 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.model.PalletCell;
+import edu.ualberta.med.biobank.model.PatientVisit;
+import edu.ualberta.med.biobank.model.Sample;
 import edu.ualberta.med.biobank.model.SampleCellStatus;
 import edu.ualberta.med.biobank.widgets.listener.ScanPalletModificationEvent;
 import edu.ualberta.med.biobank.widgets.listener.ScanPalletModificationListener;
@@ -22,7 +24,7 @@ import edu.ualberta.med.scanlib.ScanCell;
 /**
  * Specific widget to draw a 8*12 pallet
  */
-public class ScanPalletWidget extends AbstractGridContainerWidget {
+public class PalletWidget extends AbstractGridContainerWidget {
 
     public static final int SAMPLE_WIDTH = 50;
 
@@ -41,7 +43,7 @@ public class ScanPalletWidget extends AbstractGridContainerWidget {
 
     List<ScanPalletModificationListener> listeners;
 
-    public ScanPalletWidget(Composite parent) {
+    public PalletWidget(Composite parent) {
         super(parent);
         listeners = new ArrayList<ScanPalletModificationListener>();
         addMouseTrackListener(new MouseTrackAdapter() {
@@ -89,7 +91,7 @@ public class ScanPalletWidget extends AbstractGridContainerWidget {
     }
 
     @Override
-    protected String getTextForBox(int indexRow, int indexCol) {
+    protected String getMiddleTextForBox(int indexRow, int indexCol) {
         if (scannedElements != null
             && scannedElements[indexRow][indexCol] != null) {
             String title = scannedElements[indexRow][indexCol].getTitle();
@@ -97,7 +99,31 @@ public class ScanPalletWidget extends AbstractGridContainerWidget {
                 return title;
             }
         }
-        return super.getTextForBox(indexRow, indexCol);
+        return "-";
+    }
+
+    @Override
+    protected String getTopTextForBox(int indexRow, int indexCol) {
+        return getDefaultTextForBox(indexRow, indexCol);
+    }
+
+    @Override
+    protected String getBottomTextForBox(int indexRow, int indexCol) {
+        if (scannedElements != null
+            && scannedElements[indexRow][indexCol] != null) {
+            Sample sample = scannedElements[indexRow][indexCol]
+                .getExpectedSample();
+            if (sample != null) {
+                PatientVisit pv = sample.getPatientVisit();
+                if (pv != null) {
+                    String number = pv.getPatient().getNumber();
+                    if (number != null) {
+                        return number;
+                    }
+                }
+            }
+        }
+        return "-";
     }
 
     @Override

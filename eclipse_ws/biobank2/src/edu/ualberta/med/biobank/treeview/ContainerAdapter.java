@@ -131,7 +131,6 @@ public class ContainerAdapter extends AdapterBase {
                         // need to update
                     } catch (Exception e) {
                         BioBankPlugin.openError(e.getMessage(), e);
-                        e.printStackTrace();
                     }
                 }
 
@@ -174,15 +173,15 @@ public class ContainerAdapter extends AdapterBase {
                             "Unable to delete container "
                                 + c.getLabel()
                                 + ". All subcontainers/samples must be removed first.");
-                } else
+                } else {
                     try {
                         getAppService().executeQuery(query);
                         ContainerAdapter.this.getParent().removeChild(
                             ContainerAdapter.this);
                     } catch (ApplicationException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
+                        BioBankPlugin.openAsyncError("Delete error", e);
                     }
+                }
             }
         });
     }
@@ -205,8 +204,7 @@ public class ContainerAdapter extends AdapterBase {
                         addChild(node);
                     }
                     if (updateNode) {
-                        SessionManager.getInstance().getTreeViewer().update(
-                            node, null);
+                        SessionManager.getInstance().updateTreeNode(node);
                     }
                 }
             } else
@@ -377,4 +375,5 @@ public class ContainerAdapter extends AdapterBase {
         return false;
 
     }
+
 }

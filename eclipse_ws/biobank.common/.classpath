@@ -17,7 +17,7 @@
 	<classpathentry exported="true" kind="lib" path="lib/commons-logging-1.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/hibernate3.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jaxrpc.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/log4j-1.2.14.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/log4j-1.2.14.jar" sourcepath="/home/delphine/projects/sources/log4j-1.2.14-src"/>
 	<classpathentry exported="true" kind="lib" path="lib/sdk-client-framework.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/sdk-grid-remoting.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/sdk-security.jar"/>

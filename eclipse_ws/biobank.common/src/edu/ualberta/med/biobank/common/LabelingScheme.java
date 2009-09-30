@@ -14,38 +14,38 @@ public class LabelingScheme {
 
     public static final String CBSR_LABELLING_PATTERN = "ABCDEFGHJKLMNPQRSTUVWXYZ";
 
-    public static final String SBS_ROW_LABELLING_PATTERN = "ABCDEFGH";
+    public static final String SBS_ROW_LABELLING_PATTERN = "ABCDEFGHJ";
 
     /**
-     * Get the rowColPos corresponding to the given sbs standard 2 char string
-     * position. Use the 2 last character in case we have a full position string
-     * (01AA01A2)
+     * Get the rowColPos corresponding to the given SBS standard 2 or 3 char
+     * string position.
      */
     public static RowColPos sbsToRowCol(String pos) throws Exception {
-        if (pos.length() != 2) {
+        if ((pos.length() != 2) && (pos.length() != 3)) {
             throw new Exception("binPos has an invalid length: " + pos);
         }
-        int len = pos.length();
-        return new RowColPos(SBS_ROW_LABELLING_PATTERN.indexOf(pos
-            .charAt(len - 2)), pos.charAt(len - 1));
+        int row = SBS_ROW_LABELLING_PATTERN.indexOf(pos.charAt(0));
+        int col = Integer.parseInt(pos.substring(1)) - 1;
+        return new RowColPos(row, col);
     }
 
     /**
      * Get the string corresponding to the given RowColPos and using the SBS
      * standard
      */
-    public static String RowColToSBS(RowColPos rcp) {
-        return "" + SBS_ROW_LABELLING_PATTERN.charAt(rcp.row) + rcp.col;
+    public static String RowColToSbs(RowColPos rcp) {
+        return "" + SBS_ROW_LABELLING_PATTERN.charAt(rcp.row) + (rcp.col + 1);
     }
 
     /**
-     * Get the index corresponding to the given label, using the CBSR labeling
+     * Get the index corresponding to the given label, using the CBSR labelling.
      * Use the 2 last character in case we have a full position string
      * (01AA01A2).
      */
     private static int cbsrTwoCharToInt(String label) {
         int len = label.length();
-        return CBSR_LABELLING_PATTERN.indexOf(label.charAt(len - 2)) * 24
+        return CBSR_LABELLING_PATTERN.indexOf(label.charAt(len - 2))
+            * CBSR_LABELLING_PATTERN.length()
             + CBSR_LABELLING_PATTERN.indexOf(label.charAt(len - 1));
     }
 
@@ -112,16 +112,16 @@ public class LabelingScheme {
     /**
      * convert a position in row*column to two letter (in the CBSR way)
      */
-    public static String rowColToCBSRTwoChar(RowColPos rcp, Capacity capacity) {
+    public static String rowColToCbsrTwoChar(RowColPos rcp, Capacity capacity) {
         int totalRows = capacity.getRowCapacity();
         int totalCols = capacity.getColCapacity();
-        return rowColToCBSRTwoChar(rcp, totalRows, totalCols);
+        return rowColToCbsrTwoChar(rcp, totalRows, totalCols);
     }
 
     /**
      * convert a position in row*column to two letter (in the CBSR way)
      */
-    public static String rowColToCBSRTwoChar(RowColPos rcp, int totalRows,
+    public static String rowColToCbsrTwoChar(RowColPos rcp, int totalRows,
         int totalCols) {
         int pos1, pos2, index;
         if (totalRows == 1) {
@@ -136,8 +136,11 @@ public class LabelingScheme {
         pos1 = index / 24;
         pos2 = index % 24;
 
-        return String.valueOf(CBSR_LABELLING_PATTERN.charAt(pos1))
-            + String.valueOf(CBSR_LABELLING_PATTERN.charAt(pos2));
+        if (pos1 >= 0 && pos2 >= 0) {
+            return String.valueOf(CBSR_LABELLING_PATTERN.charAt(pos1))
+                + String.valueOf(CBSR_LABELLING_PATTERN.charAt(pos2));
+        }
+        return null;
     }
 
     /**
@@ -166,10 +169,10 @@ public class LabelingScheme {
         switch (scheme.getId()) {
         case 1:
             // SBS standard
-            return RowColToSBS(rcp);
+            return RowColToSbs(rcp);
         case 2:
             // CBSR 2 char alphabetic
-            return rowColToCBSRTwoChar(rcp, capacity);
+            return rowColToCbsrTwoChar(rcp, capacity);
         case 3:
             // 2 char numeric
             return rowColToTwoCharNumeric(rcp, capacity);
@@ -181,17 +184,20 @@ public class LabelingScheme {
      * Get the 2 char string corresponding to the given position
      */
     public static String getPositionString(AbstractPosition position) {
-        RowColPos rcp = new RowColPos();
-        rcp.row = position.getRow();
-        rcp.col = position.getCol();
-        Container parentContainer = null;
-        if (position instanceof ContainerPosition) {
-            parentContainer = ((ContainerPosition) position)
-                .getParentContainer();
-        } else if (position instanceof SamplePosition) {
-            parentContainer = ((SamplePosition) position).getContainer();
+        if (position != null) {
+            RowColPos rcp = new RowColPos();
+            rcp.row = position.getRow();
+            rcp.col = position.getCol();
+            Container parentContainer = null;
+            if (position instanceof ContainerPosition) {
+                parentContainer = ((ContainerPosition) position)
+                    .getParentContainer();
+            } else if (position instanceof SamplePosition) {
+                parentContainer = ((SamplePosition) position).getContainer();
+            }
+            return getPositionString(rcp, parentContainer.getContainerType());
         }
-        return getPositionString(rcp, parentContainer.getContainerType());
+        return null;
     }
 
     /**
@@ -218,6 +224,7 @@ public class LabelingScheme {
     public static void main(String[] args) throws Exception {
         testCBSR();
         testTwoCharNumeric();
+        testSbs();
     }
 
     private static void testTwoCharNumeric() throws Exception {
@@ -235,7 +242,7 @@ public class LabelingScheme {
 
     private static void testCBSR() throws Exception {
         // In a 3*5 container, 1:4=AL
-        int totalRows = 4;
+        int totalRows = 3;
         int totalCols = 5;
 
         String cbsrString = "AL";
@@ -246,8 +253,22 @@ public class LabelingScheme {
 
         rcp = new RowColPos(1, 3);
         System.out.println("CBSR: " + rcp.row + ":" + rcp.col + "=>"
-            + rowColToCBSRTwoChar(rcp, totalRows, totalCols) + " in a "
+            + rowColToCbsrTwoChar(rcp, totalRows, totalCols) + " in a "
             + totalRows + "*" + totalCols + " container");
+    }
+
+    private static void testSbs() throws Exception {
+        String sample = "D12";
+        RowColPos rcp = sbsToRowCol(sample);
+        System.out.println("SBS: " + sample + "=>" + rcp.row + ":" + rcp.col
+            + " in pallet");
+
+        rcp.row = 2;
+        rcp.col = 4;
+        String pos = RowColToSbs(rcp);
+        System.out.println("SBS: " + rcp.row + ":" + rcp.col + "=>" + pos
+            + " in pallet");
+
     }
 
 }

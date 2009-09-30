@@ -13,7 +13,9 @@ import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.ComboViewer;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -33,6 +35,8 @@ import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.LabelingScheme;
+import edu.ualberta.med.biobank.common.RowColPos;
 import edu.ualberta.med.biobank.common.utils.SiteUtils;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
@@ -51,9 +55,10 @@ import edu.ualberta.med.biobank.validators.NonEmptyString;
 import edu.ualberta.med.biobank.validators.PalletBarCodeValidator;
 import edu.ualberta.med.biobank.validators.ScannerBarcodeValidator;
 import edu.ualberta.med.biobank.widgets.CancelConfirmWidget;
-import edu.ualberta.med.biobank.widgets.ScanPalletWidget;
+import edu.ualberta.med.biobank.widgets.PalletWidget;
 import edu.ualberta.med.biobank.widgets.ViewContainerWidget;
 import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.query.example.UpdateExampleQuery;
 
 public class ScanAssignEntryForm extends AbstractPatientAdminForm {
@@ -69,7 +74,7 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
     private Label freezerLabel;
     private ViewContainerWidget freezerWidget;
     private Label palletLabel;
-    private ScanPalletWidget palletWidget;
+    private PalletWidget palletWidget;
     private Label hotelLabel;
     private ViewContainerWidget hotelWidget;
 
@@ -96,6 +101,7 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
 
     @Override
     protected void init() {
+        super.init();
         setPartName("Scan Assign");
         currentPalletWrapper = new ContainerWrapper(appService, new Container());
         initPalletValues();
@@ -224,7 +230,7 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
         freezerLabel.setLayoutData(new GridData());
         freezerWidget = new ViewContainerWidget(freezerComposite);
         toolkit.adapt(freezerWidget);
-        freezerWidget.setGridSizes(5, 10, ScanPalletWidget.PALLET_WIDTH, 100);
+        freezerWidget.setGridSizes(5, 10, PalletWidget.PALLET_WIDTH, 100);
 
         Composite hotelComposite = toolkit.createComposite(containersComposite);
         hotelComposite.setLayout(getNeutralGridLayout());
@@ -233,14 +239,14 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
         hotelWidget = new ViewContainerWidget(hotelComposite);
         toolkit.adapt(hotelWidget);
         hotelWidget.setGridSizes(11, 1, 100,
-            ScanPalletWidget.PALLET_HEIGHT_AND_LEGEND);
+            PalletWidget.PALLET_HEIGHT_AND_LEGEND);
 
         Composite palletComposite = toolkit
             .createComposite(containersComposite);
         palletComposite.setLayout(getNeutralGridLayout());
         palletComposite.setLayoutData(new GridData());
         palletLabel = toolkit.createLabel(palletComposite, "Pallet");
-        palletWidget = new ScanPalletWidget(palletComposite);
+        palletWidget = new PalletWidget(palletComposite);
         toolkit.adapt(palletWidget);
 
         showOnlyPallet(true);
@@ -273,6 +279,20 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
             palletTypesViewer = createCComboViewerWithNoSelectionValidator(
                 parent, "Pallet Container Type", palletContainerTypes, null,
                 "A pallet type should be selected");
+            palletTypesViewer
+                .addSelectionChangedListener(new ISelectionChangedListener() {
+                    @Override
+                    public void selectionChanged(SelectionChangedEvent event) {
+                        IStructuredSelection selection = (IStructuredSelection) palletTypesViewer
+                            .getSelection();
+                        if (selection.size() > 0) {
+                            currentPalletWrapper
+                                .setContainerType((ContainerType) selection
+                                    .getFirstElement());
+                        }
+                        scanLaunchedValue.setValue(false);
+                    }
+                });
         }
     }
 
@@ -280,6 +300,9 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
         try {
             boolean showResult = checkPallet();
             if (showResult) {
+                appendLog("----");
+                appendLog("Scanning plate "
+                    + plateToScanValue.getValue().toString());
                 showOnlyPallet(false);
                 if (BioBankPlugin.isRealScanEnabled()) {
                     int plateNum = BioBankPlugin.getDefault().getPlateNumber(
@@ -300,12 +323,12 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
                 boolean result = true;
                 for (int i = 0; i < cells.length; i++) { // rows
                     for (int j = 0; j < cells[i].length; j++) { // columns
-                        Sample positionSample = null;
+                        Sample expectedSample = null;
                         if (currentPalletSamples != null) {
-                            positionSample = currentPalletSamples[i][j];
+                            expectedSample = currentPalletSamples[i][j];
                         }
-                        result = setStatus(cells[i][j], positionSample)
-                            && result;
+                        cells[i][j].setExpectedSample(expectedSample);
+                        result = setStatus(cells[i][j]) && result;
                     }
                 }
 
@@ -325,6 +348,11 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
             BioBankPlugin.openRemoteConnectErrorMessage();
         } catch (Exception e) {
             BioBankPlugin.openError("Error while scanning", e);
+            String msg = e.getMessage();
+            if ((msg == null || msg.isEmpty()) && e.getCause() != null) {
+                msg = e.getCause().getMessage();
+            }
+            appendLog("ERROR: " + msg);
         }
     }
 
@@ -358,19 +386,29 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
         }
     }
 
-    protected boolean setStatus(PalletCell scanCell, Sample positionSample) {
+    protected boolean setStatus(PalletCell scanCell)
+        throws ApplicationException {
+        Sample expectedSample = scanCell.getExpectedSample();
         String value = scanCell.getValue();
+        String positionString = LabelingScheme.RowColToSbs(new RowColPos(
+            scanCell.getRow(), scanCell.getCol()));
         if (value == null) {
-            if (positionSample == null) {
+            // no sample scanned
+            if (expectedSample == null) {
+                // no existing sample should be there
                 return true;
             }
+            // sample missing
             scanCell.setStatus(SampleCellStatus.MISSING);
-            scanCell.setInformation("Sample " + positionSample.getInventoryId()
+            scanCell.setInformation("Sample " + expectedSample.getInventoryId()
                 + " missing");
             scanCell.setTitle("?");
+            appendLog("MISSING: " + expectedSample.getInventoryId()
+                + " missing from " + positionString);
             return false;
         }
         if (value.isEmpty()) {
+            // scan failed ? (not sure could happened...
             scanCell.setStatus(SampleCellStatus.ERROR);
             scanCell.setInformation("Error retrieving bar code");
             scanCell.setTitle("?");
@@ -379,55 +417,84 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
         List<Sample> samples = SiteUtils.getSamplesInSite(appService, value,
             SessionManager.getInstance().getCurrentSite());
         if (samples.size() == 0) {
+            // sample not found in site (not yet linked ?)
             scanCell.setStatus(SampleCellStatus.ERROR);
             scanCell.setInformation("Sample not found");
             scanCell.setTitle("-");
+            appendLogError(positionString, "tube " + value
+                + " not linked to any patient");
             return false;
         } else if (samples.size() == 1) {
-            Sample sample = samples.get(0);
-            if (positionSample != null
-                && !sample.getId().equals(positionSample.getId())) {
+            Sample foundSample = samples.get(0);
+            if (expectedSample != null
+                && !foundSample.getId().equals(expectedSample.getId())) {
+                // sample found but another sample already at this position
                 scanCell.setStatus(SampleCellStatus.ERROR);
                 scanCell
-                    .setInformation("Sample different from the one registered");
+                    .setInformation("Sample different from the one registered at this position");
                 scanCell.setTitle("!");
+                appendLogError(positionString, "Expected "
+                    + expectedSample.getId() + " from patient "
+                    + expectedSample.getPatientVisit().getPatient().getNumber()
+                    + " -- Found " + foundSample.getInventoryId()
+                    + " from patient "
+                    + foundSample.getPatientVisit().getPatient().getNumber());
                 return false;
             }
-            scanCell.setSample(sample);
-            if (positionSample != null) {
+            scanCell.setSample(foundSample);
+            if (expectedSample != null) {
+                // sample scanned is already registered at this position
+                // (everything is ok !)
                 scanCell.setStatus(SampleCellStatus.FILLED);
-                scanCell.setSample(positionSample);
+                scanCell.setSample(expectedSample);
             } else {
-                if (sample.getSamplePosition() != null
-                    && !sample.getSamplePosition().getContainer().getId()
+                if (foundSample.getSamplePosition() != null
+                    && !foundSample.getSamplePosition().getContainer().getId()
                         .equals(currentPalletWrapper.getId())) {
+                    // the scanned sample has already a position but a different
+                    // one
                     scanCell.setStatus(SampleCellStatus.ERROR);
-                    String posString = SampleWrapper.getPositionString(sample);
+                    String expectedPosition = SampleWrapper
+                        .getPositionString(foundSample);
                     scanCell
                         .setInformation("Sample registered on another pallet with position "
-                            + posString + "!");
+                            + expectedPosition + "!");
                     scanCell.setTitle("!");
+                    appendLogError(positionString, " tube " + value
+                        + " registered on another pallet at position "
+                        + expectedPosition);
+                    return false;
+                }
+                // sample is a new one !
+                if (!currentPalletWrapper.canHold(foundSample)) {
+                    // pallet can't hold this sample type
+                    scanCell.setStatus(SampleCellStatus.ERROR);
+                    scanCell.setInformation("This pallet type "
+                        + currentPalletWrapper.getContainerType().getName()
+                        + " can't hold this sample of type "
+                        + foundSample.getSampleType().getName());
+                    appendLogError(positionString, "This pallet type "
+                        + currentPalletWrapper.getContainerType().getName()
+                        + " can't hold this sample of type "
+                        + foundSample.getSampleType().getName());
                     return false;
                 }
                 scanCell.setStatus(SampleCellStatus.NEW);
             }
-            scanCell
-                .setTitle(sample.getPatientVisit().getPatient().getNumber());
+            scanCell.setTitle(foundSample.getPatientVisit().getPatient()
+                .getNumber());
             return true;
         } else {
             Assert
                 .isTrue(false, "InventoryId " + value + " should be unique !");
+            appendLogError(positionString,
+                "More than one sample found with the inventoryId " + value);
             return false;
         }
     }
 
-    private ContainerType getSelectedPalletType() {
-        IStructuredSelection selection = (IStructuredSelection) palletTypesViewer
-            .getSelection();
-        if (selection.size() > 0) {
-            return (ContainerType) selection.getFirstElement();
-        }
-        return null;
+    private void appendLogError(String position, String msg) {
+        appendLog("ERROR in " + position + ": " + msg);
     }
 
     @Override
@@ -435,6 +502,7 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
         currentPalletWrapper.persist();
 
         // List<SDKQuery> queries = new ArrayList<SDKQuery>();
+        int totalNb = 0;
         for (int i = 0; i < cells.length; i++) {
             for (int j = 0; j < cells[i].length; j++) {
                 PalletCell cell = cells[i][j];
@@ -451,10 +519,17 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
                         sample.setSamplePosition(samplePosition);
                         // queries.add(new UpdateExampleQuery(sample));
                         appService.executeQuery(new UpdateExampleQuery(sample));
+                        totalNb++;
                     }
                 }
             }
         }
+        appendLog("----");
+        appendLog("SCAN-ASSIGN: "
+            + totalNb
+            + " samples assign to pallet "
+            + LabelingScheme.getPositionString(currentPalletWrapper
+                .getPosition()));
         // TODO got a accessdenied exception with this. why ?
         // appService.executeBatchQuery(queries);
         setSaved(true);
@@ -479,7 +554,7 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
                 .getCurrentSite());
         } catch (Exception e) {
             SessionManager.getLogger().error(
-                "Error while reseting pallet values");
+                "Error while reseting pallet values", e);
         }
     }
 
@@ -499,7 +574,8 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
                 scanButton.setEnabled(!palletCodeText.getText().isEmpty()
                     && !palletPositionText.getText().isEmpty());
             }
-            if (palletTypesViewer != null && getSelectedPalletType() == null) {
+            if (palletTypesViewer != null
+                && palletTypesViewer.getCCombo().getSelectionIndex() == -1) {
                 scanButton.setEnabled(false);
             }
         }
@@ -522,18 +598,16 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
         currentPalletSamples = null;
         boolean pursue = true;
         boolean needToCheckPosition = true;
+        appendLog("----");
+        appendLog("Checking product barcode "
+            + currentPalletWrapper.getProductBarcode());
         Container palletFound = ContainerWrapper
             .getContainerWithProductBarcodeInSite(appService, SessionManager
                 .getInstance().getCurrentSite(), currentPalletWrapper
                 .getProductBarcode());
-        if (palletFound == null) {
-            // a pallet with this product barcode does not exists yet on the
-            // database (for the current site)
-            if (currentPalletWrapper.getContainerType() == null
-                && palletTypesViewer != null) {
-                currentPalletWrapper.setContainerType(getSelectedPalletType());
-            }
-        } else {
+        if (palletFound != null) {
+            appendLog("Checking label position "
+                + currentPalletWrapper.getLabel());
             // a pallet with this product barcode already exists in the database
             if (palletFound.getLabel().equals(currentPalletWrapper.getLabel())) {
                 // in this case, the position already contains the same pallet.
@@ -561,6 +635,8 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
             }
             // get the existing samples to be able to check added an missing
             // samples
+            appendLog("Pallet container type used: "
+                + currentPalletWrapper.getContainerType().getName());
             Capacity palletCapacity = currentPalletWrapper.getContainerType()
                 .getCapacity();
             currentPalletSamples = new Sample[palletCapacity.getRowCapacity()][palletCapacity
@@ -589,6 +665,7 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
     private boolean checkAndSetPosition() throws Exception {
         // TODO if moving, use the existing position and modify it instead of
         // create a new one (and the old one is probably not deleted) ?
+        appendLog("Checking position label " + currentPalletWrapper.getLabel());
         Container containerAtPosition = currentPalletWrapper.getContainer(
             currentPalletWrapper.getLabel(), currentPalletWrapper
                 .getContainerType());
@@ -610,9 +687,7 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
     }
 
     @Override
-    protected void print() {
-        // FIXME implement print functionnality
-        System.out.println("PRINT activity");
+    protected String getActivityTitle() {
+        return "Scan assign activity";
     }
-
 }

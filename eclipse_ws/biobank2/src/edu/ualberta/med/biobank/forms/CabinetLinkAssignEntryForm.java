@@ -42,6 +42,7 @@ import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.DatabaseResult;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
+import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
@@ -52,6 +53,7 @@ import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.Sample;
 import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.preferences.PreferenceConstants;
+import edu.ualberta.med.biobank.validators.CabinetLabelValidator;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
 import edu.ualberta.med.biobank.widgets.CabinetDrawerWidget;
 import edu.ualberta.med.biobank.widgets.CancelConfirmWidget;
@@ -100,6 +102,7 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
 
     @Override
     protected void init() {
+        super.init();
         setPartName("Cabinet Link/Assign");
         sampleWrapper = new SampleWrapper(appService, new Sample());
         IPreferenceStore store = BioBankPlugin.getDefault()
@@ -192,7 +195,7 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
 
         positionText = (Text) createBoundWidgetWithLabel(fieldsComposite,
             Text.class, SWT.NONE, "Position", new String[0], positionValue,
-            NonEmptyString.class, "Enter a position (eg 01AA01AB)");
+            new CabinetLabelValidator("Enter a position (eg 01AA01AB)"));
         positionText.addListener(SWT.DefaultSelection, new Listener() {
             public void handleEvent(Event e) {
                 if (checkPositionButton.isEnabled()) {
@@ -277,7 +280,12 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
         comboVisits.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                sampleWrapper.setPatientVisit(getSelectedPatientVisit());
+                PatientVisit pv = getSelectedPatientVisit();
+                sampleWrapper.setPatientVisit(pv);
+                appendLog("Visit selected "
+                    + new PatientVisitWrapper(appService, pv)
+                        .getFormattedDateProcessed() + " - "
+                    + pv.getClinic().getName());
             }
         });
     }
@@ -292,6 +300,8 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
             BioBankPlugin.openError("Error getting the patient", e);
         }
         if (currentPatient != null) {
+            appendLog("-----");
+            appendLog("Found patient with number " + currentPatient.getNumber());
             // show visits list
             Collection<PatientVisit> collection = currentPatient
                 .getPatientVisitCollection();
@@ -305,10 +315,14 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
         BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
             public void run() {
                 try {
+                    appendLog("----");
+                    appendLog("Checking inventoryID "
+                        + sampleWrapper.getInventoryId());
                     DatabaseResult res = sampleWrapper.checkInventoryIdUnique();
                     if (res != DatabaseResult.OK) {
                         BioBankPlugin.openError("Check position and sample",
                             res.getMessage());
+                        appendLog("ERROR: " + res.getMessage());
                         resultShownValue.setValue(Boolean.FALSE);
                         return;
                     }
@@ -316,9 +330,11 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
                     initParentContainersFromPosition(positionString);
                     if (bin == null) {
                         resultShownValue.setValue(Boolean.FALSE);
+                        hidePositions();
                         return;
                     }
 
+                    appendLog("Checking position " + positionString);
                     sampleWrapper.setSamplePositionFromString(positionString,
                         bin);
                     res = sampleWrapper.checkPosition(bin);
@@ -326,6 +342,7 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
                         BioBankPlugin.openError("Check position and sample",
                             res.getMessage());
                         resultShownValue.setValue(Boolean.FALSE);
+                        appendLog("ERROR: " + res.getMessage());
                         return;
                     }
                     sampleWrapper.getSamplePosition().setContainer(bin);
@@ -346,19 +363,35 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
     }
 
     private void showPositions() {
-        Point drawerPosition = new Point(drawer.getPosition().getRow(), drawer
-            .getPosition().getCol());
-        cabinetWidget.setSelectedBox(drawerPosition);
-        cabinetLabel.setText("Cabinet " + cabinet.getLabel());
-        drawerWidget.setSelectedBin(bin.getPosition().getRow());
-        drawerLabel.setText("Drawer " + drawer.getLabel());
+        if (drawer == null || bin == null || cabinet == null) {
+            cabinetWidget.setSelectedBox(null);
+            cabinetLabel.setText("Cabinet");
+            drawerWidget.setSelectedBin(-1);
+            drawerLabel.setText("Drawer");
+        } else {
+            Point drawerPosition = new Point(drawer.getPosition().getRow(),
+                drawer.getPosition().getCol());
+            cabinetWidget.setSelectedBox(drawerPosition);
+            cabinetLabel.setText("Cabinet " + cabinet.getLabel());
+            drawerWidget.setSelectedBin(bin.getPosition().getRow());
+            drawerLabel.setText("Drawer " + drawer.getLabel());
+        }
         form.layout(true, true);
+    }
+
+    private void hidePositions() {
+        cabinet = null;
+        bin = null;
+        drawer = null;
+        showPositions();
     }
 
     protected void initParentContainersFromPosition(String positionString)
         throws Exception {
+        bin = null;
         String binLabel = positionString.substring(0, 6);
-
+        appendLog("Checking parent container " + binLabel + " for type "
+            + sampleWrapper.getSampleType().getName());
         List<Container> containers = ContainerWrapper
             .getContainersHoldingSampleType(appService, SessionManager
                 .getInstance().getCurrentSite(), binLabel, sampleWrapper
@@ -368,21 +401,24 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
             drawer = bin.getPosition().getParentContainer();
             cabinet = drawer.getPosition().getParentContainer();
         } else if (containers.size() == 0) {
-            containers = ContainerWrapper.getContainersInSite(
-                appService, SessionManager.getInstance().getCurrentSite(),
-                binLabel);
+            containers = ContainerWrapper.getContainersInSite(appService,
+                SessionManager.getInstance().getCurrentSite(), binLabel);
+            String errorMsg = null;
             if (containers.size() > 0) {
-                BioBankPlugin.openError("Check position and sample",
-                    "Bin labelled " + binLabel
-                        + " cannont hold samples of type "
-                        + sampleWrapper.getSampleType().getName());
+                errorMsg = "Bin labelled " + binLabel
+                    + " cannot hold samples of type "
+                    + sampleWrapper.getSampleType().getName();
             } else {
-                BioBankPlugin.openError("Check position and sample",
-                    "Can't find bin labelled " + binLabel);
+                errorMsg = "Can't find bin labelled " + binLabel;
+            }
+            if (errorMsg != null) {
+                BioBankPlugin.openError("Check position and sample", errorMsg);
+                appendLog("ERROR: " + errorMsg);
             }
             return;
         } else {
-            throw new Exception("should do something");
+            throw new Exception("More than one container found for " + binLabel
+                + " --- should do something");
         }
     }
 
@@ -403,6 +439,8 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
     @Override
     protected void saveForm() throws Exception {
         sampleWrapper.setLinkDate(new Date());
+        sampleWrapper.setPatientVisit(getSelectedPatientVisit());
+        sampleWrapper.setQuantityFromType();
         DatabaseResult res = sampleWrapper.persist();
         if (res != DatabaseResult.OK) {
             BioBankPlugin.openError("Cabinet sample save", res.getMessage());
@@ -451,9 +489,7 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
     }
 
     @Override
-    protected void print() {
-        // FIXME implement print functionnality
-        System.out.println("PRINT activity");
+    protected String getActivityTitle() {
+        return "Cabinet link/assign activity";
     }
-
 }

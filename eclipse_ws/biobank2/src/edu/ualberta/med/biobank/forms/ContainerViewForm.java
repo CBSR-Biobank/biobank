@@ -116,8 +116,6 @@ public class ContainerViewForm extends BiobankViewForm {
         setPartName(container.getLabel() + " ("
             + container.getContainerType().getName() + ")");
         initCells();
-        // List<ScanPalletModificationListener> listeners = new
-        // ArrayList<ScanPalletModificationListener>();
     }
 
     @Override
@@ -614,8 +612,7 @@ public class ContainerViewForm extends BiobankViewForm {
             try {
                 appService.executeQuery(query);
             } catch (ApplicationException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                BioBankPlugin.openAsyncError("Delete error", e);
             }
         }
         try {

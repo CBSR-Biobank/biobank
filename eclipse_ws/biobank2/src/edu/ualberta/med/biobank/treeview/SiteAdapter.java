@@ -171,8 +171,7 @@ public class SiteAdapter extends AdapterBase {
                         SiteAdapter.this.getParent().removeChild(
                             SiteAdapter.this);
                     } catch (ApplicationException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
+                        BioBankPlugin.openAsyncError("Delete error", e);
                     }
 
             }

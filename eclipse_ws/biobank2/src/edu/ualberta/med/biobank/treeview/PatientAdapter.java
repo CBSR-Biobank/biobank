@@ -131,8 +131,7 @@ public class PatientAdapter extends AdapterBase {
                     addChild(node);
                 }
                 if (updateNode) {
-                    SessionManager.getInstance().getTreeViewer().update(node,
-                        null);
+                    SessionManager.getInstance().updateTreeNode(node);
                 }
             }
         } catch (Exception e) {

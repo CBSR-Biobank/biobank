@@ -160,7 +160,16 @@ public class BioBankPlugin extends AbstractUIPlugin {
             msg = e.getCause().getMessage();
         }
         openError(title, e.getMessage());
-        log4j.error(e.getMessage(), e);
+        log4j.error(title, e);
+    }
+
+    public static void openAsyncError(String title, Exception e) {
+        String msg = e.getMessage();
+        if ((msg == null || msg.isEmpty()) && e.getCause() != null) {
+            msg = e.getCause().getMessage();
+        }
+        openAsyncError(title, e.getMessage());
+        log4j.error(title, e);
     }
 
     /**
@@ -220,7 +229,8 @@ public class BioBankPlugin extends AbstractUIPlugin {
 
     public int getPlateNumber(String barcode) {
         for (int i = 0; i < PreferenceConstants.SCANNER_PLATE_BARCODES.length; i++) {
-            if (!ScannerConfigPlugin.getDefault().getPalletEnabled(i))
+            if (isRealScanEnabled()
+                && !ScannerConfigPlugin.getDefault().getPalletEnabled(i))
                 continue;
 
             String pref = getPreferenceStore().getString(
@@ -239,7 +249,7 @@ public class BioBankPlugin extends AbstractUIPlugin {
 
     public static boolean isAskPrint() {
         IPreferenceStore store = getDefault().getPreferenceStore();
-        return store.getBoolean(PreferenceConstants.GENERAL_ASK_PRINT);
+        return store.getBoolean(PreferenceConstants.LINK_ASSIGN_ASK_PRINT);
     }
 
     public static boolean isRealScanEnabled() {
@@ -266,4 +276,8 @@ public class BioBankPlugin extends AbstractUIPlugin {
         return getDefault().dateTimeFormatter;
     }
 
+    public String getPrinter() {
+        return getPreferenceStore().getString(
+            PreferenceConstants.LINK_ASSIGN_PRINTER);
+    }
 }

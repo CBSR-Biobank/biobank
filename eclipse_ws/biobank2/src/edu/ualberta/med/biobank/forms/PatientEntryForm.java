@@ -129,10 +129,10 @@ public class PatientEntryForm extends BiobankEntryForm {
         if (res != DatabaseResult.OK) {
             BioBankPlugin.openAsyncError("Save Problem", res.getMessage());
             setDirty(true);
+            return;
         }
         PatientAdministrationView.currentInstance
             .showPatientInTree(patientAdapter.getWrapper());
-
     }
 
     @Override

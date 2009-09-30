@@ -16,7 +16,6 @@ import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.widgets.SampleTypeEntryWidget;
 import edu.ualberta.med.biobank.widgets.listener.BiobankEntryFormWidgetListener;
 import edu.ualberta.med.biobank.widgets.listener.MultiSelectEvent;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.query.SDKQuery;
 import gov.nih.nci.system.query.SDKQueryResult;
 import gov.nih.nci.system.query.example.DeleteExampleQuery;
@@ -43,24 +42,18 @@ public class SampleTypesEntryForm extends BiobankEntryForm {
     };
 
     @Override
-    public void init() {
+    public void init() throws Exception {
         siteAdapter = (SiteAdapter) adapter;
         globalSampleTypes = getGlobalSampleTypes();
         siteSampleTypes = siteAdapter.getSite().getSampleTypeCollection();
         setPartName("Sample Types");
     }
 
-    private List<SampleType> getGlobalSampleTypes() {
+    private List<SampleType> getGlobalSampleTypes() throws Exception {
         List<SampleType> results = new ArrayList<SampleType>();
-        HQLCriteria c = new HQLCriteria(
-            "from edu.ualberta.med.biobank.model.SampleType "
-                + "where site = null");
-        try {
-            results = appService.query(c);
-        } catch (ApplicationException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+        HQLCriteria c = new HQLCriteria("from " + SampleType.class.getName()
+            + " where site = null");
+        results = appService.query(c);
         return results;
     }
 
@@ -183,19 +176,16 @@ public class SampleTypesEntryForm extends BiobankEntryForm {
 
     @Override
     public String getNextOpenedFormID() {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     protected String getOkMessage() {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public void cancelForm() {
-        // TODO Auto-generated method stub
 
     }
 

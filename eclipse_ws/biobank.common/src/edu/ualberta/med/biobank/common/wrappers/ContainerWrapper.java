@@ -11,6 +11,7 @@ import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.ContainerType;
+import edu.ualberta.med.biobank.model.Sample;
 import edu.ualberta.med.biobank.model.SamplePosition;
 import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.model.Site;
@@ -28,7 +29,6 @@ public class ContainerWrapper extends ModelWrapper<Container> {
     @Override
     protected void firePropertyChanges(Container oldWrappedObject,
         Container newWrappedObject) {
-        // TODO Auto-generated method stub
 
     }
 
@@ -330,4 +330,14 @@ public class ContainerWrapper extends ModelWrapper<Container> {
         return getWrappedObject().getChildPositionCollection();
     }
 
+    public boolean canHold(Sample sample) throws ApplicationException {
+        SampleType type = sample.getSampleType();
+        HQLCriteria criteria = new HQLCriteria("select sampleType from "
+            + ContainerType.class.getName()
+            + " as ct inner join ct.sampleTypeCollection as sampleType"
+            + " where ct = ? and sampleType = ?", Arrays.asList(new Object[] {
+            getContainerType(), type }));
+        List<SampleType> types = appService.query(criteria);
+        return types.size() == 1;
+    }
 }
