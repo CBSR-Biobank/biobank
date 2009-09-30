@@ -2,7 +2,6 @@ package edu.ualberta.med.biobank.common.wrappers;
 
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.model.PvInfoType;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 //FIXME delphine
@@ -28,8 +27,7 @@ public class PvInfoTypeWrapper extends ModelWrapper<PvInfoType> {
     }
 
     @Override
-    protected void persistChecks() throws BiobankCheckException,
-        ApplicationException {
+    protected void persistChecks() throws BiobankCheckException, Exception {
         // TODO Auto-generated method stub
     }
 
@@ -39,8 +37,7 @@ public class PvInfoTypeWrapper extends ModelWrapper<PvInfoType> {
     }
 
     @Override
-    protected void deleteChecks() throws BiobankCheckException,
-        ApplicationException {
+    protected void deleteChecks() throws BiobankCheckException, Exception {
         // TODO Auto-generated method stub
     }
 

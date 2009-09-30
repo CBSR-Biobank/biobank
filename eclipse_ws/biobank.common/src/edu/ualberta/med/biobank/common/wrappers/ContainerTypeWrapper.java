@@ -55,8 +55,19 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
     }
 
     @Override
-    protected void persistChecks() throws BiobankCheckException,
-        ApplicationException {
+    protected void persistChecks() throws BiobankCheckException, Exception {
+        checkNameUnique();
+        if (!isNew()) {
+            boolean exists = existsContainerWithType();
+            ContainerType oldObject = getObjectFromDatabase();
+            checkNewCapacity(oldObject, exists);
+            checkTopLevel(oldObject, exists);
+            checkLabelingScheme(oldObject, exists);
+        }
+    }
+
+    private void checkNameUnique() throws ApplicationException,
+        BiobankCheckException {
         String notSameTypeString = "";
         List<Object> params = new ArrayList<Object>(Arrays.asList(new Object[] {
             getSite(), getName() }));
@@ -128,8 +139,7 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
     }
 
     @Override
-    protected void deleteChecks() throws BiobankCheckException,
-        ApplicationException {
+    protected void deleteChecks() throws BiobankCheckException, Exception {
         String queryString = "select c.containerType from "
             + Container.class.getName() + " as c where c.containerType=?)";
         HQLCriteria c = new HQLCriteria(queryString, Arrays
@@ -334,5 +344,53 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
         List<Object> results = appService.query(new HQLCriteria(queryString,
             params));
         return results.size() == 0;
+    }
+
+    /**
+     * Check if we can use the new capacity
+     */
+    private void checkNewCapacity(ContainerType oldObject,
+        boolean existsContainersWithType) throws BiobankCheckException,
+        Exception {
+        Capacity currentCapacity = getCapacity();
+        Capacity dbCapacity = oldObject.getCapacity();
+        if (!(currentCapacity.getRowCapacity().equals(
+            dbCapacity.getRowCapacity()) && currentCapacity.getColCapacity()
+            .equals(dbCapacity.getColCapacity()))
+            && existsContainersWithType) {
+            throw new BiobankCheckException(
+                "Unable to alter dimensions. A container of this type exists in storage. Remove all instances before attempting to modify this container type.");
+        }
+    }
+
+    /**
+     * return true if at least one container exists with this container type
+     */
+    private boolean existsContainerWithType() throws ApplicationException {
+        HQLCriteria c = new HQLCriteria("select c.containerType from "
+            + Container.class.getName() + " as c where c.containerType=?)",
+            Arrays.asList(new Object[] { wrappedObject }));
+        List<Object> results = appService.query(c);
+        return results.size() > 0;
+    }
+
+    private void checkTopLevel(ContainerType oldObject,
+        boolean existsContainersWithType) throws BiobankCheckException {
+        if (!getTopLevel().equals(oldObject.getTopLevel())
+            && existsContainersWithType) {
+            throw new BiobankCheckException(
+                "Unable to change the \"Top Level\" property. A container requiring this property exists in storage. Remove all instances before attempting to modify this container type.");
+        }
+    }
+
+    private void checkLabelingScheme(ContainerType oldObject,
+        boolean existsContainersWithType) throws BiobankCheckException {
+        if (!getChildLabelingScheme().getId().equals(
+            oldObject.getChildLabelingScheme().getId())
+            && existsContainersWithType) {
+            throw new BiobankCheckException(
+                "Unable to change the \"Child Labeling scheme\" property. A container requiring this property exists in storage. Remove all instances before attempting to modify this container type.");
+        }
+
     }
 }

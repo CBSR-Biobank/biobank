@@ -129,8 +129,7 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
     }
 
     @Override
-    protected void persistChecks() throws BiobankCheckException,
-        ApplicationException {
+    protected void persistChecks() throws BiobankCheckException, Exception {
         if (!checkVisitDateDrawnUnique()) {
             throw new BiobankCheckException("A patient visit with date drawn "
                 + getDateDrawn() + " already exist in patient "
@@ -178,8 +177,7 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
     }
 
     @Override
-    protected void deleteChecks() throws BiobankCheckException,
-        ApplicationException {
+    protected void deleteChecks() throws BiobankCheckException, Exception {
         // TODO Auto-generated method stub
     }
 

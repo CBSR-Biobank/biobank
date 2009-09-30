@@ -56,8 +56,7 @@ public class ContainerWrapper extends ModelWrapper<Container> {
     }
 
     @Override
-    protected void persistChecks() throws BiobankCheckException,
-        ApplicationException {
+    protected void persistChecks() throws BiobankCheckException, Exception {
         checkLabelUniqueForType();
         checkProductBarcodeUnique();
     }
@@ -460,8 +459,7 @@ public class ContainerWrapper extends ModelWrapper<Container> {
     }
 
     @Override
-    protected void deleteChecks() throws BiobankCheckException,
-        ApplicationException {
+    protected void deleteChecks() throws BiobankCheckException, Exception {
         if (getSamplePositionCollection().size() > 0
             || getChildPositionCollection().size() > 0) {
             throw new BiobankCheckException("Unable to delete container "

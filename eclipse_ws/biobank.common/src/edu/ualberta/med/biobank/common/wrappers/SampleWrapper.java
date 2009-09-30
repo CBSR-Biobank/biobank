@@ -54,8 +54,7 @@ public class SampleWrapper extends ModelWrapper<Sample> {
     }
 
     @Override
-    protected void persistChecks() throws BiobankCheckException,
-        ApplicationException {
+    protected void persistChecks() throws BiobankCheckException, Exception {
     }
 
     public String getInventoryId() {
@@ -245,8 +244,7 @@ public class SampleWrapper extends ModelWrapper<Sample> {
     }
 
     @Override
-    protected void deleteChecks() throws BiobankCheckException,
-        ApplicationException {
+    protected void deleteChecks() throws BiobankCheckException, Exception {
         // TODO Auto-generated method stub
     }
 }

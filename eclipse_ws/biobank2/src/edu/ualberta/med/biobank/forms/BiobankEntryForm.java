@@ -132,7 +132,8 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
                     setDirty(true);
                 } catch (BiobankCheckException bce) {
                     setDirty(true);
-                    BioBankPlugin.openError("Save error", bce.getMessage());
+                    BioBankPlugin
+                        .openAsyncError("Save error", bce.getMessage());
                 } catch (Exception e) {
                     setDirty(true);
                     throw new RuntimeException(e);

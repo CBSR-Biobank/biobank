@@ -15,8 +15,6 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.List;
 
-import org.springframework.util.Assert;
-
 public abstract class ModelWrapper<E> {
 
     protected WritableApplicationService appService;
@@ -79,17 +77,28 @@ public abstract class ModelWrapper<E> {
         E newWrappedObject);
 
     private void internalReload() throws Exception {
+        wrappedObject = getObjectFromDatabase();
+    }
+
+    /**
+     * using this wrapper id, retrieve the object from the database
+     */
+    protected E getObjectFromDatabase() throws Exception {
         Class<E> classType = getWrappedClass();
         Constructor<E> constructor = classType.getConstructor();
         Object instance = constructor.newInstance();
         Method setIdMethod = classType.getMethod("setId", Integer.class);
-        setIdMethod.invoke(instance, getId());
+        Integer id = getId();
+        setIdMethod.invoke(instance, id);
 
         List<E> list = appService.search(classType, instance);
         if (list.size() == 0)
-            wrappedObject = null;
-        Assert.isTrue(list.size() == 1);
-        wrappedObject = list.get(0);
+            return null;
+        if (list.size() == 1) {
+            return list.get(0);
+        }
+        throw new Exception("Found " + list.size() + " objects of type "
+            + classType.getName() + " with id=" + id);
     }
 
     protected abstract Class<E> getWrappedClass();
@@ -98,7 +107,7 @@ public abstract class ModelWrapper<E> {
      * insert or update the object into the database
      */
     @SuppressWarnings("unchecked")
-    public void persist() throws BiobankCheckException, ApplicationException {
+    public void persist() throws BiobankCheckException, Exception {
         persistChecks();
         SDKQuery query;
         if (isNew()) {
@@ -112,14 +121,14 @@ public abstract class ModelWrapper<E> {
     }
 
     protected abstract void persistChecks() throws BiobankCheckException,
-        ApplicationException;
+        Exception;
 
     /**
      * delete the object into the database
      * 
      * @throws ApplicationException
      */
-    public void delete() throws BiobankCheckException, ApplicationException {
+    public void delete() throws BiobankCheckException, Exception {
         if (!isNew()) {
             deleteChecks();
             appService.executeQuery(new DeleteExampleQuery(wrappedObject));
@@ -127,7 +136,7 @@ public abstract class ModelWrapper<E> {
     }
 
     protected abstract void deleteChecks() throws BiobankCheckException,
-        ApplicationException;
+        Exception;
 
     public void reset() throws Exception {
         if (isNew()) {

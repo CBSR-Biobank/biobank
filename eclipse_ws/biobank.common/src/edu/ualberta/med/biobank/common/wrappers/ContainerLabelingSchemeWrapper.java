@@ -2,7 +2,6 @@ package edu.ualberta.med.biobank.common.wrappers;
 
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class ContainerLabelingSchemeWrapper extends
@@ -20,8 +19,7 @@ public class ContainerLabelingSchemeWrapper extends
     }
 
     @Override
-    protected void persistChecks() throws BiobankCheckException,
-        ApplicationException {
+    protected void persistChecks() throws BiobankCheckException, Exception {
     }
 
     @Override
@@ -38,8 +36,7 @@ public class ContainerLabelingSchemeWrapper extends
     }
 
     @Override
-    protected void deleteChecks() throws BiobankCheckException,
-        ApplicationException {
+    protected void deleteChecks() throws BiobankCheckException, Exception {
     }
 
     public void setName(String name) {

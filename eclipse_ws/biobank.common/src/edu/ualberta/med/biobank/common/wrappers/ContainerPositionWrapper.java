@@ -4,7 +4,6 @@ import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.RowColPos;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerPosition;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 //FIXME to do by delphine
@@ -32,8 +31,7 @@ public class ContainerPositionWrapper extends ModelWrapper<ContainerPosition> {
     }
 
     @Override
-    protected void persistChecks() throws BiobankCheckException,
-        ApplicationException {
+    protected void persistChecks() throws BiobankCheckException, Exception {
     }
 
     public void setParentContainer(Container parentContainer) {
@@ -93,8 +91,7 @@ public class ContainerPositionWrapper extends ModelWrapper<ContainerPosition> {
     }
 
     @Override
-    protected void deleteChecks() throws BiobankCheckException,
-        ApplicationException {
+    protected void deleteChecks() throws BiobankCheckException, Exception {
         // TODO Auto-generated method stub
     }
 

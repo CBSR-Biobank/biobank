@@ -23,13 +23,10 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.utils.ModelUtils;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.helpers.GetHelper;
-import edu.ualberta.med.biobank.model.Capacity;
-import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.ContainerTypeComparator;
@@ -44,8 +41,6 @@ import edu.ualberta.med.biobank.validators.NonEmptyString;
 import edu.ualberta.med.biobank.widgets.MultiSelectWidget;
 import edu.ualberta.med.biobank.widgets.listener.BiobankEntryFormWidgetListener;
 import edu.ualberta.med.biobank.widgets.listener.MultiSelectEvent;
-import gov.nih.nci.system.applicationservice.ApplicationException;
-import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class ContainerTypeEntryForm extends BiobankEntryForm {
     public static final String ID = "edu.ualberta.med.biobank.forms.ContainerTypeEntryForm";
@@ -66,8 +61,6 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
 
     private ContainerTypeWrapper containerType;
 
-    private Capacity capacity;
-
     private MultiSelectWidget samplesMultiSelect;
 
     private MultiSelectWidget childContainerTypesMultiSelect;
@@ -81,8 +74,6 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
     private BiobankEntryFormWidgetListener multiSelectListener;
 
     private ComboViewer labelingSchemeComboViewer;
-
-    private Boolean initialTopLevel;
 
     private Button hasSamples;
 
@@ -110,20 +101,12 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         allContainerTypes = new ArrayList<ContainerType>(site
             .getContainerTypeCollection());
         Collections.sort(allContainerTypes, new ContainerTypeComparator());
-        capacity = new Capacity();
         String tabName;
-        if (containerType.getId() == null) {
-            initialTopLevel = Boolean.FALSE;
+        if (containerType.isNew()) {
             tabName = "New Container Type";
         } else {
             tabName = "Container Type " + containerType.getName();
-            initialTopLevel = containerType.getTopLevel();
-            capacity.setRowCapacity(new Integer(containerType.getCapacity()
-                .getRowCapacity()));
-            capacity.setColCapacity(new Integer(containerType.getCapacity()
-                .getColCapacity()));
         }
-
         setPartName(tabName);
     }
 
@@ -230,12 +213,14 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         toolkit.paintBordersFor(client);
 
         createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Rows", null,
-            PojoObservables.observeValue(capacity, "rowCapacity"),
-            new IntegerNumber("Row capactiy is not a valid number", false));
+            PojoObservables.observeValue(containerType.getCapacity(),
+                "rowCapacity"), new IntegerNumber(
+                "Row capactiy is not a valid number", false));
 
         createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Columns",
-            null, PojoObservables.observeValue(capacity, "colCapacity"),
-            new IntegerNumber("Column capacity is not a valid nubmer", false));
+            null, PojoObservables.observeValue(containerType.getCapacity(),
+                "colCapacity"), new IntegerNumber(
+                "Column capacity is not a valid nubmer", false));
     }
 
     private void createContainsSection() {
@@ -364,70 +349,29 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
      */
     @Override
     protected void saveForm() throws Exception {
+        // set sampletypes
         List<Integer> selectedIds = null;
         if (hasSamples.getSelection()) {
             selectedIds = samplesMultiSelect.getSelected();
         }
         containerType.setSampleTypes(selectedIds, allSampleTypes);
+        // set childcontainers
         selectedIds = null;
         if (hasContainers.getSelection()) {
             selectedIds = childContainerTypesMultiSelect.getSelected();
         }
         containerType.setChildContainerTypes(selectedIds, allContainerTypes);
-        if (!containerType.isNew()) {
-            Integer localRows = capacity.getRowCapacity();
-            Integer localCols = capacity.getColCapacity();
-            Integer dbRows = containerType.getCapacity().getRowCapacity();
-            Integer dbCols = containerType.getCapacity().getColCapacity();
-
-            // if new type, set is ok, if unmodified, set is ok. if doesn't
-            // exist in db, set is ok
-            if (!(localRows.equals(dbRows) && localCols.equals(dbCols))
-                && !HQLSafeToChange())
-                BioBankPlugin
-                    .openError(
-                        "ContainerType Change Failed",
-                        "Unable to alter dimensions. A container of this type exists in storage. Remove all instances before attempting to modify this container type.");
-            else {
-                containerType.setCapacity(capacity);
-            }
-        } else {
-            containerType.setCapacity(capacity);
-        }
-
-        if (initialTopLevel != containerType.getTopLevel()
-            && !HQLSafeToChange()) {
-            containerType.setTopLevel(initialTopLevel);
-            BioBankPlugin
-                .openError(
-                    "ContainerType Change Failed",
-                    "Unable to change the \"Top Level\" property. A container requiring this property exists in storage. Remove all instances before attempting to modify this container type.");
-        }
 
         // associate the storage type to it's site
         containerType.setSite(site);
+
+        // set the labeling scheme
         ContainerLabelingScheme scheme = (ContainerLabelingScheme) ((StructuredSelection) labelingSchemeComboViewer
             .getSelection()).getFirstElement();
         containerType.setChildLabelingScheme(scheme);
 
         containerType.persist();
         containerTypeAdapter.getParent().performExpand();
-    }
-
-    private boolean HQLSafeToChange() throws ApplicationException {
-        String queryString = "select c.containerType from "
-            + Container.class.getName() + " as c where c.containerType.id=?)";
-        List<Object> params = new ArrayList<Object>();
-        params.add(containerType.getId());
-        HQLCriteria c = new HQLCriteria(queryString);
-        c.setParameters(params);
-        List<Object> results = appService.query(c);
-        if (results.size() == 0)
-            return true;
-        else {
-            containerType.setWrappedObject((ContainerType) results.get(0));
-            return false;
-        }
     }
 
     @Override

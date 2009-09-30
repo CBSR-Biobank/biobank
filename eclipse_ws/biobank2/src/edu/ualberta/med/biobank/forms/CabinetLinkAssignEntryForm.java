@@ -339,12 +339,13 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
                 } catch (RemoteConnectFailureException exp) {
                     BioBankPlugin.openRemoteConnectErrorMessage();
                 } catch (BiobankCheckException bce) {
-                    BioBankPlugin.openError("Error while checking position",
-                        bce);
+                    BioBankPlugin.openAsyncError(
+                        "Error while checking position", bce);
                     appendLog("ERROR: " + bce.getMessage());
                     resultShownValue.setValue(Boolean.FALSE);
                 } catch (Exception e) {
-                    BioBankPlugin.openError("Error while checking position", e);
+                    BioBankPlugin.openAsyncError(
+                        "Error while checking position", e);
                 }
                 setDirty(true);
             }
