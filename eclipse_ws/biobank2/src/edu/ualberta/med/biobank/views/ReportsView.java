@@ -25,6 +25,7 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 public class ReportsView extends ViewPart {
 
     public static final String ID = "edu.ualberta.med.biobank.views.ReportsView";
+    private ScrolledComposite sc;
     private Composite top;
     private Button andButton;
 
@@ -41,45 +42,37 @@ public class ReportsView extends ViewPart {
 
     @Override
     public void createPartControl(Composite parent) {
-        GridLayout layout = new GridLayout();
-        layout.numColumns = 1;
-
-        final ScrolledComposite sc = new ScrolledComposite(parent, SWT.V_SCROLL);
-
-        sc.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
+        sc = new ScrolledComposite(parent, SWT.V_SCROLL);
+        sc.setLayout(new GridLayout(1, false));
+        sc.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+        sc.setExpandHorizontal(true);
+        sc.setExpandVertical(true);
 
         top = new Composite(sc, SWT.NONE);
-        top.setLayout(layout);
-        GridData topLayoutData = new GridData();
-        topLayoutData.grabExcessHorizontalSpace = true;
-        topLayoutData.grabExcessVerticalSpace = true;
-        topLayoutData.horizontalAlignment = SWT.FILL;
-        topLayoutData.verticalAlignment = SWT.FILL;
-
-        top.setLayoutData(topLayoutData);
+        top.setLayout(new GridLayout(1, false));
+        top.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
         top.addListener(SWT.Resize, new Listener() {
             int height = -1;
 
             public void handleEvent(Event e) {
                 int newHeight = top.getSize().y;
                 if (newHeight != height) {
-                    sc.setMinHeight(top.computeSize(newHeight, SWT.DEFAULT).y);
                     sc.layout(true, true);
+                    sc.setMinHeight(top.computeSize(newHeight, SWT.DEFAULT).y);
                     height = newHeight;
                 }
             }
         });
 
-        queryWidget = new QueryWidget(top, SWT.NONE);
+        queryWidget = new QueryWidget(this, top, SWT.NONE);
 
         Label resultsLabel = new Label(top, SWT.NONE);
         resultsLabel.setText("Results:");
 
         searchTable = new InfoTableWidget<Object>(top, searchData,
             new String[] {}, null);
-        GridData searchLayoutData = new GridData(SWT.FILL, SWT.FILL, true,
-            true, 1, 1);
-        searchLayoutData.minimumHeight = 1200;
+        GridData searchLayoutData = new GridData(SWT.FILL, SWT.FILL, true, true);
+        searchLayoutData.minimumHeight = 400;
         searchTable.setLayoutData(searchLayoutData);
 
         searchButton = new Button(top, SWT.NONE);
@@ -103,10 +96,9 @@ public class ReportsView extends ViewPart {
             }
         });
 
+        top.layout();
         sc.setContent(top);
-        sc.setExpandHorizontal(true);
-        sc.setExpandVertical(true);
-        sc.setMinSize(800, 600);
+        sc.setMinSize(top.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 
     }
 
@@ -125,6 +117,11 @@ public class ReportsView extends ViewPart {
     @Override
     public void setFocus() {
 
+    }
+
+    public void updateScrollBars() {
+        sc.layout(true, true);
+        sc.setMinSize(top.computeSize(SWT.DEFAULT, SWT.DEFAULT));
     }
 
 }

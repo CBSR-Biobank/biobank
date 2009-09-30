@@ -29,6 +29,7 @@ import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.Sample;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
+import edu.ualberta.med.biobank.views.ReportsView;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class QueryWidget extends Composite {
@@ -41,9 +42,27 @@ public class QueryWidget extends Composite {
     private Composite whereBars;
     private Composite parent;
     private Composite subSection;
+    private ReportsView view;
 
-    public QueryWidget(Composite parent, int style) {
+    private SelectionAdapter mainClassAddClause = new SelectionAdapter() {
+        @Override
+        public void widgetSelected(SelectionEvent e) {
+            IStructuredSelection typeSelection = (IStructuredSelection) typeCombo
+                .getSelection();
+            Class<?> type = (Class<?>) typeSelection.getFirstElement();
+            Field[] classFields = type.getDeclaredFields();
+            List<Field> fields = getAttributes(classFields);
+
+            QueryBarWidget bar = new QueryBarWidget(whereBars);
+            bar.updateWhereCombo(fields);
+            queryBars.add(bar);
+            view.updateScrollBars();
+        }
+    };
+
+    public QueryWidget(ReportsView view, Composite parent, int style) {
         super(parent, style);
+        this.view = view;
         this.parent = parent;
         GridLayout queryLayout = new GridLayout(4, false);
         queryLayout.verticalSpacing = 20;
@@ -79,25 +98,6 @@ public class QueryWidget extends Composite {
         queryBars.add(new QueryBarWidget(whereBars));
         subObjectBars = new ArrayList<QueryBarWidget>();
 
-        Button andButton;
-        andButton = new Button(barsAndButton, SWT.NONE);
-        andButton.setText("And");
-        andButton.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                IStructuredSelection typeSelection = (IStructuredSelection) typeCombo
-                    .getSelection();
-                Class<?> type = (Class<?>) typeSelection.getFirstElement();
-                Field[] classFields = type.getDeclaredFields();
-                List<Field> fields = getAttributes(classFields);
-
-                QueryBarWidget bar = new QueryBarWidget(whereBars);
-                bar.updateWhereCombo(fields);
-                queryBars.add(bar);
-                QueryWidget.this.parent.layout();
-            }
-        });
-
         typeCombo.setSelection(new StructuredSelection(searchables.get(0)));
     }
 
@@ -122,21 +122,7 @@ public class QueryWidget extends Composite {
         Button andButton;
         andButton = new Button(barsAndButton, SWT.NONE);
         andButton.setText("And");
-        andButton.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                IStructuredSelection typeSelection = (IStructuredSelection) typeCombo
-                    .getSelection();
-                Class<?> type = (Class<?>) typeSelection.getFirstElement();
-                Field[] classFields = type.getDeclaredFields();
-                List<Field> fields = getAttributes(classFields);
-
-                QueryBarWidget bar = new QueryBarWidget(whereBars);
-                bar.updateWhereCombo(fields);
-                queryBars.add(bar);
-                QueryWidget.this.parent.layout();
-            }
-        });
+        andButton.addSelectionListener(mainClassAddClause);
 
         if (subSection != null)
             subSection.dispose();
@@ -209,9 +195,9 @@ public class QueryWidget extends Composite {
         subObjWhereBars.setLayout(subObjWhereLayout);
 
         final QueryBarWidget bar = new QueryBarWidget(subObjWhereBars);
-        final List<Field> attributes = getAttributes(subObj.getType()
+        final List<Field> subObjAttributes = getAttributes(subObj.getType()
             .getDeclaredFields());
-        bar.updateWhereCombo(attributes);
+        bar.updateWhereCombo(subObjAttributes);
         subObjectBars.add(bar);
         final Button andButton;
         andButton = new Button(parent, SWT.NONE);
@@ -220,9 +206,9 @@ public class QueryWidget extends Composite {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 QueryBarWidget bar = new QueryBarWidget(subObjWhereBars);
-                bar.updateWhereCombo(attributes);
+                bar.updateWhereCombo(subObjAttributes);
                 subObjectBars.add(bar);
-                QueryWidget.this.parent.layout();
+                view.updateScrollBars();
             }
         });
 
