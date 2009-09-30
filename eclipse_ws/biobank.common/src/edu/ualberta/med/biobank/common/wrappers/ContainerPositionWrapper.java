@@ -6,8 +6,8 @@ import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerPosition;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
-//FIXME to do by delphine
-public class ContainerPositionWrapper extends ModelWrapper<ContainerPosition> {
+public class ContainerPositionWrapper extends
+    AbstractPositionWrapper<ContainerPosition> {
 
     public ContainerPositionWrapper(WritableApplicationService appService,
         ContainerPosition wrappedObject) {
@@ -17,10 +17,7 @@ public class ContainerPositionWrapper extends ModelWrapper<ContainerPosition> {
     @Override
     protected void firePropertyChanges(ContainerPosition oldWrappedObject,
         ContainerPosition newWrappedObject) {
-        propertyChangeSupport.firePropertyChange("col", oldWrappedObject,
-            newWrappedObject);
-        propertyChangeSupport.firePropertyChange("row", oldWrappedObject,
-            newWrappedObject);
+        super.firePropertyChanges(oldWrappedObject, newWrappedObject);
         propertyChangeSupport.firePropertyChange("parentContainer",
             oldWrappedObject, newWrappedObject);
     }
@@ -63,26 +60,6 @@ public class ContainerPositionWrapper extends ModelWrapper<ContainerPosition> {
         RowColPos rowColPos = parent.getPositionFromLabelingScheme(position);
         setRow(rowColPos.row);
         setCol(rowColPos.col);
-    }
-
-    private void setCol(Integer col) {
-        Integer oldCol = getCol();
-        wrappedObject.setCol(col);
-        propertyChangeSupport.firePropertyChange("col", oldCol, col);
-    }
-
-    private Integer getCol() {
-        return wrappedObject.getCol();
-    }
-
-    private Integer getRow() {
-        return wrappedObject.getRow();
-    }
-
-    private void setRow(Integer row) {
-        Integer oldRow = getRow();
-        wrappedObject.setRow(row);
-        propertyChangeSupport.firePropertyChange("row", oldRow, row);
     }
 
     @Override

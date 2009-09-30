@@ -13,7 +13,6 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
-//FIXME get/set for model object should use wrapper ?
 public class PatientWrapper extends ModelWrapper<Patient> {
 
     public PatientWrapper(WritableApplicationService appService, Patient patient) {
