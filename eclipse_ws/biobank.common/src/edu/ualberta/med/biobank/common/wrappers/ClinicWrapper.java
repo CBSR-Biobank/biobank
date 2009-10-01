@@ -91,8 +91,8 @@ public class ClinicWrapper extends ModelWrapper<Clinic> implements
 
     public boolean checkClinicNameUnique() throws ApplicationException {
         HQLCriteria c = new HQLCriteria("from " + Clinic.class.getName()
-            + " where site = ? and name = ?", Arrays.asList(new Object[] {
-            getSite(), getName() }));
+            + " as clinic where site = ? and name = ? and clinic <> ?", Arrays
+            .asList(new Object[] { getSite(), getName(), getWrappedObject() }));
 
         List<Clinic> results = appService.query(c);
         return (results.size() == 0);

@@ -86,8 +86,16 @@ public class SiteWrapper extends ModelWrapper<Site> implements
     }
 
     private boolean checkSiteNameUnique() throws ApplicationException {
-        HQLCriteria c = new HQLCriteria("from " + Site.class.getName()
-            + " where name = ?", Arrays.asList(new Object[] { getName() }));
+        HQLCriteria c;
+
+        if (getWrappedObject().getId() == null) {
+            c = new HQLCriteria("from " + Site.class.getName()
+                + " where name = ?", Arrays.asList(new Object[] { getName() }));
+        } else {
+            c = new HQLCriteria("from " + Site.class.getName()
+                + " as site where site.id <> ? and name = ?", Arrays
+                .asList(new Object[] { getWrappedObject().getId(), getName() }));
+        }
 
         List<Object> results = appService.query(c);
         return (results.size() == 0);
