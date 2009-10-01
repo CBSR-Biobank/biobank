@@ -65,6 +65,10 @@ public abstract class AdapterBase {
         setHasChildren(hasChildren);
     }
 
+    public Object getObject() {
+        return object;
+    }
+
     /**
      * return true if the integrity of the object is ok
      */
@@ -393,4 +397,5 @@ public abstract class AdapterBase {
             });
         }
     }
+
 }

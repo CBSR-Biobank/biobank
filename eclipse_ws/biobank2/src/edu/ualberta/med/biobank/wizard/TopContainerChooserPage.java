@@ -45,14 +45,14 @@ public class TopContainerChooserPage extends AbstractContainerChooserPage {
         comboViewer.setLabelProvider(new LabelProvider() {
             @Override
             public String getText(Object element) {
-                Container sc = (Container) element;
+                ContainerWrapper sc = (ContainerWrapper) element;
                 return sc.getLabel() + " (" + sc.getContainerType().getName()
                     + ')';
             }
         });
         try {
             comboViewer.setInput(ContainerWrapper.getTopContainersForSite(
-                getAppService(), getSite()));
+                getAppService(), getSite().getId()));
         } catch (ApplicationException e) {
             BioBankPlugin.openError("Error",
                 "Error retrieving containers informations from database");

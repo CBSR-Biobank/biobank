@@ -603,7 +603,7 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
         appendLog("----");
         appendLog("Checking product barcode "
             + currentPalletWrapper.getProductBarcode());
-        Container palletFound = ContainerWrapper
+        ContainerWrapper palletFound = ContainerWrapper
             .getContainerWithProductBarcodeInSite(appService, SessionManager
                 .getInstance().getCurrentSiteWrapper(), currentPalletWrapper
                 .getProductBarcode());
@@ -616,7 +616,8 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
                 // Don't need to check it
                 // need to use the container object retrieved from the
                 // database !
-                currentPalletWrapper.setWrappedObject(palletFound);
+                currentPalletWrapper.setWrappedObject(palletFound
+                    .getWrappedObject());
                 needToCheckPosition = false;
             } else {
                 pursue = MessageDialog.openConfirm(PlatformUI.getWorkbench()
@@ -630,7 +631,8 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
                     // need to use the container object retrieved from the
                     // database !
                     palletFound.setLabel(currentPalletWrapper.getLabel());
-                    currentPalletWrapper.setWrappedObject(palletFound);
+                    currentPalletWrapper.setWrappedObject(palletFound
+                        .getWrappedObject());
                 } else {
                     return false;
                 }

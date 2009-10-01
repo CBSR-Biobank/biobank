@@ -99,9 +99,10 @@ public class SampleWrapper extends ModelWrapper<Sample> {
     }
 
     public void setSamplePositionFromString(String positionString,
-        Container parentContainer) throws Exception {
+        ContainerWrapper parentContainer) throws Exception {
         RowColPos rcp = LabelingScheme.getRowColFromPositionString(
-            positionString, parentContainer.getContainerType());
+            positionString, parentContainer.getContainerType()
+                .getWrappedObject());
         if ((rcp.row > -1) && (rcp.col > -1)) {
             SamplePosition sp = getSamplePosition();
             if (sp == null) {
@@ -128,13 +129,13 @@ public class SampleWrapper extends ModelWrapper<Sample> {
         return wrappedObject.getSamplePosition();
     }
 
-    public void checkPosition(Container parentContainer)
+    public void checkPosition(ContainerWrapper parentContainer)
         throws BiobankCheckException, ApplicationException {
         SamplePosition sp = getSamplePosition();
         HQLCriteria criteria = new HQLCriteria("from " + Sample.class.getName()
             + " where samplePosition.row=? and samplePosition.col=?"
             + " and samplePosition.container=?", Arrays.asList(new Object[] {
-            sp.getRow(), sp.getCol(), parentContainer }));
+            sp.getRow(), sp.getCol(), parentContainer.getWrappedObject() }));
 
         List<Sample> samples = appService.query(criteria);
         if (samples.size() == 0) {

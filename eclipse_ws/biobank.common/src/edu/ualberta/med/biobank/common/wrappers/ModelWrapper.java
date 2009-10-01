@@ -13,6 +13,7 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
+import java.util.HashMap;
 import java.util.List;
 
 public abstract class ModelWrapper<E> {
@@ -23,6 +24,8 @@ public abstract class ModelWrapper<E> {
 
     protected PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(
         this);
+
+    protected HashMap<String, Object> propertiesMap = new HashMap<String, Object>();
 
     public ModelWrapper(WritableApplicationService appService, E wrappedObject) {
         this.appService = appService;
@@ -35,6 +38,7 @@ public abstract class ModelWrapper<E> {
 
     public void setWrappedObject(E wrappedObject) {
         this.wrappedObject = wrappedObject;
+        propertiesMap.clear();
     }
 
     public void addPropertyChangeListener(String propertyName,
@@ -67,6 +71,7 @@ public abstract class ModelWrapper<E> {
             internalReload();
             firePropertyChanges(oldValue, wrappedObject);
         }
+        propertiesMap.clear();
     }
 
     /**
@@ -89,6 +94,8 @@ public abstract class ModelWrapper<E> {
 
     private void internalReload() throws Exception {
         wrappedObject = getObjectFromDatabase();
+        // set to null all lists declared as field
+        // FIXME check this is ok !
     }
 
     /**
@@ -129,6 +136,7 @@ public abstract class ModelWrapper<E> {
 
         SDKQueryResult result = appService.executeQuery(query);
         wrappedObject = ((E) result.getObjectResult());
+        propertiesMap.clear();
     }
 
     protected abstract void persistChecks() throws BiobankCheckException,
@@ -155,6 +163,7 @@ public abstract class ModelWrapper<E> {
         } else {
             reload();
         }
+        propertiesMap.clear();
     }
 
     protected E getNewObject() throws Exception {

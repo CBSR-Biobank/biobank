@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.treeview;
 
-import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
@@ -22,7 +21,6 @@ import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.forms.ContainerEntryForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Container;
-import edu.ualberta.med.biobank.model.ContainerComparator;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.Site;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -85,15 +83,13 @@ public class ContainerGroup extends AdapterBase {
                 Site.class, parentSite.getId());
             ((SiteAdapter) getParent()).setSite(parentSite);
 
-            List<Container> containers = ContainerWrapper
-                .getTopContainersForSite(getAppService(), parentSite);
-            Collections.sort(containers, new ContainerComparator());
-            for (Container container : containers) {
+            List<ContainerWrapper> containers = ContainerWrapper
+                .getTopContainersForSite(getAppService(), parentSite.getId());
+            for (ContainerWrapper container : containers) {
                 ContainerAdapter node = (ContainerAdapter) getChild(container
                     .getId());
                 if (node == null) {
-                    node = new ContainerAdapter(this, new ContainerWrapper(
-                        SessionManager.getAppService(), container));
+                    node = new ContainerAdapter(this, container);
                     addChild(node);
                 }
                 if (updateNode) {
