@@ -45,7 +45,7 @@ public class StudyViewForm extends BiobankViewForm {
                 + adapter.getClass().getName());
 
         studyAdapter = (StudyAdapter) adapter;
-
+        studyWrapper = studyAdapter.getWrapper();
         // retrieve info from database because could have been modified
         // after first opening
         retrieveStudy();
@@ -86,7 +86,6 @@ public class StudyViewForm extends BiobankViewForm {
         initEditButton(client, studyAdapter);
         setStudySectionValues();
         setPvDataSectionValues();
-
     }
 
     private void createClinicSection() {

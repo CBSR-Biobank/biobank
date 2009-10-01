@@ -1,14 +1,13 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
-import edu.ualberta.med.biobank.common.DatabaseResult;
+import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.RowColPos;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerPosition;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
-//FIXME to do by delphine
-public class ContainerPositionWrapper extends ModelWrapper<ContainerPosition> {
+public class ContainerPositionWrapper extends
+    AbstractPositionWrapper<ContainerPosition> {
 
     public ContainerPositionWrapper(WritableApplicationService appService,
         ContainerPosition wrappedObject) {
@@ -17,13 +16,10 @@ public class ContainerPositionWrapper extends ModelWrapper<ContainerPosition> {
 
     @Override
     protected void firePropertyChanges(ContainerPosition oldWrappedObject,
-        ContainerPosition newWrappedObject) {
-        propertyChangeSupport.firePropertyChange("col", oldWrappedObject,
-            newWrappedObject);
-        propertyChangeSupport.firePropertyChange("row", oldWrappedObject,
-            newWrappedObject);
-        propertyChangeSupport.firePropertyChange("parentContainer",
-            oldWrappedObject, newWrappedObject);
+        ContainerPosition newWrappedObject) throws Exception {
+        super.firePropertyChanges(oldWrappedObject, newWrappedObject);
+        String[] members = new String[] { "parentContainer", "container" };
+        firePropertyChanges(members, oldWrappedObject, newWrappedObject);
     }
 
     @Override
@@ -32,23 +28,45 @@ public class ContainerPositionWrapper extends ModelWrapper<ContainerPosition> {
     }
 
     @Override
-    protected DatabaseResult persistChecks() throws ApplicationException {
-        return DatabaseResult.OK;
+    protected void persistChecks() throws BiobankCheckException, Exception {
     }
 
     public void setParentContainer(Container parentContainer) {
-        Container oldParent = getParentContainer();
+        Container oldParent = wrappedObject.getParentContainer();
         wrappedObject.setParentContainer(parentContainer);
         propertyChangeSupport.firePropertyChange("parentContainer", oldParent,
             parentContainer);
     }
 
-    public Container getParentContainer() {
-        return wrappedObject.getParentContainer();
+    public void setParentContainer(ContainerWrapper parentContainer) {
+        setParentContainer(parentContainer.getWrappedObject());
     }
 
-    public Container getContainer() {
-        return wrappedObject.getContainer();
+    public ContainerWrapper getParentContainer() {
+        Container parent = wrappedObject.getParentContainer();
+        if (parent == null) {
+            return null;
+        }
+        return new ContainerWrapper(appService, parent);
+    }
+
+    public ContainerWrapper getContainer() {
+        Container container = wrappedObject.getContainer();
+        if (container == null) {
+            return null;
+        }
+        return new ContainerWrapper(appService, container);
+    }
+
+    public void setContainer(ContainerWrapper container) {
+        setContainer(container.getWrappedObject());
+    }
+
+    public void setContainer(Container container) {
+        Container oldContainer = wrappedObject.getContainer();
+        wrappedObject.setContainer(container);
+        propertyChangeSupport.firePropertyChange("container", oldContainer,
+            container);
     }
 
     /**
@@ -60,42 +78,15 @@ public class ContainerPositionWrapper extends ModelWrapper<ContainerPosition> {
      * @throws Exception
      */
     public void setPosition(String position) throws Exception {
-        ContainerWrapper parent = new ContainerWrapper(appService,
-            getParentContainer());
+        ContainerWrapper parent = getParentContainer();
         RowColPos rowColPos = parent.getPositionFromLabelingScheme(position);
         setRow(rowColPos.row);
         setCol(rowColPos.col);
     }
 
-    private void setCol(Integer col) {
-        Integer oldCol = getCol();
-        wrappedObject.setCol(col);
-        propertyChangeSupport.firePropertyChange("col", oldCol, col);
-    }
-
-    private Integer getCol() {
-        return wrappedObject.getCol();
-    }
-
-    private Integer getRow() {
-        return wrappedObject.getRow();
-    }
-
-    private void setRow(Integer row) {
-        Integer oldRow = getRow();
-        wrappedObject.setRow(row);
-        propertyChangeSupport.firePropertyChange("row", oldRow, row);
-    }
-
     @Override
-    public boolean checkIntegrity() {
-        return true;
-    }
-
-    @Override
-    protected DatabaseResult deleteChecks() throws ApplicationException {
+    protected void deleteChecks() throws BiobankCheckException, Exception {
         // TODO Auto-generated method stub
-        return null;
     }
 
 }

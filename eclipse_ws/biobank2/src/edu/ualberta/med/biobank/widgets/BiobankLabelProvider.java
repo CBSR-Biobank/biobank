@@ -27,6 +27,7 @@ import edu.ualberta.med.biobank.model.SampleSource;
 import edu.ualberta.med.biobank.model.SampleStorage;
 import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.model.SiteStudyInfo;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.StudyContactAndPatientInfo;
 import edu.ualberta.med.biobank.model.StudyContactInfo;
@@ -47,15 +48,11 @@ public class BiobankLabelProvider extends LabelProvider implements
 
     @Override
     public String getColumnText(Object element, int columnIndex) {
-        if (element instanceof Study) {
-            final Study study = (Study) element;
+        if (element instanceof Site) {
+            final Site site = (Site) element;
             switch (columnIndex) {
             case 0:
-                return study.getName();
-            case 1:
-                return study.getNameShort();
-            case 2:
-                return ""; // + study.getPatientCollection().size();
+                return site.getName();
             }
         } else if (element instanceof Clinic) {
             final Clinic clinic = (Clinic) element;
@@ -63,11 +60,15 @@ public class BiobankLabelProvider extends LabelProvider implements
             case 0:
                 return clinic.getName();
             }
-        } else if (element instanceof Site) {
-            final Site site = (Site) element;
+        } else if (element instanceof Study) {
+            final Study study = (Study) element;
             switch (columnIndex) {
             case 0:
-                return site.getName();
+                return study.getName();
+            case 1:
+                return study.getNameShort();
+            case 2:
+                return "" + study.getPatientCollection().size();
             }
         } else if (element instanceof Patient) {
             final Patient patient = (Patient) element;
@@ -85,16 +86,6 @@ public class BiobankLabelProvider extends LabelProvider implements
             case 1:
                 return "" + visit.getSampleCollection().size();
             }
-        } else if (element instanceof ContainerType) {
-            final ContainerType ct = (ContainerType) element;
-            switch (columnIndex) {
-            case 0:
-                return ct.getName();
-            case 1:
-                return ct.getActivityStatus();
-            case 2:
-                return "" + ct.getDefaultTemperature();
-            }
         } else if (element instanceof PvInfo) {
             final PvInfo pvInfo = (PvInfo) element;
             Integer type = pvInfo.getPvInfoType().getId();
@@ -105,6 +96,16 @@ public class BiobankLabelProvider extends LabelProvider implements
                 if ((type > 1) && (type <= 3))
                     return "N/A";
                 return pvInfo.getPossibleValues();
+            }
+        } else if (element instanceof ContainerType) {
+            final ContainerType ct = (ContainerType) element;
+            switch (columnIndex) {
+            case 0:
+                return ct.getName();
+            case 1:
+                return ct.getActivityStatus();
+            case 2:
+                return "" + ct.getDefaultTemperature();
             }
         } else if (element instanceof Container) {
             final Container container = (Container) element;
@@ -234,6 +235,22 @@ public class BiobankLabelProvider extends LabelProvider implements
                 return contact.getPhoneNumber();
             case 4:
                 return contact.getFaxNumber();
+            }
+        } else if (element instanceof SiteStudyInfo) {
+            SiteStudyInfo siteStudyInfo = (SiteStudyInfo) element;
+            switch (columnIndex) {
+            case 0:
+                return siteStudyInfo.studyWrapper.getName();
+            case 1:
+                return siteStudyInfo.studyWrapper.getNameShort();
+            case 2:
+                return siteStudyInfo.studyWrapper.getActivityStatus();
+            case 3:
+                return ""
+                    + siteStudyInfo.studyWrapper.getWrappedObject()
+                        .getPatientCollection().size();
+            case 4:
+                return "" + siteStudyInfo.patientVisits;
             }
         } else if (element instanceof ModelWrapper<?>) {
             return getColumnText(

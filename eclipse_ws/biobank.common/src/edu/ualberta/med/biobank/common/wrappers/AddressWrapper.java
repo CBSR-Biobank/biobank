@@ -1,8 +1,7 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
-import edu.ualberta.med.biobank.common.DatabaseResult;
+import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.model.Address;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class AddressWrapper extends ModelWrapper<Address> {
@@ -13,23 +12,18 @@ public class AddressWrapper extends ModelWrapper<Address> {
     }
 
     @Override
-    public boolean checkIntegrity() {
-        return false;
-    }
-
-    @Override
     protected void firePropertyChanges(Address oldWrappedObject,
         Address newWrappedObject) {
     }
 
     @Override
     protected Class<Address> getWrappedClass() {
-        return null;
+        return Address.class;
     }
 
     @Override
-    protected DatabaseResult persistChecks() throws ApplicationException {
-        return null;
+    protected void persistChecks() throws BiobankCheckException, Exception {
+        // TODO Auto-generated method stub
     }
 
     public String getStreet1() {
@@ -53,9 +47,8 @@ public class AddressWrapper extends ModelWrapper<Address> {
     }
 
     @Override
-    protected DatabaseResult deleteChecks() throws ApplicationException {
+    protected void deleteChecks() throws BiobankCheckException, Exception {
         // TODO Auto-generated method stub
-        return null;
     }
 
 }

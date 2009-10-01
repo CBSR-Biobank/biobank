@@ -5,7 +5,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 
-import edu.ualberta.med.biobank.common.DatabaseResult;
+import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.model.Site;
@@ -75,24 +75,18 @@ public class ClinicWrapper extends ModelWrapper<Clinic> implements
 
     @Override
     protected void firePropertyChanges(Clinic oldWrappedObject,
-        Clinic newWrappedObject) {
+        Clinic newWrappedObject) throws Exception {
         String[] members = new String[] { "name", "activityStatus", "comment",
             "site" };
-
-        try {
-            firePropertyChanges(members, oldWrappedObject, newWrappedObject);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        firePropertyChanges(members, oldWrappedObject, newWrappedObject);
     }
 
     @Override
-    protected DatabaseResult persistChecks() throws ApplicationException {
-        if (checkClinicNameUnique()) {
-            return DatabaseResult.OK;
+    protected void persistChecks() throws BiobankCheckException, Exception {
+        if (!checkClinicNameUnique()) {
+            throw new BiobankCheckException("A clinic with name \"" + getName()
+                + "\" already exists.");
         }
-        return new DatabaseResult("A clinic with name \"" + getName()
-            + "\" already exists.");
     }
 
     public boolean checkClinicNameUnique() throws ApplicationException {
@@ -107,11 +101,6 @@ public class ClinicWrapper extends ModelWrapper<Clinic> implements
     @Override
     protected Class<Clinic> getWrappedClass() {
         return Clinic.class;
-    }
-
-    @Override
-    public boolean checkIntegrity() {
-        return true;
     }
 
     public Collection<ContactWrapper> getContactCollection() {
@@ -133,9 +122,8 @@ public class ClinicWrapper extends ModelWrapper<Clinic> implements
     }
 
     @Override
-    protected DatabaseResult deleteChecks() throws ApplicationException {
+    protected void deleteChecks() throws BiobankCheckException, Exception {
         // TODO Auto-generated method stub
-        return null;
     }
 
     public int compareTo(ClinicWrapper wrapper) {

@@ -1,47 +1,66 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
-import edu.ualberta.med.biobank.common.DatabaseResult;
+import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.model.PvInfoPossible;
-import gov.nih.nci.system.applicationservice.ApplicationException;
+import edu.ualberta.med.biobank.model.PvInfoType;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
-// FIXME Delphine
 public class PvInfoPossibleWrapper extends ModelWrapper<PvInfoPossible> {
 
     public PvInfoPossibleWrapper(WritableApplicationService appService,
         PvInfoPossible wrappedObject) {
         super(appService, wrappedObject);
-        // TODO Auto-generated constructor stub
     }
 
     @Override
     protected void firePropertyChanges(PvInfoPossible oldWrappedObject,
-        PvInfoPossible newWrappedObject) {
-        // TODO Auto-generated method stub
-
+        PvInfoPossible newWrappedObject) throws Exception {
+        String[] members = { "label", "isDefault", "pvInfoType" };
+        firePropertyChanges(members, oldWrappedObject, newWrappedObject);
     }
 
     @Override
     protected Class<PvInfoPossible> getWrappedClass() {
-        // TODO Auto-generated method stub
-        return null;
+        return PvInfoPossible.class;
     }
 
     @Override
-    protected DatabaseResult persistChecks() throws ApplicationException {
-        // TODO Auto-generated method stub
-        return null;
+    protected void persistChecks() throws BiobankCheckException, Exception {
     }
 
     @Override
-    public boolean checkIntegrity() {
-        return true;
+    protected void deleteChecks() throws BiobankCheckException, Exception {
     }
 
-    @Override
-    protected DatabaseResult deleteChecks() throws ApplicationException {
-        // TODO Auto-generated method stub
-        return null;
+    public String getLabel() {
+        return wrappedObject.getLabel();
     }
 
+    public void setLabel(String label) {
+        String oldLabel = getLabel();
+        wrappedObject.setLabel(label);
+        propertyChangeSupport.firePropertyChange("label", oldLabel, label);
+    }
+
+    public Boolean getIsDefault() {
+        return wrappedObject.getIsDefault();
+    }
+
+    public void setIsDefault(Boolean isDefault) {
+        Boolean oldIsDefault = getIsDefault();
+        wrappedObject.setIsDefault(isDefault);
+        propertyChangeSupport.firePropertyChange("isDefault", oldIsDefault,
+            isDefault);
+    }
+
+    public PvInfoTypeWrapper getPvInfoType() {
+        return new PvInfoTypeWrapper(appService, wrappedObject.getPvInfoType());
+    }
+
+    public void setPvInfoType(PvInfoType pvInfoType) {
+        PvInfoType oldPvInfo = wrappedObject.getPvInfoType();
+        wrappedObject.setPvInfoType(pvInfoType);
+        propertyChangeSupport.firePropertyChange("pvInfoType", oldPvInfo,
+            pvInfoType);
+    }
 }

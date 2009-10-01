@@ -1,47 +1,44 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
-import edu.ualberta.med.biobank.common.DatabaseResult;
+import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.model.PvInfoType;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
-//FIXME delphine
 public class PvInfoTypeWrapper extends ModelWrapper<PvInfoType> {
 
     public PvInfoTypeWrapper(WritableApplicationService appService,
         PvInfoType wrappedObject) {
         super(appService, wrappedObject);
-        // TODO Auto-generated constructor stub
     }
 
     @Override
     protected void firePropertyChanges(PvInfoType oldWrappedObject,
-        PvInfoType newWrappedObject) {
-        // TODO Auto-generated method stub
-
+        PvInfoType newWrappedObject) throws Exception {
+        String[] members = new String[] { "type" };
+        firePropertyChanges(members, oldWrappedObject, newWrappedObject);
     }
 
     @Override
     protected Class<PvInfoType> getWrappedClass() {
-        // TODO Auto-generated method stub
-        return null;
+        return PvInfoType.class;
     }
 
     @Override
-    protected DatabaseResult persistChecks() throws ApplicationException {
-        // TODO Auto-generated method stub
-        return null;
+    protected void persistChecks() throws BiobankCheckException, Exception {
     }
 
     @Override
-    public boolean checkIntegrity() {
-        return true;
+    protected void deleteChecks() throws BiobankCheckException, Exception {
     }
 
-    @Override
-    protected DatabaseResult deleteChecks() throws ApplicationException {
-        // TODO Auto-generated method stub
-        return null;
+    public String getType() {
+        return wrappedObject.getType();
+    }
+
+    public void setType(String type) {
+        String oldType = getType();
+        wrappedObject.setType(type);
+        propertyChangeSupport.firePropertyChange("type", oldType, type);
     }
 
 }

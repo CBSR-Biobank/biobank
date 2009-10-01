@@ -16,14 +16,13 @@ import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.wrappers.ContainerPositionWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.dialogs.MoveContainerDialog;
 import edu.ualberta.med.biobank.dialogs.SelectParentContainerDialog;
 import edu.ualberta.med.biobank.forms.ContainerEntryForm;
 import edu.ualberta.med.biobank.forms.ContainerViewForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
-import edu.ualberta.med.biobank.model.Container;
-import edu.ualberta.med.biobank.model.ContainerPosition;
 
 public class ContainerAdapter extends AdapterBase {
 
@@ -127,13 +126,12 @@ public class ContainerAdapter extends AdapterBase {
     @Override
     public void loadChildren(boolean updateNode) {
         try {
-            Collection<ContainerPosition> positions = getContainer()
+            Collection<ContainerPositionWrapper> positions = getContainer()
                 .getChildPositionCollection();
             if (positions != null) {
                 // read from database again
-                for (ContainerPosition childPosition : positions) {
-                    ContainerWrapper child = new ContainerWrapper(
-                        getAppService(), childPosition.getContainer());
+                for (ContainerPositionWrapper childPosition : positions) {
+                    ContainerWrapper child = childPosition.getContainer();
                     ContainerAdapter node = (ContainerAdapter) getChild(child
                         .getId());
 
@@ -170,7 +168,7 @@ public class ContainerAdapter extends AdapterBase {
                 "Destination address must be another container (4 character minimum).");
         String newParentContainerLabel = newLabel.substring(0, newLabel
             .length() - 2);
-        List<Container> newParentContainers = container
+        List<ContainerWrapper> newParentContainers = container
             .getPossibleParents(newParentContainerLabel);
         if (newParentContainers.size() == 0) {
             // invalid parent
@@ -188,7 +186,8 @@ public class ContainerAdapter extends AdapterBase {
                 } else
                     return;
             }
-            Container newParent = newParentContainers.get(selectedParent);
+            ContainerWrapper newParent = newParentContainers
+                .get(selectedParent);
             getContainer().setNewParent(newParent, newLabel);
         }
     }

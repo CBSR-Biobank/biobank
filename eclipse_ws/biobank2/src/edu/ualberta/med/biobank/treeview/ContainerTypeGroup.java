@@ -15,8 +15,10 @@ import org.eclipse.swt.widgets.Tree;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.utils.ModelUtils;
+import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.forms.ContainerTypeEntryForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
+import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.ContainerTypeComparator;
 import edu.ualberta.med.biobank.model.Site;
@@ -38,8 +40,10 @@ public class ContainerTypeGroup extends AdapterBase {
         mi.setText("Add Container Type");
         mi.addSelectionListener(new SelectionListener() {
             public void widgetSelected(SelectionEvent event) {
-                ContainerType ct = new ContainerType();
+                ContainerTypeWrapper ct = new ContainerTypeWrapper(
+                    getAppService(), new ContainerType());
                 ct.setSite(getParentFromClass(SiteAdapter.class).getSite());
+                ct.setCapacity(new Capacity());
                 ContainerTypeAdapter adapter = new ContainerTypeAdapter(
                     ContainerTypeGroup.this, ct);
                 openForm(new FormInput(adapter), ContainerTypeEntryForm.ID);
@@ -77,7 +81,9 @@ public class ContainerTypeGroup extends AdapterBase {
                     .getId());
 
                 if (node == null) {
-                    node = new ContainerTypeAdapter(this, containerType);
+                    node = new ContainerTypeAdapter(
+                        this,
+                        new ContainerTypeWrapper(getAppService(), containerType));
                     addChild(node);
                 }
                 if (updateNode) {

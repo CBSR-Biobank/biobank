@@ -295,6 +295,8 @@ public class StudyEntryForm extends BiobankEntryForm {
 
     @Override
     protected void saveForm() throws Exception {
+        // FIXME should be transfer to persitCheck method or others set Methods
+        // of the wrapper
         if ((study.getId() == null) && !checkStudyNameUnique()) {
             setDirty(true);
             return;
@@ -349,6 +351,8 @@ public class StudyEntryForm extends BiobankEntryForm {
     }
 
     private void saveStudy() throws ApplicationException {
+        // FIXME should be transfer to persitCheck method or others set Methods
+        // of the wrapper
         SDKQuery query;
         SDKQueryResult result;
         Set<PvInfo> savedPvInfoList = new HashSet<PvInfo>();

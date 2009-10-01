@@ -14,6 +14,8 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 
+import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.wrappers.ContainerPositionWrapper;
 import edu.ualberta.med.biobank.model.ContainerCell;
 import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.ContainerStatus;
@@ -54,7 +56,8 @@ public class CabinetDrawerWidget extends Canvas {
         super(parent, SWT.DOUBLE_BUFFERED);
         cells = new ContainerCell[boxNumber][1];
         for (int i = 0; i < boxNumber; i++) {
-            ContainerPosition pos = new ContainerPosition();
+            ContainerPositionWrapper pos = new ContainerPositionWrapper(
+                SessionManager.getAppService(), new ContainerPosition());
             pos.setRow(i);
             pos.setCol(0);
             ContainerStatus stat = ContainerStatus.NOT_INITIALIZED;
@@ -157,8 +160,8 @@ public class CabinetDrawerWidget extends Canvas {
     }
 
     public void setContainersStatus(
-        Collection<ContainerPosition> childPositionCollection) {
-        for (ContainerPosition position : childPositionCollection) {
+        Collection<ContainerPositionWrapper> childPositionCollection) {
+        for (ContainerPositionWrapper position : childPositionCollection) {
             int pos = position.getRow().intValue();
             cells[pos][0] = new ContainerCell(position);
             cells[pos][0].setStatus(ContainerStatus.INITIALIZED);

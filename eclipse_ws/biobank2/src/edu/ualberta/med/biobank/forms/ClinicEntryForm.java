@@ -14,8 +14,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
-import edu.ualberta.med.biobank.common.DatabaseResult;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.treeview.ClinicAdapter;
@@ -156,14 +154,8 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
         SiteAdapter siteAdapter = clinicAdapter
             .getParentFromClass(SiteAdapter.class);
         clinicWrapper.setSiteWrapper(siteAdapter.getWrapper());
-
         saveContacts();
-        DatabaseResult res = clinicWrapper.persist();
-        if (res != DatabaseResult.OK) {
-            BioBankPlugin.openAsyncError("Save Problem", res.getMessage());
-            setDirty(true);
-            return;
-        }
+        clinicWrapper.persist();
     }
 
     private void saveContacts() throws Exception {

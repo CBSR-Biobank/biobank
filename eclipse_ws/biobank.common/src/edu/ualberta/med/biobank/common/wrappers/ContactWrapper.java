@@ -2,11 +2,10 @@ package edu.ualberta.med.biobank.common.wrappers;
 
 import java.util.Collection;
 
-import edu.ualberta.med.biobank.common.DatabaseResult;
+import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.model.Study;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class ContactWrapper extends ModelWrapper<Contact> {
@@ -90,15 +89,8 @@ public class ContactWrapper extends ModelWrapper<Contact> {
     }
 
     @Override
-    public boolean checkIntegrity() {
-        // no integrity checks for now
-        return true;
-    }
-
-    @Override
-    protected DatabaseResult deleteChecks() throws ApplicationException {
+    protected void deleteChecks() throws BiobankCheckException, Exception {
         // no checks required for contacts
-        return DatabaseResult.OK;
     }
 
     @Override
@@ -120,9 +112,8 @@ public class ContactWrapper extends ModelWrapper<Contact> {
     }
 
     @Override
-    protected DatabaseResult persistChecks() throws ApplicationException {
+    protected void persistChecks() throws BiobankCheckException, Exception {
         // no checks required for contacts
-        return DatabaseResult.OK;
     }
 
 }

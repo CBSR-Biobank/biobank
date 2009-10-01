@@ -32,7 +32,6 @@ import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.DatabaseResult;
 import edu.ualberta.med.biobank.common.utils.ModelUtils;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
@@ -447,12 +446,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
 
         // FIXME get csm_user_id and set it to the Patient Visit at insert
 
-        DatabaseResult res = patientVisitWrapper.persist();
-        if (res != DatabaseResult.OK) {
-            BioBankPlugin.openAsyncError("Save Problem", res.getMessage());
-            setDirty(true);
-            return;
-        }
+        patientVisitWrapper.persist();
 
         // FIXME samplesources and pv infos datas could be done in the patient
         // visit persists method (if we send the information in parameters)

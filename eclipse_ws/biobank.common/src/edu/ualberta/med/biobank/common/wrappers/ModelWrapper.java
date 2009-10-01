@@ -1,6 +1,6 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
-import edu.ualberta.med.biobank.common.DatabaseResult;
+import edu.ualberta.med.biobank.common.BiobankCheckException;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.SDKQuery;
@@ -74,7 +74,7 @@ public abstract class ModelWrapper<E> {
      * modifications for the different objects contained in the wrapped object
      */
     protected abstract void firePropertyChanges(E oldWrappedObject,
-        E newWrappedObject);
+        E newWrappedObject) throws Exception;
 
     protected void firePropertyChanges(String[] memberNames,
         Object oldWrappedObject, Object newWrappedObject) throws Exception {
@@ -88,19 +88,28 @@ public abstract class ModelWrapper<E> {
     }
 
     private void internalReload() throws Exception {
+        wrappedObject = getObjectFromDatabase();
+    }
+
+    /**
+     * using this wrapper id, retrieve the object from the database
+     */
+    protected E getObjectFromDatabase() throws Exception {
         Class<E> classType = getWrappedClass();
         Constructor<E> constructor = classType.getConstructor();
         Object instance = constructor.newInstance();
         Method setIdMethod = classType.getMethod("setId", Integer.class);
-        setIdMethod.invoke(instance, getId());
+        Integer id = getId();
+        setIdMethod.invoke(instance, id);
 
         List<E> list = appService.search(classType, instance);
         if (list.size() == 0)
-            wrappedObject = null;
-        if (list.size() != 1) {
-            throw new Exception("expected size to be 1");
+            return null;
+        if (list.size() == 1) {
+            return list.get(0);
         }
-        wrappedObject = list.get(0);
+        throw new Exception("Found " + list.size() + " objects of type "
+            + classType.getName() + " with id=" + id);
     }
 
     protected abstract Class<E> getWrappedClass();
@@ -109,42 +118,36 @@ public abstract class ModelWrapper<E> {
      * insert or update the object into the database
      */
     @SuppressWarnings("unchecked")
-    public DatabaseResult persist() throws ApplicationException {
-        DatabaseResult checkResult = persistChecks();
-
-        if (checkResult == DatabaseResult.OK) {
-            SDKQuery query;
-            if (isNew()) {
-                query = new InsertExampleQuery(wrappedObject);
-            } else {
-                query = new UpdateExampleQuery(wrappedObject);
-            }
-
-            SDKQueryResult result = appService.executeQuery(query);
-            wrappedObject = ((E) result.getObjectResult());
+    public void persist() throws BiobankCheckException, Exception {
+        persistChecks();
+        SDKQuery query;
+        if (isNew()) {
+            query = new InsertExampleQuery(wrappedObject);
+        } else {
+            query = new UpdateExampleQuery(wrappedObject);
         }
-        return checkResult;
+
+        SDKQueryResult result = appService.executeQuery(query);
+        wrappedObject = ((E) result.getObjectResult());
     }
 
-    protected abstract DatabaseResult persistChecks()
-        throws ApplicationException;
+    protected abstract void persistChecks() throws BiobankCheckException,
+        Exception;
 
     /**
      * delete the object into the database
+     * 
+     * @throws ApplicationException
      */
-    public DatabaseResult delete() throws ApplicationException {
-        DatabaseResult checkResult = DatabaseResult.OK;
+    public void delete() throws BiobankCheckException, Exception {
         if (!isNew()) {
-            checkResult = deleteChecks();
-            if (checkResult == DatabaseResult.OK) {
-                appService.executeQuery(new DeleteExampleQuery(wrappedObject));
-            }
+            deleteChecks();
+            appService.executeQuery(new DeleteExampleQuery(wrappedObject));
         }
-        return checkResult;
     }
 
-    protected abstract DatabaseResult deleteChecks()
-        throws ApplicationException;
+    protected abstract void deleteChecks() throws BiobankCheckException,
+        Exception;
 
     public void reset() throws Exception {
         if (isNew()) {
@@ -179,5 +182,18 @@ public abstract class ModelWrapper<E> {
     /**
      * return true if integrity of this object is ok
      */
-    public abstract boolean checkIntegrity();
+    public boolean checkIntegrity() {
+        return true;
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (object == null) {
+            return false;
+        }
+        if (getClass() != object.getClass()) {
+            return false;
+        }
+        return getId().equals(((ModelWrapper<?>) object).getId());
+    }
 }

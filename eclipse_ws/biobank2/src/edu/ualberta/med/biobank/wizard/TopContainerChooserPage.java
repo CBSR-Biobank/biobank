@@ -17,6 +17,8 @@ import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.utils.ModelUtils;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerCell;
 import edu.ualberta.med.biobank.model.ContainerStatus;
@@ -62,8 +64,9 @@ public class TopContainerChooserPage extends AbstractContainerChooserPage {
             .addSelectionChangedListener(new ISelectionChangedListener() {
                 @Override
                 public void selectionChanged(SelectionChangedEvent event) {
-                    setCurrentContainer((Container) ((IStructuredSelection) comboViewer
-                        .getSelection()).getFirstElement());
+                    setCurrentContainer(new ContainerWrapper(getAppService(),
+                        (Container) ((IStructuredSelection) comboViewer
+                            .getSelection()).getFirstElement()));
                     updateFreezerGrid();
                     pageContainer.layout(true, true);
                     textPosition.setText("");
@@ -78,7 +81,8 @@ public class TopContainerChooserPage extends AbstractContainerChooserPage {
             List<ContainerType> types = ModelUtils.queryProperty(
                 getAppService(), ContainerType.class, "name", "Freezer", false);
             if (types.size() > 0) {
-                containerWidget.setContainerType(types.get(0));
+                containerWidget.setContainerType(new ContainerTypeWrapper(
+                    getAppService(), types.get(0)));
             }
         } catch (ApplicationException e) {
             // Auto-generated catch block
@@ -102,7 +106,8 @@ public class TopContainerChooserPage extends AbstractContainerChooserPage {
     }
 
     @Override
-    protected void setStatus(ContainerCell cell, Container occupiedContainer) {
+    protected void setStatus(ContainerCell cell,
+        ContainerWrapper occupiedContainer) {
         boolean full;
         int total = 0;
 

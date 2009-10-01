@@ -2,12 +2,11 @@ package edu.ualberta.med.biobank.common.wrappers;
 
 import java.util.Collection;
 
-import edu.ualberta.med.biobank.common.DatabaseResult;
+import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.model.PvInfo;
 import edu.ualberta.med.biobank.model.SampleSource;
 import edu.ualberta.med.biobank.model.SampleStorage;
 import edu.ualberta.med.biobank.model.Study;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class StudyWrapper extends ModelWrapper<Study> implements
@@ -35,15 +34,8 @@ public class StudyWrapper extends ModelWrapper<Study> implements
     }
 
     @Override
-    public boolean checkIntegrity() {
+    protected void deleteChecks() throws BiobankCheckException, Exception {
         // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
-    protected DatabaseResult deleteChecks() throws ApplicationException {
-        // TODO Auto-generated method stub
-        return null;
     }
 
     @Override
@@ -59,9 +51,8 @@ public class StudyWrapper extends ModelWrapper<Study> implements
     }
 
     @Override
-    protected DatabaseResult persistChecks() throws ApplicationException {
+    protected void persistChecks() throws BiobankCheckException, Exception {
         // TODO Auto-generated method stub
-        return null;
     }
 
     @Override

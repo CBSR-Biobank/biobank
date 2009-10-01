@@ -1,7 +1,5 @@
 package edu.ualberta.med.biobank.forms;
 
-import java.util.List;
-
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -9,6 +7,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 
+import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.SampleType;
@@ -21,7 +20,7 @@ public class ContainerTypeViewForm extends BiobankViewForm {
 
     private ContainerTypeAdapter containerTypeAdapter;
 
-    private ContainerType containerType;
+    private ContainerTypeWrapper containerType;
 
     private Capacity capacity;
 
@@ -58,19 +57,13 @@ public class ContainerTypeViewForm extends BiobankViewForm {
                 + adapter.getClass().getName());
 
         containerTypeAdapter = (ContainerTypeAdapter) adapter;
+        containerType = containerTypeAdapter.getContainerType();
         retrieveContainerType();
         setPartName("Container Type " + containerType.getName());
     }
 
     private void retrieveContainerType() throws Exception {
-        List<ContainerType> result;
-        ContainerType searchContainerType = new ContainerType();
-        searchContainerType.setId(containerTypeAdapter.getContainerType()
-            .getId());
-        result = appService.search(ContainerType.class, searchContainerType);
-        Assert.isTrue(result.size() == 1);
-        containerType = result.get(0);
-        containerTypeAdapter.setContainerType(containerType);
+        containerType.reload();
         capacity = containerType.getCapacity();
     }
 

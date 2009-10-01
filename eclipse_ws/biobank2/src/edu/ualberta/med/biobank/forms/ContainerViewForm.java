@@ -28,6 +28,8 @@ import org.eclipse.ui.PlatformUI;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.LabelingScheme;
+import edu.ualberta.med.biobank.common.wrappers.ContainerPositionWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Capacity;
@@ -57,7 +59,7 @@ public class ContainerViewForm extends BiobankViewForm {
 
     private ContainerWrapper container;
 
-    private ContainerPosition position;
+    private ContainerPositionWrapper position;
 
     private SamplesListWidget samplesWidget;
 
@@ -158,7 +160,7 @@ public class ContainerViewForm extends BiobankViewForm {
             "Temperature");
 
         setContainerValues();
-        ContainerType containerType = container.getContainerType();
+        ContainerTypeWrapper containerType = container.getContainerType();
         initEditButton(client, containerAdapter);
 
         if (containerType.getChildContainerTypeCollection().size() > 0) {
@@ -167,7 +169,7 @@ public class ContainerViewForm extends BiobankViewForm {
     }
 
     private void initCells() {
-        ContainerType containerType = container.getContainerType();
+        ContainerTypeWrapper containerType = container.getContainerType();
         Capacity cap = containerType.getCapacity();
         // if (cap == null)
         // malformed();
@@ -180,7 +182,8 @@ public class ContainerViewForm extends BiobankViewForm {
         cells = new ContainerCell[dim1][dim2];
         for (int i = 0; i < dim1; i++) {
             for (int j = 0; j < dim2; j++) {
-                ContainerPosition pos = new ContainerPosition();
+                ContainerPositionWrapper pos = new ContainerPositionWrapper(
+                    SessionManager.getAppService(), new ContainerPosition());
                 pos.setRow(i);
                 pos.setCol(j);
                 ContainerCell cell = new ContainerCell(pos);
@@ -188,7 +191,7 @@ public class ContainerViewForm extends BiobankViewForm {
                 cells[i][j] = cell;
             }
         }
-        for (ContainerPosition position : container
+        for (ContainerPositionWrapper position : container
             .getChildPositionCollection()) {
             int row = position.getRow().intValue();
             int col = position.getCol().intValue();
@@ -393,11 +396,10 @@ public class ContainerViewForm extends BiobankViewForm {
     public void initContainers() {
         BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
             List<SDKQuery> queries = new ArrayList<SDKQuery>();
-            Collection<ContainerPosition> positions = container
+            Collection<ContainerPositionWrapper> positions = container
                 .getChildPositionCollection();
 
             public void run() {
-
                 int rows = container.getContainerType().getCapacity()
                     .getRowCapacity().intValue();
                 int cols = container.getContainerType().getCapacity()
@@ -405,7 +407,7 @@ public class ContainerViewForm extends BiobankViewForm {
                 for (int i = 0; i < rows; i++) {
                     for (int j = 0; j < cols; j++) {
                         Boolean filled = false;
-                        for (ContainerPosition pos : positions) {
+                        for (ContainerPositionWrapper pos : positions) {
                             if (pos.getRow().intValue() == i
                                 && pos.getCol().intValue() == j)
                                 filled = true;
@@ -414,7 +416,7 @@ public class ContainerViewForm extends BiobankViewForm {
                             Container newContainer = new Container();
 
                             newContainer.setContainerType(initType);
-                            newContainer.setSite(container.getSiteWrapper()
+                            newContainer.setSite(container.getSite()
                                 .getWrappedObject());
                             newContainer.setTemperature(container
                                 .getTemperature());
@@ -466,12 +468,12 @@ public class ContainerViewForm extends BiobankViewForm {
     public void deleteContainers() {
         BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
             List<SDKQuery> queries = new ArrayList<SDKQuery>();
-            Collection<ContainerPosition> positions = container
+            Collection<ContainerPositionWrapper> positions = container
                 .getChildPositionCollection();
 
             public void run() {
-                for (ContainerPosition pos : positions) {
-                    Container deletingContainer = pos.getContainer();
+                for (ContainerPositionWrapper pos : positions) {
+                    ContainerWrapper deletingContainer = pos.getContainer();
                     if (deletingContainer.getContainerType().getId().equals(
                         deleteType.getId())) {
                         if (deletingContainer.getChildPositionCollection()
@@ -518,7 +520,7 @@ public class ContainerViewForm extends BiobankViewForm {
         });
     }
 
-    private void openFormFor(ContainerPosition pos) {
+    private void openFormFor(ContainerPositionWrapper pos) {
         ContainerAdapter newAdapter = null;
         ContainerAdapter.closeEditor(new FormInput(containerAdapter));
         if (cells[pos.getRow()][pos.getCol()].getStatus() == ContainerStatus.NOT_INITIALIZED) {
@@ -526,18 +528,17 @@ public class ContainerViewForm extends BiobankViewForm {
                 .getAppService(), new Container());
             newContainer.setSite(containerAdapter.getParentFromClass(
                 SiteAdapter.class).getWrapper());
-            pos.setParentContainer(container.getWrappedObject());
+            pos.setParentContainer(container);
             newContainer.setPosition(pos);
             newAdapter = new ContainerAdapter(containerAdapter, newContainer);
             AdapterBase.openForm(new FormInput(newAdapter),
                 ContainerEntryForm.ID);
         } else {
-            Collection<ContainerPosition> childPositions = container
+            Collection<ContainerPositionWrapper> childPositions = container
                 .getChildPositionCollection();
             Assert.isNotNull(childPositions);
-            for (ContainerPosition childPos : childPositions) {
-                ContainerWrapper childContainer = new ContainerWrapper(
-                    SessionManager.getAppService(), childPos.getContainer());
+            for (ContainerPositionWrapper childPos : childPositions) {
+                ContainerWrapper childContainer = childPos.getContainer();
                 Assert.isNotNull(childContainer);
                 if (childPos.getRow().compareTo(pos.getRow()) == 0
                     && childPos.getCol().compareTo(pos.getCol()) == 0) {
@@ -554,7 +555,7 @@ public class ContainerViewForm extends BiobankViewForm {
     }
 
     private void setContainerValues() {
-        FormUtils.setTextValue(siteLabel, container.getSiteWrapper().getName());
+        FormUtils.setTextValue(siteLabel, container.getSite().getName());
         FormUtils.setTextValue(containerLabelLabel, container.getLabel());
         FormUtils.setTextValue(productBarcodeLabel, container
             .getProductBarcode());

@@ -38,13 +38,13 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.LabelingScheme;
 import edu.ualberta.med.biobank.common.RowColPos;
 import edu.ualberta.med.biobank.common.utils.SiteUtils;
+import edu.ualberta.med.biobank.common.wrappers.ContainerPositionWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
 import edu.ualberta.med.biobank.forms.listener.EnterKeyToNextFieldListener;
 import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.Container;
-import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.PalletCell;
 import edu.ualberta.med.biobank.model.Sample;
@@ -266,8 +266,8 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
      */
     private void createContainerTypeSection(Composite parent) throws Exception {
         List<ContainerType> palletContainerTypes = ContainerTypeWrapper
-            .getContainerTypesInSite(appService, currentPalletWrapper
-                .getSiteWrapper(), palletNameContains, false);
+            .getContainerTypesInSite(appService,
+                currentPalletWrapper.getSite(), palletNameContains, false);
         if (palletContainerTypes.size() == 1) {
             currentPalletWrapper.setContainerType(palletContainerTypes.get(0));
         } else {
@@ -364,13 +364,15 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
     }
 
     protected void showPalletPosition() {
-        ContainerPosition palletPosition = currentPalletWrapper.getPosition();
+        ContainerPositionWrapper palletPosition = currentPalletWrapper
+            .getPosition();
         if (palletPosition != null) {
-            ContainerWrapper hotelContainer = new ContainerWrapper(appService,
-                palletPosition.getParentContainer());
-            ContainerPosition hotelPosition = hotelContainer.getPosition();
-            ContainerWrapper freezerContainer = new ContainerWrapper(
-                appService, hotelPosition.getParentContainer());
+            ContainerWrapper hotelContainer = palletPosition
+                .getParentContainer();
+            ContainerPositionWrapper hotelPosition = hotelContainer
+                .getPosition();
+            ContainerWrapper freezerContainer = hotelPosition
+                .getParentContainer();
 
             freezerLabel.setText(freezerContainer.getFullInfoLabel());
             freezerWidget.setContainerType(freezerContainer.getContainerType());
@@ -529,7 +531,7 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
             + totalNb
             + " samples assign to pallet "
             + LabelingScheme.getPositionString(currentPalletWrapper
-                .getPosition()));
+                .getPosition().getWrappedObject()));
         // TODO got a access denied exception with this. why ?
         // appService.executeBatchQuery(queries);
         setSaved(true);
@@ -666,8 +668,8 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
         // TODO if moving, use the existing position and modify it instead of
         // create a new one (and the old one is probably not deleted) ?
         appendLog("Checking position label " + currentPalletWrapper.getLabel());
-        Container containerAtPosition = currentPalletWrapper.getContainer(
-            currentPalletWrapper.getLabel(), currentPalletWrapper
+        ContainerWrapper containerAtPosition = currentPalletWrapper
+            .getContainer(currentPalletWrapper.getLabel(), currentPalletWrapper
                 .getContainerType());
         if (containerAtPosition == null) {
             currentPalletWrapper.computePositionFromLabel();

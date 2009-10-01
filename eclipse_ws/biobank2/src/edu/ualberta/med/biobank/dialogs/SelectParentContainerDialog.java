@@ -17,19 +17,19 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 
-import edu.ualberta.med.biobank.model.Container;
+import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 
 /**
  * Allows the user to move a container and its contents to a new location
  */
 
 public class SelectParentContainerDialog extends BiobankDialog {
-    private Collection<Container> containers;
+    private Collection<ContainerWrapper> containers;
     private CCombo combo;
     protected int selectionIndex;
 
     public SelectParentContainerDialog(Shell parent,
-        Collection<Container> containers) {
+        Collection<ContainerWrapper> containers) {
         super(parent);
         Assert.isNotNull(containers);
         this.containers = containers;
@@ -72,8 +72,9 @@ public class SelectParentContainerDialog extends BiobankDialog {
         cv.setLabelProvider(new LabelProvider() {
             @Override
             public String getText(Object element) {
-                return ((Container) element).getLabel() + " ("
-                    + ((Container) element).getContainerType().getName() + ")";
+                return ((ContainerWrapper) element).getLabel() + " ("
+                    + ((ContainerWrapper) element).getContainerType().getName()
+                    + ")";
             }
         });
         cv.addSelectionChangedListener(new ISelectionChangedListener() {

@@ -6,7 +6,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 
-import edu.ualberta.med.biobank.common.DatabaseResult;
+import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Patient;
@@ -18,7 +18,6 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
-//FIXME get/set for model object should use wrapper ?
 public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
 
     public PatientVisitWrapper(WritableApplicationService appService,
@@ -28,19 +27,10 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
 
     @Override
     protected void firePropertyChanges(PatientVisit oldWrappedObject,
-        PatientVisit newWrappedObject) {
-        propertyChangeSupport.firePropertyChange("patient", oldWrappedObject,
-            newWrappedObject);
-        propertyChangeSupport.firePropertyChange("dateDrawn", oldWrappedObject,
-            newWrappedObject);
-        propertyChangeSupport.firePropertyChange("dateProcessed",
-            oldWrappedObject, newWrappedObject);
-        propertyChangeSupport.firePropertyChange("dateReceived",
-            oldWrappedObject, newWrappedObject);
-        propertyChangeSupport.firePropertyChange("clinic", oldWrappedObject,
-            newWrappedObject);
-        propertyChangeSupport.firePropertyChange("comments", oldWrappedObject,
-            newWrappedObject);
+        PatientVisit newWrappedObject) throws Exception {
+        String[] members = new String[] { "patient", "dateDrawn",
+            "dateProcessed", "dateReceived", "clinic", "comments" };
+        firePropertyChanges(members, oldWrappedObject, newWrappedObject);
     }
 
     public Date getDateDrawn() {
@@ -138,13 +128,12 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
     }
 
     @Override
-    protected DatabaseResult persistChecks() throws ApplicationException {
-        if (checkVisitDateDrawnUnique()) {
-            return DatabaseResult.OK;
+    protected void persistChecks() throws BiobankCheckException, Exception {
+        if (!checkVisitDateDrawnUnique()) {
+            throw new BiobankCheckException("A patient visit with date drawn "
+                + getDateDrawn() + " already exist in patient "
+                + getPatientWrapper().getNumber() + ".");
         }
-        return new DatabaseResult("A patient visit with date drawn "
-            + getDateDrawn() + " already exist in patient "
-            + getPatientWrapper().getNumber() + ".");
     }
 
     private boolean checkVisitDateDrawnUnique() throws ApplicationException {
@@ -182,14 +171,8 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
     }
 
     @Override
-    public boolean checkIntegrity() {
-        return true;
-    }
-
-    @Override
-    protected DatabaseResult deleteChecks() throws ApplicationException {
+    protected void deleteChecks() throws BiobankCheckException, Exception {
         // TODO Auto-generated method stub
-        return null;
     }
 
 }

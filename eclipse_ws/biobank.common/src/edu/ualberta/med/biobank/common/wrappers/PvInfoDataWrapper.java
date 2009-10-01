@@ -1,8 +1,7 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
-import edu.ualberta.med.biobank.common.DatabaseResult;
+import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.model.PvInfoData;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 //FIXME todo by delphine
@@ -18,30 +17,22 @@ public class PvInfoDataWrapper extends ModelWrapper<PvInfoData> {
     protected void firePropertyChanges(PvInfoData oldWrappedObject,
         PvInfoData newWrappedObject) {
         // TODO Auto-generated method stub
-
     }
 
     @Override
     protected Class<PvInfoData> getWrappedClass() {
         // TODO Auto-generated method stub
-        return null;
+        return PvInfoData.class;
     }
 
     @Override
-    protected DatabaseResult persistChecks() throws ApplicationException {
+    protected void persistChecks() throws BiobankCheckException, Exception {
         // TODO Auto-generated method stub
-        return null;
     }
 
     @Override
-    public boolean checkIntegrity() {
-        return true;
-    }
-
-    @Override
-    protected DatabaseResult deleteChecks() throws ApplicationException {
+    protected void deleteChecks() throws BiobankCheckException, Exception {
         // TODO Auto-generated method stub
-        return null;
     }
 
 }

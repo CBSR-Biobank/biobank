@@ -15,16 +15,16 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Label;
 
-import edu.ualberta.med.biobank.model.Container;
+import edu.ualberta.med.biobank.common.wrappers.ContainerPositionWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.model.ContainerCell;
-import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.ContainerStatus;
 import edu.ualberta.med.biobank.model.ContainerType;
 
 public class PalletPositionChooserPage extends AbstractContainerChooserPage {
 
     public static final String NAME = "HOTEL_CONTAINER";
-    private ContainerPosition selectedPosition;
+    private ContainerPositionWrapper selectedPosition;
     private ContainerType containerType;
 
     private ComboViewer comboViewer;
@@ -80,7 +80,7 @@ public class PalletPositionChooserPage extends AbstractContainerChooserPage {
     }
 
     @Override
-    public void setCurrentContainer(Container container) {
+    public void setCurrentContainer(ContainerWrapper container) {
         super.setCurrentContainer(container);
         setTitle("Container " + container.getLabel());
         updateFreezerGrid();
@@ -121,7 +121,7 @@ public class PalletPositionChooserPage extends AbstractContainerChooserPage {
         return cell;
     }
 
-    public ContainerPosition getSelectedPosition() {
+    public ContainerPositionWrapper getSelectedPosition() {
         return selectedPosition;
     }
 
@@ -130,7 +130,8 @@ public class PalletPositionChooserPage extends AbstractContainerChooserPage {
     }
 
     @Override
-    protected void setStatus(ContainerCell cell, Container occupiedContainer) {
+    protected void setStatus(ContainerCell cell,
+        ContainerWrapper occupiedContainer) {
         if (occupiedContainer == null) {
             cell.setStatus(ContainerStatus.NOT_INITIALIZED);
         } else {
@@ -144,7 +145,8 @@ public class PalletPositionChooserPage extends AbstractContainerChooserPage {
             for (int j = 0; j < cells[i].length; j++) {
                 if (cells[i][j] == null) {
                     ContainerCell cell = new ContainerCell(
-                        newContainerPosition(i, j));
+                        new ContainerPositionWrapper(getAppService(),
+                            newContainerPosition(i, j)));
                     cell.setStatus(ContainerStatus.NOT_INITIALIZED);
                     cells[i][j] = cell;
                 }

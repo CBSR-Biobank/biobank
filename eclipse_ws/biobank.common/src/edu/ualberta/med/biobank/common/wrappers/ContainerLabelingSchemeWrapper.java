@@ -1,11 +1,9 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
-import edu.ualberta.med.biobank.common.DatabaseResult;
+import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
-//FIXME todo by delphine
 public class ContainerLabelingSchemeWrapper extends
     ModelWrapper<ContainerLabelingScheme> {
 
@@ -21,28 +19,33 @@ public class ContainerLabelingSchemeWrapper extends
     }
 
     @Override
-    protected DatabaseResult persistChecks() throws ApplicationException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
     protected void firePropertyChanges(
         ContainerLabelingScheme oldWrappedObject,
-        ContainerLabelingScheme newWrappedObject) {
+        ContainerLabelingScheme newWrappedObject) throws Exception {
+        String[] members = new String[] { "name" };
+        firePropertyChanges(members, oldWrappedObject, newWrappedObject);
+    }
+
+    public void setName(String name) {
+        String oldName = name;
+        wrappedObject.setName(name);
+        propertyChangeSupport.firePropertyChange("name", oldName, name);
+    }
+
+    public String getName() {
+        return wrappedObject.getName();
+    }
+
+    @Override
+    protected void deleteChecks() throws BiobankCheckException, Exception {
         // TODO Auto-generated method stub
 
     }
 
     @Override
-    public boolean checkIntegrity() {
-        return true;
-    }
-
-    @Override
-    protected DatabaseResult deleteChecks() throws ApplicationException {
+    protected void persistChecks() throws BiobankCheckException, Exception {
         // TODO Auto-generated method stub
-        return null;
+
     }
 
 }

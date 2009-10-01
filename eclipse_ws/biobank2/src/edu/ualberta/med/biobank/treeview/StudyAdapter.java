@@ -48,11 +48,19 @@ public class StudyAdapter extends AdapterBase {
     }
 
     public void setStudy(Study study) {
-        object = study;
+        // FIXME should set StudyWrapper : need to check the use of this
+        // method
+        object = new StudyWrapper(getAppService(), study);
     }
 
     public Study getStudy() {
-        return (Study) object;
+        // FIXME should return StudyWrapper : need to check the use of this
+        // method
+        return ((StudyWrapper) object).getWrappedObject();
+    }
+
+    public StudyWrapper getWrapper() {
+        return (StudyWrapper) object;
     }
 
     @Override

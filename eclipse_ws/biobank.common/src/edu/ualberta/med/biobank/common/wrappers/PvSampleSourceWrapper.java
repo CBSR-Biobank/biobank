@@ -1,47 +1,68 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
-import edu.ualberta.med.biobank.common.DatabaseResult;
+import edu.ualberta.med.biobank.common.BiobankCheckException;
+import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.PvSampleSource;
-import gov.nih.nci.system.applicationservice.ApplicationException;
+import edu.ualberta.med.biobank.model.SampleSource;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
-//FIXME delphine
 public class PvSampleSourceWrapper extends ModelWrapper<PvSampleSource> {
 
     public PvSampleSourceWrapper(WritableApplicationService appService,
         PvSampleSource wrappedObject) {
         super(appService, wrappedObject);
-        // TODO Auto-generated constructor stub
     }
 
     @Override
     protected void firePropertyChanges(PvSampleSource oldWrappedObject,
-        PvSampleSource newWrappedObject) {
-        // TODO Auto-generated method stub
-
+        PvSampleSource newWrappedObject) throws Exception {
+        String[] members = { "quantity", "patientVisit", "sampleSource" };
+        firePropertyChanges(members, oldWrappedObject, newWrappedObject);
     }
 
     @Override
     protected Class<PvSampleSource> getWrappedClass() {
-        // TODO Auto-generated method stub
-        return null;
+        return PvSampleSource.class;
     }
 
     @Override
-    protected DatabaseResult persistChecks() throws ApplicationException {
-        // TODO Auto-generated method stub
-        return null;
+    protected void persistChecks() throws BiobankCheckException, Exception {
     }
 
     @Override
-    public boolean checkIntegrity() {
-        return true;
+    protected void deleteChecks() throws BiobankCheckException, Exception {
     }
 
-    @Override
-    protected DatabaseResult deleteChecks() throws ApplicationException {
-        // TODO Auto-generated method stub
-        return null;
+    public Integer getQuantity() {
+        return wrappedObject.getQuantity();
+    }
+
+    public void setQuantity(Integer quantity) {
+        Integer oldQuantity = getQuantity();
+        wrappedObject.setQuantity(quantity);
+        propertyChangeSupport.firePropertyChange("quantity", oldQuantity,
+            quantity);
+    }
+
+    public PatientVisitWrapper getPatientVisit() {
+        return new PatientVisitWrapper(appService, wrappedObject
+            .getPatientVisit());
+    }
+
+    public void setPatientVisit(PatientVisit pv) {
+        PatientVisitWrapper oldPv = getPatientVisit();
+        wrappedObject.setPatientVisit(pv);
+        propertyChangeSupport.firePropertyChange("patientVisit", oldPv, pv);
+    }
+
+    public SampleSource getSampleSource() {
+        return wrappedObject.getSampleSource();
+    }
+
+    public void setSampleSource(SampleSource ss) {
+        SampleSource oldSs = getSampleSource();
+        wrappedObject.setSampleSource(ss);
+        propertyChangeSupport.firePropertyChange("sampleSource", oldSs, ss);
     }
 
 }

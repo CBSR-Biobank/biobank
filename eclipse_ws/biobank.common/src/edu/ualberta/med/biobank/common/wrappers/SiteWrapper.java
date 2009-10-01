@@ -7,7 +7,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 
-import edu.ualberta.med.biobank.common.DatabaseResult;
+import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerType;
@@ -78,12 +78,11 @@ public class SiteWrapper extends ModelWrapper<Site> implements
     }
 
     @Override
-    protected DatabaseResult persistChecks() throws ApplicationException {
-        if (checkSiteNameUnique()) {
-            return DatabaseResult.OK;
+    protected void persistChecks() throws BiobankCheckException, Exception {
+        if (!checkSiteNameUnique()) {
+            throw new BiobankCheckException("A site with name \"" + getName()
+                + "\" already exists.");
         }
-        return new DatabaseResult("A site with name \"" + getName()
-            + "\" already exists.");
     }
 
     private boolean checkSiteNameUnique() throws ApplicationException {
@@ -100,14 +99,8 @@ public class SiteWrapper extends ModelWrapper<Site> implements
     }
 
     @Override
-    public boolean checkIntegrity() {
-        return true;
-    }
-
-    @Override
-    protected DatabaseResult deleteChecks() throws ApplicationException {
+    protected void deleteChecks() throws BiobankCheckException, Exception {
         // TODO Auto-generated method stub
-        return null;
     }
 
     public int compareTo(SiteWrapper wrapper) {

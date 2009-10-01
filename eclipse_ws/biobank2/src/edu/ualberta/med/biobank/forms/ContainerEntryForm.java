@@ -17,13 +17,11 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
-import edu.ualberta.med.biobank.common.DatabaseResult;
 import edu.ualberta.med.biobank.common.LabelingScheme;
-import edu.ualberta.med.biobank.common.utils.SiteUtils;
+import edu.ualberta.med.biobank.common.wrappers.ContainerPositionWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
-import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.treeview.ContainerAdapter;
 import edu.ualberta.med.biobank.validators.DoubleNumber;
@@ -50,7 +48,7 @@ public class ContainerEntryForm extends BiobankEntryForm {
 
     private Text tempWidget;
 
-    private ContainerType currentContainerType;
+    private ContainerTypeWrapper currentContainerType;
 
     private ComboViewer containerTypeComboViewer;
 
@@ -61,15 +59,15 @@ public class ContainerEntryForm extends BiobankEntryForm {
                 + adapter.getClass().getName());
         containerAdapter = (ContainerAdapter) adapter;
         containerWrapper = containerAdapter.getContainer();
-        siteWrapper = containerWrapper.getSiteWrapper();
+        siteWrapper = containerWrapper.getSite();
 
         String tabName;
         if (containerWrapper.isNew()) {
             tabName = "Container";
             if (containerWrapper.getPosition() != null) {
-                ContainerPosition pos = containerWrapper.getPosition();
+                ContainerPositionWrapper pos = containerWrapper.getPosition();
                 containerWrapper.setLabel(pos.getParentContainer().getLabel()
-                    + LabelingScheme.getPositionString(pos));
+                    + LabelingScheme.getPositionString(pos.getWrappedObject()));
                 containerWrapper.setTemperature(pos.getParentContainer()
                     .getTemperature());
             }
@@ -80,7 +78,7 @@ public class ContainerEntryForm extends BiobankEntryForm {
     }
 
     @Override
-    protected void createFormContent() {
+    protected void createFormContent() throws Exception {
         form.setText("Container");
         currentContainerType = containerWrapper.getContainerType();
         form.getBody().setLayout(new GridLayout(1, false));
@@ -88,7 +86,7 @@ public class ContainerEntryForm extends BiobankEntryForm {
         createButtonsSection();
     }
 
-    private void createContainerSection() {
+    private void createContainerSection() throws Exception {
         Composite client = toolkit.createComposite(form.getBody());
         GridLayout layout = new GridLayout(2, false);
         layout.horizontalSpacing = 10;
@@ -98,8 +96,7 @@ public class ContainerEntryForm extends BiobankEntryForm {
 
         Label siteLabel = (Label) createWidget(client, Label.class, SWT.NONE,
             "Site");
-        FormUtils.setTextValue(siteLabel, containerWrapper.getSiteWrapper()
-            .getName());
+        FormUtils.setTextValue(siteLabel, containerWrapper.getSite().getName());
 
         if (containerWrapper.getPosition() == null) {
             // only allow edit to label on top level containers
@@ -133,12 +130,12 @@ public class ContainerEntryForm extends BiobankEntryForm {
         createContainerTypesSection(client);
     }
 
-    private void createContainerTypesSection(Composite client) {
+    private void createContainerTypesSection(Composite client) throws Exception {
         Collection<ContainerType> containerTypes;
-        ContainerPosition pos = containerWrapper.getPosition();
+        ContainerPositionWrapper pos = containerWrapper.getPosition();
         if ((pos == null) || (pos.getParentContainer() == null)) {
-            containerTypes = SiteUtils.getTopContainerTypesInSite(appService,
-                siteWrapper);
+            containerTypes = ContainerTypeWrapper.getTopContainerTypesInSite(
+                appService, siteWrapper);
         } else {
             containerTypes = pos.getParentContainer().getContainerType()
                 .getChildContainerTypeCollection();
@@ -146,13 +143,15 @@ public class ContainerEntryForm extends BiobankEntryForm {
 
         if (currentContainerType == null) {
             if (containerTypes.size() == 1) {
-                currentContainerType = containerTypes.iterator().next();
+                currentContainerType = new ContainerTypeWrapper(appService,
+                    containerTypes.iterator().next());
                 setDirty(true);
             }
         } else {
             for (ContainerType type : containerTypes) {
                 if (currentContainerType.getId().equals(type.getId())) {
-                    currentContainerType = type;
+                    currentContainerType = new ContainerTypeWrapper(appService,
+                        type);
                     break;
                 }
             }
@@ -217,15 +216,9 @@ public class ContainerEntryForm extends BiobankEntryForm {
         ContainerType containerType = (ContainerType) ((StructuredSelection) containerTypeComboViewer
             .getSelection()).getFirstElement();
         containerWrapper.setContainerType(containerType);
-        DatabaseResult res = containerWrapper.persist();
-        if (res != DatabaseResult.OK) {
-            BioBankPlugin.openAsyncError("Save Problem", res.getMessage());
-            setDirty(true);
-            return;
-        }
+        containerWrapper.persist();
         containerAdapter.getParent().addChild(containerAdapter);
         containerAdapter.getParent().performExpand();
-
     }
 
     @Override

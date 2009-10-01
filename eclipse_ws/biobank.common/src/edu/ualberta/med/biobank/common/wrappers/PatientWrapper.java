@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import edu.ualberta.med.biobank.common.DatabaseResult;
+import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.Study;
@@ -12,7 +12,6 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
-//FIXME get/set for model object should use wrapper ?
 public class PatientWrapper extends ModelWrapper<Patient> {
 
     public PatientWrapper(WritableApplicationService appService, Patient patient) {
@@ -58,22 +57,22 @@ public class PatientWrapper extends ModelWrapper<Patient> {
     /**
      * When retrieve the values from the database, need to fire the
      * modifications for the different objects contained in the wrapped object
+     * 
+     * @throws Exception
      */
     @Override
-    protected void firePropertyChanges(Patient oldPatient, Patient newpatient) {
-        propertyChangeSupport.firePropertyChange("number", oldPatient
-            .getNumber(), newpatient.getNumber());
-        propertyChangeSupport.firePropertyChange("study",
-            oldPatient.getStudy(), newpatient.getStudy());
+    protected void firePropertyChanges(Patient oldPatient, Patient newpatient)
+        throws Exception {
+        String[] members = new String[] { "number", "study" };
+        firePropertyChanges(members, oldPatient, newpatient);
     }
 
     @Override
-    protected DatabaseResult persistChecks() throws ApplicationException {
-        if (checkPatientNumberUnique()) {
-            return DatabaseResult.OK;
+    protected void persistChecks() throws BiobankCheckException, Exception {
+        if (!checkPatientNumberUnique()) {
+            throw new BiobankCheckException("A patient with number \""
+                + getNumber() + "\" already exists.");
         }
-        return new DatabaseResult("A patient with number \"" + getNumber()
-            + "\" already exists.");
     }
 
     public Collection<PatientVisit> getPatientVisitCollection() {
@@ -117,13 +116,7 @@ public class PatientWrapper extends ModelWrapper<Patient> {
     }
 
     @Override
-    public boolean checkIntegrity() {
-        return true;
-    }
-
-    @Override
-    protected DatabaseResult deleteChecks() throws ApplicationException {
+    protected void deleteChecks() throws BiobankCheckException, Exception {
         // TODO Auto-generated method stub
-        return null;
     }
 }

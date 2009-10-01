@@ -90,7 +90,6 @@ public class AdapterTreeWidget extends Composite {
         Menu menu = new Menu(PlatformUI.getWorkbench()
             .getActiveWorkbenchWindow().getShell(), SWT.NONE);
         menu.addListener(SWT.Show, new Listener() {
-
             @Override
             public void handleEvent(Event event) {
                 Menu menu = treeViewer.getTree().getMenu();
