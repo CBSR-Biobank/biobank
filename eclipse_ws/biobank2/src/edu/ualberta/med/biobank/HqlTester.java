@@ -25,7 +25,8 @@ public class HqlTester {
 
         // geTopContainerTypes();
         // getPatientIds();
-        geContainerLike();
+        // geContainerLike();
+        getTopContainers();
     }
 
     @SuppressWarnings("unused")
@@ -55,13 +56,25 @@ public class HqlTester {
         }
     }
 
+    @SuppressWarnings("unused")
     private void geContainerLike() throws Exception {
         HQLCriteria c = new HQLCriteria("from " + Container.class.getName()
             + " where label like ?", Arrays.asList(new Object[] { "01%" }));
 
         List<Container> results = appService.query(c);
         for (Container container : results) {
-            System.out.println("geTopContainerTypes: " + container.getLabel());
+            System.out.println("geContainerLike: " + container.getLabel());
+        }
+    }
+
+    private void getTopContainers() throws Exception {
+        HQLCriteria criteria = new HQLCriteria("from "
+            + Container.class.getName()
+            + " where site.id = ? and position is null", Arrays
+            .asList(new Object[] { new Integer(1) }));
+        List<Container> containers = appService.query(criteria);
+        for (Container container : containers) {
+            System.out.println("getTopContainers: " + container.getLabel());
         }
     }
 

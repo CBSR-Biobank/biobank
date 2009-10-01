@@ -153,8 +153,8 @@ public class SiteWrapper extends ModelWrapper<Site> implements
         throws Exception {
         HQLCriteria criteria = new HQLCriteria("from "
             + Container.class.getName()
-            + " where site = ? and position is null", Arrays
-            .asList(new Object[] { wrappedObject }));
+            + " where site.id = ? and position is null", Arrays
+            .asList(new Object[] { wrappedObject.getId() }));
         List<Container> containers = appService.query(criteria);
 
         Collection<ContainerWrapper> wrappers = new HashSet<ContainerWrapper>();
