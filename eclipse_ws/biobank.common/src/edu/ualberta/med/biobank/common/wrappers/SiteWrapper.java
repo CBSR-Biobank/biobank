@@ -32,6 +32,10 @@ public class SiteWrapper extends ModelWrapper<Site> implements
         return addressWrapper;
     }
 
+    public void setAddressWrapper(AddressWrapper addressWrapper) {
+        this.addressWrapper = addressWrapper;
+    }
+
     public String getName() {
         return wrappedObject.getName();
     }
@@ -59,7 +63,7 @@ public class SiteWrapper extends ModelWrapper<Site> implements
 
     public void setComment(String comment) {
         String oldComment = getComment();
-        wrappedObject.setName(comment);
+        wrappedObject.setComment(comment);
         propertyChangeSupport
             .firePropertyChange("comment", oldComment, comment);
     }
@@ -93,8 +97,8 @@ public class SiteWrapper extends ModelWrapper<Site> implements
                 + " where name = ?", Arrays.asList(new Object[] { getName() }));
         } else {
             c = new HQLCriteria("from " + Site.class.getName()
-                + " as site where site.id <> ? and name = ?", Arrays
-                .asList(new Object[] { getWrappedObject().getId(), getName() }));
+                + " as site where site <> ? and name = ?", Arrays
+                .asList(new Object[] { getWrappedObject(), getName() }));
         }
 
         List<Object> results = appService.query(c);

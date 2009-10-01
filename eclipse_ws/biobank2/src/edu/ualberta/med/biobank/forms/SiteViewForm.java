@@ -1,7 +1,5 @@
 package edu.ualberta.med.biobank.forms;
 
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
@@ -15,12 +13,12 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.forms.widgets.Section;
 
+import edu.ualberta.med.biobank.common.wrappers.AddressWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Clinic;
-import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.ClinicAdapter;
@@ -30,7 +28,6 @@ import edu.ualberta.med.biobank.widgets.infotables.ClinicInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.ContainerInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.ContainerTypeInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.StudyInfoTable;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class SiteViewForm extends AddressViewFormCommon {
     public static final String ID = "edu.ualberta.med.biobank.forms.SiteViewForm";
@@ -58,6 +55,7 @@ public class SiteViewForm extends AddressViewFormCommon {
                 + adapter.getClass().getName());
 
         siteAdapter = (SiteAdapter) adapter;
+        siteWrapper = siteAdapter.getWrapper();
         retrieveSite();
         setPartName("Repository Site " + siteWrapper.getName());
     }
@@ -207,17 +205,13 @@ public class SiteViewForm extends AddressViewFormCommon {
     }
 
     private void retrieveSite() {
-        List<Site> result;
-        Site searchSite = new Site();
-        searchSite.setId(siteAdapter.getSite().getId());
         try {
-            result = siteAdapter.getAppService().search(Site.class, searchSite);
-            Assert.isTrue(result.size() == 1);
-            siteWrapper = new SiteWrapper(siteAdapter.getAppService(), result
-                .get(0));
-            addressWrapper = siteWrapper.getAddressWrapper();
+            siteWrapper.reload();
+            addressWrapper = new AddressWrapper(siteAdapter.getAppService(),
+                siteWrapper.getWrappedObject().getAddress());
+            siteWrapper.setAddressWrapper(addressWrapper);
             siteAdapter.setSite(siteWrapper.getWrappedObject());
-        } catch (ApplicationException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

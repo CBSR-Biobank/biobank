@@ -155,6 +155,7 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
             .getParentFromClass(SiteAdapter.class);
         clinicWrapper.setSiteWrapper(siteAdapter.getWrapper());
         saveContacts();
+        addressWrapper.persist();
         clinicWrapper.persist();
     }
 

@@ -35,6 +35,12 @@ public class SiteEntryForm extends AddressEntryFormCommon {
 
         siteAdapter = (SiteAdapter) adapter;
         siteWrapper = siteAdapter.getWrapper();
+        try {
+            siteWrapper.reload();
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
 
         String tabName;
         if (siteWrapper.getId() == null) {
@@ -113,6 +119,7 @@ public class SiteEntryForm extends AddressEntryFormCommon {
         if (siteAdapter.getParent() == null) {
             siteAdapter.setParent(SessionManager.getInstance().getSession());
         }
+        addressWrapper.persist();
         siteWrapper.persist();
     }
 

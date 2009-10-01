@@ -31,7 +31,7 @@ public class ContactWrapper extends ModelWrapper<Contact> {
 
     public void setTitle(String title) {
         String oldTitle = getTitle();
-        wrappedObject.setName(title);
+        wrappedObject.setTitle(title);
         propertyChangeSupport.firePropertyChange("title", oldTitle, title);
     }
 
@@ -41,7 +41,7 @@ public class ContactWrapper extends ModelWrapper<Contact> {
 
     public void setPhoneNumber(String phoneNumber) {
         String oldPhoneNumber = getPhoneNumber();
-        wrappedObject.setName(phoneNumber);
+        wrappedObject.setPhoneNumber(phoneNumber);
         propertyChangeSupport.firePropertyChange("phoneNumber", oldPhoneNumber,
             phoneNumber);
     }
@@ -52,7 +52,7 @@ public class ContactWrapper extends ModelWrapper<Contact> {
 
     public void setFaxNumber(String faxNumber) {
         String oldFaxNumber = getFaxNumber();
-        wrappedObject.setName(faxNumber);
+        wrappedObject.setFaxNumber(faxNumber);
         propertyChangeSupport.firePropertyChange("faxNumber", oldFaxNumber,
             faxNumber);
     }
@@ -63,7 +63,7 @@ public class ContactWrapper extends ModelWrapper<Contact> {
 
     public void setEmailAddress(String emailAddress) {
         String oldEmailAddress = getPhoneNumber();
-        wrappedObject.setName(emailAddress);
+        wrappedObject.setEmailAddress(emailAddress);
         propertyChangeSupport.firePropertyChange("emailAddress",
             oldEmailAddress, emailAddress);
     }
