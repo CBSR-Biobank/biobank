@@ -71,8 +71,7 @@ public class SiteWrapper extends ModelWrapper<Site> implements
     @Override
     protected void firePropertyChanges(Site oldWrappedObject,
         Site newWrappedObject) {
-        String[] members = new String[] { "name", "activityStatus", "comment",
-            "site" };
+        String[] members = new String[] { "name", "activityStatus", "comment" };
 
         try {
             firePropertyChanges(members, oldWrappedObject, newWrappedObject);
