@@ -108,6 +108,7 @@ public abstract class BiobankFormBase extends EditorPart {
         mform = new ManagedForm(parent);
         toolkit = mform.getToolkit();
         form = mform.getForm();
+        toolkit.decorateFormHeading(form.getForm());
 
         // start a new runnable so that database objects are populated in a
         // separate thread.
