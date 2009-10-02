@@ -154,7 +154,8 @@ public abstract class BiobankFormBase extends EditorPart {
         Composite client;
         Section section = createSection(title);
         ImageHyperlink link = toolkit.createImageHyperlink(section, SWT.NULL);
-        link.setImage();
+        link
+            .setImage(BioBankPlugin.getDefault().getImageRegistry().get("site"));
         client = toolkit.createComposite(section);
         section.setClient(client);
         client.setLayout(new GridLayout(2, false));

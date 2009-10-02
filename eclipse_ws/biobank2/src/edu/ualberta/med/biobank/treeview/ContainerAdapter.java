@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.treeview;
 
-import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
@@ -23,6 +22,7 @@ import edu.ualberta.med.biobank.dialogs.SelectParentContainerDialog;
 import edu.ualberta.med.biobank.forms.ContainerEntryForm;
 import edu.ualberta.med.biobank.forms.ContainerViewForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
+import edu.ualberta.med.biobank.model.Container;
 
 public class ContainerAdapter extends AdapterBase {
 
@@ -92,20 +92,7 @@ public class ContainerAdapter extends AdapterBase {
         mi.setText("Move Container");
         mi.addSelectionListener(new SelectionListener() {
             public void widgetSelected(SelectionEvent event) {
-                MoveContainerDialog mc = new MoveContainerDialog(PlatformUI
-                    .getWorkbench().getActiveWorkbenchWindow().getShell(),
-                    getContainer().getWrappedObject());
-                if (mc.open() == Dialog.OK) {
-                    setContainer(new ContainerWrapper(SessionManager
-                        .getAppService(), mc.getContainer()));
-                    try {
-                        setNewPositionFromLabel(mc.getAddress());
-                        // FIXME UPDATE TREE... difficult to know which adapter
-                        // we need to update
-                    } catch (Exception e) {
-                        BioBankPlugin.openError(e.getMessage(), e);
-                    }
-                }
+                moveAction();
             }
 
             public void widgetDefaultSelected(SelectionEvent e) {
@@ -126,7 +113,7 @@ public class ContainerAdapter extends AdapterBase {
     @Override
     public void loadChildren(boolean updateNode) {
         try {
-            Collection<ContainerPositionWrapper> positions = getContainer()
+            List<ContainerPositionWrapper> positions = getContainer()
                 .getChildPositionCollection();
             if (positions != null) {
                 // read from database again
@@ -134,7 +121,6 @@ public class ContainerAdapter extends AdapterBase {
                     ContainerWrapper child = childPosition.getContainer();
                     ContainerAdapter node = (ContainerAdapter) getChild(child
                         .getId());
-
                     if (node == null) {
                         node = new ContainerAdapter(this, child);
                         addChild(node);
@@ -191,4 +177,38 @@ public class ContainerAdapter extends AdapterBase {
             getContainer().setNewParent(newParent, newLabel);
         }
     }
+
+    private void moveAction() {
+        if (getContainer().getContainerType().getTopLevel()) {
+            BioBankPlugin.openAsyncError("Move Error",
+                "You can't move a top container");
+            return;
+        }
+        ContainerAdapter oldParent = (ContainerAdapter) getParent();
+        MoveContainerDialog mc = new MoveContainerDialog(PlatformUI
+            .getWorkbench().getActiveWorkbenchWindow().getShell(),
+            getContainer().getWrappedObject());
+        if (mc.open() == Dialog.OK) {
+            setContainer(new ContainerWrapper(SessionManager.getAppService(),
+                mc.getContainer()));
+            try {
+                setNewPositionFromLabel(mc.getAddress());
+                // FIXME UPDATE TREE... difficult to know which adapter
+                // we need to update
+                oldParent.getContainer().reload();
+                oldParent.performDoubleClick();
+                ContainerWrapper newParentContainer = getContainer()
+                    .getPosition().getParentContainer();
+                ContainerAdapter parentAdapter = (ContainerAdapter) SessionManager
+                    .getInstance().getSession().accept(
+                        new NodeSearchVisitor(Container.class,
+                            newParentContainer.getId()));
+                parentAdapter.getContainer().reload();
+                parentAdapter.performDoubleClick();
+            } catch (Exception e) {
+                BioBankPlugin.openError(e.getMessage(), e);
+            }
+        }
+    }
+
 }

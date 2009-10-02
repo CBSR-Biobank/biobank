@@ -7,7 +7,8 @@ import edu.ualberta.med.biobank.model.ContainerPosition;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class ContainerPositionWrapper extends
-    AbstractPositionWrapper<ContainerPosition> {
+    AbstractPositionWrapper<ContainerPosition> implements
+    Comparable<ContainerPositionWrapper> {
 
     public ContainerPositionWrapper(WritableApplicationService appService,
         ContainerPosition wrappedObject) {
@@ -87,6 +88,11 @@ public class ContainerPositionWrapper extends
     @Override
     protected void deleteChecks() throws BiobankCheckException, Exception {
         // TODO Auto-generated method stub
+    }
+
+    @Override
+    public int compareTo(ContainerPositionWrapper o) {
+        return getContainer().compareTo(o.getContainer());
     }
 
 }

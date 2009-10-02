@@ -47,7 +47,6 @@ import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
 import edu.ualberta.med.biobank.forms.listener.EnterKeyToNextFieldListener;
-import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.Sample;
@@ -92,9 +91,9 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
         String.class);
 
     private SampleWrapper sampleWrapper;
-    private Container cabinet;
-    private Container drawer;
-    private Container bin;
+    private ContainerWrapper cabinet;
+    private ContainerWrapper drawer;
+    private ContainerWrapper bin;
 
     private String cabinetNameContains = "";
 
@@ -331,7 +330,8 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
                     sampleWrapper.setSamplePositionFromString(positionString,
                         bin);
                     sampleWrapper.checkPosition(bin);
-                    sampleWrapper.getSamplePosition().setContainer(bin);
+                    sampleWrapper.getSamplePosition().setContainer(
+                        bin.getWrappedObject());
 
                     showPositions();
 
@@ -384,7 +384,7 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
         String binLabel = positionString.substring(0, 6);
         appendLog("Checking parent container " + binLabel + " for type "
             + sampleWrapper.getSampleType().getName());
-        List<Container> containers = ContainerWrapper
+        List<ContainerWrapper> containers = ContainerWrapper
             .getContainersHoldingSampleType(appService, SessionManager
                 .getInstance().getCurrentSiteWrapper(), binLabel, sampleWrapper
                 .getSampleType());

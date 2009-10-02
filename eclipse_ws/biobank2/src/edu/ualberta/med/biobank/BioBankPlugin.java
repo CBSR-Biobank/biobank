@@ -12,7 +12,6 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
@@ -26,8 +25,10 @@ import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
  * The activator class controls the plug-in life cycle
  */
 public class BioBankPlugin extends AbstractUIPlugin {
-    // The plug-in ID
+
     public static final String PLUGIN_ID = "biobank2";
+
+    public static final String IMAGE_ID = "biobank2.image";
 
     public static final String DATE_FORMAT = "yyyy-MM-dd";
 
@@ -38,6 +39,30 @@ public class BioBankPlugin extends AbstractUIPlugin {
     public SimpleDateFormat dateTimeFormatter;
 
     public static final String IMG_FORM_BG = "formBg";
+    public static final String IMG_BIN = "bin";
+    public static final String IMG_CABINET = "cabinet";
+    public static final String IMG_CABINET_LINK_ASSIGN = "cabinetLinkAssign";
+    public static final String IMG_CLINIC = "clinic";
+    public static final String IMG_CLINICS = "clinics";
+    public static final String IMG_CONTAINER_TYPES = "containerTypes";
+    public static final String IMG_CONTAINERS = "containers";
+    public static final String IMG_DRAWER = "drawer";
+    public static final String IMG_FREEZER = "freezer";
+    public static final String IMG_HOTEL = "hotel";
+    public static final String IMG_MAIN_PERSPECTIVE = "mainPerspective";
+    public static final String IMG_PALLET = "pallet";
+    public static final String IMG_PATIENT = "patient";
+    public static final String IMG_PATIENT_ADD = "patientAdd";
+    public static final String IMG_PATIENT_VISIT_ADD = "patientVisitAdd";
+    public static final String IMG_RELOAD_FORM = "reloadForm";
+    public static final String IMG_REPORTS = "reports";
+    public static final String IMG_SCAN_ASSIGN = "scanAssign";
+    public static final String IMG_SCAN_LINK = "scanLink";
+    public static final String IMG_SESSIONS = "sessions";
+    public static final String IMG_SITE = "site";
+    public static final String IMG_STUDIES = "studies";
+    public static final String IMG_STUDY = "study";
+    public static final String IMG_USER_ADD = "userAdd";
 
     public static final String BARCODES_FILE = BioBankPlugin.class.getPackage()
         .getName()
@@ -72,6 +97,31 @@ public class BioBankPlugin extends AbstractUIPlugin {
     @Override
     protected void initializeImageRegistry(ImageRegistry registry) {
         registerImage(registry, IMG_FORM_BG, "form_banner.bmp");
+        registerImage(registry, IMG_BIN, "bin.png");
+        registerImage(registry, IMG_CABINET, "cabinet.png");
+        registerImage(registry, IMG_CABINET_LINK_ASSIGN,
+            "cabinetLinkAssign.png");
+        registerImage(registry, IMG_CLINIC, "clinic.png");
+        registerImage(registry, IMG_CLINICS, "clinics.png");
+        registerImage(registry, IMG_CONTAINER_TYPES, "container_types.png");
+        registerImage(registry, IMG_CONTAINERS, "containers.png");
+        registerImage(registry, IMG_DRAWER, "drawer.png");
+        registerImage(registry, IMG_FREEZER, "freezer.png");
+        registerImage(registry, IMG_HOTEL, "hotel.png");
+        registerImage(registry, IMG_MAIN_PERSPECTIVE, "mainPerspective.png");
+        registerImage(registry, IMG_PALLET, "pallet.png");
+        registerImage(registry, IMG_PATIENT, "patient.png");
+        registerImage(registry, IMG_PATIENT_ADD, "patient_add.png");
+        registerImage(registry, IMG_PATIENT_VISIT_ADD, "patientvisit_add.png");
+        registerImage(registry, IMG_RELOAD_FORM, "reload.png");
+        registerImage(registry, IMG_REPORTS, "reports.png");
+        registerImage(registry, IMG_SCAN_ASSIGN, "scanAssign.png");
+        registerImage(registry, IMG_SCAN_LINK, "scanLink.png");
+        registerImage(registry, IMG_SESSIONS, "sessions.png");
+        registerImage(registry, IMG_SITE, "site.png");
+        registerImage(registry, IMG_STUDIES, "studies.png");
+        registerImage(registry, IMG_STUDY, "study.png");
+        registerImage(registry, IMG_USER_ADD, "user_add.png");
     }
 
     private void registerImage(ImageRegistry registry, String key,
