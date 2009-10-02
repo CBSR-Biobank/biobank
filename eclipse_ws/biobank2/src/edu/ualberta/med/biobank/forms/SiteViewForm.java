@@ -10,9 +10,12 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.ToolBar;
+import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.forms.widgets.Section;
 
+import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.wrappers.AddressWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
@@ -98,7 +101,15 @@ public class SiteViewForm extends AddressViewFormCommon {
     }
 
     private void createStudySection() {
-        Composite client = createSectionWithClient("Studies");
+        Section section = createSection("Studies");
+        Composite client = sectionAddClient(section);
+
+        ToolBar tbar = new ToolBar(section, SWT.FLAT | SWT.HORIZONTAL);
+        ToolItem titem = new ToolItem(tbar, SWT.NULL);
+        titem.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
+            BioBankPlugin.IMG_STUDY));
+        titem.setToolTipText("Add Study");
+        section.setTextClient(tbar);
 
         studiesTable = new StudyInfoTable(client, siteWrapper
             .getStudyWrapperCollection());
