@@ -34,8 +34,9 @@ public abstract class BiobankViewForm extends BiobankFormBase {
 
     protected String sessionName;
 
-    private static ImageDescriptor reloadActionImage = BioBankPlugin
-        .getImageDescriptor("icons/reload.png");
+    private static ImageDescriptor reloadActionImage = ImageDescriptor
+        .createFromImage(BioBankPlugin.getDefault().getImageRegistry().get(
+            BioBankPlugin.IMG_RELOAD_FORM));
 
     @Override
     public boolean isDirty() {

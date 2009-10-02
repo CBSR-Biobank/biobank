@@ -40,6 +40,7 @@ public class BioBankPlugin extends AbstractUIPlugin {
 
     public static final String IMG_FORM_BG = "formBg";
     public static final String IMG_BIN = "bin";
+    public static final String IMG_BOX = "box";
     public static final String IMG_CABINET = "cabinet";
     public static final String IMG_CABINET_LINK_ASSIGN = "cabinetLinkAssign";
     public static final String IMG_CLINIC = "clinic";
@@ -52,6 +53,7 @@ public class BioBankPlugin extends AbstractUIPlugin {
     public static final String IMG_MAIN_PERSPECTIVE = "mainPerspective";
     public static final String IMG_PALLET = "pallet";
     public static final String IMG_PATIENT = "patient";
+    public static final String IMG_PATIENT_VISIT = "patientVisit";
     public static final String IMG_PATIENT_ADD = "patientAdd";
     public static final String IMG_PATIENT_VISIT_ADD = "patientVisitAdd";
     public static final String IMG_RELOAD_FORM = "reloadForm";
@@ -98,6 +100,7 @@ public class BioBankPlugin extends AbstractUIPlugin {
     protected void initializeImageRegistry(ImageRegistry registry) {
         registerImage(registry, IMG_FORM_BG, "form_banner.bmp");
         registerImage(registry, IMG_BIN, "bin.png");
+        registerImage(registry, IMG_BOX, "bin.png");
         registerImage(registry, IMG_CABINET, "cabinet.png");
         registerImage(registry, IMG_CABINET_LINK_ASSIGN,
             "cabinetLinkAssign.png");
@@ -111,6 +114,7 @@ public class BioBankPlugin extends AbstractUIPlugin {
         registerImage(registry, IMG_MAIN_PERSPECTIVE, "mainPerspective.png");
         registerImage(registry, IMG_PALLET, "pallet.png");
         registerImage(registry, IMG_PATIENT, "patient.png");
+        registerImage(registry, IMG_PATIENT_VISIT, "patientvisit_add.png");
         registerImage(registry, IMG_PATIENT_ADD, "patient_add.png");
         registerImage(registry, IMG_PATIENT_VISIT_ADD, "patientvisit_add.png");
         registerImage(registry, IMG_RELOAD_FORM, "reload.png");
@@ -159,17 +163,6 @@ public class BioBankPlugin extends AbstractUIPlugin {
      */
     public static BioBankPlugin getDefault() {
         return plugin;
-    }
-
-    /**
-     * Returns an image descriptor for the image file at the given plug-in
-     * relative path
-     * 
-     * @param path the path
-     * @return the image descriptor
-     */
-    public static ImageDescriptor getImageDescriptor(String path) {
-        return imageDescriptorFromPlugin(PLUGIN_ID, path);
     }
 
     /**

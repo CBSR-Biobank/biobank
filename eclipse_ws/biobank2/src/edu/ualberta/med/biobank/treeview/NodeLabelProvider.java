@@ -1,9 +1,7 @@
 package edu.ualberta.med.biobank.treeview;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ILabelProviderListener;
@@ -12,23 +10,11 @@ import org.eclipse.swt.graphics.Image;
 import edu.ualberta.med.biobank.BioBankPlugin;
 
 public class NodeLabelProvider implements ILabelProvider {
-    private HashMap<String, Image> imageCollection = null;
 
-    private static String[] CONTAINER_TYPE_TO_IMAGE_KEY = null;
-
-    static {
-        Properties properties = new Properties();
-        try {
-            properties.load(NodeLabelProvider.class
-                .getResourceAsStream("containerTypesToImageKey.properties"));
-            CONTAINER_TYPE_TO_IMAGE_KEY = properties.keySet().toArray(
-                new String[properties.keySet().size()]);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-    }
-
+    // FIXME: move this to preferences
+    // 
+    // ContainerTypeAdapter and Container missing on purpose.
+    //
     private Map<String, String> nodeToImageKey = new HashMap<String, String>() {
         private static final long serialVersionUID = 1L;
         {
@@ -41,12 +27,17 @@ public class NodeLabelProvider implements ILabelProvider {
             put(ContainerGroup.class.getName(), BioBankPlugin.IMG_CONTAINERS);
             put(ClinicAdapter.class.getName(), BioBankPlugin.IMG_CLINIC);
             put(StudyAdapter.class.getName(), BioBankPlugin.IMG_STUDY);
-            put(ContainerTypeAdapter.class.getName(),
-                BioBankPlugin.IMG_CONTAINER_TYPES);
-            put(ContainerAdapter.class.getName(), BioBankPlugin.IMG_CONTAINERS);
             put(PatientAdapter.class.getName(), BioBankPlugin.IMG_PATIENT);
+            put(PatientVisitAdapter.class.getName(),
+                BioBankPlugin.IMG_PATIENT_VISIT);
         }
     };
+
+    private static final String[] CONTAINER_TYPE_IMAGE_KEYS = new String[] {
+        BioBankPlugin.IMG_BIN, BioBankPlugin.IMG_BOX,
+        BioBankPlugin.IMG_CABINET, BioBankPlugin.IMG_DRAWER,
+        BioBankPlugin.IMG_FREEZER, BioBankPlugin.IMG_HOTEL,
+        BioBankPlugin.IMG_PALLET, };
 
     public Image getImage(Object element) {
         String imageKey = nodeToImageKey.get(element.getClass().getName());
@@ -66,19 +57,20 @@ public class NodeLabelProvider implements ILabelProvider {
 
     public Image getIconForTypeName(String typeName) {
         if (nodeToImageKey.containsKey(typeName)) {
-            return imageCollection.get(typeName);
+            return BioBankPlugin.getDefault().getImageRegistry().get(
+                nodeToImageKey.get(typeName));
         }
 
         String imageKey = null;
-        for (String name : CONTAINER_TYPE_TO_IMAGE_KEY) {
-            if (typeName.contains(name)) {
+        for (String name : CONTAINER_TYPE_IMAGE_KEYS) {
+            if (typeName.toLowerCase().contains(name)) {
                 imageKey = name;
                 break;
             }
         }
 
         if (imageKey == null)
-            imageKey = BioBankPlugin.IMG_CONTAINERS;
+            imageKey = BioBankPlugin.IMG_FREEZER;
 
         nodeToImageKey.put(typeName, imageKey);
         return BioBankPlugin.getDefault().getImageRegistry().get(imageKey);
@@ -94,21 +86,15 @@ public class NodeLabelProvider implements ILabelProvider {
     public void addListener(ILabelProviderListener listener) {
     }
 
-    public void dispose() {
-        for (Image image : imageCollection.values()) {
-            if (image != null) {
-                image.dispose();
-            }
-        }
-        imageCollection.clear();
-
-    }
-
     public boolean isLabelProperty(Object element, String property) {
         return true;
     }
 
     public void removeListener(ILabelProviderListener listener) {
+    }
+
+    @Override
+    public void dispose() {
     }
 
 }
