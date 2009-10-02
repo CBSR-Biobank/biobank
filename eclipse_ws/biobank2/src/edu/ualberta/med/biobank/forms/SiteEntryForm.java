@@ -58,7 +58,6 @@ public class SiteEntryForm extends AddressEntryFormCommon {
         form.getBody().setLayout(new GridLayout(1, false));
         createSiteSection();
         createAddressArea();
-        createButtonsSection();
 
         // When adding help uncomment line below
         // PlatformUI.getWorkbench().getHelpSystem().setHelp(composite,
@@ -93,17 +92,6 @@ public class SiteEntryForm extends AddressEntryFormCommon {
         GridData gd = new GridData(GridData.FILL_HORIZONTAL);
         gd.heightHint = 40;
         comment.setLayoutData(gd);
-    }
-
-    private void createButtonsSection() {
-        Composite client = toolkit.createComposite(form.getBody());
-        GridLayout layout = new GridLayout();
-        layout.horizontalSpacing = 10;
-        layout.numColumns = 2;
-        client.setLayout(layout);
-        toolkit.paintBordersFor(client);
-
-        initCancelConfirmWidget(client);
     }
 
     @Override

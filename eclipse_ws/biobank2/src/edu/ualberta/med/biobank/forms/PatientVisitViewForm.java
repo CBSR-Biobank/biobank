@@ -82,12 +82,10 @@ public class PatientVisitViewForm extends BiobankViewForm {
             + patientVisitWrapper.getFormattedDateDrawn());
         form.getBody().setLayout(new GridLayout(1, false));
         form.getBody().setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        addRefreshToolbarAction();
+        addToolbarButtons();
         createMainSection();
         createSourcesSection();
         createSamplesSection();
-
-        initEditButton(form.getBody(), patientVisitAdapter);
     }
 
     private void createMainSection() {

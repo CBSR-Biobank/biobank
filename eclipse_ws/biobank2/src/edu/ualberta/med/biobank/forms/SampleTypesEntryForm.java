@@ -63,7 +63,6 @@ public class SampleTypesEntryForm extends BiobankEntryForm {
         form.getBody().setLayout(new GridLayout(1, false));
         createSiteSampleTypeSection();
         createGlobalSampleTypeSection();
-        initCancelConfirmWidget(form.getBody());
     }
 
     @Override

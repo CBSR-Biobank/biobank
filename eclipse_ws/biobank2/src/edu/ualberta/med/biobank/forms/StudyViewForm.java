@@ -59,7 +59,7 @@ public class StudyViewForm extends BiobankViewForm {
             form.setText("Study: " + studyWrapper.getName());
         }
 
-        addRefreshToolbarAction();
+        addToolbarButtons();
 
         GridLayout layout = new GridLayout(1, false);
         form.getBody().setLayout(layout);
@@ -82,8 +82,6 @@ public class StudyViewForm extends BiobankViewForm {
         createSampleStorageSection();
         createSampleSourceSection();
         createPvDataSection();
-
-        initEditButton(client, studyAdapter);
         setStudySectionValues();
         setPvDataSectionValues();
     }

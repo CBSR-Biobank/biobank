@@ -199,8 +199,6 @@ public class ContainerEntryForm extends BiobankEntryForm {
         layout.numColumns = 2;
         client.setLayout(layout);
         toolkit.paintBordersFor(client);
-
-        initCancelConfirmWidget(client);
     }
 
     @Override

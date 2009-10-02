@@ -45,10 +45,9 @@ public class PatientViewForm extends BiobankViewForm {
         form.getBody().setLayout(new GridLayout(1, false));
         form.getBody().setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-        addRefreshToolbarAction();
+        addToolbarButtons();
         createPatientSection();
         createPatientVisitSection();
-        initEditButton(form.getBody(), patientAdapter);
         setValues();
     }
 

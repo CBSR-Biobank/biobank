@@ -126,7 +126,7 @@ public class ContainerViewForm extends BiobankViewForm {
             + container.getContainerType().getName() + ")");
         form.getBody().setLayout(new GridLayout(1, false));
 
-        addRefreshToolbarAction();
+        addToolbarButtons();
         createContainerSection();
 
         if (container.getContainerType().getSampleTypeCollection().size() > 0) {
@@ -160,10 +160,9 @@ public class ContainerViewForm extends BiobankViewForm {
             "Temperature");
 
         setContainerValues();
-        ContainerTypeWrapper containerType = container.getContainerType();
-        initEditButton(client, containerAdapter);
 
-        if (containerType.getChildContainerTypeCollection().size() > 0) {
+        if (container.getContainerType().getChildContainerTypeCollection()
+            .size() > 0) {
             visualizeContainer();
         }
     }

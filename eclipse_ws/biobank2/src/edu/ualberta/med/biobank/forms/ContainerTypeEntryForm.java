@@ -138,8 +138,6 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         createContainerTypeSection();
         createDimensionsSection();
         createContainsSection();
-
-        initCancelConfirmWidget(form.getBody());
     }
 
     protected void createContainerTypeSection() throws Exception {

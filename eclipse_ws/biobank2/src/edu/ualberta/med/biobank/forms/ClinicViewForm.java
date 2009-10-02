@@ -45,7 +45,7 @@ public class ClinicViewForm extends AddressViewFormCommon {
     @Override
     protected void createFormContent() throws Exception {
         form.setText("Clinic: " + clinicWrapper.getName());
-        addRefreshToolbarAction();
+        addToolbarButtons();
 
         GridLayout layout = new GridLayout(1, false);
         form.getBody().setLayout(layout);
@@ -107,8 +107,6 @@ public class ClinicViewForm extends AddressViewFormCommon {
         Composite client = toolkit.createComposite(form.getBody());
         client.setLayout(new GridLayout(4, false));
         toolkit.paintBordersFor(client);
-
-        initEditButton(client, clinicAdapter);
     }
 
     @Override

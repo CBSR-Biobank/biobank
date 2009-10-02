@@ -282,7 +282,6 @@ public class StudyEntryForm extends BiobankEntryForm {
         client.setLayout(layout);
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
-        initCancelConfirmWidget(client);
     }
 
     @Override

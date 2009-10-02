@@ -140,8 +140,6 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
         client.setLayout(layout);
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
-
-        initCancelConfirmWidget(client);
     }
 
     @Override

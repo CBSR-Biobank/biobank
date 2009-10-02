@@ -61,9 +61,7 @@ public class PatientEntryForm extends BiobankEntryForm {
         form.setText("Patient Information");
         form.setMessage(getOkMessage(), IMessageProvider.NONE);
         form.getBody().setLayout(new GridLayout(1, false));
-
         createPatientSection();
-        initCancelConfirmWidget(form.getBody());
 
         if (patientAdapter.getWrapper().isNew()) {
             setDirty(true);

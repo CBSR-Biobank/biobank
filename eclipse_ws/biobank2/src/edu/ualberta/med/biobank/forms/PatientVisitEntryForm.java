@@ -144,7 +144,6 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         patientWrapper = retrievePatient();
         createMainSection(patientWrapper.getStudy());
         createSourcesSection();
-        initCancelConfirmWidget(form.getBody());
         if (patientVisitWrapper.isNew()) {
             setDirty(true);
         }

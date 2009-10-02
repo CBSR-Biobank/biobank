@@ -122,11 +122,6 @@ public class BioBankPlugin extends AbstractUIPlugin {
         return imageDescriptorFromPlugin(PLUGIN_ID, path);
     }
 
-    public static Image getImage(String path) {
-        // FIXME should add the image in the registry and create it only once !
-        return getImageDescriptor(path).createImage();
-    }
-
     /**
      * Display an information message
      */

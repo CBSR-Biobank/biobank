@@ -23,6 +23,7 @@ import org.eclipse.ui.forms.ManagedForm;
 import org.eclipse.ui.forms.events.ExpansionAdapter;
 import org.eclipse.ui.forms.events.ExpansionEvent;
 import org.eclipse.ui.forms.widgets.FormToolkit;
+import org.eclipse.ui.forms.widgets.ImageHyperlink;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.part.EditorPart;
@@ -150,11 +151,12 @@ public abstract class BiobankFormBase extends EditorPart {
     }
 
     protected Composite createSectionWithClient(String title) {
-        Section section = createSection(title);
         Composite client;
+        Section section = createSection(title);
+        ImageHyperlink link = toolkit.createImageHyperlink(section, SWT.NULL);
+        link.setImage();
         client = toolkit.createComposite(section);
         section.setClient(client);
-
         client.setLayout(new GridLayout(2, false));
         toolkit.paintBordersFor(client);
         return client;

@@ -21,7 +21,6 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ControlContribution;
 import org.eclipse.jface.databinding.swt.SWTObservables;
 import org.eclipse.jface.dialogs.IMessageProvider;
@@ -63,7 +62,6 @@ import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.validators.AbstractValidator;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
-import edu.ualberta.med.biobank.widgets.CancelConfirmWidget;
 
 /**
  * Base class for data entry forms.
@@ -82,7 +80,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
 
     protected DataBindingContext dbc;
 
-    private CancelConfirmWidget cancelConfirmWidget;
+    protected Button confirmButton;
 
     protected KeyListener keyListener = new KeyListener() {
         @Override
@@ -168,7 +166,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
     @Override
     public void createPartControl(Composite parent) {
         super.createPartControl(parent);
-        addToolbar();
+        addToolbarButtons();
         bindChangeListener();
     }
 
@@ -177,15 +175,6 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
     @Override
     public void setFocus() {
         form.setFocus();
-    }
-
-    protected void initCancelConfirmWidget(Composite parent) {
-        initConfirmButton(parent, false);
-    }
-
-    protected void initConfirmButton(Composite parent, boolean showtextField) {
-        cancelConfirmWidget = new CancelConfirmWidget(parent, this,
-            showtextField);
     }
 
     public void resetForm() throws Exception {
@@ -398,14 +387,13 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
     protected void handleStatusChanged(IStatus status) {
         if (status.getSeverity() == IStatus.OK) {
             setFormHeaderErrorMessage(getOkMessage(), IMessageProvider.NONE);
-            if (cancelConfirmWidget != null) {
-                cancelConfirmWidget.setConfirmEnabled(true);
-            }
+            if (confirmButton != null)
+                confirmButton.setEnabled(true);
         } else {
             setFormHeaderErrorMessage(status.getMessage(),
                 IMessageProvider.ERROR);
-            if (cancelConfirmWidget != null) {
-                cancelConfirmWidget.setConfirmEnabled(false);
+            if (confirmButton != null) {
+                confirmButton.setEnabled(false);
             }
         }
     }
@@ -450,11 +438,27 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
         dbc.bindValue(writableValue, observableValue, uvs, uvs);
     }
 
-    protected void addToolbar() {
+    protected void addToolbarButtons() {
+        ControlContribution cancel = new ControlContribution("Cancel") {
+            @Override
+            protected Control createControl(Composite parent) {
+                confirmButton = new Button(parent, SWT.PUSH);
+                confirmButton.setText("Cancel");
+                confirmButton.addSelectionListener(new SelectionAdapter() {
+                    @Override
+                    public void widgetSelected(SelectionEvent e) {
+                        confirm();
+                    }
+                });
+                return confirmButton;
+            }
+        };
+        form.getToolBarManager().add(cancel);
+
         ControlContribution confirm = new ControlContribution("Confirm") {
             @Override
             protected Control createControl(Composite parent) {
-                final Button confirmButton = new Button(parent, SWT.PUSH);
+                confirmButton = new Button(parent, SWT.PUSH);
                 confirmButton.setText("Confirm");
                 confirmButton.addKeyListener(new KeyListener() {
                     @Override
@@ -487,47 +491,6 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
             }
         };
         form.getToolBarManager().add(confirm);
-
-        Action cancelAction = new Action("Confirm") {
-            @Override
-            public void run() {
-                BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
-                    public void run() {
-                        try {
-                            PlatformUI.getWorkbench()
-                                .getActiveWorkbenchWindow().getActivePage()
-                                .closeEditor(BiobankEntryForm.this, false);
-                        } catch (Exception e) {
-                            SessionManager.getLogger().error(
-                                "Can't close the form", e);
-                        }
-                    }
-                });
-            }
-        };
-        cancelAction.setText("Cancel");
-        form.getToolBarManager().add(cancelAction);
-
-        Action confirmAction = new Action("Confirm") {
-            @Override
-            public void run() {
-                BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
-                    public void run() {
-                        try {
-                            setDirty(false);
-                            doSaveInternal();
-                        } catch (final RemoteConnectFailureException exp) {
-                            BioBankPlugin.openRemoteConnectErrorMessage();
-                        } catch (Exception e) {
-                            SessionManager.getLogger().error(
-                                "BioBankFormBase.createPartControl Error", e);
-                        }
-                    }
-                });
-            }
-        };
-        confirmAction.setText("Confirm");
-        form.getToolBarManager().add(confirmAction);
         form.updateToolBar();
     }
 
