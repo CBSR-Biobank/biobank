@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.apache.commons.collections.map.ListOrderedMap;
 import org.apache.log4j.Logger;
+import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.databinding.beans.PojoObservables;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.IMessageProvider;
@@ -25,11 +26,9 @@ import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.utils.ModelUtils;
+import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.helpers.GetHelper;
-import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
-import edu.ualberta.med.biobank.model.ContainerType;
-import edu.ualberta.med.biobank.model.ContainerTypeComparator;
 import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.model.SampleTypeComparator;
 import edu.ualberta.med.biobank.model.Site;
@@ -67,7 +66,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
 
     private List<SampleType> allSampleTypes;
 
-    private List<ContainerType> allContainerTypes;
+    private List<ContainerTypeWrapper> allContainerTypes;
 
     private Site site;
 
@@ -98,9 +97,14 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         containerTypeAdapter = (ContainerTypeAdapter) adapter;
         containerType = containerTypeAdapter.getContainerType();
         retrieveSiteAndType();
-        allContainerTypes = new ArrayList<ContainerType>(site
-            .getContainerTypeCollection());
-        Collections.sort(allContainerTypes, new ContainerTypeComparator());
+        allContainerTypes = ContainerTypeWrapper.transformToWrapperList(
+            appService, site.getContainerTypeCollection());
+        for (ContainerTypeWrapper type : new ArrayList<ContainerTypeWrapper>(
+            allContainerTypes)) {
+            if (type.getTopLevel() != null && type.getTopLevel()) {
+                allContainerTypes.remove(type);
+            }
+        }
         String tabName;
         if (containerType.isNew()) {
             tabName = "New Container Type";
@@ -154,49 +158,38 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
             "Site");
         FormUtils.setTextValue(siteLabel, containerType.getSite().getName());
         createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Name", null,
-            PojoObservables.observeValue(containerType, "name"),
+            BeansObservables.observeValue(containerType, "name"),
             NonEmptyString.class, MSG_NO_CONTAINER_TYPE_NAME);
 
         createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Short Name",
-            null, PojoObservables.observeValue(containerType, "nameShort"),
+            null, BeansObservables.observeValue(containerType, "nameShort"),
             NonEmptyString.class, MSG_NO_CONTAINER_TYPE_NAME_SHORT);
 
         createBoundWidgetWithLabel(client, Text.class, SWT.NONE,
-            "Default Temperature\n(Celcius)", null, PojoObservables
+            "Default Temperature\n(Celcius)", null, BeansObservables
                 .observeValue(containerType, "defaultTemperature"),
             DoubleNumber.class, "Default temperature is not a valid number");
 
-        List<ContainerLabelingScheme> schemes = appService.search(
-            ContainerLabelingScheme.class, new ContainerLabelingScheme());
-
-        ContainerLabelingScheme currentScheme = containerType
+        ContainerLabelingSchemeWrapper currentScheme = containerType
             .getChildLabelingScheme();
-        if (currentScheme != null) {
-            for (ContainerLabelingScheme scheme : schemes) {
-                if (currentScheme.getId().equals(scheme.getId())) {
-                    currentScheme = scheme;
-                    break;
-                }
-            }
-        }
-
         labelingSchemeComboViewer = createCComboViewerWithNoSelectionValidator(
-            client, "Child Labeling Scheme", schemes, currentScheme,
+            client, "Child Labeling Scheme", ContainerLabelingSchemeWrapper
+                .getAllLabelingSchemes(appService), currentScheme,
             MSG_CHILD_LABELING_SCHEME_EMPTY);
 
         createBoundWidgetWithLabel(client, Combo.class, SWT.NONE,
-            "Activity Status", FormConstants.ACTIVITY_STATUS, PojoObservables
+            "Activity Status", FormConstants.ACTIVITY_STATUS, BeansObservables
                 .observeValue(containerType, "activityStatus"), null, null);
 
         if (containerType.getTopLevel() == null) {
             containerType.setTopLevel(false);
         }
         createBoundWidgetWithLabel(client, Button.class, SWT.CHECK,
-            "Top Level Container", null, PojoObservables.observeValue(
+            "Top Level Container", null, BeansObservables.observeValue(
                 containerType, "topLevel"), null);
 
         Text comment = (Text) createBoundWidgetWithLabel(client, Text.class,
-            SWT.MULTI, "Comments", null, PojoObservables.observeValue(
+            SWT.MULTI, "Comments", null, BeansObservables.observeValue(
                 containerType, "comment"), null, null);
         GridData gd = new GridData(GridData.FILL_HORIZONTAL);
         gd.heightHint = 40;
@@ -307,33 +300,24 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         childContainerTypesMultiSelect
             .addSelectionChangedListener(multiSelectListener);
 
-        ListOrderedMap availContainerTypes = new ListOrderedMap();
         List<Integer> selChildContainerTypes = new ArrayList<Integer>();
-
-        Collection<ContainerType> childContainerTypes = containerType
+        Collection<ContainerTypeWrapper> childContainerTypes = containerType
             .getChildContainerTypeCollection();
         if (childContainerTypes != null) {
-            for (ContainerType childContainerType : childContainerTypes) {
+            for (ContainerTypeWrapper childContainerType : childContainerTypes) {
                 selChildContainerTypes.add(childContainerType.getId());
             }
         }
-
-        Integer myId = new Integer(0);
-        if (containerType.getId() != null) {
-            myId = containerType.getId();
-        }
-
-        if (allContainerTypes != null)
-            for (ContainerType type : allContainerTypes) {
-                Integer id = type.getId();
-                if (myId.compareTo(id) != 0
-                    && (type.getTopLevel() == null || type.getTopLevel() == false)) {
-                    availContainerTypes.put(id, type.getName());
+        ListOrderedMap availContainerTypes = new ListOrderedMap();
+        if (allContainerTypes != null) {
+            for (ContainerTypeWrapper type : allContainerTypes) {
+                if (containerType.isNew() || !containerType.equals(type)) {
+                    availContainerTypes.put(type.getId(), type.getName());
                 }
             }
+        }
         childContainerTypesMultiSelect.addSelections(availContainerTypes,
             selChildContainerTypes);
-
     }
 
     @Override
@@ -366,7 +350,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         containerType.setSite(site);
 
         // set the labeling scheme
-        ContainerLabelingScheme scheme = (ContainerLabelingScheme) ((StructuredSelection) labelingSchemeComboViewer
+        ContainerLabelingSchemeWrapper scheme = (ContainerLabelingSchemeWrapper) ((StructuredSelection) labelingSchemeComboViewer
             .getSelection()).getFirstElement();
         containerType.setChildLabelingScheme(scheme);
 

@@ -1,6 +1,6 @@
 package edu.ualberta.med.biobank.handlers;
 
-import java.util.List;
+import java.util.Collection;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
@@ -16,7 +16,6 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.forms.ContainerEntryForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Container;
-import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.treeview.ContainerAdapter;
 import edu.ualberta.med.biobank.treeview.NodeSearchVisitor;
@@ -28,7 +27,7 @@ public class ContainerAddHandler extends AbstractHandler {
 
     public Object execute(ExecutionEvent event) throws ExecutionException {
         try {
-            List<ContainerType> top = (List<ContainerType>) ContainerTypeWrapper
+            Collection<ContainerTypeWrapper> top = ContainerTypeWrapper
                 .getTopContainerTypesInSite(SessionManager.getAppService(),
                     SessionManager.getInstance().getCurrentSiteWrapper());
             if (top.size() == 0) {

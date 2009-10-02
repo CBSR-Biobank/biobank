@@ -151,8 +151,6 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
         drawerWidget = new CabinetDrawerWidget(client);
         toolkit.adapt(drawerWidget);
         GridData gdBin = new GridData();
-        gdBin.widthHint = CabinetDrawerWidget.WIDTH;
-        gdBin.heightHint = CabinetDrawerWidget.HEIGHT;
         gdBin.verticalSpan = 2;
         drawerWidget.setLayoutData(gdBin);
 

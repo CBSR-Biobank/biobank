@@ -1,14 +1,15 @@
 package edu.ualberta.med.biobank.forms;
 
-import java.util.Collection;
+import java.util.List;
 
-import org.eclipse.core.databinding.beans.PojoObservables;
+import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -22,7 +23,6 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerPositionWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
-import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.treeview.ContainerAdapter;
 import edu.ualberta.med.biobank.validators.DoubleNumber;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
@@ -101,9 +101,8 @@ public class ContainerEntryForm extends BiobankEntryForm {
         if (containerWrapper.getPosition() == null) {
             // only allow edit to label on top level containers
             createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Label",
-                null, PojoObservables.observeValue(containerWrapper
-                    .getWrappedObject(), "label"), NonEmptyString.class,
-                MSG_CONTAINER_NAME_EMPTY);
+                null, BeansObservables.observeValue(containerWrapper, "label"),
+                NonEmptyString.class, MSG_CONTAINER_NAME_EMPTY);
         } else {
             Label l = (Label) createWidget(client, Label.class, SWT.NONE,
                 "Label");
@@ -111,18 +110,16 @@ public class ContainerEntryForm extends BiobankEntryForm {
         }
 
         createBoundWidgetWithLabel(client, Text.class, SWT.NONE,
-            "Product Barcode", null, PojoObservables.observeValue(
-                containerWrapper.getWrappedObject(), "productBarcode"), null,
-            null);
+            "Product Barcode", null, BeansObservables.observeValue(
+                containerWrapper, "productBarcode"), null, null);
 
         createBoundWidgetWithLabel(client, Combo.class, SWT.NONE,
-            "Activity Status", FormConstants.ACTIVITY_STATUS, PojoObservables
-                .observeValue(containerWrapper.getWrappedObject(),
-                    "activityStatus"), null, null);
+            "Activity Status", FormConstants.ACTIVITY_STATUS, BeansObservables
+                .observeValue(containerWrapper, "activityStatus"), null, null);
 
         Text comment = (Text) createBoundWidgetWithLabel(client, Text.class,
-            SWT.MULTI, "Comments", null, PojoObservables.observeValue(
-                containerWrapper.getWrappedObject(), "comment"), null, null);
+            SWT.MULTI, "Comments", null, BeansObservables.observeValue(
+                containerWrapper, "comment"), null, null);
         GridData gd = new GridData(GridData.FILL_HORIZONTAL);
         gd.heightHint = 40;
         comment.setLayoutData(gd);
@@ -131,7 +128,7 @@ public class ContainerEntryForm extends BiobankEntryForm {
     }
 
     private void createContainerTypesSection(Composite client) throws Exception {
-        Collection<ContainerType> containerTypes;
+        List<ContainerTypeWrapper> containerTypes;
         ContainerPositionWrapper pos = containerWrapper.getPosition();
         if ((pos == null) || (pos.getParentContainer() == null)) {
             containerTypes = ContainerTypeWrapper.getTopContainerTypesInSite(
@@ -143,17 +140,8 @@ public class ContainerEntryForm extends BiobankEntryForm {
 
         if (currentContainerType == null) {
             if (containerTypes.size() == 1) {
-                currentContainerType = new ContainerTypeWrapper(appService,
-                    containerTypes.iterator().next());
+                currentContainerType = containerTypes.get(0);
                 setDirty(true);
-            }
-        } else {
-            for (ContainerType type : containerTypes) {
-                if (currentContainerType.getId().equals(type.getId())) {
-                    currentContainerType = new ContainerTypeWrapper(appService,
-                        type);
-                    break;
-                }
             }
         }
 
@@ -166,30 +154,26 @@ public class ContainerEntryForm extends BiobankEntryForm {
                 public void selectionChanged(SelectionChangedEvent event) {
                     IStructuredSelection selection = (IStructuredSelection) event
                         .getSelection();
-                    ContainerType containerType = (ContainerType) selection
+                    ContainerTypeWrapper containerType = (ContainerTypeWrapper) selection
                         .getFirstElement();
                     if (containerType.getTopLevel() != null
                         && containerType.getTopLevel()) {
                         Double temp = containerType.getDefaultTemperature();
-
                         if (temp == null) {
                             tempWidget.setText("");
                         } else {
                             tempWidget.setText(temp.toString());
                         }
                     }
-
                 }
             });
-
+        containerTypeComboViewer.setComparator(new ViewerComparator());
         tempWidget = (Text) createBoundWidgetWithLabel(client, Text.class,
-            SWT.NONE, "Temperature (Celcius)", null, PojoObservables
-                .observeValue(containerWrapper.getWrappedObject(),
-                    "temperature"), DoubleNumber.class,
-            "Default temperature is not a valid number");
+            SWT.NONE, "Temperature (Celcius)", null, BeansObservables
+                .observeValue(containerWrapper, "temperature"),
+            DoubleNumber.class, "Default temperature is not a valid number");
         if (containerWrapper.getPosition() != null)
             tempWidget.setEnabled(false);
-
     }
 
     private void createButtonsSection() {
@@ -213,7 +197,7 @@ public class ContainerEntryForm extends BiobankEntryForm {
 
     @Override
     protected void saveForm() throws Exception {
-        ContainerType containerType = (ContainerType) ((StructuredSelection) containerTypeComboViewer
+        ContainerTypeWrapper containerType = (ContainerTypeWrapper) ((StructuredSelection) containerTypeComboViewer
             .getSelection()).getFirstElement();
         containerWrapper.setContainerType(containerType);
         containerWrapper.persist();

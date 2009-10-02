@@ -12,8 +12,8 @@ public class AddressWrapper extends ModelWrapper<Address> {
     }
 
     @Override
-    protected void firePropertyChanges(Address oldWrappedObject,
-        Address newWrappedObject) {
+    protected String[] getPropertyChangesNames() {
+        return null;
     }
 
     @Override

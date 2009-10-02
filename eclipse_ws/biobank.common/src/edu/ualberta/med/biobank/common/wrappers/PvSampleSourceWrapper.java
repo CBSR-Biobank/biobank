@@ -14,10 +14,8 @@ public class PvSampleSourceWrapper extends ModelWrapper<PvSampleSource> {
     }
 
     @Override
-    protected void firePropertyChanges(PvSampleSource oldWrappedObject,
-        PvSampleSource newWrappedObject) throws Exception {
-        String[] members = { "quantity", "patientVisit", "sampleSource" };
-        firePropertyChanges(members, oldWrappedObject, newWrappedObject);
+    protected String[] getPropertyChangesNames() {
+        return new String[] { "quantity", "patientVisit", "sampleSource" };
     }
 
     @Override

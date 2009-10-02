@@ -63,16 +63,9 @@ public class SiteWrapper extends ModelWrapper<Site> implements
     }
 
     @Override
-    protected void firePropertyChanges(Site oldWrappedObject,
-        Site newWrappedObject) {
-        String[] members = new String[] { "name", "activityStatus", "comment",
-            "site" };
+    protected String[] getPropertyChangesNames() {
+        return new String[] { "name", "activityStatus", "comment", "site" };
 
-        try {
-            firePropertyChanges(members, oldWrappedObject, newWrappedObject);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     @Override

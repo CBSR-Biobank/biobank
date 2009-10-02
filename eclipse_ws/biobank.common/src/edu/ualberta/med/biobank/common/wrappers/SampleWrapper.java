@@ -35,17 +35,9 @@ public class SampleWrapper extends ModelWrapper<Sample> {
     }
 
     @Override
-    protected void firePropertyChanges(Sample oldWrappedObject,
-        Sample newWrappedObject) {
-        propertyChangeSupport.firePropertyChange("inventoryId",
-            oldWrappedObject, newWrappedObject);
-        propertyChangeSupport.firePropertyChange("patientVisit",
-            oldWrappedObject, newWrappedObject);
-        propertyChangeSupport.firePropertyChange("samplePosition",
-            oldWrappedObject, newWrappedObject);
-        propertyChangeSupport.firePropertyChange("linkDate", oldWrappedObject,
-            newWrappedObject);
-
+    protected String[] getPropertyChangesNames() {
+        return new String[] { "inventoryId", "patientVisit", "samplePosition",
+            "linkDate", "sampleType" };
     }
 
     @Override

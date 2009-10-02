@@ -14,9 +14,8 @@ public class PvInfoDataWrapper extends ModelWrapper<PvInfoData> {
     }
 
     @Override
-    protected void firePropertyChanges(PvInfoData oldWrappedObject,
-        PvInfoData newWrappedObject) {
-        // TODO Auto-generated method stub
+    protected String[] getPropertyChangesNames() {
+        return null;
     }
 
     @Override

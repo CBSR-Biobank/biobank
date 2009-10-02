@@ -75,14 +75,18 @@ public abstract class ModelWrapper<E> {
     }
 
     /**
+     * return the list of the different properties we want to notify when we
+     * call firePropertyChanges
+     */
+    protected abstract String[] getPropertyChangesNames();
+
+    /**
      * When retrieve the values from the database, need to fire the
      * modifications for the different objects contained in the wrapped object
      */
-    protected abstract void firePropertyChanges(E oldWrappedObject,
-        E newWrappedObject) throws Exception;
-
-    protected void firePropertyChanges(String[] memberNames,
-        Object oldWrappedObject, Object newWrappedObject) throws Exception {
+    private void firePropertyChanges(Object oldWrappedObject,
+        Object newWrappedObject) throws Exception {
+        String[] memberNames = getPropertyChangesNames();
         if (memberNames == null) {
             throw new Exception("memberNames cannot be null");
         }
@@ -205,4 +209,12 @@ public abstract class ModelWrapper<E> {
         }
         return getId().equals(((ModelWrapper<?>) object).getId());
     }
+
+    public List<E> getAllObjects() throws Exception {
+        Class<E> classType = getWrappedClass();
+        Constructor<E> constructor = classType.getConstructor();
+        Object instance = constructor.newInstance();
+        return appService.search(classType, instance);
+    }
+
 }

@@ -17,11 +17,9 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.utils.ModelUtils;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.forms.ContainerEntryForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Container;
-import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.Site;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
@@ -43,10 +41,10 @@ public class ContainerGroup extends AdapterBase {
         mi.addSelectionListener(new SelectionListener() {
             public void widgetSelected(SelectionEvent event) {
                 try {
-                    List<ContainerType> top = (List<ContainerType>) ContainerTypeWrapper
+                    List<ContainerTypeWrapper> top = ContainerTypeWrapper
                         .getTopContainerTypesInSite(SessionManager
-                            .getAppService(), new SiteWrapper(SessionManager
-                            .getAppService(), ((SiteAdapter) parent).getSite()));
+                            .getAppService(), ((SiteAdapter) parent)
+                            .getWrapper());
                     if (top.size() == 0) {
                         MessageDialog
                             .openError(PlatformUI.getWorkbench()

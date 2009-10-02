@@ -13,10 +13,8 @@ public class PvInfoPossibleWrapper extends ModelWrapper<PvInfoPossible> {
     }
 
     @Override
-    protected void firePropertyChanges(PvInfoPossible oldWrappedObject,
-        PvInfoPossible newWrappedObject) throws Exception {
-        String[] members = { "label", "isDefault", "pvInfoType" };
-        firePropertyChanges(members, oldWrappedObject, newWrappedObject);
+    protected String[] getPropertyChangesNames() {
+        return new String[] { "label", "isDefault", "pvInfoType" };
     }
 
     @Override

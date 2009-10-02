@@ -26,11 +26,9 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
     }
 
     @Override
-    protected void firePropertyChanges(PatientVisit oldWrappedObject,
-        PatientVisit newWrappedObject) throws Exception {
-        String[] members = new String[] { "patient", "dateDrawn",
-            "dateProcessed", "dateReceived", "clinic", "comments" };
-        firePropertyChanges(members, oldWrappedObject, newWrappedObject);
+    protected String[] getPropertyChangesNames() {
+        return new String[] { "patient", "dateDrawn", "dateProcessed",
+            "dateReceived", "clinic", "comments" };
     }
 
     public Date getDateDrawn() {

@@ -61,10 +61,8 @@ public class PatientWrapper extends ModelWrapper<Patient> {
      * @throws Exception
      */
     @Override
-    protected void firePropertyChanges(Patient oldPatient, Patient newpatient)
-        throws Exception {
-        String[] members = new String[] { "number", "study" };
-        firePropertyChanges(members, oldPatient, newpatient);
+    protected String[] getPropertyChangesNames() {
+        return new String[] { "number", "study" };
     }
 
     @Override

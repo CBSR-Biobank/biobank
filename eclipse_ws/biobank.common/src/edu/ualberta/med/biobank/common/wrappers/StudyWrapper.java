@@ -39,10 +39,8 @@ public class StudyWrapper extends ModelWrapper<Study> implements
     }
 
     @Override
-    protected void firePropertyChanges(Study oldWrappedObject,
-        Study newWrappedObject) {
-        // TODO Auto-generated method stub
-
+    protected String[] getPropertyChangesNames() {
+        return null;
     }
 
     @Override

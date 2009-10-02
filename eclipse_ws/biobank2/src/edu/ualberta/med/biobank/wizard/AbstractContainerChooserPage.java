@@ -21,14 +21,14 @@ import edu.ualberta.med.biobank.model.ContainerCell;
 import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.ContainerStatus;
 import edu.ualberta.med.biobank.model.Site;
-import edu.ualberta.med.biobank.widgets.ChooseContainerWidget;
+import edu.ualberta.med.biobank.widgets.ContainerDisplayWidget;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public abstract class AbstractContainerChooserPage extends WizardPage {
 
     private ContainerWrapper currentContainer;
 
-    protected ChooseContainerWidget containerWidget;
+    protected ContainerDisplayWidget containerWidget;
 
     protected Composite pageContainer;
 
@@ -68,7 +68,7 @@ public abstract class AbstractContainerChooserPage extends WizardPage {
         gd.grabExcessHorizontalSpace = true;
         gd.horizontalSpan = 2;
         gridParent.setLayoutData(gd);
-        containerWidget = new ChooseContainerWidget(gridParent);
+        containerWidget = new ContainerDisplayWidget(gridParent);
         List<ContainerStatus> legend = new ArrayList<ContainerStatus>();
         legend.add(ContainerStatus.FREE_LOCATIONS);
         legend.add(ContainerStatus.FULL);
@@ -188,9 +188,10 @@ public abstract class AbstractContainerChooserPage extends WizardPage {
         return ((ContainerChooserWizard) getWizard()).getAppService();
     }
 
-    protected ContainerPosition newContainerPosition(int dim1, int dim2) {
-        ContainerPosition position = new ContainerPosition();
-        position.setParentContainer(currentContainer.getWrappedObject());
+    protected ContainerPositionWrapper newContainerPosition(int dim1, int dim2) {
+        ContainerPositionWrapper position = new ContainerPositionWrapper(
+            getAppService(), new ContainerPosition());
+        position.setParentContainer(currentContainer);
         position.setRow(dim1);
         position.setCol(dim2);
         return position;

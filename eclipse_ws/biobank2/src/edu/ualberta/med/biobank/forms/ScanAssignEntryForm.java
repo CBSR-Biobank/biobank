@@ -45,7 +45,6 @@ import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
 import edu.ualberta.med.biobank.forms.listener.EnterKeyToNextFieldListener;
 import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.Container;
-import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.PalletCell;
 import edu.ualberta.med.biobank.model.Sample;
 import edu.ualberta.med.biobank.model.SampleCellStatus;
@@ -265,7 +264,7 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
      * If can't know which pallet type we need, add a combo
      */
     private void createContainerTypeSection(Composite parent) throws Exception {
-        List<ContainerType> palletContainerTypes = ContainerTypeWrapper
+        List<ContainerTypeWrapper> palletContainerTypes = ContainerTypeWrapper
             .getContainerTypesInSite(appService,
                 currentPalletWrapper.getSite(), palletNameContains, false);
         if (palletContainerTypes.size() == 1) {
@@ -287,7 +286,7 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
                             .getSelection();
                         if (selection.size() > 0) {
                             currentPalletWrapper
-                                .setContainerType((ContainerType) selection
+                                .setContainerType((ContainerTypeWrapper) selection
                                     .getFirstElement());
                         }
                         scanLaunchedValue.setValue(false);

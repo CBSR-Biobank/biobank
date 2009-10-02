@@ -12,10 +12,8 @@ public class PvInfoTypeWrapper extends ModelWrapper<PvInfoType> {
     }
 
     @Override
-    protected void firePropertyChanges(PvInfoType oldWrappedObject,
-        PvInfoType newWrappedObject) throws Exception {
-        String[] members = new String[] { "type" };
-        firePropertyChanges(members, oldWrappedObject, newWrappedObject);
+    protected String[] getPropertyChangesNames() {
+        return new String[] { "type" };
     }
 
     @Override

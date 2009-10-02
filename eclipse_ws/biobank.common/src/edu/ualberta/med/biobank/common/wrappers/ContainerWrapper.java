@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.common.wrappers;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.BiobankCheckException;
@@ -19,6 +20,8 @@ import edu.ualberta.med.biobank.model.Site;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.SDKQuery;
+import gov.nih.nci.system.query.example.DeleteExampleQuery;
+import gov.nih.nci.system.query.example.InsertExampleQuery;
 import gov.nih.nci.system.query.example.UpdateExampleQuery;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
@@ -31,18 +34,11 @@ public class ContainerWrapper extends ModelWrapper<Container> implements
     }
 
     @Override
-    protected void firePropertyChanges(Container oldWrappedObject,
-        Container newWrappedObject) throws Exception {
-        String[] members = new String[] { "productBarcode", "position",
-            "activityStatus", "site", "label", "temperature", "comment",
+    protected String[] getPropertyChangesNames() {
+        return new String[] { "productBarcode", "position", "activityStatus",
+            "site", "label", "temperature", "comment",
             "samplePositionCollection", "childPositionCollection",
             "containerType" };
-        firePropertyChanges(members, oldWrappedObject, newWrappedObject);
-    }
-
-    @Override
-    public void persist() throws BiobankCheckException, Exception {
-        super.persist();
     }
 
     @Override
@@ -248,7 +244,7 @@ public class ContainerWrapper extends ModelWrapper<Container> implements
     }
 
     public void setContainerType(ContainerTypeWrapper containerType) {
-        setContainerType(containerType);
+        setContainerType(containerType.getWrappedObject());
     }
 
     public void setContainerType(ContainerType containerType) {
@@ -378,7 +374,7 @@ public class ContainerWrapper extends ModelWrapper<Container> implements
 
     public void setChildPositionCollection(
         List<ContainerPositionWrapper> positions) {
-        List<ContainerPosition> positionsObjects = new ArrayList<ContainerPosition>();
+        Collection<ContainerPosition> positionsObjects = new HashSet<ContainerPosition>();
         for (ContainerPositionWrapper pos : positions) {
             positionsObjects.add(pos.getWrappedObject());
         }
@@ -439,8 +435,46 @@ public class ContainerWrapper extends ModelWrapper<Container> implements
     }
 
     public void setNewParent(ContainerWrapper newParent, String newLabel)
-        throws Exception {
-        String oldLabel = getLabel();
+        throws BiobankCheckException, Exception {
+        // remove from old parent, add to new
+        ContainerWrapper oldParent = getPosition().getParentContainer();
+        if (oldParent != null) {
+            checkFreePosition(newParent, newLabel);
+            String oldLabel = getLabel();
+            // remove from old
+            List<ContainerPositionWrapper> oldPositions = oldParent
+                .getChildPositionCollection();
+            oldPositions.remove(getPosition());
+            oldParent.setChildPositionCollection(oldPositions);
+
+            // modify position object
+            ContainerPositionWrapper positionWrapper = getPosition();
+            positionWrapper.setParentContainer(newParent);
+            positionWrapper.setPosition(newLabel
+                .substring(newLabel.length() - 2));
+            setPosition(positionWrapper);
+
+            // add to new
+            List<ContainerPositionWrapper> newPositions = newParent
+                .getChildPositionCollection();
+            newPositions.add(getPosition());
+            newParent.setChildPositionCollection(newPositions);
+
+            // change label
+            if (getLabel().equalsIgnoreCase(getProductBarcode()))
+                setProductBarcode(newLabel);
+            setLabel(newLabel);
+
+            persist();
+            // move children
+            setChildLabels(oldLabel);
+        } else
+            throw new BiobankCheckException(
+                "You cannot move a top level container.");
+    }
+
+    private void checkFreePosition(ContainerWrapper newParent, String newLabel)
+        throws BiobankCheckException {
         List<ContainerPositionWrapper> positions = newParent
             .getChildPositionCollection();
         Boolean filled = false;
@@ -450,50 +484,17 @@ public class ContainerWrapper extends ModelWrapper<Container> implements
                 filled = true;
         if (filled) {
             // filled
-            throw new Exception(
+            throw new BiobankCheckException(
                 "The destination "
                     + newLabel
                     + " in container "
                     + newParent.getFullInfoLabel()
                     + " has already been initialized. You can only move to an uninitialized location.");
-        } else {
-            // remove from old parent, add to new
-            ContainerWrapper oldParent = getPosition().getParentContainer();
-            if (oldParent != null) {
-                // remove from old
-                List<ContainerPositionWrapper> oldPositions = oldParent
-                    .getChildPositionCollection();
-                oldPositions.remove(getPosition());
-                oldParent.setChildPositionCollection(oldPositions);
-
-                // modify position object
-                ContainerPositionWrapper positionWrapper = getPosition();
-                positionWrapper.setParentContainer(newParent);
-                positionWrapper.setPosition(newLabel.substring(newLabel
-                    .length() - 2));
-                setPosition(positionWrapper);
-
-                // add to new
-                List<ContainerPositionWrapper> newPositions = newParent
-                    .getChildPositionCollection();
-                newPositions.add(getPosition());
-                newParent.setChildPositionCollection(newPositions);
-
-                // change label
-                if (getLabel().equalsIgnoreCase(getProductBarcode()))
-                    setProductBarcode(newLabel);
-                setLabel(newLabel);
-
-                persist();
-                // move children
-                setChildLabels(oldLabel);
-            } else
-                throw new Exception("You cannot move a top level container.");
         }
     }
 
     private void setChildLabels(String oldLabel) throws Exception {
-        // inefficient, should be improved
+        // FIXME inefficient, should be improved
         HQLCriteria criteria = new HQLCriteria("from "
             + Container.class.getName() + " where label like ? and site= ?",
             Arrays.asList(new Object[] { oldLabel + "%",
@@ -525,6 +526,14 @@ public class ContainerWrapper extends ModelWrapper<Container> implements
                 getContainerType().getWrappedObject() }));
         List<Container> containers = appService.query(criteria);
         return transformToWrapperList(appService, containers);
+    }
+
+    @Override
+    public int compareTo(ContainerWrapper o) {
+        String c1Name = getLabel();
+        String c2Name = o.getLabel();
+        return ((c1Name.compareTo(c2Name) > 0) ? 1 : (c1Name.equals(c2Name) ? 0
+            : -1));
     }
 
     /**
@@ -617,17 +626,82 @@ public class ContainerWrapper extends ModelWrapper<Container> implements
     public static List<ContainerWrapper> transformToWrapperList(
         WritableApplicationService appService, List<Container> containers) {
         List<ContainerWrapper> list = new ArrayList<ContainerWrapper>();
-        for (Object o : containers) {
-            list.add(new ContainerWrapper(appService, (Container) o));
+        for (Container container : containers) {
+            list.add(new ContainerWrapper(appService, container));
         }
         return list;
     }
 
-    @Override
-    public int compareTo(ContainerWrapper o) {
-        String c1Name = getLabel();
-        String c2Name = o.getLabel();
-        return ((c1Name.compareTo(c2Name) > 0) ? 1 : (c1Name.equals(c2Name) ? 0
-            : -1));
+    /**
+     * Initialize all children of this container with the given type (except
+     * children already initialized)
+     * 
+     * @return true if at least one children has been initialized
+     */
+    public boolean initChildrenWithType(ContainerTypeWrapper type)
+        throws ApplicationException {
+        List<SDKQuery> queries = new ArrayList<SDKQuery>();
+        Collection<ContainerPositionWrapper> positions = getChildPositionCollection();
+        int rows = getContainerType().getCapacity().getRowCapacity().intValue();
+        int cols = getContainerType().getCapacity().getColCapacity().intValue();
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                Boolean filled = false;
+                for (ContainerPositionWrapper pos : positions) {
+                    if (pos.getRow().intValue() == i
+                        && pos.getCol().intValue() == j) {
+                        filled = true;
+                        break;
+                    }
+                }
+                if (!filled) {
+                    Container newContainer = new Container();
+                    newContainer.setContainerType(type.getWrappedObject());
+                    newContainer.setSite(getSite().getWrappedObject());
+                    newContainer.setTemperature(getTemperature());
+
+                    ContainerPosition newPos = new ContainerPosition();
+                    newPos.setRow(new Integer(i));
+                    newPos.setCol(new Integer(j));
+                    newPos.setParentContainer(getWrappedObject());
+                    newContainer.setPosition(newPos);
+                    newContainer.setLabel(getLabel()
+                        + LabelingScheme.getPositionString(newPos));
+                    queries.add(new InsertExampleQuery(newContainer));
+                }
+            }
+        }
+        if (queries.size() > 0) {
+            appService.executeBatchQuery(queries);
+            return true;
+        }
+        return false;
     }
+
+    /**
+     * Delete all children of this container with the given type
+     * 
+     * @return true if at least one children has been deleted
+     * @throws Exception
+     * @throws BiobankCheckException
+     */
+    public boolean deleteChildrenWithType(ContainerTypeWrapper type)
+        throws BiobankCheckException, Exception {
+        List<SDKQuery> queries = new ArrayList<SDKQuery>();
+        Collection<ContainerPositionWrapper> positions = getChildPositionCollection();
+        for (ContainerPositionWrapper pos : positions) {
+            ContainerWrapper deletingContainer = pos.getContainer();
+            if (deletingContainer.getContainerType().equals(type)) {
+                deletingContainer.deleteChecks();
+                queries.add(new DeleteExampleQuery(deletingContainer
+                    .getWrappedObject()));
+            }
+        }
+        if (queries.size() > 0) {
+            appService.executeBatchQuery(queries);
+            return true;
+        }
+        return false;
+    }
+
 }

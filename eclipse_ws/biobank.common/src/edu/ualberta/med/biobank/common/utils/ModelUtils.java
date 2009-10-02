@@ -97,13 +97,6 @@ public class ModelUtils {
         return appService.query(c);
     }
 
-    public static boolean getBooleanValue(Boolean value, boolean defaultValue) {
-        if (value == null) {
-            return defaultValue;
-        }
-        return value.booleanValue();
-    }
-
     /**
      * Search an object of type clazz with the specific property :
      * <ul>

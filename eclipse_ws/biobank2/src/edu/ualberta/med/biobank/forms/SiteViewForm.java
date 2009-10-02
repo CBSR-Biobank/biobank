@@ -1,7 +1,5 @@
 package edu.ualberta.med.biobank.forms;
 
-import java.util.List;
-
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -14,12 +12,12 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.forms.widgets.Section;
 
+import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Clinic;
-import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.ClinicAdapter;
@@ -29,7 +27,6 @@ import edu.ualberta.med.biobank.widgets.infotables.ClinicInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.ContainerInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.ContainerTypeInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.StudyInfoTable;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class SiteViewForm extends AddressViewFormCommon {
     public static final String ID = "edu.ualberta.med.biobank.forms.SiteViewForm";
@@ -54,6 +51,8 @@ public class SiteViewForm extends AddressViewFormCommon {
                 + adapter.getClass().getName());
 
         siteAdapter = (SiteAdapter) adapter;
+        siteWrapper = siteAdapter.getWrapper();
+        addressWrapper = siteWrapper.getAddressWrapper();
         retrieveSite();
         setPartName("Repository Site " + siteWrapper.getName());
     }
@@ -114,7 +113,6 @@ public class SiteViewForm extends AddressViewFormCommon {
 
         containerTypesTable.addDoubleClickListener(FormUtils
             .getBiobankCollectionDoubleClickListener());
-
     }
 
     private void createContainerSection() {
@@ -199,18 +197,12 @@ public class SiteViewForm extends AddressViewFormCommon {
     }
 
     private void retrieveSite() {
-        List<Site> result;
-        Site searchSite = new Site();
-        searchSite.setId(siteAdapter.getSite().getId());
         try {
-            result = siteAdapter.getAppService().search(Site.class, searchSite);
-            Assert.isTrue(result.size() == 1);
-            siteWrapper = new SiteWrapper(siteAdapter.getAppService(), result
-                .get(0));
-            addressWrapper = siteWrapper.getAddressWrapper();
-            siteAdapter.setSite(siteWrapper.getWrappedObject());
-        } catch (ApplicationException e) {
-            e.printStackTrace();
+            siteWrapper.reload();
+            addressWrapper.setWrappedObject(siteWrapper.getAddressWrapper()
+                .getWrappedObject());
+        } catch (Exception e) {
+            BioBankPlugin.openAsyncError("Can't reload site", e);
         }
     }
 

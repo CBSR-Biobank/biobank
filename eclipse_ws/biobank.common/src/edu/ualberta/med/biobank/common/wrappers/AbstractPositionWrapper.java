@@ -12,10 +12,8 @@ public abstract class AbstractPositionWrapper<E extends AbstractPosition>
     }
 
     @Override
-    protected void firePropertyChanges(E oldWrappedObject, E newWrappedObject)
-        throws Exception {
-        String[] members = new String[] { "row", "col" };
-        firePropertyChanges(members, oldWrappedObject, newWrappedObject);
+    protected String[] getPropertyChangesNames() {
+        return new String[] { "row", "col" };
     }
 
     public void setRow(Integer row) {
