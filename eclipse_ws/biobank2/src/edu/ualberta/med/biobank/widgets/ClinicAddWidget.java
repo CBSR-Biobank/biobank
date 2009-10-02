@@ -28,9 +28,8 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.dialogs.SelectClinicContactDialog;
-import edu.ualberta.med.biobank.model.Contact;
-import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.StudyContactInfo;
 import edu.ualberta.med.biobank.widgets.infotables.BiobankCollectionModel;
 import edu.ualberta.med.biobank.widgets.infotables.StudyContactEntryInfoTable;
@@ -49,28 +48,20 @@ public class ClinicAddWidget extends BiobankWidget {
 
     private Button addClinicButton;
 
-    public ClinicAddWidget(Composite parent, int style, Study study,
-        FormToolkit toolkit) {
+    public ClinicAddWidget(Composite parent, int style,
+        StudyWrapper studyWrapper, FormToolkit toolkit) {
         super(parent, style);
         Assert.isNotNull(toolkit, "toolkit is null");
         SiteWrapper siteWrapper = new SiteWrapper(SessionManager
-            .getAppService(), study.getSite());
+            .getAppService(), studyWrapper.getSite());
         allClinics = siteWrapper.getClinicWrapperCollection();
 
-        Collection<Contact> contacts = study.getContactCollection();
-        if (selectedContacts == null) {
-            selectedContacts = new HashSet<ContactWrapper>();
-        } else {
-            for (Contact contact : contacts) {
-                selectedContacts.add(new ContactWrapper(SessionManager
-                    .getAppService(), contact));
-            }
-        }
+        selectedContacts = studyWrapper.getContactWrapperCollection();
 
         setLayout(new GridLayout(1, false));
         setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-        contactInfoTable = new StudyContactEntryInfoTable(parent, study);
+        contactInfoTable = new StudyContactEntryInfoTable(parent, studyWrapper);
         contactInfoTable.adaptToToolkit(toolkit, true);
         addTableMenu();
 

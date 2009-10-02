@@ -39,6 +39,7 @@ public class BioBankPlugin extends AbstractUIPlugin {
     public SimpleDateFormat dateTimeFormatter;
 
     public static final String IMG_FORM_BG = "formBg";
+    public static final String IMG_ADD = "add";
     public static final String IMG_BIN = "bin";
     public static final String IMG_BOX = "box";
     public static final String IMG_CABINET = "cabinet";
@@ -47,6 +48,7 @@ public class BioBankPlugin extends AbstractUIPlugin {
     public static final String IMG_CLINICS = "clinics";
     public static final String IMG_CONTAINER_TYPES = "containerTypes";
     public static final String IMG_CONTAINERS = "containers";
+    public static final String IMG_DELETE = "delete";
     public static final String IMG_DRAWER = "drawer";
     public static final String IMG_FREEZER = "freezer";
     public static final String IMG_HOTEL = "hotel";
@@ -99,6 +101,7 @@ public class BioBankPlugin extends AbstractUIPlugin {
     @Override
     protected void initializeImageRegistry(ImageRegistry registry) {
         registerImage(registry, IMG_FORM_BG, "form_banner.bmp");
+        registerImage(registry, IMG_ADD, "add.png");
         registerImage(registry, IMG_BIN, "bin.png");
         registerImage(registry, IMG_BOX, "bin.png");
         registerImage(registry, IMG_CABINET, "cabinet.png");
@@ -108,6 +111,7 @@ public class BioBankPlugin extends AbstractUIPlugin {
         registerImage(registry, IMG_CLINICS, "clinics.png");
         registerImage(registry, IMG_CONTAINER_TYPES, "container_types.png");
         registerImage(registry, IMG_CONTAINERS, "containers.png");
+        registerImage(registry, IMG_DELETE, "delete.png");
         registerImage(registry, IMG_DRAWER, "drawer.png");
         registerImage(registry, IMG_FREEZER, "freezer.png");
         registerImage(registry, IMG_HOTEL, "hotel.png");

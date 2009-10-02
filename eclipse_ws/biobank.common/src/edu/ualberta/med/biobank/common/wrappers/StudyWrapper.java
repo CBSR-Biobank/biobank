@@ -160,7 +160,11 @@ public class StudyWrapper extends ModelWrapper<Study> implements
 
     public Collection<ContactWrapper> getContactWrapperCollection() {
         Collection<ContactWrapper> collection = new HashSet<ContactWrapper>();
-        for (Contact contact : wrappedObject.getContactCollection()) {
+        Collection<Contact> contactCollection = wrappedObject
+            .getContactCollection();
+        if (contactCollection == null)
+            return collection;
+        for (Contact contact : contactCollection) {
             collection.add(new ContactWrapper(appService, contact));
         }
         return collection;
@@ -174,8 +178,22 @@ public class StudyWrapper extends ModelWrapper<Study> implements
         return wrappedObject.getSampleSourceCollection();
     }
 
+    public void setSampleSourceCollection(
+        Collection<SampleSource> sampleSourceCollection) {
+        wrappedObject.setSampleSourceCollection(sampleSourceCollection);
+
+    }
+
+    public void setSampleStorageCollection(Collection<SampleStorage> collection) {
+        wrappedObject.setSampleStorageCollection(collection);
+    }
+
     public Collection<PvInfo> getPvInfoCollection() {
         return wrappedObject.getPvInfoCollection();
+    }
+
+    public void setPvInfoCollection(Collection<PvInfo> pvInfoCollection) {
+        wrappedObject.setPvInfoCollection(pvInfoCollection);
     }
 
 }

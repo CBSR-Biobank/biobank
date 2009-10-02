@@ -5,6 +5,7 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -50,6 +51,21 @@ public class SiteViewForm extends AddressViewFormCommon {
     private Label activityStatusLabel;
 
     private Label commentLabel;
+
+    private SelectionListener addStudySelectionListener = new SelectionAdapter() {
+        @Override
+        public void widgetSelected(SelectionEvent e) {
+            try {
+                AdapterBase studiesNode = siteAdapter.getStudiesGroupNode();
+                StudyAdapter studyAdapter = new StudyAdapter(studiesNode,
+                    new StudyWrapper(siteAdapter.getAppService(), new Study()));
+                getSite().getPage().openEditor(new FormInput(studyAdapter),
+                    StudyEntryForm.ID, true);
+            } catch (PartInitException exp) {
+                exp.printStackTrace();
+            }
+        }
+    };
 
     @Override
     public void init() {
@@ -107,8 +123,9 @@ public class SiteViewForm extends AddressViewFormCommon {
         ToolBar tbar = new ToolBar(section, SWT.FLAT | SWT.HORIZONTAL);
         ToolItem titem = new ToolItem(tbar, SWT.NULL);
         titem.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
-            BioBankPlugin.IMG_STUDY));
+            BioBankPlugin.IMG_ADD));
         titem.setToolTipText("Add Study");
+        titem.addSelectionListener(addStudySelectionListener);
         section.setTextClient(tbar);
 
         studiesTable = new StudyInfoTable(client, siteWrapper
@@ -154,21 +171,7 @@ public class SiteViewForm extends AddressViewFormCommon {
 
         final Button study = toolkit
             .createButton(client, "Add Study", SWT.PUSH);
-        study.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                try {
-                    AdapterBase studiesNode = siteAdapter.getStudiesGroupNode();
-                    StudyAdapter studyAdapter = new StudyAdapter(studiesNode,
-                        new StudyWrapper(siteAdapter.getAppService(),
-                            new Study()));
-                    getSite().getPage().openEditor(new FormInput(studyAdapter),
-                        StudyEntryForm.ID, true);
-                } catch (PartInitException exp) {
-                    exp.printStackTrace();
-                }
-            }
-        });
+        study.addSelectionListener(addStudySelectionListener);
 
         final Button clinic = toolkit.createButton(client, "Add Clinic",
             SWT.PUSH);

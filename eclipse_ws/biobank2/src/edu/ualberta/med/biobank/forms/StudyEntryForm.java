@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.forms;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -19,15 +18,13 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
-import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.utils.ModelUtils;
+import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.PvInfo;
 import edu.ualberta.med.biobank.model.PvInfoPossible;
 import edu.ualberta.med.biobank.model.PvInfoType;
 import edu.ualberta.med.biobank.model.SampleSource;
 import edu.ualberta.med.biobank.model.SampleStorage;
-import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
@@ -38,13 +35,11 @@ import edu.ualberta.med.biobank.widgets.PvInfoWidget;
 import edu.ualberta.med.biobank.widgets.SampleStorageEntryWidget;
 import edu.ualberta.med.biobank.widgets.listener.BiobankEntryFormWidgetListener;
 import edu.ualberta.med.biobank.widgets.listener.MultiSelectEvent;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.query.SDKQuery;
 import gov.nih.nci.system.query.SDKQueryResult;
 import gov.nih.nci.system.query.example.DeleteExampleQuery;
 import gov.nih.nci.system.query.example.InsertExampleQuery;
 import gov.nih.nci.system.query.example.UpdateExampleQuery;
-import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 @SuppressWarnings("serial")
 public class StudyEntryForm extends BiobankEntryForm {
@@ -73,9 +68,7 @@ public class StudyEntryForm extends BiobankEntryForm {
 
     private StudyAdapter studyAdapter;
 
-    private Study study;
-
-    private Site site;
+    private StudyWrapper studyWrapper;
 
     private ClinicAddWidget contactEntryWidget;
 
@@ -108,21 +101,20 @@ public class StudyEntryForm extends BiobankEntryForm {
     }
 
     @Override
-    public void init() {
+    public void init() throws Exception {
         Assert.isTrue((adapter instanceof StudyAdapter),
             "Invalid editor input: object of type "
                 + adapter.getClass().getName());
 
         studyAdapter = (StudyAdapter) adapter;
-        site = studyAdapter.getParentFromClass(SiteAdapter.class).getSite();
-        retrieveStudy();
-        study.setSite(site);
+        studyWrapper = studyAdapter.getWrapper();
+        studyWrapper.reload();
 
         String tabName;
-        if (study.getId() == null) {
+        if (studyWrapper.getId() == null) {
             tabName = "New Study";
         } else {
-            tabName = "Study " + study.getNameShort();
+            tabName = "Study " + studyWrapper.getNameShort();
         }
         setPartName(tabName);
     }
@@ -142,9 +134,9 @@ public class StudyEntryForm extends BiobankEntryForm {
 
         Label siteLabel = (Label) createWidget(client, Label.class, SWT.NONE,
             "Site");
-        FormUtils.setTextValue(siteLabel, study.getSite().getName());
+        FormUtils.setTextValue(siteLabel, studyWrapper.getSite().getName());
 
-        createBoundWidgetsFromMap(FIELDS, study, client);
+        createBoundWidgetsFromMap(FIELDS, studyWrapper, client);
 
         Text comments = (Text) controls.get("comment");
         GridData gd = (GridData) comments.getLayoutData();
@@ -164,8 +156,8 @@ public class StudyEntryForm extends BiobankEntryForm {
         client.setLayout(layout);
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-        contactEntryWidget = new ClinicAddWidget(client, SWT.NONE, study,
-            toolkit);
+        contactEntryWidget = new ClinicAddWidget(client, SWT.NONE,
+            studyWrapper, toolkit);
         contactEntryWidget.addSelectionChangedListener(listener);
     }
 
@@ -177,13 +169,13 @@ public class StudyEntryForm extends BiobankEntryForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         sampleStorageEntryWidget = new SampleStorageEntryWidget(client,
-            SWT.NONE, study.getSampleStorageCollection(), toolkit);
+            SWT.NONE, studyWrapper.getSampleStorageCollection(), toolkit);
         sampleStorageEntryWidget.addSelectionChangedListener(listener);
     }
 
     private void createSourceVesselsSection() throws Exception {
         Composite client = createSectionWithClient("Source Vessels");
-        Collection<SampleSource> studySampleSources = study
+        Collection<SampleSource> studySampleSources = studyWrapper
             .getSampleSourceCollection();
         allSampleSources = appService.search(SampleSource.class,
             new SampleSource());
@@ -211,7 +203,7 @@ public class StudyEntryForm extends BiobankEntryForm {
 
     private void createPvInfoSection() throws Exception {
         Composite client = createSectionWithClient("Patient Visit Information Collected");
-        Collection<PvInfo> pviCollection = study.getPvInfoCollection();
+        Collection<PvInfo> pviCollection = studyWrapper.getPvInfoCollection();
         GridLayout gl = (GridLayout) client.getLayout();
         gl.numColumns = 1;
 
@@ -286,7 +278,7 @@ public class StudyEntryForm extends BiobankEntryForm {
 
     @Override
     protected String getOkMessage() {
-        if (study.getId() == null) {
+        if (studyWrapper.getId() == null) {
             return MSG_NEW_STUDY_OK;
         }
         return MSG_STUDY_OK;
@@ -296,10 +288,6 @@ public class StudyEntryForm extends BiobankEntryForm {
     protected void saveForm() throws Exception {
         // FIXME should be transfer to persitCheck method or others set Methods
         // of the wrapper
-        if ((study.getId() == null) && !checkStudyNameUnique()) {
-            setDirty(true);
-            return;
-        }
 
         // get the selected sample sources from widget
         List<Integer> selSampleSourceIds = sampleSourceMultiSelect
@@ -313,9 +301,9 @@ public class StudyEntryForm extends BiobankEntryForm {
         }
         Assert.isTrue(selSampleSource.size() == selSampleSourceIds.size(),
             "problem with sample source selections");
-        study.setSampleSourceCollection(selSampleSource);
+        studyWrapper.setSampleSourceCollection(selSampleSource);
 
-        List<PvInfo> pvInfoList = new ArrayList<PvInfo>();
+        Collection<PvInfo> pvInfoList = new HashSet<PvInfo>();
         MapIterator it = combinedPvInfoMap.mapIterator();
         while (it.hasNext()) {
             it.next();
@@ -341,28 +329,25 @@ public class StudyEntryForm extends BiobankEntryForm {
             }
             pvInfoList.add(pvInfo);
         }
-        study.setPvInfoCollection(pvInfoList);
+        studyWrapper.setPvInfoCollection(pvInfoList);
         saveStudy();
         saveSampleStorage();
-        studyAdapter.setStudy(study);
 
         studyAdapter.getParent().performExpand();
     }
 
-    private void saveStudy() throws ApplicationException {
+    private void saveStudy() throws Exception {
         // FIXME should be transfer to persitCheck method or others set Methods
         // of the wrapper
         SDKQuery query;
         SDKQueryResult result;
         Set<PvInfo> savedPvInfoList = new HashSet<PvInfo>();
 
-        study.setSite(site);
-
         // FIXME: change study to studyWrapper
         // study.setContactCollection(contactEntryWidget.getContacts());
 
-        if (study.getPvInfoCollection().size() > 0) {
-            for (PvInfo pvInfo : study.getPvInfoCollection()) {
+        if (studyWrapper.getPvInfoCollection().size() > 0) {
+            for (PvInfo pvInfo : studyWrapper.getPvInfoCollection()) {
                 if ((pvInfo.getId() == null) || (pvInfo.getId() == 0)) {
                     query = new InsertExampleQuery(pvInfo);
                 } else {
@@ -373,16 +358,11 @@ public class StudyEntryForm extends BiobankEntryForm {
                 savedPvInfoList.add((PvInfo) result.getObjectResult());
             }
         }
-        study.setPvInfoCollection(savedPvInfoList);
-
-        if ((study.getId() == null) || (study.getId() == 0)) {
-            query = new InsertExampleQuery(study);
-        } else {
-            query = new UpdateExampleQuery(study);
-        }
-
-        result = appService.executeQuery(query);
-        study = (Study) result.getObjectResult();
+        studyWrapper.setPvInfoCollection(savedPvInfoList);
+        studyWrapper.persist();
+        SiteAdapter siteAdapter = studyAdapter
+            .getParentFromClass(SiteAdapter.class);
+        studyWrapper.setSiteWrapper(siteAdapter.getWrapper());
     }
 
     private void saveSampleStorage() throws Exception {
@@ -395,7 +375,7 @@ public class StudyEntryForm extends BiobankEntryForm {
 
         Collection<SampleStorage> savedSsCollection = new HashSet<SampleStorage>();
         for (SampleStorage ss : ssCollection) {
-            ss.setStudy(study);
+            ss.setStudy(studyWrapper.getWrappedObject());
             if ((ss.getId() == null) || (ss.getId() == 0)) {
                 query = new InsertExampleQuery(ss);
             } else {
@@ -405,13 +385,13 @@ public class StudyEntryForm extends BiobankEntryForm {
             result = appService.executeQuery(query);
             savedSsCollection.add((SampleStorage) result.getObjectResult());
         }
-        study.setSampleStorageCollection(savedSsCollection);
+        studyWrapper.setSampleStorageCollection(savedSsCollection);
     }
 
     private void removeDeletedSampleStorage(
         Collection<SampleStorage> ssCollection) throws Exception {
         // no need to remove if study is not yet in the database
-        if (study.getId() == null)
+        if (studyWrapper.getId() == null)
             return;
 
         List<Integer> selectedStampleStorageIds = new ArrayList<Integer>();
@@ -423,7 +403,7 @@ public class StudyEntryForm extends BiobankEntryForm {
 
         // query from database again
         Study dbStudy = ModelUtils.getObjectWithId(appService, Study.class,
-            study.getId());
+            studyWrapper.getId());
 
         for (SampleStorage ss : dbStudy.getSampleStorageCollection()) {
             if (!selectedStampleStorageIds.contains(ss.getId())) {
@@ -436,59 +416,6 @@ public class StudyEntryForm extends BiobankEntryForm {
     private List<PvInfoPossible> getPossiblePvInfos() throws Exception {
         return studyAdapter.getAppService().search(PvInfoPossible.class,
             new PvInfoPossible());
-    }
-
-    private boolean checkStudyNameUnique() throws Exception {
-        HQLCriteria c = new HQLCriteria("from " + Study.class.getName()
-            + " as study inner join fetch study.site where study.site.id=? "
-            + "and study.name=? and study.nameShort=?");
-
-        c.setParameters(Arrays.asList(new Object[] { site.getId(),
-            study.getName(), study.getNameShort() }));
-
-        List<Object> results = appService.query(c);
-
-        if (results.size() > 0) {
-            BioBankPlugin
-                .openAsyncError("Study Name Problem", "A study with name \""
-                    + study.getName() + "\" already exists.");
-            return false;
-        }
-
-        c = new HQLCriteria("from " + Study.class.getName() + " as study "
-            + "inner join fetch study.site where study.site.id=?"
-            + "and study.nameShort=?");
-
-        c.setParameters(Arrays.asList(new Object[] { site.getId(),
-            study.getNameShort() }));
-
-        results = appService.query(c);
-
-        if (results.size() > 0) {
-            BioBankPlugin.openAsyncError("Study Name Problem",
-                "A study with short name \"" + study.getName()
-                    + "\" already exists.");
-            return false;
-        }
-
-        return true;
-    }
-
-    private void retrieveStudy() {
-        if (studyAdapter.getStudy().getId() == null) {
-            // don't retrieve if this is a new study !
-            study = studyAdapter.getStudy();
-        } else {
-            try {
-                study = ModelUtils.getObjectWithId(appService, Study.class,
-                    studyAdapter.getStudy().getId());
-                studyAdapter.setStudy(study);
-            } catch (Exception e) {
-                SessionManager.getLogger().error(
-                    "Error while retrieving study "
-                        + studyAdapter.getStudy().getName(), e);
-            }
-        }
     }
 
     @Override

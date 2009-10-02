@@ -97,7 +97,7 @@ public class StudyContactInfoTable extends InfoTableWidget<ContactWrapper> {
                                 + " where study=? and clinic=?"
                                 + " group by patients", Arrays
                                 .asList(new Object[] {
-                                    studyWrapper,
+                                    studyWrapper.getWrappedObject(),
                                     contact.getClinicWrapper()
                                         .getWrappedObject() }));
 
@@ -114,7 +114,7 @@ public class StudyContactInfoTable extends InfoTableWidget<ContactWrapper> {
                                 + " inner join visits.clinic as clinic"
                                 + " where study=? and clinic=?", Arrays
                                 .asList(new Object[] {
-                                    studyWrapper,
+                                    studyWrapper.getWrappedObject(),
                                     contact.getClinicWrapper()
                                         .getWrappedObject() }));
 

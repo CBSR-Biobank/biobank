@@ -11,8 +11,7 @@ import org.springframework.remoting.RemoteConnectFailureException;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
-import edu.ualberta.med.biobank.model.Contact;
-import edu.ualberta.med.biobank.model.Study;
+import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.StudyContactInfo;
 
 public class StudyContactEntryInfoTable extends InfoTableWidget<ContactWrapper> {
@@ -23,20 +22,16 @@ public class StudyContactEntryInfoTable extends InfoTableWidget<ContactWrapper> 
     private static final int[] BOUNDS = new int[] { 150, 150, 100, 100, 100,
         100 };
 
-    public StudyContactEntryInfoTable(Composite parent, Study study) {
+    public StudyContactEntryInfoTable(Composite parent,
+        StudyWrapper studyWrapper) {
         super(parent, null, HEADINGS, BOUNDS);
-        Collection<Contact> collection = study.getContactCollection();
-        if (collection == null)
-            return;
-
-        Collection<ContactWrapper> wrapperCollection = new HashSet<ContactWrapper>();
-        for (Contact contact : collection) {
+        Collection<ContactWrapper> collection = studyWrapper
+            .getContactWrapperCollection();
+        for (int i = 0, n = collection.size(); i < n; ++i) {
             model.add(new BiobankCollectionModel());
-            wrapperCollection.add(new ContactWrapper(SessionManager
-                .getAppService(), contact));
         }
         getTableViewer().refresh();
-        setCollection(wrapperCollection);
+        setCollection(collection);
     }
 
     @Override
