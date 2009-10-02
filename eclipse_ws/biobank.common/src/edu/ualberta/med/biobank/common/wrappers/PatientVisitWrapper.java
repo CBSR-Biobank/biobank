@@ -18,7 +18,8 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
-public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
+public class PatientVisitWrapper extends ModelWrapper<PatientVisit> implements
+    Comparable<PatientVisitWrapper> {
 
     public PatientVisitWrapper(WritableApplicationService appService,
         PatientVisit wrappedObject) {
@@ -171,6 +172,14 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
     @Override
     protected void deleteChecks() throws BiobankCheckException, Exception {
         // TODO Auto-generated method stub
+    }
+
+    @Override
+    public int compareTo(PatientVisitWrapper o) {
+        Date v1Date = getDateDrawn();
+        Date v2Date = o.getDateDrawn();
+        return ((v1Date.compareTo(v2Date) > 0) ? 1 : (v1Date.equals(v2Date) ? 0
+            : -1));
     }
 
 }

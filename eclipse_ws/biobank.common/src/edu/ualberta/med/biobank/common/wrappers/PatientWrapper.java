@@ -1,7 +1,9 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.BiobankCheckException;
@@ -12,7 +14,8 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
-public class PatientWrapper extends ModelWrapper<Patient> {
+public class PatientWrapper extends ModelWrapper<Patient> implements
+    Comparable<PatientWrapper> {
 
     public PatientWrapper(WritableApplicationService appService, Patient patient) {
         super(appService, patient);
@@ -62,7 +65,7 @@ public class PatientWrapper extends ModelWrapper<Patient> {
      */
     @Override
     protected String[] getPropertyChangesNames() {
-        return new String[] { "number", "study" };
+        return new String[] { "number", "study", "patientVisitCollection" };
     }
 
     @Override
@@ -73,37 +76,59 @@ public class PatientWrapper extends ModelWrapper<Patient> {
         }
     }
 
-    public Collection<PatientVisit> getPatientVisitCollection() {
-        return wrappedObject.getPatientVisitCollection();
+    @SuppressWarnings("unchecked")
+    public List<PatientVisitWrapper> getPatientVisitCollection() {
+        List<PatientVisitWrapper> patientVisitCollection = (List<PatientVisitWrapper>) propertiesMap
+            .get("patientVisitCollection");
+        if (patientVisitCollection == null) {
+            Collection<PatientVisit> children = wrappedObject
+                .getPatientVisitCollection();
+            if (children != null) {
+                patientVisitCollection = new ArrayList<PatientVisitWrapper>();
+                for (PatientVisit pv : children) {
+                    patientVisitCollection.add(new PatientVisitWrapper(
+                        appService, pv));
+                }
+                propertiesMap.put("patientVisitCollection",
+                    patientVisitCollection);
+            }
+        }
+        return patientVisitCollection;
     }
 
     public void setPatientVisitCollection(
-        Collection<PatientVisit> patientVisitCollection) {
+        Collection<PatientVisit> patientVisitCollection, boolean setNull) {
+        Collection<PatientVisit> oldCollection = wrappedObject
+            .getPatientVisitCollection();
         wrappedObject.setPatientVisitCollection(patientVisitCollection);
-    }
-
-    public static PatientWrapper getPatientWrapperInSite(
-        WritableApplicationService appService, String patientNumber,
-        SiteWrapper siteWrapper) throws ApplicationException {
-        Patient patient = getPatientInSite(appService, patientNumber,
-            siteWrapper);
-        if (patient != null) {
-            return new PatientWrapper(appService, patient);
+        propertyChangeSupport.firePropertyChange("patientVisitCollection",
+            oldCollection, patientVisitCollection);
+        if (setNull) {
+            propertiesMap.put("patientVisitCollection", null);
         }
-        return null;
     }
 
-    public static Patient getPatientInSite(
+    public void setPatientVisitCollection(
+        Collection<PatientVisitWrapper> patientVisitCollection) {
+        Collection<PatientVisit> pvCollection = new HashSet<PatientVisit>();
+        for (PatientVisitWrapper pv : patientVisitCollection) {
+            pvCollection.add(pv.getWrappedObject());
+        }
+        setPatientVisitCollection(pvCollection, false);
+        propertiesMap.put("patientVisitCollection", patientVisitCollection);
+    }
+
+    public static PatientWrapper getPatientInSite(
         WritableApplicationService appService, String patientNumber,
         SiteWrapper siteWrapper) throws ApplicationException {
         HQLCriteria criteria = new HQLCriteria("from "
-            + Patient.class.getName() + " where study.site = ? and number = ?",
-            Arrays.asList(new Object[] { siteWrapper.getWrappedObject(),
-                patientNumber }));
+            + Patient.class.getName()
+            + " where study.site.id = ? and number = ?", Arrays
+            .asList(new Object[] { siteWrapper.getId(), patientNumber }));
         List<Patient> patients;
         patients = appService.query(criteria);
         if (patients.size() == 1) {
-            return patients.get(0);
+            return new PatientWrapper(appService, patients.get(0));
         }
         return null;
     }
@@ -117,4 +142,10 @@ public class PatientWrapper extends ModelWrapper<Patient> {
     protected void deleteChecks() throws BiobankCheckException, Exception {
         // TODO Auto-generated method stub
     }
+
+    @Override
+    public int compareTo(PatientWrapper o) {
+        return 0;
+    }
+
 }

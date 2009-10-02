@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.forms;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -47,7 +46,6 @@ import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
 import edu.ualberta.med.biobank.forms.listener.EnterKeyToNextFieldListener;
-import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.Sample;
 import edu.ualberta.med.biobank.model.SampleType;
@@ -63,7 +61,7 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
 
     public static final String ID = "edu.ualberta.med.biobank.forms.CabinetLinkAssignEntryForm";
 
-    private Patient currentPatient;
+    private PatientWrapper currentPatient;
 
     private Label cabinetLabel;
     private Label drawerLabel;
@@ -299,7 +297,7 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
             appendLog("-----");
             appendLog("Found patient with number " + currentPatient.getNumber());
             // show visits list
-            Collection<PatientVisit> collection = currentPatient
+            List<PatientVisitWrapper> collection = currentPatient
                 .getPatientVisitCollection();
             viewerVisits.setInput(collection);
             comboVisits.select(0);

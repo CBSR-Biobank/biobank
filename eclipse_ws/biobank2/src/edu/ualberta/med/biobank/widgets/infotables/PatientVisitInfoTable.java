@@ -4,9 +4,9 @@ import java.util.Collection;
 
 import org.eclipse.swt.widgets.Composite;
 
-import edu.ualberta.med.biobank.model.PatientVisit;
+import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 
-public class PatientVisitInfoTable extends InfoTableWidget<PatientVisit> {
+public class PatientVisitInfoTable extends InfoTableWidget<PatientVisitWrapper> {
 
     private static final String[] HEADINGS = new String[] { "Visit Number",
         "Num Samples" };
@@ -15,7 +15,7 @@ public class PatientVisitInfoTable extends InfoTableWidget<PatientVisit> {
         -1 };
 
     public PatientVisitInfoTable(Composite parent,
-        Collection<PatientVisit> collection) {
+        Collection<PatientVisitWrapper> collection) {
         super(parent, collection, HEADINGS, BOUNDS);
     }
 

@@ -1,7 +1,5 @@
 package edu.ualberta.med.biobank.treeview;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
@@ -21,7 +19,6 @@ import edu.ualberta.med.biobank.forms.PatientViewForm;
 import edu.ualberta.med.biobank.forms.PatientVisitEntryForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.PatientVisit;
-import edu.ualberta.med.biobank.model.PatientVisitComparator;
 
 public class PatientAdapter extends AdapterBase {
 
@@ -33,7 +30,6 @@ public class PatientAdapter extends AdapterBase {
     public PatientWrapper getWrapper() {
         return (PatientWrapper) object;
     }
-
 
     @Override
     public String getName() {
@@ -101,17 +97,13 @@ public class PatientAdapter extends AdapterBase {
             // read from database again
             patientWrapper.reload();
 
-            List<PatientVisit> visits = new ArrayList<PatientVisit>(
-                patientWrapper.getPatientVisitCollection());
-            Collections.sort(visits, new PatientVisitComparator());
-
-            for (PatientVisit visit : visits) {
+            List<PatientVisitWrapper> visits = patientWrapper
+                .getPatientVisitCollection();
+            for (PatientVisitWrapper visit : visits) {
                 PatientVisitAdapter node = (PatientVisitAdapter) getChild(visit
                     .getId());
-
                 if (node == null) {
-                    node = new PatientVisitAdapter(this,
-                        new PatientVisitWrapper(getAppService(), visit));
+                    node = new PatientVisitAdapter(this, visit);
                     addChild(node);
                 }
                 if (updateNode) {

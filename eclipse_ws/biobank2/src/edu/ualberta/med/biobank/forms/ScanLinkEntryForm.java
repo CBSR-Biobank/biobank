@@ -48,7 +48,6 @@ import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
 import edu.ualberta.med.biobank.forms.listener.EnterKeyToNextFieldListener;
 import edu.ualberta.med.biobank.model.PalletCell;
-import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.Sample;
 import edu.ualberta.med.biobank.model.SampleCellStatus;
@@ -108,7 +107,7 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
 
     private Composite radioComponents;
 
-    private Patient currentPatient;
+    private PatientWrapper currentPatient;
 
     private Label dateProcessedLabel;
 
@@ -498,7 +497,7 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
             appendLog("-----");
             appendLog("Found patient with number " + currentPatient.getNumber());
             // show visits list
-            Collection<PatientVisit> collection = currentPatient
+            List<PatientVisitWrapper> collection = currentPatient
                 .getPatientVisitCollection();
             viewerVisits.setInput(collection);
             viewerVisits.getCCombo().select(0);
