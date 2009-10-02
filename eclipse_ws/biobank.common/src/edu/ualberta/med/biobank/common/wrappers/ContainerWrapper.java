@@ -453,6 +453,8 @@ public class ContainerWrapper extends ModelWrapper<Container> implements
             throw new Exception(
                 "The destination "
                     + newLabel
+                    + " in container "
+                    + newParent.getFullInfoLabel()
                     + " has already been initialized. You can only move to an uninitialized location.");
         } else {
             // remove from old parent, add to new
