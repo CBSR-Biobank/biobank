@@ -207,7 +207,9 @@ public abstract class ModelWrapper<E> {
         if (getClass() != object.getClass()) {
             return false;
         }
-        return getId().equals(((ModelWrapper<?>) object).getId());
+        Integer id = getId();
+        Integer id2 = ((ModelWrapper<?>) object).getId();
+        return (id == null && id2 == null) || id.equals(id2);
     }
 
     public List<E> getAllObjects() throws Exception {
