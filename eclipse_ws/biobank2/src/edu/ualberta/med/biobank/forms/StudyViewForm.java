@@ -12,7 +12,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.forms.widgets.Section;
 
-import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.PvInfo;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
@@ -39,16 +38,16 @@ public class StudyViewForm extends BiobankViewForm {
     private List<PvInfoLabelPair> pvInfoControlList;
 
     @Override
-    public void init() {
+    public void init() throws Exception {
         Assert.isTrue((adapter instanceof StudyAdapter),
             "Invalid editor input: object of type "
                 + adapter.getClass().getName());
 
         studyAdapter = (StudyAdapter) adapter;
         studyWrapper = studyAdapter.getWrapper();
-        // retrieve info from database because could have been modified
+        // retrieve info from database because study could have been modified
         // after first opening
-        retrieveStudy();
+        studyWrapper.reload();
         setPartName("Study " + studyWrapper.getNameShort());
         pvInfoControlList = new ArrayList<PvInfoLabelPair>();
     }
@@ -99,7 +98,7 @@ public class StudyViewForm extends BiobankViewForm {
     }
 
     private void setStudySectionValues() {
-        FormUtils.setTextValue(siteLabel, studyWrapper.getName());
+        FormUtils.setTextValue(siteLabel, studyWrapper.getSite().getName());
         FormUtils.setTextValue(nameShortLabel, studyWrapper.getNameShort());
         FormUtils.setTextValue(activityStatusLabel, studyWrapper
             .getActivityStatus());
@@ -165,24 +164,13 @@ public class StudyViewForm extends BiobankViewForm {
 
     @Override
     protected void reload() throws Exception {
-        retrieveStudy();
+        studyWrapper.reload();
         setPartName("Study " + studyWrapper.getNameShort());
         form.setText("Study: " + studyWrapper.getName());
         setStudySectionValues();
         setPvDataSectionValues();
         contactsTable.getTableViewer().setInput(
             studyWrapper.getContactWrapperCollection());
-    }
-
-    private void retrieveStudy() {
-        try {
-            studyWrapper.reload();
-            studyAdapter.setStudy(studyWrapper.getWrappedObject());
-        } catch (Exception e) {
-            SessionManager.getLogger().error(
-                "Error while retrieving study "
-                    + studyAdapter.getStudy().getName(), e);
-        }
     }
 
     @Override

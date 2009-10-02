@@ -34,7 +34,6 @@ public class PatientAdapter extends AdapterBase {
         return (PatientWrapper) object;
     }
 
-
     @Override
     public String getName() {
         PatientWrapper patientWrapper = getWrapper();

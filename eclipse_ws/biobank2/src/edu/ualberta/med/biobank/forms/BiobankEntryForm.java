@@ -447,7 +447,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
                 confirmButton.addSelectionListener(new SelectionAdapter() {
                     @Override
                     public void widgetSelected(SelectionEvent e) {
-                        confirm();
+                        cancel();
                     }
                 });
                 return confirmButton;

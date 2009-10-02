@@ -110,37 +110,36 @@ public class StudyWrapper extends ModelWrapper<Study> implements
 
         if (getWrappedObject().getId() == null) {
             c = new HQLCriteria("from " + Study.class.getName()
-                + " where site = ? and name = ? and nameShort = ?", Arrays
-                .asList(new Object[] { getSite(), getName(), getNameShort() }));
+                + " where site = ? and name = ?", Arrays.asList(new Object[] {
+                getSite(), getName() }));
         } else {
             c = new HQLCriteria("from " + Study.class.getName()
-                + "as study where site = ? and name = ? and nameShort = ? "
-                + "and study <> ?", Arrays.asList(new Object[] { getSite(),
-                getName(), getNameShort(), getWrappedObject() }));
+                + " as study where site = ? and name = ?  and study <> ?",
+                Arrays.asList(new Object[] { getSite(), getName(),
+                    getWrappedObject() }));
         }
 
         List<Object> results = appService.query(c);
         if (results.size() > 0) {
             throw new BiobankCheckException("A study with name \"" + getName()
-                + "\" and short name \"" + getNameShort()
                 + "\" already exists.");
         }
 
         if (getWrappedObject().getId() == null) {
             c = new HQLCriteria("from " + Study.class.getName()
-                + "site = ? and study.nameShort = ?", Arrays
+                + " site = ? and study.nameShort = ?", Arrays
                 .asList(new Object[] { getSite(), getNameShort() }));
         } else {
-            c = new HQLCriteria("from " + Study.class.getName() + " as study "
-                + "site = ? and study.nameShort = ? and study <> ?", Arrays
-                .asList(new Object[] { getSite(), getNameShort(),
+            c = new HQLCriteria("from " + Study.class.getName() + " as study"
+                + " where site = ? and study.nameShort = ? and study <> ?",
+                Arrays.asList(new Object[] { getSite(), getNameShort(),
                     getWrappedObject() }));
         }
 
         results = appService.query(c);
         if (results.size() > 0) {
             throw new BiobankCheckException("A study with short name \""
-                + getName() + "\" already exists.");
+                + getNameShort() + "\" already exists.");
         }
     }
 
