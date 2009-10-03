@@ -40,7 +40,7 @@ public class StudyWrapper extends ModelWrapper<Study> implements
 
     @Override
     protected String[] getPropertyChangesNames() {
-        return null;
+        return new String[] {};
     }
 
     @Override

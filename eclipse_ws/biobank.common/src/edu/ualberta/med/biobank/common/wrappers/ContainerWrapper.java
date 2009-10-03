@@ -391,7 +391,7 @@ public class ContainerWrapper extends ModelWrapper<Container> implements
             + ContainerType.class.getName()
             + " as ct inner join ct.sampleTypeCollection as sampleType"
             + " where ct = ? and sampleType = ?", Arrays.asList(new Object[] {
-            getContainerType(), type }));
+            wrappedObject.getContainerType(), type }));
         List<SampleType> types = appService.query(criteria);
         return types.size() == 1;
     }

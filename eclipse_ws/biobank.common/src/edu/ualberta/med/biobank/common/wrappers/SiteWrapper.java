@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
@@ -101,8 +102,8 @@ public class SiteWrapper extends ModelWrapper<Site> implements
             .equals(wrapperName) ? 0 : -1));
     }
 
-    public Collection<StudyWrapper> getStudyWrapperCollection() {
-        Collection<StudyWrapper> collection = new HashSet<StudyWrapper>();
+    public List<StudyWrapper> getStudyWrapperCollection() {
+        List<StudyWrapper> collection = new ArrayList<StudyWrapper>();
         for (Study study : wrappedObject.getStudyCollection()) {
             collection.add(new StudyWrapper(appService, study));
         }

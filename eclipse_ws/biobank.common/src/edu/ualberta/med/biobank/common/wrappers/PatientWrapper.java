@@ -31,18 +31,18 @@ public class PatientWrapper extends ModelWrapper<Patient> implements
         propertyChangeSupport.firePropertyChange("number", oldNumber, number);
     }
 
-    public Study getStudy() {
-        return wrappedObject.getStudy();
+    public StudyWrapper getStudy() {
+        Study study = wrappedObject.getStudy();
+        if (study == null) {
+            return null;
+        }
+        return new StudyWrapper(appService, study);
     }
 
     public void setStudy(Study study) {
         String oldStudy = getNumber();
         wrappedObject.setStudy(study);
         propertyChangeSupport.firePropertyChange("study", oldStudy, study);
-    }
-
-    public StudyWrapper getStudyWrapper() {
-        return new StudyWrapper(appService, wrappedObject.getStudy());
     }
 
     public boolean checkPatientNumberUnique() throws ApplicationException {

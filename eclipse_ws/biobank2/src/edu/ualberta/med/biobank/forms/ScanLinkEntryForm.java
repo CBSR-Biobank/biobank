@@ -48,7 +48,6 @@ import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
 import edu.ualberta.med.biobank.forms.listener.EnterKeyToNextFieldListener;
 import edu.ualberta.med.biobank.model.PalletCell;
-import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.Sample;
 import edu.ualberta.med.biobank.model.SampleCellStatus;
 import edu.ualberta.med.biobank.model.SampleStorage;
@@ -459,7 +458,7 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
         viewerVisits.setLabelProvider(new LabelProvider() {
             @Override
             public String getText(Object element) {
-                PatientVisit pv = (PatientVisit) element;
+                PatientVisitWrapper pv = (PatientVisitWrapper) element;
                 return BioBankPlugin.getDateTimeFormatter().format(
                     pv.getDateDrawn());
             }
@@ -603,7 +602,8 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
         PatientVisitWrapper patientVisit = getSelectedPatientVisit();
         StringBuffer sb = new StringBuffer("Samples linked:");
         int nber = 0;
-        Study study = patientVisit.getPatientWrapper().getStudy();
+        Study study = patientVisit.getPatientWrapper().getStudy()
+            .getWrappedObject();
         Collection<SampleStorage> sampleStorages = study
             .getSampleStorageCollection();
         for (int indexRow = 0; indexRow < cells.length; indexRow++) {
@@ -644,8 +644,7 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
             IStructuredSelection selection = (IStructuredSelection) viewerVisits
                 .getSelection();
             if (selection.size() == 1)
-                return new PatientVisitWrapper(appService,
-                    (PatientVisit) selection.getFirstElement());
+                return (PatientVisitWrapper) selection.getFirstElement();
         }
         return null;
     }

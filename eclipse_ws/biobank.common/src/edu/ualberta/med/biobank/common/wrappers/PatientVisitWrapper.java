@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
@@ -29,7 +30,7 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> implements
     @Override
     protected String[] getPropertyChangesNames() {
         return new String[] { "patient", "dateDrawn", "dateProcessed",
-            "dateReceived", "clinic", "comments" };
+            "dateReceived", "clinic", "comments", "pvInfoDataCollection" };
     }
 
     public Date getDateDrawn() {
@@ -61,7 +62,11 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> implements
     }
 
     public PatientWrapper getPatientWrapper() {
-        return new PatientWrapper(appService, wrappedObject.getPatient());
+        Patient patient = wrappedObject.getPatient();
+        if (patient == null) {
+            return null;
+        }
+        return new PatientWrapper(appService, patient);
     }
 
     public void setPatientWrapper(PatientWrapper patientWrapper) {
@@ -88,16 +93,57 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> implements
         return collection;
     }
 
-    public Clinic getClinic() {
-        return wrappedObject.getClinic();
+    public ClinicWrapper getClinic() {
+        Clinic clinic = wrappedObject.getClinic();
+        if (clinic == null) {
+            return null;
+        }
+        return new ClinicWrapper(appService, clinic);
     }
 
     public Collection<PvSampleSource> getPvSampleSourceCollection() {
         return wrappedObject.getPvSampleSourceCollection();
     }
 
-    public Collection<PvInfoData> getPvInfoDataCollection() {
-        return wrappedObject.getPvInfoDataCollection();
+    @SuppressWarnings("unchecked")
+    public List<PvInfoDataWrapper> getPvInfoDataCollection() {
+        List<PvInfoDataWrapper> pvInfoDataCollection = (List<PvInfoDataWrapper>) propertiesMap
+            .get("pvInfoDataCollection");
+        if (pvInfoDataCollection == null) {
+            Collection<PvInfoData> children = wrappedObject
+                .getPvInfoDataCollection();
+            if (children != null) {
+                pvInfoDataCollection = new ArrayList<PvInfoDataWrapper>();
+                for (PvInfoData pvInfo : children) {
+                    pvInfoDataCollection.add(new PvInfoDataWrapper(appService,
+                        pvInfo));
+                }
+                propertiesMap.put("pvInfoDataCollection", pvInfoDataCollection);
+            }
+        }
+        return pvInfoDataCollection;
+    }
+
+    public void setPvInfoDataCollection(
+        Collection<PvInfoData> pvInfoDataCollection, boolean setNull) {
+        Collection<PvInfoData> oldCollection = wrappedObject
+            .getPvInfoDataCollection();
+        wrappedObject.setPvInfoDataCollection(pvInfoDataCollection);
+        propertyChangeSupport.firePropertyChange("pvInfoDataCollection",
+            oldCollection, pvInfoDataCollection);
+        if (setNull) {
+            propertiesMap.put("pvInfoDataCollection", null);
+        }
+    }
+
+    public void setPvInfoDataCollection(
+        Collection<PvInfoDataWrapper> pvInfoDataCollection) {
+        Collection<PvInfoData> pvCollection = new HashSet<PvInfoData>();
+        for (PvInfoDataWrapper pv : pvInfoDataCollection) {
+            pvCollection.add(pv.getWrappedObject());
+        }
+        setPvInfoDataCollection(pvCollection, false);
+        propertiesMap.put("pvInfoDataCollection", pvInfoDataCollection);
     }
 
     public void setDateDrawn(Date date) {
@@ -150,7 +196,7 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> implements
     }
 
     public void setClinic(Clinic clinic) {
-        Clinic oldClinic = getClinic();
+        Clinic oldClinic = wrappedObject.getClinic();
         wrappedObject.setClinic(clinic);
         propertyChangeSupport.firePropertyChange("clinic", oldClinic, clinic);
     }
@@ -158,10 +204,6 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> implements
     public void setPvSampleSourceCollection(
         Collection<PvSampleSource> pvSampleSources) {
         wrappedObject.setPvSampleSourceCollection(pvSampleSources);
-    }
-
-    public void setPvInfoDataCollection(Collection<PvInfoData> pvDataCollection) {
-        wrappedObject.setPvInfoDataCollection(pvDataCollection);
     }
 
     @Override

@@ -227,8 +227,12 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> implements
         propertyChangeSupport.firePropertyChange("site", oldSite, site);
     }
 
-    public Site getSite() {
-        return wrappedObject.getSite();
+    public SiteWrapper getSite() {
+        Site site = wrappedObject.getSite();
+        if (site == null) {
+            return null;
+        }
+        return new SiteWrapper(appService, site);
     }
 
     public void setCapacity(Capacity capacity) {
@@ -254,8 +258,11 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> implements
     }
 
     public ContainerLabelingSchemeWrapper getChildLabelingScheme() {
-        return new ContainerLabelingSchemeWrapper(appService, wrappedObject
-            .getChildLabelingScheme());
+        ContainerLabelingScheme scheme = wrappedObject.getChildLabelingScheme();
+        if (scheme == null) {
+            return null;
+        }
+        return new ContainerLabelingSchemeWrapper(appService, scheme);
     }
 
     public void setSampleTypes(List<Integer> sampleTypesIds,

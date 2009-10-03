@@ -46,7 +46,6 @@ import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
 import edu.ualberta.med.biobank.forms.listener.EnterKeyToNextFieldListener;
-import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.Sample;
 import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.preferences.PreferenceConstants;
@@ -259,9 +258,8 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
         viewerVisits.setLabelProvider(new LabelProvider() {
             @Override
             public String getText(Object element) {
-                PatientVisit pv = (PatientVisit) element;
-                return BioBankPlugin.getDateTimeFormatter().format(
-                    pv.getDateDrawn());
+                PatientVisitWrapper pv = (PatientVisitWrapper) element;
+                return pv.getFormattedDateDrawn();
             }
         });
         comboVisits.addKeyListener(new KeyAdapter() {
@@ -275,12 +273,10 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
         comboVisits.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                PatientVisit pv = getSelectedPatientVisit();
-                sampleWrapper.setPatientVisit(pv);
-                appendLog("Visit selected "
-                    + new PatientVisitWrapper(appService, pv)
-                        .getFormattedDateProcessed() + " - "
-                    + pv.getClinic().getName());
+                PatientVisitWrapper pv = getSelectedPatientVisit();
+                sampleWrapper.setPatientVisit(pv.getWrappedObject());
+                appendLog("Visit selected " + pv.getFormattedDateProcessed()
+                    + " - " + pv.getClinic().getName());
             }
         });
     }
@@ -427,19 +423,20 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
     @Override
     protected void saveForm() throws Exception {
         sampleWrapper.setLinkDate(new Date());
-        sampleWrapper.setPatientVisit(getSelectedPatientVisit());
+        sampleWrapper.setPatientVisit(getSelectedPatientVisit()
+            .getWrappedObject());
         sampleWrapper.setQuantityFromType();
         sampleWrapper.persist();
         setSaved(true);
     }
 
-    private PatientVisit getSelectedPatientVisit() {
+    private PatientVisitWrapper getSelectedPatientVisit() {
         if (viewerVisits.getSelection() != null
             && viewerVisits.getSelection() instanceof IStructuredSelection) {
             IStructuredSelection selection = (IStructuredSelection) viewerVisits
                 .getSelection();
             if (selection.size() == 1)
-                return (PatientVisit) selection.getFirstElement();
+                return (PatientVisitWrapper) selection.getFirstElement();
         }
         return null;
     }

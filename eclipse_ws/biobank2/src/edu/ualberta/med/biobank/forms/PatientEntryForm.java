@@ -1,6 +1,6 @@
 package edu.ualberta.med.biobank.forms;
 
-import java.util.Collection;
+import java.util.List;
 
 import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.runtime.Assert;
@@ -83,24 +83,14 @@ public class PatientEntryForm extends BiobankEntryForm {
         siteWrapper = SessionManager.getInstance().getCurrentSiteWrapper();
         labelSite.setText(siteWrapper.getName());
 
-        Collection<StudyWrapper> studies = siteWrapper
-            .getStudyWrapperCollection();
-        Study selectedStudy = null;
+        List<StudyWrapper> studies = siteWrapper.getStudyWrapperCollection();
+        StudyWrapper selectedStudy = null;
         if (patientAdapter.getWrapper().isNew()) {
             if (studies.size() == 1) {
-                selectedStudy = studies.iterator().next().getWrappedObject();
+                selectedStudy = studies.get(0);
             }
         } else {
-            Study currentStudy = patientAdapter.getWrapper().getStudy();
-            if (currentStudy != null) {
-                for (StudyWrapper studyWrapper : studies) {
-                    if (currentStudy.getId().equals(studyWrapper.getId())) {
-                        currentStudy = studyWrapper.getWrappedObject();
-                        break;
-                    }
-                }
-                selectedStudy = currentStudy;
-            }
+            selectedStudy = patientAdapter.getWrapper().getStudy();
         }
 
         studiesViewer = createCComboViewerWithNoSelectionValidator(client,
