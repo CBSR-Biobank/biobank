@@ -20,6 +20,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
@@ -78,6 +79,8 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
     private Button hasSamples;
 
     private Button hasContainers;
+
+    private Control firstControl;
 
     public ContainerTypeEntryForm() {
         super();
@@ -151,8 +154,9 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         Label siteLabel = (Label) createWidget(client, Label.class, SWT.NONE,
             "Site");
         FormUtils.setTextValue(siteLabel, containerType.getSite().getName());
-        createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Name", null,
-            PojoObservables.observeValue(containerType, "name"),
+
+        firstControl = createBoundWidgetWithLabel(client, Text.class, SWT.NONE,
+            "Name", null, PojoObservables.observeValue(containerType, "name"),
             NonEmptyString.class, MSG_NO_CONTAINER_TYPE_NAME);
 
         createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Short Name",
@@ -375,5 +379,10 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
     @Override
     public String getNextOpenedFormID() {
         return ContainerTypeViewForm.ID;
+    }
+
+    @Override
+    public void setFocus() {
+        firstControl.setFocus();
     }
 }

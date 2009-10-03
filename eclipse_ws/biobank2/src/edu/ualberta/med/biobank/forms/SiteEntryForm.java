@@ -7,6 +7,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.SessionManager;
@@ -26,6 +27,8 @@ public class SiteEntryForm extends AddressEntryFormCommon {
     private SiteWrapper siteWrapper;
 
     protected Combo session;
+
+    private Control firstControl;
 
     @Override
     public void init() {
@@ -78,8 +81,8 @@ public class SiteEntryForm extends AddressEntryFormCommon {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Name", null,
-            BeansObservables.observeValue(siteWrapper, "name"),
+        firstControl = createBoundWidgetWithLabel(client, Text.class, SWT.NONE,
+            "Name", null, BeansObservables.observeValue(siteWrapper, "name"),
             NonEmptyString.class, MSG_NO_SITE_NAME);
 
         createBoundWidgetWithLabel(client, Combo.class, SWT.NONE,
@@ -113,7 +116,7 @@ public class SiteEntryForm extends AddressEntryFormCommon {
 
     @Override
     public void setFocus() {
-        form.setFocus();
+        firstControl.setFocus();
     }
 
     @Override

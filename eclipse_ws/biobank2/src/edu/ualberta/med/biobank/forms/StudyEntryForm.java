@@ -15,6 +15,7 @@ import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
@@ -88,6 +89,8 @@ public class StudyEntryForm extends BiobankEntryForm {
 
     private SampleStorageEntryWidget sampleStorageEntryWidget;
 
+    private Control firstControl;
+
     private BiobankEntryFormWidgetListener listener = new BiobankEntryFormWidgetListener() {
         @Override
         public void selectionChanged(MultiSelectEvent event) {
@@ -137,6 +140,9 @@ public class StudyEntryForm extends BiobankEntryForm {
         FormUtils.setTextValue(siteLabel, studyWrapper.getSite().getName());
 
         createBoundWidgetsFromMap(FIELDS, studyWrapper, client);
+
+        firstControl = controls.get("name");
+        Assert.isNotNull(firstControl, "name field does not exist");
 
         Text comments = (Text) controls.get("comment");
         GridData gd = (GridData) comments.getLayoutData();
@@ -421,5 +427,10 @@ public class StudyEntryForm extends BiobankEntryForm {
     @Override
     public String getNextOpenedFormID() {
         return StudyViewForm.ID;
+    }
+
+    @Override
+    public void setFocus() {
+        firstControl.setFocus();
     }
 }

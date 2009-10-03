@@ -14,6 +14,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
@@ -52,6 +53,8 @@ public class ContainerEntryForm extends BiobankEntryForm {
 
     private ComboViewer containerTypeComboViewer;
 
+    private Control firstControl;
+
     @Override
     public void init() {
         Assert.isTrue((adapter instanceof ContainerAdapter),
@@ -75,6 +78,7 @@ public class ContainerEntryForm extends BiobankEntryForm {
             tabName = "Container " + containerWrapper.getLabel();
         }
         setPartName(tabName);
+        firstControl = null;
     }
 
     @Override
@@ -100,20 +104,23 @@ public class ContainerEntryForm extends BiobankEntryForm {
 
         if (containerWrapper.getPosition() == null) {
             // only allow edit to label on top level containers
-            createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Label",
-                null, PojoObservables.observeValue(containerWrapper
-                    .getWrappedObject(), "label"), NonEmptyString.class,
-                MSG_CONTAINER_NAME_EMPTY);
+            firstControl = createBoundWidgetWithLabel(client, Text.class,
+                SWT.NONE, "Label", null, PojoObservables.observeValue(
+                    containerWrapper.getWrappedObject(), "label"),
+                NonEmptyString.class, MSG_CONTAINER_NAME_EMPTY);
         } else {
             Label l = (Label) createWidget(client, Label.class, SWT.NONE,
                 "Label");
             FormUtils.setTextValue(l, containerWrapper.getLabel());
         }
 
-        createBoundWidgetWithLabel(client, Text.class, SWT.NONE,
+        Control c = createBoundWidgetWithLabel(client, Text.class, SWT.NONE,
             "Product Barcode", null, PojoObservables.observeValue(
                 containerWrapper.getWrappedObject(), "productBarcode"), null,
             null);
+
+        if (firstControl == null)
+            firstControl = c;
 
         createBoundWidgetWithLabel(client, Combo.class, SWT.NONE,
             "Activity Status", FormConstants.ACTIVITY_STATUS, PojoObservables
@@ -222,5 +229,10 @@ public class ContainerEntryForm extends BiobankEntryForm {
     @Override
     public String getNextOpenedFormID() {
         return ContainerViewForm.ID;
+    }
+
+    @Override
+    public void setFocus() {
+        firstControl.setFocus();
     }
 }

@@ -11,6 +11,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
@@ -39,6 +40,8 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
     private ContactEntryWidget contactEntryWidget;
 
     protected Combo session;
+
+    private Control firstControl;
 
     private BiobankEntryFormWidgetListener listener = new BiobankEntryFormWidgetListener() {
         @Override
@@ -105,8 +108,8 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
             "Site");
         FormUtils.setTextValue(siteLabel, clinicWrapper.getSite().getName());
 
-        createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Name", null,
-            PojoObservables.observeValue(clinicWrapper, "name"),
+        firstControl = createBoundWidgetWithLabel(client, Text.class, SWT.NONE,
+            "Name", null, PojoObservables.observeValue(clinicWrapper, "name"),
             NonEmptyString.class, MSG_NO_CLINIC_NAME);
 
         createBoundWidgetWithLabel(client, Combo.class, SWT.NONE,
@@ -144,7 +147,7 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
 
     @Override
     public void setFocus() {
-        form.setFocus();
+        firstControl.setFocus();
     }
 
     @Override
