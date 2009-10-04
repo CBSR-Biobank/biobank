@@ -15,7 +15,6 @@ import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
@@ -88,8 +87,6 @@ public class StudyEntryForm extends BiobankEntryForm {
     private ListOrderedMap combinedPvInfoMap;
 
     private SampleStorageEntryWidget sampleStorageEntryWidget;
-
-    private Control firstControl;
 
     private BiobankEntryFormWidgetListener listener = new BiobankEntryFormWidgetListener() {
         @Override

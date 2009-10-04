@@ -78,6 +78,9 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
 
     protected IStatus currentStatus;
 
+    // The widget that is to get the focus when the form is created
+    protected Control firstControl;
+
     protected DataBindingContext dbc;
 
     protected Button confirmButton;
@@ -111,6 +114,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
 
     public BiobankEntryForm() {
         super();
+        firstControl = null;
         dbc = new DataBindingContext();
     }
 
@@ -174,7 +178,8 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
 
     @Override
     public void setFocus() {
-        form.setFocus();
+        Assert.isNotNull(firstControl, "first control widget is not set");
+        firstControl.setFocus();
     }
 
     public void resetForm() throws Exception {

@@ -203,6 +203,8 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
             patientVisitWrapper.getDateDrawn(), false,
             "Date drawn should be set");
 
+        firstControl = dateDrawn;
+
         Date processedDate = patientVisitWrapper.getDateProcessed();
         if (processedDate == null) {
             processedDate = new Date();
@@ -575,5 +577,10 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
     @Override
     public String getNextOpenedFormID() {
         return PatientVisitViewForm.ID;
+    }
+
+    @Override
+    public void setFocus() {
+        firstControl.setFocus();
     }
 }

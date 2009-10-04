@@ -104,7 +104,7 @@ public class PatientEntryForm extends BiobankEntryForm {
         studiesViewer = createCComboViewerWithNoSelectionValidator(client,
             "Study", studies, selectedStudy, "A study should be selected");
 
-        createBoundWidgetWithLabel(client, Text.class, SWT.NONE,
+        firstControl = createBoundWidgetWithLabel(client, Text.class, SWT.NONE,
             "Patient Number", null, BeansObservables.observeValue(
                 patientAdapter.getWrapper(), "number"), NonEmptyString.class,
             MSG_NO_PATIENT_NUMBER);
@@ -141,6 +141,11 @@ public class PatientEntryForm extends BiobankEntryForm {
                 "Error while retrieving patient "
                     + patientAdapter.getWrapper().getNumber(), e);
         }
+    }
+
+    @Override
+    public void setFocus() {
+        firstControl.setFocus();
     }
 
 }

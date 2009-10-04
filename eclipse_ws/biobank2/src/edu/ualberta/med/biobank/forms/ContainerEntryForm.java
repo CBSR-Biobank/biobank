@@ -53,8 +53,6 @@ public class ContainerEntryForm extends BiobankEntryForm {
 
     private ComboViewer containerTypeComboViewer;
 
-    private Control firstControl;
-
     @Override
     public void init() {
         Assert.isTrue((adapter instanceof ContainerAdapter),
