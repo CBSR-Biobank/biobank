@@ -46,6 +46,8 @@ public class BioBankPlugin extends AbstractUIPlugin {
     public static final String IMG_CABINET_LINK_ASSIGN = "cabinetLinkAssign";
     public static final String IMG_CLINIC = "clinic";
     public static final String IMG_CLINICS = "clinics";
+    public static final String IMG_COMPUTER = "computer";
+    public static final String IMG_COMPUTER_DELETE = "computerDelete";
     public static final String IMG_CONTAINER_TYPES = "containerTypes";
     public static final String IMG_CONTAINERS = "containers";
     public static final String IMG_DELETE = "delete";
@@ -109,6 +111,8 @@ public class BioBankPlugin extends AbstractUIPlugin {
             "cabinetLinkAssign.png");
         registerImage(registry, IMG_CLINIC, "clinic.png");
         registerImage(registry, IMG_CLINICS, "clinics.png");
+        registerImage(registry, IMG_COMPUTER, "computer.png");
+        registerImage(registry, IMG_COMPUTER_DELETE, "computer_delete.png");
         registerImage(registry, IMG_CONTAINER_TYPES, "container_types.png");
         registerImage(registry, IMG_CONTAINERS, "containers.png");
         registerImage(registry, IMG_DELETE, "delete.png");

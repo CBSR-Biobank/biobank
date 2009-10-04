@@ -540,6 +540,31 @@
       <menuContribution
             locationURI="toolbar:org.eclipse.ui.main.toolbar">
          <toolbar
+               id="edu.ualberta.med.biobank.toolbar.serverCommands">
+            <command
+               commandId="edu.ualberta.med.biobank.commands.login"
+               icon="icons/computer.png"
+               label="Login"
+               style="push">
+               <visibleWhen
+                     checkEnabled="false">
+                    <reference definitionId="biobank2.loggedOut">
+                    </reference>
+               </visibleWhen>
+            </command>
+            <command
+               commandId="edu.ualberta.med.biobank.commands.logout"
+               icon="icons/computer_delete.png"
+               label="Logout"
+               style="push">
+               <visibleWhen
+                     checkEnabled="false">
+                    <reference definitionId="biobank2.loggedIn">
+                    </reference>
+               </visibleWhen>
+            </command>
+         </toolbar>
+         <toolbar
                id="edu.ualberta.med.biobank.toolbar.mainPerpective">
             <command
                commandId="edu.ualberta.med.biobank.commands.patientAdmin"
