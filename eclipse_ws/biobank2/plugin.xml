@@ -542,10 +542,11 @@
          <toolbar
                id="edu.ualberta.med.biobank.toolbar.serverCommands">
             <command
-               commandId="edu.ualberta.med.biobank.commands.login"
-               icon="icons/computer.png"
-               label="Login"
-               style="push">
+                  commandId="edu.ualberta.med.biobank.commands.login"
+                  icon="icons/computer.png"
+                  label="Login"
+                  style="push"
+                  tooltip="Login">
                <visibleWhen
                      checkEnabled="false">
                     <reference definitionId="biobank2.loggedOut">
@@ -553,10 +554,11 @@
                </visibleWhen>
             </command>
             <command
-               commandId="edu.ualberta.med.biobank.commands.logout"
-               icon="icons/computer_delete.png"
-               label="Logout"
-               style="push">
+                  commandId="edu.ualberta.med.biobank.commands.logout"
+                  icon="icons/computer_delete.png"
+                  label="Logout"
+                  style="push"
+                  tooltip="Logout">
                <visibleWhen
                      checkEnabled="false">
                     <reference definitionId="biobank2.loggedIn">
@@ -738,6 +740,12 @@
                      value="edu.ualberta.med.biobank.forms.CabinetLinkAssignEntryForm">
                </parameter>
             </command>
+         </toolbar>
+         <toolbar
+               id="edu.ualberta.med.biobank.toolbar.siteSelection">
+            <control
+                  class="edu.ualberta.med.biobank.rcp.SiteCombo">
+            </control>
          </toolbar>
       </menuContribution>
    </extension>

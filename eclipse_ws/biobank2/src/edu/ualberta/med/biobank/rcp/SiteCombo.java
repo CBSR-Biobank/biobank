@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.rcp;
 
-import org.eclipse.jface.action.ControlContribution;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.IElementComparer;
@@ -16,6 +15,7 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.ui.menus.WorkbenchWindowControlContribution;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
@@ -23,14 +23,14 @@ import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.treeview.SessionAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
-public class SiteCombo extends ControlContribution {
+public class SiteCombo extends WorkbenchWindowControlContribution {
 
     private SessionAdapter session;
     public ComboViewer comboViewer;
 
     public SiteCombo() {
         super("Site Selection");
-
+        SessionManager.getInstance().setSiteCombo(this);
     }
 
     public SiteCombo(String str) {
