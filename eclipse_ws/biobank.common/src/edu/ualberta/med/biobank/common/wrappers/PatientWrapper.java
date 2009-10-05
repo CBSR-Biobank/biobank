@@ -21,6 +21,10 @@ public class PatientWrapper extends ModelWrapper<Patient> implements
         super(appService, patient);
     }
 
+    public PatientWrapper(WritableApplicationService appService) {
+        super(appService);
+    }
+
     public String getNumber() {
         return wrappedObject.getNumber();
     }
@@ -142,7 +146,7 @@ public class PatientWrapper extends ModelWrapper<Patient> implements
     }
 
     @Override
-    protected Class<Patient> getWrappedClass() {
+    public Class<Patient> getWrappedClass() {
         return Patient.class;
     }
 

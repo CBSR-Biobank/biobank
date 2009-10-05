@@ -139,7 +139,7 @@ public class SiteViewForm extends AddressViewFormCommon {
         Composite client = createSectionWithClient("Container Types");
 
         containerTypesTable = new ContainerTypeInfoTable(client, siteWrapper
-            .getContainerTypeWrapperCollection());
+            .getContainerTypeCollection());
         containerTypesTable.adaptToToolkit(toolkit, true);
 
         containerTypesTable.addDoubleClickListener(FormUtils
@@ -210,9 +210,9 @@ public class SiteViewForm extends AddressViewFormCommon {
         clinicsTable.getTableViewer().setInput(
             siteWrapper.getClinicWrapperCollection());
         containerTypesTable.getTableViewer().setInput(
-            siteWrapper.getContainerTypeWrapperCollection());
+            siteWrapper.getContainerTypeCollection());
         sContainersTable.getTableViewer().setInput(
-            siteWrapper.getContainerWrapperCollection());
+            siteWrapper.getContainerCollection());
     }
 
     private void retrieveSite() {

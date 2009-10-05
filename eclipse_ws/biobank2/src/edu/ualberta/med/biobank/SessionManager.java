@@ -21,6 +21,7 @@ import org.eclipse.ui.services.ISourceProviderService;
 import org.osgi.service.prefs.BackingStoreException;
 import org.osgi.service.prefs.Preferences;
 
+import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.SiteComparator;
@@ -262,6 +263,14 @@ public class SessionManager {
         Assert.isNotNull(adapter, "could not find adapter for class "
             + klass.getName() + " id " + id);
         adapter.performDoubleClick();
+    }
+
+    public void openViewForm(ModelWrapper<?> wrapper) {
+        openViewForm(wrapper.getWrappedClass(), wrapper.getId());
+    }
+
+    public AdapterBase searchNode(ModelWrapper<?> wrapper) {
+        return sessionAdapter.searchChild(wrapper);
     }
 
     public void setCurrentSite(SiteWrapper siteWrapper) {

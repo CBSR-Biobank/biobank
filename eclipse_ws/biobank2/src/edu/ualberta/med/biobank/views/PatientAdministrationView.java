@@ -26,7 +26,6 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.forms.PatientEntryForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
-import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.sourceproviders.SiteSelectionState;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.NodeSearchVisitor;
@@ -172,7 +171,7 @@ public class PatientAdministrationView extends ViewPart implements
             "Do you want to create this patient ?");
         if (create) {
             PatientWrapper patient = new PatientWrapper(SessionManager
-                .getAppService(), new Patient());
+                .getAppService());
             patient.setNumber(number);
             PatientAdapter adapter = new PatientAdapter(getRootNode(), patient);
             try {

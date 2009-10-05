@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
@@ -23,6 +24,10 @@ public class StudyWrapper extends ModelWrapper<Study> implements
         super(appService, wrappedObject);
     }
 
+    public StudyWrapper(WritableApplicationService appService) {
+        super(appService);
+    }
+
     public String getName() {
         return wrappedObject.getName();
     }
@@ -40,7 +45,7 @@ public class StudyWrapper extends ModelWrapper<Study> implements
     public void setNameShort(String nameShort) {
         String oldNameShort = getNameShort();
         wrappedObject.setNameShort(nameShort);
-        propertyChangeSupport.firePropertyChange("name", oldNameShort,
+        propertyChangeSupport.firePropertyChange("nameShort", oldNameShort,
             nameShort);
     }
 
@@ -85,11 +90,11 @@ public class StudyWrapper extends ModelWrapper<Study> implements
     @Override
     protected String[] getPropertyChangesNames() {
         return new String[] { "name", "nameShort", "activityStatus", "comment",
-            "site" };
+            "site", "pvInfoCollection" };
     }
 
     @Override
-    protected Class<Study> getWrappedClass() {
+    public Class<Study> getWrappedClass() {
         return Study.class;
     }
 
@@ -180,12 +185,41 @@ public class StudyWrapper extends ModelWrapper<Study> implements
         wrappedObject.setSampleStorageCollection(collection);
     }
 
-    public Collection<PvInfo> getPvInfoCollection() {
-        return wrappedObject.getPvInfoCollection();
+    @SuppressWarnings("unchecked")
+    public Collection<PvInfoWrapper> getPvInfoCollection() {
+        List<PvInfoWrapper> pvInfoCollection = (List<PvInfoWrapper>) propertiesMap
+            .get("pvInfoCollection");
+        if (pvInfoCollection == null) {
+            Collection<PvInfo> children = wrappedObject.getPvInfoCollection();
+            if (children != null) {
+                pvInfoCollection = new ArrayList<PvInfoWrapper>();
+                for (PvInfo pvInfo : children) {
+                    pvInfoCollection.add(new PvInfoWrapper(appService, pvInfo));
+                }
+                propertiesMap.put("pvInfoCollection", pvInfoCollection);
+            }
+        }
+        return pvInfoCollection;
     }
 
-    public void setPvInfoCollection(Collection<PvInfo> pvInfoCollection) {
+    public void setPvInfoCollection(Collection<PvInfo> pvInfoCollection,
+        boolean setNull) {
+        Collection<PvInfo> oldPvInfos = wrappedObject.getPvInfoCollection();
         wrappedObject.setPvInfoCollection(pvInfoCollection);
+        propertyChangeSupport.firePropertyChange("pvInfoCollection",
+            oldPvInfos, pvInfoCollection);
+        if (setNull) {
+            propertiesMap.put("pvInfoCollection", null);
+        }
+    }
+
+    public void setPvInfoCollection(List<PvInfoWrapper> pvInfoCollection) {
+        Collection<PvInfo> pvInfosObjects = new HashSet<PvInfo>();
+        for (PvInfoWrapper pvInfos : pvInfoCollection) {
+            pvInfosObjects.add(pvInfos.getWrappedObject());
+        }
+        setPvInfoCollection(pvInfosObjects, false);
+        propertiesMap.put("pvInfoCollection", pvInfoCollection);
     }
 
 }

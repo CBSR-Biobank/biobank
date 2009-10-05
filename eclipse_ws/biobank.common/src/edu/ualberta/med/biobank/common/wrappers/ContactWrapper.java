@@ -100,7 +100,7 @@ public class ContactWrapper extends ModelWrapper<Contact> {
     }
 
     @Override
-    protected Class<Contact> getWrappedClass() {
+    public Class<Contact> getWrappedClass() {
         return Contact.class;
     }
 

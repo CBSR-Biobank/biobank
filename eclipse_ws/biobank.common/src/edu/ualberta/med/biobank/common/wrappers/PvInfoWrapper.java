@@ -13,6 +13,10 @@ public class PvInfoWrapper extends ModelWrapper<PvInfo> {
         super(appService, wrappedObject);
     }
 
+    public PvInfoWrapper(WritableApplicationService appService) {
+        super(appService);
+    }
+
     @Override
     protected String[] getPropertyChangesNames() {
         return new String[] { "label", "possibleValues", "pvInfoPossible",
@@ -20,7 +24,7 @@ public class PvInfoWrapper extends ModelWrapper<PvInfo> {
     }
 
     @Override
-    protected Class<PvInfo> getWrappedClass() {
+    public Class<PvInfo> getWrappedClass() {
         return PvInfo.class;
     }
 

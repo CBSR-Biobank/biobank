@@ -29,9 +29,7 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Capacity;
-import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerCell;
-import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.ContainerStatus;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.ContainerAdapter;
@@ -163,7 +161,7 @@ public class ContainerViewForm extends BiobankViewForm {
             for (int j = 0; j < dim2; j++) {
                 if (cells[i][j] == null) {
                     ContainerPositionWrapper pos = new ContainerPositionWrapper(
-                        SessionManager.getAppService(), new ContainerPosition());
+                        SessionManager.getAppService());
                     pos.setRow(i);
                     pos.setCol(j);
                     ContainerCell cell = new ContainerCell(pos);
@@ -359,7 +357,7 @@ public class ContainerViewForm extends BiobankViewForm {
         ContainerAdapter.closeEditor(new FormInput(containerAdapter));
         if (cells[pos.getRow()][pos.getCol()].getStatus() == ContainerStatus.NOT_INITIALIZED) {
             ContainerWrapper newContainer = new ContainerWrapper(SessionManager
-                .getAppService(), new Container());
+                .getAppService());
             newContainer.setSite(containerAdapter.getParentFromClass(
                 SiteAdapter.class).getWrapper());
             pos.setParentContainer(container);

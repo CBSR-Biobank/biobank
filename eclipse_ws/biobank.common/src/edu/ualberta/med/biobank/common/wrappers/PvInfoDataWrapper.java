@@ -13,13 +13,17 @@ public class PvInfoDataWrapper extends ModelWrapper<PvInfoData> {
         super(appService, wrappedObject);
     }
 
+    public PvInfoDataWrapper(WritableApplicationService appService) {
+        super(appService);
+    }
+
     @Override
     protected String[] getPropertyChangesNames() {
         return new String[] { "pvInfo", "value", "patientVisit" };
     }
 
     @Override
-    protected Class<PvInfoData> getWrappedClass() {
+    public Class<PvInfoData> getWrappedClass() {
         return PvInfoData.class;
     }
 

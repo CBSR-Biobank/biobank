@@ -85,10 +85,9 @@ public class SamplesListWidget extends InfoTableWidget<SampleWrapper> {
                 Sample sample = (Sample) item.o;
                 SamplePosition sp = sample.getSamplePosition();
                 if (sp != null) {
-                    Container sc = sp.getContainer();
                     AdapterBase node = siteAdapter
-                        .accept(new NodeSearchVisitor(Container.class, sc
-                            .getId()));
+                        .accept(new NodeSearchVisitor(Container.class, sp
+                            .getContainer().getId()));
                     if (node != null) {
                         SessionManager.getInstance().setSelectedNode(node);
                         node.performDoubleClick();

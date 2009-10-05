@@ -14,7 +14,6 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.fieldassist.ControlDecoration;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ComboViewer;
-import org.eclipse.jface.viewers.IElementComparer;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.LabelProvider;
@@ -30,8 +29,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
+import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.forms.FormUtils;
-import edu.ualberta.med.biobank.model.SampleType;
 
 /**
  * Create 3 widgets to show types selection for samples on a pallet: one label,
@@ -50,7 +49,7 @@ public class SampleTypeSelectionWidget {
     private Binding binding;
 
     public SampleTypeSelectionWidget(Composite parent, Character letter,
-        List<SampleType> types, FormToolkit toolkit) {
+        List<SampleTypeWrapper> types, FormToolkit toolkit) {
 
         if (letter != null) {
             toolkit.createLabel(parent, letter.toString(), SWT.LEFT);
@@ -70,7 +69,7 @@ public class SampleTypeSelectionWidget {
         setNumber(null);
     }
 
-    private void createCombo(Composite parent, List<SampleType> types) {
+    private void createCombo(Composite parent, List<SampleTypeWrapper> types) {
         combo = new CCombo(parent, SWT.DROP_DOWN | SWT.READ_ONLY | SWT.BORDER);
         combo.setLayoutData(new GridData(SWT.LEFT, SWT.TOP, true, false));
 
@@ -79,7 +78,7 @@ public class SampleTypeSelectionWidget {
         cv.setLabelProvider(new LabelProvider() {
             @Override
             public String getText(Object element) {
-                return ((SampleType) element).getName();
+                return ((SampleTypeWrapper) element).getName();
             }
         });
         cv.addSelectionChangedListener(new ISelectionChangedListener() {
@@ -92,22 +91,6 @@ public class SampleTypeSelectionWidget {
                     selectionDone.setValue(true);
                 }
             }
-        });
-        cv.setComparer(new IElementComparer() {
-            @Override
-            public boolean equals(Object a, Object b) {
-                if (a instanceof SampleType && b instanceof SampleType) {
-                    return ((SampleType) a).getId().equals(
-                        ((SampleType) b).getId());
-                }
-                return false;
-            }
-
-            @Override
-            public int hashCode(Object element) {
-                return element.hashCode();
-            }
-
         });
         cv.setComparator(new ViewerComparator());
         cv.setInput(types);
@@ -144,8 +127,8 @@ public class SampleTypeSelectionWidget {
         }
     }
 
-    public SampleType getSelection() {
-        return (SampleType) ((StructuredSelection) cv.getSelection())
+    public SampleTypeWrapper getSelection() {
+        return (SampleTypeWrapper) ((StructuredSelection) cv.getSelection())
             .getFirstElement();
     }
 

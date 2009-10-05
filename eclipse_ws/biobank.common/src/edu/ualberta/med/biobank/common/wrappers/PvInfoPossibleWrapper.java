@@ -1,8 +1,12 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.model.PvInfoPossible;
 import edu.ualberta.med.biobank.model.PvInfoType;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class PvInfoPossibleWrapper extends ModelWrapper<PvInfoPossible> {
@@ -12,13 +16,17 @@ public class PvInfoPossibleWrapper extends ModelWrapper<PvInfoPossible> {
         super(appService, wrappedObject);
     }
 
+    public PvInfoPossibleWrapper(WritableApplicationService appService) {
+        super(appService);
+    }
+
     @Override
     protected String[] getPropertyChangesNames() {
         return new String[] { "label", "isDefault", "pvInfoType" };
     }
 
     @Override
-    protected Class<PvInfoPossible> getWrappedClass() {
+    public Class<PvInfoPossible> getWrappedClass() {
         return PvInfoPossible.class;
     }
 
@@ -60,5 +68,20 @@ public class PvInfoPossibleWrapper extends ModelWrapper<PvInfoPossible> {
         wrappedObject.setPvInfoType(pvInfoType);
         propertyChangeSupport.firePropertyChange("pvInfoType", oldPvInfo,
             pvInfoType);
+    }
+
+    public void setPvInfoType(PvInfoTypeWrapper pvInfoType) {
+        setPvInfoType(pvInfoType.wrappedObject);
+    }
+
+    public static List<PvInfoPossibleWrapper> getAllWrappers(
+        WritableApplicationService appService) throws ApplicationException {
+        List<PvInfoPossible> objects = appService.search(PvInfoPossible.class,
+            new PvInfoPossible());
+        List<PvInfoPossibleWrapper> wrappers = new ArrayList<PvInfoPossibleWrapper>();
+        for (PvInfoPossible pv : objects) {
+            wrappers.add(new PvInfoPossibleWrapper(appService, pv));
+        }
+        return wrappers;
     }
 }

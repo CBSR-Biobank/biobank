@@ -27,6 +27,10 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> implements
         super(appService, wrappedObject);
     }
 
+    public ContainerTypeWrapper(WritableApplicationService appService) {
+        super(appService);
+    }
+
     @Override
     protected String[] getPropertyChangesNames() {
         return new String[] { "name", "comment", "nameShort", "topLevel",
@@ -51,13 +55,13 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> implements
         BiobankCheckException {
         String notSameTypeString = "";
         List<Object> params = new ArrayList<Object>(Arrays.asList(new Object[] {
-            getSite(), getName() }));
+            getSite().getId(), getName() }));
         if (!isNew()) {
             notSameTypeString = " and id<>?";
             params.add(getId());
         }
         HQLCriteria c = new HQLCriteria("from " + ContainerType.class.getName()
-            + " where site = ? and name = ?" + notSameTypeString, params);
+            + " where site.id = ? and name = ?" + notSameTypeString, params);
 
         List<Object> results = appService.query(c);
         if (results.size() != 0) {
@@ -67,7 +71,7 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> implements
     }
 
     @Override
-    protected Class<ContainerType> getWrappedClass() {
+    public Class<ContainerType> getWrappedClass() {
         return ContainerType.class;
     }
 
@@ -78,17 +82,6 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> implements
             allChildren.add(type);
         }
         return allChildren;
-    }
-
-    public Collection<SampleType> getSampleTypes(boolean useChildrenRecursively) {
-        List<SampleType> sampleTypes = new ArrayList<SampleType>();
-        sampleTypes.addAll(getSampleTypeCollection());
-        if (useChildrenRecursively) {
-            for (ContainerTypeWrapper type : getChildContainerTypeCollection()) {
-                sampleTypes.addAll(type.getSampleTypes(useChildrenRecursively));
-            }
-        }
-        return sampleTypes;
     }
 
     @Override
@@ -170,16 +163,54 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> implements
         return wrappedObject.getActivityStatus();
     }
 
-    public void setSampleTypeCollection(Collection<SampleType> sampleTypes) {
-        Collection<SampleType> oldSampleTypes = wrappedObject
+    public void setSampleTypeCollection(Collection<SampleType> sampleTypes,
+        boolean setNull) {
+        Collection<SampleType> oldTypes = wrappedObject
             .getSampleTypeCollection();
         wrappedObject.setSampleTypeCollection(sampleTypes);
         propertyChangeSupport.firePropertyChange("sampleTypeCollection",
-            oldSampleTypes, sampleTypes);
+            oldTypes, sampleTypes);
+        if (setNull) {
+            propertiesMap.put("sampleTypeCollection", null);
+        }
     }
 
-    public Collection<SampleType> getSampleTypeCollection() {
-        return wrappedObject.getSampleTypeCollection();
+    public void setSampleTypeCollection(
+        Collection<SampleTypeWrapper> sampleTypes) {
+        Collection<SampleType> sampleTypesObjects = new HashSet<SampleType>();
+        for (SampleTypeWrapper type : sampleTypes) {
+            sampleTypesObjects.add(type.getWrappedObject());
+        }
+        setSampleTypeCollection(sampleTypesObjects, false);
+        propertiesMap.put("sampleTypeCollection", sampleTypes);
+    }
+
+    @SuppressWarnings("unchecked")
+    public Collection<SampleTypeWrapper> getSampleTypeCollection() {
+        List<SampleTypeWrapper> sampleTypeCollection = (List<SampleTypeWrapper>) propertiesMap
+            .get("sampleTypeCollection");
+        if (sampleTypeCollection == null) {
+            Collection<SampleType> children = wrappedObject
+                .getSampleTypeCollection();
+            if (children != null) {
+                sampleTypeCollection = new ArrayList<SampleTypeWrapper>();
+                for (SampleType type : children) {
+                    sampleTypeCollection.add(new SampleTypeWrapper(appService,
+                        type));
+                }
+                propertiesMap.put("sampleTypeCollection", sampleTypeCollection);
+            }
+        }
+        return sampleTypeCollection;
+    }
+
+    public Collection<SampleTypeWrapper> getSampleTypeCollectionRecursively() {
+        List<SampleTypeWrapper> sampleTypes = new ArrayList<SampleTypeWrapper>();
+        sampleTypes.addAll(getSampleTypeCollection());
+        for (ContainerTypeWrapper type : getChildContainerTypeCollection()) {
+            sampleTypes.addAll(type.getSampleTypeCollectionRecursively());
+        }
+        return sampleTypes;
     }
 
     public void setChildContainerTypeCollection(
@@ -266,12 +297,11 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> implements
     }
 
     public void setSampleTypes(List<Integer> sampleTypesIds,
-        List<SampleType> allSampleTypes) throws BiobankCheckException {
-        Set<SampleType> selSampleTypes = new HashSet<SampleType>();
+        List<SampleTypeWrapper> allSampleTypes) throws BiobankCheckException {
+        Set<SampleTypeWrapper> selSampleTypes = new HashSet<SampleTypeWrapper>();
         if (sampleTypesIds != null) {
-            for (SampleType sampleType : allSampleTypes) {
-                int id = sampleType.getId();
-                if (sampleTypesIds.indexOf(id) >= 0) {
+            for (SampleTypeWrapper sampleType : allSampleTypes) {
+                if (sampleTypesIds.indexOf(sampleType.getId()) >= 0) {
                     selSampleTypes.add(sampleType);
                 }
             }
@@ -287,13 +317,11 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> implements
         List<ContainerTypeWrapper> allContainerTypes)
         throws BiobankCheckException, ApplicationException {
         List<ContainerTypeWrapper> selContainerTypes = new ArrayList<ContainerTypeWrapper>();
-        if (containerTypesIds != null) {
-            if (allContainerTypes != null) {
-                for (ContainerTypeWrapper containerType : allContainerTypes) {
-                    int id = containerType.getId();
-                    if (containerTypesIds.indexOf(id) >= 0) {
-                        selContainerTypes.add(containerType);
-                    }
+        if (containerTypesIds != null && containerTypesIds.size() > 0
+            && allContainerTypes != null) {
+            for (ContainerTypeWrapper containerType : allContainerTypes) {
+                if (containerTypesIds.indexOf(containerType.getId()) >= 0) {
+                    selContainerTypes.add(containerType);
                 }
             }
         }

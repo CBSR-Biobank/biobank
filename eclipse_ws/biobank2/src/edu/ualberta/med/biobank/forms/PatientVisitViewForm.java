@@ -14,9 +14,9 @@ import org.eclipse.swt.widgets.Label;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PvInfoDataWrapper;
-import edu.ualberta.med.biobank.model.PvInfo;
-import edu.ualberta.med.biobank.model.PvSampleSource;
-import edu.ualberta.med.biobank.model.Study;
+import edu.ualberta.med.biobank.common.wrappers.PvInfoWrapper;
+import edu.ualberta.med.biobank.common.wrappers.PvSampleSourceWrapper;
+import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.treeview.PatientVisitAdapter;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
@@ -38,7 +38,7 @@ public class PatientVisitViewForm extends BiobankViewForm {
     // used to keep track of which data has been entered or left blank for
     // a patient visit.
     class CombinedPvInfo {
-        PvInfo pvInfo;
+        PvInfoWrapper pvInfo;
         PvInfoDataWrapper pvInfoData;
 
         public CombinedPvInfo() {
@@ -113,12 +113,12 @@ public class PatientVisitViewForm extends BiobankViewForm {
     }
 
     private void createPvDataSection(Composite client) {
-        Study study = patientVisitAdapter
-            .getParentFromClass(StudyAdapter.class).getStudy();
+        StudyWrapper study = patientVisitAdapter.getParentFromClass(
+            StudyAdapter.class).getWrapper();
 
         // get all PvInfo from study, since user may not have filled in all
         // fields
-        for (PvInfo pvInfo : study.getPvInfoCollection()) {
+        for (PvInfoWrapper pvInfo : study.getPvInfoCollection()) {
             CombinedPvInfo combinedPvInfo = new CombinedPvInfo();
             combinedPvInfo.pvInfo = pvInfo;
             combinedPvInfoMap.put(pvInfo.getId(), combinedPvInfo);
@@ -170,7 +170,7 @@ public class PatientVisitViewForm extends BiobankViewForm {
     private void createSourcesSection() {
         Composite client = createSectionWithClient("Source Vessels");
 
-        Collection<PvSampleSource> sources = patientVisitWrapper
+        Collection<PvSampleSourceWrapper> sources = patientVisitWrapper
             .getPvSampleSourceCollection();
         new PvSampleSourceInfoTable(client, sources);
     }

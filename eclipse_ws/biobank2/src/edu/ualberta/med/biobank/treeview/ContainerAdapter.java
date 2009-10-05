@@ -23,7 +23,6 @@ import edu.ualberta.med.biobank.dialogs.SelectParentContainerDialog;
 import edu.ualberta.med.biobank.forms.ContainerEntryForm;
 import edu.ualberta.med.biobank.forms.ContainerViewForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
-import edu.ualberta.med.biobank.model.Container;
 
 public class ContainerAdapter extends AdapterBase {
 
@@ -161,9 +160,7 @@ public class ContainerAdapter extends AdapterBase {
                         ContainerWrapper newParentContainer = getContainer()
                             .getPosition().getParentContainer();
                         ContainerAdapter parentAdapter = (ContainerAdapter) SessionManager
-                            .getInstance().getSession().accept(
-                                new NodeSearchVisitor(Container.class,
-                                    newParentContainer.getId()));
+                            .getInstance().searchNode(newParentContainer);
                         parentAdapter.getContainer().reload();
                         parentAdapter.performExpand();
                         // update old parent

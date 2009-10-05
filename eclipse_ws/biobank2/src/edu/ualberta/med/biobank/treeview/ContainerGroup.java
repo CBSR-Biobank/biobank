@@ -19,7 +19,6 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.forms.ContainerEntryForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
-import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.Site;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
@@ -53,7 +52,7 @@ public class ContainerGroup extends AdapterBase {
                                 "You must define a top-level container type before initializing storage.");
                     } else {
                         ContainerWrapper c = new ContainerWrapper(
-                            SessionManager.getAppService(), new Container());
+                            SessionManager.getAppService());
                         c.setSite(getParentFromClass(SiteAdapter.class)
                             .getWrapper());
                         ContainerAdapter adapter = new ContainerAdapter(

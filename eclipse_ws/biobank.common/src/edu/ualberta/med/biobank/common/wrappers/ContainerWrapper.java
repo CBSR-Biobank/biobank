@@ -13,7 +13,6 @@ import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.ContainerType;
-import edu.ualberta.med.biobank.model.Sample;
 import edu.ualberta.med.biobank.model.SamplePosition;
 import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.model.Site;
@@ -31,6 +30,10 @@ public class ContainerWrapper extends ModelWrapper<Container> implements
     public ContainerWrapper(WritableApplicationService appService,
         Container wrappedObject) {
         super(appService, wrappedObject);
+    }
+
+    public ContainerWrapper(WritableApplicationService appService) {
+        super(appService);
     }
 
     @Override
@@ -90,7 +93,7 @@ public class ContainerWrapper extends ModelWrapper<Container> implements
     }
 
     @Override
-    protected Class<Container> getWrappedClass() {
+    public Class<Container> getWrappedClass() {
         return Container.class;
     }
 
@@ -360,7 +363,7 @@ public class ContainerWrapper extends ModelWrapper<Container> implements
         return childPositionCollection;
     }
 
-    private void setChildPositionCollection(
+    public void setChildPositionCollection(
         Collection<ContainerPosition> positions, boolean setNull) {
         Collection<ContainerPosition> oldPositions = wrappedObject
             .getChildPositionCollection();
@@ -385,7 +388,7 @@ public class ContainerWrapper extends ModelWrapper<Container> implements
     /**
      * Return true if this container can hold the type of sample
      */
-    public boolean canHold(Sample sample) throws ApplicationException {
+    public boolean canHold(SampleWrapper sample) throws ApplicationException {
         SampleType type = sample.getSampleType();
         HQLCriteria criteria = new HQLCriteria("select sampleType from "
             + ContainerType.class.getName()

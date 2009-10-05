@@ -75,7 +75,8 @@ public class SiteWrapper extends ModelWrapper<Site> implements
 
     @Override
     protected String[] getPropertyChangesNames() {
-        return new String[] { "name", "activityStatus", "comment" };
+        return new String[] { "name", "activityStatus", "comment",
+            "containerCollection" };
     }
 
     @Override
@@ -103,7 +104,7 @@ public class SiteWrapper extends ModelWrapper<Site> implements
     }
 
     @Override
-    protected Class<Site> getWrappedClass() {
+    public Class<Site> getWrappedClass() {
         return Site.class;
     }
 
@@ -135,20 +136,85 @@ public class SiteWrapper extends ModelWrapper<Site> implements
         return collection;
     }
 
-    public Collection<ContainerTypeWrapper> getContainerTypeWrapperCollection() {
-        Collection<ContainerTypeWrapper> collection = new HashSet<ContainerTypeWrapper>();
-        for (ContainerType ct : wrappedObject.getContainerTypeCollection()) {
-            collection.add(new ContainerTypeWrapper(appService, ct));
+    @SuppressWarnings("unchecked")
+    public Collection<ContainerTypeWrapper> getContainerTypeCollection() {
+        List<ContainerTypeWrapper> containerTypeCollection = (List<ContainerTypeWrapper>) propertiesMap
+            .get("containerTypeCollection");
+        if (containerTypeCollection == null) {
+            Collection<ContainerType> children = wrappedObject
+                .getContainerTypeCollection();
+            if (children != null) {
+                containerTypeCollection = new ArrayList<ContainerTypeWrapper>();
+                for (ContainerType type : children) {
+                    containerTypeCollection.add(new ContainerTypeWrapper(
+                        appService, type));
+                }
+                propertiesMap.put("containerTypeCollection",
+                    containerTypeCollection);
+            }
         }
-        return collection;
+        return containerTypeCollection;
     }
 
-    public Collection<ContainerWrapper> getContainerWrapperCollection() {
-        Collection<ContainerWrapper> collection = new HashSet<ContainerWrapper>();
-        for (Container c : wrappedObject.getContainerCollection()) {
-            collection.add(new ContainerWrapper(appService, c));
+    public void setContainerTypeCollection(Collection<ContainerType> types,
+        boolean setNull) {
+        Collection<ContainerType> oldTypes = wrappedObject
+            .getContainerTypeCollection();
+        wrappedObject.setContainerTypeCollection(types);
+        propertyChangeSupport.firePropertyChange("containerTypeCollection",
+            oldTypes, types);
+        if (setNull) {
+            propertiesMap.put("containerTypeCollection", null);
         }
-        return collection;
+    }
+
+    public void setContainerTypeCollection(List<ContainerTypeWrapper> types) {
+        Collection<ContainerType> typeObjects = new HashSet<ContainerType>();
+        for (ContainerTypeWrapper type : types) {
+            typeObjects.add(type.getWrappedObject());
+        }
+        setContainerTypeCollection(typeObjects, false);
+        propertiesMap.put("containerTypeCollection", types);
+    }
+
+    @SuppressWarnings("unchecked")
+    public Collection<ContainerWrapper> getContainerCollection() {
+        List<ContainerWrapper> containerCollection = (List<ContainerWrapper>) propertiesMap
+            .get("containerCollection");
+        if (containerCollection == null) {
+            Collection<Container> children = wrappedObject
+                .getContainerCollection();
+            if (children != null) {
+                containerCollection = new ArrayList<ContainerWrapper>();
+                for (Container container : children) {
+                    containerCollection.add(new ContainerWrapper(appService,
+                        container));
+                }
+                propertiesMap.put("containerCollection", containerCollection);
+            }
+        }
+        return containerCollection;
+    }
+
+    public void setContainerCollection(Collection<Container> containers,
+        boolean setNull) {
+        Collection<Container> oldContainers = wrappedObject
+            .getContainerCollection();
+        wrappedObject.setContainerCollection(containers);
+        propertyChangeSupport.firePropertyChange("containerCollection",
+            oldContainers, containers);
+        if (setNull) {
+            propertiesMap.put("containerCollection", null);
+        }
+    }
+
+    public void setContainerCollection(List<ContainerWrapper> containers) {
+        Collection<Container> containerObjects = new HashSet<Container>();
+        for (ContainerWrapper container : containers) {
+            containerObjects.add(container.getWrappedObject());
+        }
+        setContainerCollection(containerObjects, false);
+        propertiesMap.put("containerCollection", containers);
     }
 
     public Collection<ContainerWrapper> getTopContainerWrapperCollection()

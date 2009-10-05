@@ -13,9 +13,9 @@ import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 
+import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
 import edu.ualberta.med.biobank.model.PalletCell;
 import edu.ualberta.med.biobank.model.PatientVisit;
-import edu.ualberta.med.biobank.model.Sample;
 import edu.ualberta.med.biobank.model.SampleCellStatus;
 import edu.ualberta.med.biobank.widgets.listener.ScanPalletModificationEvent;
 import edu.ualberta.med.biobank.widgets.listener.ScanPalletModificationListener;
@@ -111,7 +111,7 @@ public class PalletWidget extends AbstractGridContainerWidget {
     protected String getBottomTextForBox(int indexRow, int indexCol) {
         if (scannedElements != null
             && scannedElements[indexRow][indexCol] != null) {
-            Sample sample = scannedElements[indexRow][indexCol]
+            SampleWrapper sample = scannedElements[indexRow][indexCol]
                 .getExpectedSample();
             if (sample != null) {
                 PatientVisit pv = sample.getPatientVisit();

@@ -13,13 +13,11 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.utils.ModelUtils;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.forms.ContainerTypeEntryForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Capacity;
-import edu.ualberta.med.biobank.model.ContainerType;
-import edu.ualberta.med.biobank.model.Site;
 
 public class ContainerTypeGroup extends AdapterBase {
 
@@ -39,7 +37,7 @@ public class ContainerTypeGroup extends AdapterBase {
         mi.addSelectionListener(new SelectionListener() {
             public void widgetSelected(SelectionEvent event) {
                 ContainerTypeWrapper ct = new ContainerTypeWrapper(
-                    getAppService(), new ContainerType());
+                    getAppService());
                 ct.setSite(getParentFromClass(SiteAdapter.class).getSite());
                 ct.setCapacity(new Capacity());
                 ContainerTypeAdapter adapter = new ContainerTypeAdapter(
@@ -54,22 +52,19 @@ public class ContainerTypeGroup extends AdapterBase {
 
     @Override
     public void loadChildren(boolean updateNode) {
-        Site currentSite = ((SiteAdapter) getParent()).getSite();
+        SiteWrapper currentSite = ((SiteAdapter) getParent()).getWrapper();
         Assert.isNotNull(currentSite, "null site");
 
         try {
             // read from database again
-            currentSite = ModelUtils.getObjectWithId(getAppService(),
-                Site.class, currentSite.getId());
-            ((SiteAdapter) getParent()).setSite(currentSite);
-
-            List<ContainerType> containerTypes = new ArrayList<ContainerType>(
+            currentSite.reload();
+            List<ContainerTypeWrapper> containerTypes = new ArrayList<ContainerTypeWrapper>(
                 currentSite.getContainerTypeCollection());
             SessionManager.getLogger().trace(
                 "updateStudies: Site " + currentSite.getName() + " has "
                     + containerTypes.size() + " studies");
 
-            for (ContainerType containerType : containerTypes) {
+            for (ContainerTypeWrapper containerType : containerTypes) {
                 SessionManager.getLogger().trace(
                     "updateStudies: Container Type " + containerType.getId()
                         + ": " + containerType.getName());
@@ -78,9 +73,7 @@ public class ContainerTypeGroup extends AdapterBase {
                     .getId());
 
                 if (node == null) {
-                    node = new ContainerTypeAdapter(
-                        this,
-                        new ContainerTypeWrapper(getAppService(), containerType));
+                    node = new ContainerTypeAdapter(this, containerType);
                     addChild(node);
                 }
                 if (updateNode) {

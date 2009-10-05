@@ -15,6 +15,10 @@ public class SampleTypeWrapper extends ModelWrapper<SampleType> {
         super(appService, wrappedObject);
     }
 
+    public SampleTypeWrapper(WritableApplicationService appService) {
+        super(appService);
+    }
+
     @Override
     protected String[] getPropertyChangesNames() {
         return null;
@@ -22,7 +26,7 @@ public class SampleTypeWrapper extends ModelWrapper<SampleType> {
     }
 
     @Override
-    protected Class<SampleType> getWrappedClass() {
+    public Class<SampleType> getWrappedClass() {
         return SampleType.class;
     }
 
@@ -34,15 +38,15 @@ public class SampleTypeWrapper extends ModelWrapper<SampleType> {
      * get all sample types in a site for containers which type name contains
      * "typeNameContains"
      */
-    public static List<SampleType> getSampleTypeForContainerTypes(
+    public static List<SampleTypeWrapper> getSampleTypeForContainerTypes(
         WritableApplicationService appService, SiteWrapper siteWrapper,
         String typeNameContains) throws ApplicationException {
         List<ContainerTypeWrapper> types = ContainerTypeWrapper
             .getContainerTypesInSite(appService, siteWrapper, typeNameContains,
                 false);
-        List<SampleType> sampleTypes = new ArrayList<SampleType>();
+        List<SampleTypeWrapper> sampleTypes = new ArrayList<SampleTypeWrapper>();
         for (ContainerTypeWrapper type : types) {
-            sampleTypes.addAll(type.getSampleTypes(true));
+            sampleTypes.addAll(type.getSampleTypeCollectionRecursively());
         }
         return sampleTypes;
     }
@@ -55,5 +59,29 @@ public class SampleTypeWrapper extends ModelWrapper<SampleType> {
     @Override
     protected void deleteChecks() throws BiobankCheckException, Exception {
         // TODO Auto-generated method stub
+    }
+
+    public String getNameShort() {
+        return wrappedObject.getNameShort();
+    }
+
+    public String getName() {
+        return wrappedObject.getName();
+    }
+
+    public static List<SampleTypeWrapper> transformToWrapperList(
+        WritableApplicationService appService, List<SampleType> sampleTypes) {
+        List<SampleTypeWrapper> list = new ArrayList<SampleTypeWrapper>();
+        for (SampleType type : sampleTypes) {
+            list.add(new SampleTypeWrapper(appService, type));
+        }
+        return list;
+    }
+
+    public static List<SampleTypeWrapper> getAllWrappers(
+        WritableApplicationService appService) throws ApplicationException {
+        List<SampleType> sampleTypes = appService.search(SampleType.class,
+            new SampleType());
+        return transformToWrapperList(appService, sampleTypes);
     }
 }

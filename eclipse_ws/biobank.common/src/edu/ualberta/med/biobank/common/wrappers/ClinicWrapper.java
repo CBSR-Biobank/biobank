@@ -109,7 +109,7 @@ public class ClinicWrapper extends ModelWrapper<Clinic> implements
     }
 
     @Override
-    protected Class<Clinic> getWrappedClass() {
+    public Class<Clinic> getWrappedClass() {
         return Clinic.class;
     }
 

@@ -83,7 +83,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
 
     protected DataBindingContext dbc;
 
-    protected Button confirmButton;
+    private Button confirmButton;
 
     protected KeyListener keyListener = new KeyListener() {
         @Override
@@ -134,6 +134,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
                     setDirty(true);
                 } catch (final RemoteAccessException exp) {
                     BioBankPlugin.openRemoteAccessErrorMessage();
+                    exp.printStackTrace();
                     setDirty(true);
                 } catch (final AccessDeniedException ade) {
                     BioBankPlugin.openAccessDeniedErrorMessage();
@@ -392,14 +393,17 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
     protected void handleStatusChanged(IStatus status) {
         if (status.getSeverity() == IStatus.OK) {
             setFormHeaderErrorMessage(getOkMessage(), IMessageProvider.NONE);
-            if (confirmButton != null)
-                confirmButton.setEnabled(true);
+            setConfirmEnabled(true);
         } else {
             setFormHeaderErrorMessage(status.getMessage(),
                 IMessageProvider.ERROR);
-            if (confirmButton != null) {
-                confirmButton.setEnabled(false);
-            }
+            setConfirmEnabled(false);
+        }
+    }
+
+    protected void setConfirmEnabled(boolean enabled) {
+        if (confirmButton != null && !confirmButton.isDisposed()) {
+            confirmButton.setEnabled(enabled);
         }
     }
 
@@ -443,7 +447,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
         dbc.bindValue(writableValue, observableValue, uvs, uvs);
     }
 
-    protected void addToolbarButtons() {
+    private void addToolbarButtons() {
         ControlContribution cancel = new ControlContribution("Cancel") {
             @Override
             protected Control createControl(Composite parent) {
@@ -499,7 +503,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
         form.updateToolBar();
     }
 
-    private void confirm() {
+    public void confirm() {
         try {
             PlatformUI.getWorkbench().getActiveWorkbenchWindow()
                 .getActivePage().saveEditor(this, false);
@@ -516,7 +520,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
         }
     }
 
-    private void cancel() {
+    public void cancel() {
         try {
             PlatformUI.getWorkbench().getActiveWorkbenchWindow()
                 .getActivePage().closeEditor(this, false);

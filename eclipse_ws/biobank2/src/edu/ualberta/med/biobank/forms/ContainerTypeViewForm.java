@@ -8,8 +8,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.model.Capacity;
-import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.treeview.ContainerTypeAdapter;
 import edu.ualberta.med.biobank.widgets.CabinetDrawerWidget;
 import edu.ualberta.med.biobank.widgets.ContainerDisplayWidget;
@@ -164,7 +164,7 @@ public class ContainerTypeViewForm extends BiobankViewForm {
 
     private void setSampleTypesValues() {
         sampleTypesList.removeAll();
-        for (SampleType type : containerType.getSampleTypeCollection()) {
+        for (SampleTypeWrapper type : containerType.getSampleTypeCollection()) {
             sampleTypesList.add(type.getNameShort());
         }
     }

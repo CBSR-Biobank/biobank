@@ -12,8 +12,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.forms.widgets.Section;
 
+import edu.ualberta.med.biobank.common.wrappers.PvInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
-import edu.ualberta.med.biobank.model.PvInfo;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
 import edu.ualberta.med.biobank.widgets.infotables.SampleSourceInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.SampleStorageInfoTable;
@@ -36,6 +36,11 @@ public class StudyViewForm extends BiobankViewForm {
     private SampleSourceInfoTable sampleSourceTable;
 
     private List<PvInfoLabelPair> pvInfoControlList;
+
+    class PvInfoLabelPair {
+        public PvInfoWrapper pvInfo;
+        public Label label;
+    }
 
     @Override
     public void init() throws Exception {
@@ -128,7 +133,7 @@ public class StudyViewForm extends BiobankViewForm {
         Composite client = createSectionWithClient("Patient Visit Information Collected");
         client.setLayout(new GridLayout(1, false));
 
-        Collection<PvInfo> pvInfos = studyWrapper.getPvInfoCollection();
+        Collection<PvInfoWrapper> pvInfos = studyWrapper.getPvInfoCollection();
         if ((pvInfos == null) || (pvInfos.size() == 0)) {
             toolkit.createLabel(client,
                 "Study does not collect additional patient visit information");
@@ -136,7 +141,7 @@ public class StudyViewForm extends BiobankViewForm {
         }
 
         Composite subcomp;
-        for (PvInfo pvInfo : pvInfos) {
+        for (PvInfoWrapper pvInfo : pvInfos) {
             subcomp = toolkit.createComposite(client);
             subcomp.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 

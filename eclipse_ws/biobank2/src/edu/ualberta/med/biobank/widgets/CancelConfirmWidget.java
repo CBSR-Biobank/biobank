@@ -10,13 +10,9 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
-import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.forms.BiobankEntryForm;
-import edu.ualberta.med.biobank.forms.input.FormInput;
-import edu.ualberta.med.biobank.treeview.AdapterBase;
 
 public class CancelConfirmWidget extends BiobankWidget {
 
@@ -56,9 +52,9 @@ public class CancelConfirmWidget extends BiobankWidget {
                     String text = ((Text) e.widget).getText();
                     if (BioBankPlugin.getDefault().isConfirmBarcode(text)
                         && confirmButton.isEnabled()) {
-                        confirm();
+                        form.confirm();
                     } else if (BioBankPlugin.getDefault().isCancelBarcode(text)) {
-                        cancel();
+                        form.cancel();
                     }
                 }
             }
@@ -68,7 +64,7 @@ public class CancelConfirmWidget extends BiobankWidget {
         cancelButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                cancel();
+                form.cancel();
             }
         });
 
@@ -77,37 +73,11 @@ public class CancelConfirmWidget extends BiobankWidget {
         confirmButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                confirm();
+                form.confirm();
             }
         });
 
         adaptToToolkit(form.getToolkit(), true);
-    }
-
-    private void confirm() {
-        try {
-            PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-                .getActivePage().saveEditor(form, false);
-            if (!form.isDirty()) {
-                PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-                    .getActivePage().closeEditor(form, true);
-                if (form.getNextOpenedFormID() != null) {
-                    AdapterBase.openForm(new FormInput(form.getAdapter()), form
-                        .getNextOpenedFormID());
-                }
-            }
-        } catch (Exception e) {
-            SessionManager.getLogger().error("Can't save the form", e);
-        }
-    }
-
-    private void cancel() {
-        try {
-            PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-                .getActivePage().closeEditor(form, false);
-        } catch (Exception e) {
-            SessionManager.getLogger().error("Can't close the form", e);
-        }
     }
 
     public void showTextField(boolean show) {

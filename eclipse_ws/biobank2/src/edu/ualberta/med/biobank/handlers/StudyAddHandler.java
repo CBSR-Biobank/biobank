@@ -10,10 +10,6 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.forms.StudyEntryForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
-import edu.ualberta.med.biobank.model.Site;
-import edu.ualberta.med.biobank.model.Study;
-import edu.ualberta.med.biobank.treeview.NodeSearchVisitor;
-import edu.ualberta.med.biobank.treeview.SessionAdapter;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
 
@@ -21,17 +17,13 @@ public class StudyAddHandler extends AbstractHandler {
     public static final String ID = "edu.ualberta.med.biobank.commands.addStudy";
 
     public Object execute(ExecutionEvent event) throws ExecutionException {
-        SessionAdapter sessionAdapter = SessionManager.getInstance()
-            .getSession();
-        Assert.isNotNull(sessionAdapter);
-        SiteAdapter siteAdapter = (SiteAdapter) sessionAdapter
-            .accept(new NodeSearchVisitor(Site.class, SessionManager
-                .getInstance().getCurrentSiteWrapper().getId()));
+        SiteAdapter siteAdapter = (SiteAdapter) SessionManager.getInstance()
+            .searchNode(SessionManager.getInstance().getCurrentSiteWrapper());
         Assert.isNotNull(siteAdapter);
 
         StudyAdapter studyNode = new StudyAdapter(siteAdapter
-            .getStudiesGroupNode(), new StudyWrapper(sessionAdapter
-            .getAppService(), new Study()));
+            .getStudiesGroupNode(), new StudyWrapper(SessionManager
+            .getAppService()));
 
         FormInput input = new FormInput(studyNode);
         try {
