@@ -55,7 +55,6 @@ public class SiteEntryForm extends AddressEntryFormCommon {
     @Override
     protected void createFormContent() {
         form.setText("Repository Site Information");
-        addressWrapper = siteWrapper.getAddressWrapper();
         form.getBody().setLayout(new GridLayout(1, false));
         createSiteSection();
         createAddressArea();

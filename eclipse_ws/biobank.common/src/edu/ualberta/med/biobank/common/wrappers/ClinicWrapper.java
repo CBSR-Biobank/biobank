@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.BiobankCheckException;
+import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.model.Site;
@@ -22,8 +23,12 @@ public class ClinicWrapper extends ModelWrapper<Clinic> implements
     public ClinicWrapper(WritableApplicationService appService,
         Clinic wrappedObject) {
         super(appService, wrappedObject);
-        addressWrapper = new AddressWrapper(appService, wrappedObject
-            .getAddress());
+        Address address = wrappedObject.getAddress();
+        if (address == null) {
+            address = new Address();
+            wrappedObject.setAddress(address);
+        }
+        addressWrapper = new AddressWrapper(appService, address);
     }
 
     public AddressWrapper getAddressWrapper() {
@@ -112,11 +117,15 @@ public class ClinicWrapper extends ModelWrapper<Clinic> implements
     }
 
     public Collection<ContactWrapper> getContactCollection() {
-        Collection<ContactWrapper> collection = new HashSet<ContactWrapper>();
-        for (Contact contact : wrappedObject.getContactCollection()) {
-            collection.add(new ContactWrapper(appService, contact));
+        Collection<Contact> collection = wrappedObject.getContactCollection();
+        if (collection == null)
+            collection = new HashSet<Contact>();
+
+        Collection<ContactWrapper> wrapperCollection = new HashSet<ContactWrapper>();
+        for (Contact contact : collection) {
+            wrapperCollection.add(new ContactWrapper(appService, contact));
         }
-        return collection;
+        return wrapperCollection;
     }
 
     public List<Study> getStudyCollection() throws ApplicationException {

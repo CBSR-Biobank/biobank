@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.BiobankCheckException;
+import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerType;
@@ -24,8 +25,12 @@ public class SiteWrapper extends ModelWrapper<Site> implements
 
     public SiteWrapper(WritableApplicationService appService, Site wrappedObject) {
         super(appService, wrappedObject);
-        addressWrapper = new AddressWrapper(appService, wrappedObject
-            .getAddress());
+        Address address = wrappedObject.getAddress();
+        if (address == null) {
+            address = new Address();
+            wrappedObject.setAddress(address);
+        }
+        addressWrapper = new AddressWrapper(appService, address);
     }
 
     public AddressWrapper getAddressWrapper() {
