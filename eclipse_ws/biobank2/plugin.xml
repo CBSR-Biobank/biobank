@@ -432,8 +432,7 @@
             locationURI="menu:org.eclipse.ui.main.menu">
          <menu
                id="edu.ualberta.med.biobank.menu.biobank"
-               label="Server"
-               mnemonic="B">
+               label="Server">
             <command
                   commandId="edu.ualberta.med.biobank.commands.login"
                   id="edu.ualberta.med.biobank.menu.login"
@@ -458,8 +457,7 @@
          </menu>
          <menu
                id="edu.ualberta.med.biobank.menu.administration"
-               label="Administration"
-               mnemonic="A">
+               label="Administration">
                <command
                      commandId="edu.ualberta.med.biobank.commands.siteAdd"
                      id="edu.ualberta.med.biobank.menu.siteAdd"
@@ -504,9 +502,57 @@
                </visibleWhen>           
          </menu>
          <menu
+               id="edu.ualberta.med.biobank.menu.view"
+               label="View">
+            <command
+                  commandId="edu.ualberta.med.biobank.commands.mainAdmin"
+                  icon="icons/mainPerspective.png"
+                  label="Administration View"
+                  style="push">
+               <visibleWhen
+                     checkEnabled="false">
+                  <and>
+                     <not>
+                        <reference
+                              definitionId="biobank2.mainPerpectiveSelected">
+                        </reference>
+                     </not>
+                     <not>
+                        <reference
+                              definitionId="biobank2.sampleManagementPerspectiveSelected">
+                        </reference>
+                     </not>
+                  </and>
+               </visibleWhen>
+            </command>
+            <command
+               commandId="edu.ualberta.med.biobank.commands.patientAdmin"
+               icon="icons/patientPerspective.png"
+               label="Patients View"
+               style="push">
+               <visibleWhen
+                     checkEnabled="false">
+                  <reference
+                        definitionId="biobank2.mainPerpectiveSelected">
+                  </reference>
+               </visibleWhen>
+            </command>
+            <command
+               commandId="edu.ualberta.med.biobank.commands.reports"
+               icon="icons/reports.png"
+               label="Reports View"
+               style="push">
+               <visibleWhen
+                     checkEnabled="false">
+                  <reference
+                        definitionId="biobank2.mainPerpectiveSelected">
+                  </reference>
+               </visibleWhen>
+            </command>
+         </menu>
+         <menu
                id="edu.ualberta.med.biobank.menu.configuration"
-               label="Configuration"
-               mnemonic="C">
+               label="Configuration">
             <command
                   commandId="org.eclipse.ui.window.preferences"
                   id="edu.ualberta.med.biobank.menu.preferences"
@@ -559,37 +605,6 @@
                     </reference>
                </visibleWhen>
             </command>
-         </toolbar>
-         <toolbar
-               id="edu.ualberta.med.biobank.toolbar.mainPerpective">
-            <command
-               commandId="edu.ualberta.med.biobank.commands.patientAdmin"
-               icon="icons/patientPerspective.png"
-               label="Patients View"
-               style="push">
-               <visibleWhen
-                     checkEnabled="false">
-                  <reference
-                        definitionId="biobank2.mainPerpectiveSelected">
-                  </reference>
-               </visibleWhen>
-            </command>
-            <separator
-                  name="biobank2.separator1"
-                  visible="true">
-            </separator>
-            <command
-               commandId="edu.ualberta.med.biobank.commands.reports"
-               icon="icons/reports.png"
-               label="Reports View"
-               style="push">
-               <visibleWhen
-                     checkEnabled="false">
-                  <reference
-                        definitionId="biobank2.mainPerpectiveSelected">
-                  </reference>
-               </visibleWhen>
-            </command>
             <command
                   commandId="edu.ualberta.med.biobank.commands.studyAdd"
                   icon="icons/study.png"
@@ -637,6 +652,33 @@
                         definitionId="biobank2.mainPerpectiveSelected">
                   </reference>
                </visibleWhen>                  
+            </command>
+         </toolbar>
+         <toolbar
+               id="edu.ualberta.med.biobank.toolbar.mainPerpective">
+            <command
+               commandId="edu.ualberta.med.biobank.commands.patientAdmin"
+               icon="icons/patientPerspective.png"
+               label="Patients View"
+               style="push">
+               <visibleWhen
+                     checkEnabled="false">
+                  <reference
+                        definitionId="biobank2.mainPerpectiveSelected">
+                  </reference>
+               </visibleWhen>
+            </command>
+            <command
+               commandId="edu.ualberta.med.biobank.commands.reports"
+               icon="icons/reports.png"
+               label="Reports View"
+               style="push">
+               <visibleWhen
+                     checkEnabled="false">
+                  <reference
+                        definitionId="biobank2.mainPerpectiveSelected">
+                  </reference>
+               </visibleWhen>
             </command>
          </toolbar> 
          <toolbar
@@ -929,6 +971,18 @@
    </extension>
    <extension
          point="org.eclipse.ui.bindings">
+      <key commandId="edu.ualberta.med.biobank.commands.mainAdmin"
+           schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+           sequence="SHIFT+CTRL+A">
+      </key>
+      <key commandId="edu.ualberta.med.biobank.commands.patientAdmin"
+           schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+           sequence="SHIFT+CTRL+P">
+      </key>
+      <key commandId="edu.ualberta.med.biobank.commands.reports"
+           schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+           sequence="SHIFT+CTRL+R">
+      </key>
       <key commandId="edu.ualberta.med.biobank.commands.login"
            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
            sequence="CTRL+L">
