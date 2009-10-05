@@ -74,8 +74,8 @@ public class PatientViewForm extends BiobankViewForm {
     }
 
     private void setValues() {
-        FormUtils.setTextValue(siteLabel, patientWrapper.getStudy().getSite()
-            .getName());
+        FormUtils.setTextValue(siteLabel, patientWrapper.getStudy()
+            .getWrappedObject().getSite().getName());
     }
 
     @Override

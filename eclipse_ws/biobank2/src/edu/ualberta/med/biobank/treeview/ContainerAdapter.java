@@ -8,6 +8,7 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
@@ -88,16 +89,18 @@ public class ContainerAdapter extends AdapterBase {
             }
         });
 
-        mi = new MenuItem(menu, SWT.PUSH);
-        mi.setText("Move Container");
-        mi.addSelectionListener(new SelectionListener() {
-            public void widgetSelected(SelectionEvent event) {
-                moveAction();
-            }
+        if (!getContainer().getContainerType().getTopLevel()) {
+            mi = new MenuItem(menu, SWT.PUSH);
+            mi.setText("Move Container");
+            mi.addSelectionListener(new SelectionListener() {
+                public void widgetSelected(SelectionEvent event) {
+                    moveAction();
+                }
 
-            public void widgetDefaultSelected(SelectionEvent e) {
-            }
-        });
+                public void widgetDefaultSelected(SelectionEvent e) {
+                }
+            });
+        }
         mi = new MenuItem(menu, SWT.PUSH);
         mi.setText("Delete Container");
         mi.addSelectionListener(new SelectionListener() {
@@ -143,15 +146,45 @@ public class ContainerAdapter extends AdapterBase {
         return visitor.visit(this);
     }
 
+    private void moveAction() {
+        final ContainerAdapter oldParent = (ContainerAdapter) getParent();
+        final MoveContainerDialog mc = new MoveContainerDialog(PlatformUI
+            .getWorkbench().getActiveWorkbenchWindow().getShell(),
+            getContainer());
+        if (mc.open() == Dialog.OK) {
+            Display.getDefault().asyncExec(new Runnable() {
+                public void run() {
+                    try {
+                        setNewPositionFromLabel(mc.getNewLabel());
+
+                        // update new parent
+                        ContainerWrapper newParentContainer = getContainer()
+                            .getPosition().getParentContainer();
+                        ContainerAdapter parentAdapter = (ContainerAdapter) SessionManager
+                            .getInstance().getSession().accept(
+                                new NodeSearchVisitor(Container.class,
+                                    newParentContainer.getId()));
+                        parentAdapter.getContainer().reload();
+                        parentAdapter.performExpand();
+                        // update old parent
+                        oldParent.getContainer().reload();
+                        oldParent.removeAll();
+                        oldParent.performExpand();
+                    } catch (Exception e) {
+                        BioBankPlugin.openError(e.getMessage(), e);
+                    }
+                }
+            });
+        }
+    }
+
     /**
-     * if address exists if address is not full if type is valid for slot modify
-     * this object's position, label, children
+     * if address exists and if address is not full and if type is valid for
+     * slot: modify this object's position, label and the label of children
      */
     public void setNewPositionFromLabel(String newLabel) throws Exception {
         ContainerWrapper container = getContainer();
-        if (newLabel.length() < 4)
-            throw new Exception(
-                "Destination address must be another container (4 character minimum).");
+        String oldLabel = container.getLabel();
         String newParentContainerLabel = newLabel.substring(0, newLabel
             .length() - 2);
         List<ContainerWrapper> newParentContainers = container
@@ -162,53 +195,20 @@ public class ContainerAdapter extends AdapterBase {
                 "Unable to find suitable parent container with label "
                     + newParentContainerLabel + ".");
         } else {
-            int selectedParent = 0;
+            ContainerWrapper newParent = newParentContainers.get(0);
             if (newParentContainers.size() > 1) {
                 SelectParentContainerDialog dlg = new SelectParentContainerDialog(
                     PlatformUI.getWorkbench().getActiveWorkbenchWindow()
                         .getShell(), newParentContainers);
                 if (dlg.open() == Dialog.OK) {
-                    selectedParent = dlg.getSelectionIndex();
+                    newParent = dlg.getSelectedContainer();
                 } else
                     return;
             }
-            ContainerWrapper newParent = newParentContainers
-                .get(selectedParent);
             getContainer().setNewParent(newParent, newLabel);
         }
-    }
-
-    private void moveAction() {
-        if (getContainer().getContainerType().getTopLevel()) {
-            BioBankPlugin.openAsyncError("Move Error",
-                "You can't move a top container");
-            return;
-        }
-        ContainerAdapter oldParent = (ContainerAdapter) getParent();
-        MoveContainerDialog mc = new MoveContainerDialog(PlatformUI
-            .getWorkbench().getActiveWorkbenchWindow().getShell(),
-            getContainer().getWrappedObject());
-        if (mc.open() == Dialog.OK) {
-            setContainer(new ContainerWrapper(SessionManager.getAppService(),
-                mc.getContainer()));
-            try {
-                setNewPositionFromLabel(mc.getAddress());
-                // FIXME UPDATE TREE... difficult to know which adapter
-                // we need to update
-                oldParent.getContainer().reload();
-                oldParent.performDoubleClick();
-                ContainerWrapper newParentContainer = getContainer()
-                    .getPosition().getParentContainer();
-                ContainerAdapter parentAdapter = (ContainerAdapter) SessionManager
-                    .getInstance().getSession().accept(
-                        new NodeSearchVisitor(Container.class,
-                            newParentContainer.getId()));
-                parentAdapter.getContainer().reload();
-                parentAdapter.performDoubleClick();
-            } catch (Exception e) {
-                BioBankPlugin.openError(e.getMessage(), e);
-            }
-        }
+        BioBankPlugin.openInformation("Container moved", "The container "
+            + oldLabel + " has been moved to " + container.getLabel());
     }
 
 }

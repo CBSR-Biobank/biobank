@@ -133,10 +133,9 @@ public class PatientAdministrationView extends ViewPart implements
         getSite().getPage().closeAllEditors(true);
         String number = patientNumberText.getText();
         try {
-            PatientWrapper patientWrapper = PatientWrapper
-                .getPatientWrapperInSite(SessionManager.getAppService(),
-                    number, SessionManager.getInstance()
-                        .getCurrentSiteWrapper());
+            PatientWrapper patientWrapper = PatientWrapper.getPatientInSite(
+                SessionManager.getAppService(), number, SessionManager
+                    .getInstance().getCurrentSiteWrapper());
             if (patientWrapper == null) {
                 notFoundPatient(number);
             } else {
@@ -154,7 +153,7 @@ public class PatientAdministrationView extends ViewPart implements
             .getInstance().getCurrentSiteWrapper(), false);
         getRootNode().addChild(siteAdapter);
         StudyAdapter studyAdapter = new StudyAdapter(siteAdapter,
-            patientWrapper.getStudyWrapper(), false);
+            patientWrapper.getStudy(), false);
         siteAdapter.addChild(studyAdapter);
         PatientAdapter patientAdapter = new PatientAdapter(studyAdapter,
             patientWrapper);

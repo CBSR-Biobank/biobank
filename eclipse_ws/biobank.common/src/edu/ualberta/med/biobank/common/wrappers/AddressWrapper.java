@@ -68,16 +68,9 @@ public class AddressWrapper extends ModelWrapper<Address> {
     }
 
     @Override
-    protected void firePropertyChanges(Address oldWrappedObject,
-        Address newWrappedObject) {
-        String[] members = new String[] { "street1", "street2", "city",
-            "province", "postalCode" };
-
-        try {
-            firePropertyChanges(members, oldWrappedObject, newWrappedObject);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    protected String[] getPropertyChangesNames() {
+        return new String[] { "street1", "street2", "city", "province",
+            "postalCode" };
     }
 
     @Override

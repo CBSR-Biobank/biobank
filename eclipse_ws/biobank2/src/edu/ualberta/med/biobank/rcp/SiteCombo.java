@@ -2,11 +2,11 @@ package edu.ualberta.med.biobank.rcp;
 
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ComboViewer;
-import org.eclipse.jface.viewers.IElementComparer;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -74,29 +74,14 @@ public class SiteCombo extends WorkbenchWindowControlContribution {
                                 siteWrapper);
                         if (session != null)
                             session.rebuild();
-                        SessionManager.getInstance().getTreeViewer()
-                            .expandToLevel(3);
+                        TreeViewer tv = SessionManager.getInstance()
+                            .getTreeViewer();
+                        if (tv != null) {
+                            tv.expandToLevel(3);
+                        }
                     }
                 }
             });
-        comboViewer.setComparer(new IElementComparer() {
-            @Override
-            public boolean equals(Object a, Object b) {
-                if (a instanceof SiteWrapper && b instanceof SiteWrapper) {
-                    Integer ida = ((SiteWrapper) a).getId();
-                    Integer idb = ((SiteWrapper) b).getId();
-                    if (((ida == null) && (idb == null)) || ida.equals(idb))
-                        return true;
-                }
-                return false;
-            }
-
-            @Override
-            public int hashCode(Object element) {
-                return element.hashCode();
-            }
-
-        });
         comboViewer.setComparator(new ViewerComparator());
         GridData gd = new GridData();
         gd.widthHint = 155;

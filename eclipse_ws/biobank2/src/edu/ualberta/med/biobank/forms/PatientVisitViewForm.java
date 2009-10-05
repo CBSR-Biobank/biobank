@@ -13,8 +13,8 @@ import org.eclipse.swt.widgets.Label;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
+import edu.ualberta.med.biobank.common.wrappers.PvInfoDataWrapper;
 import edu.ualberta.med.biobank.model.PvInfo;
-import edu.ualberta.med.biobank.model.PvInfoData;
 import edu.ualberta.med.biobank.model.PvSampleSource;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.PatientVisitAdapter;
@@ -39,7 +39,7 @@ public class PatientVisitViewForm extends BiobankViewForm {
     // a patient visit.
     class CombinedPvInfo {
         PvInfo pvInfo;
-        PvInfoData pvInfoData;
+        PvInfoDataWrapper pvInfoData;
 
         public CombinedPvInfo() {
             pvInfo = null;
@@ -124,10 +124,10 @@ public class PatientVisitViewForm extends BiobankViewForm {
             combinedPvInfoMap.put(pvInfo.getId(), combinedPvInfo);
         }
 
-        Collection<PvInfoData> pvInfoDataCollection = patientVisitWrapper
+        Collection<PvInfoDataWrapper> pvInfoDataCollection = patientVisitWrapper
             .getPvInfoDataCollection();
         if (pvInfoDataCollection != null) {
-            for (PvInfoData pvInfoData : pvInfoDataCollection) {
+            for (PvInfoDataWrapper pvInfoData : pvInfoDataCollection) {
                 Integer key = pvInfoData.getPvInfo().getId();
                 CombinedPvInfo combinedPvInfo = (CombinedPvInfo) combinedPvInfoMap
                     .get(key);

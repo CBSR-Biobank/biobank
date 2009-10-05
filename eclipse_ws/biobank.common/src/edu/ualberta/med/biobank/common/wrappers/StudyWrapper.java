@@ -83,16 +83,9 @@ public class StudyWrapper extends ModelWrapper<Study> implements
     }
 
     @Override
-    protected void firePropertyChanges(Study oldWrappedObject,
-        Study newWrappedObject) {
-        String[] members = new String[] { "name", "nameShort",
-            "activityStatus", "comment", "site" };
-
-        try {
-            firePropertyChanges(members, oldWrappedObject, newWrappedObject);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    protected String[] getPropertyChangesNames() {
+        return new String[] { "name", "nameShort", "activityStatus", "comment",
+            "site" };
     }
 
     @Override

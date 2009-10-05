@@ -3,7 +3,7 @@ package edu.ualberta.med.biobank.wizard;
 import org.eclipse.jface.wizard.Wizard;
 
 import edu.ualberta.med.biobank.common.wrappers.ContainerPositionWrapper;
-import edu.ualberta.med.biobank.model.ContainerType;
+import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.model.Site;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
@@ -46,7 +46,7 @@ public class ContainerChooserWizard extends Wizard {
         return palletChooserPage.getSelectedPosition();
     }
 
-    public ContainerType getContainerType() {
+    public ContainerTypeWrapper getContainerType() {
         return palletChooserPage.getContainerType();
     }
 }

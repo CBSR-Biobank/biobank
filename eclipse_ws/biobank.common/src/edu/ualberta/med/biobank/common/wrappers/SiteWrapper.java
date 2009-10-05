@@ -74,15 +74,8 @@ public class SiteWrapper extends ModelWrapper<Site> implements
     }
 
     @Override
-    protected void firePropertyChanges(Site oldWrappedObject,
-        Site newWrappedObject) {
-        String[] members = new String[] { "name", "activityStatus", "comment" };
-
-        try {
-            firePropertyChanges(members, oldWrappedObject, newWrappedObject);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    protected String[] getPropertyChangesNames() {
+        return new String[] { "name", "activityStatus", "comment" };
     }
 
     @Override
@@ -126,8 +119,8 @@ public class SiteWrapper extends ModelWrapper<Site> implements
             .equals(wrapperName) ? 0 : -1));
     }
 
-    public Collection<StudyWrapper> getStudyWrapperCollection() {
-        Collection<StudyWrapper> collection = new HashSet<StudyWrapper>();
+    public List<StudyWrapper> getStudyWrapperCollection() {
+        List<StudyWrapper> collection = new ArrayList<StudyWrapper>();
         for (Study study : wrappedObject.getStudyCollection()) {
             collection.add(new StudyWrapper(appService, study));
         }

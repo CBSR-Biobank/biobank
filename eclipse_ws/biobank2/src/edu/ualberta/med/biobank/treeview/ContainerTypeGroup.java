@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.treeview;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
@@ -20,7 +19,6 @@ import edu.ualberta.med.biobank.forms.ContainerTypeEntryForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.ContainerType;
-import edu.ualberta.med.biobank.model.ContainerTypeComparator;
 import edu.ualberta.med.biobank.model.Site;
 
 public class ContainerTypeGroup extends AdapterBase {
@@ -67,7 +65,6 @@ public class ContainerTypeGroup extends AdapterBase {
 
             List<ContainerType> containerTypes = new ArrayList<ContainerType>(
                 currentSite.getContainerTypeCollection());
-            Collections.sort(containerTypes, new ContainerTypeComparator());
             SessionManager.getLogger().trace(
                 "updateStudies: Site " + currentSite.getName() + " has "
                     + containerTypes.size() + " studies");

@@ -82,7 +82,11 @@ public class CabinetDrawerWidget extends Canvas {
     }
 
     protected void paintDrawer(PaintEvent e) {
-        setSize(WIDTH, HEIGHT + LEGEND_HEIGHT);
+        int fullHeight = HEIGHT;
+        if (hasLegend) {
+            fullHeight += LEGEND_HEIGHT;
+        }
+        setSize(WIDTH, fullHeight);
         GC gc = e.gc;
         int currentX = 0;
         int rectYTotal = 0;
@@ -206,6 +210,15 @@ public class CabinetDrawerWidget extends Canvas {
         e.gc.fillRectangle(rectangle);
         e.gc.drawRectangle(rectangle);
         drawTextOnCenter(e.gc, text, rectangle);
+    }
+
+    @Override
+    public Point computeSize(int wHint, int hHint, boolean changed) {
+        int fullHeight = HEIGHT;
+        if (hasLegend) {
+            fullHeight += LEGEND_HEIGHT;
+        }
+        return new Point(CabinetDrawerWidget.WIDTH, fullHeight);
     }
 
 }

@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.BiobankCheckException;
-import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.SampleType;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -17,8 +16,8 @@ public class SampleTypeWrapper extends ModelWrapper<SampleType> {
     }
 
     @Override
-    protected void firePropertyChanges(SampleType oldWrappedObject,
-        SampleType newWrappedObject) {
+    protected String[] getPropertyChangesNames() {
+        return null;
 
     }
 
@@ -38,13 +37,12 @@ public class SampleTypeWrapper extends ModelWrapper<SampleType> {
     public static List<SampleType> getSampleTypeForContainerTypes(
         WritableApplicationService appService, SiteWrapper siteWrapper,
         String typeNameContains) throws ApplicationException {
-        List<ContainerType> types = ContainerTypeWrapper
+        List<ContainerTypeWrapper> types = ContainerTypeWrapper
             .getContainerTypesInSite(appService, siteWrapper, typeNameContains,
                 false);
         List<SampleType> sampleTypes = new ArrayList<SampleType>();
-        for (ContainerType type : types) {
-            sampleTypes.addAll(new ContainerTypeWrapper(appService, type)
-                .getSampleTypes(true));
+        for (ContainerTypeWrapper type : types) {
+            sampleTypes.addAll(type.getSampleTypes(true));
         }
         return sampleTypes;
     }

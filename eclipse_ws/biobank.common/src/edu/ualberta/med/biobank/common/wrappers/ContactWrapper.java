@@ -94,16 +94,9 @@ public class ContactWrapper extends ModelWrapper<Contact> {
     }
 
     @Override
-    protected void firePropertyChanges(Contact oldWrappedObject,
-        Contact newWrappedObject) {
-        String[] members = new String[] { "name", "title", "phoneNumber",
-            "faxNumber", "emailAddress", "clinic" };
-
-        try {
-            firePropertyChanges(members, oldWrappedObject, newWrappedObject);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    protected String[] getPropertyChangesNames() {
+        return new String[] { "name", "title", "phoneNumber", "faxNumber",
+            "emailAddress", "clinic" };
     }
 
     @Override

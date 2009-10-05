@@ -19,8 +19,8 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
-//FIXME todo by delphine
-public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
+public class ContainerTypeWrapper extends ModelWrapper<ContainerType> implements
+    Comparable<ContainerTypeWrapper> {
 
     public ContainerTypeWrapper(WritableApplicationService appService,
         ContainerType wrappedObject) {
@@ -28,13 +28,11 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
     }
 
     @Override
-    protected void firePropertyChanges(ContainerType oldWrappedObject,
-        ContainerType newWrappedObject) throws Exception {
-        String[] members = new String[] { "name", "comment", "nameShort",
-            "topLevel", "defaultTemperature", "activityStatus",
-            "sampleTypeCollection", "childContainerTypeCollection", "site",
-            "capacity", "childLabelingScheme" };
-        firePropertyChanges(members, oldWrappedObject, newWrappedObject);
+    protected String[] getPropertyChangesNames() {
+        return new String[] { "name", "comment", "nameShort", "topLevel",
+            "defaultTemperature", "activityStatus", "sampleTypeCollection",
+            "childContainerTypeCollection", "site", "capacity",
+            "childLabelingScheme" };
     }
 
     @Override
@@ -73,11 +71,10 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
         return ContainerType.class;
     }
 
-    public Collection<ContainerType> getAllChildren() {
-        List<ContainerType> allChildren = new ArrayList<ContainerType>();
-        for (ContainerType type : getChildContainerTypeCollection()) {
-            allChildren.addAll(new ContainerTypeWrapper(appService, type)
-                .getAllChildren());
+    public Collection<ContainerTypeWrapper> getAllChildren() {
+        List<ContainerTypeWrapper> allChildren = new ArrayList<ContainerTypeWrapper>();
+        for (ContainerTypeWrapper type : getChildContainerTypeCollection()) {
+            allChildren.addAll(type.getAllChildren());
             allChildren.add(type);
         }
         return allChildren;
@@ -87,35 +84,11 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
         List<SampleType> sampleTypes = new ArrayList<SampleType>();
         sampleTypes.addAll(getSampleTypeCollection());
         if (useChildrenRecursively) {
-            for (ContainerType type : getChildContainerTypeCollection()) {
-                sampleTypes.addAll(new ContainerTypeWrapper(appService, type)
-                    .getSampleTypes(useChildrenRecursively));
+            for (ContainerTypeWrapper type : getChildContainerTypeCollection()) {
+                sampleTypes.addAll(type.getSampleTypes(useChildrenRecursively));
             }
         }
         return sampleTypes;
-    }
-
-    /**
-     * Get containers types defined in a site. if useStrictName is true, then
-     * the container type name should be exactly containerName, otherwise, it
-     * will contains containerName.
-     */
-    public static List<ContainerType> getContainerTypesInSite(
-        WritableApplicationService appService, SiteWrapper siteWrapper,
-        String containerName, boolean useStrictName)
-        throws ApplicationException {
-        String nameComparison = "=";
-        String containerNameParameter = containerName;
-        if (!useStrictName) {
-            nameComparison = "like";
-            containerNameParameter = "%" + containerName + "%";
-        }
-        String query = "from " + ContainerType.class.getName()
-            + " where site = ? and name " + nameComparison + " ?";
-        HQLCriteria criteria = new HQLCriteria(query, Arrays
-            .asList(new Object[] { siteWrapper.getWrappedObject(),
-                containerNameParameter }));
-        return appService.query(criteria);
     }
 
     @Override
@@ -210,16 +183,42 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
     }
 
     public void setChildContainerTypeCollection(
-        Collection<ContainerType> containerTypes) {
+        Collection<ContainerType> containerTypes, boolean setNull) {
         Collection<ContainerType> oldContainerTypes = wrappedObject
             .getChildContainerTypeCollection();
         wrappedObject.setChildContainerTypeCollection(containerTypes);
         propertyChangeSupport.firePropertyChange(
             "childContainerTypeCollection", oldContainerTypes, containerTypes);
+        if (setNull) {
+            propertiesMap.put("childContainerTypeCollection", null);
+        }
     }
 
-    public Collection<ContainerType> getChildContainerTypeCollection() {
-        return wrappedObject.getChildContainerTypeCollection();
+    public void setChildContainerTypeCollection(
+        List<ContainerTypeWrapper> containerTypes) {
+        Collection<ContainerType> children = new HashSet<ContainerType>();
+        for (ContainerTypeWrapper pos : containerTypes) {
+            children.add(pos.getWrappedObject());
+        }
+        setChildContainerTypeCollection(children, false);
+        propertiesMap.put("childContainerTypeCollection", containerTypes);
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<ContainerTypeWrapper> getChildContainerTypeCollection() {
+        List<ContainerTypeWrapper> childContainerTypeCollection = (List<ContainerTypeWrapper>) propertiesMap
+            .get("childContainerTypeCollection");
+        if (childContainerTypeCollection == null) {
+            Collection<ContainerType> children = wrappedObject
+                .getChildContainerTypeCollection();
+            if (children != null) {
+                childContainerTypeCollection = transformToWrapperList(
+                    appService, children);
+                propertiesMap.put("childContainerTypeCollection",
+                    childContainerTypeCollection);
+            }
+        }
+        return childContainerTypeCollection;
     }
 
     public void setSite(Site site) {
@@ -228,8 +227,12 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
         propertyChangeSupport.firePropertyChange("site", oldSite, site);
     }
 
-    public Site getSite() {
-        return wrappedObject.getSite();
+    public SiteWrapper getSite() {
+        Site site = wrappedObject.getSite();
+        if (site == null) {
+            return null;
+        }
+        return new SiteWrapper(appService, site);
     }
 
     public void setCapacity(Capacity capacity) {
@@ -243,6 +246,10 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
         return wrappedObject.getCapacity();
     }
 
+    public void setChildLabelingScheme(ContainerLabelingSchemeWrapper scheme) {
+        setChildLabelingScheme(scheme.getWrappedObject());
+    }
+
     public void setChildLabelingScheme(ContainerLabelingScheme scheme) {
         ContainerLabelingScheme oldLbl = wrappedObject.getChildLabelingScheme();
         wrappedObject.setChildLabelingScheme(scheme);
@@ -250,8 +257,12 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
             scheme);
     }
 
-    public ContainerLabelingScheme getChildLabelingScheme() {
-        return wrappedObject.getChildLabelingScheme();
+    public ContainerLabelingSchemeWrapper getChildLabelingScheme() {
+        ContainerLabelingScheme scheme = wrappedObject.getChildLabelingScheme();
+        if (scheme == null) {
+            return null;
+        }
+        return new ContainerLabelingSchemeWrapper(appService, scheme);
     }
 
     public void setSampleTypes(List<Integer> sampleTypesIds,
@@ -273,12 +284,12 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
     }
 
     public void setChildContainerTypes(List<Integer> containerTypesIds,
-        List<ContainerType> allContainerTypes) throws BiobankCheckException,
-        ApplicationException {
-        Collection<ContainerType> selContainerTypes = new HashSet<ContainerType>();
+        List<ContainerTypeWrapper> allContainerTypes)
+        throws BiobankCheckException, ApplicationException {
+        List<ContainerTypeWrapper> selContainerTypes = new ArrayList<ContainerTypeWrapper>();
         if (containerTypesIds != null) {
             if (allContainerTypes != null) {
-                for (ContainerType containerType : allContainerTypes) {
+                for (ContainerTypeWrapper containerType : allContainerTypes) {
                     int id = containerType.getId();
                     if (containerTypesIds.indexOf(id) >= 0) {
                         selContainerTypes.add(containerType);
@@ -286,10 +297,10 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
                 }
             }
         }
-        Collection<ContainerType> children = getChildContainerTypeCollection();
+        List<ContainerTypeWrapper> children = getChildContainerTypeCollection();
         List<Integer> missing = new ArrayList<Integer>();
         if (children != null) {
-            for (ContainerType child : children) {
+            for (ContainerTypeWrapper child : children) {
                 int id = child.getId();
                 if (containerTypesIds.indexOf(id) < 0) {
                     missing.add(id);
@@ -373,13 +384,56 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
         }
     }
 
-    public static Collection<ContainerType> getTopContainerTypesInSite(
+    public static List<ContainerTypeWrapper> getTopContainerTypesInSite(
         WritableApplicationService appService, SiteWrapper site)
         throws ApplicationException {
         HQLCriteria criteria = new HQLCriteria("from "
             + ContainerType.class.getName()
-            + " where site = ? and topLevel=true", Arrays
-            .asList(new Object[] { site.getWrappedObject() }));
-        return appService.query(criteria);
+            + " where site.id = ? and topLevel=true", Arrays
+            .asList(new Object[] { site.getId() }));
+        List<ContainerType> types = appService.query(criteria);
+        return transformToWrapperList(appService, types);
+    }
+
+    public static List<ContainerTypeWrapper> transformToWrapperList(
+        WritableApplicationService appService,
+        Collection<ContainerType> containerTypes) {
+        List<ContainerTypeWrapper> list = new ArrayList<ContainerTypeWrapper>();
+        for (ContainerType type : containerTypes) {
+            list.add(new ContainerTypeWrapper(appService, type));
+        }
+        return list;
+    }
+
+    /**
+     * Get containers types defined in a site. if useStrictName is true, then
+     * the container type name should be exactly containerName, otherwise, it
+     * will contains containerName.
+     */
+    public static List<ContainerTypeWrapper> getContainerTypesInSite(
+        WritableApplicationService appService, SiteWrapper siteWrapper,
+        String containerName, boolean useStrictName)
+        throws ApplicationException {
+        String nameComparison = "=";
+        String containerNameParameter = containerName;
+        if (!useStrictName) {
+            nameComparison = "like";
+            containerNameParameter = "%" + containerName + "%";
+        }
+        String query = "from " + ContainerType.class.getName()
+            + " where site = ? and name " + nameComparison + " ?";
+        HQLCriteria criteria = new HQLCriteria(query, Arrays
+            .asList(new Object[] { siteWrapper.getWrappedObject(),
+                containerNameParameter }));
+        List<ContainerType> containerTypes = appService.query(criteria);
+        return transformToWrapperList(appService, containerTypes);
+    }
+
+    @Override
+    public int compareTo(ContainerTypeWrapper type) {
+        String c1Name = getName();
+        String c2Name = type.getName();
+        return ((c1Name.compareTo(c2Name) > 0) ? 1 : (c1Name.equals(c2Name) ? 0
+            : -1));
     }
 }

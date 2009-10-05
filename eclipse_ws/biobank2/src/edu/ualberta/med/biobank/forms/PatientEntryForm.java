@@ -1,6 +1,6 @@
 package edu.ualberta.med.biobank.forms;
 
-import java.util.Collection;
+import java.util.List;
 
 import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.runtime.Assert;
@@ -17,7 +17,6 @@ import org.eclipse.swt.widgets.Text;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
-import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.PatientAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
 import edu.ualberta.med.biobank.views.PatientAdministrationView;
@@ -81,24 +80,14 @@ public class PatientEntryForm extends BiobankEntryForm {
         siteWrapper = SessionManager.getInstance().getCurrentSiteWrapper();
         labelSite.setText(siteWrapper.getName());
 
-        Collection<StudyWrapper> studies = siteWrapper
-            .getStudyWrapperCollection();
-        Study selectedStudy = null;
+        List<StudyWrapper> studies = siteWrapper.getStudyWrapperCollection();
+        StudyWrapper selectedStudy = null;
         if (patientAdapter.getWrapper().isNew()) {
             if (studies.size() == 1) {
-                selectedStudy = studies.iterator().next().getWrappedObject();
+                selectedStudy = studies.get(0);
             }
         } else {
-            Study currentStudy = patientAdapter.getWrapper().getStudy();
-            if (currentStudy != null) {
-                for (StudyWrapper studyWrapper : studies) {
-                    if (currentStudy.getId().equals(studyWrapper.getId())) {
-                        currentStudy = studyWrapper.getWrappedObject();
-                        break;
-                    }
-                }
-                selectedStudy = currentStudy;
-            }
+            selectedStudy = patientAdapter.getWrapper().getStudy();
         }
 
         studiesViewer = createCComboViewerWithNoSelectionValidator(client,
@@ -120,7 +109,7 @@ public class PatientEntryForm extends BiobankEntryForm {
 
     @Override
     protected void saveForm() throws Exception {
-        Study study = (Study) ((IStructuredSelection) studiesViewer
+        StudyWrapper study = (StudyWrapper) ((IStructuredSelection) studiesViewer
             .getSelection()).getFirstElement();
         patientAdapter.getWrapper().setStudy(study);
         patientAdapter.getWrapper().persist();

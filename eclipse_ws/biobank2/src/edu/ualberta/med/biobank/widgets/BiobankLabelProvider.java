@@ -9,14 +9,16 @@ import org.springframework.util.Assert;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.ClinicStudyInfo;
 import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.model.Container;
-import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.PatientVisit;
@@ -263,15 +265,16 @@ public class BiobankLabelProvider extends LabelProvider implements
 
     @Override
     public String getText(Object element) {
-        if (element instanceof ContainerType) {
-            return ((ContainerType) element).getName();
-        } else if (element instanceof Study) {
-            Study study = (Study) element;
+        if (element instanceof ContainerTypeWrapper) {
+            return ((ContainerTypeWrapper) element).getName();
+        }
+        if (element instanceof StudyWrapper) {
+            StudyWrapper study = (StudyWrapper) element;
             return study.getNameShort() + " - " + study.getName();
         } else if (element instanceof Clinic) {
             return ((Clinic) element).getName();
-        } else if (element instanceof ContainerLabelingScheme) {
-            return ((ContainerLabelingScheme) element).getName();
+        } else if (element instanceof ContainerLabelingSchemeWrapper) {
+            return ((ContainerLabelingSchemeWrapper) element).getName();
         } else if (element instanceof Site) {
             return ((Site) element).getName();
         } else if (element instanceof SampleType) {
@@ -279,7 +282,10 @@ public class BiobankLabelProvider extends LabelProvider implements
         } else if (element instanceof SiteWrapper) {
             return ((SiteWrapper) element).getName();
         }
-        return ((AdapterBase) element).getName();
+        if (element instanceof AdapterBase) {
+            return ((AdapterBase) element).getName();
+        }
+        return "wrong element";
     }
 
     @Override

@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.forms;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -47,8 +46,6 @@ import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
 import edu.ualberta.med.biobank.forms.listener.EnterKeyToNextFieldListener;
-import edu.ualberta.med.biobank.model.Patient;
-import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.Sample;
 import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.preferences.PreferenceConstants;
@@ -63,7 +60,7 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
 
     public static final String ID = "edu.ualberta.med.biobank.forms.CabinetLinkAssignEntryForm";
 
-    private Patient currentPatient;
+    private PatientWrapper currentPatient;
 
     private Label cabinetLabel;
     private Label drawerLabel;
@@ -151,8 +148,6 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
         drawerWidget = new CabinetDrawerWidget(client);
         toolkit.adapt(drawerWidget);
         GridData gdBin = new GridData();
-        gdBin.widthHint = CabinetDrawerWidget.WIDTH;
-        gdBin.heightHint = CabinetDrawerWidget.HEIGHT;
         gdBin.verticalSpan = 2;
         drawerWidget.setLayoutData(gdBin);
 
@@ -263,9 +258,8 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
         viewerVisits.setLabelProvider(new LabelProvider() {
             @Override
             public String getText(Object element) {
-                PatientVisit pv = (PatientVisit) element;
-                return BioBankPlugin.getDateTimeFormatter().format(
-                    pv.getDateDrawn());
+                PatientVisitWrapper pv = (PatientVisitWrapper) element;
+                return pv.getFormattedDateDrawn();
             }
         });
         comboVisits.addKeyListener(new KeyAdapter() {
@@ -279,12 +273,10 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
         comboVisits.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                PatientVisit pv = getSelectedPatientVisit();
-                sampleWrapper.setPatientVisit(pv);
-                appendLog("Visit selected "
-                    + new PatientVisitWrapper(appService, pv)
-                        .getFormattedDateProcessed() + " - "
-                    + pv.getClinic().getName());
+                PatientVisitWrapper pv = getSelectedPatientVisit();
+                sampleWrapper.setPatientVisit(pv.getWrappedObject());
+                appendLog("Visit selected " + pv.getFormattedDateProcessed()
+                    + " - " + pv.getClinic().getName());
             }
         });
     }
@@ -301,7 +293,7 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
             appendLog("-----");
             appendLog("Found patient with number " + currentPatient.getNumber());
             // show visits list
-            Collection<PatientVisit> collection = currentPatient
+            List<PatientVisitWrapper> collection = currentPatient
                 .getPatientVisitCollection();
             viewerVisits.setInput(collection);
             comboVisits.select(0);
@@ -431,19 +423,20 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
     @Override
     protected void saveForm() throws Exception {
         sampleWrapper.setLinkDate(new Date());
-        sampleWrapper.setPatientVisit(getSelectedPatientVisit());
+        sampleWrapper.setPatientVisit(getSelectedPatientVisit()
+            .getWrappedObject());
         sampleWrapper.setQuantityFromType();
         sampleWrapper.persist();
         setSaved(true);
     }
 
-    private PatientVisit getSelectedPatientVisit() {
+    private PatientVisitWrapper getSelectedPatientVisit() {
         if (viewerVisits.getSelection() != null
             && viewerVisits.getSelection() instanceof IStructuredSelection) {
             IStructuredSelection selection = (IStructuredSelection) viewerVisits
                 .getSelection();
             if (selection.size() == 1)
-                return (PatientVisit) selection.getFirstElement();
+                return (PatientVisitWrapper) selection.getFirstElement();
         }
         return null;
     }

@@ -17,7 +17,6 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
-import edu.ualberta.med.biobank.common.wrappers.AddressWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
@@ -75,6 +74,7 @@ public class SiteViewForm extends AddressViewFormCommon {
 
         siteAdapter = (SiteAdapter) adapter;
         siteWrapper = siteAdapter.getWrapper();
+        addressWrapper = siteWrapper.getAddressWrapper();
         retrieveSite();
         setPartName("Repository Site " + siteWrapper.getName());
     }
@@ -144,7 +144,6 @@ public class SiteViewForm extends AddressViewFormCommon {
 
         containerTypesTable.addDoubleClickListener(FormUtils
             .getBiobankCollectionDoubleClickListener());
-
     }
 
     private void createContainerSection() {
@@ -219,12 +218,10 @@ public class SiteViewForm extends AddressViewFormCommon {
     private void retrieveSite() {
         try {
             siteWrapper.reload();
-            addressWrapper = new AddressWrapper(siteAdapter.getAppService(),
-                siteWrapper.getWrappedObject().getAddress());
-            siteWrapper.setAddressWrapper(addressWrapper);
-            siteAdapter.setSite(siteWrapper.getWrappedObject());
+            addressWrapper.setWrappedObject(siteWrapper.getAddressWrapper()
+                .getWrappedObject());
         } catch (Exception e) {
-            e.printStackTrace();
+            BioBankPlugin.openAsyncError("Can't reload site", e);
         }
     }
 
