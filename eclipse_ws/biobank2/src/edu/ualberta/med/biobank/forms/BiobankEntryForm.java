@@ -392,12 +392,12 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
     protected void handleStatusChanged(IStatus status) {
         if (status.getSeverity() == IStatus.OK) {
             setFormHeaderErrorMessage(getOkMessage(), IMessageProvider.NONE);
-            if (confirmButton != null)
+            if ((confirmButton != null) && !confirmButton.isDisposed())
                 confirmButton.setEnabled(true);
         } else {
             setFormHeaderErrorMessage(status.getMessage(),
                 IMessageProvider.ERROR);
-            if (confirmButton != null) {
+            if ((confirmButton != null) && !confirmButton.isDisposed()) {
                 confirmButton.setEnabled(false);
             }
         }

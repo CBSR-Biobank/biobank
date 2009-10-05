@@ -414,6 +414,8 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
             }
         });
 
+        firstControl = patientNumberText;
+
         patientNumberText.addKeyListener(EnterKeyToNextFieldListener.INSTANCE);
         patientNumberText.addFocusListener(new FocusAdapter() {
             @Override

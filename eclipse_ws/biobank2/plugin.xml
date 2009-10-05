@@ -565,7 +565,7 @@
             <command
                commandId="edu.ualberta.med.biobank.commands.patientAdmin"
                icon="icons/patientPerspective.png"
-               label="Patients Administration"
+               label="Patients View"
                style="push">
                <visibleWhen
                      checkEnabled="false">
@@ -581,7 +581,7 @@
             <command
                commandId="edu.ualberta.med.biobank.commands.reports"
                icon="icons/reports.png"
-               label="Reports"
+               label="Reports View"
                style="push">
                <visibleWhen
                      checkEnabled="false">
@@ -644,7 +644,7 @@
             <command
                   commandId="edu.ualberta.med.biobank.commands.mainAdmin"
                   icon="icons/mainPerspective.png"
-                  label="Main Administration"
+                  label="Administration View"
                   style="push">
                <visibleWhen
                      checkEnabled="false">
