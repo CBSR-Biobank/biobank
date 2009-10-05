@@ -114,25 +114,29 @@ public class ClinicWrapper extends ModelWrapper<Clinic> implements
     }
 
     public Collection<ContactWrapper> getContactCollection() {
-        Collection<Contact> collection = wrappedObject.getContactCollection();
-        if (collection == null)
-            collection = new HashSet<Contact>();
-
         Collection<ContactWrapper> wrapperCollection = new HashSet<ContactWrapper>();
-        for (Contact contact : collection) {
-            wrapperCollection.add(new ContactWrapper(appService, contact));
-        }
+        Collection<Contact> collection = wrappedObject.getContactCollection();
+        if (collection != null)
+            for (Contact contact : collection) {
+                wrapperCollection.add(new ContactWrapper(appService, contact));
+            }
         return wrapperCollection;
     }
 
-    public List<Study> getStudyCollection() throws ApplicationException {
+    public Collection<StudyWrapper> getStudyWrapperCollection()
+        throws ApplicationException {
         HQLCriteria c = new HQLCriteria("select distinct studies from "
             + Contact.class.getName() + " as contacts"
             + " inner join contacts.studyCollection as studies"
             + " where contacts.clinic = ?", Arrays
             .asList(new Object[] { wrappedObject }));
 
-        return appService.query(c);
+        Collection<StudyWrapper> wrapperCollection = new HashSet<StudyWrapper>();
+        List<Study> collection = appService.query(c);
+        for (Study study : collection) {
+            wrapperCollection.add(new StudyWrapper(appService, study));
+        }
+        return wrapperCollection;
     }
 
     @Override

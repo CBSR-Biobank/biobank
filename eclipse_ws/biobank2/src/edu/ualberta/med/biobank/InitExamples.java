@@ -142,18 +142,24 @@ public class InitExamples {
             public void done(final IJobChangeEvent event) {
                 Display.getDefault().asyncExec(new Runnable() {
                     public void run() {
-                        SessionManager.getInstance().updateSites();
-                        SessionManager.getInstance().getSession()
-                            .performExpand();
-                        if (event.getResult().isOK()) {
-                            if ((Boolean) event.getJob().getProperty(
-                                IProgressConstants.PROPERTY_IN_DIALOG))
-                                return;
-                            BioBankPlugin.openMessage("Init Examples",
-                                "successfully added all init examples");
-                        } else
-                            BioBankPlugin.openError("Init Examples",
-                                "Error encounted when adding init examples");
+                        try {
+                            SessionManager.getInstance().updateSites();
+                            SessionManager.getInstance().getSession()
+                                .performExpand();
+                            if (event.getResult().isOK()) {
+                                if ((Boolean) event.getJob().getProperty(
+                                    IProgressConstants.PROPERTY_IN_DIALOG))
+                                    return;
+                                BioBankPlugin.openMessage("Init Examples",
+                                    "successfully added all init examples");
+                            } else
+                                BioBankPlugin
+                                    .openError("Init Examples",
+                                        "Error encounted when adding init examples");
+                        } catch (Exception e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        }
                     }
                 });
             }

@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.treeview;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -16,9 +17,8 @@ import org.springframework.remoting.RemoteAccessException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.utils.ModelUtils;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
-import edu.ualberta.med.biobank.model.Site;
-import edu.ualberta.med.biobank.model.SiteComparator;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
@@ -101,18 +101,17 @@ public class SessionAdapter extends AdapterBase {
     public void loadChildren(boolean updateNode) {
         try {
             // read from database again
-            Site siteSearch = new Site();
-            List<Site> result = appService.search(Site.class, siteSearch);
-            Collections.sort(result, new SiteComparator());
+            Integer siteId = null;
             SiteWrapper currentSite = SessionManager.getInstance()
                 .getCurrentSiteWrapper();
-            for (Site site : result) {
-                if ((currentSite != null)
-                    && !site.getName().equals(currentSite.getName()))
-                    continue;
+            if (currentSite != null)
+                siteId = currentSite.getId();
 
-                SiteWrapper siteWrapper = new SiteWrapper(getAppService(), site);
+            List<SiteWrapper> siteCollection = new ArrayList<SiteWrapper>(
+                ModelUtils.getSites(appService, siteId));
+            Collections.sort(siteCollection);
 
+            for (SiteWrapper siteWrapper : siteCollection) {
                 SiteAdapter node = (SiteAdapter) getChild(siteWrapper.getId());
                 if (node == null) {
                     node = new SiteAdapter(this, siteWrapper);

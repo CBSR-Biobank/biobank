@@ -120,20 +120,24 @@ public class SiteWrapper extends ModelWrapper<Site> implements
             .equals(wrapperName) ? 0 : -1));
     }
 
-    public List<StudyWrapper> getStudyWrapperCollection() {
-        List<StudyWrapper> collection = new ArrayList<StudyWrapper>();
-        for (Study study : wrappedObject.getStudyCollection()) {
-            collection.add(new StudyWrapper(appService, study));
-        }
-        return collection;
+    public Collection<StudyWrapper> getStudyWrapperCollection() {
+        Collection<StudyWrapper> wrapperCollection = new HashSet<StudyWrapper>();
+        Collection<Study> collection = wrappedObject.getStudyCollection();
+        if (collection != null)
+            for (Study study : collection) {
+                wrapperCollection.add(new StudyWrapper(appService, study));
+            }
+        return wrapperCollection;
     }
 
     public Collection<ClinicWrapper> getClinicWrapperCollection() {
-        Collection<ClinicWrapper> collection = new HashSet<ClinicWrapper>();
-        for (Clinic clinic : wrappedObject.getClinicCollection()) {
-            collection.add(new ClinicWrapper(appService, clinic));
-        }
-        return collection;
+        Collection<ClinicWrapper> wrapperCollection = new HashSet<ClinicWrapper>();
+        Collection<Clinic> collection = wrappedObject.getClinicCollection();
+        if (collection != null)
+            for (Clinic clinic : collection) {
+                wrapperCollection.add(new ClinicWrapper(appService, clinic));
+            }
+        return wrapperCollection;
     }
 
     @SuppressWarnings("unchecked")

@@ -31,7 +31,8 @@ import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.utils.ModelUtils;
+import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PvInfoDataWrapper;
@@ -156,7 +157,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         return patientWrapper;
     }
 
-    private void createMainSection(StudyWrapper study) throws Exception {
+    private void createMainSection(StudyWrapper study) {
         Composite client = toolkit.createComposite(form.getBody());
         GridLayout layout = new GridLayout(2, false);
         layout.horizontalSpacing = 10;
@@ -172,15 +173,16 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
 
         if (patientVisitWrapper.getId() == null) {
             // choose clinic for new visit
-            Collection<Clinic> clinics = ModelUtils.getStudyClinicCollection(
-                appService, study.getWrappedObject());
-            Clinic selectedClinic = null;
+            Collection<ContactWrapper> contacts = study
+                .getContactWrapperCollection();
+            ClinicWrapper selectedClinic = null;
 
-            if (clinics.size() == 1) {
-                selectedClinic = clinics.iterator().next();
+            if (contacts.size() == 1) {
+                selectedClinic = contacts.iterator().next().getClinicWrapper();
             }
             if (patientVisitWrapper.getClinic() != null) {
-                for (Clinic clinic : clinics) {
+                for (ContactWrapper contact : contacts) {
+                    ClinicWrapper clinic = contact.getClinicWrapper();
                     if (clinic.getId().equals(
                         patientVisitWrapper.getClinic().getId())) {
                         selectedClinic = clinic;
@@ -190,7 +192,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
             }
 
             clinicsComboViewer = createCComboViewerWithNoSelectionValidator(
-                client, "Clinic", clinics, selectedClinic,
+                client, "Clinic", contacts, selectedClinic,
                 "A clinic should be selected");
         } else {
             Label clinicLabel = (Label) createWidget(client, Label.class,
