@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.forms;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.databinding.beans.BeansObservables;
@@ -80,7 +81,8 @@ public class PatientEntryForm extends BiobankEntryForm {
         siteWrapper = SessionManager.getInstance().getCurrentSiteWrapper();
         labelSite.setText(siteWrapper.getName());
 
-        List<StudyWrapper> studies = siteWrapper.getStudyWrapperCollection();
+        List<StudyWrapper> studies = new ArrayList<StudyWrapper>(siteWrapper
+            .getStudyWrapperCollection());
         StudyWrapper selectedStudy = null;
         if (patientAdapter.getWrapper().isNew()) {
             if (studies.size() == 1) {

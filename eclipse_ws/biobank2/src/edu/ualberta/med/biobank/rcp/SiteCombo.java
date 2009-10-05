@@ -1,5 +1,7 @@
 package edu.ualberta.med.biobank.rcp;
 
+import java.util.List;
+
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -25,7 +27,8 @@ import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 public class SiteCombo extends WorkbenchWindowControlContribution {
 
     private SessionAdapter session;
-    public ComboViewer comboViewer;
+
+    private ComboViewer comboViewer;
 
     public SiteCombo() {
         super("Site Selection");
@@ -38,7 +41,10 @@ public class SiteCombo extends WorkbenchWindowControlContribution {
 
     public void setSession(SessionAdapter session) {
         this.session = session;
+    }
 
+    public void setInput(List<SiteWrapper> sites) {
+        comboViewer.setInput(sites);
     }
 
     @Override
@@ -66,19 +72,20 @@ public class SiteCombo extends WorkbenchWindowControlContribution {
                     SiteWrapper siteWrapper = (SiteWrapper) selection
                         .getFirstElement();
 
-                    if (siteWrapper != null) {
-                        if (siteWrapper.getId() == null)
-                            SessionManager.getInstance().setCurrentSite(null);
-                        else
-                            SessionManager.getInstance().setCurrentSite(
-                                siteWrapper);
-                        if (session != null)
-                            session.rebuild();
-                        TreeViewer tv = SessionManager.getInstance()
-                            .getTreeViewer();
-                        if (tv != null) {
-                            tv.expandToLevel(3);
-                        }
+                    if (siteWrapper == null)
+                        return;
+
+                    if (siteWrapper.getId() == null)
+                        SessionManager.getInstance().setCurrentSite(null);
+                    else
+                        SessionManager.getInstance()
+                            .setCurrentSite(siteWrapper);
+                    if (session != null)
+                        session.rebuild();
+                    TreeViewer tv = SessionManager.getInstance()
+                        .getTreeViewer();
+                    if (tv != null) {
+                        tv.expandToLevel(3);
                     }
                 }
             });

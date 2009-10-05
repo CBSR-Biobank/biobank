@@ -16,13 +16,11 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.utils.ModelUtils;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.forms.ClinicEntryForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Clinic;
-import edu.ualberta.med.biobank.model.ClinicComparator;
-import edu.ualberta.med.biobank.model.Site;
 
 public class ClinicGroup extends AdapterBase {
 
@@ -63,24 +61,22 @@ public class ClinicGroup extends AdapterBase {
 
     @Override
     public void loadChildren(boolean updateNode) {
-        Site currentSite = ((SiteAdapter) getParent()).getSite();
+        SiteWrapper currentSite = ((SiteAdapter) getParent()).getWrapper();
         Assert.isNotNull(currentSite, "null site");
 
         try {
             // read from database again
-            currentSite = ModelUtils.getObjectWithId(getAppService(),
-                Site.class, currentSite.getId());
-            ((SiteAdapter) getParent()).setSite(currentSite);
+            currentSite.reload();
+            ((SiteAdapter) getParent()).setSite(currentSite.getWrappedObject());
 
-            List<Clinic> clinics = new ArrayList<Clinic>(currentSite
-                .getClinicCollection());
-            Collections.sort(clinics, new ClinicComparator());
-            for (Clinic clinic : clinics) {
+            List<ClinicWrapper> clinics = new ArrayList<ClinicWrapper>(
+                currentSite.getClinicWrapperCollection());
+            Collections.sort(clinics);
+            for (ClinicWrapper clinic : clinics) {
                 ClinicAdapter node = (ClinicAdapter) getChild(clinic.getId());
 
                 if (node == null) {
-                    node = new ClinicAdapter(this, new ClinicWrapper(
-                        getAppService(), clinic));
+                    node = new ClinicAdapter(this, clinic);
                     addChild(node);
                 }
                 if (updateNode) {

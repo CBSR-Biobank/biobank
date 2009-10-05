@@ -119,36 +119,46 @@ public class SiteWrapper extends ModelWrapper<Site> implements
             .equals(wrapperName) ? 0 : -1));
     }
 
-    public List<StudyWrapper> getStudyWrapperCollection() {
-        List<StudyWrapper> collection = new ArrayList<StudyWrapper>();
-        for (Study study : wrappedObject.getStudyCollection()) {
-            collection.add(new StudyWrapper(appService, study));
-        }
-        return collection;
+    public Collection<StudyWrapper> getStudyWrapperCollection() {
+        Collection<StudyWrapper> wrapperCollection = new HashSet<StudyWrapper>();
+        Collection<Study> collection = wrappedObject.getStudyCollection();
+        if (collection != null)
+            for (Study study : collection) {
+                wrapperCollection.add(new StudyWrapper(appService, study));
+            }
+        return wrapperCollection;
     }
 
     public Collection<ClinicWrapper> getClinicWrapperCollection() {
-        Collection<ClinicWrapper> collection = new HashSet<ClinicWrapper>();
-        for (Clinic clinic : wrappedObject.getClinicCollection()) {
-            collection.add(new ClinicWrapper(appService, clinic));
-        }
-        return collection;
+        Collection<ClinicWrapper> wrapperCollection = new HashSet<ClinicWrapper>();
+        Collection<Clinic> collection = wrappedObject.getClinicCollection();
+        if (collection != null)
+            for (Clinic clinic : collection) {
+                wrapperCollection.add(new ClinicWrapper(appService, clinic));
+            }
+        return wrapperCollection;
     }
 
     public Collection<ContainerTypeWrapper> getContainerTypeWrapperCollection() {
-        Collection<ContainerTypeWrapper> collection = new HashSet<ContainerTypeWrapper>();
-        for (ContainerType ct : wrappedObject.getContainerTypeCollection()) {
-            collection.add(new ContainerTypeWrapper(appService, ct));
-        }
-        return collection;
+        Collection<ContainerTypeWrapper> wrapperCollection = new HashSet<ContainerTypeWrapper>();
+        Collection<ContainerType> collection = wrappedObject
+            .getContainerTypeCollection();
+        if (collection != null)
+            for (ContainerType ct : collection) {
+                wrapperCollection.add(new ContainerTypeWrapper(appService, ct));
+            }
+        return wrapperCollection;
     }
 
     public Collection<ContainerWrapper> getContainerWrapperCollection() {
-        Collection<ContainerWrapper> collection = new HashSet<ContainerWrapper>();
-        for (Container c : wrappedObject.getContainerCollection()) {
-            collection.add(new ContainerWrapper(appService, c));
-        }
-        return collection;
+        Collection<ContainerWrapper> wrapperCollection = new HashSet<ContainerWrapper>();
+        Collection<Container> collection = wrappedObject
+            .getContainerCollection();
+        if (collection != null)
+            for (Container c : collection) {
+                wrapperCollection.add(new ContainerWrapper(appService, c));
+            }
+        return wrapperCollection;
     }
 
     public Collection<ContainerWrapper> getTopContainerWrapperCollection()

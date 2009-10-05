@@ -1,10 +1,11 @@
 package edu.ualberta.med.biobank.model;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 
 public class ClinicStudyInfo {
 
-    public Study study;
+    public StudyWrapper studyWrapper;
 
     public String studyShortName;
 
@@ -13,7 +14,8 @@ public class ClinicStudyInfo {
     public Long patientVisits;
 
     public void performDoubleClick() {
-        SessionManager.getInstance().openViewForm(Study.class, study.getId());
+        SessionManager.getInstance().openViewForm(Study.class,
+            studyWrapper.getId());
     }
 
 }

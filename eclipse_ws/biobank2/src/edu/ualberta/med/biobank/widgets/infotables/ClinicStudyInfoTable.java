@@ -12,6 +12,7 @@ import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
+import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.ClinicStudyInfo;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.Study;
@@ -19,7 +20,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
-public class ClinicStudyInfoTable extends InfoTableWidget<Study> {
+public class ClinicStudyInfoTable extends InfoTableWidget<StudyWrapper> {
 
     private static final String[] HEADINGS = new String[] { "Study",
         "No. Patients", "No. Patient Visits" };
@@ -37,7 +38,8 @@ public class ClinicStudyInfoTable extends InfoTableWidget<Study> {
         super(parent, null, HEADINGS, BOUNDS);
         this.appService = appService;
         this.clinicWrapper = clinicWrapper;
-        Collection<Study> collection = clinicWrapper.getStudyCollection();
+        Collection<StudyWrapper> collection = clinicWrapper
+            .getStudyWrapperCollection();
         for (int i = 0, n = collection.size(); i < n; ++i) {
             model.add(new BiobankCollectionModel());
         }
@@ -46,7 +48,8 @@ public class ClinicStudyInfoTable extends InfoTableWidget<Study> {
     }
 
     @Override
-    public void setCollection(final Collection<Study> collection) {
+    public void setCollection(final Collection<StudyWrapper> collection) {
+        Assert.isNotNull(collection, "collection is null");
         Thread t = new Thread() {
             @Override
             public void run() {
@@ -68,14 +71,14 @@ public class ClinicStudyInfoTable extends InfoTableWidget<Study> {
                         });
                     }
 
-                    for (Study study : collection) {
+                    for (StudyWrapper study : collection) {
                         if (getTableViewer().getTable().isDisposed()) {
                             return;
                         }
                         final BiobankCollectionModel item = model.get(count);
                         ClinicStudyInfo info = new ClinicStudyInfo();
                         item.o = info;
-                        info.study = study;
+                        info.studyWrapper = study;
                         info.studyShortName = study.getNameShort();
 
                         HQLCriteria c = new HQLCriteria(

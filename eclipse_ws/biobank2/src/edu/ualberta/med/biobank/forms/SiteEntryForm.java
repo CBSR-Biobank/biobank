@@ -109,6 +109,7 @@ public class SiteEntryForm extends AddressEntryFormCommon {
         }
         addressWrapper.persist();
         siteWrapper.persist();
+        SessionManager.getInstance().updateSites();
     }
 
     @Override
