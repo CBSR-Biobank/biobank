@@ -1,14 +1,18 @@
 package edu.ualberta.med.biobank.forms;
 
+import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.ToolBar;
+import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.forms.widgets.Section;
 
@@ -31,6 +35,9 @@ import edu.ualberta.med.biobank.widgets.infotables.StudyInfoTable;
 public class SiteViewForm extends AddressViewFormCommon {
     public static final String ID = "edu.ualberta.med.biobank.forms.SiteViewForm";
 
+    private static final Logger logger = Logger.getLogger(SiteViewForm.class
+        .getName());
+
     private SiteAdapter siteAdapter;
 
     private SiteWrapper siteWrapper;
@@ -43,6 +50,21 @@ public class SiteViewForm extends AddressViewFormCommon {
     private Label activityStatusLabel;
 
     private Label commentLabel;
+
+    private SelectionListener addStudySelectionListener = new SelectionAdapter() {
+        @Override
+        public void widgetSelected(SelectionEvent e) {
+            try {
+                AdapterBase studiesNode = siteAdapter.getStudiesGroupNode();
+                StudyAdapter studyAdapter = new StudyAdapter(studiesNode,
+                    new StudyWrapper(siteAdapter.getAppService(), new Study()));
+                getSite().getPage().openEditor(new FormInput(studyAdapter),
+                    StudyEntryForm.ID, true);
+            } catch (PartInitException exp) {
+                exp.printStackTrace();
+            }
+        }
+    };
 
     @Override
     public void init() {
@@ -60,7 +82,7 @@ public class SiteViewForm extends AddressViewFormCommon {
     @Override
     protected void createFormContent() {
         form.setText("Repository Site: " + siteWrapper.getName());
-        addRefreshToolbarAction();
+        addToolbarButtons();
 
         form.getBody().setLayout(new GridLayout(1, false));
         form.getBody().setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -95,7 +117,16 @@ public class SiteViewForm extends AddressViewFormCommon {
     }
 
     private void createStudySection() {
-        Composite client = createSectionWithClient("Studies");
+        Section section = createSection("Studies");
+        Composite client = sectionAddClient(section);
+
+        ToolBar tbar = new ToolBar(section, SWT.FLAT | SWT.HORIZONTAL);
+        ToolItem titem = new ToolItem(tbar, SWT.NULL);
+        titem.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
+            BioBankPlugin.IMG_ADD));
+        titem.setToolTipText("Add Study");
+        titem.addSelectionListener(addStudySelectionListener);
+        section.setTextClient(tbar);
 
         studiesTable = new StudyInfoTable(client, siteWrapper
             .getStudyWrapperCollection());
@@ -116,16 +147,20 @@ public class SiteViewForm extends AddressViewFormCommon {
     }
 
     private void createContainerSection() {
-        Section section = createSection("Containers");
+        Section section = createSection("Top Level Containers");
 
-        sContainersTable = new ContainerInfoTable(section, siteWrapper
-            .getContainerWrapperCollection());
-        section.setClient(sContainersTable);
-        sContainersTable.adaptToToolkit(toolkit, true);
-        toolkit.paintBordersFor(sContainersTable);
+        try {
+            sContainersTable = new ContainerInfoTable(section, siteAdapter
+                .getWrapper().getTopContainerWrapperCollectionSorted());
+            section.setClient(sContainersTable);
+            sContainersTable.adaptToToolkit(toolkit, true);
+            toolkit.paintBordersFor(sContainersTable);
 
-        sContainersTable.addDoubleClickListener(FormUtils
-            .getBiobankCollectionDoubleClickListener());
+            sContainersTable.addDoubleClickListener(FormUtils
+                .getBiobankCollectionDoubleClickListener());
+        } catch (Exception e) {
+            logger.error("Problem while queriyng top level containers", e);
+        }
     }
 
     private void createButtons() {
@@ -133,25 +168,9 @@ public class SiteViewForm extends AddressViewFormCommon {
         client.setLayout(new GridLayout(4, false));
         toolkit.paintBordersFor(client);
 
-        initEditButton(client, siteAdapter);
-
         final Button study = toolkit
             .createButton(client, "Add Study", SWT.PUSH);
-        study.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                try {
-                    AdapterBase studiesNode = siteAdapter.getStudiesGroupNode();
-                    StudyAdapter studyAdapter = new StudyAdapter(studiesNode,
-                        new StudyWrapper(siteAdapter.getAppService(),
-                            new Study()));
-                    getSite().getPage().openEditor(new FormInput(studyAdapter),
-                        StudyEntryForm.ID, true);
-                } catch (PartInitException exp) {
-                    exp.printStackTrace();
-                }
-            }
-        });
+        study.addSelectionListener(addStudySelectionListener);
 
         final Button clinic = toolkit.createButton(client, "Add Clinic",
             SWT.PUSH);

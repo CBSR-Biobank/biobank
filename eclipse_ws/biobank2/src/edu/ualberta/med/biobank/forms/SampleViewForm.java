@@ -47,7 +47,7 @@ public class SampleViewForm extends BiobankViewForm {
     @Override
     protected void createFormContent() {
         form.setText("Sample: " + sample.getInventoryId());
-        addRefreshToolbarAction();
+        addToolbarButtons();
         GridLayout layout = new GridLayout(1, false);
         form.getBody().setLayout(layout);
         form.getBody().setLayoutData(new GridData(GridData.FILL_HORIZONTAL));

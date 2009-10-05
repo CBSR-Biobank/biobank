@@ -113,6 +113,7 @@ public abstract class BiobankFormBase extends EditorPart {
         mform = new ManagedForm(parent);
         toolkit = mform.getToolkit();
         form = mform.getForm();
+        toolkit.decorateFormHeading(form.getForm());
 
         // start a new runnable so that database objects are populated in a
         // separate thread.
@@ -153,15 +154,16 @@ public abstract class BiobankFormBase extends EditorPart {
         return section;
     }
 
-    protected Composite createSectionWithClient(String title) {
-        Section section = createSection(title);
-        Composite client;
-        client = toolkit.createComposite(section);
+    protected Composite sectionAddClient(Section section) {
+        Composite client = toolkit.createComposite(section);
         section.setClient(client);
-
         client.setLayout(new GridLayout(2, false));
         toolkit.paintBordersFor(client);
         return client;
+    }
+
+    protected Composite createSectionWithClient(String title) {
+        return sectionAddClient(createSection(title));
     }
 
     protected Control createWidget(Composite parent, Class<?> widgetClass,

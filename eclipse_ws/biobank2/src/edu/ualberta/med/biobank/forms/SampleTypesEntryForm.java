@@ -63,7 +63,6 @@ public class SampleTypesEntryForm extends BiobankEntryForm {
         form.getBody().setLayout(new GridLayout(1, false));
         createSiteSampleTypeSection();
         createGlobalSampleTypeSection();
-        initCancelConfirmWidget(form.getBody());
     }
 
     @Override
@@ -159,6 +158,7 @@ public class SampleTypesEntryForm extends BiobankEntryForm {
         siteSampleWidget.adaptToToolkit(toolkit, true);
         siteSampleWidget.addSelectionChangedListener(listener);
         toolkit.paintBordersFor(siteSampleWidget);
+        firstControl = siteSampleWidget;
     }
 
     private void createGlobalSampleTypeSection() {

@@ -18,6 +18,7 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.utils.ModelUtils;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerCell;
 import edu.ualberta.med.biobank.model.ContainerStatus;
@@ -51,9 +52,11 @@ public class TopContainerChooserPage extends AbstractContainerChooserPage {
             }
         });
         try {
-            comboViewer.setInput(ContainerWrapper.getTopContainersForSite(
-                getAppService(), getSite().getId()));
-        } catch (ApplicationException e) {
+            SiteWrapper siteWrapper = new SiteWrapper(getAppService(),
+                getSite());
+            comboViewer.setInput(siteWrapper
+                .getTopContainerWrapperCollectionSorted());
+        } catch (Exception e) {
             BioBankPlugin.openError("Error",
                 "Error retrieving containers informations from database");
         }

@@ -142,8 +142,6 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         createContainerTypeSection();
         createDimensionsSection();
         createContainsSection();
-
-        initCancelConfirmWidget(form.getBody());
     }
 
     protected void createContainerTypeSection() throws Exception {
@@ -157,8 +155,8 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         Label siteLabel = (Label) createWidget(client, Label.class, SWT.NONE,
             "Site");
         FormUtils.setTextValue(siteLabel, containerType.getSite().getName());
-        createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Name", null,
-            BeansObservables.observeValue(containerType, "name"),
+        firstControl = createBoundWidgetWithLabel(client, Text.class, SWT.NONE,
+            "Name", null, BeansObservables.observeValue(containerType, "name"),
             NonEmptyString.class, MSG_NO_CONTAINER_TYPE_NAME);
 
         createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Short Name",
@@ -361,5 +359,10 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
     @Override
     public String getNextOpenedFormID() {
         return ContainerTypeViewForm.ID;
+    }
+
+    @Override
+    public void setFocus() {
+        firstControl.setFocus();
     }
 }

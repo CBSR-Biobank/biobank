@@ -69,7 +69,7 @@ public class ContainerTypeViewForm extends BiobankViewForm {
     @Override
     protected void createFormContent() {
         form.setText("Container Type: " + containerType.getName());
-        addRefreshToolbarAction();
+        addToolbarButtons();
         form.getBody().setLayout(new GridLayout(1, false));
         createContainerTypeSection();
         if (containerType.getChildContainerTypeCollection().size() > 0) {
@@ -225,8 +225,6 @@ public class ContainerTypeViewForm extends BiobankViewForm {
         Composite client = toolkit.createComposite(form.getBody());
         client.setLayout(new GridLayout(4, false));
         toolkit.paintBordersFor(client);
-
-        initEditButton(client, containerTypeAdapter);
     }
 
     @Override

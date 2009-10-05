@@ -144,7 +144,6 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         patientWrapper = retrievePatient();
         createMainSection(patientWrapper.getStudy());
         createSourcesSection();
-        initCancelConfirmWidget(form.getBody());
         if (patientVisitWrapper.isNew()) {
             setDirty(true);
         }
@@ -204,6 +203,8 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         dateDrawn = createDateTimeWidget(client, "Date Drawn",
             patientVisitWrapper.getDateDrawn(), false,
             "Date drawn should be set");
+
+        firstControl = dateDrawn;
 
         Date processedDate = patientVisitWrapper.getDateProcessed();
         if (processedDate == null) {
@@ -574,5 +575,10 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
     @Override
     public String getNextOpenedFormID() {
         return PatientVisitViewForm.ID;
+    }
+
+    @Override
+    public void setFocus() {
+        firstControl.setFocus();
     }
 }

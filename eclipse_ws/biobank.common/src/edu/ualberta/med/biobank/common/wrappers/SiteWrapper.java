@@ -3,10 +3,12 @@ package edu.ualberta.med.biobank.common.wrappers;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.BiobankCheckException;
+import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerType;
@@ -23,12 +25,20 @@ public class SiteWrapper extends ModelWrapper<Site> implements
 
     public SiteWrapper(WritableApplicationService appService, Site wrappedObject) {
         super(appService, wrappedObject);
-        addressWrapper = new AddressWrapper(appService, wrappedObject
-            .getAddress());
+        Address address = wrappedObject.getAddress();
+        if (address == null) {
+            address = new Address();
+            wrappedObject.setAddress(address);
+        }
+        addressWrapper = new AddressWrapper(appService, address);
     }
 
     public AddressWrapper getAddressWrapper() {
         return addressWrapper;
+    }
+
+    public void setAddressWrapper(AddressWrapper addressWrapper) {
+        this.addressWrapper = addressWrapper;
     }
 
     public String getName() {
@@ -58,15 +68,14 @@ public class SiteWrapper extends ModelWrapper<Site> implements
 
     public void setComment(String comment) {
         String oldComment = getComment();
-        wrappedObject.setName(comment);
+        wrappedObject.setComment(comment);
         propertyChangeSupport
             .firePropertyChange("comment", oldComment, comment);
     }
 
     @Override
     protected String[] getPropertyChangesNames() {
-        return new String[] { "name", "activityStatus", "comment", "site" };
-
+        return new String[] { "name", "activityStatus", "comment" };
     }
 
     @Override
@@ -78,8 +87,16 @@ public class SiteWrapper extends ModelWrapper<Site> implements
     }
 
     private boolean checkSiteNameUnique() throws ApplicationException {
-        HQLCriteria c = new HQLCriteria("from " + Site.class.getName()
-            + " where name = ?", Arrays.asList(new Object[] { getName() }));
+        HQLCriteria c;
+
+        if (getWrappedObject().getId() == null) {
+            c = new HQLCriteria("from " + Site.class.getName()
+                + " where name = ?", Arrays.asList(new Object[] { getName() }));
+        } else {
+            c = new HQLCriteria("from " + Site.class.getName()
+                + " as site where site <> ? and name = ?", Arrays
+                .asList(new Object[] { getWrappedObject(), getName() }));
+        }
 
         List<Object> results = appService.query(c);
         return (results.size() == 0);
@@ -132,6 +149,29 @@ public class SiteWrapper extends ModelWrapper<Site> implements
             collection.add(new ContainerWrapper(appService, c));
         }
         return collection;
+    }
+
+    public Collection<ContainerWrapper> getTopContainerWrapperCollection()
+        throws Exception {
+        HQLCriteria criteria = new HQLCriteria("from "
+            + Container.class.getName()
+            + " where site.id = ? and position is null", Arrays
+            .asList(new Object[] { wrappedObject.getId() }));
+        List<Container> containers = appService.query(criteria);
+
+        Collection<ContainerWrapper> wrappers = new HashSet<ContainerWrapper>();
+        for (Container c : containers) {
+            wrappers.add(new ContainerWrapper(appService, c));
+        }
+        return wrappers;
+    }
+
+    public List<ContainerWrapper> getTopContainerWrapperCollectionSorted()
+        throws Exception {
+        List<ContainerWrapper> result = new ArrayList<ContainerWrapper>(
+            getTopContainerWrapperCollection());
+        Collections.sort(result);
+        return result;
     }
 
 }

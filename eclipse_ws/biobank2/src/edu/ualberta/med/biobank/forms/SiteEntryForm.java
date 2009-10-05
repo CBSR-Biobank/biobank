@@ -35,6 +35,13 @@ public class SiteEntryForm extends AddressEntryFormCommon {
 
         siteAdapter = (SiteAdapter) adapter;
         siteWrapper = siteAdapter.getWrapper();
+        try {
+            siteWrapper.reload();
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        addressWrapper = siteWrapper.getAddressWrapper();
 
         String tabName;
         if (siteWrapper.getId() == null) {
@@ -48,11 +55,9 @@ public class SiteEntryForm extends AddressEntryFormCommon {
     @Override
     protected void createFormContent() {
         form.setText("Repository Site Information");
-        addressWrapper = siteWrapper.getAddressWrapper();
         form.getBody().setLayout(new GridLayout(1, false));
         createSiteSection();
         createAddressArea();
-        createButtonsSection();
 
         // When adding help uncomment line below
         // PlatformUI.getWorkbench().getHelpSystem().setHelp(composite,
@@ -73,8 +78,8 @@ public class SiteEntryForm extends AddressEntryFormCommon {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Name", null,
-            BeansObservables.observeValue(siteWrapper, "name"),
+        firstControl = createBoundWidgetWithLabel(client, Text.class, SWT.NONE,
+            "Name", null, BeansObservables.observeValue(siteWrapper, "name"),
             NonEmptyString.class, MSG_NO_SITE_NAME);
 
         createBoundWidgetWithLabel(client, Combo.class, SWT.NONE,
@@ -87,17 +92,6 @@ public class SiteEntryForm extends AddressEntryFormCommon {
         GridData gd = new GridData(GridData.FILL_HORIZONTAL);
         gd.heightHint = 40;
         comment.setLayoutData(gd);
-    }
-
-    private void createButtonsSection() {
-        Composite client = toolkit.createComposite(form.getBody());
-        GridLayout layout = new GridLayout();
-        layout.horizontalSpacing = 10;
-        layout.numColumns = 2;
-        client.setLayout(layout);
-        toolkit.paintBordersFor(client);
-
-        initCancelConfirmWidget(client);
     }
 
     @Override
@@ -113,12 +107,13 @@ public class SiteEntryForm extends AddressEntryFormCommon {
         if (siteAdapter.getParent() == null) {
             siteAdapter.setParent(SessionManager.getInstance().getSession());
         }
+        addressWrapper.persist();
         siteWrapper.persist();
     }
 
     @Override
     public void setFocus() {
-        form.setFocus();
+        firstControl.setFocus();
     }
 
     @Override

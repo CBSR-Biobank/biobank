@@ -79,15 +79,15 @@ public class ContainerGroup extends AdapterBase {
             // read from database again
             parentSite = ModelUtils.getObjectWithId(getAppService(),
                 Site.class, parentSite.getId());
-            ((SiteAdapter) getParent()).setSite(parentSite);
+            SiteAdapter siteAdapter = (SiteAdapter) getParent();
+            siteAdapter.setSite(parentSite);
 
-            List<ContainerWrapper> containers = ContainerWrapper
-                .getTopContainersForSite(getAppService(), parentSite.getId());
-            for (ContainerWrapper container : containers) {
-                ContainerAdapter node = (ContainerAdapter) getChild(container
+            for (ContainerWrapper containerWrapper : siteAdapter.getWrapper()
+                .getTopContainerWrapperCollectionSorted()) {
+                ContainerAdapter node = (ContainerAdapter) getChild(containerWrapper
                     .getId());
                 if (node == null) {
-                    node = new ContainerAdapter(this, container);
+                    node = new ContainerAdapter(this, containerWrapper);
                     addChild(node);
                 }
                 if (updateNode) {

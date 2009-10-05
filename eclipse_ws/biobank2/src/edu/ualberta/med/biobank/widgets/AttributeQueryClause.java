@@ -68,11 +68,13 @@ public class AttributeQueryClause extends AbstractQueryClause {
         buttons.setLayout(buttonLayout);
 
         andButton = new Button(buttons, SWT.NONE);
-        andButton.setImage(BioBankPlugin.getImage("icons/add.png"));
+        andButton.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
+            BioBankPlugin.IMG_ADD));
         andButton.addSelectionListener(addListener);
 
         deleteButton = new Button(buttons, SWT.NONE);
-        deleteButton.setImage(BioBankPlugin.getImage("icons/delete.png"));
+        deleteButton.setImage(BioBankPlugin.getDefault().getImageRegistry()
+            .get(BioBankPlugin.IMG_DELETE));
         deleteButton.addSelectionListener(deleteListener);
 
     }

@@ -21,6 +21,7 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.action.ControlContribution;
 import org.eclipse.jface.databinding.swt.SWTObservables;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.viewers.ArrayContentProvider;
@@ -49,15 +50,18 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.ISaveablePart;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
 import org.springframework.remoting.RemoteAccessException;
 import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.BiobankCheckException;
+import edu.ualberta.med.biobank.forms.input.FormInput;
+import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.validators.AbstractValidator;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
-import edu.ualberta.med.biobank.widgets.CancelConfirmWidget;
 
 /**
  * Base class for data entry forms.
@@ -74,9 +78,12 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
 
     protected IStatus currentStatus;
 
+    // The widget that is to get the focus when the form is created
+    protected Control firstControl;
+
     protected DataBindingContext dbc;
 
-    private CancelConfirmWidget cancelConfirmWidget;
+    protected Button confirmButton;
 
     protected KeyListener keyListener = new KeyListener() {
         @Override
@@ -107,6 +114,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
 
     public BiobankEntryForm() {
         super();
+        firstControl = null;
         dbc = new DataBindingContext();
     }
 
@@ -162,6 +170,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
     @Override
     public void createPartControl(Composite parent) {
         super.createPartControl(parent);
+        addToolbarButtons();
         bindChangeListener();
     }
 
@@ -169,16 +178,8 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
 
     @Override
     public void setFocus() {
-        form.setFocus();
-    }
-
-    protected void initCancelConfirmWidget(Composite parent) {
-        initConfirmButton(parent, false);
-    }
-
-    protected void initConfirmButton(Composite parent, boolean showtextField) {
-        cancelConfirmWidget = new CancelConfirmWidget(parent, this,
-            showtextField);
+        Assert.isNotNull(firstControl, "first control widget is not set");
+        firstControl.setFocus();
     }
 
     public void resetForm() throws Exception {
@@ -391,14 +392,13 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
     protected void handleStatusChanged(IStatus status) {
         if (status.getSeverity() == IStatus.OK) {
             setFormHeaderErrorMessage(getOkMessage(), IMessageProvider.NONE);
-            if (cancelConfirmWidget != null) {
-                cancelConfirmWidget.setConfirmEnabled(true);
-            }
+            if (confirmButton != null)
+                confirmButton.setEnabled(true);
         } else {
             setFormHeaderErrorMessage(status.getMessage(),
                 IMessageProvider.ERROR);
-            if (cancelConfirmWidget != null) {
-                cancelConfirmWidget.setConfirmEnabled(false);
+            if (confirmButton != null) {
+                confirmButton.setEnabled(false);
             }
         }
     }
@@ -441,6 +441,88 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
 
         });
         dbc.bindValue(writableValue, observableValue, uvs, uvs);
+    }
+
+    protected void addToolbarButtons() {
+        ControlContribution cancel = new ControlContribution("Cancel") {
+            @Override
+            protected Control createControl(Composite parent) {
+                confirmButton = new Button(parent, SWT.PUSH);
+                confirmButton.setText("Cancel");
+                confirmButton.addSelectionListener(new SelectionAdapter() {
+                    @Override
+                    public void widgetSelected(SelectionEvent e) {
+                        cancel();
+                    }
+                });
+                return confirmButton;
+            }
+        };
+        form.getToolBarManager().add(cancel);
+
+        ControlContribution confirm = new ControlContribution("Confirm") {
+            @Override
+            protected Control createControl(Composite parent) {
+                confirmButton = new Button(parent, SWT.PUSH);
+                confirmButton.setText("Confirm");
+                confirmButton.addKeyListener(new KeyListener() {
+                    @Override
+                    public void keyPressed(KeyEvent e) {
+                        if (e.keyCode == 13) {
+                            String text = ((Text) e.widget).getText();
+                            if (BioBankPlugin.getDefault().isConfirmBarcode(
+                                text)
+                                && confirmButton.isEnabled()) {
+                                setDirty(false);
+                                doSaveInternal();
+                            } else if (BioBankPlugin.getDefault()
+                                .isCancelBarcode(text)) {
+                                cancel();
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void keyReleased(KeyEvent e) {
+                    }
+                });
+                confirmButton.addSelectionListener(new SelectionAdapter() {
+                    @Override
+                    public void widgetSelected(SelectionEvent e) {
+                        confirm();
+                    }
+                });
+                return confirmButton;
+            }
+        };
+        form.getToolBarManager().add(confirm);
+        form.updateToolBar();
+    }
+
+    private void confirm() {
+        try {
+            PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+                .getActivePage().saveEditor(this, false);
+            if (!isDirty()) {
+                PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+                    .getActivePage().closeEditor(this, true);
+                if (getNextOpenedFormID() != null) {
+                    AdapterBase.openForm(new FormInput(getAdapter()),
+                        getNextOpenedFormID());
+                }
+            }
+        } catch (Exception e) {
+            SessionManager.getLogger().error("Can't save the form", e);
+        }
+    }
+
+    private void cancel() {
+        try {
+            PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+                .getActivePage().closeEditor(this, false);
+        } catch (Exception e) {
+            SessionManager.getLogger().error("Can't close the form", e);
+        }
     }
 
     /**

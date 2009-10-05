@@ -105,8 +105,8 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
             "Site");
         FormUtils.setTextValue(siteLabel, clinicWrapper.getSite().getName());
 
-        createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Name", null,
-            PojoObservables.observeValue(clinicWrapper, "name"),
+        firstControl = createBoundWidgetWithLabel(client, Text.class, SWT.NONE,
+            "Name", null, PojoObservables.observeValue(clinicWrapper, "name"),
             NonEmptyString.class, MSG_NO_CLINIC_NAME);
 
         createBoundWidgetWithLabel(client, Combo.class, SWT.NONE,
@@ -140,13 +140,11 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
         client.setLayout(layout);
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
-
-        initCancelConfirmWidget(client);
     }
 
     @Override
     public void setFocus() {
-        form.setFocus();
+        firstControl.setFocus();
     }
 
     @Override
@@ -155,6 +153,7 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
             .getParentFromClass(SiteAdapter.class);
         clinicWrapper.setSiteWrapper(siteAdapter.getWrapper());
         saveContacts();
+        addressWrapper.persist();
         clinicWrapper.persist();
     }
 

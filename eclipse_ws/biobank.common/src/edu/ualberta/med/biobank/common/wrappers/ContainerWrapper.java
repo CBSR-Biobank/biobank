@@ -528,14 +528,6 @@ public class ContainerWrapper extends ModelWrapper<Container> implements
         return transformToWrapperList(appService, containers);
     }
 
-    @Override
-    public int compareTo(ContainerWrapper o) {
-        String c1Name = getLabel();
-        String c2Name = o.getLabel();
-        return ((c1Name.compareTo(c2Name) > 0) ? 1 : (c1Name.equals(c2Name) ? 0
-            : -1));
-    }
-
     /**
      * get the containers with label label, with site site and container type
      * type
@@ -621,6 +613,14 @@ public class ContainerWrapper extends ModelWrapper<Container> implements
             .asList(new Object[] { siteId }));
         List<Container> containers = appService.query(criteria);
         return transformToWrapperList(appService, containers);
+    }
+
+    @Override
+    public int compareTo(ContainerWrapper o) {
+        String c1Name = getLabel();
+        String c2Name = o.getLabel();
+        return ((c1Name.compareTo(c2Name) > 0) ? 1 : (c1Name.equals(c2Name) ? 0
+            : -1));
     }
 
     public static List<ContainerWrapper> transformToWrapperList(
