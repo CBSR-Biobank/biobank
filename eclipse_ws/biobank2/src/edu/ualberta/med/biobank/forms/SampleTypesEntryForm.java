@@ -158,6 +158,7 @@ public class SampleTypesEntryForm extends BiobankEntryForm {
         siteSampleWidget.adaptToToolkit(toolkit, true);
         siteSampleWidget.addSelectionChangedListener(listener);
         toolkit.paintBordersFor(siteSampleWidget);
+        firstControl = siteSampleWidget;
     }
 
     private void createGlobalSampleTypeSection() {

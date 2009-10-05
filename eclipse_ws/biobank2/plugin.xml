@@ -432,7 +432,7 @@
             locationURI="menu:org.eclipse.ui.main.menu">
          <menu
                id="edu.ualberta.med.biobank.menu.biobank"
-               label="BioBank"
+               label="Server"
                mnemonic="B">
             <command
                   commandId="edu.ualberta.med.biobank.commands.login"
@@ -460,26 +460,22 @@
                id="edu.ualberta.med.biobank.menu.administration"
                label="Administration"
                mnemonic="A">
-            <menu
-                  id="edu.ualberta.med.biobank.menu.session"
-                  label="Session"
-                  mnemonic="i">
                <command
                      commandId="edu.ualberta.med.biobank.commands.siteAdd"
                      id="edu.ualberta.med.biobank.menu.siteAdd"
-                     label="Add Site"
-                     style="push">
-               </command>
-               <command
-                     commandId="edu.ualberta.med.biobank.commands.studyAdd"
-                     id="edu.ualberta.med.biobank.menu.studyAdd"
-                     label="Add Study"
+                     label="Add Repository Site"
                      style="push">
                </command>
                <command
                      commandId="edu.ualberta.med.biobank.commands.clinicAdd"
                      id="edu.ualberta.med.biobank.menu.clinicAdd"
                      label="Add Clinic"
+                     style="push">
+               </command>
+               <command
+                     commandId="edu.ualberta.med.biobank.commands.studyAdd"
+                     id="edu.ualberta.med.biobank.menu.studyAdd"
+                     label="Add Study"
                      style="push">
                </command>
                <command
@@ -505,9 +501,7 @@
                   <reference
                         definitionId="biobank2.mainPerpectiveSelected">
                   </reference>
-               </visibleWhen>
-            </menu>
-           
+               </visibleWhen>           
          </menu>
          <menu
                id="edu.ualberta.med.biobank.menu.configuration"
@@ -935,10 +929,26 @@
    </extension>
    <extension
          point="org.eclipse.ui.bindings">
-      <scheme
-            id="org.eclipse.ui.examples.contributions.scheme"
-            name="%scheme.info.name">
-      </scheme>
+      <key commandId="edu.ualberta.med.biobank.commands.login"
+           schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+           sequence="CTRL+L">
+      </key>
+      <key commandId="edu.ualberta.med.biobank.commands.logout"
+           schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+           sequence="CTRL+SHIFT+L">
+      </key>
+      <key commandId="edu.ualberta.med.biobank.commands.siteAdd"
+           schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+           sequence="ALT+R">
+      </key>
+      <key commandId="edu.ualberta.med.biobank.commands.clinicAdd"
+           schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+           sequence="ALT+C">
+      </key>
+      <key commandId="edu.ualberta.med.biobank.commands.studyAdd"
+           schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+           sequence="ALT+S">
+      </key>
    </extension>
     <extension
          point="org.eclipse.ui.preferencePages">
