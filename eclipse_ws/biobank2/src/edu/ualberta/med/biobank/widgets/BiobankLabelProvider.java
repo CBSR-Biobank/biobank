@@ -14,6 +14,7 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.ClinicStudyInfo;
 import edu.ualberta.med.biobank.model.Contact;
@@ -250,8 +251,8 @@ public class BiobankLabelProvider extends LabelProvider implements
         if (element instanceof ContainerTypeWrapper) {
             return ((ContainerTypeWrapper) element).getName();
         }
-        if (element instanceof Study) {
-            Study study = (Study) element;
+        if (element instanceof StudyWrapper) {
+            StudyWrapper study = (StudyWrapper) element;
             return study.getNameShort() + " - " + study.getName();
         } else if (element instanceof Clinic) {
             return ((Clinic) element).getName();

@@ -7,6 +7,7 @@ import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -73,8 +74,11 @@ public class SiteCombo extends ControlContribution {
                                 siteWrapper);
                         if (session != null)
                             session.rebuild();
-                        SessionManager.getInstance().getTreeViewer()
-                            .expandToLevel(3);
+                        TreeViewer tv = SessionManager.getInstance()
+                            .getTreeViewer();
+                        if (tv != null) {
+                            tv.expandToLevel(3);
+                        }
                     }
                 }
             });

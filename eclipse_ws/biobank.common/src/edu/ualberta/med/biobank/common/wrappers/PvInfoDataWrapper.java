@@ -6,7 +6,6 @@ import edu.ualberta.med.biobank.model.PvInfo;
 import edu.ualberta.med.biobank.model.PvInfoData;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
-//FIXME todo by delphine
 public class PvInfoDataWrapper extends ModelWrapper<PvInfoData> {
 
     public PvInfoDataWrapper(WritableApplicationService appService,
@@ -26,12 +25,10 @@ public class PvInfoDataWrapper extends ModelWrapper<PvInfoData> {
 
     @Override
     protected void persistChecks() throws BiobankCheckException, Exception {
-        // TODO Auto-generated method stub
     }
 
     @Override
     protected void deleteChecks() throws BiobankCheckException, Exception {
-        // TODO Auto-generated method stub
     }
 
     public PvInfoWrapper getPvInfo() {

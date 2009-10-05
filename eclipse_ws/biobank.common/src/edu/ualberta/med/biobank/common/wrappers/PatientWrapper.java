@@ -45,16 +45,24 @@ public class PatientWrapper extends ModelWrapper<Patient> implements
         propertyChangeSupport.firePropertyChange("study", oldStudy, study);
     }
 
-    public boolean checkPatientNumberUnique() throws ApplicationException {
-        if (isNew()) {
-            HQLCriteria c = new HQLCriteria("from " + Patient.class.getName()
-                + " where study = ? and number = ?", Arrays
-                .asList(new Object[] { getStudy(), getNumber() }));
+    public void setStudy(StudyWrapper study) {
+        setStudy(study.wrappedObject);
+    }
 
-            List<Object> results = appService.query(c);
-            return results.size() == 0;
+    public boolean checkPatientNumberUnique() throws ApplicationException {
+        String isSamePatient = "";
+        List<Object> params = new ArrayList<Object>();
+        params.add(getStudy().wrappedObject);
+        params.add(getNumber());
+        if (!isNew()) {
+            isSamePatient = " and id <> ?";
+            params.add(getId());
         }
-        return true;
+        HQLCriteria c = new HQLCriteria("from " + Patient.class.getName()
+            + " where study = ? and number = ?" + isSamePatient, params);
+
+        List<Object> results = appService.query(c);
+        return results.size() == 0;
     }
 
     /**
@@ -145,7 +153,9 @@ public class PatientWrapper extends ModelWrapper<Patient> implements
 
     @Override
     public int compareTo(PatientWrapper o) {
-        return 0;
+        String number1 = getNumber();
+        String number2 = o.getNumber();
+        return number1.compareTo(number2);
     }
 
 }
