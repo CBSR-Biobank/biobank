@@ -67,9 +67,8 @@ public class ContainerTypeViewForm extends BiobankViewForm {
     }
 
     @Override
-    protected void createFormContent() {
+    protected void createFormContent() throws Exception {
         form.setText("Container Type: " + containerType.getName());
-        addToolbarButtons();
         form.getBody().setLayout(new GridLayout(1, false));
         createContainerTypeSection();
         if (containerType.getChildContainerTypeCollection().size() > 0) {

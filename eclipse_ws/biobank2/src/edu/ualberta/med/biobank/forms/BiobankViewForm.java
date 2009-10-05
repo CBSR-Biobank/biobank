@@ -39,6 +39,12 @@ public abstract class BiobankViewForm extends BiobankFormBase {
             BioBankPlugin.IMG_RELOAD_FORM));
 
     @Override
+    public void createPartControl(Composite parent) {
+        super.createPartControl(parent);
+        addToolbarButtons();
+    }
+
+    @Override
     public boolean isDirty() {
         return false;
     }

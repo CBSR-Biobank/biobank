@@ -95,12 +95,11 @@ public class ContainerViewForm extends BiobankViewForm {
     }
 
     @Override
-    protected void createFormContent() {
+    protected void createFormContent() throws Exception {
         form.setText("Container " + container.getLabel() + " ("
             + container.getContainerType().getName() + ")");
         form.getBody().setLayout(new GridLayout(1, false));
 
-        addToolbarButtons();
         createContainerSection();
 
         if (container.getContainerType().getSampleTypeCollection().size() > 0) {

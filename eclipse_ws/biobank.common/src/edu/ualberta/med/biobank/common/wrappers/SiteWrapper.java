@@ -129,6 +129,15 @@ public class SiteWrapper extends ModelWrapper<Site> implements
         return wrapperCollection;
     }
 
+    public List<StudyWrapper> getStudyWrapperCollectionSorted() {
+        List<StudyWrapper> list = new ArrayList<StudyWrapper>(
+            getStudyWrapperCollection());
+        if (list.size() > 1) {
+            Collections.sort(list);
+        }
+        return list;
+    }
+
     public Collection<ClinicWrapper> getClinicWrapperCollection() {
         Collection<ClinicWrapper> wrapperCollection = new HashSet<ClinicWrapper>();
         Collection<Clinic> collection = wrappedObject.getClinicCollection();
@@ -137,6 +146,15 @@ public class SiteWrapper extends ModelWrapper<Site> implements
                 wrapperCollection.add(new ClinicWrapper(appService, clinic));
             }
         return wrapperCollection;
+    }
+
+    public List<ClinicWrapper> getClinicWrapperCollectionSorted() {
+        List<ClinicWrapper> list = new ArrayList<ClinicWrapper>(
+            getClinicWrapperCollection());
+        if (list.size() > 1) {
+            Collections.sort(list);
+        }
+        return list;
     }
 
     public Collection<ContainerTypeWrapper> getContainerTypeWrapperCollection() {
