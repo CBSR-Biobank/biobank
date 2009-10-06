@@ -145,16 +145,18 @@ public class StudyWrapper extends ModelWrapper<Study> implements
 
     @Override
     public int compareTo(StudyWrapper wrapper) {
-        String myNameShort = wrappedObject.getNameShort();
-        String wrapperNameShort = wrapper.wrappedObject.getNameShort();
-
         String myName = wrappedObject.getName();
         String wrapperName = wrapper.wrappedObject.getName();
 
-        return ((myNameShort.compareTo(wrapperNameShort) > 0) ? 1
-            : (myNameShort.equals(wrapperNameShort) ? (myName
-                .compareTo(wrapperName) > 0) ? 1
-                : (myName.equals(wrapperName) ? 0 : -1) : -1));
+        int compare = myName.compareTo(wrapperName);
+        if (compare == 0) {
+            String myNameShort = wrappedObject.getNameShort();
+            String wrapperNameShort = wrapper.wrappedObject.getNameShort();
+
+            return ((myNameShort.compareTo(wrapperNameShort) > 0) ? 1
+                : (myNameShort.equals(wrapperNameShort) ? 0 : -1));
+        }
+        return (compare > 0) ? 1 : -1;
     }
 
     @SuppressWarnings("unchecked")

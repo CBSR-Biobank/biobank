@@ -1,5 +1,7 @@
 package edu.ualberta.med.biobank.treeview;
 
+import java.util.List;
+
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
@@ -65,17 +67,20 @@ public class ClinicGroup extends AdapterBase {
             currentSite.reload();
             ((SiteAdapter) getParent()).setSite(currentSite.getWrappedObject());
 
-            for (ClinicWrapper clinic : currentSite.getClinicCollection(true)) {
-                ClinicAdapter node = (ClinicAdapter) getChild(clinic.getId());
+            List<ClinicWrapper> clinics = currentSite.getClinicCollection(true);
+            if (clinics != null)
+                for (ClinicWrapper clinic : clinics) {
+                    ClinicAdapter node = (ClinicAdapter) getChild(clinic
+                        .getId());
 
-                if (node == null) {
-                    node = new ClinicAdapter(this, clinic);
-                    addChild(node);
+                    if (node == null) {
+                        node = new ClinicAdapter(this, clinic);
+                        addChild(node);
+                    }
+                    if (updateNode) {
+                        SessionManager.getInstance().updateTreeNode(node);
+                    }
                 }
-                if (updateNode) {
-                    SessionManager.getInstance().updateTreeNode(node);
-                }
-            }
         } catch (Exception e) {
             SessionManager.getLogger().error(
                 "Error while loading clinic group children for site "

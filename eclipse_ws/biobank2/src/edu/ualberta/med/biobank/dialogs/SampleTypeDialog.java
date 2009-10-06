@@ -10,6 +10,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
+import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
 
@@ -20,27 +21,25 @@ public class SampleTypeDialog extends BiobankDialog {
     private static final String MSG_NO_ST_NAME = "Sample type must have a name.";
     private static final String MSG_NO_ST_SNAME = "Sample type must have a short name.";
 
-    private SampleType sampleType;
+    private SampleTypeWrapper sampleType;
 
-    public SampleTypeDialog(Shell parent, SampleType sampleType) {
+    // this is the object that is modified via the bound widgets
+    private SampleType sampleTypeCopy;
+
+    public SampleTypeDialog(Shell parent, SampleTypeWrapper sampleType) {
         super(parent);
         Assert.isNotNull(sampleType);
         this.sampleType = sampleType;
+        sampleTypeCopy = new SampleType();
+        sampleTypeCopy.setName(sampleType.getName());
+        sampleTypeCopy.setNameShort(sampleType.getNameShort());
     }
 
     @Override
     protected void configureShell(Shell shell) {
         super.configureShell(shell);
         Integer id = sampleType.getId();
-        String title = new String();
-
-        if (id == null) {
-            title = "Add";
-        } else {
-            title = "Edit ";
-        }
-        title += TITLE;
-        shell.setText(title);
+        shell.setText(((id == null) ? "Add " : "Edit ") + TITLE);
     }
 
     @Override
@@ -54,20 +53,27 @@ public class SampleTypeDialog extends BiobankDialog {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         Control c = createBoundWidgetWithLabel(client, Text.class, SWT.BORDER,
-            "Name", null, PojoObservables.observeValue(sampleType, "name"),
+            "Name", null, PojoObservables.observeValue(sampleTypeCopy, "name"),
             NonEmptyString.class, MSG_NO_ST_NAME);
         GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
         gd.widthHint = 200;
         c.setLayoutData(gd);
 
         createBoundWidgetWithLabel(client, Text.class, SWT.BORDER,
-            "Short Name", null, PojoObservables.observeValue(sampleType,
+            "Short Name", null, PojoObservables.observeValue(sampleTypeCopy,
                 "nameShort"), NonEmptyString.class, MSG_NO_ST_SNAME);
 
         return client;
     }
 
-    public SampleType getSampleType() {
+    @Override
+    protected void okPressed() {
+        super.okPressed();
+        sampleType.setName(sampleTypeCopy.getName());
+        sampleType.setNameShort(sampleTypeCopy.getNameShort());
+    }
+
+    public SampleTypeWrapper getSampleType() {
         return sampleType;
     }
 

@@ -12,6 +12,7 @@ import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerType;
+import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -31,6 +32,17 @@ public class SiteWrapper extends ModelWrapper<Site> implements
             wrappedObject.setAddress(address);
         }
         addressWrapper = new AddressWrapper(appService, address);
+    }
+
+    public SiteWrapper(WritableApplicationService appService) {
+        super(appService);
+    }
+
+    @Override
+    protected String[] getPropertyChangesNames() {
+        return new String[] { "name", "activityStatus", "comment",
+            "clinicCollection", "siteCollection", "containerCollection",
+            "sampleTypeCollection" };
     }
 
     public AddressWrapper getAddressWrapper() {
@@ -71,12 +83,6 @@ public class SiteWrapper extends ModelWrapper<Site> implements
         wrappedObject.setComment(comment);
         propertyChangeSupport
             .firePropertyChange("comment", oldComment, comment);
-    }
-
-    @Override
-    protected String[] getPropertyChangesNames() {
-        return new String[] { "name", "activityStatus", "comment",
-            "containerCollection" };
     }
 
     @Override
@@ -283,4 +289,79 @@ public class SiteWrapper extends ModelWrapper<Site> implements
     public void clearTopContainerCollection() {
         propertiesMap.put("topContainerCollection", null);
     }
+
+    @SuppressWarnings("unchecked")
+    public List<SampleTypeWrapper> getSampleTypeCollection(boolean sort) {
+        List<SampleTypeWrapper> sampleTypeCollection = (List<SampleTypeWrapper>) propertiesMap
+            .get("sampleTypeCollection");
+        if (sampleTypeCollection == null) {
+            Collection<SampleType> children = wrappedObject
+                .getSampleTypeCollection();
+            if (children != null) {
+                sampleTypeCollection = new ArrayList<SampleTypeWrapper>();
+                for (SampleType type : children) {
+                    sampleTypeCollection.add(new SampleTypeWrapper(appService,
+                        type));
+                }
+                propertiesMap.put("sampleTypeCollection", sampleTypeCollection);
+            }
+        }
+        if ((sampleTypeCollection != null) && sort)
+            Collections.sort(sampleTypeCollection);
+        return sampleTypeCollection;
+    }
+
+    public List<SampleTypeWrapper> getSampleTypeCollection() {
+        return getSampleTypeCollection(false);
+    }
+
+    public void setSampleTypeCollection(Collection<SampleType> types,
+        boolean setNull) {
+        Collection<SampleType> oldTypes = wrappedObject
+            .getSampleTypeCollection();
+        wrappedObject.setSampleTypeCollection(types);
+        propertyChangeSupport.firePropertyChange("sampleTypeCollection",
+            oldTypes, types);
+        if (setNull) {
+            propertiesMap.put("sampleTypeCollection", null);
+        }
+    }
+
+    public void setSampleTypeCollection(List<SampleTypeWrapper> types) {
+        Collection<SampleType> typeObjects = new HashSet<SampleType>();
+        for (SampleTypeWrapper type : types) {
+            typeObjects.add(type.getWrappedObject());
+        }
+        setSampleTypeCollection(typeObjects, false);
+        propertiesMap.put("sampleTypeCollection", types);
+    }
+
+    /**
+     * Removes the sample type objects that are not contained in the collection.
+     * 
+     * @param ssCollection
+     * @throws Exception
+     */
+    public void deleteSampleTypeComplement(List<SampleTypeWrapper> ssCollection)
+        throws Exception {
+        // no need to remove if study is not yet in the database or nothing in
+        // the collection
+        if ((getId() == null) || (ssCollection.size() == 0))
+            return;
+
+        // query from database again
+        reload();
+
+        List<Integer> selectedStampleStorageIds = new ArrayList<Integer>();
+        for (SampleTypeWrapper ss : ssCollection) {
+            selectedStampleStorageIds.add(ss.getId());
+        }
+
+        for (SampleTypeWrapper ss : getSampleTypeCollection()) {
+            if (!selectedStampleStorageIds.contains(ss.getId())) {
+                ss.delete();
+            }
+        }
+    }
+
 }
