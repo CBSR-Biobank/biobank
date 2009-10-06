@@ -153,8 +153,8 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
 
         plateToScanText = (Text) createBoundWidgetWithLabel(fieldsComposite,
             Text.class, SWT.NONE, "Plate to scan", new String[0],
-            plateToScanValue, ScannerBarcodeValidator.class,
-            "Enter a valid plate barcode");
+            plateToScanValue, new ScannerBarcodeValidator(
+                "Enter a valid plate barcode"));
         plateToScanText.addListener(SWT.DefaultSelection, new Listener() {
             public void handleEvent(Event e) {
                 if (scanButton.isEnabled()) {

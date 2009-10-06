@@ -107,15 +107,15 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
 
         firstControl = createBoundWidgetWithLabel(client, Text.class, SWT.NONE,
             "Name", null, PojoObservables.observeValue(clinicWrapper, "name"),
-            NonEmptyString.class, MSG_NO_CLINIC_NAME);
+            new NonEmptyString(MSG_NO_CLINIC_NAME));
 
         createBoundWidgetWithLabel(client, Combo.class, SWT.NONE,
             "Activity Status", FormConstants.ACTIVITY_STATUS, PojoObservables
-                .observeValue(clinicWrapper, "activityStatus"), null, null);
+                .observeValue(clinicWrapper, "activityStatus"), null);
 
         Text comment = (Text) createBoundWidgetWithLabel(client, Text.class,
             SWT.MULTI, "Comments", null, PojoObservables.observeValue(
-                clinicWrapper, "comment"), null, null);
+                clinicWrapper, "comment"), null);
         GridData gd = new GridData(GridData.FILL_HORIZONTAL);
         gd.heightHint = 40;
         comment.setLayoutData(gd);
@@ -140,11 +140,6 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
         client.setLayout(layout);
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
-    }
-
-    @Override
-    public void setFocus() {
-        firstControl.setFocus();
     }
 
     @Override

@@ -164,8 +164,8 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
                 }
             }
         });
-        dbc.bindValue(new WritableValue(Boolean.FALSE, Boolean.class),
-            scanOkValue, uvs, uvs);
+        bindValue(new WritableValue(Boolean.FALSE, Boolean.class), scanOkValue,
+            uvs, uvs);
         scanOkValue.setValue(false);
 
         createPalletSection();
@@ -184,7 +184,7 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
                 }
             }
         });
-        dbc.bindValue(new WritableValue(Boolean.FALSE, Boolean.class),
+        bindValue(new WritableValue(Boolean.FALSE, Boolean.class),
             scannedValue, uvs, uvs);
         scannedValue.setValue(false);
 
@@ -200,7 +200,7 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
             }
 
         });
-        dbc.bindValue(new WritableValue(Boolean.TRUE, Boolean.class),
+        bindValue(new WritableValue(Boolean.TRUE, Boolean.class),
             typesFilledValue, uvs, uvs);
     }
 
@@ -277,10 +277,10 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
                     selectionStackLayout.topControl = typesSelectionPerRowComposite;
                     selectionComp.layout();
                     for (SampleTypeSelectionWidget sampleType : sampleTypeWidgets) {
-                        sampleType.addBinding(dbc);
+                        sampleType.addBinding(widgetCreator);
                         sampleType.resetValues(false);
                     }
-                    customSelection.addBinding(dbc);
+                    customSelection.addBinding(widgetCreator);
                     spw.disableSelection();
                     typesFilledValue.setValue(Boolean.TRUE);
                     spw.redraw();
@@ -294,9 +294,9 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
                     selectionStackLayout.topControl = typesSelectionCustomComposite;
                     selectionComp.layout();
                     for (SampleTypeSelectionWidget sampleType : sampleTypeWidgets) {
-                        sampleType.removeBinding(dbc);
+                        sampleType.removeBinding(widgetCreator);
                     }
-                    customSelection.addBinding(dbc);
+                    customSelection.addBinding(widgetCreator);
                     spw.enableSelection();
                     typesFilledValue.setValue(spw.isEverythingTyped());
                     spw.redraw();
@@ -372,7 +372,7 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
                     }
 
                 });
-            typeWidget.addBinding(dbc);
+            typeWidget.addBinding(widgetCreator);
             sampleTypeWidgets.add(typeWidget);
         }
         SampleTypeSelectionWidget lastWidget = sampleTypeWidgets
@@ -406,7 +406,7 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
 
         patientNumberText = (Text) createBoundWidgetWithLabel(fieldsComposite,
             Text.class, SWT.NONE, "Patient Number", new String[0],
-            patientNumberValue, NonEmptyString.class, "Enter a patient number");
+            patientNumberValue, new NonEmptyString("Enter a patient number"));
         patientNumberText.addListener(SWT.DefaultSelection, new Listener() {
             public void handleEvent(Event e) {
                 setVisitsList();
@@ -427,8 +427,8 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
 
         plateToScanText = (Text) createBoundWidgetWithLabel(fieldsComposite,
             Text.class, SWT.NONE, "Plate to Scan", new String[0],
-            plateToScanValue, ScannerBarcodeValidator.class,
-            "Enter a valid plate barcode");
+            plateToScanValue, new ScannerBarcodeValidator(
+                "Enter a valid plate barcode"));
         plateToScanText.addListener(SWT.DefaultSelection, new Listener() {
             public void handleEvent(Event e) {
                 if (scanButton.isEnabled()) {

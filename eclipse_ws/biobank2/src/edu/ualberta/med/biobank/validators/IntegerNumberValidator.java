@@ -7,17 +7,17 @@ import org.eclipse.core.databinding.validation.ValidationStatus;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 
-public class IntegerNumber extends AbstractValidator {
+public class IntegerNumberValidator extends AbstractValidator {
 
     private static final Pattern pattern = Pattern.compile("^[0-9\\+-]*$");
 
     private boolean allowEmpty = true;
 
-    public IntegerNumber(String message) {
+    public IntegerNumberValidator(String message) {
         super(message);
     }
 
-    public IntegerNumber(String message, boolean allowEmpty) {
+    public IntegerNumberValidator(String message, boolean allowEmpty) {
         this(message);
         this.allowEmpty = allowEmpty;
     }

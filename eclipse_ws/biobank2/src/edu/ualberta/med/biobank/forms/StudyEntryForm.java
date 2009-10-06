@@ -423,8 +423,4 @@ public class StudyEntryForm extends BiobankEntryForm {
         return StudyViewForm.ID;
     }
 
-    @Override
-    public void setFocus() {
-        firstControl.setFocus();
-    }
 }

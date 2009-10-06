@@ -80,15 +80,15 @@ public class SiteEntryForm extends AddressEntryFormCommon {
 
         firstControl = createBoundWidgetWithLabel(client, Text.class, SWT.NONE,
             "Name", null, BeansObservables.observeValue(siteWrapper, "name"),
-            NonEmptyString.class, MSG_NO_SITE_NAME);
+            new NonEmptyString(MSG_NO_SITE_NAME));
 
         createBoundWidgetWithLabel(client, Combo.class, SWT.NONE,
             "Activity Status", FormConstants.ACTIVITY_STATUS, BeansObservables
-                .observeValue(siteWrapper, "activityStatus"), null, null);
+                .observeValue(siteWrapper, "activityStatus"), null);
 
         Text comment = (Text) createBoundWidgetWithLabel(client, Text.class,
             SWT.MULTI, "Comments", null, BeansObservables.observeValue(
-                siteWrapper, "comment"), null, null);
+                siteWrapper, "comment"), null);
         GridData gd = new GridData(GridData.FILL_HORIZONTAL);
         gd.heightHint = 40;
         comment.setLayoutData(gd);

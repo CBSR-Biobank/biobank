@@ -19,8 +19,8 @@ import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.model.SampleStorage;
 import edu.ualberta.med.biobank.model.SampleType;
-import edu.ualberta.med.biobank.validators.DoubleNumber;
-import edu.ualberta.med.biobank.validators.IntegerNumber;
+import edu.ualberta.med.biobank.validators.DoubleNumberValidator;
+import edu.ualberta.med.biobank.validators.IntegerNumberValidator;
 
 public class SampleStorageDialog extends BiobankDialog {
 
@@ -81,13 +81,13 @@ public class SampleStorageDialog extends BiobankDialog {
 
         createBoundWidgetWithLabel(contents, Text.class, SWT.BORDER,
             "Volume (ml)", new String[0], PojoObservables.observeValue(
-                sampleStorage, "volume"), DoubleNumber.class,
-            "volume should be a real number");
+                sampleStorage, "volume"), new DoubleNumberValidator(
+                "Volume should be a real number"));
 
         createBoundWidgetWithLabel(contents, Text.class, SWT.BORDER,
             "Quantity", new String[0], PojoObservables.observeValue(
-                sampleStorage, "quantity"), IntegerNumber.class,
-            "quantity should be a whole number");
+                sampleStorage, "quantity"), new IntegerNumberValidator(
+                "Quantity should be a whole number"));
 
         return contents;
     }

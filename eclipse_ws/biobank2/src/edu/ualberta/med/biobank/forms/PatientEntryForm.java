@@ -97,8 +97,8 @@ public class PatientEntryForm extends BiobankEntryForm {
 
         firstControl = createBoundWidgetWithLabel(client, Text.class, SWT.NONE,
             "Patient Number", null, BeansObservables.observeValue(
-                patientAdapter.getWrapper(), "number"), NonEmptyString.class,
-            MSG_NO_PATIENT_NUMBER);
+                patientAdapter.getWrapper(), "number"), new NonEmptyString(
+                MSG_NO_PATIENT_NUMBER));
     }
 
     @Override

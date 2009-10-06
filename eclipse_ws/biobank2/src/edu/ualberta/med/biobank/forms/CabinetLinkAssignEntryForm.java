@@ -165,7 +165,7 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
 
         patientNumberText = (Text) createBoundWidgetWithLabel(fieldsComposite,
             Text.class, SWT.NONE, "Patient Number", new String[0],
-            patientNumberValue, NonEmptyString.class, "Enter a patient number");
+            patientNumberValue, new NonEmptyString("Enter a patient number"));
         patientNumberText.addListener(SWT.DefaultSelection, new Listener() {
             public void handleEvent(Event e) {
                 setVisitsList();
@@ -184,7 +184,7 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
         inventoryIdText = (Text) createBoundWidgetWithLabel(fieldsComposite,
             Text.class, SWT.NONE, "Inventory ID", new String[0],
             PojoObservables.observeValue(sampleWrapper, "inventoryId"),
-            NonEmptyString.class, "Enter Inventory Id");
+            new NonEmptyString("Enter Inventory Id"));
         inventoryIdText.addKeyListener(EnterKeyToNextFieldListener.INSTANCE);
 
         positionText = (Text) createBoundWidgetWithLabel(fieldsComposite,
@@ -246,8 +246,8 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
     private void createVisitCombo(Composite client) {
         comboVisits = (CCombo) createBoundWidgetWithLabel(client, CCombo.class,
             SWT.READ_ONLY | SWT.BORDER | SWT.FLAT, "Visits", new String[0],
-            visitSelectionValue, NonEmptyString.class,
-            "A visit should be selected");
+            visitSelectionValue, new NonEmptyString(
+                "A visit should be selected"));
         GridData gridData = new GridData();
         gridData.grabExcessHorizontalSpace = true;
         gridData.horizontalAlignment = SWT.FILL;

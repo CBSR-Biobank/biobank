@@ -1,35 +1,23 @@
 package edu.ualberta.med.biobank.forms;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 
 import org.acegisecurity.AccessDeniedException;
-import org.apache.commons.collections.MapIterator;
 import org.apache.commons.collections.map.ListOrderedMap;
-import org.eclipse.core.databinding.AggregateValidationStatus;
-import org.eclipse.core.databinding.DataBindingContext;
 import org.eclipse.core.databinding.UpdateValueStrategy;
-import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.databinding.observable.ChangeEvent;
 import org.eclipse.core.databinding.observable.IChangeListener;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.observable.value.WritableValue;
-import org.eclipse.core.databinding.validation.IValidator;
-import org.eclipse.core.databinding.validation.ValidationStatus;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.action.ControlContribution;
-import org.eclipse.jface.databinding.swt.SWTObservables;
 import org.eclipse.jface.dialogs.IMessageProvider;
-import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ComboViewer;
-import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
-import org.eclipse.swt.custom.CCombo;
+import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.ModifyEvent;
@@ -39,7 +27,6 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
@@ -60,8 +47,6 @@ import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.validators.AbstractValidator;
-import edu.ualberta.med.biobank.validators.NonEmptyString;
-import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
 /**
  * Base class for data entry forms.
@@ -81,33 +66,27 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
     // The widget that is to get the focus when the form is created
     protected Control firstControl;
 
-    protected DataBindingContext dbc;
-
     private Button confirmButton;
 
-    protected KeyListener keyListener = new KeyListener() {
+    protected KeyListener keyListener = new KeyAdapter() {
         @Override
         public void keyPressed(KeyEvent e) {
             if ((e.keyCode & SWT.MODIFIER_MASK) == 0) {
                 setDirty(true);
             }
         }
-
-        @Override
-        public void keyReleased(KeyEvent e) {
-        }
     };
 
-    SelectionListener selectionListener = new SelectionAdapter() {
+    protected ModifyListener modifyListener = new ModifyListener() {
         @Override
-        public void widgetSelected(SelectionEvent e) {
+        public void modifyText(ModifyEvent e) {
             setDirty(true);
         }
     };
 
-    ModifyListener modifyListener = new ModifyListener() {
+    protected SelectionListener selectionListener = new SelectionAdapter() {
         @Override
-        public void modifyText(ModifyEvent e) {
+        public void widgetSelected(SelectionEvent e) {
             setDirty(true);
         }
     };
@@ -115,7 +94,10 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
     public BiobankEntryForm() {
         super();
         firstControl = null;
-        dbc = new DataBindingContext();
+        widgetCreator.initDataBinding();
+        widgetCreator.setKeyListener(keyListener);
+        widgetCreator.setModifyListener(modifyListener);
+        widgetCreator.setSelectionListener(selectionListener);
     }
 
     @Override
@@ -195,183 +177,31 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
         this.sessionName = sessionName;
     }
 
-    protected Control createBoundWidgetWithLabel(Composite composite,
-        Class<? extends Widget> widgetClass, int widgetOptions,
-        String fieldLabel, String[] widgetValues,
-        IObservableValue modelObservableValue,
-        Class<? extends AbstractValidator> validatorClass,
-        String validatorErrMsg) {
-        AbstractValidator validator = null;
-        if (validatorClass != null) {
-            validator = createValidator(validatorClass, validatorErrMsg);
-        }
-        return createBoundWidgetWithLabel(composite, widgetClass,
-            widgetOptions, fieldLabel, widgetValues, modelObservableValue,
-            validator);
+    protected void addBooleanBinding(WritableValue writableValue,
+        IObservableValue observableValue, final String errorMsg) {
+        widgetCreator.addBooleanBinding(writableValue, observableValue,
+            errorMsg);
+    }
+
+    protected void createBoundWidgetsFromMap(ListOrderedMap fieldsMap,
+        Object bean, Composite client) {
+        widgetCreator.createBoundWidgetsFromMap(fieldsMap, bean, client);
     }
 
     protected Control createBoundWidgetWithLabel(Composite composite,
         Class<? extends Widget> widgetClass, int widgetOptions,
         String fieldLabel, String[] widgetValues,
         IObservableValue modelObservableValue, AbstractValidator validator) {
-        Label label;
-
-        label = toolkit.createLabel(composite, fieldLabel + ":", SWT.LEFT);
-        label.setLayoutData(new GridData(GridData.VERTICAL_ALIGN_BEGINNING));
-        return createBoundWidget(composite, widgetClass, widgetOptions, label,
-            widgetValues, modelObservableValue, validator);
-
+        return widgetCreator.createBoundWidgetWithLabel(composite, widgetClass,
+            widgetOptions, fieldLabel, widgetValues, modelObservableValue,
+            validator);
     }
 
-    protected Control createBoundWidget(Composite composite,
-        Class<? extends Widget> widgetClass, int widgetOptions,
-        String[] widgetValues, IObservableValue modelObservableValue,
-        IValidator validator) {
-
-        UpdateValueStrategy uvs = null;
-        if (validator != null) {
-            uvs = new UpdateValueStrategy();
-            uvs.setAfterGetValidator(validator);
-        }
-        if (widgetClass == Text.class) {
-            if (widgetOptions == SWT.NONE) {
-                widgetOptions = SWT.SINGLE;
-            }
-            Text text = toolkit.createText(composite, "", widgetOptions);
-            text.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-            text.addKeyListener(keyListener);
-
-            dbc.bindValue(SWTObservables.observeText(text, SWT.Modify),
-                modelObservableValue, uvs, null);
-            return text;
-        } else if (widgetClass == Combo.class) {
-            Combo combo = new Combo(composite, SWT.READ_ONLY);
-            combo.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
-            Assert.isNotNull(widgetValues, "combo values not assigned");
-            combo.setItems(widgetValues);
-            toolkit.adapt(combo, true, true);
-
-            dbc.bindValue(SWTObservables.observeSelection(combo),
-                modelObservableValue, uvs, null);
-
-            combo.addSelectionListener(selectionListener);
-            combo.addModifyListener(modifyListener);
-            return combo;
-        } else if (widgetClass == CCombo.class) {
-            CCombo combo = new CCombo(composite, SWT.READ_ONLY);
-            combo.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
-            Assert.isNotNull(widgetValues, "combo values not assigned");
-            combo.setItems(widgetValues);
-            toolkit.adapt(combo, true, true);
-
-            dbc.bindValue(SWTObservables.observeSelection(combo),
-                modelObservableValue, uvs, null);
-
-            combo.addSelectionListener(selectionListener);
-            combo.addModifyListener(modifyListener);
-            return combo;
-        } else if (widgetClass == Button.class) {
-            Button button = new Button(composite, SWT.CHECK);
-            toolkit.adapt(button, true, true);
-            dbc.bindValue(SWTObservables.observeSelection(button),
-                modelObservableValue, uvs, null);
-
-            button.addSelectionListener(selectionListener);
-            return button;
-        } else {
-            Assert.isTrue(false, "invalid widget class "
-                + widgetClass.getName());
-        }
-        return null;
-    }
-
-    protected Control createBoundWidget(Composite composite,
-        Class<? extends Widget> widgetClass, int widgetOptions, Label label,
-        String[] widgetValues, IObservableValue modelObservableValue,
-        AbstractValidator validator) {
-
-        if (validator != null) {
-            validator.setControlDecoration(FormUtils.createDecorator(label,
-                validator.getErrorMessage()));
-        }
-
-        return createBoundWidget(composite, widgetClass, widgetOptions,
-            widgetValues, modelObservableValue, validator);
-    }
-
-    /**
-     * Create a combo using ArrayContentProvider as content provider and
-     * BiobankLabelProvider as Label provider. You should use
-     * comboViewer.getSelection() to update datas.
-     * 
-     * @see BiobankLabelProvider#getColumnText
-     */
     protected <T> ComboViewer createCComboViewerWithNoSelectionValidator(
         Composite parent, String fieldLabel, Collection<?> input, T selection,
         String errorMessage) {
-        Label label = toolkit.createLabel(parent, fieldLabel + ":", SWT.LEFT);
-
-        CCombo combo = new CCombo(parent, SWT.READ_ONLY | SWT.BORDER);
-        ComboViewer comboViewer = new ComboViewer(combo);
-        comboViewer.setContentProvider(new ArrayContentProvider());
-        comboViewer.setLabelProvider(new BiobankLabelProvider());
-        if (input != null) {
-            comboViewer.setInput(input);
-        }
-
-        combo.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
-        AbstractValidator validator = new NonEmptyString(errorMessage);
-        validator.setControlDecoration(FormUtils.createDecorator(label,
-            errorMessage));
-        UpdateValueStrategy uvs = new UpdateValueStrategy();
-        uvs.setAfterGetValidator(validator);
-        IObservableValue selectedValue = new WritableValue("", String.class);
-        dbc.bindValue(SWTObservables.observeSelection(combo), selectedValue,
-            uvs, null);
-
-        if (selection != null) {
-            comboViewer.setSelection(new StructuredSelection(selection));
-        }
-        combo.addModifyListener(modifyListener);
-        return comboViewer;
-    }
-
-    protected AbstractValidator createValidator(
-        Class<? extends AbstractValidator> validatorClass,
-        String validatorErrMsg) {
-        try {
-            Class<?>[] types = new Class[] { String.class };
-            Constructor<?> cons = validatorClass.getConstructor(types);
-            Object[] args = new Object[] { validatorErrMsg };
-            return (AbstractValidator) cons.newInstance(args);
-        } catch (NoSuchMethodException e) {
-            throw new RuntimeException(e);
-        } catch (InvocationTargetException e) {
-            throw new RuntimeException(e);
-        } catch (IllegalArgumentException e) {
-            throw new RuntimeException(e);
-        } catch (InstantiationException e) {
-            throw new RuntimeException(e);
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    protected void createBoundWidgetsFromMap(ListOrderedMap fieldsMap,
-        Object bean, Composite client) {
-        FieldInfo fi;
-
-        MapIterator it = fieldsMap.mapIterator();
-        while (it.hasNext()) {
-            String key = (String) it.next();
-            fi = (FieldInfo) it.getValue();
-
-            Control control = createBoundWidgetWithLabel(client,
-                fi.widgetClass, fi.widgetOptions, fi.label, fi.widgetValues,
-                BeansObservables.observeValue(bean, key), fi.validatorClass,
-                fi.errMsg);
-            controls.put(key, control);
-        }
+        return widgetCreator.createCComboViewerWithNoSelectionValidator(parent,
+            fieldLabel, input, selection, errorMessage);
     }
 
     protected void bindChangeListener() {
@@ -384,10 +214,14 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
             }
         });
 
-        dbc
-            .bindValue(statusObservable, new AggregateValidationStatus(dbc
-                .getBindings(), AggregateValidationStatus.MAX_SEVERITY), null,
-                null);
+        widgetCreator.addGlobalBindValue(statusObservable);
+    }
+
+    protected void bindValue(IObservableValue targetObservableValue,
+        IObservableValue modelObservableValue,
+        UpdateValueStrategy targetToModel, UpdateValueStrategy modelToTarget) {
+        widgetCreator.bindValue(targetObservableValue, modelObservableValue,
+            targetToModel, modelToTarget);
     }
 
     protected void handleStatusChanged(IStatus status) {
@@ -428,23 +262,6 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
         gd.grabExcessHorizontalSpace = true;
         gd.horizontalAlignment = SWT.FILL;
         separator.setLayoutData(gd);
-    }
-
-    protected void addBooleanBinding(WritableValue writableValue,
-        IObservableValue observableValue, final String errorMsg) {
-        UpdateValueStrategy uvs = new UpdateValueStrategy();
-        uvs.setAfterConvertValidator(new IValidator() {
-            @Override
-            public IStatus validate(Object value) {
-                if (value instanceof Boolean && !(Boolean) value) {
-                    return ValidationStatus.error(errorMsg);
-                } else {
-                    return Status.OK_STATUS;
-                }
-            }
-
-        });
-        dbc.bindValue(writableValue, observableValue, uvs, uvs);
     }
 
     private void addToolbarButtons() {

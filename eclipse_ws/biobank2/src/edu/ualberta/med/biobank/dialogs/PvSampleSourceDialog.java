@@ -20,7 +20,7 @@ import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.common.wrappers.PvSampleSourceWrapper;
 import edu.ualberta.med.biobank.model.SampleSource;
-import edu.ualberta.med.biobank.validators.IntegerNumber;
+import edu.ualberta.med.biobank.validators.IntegerNumberValidator;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
 
 public class PvSampleSourceDialog extends BiobankDialog {
@@ -84,7 +84,7 @@ public class PvSampleSourceDialog extends BiobankDialog {
 
         createBoundWidgetWithLabel(contents, Text.class, SWT.BORDER,
             "Quantity", new String[0], PojoObservables.observeValue(
-                pvSampleSource, "quantity"), new IntegerNumber(
+                pvSampleSource, "quantity"), new IntegerNumberValidator(
                 "quantity should be a whole number", false));
 
         return contents;

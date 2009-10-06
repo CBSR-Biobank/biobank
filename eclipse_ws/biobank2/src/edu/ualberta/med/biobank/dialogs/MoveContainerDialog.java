@@ -57,7 +57,7 @@ public class MoveContainerDialog extends BiobankDialog {
 
         Control c = createBoundWidgetWithLabel(contents, Text.class,
             SWT.BORDER, "Source Address: ", new String[0], PojoObservables
-                .observeValue(container, "label"), null, null);
+                .observeValue(container, "label"), null);
         GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
         gd.widthHint = 250;
         c.setLayoutData(gd);

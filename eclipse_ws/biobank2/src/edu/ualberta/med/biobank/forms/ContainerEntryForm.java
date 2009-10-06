@@ -25,7 +25,7 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.treeview.ContainerAdapter;
-import edu.ualberta.med.biobank.validators.DoubleNumber;
+import edu.ualberta.med.biobank.validators.DoubleNumberValidator;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
 
 public class ContainerEntryForm extends BiobankEntryForm {
@@ -104,8 +104,8 @@ public class ContainerEntryForm extends BiobankEntryForm {
             // only allow edit to label on top level containers
             firstControl = createBoundWidgetWithLabel(client, Text.class,
                 SWT.NONE, "Label", null, BeansObservables.observeValue(
-                    containerWrapper, "label"), NonEmptyString.class,
-                MSG_CONTAINER_NAME_EMPTY);
+                    containerWrapper, "label"), new NonEmptyString(
+                    MSG_CONTAINER_NAME_EMPTY));
         } else {
             Label l = (Label) createWidget(client, Label.class, SWT.NONE,
                 "Label");
@@ -114,17 +114,17 @@ public class ContainerEntryForm extends BiobankEntryForm {
 
         Control c = createBoundWidgetWithLabel(client, Text.class, SWT.NONE,
             "Product Barcode", null, BeansObservables.observeValue(
-                containerWrapper, "productBarcode"), null, null);
+                containerWrapper, "productBarcode"), null);
         if (firstControl == null)
             firstControl = c;
 
         createBoundWidgetWithLabel(client, Combo.class, SWT.NONE,
             "Activity Status", FormConstants.ACTIVITY_STATUS, BeansObservables
-                .observeValue(containerWrapper, "activityStatus"), null, null);
+                .observeValue(containerWrapper, "activityStatus"), null);
 
         Text comment = (Text) createBoundWidgetWithLabel(client, Text.class,
             SWT.MULTI, "Comments", null, BeansObservables.observeValue(
-                containerWrapper, "comment"), null, null);
+                containerWrapper, "comment"), null);
         GridData gd = new GridData(GridData.FILL_HORIZONTAL);
         gd.heightHint = 40;
         comment.setLayoutData(gd);
@@ -176,7 +176,7 @@ public class ContainerEntryForm extends BiobankEntryForm {
         tempWidget = (Text) createBoundWidgetWithLabel(client, Text.class,
             SWT.NONE, "Temperature (Celcius)", null, BeansObservables
                 .observeValue(containerWrapper, "temperature"),
-            DoubleNumber.class, "Default temperature is not a valid number");
+            new DoubleNumberValidator("Default temperature is not a valid number"));
         if (containerWrapper.getPosition() != null)
             tempWidget.setEnabled(false);
     }

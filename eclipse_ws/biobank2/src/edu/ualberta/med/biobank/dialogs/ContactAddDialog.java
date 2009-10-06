@@ -55,26 +55,26 @@ public class ContactAddDialog extends BiobankDialog {
 
         Control c = createBoundWidgetWithLabel(contents, Text.class,
             SWT.BORDER, "Name", new String[0], PojoObservables.observeValue(
-                contactWrapper, "name"), null, null);
+                contactWrapper, "name"), null);
         GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
         gd.widthHint = 250;
         c.setLayoutData(gd);
 
         createBoundWidgetWithLabel(contents, Text.class, SWT.BORDER, "Title",
             new String[0], PojoObservables
-                .observeValue(contactWrapper, "title"), null, null);
+                .observeValue(contactWrapper, "title"), null);
 
         createBoundWidgetWithLabel(contents, Text.class, SWT.BORDER, "email",
             new String[0], PojoObservables.observeValue(contactWrapper,
-                "emailAddress"), null, null);
+                "emailAddress"), null);
 
         createBoundWidgetWithLabel(contents, Text.class, SWT.BORDER, "Phone #",
             new String[0], PojoObservables.observeValue(contactWrapper,
-                "phoneNumber"), null, null);
+                "phoneNumber"), null);
 
         createBoundWidgetWithLabel(contents, Text.class, SWT.BORDER, "Fax #",
             new String[0], PojoObservables.observeValue(contactWrapper,
-                "faxNumber"), null, null);
+                "faxNumber"), null);
 
         return contents;
     }

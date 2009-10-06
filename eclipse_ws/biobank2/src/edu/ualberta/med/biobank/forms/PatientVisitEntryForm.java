@@ -366,8 +366,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
                 validator.getErrorMessage()));
             UpdateValueStrategy uvs = new UpdateValueStrategy();
             uvs.setAfterConvertValidator(validator);
-            dbc.bindValue(new WritableValue(null, Date.class), dateValue, uvs,
-                uvs);
+            bindValue(new WritableValue(null, Date.class), dateValue, uvs, uvs);
             dateValue.setValue(date);
             widget.addSelectionListener(new SelectionAdapter() {
                 @Override

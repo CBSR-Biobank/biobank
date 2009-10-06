@@ -3,7 +3,6 @@ package edu.ualberta.med.biobank.widgets;
 import java.util.List;
 
 import org.eclipse.core.databinding.Binding;
-import org.eclipse.core.databinding.DataBindingContext;
 import org.eclipse.core.databinding.UpdateValueStrategy;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.observable.value.WritableValue;
@@ -31,6 +30,7 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.forms.FormUtils;
+import edu.ualberta.med.biobank.widgets.utils.WidgetCreator;
 
 /**
  * Create 3 widgets to show types selection for samples on a pallet: one label,
@@ -132,7 +132,7 @@ public class SampleTypeSelectionWidget {
             .getFirstElement();
     }
 
-    public void addBinding(DataBindingContext dbc) {
+    public void addBinding(WidgetCreator dbc) {
         if (binding == null) {
             WritableValue wv = new WritableValue(Boolean.FALSE, Boolean.class);
             UpdateValueStrategy uvs = new UpdateValueStrategy();
@@ -157,7 +157,7 @@ public class SampleTypeSelectionWidget {
 
     }
 
-    public void removeBinding(DataBindingContext dbc) {
+    public void removeBinding(WidgetCreator dbc) {
         if (binding != null) {
             dbc.removeBinding(binding);
         }
