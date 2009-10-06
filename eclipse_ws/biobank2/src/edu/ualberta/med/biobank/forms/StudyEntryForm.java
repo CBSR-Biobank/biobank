@@ -25,7 +25,6 @@ import edu.ualberta.med.biobank.model.PvInfo;
 import edu.ualberta.med.biobank.model.PvInfoPossible;
 import edu.ualberta.med.biobank.model.PvInfoType;
 import edu.ualberta.med.biobank.model.SampleSource;
-import edu.ualberta.med.biobank.model.SampleStorage;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
@@ -350,7 +349,7 @@ public class StudyEntryForm extends BiobankEntryForm {
         Set<PvInfo> savedPvInfoList = new HashSet<PvInfo>();
 
         // FIXME: change study to studyWrapper
-        // study.setContactCollection(contactEntryWidget.getContacts());
+        studyWrapper.setContactCollection(contactEntryWidget.getContacts());
 
         if (studyWrapper.getPvInfoCollection().size() > 0) {
             for (PvInfo pvInfo : studyWrapper.getPvInfoCollection()) {
@@ -374,38 +373,8 @@ public class StudyEntryForm extends BiobankEntryForm {
     private void saveSampleStorage() throws Exception {
         Collection<SampleStorageWrapper> ssCollection = sampleStorageEntryWidget
             .getSampleStorage();
-
-        removeDeletedSampleStorage(ssCollection);
-
-        Collection<SampleStorage> savedSsCollection = new HashSet<SampleStorage>();
-        for (SampleStorageWrapper ss : ssCollection) {
-            ss.setStudy(studyWrapper.getWrappedObject());
-            ss.persist();
-            savedSsCollection.add(ss.getWrappedObject());
-        }
-        studyWrapper.setSampleStorageCollection(savedSsCollection);
-    }
-
-    private void removeDeletedSampleStorage(
-        Collection<SampleStorageWrapper> ssCollection) throws Exception {
-        // no need to remove if study is not yet in the database
-        if (studyWrapper.getId() == null)
-            return;
-
-        List<Integer> selectedStampleStorageIds = new ArrayList<Integer>();
-        for (SampleStorageWrapper ss : ssCollection) {
-            selectedStampleStorageIds.add(ss.getId());
-        }
-
-        // query from database again
-        studyWrapper.reload();
-
-        for (SampleStorageWrapper ss : studyWrapper
-            .getSampleStorageCollection()) {
-            if (!selectedStampleStorageIds.contains(ss.getId())) {
-                ss.delete();
-            }
-        }
+        studyWrapper.deleteSampleStorageComplement(ssCollection);
+        studyWrapper.setSampleStorageCollection(ssCollection);
     }
 
     private List<PvInfoPossible> getPossiblePvInfos() throws Exception {

@@ -171,6 +171,15 @@ public class StudyWrapper extends ModelWrapper<Study> implements
         return list;
     }
 
+    public void setContactCollection(
+        Collection<ContactWrapper> wrapperCollection) {
+        Collection<Contact> collection = new HashSet<Contact>();
+        for (ContactWrapper contact : wrapperCollection) {
+            collection.add(contact.wrappedObject);
+        }
+        wrappedObject.setContactCollection(collection);
+    }
+
     public Collection<SampleStorageWrapper> getSampleStorageCollection() {
         Collection<SampleStorageWrapper> wrapperCollection = new HashSet<SampleStorageWrapper>();
         Collection<SampleStorage> collection = wrappedObject
@@ -189,6 +198,45 @@ public class StudyWrapper extends ModelWrapper<Study> implements
             Collections.sort(list);
         }
         return list;
+    }
+
+    public void setSampleStorageCollection(
+        Collection<SampleStorageWrapper> wrapperCollection) {
+        Collection<SampleStorage> collection = new HashSet<SampleStorage>();
+        for (SampleStorageWrapper wrapper : wrapperCollection) {
+            wrapper.setStudy(wrappedObject);
+            collection.add(wrapper.getWrappedObject());
+        }
+        wrappedObject.setSampleStorageCollection(collection);
+    }
+
+    /**
+     * Removes the sample storage objects that are not contained in the
+     * collection.
+     * 
+     * @param ssCollection
+     * @throws Exception
+     */
+    public void deleteSampleStorageComplement(
+        Collection<SampleStorageWrapper> ssCollection) throws Exception {
+        // no need to remove if study is not yet in the database or nothing in
+        // the collection
+        if ((getId() == null) || (ssCollection.size() == 0))
+            return;
+
+        // query from database again
+        reload();
+
+        List<Integer> selectedStampleStorageIds = new ArrayList<Integer>();
+        for (SampleStorageWrapper ss : ssCollection) {
+            selectedStampleStorageIds.add(ss.getId());
+        }
+
+        for (SampleStorageWrapper ss : getSampleStorageCollection()) {
+            if (!selectedStampleStorageIds.contains(ss.getId())) {
+                ss.delete();
+            }
+        }
     }
 
     public Collection<SampleSourceWrapper> getSampleSourceCollection() {
@@ -215,10 +263,6 @@ public class StudyWrapper extends ModelWrapper<Study> implements
         Collection<SampleSource> sampleSourceCollection) {
         wrappedObject.setSampleSourceCollection(sampleSourceCollection);
 
-    }
-
-    public void setSampleStorageCollection(Collection<SampleStorage> collection) {
-        wrappedObject.setSampleStorageCollection(collection);
     }
 
     public Collection<PvInfo> getPvInfoCollection() {
