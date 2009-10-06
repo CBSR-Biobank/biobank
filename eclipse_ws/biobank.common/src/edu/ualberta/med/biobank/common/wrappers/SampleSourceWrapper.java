@@ -34,27 +34,46 @@ public class SampleSourceWrapper extends ModelWrapper<SampleSource> implements
         return new String[] { "name" };
     }
 
-    public Collection<StudyWrapper> getStudyCollection() {
-        Collection<StudyWrapper> wrapperCollection = new HashSet<StudyWrapper>();
-        Collection<Study> collection = wrappedObject.getStudyCollection();
-        if (collection != null)
-            for (Study study : collection) {
-                wrapperCollection.add(new StudyWrapper(appService, study));
+    @SuppressWarnings("unchecked")
+    public Collection<StudyWrapper> getStudyCollection(boolean sort) {
+        List<StudyWrapper> clinicCollection = (List<StudyWrapper>) propertiesMap
+            .get("studyCollection");
+        if (clinicCollection == null) {
+            Collection<Study> children = wrappedObject.getStudyCollection();
+            if (children != null) {
+                clinicCollection = new ArrayList<StudyWrapper>();
+                for (Study study : children) {
+                    clinicCollection.add(new StudyWrapper(appService, study));
+                }
+                propertiesMap.put("studyCollection", clinicCollection);
             }
-        return wrapperCollection;
+        }
+        if ((clinicCollection != null) && sort)
+            Collections.sort(clinicCollection);
+        return clinicCollection;
     }
 
-    public List<StudyWrapper> getStudyCollectionSorted() {
-        List<StudyWrapper> list = new ArrayList<StudyWrapper>(
-            getStudyCollection());
-        if (list.size() > 1) {
-            Collections.sort(list);
+    public void setStudyCollection(Collection<Study> studies, boolean setNull) {
+        Collection<Study> oldStudies = wrappedObject.getStudyCollection();
+        wrappedObject.setStudyCollection(studies);
+        propertyChangeSupport.firePropertyChange("studyCollection", oldStudies,
+            studies);
+        if (setNull) {
+            propertiesMap.put("studyCollection", null);
         }
-        return list;
+    }
+
+    public void setStudyCollection(List<StudyWrapper> studies) {
+        Collection<Study> studyObjects = new HashSet<Study>();
+        for (StudyWrapper study : studies) {
+            studyObjects.add(study.getWrappedObject());
+        }
+        setStudyCollection(studyObjects, false);
+        propertiesMap.put("studyCollection", studies);
     }
 
     @Override
-    protected Class<SampleSource> getWrappedClass() {
+    public Class<SampleSource> getWrappedClass() {
         return SampleSource.class;
     }
 

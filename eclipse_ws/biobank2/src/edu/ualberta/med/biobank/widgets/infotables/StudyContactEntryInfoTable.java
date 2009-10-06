@@ -1,7 +1,8 @@
 package edu.ualberta.med.biobank.widgets.infotables;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.List;
 
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.widgets.Composite;
@@ -88,8 +89,8 @@ public class StudyContactEntryInfoTable extends InfoTableWidget<ContactWrapper> 
     }
 
     @Override
-    public Collection<ContactWrapper> getCollection() {
-        Collection<ContactWrapper> collection = new HashSet<ContactWrapper>();
+    public List<ContactWrapper> getCollection() {
+        List<ContactWrapper> collection = new ArrayList<ContactWrapper>();
         for (BiobankCollectionModel item : model) {
             collection.add(((StudyContactInfo) item.o).contact);
         }

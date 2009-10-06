@@ -18,12 +18,13 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
+import edu.ualberta.med.biobank.common.wrappers.PvInfoPossibleWrapper;
+import edu.ualberta.med.biobank.common.wrappers.PvInfoTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.PvInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleSourceWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.PvInfo;
-import edu.ualberta.med.biobank.model.PvInfoPossible;
-import edu.ualberta.med.biobank.model.PvInfoType;
 import edu.ualberta.med.biobank.model.SampleSource;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
@@ -74,11 +75,11 @@ public class StudyEntryForm extends BiobankEntryForm {
 
     private MultiSelectWidget sampleSourceMultiSelect;
 
-    private Collection<PvInfoPossible> possiblePvInfos;
+    private Collection<PvInfoPossibleWrapper> possiblePvInfos;
 
     class CombinedPvInfo {
-        PvInfoPossible pvInfoPossible;
-        PvInfo pvInfo;
+        PvInfoPossibleWrapper pvInfoPossible;
+        PvInfoWrapper pvInfo;
         PvInfoWidget wiget;
     };
 
@@ -208,12 +209,13 @@ public class StudyEntryForm extends BiobankEntryForm {
 
     private void createPvInfoSection() throws Exception {
         Composite client = createSectionWithClient("Patient Visit Information Collected");
-        Collection<PvInfo> pviCollection = studyWrapper.getPvInfoCollection();
+        Collection<PvInfoWrapper> pviCollection = studyWrapper
+            .getPvInfoCollection();
         GridLayout gl = (GridLayout) client.getLayout();
         gl.numColumns = 1;
 
         if (pviCollection != null) {
-            for (PvInfo pvInfo : pviCollection) {
+            for (PvInfoWrapper pvInfo : pviCollection) {
                 CombinedPvInfo combinedPvInfo = new CombinedPvInfo();
                 combinedPvInfo.pvInfo = pvInfo;
                 combinedPvInfo.pvInfoPossible = pvInfo.getPvInfoPossible();
@@ -223,7 +225,7 @@ public class StudyEntryForm extends BiobankEntryForm {
             }
         }
 
-        possiblePvInfos = getPossiblePvInfos();
+        possiblePvInfos = PvInfoPossibleWrapper.getAllWrappers(appService);
         Assert.isNotNull(possiblePvInfos);
 
         // START KLUDGE
@@ -236,9 +238,10 @@ public class StudyEntryForm extends BiobankEntryForm {
             "Date Received" };
 
         for (String field : defaultFields) {
-            PvInfoType pvType = new PvInfoType();
+            PvInfoTypeWrapper pvType = new PvInfoTypeWrapper(appService);
             pvType.setType("date_time");
-            PvInfoPossible pvInfoDateDrawn = new PvInfoPossible();
+            PvInfoPossibleWrapper pvInfoDateDrawn = new PvInfoPossibleWrapper(
+                appService);
             pvInfoDateDrawn.setIsDefault(true);
             pvInfoDateDrawn.setLabel(field);
             pvInfoDateDrawn.setPvInfoType(pvType);
@@ -247,7 +250,7 @@ public class StudyEntryForm extends BiobankEntryForm {
         //
         // END KLUDGE
 
-        for (PvInfoPossible possiblePvInfo : possiblePvInfos) {
+        for (PvInfoPossibleWrapper possiblePvInfo : possiblePvInfos) {
             boolean selected = false;
             String value = "";
             CombinedPvInfo combinedPvInfo = (CombinedPvInfo) combinedPvInfoMap
@@ -297,18 +300,19 @@ public class StudyEntryForm extends BiobankEntryForm {
         // get the selected sample sources from widget
         List<Integer> selSampleSourceIds = sampleSourceMultiSelect
             .getSelected();
-        Collection<SampleSource> selSampleSource = new HashSet<SampleSource>();
+        List<SampleSourceWrapper> selSampleSource = new ArrayList<SampleSourceWrapper>();
         for (SampleSourceWrapper ss : allSampleSources) {
             int id = ss.getId();
             if (selSampleSourceIds.indexOf(id) >= 0) {
-                selSampleSource.add(ss.getWrappedObject());
+                selSampleSource.add(ss);
             }
         }
         Assert.isTrue(selSampleSource.size() == selSampleSourceIds.size(),
             "problem with sample source selections");
+        studyWrapper.deleteSampleSourceComplement(selSampleSource);
         studyWrapper.setSampleSourceCollection(selSampleSource);
 
-        Collection<PvInfo> pvInfoList = new HashSet<PvInfo>();
+        List<PvInfoWrapper> pvInfoList = new ArrayList<PvInfoWrapper>();
         MapIterator it = combinedPvInfoMap.mapIterator();
         while (it.hasNext()) {
             it.next();
@@ -319,10 +323,9 @@ public class StudyEntryForm extends BiobankEntryForm {
                 continue;
 
             String value = combinedPvInfo.wiget.getValues();
-            PvInfo pvInfo = combinedPvInfo.pvInfo;
-
+            PvInfoWrapper pvInfo = combinedPvInfo.pvInfo;
             if (pvInfo == null) {
-                pvInfo = new PvInfo();
+                pvInfo = new PvInfoWrapper(appService);
                 pvInfo.setPvInfoPossible(combinedPvInfo.pvInfoPossible);
                 pvInfo.setPvInfoType(combinedPvInfo.pvInfoPossible
                     .getPvInfoType());
@@ -352,18 +355,18 @@ public class StudyEntryForm extends BiobankEntryForm {
         studyWrapper.setContactCollection(contactEntryWidget.getContacts());
 
         if (studyWrapper.getPvInfoCollection().size() > 0) {
-            for (PvInfo pvInfo : studyWrapper.getPvInfoCollection()) {
+            for (PvInfoWrapper pvInfo : studyWrapper.getPvInfoCollection()) {
                 if ((pvInfo.getId() == null) || (pvInfo.getId() == 0)) {
-                    query = new InsertExampleQuery(pvInfo);
+                    query = new InsertExampleQuery(pvInfo.getWrappedObject());
                 } else {
-                    query = new UpdateExampleQuery(pvInfo);
+                    query = new UpdateExampleQuery(pvInfo.getWrappedObject());
                 }
 
                 result = studyAdapter.getAppService().executeQuery(query);
                 savedPvInfoList.add((PvInfo) result.getObjectResult());
             }
         }
-        studyWrapper.setPvInfoCollection(savedPvInfoList);
+        studyWrapper.setPvInfoCollection(savedPvInfoList, true);
         studyWrapper.persist();
         SiteAdapter siteAdapter = studyAdapter
             .getParentFromClass(SiteAdapter.class);
@@ -371,15 +374,10 @@ public class StudyEntryForm extends BiobankEntryForm {
     }
 
     private void saveSampleStorage() throws Exception {
-        Collection<SampleStorageWrapper> ssCollection = sampleStorageEntryWidget
+        List<SampleStorageWrapper> ssCollection = sampleStorageEntryWidget
             .getSampleStorage();
         studyWrapper.deleteSampleStorageComplement(ssCollection);
         studyWrapper.setSampleStorageCollection(ssCollection);
-    }
-
-    private List<PvInfoPossible> getPossiblePvInfos() throws Exception {
-        return studyAdapter.getAppService().search(PvInfoPossible.class,
-            new PvInfoPossible());
     }
 
     @Override

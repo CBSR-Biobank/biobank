@@ -398,4 +398,9 @@ public abstract class AdapterBase {
         }
     }
 
+    public AdapterBase searchChild(ModelWrapper<?> wrapper) {
+        return accept(new NodeSearchVisitor(wrapper.getWrappedClass(), wrapper
+            .getId()));
+    }
+
 }

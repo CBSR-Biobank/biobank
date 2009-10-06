@@ -62,7 +62,7 @@ public class SampleStorageWrapper extends ModelWrapper<SampleStorage> implements
     }
 
     @Override
-    protected Class<SampleStorage> getWrappedClass() {
+    public Class<SampleStorage> getWrappedClass() {
         return SampleStorage.class;
     }
 

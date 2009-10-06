@@ -18,7 +18,6 @@ import edu.ualberta.med.biobank.forms.PatientEntryForm;
 import edu.ualberta.med.biobank.forms.PatientViewForm;
 import edu.ualberta.med.biobank.forms.PatientVisitEntryForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
-import edu.ualberta.med.biobank.model.PatientVisit;
 
 public class PatientAdapter extends AdapterBase {
 
@@ -80,7 +79,7 @@ public class PatientAdapter extends AdapterBase {
             public void widgetSelected(SelectionEvent event) {
                 PatientVisitAdapter adapter = new PatientVisitAdapter(
                     PatientAdapter.this, new PatientVisitWrapper(
-                        getAppService(), new PatientVisit()));
+                        getAppService()));
                 adapter.getWrapper().setPatientWrapper(getWrapper());
                 openForm(new FormInput(adapter), PatientVisitEntryForm.ID);
             }

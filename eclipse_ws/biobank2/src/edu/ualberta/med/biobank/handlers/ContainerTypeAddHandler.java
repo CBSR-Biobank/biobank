@@ -11,28 +11,19 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.forms.ContainerTypeEntryForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Capacity;
-import edu.ualberta.med.biobank.model.ContainerType;
-import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.treeview.ContainerTypeAdapter;
-import edu.ualberta.med.biobank.treeview.NodeSearchVisitor;
-import edu.ualberta.med.biobank.treeview.SessionAdapter;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 
 public class ContainerTypeAddHandler extends AbstractHandler {
     public static final String ID = "edu.ualberta.med.biobank.commands.containerTypeAdd";
 
     public Object execute(ExecutionEvent event) throws ExecutionException {
-
-        SessionAdapter sessionAdapter = SessionManager.getInstance()
-            .getSession();
-        Assert.isNotNull(sessionAdapter);
-        SiteAdapter siteAdapter = (SiteAdapter) sessionAdapter
-            .accept(new NodeSearchVisitor(Site.class, SessionManager
-                .getInstance().getCurrentSiteWrapper().getId()));
+        SiteAdapter siteAdapter = (SiteAdapter) SessionManager.getInstance()
+            .searchNode(SessionManager.getInstance().getCurrentSiteWrapper());
         Assert.isNotNull(siteAdapter);
 
         ContainerTypeWrapper containerType = new ContainerTypeWrapper(
-            SessionManager.getAppService(), new ContainerType());
+            SessionManager.getAppService());
         containerType.setSite(siteAdapter.getSite());
         containerType.setCapacity(new Capacity());
         ContainerTypeAdapter containerTypeNode = new ContainerTypeAdapter(

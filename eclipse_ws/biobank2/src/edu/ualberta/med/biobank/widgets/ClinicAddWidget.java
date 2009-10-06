@@ -40,9 +40,9 @@ import edu.ualberta.med.biobank.widgets.infotables.StudyContactEntryInfoTable;
  */
 public class ClinicAddWidget extends BiobankWidget {
 
-    private Collection<ContactWrapper> selectedContacts;
+    private List<ContactWrapper> selectedContacts;
 
-    private Collection<ClinicWrapper> allClinics;
+    private List<ClinicWrapper> allClinics;
 
     private StudyContactEntryInfoTable contactInfoTable;
 
@@ -54,7 +54,7 @@ public class ClinicAddWidget extends BiobankWidget {
         Assert.isNotNull(toolkit, "toolkit is null");
         SiteWrapper siteWrapper = new SiteWrapper(SessionManager
             .getAppService(), studyWrapper.getSite());
-        allClinics = siteWrapper.getClinicCollection();
+        allClinics = siteWrapper.getClinicCollection(true);
 
         selectedContacts = studyWrapper.getContactCollection();
 
@@ -154,7 +154,7 @@ public class ClinicAddWidget extends BiobankWidget {
         return clinics;
     }
 
-    public Collection<ContactWrapper> getContacts() {
+    public List<ContactWrapper> getContacts() {
         return selectedContacts;
     }
 }

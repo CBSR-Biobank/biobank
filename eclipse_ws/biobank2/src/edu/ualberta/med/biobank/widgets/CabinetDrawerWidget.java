@@ -17,7 +17,6 @@ import org.eclipse.swt.widgets.Composite;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ContainerPositionWrapper;
 import edu.ualberta.med.biobank.model.ContainerCell;
-import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.ContainerStatus;
 
 public class CabinetDrawerWidget extends Canvas {
@@ -57,7 +56,7 @@ public class CabinetDrawerWidget extends Canvas {
         cells = new ContainerCell[boxNumber][1];
         for (int i = 0; i < boxNumber; i++) {
             ContainerPositionWrapper pos = new ContainerPositionWrapper(
-                SessionManager.getAppService(), new ContainerPosition());
+                SessionManager.getAppService());
             pos.setRow(i);
             pos.setCol(0);
             ContainerStatus stat = ContainerStatus.NOT_INITIALIZED;

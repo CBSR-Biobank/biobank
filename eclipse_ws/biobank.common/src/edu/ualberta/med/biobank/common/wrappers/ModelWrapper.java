@@ -32,6 +32,20 @@ public abstract class ModelWrapper<E> {
         this.wrappedObject = wrappedObject;
     }
 
+    /**
+     * create a new wrapped object
+     */
+    public ModelWrapper(WritableApplicationService appService) {
+        this.appService = appService;
+        try {
+            this.wrappedObject = getNewObject();
+        } catch (Exception e) {
+            throw new RuntimeException(
+                "was not able to create new object of type "
+                    + getWrappedClass().getName());
+        }
+    }
+
     public E getWrappedObject() {
         return wrappedObject;
     }
@@ -123,7 +137,7 @@ public abstract class ModelWrapper<E> {
             + classType.getName() + " with id=" + id);
     }
 
-    protected abstract Class<E> getWrappedClass();
+    public abstract Class<E> getWrappedClass();
 
     /**
      * insert or update the object into the database
@@ -212,7 +226,10 @@ public abstract class ModelWrapper<E> {
         return (id == null && id2 == null) || id.equals(id2);
     }
 
-    public List<E> getAllObjects() throws Exception {
+    /**
+     * return the list of all objects of the database of this type
+     */
+    protected List<E> getAllObjects() throws Exception {
         Class<E> classType = getWrappedClass();
         Constructor<E> constructor = classType.getConstructor();
         Object instance = constructor.newInstance();

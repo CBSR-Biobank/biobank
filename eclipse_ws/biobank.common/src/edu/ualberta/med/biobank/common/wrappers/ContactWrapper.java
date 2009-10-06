@@ -1,6 +1,10 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
 
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.model.Clinic;
@@ -81,12 +85,42 @@ public class ContactWrapper extends ModelWrapper<Contact> implements
             .firePropertyChange("clinic", oldClinic, newClinic);
     }
 
-    public Collection<Study> getStudyCollection() {
-        return wrappedObject.getStudyCollection();
+    @SuppressWarnings("unchecked")
+    public Collection<StudyWrapper> getStudyCollection(boolean sort) {
+        List<StudyWrapper> clinicCollection = (List<StudyWrapper>) propertiesMap
+            .get("studyCollection");
+        if (clinicCollection == null) {
+            Collection<Study> children = wrappedObject.getStudyCollection();
+            if (children != null) {
+                clinicCollection = new ArrayList<StudyWrapper>();
+                for (Study study : children) {
+                    clinicCollection.add(new StudyWrapper(appService, study));
+                }
+                propertiesMap.put("studyCollection", clinicCollection);
+            }
+        }
+        if ((clinicCollection != null) && sort)
+            Collections.sort(clinicCollection);
+        return clinicCollection;
     }
 
-    public void setStudyCollection(Collection<Study> collection) {
-        wrappedObject.setStudyCollection(collection);
+    public void setStudyCollection(Collection<Study> studies, boolean setNull) {
+        Collection<Study> oldStudies = wrappedObject.getStudyCollection();
+        wrappedObject.setStudyCollection(studies);
+        propertyChangeSupport.firePropertyChange("studyCollection", oldStudies,
+            studies);
+        if (setNull) {
+            propertiesMap.put("studyCollection", null);
+        }
+    }
+
+    public void setStudyCollection(List<StudyWrapper> studies) {
+        Collection<Study> studyObjects = new HashSet<Study>();
+        for (StudyWrapper study : studies) {
+            studyObjects.add(study.getWrappedObject());
+        }
+        setStudyCollection(studyObjects, false);
+        propertiesMap.put("studyCollection", studies);
     }
 
     @Override
@@ -97,11 +131,11 @@ public class ContactWrapper extends ModelWrapper<Contact> implements
     @Override
     protected String[] getPropertyChangesNames() {
         return new String[] { "name", "title", "phoneNumber", "faxNumber",
-            "emailAddress", "clinic" };
+            "emailAddress", "clinic", "studyCollection" };
     }
 
     @Override
-    protected Class<Contact> getWrappedClass() {
+    public Class<Contact> getWrappedClass() {
         return Contact.class;
     }
 

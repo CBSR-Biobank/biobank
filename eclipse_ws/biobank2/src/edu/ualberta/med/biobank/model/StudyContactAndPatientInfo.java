@@ -20,7 +20,7 @@ public class StudyContactAndPatientInfo {
         Assert.isNotNull(contact, "contact is null");
         ClinicWrapper clinic = contact.getClinicWrapper();
         Assert.isNotNull(clinic, "clinic is null");
-        SessionManager.getInstance().openViewForm(Clinic.class, clinic.getId());
+        SessionManager.getInstance().openViewForm(clinic);
     }
 
 }

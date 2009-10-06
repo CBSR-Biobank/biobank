@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
@@ -41,7 +42,7 @@ public class SampleWrapper extends ModelWrapper<Sample> {
     }
 
     @Override
-    protected Class<Sample> getWrappedClass() {
+    public Class<Sample> getWrappedClass() {
         return Sample.class;
     }
 
@@ -145,6 +146,10 @@ public class SampleWrapper extends ModelWrapper<Sample> {
         propertyChangeSupport.firePropertyChange("sampleType", oldType, type);
     }
 
+    public void setSampleType(SampleTypeWrapper type) {
+        setSampleType(type.wrappedObject);
+    }
+
     public SampleType getSampleType() {
         return wrappedObject.getSampleType();
     }
@@ -200,14 +205,15 @@ public class SampleWrapper extends ModelWrapper<Sample> {
             + LabelingScheme.getPositionString(position);
     }
 
-    public static Sample createNewSample(String inventoryId,
-        PatientVisitWrapper pv, SampleType type,
+    public static SampleWrapper createNewSample(
+        WritableApplicationService appService, String inventoryId,
+        PatientVisitWrapper pv, SampleTypeWrapper type,
         Collection<SampleStorage> sampleStorages) {
         Sample sample = new Sample();
         sample.setInventoryId(inventoryId);
         sample.setPatientVisit(pv.getWrappedObject());
         sample.setLinkDate(new Date());
-        sample.setSampleType(type);
+        sample.setSampleType(type.getWrappedObject());
         Double volume = null;
         for (SampleStorage ss : sampleStorages) {
             if (ss.getSampleType().getId().equals(type.getId())) {
@@ -215,7 +221,7 @@ public class SampleWrapper extends ModelWrapper<Sample> {
             }
         }
         sample.setQuantity(volume);
-        return sample;
+        return new SampleWrapper(appService, sample);
     }
 
     public void setQuantityFromType() {
@@ -240,4 +246,26 @@ public class SampleWrapper extends ModelWrapper<Sample> {
     protected void deleteChecks() throws BiobankCheckException, Exception {
         // TODO Auto-generated method stub
     }
+
+    public static List<SampleWrapper> getSamplesInSite(
+        WritableApplicationService appService, String inventoryId,
+        SiteWrapper siteWrapper) throws ApplicationException {
+        HQLCriteria criteria = new HQLCriteria(
+            "from "
+                + Sample.class.getName()
+                + " where inventoryId = ? and patientVisit.patient.study.site.id = ?",
+            Arrays.asList(new Object[] { inventoryId, siteWrapper.getId() }));
+        List<Sample> samples = appService.query(criteria);
+        return transformToWrapperList(appService, samples);
+    }
+
+    public static List<SampleWrapper> transformToWrapperList(
+        WritableApplicationService appService, List<Sample> samples) {
+        List<SampleWrapper> list = new ArrayList<SampleWrapper>();
+        for (Sample sample : samples) {
+            list.add(new SampleWrapper(appService, sample));
+        }
+        return list;
+    }
+
 }

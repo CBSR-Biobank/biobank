@@ -196,7 +196,7 @@ public class SampleStorageEntryWidget extends BiobankWidget {
         }
     }
 
-    public Collection<SampleStorageWrapper> getSampleStorage() {
+    public List<SampleStorageWrapper> getSampleStorage() {
         return sampleStorageTable.getCollection();
     }
 

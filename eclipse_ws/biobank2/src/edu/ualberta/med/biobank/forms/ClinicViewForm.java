@@ -115,7 +115,7 @@ public class ClinicViewForm extends AddressViewFormCommon {
         form.setText("Clinic: " + clinicWrapper.getName());
         setClinicValues();
         setAdressValues();
-        studiesTable.setCollection(clinicWrapper.getStudyCollection());
+        studiesTable.setCollection(clinicWrapper.getStudyCollection(true));
     }
 
     @Override

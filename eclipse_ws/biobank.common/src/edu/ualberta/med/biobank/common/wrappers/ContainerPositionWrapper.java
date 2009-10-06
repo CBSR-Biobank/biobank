@@ -18,6 +18,10 @@ public class ContainerPositionWrapper extends
         super(appService, wrappedObject);
     }
 
+    public ContainerPositionWrapper(WritableApplicationService appService) {
+        super(appService);
+    }
+
     @Override
     protected String[] getPropertyChangesNames() {
         List<String> properties = Arrays
@@ -28,7 +32,7 @@ public class ContainerPositionWrapper extends
     }
 
     @Override
-    protected Class<ContainerPosition> getWrappedClass() {
+    public Class<ContainerPosition> getWrappedClass() {
         return ContainerPosition.class;
     }
 

@@ -11,6 +11,10 @@ public abstract class AbstractPositionWrapper<E extends AbstractPosition>
         super(appService, wrappedObject);
     }
 
+    public AbstractPositionWrapper(WritableApplicationService appService) {
+        super(appService);
+    }
+
     @Override
     protected String[] getPropertyChangesNames() {
         return new String[] { "row", "col" };

@@ -21,7 +21,7 @@ public class ContainerLabelingSchemeWrapper extends
     }
 
     @Override
-    protected Class<ContainerLabelingScheme> getWrappedClass() {
+    public Class<ContainerLabelingScheme> getWrappedClass() {
         return ContainerLabelingScheme.class;
     }
 

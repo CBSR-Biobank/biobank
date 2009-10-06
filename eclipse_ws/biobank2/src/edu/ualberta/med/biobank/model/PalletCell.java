@@ -3,6 +3,8 @@ package edu.ualberta.med.biobank.model;
 import java.util.Arrays;
 import java.util.List;
 
+import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.scanlib.ScanCell;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -19,13 +21,13 @@ public class PalletCell {
 
     private boolean selected = false;
 
-    private SampleType type;
+    private SampleTypeWrapper type;
 
-    private Sample sample;
+    private SampleWrapper sample;
 
     private ScanCell scanCell;
 
-    private Sample expectedSample;
+    private SampleWrapper expectedSample;
 
     public PalletCell(ScanCell scanCell) {
         this.scanCell = scanCell;
@@ -139,19 +141,19 @@ public class PalletCell {
         this.selected = selected;
     }
 
-    public SampleType getType() {
+    public SampleTypeWrapper getType() {
         return type;
     }
 
-    public void setType(SampleType type) {
+    public void setType(SampleTypeWrapper type) {
         this.type = type;
     }
 
-    public void setSample(Sample sample) {
+    public void setSample(SampleWrapper sample) {
         this.sample = sample;
     }
 
-    public Sample getSample() {
+    public SampleWrapper getSample() {
         return sample;
     }
 
@@ -184,11 +186,11 @@ public class PalletCell {
         return new PalletCell[ScanCell.ROW_MAX][ScanCell.COL_MAX];
     }
 
-    public void setExpectedSample(Sample expectedSample) {
+    public void setExpectedSample(SampleWrapper expectedSample) {
         this.expectedSample = expectedSample;
     }
 
-    public Sample getExpectedSample() {
+    public SampleWrapper getExpectedSample() {
         return expectedSample;
     }
 }

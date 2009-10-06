@@ -12,7 +12,7 @@ public class AddressWrapper extends ModelWrapper<Address> {
     }
 
     @Override
-    protected Class<Address> getWrappedClass() {
+    public Class<Address> getWrappedClass() {
         return Address.class;
     }
 
@@ -23,7 +23,8 @@ public class AddressWrapper extends ModelWrapper<Address> {
     public void setStreet1(String street1) {
         String oldStreet1 = getStreet1();
         wrappedObject.setStreet1(street1);
-        propertyChangeSupport.firePropertyChange("name", oldStreet1, street1);
+        propertyChangeSupport
+            .firePropertyChange("street1", oldStreet1, street1);
     }
 
     public String getStreet2() {
@@ -33,7 +34,8 @@ public class AddressWrapper extends ModelWrapper<Address> {
     public void setStreet2(String street2) {
         String oldStreet2 = getStreet2();
         wrappedObject.setStreet2(street2);
-        propertyChangeSupport.firePropertyChange("name", oldStreet2, street2);
+        propertyChangeSupport
+            .firePropertyChange("street2", oldStreet2, street2);
     }
 
     public String getCity() {
@@ -43,7 +45,7 @@ public class AddressWrapper extends ModelWrapper<Address> {
     public void setCity(String city) {
         String oldCity = getCity();
         wrappedObject.setCity(city);
-        propertyChangeSupport.firePropertyChange("name", oldCity, city);
+        propertyChangeSupport.firePropertyChange("city", oldCity, city);
     }
 
     public String getProvince() {
@@ -53,7 +55,8 @@ public class AddressWrapper extends ModelWrapper<Address> {
     public void setProvince(String province) {
         String oldProvince = getProvince();
         wrappedObject.setProvince(province);
-        propertyChangeSupport.firePropertyChange("name", oldProvince, province);
+        propertyChangeSupport.firePropertyChange("province", oldProvince,
+            province);
     }
 
     public String getPostalCode() {
@@ -63,7 +66,7 @@ public class AddressWrapper extends ModelWrapper<Address> {
     public void setPostalCode(String postalCode) {
         String oldPostalCode = getPostalCode();
         wrappedObject.setPostalCode(postalCode);
-        propertyChangeSupport.firePropertyChange("name", oldPostalCode,
+        propertyChangeSupport.firePropertyChange("postalCode", oldPostalCode,
             postalCode);
     }
 

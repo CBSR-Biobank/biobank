@@ -16,11 +16,10 @@ import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.common.wrappers.ContainerPositionWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.ContainerCell;
-import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.ContainerStatus;
-import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.widgets.ContainerDisplayWidget;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
@@ -180,7 +179,7 @@ public abstract class AbstractContainerChooserPage extends WizardPage {
         return currentContainer;
     }
 
-    public Site getSite() {
+    public SiteWrapper getSite() {
         return ((ContainerChooserWizard) getWizard()).getSite();
     }
 
@@ -190,7 +189,7 @@ public abstract class AbstractContainerChooserPage extends WizardPage {
 
     protected ContainerPositionWrapper newContainerPosition(int dim1, int dim2) {
         ContainerPositionWrapper position = new ContainerPositionWrapper(
-            getAppService(), new ContainerPosition());
+            getAppService());
         position.setParentContainer(currentContainer);
         position.setRow(dim1);
         position.setCol(dim2);

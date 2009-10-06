@@ -13,13 +13,17 @@ public class PvSampleSourceWrapper extends ModelWrapper<PvSampleSource> {
         super(appService, wrappedObject);
     }
 
+    public PvSampleSourceWrapper(WritableApplicationService appService) {
+        super(appService);
+    }
+
     @Override
     protected String[] getPropertyChangesNames() {
         return new String[] { "quantity", "patientVisit", "sampleSource" };
     }
 
     @Override
-    protected Class<PvSampleSource> getWrappedClass() {
+    public Class<PvSampleSource> getWrappedClass() {
         return PvSampleSource.class;
     }
 

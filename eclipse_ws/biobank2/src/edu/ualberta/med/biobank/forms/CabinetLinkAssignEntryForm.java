@@ -47,7 +47,6 @@ import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
 import edu.ualberta.med.biobank.forms.listener.EnterKeyToNextFieldListener;
 import edu.ualberta.med.biobank.model.Sample;
-import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.preferences.PreferenceConstants;
 import edu.ualberta.med.biobank.validators.CabinetLabelValidator;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
@@ -172,6 +171,7 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
                 setVisitsList();
             }
         });
+        firstControl = patientNumberText;
         patientNumberText.addKeyListener(EnterKeyToNextFieldListener.INSTANCE);
         patientNumberText.addFocusListener(new FocusAdapter() {
             @Override
@@ -215,14 +215,14 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
     }
 
     private void createTypeCombo(Composite fieldsComposite) {
-        List<SampleType> sampleTypes;
+        List<SampleTypeWrapper> sampleTypes;
         try {
             sampleTypes = SampleTypeWrapper.getSampleTypeForContainerTypes(
                 appService, SessionManager.getInstance()
                     .getCurrentSiteWrapper(), cabinetNameContains);
         } catch (ApplicationException e) {
             BioBankPlugin.openError("Initialisation failed", e);
-            sampleTypes = new ArrayList<SampleType>();
+            sampleTypes = new ArrayList<SampleTypeWrapper>();
         }
         comboViewerSampleTypes = createCComboViewerWithNoSelectionValidator(
             fieldsComposite, "Sample type", sampleTypes, null,
@@ -233,13 +233,13 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
                 public void selectionChanged(SelectionChangedEvent event) {
                     IStructuredSelection stSelection = (IStructuredSelection) comboViewerSampleTypes
                         .getSelection();
-                    sampleWrapper.setSampleType((SampleType) stSelection
+                    sampleWrapper.setSampleType((SampleTypeWrapper) stSelection
                         .getFirstElement());
                 }
             });
         if (sampleTypes.size() == 1) {
             comboViewerSampleTypes.getCCombo().select(0);
-            sampleWrapper.setSampleType(sampleTypes.get(0));
+            sampleWrapper.setSampleType(sampleTypes.get(0).getWrappedObject());
         }
     }
 
@@ -451,10 +451,12 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
         if (status.getSeverity() == IStatus.OK) {
             form.setMessage(getOkMessage(), IMessageProvider.NONE);
             cancelConfirmWidget.setConfirmEnabled(true);
+            setConfirmEnabled(true);
             checkPositionButton.setEnabled(true);
         } else {
             form.setMessage(status.getMessage(), IMessageProvider.ERROR);
             cancelConfirmWidget.setConfirmEnabled(false);
+            setConfirmEnabled(false);
             if (status.getMessage() != null
                 && status.getMessage().contentEquals(CHECK_CLICK_MESSAGE)) {
                 checkPositionButton.setEnabled(true);

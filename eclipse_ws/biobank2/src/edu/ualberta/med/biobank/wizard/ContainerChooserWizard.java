@@ -4,17 +4,17 @@ import org.eclipse.jface.wizard.Wizard;
 
 import edu.ualberta.med.biobank.common.wrappers.ContainerPositionWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
-import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class ContainerChooserWizard extends Wizard {
     private TopContainerChooserPage containerChooserPage;
     private PalletPositionChooserPage palletChooserPage;
-    private Site site;
+    private SiteWrapper site;
     private WritableApplicationService appService;
 
     public ContainerChooserWizard(WritableApplicationService appService,
-        Site site) {
+        SiteWrapper site) {
         super();
         this.appService = appService;
         this.site = site;
@@ -34,7 +34,7 @@ public class ContainerChooserWizard extends Wizard {
         return true;
     }
 
-    public Site getSite() {
+    public SiteWrapper getSite() {
         return site;
     }
 

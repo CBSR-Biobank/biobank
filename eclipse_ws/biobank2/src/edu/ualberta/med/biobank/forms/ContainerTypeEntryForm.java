@@ -2,7 +2,6 @@ package edu.ualberta.med.biobank.forms;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.collections.map.ListOrderedMap;
@@ -28,9 +27,7 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.utils.ModelUtils;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
-import edu.ualberta.med.biobank.helpers.GetHelper;
-import edu.ualberta.med.biobank.model.SampleType;
-import edu.ualberta.med.biobank.model.SampleTypeComparator;
+import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.treeview.ContainerTypeAdapter;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
@@ -64,7 +61,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
 
     private MultiSelectWidget childContainerTypesMultiSelect;
 
-    private List<SampleType> allSampleTypes;
+    private List<SampleTypeWrapper> allSampleTypes;
 
     private List<ContainerTypeWrapper> allContainerTypes;
 
@@ -214,7 +211,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
                 "Column capacity is not a valid nubmer", false));
     }
 
-    private void createContainsSection() {
+    private void createContainsSection() throws Exception {
         Composite client = createSectionWithClient("Contains");
         hasContainers = toolkit.createButton(client, "Contains Containers",
             SWT.RADIO);
@@ -254,14 +251,12 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         form.layout(true, true);
     }
 
-    private void createSampleTypesSection(Composite parent) {
-        Collection<SampleType> stSamplesTypes = containerType
+    private void createSampleTypesSection(Composite parent) throws Exception {
+        Collection<SampleTypeWrapper> stSamplesTypes = containerType
             .getSampleTypeCollection();
 
-        GetHelper<SampleType> helper = new GetHelper<SampleType>();
-
-        allSampleTypes = helper.getModelObjects(appService, SampleType.class);
-        Collections.sort(allSampleTypes, new SampleTypeComparator());
+        allSampleTypes = SampleTypeWrapper.getAllWrappers(appService);
+        // Collections.sort(allSampleTypes, new SampleTypeComparator());
 
         samplesMultiSelect = new MultiSelectWidget(parent, SWT.NONE,
             "Selected Sample Types", "Available Sample Types", 100);
@@ -275,12 +270,12 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         List<Integer> selSampleTypes = new ArrayList<Integer>();
 
         if (stSamplesTypes != null) {
-            for (SampleType sampleType : stSamplesTypes) {
+            for (SampleTypeWrapper sampleType : stSamplesTypes) {
                 selSampleTypes.add(sampleType.getId());
             }
         }
 
-        for (SampleType sampleType : allSampleTypes) {
+        for (SampleTypeWrapper sampleType : allSampleTypes) {
             availSampleTypes.put(sampleType.getId(), sampleType.getName());
         }
         samplesMultiSelect.addSelections(availSampleTypes, selSampleTypes);
@@ -332,13 +327,13 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
     @Override
     protected void saveForm() throws Exception {
         // set sampletypes
-        List<Integer> selectedIds = null;
+        List<Integer> selectedIds = new ArrayList<Integer>();
         if (hasSamples.getSelection()) {
             selectedIds = samplesMultiSelect.getSelected();
         }
         containerType.setSampleTypes(selectedIds, allSampleTypes);
         // set childcontainers
-        selectedIds = null;
+        selectedIds = new ArrayList<Integer>();
         if (hasContainers.getSelection()) {
             selectedIds = childContainerTypesMultiSelect.getSelected();
         }

@@ -20,7 +20,6 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.model.ContainerCell;
 import edu.ualberta.med.biobank.model.ContainerStatus;
-import edu.ualberta.med.biobank.model.ContainerType;
 
 public class PalletPositionChooserPage extends AbstractContainerChooserPage {
 
@@ -60,7 +59,7 @@ public class PalletPositionChooserPage extends AbstractContainerChooserPage {
         comboViewer.setLabelProvider(new LabelProvider() {
             @Override
             public String getText(Object element) {
-                ContainerType st = (ContainerType) element;
+                ContainerTypeWrapper st = (ContainerTypeWrapper) element;
                 return st.getName();
             }
         });

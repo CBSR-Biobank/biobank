@@ -15,11 +15,7 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.forms.ContainerEntryForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
-import edu.ualberta.med.biobank.model.Container;
-import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.treeview.ContainerAdapter;
-import edu.ualberta.med.biobank.treeview.NodeSearchVisitor;
-import edu.ualberta.med.biobank.treeview.SessionAdapter;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 
 public class ContainerAddHandler extends AbstractHandler {
@@ -39,16 +35,13 @@ public class ContainerAddHandler extends AbstractHandler {
                 return null;
             }
 
-            SessionAdapter sessionAdapter = SessionManager.getInstance()
-                .getSession();
-            Assert.isNotNull(sessionAdapter);
-            SiteAdapter siteAdapter = (SiteAdapter) sessionAdapter
-                .accept(new NodeSearchVisitor(Site.class, SessionManager
-                    .getInstance().getCurrentSiteWrapper().getId()));
+            SiteAdapter siteAdapter = (SiteAdapter) SessionManager
+                .getInstance().searchNode(
+                    SessionManager.getInstance().getCurrentSiteWrapper());
             Assert.isNotNull(siteAdapter);
 
             ContainerWrapper containerWrapper = new ContainerWrapper(
-                SessionManager.getAppService(), new Container());
+                SessionManager.getAppService());
             containerWrapper.setSite(siteAdapter.getWrapper());
             ContainerAdapter containerNode = new ContainerAdapter(siteAdapter
                 .getContainerTypesGroupNode(), containerWrapper);

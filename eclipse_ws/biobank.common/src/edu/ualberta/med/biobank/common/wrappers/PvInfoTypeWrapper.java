@@ -11,13 +11,17 @@ public class PvInfoTypeWrapper extends ModelWrapper<PvInfoType> {
         super(appService, wrappedObject);
     }
 
+    public PvInfoTypeWrapper(WritableApplicationService appService) {
+        super(appService);
+    }
+
     @Override
     protected String[] getPropertyChangesNames() {
         return new String[] { "type" };
     }
 
     @Override
-    protected Class<PvInfoType> getWrappedClass() {
+    public Class<PvInfoType> getWrappedClass() {
         return PvInfoType.class;
     }
 

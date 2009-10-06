@@ -7,6 +7,8 @@ public class SiteClinicInfo {
 
     public ClinicWrapper clinicWrapper;
 
+    public int studies;
+
     public int patients;
 
     public Long patientVisits;

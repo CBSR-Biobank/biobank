@@ -75,7 +75,8 @@ public class SiteWrapper extends ModelWrapper<Site> implements
 
     @Override
     protected String[] getPropertyChangesNames() {
-        return new String[] { "name", "activityStatus", "comment" };
+        return new String[] { "name", "activityStatus", "comment",
+            "containerCollection" };
     }
 
     @Override
@@ -103,7 +104,7 @@ public class SiteWrapper extends ModelWrapper<Site> implements
     }
 
     @Override
-    protected Class<Site> getWrappedClass() {
+    public Class<Site> getWrappedClass() {
         return Site.class;
     }
 
@@ -119,105 +120,167 @@ public class SiteWrapper extends ModelWrapper<Site> implements
             .equals(wrapperName) ? 0 : -1));
     }
 
+    @SuppressWarnings("unchecked")
+    public List<StudyWrapper> getStudyCollection(boolean sort) {
+        List<StudyWrapper> clinicCollection = (List<StudyWrapper>) propertiesMap
+            .get("studyCollection");
+        if (clinicCollection == null) {
+            Collection<Study> children = wrappedObject.getStudyCollection();
+            if (children != null) {
+                clinicCollection = new ArrayList<StudyWrapper>();
+                for (Study study : children) {
+                    clinicCollection.add(new StudyWrapper(appService, study));
+                }
+                propertiesMap.put("studyCollection", clinicCollection);
+            }
+        }
+        if ((clinicCollection != null) && sort)
+            Collections.sort(clinicCollection);
+        return clinicCollection;
+    }
+
     public Collection<StudyWrapper> getStudyCollection() {
-        Collection<StudyWrapper> wrapperCollection = new HashSet<StudyWrapper>();
-        Collection<Study> collection = wrappedObject.getStudyCollection();
-        if (collection != null)
-            for (Study study : collection) {
-                wrapperCollection.add(new StudyWrapper(appService, study));
+        return getStudyCollection(false);
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<ClinicWrapper> getClinicCollection(boolean sort) {
+        List<ClinicWrapper> clinicCollection = (List<ClinicWrapper>) propertiesMap
+            .get("clinicCollection");
+        if (clinicCollection == null) {
+            Collection<Clinic> children = wrappedObject.getClinicCollection();
+            if (children != null) {
+                clinicCollection = new ArrayList<ClinicWrapper>();
+                for (Clinic clinic : children) {
+                    clinicCollection.add(new ClinicWrapper(appService, clinic));
+                }
+                propertiesMap.put("clinicCollection", clinicCollection);
             }
-        return wrapperCollection;
-    }
-
-    public List<StudyWrapper> getStudyCollectionSorted() {
-        List<StudyWrapper> list = new ArrayList<StudyWrapper>(
-            getStudyCollection());
-        if (list.size() > 1) {
-            Collections.sort(list);
         }
-        return list;
+        if ((clinicCollection != null) && sort)
+            Collections.sort(clinicCollection);
+        return clinicCollection;
     }
 
-    public Collection<ClinicWrapper> getClinicCollection() {
-        Collection<ClinicWrapper> wrapperCollection = new HashSet<ClinicWrapper>();
-        Collection<Clinic> collection = wrappedObject.getClinicCollection();
-        if (collection != null)
-            for (Clinic clinic : collection) {
-                wrapperCollection.add(new ClinicWrapper(appService, clinic));
+    public List<ClinicWrapper> getClinicCollection() {
+        return getClinicCollection(false);
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<ContainerTypeWrapper> getContainerTypeCollection(boolean sort) {
+        List<ContainerTypeWrapper> containerTypeCollection = (List<ContainerTypeWrapper>) propertiesMap
+            .get("containerTypeCollection");
+        if (containerTypeCollection == null) {
+            Collection<ContainerType> children = wrappedObject
+                .getContainerTypeCollection();
+            if (children != null) {
+                containerTypeCollection = new ArrayList<ContainerTypeWrapper>();
+                for (ContainerType type : children) {
+                    containerTypeCollection.add(new ContainerTypeWrapper(
+                        appService, type));
+                }
+                propertiesMap.put("containerTypeCollection",
+                    containerTypeCollection);
             }
-        return wrapperCollection;
-    }
-
-    public List<ClinicWrapper> getClinicCollectionSorted() {
-        List<ClinicWrapper> list = new ArrayList<ClinicWrapper>(
-            getClinicCollection());
-        if (list.size() > 1) {
-            Collections.sort(list);
         }
-        return list;
+        if ((containerTypeCollection != null) && sort)
+            Collections.sort(containerTypeCollection);
+        return containerTypeCollection;
     }
 
-    public Collection<ContainerTypeWrapper> getContainerTypeCollection() {
-        Collection<ContainerTypeWrapper> wrapperCollection = new HashSet<ContainerTypeWrapper>();
-        Collection<ContainerType> collection = wrappedObject
+    public List<ContainerTypeWrapper> getContainerTypeCollection() {
+        return getContainerTypeCollection(false);
+    }
+
+    public void setContainerTypeCollection(Collection<ContainerType> types,
+        boolean setNull) {
+        Collection<ContainerType> oldTypes = wrappedObject
             .getContainerTypeCollection();
-        if (collection != null)
-            for (ContainerType ct : collection) {
-                wrapperCollection.add(new ContainerTypeWrapper(appService, ct));
-            }
-        return wrapperCollection;
-    }
-
-    public List<ContainerTypeWrapper> getContainerTypeCollectionSorted() {
-        List<ContainerTypeWrapper> list = new ArrayList<ContainerTypeWrapper>(
-            getContainerTypeCollection());
-        if (list.size() > 1) {
-            Collections.sort(list);
+        wrappedObject.setContainerTypeCollection(types);
+        propertyChangeSupport.firePropertyChange("containerTypeCollection",
+            oldTypes, types);
+        if (setNull) {
+            propertiesMap.put("containerTypeCollection", null);
         }
-        return list;
     }
 
-    public Collection<ContainerWrapper> getContainerCollection() {
-        Collection<ContainerWrapper> wrapperCollection = new HashSet<ContainerWrapper>();
-        Collection<Container> collection = wrappedObject
+    public void setContainerTypeCollection(List<ContainerTypeWrapper> types) {
+        Collection<ContainerType> typeObjects = new HashSet<ContainerType>();
+        for (ContainerTypeWrapper type : types) {
+            typeObjects.add(type.getWrappedObject());
+        }
+        setContainerTypeCollection(typeObjects, false);
+        propertiesMap.put("containerTypeCollection", types);
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<ContainerWrapper> getContainerCollection() {
+        List<ContainerWrapper> containerCollection = (List<ContainerWrapper>) propertiesMap
+            .get("containerCollection");
+        if (containerCollection == null) {
+            Collection<Container> children = wrappedObject
+                .getContainerCollection();
+            if (children != null) {
+                containerCollection = new ArrayList<ContainerWrapper>();
+                for (Container container : children) {
+                    containerCollection.add(new ContainerWrapper(appService,
+                        container));
+                }
+                propertiesMap.put("containerCollection", containerCollection);
+            }
+        }
+        return containerCollection;
+    }
+
+    public void setContainerCollection(Collection<Container> containers,
+        boolean setNull) {
+        Collection<Container> oldContainers = wrappedObject
             .getContainerCollection();
-        if (collection != null)
-            for (Container c : collection) {
-                wrapperCollection.add(new ContainerWrapper(appService, c));
+        wrappedObject.setContainerCollection(containers);
+        propertyChangeSupport.firePropertyChange("containerCollection",
+            oldContainers, containers);
+        if (setNull) {
+            propertiesMap.put("containerCollection", null);
+        }
+    }
+
+    public void setContainerCollection(List<ContainerWrapper> containers) {
+        Collection<Container> containerObjects = new HashSet<Container>();
+        for (ContainerWrapper container : containers) {
+            containerObjects.add(container.getWrappedObject());
+        }
+        setContainerCollection(containerObjects, false);
+        propertiesMap.put("containerCollection", containers);
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<ContainerWrapper> getTopContainerCollection(boolean sort)
+        throws Exception {
+        List<ContainerWrapper> topContainerCollection = (List<ContainerWrapper>) propertiesMap
+            .get("topContainerCollection");
+
+        if (topContainerCollection == null) {
+            topContainerCollection = new ArrayList<ContainerWrapper>();
+            HQLCriteria criteria = new HQLCriteria("from "
+                + Container.class.getName()
+                + " where site.id = ? and position is null", Arrays
+                .asList(new Object[] { wrappedObject.getId() }));
+            List<Container> containers = appService.query(criteria);
+            for (Container c : containers) {
+                topContainerCollection.add(new ContainerWrapper(appService, c));
             }
-        return wrapperCollection;
-    }
-
-    public List<ContainerWrapper> getContainerCollectionSorted() {
-        List<ContainerWrapper> list = new ArrayList<ContainerWrapper>(
-            getContainerCollection());
-        if (list.size() > 1) {
-            Collections.sort(list);
+            if (sort)
+                Collections.sort(topContainerCollection);
+            propertiesMap.put("topContainerCollection", topContainerCollection);
         }
-        return list;
+        return topContainerCollection;
     }
 
-    public Collection<ContainerWrapper> getTopContainerCollection()
-        throws Exception {
-        HQLCriteria criteria = new HQLCriteria("from "
-            + Container.class.getName()
-            + " where site.id = ? and position is null", Arrays
-            .asList(new Object[] { wrappedObject.getId() }));
-        List<Container> containers = appService.query(criteria);
-
-        Collection<ContainerWrapper> wrappers = new HashSet<ContainerWrapper>();
-        for (Container c : containers) {
-            wrappers.add(new ContainerWrapper(appService, c));
-        }
-        return wrappers;
+    public List<ContainerWrapper> getTopContainerCollection() throws Exception {
+        return getTopContainerCollection(false);
     }
 
-    public List<ContainerWrapper> getTopContainerCollectionSorted()
-        throws Exception {
-        List<ContainerWrapper> result = new ArrayList<ContainerWrapper>(
-            getTopContainerCollection());
-        Collections.sort(result);
-        return result;
+    public void clearTopContainerCollection() {
+        propertiesMap.put("topContainerCollection", null);
     }
-
 }
