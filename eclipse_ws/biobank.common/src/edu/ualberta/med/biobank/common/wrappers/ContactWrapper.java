@@ -8,7 +8,8 @@ import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.model.Study;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
-public class ContactWrapper extends ModelWrapper<Contact> {
+public class ContactWrapper extends ModelWrapper<Contact> implements
+    Comparable<ContactWrapper> {
 
     public ContactWrapper(WritableApplicationService appService,
         Contact wrappedObject) {
@@ -107,6 +108,13 @@ public class ContactWrapper extends ModelWrapper<Contact> {
     @Override
     protected void persistChecks() throws BiobankCheckException, Exception {
         // no checks required for contacts
+    }
+
+    public int compareTo(ContactWrapper wrapper) {
+        String myName = wrappedObject.getName();
+        String wrapperName = wrapper.wrappedObject.getName();
+        return ((myName.compareTo(wrapperName) > 0) ? 1 : (myName
+            .equals(wrapperName) ? 0 : -1));
     }
 
 }

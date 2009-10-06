@@ -54,9 +54,9 @@ public class ClinicAddWidget extends BiobankWidget {
         Assert.isNotNull(toolkit, "toolkit is null");
         SiteWrapper siteWrapper = new SiteWrapper(SessionManager
             .getAppService(), studyWrapper.getSite());
-        allClinics = siteWrapper.getClinicWrapperCollection();
+        allClinics = siteWrapper.getClinicCollection();
 
-        selectedContacts = studyWrapper.getContactWrapperCollection();
+        selectedContacts = studyWrapper.getContactCollection();
 
         setLayout(new GridLayout(1, false));
         setLayoutData(new GridData(GridData.FILL_HORIZONTAL));

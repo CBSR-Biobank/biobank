@@ -82,7 +82,7 @@ public class PatientEntryForm extends BiobankEntryForm {
         labelSite.setText(siteWrapper.getName());
 
         List<StudyWrapper> studies = new ArrayList<StudyWrapper>(siteWrapper
-            .getStudyWrapperCollection());
+            .getStudyCollection());
         StudyWrapper selectedStudy = null;
         if (patientAdapter.getWrapper().isNew()) {
             if (studies.size() == 1) {

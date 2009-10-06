@@ -168,7 +168,7 @@ public class StudyViewForm extends BiobankViewForm {
         setStudySectionValues();
         setPvDataSectionValues();
         contactsTable.getTableViewer().setInput(
-            studyWrapper.getContactWrapperCollection());
+            studyWrapper.getContactCollection());
     }
 
     @Override

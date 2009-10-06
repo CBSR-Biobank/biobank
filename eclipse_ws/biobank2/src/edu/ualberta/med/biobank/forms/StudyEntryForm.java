@@ -18,14 +18,13 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
-import edu.ualberta.med.biobank.common.utils.ModelUtils;
+import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.PvInfo;
 import edu.ualberta.med.biobank.model.PvInfoPossible;
 import edu.ualberta.med.biobank.model.PvInfoType;
 import edu.ualberta.med.biobank.model.SampleSource;
 import edu.ualberta.med.biobank.model.SampleStorage;
-import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
@@ -37,7 +36,6 @@ import edu.ualberta.med.biobank.widgets.listener.BiobankEntryFormWidgetListener;
 import edu.ualberta.med.biobank.widgets.listener.MultiSelectEvent;
 import gov.nih.nci.system.query.SDKQuery;
 import gov.nih.nci.system.query.SDKQueryResult;
-import gov.nih.nci.system.query.example.DeleteExampleQuery;
 import gov.nih.nci.system.query.example.InsertExampleQuery;
 import gov.nih.nci.system.query.example.UpdateExampleQuery;
 
@@ -369,49 +367,38 @@ public class StudyEntryForm extends BiobankEntryForm {
     }
 
     private void saveSampleStorage() throws Exception {
-        Collection<SampleStorage> ssCollection = sampleStorageEntryWidget
+        Collection<SampleStorageWrapper> ssCollection = sampleStorageEntryWidget
             .getSampleStorage();
-        SDKQuery query;
-        SDKQueryResult result;
 
         removeDeletedSampleStorage(ssCollection);
 
         Collection<SampleStorage> savedSsCollection = new HashSet<SampleStorage>();
-        for (SampleStorage ss : ssCollection) {
+        for (SampleStorageWrapper ss : ssCollection) {
             ss.setStudy(studyWrapper.getWrappedObject());
-            if ((ss.getId() == null) || (ss.getId() == 0)) {
-                query = new InsertExampleQuery(ss);
-            } else {
-                query = new UpdateExampleQuery(ss);
-            }
-
-            result = appService.executeQuery(query);
-            savedSsCollection.add((SampleStorage) result.getObjectResult());
+            ss.persist();
+            savedSsCollection.add(ss.getWrappedObject());
         }
         studyWrapper.setSampleStorageCollection(savedSsCollection);
     }
 
     private void removeDeletedSampleStorage(
-        Collection<SampleStorage> ssCollection) throws Exception {
+        Collection<SampleStorageWrapper> ssCollection) throws Exception {
         // no need to remove if study is not yet in the database
         if (studyWrapper.getId() == null)
             return;
 
         List<Integer> selectedStampleStorageIds = new ArrayList<Integer>();
-        for (SampleStorage ss : ssCollection) {
+        for (SampleStorageWrapper ss : ssCollection) {
             selectedStampleStorageIds.add(ss.getId());
         }
 
-        SDKQuery query;
-
         // query from database again
-        Study dbStudy = ModelUtils.getObjectWithId(appService, Study.class,
-            studyWrapper.getId());
+        studyWrapper.reload();
 
-        for (SampleStorage ss : dbStudy.getSampleStorageCollection()) {
+        for (SampleStorageWrapper ss : studyWrapper
+            .getSampleStorageCollection()) {
             if (!selectedStampleStorageIds.contains(ss.getId())) {
-                query = new DeleteExampleQuery(ss);
-                appService.executeQuery(query);
+                ss.delete();
             }
         }
     }

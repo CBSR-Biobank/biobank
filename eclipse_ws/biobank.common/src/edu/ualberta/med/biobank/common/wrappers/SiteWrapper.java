@@ -119,7 +119,7 @@ public class SiteWrapper extends ModelWrapper<Site> implements
             .equals(wrapperName) ? 0 : -1));
     }
 
-    public Collection<StudyWrapper> getStudyWrapperCollection() {
+    public Collection<StudyWrapper> getStudyCollection() {
         Collection<StudyWrapper> wrapperCollection = new HashSet<StudyWrapper>();
         Collection<Study> collection = wrappedObject.getStudyCollection();
         if (collection != null)
@@ -129,16 +129,16 @@ public class SiteWrapper extends ModelWrapper<Site> implements
         return wrapperCollection;
     }
 
-    public List<StudyWrapper> getStudyWrapperCollectionSorted() {
+    public List<StudyWrapper> getStudyCollectionSorted() {
         List<StudyWrapper> list = new ArrayList<StudyWrapper>(
-            getStudyWrapperCollection());
+            getStudyCollection());
         if (list.size() > 1) {
             Collections.sort(list);
         }
         return list;
     }
 
-    public Collection<ClinicWrapper> getClinicWrapperCollection() {
+    public Collection<ClinicWrapper> getClinicCollection() {
         Collection<ClinicWrapper> wrapperCollection = new HashSet<ClinicWrapper>();
         Collection<Clinic> collection = wrappedObject.getClinicCollection();
         if (collection != null)
@@ -148,16 +148,16 @@ public class SiteWrapper extends ModelWrapper<Site> implements
         return wrapperCollection;
     }
 
-    public List<ClinicWrapper> getClinicWrapperCollectionSorted() {
+    public List<ClinicWrapper> getClinicCollectionSorted() {
         List<ClinicWrapper> list = new ArrayList<ClinicWrapper>(
-            getClinicWrapperCollection());
+            getClinicCollection());
         if (list.size() > 1) {
             Collections.sort(list);
         }
         return list;
     }
 
-    public Collection<ContainerTypeWrapper> getContainerTypeWrapperCollection() {
+    public Collection<ContainerTypeWrapper> getContainerTypeCollection() {
         Collection<ContainerTypeWrapper> wrapperCollection = new HashSet<ContainerTypeWrapper>();
         Collection<ContainerType> collection = wrappedObject
             .getContainerTypeCollection();
@@ -168,7 +168,16 @@ public class SiteWrapper extends ModelWrapper<Site> implements
         return wrapperCollection;
     }
 
-    public Collection<ContainerWrapper> getContainerWrapperCollection() {
+    public List<ContainerTypeWrapper> getContainerTypeCollectionSorted() {
+        List<ContainerTypeWrapper> list = new ArrayList<ContainerTypeWrapper>(
+            getContainerTypeCollection());
+        if (list.size() > 1) {
+            Collections.sort(list);
+        }
+        return list;
+    }
+
+    public Collection<ContainerWrapper> getContainerCollection() {
         Collection<ContainerWrapper> wrapperCollection = new HashSet<ContainerWrapper>();
         Collection<Container> collection = wrappedObject
             .getContainerCollection();
@@ -179,7 +188,16 @@ public class SiteWrapper extends ModelWrapper<Site> implements
         return wrapperCollection;
     }
 
-    public Collection<ContainerWrapper> getTopContainerWrapperCollection()
+    public List<ContainerWrapper> getContainerCollectionSorted() {
+        List<ContainerWrapper> list = new ArrayList<ContainerWrapper>(
+            getContainerCollection());
+        if (list.size() > 1) {
+            Collections.sort(list);
+        }
+        return list;
+    }
+
+    public Collection<ContainerWrapper> getTopContainerCollection()
         throws Exception {
         HQLCriteria criteria = new HQLCriteria("from "
             + Container.class.getName()
@@ -194,10 +212,10 @@ public class SiteWrapper extends ModelWrapper<Site> implements
         return wrappers;
     }
 
-    public List<ContainerWrapper> getTopContainerWrapperCollectionSorted()
+    public List<ContainerWrapper> getTopContainerCollectionSorted()
         throws Exception {
         List<ContainerWrapper> result = new ArrayList<ContainerWrapper>(
-            getTopContainerWrapperCollection());
+            getTopContainerCollection());
         Collections.sort(result);
         return result;
     }

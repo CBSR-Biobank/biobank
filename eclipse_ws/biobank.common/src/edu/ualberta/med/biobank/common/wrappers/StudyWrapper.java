@@ -1,7 +1,9 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 
@@ -150,20 +152,43 @@ public class StudyWrapper extends ModelWrapper<Study> implements
                 : (myName.equals(wrapperName) ? 0 : -1) : -1));
     }
 
-    public Collection<ContactWrapper> getContactWrapperCollection() {
-        Collection<ContactWrapper> collection = new HashSet<ContactWrapper>();
-        Collection<Contact> contactCollection = wrappedObject
-            .getContactCollection();
-        if (contactCollection == null)
-            return collection;
-        for (Contact contact : contactCollection) {
-            collection.add(new ContactWrapper(appService, contact));
-        }
-        return collection;
+    public Collection<ContactWrapper> getContactCollection() {
+        Collection<ContactWrapper> wrapperCollection = new HashSet<ContactWrapper>();
+        Collection<Contact> collection = wrappedObject.getContactCollection();
+        if (collection != null)
+            for (Contact contact : collection) {
+                wrapperCollection.add(new ContactWrapper(appService, contact));
+            }
+        return wrapperCollection;
     }
 
-    public Collection<SampleStorage> getSampleStorageCollection() {
-        return wrappedObject.getSampleStorageCollection();
+    public List<ContactWrapper> getClinicCollectionSorted() {
+        List<ContactWrapper> list = new ArrayList<ContactWrapper>(
+            getContactCollection());
+        if (list.size() > 1) {
+            Collections.sort(list);
+        }
+        return list;
+    }
+
+    public Collection<SampleStorageWrapper> getSampleStorageCollection() {
+        Collection<SampleStorageWrapper> wrapperCollection = new HashSet<SampleStorageWrapper>();
+        Collection<SampleStorage> collection = wrappedObject
+            .getSampleStorageCollection();
+        if (collection != null)
+            for (SampleStorage ss : collection) {
+                wrapperCollection.add(new SampleStorageWrapper(appService, ss));
+            }
+        return wrapperCollection;
+    }
+
+    public List<SampleStorageWrapper> getSampleStorageCollectionSorted() {
+        List<SampleStorageWrapper> list = new ArrayList<SampleStorageWrapper>(
+            getSampleStorageCollection());
+        if (list.size() > 1) {
+            Collections.sort(list);
+        }
+        return list;
     }
 
     public Collection<SampleSource> getSampleSourceCollection() {

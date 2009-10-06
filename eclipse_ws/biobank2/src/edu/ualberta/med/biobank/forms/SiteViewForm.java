@@ -90,7 +90,7 @@ public class SiteViewForm extends AddressViewFormCommon {
         createAddressSection();
         createStudySection();
         clinicsTable = FormUtils.createClinicSection(toolkit, form.getBody(),
-            siteWrapper.getClinicWrapperCollectionSorted());
+            siteWrapper.getClinicCollectionSorted());
         createContainerTypesSection();
         createContainerSection();
         createButtons();
@@ -128,7 +128,7 @@ public class SiteViewForm extends AddressViewFormCommon {
         section.setTextClient(tbar);
 
         studiesTable = new StudyInfoTable(client, siteWrapper
-            .getStudyWrapperCollectionSorted());
+            .getStudyCollectionSorted());
         studiesTable.adaptToToolkit(toolkit, true);
         studiesTable.addDoubleClickListener(FormUtils
             .getBiobankCollectionDoubleClickListener());
@@ -138,7 +138,7 @@ public class SiteViewForm extends AddressViewFormCommon {
         Composite client = createSectionWithClient("Container Types");
 
         containerTypesTable = new ContainerTypeInfoTable(client, siteWrapper
-            .getContainerTypeWrapperCollection());
+            .getContainerTypeCollection());
         containerTypesTable.adaptToToolkit(toolkit, true);
 
         containerTypesTable.addDoubleClickListener(FormUtils
@@ -150,7 +150,7 @@ public class SiteViewForm extends AddressViewFormCommon {
 
         try {
             sContainersTable = new ContainerInfoTable(section, siteAdapter
-                .getWrapper().getTopContainerWrapperCollectionSorted());
+                .getWrapper().getTopContainerCollectionSorted());
             section.setClient(sContainersTable);
             sContainersTable.adaptToToolkit(toolkit, true);
             toolkit.paintBordersFor(sContainersTable);
@@ -205,13 +205,13 @@ public class SiteViewForm extends AddressViewFormCommon {
         setSiteSectionValues();
         setAdressValues();
         studiesTable.setCollection(siteWrapper
-            .getStudyWrapperCollectionSorted());
+            .getStudyCollectionSorted());
         clinicsTable.setCollection(siteWrapper
-            .getClinicWrapperCollectionSorted());
+            .getClinicCollectionSorted());
         containerTypesTable.setCollection(siteWrapper
-            .getContainerTypeWrapperCollection());
+            .getContainerTypeCollection());
         sContainersTable.setCollection(siteWrapper
-            .getContainerWrapperCollection());
+            .getContainerCollection());
     }
 
     private void retrieveSite() {

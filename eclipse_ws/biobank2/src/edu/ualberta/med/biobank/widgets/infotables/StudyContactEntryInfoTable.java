@@ -26,7 +26,7 @@ public class StudyContactEntryInfoTable extends InfoTableWidget<ContactWrapper> 
         StudyWrapper studyWrapper) {
         super(parent, null, HEADINGS, BOUNDS);
         Collection<ContactWrapper> collection = studyWrapper
-            .getContactWrapperCollection();
+            .getContactCollection();
         for (int i = 0, n = collection.size(); i < n; ++i) {
             model.add(new BiobankCollectionModel());
         }

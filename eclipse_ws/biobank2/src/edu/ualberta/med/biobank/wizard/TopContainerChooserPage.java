@@ -55,7 +55,7 @@ public class TopContainerChooserPage extends AbstractContainerChooserPage {
             SiteWrapper siteWrapper = new SiteWrapper(getAppService(),
                 getSite());
             comboViewer.setInput(siteWrapper
-                .getTopContainerWrapperCollectionSorted());
+                .getTopContainerCollectionSorted());
         } catch (Exception e) {
             BioBankPlugin.openError("Error",
                 "Error retrieving containers informations from database");

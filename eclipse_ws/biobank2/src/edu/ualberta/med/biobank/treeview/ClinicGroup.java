@@ -70,7 +70,7 @@ public class ClinicGroup extends AdapterBase {
             ((SiteAdapter) getParent()).setSite(currentSite.getWrappedObject());
 
             List<ClinicWrapper> clinics = new ArrayList<ClinicWrapper>(
-                currentSite.getClinicWrapperCollection());
+                currentSite.getClinicCollection());
             Collections.sort(clinics);
             for (ClinicWrapper clinic : clinics) {
                 ClinicAdapter node = (ClinicAdapter) getChild(clinic.getId());

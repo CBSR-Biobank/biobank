@@ -1,7 +1,9 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 
@@ -123,7 +125,16 @@ public class ClinicWrapper extends ModelWrapper<Clinic> implements
         return wrapperCollection;
     }
 
-    public Collection<StudyWrapper> getStudyWrapperCollection()
+    public List<ContactWrapper> getClinicCollectionSorted() {
+        List<ContactWrapper> list = new ArrayList<ContactWrapper>(
+            getContactCollection());
+        if (list.size() > 1) {
+            Collections.sort(list);
+        }
+        return list;
+    }
+
+    public Collection<StudyWrapper> getStudyCollection()
         throws ApplicationException {
         HQLCriteria c = new HQLCriteria("select distinct studies from "
             + Contact.class.getName() + " as contacts"
@@ -137,6 +148,16 @@ public class ClinicWrapper extends ModelWrapper<Clinic> implements
             wrapperCollection.add(new StudyWrapper(appService, study));
         }
         return wrapperCollection;
+    }
+
+    public List<StudyWrapper> getStudyCollectionSorted()
+        throws Exception {
+        List<StudyWrapper> list = new ArrayList<StudyWrapper>(
+            getStudyCollection());
+        if (list.size() > 1) {
+            Collections.sort(list);
+        }
+        return list;
     }
 
     @Override
