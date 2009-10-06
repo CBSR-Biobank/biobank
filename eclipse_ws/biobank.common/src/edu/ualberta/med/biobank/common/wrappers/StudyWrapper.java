@@ -191,8 +191,24 @@ public class StudyWrapper extends ModelWrapper<Study> implements
         return list;
     }
 
-    public Collection<SampleSource> getSampleSourceCollection() {
-        return wrappedObject.getSampleSourceCollection();
+    public Collection<SampleSourceWrapper> getSampleSourceCollection() {
+        Collection<SampleSourceWrapper> wrapperCollection = new HashSet<SampleSourceWrapper>();
+        Collection<SampleSource> collection = wrappedObject
+            .getSampleSourceCollection();
+        if (collection != null)
+            for (SampleSource ss : collection) {
+                wrapperCollection.add(new SampleSourceWrapper(appService, ss));
+            }
+        return wrapperCollection;
+    }
+
+    public List<SampleSourceWrapper> getSampleSourceCollectionSorted() {
+        List<SampleSourceWrapper> list = new ArrayList<SampleSourceWrapper>(
+            getSampleSourceCollection());
+        if (list.size() > 1) {
+            Collections.sort(list);
+        }
+        return list;
     }
 
     public void setSampleSourceCollection(

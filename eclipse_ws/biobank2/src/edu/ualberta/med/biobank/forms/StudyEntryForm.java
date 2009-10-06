@@ -18,6 +18,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
+import edu.ualberta.med.biobank.common.wrappers.SampleSourceWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.PvInfo;
@@ -70,7 +71,7 @@ public class StudyEntryForm extends BiobankEntryForm {
 
     private ClinicAddWidget contactEntryWidget;
 
-    private Collection<SampleSource> allSampleSources;
+    private Collection<SampleSourceWrapper> allSampleSources;
 
     private MultiSelectWidget sampleSourceMultiSelect;
 
@@ -176,21 +177,25 @@ public class StudyEntryForm extends BiobankEntryForm {
 
     private void createSourceVesselsSection() throws Exception {
         Composite client = createSectionWithClient("Source Vessels");
-        Collection<SampleSource> studySampleSources = studyWrapper
+        Collection<SampleSourceWrapper> studySampleSources = studyWrapper
             .getSampleSourceCollection();
-        allSampleSources = appService.search(SampleSource.class,
+        allSampleSources = new ArrayList<SampleSourceWrapper>();
+        List<SampleSource> result = appService.search(SampleSource.class,
             new SampleSource());
+        for (SampleSource ss : result) {
+            allSampleSources.add(new SampleSourceWrapper(appService, ss));
+        }
 
         ListOrderedMap availSampleSource = new ListOrderedMap();
         List<Integer> selSampleSource = new ArrayList<Integer>();
 
         if (studySampleSources != null) {
-            for (SampleSource ss : studySampleSources) {
+            for (SampleSourceWrapper ss : studySampleSources) {
                 selSampleSource.add(ss.getId());
             }
         }
 
-        for (SampleSource ss : allSampleSources) {
+        for (SampleSourceWrapper ss : allSampleSources) {
             availSampleSource.put(ss.getId(), ss.getName());
         }
 
@@ -294,10 +299,10 @@ public class StudyEntryForm extends BiobankEntryForm {
         List<Integer> selSampleSourceIds = sampleSourceMultiSelect
             .getSelected();
         Collection<SampleSource> selSampleSource = new HashSet<SampleSource>();
-        for (SampleSource ss : allSampleSources) {
+        for (SampleSourceWrapper ss : allSampleSources) {
             int id = ss.getId();
             if (selSampleSourceIds.indexOf(id) >= 0) {
-                selSampleSource.add(ss);
+                selSampleSource.add(ss.getWrappedObject());
             }
         }
         Assert.isTrue(selSampleSource.size() == selSampleSourceIds.size(),
