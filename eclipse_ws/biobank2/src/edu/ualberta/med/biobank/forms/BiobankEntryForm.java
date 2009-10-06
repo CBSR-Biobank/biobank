@@ -165,10 +165,6 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
         firstControl.setFocus();
     }
 
-    public void resetForm() throws Exception {
-        adapter.resetObject();
-    }
-
     public String getSessionName() {
         return sessionName;
     }
@@ -265,6 +261,22 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
     }
 
     private void addToolbarButtons() {
+        ControlContribution reset = new ControlContribution("Reset") {
+            @Override
+            protected Control createControl(Composite parent) {
+                confirmButton = new Button(parent, SWT.PUSH);
+                confirmButton.setText("Reset");
+                confirmButton.addSelectionListener(new SelectionAdapter() {
+                    @Override
+                    public void widgetSelected(SelectionEvent e) {
+                        reset();
+                    }
+                });
+                return confirmButton;
+            }
+        };
+        form.getToolBarManager().add(reset);
+
         ControlContribution cancel = new ControlContribution("Cancel") {
             @Override
             protected Control createControl(Composite parent) {
@@ -343,6 +355,14 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
                 .getActivePage().closeEditor(this, false);
         } catch (Exception e) {
             SessionManager.getLogger().error("Can't close the form", e);
+        }
+    }
+
+    public void reset() {
+        try {
+            adapter.resetObject();
+        } catch (Exception e) {
+            SessionManager.getLogger().error("Can't reset the form", e);
         }
     }
 

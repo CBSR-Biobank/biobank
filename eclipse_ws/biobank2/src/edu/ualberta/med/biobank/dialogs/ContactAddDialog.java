@@ -1,6 +1,6 @@
 package edu.ualberta.med.biobank.dialogs;
 
-import org.eclipse.core.databinding.beans.PojoObservables;
+import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -54,26 +54,26 @@ public class ContactAddDialog extends BiobankDialog {
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
         Control c = createBoundWidgetWithLabel(contents, Text.class,
-            SWT.BORDER, "Name", new String[0], PojoObservables.observeValue(
+            SWT.BORDER, "Name", new String[0], BeansObservables.observeValue(
                 contactWrapper, "name"), null);
         GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
         gd.widthHint = 250;
         c.setLayoutData(gd);
 
         createBoundWidgetWithLabel(contents, Text.class, SWT.BORDER, "Title",
-            new String[0], PojoObservables
-                .observeValue(contactWrapper, "title"), null);
+            new String[0], BeansObservables.observeValue(contactWrapper,
+                "title"), null);
 
         createBoundWidgetWithLabel(contents, Text.class, SWT.BORDER, "email",
-            new String[0], PojoObservables.observeValue(contactWrapper,
+            new String[0], BeansObservables.observeValue(contactWrapper,
                 "emailAddress"), null);
 
         createBoundWidgetWithLabel(contents, Text.class, SWT.BORDER, "Phone #",
-            new String[0], PojoObservables.observeValue(contactWrapper,
+            new String[0], BeansObservables.observeValue(contactWrapper,
                 "phoneNumber"), null);
 
         createBoundWidgetWithLabel(contents, Text.class, SWT.BORDER, "Fax #",
-            new String[0], PojoObservables.observeValue(contactWrapper,
+            new String[0], BeansObservables.observeValue(contactWrapper,
                 "faxNumber"), null);
 
         return contents;

@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.eclipse.core.databinding.beans.PojoObservables;
+import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.observable.value.WritableValue;
 import org.eclipse.core.runtime.Assert;
@@ -83,7 +83,7 @@ public class PvSampleSourceDialog extends BiobankDialog {
         }
 
         createBoundWidgetWithLabel(contents, Text.class, SWT.BORDER,
-            "Quantity", new String[0], PojoObservables.observeValue(
+            "Quantity", new String[0], BeansObservables.observeValue(
                 pvSampleSource, "quantity"), new IntegerNumberValidator(
                 "quantity should be a whole number", false));
 

@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.eclipse.core.databinding.beans.PojoObservables;
+import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.observable.value.WritableValue;
 import org.eclipse.core.runtime.IStatus;
@@ -183,7 +183,7 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
 
         inventoryIdText = (Text) createBoundWidgetWithLabel(fieldsComposite,
             Text.class, SWT.NONE, "Inventory ID", new String[0],
-            PojoObservables.observeValue(sampleWrapper, "inventoryId"),
+            BeansObservables.observeValue(sampleWrapper, "inventoryId"),
             new NonEmptyString("Enter Inventory Id"));
         inventoryIdText.addKeyListener(EnterKeyToNextFieldListener.INSTANCE);
 
@@ -407,7 +407,7 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
     }
 
     @Override
-    public void resetForm() {
+    public void reset() {
         sampleWrapper.setWrappedObject(new Sample());
         cabinet = null;
         drawer = null;

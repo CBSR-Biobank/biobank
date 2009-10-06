@@ -265,16 +265,21 @@ public class WidgetCreator {
     }
 
     private Label createLabel(Composite parent, String fieldLabel) {
-        return createLabel(parent, fieldLabel, SWT.LEFT);
+        return createLabel(parent, fieldLabel, SWT.LEFT, true);
     }
 
-    private Label createLabel(Composite parent, String fieldLabel, int options) {
+    private Label createLabel(Composite parent, String fieldLabel, int options,
+        boolean addColon) {
         Label label = null;
+        String text = fieldLabel;
+        if (addColon) {
+            text += ":";
+        }
         if (toolkit == null) {
             label = new Label(parent, options);
-            label.setText(fieldLabel + ":");
+            label.setText(text);
         } else {
-            label = toolkit.createLabel(parent, fieldLabel + ":", options);
+            label = toolkit.createLabel(parent, text, options);
         }
         return label;
     }
@@ -398,7 +403,7 @@ public class WidgetCreator {
                 widgetOptions = SWT.SINGLE;
             }
             Label field = createLabel(parent, "", widgetOptions | SWT.LEFT
-                | SWT.BORDER);
+                | SWT.BORDER, false);
             field.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
 
             return field;

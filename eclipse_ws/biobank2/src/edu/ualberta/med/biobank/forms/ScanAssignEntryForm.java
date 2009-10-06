@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.core.databinding.beans.BeansObservables;
-import org.eclipse.core.databinding.beans.PojoObservables;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.observable.value.WritableValue;
 import org.eclipse.core.runtime.Assert;
@@ -140,9 +139,9 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
 
         palletCodeText = (Text) createBoundWidgetWithLabel(fieldsComposite,
             Text.class, SWT.NONE, "Pallet product barcode", null,
-            PojoObservables
-                .observeValue(currentPalletWrapper, "productBarcode"),
-            new NonEmptyString("Enter pallet position code"));
+            BeansObservables.observeValue(currentPalletWrapper,
+                "productBarcode"), new NonEmptyString(
+                "Enter pallet position code"));
         palletCodeText.addKeyListener(EnterKeyToNextFieldListener.INSTANCE);
 
         palletPositionText = (Text) createBoundWidgetWithLabel(fieldsComposite,
@@ -541,7 +540,7 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
     }
 
     @Override
-    public void resetForm() {
+    public void reset() {
         freezerWidget.setSelectedBox(null);
         hotelWidget.setSelectedBox(null);
         palletWidget.setScannedElements(null);

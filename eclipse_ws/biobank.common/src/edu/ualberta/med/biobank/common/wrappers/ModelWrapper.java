@@ -80,9 +80,9 @@ public abstract class ModelWrapper<E> {
     }
 
     public void reload() throws Exception {
-        E oldValue = wrappedObject;
         if (!isNew()) {
-            internalReload();
+            E oldValue = wrappedObject;
+            wrappedObject = getObjectFromDatabase();
             firePropertyChanges(oldValue, wrappedObject);
         }
         propertiesMap.clear();
@@ -108,12 +108,6 @@ public abstract class ModelWrapper<E> {
             propertyChangeSupport.firePropertyChange(member, oldWrappedObject,
                 newWrappedObject);
         }
-    }
-
-    private void internalReload() throws Exception {
-        wrappedObject = getObjectFromDatabase();
-        // set to null all lists declared as field
-        // FIXME check this is ok !
     }
 
     /**
@@ -177,7 +171,10 @@ public abstract class ModelWrapper<E> {
 
     public void reset() throws Exception {
         if (isNew()) {
+            E oldValue = wrappedObject;
             wrappedObject = getNewObject();
+            firePropertyChanges(oldValue, wrappedObject);
+            propertiesMap.clear();
         } else {
             reload();
         }

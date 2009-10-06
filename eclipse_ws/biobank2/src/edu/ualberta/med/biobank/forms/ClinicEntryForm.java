@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.eclipse.core.databinding.beans.PojoObservables;
+import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -106,15 +106,15 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
         FormUtils.setTextValue(siteLabel, clinicWrapper.getSite().getName());
 
         firstControl = createBoundWidgetWithLabel(client, Text.class, SWT.NONE,
-            "Name", null, PojoObservables.observeValue(clinicWrapper, "name"),
+            "Name", null, BeansObservables.observeValue(clinicWrapper, "name"),
             new NonEmptyString(MSG_NO_CLINIC_NAME));
 
         createBoundWidgetWithLabel(client, Combo.class, SWT.NONE,
-            "Activity Status", FormConstants.ACTIVITY_STATUS, PojoObservables
+            "Activity Status", FormConstants.ACTIVITY_STATUS, BeansObservables
                 .observeValue(clinicWrapper, "activityStatus"), null);
 
         Text comment = (Text) createBoundWidgetWithLabel(client, Text.class,
-            SWT.MULTI, "Comments", null, PojoObservables.observeValue(
+            SWT.MULTI, "Comments", null, BeansObservables.observeValue(
                 clinicWrapper, "comment"), null);
         GridData gd = new GridData(GridData.FILL_HORIZONTAL);
         gd.heightHint = 40;
