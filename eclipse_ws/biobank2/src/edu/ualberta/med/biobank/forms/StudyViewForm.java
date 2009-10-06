@@ -63,8 +63,6 @@ public class StudyViewForm extends BiobankViewForm {
             form.setText("Study: " + studyWrapper.getName());
         }
 
-        addToolbarButtons();
-
         GridLayout layout = new GridLayout(1, false);
         form.getBody().setLayout(layout);
         form.getBody().setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -175,7 +173,7 @@ public class StudyViewForm extends BiobankViewForm {
         setStudySectionValues();
         setPvDataSectionValues();
         contactsTable.getTableViewer().setInput(
-            studyWrapper.getContactWrapperCollection());
+            studyWrapper.getContactCollection());
     }
 
     @Override

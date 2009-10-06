@@ -1,8 +1,9 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.Collections;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.BiobankCheckException;
@@ -80,7 +81,8 @@ public class ClinicWrapper extends ModelWrapper<Clinic> implements
 
     @Override
     protected String[] getPropertyChangesNames() {
-        return new String[] { "name", "activityStatus", "comment", "site" };
+        return new String[] { "name", "activityStatus", "comment", "site",
+            "contactCollection" };
     }
 
     @Override
@@ -113,30 +115,62 @@ public class ClinicWrapper extends ModelWrapper<Clinic> implements
         return Clinic.class;
     }
 
-    public Collection<ContactWrapper> getContactCollection() {
-        Collection<ContactWrapper> wrapperCollection = new HashSet<ContactWrapper>();
-        Collection<Contact> collection = wrappedObject.getContactCollection();
-        if (collection != null)
-            for (Contact contact : collection) {
-                wrapperCollection.add(new ContactWrapper(appService, contact));
+    @SuppressWarnings("unchecked")
+    public Collection<ContactWrapper> getContactCollection(boolean sort) {
+        List<ContactWrapper> contactCollection = (List<ContactWrapper>) propertiesMap
+            .get("contactCollection");
+        if (contactCollection == null) {
+            Collection<Contact> children = wrappedObject.getContactCollection();
+            if (children != null) {
+                contactCollection = new ArrayList<ContactWrapper>();
+                for (Contact type : children) {
+                    contactCollection.add(new ContactWrapper(appService, type));
+                }
+                propertiesMap.put("contactCollection", contactCollection);
             }
-        return wrapperCollection;
+        }
+        if ((contactCollection != null) && sort)
+            Collections.sort(contactCollection);
+        return contactCollection;
     }
 
-    public Collection<StudyWrapper> getStudyWrapperCollection()
-        throws ApplicationException {
-        HQLCriteria c = new HQLCriteria("select distinct studies from "
-            + Contact.class.getName() + " as contacts"
-            + " inner join contacts.studyCollection as studies"
-            + " where contacts.clinic = ?", Arrays
-            .asList(new Object[] { wrappedObject }));
+    public Collection<ContactWrapper> getContactCollection() {
+        return getContactCollection(false);
+    }
 
-        Collection<StudyWrapper> wrapperCollection = new HashSet<StudyWrapper>();
-        List<Study> collection = appService.query(c);
-        for (Study study : collection) {
-            wrapperCollection.add(new StudyWrapper(appService, study));
+    public void setContactCollection(Collection<Contact> contacts,
+        boolean setNull) {
+        Collection<Contact> oldContacts = wrappedObject.getContactCollection();
+        wrappedObject.setContactCollection(contacts);
+        propertyChangeSupport.firePropertyChange("contactCollection", oldContacts,
+            contacts);
+        if (setNull) {
+            propertiesMap.put("contactCollection", null);
         }
-        return wrapperCollection;
+    }
+
+    @SuppressWarnings("unchecked")
+    public Collection<StudyWrapper> getStudyCollection(boolean sort)
+        throws Exception {
+        List<StudyWrapper> studyCollection = (List<StudyWrapper>) propertiesMap
+            .get("studyCollection");
+
+        if (studyCollection == null) {
+            studyCollection = new ArrayList<StudyWrapper>();
+            HQLCriteria c = new HQLCriteria("select distinct studies from "
+                + Contact.class.getName() + " as contacts"
+                + " inner join contacts.studyCollection as studies"
+                + " where contacts.clinic = ?", Arrays
+                .asList(new Object[] { wrappedObject }));
+            List<Study> collection = appService.query(c);
+            for (Study study : collection) {
+                studyCollection.add(new StudyWrapper(appService, study));
+            }
+            if (sort)
+                Collections.sort(studyCollection);
+            propertiesMap.put("studyCollection", studyCollection);
+        }
+        return studyCollection;
     }
 
     @Override

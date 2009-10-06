@@ -41,7 +41,7 @@ public class StudyContactInfoTable extends InfoTableWidget<ContactWrapper> {
         this.appService = appService;
         this.studyWrapper = studyWrapper;
         Collection<ContactWrapper> collection = studyWrapper
-            .getContactWrapperCollection();
+            .getContactCollection();
         if (collection == null)
             return;
 

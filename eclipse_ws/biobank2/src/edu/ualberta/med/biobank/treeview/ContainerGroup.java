@@ -82,7 +82,7 @@ public class ContainerGroup extends AdapterBase {
             siteAdapter.setSite(parentSite);
 
             for (ContainerWrapper containerWrapper : siteAdapter.getWrapper()
-                .getTopContainerWrapperCollectionSorted()) {
+                .getTopContainerCollection()) {
                 ContainerAdapter node = (ContainerAdapter) getChild(containerWrapper
                     .getId());
                 if (node == null) {

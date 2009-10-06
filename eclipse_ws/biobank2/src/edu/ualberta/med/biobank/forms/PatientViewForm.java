@@ -40,12 +40,11 @@ public class PatientViewForm extends BiobankViewForm {
     }
 
     @Override
-    protected void createFormContent() {
+    protected void createFormContent() throws Exception {
         form.setText("Patient: " + patientWrapper.getNumber());
         form.getBody().setLayout(new GridLayout(1, false));
         form.getBody().setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-        addToolbarButtons();
         createPatientSection();
         createPatientVisitSection();
         setValues();

@@ -18,15 +18,14 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
-import edu.ualberta.med.biobank.common.utils.ModelUtils;
 import edu.ualberta.med.biobank.common.wrappers.PvInfoPossibleWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PvInfoTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PvInfoWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SampleSourceWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.PvInfo;
 import edu.ualberta.med.biobank.model.SampleSource;
-import edu.ualberta.med.biobank.model.SampleStorage;
-import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
@@ -38,7 +37,6 @@ import edu.ualberta.med.biobank.widgets.listener.BiobankEntryFormWidgetListener;
 import edu.ualberta.med.biobank.widgets.listener.MultiSelectEvent;
 import gov.nih.nci.system.query.SDKQuery;
 import gov.nih.nci.system.query.SDKQueryResult;
-import gov.nih.nci.system.query.example.DeleteExampleQuery;
 import gov.nih.nci.system.query.example.InsertExampleQuery;
 import gov.nih.nci.system.query.example.UpdateExampleQuery;
 
@@ -73,7 +71,7 @@ public class StudyEntryForm extends BiobankEntryForm {
 
     private ClinicAddWidget contactEntryWidget;
 
-    private Collection<SampleSource> allSampleSources;
+    private Collection<SampleSourceWrapper> allSampleSources;
 
     private MultiSelectWidget sampleSourceMultiSelect;
 
@@ -179,21 +177,25 @@ public class StudyEntryForm extends BiobankEntryForm {
 
     private void createSourceVesselsSection() throws Exception {
         Composite client = createSectionWithClient("Source Vessels");
-        Collection<SampleSource> studySampleSources = studyWrapper
+        Collection<SampleSourceWrapper> studySampleSources = studyWrapper
             .getSampleSourceCollection();
-        allSampleSources = appService.search(SampleSource.class,
+        allSampleSources = new ArrayList<SampleSourceWrapper>();
+        List<SampleSource> result = appService.search(SampleSource.class,
             new SampleSource());
+        for (SampleSource ss : result) {
+            allSampleSources.add(new SampleSourceWrapper(appService, ss));
+        }
 
         ListOrderedMap availSampleSource = new ListOrderedMap();
         List<Integer> selSampleSource = new ArrayList<Integer>();
 
         if (studySampleSources != null) {
-            for (SampleSource ss : studySampleSources) {
+            for (SampleSourceWrapper ss : studySampleSources) {
                 selSampleSource.add(ss.getId());
             }
         }
 
-        for (SampleSource ss : allSampleSources) {
+        for (SampleSourceWrapper ss : allSampleSources) {
             availSampleSource.put(ss.getId(), ss.getName());
         }
 
@@ -298,8 +300,8 @@ public class StudyEntryForm extends BiobankEntryForm {
         // get the selected sample sources from widget
         List<Integer> selSampleSourceIds = sampleSourceMultiSelect
             .getSelected();
-        Collection<SampleSource> selSampleSource = new HashSet<SampleSource>();
-        for (SampleSource ss : allSampleSources) {
+        List<SampleSourceWrapper> selSampleSource = new ArrayList<SampleSourceWrapper>();
+        for (SampleSourceWrapper ss : allSampleSources) {
             int id = ss.getId();
             if (selSampleSourceIds.indexOf(id) >= 0) {
                 selSampleSource.add(ss);
@@ -307,6 +309,7 @@ public class StudyEntryForm extends BiobankEntryForm {
         }
         Assert.isTrue(selSampleSource.size() == selSampleSourceIds.size(),
             "problem with sample source selections");
+        studyWrapper.deleteSampleSourceComplement(selSampleSource);
         studyWrapper.setSampleSourceCollection(selSampleSource);
 
         List<PvInfoWrapper> pvInfoList = new ArrayList<PvInfoWrapper>();
@@ -349,7 +352,7 @@ public class StudyEntryForm extends BiobankEntryForm {
         Set<PvInfo> savedPvInfoList = new HashSet<PvInfo>();
 
         // FIXME: change study to studyWrapper
-        // study.setContactCollection(contactEntryWidget.getContacts());
+        studyWrapper.setContactCollection(contactEntryWidget.getContacts());
 
         if (studyWrapper.getPvInfoCollection().size() > 0) {
             for (PvInfoWrapper pvInfo : studyWrapper.getPvInfoCollection()) {
@@ -371,51 +374,10 @@ public class StudyEntryForm extends BiobankEntryForm {
     }
 
     private void saveSampleStorage() throws Exception {
-        Collection<SampleStorage> ssCollection = sampleStorageEntryWidget
+        List<SampleStorageWrapper> ssCollection = sampleStorageEntryWidget
             .getSampleStorage();
-        SDKQuery query;
-        SDKQueryResult result;
-
-        removeDeletedSampleStorage(ssCollection);
-
-        Collection<SampleStorage> savedSsCollection = new HashSet<SampleStorage>();
-        for (SampleStorage ss : ssCollection) {
-            ss.setStudy(studyWrapper.getWrappedObject());
-            if ((ss.getId() == null) || (ss.getId() == 0)) {
-                query = new InsertExampleQuery(ss);
-            } else {
-                query = new UpdateExampleQuery(ss);
-            }
-
-            result = appService.executeQuery(query);
-            savedSsCollection.add((SampleStorage) result.getObjectResult());
-        }
-        studyWrapper.setSampleStorageCollection(savedSsCollection);
-    }
-
-    private void removeDeletedSampleStorage(
-        Collection<SampleStorage> ssCollection) throws Exception {
-        // no need to remove if study is not yet in the database
-        if (studyWrapper.getId() == null)
-            return;
-
-        List<Integer> selectedStampleStorageIds = new ArrayList<Integer>();
-        for (SampleStorage ss : ssCollection) {
-            selectedStampleStorageIds.add(ss.getId());
-        }
-
-        SDKQuery query;
-
-        // query from database again
-        Study dbStudy = ModelUtils.getObjectWithId(appService, Study.class,
-            studyWrapper.getId());
-
-        for (SampleStorage ss : dbStudy.getSampleStorageCollection()) {
-            if (!selectedStampleStorageIds.contains(ss.getId())) {
-                query = new DeleteExampleQuery(ss);
-                appService.executeQuery(query);
-            }
-        }
+        studyWrapper.deleteSampleStorageComplement(ssCollection);
+        studyWrapper.setSampleStorageCollection(ssCollection);
     }
 
     @Override

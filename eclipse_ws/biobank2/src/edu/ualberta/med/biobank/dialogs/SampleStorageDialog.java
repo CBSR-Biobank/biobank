@@ -17,7 +17,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
-import edu.ualberta.med.biobank.model.SampleStorage;
+import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.validators.DoubleNumberValidator;
 import edu.ualberta.med.biobank.validators.IntegerNumberValidator;
@@ -26,14 +26,14 @@ public class SampleStorageDialog extends BiobankDialog {
 
     private static final String TITLE = "Sample Storage";
 
-    private SampleStorage sampleStorage;
+    private SampleStorageWrapper sampleStorage;
 
     private HashMap<String, SampleType> sampleTypeMap;
 
     private CCombo sampleTypesCombo;
 
-    public SampleStorageDialog(Shell parent, SampleStorage sampleStorage,
-        Collection<SampleType> sampleTypes) {
+    public SampleStorageDialog(Shell parent,
+        SampleStorageWrapper sampleStorage, Collection<SampleType> sampleTypes) {
         super(parent);
         Assert.isNotNull(sampleStorage);
         Assert.isNotNull(sampleTypes);
@@ -99,7 +99,7 @@ public class SampleStorageDialog extends BiobankDialog {
         super.okPressed();
     }
 
-    public SampleStorage getSampleStorage() {
+    public SampleStorageWrapper getSampleStorage() {
         return sampleStorage;
     }
 

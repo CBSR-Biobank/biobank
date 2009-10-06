@@ -45,7 +45,6 @@ public class ClinicViewForm extends AddressViewFormCommon {
     @Override
     protected void createFormContent() throws Exception {
         form.setText("Clinic: " + clinicWrapper.getName());
-        addToolbarButtons();
 
         GridLayout layout = new GridLayout(1, false);
         form.getBody().setLayout(layout);
@@ -116,7 +115,7 @@ public class ClinicViewForm extends AddressViewFormCommon {
         form.setText("Clinic: " + clinicWrapper.getName());
         setClinicValues();
         setAdressValues();
-        studiesTable.setCollection(clinicWrapper.getStudyWrapperCollection());
+        studiesTable.setCollection(clinicWrapper.getStudyCollection(true));
     }
 
     @Override

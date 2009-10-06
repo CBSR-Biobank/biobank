@@ -39,7 +39,7 @@ public class ClinicStudyInfoTable extends InfoTableWidget<StudyWrapper> {
         this.appService = appService;
         this.clinicWrapper = clinicWrapper;
         Collection<StudyWrapper> collection = clinicWrapper
-            .getStudyWrapperCollection();
+            .getStudyCollection(true);
         for (int i = 0, n = collection.size(); i < n; ++i) {
             model.add(new BiobankCollectionModel());
         }

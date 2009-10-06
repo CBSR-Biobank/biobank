@@ -2,7 +2,6 @@ package edu.ualberta.med.biobank.widgets.infotables;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
@@ -157,8 +156,8 @@ public class InfoTableWidget<T> extends BiobankWidget {
     }
 
     @SuppressWarnings("unchecked")
-    public Collection<T> getCollection() {
-        Collection<T> collection = new HashSet<T>();
+    public List<T> getCollection() {
+        List<T> collection = new ArrayList<T>();
         for (BiobankCollectionModel item : model) {
             collection.add((T) item.o);
         }

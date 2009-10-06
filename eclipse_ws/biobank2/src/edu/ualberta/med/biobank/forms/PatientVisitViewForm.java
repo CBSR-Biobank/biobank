@@ -77,12 +77,11 @@ public class PatientVisitViewForm extends BiobankViewForm {
     }
 
     @Override
-    protected void createFormContent() {
+    protected void createFormContent() throws Exception {
         form.setText("Visit Drawn Date: "
             + patientVisitWrapper.getFormattedDateDrawn());
         form.getBody().setLayout(new GridLayout(1, false));
         form.getBody().setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        addToolbarButtons();
         createMainSection();
         createSourcesSection();
         createSamplesSection();

@@ -1,9 +1,5 @@
 package edu.ualberta.med.biobank.treeview;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
@@ -69,10 +65,7 @@ public class ClinicGroup extends AdapterBase {
             currentSite.reload();
             ((SiteAdapter) getParent()).setSite(currentSite.getWrappedObject());
 
-            List<ClinicWrapper> clinics = new ArrayList<ClinicWrapper>(
-                currentSite.getClinicWrapperCollection());
-            Collections.sort(clinics);
-            for (ClinicWrapper clinic : clinics) {
+            for (ClinicWrapper clinic : currentSite.getClinicCollection(true)) {
                 ClinicAdapter node = (ClinicAdapter) getChild(clinic.getId());
 
                 if (node == null) {

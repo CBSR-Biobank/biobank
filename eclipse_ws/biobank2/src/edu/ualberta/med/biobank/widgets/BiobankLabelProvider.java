@@ -28,6 +28,7 @@ import edu.ualberta.med.biobank.model.SampleSource;
 import edu.ualberta.med.biobank.model.SampleStorage;
 import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.model.SiteClinicInfo;
 import edu.ualberta.med.biobank.model.SiteStudyInfo;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.StudyContactAndPatientInfo;
@@ -244,6 +245,18 @@ public class BiobankLabelProvider extends LabelProvider implements
                         .getPatientCollection().size();
             case 4:
                 return "" + siteStudyInfo.patientVisits;
+            }
+        } else if (element instanceof SiteClinicInfo) {
+            SiteClinicInfo siteClinicInfo = (SiteClinicInfo) element;
+            switch (columnIndex) {
+            case 0:
+                return siteClinicInfo.clinicWrapper.getName();
+            case 1:
+                return "" + siteClinicInfo.studies;
+            case 2:
+                return "" + siteClinicInfo.patients;
+            case 3:
+                return "" + siteClinicInfo.patientVisits;
             }
         } else if (element instanceof ModelWrapper<?>) {
             return getColumnText(

@@ -174,7 +174,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         if (patientVisitWrapper.getId() == null) {
             // choose clinic for new visit
             Collection<ContactWrapper> contacts = study
-                .getContactWrapperCollection();
+                .getContactCollection();
             ClinicWrapper selectedClinic = null;
 
             if (contacts.size() == 1) {
