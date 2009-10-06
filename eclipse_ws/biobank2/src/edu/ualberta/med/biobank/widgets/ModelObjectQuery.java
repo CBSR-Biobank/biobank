@@ -1,6 +1,8 @@
 package edu.ualberta.med.biobank.widgets;
 
-import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
@@ -19,23 +21,55 @@ public class ModelObjectQuery {
     private Label with;
     private Composite attributeQueries;
     private AttributeQueryClause clause;
+    private Class<?> modelObjectClass;
+    private Type modelObjectType;
+    private String joins;
+    private String alias;
 
-    public ModelObjectQuery(Composite parent, Field modelObjectField,
-        ReportsView view) {
-
-        radio = new Button(parent, SWT.CHECK);
-        radio.setSelection(false);
+    public ModelObjectQuery(Composite parent, Method modelObjectMethod,
+        String alias, ReportsView view) {
 
         with = new Label(parent, SWT.NONE);
-        with.setText("With: " + AttributeQueryClause.getText(modelObjectField));
+        this.alias = alias;
+        joins = "";
+
+        // is it a collection?
+        modelObjectType = modelObjectMethod.getGenericReturnType();
+        if (modelObjectType instanceof ParameterizedType) {
+            // what type of collection?
+            ParameterizedType type = (ParameterizedType) modelObjectType;
+            modelObjectClass = (Class<?>) type.getActualTypeArguments()[0];
+            with.setText("With: "
+                + AttributeQueryClause.getText(modelObjectMethod.getName()
+                    .substring(3)));
+        } else {
+            // it's not a collection
+            modelObjectClass = (Class<?>) modelObjectType;
+            with.setText("With: "
+                + AttributeQueryClause.getText(modelObjectClass));
+        }
+        radio = new Button(parent, SWT.CHECK);
+        radio.setSelection(false);
 
         attributeQueries = new Composite(parent, SWT.NONE);
         GridLayout layout = new GridLayout(3, false);
         layout.verticalSpacing = 10;
         attributeQueries.setLayout(layout);
 
-        clause = new AttributeQueryClause(attributeQueries, modelObjectField,
-            modelObjectField.getName(), view);
+        if (modelObjectType instanceof ParameterizedType) {
+            joins = alias
+                + "."
+                + AttributeQueryClause.getText(modelObjectMethod.getName()
+                    .substring(3)) + " as ";
+            alias = AttributeQueryClause.getText(modelObjectClass.getName())
+                + "Alias";
+            joins += alias;
+        } else
+            alias += "."
+                + AttributeQueryClause.getText(modelObjectClass.getName());
+
+        clause = new AttributeQueryClause(attributeQueries, modelObjectClass,
+            alias, view);
 
         radio.addSelectionListener(new SelectionListener() {
             @Override
@@ -58,8 +92,18 @@ public class ModelObjectQuery {
     public HQLCriteria getClause() {
         if (!getEnabled())
             return null;
-        else
+        else {
             return clause.getClause();
+        }
+    }
+
+    public String getJoin() {
+        if (!getEnabled() || joins.compareTo("") == 0
+            || clause.getClause() == null)
+            return null;
+        else {
+            return joins;
+        }
     }
 
     public Boolean getEnabled() {

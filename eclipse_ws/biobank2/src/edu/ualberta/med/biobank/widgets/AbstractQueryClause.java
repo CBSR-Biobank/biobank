@@ -2,7 +2,6 @@ package edu.ualberta.med.biobank.widgets;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.jface.viewers.ArrayContentProvider;
@@ -20,7 +19,7 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public abstract class AbstractQueryClause {
     protected ReportsView view;
-    protected String name;
+    protected String alias;
     protected List<Field> attributes;
     protected Class<?> modelObjectClass;
 
@@ -32,13 +31,10 @@ public abstract class AbstractQueryClause {
     protected List<String> numberOps;
     protected List<String> collectionOps;
 
-    protected AbstractQueryClause(Class<?> modelObjectClass, String name,
+    protected AbstractQueryClause(Class<?> modelObjectClass, String alias,
         ReportsView view) {
         this.modelObjectClass = modelObjectClass;
-        if (name == null)
-            this.name = "";
-        else
-            this.name = name + ".";
+        this.alias = alias;
         this.view = view;
 
         whereCombos = new ArrayList<ComboViewer>();
@@ -111,28 +107,29 @@ public abstract class AbstractQueryClause {
             String value = getValue(searchField);
             if (value.compareTo("") == 0 || value == null)
                 continue;
-            String attributeName = name + attribute.getName();
+            String attributeName = alias + "." + attribute.getName();
 
             // convert value if necessary to correct type
             if (attribute.getType().equals(Integer.class)
-                || attribute.getType().equals(Double.class)
-                || attribute.getType().equals(Collection.class))
+                || attribute.getType().equals(Double.class))
                 params.add(Integer.valueOf(value));
             else
                 params.add(value);
 
             // query syntax modifications
-            if (attribute.getType().equals(Collection.class))
-                query += "size(" + attributeName + ") " + operator + " ? and ";
+
             // modify query to use "like" if user wants contains
-            else if (operator.compareTo("contains") == 0) {
+            if (operator.compareTo("contains") == 0) {
                 query += attributeName + " like ? and ";
                 params.set(params.size() - 1, "%"
                     + params.get(params.size() - 1) + "%");
             } else
                 query += attributeName + " " + operator + " ? and ";
         }
-        return new HQLCriteria(query, params);
+        if (query.compareTo("") == 0)
+            return null;
+        else
+            return new HQLCriteria(query, params);
     }
 
     protected static ComboViewer createCombo(Composite parent, List<?> list) {
@@ -162,10 +159,8 @@ public abstract class AbstractQueryClause {
         for (Field field : classFields) {
             if (field.getType().equals(String.class)
                 || field.getType().equals(Integer.class)
-                || field.getType().equals(Double.class)
-                || field.getType().equals(Collection.class)) {
+                || field.getType().equals(Double.class))
                 attributes.add(field);
-            }
         }
         this.attributes = attributes;
     }
@@ -182,8 +177,6 @@ public abstract class AbstractQueryClause {
                 opCombo.setInput(stringOps);
             else if (type.equals(Integer.class) || type.equals(Double.class))
                 opCombo.setInput(numberOps);
-            else if (type.equals(Collection.class))
-                opCombo.setInput(collectionOps);
             else {
                 opCombo.setInput(null);
                 throw new Exception(
@@ -220,9 +213,11 @@ public abstract class AbstractQueryClause {
 
     public static String getText(Object element) {
         String[] s = element.toString().split("\\.");
-        if (s.length > 0)
-            return s[s.length - 1];
-        else
+        if (s.length > 0) {
+            String newstring = s[s.length - 1].substring(0, 1).toLowerCase();
+            newstring += s[s.length - 1].substring(1);
+            return newstring;
+        } else
             return null;
     }
 }

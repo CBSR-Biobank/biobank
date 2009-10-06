@@ -2,7 +2,9 @@ package edu.ualberta.med.biobank.views;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
@@ -19,6 +21,7 @@ import org.eclipse.ui.part.ViewPart;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.widgets.QueryPage;
+import edu.ualberta.med.biobank.widgets.ReportsLabelProvider;
 import edu.ualberta.med.biobank.widgets.infotables.InfoTableWidget;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
@@ -70,17 +73,35 @@ public class ReportsView extends ViewPart {
                 searchData = search();
                 if (searchData.size() > 0) {
                     Iterator<Object> searchDataIt = searchData.iterator();
-                    List<Method> filteredMethods = filterMethods(searchDataIt
-                        .next().getClass().getDeclaredMethods());
-
+                    List<Method> filteredMethods = QueryPage.filterMethods(
+                        searchDataIt.next().getClass().getDeclaredMethods(),
+                        false);
+                    int[] bounds = new int[filteredMethods.size()];
                     String[] names = new String[filteredMethods.size()];
+
                     for (int i = 0; i < filteredMethods.size(); i++) {
                         names[i] = filteredMethods.get(i).getName()
                             .substring(3);
+                        bounds[i] = names[i].length() * 8;
                     }
+                    Arrays.sort(names, new Comparator<String>() {
+
+                        @Override
+                        public int compare(String o1, String o2) {
+                            if (o1.compareToIgnoreCase("id") == 0)
+                                return -1;
+                            else if (o2.compareToIgnoreCase("id") == 0)
+                                return 1;
+                            else
+                                return o1.compareToIgnoreCase(o2);
+                        }
+
+                    });
                     searchTable.dispose();
                     searchTable = new InfoTableWidget<Object>(top, searchData,
-                        names, null);
+                        names, bounds);
+                    searchTable.getTableViewer().setLabelProvider(
+                        new ReportsLabelProvider());
                     GridData searchLayoutData = new GridData(SWT.FILL,
                         SWT.FILL, true, true);
                     searchLayoutData.minimumHeight = 500;
@@ -130,12 +151,4 @@ public class ReportsView extends ViewPart {
         sc.setMinSize(top.computeSize(SWT.DEFAULT, SWT.DEFAULT));
     }
 
-    public List<Method> filterMethods(Method[] unfiltered) {
-        List<Method> filtered = new ArrayList<Method>();
-        for (int i = 0; i < unfiltered.length; i++)
-            if (unfiltered[i].getName().contains("get")
-                || unfiltered[i].getName().contains("set"))
-                filtered.add(unfiltered[i]);
-        return filtered;
-    }
 }
