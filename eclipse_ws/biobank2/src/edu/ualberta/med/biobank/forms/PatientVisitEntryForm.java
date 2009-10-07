@@ -142,6 +142,8 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         form.setText("Patient Visit Information");
         form.setMessage(getOkMessage(), IMessageProvider.NONE);
         form.getBody().setLayout(new GridLayout(1, false));
+        form.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
+            BioBankPlugin.IMG_PATIENT_VISIT));
         patientWrapper = retrievePatient();
         createMainSection(patientWrapper.getStudy());
         createSourcesSection();
@@ -173,8 +175,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
 
         if (patientVisitWrapper.getId() == null) {
             // choose clinic for new visit
-            Collection<ContactWrapper> contacts = study
-                .getContactCollection();
+            Collection<ContactWrapper> contacts = study.getContactCollection();
             ClinicWrapper selectedClinic = null;
 
             if (contacts.size() == 1) {

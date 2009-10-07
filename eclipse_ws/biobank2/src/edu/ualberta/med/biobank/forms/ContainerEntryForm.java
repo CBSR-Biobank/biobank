@@ -19,6 +19,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
+import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.LabelingScheme;
 import edu.ualberta.med.biobank.common.wrappers.ContainerPositionWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
@@ -82,6 +83,9 @@ public class ContainerEntryForm extends BiobankEntryForm {
     @Override
     protected void createFormContent() throws Exception {
         form.setText("Container");
+        form.setImage(BioBankPlugin.getDefault().getIconForTypeName(
+            containerWrapper.getContainerType().getName()));
+
         currentContainerType = containerWrapper.getContainerType();
         form.getBody().setLayout(new GridLayout(1, false));
         createContainerSection();

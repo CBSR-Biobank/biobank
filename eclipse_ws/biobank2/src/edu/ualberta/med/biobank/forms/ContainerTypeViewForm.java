@@ -7,6 +7,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 
+import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.model.Capacity;
@@ -70,6 +71,9 @@ public class ContainerTypeViewForm extends BiobankViewForm {
     protected void createFormContent() throws Exception {
         form.setText("Container Type: " + containerType.getName());
         form.getBody().setLayout(new GridLayout(1, false));
+        form.setImage(BioBankPlugin.getDefault().getIconForTypeName(
+            containerType.getName()));
+
         createContainerTypeSection();
         if (containerType.getChildContainerTypeCollection().size() > 0) {
             createVisualizeContainer();
