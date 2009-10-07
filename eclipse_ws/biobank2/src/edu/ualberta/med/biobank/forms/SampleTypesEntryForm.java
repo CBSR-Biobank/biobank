@@ -78,7 +78,6 @@ public class SampleTypesEntryForm extends BiobankEntryForm {
     public void saveForm() throws Exception {
         List<SampleTypeWrapper> ssCollection = siteSampleWidget
             .getTableSampleTypes();
-        siteWrapper.deleteSampleTypeComplement(ssCollection);
         siteWrapper.setSampleTypeCollection(ssCollection);
 
         ssCollection = globalSampleWidget.getTableSampleTypes();

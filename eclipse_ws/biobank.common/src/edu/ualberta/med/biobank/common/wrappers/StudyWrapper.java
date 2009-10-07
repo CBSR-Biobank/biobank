@@ -5,7 +5,9 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.model.Contact;
@@ -240,7 +242,8 @@ public class StudyWrapper extends ModelWrapper<Study> implements
     }
 
     public void setSampleStorageCollection(
-        List<SampleStorageWrapper> ssCollection) {
+        List<SampleStorageWrapper> ssCollection) throws Exception {
+        deleteSampleStorageDifference(ssCollection);
         Collection<SampleStorage> ssObjects = new HashSet<SampleStorage>();
         for (SampleStorageWrapper ss : ssCollection) {
             ssObjects.add(ss.getWrappedObject());
@@ -256,24 +259,23 @@ public class StudyWrapper extends ModelWrapper<Study> implements
      * @param ssCollection
      * @throws Exception
      */
-    public void deleteSampleStorageComplement(
-        List<SampleStorageWrapper> ssCollection) throws Exception {
+    private void deleteSampleStorageDifference(
+        List<SampleStorageWrapper> newCollection) throws Exception {
         // no need to remove if study is not yet in the database or nothing in
         // the collection
-        if ((getId() == null) || (ssCollection.size() == 0))
+        if (isNew() || (newCollection.size() == 0))
             return;
 
-        // query from database again
-        reload();
+        List<SampleStorageWrapper> currSamplesSources = getSampleStorageCollection();
+        if (currSamplesSources.size() == 0)
+            return;
 
-        List<Integer> selectedStampleStorageIds = new ArrayList<Integer>();
-        for (SampleStorageWrapper ss : ssCollection) {
-            selectedStampleStorageIds.add(ss.getId());
-        }
-
-        for (SampleStorageWrapper ss : getSampleStorageCollection()) {
-            if (!selectedStampleStorageIds.contains(ss.getId())) {
-                ss.delete();
+        Set<SampleStorageWrapper> set = new HashSet<SampleStorageWrapper>(
+            newCollection);
+        Iterator<SampleStorageWrapper> it = currSamplesSources.iterator();
+        while (it.hasNext()) {
+            if (!set.contains(it.next().getId())) {
+                it.next().delete();
             }
         }
     }
@@ -315,7 +317,9 @@ public class StudyWrapper extends ModelWrapper<Study> implements
         }
     }
 
-    public void setSampleSourceCollection(List<SampleSourceWrapper> ssCollection) {
+    public void setSampleSourceCollection(List<SampleSourceWrapper> ssCollection)
+        throws Exception {
+        deleteSampleSourceDifference(ssCollection);
         Collection<SampleSource> ssObjects = new HashSet<SampleSource>();
         for (SampleSourceWrapper ss : ssCollection) {
             ssObjects.add(ss.getWrappedObject());
@@ -328,27 +332,26 @@ public class StudyWrapper extends ModelWrapper<Study> implements
      * Removes the sample storage objects that are not contained in the
      * collection.
      * 
-     * @param ssCollection
+     * @param newCollection
      * @throws Exception
      */
-    public void deleteSampleSourceComplement(
-        List<SampleSourceWrapper> ssCollection) throws Exception {
+    private void deleteSampleSourceDifference(
+        List<SampleSourceWrapper> newCollection) throws Exception {
         // no need to remove if study is not yet in the database or nothing in
         // the collection
-        if ((getId() == null) || (ssCollection.size() == 0))
+        if (isNew() || (newCollection.size() == 0))
             return;
 
-        // query from database again
-        reload();
+        List<SampleSourceWrapper> currSamplesSources = getSampleSourceCollection();
+        if (currSamplesSources.size() == 0)
+            return;
 
-        List<Integer> selectedStampleStorageIds = new ArrayList<Integer>();
-        for (SampleSourceWrapper ss : ssCollection) {
-            selectedStampleStorageIds.add(ss.getId());
-        }
-
-        for (SampleSourceWrapper ss : getSampleSourceCollection()) {
-            if (!selectedStampleStorageIds.contains(ss.getId())) {
-                ss.delete();
+        Set<SampleSourceWrapper> set = new HashSet<SampleSourceWrapper>(
+            newCollection);
+        Iterator<SampleSourceWrapper> it = currSamplesSources.iterator();
+        while (it.hasNext()) {
+            if (!set.contains(it.next().getId())) {
+                it.next().delete();
             }
         }
     }
