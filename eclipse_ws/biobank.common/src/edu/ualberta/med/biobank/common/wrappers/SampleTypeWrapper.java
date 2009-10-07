@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.common.wrappers;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -132,11 +133,10 @@ public class SampleTypeWrapper extends ModelWrapper<SampleType> implements
         Exception {
         Set<SampleTypeWrapper> setNewTypes = new HashSet<SampleTypeWrapper>(
             newTypes);
-        for (SampleTypeWrapper ss : oldTypes) {
-            if (!setNewTypes.contains(ss)) {
-                System.out.println("deleteOldSampleTypes: deleting "
-                    + ss.getName());
-                ss.delete();
+        Iterator<SampleTypeWrapper> it = oldTypes.iterator();
+        while (it.hasNext()) {
+            if (!setNewTypes.contains(it.next().getId())) {
+                it.next().delete();
             }
         }
     }

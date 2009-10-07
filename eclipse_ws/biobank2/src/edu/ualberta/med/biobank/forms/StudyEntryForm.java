@@ -309,7 +309,6 @@ public class StudyEntryForm extends BiobankEntryForm {
         }
         Assert.isTrue(selSampleSource.size() == selSampleSourceIds.size(),
             "problem with sample source selections");
-        studyWrapper.deleteSampleSourceComplement(selSampleSource);
         studyWrapper.setSampleSourceCollection(selSampleSource);
 
         List<PvInfoWrapper> pvInfoList = new ArrayList<PvInfoWrapper>();
@@ -376,7 +375,6 @@ public class StudyEntryForm extends BiobankEntryForm {
     private void saveSampleStorage() throws Exception {
         List<SampleStorageWrapper> ssCollection = sampleStorageEntryWidget
             .getSampleStorage();
-        studyWrapper.deleteSampleStorageComplement(ssCollection);
         studyWrapper.setSampleStorageCollection(ssCollection);
     }
 

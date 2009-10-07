@@ -5,7 +5,9 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.model.Address;
@@ -327,7 +329,9 @@ public class SiteWrapper extends ModelWrapper<Site> implements
         }
     }
 
-    public void setSampleTypeCollection(List<SampleTypeWrapper> types) {
+    public void setSampleTypeCollection(List<SampleTypeWrapper> types)
+        throws Exception {
+        deleteSampleTypeDifference(types);
         Collection<SampleType> typeObjects = new HashSet<SampleType>();
         for (SampleTypeWrapper type : types) {
             typeObjects.add(type.getWrappedObject());
@@ -339,27 +343,26 @@ public class SiteWrapper extends ModelWrapper<Site> implements
     /**
      * Removes the sample type objects that are not contained in the collection.
      * 
-     * @param ssCollection
+     * @param newCollection
      * @throws Exception
      */
-    public void deleteSampleTypeComplement(List<SampleTypeWrapper> ssCollection)
-        throws Exception {
+    private void deleteSampleTypeDifference(
+        List<SampleTypeWrapper> newCollection) throws Exception {
         // no need to remove if study is not yet in the database or nothing in
         // the collection
-        if ((getId() == null) || (ssCollection.size() == 0))
+        if (isNew() || (newCollection.size() == 0))
             return;
 
-        // query from database again
-        reload();
+        List<SampleTypeWrapper> currSamplesSources = getSampleTypeCollection();
+        if (currSamplesSources.size() == 0)
+            return;
 
-        List<Integer> selectedStampleStorageIds = new ArrayList<Integer>();
-        for (SampleTypeWrapper ss : ssCollection) {
-            selectedStampleStorageIds.add(ss.getId());
-        }
-
-        for (SampleTypeWrapper ss : getSampleTypeCollection()) {
-            if (!selectedStampleStorageIds.contains(ss.getId())) {
-                ss.delete();
+        Set<SampleTypeWrapper> set = new HashSet<SampleTypeWrapper>(
+            newCollection);
+        Iterator<SampleTypeWrapper> it = currSamplesSources.iterator();
+        while (it.hasNext()) {
+            if (!set.contains(it.next().getId())) {
+                it.next().delete();
             }
         }
     }
