@@ -8,6 +8,7 @@ import org.eclipse.swt.graphics.Image;
 import org.springframework.util.Assert;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
@@ -275,8 +276,8 @@ public class BiobankLabelProvider extends LabelProvider implements
         if (element instanceof StudyWrapper) {
             StudyWrapper study = (StudyWrapper) element;
             return study.getNameShort() + " - " + study.getName();
-        } else if (element instanceof Clinic) {
-            return ((Clinic) element).getName();
+        } else if (element instanceof ClinicWrapper) {
+            return ((ClinicWrapper) element).getName();
         } else if (element instanceof ContainerLabelingSchemeWrapper) {
             return ((ContainerLabelingSchemeWrapper) element).getName();
         } else if (element instanceof Site) {

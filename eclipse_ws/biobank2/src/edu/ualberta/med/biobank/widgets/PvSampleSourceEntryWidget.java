@@ -25,7 +25,9 @@ import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PvSampleSourceWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SampleSourceWrapper;
 import edu.ualberta.med.biobank.dialogs.PvSampleSourceDialog;
 import edu.ualberta.med.biobank.model.SampleSource;
 import edu.ualberta.med.biobank.widgets.infotables.PvSampleSourceInfoTable;
@@ -43,9 +45,11 @@ public class PvSampleSourceEntryWidget extends BiobankWidget {
 
     private Button addPvSampleSourceButton;
 
-    private Collection<SampleSource> allSampleSources;
+    private List<SampleSourceWrapper> allSampleSources;
 
-    private Collection<PvSampleSourceWrapper> selectedPvSampleSources;
+    private List<PvSampleSourceWrapper> selectedPvSampleSources;
+
+    private PatientVisitWrapper patientVisit;
 
     /**
      * 
@@ -59,13 +63,14 @@ public class PvSampleSourceEntryWidget extends BiobankWidget {
      *            form this parameter should be null.
      */
     public PvSampleSourceEntryWidget(Composite parent, int style,
-        Collection<PvSampleSourceWrapper> pvSampleSourceCollection,
-        FormToolkit toolkit) {
+        List<PvSampleSourceWrapper> pvSampleSourceCollection,
+        PatientVisitWrapper patientVisit, FormToolkit toolkit) {
         super(parent, style);
         Assert.isNotNull(toolkit, "toolkit is null");
         getSampleSources();
+        this.patientVisit = patientVisit;
         if (pvSampleSourceCollection == null) {
-            selectedPvSampleSources = new HashSet<PvSampleSourceWrapper>();
+            selectedPvSampleSources = new ArrayList<PvSampleSourceWrapper>();
         } else {
             selectedPvSampleSources = pvSampleSourceCollection;
         }
@@ -90,8 +95,11 @@ public class PvSampleSourceEntryWidget extends BiobankWidget {
         addPvSampleSourceButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                addOrEditPvSampleSource(true, new PvSampleSourceWrapper(
-                    SessionManager.getAppService()),
+                PvSampleSourceWrapper sampleSource = new PvSampleSourceWrapper(
+                    SessionManager.getAppService());
+                sampleSource
+                    .setPatientVisit(PvSampleSourceEntryWidget.this.patientVisit);
+                addOrEditPvSampleSource(true, sampleSource,
                     getNonDuplicateSampleSources());
             }
         });
@@ -99,7 +107,7 @@ public class PvSampleSourceEntryWidget extends BiobankWidget {
 
     private void addOrEditPvSampleSource(boolean add,
         PvSampleSourceWrapper pvSampleSource,
-        Set<SampleSource> availSampleSources) {
+        Set<SampleSourceWrapper> availSampleSources) {
         PvSampleSourceDialog dlg = new PvSampleSourceDialog(PlatformUI
             .getWorkbench().getActiveWorkbenchWindow().getShell(),
             pvSampleSource, availSampleSources);
@@ -109,25 +117,17 @@ public class PvSampleSourceEntryWidget extends BiobankWidget {
                 selectedPvSampleSources.add(dlg.getPvSampleSource());
             }
             pvSampleSourceTable.setCollection(selectedPvSampleSources);
+            notifyListeners();
         }
     }
 
     // need sample types that have not yet been selected in sampleStorageTable
-    private Set<SampleSource> getNonDuplicateSampleSources() {
-        Set<SampleSource> sampleSources = new HashSet<SampleSource>(
-            allSampleSources);
-        Set<SampleSource> nonDupSampleSources = new HashSet<SampleSource>();
+    private Set<SampleSourceWrapper> getNonDuplicateSampleSources() {
+        Set<SampleSourceWrapper> nonDupSampleSources = new HashSet<SampleSourceWrapper>();
         Collection<PvSampleSourceWrapper> currentSampleSources = pvSampleSourceTable
             .getCollection();
-
-        // get the IDs of the selected sample types
-        List<Integer> sampleSourceIds = new ArrayList<Integer>();
-        for (PvSampleSourceWrapper ss : currentSampleSources) {
-            sampleSourceIds.add(ss.getSampleSource().getId());
-        }
-
-        for (SampleSource ss : sampleSources) {
-            if (!sampleSourceIds.contains(ss.getId())) {
+        for (SampleSourceWrapper ss : allSampleSources) {
+            if (!currentSampleSources.contains(ss)) {
                 nonDupSampleSources.add(ss);
             }
         }
@@ -144,9 +144,9 @@ public class PvSampleSourceEntryWidget extends BiobankWidget {
         item.addSelectionListener(new SelectionListener() {
             public void widgetSelected(SelectionEvent event) {
                 PvSampleSourceWrapper pvss = pvSampleSourceTable.getSelection();
-
-                Set<SampleSource> allowedSampleSources = getNonDuplicateSampleSources();
-                allowedSampleSources.add(pvss.getSampleSource());
+                Set<SampleSourceWrapper> allowedSampleSources = getNonDuplicateSampleSources();
+                allowedSampleSources.add(new SampleSourceWrapper(SessionManager
+                    .getAppService(), pvss.getSampleSource()));
                 addOrEditPvSampleSource(false, pvss, allowedSampleSources);
             }
 
@@ -189,12 +189,17 @@ public class PvSampleSourceEntryWidget extends BiobankWidget {
 
     private void getSampleSources() {
         try {
-            allSampleSources = SessionManager.getAppService().search(
-                SampleSource.class, new SampleSource());
+            List<SampleSource> sampleSources = SessionManager.getAppService()
+                .search(SampleSource.class, new SampleSource());
+            allSampleSources = new ArrayList<SampleSourceWrapper>();
+            for (SampleSource ss : sampleSources) {
+                allSampleSources.add(new SampleSourceWrapper(SessionManager
+                    .getAppService(), ss));
+            }
         } catch (final RemoteConnectFailureException exp) {
             BioBankPlugin.openRemoteConnectErrorMessage();
         } catch (ApplicationException e) {
-            e.printStackTrace();
+            BioBankPlugin.openAsyncError("Error retrieving sample sources", e);
         }
     }
 

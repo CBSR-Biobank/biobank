@@ -143,12 +143,23 @@ public abstract class ModelWrapper<E> {
         if (isNew()) {
             query = new InsertExampleQuery(wrappedObject);
         } else {
+            E origObject = getObjectFromDatabase();
+            persistDependencies(origObject);
             query = new UpdateExampleQuery(wrappedObject);
         }
 
         SDKQueryResult result = appService.executeQuery(query);
         wrappedObject = ((E) result.getObjectResult());
         propertiesMap.clear();
+    }
+
+    /**
+     * should redefine this method if others updates (or deletes) need to be
+     * done when this object is update
+     */
+    @SuppressWarnings("unused")
+    protected void persistDependencies(E origObject)
+        throws BiobankCheckException, Exception {
     }
 
     protected abstract void persistChecks() throws BiobankCheckException,

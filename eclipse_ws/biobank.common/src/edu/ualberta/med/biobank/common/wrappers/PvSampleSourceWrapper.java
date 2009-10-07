@@ -57,6 +57,10 @@ public class PvSampleSourceWrapper extends ModelWrapper<PvSampleSource> {
         propertyChangeSupport.firePropertyChange("patientVisit", oldPv, pv);
     }
 
+    public void setPatientVisit(PatientVisitWrapper pv) {
+        setPatientVisit(pv.wrappedObject);
+    }
+
     public SampleSource getSampleSource() {
         return wrappedObject.getSampleSource();
     }

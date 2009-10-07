@@ -109,7 +109,7 @@ public class SessionManager {
             return;
 
         for (SiteWrapper site : sites) {
-            if (site.getId().equals(siteId))
+            if (site.getId().toString().equals(siteId))
                 currentSiteWrapper = site;
         }
     }

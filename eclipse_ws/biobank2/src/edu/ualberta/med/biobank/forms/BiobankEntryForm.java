@@ -264,15 +264,15 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
         ControlContribution reset = new ControlContribution("Reset") {
             @Override
             protected Control createControl(Composite parent) {
-                confirmButton = new Button(parent, SWT.PUSH);
-                confirmButton.setText("Reset");
-                confirmButton.addSelectionListener(new SelectionAdapter() {
+                Button resetButton = new Button(parent, SWT.PUSH);
+                resetButton.setText("Reset");
+                resetButton.addSelectionListener(new SelectionAdapter() {
                     @Override
                     public void widgetSelected(SelectionEvent e) {
                         reset();
                     }
                 });
-                return confirmButton;
+                return resetButton;
             }
         };
         form.getToolBarManager().add(reset);
@@ -280,15 +280,15 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
         ControlContribution cancel = new ControlContribution("Cancel") {
             @Override
             protected Control createControl(Composite parent) {
-                confirmButton = new Button(parent, SWT.PUSH);
-                confirmButton.setText("Cancel");
-                confirmButton.addSelectionListener(new SelectionAdapter() {
+                Button cancelButton = new Button(parent, SWT.PUSH);
+                cancelButton.setText("Cancel");
+                cancelButton.addSelectionListener(new SelectionAdapter() {
                     @Override
                     public void widgetSelected(SelectionEvent e) {
                         cancel();
                     }
                 });
-                return confirmButton;
+                return cancelButton;
             }
         };
         form.getToolBarManager().add(cancel);

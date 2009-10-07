@@ -22,5 +22,4 @@ Require-Bundle: org.eclipse.ui,
  biobank.common;visibility:=reexport,
  org.eclipse.ui.console;bundle-version="3.4.0"
 Bundle-Version: 1.0.5.Beta
-Import-Package: edu.ualberta.med.scannerconfig
 

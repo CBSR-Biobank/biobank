@@ -6,6 +6,8 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 
+import org.apache.commons.collections.map.ListOrderedMap;
+
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.model.Clinic;
@@ -105,7 +107,7 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> implements
     }
 
     @SuppressWarnings("unchecked")
-    public Collection<PvSampleSourceWrapper> getPvSampleSourceCollection() {
+    public List<PvSampleSourceWrapper> getPvSampleSourceCollection() {
         List<PvSampleSourceWrapper> pvSampleSourceCollection = (List<PvSampleSourceWrapper>) propertiesMap
             .get("pvSampleSourceCollection");
         if (pvSampleSourceCollection == null) {
@@ -165,6 +167,31 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> implements
         propertiesMap.put("pvInfoDataCollection", pvInfoDataCollection);
     }
 
+    @SuppressWarnings("unchecked")
+    public List<PvInfoPvInfoData> getPvInfoWithValues() {
+        List<PvInfoWrapper> studyPvInfos = getPatientWrapper().getStudy()
+            .getPvInfoCollection();
+        if (studyPvInfos.size() > 0) {
+            ListOrderedMap combinedPvInfoMap = new ListOrderedMap();
+            for (PvInfoWrapper pvInfo : studyPvInfos) {
+                PvInfoPvInfoData combinedPvInfo = new PvInfoPvInfoData();
+                combinedPvInfo.pvInfo = pvInfo;
+                combinedPvInfoMap.put(pvInfo.getId(), combinedPvInfo);
+            }
+
+            Collection<PvInfoDataWrapper> pvDataCollection = getPvInfoDataCollection();
+            if (pvDataCollection != null) {
+                for (PvInfoDataWrapper pvInfoData : pvDataCollection) {
+                    PvInfoPvInfoData combinedPvInfo = (PvInfoPvInfoData) combinedPvInfoMap
+                        .get(pvInfoData.getPvInfo().getId());
+                    combinedPvInfo.pvInfoData = pvInfoData;
+                }
+            }
+            return combinedPvInfoMap.valueList();
+        }
+        return null;
+    }
+
     public void setDateDrawn(Date date) {
         Date oldDate = getDateDrawn();
         wrappedObject.setDateDrawn(date);
@@ -200,6 +227,33 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> implements
         }
     }
 
+    @Override
+    protected void persistDependencies(PatientVisit origObject)
+        throws BiobankCheckException, Exception {
+
+        // for (PvInfoDataWrapper pvInfoData : getPvInfoDataCollection()) {
+        // pvInfoData.persist();
+        // }
+        // removeDeletedPvSampleSources(origObject);
+        // for (PvSampleSourceWrapper ss : getPvSampleSourceCollection()) {
+        // ss.persist();
+        // }
+    }
+
+    private void removeDeletedPvSampleSources(PatientVisit pvDatabase)
+        throws BiobankCheckException, Exception {
+        List<PvSampleSourceWrapper> newSampleSources = getPvSampleSourceCollection();
+        List<PvSampleSourceWrapper> oldSampleSources = new PatientVisitWrapper(
+            appService, pvDatabase).getPvSampleSourceCollection();
+        if (oldSampleSources != null) {
+            for (PvSampleSourceWrapper ss : oldSampleSources) {
+                if (newSampleSources == null || !newSampleSources.contains(ss)) {
+                    ss.delete();
+                }
+            }
+        }
+    }
+
     private boolean checkVisitDateDrawnUnique() throws ApplicationException {
         String isSameVisit = "";
         List<Object> params = new ArrayList<Object>();
@@ -220,6 +274,14 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> implements
         Clinic oldClinic = wrappedObject.getClinic();
         wrappedObject.setClinic(clinic);
         propertyChangeSupport.firePropertyChange("clinic", oldClinic, clinic);
+    }
+
+    public void setClinic(ClinicWrapper clinic) {
+        if (clinic == null) {
+            setClinic((Clinic) null);
+        } else {
+            setClinic(clinic.wrappedObject);
+        }
     }
 
     public void setPvSampleSourceCollection(
@@ -262,4 +324,16 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> implements
             : -1));
     }
 
+    public class PvInfoPvInfoData {
+        private PvInfoWrapper pvInfo;
+        private PvInfoDataWrapper pvInfoData;
+
+        public PvInfoWrapper getPvInfo() {
+            return pvInfo;
+        }
+
+        public PvInfoDataWrapper getPvInfoData() {
+            return pvInfoData;
+        }
+    }
 }

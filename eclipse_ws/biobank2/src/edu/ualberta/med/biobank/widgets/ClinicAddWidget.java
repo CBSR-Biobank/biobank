@@ -69,7 +69,8 @@ public class ClinicAddWidget extends BiobankWidget {
         addClinicButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                if (allClinics.size() == selectedContacts.size()) {
+                if (allClinics != null && selectedContacts != null
+                    && allClinics.size() == selectedContacts.size()) {
                     BioBankPlugin.openInformation("All Clinics Selected",
                         "No more clinics available.");
                 } else {

@@ -8,12 +8,14 @@ import java.util.HashSet;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.BiobankCheckException;
+import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.model.PvInfo;
 import edu.ualberta.med.biobank.model.SampleSource;
 import edu.ualberta.med.biobank.model.SampleStorage;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
@@ -352,7 +354,7 @@ public class StudyWrapper extends ModelWrapper<Study> implements
     }
 
     @SuppressWarnings("unchecked")
-    public Collection<PvInfoWrapper> getPvInfoCollection() {
+    public List<PvInfoWrapper> getPvInfoCollection() {
         List<PvInfoWrapper> pvInfoCollection = (List<PvInfoWrapper>) propertiesMap
             .get("pvInfoCollection");
         if (pvInfoCollection == null) {
@@ -388,4 +390,18 @@ public class StudyWrapper extends ModelWrapper<Study> implements
         propertiesMap.put("pvInfoCollection", pvInfoCollection);
     }
 
+    public List<ClinicWrapper> getClinicCollection()
+        throws ApplicationException {
+        HQLCriteria c = new HQLCriteria("select distinct clinics from "
+            + Contact.class.getName() + " as contacts"
+            + " inner join contacts.clinic as clinics"
+            + " where contacts.studyCollection.id = ?", Arrays
+            .asList(new Object[] { getId() }));
+        List<Clinic> clinics = appService.query(c);
+        List<ClinicWrapper> clinicWrappers = new ArrayList<ClinicWrapper>();
+        for (Clinic clinic : clinics) {
+            clinicWrappers.add(new ClinicWrapper(appService, clinic));
+        }
+        return clinicWrappers;
+    }
 }

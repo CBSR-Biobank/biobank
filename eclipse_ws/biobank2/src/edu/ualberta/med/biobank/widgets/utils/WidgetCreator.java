@@ -203,7 +203,11 @@ public class WidgetCreator {
         } else {
             text = toolkit.createText(composite, "", widgetOptions);
         }
-        text.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        GridData gd = new GridData(GridData.FILL_HORIZONTAL);
+        if ((widgetOptions & SWT.MULTI) != 0) {
+            gd.heightHint = 40;
+        }
+        text.setLayoutData(gd);
         if (keyListener != null) {
             text.addKeyListener(keyListener);
         }

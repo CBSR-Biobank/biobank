@@ -28,8 +28,10 @@ public class StudyContactEntryInfoTable extends InfoTableWidget<ContactWrapper> 
         super(parent, null, HEADINGS, BOUNDS);
         Collection<ContactWrapper> collection = studyWrapper
             .getContactCollection();
-        for (int i = 0, n = collection.size(); i < n; ++i) {
-            model.add(new BiobankCollectionModel());
+        if (collection != null) {
+            for (int i = 0, n = collection.size(); i < n; ++i) {
+                model.add(new BiobankCollectionModel());
+            }
         }
         getTableViewer().refresh();
         setCollection(collection);
@@ -45,7 +47,7 @@ public class StudyContactEntryInfoTable extends InfoTableWidget<ContactWrapper> 
                     Display display = viewer.getTable().getDisplay();
                     int count = 0;
 
-                    if (collection != null)
+                    if (collection != null) {
                         if (model.size() != collection.size()) {
                             model.clear();
                             for (int i = 0, n = collection.size(); i < n; ++i) {
@@ -59,23 +61,25 @@ public class StudyContactEntryInfoTable extends InfoTableWidget<ContactWrapper> 
                             });
                         }
 
-                    for (ContactWrapper contact : collection) {
-                        if (getTableViewer().getTable().isDisposed()) {
-                            return;
-                        }
-                        final BiobankCollectionModel item = model.get(count);
-                        StudyContactInfo info = new StudyContactInfo();
-                        item.o = info;
-                        model.add(item);
-                        info.contact = contact;
-
-                        display.asyncExec(new Runnable() {
-                            public void run() {
-                                if (!viewer.getTable().isDisposed())
-                                    viewer.refresh(item, false);
+                        for (ContactWrapper contact : collection) {
+                            if (getTableViewer().getTable().isDisposed()) {
+                                return;
                             }
-                        });
-                        ++count;
+                            final BiobankCollectionModel item = model
+                                .get(count);
+                            StudyContactInfo info = new StudyContactInfo();
+                            item.o = info;
+                            model.add(item);
+                            info.contact = contact;
+
+                            display.asyncExec(new Runnable() {
+                                public void run() {
+                                    if (!viewer.getTable().isDisposed())
+                                        viewer.refresh(item, false);
+                                }
+                            });
+                            ++count;
+                        }
                     }
                 } catch (final RemoteConnectFailureException exp) {
                     BioBankPlugin.openRemoteConnectErrorMessage();
