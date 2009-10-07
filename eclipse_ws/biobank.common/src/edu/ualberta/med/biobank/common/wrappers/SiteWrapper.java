@@ -7,7 +7,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.model.Address;
@@ -353,15 +352,17 @@ public class SiteWrapper extends ModelWrapper<Site> implements
         if (isNew() || (newCollection.size() == 0))
             return;
 
-        List<SampleTypeWrapper> currSamplesSources = getSampleTypeCollection();
-        if (currSamplesSources.size() == 0)
+        List<SampleTypeWrapper> currSamplesStorage = getSampleTypeCollection();
+        if (currSamplesStorage.size() == 0)
             return;
 
-        Set<SampleTypeWrapper> set = new HashSet<SampleTypeWrapper>(
-            newCollection);
-        Iterator<SampleTypeWrapper> it = currSamplesSources.iterator();
+        List<Integer> idList = new ArrayList<Integer>();
+        for (SampleTypeWrapper ss : newCollection) {
+            idList.add(ss.getId());
+        }
+        Iterator<SampleTypeWrapper> it = currSamplesStorage.iterator();
         while (it.hasNext()) {
-            if (!set.contains(it.next().getId())) {
+            if (!idList.contains(it.next().getId())) {
                 it.next().delete();
             }
         }

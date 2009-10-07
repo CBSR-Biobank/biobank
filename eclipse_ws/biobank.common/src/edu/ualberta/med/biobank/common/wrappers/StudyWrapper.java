@@ -7,7 +7,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.model.Contact;
@@ -229,13 +228,13 @@ public class StudyWrapper extends ModelWrapper<Study> implements
         return getSampleStorageCollection(false);
     }
 
-    public void setSampleStorageCollection(Collection<SampleStorage> ss,
-        boolean setNull) {
+    public void setSampleStorageCollection(
+        Collection<SampleStorage> collection, boolean setNull) {
         Collection<SampleStorage> oldSampleStorage = wrappedObject
             .getSampleStorageCollection();
-        wrappedObject.setSampleStorageCollection(ss);
+        wrappedObject.setSampleStorageCollection(collection);
         propertyChangeSupport.firePropertyChange("sampleStorageCollection",
-            oldSampleStorage, ss);
+            oldSampleStorage, collection);
         if (setNull) {
             propertiesMap.put("sampleStorageCollection", null);
         }
@@ -246,6 +245,7 @@ public class StudyWrapper extends ModelWrapper<Study> implements
         deleteSampleStorageDifference(ssCollection);
         Collection<SampleStorage> ssObjects = new HashSet<SampleStorage>();
         for (SampleStorageWrapper ss : ssCollection) {
+            ss.setStudy(wrappedObject);
             ssObjects.add(ss.getWrappedObject());
         }
         setSampleStorageCollection(ssObjects, false);
@@ -263,18 +263,20 @@ public class StudyWrapper extends ModelWrapper<Study> implements
         List<SampleStorageWrapper> newCollection) throws Exception {
         // no need to remove if study is not yet in the database or nothing in
         // the collection
-        if (isNew() || (newCollection.size() == 0))
+        if (isNew())
             return;
 
-        List<SampleStorageWrapper> currSamplesSources = getSampleStorageCollection();
-        if (currSamplesSources.size() == 0)
+        List<SampleStorageWrapper> currSamplesStorage = getSampleStorageCollection();
+        if (currSamplesStorage.size() == 0)
             return;
 
-        Set<SampleStorageWrapper> set = new HashSet<SampleStorageWrapper>(
-            newCollection);
-        Iterator<SampleStorageWrapper> it = currSamplesSources.iterator();
+        List<Integer> idList = new ArrayList<Integer>();
+        for (SampleStorageWrapper ss : newCollection) {
+            idList.add(ss.getId());
+        }
+        Iterator<SampleStorageWrapper> it = currSamplesStorage.iterator();
         while (it.hasNext()) {
-            if (!set.contains(it.next().getId())) {
+            if ((idList.size() == 0) || !idList.contains(it.next().getId())) {
                 it.next().delete();
             }
         }
@@ -339,18 +341,20 @@ public class StudyWrapper extends ModelWrapper<Study> implements
         List<SampleSourceWrapper> newCollection) throws Exception {
         // no need to remove if study is not yet in the database or nothing in
         // the collection
-        if (isNew() || (newCollection.size() == 0))
+        if (isNew())
             return;
 
         List<SampleSourceWrapper> currSamplesSources = getSampleSourceCollection();
         if (currSamplesSources.size() == 0)
             return;
 
-        Set<SampleSourceWrapper> set = new HashSet<SampleSourceWrapper>(
-            newCollection);
+        List<Integer> idList = new ArrayList<Integer>();
+        for (SampleSourceWrapper ss : newCollection) {
+            idList.add(ss.getId());
+        }
         Iterator<SampleSourceWrapper> it = currSamplesSources.iterator();
         while (it.hasNext()) {
-            if (!set.contains(it.next().getId())) {
+            if (!idList.contains(it.next().getId())) {
                 it.next().delete();
             }
         }
