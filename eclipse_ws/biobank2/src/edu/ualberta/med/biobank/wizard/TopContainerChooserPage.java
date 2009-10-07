@@ -15,11 +15,10 @@ import org.eclipse.swt.widgets.Label;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.utils.ModelUtils;
-import edu.ualberta.med.biobank.model.Container;
+import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.model.ContainerCell;
 import edu.ualberta.med.biobank.model.ContainerStatus;
-import edu.ualberta.med.biobank.model.ContainerType;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class TopContainerChooserPage extends AbstractContainerChooserPage {
@@ -43,15 +42,14 @@ public class TopContainerChooserPage extends AbstractContainerChooserPage {
         comboViewer.setLabelProvider(new LabelProvider() {
             @Override
             public String getText(Object element) {
-                Container sc = (Container) element;
+                ContainerWrapper sc = (ContainerWrapper) element;
                 return sc.getLabel() + " (" + sc.getContainerType().getName()
                     + ')';
             }
         });
         try {
-            comboViewer.setInput(ModelUtils.getTopContainersForSite(
-                getAppService(), getSite()));
-        } catch (ApplicationException e) {
+            comboViewer.setInput(getSite().getTopContainerCollection());
+        } catch (Exception e) {
             BioBankPlugin.openError("Error",
                 "Error retrieving containers informations from database");
         }
@@ -59,7 +57,7 @@ public class TopContainerChooserPage extends AbstractContainerChooserPage {
             .addSelectionChangedListener(new ISelectionChangedListener() {
                 @Override
                 public void selectionChanged(SelectionChangedEvent event) {
-                    setCurrentContainer((Container) ((IStructuredSelection) comboViewer
+                    setCurrentContainer((ContainerWrapper) ((IStructuredSelection) comboViewer
                         .getSelection()).getFirstElement());
                     updateFreezerGrid();
                     pageContainer.layout(true, true);
@@ -71,14 +69,13 @@ public class TopContainerChooserPage extends AbstractContainerChooserPage {
         super.initComponent();
         containerWidget.setVisible(false);
         try {
-            // homogenise
-            List<ContainerType> types = ModelUtils.queryProperty(
-                getAppService(), ContainerType.class, "name", "Freezer", false);
+            List<ContainerTypeWrapper> types = ContainerTypeWrapper
+                .getContainerTypesInSite(getAppService(), getSite(), "Freezer",
+                    false);
             if (types.size() > 0) {
                 containerWidget.setContainerType(types.get(0));
             }
         } catch (ApplicationException e) {
-            // Auto-generated catch block
             e.printStackTrace();
         }
     }
@@ -99,7 +96,8 @@ public class TopContainerChooserPage extends AbstractContainerChooserPage {
     }
 
     @Override
-    protected void setStatus(ContainerCell cell, Container occupiedContainer) {
+    protected void setStatus(ContainerCell cell,
+        ContainerWrapper occupiedContainer) {
         boolean full;
         int total = 0;
 

@@ -8,6 +8,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.forms.widgets.Section;
 
+import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.treeview.PatientAdapter;
 import edu.ualberta.med.biobank.widgets.infotables.PatientVisitInfoTable;
@@ -40,15 +41,15 @@ public class PatientViewForm extends BiobankViewForm {
     }
 
     @Override
-    protected void createFormContent() {
+    protected void createFormContent() throws Exception {
         form.setText("Patient: " + patientWrapper.getNumber());
         form.getBody().setLayout(new GridLayout(1, false));
         form.getBody().setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        form.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
+            BioBankPlugin.IMG_PATIENT));
 
-        addRefreshToolbarAction();
         createPatientSection();
         createPatientVisitSection();
-        initEditButton(form.getBody(), patientAdapter);
         setValues();
     }
 
@@ -75,8 +76,8 @@ public class PatientViewForm extends BiobankViewForm {
     }
 
     private void setValues() {
-        FormUtils.setTextValue(siteLabel, patientWrapper.getStudy().getSite()
-            .getName());
+        FormUtils.setTextValue(siteLabel, patientWrapper.getStudy()
+            .getWrappedObject().getSite().getName());
     }
 
     @Override

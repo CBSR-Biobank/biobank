@@ -12,7 +12,7 @@ import edu.ualberta.med.biobank.common.RowColPos;
 import edu.ualberta.med.biobank.model.ContainerCell;
 import edu.ualberta.med.biobank.model.ContainerStatus;
 
-public class ChooseContainerWidget extends AbstractGridContainerWidget {
+public class ContainerDisplayWidget extends AbstractGridContainerWidget {
 
     private ContainerCell[][] cells;
 
@@ -23,10 +23,7 @@ public class ChooseContainerWidget extends AbstractGridContainerWidget {
      */
     private ContainerStatus defaultStatus = ContainerStatus.NOT_INITIALIZED;
 
-    @SuppressWarnings("unused")
-    private boolean showNullStatusAsEmpty = false;
-
-    public ChooseContainerWidget(Composite parent) {
+    public ContainerDisplayWidget(Composite parent) {
         super(parent);
     }
 
@@ -90,8 +87,8 @@ public class ChooseContainerWidget extends AbstractGridContainerWidget {
         String sname = "";
         if (cells != null) {
             ContainerCell cell = cells[indexRow][indexCol];
-
-            if ((cell.getPosition().getContainer() != null)
+            if ((cell.getPosition() != null && cell.getPosition()
+                .getContainer() != null)
                 && (cell.getPosition().getContainer().getContainerType()
                     .getNameShort() != null)
                 && (cell.getPosition().getContainer().getContainerType()
@@ -106,7 +103,7 @@ public class ChooseContainerWidget extends AbstractGridContainerWidget {
         if (super.getContainerType() != null) {
             return parentLabel
                 + LabelingScheme.getPositionString(rowcol, super
-                    .getContainerType()) + sname;
+                    .getContainerType().getWrappedObject()) + sname;
         }
 
         String row = getValueForCell(firstRowSign, indexRow,
@@ -117,10 +114,6 @@ public class ChooseContainerWidget extends AbstractGridContainerWidget {
             return col + row;
         }
         return row + col;
-    }
-
-    public void setShowNullStatusAsEmpty(boolean showNullStatusAsEmpty) {
-        this.showNullStatusAsEmpty = showNullStatusAsEmpty;
     }
 
     public void setLegend(List<ContainerStatus> legendStatus) {

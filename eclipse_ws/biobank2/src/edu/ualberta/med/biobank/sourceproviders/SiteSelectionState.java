@@ -6,7 +6,7 @@ import java.util.Map;
 import org.eclipse.ui.AbstractSourceProvider;
 import org.eclipse.ui.ISources;
 
-import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 
 public class SiteSelectionState extends AbstractSourceProvider {
 
@@ -30,7 +30,7 @@ public class SiteSelectionState extends AbstractSourceProvider {
         return new String[] { SITE_SELECTION_ID };
     }
 
-    public void setSiteSelection(Site site) {
+    public void setSiteSelection(SiteWrapper site) {
         Integer id = null;
         if (site != null) {
             id = site.getId();

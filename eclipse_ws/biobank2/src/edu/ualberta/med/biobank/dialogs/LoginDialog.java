@@ -2,7 +2,6 @@ package edu.ualberta.med.biobank.dialogs;
 
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.preferences.InstanceScope;
@@ -26,7 +25,6 @@ import org.osgi.service.prefs.Preferences;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.helpers.SessionHelper;
-import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.rcp.Application;
 
 public class LoginDialog extends TitleAreaDialog {
@@ -99,6 +97,8 @@ public class LoginDialog extends TitleAreaDialog {
     protected Control createContents(Composite parent) {
         Control contents = super.createContents(parent);
         setTitle("Login to a BioBank server");
+        setTitleImage(BioBankPlugin.getDefault().getImageRegistry().get(
+            BioBankPlugin.IMG_COMPUTER_KEY));
         setMessage("Enter server name and login details.");
         return contents;
     }
@@ -212,14 +212,9 @@ public class LoginDialog extends TitleAreaDialog {
         BusyIndicator.showWhile(PlatformUI.getWorkbench()
             .getActiveWorkbenchWindow().getShell().getDisplay(), sessionHelper);
 
-        List<Site> sites = sessionHelper.getSites();
-        if (sites != null) {
-            SessionManager.getInstance().addSession(
-                sessionHelper.getAppService(), serverText.getText(),
-                userNameText.getText(), sites);
-        }
-
+        SessionManager.getInstance().addSession(sessionHelper.getAppService(),
+            serverText.getText(), userNameText.getText(),
+            sessionHelper.getSites());
         super.okPressed();
     }
-
 }

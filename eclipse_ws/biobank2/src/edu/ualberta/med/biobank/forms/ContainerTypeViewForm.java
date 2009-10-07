@@ -1,7 +1,5 @@
 package edu.ualberta.med.biobank.forms;
 
-import java.util.List;
-
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -9,19 +7,20 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 
+import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.model.Capacity;
-import edu.ualberta.med.biobank.model.ContainerType;
-import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.treeview.ContainerTypeAdapter;
 import edu.ualberta.med.biobank.widgets.CabinetDrawerWidget;
-import edu.ualberta.med.biobank.widgets.ChooseContainerWidget;
+import edu.ualberta.med.biobank.widgets.ContainerDisplayWidget;
 
 public class ContainerTypeViewForm extends BiobankViewForm {
     public static final String ID = "edu.ualberta.med.biobank.forms.ContainerTypeViewForm";
 
     private ContainerTypeAdapter containerTypeAdapter;
 
-    private ContainerType containerType;
+    private ContainerTypeWrapper containerType;
 
     private Capacity capacity;
 
@@ -58,30 +57,26 @@ public class ContainerTypeViewForm extends BiobankViewForm {
                 + adapter.getClass().getName());
 
         containerTypeAdapter = (ContainerTypeAdapter) adapter;
+        containerType = containerTypeAdapter.getContainerType();
         retrieveContainerType();
         setPartName("Container Type " + containerType.getName());
     }
 
     private void retrieveContainerType() throws Exception {
-        List<ContainerType> result;
-        ContainerType searchContainerType = new ContainerType();
-        searchContainerType.setId(containerTypeAdapter.getContainerType()
-            .getId());
-        result = appService.search(ContainerType.class, searchContainerType);
-        Assert.isTrue(result.size() == 1);
-        containerType = result.get(0);
-        containerTypeAdapter.setContainerType(containerType);
+        containerType.reload();
         capacity = containerType.getCapacity();
     }
 
     @Override
-    protected void createFormContent() {
+    protected void createFormContent() throws Exception {
         form.setText("Container Type: " + containerType.getName());
-        addRefreshToolbarAction();
         form.getBody().setLayout(new GridLayout(1, false));
+        form.setImage(BioBankPlugin.getDefault().getIconForTypeName(
+            containerType.getName()));
+
         createContainerTypeSection();
         if (containerType.getChildContainerTypeCollection().size() > 0) {
-            visualizeContainer();
+            createVisualizeContainer();
         }
         createDimensionsSection();
         if (containerType.getSampleTypeCollection() != null
@@ -167,12 +162,12 @@ public class ContainerTypeViewForm extends BiobankViewForm {
         GridData gd = new GridData(GridData.FILL_BOTH);
         gd.heightHint = 100;
         sampleTypesList.setLayoutData(gd);
-        setSampleDerivTypesValues();
+        setSampleTypesValues();
     }
 
-    private void setSampleDerivTypesValues() {
+    private void setSampleTypesValues() {
         sampleTypesList.removeAll();
-        for (SampleType type : containerType.getSampleTypeCollection()) {
+        for (SampleTypeWrapper type : containerType.getSampleTypeCollection()) {
             sampleTypesList.add(type.getNameShort());
         }
     }
@@ -196,7 +191,7 @@ public class ContainerTypeViewForm extends BiobankViewForm {
         setChildContainerTypesValues();
     }
 
-    protected void visualizeContainer() {
+    protected void createVisualizeContainer() {
         Composite client = createSectionWithClient("Container Visual");
         // get occupied positions
         if (containerType.getName().startsWith("Drawer")) {
@@ -204,16 +199,13 @@ public class ContainerTypeViewForm extends BiobankViewForm {
             CabinetDrawerWidget containerWidget = new CabinetDrawerWidget(
                 client);
             GridData gdBin = new GridData();
-            gdBin.widthHint = CabinetDrawerWidget.WIDTH;
-            gdBin.heightHint = CabinetDrawerWidget.HEIGHT;
             gdBin.verticalSpan = 2;
             containerWidget.setLayoutData(gdBin);
         } else {
             // otherwise, normal grid
-            ChooseContainerWidget containerWidget = new ChooseContainerWidget(
+            ContainerDisplayWidget containerWidget = new ContainerDisplayWidget(
                 client);
             containerWidget.setContainerType(containerType);
-
             int dim2 = containerType.getCapacity().getColCapacity().intValue();
             if (dim2 <= 1) {
                 // single dimension size
@@ -226,7 +218,7 @@ public class ContainerTypeViewForm extends BiobankViewForm {
 
     private void setChildContainerTypesValues() {
         childContainerTypesList.removeAll();
-        for (ContainerType type : containerType
+        for (ContainerTypeWrapper type : containerType
             .getChildContainerTypeCollection()) {
             childContainerTypesList.add(type.getName());
         }
@@ -236,8 +228,6 @@ public class ContainerTypeViewForm extends BiobankViewForm {
         Composite client = toolkit.createComposite(form.getBody());
         client.setLayout(new GridLayout(4, false));
         toolkit.paintBordersFor(client);
-
-        initEditButton(client, containerTypeAdapter);
     }
 
     @Override
@@ -247,7 +237,7 @@ public class ContainerTypeViewForm extends BiobankViewForm {
         form.setText("Container Type: " + containerType.getName());
         setContainerTypeValues();
         setDimensionsValues();
-        // setSampleDerivTypesValues();
+        setSampleTypesValues();
         setChildContainerTypesValues();
     }
 

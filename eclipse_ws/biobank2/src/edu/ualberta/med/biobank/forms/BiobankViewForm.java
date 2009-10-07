@@ -2,9 +2,10 @@ package edu.ualberta.med.biobank.forms;
 
 import org.apache.commons.collections.MapIterator;
 import org.apache.commons.collections.map.ListOrderedMap;
-import org.eclipse.core.databinding.beans.PojoObservables;
+import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.ControlContribution;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
@@ -23,7 +24,6 @@ import org.springframework.remoting.RemoteConnectFailureException;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.forms.input.FormInput;
-import edu.ualberta.med.biobank.treeview.AdapterBase;
 
 /**
  * The base class for all BioBank2 Java Client view forms. The forms are usually
@@ -34,8 +34,15 @@ public abstract class BiobankViewForm extends BiobankFormBase {
 
     protected String sessionName;
 
-    private static ImageDescriptor reloadActionImage = BioBankPlugin
-        .getImageDescriptor("icons/reload.png");
+    private static ImageDescriptor reloadActionImage = ImageDescriptor
+        .createFromImage(BioBankPlugin.getDefault().getImageRegistry().get(
+            BioBankPlugin.IMG_RELOAD_FORM));
+
+    @Override
+    public void createPartControl(Composite parent) {
+        super.createPartControl(parent);
+        addToolbarButtons();
+    }
 
     @Override
     public boolean isDirty() {
@@ -56,7 +63,7 @@ public abstract class BiobankViewForm extends BiobankFormBase {
         while (it.hasNext()) {
             String key = (String) it.next();
             FieldInfo fi = (FieldInfo) it.getValue();
-            IObservableValue ov = PojoObservables.observeValue(bean, key);
+            IObservableValue ov = BeansObservables.observeValue(bean, key);
             Object value = ov.getValue();
             if (value != null) {
                 Control control = controls.get(key);
@@ -69,7 +76,7 @@ public abstract class BiobankViewForm extends BiobankFormBase {
         }
     }
 
-    protected void addRefreshToolbarAction() {
+    protected void addToolbarButtons() {
         Action reloadAction = new Action("Reload") {
             @Override
             public void run() {
@@ -90,29 +97,34 @@ public abstract class BiobankViewForm extends BiobankFormBase {
 
         reloadAction.setImageDescriptor(reloadActionImage);
         form.getToolBarManager().add(reloadAction);
+
+        ControlContribution edit = new ControlContribution("Edit") {
+            @Override
+            protected Control createControl(Composite parent) {
+                final Button editButton = new Button(parent, SWT.PUSH);
+                editButton.setText("Edit");
+                editButton.addSelectionListener(new SelectionAdapter() {
+                    @Override
+                    public void widgetSelected(SelectionEvent e) {
+                        getSite().getPage().closeEditor(BiobankViewForm.this,
+                            false);
+                        try {
+                            getSite().getPage().openEditor(
+                                new FormInput(adapter), getEntryFormId(), true);
+                        } catch (PartInitException exp) {
+                            SessionManager.getLogger().error(
+                                "Can't open the entry form", exp);
+                        }
+                    }
+                });
+                return editButton;
+            }
+        };
+        form.getToolBarManager().add(edit);
         form.updateToolBar();
     }
 
     protected abstract void reload() throws Exception;
-
-    protected void initEditButton(Composite parent, final AdapterBase adapter) {
-        Button editButton = toolkit.createButton(parent,
-            "Edit this information", SWT.PUSH);
-        editButton.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                getSite().getPage().closeEditor(BiobankViewForm.this, false);
-                try {
-                    getSite().getPage().openEditor(new FormInput(adapter),
-                        getEntryFormId(), true);
-                } catch (PartInitException exp) {
-                    SessionManager.getLogger().error(
-                        "Can't open the entry form", exp);
-                }
-            }
-        });
-
-    }
 
     protected abstract String getEntryFormId();
 }

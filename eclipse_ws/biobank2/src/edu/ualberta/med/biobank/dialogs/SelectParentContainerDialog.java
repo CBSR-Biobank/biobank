@@ -6,10 +6,11 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -17,19 +18,19 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 
-import edu.ualberta.med.biobank.model.Container;
+import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 
 /**
  * Allows the user to move a container and its contents to a new location
  */
 
 public class SelectParentContainerDialog extends BiobankDialog {
-    private Collection<Container> containers;
-    private CCombo combo;
-    protected int selectionIndex;
+    private Collection<ContainerWrapper> containers;
+    private ComboViewer comboViewer;
+    protected ContainerWrapper selectedContainer;
 
     public SelectParentContainerDialog(Shell parent,
-        Collection<Container> containers) {
+        Collection<ContainerWrapper> containers) {
         super(parent);
         Assert.isNotNull(containers);
         this.containers = containers;
@@ -62,34 +63,41 @@ public class SelectParentContainerDialog extends BiobankDialog {
     }
 
     private void createCombo(Composite parent) {
-        combo = new CCombo(parent, SWT.DROP_DOWN | SWT.READ_ONLY);
-        combo.setLayout(new GridLayout());
-        combo.setLayoutData(new GridData(SWT.NONE, SWT.BOTTOM, true, false));
+        // CCombo combo = new CCombo(parent, SWT.DROP_DOWN | SWT.READ_ONLY);
+        // combo.setLayout(new GridLayout());
+        // combo.setLayoutData(new GridData(SWT.NONE, SWT.BOTTOM, true, false));
 
-        ComboViewer cv = new ComboViewer(combo);
+        comboViewer = new ComboViewer(parent);
 
-        cv.setContentProvider(new ArrayContentProvider());
-        cv.setLabelProvider(new LabelProvider() {
+        comboViewer.setContentProvider(new ArrayContentProvider());
+        comboViewer.setLabelProvider(new LabelProvider() {
             @Override
             public String getText(Object element) {
-                return ((Container) element).getLabel() + " ("
-                    + ((Container) element).getContainerType().getName() + ")";
+                return ((ContainerWrapper) element).getLabel() + " ("
+                    + ((ContainerWrapper) element).getContainerType().getName()
+                    + ")";
             }
         });
-        cv.addSelectionChangedListener(new ISelectionChangedListener() {
-            @Override
-            public void selectionChanged(SelectionChangedEvent event) {
-                selectionIndex = combo.getSelectionIndex();
-            }
-        });
-
-        // cv.setComparator(new ViewerComparator());
-        cv.setInput(containers);
-        combo.select(0);
+        comboViewer
+            .addSelectionChangedListener(new ISelectionChangedListener() {
+                @Override
+                public void selectionChanged(SelectionChangedEvent event) {
+                    saveSelectedContainer();
+                }
+            });
+        comboViewer.setComparator(new ViewerComparator());
+        comboViewer.setInput(containers);
+        comboViewer.getCombo().select(0);
+        saveSelectedContainer();
     }
 
-    public int getSelectionIndex() {
-        return selectionIndex;
+    private void saveSelectedContainer() {
+        selectedContainer = (ContainerWrapper) ((IStructuredSelection) comboViewer
+            .getSelection()).getFirstElement();
+    }
+
+    public ContainerWrapper getSelectedContainer() {
+        return selectedContainer;
     }
 
 }

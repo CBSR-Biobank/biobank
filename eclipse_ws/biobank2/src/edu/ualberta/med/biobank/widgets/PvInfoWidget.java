@@ -19,8 +19,8 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.common.wrappers.PvInfoPossibleWrapper;
 import edu.ualberta.med.biobank.dialogs.ListAddDialog;
-import edu.ualberta.med.biobank.model.PvInfoPossible;
 
 public class PvInfoWidget extends BiobankWidget {
     String label;
@@ -32,7 +32,7 @@ public class PvInfoWidget extends BiobankWidget {
     boolean hasListValues;
 
     public PvInfoWidget(Composite parent, int style,
-        PvInfoPossible pvInfoPossible, boolean selected, String value) {
+        PvInfoPossibleWrapper pvInfoPossible, boolean selected, String value) {
         super(parent, style);
 
         setLayout(new GridLayout(1, false));

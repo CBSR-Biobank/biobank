@@ -48,12 +48,9 @@ import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
 import edu.ualberta.med.biobank.forms.listener.EnterKeyToNextFieldListener;
 import edu.ualberta.med.biobank.model.PalletCell;
-import edu.ualberta.med.biobank.model.Patient;
-import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.Sample;
 import edu.ualberta.med.biobank.model.SampleCellStatus;
 import edu.ualberta.med.biobank.model.SampleStorage;
-import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.preferences.PreferenceConstants;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
@@ -108,7 +105,7 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
 
     private Composite radioComponents;
 
-    private Patient currentPatient;
+    private PatientWrapper currentPatient;
 
     private Label dateProcessedLabel;
 
@@ -129,9 +126,11 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
         if (status.getSeverity() == IStatus.OK) {
             form.setMessage(getOkMessage(), IMessageProvider.NONE);
             cancelConfirmWidget.setConfirmEnabled(true);
+            setConfirmEnabled(true);
         } else {
             form.setMessage(status.getMessage(), IMessageProvider.ERROR);
             cancelConfirmWidget.setConfirmEnabled(false);
+            setConfirmEnabled(false);
             if (!BioBankPlugin.getDefault().isValidPlateBarcode(
                 plateToScanText.getText())) {
                 scanButton.setEnabled(false);
@@ -263,9 +262,9 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
         gd.horizontalSpan = 2;
         selectionComp.setLayoutData(gd);
 
-        List<SampleType> sampleTypes = SampleTypeWrapper
+        List<SampleTypeWrapper> sampleTypes = SampleTypeWrapper
             .getSampleTypeForContainerTypes(appService, SessionManager
-                .getInstance().getCurrentSite(), palletNameContains);
+                .getInstance().getCurrentSiteWrapper(), palletNameContains);
         createTypeSelectionPerRowComposite(selectionComp, sampleTypes);
         createTypeSelectionCustom(selectionComp, sampleTypes);
         radioRowSelection.setSelection(true);
@@ -310,7 +309,7 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
      * Give a sample type to selected samples
      */
     private void createTypeSelectionCustom(Composite parent,
-        List<SampleType> sampleTypes) {
+        List<SampleTypeWrapper> sampleTypes) {
         typesSelectionCustomComposite = toolkit.createComposite(parent);
         GridLayout layout = new GridLayout(3, false);
         typesSelectionCustomComposite.setLayout(layout);
@@ -331,7 +330,7 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
         applyType.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                SampleType type = customSelection.getSelection();
+                SampleTypeWrapper type = customSelection.getSelection();
                 if (type != null) {
                     for (PalletCell cell : spw.getSelectedCells()) {
                         cell.setType(type);
@@ -350,7 +349,7 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
      * give sample type row per row (default)
      */
     private void createTypeSelectionPerRowComposite(Composite parent,
-        List<SampleType> sampleTypes) {
+        List<SampleTypeWrapper> sampleTypes) {
         typesSelectionPerRowComposite = toolkit.createComposite(parent);
         GridLayout layout = new GridLayout(3, false);
         layout.horizontalSpacing = 10;
@@ -413,6 +412,9 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
                 setVisitsList();
             }
         });
+        firstControl = patientNumberText;
+
+        firstControl = patientNumberText;
 
         patientNumberText.addKeyListener(EnterKeyToNextFieldListener.INSTANCE);
         patientNumberText.addFocusListener(new FocusAdapter() {
@@ -460,7 +462,7 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
         viewerVisits.setLabelProvider(new LabelProvider() {
             @Override
             public String getText(Object element) {
-                PatientVisit pv = (PatientVisit) element;
+                PatientVisitWrapper pv = (PatientVisitWrapper) element;
                 return BioBankPlugin.getDateTimeFormatter().format(
                     pv.getDateDrawn());
             }
@@ -490,7 +492,7 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
         try {
             currentPatient = PatientWrapper.getPatientInSite(appService,
                 patientNumberText.getText(), SessionManager.getInstance()
-                    .getCurrentSite());
+                    .getCurrentSiteWrapper());
         } catch (ApplicationException e) {
             BioBankPlugin.openError("Error getting the patient", e);
         }
@@ -498,7 +500,7 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
             appendLog("-----");
             appendLog("Found patient with number " + currentPatient.getNumber());
             // show visits list
-            Collection<PatientVisit> collection = currentPatient
+            List<PatientVisitWrapper> collection = currentPatient
                 .getPatientVisitCollection();
             viewerVisits.setInput(collection);
             viewerVisits.getCCombo().select(0);
@@ -604,7 +606,8 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
         PatientVisitWrapper patientVisit = getSelectedPatientVisit();
         StringBuffer sb = new StringBuffer("Samples linked:");
         int nber = 0;
-        Study study = patientVisit.getPatientWrapper().getStudy();
+        Study study = patientVisit.getPatientWrapper().getStudy()
+            .getWrappedObject();
         Collection<SampleStorage> sampleStorages = study
             .getSampleStorageCollection();
         for (int indexRow = 0; indexRow < cells.length; indexRow++) {
@@ -613,10 +616,11 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
                 if (PalletCell.hasValue(cell)
                     && cell.getStatus().equals(SampleCellStatus.TYPE)) {
                     // add new samples
-                    Sample sample = SampleWrapper.createNewSample(cell
-                        .getValue(), patientVisit, cell.getType(),
-                        sampleStorages);
-                    queries.add(new InsertExampleQuery(sample));
+                    SampleWrapper sample = SampleWrapper.createNewSample(
+                        appService, cell.getValue(), patientVisit, cell
+                            .getType(), sampleStorages);
+                    queries.add(new InsertExampleQuery(sample
+                        .getWrappedObject()));
                     sb.append("\nLINKED: ").append(cell.getValue());
                     sb.append(" - patient: ").append(
                         patientVisit.getWrappedObject().getPatient()
@@ -645,8 +649,7 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
             IStructuredSelection selection = (IStructuredSelection) viewerVisits
                 .getSelection();
             if (selection.size() == 1)
-                return new PatientVisitWrapper(appService,
-                    (PatientVisit) selection.getFirstElement());
+                return (PatientVisitWrapper) selection.getFirstElement();
         }
         return null;
     }
@@ -657,7 +660,7 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
     private void setTypeForRow(SampleTypeSelectionWidget typeWidget,
         int indexRow) {
         if (typeWidget.needToSave()) {
-            SampleType type = typeWidget.getSelection();
+            SampleTypeWrapper type = typeWidget.getSelection();
             PalletCell[][] cells = spw.getScannedElements();
             if (cells != null) {
                 for (int indexColumn = 0; indexColumn < cells[indexRow].length; indexColumn++) {
@@ -673,7 +676,7 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
     }
 
     @Override
-    public void cancelForm() {
+    public void resetForm() {
         patientNumberText.setText("");
         viewerVisits.setInput(null);
         currentPatient = null;

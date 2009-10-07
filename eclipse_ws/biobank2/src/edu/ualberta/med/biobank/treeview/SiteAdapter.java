@@ -14,6 +14,7 @@ import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.forms.SiteEntryForm;
 import edu.ualberta.med.biobank.forms.SiteViewForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
@@ -34,12 +35,9 @@ public class SiteAdapter extends AdapterBase {
      */
     private boolean enableActions = true;
 
-    public SiteAdapter(AdapterBase parent, Site site) {
-        this(parent, site, true);
-    }
-
-    public SiteAdapter(AdapterBase parent, Site site, boolean enableActions) {
-        super(parent, site, Site.class);
+    public SiteAdapter(AdapterBase parent, SiteWrapper siteWrapper,
+        boolean enableActions) {
+        super(parent, siteWrapper);
         this.enableActions = enableActions;
         if (enableActions) {
             addChild(new ClinicGroup(this, CLINICS_NODE_ID));
@@ -49,17 +47,20 @@ public class SiteAdapter extends AdapterBase {
         }
     }
 
+    public SiteWrapper getWrapper() {
+        return (SiteWrapper) object;
+    }
+
+    public SiteAdapter(AdapterBase parent, SiteWrapper siteWrapper) {
+        this(parent, siteWrapper, true);
+    }
+
     public void setSite(Site site) {
-        setWrappedObject(site, Site.class);
+        ((SiteWrapper) object).setWrappedObject(site);
     }
 
     public Site getSite() {
-        return (Site) getWrappedObject();
-    }
-
-    @Override
-    protected Integer getWrappedObjectId() {
-        return getSite().getId();
+        return ((SiteWrapper) object).getWrappedObject();
     }
 
     public AdapterBase getStudiesGroupNode() {
@@ -76,13 +77,6 @@ public class SiteAdapter extends AdapterBase {
 
     public AdapterBase getContainersGroupNode() {
         return children.get(STORAGE_CONTAINERS_NODE_ID);
-    }
-
-    @Override
-    public Integer getId() {
-        Site site = getSite();
-        Assert.isNotNull(site, "site is null");
-        return site.getId();
     }
 
     @Override
@@ -106,50 +100,54 @@ public class SiteAdapter extends AdapterBase {
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-        if (enableActions) {
-            MenuItem mi = new MenuItem(menu, SWT.PUSH);
-            mi.setText("Edit Site");
-            mi.addSelectionListener(new SelectionListener() {
-                public void widgetSelected(SelectionEvent event) {
-                    openForm(new FormInput(SiteAdapter.this), SiteEntryForm.ID);
+        if (!enableActions)
+            return;
+
+        MenuItem mi = new MenuItem(menu, SWT.PUSH);
+        mi.setText("Edit Site");
+        mi.addSelectionListener(new SelectionListener() {
+            public void widgetSelected(SelectionEvent event) {
+                openForm(new FormInput(SiteAdapter.this), SiteEntryForm.ID);
+            }
+
+            public void widgetDefaultSelected(SelectionEvent e) {
+            }
+        });
+
+        mi = new MenuItem(menu, SWT.PUSH);
+        mi.setText("View Site");
+        mi.addSelectionListener(new SelectionListener() {
+            public void widgetSelected(SelectionEvent event) {
+                openForm(new FormInput(SiteAdapter.this), SiteViewForm.ID);
+            }
+
+            public void widgetDefaultSelected(SelectionEvent e) {
+            }
+        });
+        mi = new MenuItem(menu, SWT.PUSH);
+        mi.setText("Delete Site");
+        mi.addSelectionListener(new SelectionListener() {
+            public void widgetSelected(SelectionEvent event) {
+                Boolean confirm = MessageDialog.openConfirm(PlatformUI
+                    .getWorkbench().getActiveWorkbenchWindow().getShell(),
+                    "Confirm Delete",
+                    "Are you sure you want to delete this site?");
+
+                if (confirm) {
+                    delete();
                 }
 
-                public void widgetDefaultSelected(SelectionEvent e) {
-                }
-            });
+            }
 
-            mi = new MenuItem(menu, SWT.PUSH);
-            mi.setText("View Site");
-            mi.addSelectionListener(new SelectionListener() {
-                public void widgetSelected(SelectionEvent event) {
-                    openForm(new FormInput(SiteAdapter.this), SiteViewForm.ID);
-                }
-
-                public void widgetDefaultSelected(SelectionEvent e) {
-                }
-            });
-            mi = new MenuItem(menu, SWT.PUSH);
-            mi.setText("Delete Site");
-            mi.addSelectionListener(new SelectionListener() {
-                public void widgetSelected(SelectionEvent event) {
-                    Boolean confirm = MessageDialog.openConfirm(PlatformUI
-                        .getWorkbench().getActiveWorkbenchWindow().getShell(),
-                        "Confirm Delete",
-                        "Are you sure you want to delete this site?");
-
-                    if (confirm) {
-                        delete();
-                    }
-
-                }
-
-                public void widgetDefaultSelected(SelectionEvent e) {
-                }
-            });
-        }
+            public void widgetDefaultSelected(SelectionEvent e) {
+            }
+        });
     }
 
+    @Override
     public void delete() {
+        // FIXME when wrapper is used : remove this method to use the
+        // parent one
         BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
             Site site = getSite();
             SDKQuery query = new DeleteExampleQuery(site);
@@ -186,11 +184,6 @@ public class SiteAdapter extends AdapterBase {
     @Override
     public AdapterBase accept(NodeSearchVisitor visitor) {
         return visitor.visit(this);
-    }
-
-    @Override
-    protected boolean integrityCheck() {
-        return true;
     }
 
 }

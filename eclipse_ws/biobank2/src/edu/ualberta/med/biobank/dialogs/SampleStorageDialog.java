@@ -17,6 +17,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
+import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.model.SampleStorage;
 import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.validators.DoubleNumber;
@@ -26,18 +27,21 @@ public class SampleStorageDialog extends BiobankDialog {
 
     private static final String TITLE = "Sample Storage";
 
+    private SampleStorageWrapper origSampleStorage;
+
     private SampleStorage sampleStorage;
 
     private HashMap<String, SampleType> sampleTypeMap;
 
     private CCombo sampleTypesCombo;
 
-    public SampleStorageDialog(Shell parent, SampleStorage sampleStorage,
-        Collection<SampleType> sampleTypes) {
+    public SampleStorageDialog(Shell parent,
+        SampleStorageWrapper sampleStorage, Collection<SampleType> sampleTypes) {
         super(parent);
         Assert.isNotNull(sampleStorage);
         Assert.isNotNull(sampleTypes);
-        this.sampleStorage = sampleStorage;
+        this.sampleStorage = new SampleStorage();
+        this.origSampleStorage = sampleStorage;
         sampleTypeMap = new HashMap<String, SampleType>();
         for (SampleType st : sampleTypes) {
             sampleTypeMap.put(st.getName(), st);
@@ -47,7 +51,7 @@ public class SampleStorageDialog extends BiobankDialog {
     @Override
     protected void configureShell(Shell shell) {
         super.configureShell(shell);
-        Integer id = sampleStorage.getId();
+        Integer id = origSampleStorage.getId();
         String title = new String();
 
         if (id == null) {
@@ -74,7 +78,7 @@ public class SampleStorageDialog extends BiobankDialog {
             sampleTypesCombo.add(stName);
         }
 
-        SampleType st = sampleStorage.getSampleType();
+        SampleType st = origSampleStorage.getSampleType();
         if (st != null) {
             sampleTypesCombo.setText(st.getName());
         }
@@ -94,13 +98,15 @@ public class SampleStorageDialog extends BiobankDialog {
 
     @Override
     protected void okPressed() {
-        sampleStorage.setSampleType(sampleTypeMap.get(sampleTypesCombo
+        origSampleStorage.setSampleType(sampleTypeMap.get(sampleTypesCombo
             .getText()));
+        origSampleStorage.setVolume(sampleStorage.getVolume());
+        origSampleStorage.setQuantity(sampleStorage.getQuantity());
         super.okPressed();
     }
 
-    public SampleStorage getSampleStorage() {
-        return sampleStorage;
+    public SampleStorageWrapper getSampleStorage() {
+        return origSampleStorage;
     }
 
 }

@@ -10,29 +10,32 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
+import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.model.Contact;
 
 public class ContactAddDialog extends BiobankDialog {
 
     private static final String TITLE = "Contact Information";
 
-    private Contact contact;
+    private ContactWrapper contactWrapper;
 
     public ContactAddDialog(Shell parent) {
-        this(parent, new Contact());
+        this(parent, new ContactWrapper(SessionManager.getAppService(),
+            new Contact()));
     }
 
-    public ContactAddDialog(Shell parent, Contact contact) {
+    public ContactAddDialog(Shell parent, ContactWrapper contactWrapper) {
         super(parent);
-        Assert.isNotNull(contact);
-        this.contact = contact;
+        Assert.isNotNull(contactWrapper);
+        this.contactWrapper = contactWrapper;
     }
 
     @Override
     protected void configureShell(Shell shell) {
         super.configureShell(shell);
         String title = new String();
-        Integer id = contact.getId();
+        Integer id = contactWrapper.getId();
 
         if (id == null) {
             title = "Add";
@@ -52,31 +55,31 @@ public class ContactAddDialog extends BiobankDialog {
 
         Control c = createBoundWidgetWithLabel(contents, Text.class,
             SWT.BORDER, "Name", new String[0], PojoObservables.observeValue(
-                contact, "name"), null, null);
+                contactWrapper, "name"), null, null);
         GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
         gd.widthHint = 250;
         c.setLayoutData(gd);
 
         createBoundWidgetWithLabel(contents, Text.class, SWT.BORDER, "Title",
-            new String[0], PojoObservables.observeValue(contact, "title"),
-            null, null);
+            new String[0], PojoObservables
+                .observeValue(contactWrapper, "title"), null, null);
 
         createBoundWidgetWithLabel(contents, Text.class, SWT.BORDER, "email",
-            new String[0], PojoObservables
-                .observeValue(contact, "emailAddress"), null, null);
+            new String[0], PojoObservables.observeValue(contactWrapper,
+                "emailAddress"), null, null);
 
         createBoundWidgetWithLabel(contents, Text.class, SWT.BORDER, "Phone #",
-            new String[0],
-            PojoObservables.observeValue(contact, "phoneNumber"), null, null);
+            new String[0], PojoObservables.observeValue(contactWrapper,
+                "phoneNumber"), null, null);
 
         createBoundWidgetWithLabel(contents, Text.class, SWT.BORDER, "Fax #",
-            new String[0], PojoObservables.observeValue(contact, "faxNumber"),
-            null, null);
+            new String[0], PojoObservables.observeValue(contactWrapper,
+                "faxNumber"), null, null);
 
         return contents;
     }
 
-    public Contact getContact() {
-        return contact;
+    public ContactWrapper getContactWrapper() {
+        return contactWrapper;
     }
 }

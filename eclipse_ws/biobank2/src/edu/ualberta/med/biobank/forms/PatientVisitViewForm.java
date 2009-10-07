@@ -11,12 +11,13 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 
+import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
-import edu.ualberta.med.biobank.model.PvInfo;
-import edu.ualberta.med.biobank.model.PvInfoData;
-import edu.ualberta.med.biobank.model.PvSampleSource;
-import edu.ualberta.med.biobank.model.Study;
+import edu.ualberta.med.biobank.common.wrappers.PvInfoDataWrapper;
+import edu.ualberta.med.biobank.common.wrappers.PvInfoWrapper;
+import edu.ualberta.med.biobank.common.wrappers.PvSampleSourceWrapper;
+import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.treeview.PatientVisitAdapter;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
@@ -38,8 +39,8 @@ public class PatientVisitViewForm extends BiobankViewForm {
     // used to keep track of which data has been entered or left blank for
     // a patient visit.
     class CombinedPvInfo {
-        PvInfo pvInfo;
-        PvInfoData pvInfoData;
+        PvInfoWrapper pvInfo;
+        PvInfoDataWrapper pvInfoData;
 
         public CombinedPvInfo() {
             pvInfo = null;
@@ -77,17 +78,16 @@ public class PatientVisitViewForm extends BiobankViewForm {
     }
 
     @Override
-    protected void createFormContent() {
+    protected void createFormContent() throws Exception {
         form.setText("Visit Drawn Date: "
             + patientVisitWrapper.getFormattedDateDrawn());
         form.getBody().setLayout(new GridLayout(1, false));
         form.getBody().setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        addRefreshToolbarAction();
+        form.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
+            BioBankPlugin.IMG_PATIENT_VISIT));
         createMainSection();
         createSourcesSection();
         createSamplesSection();
-
-        initEditButton(form.getBody(), patientVisitAdapter);
     }
 
     private void createMainSection() {
@@ -115,21 +115,21 @@ public class PatientVisitViewForm extends BiobankViewForm {
     }
 
     private void createPvDataSection(Composite client) {
-        Study study = patientVisitAdapter
-            .getParentFromClass(StudyAdapter.class).getStudy();
+        StudyWrapper study = patientVisitAdapter.getParentFromClass(
+            StudyAdapter.class).getWrapper();
 
         // get all PvInfo from study, since user may not have filled in all
         // fields
-        for (PvInfo pvInfo : study.getPvInfoCollection()) {
+        for (PvInfoWrapper pvInfo : study.getPvInfoCollection()) {
             CombinedPvInfo combinedPvInfo = new CombinedPvInfo();
             combinedPvInfo.pvInfo = pvInfo;
             combinedPvInfoMap.put(pvInfo.getId(), combinedPvInfo);
         }
 
-        Collection<PvInfoData> pvInfoDataCollection = patientVisitWrapper
+        Collection<PvInfoDataWrapper> pvInfoDataCollection = patientVisitWrapper
             .getPvInfoDataCollection();
         if (pvInfoDataCollection != null) {
-            for (PvInfoData pvInfoData : pvInfoDataCollection) {
+            for (PvInfoDataWrapper pvInfoData : pvInfoDataCollection) {
                 Integer key = pvInfoData.getPvInfo().getId();
                 CombinedPvInfo combinedPvInfo = (CombinedPvInfo) combinedPvInfoMap
                     .get(key);
@@ -172,7 +172,7 @@ public class PatientVisitViewForm extends BiobankViewForm {
     private void createSourcesSection() {
         Composite client = createSectionWithClient("Source Vessels");
 
-        Collection<PvSampleSource> sources = patientVisitWrapper
+        Collection<PvSampleSourceWrapper> sources = patientVisitWrapper
             .getPvSampleSourceCollection();
         new PvSampleSourceInfoTable(client, sources);
     }
@@ -199,7 +199,7 @@ public class PatientVisitViewForm extends BiobankViewForm {
         Composite parent = createSectionWithClient("Samples");
         samplesWidget = new SamplesListWidget(parent, patientVisitAdapter
             .getParentFromClass(SiteAdapter.class), patientVisitWrapper
-            .getSampleCollection());
+            .getSampleWrapperCollection());
         samplesWidget.adaptToToolkit(toolkit, true);
         samplesWidget.setSelection(patientVisitAdapter.getSelectedSample());
     }

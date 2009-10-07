@@ -1,11 +1,15 @@
 package edu.ualberta.med.biobank.forms;
 
+import java.util.Collection;
 import java.util.HashMap;
 
 import org.apache.commons.collections.MapIterator;
 import org.apache.commons.collections.map.ListOrderedMap;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.viewers.ArrayContentProvider;
+import org.eclipse.jface.viewers.ComboViewer;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.layout.GridData;
@@ -32,6 +36,7 @@ import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
+import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 /**
@@ -108,6 +113,7 @@ public abstract class BiobankFormBase extends EditorPart {
         mform = new ManagedForm(parent);
         toolkit = mform.getToolkit();
         form = mform.getForm();
+        toolkit.decorateFormHeading(form.getForm());
 
         // start a new runnable so that database objects are populated in a
         // separate thread.
@@ -148,15 +154,16 @@ public abstract class BiobankFormBase extends EditorPart {
         return section;
     }
 
-    protected Composite createSectionWithClient(String title) {
-        Section section = createSection(title);
-        Composite client;
-        client = toolkit.createComposite(section);
+    protected Composite sectionAddClient(Section section) {
+        Composite client = toolkit.createComposite(section);
         section.setClient(client);
-
         client.setLayout(new GridLayout(2, false));
         toolkit.paintBordersFor(client);
         return client;
+    }
+
+    protected Composite createSectionWithClient(String title) {
+        return sectionAddClient(createSection(title));
     }
 
     protected Control createWidget(Composite parent, Class<?> widgetClass,
@@ -206,6 +213,25 @@ public abstract class BiobankFormBase extends EditorPart {
 
     public AdapterBase getAdapter() {
         return adapter;
+    }
+
+    protected <T> ComboViewer createComboViewer(Composite parent,
+        String fieldLabel, Collection<?> input, T selection) {
+        toolkit.createLabel(parent, fieldLabel + ":", SWT.LEFT);
+
+        Combo combo = new Combo(parent, SWT.READ_ONLY | SWT.BORDER);
+        ComboViewer comboViewer = new ComboViewer(combo);
+        comboViewer.setContentProvider(new ArrayContentProvider());
+        comboViewer.setLabelProvider(new BiobankLabelProvider());
+        if (input != null) {
+            comboViewer.setInput(input);
+        }
+
+        combo.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
+        if (selection != null) {
+            comboViewer.setSelection(new StructuredSelection(selection));
+        }
+        return comboViewer;
     }
 
 }

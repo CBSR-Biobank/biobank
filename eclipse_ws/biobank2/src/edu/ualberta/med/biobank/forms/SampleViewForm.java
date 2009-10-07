@@ -45,9 +45,8 @@ public class SampleViewForm extends BiobankViewForm {
     }
 
     @Override
-    protected void createFormContent() {
+    protected void createFormContent() throws Exception {
         form.setText("Sample: " + sample.getInventoryId());
-        addRefreshToolbarAction();
         GridLayout layout = new GridLayout(1, false);
         form.getBody().setLayout(layout);
         form.getBody().setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -63,8 +62,7 @@ public class SampleViewForm extends BiobankViewForm {
         if (sample.getSamplePosition() == null) {
             string += "No position - should be assign to a location";
         } else {
-            string += "Position = "
-                + sample.getSamplePosition().getRow() + ":"
+            string += "Position = " + sample.getSamplePosition().getRow() + ":"
                 + sample.getSamplePosition().getCol();
         }
         toolkit.createLabel(client, string);

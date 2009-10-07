@@ -10,6 +10,8 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeExpansionEvent;
 import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -90,7 +92,6 @@ public class AdapterTreeWidget extends Composite {
         Menu menu = new Menu(PlatformUI.getWorkbench()
             .getActiveWorkbenchWindow().getShell(), SWT.NONE);
         menu.addListener(SWT.Show, new Listener() {
-
             @Override
             public void handleEvent(Event event) {
                 Menu menu = treeViewer.getTree().getMenu();
@@ -109,6 +110,22 @@ public class AdapterTreeWidget extends Composite {
 
         treeViewer.getTree().setMenu(menu);
 
+        treeViewer.setComparator(new ViewerComparator() {
+            @SuppressWarnings("unchecked")
+            @Override
+            public int compare(Viewer viewer, Object e1, Object e2) {
+                if (e1 instanceof AdapterBase && e2 instanceof AdapterBase) {
+                    Object object1 = ((AdapterBase) e1).getObject();
+                    Object object2 = ((AdapterBase) e2).getObject();
+                    if (object1 != null && object2 != null
+                        && object1 instanceof Comparable<?>
+                        && object2 instanceof Comparable<?>) {
+                        return ((Comparable) object1).compareTo(object2);
+                    }
+                }
+                return 0;
+            }
+        });
     }
 
     public TreeViewer getTreeViewer() {

@@ -12,12 +12,9 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.forms.widgets.Section;
 
-import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.utils.ModelUtils;
-import edu.ualberta.med.biobank.model.PvInfo;
-import edu.ualberta.med.biobank.model.Study;
-import edu.ualberta.med.biobank.treeview.AdapterBase;
-import edu.ualberta.med.biobank.treeview.SiteAdapter;
+import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.common.wrappers.PvInfoWrapper;
+import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
 import edu.ualberta.med.biobank.widgets.infotables.SampleSourceInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.SampleStorageInfoTable;
@@ -28,45 +25,50 @@ public class StudyViewForm extends BiobankViewForm {
     public static final String ID = "edu.ualberta.med.biobank.forms.StudyViewForm";
 
     private StudyAdapter studyAdapter;
-    private Study study;
+    private StudyWrapper studyWrapper;
 
     private Label siteLabel;
     private Label nameShortLabel;
     private Label activityStatusLabel;
     private Label commentLabel;
 
-    private StudyContactInfoTable clinicsTable;
+    private StudyContactInfoTable contactsTable;
     private SampleStorageInfoTable sampleStorageTable;
     private SampleSourceInfoTable sampleSourceTable;
 
     private List<PvInfoLabelPair> pvInfoControlList;
 
+    class PvInfoLabelPair {
+        public PvInfoWrapper pvInfo;
+        public Label label;
+    }
+
     @Override
-    public void init() {
+    public void init() throws Exception {
         Assert.isTrue((adapter instanceof StudyAdapter),
             "Invalid editor input: object of type "
                 + adapter.getClass().getName());
 
         studyAdapter = (StudyAdapter) adapter;
-
-        // retrieve info from database because could have been modified
+        studyWrapper = studyAdapter.getWrapper();
+        // retrieve info from database because study could have been modified
         // after first opening
-        retrieveStudy();
-        setPartName("Study " + study.getNameShort());
+        studyWrapper.reload();
+        setPartName("Study " + studyWrapper.getNameShort());
         pvInfoControlList = new ArrayList<PvInfoLabelPair>();
     }
 
     @Override
     protected void createFormContent() throws Exception {
-        if (study.getName() != null) {
-            form.setText("Study: " + study.getName());
+        if (studyWrapper.getName() != null) {
+            form.setText("Study: " + studyWrapper.getName());
         }
-
-        addRefreshToolbarAction();
 
         GridLayout layout = new GridLayout(1, false);
         form.getBody().setLayout(layout);
         form.getBody().setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        form.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
+            BioBankPlugin.IMG_STUDY));
 
         Composite client = toolkit.createComposite(form.getBody());
         client.setLayout(new GridLayout(2, false));
@@ -85,35 +87,34 @@ public class StudyViewForm extends BiobankViewForm {
         createSampleStorageSection();
         createSampleSourceSection();
         createPvDataSection();
-
-        initEditButton(client, studyAdapter);
         setStudySectionValues();
         setPvDataSectionValues();
-
     }
 
     private void createClinicSection() {
         Composite client = createSectionWithClient("Clinics");
 
-        clinicsTable = new StudyContactInfoTable(client, appService, study);
-        clinicsTable.adaptToToolkit(toolkit, true);
-        toolkit.paintBordersFor(clinicsTable);
+        contactsTable = new StudyContactInfoTable(client, appService,
+            studyWrapper);
+        contactsTable.adaptToToolkit(toolkit, true);
+        toolkit.paintBordersFor(contactsTable);
 
-        clinicsTable.getTableViewer().addDoubleClickListener(
+        contactsTable.getTableViewer().addDoubleClickListener(
             FormUtils.getBiobankCollectionDoubleClickListener());
     }
 
     private void setStudySectionValues() {
-        FormUtils.setTextValue(siteLabel, study.getSite().getName());
-        FormUtils.setTextValue(nameShortLabel, study.getNameShort());
-        FormUtils.setTextValue(activityStatusLabel, study.getActivityStatus());
-        FormUtils.setTextValue(commentLabel, study.getComment());
+        FormUtils.setTextValue(siteLabel, studyWrapper.getSite().getName());
+        FormUtils.setTextValue(nameShortLabel, studyWrapper.getNameShort());
+        FormUtils.setTextValue(activityStatusLabel, studyWrapper
+            .getActivityStatus());
+        FormUtils.setTextValue(commentLabel, studyWrapper.getComment());
     }
 
     private void createSampleStorageSection() {
         Section section = createSection("Sample Storage");
 
-        sampleStorageTable = new SampleStorageInfoTable(section, study
+        sampleStorageTable = new SampleStorageInfoTable(section, studyWrapper
             .getSampleStorageCollection());
         section.setClient(sampleStorageTable);
         sampleStorageTable.adaptToToolkit(toolkit, true);
@@ -122,7 +123,7 @@ public class StudyViewForm extends BiobankViewForm {
 
     private void createSampleSourceSection() {
         Section section = createSection("Source Vessels");
-        sampleSourceTable = new SampleSourceInfoTable(section, study
+        sampleSourceTable = new SampleSourceInfoTable(section, studyWrapper
             .getSampleSourceCollection());
         section.setClient(sampleSourceTable);
         sampleStorageTable.adaptToToolkit(toolkit, true);
@@ -133,7 +134,7 @@ public class StudyViewForm extends BiobankViewForm {
         Composite client = createSectionWithClient("Patient Visit Information Collected");
         client.setLayout(new GridLayout(1, false));
 
-        Collection<PvInfo> pvInfos = study.getPvInfoCollection();
+        Collection<PvInfoWrapper> pvInfos = studyWrapper.getPvInfoCollection();
         if ((pvInfos == null) || (pvInfos.size() == 0)) {
             toolkit.createLabel(client,
                 "Study does not collect additional patient visit information");
@@ -141,7 +142,7 @@ public class StudyViewForm extends BiobankViewForm {
         }
 
         Composite subcomp;
-        for (PvInfo pvInfo : pvInfos) {
+        for (PvInfoWrapper pvInfo : pvInfos) {
             subcomp = toolkit.createComposite(client);
             subcomp.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
@@ -169,29 +170,13 @@ public class StudyViewForm extends BiobankViewForm {
 
     @Override
     protected void reload() throws Exception {
-        retrieveStudy();
-        setPartName("Study " + study.getNameShort());
-        form.setText("Study: " + study.getName());
+        studyWrapper.reload();
+        setPartName("Study " + studyWrapper.getNameShort());
+        form.setText("Study: " + studyWrapper.getName());
         setStudySectionValues();
         setPvDataSectionValues();
-
-        AdapterBase clinicGroupNode = ((SiteAdapter) studyAdapter.getParent()
-            .getParent()).getClinicGroupNode();
-        clinicsTable.getTableViewer().setInput(
-            FormUtils.getClinicsAdapters(clinicGroupNode, ModelUtils
-                .getStudyClinicCollection(appService, study)));
-    }
-
-    private void retrieveStudy() {
-        try {
-            study = ModelUtils.getObjectWithId(studyAdapter.getAppService(),
-                Study.class, studyAdapter.getStudy().getId());
-            studyAdapter.setStudy(study);
-        } catch (Exception e) {
-            SessionManager.getLogger().error(
-                "Error while retrieving study "
-                    + studyAdapter.getStudy().getName(), e);
-        }
+        contactsTable.getTableViewer().setInput(
+            studyWrapper.getContactCollection());
     }
 
     @Override

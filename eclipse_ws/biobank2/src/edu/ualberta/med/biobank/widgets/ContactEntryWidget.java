@@ -5,7 +5,6 @@ import java.util.HashSet;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.Dialog;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -19,6 +18,9 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
+import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.dialogs.ContactAddDialog;
 import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.widgets.infotables.ContactInfoTable;
@@ -27,19 +29,19 @@ import edu.ualberta.med.biobank.widgets.listener.MultiSelectEvent;
 
 public class ContactEntryWidget extends BiobankWidget {
 
-    private Collection<Contact> selectedContacts;
+    private Collection<ContactWrapper> selectedContacts;
 
     private ContactInfoTable contactInfoTable;
 
     private Button addClinicButton;
 
     public ContactEntryWidget(Composite parent, int style,
-        Collection<Contact> selectedContacts, FormToolkit toolkit) {
+        Collection<ContactWrapper> selectedContacts, FormToolkit toolkit) {
         super(parent, style);
         Assert.isNotNull(toolkit, "toolkit is null");
 
         if (selectedContacts == null) {
-            selectedContacts = new HashSet<Contact>();
+            selectedContacts = new HashSet<ContactWrapper>();
         }
         this.selectedContacts = selectedContacts;
 
@@ -61,7 +63,8 @@ public class ContactEntryWidget extends BiobankWidget {
         addClinicButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                addOrEditContact(true, new Contact());
+                addOrEditContact(true, new ContactWrapper(SessionManager
+                    .getAppService(), new Contact()));
             }
         });
     }
@@ -75,7 +78,12 @@ public class ContactEntryWidget extends BiobankWidget {
         item.setText("Edit");
         item.addSelectionListener(new SelectionListener() {
             public void widgetSelected(SelectionEvent event) {
-                addOrEditContact(false, contactInfoTable.getSelection());
+                ContactWrapper contactWrapper = contactInfoTable.getSelection();
+                if (contactWrapper == null) {
+                    BioBankPlugin.openError("Edit Clinic", "Invalid selection");
+                    return;
+                }
+                addOrEditContact(false, contactWrapper);
             }
 
             public void widgetDefaultSelected(SelectionEvent e) {
@@ -86,26 +94,30 @@ public class ContactEntryWidget extends BiobankWidget {
         item.setText("Delete");
         item.addSelectionListener(new SelectionListener() {
             public void widgetSelected(SelectionEvent event) {
-                Contact contact = contactInfoTable.getSelection();
+                ContactWrapper contactWrapper = contactInfoTable.getSelection();
+                if (contactWrapper == null) {
+                    BioBankPlugin.openError("Delete Clinic",
+                        "Invalid selection");
+                    return;
+                }
 
-                boolean confirm = MessageDialog.openConfirm(PlatformUI
-                    .getWorkbench().getActiveWorkbenchWindow().getShell(),
-                    "Delete Clinic",
+                boolean confirm = BioBankPlugin.openConfirm("Delete Clinic",
                     "Are you sure you want to delete clinic \""
-                        + contact.getClinic().getName() + "\"");
+                        + contactWrapper.getClinicWrapper().getName() + "\"");
 
                 if (confirm) {
-                    Collection<Contact> contactToDelete = new HashSet<Contact>();
-                    for (Contact c : selectedContacts) {
-                        if (c.getName().equals(contact.getName()))
-                            contactToDelete.add(c);
+                    Collection<ContactWrapper> contactToDelete = new HashSet<ContactWrapper>();
+                    for (ContactWrapper cw : selectedContacts) {
+                        if (cw.getName().equals(contactWrapper.getName()))
+                            contactToDelete.add(cw);
                     }
 
-                    for (Contact c : contactToDelete) {
+                    for (ContactWrapper c : contactToDelete) {
                         selectedContacts.remove(c);
                     }
 
                     contactInfoTable.setCollection(selectedContacts);
+                    notifyListeners();
                 }
             }
 
@@ -114,19 +126,20 @@ public class ContactEntryWidget extends BiobankWidget {
         });
     }
 
-    private void addOrEditContact(boolean add, Contact contact) {
+    private void addOrEditContact(boolean add, ContactWrapper contactWrapper) {
         ContactAddDialog dlg = new ContactAddDialog(PlatformUI.getWorkbench()
-            .getActiveWorkbenchWindow().getShell(), contact);
+            .getActiveWorkbenchWindow().getShell(), contactWrapper);
         if (dlg.open() == Dialog.OK) {
             if (add) {
                 // only add to the collection when adding and not editing
-                selectedContacts.add(dlg.getContact());
+                selectedContacts.add(dlg.getContactWrapper());
             }
             contactInfoTable.setCollection(selectedContacts);
+            notifyListeners();
         }
     }
 
-    public Collection<Contact> getContacts() {
+    public Collection<ContactWrapper> getContacts() {
         return contactInfoTable.getCollection();
     }
 }

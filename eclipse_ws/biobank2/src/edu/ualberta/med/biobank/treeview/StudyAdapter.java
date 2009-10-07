@@ -14,6 +14,7 @@ import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.forms.StudyEntryForm;
 import edu.ualberta.med.biobank.forms.StudyViewForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
@@ -31,39 +32,35 @@ public class StudyAdapter extends AdapterBase {
      */
     private boolean enableActions = true;
 
-    public StudyAdapter(AdapterBase parent, Study study) {
-        this(parent, study, true);
-    }
-
-    public StudyAdapter(AdapterBase parent, Study study, boolean enabledActions) {
-        super(parent, study, Study.class);
-        this.setStudy(study);
+    public StudyAdapter(AdapterBase parent, StudyWrapper studyWrapper,
+        boolean enabledActions) {
+        super(parent, studyWrapper);
         this.enableActions = enabledActions;
 
-        if (study.getId() != null) {
-            setId(study.getId());
-            setName(study.getName());
+        if (studyWrapper.getId() != null) {
+            setId(studyWrapper.getId());
+            setName(studyWrapper.getName());
         }
     }
 
+    public StudyAdapter(AdapterBase parent, StudyWrapper studyWrapper) {
+        this(parent, studyWrapper, true);
+    }
+
     public void setStudy(Study study) {
-        setWrappedObject(study, Study.class);
+        // FIXME should set StudyWrapper : need to check the use of this
+        // method
+        object = new StudyWrapper(getAppService(), study);
     }
 
     public Study getStudy() {
-        return (Study) getWrappedObject();
+        // FIXME should return StudyWrapper : need to check the use of this
+        // method
+        return ((StudyWrapper) object).getWrappedObject();
     }
 
-    @Override
-    protected Integer getWrappedObjectId() {
-        return getStudy().getId();
-    }
-
-    @Override
-    public Integer getId() {
-        Study study = getStudy();
-        Assert.isNotNull(study, "study is null");
-        return study.getId();
+    public StudyWrapper getWrapper() {
+        return (StudyWrapper) object;
     }
 
     @Override
@@ -132,7 +129,10 @@ public class StudyAdapter extends AdapterBase {
         }
     }
 
+    @Override
     public void delete() {
+        // FIXME when wrapper is used : remove this method to use the
+        // parent one
         BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
             Study study = getStudy();
             SDKQuery query = new DeleteExampleQuery(study);
@@ -162,11 +162,6 @@ public class StudyAdapter extends AdapterBase {
     @Override
     public AdapterBase accept(NodeSearchVisitor visitor) {
         return visitor.visit(this);
-    }
-
-    @Override
-    protected boolean integrityCheck() {
-        return true;
     }
 
 }

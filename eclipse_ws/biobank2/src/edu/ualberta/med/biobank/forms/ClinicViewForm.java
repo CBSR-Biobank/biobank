@@ -7,7 +7,8 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 
-import edu.ualberta.med.biobank.model.Clinic;
+import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.treeview.ClinicAdapter;
 import edu.ualberta.med.biobank.widgets.infotables.ClinicStudyInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.ContactInfoTable;
@@ -17,7 +18,7 @@ public class ClinicViewForm extends AddressViewFormCommon {
 
     private ClinicAdapter clinicAdapter;
 
-    private Clinic clinic;
+    private ClinicWrapper clinicWrapper;
 
     private ContactInfoTable contactsTable;
 
@@ -36,19 +37,21 @@ public class ClinicViewForm extends AddressViewFormCommon {
                 + adapter.getClass().getName());
 
         clinicAdapter = (ClinicAdapter) adapter;
-        clinic = clinicAdapter.loadClinic();
-        address = clinic.getAddress();
-        setPartName("Clinic: " + clinic.getName());
+        clinicWrapper = clinicAdapter.getWrapper();
+        clinicWrapper.reload();
+        addressWrapper = clinicWrapper.getAddressWrapper();
+        setPartName("Clinic: " + clinicWrapper.getName());
     }
 
     @Override
     protected void createFormContent() throws Exception {
-        form.setText("Clinic: " + clinic.getName());
-        addRefreshToolbarAction();
+        form.setText("Clinic: " + clinicWrapper.getName());
 
         GridLayout layout = new GridLayout(1, false);
         form.getBody().setLayout(layout);
         form.getBody().setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        form.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
+            BioBankPlugin.IMG_CLINIC));
         createClinicSection();
         createAddressSection();
         createContactsSection();
@@ -72,15 +75,16 @@ public class ClinicViewForm extends AddressViewFormCommon {
     }
 
     private void setClinicValues() {
-        FormUtils.setTextValue(siteLabel, clinic.getSite().getName());
-        FormUtils.setTextValue(activityStatusLabel, clinic.getActivityStatus());
-        FormUtils.setTextValue(commentLabel, clinic.getComment());
+        FormUtils.setTextValue(siteLabel, clinicWrapper.getSite().getName());
+        FormUtils.setTextValue(activityStatusLabel, clinicWrapper
+            .getActivityStatus());
+        FormUtils.setTextValue(commentLabel, clinicWrapper.getComment());
     }
 
     private void createContactsSection() {
-        Composite client = createSectionWithClient("Clinics");
+        Composite client = createSectionWithClient("Contacts");
 
-        contactsTable = new ContactInfoTable(client, clinic
+        contactsTable = new ContactInfoTable(client, clinicWrapper
             .getContactCollection());
         contactsTable.adaptToToolkit(toolkit, true);
         toolkit.paintBordersFor(contactsTable);
@@ -92,7 +96,8 @@ public class ClinicViewForm extends AddressViewFormCommon {
     protected void createStudiesSection() throws Exception {
         Composite client = createSectionWithClient("Studies");
 
-        studiesTable = new ClinicStudyInfoTable(client, appService, clinic);
+        studiesTable = new ClinicStudyInfoTable(client, appService,
+            clinicWrapper);
         studiesTable.adaptToToolkit(toolkit, true);
         toolkit.paintBordersFor(studiesTable);
 
@@ -104,18 +109,16 @@ public class ClinicViewForm extends AddressViewFormCommon {
         Composite client = toolkit.createComposite(form.getBody());
         client.setLayout(new GridLayout(4, false));
         toolkit.paintBordersFor(client);
-
-        initEditButton(client, clinicAdapter);
     }
 
     @Override
     protected void reload() throws Exception {
-        clinic = clinicAdapter.loadClinic();
-        setPartName("Clinic: " + clinic.getName());
-        form.setText("Clinic: " + clinic.getName());
+        clinicWrapper.reload();
+        setPartName("Clinic: " + clinicWrapper.getName());
+        form.setText("Clinic: " + clinicWrapper.getName());
         setClinicValues();
         setAdressValues();
-        studiesTable.setCollection(null);
+        studiesTable.setCollection(clinicWrapper.getStudyCollection(true));
     }
 
     @Override

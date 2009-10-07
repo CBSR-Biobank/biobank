@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.forms;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -16,24 +15,14 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
-import edu.ualberta.med.biobank.common.utils.ModelUtils;
-import edu.ualberta.med.biobank.model.Address;
-import edu.ualberta.med.biobank.model.Clinic;
-import edu.ualberta.med.biobank.model.Contact;
-import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.treeview.ClinicAdapter;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
 import edu.ualberta.med.biobank.widgets.ContactEntryWidget;
 import edu.ualberta.med.biobank.widgets.listener.BiobankEntryFormWidgetListener;
 import edu.ualberta.med.biobank.widgets.listener.MultiSelectEvent;
-import gov.nih.nci.system.applicationservice.ApplicationException;
-import gov.nih.nci.system.query.SDKQuery;
-import gov.nih.nci.system.query.SDKQueryResult;
-import gov.nih.nci.system.query.example.DeleteExampleQuery;
-import gov.nih.nci.system.query.example.InsertExampleQuery;
-import gov.nih.nci.system.query.example.UpdateExampleQuery;
-import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class ClinicEntryForm extends AddressEntryFormCommon {
     public static final String ID = "edu.ualberta.med.biobank.forms.ClinicEntryForm";
@@ -45,7 +34,8 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
     private static final String MSG_NO_CLINIC_NAME = "Clinic must have a name";
 
     private ClinicAdapter clinicAdapter;
-    private Clinic clinic;
+
+    private ClinicWrapper clinicWrapper;
 
     private ContactEntryWidget contactEntryWidget;
 
@@ -64,25 +54,20 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
             "Invalid editor input: object of type "
                 + adapter.getClass().getName());
         clinicAdapter = (ClinicAdapter) adapter;
-        clinic = clinicAdapter.loadClinic();
-
-        address = clinic.getAddress();
-        if (address == null) {
-            address = new Address();
-            clinic.setAddress(address);
-        }
+        clinicWrapper = clinicAdapter.getWrapper();
+        addressWrapper = clinicWrapper.getAddressWrapper();
 
         String tabName;
-        if (clinic.getId() == null)
+        if (clinicWrapper.getId() == null)
             tabName = "New Clinic";
         else
-            tabName = "Clinic " + clinic.getName();
+            tabName = "Clinic " + clinicWrapper.getName();
         setPartName(tabName);
     }
 
     @Override
     protected String getOkMessage() {
-        if (clinic.getId() == null) {
+        if (clinicWrapper.getId() == null) {
             return MSG_NEW_CLINIC_OK;
         }
         return MSG_CLINIC_OK;
@@ -93,6 +78,8 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
         form.setText("Clinic Information");
         GridLayout layout = new GridLayout(1, false);
         form.getBody().setLayout(layout);
+        form.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
+            BioBankPlugin.IMG_CLINIC));
 
         toolkit
             .createLabel(
@@ -104,7 +91,7 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
         createContactSection();
         createButtonsSection();
 
-        // When adding help uncomment line below
+        // TODO: When adding help uncomment line below
         // PlatformUI.getWorkbench().getHelpSystem().setHelp(composite,
         // IJavaHelpContextIds.XXXXX);
     }
@@ -119,19 +106,19 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
 
         Label siteLabel = (Label) createWidget(client, Label.class, SWT.NONE,
             "Site");
-        FormUtils.setTextValue(siteLabel, clinic.getSite().getName());
+        FormUtils.setTextValue(siteLabel, clinicWrapper.getSite().getName());
 
-        createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Name", null,
-            PojoObservables.observeValue(clinic, "name"), NonEmptyString.class,
-            MSG_NO_CLINIC_NAME);
+        firstControl = createBoundWidgetWithLabel(client, Text.class, SWT.NONE,
+            "Name", null, PojoObservables.observeValue(clinicWrapper, "name"),
+            NonEmptyString.class, MSG_NO_CLINIC_NAME);
 
         createBoundWidgetWithLabel(client, Combo.class, SWT.NONE,
             "Activity Status", FormConstants.ACTIVITY_STATUS, PojoObservables
-                .observeValue(clinic, "activityStatus"), null, null);
+                .observeValue(clinicWrapper, "activityStatus"), null, null);
 
         Text comment = (Text) createBoundWidgetWithLabel(client, Text.class,
-            SWT.MULTI, "Comments", null, PojoObservables.observeValue(clinic,
-                "comment"), null, null);
+            SWT.MULTI, "Comments", null, PojoObservables.observeValue(
+                clinicWrapper, "comment"), null, null);
         GridData gd = new GridData(GridData.FILL_HORIZONTAL);
         gd.heightHint = 40;
         comment.setLayoutData(gd);
@@ -144,8 +131,8 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
         client.setLayout(layout);
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-        contactEntryWidget = new ContactEntryWidget(client, SWT.NONE, clinic
-            .getContactCollection(), toolkit);
+        contactEntryWidget = new ContactEntryWidget(client, SWT.NONE,
+            clinicWrapper.getContactCollection(), toolkit);
         contactEntryWidget.addSelectionChangedListener(listener);
     }
 
@@ -156,127 +143,56 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
         client.setLayout(layout);
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
-
-        initCancelConfirmWidget(client);
     }
 
     @Override
     public void setFocus() {
-        form.setFocus();
+        firstControl.setFocus();
     }
 
     @Override
     public void saveForm() throws Exception {
-        clinic.setAddress(address);
         SiteAdapter siteAdapter = clinicAdapter
             .getParentFromClass(SiteAdapter.class);
-        clinic.setSite(siteAdapter.getSite());
-
-        SDKQuery query;
-        SDKQueryResult result;
-
-        if ((clinic.getId() == null) && !checkClinicNameUnique()) {
-            setDirty(true);
-            return;
-        }
-
+        clinicWrapper.setSiteWrapper(siteAdapter.getWrapper());
         saveContacts();
-        clinic.setAddress(address);
-
-        if ((clinic.getId() == null) || (clinic.getId() == 0)) {
-            Assert.isTrue(clinic.getAddress().getId() == null,
-                "insert invoked on address already in database");
-
-            query = new InsertExampleQuery(clinic.getAddress());
-            result = appService.executeQuery(query);
-            clinic.setAddress((Address) result.getObjectResult());
-            query = new InsertExampleQuery(clinic);
-        } else {
-            Assert.isNotNull(clinic.getAddress().getId(),
-                "update invoked on address not in database");
-
-            query = new UpdateExampleQuery(clinic.getAddress());
-            result = appService.executeQuery(query);
-            clinic.setAddress((Address) result.getObjectResult());
-            query = new UpdateExampleQuery(clinic);
-        }
-
-        result = appService.executeQuery(query);
-        clinic = (Clinic) result.getObjectResult();
-
-        clinicAdapter.setClinic(clinic);
-        clinicAdapter.getParent().performExpand();
+        addressWrapper.persist();
+        clinicWrapper.persist();
     }
 
     private void saveContacts() throws Exception {
-        SDKQuery query;
-
-        Collection<Contact> contactCollection = contactEntryWidget
+        Collection<ContactWrapper> contactCollection = contactEntryWidget
             .getContacts();
         removeDeletedContacts(contactCollection);
 
-        for (Contact c : contactCollection) {
-            c.setClinic(clinic);
-            if ((c.getId() == null) || (c.getId() == 0)) {
-                query = new InsertExampleQuery(c);
-            } else {
-                query = new UpdateExampleQuery(c);
-            }
-
-            appService.executeQuery(query);
+        for (ContactWrapper cw : contactCollection) {
+            cw.setClinicWrapper(clinicWrapper);
+            cw.persist();
         }
     }
 
-    private void removeDeletedContacts(Collection<Contact> contactCollection)
-        throws Exception {
+    private void removeDeletedContacts(
+        Collection<ContactWrapper> newContactCollection) throws Exception {
         // no need to remove if clinic is not yet in the database
-        if (clinic.getId() == null)
+        if (clinicWrapper.getId() == null)
+            return;
+
+        Collection<ContactWrapper> contactCollection = clinicWrapper
+            .getContactCollection();
+
+        if (contactCollection == null)
             return;
 
         List<Integer> selectedContactIds = new ArrayList<Integer>();
-        for (Contact c : contactCollection) {
-            selectedContactIds.add(c.getId());
+        for (ContactWrapper cw : newContactCollection) {
+            selectedContactIds.add(cw.getId());
         }
 
-        SDKQuery query;
-
-        // query from database again
-        Clinic dbClinic = ModelUtils.getObjectWithId(appService, Clinic.class,
-            clinic.getId());
-
-        Collection<Contact> dbContactCollection = dbClinic
-            .getContactCollection();
-
-        if (dbContactCollection == null)
-            return;
-
-        for (Contact c : dbContactCollection) {
-            if (!selectedContactIds.contains(c.getId())) {
-                query = new DeleteExampleQuery(c);
-                appService.executeQuery(query);
+        for (ContactWrapper cw : contactCollection) {
+            if (!selectedContactIds.contains(cw.getId())) {
+                cw.delete();
             }
         }
-    }
-
-    private boolean checkClinicNameUnique() throws ApplicationException {
-        Site site = clinicAdapter.getParentFromClass(SiteAdapter.class)
-            .getSite();
-        HQLCriteria c = new HQLCriteria("from " + Clinic.class.getName()
-            + " as clinic where site = ? and clinic.name = ?", Arrays
-            .asList(new Object[] { site, clinic.getName() }));
-
-        List<Object> results = appService.query(c);
-        if (results.size() == 0)
-            return true;
-
-        BioBankPlugin.openAsyncError("Clinic Name Problem",
-            "A clinic with name \"" + clinic.getName() + "\" already exists.");
-        return false;
-    }
-
-    @Override
-    public void cancelForm() {
-
     }
 
     @Override

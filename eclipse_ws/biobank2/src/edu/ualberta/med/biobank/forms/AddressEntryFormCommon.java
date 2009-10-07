@@ -9,13 +9,13 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
 
-import edu.ualberta.med.biobank.model.Address;
+import edu.ualberta.med.biobank.common.wrappers.AddressWrapper;
 import edu.ualberta.med.biobank.validators.PostalCode;
 
 @SuppressWarnings("serial")
 public abstract class AddressEntryFormCommon extends BiobankEntryForm {
 
-    protected Address address;
+    protected AddressWrapper addressWrapper;
 
     /*
      * Want to preserve insert order so using ListOrderedMap.
@@ -43,7 +43,7 @@ public abstract class AddressEntryFormCommon extends BiobankEntryForm {
 
     protected void createAddressArea() {
         Composite client = createSectionWithClient("Address");
-        createBoundWidgetsFromMap(ADDRESS_FIELDS, address, client);
+        createBoundWidgetsFromMap(ADDRESS_FIELDS, addressWrapper, client);
     }
 
 }

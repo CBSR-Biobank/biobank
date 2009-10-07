@@ -3,6 +3,9 @@ package edu.ualberta.med.biobank.model;
 import java.util.Arrays;
 import java.util.List;
 
+import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.scanlib.ScanCell;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -18,13 +21,13 @@ public class PalletCell {
 
     private boolean selected = false;
 
-    private SampleType type;
+    private SampleTypeWrapper type;
 
-    private Sample sample;
+    private SampleWrapper sample;
 
     private ScanCell scanCell;
 
-    private Sample expectedSample;
+    private SampleWrapper expectedSample;
 
     public PalletCell(ScanCell scanCell) {
         this.scanCell = scanCell;
@@ -49,13 +52,14 @@ public class PalletCell {
     }
 
     public static PalletCell[][] getRandomScanProcessAlreadyInPallet(
-        WritableApplicationService appService, Site site) throws Exception {
+        WritableApplicationService appService, SiteWrapper siteWrapper)
+        throws Exception {
         PalletCell[][] palletScanned = initArray();
         HQLCriteria criteria = new HQLCriteria("from " + Sample.class.getName()
             + " as s where s in (select sp.sample from "
             + SamplePosition.class.getName()
             + " as sp) and s.patientVisit.patient.study.site = ?", Arrays
-            .asList(new Object[] { site }));
+            .asList(new Object[] { siteWrapper.getWrappedObject() }));
         List<Sample> samples = appService.query(criteria);
         if (samples.size() > 0) {
             palletScanned[0][0] = new PalletCell(new ScanCell(0, 0, samples
@@ -69,17 +73,15 @@ public class PalletCell {
     }
 
     public static PalletCell[][] getRandomScanProcessNotInPallet(
-        WritableApplicationService appService, Site site)
+        WritableApplicationService appService, SiteWrapper siteWrapper)
         throws ApplicationException {
         PalletCell[][] palletScanned = initArray();
-        HQLCriteria criteria = new HQLCriteria(
-            "from "
-                + Sample.class.getName()
-                + " as s where s not in (select sp.sample from "
-                + SamplePosition.class.getName()
-                + " as sp) "
-                + "and s.inventoryId <> '123' and s.patientVisit.patient.study.site = ?",
-            Arrays.asList(new Object[] { site }));
+        HQLCriteria criteria = new HQLCriteria("from " + Sample.class.getName()
+            + " as s where s not in (select sp.sample from "
+            + SamplePosition.class.getName()
+            + " as sp) and s.inventoryId <> '123'"
+            + " and s.patientVisit.patient.study.site = ?", Arrays
+            .asList(new Object[] { siteWrapper.getWrappedObject() }));
         List<Sample> samples = appService.query(criteria);
         if (samples.size() > 1) {
             // Random r = new Random();
@@ -139,19 +141,19 @@ public class PalletCell {
         this.selected = selected;
     }
 
-    public SampleType getType() {
+    public SampleTypeWrapper getType() {
         return type;
     }
 
-    public void setType(SampleType type) {
+    public void setType(SampleTypeWrapper type) {
         this.type = type;
     }
 
-    public void setSample(Sample sample) {
+    public void setSample(SampleWrapper sample) {
         this.sample = sample;
     }
 
-    public Sample getSample() {
+    public SampleWrapper getSample() {
         return sample;
     }
 
@@ -184,11 +186,11 @@ public class PalletCell {
         return new PalletCell[ScanCell.ROW_MAX][ScanCell.COL_MAX];
     }
 
-    public void setExpectedSample(Sample expectedSample) {
+    public void setExpectedSample(SampleWrapper expectedSample) {
         this.expectedSample = expectedSample;
     }
 
-    public Sample getExpectedSample() {
+    public SampleWrapper getExpectedSample() {
         return expectedSample;
     }
 }

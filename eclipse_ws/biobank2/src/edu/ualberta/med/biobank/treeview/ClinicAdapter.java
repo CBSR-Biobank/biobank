@@ -14,6 +14,7 @@ import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.forms.ClinicEntryForm;
 import edu.ualberta.med.biobank.forms.ClinicViewForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
@@ -24,45 +25,29 @@ import gov.nih.nci.system.query.example.DeleteExampleQuery;
 
 public class ClinicAdapter extends AdapterBase {
 
-    public ClinicAdapter(AdapterBase parent, Clinic clinic) {
-        super(parent, clinic, Clinic.class);
+    public ClinicAdapter(AdapterBase parent, ClinicWrapper clinicWrapper) {
+        super(parent, clinicWrapper);
     }
 
-    public void setClinic(Clinic clinic) {
-        setWrappedObject(clinic, Clinic.class);
-    }
-
-    public Clinic getClinic() {
-        return (Clinic) getWrappedObject();
+    public ClinicWrapper getWrapper() {
+        return (ClinicWrapper) object;
     }
 
     @Override
-    protected Integer getWrappedObjectId() {
-        return getClinic().getId();
+    public String getName() {
+        ClinicWrapper wrapper = getWrapper();
+        Assert.isNotNull(wrapper.getWrappedObject(), "client is null");
+        return wrapper.getName();
+    }
+
+    @Override
+    public String getTitle() {
+        return getTitle("Patient");
     }
 
     @Override
     public void addChild(AdapterBase child) {
         Assert.isTrue(false, "Cannot add children to this adapter");
-    }
-
-    @Override
-    public Integer getId() {
-        Clinic clinic = getClinic();
-        Assert.isNotNull(clinic, "Clinic is null");
-        return clinic.getId();
-    }
-
-    @Override
-    public String getName() {
-        Clinic clinic = getClinic();
-        Assert.isNotNull(clinic, "Clinic is null");
-        return clinic.getName();
-    }
-
-    @Override
-    public String getTitle() {
-        return getTitle("Clinic");
     }
 
     @Override
@@ -113,9 +98,12 @@ public class ClinicAdapter extends AdapterBase {
         });
     }
 
+    @Override
     public void delete() {
+        // FIXME when clinicwrapper is used : remove this method to use the
+        // parent one
         BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
-            Clinic clinic = getClinic();
+            Clinic clinic = ((ClinicWrapper) object).getWrappedObject();
             SDKQuery query = new DeleteExampleQuery(clinic);
 
             public void run() {
@@ -140,7 +128,7 @@ public class ClinicAdapter extends AdapterBase {
 
     @Override
     public void loadChildren(boolean updateNode) {
-
+        Assert.isTrue(false, "Cannot add children to this adapter");
     }
 
     @Override
@@ -150,11 +138,6 @@ public class ClinicAdapter extends AdapterBase {
 
     public Clinic loadClinic() throws Exception {
         return (Clinic) loadWrappedObject();
-    }
-
-    @Override
-    protected boolean integrityCheck() {
-        return true;
     }
 
 }

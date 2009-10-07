@@ -6,9 +6,9 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.ui.handlers.HandlerUtil;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.forms.PatientVisitEntryForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
-import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.treeview.PatientAdapter;
 import edu.ualberta.med.biobank.treeview.PatientVisitAdapter;
 import edu.ualberta.med.biobank.views.PatientAdministrationView;
@@ -20,8 +20,10 @@ public class PatientVisitAddHandler extends AbstractHandler {
         try {
             PatientAdapter patientAdapter = PatientAdministrationView
                 .getCurrentPatientAdapter();
+            PatientVisitWrapper pvWrapper = new PatientVisitWrapper(
+                SessionManager.getAppService());
             PatientVisitAdapter adapter = new PatientVisitAdapter(
-                patientAdapter, new PatientVisit());
+                patientAdapter, pvWrapper);
             adapter.getWrapper().setPatientWrapper(patientAdapter.getWrapper());
             HandlerUtil.getActiveWorkbenchWindowChecked(event).getActivePage()
                 .openEditor(new FormInput(adapter), PatientVisitEntryForm.ID,

@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.forms;
 
-import java.util.Collection;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.runtime.Assert;
@@ -16,9 +17,8 @@ import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.DatabaseResult;
-import edu.ualberta.med.biobank.model.Site;
-import edu.ualberta.med.biobank.model.Study;
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.treeview.PatientAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
 import edu.ualberta.med.biobank.views.PatientAdministrationView;
@@ -36,7 +36,7 @@ public class PatientEntryForm extends BiobankEntryForm {
 
     private PatientAdapter patientAdapter;
 
-    private Site site;
+    private SiteWrapper siteWrapper;
 
     private ComboViewer studiesViewer;
 
@@ -62,9 +62,9 @@ public class PatientEntryForm extends BiobankEntryForm {
         form.setText("Patient Information");
         form.setMessage(getOkMessage(), IMessageProvider.NONE);
         form.getBody().setLayout(new GridLayout(1, false));
-
+        form.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
+            BioBankPlugin.IMG_PATIENT));
         createPatientSection();
-        initCancelConfirmWidget(form.getBody());
 
         if (patientAdapter.getWrapper().isNew()) {
             setDirty(true);
@@ -81,32 +81,24 @@ public class PatientEntryForm extends BiobankEntryForm {
 
         Label labelSite = (Label) createWidget(client, Label.class, SWT.NONE,
             "Site");
-        site = SessionManager.getInstance().getCurrentSite();
-        labelSite.setText(site.getName());
+        siteWrapper = SessionManager.getInstance().getCurrentSiteWrapper();
+        labelSite.setText(siteWrapper.getName());
 
-        Collection<Study> studies = site.getStudyCollection();
-        Study selectedStudy = null;
+        List<StudyWrapper> studies = new ArrayList<StudyWrapper>(siteWrapper
+            .getStudyCollection());
+        StudyWrapper selectedStudy = null;
         if (patientAdapter.getWrapper().isNew()) {
             if (studies.size() == 1) {
-                selectedStudy = studies.iterator().next();
+                selectedStudy = studies.get(0);
             }
         } else {
-            Study currentStudy = patientAdapter.getWrapper().getStudy();
-            if (currentStudy != null) {
-                for (Study study : studies) {
-                    if (currentStudy.getId().equals(study.getId())) {
-                        currentStudy = study;
-                        break;
-                    }
-                }
-                selectedStudy = currentStudy;
-            }
+            selectedStudy = patientAdapter.getWrapper().getStudy();
         }
 
         studiesViewer = createCComboViewerWithNoSelectionValidator(client,
             "Study", studies, selectedStudy, "A study should be selected");
 
-        createBoundWidgetWithLabel(client, Text.class, SWT.NONE,
+        firstControl = createBoundWidgetWithLabel(client, Text.class, SWT.NONE,
             "Patient Number", null, BeansObservables.observeValue(
                 patientAdapter.getWrapper(), "number"), NonEmptyString.class,
             MSG_NO_PATIENT_NUMBER);
@@ -122,22 +114,12 @@ public class PatientEntryForm extends BiobankEntryForm {
 
     @Override
     protected void saveForm() throws Exception {
-        Study study = (Study) ((IStructuredSelection) studiesViewer
+        StudyWrapper study = (StudyWrapper) ((IStructuredSelection) studiesViewer
             .getSelection()).getFirstElement();
         patientAdapter.getWrapper().setStudy(study);
-        DatabaseResult res = patientAdapter.getWrapper().persist();
-        if (res != DatabaseResult.OK) {
-            BioBankPlugin.openAsyncError("Save Problem", res.getMessage());
-            setDirty(true);
-            return;
-        }
+        patientAdapter.getWrapper().persist();
         PatientAdministrationView.currentInstance
             .showPatientInTree(patientAdapter.getWrapper());
-    }
-
-    @Override
-    public void cancelForm() throws Exception {
-        patientAdapter.getWrapper().reset();
     }
 
     @Override
@@ -153,6 +135,11 @@ public class PatientEntryForm extends BiobankEntryForm {
                 "Error while retrieving patient "
                     + patientAdapter.getWrapper().getNumber(), e);
         }
+    }
+
+    @Override
+    public void setFocus() {
+        firstControl.setFocus();
     }
 
 }

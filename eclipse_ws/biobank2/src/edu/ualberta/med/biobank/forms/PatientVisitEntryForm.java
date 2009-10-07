@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.collections.MapIterator;
@@ -32,15 +31,16 @@ import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.DatabaseResult;
-import edu.ualberta.med.biobank.common.utils.ModelUtils;
+import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
+import edu.ualberta.med.biobank.common.wrappers.PvInfoDataWrapper;
+import edu.ualberta.med.biobank.common.wrappers.PvInfoWrapper;
+import edu.ualberta.med.biobank.common.wrappers.PvSampleSourceWrapper;
+import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.Clinic;
-import edu.ualberta.med.biobank.model.PvInfo;
 import edu.ualberta.med.biobank.model.PvInfoData;
-import edu.ualberta.med.biobank.model.PvSampleSource;
-import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.PatientAdapter;
 import edu.ualberta.med.biobank.treeview.PatientVisitAdapter;
 import edu.ualberta.med.biobank.validators.DateNotNulValidator;
@@ -77,8 +77,8 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
     };
 
     class CombinedPvInfo {
-        PvInfo pvInfo;
-        PvInfoData pvInfoData;
+        PvInfoWrapper pvInfo;
+        PvInfoDataWrapper pvInfoData;
         Control control;
 
         public CombinedPvInfo() {
@@ -142,10 +142,11 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         form.setText("Patient Visit Information");
         form.setMessage(getOkMessage(), IMessageProvider.NONE);
         form.getBody().setLayout(new GridLayout(1, false));
+        form.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
+            BioBankPlugin.IMG_PATIENT_VISIT));
         patientWrapper = retrievePatient();
         createMainSection(patientWrapper.getStudy());
         createSourcesSection();
-        initCancelConfirmWidget(form.getBody());
         if (patientVisitWrapper.isNew()) {
             setDirty(true);
         }
@@ -158,7 +159,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         return patientWrapper;
     }
 
-    private void createMainSection(Study study) throws Exception {
+    private void createMainSection(StudyWrapper study) {
         Composite client = toolkit.createComposite(form.getBody());
         GridLayout layout = new GridLayout(2, false);
         layout.horizontalSpacing = 10;
@@ -169,19 +170,20 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         Label siteLabel = (Label) createWidget(client, Label.class, SWT.NONE,
             "Site");
         FormUtils.setTextValue(siteLabel, patientVisitWrapper
-            .getPatientWrapper().getStudy().getSite().getName());
+            .getPatientWrapper().getStudy().getWrappedObject().getSite()
+            .getName());
 
         if (patientVisitWrapper.getId() == null) {
             // choose clinic for new visit
-            Collection<Clinic> clinics = ModelUtils.getStudyClinicCollection(
-                appService, study);
-            Clinic selectedClinic = null;
+            Collection<ContactWrapper> contacts = study.getContactCollection();
+            ClinicWrapper selectedClinic = null;
 
-            if (clinics.size() == 1) {
-                selectedClinic = clinics.iterator().next();
+            if (contacts.size() == 1) {
+                selectedClinic = contacts.iterator().next().getClinicWrapper();
             }
             if (patientVisitWrapper.getClinic() != null) {
-                for (Clinic clinic : clinics) {
+                for (ContactWrapper contact : contacts) {
+                    ClinicWrapper clinic = contact.getClinicWrapper();
                     if (clinic.getId().equals(
                         patientVisitWrapper.getClinic().getId())) {
                         selectedClinic = clinic;
@@ -191,7 +193,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
             }
 
             clinicsComboViewer = createCComboViewerWithNoSelectionValidator(
-                client, "Clinic", clinics, selectedClinic,
+                client, "Clinic", contacts, selectedClinic,
                 "A clinic should be selected");
         } else {
             Label clinicLabel = (Label) createWidget(client, Label.class,
@@ -204,6 +206,8 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         dateDrawn = createDateTimeWidget(client, "Date Drawn",
             patientVisitWrapper.getDateDrawn(), false,
             "Date drawn should be set");
+
+        firstControl = dateDrawn;
 
         Date processedDate = patientVisitWrapper.getDateProcessed();
         if (processedDate == null) {
@@ -227,19 +231,19 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         commentsText.setLayoutData(gd);
     }
 
-    private void createPvDataSection(Composite client, Study study) {
+    private void createPvDataSection(Composite client, StudyWrapper study) {
         if (study.getPvInfoCollection().size() > 0) {
 
-            for (PvInfo pvInfo : study.getPvInfoCollection()) {
+            for (PvInfoWrapper pvInfo : study.getPvInfoCollection()) {
                 CombinedPvInfo combinedPvInfo = new CombinedPvInfo();
                 combinedPvInfo.pvInfo = pvInfo;
                 combinedPvInfoMap.put(pvInfo.getId(), combinedPvInfo);
             }
 
-            Collection<PvInfoData> pvDataCollection = patientVisitWrapper
+            Collection<PvInfoDataWrapper> pvDataCollection = patientVisitWrapper
                 .getPvInfoDataCollection();
             if (pvDataCollection != null) {
-                for (PvInfoData pvInfoData : pvDataCollection) {
+                for (PvInfoDataWrapper pvInfoData : pvDataCollection) {
                     Integer key = pvInfoData.getPvInfo().getId();
                     CombinedPvInfo combinedPvInfo = (CombinedPvInfo) combinedPvInfoMap
                         .get(key);
@@ -432,7 +436,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         if (clinicsComboViewer != null) {
             IStructuredSelection clinicSelection = (IStructuredSelection) clinicsComboViewer
                 .getSelection();
-            if (clinicSelection != null && clinicSelection.size() > 0) {
+            if ((clinicSelection != null) && (clinicSelection.size() > 0)) {
                 patientVisitWrapper.setClinic((Clinic) clinicSelection
                     .getFirstElement());
             } else {
@@ -447,12 +451,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
 
         // FIXME get csm_user_id and set it to the Patient Visit at insert
 
-        DatabaseResult res = patientVisitWrapper.persist();
-        if (res != DatabaseResult.OK) {
-            BioBankPlugin.openAsyncError("Save Problem", res.getMessage());
-            setDirty(true);
-            return;
-        }
+        patientVisitWrapper.persist();
 
         // FIXME samplesources and pv infos datas could be done in the patient
         // visit persists method (if we send the information in parameters)
@@ -462,15 +461,15 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
     }
 
     private void savePvSampleSources() throws Exception {
-        Collection<PvSampleSource> ssCollection = pvSampleSourceEntryWidget
+        Collection<PvSampleSourceWrapper> ssCollection = pvSampleSourceEntryWidget
             .getPvSampleSources();
         SDKQuery query;
         SDKQueryResult result;
 
         removeDeletedPvSampleSources(ssCollection);
 
-        Collection<PvSampleSource> savedSsCollection = new HashSet<PvSampleSource>();
-        for (PvSampleSource ss : ssCollection) {
+        Collection<PvSampleSourceWrapper> savedSsCollection = new HashSet<PvSampleSourceWrapper>();
+        for (PvSampleSourceWrapper ss : ssCollection) {
             ss.setPatientVisit(patientVisitWrapper.getWrappedObject());
             if ((ss.getId() == null) || (ss.getId() == 0)) {
                 query = new InsertExampleQuery(ss);
@@ -478,25 +477,26 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
                 query = new UpdateExampleQuery(ss);
             }
             result = appService.executeQuery(query);
-            savedSsCollection.add((PvSampleSource) result.getObjectResult());
+            savedSsCollection.add((PvSampleSourceWrapper) result
+                .getObjectResult());
         }
         patientVisitWrapper.setPvSampleSourceCollection(savedSsCollection);
     }
 
     private void removeDeletedPvSampleSources(
-        Collection<PvSampleSource> ssCollection) throws Exception {
+        Collection<PvSampleSourceWrapper> ssCollection) throws Exception {
         // no need to remove if patientVisit is not yet in the database
         if (patientVisitWrapper.isNew())
             return;
 
         List<Integer> selectedPvSampleSourceIds = new ArrayList<Integer>();
-        for (PvSampleSource ss : ssCollection) {
+        for (PvSampleSourceWrapper ss : ssCollection) {
             selectedPvSampleSourceIds.add(ss.getId());
         }
 
         SDKQuery query;
         if (patientVisitWrapper.getPvSampleSourceCollection() != null) {
-            for (PvSampleSource ss : patientVisitWrapper
+            for (PvSampleSourceWrapper ss : patientVisitWrapper
                 .getPvSampleSourceCollection()) {
                 if (!selectedPvSampleSourceIds.contains(ss.getId())) {
                     query = new DeleteExampleQuery(ss);
@@ -507,7 +507,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
     }
 
     private void savePvInfoData() throws Exception {
-        Collection<PvInfoData> pvDataCollection = new HashSet<PvInfoData>();
+        List<PvInfoDataWrapper> pvDataCollection = new ArrayList<PvInfoDataWrapper>();
 
         MapIterator it = combinedPvInfoMap.mapIterator();
         while (it.hasNext()) {
@@ -542,10 +542,10 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
             if ((value == null) || (value.length() == 0))
                 continue;
 
-            PvInfoData pvInfoData;
+            PvInfoDataWrapper pvInfoData;
 
             if (combinedPvInfo.pvInfoData == null) {
-                pvInfoData = new PvInfoData();
+                pvInfoData = new PvInfoDataWrapper(appService);
                 pvInfoData.setPvInfo(combinedPvInfo.pvInfo);
                 pvInfoData.setPatientVisit(patientVisitWrapper
                     .getWrappedObject());
@@ -562,14 +562,11 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         SDKQuery query;
         SDKQueryResult result;
         Collection<PvInfoData> savedPvDataCollection = new HashSet<PvInfoData>();
-        Iterator<PvInfoData> itr = pvDataCollection.iterator();
-
-        while (itr.hasNext()) {
-            PvInfoData pvInfoData = itr.next();
-            if (pvInfoData.getId() == null) {
-                query = new InsertExampleQuery(pvInfoData);
+        for (PvInfoDataWrapper pvInfoData : pvDataCollection) {
+            if (pvInfoData.isNew()) {
+                query = new InsertExampleQuery(pvInfoData.getWrappedObject());
             } else {
-                query = new UpdateExampleQuery(pvInfoData);
+                query = new UpdateExampleQuery(pvInfoData.getWrappedObject());
             }
 
             result = appService.executeQuery(query);
@@ -580,12 +577,12 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
     }
 
     @Override
-    public void cancelForm() {
-
+    public String getNextOpenedFormID() {
+        return PatientVisitViewForm.ID;
     }
 
     @Override
-    public String getNextOpenedFormID() {
-        return PatientVisitViewForm.ID;
+    public void setFocus() {
+        firstControl.setFocus();
     }
 }

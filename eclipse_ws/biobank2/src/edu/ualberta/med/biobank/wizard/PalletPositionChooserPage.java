@@ -1,6 +1,6 @@
 package edu.ualberta.med.biobank.wizard;
 
-import java.util.Collection;
+import java.util.List;
 
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ComboViewer;
@@ -15,17 +15,17 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Label;
 
-import edu.ualberta.med.biobank.model.Container;
+import edu.ualberta.med.biobank.common.wrappers.ContainerPositionWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.model.ContainerCell;
-import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.ContainerStatus;
-import edu.ualberta.med.biobank.model.ContainerType;
 
 public class PalletPositionChooserPage extends AbstractContainerChooserPage {
 
     public static final String NAME = "HOTEL_CONTAINER";
-    private ContainerPosition selectedPosition;
-    private ContainerType containerType;
+    private ContainerPositionWrapper selectedPosition;
+    private ContainerTypeWrapper containerType;
 
     private ComboViewer comboViewer;
     private Combo combo;
@@ -45,7 +45,7 @@ public class PalletPositionChooserPage extends AbstractContainerChooserPage {
         containerWidget.setLegendOnSide(true);
         containerWidget.setFirstColSign(null);
         containerWidget.setFirstRowSign(1);
-        containerWidget.setShowNullStatusAsEmpty(true);
+        // containerWidget.setShowNullStatusAsEmpty(true);
 
         Label label = new Label(pageContainer, SWT.NONE);
         label.setText("Choose container type:");
@@ -59,7 +59,7 @@ public class PalletPositionChooserPage extends AbstractContainerChooserPage {
         comboViewer.setLabelProvider(new LabelProvider() {
             @Override
             public String getText(Object element) {
-                ContainerType st = (ContainerType) element;
+                ContainerTypeWrapper st = (ContainerTypeWrapper) element;
                 return st.getName();
             }
         });
@@ -73,20 +73,20 @@ public class PalletPositionChooserPage extends AbstractContainerChooserPage {
                     if (!textPosition.getText().isEmpty()) {
                         setPageComplete(true);
                     }
-                    containerType = (ContainerType) ((IStructuredSelection) comboViewer
+                    containerType = (ContainerTypeWrapper) ((IStructuredSelection) comboViewer
                         .getSelection()).getFirstElement();
                 }
             });
     }
 
     @Override
-    public void setCurrentContainer(Container container) {
+    public void setCurrentContainer(ContainerWrapper container) {
         super.setCurrentContainer(container);
         setTitle("Container " + container.getLabel());
         updateFreezerGrid();
         textPosition.setText("");
         selectedPosition = null;
-        Collection<ContainerType> types = getCurrentContainer()
+        List<ContainerTypeWrapper> types = getCurrentContainer()
             .getContainerType().getChildContainerTypeCollection();
         // do not include type not active
         comboViewer.setInput(types);
@@ -121,16 +121,17 @@ public class PalletPositionChooserPage extends AbstractContainerChooserPage {
         return cell;
     }
 
-    public ContainerPosition getSelectedPosition() {
+    public ContainerPositionWrapper getSelectedPosition() {
         return selectedPosition;
     }
 
-    public ContainerType getContainerType() {
+    public ContainerTypeWrapper getContainerType() {
         return containerType;
     }
 
     @Override
-    protected void setStatus(ContainerCell cell, Container occupiedContainer) {
+    protected void setStatus(ContainerCell cell,
+        ContainerWrapper occupiedContainer) {
         if (occupiedContainer == null) {
             cell.setStatus(ContainerStatus.NOT_INITIALIZED);
         } else {
