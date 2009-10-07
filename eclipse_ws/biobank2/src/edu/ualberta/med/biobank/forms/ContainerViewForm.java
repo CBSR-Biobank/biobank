@@ -97,6 +97,8 @@ public class ContainerViewForm extends BiobankViewForm {
         form.setText("Container " + container.getLabel() + " ("
             + container.getContainerType().getName() + ")");
         form.getBody().setLayout(new GridLayout(1, false));
+        form.setImage(BioBankPlugin.getDefault().getIconForTypeName(
+            container.getContainerType().getName()));
 
         createContainerSection();
 

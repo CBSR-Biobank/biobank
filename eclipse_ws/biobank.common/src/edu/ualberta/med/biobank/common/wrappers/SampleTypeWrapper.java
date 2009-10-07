@@ -1,14 +1,19 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.model.SampleType;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
-public class SampleTypeWrapper extends ModelWrapper<SampleType> {
+public class SampleTypeWrapper extends ModelWrapper<SampleType> implements
+    Comparable<SampleTypeWrapper> {
 
     public SampleTypeWrapper(WritableApplicationService appService,
         SampleType wrappedObject) {
@@ -21,8 +26,28 @@ public class SampleTypeWrapper extends ModelWrapper<SampleType> {
 
     @Override
     protected String[] getPropertyChangesNames() {
-        return null;
+        return new String[] { "name", "nameShort" };
+    }
 
+    public String getName() {
+        return wrappedObject.getName();
+    }
+
+    public void setName(String name) {
+        String oldName = getName();
+        wrappedObject.setName(name);
+        propertyChangeSupport.firePropertyChange("name", oldName, name);
+    }
+
+    public String getNameShort() {
+        return wrappedObject.getNameShort();
+    }
+
+    public void setNameShort(String nameShort) {
+        String oldNameShort = getNameShort();
+        wrappedObject.setNameShort(nameShort);
+        propertyChangeSupport.firePropertyChange("nameShort", oldNameShort,
+            nameShort);
     }
 
     @Override
@@ -58,15 +83,23 @@ public class SampleTypeWrapper extends ModelWrapper<SampleType> {
 
     @Override
     protected void deleteChecks() throws BiobankCheckException, Exception {
-        // TODO Auto-generated method stub
+        // do nothing for now
     }
 
-    public String getNameShort() {
-        return wrappedObject.getNameShort();
-    }
+    @Override
+    public int compareTo(SampleTypeWrapper wrapper) {
+        String myName = wrappedObject.getName();
+        String wrapperName = wrapper.wrappedObject.getName();
 
-    public String getName() {
-        return wrappedObject.getName();
+        int compare = myName.compareTo(wrapperName);
+        if (compare == 0) {
+            String myNameShort = wrappedObject.getNameShort();
+            String wrapperNameShort = wrapper.wrappedObject.getNameShort();
+
+            return ((myNameShort.compareTo(wrapperNameShort) > 0) ? 1
+                : (myNameShort.equals(wrapperNameShort) ? 0 : -1));
+        }
+        return (compare > 0) ? 1 : -1;
     }
 
     public static List<SampleTypeWrapper> transformToWrapperList(
@@ -79,9 +112,32 @@ public class SampleTypeWrapper extends ModelWrapper<SampleType> {
     }
 
     public static List<SampleTypeWrapper> getAllWrappers(
-        WritableApplicationService appService) throws ApplicationException {
+        WritableApplicationService appService, boolean sort)
+        throws ApplicationException {
         List<SampleType> sampleTypes = appService.search(SampleType.class,
             new SampleType());
-        return transformToWrapperList(appService, sampleTypes);
+        List<SampleTypeWrapper> list = transformToWrapperList(appService,
+            sampleTypes);
+        if (sort)
+            Collections.sort(list);
+        return list;
+    }
+
+    public static List<SampleTypeWrapper> getAllWrappers(
+        WritableApplicationService appService) throws ApplicationException {
+        return getAllWrappers(appService, false);
+    }
+
+    public static void deleteOldSampleTypes(List<SampleTypeWrapper> newTypes,
+        List<SampleTypeWrapper> oldTypes) throws BiobankCheckException,
+        Exception {
+        Set<SampleTypeWrapper> setNewTypes = new HashSet<SampleTypeWrapper>(
+            newTypes);
+        Iterator<SampleTypeWrapper> it = oldTypes.iterator();
+        while (it.hasNext()) {
+            if (!setNewTypes.contains(it.next().getId())) {
+                it.next().delete();
+            }
+        }
     }
 }

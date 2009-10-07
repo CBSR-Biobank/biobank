@@ -1,7 +1,5 @@
 package edu.ualberta.med.biobank.treeview;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
@@ -14,13 +12,11 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.utils.ModelUtils;
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.forms.StudyEntryForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
-import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
-import edu.ualberta.med.biobank.model.StudyComparator;
 
 public class StudyGroup extends AdapterBase {
 
@@ -57,30 +53,27 @@ public class StudyGroup extends AdapterBase {
 
     @Override
     public void loadChildren(boolean updateNode) {
-        Site currentSite = ((SiteAdapter) getParent()).getSite();
+        SiteWrapper currentSite = ((SiteAdapter) getParent()).getWrapper();
         Assert.isNotNull(currentSite, "null site");
         try {
             // read from database again
-            currentSite = ModelUtils.getObjectWithId(getAppService(),
-                Site.class, currentSite.getId());
-            ((SiteAdapter) getParent()).setSite(currentSite);
+            currentSite.reload();
+            ((SiteAdapter) getParent()).setSite(currentSite.getWrappedObject());
 
-            List<Study> studies = new ArrayList<Study>(currentSite
-                .getStudyCollection());
-            Collections.sort(studies, new StudyComparator());
-            for (Study study : studies) {
-                StudyAdapter node = (StudyAdapter) getChild(study.getId());
+            List<StudyWrapper> studies = currentSite.getStudyCollection(true);
+            if (studies != null)
+                for (StudyWrapper study : studies) {
+                    StudyAdapter node = (StudyAdapter) getChild(study.getId());
 
-                if (node == null) {
-                    // first time building the tree
-                    node = new StudyAdapter(this, new StudyWrapper(
-                        getAppService(), study));
-                    addChild(node);
+                    if (node == null) {
+                        // first time building the tree
+                        node = new StudyAdapter(this, study);
+                        addChild(node);
+                    }
+                    if (updateNode) {
+                        SessionManager.getInstance().updateTreeNode(node);
+                    }
                 }
-                if (updateNode) {
-                    SessionManager.getInstance().updateTreeNode(node);
-                }
-            }
         } catch (Exception e) {
             SessionManager.getLogger().error(
                 "Error while loading study group children for site "

@@ -97,6 +97,8 @@ public class LoginDialog extends TitleAreaDialog {
     protected Control createContents(Composite parent) {
         Control contents = super.createContents(parent);
         setTitle("Login to a BioBank server");
+        setTitleImage(BioBankPlugin.getDefault().getImageRegistry().get(
+            BioBankPlugin.IMG_COMPUTER_KEY));
         setMessage("Enter server name and login details.");
         return contents;
     }

@@ -14,6 +14,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
+import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.treeview.ClinicAdapter;
@@ -77,6 +78,8 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
         form.setText("Clinic Information");
         GridLayout layout = new GridLayout(1, false);
         form.getBody().setLayout(layout);
+        form.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
+            BioBankPlugin.IMG_CLINIC));
 
         toolkit
             .createLabel(

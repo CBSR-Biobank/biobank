@@ -4,9 +4,9 @@ import java.util.Collection;
 
 import org.eclipse.swt.widgets.Composite;
 
-import edu.ualberta.med.biobank.model.SampleType;
+import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 
-public class SampleTypeInfoTable extends InfoTableWidget<SampleType> {
+public class SampleTypeInfoTable extends InfoTableWidget<SampleTypeWrapper> {
 
     private static final String[] HEADINGS = new String[] { "Sample Type",
         "Short Name" };
@@ -15,7 +15,7 @@ public class SampleTypeInfoTable extends InfoTableWidget<SampleType> {
         -1 };
 
     public SampleTypeInfoTable(Composite parent,
-        Collection<SampleType> sampleTypeCollection) {
+        Collection<SampleTypeWrapper> sampleTypeCollection) {
         super(parent, sampleTypeCollection, HEADINGS, BOUNDS);
     }
 }
