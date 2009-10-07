@@ -308,16 +308,46 @@ public class ContainerWrapper extends ModelWrapper<Container> implements
         propertyChangeSupport.firePropertyChange("label", oldLabel, label);
     }
 
-    public Collection<SamplePosition> getSamplePositionCollection() {
-        return wrappedObject.getSamplePositionCollection();
+    @SuppressWarnings("unchecked")
+    public List<SamplePositionWrapper> getSamplePositionCollection() {
+        List<SamplePositionWrapper> samplePositionCollection = (List<SamplePositionWrapper>) propertiesMap
+            .get("samplePositionCollection");
+        if (samplePositionCollection == null) {
+            Collection<SamplePosition> children = wrappedObject
+                .getSamplePositionCollection();
+            if (children != null) {
+                samplePositionCollection = new ArrayList<SamplePositionWrapper>();
+                for (SamplePosition position : children) {
+                    samplePositionCollection.add(new SamplePositionWrapper(
+                        appService, position));
+                }
+                propertiesMap.put("samplePositionCollection",
+                    samplePositionCollection);
+            }
+        }
+        return samplePositionCollection;
     }
 
-    public void setSamplePositionCollection(Collection<SamplePosition> positions) {
+    public void setSamplePositionCollection(
+        Collection<SamplePosition> positions, boolean setNull) {
         Collection<SamplePosition> oldPositions = wrappedObject
             .getSamplePositionCollection();
         wrappedObject.setSamplePositionCollection(positions);
         propertyChangeSupport.firePropertyChange("samplePositionCollection",
             oldPositions, positions);
+        if (setNull) {
+            propertiesMap.put("samplePositionCollection", null);
+        }
+    }
+
+    public void setSamplePositionCollection(
+        List<SamplePositionWrapper> positions) {
+        Collection<SamplePosition> positionsObjects = new HashSet<SamplePosition>();
+        for (SamplePositionWrapper pos : positions) {
+            positionsObjects.add(pos.getWrappedObject());
+        }
+        setSamplePositionCollection(positionsObjects, false);
+        propertiesMap.put("samplePositionCollection", positions);
     }
 
     /**

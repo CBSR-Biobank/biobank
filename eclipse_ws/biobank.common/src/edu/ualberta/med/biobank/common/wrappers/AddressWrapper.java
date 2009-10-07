@@ -11,6 +11,10 @@ public class AddressWrapper extends ModelWrapper<Address> {
         super(appService, wrappedObject);
     }
 
+    public AddressWrapper(WritableApplicationService appService) {
+        super(appService);
+    }
+
     @Override
     public Class<Address> getWrappedClass() {
         return Address.class;

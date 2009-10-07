@@ -12,17 +12,17 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
 
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
 import edu.ualberta.med.biobank.forms.PatientVisitEntryForm;
 import edu.ualberta.med.biobank.forms.PatientVisitViewForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
-import edu.ualberta.med.biobank.model.Sample;
 
 public class PatientVisitAdapter extends AdapterBase {
 
     /**
      * Sample selected in this patient visit
      */
-    private Sample selectedSample;
+    private SampleWrapper selectedSample;
 
     public PatientVisitAdapter(AdapterBase parent,
         PatientVisitWrapper patientVisitWrapper) {
@@ -44,7 +44,7 @@ public class PatientVisitAdapter extends AdapterBase {
 
     @Override
     public String getTreeText() {
-        Collection<Sample> samples = getWrapper().getSampleCollection();
+        Collection<SampleWrapper> samples = getWrapper().getSampleCollection();
         int total = 0;
         if (samples != null) {
             total = samples.size();
@@ -95,14 +95,14 @@ public class PatientVisitAdapter extends AdapterBase {
 
     @Override
     public AdapterBase accept(NodeSearchVisitor visitor) {
-        return visitor.visit(this);
+        return null;
     }
 
-    public void setSelectedSample(Sample sample) {
+    public void setSelectedSample(SampleWrapper sample) {
         this.selectedSample = sample;
     }
 
-    public Sample getSelectedSample() {
+    public SampleWrapper getSelectedSample() {
         return selectedSample;
     }
 

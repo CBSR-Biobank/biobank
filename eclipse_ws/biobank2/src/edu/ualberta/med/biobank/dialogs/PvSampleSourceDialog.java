@@ -20,7 +20,6 @@ import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.common.wrappers.PvSampleSourceWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleSourceWrapper;
-import edu.ualberta.med.biobank.model.SampleSource;
 import edu.ualberta.med.biobank.validators.IntegerNumberValidator;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
 
@@ -78,7 +77,7 @@ public class PvSampleSourceDialog extends BiobankDialog {
                 .toArray(new String[sortedKeys.size()]), sampleSourceSelection,
             new NonEmptyString("a sample source should be selected"));
 
-        SampleSource ss = pvSampleSource.getSampleSource();
+        SampleSourceWrapper ss = pvSampleSource.getSampleSource();
         if (ss != null) {
             sampleSourcesCombo.setText(ss.getName());
         }

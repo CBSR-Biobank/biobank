@@ -9,6 +9,7 @@ import java.util.List;
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.model.SampleSource;
 import edu.ualberta.med.biobank.model.Study;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class SampleSourceWrapper extends ModelWrapper<SampleSource> implements
@@ -17,6 +18,10 @@ public class SampleSourceWrapper extends ModelWrapper<SampleSource> implements
     public SampleSourceWrapper(WritableApplicationService appService,
         SampleSource wrappedObject) {
         super(appService, wrappedObject);
+    }
+
+    public SampleSourceWrapper(WritableApplicationService appService) {
+        super(appService);
     }
 
     public String getName() {
@@ -92,4 +97,14 @@ public class SampleSourceWrapper extends ModelWrapper<SampleSource> implements
             .equals(wrapperName) ? 0 : -1));
     }
 
+    public static List<SampleSourceWrapper> getAllSampleSources(
+        WritableApplicationService appService) throws ApplicationException {
+        List<SampleSource> list = appService.search(SampleSource.class,
+            new SampleSource());
+        List<SampleSourceWrapper> wrappers = new ArrayList<SampleSourceWrapper>();
+        for (SampleSource ss : list) {
+            wrappers.add(new SampleSourceWrapper(appService, ss));
+        }
+        return wrappers;
+    }
 }

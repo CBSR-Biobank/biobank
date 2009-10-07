@@ -20,6 +20,10 @@ public class ContainerLabelingSchemeWrapper extends
         super(appService, wrappedObject);
     }
 
+    public ContainerLabelingSchemeWrapper(WritableApplicationService appService) {
+        super(appService);
+    }
+
     @Override
     public Class<ContainerLabelingScheme> getWrappedClass() {
         return ContainerLabelingScheme.class;

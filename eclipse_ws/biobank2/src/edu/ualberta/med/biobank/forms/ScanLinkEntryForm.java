@@ -48,7 +48,6 @@ import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
 import edu.ualberta.med.biobank.forms.listener.EnterKeyToNextFieldListener;
 import edu.ualberta.med.biobank.model.PalletCell;
-import edu.ualberta.med.biobank.model.Sample;
 import edu.ualberta.med.biobank.model.SampleCellStatus;
 import edu.ualberta.med.biobank.model.SampleStorage;
 import edu.ualberta.med.biobank.model.Study;
@@ -63,8 +62,6 @@ import edu.ualberta.med.biobank.widgets.listener.ScanPalletModificationListener;
 import edu.ualberta.med.scanlib.ScanCell;
 import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
 import gov.nih.nci.system.applicationservice.ApplicationException;
-import gov.nih.nci.system.query.SDKQuery;
-import gov.nih.nci.system.query.example.InsertExampleQuery;
 
 /**
  * Link samples to a patient visit
@@ -570,8 +567,7 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
         if (cell != null) {
             String value = cell.getValue();
             if (value != null) {
-                boolean exists = checkSampleExists(value);
-                if (exists) {
+                if (SampleWrapper.exists(appService, value)) {
                     cell.setStatus(SampleCellStatus.ERROR);
                     String msg = "Aliquot already in database";
                     cell.setInformation(msg);
@@ -588,20 +584,8 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
         return false;
     }
 
-    protected boolean checkSampleExists(String inventoryId)
-        throws ApplicationException {
-        Sample sample = new Sample();
-        sample.setInventoryId(inventoryId);
-        List<Sample> samples = appService.search(Sample.class, sample);
-        if (samples.size() == 0) {
-            return false;
-        }
-        return true;
-    }
-
     @Override
     protected void saveForm() throws Exception {
-        List<SDKQuery> queries = new ArrayList<SDKQuery>();
         PalletCell[][] cells = spw.getScannedElements();
         PatientVisitWrapper patientVisit = getSelectedPatientVisit();
         StringBuffer sb = new StringBuffer("Samples linked:");
@@ -619,8 +603,7 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
                     SampleWrapper sample = SampleWrapper.createNewSample(
                         appService, cell.getValue(), patientVisit, cell
                             .getType(), sampleStorages);
-                    queries.add(new InsertExampleQuery(sample
-                        .getWrappedObject()));
+                    sample.persist();
                     sb.append("\nLINKED: ").append(cell.getValue());
                     sb.append(" - patient: ").append(
                         patientVisit.getWrappedObject().getPatient()
@@ -633,7 +616,6 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
                 }
             }
         }
-        appService.executeBatchQuery(queries);
         appendLog("----");
         appendLog(sb.toString());
         appendLog("SCAN-LINK: " + nber + " samples linked to visit");

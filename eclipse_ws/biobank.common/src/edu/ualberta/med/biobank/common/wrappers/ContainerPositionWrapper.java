@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -24,8 +25,8 @@ public class ContainerPositionWrapper extends
 
     @Override
     protected String[] getPropertyChangesNames() {
-        List<String> properties = Arrays
-            .asList(super.getPropertyChangesNames());
+        List<String> properties = new ArrayList<String>(Arrays.asList(super
+            .getPropertyChangesNames()));
         properties.add("parentContainer");
         properties.add("container");
         return (String[]) properties.toArray();

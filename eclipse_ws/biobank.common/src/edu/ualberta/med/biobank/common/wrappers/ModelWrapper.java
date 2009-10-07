@@ -144,8 +144,8 @@ public abstract class ModelWrapper<E> {
             query = new InsertExampleQuery(wrappedObject);
         } else {
             E origObject = getObjectFromDatabase();
-            persistDependencies(origObject);
             query = new UpdateExampleQuery(wrappedObject);
+            persistDependencies(origObject);
         }
 
         SDKQueryResult result = appService.executeQuery(query);

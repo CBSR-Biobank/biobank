@@ -9,22 +9,22 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
 
+import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
 import edu.ualberta.med.biobank.forms.SampleViewForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
-import edu.ualberta.med.biobank.model.Sample;
 
 public class SampleAdapter extends AdapterBase {
 
-    public SampleAdapter(AdapterBase parent, Sample sample) {
+    public SampleAdapter(AdapterBase parent, SampleWrapper sample) {
         super(parent, sample);
     }
 
-    public void setSample(Sample sample) {
+    public void setSample(SampleWrapper sample) {
         object = sample;
     }
 
-    public Sample getSample() {
-        return (Sample) object;
+    public SampleWrapper getSample() {
+        return (SampleWrapper) object;
     }
 
     @Override
@@ -34,7 +34,7 @@ public class SampleAdapter extends AdapterBase {
 
     @Override
     public String getName() {
-        Sample sample = getSample();
+        SampleWrapper sample = getSample();
         Assert.isNotNull(sample, "Clinic is null");
         return sample.getInventoryId();
     }

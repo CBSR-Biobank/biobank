@@ -17,6 +17,7 @@ import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PvInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PvSampleSourceWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SampleSourceWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
@@ -24,8 +25,6 @@ import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.ClinicStudyInfo;
 import edu.ualberta.med.biobank.model.Contact;
-import edu.ualberta.med.biobank.model.Sample;
-import edu.ualberta.med.biobank.model.SampleSource;
 import edu.ualberta.med.biobank.model.SampleStorage;
 import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.model.Site;
@@ -114,8 +113,8 @@ public class BiobankLabelProvider extends LabelProvider implements
             case 3:
                 return "" + container.getTemperature();
             }
-        } else if (element instanceof Sample) {
-            final Sample sample = (Sample) element;
+        } else if (element instanceof SampleWrapper) {
+            final SampleWrapper sample = (SampleWrapper) element;
             switch (columnIndex) {
             case 0:
                 return sample.getInventoryId();
@@ -123,7 +122,7 @@ public class BiobankLabelProvider extends LabelProvider implements
                 return sample.getSampleType() == null ? "" : sample
                     .getSampleType().getName();
             case 2:
-                return SampleWrapper.getPositionString(sample);
+                return sample.getPositionString();
             case 3:
                 return sample.getLinkDate() == null ? ""
                     : new SimpleDateFormat(BioBankPlugin.DATE_TIME_FORMAT)
@@ -202,10 +201,10 @@ public class BiobankLabelProvider extends LabelProvider implements
                 return "";
             }
             return getContactWrapperColumnIndex(info.contact, columnIndex);
-        } else if (element instanceof SampleSource) {
-            SampleSource info = (SampleSource) element;
+        } else if (element instanceof SampleSourceWrapper) {
+            SampleSourceWrapper source = (SampleSourceWrapper) element;
             if (columnIndex == 0) {
-                return info.getName();
+                return source.getName();
             } else {
                 Assert.isTrue(false, "invalid column index: " + columnIndex);
             }

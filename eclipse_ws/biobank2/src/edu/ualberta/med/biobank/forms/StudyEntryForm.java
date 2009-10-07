@@ -26,7 +26,6 @@ import edu.ualberta.med.biobank.common.wrappers.SampleSourceWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.PvInfo;
-import edu.ualberta.med.biobank.model.SampleSource;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
@@ -182,12 +181,7 @@ public class StudyEntryForm extends BiobankEntryForm {
         Composite client = createSectionWithClient("Source Vessels");
         Collection<SampleSourceWrapper> studySampleSources = studyWrapper
             .getSampleSourceCollection();
-        allSampleSources = new ArrayList<SampleSourceWrapper>();
-        List<SampleSource> result = appService.search(SampleSource.class,
-            new SampleSource());
-        for (SampleSource ss : result) {
-            allSampleSources.add(new SampleSourceWrapper(appService, ss));
-        }
+        allSampleSources = SampleSourceWrapper.getAllSampleSources(appService);
 
         ListOrderedMap availSampleSource = new ListOrderedMap();
         List<Integer> selSampleSource = new ArrayList<Integer>();

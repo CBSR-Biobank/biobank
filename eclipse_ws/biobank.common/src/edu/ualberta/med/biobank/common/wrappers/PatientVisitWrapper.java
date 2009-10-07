@@ -35,7 +35,8 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> implements
     @Override
     protected String[] getPropertyChangesNames() {
         return new String[] { "patient", "dateDrawn", "dateProcessed",
-            "dateReceived", "clinic", "comments", "pvInfoDataCollection" };
+            "dateReceived", "clinic", "comments", "pvInfoDataCollection",
+            "sampleCollection" };
     }
 
     public Date getDateDrawn() {
@@ -82,12 +83,41 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> implements
             newPatient);
     }
 
-    public Collection<Sample> getSampleCollection() {
-        return wrappedObject.getSampleCollection();
+    @SuppressWarnings("unchecked")
+    public Collection<SampleWrapper> getSampleCollection() {
+        List<SampleWrapper> sampleCollection = (List<SampleWrapper>) propertiesMap
+            .get("sampleCollection");
+        if (sampleCollection == null) {
+            Collection<Sample> children = wrappedObject.getSampleCollection();
+            if (children != null) {
+                sampleCollection = new ArrayList<SampleWrapper>();
+                for (Sample sample : children) {
+                    sampleCollection.add(new SampleWrapper(appService, sample));
+                }
+                propertiesMap.put("sampleCollection", sampleCollection);
+            }
+        }
+        return sampleCollection;
     }
 
-    public void setSampleCollection(Collection<Sample> sampleCollection) {
+    public void setSampleCollection(Collection<Sample> sampleCollection,
+        boolean setNull) {
+        Collection<Sample> oldCollection = wrappedObject.getSampleCollection();
         wrappedObject.setSampleCollection(sampleCollection);
+        propertyChangeSupport.firePropertyChange("sampleCollection",
+            oldCollection, sampleCollection);
+        if (setNull) {
+            propertiesMap.put("sampleCollection", null);
+        }
+    }
+
+    public void setSampleCollection(Collection<SampleWrapper> sampleCollection) {
+        Collection<Sample> collection = new HashSet<Sample>();
+        for (SampleWrapper sample : sampleCollection) {
+            collection.add(sample.getWrappedObject());
+        }
+        setSampleCollection(collection, false);
+        propertiesMap.put("sampleCollection", sampleCollection);
     }
 
     public Collection<SampleWrapper> getSampleWrapperCollection() {
@@ -230,14 +260,7 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> implements
     @Override
     protected void persistDependencies(PatientVisit origObject)
         throws BiobankCheckException, Exception {
-
-        // for (PvInfoDataWrapper pvInfoData : getPvInfoDataCollection()) {
-        // pvInfoData.persist();
-        // }
-        // removeDeletedPvSampleSources(origObject);
-        // for (PvSampleSourceWrapper ss : getPvSampleSourceCollection()) {
-        // ss.persist();
-        // }
+        removeDeletedPvSampleSources(origObject);
     }
 
     private void removeDeletedPvSampleSources(PatientVisit pvDatabase)

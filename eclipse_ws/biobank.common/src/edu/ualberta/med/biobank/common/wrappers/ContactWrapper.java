@@ -20,6 +20,10 @@ public class ContactWrapper extends ModelWrapper<Contact> implements
         super(appService, wrappedObject);
     }
 
+    public ContactWrapper(WritableApplicationService appService) {
+        super(appService);
+    }
+
     public String getName() {
         return wrappedObject.getName();
     }

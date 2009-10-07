@@ -28,6 +28,10 @@ public class SampleWrapper extends ModelWrapper<Sample> {
         super(appService, wrappedObject);
     }
 
+    public SampleWrapper(WritableApplicationService appService) {
+        super(appService);
+    }
+
     public void setInventoryId(String inventoryId) {
         String oldInventoryId = inventoryId;
         wrappedObject.setInventoryId(inventoryId);
@@ -38,7 +42,7 @@ public class SampleWrapper extends ModelWrapper<Sample> {
     @Override
     protected String[] getPropertyChangesNames() {
         return new String[] { "inventoryId", "patientVisit", "samplePosition",
-            "linkDate", "sampleType" };
+            "linkDate", "sampleType", "quantity", "oldComment", "quantityUsed" };
     }
 
     @Override
@@ -97,7 +101,7 @@ public class SampleWrapper extends ModelWrapper<Sample> {
             positionString, parentContainer.getContainerType()
                 .getWrappedObject());
         if ((rcp.row > -1) && (rcp.col > -1)) {
-            SamplePosition sp = getSamplePosition();
+            SamplePosition sp = wrappedObject.getSamplePosition();
             if (sp == null) {
                 sp = new SamplePosition();
                 setSamplePosition(sp);
@@ -113,18 +117,26 @@ public class SampleWrapper extends ModelWrapper<Sample> {
     }
 
     public void setSamplePosition(SamplePosition sp) {
-        SamplePosition old = getSamplePosition();
+        SamplePosition old = wrappedObject.getSamplePosition();
         wrappedObject.setSamplePosition(sp);
         propertyChangeSupport.firePropertyChange("samplePosition", old, sp);
     }
 
-    public SamplePosition getSamplePosition() {
-        return wrappedObject.getSamplePosition();
+    public void setSamplePosition(SamplePositionWrapper sp) {
+        setSamplePosition(sp.wrappedObject);
+    }
+
+    public SamplePositionWrapper getSamplePosition() {
+        SamplePosition sp = wrappedObject.getSamplePosition();
+        if (sp == null) {
+            return null;
+        }
+        return new SamplePositionWrapper(appService, sp);
     }
 
     public void checkPosition(ContainerWrapper parentContainer)
         throws BiobankCheckException, ApplicationException {
-        SamplePosition sp = getSamplePosition();
+        SamplePosition sp = wrappedObject.getSamplePosition();
         HQLCriteria criteria = new HQLCriteria("from " + Sample.class.getName()
             + " where samplePosition.row=? and samplePosition.col=?"
             + " and samplePosition.container=?", Arrays.asList(new Object[] {
@@ -165,24 +177,44 @@ public class SampleWrapper extends ModelWrapper<Sample> {
     }
 
     public void setQuantity(Double quantity) {
+        Double oldQuantity = wrappedObject.getQuantity();
         wrappedObject.setQuantity(quantity);
+        propertyChangeSupport.firePropertyChange("quantity", oldQuantity,
+            quantity);
+    }
+
+    public Double getQuantityUsed() {
+        return wrappedObject.getQuantityUsed();
+    }
+
+    public void setQuantityUsed(Double quantityUsed) {
+        Double oldQuantityUsed = wrappedObject.getQuantityUsed();
+        wrappedObject.setQuantityUsed(quantityUsed);
+        propertyChangeSupport.firePropertyChange("quantityUsed",
+            oldQuantityUsed, quantityUsed);
     }
 
     public Double getQuantity() {
         return wrappedObject.getQuantity();
     }
 
-    public static String getPositionString(Sample sample) {
-        return getPositionString(sample, true);
+    public void setComment(String comment) {
+        String oldComment = wrappedObject.getComment();
+        wrappedObject.setComment(comment);
+        propertyChangeSupport
+            .firePropertyChange("comment", oldComment, comment);
     }
 
-    public static String getPositionString(Sample sample, boolean fullString) {
-        SampleWrapper wrapper = new SampleWrapper(null, sample);
-        return wrapper.getPositionString(fullString);
+    public String getComment() {
+        return wrappedObject.getComment();
+    }
+
+    public String getPositionString() {
+        return getPositionString(true);
     }
 
     public String getPositionString(boolean fullString) {
-        SamplePosition position = getSamplePosition();
+        SamplePosition position = wrappedObject.getSamplePosition();
         if (position == null) {
             return "none";
         }
@@ -266,6 +298,18 @@ public class SampleWrapper extends ModelWrapper<Sample> {
             list.add(new SampleWrapper(appService, sample));
         }
         return list;
+    }
+
+    public static boolean exists(WritableApplicationService appService,
+        String inventoryId) throws ApplicationException {
+
+        Sample sample = new Sample();
+        sample.setInventoryId(inventoryId);
+        List<Sample> samples = appService.search(Sample.class, sample);
+        if (samples.size() == 0) {
+            return false;
+        }
+        return true;
     }
 
 }

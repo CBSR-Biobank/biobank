@@ -39,12 +39,12 @@ import edu.ualberta.med.biobank.common.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerPositionWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SamplePositionWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
 import edu.ualberta.med.biobank.forms.listener.EnterKeyToNextFieldListener;
 import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.PalletCell;
 import edu.ualberta.med.biobank.model.SampleCellStatus;
-import edu.ualberta.med.biobank.model.SamplePosition;
 import edu.ualberta.med.biobank.preferences.PreferenceConstants;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
 import edu.ualberta.med.biobank.validators.PalletBarCodeValidator;
@@ -497,35 +497,31 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
     @Override
     protected void saveForm() throws Exception {
         currentPalletWrapper.persist();
-
-        // List<SDKQuery> queries = new ArrayList<SDKQuery>();
         int totalNb = 0;
         try {
             for (int i = 0; i < cells.length; i++) {
                 for (int j = 0; j < cells[i].length; j++) {
                     PalletCell cell = cells[i][j];
-                    // cell.getStatus()
                     if (cell != null) {
                         SampleWrapper sample = cell.getSample();
-                        if (sample != null
-                            && sample.getSamplePosition() == null) {
-                            SamplePosition samplePosition = new SamplePosition();
+                        if (sample != null) {
+                            SamplePositionWrapper samplePosition = sample
+                                .getSamplePosition();
+                            if (samplePosition == null) {
+                                samplePosition = new SamplePositionWrapper(
+                                    appService);
+                                sample.setSamplePosition(samplePosition);
+                            }
                             samplePosition.setRow(i);
                             samplePosition.setCol(j);
-                            samplePosition.setContainer(currentPalletWrapper
-                                .getWrappedObject());
-                            samplePosition.setSample(sample.getWrappedObject());
-                            sample.setSamplePosition(samplePosition);
-                            // queries.add(new
-                            // UpdateExampleQuery(sample.getWrappedObject()));
+                            samplePosition.setContainer(currentPalletWrapper);
+                            samplePosition.setSample(sample);
                             sample.persist();
                             totalNb++;
                         }
                     }
                 }
             }
-            // TODO got a access denied exception with this. why ?
-            // appService.executeBatchQuery(queries);
         } catch (Exception ex) {
             scanLaunchedValue.setValue(false);
             throw ex;
@@ -649,12 +645,12 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
                 .getCapacity();
             currentPalletSamples = new SampleWrapper[palletCapacity
                 .getRowCapacity()][palletCapacity.getColCapacity()];
-            Collection<SamplePosition> positions = currentPalletWrapper
+            Collection<SamplePositionWrapper> positions = currentPalletWrapper
                 .getSamplePositionCollection();
             if (positions != null) {
-                for (SamplePosition position : positions) {
-                    currentPalletSamples[position.getRow()][position.getCol()] = new SampleWrapper(
-                        appService, position.getSample());
+                for (SamplePositionWrapper position : positions) {
+                    currentPalletSamples[position.getRow()][position.getCol()] = position
+                        .getSample();
                 }
             }
         }

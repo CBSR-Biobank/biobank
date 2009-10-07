@@ -29,7 +29,6 @@ import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PvSampleSourceWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleSourceWrapper;
 import edu.ualberta.med.biobank.dialogs.PvSampleSourceDialog;
-import edu.ualberta.med.biobank.model.SampleSource;
 import edu.ualberta.med.biobank.widgets.infotables.PvSampleSourceInfoTable;
 import edu.ualberta.med.biobank.widgets.listener.BiobankEntryFormWidgetListener;
 import edu.ualberta.med.biobank.widgets.listener.MultiSelectEvent;
@@ -145,8 +144,7 @@ public class PvSampleSourceEntryWidget extends BiobankWidget {
             public void widgetSelected(SelectionEvent event) {
                 PvSampleSourceWrapper pvss = pvSampleSourceTable.getSelection();
                 Set<SampleSourceWrapper> allowedSampleSources = getNonDuplicateSampleSources();
-                allowedSampleSources.add(new SampleSourceWrapper(SessionManager
-                    .getAppService(), pvss.getSampleSource()));
+                allowedSampleSources.add(pvss.getSampleSource());
                 addOrEditPvSampleSource(false, pvss, allowedSampleSources);
             }
 
@@ -170,15 +168,14 @@ public class PvSampleSourceEntryWidget extends BiobankWidget {
                     Collection<PvSampleSourceWrapper> ssToDelete = new HashSet<PvSampleSourceWrapper>();
                     for (PvSampleSourceWrapper ss : selectedPvSampleSources) {
                         if (ss.getSampleSource().getId().equals(
-                            pvss.getSampleSource().getId()))
+                            pvss.getSampleSource().getId())) {
                             ssToDelete.add(ss);
+                            // ss.setPatientVisit((PatientVisit) null);
+                        }
                     }
-
-                    for (PvSampleSourceWrapper pvssDel : ssToDelete) {
-                        selectedPvSampleSources.remove(pvssDel);
-                    }
-
+                    selectedPvSampleSources.removeAll(ssToDelete);
                     pvSampleSourceTable.setCollection(selectedPvSampleSources);
+                    notifyListeners();
                 }
             }
 
@@ -189,13 +186,8 @@ public class PvSampleSourceEntryWidget extends BiobankWidget {
 
     private void getSampleSources() {
         try {
-            List<SampleSource> sampleSources = SessionManager.getAppService()
-                .search(SampleSource.class, new SampleSource());
-            allSampleSources = new ArrayList<SampleSourceWrapper>();
-            for (SampleSource ss : sampleSources) {
-                allSampleSources.add(new SampleSourceWrapper(SessionManager
-                    .getAppService(), ss));
-            }
+            allSampleSources = SampleSourceWrapper
+                .getAllSampleSources(SessionManager.getAppService());
         } catch (final RemoteConnectFailureException exp) {
             BioBankPlugin.openRemoteConnectErrorMessage();
         } catch (ApplicationException e) {

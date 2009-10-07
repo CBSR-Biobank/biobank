@@ -46,7 +46,6 @@ import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
 import edu.ualberta.med.biobank.forms.listener.EnterKeyToNextFieldListener;
-import edu.ualberta.med.biobank.model.Sample;
 import edu.ualberta.med.biobank.preferences.PreferenceConstants;
 import edu.ualberta.med.biobank.validators.CabinetLabelValidator;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
@@ -99,7 +98,7 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
     protected void init() {
         super.init();
         setPartName("Cabinet Link/Assign");
-        sampleWrapper = new SampleWrapper(appService, new Sample());
+        sampleWrapper = new SampleWrapper(appService);
         IPreferenceStore store = BioBankPlugin.getDefault()
             .getPreferenceStore();
         cabinetNameContains = store
@@ -408,16 +407,20 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
 
     @Override
     public void reset() {
-        sampleWrapper.setWrappedObject(new Sample());
-        cabinet = null;
-        drawer = null;
-        bin = null;
-        cabinetWidget.setSelectedBox(null);
-        drawerWidget.setSelectedBin(0);
-        resultShownValue.setValue(Boolean.FALSE);
-        selectedSampleTypeValue.setValue("");
-        inventoryIdText.setText("");
-        positionText.setText("");
+        try {
+            sampleWrapper.reset();
+            cabinet = null;
+            drawer = null;
+            bin = null;
+            cabinetWidget.setSelectedBox(null);
+            drawerWidget.setSelectedBin(0);
+            resultShownValue.setValue(Boolean.FALSE);
+            selectedSampleTypeValue.setValue("");
+            inventoryIdText.setText("");
+            positionText.setText("");
+        } catch (Exception e) {
+            SessionManager.getLogger().error("Can't reset the form", e);
+        }
     }
 
     @Override

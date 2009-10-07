@@ -47,8 +47,11 @@ public class PvSampleSourceWrapper extends ModelWrapper<PvSampleSource> {
     }
 
     public PatientVisitWrapper getPatientVisit() {
-        return new PatientVisitWrapper(appService, wrappedObject
-            .getPatientVisit());
+        PatientVisit pv = wrappedObject.getPatientVisit();
+        if (pv == null) {
+            return null;
+        }
+        return new PatientVisitWrapper(appService, pv);
     }
 
     public void setPatientVisit(PatientVisit pv) {
@@ -61,12 +64,16 @@ public class PvSampleSourceWrapper extends ModelWrapper<PvSampleSource> {
         setPatientVisit(pv.wrappedObject);
     }
 
-    public SampleSource getSampleSource() {
-        return wrappedObject.getSampleSource();
+    public SampleSourceWrapper getSampleSource() {
+        SampleSource ss = wrappedObject.getSampleSource();
+        if (ss == null) {
+            return null;
+        }
+        return new SampleSourceWrapper(appService, ss);
     }
 
     public void setSampleSource(SampleSource ss) {
-        SampleSource oldSs = getSampleSource();
+        SampleSource oldSs = wrappedObject.getSampleSource();
         wrappedObject.setSampleSource(ss);
         propertyChangeSupport.firePropertyChange("sampleSource", oldSs, ss);
     }
