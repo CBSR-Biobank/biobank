@@ -210,19 +210,8 @@
 		<copy todir="${eclipse.proj.dir.importer}/lib">
 			<fileset dir="${cacore.sdk.dir}/output/biobank2/package/remote-client/lib" />
 		</copy>
-		<copy todir="${eclipse.proj.dir.importer}/conf">
-			<fileset dir="${cacore.sdk.dir}/output/biobank2/package/remote-client/conf">
-				<include name="application-config-client*.xml" />
-			</fileset>
-		</copy>
-
 		<copy todir="${eclipse.proj.dir.junit}/lib">
 			<fileset dir="${cacore.sdk.dir}/output/biobank2/package/remote-client/lib" />
-		</copy>
-		<copy todir="${eclipse.proj.dir.junit}/conf">
-			<fileset dir="${cacore.sdk.dir}/output/biobank2/package/remote-client/conf">
-				<include name="application-config-client*.xml" />
-			</fileset>
 		</copy>
 	</target>
 

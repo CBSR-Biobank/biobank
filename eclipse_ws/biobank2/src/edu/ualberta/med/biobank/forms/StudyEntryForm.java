@@ -23,7 +23,6 @@ import edu.ualberta.med.biobank.common.wrappers.PvInfoPossibleWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PvInfoTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PvInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleSourceWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.PvInfo;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
@@ -291,6 +290,7 @@ public class StudyEntryForm extends BiobankEntryForm {
 
     @Override
     protected void saveForm() throws Exception {
+        studyWrapper.reload();
         // FIXME should be transfer to persitCheck method or others set Methods
         // of the wrapper
 
@@ -334,8 +334,9 @@ public class StudyEntryForm extends BiobankEntryForm {
             pvInfoList.add(pvInfo);
         }
         studyWrapper.setPvInfoCollection(pvInfoList);
+        studyWrapper.setSampleStorageCollection(sampleStorageEntryWidget
+            .getSampleStorage());
         saveStudy();
-        saveSampleStorage();
 
         studyAdapter.getParent().performExpand();
     }
@@ -367,12 +368,6 @@ public class StudyEntryForm extends BiobankEntryForm {
         SiteAdapter siteAdapter = studyAdapter
             .getParentFromClass(SiteAdapter.class);
         studyWrapper.setSiteWrapper(siteAdapter.getWrapper());
-    }
-
-    private void saveSampleStorage() throws Exception {
-        List<SampleStorageWrapper> ssCollection = sampleStorageEntryWidget
-            .getSampleStorage();
-        studyWrapper.setSampleStorageCollection(ssCollection);
     }
 
     @Override
