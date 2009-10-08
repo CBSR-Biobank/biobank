@@ -1,7 +1,5 @@
 package edu.ualberta.med.biobank.widgets;
 
-import java.lang.reflect.Field;
-
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
@@ -52,8 +50,8 @@ public class AttributeQueryClause extends AbstractQueryClause {
     };
 
     public AttributeQueryClause(Composite parent, Class<?> modelObjectClass,
-        String name, ReportsView view) {
-        super(modelObjectClass, name, view);
+        String alias, ReportsView view) {
+        super(modelObjectClass, alias, view);
 
         where = new Label(parent, SWT.None);
         where.setText("Where: ");
@@ -77,11 +75,6 @@ public class AttributeQueryClause extends AbstractQueryClause {
             .get(BioBankPlugin.IMG_DELETE));
         deleteButton.addSelectionListener(deleteListener);
 
-    }
-
-    public AttributeQueryClause(Composite parent, Field modelObjectField,
-        String name, ReportsView view) {
-        this(parent, modelObjectField.getType(), name, view);
     }
 
     @Override

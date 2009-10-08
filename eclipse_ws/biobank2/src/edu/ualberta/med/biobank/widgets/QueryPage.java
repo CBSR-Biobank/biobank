@@ -1,8 +1,7 @@
 package edu.ualberta.med.biobank.widgets;
 
-import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.jface.viewers.ComboViewer;
@@ -35,7 +34,7 @@ public class QueryPage extends Composite {
     private ReportsView view;
 
     private List<Class<?>> searchableModelObjects;
-    private List<Field> modelObjectFields;
+    private List<Method> modelObjectMethods;
     private ComboViewer selectedTypeCombo;
     private AttributeQueryClause attributeClause;
     private List<ModelObjectQuery> modelObjectClauses;
@@ -49,7 +48,7 @@ public class QueryPage extends Composite {
         setLayout(queryLayout);
 
         searchableModelObjects = new ArrayList<Class<?>>();
-        modelObjectFields = new ArrayList<Field>();
+        modelObjectMethods = new ArrayList<Method>();
 
         createSearchablesList();
 
@@ -91,9 +90,11 @@ public class QueryPage extends Composite {
         IStructuredSelection typeSelection = (IStructuredSelection) selectedTypeCombo
             .getSelection();
         Class<?> type = (Class<?>) typeSelection.getFirstElement();
-        Field[] classFields = type.getDeclaredFields();
+        // Field[] classFields = type.getDeclaredFields();
+        List<Method> methods = filterMethods(type.getDeclaredMethods(), true);
 
-        attributeClause = new AttributeQueryClause(whereBars, type, null, view);
+        attributeClause = new AttributeQueryClause(whereBars, type,
+            AttributeQueryClause.getText(type.getName()), view);
 
         modelObjectClauses = new ArrayList<ModelObjectQuery>();
 
@@ -109,26 +110,40 @@ public class QueryPage extends Composite {
         subSection.setLayoutData(colSpanInfo);
 
         // update sub-objects
-        modelObjectFields.clear();
-        initModelObjectFields(classFields);
-        for (Field field : modelObjectFields)
-            modelObjectClauses
-                .add(new ModelObjectQuery(subSection, field, view));
+
+        modelObjectMethods.clear();
+        initModelObjectClasses(methods);
+        for (Method method : modelObjectMethods)
+            modelObjectClauses.add(new ModelObjectQuery(subSection, method,
+                AttributeQueryClause.getText(type.getName()), view));
 
         QueryPage.this.parent.layout(true, true);
 
     }
 
-    private void initModelObjectFields(Field[] classFields) {
-        for (Field field : classFields) {
-            if (!field.getType().equals(String.class)
-                && !field.getType().equals(Integer.class)
-                && !field.getType().equals(Double.class)
-                && !field.getType().equals(Collection.class)) {
-                if (!field.getType().isPrimitive())
-                    modelObjectFields.add(field);
-            }
+    private void initModelObjectClasses(List<Method> methods) {
+        for (Method method : methods) {
+            if (!method.getReturnType().equals(String.class)
+                && !method.getReturnType().equals(Integer.class)
+                && !method.getReturnType().equals(Double.class)
+                && !method.getReturnType().equals(Boolean.class))
+                if (!method.getReturnType().isPrimitive())
+                    modelObjectMethods.add(method);
         }
+    }
+
+    public static List<Method> filterMethods(Method[] unfiltered,
+        boolean includeCollections) {
+        List<Method> filtered = new ArrayList<Method>();
+        for (int i = 0; i < unfiltered.length; i++)
+            if (unfiltered[i].getName().startsWith("get")
+                && !unfiltered[i].getName().contains("Proxied")
+                && !unfiltered[i].getName().contains("Call")
+                && !unfiltered[i].getName().contains("Advisors")
+                && !unfiltered[i].getName().contains("Target")
+                && (!unfiltered[i].getName().contains("Collection") || includeCollections))
+                filtered.add(unfiltered[i]);
+        return filtered;
     }
 
     private void createSearchablesList() {
@@ -146,27 +161,46 @@ public class QueryPage extends Composite {
         IStructuredSelection typeSelection = (IStructuredSelection) selectedTypeCombo
             .getSelection();
         Class<?> type = (Class<?>) typeSelection.getFirstElement();
-
-        String query = "from " + type.getName() + " where ";
+        String query = "select " + AttributeQueryClause.getText(type.getName());
+        query += " from " + type.getName() + " as "
+            + AttributeQueryClause.getText(type.getName());
 
         List<Object> params = new ArrayList<Object>();
 
-        HQLCriteria attributeCriteria = attributeClause.getClause();
-        query += attributeCriteria.getHqlString();
-        params.addAll(attributeCriteria.getParameters());
-
+        // compute joins
+        String firstPart = "";
         for (int i = 0; i < modelObjectClauses.size(); i++) {
-            if (modelObjectClauses.get(i).getEnabled()) {
-                HQLCriteria modelObjectCriteria = modelObjectClauses.get(i)
-                    .getClause();
-                query += modelObjectCriteria.getHqlString();
-                params.addAll(modelObjectCriteria.getParameters());
+            ModelObjectQuery clause = modelObjectClauses.get(i);
+            if (clause.getJoin() != null) {
+                firstPart += " left join ";
+                firstPart += clause.getJoin() + " ";
             }
         }
 
-        query = query.substring(0, query.length() - 4);
+        // compute clauses
+        String secondPart = "";
+        for (int i = 0; i < modelObjectClauses.size(); i++) {
+            HQLCriteria modelObjectCriteria = modelObjectClauses.get(i)
+                .getClause();
+            if (modelObjectCriteria == null)
+                continue;
+            secondPart += modelObjectCriteria.getHqlString();
+            params.addAll(modelObjectCriteria.getParameters());
+        }
+
+        HQLCriteria attributeCriteria = attributeClause.getClause();
+        if (attributeCriteria != null) {
+            secondPart += attributeCriteria.getHqlString();
+            params.addAll(attributeCriteria.getParameters());
+        }
+        if (firstPart.compareTo("") != 0)
+            query += firstPart;
+        if (secondPart.compareTo("") != 0) {
+            query += " where " + secondPart;
+            query = query.substring(0, query.length() - 4);
+        }
+
         HQLCriteria c = new HQLCriteria(query, params);
         return c;
     }
-
 }

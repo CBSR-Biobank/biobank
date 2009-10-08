@@ -1,8 +1,6 @@
 package edu.ualberta.med.biobank;
 
-import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerType;
-import edu.ualberta.med.biobank.model.Patient;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.client.ApplicationServiceProvider;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -22,19 +20,19 @@ public class HqlTester {
         appService = (WritableApplicationService) ApplicationServiceProvider
             .getApplicationServiceFromUrl("http://localhost:8080/biobank2",
                 "testuser", "test");
-
+        getBrokenQuery();
         // geTopContainerTypes();
         // getPatientIds();
-        // geContainerLike();
-        getTopContainers();
     }
 
     @SuppressWarnings("unused")
     private void getPatientIds() throws Exception {
-        HQLCriteria c = new HQLCriteria("select patients.id from "
-            + Patient.class.getName()
-            + " inner join patients.study as study where study.nameShort=?",
-            Arrays.asList(new Object[] { "BBP" }));
+        HQLCriteria c = new HQLCriteria("select patients.id"
+            + " from edu.ualberta.med.biobank.model.Patient as patients"
+            + " inner join patients.study as study"
+            + " where study.nameShort=?");
+
+        c.setParameters(Arrays.asList(new Object[] { "BBP" }));
 
         List<Integer> results = appService.query(c);
         for (Integer id : results) {
@@ -42,17 +40,26 @@ public class HqlTester {
         }
     }
 
-    @SuppressWarnings("unused")
     private void geTopContainerTypes() throws Exception {
-        HQLCriteria c = new HQLCriteria("from " + ContainerType.class.getName()
-            + " as cttop where cttop.id not in (select child.id"
-            + " from edu.ualberta.med.biobank.model.ContainerType as ct"
-            + " left join ct.childContainerTypeCollection as child "
-            + " where child.id!=null)");
+        HQLCriteria c = new HQLCriteria(
+            "from edu.ualberta.med.biobank.model.ContainerType as cttop"
+                + " where cttop.id not in (select child.id"
+                + " from edu.ualberta.med.biobank.model.ContainerType as ct"
+                + " left join ct.childContainerTypeCollection as child "
+                + " where child.id!=null)");
 
         List<ContainerType> results = appService.query(c);
         for (ContainerType ct : results) {
             System.out.println("geTopContainerTypes: " + ct.getName());
+        }
+    }
+
+    private void getBrokenQuery() throws Exception {
+        HQLCriteria c = new HQLCriteria(
+            "select containerType from edu.ualberta.med.biobank.model.ContainerType as containerType left join containerType.sampleTypeCollection as sampleTypeAlias  where sampleTypeAlias.name like '%blood%'");
+        List<Object> results = appService.query(c);
+        for (Object ct : results) {
+            System.out.println(ct.toString());
         }
     }
 
@@ -77,5 +84,4 @@ public class HqlTester {
             System.out.println("getTopContainers: " + container.getLabel());
         }
     }
-
 }
