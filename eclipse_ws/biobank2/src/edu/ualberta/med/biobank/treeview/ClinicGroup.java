@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.treeview;
 
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
@@ -21,6 +22,9 @@ import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Clinic;
 
 public class ClinicGroup extends AdapterBase {
+
+    private static Logger LOGGER = Logger
+        .getLogger(ClinicGroup.class.getName());
 
     public ClinicGroup(SiteAdapter parent, int id) {
         super(parent, id, "Clinics", true);
@@ -82,9 +86,8 @@ public class ClinicGroup extends AdapterBase {
                     }
                 }
         } catch (Exception e) {
-            SessionManager.getLogger().error(
-                "Error while loading clinic group children for site "
-                    + currentSite.getName(), e);
+            LOGGER.error("Error while loading clinic group children for site "
+                + currentSite.getName(), e);
         }
     }
 

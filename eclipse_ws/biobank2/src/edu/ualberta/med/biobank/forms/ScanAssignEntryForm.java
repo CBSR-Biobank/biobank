@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.forms;
 import java.util.Collection;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.databinding.beans.PojoObservables;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
@@ -57,6 +58,9 @@ import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ScanAssignEntryForm extends AbstractPatientAdminForm {
+
+    private static Logger LOGGER = Logger.getLogger(ScanAssignEntryForm.class
+        .getName());
 
     public static final String ID = "edu.ualberta.med.biobank.forms.ScanAssignEntryForm";
 
@@ -558,8 +562,7 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
             currentPalletWrapper.setSite(SessionManager.getInstance()
                 .getCurrentSiteWrapper());
         } catch (Exception e) {
-            SessionManager.getLogger().error(
-                "Error while reseting pallet values", e);
+            LOGGER.error("Error while reseting pallet values", e);
         }
     }
 

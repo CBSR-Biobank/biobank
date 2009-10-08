@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.views;
 
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
@@ -38,6 +39,9 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class PatientAdministrationView extends ViewPart implements
     IAdapterTreeView {
+
+    private static Logger LOGGER = Logger
+        .getLogger(PatientAdministrationView.class.getName());
 
     public static final String ID = "edu.ualberta.med.biobank.views.patientsAdmin";
 
@@ -181,7 +185,7 @@ public class PatientAdministrationView extends ViewPart implements
             } catch (PartInitException e) {
                 String msg = "Wasn't able to open the form";
                 BioBankPlugin.openError("Patient Form", msg);
-                SessionManager.getLogger().error(msg, e);
+                LOGGER.error(msg, e);
             }
         }
     }

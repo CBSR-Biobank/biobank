@@ -4,6 +4,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.custom.BusyIndicator;
@@ -16,7 +17,6 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
-import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.forms.input.FormInput;
@@ -27,6 +27,9 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
  * the tree are adapters for classes in the ORM model.
  */
 public abstract class AdapterBase {
+
+    private static Logger LOGGER = Logger
+        .getLogger(AdapterBase.class.getName());
 
     protected IDeltaListener listener = NullDeltaListener.getSoleInstance();
 
@@ -315,8 +318,7 @@ public abstract class AdapterBase {
             PlatformUI.getWorkbench().getActiveWorkbenchWindow()
                 .getActivePage().openEditor(input, id, true);
         } catch (PartInitException e) {
-            SessionManager.getLogger()
-                .error("Can't open form with id " + id, e);
+            LOGGER.error("Can't open form with id " + id, e);
         }
     }
 

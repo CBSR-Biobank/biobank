@@ -1,30 +1,21 @@
 package edu.ualberta.med.biobank;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.services.ISourceProviderService;
-import org.osgi.service.prefs.BackingStoreException;
-import org.osgi.service.prefs.Preferences;
 
-import edu.ualberta.med.biobank.common.utils.ModelUtils;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
-import edu.ualberta.med.biobank.model.Site;
-import edu.ualberta.med.biobank.rcp.Application;
 import edu.ualberta.med.biobank.rcp.SiteCombo;
 import edu.ualberta.med.biobank.sourceproviders.DebugState;
 import edu.ualberta.med.biobank.sourceproviders.SessionState;
-import edu.ualberta.med.biobank.sourceproviders.SiteSelectionState;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.NodeSearchVisitor;
 import edu.ualberta.med.biobank.treeview.RootNode;
@@ -34,16 +25,10 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class SessionManager {
 
-    private static final String SITE_PREF_NODE = "Site";
-
-    private static final String LAST_SERVER_PREF = "lastServer";
-
-    private static final String LAST_SITE_PREF = "lastSite";
+    private static Logger LOGGER = Logger.getLogger(SessionManager.class
+        .getName());
 
     private static SessionManager instance = null;
-
-    private static Logger log4j = Logger.getLogger(SessionManager.class
-        .getName());
 
     private SessionsView view;
 
@@ -51,15 +36,13 @@ public class SessionManager {
 
     private RootNode rootNode;
 
-    private SiteWrapper currentSiteWrapper;
     private SiteCombo siteCombo;
 
-    private List<SiteWrapper> currentSiteWrappers;
+    private SiteManager siteManager;
 
     private SessionManager() {
         super();
         rootNode = new RootNode();
-        currentSiteWrappers = new ArrayList<SiteWrapper>();
     }
 
     public static SessionManager getInstance() {
@@ -76,50 +59,36 @@ public class SessionManager {
 
     public void addSession(final WritableApplicationService appService,
         String serverName, String userName, Collection<SiteWrapper> sites) {
-        log4j.debug("addSession: " + serverName + ", user/" + userName);
+        LOGGER.debug("addSession: " + serverName + ", user/" + userName
+            + " numSites/" + sites.size());
         sessionAdapter = new SessionAdapter(rootNode, appService, 0,
             serverName, userName);
         rootNode.addChild(sessionAdapter);
-        getCurrentSite(serverName, sites);
-        updateSites(sites);
+
+        Assert.isNotNull(siteCombo, "site combo is null");
+
+        siteManager = new SiteManager(appService, serverName);
+        siteManager.setSiteCombo(siteCombo);
+        siteManager.getCurrentSite(serverName, sites);
+        siteManager.updateSites(sites);
+
         sessionAdapter.loadChildren(true);
-        siteCombo.setSession(sessionAdapter);
         if (view != null) {
             view.getTreeViewer().expandToLevel(3);
         }
         updateMenus();
     }
 
-    // selects the site the user was working with the last time he / she logged
-    // out if logged into same server and same site exists
-    private void getCurrentSite(String serverName, Collection<SiteWrapper> sites) {
-        if (currentSiteWrapper != null)
-            return;
-
-        Preferences prefs = new InstanceScope().getNode(Application.PLUGIN_ID);
-        Preferences prefNode = prefs.node(SITE_PREF_NODE);
-        String lastServer = prefNode.get(LAST_SERVER_PREF, "");
-
-        if (!lastServer.equals(serverName))
-            return;
-
-        String siteId = prefNode.get(LAST_SITE_PREF, "-1");
-
-        if (siteId.equalsIgnoreCase("-1"))
-            return;
-
-        for (SiteWrapper site : sites) {
-            if (site.getId().equals(siteId))
-                currentSiteWrapper = site;
-        }
-    }
-
     public void deleteSession() {
+        siteManager.setEnabled(false);
         rootNode.removeChild(sessionAdapter);
         sessionAdapter = null;
         updateMenus();
-        currentSiteWrappers = new ArrayList<SiteWrapper>();
-        siteCombo.setInput(currentSiteWrappers);
+    }
+
+    public void updateSession() {
+        Assert.isNotNull(sessionAdapter, "session adapter is null");
+        sessionAdapter.performExpand();
     }
 
     private void updateMenus() {
@@ -140,15 +109,8 @@ public class SessionManager {
             .isDebugging());
     }
 
-    public void setSiteCombo(SiteCombo combo) {
-        this.siteCombo = combo;
-    }
-
-    public SiteCombo getSiteCombo() {
-        return siteCombo;
-    }
-
     public SessionAdapter getSession() {
+        Assert.isNotNull(sessionAdapter, "session adapter is null");
         return sessionAdapter;
     }
 
@@ -179,10 +141,6 @@ public class SessionManager {
         return null;
     }
 
-    public static Logger getLogger() {
-        return log4j;
-    }
-
     public void openViewForm(Class<?> klass, int id) {
         NodeSearchVisitor v = new NodeSearchVisitor(klass, id);
         AdapterBase adapter = sessionAdapter.accept(v);
@@ -199,69 +157,31 @@ public class SessionManager {
         return sessionAdapter.searchChild(wrapper);
     }
 
-    public void setCurrentSite(SiteWrapper siteWrapper) {
-        try {
-            currentSiteWrapper = siteWrapper;
-            String saveVal = "-1";
-            if ((siteWrapper != null) && (siteWrapper.getId() != null))
-                saveVal = siteWrapper.getId().toString();
-            Preferences prefs = new InstanceScope()
-                .getNode(Application.PLUGIN_ID);
-            Preferences prefNode = prefs.node(SITE_PREF_NODE);
-            prefNode.put(LAST_SERVER_PREF, sessionAdapter.getName());
-            prefNode.put(LAST_SITE_PREF, saveVal);
-            prefs.flush();
-            IWorkbenchWindow window = PlatformUI.getWorkbench()
-                .getActiveWorkbenchWindow();
-            ISourceProviderService service = (ISourceProviderService) window
-                .getService(ISourceProviderService.class);
-            SiteSelectionState siteSelectionStateSourceProvider = (SiteSelectionState) service
-                .getSourceProvider(SiteSelectionState.SITE_SELECTION_ID);
-            siteSelectionStateSourceProvider.setSiteSelection(siteWrapper);
-            if (sessionAdapter != null) {
-                sessionAdapter.performExpand();
-            }
-        } catch (BackingStoreException e) {
-            getLogger().error("Could not save site preferences", e);
-        }
-    }
-
     public RootNode getRootNode() {
         return rootNode;
     }
 
     public SiteWrapper getCurrentSiteWrapper() {
-        return currentSiteWrapper;
-    }
-
-    private void updateSites(Collection<SiteWrapper> sites) {
-        SiteWrapper allSiteWrapper = new SiteWrapper(getAppService(),
-            new Site());
-        allSiteWrapper.setName("All Sites");
-        if (currentSiteWrapper == null)
-            currentSiteWrapper = allSiteWrapper;
-        log4j.debug("site selected: " + currentSiteWrapper.getName());
-
-        currentSiteWrappers.clear();
-        currentSiteWrappers.add(0, allSiteWrapper);
-        for (SiteWrapper site : sites) {
-            currentSiteWrappers.add(site);
-        }
-        siteCombo.setInput(currentSiteWrappers);
-        siteCombo.setSelection(currentSiteWrapper);
-    }
-
-    public void updateSites() {
-        try {
-            updateSites(ModelUtils.getSites(getAppService(), null));
-        } catch (Exception e) {
-            getLogger().error("Cannot update Sites", e);
-        }
+        return siteManager.getCurrentSiteWrapper();
     }
 
     public TreeViewer getTreeViewer() {
         if (view != null)
             return view.getTreeViewer();
         return null;
+    }
+
+    public void setSiteManagerEnabled(boolean enable) {
+        Assert.isNotNull(siteManager, "site manager is null");
+        siteManager.setEnabled(enable);
+    }
+
+    public void setSiteCombo(SiteCombo siteCombo) {
+        this.siteCombo = siteCombo;
+    }
+
+    public void updateSites() {
+        Assert.isNotNull(siteManager, "site manager is null");
+        siteManager.updateSites();
     }
 }

@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.forms;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.IMessageProvider;
@@ -24,6 +25,10 @@ import edu.ualberta.med.biobank.validators.NonEmptyString;
 import edu.ualberta.med.biobank.views.PatientAdministrationView;
 
 public class PatientEntryForm extends BiobankEntryForm {
+
+    private static Logger LOGGER = Logger.getLogger(PatientEntryForm.class
+        .getName());
+
     public static final String ID = "edu.ualberta.med.biobank.forms.PatientEntryForm";
 
     public static final String MSG_NEW_PATIENT_OK = "Creating a new patient record.";
@@ -131,9 +136,8 @@ public class PatientEntryForm extends BiobankEntryForm {
         try {
             patientAdapter.getWrapper().reload();
         } catch (Exception e) {
-            SessionManager.getLogger().error(
-                "Error while retrieving patient "
-                    + patientAdapter.getWrapper().getNumber(), e);
+            LOGGER.error("Error while retrieving patient "
+                + patientAdapter.getWrapper().getNumber(), e);
         }
     }
 

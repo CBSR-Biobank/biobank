@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.widgets.Composite;
@@ -19,6 +20,9 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class StudyInfoTable extends InfoTableWidget<StudyWrapper> {
+
+    private static Logger LOGGER = Logger.getLogger(StudyInfoTable.class
+        .getName());
 
     private static final String[] HEADINGS = new String[] { "Name",
         "Short Name", "Activity Staus", "Patients", "Patient Visists" };
@@ -92,8 +96,7 @@ public class StudyInfoTable extends InfoTableWidget<StudyWrapper> {
                 } catch (final RemoteConnectFailureException exp) {
                     BioBankPlugin.openRemoteConnectErrorMessage();
                 } catch (Exception e) {
-                    SessionManager.getLogger().error(
-                        "Error while retrieving the clinic", e);
+                    LOGGER.error("Error while retrieving the clinic", e);
                 }
             }
         };

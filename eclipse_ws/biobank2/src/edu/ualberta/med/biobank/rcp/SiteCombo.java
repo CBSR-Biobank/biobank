@@ -5,10 +5,7 @@ import java.util.List;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
-import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -21,12 +18,9 @@ import org.eclipse.ui.menus.WorkbenchWindowControlContribution;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
-import edu.ualberta.med.biobank.treeview.SessionAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
 public class SiteCombo extends WorkbenchWindowControlContribution {
-
-    private SessionAdapter session;
 
     private ComboViewer comboViewer;
 
@@ -37,10 +31,6 @@ public class SiteCombo extends WorkbenchWindowControlContribution {
 
     public SiteCombo(String str) {
         super(str);
-    }
-
-    public void setSession(SessionAdapter session) {
-        this.session = session;
     }
 
     public void setInput(List<SiteWrapper> sites) {
@@ -62,33 +52,6 @@ public class SiteCombo extends WorkbenchWindowControlContribution {
 
         comboViewer.setContentProvider(new ArrayContentProvider());
         comboViewer.setLabelProvider(new BiobankLabelProvider());
-
-        comboViewer
-            .addSelectionChangedListener(new ISelectionChangedListener() {
-                @Override
-                public void selectionChanged(SelectionChangedEvent event) {
-                    IStructuredSelection selection = (IStructuredSelection) event
-                        .getSelection();
-                    SiteWrapper siteWrapper = (SiteWrapper) selection
-                        .getFirstElement();
-
-                    if (siteWrapper == null)
-                        return;
-
-                    if (siteWrapper.getId() == null)
-                        SessionManager.getInstance().setCurrentSite(null);
-                    else
-                        SessionManager.getInstance()
-                            .setCurrentSite(siteWrapper);
-                    if (session != null)
-                        session.rebuild();
-                    TreeViewer tv = SessionManager.getInstance()
-                        .getTreeViewer();
-                    if (tv != null) {
-                        tv.expandToLevel(3);
-                    }
-                }
-            });
         comboViewer.setComparator(new ViewerComparator());
         GridData gd = new GridData();
         gd.widthHint = 155;
@@ -97,6 +60,10 @@ public class SiteCombo extends WorkbenchWindowControlContribution {
         combo.setTextLimit(50);
 
         return resizedComboPanel;
+    }
+
+    public void addSelectionChangedListener(ISelectionChangedListener listener) {
+        comboViewer.addSelectionChangedListener(listener);
     }
 
     public void setEnabled(boolean enabled) {

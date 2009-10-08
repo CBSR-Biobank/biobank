@@ -40,6 +40,10 @@ import edu.ualberta.med.biobank.widgets.listener.BiobankEntryFormWidgetListener;
 import edu.ualberta.med.biobank.widgets.listener.MultiSelectEvent;
 
 public class ContainerTypeEntryForm extends BiobankEntryForm {
+
+    private static Logger LOGGER = Logger
+        .getLogger(ContainerTypeEntryForm.class.getName());
+
     public static final String ID = "edu.ualberta.med.biobank.forms.ContainerTypeEntryForm";
 
     private static final String MSG_NEW_STORAGE_TYPE_OK = "Creating a new storage type.";
@@ -121,13 +125,13 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
             site = ModelUtils.getObjectWithId(appService, Site.class, site
                 .getId());
         } catch (Exception e) {
-            SessionManager.getLogger().error("Can't retrieve site", e);
+            LOGGER.error("Can't retrieve site", e);
         }
         try {
             containerType.reload();
         } catch (Exception e) {
-            SessionManager.getLogger().error(
-                "Error while retrieving type " + containerType.getName(), e);
+            LOGGER.error("Error while retrieving type "
+                + containerType.getName(), e);
         }
     }
 
