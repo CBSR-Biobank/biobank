@@ -68,8 +68,8 @@ public class ModelObjectQuery {
             alias += "."
                 + AttributeQueryClause.getText(modelObjectClass.getName());
 
-        clause = new AttributeQueryClause(attributeQueries, modelObjectClass,
-            alias, view);
+        clause = new AttributeQueryClause(attributeQueries, QueryPage
+            .filterMethods(modelObjectClass), alias, view);
 
         radio.addSelectionListener(new SelectionListener() {
             @Override

@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.widgets;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,8 +21,7 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 public abstract class AbstractQueryClause {
     protected ReportsView view;
     protected String alias;
-    protected List<Field> attributes;
-    protected Class<?> modelObjectClass;
+    protected List<Method> attributes;
 
     protected List<ComboViewer> whereCombos;
     protected List<ComboViewer> operatorCombos;
@@ -31,9 +31,9 @@ public abstract class AbstractQueryClause {
     protected List<String> numberOps;
     protected List<String> collectionOps;
 
-    protected AbstractQueryClause(Class<?> modelObjectClass, String alias,
+    protected AbstractQueryClause(List<Method> methods, String alias,
         ReportsView view) {
-        this.modelObjectClass = modelObjectClass;
+
         this.alias = alias;
         this.view = view;
 
@@ -41,7 +41,7 @@ public abstract class AbstractQueryClause {
         operatorCombos = new ArrayList<ComboViewer>();
         searchFields = new ArrayList<Text>();
 
-        initAttributes();
+        initAttributes(methods);
 
         initStringOps();
         initNumberOps();
@@ -153,14 +153,15 @@ public abstract class AbstractQueryClause {
         return comboViewer;
     }
 
-    protected void initAttributes() {
-        Field[] classFields = modelObjectClass.getDeclaredFields();
-        List<Field> attributes = new ArrayList<Field>();
-        for (Field field : classFields) {
-            if (field.getType().equals(String.class)
-                || field.getType().equals(Integer.class)
-                || field.getType().equals(Double.class))
-                attributes.add(field);
+    protected void initAttributes(List<Method> methods) {
+        List<Method> attributes = new ArrayList<Method>();
+        for (Method method : methods) {
+            if (method.getReturnType().equals(String.class)
+                || method.getReturnType().equals(Integer.class)
+                || method.getReturnType().equals(Double.class))
+
+                attributes.add(method);
+
         }
         this.attributes = attributes;
     }
@@ -171,8 +172,8 @@ public abstract class AbstractQueryClause {
             ComboViewer opCombo = operatorCombos.get(index);
             IStructuredSelection whereSelection = (IStructuredSelection) whereCombo
                 .getSelection();
-            Field whereField = (Field) whereSelection.getFirstElement();
-            Class<?> type = whereField.getType();
+            Method whereMethod = (Method) whereSelection.getFirstElement();
+            Class<?> type = whereMethod.getReturnType();
             if (type.equals(String.class))
                 opCombo.setInput(stringOps);
             else if (type.equals(Integer.class) || type.equals(Double.class))

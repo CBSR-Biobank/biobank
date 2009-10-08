@@ -14,6 +14,10 @@ public class SampleStorageWrapper extends ModelWrapper<SampleStorage> implements
         super(appService, wrappedObject);
     }
 
+    protected SampleStorageWrapper(WritableApplicationService appService) {
+        super(appService);
+    }
+
     public Study getStudy() {
         return wrappedObject.getStudy();
     }

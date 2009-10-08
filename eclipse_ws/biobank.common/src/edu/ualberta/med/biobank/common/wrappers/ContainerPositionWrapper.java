@@ -1,8 +1,5 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
-import java.util.Arrays;
-import java.util.List;
-
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.RowColPos;
 import edu.ualberta.med.biobank.model.Container;
@@ -24,11 +21,13 @@ public class ContainerPositionWrapper extends
 
     @Override
     protected String[] getPropertyChangesNames() {
-        List<String> properties = Arrays
-            .asList(super.getPropertyChangesNames());
-        properties.add("parentContainer");
-        properties.add("container");
-        return (String[]) properties.toArray();
+        String[] parentStrings = super.getPropertyChangesNames();
+        String[] properties = new String[parentStrings.length + 2];
+        properties[0] = new String("parentContainer");
+        properties[1] = new String("container");
+        for (int i = 2; i < parentStrings.length + 2; i++)
+            properties[i] = (parentStrings[i - 2]);
+        return properties;
     }
 
     @Override

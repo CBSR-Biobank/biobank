@@ -22,14 +22,9 @@ public class HqlTester {
         appService = (WritableApplicationService) ApplicationServiceProvider
             .getApplicationServiceFromUrl("http://localhost:8080/biobank2",
                 "testuser", "test");
-<<<<<<< HEAD
-        getBrokenQuery();
-=======
 
->>>>>>> d66118e9a18e96e05fba8f179d31f6a4cf299e3f
-        // geTopContainerTypes();
-        // getPatientIds();
-        // geContainerLike();
+        getBrokenQuery();
+
         getTopContainers();
     }
 
@@ -60,7 +55,6 @@ public class HqlTester {
         }
     }
 
-<<<<<<< HEAD
     private void getBrokenQuery() throws Exception {
         HQLCriteria c = new HQLCriteria(
             "select containerType from edu.ualberta.med.biobank.model.ContainerType as containerType left join containerType.sampleTypeCollection as sampleTypeAlias  where sampleTypeAlias.name like '%blood%'");
@@ -69,7 +63,7 @@ public class HqlTester {
             System.out.println(ct.toString());
         }
     }
-=======
+
     @SuppressWarnings("unused")
     private void geContainerLike() throws Exception {
         HQLCriteria c = new HQLCriteria("from " + Container.class.getName()
@@ -92,5 +86,4 @@ public class HqlTester {
         }
     }
 
->>>>>>> d66118e9a18e96e05fba8f179d31f6a4cf299e3f
 }

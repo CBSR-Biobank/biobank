@@ -28,6 +28,10 @@ public class SampleWrapper extends ModelWrapper<Sample> {
         super(appService, wrappedObject);
     }
 
+    public SampleWrapper(WritableApplicationService appService) {
+        super(appService);
+    }
+
     public void setInventoryId(String inventoryId) {
         String oldInventoryId = inventoryId;
         wrappedObject.setInventoryId(inventoryId);

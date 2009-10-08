@@ -73,9 +73,8 @@ public class ReportsView extends ViewPart {
                 searchData = search();
                 if (searchData.size() > 0) {
                     Iterator<Object> searchDataIt = searchData.iterator();
-                    List<Method> filteredMethods = QueryPage.filterMethods(
-                        searchDataIt.next().getClass().getDeclaredMethods(),
-                        false);
+                    List<Method> filteredMethods = QueryPage
+                        .filterMethods(searchDataIt.next().getClass());
                     int[] bounds = new int[filteredMethods.size()];
                     String[] names = new String[filteredMethods.size()];
 

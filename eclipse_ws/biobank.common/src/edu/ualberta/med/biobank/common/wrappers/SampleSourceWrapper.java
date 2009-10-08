@@ -19,6 +19,10 @@ public class SampleSourceWrapper extends ModelWrapper<SampleSource> implements
         super(appService, wrappedObject);
     }
 
+    public SampleSourceWrapper(WritableApplicationService appService) {
+        super(appService);
+    }
+
     public String getName() {
         return wrappedObject.getName();
     }

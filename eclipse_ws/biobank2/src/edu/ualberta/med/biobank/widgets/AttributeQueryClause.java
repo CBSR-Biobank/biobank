@@ -1,5 +1,8 @@
 package edu.ualberta.med.biobank.widgets;
 
+import java.lang.reflect.Method;
+import java.util.List;
+
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
@@ -49,9 +52,9 @@ public class AttributeQueryClause extends AbstractQueryClause {
         }
     };
 
-    public AttributeQueryClause(Composite parent, Class<?> modelObjectClass,
+    public AttributeQueryClause(Composite parent, List<Method> methods,
         String alias, ReportsView view) {
-        super(modelObjectClass, alias, view);
+        super(methods, alias, view);
 
         where = new Label(parent, SWT.None);
         where.setText("Where: ");

@@ -32,6 +32,10 @@ public class ClinicWrapper extends ModelWrapper<Clinic> implements
         addressWrapper = new AddressWrapper(appService, address);
     }
 
+    protected ClinicWrapper(WritableApplicationService appService) {
+        super(appService);
+    }
+
     public AddressWrapper getAddressWrapper() {
         return addressWrapper;
     }
@@ -142,8 +146,8 @@ public class ClinicWrapper extends ModelWrapper<Clinic> implements
         boolean setNull) {
         Collection<Contact> oldContacts = wrappedObject.getContactCollection();
         wrappedObject.setContactCollection(contacts);
-        propertyChangeSupport.firePropertyChange("contactCollection", oldContacts,
-            contacts);
+        propertyChangeSupport.firePropertyChange("contactCollection",
+            oldContacts, contacts);
         if (setNull) {
             propertiesMap.put("contactCollection", null);
         }
