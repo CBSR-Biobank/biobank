@@ -21,8 +21,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
-public class StudyWrapper extends ModelWrapper<Study> implements
-    Comparable<StudyWrapper> {
+public class StudyWrapper extends ModelWrapper<Study> {
 
     public StudyWrapper(WritableApplicationService appService,
         Study wrappedObject) {
@@ -145,22 +144,6 @@ public class StudyWrapper extends ModelWrapper<Study> implements
             throw new BiobankCheckException("A study with short name \""
                 + getNameShort() + "\" already exists.");
         }
-    }
-
-    @Override
-    public int compareTo(StudyWrapper wrapper) {
-        String myName = wrappedObject.getName();
-        String wrapperName = wrapper.wrappedObject.getName();
-
-        int compare = myName.compareTo(wrapperName);
-        if (compare == 0) {
-            String myNameShort = wrappedObject.getNameShort();
-            String wrapperNameShort = wrapper.wrappedObject.getNameShort();
-
-            return ((myNameShort.compareTo(wrapperNameShort) > 0) ? 1
-                : (myNameShort.equals(wrapperNameShort) ? 0 : -1));
-        }
-        return (compare > 0) ? 1 : -1;
     }
 
     @SuppressWarnings("unchecked")
@@ -408,5 +391,21 @@ public class StudyWrapper extends ModelWrapper<Study> implements
             clinicWrappers.add(new ClinicWrapper(appService, clinic));
         }
         return clinicWrappers;
+    }
+
+    @Override
+    public int compareTo(ModelWrapper<Study> wrapper) {
+        String name1 = wrappedObject.getName();
+        String name2 = wrapper.wrappedObject.getName();
+
+        int compare = name1.compareTo(name2);
+        if (compare == 0) {
+            String nameShort1 = wrappedObject.getNameShort();
+            String nameShort2 = wrapper.wrappedObject.getNameShort();
+
+            return ((nameShort1.compareTo(nameShort2) > 0) ? 1
+                : (nameShort1.equals(nameShort2) ? 0 : -1));
+        }
+        return (compare > 0) ? 1 : -1;
     }
 }

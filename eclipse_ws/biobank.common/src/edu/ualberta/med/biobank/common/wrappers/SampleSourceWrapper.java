@@ -12,8 +12,7 @@ import edu.ualberta.med.biobank.model.Study;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
-public class SampleSourceWrapper extends ModelWrapper<SampleSource> implements
-    Comparable<SampleSourceWrapper> {
+public class SampleSourceWrapper extends ModelWrapper<SampleSource> {
 
     public SampleSourceWrapper(WritableApplicationService appService,
         SampleSource wrappedObject) {
@@ -90,13 +89,6 @@ public class SampleSourceWrapper extends ModelWrapper<SampleSource> implements
     protected void persistChecks() throws BiobankCheckException, Exception {
     }
 
-    public int compareTo(SampleSourceWrapper wrapper) {
-        String myName = wrappedObject.getName();
-        String wrapperName = wrapper.wrappedObject.getName();
-        return ((myName.compareTo(wrapperName) > 0) ? 1 : (myName
-            .equals(wrapperName) ? 0 : -1));
-    }
-
     public static List<SampleSourceWrapper> getAllSampleSources(
         WritableApplicationService appService) throws ApplicationException {
         List<SampleSource> list = appService.search(SampleSource.class,
@@ -106,5 +98,13 @@ public class SampleSourceWrapper extends ModelWrapper<SampleSource> implements
             wrappers.add(new SampleSourceWrapper(appService, ss));
         }
         return wrappers;
+    }
+
+    @Override
+    public int compareTo(ModelWrapper<SampleSource> wrapper) {
+        String name1 = wrappedObject.getName();
+        String name2 = wrapper.wrappedObject.getName();
+        return ((name1.compareTo(name2) > 0) ? 1 : (name1.equals(name2) ? 0
+            : -1));
     }
 }

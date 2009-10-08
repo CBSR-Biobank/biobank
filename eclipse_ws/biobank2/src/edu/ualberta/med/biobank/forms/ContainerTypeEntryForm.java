@@ -360,8 +360,4 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         return ContainerTypeViewForm.ID;
     }
 
-    @Override
-    public void setFocus() {
-        firstControl.setFocus();
-    }
 }

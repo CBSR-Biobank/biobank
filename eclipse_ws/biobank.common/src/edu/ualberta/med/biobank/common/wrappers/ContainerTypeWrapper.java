@@ -19,8 +19,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
-public class ContainerTypeWrapper extends ModelWrapper<ContainerType> implements
-    Comparable<ContainerTypeWrapper> {
+public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
 
     public ContainerTypeWrapper(WritableApplicationService appService,
         ContainerType wrappedObject) {
@@ -458,9 +457,9 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> implements
     }
 
     @Override
-    public int compareTo(ContainerTypeWrapper type) {
-        String c1Name = getName();
-        String c2Name = type.getName();
+    public int compareTo(ModelWrapper<ContainerType> type) {
+        String c1Name = wrappedObject.getName();
+        String c2Name = type.wrappedObject.getName();
         return ((c1Name.compareTo(c2Name) > 0) ? 1 : (c1Name.equals(c2Name) ? 0
             : -1));
     }

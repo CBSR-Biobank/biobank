@@ -78,4 +78,9 @@ public class PvSampleSourceWrapper extends ModelWrapper<PvSampleSource> {
         propertyChangeSupport.firePropertyChange("sampleSource", oldSs, ss);
     }
 
+    @Override
+    public int compareTo(ModelWrapper<PvSampleSource> o) {
+        return 0;
+    }
+
 }

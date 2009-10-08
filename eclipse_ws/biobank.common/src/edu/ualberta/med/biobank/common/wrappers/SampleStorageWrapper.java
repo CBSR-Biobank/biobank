@@ -6,8 +6,7 @@ import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.model.Study;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
-public class SampleStorageWrapper extends ModelWrapper<SampleStorage> implements
-    Comparable<SampleStorageWrapper> {
+public class SampleStorageWrapper extends ModelWrapper<SampleStorage> {
 
     public SampleStorageWrapper(WritableApplicationService appService,
         SampleStorage wrappedObject) {
@@ -78,11 +77,12 @@ public class SampleStorageWrapper extends ModelWrapper<SampleStorage> implements
     protected void persistChecks() throws BiobankCheckException, Exception {
     }
 
-    public int compareTo(SampleStorageWrapper wrapper) {
-        String myName = wrappedObject.getSampleType().getName();
-        String wrapperName = wrapper.wrappedObject.getSampleType().getName();
-        return ((myName.compareTo(wrapperName) > 0) ? 1 : (myName
-            .equals(wrapperName) ? 0 : -1));
+    @Override
+    public int compareTo(ModelWrapper<SampleStorage> wrapper) {
+        String name1 = wrappedObject.getSampleType().getName();
+        String name2 = wrapper.wrappedObject.getSampleType().getName();
+        return ((name1.compareTo(name2) > 0) ? 1 : (name1.equals(name2) ? 0
+            : -1));
     }
 
 }

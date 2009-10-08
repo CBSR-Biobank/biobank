@@ -276,7 +276,6 @@ public class SampleWrapper extends ModelWrapper<Sample> {
 
     @Override
     protected void deleteChecks() throws BiobankCheckException, Exception {
-        // TODO Auto-generated method stub
     }
 
     public static List<SampleWrapper> getSamplesInSite(
@@ -310,6 +309,11 @@ public class SampleWrapper extends ModelWrapper<Sample> {
             return false;
         }
         return true;
+    }
+
+    @Override
+    public int compareTo(ModelWrapper<Sample> o) {
+        return 0;
     }
 
 }

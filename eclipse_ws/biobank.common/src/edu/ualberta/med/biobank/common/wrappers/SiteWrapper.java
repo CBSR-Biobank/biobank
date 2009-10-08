@@ -21,8 +21,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
-public class SiteWrapper extends ModelWrapper<Site> implements
-    Comparable<SiteWrapper> {
+public class SiteWrapper extends ModelWrapper<Site> {
 
     private AddressWrapper addressWrapper;
 
@@ -119,13 +118,6 @@ public class SiteWrapper extends ModelWrapper<Site> implements
     @Override
     protected void deleteChecks() throws BiobankCheckException, Exception {
         // TODO Auto-generated method stub
-    }
-
-    public int compareTo(SiteWrapper wrapper) {
-        String myName = wrappedObject.getName();
-        String wrapperName = wrapper.wrappedObject.getName();
-        return ((myName.compareTo(wrapperName) > 0) ? 1 : (myName
-            .equals(wrapperName) ? 0 : -1));
     }
 
     @SuppressWarnings("unchecked")
@@ -365,6 +357,14 @@ public class SiteWrapper extends ModelWrapper<Site> implements
                 it.next().delete();
             }
         }
+    }
+
+    @Override
+    public int compareTo(ModelWrapper<Site> wrapper) {
+        String name1 = wrappedObject.getName();
+        String name2 = wrapper.wrappedObject.getName();
+        return ((name1.compareTo(name2) > 0) ? 1 : (name1
+            .equals(name2) ? 0 : -1));
     }
 
 }

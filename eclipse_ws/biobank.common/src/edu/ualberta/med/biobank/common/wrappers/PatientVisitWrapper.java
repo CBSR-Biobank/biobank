@@ -20,8 +20,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
-public class PatientVisitWrapper extends ModelWrapper<PatientVisit> implements
-    Comparable<PatientVisitWrapper> {
+public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
 
     public PatientVisitWrapper(WritableApplicationService appService,
         PatientVisit wrappedObject) {
@@ -339,14 +338,6 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> implements
         // TODO Auto-generated method stub
     }
 
-    @Override
-    public int compareTo(PatientVisitWrapper o) {
-        Date v1Date = getDateDrawn();
-        Date v2Date = o.getDateDrawn();
-        return ((v1Date.compareTo(v2Date) > 0) ? 1 : (v1Date.equals(v2Date) ? 0
-            : -1));
-    }
-
     public class PvInfoPvInfoData {
         private PvInfoWrapper pvInfo;
         private PvInfoDataWrapper pvInfoData;
@@ -358,5 +349,13 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> implements
         public PvInfoDataWrapper getPvInfoData() {
             return pvInfoData;
         }
+    }
+
+    @Override
+    public int compareTo(ModelWrapper<PatientVisit> wrapper) {
+        Date v1Date = wrappedObject.getDateDrawn();
+        Date v2Date = wrapper.wrappedObject.getDateDrawn();
+        return ((v1Date.compareTo(v2Date) > 0) ? 1 : (v1Date.equals(v2Date) ? 0
+            : -1));
     }
 }

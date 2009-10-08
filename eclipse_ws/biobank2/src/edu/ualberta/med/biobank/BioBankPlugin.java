@@ -373,8 +373,7 @@ public class BioBankPlugin extends AbstractUIPlugin {
     }
 
     public Image getImage(Object element) {
-        String imageKey = classToImageKey
-            .get(element.getClass().getName());
+        String imageKey = classToImageKey.get(element.getClass().getName());
         if ((imageKey == null)
             && ((element instanceof ContainerAdapter) || (element instanceof ContainerTypeAdapter))) {
             String ctName;
@@ -390,6 +389,9 @@ public class BioBankPlugin extends AbstractUIPlugin {
     }
 
     public Image getIconForTypeName(String typeName) {
+        if (typeName == null) {
+            return null;
+        }
         if (classToImageKey.containsKey(typeName)) {
             return BioBankPlugin.getDefault().getImageRegistry().get(
                 classToImageKey.get(typeName));

@@ -81,4 +81,9 @@ public class ContainerLabelingSchemeWrapper extends
         return list;
     }
 
+    @Override
+    public int compareTo(ModelWrapper<ContainerLabelingScheme> o) {
+        return 0;
+    }
+
 }

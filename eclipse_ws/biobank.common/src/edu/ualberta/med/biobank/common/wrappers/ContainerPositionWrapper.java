@@ -11,8 +11,7 @@ import edu.ualberta.med.biobank.model.ContainerPosition;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class ContainerPositionWrapper extends
-    AbstractPositionWrapper<ContainerPosition> implements
-    Comparable<ContainerPositionWrapper> {
+    AbstractPositionWrapper<ContainerPosition> {
 
     public ContainerPositionWrapper(WritableApplicationService appService,
         ContainerPosition wrappedObject) {
@@ -100,8 +99,12 @@ public class ContainerPositionWrapper extends
     }
 
     @Override
-    public int compareTo(ContainerPositionWrapper o) {
-        return getContainer().compareTo(o.getContainer());
+    public int compareTo(ModelWrapper<ContainerPosition> modelWrapper) {
+        if (modelWrapper instanceof ContainerPositionWrapper) {
+            return getContainer().compareTo(
+                ((ContainerPositionWrapper) modelWrapper).getContainer());
+        }
+        return 0;
     }
 
 }

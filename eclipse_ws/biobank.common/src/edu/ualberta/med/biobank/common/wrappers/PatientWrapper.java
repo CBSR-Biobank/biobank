@@ -14,8 +14,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
-public class PatientWrapper extends ModelWrapper<Patient> implements
-    Comparable<PatientWrapper> {
+public class PatientWrapper extends ModelWrapper<Patient> {
 
     public PatientWrapper(WritableApplicationService appService, Patient patient) {
         super(appService, patient);
@@ -156,9 +155,9 @@ public class PatientWrapper extends ModelWrapper<Patient> implements
     }
 
     @Override
-    public int compareTo(PatientWrapper o) {
-        String number1 = getNumber();
-        String number2 = o.getNumber();
+    public int compareTo(ModelWrapper<Patient> wrapper) {
+        String number1 = wrappedObject.getNumber();
+        String number2 = wrapper.wrappedObject.getNumber();
         return number1.compareTo(number2);
     }
 

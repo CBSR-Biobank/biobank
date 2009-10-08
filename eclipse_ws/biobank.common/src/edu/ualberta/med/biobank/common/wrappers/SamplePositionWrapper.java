@@ -77,4 +77,9 @@ public class SamplePositionWrapper extends
         return new ContainerWrapper(appService, wrappedObject.getContainer());
     }
 
+    @Override
+    public int compareTo(ModelWrapper<SamplePosition> o) {
+        return 0;
+    }
+
 }

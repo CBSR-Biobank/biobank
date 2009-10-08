@@ -24,8 +24,7 @@ import gov.nih.nci.system.query.example.InsertExampleQuery;
 import gov.nih.nci.system.query.example.UpdateExampleQuery;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
-public class ContainerWrapper extends ModelWrapper<Container> implements
-    Comparable<ContainerWrapper> {
+public class ContainerWrapper extends ModelWrapper<Container> {
 
     public ContainerWrapper(WritableApplicationService appService,
         Container wrappedObject) {
@@ -648,14 +647,6 @@ public class ContainerWrapper extends ModelWrapper<Container> implements
         return transformToWrapperList(appService, containers);
     }
 
-    @Override
-    public int compareTo(ContainerWrapper o) {
-        String c1Name = getLabel();
-        String c2Name = o.getLabel();
-        return ((c1Name.compareTo(c2Name) > 0) ? 1 : (c1Name.equals(c2Name) ? 0
-            : -1));
-    }
-
     public static List<ContainerWrapper> transformToWrapperList(
         WritableApplicationService appService, List<Container> containers) {
         List<ContainerWrapper> list = new ArrayList<ContainerWrapper>();
@@ -735,6 +726,14 @@ public class ContainerWrapper extends ModelWrapper<Container> implements
             return true;
         }
         return false;
+    }
+
+    @Override
+    public int compareTo(ModelWrapper<Container> wrapper) {
+        String c1Name = wrappedObject.getLabel();
+        String c2Name = wrapper.wrappedObject.getLabel();
+        return ((c1Name.compareTo(c2Name) > 0) ? 1 : (c1Name.equals(c2Name) ? 0
+            : -1));
     }
 
 }

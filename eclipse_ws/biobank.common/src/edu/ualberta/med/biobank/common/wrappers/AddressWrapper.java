@@ -90,4 +90,9 @@ public class AddressWrapper extends ModelWrapper<Address> {
         // no checks required for address
     }
 
+    @Override
+    public int compareTo(ModelWrapper<Address> o) {
+        return 0;
+    }
+
 }

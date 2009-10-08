@@ -16,8 +16,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
-public class ClinicWrapper extends ModelWrapper<Clinic> implements
-    Comparable<ClinicWrapper> {
+public class ClinicWrapper extends ModelWrapper<Clinic> {
 
     private AddressWrapper addressWrapper;
 
@@ -182,7 +181,8 @@ public class ClinicWrapper extends ModelWrapper<Clinic> implements
         // TODO Auto-generated method stub
     }
 
-    public int compareTo(ClinicWrapper wrapper) {
+    @Override
+    public int compareTo(ModelWrapper<Clinic> wrapper) {
         String myName = wrappedObject.getName();
         String wrapperName = wrapper.wrappedObject.getName();
         return ((myName.compareTo(wrapperName) > 0) ? 1 : (myName
