@@ -4,17 +4,15 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.springframework.util.Assert;
 
-import edu.ualberta.med.biobank.model.Clinic;
-import edu.ualberta.med.biobank.model.Contact;
-import edu.ualberta.med.biobank.model.Container;
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.model.SampleStorage;
 import edu.ualberta.med.biobank.model.Site;
-import edu.ualberta.med.biobank.model.Study;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -23,16 +21,6 @@ public class ModelUtils {
 
     private static final Logger logger = Logger.getLogger(ModelUtils.class
         .getName());
-
-    public static List<Container> getTopContainersForSite(
-        WritableApplicationService appService, Site site)
-        throws ApplicationException {
-        HQLCriteria criteria = new HQLCriteria("from "
-            + Container.class.getName()
-            + " where site.id=? and position is null", Arrays
-            .asList(new Object[] { site.getId() }));
-        return appService.query(criteria);
-    }
 
     public static <E> E getObjectWithId(WritableApplicationService appService,
         Class<E> classType, Integer id) throws Exception {
@@ -97,37 +85,6 @@ public class ModelUtils {
         }
     }
 
-    public static List<Clinic> getStudyClinicCollection(
-        WritableApplicationService appService, Study study)
-        throws ApplicationException {
-        HQLCriteria c = new HQLCriteria("select distinct clinics from "
-            + Contact.class.getName() + " as contacts"
-            + " inner join contacts.clinic as clinics"
-            + " where contacts.studyCollection.id = ?", Arrays
-            .asList(new Object[] { study.getId() }));
-
-        return appService.query(c);
-    }
-
-    public static List<Study> getClinicStudyCollection(
-        WritableApplicationService appService, Clinic clinic)
-        throws ApplicationException {
-        HQLCriteria c = new HQLCriteria("select distinct studies from "
-            + Contact.class.getName() + " as contacts"
-            + " inner join contacts.studyCollection as studies"
-            + " where contacts.clinic = ?", Arrays
-            .asList(new Object[] { clinic }));
-
-        return appService.query(c);
-    }
-
-    public static boolean getBooleanValue(Boolean value, boolean defaultValue) {
-        if (value == null) {
-            return defaultValue;
-        }
-        return value.booleanValue();
-    }
-
     /**
      * Search an object of type clazz with the specific property :
      * <ul>
@@ -152,6 +109,33 @@ public class ModelUtils {
         }
         return appService.query(new HQLCriteria(query, Arrays
             .asList(new Object[] { textParam })));
+    }
+
+    /**
+     * If "id" is null, then all sites are returned. If not not, then only sites
+     * with that id are returned.
+     * 
+     * @return
+     * @throws Exception
+     */
+    public static Collection<SiteWrapper> getSites(
+        WritableApplicationService appService, Integer id) throws Exception {
+        HQLCriteria criteria;
+
+        if (id == null) {
+            criteria = new HQLCriteria("from " + Site.class.getName());
+        } else {
+            criteria = new HQLCriteria("from " + Site.class.getName()
+                + " where id = ?", Arrays.asList(new Object[] { id }));
+        }
+
+        List<Site> sites = appService.query(criteria);
+
+        Collection<SiteWrapper> wrappers = new HashSet<SiteWrapper>();
+        for (Site s : sites) {
+            wrappers.add(new SiteWrapper(appService, s));
+        }
+        return wrappers;
     }
 
     public static SampleStorage[] toArray(Collection<SampleStorage> collection) {

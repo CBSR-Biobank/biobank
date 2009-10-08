@@ -8,22 +8,28 @@ import org.eclipse.swt.graphics.Image;
 import org.springframework.util.Assert;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
+import edu.ualberta.med.biobank.common.wrappers.PvInfoWrapper;
+import edu.ualberta.med.biobank.common.wrappers.PvSampleSourceWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.ClinicStudyInfo;
 import edu.ualberta.med.biobank.model.Contact;
-import edu.ualberta.med.biobank.model.Container;
-import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
-import edu.ualberta.med.biobank.model.ContainerType;
-import edu.ualberta.med.biobank.model.Patient;
-import edu.ualberta.med.biobank.model.PatientVisit;
-import edu.ualberta.med.biobank.model.PvInfo;
-import edu.ualberta.med.biobank.model.PvSampleSource;
 import edu.ualberta.med.biobank.model.Sample;
 import edu.ualberta.med.biobank.model.SampleSource;
 import edu.ualberta.med.biobank.model.SampleStorage;
 import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.model.SiteClinicInfo;
+import edu.ualberta.med.biobank.model.SiteStudyInfo;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.StudyContactAndPatientInfo;
 import edu.ualberta.med.biobank.model.StudyContactInfo;
@@ -44,7 +50,19 @@ public class BiobankLabelProvider extends LabelProvider implements
 
     @Override
     public String getColumnText(Object element, int columnIndex) {
-        if (element instanceof Study) {
+        if (element instanceof Site) {
+            final Site site = (Site) element;
+            switch (columnIndex) {
+            case 0:
+                return site.getName();
+            }
+        } else if (element instanceof Clinic) {
+            final Clinic clinic = (Clinic) element;
+            switch (columnIndex) {
+            case 0:
+                return clinic.getName();
+            }
+        } else if (element instanceof Study) {
             final Study study = (Study) element;
             switch (columnIndex) {
             case 0:
@@ -54,46 +72,16 @@ public class BiobankLabelProvider extends LabelProvider implements
             case 2:
                 return "" + study.getPatientCollection().size();
             }
-        } else if (element instanceof Clinic) {
-            final Clinic clinic = (Clinic) element;
+        } else if (element instanceof PatientVisitWrapper) {
+            PatientVisitWrapper visit = (PatientVisitWrapper) element;
             switch (columnIndex) {
             case 0:
-                return clinic.getName();
-            }
-        } else if (element instanceof Site) {
-            final Site site = (Site) element;
-            switch (columnIndex) {
-            case 0:
-                return site.getName();
-            }
-        } else if (element instanceof Patient) {
-            final Patient patient = (Patient) element;
-            switch (columnIndex) {
-            case 0:
-                return patient.getNumber();
-            }
-        } else if (element instanceof PatientVisit) {
-            SimpleDateFormat sdf;
-            final PatientVisit visit = (PatientVisit) element;
-            switch (columnIndex) {
-            case 0:
-                sdf = new SimpleDateFormat(BioBankPlugin.DATE_FORMAT);
-                return sdf.format(visit.getDateDrawn());
+                return visit.getFormattedDateDrawn();
             case 1:
-                return "" + visit.getSampleCollection().size();
+                return String.valueOf(visit.getSampleCollection().size());
             }
-        } else if (element instanceof ContainerType) {
-            final ContainerType ct = (ContainerType) element;
-            switch (columnIndex) {
-            case 0:
-                return ct.getName();
-            case 1:
-                return ct.getActivityStatus();
-            case 2:
-                return "" + ct.getDefaultTemperature();
-            }
-        } else if (element instanceof PvInfo) {
-            final PvInfo pvInfo = (PvInfo) element;
+        } else if (element instanceof PvInfoWrapper) {
+            final PvInfoWrapper pvInfo = (PvInfoWrapper) element;
             Integer type = pvInfo.getPvInfoType().getId();
             switch (columnIndex) {
             case 0:
@@ -103,8 +91,18 @@ public class BiobankLabelProvider extends LabelProvider implements
                     return "N/A";
                 return pvInfo.getPossibleValues();
             }
-        } else if (element instanceof Container) {
-            final Container container = (Container) element;
+        } else if (element instanceof ContainerTypeWrapper) {
+            final ContainerTypeWrapper ct = (ContainerTypeWrapper) element;
+            switch (columnIndex) {
+            case 0:
+                return ct.getName();
+            case 1:
+                return ct.getActivityStatus();
+            case 2:
+                return "" + ct.getDefaultTemperature();
+            }
+        } else if (element instanceof ContainerWrapper) {
+            final ContainerWrapper container = (ContainerWrapper) element;
             switch (columnIndex) {
             case 0:
                 return container.getLabel();
@@ -194,15 +192,15 @@ public class BiobankLabelProvider extends LabelProvider implements
                 return "";
             default:
             }
-            return getContactColumnIndex(info.contact, columnIndex - 2);
+            return getContactWrapperColumnIndex(info.contact, columnIndex - 2);
         } else if (element instanceof StudyContactInfo) {
             StudyContactInfo info = (StudyContactInfo) element;
             if (columnIndex == 0) {
                 if (info.contact != null)
-                    return info.contact.getClinic().getName();
+                    return info.contact.getClinicWrapper().getName();
                 return "";
             }
-            return getContactColumnIndex(info.contact, columnIndex);
+            return getContactWrapperColumnIndex(info.contact, columnIndex);
         } else if (element instanceof SampleSource) {
             SampleSource info = (SampleSource) element;
             if (columnIndex == 0) {
@@ -210,8 +208,8 @@ public class BiobankLabelProvider extends LabelProvider implements
             } else {
                 Assert.isTrue(false, "invalid column index: " + columnIndex);
             }
-        } else if (element instanceof PvSampleSource) {
-            PvSampleSource info = (PvSampleSource) element;
+        } else if (element instanceof PvSampleSourceWrapper) {
+            PvSampleSourceWrapper info = (PvSampleSourceWrapper) element;
             switch (columnIndex) {
             case 0:
                 return info.getSampleSource().getName();
@@ -232,6 +230,37 @@ public class BiobankLabelProvider extends LabelProvider implements
             case 4:
                 return contact.getFaxNumber();
             }
+        } else if (element instanceof SiteStudyInfo) {
+            SiteStudyInfo siteStudyInfo = (SiteStudyInfo) element;
+            switch (columnIndex) {
+            case 0:
+                return siteStudyInfo.studyWrapper.getName();
+            case 1:
+                return siteStudyInfo.studyWrapper.getNameShort();
+            case 2:
+                return siteStudyInfo.studyWrapper.getActivityStatus();
+            case 3:
+                return ""
+                    + siteStudyInfo.studyWrapper.getWrappedObject()
+                        .getPatientCollection().size();
+            case 4:
+                return "" + siteStudyInfo.patientVisits;
+            }
+        } else if (element instanceof SiteClinicInfo) {
+            SiteClinicInfo siteClinicInfo = (SiteClinicInfo) element;
+            switch (columnIndex) {
+            case 0:
+                return siteClinicInfo.clinicWrapper.getName();
+            case 1:
+                return "" + siteClinicInfo.studies;
+            case 2:
+                return "" + siteClinicInfo.patients;
+            case 3:
+                return "" + siteClinicInfo.patientVisits;
+            }
+        } else if (element instanceof ModelWrapper<?>) {
+            return getColumnText(
+                ((ModelWrapper<?>) element).getWrappedObject(), columnIndex);
         } else {
             Assert.isTrue(false, "invalid object type: " + element.getClass());
         }
@@ -240,21 +269,27 @@ public class BiobankLabelProvider extends LabelProvider implements
 
     @Override
     public String getText(Object element) {
-        if (element instanceof ContainerType) {
-            return ((ContainerType) element).getName();
-        } else if (element instanceof Study) {
-            Study study = (Study) element;
+        if (element instanceof ContainerTypeWrapper) {
+            return ((ContainerTypeWrapper) element).getName();
+        }
+        if (element instanceof StudyWrapper) {
+            StudyWrapper study = (StudyWrapper) element;
             return study.getNameShort() + " - " + study.getName();
         } else if (element instanceof Clinic) {
             return ((Clinic) element).getName();
-        } else if (element instanceof ContainerLabelingScheme) {
-            return ((ContainerLabelingScheme) element).getName();
+        } else if (element instanceof ContainerLabelingSchemeWrapper) {
+            return ((ContainerLabelingSchemeWrapper) element).getName();
         } else if (element instanceof Site) {
             return ((Site) element).getName();
-        } else if (element instanceof SampleType) {
-            return ((SampleType) element).getName();
+        } else if (element instanceof SampleTypeWrapper) {
+            return ((SampleTypeWrapper) element).getName();
+        } else if (element instanceof SiteWrapper) {
+            return ((SiteWrapper) element).getName();
         }
-        return ((AdapterBase) element).getName();
+        if (element instanceof AdapterBase) {
+            return ((AdapterBase) element).getName();
+        }
+        return element.toString();
     }
 
     @Override
@@ -262,7 +297,8 @@ public class BiobankLabelProvider extends LabelProvider implements
         return false;
     }
 
-    private String getContactColumnIndex(Contact contact, int columnIndex) {
+    private String getContactWrapperColumnIndex(ContactWrapper contact,
+        int columnIndex) {
         switch (columnIndex) {
         case 1:
             if ((contact != null) && (contact.getName() != null))

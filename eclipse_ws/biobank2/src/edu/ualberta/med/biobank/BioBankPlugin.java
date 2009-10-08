@@ -2,6 +2,8 @@ package edu.ualberta.med.biobank;
 
 import java.net.URL;
 import java.text.SimpleDateFormat;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.FileLocator;
@@ -20,14 +22,28 @@ import org.osgi.framework.BundleContext;
 import org.springframework.util.Assert;
 
 import edu.ualberta.med.biobank.preferences.PreferenceConstants;
+import edu.ualberta.med.biobank.treeview.ClinicAdapter;
+import edu.ualberta.med.biobank.treeview.ClinicGroup;
+import edu.ualberta.med.biobank.treeview.ContainerAdapter;
+import edu.ualberta.med.biobank.treeview.ContainerGroup;
+import edu.ualberta.med.biobank.treeview.ContainerTypeAdapter;
+import edu.ualberta.med.biobank.treeview.ContainerTypeGroup;
+import edu.ualberta.med.biobank.treeview.PatientAdapter;
+import edu.ualberta.med.biobank.treeview.PatientVisitAdapter;
+import edu.ualberta.med.biobank.treeview.SessionAdapter;
+import edu.ualberta.med.biobank.treeview.SiteAdapter;
+import edu.ualberta.med.biobank.treeview.StudyAdapter;
+import edu.ualberta.med.biobank.treeview.StudyGroup;
 import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
 
 /**
  * The activator class controls the plug-in life cycle
  */
 public class BioBankPlugin extends AbstractUIPlugin {
-    // The plug-in ID
+
     public static final String PLUGIN_ID = "biobank2";
+
+    public static final String IMAGE_ID = "biobank2.image";
 
     public static final String DATE_FORMAT = "yyyy-MM-dd";
 
@@ -38,6 +54,65 @@ public class BioBankPlugin extends AbstractUIPlugin {
     public SimpleDateFormat dateTimeFormatter;
 
     public static final String IMG_FORM_BG = "formBg";
+    public static final String IMG_ADD = "add";
+    public static final String IMG_BIN = "bin";
+    public static final String IMG_BOX = "box";
+    public static final String IMG_CABINET = "cabinet";
+    public static final String IMG_CABINET_LINK_ASSIGN = "cabinetLinkAssign";
+    public static final String IMG_CLINIC = "clinic";
+    public static final String IMG_CLINICS = "clinics";
+    public static final String IMG_COMPUTER = "computer";
+    public static final String IMG_COMPUTER_DELETE = "computerDelete";
+    public static final String IMG_COMPUTER_KEY = "computerKey";
+    public static final String IMG_CONTAINER_TYPES = "containerTypes";
+    public static final String IMG_CONTAINERS = "containers";
+    public static final String IMG_DELETE = "delete";
+    public static final String IMG_DRAWER = "drawer";
+    public static final String IMG_FREEZER = "freezer";
+    public static final String IMG_HOTEL = "hotel";
+    public static final String IMG_MAIN_PERSPECTIVE = "mainPerspective";
+    public static final String IMG_PALLET = "pallet";
+    public static final String IMG_PATIENT = "patient";
+    public static final String IMG_PATIENT_VISIT = "patientVisit";
+    public static final String IMG_PATIENT_ADD = "patientAdd";
+    public static final String IMG_PATIENT_VISIT_ADD = "patientVisitAdd";
+    public static final String IMG_RELOAD_FORM = "reloadForm";
+    public static final String IMG_REPORTS = "reports";
+    public static final String IMG_SCAN_ASSIGN = "scanAssign";
+    public static final String IMG_SCAN_LINK = "scanLink";
+    public static final String IMG_SESSIONS = "sessions";
+    public static final String IMG_SITE = "site";
+    public static final String IMG_STUDIES = "studies";
+    public static final String IMG_STUDY = "study";
+    public static final String IMG_USER_ADD = "userAdd";
+
+    // FIXME: move this to preferences
+    // 
+    // ContainerTypeAdapter and Container missing on purpose.
+    //
+    private Map<String, String> classToImageKey = new HashMap<String, String>() {
+        private static final long serialVersionUID = 1L;
+        {
+            put(SessionAdapter.class.getName(), BioBankPlugin.IMG_SESSIONS);
+            put(SiteAdapter.class.getName(), BioBankPlugin.IMG_SITE);
+            put(ClinicGroup.class.getName(), BioBankPlugin.IMG_CLINICS);
+            put(StudyGroup.class.getName(), BioBankPlugin.IMG_STUDIES);
+            put(ContainerTypeGroup.class.getName(),
+                BioBankPlugin.IMG_CONTAINER_TYPES);
+            put(ContainerGroup.class.getName(), BioBankPlugin.IMG_CONTAINERS);
+            put(ClinicAdapter.class.getName(), BioBankPlugin.IMG_CLINIC);
+            put(StudyAdapter.class.getName(), BioBankPlugin.IMG_STUDY);
+            put(PatientAdapter.class.getName(), BioBankPlugin.IMG_PATIENT);
+            put(PatientVisitAdapter.class.getName(),
+                BioBankPlugin.IMG_PATIENT_VISIT);
+        }
+    };
+
+    private static final String[] CONTAINER_TYPE_IMAGE_KEYS = new String[] {
+        BioBankPlugin.IMG_BIN, BioBankPlugin.IMG_BOX,
+        BioBankPlugin.IMG_CABINET, BioBankPlugin.IMG_DRAWER,
+        BioBankPlugin.IMG_FREEZER, BioBankPlugin.IMG_HOTEL,
+        BioBankPlugin.IMG_PALLET, };
 
     public static final String BARCODES_FILE = BioBankPlugin.class.getPackage()
         .getName()
@@ -72,6 +147,38 @@ public class BioBankPlugin extends AbstractUIPlugin {
     @Override
     protected void initializeImageRegistry(ImageRegistry registry) {
         registerImage(registry, IMG_FORM_BG, "form_banner.bmp");
+        registerImage(registry, IMG_ADD, "add.png");
+        registerImage(registry, IMG_BIN, "bin.png");
+        registerImage(registry, IMG_BOX, "bin.png");
+        registerImage(registry, IMG_CABINET, "cabinet.png");
+        registerImage(registry, IMG_CABINET_LINK_ASSIGN,
+            "cabinetLinkAssign.png");
+        registerImage(registry, IMG_CLINIC, "clinic.png");
+        registerImage(registry, IMG_CLINICS, "clinics.png");
+        registerImage(registry, IMG_COMPUTER, "computer.png");
+        registerImage(registry, IMG_COMPUTER_KEY, "computer_key.png");
+        registerImage(registry, IMG_COMPUTER_DELETE, "computer_delete.png");
+        registerImage(registry, IMG_CONTAINER_TYPES, "container_types.png");
+        registerImage(registry, IMG_CONTAINERS, "containers.png");
+        registerImage(registry, IMG_DELETE, "delete.png");
+        registerImage(registry, IMG_DRAWER, "drawer.png");
+        registerImage(registry, IMG_FREEZER, "freezer.png");
+        registerImage(registry, IMG_HOTEL, "hotel.png");
+        registerImage(registry, IMG_MAIN_PERSPECTIVE, "mainPerspective.png");
+        registerImage(registry, IMG_PALLET, "pallet.png");
+        registerImage(registry, IMG_PATIENT, "patient.png");
+        registerImage(registry, IMG_PATIENT_VISIT, "patientvisit_add.png");
+        registerImage(registry, IMG_PATIENT_ADD, "patient_add.png");
+        registerImage(registry, IMG_PATIENT_VISIT_ADD, "patientvisit_add.png");
+        registerImage(registry, IMG_RELOAD_FORM, "reload.png");
+        registerImage(registry, IMG_REPORTS, "reports.png");
+        registerImage(registry, IMG_SCAN_ASSIGN, "scanAssign.png");
+        registerImage(registry, IMG_SCAN_LINK, "scanLink.png");
+        registerImage(registry, IMG_SESSIONS, "sessions.png");
+        registerImage(registry, IMG_SITE, "site.png");
+        registerImage(registry, IMG_STUDIES, "studies.png");
+        registerImage(registry, IMG_STUDY, "study.png");
+        registerImage(registry, IMG_USER_ADD, "user_add.png");
     }
 
     private void registerImage(ImageRegistry registry, String key,
@@ -112,22 +219,6 @@ public class BioBankPlugin extends AbstractUIPlugin {
     }
 
     /**
-     * Returns an image descriptor for the image file at the given plug-in
-     * relative path
-     * 
-     * @param path the path
-     * @return the image descriptor
-     */
-    public static ImageDescriptor getImageDescriptor(String path) {
-        return imageDescriptorFromPlugin(PLUGIN_ID, path);
-    }
-
-    public static Image getImage(String path) {
-        // FIXME should add the image in the registry and create it only once !
-        return getImageDescriptor(path).createImage();
-    }
-
-    /**
      * Display an information message
      */
     public static void openMessage(String title, String message) {
@@ -156,7 +247,7 @@ public class BioBankPlugin extends AbstractUIPlugin {
      */
     public static void openError(String title, Exception e) {
         String msg = e.getMessage();
-        if ((msg == null || msg.isEmpty()) && e.getCause() != null) {
+        if (((msg == null) || msg.isEmpty()) && (e.getCause() != null)) {
             msg = e.getCause().getMessage();
         }
         openError(title, e.getMessage());
@@ -280,4 +371,43 @@ public class BioBankPlugin extends AbstractUIPlugin {
         return getPreferenceStore().getString(
             PreferenceConstants.LINK_ASSIGN_PRINTER);
     }
+
+    public Image getImage(Object element) {
+        String imageKey = classToImageKey
+            .get(element.getClass().getName());
+        if ((imageKey == null)
+            && ((element instanceof ContainerAdapter) || (element instanceof ContainerTypeAdapter))) {
+            String ctName;
+            if (element instanceof ContainerAdapter) {
+                ctName = ((ContainerAdapter) element).getContainer()
+                    .getContainerType().getName();
+            } else {
+                ctName = ((ContainerTypeAdapter) element).getName();
+            }
+            return getIconForTypeName(ctName);
+        }
+        return BioBankPlugin.getDefault().getImageRegistry().get(imageKey);
+    }
+
+    public Image getIconForTypeName(String typeName) {
+        if (classToImageKey.containsKey(typeName)) {
+            return BioBankPlugin.getDefault().getImageRegistry().get(
+                classToImageKey.get(typeName));
+        }
+
+        String imageKey = null;
+        for (String name : CONTAINER_TYPE_IMAGE_KEYS) {
+            if (typeName.toLowerCase().contains(name)) {
+                imageKey = name;
+                break;
+            }
+        }
+
+        if (imageKey == null)
+            imageKey = BioBankPlugin.IMG_FREEZER;
+
+        classToImageKey.put(typeName, imageKey);
+        return BioBankPlugin.getDefault().getImageRegistry().get(imageKey);
+    }
+
 }

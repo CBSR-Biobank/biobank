@@ -6,6 +6,7 @@ import java.util.List;
 import org.apache.commons.collections.MapIterator;
 import org.apache.commons.collections.map.ListOrderedMap;
 import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -39,8 +40,10 @@ public class MultiSelectWidget extends BiobankWidget {
 
         selTree = createLabelledTree(this, leftLabel);
         selTree.setInput(selTreeRootNode);
+        selTree.setComparator(new ViewerComparator());
         availTree = createLabelledTree(this, rightLabel);
         availTree.setInput(availTreeRootNode);
+        availTree.setComparator(new ViewerComparator());
 
         dragAndDropSupport(availTree, selTree);
         dragAndDropSupport(selTree, availTree);

@@ -16,32 +16,20 @@ import edu.ualberta.med.biobank.model.Sample;
 public class SampleAdapter extends AdapterBase {
 
     public SampleAdapter(AdapterBase parent, Sample sample) {
-        super(parent, sample, Sample.class);
+        super(parent, sample);
     }
 
     public void setSample(Sample sample) {
-        setWrappedObject(sample, Sample.class);
+        object = sample;
     }
 
     public Sample getSample() {
-        return (Sample) getWrappedObject();
-    }
-
-    @Override
-    protected Integer getWrappedObjectId() {
-        return getSample().getId();
+        return (Sample) object;
     }
 
     @Override
     public void addChild(AdapterBase child) {
         Assert.isTrue(false, "Cannot add children to this adapter");
-    }
-
-    @Override
-    public Integer getId() {
-        Sample sample = getSample();
-        Assert.isNotNull(sample, "Sample is null");
-        return sample.getId();
     }
 
     @Override
@@ -82,11 +70,6 @@ public class SampleAdapter extends AdapterBase {
     @Override
     public AdapterBase accept(NodeSearchVisitor visitor) {
         return null;
-    }
-
-    @Override
-    protected boolean integrityCheck() {
-        return true;
     }
 
 }

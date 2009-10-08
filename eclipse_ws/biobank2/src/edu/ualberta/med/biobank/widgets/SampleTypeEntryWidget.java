@@ -25,9 +25,10 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.dialogs.SampleTypeDialog;
 import edu.ualberta.med.biobank.model.SampleType;
-import edu.ualberta.med.biobank.model.SampleTypeComparator;
 import edu.ualberta.med.biobank.widgets.infotables.BiobankCollectionModel;
 import edu.ualberta.med.biobank.widgets.infotables.SampleTypeInfoTable;
 import edu.ualberta.med.biobank.widgets.listener.BiobankEntryFormWidgetListener;
@@ -43,9 +44,9 @@ public class SampleTypeEntryWidget extends BiobankWidget {
 
     private Button addSampleTypeButton;
 
-    private List<SampleType> selectedSampleTypes;
+    private List<SampleTypeWrapper> selectedSampleTypes;
 
-    private Collection<SampleType> conflictTypes;
+    private Collection<SampleTypeWrapper> conflictTypes;
 
     /**
      * 
@@ -59,8 +60,8 @@ public class SampleTypeEntryWidget extends BiobankWidget {
      *            form this parameter should be null.
      */
     public SampleTypeEntryWidget(Composite parent, int style,
-        Collection<SampleType> sampleTypeCollection,
-        Collection<SampleType> conflictTypes, String buttonLabel,
+        Collection<SampleTypeWrapper> sampleTypeCollection,
+        Collection<SampleTypeWrapper> conflictTypes, String buttonLabel,
         FormToolkit toolkit) {
         super(parent, style);
         Assert.isNotNull(toolkit, "toolkit is null");
@@ -68,12 +69,12 @@ public class SampleTypeEntryWidget extends BiobankWidget {
         this.conflictTypes = conflictTypes;
 
         if (sampleTypeCollection == null) {
-            selectedSampleTypes = new ArrayList<SampleType>();
+            selectedSampleTypes = new ArrayList<SampleTypeWrapper>();
         } else {
-            selectedSampleTypes = new ArrayList<SampleType>(
+            selectedSampleTypes = new ArrayList<SampleTypeWrapper>(
                 sampleTypeCollection);
         }
-        Collections.sort(selectedSampleTypes, new SampleTypeComparator());
+        Collections.sort(selectedSampleTypes);
         setLayout(new GridLayout(1, false));
         setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
@@ -96,42 +97,40 @@ public class SampleTypeEntryWidget extends BiobankWidget {
         addSampleTypeButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                addOrEditSampleType(true, new SampleType(),
-                    getRestrictedTypes());
+                addOrEditSampleType(true, new SampleTypeWrapper(SessionManager
+                    .getAppService(), new SampleType()), getRestrictedTypes());
             }
         });
     }
 
-    private boolean addOrEditSampleType(boolean add, SampleType sampleType,
-        Set<SampleType> restrictedTypes) {
+    private boolean addOrEditSampleType(boolean add,
+        SampleTypeWrapper sampleType, Set<SampleTypeWrapper> restrictedTypes) {
         SampleTypeDialog dlg = new SampleTypeDialog(PlatformUI.getWorkbench()
             .getActiveWorkbenchWindow().getShell(), sampleType);
         if (dlg.open() == Dialog.OK) {
             if (addEditOk(sampleType, restrictedTypes)) {
                 if (add) {
-
                     // only add to the collection when adding and not editing
                     selectedSampleTypes.add(dlg.getSampleType());
                 }
                 sampleTypeTable.setCollection(selectedSampleTypes);
+                notifyListeners();
                 return true;
-            } else {
-                BioBankPlugin.openAsyncError("Name Problem",
-                    "A type with the same name or short name already exists.");
-                return false;
             }
+            BioBankPlugin.openAsyncError("Name Problem",
+                "A type with the same name or short name already exists.");
         }
         return false;
     }
 
     // need sample types that have not yet been selected in sampleStorageTable
-    private Set<SampleType> getRestrictedTypes() {
-
-        Set<SampleType> restrictedTypes = new HashSet<SampleType>(conflictTypes);
-        Collection<SampleType> currentSampleTypes = sampleTypeTable
+    private Set<SampleTypeWrapper> getRestrictedTypes() {
+        Set<SampleTypeWrapper> restrictedTypes = new HashSet<SampleTypeWrapper>(
+            conflictTypes);
+        Collection<SampleTypeWrapper> currentSampleTypes = sampleTypeTable
             .getCollection();
 
-        for (SampleType ss : currentSampleTypes) {
+        for (SampleTypeWrapper ss : currentSampleTypes) {
             restrictedTypes.add(ss);
         }
         return restrictedTypes;
@@ -152,18 +151,10 @@ public class SampleTypeEntryWidget extends BiobankWidget {
 
                 BiobankCollectionModel item = (BiobankCollectionModel) stSelection
                     .getFirstElement();
-                SampleType pvss = ((SampleType) item.o);
-                SampleType st = new SampleType();
-                st.setId(pvss.getId());
-                st.setName(pvss.getName());
-                st.setNameShort(pvss.getNameShort());
-
-                Set<SampleType> restrictedTypes = getRestrictedTypes();
+                SampleTypeWrapper pvss = ((SampleTypeWrapper) item.o);
+                Set<SampleTypeWrapper> restrictedTypes = getRestrictedTypes();
                 restrictedTypes.remove(pvss);
-                if (addOrEditSampleType(false, st, restrictedTypes)) {
-                    pvss.setName(st.getName());
-                    pvss.setNameShort(st.getNameShort());
-                }
+                addOrEditSampleType(false, pvss, restrictedTypes);
             }
 
             public void widgetDefaultSelected(SelectionEvent e) {
@@ -179,7 +170,7 @@ public class SampleTypeEntryWidget extends BiobankWidget {
 
                 BiobankCollectionModel item = (BiobankCollectionModel) stSelection
                     .getFirstElement();
-                SampleType sampleType = (SampleType) item.o;
+                SampleTypeWrapper sampleType = (SampleTypeWrapper) item.o;
 
                 boolean confirm = MessageDialog.openConfirm(PlatformUI
                     .getWorkbench().getActiveWorkbenchWindow().getShell(),
@@ -188,17 +179,18 @@ public class SampleTypeEntryWidget extends BiobankWidget {
                         + sampleType.getName() + "\"?");
 
                 if (confirm) {
-                    Collection<SampleType> stToDelete = new HashSet<SampleType>();
-                    for (SampleType st : selectedSampleTypes) {
+                    Collection<SampleTypeWrapper> stToDelete = new HashSet<SampleTypeWrapper>();
+                    for (SampleTypeWrapper st : selectedSampleTypes) {
                         if (st.getName().equals(sampleType.getName()))
                             stToDelete.add(st);
                     }
 
-                    for (SampleType st : stToDelete) {
+                    for (SampleTypeWrapper st : stToDelete) {
                         selectedSampleTypes.remove(st);
                     }
 
                     sampleTypeTable.setCollection(selectedSampleTypes);
+                    notifyListeners();
                 }
             }
 
@@ -207,8 +199,9 @@ public class SampleTypeEntryWidget extends BiobankWidget {
         });
     }
 
-    private boolean addEditOk(SampleType type, Set<SampleType> restrictedTypes) {
-        for (SampleType st : restrictedTypes) {
+    private boolean addEditOk(SampleTypeWrapper type,
+        Set<SampleTypeWrapper> restrictedTypes) {
+        for (SampleTypeWrapper st : restrictedTypes) {
             if (st.getName().equals(type.getName())
                 || st.getNameShort().equals(type.getNameShort())) {
                 return false;
@@ -217,7 +210,7 @@ public class SampleTypeEntryWidget extends BiobankWidget {
         return true;
     }
 
-    public Collection<SampleType> getTableSampleTypes() {
+    public List<SampleTypeWrapper> getTableSampleTypes() {
         return sampleTypeTable.getCollection();
     }
 

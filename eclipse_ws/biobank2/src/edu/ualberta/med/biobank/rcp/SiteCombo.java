@@ -1,13 +1,14 @@
 package edu.ualberta.med.biobank.rcp;
 
-import org.eclipse.jface.action.ControlContribution;
+import java.util.List;
+
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ComboViewer;
-import org.eclipse.jface.viewers.IElementComparer;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -16,20 +17,22 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.ui.menus.WorkbenchWindowControlContribution;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.treeview.SessionAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
-public class SiteCombo extends ControlContribution {
+public class SiteCombo extends WorkbenchWindowControlContribution {
 
     private SessionAdapter session;
-    public ComboViewer comboViewer;
+
+    private ComboViewer comboViewer;
 
     public SiteCombo() {
         super("Site Selection");
-
+        SessionManager.getInstance().setSiteCombo(this);
     }
 
     public SiteCombo(String str) {
@@ -38,7 +41,10 @@ public class SiteCombo extends ControlContribution {
 
     public void setSession(SessionAdapter session) {
         this.session = session;
+    }
 
+    public void setInput(List<SiteWrapper> sites) {
+        comboViewer.setInput(sites);
     }
 
     @Override
@@ -63,36 +69,26 @@ public class SiteCombo extends ControlContribution {
                 public void selectionChanged(SelectionChangedEvent event) {
                     IStructuredSelection selection = (IStructuredSelection) event
                         .getSelection();
-                    Site site = (Site) selection.getFirstElement();
+                    SiteWrapper siteWrapper = (SiteWrapper) selection
+                        .getFirstElement();
 
-                    if (site != null) {
-                        if (site.getId() == null)
-                            SessionManager.getInstance().setCurrentSite(null);
-                        else
-                            SessionManager.getInstance().setCurrentSite(site);
-                        if (session != null)
-                            session.rebuild();
+                    if (siteWrapper == null)
+                        return;
+
+                    if (siteWrapper.getId() == null)
+                        SessionManager.getInstance().setCurrentSite(null);
+                    else
+                        SessionManager.getInstance()
+                            .setCurrentSite(siteWrapper);
+                    if (session != null)
+                        session.rebuild();
+                    TreeViewer tv = SessionManager.getInstance()
+                        .getTreeViewer();
+                    if (tv != null) {
+                        tv.expandToLevel(3);
                     }
                 }
             });
-        comboViewer.setComparer(new IElementComparer() {
-            @Override
-            public boolean equals(Object a, Object b) {
-                if (a instanceof Site && b instanceof Site) {
-                    Integer ida = ((Site) a).getId();
-                    Integer idb = ((Site) b).getId();
-                    if (((ida == null) && (idb == null)) || ida.equals(idb))
-                        return true;
-                }
-                return false;
-            }
-
-            @Override
-            public int hashCode(Object element) {
-                return element.hashCode();
-            }
-
-        });
         comboViewer.setComparator(new ViewerComparator());
         GridData gd = new GridData();
         gd.widthHint = 155;
@@ -107,8 +103,8 @@ public class SiteCombo extends ControlContribution {
         comboViewer.getCombo().setEnabled(enabled);
     }
 
-    public void setSelection(Site site) {
-        comboViewer.setSelection(new StructuredSelection(site));
+    public void setSelection(SiteWrapper siteWrapper) {
+        comboViewer.setSelection(new StructuredSelection(siteWrapper));
     }
 
 }

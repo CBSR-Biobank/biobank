@@ -1,10 +1,12 @@
 package edu.ualberta.med.biobank.treeview;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
@@ -13,8 +15,10 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 
+import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.utils.ModelUtils;
+import edu.ualberta.med.biobank.common.BiobankCheckException;
+import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
@@ -26,9 +30,7 @@ public abstract class AdapterBase {
 
     protected IDeltaListener listener = NullDeltaListener.getSoleInstance();
 
-    private Object wrappedObject;
-
-    private Class<?> wrappedObjectClass;
+    protected Object object;
 
     private Integer id;
 
@@ -40,44 +42,42 @@ public abstract class AdapterBase {
 
     protected List<AdapterBase> children;
 
-    public AdapterBase(AdapterBase parent, Object wrappedObject,
-        Class<?> wrappedObjectClass) {
-        this.wrappedObject = wrappedObject;
-        this.wrappedObjectClass = wrappedObjectClass;
+    public AdapterBase(AdapterBase parent, Object object) {
+        this.object = object;
         this.parent = parent;
         children = new ArrayList<AdapterBase>();
         if (parent != null) {
             addListener(parent.listener);
         }
 
-        Assert.isTrue(integrityCheck(), "integrity checks failed");
+        Assert.isTrue(checkIntegrity(), "integrity checks failed");
     }
 
-    public AdapterBase(AdapterBase parent, Object modelObject,
-        Class<?> modelClass, int id, String name) {
-        this(parent, modelObject, modelClass);
+    public AdapterBase(AdapterBase parent, int id, String name) {
+        this(parent, null);
         setId(id);
         setName(name);
     }
 
-    public AdapterBase(AdapterBase parent, Object modelObject,
-        Class<?> modelClass, int id, String name, boolean hasChildren) {
-        this(parent, modelObject, modelClass, id, name);
+    public AdapterBase(AdapterBase parent, int id, String name,
+        boolean hasChildren) {
+        this(parent, id, name);
         setHasChildren(hasChildren);
     }
 
-    protected Object getWrappedObject() {
-        return wrappedObject;
+    public Object getObject() {
+        return object;
     }
 
-    protected void setWrappedObject(Object object, Class<?> klass) {
-        wrappedObject = object;
-        this.wrappedObjectClass = klass;
+    /**
+     * return true if the integrity of the object is ok
+     */
+    private boolean checkIntegrity() {
+        if ((object != null) && (object instanceof ModelWrapper<?>)) {
+            return ((ModelWrapper<?>) object).checkIntegrity();
+        }
+        return true;
     }
-
-    protected abstract Integer getWrappedObjectId();
-
-    protected abstract boolean integrityCheck();
 
     public void setParent(AdapterBase parent) {
         this.parent = parent;
@@ -92,6 +92,20 @@ public abstract class AdapterBase {
     }
 
     public Integer getId() {
+        if (object != null) {
+            if (object instanceof ModelWrapper<?>) {
+                return ((ModelWrapper<?>) object).getId();
+            }
+            // FIXME remove this when everything is moved to wrapped objects
+            try {
+                Method method = object.getClass().getDeclaredMethod("getId");
+                if (method != null) {
+                    return (Integer) method.invoke(object);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
         return id;
     }
 
@@ -329,19 +343,20 @@ public abstract class AdapterBase {
         return getParentFromClass(RootNode.class);
     }
 
+    // FIXME should use the wrapped object method now !
     public Object loadWrappedObject() throws Exception {
-        Object realObject = wrappedObject;
-        Class<?> realObjectClass = wrappedObject.getClass();
-        Assert.isNotNull(realObjectClass, "model class is null");
-
-        Integer id = getWrappedObjectId();
-        // if object is not stored in the database it cannot be loaded
-        if (id == null)
-            return realObject;
-
-        wrappedObject = ModelUtils.getObjectWithId(getAppService(),
-            wrappedObjectClass, id);
-        Assert.isNotNull(realObject, "model object not in database");
+        Object realObject = object;
+        // Class<?> realObjectClass = wrappedObject.getClass();
+        // Assert.isNotNull(realObjectClass, "model class is null");
+        //
+        // Integer id = getWrappedObjectId();
+        // // if object is not stored in the database it cannot be loaded
+        // if (id == null)
+        // return realObject;
+        //
+        // wrappedObject = ModelUtils.getObjectWithId(getAppService(),
+        // wrappedObjectClass, id);
+        // Assert.isNotNull(realObject, "model object not in database");
         return realObject;
     }
 
@@ -349,4 +364,43 @@ public abstract class AdapterBase {
         removeAll();
         loadChildren(false);
     }
+
+    public void resetObject() throws Exception {
+        if (object != null && object instanceof ModelWrapper<?>) {
+            ((ModelWrapper<?>) object).reset();
+        }
+    }
+
+    public void delete() {
+        delete(null);
+    }
+
+    public void delete(String message) {
+        boolean doDelete = true;
+        if (message != null)
+            doDelete = BioBankPlugin.openConfirm("Confirm Delete", message);
+        if (doDelete) {
+            BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        if (object != null && object instanceof ModelWrapper<?>) {
+                            ((ModelWrapper<?>) object).delete();
+                            getParent().removeChild(AdapterBase.this);
+                        }
+                    } catch (BiobankCheckException bce) {
+                        BioBankPlugin.openAsyncError("Delete failed", bce);
+                    } catch (Exception e) {
+                        BioBankPlugin.openAsyncError("Delete failed", e);
+                    }
+                }
+            });
+        }
+    }
+
+    public AdapterBase searchChild(ModelWrapper<?> wrapper) {
+        return accept(new NodeSearchVisitor(wrapper.getWrappedClass(), wrapper
+            .getId()));
+    }
+
 }

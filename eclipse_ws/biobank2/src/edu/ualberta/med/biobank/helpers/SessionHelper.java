@@ -2,12 +2,13 @@ package edu.ualberta.med.biobank.helpers;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.common.utils.ModelUtils;
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.client.ApplicationServiceProvider;
 
-import java.util.List;
+import java.util.Collection;
 
 import org.acegisecurity.providers.rcp.RemoteAuthenticationException;
 import org.springframework.remoting.RemoteAccessException;
@@ -22,7 +23,7 @@ public class SessionHelper implements Runnable {
 
     private WritableApplicationService appService;
 
-    private List<Site> sites;
+    private Collection<SiteWrapper> siteWrappers;
 
     public SessionHelper(String server, String userName, String password) {
         this.serverUrl = "http://" + server + "/biobank2";
@@ -30,7 +31,7 @@ public class SessionHelper implements Runnable {
         this.password = password;
 
         appService = null;
-        sites = null;
+        siteWrappers = null;
     }
 
     public void run() {
@@ -49,8 +50,7 @@ public class SessionHelper implements Runnable {
                     .getApplicationServiceFromUrl(serverUrl, userName, password);
             }
 
-            Site site = new Site();
-            sites = appService.search(Site.class, site);
+            siteWrappers = ModelUtils.getSites(appService, null);
         } catch (ApplicationException exp) {
             SessionManager.getLogger().error(
                 "Error while logging to application", exp);
@@ -73,7 +73,7 @@ public class SessionHelper implements Runnable {
         return appService;
     }
 
-    public List<Site> getSites() {
-        return sites;
+    public Collection<SiteWrapper> getSites() {
+        return siteWrappers;
     }
 }

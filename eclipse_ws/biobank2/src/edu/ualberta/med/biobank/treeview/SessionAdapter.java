@@ -1,9 +1,9 @@
 package edu.ualberta.med.biobank.treeview;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
@@ -17,8 +17,8 @@ import org.springframework.remoting.RemoteAccessException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.model.Site;
-import edu.ualberta.med.biobank.model.SiteComparator;
+import edu.ualberta.med.biobank.common.utils.ModelUtils;
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
@@ -31,7 +31,7 @@ public class SessionAdapter extends AdapterBase {
     public SessionAdapter(AdapterBase parent,
         WritableApplicationService appService, int sessionId, String name,
         String userName) {
-        super(parent, null, null);
+        super(parent, null);
         this.appService = appService;
         setId(sessionId);
         setName(name);
@@ -40,19 +40,8 @@ public class SessionAdapter extends AdapterBase {
     }
 
     @Override
-    protected Integer getWrappedObjectId() {
-        Assert.isTrue(false, "Should not be invoked for this type of adatper");
-        return null;
-    }
-
-    @Override
     public WritableApplicationService getAppService() {
         return appService;
-    }
-
-    @Override
-    public Integer getId() {
-        return null;
     }
 
     @Override
@@ -112,25 +101,24 @@ public class SessionAdapter extends AdapterBase {
     public void loadChildren(boolean updateNode) {
         try {
             // read from database again
-            Site siteSearch = new Site();
-            List<Site> result = appService.search(Site.class, siteSearch);
-            Collections.sort(result, new SiteComparator());
-            Site currentSite = SessionManager.getInstance().getCurrentSite();
-            for (Site site : result) {
-                if (currentSite == null
-                    || site.getName().equals(currentSite.getName())) {
-                    SessionManager.getLogger().trace(
-                        "updateSites: Site " + site.getId() + ": "
-                            + site.getName());
+            Integer siteId = null;
+            SiteWrapper currentSite = SessionManager.getInstance()
+                .getCurrentSiteWrapper();
+            if (currentSite != null)
+                siteId = currentSite.getId();
 
-                    SiteAdapter node = (SiteAdapter) getChild(site.getId());
-                    if (node == null) {
-                        node = new SiteAdapter(this, site);
-                        addChild(node);
-                    }
-                    if (updateNode) {
-                        SessionManager.getInstance().updateTreeNode(node);
-                    }
+            List<SiteWrapper> siteCollection = new ArrayList<SiteWrapper>(
+                ModelUtils.getSites(appService, siteId));
+            Collections.sort(siteCollection);
+
+            for (SiteWrapper siteWrapper : siteCollection) {
+                SiteAdapter node = (SiteAdapter) getChild(siteWrapper.getId());
+                if (node == null) {
+                    node = new SiteAdapter(this, siteWrapper);
+                    addChild(node);
+                }
+                if (updateNode) {
+                    SessionManager.getInstance().updateTreeNode(node);
                 }
             }
         } catch (final RemoteAccessException exp) {
@@ -169,8 +157,4 @@ public class SessionAdapter extends AdapterBase {
         return "";
     }
 
-    @Override
-    protected boolean integrityCheck() {
-        return true;
-    }
 }

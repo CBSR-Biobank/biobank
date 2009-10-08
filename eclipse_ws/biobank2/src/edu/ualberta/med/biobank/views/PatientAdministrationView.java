@@ -26,7 +26,6 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.forms.PatientEntryForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
-import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.sourceproviders.SiteSelectionState;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.NodeSearchVisitor;
@@ -133,9 +132,9 @@ public class PatientAdministrationView extends ViewPart implements
         getSite().getPage().closeAllEditors(true);
         String number = patientNumberText.getText();
         try {
-            PatientWrapper patientWrapper = PatientWrapper
-                .getPatientWrapperInSite(SessionManager.getAppService(),
-                    number, SessionManager.getInstance().getCurrentSite());
+            PatientWrapper patientWrapper = PatientWrapper.getPatientInSite(
+                SessionManager.getAppService(), number, SessionManager
+                    .getInstance().getCurrentSiteWrapper());
             if (patientWrapper == null) {
                 notFoundPatient(number);
             } else {
@@ -149,8 +148,8 @@ public class PatientAdministrationView extends ViewPart implements
 
     public void showPatientInTree(PatientWrapper patientWrapper) {
         getRootNode().removeAll();
-        SiteAdapter siteAdapter = new SiteAdapter(getRootNode(), patientWrapper
-            .getStudy().getSite(), false);
+        SiteAdapter siteAdapter = new SiteAdapter(getRootNode(), SessionManager
+            .getInstance().getCurrentSiteWrapper(), false);
         getRootNode().addChild(siteAdapter);
         StudyAdapter studyAdapter = new StudyAdapter(siteAdapter,
             patientWrapper.getStudy(), false);
@@ -171,7 +170,8 @@ public class PatientAdministrationView extends ViewPart implements
         boolean create = BioBankPlugin.openConfirm("Patient not found",
             "Do you want to create this patient ?");
         if (create) {
-            Patient patient = new Patient();
+            PatientWrapper patient = new PatientWrapper(SessionManager
+                .getAppService());
             patient.setNumber(number);
             PatientAdapter adapter = new PatientAdapter(getRootNode(), patient);
             try {
@@ -204,8 +204,8 @@ public class PatientAdministrationView extends ViewPart implements
 
     private static AdapterBase getNoPatientFoundAdapter() {
         if (noPatientFoundAdapter == null) {
-            noPatientFoundAdapter = new AdapterBase(getRootNode(), null, null,
-                0, "- No patient found -") {
+            noPatientFoundAdapter = new AdapterBase(getRootNode(), 0,
+                "- No patient found -") {
                 @Override
                 public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
                 }
@@ -226,16 +226,6 @@ public class PatientAdministrationView extends ViewPart implements
                 @Override
                 public AdapterBase accept(NodeSearchVisitor visitor) {
                     return null;
-                }
-
-                @Override
-                protected Integer getWrappedObjectId() {
-                    return null;
-                }
-
-                @Override
-                protected boolean integrityCheck() {
-                    return true;
                 }
             };
         }

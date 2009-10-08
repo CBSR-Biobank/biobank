@@ -4,16 +4,17 @@ import java.util.Collection;
 
 import org.eclipse.swt.widgets.Composite;
 
-import edu.ualberta.med.biobank.model.PvSampleSource;
+import edu.ualberta.med.biobank.common.wrappers.PvSampleSourceWrapper;
 
-public class PvSampleSourceInfoTable extends InfoTableWidget<PvSampleSource> {
+public class PvSampleSourceInfoTable extends
+    InfoTableWidget<PvSampleSourceWrapper> {
 
     private final static String[] headings = new String[] { "Name", "Quantity" };
 
     private final static int[] bounds = new int[] { 250, -1, -1, -1, -1 };
 
     public PvSampleSourceInfoTable(Composite parent,
-        Collection<PvSampleSource> collection) {
+        Collection<PvSampleSourceWrapper> collection) {
         super(parent, collection, headings, bounds);
     }
 

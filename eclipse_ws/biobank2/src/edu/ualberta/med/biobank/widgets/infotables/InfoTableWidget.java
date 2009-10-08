@@ -2,7 +2,6 @@ package edu.ualberta.med.biobank.widgets.infotables;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
@@ -16,11 +15,13 @@ import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 
+import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import edu.ualberta.med.biobank.widgets.BiobankWidget;
 
@@ -82,6 +83,7 @@ public class InfoTableWidget<T> extends BiobankWidget {
             for (int i = 0, n = collection.size(); i < n; ++i) {
                 model.add(new BiobankCollectionModel());
             }
+            getTableViewer().refresh();
             setCollection(collection);
             setCollectionCount = 0;
         } else
@@ -107,41 +109,55 @@ public class InfoTableWidget<T> extends BiobankWidget {
         Thread t = new Thread() {
             @Override
             public void run() {
-                if (getTableViewer().getTable().isDisposed())
-                    return;
+                final TableViewer viewer = getTableViewer();
+                Display display = viewer.getTable().getDisplay();
+                int count = 0;
 
-                BiobankCollectionModel modelItem;
-                model.clear();
-
-                for (T item : collection) {
-                    modelItem = new BiobankCollectionModel();
-                    model.add(modelItem);
-                    modelItem.o = item;
+                if (model.size() != collection.size()) {
+                    model.clear();
+                    for (int i = 0, n = collection.size(); i < n; ++i) {
+                        model.add(new BiobankCollectionModel());
+                    }
+                    display.asyncExec(new Runnable() {
+                        public void run() {
+                            if (!viewer.getTable().isDisposed())
+                                getTableViewer().refresh();
+                        }
+                    });
                 }
-                launchAsyncRefresh();
+
+                try {
+                    for (T item : collection) {
+                        if (viewer.getTable().isDisposed())
+                            return;
+
+                        final BiobankCollectionModel modelItem = model
+                            .get(count);
+                        modelItem.o = item;
+                        if (item instanceof ModelWrapper<?>) {
+                            ((ModelWrapper<?>) item).loadAttributes();
+                        }
+
+                        display.asyncExec(new Runnable() {
+                            public void run() {
+                                if (!viewer.getTable().isDisposed())
+                                    viewer.refresh(modelItem, false);
+                            }
+                        });
+                        ++count;
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
 
         };
         t.start();
     }
 
-    protected void launchAsyncRefresh() {
-        getTableViewer().getTable().getDisplay().asyncExec(new Runnable() {
-            public void run() {
-                getTableViewer().refresh();
-
-                // only notify listeners if collection has been
-                // assigned other than by constructor
-                if (setCollectionCount > 0)
-                    InfoTableWidget.this.notifyListeners();
-                ++setCollectionCount;
-            }
-        });
-    }
-
     @SuppressWarnings("unchecked")
-    public Collection<T> getCollection() {
-        Collection<T> collection = new HashSet<T>();
+    public List<T> getCollection() {
+        List<T> collection = new ArrayList<T>();
         for (BiobankCollectionModel item : model) {
             collection.add((T) item.o);
         }

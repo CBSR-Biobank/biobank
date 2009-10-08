@@ -1,11 +1,12 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
-import edu.ualberta.med.biobank.common.DatabaseResult;
+import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.LabelingScheme;
 import edu.ualberta.med.biobank.common.RowColPos;
 import edu.ualberta.med.biobank.model.Container;
@@ -35,45 +36,41 @@ public class SampleWrapper extends ModelWrapper<Sample> {
     }
 
     @Override
-    protected void firePropertyChanges(Sample oldWrappedObject,
-        Sample newWrappedObject) {
-        propertyChangeSupport.firePropertyChange("inventoryId",
-            oldWrappedObject, newWrappedObject);
-        propertyChangeSupport.firePropertyChange("patientVisit",
-            oldWrappedObject, newWrappedObject);
-        propertyChangeSupport.firePropertyChange("samplePosition",
-            oldWrappedObject, newWrappedObject);
+    protected String[] getPropertyChangesNames() {
+        return new String[] { "inventoryId", "patientVisit", "samplePosition",
+            "linkDate", "sampleType" };
     }
 
     @Override
-    protected Class<Sample> getWrappedClass() {
+    public Class<Sample> getWrappedClass() {
         return Sample.class;
     }
 
     @Override
-    protected DatabaseResult persistChecks() throws ApplicationException {
-        return DatabaseResult.OK;
+    protected void persistChecks() throws BiobankCheckException, Exception {
     }
 
     public String getInventoryId() {
         return wrappedObject.getInventoryId();
     }
 
-    public DatabaseResult checkInventoryIdUnique() throws ApplicationException {
+    public void checkInventoryIdUnique() throws BiobankCheckException,
+        ApplicationException {
         HQLCriteria criteria = new HQLCriteria("from " + Sample.class.getName()
             + " where inventoryId  = ? and patientVisit.patient.study.site=?",
             Arrays.asList(new Object[] { getInventoryId(), getSite() }));
         List<Sample> samples = appService.query(criteria);
         if (samples.size() == 0) {
-            return DatabaseResult.OK;
+            return;
         }
         for (Sample sample : samples) {
+            // need to do that for the upper and lower letter (not taken into
+            // account in the sql query
             if (sample.getInventoryId().equals(getInventoryId())) {
-                return new DatabaseResult("A sample with inventoryId \""
+                throw new BiobankCheckException("A sample with inventoryId \""
                     + getInventoryId() + "\" already exists.");
             }
         }
-        return DatabaseResult.OK;
     }
 
     public Site getSite() {
@@ -95,10 +92,11 @@ public class SampleWrapper extends ModelWrapper<Sample> {
     }
 
     public void setSamplePositionFromString(String positionString,
-        Container parentContainer) throws Exception {
+        ContainerWrapper parentContainer) throws Exception {
         RowColPos rcp = LabelingScheme.getRowColFromPositionString(
-            positionString, parentContainer.getContainerType());
-        if (rcp.row > -1 && rcp.col > -1) {
+            positionString, parentContainer.getContainerType()
+                .getWrappedObject());
+        if ((rcp.row > -1) && (rcp.col > -1)) {
             SamplePosition sp = getSamplePosition();
             if (sp == null) {
                 sp = new SamplePosition();
@@ -124,20 +122,20 @@ public class SampleWrapper extends ModelWrapper<Sample> {
         return wrappedObject.getSamplePosition();
     }
 
-    public DatabaseResult checkPosition(Container parentContainer)
-        throws ApplicationException {
-        HQLCriteria criteria = new HQLCriteria(
-            "from "
-                + Sample.class.getName()
-                + " where samplePosition.row=? and samplePosition.col=? and samplePosition.container=?",
-            Arrays.asList(new Object[] { getSamplePosition().getRow(),
-                getSamplePosition().getCol(), parentContainer }));
+    public void checkPosition(ContainerWrapper parentContainer)
+        throws BiobankCheckException, ApplicationException {
+        SamplePosition sp = getSamplePosition();
+        HQLCriteria criteria = new HQLCriteria("from " + Sample.class.getName()
+            + " where samplePosition.row=? and samplePosition.col=?"
+            + " and samplePosition.container=?", Arrays.asList(new Object[] {
+            sp.getRow(), sp.getCol(), parentContainer.getWrappedObject() }));
+
         List<Sample> samples = appService.query(criteria);
         if (samples.size() == 0) {
-            return DatabaseResult.OK;
+            return;
         }
         Sample sample = samples.get(0);
-        return new DatabaseResult("Position already in use in container "
+        throw new BiobankCheckException("Position already in use in container "
             + parentContainer.getLabel() + " by sample "
             + sample.getInventoryId());
     }
@@ -146,6 +144,10 @@ public class SampleWrapper extends ModelWrapper<Sample> {
         SampleType oldType = getSampleType();
         wrappedObject.setSampleType(type);
         propertyChangeSupport.firePropertyChange("sampleType", oldType, type);
+    }
+
+    public void setSampleType(SampleTypeWrapper type) {
+        setSampleType(type.wrappedObject);
     }
 
     public SampleType getSampleType() {
@@ -183,36 +185,35 @@ public class SampleWrapper extends ModelWrapper<Sample> {
         SamplePosition position = getSamplePosition();
         if (position == null) {
             return "none";
-        } else {
-            if (fullString) {
-                Container container = position.getContainer();
-                Container topContainer = container;
-                while (topContainer.getPosition() != null
-                    && topContainer.getPosition().getParentContainer() != null) {
-                    topContainer = topContainer.getPosition()
-                        .getParentContainer();
-                }
-                String nameShort = topContainer.getContainerType()
-                    .getNameShort();
-                if (nameShort != null)
-                    return nameShort + "-" + container.getLabel()
-                        + LabelingScheme.getPositionString(position);
-                return container.getLabel()
-                    + LabelingScheme.getPositionString(position);
-            } else {
-                return LabelingScheme.getPositionString(position);
-            }
         }
+
+        if (!fullString) {
+            return LabelingScheme.getPositionString(position);
+        }
+
+        Container container = position.getContainer();
+        Container topContainer = container;
+        while ((topContainer.getPosition() != null)
+            && (topContainer.getPosition().getParentContainer() != null)) {
+            topContainer = topContainer.getPosition().getParentContainer();
+        }
+        String nameShort = topContainer.getContainerType().getNameShort();
+        if (nameShort != null)
+            return nameShort + "-" + container.getLabel()
+                + LabelingScheme.getPositionString(position);
+        return container.getLabel()
+            + LabelingScheme.getPositionString(position);
     }
 
-    public static Sample createNewSample(String inventoryId,
-        PatientVisitWrapper pv, SampleType type,
+    public static SampleWrapper createNewSample(
+        WritableApplicationService appService, String inventoryId,
+        PatientVisitWrapper pv, SampleTypeWrapper type,
         Collection<SampleStorage> sampleStorages) {
         Sample sample = new Sample();
         sample.setInventoryId(inventoryId);
         sample.setPatientVisit(pv.getWrappedObject());
         sample.setLinkDate(new Date());
-        sample.setSampleType(type);
+        sample.setSampleType(type.getWrappedObject());
         Double volume = null;
         for (SampleStorage ss : sampleStorages) {
             if (ss.getSampleType().getId().equals(type.getId())) {
@@ -220,7 +221,7 @@ public class SampleWrapper extends ModelWrapper<Sample> {
             }
         }
         sample.setQuantity(volume);
-        return sample;
+        return new SampleWrapper(appService, sample);
     }
 
     public void setQuantityFromType() {
@@ -233,4 +234,38 @@ public class SampleWrapper extends ModelWrapper<Sample> {
         }
         setQuantity(volume);
     }
+
+    @Override
+    public void loadAttributes() throws Exception {
+        super.loadAttributes();
+        getPositionString(true);
+        wrappedObject.getSampleType().getName();
+    }
+
+    @Override
+    protected void deleteChecks() throws BiobankCheckException, Exception {
+        // TODO Auto-generated method stub
+    }
+
+    public static List<SampleWrapper> getSamplesInSite(
+        WritableApplicationService appService, String inventoryId,
+        SiteWrapper siteWrapper) throws ApplicationException {
+        HQLCriteria criteria = new HQLCriteria(
+            "from "
+                + Sample.class.getName()
+                + " where inventoryId = ? and patientVisit.patient.study.site.id = ?",
+            Arrays.asList(new Object[] { inventoryId, siteWrapper.getId() }));
+        List<Sample> samples = appService.query(criteria);
+        return transformToWrapperList(appService, samples);
+    }
+
+    public static List<SampleWrapper> transformToWrapperList(
+        WritableApplicationService appService, List<Sample> samples) {
+        List<SampleWrapper> list = new ArrayList<SampleWrapper>();
+        for (Sample sample : samples) {
+            list.add(new SampleWrapper(appService, sample));
+        }
+        return list;
+    }
+
 }

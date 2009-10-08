@@ -20,11 +20,10 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
 
-import edu.ualberta.med.biobank.model.Clinic;
+import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.model.ClinicStudyInfo;
 import edu.ualberta.med.biobank.model.StudyContactAndPatientInfo;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
-import edu.ualberta.med.biobank.treeview.ClinicAdapter;
 import edu.ualberta.med.biobank.widgets.infotables.BiobankCollectionModel;
 import edu.ualberta.med.biobank.widgets.infotables.ClinicInfoTable;
 
@@ -76,7 +75,7 @@ public class FormUtils {
     }
 
     public static ClinicInfoTable createClinicSection(FormToolkit toolkit,
-        Composite parent, final Collection<Clinic> clinics) {
+        Composite parent, final Collection<ClinicWrapper> clinics) {
         Section section = toolkit.createSection(parent, Section.TWISTIE
             | Section.TITLE_BAR | Section.EXPANDED);
         section.setText("Clinics");
@@ -89,18 +88,6 @@ public class FormUtils {
         comp.getTableViewer().addDoubleClickListener(
             getBiobankCollectionDoubleClickListener());
         return comp;
-    }
-
-    public static ClinicAdapter[] getClinicsAdapters(
-        AdapterBase clinicGroupParent, Collection<Clinic> clinics) {
-        ClinicAdapter[] clinicAdapters = new ClinicAdapter[clinics.size()];
-
-        int count = 0;
-        for (Clinic clinic : clinics) {
-            clinicAdapters[count] = new ClinicAdapter(clinicGroupParent, clinic);
-            ++count;
-        }
-        return clinicAdapters;
     }
 
     /**

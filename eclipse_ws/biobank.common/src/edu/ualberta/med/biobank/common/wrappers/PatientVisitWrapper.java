@@ -1,11 +1,12 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 
-import edu.ualberta.med.biobank.common.DatabaseResult;
+import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Patient;
@@ -17,22 +18,22 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
-public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
+public class PatientVisitWrapper extends ModelWrapper<PatientVisit> implements
+    Comparable<PatientVisitWrapper> {
 
     public PatientVisitWrapper(WritableApplicationService appService,
         PatientVisit wrappedObject) {
         super(appService, wrappedObject);
     }
 
+    public PatientVisitWrapper(WritableApplicationService appService) {
+        super(appService);
+    }
+
     @Override
-    protected void firePropertyChanges(PatientVisit oldWrappedObject,
-        PatientVisit newWrappedObject) {
-        propertyChangeSupport.firePropertyChange("patient", oldWrappedObject,
-            newWrappedObject);
-        propertyChangeSupport.firePropertyChange("dateDrawn", oldWrappedObject,
-            newWrappedObject);
-        propertyChangeSupport.firePropertyChange("clinic", oldWrappedObject,
-            newWrappedObject);
+    protected String[] getPropertyChangesNames() {
+        return new String[] { "patient", "dateDrawn", "dateProcessed",
+            "dateReceived", "clinic", "comments", "pvInfoDataCollection" };
     }
 
     public Date getDateDrawn() {
@@ -64,7 +65,11 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
     }
 
     public PatientWrapper getPatientWrapper() {
-        return new PatientWrapper(appService, wrappedObject.getPatient());
+        Patient patient = wrappedObject.getPatient();
+        if (patient == null) {
+            return null;
+        }
+        return new PatientWrapper(appService, patient);
     }
 
     public void setPatientWrapper(PatientWrapper patientWrapper) {
@@ -79,16 +84,85 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
         return wrappedObject.getSampleCollection();
     }
 
-    public Clinic getClinic() {
-        return wrappedObject.getClinic();
+    public void setSampleCollection(Collection<Sample> sampleCollection) {
+        wrappedObject.setSampleCollection(sampleCollection);
     }
 
-    public Collection<PvSampleSource> getPvSampleSourceCollection() {
-        return wrappedObject.getPvSampleSourceCollection();
+    public Collection<SampleWrapper> getSampleWrapperCollection() {
+        Collection<SampleWrapper> collection = new HashSet<SampleWrapper>();
+        for (Sample sample : wrappedObject.getSampleCollection()) {
+            collection.add(new SampleWrapper(appService, sample));
+        }
+        return collection;
     }
 
-    public Collection<PvInfoData> getPvInfoDataCollection() {
-        return wrappedObject.getPvInfoDataCollection();
+    public ClinicWrapper getClinic() {
+        Clinic clinic = wrappedObject.getClinic();
+        if (clinic == null) {
+            return null;
+        }
+        return new ClinicWrapper(appService, clinic);
+    }
+
+    @SuppressWarnings("unchecked")
+    public Collection<PvSampleSourceWrapper> getPvSampleSourceCollection() {
+        List<PvSampleSourceWrapper> pvSampleSourceCollection = (List<PvSampleSourceWrapper>) propertiesMap
+            .get("pvSampleSourceCollection");
+        if (pvSampleSourceCollection == null) {
+            Collection<PvSampleSource> children = wrappedObject
+                .getPvSampleSourceCollection();
+            if (children != null) {
+                pvSampleSourceCollection = new ArrayList<PvSampleSourceWrapper>();
+                for (PvSampleSource pvSampleSource : children) {
+                    pvSampleSourceCollection.add(new PvSampleSourceWrapper(
+                        appService, pvSampleSource));
+                }
+                propertiesMap.put("pvSampleSourceCollection",
+                    pvSampleSourceCollection);
+            }
+        }
+        return pvSampleSourceCollection;
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<PvInfoDataWrapper> getPvInfoDataCollection() {
+        List<PvInfoDataWrapper> pvInfoDataCollection = (List<PvInfoDataWrapper>) propertiesMap
+            .get("pvInfoDataCollection");
+        if (pvInfoDataCollection == null) {
+            Collection<PvInfoData> children = wrappedObject
+                .getPvInfoDataCollection();
+            if (children != null) {
+                pvInfoDataCollection = new ArrayList<PvInfoDataWrapper>();
+                for (PvInfoData pvInfo : children) {
+                    pvInfoDataCollection.add(new PvInfoDataWrapper(appService,
+                        pvInfo));
+                }
+                propertiesMap.put("pvInfoDataCollection", pvInfoDataCollection);
+            }
+        }
+        return pvInfoDataCollection;
+    }
+
+    public void setPvInfoDataCollection(
+        Collection<PvInfoData> pvInfoDataCollection, boolean setNull) {
+        Collection<PvInfoData> oldCollection = wrappedObject
+            .getPvInfoDataCollection();
+        wrappedObject.setPvInfoDataCollection(pvInfoDataCollection);
+        propertyChangeSupport.firePropertyChange("pvInfoDataCollection",
+            oldCollection, pvInfoDataCollection);
+        if (setNull) {
+            propertiesMap.put("pvInfoDataCollection", null);
+        }
+    }
+
+    public void setPvInfoDataCollection(
+        Collection<PvInfoDataWrapper> pvInfoDataCollection) {
+        Collection<PvInfoData> pvCollection = new HashSet<PvInfoData>();
+        for (PvInfoDataWrapper pv : pvInfoDataCollection) {
+            pvCollection.add(pv.getWrappedObject());
+        }
+        setPvInfoDataCollection(pvCollection, false);
+        propertiesMap.put("pvInfoDataCollection", pvInfoDataCollection);
     }
 
     public void setDateDrawn(Date date) {
@@ -113,52 +187,79 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
     public void setComments(String comments) {
         String oldComments = getComments();
         wrappedObject.setComments(comments);
-        propertyChangeSupport.firePropertyChange("dateReceived", oldComments,
+        propertyChangeSupport.firePropertyChange("comments", oldComments,
             comments);
     }
 
     @Override
-    protected DatabaseResult persistChecks() throws ApplicationException {
-        if (checkVisitDateDrawnUnique()) {
-            return DatabaseResult.OK;
+    protected void persistChecks() throws BiobankCheckException, Exception {
+        if (!checkVisitDateDrawnUnique()) {
+            throw new BiobankCheckException("A patient visit with date drawn "
+                + getDateDrawn() + " already exist in patient "
+                + getPatientWrapper().getNumber() + ".");
         }
-        return new DatabaseResult("A patient visit with date drawn "
-            + getDateDrawn() + " already exist in patient "
-            + getPatientWrapper().getNumber() + ".");
     }
 
     private boolean checkVisitDateDrawnUnique() throws ApplicationException {
-        if (isNew()) {
-            HQLCriteria c = new HQLCriteria("from "
-                + PatientVisit.class.getName()
-                + " where patient=? and dateDrawn = ?", Arrays
-                .asList(new Object[] { getPatientWrapper().getWrappedObject(),
-                    getDateDrawn() }));
-
-            List<Object> results = appService.query(c);
-            return results.size() == 0;
+        String isSameVisit = "";
+        List<Object> params = new ArrayList<Object>();
+        params.add(getPatientWrapper().getId());
+        params.add(getDateDrawn());
+        if (!isNew()) {
+            isSameVisit = " and id <> ?";
+            params.add(getId());
         }
-        return true;
+        HQLCriteria c = new HQLCriteria("from " + PatientVisit.class.getName()
+            + " where patient.id=? and dateDrawn = ?" + isSameVisit, params);
+
+        List<Object> results = appService.query(c);
+        return results.size() == 0;
     }
 
     public void setClinic(Clinic clinic) {
-        Clinic oldClinic = getClinic();
+        Clinic oldClinic = wrappedObject.getClinic();
         wrappedObject.setClinic(clinic);
         propertyChangeSupport.firePropertyChange("clinic", oldClinic, clinic);
     }
 
     public void setPvSampleSourceCollection(
-        Collection<PvSampleSource> pvSampleSources) {
+        Collection<PvSampleSource> pvSampleSources, boolean setNull) {
+        Collection<PvSampleSource> oldCollection = wrappedObject
+            .getPvSampleSourceCollection();
         wrappedObject.setPvSampleSourceCollection(pvSampleSources);
+        propertyChangeSupport.firePropertyChange("pvSampleSourceCollection",
+            oldCollection, pvSampleSources);
+        if (setNull) {
+            propertiesMap.put("pvSampleSourceCollection", null);
+        }
     }
 
-    public void setPvInfoDataCollection(Collection<PvInfoData> pvDataCollection) {
-        wrappedObject.setPvInfoDataCollection(pvDataCollection);
+    public void setPvSampleSourceCollection(
+        Collection<PvSampleSourceWrapper> pvSampleSources) {
+        Collection<PvSampleSource> pvCollection = new HashSet<PvSampleSource>();
+        for (PvSampleSourceWrapper pv : pvSampleSources) {
+            pvCollection.add(pv.getWrappedObject());
+        }
+        setPvSampleSourceCollection(pvCollection, false);
+        propertiesMap.put("pvSampleSourceCollection", pvSampleSources);
     }
 
     @Override
-    protected Class<PatientVisit> getWrappedClass() {
+    public Class<PatientVisit> getWrappedClass() {
         return PatientVisit.class;
+    }
+
+    @Override
+    protected void deleteChecks() throws BiobankCheckException, Exception {
+        // TODO Auto-generated method stub
+    }
+
+    @Override
+    public int compareTo(PatientVisitWrapper o) {
+        Date v1Date = getDateDrawn();
+        Date v2Date = o.getDateDrawn();
+        return ((v1Date.compareTo(v2Date) > 0) ? 1 : (v1Date.equals(v2Date) ? 0
+            : -1));
     }
 
 }

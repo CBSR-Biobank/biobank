@@ -4,17 +4,18 @@ import java.util.Collection;
 
 import org.eclipse.swt.widgets.Composite;
 
-import edu.ualberta.med.biobank.model.Contact;
+import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 
-public class ContactInfoTable extends InfoTableWidget<Contact> {
+public class ContactInfoTable extends InfoTableWidget<ContactWrapper> {
 
-    private static final String[] headings = new String[] { "Contact Name",
+    private static final String[] HEADINGS = new String[] { "Contact Name",
         "Title", "Email", "Phone #", "Fax #" };
 
-    private static final int[] bounds = new int[] { 150, 150, 100, 100, 100 };
+    private static final int[] BOUNDS = new int[] { 150, 150, 100, 100, 100 };
 
-    public ContactInfoTable(Composite parent, Collection<Contact> contacts) {
-        super(parent, contacts, headings, bounds);
+    public ContactInfoTable(Composite parent,
+        Collection<ContactWrapper> contacts) {
+        super(parent, contacts, HEADINGS, BOUNDS);
     }
 
 }

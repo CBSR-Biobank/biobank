@@ -14,8 +14,9 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 
+import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.wrappers.ContainerPositionWrapper;
 import edu.ualberta.med.biobank.model.ContainerCell;
-import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.ContainerStatus;
 
 public class CabinetDrawerWidget extends Canvas {
@@ -54,7 +55,8 @@ public class CabinetDrawerWidget extends Canvas {
         super(parent, SWT.DOUBLE_BUFFERED);
         cells = new ContainerCell[boxNumber][1];
         for (int i = 0; i < boxNumber; i++) {
-            ContainerPosition pos = new ContainerPosition();
+            ContainerPositionWrapper pos = new ContainerPositionWrapper(
+                SessionManager.getAppService());
             pos.setRow(i);
             pos.setCol(0);
             ContainerStatus stat = ContainerStatus.NOT_INITIALIZED;
@@ -79,7 +81,11 @@ public class CabinetDrawerWidget extends Canvas {
     }
 
     protected void paintDrawer(PaintEvent e) {
-        setSize(WIDTH, HEIGHT + LEGEND_HEIGHT);
+        int fullHeight = HEIGHT;
+        if (hasLegend) {
+            fullHeight += LEGEND_HEIGHT;
+        }
+        setSize(WIDTH, fullHeight);
         GC gc = e.gc;
         int currentX = 0;
         int rectYTotal = 0;
@@ -157,8 +163,8 @@ public class CabinetDrawerWidget extends Canvas {
     }
 
     public void setContainersStatus(
-        Collection<ContainerPosition> childPositionCollection) {
-        for (ContainerPosition position : childPositionCollection) {
+        Collection<ContainerPositionWrapper> childPositionCollection) {
+        for (ContainerPositionWrapper position : childPositionCollection) {
             int pos = position.getRow().intValue();
             cells[pos][0] = new ContainerCell(position);
             cells[pos][0].setStatus(ContainerStatus.INITIALIZED);
@@ -203,6 +209,15 @@ public class CabinetDrawerWidget extends Canvas {
         e.gc.fillRectangle(rectangle);
         e.gc.drawRectangle(rectangle);
         drawTextOnCenter(e.gc, text, rectangle);
+    }
+
+    @Override
+    public Point computeSize(int wHint, int hHint, boolean changed) {
+        int fullHeight = HEIGHT;
+        if (hasLegend) {
+            fullHeight += LEGEND_HEIGHT;
+        }
+        return new Point(CabinetDrawerWidget.WIDTH, fullHeight);
     }
 
 }

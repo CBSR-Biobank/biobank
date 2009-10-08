@@ -6,20 +6,17 @@ import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.viewers.ComboViewer;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.MouseListener;
-import org.eclipse.swt.events.MouseMoveListener;
-import org.eclipse.swt.events.MouseTrackListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
@@ -27,28 +24,20 @@ import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.LabelingScheme;
-import edu.ualberta.med.biobank.common.utils.ModelUtils;
+import edu.ualberta.med.biobank.common.wrappers.ContainerPositionWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.Capacity;
-import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerCell;
-import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.ContainerStatus;
-import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.ContainerAdapter;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.widgets.CabinetDrawerWidget;
-import edu.ualberta.med.biobank.widgets.ChooseContainerWidget;
+import edu.ualberta.med.biobank.widgets.ContainerDisplayWidget;
 import edu.ualberta.med.biobank.widgets.infotables.SamplesListWidget;
-import edu.ualberta.med.biobank.widgets.listener.ScanPalletModificationEvent;
-import edu.ualberta.med.biobank.widgets.listener.ScanPalletModificationListener;
 import gov.nih.nci.system.applicationservice.ApplicationException;
-import gov.nih.nci.system.query.SDKQuery;
-import gov.nih.nci.system.query.example.DeleteExampleQuery;
-import gov.nih.nci.system.query.example.InsertExampleQuery;
 
 public class ContainerViewForm extends BiobankViewForm {
 
@@ -56,9 +45,9 @@ public class ContainerViewForm extends BiobankViewForm {
 
     private ContainerAdapter containerAdapter;
 
-    private Container container;
+    private ContainerWrapper container;
 
-    private ContainerPosition position;
+    private ContainerPositionWrapper position;
 
     private SamplesListWidget samplesWidget;
 
@@ -82,36 +71,21 @@ public class ContainerViewForm extends BiobankViewForm {
 
     private CabinetDrawerWidget cabWidget;
 
-    private ChooseContainerWidget containerWidget;
+    private ContainerDisplayWidget containerWidget;
 
-    private ContainerType initType;
-
-    ContainerCell[][] cells;
+    private ContainerCell[][] cells;
 
     private List<ContainerCell> selectedCells;
-    List<ScanPalletModificationListener> listeners;
-    private MouseListener selectionMouseListener;
-    private MouseTrackListener selectionMouseTrackListener;
-
-    private ContainerType deleteType;
-
-    public void addModificationListener(ScanPalletModificationListener listener) {
-        listeners.add(listener);
-    }
-
-    public void removeModificationListener(
-        ScanPalletModificationListener listener) {
-        listeners.remove(listener);
-    }
 
     @Override
-    public void init() {
+    public void init() throws Exception {
         Assert.isTrue(adapter instanceof ContainerAdapter,
             "Invalid editor input: object of type "
                 + adapter.getClass().getName());
 
         containerAdapter = (ContainerAdapter) adapter;
-        retrieveContainer();
+        container = containerAdapter.getContainer();
+        container.reload();
         position = container.getPosition();
         setPartName(container.getLabel() + " ("
             + container.getContainerType().getName() + ")");
@@ -119,12 +93,13 @@ public class ContainerViewForm extends BiobankViewForm {
     }
 
     @Override
-    protected void createFormContent() {
+    protected void createFormContent() throws Exception {
         form.setText("Container " + container.getLabel() + " ("
             + container.getContainerType().getName() + ")");
         form.getBody().setLayout(new GridLayout(1, false));
+        form.setImage(BioBankPlugin.getDefault().getIconForTypeName(
+            container.getContainerType().getName()));
 
-        addRefreshToolbarAction();
         createContainerSection();
 
         if (container.getContainerType().getSampleTypeCollection().size() > 0) {
@@ -158,19 +133,16 @@ public class ContainerViewForm extends BiobankViewForm {
             "Temperature");
 
         setContainerValues();
-        ContainerType containerType = container.getContainerType();
-        initEditButton(client, containerAdapter);
 
-        if (containerType.getChildContainerTypeCollection().size() > 0) {
-            visualizeContainer();
+        if (container.getContainerType().getChildContainerTypeCollection()
+            .size() > 0) {
+            createVisualizeContainer();
         }
     }
 
     private void initCells() {
-        ContainerType containerType = container.getContainerType();
+        ContainerTypeWrapper containerType = container.getContainerType();
         Capacity cap = containerType.getCapacity();
-        // if (cap == null)
-        // malformed();
         int dim1 = cap.getRowCapacity().intValue();
         int dim2 = cap.getColCapacity().intValue();
         if (dim1 == 0)
@@ -178,17 +150,7 @@ public class ContainerViewForm extends BiobankViewForm {
         if (dim2 == 0)
             dim2 = 1;
         cells = new ContainerCell[dim1][dim2];
-        for (int i = 0; i < dim1; i++) {
-            for (int j = 0; j < dim2; j++) {
-                ContainerPosition pos = new ContainerPosition();
-                pos.setRow(i);
-                pos.setCol(j);
-                ContainerCell cell = new ContainerCell(pos);
-                cell.setStatus(ContainerStatus.NOT_INITIALIZED);
-                cells[i][j] = cell;
-            }
-        }
-        for (ContainerPosition position : container
+        for (ContainerPositionWrapper position : container
             .getChildPositionCollection()) {
             int row = position.getRow().intValue();
             int col = position.getCol().intValue();
@@ -196,42 +158,26 @@ public class ContainerViewForm extends BiobankViewForm {
             cell.setStatus(ContainerStatus.INITIALIZED);
             cells[row][col] = cell;
         }
-    }
-
-    public void enableSelection() {
-        containerWidget.addMouseListener(selectionMouseListener);
-        containerWidget.addMouseTrackListener(selectionMouseTrackListener);
+        for (int i = 0; i < dim1; i++) {
+            for (int j = 0; j < dim2; j++) {
+                if (cells[i][j] == null) {
+                    ContainerPositionWrapper pos = new ContainerPositionWrapper(
+                        SessionManager.getAppService());
+                    pos.setRow(i);
+                    pos.setCol(j);
+                    ContainerCell cell = new ContainerCell(pos);
+                    cell.setStatus(ContainerStatus.NOT_INITIALIZED);
+                    cells[i][j] = cell;
+                }
+            }
+        }
     }
 
     public void clearSelection() {
         for (ContainerCell cell : selectedCells) {
             cell.setStatus(ContainerStatus.NOT_INITIALIZED);
         }
-        notifyListeners();
         selectedCells.clear();
-    }
-
-    public void notifyListeners(ScanPalletModificationEvent event) {
-        if (listeners != null && listeners.size() != 0)
-            for (ScanPalletModificationListener listener : listeners) {
-                listener.modification(event);
-            }
-    }
-
-    private void notifyListeners() {
-        notifyListeners(new ScanPalletModificationEvent(this, selectedCells
-            .size()));
-    }
-
-    private void retrieveContainer() {
-        try {
-            container = ModelUtils.getObjectWithId(appService, Container.class,
-                containerAdapter.getContainer().getId());
-            containerAdapter.setContainer(new ContainerWrapper(SessionManager
-                .getAppService(), container));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     private void refreshVis() {
@@ -248,219 +194,130 @@ public class ContainerViewForm extends BiobankViewForm {
         return container.getContainerType().getName().startsWith("Drawer");
     }
 
-    protected void visualizeContainer() {
-        // default 2 dimensional grid
+    protected void createVisualizeContainer() {
         Composite client = createSectionWithClient("Container Visual");
-        GridLayout gl = new GridLayout();
-        gl.numColumns = 1;
-        client.setLayout(gl);
-        // get occupied positions
+        client.setLayout(new GridLayout(1, false));
+
         if (isContainerDrawer()) {
-            // if Drawer, requires special grid
-            cabWidget = new CabinetDrawerWidget(client);
-            cabWidget.initLegend();
-            GridData gdBin = new GridData();
-            gdBin.widthHint = CabinetDrawerWidget.WIDTH;
-            gdBin.heightHint = CabinetDrawerWidget.HEIGHT
-                + CabinetDrawerWidget.LEGEND_HEIGHT;
-            gdBin.verticalSpan = 2;
-            cabWidget.setLayoutData(gdBin);
-            cabWidget.setContainersStatus(container
-                .getChildPositionCollection());
-            cabWidget.addMouseListener(new MouseAdapter() {
-                @Override
-                public void mouseDown(MouseEvent e) {
-                    ContainerCell cell = ((CabinetDrawerWidget) e.widget)
-                        .getPositionAtCoordinates(e.x, e.y);
-                    openFormFor(cell.getPosition());
-
-                }
-            });
+            initCabinetDrawerContainer(client);
         } else {
-            // otherwise, normal grid
-            containerWidget = new ChooseContainerWidget(client);
-            containerWidget.setContainerType(container.getContainerType());
-            containerWidget.setParentLabel(containerLabelLabel.getText());
-            containerWidget.initDefaultLegend();
-            selectedCells = new ArrayList<ContainerCell>();
-            // initListeners();
-            int dim2 = cells[0].length;
-            if (dim2 <= 1) {
-                // single dimension size
-                containerWidget.setCellWidth(150);
-                containerWidget.setCellHeight(20);
-                containerWidget.setLegendOnSide(true);
-            }
-            containerWidget.setContainersStatus(cells);
-            // enableSelection();
-            containerWidget.addMouseListener(new MouseAdapter() {
-                @Override
-                public void mouseDown(MouseEvent e) {
-                    ContainerCell cell = ((ChooseContainerWidget) e.widget)
-                        .getPositionAtCoordinates(e.x, e.y);
-                    if (cell != null)
-                        openFormFor(cell.getPosition());
-
-                }
-
-            });
-            containerWidget.addMouseMoveListener(new MouseMoveListener() {
-
-                @Override
-                public void mouseMove(MouseEvent e) {
-                    Rectangle widgetBounds = containerWidget.getBounds();
-                    int safetyPadding = 15;
-                    widgetBounds.height -= safetyPadding;
-                    widgetBounds.width -= safetyPadding;
-                    if (containerWidget.legendOnSide == false)
-                        widgetBounds.height -= ChooseContainerWidget.LEGEND_HEIGHT;
-                    else
-                        widgetBounds.width -= ChooseContainerWidget.LEGEND_WIDTH;
-
-                    if (widgetBounds.width > e.x && widgetBounds.height > e.y)
-                        ((ChooseContainerWidget) e.widget)
-                            .setCursor(containerWidget.getDisplay()
-                                .getSystemCursor(SWT.CURSOR_HAND));
-                    else
-                        ((ChooseContainerWidget) e.widget)
-                            .setCursor(containerWidget.getDisplay()
-                                .getSystemCursor(SWT.CURSOR_ARROW));
-                }
-
-            });
+            initBasicContainer(client);
         }
+        addChildrenActions(client);
+    }
+
+    private void addChildrenActions(Composite client) {
         Composite multiSection = toolkit.createComposite(client);
-        GridLayout gli = new GridLayout();
-        gli.numColumns = 3;
+        multiSection.setLayout(new GridLayout(3, false));
 
-        multiSection.setLayout(gli);
-        Label comboLabel = new Label(multiSection, SWT.NONE);
-        comboLabel.setText("Initialize all available containers to:");
-        final Combo init = new Combo(multiSection, SWT.NONE);
-        Collection<ContainerType> containerTypes = container.getContainerType()
-            .getChildContainerTypeCollection();
-        for (ContainerType ct : containerTypes) {
-            init.add(ct.getName());
-        }
-        init.select(0);
+        List<ContainerTypeWrapper> containerTypes = container
+            .getContainerType().getChildContainerTypeCollection();
 
-        final Button initialize = toolkit.createButton(multiSection,
-            "Initialize", SWT.PUSH);
+        // Initialisation action
+        final ComboViewer initCv = createComboViewer(multiSection,
+            "Initialize all available containers to", containerTypes,
+            containerTypes.get(0));
+        Button initialize = toolkit.createButton(multiSection, "Initialize",
+            SWT.PUSH);
         initialize.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                setInitType(init.getItem(init.getSelectionIndex()));
-                initContainers();
+                ContainerTypeWrapper type = (ContainerTypeWrapper) ((IStructuredSelection) initCv
+                    .getSelection()).getFirstElement();
+                initContainers(type);
             }
         });
-        Label deleteLabel = new Label(multiSection, SWT.NONE);
-        deleteLabel.setText("Delete all initialized containers of type:");
-        final Combo delete = new Combo(multiSection, SWT.NONE);
-        for (ContainerType ct : containerTypes) {
-            delete.add(ct.getName());
-        }
-        delete.select(0);
-        final Button deleteButton = toolkit.createButton(multiSection,
-            "Delete", SWT.PUSH);
+
+        // Delete action
+        final ComboViewer deleteCv = createComboViewer(multiSection,
+            "Delete all initialized containers of type", containerTypes,
+            containerTypes.get(0));
+        Button deleteButton = toolkit.createButton(multiSection, "Delete",
+            SWT.PUSH);
         deleteButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                setDeleteType(delete.getItem(delete.getSelectionIndex()));
                 Boolean confirm = MessageDialog.openConfirm(PlatformUI
                     .getWorkbench().getActiveWorkbenchWindow().getShell(),
                     "Confirm Delete",
                     "Are you sure you want to delete these containers?");
-
                 if (confirm) {
-                    deleteContainers();
+                    ContainerTypeWrapper type = (ContainerTypeWrapper) ((IStructuredSelection) deleteCv
+                        .getSelection()).getFirstElement();
+                    deleteContainers(type);
                 }
             }
         });
-
     }
 
-    protected void setInitType(String name) {
-        Collection<ContainerType> containerTypes = container.getContainerType()
-            .getChildContainerTypeCollection();
-        for (ContainerType ct : containerTypes) {
-            if (name.compareTo(ct.getName()) == 0) {
-                initType = ct;
-                break;
+    private void initCabinetDrawerContainer(Composite client) {
+        // if Drawer, requires special grid
+        cabWidget = new CabinetDrawerWidget(client);
+        cabWidget.initLegend();
+        GridData gdBin = new GridData();
+        gdBin.verticalSpan = 2;
+        cabWidget.setLayoutData(gdBin);
+        cabWidget.setContainersStatus(container.getChildPositionCollection());
+        cabWidget.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseDown(MouseEvent e) {
+                ContainerCell cell = ((CabinetDrawerWidget) e.widget)
+                    .getPositionAtCoordinates(e.x, e.y);
+                openFormFor(cell.getPosition());
+
             }
-        }
+        });
     }
 
-    protected void setDeleteType(String name) {
-        Collection<ContainerType> containerTypes = container.getContainerType()
-            .getChildContainerTypeCollection();
-        for (ContainerType ct : containerTypes) {
-            if (name.compareTo(ct.getName()) == 0) {
-                deleteType = ct;
-                break;
+    private void initBasicContainer(Composite client) {
+        // otherwise, normal grid
+        containerWidget = new ContainerDisplayWidget(client);
+        containerWidget.setContainerType(container.getContainerType());
+        containerWidget.setParentLabel(containerLabelLabel.getText());
+        containerWidget.initDefaultLegend();
+        selectedCells = new ArrayList<ContainerCell>();
+        int dim2 = cells[0].length;
+        if (dim2 <= 1) {
+            // single dimension size
+            containerWidget.setCellWidth(150);
+            containerWidget.setCellHeight(20);
+            containerWidget.setLegendOnSide(true);
+        }
+        containerWidget.setContainersStatus(cells);
+        containerWidget.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseDown(MouseEvent e) {
+                ContainerCell cell = ((ContainerDisplayWidget) e.widget)
+                    .getPositionAtCoordinates(e.x, e.y);
+                if (cell != null)
+                    openFormFor(cell.getPosition());
             }
-        }
+        });
     }
 
-    public void initContainers() {
+    private void initContainers(final ContainerTypeWrapper type) {
         BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
-            List<SDKQuery> queries = new ArrayList<SDKQuery>();
-            Collection<ContainerPosition> positions = container
-                .getChildPositionCollection();
-
             public void run() {
-
-                int rows = container.getContainerType().getCapacity()
-                    .getRowCapacity().intValue();
-                int cols = container.getContainerType().getCapacity()
-                    .getColCapacity().intValue();
-                for (int i = 0; i < rows; i++) {
-                    for (int j = 0; j < cols; j++) {
-                        Boolean filled = false;
-                        for (ContainerPosition pos : positions) {
-                            if (pos.getRow().intValue() == i
-                                && pos.getCol().intValue() == j)
-                                filled = true;
-                        }
-                        if (!filled) {
-                            Container newContainer = new Container();
-
-                            newContainer.setContainerType(initType);
-                            newContainer.setSite(container.getSite());
-                            newContainer.setTemperature(container
-                                .getTemperature());
-
-                            ContainerPosition newPos = new ContainerPosition();
-                            newPos.setRow(new Integer(i));
-                            newPos.setCol(new Integer(j));
-                            newPos.setParentContainer(container);
-                            newContainer.setPosition(newPos);
-                            newContainer.setLabel(container.getLabel()
-                                + LabelingScheme.getPositionString(newPos));
-
-                            // insert containers/positions to db
-
-                            queries.add(new InsertExampleQuery(newContainer));
-
-                        }
-                    }
+                boolean initDones = false;
+                try {
+                    initDones = container.initChildrenWithType(type);
+                } catch (ApplicationException ae) {
+                    BioBankPlugin.openAsyncError(
+                        "Error while creating children", ae);
                 }
                 // refresh
-                if (queries.size() > 0) {
-                    try {
-                        appService.executeBatchQuery(queries);
-                    } catch (ApplicationException e) {
-                        e.printStackTrace();
-                    }
+                if (initDones) {
                     PlatformUI.getWorkbench().getDisplay().asyncExec(
                         new Runnable() {
-
                             public void run() {
+                                try {
+                                    reload();
+                                } catch (Exception e) {
+                                    SessionManager.getLogger().error(
+                                        "Error loading", e);
+                                }
                                 containerAdapter.performExpand();
-                                positions = container
-                                    .getChildPositionCollection();
-                                reload();
                             }
-
                         });
                 }
             }
@@ -468,49 +325,27 @@ public class ContainerViewForm extends BiobankViewForm {
 
     }
 
-    public void deleteContainers() {
+    private void deleteContainers(final ContainerTypeWrapper type) {
         BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
-            List<SDKQuery> queries = new ArrayList<SDKQuery>();
-            Collection<ContainerPosition> positions = container
-                .getChildPositionCollection();
-
             public void run() {
-                for (ContainerPosition pos : positions) {
-                    Container deletingContainer = pos.getContainer();
-                    if (deletingContainer.getContainerType().getId().equals(
-                        deleteType.getId())) {
-                        if (deletingContainer.getChildPositionCollection()
-                            .size() > 0
-                            || deletingContainer.getSamplePositionCollection()
-                                .size() > 0) {
-                            BioBankPlugin
-                                .openError(
-                                    "Error",
-                                    "Unable to delete container "
-                                        + deletingContainer.getLabel()
-                                        + ". Container must be empty before it can be deleted.");
-                        } else {
-                            // insert containers/positions to db
-                            queries.add(new DeleteExampleQuery(
-                                deletingContainer));
-                        }
-                    }
+                boolean deleteDones = false;
+                try {
+                    deleteDones = container.deleteChildrenWithType(type);
+                } catch (Exception ex) {
+                    BioBankPlugin.openAsyncError("Can't Delete Containers", ex);
                 }
-                // refresh
-                if (queries.size() > 0) {
-                    try {
-                        appService.executeBatchQuery(queries);
-                    } catch (ApplicationException e) {
-                        e.printStackTrace();
-                    }
+                if (deleteDones) {
                     PlatformUI.getWorkbench().getDisplay().asyncExec(
                         new Runnable() {
                             public void run() {
+                                try {
+                                    reload();
+                                } catch (Exception e) {
+                                    SessionManager.getLogger().error(
+                                        "Error loading", e);
+                                }
                                 containerAdapter.rebuild();
                                 containerAdapter.performExpand();
-                                positions = container
-                                    .getChildPositionCollection();
-                                reload();
                             }
                         });
                 }
@@ -518,27 +353,25 @@ public class ContainerViewForm extends BiobankViewForm {
         });
     }
 
-    private void openFormFor(ContainerPosition pos) {
+    private void openFormFor(ContainerPositionWrapper pos) {
         ContainerAdapter newAdapter = null;
         ContainerAdapter.closeEditor(new FormInput(containerAdapter));
         if (cells[pos.getRow()][pos.getCol()].getStatus() == ContainerStatus.NOT_INITIALIZED) {
             ContainerWrapper newContainer = new ContainerWrapper(SessionManager
-                .getAppService(), new Container());
+                .getAppService());
             newContainer.setSite(containerAdapter.getParentFromClass(
-                SiteAdapter.class).getSite());
+                SiteAdapter.class).getWrapper());
             pos.setParentContainer(container);
             newContainer.setPosition(pos);
             newAdapter = new ContainerAdapter(containerAdapter, newContainer);
             AdapterBase.openForm(new FormInput(newAdapter),
                 ContainerEntryForm.ID);
         } else {
-
-            Collection<ContainerPosition> childPositions = container
+            Collection<ContainerPositionWrapper> childPositions = container
                 .getChildPositionCollection();
             Assert.isNotNull(childPositions);
-            for (ContainerPosition childPos : childPositions) {
-                ContainerWrapper childContainer = new ContainerWrapper(
-                    SessionManager.getAppService(), childPos.getContainer());
+            for (ContainerPositionWrapper childPos : childPositions) {
+                ContainerWrapper childContainer = childPos.getContainer();
                 Assert.isNotNull(childContainer);
                 if (childPos.getRow().compareTo(pos.getRow()) == 0
                     && childPos.getCol().compareTo(pos.getCol()) == 0) {
@@ -550,7 +383,6 @@ public class ContainerViewForm extends BiobankViewForm {
             AdapterBase.openForm(new FormInput(newAdapter),
                 ContainerViewForm.ID);
         }
-
         containerAdapter.performExpand();
     }
 
@@ -578,14 +410,14 @@ public class ContainerViewForm extends BiobankViewForm {
 
     private void createSamplesSection() {
         Composite parent = createSectionWithClient("Samples");
-        samplesWidget = new SamplesListWidget(parent, container
-            .getSamplePositionCollection());
+        samplesWidget = new SamplesListWidget(parent, containerAdapter
+            .getAppService(), container.getSamplePositionCollection());
         samplesWidget.adaptToToolkit(toolkit, true);
     }
 
     @Override
-    protected void reload() {
-        retrieveContainer();
+    protected void reload() throws Exception {
+        containerAdapter.getContainer().reload();
         form.setText("Container " + container.getLabel() + " ("
             + container.getContainerType().getName() + ")");
         if (container.getContainerType().getChildContainerTypeCollection()
@@ -598,29 +430,4 @@ public class ContainerViewForm extends BiobankViewForm {
     protected String getEntryFormId() {
         return ContainerEntryForm.ID;
     }
-
-    protected void malformed() {
-        Boolean delete = MessageDialog
-            .openConfirm(
-                PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
-                "Malformed Container",
-                "This container is malformed and may be missing required fields. Would you like to delete it? ");
-        if (delete) {
-            containerAdapter.getParent().removeChild(containerAdapter);
-
-            SDKQuery query = new DeleteExampleQuery(container);
-            try {
-                appService.executeQuery(query);
-            } catch (ApplicationException e) {
-                BioBankPlugin.openAsyncError("Delete error", e);
-            }
-        }
-        try {
-            PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-                .getActivePage().closeEditor(this, false);
-        } catch (Exception e) {
-            SessionManager.getLogger().error("Can't close the form", e);
-        }
-    }
-
 }
