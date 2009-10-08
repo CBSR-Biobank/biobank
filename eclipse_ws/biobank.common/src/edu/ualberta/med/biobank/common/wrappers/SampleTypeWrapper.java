@@ -1,16 +1,19 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 import edu.ualberta.med.biobank.common.BiobankCheckException;
+import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.SampleType;
+import edu.ualberta.med.biobank.model.Site;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
+import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class SampleTypeWrapper extends ModelWrapper<SampleType> implements
     Comparable<SampleTypeWrapper> {
@@ -26,7 +29,8 @@ public class SampleTypeWrapper extends ModelWrapper<SampleType> implements
 
     @Override
     protected String[] getPropertyChangesNames() {
-        return new String[] { "name", "nameShort" };
+        return new String[] { "name", "nameShort", "site",
+            "containerTypeCollection" };
     }
 
     public String getName() {
@@ -48,6 +52,63 @@ public class SampleTypeWrapper extends ModelWrapper<SampleType> implements
         wrappedObject.setNameShort(nameShort);
         propertyChangeSupport.firePropertyChange("nameShort", oldNameShort,
             nameShort);
+    }
+
+    public Site getSite() {
+        return wrappedObject.getSite();
+    }
+
+    public void setSite(Site site) {
+        String oldNameShort = getNameShort();
+        wrappedObject.setSite(site);
+        propertyChangeSupport.firePropertyChange("site", oldNameShort, site);
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<ContainerTypeWrapper> getContainerTypeCollection(boolean sort) {
+        List<ContainerTypeWrapper> containerTypeCollection = (List<ContainerTypeWrapper>) propertiesMap
+            .get("containerTypeCollection");
+        if (containerTypeCollection == null) {
+            Collection<ContainerType> children = wrappedObject
+                .getContainerTypeCollection();
+            if (children != null) {
+                containerTypeCollection = new ArrayList<ContainerTypeWrapper>();
+                for (ContainerType type : children) {
+                    containerTypeCollection.add(new ContainerTypeWrapper(
+                        appService, type));
+                }
+                propertiesMap.put("containerTypeCollection",
+                    containerTypeCollection);
+            }
+        }
+        if ((containerTypeCollection != null) && sort)
+            Collections.sort(containerTypeCollection);
+        return containerTypeCollection;
+    }
+
+    public List<ContainerTypeWrapper> getContainerTypeCollection() {
+        return getContainerTypeCollection(false);
+    }
+
+    public void setContainerTypeCollection(Collection<ContainerType> types,
+        boolean setNull) {
+        Collection<ContainerType> oldTypes = wrappedObject
+            .getContainerTypeCollection();
+        wrappedObject.setContainerTypeCollection(types);
+        propertyChangeSupport.firePropertyChange("containerTypeCollection",
+            oldTypes, types);
+        if (setNull) {
+            propertiesMap.put("containerTypeCollection", null);
+        }
+    }
+
+    public void setContainerTypeCollection(List<ContainerTypeWrapper> types) {
+        Collection<ContainerType> typeObjects = new HashSet<ContainerType>();
+        for (ContainerTypeWrapper type : types) {
+            typeObjects.add(type.getWrappedObject());
+        }
+        setContainerTypeCollection(typeObjects, false);
+        propertiesMap.put("containerTypeCollection", types);
     }
 
     @Override
@@ -128,15 +189,51 @@ public class SampleTypeWrapper extends ModelWrapper<SampleType> implements
         return getAllWrappers(appService, false);
     }
 
-    public static void deleteOldSampleTypes(List<SampleTypeWrapper> newTypes,
+    public static List<SampleTypeWrapper> getGlobalSampleTypes(
+        WritableApplicationService appService, boolean sort)
+        throws ApplicationException {
+        HQLCriteria c = new HQLCriteria("from " + SampleType.class.getName()
+            + " where site = null");
+
+        List<SampleType> sampleTypes = appService.query(c);
+        List<SampleTypeWrapper> list = transformToWrapperList(appService,
+            sampleTypes);
+        if (sort)
+            Collections.sort(list);
+        return list;
+    }
+
+    public static void setGlobalSampleTypes(
+        List<SampleTypeWrapper> newGlobalSampleTypes,
+        List<SampleTypeWrapper> oldGlobalSampleTypes)
+        throws BiobankCheckException, Exception {
+        deleteOldSampleTypes(newGlobalSampleTypes, oldGlobalSampleTypes);
+        for (SampleTypeWrapper ss : newGlobalSampleTypes) {
+            ss.persist();
+        }
+    }
+
+    private static void deleteOldSampleTypes(List<SampleTypeWrapper> newTypes,
         List<SampleTypeWrapper> oldTypes) throws BiobankCheckException,
         Exception {
-        Set<SampleTypeWrapper> setNewTypes = new HashSet<SampleTypeWrapper>(
-            newTypes);
+        if (newTypes.size() == 0) {
+            // remove all
+            Iterator<SampleTypeWrapper> it = oldTypes.iterator();
+            while (it.hasNext()) {
+                it.next().delete();
+            }
+            return;
+        }
+
+        List<Integer> idList = new ArrayList<Integer>();
+        for (SampleTypeWrapper ss : newTypes) {
+            idList.add(ss.getId());
+        }
         Iterator<SampleTypeWrapper> it = oldTypes.iterator();
         while (it.hasNext()) {
-            if (!setNewTypes.contains(it.next().getId())) {
-                it.next().delete();
+            SampleTypeWrapper ss = it.next();
+            if (!idList.contains(ss.getId())) {
+                ss.delete();
             }
         }
     }

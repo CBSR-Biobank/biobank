@@ -6,6 +6,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 
+import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
@@ -18,9 +19,9 @@ public class SampleTypesEntryForm extends BiobankEntryForm {
     public static final String ID = "edu.ualberta.med.biobank.forms.SampleTypesEntryForm";
     public static final String OK_MESSAGE = "View and edit sample types.";
 
+    private SiteWrapper siteWrapper;
     private List<SampleTypeWrapper> globalSampleTypes;
     private List<SampleTypeWrapper> siteSampleTypes;
-    private SiteWrapper siteWrapper;
     private SampleTypeEntryWidget siteSampleWidget;
     private SampleTypeEntryWidget globalSampleWidget;
 
@@ -35,7 +36,8 @@ public class SampleTypesEntryForm extends BiobankEntryForm {
     public void init() throws Exception {
         SiteAdapter siteAdapter = (SiteAdapter) adapter;
         siteWrapper = siteAdapter.getWrapper();
-        globalSampleTypes = SampleTypeWrapper.getAllWrappers(appService, true);
+        globalSampleTypes = SampleTypeWrapper.getGlobalSampleTypes(appService,
+            true);
         siteSampleTypes = siteWrapper.getSampleTypeCollection(true);
         setPartName("Sample Types Entry");
     }
@@ -75,16 +77,14 @@ public class SampleTypesEntryForm extends BiobankEntryForm {
     }
 
     @Override
-    public void saveForm() throws Exception {
+    public void saveForm() throws BiobankCheckException, Exception {
+        siteWrapper.reload();
         List<SampleTypeWrapper> ssCollection = siteSampleWidget
             .getTableSampleTypes();
         siteWrapper.setSampleTypeCollection(ssCollection);
-
-        ssCollection = globalSampleWidget.getTableSampleTypes();
-        for (SampleTypeWrapper ss : ssCollection) {
-            ss.persist();
-        }
-        SampleTypeWrapper.deleteOldSampleTypes(ssCollection, globalSampleTypes);
+        siteWrapper.persist();
+        SampleTypeWrapper.setGlobalSampleTypes(globalSampleWidget
+            .getTableSampleTypes(), globalSampleTypes);
     }
 
     @Override
