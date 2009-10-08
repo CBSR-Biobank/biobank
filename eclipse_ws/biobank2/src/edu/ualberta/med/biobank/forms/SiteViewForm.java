@@ -82,9 +82,11 @@ public class SiteViewForm extends AddressViewFormCommon {
     @Override
     protected void createFormContent() throws Exception {
         form.setText("Repository Site: " + siteWrapper.getName());
-
         form.getBody().setLayout(new GridLayout(1, false));
         form.getBody().setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        form.getBody().setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        form.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
+            BioBankPlugin.IMG_SITE));
 
         createSiteSection();
         createAddressSection();
