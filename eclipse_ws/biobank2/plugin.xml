@@ -583,7 +583,7 @@
                id="edu.ualberta.med.biobank.toolbar.serverCommands">
             <command
                   commandId="edu.ualberta.med.biobank.commands.login"
-                  icon="icons/computer.png"
+                  icon="icons/login.png"
                   label="Login"
                   style="push"
                   tooltip="Login">
@@ -595,7 +595,7 @@
             </command>
             <command
                   commandId="edu.ualberta.med.biobank.commands.logout"
-                  icon="icons/computer_delete.png"
+                  icon="icons/logout.png"
                   label="Logout"
                   style="push"
                   tooltip="Logout">
@@ -607,7 +607,7 @@
             </command>
             <command
                   commandId="edu.ualberta.med.biobank.commands.studyAdd"
-                  icon="icons/study.png"
+                  icon="icons/studies_add.png"
                   label="Add Study"
                   style="push">
                <visibleWhen
@@ -619,7 +619,7 @@
             </command>
             <command
                   commandId="edu.ualberta.med.biobank.commands.clinicAdd"
-                  icon="icons/clinic.png"
+                  icon="icons/clinics_add.png"
                   label="Add Clinic"
                   style="push">
                <visibleWhen
@@ -631,7 +631,7 @@
             </command>
             <command
                   commandId="edu.ualberta.med.biobank.commands.containerTypeAdd"
-                  icon="icons/container_types.png"
+                  icon="icons/containerTypes_add.png"
                   label="Add Container Type"
                   style="push">
                <visibleWhen
@@ -643,7 +643,7 @@
             </command>
             <command
                   commandId="edu.ualberta.med.biobank.commands.containerAdd"
-                  icon="icons/containers.png"
+                  icon="icons/containers_add.png"
                   label="Add Container"
                   style="push">
                <visibleWhen
@@ -718,7 +718,7 @@
             </command>
             <command
                   commandId="edu.ualberta.med.biobank.commands.patients.patientVisitAdd"
-                  icon="icons/patientvisit_add.png"
+                  icon="icons/patientVisit_add.png"
                   label="Add Patient Visit"
                   style="push">
                <visibleWhen
