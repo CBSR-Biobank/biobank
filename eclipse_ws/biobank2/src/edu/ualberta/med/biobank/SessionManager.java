@@ -76,6 +76,7 @@ public class SessionManager {
 
     public void addSession(final WritableApplicationService appService,
         String serverName, String userName, Collection<SiteWrapper> sites) {
+        log4j.debug("addSession: " + serverName + ", user/" + userName);
         sessionAdapter = new SessionAdapter(rootNode, appService, 0,
             serverName, userName);
         rootNode.addChild(sessionAdapter);
@@ -86,7 +87,6 @@ public class SessionManager {
         if (view != null) {
             view.getTreeViewer().expandToLevel(3);
         }
-        log4j.debug("addSession: " + serverName);
         updateMenus();
     }
 
@@ -115,7 +115,6 @@ public class SessionManager {
     }
 
     public void deleteSession() {
-        setCurrentSite(null);
         rootNode.removeChild(sessionAdapter);
         sessionAdapter = null;
         updateMenus();
@@ -236,19 +235,20 @@ public class SessionManager {
     }
 
     private void updateSites(Collection<SiteWrapper> sites) {
-        currentSiteWrappers.clear();
         SiteWrapper allSiteWrapper = new SiteWrapper(getAppService(),
             new Site());
         allSiteWrapper.setName("All Sites");
+        if (currentSiteWrapper == null)
+            currentSiteWrapper = allSiteWrapper;
+        log4j.debug("site selected: " + currentSiteWrapper.getName());
+
+        currentSiteWrappers.clear();
         currentSiteWrappers.add(0, allSiteWrapper);
         for (SiteWrapper site : sites) {
             currentSiteWrappers.add(site);
         }
         siteCombo.setInput(currentSiteWrappers);
-        if (currentSiteWrapper == null)
-            siteCombo.setSelection(allSiteWrapper);
-        else
-            siteCombo.setSelection(currentSiteWrapper);
+        siteCombo.setSelection(currentSiteWrapper);
     }
 
     public void updateSites() {

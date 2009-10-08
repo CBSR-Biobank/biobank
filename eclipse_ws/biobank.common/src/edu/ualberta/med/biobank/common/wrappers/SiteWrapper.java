@@ -7,7 +7,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.model.Address;
@@ -334,6 +333,7 @@ public class SiteWrapper extends ModelWrapper<Site> implements
         deleteSampleTypeDifference(types);
         Collection<SampleType> typeObjects = new HashSet<SampleType>();
         for (SampleTypeWrapper type : types) {
+            type.setSite(wrappedObject);
             typeObjects.add(type.getWrappedObject());
         }
         setSampleTypeCollection(typeObjects, false);
@@ -350,19 +350,31 @@ public class SiteWrapper extends ModelWrapper<Site> implements
         List<SampleTypeWrapper> newCollection) throws Exception {
         // no need to remove if study is not yet in the database or nothing in
         // the collection
-        if (isNew() || (newCollection.size() == 0))
+        if (isNew())
             return;
 
-        List<SampleTypeWrapper> currSamplesSources = getSampleTypeCollection();
-        if (currSamplesSources.size() == 0)
+        List<SampleTypeWrapper> currSamplesStorage = getSampleTypeCollection();
+        if (currSamplesStorage.size() == 0)
             return;
 
-        Set<SampleTypeWrapper> set = new HashSet<SampleTypeWrapper>(
-            newCollection);
-        Iterator<SampleTypeWrapper> it = currSamplesSources.iterator();
-        while (it.hasNext()) {
-            if (!set.contains(it.next().getId())) {
+        if (newCollection.size() == 0) {
+            // remove all
+            Iterator<SampleTypeWrapper> it = currSamplesStorage.iterator();
+            while (it.hasNext()) {
                 it.next().delete();
+            }
+            return;
+        }
+
+        List<Integer> idList = new ArrayList<Integer>();
+        for (SampleTypeWrapper ss : newCollection) {
+            idList.add(ss.getId());
+        }
+        Iterator<SampleTypeWrapper> it = currSamplesStorage.iterator();
+        while (it.hasNext()) {
+            SampleTypeWrapper st = it.next();
+            if (!idList.contains(st.getId())) {
+                st.delete();
             }
         }
     }

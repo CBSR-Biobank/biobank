@@ -41,6 +41,9 @@ public class SampleStorageDialog extends BiobankDialog {
         Assert.isNotNull(sampleStorage);
         Assert.isNotNull(sampleTypes);
         this.sampleStorage = new SampleStorage();
+        this.sampleStorage.setSampleType(sampleStorage.getSampleType());
+        this.sampleStorage.setVolume(sampleStorage.getVolume());
+        this.sampleStorage.setQuantity(sampleStorage.getQuantity());
         this.origSampleStorage = sampleStorage;
         sampleTypeMap = new HashMap<String, SampleType>();
         for (SampleType st : sampleTypes) {
