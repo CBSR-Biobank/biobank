@@ -66,7 +66,7 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
         return wrappedObject.getComments();
     }
 
-    public PatientWrapper getPatientWrapper() {
+    public PatientWrapper getPatient() {
         Patient patient = wrappedObject.getPatient();
         if (patient == null) {
             return null;
@@ -74,12 +74,15 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
         return new PatientWrapper(appService, patient);
     }
 
-    public void setPatientWrapper(PatientWrapper patientWrapper) {
+    public void setPatient(PatientWrapper patientWrapper) {
+        setPatient(patientWrapper.getWrappedObject());
+    }
+
+    public void setPatient(Patient patient) {
         Patient oldPatient = wrappedObject.getPatient();
-        Patient newPatient = patientWrapper.getWrappedObject();
-        wrappedObject.setPatient(newPatient);
-        propertyChangeSupport.firePropertyChange("patient", oldPatient,
-            newPatient);
+        wrappedObject.setPatient(patient);
+        propertyChangeSupport
+            .firePropertyChange("patient", oldPatient, patient);
     }
 
     @SuppressWarnings("unchecked")
@@ -198,7 +201,7 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
 
     @SuppressWarnings("unchecked")
     public List<PvInfoPvInfoData> getPvInfoWithValues() {
-        List<PvInfoWrapper> studyPvInfos = getPatientWrapper().getStudy()
+        List<PvInfoWrapper> studyPvInfos = getPatient().getStudy()
             .getPvInfoCollection();
         if (studyPvInfos.size() > 0) {
             ListOrderedMap combinedPvInfoMap = new ListOrderedMap();
@@ -252,7 +255,7 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
         if (!checkVisitDateDrawnUnique()) {
             throw new BiobankCheckException("A patient visit with date drawn "
                 + getDateDrawn() + " already exist in patient "
-                + getPatientWrapper().getNumber() + ".");
+                + getPatient().getNumber() + ".");
         }
     }
 
@@ -279,7 +282,7 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
     private boolean checkVisitDateDrawnUnique() throws ApplicationException {
         String isSameVisit = "";
         List<Object> params = new ArrayList<Object>();
-        params.add(getPatientWrapper().getId());
+        params.add(getPatient().getId());
         params.add(getDateDrawn());
         if (!isNew()) {
             isSameVisit = " and id <> ?";

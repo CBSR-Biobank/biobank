@@ -590,8 +590,7 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
         PatientVisitWrapper patientVisit = getSelectedPatientVisit();
         StringBuffer sb = new StringBuffer("Samples linked:");
         int nber = 0;
-        Study study = patientVisit.getPatientWrapper().getStudy()
-            .getWrappedObject();
+        Study study = patientVisit.getPatient().getStudy().getWrappedObject();
         Collection<SampleStorage> sampleStorages = study
             .getSampleStorageCollection();
         for (int indexRow = 0; indexRow < cells.length; indexRow++) {

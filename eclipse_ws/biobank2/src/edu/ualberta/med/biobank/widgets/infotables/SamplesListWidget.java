@@ -20,7 +20,6 @@ import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.NodeSearchVisitor;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
-import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class SamplesListWidget extends InfoTableWidget<SampleWrapper> {
 
@@ -30,8 +29,6 @@ public class SamplesListWidget extends InfoTableWidget<SampleWrapper> {
 
     private static final int[] BOUNDS = new int[] { 130, 130, 150, 150, -1, -1,
         -1 };
-
-    private WritableApplicationService appService;
 
     private SiteAdapter siteAdapter;
 
@@ -45,10 +42,8 @@ public class SamplesListWidget extends InfoTableWidget<SampleWrapper> {
     }
 
     public SamplesListWidget(Composite parent,
-        WritableApplicationService appService,
         Collection<SamplePositionWrapper> samplePositionCollection) {
         this(parent);
-        this.appService = appService;
         setSamplePositions(samplePositionCollection);
     }
 

@@ -24,7 +24,7 @@ public class PatientVisitAddHandler extends AbstractHandler {
                 SessionManager.getAppService());
             PatientVisitAdapter adapter = new PatientVisitAdapter(
                 patientAdapter, pvWrapper);
-            adapter.getWrapper().setPatientWrapper(patientAdapter.getWrapper());
+            adapter.getWrapper().setPatient(patientAdapter.getWrapper());
             HandlerUtil.getActiveWorkbenchWindowChecked(event).getActivePage()
                 .openEditor(new FormInput(adapter), PatientVisitEntryForm.ID,
                     true);

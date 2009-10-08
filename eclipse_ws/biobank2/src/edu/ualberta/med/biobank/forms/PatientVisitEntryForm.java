@@ -161,9 +161,8 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
 
         Label siteLabel = (Label) createWidget(client, Label.class, SWT.NONE,
             "Site");
-        FormUtils.setTextValue(siteLabel, patientVisitWrapper
-            .getPatientWrapper().getStudy().getWrappedObject().getSite()
-            .getName());
+        FormUtils.setTextValue(siteLabel, patientVisitWrapper.getPatient()
+            .getStudy().getWrappedObject().getSite().getName());
 
         if (patientVisitWrapper.getId() == null) {
             // choose clinic for new visit
@@ -345,7 +344,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
     protected void saveForm() throws Exception {
         PatientAdapter patientAdapter = (PatientAdapter) patientVisitAdapter
             .getParent();
-        patientVisitWrapper.setPatientWrapper(patientAdapter.getWrapper());
+        patientVisitWrapper.setPatient(patientAdapter.getWrapper());
         if (clinicsComboViewer != null) {
             IStructuredSelection clinicSelection = (IStructuredSelection) clinicsComboViewer
                 .getSelection();

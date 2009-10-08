@@ -80,7 +80,7 @@ public class PatientAdapter extends AdapterBase {
                 PatientVisitAdapter adapter = new PatientVisitAdapter(
                     PatientAdapter.this, new PatientVisitWrapper(
                         getAppService()));
-                adapter.getWrapper().setPatientWrapper(getWrapper());
+                adapter.getWrapper().setPatient(getWrapper());
                 openForm(new FormInput(adapter), PatientVisitEntryForm.ID);
             }
 

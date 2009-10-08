@@ -17,6 +17,7 @@ import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PvInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PvSampleSourceWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SamplePositionWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleSourceWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
@@ -258,6 +259,9 @@ public class BiobankLabelProvider extends LabelProvider implements
             case 3:
                 return "" + siteClinicInfo.patientVisits;
             }
+        } else if (element instanceof SamplePositionWrapper) {
+            return getColumnText(((SamplePositionWrapper) element).getSample(),
+                columnIndex);
         } else if (element instanceof ModelWrapper<?>) {
             return getColumnText(
                 ((ModelWrapper<?>) element).getWrappedObject(), columnIndex);
