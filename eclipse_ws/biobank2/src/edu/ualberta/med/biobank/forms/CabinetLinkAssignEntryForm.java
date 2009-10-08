@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.observable.value.WritableValue;
@@ -55,6 +56,9 @@ import edu.ualberta.med.biobank.widgets.ViewContainerWidget;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
+
+    private static Logger LOGGER = Logger
+        .getLogger(CabinetLinkAssignEntryForm.class.getName());
 
     public static final String ID = "edu.ualberta.med.biobank.forms.CabinetLinkAssignEntryForm";
 
@@ -419,7 +423,7 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
             inventoryIdText.setText("");
             positionText.setText("");
         } catch (Exception e) {
-            SessionManager.getLogger().error("Can't reset the form", e);
+            LOGGER.error("Can't reset the form", e);
         }
     }
 

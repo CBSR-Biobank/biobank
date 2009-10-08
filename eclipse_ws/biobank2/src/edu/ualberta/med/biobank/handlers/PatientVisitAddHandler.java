@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.handlers;
 
+import org.apache.log4j.Logger;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
@@ -15,6 +16,9 @@ import edu.ualberta.med.biobank.views.PatientAdministrationView;
 
 public class PatientVisitAddHandler extends AbstractHandler {
 
+    private static Logger LOGGER = Logger
+        .getLogger(PatientVisitAddHandler.class.getName());
+
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
         try {
@@ -29,8 +33,8 @@ public class PatientVisitAddHandler extends AbstractHandler {
                 .openEditor(new FormInput(adapter), PatientVisitEntryForm.ID,
                     true);
         } catch (Exception exp) {
-            SessionManager.getLogger().error(
-                "Error while opening the patient visit entry form", exp);
+            LOGGER.error("Error while opening the patient visit entry form",
+                exp);
         }
         return null;
     }

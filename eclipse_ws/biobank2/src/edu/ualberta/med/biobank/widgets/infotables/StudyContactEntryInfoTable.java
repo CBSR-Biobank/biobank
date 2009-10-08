@@ -4,18 +4,21 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
-import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.StudyContactInfo;
 
 public class StudyContactEntryInfoTable extends InfoTableWidget<ContactWrapper> {
+
+    private static Logger LOGGER = Logger
+        .getLogger(StudyContactEntryInfoTable.class.getName());
 
     private static final String[] HEADINGS = new String[] { "Clinic",
         "Contact Name", "Title", "Email", "Phone #", "Fax #" };
@@ -84,8 +87,7 @@ public class StudyContactEntryInfoTable extends InfoTableWidget<ContactWrapper> 
                 } catch (final RemoteConnectFailureException exp) {
                     BioBankPlugin.openRemoteConnectErrorMessage();
                 } catch (Exception e) {
-                    SessionManager.getLogger().error(
-                        "Error while retrieving the clinic", e);
+                    LOGGER.error("Error while retrieving the clinic", e);
                 }
             }
         };

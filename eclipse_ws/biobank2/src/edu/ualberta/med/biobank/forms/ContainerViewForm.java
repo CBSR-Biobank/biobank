@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ComboViewer;
@@ -42,6 +43,9 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 public class ContainerViewForm extends BiobankViewForm {
 
     public static final String ID = "edu.ualberta.med.biobank.forms.ContainerViewForm";
+
+    private static Logger LOGGER = Logger.getLogger(ContainerViewForm.class
+        .getName());
 
     private ContainerAdapter containerAdapter;
 
@@ -313,8 +317,7 @@ public class ContainerViewForm extends BiobankViewForm {
                                 try {
                                     reload();
                                 } catch (Exception e) {
-                                    SessionManager.getLogger().error(
-                                        "Error loading", e);
+                                    LOGGER.error("Error loading", e);
                                 }
                                 containerAdapter.performExpand();
                             }
@@ -341,8 +344,7 @@ public class ContainerViewForm extends BiobankViewForm {
                                 try {
                                     reload();
                                 } catch (Exception e) {
-                                    SessionManager.getLogger().error(
-                                        "Error loading", e);
+                                    LOGGER.error("Error loading", e);
                                 }
                                 containerAdapter.rebuild();
                                 containerAdapter.performExpand();

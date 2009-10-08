@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.HashMap;
 
 import org.apache.commons.collections.map.ListOrderedMap;
+import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.viewers.ComboViewer;
@@ -25,7 +26,6 @@ import org.eclipse.ui.part.EditorPart;
 import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
-import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.widgets.utils.WidgetCreator;
@@ -40,6 +40,9 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
  * possible. See {@link #createFormContent()}
  */
 public abstract class BiobankFormBase extends EditorPart {
+
+    private static Logger LOGGER = Logger.getLogger(BiobankFormBase.class
+        .getName());
 
     protected WritableApplicationService appService;
 
@@ -91,8 +94,7 @@ public abstract class BiobankFormBase extends EditorPart {
         } catch (final RemoteConnectFailureException exp) {
             BioBankPlugin.openRemoteConnectErrorMessage();
         } catch (Exception e) {
-            SessionManager.getLogger().error(
-                "BioBankFormBase.createPartControl Error", e);
+            LOGGER.error("BioBankFormBase.createPartControl Error", e);
         }
     }
 

@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.treeview;
 
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.viewers.TreeViewer;
@@ -25,6 +26,9 @@ import edu.ualberta.med.biobank.forms.ContainerViewForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 
 public class ContainerAdapter extends AdapterBase {
+
+    private static Logger LOGGER = Logger.getLogger(SessionManager.class
+        .getName());
 
     public ContainerAdapter(AdapterBase parent, ContainerWrapper container) {
         super(parent, container);
@@ -134,7 +138,7 @@ public class ContainerAdapter extends AdapterBase {
             } else
                 throw new Exception("Children null.");
         } catch (Exception e) {
-            SessionManager.getLogger().error(
+            LOGGER.error(
                 "Error while loading storage container group children for storage container "
                     + getContainer().getLabel(), e);
         }

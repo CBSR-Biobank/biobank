@@ -24,7 +24,7 @@ public class PatientsAdministrationPerspective implements IPerspectiveFactory {
     // try {
     // activePage.showView(PatientAdministrationView.ID);
     // } catch (PartInitException e) {
-    // SessionManager.getLogger().error(
+    // LOGGER.error(
     // "Failed to show Administraction View", e);
     // }
     // }

@@ -4,6 +4,7 @@ import java.util.Collection;
 
 import org.acegisecurity.AccessDeniedException;
 import org.apache.commons.collections.map.ListOrderedMap;
+import org.apache.log4j.Logger;
 import org.eclipse.core.databinding.UpdateValueStrategy;
 import org.eclipse.core.databinding.observable.ChangeEvent;
 import org.eclipse.core.databinding.observable.IChangeListener;
@@ -42,7 +43,6 @@ import org.springframework.remoting.RemoteAccessException;
 import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
-import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
@@ -56,6 +56,9 @@ import edu.ualberta.med.biobank.validators.AbstractValidator;
  * 
  */
 public abstract class BiobankEntryForm extends BiobankFormBase {
+
+    private static Logger LOGGER = Logger.getLogger(BiobankEntryForm.class
+        .getName());
 
     protected String sessionName;
 
@@ -345,7 +348,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
                 }
             }
         } catch (Exception e) {
-            SessionManager.getLogger().error("Can't save the form", e);
+            LOGGER.error("Can't save the form", e);
         }
     }
 
@@ -354,7 +357,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
             PlatformUI.getWorkbench().getActiveWorkbenchWindow()
                 .getActivePage().closeEditor(this, false);
         } catch (Exception e) {
-            SessionManager.getLogger().error("Can't close the form", e);
+            LOGGER.error("Can't close the form", e);
         }
     }
 
@@ -362,7 +365,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
         try {
             adapter.resetObject();
         } catch (Exception e) {
-            SessionManager.getLogger().error("Can't reset the form", e);
+            LOGGER.error("Can't reset the form", e);
         }
     }
 

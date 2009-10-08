@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
 import org.eclipse.core.databinding.UpdateValueStrategy;
 import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.databinding.beans.PojoObservables;
@@ -26,7 +27,6 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
-import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
@@ -48,6 +48,10 @@ import edu.ualberta.med.biobank.widgets.listener.BiobankEntryFormWidgetListener;
 import edu.ualberta.med.biobank.widgets.listener.MultiSelectEvent;
 
 public class PatientVisitEntryForm extends BiobankEntryForm {
+
+    private static Logger LOGGER = Logger.getLogger(PatientVisitEntryForm.class
+        .getName());
+
     public static final String ID = "edu.ualberta.med.biobank.forms.PatientVisitEntryForm";
 
     public static final String MSG_NEW_PATIENT_VISIT_OK = "Creating a new patient visit record.";
@@ -131,9 +135,8 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
             patientVisitWrapper.reload();
             patientWrapper.reload();
         } catch (Exception e) {
-            SessionManager.getLogger().error(
-                "Error while retrieving patient visit "
-                    + patientVisitAdapter.getWrapper().getDateDrawn(), e);
+            LOGGER.error("Error while retrieving patient visit "
+                + patientVisitAdapter.getWrapper().getDateDrawn(), e);
         }
     }
 
