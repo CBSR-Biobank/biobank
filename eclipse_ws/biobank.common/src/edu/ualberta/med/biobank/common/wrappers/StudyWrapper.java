@@ -270,14 +270,24 @@ public class StudyWrapper extends ModelWrapper<Study> implements
         if (currSamplesStorage.size() == 0)
             return;
 
+        if (newCollection.size() == 0) {
+            // remove all
+            Iterator<SampleStorageWrapper> it = currSamplesStorage.iterator();
+            while (it.hasNext()) {
+                it.next().delete();
+            }
+            return;
+        }
+
         List<Integer> idList = new ArrayList<Integer>();
         for (SampleStorageWrapper ss : newCollection) {
             idList.add(ss.getId());
         }
         Iterator<SampleStorageWrapper> it = currSamplesStorage.iterator();
         while (it.hasNext()) {
-            if ((idList.size() == 0) || !idList.contains(it.next().getId())) {
-                it.next().delete();
+            SampleStorageWrapper ss = it.next();
+            if (!idList.contains(ss.getId())) {
+                ss.delete();
             }
         }
     }
@@ -348,14 +358,24 @@ public class StudyWrapper extends ModelWrapper<Study> implements
         if (currSamplesSources.size() == 0)
             return;
 
+        if (newCollection.size() == 0) {
+            // remove all
+            Iterator<SampleSourceWrapper> it = currSamplesSources.iterator();
+            while (it.hasNext()) {
+                it.next().delete();
+            }
+            return;
+        }
+
         List<Integer> idList = new ArrayList<Integer>();
         for (SampleSourceWrapper ss : newCollection) {
             idList.add(ss.getId());
         }
         Iterator<SampleSourceWrapper> it = currSamplesSources.iterator();
         while (it.hasNext()) {
-            if (!idList.contains(it.next().getId())) {
-                it.next().delete();
+            SampleSourceWrapper ss = it.next();
+            if (!idList.contains(ss.getId())) {
+                ss.delete();
             }
         }
     }
