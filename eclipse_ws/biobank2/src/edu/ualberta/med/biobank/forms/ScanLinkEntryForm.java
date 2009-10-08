@@ -169,6 +169,9 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
 
         cancelConfirmWidget = new CancelConfirmWidget(form.getBody(), this,
             true);
+        SampleTypeSelectionWidget lastWidget = sampleTypeWidgets
+            .get(sampleTypeWidgets.size() - 1);
+        lastWidget.setNextWidget(cancelConfirmWidget);
 
         uvs = new UpdateValueStrategy();
         uvs.setAfterConvertValidator(new IValidator() {
@@ -354,6 +357,7 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
         toolkit.paintBordersFor(typesSelectionPerRowComposite);
 
         sampleTypeWidgets = new ArrayList<SampleTypeSelectionWidget>();
+        SampleTypeSelectionWidget precedent = null;
         for (int i = 0; i < ScanCell.ROW_MAX; i++) {
             final SampleTypeSelectionWidget typeWidget = new SampleTypeSelectionWidget(
                 typesSelectionPerRowComposite,
@@ -371,23 +375,11 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
                 });
             typeWidget.addBinding(widgetCreator);
             sampleTypeWidgets.add(typeWidget);
+            if (precedent != null) {
+                precedent.setNextWidget(typeWidget);
+            }
+            precedent = typeWidget;
         }
-        SampleTypeSelectionWidget lastWidget = sampleTypeWidgets
-            .get(sampleTypeWidgets.size() - 1);
-        lastWidget.addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyReleased(KeyEvent e) {
-                if (e.keyCode == 13) {
-                    cancelConfirmWidget.setFocus();
-                }
-            }
-        });
-        lastWidget.addFocusListener(new FocusAdapter() {
-            @Override
-            public void focusLost(FocusEvent e) {
-                cancelConfirmWidget.setFocus();
-            }
-        });
     }
 
     private void createFieldsComposite() throws Exception {
@@ -642,14 +634,16 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
         int indexRow) {
         if (typeWidget.needToSave()) {
             SampleTypeWrapper type = typeWidget.getSelection();
-            PalletCell[][] cells = spw.getScannedElements();
-            if (cells != null) {
-                for (int indexColumn = 0; indexColumn < cells[indexRow].length; indexColumn++) {
-                    PalletCell cell = cells[indexRow][indexColumn];
-                    if (PalletCell.hasValue(cell)) {
-                        cell.setType(type);
-                        cell.setStatus(SampleCellStatus.TYPE);
-                        spw.redraw();
+            if (type != null) {
+                PalletCell[][] cells = spw.getScannedElements();
+                if (cells != null) {
+                    for (int indexColumn = 0; indexColumn < cells[indexRow].length; indexColumn++) {
+                        PalletCell cell = cells[indexRow][indexColumn];
+                        if (PalletCell.hasValue(cell)) {
+                            cell.setType(type);
+                            cell.setStatus(SampleCellStatus.TYPE);
+                            spw.redraw();
+                        }
                     }
                 }
             }

@@ -21,10 +21,13 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
-import org.eclipse.swt.events.FocusListener;
-import org.eclipse.swt.events.KeyListener;
+import org.eclipse.swt.events.KeyAdapter;
+import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.TraverseEvent;
+import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
@@ -47,6 +50,7 @@ public class SampleTypeSelectionWidget {
     private IObservableValue selectionDone = new WritableValue(Boolean.TRUE,
         Boolean.class);
     private Binding binding;
+    private Object nextWidget;
 
     public SampleTypeSelectionWidget(Composite parent, Character letter,
         List<SampleTypeWrapper> types, FormToolkit toolkit) {
@@ -94,6 +98,35 @@ public class SampleTypeSelectionWidget {
         });
         cv.setComparator(new ViewerComparator());
         cv.setInput(types);
+        combo.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyReleased(KeyEvent e) {
+                if (e.keyCode == 13 && nextWidget != null) {
+                    // setNextFocus();
+                }
+            }
+        });
+        combo.addTraverseListener(new TraverseListener() {
+            @Override
+            public void keyTraversed(TraverseEvent e) {
+                if (e.detail == SWT.TRAVERSE_TAB_NEXT
+                    || e.detail == SWT.TRAVERSE_RETURN) {
+                    e.doit = setNextFocus();
+                }
+            }
+        });
+    }
+
+    private boolean setNextFocus() {
+        if (nextWidget != null) {
+            if (nextWidget instanceof Control) {
+                ((Control) nextWidget).setFocus();
+                return false; // cancel doit
+            } else if (nextWidget instanceof SampleTypeSelectionWidget) {
+                ((SampleTypeSelectionWidget) nextWidget).combo.setFocus();
+            }
+        }
+        return true;
     }
 
     public void addSelectionChangedListener(ISelectionChangedListener listener) {
@@ -172,11 +205,7 @@ public class SampleTypeSelectionWidget {
         }
     }
 
-    public void addKeyListener(KeyListener listener) {
-        combo.addKeyListener(listener);
-    }
-
-    public void addFocusListener(FocusListener listener) {
-        combo.addFocusListener(listener);
+    public void setNextWidget(Object nextWidget) {
+        this.nextWidget = nextWidget;
     }
 }

@@ -293,6 +293,7 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
     protected void scan() {
         try {
             boolean showResult = checkPallet();
+            currentPalletWrapper.getWrappedObject().setId(null);
             if (showResult) {
                 appendLog("----");
                 appendLog("Scanning plate "
@@ -430,10 +431,10 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
                 scanCell
                     .setInformation("Sample different from the one registered at this position");
                 scanCell.setTitle("!");
-                appendLogError(positionString, "Expected "
-                    + expectedSample.getId() + " from patient "
+                appendLogError(positionString, "Expected inventoryId "
+                    + expectedSample.getInventoryId() + " from patient "
                     + expectedSample.getPatientVisit().getPatient().getNumber()
-                    + " -- Found " + foundSample.getInventoryId()
+                    + " -- Found inventoryId " + foundSample.getInventoryId()
                     + " from patient "
                     + foundSample.getPatientVisit().getPatient().getNumber());
                 return false;
