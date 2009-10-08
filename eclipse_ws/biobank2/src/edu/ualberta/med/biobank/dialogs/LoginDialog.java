@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.dialogs;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 
 import org.apache.log4j.Logger;
@@ -24,6 +25,7 @@ import org.osgi.service.prefs.Preferences;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.helpers.SessionHelper;
 import edu.ualberta.med.biobank.rcp.Application;
 
@@ -212,9 +214,14 @@ public class LoginDialog extends TitleAreaDialog {
         BusyIndicator.showWhile(PlatformUI.getWorkbench()
             .getActiveWorkbenchWindow().getShell().getDisplay(), sessionHelper);
 
-        SessionManager.getInstance().addSession(sessionHelper.getAppService(),
-            serverText.getText(), userNameText.getText(),
-            sessionHelper.getSites());
+        Collection<SiteWrapper> sites = sessionHelper.getSites();
+
+        if (sites != null) {
+            // login successful
+            SessionManager.getInstance().addSession(
+                sessionHelper.getAppService(), serverText.getText(),
+                userNameText.getText(), sites);
+        }
         super.okPressed();
     }
 }

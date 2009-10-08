@@ -4,6 +4,7 @@ import java.util.Collection;
 
 import org.apache.commons.collections.MapIterator;
 import org.apache.commons.collections.map.ListOrderedMap;
+import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -12,7 +13,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
-import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PvInfoDataWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PvInfoWrapper;
@@ -27,6 +27,9 @@ import edu.ualberta.med.biobank.widgets.infotables.SamplesListWidget;
 public class PatientVisitViewForm extends BiobankViewForm {
 
     public static final String ID = "edu.ualberta.med.biobank.forms.PatientVisitViewForm";
+
+    private static Logger LOGGER = Logger.getLogger(PatientVisitViewForm.class
+        .getName());
 
     private PatientVisitAdapter patientVisitAdapter;
 
@@ -217,9 +220,8 @@ public class PatientVisitViewForm extends BiobankViewForm {
         try {
             patientVisitWrapper.reload();
         } catch (Exception ex) {
-            SessionManager.getLogger().error(
-                "Error while retrieving patient visit "
-                    + patientVisitWrapper.getDateDrawn(), ex);
+            LOGGER.error("Error while retrieving patient visit "
+                + patientVisitWrapper.getDateDrawn(), ex);
         }
     }
 

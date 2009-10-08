@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.wizard;
 
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -14,7 +15,6 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Label;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
-import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.model.ContainerCell;
@@ -22,6 +22,9 @@ import edu.ualberta.med.biobank.model.ContainerStatus;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class TopContainerChooserPage extends AbstractContainerChooserPage {
+
+    private static Logger LOGGER = Logger
+        .getLogger(TopContainerChooserPage.class.getName());
 
     public static final String NAME = "FIRST_CONTAINER";
 
@@ -89,7 +92,7 @@ public class TopContainerChooserPage extends AbstractContainerChooserPage {
                 nextPage.setCurrentContainer(cell.getPosition().getContainer());
             } catch (ArrayIndexOutOfBoundsException aiobe) {
                 setPageComplete(false);
-                SessionManager.getLogger().error("Index error", aiobe);
+                LOGGER.error("Index error", aiobe);
             }
         }
         return cell;

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
@@ -23,6 +24,9 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class SessionAdapter extends AdapterBase {
+
+    private static Logger LOGGER = Logger.getLogger(SessionAdapter.class
+        .getName());
 
     private WritableApplicationService appService;
 
@@ -124,8 +128,8 @@ public class SessionAdapter extends AdapterBase {
         } catch (final RemoteAccessException exp) {
             BioBankPlugin.openRemoteAccessErrorMessage();
         } catch (Exception e) {
-            SessionManager.getLogger().error(
-                "Error while loading sites for session " + getName(), e);
+            LOGGER.error("Error while loading sites for session " + getName(),
+                e);
         }
     }
 
