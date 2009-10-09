@@ -23,16 +23,8 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 public class SiteWrapper extends ModelWrapper<Site> implements
     Comparable<SiteWrapper> {
 
-    private AddressWrapper addressWrapper;
-
     public SiteWrapper(WritableApplicationService appService, Site wrappedObject) {
         super(appService, wrappedObject);
-        Address address = wrappedObject.getAddress();
-        if (address == null) {
-            address = new Address();
-            wrappedObject.setAddress(address);
-        }
-        addressWrapper = new AddressWrapper(appService, address);
     }
 
     public SiteWrapper(WritableApplicationService appService) {
@@ -41,17 +33,9 @@ public class SiteWrapper extends ModelWrapper<Site> implements
 
     @Override
     protected String[] getPropertyChangesNames() {
-        return new String[] { "name", "activityStatus", "comment",
+        return new String[] { "name", "activityStatus", "comment", "address",
             "clinicCollection", "siteCollection", "containerCollection",
             "sampleTypeCollection" };
-    }
-
-    public AddressWrapper getAddressWrapper() {
-        return addressWrapper;
-    }
-
-    public void setAddressWrapper(AddressWrapper addressWrapper) {
-        this.addressWrapper = addressWrapper;
     }
 
     public String getName() {
@@ -84,6 +68,25 @@ public class SiteWrapper extends ModelWrapper<Site> implements
         wrappedObject.setComment(comment);
         propertyChangeSupport
             .firePropertyChange("comment", oldComment, comment);
+    }
+
+    public AddressWrapper getAddress() {
+        Address address = wrappedObject.getAddress();
+        if (address == null) {
+            return null;
+        }
+        return new AddressWrapper(appService, address);
+    }
+
+    public void setAddress(Address address) {
+        Address oldAddress = wrappedObject.getAddress();
+        wrappedObject.setAddress(address);
+        propertyChangeSupport
+            .firePropertyChange("address", oldAddress, address);
+    }
+
+    public void setAddress(AddressWrapper study) {
+        setAddress(study.wrappedObject);
     }
 
     @Override

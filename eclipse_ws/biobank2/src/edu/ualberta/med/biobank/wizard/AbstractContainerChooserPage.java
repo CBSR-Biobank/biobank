@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.wizard;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
@@ -14,10 +15,10 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
+import edu.ualberta.med.biobank.common.wrappers.CapacityWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerPositionWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
-import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.ContainerCell;
 import edu.ualberta.med.biobank.model.ContainerStatus;
 import edu.ualberta.med.biobank.widgets.ContainerDisplayWidget;
@@ -143,16 +144,18 @@ public abstract class AbstractContainerChooserPage extends WizardPage {
         ContainerWrapper occupiedContainer);
 
     private ContainerCell[][] initGridSize() {
-        int dim1;
-        int dim2;
+        int rowCap;
+        int colCap;
         if (currentContainer == null) {
-            dim1 = defaultDim1;
-            dim2 = defaultDim2;
+            rowCap = defaultDim1;
+            colCap = defaultDim2;
         } else {
-            Capacity capacity = currentContainer.getContainerType()
+            CapacityWrapper capacity = currentContainer.getContainerType()
                 .getCapacity();
-            dim1 = capacity.getRowCapacity();
-            dim2 = capacity.getColCapacity();
+            rowCap = capacity.getRowCapacity();
+            colCap = capacity.getColCapacity();
+            Assert.isNotNull(rowCap, "row capacity is null");
+            Assert.isNotNull(colCap, "column capacity is null");
         }
         int width;
         if (gridWidth == null) {
@@ -167,8 +170,8 @@ public abstract class AbstractContainerChooserPage extends WizardPage {
         } else {
             height = gridHeight;
         }
-        containerWidget.setGridSizes(dim1, dim2, width, height);
-        return new ContainerCell[dim1][dim2];
+        containerWidget.setGridSizes(rowCap, colCap, width, height);
+        return new ContainerCell[rowCap][colCap];
     }
 
     public void setCurrentContainer(ContainerWrapper container) {

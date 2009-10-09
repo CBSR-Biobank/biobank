@@ -25,11 +25,11 @@ import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.wrappers.CapacityWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerPositionWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.forms.input.FormInput;
-import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.ContainerCell;
 import edu.ualberta.med.biobank.model.ContainerStatus;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
@@ -146,24 +146,28 @@ public class ContainerViewForm extends BiobankViewForm {
 
     private void initCells() {
         ContainerTypeWrapper containerType = container.getContainerType();
-        Capacity cap = containerType.getCapacity();
-        int dim1 = cap.getRowCapacity().intValue();
-        int dim2 = cap.getColCapacity().intValue();
-        if (dim1 == 0)
-            dim1 = 1;
-        if (dim2 == 0)
-            dim2 = 1;
-        cells = new ContainerCell[dim1][dim2];
+        CapacityWrapper cap = containerType.getCapacity();
+        Integer rowCap = cap.getRowCapacity();
+        Integer colCap = cap.getColCapacity();
+        Assert.isNotNull(rowCap, "row capacity is null");
+        Assert.isNotNull(colCap, "column capacity is null");
+        if (rowCap == 0)
+            rowCap = 1;
+        if (colCap == 0)
+            colCap = 1;
+        cells = new ContainerCell[rowCap][colCap];
         for (ContainerPositionWrapper position : container
             .getChildPositionCollection()) {
-            int row = position.getRow().intValue();
-            int col = position.getCol().intValue();
+            Integer row = position.getRow();
+            Integer col = position.getCol();
+            Assert.isNotNull(row, "row is null");
+            Assert.isNotNull(col, "column is null");
             ContainerCell cell = new ContainerCell(position);
             cell.setStatus(ContainerStatus.INITIALIZED);
             cells[row][col] = cell;
         }
-        for (int i = 0; i < dim1; i++) {
-            for (int j = 0; j < dim2; j++) {
+        for (int i = 0; i < rowCap; i++) {
+            for (int j = 0; j < colCap; j++) {
                 if (cells[i][j] == null) {
                     ContainerPositionWrapper pos = new ContainerPositionWrapper(
                         SessionManager.getAppService());

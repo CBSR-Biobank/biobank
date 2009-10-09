@@ -144,7 +144,6 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
             containerType.getName()));
 
         createContainerTypeSection();
-        createDimensionsSection();
         createContainsSection();
     }
 
@@ -167,6 +166,24 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
             null, BeansObservables.observeValue(containerType, "nameShort"),
             NonEmptyString.class, MSG_NO_CONTAINER_TYPE_NAME_SHORT);
 
+        if (containerType.getTopLevel() == null) {
+            containerType.setTopLevel(false);
+        }
+        createBoundWidgetWithLabel(client, Button.class, SWT.CHECK,
+            "Top Level Container", null, BeansObservables.observeValue(
+                containerType, "topLevel"), null);
+        toolkit.paintBordersFor(client);
+
+        createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Rows", null,
+            PojoObservables.observeValue(containerType.getCapacity(),
+                "rowCapacity"), new IntegerNumber(
+                "Row capactiy is not a valid number", false));
+
+        createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Columns",
+            null, PojoObservables.observeValue(containerType.getCapacity(),
+                "colCapacity"), new IntegerNumber(
+                "Column capacity is not a valid nubmer", false));
+
         createBoundWidgetWithLabel(client, Text.class, SWT.NONE,
             "Default Temperature\n(Celcius)", null, BeansObservables
                 .observeValue(containerType, "defaultTemperature"),
@@ -183,39 +200,12 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
             "Activity Status", FormConstants.ACTIVITY_STATUS, BeansObservables
                 .observeValue(containerType, "activityStatus"), null, null);
 
-        if (containerType.getTopLevel() == null) {
-            containerType.setTopLevel(false);
-        }
-        createBoundWidgetWithLabel(client, Button.class, SWT.CHECK,
-            "Top Level Container", null, BeansObservables.observeValue(
-                containerType, "topLevel"), null);
-
         Text comment = (Text) createBoundWidgetWithLabel(client, Text.class,
             SWT.MULTI, "Comments", null, BeansObservables.observeValue(
                 containerType, "comment"), null, null);
         GridData gd = new GridData(GridData.FILL_HORIZONTAL);
         gd.heightHint = 40;
         comment.setLayoutData(gd);
-    }
-
-    private void createDimensionsSection() {
-        Composite client = createSectionWithClient("Default Capacity");
-
-        GridLayout layout = (GridLayout) client.getLayout();
-        layout.numColumns = 2;
-        layout.horizontalSpacing = 10;
-        client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        toolkit.paintBordersFor(client);
-
-        createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Rows", null,
-            PojoObservables.observeValue(containerType.getCapacity(),
-                "rowCapacity"), new IntegerNumber(
-                "Row capactiy is not a valid number", false));
-
-        createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Columns",
-            null, PojoObservables.observeValue(containerType.getCapacity(),
-                "colCapacity"), new IntegerNumber(
-                "Column capacity is not a valid nubmer", false));
     }
 
     private void createContainsSection() throws Exception {
