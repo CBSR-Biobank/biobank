@@ -234,14 +234,12 @@ public class ContainerWrapper extends ModelWrapper<Container> {
         ContainerTypeWrapper type = getContainerType();
         RowColPos rcp = LabelingScheme.getRowColFromPositionString(position,
             type.getWrappedObject());
-        CapacityWrapper capacity = type.getCapacity();
-        if (rcp.row < capacity.getRowCapacity()
-            && rcp.col < capacity.getColCapacity()) {
+        if (rcp.row < type.getRowCapacity() && rcp.col < type.getColCapacity()) {
             return rcp;
         }
         throw new Exception("Can't use position " + position + " in container "
             + getFullInfoLabel() + "\nReason: capacity = "
-            + capacity.getRowCapacity() + "*" + capacity.getColCapacity());
+            + type.getRowCapacity() + "*" + type.getColCapacity());
     }
 
     public void setContainerType(ContainerTypeWrapper containerType) {
@@ -441,14 +439,14 @@ public class ContainerWrapper extends ModelWrapper<Container> {
     @Override
     public boolean checkIntegrity() {
         if (wrappedObject != null)
-            if ((getContainerType() != null
-                && getContainerType().getCapacity() != null
-                && getContainerType().getCapacity().getRowCapacity() != null && getContainerType()
-                .getCapacity().getColCapacity() != null)
-                || getContainerType() == null)
-                if ((getPosition() != null && getPosition().getRow() != null && getPosition()
-                    .getCol() != null)
-                    || getPosition() == null)
+            if (((getContainerType() != null)
+                && (getContainerType().getRowCapacity() != null) && (getContainerType()
+                .getColCapacity() != null))
+                || (getContainerType() == null))
+                if (((getPosition() != null)
+                    && (getPosition().getRow() != null) && (getPosition()
+                    .getCol() != null))
+                    || (getPosition() == null))
                     if (wrappedObject.getSite() != null)
                         return true;
         return false;
@@ -665,8 +663,8 @@ public class ContainerWrapper extends ModelWrapper<Container> {
         throws ApplicationException {
         List<SDKQuery> queries = new ArrayList<SDKQuery>();
         Collection<ContainerPositionWrapper> positions = getChildPositionCollection();
-        int rows = getContainerType().getCapacity().getRowCapacity().intValue();
-        int cols = getContainerType().getCapacity().getColCapacity().intValue();
+        int rows = getContainerType().getRowCapacity().intValue();
+        int cols = getContainerType().getColCapacity().intValue();
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
                 Boolean filled = false;

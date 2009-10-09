@@ -3,13 +3,14 @@ package edu.ualberta.med.biobank.common.wrappers;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-
-import org.apache.commons.collections.map.ListOrderedMap;
+import java.util.Map;
 
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
+import edu.ualberta.med.biobank.common.wrappers.internal.PvInfoWrapper;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.PatientVisit;
@@ -22,9 +23,12 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
 
+    private Map<String, PvInfoDataWrapper> pvInfoDataMap;
+
     public PatientVisitWrapper(WritableApplicationService appService,
         PatientVisit wrappedObject) {
         super(appService, wrappedObject);
+        pvInfoDataMap = null;
     }
 
     public PatientVisitWrapper(WritableApplicationService appService) {
@@ -159,7 +163,7 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
     }
 
     @SuppressWarnings("unchecked")
-    public List<PvInfoDataWrapper> getPvInfoDataCollection() {
+    private List<PvInfoDataWrapper> getPvInfoDataCollection() {
         List<PvInfoDataWrapper> pvInfoDataCollection = (List<PvInfoDataWrapper>) propertiesMap
             .get("pvInfoDataCollection");
         if (pvInfoDataCollection == null) {
@@ -177,7 +181,7 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
         return pvInfoDataCollection;
     }
 
-    public void setPvInfoDataCollection(
+    private void setPvInfoDataCollection(
         Collection<PvInfoData> pvInfoDataCollection, boolean setNull) {
         Collection<PvInfoData> oldCollection = wrappedObject
             .getPvInfoDataCollection();
@@ -189,7 +193,7 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
         }
     }
 
-    public void setPvInfoDataCollection(
+    private void setPvInfoDataCollection(
         Collection<PvInfoDataWrapper> pvInfoDataCollection) {
         Collection<PvInfoData> pvCollection = new HashSet<PvInfoData>();
         for (PvInfoDataWrapper pv : pvInfoDataCollection) {
@@ -199,29 +203,33 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
         propertiesMap.put("pvInfoDataCollection", pvInfoDataCollection);
     }
 
-    @SuppressWarnings("unchecked")
-    public List<PvInfoPvInfoData> getPvInfoWithValues() {
-        List<PvInfoWrapper> studyPvInfos = getPatient().getStudy()
-            .getPvInfoCollection();
-        if (studyPvInfos.size() > 0) {
-            ListOrderedMap combinedPvInfoMap = new ListOrderedMap();
-            for (PvInfoWrapper pvInfo : studyPvInfos) {
-                PvInfoPvInfoData combinedPvInfo = new PvInfoPvInfoData();
-                combinedPvInfo.pvInfo = pvInfo;
-                combinedPvInfoMap.put(pvInfo.getId(), combinedPvInfo);
-            }
+    private Map<String, PvInfoDataWrapper> getPvInfoDataMap() {
+        if (pvInfoDataMap != null)
+            return pvInfoDataMap;
 
-            Collection<PvInfoDataWrapper> pvDataCollection = getPvInfoDataCollection();
-            if (pvDataCollection != null) {
-                for (PvInfoDataWrapper pvInfoData : pvDataCollection) {
-                    PvInfoPvInfoData combinedPvInfo = (PvInfoPvInfoData) combinedPvInfoMap
-                        .get(pvInfoData.getPvInfo().getId());
-                    combinedPvInfo.pvInfoData = pvInfoData;
-                }
+        pvInfoDataMap = new HashMap<String, PvInfoDataWrapper>();
+        List<PvInfoDataWrapper> pvInfoCollection = getPvInfoDataCollection();
+        if (pvInfoCollection != null) {
+            for (PvInfoDataWrapper pvInfoData : pvInfoCollection) {
+                pvInfoDataMap
+                    .put(pvInfoData.getPvInfo().getLabel(), pvInfoData);
             }
-            return combinedPvInfoMap.valueList();
         }
-        return null;
+        return pvInfoDataMap;
+    }
+
+    public String[] getPvInfoLabels() {
+        getPvInfoDataMap();
+        return pvInfoDataMap.keySet().toArray(new String[] {});
+    }
+
+    public void addPvInfo(String label, String value) {
+        getPvInfoDataMap();
+        PvInfoDataWrapper pvInfo = new PvInfoDataWrapper(appService,
+            new PvInfoData());
+        pvInfo.setLabel(label);
+        pvInfo.ssetAllowedValues(StringUtils.join(possibleValues, ';'));
+        pvInfoMap.put(label, pvInfo);
     }
 
     public void setDateDrawn(Date date) {
@@ -360,5 +368,11 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
         Date v2Date = wrapper.wrappedObject.getDateDrawn();
         return ((v1Date.compareTo(v2Date) > 0) ? 1 : (v1Date.equals(v2Date) ? 0
             : -1));
+    }
+
+    @Override
+    public void reload() throws Exception {
+        super.reload();
+        pvInfoDataMap = null;
     }
 }

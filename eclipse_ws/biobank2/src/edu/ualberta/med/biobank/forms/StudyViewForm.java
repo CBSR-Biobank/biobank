@@ -13,8 +13,8 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
-import edu.ualberta.med.biobank.common.wrappers.PvInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.common.wrappers.internal.PvInfoWrapper;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
 import edu.ualberta.med.biobank.widgets.infotables.SampleSourceInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.SampleStorageInfoTable;
@@ -146,7 +146,7 @@ public class StudyViewForm extends BiobankViewForm {
             subcomp = toolkit.createComposite(client);
             subcomp.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-            if (pvInfo.getPossibleValues() != null) {
+            if (pvInfo.getAllowedValue() != null) {
                 subcomp.setLayout(new GridLayout(2, false));
 
                 PvInfoLabelPair pair = new PvInfoLabelPair();
@@ -163,7 +163,7 @@ public class StudyViewForm extends BiobankViewForm {
 
     private void setPvDataSectionValues() {
         for (PvInfoLabelPair pair : pvInfoControlList) {
-            FormUtils.setTextValue(pair.label, pair.pvInfo.getPossibleValues()
+            FormUtils.setTextValue(pair.label, pair.pvInfo.getAllowedValue()
                 .replaceAll(";", "; "));
         }
     }

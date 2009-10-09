@@ -15,7 +15,6 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
-import edu.ualberta.med.biobank.common.wrappers.PvInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PvSampleSourceWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SamplePositionWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleSourceWrapper;
@@ -23,6 +22,7 @@ import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.common.wrappers.internal.PvInfoWrapper;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.ClinicStudyInfo;
 import edu.ualberta.med.biobank.model.Contact;
@@ -90,7 +90,7 @@ public class BiobankLabelProvider extends LabelProvider implements
             case 1:
                 if ((type > 1) && (type <= 3))
                     return "N/A";
-                return pvInfo.getPossibleValues();
+                return pvInfo.getAllowedValue();
             }
         } else if (element instanceof ContainerTypeWrapper) {
             final ContainerTypeWrapper ct = (ContainerTypeWrapper) element;

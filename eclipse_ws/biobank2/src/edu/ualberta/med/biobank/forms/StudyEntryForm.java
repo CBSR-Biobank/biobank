@@ -21,9 +21,9 @@ import org.eclipse.swt.widgets.Text;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.wrappers.PvInfoPossibleWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PvInfoTypeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.PvInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleSourceWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.common.wrappers.internal.PvInfoWrapper;
 import edu.ualberta.med.biobank.model.PvInfo;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
@@ -259,7 +259,7 @@ public class StudyEntryForm extends BiobankEntryForm {
                 selected = false;
             } else {
                 selected = true;
-                value = combinedPvInfo.pvInfo.getPossibleValues();
+                value = combinedPvInfo.pvInfo.getAllowedValue();
             }
 
             combinedPvInfo.wiget = new PvInfoWidget(client, SWT.NONE,
@@ -329,7 +329,7 @@ public class StudyEntryForm extends BiobankEntryForm {
 
             pvInfo.setLabel(combinedPvInfo.pvInfoPossible.getLabel());
             if (value != null) {
-                pvInfo.setPossibleValues(value);
+                pvInfo.ssetAllowedValues(value);
             }
             pvInfoList.add(pvInfo);
         }

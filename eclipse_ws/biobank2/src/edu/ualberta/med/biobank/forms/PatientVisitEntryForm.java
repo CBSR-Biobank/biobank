@@ -32,9 +32,9 @@ import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PvInfoDataWrapper;
-import edu.ualberta.med.biobank.common.wrappers.PvInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper.PvInfoPvInfoData;
+import edu.ualberta.med.biobank.common.wrappers.internal.PvInfoWrapper;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.treeview.PatientAdapter;
 import edu.ualberta.med.biobank.treeview.PatientVisitAdapter;
@@ -233,7 +233,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         PvInfoWrapper pvInfo = cPvInfo.pvInfoPvInfoData.getPvInfo();
         PvInfoDataWrapper pvInfoData = cPvInfo.pvInfoPvInfoData.getPvInfoData();
 
-        String possibleValues = pvInfo.getPossibleValues();
+        String possibleValues = pvInfo.getAllowedValue();
         if (possibleValues != null) {
             cPvInfo.possibleValues = possibleValues.split(";");
         }

@@ -9,7 +9,7 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
 
-import edu.ualberta.med.biobank.common.wrappers.AddressWrapper;
+import edu.ualberta.med.biobank.common.wrappers.internal.AddressWrapper;
 import edu.ualberta.med.biobank.validators.PostalCode;
 
 @SuppressWarnings("serial")

@@ -4,11 +4,16 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.lang.StringUtils;
 
 import edu.ualberta.med.biobank.common.BiobankCheckException;
+import edu.ualberta.med.biobank.common.wrappers.internal.PvInfoWrapper;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.model.PvInfo;
@@ -22,9 +27,12 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class StudyWrapper extends ModelWrapper<Study> {
 
+    private Map<String, PvInfoWrapper> pvInfoMap;
+
     public StudyWrapper(WritableApplicationService appService,
         Study wrappedObject) {
         super(appService, wrappedObject);
+        pvInfoMap = null;
     }
 
     public StudyWrapper(WritableApplicationService appService) {
@@ -366,7 +374,7 @@ public class StudyWrapper extends ModelWrapper<Study> {
     }
 
     @SuppressWarnings("unchecked")
-    public List<PvInfoWrapper> getPvInfoCollection() {
+    private List<PvInfoWrapper> getPvInfoCollection() {
         List<PvInfoWrapper> pvInfoCollection = (List<PvInfoWrapper>) propertiesMap
             .get("pvInfoCollection");
         if (pvInfoCollection == null) {
@@ -382,7 +390,7 @@ public class StudyWrapper extends ModelWrapper<Study> {
         return pvInfoCollection;
     }
 
-    public void setPvInfoCollection(Collection<PvInfo> pvInfoCollection,
+    private void setPvInfoCollection(Collection<PvInfo> pvInfoCollection,
         boolean setNull) {
         Collection<PvInfo> oldPvInfos = wrappedObject.getPvInfoCollection();
         wrappedObject.setPvInfoCollection(pvInfoCollection);
@@ -393,13 +401,59 @@ public class StudyWrapper extends ModelWrapper<Study> {
         }
     }
 
-    public void setPvInfoCollection(List<PvInfoWrapper> pvInfoCollection) {
+    private void setPvInfoCollection(List<PvInfoWrapper> pvInfoCollection) {
         Collection<PvInfo> pvInfosObjects = new HashSet<PvInfo>();
         for (PvInfoWrapper pvInfos : pvInfoCollection) {
             pvInfosObjects.add(pvInfos.getWrappedObject());
         }
         setPvInfoCollection(pvInfosObjects, false);
         propertiesMap.put("pvInfoCollection", pvInfoCollection);
+    }
+
+    private Map<String, PvInfoWrapper> getPvInfoMap() {
+        if (pvInfoMap != null)
+            return pvInfoMap;
+
+        pvInfoMap = new HashMap<String, PvInfoWrapper>();
+        List<PvInfoWrapper> pvInfoCollection = getPvInfoCollection();
+        if (pvInfoCollection != null) {
+            for (PvInfoWrapper pvInfo : pvInfoCollection) {
+                pvInfoMap.put(pvInfo.getLabel(), pvInfo);
+            }
+        }
+        return pvInfoMap;
+    }
+
+    public String[] getPvInfoLabels() throws ApplicationException {
+        getPvInfoMap();
+        return pvInfoMap.keySet().toArray(new String[] {});
+    }
+
+    public String[] getPvInfoAllowedValues(String label) throws Exception {
+        getPvInfoMap();
+        PvInfoWrapper pvInfo = pvInfoMap.get(label);
+        if (pvInfo == null) {
+            throw new Exception("PvInfo with label \"" + label
+                + "\" is invalid");
+        }
+        String joinedPossibleValues = pvInfo.getAllowedValues();
+        if (joinedPossibleValues == null)
+            return null;
+        return joinedPossibleValues.split(";");
+    }
+
+    public void setPvInfo(String label, String[] possibleValues)
+        throws Exception {
+        getPvInfoMap();
+        PvInfoWrapper pvInfo = pvInfoMap.get(label);
+        if (pvInfo == null) {
+            throw new Exception("PvInfo with label \"" + label
+                + "\" is invalid");
+        }
+        pvInfo = new PvInfoWrapper(appService, new PvInfo());
+        pvInfo.setLabel(label);
+        pvInfo.ssetAllowedValues(StringUtils.join(possibleValues, ';'));
+        pvInfoMap.put(label, pvInfo);
     }
 
     public List<ClinicWrapper> getClinicCollection()
@@ -427,9 +481,24 @@ public class StudyWrapper extends ModelWrapper<Study> {
             String nameShort1 = wrappedObject.getNameShort();
             String nameShort2 = wrapper.wrappedObject.getNameShort();
 
-            return ((nameShort1.compareTo(nameShort2) > 0) ? 1
-                : (nameShort1.equals(nameShort2) ? 0 : -1));
+            return ((nameShort1.compareTo(nameShort2) > 0) ? 1 : (nameShort1
+                .equals(nameShort2) ? 0 : -1));
         }
         return (compare > 0) ? 1 : -1;
+    }
+
+    @Override
+    public void persist() throws BiobankCheckException, Exception {
+        if (pvInfoMap != null) {
+            setPvInfoCollection(new ArrayList<PvInfoWrapper>(pvInfoMap.values()));
+        }
+        super.persist();
+
+    }
+
+    @Override
+    public void reload() throws Exception {
+        super.reload();
+        pvInfoMap = null;
     }
 }

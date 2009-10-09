@@ -5,10 +5,10 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.BiobankCheckException;
+import edu.ualberta.med.biobank.common.wrappers.internal.AddressWrapper;
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Container;
@@ -34,7 +34,7 @@ public class SiteWrapper extends ModelWrapper<Site> {
     protected String[] getPropertyChangesNames() {
         return new String[] { "name", "activityStatus", "comment", "address",
             "clinicCollection", "siteCollection", "containerCollection",
-            "sampleTypeCollection" };
+            "sampleTypeCollection", "pvInfoPossibleCollection" };
     }
 
     public String getName() {
@@ -323,9 +323,7 @@ public class SiteWrapper extends ModelWrapper<Site> {
         }
     }
 
-    public void setSampleTypeCollection(List<SampleTypeWrapper> types)
-        throws Exception {
-        deleteSampleTypeDifference(types);
+    public void setSampleTypeCollection(List<SampleTypeWrapper> types) {
         Collection<SampleType> typeObjects = new HashSet<SampleType>();
         for (SampleTypeWrapper type : types) {
             type.setSite(wrappedObject);
@@ -338,48 +336,35 @@ public class SiteWrapper extends ModelWrapper<Site> {
     /**
      * Removes the sample type objects that are not contained in the collection.
      * 
-     * @param newCollection
+     * @param oldCollection
      * @throws Exception
      */
-    private void deleteSampleTypeDifference(
-        List<SampleTypeWrapper> newCollection) throws Exception {
-        // no need to remove if study is not yet in the database or nothing in
-        // the collection
-        if (isNew())
-            return;
-
-        List<SampleTypeWrapper> currSamplesStorage = getSampleTypeCollection();
-        if (currSamplesStorage.size() == 0)
-            return;
-
-        if (newCollection.size() == 0) {
-            // remove all
-            Iterator<SampleTypeWrapper> it = currSamplesStorage.iterator();
-            while (it.hasNext()) {
-                it.next().delete();
-            }
-            return;
-        }
-
-        List<Integer> idList = new ArrayList<Integer>();
-        for (SampleTypeWrapper ss : newCollection) {
-            idList.add(ss.getId());
-        }
-        Iterator<SampleTypeWrapper> it = currSamplesStorage.iterator();
-        while (it.hasNext()) {
-            SampleTypeWrapper st = it.next();
-            if (!idList.contains(st.getId())) {
-                st.delete();
+    private void deleteSampleTypeDifference(Site origSite) throws Exception {
+        List<SampleTypeWrapper> newSampleSources = getSampleTypeCollection();
+        List<SampleTypeWrapper> oldSampleSources = new SiteWrapper(appService,
+            origSite).getSampleTypeCollection();
+        if (oldSampleSources != null) {
+            for (SampleTypeWrapper st : oldSampleSources) {
+                if ((newSampleSources == null)
+                    || !newSampleSources.contains(st)) {
+                    st.delete();
+                }
             }
         }
+    }
+
+    @Override
+    protected void persistDependencies(Site origObject)
+        throws BiobankCheckException, Exception {
+        deleteSampleTypeDifference(origObject);
     }
 
     @Override
     public int compareTo(ModelWrapper<Site> wrapper) {
         String name1 = wrappedObject.getName();
         String name2 = wrapper.wrappedObject.getName();
-        return ((name1.compareTo(name2) > 0) ? 1 : (name1
-            .equals(name2) ? 0 : -1));
+        return ((name1.compareTo(name2) > 0) ? 1 : (name1.equals(name2) ? 0
+            : -1));
     }
 
 }

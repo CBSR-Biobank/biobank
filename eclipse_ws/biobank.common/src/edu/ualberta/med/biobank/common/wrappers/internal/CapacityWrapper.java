@@ -1,6 +1,7 @@
-package edu.ualberta.med.biobank.common.wrappers;
+package edu.ualberta.med.biobank.common.wrappers.internal;
 
 import edu.ualberta.med.biobank.common.BiobankCheckException;
+import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.model.Capacity;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
@@ -60,11 +61,11 @@ public class CapacityWrapper extends ModelWrapper<Capacity> {
     @Override
     public int compareTo(ModelWrapper<Capacity> cap) {
         Integer rowCapacity1 = wrappedObject.getRowCapacity();
-        Integer rowCapacity2 = cap.wrappedObject.getRowCapacity();
+        Integer rowCapacity2 = cap.getWrappedObject().getRowCapacity();
         int compare = rowCapacity1.compareTo(rowCapacity2);
         if (compare == 0) {
             Integer colCapacity1 = wrappedObject.getColCapacity();
-            Integer colCapacity2 = cap.wrappedObject.getColCapacity();
+            Integer colCapacity2 = cap.getWrappedObject().getColCapacity();
 
             return ((colCapacity1.compareTo(colCapacity2) > 0) ? 1
                 : (colCapacity1.equals(colCapacity2) ? 0 : -1));

@@ -3,7 +3,7 @@ package edu.ualberta.med.biobank.forms;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.Section;
 
-import edu.ualberta.med.biobank.common.wrappers.AddressWrapper;
+import edu.ualberta.med.biobank.common.wrappers.internal.AddressWrapper;
 
 public abstract class AddressViewFormCommon extends BiobankViewForm {
 
