@@ -340,13 +340,13 @@ public class SiteWrapper extends ModelWrapper<Site> {
      * @throws Exception
      */
     private void deleteSampleTypeDifference(Site origSite) throws Exception {
-        List<SampleTypeWrapper> newSampleSources = getSampleTypeCollection();
+        List<SampleTypeWrapper> newSampleType = getSampleTypeCollection();
         List<SampleTypeWrapper> oldSampleSources = new SiteWrapper(appService,
             origSite).getSampleTypeCollection();
         if (oldSampleSources != null) {
             for (SampleTypeWrapper st : oldSampleSources) {
-                if ((newSampleSources == null)
-                    || !newSampleSources.contains(st)) {
+                if ((newSampleType == null)
+                    || !newSampleType.contains(st)) {
                     st.delete();
                 }
             }

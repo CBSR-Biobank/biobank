@@ -235,7 +235,6 @@ public class StudyWrapper extends ModelWrapper<Study> {
 
     public void setSampleStorageCollection(
         List<SampleStorageWrapper> ssCollection) throws Exception {
-        deleteSampleStorageDifference(ssCollection);
         Collection<SampleStorage> ssObjects = new HashSet<SampleStorage>();
         for (SampleStorageWrapper ss : ssCollection) {
             ss.setStudy(wrappedObject);
@@ -252,35 +251,17 @@ public class StudyWrapper extends ModelWrapper<Study> {
      * @param ssCollection
      * @throws Exception
      */
-    private void deleteSampleStorageDifference(
-        List<SampleStorageWrapper> newCollection) throws Exception {
-        // no need to remove if study is not yet in the database or nothing in
-        // the collection
-        if (isNew())
-            return;
-
-        List<SampleStorageWrapper> currSamplesStorage = getSampleStorageCollection();
-        if (currSamplesStorage.size() == 0)
-            return;
-
-        if (newCollection.size() == 0) {
-            // remove all
-            Iterator<SampleStorageWrapper> it = currSamplesStorage.iterator();
-            while (it.hasNext()) {
-                it.next().delete();
-            }
-            return;
-        }
-
-        List<Integer> idList = new ArrayList<Integer>();
-        for (SampleStorageWrapper ss : newCollection) {
-            idList.add(ss.getId());
-        }
-        Iterator<SampleStorageWrapper> it = currSamplesStorage.iterator();
-        while (it.hasNext()) {
-            SampleStorageWrapper ss = it.next();
-            if (!idList.contains(ss.getId())) {
-                ss.delete();
+    private void deleteSampleStorageDifference(Study origStudy)
+        throws Exception {
+        List<SampleStorageWrapper> newSampleStorage = getSampleStorageCollection();
+        List<SampleStorageWrapper> oldSampleStorage = new StudyWrapper(
+            appService, origStudy).getSampleStorageCollection();
+        if (oldSampleStorage != null) {
+            for (SampleStorageWrapper st : oldSampleStorage) {
+                if ((newSampleStorage == null)
+                    || !newSampleStorage.contains(st)) {
+                    st.delete();
+                }
             }
         }
     }
@@ -324,7 +305,6 @@ public class StudyWrapper extends ModelWrapper<Study> {
 
     public void setSampleSourceCollection(List<SampleSourceWrapper> ssCollection)
         throws Exception {
-        deleteSampleSourceDifference(ssCollection);
         Collection<SampleSource> ssObjects = new HashSet<SampleSource>();
         for (SampleSourceWrapper ss : ssCollection) {
             ssObjects.add(ss.getWrappedObject());
@@ -494,6 +474,12 @@ public class StudyWrapper extends ModelWrapper<Study> {
         }
         super.persist();
 
+    }
+
+    @Override
+    protected void persistDependencies(Site origObject)
+        throws BiobankCheckException, Exception {
+        deleteSampleStorageDifference(origObject);
     }
 
     @Override
