@@ -154,8 +154,11 @@ public class SiteManager {
                 setCurrentSite(currentSiteWrapper);
                 SessionManager.getInstance().getSession().rebuild();
                 TreeViewer tv = SessionManager.getInstance().getTreeViewer();
-                Assert.isNotNull(tv, "tree viewer is null");
-                tv.expandToLevel(3);
+                if (tv != null) {
+                    // can be null if we start on the
+                    // PatientAdministrationPerspective
+                    tv.expandToLevel(3);
+                }
             }
         });
     }

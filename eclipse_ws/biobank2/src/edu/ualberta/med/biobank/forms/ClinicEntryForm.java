@@ -55,7 +55,7 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
                 + adapter.getClass().getName());
         clinicAdapter = (ClinicAdapter) adapter;
         clinicWrapper = clinicAdapter.getWrapper();
-        addressWrapper = clinicWrapper.getAddressWrapper();
+        addressWrapper = clinicWrapper.getAddress();
 
         String tabName;
         if (clinicWrapper.getId() == null)

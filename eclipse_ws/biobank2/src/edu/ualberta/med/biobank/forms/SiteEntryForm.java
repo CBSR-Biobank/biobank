@@ -42,7 +42,7 @@ public class SiteEntryForm extends AddressEntryFormCommon {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        addressWrapper = siteWrapper.getAddressWrapper();
+        addressWrapper = siteWrapper.getAddress();
 
         String tabName;
         if (siteWrapper.getId() == null) {

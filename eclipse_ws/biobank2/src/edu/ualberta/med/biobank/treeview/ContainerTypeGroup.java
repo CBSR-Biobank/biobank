@@ -14,11 +14,11 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.wrappers.CapacityWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.forms.ContainerTypeEntryForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
-import edu.ualberta.med.biobank.model.Capacity;
 
 public class ContainerTypeGroup extends AdapterBase {
 
@@ -43,7 +43,7 @@ public class ContainerTypeGroup extends AdapterBase {
                 ContainerTypeWrapper ct = new ContainerTypeWrapper(
                     getAppService());
                 ct.setSite(getParentFromClass(SiteAdapter.class).getSite());
-                ct.setCapacity(new Capacity());
+                ct.setCapacity(new CapacityWrapper(getAppService()));
                 ContainerTypeAdapter adapter = new ContainerTypeAdapter(
                     ContainerTypeGroup.this, ct);
                 openForm(new FormInput(adapter), ContainerTypeEntryForm.ID);

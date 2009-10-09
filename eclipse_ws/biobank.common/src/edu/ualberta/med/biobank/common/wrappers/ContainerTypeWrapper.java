@@ -265,6 +265,14 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
         return new SiteWrapper(appService, site);
     }
 
+    public CapacityWrapper getCapacity() {
+        Capacity capacity = wrappedObject.getCapacity();
+        if (capacity == null) {
+            return null;
+        }
+        return new CapacityWrapper(appService, capacity);
+    }
+
     public void setCapacity(Capacity capacity) {
         Capacity oldCapacity = wrappedObject.getCapacity();
         wrappedObject.setCapacity(capacity);
@@ -272,8 +280,8 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
             capacity);
     }
 
-    public Capacity getCapacity() {
-        return wrappedObject.getCapacity();
+    public void setCapacity(CapacityWrapper capacity) {
+        setCapacity(capacity.wrappedObject);
     }
 
     public void setChildLabelingScheme(ContainerLabelingSchemeWrapper scheme) {
@@ -370,7 +378,7 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
     private void checkNewCapacity(ContainerType oldObject,
         boolean existsContainersWithType) throws BiobankCheckException,
         Exception {
-        Capacity currentCapacity = getCapacity();
+        CapacityWrapper currentCapacity = getCapacity();
         Capacity dbCapacity = oldObject.getCapacity();
         if (!(currentCapacity.getRowCapacity().equals(
             dbCapacity.getRowCapacity()) && currentCapacity.getColCapacity()

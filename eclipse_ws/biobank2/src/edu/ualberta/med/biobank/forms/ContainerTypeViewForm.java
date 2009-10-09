@@ -4,13 +4,14 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.common.wrappers.CapacityWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
-import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.treeview.ContainerTypeAdapter;
 import edu.ualberta.med.biobank.widgets.CabinetDrawerWidget;
 import edu.ualberta.med.biobank.widgets.ContainerDisplayWidget;
@@ -22,13 +23,19 @@ public class ContainerTypeViewForm extends BiobankViewForm {
 
     private ContainerTypeWrapper containerType;
 
-    private Capacity capacity;
+    private CapacityWrapper capacity;
 
     private Label siteLabel;
 
     private Label nameLabel;
 
     private Label nameShortLabel;
+
+    private Button isTopLevelButton;
+
+    private Label dimOneCapacityLabel;
+
+    private Label dimTwoCapacityLabel;
 
     private Label defaultTempLabel;
 
@@ -37,10 +44,6 @@ public class ContainerTypeViewForm extends BiobankViewForm {
     private Label activityStatusLabel;
 
     private Label commentLabel;
-
-    private Label dimOneCapacityLabel;
-
-    private Label dimTwoCapacityLabel;
 
     private org.eclipse.swt.widgets.List sampleTypesList;
 
@@ -78,7 +81,6 @@ public class ContainerTypeViewForm extends BiobankViewForm {
         if (containerType.getChildContainerTypeCollection().size() > 0) {
             createVisualizeContainer();
         }
-        createDimensionsSection();
         if (containerType.getSampleTypeCollection() != null
             && containerType.getSampleTypeCollection().size() > 0) {
             createSampleTypesSection();
@@ -100,6 +102,12 @@ public class ContainerTypeViewForm extends BiobankViewForm {
         nameLabel = (Label) createWidget(client, Label.class, SWT.NONE, "Name");
         nameShortLabel = (Label) createWidget(client, Label.class, SWT.NONE,
             "Short Name");
+        isTopLevelButton = (Button) createWidget(client, Button.class,
+            SWT.NONE, "Top Level Container");
+        dimOneCapacityLabel = (Label) createWidget(client, Label.class,
+            SWT.NONE, "Maximum Rows");
+        dimTwoCapacityLabel = (Label) createWidget(client, Label.class,
+            SWT.NONE, "Maximum Columns");
         defaultTempLabel = (Label) createWidget(client, Label.class, SWT.NONE,
             "Default Temperature\n(Celcius)");
         numSchemeLabel = (Label) createWidget(client, Label.class, SWT.NONE,
@@ -116,6 +124,10 @@ public class ContainerTypeViewForm extends BiobankViewForm {
         FormUtils.setTextValue(siteLabel, containerType.getSite().getName());
         FormUtils.setTextValue(nameLabel, containerType.getName());
         FormUtils.setTextValue(nameShortLabel, containerType.getNameShort());
+        FormUtils.setCheckBoxValue(isTopLevelButton, containerType
+            .getTopLevel());
+        FormUtils.setTextValue(dimOneCapacityLabel, capacity.getRowCapacity());
+        FormUtils.setTextValue(dimTwoCapacityLabel, capacity.getColCapacity());
         FormUtils.setTextValue(defaultTempLabel, containerType
             .getDefaultTemperature());
         FormUtils.setTextValue(numSchemeLabel, containerType
@@ -124,26 +136,6 @@ public class ContainerTypeViewForm extends BiobankViewForm {
         FormUtils.setTextValue(activityStatusLabel, containerType
             .getActivityStatus());
         FormUtils.setTextValue(commentLabel, containerType.getComment());
-    }
-
-    private void createDimensionsSection() {
-        Composite client = createSectionWithClient("Default Capacity");
-        GridLayout layout = (GridLayout) client.getLayout();
-        layout.numColumns = 2;
-        layout.horizontalSpacing = 10;
-        client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-
-        dimOneCapacityLabel = (Label) createWidget(client, Label.class,
-            SWT.NONE, "Maximum Rows");
-        dimTwoCapacityLabel = (Label) createWidget(client, Label.class,
-            SWT.NONE, "Maximum Columns");
-
-        setDimensionsValues();
-    }
-
-    private void setDimensionsValues() {
-        FormUtils.setTextValue(dimOneCapacityLabel, capacity.getRowCapacity());
-        FormUtils.setTextValue(dimTwoCapacityLabel, capacity.getColCapacity());
     }
 
     private void createSampleTypesSection() {
@@ -236,7 +228,6 @@ public class ContainerTypeViewForm extends BiobankViewForm {
         setPartName("Container Type " + containerType.getName());
         form.setText("Container Type: " + containerType.getName());
         setContainerTypeValues();
-        setDimensionsValues();
         setSampleTypesValues();
         setChildContainerTypesValues();
     }
