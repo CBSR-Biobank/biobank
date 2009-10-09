@@ -17,7 +17,6 @@ import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.wrappers.ContainerPositionWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.dialogs.MoveContainerDialog;
 import edu.ualberta.med.biobank.dialogs.SelectParentContainerDialog;
@@ -32,8 +31,7 @@ public class ContainerAdapter extends AdapterBase {
 
     public ContainerAdapter(AdapterBase parent, ContainerWrapper container) {
         super(parent, container);
-        setHasChildren(container.getChildPositionCollection() != null
-            && container.getChildPositionCollection().size() > 0);
+        setHasChildren(container.hasChildren());
     }
 
     public ContainerWrapper getContainer() {
@@ -119,12 +117,10 @@ public class ContainerAdapter extends AdapterBase {
     @Override
     public void loadChildren(boolean updateNode) {
         try {
-            List<ContainerPositionWrapper> positions = getContainer()
-                .getChildPositionCollection();
-            if (positions != null) {
+            List<ContainerWrapper> children = getContainer().getChildren();
+            if (children != null) {
                 // read from database again
-                for (ContainerPositionWrapper childPosition : positions) {
-                    ContainerWrapper child = childPosition.getContainer();
+                for (ContainerWrapper child : children) {
                     ContainerAdapter node = (ContainerAdapter) getChild(child
                         .getId());
                     if (node == null) {
@@ -162,7 +158,7 @@ public class ContainerAdapter extends AdapterBase {
 
                         // update new parent
                         ContainerWrapper newParentContainer = getContainer()
-                            .getPosition().getParentContainer();
+                            .getParent();
                         ContainerAdapter parentAdapter = (ContainerAdapter) SessionManager
                             .getInstance().searchNode(newParentContainer);
                         parentAdapter.getContainer().reload();

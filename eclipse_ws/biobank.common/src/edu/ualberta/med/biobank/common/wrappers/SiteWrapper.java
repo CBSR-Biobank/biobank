@@ -262,8 +262,8 @@ public class SiteWrapper extends ModelWrapper<Site> {
             topContainerCollection = new ArrayList<ContainerWrapper>();
             HQLCriteria criteria = new HQLCriteria("from "
                 + Container.class.getName()
-                + " where site.id = ? and position is null", Arrays
-                .asList(new Object[] { wrappedObject.getId() }));
+                + " where site.id = ? and containerType.topLevel = true",
+                Arrays.asList(new Object[] { wrappedObject.getId() }));
             List<Container> containers = appService.query(criteria);
             for (Container c : containers) {
                 topContainerCollection.add(new ContainerWrapper(appService, c));
@@ -375,8 +375,8 @@ public class SiteWrapper extends ModelWrapper<Site> {
     public int compareTo(ModelWrapper<Site> wrapper) {
         String name1 = wrappedObject.getName();
         String name2 = wrapper.wrappedObject.getName();
-        return ((name1.compareTo(name2) > 0) ? 1 : (name1
-            .equals(name2) ? 0 : -1));
+        return ((name1.compareTo(name2) > 0) ? 1 : (name1.equals(name2) ? 0
+            : -1));
     }
 
 }

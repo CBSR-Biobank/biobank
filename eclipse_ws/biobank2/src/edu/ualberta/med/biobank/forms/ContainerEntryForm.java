@@ -21,7 +21,6 @@ import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.LabelingScheme;
-import edu.ualberta.med.biobank.common.wrappers.ContainerPositionWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
@@ -66,11 +65,11 @@ public class ContainerEntryForm extends BiobankEntryForm {
         String tabName;
         if (containerWrapper.isNew()) {
             tabName = "Container";
-            if (containerWrapper.getPosition() != null) {
-                ContainerPositionWrapper pos = containerWrapper.getPosition();
-                containerWrapper.setLabel(pos.getParentContainer().getLabel()
-                    + LabelingScheme.getPositionString(pos.getWrappedObject()));
-                containerWrapper.setTemperature(pos.getParentContainer()
+            if (containerWrapper.hasParent()) {
+                containerWrapper.setLabel(containerWrapper.getParent()
+                    .getLabel()
+                    + LabelingScheme.getPositionString(containerWrapper));
+                containerWrapper.setTemperature(containerWrapper.getParent()
                     .getTemperature());
             }
         } else {
@@ -83,8 +82,10 @@ public class ContainerEntryForm extends BiobankEntryForm {
     @Override
     protected void createFormContent() throws Exception {
         form.setText("Container");
-        form.setImage(BioBankPlugin.getDefault().getIconForTypeName(
-            containerWrapper.getContainerType().getName()));
+        if (containerWrapper.getContainerType() != null) {
+            form.setImage(BioBankPlugin.getDefault().getIconForTypeName(
+                containerWrapper.getContainerType().getName()));
+        }
 
         currentContainerType = containerWrapper.getContainerType();
         form.getBody().setLayout(new GridLayout(1, false));
@@ -104,7 +105,8 @@ public class ContainerEntryForm extends BiobankEntryForm {
             "Site");
         FormUtils.setTextValue(siteLabel, containerWrapper.getSite().getName());
 
-        if (containerWrapper.getPosition() == null) {
+        if (containerWrapper.getContainerType() != null
+            && containerWrapper.getContainerType().getTopLevel()) {
             // only allow edit to label on top level containers
             firstControl = createBoundWidgetWithLabel(client, Text.class,
                 SWT.NONE, "Label", null, BeansObservables.observeValue(
@@ -138,12 +140,11 @@ public class ContainerEntryForm extends BiobankEntryForm {
 
     private void createContainerTypesSection(Composite client) throws Exception {
         List<ContainerTypeWrapper> containerTypes;
-        ContainerPositionWrapper pos = containerWrapper.getPosition();
-        if ((pos == null) || (pos.getParentContainer() == null)) {
+        if (!containerWrapper.hasParent()) {
             containerTypes = ContainerTypeWrapper.getTopContainerTypesInSite(
                 appService, siteWrapper);
         } else {
-            containerTypes = pos.getParentContainer().getContainerType()
+            containerTypes = containerWrapper.getParent().getContainerType()
                 .getChildContainerTypeCollection();
         }
 
@@ -180,8 +181,9 @@ public class ContainerEntryForm extends BiobankEntryForm {
         tempWidget = (Text) createBoundWidgetWithLabel(client, Text.class,
             SWT.NONE, "Temperature (Celcius)", null, BeansObservables
                 .observeValue(containerWrapper, "temperature"),
-            new DoubleNumberValidator("Default temperature is not a valid number"));
-        if (containerWrapper.getPosition() != null)
+            new DoubleNumberValidator(
+                "Default temperature is not a valid number"));
+        if (containerWrapper.hasParent())
             tempWidget.setEnabled(false);
     }
 
@@ -217,8 +219,4 @@ public class ContainerEntryForm extends BiobankEntryForm {
         return ContainerViewForm.ID;
     }
 
-    @Override
-    public void setFocus() {
-        firstControl.setFocus();
-    }
 }

@@ -87,15 +87,11 @@ public class ContainerDisplayWidget extends AbstractGridContainerWidget {
         String sname = "";
         if (cells != null) {
             ContainerCell cell = cells[indexRow][indexCol];
-            if ((cell.getPosition() != null && cell.getPosition()
-                .getContainer() != null)
-                && (cell.getPosition().getContainer().getContainerType()
-                    .getNameShort() != null)
-                && (cell.getPosition().getContainer().getContainerType()
-                    .getNameShort() != null))
+            if ((cell.getContainer() != null)
+                && (cell.getContainer().getContainerType().getNameShort() != null)
+                && (cell.getContainer().getContainerType().getNameShort() != null))
                 sname += "-"
-                    + cell.getPosition().getContainer().getContainerType()
-                        .getNameShort();
+                    + cell.getContainer().getContainerType().getNameShort();
         }
         RowColPos rowcol = new RowColPos();
         rowcol.row = indexRow;

@@ -1,10 +1,13 @@
-package edu.ualberta.med.biobank.common.wrappers;
+package edu.ualberta.med.biobank.common.wrappers.internal;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.BiobankCheckException;
+import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.Sample;
 import edu.ualberta.med.biobank.model.SamplePosition;
@@ -28,12 +31,11 @@ public class SamplePositionWrapper extends
             .getPropertyChangesNames()));
         properties.add("sample");
         properties.add("container");
-        return (String[]) properties.toArray();
+        return properties.toArray(new String[properties.size()]);
     }
 
     @Override
     protected void deleteChecks() throws BiobankCheckException, Exception {
-        // TODO Auto-generated method stub
 
     }
 
@@ -55,7 +57,7 @@ public class SamplePositionWrapper extends
     }
 
     public void setSample(SampleWrapper sample) {
-        setSample(sample.wrappedObject);
+        setSample(sample.getWrappedObject());
     }
 
     public SampleWrapper getSample() {
@@ -70,7 +72,7 @@ public class SamplePositionWrapper extends
     }
 
     public void setContainer(ContainerWrapper container) {
-        setContainer(container.wrappedObject);
+        setContainer(container.getWrappedObject());
     }
 
     public ContainerWrapper getContainer() {

@@ -165,7 +165,9 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
     @Override
     public void setFocus() {
         Assert.isNotNull(firstControl, "first control widget is not set");
-        firstControl.setFocus();
+        if (!firstControl.isDisposed()) {
+            firstControl.setFocus();
+        }
     }
 
     public String getSessionName() {

@@ -89,7 +89,7 @@ public class TopContainerChooserPage extends AbstractContainerChooserPage {
         if (cell != null) {
             PalletPositionChooserPage nextPage = (PalletPositionChooserPage) getNextPage();
             try {
-                nextPage.setCurrentContainer(cell.getPosition().getContainer());
+                nextPage.setCurrentContainer(cell.getContainer());
             } catch (ArrayIndexOutOfBoundsException aiobe) {
                 setPageComplete(false);
                 LOGGER.error("Index error", aiobe);
@@ -99,14 +99,14 @@ public class TopContainerChooserPage extends AbstractContainerChooserPage {
     }
 
     @Override
-    protected void setStatus(ContainerCell cell,
-        ContainerWrapper occupiedContainer) {
+    protected void setStatus(ContainerCell cell) {
         boolean full;
         int total = 0;
 
+        ContainerWrapper occupiedContainer = cell.getContainer();
         // check if we can add a pallet in the hotel
-        if (occupiedContainer.getChildPositionCollection() != null) {
-            total = occupiedContainer.getChildPositionCollection().size();
+        if (occupiedContainer.hasChildren()) {
+            total = occupiedContainer.getChildren().size();
         }
         int capacityTotal = occupiedContainer.getContainerType().getCapacity()
             .getRowCapacity()

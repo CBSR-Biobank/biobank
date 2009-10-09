@@ -1,26 +1,28 @@
 package edu.ualberta.med.biobank.model;
 
-import edu.ualberta.med.biobank.common.wrappers.ContainerPositionWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 
 public class ContainerCell {
 
-    private ContainerPositionWrapper position;
+    private Integer row;
+
+    private Integer col;
+
+    private ContainerWrapper container;
 
     private ContainerStatus status;
 
     public ContainerCell() {
     }
 
-    public ContainerCell(ContainerPositionWrapper position) {
-        this.position = position;
+    public ContainerCell(Integer row, Integer col, ContainerWrapper container) {
+        this.row = row;
+        this.col = col;
+        this.container = container;
     }
 
-    public ContainerPositionWrapper getPosition() {
-        return position;
-    }
-
-    public void setPosition(ContainerPositionWrapper position) {
-        this.position = position;
+    public ContainerCell(Integer row, Integer col) {
+        this(row, col, null);
     }
 
     public ContainerStatus getStatus() {
@@ -29,6 +31,18 @@ public class ContainerCell {
 
     public void setStatus(ContainerStatus status) {
         this.status = status;
+    }
+
+    public Integer getRow() {
+        return row;
+    }
+
+    public Integer getCol() {
+        return col;
+    }
+
+    public ContainerWrapper getContainer() {
+        return container;
     }
 
 }

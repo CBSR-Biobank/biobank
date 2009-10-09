@@ -9,6 +9,7 @@ import java.util.List;
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.LabelingScheme;
 import edu.ualberta.med.biobank.common.RowColPos;
+import edu.ualberta.med.biobank.common.wrappers.internal.SamplePositionWrapper;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.Sample;
@@ -23,9 +24,15 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class SampleWrapper extends ModelWrapper<Sample> {
 
+    private SamplePositionWrapper position;
+
     public SampleWrapper(WritableApplicationService appService,
         Sample wrappedObject) {
         super(appService, wrappedObject);
+        SamplePosition pos = wrappedObject.getSamplePosition();
+        if (pos != null) {
+            position = new SamplePositionWrapper(appService, pos);
+        }
     }
 
     public SampleWrapper(WritableApplicationService appService) {
@@ -41,8 +48,9 @@ public class SampleWrapper extends ModelWrapper<Sample> {
 
     @Override
     protected String[] getPropertyChangesNames() {
-        return new String[] { "inventoryId", "patientVisit", "samplePosition",
-            "linkDate", "sampleType", "quantity", "oldComment", "quantityUsed" };
+        return new String[] { "inventoryId", "patientVisit", "positionRow",
+            "positionCol", "linkDate", "sampleType", "quantity", "oldComment",
+            "quantityUsed" };
     }
 
     @Override
@@ -116,22 +124,75 @@ public class SampleWrapper extends ModelWrapper<Sample> {
         }
     }
 
-    public void setSamplePosition(SamplePosition sp) {
+    private void setSamplePosition(SamplePosition sp) {
         SamplePosition old = wrappedObject.getSamplePosition();
         wrappedObject.setSamplePosition(sp);
         propertyChangeSupport.firePropertyChange("samplePosition", old, sp);
     }
 
-    public void setSamplePosition(SamplePositionWrapper sp) {
-        setSamplePosition(sp.wrappedObject);
-    }
-
-    public SamplePositionWrapper getSamplePosition() {
-        SamplePosition sp = wrappedObject.getSamplePosition();
-        if (sp == null) {
+    public Integer getPositionRow() {
+        if (position == null) {
             return null;
         }
-        return new SamplePositionWrapper(appService, sp);
+        return position.getRow();
+    }
+
+    public void setPositionRow(Integer row) {
+        Integer oldValue = null;
+        if (position == null) {
+            initPosition();
+        } else {
+            oldValue = position.getRow();
+        }
+        position.setRow(row);
+        propertyChangeSupport.firePropertyChange("positionRow", oldValue, row);
+    }
+
+    private void initPosition() {
+        position = new SamplePositionWrapper(appService);
+        position.setSample(this);
+        wrappedObject.setSamplePosition(position.getWrappedObject());
+    }
+
+    public Integer getPositionCol() {
+        if (position == null) {
+            return null;
+        }
+        return position.getCol();
+
+    }
+
+    public void setPositionCol(Integer col) {
+        Integer oldValue = null;
+        if (position == null) {
+            initPosition();
+        } else {
+            oldValue = position.getCol();
+        }
+        position.setCol(col);
+        propertyChangeSupport.firePropertyChange("positionCol", oldValue, col);
+    }
+
+    public ContainerWrapper getParent() {
+        if (position == null) {
+            return null;
+        }
+        return position.getContainer();
+    }
+
+    public void setParent(ContainerWrapper parent) {
+        ContainerWrapper oldValue = null;
+        if (position == null) {
+            initPosition();
+        } else {
+            oldValue = position.getContainer();
+        }
+        position.setContainer(parent);
+        propertyChangeSupport.firePropertyChange("parent", oldValue, parent);
+    }
+
+    public boolean hasParent() {
+        return position != null;
     }
 
     public void checkPosition(ContainerWrapper parentContainer)
