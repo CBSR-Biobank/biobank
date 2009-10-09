@@ -39,7 +39,7 @@ public class ClinicViewForm extends AddressViewFormCommon {
         clinicAdapter = (ClinicAdapter) adapter;
         clinicWrapper = clinicAdapter.getWrapper();
         clinicWrapper.reload();
-        addressWrapper = clinicWrapper.getAddressWrapper();
+        addressWrapper = clinicWrapper.getAddress();
         setPartName("Clinic: " + clinicWrapper.getName());
     }
 

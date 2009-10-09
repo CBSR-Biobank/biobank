@@ -72,8 +72,8 @@ public class LabelingScheme {
         int pos = cbsrTwoCharToInt(label);
         if (pos >= rowCap * colCap) {
             throw new Exception("Address  " + label + " does not exist in "
-                + containerTypeName + ". Max row: " + rowCap
-                + " Max col: " + colCap);
+                + containerTypeName + ". Max row: " + rowCap + " Max col: "
+                + colCap);
         }
         RowColPos rowColPos = new RowColPos();
         rowColPos.row = pos % rowCap;

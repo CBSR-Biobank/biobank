@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.widgets;
 
 import java.text.DecimalFormat;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
@@ -15,8 +16,8 @@ import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.common.LabelingScheme;
 import edu.ualberta.med.biobank.common.RowColPos;
+import edu.ualberta.med.biobank.common.wrappers.CapacityWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
-import edu.ualberta.med.biobank.model.Capacity;
 
 /**
  * Draw a grid according to specific parameters : total number of rows, total
@@ -189,10 +190,12 @@ public abstract class AbstractGridContainerWidget extends Canvas {
 
     public void setContainerType(ContainerTypeWrapper type) {
         this.containerType = type;
-        Capacity capacity = containerType.getCapacity();
-        int dim1 = capacity.getRowCapacity();
-        int dim2 = capacity.getColCapacity();
-        setStorageSize(dim1, dim2);
+        CapacityWrapper capacity = containerType.getCapacity();
+        Integer rowCap = capacity.getRowCapacity();
+        Integer colCap = capacity.getColCapacity();
+        Assert.isNotNull(rowCap, "row capacity is null");
+        Assert.isNotNull(colCap, "column capacity is null");
+        setStorageSize(rowCap, colCap);
     }
 
     public void setParentLabel(String parentLabel) {

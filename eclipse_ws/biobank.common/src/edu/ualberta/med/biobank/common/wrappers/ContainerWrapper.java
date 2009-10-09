@@ -9,7 +9,6 @@ import java.util.List;
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.LabelingScheme;
 import edu.ualberta.med.biobank.common.RowColPos;
-import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.ContainerType;
@@ -235,7 +234,7 @@ public class ContainerWrapper extends ModelWrapper<Container> {
         ContainerTypeWrapper type = getContainerType();
         RowColPos rcp = LabelingScheme.getRowColFromPositionString(position,
             type.getWrappedObject());
-        Capacity capacity = type.getCapacity();
+        CapacityWrapper capacity = type.getCapacity();
         if (rcp.row < capacity.getRowCapacity()
             && rcp.col < capacity.getColCapacity()) {
             return rcp;

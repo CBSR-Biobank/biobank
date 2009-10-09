@@ -74,7 +74,7 @@ public class SiteViewForm extends AddressViewFormCommon {
 
         siteAdapter = (SiteAdapter) adapter;
         siteWrapper = siteAdapter.getWrapper();
-        addressWrapper = siteWrapper.getAddressWrapper();
+        addressWrapper = siteWrapper.getAddress();
         retrieveSite();
         setPartName("Repository Site " + siteWrapper.getName());
     }
@@ -216,7 +216,7 @@ public class SiteViewForm extends AddressViewFormCommon {
     private void retrieveSite() {
         try {
             siteWrapper.reload();
-            addressWrapper.setWrappedObject(siteWrapper.getAddressWrapper()
+            addressWrapper.setWrappedObject(siteWrapper.getAddress()
                 .getWrappedObject());
         } catch (Exception e) {
             BioBankPlugin.openAsyncError("Can't reload site", e);

@@ -10,7 +10,6 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.forms.ContainerTypeEntryForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
-import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.treeview.ContainerTypeAdapter;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 
@@ -25,7 +24,6 @@ public class ContainerTypeAddHandler extends AbstractHandler {
         ContainerTypeWrapper containerType = new ContainerTypeWrapper(
             SessionManager.getAppService());
         containerType.setSite(siteAdapter.getSite());
-        containerType.setCapacity(new Capacity());
         ContainerTypeAdapter containerTypeNode = new ContainerTypeAdapter(
             siteAdapter.getContainerTypesGroupNode(), containerType);
 

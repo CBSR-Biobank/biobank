@@ -18,25 +18,38 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class ClinicWrapper extends ModelWrapper<Clinic> {
 
-    private AddressWrapper addressWrapper;
-
-    public ClinicWrapper(WritableApplicationService appService,
-        Clinic wrappedObject) {
-        super(appService, wrappedObject);
-        Address address = wrappedObject.getAddress();
-        if (address == null) {
-            address = new Address();
-            wrappedObject.setAddress(address);
-        }
-        addressWrapper = new AddressWrapper(appService, address);
-    }
-
     public ClinicWrapper(WritableApplicationService appService) {
         super(appService);
     }
 
-    public AddressWrapper getAddressWrapper() {
-        return addressWrapper;
+    public ClinicWrapper(WritableApplicationService appService,
+        Clinic wrappedObject) {
+        super(appService, wrappedObject);
+    }
+
+    @Override
+    protected String[] getPropertyChangesNames() {
+        return new String[] { "name", "activityStatus", "comment", "address",
+            "site", "contactCollection" };
+    }
+
+    public AddressWrapper getAddress() {
+        Address address = wrappedObject.getAddress();
+        if (address == null) {
+            return null;
+        }
+        return new AddressWrapper(appService, address);
+    }
+
+    public void setAddress(Address address) {
+        Address oldAddress = wrappedObject.getAddress();
+        wrappedObject.setAddress(address);
+        propertyChangeSupport
+            .firePropertyChange("address", oldAddress, address);
+    }
+
+    public void setAddress(AddressWrapper study) {
+        setAddress(study.wrappedObject);
     }
 
     public String getName() {
@@ -80,12 +93,6 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
         Site newSite = siteWrapper.getWrappedObject();
         wrappedObject.setSite(newSite);
         propertyChangeSupport.firePropertyChange("site", oldSite, newSite);
-    }
-
-    @Override
-    protected String[] getPropertyChangesNames() {
-        return new String[] { "name", "activityStatus", "comment", "site",
-            "contactCollection" };
     }
 
     @Override
