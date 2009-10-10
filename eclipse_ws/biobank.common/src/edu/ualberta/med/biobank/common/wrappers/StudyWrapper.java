@@ -6,7 +6,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -320,35 +319,15 @@ public class StudyWrapper extends ModelWrapper<Study> {
      * @param newCollection
      * @throws Exception
      */
-    private void deleteSampleSourceDifference(
-        List<SampleSourceWrapper> newCollection) throws Exception {
-        // no need to remove if study is not yet in the database or nothing in
-        // the collection
-        if (isNew())
-            return;
-
-        List<SampleSourceWrapper> currSamplesSources = getSampleSourceCollection();
-        if (currSamplesSources.size() == 0)
-            return;
-
-        if (newCollection.size() == 0) {
-            // remove all
-            Iterator<SampleSourceWrapper> it = currSamplesSources.iterator();
-            while (it.hasNext()) {
-                it.next().delete();
-            }
-            return;
-        }
-
-        List<Integer> idList = new ArrayList<Integer>();
-        for (SampleSourceWrapper ss : newCollection) {
-            idList.add(ss.getId());
-        }
-        Iterator<SampleSourceWrapper> it = currSamplesSources.iterator();
-        while (it.hasNext()) {
-            SampleSourceWrapper ss = it.next();
-            if (!idList.contains(ss.getId())) {
-                ss.delete();
+    private void deleteSampleSourceDifference(Study origStudy) throws Exception {
+        List<SampleSourceWrapper> newSampleSource = getSampleSourceCollection();
+        List<SampleSourceWrapper> oldSampleSource = new StudyWrapper(
+            appService, origStudy).getSampleSourceCollection();
+        if (oldSampleSource != null) {
+            for (SampleSourceWrapper ss : oldSampleSource) {
+                if ((newSampleSource == null) || !newSampleSource.contains(ss)) {
+                    ss.delete();
+                }
             }
         }
     }
@@ -477,9 +456,10 @@ public class StudyWrapper extends ModelWrapper<Study> {
     }
 
     @Override
-    protected void persistDependencies(Site origObject)
+    protected void persistDependencies(Study origObject)
         throws BiobankCheckException, Exception {
         deleteSampleStorageDifference(origObject);
+        deleteSampleSourceDifference(origObject);
     }
 
     @Override
