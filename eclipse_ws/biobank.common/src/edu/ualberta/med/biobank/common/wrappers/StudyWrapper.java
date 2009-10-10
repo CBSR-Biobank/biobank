@@ -392,13 +392,19 @@ public class StudyWrapper extends ModelWrapper<Study> {
         return pvInfoMap.keySet().toArray(new String[] {});
     }
 
-    public String[] getPvInfoAllowedValues(String label) throws Exception {
+    public PvInfoWrapper getPvInfo(String label) throws Exception {
         getPvInfoMap();
         PvInfoWrapper pvInfo = pvInfoMap.get(label);
         if (pvInfo == null) {
             throw new Exception("PvInfo with label \"" + label
                 + "\" is invalid");
         }
+        return pvInfo;
+    }
+
+    public String[] getPvInfoAllowedValues(String label) throws Exception {
+        getPvInfoMap();
+        PvInfoWrapper pvInfo = getPvInfo(label);
         String joinedPossibleValues = pvInfo.getAllowedValues();
         if (joinedPossibleValues == null)
             return null;

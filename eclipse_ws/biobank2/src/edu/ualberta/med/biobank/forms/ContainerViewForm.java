@@ -28,7 +28,6 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ContainerPositionWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
-import edu.ualberta.med.biobank.common.wrappers.internal.CapacityWrapper;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.ContainerCell;
 import edu.ualberta.med.biobank.model.ContainerStatus;
@@ -146,9 +145,8 @@ public class ContainerViewForm extends BiobankViewForm {
 
     private void initCells() {
         ContainerTypeWrapper containerType = container.getContainerType();
-        CapacityWrapper cap = containerType.getCapacity();
-        Integer rowCap = cap.getRowCapacity();
-        Integer colCap = cap.getColCapacity();
+        Integer rowCap = containerType.getRowCapacity();
+        Integer colCap = containerType.getColCapacity();
         Assert.isNotNull(rowCap, "row capacity is null");
         Assert.isNotNull(colCap, "column capacity is null");
         if (rowCap == 0)

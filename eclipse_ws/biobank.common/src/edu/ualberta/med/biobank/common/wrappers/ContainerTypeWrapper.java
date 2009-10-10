@@ -288,7 +288,7 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
     public Integer getRowCapacity() {
         CapacityWrapper capacity = getCapacity();
         if (capacity == null) {
-            capacity = new CapacityWrapper(appService, new Capacity());
+            return null;
         }
         return capacity.getRowCapacity();
     }
@@ -296,7 +296,7 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
     public Integer getColCapacity() {
         CapacityWrapper capacity = getCapacity();
         if (capacity == null) {
-            capacity = new CapacityWrapper(appService, new Capacity());
+            return null;
         }
         return capacity.getColCapacity();
     }

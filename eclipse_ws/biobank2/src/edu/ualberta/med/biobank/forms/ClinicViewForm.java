@@ -39,7 +39,6 @@ public class ClinicViewForm extends AddressViewFormCommon {
         clinicAdapter = (ClinicAdapter) adapter;
         clinicWrapper = clinicAdapter.getWrapper();
         clinicWrapper.reload();
-        addressWrapper = clinicWrapper.getAddress();
         setPartName("Clinic: " + clinicWrapper.getName());
     }
 
@@ -53,7 +52,7 @@ public class ClinicViewForm extends AddressViewFormCommon {
         form.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
             BioBankPlugin.IMG_CLINIC));
         createClinicSection();
-        createAddressSection();
+        createAddressSection(clinicWrapper);
         createContactsSection();
         createStudiesSection();
         createButtonsSection();
@@ -117,7 +116,7 @@ public class ClinicViewForm extends AddressViewFormCommon {
         setPartName("Clinic: " + clinicWrapper.getName());
         form.setText("Clinic: " + clinicWrapper.getName());
         setClinicValues();
-        setAdressValues();
+        setAdressValues(clinicWrapper);
         studiesTable.setCollection(clinicWrapper.getStudyCollection(true));
     }
 

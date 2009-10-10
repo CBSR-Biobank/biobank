@@ -24,7 +24,6 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
-import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
@@ -52,9 +51,9 @@ public class ClinicAddWidget extends BiobankWidget {
         StudyWrapper studyWrapper, FormToolkit toolkit) {
         super(parent, style);
         Assert.isNotNull(toolkit, "toolkit is null");
-        SiteWrapper siteWrapper = new SiteWrapper(SessionManager
-            .getAppService(), studyWrapper.getSite());
-        allClinics = siteWrapper.getClinicCollection(true);
+        SiteWrapper site = studyWrapper.getSite();
+        Assert.isNotNull(site, "site is null");
+        allClinics = site.getClinicCollection(true);
 
         selectedContacts = studyWrapper.getContactCollection();
 

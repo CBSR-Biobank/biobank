@@ -17,7 +17,6 @@ import org.eclipse.swt.widgets.Composite;
 import edu.ualberta.med.biobank.common.LabelingScheme;
 import edu.ualberta.med.biobank.common.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.internal.CapacityWrapper;
 
 /**
  * Draw a grid according to specific parameters : total number of rows, total
@@ -190,9 +189,8 @@ public abstract class AbstractGridContainerWidget extends Canvas {
 
     public void setContainerType(ContainerTypeWrapper type) {
         this.containerType = type;
-        CapacityWrapper capacity = containerType.getCapacity();
-        Integer rowCap = capacity.getRowCapacity();
-        Integer colCap = capacity.getColCapacity();
+        Integer rowCap = containerType.getRowCapacity();
+        Integer colCap = containerType.getColCapacity();
         Assert.isNotNull(rowCap, "row capacity is null");
         Assert.isNotNull(colCap, "column capacity is null");
         setStorageSize(rowCap, colCap);

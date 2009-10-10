@@ -11,7 +11,6 @@ import org.eclipse.swt.widgets.Label;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.internal.CapacityWrapper;
 import edu.ualberta.med.biobank.treeview.ContainerTypeAdapter;
 import edu.ualberta.med.biobank.widgets.CabinetDrawerWidget;
 import edu.ualberta.med.biobank.widgets.ContainerDisplayWidget;
@@ -22,8 +21,6 @@ public class ContainerTypeViewForm extends BiobankViewForm {
     private ContainerTypeAdapter containerTypeAdapter;
 
     private ContainerTypeWrapper containerType;
-
-    private CapacityWrapper capacity;
 
     private Label siteLabel;
 
@@ -67,7 +64,6 @@ public class ContainerTypeViewForm extends BiobankViewForm {
 
     private void retrieveContainerType() throws Exception {
         containerType.reload();
-        capacity = containerType.getCapacity();
     }
 
     @Override
@@ -126,8 +122,10 @@ public class ContainerTypeViewForm extends BiobankViewForm {
         FormUtils.setTextValue(nameShortLabel, containerType.getNameShort());
         FormUtils.setCheckBoxValue(isTopLevelButton, containerType
             .getTopLevel());
-        FormUtils.setTextValue(dimOneCapacityLabel, capacity.getRowCapacity());
-        FormUtils.setTextValue(dimTwoCapacityLabel, capacity.getColCapacity());
+        FormUtils.setTextValue(dimOneCapacityLabel, containerType
+            .getRowCapacity());
+        FormUtils.setTextValue(dimTwoCapacityLabel, containerType
+            .getColCapacity());
         FormUtils.setTextValue(defaultTempLabel, containerType
             .getDefaultTemperature());
         FormUtils.setTextValue(numSchemeLabel, containerType
@@ -198,7 +196,7 @@ public class ContainerTypeViewForm extends BiobankViewForm {
             ContainerDisplayWidget containerWidget = new ContainerDisplayWidget(
                 client);
             containerWidget.setContainerType(containerType);
-            int dim2 = containerType.getCapacity().getColCapacity().intValue();
+            int dim2 = containerType.getColCapacity().intValue();
             if (dim2 <= 1) {
                 // single dimension size
                 containerWidget.setCellWidth(150);

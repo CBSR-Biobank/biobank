@@ -42,7 +42,6 @@ public class SiteEntryForm extends AddressEntryFormCommon {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        addressWrapper = siteWrapper.getAddress();
 
         String tabName;
         if (siteWrapper.getId() == null) {
@@ -58,7 +57,7 @@ public class SiteEntryForm extends AddressEntryFormCommon {
         form.setText("Repository Site Information");
         form.getBody().setLayout(new GridLayout(1, false));
         createSiteSection();
-        createAddressArea();
+        createAddressArea(siteWrapper);
 
         // When adding help uncomment line below
         // PlatformUI.getWorkbench().getHelpSystem().setHelp(composite,
@@ -110,7 +109,6 @@ public class SiteEntryForm extends AddressEntryFormCommon {
         if (siteAdapter.getParent() == null) {
             siteAdapter.setParent(SessionManager.getInstance().getSession());
         }
-        addressWrapper.persist();
         siteWrapper.persist();
         SessionManager.getInstance().updateSites();
     }

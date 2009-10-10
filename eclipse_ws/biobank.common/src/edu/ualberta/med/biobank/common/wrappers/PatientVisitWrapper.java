@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -223,13 +224,61 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
         return pvInfoDataMap.keySet().toArray(new String[] {});
     }
 
-    public void addPvInfo(String label, String value) {
+    public String getPvInfo(String label) throws Exception {
         getPvInfoDataMap();
-        PvInfoDataWrapper pvInfo = new PvInfoDataWrapper(appService,
-            new PvInfoData());
-        pvInfo.setLabel(label);
-        pvInfo.setAllowedValues(StringUtils.join(possibleValues, ';'));
-        pvInfoMap.put(label, pvInfo);
+        PvInfoDataWrapper pvInfo = pvInfoDataMap.get(label);
+        if (pvInfo == null) {
+            // make sure "label" is a valid pvInfo for study
+            StudyWrapper study = getPatient().getStudy();
+            if (study == null) {
+                throw new Exception("study is null");
+            }
+            study.getPvInfo(label);
+
+            // not assigned yet
+            return null;
+        }
+        return pvInfo.getValue();
+    }
+
+    public Integer getPvInfoType(String label) throws Exception {
+        StudyWrapper study = getPatient().getStudy();
+        if (study == null) {
+            throw new Exception("study is null");
+        }
+        return study.getPvInfo(label).getPvInfoType().getId();
+    }
+
+    public String[] getPvInfoAllowedValues(String label) throws Exception {
+        StudyWrapper study = getPatient().getStudy();
+        if (study == null) {
+            throw new Exception("study is null");
+        }
+        return study.getPvInfoAllowedValues(label);
+    }
+
+    public void setPvInfo(String label, String value) throws Exception {
+        getPvInfoDataMap();
+        PvInfoDataWrapper pid = pvInfoDataMap.get(label);
+        if (pid == null) {
+            StudyWrapper study = getPatient().getStudy();
+            if (study == null) {
+                throw new Exception("study is null");
+            }
+            PvInfoWrapper pvInfo = study.getPvInfo(label);
+            List<String> allowedValList = Arrays.asList(study
+                .getPvInfoAllowedValues(label));
+            if (!allowedValList.contains(value)) {
+                throw new Exception("PvInfoData with label \"" + label
+                    + "\" and value \"" + value + "\" is invalid");
+            }
+
+            pid = new PvInfoDataWrapper(appService, new PvInfoData());
+            pid.setPatientVisit(this);
+            pid.setPvInfo(pvInfo);
+            pvInfoDataMap.put(label, pid);
+        }
+        pid.setValue(value);
     }
 
     public void setDateDrawn(Date date) {
@@ -368,6 +417,15 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
         Date v2Date = wrapper.wrappedObject.getDateDrawn();
         return ((v1Date.compareTo(v2Date) > 0) ? 1 : (v1Date.equals(v2Date) ? 0
             : -1));
+    }
+
+    @Override
+    public void persist() throws BiobankCheckException, Exception {
+        if (pvInfoDataMap != null) {
+            setPvInfoDataCollection(pvInfoDataMap.values());
+        }
+        super.persist();
+
     }
 
     @Override

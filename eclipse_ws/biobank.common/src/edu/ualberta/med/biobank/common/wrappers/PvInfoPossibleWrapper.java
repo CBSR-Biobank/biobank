@@ -77,8 +77,12 @@ public class PvInfoPossibleWrapper extends ModelWrapper<PvInfoPossible> {
         setPvInfoType(pvInfoType.wrappedObject);
     }
 
-    public Site getSite() {
-        return wrappedObject.getSite();
+    public SiteWrapper getSite() {
+        Site site = wrappedObject.getSite();
+        if (site == null) {
+            return null;
+        }
+        return new SiteWrapper(appService, site);
     }
 
     public void setSite(SiteWrapper siteWrapper) {

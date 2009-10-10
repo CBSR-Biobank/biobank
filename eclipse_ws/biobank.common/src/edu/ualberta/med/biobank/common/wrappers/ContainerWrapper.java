@@ -222,6 +222,22 @@ public class ContainerWrapper extends ModelWrapper<Container> {
         return null;
     }
 
+    public Integer getRowCapacity() throws Exception {
+        ContainerTypeWrapper type = getContainerType();
+        if (type == null) {
+            throw new Exception("container type is null");
+        }
+        return type.getRowCapacity();
+    }
+
+    public Integer getColCapacity() throws Exception {
+        ContainerTypeWrapper type = getContainerType();
+        if (type == null) {
+            throw new Exception("container type is null");
+        }
+        return type.getColCapacity();
+    }
+
     /**
      * position is 2 letters, or 2 number or 1 letter and 1 number... this
      * position string is used to get the correct row and column index the given

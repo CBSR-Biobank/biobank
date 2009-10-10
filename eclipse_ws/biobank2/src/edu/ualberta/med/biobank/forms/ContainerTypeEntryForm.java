@@ -175,14 +175,14 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         toolkit.paintBordersFor(client);
 
         createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Rows", null,
-            PojoObservables.observeValue(containerType.getCapacity(),
-                "rowCapacity"), new IntegerNumberValidator(
-                "Row capactiy is not a valid number", false));
+            PojoObservables.observeValue(containerType, "rowCapacity"),
+            new IntegerNumberValidator("Row capactiy is not a valid number",
+                false));
 
         createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Columns",
-            null, PojoObservables.observeValue(containerType.getCapacity(),
-                "colCapacity"), new IntegerNumberValidator(
-                "Column capacity is not a valid nubmer", false));
+            null, PojoObservables.observeValue(containerType, "colCapacity"),
+            new IntegerNumberValidator("Column capacity is not a valid nubmer",
+                false));
 
         createBoundWidgetWithLabel(client, Text.class, SWT.NONE,
             "Default Temperature\n(Celcius)", null, BeansObservables

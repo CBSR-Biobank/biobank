@@ -33,7 +33,6 @@ import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PvInfoDataWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
-import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper.PvInfoPvInfoData;
 import edu.ualberta.med.biobank.common.wrappers.internal.PvInfoWrapper;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.treeview.PatientAdapter;
@@ -70,31 +69,6 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
             setDirty(true);
         }
     };
-
-    class CombinedPvInfo {
-        PvInfoPvInfoData pvInfoPvInfoData;
-        Control control;
-        String[] possibleValues;
-        String value;
-
-        public CombinedPvInfo(PvInfoPvInfoData pvInfoPvInfoData,
-            Control control, String[] possibleValues) {
-            this.pvInfoPvInfoData = pvInfoPvInfoData;
-            this.control = control;
-            this.possibleValues = possibleValues;
-        }
-
-        public void setValue(String value) {
-            this.value = value;
-        }
-
-        public String getValue() {
-            return value;
-        }
-
-    }
-
-    private List<CombinedPvInfo> combinedPvInfoList;
 
     private DateTimeWidget dateDrawn;
 
@@ -210,40 +184,24 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
     }
 
     private void createPvDataSection(Composite client) {
-        combinedPvInfoList = new ArrayList<CombinedPvInfo>();
-        List<PvInfoPvInfoData> pvInfoPvInfoDatas = patientVisitWrapper
-            .getPvInfoWithValues();
-        if (pvInfoPvInfoDatas != null) {
-            for (PvInfoPvInfoData infos : pvInfoPvInfoDatas) {
-                CombinedPvInfo cPvInfo = new CombinedPvInfo(infos, null, null);
-                Control control = getControlForPvInfoType(client, cPvInfo);
-                cPvInfo.control = control;
-                combinedPvInfoList.add(cPvInfo);
-                if (control != null) {
-                    GridData gd = new GridData(GridData.FILL_HORIZONTAL);
-                    control.setLayoutData(gd);
-                    controls.put(infos.getPvInfo().getLabel(), control);
-                }
+        String[] labels = patientVisitWrapper.getPvInfoLabels();
+        if (labels == null)
+            return;
+
+        for (String label : labels) {
+            Control control = getControlForLabel(client, label);
+            cPvInfo.control = control;
+            combinedPvInfoList.add(cPvInfo);
+            if (control != null) {
+                GridData gd = new GridData(GridData.FILL_HORIZONTAL);
+                control.setLayoutData(gd);
+                controls.put(infos.getPvInfo().getLabel(), control);
             }
         }
     }
 
-    private Control getControlForPvInfoType(Composite client,
-        CombinedPvInfo cPvInfo) {
-        PvInfoWrapper pvInfo = cPvInfo.pvInfoPvInfoData.getPvInfo();
-        PvInfoDataWrapper pvInfoData = cPvInfo.pvInfoPvInfoData.getPvInfoData();
-
-        String possibleValues = pvInfo.getAllowedValue();
-        if (possibleValues != null) {
-            cPvInfo.possibleValues = possibleValues.split(";");
-        }
-
-        if (pvInfoData != null) {
-            cPvInfo.value = pvInfoData.getValue();
-        }
-
-        Integer typeId = pvInfo.getPvInfoType().getId();
-        switch (typeId) {
+    private Control getControlForLabel(Composite client, String label) {
+        switch (patientVisitWrapper.getPvInfoType(label)) {
         case 1: // number
             return createBoundWidgetWithLabel(client, Text.class, SWT.NONE,
                 pvInfo.getLabel(), null, PojoObservables.observeValue(cPvInfo,
