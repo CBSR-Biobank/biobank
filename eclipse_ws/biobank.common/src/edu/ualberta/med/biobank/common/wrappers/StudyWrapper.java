@@ -36,6 +36,7 @@ public class StudyWrapper extends ModelWrapper<Study> {
 
     public StudyWrapper(WritableApplicationService appService) {
         super(appService);
+        pvInfoMap = null;
     }
 
     public String getName() {
@@ -81,11 +82,15 @@ public class StudyWrapper extends ModelWrapper<Study> {
             .firePropertyChange("comment", oldComment, comment);
     }
 
-    public Site getSite() {
-        return wrappedObject.getSite();
+    public SiteWrapper getSite() {
+        Site site = wrappedObject.getSite();
+        if (site == null) {
+            return null;
+        }
+        return new SiteWrapper(appService, site);
     }
 
-    public void setSiteWrapper(SiteWrapper siteWrapper) {
+    public void setSite(SiteWrapper siteWrapper) {
         Site oldSite = wrappedObject.getSite();
         Site newSite = siteWrapper.getWrappedObject();
         wrappedObject.setSite(newSite);
@@ -233,7 +238,7 @@ public class StudyWrapper extends ModelWrapper<Study> {
     }
 
     public void setSampleStorageCollection(
-        List<SampleStorageWrapper> ssCollection) throws Exception {
+        List<SampleStorageWrapper> ssCollection) {
         Collection<SampleStorage> ssObjects = new HashSet<SampleStorage>();
         for (SampleStorageWrapper ss : ssCollection) {
             ss.setStudy(wrappedObject);
@@ -302,8 +307,7 @@ public class StudyWrapper extends ModelWrapper<Study> {
         }
     }
 
-    public void setSampleSourceCollection(List<SampleSourceWrapper> ssCollection)
-        throws Exception {
+    public void setSampleSourceCollection(List<SampleSourceWrapper> ssCollection) {
         Collection<SampleSource> ssObjects = new HashSet<SampleSource>();
         for (SampleSourceWrapper ss : ssCollection) {
             ssObjects.add(ss.getWrappedObject());
@@ -383,7 +387,7 @@ public class StudyWrapper extends ModelWrapper<Study> {
         return pvInfoMap;
     }
 
-    public String[] getPvInfoLabels() throws ApplicationException {
+    public String[] getPvInfoLabels() {
         getPvInfoMap();
         return pvInfoMap.keySet().toArray(new String[] {});
     }
@@ -401,17 +405,26 @@ public class StudyWrapper extends ModelWrapper<Study> {
         return joinedPossibleValues.split(";");
     }
 
-    public void setPvInfo(String label, String[] possibleValues)
+    public void setPvInfoAllowedValues(String label, String[] allowedValues)
         throws Exception {
         getPvInfoMap();
         PvInfoWrapper pvInfo = pvInfoMap.get(label);
         if (pvInfo == null) {
-            throw new Exception("PvInfo with label \"" + label
-                + "\" is invalid");
+            // is label a valid PvInfoPossible value?
+            SiteWrapper site = getSite();
+            if (site == null) {
+                throw new Exception("site is null");
+            }
+            PvInfoPossibleWrapper pip = site.getPvInfoPossible(label);
+            if (pip == null) {
+                throw new Exception("PvInfo with label \"" + label
+                    + "\" is invalid: not in PvInfoPossible");
+            }
+            pvInfo = new PvInfoWrapper(appService, new PvInfo());
+            pvInfo.setPvInfoPossible(pip);
+            pvInfo.setLabel(label);
         }
-        pvInfo = new PvInfoWrapper(appService, new PvInfo());
-        pvInfo.setLabel(label);
-        pvInfo.ssetAllowedValues(StringUtils.join(possibleValues, ';'));
+        pvInfo.setAllowedValues(StringUtils.join(allowedValues, ';'));
         pvInfoMap.put(label, pvInfo);
     }
 

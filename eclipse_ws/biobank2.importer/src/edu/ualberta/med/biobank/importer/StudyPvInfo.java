@@ -29,7 +29,7 @@ public class StudyPvInfo {
             PvInfo pvInfo = getPvInfoFromPossible(label);
 
             if (label.equals("Blood Received")) {
-                pvInfo.ssetAllowedValues("");
+                pvInfo.setAllowedValues("");
             }
 
             pvInfoSet.add((PvInfo) BioBank2Db.getInstance().setObject(pvInfo));
@@ -46,7 +46,7 @@ public class StudyPvInfo {
     public static Study assignBbpPvInfo(Study study) throws Exception {
         HashSet<PvInfo> pvInfoSet = assignCommonPvInfo(study);
         PvInfo pvInfo = getPvInfoFromPossible("Consent");
-        pvInfo.ssetAllowedValues("Surveillance;Genetic predisposition;Previous samples;Genetic mutation");
+        pvInfo.setAllowedValues("Surveillance;Genetic predisposition;Previous samples;Genetic mutation");
         pvInfoSet.add((PvInfo) BioBank2Db.getInstance().setObject(pvInfo));
         return assignStudyPvInfo(study, pvInfoSet);
     }
@@ -69,7 +69,7 @@ public class StudyPvInfo {
     public static Study assignNhsInfo(Study study) throws Exception {
         HashSet<PvInfo> pvInfoSet = assignCommonPvInfo(study);
         PvInfo pvInfo = getPvInfoFromPossible("Visit Type");
-        pvInfo.ssetAllowedValues("D0;D2;D4;W2;W4;M2;M6;M12;M18;M24;Unscheduled");
+        pvInfo.setAllowedValues("D0;D2;D4;W2;W4;M2;M6;M12;M18;M24;Unscheduled");
         pvInfo = (PvInfo) BioBank2Db.getInstance().setObject(pvInfo);
         pvInfoSet.add((PvInfo) BioBank2Db.getInstance().setObject(pvInfo));
         return assignStudyPvInfo(study, pvInfoSet);

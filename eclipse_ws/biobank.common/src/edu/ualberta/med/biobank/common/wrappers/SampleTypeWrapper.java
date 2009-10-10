@@ -187,16 +187,14 @@ public class SampleTypeWrapper extends ModelWrapper<SampleType> {
     }
 
     public static void setGlobalSampleTypes(
-        List<SampleTypeWrapper> newGlobalSampleTypes,
-        List<SampleTypeWrapper> oldGlobalSampleTypes)
+        List<SampleTypeWrapper> newGlobalSampleTypes)
         throws BiobankCheckException, Exception {
-        deleteOldSampleTypes(newGlobalSampleTypes, oldGlobalSampleTypes);
         for (SampleTypeWrapper ss : newGlobalSampleTypes) {
             ss.persist();
         }
     }
 
-    private static void deleteOldSampleTypes(List<SampleTypeWrapper> newTypes,
+    public static void deleteOldSampleTypes(List<SampleTypeWrapper> newTypes,
         List<SampleTypeWrapper> oldTypes) throws BiobankCheckException,
         Exception {
         if (newTypes.size() == 0) {

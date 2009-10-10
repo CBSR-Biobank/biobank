@@ -228,7 +228,7 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
         PvInfoDataWrapper pvInfo = new PvInfoDataWrapper(appService,
             new PvInfoData());
         pvInfo.setLabel(label);
-        pvInfo.ssetAllowedValues(StringUtils.join(possibleValues, ';'));
+        pvInfo.setAllowedValues(StringUtils.join(possibleValues, ';'));
         pvInfoMap.put(label, pvInfo);
     }
 

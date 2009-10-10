@@ -53,7 +53,7 @@ public class PvInfoWrapper extends ModelWrapper<PvInfo> {
         return wrappedObject.getAllowedValues();
     }
 
-    public void ssetAllowedValues(String possibleValues) {
+    public void setAllowedValues(String possibleValues) {
         String oldPV = wrappedObject.getAllowedValues();
         wrappedObject.setAllowedValues(possibleValues);
         propertyChangeSupport.firePropertyChange("possibleValues", oldPV,

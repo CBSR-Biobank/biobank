@@ -85,11 +85,15 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
             .firePropertyChange("comment", oldComment, comment);
     }
 
-    public Site getSite() {
-        return wrappedObject.getSite();
+    public SiteWrapper getSite() {
+        Site site = wrappedObject.getSite();
+        if (site == null) {
+            return null;
+        }
+        return new SiteWrapper(appService, site);
     }
 
-    public void setSiteWrapper(SiteWrapper siteWrapper) {
+    public void setSite(SiteWrapper siteWrapper) {
         Site oldSite = wrappedObject.getSite();
         Site newSite = siteWrapper.getWrappedObject();
         wrappedObject.setSite(newSite);

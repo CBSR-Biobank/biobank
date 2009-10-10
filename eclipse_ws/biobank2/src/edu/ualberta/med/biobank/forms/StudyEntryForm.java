@@ -329,7 +329,7 @@ public class StudyEntryForm extends BiobankEntryForm {
 
             pvInfo.setLabel(combinedPvInfo.pvInfoPossible.getLabel());
             if (value != null) {
-                pvInfo.ssetAllowedValues(value);
+                pvInfo.setAllowedValues(value);
             }
             pvInfoList.add(pvInfo);
         }
@@ -367,7 +367,7 @@ public class StudyEntryForm extends BiobankEntryForm {
         studyWrapper.persist();
         SiteAdapter siteAdapter = studyAdapter
             .getParentFromClass(SiteAdapter.class);
-        studyWrapper.setSiteWrapper(siteAdapter.getWrapper());
+        studyWrapper.setSite(siteAdapter.getWrapper());
     }
 
     @Override

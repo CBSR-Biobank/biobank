@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.internal.AddressWrapper;
@@ -13,6 +15,7 @@ import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerType;
+import edu.ualberta.med.biobank.model.PvInfoPossible;
 import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
@@ -22,12 +25,20 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class SiteWrapper extends ModelWrapper<Site> {
 
+    private Map<String, PvInfoPossibleWrapper> pvInfoPossibleMap;
+
+    private Map<String, PvInfoTypeWrapper> pvInfoTypeMap;
+
     public SiteWrapper(WritableApplicationService appService, Site wrappedObject) {
         super(appService, wrappedObject);
+        pvInfoPossibleMap = null;
+        pvInfoTypeMap = null;
     }
 
     public SiteWrapper(WritableApplicationService appService) {
         super(appService);
+        pvInfoPossibleMap = null;
+        pvInfoTypeMap = null;
     }
 
     @Override
@@ -345,18 +356,154 @@ public class SiteWrapper extends ModelWrapper<Site> {
             origSite).getSampleTypeCollection();
         if (oldSampleSources != null) {
             for (SampleTypeWrapper st : oldSampleSources) {
-                if ((newSampleType == null)
-                    || !newSampleType.contains(st)) {
+                if ((newSampleType == null) || !newSampleType.contains(st)) {
                     st.delete();
                 }
             }
         }
     }
 
+    @SuppressWarnings("unchecked")
+    public List<PvInfoPossibleWrapper> getPvInfoPossibleCollection(boolean sort) {
+        List<PvInfoPossibleWrapper> PvInfoPossibleCollection = (List<PvInfoPossibleWrapper>) propertiesMap
+            .get("PvInfoPossibleCollection");
+        if (PvInfoPossibleCollection == null) {
+            Collection<PvInfoPossible> children = wrappedObject
+                .getPvInfoPossibleCollection();
+            if (children != null) {
+                PvInfoPossibleCollection = new ArrayList<PvInfoPossibleWrapper>();
+                for (PvInfoPossible possible : children) {
+                    PvInfoPossibleCollection.add(new PvInfoPossibleWrapper(
+                        appService, possible));
+                }
+                propertiesMap.put("PvInfoPossibleCollection",
+                    PvInfoPossibleCollection);
+            }
+        }
+        if ((PvInfoPossibleCollection != null) && sort)
+            Collections.sort(PvInfoPossibleCollection);
+        return PvInfoPossibleCollection;
+    }
+
+    public List<PvInfoPossibleWrapper> getPvInfoPossibleCollection() {
+        return getPvInfoPossibleCollection(false);
+    }
+
+    public void setPvInfoPossibleCollection(
+        Collection<PvInfoPossible> collection, boolean setNull) {
+        Collection<PvInfoPossible> oldCollection = wrappedObject
+            .getPvInfoPossibleCollection();
+        wrappedObject.setPvInfoPossibleCollection(collection);
+        propertyChangeSupport.firePropertyChange("PvInfoPossibleCollection",
+            oldCollection, collection);
+        if (setNull) {
+            propertiesMap.put("PvInfoPossibleCollection", null);
+        }
+    }
+
+    public void setPvInfoPossibleCollection(
+        List<PvInfoPossibleWrapper> collection) {
+        Collection<PvInfoPossible> pipObjects = new HashSet<PvInfoPossible>();
+        for (PvInfoPossibleWrapper pip : collection) {
+            pip.setSite(this);
+            pipObjects.add(pip.getWrappedObject());
+        }
+        setPvInfoPossibleCollection(pipObjects, false);
+        propertiesMap.put("PvInfoPossibleCollection", collection);
+    }
+
+    /**
+     * Removes the sample type objects that are not contained in the collection.
+     * 
+     * @param oldCollection
+     * @throws Exception
+     */
+    private void deletePvInfoPossibleDifference(Site origSite) throws Exception {
+        List<PvInfoPossibleWrapper> newPvInfoPossible = getPvInfoPossibleCollection();
+        List<PvInfoPossibleWrapper> oldSampleSources = new SiteWrapper(
+            appService, origSite).getPvInfoPossibleCollection();
+        if (oldSampleSources != null) {
+            for (PvInfoPossibleWrapper st : oldSampleSources) {
+                if ((newPvInfoPossible == null)
+                    || !newPvInfoPossible.contains(st)) {
+                    st.delete();
+                }
+            }
+        }
+    }
+
+    private Map<String, PvInfoTypeWrapper> getPvInfoTypeMap()
+        throws ApplicationException {
+        if (pvInfoTypeMap == null) {
+            for (PvInfoTypeWrapper pit : PvInfoTypeWrapper
+                .getAllWrappers(appService)) {
+                pvInfoTypeMap.put(pit.getType(), pit);
+            }
+        }
+        return pvInfoTypeMap;
+    }
+
+    private Map<String, PvInfoPossibleWrapper> getPvInfoPossibleMap()
+        throws ApplicationException {
+        if (pvInfoPossibleMap != null)
+            return pvInfoPossibleMap;
+
+        pvInfoPossibleMap = new HashMap<String, PvInfoPossibleWrapper>();
+        List<PvInfoPossibleWrapper> pipCollection = getPvInfoPossibleCollection();
+        if (pipCollection != null) {
+            for (PvInfoPossibleWrapper pip : pipCollection) {
+                pvInfoPossibleMap.put(pip.getLabel(), pip);
+            }
+        }
+
+        // get global PIPs now
+        for (PvInfoPossibleWrapper pip : PvInfoPossibleWrapper
+            .getGlobalPvInfoPossible(appService, false)) {
+            pvInfoPossibleMap.put(pip.getLabel(), pip);
+        }
+        return pvInfoPossibleMap;
+    }
+
+    public String[] getPvInfoPossibleLabels() throws ApplicationException {
+        getPvInfoPossibleMap();
+        return pvInfoPossibleMap.keySet().toArray(new String[] {});
+    }
+
+    public PvInfoPossibleWrapper getPvInfoPossible(String label)
+        throws Exception {
+        getPvInfoPossibleMap();
+        PvInfoPossibleWrapper pip = pvInfoPossibleMap.get(label);
+        if (pip == null) {
+            throw new Exception("PvInfoPossible with label \"" + label
+                + "\" does not exists");
+        }
+        return pip;
+    }
+
+    public void setPvInfoPossible(String label, String type, boolean global)
+        throws Exception {
+        getPvInfoTypeMap();
+        PvInfoTypeWrapper pit = pvInfoTypeMap.get(type);
+        if (pit == null) {
+            throw new Exception("PvInfoType with type \"" + type
+                + "\" is invalid");
+        }
+
+        getPvInfoPossibleMap();
+        PvInfoPossibleWrapper pip = getPvInfoPossible(label);
+        if (pip == null) {
+            pip = new PvInfoPossibleWrapper(appService, new PvInfoPossible());
+            pip.setLabel(label);
+        }
+        pip.setSite(global ? null : this);
+        pip.setPvInfoType(pit);
+    }
+
     @Override
     protected void persistDependencies(Site origObject)
         throws BiobankCheckException, Exception {
         deleteSampleTypeDifference(origObject);
+        deletePvInfoPossibleDifference(origObject);
     }
 
     @Override
@@ -365,6 +512,13 @@ public class SiteWrapper extends ModelWrapper<Site> {
         String name2 = wrapper.wrappedObject.getName();
         return ((name1.compareTo(name2) > 0) ? 1 : (name1.equals(name2) ? 0
             : -1));
+    }
+
+    @Override
+    public void reload() throws Exception {
+        super.reload();
+        pvInfoPossibleMap = null;
+        pvInfoTypeMap = null;
     }
 
 }
