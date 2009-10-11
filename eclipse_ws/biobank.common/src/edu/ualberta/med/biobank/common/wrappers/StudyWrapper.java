@@ -392,7 +392,7 @@ public class StudyWrapper extends ModelWrapper<Study> {
         return pvInfoMap.keySet().toArray(new String[] {});
     }
 
-    public PvInfoWrapper getPvInfo(String label) throws Exception {
+    private PvInfoWrapper getPvInfo(String label) throws Exception {
         getPvInfoMap();
         PvInfoWrapper pvInfo = pvInfoMap.get(label);
         if (pvInfo == null) {
@@ -400,6 +400,10 @@ public class StudyWrapper extends ModelWrapper<Study> {
                 + "\" is invalid");
         }
         return pvInfo;
+    }
+
+    public Integer getPvInfoType(String label) throws Exception {
+        return getPvInfo(label).getPvInfoType().getId();
     }
 
     public String[] getPvInfoAllowedValues(String label) throws Exception {

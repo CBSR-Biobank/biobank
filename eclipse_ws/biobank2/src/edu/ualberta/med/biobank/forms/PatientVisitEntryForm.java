@@ -336,7 +336,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
     private void setPvInfoDatas() {
         List<PvInfoDataWrapper> pvDataCollection = new ArrayList<PvInfoDataWrapper>();
 
-        for (CombinedPvInfo combinedPvInfo : combinedPvInfoList) {
+        for (PvCustonInfo combinedPvInfo : combinedPvInfoList) {
             setPvInfoValueFromControlType(combinedPvInfo);
             PvInfoDataWrapper pvInfoData = combinedPvInfo.pvInfoPvInfoData
                 .getPvInfoData();
@@ -357,7 +357,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         patientVisitWrapper.setPvInfoDataCollection(pvDataCollection);
     }
 
-    private void setPvInfoValueFromControlType(CombinedPvInfo combinedPvInfo) {
+    private void setPvInfoValueFromControlType(PvCustonInfo combinedPvInfo) {
         // for text and combo, the databinding is used
         if (combinedPvInfo.control instanceof DateTimeWidget) {
             combinedPvInfo.value = ((DateTimeWidget) combinedPvInfo.control)
