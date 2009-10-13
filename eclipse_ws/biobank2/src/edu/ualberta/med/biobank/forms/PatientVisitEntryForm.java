@@ -31,9 +31,7 @@ import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
-import edu.ualberta.med.biobank.common.wrappers.PvInfoDataWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
-import edu.ualberta.med.biobank.common.wrappers.internal.PvInfoWrapper;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.treeview.PatientAdapter;
 import edu.ualberta.med.biobank.treeview.PatientVisitAdapter;
@@ -83,6 +81,23 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
     private PvSampleSourceEntryWidget pvSampleSourceEntryWidget;
 
     private PatientWrapper patientWrapper;
+
+    private class PvCustomInfo {
+        String label;
+        Integer type;
+        String[] allowedValues;
+        String value;
+        Control control;
+
+        public PvCustomInfo(Control control, Integer type,
+            String[] possibleValues) {
+            this.control = control;
+            this.type = type;
+            this.allowedValues = possibleValues;
+        }
+    }
+
+    private List<PvCustomInfo> pvCustomInfoList;
 
     @Override
     public void init() {
@@ -183,65 +198,70 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
                 patientVisitWrapper, "comments"), null);
     }
 
-    private void createPvDataSection(Composite client) {
+    private void createPvDataSection(Composite client) throws Exception {
         String[] labels = patientVisitWrapper.getPvInfoLabels();
         if (labels == null)
             return;
 
+        pvCustomInfoList = new ArrayList<PvCustomInfo>();
+
         for (String label : labels) {
-            Control control = getControlForLabel(client, label);
-            cPvInfo.control = control;
-            combinedPvInfoList.add(cPvInfo);
+            PvCustomInfo pvCustomInfo = new PvCustomInfo(null, patientWrapper
+                .getStudy().getPvInfoType(label), patientWrapper.getStudy()
+                .getPvInfoAllowedValues(label));
+            Control control = getControlForLabel(client, pvCustomInfo);
+            pvCustomInfoList.add(pvCustomInfo);
             if (control != null) {
                 GridData gd = new GridData(GridData.FILL_HORIZONTAL);
                 control.setLayoutData(gd);
-                controls.put(infos.getPvInfo().getLabel(), control);
+                controls.put(label, control);
             }
         }
     }
 
-    private Control getControlForLabel(Composite client, String label) {
-        switch (patientVisitWrapper.getPvInfoType(label)) {
+    private Control getControlForLabel(Composite client,
+        PvCustomInfo pvCustomInfo) {
+        switch (pvCustomInfo.type) {
         case 1: // number
             return createBoundWidgetWithLabel(client, Text.class, SWT.NONE,
-                pvInfo.getLabel(), null, PojoObservables.observeValue(cPvInfo,
-                    "value"), new DoubleNumberValidator(
+                pvCustomInfo.label, null, PojoObservables.observeValue(
+                    pvCustomInfo, "value"), new DoubleNumberValidator(
                     "You should select a valid number"));
         case 2: // text
             return createBoundWidgetWithLabel(client, Text.class, SWT.NONE,
-                pvInfo.getLabel(), null, PojoObservables.observeValue(cPvInfo,
-                    "value"), null);
+                pvCustomInfo.label, null, PojoObservables.observeValue(
+                    pvCustomInfo, "value"), null);
         case 3: // date_time
-            return createDateTimeWidget(client, pvInfo.getLabel(),
-                DateFormatter.parseToDateTime(cPvInfo.value), true, null);
+            return createDateTimeWidget(client, pvCustomInfo.label,
+                DateFormatter.parseToDateTime(pvCustomInfo.value), true, null);
         case 4: // select_single
             return createBoundWidgetWithLabel(client, Combo.class, SWT.NONE,
-                pvInfo.getLabel(), cPvInfo.possibleValues, PojoObservables
-                    .observeValue(cPvInfo, "value"), null);
+                pvCustomInfo.label, pvCustomInfo.allowedValues, PojoObservables
+                    .observeValue(pvCustomInfo, "value"), null);
         case 5: // select_multiple
-            createFieldLabel(client, pvInfo.getLabel());
+            createFieldLabel(client, pvCustomInfo.label);
             SelectMultiple s = new SelectMultiple(client, SWT.BORDER,
-                cPvInfo.possibleValues, selectionListener);
+                pvCustomInfo.allowedValues, selectionListener);
             s.adaptToToolkit(toolkit, true);
-            if (cPvInfo.value != null) {
-                s.setSelections(cPvInfo.value.split(";"));
+            if (pvCustomInfo.value != null) {
+                s.setSelections(pvCustomInfo.value.split(";"));
             }
             return s;
         case 6: // select_single_and_quantity_1_5_1
-            createFieldLabel(client, pvInfo.getLabel());
+            createFieldLabel(client, pvCustomInfo.label);
             ComboAndQuantity c = new ComboAndQuantity(client, SWT.BORDER);
             c.adaptToToolkit(toolkit, true);
-            if (possibleValues != null) {
-                c.addValues(cPvInfo.possibleValues);
+            if (pvCustomInfo.allowedValues != null) {
+                c.addValues(pvCustomInfo.allowedValues);
             }
-            if (cPvInfo.value != null) {
-                String[] values = cPvInfo.value.split(" ");
+            if (pvCustomInfo.value != null) {
+                String[] values = pvCustomInfo.value.split(" ");
                 Assert.isTrue(values.length == 2);
                 c.setText(values[0], Integer.parseInt(values[1]));
             }
             return c;
         default:
-            Assert.isTrue(false, "Invalid pvInfo type: " + typeId);
+            Assert.isTrue(false, "Invalid pvInfo type: " + pvCustomInfo.type);
         }
         return null;
     }
@@ -324,7 +344,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
 
         // FIXME get csm_user_id and set it to the Patient Visit at insert
 
-        setPvInfoDatas();
+        setPvCustomInfo();
         patientVisitWrapper
             .setPvSampleSourceCollection(pvSampleSourceEntryWidget
                 .getPvSampleSources());
@@ -333,42 +353,30 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         patientAdapter.performExpand();
     }
 
-    private void setPvInfoDatas() {
-        List<PvInfoDataWrapper> pvDataCollection = new ArrayList<PvInfoDataWrapper>();
-
-        for (PvCustonInfo combinedPvInfo : combinedPvInfoList) {
+    private void setPvCustomInfo() throws Exception {
+        for (PvCustomInfo combinedPvInfo : pvCustomInfoList) {
             setPvInfoValueFromControlType(combinedPvInfo);
-            PvInfoDataWrapper pvInfoData = combinedPvInfo.pvInfoPvInfoData
-                .getPvInfoData();
-            if (combinedPvInfo.value == null
-                || (combinedPvInfo.value.length() == 0 && pvInfoData == null))
+            if ((combinedPvInfo.value == null)
+                || (combinedPvInfo.value.length() == 0))
                 continue;
 
-            PvInfoWrapper pvInfo = combinedPvInfo.pvInfoPvInfoData.getPvInfo();
-            if (pvInfoData == null) {
-                pvInfoData = new PvInfoDataWrapper(appService);
-                pvInfoData.setPvInfo(pvInfo);
-                pvInfoData.setPatientVisit(patientVisitWrapper
-                    .getWrappedObject());
-            }
-            pvInfoData.setValue(combinedPvInfo.value);
-            pvDataCollection.add(pvInfoData);
+            patientVisitWrapper.setPvInfo(combinedPvInfo.label,
+                combinedPvInfo.value);
         }
-        patientVisitWrapper.setPvInfoDataCollection(pvDataCollection);
     }
 
-    private void setPvInfoValueFromControlType(PvCustonInfo combinedPvInfo) {
+    private void setPvInfoValueFromControlType(PvCustomInfo pvCustomInfo) {
         // for text and combo, the databinding is used
-        if (combinedPvInfo.control instanceof DateTimeWidget) {
-            combinedPvInfo.value = ((DateTimeWidget) combinedPvInfo.control)
+        if (pvCustomInfo.control instanceof DateTimeWidget) {
+            pvCustomInfo.value = ((DateTimeWidget) pvCustomInfo.control)
                 .getText();
-        } else if (combinedPvInfo.control instanceof ComboAndQuantity) {
-            combinedPvInfo.value = ((ComboAndQuantity) combinedPvInfo.control)
+        } else if (pvCustomInfo.control instanceof ComboAndQuantity) {
+            pvCustomInfo.value = ((ComboAndQuantity) pvCustomInfo.control)
                 .getText();
-        } else if (combinedPvInfo.control instanceof SelectMultiple) {
-            String[] values = ((SelectMultiple) combinedPvInfo.control)
+        } else if (pvCustomInfo.control instanceof SelectMultiple) {
+            String[] values = ((SelectMultiple) pvCustomInfo.control)
                 .getSelections();
-            combinedPvInfo.value = StringUtils.join(values, ";");
+            pvCustomInfo.value = StringUtils.join(values, ";");
         }
     }
 

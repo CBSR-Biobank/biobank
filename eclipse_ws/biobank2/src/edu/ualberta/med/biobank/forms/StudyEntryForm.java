@@ -73,7 +73,7 @@ public class StudyEntryForm extends BiobankEntryForm {
 
     private MultiSelectWidget sampleSourceMultiSelect;
 
-    class PvCustonInfo {
+    private class PvCustomInfo {
         String label;
         Integer type;
         String[] allowedValues;
@@ -216,7 +216,7 @@ public class StudyEntryForm extends BiobankEntryForm {
             "Date Received" };
 
         for (String field : defaultFields) {
-            PvCustonInfo combinedPvInfo = new PvCustonInfo();
+            PvCustomInfo combinedPvInfo = new PvCustomInfo();
             combinedPvInfo.label = field;
             combinedPvInfo.type = 3;
             pvCustomInfoMap.put(field, combinedPvInfo);
@@ -225,7 +225,7 @@ public class StudyEntryForm extends BiobankEntryForm {
         // END KLUDGE
 
         for (String label : studyWrapper.getPvInfoLabels()) {
-            PvCustonInfo combinedPvInfo = new PvCustonInfo();
+            PvCustomInfo combinedPvInfo = new PvCustomInfo();
             combinedPvInfo.label = label;
             combinedPvInfo.type = studyWrapper.getPvInfoType(label);
             combinedPvInfo.allowedValues = studyWrapper
@@ -237,11 +237,11 @@ public class StudyEntryForm extends BiobankEntryForm {
             boolean selected = false;
             String label = (String) key;
             String value = "";
-            PvCustonInfo pvCustomInfo = (PvCustonInfo) pvCustomInfoMap
+            PvCustomInfo pvCustomInfo = (PvCustomInfo) pvCustomInfoMap
                 .get(label);
 
             if (pvCustomInfo == null) {
-                pvCustomInfo = new PvCustonInfo();
+                pvCustomInfo = new PvCustomInfo();
                 pvCustomInfo.pvInfoPossible = possiblePvInfo;
                 pvCustomInfo.pvInfo = null;
                 selected = false;
@@ -300,7 +300,7 @@ public class StudyEntryForm extends BiobankEntryForm {
         MapIterator it = pvCustomInfoMap.mapIterator();
         while (it.hasNext()) {
             it.next();
-            PvCustonInfo combinedPvInfo = (PvCustonInfo) it.getValue();
+            PvCustomInfo combinedPvInfo = (PvCustomInfo) it.getValue();
             boolean selected = combinedPvInfo.wiget.getSelected();
 
             if (!selected)

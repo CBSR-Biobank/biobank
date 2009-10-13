@@ -49,7 +49,22 @@ public class PatientVisitViewForm extends BiobankViewForm {
             pvInfo = null;
             pvInfoData = null;
         }
-    }
+//    }
+//
+//    private class PvCustomInfo {
+//        String label;
+//        Integer type;
+//        String[] allowedValues;
+//        String value;
+//        Control control;
+//
+//        public PvCustomInfo(Control control, Integer type,
+//            String[] possibleValues) {
+//            this.control = control;
+//            this.type = type;
+//            this.allowedValues = possibleValues;
+//        }
+//    }
 
     private ListOrderedMap combinedPvInfoMap;
 
@@ -120,6 +135,10 @@ public class PatientVisitViewForm extends BiobankViewForm {
     private void createPvDataSection(Composite client) {
         StudyWrapper study = patientVisitAdapter.getParentFromClass(
             StudyAdapter.class).getWrapper();
+        
+        String[] labels = patientVisitWrapper.getPvInfoLabels();
+        if (labels == null)
+            return;
 
         // get all PvInfo from study, since user may not have filled in all
         // fields
