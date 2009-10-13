@@ -50,8 +50,8 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
             .firePropertyChange("address", oldAddress, address);
     }
 
-    public void setAddress(AddressWrapper study) {
-        setAddress(study.wrappedObject);
+    public void setAddress(AddressWrapper address) {
+        setAddress(address.wrappedObject);
     }
 
     public String getName() {
@@ -86,8 +86,12 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
             .firePropertyChange("comment", oldComment, comment);
     }
 
-    public Site getSite() {
-        return wrappedObject.getSite();
+    public SiteWrapper getSite() {
+        Site site = wrappedObject.getSite();
+        if (site == null) {
+            return null;
+        }
+        return new SiteWrapper(appService, site);
     }
 
     public void setSite(SiteWrapper siteWrapper) {

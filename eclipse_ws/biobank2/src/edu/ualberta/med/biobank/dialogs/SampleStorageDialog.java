@@ -18,8 +18,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
-import edu.ualberta.med.biobank.model.SampleStorage;
-import edu.ualberta.med.biobank.model.SampleType;
+import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.validators.DoubleNumberValidator;
 import edu.ualberta.med.biobank.validators.IntegerNumberValidator;
 
@@ -29,24 +28,25 @@ public class SampleStorageDialog extends BiobankDialog {
 
     private SampleStorageWrapper origSampleStorage;
 
-    private SampleStorage sampleStorage;
+    private SampleStorageWrapper sampleStorage;
 
-    private HashMap<String, SampleType> sampleTypeMap;
+    private HashMap<String, SampleTypeWrapper> sampleTypeMap;
 
     private CCombo sampleTypesCombo;
 
     public SampleStorageDialog(Shell parent,
-        SampleStorageWrapper sampleStorage, Collection<SampleType> sampleTypes) {
+        SampleStorageWrapper sampleStorage,
+        Collection<SampleTypeWrapper> sampleTypes) {
         super(parent);
         Assert.isNotNull(sampleStorage);
         Assert.isNotNull(sampleTypes);
-        this.sampleStorage = new SampleStorage();
+        this.origSampleStorage = sampleStorage;
+        this.sampleStorage = new SampleStorageWrapper(null);
         this.sampleStorage.setSampleType(sampleStorage.getSampleType());
         this.sampleStorage.setVolume(sampleStorage.getVolume());
         this.sampleStorage.setQuantity(sampleStorage.getQuantity());
-        this.origSampleStorage = sampleStorage;
-        sampleTypeMap = new HashMap<String, SampleType>();
-        for (SampleType st : sampleTypes) {
+        sampleTypeMap = new HashMap<String, SampleTypeWrapper>();
+        for (SampleTypeWrapper st : sampleTypes) {
             sampleTypeMap.put(st.getName(), st);
         }
     }
@@ -81,7 +81,7 @@ public class SampleStorageDialog extends BiobankDialog {
             sampleTypesCombo.add(stName);
         }
 
-        SampleType st = origSampleStorage.getSampleType();
+        SampleTypeWrapper st = origSampleStorage.getSampleType();
         if (st != null) {
             sampleTypesCombo.setText(st.getName());
         }

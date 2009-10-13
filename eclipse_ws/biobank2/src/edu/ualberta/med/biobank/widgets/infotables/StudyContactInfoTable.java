@@ -2,7 +2,6 @@ package edu.ualberta.med.biobank.widgets.infotables;
 
 import java.util.Collection;
 
-import org.apache.log4j.Logger;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
@@ -15,9 +14,6 @@ import edu.ualberta.med.biobank.model.StudyContactAndPatientInfo;
  * StudyViewForm only.
  */
 public class StudyContactInfoTable extends InfoTableWidget<ContactWrapper> {
-
-    private static Logger LOGGER = Logger.getLogger(StudyContactInfoTable.class
-        .getName());
 
     private static final String[] HEADINGS = new String[] { "Clinic",
         "#Patients", "#Patient Visits", "Contact Name", "Title" };

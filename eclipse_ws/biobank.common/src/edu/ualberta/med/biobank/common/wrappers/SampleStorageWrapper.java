@@ -27,15 +27,27 @@ public class SampleStorageWrapper extends ModelWrapper<SampleStorage> {
         propertyChangeSupport.firePropertyChange("study", oldStudy, study);
     }
 
-    public SampleType getSampleType() {
-        return wrappedObject.getSampleType();
+    public SampleTypeWrapper getSampleType() {
+        SampleType type = wrappedObject.getSampleType();
+        if (type == null) {
+            return null;
+        }
+        return new SampleTypeWrapper(appService, type);
     }
 
     public void setSampleType(SampleType sampleType) {
-        SampleType oldSampleType = getSampleType();
+        SampleType oldSampleType = wrappedObject.getSampleType();
         wrappedObject.setSampleType(sampleType);
         propertyChangeSupport.firePropertyChange("sampleType", oldSampleType,
             sampleType);
+    }
+
+    public void setSampleType(SampleTypeWrapper sampleType) {
+        SampleType type = null;
+        if (sampleType != null) {
+            type = sampleType.getWrappedObject();
+        }
+        setSampleType(type);
     }
 
     public Integer getQuantity() {

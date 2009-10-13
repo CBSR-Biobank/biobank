@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -26,9 +27,9 @@ import org.springframework.remoting.RemoteConnectFailureException;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.dialogs.SampleStorageDialog;
 import edu.ualberta.med.biobank.model.SampleStorage;
-import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.widgets.infotables.SampleStorageInfoTable;
 import edu.ualberta.med.biobank.widgets.listener.BiobankEntryFormWidgetListener;
 import edu.ualberta.med.biobank.widgets.listener.MultiSelectEvent;
@@ -40,11 +41,14 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
  */
 public class SampleStorageEntryWidget extends BiobankWidget {
 
+    private static Logger LOGGER = Logger
+        .getLogger(SampleStorageEntryWidget.class.getName());
+
     private SampleStorageInfoTable sampleStorageTable;
 
     private Button addSampleStorageButton;
 
-    private Collection<SampleType> allSampleTypes;
+    private Collection<SampleTypeWrapper> allSampleTypes;
 
     private Collection<SampleStorageWrapper> selectedSampleStorage;
 
@@ -95,7 +99,8 @@ public class SampleStorageEntryWidget extends BiobankWidget {
     }
 
     private void addOrEditSampleStorage(boolean add,
-        SampleStorageWrapper sampleStorage, Set<SampleType> availSampleTypes) {
+        SampleStorageWrapper sampleStorage,
+        Set<SampleTypeWrapper> availSampleTypes) {
         SampleStorageDialog dlg = new SampleStorageDialog(PlatformUI
             .getWorkbench().getActiveWorkbenchWindow().getShell(),
             sampleStorage, availSampleTypes);
@@ -110,9 +115,10 @@ public class SampleStorageEntryWidget extends BiobankWidget {
     }
 
     // need sample types that have not yet been selected in sampleStorageTable
-    private Set<SampleType> getNonDuplicateSampleTypes() {
-        Set<SampleType> sampleTypes = new HashSet<SampleType>(allSampleTypes);
-        Set<SampleType> dupSampleTypes = new HashSet<SampleType>();
+    private Set<SampleTypeWrapper> getNonDuplicateSampleTypes() {
+        Set<SampleTypeWrapper> sampleTypes = new HashSet<SampleTypeWrapper>(
+            allSampleTypes);
+        Set<SampleTypeWrapper> dupSampleTypes = new HashSet<SampleTypeWrapper>();
 
         // get the IDs of the selected sample types
         List<Integer> sampleTypeIds = new ArrayList<Integer>();
@@ -120,7 +126,7 @@ public class SampleStorageEntryWidget extends BiobankWidget {
             sampleTypeIds.add(ss.getSampleType().getId());
         }
 
-        for (SampleType stype : allSampleTypes) {
+        for (SampleTypeWrapper stype : allSampleTypes) {
             if (sampleTypeIds.contains(stype.getId())) {
                 dupSampleTypes.add(stype);
             }
@@ -141,7 +147,7 @@ public class SampleStorageEntryWidget extends BiobankWidget {
                 SampleStorageWrapper sampleStorage = sampleStorageTable
                     .getSelection();
 
-                Set<SampleType> allowedSampleTypes = getNonDuplicateSampleTypes();
+                Set<SampleTypeWrapper> allowedSampleTypes = getNonDuplicateSampleTypes();
                 allowedSampleTypes.add(sampleStorage.getSampleType());
                 addOrEditSampleStorage(false, sampleStorage, allowedSampleTypes);
             }
@@ -187,12 +193,12 @@ public class SampleStorageEntryWidget extends BiobankWidget {
 
     private void getSampleTypes() {
         try {
-            allSampleTypes = SessionManager.getAppService().search(
-                SampleType.class, new SampleType());
+            allSampleTypes = SampleTypeWrapper.getAllWrappers(SessionManager
+                .getAppService());
         } catch (final RemoteConnectFailureException exp) {
             BioBankPlugin.openRemoteConnectErrorMessage();
         } catch (ApplicationException e) {
-            e.printStackTrace();
+            LOGGER.error("getSampleTypes", e);
         }
     }
 
