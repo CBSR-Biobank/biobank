@@ -24,14 +24,15 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class SampleWrapper extends ModelWrapper<Sample> {
 
-    private SamplePositionWrapper position;
+    private SamplePositionWrapper samplePosition;
+    private Position position;
 
     public SampleWrapper(WritableApplicationService appService,
         Sample wrappedObject) {
         super(appService, wrappedObject);
         SamplePosition pos = wrappedObject.getSamplePosition();
         if (pos != null) {
-            position = new SamplePositionWrapper(appService, pos);
+            samplePosition = new SamplePositionWrapper(appService, pos);
         }
     }
 
@@ -48,9 +49,8 @@ public class SampleWrapper extends ModelWrapper<Sample> {
 
     @Override
     protected String[] getPropertyChangesNames() {
-        return new String[] { "inventoryId", "patientVisit", "positionRow",
-            "positionCol", "linkDate", "sampleType", "quantity", "oldComment",
-            "quantityUsed" };
+        return new String[] { "inventoryId", "patientVisit", "position",
+            "linkDate", "sampleType", "quantity", "oldComment", "quantityUsed" };
     }
 
     @Override
@@ -109,90 +109,58 @@ public class SampleWrapper extends ModelWrapper<Sample> {
             positionString, parentContainer.getContainerType()
                 .getWrappedObject());
         if ((rcp.row > -1) && (rcp.col > -1)) {
-            SamplePosition sp = wrappedObject.getSamplePosition();
-            if (sp == null) {
-                sp = new SamplePosition();
-                setSamplePosition(sp);
-            }
-            sp.setSample(wrappedObject);
-            // TODO check if update works well when sampleposition already
-            // exists
-            sp.setRow(rcp.row);
-            sp.setCol(rcp.col);
+            setPosition(new Position(rcp.row, rcp.col));
         } else {
             throw new Exception("Position " + positionString + " not valid");
         }
     }
 
-    private void setSamplePosition(SamplePosition sp) {
-        SamplePosition old = wrappedObject.getSamplePosition();
-        wrappedObject.setSamplePosition(sp);
-        propertyChangeSupport.firePropertyChange("samplePosition", old, sp);
+    private void initSamplePosition() {
+        samplePosition = new SamplePositionWrapper(appService);
+        position = new Position();
+        samplePosition.setSample(this);
+        wrappedObject.setSamplePosition(samplePosition.getWrappedObject());
     }
 
-    public Integer getPositionRow() {
-        if (position == null) {
+    public Position getPosition() {
+        if (samplePosition == null) {
             return null;
         }
-        return position.getRow();
+        return position;
     }
 
-    public void setPositionRow(Integer row) {
-        Integer oldValue = null;
-        if (position == null) {
-            initPosition();
-        } else {
-            oldValue = position.getRow();
+    public void setPosition(Position position) {
+        Position oldPosition = this.position;
+        if (samplePosition == null) {
+            initSamplePosition();
         }
-        position.setRow(row);
-        propertyChangeSupport.firePropertyChange("positionRow", oldValue, row);
-    }
-
-    private void initPosition() {
-        position = new SamplePositionWrapper(appService);
-        position.setSample(this);
-        wrappedObject.setSamplePosition(position.getWrappedObject());
-    }
-
-    public Integer getPositionCol() {
-        if (position == null) {
-            return null;
-        }
-        return position.getCol();
-
-    }
-
-    public void setPositionCol(Integer col) {
-        Integer oldValue = null;
-        if (position == null) {
-            initPosition();
-        } else {
-            oldValue = position.getCol();
-        }
-        position.setCol(col);
-        propertyChangeSupport.firePropertyChange("positionCol", oldValue, col);
+        samplePosition.setRow(position.row);
+        samplePosition.setCol(position.col);
+        this.position = position;
+        propertyChangeSupport.firePropertyChange("position", oldPosition,
+            position);
     }
 
     public ContainerWrapper getParent() {
-        if (position == null) {
+        if (samplePosition == null) {
             return null;
         }
-        return position.getContainer();
+        return samplePosition.getContainer();
     }
 
     public void setParent(ContainerWrapper parent) {
         ContainerWrapper oldValue = null;
-        if (position == null) {
-            initPosition();
+        if (samplePosition == null) {
+            initSamplePosition();
         } else {
-            oldValue = position.getContainer();
+            oldValue = samplePosition.getContainer();
         }
-        position.setContainer(parent);
+        samplePosition.setContainer(parent);
         propertyChangeSupport.firePropertyChange("parent", oldValue, parent);
     }
 
     public boolean hasParent() {
-        return position != null;
+        return samplePosition != null;
     }
 
     public void checkPosition(ContainerWrapper parentContainer)
@@ -214,7 +182,7 @@ public class SampleWrapper extends ModelWrapper<Sample> {
     }
 
     public void setSampleType(SampleType type) {
-        SampleType oldType = getSampleType();
+        SampleType oldType = wrappedObject.getSampleType();
         wrappedObject.setSampleType(type);
         propertyChangeSupport.firePropertyChange("sampleType", oldType, type);
     }
@@ -223,8 +191,12 @@ public class SampleWrapper extends ModelWrapper<Sample> {
         setSampleType(type.wrappedObject);
     }
 
-    public SampleType getSampleType() {
-        return wrappedObject.getSampleType();
+    public SampleTypeWrapper getSampleType() {
+        SampleType type = wrappedObject.getSampleType();
+        if (type == null) {
+            return null;
+        }
+        return new SampleTypeWrapper(appService, type);
     }
 
     public void setLinkDate(Date date) {
@@ -377,4 +349,27 @@ public class SampleWrapper extends ModelWrapper<Sample> {
         return 0;
     }
 
+    public static List<SampleWrapper> getRandomSamplesAlreadyAssigned(
+        WritableApplicationService appService, Integer siteId)
+        throws ApplicationException {
+        HQLCriteria criteria = new HQLCriteria("from " + Sample.class.getName()
+            + " as s where s in (select sp.sample from "
+            + SamplePosition.class.getName()
+            + " as sp) and s.patientVisit.patient.study.site.id = ?", Arrays
+            .asList(new Object[] { siteId }));
+        List<Sample> samples = appService.query(criteria);
+        return transformToWrapperList(appService, samples);
+    }
+
+    public static List<SampleWrapper> getRandomSamplesNotAssigned(
+        WritableApplicationService appService, Integer siteId)
+        throws ApplicationException {
+        HQLCriteria criteria = new HQLCriteria("from " + Sample.class.getName()
+            + " as s where s not in (select sp.sample from "
+            + SamplePosition.class.getName()
+            + " as sp) and s.patientVisit.patient.study.site.id = ?", Arrays
+            .asList(new Object[] { siteId }));
+        List<Sample> samples = appService.query(criteria);
+        return transformToWrapperList(appService, samples);
+    }
 }

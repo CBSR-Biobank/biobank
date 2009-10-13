@@ -149,7 +149,7 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
     public void saveForm() throws Exception {
         SiteAdapter siteAdapter = clinicAdapter
             .getParentFromClass(SiteAdapter.class);
-        clinicWrapper.setSiteWrapper(siteAdapter.getWrapper());
+        clinicWrapper.setSite(siteAdapter.getWrapper());
         saveContacts();
         addressWrapper.persist();
         clinicWrapper.persist();

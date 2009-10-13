@@ -42,7 +42,7 @@ public class ContainerTypeGroup extends AdapterBase {
             public void widgetSelected(SelectionEvent event) {
                 ContainerTypeWrapper ct = new ContainerTypeWrapper(
                     getAppService());
-                ct.setSite(getParentFromClass(SiteAdapter.class).getSite());
+                ct.setSite(getParentFromClass(SiteAdapter.class).getWrapper());
                 ct.setCapacity(new CapacityWrapper(getAppService()));
                 ContainerTypeAdapter adapter = new ContainerTypeAdapter(
                     ContainerTypeGroup.this, ct);

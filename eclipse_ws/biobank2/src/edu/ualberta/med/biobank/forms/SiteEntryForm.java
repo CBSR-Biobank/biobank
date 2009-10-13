@@ -39,7 +39,6 @@ public class SiteEntryForm extends AddressEntryFormCommon {
         try {
             siteWrapper.reload();
         } catch (Exception e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
         addressWrapper = siteWrapper.getAddress();

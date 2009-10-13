@@ -26,12 +26,11 @@ public class PatientVisitAdapter extends AdapterBase {
 
     public PatientVisitAdapter(AdapterBase parent,
         PatientVisitWrapper patientVisitWrapper) {
-        super(parent, null);
-        object = patientVisitWrapper;
+        super(parent, patientVisitWrapper);
     }
 
     public PatientVisitWrapper getWrapper() {
-        return (PatientVisitWrapper) object;
+        return (PatientVisitWrapper) modelObject;
     }
 
     @Override

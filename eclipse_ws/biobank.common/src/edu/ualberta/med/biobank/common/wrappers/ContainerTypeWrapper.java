@@ -257,6 +257,10 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
         propertyChangeSupport.firePropertyChange("site", oldSite, site);
     }
 
+    public void setSite(SiteWrapper site) {
+        setSite(site.getWrappedObject());
+    }
+
     public SiteWrapper getSite() {
         Site site = wrappedObject.getSite();
         if (site == null) {

@@ -348,7 +348,6 @@ public class StudyEntryForm extends BiobankEntryForm {
         SDKQueryResult result;
         Set<PvInfo> savedPvInfoList = new HashSet<PvInfo>();
 
-        // FIXME: change study to studyWrapper
         studyWrapper.setContactCollection(contactEntryWidget.getContacts());
 
         if (studyWrapper.getPvInfoCollection().size() > 0) {
@@ -367,7 +366,7 @@ public class StudyEntryForm extends BiobankEntryForm {
         studyWrapper.persist();
         SiteAdapter siteAdapter = studyAdapter
             .getParentFromClass(SiteAdapter.class);
-        studyWrapper.setSiteWrapper(siteAdapter.getWrapper());
+        studyWrapper.setSite(siteAdapter.getWrapper());
     }
 
     @Override

@@ -10,9 +10,9 @@ public class StudyContactAndPatientInfo {
 
     public String clinicName;
 
-    public int patients;
+    public long patients;
 
-    public Long patientVisits;
+    public long patientVisits;
 
     public ContactWrapper contact;
 

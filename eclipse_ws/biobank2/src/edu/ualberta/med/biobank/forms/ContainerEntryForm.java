@@ -105,8 +105,9 @@ public class ContainerEntryForm extends BiobankEntryForm {
             "Site");
         FormUtils.setTextValue(siteLabel, containerWrapper.getSite().getName());
 
-        if (containerWrapper.getContainerType() != null
-            && containerWrapper.getContainerType().getTopLevel()) {
+        if (containerWrapper.isNew()
+            || (containerWrapper.getContainerType() != null && containerWrapper
+                .getContainerType().getTopLevel())) {
             // only allow edit to label on top level containers
             firstControl = createBoundWidgetWithLabel(client, Text.class,
                 SWT.NONE, "Label", null, BeansObservables.observeValue(

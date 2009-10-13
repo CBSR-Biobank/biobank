@@ -7,7 +7,6 @@ import org.apache.log4j.Logger;
 import org.springframework.remoting.RemoteAccessException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
-import edu.ualberta.med.biobank.common.utils.ModelUtils;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -53,7 +52,7 @@ public class SessionHelper implements Runnable {
                     .getApplicationServiceFromUrl(serverUrl, userName, password);
             }
 
-            siteWrappers = ModelUtils.getSites(appService, null);
+            siteWrappers = SiteWrapper.getSites(appService, null);
         } catch (ApplicationException exp) {
             LOGGER.error("Error while logging to application", exp);
             if (exp.getCause() != null

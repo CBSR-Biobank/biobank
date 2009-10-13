@@ -96,8 +96,7 @@ public class ClinicViewForm extends AddressViewFormCommon {
     protected void createStudiesSection() throws Exception {
         Composite client = createSectionWithClient("Studies");
 
-        studiesTable = new ClinicStudyInfoTable(client, appService,
-            clinicWrapper);
+        studiesTable = new ClinicStudyInfoTable(client, clinicWrapper);
         studiesTable.adaptToToolkit(toolkit, true);
         toolkit.paintBordersFor(studiesTable);
 

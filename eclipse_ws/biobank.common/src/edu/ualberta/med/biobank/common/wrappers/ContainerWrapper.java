@@ -352,11 +352,14 @@ public class ContainerWrapper extends ModelWrapper<Container> {
         return wrappedObject.getActivityStatus();
     }
 
-    public void setSite(SiteWrapper siteWrapper) {
+    public void setSite(Site site) {
         Site oldSite = wrappedObject.getSite();
-        wrappedObject.setSite(siteWrapper.getWrappedObject());
-        propertyChangeSupport.firePropertyChange("site", oldSite, siteWrapper
-            .getWrappedObject());
+        wrappedObject.setSite(site);
+        propertyChangeSupport.firePropertyChange("site", oldSite, site);
+    }
+
+    public void setSite(SiteWrapper siteWrapper) {
+        setSite(siteWrapper.getWrappedObject());
     }
 
     public void setLabel(String label) {
@@ -520,12 +523,12 @@ public class ContainerWrapper extends ModelWrapper<Container> {
      * Return true if this container can hold the type of sample
      */
     public boolean canHold(SampleWrapper sample) throws ApplicationException {
-        SampleType type = sample.getSampleType();
+        SampleTypeWrapper type = sample.getSampleType();
         HQLCriteria criteria = new HQLCriteria("select sampleType from "
             + ContainerType.class.getName()
             + " as ct inner join ct.sampleTypeCollection as sampleType"
             + " where ct = ? and sampleType = ?", Arrays.asList(new Object[] {
-            wrappedObject.getContainerType(), type }));
+            wrappedObject.getContainerType(), type.getWrappedObject() }));
         List<SampleType> types = appService.query(criteria);
         return types.size() == 1;
     }
@@ -684,7 +687,7 @@ public class ContainerWrapper extends ModelWrapper<Container> {
      */
     public static List<ContainerWrapper> getContainersHoldingSampleType(
         WritableApplicationService appService, SiteWrapper siteWrapper,
-        String label, SampleType sampleType) throws ApplicationException {
+        String label, SampleTypeWrapper sampleType) throws ApplicationException {
         HQLCriteria criteria = new HQLCriteria(
             "from "
                 + Container.class.getName()
@@ -694,7 +697,7 @@ public class ContainerWrapper extends ModelWrapper<Container> {
                 + ContainerType.class.getName() + " as ct"
                 + " left join ct.sampleTypeCollection as sampleType "
                 + " where sampleType = ?))", Arrays.asList(new Object[] {
-                siteWrapper.getId(), label, sampleType }));
+                siteWrapper.getId(), label, sampleType.getWrappedObject() }));
         List<Container> containers = appService.query(criteria);
         return transformToWrapperList(appService, containers);
     }

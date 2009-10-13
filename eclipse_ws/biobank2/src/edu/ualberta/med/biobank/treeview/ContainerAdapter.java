@@ -35,11 +35,7 @@ public class ContainerAdapter extends AdapterBase {
     }
 
     public ContainerWrapper getContainer() {
-        return (ContainerWrapper) object;
-    }
-
-    public void setContainer(ContainerWrapper container) {
-        object = container;
+        return (ContainerWrapper) modelObject;
     }
 
     @Override

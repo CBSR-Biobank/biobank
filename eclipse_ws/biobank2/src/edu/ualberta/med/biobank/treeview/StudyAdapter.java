@@ -4,24 +4,17 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.PlatformUI;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.forms.StudyEntryForm;
 import edu.ualberta.med.biobank.forms.StudyViewForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
-import edu.ualberta.med.biobank.model.Study;
-import gov.nih.nci.system.applicationservice.ApplicationException;
-import gov.nih.nci.system.query.SDKQuery;
-import gov.nih.nci.system.query.example.DeleteExampleQuery;
 
 public class StudyAdapter extends AdapterBase {
 
@@ -47,25 +40,13 @@ public class StudyAdapter extends AdapterBase {
         this(parent, studyWrapper, true);
     }
 
-    public void setStudy(Study study) {
-        // FIXME should set StudyWrapper : need to check the use of this
-        // method
-        object = new StudyWrapper(getAppService(), study);
-    }
-
-    public Study getStudy() {
-        // FIXME should return StudyWrapper : need to check the use of this
-        // method
-        return ((StudyWrapper) object).getWrappedObject();
-    }
-
     public StudyWrapper getWrapper() {
-        return (StudyWrapper) object;
+        return (StudyWrapper) modelObject;
     }
 
     @Override
     public String getName() {
-        Study study = getStudy();
+        StudyWrapper study = getWrapper();
         Assert.isNotNull(study, "study is null");
         return study.getNameShort();
     }
@@ -127,32 +108,6 @@ public class StudyAdapter extends AdapterBase {
                 }
             });
         }
-    }
-
-    @Override
-    public void delete() {
-        // FIXME when wrapper is used : remove this method to use the
-        // parent one
-        BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
-            Study study = getStudy();
-            SDKQuery query = new DeleteExampleQuery(study);
-
-            public void run() {
-                if (study.getPatientCollection().size() > 0) {
-                    BioBankPlugin.openError("Error", "Unable to delete study "
-                        + study.getName()
-                        + ". All defined patients must be removed first.");
-                } else
-                    try {
-                        getAppService().executeQuery(query);
-                        StudyAdapter.this.getParent().removeChild(
-                            StudyAdapter.this);
-                    } catch (ApplicationException e) {
-                        BioBankPlugin.openAsyncError("Delete error", e);
-                    }
-
-            }
-        });
     }
 
     @Override

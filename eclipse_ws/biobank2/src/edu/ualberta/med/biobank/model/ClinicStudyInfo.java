@@ -9,9 +9,9 @@ public class ClinicStudyInfo {
 
     public String studyShortName;
 
-    public int patients;
+    public long patients;
 
-    public Long patientVisits;
+    public long patientVisits;
 
     public void performDoubleClick() {
         SessionManager.getInstance().openViewForm(Study.class,

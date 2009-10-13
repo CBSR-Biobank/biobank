@@ -21,12 +21,8 @@ public class ContainerTypeAdapter extends AdapterBase {
         super(parent, containerType);
     }
 
-    public void setContainerType(ContainerTypeWrapper containerType) {
-        object = containerType;
-    }
-
     public ContainerTypeWrapper getContainerType() {
-        return (ContainerTypeWrapper) object;
+        return (ContainerTypeWrapper) modelObject;
     }
 
     @Override

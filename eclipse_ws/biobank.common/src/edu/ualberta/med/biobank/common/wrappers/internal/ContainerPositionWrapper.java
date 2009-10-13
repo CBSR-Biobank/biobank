@@ -97,7 +97,6 @@ public class ContainerPositionWrapper extends
 
     @Override
     protected void deleteChecks() throws BiobankCheckException, Exception {
-        // TODO Auto-generated method stub
     }
 
     @Override

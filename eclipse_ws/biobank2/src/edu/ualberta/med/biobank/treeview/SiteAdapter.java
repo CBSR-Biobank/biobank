@@ -4,24 +4,17 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.PlatformUI;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.forms.SiteEntryForm;
 import edu.ualberta.med.biobank.forms.SiteViewForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
-import edu.ualberta.med.biobank.model.Site;
-import gov.nih.nci.system.applicationservice.ApplicationException;
-import gov.nih.nci.system.query.SDKQuery;
-import gov.nih.nci.system.query.example.DeleteExampleQuery;
 
 public class SiteAdapter extends AdapterBase {
 
@@ -48,19 +41,11 @@ public class SiteAdapter extends AdapterBase {
     }
 
     public SiteWrapper getWrapper() {
-        return (SiteWrapper) object;
+        return (SiteWrapper) modelObject;
     }
 
     public SiteAdapter(AdapterBase parent, SiteWrapper siteWrapper) {
         this(parent, siteWrapper, true);
-    }
-
-    public void setSite(Site site) {
-        ((SiteWrapper) object).setWrappedObject(site);
-    }
-
-    public Site getSite() {
-        return ((SiteWrapper) object).getWrappedObject();
     }
 
     public AdapterBase getStudiesGroupNode() {
@@ -81,7 +66,7 @@ public class SiteAdapter extends AdapterBase {
 
     @Override
     public String getName() {
-        Site site = getSite();
+        SiteWrapper site = getWrapper();
         Assert.isNotNull(site, "site is null");
         return site.getName();
     }
@@ -140,38 +125,6 @@ public class SiteAdapter extends AdapterBase {
             }
 
             public void widgetDefaultSelected(SelectionEvent e) {
-            }
-        });
-    }
-
-    @Override
-    public void delete() {
-        // FIXME when wrapper is used : remove this method to use the
-        // parent one
-        BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
-            Site site = getSite();
-            SDKQuery query = new DeleteExampleQuery(site);
-
-            public void run() {
-                if (site.getClinicCollection().size() > 0
-                    || site.getContainerCollection().size() > 0
-                    || site.getContainerTypeCollection().size() > 0
-                    || site.getStudyCollection().size() > 0) {
-                    BioBankPlugin
-                        .openError(
-                            "Error",
-                            "Unable to delete site "
-                                + site.getName()
-                                + ". All defined children (studies, clinics, container types, and containers) must be removed first.");
-                } else
-                    try {
-                        getAppService().executeQuery(query);
-                        SiteAdapter.this.getParent().removeChild(
-                            SiteAdapter.this);
-                    } catch (ApplicationException e) {
-                        BioBankPlugin.openAsyncError("Delete error", e);
-                    }
-
             }
         });
     }

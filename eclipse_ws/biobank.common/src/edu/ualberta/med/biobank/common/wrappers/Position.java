@@ -1,5 +1,8 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
+/**
+ * Simple class object representing a position on a 2 dimensional object.
+ */
 public class Position {
 
     public Integer row;
@@ -12,6 +15,5 @@ public class Position {
     }
 
     public Position() {
-        // TODO Auto-generated constructor stub
     }
 }

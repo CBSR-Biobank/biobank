@@ -1,5 +1,7 @@
 package edu.ualberta.med.biobank.forms;
 
+import java.util.Collection;
+
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
@@ -91,8 +93,7 @@ public class SiteViewForm extends AddressViewFormCommon {
         createSiteSection();
         createAddressSection();
         createStudySection();
-        clinicsTable = FormUtils.createClinicSection(toolkit, form.getBody(),
-            siteWrapper.getClinicCollection(true));
+        createClinicSection();
         createContainerTypesSection();
         createContainerSection();
         createButtons();
@@ -134,6 +135,22 @@ public class SiteViewForm extends AddressViewFormCommon {
         studiesTable.adaptToToolkit(toolkit, true);
         studiesTable.addDoubleClickListener(FormUtils
             .getBiobankCollectionDoubleClickListener());
+    }
+
+    public void createClinicSection() {
+        Collection<ClinicWrapper> clinics = siteWrapper
+            .getClinicCollection(true);
+        Section section = toolkit.createSection(form.getBody(), Section.TWISTIE
+            | Section.TITLE_BAR | Section.EXPANDED);
+        section.setText("Clinics");
+        section.setLayout(new GridLayout(1, false));
+        section.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+        clinicsTable = new ClinicInfoTable(section, clinics);
+        section.setClient(clinicsTable);
+        clinicsTable.adaptToToolkit(toolkit, true);
+        clinicsTable.getTableViewer().addDoubleClickListener(
+            FormUtils.getBiobankCollectionDoubleClickListener());
     }
 
     private void createContainerTypesSection() {

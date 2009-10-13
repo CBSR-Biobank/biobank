@@ -15,12 +15,11 @@ import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.utils.ModelUtils;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.forms.ContainerEntryForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
-import edu.ualberta.med.biobank.model.Site;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ContainerGroup extends AdapterBase {
@@ -75,16 +74,12 @@ public class ContainerGroup extends AdapterBase {
 
     @Override
     public void loadChildren(boolean updateNode) {
-        Site parentSite = ((SiteAdapter) getParent()).getSite();
+        SiteWrapper parentSite = ((SiteAdapter) getParent()).getWrapper();
         Assert.isNotNull(parentSite, "site null");
         try {
             // read from database again
-            parentSite = ModelUtils.getObjectWithId(getAppService(),
-                Site.class, parentSite.getId());
-            SiteAdapter siteAdapter = (SiteAdapter) getParent();
-            siteAdapter.setSite(parentSite);
-
-            for (ContainerWrapper containerWrapper : siteAdapter.getWrapper()
+            parentSite.reload();
+            for (ContainerWrapper containerWrapper : parentSite
                 .getTopContainerCollection()) {
                 ContainerAdapter node = (ContainerAdapter) getChild(containerWrapper
                     .getId());

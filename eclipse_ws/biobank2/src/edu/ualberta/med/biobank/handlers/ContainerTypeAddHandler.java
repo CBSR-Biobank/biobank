@@ -23,7 +23,7 @@ public class ContainerTypeAddHandler extends AbstractHandler {
 
         ContainerTypeWrapper containerType = new ContainerTypeWrapper(
             SessionManager.getAppService());
-        containerType.setSite(siteAdapter.getSite());
+        containerType.setSite(siteAdapter.getWrapper());
         ContainerTypeAdapter containerTypeNode = new ContainerTypeAdapter(
             siteAdapter.getContainerTypesGroupNode(), containerType);
 

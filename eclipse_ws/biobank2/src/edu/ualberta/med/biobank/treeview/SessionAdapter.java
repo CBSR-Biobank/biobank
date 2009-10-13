@@ -18,10 +18,8 @@ import org.springframework.remoting.RemoteAccessException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.utils.ModelUtils;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
-import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class SessionAdapter extends AdapterBase {
 
@@ -112,7 +110,7 @@ public class SessionAdapter extends AdapterBase {
                 siteId = currentSite.getId();
 
             List<SiteWrapper> siteCollection = new ArrayList<SiteWrapper>(
-                ModelUtils.getSites(appService, siteId));
+                SiteWrapper.getSites(appService, siteId));
             Collections.sort(siteCollection);
 
             for (SiteWrapper siteWrapper : siteCollection) {
@@ -150,15 +148,6 @@ public class SessionAdapter extends AdapterBase {
 
     public String getUserName() {
         return userName;
-    }
-
-    public String getUserCsmId() throws Exception {
-        HQLCriteria criteria = new HQLCriteria(
-            "from gov.nih.nci.security.authorization.domainobjects.User where loginName = '"
-                + userName + "'");
-        List<Object> userCsmId = appService.query(criteria);
-        System.out.println(userCsmId);
-        return "";
     }
 
 }

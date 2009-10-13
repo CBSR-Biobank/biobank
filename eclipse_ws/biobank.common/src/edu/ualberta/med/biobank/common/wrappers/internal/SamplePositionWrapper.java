@@ -46,7 +46,6 @@ public class SamplePositionWrapper extends
 
     @Override
     protected void persistChecks() throws BiobankCheckException, Exception {
-        // TODO Auto-generated method stub
 
     }
 
@@ -61,7 +60,11 @@ public class SamplePositionWrapper extends
     }
 
     public SampleWrapper getSample() {
-        return new SampleWrapper(appService, wrappedObject.getSample());
+        Sample sample = wrappedObject.getSample();
+        if (sample == null) {
+            return null;
+        }
+        return new SampleWrapper(appService, sample);
     }
 
     public void setContainer(Container container) {
@@ -76,7 +79,11 @@ public class SamplePositionWrapper extends
     }
 
     public ContainerWrapper getContainer() {
-        return new ContainerWrapper(appService, wrappedObject.getContainer());
+        Container container = wrappedObject.getContainer();
+        if (container == null) {
+            return null;
+        }
+        return new ContainerWrapper(appService, container);
     }
 
     @Override

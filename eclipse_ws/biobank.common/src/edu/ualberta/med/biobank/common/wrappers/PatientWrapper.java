@@ -151,7 +151,6 @@ public class PatientWrapper extends ModelWrapper<Patient> {
 
     @Override
     protected void deleteChecks() throws BiobankCheckException, Exception {
-        // TODO Auto-generated method stub
     }
 
     @Override
