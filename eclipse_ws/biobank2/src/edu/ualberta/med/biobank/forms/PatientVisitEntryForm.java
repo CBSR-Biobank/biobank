@@ -33,6 +33,7 @@ import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.Clinic;
+import edu.ualberta.med.biobank.model.PvCustomInfo;
 import edu.ualberta.med.biobank.treeview.PatientAdapter;
 import edu.ualberta.med.biobank.treeview.PatientVisitAdapter;
 import edu.ualberta.med.biobank.validators.DateNotNulValidator;
@@ -82,22 +83,11 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
 
     private PatientWrapper patientWrapper;
 
-    private class PvCustomInfo {
-        String label;
-        Integer type;
-        String[] allowedValues;
-        String value;
+    private class FormPvCustomInfo extends PvCustomInfo {
         Control control;
-
-        public PvCustomInfo(Control control, Integer type,
-            String[] possibleValues) {
-            this.control = control;
-            this.type = type;
-            this.allowedValues = possibleValues;
-        }
     }
 
-    private List<PvCustomInfo> pvCustomInfoList;
+    private List<FormPvCustomInfo> pvCustomInfoList;
 
     @Override
     public void init() {
@@ -203,12 +193,14 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         if (labels == null)
             return;
 
-        pvCustomInfoList = new ArrayList<PvCustomInfo>();
+        pvCustomInfoList = new ArrayList<FormPvCustomInfo>();
 
         for (String label : labels) {
-            PvCustomInfo pvCustomInfo = new PvCustomInfo(null, patientWrapper
-                .getStudy().getPvInfoType(label), patientWrapper.getStudy()
-                .getPvInfoAllowedValues(label));
+            FormPvCustomInfo pvCustomInfo = new FormPvCustomInfo();
+            pvCustomInfo.label = label;
+            pvCustomInfo.type = patientWrapper.getStudy().getPvInfoType(label);
+            pvCustomInfo.allowedValues = patientWrapper.getStudy()
+                .getPvInfoAllowedValues(label);
             Control control = getControlForLabel(client, pvCustomInfo);
             pvCustomInfoList.add(pvCustomInfo);
             if (control != null) {
@@ -220,7 +212,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
     }
 
     private Control getControlForLabel(Composite client,
-        PvCustomInfo pvCustomInfo) {
+        FormPvCustomInfo pvCustomInfo) {
         switch (pvCustomInfo.type) {
         case 1: // number
             return createBoundWidgetWithLabel(client, Text.class, SWT.NONE,
@@ -354,7 +346,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
     }
 
     private void setPvCustomInfo() throws Exception {
-        for (PvCustomInfo combinedPvInfo : pvCustomInfoList) {
+        for (FormPvCustomInfo combinedPvInfo : pvCustomInfoList) {
             setPvInfoValueFromControlType(combinedPvInfo);
             if ((combinedPvInfo.value == null)
                 || (combinedPvInfo.value.length() == 0))
@@ -365,7 +357,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         }
     }
 
-    private void setPvInfoValueFromControlType(PvCustomInfo pvCustomInfo) {
+    private void setPvInfoValueFromControlType(FormPvCustomInfo pvCustomInfo) {
         // for text and combo, the databinding is used
         if (pvCustomInfo.control instanceof DateTimeWidget) {
             pvCustomInfo.value = ((DateTimeWidget) pvCustomInfo.control)

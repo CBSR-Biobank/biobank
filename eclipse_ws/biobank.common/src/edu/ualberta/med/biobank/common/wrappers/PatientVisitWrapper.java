@@ -11,6 +11,7 @@ import java.util.Map;
 
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
+import edu.ualberta.med.biobank.common.wrappers.internal.PvInfoDataWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.PvInfoWrapper;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Patient;

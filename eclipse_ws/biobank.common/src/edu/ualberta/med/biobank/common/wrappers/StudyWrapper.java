@@ -12,6 +12,7 @@ import java.util.Map;
 import org.apache.commons.lang.StringUtils;
 
 import edu.ualberta.med.biobank.common.BiobankCheckException;
+import edu.ualberta.med.biobank.common.wrappers.internal.PvInfoPossibleWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.PvInfoWrapper;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Contact;

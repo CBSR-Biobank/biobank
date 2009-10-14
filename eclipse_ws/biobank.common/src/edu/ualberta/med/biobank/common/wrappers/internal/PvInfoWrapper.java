@@ -2,8 +2,6 @@ package edu.ualberta.med.biobank.common.wrappers.internal;
 
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.common.wrappers.PvInfoPossibleWrapper;
-import edu.ualberta.med.biobank.common.wrappers.PvInfoTypeWrapper;
 import edu.ualberta.med.biobank.model.PvInfo;
 import edu.ualberta.med.biobank.model.PvInfoPossible;
 import edu.ualberta.med.biobank.model.PvInfoType;

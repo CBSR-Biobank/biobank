@@ -1,6 +1,8 @@
 package edu.ualberta.med.biobank.widgets;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.Assert;
@@ -19,33 +21,62 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
-import edu.ualberta.med.biobank.common.wrappers.PvInfoPossibleWrapper;
 import edu.ualberta.med.biobank.dialogs.ListAddDialog;
+import edu.ualberta.med.biobank.model.PvCustomInfo;
 
 public class PvInfoWidget extends BiobankWidget {
-    String label;
-    String type;
-    Button checkButton;
-    Button addButton;
-    Button removeButton;
-    List list;
+    private Button checkButton;
+    private Button addButton;
+    private Button removeButton;
+    private List list;
     boolean hasListValues;
 
+    private static class LabelDialogInfo {
+        public String title;
+        public String prompt;
+        public String helpText;
+
+        public LabelDialogInfo(String title, String prompt, String helpText) {
+            this.title = title;
+            this.prompt = prompt;
+            this.helpText = helpText;
+        }
+    };
+
+    private static Map<String, LabelDialogInfo> LABEL_DLG_INFO = new HashMap<String, LabelDialogInfo>() {
+        private static final long serialVersionUID = 1L;
+        {
+            put("Aliquot Volume", new LabelDialogInfo(
+                "Allowed Aliquot Volumes", "Please enter a new volume:",
+                "To enter multiple volumes, separate with semicolon."));
+            put("Blood Received", new LabelDialogInfo(
+                "Allowed Blood Received Volumes", "Please enter a new volume:",
+                "To enter multiple volumes, separate with semicolon."));
+            put(
+                "Visit Type",
+                new LabelDialogInfo("Visit Type Values",
+                    "Please enter a visit type:",
+                    "To enter multiple visit type values, separate with semicolon."));
+            put("Consent", new LabelDialogInfo("Consent Types",
+                "Please enter a consent type:",
+                "To enter multiple consent values, separate with semicolon."));
+        }
+    };
+
     public PvInfoWidget(Composite parent, int style,
-        PvInfoPossibleWrapper pvInfoPossible, boolean selected, String value) {
+        final PvCustomInfo pvCustomInfo) {
         super(parent, style);
 
         setLayout(new GridLayout(1, false));
         setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-        label = pvInfoPossible.getLabel();
-        type = pvInfoPossible.getPvInfoType().getType();
-        hasListValues = type.equals("select_single")
-            || type.equals("select_multiple");
+        hasListValues = (pvCustomInfo.type.equals(4) || pvCustomInfo.type
+            .equals(5));
+        boolean selected = (pvCustomInfo.allowedValues != null);
 
         if (hasListValues) {
             checkButton = new Button(this, SWT.CHECK);
-            checkButton.setText(label);
+            checkButton.setText(pvCustomInfo.label);
             checkButton.addSelectionListener(new SelectionListener() {
 
                 @Override
@@ -60,7 +91,7 @@ public class PvInfoWidget extends BiobankWidget {
 
             });
 
-            if (pvInfoPossible.getIsDefault()) {
+            if (pvCustomInfo.isDefault) {
                 checkButton.setEnabled(false);
                 checkButton.setSelection(true);
             } else {
@@ -85,34 +116,15 @@ public class PvInfoWidget extends BiobankWidget {
                 @Override
                 public void widgetSelected(SelectionEvent e) {
                     notifyListeners();
-                    String title = "";
-                    String prompt = "";
-                    String helpText = "";
-
-                    if (label.equals("Aliquot Volume")) {
-                        title = "Allowed Aliquot Volumes";
-                        prompt = "Please enter a new volume:";
-                        helpText = "To enter multiple volumes, separate with semicolon.";
-                    } else if (label.equals("Blood Received")) {
-                        title = "Allowed Blood Received Volumes";
-                        prompt = "Please enter a new volume:";
-                        helpText = "To enter multiple volumes, separate with semicolon.";
-                    } else if (label.equals("Visit Type")) {
-                        title = "Visit Type Values";
-                        prompt = "Please enter a visit type:";
-                        helpText = "To enter multiple visit type values, separate with semicolon.";
-                    } else if (label.equals("Consent")) {
-                        title = "Consent Types";
-                        prompt = "Please enter a consent type:";
-                        helpText = "To enter multiple consent values, separate with semicolon.";
-                    } else {
-                        Assert
-                            .isTrue(false, "invalid value for label " + label);
-                    }
+                    LabelDialogInfo labelDlgInfo = LABEL_DLG_INFO
+                        .get(pvCustomInfo.label);
+                    Assert.isNotNull(labelDlgInfo, "no dialog info for label "
+                        + pvCustomInfo.label);
 
                     ListAddDialog dlg = new ListAddDialog(PlatformUI
                         .getWorkbench().getActiveWorkbenchWindow().getShell(),
-                        title, prompt, helpText);
+                        labelDlgInfo.title, labelDlgInfo.prompt,
+                        labelDlgInfo.helpText);
                     if (dlg.open() == Dialog.OK) {
                         // make sure there are no duplicates
                         String[] newItems = dlg.getResult();
@@ -136,12 +148,12 @@ public class PvInfoWidget extends BiobankWidget {
                         int numDuplicates = duplicates.size();
                         if (numDuplicates > 0) {
                             String msg = "Value " + duplicates.get(0)
-                                + " already in " + title;
+                                + " already in " + labelDlgInfo.title;
                             if (numDuplicates > 1) {
                                 msg = "Values " + duplicates.toString()
-                                    + " already in " + title;
+                                    + " already in " + labelDlgInfo.title;
                             }
-                            BioBankPlugin.openError(title, msg);
+                            BioBankPlugin.openError(labelDlgInfo.title, msg);
                         }
                         checkButton.setSelection(true);
                     }
@@ -164,8 +176,8 @@ public class PvInfoWidget extends BiobankWidget {
 
             list = new List(comp, SWT.BORDER | SWT.V_SCROLL);
             list.setLayoutData(new GridData(GridData.FILL_BOTH));
-            if ((value != null) && (value.length() > 0)) {
-                for (String item : value.split(";")) {
+            if (pvCustomInfo.allowedValues != null) {
+                for (String item : pvCustomInfo.allowedValues) {
                     list.add(item);
                 }
             }
@@ -277,7 +289,7 @@ public class PvInfoWidget extends BiobankWidget {
             list.setMenu(m);
         } else {
             checkButton = new Button(this, SWT.CHECK);
-            checkButton.setText(pvInfoPossible.getLabel());
+            checkButton.setText(pvCustomInfo.label);
             GridData gd = new GridData(GridData.VERTICAL_ALIGN_BEGINNING
                 | GridData.GRAB_HORIZONTAL);
             checkButton.setLayoutData(gd);
@@ -295,7 +307,7 @@ public class PvInfoWidget extends BiobankWidget {
 
             });
 
-            if (pvInfoPossible.getIsDefault()) {
+            if (pvCustomInfo.isDefault) {
                 checkButton.setEnabled(false);
                 checkButton.setSelection(true);
             } else {

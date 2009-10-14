@@ -9,12 +9,12 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PvSampleSourceWrapper;
+import edu.ualberta.med.biobank.model.PvCustomInfo;
 import edu.ualberta.med.biobank.treeview.PatientVisitAdapter;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.widgets.infotables.PvSampleSourceInfoTable;
@@ -34,16 +34,6 @@ public class PatientVisitViewForm extends BiobankViewForm {
     private Label siteLabel;
 
     private SamplesListWidget samplesWidget;
-
-    // used to keep track of which data has been entered or left blank for
-    // a patient visit.
-    private class PvCustomInfo {
-        String label;
-        Integer type;
-        String[] allowedValues;
-        String value;
-        Control control;
-    }
 
     private ListOrderedMap pvCustomInfoMap;
 

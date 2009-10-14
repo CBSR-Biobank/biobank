@@ -1,10 +1,12 @@
-package edu.ualberta.med.biobank.common.wrappers;
+package edu.ualberta.med.biobank.common.wrappers.internal;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.BiobankCheckException;
+import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.model.PvInfoPossible;
 import edu.ualberta.med.biobank.model.PvInfoType;
 import edu.ualberta.med.biobank.model.Site;
@@ -74,7 +76,7 @@ public class PvInfoPossibleWrapper extends ModelWrapper<PvInfoPossible> {
     }
 
     public void setPvInfoType(PvInfoTypeWrapper pvInfoType) {
-        setPvInfoType(pvInfoType.wrappedObject);
+        setPvInfoType(pvInfoType.getWrappedObject());
     }
 
     public SiteWrapper getSite() {

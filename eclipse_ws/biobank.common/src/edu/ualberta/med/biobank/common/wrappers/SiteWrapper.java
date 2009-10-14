@@ -11,6 +11,8 @@ import java.util.Map;
 
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.internal.AddressWrapper;
+import edu.ualberta.med.biobank.common.wrappers.internal.PvInfoPossibleWrapper;
+import edu.ualberta.med.biobank.common.wrappers.internal.PvInfoTypeWrapper;
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Container;
