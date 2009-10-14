@@ -24,13 +24,11 @@ public class ModelObjectQuery {
     private Class<?> modelObjectClass;
     private Type modelObjectType;
     private String joins;
-    private String alias;
 
     public ModelObjectQuery(Composite parent, Method modelObjectMethod,
         String alias, AdvancedReportsView view) {
 
         with = new Label(parent, SWT.NONE);
-        this.alias = alias;
         joins = "";
 
         // is it a collection?

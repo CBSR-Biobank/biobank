@@ -19,11 +19,12 @@ import edu.ualberta.med.biobank.views.AdvancedReportsView;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public abstract class AbstractQueryClause {
-    
-  private static Logger LOGGER = Logger.getLogger(AbstractQueryClause.class
+
+    @SuppressWarnings("unused")
+    private static Logger LOGGER = Logger.getLogger(AbstractQueryClause.class
         .getName());
 
-  protected AdvancedReportsView view;
+    protected AdvancedReportsView view;
     protected String alias;
     protected List<Method> attributes;
 
