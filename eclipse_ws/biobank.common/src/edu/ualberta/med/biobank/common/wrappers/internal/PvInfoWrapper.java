@@ -1,6 +1,7 @@
-package edu.ualberta.med.biobank.common.wrappers;
+package edu.ualberta.med.biobank.common.wrappers.internal;
 
 import edu.ualberta.med.biobank.common.BiobankCheckException;
+import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.model.PvInfo;
 import edu.ualberta.med.biobank.model.PvInfoPossible;
 import edu.ualberta.med.biobank.model.PvInfoType;
@@ -46,13 +47,13 @@ public class PvInfoWrapper extends ModelWrapper<PvInfo> {
         propertyChangeSupport.firePropertyChange("label", oldLabel, label);
     }
 
-    public String getPossibleValues() {
-        return wrappedObject.getPossibleValues();
+    public String getAllowedValues() {
+        return wrappedObject.getAllowedValues();
     }
 
-    public void setPossibleValues(String possibleValues) {
-        String oldPV = wrappedObject.getPossibleValues();
-        wrappedObject.setPossibleValues(possibleValues);
+    public void setAllowedValues(String possibleValues) {
+        String oldPV = wrappedObject.getAllowedValues();
+        wrappedObject.setAllowedValues(possibleValues);
         propertyChangeSupport.firePropertyChange("possibleValues", oldPV,
             possibleValues);
     }
@@ -70,7 +71,7 @@ public class PvInfoWrapper extends ModelWrapper<PvInfo> {
     }
 
     public void setPvInfoPossible(PvInfoPossibleWrapper pvInfoPossible) {
-        setPvInfoPossible(pvInfoPossible.wrappedObject);
+        setPvInfoPossible(pvInfoPossible.getWrappedObject());
     }
 
     public PvInfoTypeWrapper getPvInfoType() {
@@ -85,7 +86,7 @@ public class PvInfoWrapper extends ModelWrapper<PvInfo> {
     }
 
     public void setPvInfoType(PvInfoTypeWrapper pvInfoType) {
-        setPvInfoType(pvInfoType.wrappedObject);
+        setPvInfoType(pvInfoType.getWrappedObject());
     }
 
     @Override

@@ -4,11 +4,16 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.lang.StringUtils;
 
 import edu.ualberta.med.biobank.common.BiobankCheckException;
+import edu.ualberta.med.biobank.common.wrappers.internal.PvInfoPossibleWrapper;
+import edu.ualberta.med.biobank.common.wrappers.internal.PvInfoWrapper;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.model.Patient;
@@ -23,13 +28,17 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class StudyWrapper extends ModelWrapper<Study> {
 
+    private Map<String, PvInfoWrapper> pvInfoMap;
+
     public StudyWrapper(WritableApplicationService appService,
         Study wrappedObject) {
         super(appService, wrappedObject);
+        pvInfoMap = null;
     }
 
     public StudyWrapper(WritableApplicationService appService) {
         super(appService);
+        pvInfoMap = null;
     }
 
     public String getName() {
@@ -75,8 +84,12 @@ public class StudyWrapper extends ModelWrapper<Study> {
             .firePropertyChange("comment", oldComment, comment);
     }
 
-    public Site getSite() {
-        return wrappedObject.getSite();
+    public SiteWrapper getSite() {
+        Site site = wrappedObject.getSite();
+        if (site == null) {
+            return null;
+        }
+        return new SiteWrapper(appService, site);
     }
 
     public void setSite(Site site) {
@@ -233,8 +246,7 @@ public class StudyWrapper extends ModelWrapper<Study> {
     }
 
     public void setSampleStorageCollection(
-        List<SampleStorageWrapper> ssCollection) throws Exception {
-        deleteSampleStorageDifference(ssCollection);
+        List<SampleStorageWrapper> ssCollection) {
         Collection<SampleStorage> ssObjects = new HashSet<SampleStorage>();
         for (SampleStorageWrapper ss : ssCollection) {
             ss.setStudy(wrappedObject);
@@ -251,35 +263,17 @@ public class StudyWrapper extends ModelWrapper<Study> {
      * @param ssCollection
      * @throws Exception
      */
-    private void deleteSampleStorageDifference(
-        List<SampleStorageWrapper> newCollection) throws Exception {
-        // no need to remove if study is not yet in the database or nothing in
-        // the collection
-        if (isNew())
-            return;
-
-        List<SampleStorageWrapper> currSamplesStorage = getSampleStorageCollection();
-        if (currSamplesStorage.size() == 0)
-            return;
-
-        if (newCollection.size() == 0) {
-            // remove all
-            Iterator<SampleStorageWrapper> it = currSamplesStorage.iterator();
-            while (it.hasNext()) {
-                it.next().delete();
-            }
-            return;
-        }
-
-        List<Integer> idList = new ArrayList<Integer>();
-        for (SampleStorageWrapper ss : newCollection) {
-            idList.add(ss.getId());
-        }
-        Iterator<SampleStorageWrapper> it = currSamplesStorage.iterator();
-        while (it.hasNext()) {
-            SampleStorageWrapper ss = it.next();
-            if (!idList.contains(ss.getId())) {
-                ss.delete();
+    private void deleteSampleStorageDifference(Study origStudy)
+        throws Exception {
+        List<SampleStorageWrapper> newSampleStorage = getSampleStorageCollection();
+        List<SampleStorageWrapper> oldSampleStorage = new StudyWrapper(
+            appService, origStudy).getSampleStorageCollection();
+        if (oldSampleStorage != null) {
+            for (SampleStorageWrapper st : oldSampleStorage) {
+                if ((newSampleStorage == null)
+                    || !newSampleStorage.contains(st)) {
+                    st.delete();
+                }
             }
         }
     }
@@ -321,9 +315,7 @@ public class StudyWrapper extends ModelWrapper<Study> {
         }
     }
 
-    public void setSampleSourceCollection(List<SampleSourceWrapper> ssCollection)
-        throws Exception {
-        deleteSampleSourceDifference(ssCollection);
+    public void setSampleSourceCollection(List<SampleSourceWrapper> ssCollection) {
         Collection<SampleSource> ssObjects = new HashSet<SampleSource>();
         for (SampleSourceWrapper ss : ssCollection) {
             ssObjects.add(ss.getWrappedObject());
@@ -339,41 +331,21 @@ public class StudyWrapper extends ModelWrapper<Study> {
      * @param newCollection
      * @throws Exception
      */
-    private void deleteSampleSourceDifference(
-        List<SampleSourceWrapper> newCollection) throws Exception {
-        // no need to remove if study is not yet in the database or nothing in
-        // the collection
-        if (isNew())
-            return;
-
-        List<SampleSourceWrapper> currSamplesSources = getSampleSourceCollection();
-        if (currSamplesSources.size() == 0)
-            return;
-
-        if (newCollection.size() == 0) {
-            // remove all
-            Iterator<SampleSourceWrapper> it = currSamplesSources.iterator();
-            while (it.hasNext()) {
-                it.next().delete();
-            }
-            return;
-        }
-
-        List<Integer> idList = new ArrayList<Integer>();
-        for (SampleSourceWrapper ss : newCollection) {
-            idList.add(ss.getId());
-        }
-        Iterator<SampleSourceWrapper> it = currSamplesSources.iterator();
-        while (it.hasNext()) {
-            SampleSourceWrapper ss = it.next();
-            if (!idList.contains(ss.getId())) {
-                ss.delete();
+    private void deleteSampleSourceDifference(Study origStudy) throws Exception {
+        List<SampleSourceWrapper> newSampleSource = getSampleSourceCollection();
+        List<SampleSourceWrapper> oldSampleSource = new StudyWrapper(
+            appService, origStudy).getSampleSourceCollection();
+        if (oldSampleSource != null) {
+            for (SampleSourceWrapper ss : oldSampleSource) {
+                if ((newSampleSource == null) || !newSampleSource.contains(ss)) {
+                    ss.delete();
+                }
             }
         }
     }
 
     @SuppressWarnings("unchecked")
-    public List<PvInfoWrapper> getPvInfoCollection() {
+    private List<PvInfoWrapper> getPvInfoCollection() {
         List<PvInfoWrapper> pvInfoCollection = (List<PvInfoWrapper>) propertiesMap
             .get("pvInfoCollection");
         if (pvInfoCollection == null) {
@@ -389,7 +361,7 @@ public class StudyWrapper extends ModelWrapper<Study> {
         return pvInfoCollection;
     }
 
-    public void setPvInfoCollection(Collection<PvInfo> pvInfoCollection,
+    private void setPvInfoCollection(Collection<PvInfo> pvInfoCollection,
         boolean setNull) {
         Collection<PvInfo> oldPvInfos = wrappedObject.getPvInfoCollection();
         wrappedObject.setPvInfoCollection(pvInfoCollection);
@@ -400,13 +372,81 @@ public class StudyWrapper extends ModelWrapper<Study> {
         }
     }
 
-    public void setPvInfoCollection(List<PvInfoWrapper> pvInfoCollection) {
+    private void setPvInfoCollection(List<PvInfoWrapper> pvInfoCollection) {
         Collection<PvInfo> pvInfosObjects = new HashSet<PvInfo>();
         for (PvInfoWrapper pvInfos : pvInfoCollection) {
             pvInfosObjects.add(pvInfos.getWrappedObject());
         }
         setPvInfoCollection(pvInfosObjects, false);
         propertiesMap.put("pvInfoCollection", pvInfoCollection);
+    }
+
+    private Map<String, PvInfoWrapper> getPvInfoMap() {
+        if (pvInfoMap != null)
+            return pvInfoMap;
+
+        pvInfoMap = new HashMap<String, PvInfoWrapper>();
+        List<PvInfoWrapper> pvInfoCollection = getPvInfoCollection();
+        if (pvInfoCollection != null) {
+            for (PvInfoWrapper pvInfo : pvInfoCollection) {
+                pvInfoMap.put(pvInfo.getLabel(), pvInfo);
+            }
+        }
+        return pvInfoMap;
+    }
+
+    public String[] getPvInfoLabels() {
+        getPvInfoMap();
+        return pvInfoMap.keySet().toArray(new String[] {});
+    }
+
+    /*
+     * Should not be used by non-wrappers
+     */
+    public PvInfoWrapper getPvInfo(String label) throws Exception {
+        getPvInfoMap();
+        PvInfoWrapper pvInfo = pvInfoMap.get(label);
+        if (pvInfo == null) {
+            throw new Exception("PvInfo with label \"" + label
+                + "\" is invalid");
+        }
+        return pvInfo;
+    }
+
+    public Integer getPvInfoType(String label) throws Exception {
+        return getPvInfo(label).getPvInfoType().getId();
+    }
+
+    public String[] getPvInfoAllowedValues(String label) throws Exception {
+        getPvInfoMap();
+        PvInfoWrapper pvInfo = getPvInfo(label);
+        String joinedPossibleValues = pvInfo.getAllowedValues();
+        if (joinedPossibleValues == null)
+            return null;
+        return joinedPossibleValues.split(";");
+    }
+
+    public void setPvInfoAllowedValues(String label, String[] allowedValues)
+        throws Exception {
+        getPvInfoMap();
+        PvInfoWrapper pvInfo = pvInfoMap.get(label);
+        if (pvInfo == null) {
+            // is label a valid PvInfoPossible value?
+            SiteWrapper site = getSite();
+            if (site == null) {
+                throw new Exception("site is null");
+            }
+            PvInfoPossibleWrapper pip = site.getPvInfoPossible(label);
+            if (pip == null) {
+                throw new Exception("PvInfo with label \"" + label
+                    + "\" is invalid: not in PvInfoPossible");
+            }
+            pvInfo = new PvInfoWrapper(appService, new PvInfo());
+            pvInfo.setPvInfoPossible(pip);
+            pvInfo.setLabel(label);
+        }
+        pvInfo.setAllowedValues(StringUtils.join(allowedValues, ';'));
+        pvInfoMap.put(label, pvInfo);
     }
 
     public List<ClinicWrapper> getClinicCollection()
@@ -531,5 +571,27 @@ public class StudyWrapper extends ModelWrapper<Study> {
             throw new BiobankCheckException("Invalid size for HQL query result");
         }
         return results.get(0);
+    }
+
+    @Override
+    public void persist() throws BiobankCheckException, Exception {
+        if (pvInfoMap != null) {
+            setPvInfoCollection(new ArrayList<PvInfoWrapper>(pvInfoMap.values()));
+        }
+        super.persist();
+
+    }
+
+    @Override
+    protected void persistDependencies(Study origObject)
+        throws BiobankCheckException, Exception {
+        deleteSampleStorageDifference(origObject);
+        deleteSampleSourceDifference(origObject);
+    }
+
+    @Override
+    public void reload() throws Exception {
+        super.reload();
+        pvInfoMap = null;
     }
 }

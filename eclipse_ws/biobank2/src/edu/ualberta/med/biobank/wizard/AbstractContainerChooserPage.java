@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.wizard;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.wizard.WizardPage;
@@ -15,7 +16,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
-import edu.ualberta.med.biobank.common.wrappers.CapacityWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.Position;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
@@ -25,6 +25,9 @@ import edu.ualberta.med.biobank.widgets.ContainerDisplayWidget;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public abstract class AbstractContainerChooserPage extends WizardPage {
+
+    private static Logger LOGGER = Logger
+        .getLogger(AbstractContainerChooserPage.class.getName());
 
     private ContainerWrapper currentContainer;
 
@@ -57,7 +60,12 @@ public abstract class AbstractContainerChooserPage extends WizardPage {
         initComponent();
         setControl(pageContainer);
         setPageComplete(false);
-        updateFreezerGrid();
+
+        try {
+            updateFreezerGrid();
+        } catch (Exception e) {
+            LOGGER.error("Could not save site preferences", e);
+        }
     }
 
     protected void initComponent() {
@@ -108,6 +116,8 @@ public abstract class AbstractContainerChooserPage extends WizardPage {
 
     /**
      * Update grid representation according to the container displayed
+     * 
+     * @throws Exception
      */
     protected void updateFreezerGrid() {
         ContainerCell[][] cells = initGridSize();
@@ -141,10 +151,8 @@ public abstract class AbstractContainerChooserPage extends WizardPage {
             rowCap = defaultDim1;
             colCap = defaultDim2;
         } else {
-            CapacityWrapper capacity = currentContainer.getContainerType()
-                .getCapacity();
-            rowCap = capacity.getRowCapacity();
-            colCap = capacity.getColCapacity();
+            rowCap = currentContainer.getContainerType().getRowCapacity();
+            colCap = currentContainer.getContainerType().getColCapacity();
             Assert.isNotNull(rowCap, "row capacity is null");
             Assert.isNotNull(colCap, "column capacity is null");
         }

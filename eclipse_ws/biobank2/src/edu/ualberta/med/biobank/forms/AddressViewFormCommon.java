@@ -3,26 +3,25 @@ package edu.ualberta.med.biobank.forms;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.Section;
 
-import edu.ualberta.med.biobank.common.wrappers.AddressWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 
 public abstract class AddressViewFormCommon extends BiobankViewForm {
 
-    protected AddressWrapper addressWrapper;
-
-    protected void createAddressSection() {
+    protected void createAddressSection(ModelWrapper<?> wrapperObject) {
         Composite client = createSectionWithClient("Address");
         Section section = (Section) client.getParent();
         section.setExpanded(false);
-        createAddressArea(client);
+        createAddressArea(client, wrapperObject);
     }
 
-    protected void createAddressArea(Composite parent) {
+    protected void createAddressArea(Composite parent,
+        ModelWrapper<?> wrapperObject) {
         createWidgetsFromMap(AddressEntryFormCommon.ADDRESS_FIELDS, parent);
-        setAdressValues();
+        setAdressValues(wrapperObject);
     }
 
-    protected void setAdressValues() {
-        setWidgetsValues(AddressEntryFormCommon.ADDRESS_FIELDS, addressWrapper);
+    protected void setAdressValues(ModelWrapper<?> wrapperObject) {
+        setWidgetsValues(AddressEntryFormCommon.ADDRESS_FIELDS, wrapperObject);
     }
 
 }

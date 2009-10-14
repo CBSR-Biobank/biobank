@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Set;
 
 import edu.ualberta.med.biobank.common.BiobankCheckException;
+import edu.ualberta.med.biobank.common.wrappers.internal.CapacityWrapper;
 import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
@@ -269,7 +270,7 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
         return new SiteWrapper(appService, site);
     }
 
-    public CapacityWrapper getCapacity() {
+    private CapacityWrapper getCapacity() {
         Capacity capacity = wrappedObject.getCapacity();
         if (capacity == null) {
             return null;
@@ -277,15 +278,49 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
         return new CapacityWrapper(appService, capacity);
     }
 
-    public void setCapacity(Capacity capacity) {
+    private void setCapacity(Capacity capacity) {
         Capacity oldCapacity = wrappedObject.getCapacity();
         wrappedObject.setCapacity(capacity);
         propertyChangeSupport.firePropertyChange("capacity", oldCapacity,
             capacity);
     }
 
-    public void setCapacity(CapacityWrapper capacity) {
+    private void setCapacity(CapacityWrapper capacity) {
         setCapacity(capacity.wrappedObject);
+    }
+
+    public Integer getRowCapacity() {
+        CapacityWrapper capacity = getCapacity();
+        if (capacity == null) {
+            return null;
+        }
+        return capacity.getRowCapacity();
+    }
+
+    public Integer getColCapacity() {
+        CapacityWrapper capacity = getCapacity();
+        if (capacity == null) {
+            return null;
+        }
+        return capacity.getColCapacity();
+    }
+
+    public void setRowCapacity(Integer maxRows) {
+        CapacityWrapper capacity = getCapacity();
+        if (capacity == null) {
+            capacity = new CapacityWrapper(appService, new Capacity());
+        }
+        capacity.setRow(maxRows);
+        setCapacity(capacity);
+    }
+
+    public void setColCapacity(Integer maxCols) {
+        CapacityWrapper capacity = getCapacity();
+        if (capacity == null) {
+            capacity = new CapacityWrapper(appService, new Capacity());
+        }
+        capacity.setCol(maxCols);
+        setCapacity(capacity);
     }
 
     public void setChildLabelingScheme(ContainerLabelingSchemeWrapper scheme) {

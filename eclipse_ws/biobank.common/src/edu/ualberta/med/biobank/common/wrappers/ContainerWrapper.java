@@ -55,9 +55,12 @@ public class ContainerWrapper extends ModelWrapper<Container> {
 
     @Override
     protected void persistChecks() throws BiobankCheckException, Exception {
+        checkSiteNotNull();
         checkLabelUniqueForType();
         checkProductBarcodeUnique();
-        containerPosition.persistChecks();
+        if (containerPosition != null) {
+            containerPosition.persistChecks();
+        }
     }
 
     @Override
@@ -115,6 +118,13 @@ public class ContainerWrapper extends ModelWrapper<Container> {
             throw new BiobankCheckException("A container with label \""
                 + getLabel() + "\" and type \"" + getContainerType().getName()
                 + "\" already exists.");
+        }
+    }
+
+    private void checkSiteNotNull() throws BiobankCheckException {
+        if (getSite() == null) {
+            throw new BiobankCheckException(
+                "This container should be associate to a site");
         }
     }
 
@@ -244,6 +254,22 @@ public class ContainerWrapper extends ModelWrapper<Container> {
         return null;
     }
 
+    public Integer getRowCapacity() throws Exception {
+        ContainerTypeWrapper type = getContainerType();
+        if (type == null) {
+            throw new Exception("container type is null");
+        }
+        return type.getRowCapacity();
+    }
+
+    public Integer getColCapacity() throws Exception {
+        ContainerTypeWrapper type = getContainerType();
+        if (type == null) {
+            throw new Exception("container type is null");
+        }
+        return type.getColCapacity();
+    }
+
     /**
      * position is 2 letters, or 2 number or 1 letter and 1 number... this
      * position string is used to get the correct row and column index the given
@@ -256,13 +282,12 @@ public class ContainerWrapper extends ModelWrapper<Container> {
         ContainerTypeWrapper type = getContainerType();
         RowColPos rcp = LabelingScheme.getRowColFromPositionString(position,
             type.getWrappedObject());
-        CapacityWrapper capacity = type.getCapacity();
-        if (rcp.row >= capacity.getRowCapacity()
-            || rcp.col >= capacity.getColCapacity()) {
+        if (rcp.row >= type.getRowCapacity()
+            || rcp.col >= type.getColCapacity()) {
             throw new Exception("Can't use position " + position
                 + " in container " + getFullInfoLabel()
-                + "\nReason: capacity = " + capacity.getRowCapacity() + "*"
-                + capacity.getColCapacity());
+                + "\nReason: capacity = " + type.getRowCapacity() + "*"
+                + type.getColCapacity());
         }
         if (rcp.row < 0 || rcp.col < 0) {
             throw new Exception("Position " + position
@@ -553,12 +578,12 @@ public class ContainerWrapper extends ModelWrapper<Container> {
     @Override
     public boolean checkIntegrity() {
         if (wrappedObject != null)
-            if ((getContainerType() != null
-                && getContainerType().getCapacity() != null
-                && getContainerType().getCapacity().getRowCapacity() != null && getContainerType()
-                .getCapacity().getColCapacity() != null)
-                || getContainerType() == null)
-                if ((getPosition() != null) || containerPosition == null)
+            if (((getContainerType() != null)
+                && (getContainerType().getRowCapacity() != null) && (getContainerType()
+                .getColCapacity() != null))
+                || (getContainerType() == null))
+                if (((getPosition() != null) && (getPosition().row != null) && (getPosition().col != null))
+                    || (getPosition() == null))
                     if (wrappedObject.getSite() != null)
                         return true;
         return false;
@@ -631,7 +656,7 @@ public class ContainerWrapper extends ModelWrapper<Container> {
         }
     }
 
-    private void setChildLabels(String oldLabel) throws Exception {
+    public void setChildLabels(String oldLabel) throws Exception {
         // FIXME inefficient, should be improved
         HQLCriteria criteria = new HQLCriteria("from "
             + Container.class.getName() + " where label like ? and site= ?",
@@ -761,8 +786,8 @@ public class ContainerWrapper extends ModelWrapper<Container> {
         throws ApplicationException {
         List<SDKQuery> queries = new ArrayList<SDKQuery>();
         Collection<ContainerPositionWrapper> positions = getChildPositionCollection();
-        int rows = getContainerType().getCapacity().getRowCapacity().intValue();
-        int cols = getContainerType().getCapacity().getColCapacity().intValue();
+        int rows = getContainerType().getRowCapacity().intValue();
+        int cols = getContainerType().getColCapacity().intValue();
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
                 Boolean filled = false;

@@ -15,7 +15,6 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
-import edu.ualberta.med.biobank.common.wrappers.PvInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PvSampleSourceWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleSourceWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
@@ -74,17 +73,6 @@ public class BiobankLabelProvider extends LabelProvider implements
                 return visit.getFormattedDateDrawn();
             case 1:
                 return String.valueOf(visit.getSampleCollection().size());
-            }
-        } else if (element instanceof PvInfoWrapper) {
-            final PvInfoWrapper pvInfo = (PvInfoWrapper) element;
-            Integer type = pvInfo.getPvInfoType().getId();
-            switch (columnIndex) {
-            case 0:
-                return pvInfo.getLabel();
-            case 1:
-                if ((type > 1) && (type <= 3))
-                    return "N/A";
-                return pvInfo.getPossibleValues();
             }
         } else if (element instanceof ContainerTypeWrapper) {
             final ContainerTypeWrapper ct = (ContainerTypeWrapper) element;
