@@ -35,16 +35,23 @@ public class ReportsLabelProvider extends LabelProvider implements
             final Study study = (Study) element;
             switch (columnIndex) {
             case 0:
-                return study.getId().toString();
+                return study.getName();
             case 1:
                 return study.getActivityStatus();
             case 2:
                 return study.getComment();
             case 3:
-                return study.getName();
+                return String.valueOf(study.getContactCollection().size());
             case 4:
                 return study.getNameShort();
             case 5:
+                return String.valueOf(study.getPvInfoCollection().size());
+            case 6:
+                return String.valueOf(study.getSampleSourceCollection().size());
+            case 7:
+                return String
+                    .valueOf(study.getSampleStorageCollection().size());
+            case 8:
                 return study.getSite().getName();
             }
         } else if (element instanceof Clinic) {
@@ -111,9 +118,10 @@ public class ReportsLabelProvider extends LabelProvider implements
             final Container container = (Container) element;
             switch (columnIndex) {
             case 0:
-                return container.getId().toString();
-            case 1:
                 return container.getActivityStatus();
+            case 1:
+                return String.valueOf(container.getChildPositionCollection()
+                    .size());
             case 2:
                 return container.getComment();
             case 3:
@@ -129,8 +137,11 @@ public class ReportsLabelProvider extends LabelProvider implements
             case 6:
                 return container.getProductBarcode();
             case 7:
-                return container.getSite().getName();
+                return String.valueOf(container.getSamplePositionCollection()
+                    .size());
             case 8:
+                return container.getSite().getName();
+            case 9:
                 if (container.getTemperature() == null)
                     return "";
                 else

@@ -17,14 +17,16 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
-import edu.ualberta.med.biobank.views.ReportsView;
+import edu.ualberta.med.biobank.views.AdvancedReportsView;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
@@ -34,7 +36,7 @@ public class QueryPage extends Composite {
     private Composite whereBars;
     private Composite parent;
     private Composite subSection;
-    private ReportsView view;
+    private AdvancedReportsView view;
 
     private List<Class<?>> searchableModelObjects;
     private List<Method> modelObjectMethods;
@@ -42,9 +44,10 @@ public class QueryPage extends Composite {
     private AttributeQueryClause attributeClause;
     private List<ModelObjectQuery> modelObjectClauses;
 
-    public QueryPage(ReportsView view, Composite parent, int style) {
+    public QueryPage(AdvancedReportsView advancedReportsView, Composite parent,
+        int style) {
         super(parent, style);
-        this.view = view;
+        this.view = advancedReportsView;
         this.parent = parent;
         GridLayout queryLayout = new GridLayout(3, false);
         queryLayout.verticalSpacing = 20;
@@ -120,6 +123,9 @@ public class QueryPage extends Composite {
             modelObjectClauses.add(new ModelObjectQuery(subSection, method,
                 AttributeQueryClause.getText(type.getName()), view));
 
+        // update parents
+        view.resetSearch();
+        view.updateScrollBars();
         QueryPage.this.parent.layout(true, true);
 
     }
@@ -182,7 +188,8 @@ public class QueryPage extends Composite {
         }
         for (int i = 0; i < unfiltered.length; i++) {
             String name = unfiltered[i].getName();
-            if (name.startsWith("get"))
+            if (name.startsWith("get")
+                && unfiltered[i].getParameterTypes().length == 0) {
                 if (props != null) {
                     for (int j = 0; j < props.length; j++) {
                         if (name.substring(3).compareToIgnoreCase(props[j]) == 0) {
@@ -192,8 +199,15 @@ public class QueryPage extends Composite {
                     }
                 } else
                     filtered.add(unfiltered[i]);
+            }
         }
         return filtered;
+    }
+
+    public Class<?> getActiveWrapperClass() {
+        IStructuredSelection typeSelection = (IStructuredSelection) selectedTypeCombo
+            .getSelection();
+        return (Class<?>) (typeSelection.getFirstElement());
     }
 
     private void createSearchablesList() {
@@ -212,8 +226,32 @@ public class QueryPage extends Composite {
             .getSelection();
         Class<?> type = (Class<?>) typeSelection.getFirstElement();
         String query = "select " + AttributeQueryClause.getText(type.getName());
-        query += " from " + type.getName() + " as "
-            + AttributeQueryClause.getText(type.getName());
+        try {
+            query += " from "
+                + ((ModelWrapper<?>) type.getDeclaredConstructor(
+                    WritableApplicationService.class).newInstance(
+                    SessionManager.getAppService())).getWrappedClass()
+                    .getName() + " as "
+                + AttributeQueryClause.getText(type.getName());
+        } catch (IllegalArgumentException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (SecurityException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (InstantiationException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (NoSuchMethodException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
 
         List<Object> params = new ArrayList<Object>();
 
