@@ -392,7 +392,10 @@ public class StudyWrapper extends ModelWrapper<Study> {
         return pvInfoMap.keySet().toArray(new String[] {});
     }
 
-    private PvInfoWrapper getPvInfo(String label) throws Exception {
+    /*
+     * Should not be used by non-wrappers
+     */
+    public PvInfoWrapper getPvInfo(String label) throws Exception {
         getPvInfoMap();
         PvInfoWrapper pvInfo = pvInfoMap.get(label);
         if (pvInfo == null) {

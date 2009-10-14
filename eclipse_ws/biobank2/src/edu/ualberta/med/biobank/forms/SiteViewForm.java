@@ -35,7 +35,7 @@ import edu.ualberta.med.biobank.widgets.infotables.StudyInfoTable;
 public class SiteViewForm extends AddressViewFormCommon {
     public static final String ID = "edu.ualberta.med.biobank.forms.SiteViewForm";
 
-    private static final Logger logger = Logger.getLogger(SiteViewForm.class
+    private static final Logger LOGGER = Logger.getLogger(SiteViewForm.class
         .getName());
 
     private SiteAdapter siteAdapter;
@@ -74,7 +74,6 @@ public class SiteViewForm extends AddressViewFormCommon {
 
         siteAdapter = (SiteAdapter) adapter;
         siteWrapper = siteAdapter.getWrapper();
-        addressWrapper = siteWrapper.getAddress();
         retrieveSite();
         setPartName("Repository Site " + siteWrapper.getName());
     }
@@ -89,7 +88,7 @@ public class SiteViewForm extends AddressViewFormCommon {
             BioBankPlugin.IMG_SITE));
 
         createSiteSection();
-        createAddressSection();
+        createAddressSection(siteWrapper);
         createStudySection();
         clinicsTable = FormUtils.createClinicSection(toolkit, form.getBody(),
             siteWrapper.getClinicCollection(true));
@@ -160,7 +159,7 @@ public class SiteViewForm extends AddressViewFormCommon {
             sContainersTable.addDoubleClickListener(FormUtils
                 .getBiobankCollectionDoubleClickListener());
         } catch (Exception e) {
-            logger.error("Problem while queriyng top level containers", e);
+            LOGGER.error("Problem while queriyng top level containers", e);
         }
     }
 
@@ -205,7 +204,7 @@ public class SiteViewForm extends AddressViewFormCommon {
         setPartName("Repository Site " + siteWrapper.getName());
         form.setText("Repository Site: " + siteWrapper.getName());
         setSiteSectionValues();
-        setAdressValues();
+        setAdressValues(siteWrapper);
         studiesTable.setCollection(siteWrapper.getStudyCollection());
         clinicsTable.setCollection(siteWrapper.getClinicCollection(true));
         containerTypesTable.setCollection(siteWrapper
@@ -216,8 +215,6 @@ public class SiteViewForm extends AddressViewFormCommon {
     private void retrieveSite() {
         try {
             siteWrapper.reload();
-            addressWrapper.setWrappedObject(siteWrapper.getAddress()
-                .getWrappedObject());
         } catch (Exception e) {
             BioBankPlugin.openAsyncError("Can't reload site", e);
         }

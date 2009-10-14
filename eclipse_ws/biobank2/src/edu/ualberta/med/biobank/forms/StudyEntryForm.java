@@ -15,7 +15,6 @@ import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
@@ -77,7 +76,7 @@ public class StudyEntryForm extends BiobankEntryForm {
         String label;
         Integer type;
         String[] allowedValues;
-        Control control;
+        PvInfoWidget widget;
     };
 
     private ListOrderedMap pvCustomInfoMap;
@@ -230,32 +229,12 @@ public class StudyEntryForm extends BiobankEntryForm {
             combinedPvInfo.type = studyWrapper.getPvInfoType(label);
             combinedPvInfo.allowedValues = studyWrapper
                 .getPvInfoAllowedValues(label);
-            pvCustomInfoMap.put(label, combinedPvInfo);
-        }
 
-        for (Object key : pvCustomInfoMap.keySet()) {
-            boolean selected = false;
-            String label = (String) key;
-            String value = "";
-            PvCustomInfo pvCustomInfo = (PvCustomInfo) pvCustomInfoMap
-                .get(label);
-
-            if (pvCustomInfo == null) {
-                pvCustomInfo = new PvCustomInfo();
-                pvCustomInfo.pvInfoPossible = possiblePvInfo;
-                pvCustomInfo.pvInfo = null;
-                selected = false;
-            } else {
-                selected = true;
-                value = pvCustomInfo.pvInfo.getAllowedValue();
-            }
-
-            pvCustomInfo.wiget = new PvInfoWidget(client, SWT.NONE,
-                possiblePvInfo, selected, value);
+            combinedPvInfo.wiget = new PvInfoWidget(client, SWT.NONE,
+                combinedPvInfo.allowedValues, selected, value);
             pvCustomInfo.wiget.addSelectionChangedListener(listener);
 
-            pvCustomInfoMap.put(pvCustomInfo.pvInfoPossible.getId(),
-                pvCustomInfo);
+            pvCustomInfoMap.put(label, combinedPvInfo);
         }
     }
 

@@ -233,7 +233,10 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
             if (study == null) {
                 throw new Exception("study is null");
             }
-            study.getPvInfo(label);
+
+            // make sure label is valid PV custom info, make the method call
+            // and make sure exception is not thrown
+            study.getPvInfoAllowedValues(label);
 
             // not assigned yet
             return null;
@@ -246,7 +249,7 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
         if (study == null) {
             throw new Exception("study is null");
         }
-        return study.getPvInfo(label).getPvInfoType().getId();
+        return study.getPvInfoType(label);
     }
 
     public String[] getPvInfoAllowedValues(String label) throws Exception {
@@ -265,7 +268,6 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
             if (study == null) {
                 throw new Exception("study is null");
             }
-            PvInfoWrapper pvInfo = study.getPvInfo(label);
             List<String> allowedValList = Arrays.asList(study
                 .getPvInfoAllowedValues(label));
             if (!allowedValList.contains(value)) {
@@ -275,7 +277,7 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
 
             pid = new PvInfoDataWrapper(appService, new PvInfoData());
             pid.setPatientVisit(this);
-            pid.setPvInfo(pvInfo);
+            pid.setPvInfo(study.getPvInfo(label));
             pvInfoDataMap.put(label, pid);
         }
         pid.setValue(value);

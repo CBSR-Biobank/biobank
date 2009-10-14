@@ -42,7 +42,6 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SamplePositionWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
-import edu.ualberta.med.biobank.common.wrappers.internal.CapacityWrapper;
 import edu.ualberta.med.biobank.forms.listener.EnterKeyToNextFieldListener;
 import edu.ualberta.med.biobank.model.PalletCell;
 import edu.ualberta.med.biobank.model.SampleCellStatus;
@@ -645,10 +644,13 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
             // samples
             appendLog("Pallet container type used: "
                 + currentPalletWrapper.getContainerType().getName());
-            CapacityWrapper palletCapacity = currentPalletWrapper
-                .getContainerType().getCapacity();
-            currentPalletSamples = new SampleWrapper[palletCapacity
-                .getRowCapacity()][palletCapacity.getColCapacity()];
+            Integer rows = currentPalletWrapper
+
+            .getContainerType().getRowCapacity();
+            Integer cols = currentPalletWrapper.getContainerType()
+                .getColCapacity();
+
+            currentPalletSamples = new SampleWrapper[rows][cols];
             Collection<SamplePositionWrapper> positions = currentPalletWrapper
                 .getSamplePositionCollection();
             if (positions != null) {
