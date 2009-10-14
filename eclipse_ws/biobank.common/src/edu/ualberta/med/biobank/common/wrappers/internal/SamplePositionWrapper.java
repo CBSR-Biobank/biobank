@@ -44,11 +44,6 @@ public class SamplePositionWrapper extends
         return SamplePosition.class;
     }
 
-    @Override
-    protected void persistChecks() throws BiobankCheckException, Exception {
-
-    }
-
     public void setSample(Sample sample) {
         Sample oldSample = wrappedObject.getSample();
         wrappedObject.setSample(sample);

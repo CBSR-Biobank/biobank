@@ -157,8 +157,10 @@ public class ContainerAdapter extends AdapterBase {
                             .getParent();
                         ContainerAdapter parentAdapter = (ContainerAdapter) SessionManager
                             .getInstance().searchNode(newParentContainer);
-                        parentAdapter.getContainer().reload();
-                        parentAdapter.performExpand();
+                        if (parentAdapter != null) {
+                            parentAdapter.getContainer().reload();
+                            parentAdapter.performExpand();
+                        }
                         // update old parent
                         oldParent.getContainer().reload();
                         oldParent.removeAll();
@@ -198,7 +200,7 @@ public class ContainerAdapter extends AdapterBase {
                 } else
                     return;
             }
-            getContainer().setNewParent(newParent, newLabel);
+            container.setNewParent(newParent, newLabel);
         }
         BioBankPlugin.openInformation("Container moved", "The container "
             + oldLabel + " has been moved to " + container.getLabel());

@@ -57,6 +57,7 @@ public class ContainerWrapper extends ModelWrapper<Container> {
     protected void persistChecks() throws BiobankCheckException, Exception {
         checkLabelUniqueForType();
         checkProductBarcodeUnique();
+        containerPosition.persistChecks();
     }
 
     @Override
@@ -256,13 +257,18 @@ public class ContainerWrapper extends ModelWrapper<Container> {
         RowColPos rcp = LabelingScheme.getRowColFromPositionString(position,
             type.getWrappedObject());
         CapacityWrapper capacity = type.getCapacity();
-        if (rcp.row < capacity.getRowCapacity()
-            && rcp.col < capacity.getColCapacity()) {
-            return rcp;
+        if (rcp.row >= capacity.getRowCapacity()
+            || rcp.col >= capacity.getColCapacity()) {
+            throw new Exception("Can't use position " + position
+                + " in container " + getFullInfoLabel()
+                + "\nReason: capacity = " + capacity.getRowCapacity() + "*"
+                + capacity.getColCapacity());
         }
-        throw new Exception("Can't use position " + position + " in container "
-            + getFullInfoLabel() + "\nReason: capacity = "
-            + capacity.getRowCapacity() + "*" + capacity.getColCapacity());
+        if (rcp.row < 0 || rcp.col < 0) {
+            throw new Exception("Position " + position
+                + " is invalid in container " + getFullInfoLabel());
+        }
+        return rcp;
     }
 
     public void setContainerType(ContainerTypeWrapper containerType) {

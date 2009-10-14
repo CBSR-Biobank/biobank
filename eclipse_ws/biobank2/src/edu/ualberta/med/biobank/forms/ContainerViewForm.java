@@ -77,6 +77,8 @@ public class ContainerViewForm extends BiobankViewForm {
 
     private List<ContainerCell> selectedCells;
 
+    private boolean childrenOk = true;
+
     @Override
     public void init() throws Exception {
         Assert.isTrue(adapter instanceof ContainerAdapter,
@@ -140,36 +142,42 @@ public class ContainerViewForm extends BiobankViewForm {
     }
 
     private void initCells() {
-        ContainerTypeWrapper containerType = container.getContainerType();
-        CapacityWrapper cap = containerType.getCapacity();
-        Integer rowCap = cap.getRowCapacity();
-        Integer colCap = cap.getColCapacity();
-        Assert.isNotNull(rowCap, "row capacity is null");
-        Assert.isNotNull(colCap, "column capacity is null");
-        if (rowCap == 0)
-            rowCap = 1;
-        if (colCap == 0)
-            colCap = 1;
+        try {
+            ContainerTypeWrapper containerType = container.getContainerType();
+            CapacityWrapper cap = containerType.getCapacity();
+            Integer rowCap = cap.getRowCapacity();
+            Integer colCap = cap.getColCapacity();
+            Assert.isNotNull(rowCap, "row capacity is null");
+            Assert.isNotNull(colCap, "column capacity is null");
+            if (rowCap == 0)
+                rowCap = 1;
+            if (colCap == 0)
+                colCap = 1;
 
-        cells = new ContainerCell[rowCap][colCap];
-        for (ContainerWrapper child : container.getChildren()) {
-            Position position = child.getPosition();
-            Assert.isNotNull(position, "position is null");
-            Assert.isNotNull(position.row, "row is null");
-            Assert.isNotNull(position.col, "column is null");
-            ContainerCell cell = new ContainerCell(position.row, position.col,
-                child);
-            cell.setStatus(ContainerStatus.INITIALIZED);
-            cells[position.row][position.col] = cell;
-        }
-        for (int i = 0; i < rowCap; i++) {
-            for (int j = 0; j < colCap; j++) {
-                if (cells[i][j] == null) {
-                    ContainerCell cell = new ContainerCell(i, j);
-                    cell.setStatus(ContainerStatus.NOT_INITIALIZED);
-                    cells[i][j] = cell;
+            cells = new ContainerCell[rowCap][colCap];
+            for (ContainerWrapper child : container.getChildren()) {
+                Position position = child.getPosition();
+                Assert.isNotNull(position, "position is null");
+                Assert.isNotNull(position.row, "row is null");
+                Assert.isNotNull(position.col, "column is null");
+                ContainerCell cell = new ContainerCell(position.row,
+                    position.col, child);
+                cell.setStatus(ContainerStatus.INITIALIZED);
+                cells[position.row][position.col] = cell;
+            }
+            for (int i = 0; i < rowCap; i++) {
+                for (int j = 0; j < colCap; j++) {
+                    if (cells[i][j] == null) {
+                        ContainerCell cell = new ContainerCell(i, j);
+                        cell.setStatus(ContainerStatus.NOT_INITIALIZED);
+                        cells[i][j] = cell;
+                    }
                 }
             }
+        } catch (Exception ex) {
+            BioBankPlugin.openAsyncError("Positions errors",
+                "Some child container has wrong position number");
+            childrenOk = false;
         }
     }
 
@@ -196,7 +204,13 @@ public class ContainerViewForm extends BiobankViewForm {
     protected void createVisualizeContainer() {
         Composite client = createSectionWithClient("Container Visual");
         client.setLayout(new GridLayout(1, false));
-
+        if (!childrenOk) {
+            Label label = toolkit
+                .createLabel(client,
+                    "Error in container children : can't display those initialized");
+            label.setForeground(Display.getCurrent().getSystemColor(
+                SWT.COLOR_RED));
+        }
         if (isContainerDrawer()) {
             initCabinetDrawerContainer(client);
         } else {

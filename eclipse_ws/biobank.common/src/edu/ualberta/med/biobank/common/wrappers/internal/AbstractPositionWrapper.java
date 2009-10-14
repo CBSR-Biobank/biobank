@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.common.wrappers.internal;
 
+import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.model.AbstractPosition;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -39,6 +40,20 @@ public abstract class AbstractPositionWrapper<E extends AbstractPosition>
 
     public Integer getCol() {
         return wrappedObject.getCol();
+    }
+
+    @Override
+    public void persistChecks() throws BiobankCheckException, Exception {
+        if (getRow() == null) {
+            throw new BiobankCheckException("Position row can't be null");
+        }
+        if (getCol() == null) {
+            throw new BiobankCheckException("Position col can't be null");
+        }
+        if (getRow() < 0 || getCol() < 0) {
+            throw new BiobankCheckException("Position " + getRow() + ":"
+                + getCol() + " is invalid. Need positive numbers.");
+        }
     }
 
 }

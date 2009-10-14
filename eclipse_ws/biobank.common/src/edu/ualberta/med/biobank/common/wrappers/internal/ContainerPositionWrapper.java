@@ -38,10 +38,6 @@ public class ContainerPositionWrapper extends
         return ContainerPosition.class;
     }
 
-    @Override
-    protected void persistChecks() throws BiobankCheckException, Exception {
-    }
-
     public void setParentContainer(Container parentContainer) {
         Container oldParent = wrappedObject.getParentContainer();
         wrappedObject.setParentContainer(parentContainer);
