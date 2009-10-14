@@ -83,8 +83,8 @@ public class SampleTypesEntryForm extends BiobankEntryForm {
             .getTableSampleTypes();
         siteWrapper.setSampleTypeCollection(ssCollection);
         siteWrapper.persist();
-        SampleTypeWrapper.setGlobalSampleTypes(globalSampleWidget
-            .getTableSampleTypes(), globalSampleTypes);
+        SampleTypeWrapper.setGlobalSampleTypes(appService, globalSampleWidget
+            .getTableSampleTypes());
     }
 
     @Override

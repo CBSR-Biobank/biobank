@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.BiobankCheckException;
@@ -186,37 +185,38 @@ public class SampleTypeWrapper extends ModelWrapper<SampleType> {
         return list;
     }
 
+    /**
+     * This method should only be called to save the new sample type list. The
+     * differences between the old list and the new list will be deleted and the
+     * new list written to the database.
+     * 
+     * @param appService
+     * @param newGlobalSampleTypes
+     * 
+     * @throws BiobankCheckException
+     * @throws Exception
+     */
     public static void setGlobalSampleTypes(
-        List<SampleTypeWrapper> newGlobalSampleTypes,
-        List<SampleTypeWrapper> oldGlobalSampleTypes)
+        WritableApplicationService appService,
+        List<SampleTypeWrapper> newGlobalSampleTypes)
         throws BiobankCheckException, Exception {
-        deleteOldSampleTypes(newGlobalSampleTypes, oldGlobalSampleTypes);
+        SampleTypeWrapper
+            .deleteOldSampleTypes(appService, newGlobalSampleTypes);
         for (SampleTypeWrapper ss : newGlobalSampleTypes) {
             ss.persist();
         }
     }
 
-    private static void deleteOldSampleTypes(List<SampleTypeWrapper> newTypes,
-        List<SampleTypeWrapper> oldTypes) throws BiobankCheckException,
-        Exception {
-        if (newTypes.size() == 0) {
-            // remove all
-            Iterator<SampleTypeWrapper> it = oldTypes.iterator();
-            while (it.hasNext()) {
-                it.next().delete();
-            }
-            return;
-        }
-
-        List<Integer> idList = new ArrayList<Integer>();
-        for (SampleTypeWrapper ss : newTypes) {
-            idList.add(ss.getId());
-        }
-        Iterator<SampleTypeWrapper> it = oldTypes.iterator();
-        while (it.hasNext()) {
-            SampleTypeWrapper ss = it.next();
-            if (!idList.contains(ss.getId())) {
-                ss.delete();
+    private static void deleteOldSampleTypes(
+        WritableApplicationService appService, List<SampleTypeWrapper> newTypes)
+        throws BiobankCheckException, Exception {
+        List<SampleTypeWrapper> oldTypes = getGlobalSampleTypes(appService,
+            false);
+        if (oldTypes != null) {
+            for (SampleTypeWrapper ss : oldTypes) {
+                if ((newTypes == null) || !newTypes.contains(ss)) {
+                    ss.delete();
+                }
             }
         }
     }

@@ -2,11 +2,8 @@ package edu.ualberta.med.biobank.forms;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
-import org.apache.commons.collections.MapIterator;
 import org.apache.commons.collections.map.ListOrderedMap;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.IMessageProvider;
@@ -19,12 +16,9 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
-import edu.ualberta.med.biobank.common.wrappers.PvInfoPossibleWrapper;
-import edu.ualberta.med.biobank.common.wrappers.PvInfoTypeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.PvInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleSourceWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
-import edu.ualberta.med.biobank.model.PvInfo;
+import edu.ualberta.med.biobank.model.PvCustomInfo;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
@@ -34,10 +28,6 @@ import edu.ualberta.med.biobank.widgets.PvInfoWidget;
 import edu.ualberta.med.biobank.widgets.SampleStorageEntryWidget;
 import edu.ualberta.med.biobank.widgets.listener.BiobankEntryFormWidgetListener;
 import edu.ualberta.med.biobank.widgets.listener.MultiSelectEvent;
-import gov.nih.nci.system.query.SDKQuery;
-import gov.nih.nci.system.query.SDKQueryResult;
-import gov.nih.nci.system.query.example.InsertExampleQuery;
-import gov.nih.nci.system.query.example.UpdateExampleQuery;
 
 @SuppressWarnings("serial")
 public class StudyEntryForm extends BiobankEntryForm {
@@ -74,15 +64,7 @@ public class StudyEntryForm extends BiobankEntryForm {
 
     private MultiSelectWidget sampleSourceMultiSelect;
 
-    private Collection<PvInfoPossibleWrapper> possiblePvInfos;
-
-    class CombinedPvInfo {
-        PvInfoPossibleWrapper pvInfoPossible;
-        PvInfoWrapper pvInfo;
-        PvInfoWidget wiget;
-    };
-
-    private ListOrderedMap combinedPvInfoMap;
+    private ListOrderedMap pvCustomInfoMap;
 
     private SampleStorageEntryWidget sampleStorageEntryWidget;
 
@@ -93,9 +75,13 @@ public class StudyEntryForm extends BiobankEntryForm {
         }
     };
 
+    private class StudyPvCustomInfo extends PvCustomInfo {
+        public PvInfoWidget wiget;
+    }
+
     public StudyEntryForm() {
         super();
-        combinedPvInfoMap = new ListOrderedMap();
+        pvCustomInfoMap = new ListOrderedMap();
     }
 
     @Override
@@ -148,7 +134,7 @@ public class StudyEntryForm extends BiobankEntryForm {
         createClinicSection();
         createSampleStorageSection();
         createSourceVesselsSection();
-        createPvInfoSection();
+        createPvCustomInfoSection();
         createButtonsSection();
     }
 
@@ -203,26 +189,10 @@ public class StudyEntryForm extends BiobankEntryForm {
         sampleSourceMultiSelect.addSelectionChangedListener(listener);
     }
 
-    private void createPvInfoSection() throws Exception {
+    private void createPvCustomInfoSection() throws Exception {
         Composite client = createSectionWithClient("Patient Visit Information Collected");
-        Collection<PvInfoWrapper> pviCollection = studyWrapper
-            .getPvInfoCollection();
         GridLayout gl = (GridLayout) client.getLayout();
         gl.numColumns = 1;
-
-        if (pviCollection != null) {
-            for (PvInfoWrapper pvInfo : pviCollection) {
-                CombinedPvInfo combinedPvInfo = new CombinedPvInfo();
-                combinedPvInfo.pvInfo = pvInfo;
-                combinedPvInfo.pvInfoPossible = pvInfo.getPvInfoPossible();
-
-                combinedPvInfoMap.put(combinedPvInfo.pvInfoPossible.getId(),
-                    combinedPvInfo);
-            }
-        }
-
-        possiblePvInfos = PvInfoPossibleWrapper.getAllWrappers(appService);
-        Assert.isNotNull(possiblePvInfos);
 
         // START KLUDGE
         //
@@ -234,40 +204,24 @@ public class StudyEntryForm extends BiobankEntryForm {
             "Date Received" };
 
         for (String field : defaultFields) {
-            PvInfoTypeWrapper pvType = new PvInfoTypeWrapper(appService);
-            pvType.setType("date_time");
-            PvInfoPossibleWrapper pvInfoDateDrawn = new PvInfoPossibleWrapper(
-                appService);
-            pvInfoDateDrawn.setIsDefault(true);
-            pvInfoDateDrawn.setLabel(field);
-            pvInfoDateDrawn.setPvInfoType(pvType);
-            new PvInfoWidget(client, SWT.NONE, pvInfoDateDrawn, true, null);
+            StudyPvCustomInfo combinedPvInfo = new StudyPvCustomInfo();
+            combinedPvInfo.label = field;
+            combinedPvInfo.type = 3;
+            pvCustomInfoMap.put(field, combinedPvInfo);
         }
         //
         // END KLUDGE
 
-        for (PvInfoPossibleWrapper possiblePvInfo : possiblePvInfos) {
-            boolean selected = false;
-            String value = "";
-            CombinedPvInfo combinedPvInfo = (CombinedPvInfo) combinedPvInfoMap
-                .get(possiblePvInfo.getId());
-
-            if (combinedPvInfo == null) {
-                combinedPvInfo = new CombinedPvInfo();
-                combinedPvInfo.pvInfoPossible = possiblePvInfo;
-                combinedPvInfo.pvInfo = null;
-                selected = false;
-            } else {
-                selected = true;
-                value = combinedPvInfo.pvInfo.getPossibleValues();
-            }
-
+        for (String label : studyWrapper.getPvInfoLabels()) {
+            StudyPvCustomInfo combinedPvInfo = new StudyPvCustomInfo();
+            combinedPvInfo.label = label;
+            combinedPvInfo.type = studyWrapper.getPvInfoType(label);
+            combinedPvInfo.allowedValues = studyWrapper
+                .getPvInfoAllowedValues(label);
             combinedPvInfo.wiget = new PvInfoWidget(client, SWT.NONE,
-                possiblePvInfo, selected, value);
-            combinedPvInfo.wiget.addSelectionChangedListener(listener);
-
-            combinedPvInfoMap.put(combinedPvInfo.pvInfoPossible.getId(),
                 combinedPvInfo);
+            combinedPvInfo.wiget.addSelectionChangedListener(listener);
+            pvCustomInfoMap.put(label, combinedPvInfo);
         }
     }
 
@@ -308,32 +262,19 @@ public class StudyEntryForm extends BiobankEntryForm {
             "problem with sample source selections");
         studyWrapper.setSampleSourceCollection(selSampleSource);
 
-        List<PvInfoWrapper> pvInfoList = new ArrayList<PvInfoWrapper>();
-        MapIterator it = combinedPvInfoMap.mapIterator();
-        while (it.hasNext()) {
-            it.next();
-            CombinedPvInfo combinedPvInfo = (CombinedPvInfo) it.getValue();
-            boolean selected = combinedPvInfo.wiget.getSelected();
+        for (Object object : pvCustomInfoMap.values()) {
+            StudyPvCustomInfo pvCustomInfo = (StudyPvCustomInfo) object;
+            boolean selected = pvCustomInfo.wiget.getSelected();
 
             if (!selected)
                 continue;
 
-            String value = combinedPvInfo.wiget.getValues();
-            PvInfoWrapper pvInfo = combinedPvInfo.pvInfo;
-            if (pvInfo == null) {
-                pvInfo = new PvInfoWrapper(appService);
-                pvInfo.setPvInfoPossible(combinedPvInfo.pvInfoPossible);
-                pvInfo.setPvInfoType(combinedPvInfo.pvInfoPossible
-                    .getPvInfoType());
+            String value = pvCustomInfo.wiget.getValues();
+            if (pvCustomInfo.type.equals(4) || pvCustomInfo.type.equals(5)) {
+                studyWrapper.setPvInfoAllowedValues(pvCustomInfo.label, value
+                    .split(";"));
             }
-
-            pvInfo.setLabel(combinedPvInfo.pvInfoPossible.getLabel());
-            if (value != null) {
-                pvInfo.setPossibleValues(value);
-            }
-            pvInfoList.add(pvInfo);
         }
-        studyWrapper.setPvInfoCollection(pvInfoList);
         studyWrapper.setSampleStorageCollection(sampleStorageEntryWidget
             .getSampleStorage());
         saveStudy();
@@ -342,27 +283,7 @@ public class StudyEntryForm extends BiobankEntryForm {
     }
 
     private void saveStudy() throws Exception {
-        // FIXME should be transfer to persitCheck method or others set Methods
-        // of the wrapper
-        SDKQuery query;
-        SDKQueryResult result;
-        Set<PvInfo> savedPvInfoList = new HashSet<PvInfo>();
-
         studyWrapper.setContactCollection(contactEntryWidget.getContacts());
-
-        if (studyWrapper.getPvInfoCollection().size() > 0) {
-            for (PvInfoWrapper pvInfo : studyWrapper.getPvInfoCollection()) {
-                if ((pvInfo.getId() == null) || (pvInfo.getId() == 0)) {
-                    query = new InsertExampleQuery(pvInfo.getWrappedObject());
-                } else {
-                    query = new UpdateExampleQuery(pvInfo.getWrappedObject());
-                }
-
-                result = studyAdapter.getAppService().executeQuery(query);
-                savedPvInfoList.add((PvInfo) result.getObjectResult());
-            }
-        }
-        studyWrapper.setPvInfoCollection(savedPvInfoList, true);
         studyWrapper.persist();
         SiteAdapter siteAdapter = studyAdapter
             .getParentFromClass(SiteAdapter.class);

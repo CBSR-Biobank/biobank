@@ -2,7 +2,6 @@ package edu.ualberta.med.biobank.forms;
 
 import java.util.Collection;
 
-import org.apache.commons.collections.MapIterator;
 import org.apache.commons.collections.map.ListOrderedMap;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.Assert;
@@ -14,13 +13,10 @@ import org.eclipse.swt.widgets.Label;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
-import edu.ualberta.med.biobank.common.wrappers.PvInfoDataWrapper;
-import edu.ualberta.med.biobank.common.wrappers.PvInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PvSampleSourceWrapper;
-import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.model.PvCustomInfo;
 import edu.ualberta.med.biobank.treeview.PatientVisitAdapter;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
-import edu.ualberta.med.biobank.treeview.StudyAdapter;
 import edu.ualberta.med.biobank.widgets.infotables.PvSampleSourceInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.SamplesListWidget;
 
@@ -39,19 +35,7 @@ public class PatientVisitViewForm extends BiobankViewForm {
 
     private SamplesListWidget samplesWidget;
 
-    // used to keep track of which data has been entered or left blank for
-    // a patient visit.
-    class CombinedPvInfo {
-        PvInfoWrapper pvInfo;
-        PvInfoDataWrapper pvInfoData;
-
-        public CombinedPvInfo() {
-            pvInfo = null;
-            pvInfoData = null;
-        }
-    }
-
-    private ListOrderedMap combinedPvInfoMap;
+    private ListOrderedMap pvCustomInfoMap;
 
     private Label clinicLabel;
 
@@ -63,7 +47,7 @@ public class PatientVisitViewForm extends BiobankViewForm {
 
     public PatientVisitViewForm() {
         super();
-        combinedPvInfoMap = new ListOrderedMap();
+        pvCustomInfoMap = new ListOrderedMap();
 
     }
 
@@ -93,7 +77,7 @@ public class PatientVisitViewForm extends BiobankViewForm {
         createSamplesSection();
     }
 
-    private void createMainSection() {
+    private void createMainSection() throws Exception {
         Composite client = toolkit.createComposite(form.getBody());
         GridLayout layout = new GridLayout(2, false);
         layout.horizontalSpacing = 10;
@@ -117,56 +101,35 @@ public class PatientVisitViewForm extends BiobankViewForm {
         setPatientVisitValues();
     }
 
-    private void createPvDataSection(Composite client) {
-        StudyWrapper study = patientVisitAdapter.getParentFromClass(
-            StudyAdapter.class).getWrapper();
-
-        // get all PvInfo from study, since user may not have filled in all
-        // fields
-        for (PvInfoWrapper pvInfo : study.getPvInfoCollection()) {
-            CombinedPvInfo combinedPvInfo = new CombinedPvInfo();
-            combinedPvInfo.pvInfo = pvInfo;
-            combinedPvInfoMap.put(pvInfo.getId(), combinedPvInfo);
-        }
-
-        Collection<PvInfoDataWrapper> pvInfoDataCollection = patientVisitWrapper
-            .getPvInfoDataCollection();
-        if (pvInfoDataCollection != null) {
-            for (PvInfoDataWrapper pvInfoData : pvInfoDataCollection) {
-                Integer key = pvInfoData.getPvInfo().getId();
-                CombinedPvInfo combinedPvInfo = (CombinedPvInfo) combinedPvInfoMap
-                    .get(key);
-                combinedPvInfo.pvInfoData = pvInfoData;
-            }
-        }
+    private void createPvDataSection(Composite client) throws Exception {
+        String[] labels = patientVisitWrapper.getPvInfoLabels();
+        if (labels == null)
+            return;
 
         Label widget;
-        MapIterator it = combinedPvInfoMap.mapIterator();
-        while (it.hasNext()) {
-            it.next();
-            CombinedPvInfo combinedPvInfo = (CombinedPvInfo) it.getValue();
-            String type = combinedPvInfo.pvInfo.getPvInfoType().getType();
-            String value = "";
+        for (String label : labels) {
+            PvCustomInfo combinedPvInfo = new PvCustomInfo();
+            combinedPvInfo.label = label;
+            combinedPvInfo.type = patientVisitWrapper.getPvInfoType(label);
+            combinedPvInfo.value = patientVisitWrapper.getPvInfo(label);
 
-            if (combinedPvInfo.pvInfoData != null) {
-                value = combinedPvInfo.pvInfoData.getValue();
-            }
+            pvCustomInfoMap.put(label, combinedPvInfo);
 
-            Label labelWidget = toolkit.createLabel(client,
-                combinedPvInfo.pvInfo.getLabel() + ":", SWT.LEFT);
+            Label labelWidget = toolkit.createLabel(client, label + ":",
+                SWT.LEFT);
             labelWidget.setLayoutData(new GridData(
                 GridData.VERTICAL_ALIGN_BEGINNING));
 
             int style = SWT.BORDER | SWT.LEFT;
-            if (type.equals("text") || type.equals("select_multiple")) {
+            if (combinedPvInfo.type.equals(1) || combinedPvInfo.type.equals(5)) {
                 style |= SWT.WRAP;
             }
 
-            if ((value != null) && type.equals("select_multiple")) {
-                value = value.replace(';', '\n');
+            if ((combinedPvInfo.value != null) && combinedPvInfo.type.equals(5)) {
+                combinedPvInfo.value = combinedPvInfo.value.replace(';', '\n');
             }
 
-            widget = toolkit.createLabel(client, value, style);
+            widget = toolkit.createLabel(client, combinedPvInfo.value, style);
             GridData gd = new GridData(GridData.FILL_HORIZONTAL);
             widget.setLayoutData(gd);
         }

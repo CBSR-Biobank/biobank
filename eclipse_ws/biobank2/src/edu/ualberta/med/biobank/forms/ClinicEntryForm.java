@@ -55,7 +55,6 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
                 + adapter.getClass().getName());
         clinicAdapter = (ClinicAdapter) adapter;
         clinicWrapper = clinicAdapter.getWrapper();
-        addressWrapper = clinicWrapper.getAddress();
 
         String tabName;
         if (clinicWrapper.getId() == null)
@@ -87,7 +86,7 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
                 "Clinics can be associated with studies after submitting this initial information.",
                 SWT.LEFT);
         createClinicInfoSection();
-        createAddressArea();
+        createAddressArea(clinicWrapper);
         createContactSection();
         createButtonsSection();
 
@@ -151,7 +150,6 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
             .getParentFromClass(SiteAdapter.class);
         clinicWrapper.setSite(siteAdapter.getWrapper());
         saveContacts();
-        addressWrapper.persist();
         clinicWrapper.persist();
     }
 

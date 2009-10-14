@@ -1,9 +1,9 @@
 package edu.ualberta.med.biobank.forms;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -13,8 +13,8 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
-import edu.ualberta.med.biobank.common.wrappers.PvInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.model.PvCustomInfo;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
 import edu.ualberta.med.biobank.widgets.infotables.SampleSourceInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.SampleStorageInfoTable;
@@ -36,12 +36,11 @@ public class StudyViewForm extends BiobankViewForm {
     private SampleStorageInfoTable sampleStorageTable;
     private SampleSourceInfoTable sampleSourceTable;
 
-    private List<PvInfoLabelPair> pvInfoControlList;
-
-    class PvInfoLabelPair {
-        public PvInfoWrapper pvInfo;
-        public Label label;
+    private class StudyPvCustomInfo extends PvCustomInfo {
+        public Label wiget;
     }
+
+    private List<StudyPvCustomInfo> pvCustomInfoList;
 
     @Override
     public void init() throws Exception {
@@ -55,7 +54,7 @@ public class StudyViewForm extends BiobankViewForm {
         // after first opening
         studyWrapper.reload();
         setPartName("Study " + studyWrapper.getNameShort());
-        pvInfoControlList = new ArrayList<PvInfoLabelPair>();
+        pvCustomInfoList = new ArrayList<StudyPvCustomInfo>();
     }
 
     @Override
@@ -86,7 +85,7 @@ public class StudyViewForm extends BiobankViewForm {
         createClinicSection();
         createSampleStorageSection();
         createSampleSourceSection();
-        createPvDataSection();
+        createPvCustomInfoSection();
         setStudySectionValues();
         setPvDataSectionValues();
     }
@@ -129,41 +128,46 @@ public class StudyViewForm extends BiobankViewForm {
         toolkit.paintBordersFor(sampleStorageTable);
     }
 
-    private void createPvDataSection() {
+    private void createPvCustomInfoSection() throws Exception {
         Composite client = createSectionWithClient("Patient Visit Information Collected");
         client.setLayout(new GridLayout(1, false));
 
-        Collection<PvInfoWrapper> pvInfos = studyWrapper.getPvInfoCollection();
-        if ((pvInfos == null) || (pvInfos.size() == 0)) {
+        for (String label : studyWrapper.getPvInfoLabels()) {
+            StudyPvCustomInfo combinedPvInfo = new StudyPvCustomInfo();
+            combinedPvInfo.label = label;
+            combinedPvInfo.type = studyWrapper.getPvInfoType(label);
+            combinedPvInfo.allowedValues = studyWrapper
+                .getPvInfoAllowedValues(label);
+            pvCustomInfoList.add(combinedPvInfo);
+        }
+
+        if (pvCustomInfoList.size() == 0) {
             toolkit.createLabel(client,
                 "Study does not collect additional patient visit information");
             return;
         }
 
         Composite subcomp;
-        for (PvInfoWrapper pvInfo : pvInfos) {
+        for (StudyPvCustomInfo pvCustomInfo : pvCustomInfoList) {
             subcomp = toolkit.createComposite(client);
             subcomp.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-            if (pvInfo.getPossibleValues() != null) {
+            if (pvCustomInfo.allowedValues != null) {
                 subcomp.setLayout(new GridLayout(2, false));
 
-                PvInfoLabelPair pair = new PvInfoLabelPair();
-                pair.pvInfo = pvInfo;
-                pair.label = (Label) createWidget(subcomp, Label.class,
-                    SWT.NONE, pvInfo.getLabel());
-                pvInfoControlList.add(pair);
+                pvCustomInfo.wiget = (Label) createWidget(subcomp, Label.class,
+                    SWT.NONE, pvCustomInfo.label);
             } else {
                 subcomp.setLayout(new GridLayout(1, false));
-                toolkit.createLabel(subcomp, pvInfo.getLabel());
+                toolkit.createLabel(subcomp, pvCustomInfo.label);
             }
         }
     }
 
-    private void setPvDataSectionValues() {
-        for (PvInfoLabelPair pair : pvInfoControlList) {
-            FormUtils.setTextValue(pair.label, pair.pvInfo.getPossibleValues()
-                .replaceAll(";", "; "));
+    private void setPvDataSectionValues() throws Exception {
+        for (StudyPvCustomInfo pvCustomInfo : pvCustomInfoList) {
+            FormUtils.setTextValue(pvCustomInfo.wiget, StringUtils.join(
+                studyWrapper.getPvInfoAllowedValues(pvCustomInfo.label), "; "));
         }
     }
 

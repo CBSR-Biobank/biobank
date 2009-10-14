@@ -108,10 +108,9 @@ public class TopContainerChooserPage extends AbstractContainerChooserPage {
         if (occupiedContainer.hasChildren()) {
             total = occupiedContainer.getChildren().size();
         }
-        int capacityTotal = occupiedContainer.getContainerType().getCapacity()
+        int capacityTotal = occupiedContainer.getContainerType()
             .getRowCapacity()
-            * occupiedContainer.getContainerType().getCapacity()
-                .getColCapacity();
+            * occupiedContainer.getContainerType().getColCapacity();
         full = (total == capacityTotal);
 
         if (full) {

@@ -23,7 +23,6 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
-import edu.ualberta.med.biobank.common.wrappers.CapacityWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.Position;
@@ -144,9 +143,8 @@ public class ContainerViewForm extends BiobankViewForm {
     private void initCells() {
         try {
             ContainerTypeWrapper containerType = container.getContainerType();
-            CapacityWrapper cap = containerType.getCapacity();
-            Integer rowCap = cap.getRowCapacity();
-            Integer colCap = cap.getColCapacity();
+            Integer rowCap = container.getRowCapacity();
+            Integer colCap = container.getColCapacity();
             Assert.isNotNull(rowCap, "row capacity is null");
             Assert.isNotNull(colCap, "column capacity is null");
             if (rowCap == 0)
