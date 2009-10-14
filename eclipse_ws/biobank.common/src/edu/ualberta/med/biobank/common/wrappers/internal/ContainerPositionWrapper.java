@@ -1,14 +1,19 @@
-package edu.ualberta.med.biobank.common.wrappers;
+package edu.ualberta.med.biobank.common.wrappers.internal;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.RowColPos;
+import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerPosition;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class ContainerPositionWrapper extends
-    AbstractPositionWrapper<ContainerPosition> implements
-    Comparable<ContainerPositionWrapper> {
+    AbstractPositionWrapper<ContainerPosition> {
 
     public ContainerPositionWrapper(WritableApplicationService appService,
         ContainerPosition wrappedObject) {
@@ -21,22 +26,16 @@ public class ContainerPositionWrapper extends
 
     @Override
     protected String[] getPropertyChangesNames() {
-        String[] parentStrings = super.getPropertyChangesNames();
-        String[] properties = new String[parentStrings.length + 2];
-        properties[0] = new String("parentContainer");
-        properties[1] = new String("container");
-        for (int i = 2; i < parentStrings.length + 2; i++)
-            properties[i] = (parentStrings[i - 2]);
-        return properties;
+        List<String> properties = new ArrayList<String>(Arrays.asList(super
+            .getPropertyChangesNames()));
+        properties.add("parentContainer");
+        properties.add("container");
+        return properties.toArray(new String[properties.size()]);
     }
 
     @Override
     public Class<ContainerPosition> getWrappedClass() {
         return ContainerPosition.class;
-    }
-
-    @Override
-    protected void persistChecks() throws BiobankCheckException, Exception {
     }
 
     public void setParentContainer(Container parentContainer) {
@@ -94,12 +93,15 @@ public class ContainerPositionWrapper extends
 
     @Override
     protected void deleteChecks() throws BiobankCheckException, Exception {
-        // TODO Auto-generated method stub
     }
 
     @Override
-    public int compareTo(ContainerPositionWrapper o) {
-        return getContainer().compareTo(o.getContainer());
+    public int compareTo(ModelWrapper<ContainerPosition> modelWrapper) {
+        if (modelWrapper instanceof ContainerPositionWrapper) {
+            return getContainer().compareTo(
+                ((ContainerPositionWrapper) modelWrapper).getContainer());
+        }
+        return 0;
     }
 
 }

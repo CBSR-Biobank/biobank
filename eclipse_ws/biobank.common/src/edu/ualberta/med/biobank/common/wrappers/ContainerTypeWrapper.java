@@ -19,8 +19,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
-public class ContainerTypeWrapper extends ModelWrapper<ContainerType> implements
-    Comparable<ContainerTypeWrapper> {
+public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
 
     public ContainerTypeWrapper(WritableApplicationService appService,
         ContainerType wrappedObject) {
@@ -258,12 +257,24 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> implements
         propertyChangeSupport.firePropertyChange("site", oldSite, site);
     }
 
+    public void setSite(SiteWrapper site) {
+        setSite(site.getWrappedObject());
+    }
+
     public SiteWrapper getSite() {
         Site site = wrappedObject.getSite();
         if (site == null) {
             return null;
         }
         return new SiteWrapper(appService, site);
+    }
+
+    public CapacityWrapper getCapacity() {
+        Capacity capacity = wrappedObject.getCapacity();
+        if (capacity == null) {
+            return null;
+        }
+        return new CapacityWrapper(appService, capacity);
     }
 
     public void setCapacity(Capacity capacity) {
@@ -273,8 +284,8 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> implements
             capacity);
     }
 
-    public Capacity getCapacity() {
-        return wrappedObject.getCapacity();
+    public void setCapacity(CapacityWrapper capacity) {
+        setCapacity(capacity.wrappedObject);
     }
 
     public void setChildLabelingScheme(ContainerLabelingSchemeWrapper scheme) {
@@ -371,7 +382,7 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> implements
     private void checkNewCapacity(ContainerType oldObject,
         boolean existsContainersWithType) throws BiobankCheckException,
         Exception {
-        Capacity currentCapacity = getCapacity();
+        CapacityWrapper currentCapacity = getCapacity();
         Capacity dbCapacity = oldObject.getCapacity();
         if (!(currentCapacity.getRowCapacity().equals(
             dbCapacity.getRowCapacity()) && currentCapacity.getColCapacity()
@@ -458,10 +469,11 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> implements
     }
 
     @Override
-    public int compareTo(ContainerTypeWrapper type) {
-        String c1Name = getName();
-        String c2Name = type.getName();
+    public int compareTo(ModelWrapper<ContainerType> type) {
+        String c1Name = wrappedObject.getName();
+        String c2Name = type.wrappedObject.getName();
         return ((c1Name.compareTo(c2Name) > 0) ? 1 : (c1Name.equals(c2Name) ? 0
             : -1));
     }
+
 }

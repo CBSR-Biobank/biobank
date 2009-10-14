@@ -16,12 +16,9 @@ import org.eclipse.swt.widgets.Display;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
 import edu.ualberta.med.biobank.model.Container;
-import edu.ualberta.med.biobank.model.Sample;
-import edu.ualberta.med.biobank.model.SamplePosition;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.NodeSearchVisitor;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
-import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class SamplesListWidget extends InfoTableWidget<SampleWrapper> {
 
@@ -31,8 +28,6 @@ public class SamplesListWidget extends InfoTableWidget<SampleWrapper> {
 
     private static final int[] BOUNDS = new int[] { 130, 130, 150, 150, -1, -1,
         -1 };
-
-    private WritableApplicationService appService;
 
     private SiteAdapter siteAdapter;
 
@@ -46,11 +41,9 @@ public class SamplesListWidget extends InfoTableWidget<SampleWrapper> {
     }
 
     public SamplesListWidget(Composite parent,
-        WritableApplicationService appService,
-        Collection<SamplePosition> samplePositionCollection) {
+        Collection<SampleWrapper> sampleCollection) {
         this(parent);
-        this.appService = appService;
-        setSamplePositions(samplePositionCollection);
+        setSamples(sampleCollection);
     }
 
     public SamplesListWidget(Composite parent, SiteAdapter siteAdapter,
@@ -78,16 +71,15 @@ public class SamplesListWidget extends InfoTableWidget<SampleWrapper> {
                 BiobankCollectionModel item = (BiobankCollectionModel) ((StructuredSelection) selection)
                     .getFirstElement();
                 Assert
-                    .isTrue(item.o instanceof Sample,
+                    .isTrue(item.o instanceof SampleWrapper,
                         "Invalid class where sample expected: "
                             + item.o.getClass());
 
-                Sample sample = (Sample) item.o;
-                SamplePosition sp = sample.getSamplePosition();
-                if (sp != null) {
+                SampleWrapper sample = (SampleWrapper) item.o;
+                if (sample.hasParent()) {
                     AdapterBase node = siteAdapter
-                        .accept(new NodeSearchVisitor(Container.class, sp
-                            .getContainer().getId()));
+                        .accept(new NodeSearchVisitor(Container.class, sample
+                            .getParent().getId()));
                     if (node != null) {
                         SessionManager.getInstance().setSelectedNode(node);
                         node.performDoubleClick();
@@ -97,13 +89,12 @@ public class SamplesListWidget extends InfoTableWidget<SampleWrapper> {
         });
     }
 
-    private void setSamplePositions(
-        final Collection<SamplePosition> samplePositionCollection) {
-        if (samplePositionCollection == null)
+    private void setSamples(final Collection<SampleWrapper> sampleCollection) {
+        if (sampleCollection == null)
             return;
 
         // Initialise collection
-        for (int i = 0, n = samplePositionCollection.size(); i < n; ++i) {
+        for (int i = 0, n = sampleCollection.size(); i < n; ++i) {
             model.add(new BiobankCollectionModel());
         }
         getTableViewer().refresh();
@@ -115,9 +106,9 @@ public class SamplesListWidget extends InfoTableWidget<SampleWrapper> {
                 Display display = viewer.getTable().getDisplay();
                 int count = 0;
 
-                if (model.size() != samplePositionCollection.size()) {
+                if (model.size() != sampleCollection.size()) {
                     model.clear();
-                    for (int i = 0, n = samplePositionCollection.size(); i < n; ++i) {
+                    for (int i = 0, n = sampleCollection.size(); i < n; ++i) {
                         model.add(new BiobankCollectionModel());
                     }
                     display.asyncExec(new Runnable() {
@@ -129,16 +120,14 @@ public class SamplesListWidget extends InfoTableWidget<SampleWrapper> {
                 }
 
                 try {
-                    for (SamplePosition position : samplePositionCollection) {
+                    for (SampleWrapper sample : sampleCollection) {
                         if (viewer.getTable().isDisposed())
                             return;
 
                         final BiobankCollectionModel modelItem = model
                             .get(count);
-                        SampleWrapper w = new SampleWrapper(appService,
-                            position.getSample());
-                        w.loadAttributes();
-                        modelItem.o = w.getWrappedObject();
+                        sample.loadAttributes();
+                        modelItem.o = sample;
                         ++count;
 
                         display.asyncExec(new Runnable() {
@@ -156,13 +145,10 @@ public class SamplesListWidget extends InfoTableWidget<SampleWrapper> {
         t.start();
     }
 
-    public void setSelection(Sample selectedSample) {
+    public void setSelection(SampleWrapper selectedSample) {
         if (selectedSample == null)
             return;
-
-        // we need to get sample by ID, as the equals method from the cacore
-        // object doesn't work well !
-        SampleWrapper sw = samples.get(selectedSample.getId());
-        getTableViewer().setSelection(new StructuredSelection(sw), true);
+        getTableViewer().setSelection(new StructuredSelection(selectedSample),
+            true);
     }
 }

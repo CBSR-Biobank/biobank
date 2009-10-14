@@ -18,10 +18,9 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
-import edu.ualberta.med.biobank.model.SampleStorage;
-import edu.ualberta.med.biobank.model.SampleType;
-import edu.ualberta.med.biobank.validators.DoubleNumber;
-import edu.ualberta.med.biobank.validators.IntegerNumber;
+import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
+import edu.ualberta.med.biobank.validators.DoubleNumberValidator;
+import edu.ualberta.med.biobank.validators.IntegerNumberValidator;
 
 public class SampleStorageDialog extends BiobankDialog {
 
@@ -29,24 +28,25 @@ public class SampleStorageDialog extends BiobankDialog {
 
     private SampleStorageWrapper origSampleStorage;
 
-    private SampleStorage sampleStorage;
+    private SampleStorageWrapper sampleStorage;
 
-    private HashMap<String, SampleType> sampleTypeMap;
+    private HashMap<String, SampleTypeWrapper> sampleTypeMap;
 
     private CCombo sampleTypesCombo;
 
     public SampleStorageDialog(Shell parent,
-        SampleStorageWrapper sampleStorage, Collection<SampleType> sampleTypes) {
+        SampleStorageWrapper sampleStorage,
+        Collection<SampleTypeWrapper> sampleTypes) {
         super(parent);
         Assert.isNotNull(sampleStorage);
         Assert.isNotNull(sampleTypes);
-        this.sampleStorage = new SampleStorage();
+        this.origSampleStorage = sampleStorage;
+        this.sampleStorage = new SampleStorageWrapper(null);
         this.sampleStorage.setSampleType(sampleStorage.getSampleType());
         this.sampleStorage.setVolume(sampleStorage.getVolume());
         this.sampleStorage.setQuantity(sampleStorage.getQuantity());
-        this.origSampleStorage = sampleStorage;
-        sampleTypeMap = new HashMap<String, SampleType>();
-        for (SampleType st : sampleTypes) {
+        sampleTypeMap = new HashMap<String, SampleTypeWrapper>();
+        for (SampleTypeWrapper st : sampleTypes) {
             sampleTypeMap.put(st.getName(), st);
         }
     }
@@ -81,20 +81,20 @@ public class SampleStorageDialog extends BiobankDialog {
             sampleTypesCombo.add(stName);
         }
 
-        SampleType st = origSampleStorage.getSampleType();
+        SampleTypeWrapper st = origSampleStorage.getSampleType();
         if (st != null) {
             sampleTypesCombo.setText(st.getName());
         }
 
         createBoundWidgetWithLabel(contents, Text.class, SWT.BORDER,
             "Volume (ml)", new String[0], PojoObservables.observeValue(
-                sampleStorage, "volume"), DoubleNumber.class,
-            "volume should be a real number");
+                sampleStorage, "volume"), new DoubleNumberValidator(
+                "Volume should be a real number"));
 
         createBoundWidgetWithLabel(contents, Text.class, SWT.BORDER,
             "Quantity", new String[0], PojoObservables.observeValue(
-                sampleStorage, "quantity"), IntegerNumber.class,
-            "quantity should be a whole number");
+                sampleStorage, "quantity"), new IntegerNumberValidator(
+                "Quantity should be a whole number"));
 
         return contents;
     }

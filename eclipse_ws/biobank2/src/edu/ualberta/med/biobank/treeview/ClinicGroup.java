@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.treeview;
 
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
@@ -18,9 +19,11 @@ import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.forms.ClinicEntryForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
-import edu.ualberta.med.biobank.model.Clinic;
 
 public class ClinicGroup extends AdapterBase {
+
+    private static Logger LOGGER = Logger
+        .getLogger(ClinicGroup.class.getName());
 
     public ClinicGroup(SiteAdapter parent, int id) {
         super(parent, id, "Clinics", true);
@@ -37,11 +40,11 @@ public class ClinicGroup extends AdapterBase {
         mi.setText("Add Clinic");
         mi.addSelectionListener(new SelectionListener() {
             public void widgetSelected(SelectionEvent event) {
-                Clinic clinic = new Clinic();
-                clinic.setSite(getParentFromClass(SiteAdapter.class).getSite());
+                ClinicWrapper clinic = new ClinicWrapper(getAppService());
+                clinic.setSite(getParentFromClass(SiteAdapter.class)
+                    .getWrapper());
                 ClinicAdapter clinicAdapter = new ClinicAdapter(
-                    ClinicGroup.this,
-                    new ClinicWrapper(getAppService(), clinic));
+                    ClinicGroup.this, clinic);
                 FormInput input = new FormInput(clinicAdapter);
                 try {
                     PlatformUI.getWorkbench().getActiveWorkbenchWindow()
@@ -65,7 +68,6 @@ public class ClinicGroup extends AdapterBase {
         try {
             // read from database again
             currentSite.reload();
-            ((SiteAdapter) getParent()).setSite(currentSite.getWrappedObject());
 
             List<ClinicWrapper> clinics = currentSite.getClinicCollection(true);
             if (clinics != null)
@@ -82,9 +84,8 @@ public class ClinicGroup extends AdapterBase {
                     }
                 }
         } catch (Exception e) {
-            SessionManager.getLogger().error(
-                "Error while loading clinic group children for site "
-                    + currentSite.getName(), e);
+            LOGGER.error("Error while loading clinic group children for site "
+                + currentSite.getName(), e);
         }
     }
 

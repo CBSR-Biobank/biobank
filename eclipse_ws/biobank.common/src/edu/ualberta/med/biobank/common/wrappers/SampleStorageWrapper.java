@@ -6,15 +6,14 @@ import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.model.Study;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
-public class SampleStorageWrapper extends ModelWrapper<SampleStorage> implements
-    Comparable<SampleStorageWrapper> {
+public class SampleStorageWrapper extends ModelWrapper<SampleStorage> {
 
     public SampleStorageWrapper(WritableApplicationService appService,
         SampleStorage wrappedObject) {
         super(appService, wrappedObject);
     }
 
-    protected SampleStorageWrapper(WritableApplicationService appService) {
+    public SampleStorageWrapper(WritableApplicationService appService) {
         super(appService);
     }
 
@@ -28,15 +27,27 @@ public class SampleStorageWrapper extends ModelWrapper<SampleStorage> implements
         propertyChangeSupport.firePropertyChange("study", oldStudy, study);
     }
 
-    public SampleType getSampleType() {
-        return wrappedObject.getSampleType();
+    public SampleTypeWrapper getSampleType() {
+        SampleType type = wrappedObject.getSampleType();
+        if (type == null) {
+            return null;
+        }
+        return new SampleTypeWrapper(appService, type);
     }
 
     public void setSampleType(SampleType sampleType) {
-        SampleType oldSampleType = getSampleType();
+        SampleType oldSampleType = wrappedObject.getSampleType();
         wrappedObject.setSampleType(sampleType);
         propertyChangeSupport.firePropertyChange("sampleType", oldSampleType,
             sampleType);
+    }
+
+    public void setSampleType(SampleTypeWrapper sampleType) {
+        SampleType type = null;
+        if (sampleType != null) {
+            type = sampleType.getWrappedObject();
+        }
+        setSampleType(type);
     }
 
     public Integer getQuantity() {
@@ -78,11 +89,12 @@ public class SampleStorageWrapper extends ModelWrapper<SampleStorage> implements
     protected void persistChecks() throws BiobankCheckException, Exception {
     }
 
-    public int compareTo(SampleStorageWrapper wrapper) {
-        String myName = wrappedObject.getSampleType().getName();
-        String wrapperName = wrapper.wrappedObject.getSampleType().getName();
-        return ((myName.compareTo(wrapperName) > 0) ? 1 : (myName
-            .equals(wrapperName) ? 0 : -1));
+    @Override
+    public int compareTo(ModelWrapper<SampleStorage> wrapper) {
+        String name1 = wrappedObject.getSampleType().getName();
+        String name2 = wrapper.wrappedObject.getSampleType().getName();
+        return ((name1.compareTo(name2) > 0) ? 1 : (name1.equals(name2) ? 0
+            : -1));
     }
 
 }

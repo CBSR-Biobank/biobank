@@ -1,5 +1,32 @@
-package edu.ualberta.med.biobank;
+package edu.ualberta.med.biobank.helpers;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Random;
+
+import org.apache.log4j.Logger;
+import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.OperationCanceledException;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.IJobChangeEvent;
+import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.core.runtime.jobs.JobChangeAdapter;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.progress.IProgressConstants;
+
+import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.LabelingScheme;
 import edu.ualberta.med.biobank.common.RowColPos;
 import edu.ualberta.med.biobank.model.Address;
@@ -24,42 +51,21 @@ import gov.nih.nci.system.query.example.DeleteExampleQuery;
 import gov.nih.nci.system.query.example.InsertExampleQuery;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Random;
-
-import org.eclipse.core.runtime.Assert;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.OperationCanceledException;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.IJobChangeEvent;
-import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.core.runtime.jobs.JobChangeAdapter;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.ui.progress.IProgressConstants;
-
 /**
  * Accessed via the "**Debug**" main menu item. Invoked by the
  * InitExamplesHandler to populate the database with sample objects.
  * 
- * After re-generation : init some storagetype and storage containers for one
+ * After re-generation : init some storage type and storage containers for one
  * site
  */
-public class InitExamples {
+public class DebugInitializationHelper {
+
+    private static Logger LOGGER = Logger.getLogger(DebugInitializationHelper.class
+        .getName());
 
     private static final int MAX_CLINICS = 2;
 
-    private static WritableApplicationService appService;
+    private WritableApplicationService appService;
 
     private Site site;
     private Study study;
@@ -80,7 +86,7 @@ public class InitExamples {
 
     private HashMap<String, ContainerLabelingScheme> numSchemeMap;
 
-    public InitExamples() {
+    public DebugInitializationHelper() {
         Job job = new Job("Init Examples") {
             @Override
             protected IStatus run(IProgressMonitor monitor) {
@@ -117,17 +123,18 @@ public class InitExamples {
                     // invokes all methods starting with "insert"
                     for (String methodName : insertMethodNames) {
                         monitor.subTask("invoking " + methodName);
-                        Method method = InitExamples.class.getDeclaredMethod(
-                            methodName, new Class<?>[] {});
+                        Method method = DebugInitializationHelper.class
+                            .getDeclaredMethod(methodName, new Class<?>[] {});
                         method.setAccessible(true);
-                        method.invoke(InitExamples.this, new Object[] {});
+                        method
+                            .invoke(DebugInitializationHelper.this, new Object[] {});
                         monitor.worked(1);
                         method.setAccessible(false);
                         if (monitor.isCanceled())
                             throw new OperationCanceledException();
                     }
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    LOGGER.error("initialization error", e);
                     return Status.CANCEL_STATUS;
                 } finally {
                     monitor.done();
@@ -157,7 +164,6 @@ public class InitExamples {
                                     .openError("Init Examples",
                                         "Error encounted when adding init examples");
                         } catch (Exception e) {
-                            // TODO Auto-generated catch block
                             e.printStackTrace();
                         }
                     }

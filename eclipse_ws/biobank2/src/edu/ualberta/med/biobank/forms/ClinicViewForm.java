@@ -39,7 +39,7 @@ public class ClinicViewForm extends AddressViewFormCommon {
         clinicAdapter = (ClinicAdapter) adapter;
         clinicWrapper = clinicAdapter.getWrapper();
         clinicWrapper.reload();
-        addressWrapper = clinicWrapper.getAddressWrapper();
+        addressWrapper = clinicWrapper.getAddress();
         setPartName("Clinic: " + clinicWrapper.getName());
     }
 
@@ -96,8 +96,7 @@ public class ClinicViewForm extends AddressViewFormCommon {
     protected void createStudiesSection() throws Exception {
         Composite client = createSectionWithClient("Studies");
 
-        studiesTable = new ClinicStudyInfoTable(client, appService,
-            clinicWrapper);
+        studiesTable = new ClinicStudyInfoTable(client, clinicWrapper);
         studiesTable.adaptToToolkit(toolkit, true);
         toolkit.paintBordersFor(studiesTable);
 

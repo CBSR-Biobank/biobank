@@ -102,15 +102,9 @@ public abstract class AbstractPatientAdminForm extends BiobankEntryForm {
             + SessionManager.getInstance().getSession().getUserName();
         options.jobName = "scannedLinkedActivity";
         final Runnable styledTextPrinter = sText.print(printer, options);
-        Thread printingThread = new Thread("Printing") { //$NON-NLS-1$
-            @Override
-            public void run() {
-                styledTextPrinter.run();
-                printer.dispose();
-                font.dispose();
-            }
-        };
-        printingThread.start();
+        styledTextPrinter.run();
+        printer.dispose();
+        font.dispose();
     }
 
     protected abstract String getActivityTitle();

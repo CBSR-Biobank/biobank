@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.forms;
 
 import org.apache.commons.collections.MapIterator;
 import org.apache.commons.collections.map.ListOrderedMap;
+import org.apache.log4j.Logger;
 import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.jface.action.Action;
@@ -22,7 +23,6 @@ import org.eclipse.ui.PartInitException;
 import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
-import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 
 /**
@@ -31,6 +31,9 @@ import edu.ualberta.med.biobank.forms.input.FormInput;
  * view.
  */
 public abstract class BiobankViewForm extends BiobankFormBase {
+
+    private static Logger LOGGER = Logger.getLogger(BiobankViewForm.class
+        .getName());
 
     protected String sessionName;
 
@@ -87,7 +90,7 @@ public abstract class BiobankViewForm extends BiobankFormBase {
                         } catch (final RemoteConnectFailureException exp) {
                             BioBankPlugin.openRemoteConnectErrorMessage();
                         } catch (Exception e) {
-                            SessionManager.getLogger().error(
+                            LOGGER.error(
                                 "BioBankFormBase.createPartControl Error", e);
                         }
                     }
@@ -112,8 +115,7 @@ public abstract class BiobankViewForm extends BiobankFormBase {
                             getSite().getPage().openEditor(
                                 new FormInput(adapter), getEntryFormId(), true);
                         } catch (PartInitException exp) {
-                            SessionManager.getLogger().error(
-                                "Can't open the entry form", exp);
+                            LOGGER.error("Can't open the entry form", exp);
                         }
                     }
                 });

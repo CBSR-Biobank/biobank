@@ -43,4 +43,9 @@ public class PvInfoTypeWrapper extends ModelWrapper<PvInfoType> {
         propertyChangeSupport.firePropertyChange("type", oldType, type);
     }
 
+    @Override
+    public int compareTo(ModelWrapper<PvInfoType> o) {
+        return 0;
+    }
+
 }

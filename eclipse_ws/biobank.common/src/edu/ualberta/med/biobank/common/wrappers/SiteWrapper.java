@@ -20,19 +20,10 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
-public class SiteWrapper extends ModelWrapper<Site> implements
-    Comparable<SiteWrapper> {
-
-    private AddressWrapper addressWrapper;
+public class SiteWrapper extends ModelWrapper<Site> {
 
     public SiteWrapper(WritableApplicationService appService, Site wrappedObject) {
         super(appService, wrappedObject);
-        Address address = wrappedObject.getAddress();
-        if (address == null) {
-            address = new Address();
-            wrappedObject.setAddress(address);
-        }
-        addressWrapper = new AddressWrapper(appService, address);
     }
 
     public SiteWrapper(WritableApplicationService appService) {
@@ -41,17 +32,9 @@ public class SiteWrapper extends ModelWrapper<Site> implements
 
     @Override
     protected String[] getPropertyChangesNames() {
-        return new String[] { "name", "activityStatus", "comment",
+        return new String[] { "name", "activityStatus", "comment", "address",
             "clinicCollection", "siteCollection", "containerCollection",
             "sampleTypeCollection" };
-    }
-
-    public AddressWrapper getAddressWrapper() {
-        return addressWrapper;
-    }
-
-    public void setAddressWrapper(AddressWrapper addressWrapper) {
-        this.addressWrapper = addressWrapper;
     }
 
     public String getName() {
@@ -86,6 +69,25 @@ public class SiteWrapper extends ModelWrapper<Site> implements
             .firePropertyChange("comment", oldComment, comment);
     }
 
+    public AddressWrapper getAddress() {
+        Address address = wrappedObject.getAddress();
+        if (address == null) {
+            return null;
+        }
+        return new AddressWrapper(appService, address);
+    }
+
+    public void setAddress(Address address) {
+        Address oldAddress = wrappedObject.getAddress();
+        wrappedObject.setAddress(address);
+        propertyChangeSupport
+            .firePropertyChange("address", oldAddress, address);
+    }
+
+    public void setAddress(AddressWrapper study) {
+        setAddress(study.wrappedObject);
+    }
+
     @Override
     protected void persistChecks() throws BiobankCheckException, Exception {
         if (!checkSiteNameUnique()) {
@@ -117,14 +119,16 @@ public class SiteWrapper extends ModelWrapper<Site> implements
 
     @Override
     protected void deleteChecks() throws BiobankCheckException, Exception {
-        // TODO Auto-generated method stub
-    }
+        if (getClinicCollection().size() > 0
+            || getContainerCollection().size() > 0
+            || getContainerTypeCollection().size() > 0
+            || getStudyCollection().size() > 0) {
+            throw new BiobankCheckException(
+                "Unable to delete site "
+                    + getName()
+                    + ". All defined children (studies, clinics, container types, and containers) must be removed first.");
+        }
 
-    public int compareTo(SiteWrapper wrapper) {
-        String myName = wrappedObject.getName();
-        String wrapperName = wrapper.wrappedObject.getName();
-        return ((myName.compareTo(wrapperName) > 0) ? 1 : (myName
-            .equals(wrapperName) ? 0 : -1));
     }
 
     @SuppressWarnings("unchecked")
@@ -270,8 +274,8 @@ public class SiteWrapper extends ModelWrapper<Site> implements
             topContainerCollection = new ArrayList<ContainerWrapper>();
             HQLCriteria criteria = new HQLCriteria("from "
                 + Container.class.getName()
-                + " where site.id = ? and position is null", Arrays
-                .asList(new Object[] { wrappedObject.getId() }));
+                + " where site.id = ? and containerType.topLevel = true",
+                Arrays.asList(new Object[] { wrappedObject.getId() }));
             List<Container> containers = appService.query(criteria);
             for (Container c : containers) {
                 topContainerCollection.add(new ContainerWrapper(appService, c));
@@ -379,4 +383,48 @@ public class SiteWrapper extends ModelWrapper<Site> implements
         }
     }
 
+    @Override
+    public int compareTo(ModelWrapper<Site> wrapper) {
+        String name1 = wrappedObject.getName();
+        String name2 = wrapper.wrappedObject.getName();
+        return ((name1.compareTo(name2) > 0) ? 1 : (name1.equals(name2) ? 0
+            : -1));
+    }
+
+    /**
+     * get all site existing
+     */
+    public static Collection<SiteWrapper> getAllSites(
+        WritableApplicationService appService) throws Exception {
+        List<Site> sites = appService.search(Site.class, new Site());
+        Collection<SiteWrapper> wrappers = new HashSet<SiteWrapper>();
+        for (Site s : sites) {
+            wrappers.add(new SiteWrapper(appService, s));
+        }
+        return wrappers;
+    }
+
+    /**
+     * If "id" is null, then all sites are returned. If not not, then only sites
+     * with that id are returned.
+     */
+    public static Collection<SiteWrapper> getSites(
+        WritableApplicationService appService, Integer id) throws Exception {
+        HQLCriteria criteria;
+
+        if (id == null) {
+            criteria = new HQLCriteria("from " + Site.class.getName());
+        } else {
+            criteria = new HQLCriteria("from " + Site.class.getName()
+                + " where id = ?", Arrays.asList(new Object[] { id }));
+        }
+
+        List<Site> sites = appService.query(criteria);
+
+        Collection<SiteWrapper> wrappers = new HashSet<SiteWrapper>();
+        for (Site s : sites) {
+            wrappers.add(new SiteWrapper(appService, s));
+        }
+        return wrappers;
+    }
 }

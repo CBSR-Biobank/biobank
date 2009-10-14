@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.eclipse.core.databinding.beans.PojoObservables;
+import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.observable.value.WritableValue;
 import org.eclipse.core.runtime.Assert;
@@ -19,8 +19,8 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.common.wrappers.PvSampleSourceWrapper;
-import edu.ualberta.med.biobank.model.SampleSource;
-import edu.ualberta.med.biobank.validators.IntegerNumber;
+import edu.ualberta.med.biobank.common.wrappers.SampleSourceWrapper;
+import edu.ualberta.med.biobank.validators.IntegerNumberValidator;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
 
 public class PvSampleSourceDialog extends BiobankDialog {
@@ -29,7 +29,7 @@ public class PvSampleSourceDialog extends BiobankDialog {
 
     private PvSampleSourceWrapper pvSampleSource;
 
-    private HashMap<String, SampleSource> sampleSourceMap;
+    private HashMap<String, SampleSourceWrapper> sampleSourceMap;
 
     private CCombo sampleSourcesCombo;
 
@@ -38,13 +38,13 @@ public class PvSampleSourceDialog extends BiobankDialog {
 
     public PvSampleSourceDialog(Shell parent,
         PvSampleSourceWrapper pvSampleSource,
-        Collection<SampleSource> sampleSources) {
+        Collection<SampleSourceWrapper> sampleSources) {
         super(parent);
         Assert.isNotNull(pvSampleSource);
         Assert.isNotNull(sampleSources);
         this.pvSampleSource = pvSampleSource;
-        sampleSourceMap = new HashMap<String, SampleSource>();
-        for (SampleSource ss : sampleSources) {
+        sampleSourceMap = new HashMap<String, SampleSourceWrapper>();
+        for (SampleSourceWrapper ss : sampleSources) {
             sampleSourceMap.put(ss.getName(), ss);
         }
     }
@@ -77,14 +77,14 @@ public class PvSampleSourceDialog extends BiobankDialog {
                 .toArray(new String[sortedKeys.size()]), sampleSourceSelection,
             new NonEmptyString("a sample source should be selected"));
 
-        SampleSource ss = pvSampleSource.getSampleSource();
+        SampleSourceWrapper ss = pvSampleSource.getSampleSource();
         if (ss != null) {
             sampleSourcesCombo.setText(ss.getName());
         }
 
         createBoundWidgetWithLabel(contents, Text.class, SWT.BORDER,
-            "Quantity", new String[0], PojoObservables.observeValue(
-                pvSampleSource, "quantity"), new IntegerNumber(
+            "Quantity", new String[0], BeansObservables.observeValue(
+                pvSampleSource, "quantity"), new IntegerNumberValidator(
                 "quantity should be a whole number", false));
 
         return contents;
@@ -92,8 +92,8 @@ public class PvSampleSourceDialog extends BiobankDialog {
 
     @Override
     protected void okPressed() {
-        pvSampleSource.setSampleSource(sampleSourceMap.get(sampleSourcesCombo
-            .getText()));
+        pvSampleSource.setSampleSource(sampleSourceMap.get(
+            sampleSourcesCombo.getText()).getWrappedObject());
         super.okPressed();
     }
 

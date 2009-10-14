@@ -5,8 +5,8 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
@@ -71,13 +71,7 @@ public class ModelObjectQuery {
         clause = new AttributeQueryClause(attributeQueries, QueryPage
             .filterMethods(modelObjectClass), alias, view);
 
-        radio.addSelectionListener(new SelectionListener() {
-            @Override
-            public void widgetDefaultSelected(SelectionEvent e) {
-                // TODO Auto-generated method stub
-
-            }
-
+        radio.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 setEnabled(!getEnabled());

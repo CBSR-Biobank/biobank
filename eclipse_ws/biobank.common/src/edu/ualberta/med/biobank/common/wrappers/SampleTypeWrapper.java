@@ -15,8 +15,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
-public class SampleTypeWrapper extends ModelWrapper<SampleType> implements
-    Comparable<SampleTypeWrapper> {
+public class SampleTypeWrapper extends ModelWrapper<SampleType> {
 
     public SampleTypeWrapper(WritableApplicationService appService,
         SampleType wrappedObject) {
@@ -147,22 +146,6 @@ public class SampleTypeWrapper extends ModelWrapper<SampleType> implements
         // do nothing for now
     }
 
-    @Override
-    public int compareTo(SampleTypeWrapper wrapper) {
-        String myName = wrappedObject.getName();
-        String wrapperName = wrapper.wrappedObject.getName();
-
-        int compare = myName.compareTo(wrapperName);
-        if (compare == 0) {
-            String myNameShort = wrappedObject.getNameShort();
-            String wrapperNameShort = wrapper.wrappedObject.getNameShort();
-
-            return ((myNameShort.compareTo(wrapperNameShort) > 0) ? 1
-                : (myNameShort.equals(wrapperNameShort) ? 0 : -1));
-        }
-        return (compare > 0) ? 1 : -1;
-    }
-
     public static List<SampleTypeWrapper> transformToWrapperList(
         WritableApplicationService appService, List<SampleType> sampleTypes) {
         List<SampleTypeWrapper> list = new ArrayList<SampleTypeWrapper>();
@@ -236,5 +219,21 @@ public class SampleTypeWrapper extends ModelWrapper<SampleType> implements
                 ss.delete();
             }
         }
+    }
+
+    @Override
+    public int compareTo(ModelWrapper<SampleType> wrapper) {
+        String name1 = wrappedObject.getName();
+        String name2 = wrapper.wrappedObject.getName();
+
+        int compare = name1.compareTo(name2);
+        if (compare == 0) {
+            String nameShort1 = wrappedObject.getNameShort();
+            String nameShort2 = wrapper.wrappedObject.getNameShort();
+
+            return ((nameShort1.compareTo(nameShort2) > 0) ? 1 : (nameShort1
+                .equals(nameShort2) ? 0 : -1));
+        }
+        return (compare > 0) ? 1 : -1;
     }
 }

@@ -15,7 +15,6 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Label;
 
-import edu.ualberta.med.biobank.common.wrappers.ContainerPositionWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.model.ContainerCell;
@@ -24,11 +23,11 @@ import edu.ualberta.med.biobank.model.ContainerStatus;
 public class PalletPositionChooserPage extends AbstractContainerChooserPage {
 
     public static final String NAME = "HOTEL_CONTAINER";
-    private ContainerPositionWrapper selectedPosition;
     private ContainerTypeWrapper containerType;
 
     private ComboViewer comboViewer;
     private Combo combo;
+    private ContainerCell selectedPosition;
 
     protected PalletPositionChooserPage() {
         super(NAME);
@@ -102,7 +101,7 @@ public class PalletPositionChooserPage extends AbstractContainerChooserPage {
         boolean complete = false;
         ContainerCell cell = containerWidget.getPositionAtCoordinates(e.x, e.y);
         if (cell.getStatus() == ContainerStatus.NOT_INITIALIZED) {
-            this.selectedPosition = cell.getPosition();
+            this.selectedPosition = cell;
             int positionText = selectedPosition.getRow() + 1;
             textPosition.setText(String.valueOf(positionText));
             complete = true;
@@ -121,7 +120,7 @@ public class PalletPositionChooserPage extends AbstractContainerChooserPage {
         return cell;
     }
 
-    public ContainerPositionWrapper getSelectedPosition() {
+    public ContainerCell getSelectedPosition() {
         return selectedPosition;
     }
 
@@ -130,9 +129,8 @@ public class PalletPositionChooserPage extends AbstractContainerChooserPage {
     }
 
     @Override
-    protected void setStatus(ContainerCell cell,
-        ContainerWrapper occupiedContainer) {
-        if (occupiedContainer == null) {
+    protected void setStatus(ContainerCell cell) {
+        if (cell.getContainer() == null) {
             cell.setStatus(ContainerStatus.NOT_INITIALIZED);
         } else {
             cell.setStatus(ContainerStatus.INITIALIZED);
@@ -144,8 +142,7 @@ public class PalletPositionChooserPage extends AbstractContainerChooserPage {
         for (int i = 0; i < cells.length; i++) {
             for (int j = 0; j < cells[i].length; j++) {
                 if (cells[i][j] == null) {
-                    ContainerCell cell = new ContainerCell(
-                        newContainerPosition(i, j));
+                    ContainerCell cell = new ContainerCell(i, j);
                     cell.setStatus(ContainerStatus.NOT_INITIALIZED);
                     cells[i][j] = cell;
                 }

@@ -9,6 +9,7 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
 
+import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
@@ -38,10 +39,9 @@ public class SiteEntryForm extends AddressEntryFormCommon {
         try {
             siteWrapper.reload();
         } catch (Exception e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        addressWrapper = siteWrapper.getAddressWrapper();
+        addressWrapper = siteWrapper.getAddress();
 
         String tabName;
         if (siteWrapper.getId() == null) {
@@ -77,18 +77,20 @@ public class SiteEntryForm extends AddressEntryFormCommon {
         client.setLayout(layout);
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
+        form.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
+            BioBankPlugin.IMG_SITE));
 
         firstControl = createBoundWidgetWithLabel(client, Text.class, SWT.NONE,
             "Name", null, BeansObservables.observeValue(siteWrapper, "name"),
-            NonEmptyString.class, MSG_NO_SITE_NAME);
+            new NonEmptyString(MSG_NO_SITE_NAME));
 
         createBoundWidgetWithLabel(client, Combo.class, SWT.NONE,
             "Activity Status", FormConstants.ACTIVITY_STATUS, BeansObservables
-                .observeValue(siteWrapper, "activityStatus"), null, null);
+                .observeValue(siteWrapper, "activityStatus"), null);
 
         Text comment = (Text) createBoundWidgetWithLabel(client, Text.class,
             SWT.MULTI, "Comments", null, BeansObservables.observeValue(
-                siteWrapper, "comment"), null, null);
+                siteWrapper, "comment"), null);
         GridData gd = new GridData(GridData.FILL_HORIZONTAL);
         gd.heightHint = 40;
         comment.setLayoutData(gd);

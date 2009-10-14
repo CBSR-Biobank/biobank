@@ -61,8 +61,8 @@ public class BioBankPlugin extends AbstractUIPlugin {
     public static final String IMG_CABINET_LINK_ASSIGN = "cabinetLinkAssign";
     public static final String IMG_CLINIC = "clinic";
     public static final String IMG_CLINICS = "clinics";
-    public static final String IMG_COMPUTER = "computer";
-    public static final String IMG_COMPUTER_DELETE = "computerDelete";
+    public static final String IMG_LOGIN = "login";
+    public static final String IMG_LOGOUT = "logout";
     public static final String IMG_COMPUTER_KEY = "computerKey";
     public static final String IMG_CONTAINER_TYPES = "containerTypes";
     public static final String IMG_CONTAINERS = "containers";
@@ -74,8 +74,6 @@ public class BioBankPlugin extends AbstractUIPlugin {
     public static final String IMG_PALLET = "pallet";
     public static final String IMG_PATIENT = "patient";
     public static final String IMG_PATIENT_VISIT = "patientVisit";
-    public static final String IMG_PATIENT_ADD = "patientAdd";
-    public static final String IMG_PATIENT_VISIT_ADD = "patientVisitAdd";
     public static final String IMG_RELOAD_FORM = "reloadForm";
     public static final String IMG_REPORTS = "reports";
     public static final String IMG_SCAN_ASSIGN = "scanAssign";
@@ -155,10 +153,10 @@ public class BioBankPlugin extends AbstractUIPlugin {
             "cabinetLinkAssign.png");
         registerImage(registry, IMG_CLINIC, "clinic.png");
         registerImage(registry, IMG_CLINICS, "clinics.png");
-        registerImage(registry, IMG_COMPUTER, "computer.png");
+        registerImage(registry, IMG_LOGIN, "computer.png");
         registerImage(registry, IMG_COMPUTER_KEY, "computer_key.png");
-        registerImage(registry, IMG_COMPUTER_DELETE, "computer_delete.png");
-        registerImage(registry, IMG_CONTAINER_TYPES, "container_types.png");
+        registerImage(registry, IMG_LOGOUT, "computer_delete.png");
+        registerImage(registry, IMG_CONTAINER_TYPES, "containerTypes.png");
         registerImage(registry, IMG_CONTAINERS, "containers.png");
         registerImage(registry, IMG_DELETE, "delete.png");
         registerImage(registry, IMG_DRAWER, "drawer.png");
@@ -167,9 +165,7 @@ public class BioBankPlugin extends AbstractUIPlugin {
         registerImage(registry, IMG_MAIN_PERSPECTIVE, "mainPerspective.png");
         registerImage(registry, IMG_PALLET, "pallet.png");
         registerImage(registry, IMG_PATIENT, "patient.png");
-        registerImage(registry, IMG_PATIENT_VISIT, "patientvisit_add.png");
-        registerImage(registry, IMG_PATIENT_ADD, "patient_add.png");
-        registerImage(registry, IMG_PATIENT_VISIT_ADD, "patientvisit_add.png");
+        registerImage(registry, IMG_PATIENT_VISIT, "patientVisit.png");
         registerImage(registry, IMG_RELOAD_FORM, "reload.png");
         registerImage(registry, IMG_REPORTS, "reports.png");
         registerImage(registry, IMG_SCAN_ASSIGN, "scanAssign.png");
@@ -178,7 +174,6 @@ public class BioBankPlugin extends AbstractUIPlugin {
         registerImage(registry, IMG_SITE, "site.png");
         registerImage(registry, IMG_STUDIES, "studies.png");
         registerImage(registry, IMG_STUDY, "study.png");
-        registerImage(registry, IMG_USER_ADD, "user_add.png");
     }
 
     private void registerImage(ImageRegistry registry, String key,
@@ -373,8 +368,7 @@ public class BioBankPlugin extends AbstractUIPlugin {
     }
 
     public Image getImage(Object element) {
-        String imageKey = classToImageKey
-            .get(element.getClass().getName());
+        String imageKey = classToImageKey.get(element.getClass().getName());
         if ((imageKey == null)
             && ((element instanceof ContainerAdapter) || (element instanceof ContainerTypeAdapter))) {
             String ctName;
@@ -390,6 +384,9 @@ public class BioBankPlugin extends AbstractUIPlugin {
     }
 
     public Image getIconForTypeName(String typeName) {
+        if (typeName == null) {
+            return null;
+        }
         if (classToImageKey.containsKey(typeName)) {
             return BioBankPlugin.getDefault().getImageRegistry().get(
                 classToImageKey.get(typeName));

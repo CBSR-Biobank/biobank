@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.treeview;
 
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
@@ -16,9 +17,10 @@ import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.forms.StudyEntryForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
-import edu.ualberta.med.biobank.model.Study;
 
 public class StudyGroup extends AdapterBase {
+
+    private static Logger LOGGER = Logger.getLogger(StudyGroup.class.getName());
 
     public StudyGroup(SiteAdapter parent, int id) {
         super(parent, id, "Studies", true);
@@ -39,10 +41,10 @@ public class StudyGroup extends AdapterBase {
         mi.setText("Add Study");
         mi.addSelectionListener(new SelectionListener() {
             public void widgetSelected(SelectionEvent event) {
-                Study study = new Study();
-                study.setSite(getParentFromClass(SiteAdapter.class).getSite());
-                StudyAdapter adapter = new StudyAdapter(StudyGroup.this,
-                    new StudyWrapper(parent.getAppService(), study));
+                StudyWrapper study = new StudyWrapper(parent.getAppService());
+                study.setSite(getParentFromClass(SiteAdapter.class)
+                    .getWrapper());
+                StudyAdapter adapter = new StudyAdapter(StudyGroup.this, study);
                 openForm(new FormInput(adapter), StudyEntryForm.ID);
             }
 
@@ -58,7 +60,6 @@ public class StudyGroup extends AdapterBase {
         try {
             // read from database again
             currentSite.reload();
-            ((SiteAdapter) getParent()).setSite(currentSite.getWrappedObject());
 
             List<StudyWrapper> studies = currentSite.getStudyCollection(true);
             if (studies != null)
@@ -75,9 +76,8 @@ public class StudyGroup extends AdapterBase {
                     }
                 }
         } catch (Exception e) {
-            SessionManager.getLogger().error(
-                "Error while loading study group children for site "
-                    + currentSite.getName(), e);
+            LOGGER.error("Error while loading study group children for site "
+                + currentSite.getName(), e);
         }
     }
 

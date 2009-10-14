@@ -25,6 +25,8 @@ import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
@@ -48,7 +50,6 @@ import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
 import edu.ualberta.med.biobank.forms.listener.EnterKeyToNextFieldListener;
 import edu.ualberta.med.biobank.model.PalletCell;
-import edu.ualberta.med.biobank.model.Sample;
 import edu.ualberta.med.biobank.model.SampleCellStatus;
 import edu.ualberta.med.biobank.model.SampleStorage;
 import edu.ualberta.med.biobank.model.Study;
@@ -63,8 +64,6 @@ import edu.ualberta.med.biobank.widgets.listener.ScanPalletModificationListener;
 import edu.ualberta.med.scanlib.ScanCell;
 import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
 import gov.nih.nci.system.applicationservice.ApplicationException;
-import gov.nih.nci.system.query.SDKQuery;
-import gov.nih.nci.system.query.example.InsertExampleQuery;
 
 /**
  * Link samples to a patient visit
@@ -164,14 +163,17 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
                 }
             }
         });
-        dbc.bindValue(new WritableValue(Boolean.FALSE, Boolean.class),
-            scanOkValue, uvs, uvs);
+        bindValue(new WritableValue(Boolean.FALSE, Boolean.class), scanOkValue,
+            uvs, uvs);
         scanOkValue.setValue(false);
 
         createPalletSection();
 
         cancelConfirmWidget = new CancelConfirmWidget(form.getBody(), this,
             true);
+        SampleTypeSelectionWidget lastWidget = sampleTypeWidgets
+            .get(sampleTypeWidgets.size() - 1);
+        lastWidget.setNextWidget(cancelConfirmWidget);
 
         uvs = new UpdateValueStrategy();
         uvs.setAfterConvertValidator(new IValidator() {
@@ -184,7 +186,7 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
                 }
             }
         });
-        dbc.bindValue(new WritableValue(Boolean.FALSE, Boolean.class),
+        bindValue(new WritableValue(Boolean.FALSE, Boolean.class),
             scannedValue, uvs, uvs);
         scannedValue.setValue(false);
 
@@ -200,7 +202,7 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
             }
 
         });
-        dbc.bindValue(new WritableValue(Boolean.TRUE, Boolean.class),
+        bindValue(new WritableValue(Boolean.TRUE, Boolean.class),
             typesFilledValue, uvs, uvs);
     }
 
@@ -277,10 +279,10 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
                     selectionStackLayout.topControl = typesSelectionPerRowComposite;
                     selectionComp.layout();
                     for (SampleTypeSelectionWidget sampleType : sampleTypeWidgets) {
-                        sampleType.addBinding(dbc);
+                        sampleType.addBinding(widgetCreator);
                         sampleType.resetValues(false);
                     }
-                    customSelection.addBinding(dbc);
+                    customSelection.addBinding(widgetCreator);
                     spw.disableSelection();
                     typesFilledValue.setValue(Boolean.TRUE);
                     spw.redraw();
@@ -294,9 +296,9 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
                     selectionStackLayout.topControl = typesSelectionCustomComposite;
                     selectionComp.layout();
                     for (SampleTypeSelectionWidget sampleType : sampleTypeWidgets) {
-                        sampleType.removeBinding(dbc);
+                        sampleType.removeBinding(widgetCreator);
                     }
-                    customSelection.addBinding(dbc);
+                    customSelection.addBinding(widgetCreator);
                     spw.enableSelection();
                     typesFilledValue.setValue(spw.isEverythingTyped());
                     spw.redraw();
@@ -357,6 +359,7 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
         toolkit.paintBordersFor(typesSelectionPerRowComposite);
 
         sampleTypeWidgets = new ArrayList<SampleTypeSelectionWidget>();
+        SampleTypeSelectionWidget precedent = null;
         for (int i = 0; i < ScanCell.ROW_MAX; i++) {
             final SampleTypeSelectionWidget typeWidget = new SampleTypeSelectionWidget(
                 typesSelectionPerRowComposite,
@@ -372,25 +375,13 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
                     }
 
                 });
-            typeWidget.addBinding(dbc);
+            typeWidget.addBinding(widgetCreator);
             sampleTypeWidgets.add(typeWidget);
+            if (precedent != null) {
+                precedent.setNextWidget(typeWidget);
+            }
+            precedent = typeWidget;
         }
-        SampleTypeSelectionWidget lastWidget = sampleTypeWidgets
-            .get(sampleTypeWidgets.size() - 1);
-        lastWidget.addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyReleased(KeyEvent e) {
-                if (e.keyCode == 13) {
-                    cancelConfirmWidget.setFocus();
-                }
-            }
-        });
-        lastWidget.addFocusListener(new FocusAdapter() {
-            @Override
-            public void focusLost(FocusEvent e) {
-                cancelConfirmWidget.setFocus();
-            }
-        });
     }
 
     private void createFieldsComposite() throws Exception {
@@ -406,29 +397,29 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
 
         patientNumberText = (Text) createBoundWidgetWithLabel(fieldsComposite,
             Text.class, SWT.NONE, "Patient Number", new String[0],
-            patientNumberValue, NonEmptyString.class, "Enter a patient number");
-        patientNumberText.addListener(SWT.DefaultSelection, new Listener() {
-            public void handleEvent(Event e) {
-                setVisitsList();
-            }
-        });
-        firstControl = patientNumberText;
-
-        firstControl = patientNumberText;
-
-        patientNumberText.addKeyListener(EnterKeyToNextFieldListener.INSTANCE);
+            patientNumberValue, new NonEmptyString("Enter a patient number"));
         patientNumberText.addFocusListener(new FocusAdapter() {
             @Override
             public void focusLost(FocusEvent e) {
                 setVisitsList();
+
             }
         });
+        patientNumberText.addModifyListener(new ModifyListener() {
+            @Override
+            public void modifyText(ModifyEvent e) {
+                reset(false);
+            }
+        });
+        patientNumberText.addKeyListener(EnterKeyToNextFieldListener.INSTANCE);
+        firstControl = patientNumberText;
+
         createVisitCombo(fieldsComposite);
 
         plateToScanText = (Text) createBoundWidgetWithLabel(fieldsComposite,
             Text.class, SWT.NONE, "Plate to Scan", new String[0],
-            plateToScanValue, ScannerBarcodeValidator.class,
-            "Enter a valid plate barcode");
+            plateToScanValue, new ScannerBarcodeValidator(
+                "Enter a valid plate barcode"));
         plateToScanText.addListener(SWT.DefaultSelection, new Listener() {
             public void handleEvent(Event e) {
                 if (scanButton.isEnabled()) {
@@ -472,17 +463,23 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
             public void keyReleased(KeyEvent e) {
                 if (e.keyCode == 13) {
                     plateToScanText.setFocus();
+                    e.doit = false;
                 }
             }
         });
-        viewerVisits
-            .addSelectionChangedListener(new ISelectionChangedListener() {
-                @Override
-                public void selectionChanged(SelectionChangedEvent event) {
-                    setDateProcessedField();
-                }
-            });
-
+        // viewerVisits
+        // .addSelectionChangedListener(new ISelectionChangedListener() {
+        // @Override
+        // public void selectionChanged(SelectionChangedEvent event) {
+        // setDateProcessedField();
+        // }
+        // });
+        viewerVisits.getCCombo().addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusLost(FocusEvent e) {
+                setDateProcessedField();
+            }
+        });
         dateProcessedLabel = (Label) createWidget(compositeFields, Label.class,
             SWT.NONE, "Date processed");
     }
@@ -514,9 +511,13 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
     private void setDateProcessedField() {
         PatientVisitWrapper pv = getSelectedPatientVisit();
         if (pv != null) {
-            dateProcessedLabel.setText(pv.getFormattedDateProcessed());
-            appendLog("Visit selected " + pv.getFormattedDateProcessed()
-                + " - " + pv.getClinic().getName());
+            String date = pv.getFormattedDateProcessed();
+            System.out.println(date);
+            dateProcessedLabel.setText(date);
+            appendLog("Visit selected " + date + " - "
+                + pv.getClinic().getName());
+        } else {
+            dateProcessedLabel.setText("");
         }
     }
 
@@ -570,8 +571,7 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
         if (cell != null) {
             String value = cell.getValue();
             if (value != null) {
-                boolean exists = checkSampleExists(value);
-                if (exists) {
+                if (SampleWrapper.exists(appService, value)) {
                     cell.setStatus(SampleCellStatus.ERROR);
                     String msg = "Aliquot already in database";
                     cell.setInformation(msg);
@@ -588,26 +588,13 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
         return false;
     }
 
-    protected boolean checkSampleExists(String inventoryId)
-        throws ApplicationException {
-        Sample sample = new Sample();
-        sample.setInventoryId(inventoryId);
-        List<Sample> samples = appService.search(Sample.class, sample);
-        if (samples.size() == 0) {
-            return false;
-        }
-        return true;
-    }
-
     @Override
     protected void saveForm() throws Exception {
-        List<SDKQuery> queries = new ArrayList<SDKQuery>();
         PalletCell[][] cells = spw.getScannedElements();
         PatientVisitWrapper patientVisit = getSelectedPatientVisit();
         StringBuffer sb = new StringBuffer("Samples linked:");
         int nber = 0;
-        Study study = patientVisit.getPatientWrapper().getStudy()
-            .getWrappedObject();
+        Study study = patientVisit.getPatient().getStudy().getWrappedObject();
         Collection<SampleStorage> sampleStorages = study
             .getSampleStorageCollection();
         for (int indexRow = 0; indexRow < cells.length; indexRow++) {
@@ -619,8 +606,7 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
                     SampleWrapper sample = SampleWrapper.createNewSample(
                         appService, cell.getValue(), patientVisit, cell
                             .getType(), sampleStorages);
-                    queries.add(new InsertExampleQuery(sample
-                        .getWrappedObject()));
+                    sample.persist();
                     sb.append("\nLINKED: ").append(cell.getValue());
                     sb.append(" - patient: ").append(
                         patientVisit.getWrappedObject().getPatient()
@@ -633,7 +619,6 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
                 }
             }
         }
-        appService.executeBatchQuery(queries);
         appendLog("----");
         appendLog(sb.toString());
         appendLog("SCAN-LINK: " + nber + " samples linked to visit");
@@ -661,14 +646,16 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
         int indexRow) {
         if (typeWidget.needToSave()) {
             SampleTypeWrapper type = typeWidget.getSelection();
-            PalletCell[][] cells = spw.getScannedElements();
-            if (cells != null) {
-                for (int indexColumn = 0; indexColumn < cells[indexRow].length; indexColumn++) {
-                    PalletCell cell = cells[indexRow][indexColumn];
-                    if (PalletCell.hasValue(cell)) {
-                        cell.setType(type);
-                        cell.setStatus(SampleCellStatus.TYPE);
-                        spw.redraw();
+            if (type != null) {
+                PalletCell[][] cells = spw.getScannedElements();
+                if (cells != null) {
+                    for (int indexColumn = 0; indexColumn < cells[indexRow].length; indexColumn++) {
+                        PalletCell cell = cells[indexRow][indexColumn];
+                        if (PalletCell.hasValue(cell)) {
+                            cell.setType(type);
+                            cell.setStatus(SampleCellStatus.TYPE);
+                            spw.redraw();
+                        }
                     }
                 }
             }
@@ -676,19 +663,27 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
     }
 
     @Override
-    public void resetForm() {
-        patientNumberText.setText("");
+    public void reset() {
+        reset(true);
+    }
+
+    public void reset(boolean resetAll) {
         viewerVisits.setInput(null);
         currentPatient = null;
-        plateToScanText.setText("");
         cancelConfirmWidget.reset();
         scanButton.setEnabled(false);
-        plateToScanValue.setValue("");
         scannedValue.setValue(Boolean.FALSE);
-        spw.setScannedElements(null);
-        for (SampleTypeSelectionWidget stw : sampleTypeWidgets) {
-            stw.resetValues(true);
+        dateProcessedLabel.setText("");
+        if (resetAll) {
+            patientNumberText.setText("");
+            plateToScanText.setText("");
+            plateToScanValue.setValue("");
+            spw.setScannedElements(null);
+            for (SampleTypeSelectionWidget stw : sampleTypeWidgets) {
+                stw.resetValues(true);
+            }
         }
+        setFocus();
     }
 
     @Override

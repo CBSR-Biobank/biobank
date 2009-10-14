@@ -11,7 +11,7 @@ public class SiteClinicInfo {
 
     public int patients;
 
-    public Long patientVisits;
+    public int patientVisits;
 
     public void performDoubleClick() {
         SessionManager.getInstance().openViewForm(Study.class,

@@ -1,22 +1,24 @@
 package edu.ualberta.med.biobank.forms;
 
-import java.util.List;
-
+import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 
-import edu.ualberta.med.biobank.model.Sample;
+import edu.ualberta.med.biobank.common.wrappers.Position;
+import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
 import edu.ualberta.med.biobank.treeview.SampleAdapter;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class SampleViewForm extends BiobankViewForm {
+
+    private static Logger LOGGER = Logger.getLogger(SampleViewForm.class
+        .getName());
 
     public static final String ID = "edu.ualberta.med.biobank.forms.SampleViewForm";
 
     private SampleAdapter sampleAdapter;
-    private Sample sample;
+    private SampleWrapper sample;
 
     @Override
     public void init() {
@@ -25,22 +27,16 @@ public class SampleViewForm extends BiobankViewForm {
                 + adapter.getClass().getName());
 
         sampleAdapter = (SampleAdapter) adapter;
+        sample = sampleAdapter.getSample();
         retrieveSample();
         setPartName("Sample: " + sample.getInventoryId());
     }
 
     private void retrieveSample() {
-        List<Sample> result;
-        Sample searchSample = new Sample();
-        searchSample.setId(sampleAdapter.getSample().getId());
         try {
-            result = sampleAdapter.getAppService().search(Sample.class,
-                searchSample);
-            Assert.isTrue(result.size() == 1);
-            sample = result.get(0);
-            sampleAdapter.setSample(sample);
-        } catch (ApplicationException e) {
-            e.printStackTrace();
+            sample.reload();
+        } catch (Exception e) {
+            LOGGER.error("Can't reload sample with id " + sample.getId());
         }
     }
 
@@ -59,11 +55,11 @@ public class SampleViewForm extends BiobankViewForm {
         client.setLayout(layout);
 
         String string = "Type = " + sample.getSampleType().getName() + "\n";
-        if (sample.getSamplePosition() == null) {
-            string += "No position - should be assign to a location";
+        if (sample.hasParent()) {
+            Position position = sample.getPosition();
+            string += "Position = " + position.row + ":" + position.col;
         } else {
-            string += "Position = " + sample.getSamplePosition().getRow() + ":"
-                + sample.getSamplePosition().getCol();
+            string += "No position - should be assign to a location";
         }
         toolkit.createLabel(client, string);
     }

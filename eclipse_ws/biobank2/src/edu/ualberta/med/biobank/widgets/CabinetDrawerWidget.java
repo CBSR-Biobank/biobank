@@ -2,7 +2,7 @@ package edu.ualberta.med.biobank.widgets;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.List;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.PaintEvent;
@@ -14,8 +14,7 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 
-import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.wrappers.ContainerPositionWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.model.ContainerCell;
 import edu.ualberta.med.biobank.model.ContainerStatus;
 
@@ -55,13 +54,8 @@ public class CabinetDrawerWidget extends Canvas {
         super(parent, SWT.DOUBLE_BUFFERED);
         cells = new ContainerCell[boxNumber][1];
         for (int i = 0; i < boxNumber; i++) {
-            ContainerPositionWrapper pos = new ContainerPositionWrapper(
-                SessionManager.getAppService());
-            pos.setRow(i);
-            pos.setCol(0);
             ContainerStatus stat = ContainerStatus.NOT_INITIALIZED;
-            ContainerCell cell = new ContainerCell();
-            cell.setPosition(pos);
+            ContainerCell cell = new ContainerCell(i, 0);
             cell.setStatus(stat);
             cells[i][0] = cell;
         }
@@ -162,11 +156,10 @@ public class CabinetDrawerWidget extends Canvas {
         redraw();
     }
 
-    public void setContainersStatus(
-        Collection<ContainerPositionWrapper> childPositionCollection) {
-        for (ContainerPositionWrapper position : childPositionCollection) {
-            int pos = position.getRow().intValue();
-            cells[pos][0] = new ContainerCell(position);
+    public void setContainersStatus(List<ContainerWrapper> children) {
+        for (ContainerWrapper child : children) {
+            int pos = child.getPosition().row;
+            cells[pos][0] = new ContainerCell(pos, 0, child);
             cells[pos][0].setStatus(ContainerStatus.INITIALIZED);
         }
         LEGEND_WIDTH = WIDTH / legendStatus.size();

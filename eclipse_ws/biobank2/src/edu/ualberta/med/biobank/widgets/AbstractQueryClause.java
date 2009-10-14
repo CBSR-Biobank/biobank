@@ -4,6 +4,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -18,7 +19,11 @@ import edu.ualberta.med.biobank.views.AdvancedReportsView;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public abstract class AbstractQueryClause {
-    protected AdvancedReportsView view;
+    
+  private static Logger LOGGER = Logger.getLogger(AbstractQueryClause.class
+        .getName());
+
+  protected AdvancedReportsView view;
     protected String alias;
     protected List<Method> attributes;
 

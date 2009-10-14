@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -33,6 +34,10 @@ import edu.ualberta.med.biobank.widgets.ReportsLabelProvider;
 import edu.ualberta.med.biobank.widgets.infotables.InfoTableWidget;
 
 public class ReportsView extends ViewPart {
+
+    @SuppressWarnings("unused")
+    private static Logger LOGGER = Logger
+        .getLogger(ReportsView.class.getName());
 
     public static final String ID = "edu.ualberta.med.biobank.views.ReportsView";
     private ScrolledComposite sc;

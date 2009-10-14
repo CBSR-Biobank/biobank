@@ -7,11 +7,11 @@ import org.eclipse.core.databinding.validation.ValidationStatus;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 
-public class DoubleNumber extends AbstractValidator {
+public class DoubleNumberValidator extends AbstractValidator {
 
     private static final Pattern pattern = Pattern.compile("^[0-9\\.\\+-]*$");
 
-    public DoubleNumber(String message) {
+    public DoubleNumberValidator(String message) {
         super(message);
     }
 

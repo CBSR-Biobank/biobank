@@ -4,7 +4,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.eclipse.core.databinding.beans.PojoObservables;
+import org.apache.log4j.Logger;
+import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.observable.value.WritableValue;
 import org.eclipse.core.runtime.IStatus;
@@ -43,10 +44,10 @@ import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
+import edu.ualberta.med.biobank.common.wrappers.Position;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
 import edu.ualberta.med.biobank.forms.listener.EnterKeyToNextFieldListener;
-import edu.ualberta.med.biobank.model.Sample;
 import edu.ualberta.med.biobank.preferences.PreferenceConstants;
 import edu.ualberta.med.biobank.validators.CabinetLabelValidator;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
@@ -56,6 +57,9 @@ import edu.ualberta.med.biobank.widgets.ViewContainerWidget;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
+
+    private static Logger LOGGER = Logger
+        .getLogger(CabinetLinkAssignEntryForm.class.getName());
 
     public static final String ID = "edu.ualberta.med.biobank.forms.CabinetLinkAssignEntryForm";
 
@@ -99,7 +103,7 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
     protected void init() {
         super.init();
         setPartName("Cabinet Link/Assign");
-        sampleWrapper = new SampleWrapper(appService, new Sample());
+        sampleWrapper = new SampleWrapper(appService);
         IPreferenceStore store = BioBankPlugin.getDefault()
             .getPreferenceStore();
         cabinetNameContains = store
@@ -165,7 +169,7 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
 
         patientNumberText = (Text) createBoundWidgetWithLabel(fieldsComposite,
             Text.class, SWT.NONE, "Patient Number", new String[0],
-            patientNumberValue, NonEmptyString.class, "Enter a patient number");
+            patientNumberValue, new NonEmptyString("Enter a patient number"));
         patientNumberText.addListener(SWT.DefaultSelection, new Listener() {
             public void handleEvent(Event e) {
                 setVisitsList();
@@ -183,8 +187,8 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
 
         inventoryIdText = (Text) createBoundWidgetWithLabel(fieldsComposite,
             Text.class, SWT.NONE, "Inventory ID", new String[0],
-            PojoObservables.observeValue(sampleWrapper, "inventoryId"),
-            NonEmptyString.class, "Enter Inventory Id");
+            BeansObservables.observeValue(sampleWrapper, "inventoryId"),
+            new NonEmptyString("Enter Inventory Id"));
         inventoryIdText.addKeyListener(EnterKeyToNextFieldListener.INSTANCE);
 
         positionText = (Text) createBoundWidgetWithLabel(fieldsComposite,
@@ -246,8 +250,8 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
     private void createVisitCombo(Composite client) {
         comboVisits = (CCombo) createBoundWidgetWithLabel(client, CCombo.class,
             SWT.READ_ONLY | SWT.BORDER | SWT.FLAT, "Visits", new String[0],
-            visitSelectionValue, NonEmptyString.class,
-            "A visit should be selected");
+            visitSelectionValue, new NonEmptyString(
+                "A visit should be selected"));
         GridData gridData = new GridData();
         gridData.grabExcessHorizontalSpace = true;
         gridData.horizontalAlignment = SWT.FILL;
@@ -322,8 +326,7 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
                     sampleWrapper.setSamplePositionFromString(positionString,
                         bin);
                     sampleWrapper.checkPosition(bin);
-                    sampleWrapper.getSamplePosition().setContainer(
-                        bin.getWrappedObject());
+                    sampleWrapper.setParent(bin);
 
                     showPositions();
 
@@ -353,11 +356,10 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
             drawerWidget.setSelectedBin(-1);
             drawerLabel.setText("Drawer");
         } else {
-            Point drawerPosition = new Point(drawer.getPosition().getRow(),
-                drawer.getPosition().getCol());
-            cabinetWidget.setSelectedBox(drawerPosition);
+            Position position = drawer.getPosition();
+            cabinetWidget.setSelectedBox(new Point(position.row, position.col));
             cabinetLabel.setText("Cabinet " + cabinet.getLabel());
-            drawerWidget.setSelectedBin(bin.getPosition().getRow());
+            drawerWidget.setSelectedBin(bin.getPosition().row);
             drawerLabel.setText("Drawer " + drawer.getLabel());
         }
         form.layout(true, true);
@@ -382,8 +384,8 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
                 .getSampleType());
         if (containers.size() == 1) {
             bin = containers.get(0);
-            drawer = bin.getPosition().getParentContainer();
-            cabinet = drawer.getPosition().getParentContainer();
+            drawer = bin.getParent();
+            cabinet = drawer.getParent();
         } else if (containers.size() == 0) {
             containers = ContainerWrapper.getContainersInSite(appService,
                 SessionManager.getInstance().getCurrentSiteWrapper(), binLabel);
@@ -407,17 +409,21 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
     }
 
     @Override
-    public void resetForm() {
-        sampleWrapper.setWrappedObject(new Sample());
-        cabinet = null;
-        drawer = null;
-        bin = null;
-        cabinetWidget.setSelectedBox(null);
-        drawerWidget.setSelectedBin(0);
-        resultShownValue.setValue(Boolean.FALSE);
-        selectedSampleTypeValue.setValue("");
-        inventoryIdText.setText("");
-        positionText.setText("");
+    public void reset() {
+        try {
+            sampleWrapper.reset();
+            cabinet = null;
+            drawer = null;
+            bin = null;
+            cabinetWidget.setSelectedBox(null);
+            drawerWidget.setSelectedBin(0);
+            resultShownValue.setValue(Boolean.FALSE);
+            selectedSampleTypeValue.setValue("");
+            inventoryIdText.setText("");
+            positionText.setText("");
+        } catch (Exception e) {
+            LOGGER.error("Can't reset the form", e);
+        }
     }
 
     @Override

@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.eclipse.core.databinding.beans.PojoObservables;
+import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -55,7 +55,7 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
                 + adapter.getClass().getName());
         clinicAdapter = (ClinicAdapter) adapter;
         clinicWrapper = clinicAdapter.getWrapper();
-        addressWrapper = clinicWrapper.getAddressWrapper();
+        addressWrapper = clinicWrapper.getAddress();
 
         String tabName;
         if (clinicWrapper.getId() == null)
@@ -109,16 +109,16 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
         FormUtils.setTextValue(siteLabel, clinicWrapper.getSite().getName());
 
         firstControl = createBoundWidgetWithLabel(client, Text.class, SWT.NONE,
-            "Name", null, PojoObservables.observeValue(clinicWrapper, "name"),
-            NonEmptyString.class, MSG_NO_CLINIC_NAME);
+            "Name", null, BeansObservables.observeValue(clinicWrapper, "name"),
+            new NonEmptyString(MSG_NO_CLINIC_NAME));
 
         createBoundWidgetWithLabel(client, Combo.class, SWT.NONE,
-            "Activity Status", FormConstants.ACTIVITY_STATUS, PojoObservables
-                .observeValue(clinicWrapper, "activityStatus"), null, null);
+            "Activity Status", FormConstants.ACTIVITY_STATUS, BeansObservables
+                .observeValue(clinicWrapper, "activityStatus"), null);
 
         Text comment = (Text) createBoundWidgetWithLabel(client, Text.class,
-            SWT.MULTI, "Comments", null, PojoObservables.observeValue(
-                clinicWrapper, "comment"), null, null);
+            SWT.MULTI, "Comments", null, BeansObservables.observeValue(
+                clinicWrapper, "comment"), null);
         GridData gd = new GridData(GridData.FILL_HORIZONTAL);
         gd.heightHint = 40;
         comment.setLayoutData(gd);
@@ -146,15 +146,10 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
     }
 
     @Override
-    public void setFocus() {
-        firstControl.setFocus();
-    }
-
-    @Override
     public void saveForm() throws Exception {
         SiteAdapter siteAdapter = clinicAdapter
             .getParentFromClass(SiteAdapter.class);
-        clinicWrapper.setSiteWrapper(siteAdapter.getWrapper());
+        clinicWrapper.setSite(siteAdapter.getWrapper());
         saveContacts();
         addressWrapper.persist();
         clinicWrapper.persist();

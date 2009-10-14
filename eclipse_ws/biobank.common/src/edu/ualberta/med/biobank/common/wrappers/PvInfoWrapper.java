@@ -88,4 +88,9 @@ public class PvInfoWrapper extends ModelWrapper<PvInfo> {
         setPvInfoType(pvInfoType.wrappedObject);
     }
 
+    @Override
+    public int compareTo(ModelWrapper<PvInfo> o) {
+        return 0;
+    }
+
 }

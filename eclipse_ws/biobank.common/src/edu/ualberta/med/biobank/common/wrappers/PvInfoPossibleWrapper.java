@@ -84,4 +84,9 @@ public class PvInfoPossibleWrapper extends ModelWrapper<PvInfoPossible> {
         }
         return wrappers;
     }
+
+    @Override
+    public int compareTo(ModelWrapper<PvInfoPossible> o) {
+        return 0;
+    }
 }

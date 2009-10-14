@@ -25,21 +25,24 @@ import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.utils.ModelUtils;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
-import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.treeview.ContainerTypeAdapter;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
-import edu.ualberta.med.biobank.validators.DoubleNumber;
-import edu.ualberta.med.biobank.validators.IntegerNumber;
+import edu.ualberta.med.biobank.validators.DoubleNumberValidator;
+import edu.ualberta.med.biobank.validators.IntegerNumberValidator;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
 import edu.ualberta.med.biobank.widgets.MultiSelectWidget;
 import edu.ualberta.med.biobank.widgets.listener.BiobankEntryFormWidgetListener;
 import edu.ualberta.med.biobank.widgets.listener.MultiSelectEvent;
 
 public class ContainerTypeEntryForm extends BiobankEntryForm {
+
+    private static Logger LOGGER = Logger
+        .getLogger(ContainerTypeEntryForm.class.getName());
+
     public static final String ID = "edu.ualberta.med.biobank.forms.ContainerTypeEntryForm";
 
     private static final String MSG_NEW_STORAGE_TYPE_OK = "Creating a new storage type.";
@@ -66,7 +69,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
 
     private List<ContainerTypeWrapper> allContainerTypes;
 
-    private Site site;
+    private SiteWrapper site;
 
     private BiobankEntryFormWidgetListener multiSelectListener;
 
@@ -95,8 +98,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         containerTypeAdapter = (ContainerTypeAdapter) adapter;
         containerType = containerTypeAdapter.getContainerType();
         retrieveSiteAndType();
-        allContainerTypes = ContainerTypeWrapper.transformToWrapperList(
-            appService, site.getContainerTypeCollection());
+        allContainerTypes = site.getContainerTypeCollection();
         for (ContainerTypeWrapper type : new ArrayList<ContainerTypeWrapper>(
             allContainerTypes)) {
             if (type.getTopLevel() != null && type.getTopLevel()) {
@@ -116,18 +118,17 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         // FIXME once siteAdapter contains a wrapper, call reload on it
         // to get last inserted types
         site = containerTypeAdapter.getParentFromClass(SiteAdapter.class)
-            .getSite();
+            .getWrapper();
         try {
-            site = ModelUtils.getObjectWithId(appService, Site.class, site
-                .getId());
+            site.reload();
         } catch (Exception e) {
-            SessionManager.getLogger().error("Can't retrieve site", e);
+            LOGGER.error("Can't retrieve site", e);
         }
         try {
             containerType.reload();
         } catch (Exception e) {
-            SessionManager.getLogger().error(
-                "Error while retrieving type " + containerType.getName(), e);
+            LOGGER.error("Error while retrieving type "
+                + containerType.getName(), e);
         }
     }
 
@@ -140,7 +141,6 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
             containerType.getName()));
 
         createContainerTypeSection();
-        createDimensionsSection();
         createContainsSection();
     }
 
@@ -157,16 +157,35 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         FormUtils.setTextValue(siteLabel, containerType.getSite().getName());
         firstControl = createBoundWidgetWithLabel(client, Text.class, SWT.NONE,
             "Name", null, BeansObservables.observeValue(containerType, "name"),
-            NonEmptyString.class, MSG_NO_CONTAINER_TYPE_NAME);
+            new NonEmptyString(MSG_NO_CONTAINER_TYPE_NAME));
 
         createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Short Name",
             null, BeansObservables.observeValue(containerType, "nameShort"),
-            NonEmptyString.class, MSG_NO_CONTAINER_TYPE_NAME_SHORT);
+            new NonEmptyString(MSG_NO_CONTAINER_TYPE_NAME_SHORT));
+
+        if (containerType.getTopLevel() == null) {
+            containerType.setTopLevel(false);
+        }
+        createBoundWidgetWithLabel(client, Button.class, SWT.CHECK,
+            "Top Level Container", null, BeansObservables.observeValue(
+                containerType, "topLevel"), null);
+        toolkit.paintBordersFor(client);
+
+        createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Rows", null,
+            PojoObservables.observeValue(containerType.getCapacity(),
+                "rowCapacity"), new IntegerNumberValidator(
+                "Row capactiy is not a valid number", false));
+
+        createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Columns",
+            null, PojoObservables.observeValue(containerType.getCapacity(),
+                "colCapacity"), new IntegerNumberValidator(
+                "Column capacity is not a valid nubmer", false));
 
         createBoundWidgetWithLabel(client, Text.class, SWT.NONE,
             "Default Temperature\n(Celcius)", null, BeansObservables
                 .observeValue(containerType, "defaultTemperature"),
-            DoubleNumber.class, "Default temperature is not a valid number");
+            new DoubleNumberValidator(
+                "Default temperature is not a valid number"));
 
         ContainerLabelingSchemeWrapper currentScheme = containerType
             .getChildLabelingScheme();
@@ -177,41 +196,14 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
 
         createBoundWidgetWithLabel(client, Combo.class, SWT.NONE,
             "Activity Status", FormConstants.ACTIVITY_STATUS, BeansObservables
-                .observeValue(containerType, "activityStatus"), null, null);
-
-        if (containerType.getTopLevel() == null) {
-            containerType.setTopLevel(false);
-        }
-        createBoundWidgetWithLabel(client, Button.class, SWT.CHECK,
-            "Top Level Container", null, BeansObservables.observeValue(
-                containerType, "topLevel"), null);
+                .observeValue(containerType, "activityStatus"), null);
 
         Text comment = (Text) createBoundWidgetWithLabel(client, Text.class,
             SWT.MULTI, "Comments", null, BeansObservables.observeValue(
-                containerType, "comment"), null, null);
+                containerType, "comment"), null);
         GridData gd = new GridData(GridData.FILL_HORIZONTAL);
         gd.heightHint = 40;
         comment.setLayoutData(gd);
-    }
-
-    private void createDimensionsSection() {
-        Composite client = createSectionWithClient("Default Capacity");
-
-        GridLayout layout = (GridLayout) client.getLayout();
-        layout.numColumns = 2;
-        layout.horizontalSpacing = 10;
-        client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        toolkit.paintBordersFor(client);
-
-        createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Rows", null,
-            PojoObservables.observeValue(containerType.getCapacity(),
-                "rowCapacity"), new IntegerNumber(
-                "Row capactiy is not a valid number", false));
-
-        createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Columns",
-            null, PojoObservables.observeValue(containerType.getCapacity(),
-                "colCapacity"), new IntegerNumber(
-                "Column capacity is not a valid nubmer", false));
     }
 
     private void createContainsSection() throws Exception {
@@ -359,8 +351,4 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         return ContainerTypeViewForm.ID;
     }
 
-    @Override
-    public void setFocus() {
-        firstControl.setFocus();
-    }
 }

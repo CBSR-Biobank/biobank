@@ -1,7 +1,5 @@
 package edu.ualberta.med.biobank.forms;
 
-import java.util.Collection;
-
 import org.eclipse.jface.fieldassist.ControlDecoration;
 import org.eclipse.jface.fieldassist.FieldDecoration;
 import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
@@ -11,21 +9,17 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.widgets.FormToolkit;
-import org.eclipse.ui.forms.widgets.Section;
 
-import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.model.ClinicStudyInfo;
 import edu.ualberta.med.biobank.model.StudyContactAndPatientInfo;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.widgets.infotables.BiobankCollectionModel;
-import edu.ualberta.med.biobank.widgets.infotables.ClinicInfoTable;
 
 /**
  * Static methods for constructing the forms that allow the user to edit / view
@@ -72,22 +66,6 @@ public class FormUtils {
 
     public static Font getHeadingFont() {
         return new Font(null, "sans-serif", 8, SWT.BOLD);
-    }
-
-    public static ClinicInfoTable createClinicSection(FormToolkit toolkit,
-        Composite parent, final Collection<ClinicWrapper> clinics) {
-        Section section = toolkit.createSection(parent, Section.TWISTIE
-            | Section.TITLE_BAR | Section.EXPANDED);
-        section.setText("Clinics");
-        section.setLayout(new GridLayout(1, false));
-        section.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-
-        final ClinicInfoTable comp = new ClinicInfoTable(section, clinics);
-        section.setClient(comp);
-        comp.adaptToToolkit(toolkit, true);
-        comp.getTableViewer().addDoubleClickListener(
-            getBiobankCollectionDoubleClickListener());
-        return comp;
     }
 
     /**

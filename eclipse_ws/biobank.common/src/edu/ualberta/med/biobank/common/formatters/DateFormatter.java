@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.common.formatters;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -28,5 +29,24 @@ public class DateFormatter {
             return "";
         }
         return sdf.format(date);
+    }
+
+    public static Date parseToDate(String string) {
+        return parse(dateFormatter, string);
+    }
+
+    public static Date parseToDateTime(String string) {
+        return parse(dateTimeFormatter, string);
+    }
+
+    public static Date parse(SimpleDateFormat sdf, String string) {
+        if (string == null) {
+            return null;
+        }
+        try {
+            return sdf.parse(string);
+        } catch (ParseException e) {
+            return null;
+        }
     }
 }

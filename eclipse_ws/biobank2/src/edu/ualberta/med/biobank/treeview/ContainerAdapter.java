@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.treeview;
 
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.viewers.TreeViewer;
@@ -16,7 +17,6 @@ import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.wrappers.ContainerPositionWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.dialogs.MoveContainerDialog;
 import edu.ualberta.med.biobank.dialogs.SelectParentContainerDialog;
@@ -26,18 +26,16 @@ import edu.ualberta.med.biobank.forms.input.FormInput;
 
 public class ContainerAdapter extends AdapterBase {
 
+    private static Logger LOGGER = Logger.getLogger(SessionManager.class
+        .getName());
+
     public ContainerAdapter(AdapterBase parent, ContainerWrapper container) {
         super(parent, container);
-        setHasChildren(container.getChildPositionCollection() != null
-            && container.getChildPositionCollection().size() > 0);
+        setHasChildren(container.hasChildren());
     }
 
     public ContainerWrapper getContainer() {
-        return (ContainerWrapper) object;
-    }
-
-    public void setContainer(ContainerWrapper container) {
-        object = container;
+        return (ContainerWrapper) modelObject;
     }
 
     @Override
@@ -115,12 +113,10 @@ public class ContainerAdapter extends AdapterBase {
     @Override
     public void loadChildren(boolean updateNode) {
         try {
-            List<ContainerPositionWrapper> positions = getContainer()
-                .getChildPositionCollection();
-            if (positions != null) {
+            List<ContainerWrapper> children = getContainer().getChildren();
+            if (children != null) {
                 // read from database again
-                for (ContainerPositionWrapper childPosition : positions) {
-                    ContainerWrapper child = childPosition.getContainer();
+                for (ContainerWrapper child : children) {
                     ContainerAdapter node = (ContainerAdapter) getChild(child
                         .getId());
                     if (node == null) {
@@ -134,7 +130,7 @@ public class ContainerAdapter extends AdapterBase {
             } else
                 throw new Exception("Children null.");
         } catch (Exception e) {
-            SessionManager.getLogger().error(
+            LOGGER.error(
                 "Error while loading storage container group children for storage container "
                     + getContainer().getLabel(), e);
         }
@@ -158,11 +154,13 @@ public class ContainerAdapter extends AdapterBase {
 
                         // update new parent
                         ContainerWrapper newParentContainer = getContainer()
-                            .getPosition().getParentContainer();
+                            .getParent();
                         ContainerAdapter parentAdapter = (ContainerAdapter) SessionManager
                             .getInstance().searchNode(newParentContainer);
-                        parentAdapter.getContainer().reload();
-                        parentAdapter.performExpand();
+                        if (parentAdapter != null) {
+                            parentAdapter.getContainer().reload();
+                            parentAdapter.performExpand();
+                        }
                         // update old parent
                         oldParent.getContainer().reload();
                         oldParent.removeAll();
@@ -202,7 +200,7 @@ public class ContainerAdapter extends AdapterBase {
                 } else
                     return;
             }
-            getContainer().setNewParent(newParent, newLabel);
+            container.setNewParent(newParent, newLabel);
         }
         BioBankPlugin.openInformation("Container moved", "The container "
             + oldLabel + " has been moved to " + container.getLabel());

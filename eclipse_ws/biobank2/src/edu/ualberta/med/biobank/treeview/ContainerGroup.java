@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.treeview;
 
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.TreeViewer;
@@ -14,15 +15,17 @@ import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.utils.ModelUtils;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.forms.ContainerEntryForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
-import edu.ualberta.med.biobank.model.Site;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ContainerGroup extends AdapterBase {
+
+    private static Logger LOGGER = Logger.getLogger(ContainerGroup.class
+        .getName());
 
     public ContainerGroup(SiteAdapter parent, int id) {
         super(parent, id, "Containers", true);
@@ -60,8 +63,7 @@ public class ContainerGroup extends AdapterBase {
                         openForm(new FormInput(adapter), ContainerEntryForm.ID);
                     }
                 } catch (ApplicationException ae) {
-                    SessionManager.getLogger().error(
-                        "Problem executing add container", ae);
+                    LOGGER.error("Problem executing add container", ae);
                 }
             }
 
@@ -72,16 +74,12 @@ public class ContainerGroup extends AdapterBase {
 
     @Override
     public void loadChildren(boolean updateNode) {
-        Site parentSite = ((SiteAdapter) getParent()).getSite();
+        SiteWrapper parentSite = ((SiteAdapter) getParent()).getWrapper();
         Assert.isNotNull(parentSite, "site null");
         try {
             // read from database again
-            parentSite = ModelUtils.getObjectWithId(getAppService(),
-                Site.class, parentSite.getId());
-            SiteAdapter siteAdapter = (SiteAdapter) getParent();
-            siteAdapter.setSite(parentSite);
-
-            for (ContainerWrapper containerWrapper : siteAdapter.getWrapper()
+            parentSite.reload();
+            for (ContainerWrapper containerWrapper : parentSite
                 .getTopContainerCollection()) {
                 ContainerAdapter node = (ContainerAdapter) getChild(containerWrapper
                     .getId());
@@ -94,7 +92,7 @@ public class ContainerGroup extends AdapterBase {
                 }
             }
         } catch (Exception e) {
-            SessionManager.getLogger().error(
+            LOGGER.error(
                 "Error while loading storage container group children for site "
                     + parentSite.getName(), e);
         }

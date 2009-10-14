@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.treeview;
 
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
@@ -21,13 +22,16 @@ import edu.ualberta.med.biobank.forms.input.FormInput;
 
 public class PatientAdapter extends AdapterBase {
 
+    private static Logger LOGGER = Logger.getLogger(PatientAdapter.class
+        .getName());
+
     public PatientAdapter(AdapterBase parent, PatientWrapper patientWrapper) {
         super(parent, patientWrapper);
         setHasChildren(true);
     }
 
     public PatientWrapper getWrapper() {
-        return (PatientWrapper) object;
+        return (PatientWrapper) modelObject;
     }
 
     @Override
@@ -80,7 +84,7 @@ public class PatientAdapter extends AdapterBase {
                 PatientVisitAdapter adapter = new PatientVisitAdapter(
                     PatientAdapter.this, new PatientVisitWrapper(
                         getAppService()));
-                adapter.getWrapper().setPatientWrapper(getWrapper());
+                adapter.getWrapper().setPatient(getWrapper());
                 openForm(new FormInput(adapter), PatientVisitEntryForm.ID);
             }
 
@@ -110,9 +114,8 @@ public class PatientAdapter extends AdapterBase {
                 }
             }
         } catch (Exception e) {
-            SessionManager.getLogger().error(
-                "Error while loading children of patient "
-                    + getWrapper().getNumber(), e);
+            LOGGER.error("Error while loading children of patient "
+                + getWrapper().getNumber(), e);
             throw new RuntimeException(e);
         }
     }

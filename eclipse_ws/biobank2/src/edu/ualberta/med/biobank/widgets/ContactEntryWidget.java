@@ -22,7 +22,6 @@ import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.dialogs.ContactAddDialog;
-import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.widgets.infotables.ContactInfoTable;
 import edu.ualberta.med.biobank.widgets.listener.BiobankEntryFormWidgetListener;
 import edu.ualberta.med.biobank.widgets.listener.MultiSelectEvent;
@@ -64,7 +63,7 @@ public class ContactEntryWidget extends BiobankWidget {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 addOrEditContact(true, new ContactWrapper(SessionManager
-                    .getAppService(), new Contact()));
+                    .getAppService()));
             }
         });
     }

@@ -20,8 +20,7 @@ public class ContainerLabelingSchemeWrapper extends
         super(appService, wrappedObject);
     }
 
-    protected ContainerLabelingSchemeWrapper(
-        WritableApplicationService appService) {
+    public ContainerLabelingSchemeWrapper(WritableApplicationService appService) {
         super(appService);
     }
 
@@ -80,6 +79,11 @@ public class ContainerLabelingSchemeWrapper extends
             list.add(new ContainerLabelingSchemeWrapper(appService, scheme));
         }
         return list;
+    }
+
+    @Override
+    public int compareTo(ModelWrapper<ContainerLabelingScheme> o) {
+        return 0;
     }
 
 }

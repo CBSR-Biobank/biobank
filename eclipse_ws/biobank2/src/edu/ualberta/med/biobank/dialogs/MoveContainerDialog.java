@@ -3,7 +3,7 @@ package edu.ualberta.med.biobank.dialogs;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.eclipse.core.databinding.beans.PojoObservables;
+import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.observable.value.WritableValue;
 import org.eclipse.core.databinding.validation.ValidationStatus;
@@ -56,8 +56,8 @@ public class MoveContainerDialog extends BiobankDialog {
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
         Control c = createBoundWidgetWithLabel(contents, Text.class,
-            SWT.BORDER, "Source Address: ", new String[0], PojoObservables
-                .observeValue(container, "label"), null, null);
+            SWT.BORDER, "Source Address: ", new String[0], BeansObservables
+                .observeValue(container, "label"), null);
         GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
         gd.widthHint = 250;
         c.setLayoutData(gd);

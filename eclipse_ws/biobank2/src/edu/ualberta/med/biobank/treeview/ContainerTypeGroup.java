@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.treeview;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
@@ -13,13 +14,16 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.wrappers.CapacityWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.forms.ContainerTypeEntryForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
-import edu.ualberta.med.biobank.model.Capacity;
 
 public class ContainerTypeGroup extends AdapterBase {
+
+    private static Logger LOGGER = Logger.getLogger(ContainerTypeGroup.class
+        .getName());
 
     public ContainerTypeGroup(SiteAdapter parent, int id) {
         super(parent, id, "Container Types", true);
@@ -38,8 +42,8 @@ public class ContainerTypeGroup extends AdapterBase {
             public void widgetSelected(SelectionEvent event) {
                 ContainerTypeWrapper ct = new ContainerTypeWrapper(
                     getAppService());
-                ct.setSite(getParentFromClass(SiteAdapter.class).getSite());
-                ct.setCapacity(new Capacity());
+                ct.setSite(getParentFromClass(SiteAdapter.class).getWrapper());
+                ct.setCapacity(new CapacityWrapper(getAppService()));
                 ContainerTypeAdapter adapter = new ContainerTypeAdapter(
                     ContainerTypeGroup.this, ct);
                 openForm(new FormInput(adapter), ContainerTypeEntryForm.ID);
@@ -60,14 +64,12 @@ public class ContainerTypeGroup extends AdapterBase {
             currentSite.reload();
             List<ContainerTypeWrapper> containerTypes = new ArrayList<ContainerTypeWrapper>(
                 currentSite.getContainerTypeCollection());
-            SessionManager.getLogger().trace(
-                "updateStudies: Site " + currentSite.getName() + " has "
-                    + containerTypes.size() + " studies");
+            LOGGER.trace("updateStudies: Site " + currentSite.getName()
+                + " has " + containerTypes.size() + " studies");
 
             for (ContainerTypeWrapper containerType : containerTypes) {
-                SessionManager.getLogger().trace(
-                    "updateStudies: Container Type " + containerType.getId()
-                        + ": " + containerType.getName());
+                LOGGER.trace("updateStudies: Container Type "
+                    + containerType.getId() + ": " + containerType.getName());
 
                 ContainerTypeAdapter node = (ContainerTypeAdapter) getChild(containerType
                     .getId());
@@ -81,7 +83,7 @@ public class ContainerTypeGroup extends AdapterBase {
                 }
             }
         } catch (Exception e) {
-            SessionManager.getLogger().error(
+            LOGGER.error(
                 "Error while loading storage type group children for site "
                     + currentSite.getName(), e);
         }

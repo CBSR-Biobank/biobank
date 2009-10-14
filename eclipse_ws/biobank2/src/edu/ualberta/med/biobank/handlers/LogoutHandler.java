@@ -25,7 +25,7 @@ public class LogoutHandler extends AbstractHandler {
             // workbench.showPerspective(MainPerspective.ID, workbench
             // .getActiveWorkbenchWindow());
             // } catch (WorkbenchException e) {
-            // SessionManager.getLogger().error(
+            // LOGGER.error(
             // "Error while opening main perspective", e);
             // }
         }

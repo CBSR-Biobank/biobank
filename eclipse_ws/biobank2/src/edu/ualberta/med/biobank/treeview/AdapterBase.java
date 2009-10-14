@@ -1,9 +1,9 @@
 package edu.ualberta.med.biobank.treeview;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.custom.BusyIndicator;
@@ -16,7 +16,6 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
-import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.forms.input.FormInput;
@@ -28,9 +27,12 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
  */
 public abstract class AdapterBase {
 
+    private static Logger LOGGER = Logger
+        .getLogger(AdapterBase.class.getName());
+
     protected IDeltaListener listener = NullDeltaListener.getSoleInstance();
 
-    protected Object object;
+    protected ModelWrapper<?> modelObject;
 
     private Integer id;
 
@@ -42,8 +44,8 @@ public abstract class AdapterBase {
 
     protected List<AdapterBase> children;
 
-    public AdapterBase(AdapterBase parent, Object object) {
-        this.object = object;
+    public AdapterBase(AdapterBase parent, ModelWrapper<?> object) {
+        this.modelObject = object;
         this.parent = parent;
         children = new ArrayList<AdapterBase>();
         if (parent != null) {
@@ -65,16 +67,16 @@ public abstract class AdapterBase {
         setHasChildren(hasChildren);
     }
 
-    public Object getObject() {
-        return object;
+    public ModelWrapper<?> getModelObject() {
+        return modelObject;
     }
 
     /**
      * return true if the integrity of the object is ok
      */
     private boolean checkIntegrity() {
-        if ((object != null) && (object instanceof ModelWrapper<?>)) {
-            return ((ModelWrapper<?>) object).checkIntegrity();
+        if (modelObject != null) {
+            return modelObject.checkIntegrity();
         }
         return true;
     }
@@ -92,19 +94,8 @@ public abstract class AdapterBase {
     }
 
     public Integer getId() {
-        if (object != null) {
-            if (object instanceof ModelWrapper<?>) {
-                return ((ModelWrapper<?>) object).getId();
-            }
-            // FIXME remove this when everything is moved to wrapped objects
-            try {
-                Method method = object.getClass().getDeclaredMethod("getId");
-                if (method != null) {
-                    return (Integer) method.invoke(object);
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+        if (modelObject != null) {
+            return ((ModelWrapper<?>) modelObject).getId();
         }
         return id;
     }
@@ -315,8 +306,7 @@ public abstract class AdapterBase {
             PlatformUI.getWorkbench().getActiveWorkbenchWindow()
                 .getActivePage().openEditor(input, id, true);
         } catch (PartInitException e) {
-            SessionManager.getLogger()
-                .error("Can't open form with id " + id, e);
+            LOGGER.error("Can't open form with id " + id, e);
         }
     }
 
@@ -343,31 +333,14 @@ public abstract class AdapterBase {
         return getParentFromClass(RootNode.class);
     }
 
-    // FIXME should use the wrapped object method now !
-    public Object loadWrappedObject() throws Exception {
-        Object realObject = object;
-        // Class<?> realObjectClass = wrappedObject.getClass();
-        // Assert.isNotNull(realObjectClass, "model class is null");
-        //
-        // Integer id = getWrappedObjectId();
-        // // if object is not stored in the database it cannot be loaded
-        // if (id == null)
-        // return realObject;
-        //
-        // wrappedObject = ModelUtils.getObjectWithId(getAppService(),
-        // wrappedObjectClass, id);
-        // Assert.isNotNull(realObject, "model object not in database");
-        return realObject;
-    }
-
     public void rebuild() {
         removeAll();
         loadChildren(false);
     }
 
     public void resetObject() throws Exception {
-        if (object != null && object instanceof ModelWrapper<?>) {
-            ((ModelWrapper<?>) object).reset();
+        if (modelObject != null) {
+            modelObject.reset();
         }
     }
 
@@ -384,8 +357,8 @@ public abstract class AdapterBase {
                 @Override
                 public void run() {
                     try {
-                        if (object != null && object instanceof ModelWrapper<?>) {
-                            ((ModelWrapper<?>) object).delete();
+                        if (modelObject != null) {
+                            modelObject.delete();
                             getParent().removeChild(AdapterBase.this);
                         }
                     } catch (BiobankCheckException bce) {

@@ -8,11 +8,10 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.handlers.HandlerUtil;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.wrappers.AddressWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.forms.ClinicEntryForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
-import edu.ualberta.med.biobank.model.Address;
-import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.treeview.ClinicAdapter;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 
@@ -24,12 +23,11 @@ public class ClinicAddHandler extends AbstractHandler {
             .searchNode(SessionManager.getInstance().getCurrentSiteWrapper());
         Assert.isNotNull(siteAdapter);
 
-        Clinic clinic = new Clinic();
-        clinic.setAddress(new Address());
-        clinic.setSite(siteAdapter.getSite());
+        ClinicWrapper clinic = new ClinicWrapper(siteAdapter.getAppService());
+        clinic.setAddress(new AddressWrapper(siteAdapter.getAppService()));
+        clinic.setSite(siteAdapter.getWrapper());
         ClinicAdapter clinicNode = new ClinicAdapter(siteAdapter
-            .getClinicGroupNode(), new ClinicWrapper(siteAdapter
-            .getAppService(), clinic));
+            .getClinicGroupNode(), clinic);
         FormInput input = new FormInput(clinicNode);
 
         try {

@@ -3,23 +3,16 @@ package edu.ualberta.med.biobank.forms;
 import java.util.Collection;
 import java.util.HashMap;
 
-import org.apache.commons.collections.MapIterator;
 import org.apache.commons.collections.map.ListOrderedMap;
+import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ComboViewer;
-import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
@@ -33,10 +26,9 @@ import org.eclipse.ui.part.EditorPart;
 import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
-import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
-import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
+import edu.ualberta.med.biobank.widgets.utils.WidgetCreator;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 /**
@@ -48,6 +40,9 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
  * possible. See {@link #createFormContent()}
  */
 public abstract class BiobankFormBase extends EditorPart {
+
+    private static Logger LOGGER = Logger.getLogger(BiobankFormBase.class
+        .getName());
 
     protected WritableApplicationService appService;
 
@@ -61,6 +56,12 @@ public abstract class BiobankFormBase extends EditorPart {
 
     protected HashMap<String, Control> controls = new HashMap<String, Control>();
 
+    protected WidgetCreator widgetCreator;
+
+    public BiobankFormBase() {
+        widgetCreator = new WidgetCreator(controls);
+    }
+
     @Override
     public void doSave(IProgressMonitor monitor) {
     }
@@ -70,7 +71,7 @@ public abstract class BiobankFormBase extends EditorPart {
     }
 
     /**
-     * The initialization method for the derived form.
+     * The initialisation method for the derived form.
      * 
      * @param adapter the corresponding model adapter the form is to edit /
      *            view.
@@ -93,8 +94,7 @@ public abstract class BiobankFormBase extends EditorPart {
         } catch (final RemoteConnectFailureException exp) {
             BioBankPlugin.openRemoteConnectErrorMessage();
         } catch (Exception e) {
-            SessionManager.getLogger().error(
-                "BioBankFormBase.createPartControl Error", e);
+            LOGGER.error("BioBankFormBase.createPartControl Error", e);
         }
     }
 
@@ -112,6 +112,7 @@ public abstract class BiobankFormBase extends EditorPart {
     public void createPartControl(Composite parent) {
         mform = new ManagedForm(parent);
         toolkit = mform.getToolkit();
+        widgetCreator.setToolkit(toolkit);
         form = mform.getForm();
         toolkit.decorateFormHeading(form.getForm());
 
@@ -166,47 +167,6 @@ public abstract class BiobankFormBase extends EditorPart {
         return sectionAddClient(createSection(title));
     }
 
-    protected Control createWidget(Composite parent, Class<?> widgetClass,
-        int widgetOptions, String fieldLabel) {
-        Label label = toolkit.createLabel(parent, fieldLabel + ":", SWT.LEFT);
-        label.setLayoutData(new GridData(GridData.VERTICAL_ALIGN_BEGINNING));
-        if ((widgetClass == Combo.class) || (widgetClass == Text.class)
-            || (widgetClass == Label.class)) {
-            if (widgetOptions == SWT.NONE) {
-                widgetOptions = SWT.SINGLE;
-            }
-            Label field = toolkit.createLabel(parent, "", widgetOptions
-                | SWT.LEFT | SWT.BORDER);
-            field.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
-
-            return field;
-        } else if (widgetClass == Button.class) {
-            Button button = new Button(parent, SWT.CHECK | widgetOptions);
-            button.setEnabled(false);
-            toolkit.adapt(button, true, true);
-            return button;
-        } else {
-            Assert.isTrue(false, "invalid widget class "
-                + widgetClass.getName());
-        }
-        return null;
-    }
-
-    protected void createWidgetsFromMap(ListOrderedMap fieldsMap,
-        Composite parent) {
-        FieldInfo fi;
-
-        MapIterator it = fieldsMap.mapIterator();
-        while (it.hasNext()) {
-            String key = (String) it.next();
-            fi = (FieldInfo) it.getValue();
-
-            Control control = createWidget(parent, fi.widgetClass, SWT.NONE,
-                fi.label);
-            controls.put(key, control);
-        }
-    }
-
     public FormToolkit getToolkit() {
         return toolkit;
     }
@@ -217,21 +177,19 @@ public abstract class BiobankFormBase extends EditorPart {
 
     protected <T> ComboViewer createComboViewer(Composite parent,
         String fieldLabel, Collection<?> input, T selection) {
-        toolkit.createLabel(parent, fieldLabel + ":", SWT.LEFT);
+        return widgetCreator.createComboViewer(parent, fieldLabel, input,
+            selection);
+    }
 
-        Combo combo = new Combo(parent, SWT.READ_ONLY | SWT.BORDER);
-        ComboViewer comboViewer = new ComboViewer(combo);
-        comboViewer.setContentProvider(new ArrayContentProvider());
-        comboViewer.setLabelProvider(new BiobankLabelProvider());
-        if (input != null) {
-            comboViewer.setInput(input);
-        }
+    protected Control createWidget(Composite parent, Class<?> widgetClass,
+        int widgetOptions, String fieldLabel) {
+        return widgetCreator.createWidget(parent, widgetClass, widgetOptions,
+            fieldLabel);
+    }
 
-        combo.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
-        if (selection != null) {
-            comboViewer.setSelection(new StructuredSelection(selection));
-        }
-        return comboViewer;
+    protected void createWidgetsFromMap(ListOrderedMap fieldsMap,
+        Composite parent) {
+        widgetCreator.createWidgetsFromMap(fieldsMap, parent);
     }
 
 }

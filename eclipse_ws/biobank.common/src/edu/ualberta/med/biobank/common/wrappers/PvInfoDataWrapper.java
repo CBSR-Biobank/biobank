@@ -80,4 +80,9 @@ public class PvInfoDataWrapper extends ModelWrapper<PvInfoData> {
     public void setPatientVisit(PatientVisitWrapper pv) {
         setPatientVisit(pv.getWrappedObject());
     }
+
+    @Override
+    public int compareTo(ModelWrapper<PvInfoData> o) {
+        return 0;
+    }
 }

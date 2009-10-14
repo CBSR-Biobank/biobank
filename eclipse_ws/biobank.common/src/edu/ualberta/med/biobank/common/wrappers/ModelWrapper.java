@@ -1,5 +1,12 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.List;
+
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -9,14 +16,7 @@ import gov.nih.nci.system.query.example.DeleteExampleQuery;
 import gov.nih.nci.system.query.example.InsertExampleQuery;
 import gov.nih.nci.system.query.example.UpdateExampleQuery;
 
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.List;
-
-public abstract class ModelWrapper<E> {
+public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
 
     protected WritableApplicationService appService;
 
@@ -80,9 +80,9 @@ public abstract class ModelWrapper<E> {
     }
 
     public void reload() throws Exception {
-        E oldValue = wrappedObject;
         if (!isNew()) {
-            internalReload();
+            E oldValue = wrappedObject;
+            wrappedObject = getObjectFromDatabase();
             firePropertyChanges(oldValue, wrappedObject);
         }
         propertiesMap.clear();
@@ -108,12 +108,6 @@ public abstract class ModelWrapper<E> {
             propertyChangeSupport.firePropertyChange(member, oldWrappedObject,
                 newWrappedObject);
         }
-    }
-
-    private void internalReload() throws Exception {
-        wrappedObject = getObjectFromDatabase();
-        // set to null all lists declared as field
-        // FIXME check this is ok !
     }
 
     /**
@@ -146,15 +140,30 @@ public abstract class ModelWrapper<E> {
     public void persist() throws BiobankCheckException, Exception {
         persistChecks();
         SDKQuery query;
+        E origObject = null;
         if (isNew()) {
             query = new InsertExampleQuery(wrappedObject);
         } else {
+            origObject = getObjectFromDatabase();
             query = new UpdateExampleQuery(wrappedObject);
+
         }
 
         SDKQueryResult result = appService.executeQuery(query);
+        if (origObject != null) {
+            persistDependencies(origObject);
+        }
         wrappedObject = ((E) result.getObjectResult());
         propertiesMap.clear();
+    }
+
+    /**
+     * should redefine this method if others updates (or deletes) need to be
+     * done when this object is update
+     */
+    @SuppressWarnings("unused")
+    protected void persistDependencies(E origObject)
+        throws BiobankCheckException, Exception {
     }
 
     protected abstract void persistChecks() throws BiobankCheckException,
@@ -177,7 +186,10 @@ public abstract class ModelWrapper<E> {
 
     public void reset() throws Exception {
         if (isNew()) {
+            E oldValue = wrappedObject;
             wrappedObject = getNewObject();
+            firePropertyChanges(oldValue, wrappedObject);
+            propertiesMap.clear();
         } else {
             reload();
         }
@@ -223,7 +235,8 @@ public abstract class ModelWrapper<E> {
         }
         Integer id = getId();
         Integer id2 = ((ModelWrapper<?>) object).getId();
-        return (id == null && id2 == null) || id.equals(id2);
+        return (id == null && id2 == null)
+            || (id != null && id2 != null && id.equals(id2));
     }
 
     /**

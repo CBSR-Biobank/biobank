@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.wizard;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
@@ -14,10 +15,10 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
-import edu.ualberta.med.biobank.common.wrappers.ContainerPositionWrapper;
+import edu.ualberta.med.biobank.common.wrappers.CapacityWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
+import edu.ualberta.med.biobank.common.wrappers.Position;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
-import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.ContainerCell;
 import edu.ualberta.med.biobank.model.ContainerStatus;
 import edu.ualberta.med.biobank.widgets.ContainerDisplayWidget;
@@ -97,14 +98,8 @@ public abstract class AbstractContainerChooserPage extends WizardPage {
             textPosition.setText("");
             setPageComplete(false);
         } else {
-            ContainerPositionWrapper cp = cell.getPosition();
-            if (cp != null && cp.getContainer() != null) {
-                String code = cp.getContainer().getLabel();
-                if (code != null) {
-                    textPosition.setText(code);
-                } else {
-                    textPosition.setText(cp.getContainer().getLabel());
-                }
+            if (cell.getContainer() != null) {
+                textPosition.setText(cell.getContainer().getLabel());
                 setPageComplete(true);
             }
         }
@@ -118,14 +113,12 @@ public abstract class AbstractContainerChooserPage extends WizardPage {
         ContainerCell[][] cells = initGridSize();
         if (currentContainer != null) {
             // get cells informations
-            for (ContainerPositionWrapper position : currentContainer
-                .getChildPositionCollection()) {
-                int positionDim1 = position.getRow();
-                int positionDim2 = position.getCol();
-                ContainerCell cell = new ContainerCell(position);
-                ContainerWrapper occupiedContainer = position.getContainer();
-                setStatus(cell, occupiedContainer);
-                cells[positionDim1][positionDim2] = cell;
+            for (ContainerWrapper child : currentContainer.getChildren()) {
+                Position position = child.getPosition();
+                ContainerCell cell = new ContainerCell(position.row,
+                    position.col, child);
+                setStatus(cell);
+                cells[position.row][position.col] = cell;
             }
             initEmptyCells(cells);
             containerWidget.setContainersStatus(cells);
@@ -139,20 +132,21 @@ public abstract class AbstractContainerChooserPage extends WizardPage {
         // way
     }
 
-    protected abstract void setStatus(ContainerCell cell,
-        ContainerWrapper occupiedContainer);
+    protected abstract void setStatus(ContainerCell cell);
 
     private ContainerCell[][] initGridSize() {
-        int dim1;
-        int dim2;
+        int rowCap;
+        int colCap;
         if (currentContainer == null) {
-            dim1 = defaultDim1;
-            dim2 = defaultDim2;
+            rowCap = defaultDim1;
+            colCap = defaultDim2;
         } else {
-            Capacity capacity = currentContainer.getContainerType()
+            CapacityWrapper capacity = currentContainer.getContainerType()
                 .getCapacity();
-            dim1 = capacity.getRowCapacity();
-            dim2 = capacity.getColCapacity();
+            rowCap = capacity.getRowCapacity();
+            colCap = capacity.getColCapacity();
+            Assert.isNotNull(rowCap, "row capacity is null");
+            Assert.isNotNull(colCap, "column capacity is null");
         }
         int width;
         if (gridWidth == null) {
@@ -167,8 +161,8 @@ public abstract class AbstractContainerChooserPage extends WizardPage {
         } else {
             height = gridHeight;
         }
-        containerWidget.setGridSizes(dim1, dim2, width, height);
-        return new ContainerCell[dim1][dim2];
+        containerWidget.setGridSizes(rowCap, colCap, width, height);
+        return new ContainerCell[rowCap][colCap];
     }
 
     public void setCurrentContainer(ContainerWrapper container) {
@@ -187,13 +181,14 @@ public abstract class AbstractContainerChooserPage extends WizardPage {
         return ((ContainerChooserWizard) getWizard()).getAppService();
     }
 
-    protected ContainerPositionWrapper newContainerPosition(int dim1, int dim2) {
-        ContainerPositionWrapper position = new ContainerPositionWrapper(
-            getAppService());
-        position.setParentContainer(currentContainer);
-        position.setRow(dim1);
-        position.setCol(dim2);
-        return position;
-    }
+    // protected ContainerPositionWrapper newContainerPosition(int dim1, int
+    // dim2) {
+    // ContainerPositionWrapper position = new ContainerPositionWrapper(
+    // getAppService());
+    // position.setParentContainer(currentContainer);
+    // position.setRow(dim1);
+    // position.setCol(dim2);
+    // return position;
+    // }
 
 }
