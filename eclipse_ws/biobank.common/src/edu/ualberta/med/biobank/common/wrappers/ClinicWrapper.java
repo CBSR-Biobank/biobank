@@ -36,7 +36,7 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
             "site", "contactCollection", "patientVisitCollection" };
     }
 
-    public AddressWrapper getAddress() {
+    private AddressWrapper getAddress() {
         Address address = wrappedObject.getAddress();
         if (address == null) {
             return null;
@@ -44,7 +44,7 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
         return new AddressWrapper(appService, address);
     }
 
-    public void setAddress(Address address) {
+    private void setAddress(Address address) {
         Address oldAddress = wrappedObject.getAddress();
         wrappedObject.setAddress(address);
         propertyChangeSupport
@@ -100,6 +100,46 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
         Site newSite = siteWrapper.getWrappedObject();
         wrappedObject.setSite(newSite);
         propertyChangeSupport.firePropertyChange("site", oldSite, newSite);
+    }
+
+    public String getStreet1() {
+        return getAddress().getStreet1();
+    }
+
+    public void setStreet1(String street1) {
+        getAddress().setStreet1(street1);
+    }
+
+    public String getStreet2() {
+        return getAddress().getStreet2();
+    }
+
+    public void setStreet2(String street2) {
+        getAddress().setStreet2(street2);
+    }
+
+    public String getCity() {
+        return getAddress().getCity();
+    }
+
+    public void setCity(String city) {
+        getAddress().setCity(city);
+    }
+
+    public String getProvince() {
+        return getAddress().getProvince();
+    }
+
+    public void setProvince(String province) {
+        getAddress().setProvince(province);
+    }
+
+    public String getPostalCode() {
+        return getAddress().getPostalCode();
+    }
+
+    public void setPostalCode(String postalCode) {
+        getAddress().setPostalCode(postalCode);
     }
 
     @Override
