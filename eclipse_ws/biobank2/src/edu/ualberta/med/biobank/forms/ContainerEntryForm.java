@@ -53,6 +53,8 @@ public class ContainerEntryForm extends BiobankEntryForm {
 
     private ComboViewer containerTypeComboViewer;
 
+    private String oldContainerLabel;
+
     @Override
     public void init() {
         Assert.isTrue((adapter instanceof ContainerAdapter),
@@ -74,6 +76,7 @@ public class ContainerEntryForm extends BiobankEntryForm {
             }
         } else {
             tabName = "Container " + containerWrapper.getLabel();
+            oldContainerLabel = containerWrapper.getLabel();
         }
         setPartName(tabName);
         firstControl = null;
@@ -207,12 +210,33 @@ public class ContainerEntryForm extends BiobankEntryForm {
 
     @Override
     protected void saveForm() throws Exception {
-        ContainerTypeWrapper containerType = (ContainerTypeWrapper) ((StructuredSelection) containerTypeComboViewer
-            .getSelection()).getFirstElement();
-        containerWrapper.setContainerType(containerType);
-        containerWrapper.persist();
-        containerAdapter.getParent().addChild(containerAdapter);
-        containerAdapter.getParent().performExpand();
+        boolean doSave = true;
+        boolean newName = false;
+        if (containerWrapper.hasChildren() && oldContainerLabel != null
+            && !oldContainerLabel.equals(containerWrapper.getLabel())) {
+            doSave = BioBankPlugin
+                .openConfirm(
+                    "Renaming container",
+                    "This container has been renamed. Its children will also be renamed. Are you sure you want to continue ?");
+            newName = true;
+        }
+        if (doSave) {
+            ContainerTypeWrapper containerType = (ContainerTypeWrapper) ((StructuredSelection) containerTypeComboViewer
+                .getSelection()).getFirstElement();
+            containerWrapper.setContainerType(containerType);
+            containerWrapper.persist();
+            if (newName) {
+                containerWrapper.setChildLabels(oldContainerLabel);
+                containerWrapper.reload();
+                containerAdapter.rebuild();
+                containerAdapter.performExpand();
+            } else {
+                containerAdapter.getParent().addChild(containerAdapter);
+            }
+            containerAdapter.getParent().performExpand();
+        } else {
+            setDirty(true);
+        }
     }
 
     @Override

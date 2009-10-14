@@ -394,10 +394,10 @@ public class SiteWrapper extends ModelWrapper<Site> {
     /**
      * get all site existing
      */
-    public static Collection<SiteWrapper> getAllSites(
+    public static List<SiteWrapper> getAllSites(
         WritableApplicationService appService) throws Exception {
         List<Site> sites = appService.search(Site.class, new Site());
-        Collection<SiteWrapper> wrappers = new HashSet<SiteWrapper>();
+        List<SiteWrapper> wrappers = new ArrayList<SiteWrapper>();
         for (Site s : sites) {
             wrappers.add(new SiteWrapper(appService, s));
         }

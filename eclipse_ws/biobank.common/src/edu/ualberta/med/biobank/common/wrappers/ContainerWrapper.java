@@ -55,9 +55,12 @@ public class ContainerWrapper extends ModelWrapper<Container> {
 
     @Override
     protected void persistChecks() throws BiobankCheckException, Exception {
+        checkSiteNotNull();
         checkLabelUniqueForType();
         checkProductBarcodeUnique();
-        containerPosition.persistChecks();
+        if (containerPosition != null) {
+            containerPosition.persistChecks();
+        }
     }
 
     @Override
@@ -115,6 +118,13 @@ public class ContainerWrapper extends ModelWrapper<Container> {
             throw new BiobankCheckException("A container with label \""
                 + getLabel() + "\" and type \"" + getContainerType().getName()
                 + "\" already exists.");
+        }
+    }
+
+    private void checkSiteNotNull() throws BiobankCheckException {
+        if (getSite() == null) {
+            throw new BiobankCheckException(
+                "This container should be associate to a site");
         }
     }
 
@@ -631,7 +641,7 @@ public class ContainerWrapper extends ModelWrapper<Container> {
         }
     }
 
-    private void setChildLabels(String oldLabel) throws Exception {
+    public void setChildLabels(String oldLabel) throws Exception {
         // FIXME inefficient, should be improved
         HQLCriteria criteria = new HQLCriteria("from "
             + Container.class.getName() + " where label like ? and site= ?",
