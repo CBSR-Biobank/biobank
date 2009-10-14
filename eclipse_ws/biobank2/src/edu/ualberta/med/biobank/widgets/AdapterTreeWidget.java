@@ -23,6 +23,7 @@ import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbenchPartSite;
 import org.eclipse.ui.PlatformUI;
 
+import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.NodeContentProvider;
 import edu.ualberta.med.biobank.treeview.NodeLabelProvider;
@@ -115,11 +116,11 @@ public class AdapterTreeWidget extends Composite {
             @Override
             public int compare(Viewer viewer, Object e1, Object e2) {
                 if (e1 instanceof AdapterBase && e2 instanceof AdapterBase) {
-                    Object object1 = ((AdapterBase) e1).getObject();
-                    Object object2 = ((AdapterBase) e2).getObject();
-                    if (object1 != null && object2 != null
-                        && object1 instanceof Comparable<?>
-                        && object2 instanceof Comparable<?>) {
+                    ModelWrapper<?> object1 = ((AdapterBase) e1)
+                        .getModelObject();
+                    ModelWrapper<?> object2 = ((AdapterBase) e2)
+                        .getModelObject();
+                    if (object1 != null && object2 != null) {
                         return ((Comparable) object1).compareTo(object2);
                     }
                 }

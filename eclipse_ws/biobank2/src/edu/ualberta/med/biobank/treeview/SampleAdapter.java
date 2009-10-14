@@ -19,12 +19,8 @@ public class SampleAdapter extends AdapterBase {
         super(parent, sample);
     }
 
-    public void setSample(SampleWrapper sample) {
-        object = sample;
-    }
-
     public SampleWrapper getSample() {
-        return (SampleWrapper) object;
+        return (SampleWrapper) modelObject;
     }
 
     @Override

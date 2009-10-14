@@ -1,10 +1,13 @@
-package edu.ualberta.med.biobank.common.wrappers;
+package edu.ualberta.med.biobank.common.wrappers.internal;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.BiobankCheckException;
+import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.Sample;
 import edu.ualberta.med.biobank.model.SamplePosition;
@@ -28,24 +31,17 @@ public class SamplePositionWrapper extends
             .getPropertyChangesNames()));
         properties.add("sample");
         properties.add("container");
-        return (String[]) properties.toArray();
+        return properties.toArray(new String[properties.size()]);
     }
 
     @Override
     protected void deleteChecks() throws BiobankCheckException, Exception {
-        // TODO Auto-generated method stub
 
     }
 
     @Override
     public Class<SamplePosition> getWrappedClass() {
         return SamplePosition.class;
-    }
-
-    @Override
-    protected void persistChecks() throws BiobankCheckException, Exception {
-        // TODO Auto-generated method stub
-
     }
 
     public void setSample(Sample sample) {
@@ -55,11 +51,15 @@ public class SamplePositionWrapper extends
     }
 
     public void setSample(SampleWrapper sample) {
-        setSample(sample.wrappedObject);
+        setSample(sample.getWrappedObject());
     }
 
     public SampleWrapper getSample() {
-        return new SampleWrapper(appService, wrappedObject.getSample());
+        Sample sample = wrappedObject.getSample();
+        if (sample == null) {
+            return null;
+        }
+        return new SampleWrapper(appService, sample);
     }
 
     public void setContainer(Container container) {
@@ -70,11 +70,15 @@ public class SamplePositionWrapper extends
     }
 
     public void setContainer(ContainerWrapper container) {
-        setContainer(container.wrappedObject);
+        setContainer(container.getWrappedObject());
     }
 
     public ContainerWrapper getContainer() {
-        return new ContainerWrapper(appService, wrappedObject.getContainer());
+        Container container = wrappedObject.getContainer();
+        if (container == null) {
+            return null;
+        }
+        return new ContainerWrapper(appService, container);
     }
 
     @Override

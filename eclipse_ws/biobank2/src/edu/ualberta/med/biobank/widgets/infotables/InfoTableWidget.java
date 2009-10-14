@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.IDoubleClickListener;
@@ -28,6 +29,9 @@ import edu.ualberta.med.biobank.widgets.BiobankWidget;
 public class InfoTableWidget<T> extends BiobankWidget {
 
     private TableViewer tableViewer;
+
+    private static Logger LOGGER = Logger.getLogger(InfoTableWidget.class
+        .getName());
 
     // FIXME - used to inform listeners of changes to the widget
     // could be done in a better way
@@ -133,7 +137,7 @@ public class InfoTableWidget<T> extends BiobankWidget {
 
                         final BiobankCollectionModel modelItem = model
                             .get(count);
-                        modelItem.o = item;
+                        modelItem.o = getCollectionModelObject(item);
                         if (item instanceof ModelWrapper<?>) {
                             ((ModelWrapper<?>) item).loadAttributes();
                         }
@@ -147,12 +151,17 @@ public class InfoTableWidget<T> extends BiobankWidget {
                         ++count;
                     }
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    LOGGER.error("setCollection error", e);
                 }
             }
 
         };
         t.start();
+    }
+
+    @SuppressWarnings("unused")
+    public Object getCollectionModelObject(T item) throws Exception {
+        return item;
     }
 
     @SuppressWarnings("unchecked")

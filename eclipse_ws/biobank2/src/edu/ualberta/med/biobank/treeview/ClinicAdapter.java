@@ -4,24 +4,17 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.PlatformUI;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.forms.ClinicEntryForm;
 import edu.ualberta.med.biobank.forms.ClinicViewForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
-import edu.ualberta.med.biobank.model.Clinic;
-import gov.nih.nci.system.applicationservice.ApplicationException;
-import gov.nih.nci.system.query.SDKQuery;
-import gov.nih.nci.system.query.example.DeleteExampleQuery;
 
 public class ClinicAdapter extends AdapterBase {
 
@@ -30,7 +23,7 @@ public class ClinicAdapter extends AdapterBase {
     }
 
     public ClinicWrapper getWrapper() {
-        return (ClinicWrapper) object;
+        return (ClinicWrapper) modelObject;
     }
 
     @Override
@@ -99,34 +92,6 @@ public class ClinicAdapter extends AdapterBase {
     }
 
     @Override
-    public void delete() {
-        // FIXME when clinicwrapper is used : remove this method to use the
-        // parent one
-        BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
-            Clinic clinic = ((ClinicWrapper) object).getWrappedObject();
-            SDKQuery query = new DeleteExampleQuery(clinic);
-
-            public void run() {
-                if (clinic.getPatientVisitCollection().size() > 0) {
-                    BioBankPlugin
-                        .openError(
-                            "Error",
-                            "Unable to delete clinic "
-                                + clinic.getName()
-                                + ". All defined patient visits must be removed first.");
-                } else {
-                    try {
-                        getAppService().executeQuery(query);
-                        // TODO update tree
-                    } catch (ApplicationException e) {
-                        BioBankPlugin.openAsyncError("Delete error", e);
-                    }
-                }
-            }
-        });
-    }
-
-    @Override
     public void loadChildren(boolean updateNode) {
         Assert.isTrue(false, "Cannot add children to this adapter");
     }
@@ -134,10 +99,6 @@ public class ClinicAdapter extends AdapterBase {
     @Override
     public AdapterBase accept(NodeSearchVisitor visitor) {
         return null;
-    }
-
-    public Clinic loadClinic() throws Exception {
-        return (Clinic) loadWrappedObject();
     }
 
 }

@@ -12,7 +12,6 @@ import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
-import edu.ualberta.med.biobank.model.Contact;
 
 public class ContactAddDialog extends BiobankDialog {
 
@@ -21,8 +20,7 @@ public class ContactAddDialog extends BiobankDialog {
     private ContactWrapper contactWrapper;
 
     public ContactAddDialog(Shell parent) {
-        this(parent, new ContactWrapper(SessionManager.getAppService(),
-            new Contact()));
+        this(parent, new ContactWrapper(SessionManager.getAppService()));
     }
 
     public ContactAddDialog(Shell parent, ContactWrapper contactWrapper) {

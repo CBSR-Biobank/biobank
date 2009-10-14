@@ -6,6 +6,6 @@ public class SiteStudyInfo {
 
     public StudyWrapper studyWrapper;
 
-    public Long patientVisits;
+    public long patientVisits;
 
 }

@@ -1,15 +1,12 @@
 package edu.ualberta.med.biobank.model;
 
-import java.util.Arrays;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.scanlib.ScanCell;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
-import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class PalletCell {
 
@@ -51,44 +48,34 @@ public class PalletCell {
         // return convertArray(palletScanned);
     }
 
-    public static PalletCell[][] getRandomScanProcessAlreadyInPallet(
-        WritableApplicationService appService, SiteWrapper siteWrapper)
-        throws Exception {
+    public static PalletCell[][] getRandomSamplesAlreadyAssigned(
+        WritableApplicationService appService, Integer siteId) throws Exception {
         PalletCell[][] palletScanned = initArray();
-        HQLCriteria criteria = new HQLCriteria("from " + Sample.class.getName()
-            + " as s where s in (select sp.sample from "
-            + SamplePosition.class.getName()
-            + " as sp) and s.patientVisit.patient.study.site = ?", Arrays
-            .asList(new Object[] { siteWrapper.getWrappedObject() }));
-        List<Sample> samples = appService.query(criteria);
-        if (samples.size() > 0) {
-            palletScanned[0][0] = new PalletCell(new ScanCell(0, 0, samples
-                .get(0).getInventoryId()));
+        List<SampleWrapper> randomSamples = SampleWrapper
+            .getRandomSamplesAlreadyAssigned(appService, siteId);
+        if (randomSamples.size() > 0) {
+            palletScanned[0][0] = new PalletCell(new ScanCell(0, 0,
+                randomSamples.get(0).getInventoryId()));
         }
-        if (samples.size() > 1) {
-            palletScanned[2][4] = new PalletCell(new ScanCell(2, 4, samples
-                .get(1).getInventoryId()));
+        if (randomSamples.size() > 1) {
+            palletScanned[2][4] = new PalletCell(new ScanCell(2, 4,
+                randomSamples.get(1).getInventoryId()));
         }
         return palletScanned;
     }
 
-    public static PalletCell[][] getRandomScanProcessNotInPallet(
-        WritableApplicationService appService, SiteWrapper siteWrapper)
+    public static PalletCell[][] getRandomSamplesNotAssigned(
+        WritableApplicationService appService, Integer siteId)
         throws ApplicationException {
         PalletCell[][] palletScanned = initArray();
-        HQLCriteria criteria = new HQLCriteria("from " + Sample.class.getName()
-            + " as s where s not in (select sp.sample from "
-            + SamplePosition.class.getName()
-            + " as sp) and s.inventoryId <> '123'"
-            + " and s.patientVisit.patient.study.site = ?", Arrays
-            .asList(new Object[] { siteWrapper.getWrappedObject() }));
-        List<Sample> samples = appService.query(criteria);
-        if (samples.size() > 1) {
+        List<SampleWrapper> randomSamples = SampleWrapper
+            .getRandomSamplesNotAssigned(appService, siteId);
+        if (randomSamples.size() > 1) {
             // Random r = new Random();
             // int sample1 = r.nextInt(samples.size());
             // int sample2 = r.nextInt(samples.size());
-            palletScanned[0][0] = new PalletCell(new ScanCell(0, 0, samples
-                .get(0).getInventoryId()));
+            palletScanned[0][0] = new PalletCell(new ScanCell(0, 0,
+                randomSamples.get(0).getInventoryId()));
             // palletScanned[2][4] = new PalletCell(new ScanCell(2, 4, samples
             // .get(1).getInventoryId()));
         }

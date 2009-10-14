@@ -25,11 +25,10 @@ import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.utils.ModelUtils;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
-import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.treeview.ContainerTypeAdapter;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.validators.DoubleNumberValidator;
@@ -70,7 +69,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
 
     private List<ContainerTypeWrapper> allContainerTypes;
 
-    private Site site;
+    private SiteWrapper site;
 
     private BiobankEntryFormWidgetListener multiSelectListener;
 
@@ -99,8 +98,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         containerTypeAdapter = (ContainerTypeAdapter) adapter;
         containerType = containerTypeAdapter.getContainerType();
         retrieveSiteAndType();
-        allContainerTypes = ContainerTypeWrapper.transformToWrapperList(
-            appService, site.getContainerTypeCollection());
+        allContainerTypes = site.getContainerTypeCollection();
         for (ContainerTypeWrapper type : new ArrayList<ContainerTypeWrapper>(
             allContainerTypes)) {
             if (type.getTopLevel() != null && type.getTopLevel()) {
@@ -120,10 +118,9 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         // FIXME once siteAdapter contains a wrapper, call reload on it
         // to get last inserted types
         site = containerTypeAdapter.getParentFromClass(SiteAdapter.class)
-            .getSite();
+            .getWrapper();
         try {
-            site = ModelUtils.getObjectWithId(appService, Site.class, site
-                .getId());
+            site.reload();
         } catch (Exception e) {
             LOGGER.error("Can't retrieve site", e);
         }

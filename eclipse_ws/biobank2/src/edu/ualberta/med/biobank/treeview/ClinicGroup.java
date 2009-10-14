@@ -19,7 +19,6 @@ import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.forms.ClinicEntryForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
-import edu.ualberta.med.biobank.model.Clinic;
 
 public class ClinicGroup extends AdapterBase {
 
@@ -41,11 +40,11 @@ public class ClinicGroup extends AdapterBase {
         mi.setText("Add Clinic");
         mi.addSelectionListener(new SelectionListener() {
             public void widgetSelected(SelectionEvent event) {
-                Clinic clinic = new Clinic();
-                clinic.setSite(getParentFromClass(SiteAdapter.class).getSite());
+                ClinicWrapper clinic = new ClinicWrapper(getAppService());
+                clinic.setSite(getParentFromClass(SiteAdapter.class)
+                    .getWrapper());
                 ClinicAdapter clinicAdapter = new ClinicAdapter(
-                    ClinicGroup.this,
-                    new ClinicWrapper(getAppService(), clinic));
+                    ClinicGroup.this, clinic);
                 FormInput input = new FormInput(clinicAdapter);
                 try {
                     PlatformUI.getWorkbench().getActiveWorkbenchWindow()
@@ -69,7 +68,6 @@ public class ClinicGroup extends AdapterBase {
         try {
             // read from database again
             currentSite.reload();
-            ((SiteAdapter) getParent()).setSite(currentSite.getWrappedObject());
 
             List<ClinicWrapper> clinics = currentSite.getClinicCollection(true);
             if (clinics != null)

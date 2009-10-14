@@ -3,16 +3,11 @@ package edu.ualberta.med.biobank.common.utils;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.springframework.util.Assert;
 
-import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
-import edu.ualberta.med.biobank.model.SampleStorage;
-import edu.ualberta.med.biobank.model.Site;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -111,49 +106,4 @@ public class ModelUtils {
             .asList(new Object[] { textParam })));
     }
 
-    /**
-     * If "id" is null, then all sites are returned. If not not, then only sites
-     * with that id are returned.
-     * 
-     * @return
-     * @throws Exception
-     */
-    public static Collection<SiteWrapper> getSites(
-        WritableApplicationService appService, Integer id) throws Exception {
-        HQLCriteria criteria;
-
-        if (id == null) {
-            criteria = new HQLCriteria("from " + Site.class.getName());
-        } else {
-            criteria = new HQLCriteria("from " + Site.class.getName()
-                + " where id = ?", Arrays.asList(new Object[] { id }));
-        }
-
-        List<Site> sites = appService.query(criteria);
-
-        Collection<SiteWrapper> wrappers = new HashSet<SiteWrapper>();
-        for (Site s : sites) {
-            wrappers.add(new SiteWrapper(appService, s));
-        }
-        return wrappers;
-    }
-
-    public static SampleStorage[] toArray(Collection<SampleStorage> collection) {
-        if (collection != null) {
-            // hack required here because xxx.getXxxxCollection().toArray(new
-            // Xxx[0])
-            // returns Object[].
-            if ((collection != null) && (collection.size() == 0))
-                return null;
-
-            int count = 0;
-            SampleStorage[] arr = new SampleStorage[collection.size()];
-            for (SampleStorage ss : collection) {
-                arr[count] = ss;
-                ++count;
-            }
-            return arr;
-        }
-        return null;
-    }
 }

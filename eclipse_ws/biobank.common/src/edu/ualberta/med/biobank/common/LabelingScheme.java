@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.common;
 
 import org.springframework.util.Assert;
 
+import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.model.AbstractPosition;
 import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.Container;
@@ -178,6 +179,10 @@ public class LabelingScheme {
             return rowColToTwoCharNumeric(rcp, capacity);
         }
         return null;
+    }
+
+    public static String getPositionString(ContainerWrapper container) {
+        return getPositionString(container.getWrappedObject().getPosition());
     }
 
     /**

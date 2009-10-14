@@ -44,6 +44,7 @@ import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
+import edu.ualberta.med.biobank.common.wrappers.Position;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
 import edu.ualberta.med.biobank.forms.listener.EnterKeyToNextFieldListener;
@@ -325,8 +326,7 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
                     sampleWrapper.setSamplePositionFromString(positionString,
                         bin);
                     sampleWrapper.checkPosition(bin);
-                    sampleWrapper.getSamplePosition().setContainer(
-                        bin.getWrappedObject());
+                    sampleWrapper.setParent(bin);
 
                     showPositions();
 
@@ -356,11 +356,10 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
             drawerWidget.setSelectedBin(-1);
             drawerLabel.setText("Drawer");
         } else {
-            Point drawerPosition = new Point(drawer.getPosition().getRow(),
-                drawer.getPosition().getCol());
-            cabinetWidget.setSelectedBox(drawerPosition);
+            Position position = drawer.getPosition();
+            cabinetWidget.setSelectedBox(new Point(position.row, position.col));
             cabinetLabel.setText("Cabinet " + cabinet.getLabel());
-            drawerWidget.setSelectedBin(bin.getPosition().getRow());
+            drawerWidget.setSelectedBin(bin.getPosition().row);
             drawerLabel.setText("Drawer " + drawer.getLabel());
         }
         form.layout(true, true);
@@ -385,8 +384,8 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
                 .getSampleType());
         if (containers.size() == 1) {
             bin = containers.get(0);
-            drawer = bin.getPosition().getParentContainer();
-            cabinet = drawer.getPosition().getParentContainer();
+            drawer = bin.getParent();
+            cabinet = drawer.getParent();
         } else if (containers.size() == 0) {
             containers = ContainerWrapper.getContainersInSite(appService,
                 SessionManager.getInstance().getCurrentSiteWrapper(), binLabel);

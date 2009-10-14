@@ -25,6 +25,8 @@ import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
@@ -396,22 +398,22 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
         patientNumberText = (Text) createBoundWidgetWithLabel(fieldsComposite,
             Text.class, SWT.NONE, "Patient Number", new String[0],
             patientNumberValue, new NonEmptyString("Enter a patient number"));
-        patientNumberText.addListener(SWT.DefaultSelection, new Listener() {
-            public void handleEvent(Event e) {
-                setVisitsList();
-            }
-        });
-        firstControl = patientNumberText;
-
-        firstControl = patientNumberText;
-
-        patientNumberText.addKeyListener(EnterKeyToNextFieldListener.INSTANCE);
         patientNumberText.addFocusListener(new FocusAdapter() {
             @Override
             public void focusLost(FocusEvent e) {
                 setVisitsList();
+
             }
         });
+        patientNumberText.addModifyListener(new ModifyListener() {
+            @Override
+            public void modifyText(ModifyEvent e) {
+                reset(false);
+            }
+        });
+        patientNumberText.addKeyListener(EnterKeyToNextFieldListener.INSTANCE);
+        firstControl = patientNumberText;
+
         createVisitCombo(fieldsComposite);
 
         plateToScanText = (Text) createBoundWidgetWithLabel(fieldsComposite,
@@ -461,17 +463,23 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
             public void keyReleased(KeyEvent e) {
                 if (e.keyCode == 13) {
                     plateToScanText.setFocus();
+                    e.doit = false;
                 }
             }
         });
-        viewerVisits
-            .addSelectionChangedListener(new ISelectionChangedListener() {
-                @Override
-                public void selectionChanged(SelectionChangedEvent event) {
-                    setDateProcessedField();
-                }
-            });
-
+        // viewerVisits
+        // .addSelectionChangedListener(new ISelectionChangedListener() {
+        // @Override
+        // public void selectionChanged(SelectionChangedEvent event) {
+        // setDateProcessedField();
+        // }
+        // });
+        viewerVisits.getCCombo().addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusLost(FocusEvent e) {
+                setDateProcessedField();
+            }
+        });
         dateProcessedLabel = (Label) createWidget(compositeFields, Label.class,
             SWT.NONE, "Date processed");
     }
@@ -503,9 +511,13 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
     private void setDateProcessedField() {
         PatientVisitWrapper pv = getSelectedPatientVisit();
         if (pv != null) {
-            dateProcessedLabel.setText(pv.getFormattedDateProcessed());
-            appendLog("Visit selected " + pv.getFormattedDateProcessed()
-                + " - " + pv.getClinic().getName());
+            String date = pv.getFormattedDateProcessed();
+            System.out.println(date);
+            dateProcessedLabel.setText(date);
+            appendLog("Visit selected " + date + " - "
+                + pv.getClinic().getName());
+        } else {
+            dateProcessedLabel.setText("");
         }
     }
 
@@ -652,18 +664,26 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
 
     @Override
     public void reset() {
-        patientNumberText.setText("");
+        reset(true);
+    }
+
+    public void reset(boolean resetAll) {
         viewerVisits.setInput(null);
         currentPatient = null;
-        plateToScanText.setText("");
         cancelConfirmWidget.reset();
         scanButton.setEnabled(false);
-        plateToScanValue.setValue("");
         scannedValue.setValue(Boolean.FALSE);
-        spw.setScannedElements(null);
-        for (SampleTypeSelectionWidget stw : sampleTypeWidgets) {
-            stw.resetValues(true);
+        dateProcessedLabel.setText("");
+        if (resetAll) {
+            patientNumberText.setText("");
+            plateToScanText.setText("");
+            plateToScanValue.setValue("");
+            spw.setScannedElements(null);
+            for (SampleTypeSelectionWidget stw : sampleTypeWidgets) {
+                stw.resetValues(true);
+            }
         }
+        setFocus();
     }
 
     @Override

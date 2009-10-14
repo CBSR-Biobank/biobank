@@ -14,7 +14,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.wrappers.SamplePositionWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
@@ -42,9 +41,9 @@ public class SamplesListWidget extends InfoTableWidget<SampleWrapper> {
     }
 
     public SamplesListWidget(Composite parent,
-        Collection<SamplePositionWrapper> samplePositionCollection) {
+        Collection<SampleWrapper> sampleCollection) {
         this(parent);
-        setSamplePositions(samplePositionCollection);
+        setSamples(sampleCollection);
     }
 
     public SamplesListWidget(Composite parent, SiteAdapter siteAdapter,
@@ -77,11 +76,10 @@ public class SamplesListWidget extends InfoTableWidget<SampleWrapper> {
                             + item.o.getClass());
 
                 SampleWrapper sample = (SampleWrapper) item.o;
-                SamplePositionWrapper sp = sample.getSamplePosition();
-                if (sp != null) {
+                if (sample.hasParent()) {
                     AdapterBase node = siteAdapter
-                        .accept(new NodeSearchVisitor(Container.class, sp
-                            .getContainer().getId()));
+                        .accept(new NodeSearchVisitor(Container.class, sample
+                            .getParent().getId()));
                     if (node != null) {
                         SessionManager.getInstance().setSelectedNode(node);
                         node.performDoubleClick();
@@ -91,13 +89,12 @@ public class SamplesListWidget extends InfoTableWidget<SampleWrapper> {
         });
     }
 
-    private void setSamplePositions(
-        final Collection<SamplePositionWrapper> samplePositionCollection) {
-        if (samplePositionCollection == null)
+    private void setSamples(final Collection<SampleWrapper> sampleCollection) {
+        if (sampleCollection == null)
             return;
 
         // Initialise collection
-        for (int i = 0, n = samplePositionCollection.size(); i < n; ++i) {
+        for (int i = 0, n = sampleCollection.size(); i < n; ++i) {
             model.add(new BiobankCollectionModel());
         }
         getTableViewer().refresh();
@@ -109,9 +106,9 @@ public class SamplesListWidget extends InfoTableWidget<SampleWrapper> {
                 Display display = viewer.getTable().getDisplay();
                 int count = 0;
 
-                if (model.size() != samplePositionCollection.size()) {
+                if (model.size() != sampleCollection.size()) {
                     model.clear();
-                    for (int i = 0, n = samplePositionCollection.size(); i < n; ++i) {
+                    for (int i = 0, n = sampleCollection.size(); i < n; ++i) {
                         model.add(new BiobankCollectionModel());
                     }
                     display.asyncExec(new Runnable() {
@@ -123,14 +120,14 @@ public class SamplesListWidget extends InfoTableWidget<SampleWrapper> {
                 }
 
                 try {
-                    for (SamplePositionWrapper position : samplePositionCollection) {
+                    for (SampleWrapper sample : sampleCollection) {
                         if (viewer.getTable().isDisposed())
                             return;
 
                         final BiobankCollectionModel modelItem = model
                             .get(count);
-                        position.loadAttributes();
-                        modelItem.o = position;
+                        sample.loadAttributes();
+                        modelItem.o = sample;
                         ++count;
 
                         display.asyncExec(new Runnable() {

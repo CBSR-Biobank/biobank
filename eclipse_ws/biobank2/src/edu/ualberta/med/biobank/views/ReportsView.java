@@ -8,6 +8,7 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -26,6 +27,9 @@ import edu.ualberta.med.biobank.widgets.infotables.InfoTableWidget;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class ReportsView extends ViewPart {
+
+    private static Logger LOGGER = Logger
+        .getLogger(ReportsView.class.getName());
 
     public static final String ID = "edu.ualberta.med.biobank.views.ReportsView";
     private ScrolledComposite sc;
@@ -135,8 +139,7 @@ public class ReportsView extends ViewPart {
             List<Object> result = SessionManager.getAppService().query(c);
             return result;
         } catch (Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            LOGGER.error("Search error", e);
             return null;
         }
     }

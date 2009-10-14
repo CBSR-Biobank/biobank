@@ -31,7 +31,7 @@ public class PatientAdapter extends AdapterBase {
     }
 
     public PatientWrapper getWrapper() {
-        return (PatientWrapper) object;
+        return (PatientWrapper) modelObject;
     }
 
     @Override

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.BiobankCheckException;
@@ -11,6 +12,7 @@ import edu.ualberta.med.biobank.common.wrappers.internal.AddressWrapper;
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Contact;
+import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -31,7 +33,7 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
     @Override
     protected String[] getPropertyChangesNames() {
         return new String[] { "name", "activityStatus", "comment", "address",
-            "site", "contactCollection" };
+            "site", "contactCollection", "patientVisitCollection" };
     }
 
     public AddressWrapper getAddress() {
@@ -49,8 +51,8 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
             .firePropertyChange("address", oldAddress, address);
     }
 
-    public void setAddress(AddressWrapper study) {
-        setAddress(study.wrappedObject);
+    public void setAddress(AddressWrapper address) {
+        setAddress(address.wrappedObject);
     }
 
     public String getName() {
@@ -190,7 +192,53 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
 
     @Override
     protected void deleteChecks() throws BiobankCheckException, Exception {
-        // TODO Auto-generated method stub
+        if (getPatientVisitCollection().size() > 0) {
+            throw new BiobankCheckException("Unable to delete clinic "
+                + getName()
+                + ". All defined patient visits must be removed first.");
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<PatientVisitWrapper> getPatientVisitCollection() {
+        List<PatientVisitWrapper> patientVisitCollection = (List<PatientVisitWrapper>) propertiesMap
+            .get("patientVisitCollection");
+        if (patientVisitCollection == null) {
+            Collection<PatientVisit> children = wrappedObject
+                .getPatientVisitCollection();
+            if (children != null) {
+                patientVisitCollection = new ArrayList<PatientVisitWrapper>();
+                for (PatientVisit pv : children) {
+                    patientVisitCollection.add(new PatientVisitWrapper(
+                        appService, pv));
+                }
+                propertiesMap.put("patientVisitCollection",
+                    patientVisitCollection);
+            }
+        }
+        return patientVisitCollection;
+    }
+
+    public void setPatientVisitCollection(
+        Collection<PatientVisit> patientVisitCollection, boolean setNull) {
+        Collection<PatientVisit> oldCollection = wrappedObject
+            .getPatientVisitCollection();
+        wrappedObject.setPatientVisitCollection(patientVisitCollection);
+        propertyChangeSupport.firePropertyChange("patientVisitCollection",
+            oldCollection, patientVisitCollection);
+        if (setNull) {
+            propertiesMap.put("patientVisitCollection", null);
+        }
+    }
+
+    public void setPatientVisitCollection(
+        Collection<PatientVisitWrapper> patientVisitCollection) {
+        Collection<PatientVisit> pvCollection = new HashSet<PatientVisit>();
+        for (PatientVisitWrapper pv : patientVisitCollection) {
+            pvCollection.add(pv.getWrappedObject());
+        }
+        setPatientVisitCollection(pvCollection, false);
+        propertiesMap.put("patientVisitCollection", patientVisitCollection);
     }
 
     @Override

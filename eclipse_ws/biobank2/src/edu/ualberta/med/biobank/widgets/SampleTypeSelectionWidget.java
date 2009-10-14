@@ -21,8 +21,6 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
-import org.eclipse.swt.events.KeyAdapter;
-import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.TraverseEvent;
 import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.layout.GridData;
@@ -98,14 +96,6 @@ public class SampleTypeSelectionWidget {
         });
         cv.setComparator(new ViewerComparator());
         cv.setInput(types);
-        combo.addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyReleased(KeyEvent e) {
-                if (e.keyCode == 13 && nextWidget != null) {
-                    // setNextFocus();
-                }
-            }
-        });
         combo.addTraverseListener(new TraverseListener() {
             @Override
             public void keyTraversed(TraverseEvent e) {

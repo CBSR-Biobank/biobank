@@ -60,7 +60,8 @@ public class ClinicAddWidget extends BiobankWidget {
         setLayout(new GridLayout(1, false));
         setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-        contactInfoTable = new StudyContactEntryInfoTable(parent, studyWrapper);
+        contactInfoTable = new StudyContactEntryInfoTable(parent, studyWrapper
+            .getContactCollection());
         contactInfoTable.adaptToToolkit(toolkit, true);
         addTableMenu();
 
@@ -85,8 +86,11 @@ public class ClinicAddWidget extends BiobankWidget {
             getNonDuplicateClinics());
         if (dlg.open() == Dialog.OK) {
             notifyListeners();
-            selectedContacts.add(dlg.getSelection());
-            contactInfoTable.setCollection(selectedContacts);
+            ContactWrapper contact = dlg.getSelection();
+            if (contact != null) {
+                selectedContacts.add(contact);
+                contactInfoTable.setCollection(selectedContacts);
+            }
         }
     }
 

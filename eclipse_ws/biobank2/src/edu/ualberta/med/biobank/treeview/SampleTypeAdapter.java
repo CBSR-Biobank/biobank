@@ -5,26 +5,22 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 
-import edu.ualberta.med.biobank.model.SampleType;
+import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 
 public class SampleTypeAdapter extends AdapterBase {
 
-    public SampleTypeAdapter(AdapterBase parent, SampleType sampleType) {
+    public SampleTypeAdapter(AdapterBase parent, SampleTypeWrapper sampleType) {
         super(parent, sampleType);
         setHasChildren(true);
     }
 
-    public SampleType getSampleType() {
-        return (SampleType) object;
-    }
-
-    public void setSampleType(SampleType sampleType) {
-        object = sampleType;
+    public SampleTypeWrapper getSampleType() {
+        return (SampleTypeWrapper) modelObject;
     }
 
     @Override
     public String getName() {
-        SampleType sampleType = getSampleType();
+        SampleTypeWrapper sampleType = getSampleType();
         Assert.isNotNull(sampleType, "storage type is null");
         return sampleType.getNameShort();
     }

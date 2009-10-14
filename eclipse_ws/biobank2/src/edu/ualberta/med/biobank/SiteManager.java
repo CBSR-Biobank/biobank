@@ -17,7 +17,6 @@ import org.eclipse.ui.services.ISourceProviderService;
 import org.osgi.service.prefs.BackingStoreException;
 import org.osgi.service.prefs.Preferences;
 
-import edu.ualberta.med.biobank.common.utils.ModelUtils;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.rcp.Application;
@@ -126,7 +125,7 @@ public class SiteManager {
 
     public void updateSites() {
         try {
-            updateSites(ModelUtils.getSites(appService, null));
+            updateSites(SiteWrapper.getSites(appService, null));
         } catch (Exception e) {
             LOGGER.error("Cannot update Sites", e);
         }
@@ -154,8 +153,11 @@ public class SiteManager {
                 setCurrentSite(currentSiteWrapper);
                 SessionManager.getInstance().getSession().rebuild();
                 TreeViewer tv = SessionManager.getInstance().getTreeViewer();
-                Assert.isNotNull(tv, "tree viewer is null");
-                tv.expandToLevel(3);
+                if (tv != null) {
+                    // can be null if we start on the
+                    // PatientAdministrationPerspective
+                    tv.expandToLevel(3);
+                }
             }
         });
     }

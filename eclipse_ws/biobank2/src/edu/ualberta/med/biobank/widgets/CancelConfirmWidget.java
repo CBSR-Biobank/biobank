@@ -53,6 +53,10 @@ public class CancelConfirmWidget extends BiobankWidget {
                     if (BioBankPlugin.getDefault().isConfirmBarcode(text)
                         && confirmButton.isEnabled()) {
                         form.confirm();
+                        // form will be closed. Default following behaviours
+                        // will send a disposed error if we don't set this to
+                        // false
+                        e.doit = false;
                     } else if (BioBankPlugin.getDefault().isCancelBarcode(text)) {
                         form.cancel();
                     }

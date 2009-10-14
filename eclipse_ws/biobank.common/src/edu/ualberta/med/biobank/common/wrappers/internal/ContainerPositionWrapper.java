@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.common.wrappers;
+package edu.ualberta.med.biobank.common.wrappers.internal;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -6,6 +6,8 @@ import java.util.List;
 
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.RowColPos;
+import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerPosition;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -28,16 +30,12 @@ public class ContainerPositionWrapper extends
             .getPropertyChangesNames()));
         properties.add("parentContainer");
         properties.add("container");
-        return (String[]) properties.toArray();
+        return properties.toArray(new String[properties.size()]);
     }
 
     @Override
     public Class<ContainerPosition> getWrappedClass() {
         return ContainerPosition.class;
-    }
-
-    @Override
-    protected void persistChecks() throws BiobankCheckException, Exception {
     }
 
     public void setParentContainer(Container parentContainer) {
@@ -95,7 +93,6 @@ public class ContainerPositionWrapper extends
 
     @Override
     protected void deleteChecks() throws BiobankCheckException, Exception {
-        // TODO Auto-generated method stub
     }
 
     @Override
