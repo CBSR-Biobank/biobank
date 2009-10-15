@@ -110,6 +110,10 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
 
     private String palletNameContains;
 
+    private Button randomScan;
+
+    private Button existsScan;
+
     @Override
     protected void init() {
         super.init();
@@ -391,7 +395,7 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
         fieldsComposite.setLayout(layout);
         toolkit.paintBordersFor(fieldsComposite);
         GridData gd = new GridData();
-        gd.widthHint = 400;
+        gd.widthHint = 500;
         gd.verticalAlignment = SWT.TOP;
         fieldsComposite.setLayoutData(gd);
 
@@ -427,7 +431,24 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
                 }
             }
         });
-        scanButton = toolkit.createButton(fieldsComposite, "Scan", SWT.PUSH);
+
+        String scanButtonTitle = "Launch scan";
+        if (!BioBankPlugin.isRealScanEnabled()) {
+            gd.widthHint = 400;
+            Composite comp = toolkit.createComposite(fieldsComposite);
+            comp.setLayout(new GridLayout());
+            gd = new GridData();
+            gd.horizontalSpan = 2;
+            comp.setLayoutData(gd);
+            randomScan = toolkit.createButton(comp, "Get random scan values",
+                SWT.RADIO);
+            randomScan.setSelection(true);
+            existsScan = toolkit.createButton(comp,
+                "Get random and already linked samples", SWT.RADIO);
+            scanButtonTitle = "Fake scan";
+        }
+        scanButton = toolkit.createButton(fieldsComposite, scanButtonTitle,
+            SWT.PUSH);
         gd = new GridData();
         gd.horizontalSpan = 2;
         scanButton.setLayoutData(gd);
@@ -526,7 +547,7 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
             public void run() {
                 try {
                     scanOk = true;
-                    PalletCell[][] cells;
+                    PalletCell[][] cells = null;
                     appendLog("----");
                     appendLog("Scanning plate "
                         + plateToScanValue.getValue().toString());
@@ -536,9 +557,15 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
                         cells = PalletCell.convertArray(ScannerConfigPlugin
                             .scan(plateNum));
                     } else {
-                        cells = PalletCell.getRandomScanLink();
+                        if (randomScan.getSelection()) {
+                            cells = PalletCell.getRandomScanLink();
+                        } else if (existsScan.getSelection()) {
+                            cells = PalletCell
+                                .getRandomScanLinkWithSamplesAlreadyLinked(
+                                    appService, SessionManager.getInstance()
+                                        .getCurrentSiteWrapper().getId());
+                        }
                     }
-
                     scannedValue.setValue(true);
                     radioComponents.setEnabled(true);
                     for (int i = 0; i < cells.length; i++) { // rows
@@ -571,12 +598,19 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
         if (cell != null) {
             String value = cell.getValue();
             if (value != null) {
-                if (SampleWrapper.exists(appService, value)) {
+                List<SampleWrapper> samples = SampleWrapper.getSamplesInSite(
+                    appService, value, SessionManager.getInstance()
+                        .getCurrentSiteWrapper());
+                if (samples.size() > 0) {
                     cell.setStatus(SampleCellStatus.ERROR);
                     String msg = "Aliquot already in database";
                     cell.setInformation(msg);
                     scanOk = false;
-                    appendLog("ERROR: " + value + " - " + msg);
+                    SampleWrapper sample = samples.get(0);
+                    appendLog("ERROR: " + value + " - " + msg + " see visit "
+                        + sample.getPatientVisit().getFormattedDateDrawn()
+                        + " of patient "
+                        + sample.getPatientVisit().getPatient().getNumber());
                 } else {
                     cell.setStatus(SampleCellStatus.NEW);
                 }
