@@ -19,6 +19,8 @@ public class TestDatabase {
     private static final List<String> IGNORE_RETURN_TYPES = new ArrayList<String>() {
         private static final long serialVersionUID = 1L;
         {
+            add("java.lang.Class");
+            add("java.lang.Object");
             add("java.util.Set");
             add("java.util.List");
         }
@@ -46,7 +48,9 @@ public class TestDatabase {
             if (method.getName().startsWith("get")
                 && !method.getName().equals("getClass")
                 && !IGNORE_RETURN_TYPES.contains(method.getReturnType()
-                    .getName())) {
+                    .getName())
+                && !method.getReturnType().getName().startsWith(
+                    "edu.ualberta.med.biobank.common.wrappers")) {
                 GetterInfo getterInfo = new GetterInfo();
                 getterInfo.getMethod = method;
                 map.put(method.getName(), getterInfo);
@@ -60,9 +64,11 @@ public class TestDatabase {
                 String getterName = "g"
                     + setterName.substring(1, setterName.length());
                 GetterInfo getterInfo = map.get(getterName);
-                Assert.assertNotNull(
-                    "corresponding getter not found for setter \"" + setterName
-                        + "\"", getterInfo);
+                if (getterInfo == null) {
+                    System.out.println("no getter found for "
+                        + w.getClass().getName() + "." + setterName + "()");
+                    continue;
+                }
                 getterInfo.setMethod = method;
             }
         }
@@ -73,18 +79,25 @@ public class TestDatabase {
         throws BiobankCheckException, Exception {
         Collection<GetterInfo> gettersInfoList = getGettersAndSetters(w);
         for (GetterInfo getterInfo : gettersInfoList) {
+            if (getterInfo.setMethod == null) {
+                System.out.println("no setter found for "
+                    + w.getClass().getName() + "."
+                    + getterInfo.getMethod.getName() + "()");
+                continue;
+            }
+
             String getReturnType = getterInfo.getMethod.getReturnType()
                 .getName();
 
             Object parameter = null;
 
-            if (getReturnType.equals("Boolean")) {
+            if (getReturnType.equals("java.lang.Boolean")) {
                 parameter = new Boolean(true);
-            } else if (getReturnType.equals("Integer")) {
+            } else if (getReturnType.equals("java.lang.Integer")) {
                 parameter = new Integer(1);
-            } else if (getReturnType.equals("Double")) {
+            } else if (getReturnType.equals("java.lang.Double")) {
                 parameter = new Double(1.0);
-            } else if (getReturnType.equals("String")) {
+            } else if (getReturnType.equals("java.lang.String")) {
                 parameter = new String("abcdef");
             } else {
                 throw new Exception("return type " + getReturnType
@@ -99,6 +112,7 @@ public class TestDatabase {
             Object getResult = getterInfo.getMethod.invoke(w);
 
             Assert.assertEquals(parameter, getResult);
+            w.delete();
         }
 
     }
