@@ -97,8 +97,9 @@ public class SiteWrapper extends ModelWrapper<Site> {
             .firePropertyChange("address", oldAddress, address);
     }
 
-    private void initAddress() {
+    private AddressWrapper initAddress() {
         setAddress(new Address());
+        return getAddress();
     }
 
     public String getStreet1() {
@@ -112,7 +113,7 @@ public class SiteWrapper extends ModelWrapper<Site> {
     public void setStreet1(String street1) {
         AddressWrapper address = getAddress();
         if (address == null) {
-            initAddress();
+            address = initAddress();
         }
         address.setStreet1(street1);
     }
@@ -128,7 +129,7 @@ public class SiteWrapper extends ModelWrapper<Site> {
     public void setStreet2(String street2) {
         AddressWrapper address = getAddress();
         if (address == null) {
-            initAddress();
+            address = initAddress();
         }
         address.setStreet2(street2);
     }
@@ -144,7 +145,7 @@ public class SiteWrapper extends ModelWrapper<Site> {
     public void setCity(String city) {
         AddressWrapper address = getAddress();
         if (address == null) {
-            initAddress();
+            address = initAddress();
         }
         address.setCity(city);
     }
@@ -160,7 +161,7 @@ public class SiteWrapper extends ModelWrapper<Site> {
     public void setProvince(String province) {
         AddressWrapper address = getAddress();
         if (address == null) {
-            initAddress();
+            address = initAddress();
         }
         address.setProvince(province);
     }
@@ -176,13 +177,17 @@ public class SiteWrapper extends ModelWrapper<Site> {
     public void setPostalCode(String postalCode) {
         AddressWrapper address = getAddress();
         if (address == null) {
-            initAddress();
+            address = initAddress();
         }
         address.setPostalCode(postalCode);
     }
 
     @Override
     protected void persistChecks() throws BiobankCheckException, Exception {
+        if (getAddress() == null) {
+            throw new BiobankCheckException("the site does not have an address");
+        }
+
         if (!checkSiteNameUnique()) {
             throw new BiobankCheckException("A site with name \"" + getName()
                 + "\" already exists.");

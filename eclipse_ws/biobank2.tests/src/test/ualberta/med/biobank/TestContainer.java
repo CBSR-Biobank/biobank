@@ -14,53 +14,70 @@ import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.model.Container;
 
 public class TestContainer extends TestDatabase {
-	private SiteWrapper site;
-	private List<ContainerTypeWrapper> containerTypes;
-	private List<ContainerTypeWrapper> topTypes;
+    private SiteWrapper site;
+    private List<ContainerTypeWrapper> containerTypes;
+    private List<ContainerTypeWrapper> topTypes;
 
-	@Before
-	public void setUp() throws Exception {
-		super.setUp();
-		List<SiteWrapper> sites = SiteWrapper.getAllSites(appService);
-		if (sites.size() > 0) {
-			site = sites.get(0);
-			containerTypes = ContainerTypeWrapper.getContainerTypesInSite(
-					appService, site, "", false);
-			if (containerTypes.size() == 0) {
-				throw new Exception(
-						"Can't test with no container type in this site");
-			}
-			topTypes = ContainerTypeWrapper.getTopContainerTypesInSite(
-					appService, site);
-			if (topTypes.size() == 0) {
-				throw new Exception(
-						"Can't test with no Top container type in this site");
-			}
-		} else {
-			throw new Exception("Can't test with no site");
-		}
-	}
+    @Before
+    public void setUp() throws Exception {
+        super.setUp();
+        List<SiteWrapper> sites = SiteWrapper.getAllSites(appService);
+        if (sites.size() > 0) {
+            site = sites.get(0);
+            containerTypes = ContainerTypeWrapper.getContainerTypesInSite(
+                appService, site, "", false);
+            if (containerTypes.size() == 0) {
+                ContainerTypeWrapper containerType = new ContainerTypeWrapper(
+                    appService);
+                containerType.setSite(site);
+                containerType.setName("Top Container Type");
+                containerType.setNameShort("TCT");
+                containerType.setRowCapacity(5);
+                containerType.setColCapacity(9);
+                containerType.setTopLevel(true);
+                containerType.persist();
+            }
+            topTypes = ContainerTypeWrapper.getTopContainerTypesInSite(
+                appService, site);
+            if (topTypes.size() == 0) {
+                throw new Exception(
+                    "Can't test with no Top container type in this site");
+            }
+        } else {
+            site = new SiteWrapper(appService);
+            site.setName("Site - Container Test");
+            site.setStreet1("street");
+            site.persist();
+        }
+    }
 
-	@Test
-	public void createOk() throws Exception {
-		ContainerWrapper container = new ContainerWrapper(appService);
-		container.setLabel("05");
-		container.setContainerType(topTypes.get(0));
-		container.setSite(site);
-		container.persist();
+    @Test
+    public void testGettersAndSetters() throws BiobankCheckException, Exception {
+        ContainerWrapper container = new ContainerWrapper(appService);
+        container.setSite(site);
+        testGettersAndSetters(container);
+    }
 
-		Integer id = container.getId();
-		Assert.assertNotNull(id);
-		Container containerInDB = ModelUtils.getObjectWithId(appService,
-				Container.class, id);
-		Assert.assertNotNull(containerInDB);
-	}
+    @Test
+    public void createOk() throws Exception {
+        ContainerWrapper container = new ContainerWrapper(appService);
+        container.setLabel("05");
+        container.setContainerType(topTypes.get(0));
+        container.setSite(site);
+        container.persist();
 
-	@Test(expected = BiobankCheckException.class)
-	public void createNoSite() throws Exception {
-		ContainerWrapper container = new ContainerWrapper(appService);
-		container.setLabel("05");
-		container.setContainerType(topTypes.get(0));
-		container.persist();
-	}
+        Integer id = container.getId();
+        Assert.assertNotNull(id);
+        Container containerInDB = ModelUtils.getObjectWithId(appService,
+            Container.class, id);
+        Assert.assertNotNull(containerInDB);
+    }
+
+    @Test(expected = BiobankCheckException.class)
+    public void createNoSite() throws Exception {
+        ContainerWrapper container = new ContainerWrapper(appService);
+        container.setLabel("05");
+        container.setContainerType(topTypes.get(0));
+        container.persist();
+    }
 }

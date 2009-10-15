@@ -102,8 +102,9 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
         propertyChangeSupport.firePropertyChange("site", oldSite, newSite);
     }
 
-    private void initAddress() {
+    private AddressWrapper initAddress() {
         setAddress(new Address());
+        return getAddress();
     }
 
     public String getStreet1() {
@@ -117,7 +118,7 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
     public void setStreet1(String street1) {
         AddressWrapper address = getAddress();
         if (address == null) {
-            initAddress();
+            address = initAddress();
         }
         address.setStreet1(street1);
     }
@@ -133,7 +134,7 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
     public void setStreet2(String street2) {
         AddressWrapper address = getAddress();
         if (address == null) {
-            initAddress();
+            address = initAddress();
         }
         address.setStreet2(street2);
     }
@@ -149,7 +150,7 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
     public void setCity(String city) {
         AddressWrapper address = getAddress();
         if (address == null) {
-            initAddress();
+            address = initAddress();
         }
         address.setCity(city);
     }
@@ -165,7 +166,7 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
     public void setProvince(String province) {
         AddressWrapper address = getAddress();
         if (address == null) {
-            initAddress();
+            address = initAddress();
         }
         address.setProvince(province);
     }
@@ -181,13 +182,17 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
     public void setPostalCode(String postalCode) {
         AddressWrapper address = getAddress();
         if (address == null) {
-            initAddress();
+            address = initAddress();
         }
         address.setPostalCode(postalCode);
     }
 
     @Override
     protected void persistChecks() throws BiobankCheckException, Exception {
+        if (getAddress() == null) {
+            throw new BiobankCheckException("the site does not have an address");
+        }
+
         if (!checkClinicNameUnique()) {
             throw new BiobankCheckException("A clinic with name \"" + getName()
                 + "\" already exists.");
