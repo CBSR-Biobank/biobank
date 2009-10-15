@@ -71,6 +71,7 @@ public class TestContainer extends TestDatabase {
         Container containerInDB = ModelUtils.getObjectWithId(appService,
             Container.class, id);
         Assert.assertNotNull(containerInDB);
+        container.delete();
     }
 
     @Test(expected = BiobankCheckException.class)

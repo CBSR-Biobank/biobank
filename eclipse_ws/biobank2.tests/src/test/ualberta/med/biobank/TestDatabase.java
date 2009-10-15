@@ -5,14 +5,24 @@ import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Before;
 
 public class TestDatabase {
     protected static WritableApplicationService appService;
+
+    private static final List<String> IGNORE_RETURN_TYPES = new ArrayList<String>() {
+        private static final long serialVersionUID = 1L;
+        {
+            add("java.util.Set");
+            add("java.util.List");
+        }
+    };
 
     private class GetterInfo {
         Method getMethod;
@@ -35,7 +45,8 @@ public class TestDatabase {
         for (Method method : methods) {
             if (method.getName().startsWith("get")
                 && !method.getName().equals("getClass")
-                && !method.getReturnType().getName().equals("java.util.Set")) {
+                && !IGNORE_RETURN_TYPES.contains(method.getReturnType()
+                    .getName())) {
                 GetterInfo getterInfo = new GetterInfo();
                 getterInfo.getMethod = method;
                 map.put(method.getName(), getterInfo);
@@ -47,7 +58,7 @@ public class TestDatabase {
                 && !method.getName().equals("setClass")) {
                 String setterName = method.getName();
                 String getterName = "g"
-                    + setterName.substring(1, setterName.length() - 1);
+                    + setterName.substring(1, setterName.length());
                 GetterInfo getterInfo = map.get(getterName);
                 Assert.assertNotNull(
                     "corresponding getter not found for setter \"" + setterName
