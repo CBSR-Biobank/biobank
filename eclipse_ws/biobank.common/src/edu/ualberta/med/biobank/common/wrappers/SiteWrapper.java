@@ -247,6 +247,25 @@ public class SiteWrapper extends ModelWrapper<Site> {
         return getStudyCollection(false);
     }
 
+    public void setStudyCollection(Collection<Study> studies, boolean setNull) {
+        Collection<Study> oldStudies = wrappedObject.getStudyCollection();
+        wrappedObject.setStudyCollection(studies);
+        propertyChangeSupport.firePropertyChange("studyCollection", oldStudies,
+            studies);
+        if (setNull) {
+            propertiesMap.put("studyCollection", null);
+        }
+    }
+
+    public void setStudyCollection(List<StudyWrapper> studies) {
+        Collection<Study> studyObjects = new HashSet<Study>();
+        for (StudyWrapper study : studies) {
+            studyObjects.add(study.getWrappedObject());
+        }
+        setStudyCollection(studyObjects, false);
+        propertiesMap.put("studyCollection", studies);
+    }
+
     @SuppressWarnings("unchecked")
     public List<ClinicWrapper> getClinicCollection(boolean sort) {
         List<ClinicWrapper> clinicCollection = (List<ClinicWrapper>) propertiesMap
@@ -523,6 +542,22 @@ public class SiteWrapper extends ModelWrapper<Site> {
         }
     }
 
+    /**
+     * Removes the study objects that are not contained in the collection.
+     */
+    private void deleteStudyDifference(Site origSite) throws Exception {
+        List<StudyWrapper> newStudies = getStudyCollection();
+        List<StudyWrapper> oldStudies = new SiteWrapper(appService, origSite)
+            .getStudyCollection();
+        if (oldStudies != null) {
+            for (StudyWrapper study : oldStudies) {
+                if ((study == null) || !newStudies.contains(study)) {
+                    study.delete();
+                }
+            }
+        }
+    }
+
     private Map<String, PvInfoTypeWrapper> getPvInfoTypeMap()
         throws ApplicationException {
         if (pvInfoTypeMap == null) {
@@ -595,6 +630,7 @@ public class SiteWrapper extends ModelWrapper<Site> {
         throws BiobankCheckException, Exception {
         deleteSampleTypeDifference(origObject);
         deletePvInfoPossibleDifference(origObject);
+        deleteStudyDifference(origObject);
     }
 
     @Override

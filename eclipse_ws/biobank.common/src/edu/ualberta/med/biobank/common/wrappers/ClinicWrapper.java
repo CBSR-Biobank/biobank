@@ -51,10 +51,6 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
             .firePropertyChange("address", oldAddress, address);
     }
 
-    public void setAddress(AddressWrapper address) {
-        setAddress(address.wrappedObject);
-    }
-
     public String getName() {
         return wrappedObject.getName();
     }

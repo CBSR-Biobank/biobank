@@ -2,6 +2,9 @@ package test.ualberta.med.biobank;
 
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
+import java.util.List;
+import java.util.Random;
+
 import org.junit.Before;
 
 public class TestDatabase {
@@ -16,4 +19,12 @@ public class TestDatabase {
 		}
 	}
 
+	public <T> T chooseRandomlyInList(List<T> list) {
+		if (list.size() > 0) {
+			Random r = new Random();
+			int pos = r.nextInt(list.size());
+			return list.get(pos);
+		}
+		return null;
+	}
 }
