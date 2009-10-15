@@ -8,8 +8,11 @@ public class TestDatabase {
     protected WritableApplicationService appService;
 
     @Before
-    public void setUp() {
+    public void setUp() throws Exception {
         appService = AllTests.appService;
+        if (appService == null) {
+            throw new Exception("no application service");
+        }
     }
 
 }
