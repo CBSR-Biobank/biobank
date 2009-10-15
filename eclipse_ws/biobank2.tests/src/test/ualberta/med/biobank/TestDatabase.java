@@ -10,9 +10,6 @@ public class TestDatabase {
     @Before
     public void setUp() throws Exception {
         appService = AllTests.appService;
-        if (appService == null) {
-            throw new Exception("no application service");
-        }
     }
 
 }
