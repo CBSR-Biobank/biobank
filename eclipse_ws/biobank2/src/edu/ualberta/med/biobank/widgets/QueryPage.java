@@ -156,6 +156,7 @@ public class QueryPage extends Composite {
         searchableModelObjects.add(Clinic.class);
     }
 
+    @SuppressWarnings("unchecked")
     public HQLCriteria getQuery() {
 
         IStructuredSelection typeSelection = (IStructuredSelection) selectedTypeCombo
