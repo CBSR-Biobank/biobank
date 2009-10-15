@@ -68,9 +68,8 @@ public class SessionAdapter extends AdapterBase {
                     handlerService.executeCommand(
                         "edu.ualberta.med.biobank.commands.siteAdd", null);
                 } catch (Exception ex) {
-                    // throw new
-                    // RuntimeException("edu.ualberta.med.biobank.commands.addSite not found");
-                    ex.printStackTrace();
+                    throw new RuntimeException(
+                        "edu.ualberta.med.biobank.commands.addSite not found");
                 }
             }
 

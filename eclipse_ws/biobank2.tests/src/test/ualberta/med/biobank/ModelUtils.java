@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.common.utils;
+package test.ualberta.med.biobank;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;

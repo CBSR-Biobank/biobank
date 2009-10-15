@@ -63,7 +63,7 @@ public class SiteViewForm extends AddressViewFormCommon {
                 getSite().getPage().openEditor(new FormInput(studyAdapter),
                     StudyEntryForm.ID, true);
             } catch (PartInitException exp) {
-                exp.printStackTrace();
+                LOGGER.error("Error opening form " + StudyEntryForm.ID, exp);
             }
         }
     };
@@ -201,7 +201,8 @@ public class SiteViewForm extends AddressViewFormCommon {
                     getSite().getPage().openEditor(
                         new FormInput(clinicAdapter), ClinicEntryForm.ID, true);
                 } catch (PartInitException exp) {
-                    exp.printStackTrace();
+                    LOGGER.error("Error opening form " + ClinicEntryForm.ID,
+                        exp);
                 }
             }
         });

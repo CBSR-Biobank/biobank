@@ -22,7 +22,6 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.SDKQuery;
 import gov.nih.nci.system.query.example.DeleteExampleQuery;
 import gov.nih.nci.system.query.example.InsertExampleQuery;
-import gov.nih.nci.system.query.example.UpdateExampleQuery;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class ContainerWrapper extends ModelWrapper<Container> {
@@ -657,22 +656,27 @@ public class ContainerWrapper extends ModelWrapper<Container> {
     }
 
     public void setChildLabels(String oldLabel) throws Exception {
-        // FIXME inefficient, should be improved
-        HQLCriteria criteria = new HQLCriteria("from "
-            + Container.class.getName() + " where label like ? and site= ?",
-            Arrays.asList(new Object[] { oldLabel + "%",
-                getSite().getWrappedObject() }));
-        List<Container> containers = appService.query(criteria);
-        for (Container c : containers) {
-            if (c.getLabel().compareToIgnoreCase(oldLabel) == 0)
-                continue;
+        for (ContainerWrapper c : getChildren()) {
             String nameEnd = c.getLabel().substring(oldLabel.length());
             c.setLabel(getLabel() + nameEnd);
-            SDKQuery q = new UpdateExampleQuery(c);
-            appService.executeQuery(q);
-            new ContainerWrapper(appService, c).setChildLabels(oldLabel
-                + nameEnd);
+            c.persist();
+            c.setChildLabels(oldLabel + nameEnd);
         }
+    }
+
+    /**
+     * get a list of all containers that are above this container in the
+     * hierarchy
+     */
+    public List<ContainerWrapper> getAllParents() {
+        List<ContainerWrapper> list = new ArrayList<ContainerWrapper>();
+        ContainerPositionWrapper position = containerPosition;
+        if (position != null) {
+            ContainerWrapper parent = position.getParentContainer();
+            list.add(parent);
+            list.addAll(parent.getAllParents());
+        }
+        return list;
     }
 
     /**

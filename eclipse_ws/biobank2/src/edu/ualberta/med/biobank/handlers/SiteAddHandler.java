@@ -30,7 +30,8 @@ public class SiteAddHandler extends AbstractHandler {
             HandlerUtil.getActiveWorkbenchWindowChecked(event).getActivePage()
                 .openEditor(input, SiteEntryForm.ID, true);
         } catch (Exception exp) {
-            exp.printStackTrace();
+            throw new ExecutionException("Error opening form "
+                + SiteEntryForm.ID, exp);
         }
 
         return null;

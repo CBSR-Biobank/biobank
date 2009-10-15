@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.forms;
 
+import org.apache.log4j.Logger;
 import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
@@ -16,6 +17,10 @@ import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
 
 public class SiteEntryForm extends AddressEntryFormCommon {
+
+    private static Logger LOGGER = Logger.getLogger(SiteEntryForm.class
+        .getName());
+
     public static final String ID = "edu.ualberta.med.biobank.forms.SiteEntryForm";
 
     private static final String MSG_NEW_SITE_OK = "Create a new BioBank site.";
@@ -39,7 +44,7 @@ public class SiteEntryForm extends AddressEntryFormCommon {
         try {
             siteWrapper.reload();
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error("Can't reload site", e);
         }
 
         String tabName;

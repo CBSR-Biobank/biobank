@@ -97,52 +97,97 @@ public class SiteWrapper extends ModelWrapper<Site> {
             .firePropertyChange("address", oldAddress, address);
     }
 
-    public void setAddress(AddressWrapper study) {
-        setAddress(study.wrappedObject);
+    private AddressWrapper initAddress() {
+        setAddress(new Address());
+        return getAddress();
     }
 
     public String getStreet1() {
-        return getAddress().getStreet1();
+        AddressWrapper address = getAddress();
+        if (address == null) {
+            return null;
+        }
+        return address.getStreet1();
     }
 
     public void setStreet1(String street1) {
-        getAddress().setStreet1(street1);
+        AddressWrapper address = getAddress();
+        if (address == null) {
+            address = initAddress();
+        }
+        address.setStreet1(street1);
     }
 
     public String getStreet2() {
-        return getAddress().getStreet2();
+        AddressWrapper address = getAddress();
+        if (address == null) {
+            return null;
+        }
+        return address.getStreet2();
     }
 
     public void setStreet2(String street2) {
-        getAddress().setStreet2(street2);
+        AddressWrapper address = getAddress();
+        if (address == null) {
+            address = initAddress();
+        }
+        address.setStreet2(street2);
     }
 
     public String getCity() {
-        return getAddress().getCity();
+        AddressWrapper address = getAddress();
+        if (address == null) {
+            return null;
+        }
+        return address.getCity();
     }
 
     public void setCity(String city) {
-        getAddress().setCity(city);
+        AddressWrapper address = getAddress();
+        if (address == null) {
+            address = initAddress();
+        }
+        address.setCity(city);
     }
 
     public String getProvince() {
-        return getAddress().getProvince();
+        AddressWrapper address = getAddress();
+        if (address == null) {
+            return null;
+        }
+        return address.getProvince();
     }
 
     public void setProvince(String province) {
-        getAddress().setProvince(province);
+        AddressWrapper address = getAddress();
+        if (address == null) {
+            address = initAddress();
+        }
+        address.setProvince(province);
     }
 
     public String getPostalCode() {
-        return getAddress().getPostalCode();
+        AddressWrapper address = getAddress();
+        if (address == null) {
+            return null;
+        }
+        return address.getPostalCode();
     }
 
     public void setPostalCode(String postalCode) {
-        getAddress().setPostalCode(postalCode);
+        AddressWrapper address = getAddress();
+        if (address == null) {
+            address = initAddress();
+        }
+        address.setPostalCode(postalCode);
     }
 
     @Override
     protected void persistChecks() throws BiobankCheckException, Exception {
+        if (getAddress() == null) {
+            throw new BiobankCheckException("the site does not have an address");
+        }
+
         if (!checkSiteNameUnique()) {
             throw new BiobankCheckException("A site with name \"" + getName()
                 + "\" already exists.");
@@ -203,7 +248,7 @@ public class SiteWrapper extends ModelWrapper<Site> {
         return clinicCollection;
     }
 
-    public Collection<StudyWrapper> getStudyCollection() {
+    public List<StudyWrapper> getStudyCollection() {
         return getStudyCollection(false);
     }
 

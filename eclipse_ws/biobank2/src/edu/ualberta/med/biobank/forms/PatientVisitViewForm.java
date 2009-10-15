@@ -163,9 +163,9 @@ public class PatientVisitViewForm extends BiobankViewForm {
 
     private void createSamplesSection() {
         Composite parent = createSectionWithClient("Samples");
-        samplesWidget = new SamplesListWidget(parent, patientVisitAdapter
-            .getParentFromClass(SiteAdapter.class), patientVisitWrapper
-            .getSampleWrapperCollection());
+        samplesWidget = new SamplesListWidget(parent, patientVisitWrapper
+            .getSampleWrapperCollection(), patientVisitAdapter
+            .getParentFromClass(SiteAdapter.class));
         samplesWidget.adaptToToolkit(toolkit, true);
         samplesWidget.setSelection(patientVisitAdapter.getSelectedSample());
     }

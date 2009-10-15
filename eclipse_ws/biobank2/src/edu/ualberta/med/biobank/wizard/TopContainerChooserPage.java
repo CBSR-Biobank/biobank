@@ -79,7 +79,7 @@ public class TopContainerChooserPage extends AbstractContainerChooserPage {
                 containerWidget.setContainerType(types.get(0));
             }
         } catch (ApplicationException e) {
-            e.printStackTrace();
+            LOGGER.error("Error getting freezers", e);
         }
     }
 

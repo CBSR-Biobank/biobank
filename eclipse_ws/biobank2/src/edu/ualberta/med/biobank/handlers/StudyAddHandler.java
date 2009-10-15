@@ -32,7 +32,8 @@ public class StudyAddHandler extends AbstractHandler {
             HandlerUtil.getActiveWorkbenchWindowChecked(event).getActivePage()
                 .openEditor(input, StudyEntryForm.ID, true);
         } catch (Exception exp) {
-            exp.printStackTrace();
+            throw new ExecutionException("Error opening form "
+                + StudyEntryForm.ID, exp);
         }
 
         return null;

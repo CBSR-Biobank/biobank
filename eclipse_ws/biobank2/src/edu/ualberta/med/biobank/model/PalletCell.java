@@ -42,10 +42,25 @@ public class PalletCell {
 
     public static PalletCell[][] getRandomScanLink() {
         return convertArray(ScanCell.getRandom());
-        // ScanCell[][] palletScanned = new ScanCell[8][12];
-        // palletScanned[0][0] = new ScanCell(0, 0, "titi");
-        // palletScanned[1][3] = new ScanCell(1, 3, "toto");
-        // return convertArray(palletScanned);
+    }
+
+    public static PalletCell[][] getRandomScanLinkWithSamplesAlreadyLinked(
+        WritableApplicationService appService, Integer siteId) throws Exception {
+        PalletCell[][] cells = convertArray(ScanCell.getRandom());
+        List<SampleWrapper> samples = SampleWrapper
+            .getRandomSamplesAlreadyLinked(appService, siteId);
+        if (samples.size() > 1) {
+            int row = 2;
+            int col = 3;
+            ScanCell scanCell = new ScanCell(row, col, samples.get(0)
+                .getInventoryId());
+            cells[row][col] = new PalletCell(scanCell);
+            row = 3;
+            col = 1;
+            scanCell = new ScanCell(row, col, samples.get(1).getInventoryId());
+            cells[row][col] = new PalletCell(scanCell);
+        }
+        return cells;
     }
 
     public static PalletCell[][] getRandomSamplesAlreadyAssigned(

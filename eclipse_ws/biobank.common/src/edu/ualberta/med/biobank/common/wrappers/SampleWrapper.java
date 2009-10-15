@@ -16,8 +16,6 @@ import edu.ualberta.med.biobank.model.Sample;
 import edu.ualberta.med.biobank.model.SamplePosition;
 import edu.ualberta.med.biobank.model.SampleStorage;
 import edu.ualberta.med.biobank.model.SampleType;
-import edu.ualberta.med.biobank.model.Site;
-import edu.ualberta.med.biobank.model.Study;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -85,7 +83,7 @@ public class SampleWrapper extends ModelWrapper<Sample> {
         }
     }
 
-    public Site getSite() {
+    public SiteWrapper getSite() {
         if (getPatientVisit() != null) {
             return getPatientVisit().getPatient().getStudy().getSite();
         }
@@ -99,8 +97,12 @@ public class SampleWrapper extends ModelWrapper<Sample> {
             patientVisit);
     }
 
-    public PatientVisit getPatientVisit() {
-        return wrappedObject.getPatientVisit();
+    public PatientVisitWrapper getPatientVisit() {
+        PatientVisit pv = wrappedObject.getPatientVisit();
+        if (pv == null) {
+            return null;
+        }
+        return new PatientVisitWrapper(appService, pv);
     }
 
     public void setSamplePositionFromString(String positionString,
@@ -290,9 +292,9 @@ public class SampleWrapper extends ModelWrapper<Sample> {
     }
 
     public void setQuantityFromType() {
-        Study study = getPatientVisit().getPatient().getStudy();
+        StudyWrapper study = getPatientVisit().getPatient().getStudy();
         Double volume = null;
-        for (SampleStorage ss : study.getSampleStorageCollection()) {
+        for (SampleStorageWrapper ss : study.getSampleStorageCollection()) {
             if (ss.getSampleType().getId().equals(getSampleType().getId())) {
                 volume = ss.getVolume();
             }
@@ -332,21 +334,19 @@ public class SampleWrapper extends ModelWrapper<Sample> {
         return list;
     }
 
-    public static boolean exists(WritableApplicationService appService,
-        String inventoryId) throws ApplicationException {
-
-        Sample sample = new Sample();
-        sample.setInventoryId(inventoryId);
-        List<Sample> samples = appService.search(Sample.class, sample);
-        if (samples.size() == 0) {
-            return false;
-        }
-        return true;
-    }
-
     @Override
     public int compareTo(ModelWrapper<Sample> o) {
         return 0;
+    }
+
+    public static List<SampleWrapper> getRandomSamplesAlreadyLinked(
+        WritableApplicationService appService, Integer siteId)
+        throws ApplicationException {
+        HQLCriteria criteria = new HQLCriteria("from " + Sample.class.getName()
+            + " as s where s.patientVisit.patient.study.site.id = ?", Arrays
+            .asList(new Object[] { siteId }));
+        List<Sample> samples = appService.query(criteria);
+        return transformToWrapperList(appService, samples);
     }
 
     public static List<SampleWrapper> getRandomSamplesAlreadyAssigned(

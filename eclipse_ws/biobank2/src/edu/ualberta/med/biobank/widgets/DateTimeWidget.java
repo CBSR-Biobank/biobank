@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.widgets;
 import java.text.ParseException;
 import java.util.Date;
 
+import org.apache.log4j.Logger;
 import org.eclipse.nebula.widgets.cdatetime.CDT;
 import org.eclipse.nebula.widgets.cdatetime.CDateTime;
 import org.eclipse.swt.SWT;
@@ -27,6 +28,9 @@ import edu.ualberta.med.biobank.BioBankPlugin;
 public class DateTimeWidget extends BiobankWidget {
 
     CDateTime cdt;
+
+    private static Logger LOGGER = Logger.getLogger(DateTimeWidget.class
+        .getName());
 
     /**
      * Allow date to be null.
@@ -63,9 +67,8 @@ public class DateTimeWidget extends BiobankWidget {
         try {
             return BioBankPlugin.getDateTimeFormatter().parse(cdt.getText());
         } catch (ParseException e) {
-            e.printStackTrace();
+            LOGGER.error("Error parsing the date text", e);
         }
         return null;
     }
-
 }
