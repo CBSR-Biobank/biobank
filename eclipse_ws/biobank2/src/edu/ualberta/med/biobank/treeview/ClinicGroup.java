@@ -11,8 +11,6 @@ import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
-import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
@@ -46,13 +44,7 @@ public class ClinicGroup extends AdapterBase {
                 ClinicAdapter clinicAdapter = new ClinicAdapter(
                     ClinicGroup.this, clinic);
                 FormInput input = new FormInput(clinicAdapter);
-                try {
-                    PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-                        .getActivePage().openEditor(input, ClinicEntryForm.ID,
-                            true);
-                } catch (PartInitException exp) {
-                    exp.printStackTrace();
-                }
+                openForm(input, ClinicEntryForm.ID);
             }
 
             public void widgetDefaultSelected(SelectionEvent e) {

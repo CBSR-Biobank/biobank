@@ -32,7 +32,8 @@ public class ClinicAddHandler extends AbstractHandler {
             HandlerUtil.getActiveWorkbenchWindowChecked(event).getActivePage()
                 .openEditor(input, ClinicEntryForm.ID, true);
         } catch (PartInitException e) {
-            e.printStackTrace();
+            throw new ExecutionException("Error opening form "
+                + ClinicEntryForm.ID, e);
         }
 
         return null;

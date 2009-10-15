@@ -119,7 +119,6 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
                     setDirty(true);
                 } catch (final RemoteAccessException exp) {
                     BioBankPlugin.openRemoteAccessErrorMessage();
-                    exp.printStackTrace();
                     setDirty(true);
                 } catch (final AccessDeniedException ade) {
                     BioBankPlugin.openAccessDeniedErrorMessage();

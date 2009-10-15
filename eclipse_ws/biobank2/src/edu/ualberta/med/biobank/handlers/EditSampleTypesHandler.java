@@ -31,7 +31,8 @@ public class EditSampleTypesHandler extends AbstractHandler {
             HandlerUtil.getActiveWorkbenchWindowChecked(event).getActivePage()
                 .openEditor(input, SampleTypesEntryForm.ID, true);
         } catch (PartInitException e) {
-            e.printStackTrace();
+            throw new ExecutionException("Error opening form "
+                + SampleTypesEntryForm.ID, e);
         }
 
         return null;

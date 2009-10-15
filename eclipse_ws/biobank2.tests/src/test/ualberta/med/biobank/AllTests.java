@@ -10,21 +10,21 @@ import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
-@SuiteClasses( { TestContainer.class })
+@SuiteClasses( { TestContainer.class, TestSite.class })
 public class AllTests {
-    public static WritableApplicationService appService = null;
+	public static WritableApplicationService appService = null;
 
-    @BeforeClass
-    public static void setUp() throws Exception {
-        appService = (WritableApplicationService) ApplicationServiceProvider
-            .getApplicationServiceFromUrl("http://"
-                + System.getProperty("server", "localhost:8080") + "/biobank2",
-                "testuser", "test");
-    }
+	@BeforeClass
+	public static void setUp() throws Exception {
+		appService = (WritableApplicationService) ApplicationServiceProvider
+				.getApplicationServiceFromUrl("http://"
+						+ System.getProperty("server", "localhost:8080")
+						+ "/biobank2", "testuser", "test");
+	}
 
-    @AfterClass
-    public static void tearDown() {
-        System.out.println("tearing down");
-    }
+	@AfterClass
+	public static void tearDown() {
+		System.out.println("tearing down");
+	}
 
 }

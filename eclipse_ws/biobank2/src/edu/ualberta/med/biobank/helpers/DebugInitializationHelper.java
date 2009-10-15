@@ -60,8 +60,8 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
  */
 public class DebugInitializationHelper {
 
-    private static Logger LOGGER = Logger.getLogger(DebugInitializationHelper.class
-        .getName());
+    private static Logger LOGGER = Logger
+        .getLogger(DebugInitializationHelper.class.getName());
 
     private static final int MAX_CLINICS = 2;
 
@@ -126,8 +126,8 @@ public class DebugInitializationHelper {
                         Method method = DebugInitializationHelper.class
                             .getDeclaredMethod(methodName, new Class<?>[] {});
                         method.setAccessible(true);
-                        method
-                            .invoke(DebugInitializationHelper.this, new Object[] {});
+                        method.invoke(DebugInitializationHelper.this,
+                            new Object[] {});
                         monitor.worked(1);
                         method.setAccessible(false);
                         if (monitor.isCanceled())
@@ -164,7 +164,7 @@ public class DebugInitializationHelper {
                                     .openError("Init Examples",
                                         "Error encounted when adding init examples");
                         } catch (Exception e) {
-                            e.printStackTrace();
+                            LOGGER.error("Init Examples error", e);
                         }
                     }
                 });

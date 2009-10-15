@@ -32,7 +32,8 @@ public class ContainerTypeAddHandler extends AbstractHandler {
             HandlerUtil.getActiveWorkbenchWindowChecked(event).getActivePage()
                 .openEditor(input, ContainerTypeEntryForm.ID, true);
         } catch (Exception exp) {
-            exp.printStackTrace();
+            throw new ExecutionException("Error opening form "
+                + ContainerTypeEntryForm.ID, exp);
         }
         return null;
     }

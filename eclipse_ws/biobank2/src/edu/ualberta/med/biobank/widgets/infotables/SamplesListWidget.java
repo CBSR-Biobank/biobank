@@ -1,17 +1,13 @@
 package edu.ualberta.med.biobank.widgets.infotables;
 
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
@@ -31,34 +27,20 @@ public class SamplesListWidget extends InfoTableWidget<SampleWrapper> {
 
     private SiteAdapter siteAdapter;
 
-    private Map<Integer, SampleWrapper> samples;
-
-    private SamplesListWidget(Composite parent) {
-        super(parent, null, HEADINGS, BOUNDS);
-        GridData tableData = ((GridData) getLayoutData());
-        tableData.heightHint = 500;
-        samples = new HashMap<Integer, SampleWrapper>();
+    public SamplesListWidget(Composite parent,
+        Collection<SampleWrapper> sampleCollection) {
+        this(parent, sampleCollection, null);
     }
 
     public SamplesListWidget(Composite parent,
-        Collection<SampleWrapper> sampleCollection) {
-        this(parent);
-        setSamples(sampleCollection);
-    }
-
-    public SamplesListWidget(Composite parent, SiteAdapter siteAdapter,
-        Collection<SampleWrapper> sampleCollection) {
-        this(parent);
+        Collection<SampleWrapper> sampleCollection, SiteAdapter siteAdapter) {
+        super(parent, sampleCollection, HEADINGS, BOUNDS);
+        GridData tableData = ((GridData) getLayoutData());
+        tableData.heightHint = 500;
         this.siteAdapter = siteAdapter;
-        assignDoubleClickListener();
-
-        // Initialise collection
-        for (SampleWrapper sampleWrapper : sampleCollection) {
-            model.add(new BiobankCollectionModel());
-            samples.put(sampleWrapper.getId(), sampleWrapper);
+        if (siteAdapter != null) {
+            assignDoubleClickListener();
         }
-        getTableViewer().refresh();
-        setCollection(sampleCollection);
     }
 
     private void assignDoubleClickListener() {
@@ -89,60 +71,12 @@ public class SamplesListWidget extends InfoTableWidget<SampleWrapper> {
         });
     }
 
-    private void setSamples(final Collection<SampleWrapper> sampleCollection) {
-        if (sampleCollection == null)
-            return;
+    @Override
+    public Object getCollectionModelObject(SampleWrapper sample)
+        throws Exception {
+        sample.loadAttributes();
+        return sample;
 
-        // Initialise collection
-        for (int i = 0, n = sampleCollection.size(); i < n; ++i) {
-            model.add(new BiobankCollectionModel());
-        }
-        getTableViewer().refresh();
-
-        Thread t = new Thread() {
-            @Override
-            public void run() {
-                final TableViewer viewer = getTableViewer();
-                Display display = viewer.getTable().getDisplay();
-                int count = 0;
-
-                if (model.size() != sampleCollection.size()) {
-                    model.clear();
-                    for (int i = 0, n = sampleCollection.size(); i < n; ++i) {
-                        model.add(new BiobankCollectionModel());
-                    }
-                    display.asyncExec(new Runnable() {
-                        public void run() {
-                            if (!viewer.getTable().isDisposed())
-                                getTableViewer().refresh();
-                        }
-                    });
-                }
-
-                try {
-                    for (SampleWrapper sample : sampleCollection) {
-                        if (viewer.getTable().isDisposed())
-                            return;
-
-                        final BiobankCollectionModel modelItem = model
-                            .get(count);
-                        sample.loadAttributes();
-                        modelItem.o = sample;
-                        ++count;
-
-                        display.asyncExec(new Runnable() {
-                            public void run() {
-                                if (!viewer.getTable().isDisposed())
-                                    viewer.refresh(modelItem, false);
-                            }
-                        });
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        };
-        t.start();
     }
 
     public void setSelection(SampleWrapper selectedSample) {
