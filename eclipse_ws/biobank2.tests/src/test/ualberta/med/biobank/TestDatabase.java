@@ -9,12 +9,19 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Random;
 
 import org.junit.Assert;
 import org.junit.Before;
 
 public class TestDatabase {
     protected static WritableApplicationService appService;
+
+    private static final String ALPHABET = "abcdefghijklmnopqrstuvwxyz";
+
+    private static final int ALPHABET_LEN = ALPHABET.length();
+
+    protected Random r;
 
     private static final List<String> IGNORE_RETURN_TYPES = new ArrayList<String>() {
         private static final long serialVersionUID = 1L;
@@ -33,6 +40,7 @@ public class TestDatabase {
 
     @Before
     public void setUp() throws Exception {
+        r = new Random();
         appService = AllTests.appService;
         if (appService == null) {
             AllTests.setUp();
@@ -89,29 +97,36 @@ public class TestDatabase {
             String getReturnType = getterInfo.getMethod.getReturnType()
                 .getName();
 
-            Object parameter = null;
+            for (int i = 0; i < 5; ++i) {
+                Object parameter = null;
 
-            if (getReturnType.equals("java.lang.Boolean")) {
-                parameter = new Boolean(true);
-            } else if (getReturnType.equals("java.lang.Integer")) {
-                parameter = new Integer(1);
-            } else if (getReturnType.equals("java.lang.Double")) {
-                parameter = new Double(1.0);
-            } else if (getReturnType.equals("java.lang.String")) {
-                parameter = new String("abcdef");
-            } else {
-                throw new Exception("return type " + getReturnType
-                    + " for method " + getterInfo.getMethod.getName()
-                    + " for class " + w.getClass().getName()
-                    + " not implemented");
+                if (getReturnType.equals("java.lang.Boolean")) {
+                    parameter = new Boolean(r.nextBoolean());
+                } else if (getReturnType.equals("java.lang.Integer")) {
+                    parameter = new Integer(r.nextInt());
+                } else if (getReturnType.equals("java.lang.Double")) {
+                    parameter = new Double(r.nextDouble());
+                } else if (getReturnType.equals("java.lang.String")) {
+                    String str = new String();
+                    for (int j = 0, n = r.nextInt(32); j < n; ++j) {
+                        int begin = r.nextInt(ALPHABET_LEN - 1);
+                        str += ALPHABET.substring(begin, begin + 1);
+                    }
+                    parameter = str;
+                } else {
+                    throw new Exception("return type " + getReturnType
+                        + " for method " + getterInfo.getMethod.getName()
+                        + " for class " + w.getClass().getName()
+                        + " not implemented");
+                }
+
+                getterInfo.setMethod.invoke(w, parameter);
+                w.persist();
+                w.reload();
+                Object getResult = getterInfo.getMethod.invoke(w);
+
+                Assert.assertEquals(parameter, getResult);
             }
-
-            getterInfo.setMethod.invoke(w, parameter);
-            w.persist();
-            w.reload();
-            Object getResult = getterInfo.getMethod.invoke(w);
-
-            Assert.assertEquals(parameter, getResult);
         }
 
     }
