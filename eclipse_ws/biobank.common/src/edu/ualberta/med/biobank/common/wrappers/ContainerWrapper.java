@@ -591,15 +591,18 @@ public class ContainerWrapper extends ModelWrapper<Container> {
 
     @Override
     protected void deleteChecks() throws BiobankCheckException, Exception {
-        if (getSamplePositionCollection().size() > 0
-            || getChildPositionCollection().size() > 0) {
+        List<SamplePositionWrapper> spCollection = getSamplePositionCollection();
+        List<ContainerPositionWrapper> childCollection = getChildPositionCollection();
+
+        if (((spCollection != null) && (spCollection.size() > 0))
+            || ((childCollection != null) && (childCollection.size() > 0))) {
             throw new BiobankCheckException("Unable to delete container "
                 + getLabel()
                 + ". All subcontainers/samples must be removed first.");
         }
     }
 
-    public void setNewParent(ContainerWrapper newParent, String newLabel)
+    public void assignNewParent(ContainerWrapper newParent, String newLabel)
         throws BiobankCheckException, Exception {
         // remove from old parent, add to new
         ContainerWrapper oldParent = containerPosition.getParentContainer();
@@ -629,7 +632,7 @@ public class ContainerWrapper extends ModelWrapper<Container> {
 
             persist();
             // move children
-            setChildLabels(oldLabel);
+            assignChildLabels(oldLabel);
         } else
             throw new BiobankCheckException(
                 "You cannot move a top level container.");
@@ -655,12 +658,12 @@ public class ContainerWrapper extends ModelWrapper<Container> {
         }
     }
 
-    public void setChildLabels(String oldLabel) throws Exception {
+    public void assignChildLabels(String oldLabel) throws Exception {
         for (ContainerWrapper c : getChildren()) {
             String nameEnd = c.getLabel().substring(oldLabel.length());
             c.setLabel(getLabel() + nameEnd);
             c.persist();
-            c.setChildLabels(oldLabel + nameEnd);
+            c.assignChildLabels(oldLabel + nameEnd);
         }
     }
 

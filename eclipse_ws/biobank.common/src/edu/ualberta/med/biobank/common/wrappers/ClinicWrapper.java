@@ -82,7 +82,7 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
 
     public void setComment(String comment) {
         String oldComment = getComment();
-        wrappedObject.setName(comment);
+        wrappedObject.setComment(comment);
         propertyChangeSupport
             .firePropertyChange("comment", oldComment, comment);
     }
@@ -190,7 +190,8 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
     @Override
     protected void persistChecks() throws BiobankCheckException, Exception {
         if (getAddress() == null) {
-            throw new BiobankCheckException("the site does not have an address");
+            throw new BiobankCheckException(
+                "the clinic does not have an address");
         }
 
         if (!checkClinicNameUnique()) {

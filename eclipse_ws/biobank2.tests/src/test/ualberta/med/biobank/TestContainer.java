@@ -18,6 +18,18 @@ public class TestContainer extends TestDatabase {
     private List<ContainerTypeWrapper> containerTypes;
     private List<ContainerTypeWrapper> topTypes;
 
+    public void addTopContainerType() throws BiobankCheckException, Exception {
+        ContainerTypeWrapper containerType = new ContainerTypeWrapper(
+            appService);
+        containerType.setSite(site);
+        containerType.setName("Top Container Type");
+        containerType.setNameShort("TCT");
+        containerType.setRowCapacity(5);
+        containerType.setColCapacity(9);
+        containerType.setTopLevel(true);
+        containerType.persist();
+    }
+
     @Before
     public void setUp() throws Exception {
         super.setUp();
@@ -27,27 +39,21 @@ public class TestContainer extends TestDatabase {
             containerTypes = ContainerTypeWrapper.getContainerTypesInSite(
                 appService, site, "", false);
             if (containerTypes.size() == 0) {
-                ContainerTypeWrapper containerType = new ContainerTypeWrapper(
-                    appService);
-                containerType.setSite(site);
-                containerType.setName("Top Container Type");
-                containerType.setNameShort("TCT");
-                containerType.setRowCapacity(5);
-                containerType.setColCapacity(9);
-                containerType.setTopLevel(true);
-                containerType.persist();
-            }
-            topTypes = ContainerTypeWrapper.getTopContainerTypesInSite(
-                appService, site);
-            if (topTypes.size() == 0) {
-                throw new Exception(
-                    "Can't test with no Top container type in this site");
+                addTopContainerType();
             }
         } else {
             site = new SiteWrapper(appService);
             site.setName("Site - Container Test");
             site.setStreet1("street");
             site.persist();
+            addTopContainerType();
+        }
+
+        topTypes = ContainerTypeWrapper.getTopContainerTypesInSite(appService,
+            site);
+        if (topTypes.size() == 0) {
+            throw new Exception(
+                "Can't test with no Top container type in this site");
         }
     }
 
@@ -55,11 +61,13 @@ public class TestContainer extends TestDatabase {
     public void testGettersAndSetters() throws BiobankCheckException, Exception {
         ContainerWrapper container = new ContainerWrapper(appService);
         container.setSite(site);
+        container.setContainerType(topTypes.get(0));
+        container.persist();
         testGettersAndSetters(container);
     }
 
     @Test
-    public void createOk() throws Exception {
+    public void createValidContainer() throws Exception {
         ContainerWrapper container = new ContainerWrapper(appService);
         container.setLabel("05");
         container.setContainerType(topTypes.get(0));
@@ -71,6 +79,7 @@ public class TestContainer extends TestDatabase {
         Container containerInDB = ModelUtils.getObjectWithId(appService,
             Container.class, id);
         Assert.assertNotNull(containerInDB);
+        container.delete();
     }
 
     @Test(expected = BiobankCheckException.class)
