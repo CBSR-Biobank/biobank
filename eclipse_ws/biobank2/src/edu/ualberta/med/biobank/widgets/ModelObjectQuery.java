@@ -24,20 +24,10 @@ public class ModelObjectQuery {
     private Class<?> modelObjectClass;
     private Type modelObjectType;
     private String joins;
-<<<<<<< HEAD
-=======
-
-    // private String alias;
->>>>>>> master
 
     public ModelObjectQuery(Composite parent, Method modelObjectMethod,
         String alias, AdvancedReportsView view) {
-
         with = new Label(parent, SWT.NONE);
-<<<<<<< HEAD
-=======
-        // this.alias = alias;
->>>>>>> master
         joins = "";
 
         // is it a collection?

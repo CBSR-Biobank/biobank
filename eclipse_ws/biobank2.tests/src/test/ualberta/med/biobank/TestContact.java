@@ -10,7 +10,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.BiobankCheckException;
-import edu.ualberta.med.biobank.common.utils.ModelUtils;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
@@ -47,6 +46,7 @@ public class TestContact extends TestDatabase {
 	
 	List<StudyWrapper> oldStudyCollection= new ArrayList<StudyWrapper>();
 	List<StudyWrapper> modifiedStudyCollection= new ArrayList<StudyWrapper>();
+	List<ContactWrapper> studyContactWrappers = new ArrayList<ContactWrapper>();
 	StudyWrapper testWrapper = new StudyWrapper(appService);
 	        
 	Contact dbContact;
@@ -58,8 +58,12 @@ public class TestContact extends TestDatabase {
 	boolean found;
 	       
 	//simple add
+	studyContactWrappers.add(cw);
+	testWrapper.setContactCollection(studyContactWrappers);
+	testWrapper.persist();
 	modifiedStudyCollection.add(testWrapper);
 	cw.setStudyCollection(modifiedStudyCollection);
+	
 	cw.persist();
 			
 	dbStudy = ModelUtils.getObjectWithId(appService, Study.class, testWrapper.getId());
@@ -181,20 +185,43 @@ public class TestContact extends TestDatabase {
     
 	@Test
 	public void TestGetSetClinicWrapper() throws BiobankCheckException, Exception {
-		ClinicWrapper clinicWrapper = new ClinicWrapper(appService, new Clinic());
-		ContactWrapper contactWrapper = new ContactWrapper(appService, new Contact());
-		Assert.assertTrue(contactWrapper.getClinicWrapper()==null);
-		contactWrapper.setClinicWrapper(clinicWrapper);
-		contactWrapper.persist();
-		Contact contact = ModelUtils.getObjectWithId(appService, Contact.class, contactWrapper.getId());
+		//make sure we have an object in db, retrieve
+		if (cw.getId()==null) cw.persist();
+		Contact contact = ModelUtils.getObjectWithId(appService, Contact.class, cw.getId());
 		Assert.assertTrue(contact!=null);
-		Clinic clinic = ModelUtils.getObjectWithId(appService, Clinic.class, clinicWrapper.getId());
+		
+		//find the clinic we added
+		Clinic clinic = ModelUtils.getObjectWithId(appService, Clinic.class, contact.getClinic().getId());
 		Assert.assertTrue(clinic!=null);
-		Assert.assertTrue(clinic.getId()==clinicWrapper.getId());
 		
-		ClinicWrapper getWrapper = contactWrapper.getClinicWrapper();
-		Assert.assertTrue(getWrapper.getId()==clinicWrapper.getId());
+		//Set new clinic
+		ClinicWrapper newClinicWrapper = new ClinicWrapper(appService, new Clinic());
+		newClinicWrapper.setStreet1("stree1");
+		SiteWrapper siteWrapper = new SiteWrapper(appService, new Site());
+		siteWrapper.setStreet1("stresd");
+		siteWrapper.persist();
+		newClinicWrapper.setSite(siteWrapper);
+		newClinicWrapper.persist();
+		cw.setClinicWrapper(newClinicWrapper);
+		cw.persist();
 		
+		Clinic retrievedClinic;
+		
+		//Check to make sure the old one is unlinked clinic-side
+		retrievedClinic = ModelUtils.getObjectWithId(appService, Clinic.class, clinic.getId());
+		Collection<Contact> contacts = retrievedClinic.getContactCollection();
+		boolean found=false;
+		for (Contact c: contacts) 
+			if (c.getId()==cw.getId()) found = true;
+		Assert.assertFalse(found);
+		
+		//Check to make sure the new one exists
+		retrievedClinic = ModelUtils.getObjectWithId(appService, Clinic.class, newClinicWrapper.getId());
+		Assert.assertTrue(retrievedClinic!=null);
+		
+		
+		//make sure old is unlinked, new one is linked contactWrapper-side
+		Assert.assertTrue(clinic.getId()!=cw.getClinicWrapper().getId());		
 	}
 	
     @Test
@@ -218,7 +245,7 @@ public class TestContact extends TestDatabase {
     	c.persist();	
     }
     
-    @Test(expected = ApplicationException.class)
+    @Test(expected = BiobankCheckException.class)
     public void TestPersistsNullSomethingElse() throws Exception {
     	//null clinic
     	ContactWrapper c = new ContactWrapper(appService);
