@@ -14,6 +14,7 @@ import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.treeview.ContainerTypeAdapter;
 import edu.ualberta.med.biobank.widgets.CabinetDrawerWidget;
 import edu.ualberta.med.biobank.widgets.ContainerDisplayWidget;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ContainerTypeViewForm extends BiobankViewForm {
     public static final String ID = "edu.ualberta.med.biobank.forms.ContainerTypeViewForm";
@@ -130,7 +131,7 @@ public class ContainerTypeViewForm extends BiobankViewForm {
             .getDefaultTemperature());
         FormUtils.setTextValue(numSchemeLabel, containerType
             .getChildLabelingScheme() == null ? "" : containerType
-            .getChildLabelingScheme().getName());
+            .getChildLabelingSchemeName());
         FormUtils.setTextValue(activityStatusLabel, containerType
             .getActivityStatus());
         FormUtils.setTextValue(commentLabel, containerType.getComment());
@@ -162,7 +163,7 @@ public class ContainerTypeViewForm extends BiobankViewForm {
         }
     }
 
-    private void createChildContainerTypesSection() {
+    private void createChildContainerTypesSection() throws ApplicationException {
         Composite client = createSectionWithClient("Contains Container Types");
         GridLayout layout = (GridLayout) client.getLayout();
         layout.numColumns = 2;
@@ -206,7 +207,7 @@ public class ContainerTypeViewForm extends BiobankViewForm {
         }
     }
 
-    private void setChildContainerTypesValues() {
+    private void setChildContainerTypesValues() throws ApplicationException {
         childContainerTypesList.removeAll();
         for (ContainerTypeWrapper type : containerType
             .getChildContainerTypeCollection()) {

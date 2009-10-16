@@ -253,18 +253,18 @@ public class ContainerWrapper extends ModelWrapper<Container> {
         return null;
     }
 
-    public Integer getRowCapacity() throws Exception {
+    public Integer getRowCapacity() {
         ContainerTypeWrapper type = getContainerType();
         if (type == null) {
-            throw new Exception("container type is null");
+            return null;
         }
         return type.getRowCapacity();
     }
 
-    public Integer getColCapacity() throws Exception {
+    public Integer getColCapacity() {
         ContainerTypeWrapper type = getContainerType();
         if (type == null) {
-            throw new Exception("container type is null");
+            return null;
         }
         return type.getColCapacity();
     }
@@ -306,7 +306,7 @@ public class ContainerWrapper extends ModelWrapper<Container> {
             containerType);
     }
 
-    public ContainerTypeWrapper getContainerType() {
+    public ContainerTypeWrapper getContainerType() throws ApplicationException {
         ContainerType type = wrappedObject.getContainerType();
         if (type == null) {
             return null;
@@ -462,8 +462,10 @@ public class ContainerWrapper extends ModelWrapper<Container> {
     /**
      * return a string with the label of this container + the short name of its
      * type
+     * 
+     * @throws ApplicationException
      */
-    public String getFullInfoLabel() {
+    public String getFullInfoLabel() throws ApplicationException {
         if (getContainerType() == null
             || getContainerType().getNameShort() == null) {
             return getLabel();
@@ -575,7 +577,7 @@ public class ContainerWrapper extends ModelWrapper<Container> {
     }
 
     @Override
-    public boolean checkIntegrity() {
+    public boolean checkIntegrity() throws ApplicationException {
         if (wrappedObject != null)
             if (((getContainerType() != null)
                 && (getContainerType().getRowCapacity() != null) && (getContainerType()
@@ -639,7 +641,7 @@ public class ContainerWrapper extends ModelWrapper<Container> {
     }
 
     private void checkFreePosition(ContainerWrapper newParent, String newLabel)
-        throws BiobankCheckException {
+        throws BiobankCheckException, ApplicationException {
         List<ContainerPositionWrapper> positions = newParent
             .getChildPositionCollection();
         Boolean filled = false;

@@ -151,8 +151,8 @@ public abstract class AbstractContainerChooserPage extends WizardPage {
             rowCap = defaultDim1;
             colCap = defaultDim2;
         } else {
-            rowCap = currentContainer.getContainerType().getRowCapacity();
-            colCap = currentContainer.getContainerType().getColCapacity();
+            rowCap = currentContainer.getRowCapacity();
+            colCap = currentContainer.getColCapacity();
             Assert.isNotNull(rowCap, "row capacity is null");
             Assert.isNotNull(colCap, "column capacity is null");
         }

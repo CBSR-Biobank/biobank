@@ -2,7 +2,9 @@ package edu.ualberta.med.biobank.forms;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.collections.map.ListOrderedMap;
 import org.apache.log4j.Logger;
@@ -25,7 +27,6 @@ import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
@@ -78,6 +79,11 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
     private Button hasSamples;
 
     private Button hasContainers;
+
+    private class LabelingScheme {
+        Integer id;
+        String name;
+    };
 
     public ContainerTypeEntryForm() {
         super();
@@ -187,12 +193,22 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
             new DoubleNumberValidator(
                 "Default temperature is not a valid number"));
 
-        ContainerLabelingSchemeWrapper currentScheme = containerType
-            .getChildLabelingScheme();
+        LabelingScheme currentScheme = null;
+        Integer currentSchemeId = containerType.getChildLabelingScheme();
+        Map<Integer, String> labelingSchemeMap = ContainerTypeWrapper
+            .getAllLabelingSchemes(appService);
+        Collection<LabelingScheme> labelingSchemeCollection = new HashSet<LabelingScheme>();
+        for (Integer id : labelingSchemeMap.keySet()) {
+            LabelingScheme ls = new LabelingScheme();
+            ls.id = id;
+            ls.name = labelingSchemeMap.get(id);
+            if (id == currentSchemeId) {
+                currentScheme = ls;
+            }
+        }
         labelingSchemeComboViewer = createCComboViewerWithNoSelectionValidator(
-            client, "Child Labeling Scheme", ContainerLabelingSchemeWrapper
-                .getAllLabelingSchemes(appService), currentScheme,
-            MSG_CHILD_LABELING_SCHEME_EMPTY);
+            client, "Child Labeling Scheme", labelingSchemeCollection,
+            currentScheme, MSG_CHILD_LABELING_SCHEME_EMPTY);
 
         createBoundWidgetWithLabel(client, Combo.class, SWT.NONE,
             "Activity Status", FormConstants.ACTIVITY_STATUS, BeansObservables
@@ -338,9 +354,9 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         containerType.setSite(site);
 
         // set the labeling scheme
-        ContainerLabelingSchemeWrapper scheme = (ContainerLabelingSchemeWrapper) ((StructuredSelection) labelingSchemeComboViewer
+        LabelingScheme currentScheme = (LabelingScheme) ((StructuredSelection) labelingSchemeComboViewer
             .getSelection()).getFirstElement();
-        containerType.setChildLabelingScheme(scheme);
+        containerType.setChildLabelingScheme(currentScheme.id);
 
         containerType.persist();
         containerTypeAdapter.getParent().performExpand();
