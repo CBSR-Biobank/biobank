@@ -255,4 +255,9 @@ public class TestContact extends TestDatabase {
     	c.persist();	
     }
     
+    @Test
+    public void TestBasicGettersAndSetters() throws BiobankCheckException, Exception {
+    	testGettersAndSetters(cw);
+    }
+    
 }
