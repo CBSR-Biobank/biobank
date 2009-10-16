@@ -262,14 +262,13 @@
 	</target>
 
 	<!--Add the length="#" field into .hbm.xml, references the biobank.uml file for the VARCHAR(#) -->
-	<target name="string-length-field-addition" description="Add the length='#' field into .hbm.xml, references the biobank.uml file for the VARCHAR(#)" depends="check-cacore-sdk-uptodate" unless="cacore.sdk.uptodate">
+	<target name="string-length-field-addition" description="Add the length='#' field into .hbm.xml, references the biobank.uml file for the VARCHAR(#)" depends="check-cacore-sdk-uptodate">
 		<exec executable="${perl}">
 			<env key="PATH" path="${scripts.proj.dir}" />
 			<arg value="${scripts.proj.dir}/hbmstringlength.pl" />
 			<arg value="${model.proj.dir}/biobank2.uml" />
 			<arg value="${cacore.sdk.dir}/output/biobank2/src/edu/ualberta/med/biobank/model" />
 			<arg value="0" />
-			<!--Verbose-->
 		</exec>
 	</target>
 

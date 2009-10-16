@@ -29,6 +29,13 @@ public class TestSite extends TestDatabase {
 	}
 
 	@Test
+	public void testGettersAndSetters() throws BiobankCheckException, Exception {
+		SiteWrapper site = new SiteWrapper(appService);
+		site.persist();
+		testGettersAndSetters(site);
+	}
+
+	@Test
 	public void testGetStudyCollection() {
 		List<StudyWrapper> studies = oneSite.getStudyCollection();
 		int sizeFound = studies.size();

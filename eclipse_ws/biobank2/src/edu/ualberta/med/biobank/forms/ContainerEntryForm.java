@@ -226,7 +226,7 @@ public class ContainerEntryForm extends BiobankEntryForm {
             containerWrapper.setContainerType(containerType);
             containerWrapper.persist();
             if (newName) {
-                containerWrapper.setChildLabels(oldContainerLabel);
+                containerWrapper.assignChildLabels(oldContainerLabel);
                 containerWrapper.reload();
                 containerAdapter.rebuild();
                 containerAdapter.performExpand();
