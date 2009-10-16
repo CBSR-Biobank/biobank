@@ -591,8 +591,11 @@ public class ContainerWrapper extends ModelWrapper<Container> {
 
     @Override
     protected void deleteChecks() throws BiobankCheckException, Exception {
-        if (getSamplePositionCollection().size() > 0
-            || getChildPositionCollection().size() > 0) {
+        List<SamplePositionWrapper> spCollection = getSamplePositionCollection();
+        List<ContainerPositionWrapper> childCollection = getChildPositionCollection();
+
+        if (((spCollection != null) && (spCollection.size() > 0))
+            || ((childCollection != null) && (childCollection.size() > 0))) {
             throw new BiobankCheckException("Unable to delete container "
                 + getLabel()
                 + ". All subcontainers/samples must be removed first.");

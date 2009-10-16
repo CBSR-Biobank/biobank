@@ -62,11 +62,12 @@ public class TestContainer extends TestDatabase {
         ContainerWrapper container = new ContainerWrapper(appService);
         container.setSite(site);
         container.setContainerType(topTypes.get(0));
+        container.persist();
         testGettersAndSetters(container);
     }
 
     @Test
-    public void createOk() throws Exception {
+    public void createValidContainer() throws Exception {
         ContainerWrapper container = new ContainerWrapper(appService);
         container.setLabel("05");
         container.setContainerType(topTypes.get(0));

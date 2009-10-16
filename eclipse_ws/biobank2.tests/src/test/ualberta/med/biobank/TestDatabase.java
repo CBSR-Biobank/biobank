@@ -112,7 +112,6 @@ public class TestDatabase {
             Object getResult = getterInfo.getMethod.invoke(w);
 
             Assert.assertEquals(parameter, getResult);
-            w.delete();
         }
 
     }
