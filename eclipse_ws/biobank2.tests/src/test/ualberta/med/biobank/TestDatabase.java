@@ -30,6 +30,7 @@ public class TestDatabase {
             add("java.lang.Object");
             add("java.util.Set");
             add("java.util.List");
+            add("java.util.Collection");
         }
     };
 
@@ -125,7 +126,9 @@ public class TestDatabase {
                 w.reload();
                 Object getResult = getterInfo.getMethod.invoke(w);
 
-                Assert.assertEquals(parameter, getResult);
+                Assert.assertEquals(w.getClass().getName() + "."
+                    + getterInfo.getMethod.getName() + "()", parameter,
+                    getResult);
             }
         }
 
