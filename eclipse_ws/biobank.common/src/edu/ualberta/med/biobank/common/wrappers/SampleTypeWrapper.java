@@ -62,6 +62,10 @@ public class SampleTypeWrapper extends ModelWrapper<SampleType> {
         propertyChangeSupport.firePropertyChange("site", oldNameShort, site);
     }
 
+    public void setSite(SiteWrapper site) {
+        setSite(site.wrappedObject);
+    }
+
     @SuppressWarnings("unchecked")
     public List<ContainerTypeWrapper> getContainerTypeCollection(boolean sort) {
         List<ContainerTypeWrapper> containerTypeCollection = (List<ContainerTypeWrapper>) propertiesMap

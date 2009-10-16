@@ -18,6 +18,7 @@ import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.model.Site;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
+import gov.nih.nci.system.query.example.DeleteExampleQuery;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
@@ -42,8 +43,9 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
     @Override
     protected void persistChecks() throws BiobankCheckException, Exception {
         checkNameUnique();
+        getCapacity().persistChecks();
         if (!isNew()) {
-            boolean exists = existsContainerWithType();
+            boolean exists = isUsedByContainers();
             ContainerType oldObject = getObjectFromDatabase();
             checkNewCapacity(oldObject, exists);
             checkTopLevel(oldObject, exists);
@@ -85,17 +87,52 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
     }
 
     @Override
+    public void delete() throws BiobankCheckException, Exception {
+        if (!isNew()) {
+            deleteChecks();
+            // should remove this containerType from its parents
+            for (ContainerTypeWrapper parent : getParentContainerTypes()) {
+                List<ContainerTypeWrapper> children = parent
+                    .getChildContainerTypeCollection();
+                children.remove(this);
+                parent.setChildContainerTypeCollection(children);
+                parent.persist();
+            }
+            appService.executeQuery(new DeleteExampleQuery(wrappedObject));
+        }
+    }
+
+    @Override
     protected void deleteChecks() throws BiobankCheckException, Exception {
-        String queryString = "select c.containerType from "
-            + Container.class.getName() + " as c where c.containerType=?)";
-        HQLCriteria c = new HQLCriteria(queryString, Arrays
-            .asList(new Object[] { wrappedObject }));
-        List<Object> results = appService.query(c);
-        if (results.size() > 0) {
+        if (isUsedByContainers()) {
             throw new BiobankCheckException("Unable to delete container type "
                 + getName() + ". A container of this type exists in storage."
                 + " Remove all instances before deleting this type.");
         }
+    }
+
+    public boolean isUsedByContainers() throws ApplicationException,
+        BiobankCheckException {
+        String queryString = "select count(c) from "
+            + Container.class.getName() + " as c where c.containerType=?)";
+        HQLCriteria c = new HQLCriteria(queryString, Arrays
+            .asList(new Object[] { wrappedObject }));
+        List<Long> results = appService.query(c);
+        if (results.size() != 1) {
+            throw new BiobankCheckException("Invalid size for HQL query result");
+        }
+        return results.get(0) > 0;
+    }
+
+    public List<ContainerTypeWrapper> getParentContainerTypes()
+        throws ApplicationException {
+        String queryString = "select ct from "
+            + ContainerType.class.getName()
+            + " as ct inner join ct.childContainerTypeCollection as child where child.id = ?)";
+        HQLCriteria c = new HQLCriteria(queryString, Arrays
+            .asList(new Object[] { wrappedObject.getId() }));
+        List<ContainerType> results = appService.query(c);
+        return transformToWrapperList(appService, results);
     }
 
     public void setName(String name) {
@@ -428,21 +465,12 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
         }
     }
 
-    /**
-     * return true if at least one container exists with this container type
-     */
-    private boolean existsContainerWithType() throws ApplicationException {
-        HQLCriteria c = new HQLCriteria("select c.containerType from "
-            + Container.class.getName() + " as c where c.containerType=?)",
-            Arrays.asList(new Object[] { wrappedObject }));
-        List<Object> results = appService.query(c);
-        return results.size() > 0;
-    }
-
     private void checkTopLevel(ContainerType oldObject,
         boolean existsContainersWithType) throws BiobankCheckException {
-        if (!getTopLevel().equals(oldObject.getTopLevel())
-            && existsContainersWithType) {
+        if ((getTopLevel() == null && oldObject.getTopLevel() != null)
+            || (getTopLevel() != null && oldObject.getTopLevel() == null)
+            || (getTopLevel() != null && oldObject.getTopLevel() != null && !getTopLevel()
+                .equals(oldObject.getTopLevel())) && existsContainersWithType) {
             throw new BiobankCheckException(
                 "Unable to change the \"Top Level\" property. A container requiring this property exists in storage. Remove all instances before attempting to modify this container type.");
         }

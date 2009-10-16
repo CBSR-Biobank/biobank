@@ -11,8 +11,10 @@ import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.model.Site;
 
 // FIXME to be implemented by Delphine
 public class TestSite extends TestDatabase {
@@ -31,6 +33,7 @@ public class TestSite extends TestDatabase {
 	@Test
 	public void testGettersAndSetters() throws BiobankCheckException, Exception {
 		SiteWrapper site = new SiteWrapper(appService);
+		site.setCity("");
 		site.persist();
 		testGettersAndSetters(site);
 	}
@@ -61,47 +64,45 @@ public class TestSite extends TestDatabase {
 	public void testAddInStudyCollection() throws BiobankCheckException,
 			Exception {
 		List<StudyWrapper> studies = oneSite.getStudyCollection();
-
-		StudyWrapper study = createStudy(oneSite, "AddInStudyCollection");
-		studies.add(study);
-		oneSite.setStudyCollection(studies);
-		int expectedSize = studies.size();
-		oneSite.persist();
+		int expectedSize = studies.size() + 1;
+		addStudy("testAddInStudyCollection");
 
 		oneSite.reload();
+		// one study added
 		Assert.assertEquals(expectedSize, oneSite.getStudyCollection().size());
 	}
 
 	@Test
 	public void testRemoveInStudyCollection() throws BiobankCheckException,
 			Exception {
+		StudyWrapper study = addStudy("testRemoveInStudyCollection");
+		oneSite.reload();
+
 		List<StudyWrapper> studies = oneSite.getStudyCollection();
-		StudyWrapper studyNoPatients = null;
-		for (StudyWrapper study : studies) {
-			if (study.getPatientCollection().size() == 0) {
-				studyNoPatients = study;
-				break;
-			}
-		}
-		if (studyNoPatients == null) {
-			Assert.fail("Need a study without patients to test that");
-		} else {
-			studies.remove(studyNoPatients);
-			oneSite.setStudyCollection(studies);
-			int expectedSize = studies.size();
-			oneSite.persist();
+		int idStudy = study.getId();
+		studies.remove(study);
+		oneSite.setStudyCollection(studies);
+		study.delete();
+		int expectedSize = studies.size();
+		oneSite.persist();
 
-			oneSite.reload();
-			Assert.assertEquals(expectedSize, oneSite.getStudyCollection()
-					.size());
-		}
+		oneSite.reload();
+		// one study removed
+		Assert.assertEquals(expectedSize, oneSite.getStudyCollection().size());
 
+		// study should not be anymore in the study collection (removed the
+		// good one)
+		for (StudyWrapper s : oneSite.getStudyCollection()) {
+			Assert.assertFalse(s.getId().equals(idStudy));
+		}
 	}
 
-	private StudyWrapper createStudy(SiteWrapper site, String name) {
+	private StudyWrapper addStudy(String name) throws BiobankCheckException,
+			Exception {
 		StudyWrapper study = new StudyWrapper(appService);
 		study.setName(name + new Random().nextInt());
-		study.setSite(site);
+		study.setSite(oneSite);
+		study.persist();
 		return study;
 	}
 
@@ -124,6 +125,53 @@ public class TestSite extends TestDatabase {
 				ClinicWrapper clinic2 = clinics.get(i + 1);
 				Assert.assertTrue(clinic1.compareTo(clinic2) <= 0);
 			}
+		}
+	}
+
+	@Test
+	public void testAddInClinicCollection() throws BiobankCheckException,
+			Exception {
+		List<ClinicWrapper> clinics = oneSite.getClinicCollection();
+		int expectedSize = clinics.size() + 1;
+		addClinic("testAddInClinicCollection");
+
+		oneSite.reload();
+		// one clinic added
+		Assert.assertEquals(expectedSize, oneSite.getClinicCollection().size());
+	}
+
+	private ClinicWrapper addClinic(String name) throws BiobankCheckException,
+			Exception {
+		ClinicWrapper clinic = new ClinicWrapper(appService);
+		clinic.setName(name + new Random().nextInt());
+		clinic.setCity("");
+		clinic.setSite(oneSite);
+		clinic.persist();
+		return clinic;
+	}
+
+	@Test
+	public void testRemoveInClinicCollection() throws BiobankCheckException,
+			Exception {
+		ClinicWrapper clinic = addClinic("testRemoveInClinicCollection");
+		oneSite.reload();
+
+		List<ClinicWrapper> clinics = oneSite.getClinicCollection();
+		int idClinic = clinic.getId();
+		clinics.remove(clinic);
+		oneSite.setClinicCollection(clinics);
+		clinic.delete();
+		int expectedSize = clinics.size();
+		oneSite.persist();
+
+		oneSite.reload();
+		// one clinic removed
+		Assert.assertEquals(expectedSize, oneSite.getClinicCollection().size());
+
+		// clinic should not be anymore in the clinic collection (removed
+		// the good one)
+		for (ClinicWrapper c : oneSite.getClinicCollection()) {
+			Assert.assertFalse(c.getId().equals(idClinic));
 		}
 	}
 
@@ -152,6 +200,54 @@ public class TestSite extends TestDatabase {
 	}
 
 	@Test
+	public void testAddInContainerTypeCollection()
+			throws BiobankCheckException, Exception {
+		List<ContainerTypeWrapper> types = oneSite.getContainerTypeCollection();
+		int expectedSize = types.size() + 1;
+		addContainerType("testAddInContainerTypeCollection");
+		oneSite.reload();
+		// one type added
+		Assert.assertEquals(expectedSize, oneSite.getContainerTypeCollection()
+				.size());
+	}
+
+	@Test
+	public void testRemoveInContainerTypeCollection()
+			throws BiobankCheckException, Exception {
+		ContainerTypeWrapper type = addContainerType("RemoveInContainerTypeCollection");
+		oneSite.reload();
+		List<ContainerTypeWrapper> types = oneSite.getContainerTypeCollection();
+		int idType = type.getId();
+		types.remove(type);
+		oneSite.setContainerTypeCollection(types);
+		type.delete();
+		int expectedSize = types.size();
+		oneSite.persist();
+
+		oneSite.reload();
+		// one type removed
+		Assert.assertEquals(expectedSize, oneSite.getContainerTypeCollection()
+				.size());
+
+		// type should not be anymore in the type collection (removed
+		// the good one)
+		for (ContainerTypeWrapper t : oneSite.getContainerTypeCollection()) {
+			Assert.assertFalse(t.getId().equals(idType));
+		}
+	}
+
+	private ContainerTypeWrapper addContainerType(String name)
+			throws BiobankCheckException, Exception {
+		ContainerTypeWrapper type = new ContainerTypeWrapper(appService);
+		type.setSite(oneSite);
+		type.setName(name + new Random().nextInt());
+		type.setRowCapacity(5);
+		type.setColCapacity(4);
+		type.persist();
+		return type;
+	}
+
+	@Test
 	public void testGetContainerCollection() {
 		List<ContainerWrapper> containers = oneSite.getContainerCollection();
 		int sizeFound = containers.size();
@@ -162,15 +258,170 @@ public class TestSite extends TestDatabase {
 		Assert.assertEquals(expected, sizeFound);
 	}
 
-	// @Test
-	// public void testGetPvInfoPossibleCollectionBoolean() {
-	// fail("Not yet implemented");
-	// }
-	//
-	// @Test
-	// public void testGetPvInfoPossibleCollection() {
-	// fail("Not yet implemented");
-	// }
+	@Test
+	public void testAddInContainerCollection() throws BiobankCheckException,
+			Exception {
+		List<ContainerWrapper> containers = oneSite.getContainerCollection();
+		int expectedSize = containers.size() + 1;
+		addContainer("testAddInContainerCollection");
+
+		oneSite.reload();
+		// one container added
+		Assert.assertEquals(expectedSize, oneSite.getContainerCollection()
+				.size());
+	}
+
+	private ContainerWrapper addContainer(String name)
+			throws BiobankCheckException, Exception {
+		ContainerWrapper container = new ContainerWrapper(appService);
+		container.setLabel(name + new Random().nextInt());
+		ContainerTypeWrapper type = addContainerType(name);
+		container.setContainerType(type);
+		container.setSite(oneSite);
+		container.persist();
+		return container;
+	}
+
+	@Test
+	public void testRemoveInContainerCollection() throws BiobankCheckException,
+			Exception {
+		ContainerWrapper container = addContainer("testRemoveInContainerCollection");
+		oneSite.reload();
+		List<ContainerWrapper> containers = oneSite.getContainerCollection();
+		int idContainer = container.getId();
+		containers.remove(container);
+		oneSite.setContainerCollection(containers);
+		container.delete();
+		int expectedSize = containers.size();
+		oneSite.persist();
+
+		oneSite.reload();
+		// one container removed
+		Assert.assertEquals(expectedSize, oneSite.getContainerCollection()
+				.size());
+
+		// container should not be anymore in the container collection
+		// (removed
+		// the good one)
+		for (ContainerWrapper c : oneSite.getContainerCollection()) {
+			Assert.assertFalse(c.getId().equals(idContainer));
+		}
+	}
+
+	@Test
+	public void testGetSampleTypeCollectionBoolean() {
+		List<SampleTypeWrapper> types = oneSite.getSampleTypeCollection();
+		int sizeFound = types.size();
+
+		int expected = oneSite.getWrappedObject().getSampleTypeCollection()
+				.size();
+
+		Assert.assertEquals(expected, sizeFound);
+	}
+
+	@Test
+	public void testGetSampleTypeCollection() {
+		List<SampleTypeWrapper> types = oneSite.getSampleTypeCollection(true);
+		if (types.size() > 1) {
+			for (int i = 0; i < types.size() - 1; i++) {
+				SampleTypeWrapper type1 = types.get(i);
+				SampleTypeWrapper type2 = types.get(i + 1);
+				Assert.assertTrue(type1.compareTo(type2) <= 0);
+			}
+		}
+	}
+
+	@Test
+	public void testAddInSampleTypeCollection() throws BiobankCheckException,
+			Exception {
+		List<SampleTypeWrapper> types = oneSite.getSampleTypeCollection();
+		int expectedSize = types.size() + 1;
+		addSampleType("testAddInSampleTypeCollection");
+
+		oneSite.reload();
+		// one container added
+		Assert.assertEquals(expectedSize, oneSite.getSampleTypeCollection()
+				.size());
+	}
+
+	private SampleTypeWrapper addSampleType(String name)
+			throws BiobankCheckException, Exception {
+		SampleTypeWrapper type = new SampleTypeWrapper(appService);
+		type.setName(name + new Random().nextInt());
+		type.setSite(oneSite);
+		type.persist();
+		return type;
+	}
+
+	@Test
+	public void testRemoveInSampleTypeCollection()
+			throws BiobankCheckException, Exception {
+		SampleTypeWrapper type = addSampleType("testRemoveInSampleTypeCollection");
+		oneSite.reload();
+		List<SampleTypeWrapper> types = oneSite.getSampleTypeCollection();
+		int idContainer = type.getId();
+		types.remove(type);
+		oneSite.setSampleTypeCollection(types);
+		type.delete();
+		int expectedSize = types.size();
+		oneSite.persist();
+
+		oneSite.reload();
+		// one type removed
+		Assert.assertEquals(expectedSize, oneSite.getSampleTypeCollection()
+				.size());
+
+		// type should not be anymore in the type collection
+		// (removed the good one)
+		for (SampleTypeWrapper t : oneSite.getSampleTypeCollection()) {
+			Assert.assertFalse(t.getId().equals(idContainer));
+		}
+	}
+
+	@Test
+	public void testPersist() throws Exception {
+		int expected = sites.size() + 1;
+		addSite("testPersist");
+		int newTotal = SiteWrapper.getAllSites(appService).size();
+		Assert.assertEquals(expected, newTotal);
+	}
+
+	private SiteWrapper addSite(String name) throws BiobankCheckException,
+			Exception {
+		SiteWrapper site = new SiteWrapper(appService);
+		site.setName(name + new Random().nextInt());
+		site.setCity("");
+		site.persist();
+		return site;
+	}
+
+	@Test
+	public void testDelete() throws Exception {
+		SiteWrapper site = addSite("testDelete");
+		// object is in database
+		Assert.assertNotNull(site);
+		site.delete();
+		Site siteInDB = ModelUtils.getObjectWithId(appService, Site.class, site
+				.getId());
+		// object is not anymore in database
+		Assert.assertNull(siteInDB);
+	}
+
+	@Test
+	public void testResetAlreadyInDatabase() throws Exception {
+		String name = oneSite.getName();
+		oneSite.setName("toto");
+		oneSite.reset();
+		Assert.assertEquals(name, oneSite.getName());
+	}
+
+	@Test
+	public void testResetNew() throws Exception {
+		SiteWrapper newSite = new SiteWrapper(appService);
+		newSite.setName("titi");
+		newSite.reset();
+		Assert.assertEquals(null, newSite.getName());
+	}
 
 	//
 	// @Test
@@ -184,128 +435,9 @@ public class TestSite extends TestDatabase {
 	// }
 	//
 
-	//
-	// @Test
-	// public void
-	// testSetContainerTypeCollectionCollectionOfContainerTypeBoolean() {
-	// fail("Not yet implemented");
-	// }
-	//
-	// @Test
-	// public void testSetContainerTypeCollectionListOfContainerTypeWrapper() {
-	// fail("Not yet implemented");
-	// }
-	//
-
-	//
-	// @Test
-	// public void testSetContainerCollectionCollectionOfContainerBoolean() {
-	// fail("Not yet implemented");
-	// }
-	//
-	// @Test
-	// public void testSetContainerCollectionListOfContainerWrapper() {
-	// fail("Not yet implemented");
-	// }
-
-	// @Test
-	// public void testReload() {
-	// fail("Not yet implemented");
-	// }
-	//
-	// @Test
-	// public void testSiteWrapperWritableApplicationServiceSite() {
-	// fail("Not yet implemented");
-	// }
-	//
-	// @Test
-	// public void testSiteWrapperWritableApplicationService() {
-	// fail("Not yet implemented");
-	// }
-
-	//
-	// @Test
-	// public void testGetSampleTypeCollectionBoolean() {
-	// fail("Not yet implemented");
-	// }
-	//
-	// @Test
-	// public void testGetSampleTypeCollection() {
-	// fail("Not yet implemented");
-	// }
-	//
-	// @Test
-	// public void testSetSampleTypeCollectionCollectionOfSampleTypeBoolean() {
-	// fail("Not yet implemented");
-	// }
-	//
-	// @Test
-	// public void testSetSampleTypeCollectionListOfSampleTypeWrapper() {
-	// fail("Not yet implemented");
-	// }
-	//
-
-	//
-	// @Test
-	// public void
-	// testSetPvInfoPossibleCollectionCollectionOfPvInfoPossibleBoolean() {
-	// fail("Not yet implemented");
-	// }
-	//
-	// @Test
-	// public void testSetPvInfoPossibleCollectionListOfPvInfoPossibleWrapper()
-	// {
-	// fail("Not yet implemented");
-	// }
-	//
-	// @Test
-	// public void testGetPvInfoPossibleLabels() {
-	// fail("Not yet implemented");
-	// }
-	//
-	// @Test
-	// public void testGetPvInfoPossible() {
-	// fail("Not yet implemented");
-	// }
-	//
-	// @Test
-	// public void testSetPvInfoPossible() {
-	// fail("Not yet implemented");
-	// }
-	//
-	// @Test
-	// public void testCompareTo() {
-	// fail("Not yet implemented");
-	// }
-	//
 	// @Test
 	// public void testGetSites() {
 	// fail("Not yet implemented");
 	// }
 	//
-	// @Test
-	// public void testPersist() {
-	// fail("Not yet implemented");
-	// }
-	//
-	// @Test
-	// public void testDelete() {
-	// fail("Not yet implemented");
-	// }
-	//
-	// @Test
-	// public void testReset() {
-	// fail("Not yet implemented");
-	// }
-	//
-	// @Test
-	// public void testCheckIntegrity() {
-	// fail("Not yet implemented");
-	// }
-	//
-	// @Test
-	// public void testEqualsObject() {
-	// fail("Not yet implemented");
-	// }
-
 }

@@ -104,7 +104,7 @@ public class StudyWrapper extends ModelWrapper<Study> {
 
     @Override
     protected void deleteChecks() throws BiobankCheckException, Exception {
-        if (getPatientCollection().size() > 0) {
+        if (hasPatients()) {
             throw new BiobankCheckException("Unable to delete study "
                 + getName() + ". All defined patients must be removed first.");
         }
@@ -132,13 +132,15 @@ public class StudyWrapper extends ModelWrapper<Study> {
 
         if (getWrappedObject().getId() == null) {
             c = new HQLCriteria("from " + Study.class.getName()
-                + " where site = ? and name = ?", Arrays.asList(new Object[] {
-                getSite(), getName() }));
+                + " where site.id = ? and name = ?", Arrays
+                .asList(new Object[] { getSite().getId(), getName() }));
         } else {
-            c = new HQLCriteria("from " + Study.class.getName()
-                + " as study where site = ? and name = ?  and study <> ?",
-                Arrays.asList(new Object[] { getSite(), getName(),
-                    getWrappedObject() }));
+            c = new HQLCriteria(
+                "from "
+                    + Study.class.getName()
+                    + " as study where site.id = ? and name = ?  and study.id <> ?",
+                Arrays.asList(new Object[] { getSite().getId(), getName(),
+                    getId() }));
         }
 
         List<Object> results = appService.query(c);
@@ -149,13 +151,16 @@ public class StudyWrapper extends ModelWrapper<Study> {
 
         if (getWrappedObject().getId() == null) {
             c = new HQLCriteria("from " + Study.class.getName()
-                + " site = ? and study.nameShort = ?", Arrays
-                .asList(new Object[] { getSite(), getNameShort() }));
+                + " where site.id = ? and nameShort = ?", Arrays
+                .asList(new Object[] { getSite().getId(), getNameShort() }));
         } else {
-            c = new HQLCriteria("from " + Study.class.getName() + " as study"
-                + " where site = ? and study.nameShort = ? and study <> ?",
-                Arrays.asList(new Object[] { getSite(), getNameShort(),
-                    getWrappedObject() }));
+            c = new HQLCriteria(
+                "from "
+                    + Study.class.getName()
+                    + " as study"
+                    + " where site.id = ? and study.nameShort = ? and study.id <> ?",
+                Arrays.asList(new Object[] { getSite().getId(), getNameShort(),
+                    getId() }));
         }
 
         results = appService.query(c);
@@ -486,6 +491,20 @@ public class StudyWrapper extends ModelWrapper<Study> {
 
     public List<PatientWrapper> getPatientCollection() {
         return getPatientCollection(false);
+    }
+
+    public boolean hasPatients() throws ApplicationException,
+        BiobankCheckException {
+        HQLCriteria criteria = new HQLCriteria(
+            "select count(patient) from "
+                + Study.class.getName()
+                + " as study inner join study.patientCollection as patient where patient.id = ?",
+            Arrays.asList(new Object[] { getId() }));
+        List<Long> result = appService.query(criteria);
+        if (result.size() != 1) {
+            throw new BiobankCheckException("Invalid size for HQL query result");
+        }
+        return result.get(0) > 0;
     }
 
     public void setPatientCollection(Collection<Patient> patients,

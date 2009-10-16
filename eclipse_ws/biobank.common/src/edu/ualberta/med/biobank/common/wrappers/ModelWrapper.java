@@ -140,19 +140,14 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     public void persist() throws BiobankCheckException, Exception {
         persistChecks();
         SDKQuery query;
-        E origObject = null;
         if (isNew()) {
             query = new InsertExampleQuery(wrappedObject);
         } else {
-            origObject = getObjectFromDatabase();
             query = new UpdateExampleQuery(wrappedObject);
-
+            persistDependencies(getObjectFromDatabase());
         }
 
         SDKQueryResult result = appService.executeQuery(query);
-        if (origObject != null) {
-            persistDependencies(origObject);
-        }
         wrappedObject = ((E) result.getObjectResult());
         propertiesMap.clear();
     }

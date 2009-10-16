@@ -217,10 +217,12 @@ public class SiteWrapper extends ModelWrapper<Site> {
 
     @Override
     protected void deleteChecks() throws BiobankCheckException, Exception {
-        if (getClinicCollection().size() > 0
-            || getContainerCollection().size() > 0
-            || getContainerTypeCollection().size() > 0
-            || getStudyCollection().size() > 0) {
+        if ((getClinicCollection() != null && getClinicCollection().size() > 0)
+            || (getContainerCollection() != null && getContainerCollection()
+                .size() > 0)
+            || (getContainerTypeCollection() != null && getContainerTypeCollection()
+                .size() > 0)
+            || (getStudyCollection() != null && getStudyCollection().size() > 0)) {
             throw new BiobankCheckException(
                 "Unable to delete site "
                     + getName()
@@ -292,6 +294,25 @@ public class SiteWrapper extends ModelWrapper<Site> {
 
     public List<ClinicWrapper> getClinicCollection() {
         return getClinicCollection(false);
+    }
+
+    public void setClinicCollection(Collection<Clinic> clinics, boolean setNull) {
+        Collection<Clinic> oldClinics = wrappedObject.getClinicCollection();
+        wrappedObject.setClinicCollection(clinics);
+        propertyChangeSupport.firePropertyChange("clinicCollection",
+            oldClinics, clinics);
+        if (setNull) {
+            propertiesMap.put("clinicCollection", null);
+        }
+    }
+
+    public void setClinicCollection(List<ClinicWrapper> clinics) {
+        Collection<Clinic> clinicObjects = new HashSet<Clinic>();
+        for (ClinicWrapper clinic : clinics) {
+            clinicObjects.add(clinic.getWrappedObject());
+        }
+        setClinicCollection(clinicObjects, false);
+        propertiesMap.put("clinicCollection", clinics);
     }
 
     @SuppressWarnings("unchecked")
@@ -479,7 +500,8 @@ public class SiteWrapper extends ModelWrapper<Site> {
     }
 
     @SuppressWarnings("unchecked")
-    public List<PvInfoPossibleWrapper> getPvInfoPossibleCollection(boolean sort) {
+    protected List<PvInfoPossibleWrapper> getPvInfoPossibleCollection(
+        boolean sort) {
         List<PvInfoPossibleWrapper> PvInfoPossibleCollection = (List<PvInfoPossibleWrapper>) propertiesMap
             .get("PvInfoPossibleCollection");
         if (PvInfoPossibleCollection == null) {
@@ -500,11 +522,11 @@ public class SiteWrapper extends ModelWrapper<Site> {
         return PvInfoPossibleCollection;
     }
 
-    public List<PvInfoPossibleWrapper> getPvInfoPossibleCollection() {
+    protected List<PvInfoPossibleWrapper> getPvInfoPossibleCollection() {
         return getPvInfoPossibleCollection(false);
     }
 
-    public void setPvInfoPossibleCollection(
+    protected void setPvInfoPossibleCollection(
         Collection<PvInfoPossible> collection, boolean setNull) {
         Collection<PvInfoPossible> oldCollection = wrappedObject
             .getPvInfoPossibleCollection();
@@ -516,7 +538,7 @@ public class SiteWrapper extends ModelWrapper<Site> {
         }
     }
 
-    public void setPvInfoPossibleCollection(
+    protected void setPvInfoPossibleCollection(
         List<PvInfoPossibleWrapper> collection) {
         Collection<PvInfoPossible> pipObjects = new HashSet<PvInfoPossible>();
         for (PvInfoPossibleWrapper pip : collection) {
@@ -542,22 +564,6 @@ public class SiteWrapper extends ModelWrapper<Site> {
                 if ((newPvInfoPossible == null)
                     || !newPvInfoPossible.contains(st)) {
                     st.delete();
-                }
-            }
-        }
-    }
-
-    /**
-     * Removes the study objects that are not contained in the collection.
-     */
-    private void deleteStudyDifference(Site origSite) throws Exception {
-        List<StudyWrapper> newStudies = getStudyCollection();
-        List<StudyWrapper> oldStudies = new SiteWrapper(appService, origSite)
-            .getStudyCollection();
-        if (oldStudies != null) {
-            for (StudyWrapper study : oldStudies) {
-                if ((study == null) || !newStudies.contains(study)) {
-                    study.delete();
                 }
             }
         }
@@ -635,7 +641,6 @@ public class SiteWrapper extends ModelWrapper<Site> {
         throws BiobankCheckException, Exception {
         deleteSampleTypeDifference(origObject);
         deletePvInfoPossibleDifference(origObject);
-        deleteStudyDifference(origObject);
     }
 
     @Override
