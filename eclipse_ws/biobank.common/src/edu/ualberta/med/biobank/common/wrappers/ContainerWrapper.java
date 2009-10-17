@@ -306,7 +306,7 @@ public class ContainerWrapper extends ModelWrapper<Container> {
             containerType);
     }
 
-    public ContainerTypeWrapper getContainerType() throws ApplicationException {
+    public ContainerTypeWrapper getContainerType() {
         ContainerType type = wrappedObject.getContainerType();
         if (type == null) {
             return null;
@@ -465,7 +465,7 @@ public class ContainerWrapper extends ModelWrapper<Container> {
      * 
      * @throws ApplicationException
      */
-    public String getFullInfoLabel() throws ApplicationException {
+    public String getFullInfoLabel() {
         if (getContainerType() == null
             || getContainerType().getNameShort() == null) {
             return getLabel();
@@ -577,7 +577,7 @@ public class ContainerWrapper extends ModelWrapper<Container> {
     }
 
     @Override
-    public boolean checkIntegrity() throws ApplicationException {
+    public boolean checkIntegrity() {
         if (wrappedObject != null)
             if (((getContainerType() != null)
                 && (getContainerType().getRowCapacity() != null) && (getContainerType()
@@ -641,7 +641,7 @@ public class ContainerWrapper extends ModelWrapper<Container> {
     }
 
     private void checkFreePosition(ContainerWrapper newParent, String newLabel)
-        throws BiobankCheckException, ApplicationException {
+        throws BiobankCheckException {
         List<ContainerPositionWrapper> positions = newParent
             .getChildPositionCollection();
         Boolean filled = false;

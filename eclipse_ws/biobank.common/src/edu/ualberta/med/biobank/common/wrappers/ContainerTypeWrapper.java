@@ -28,15 +28,14 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
     private static Map<Integer, ContainerLabelingSchemeWrapper> labelingSchemeMap;
 
     public ContainerTypeWrapper(WritableApplicationService appService,
-        ContainerType wrappedObject) throws ApplicationException {
+        ContainerType wrappedObject) {
         super(appService, wrappedObject);
         if (labelingSchemeMap == null) {
             getAllLabelingSchemesMap(appService);
         }
     }
 
-    public ContainerTypeWrapper(WritableApplicationService appService)
-        throws ApplicationException {
+    public ContainerTypeWrapper(WritableApplicationService appService) {
         super(appService);
         if (labelingSchemeMap == null) {
             getAllLabelingSchemesMap(appService);
@@ -250,8 +249,7 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
     }
 
     @SuppressWarnings("unchecked")
-    public List<ContainerTypeWrapper> getChildContainerTypeCollection()
-        throws ApplicationException {
+    public List<ContainerTypeWrapper> getChildContainerTypeCollection() {
         List<ContainerTypeWrapper> childContainerTypeCollection = (List<ContainerTypeWrapper>) propertiesMap
             .get("childContainerTypeCollection");
         if (childContainerTypeCollection == null) {
@@ -498,7 +496,7 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
 
     public static List<ContainerTypeWrapper> transformToWrapperList(
         WritableApplicationService appService,
-        Collection<ContainerType> containerTypes) throws ApplicationException {
+        Collection<ContainerType> containerTypes) {
         List<ContainerTypeWrapper> list = new ArrayList<ContainerTypeWrapper>();
         for (ContainerType type : containerTypes) {
             list.add(new ContainerTypeWrapper(appService, type));
@@ -531,20 +529,25 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
     }
 
     private static Map<Integer, ContainerLabelingSchemeWrapper> getAllLabelingSchemesMap(
-        WritableApplicationService appService) throws ApplicationException {
-        if (labelingSchemeMap == null) {
+        WritableApplicationService appService) throws RuntimeException {
+        try {
             labelingSchemeMap = new HashMap<Integer, ContainerLabelingSchemeWrapper>();
-            for (ContainerLabelingSchemeWrapper labeling : ContainerLabelingSchemeWrapper
-                .getAllLabelingSchemes(appService)) {
-                labelingSchemeMap.put(labeling.getId(), labeling);
+            if (labelingSchemeMap == null) {
+                for (ContainerLabelingSchemeWrapper labeling : ContainerLabelingSchemeWrapper
+                    .getAllLabelingSchemes(appService)) {
+                    labelingSchemeMap.put(labeling.getId(), labeling);
 
+                }
             }
+            return labelingSchemeMap;
+        } catch (ApplicationException e) {
+            throw new RuntimeException(
+                "could not load container labeling schemes");
         }
-        return labelingSchemeMap;
     }
 
     public static Map<Integer, String> getAllLabelingSchemes(
-        WritableApplicationService appService) throws ApplicationException {
+        WritableApplicationService appService) {
         getAllLabelingSchemesMap(appService);
         Map<Integer, String> map = new HashMap<Integer, String>();
         for (ContainerLabelingSchemeWrapper labeling : labelingSchemeMap

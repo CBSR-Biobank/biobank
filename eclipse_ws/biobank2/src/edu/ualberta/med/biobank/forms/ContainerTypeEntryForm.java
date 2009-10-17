@@ -30,6 +30,7 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.model.LabelingScheme;
 import edu.ualberta.med.biobank.treeview.ContainerTypeAdapter;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.validators.DoubleNumberValidator;
@@ -79,11 +80,6 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
     private Button hasSamples;
 
     private Button hasContainers;
-
-    private class LabelingScheme {
-        Integer id;
-        String name;
-    };
 
     public ContainerTypeEntryForm() {
         super();
@@ -150,7 +146,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         createContainsSection();
     }
 
-    protected void createContainerTypeSection() throws Exception {
+    protected void createContainerTypeSection() {
         Composite client = toolkit.createComposite(form.getBody());
         GridLayout layout = new GridLayout(2, false);
         layout.horizontalSpacing = 10;

@@ -14,7 +14,6 @@ import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.treeview.ContainerTypeAdapter;
 import edu.ualberta.med.biobank.widgets.CabinetDrawerWidget;
 import edu.ualberta.med.biobank.widgets.ContainerDisplayWidget;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ContainerTypeViewForm extends BiobankViewForm {
     public static final String ID = "edu.ualberta.med.biobank.forms.ContainerTypeViewForm";
@@ -163,7 +162,7 @@ public class ContainerTypeViewForm extends BiobankViewForm {
         }
     }
 
-    private void createChildContainerTypesSection() throws ApplicationException {
+    private void createChildContainerTypesSection() {
         Composite client = createSectionWithClient("Contains Container Types");
         GridLayout layout = (GridLayout) client.getLayout();
         layout.numColumns = 2;
@@ -207,7 +206,7 @@ public class ContainerTypeViewForm extends BiobankViewForm {
         }
     }
 
-    private void setChildContainerTypesValues() throws ApplicationException {
+    private void setChildContainerTypesValues() {
         childContainerTypesList.removeAll();
         for (ContainerTypeWrapper type : containerType
             .getChildContainerTypeCollection()) {

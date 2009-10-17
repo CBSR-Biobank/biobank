@@ -221,8 +221,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     /**
      * return true if integrity of this object is ok
      */
-    @SuppressWarnings("unused")
-    public boolean checkIntegrity() throws Exception {
+    public boolean checkIntegrity() {
         return true;
     }
 
