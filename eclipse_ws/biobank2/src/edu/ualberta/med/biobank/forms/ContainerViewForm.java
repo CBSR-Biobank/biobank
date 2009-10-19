@@ -23,9 +23,9 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.common.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
-import edu.ualberta.med.biobank.common.wrappers.Position;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.ContainerCell;
 import edu.ualberta.med.biobank.model.ContainerStatus;
@@ -153,7 +153,7 @@ public class ContainerViewForm extends BiobankViewForm {
 
             cells = new ContainerCell[rowCap][colCap];
             for (ContainerWrapper child : container.getChildren()) {
-                Position position = child.getPosition();
+                RowColPos position = child.getPosition();
                 Assert.isNotNull(position, "position is null");
                 Assert.isNotNull(position.row, "row is null");
                 Assert.isNotNull(position.col, "column is null");
@@ -371,7 +371,7 @@ public class ContainerViewForm extends BiobankViewForm {
             containerToOpen.setSite(containerAdapter.getParentFromClass(
                 SiteAdapter.class).getWrapper());
             containerToOpen.setParent(container);
-            containerToOpen.setPosition(new Position(cell.getRow(), cell
+            containerToOpen.setPosition(new RowColPos(cell.getRow(), cell
                 .getCol()));
             newAdapter = new ContainerAdapter(containerAdapter, containerToOpen);
             AdapterBase.openForm(new FormInput(newAdapter),
@@ -380,7 +380,7 @@ public class ContainerViewForm extends BiobankViewForm {
             List<ContainerWrapper> children = container.getChildren();
             Assert.isNotNull(children);
             for (ContainerWrapper child : children) {
-                Position position = child.getPosition();
+                RowColPos position = child.getPosition();
                 if (position.row.equals(cell.getRow())
                     && position.col.equals(cell.getCol())) {
                     newAdapter = new ContainerAdapter(containerAdapter, child);

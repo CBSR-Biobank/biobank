@@ -41,10 +41,10 @@ import org.springframework.remoting.RemoteConnectFailureException;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.BiobankCheckException;
+import edu.ualberta.med.biobank.common.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
-import edu.ualberta.med.biobank.common.wrappers.Position;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
 import edu.ualberta.med.biobank.forms.listener.EnterKeyToNextFieldListener;
@@ -356,7 +356,7 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
             drawerWidget.setSelectedBin(-1);
             drawerLabel.setText("Drawer");
         } else {
-            Position position = drawer.getPosition();
+            RowColPos position = drawer.getPosition();
             cabinetWidget.setSelectedBox(new Point(position.row, position.col));
             cabinetLabel.setText("Cabinet " + cabinet.getLabel());
             drawerWidget.setSelectedBin(bin.getPosition().row);
