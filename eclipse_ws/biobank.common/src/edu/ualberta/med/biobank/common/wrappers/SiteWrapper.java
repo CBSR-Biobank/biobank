@@ -217,10 +217,12 @@ public class SiteWrapper extends ModelWrapper<Site> {
 
     @Override
     protected void deleteChecks() throws BiobankCheckException, Exception {
-        if (getClinicCollection().size() > 0
-            || getContainerCollection().size() > 0
-            || getContainerTypeCollection().size() > 0
-            || getStudyCollection().size() > 0) {
+        if ((getClinicCollection() != null && getClinicCollection().size() > 0)
+            || (getContainerCollection() != null && getContainerCollection()
+                .size() > 0)
+            || (getContainerTypeCollection() != null && getContainerTypeCollection()
+                .size() > 0)
+            || (getStudyCollection() != null && getStudyCollection().size() > 0)) {
             throw new BiobankCheckException(
                 "Unable to delete site "
                     + getName()
@@ -252,6 +254,25 @@ public class SiteWrapper extends ModelWrapper<Site> {
         return getStudyCollection(false);
     }
 
+    public void setStudyCollection(Collection<Study> studies, boolean setNull) {
+        Collection<Study> oldStudies = wrappedObject.getStudyCollection();
+        wrappedObject.setStudyCollection(studies);
+        propertyChangeSupport.firePropertyChange("studyCollection", oldStudies,
+            studies);
+        if (setNull) {
+            propertiesMap.put("studyCollection", null);
+        }
+    }
+
+    public void setStudyCollection(List<StudyWrapper> studies) {
+        Collection<Study> studyObjects = new HashSet<Study>();
+        for (StudyWrapper study : studies) {
+            studyObjects.add(study.getWrappedObject());
+        }
+        setStudyCollection(studyObjects, false);
+        propertiesMap.put("studyCollection", studies);
+    }
+
     @SuppressWarnings("unchecked")
     public List<ClinicWrapper> getClinicCollection(boolean sort) {
         List<ClinicWrapper> clinicCollection = (List<ClinicWrapper>) propertiesMap
@@ -273,6 +294,25 @@ public class SiteWrapper extends ModelWrapper<Site> {
 
     public List<ClinicWrapper> getClinicCollection() {
         return getClinicCollection(false);
+    }
+
+    public void setClinicCollection(Collection<Clinic> clinics, boolean setNull) {
+        Collection<Clinic> oldClinics = wrappedObject.getClinicCollection();
+        wrappedObject.setClinicCollection(clinics);
+        propertyChangeSupport.firePropertyChange("clinicCollection",
+            oldClinics, clinics);
+        if (setNull) {
+            propertiesMap.put("clinicCollection", null);
+        }
+    }
+
+    public void setClinicCollection(List<ClinicWrapper> clinics) {
+        Collection<Clinic> clinicObjects = new HashSet<Clinic>();
+        for (ClinicWrapper clinic : clinics) {
+            clinicObjects.add(clinic.getWrappedObject());
+        }
+        setClinicCollection(clinicObjects, false);
+        propertiesMap.put("clinicCollection", clinics);
     }
 
     @SuppressWarnings("unchecked")
@@ -460,7 +500,8 @@ public class SiteWrapper extends ModelWrapper<Site> {
     }
 
     @SuppressWarnings("unchecked")
-    public List<PvInfoPossibleWrapper> getPvInfoPossibleCollection(boolean sort) {
+    protected List<PvInfoPossibleWrapper> getPvInfoPossibleCollection(
+        boolean sort) {
         List<PvInfoPossibleWrapper> PvInfoPossibleCollection = (List<PvInfoPossibleWrapper>) propertiesMap
             .get("PvInfoPossibleCollection");
         if (PvInfoPossibleCollection == null) {
@@ -481,11 +522,11 @@ public class SiteWrapper extends ModelWrapper<Site> {
         return PvInfoPossibleCollection;
     }
 
-    public List<PvInfoPossibleWrapper> getPvInfoPossibleCollection() {
+    protected List<PvInfoPossibleWrapper> getPvInfoPossibleCollection() {
         return getPvInfoPossibleCollection(false);
     }
 
-    public void setPvInfoPossibleCollection(
+    protected void setPvInfoPossibleCollection(
         Collection<PvInfoPossible> collection, boolean setNull) {
         Collection<PvInfoPossible> oldCollection = wrappedObject
             .getPvInfoPossibleCollection();
@@ -497,7 +538,7 @@ public class SiteWrapper extends ModelWrapper<Site> {
         }
     }
 
-    public void setPvInfoPossibleCollection(
+    protected void setPvInfoPossibleCollection(
         List<PvInfoPossibleWrapper> collection) {
         Collection<PvInfoPossible> pipObjects = new HashSet<PvInfoPossible>();
         for (PvInfoPossibleWrapper pip : collection) {
@@ -563,6 +604,13 @@ public class SiteWrapper extends ModelWrapper<Site> {
     public String[] getPvInfoPossibleLabels() throws ApplicationException {
         getPvInfoPossibleMap();
         return pvInfoPossibleMap.keySet().toArray(new String[] {});
+    }
+
+    public Integer getPvInfoType(String label) {
+        PvInfoPossibleWrapper pvInfoPossible = pvInfoPossibleMap.get(label);
+        if (pvInfoPossible == null)
+            return null;
+        return pvInfoPossible.getPvInfoType().getId();
     }
 
     public PvInfoPossibleWrapper getPvInfoPossible(String label)

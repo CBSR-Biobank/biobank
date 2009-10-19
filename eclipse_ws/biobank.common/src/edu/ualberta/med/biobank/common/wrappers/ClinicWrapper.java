@@ -51,10 +51,6 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
             .firePropertyChange("address", oldAddress, address);
     }
 
-    public void setAddress(AddressWrapper address) {
-        setAddress(address.wrappedObject);
-    }
-
     public String getName() {
         return wrappedObject.getName();
     }
@@ -282,11 +278,25 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
 
     @Override
     protected void deleteChecks() throws BiobankCheckException, Exception {
-        if (getPatientVisitCollection().size() > 0) {
+        if (hasPatientVisits()) {
             throw new BiobankCheckException("Unable to delete clinic "
                 + getName()
                 + ". All defined patient visits must be removed first.");
         }
+    }
+
+    public boolean hasPatientVisits() throws ApplicationException,
+        BiobankCheckException {
+        HQLCriteria criteria = new HQLCriteria(
+            "select count(visit) from "
+                + Clinic.class.getName()
+                + " as clinic inner join clinic.patientVisitCollection as visit where clinic.id = ?",
+            Arrays.asList(new Object[] { getId() }));
+        List<Long> result = appService.query(criteria);
+        if (result.size() != 1) {
+            throw new BiobankCheckException("Invalid size for HQL query result");
+        }
+        return result.get(0) > 0;
     }
 
     @SuppressWarnings("unchecked")

@@ -10,7 +10,6 @@ import org.springframework.util.Assert;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
@@ -259,8 +258,6 @@ public class BiobankLabelProvider extends LabelProvider implements
             return study.getNameShort() + " - " + study.getName();
         } else if (element instanceof ClinicWrapper) {
             return ((ClinicWrapper) element).getName();
-        } else if (element instanceof ContainerLabelingSchemeWrapper) {
-            return ((ContainerLabelingSchemeWrapper) element).getName();
         } else if (element instanceof SiteWrapper) {
             return ((SiteWrapper) element).getName();
         } else if (element instanceof SampleTypeWrapper) {

@@ -54,8 +54,12 @@ public class CapacityWrapper extends ModelWrapper<Capacity> {
     }
 
     @Override
-    protected void persistChecks() throws BiobankCheckException, Exception {
-        // do nothing
+    public void persistChecks() throws BiobankCheckException, Exception {
+        if (getRowCapacity() == null || getColCapacity() == null
+            || getRowCapacity() < 0 || getColCapacity() < 0) {
+            throw new BiobankCheckException("Capacity '" + getRowCapacity()
+                + ":" + getColCapacity() + "' is invalid");
+        }
     }
 
     @Override

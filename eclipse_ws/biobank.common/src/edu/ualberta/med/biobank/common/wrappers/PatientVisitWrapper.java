@@ -332,7 +332,8 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
             appService, pvDatabase).getPvSampleSourceCollection();
         if (oldSampleSources != null) {
             for (PvSampleSourceWrapper ss : oldSampleSources) {
-                if (newSampleSources == null || !newSampleSources.contains(ss)) {
+                if ((newSampleSources == null)
+                    || !newSampleSources.contains(ss)) {
                     ss.delete();
                 }
             }

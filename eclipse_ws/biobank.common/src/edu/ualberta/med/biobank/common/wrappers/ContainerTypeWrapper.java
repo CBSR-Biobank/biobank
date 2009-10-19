@@ -3,12 +3,15 @@ package edu.ualberta.med.biobank.common.wrappers;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.internal.CapacityWrapper;
+import edu.ualberta.med.biobank.common.wrappers.internal.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
@@ -18,17 +21,26 @@ import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.model.Site;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
+import gov.nih.nci.system.query.example.DeleteExampleQuery;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
 
+    private static Map<Integer, ContainerLabelingSchemeWrapper> labelingSchemeMap;
+
     public ContainerTypeWrapper(WritableApplicationService appService,
         ContainerType wrappedObject) {
         super(appService, wrappedObject);
+        if (labelingSchemeMap == null) {
+            getAllLabelingSchemesMap(appService);
+        }
     }
 
     public ContainerTypeWrapper(WritableApplicationService appService) {
         super(appService);
+        if (labelingSchemeMap == null) {
+            getAllLabelingSchemesMap(appService);
+        }
     }
 
     @Override
@@ -42,8 +54,9 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
     @Override
     protected void persistChecks() throws BiobankCheckException, Exception {
         checkNameUnique();
+        getCapacity().persistChecks();
         if (!isNew()) {
-            boolean exists = existsContainerWithType();
+            boolean exists = isUsedByContainers();
             ContainerType oldObject = getObjectFromDatabase();
             checkNewCapacity(oldObject, exists);
             checkTopLevel(oldObject, exists);
@@ -75,7 +88,8 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
         return ContainerType.class;
     }
 
-    public Collection<ContainerTypeWrapper> getAllChildren() {
+    public Collection<ContainerTypeWrapper> getAllChildren()
+        throws ApplicationException {
         List<ContainerTypeWrapper> allChildren = new ArrayList<ContainerTypeWrapper>();
         for (ContainerTypeWrapper type : getChildContainerTypeCollection()) {
             allChildren.addAll(type.getAllChildren());
@@ -85,17 +99,52 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
     }
 
     @Override
+    public void delete() throws BiobankCheckException, Exception {
+        if (!isNew()) {
+            deleteChecks();
+            // should remove this containerType from its parents
+            for (ContainerTypeWrapper parent : getParentContainerTypes()) {
+                List<ContainerTypeWrapper> children = parent
+                    .getChildContainerTypeCollection();
+                children.remove(this);
+                parent.setChildContainerTypeCollection(children);
+                parent.persist();
+            }
+            appService.executeQuery(new DeleteExampleQuery(wrappedObject));
+        }
+    }
+
+    @Override
     protected void deleteChecks() throws BiobankCheckException, Exception {
-        String queryString = "select c.containerType from "
-            + Container.class.getName() + " as c where c.containerType=?)";
-        HQLCriteria c = new HQLCriteria(queryString, Arrays
-            .asList(new Object[] { wrappedObject }));
-        List<Object> results = appService.query(c);
-        if (results.size() > 0) {
+        if (isUsedByContainers()) {
             throw new BiobankCheckException("Unable to delete container type "
                 + getName() + ". A container of this type exists in storage."
                 + " Remove all instances before deleting this type.");
         }
+    }
+
+    public boolean isUsedByContainers() throws ApplicationException,
+        BiobankCheckException {
+        String queryString = "select count(c) from "
+            + Container.class.getName() + " as c where c.containerType=?)";
+        HQLCriteria c = new HQLCriteria(queryString, Arrays
+            .asList(new Object[] { wrappedObject }));
+        List<Long> results = appService.query(c);
+        if (results.size() != 1) {
+            throw new BiobankCheckException("Invalid size for HQL query result");
+        }
+        return results.get(0) > 0;
+    }
+
+    public List<ContainerTypeWrapper> getParentContainerTypes()
+        throws ApplicationException {
+        String queryString = "select ct from "
+            + ContainerType.class.getName()
+            + " as ct inner join ct.childContainerTypeCollection as child where child.id = ?)";
+        HQLCriteria c = new HQLCriteria(queryString, Arrays
+            .asList(new Object[] { wrappedObject.getId() }));
+        List<ContainerType> results = appService.query(c);
+        return transformToWrapperList(appService, results);
     }
 
     public void setName(String name) {
@@ -204,7 +253,8 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
         return sampleTypeCollection;
     }
 
-    public Collection<SampleTypeWrapper> getSampleTypeCollectionRecursively() {
+    public Collection<SampleTypeWrapper> getSampleTypeCollectionRecursively()
+        throws ApplicationException {
         List<SampleTypeWrapper> sampleTypes = new ArrayList<SampleTypeWrapper>();
         sampleTypes.addAll(getSampleTypeCollection());
         for (ContainerTypeWrapper type : getChildContainerTypeCollection()) {
@@ -323,23 +373,35 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
         setCapacity(capacity);
     }
 
-    public void setChildLabelingScheme(ContainerLabelingSchemeWrapper scheme) {
+    public void setChildLabelingScheme(Integer id) {
+        setChildLabelingScheme(labelingSchemeMap.get(id));
+    }
+
+    private void setChildLabelingScheme(ContainerLabelingSchemeWrapper scheme) {
         setChildLabelingScheme(scheme.getWrappedObject());
     }
 
-    public void setChildLabelingScheme(ContainerLabelingScheme scheme) {
+    private void setChildLabelingScheme(ContainerLabelingScheme scheme) {
         ContainerLabelingScheme oldLbl = wrappedObject.getChildLabelingScheme();
         wrappedObject.setChildLabelingScheme(scheme);
         propertyChangeSupport.firePropertyChange("childLabelingScheme", oldLbl,
             scheme);
     }
 
-    public ContainerLabelingSchemeWrapper getChildLabelingScheme() {
+    public Integer getChildLabelingScheme() {
         ContainerLabelingScheme scheme = wrappedObject.getChildLabelingScheme();
         if (scheme == null) {
             return null;
         }
-        return new ContainerLabelingSchemeWrapper(appService, scheme);
+        return scheme.getId();
+    }
+
+    public String getChildLabelingSchemeName() {
+        ContainerLabelingScheme scheme = wrappedObject.getChildLabelingScheme();
+        if (scheme == null) {
+            return null;
+        }
+        return scheme.getName();
     }
 
     public void setSampleTypes(List<Integer> sampleTypesIds,
@@ -428,21 +490,12 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
         }
     }
 
-    /**
-     * return true if at least one container exists with this container type
-     */
-    private boolean existsContainerWithType() throws ApplicationException {
-        HQLCriteria c = new HQLCriteria("select c.containerType from "
-            + Container.class.getName() + " as c where c.containerType=?)",
-            Arrays.asList(new Object[] { wrappedObject }));
-        List<Object> results = appService.query(c);
-        return results.size() > 0;
-    }
-
     private void checkTopLevel(ContainerType oldObject,
         boolean existsContainersWithType) throws BiobankCheckException {
-        if (!getTopLevel().equals(oldObject.getTopLevel())
-            && existsContainersWithType) {
+        if ((getTopLevel() == null && oldObject.getTopLevel() != null)
+            || (getTopLevel() != null && oldObject.getTopLevel() == null)
+            || (getTopLevel() != null && oldObject.getTopLevel() != null && !getTopLevel()
+                .equals(oldObject.getTopLevel())) && existsContainersWithType) {
             throw new BiobankCheckException(
                 "Unable to change the \"Top Level\" property. A container requiring this property exists in storage. Remove all instances before attempting to modify this container type.");
         }
@@ -450,7 +503,7 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
 
     private void checkLabelingScheme(ContainerType oldObject,
         boolean existsContainersWithType) throws BiobankCheckException {
-        if (!getChildLabelingScheme().getId().equals(
+        if (!getChildLabelingScheme().equals(
             oldObject.getChildLabelingScheme().getId())
             && existsContainersWithType) {
             throw new BiobankCheckException(
@@ -501,6 +554,35 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
                 containerNameParameter }));
         List<ContainerType> containerTypes = appService.query(criteria);
         return transformToWrapperList(appService, containerTypes);
+    }
+
+    private static Map<Integer, ContainerLabelingSchemeWrapper> getAllLabelingSchemesMap(
+        WritableApplicationService appService) throws RuntimeException {
+        try {
+            if (labelingSchemeMap == null) {
+                labelingSchemeMap = new HashMap<Integer, ContainerLabelingSchemeWrapper>();
+                for (ContainerLabelingSchemeWrapper labeling : ContainerLabelingSchemeWrapper
+                    .getAllLabelingSchemes(appService)) {
+                    labelingSchemeMap.put(labeling.getId(), labeling);
+
+                }
+            }
+            return labelingSchemeMap;
+        } catch (ApplicationException e) {
+            throw new RuntimeException(
+                "could not load container labeling schemes");
+        }
+    }
+
+    public static Map<Integer, String> getAllLabelingSchemes(
+        WritableApplicationService appService) {
+        getAllLabelingSchemesMap(appService);
+        Map<Integer, String> map = new HashMap<Integer, String>();
+        for (ContainerLabelingSchemeWrapper labeling : labelingSchemeMap
+            .values()) {
+            map.put(labeling.getId(), labeling.getName());
+        }
+        return map;
     }
 
     @Override
