@@ -6,7 +6,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 
-import edu.ualberta.med.biobank.common.wrappers.Position;
+import edu.ualberta.med.biobank.common.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
 import edu.ualberta.med.biobank.treeview.SampleAdapter;
 
@@ -56,7 +56,7 @@ public class SampleViewForm extends BiobankViewForm {
 
         String string = "Type = " + sample.getSampleType().getName() + "\n";
         if (sample.hasParent()) {
-            Position position = sample.getPosition();
+            RowColPos position = sample.getPosition();
             string += "Position = " + position.row + ":" + position.col;
         } else {
             string += "No position - should be assign to a location";
