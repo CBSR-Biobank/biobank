@@ -128,58 +128,40 @@ public class TestContainer extends TestDatabase {
     }
 
     private void addContainers() throws BiobankCheckException, Exception {
-        ContainerWrapper top = newContainer("barcode1", site, containerTypeMap
-            .get("TopCT"));
-        top.setLabel("01");
-        top.persist();
+        ContainerWrapper top = addContainer("01", "barcode1", null, site,
+            containerTypeMap.get("TopCT"));
         containerMap.put("Top", top);
-    }
-
-    private ContainerWrapper createContainer(String barcode, SiteWrapper site,
-        ContainerTypeWrapper type, Integer row, Integer col) throws Exception {
-        ContainerWrapper container = newContainer(barcode, site, type);
-        container.setPosition(row, col);
-        return container;
     }
 
     private void addContainerHierarchy() throws Exception {
         ContainerWrapper top, childL1, childL2, childL3;
 
         top = containerMap.get("Top");
-        childL1 = createContainer("uvwxyz", site, containerTypeMap
+        childL1 = addContainer(null, "uvwxyz", top, site, containerTypeMap
             .get("ChildCtL1"), 0, 0);
-        childL1.setParent(top);
-        childL1.persist();
         containerMap.put("ChildL1", childL1);
 
-        childL2 = createContainer("0001", site, containerTypeMap
+        childL2 = addContainer(null, "0001", childL1, site, containerTypeMap
             .get("ChildCtL2"), 0, 0);
-        childL2.setParent(childL1);
-        childL2.persist();
         containerMap.put("ChildL2", childL2);
 
-        childL3 = createContainer("0002", site, containerTypeMap
+        childL3 = addContainer(null, "0002", childL2, site, containerTypeMap
             .get("ChildCtL3"), 0, 0);
-        childL3.setParent(childL2);
-        childL3.persist();
         containerMap.put("ChildL3", childL3);
 
     }
 
     @Test
     public void testGettersAndSetters() throws BiobankCheckException, Exception {
-        ContainerWrapper container = newContainer(null, site, containerTypeMap
-            .get("TopCT"));
+        ContainerWrapper container = addContainer(null, null, null, site,
+            containerTypeMap.get("TopCT"));
         container.persist();
-        testGettersAndSetters(container);
     }
 
     @Test
     public void createValidContainer() throws Exception {
-        ContainerWrapper container = newContainer(null, site, containerTypeMap
-            .get("TopCT"));
-        container.setLabel("05");
-        container.persist();
+        ContainerWrapper container = addContainer("05", null, null, site,
+            containerTypeMap.get("TopCT"));
 
         Integer id = container.getId();
         Assert.assertNotNull(id);
@@ -190,26 +172,15 @@ public class TestContainer extends TestDatabase {
 
     @Test(expected = BiobankCheckException.class)
     public void createNoSite() throws Exception {
-        ContainerWrapper container = newContainer(null, null, containerTypeMap
-            .get("TopCT"));
-        container.setLabel("05");
-        container.persist();
+        addContainer("05", null, null, null, containerTypeMap.get("TopCT"));
     }
 
     @Test
     public void testLabelUnique() throws Exception {
-        ContainerWrapper container1, container2;
-        container1 = newContainer(null, site, containerTypeMap.get("TopCT"));
-        container1.setLabel("05");
-
-        try {
-            container1.persist();
-        } catch (Exception e) {
-            Assert.fail("adding first container failed" + e);
-        }
-
-        container2 = newContainer(null, site, containerTypeMap.get("TopCT"));
-        container2.setLabel("05");
+        ContainerWrapper container2;
+        addContainer("05", null, null, site, containerTypeMap.get("TopCT"));
+        container2 = newContainer("05", null, null, site, containerTypeMap
+            .get("TopCT"));
 
         try {
             container2.persist();
@@ -222,19 +193,11 @@ public class TestContainer extends TestDatabase {
 
     @Test
     public void testProductBarcodeUnique() throws Exception {
-        ContainerWrapper container1, container2;
+        ContainerWrapper container2;
 
-        container1 = newContainer("abcdef", site, containerTypeMap.get("TopCT"));
-        container1.setLabel("05");
-
-        try {
-            container1.persist();
-        } catch (Exception e) {
-            Assert.fail("adding first container failed");
-        }
-
-        container2 = newContainer("abcdef", site, containerTypeMap.get("TopCT"));
-        container2.setLabel("06");
+        addContainer("05", "abcdef", null, site, containerTypeMap.get("TopCT"));
+        container2 = newContainer("06", "abcdef", null, site, containerTypeMap
+            .get("TopCT"));
 
         try {
             container2.persist();
@@ -247,42 +210,28 @@ public class TestContainer extends TestDatabase {
 
     @Test
     public void testReset() throws Exception {
-        ContainerWrapper container;
-
-        container = newContainer("uvwxyz", site, containerTypeMap.get("TopCT"));
-        container.setLabel("05");
-        container.persist();
+        ContainerWrapper container = addContainer("05", "uvwxyz", null, site,
+            containerTypeMap.get("TopCT"));
         container.reset();
     }
 
     @Test
     public void testReload() throws Exception {
-        ContainerWrapper container;
-
-        container = newContainer("uvwxyz", site, containerTypeMap.get("TopCT"));
-        container.setLabel("05");
-        container.persist();
+        ContainerWrapper container = newContainer("05", "uvwxyz", null, site,
+            containerTypeMap.get("TopCT"));
         container.reload();
     }
 
     @Test(expected = BiobankCheckException.class)
     public void testSetPositionOnTopLevel() throws Exception {
-        ContainerWrapper container;
-
-        container = createContainer("uvwxyz", site, containerTypeMap
-            .get("TopCT"), 0, 0);
-        container.setLabel("05");
-        container.persist();
+        addContainer("05", "uvwxyz", null, site, containerTypeMap.get("TopCT"),
+            0, 0);
     }
 
     @Test
     public void testSetPositionOnChild() throws Exception {
-        ContainerWrapper child;
-
-        child = createContainer("uvwxyz", site, containerTypeMap
-            .get("ChildCtL1"), 0, 0);
-        child.setParent(containerMap.get("Top"));
-        child.persist();
+        addContainer(null, "uvwxyz", containerMap.get("Top"), site,
+            containerTypeMap.get("ChildCtL1"), 0, 0);
     }
 
     @Test
@@ -291,28 +240,27 @@ public class TestContainer extends TestDatabase {
 
         top = containerMap.get("Top");
 
-        child = newContainer("uvwxyz", site, containerTypeMap.get("ChildCtL1"));
-        child.setParent(top);
+        child = newContainer(null, "uvwxyz", top, site, containerTypeMap
+            .get("ChildCtL1"));
+        child.setPosition(top.getRowCapacity(), top.getColCapacity());
 
         try {
-            child.setPosition(top.getRowCapacity(), top.getColCapacity());
             child.persist();
             Assert.fail("should not be allowed to set an invalid position");
         } catch (BiobankCheckException e) {
             Assert.assertTrue(true);
         }
 
+        child.setPosition(top.getRowCapacity() + 1, top.getColCapacity() + 1);
         try {
-            child.setPosition(top.getRowCapacity() + 1,
-                top.getColCapacity() + 1);
             child.persist();
             Assert.fail("should not be allowed to set an invalid position");
         } catch (BiobankCheckException e) {
             Assert.assertTrue(true);
         }
 
+        child.setPosition(-1, -1);
         try {
-            child.setPosition(-1, -1);
             child.persist();
             Assert.fail("should not be allowed to set an invalid position");
         } catch (BiobankCheckException e) {
@@ -322,22 +270,13 @@ public class TestContainer extends TestDatabase {
 
     @Test
     public void testUniquePosition() throws Exception {
-        ContainerWrapper top, container1, container2;
+        ContainerWrapper top, container2;
 
         top = containerMap.get("Top");
-        container1 = createContainer("uvwxyz", site, containerTypeMap
+        addContainer(null, "uvwxyz", top, site, containerTypeMap
             .get("ChildCtL1"), 0, 0);
-        container1.setParent(top);
-
-        try {
-            container1.persist();
-        } catch (Exception e) {
-            Assert.fail("adding first container failed");
-        }
-
-        container2 = createContainer("uvwxyz", site, containerTypeMap
+        container2 = newContainer(null, "uvwxyz", top, site, containerTypeMap
             .get("ChildCtL1"), 0, 0);
-        container2.setParent(top);
 
         try {
             container2.persist();
@@ -382,27 +321,18 @@ public class TestContainer extends TestDatabase {
     public void testGetContainersHoldingContainerType() throws Exception {
         ContainerWrapper top1, top2, child1, child2;
 
-        top1 = newContainer("barcode2", site, containerTypeMap.get("TopCT"));
-        top1.setLabel("02");
-        top1.persist();
-
-        child1 = createContainer("0001", site, containerTypeMap
+        top1 = addContainer("02", "barcode2", null, site, containerTypeMap
+            .get("TopCT"));
+        child1 = addContainer(null, "0001", top1, site, containerTypeMap
             .get("ChildCtL1"), 0, 0);
-        child1.setParent(top1);
-        child1.persist();
 
-        ContainerTypeWrapper topType2 = newContainerType(site,
+        ContainerTypeWrapper topType2 = addContainerType(site,
             "Top Container Type 2", "TCT2", 2, 3, 10, true);
-        topType2.persist();
 
-        top2 = newContainer("barcode3", site, topType2);
-        top2.setLabel("02");
-        top2.persist();
+        top2 = addContainer("02", "barcode3", null, site, topType2);
 
-        child2 = createContainer("0002", site, containerTypeMap
+        child2 = addContainer(null, "0002", top2, site, containerTypeMap
             .get("ChildCtL1"), 0, 0);
-        child2.setParent(top2);
-        child2.persist();
 
         List<ContainerWrapper> list = top1
             .getContainersHoldingContainerType("02AA");
@@ -421,7 +351,7 @@ public class TestContainer extends TestDatabase {
         top = containerMap.get("Top");
         for (int row = 0; row < 5; ++row) {
             for (int col = 0; col < 9; ++col) {
-                child = createContainer("0001", site, containerTypeMap
+                child = newContainer(null, "0001", top, site, containerTypeMap
                     .get("ChildCtL1"), row, col);
                 child.setParent(top);
                 child.persist();
