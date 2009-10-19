@@ -138,7 +138,6 @@ public class TestDatabase {
 			return list.get(0);
 		}
 		if (list.size() > 1) {
-			Random r = new Random();
 			int pos = r.nextInt(list.size());
 			return list.get(pos);
 		}

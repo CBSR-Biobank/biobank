@@ -2,7 +2,6 @@ package test.ualberta.med.biobank;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -23,43 +22,39 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class TestSite extends TestDatabase {
 
-	private List<SiteWrapper> sites;
-
-	private SiteWrapper oneSite;
-
-	private List<ModelWrapper<?>> createdObjects = new ArrayList<ModelWrapper<?>>();
+	private List<SiteWrapper> createdSites;
 
 	@Override
 	@Before
 	public void setUp() throws Exception {
 		super.setUp();
-		sites = SiteWrapper.getAllSites(appService);
-		if (sites.size() == 0) {
-			SiteWrapper newSite = addSite("NewSite");
-			sites.add(newSite);
-		}
-		oneSite = chooseRandomlyInList(sites);
+		createdSites = new ArrayList<SiteWrapper>();
 	}
 
 	@Test
 	public void testGettersAndSetters() throws BiobankCheckException, Exception {
-		SiteWrapper site = addSite("testGettersAndSetters");
+		SiteWrapper site = addSite("testGettersAndSetters", true);
 		testGettersAndSetters(site);
 	}
 
 	@Test
-	public void testGetStudyCollection() {
-		List<StudyWrapper> studies = oneSite.getStudyCollection();
+	public void testGetStudyCollection() throws BiobankCheckException,
+			Exception {
+		SiteWrapper site = addSite("testGetStudyCollection", true);
+		int studiesNber = addStudies(site, "testGetStudyCollection");
+
+		List<StudyWrapper> studies = site.getStudyCollection();
 		int sizeFound = studies.size();
 
-		int expected = oneSite.getWrappedObject().getStudyCollection().size();
-
-		Assert.assertEquals(expected, sizeFound);
+		Assert.assertEquals(studiesNber, sizeFound);
 	}
 
 	@Test
 	public void testGetStudyCollectionBoolean() throws Exception {
-		List<StudyWrapper> studiesSorted = oneSite.getStudyCollection(true);
+		SiteWrapper site = addSite("testGetStudyCollectionBoolean", true);
+		addStudies(site, "testGetStudyCollectionBoolean");
+
+		List<StudyWrapper> studiesSorted = site.getStudyCollection(true);
 		if (studiesSorted.size() > 1) {
 			for (int i = 0; i < studiesSorted.size() - 1; i++) {
 				StudyWrapper study1 = studiesSorted.get(i);
@@ -72,63 +67,85 @@ public class TestSite extends TestDatabase {
 	@Test
 	public void testAddInStudyCollection() throws BiobankCheckException,
 			Exception {
-		List<StudyWrapper> studies = oneSite.getStudyCollection();
-		int expectedSize = studies.size() + 1;
-		addStudy("testAddInStudyCollection");
+		SiteWrapper site = addSite("testAddInStudyCollection", true);
+		int studiesNber = addStudies(site, "testAddInStudyCollection");
 
-		oneSite.reload();
+		List<StudyWrapper> studies = site.getStudyCollection();
+		StudyWrapper study = new StudyWrapper(appService);
+		study.setName("testAddInStudyCollection" + r.nextInt());
+		study.setSite(site);
+		studies.add(study);
+		site.setStudyCollection(studies);
+		site.persist();
+
+		site.reload();
 		// one study added
-		Assert.assertEquals(expectedSize, oneSite.getStudyCollection().size());
+		Assert.assertEquals(studiesNber + 1, site.getStudyCollection().size());
 	}
 
 	@Test
 	public void testRemoveInStudyCollection() throws BiobankCheckException,
 			Exception {
-		StudyWrapper study = addStudy("testRemoveInStudyCollection");
-		oneSite.reload();
+		SiteWrapper site = addSite("testRemoveInStudyCollection", true);
+		int studiesNber = addStudies(site, "testRemoveInStudyCollection");
 
-		List<StudyWrapper> studies = oneSite.getStudyCollection();
+		List<StudyWrapper> studies = site.getStudyCollection();
+		StudyWrapper study = chooseRandomlyInList(studies);
 		int idStudy = study.getId();
 		studies.remove(study);
-		oneSite.setStudyCollection(studies);
+		site.setStudyCollection(studies);
 		study.delete();
-		int expectedSize = studies.size();
-		oneSite.persist();
+		site.persist();
 
-		oneSite.reload();
+		site.reload();
 		// one study removed
-		Assert.assertEquals(expectedSize, oneSite.getStudyCollection().size());
+		Assert.assertEquals(studiesNber - 1, site.getStudyCollection().size());
 
 		// study should not be anymore in the study collection (removed the
 		// good one)
-		for (StudyWrapper s : oneSite.getStudyCollection()) {
+		for (StudyWrapper s : site.getStudyCollection()) {
 			Assert.assertFalse(s.getId().equals(idStudy));
 		}
 	}
 
-	private StudyWrapper addStudy(String name) throws BiobankCheckException,
-			Exception {
+	private StudyWrapper addStudy(SiteWrapper site, String name)
+			throws Exception {
 		StudyWrapper study = new StudyWrapper(appService);
-		study.setName(name + new Random().nextInt());
-		study.setSite(oneSite);
+		study.setName(name + "Random" + r.nextInt());
+		study.setSite(site);
 		study.persist();
-		createdObjects.add(study);
 		return study;
 	}
 
-	@Test
-	public void testGetClinicCollection() {
-		List<ClinicWrapper> clinics = oneSite.getClinicCollection();
-		int sizeFound = clinics.size();
-
-		int expected = oneSite.getWrappedObject().getClinicCollection().size();
-
-		Assert.assertEquals(expected, sizeFound);
+	private int addStudies(SiteWrapper site, String name)
+			throws BiobankCheckException, Exception {
+		int studiesNber = r.nextInt(15);
+		for (int i = 0; i < studiesNber; i++) {
+			addStudy(site, name);
+		}
+		site.reload();
+		return studiesNber;
 	}
 
 	@Test
-	public void testGetClinicCollectionBoolean() {
-		List<ClinicWrapper> clinics = oneSite.getClinicCollection(true);
+	public void testGetClinicCollection() throws BiobankCheckException,
+			Exception {
+		SiteWrapper site = addSite("testGetClinicCollection", true);
+		int clinicsNber = addClinics(site, "testGetClinicCollection");
+
+		List<ClinicWrapper> clinics = site.getClinicCollection();
+		int sizeFound = clinics.size();
+
+		Assert.assertEquals(clinicsNber, sizeFound);
+	}
+
+	@Test
+	public void testGetClinicCollectionBoolean() throws BiobankCheckException,
+			Exception {
+		SiteWrapper site = addSite("testGetClinicCollectionBoolean", true);
+		addClinics(site, "testGetClinicCollectionBoolean");
+
+		List<ClinicWrapper> clinics = site.getClinicCollection(true);
 		if (clinics.size() > 1) {
 			for (int i = 0; i < clinics.size() - 1; i++) {
 				ClinicWrapper clinic1 = clinics.get(i);
@@ -141,65 +158,85 @@ public class TestSite extends TestDatabase {
 	@Test
 	public void testAddInClinicCollection() throws BiobankCheckException,
 			Exception {
-		List<ClinicWrapper> clinics = oneSite.getClinicCollection();
-		int expectedSize = clinics.size() + 1;
-		addClinic("testAddInClinicCollection");
+		SiteWrapper site = addSite("testAddInClinicCollection", true);
+		int nber = addClinics(site, "testAddInClinicCollection");
 
-		oneSite.reload();
+		List<ClinicWrapper> clinics = site.getClinicCollection();
+		ClinicWrapper clinic = new ClinicWrapper(appService);
+		clinic.setName("testAddInClinicCollection" + r.nextInt());
+		clinic.setCity("");
+		clinic.setSite(site);
+		clinics.add(clinic);
+		site.setClinicCollection(clinics);
+		site.persist();
+
+		site.reload();
 		// one clinic added
-		Assert.assertEquals(expectedSize, oneSite.getClinicCollection().size());
+		Assert.assertEquals(nber + 1, site.getClinicCollection().size());
 	}
 
-	private ClinicWrapper addClinic(String name) throws BiobankCheckException,
-			Exception {
+	private ClinicWrapper addClinic(SiteWrapper site, String name)
+			throws Exception {
 		ClinicWrapper clinic = new ClinicWrapper(appService);
-		clinic.setName(name + new Random().nextInt());
+		clinic.setName(name + "Random" + r.nextInt());
 		clinic.setCity("");
-		clinic.setSite(oneSite);
+		clinic.setSite(site);
 		clinic.persist();
-		createdObjects.add(clinic);
 		return clinic;
+	}
+
+	private int addClinics(SiteWrapper site, String name) throws Exception {
+		int nber = r.nextInt(15);
+		for (int i = 0; i < nber; i++) {
+			addClinic(site, name);
+		}
+		site.reload();
+		return nber;
 	}
 
 	@Test
 	public void testRemoveInClinicCollection() throws BiobankCheckException,
 			Exception {
-		ClinicWrapper clinic = addClinic("testRemoveInClinicCollection");
-		oneSite.reload();
+		SiteWrapper site = addSite("testRemoveInClinicCollection", true);
+		int nber = addClinics(site, "testRemoveInClinicCollection");
 
-		List<ClinicWrapper> clinics = oneSite.getClinicCollection();
+		List<ClinicWrapper> clinics = site.getClinicCollection();
+		ClinicWrapper clinic = chooseRandomlyInList(clinics);
 		int idClinic = clinic.getId();
 		clinics.remove(clinic);
-		oneSite.setClinicCollection(clinics);
+		site.setClinicCollection(clinics);
 		clinic.delete();
-		int expectedSize = clinics.size();
-		oneSite.persist();
+		site.persist();
 
-		oneSite.reload();
+		site.reload();
 		// one clinic removed
-		Assert.assertEquals(expectedSize, oneSite.getClinicCollection().size());
+		Assert.assertEquals(nber - 1, site.getClinicCollection().size());
 
 		// clinic should not be anymore in the clinic collection (removed
 		// the good one)
-		for (ClinicWrapper c : oneSite.getClinicCollection()) {
+		for (ClinicWrapper c : site.getClinicCollection()) {
 			Assert.assertFalse(c.getId().equals(idClinic));
 		}
 	}
 
 	@Test
-	public void testGetContainerTypeCollection() {
-		List<ContainerTypeWrapper> types = oneSite.getContainerTypeCollection();
+	public void testGetContainerTypeCollection() throws Exception {
+		SiteWrapper site = addSite("testGetContainerTypeCollection", true);
+		int nber = addContainerTypes(site, "testGetContainerTypeCollection");
+
+		List<ContainerTypeWrapper> types = site.getContainerTypeCollection();
 		int sizeFound = types.size();
 
-		int expected = oneSite.getWrappedObject().getContainerTypeCollection()
-				.size();
-
-		Assert.assertEquals(expected, sizeFound);
+		Assert.assertEquals(nber, sizeFound);
 	}
 
 	@Test
-	public void testGetContainerTypeCollectionBoolean() {
-		List<ContainerTypeWrapper> types = oneSite
+	public void testGetContainerTypeCollectionBoolean() throws Exception {
+		SiteWrapper site = addSite("testGetContainerTypeCollectionBoolean",
+				true);
+		addContainerTypes(site, "testGetContainerTypeCollectionBoolean");
+
+		List<ContainerTypeWrapper> types = site
 				.getContainerTypeCollection(true);
 		if (types.size() > 1) {
 			for (int i = 0; i < types.size() - 1; i++) {
@@ -211,130 +248,165 @@ public class TestSite extends TestDatabase {
 	}
 
 	@Test
-	public void testAddInContainerTypeCollection()
-			throws BiobankCheckException, Exception {
-		List<ContainerTypeWrapper> types = oneSite.getContainerTypeCollection();
-		int expectedSize = types.size() + 1;
-		addContainerType("testAddInContainerTypeCollection");
-		oneSite.reload();
+	public void testAddInContainerTypeCollection() throws Exception {
+		SiteWrapper site = addSite("testAddInContainerTypeCollection", true);
+		int nber = addContainerTypes(site, "testAddInContainerTypeCollection");
+
+		List<ContainerTypeWrapper> types = site.getContainerTypeCollection();
+		ContainerTypeWrapper type = new ContainerTypeWrapper(appService);
+		type.setSite(site);
+		type.setName("testAddInContainerTypeCollection" + r.nextInt());
+		type.setRowCapacity(5);
+		type.setColCapacity(4);
+		types.add(type);
+		site.setContainerTypeCollection(types);
+		site.persist();
+
+		site.reload();
 		// one type added
-		Assert.assertEquals(expectedSize, oneSite.getContainerTypeCollection()
-				.size());
+		Assert.assertEquals(nber + 1, site.getContainerTypeCollection().size());
 	}
 
 	@Test
-	public void testRemoveInContainerTypeCollection()
-			throws BiobankCheckException, Exception {
-		ContainerTypeWrapper type = addContainerType("RemoveInContainerTypeCollection");
-		oneSite.reload();
-		List<ContainerTypeWrapper> types = oneSite.getContainerTypeCollection();
+	public void testRemoveInContainerTypeCollection() throws Exception {
+		SiteWrapper site = addSite("testRemoveInContainerTypeCollection", true);
+		int nber = addContainerTypes(site,
+				"testRemoveInContainerTypeCollection");
+
+		List<ContainerTypeWrapper> types = site.getContainerTypeCollection();
+		ContainerTypeWrapper type = chooseRandomlyInList(types);
 		int idType = type.getId();
 		types.remove(type);
-		oneSite.setContainerTypeCollection(types);
+		site.setContainerTypeCollection(types);
 		type.delete();
-		int expectedSize = types.size();
-		oneSite.persist();
+		site.persist();
 
-		oneSite.reload();
+		site.reload();
 		// one type removed
-		Assert.assertEquals(expectedSize, oneSite.getContainerTypeCollection()
-				.size());
+		Assert.assertEquals(nber - 1, site.getContainerTypeCollection().size());
 
 		// type should not be anymore in the type collection (removed
 		// the good one)
-		for (ContainerTypeWrapper t : oneSite.getContainerTypeCollection()) {
+		for (ContainerTypeWrapper t : site.getContainerTypeCollection()) {
 			Assert.assertFalse(t.getId().equals(idType));
 		}
 	}
 
-	private ContainerTypeWrapper addContainerType(String name)
-			throws BiobankCheckException, Exception {
+	private ContainerTypeWrapper addContainerType(SiteWrapper site, String name)
+			throws Exception {
 		ContainerTypeWrapper type = new ContainerTypeWrapper(appService);
-		type.setSite(oneSite);
-		type.setName(name + new Random().nextInt());
+		type.setSite(site);
+		type.setName(name + "Random" + r.nextInt());
 		type.setRowCapacity(5);
 		type.setColCapacity(4);
+		type.setTopLevel(r.nextBoolean());
 		type.persist();
-		createdObjects.add(type);
 		return type;
 	}
 
+	private int addContainerTypes(SiteWrapper site, String name)
+			throws Exception {
+		int nber = r.nextInt(15);
+		for (int i = 0; i < nber; i++) {
+			addContainerType(site, name);
+		}
+		site.reload();
+		return nber;
+	}
+
 	@Test
-	public void testGetContainerCollection() {
-		List<ContainerWrapper> containers = oneSite.getContainerCollection();
+	public void testGetContainerCollection() throws Exception {
+		SiteWrapper site = addSite("testGetContainerCollection", true);
+		int nber = addContainers(site, "testGetContainerCollection");
+
+		List<ContainerWrapper> containers = site.getContainerCollection();
 		int sizeFound = containers.size();
 
-		int expected = oneSite.getWrappedObject().getContainerCollection()
-				.size();
-
-		Assert.assertEquals(expected, sizeFound);
+		Assert.assertEquals(nber, sizeFound);
 	}
 
 	@Test
-	public void testAddInContainerCollection() throws BiobankCheckException,
-			Exception {
-		List<ContainerWrapper> containers = oneSite.getContainerCollection();
-		int expectedSize = containers.size() + 1;
-		addContainer("testAddInContainerCollection");
+	public void testAddInContainerCollection() throws Exception {
+		SiteWrapper site = addSite("testAddInContainerCollection", true);
+		int nber = addContainers(site, "testAddInContainerCollection");
 
-		oneSite.reload();
+		List<ContainerWrapper> containers = site.getContainerCollection();
+		ContainerWrapper container = new ContainerWrapper(appService);
+		container.setLabel("testAddInContainerCollection" + r.nextInt());
+		ContainerTypeWrapper type = addContainerType(site,
+				"testAddInContainerCollection");
+		container.setContainerType(type);
+		container.setSite(site);
+		containers.add(container);
+		site.setContainerCollection(containers);
+		site.persist();
+
+		site.reload();
 		// one container added
-		Assert.assertEquals(expectedSize, oneSite.getContainerCollection()
-				.size());
+		Assert.assertEquals(nber + 1, site.getContainerCollection().size());
 	}
 
-	private ContainerWrapper addContainer(String name)
-			throws BiobankCheckException, Exception {
+	private ContainerWrapper addContainer(SiteWrapper site, String name)
+			throws Exception {
 		ContainerWrapper container = new ContainerWrapper(appService);
-		container.setLabel(name + new Random().nextInt());
-		ContainerTypeWrapper type = addContainerType(name);
+		container.setLabel(name + "Random" + r.nextInt());
+		ContainerTypeWrapper type = addContainerType(site, name);
 		container.setContainerType(type);
-		container.setSite(oneSite);
+		container.setSite(site);
 		container.persist();
-		createdObjects.add(container);
 		return container;
 	}
 
+	private int addContainers(SiteWrapper site, String name) throws Exception {
+		int nber = r.nextInt(15);
+		for (int i = 0; i < nber; i++) {
+			addContainer(site, name);
+		}
+		site.reload();
+		return nber;
+	}
+
 	@Test
-	public void testRemoveInContainerCollection() throws BiobankCheckException,
-			Exception {
-		ContainerWrapper container = addContainer("testRemoveInContainerCollection");
-		oneSite.reload();
-		List<ContainerWrapper> containers = oneSite.getContainerCollection();
+	public void testRemoveInContainerCollection() throws Exception {
+		SiteWrapper site = addSite("testRemoveInContainerCollection", true);
+		int nber = addContainers(site, "testRemoveInContainerCollection");
+
+		List<ContainerWrapper> containers = site.getContainerCollection();
+		ContainerWrapper container = chooseRandomlyInList(containers);
 		int idContainer = container.getId();
 		containers.remove(container);
-		oneSite.setContainerCollection(containers);
+		site.setContainerCollection(containers);
 		container.delete();
-		int expectedSize = containers.size();
-		oneSite.persist();
+		site.persist();
 
-		oneSite.reload();
+		site.reload();
 		// one container removed
-		Assert.assertEquals(expectedSize, oneSite.getContainerCollection()
-				.size());
+		Assert.assertEquals(nber - 1, site.getContainerCollection().size());
 
 		// container should not be anymore in the container collection
-		// (removed
-		// the good one)
-		for (ContainerWrapper c : oneSite.getContainerCollection()) {
+		// (removed the good one)
+		for (ContainerWrapper c : site.getContainerCollection()) {
 			Assert.assertFalse(c.getId().equals(idContainer));
 		}
 	}
 
 	@Test
-	public void testGetSampleTypeCollectionBoolean() {
-		List<SampleTypeWrapper> types = oneSite.getSampleTypeCollection();
+	public void testGetSampleTypeCollection() throws Exception {
+		SiteWrapper site = addSite("testGetSampleTypeCollection", true);
+		int nber = addSampleTypes(site, "testGetSampleTypeCollection");
+
+		List<SampleTypeWrapper> types = site.getSampleTypeCollection();
 		int sizeFound = types.size();
 
-		int expected = oneSite.getWrappedObject().getSampleTypeCollection()
-				.size();
-
-		Assert.assertEquals(expected, sizeFound);
+		Assert.assertEquals(nber, sizeFound);
 	}
 
 	@Test
-	public void testGetSampleTypeCollection() {
-		List<SampleTypeWrapper> types = oneSite.getSampleTypeCollection(true);
+	public void testGetSampleTypeCollectionBoolean() throws Exception {
+		SiteWrapper site = addSite("testGetSampleTypeCollectionBoolean", true);
+		addSampleTypes(site, "testGetSampleTypeCollectionBoolean");
+
+		List<SampleTypeWrapper> types = site.getSampleTypeCollection(true);
 		if (types.size() > 1) {
 			for (int i = 0; i < types.size() - 1; i++) {
 				SampleTypeWrapper type1 = types.get(i);
@@ -347,72 +419,96 @@ public class TestSite extends TestDatabase {
 	@Test
 	public void testAddInSampleTypeCollection() throws BiobankCheckException,
 			Exception {
-		List<SampleTypeWrapper> types = oneSite.getSampleTypeCollection();
-		int expectedSize = types.size() + 1;
-		addSampleType("testAddInSampleTypeCollection");
+		SiteWrapper site = addSite("testAddInSampleTypeCollection", true);
+		int nber = addSampleTypes(site, "testAddInSampleTypeCollection");
 
-		oneSite.reload();
+		List<SampleTypeWrapper> types = site.getSampleTypeCollection();
+		SampleTypeWrapper type = new SampleTypeWrapper(appService);
+		type.setName("testAddInSampleTypeCollection" + r.nextInt());
+		type.setSite(site);
+		types.add(type);
+		site.setSampleTypeCollection(types);
+		site.persist();
+
+		site.reload();
 		// one container added
-		Assert.assertEquals(expectedSize, oneSite.getSampleTypeCollection()
-				.size());
+		Assert.assertEquals(nber + 1, site.getSampleTypeCollection().size());
 	}
 
-	private SampleTypeWrapper addSampleType(String name)
-			throws BiobankCheckException, Exception {
+	private SampleTypeWrapper addSampleType(SiteWrapper site, String name)
+			throws Exception {
 		SampleTypeWrapper type = new SampleTypeWrapper(appService);
-		type.setName(name + new Random().nextInt());
-		type.setSite(oneSite);
+		type.setName(name + "Random" + r.nextInt());
+		type.setSite(site);
 		type.persist();
-		createdObjects.add(type);
 		return type;
+	}
+
+	private int addSampleTypes(SiteWrapper site, String name) throws Exception {
+		int nber = r.nextInt(15);
+		for (int i = 0; i < nber; i++) {
+			addSampleType(site, name);
+		}
+		site.reload();
+		return nber;
 	}
 
 	@Test
 	public void testRemoveInSampleTypeCollection()
 			throws BiobankCheckException, Exception {
-		SampleTypeWrapper type = addSampleType("testRemoveInSampleTypeCollection");
-		oneSite.reload();
-		List<SampleTypeWrapper> types = oneSite.getSampleTypeCollection();
+		SiteWrapper site = addSite("testRemoveInSampleTypeCollection", true);
+		int nber = addSampleTypes(site, "testRemoveInSampleTypeCollection");
+
+		List<SampleTypeWrapper> types = site.getSampleTypeCollection();
+		SampleTypeWrapper type = chooseRandomlyInList(types);
 		int idContainer = type.getId();
 		types.remove(type);
-		oneSite.setSampleTypeCollection(types);
+		site.setSampleTypeCollection(types);
 		type.delete();
-		int expectedSize = types.size();
-		oneSite.persist();
+		site.persist();
 
-		oneSite.reload();
+		site.reload();
 		// one type removed
-		Assert.assertEquals(expectedSize, oneSite.getSampleTypeCollection()
-				.size());
+		Assert.assertEquals(nber - 1, site.getSampleTypeCollection().size());
 
 		// type should not be anymore in the type collection
 		// (removed the good one)
-		for (SampleTypeWrapper t : oneSite.getSampleTypeCollection()) {
+		for (SampleTypeWrapper t : site.getSampleTypeCollection()) {
 			Assert.assertFalse(t.getId().equals(idContainer));
 		}
 	}
 
 	@Test
-	public void testPersist() throws Exception {
-		int expected = sites.size() + 1;
-		addSite("testPersist");
+	public void testAddSite() throws Exception {
+		int oldTotal = SiteWrapper.getAllSites(appService).size();
+		addSite("testPersist", true);
 		int newTotal = SiteWrapper.getAllSites(appService).size();
-		Assert.assertEquals(expected, newTotal);
+		Assert.assertEquals(oldTotal + 1, newTotal);
 	}
 
-	private SiteWrapper addSite(String name) throws BiobankCheckException,
-			Exception {
+	private SiteWrapper addSite(String name, boolean addToList)
+			throws Exception {
 		SiteWrapper site = new SiteWrapper(appService);
-		site.setName(name + new Random().nextInt());
+		site.setName(name + r.nextInt());
 		site.setCity("");
 		site.persist();
-		createdObjects.add(site);
+		if (addToList) {
+			createdSites.add(site);
+		}
 		return site;
+	}
+
+	private int addSites(String name) throws Exception {
+		int nber = r.nextInt(15);
+		for (int i = 0; i < nber; i++) {
+			addSite(name, true);
+		}
+		return nber;
 	}
 
 	@Test
 	public void testDelete() throws Exception {
-		SiteWrapper site = addSite("testDelete");
+		SiteWrapper site = addSite("testDelete", false);
 		// object is in database
 		Assert.assertNotNull(site);
 		site.delete();
@@ -424,10 +520,12 @@ public class TestSite extends TestDatabase {
 
 	@Test
 	public void testResetAlreadyInDatabase() throws Exception {
-		String name = oneSite.getName();
-		oneSite.setName("toto");
-		oneSite.reset();
-		Assert.assertEquals(name, oneSite.getName());
+		SiteWrapper site = addSite("testResetAlreadyInDatabase", true);
+		site.reload();
+		String oldName = site.getName();
+		site.setName("toto");
+		site.reset();
+		Assert.assertEquals(oldName, site.getName());
 	}
 
 	@Test
@@ -440,24 +538,25 @@ public class TestSite extends TestDatabase {
 
 	@Test
 	public void testSetPvInfoPossible() throws Exception {
-		Random r = new Random();
+		SiteWrapper site = addSite("testSetPvInfoPossible", true);
+		site.reload();
 
-		String[] types = oneSite.getPvInfoTypes();
+		String[] types = site.getPvInfoTypes();
 		if (types.length == 0) {
 			Assert.fail("Can't test without pvinfotypes");
 		}
 		String labelGlobal = "labelGlobal" + r.nextInt();
 		String type = types[r.nextInt(types.length)];
-		oneSite.setPvInfoPossible(labelGlobal, type, true);
-		oneSite.persist();
+		site.setPvInfoPossible(labelGlobal, type, true);
+		site.persist();
 
-		oneSite.reload();
-		boolean labelExists = findLabel(oneSite, labelGlobal);
+		site.reload();
+		boolean labelExists = findLabel(site, labelGlobal);
 		Assert.assertTrue(labelExists);
 
-		Assert.assertEquals(type, oneSite.getPvInfoType(labelGlobal));
+		Assert.assertEquals(type, site.getPvInfoType(labelGlobal));
 
-		SiteWrapper site2 = addSite("SetPvInfoPossible");
+		SiteWrapper site2 = addSite("SetPvInfoPossible", true);
 		types = site2.getPvInfoTypes();
 		if (types.length == 0) {
 			Assert.fail("Can't test without pvinfotypes");
@@ -473,7 +572,7 @@ public class TestSite extends TestDatabase {
 
 		Assert.assertEquals(type, site2.getPvInfoType(labelGlobal));
 
-		labelExists = findLabel(oneSite, labelSite);
+		labelExists = findLabel(site, labelSite);
 		Assert.assertFalse(labelExists);
 	}
 
@@ -490,11 +589,14 @@ public class TestSite extends TestDatabase {
 
 	@Test
 	public void testGetTopContainerCollection() throws Exception {
-		List<ContainerWrapper> containers = oneSite.getTopContainerCollection();
+		SiteWrapper site = addSite("testGetTopContainerCollection", true);
+		addContainers(site, "testGetTopContainerCollection");
+
+		List<ContainerWrapper> containers = site.getTopContainerCollection();
 		int sizeFound = containers.size();
 
 		int expected = 0;
-		for (ContainerWrapper container : oneSite.getContainerCollection()) {
+		for (ContainerWrapper container : site.getContainerCollection()) {
 			if (Boolean.TRUE.equals(container.getContainerType().getTopLevel())) {
 				expected++;
 			}
@@ -505,7 +607,10 @@ public class TestSite extends TestDatabase {
 
 	@Test
 	public void testGetTopContainerCollectionBoolean() throws Exception {
-		List<ContainerWrapper> containers = oneSite
+		SiteWrapper site = addSite("testGetTopContainerCollection", true);
+		addContainers(site, "testGetTopContainerCollection");
+
+		List<ContainerWrapper> containers = site
 				.getTopContainerCollection(true);
 		if (containers.size() > 1) {
 			for (int i = 0; i < containers.size() - 1; i++) {
@@ -518,11 +623,13 @@ public class TestSite extends TestDatabase {
 
 	@Test
 	public void testGetSites() throws Exception {
-		List<SiteWrapper> siteWrappers = SiteWrapper.getSites(appService, null);
-		List<Site> sites = appService.search(Site.class, new Site());
-		Assert.assertEquals(sites.size(), siteWrappers.size());
+		int nber = addSites("testGetSites");
 
-		siteWrappers = SiteWrapper.getSites(appService, oneSite.getId());
+		List<SiteWrapper> siteWrappers = SiteWrapper.getSites(appService, null);
+		Assert.assertEquals(nber, siteWrappers.size());
+
+		SiteWrapper site = chooseRandomlyInList(siteWrappers);
+		siteWrappers = SiteWrapper.getSites(appService, site.getId());
 		Assert.assertEquals(1, siteWrappers.size());
 
 		HQLCriteria criteria = new HQLCriteria("select max(id) from "
@@ -534,5 +641,29 @@ public class TestSite extends TestDatabase {
 
 	@After
 	public void tearDown() {
+		try {
+			for (SiteWrapper site : createdSites) {
+				removeFromList(site.getContainerCollection());
+				removeFromList(site.getStudyCollection());
+				removeFromList(site.getClinicCollection());
+				removeFromList(site.getContainerTypeCollection());
+				site.reload();
+				site.delete();
+			}
+		} catch (Exception e) {
+			e.printStackTrace(System.err);
+			Assert.fail();
+		}
+
+	}
+
+	private void removeFromList(List<? extends ModelWrapper<?>> list)
+			throws Exception {
+		if (list != null) {
+			for (ModelWrapper<?> object : list) {
+				object.reload();
+				object.delete();
+			}
+		}
 	}
 }

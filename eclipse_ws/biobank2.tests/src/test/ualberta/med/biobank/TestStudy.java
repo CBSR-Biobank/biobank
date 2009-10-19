@@ -5,62 +5,40 @@ import static org.junit.Assert.fail;
 import org.junit.Before;
 import org.junit.Test;
 
-//FIXME to be implemented by Delphine
-public class TestStudy {
+import edu.ualberta.med.biobank.common.BiobankCheckException;
 
+public class TestStudy extends TestDatabase {
+
+	@Override
 	@Before
 	public void setUp() throws Exception {
-		fail("Not yet implemented");
+		super.setUp();
 	}
 
 	@Test
-	public void testReload() {
-		fail("Not yet implemented");
-	}
-
-	@Test
-	public void testPersist() {
-		fail("Not yet implemented");
-	}
-
-	@Test
-	public void testGetName() {
-		fail("Not yet implemented");
-	}
-
-	@Test
-	public void testSetName() {
-		fail("Not yet implemented");
-	}
-
-	@Test
-	public void testGetNameShort() {
-		fail("Not yet implemented");
-	}
-
-	@Test
-	public void testSetNameShort() {
-		fail("Not yet implemented");
-	}
-
-	@Test
-	public void testGetActivityStatus() {
-		fail("Not yet implemented");
-	}
-
-	@Test
-	public void testSetActivityStatus() {
-		fail("Not yet implemented");
-	}
-
-	@Test
-	public void testGetComment() {
-		fail("Not yet implemented");
-	}
-
-	@Test
-	public void testSetComment() {
-		fail("Not yet implemented");
+	public void testGettersAndSetters() throws BiobankCheckException, Exception {
+		// StudyWrapper site = addStudy("testGettersAndSetters");
+		// testGettersAndSetters(site);
+		// }
+		//
+		// private StudyWrapper addStudy(SiteWrapper site, String name)
+		// throws Exception {
+		// StudyWrapper study = new StudyWrapper(appService);
+		// study.setName(name + "Random" + r.nextInt());
+		// study.setSite(site);
+		// study.persist();
+		// return study;
+		// }
+		//
+		// private int addStudies(SiteWrapper site, String name)
+		// throws BiobankCheckException, Exception {
+		// int studiesNber = r.nextInt(15);
+		// for (int i = 0; i < studiesNber; i++) {
+		// addStudy(site, name);
+		// }
+		// site.reload();
+		// return studiesNber;
+		// }
 	}
 
 	@Test
@@ -194,11 +172,6 @@ public class TestStudy {
 	}
 
 	@Test
-	public void testCompareTo() {
-		fail("Not yet implemented");
-	}
-
-	@Test
 	public void testGetPatientCountForClinic() {
 		fail("Not yet implemented");
 	}
@@ -214,32 +187,12 @@ public class TestStudy {
 	}
 
 	@Test
-	public void testPersistDependenciesStudy() {
-		fail("Not yet implemented");
-	}
-
-	@Test
-	public void testIsNew() {
-		fail("Not yet implemented");
-	}
-
-	@Test
 	public void testDelete() {
 		fail("Not yet implemented");
 	}
 
 	@Test
 	public void testReset() {
-		fail("Not yet implemented");
-	}
-
-	@Test
-	public void testCheckIntegrity() {
-		fail("Not yet implemented");
-	}
-
-	@Test
-	public void testEqualsObject() {
 		fail("Not yet implemented");
 	}
 
