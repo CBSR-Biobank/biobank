@@ -1,8 +1,10 @@
 package test.ualberta.med.biobank;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -11,18 +13,21 @@ import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.Site;
 import gov.nih.nci.system.applicationservice.ApplicationException;
+import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
-// FIXME to be implemented by Delphine
 public class TestSite extends TestDatabase {
 
 	private List<SiteWrapper> sites;
 
 	private SiteWrapper oneSite;
+
+	private List<ModelWrapper<?>> createdObjects = new ArrayList<ModelWrapper<?>>();
 
 	@Override
 	@Before
@@ -38,9 +43,7 @@ public class TestSite extends TestDatabase {
 
 	@Test
 	public void testGettersAndSetters() throws BiobankCheckException, Exception {
-		SiteWrapper site = new SiteWrapper(appService);
-		site.setCity("");
-		site.persist();
+		SiteWrapper site = addSite("testGettersAndSetters");
 		testGettersAndSetters(site);
 	}
 
@@ -109,6 +112,7 @@ public class TestSite extends TestDatabase {
 		study.setName(name + new Random().nextInt());
 		study.setSite(oneSite);
 		study.persist();
+		createdObjects.add(study);
 		return study;
 	}
 
@@ -153,6 +157,7 @@ public class TestSite extends TestDatabase {
 		clinic.setCity("");
 		clinic.setSite(oneSite);
 		clinic.persist();
+		createdObjects.add(clinic);
 		return clinic;
 	}
 
@@ -250,6 +255,7 @@ public class TestSite extends TestDatabase {
 		type.setRowCapacity(5);
 		type.setColCapacity(4);
 		type.persist();
+		createdObjects.add(type);
 		return type;
 	}
 
@@ -285,6 +291,7 @@ public class TestSite extends TestDatabase {
 		container.setContainerType(type);
 		container.setSite(oneSite);
 		container.persist();
+		createdObjects.add(container);
 		return container;
 	}
 
@@ -356,6 +363,7 @@ public class TestSite extends TestDatabase {
 		type.setName(name + new Random().nextInt());
 		type.setSite(oneSite);
 		type.persist();
+		createdObjects.add(type);
 		return type;
 	}
 
@@ -398,6 +406,7 @@ public class TestSite extends TestDatabase {
 		site.setName(name + new Random().nextInt());
 		site.setCity("");
 		site.persist();
+		createdObjects.add(site);
 		return site;
 	}
 
@@ -446,6 +455,8 @@ public class TestSite extends TestDatabase {
 		boolean labelExists = findLabel(oneSite, labelGlobal);
 		Assert.assertTrue(labelExists);
 
+		Assert.assertEquals(type, oneSite.getPvInfoType(labelGlobal));
+
 		SiteWrapper site2 = addSite("SetPvInfoPossible");
 		types = site2.getPvInfoTypes();
 		if (types.length == 0) {
@@ -459,6 +470,8 @@ public class TestSite extends TestDatabase {
 		site2.reload();
 		labelExists = findLabel(site2, labelSite);
 		Assert.assertTrue(labelExists);
+
+		Assert.assertEquals(type, site2.getPvInfoType(labelGlobal));
 
 		labelExists = findLabel(oneSite, labelSite);
 		Assert.assertFalse(labelExists);
@@ -475,22 +488,51 @@ public class TestSite extends TestDatabase {
 		return false;
 	}
 
-	//
-	// @Test
-	// public void testGetTopContainerCollectionBoolean() {
-	// fail("Not yet implemented");
-	// }
-	//
-	// @Test
-	// public void testGetTopContainerCollection() {
-	// fail("Not yet implemented");
-	// }
-	//
+	@Test
+	public void testGetTopContainerCollection() throws Exception {
+		List<ContainerWrapper> containers = oneSite.getTopContainerCollection();
+		int sizeFound = containers.size();
 
-	// @Test
-	// public void testGetSites() {
-	// fail("Not yet implemented");
-	// }
-	//
+		int expected = 0;
+		for (ContainerWrapper container : oneSite.getContainerCollection()) {
+			if (Boolean.TRUE.equals(container.getContainerType().getTopLevel())) {
+				expected++;
+			}
+		}
 
+		Assert.assertEquals(expected, sizeFound);
+	}
+
+	@Test
+	public void testGetTopContainerCollectionBoolean() throws Exception {
+		List<ContainerWrapper> containers = oneSite
+				.getTopContainerCollection(true);
+		if (containers.size() > 1) {
+			for (int i = 0; i < containers.size() - 1; i++) {
+				ContainerWrapper container1 = containers.get(i);
+				ContainerWrapper containter2 = containers.get(i + 1);
+				Assert.assertTrue(container1.compareTo(containter2) <= 0);
+			}
+		}
+	}
+
+	@Test
+	public void testGetSites() throws Exception {
+		List<SiteWrapper> siteWrappers = SiteWrapper.getSites(appService, null);
+		List<Site> sites = appService.search(Site.class, new Site());
+		Assert.assertEquals(sites.size(), siteWrappers.size());
+
+		siteWrappers = SiteWrapper.getSites(appService, oneSite.getId());
+		Assert.assertEquals(1, siteWrappers.size());
+
+		HQLCriteria criteria = new HQLCriteria("select max(id) from "
+				+ Site.class.getName());
+		List<Integer> max = appService.query(criteria);
+		siteWrappers = SiteWrapper.getSites(appService, max.get(0) + 1000);
+		Assert.assertEquals(0, siteWrappers.size());
+	}
+
+	@After
+	public void tearDown() {
+	}
 }

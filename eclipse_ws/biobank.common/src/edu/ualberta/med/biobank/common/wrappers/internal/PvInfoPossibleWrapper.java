@@ -87,11 +87,18 @@ public class PvInfoPossibleWrapper extends ModelWrapper<PvInfoPossible> {
         return new SiteWrapper(appService, site);
     }
 
-    public void setSite(SiteWrapper siteWrapper) {
+    public void setSite(Site site) {
         Site oldSite = wrappedObject.getSite();
-        Site newSite = siteWrapper.getWrappedObject();
-        wrappedObject.setSite(newSite);
-        propertyChangeSupport.firePropertyChange("site", oldSite, newSite);
+        wrappedObject.setSite(site);
+        propertyChangeSupport.firePropertyChange("site", oldSite, site);
+    }
+
+    public void setSite(SiteWrapper site) {
+        if (site == null) {
+            setSite((Site) null);
+        } else {
+            setSite(site.getWrappedObject());
+        }
     }
 
     public static List<PvInfoPossibleWrapper> getAllWrappers(
