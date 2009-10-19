@@ -531,8 +531,8 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
     private static Map<Integer, ContainerLabelingSchemeWrapper> getAllLabelingSchemesMap(
         WritableApplicationService appService) throws RuntimeException {
         try {
-            labelingSchemeMap = new HashMap<Integer, ContainerLabelingSchemeWrapper>();
             if (labelingSchemeMap == null) {
+                labelingSchemeMap = new HashMap<Integer, ContainerLabelingSchemeWrapper>();
                 for (ContainerLabelingSchemeWrapper labeling : ContainerLabelingSchemeWrapper
                     .getAllLabelingSchemes(appService)) {
                     labelingSchemeMap.put(labeling.getId(), labeling);

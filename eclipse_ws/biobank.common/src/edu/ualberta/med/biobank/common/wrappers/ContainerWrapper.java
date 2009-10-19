@@ -55,6 +55,7 @@ public class ContainerWrapper extends ModelWrapper<Container> {
     @Override
     protected void persistChecks() throws BiobankCheckException, Exception {
         checkSiteNotNull();
+        checkContainerTypeNotNull();
         checkLabelUniqueForType();
         checkProductBarcodeUnique();
         if (containerPosition != null) {
@@ -122,6 +123,13 @@ public class ContainerWrapper extends ModelWrapper<Container> {
 
     private void checkSiteNotNull() throws BiobankCheckException {
         if (getSite() == null) {
+            throw new BiobankCheckException(
+                "This container should be associate to a site");
+        }
+    }
+
+    private void checkContainerTypeNotNull() throws BiobankCheckException {
+        if (getContainerType() == null) {
             throw new BiobankCheckException(
                 "This container should be associate to a site");
         }
@@ -333,6 +341,10 @@ public class ContainerWrapper extends ModelWrapper<Container> {
             position);
     }
 
+    public void setPosition(Integer row, Integer col) {
+        setPosition(new Position(row, col));
+    }
+
     public void setPosition(String positionAsString) throws Exception {
         if (containerPosition == null) {
             initContainerPosition();
@@ -388,7 +400,10 @@ public class ContainerWrapper extends ModelWrapper<Container> {
         propertyChangeSupport.firePropertyChange("site", oldSite, site);
     }
 
-    public void setSite(SiteWrapper siteWrapper) {
+    public void setSite(SiteWrapper siteWrapper) throws Exception {
+        if (siteWrapper == null) {
+            throw new Exception("site cannot be null");
+        }
         setSite(siteWrapper.getWrappedObject());
     }
 
