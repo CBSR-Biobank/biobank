@@ -8,6 +8,7 @@ import java.util.Map;
 
 import junit.framework.Assert;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -44,12 +45,25 @@ public class TestContainer extends TestDatabase {
         addContainers();
     }
 
+    @After
+    public void tearDown() throws Exception {
+        deleteContainers();
+        deleteContainerTypes();
+    }
+
     private void deleteContainers() throws Exception {
-        List<ContainerWrapper> containerList = site.getContainerCollection();
-        if (containerList != null) {
-            for (ContainerWrapper container : containerList) {
-                container.delete();
+        site.reload();
+        while (true) {
+            List<ContainerWrapper> containerList = site
+                .getContainerCollection();
+            if (containerList != null) {
+                for (ContainerWrapper container : containerList) {
+                    if (container.getChildren().size() == 0) {
+                        container.delete();
+                    }
+                }
             }
+            site.reload();
         }
     }
 
@@ -258,16 +272,18 @@ public class TestContainer extends TestDatabase {
         container = createContainer("01", "uvwxyz", site, containerTypeMap
             .get("TopCT"), 0, 0);
         container.persist();
+        container.delete();
     }
 
     @Test
     public void testSetPositionOnChild() throws Exception {
         ContainerWrapper child;
 
-        child = createContainer("01", "uvwxyz", site, containerTypeMap
-            .get("TopCT"), 0, 0);
+        child = createContainer("AA", "uvwxyz", site, containerTypeMap
+            .get("ChildCtL1"), 0, 0);
         child.setParent(containerMap.get("Top"));
         child.persist();
+        child.delete();
     }
 
     @Test
