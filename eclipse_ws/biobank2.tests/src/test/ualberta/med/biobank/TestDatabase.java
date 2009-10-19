@@ -3,6 +3,8 @@ package test.ualberta.med.biobank;
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
@@ -229,4 +231,81 @@ public class TestDatabase {
 		return nber;
 	}
 
+	protected ContainerTypeWrapper newContainerType(SiteWrapper site,
+			String name, String nameShort, Integer labelingScheme,
+			Integer rowCapacity, Integer colCapacity, boolean isTopLevel) {
+		ContainerTypeWrapper ct = new ContainerTypeWrapper(appService);
+		ct.setSite(site);
+		ct.setName(name);
+		ct.setNameShort(nameShort);
+		ct.setChildLabelingScheme(labelingScheme);
+		if (rowCapacity != null)
+			ct.setRowCapacity(rowCapacity);
+		if (colCapacity != null)
+			ct.setColCapacity(colCapacity);
+		ct.setTopLevel(isTopLevel);
+		return ct;
+	}
+
+	protected ContainerTypeWrapper addContainerType(SiteWrapper site,
+			String name, String nameShort, Integer labelingScheme,
+			Integer rowCapacity, Integer colCapacity, boolean isTopLevel)
+			throws BiobankCheckException, Exception {
+		ContainerTypeWrapper container = newContainerType(site, name,
+				nameShort, labelingScheme, rowCapacity, colCapacity, isTopLevel);
+		container.persist();
+		return container;
+	}
+
+	protected ContainerTypeWrapper addContainerTypeRandom(SiteWrapper site,
+			String name) throws Exception {
+		return addContainerType(site, name + "Random" + r.nextInt(), "", null,
+				r.nextInt(10), r.nextInt(10), r.nextBoolean());
+	}
+
+	protected int addContainerTypesRandom(SiteWrapper site, String name)
+			throws Exception {
+		int nber = r.nextInt(15);
+		for (int i = 0; i < nber; i++) {
+			addContainerTypeRandom(site, name);
+		}
+		site.reload();
+		return nber;
+	}
+
+	protected ContainerWrapper newContainer(String barcode, SiteWrapper site,
+			ContainerTypeWrapper type) throws Exception {
+		ContainerWrapper container;
+
+		container = new ContainerWrapper(appService);
+		container.setProductBarcode(barcode);
+		if (site != null) {
+			container.setSite(site);
+		}
+		container.setContainerType(type);
+		return container;
+	}
+
+	protected ContainerWrapper addContainer(String barcode, SiteWrapper site,
+			ContainerTypeWrapper type) throws Exception {
+		ContainerWrapper container = newContainer(barcode, site, type);
+		container.persist();
+		return container;
+	}
+
+	protected ContainerWrapper addContainerRandom(SiteWrapper site, String name)
+			throws Exception {
+		ContainerTypeWrapper type = addContainerTypeRandom(site, name);
+		return addContainer(name + "Random" + r.nextInt(), site, type);
+	}
+
+	protected int addContainersRandom(SiteWrapper site, String name)
+			throws Exception {
+		int nber = r.nextInt(15);
+		for (int i = 0; i < nber; i++) {
+			addContainerRandom(site, name);
+		}
+		site.reload();
+		return nber;
+	}
 }

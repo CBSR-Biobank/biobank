@@ -16,8 +16,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
+import edu.ualberta.med.biobank.common.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
-import edu.ualberta.med.biobank.common.wrappers.Position;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.model.ContainerCell;
 import edu.ualberta.med.biobank.model.ContainerStatus;
@@ -124,7 +124,7 @@ public abstract class AbstractContainerChooserPage extends WizardPage {
         if (currentContainer != null) {
             // get cells informations
             for (ContainerWrapper child : currentContainer.getChildren()) {
-                Position position = child.getPosition();
+                RowColPos position = child.getPosition();
                 ContainerCell cell = new ContainerCell(position.row,
                     position.col, child);
                 setStatus(cell);

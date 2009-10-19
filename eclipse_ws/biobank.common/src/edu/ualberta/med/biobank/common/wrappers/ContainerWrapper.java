@@ -27,7 +27,7 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 public class ContainerWrapper extends ModelWrapper<Container> {
 
     private ContainerPositionWrapper containerPosition;
-    private Position position;
+    private RowColPos position;
 
     public ContainerWrapper(WritableApplicationService appService,
         Container wrappedObject) {
@@ -35,7 +35,7 @@ public class ContainerWrapper extends ModelWrapper<Container> {
         ContainerPosition pos = wrappedObject.getPosition();
         if (pos != null) {
             containerPosition = new ContainerPositionWrapper(appService, pos);
-            position = new Position(containerPosition.getRow(),
+            position = new RowColPos(containerPosition.getRow(),
                 containerPosition.getCol());
         }
     }
@@ -186,24 +186,7 @@ public class ContainerWrapper extends ModelWrapper<Container> {
     }
 
     /**
-     * get the containers with label label and from same site that this
-     * containerWrapper
-     * 
-     * @param label label of the container
-     * @throws ApplicationException
-     */
-    public List<Container> getContainers(String label)
-        throws ApplicationException {
-        HQLCriteria criteria = new HQLCriteria(
-            "from " + Container.class.getName()
-                + " where site.id = ? and label = ?",
-            Arrays
-                .asList(new Object[] { wrappedObject.getSite().getId(), label }));
-        return appService.query(criteria);
-    }
-
-    /**
-     * get the containers with label label and from same site that this
+     * get the containers with label label and from same site as this
      * containerWrapper and holding this container type
      * 
      * @param label label of the container
@@ -219,6 +202,8 @@ public class ContainerWrapper extends ModelWrapper<Container> {
      * compute the ContainerPosition for this container using its label. If the
      * parent container cannot hold the container type of this container, then
      * an exception is launched
+     * 
+     * FIX: is this required once code is added to compute child labels?
      */
     public void computePositionFromLabel() throws Exception {
         String parentContainerLabel = getLabel().substring(0,
@@ -261,22 +246,6 @@ public class ContainerWrapper extends ModelWrapper<Container> {
         return null;
     }
 
-    public Integer getRowCapacity() {
-        ContainerTypeWrapper type = getContainerType();
-        if (type == null) {
-            return null;
-        }
-        return type.getRowCapacity();
-    }
-
-    public Integer getColCapacity() {
-        ContainerTypeWrapper type = getContainerType();
-        if (type == null) {
-            return null;
-        }
-        return type.getColCapacity();
-    }
-
     /**
      * position is 2 letters, or 2 number or 1 letter and 1 number... this
      * position string is used to get the correct row and column index the given
@@ -303,6 +272,22 @@ public class ContainerWrapper extends ModelWrapper<Container> {
         return rcp;
     }
 
+    public Integer getRowCapacity() {
+        ContainerTypeWrapper type = getContainerType();
+        if (type == null) {
+            return null;
+        }
+        return type.getRowCapacity();
+    }
+
+    public Integer getColCapacity() {
+        ContainerTypeWrapper type = getContainerType();
+        if (type == null) {
+            return null;
+        }
+        return type.getColCapacity();
+    }
+
     public void setContainerType(ContainerTypeWrapper containerType) {
         setContainerType(containerType.getWrappedObject());
     }
@@ -322,15 +307,15 @@ public class ContainerWrapper extends ModelWrapper<Container> {
         return new ContainerTypeWrapper(appService, type);
     }
 
-    public Position getPosition() {
+    public RowColPos getPosition() {
         if (containerPosition == null) {
             return null;
         }
         return position;
     }
 
-    public void setPosition(Position position) {
-        Position oldPosition = this.position;
+    public void setPosition(RowColPos position) {
+        RowColPos oldPosition = this.position;
         if (containerPosition == null) {
             initContainerPosition();
         }
@@ -342,9 +327,11 @@ public class ContainerWrapper extends ModelWrapper<Container> {
     }
 
     public void setPosition(Integer row, Integer col) {
-        setPosition(new Position(row, col));
+        setPosition(new RowColPos(row, col));
     }
 
+    // FIX: still required new that label is assigned by wrapper for child
+    // containers?
     public void setPosition(String positionAsString) throws Exception {
         if (containerPosition == null) {
             initContainerPosition();
@@ -356,7 +343,7 @@ public class ContainerWrapper extends ModelWrapper<Container> {
 
     private void initContainerPosition() {
         containerPosition = new ContainerPositionWrapper(appService);
-        position = new Position();
+        position = new RowColPos();
         containerPosition.setContainer(this);
         wrappedObject.setPosition(containerPosition.getWrappedObject());
     }
@@ -415,7 +402,7 @@ public class ContainerWrapper extends ModelWrapper<Container> {
     }
 
     @SuppressWarnings("unchecked")
-    public List<SamplePositionWrapper> getSamplePositionCollection() {
+    private List<SamplePositionWrapper> getSamplePositionCollection() {
         List<SamplePositionWrapper> samplePositionCollection = (List<SamplePositionWrapper>) propertiesMap
             .get("samplePositionCollection");
         if (samplePositionCollection == null) {
@@ -432,28 +419,6 @@ public class ContainerWrapper extends ModelWrapper<Container> {
             }
         }
         return samplePositionCollection;
-    }
-
-    public void setSamplePositionCollection(
-        Collection<SamplePosition> positions, boolean setNull) {
-        Collection<SamplePosition> oldPositions = wrappedObject
-            .getSamplePositionCollection();
-        wrappedObject.setSamplePositionCollection(positions);
-        propertyChangeSupport.firePropertyChange("samplePositionCollection",
-            oldPositions, positions);
-        if (setNull) {
-            propertiesMap.put("samplePositionCollection", null);
-        }
-    }
-
-    public void setSamplePositionCollection(
-        List<SamplePositionWrapper> positions) {
-        Collection<SamplePosition> positionsObjects = new HashSet<SamplePosition>();
-        for (SamplePositionWrapper pos : positions) {
-            positionsObjects.add(pos.getWrappedObject());
-        }
-        setSamplePositionCollection(positionsObjects, false);
-        propertiesMap.put("samplePositionCollection", positions);
     }
 
     @SuppressWarnings("unchecked")

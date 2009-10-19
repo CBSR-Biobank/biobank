@@ -33,14 +33,12 @@ public class TestSite extends TestDatabase {
 	@Test
 	public void testGettersAndSetters() throws Exception {
 		SiteWrapper site = addSite("testGettersAndSetters");
-		createdSites.add(site);
 		testGettersAndSetters(site);
 	}
 
 	@Test
 	public void testGetStudyCollection() throws Exception {
 		SiteWrapper site = addSite("testGetStudyCollection");
-		createdSites.add(site);
 		int studiesNber = addStudies(site, "testGetStudyCollection");
 
 		List<StudyWrapper> studies = site.getStudyCollection();
@@ -178,7 +176,8 @@ public class TestSite extends TestDatabase {
 	@Test
 	public void testGetContainerTypeCollection() throws Exception {
 		SiteWrapper site = addSite("testGetContainerTypeCollection");
-		int nber = addContainerTypes(site, "testGetContainerTypeCollection");
+		int nber = addContainerTypesRandom(site,
+				"testGetContainerTypeCollection");
 
 		List<ContainerTypeWrapper> types = site.getContainerTypeCollection();
 		int sizeFound = types.size();
@@ -189,7 +188,7 @@ public class TestSite extends TestDatabase {
 	@Test
 	public void testGetContainerTypeCollectionBoolean() throws Exception {
 		SiteWrapper site = addSite("testGetContainerTypeCollectionBoolean");
-		addContainerTypes(site, "testGetContainerTypeCollectionBoolean");
+		addContainerTypesRandom(site, "testGetContainerTypeCollectionBoolean");
 
 		List<ContainerTypeWrapper> types = site
 				.getContainerTypeCollection(true);
@@ -205,7 +204,8 @@ public class TestSite extends TestDatabase {
 	@Test
 	public void testAddInContainerTypeCollection() throws Exception {
 		SiteWrapper site = addSite("testAddInContainerTypeCollection");
-		int nber = addContainerTypes(site, "testAddInContainerTypeCollection");
+		int nber = addContainerTypesRandom(site,
+				"testAddInContainerTypeCollection");
 
 		List<ContainerTypeWrapper> types = site.getContainerTypeCollection();
 		ContainerTypeWrapper type = new ContainerTypeWrapper(appService);
@@ -225,7 +225,7 @@ public class TestSite extends TestDatabase {
 	@Test
 	public void testRemoveInContainerTypeCollection() throws Exception {
 		SiteWrapper site = addSite("testRemoveInContainerTypeCollection");
-		int nber = addContainerTypes(site,
+		int nber = addContainerTypesRandom(site,
 				"testRemoveInContainerTypeCollection");
 
 		List<ContainerTypeWrapper> types = site.getContainerTypeCollection();
@@ -247,32 +247,10 @@ public class TestSite extends TestDatabase {
 		}
 	}
 
-	private ContainerTypeWrapper addContainerType(SiteWrapper site, String name)
-			throws Exception {
-		ContainerTypeWrapper type = new ContainerTypeWrapper(appService);
-		type.setSite(site);
-		type.setName(name + "Random" + r.nextInt());
-		type.setRowCapacity(5);
-		type.setColCapacity(4);
-		type.setTopLevel(r.nextBoolean());
-		type.persist();
-		return type;
-	}
-
-	private int addContainerTypes(SiteWrapper site, String name)
-			throws Exception {
-		int nber = r.nextInt(15);
-		for (int i = 0; i < nber; i++) {
-			addContainerType(site, name);
-		}
-		site.reload();
-		return nber;
-	}
-
 	@Test
 	public void testGetContainerCollection() throws Exception {
 		SiteWrapper site = addSite("testGetContainerCollection");
-		int nber = addContainers(site, "testGetContainerCollection");
+		int nber = addContainersRandom(site, "testGetContainerCollection");
 
 		List<ContainerWrapper> containers = site.getContainerCollection();
 		int sizeFound = containers.size();
@@ -283,12 +261,12 @@ public class TestSite extends TestDatabase {
 	@Test
 	public void testAddInContainerCollection() throws Exception {
 		SiteWrapper site = addSite("testAddInContainerCollection");
-		int nber = addContainers(site, "testAddInContainerCollection");
+		int nber = addContainersRandom(site, "testAddInContainerCollection");
 
 		List<ContainerWrapper> containers = site.getContainerCollection();
 		ContainerWrapper container = new ContainerWrapper(appService);
 		container.setLabel("testAddInContainerCollection" + r.nextInt());
-		ContainerTypeWrapper type = addContainerType(site,
+		ContainerTypeWrapper type = addContainerTypeRandom(site,
 				"testAddInContainerCollection");
 		container.setContainerType(type);
 		container.setSite(site);
@@ -301,30 +279,10 @@ public class TestSite extends TestDatabase {
 		Assert.assertEquals(nber + 1, site.getContainerCollection().size());
 	}
 
-	private ContainerWrapper addContainer(SiteWrapper site, String name)
-			throws Exception {
-		ContainerWrapper container = new ContainerWrapper(appService);
-		container.setLabel(name + "Random" + r.nextInt());
-		ContainerTypeWrapper type = addContainerType(site, name);
-		container.setContainerType(type);
-		container.setSite(site);
-		container.persist();
-		return container;
-	}
-
-	private int addContainers(SiteWrapper site, String name) throws Exception {
-		int nber = r.nextInt(15);
-		for (int i = 0; i < nber; i++) {
-			addContainer(site, name);
-		}
-		site.reload();
-		return nber;
-	}
-
 	@Test
 	public void testRemoveInContainerCollection() throws Exception {
 		SiteWrapper site = addSite("testRemoveInContainerCollection");
-		int nber = addContainers(site, "testRemoveInContainerCollection");
+		int nber = addContainersRandom(site, "testRemoveInContainerCollection");
 
 		List<ContainerWrapper> containers = site.getContainerCollection();
 		ContainerWrapper container = chooseRandomlyInList(containers);
@@ -523,7 +481,7 @@ public class TestSite extends TestDatabase {
 	@Test
 	public void testGetTopContainerCollection() throws Exception {
 		SiteWrapper site = addSite("testGetTopContainerCollection");
-		addContainers(site, "testGetTopContainerCollection");
+		addContainersRandom(site, "testGetTopContainerCollection");
 
 		List<ContainerWrapper> containers = site.getTopContainerCollection();
 		int sizeFound = containers.size();
@@ -541,7 +499,7 @@ public class TestSite extends TestDatabase {
 	@Test
 	public void testGetTopContainerCollectionBoolean() throws Exception {
 		SiteWrapper site = addSite("testGetTopContainerCollection");
-		addContainers(site, "testGetTopContainerCollection");
+		addContainersRandom(site, "testGetTopContainerCollection");
 
 		List<ContainerWrapper> containers = site
 				.getTopContainerCollection(true);
