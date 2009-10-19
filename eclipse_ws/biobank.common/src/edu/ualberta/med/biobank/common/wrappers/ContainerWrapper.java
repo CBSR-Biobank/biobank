@@ -400,11 +400,12 @@ public class ContainerWrapper extends ModelWrapper<Container> {
         propertyChangeSupport.firePropertyChange("site", oldSite, site);
     }
 
-    public void setSite(SiteWrapper siteWrapper) throws Exception {
+    public void setSite(SiteWrapper siteWrapper) {
         if (siteWrapper == null) {
-            throw new Exception("site cannot be null");
+            setSite((Site) null);
+        } else {
+            setSite(siteWrapper.getWrappedObject());
         }
-        setSite(siteWrapper.getWrappedObject());
     }
 
     public void setLabel(String label) {

@@ -8,7 +8,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
@@ -32,15 +31,16 @@ public class TestSite extends TestDatabase {
 	}
 
 	@Test
-	public void testGettersAndSetters() throws BiobankCheckException, Exception {
-		SiteWrapper site = addSite("testGettersAndSetters", true);
+	public void testGettersAndSetters() throws Exception {
+		SiteWrapper site = addSite("testGettersAndSetters");
+		createdSites.add(site);
 		testGettersAndSetters(site);
 	}
 
 	@Test
-	public void testGetStudyCollection() throws BiobankCheckException,
-			Exception {
-		SiteWrapper site = addSite("testGetStudyCollection", true);
+	public void testGetStudyCollection() throws Exception {
+		SiteWrapper site = addSite("testGetStudyCollection");
+		createdSites.add(site);
 		int studiesNber = addStudies(site, "testGetStudyCollection");
 
 		List<StudyWrapper> studies = site.getStudyCollection();
@@ -51,7 +51,7 @@ public class TestSite extends TestDatabase {
 
 	@Test
 	public void testGetStudyCollectionBoolean() throws Exception {
-		SiteWrapper site = addSite("testGetStudyCollectionBoolean", true);
+		SiteWrapper site = addSite("testGetStudyCollectionBoolean");
 		addStudies(site, "testGetStudyCollectionBoolean");
 
 		List<StudyWrapper> studiesSorted = site.getStudyCollection(true);
@@ -65,9 +65,8 @@ public class TestSite extends TestDatabase {
 	}
 
 	@Test
-	public void testAddInStudyCollection() throws BiobankCheckException,
-			Exception {
-		SiteWrapper site = addSite("testAddInStudyCollection", true);
+	public void testAddInStudyCollection() throws Exception {
+		SiteWrapper site = addSite("testAddInStudyCollection");
 		int studiesNber = addStudies(site, "testAddInStudyCollection");
 
 		List<StudyWrapper> studies = site.getStudyCollection();
@@ -84,9 +83,8 @@ public class TestSite extends TestDatabase {
 	}
 
 	@Test
-	public void testRemoveInStudyCollection() throws BiobankCheckException,
-			Exception {
-		SiteWrapper site = addSite("testRemoveInStudyCollection", true);
+	public void testRemoveInStudyCollection() throws Exception {
+		SiteWrapper site = addSite("testRemoveInStudyCollection");
 		int studiesNber = addStudies(site, "testRemoveInStudyCollection");
 
 		List<StudyWrapper> studies = site.getStudyCollection();
@@ -108,29 +106,9 @@ public class TestSite extends TestDatabase {
 		}
 	}
 
-	private StudyWrapper addStudy(SiteWrapper site, String name)
-			throws Exception {
-		StudyWrapper study = new StudyWrapper(appService);
-		study.setName(name + "Random" + r.nextInt());
-		study.setSite(site);
-		study.persist();
-		return study;
-	}
-
-	private int addStudies(SiteWrapper site, String name)
-			throws BiobankCheckException, Exception {
-		int studiesNber = r.nextInt(15);
-		for (int i = 0; i < studiesNber; i++) {
-			addStudy(site, name);
-		}
-		site.reload();
-		return studiesNber;
-	}
-
 	@Test
-	public void testGetClinicCollection() throws BiobankCheckException,
-			Exception {
-		SiteWrapper site = addSite("testGetClinicCollection", true);
+	public void testGetClinicCollection() throws Exception {
+		SiteWrapper site = addSite("testGetClinicCollection");
 		int clinicsNber = addClinics(site, "testGetClinicCollection");
 
 		List<ClinicWrapper> clinics = site.getClinicCollection();
@@ -140,9 +118,8 @@ public class TestSite extends TestDatabase {
 	}
 
 	@Test
-	public void testGetClinicCollectionBoolean() throws BiobankCheckException,
-			Exception {
-		SiteWrapper site = addSite("testGetClinicCollectionBoolean", true);
+	public void testGetClinicCollectionBoolean() throws Exception {
+		SiteWrapper site = addSite("testGetClinicCollectionBoolean");
 		addClinics(site, "testGetClinicCollectionBoolean");
 
 		List<ClinicWrapper> clinics = site.getClinicCollection(true);
@@ -156,9 +133,8 @@ public class TestSite extends TestDatabase {
 	}
 
 	@Test
-	public void testAddInClinicCollection() throws BiobankCheckException,
-			Exception {
-		SiteWrapper site = addSite("testAddInClinicCollection", true);
+	public void testAddInClinicCollection() throws Exception {
+		SiteWrapper site = addSite("testAddInClinicCollection");
 		int nber = addClinics(site, "testAddInClinicCollection");
 
 		List<ClinicWrapper> clinics = site.getClinicCollection();
@@ -175,29 +151,9 @@ public class TestSite extends TestDatabase {
 		Assert.assertEquals(nber + 1, site.getClinicCollection().size());
 	}
 
-	private ClinicWrapper addClinic(SiteWrapper site, String name)
-			throws Exception {
-		ClinicWrapper clinic = new ClinicWrapper(appService);
-		clinic.setName(name + "Random" + r.nextInt());
-		clinic.setCity("");
-		clinic.setSite(site);
-		clinic.persist();
-		return clinic;
-	}
-
-	private int addClinics(SiteWrapper site, String name) throws Exception {
-		int nber = r.nextInt(15);
-		for (int i = 0; i < nber; i++) {
-			addClinic(site, name);
-		}
-		site.reload();
-		return nber;
-	}
-
 	@Test
-	public void testRemoveInClinicCollection() throws BiobankCheckException,
-			Exception {
-		SiteWrapper site = addSite("testRemoveInClinicCollection", true);
+	public void testRemoveInClinicCollection() throws Exception {
+		SiteWrapper site = addSite("testRemoveInClinicCollection");
 		int nber = addClinics(site, "testRemoveInClinicCollection");
 
 		List<ClinicWrapper> clinics = site.getClinicCollection();
@@ -221,7 +177,7 @@ public class TestSite extends TestDatabase {
 
 	@Test
 	public void testGetContainerTypeCollection() throws Exception {
-		SiteWrapper site = addSite("testGetContainerTypeCollection", true);
+		SiteWrapper site = addSite("testGetContainerTypeCollection");
 		int nber = addContainerTypes(site, "testGetContainerTypeCollection");
 
 		List<ContainerTypeWrapper> types = site.getContainerTypeCollection();
@@ -232,8 +188,7 @@ public class TestSite extends TestDatabase {
 
 	@Test
 	public void testGetContainerTypeCollectionBoolean() throws Exception {
-		SiteWrapper site = addSite("testGetContainerTypeCollectionBoolean",
-				true);
+		SiteWrapper site = addSite("testGetContainerTypeCollectionBoolean");
 		addContainerTypes(site, "testGetContainerTypeCollectionBoolean");
 
 		List<ContainerTypeWrapper> types = site
@@ -249,7 +204,7 @@ public class TestSite extends TestDatabase {
 
 	@Test
 	public void testAddInContainerTypeCollection() throws Exception {
-		SiteWrapper site = addSite("testAddInContainerTypeCollection", true);
+		SiteWrapper site = addSite("testAddInContainerTypeCollection");
 		int nber = addContainerTypes(site, "testAddInContainerTypeCollection");
 
 		List<ContainerTypeWrapper> types = site.getContainerTypeCollection();
@@ -269,7 +224,7 @@ public class TestSite extends TestDatabase {
 
 	@Test
 	public void testRemoveInContainerTypeCollection() throws Exception {
-		SiteWrapper site = addSite("testRemoveInContainerTypeCollection", true);
+		SiteWrapper site = addSite("testRemoveInContainerTypeCollection");
 		int nber = addContainerTypes(site,
 				"testRemoveInContainerTypeCollection");
 
@@ -316,7 +271,7 @@ public class TestSite extends TestDatabase {
 
 	@Test
 	public void testGetContainerCollection() throws Exception {
-		SiteWrapper site = addSite("testGetContainerCollection", true);
+		SiteWrapper site = addSite("testGetContainerCollection");
 		int nber = addContainers(site, "testGetContainerCollection");
 
 		List<ContainerWrapper> containers = site.getContainerCollection();
@@ -327,7 +282,7 @@ public class TestSite extends TestDatabase {
 
 	@Test
 	public void testAddInContainerCollection() throws Exception {
-		SiteWrapper site = addSite("testAddInContainerCollection", true);
+		SiteWrapper site = addSite("testAddInContainerCollection");
 		int nber = addContainers(site, "testAddInContainerCollection");
 
 		List<ContainerWrapper> containers = site.getContainerCollection();
@@ -368,7 +323,7 @@ public class TestSite extends TestDatabase {
 
 	@Test
 	public void testRemoveInContainerCollection() throws Exception {
-		SiteWrapper site = addSite("testRemoveInContainerCollection", true);
+		SiteWrapper site = addSite("testRemoveInContainerCollection");
 		int nber = addContainers(site, "testRemoveInContainerCollection");
 
 		List<ContainerWrapper> containers = site.getContainerCollection();
@@ -392,7 +347,7 @@ public class TestSite extends TestDatabase {
 
 	@Test
 	public void testGetSampleTypeCollection() throws Exception {
-		SiteWrapper site = addSite("testGetSampleTypeCollection", true);
+		SiteWrapper site = addSite("testGetSampleTypeCollection");
 		int nber = addSampleTypes(site, "testGetSampleTypeCollection");
 
 		List<SampleTypeWrapper> types = site.getSampleTypeCollection();
@@ -403,7 +358,7 @@ public class TestSite extends TestDatabase {
 
 	@Test
 	public void testGetSampleTypeCollectionBoolean() throws Exception {
-		SiteWrapper site = addSite("testGetSampleTypeCollectionBoolean", true);
+		SiteWrapper site = addSite("testGetSampleTypeCollectionBoolean");
 		addSampleTypes(site, "testGetSampleTypeCollectionBoolean");
 
 		List<SampleTypeWrapper> types = site.getSampleTypeCollection(true);
@@ -417,9 +372,8 @@ public class TestSite extends TestDatabase {
 	}
 
 	@Test
-	public void testAddInSampleTypeCollection() throws BiobankCheckException,
-			Exception {
-		SiteWrapper site = addSite("testAddInSampleTypeCollection", true);
+	public void testAddInSampleTypeCollection() throws Exception {
+		SiteWrapper site = addSite("testAddInSampleTypeCollection");
 		int nber = addSampleTypes(site, "testAddInSampleTypeCollection");
 
 		List<SampleTypeWrapper> types = site.getSampleTypeCollection();
@@ -454,9 +408,8 @@ public class TestSite extends TestDatabase {
 	}
 
 	@Test
-	public void testRemoveInSampleTypeCollection()
-			throws BiobankCheckException, Exception {
-		SiteWrapper site = addSite("testRemoveInSampleTypeCollection", true);
+	public void testRemoveInSampleTypeCollection() throws Exception {
+		SiteWrapper site = addSite("testRemoveInSampleTypeCollection");
 		int nber = addSampleTypes(site, "testRemoveInSampleTypeCollection");
 
 		List<SampleTypeWrapper> types = site.getSampleTypeCollection();
@@ -481,34 +434,14 @@ public class TestSite extends TestDatabase {
 	@Test
 	public void testAddSite() throws Exception {
 		int oldTotal = SiteWrapper.getAllSites(appService).size();
-		addSite("testPersist", true);
+		addSite("testPersist");
 		int newTotal = SiteWrapper.getAllSites(appService).size();
 		Assert.assertEquals(oldTotal + 1, newTotal);
 	}
 
-	private SiteWrapper addSite(String name, boolean addToList)
-			throws Exception {
-		SiteWrapper site = new SiteWrapper(appService);
-		site.setName(name + r.nextInt());
-		site.setCity("");
-		site.persist();
-		if (addToList) {
-			createdSites.add(site);
-		}
-		return site;
-	}
-
-	private int addSites(String name) throws Exception {
-		int nber = r.nextInt(15);
-		for (int i = 0; i < nber; i++) {
-			addSite(name, true);
-		}
-		return nber;
-	}
-
 	@Test
 	public void testDelete() throws Exception {
-		SiteWrapper site = addSite("testDelete", false);
+		SiteWrapper site = super.addSite("testDelete");
 		// object is in database
 		Assert.assertNotNull(site);
 		site.delete();
@@ -520,7 +453,7 @@ public class TestSite extends TestDatabase {
 
 	@Test
 	public void testResetAlreadyInDatabase() throws Exception {
-		SiteWrapper site = addSite("testResetAlreadyInDatabase", true);
+		SiteWrapper site = addSite("testResetAlreadyInDatabase");
 		site.reload();
 		String oldName = site.getName();
 		site.setName("toto");
@@ -538,7 +471,7 @@ public class TestSite extends TestDatabase {
 
 	@Test
 	public void testSetPvInfoPossible() throws Exception {
-		SiteWrapper site = addSite("testSetPvInfoPossible", true);
+		SiteWrapper site = addSite("testSetPvInfoPossible");
 		site.reload();
 
 		String[] types = site.getPvInfoTypes();
@@ -556,7 +489,7 @@ public class TestSite extends TestDatabase {
 
 		Assert.assertEquals(type, site.getPvInfoType(labelGlobal));
 
-		SiteWrapper site2 = addSite("SetPvInfoPossible", true);
+		SiteWrapper site2 = addSite("SetPvInfoPossible");
 		types = site2.getPvInfoTypes();
 		if (types.length == 0) {
 			Assert.fail("Can't test without pvinfotypes");
@@ -589,7 +522,7 @@ public class TestSite extends TestDatabase {
 
 	@Test
 	public void testGetTopContainerCollection() throws Exception {
-		SiteWrapper site = addSite("testGetTopContainerCollection", true);
+		SiteWrapper site = addSite("testGetTopContainerCollection");
 		addContainers(site, "testGetTopContainerCollection");
 
 		List<ContainerWrapper> containers = site.getTopContainerCollection();
@@ -607,7 +540,7 @@ public class TestSite extends TestDatabase {
 
 	@Test
 	public void testGetTopContainerCollectionBoolean() throws Exception {
-		SiteWrapper site = addSite("testGetTopContainerCollection", true);
+		SiteWrapper site = addSite("testGetTopContainerCollection");
 		addContainers(site, "testGetTopContainerCollection");
 
 		List<ContainerWrapper> containers = site
@@ -639,6 +572,13 @@ public class TestSite extends TestDatabase {
 		Assert.assertEquals(0, siteWrappers.size());
 	}
 
+	@Override
+	protected SiteWrapper addSite(String name) throws Exception {
+		SiteWrapper site = super.addSite(name);
+		createdSites.add(site);
+		return site;
+	}
+
 	@After
 	public void tearDown() {
 		try {
@@ -666,4 +606,5 @@ public class TestSite extends TestDatabase {
 			}
 		}
 	}
+
 }
