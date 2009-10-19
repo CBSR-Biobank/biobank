@@ -612,6 +612,13 @@ public class SiteWrapper extends ModelWrapper<Site> {
         return pvInfoTypeMap.keySet().toArray(new String[] {});
     }
 
+    public Integer getPvInfoType(String label) {
+        PvInfoPossibleWrapper pvInfoPossible = pvInfoPossibleMap.get(label);
+        if (pvInfoPossible == null)
+            return null;
+        return pvInfoPossible.getPvInfoType().getId();
+    }
+
     protected PvInfoPossibleWrapper getPvInfoPossible(String label)
         throws Exception {
         getPvInfoPossibleMap();
