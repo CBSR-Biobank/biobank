@@ -1,12 +1,14 @@
 package test.ualberta.med.biobank;
 
 import edu.ualberta.med.biobank.common.BiobankCheckException;
+import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
@@ -114,6 +116,14 @@ public class TestDatabase {
                         str += ALPHABET.substring(begin, begin + 1);
                     }
                     parameter = str;
+                } else if (getReturnType.equals("java.util.Date")) {
+                    String dateStr = String
+                        .format("%04-%02-%02 %02:%02", 2000 + r.nextInt(40), r
+                            .nextInt(12) + 1, r.nextInt(30) + 1,
+                            r.nextInt(24) + 1, r.nextInt(60) + 1);
+                    Date date = DateFormatter.parse(
+                        DateFormatter.dateFormatter, dateStr);
+                    parameter = date;
                 } else {
                     throw new Exception("return type " + getReturnType
                         + " for method " + getterInfo.getMethod.getName()
