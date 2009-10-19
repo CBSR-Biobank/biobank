@@ -572,6 +572,7 @@ public class SiteWrapper extends ModelWrapper<Site> {
     private Map<String, PvInfoTypeWrapper> getPvInfoTypeMap()
         throws ApplicationException {
         if (pvInfoTypeMap == null) {
+            pvInfoTypeMap = new HashMap<String, PvInfoTypeWrapper>();
             for (PvInfoTypeWrapper pit : PvInfoTypeWrapper
                 .getAllWrappers(appService)) {
                 pvInfoTypeMap.put(pit.getType(), pit);
@@ -606,7 +607,12 @@ public class SiteWrapper extends ModelWrapper<Site> {
         return pvInfoPossibleMap.keySet().toArray(new String[] {});
     }
 
-    public PvInfoPossibleWrapper getPvInfoPossible(String label)
+    public String[] getPvInfoTypes() throws ApplicationException {
+        getPvInfoTypeMap();
+        return pvInfoTypeMap.keySet().toArray(new String[] {});
+    }
+
+    protected PvInfoPossibleWrapper getPvInfoPossible(String label)
         throws Exception {
         getPvInfoPossibleMap();
         PvInfoPossibleWrapper pip = pvInfoPossibleMap.get(label);
@@ -694,4 +700,5 @@ public class SiteWrapper extends ModelWrapper<Site> {
         pvInfoPossibleMap = null;
         pvInfoTypeMap = null;
     }
+
 }

@@ -134,7 +134,10 @@ public class TestDatabase {
 	}
 
 	public <T> T chooseRandomlyInList(List<T> list) {
-		if (list.size() > 0) {
+		if (list.size() == 1) {
+			return list.get(0);
+		}
+		if (list.size() > 1) {
 			Random r = new Random();
 			int pos = r.nextInt(list.size());
 			return list.get(pos);

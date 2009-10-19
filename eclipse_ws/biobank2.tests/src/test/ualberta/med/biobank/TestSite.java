@@ -15,6 +15,7 @@ import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.Site;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 // FIXME to be implemented by Delphine
 public class TestSite extends TestDatabase {
@@ -23,10 +24,15 @@ public class TestSite extends TestDatabase {
 
 	private SiteWrapper oneSite;
 
+	@Override
 	@Before
 	public void setUp() throws Exception {
 		super.setUp();
 		sites = SiteWrapper.getAllSites(appService);
+		if (sites.size() == 0) {
+			SiteWrapper newSite = addSite("NewSite");
+			sites.add(newSite);
+		}
 		oneSite = chooseRandomlyInList(sites);
 	}
 
@@ -423,6 +429,52 @@ public class TestSite extends TestDatabase {
 		Assert.assertEquals(null, newSite.getName());
 	}
 
+	@Test
+	public void testSetPvInfoPossible() throws Exception {
+		Random r = new Random();
+
+		String[] types = oneSite.getPvInfoTypes();
+		if (types.length == 0) {
+			Assert.fail("Can't test without pvinfotypes");
+		}
+		String labelGlobal = "labelGlobal" + r.nextInt();
+		String type = types[r.nextInt(types.length)];
+		oneSite.setPvInfoPossible(labelGlobal, type, true);
+		oneSite.persist();
+
+		oneSite.reload();
+		boolean labelExists = findLabel(oneSite, labelGlobal);
+		Assert.assertTrue(labelExists);
+
+		SiteWrapper site2 = addSite("SetPvInfoPossible");
+		types = site2.getPvInfoTypes();
+		if (types.length == 0) {
+			Assert.fail("Can't test without pvinfotypes");
+		}
+		String labelSite = "labelSite" + r.nextInt();
+		type = types[r.nextInt(types.length)];
+		site2.setPvInfoPossible(labelSite, type, false);
+		site2.persist();
+
+		site2.reload();
+		labelExists = findLabel(site2, labelSite);
+		Assert.assertTrue(labelExists);
+
+		labelExists = findLabel(oneSite, labelSite);
+		Assert.assertFalse(labelExists);
+	}
+
+	private boolean findLabel(SiteWrapper site, String label)
+			throws ApplicationException {
+		String[] labels = site.getPvInfoPossibleLabels();
+		for (String l : labels) {
+			if (l.equals(label)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	//
 	// @Test
 	// public void testGetTopContainerCollectionBoolean() {
@@ -440,4 +492,5 @@ public class TestSite extends TestDatabase {
 	// fail("Not yet implemented");
 	// }
 	//
+
 }
