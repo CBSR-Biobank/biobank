@@ -26,11 +26,11 @@ public class TestContact extends TestDatabase {
 	@Before
 	public void setUp() throws Exception {
 		super.setUp();
-		cw = new ContactWrapper(appService, new Contact());
+		cw = newContact();
 		String street="Street1";
-		SiteWrapper siteWrapper = addSiteWrapper(street);
-		ClinicWrapper clinicWrapper = addClinicWrapper(siteWrapper, street);
-		//TODO: delete both later
+		SiteWrapper siteWrapper = addSite(street);
+		ClinicWrapper clinicWrapper = addClinic(siteWrapper, street);
+		//TODO: delete later
 		cw.setClinicWrapper(clinicWrapper);
 	}
 	    
@@ -40,7 +40,8 @@ public class TestContact extends TestDatabase {
 	List<StudyWrapper> oldStudyCollection= new ArrayList<StudyWrapper>();
 	List<StudyWrapper> modifiedStudyCollection= new ArrayList<StudyWrapper>();
 	List<ContactWrapper> studyContactWrappers = new ArrayList<ContactWrapper>();
-	StudyWrapper testWrapper = addStudyWrapper();
+	SiteWrapper dummySite =addSite("dummysite");
+	StudyWrapper testWrapper = addStudy(dummySite,"dummystudy");
 	        
 	Contact dbContact;
 	Study dbStudy;
@@ -51,6 +52,7 @@ public class TestContact extends TestDatabase {
 	boolean found;
 	       
 	//simple add
+	cw.persist();
 	studyContactWrappers.add(cw);
 	testWrapper.setContactCollection(studyContactWrappers);
 	testWrapper.persist();
@@ -64,7 +66,7 @@ public class TestContact extends TestDatabase {
 	studyContacts=dbStudy.getContactCollection();
 	found=false;
 	for (Contact contact: studyContacts) {
-		if (contact.getId()==cw.getId()) found=true;
+		if (contact.getId().equals(cw.getId())) found=true;
 	}
 	Assert.assertTrue(found);
 	dbContact = ModelUtils.getObjectWithId(appService, Contact.class, cw.getId());
@@ -87,7 +89,7 @@ public class TestContact extends TestDatabase {
 	cw.persist();
 			
 	dbStudy = ModelUtils.getObjectWithId(appService, Study.class, testWrapper.getId());
-	Assert.assertTrue(dbStudy==null);
+	Assert.assertTrue(dbStudy!=null);
 	studyContacts=dbStudy.getContactCollection();
 	found=false;
 	for (Contact contact: studyContacts) {
@@ -96,6 +98,7 @@ public class TestContact extends TestDatabase {
 	Assert.assertFalse(found);
 	dbContact = ModelUtils.getObjectWithId(appService, Contact.class, cw.getId());
 	dbCollection=dbContact.getStudyCollection();
+	//delete failed
 	Assert.assertTrue(dbCollection.size()==oldStudyCollection.size()&&(dbCollection.size()==cw.getStudyCollection(false).size()));
 	getCollection = cw.getStudyCollection(false);
 	i=0;
@@ -119,8 +122,8 @@ public class TestContact extends TestDatabase {
 		//deleting from midpoint of list
 		int middle = modifiedStudyCollection.size()+1;
 		
-		StudyWrapper testWrapper2= addStudyWrapper();
-		StudyWrapper testWrapper3= addStudyWrapper();
+		StudyWrapper testWrapper2= addStudy(dummySite, "s2");
+		StudyWrapper testWrapper3= addStudy(dummySite, "s3");
 		modifiedStudyCollection.add(testWrapper2);
 		modifiedStudyCollection.add(testWrapper);
 		modifiedStudyCollection.add(testWrapper3);
@@ -188,8 +191,8 @@ public class TestContact extends TestDatabase {
 		Assert.assertTrue(clinic!=null);
 		
 		//Set new clinic
-		SiteWrapper siteWrapper = addSiteWrapper("street");
-		ClinicWrapper newClinicWrapper = addClinicWrapper(siteWrapper, "street");
+		SiteWrapper siteWrapper = addSite("dummySite");
+		ClinicWrapper newClinicWrapper = addClinic(siteWrapper, "dummyClinic");
 		cw.setClinicWrapper(newClinicWrapper);
 		cw.persist();
 		
@@ -233,15 +236,11 @@ public class TestContact extends TestDatabase {
     	c.persist();	
     }
     
-    @Test(expected = BiobankCheckException.class)
-    public void TestPersistsNullSomethingElse() throws Exception {
-    	//null clinic
-    	ContactWrapper c = new ContactWrapper(appService);
-    	ClinicWrapper cw = new ClinicWrapper(appService, new Clinic());
-    	cw.persist();
-    	c.setClinicWrapper(cw);
-    	c.persist();	
+    public static ContactWrapper newContact() {
+    	ContactWrapper contactWrapper = new ContactWrapper(appService, new Contact());
+    	return contactWrapper;
     }
+    
     
     @Test
     public void TestBasicGettersAndSetters() throws BiobankCheckException, Exception {

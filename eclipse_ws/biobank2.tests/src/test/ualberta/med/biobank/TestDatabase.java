@@ -14,6 +14,7 @@ import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.model.Study;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 import java.lang.reflect.Method;
@@ -310,8 +311,9 @@ public class TestDatabase {
         return patient;
     }
 
-    protected PatientWrapper addPatient(String number) throws Exception {
+    protected PatientWrapper addPatient(String number, StudyWrapper study) throws Exception {
         PatientWrapper patient = newPatient(number);
+        patient.setStudy(study);
         patient.persist();
         return patient;
     }
@@ -327,10 +329,11 @@ public class TestDatabase {
     }
 
     protected PatientVisitWrapper addPatientVisit(PatientWrapper patient,
-			Date dateDrawn, Date dateProcessed, Date dateReceived)
+			ClinicWrapper clinic, Date dateDrawn, Date dateProcessed, Date dateReceived)
 			throws Exception {
         PatientVisitWrapper pv = newPatientVisit(patient, dateDrawn,
             dateProcessed, dateReceived);
+        pv.setClinic(clinic);
         pv.persist();
         return pv;
     }
