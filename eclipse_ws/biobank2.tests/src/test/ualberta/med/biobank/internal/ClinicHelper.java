@@ -1,7 +1,9 @@
 package test.ualberta.med.biobank.internal;
 
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.model.Contact;
 
 public class ClinicHelper extends DbHelper {
 
@@ -28,6 +30,12 @@ public class ClinicHelper extends DbHelper {
             addClinic(site, name + (i + 1));
         }
         site.reload();
+    }
+
+    public static ContactWrapper newContact() {
+        ContactWrapper contactWrapper = new ContactWrapper(appService,
+            new Contact());
+        return contactWrapper;
     }
 
 }

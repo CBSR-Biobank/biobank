@@ -15,6 +15,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import test.ualberta.med.biobank.internal.PatientHelper;
 import test.ualberta.med.biobank.internal.SiteHelper;
 import test.ualberta.med.biobank.internal.StudyHelper;
 import edu.ualberta.med.biobank.common.BiobankCheckException;
@@ -464,9 +465,10 @@ public class TestContainer extends TestDatabase {
 
         StudyWrapper study = StudyHelper.addStudy("Study1", "S1", site);
 
-        PatientWrapper patient = addPatient("1000", study);
-        PatientVisitWrapper pv = addPatientVisit(patient,
-            Utils.getRandomDate(), Utils.getRandomDate(), Utils.getRandomDate());
+        PatientWrapper patient = PatientHelper.addPatient("1000", study);
+        PatientVisitWrapper pv = PatientHelper
+            .addPatientVisit(patient, null, Utils.getRandomDate(), Utils
+                .getRandomDate(), Utils.getRandomDate());
         addContainerHierarchy();
         ContainerWrapper childL3 = containerMap.get("ChildL3");
         for (int i = 0, n = sampleTypeList.size(); i < n; ++i) {
@@ -495,9 +497,10 @@ public class TestContainer extends TestDatabase {
 
         StudyWrapper study = StudyHelper.addStudy("Study1", "S1", site);
 
-        PatientWrapper patient = addPatient("1000", study);
-        PatientVisitWrapper pv = addPatientVisit(patient,
-            Utils.getRandomDate(), Utils.getRandomDate(), Utils.getRandomDate());
+        PatientWrapper patient = PatientHelper.addPatient("1000", study);
+        PatientVisitWrapper pv = PatientHelper
+            .addPatientVisit(patient, null, Utils.getRandomDate(), Utils
+                .getRandomDate(), Utils.getRandomDate());
         addContainerHierarchy();
         ContainerWrapper childL3 = containerMap.get("ChildL3");
         for (int i = 0, n = sampleTypeList.size(); i < n; ++i) {

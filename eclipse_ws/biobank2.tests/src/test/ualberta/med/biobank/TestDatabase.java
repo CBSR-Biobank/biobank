@@ -5,17 +5,14 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
-import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
-import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
@@ -55,16 +52,16 @@ public class TestDatabase {
             AllTests.setUp();
             appService = AllTests.appService;
         }
-	}
+    }
 
-	@After
-	public void tearDown() throws Exception {
-		try {
+    @After
+    public void tearDown() throws Exception {
+        try {
             SiteHelper.deletedCreatedSites();
-		} catch (Exception e) {
-			e.printStackTrace(System.err);
-			Assert.fail();
-		}
+        } catch (Exception e) {
+            e.printStackTrace(System.err);
+            Assert.fail();
+        }
     }
 
     public Collection<GetterInfo> getGettersAndSetters(ModelWrapper<?> w) {
@@ -160,7 +157,7 @@ public class TestDatabase {
         return null;
     }
 
-	protected ContainerTypeWrapper newContainerType(SiteWrapper site,
+    protected ContainerTypeWrapper newContainerType(SiteWrapper site,
         String name, String nameShort, Integer labelingScheme,
         Integer rowCapacity, Integer colCapacity, boolean isTopLevel) {
         ContainerTypeWrapper ct = new ContainerTypeWrapper(appService);
@@ -186,21 +183,21 @@ public class TestDatabase {
         return container;
     }
 
-	protected ContainerTypeWrapper addContainerTypeRandom(SiteWrapper site,
-			String name) throws Exception {
-		return addContainerType(site, name + "Random" + r.nextInt(), "", null,
+    protected ContainerTypeWrapper addContainerTypeRandom(SiteWrapper site,
+        String name) throws Exception {
+        return addContainerType(site, name + "Random" + r.nextInt(), "", null,
             r.nextInt(10) + 1, r.nextInt(10) + 1, r.nextBoolean());
-	}
+    }
 
-	protected int addContainerTypesRandom(SiteWrapper site, String name)
-			throws Exception {
+    protected int addContainerTypesRandom(SiteWrapper site, String name)
+        throws Exception {
         int nber = r.nextInt(15) + 1;
-		for (int i = 0; i < nber; i++) {
-			addContainerTypeRandom(site, name);
-		}
-		site.reload();
-		return nber;
-	}
+        for (int i = 0; i < nber; i++) {
+            addContainerTypeRandom(site, name);
+        }
+        site.reload();
+        return nber;
+    }
 
     protected ContainerWrapper newContainer(String label, String barcode,
         ContainerWrapper parent, SiteWrapper site, ContainerTypeWrapper type)
@@ -252,67 +249,32 @@ public class TestDatabase {
             type, row, col);
         container.persist();
         return container;
-	}
-
-	protected ContainerWrapper addContainerRandom(SiteWrapper site, String name)
-			throws Exception {
-		ContainerTypeWrapper type = addContainerTypeRandom(site, name);
-		String label = null;
-		if ((type.getTopLevel() != null) && type.getTopLevel()) {
-			label = String.valueOf(r.nextInt());
-		}
-		ContainerWrapper container = addContainer(label, name + "Random"
-				+ r.nextInt(), null, site, type);
-		if (label == null) {
-			container.setPosition(0, 0);
-		}
-		container.persist();
-		return container;
-	}
-
-	protected int addContainersRandom(SiteWrapper site, String name)
-			throws Exception {
-        int nber = r.nextInt(15) + 1;
-		for (int i = 0; i < nber; i++) {
-			addContainerRandom(site, name);
-		}
-		site.reload();
-		return nber;
     }
 
-    protected PatientWrapper newPatient(String number) {
-        PatientWrapper patient = new PatientWrapper(appService);
-        patient.setNumber(number);
-        return patient;
-    }
-
-    protected PatientWrapper addPatient(String number, StudyWrapper study)
+    protected ContainerWrapper addContainerRandom(SiteWrapper site, String name)
         throws Exception {
-        PatientWrapper patient = newPatient(number);
-        patient.setStudy(study);
-        patient.persist();
-        return patient;
+        ContainerTypeWrapper type = addContainerTypeRandom(site, name);
+        String label = null;
+        if ((type.getTopLevel() != null) && type.getTopLevel()) {
+            label = String.valueOf(r.nextInt());
+        }
+        ContainerWrapper container = addContainer(label, name + "Random"
+            + r.nextInt(), null, site, type);
+        if (label == null) {
+            container.setPosition(0, 0);
+        }
+        container.persist();
+        return container;
     }
 
-    protected PatientVisitWrapper newPatientVisit(PatientWrapper patient, ClinicWrapper clinic,
-        Date dateDrawn, Date dateProcessed, Date dateReceived) {
-        PatientVisitWrapper pv = new PatientVisitWrapper(appService);
-        pv.setPatient(patient);
-		pv.setClinic(clinic);        
-		pv.setDateDrawn(dateDrawn);
-        pv.setDateProcessed(dateProcessed);
-        pv.setDateReceived(dateReceived);
-        return pv;
-    }
-
-    protected PatientVisitWrapper addPatientVisit(PatientWrapper patient,
-			ClinicWrapper clinic, Date dateDrawn, Date dateProcessed, Date dateReceived)
-			throws Exception {
-        PatientVisitWrapper pv = newPatientVisit(patient, dateDrawn,
-            dateProcessed, dateReceived);
-        pv.setClinic(clinic);
-        pv.persist();
-        return pv;
+    protected int addContainersRandom(SiteWrapper site, String name)
+        throws Exception {
+        int nber = r.nextInt(15) + 1;
+        for (int i = 0; i < nber; i++) {
+            addContainerRandom(site, name);
+        }
+        site.reload();
+        return nber;
     }
 
     protected SampleWrapper newSample(SampleTypeWrapper sampleType,
