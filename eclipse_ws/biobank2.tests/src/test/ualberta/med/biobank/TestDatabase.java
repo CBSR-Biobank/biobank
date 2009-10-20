@@ -284,12 +284,24 @@ public class TestDatabase {
 		return nber;
 	}
 
-	protected ContainerWrapper newContainer(String barcode, SiteWrapper site,
-			ContainerTypeWrapper type) throws Exception {
+	protected ContainerWrapper newContainer(String label, String barcode,
+			ContainerWrapper parent, SiteWrapper site, ContainerTypeWrapper type)
+			throws Exception {
 		ContainerWrapper container;
 
 		container = new ContainerWrapper(appService);
+		if (label != null) {
+			if (type.getTopLevel()) {
+				container.setLabel(label);
+			} else {
+				throw new Exception(
+						"cannot set label on non top level containers");
+			}
+		}
 		container.setProductBarcode(barcode);
+		if (parent != null) {
+			container.setParent(parent);
+		}
 		if (site != null) {
 			container.setSite(site);
 		}
@@ -297,20 +309,41 @@ public class TestDatabase {
 		return container;
 	}
 
-	protected ContainerWrapper addContainer(String barcode, SiteWrapper site,
-			ContainerTypeWrapper type) throws Exception {
-		ContainerWrapper container = newContainer(barcode, site, type);
+	protected ContainerWrapper newContainer(String label, String barcode,
+			ContainerWrapper parent, SiteWrapper site,
+			ContainerTypeWrapper type, Integer row, Integer col)
+			throws Exception {
+		ContainerWrapper container = newContainer(label, barcode, parent, site,
+				type);
+		container.setPosition(row, col);
+		return container;
+	}
+
+	protected ContainerWrapper addContainer(String label, String barcode,
+			ContainerWrapper parent, SiteWrapper site, ContainerTypeWrapper type)
+			throws Exception {
+		ContainerWrapper container = newContainer(label, barcode, parent, site,
+				type);
 		container.persist();
 		return container;
+	}
+
+	protected ContainerWrapper addContainer(String label, String barcode,
+			ContainerWrapper parent, SiteWrapper site,
+			ContainerTypeWrapper type, Integer row, Integer col)
+			throws Exception {
+		ContainerWrapper container = newContainer(label, barcode, parent, site,
+				type, row, col);
+		container.persist();
+		return container;
+
 	}
 
 	protected ContainerWrapper addContainerRandom(SiteWrapper site, String name)
 			throws Exception {
 		ContainerTypeWrapper type = addContainerTypeRandom(site, name);
-		String label = name + "Random" + r.nextInt();
-		ContainerWrapper container = addContainer(label, site, type);
-		container.setLabel(label);
-		container.persist();
+		ContainerWrapper container = addContainer(
+				name + "Random" + r.nextInt(), "", null, site, type);
 		return container;
 	}
 
@@ -345,4 +378,5 @@ public class TestDatabase {
 			}
 		}
 	}
+
 }
