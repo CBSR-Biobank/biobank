@@ -25,6 +25,7 @@ import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.Container;
 
 public class TestContainer extends TestDatabase {
@@ -48,10 +49,7 @@ public class TestContainer extends TestDatabase {
         if (sites.size() > 0) {
             site = sites.get(0);
         } else {
-            site = new SiteWrapper(appService);
-            site.setName("Site - Container Test");
-            site.setStreet1("street");
-            site.persist();
+            site = addSite("Site - Container Test", "street");
         }
 
         deleteContainers();
@@ -155,8 +153,7 @@ public class TestContainer extends TestDatabase {
 
     @Test
     public void testGettersAndSetters() throws BiobankCheckException, Exception {
-        ContainerWrapper container = addContainer(null, null, null, site,
-            containerTypeMap.get("TopCT"));
+        addContainer(null, null, null, site, containerTypeMap.get("TopCT"));
     }
 
     @Test
@@ -461,7 +458,9 @@ public class TestContainer extends TestDatabase {
         childTypeL3.setSampleTypeCollection(sampleTypeList);
         childTypeL3.persist();
 
-        PatientWrapper patient = addPatient("1000");
+        StudyWrapper study = addStudy("Study1", "S1", site);
+
+        PatientWrapper patient = addPatient("1000", study);
         PatientVisitWrapper pv = addPatientVisit(patient, getRandomDate(),
             getRandomDate(), getRandomDate());
         addContainerHierarchy();
@@ -490,7 +489,9 @@ public class TestContainer extends TestDatabase {
         childTypeL3.setSampleTypeCollection(sampleTypeList);
         childTypeL3.persist();
 
-        PatientWrapper patient = addPatient("1000");
+        StudyWrapper study = addStudy("Study1", "S1", site);
+
+        PatientWrapper patient = addPatient("1000", study);
         PatientVisitWrapper pv = addPatientVisit(patient, getRandomDate(),
             getRandomDate(), getRandomDate());
         addContainerHierarchy();

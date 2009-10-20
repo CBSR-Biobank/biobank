@@ -10,6 +10,7 @@ import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 import java.lang.reflect.Method;
@@ -249,8 +250,10 @@ public class TestDatabase {
         return patient;
     }
 
-    protected PatientWrapper addPatient(String number) throws Exception {
+    protected PatientWrapper addPatient(String number, StudyWrapper study)
+        throws Exception {
         PatientWrapper patient = newPatient(number);
+        patient.setStudy(study);
         patient.persist();
         return patient;
     }
@@ -290,6 +293,35 @@ public class TestDatabase {
         SampleWrapper sample = newSample(sampleType, container, pv, row, col);
         sample.persist();
         return sample;
+    }
+
+    protected StudyWrapper newStudy(String name, String nameShort,
+        SiteWrapper site) {
+        StudyWrapper study = new StudyWrapper(appService);
+        study.setName(name);
+        study.setNameShort(nameShort);
+        study.setSite(site);
+        return study;
+    }
+
+    protected StudyWrapper addStudy(String name, String nameShort,
+        SiteWrapper site) throws Exception {
+        StudyWrapper study = newStudy(name, nameShort, site);
+        study.persist();
+        return study;
+    }
+
+    protected SiteWrapper newSite(String name, String street1) {
+        SiteWrapper site = new SiteWrapper(appService);
+        site.setName(name);
+        site.setStreet1(street1);
+        return site;
+    }
+
+    protected SiteWrapper addSite(String name, String street1) throws Exception {
+        SiteWrapper site = newSite(name, street1);
+        site.persist();
+        return site;
     }
 
 }
