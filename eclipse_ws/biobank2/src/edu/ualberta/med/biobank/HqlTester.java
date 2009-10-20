@@ -21,6 +21,7 @@ public class HqlTester {
         appService = (WritableApplicationService) ApplicationServiceProvider
             .getApplicationServiceFromUrl("http://localhost:8080/biobank2",
                 "testuser", "test");
+
         getBrokenQuery();
         // geTopContainerTypes();
         // getPatientIds();
@@ -75,4 +76,17 @@ public class HqlTester {
             System.out.println("geContainerLike: " + container.getLabel());
         }
     }
+
+    @SuppressWarnings("unused")
+    private void getTopContainers() throws Exception {
+        HQLCriteria criteria = new HQLCriteria("from "
+            + Container.class.getName()
+            + " where site.id = ? and position is null", Arrays
+            .asList(new Object[] { new Integer(1) }));
+        List<Container> containers = appService.query(criteria);
+        for (Container container : containers) {
+            System.out.println("getTopContainers: " + container.getLabel());
+        }
+    }
+
 }

@@ -5,8 +5,12 @@ import static org.junit.Assert.fail;
 import org.junit.Before;
 import org.junit.Test;
 
+import edu.ualberta.med.biobank.common.BiobankCheckException;
+import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
+import edu.ualberta.med.biobank.model.SampleType;
+
 //FIXME to be implemented by Delphine
-public class TestSampleType {
+public class TestSampleType extends TestDatabase{
 
     @Before
     public void setUp() throws Exception {
@@ -123,4 +127,10 @@ public class TestSampleType {
         fail("Not yet implemented");
     }
 
+	public static SampleTypeWrapper addSampleTypeWrapper() throws BiobankCheckException, Exception {
+		SampleTypeWrapper stw = new SampleTypeWrapper(appService, new SampleType());
+		stw.persist();
+		return stw;
+	}
+	
 }

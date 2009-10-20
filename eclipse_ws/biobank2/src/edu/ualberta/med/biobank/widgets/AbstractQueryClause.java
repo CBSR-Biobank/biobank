@@ -1,6 +1,6 @@
 package edu.ualberta.med.biobank.widgets;
 
-import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,18 +15,18 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
 
-import edu.ualberta.med.biobank.views.ReportsView;
+import edu.ualberta.med.biobank.views.AdvancedReportsView;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public abstract class AbstractQueryClause {
 
+    @SuppressWarnings("unused")
     private static Logger LOGGER = Logger.getLogger(AbstractQueryClause.class
         .getName());
 
-    protected ReportsView view;
+    protected AdvancedReportsView view;
     protected String alias;
-    protected List<Field> attributes;
-    protected Class<?> modelObjectClass;
+    protected List<Method> attributes;
 
     protected List<ComboViewer> whereCombos;
     protected List<ComboViewer> operatorCombos;
@@ -36,9 +36,9 @@ public abstract class AbstractQueryClause {
     protected List<String> numberOps;
     protected List<String> collectionOps;
 
-    protected AbstractQueryClause(Class<?> modelObjectClass, String alias,
-        ReportsView view) {
-        this.modelObjectClass = modelObjectClass;
+    protected AbstractQueryClause(List<Method> methods, String alias,
+        AdvancedReportsView view) {
+
         this.alias = alias;
         this.view = view;
 
@@ -46,7 +46,7 @@ public abstract class AbstractQueryClause {
         operatorCombos = new ArrayList<ComboViewer>();
         searchFields = new ArrayList<Text>();
 
-        initAttributes();
+        initAttributes(methods);
 
         initStringOps();
         initNumberOps();
@@ -86,10 +86,10 @@ public abstract class AbstractQueryClause {
         return (String) operatorSelection.getFirstElement();
     }
 
-    private Field getAttribute(ComboViewer whereCombo) {
+    private Method getAttribute(ComboViewer whereCombo) {
         IStructuredSelection whereSelection = (IStructuredSelection) whereCombo
             .getSelection();
-        return (Field) whereSelection.getFirstElement();
+        return (Method) whereSelection.getFirstElement();
     }
 
     private String getValue(Text searchField) {
@@ -105,18 +105,19 @@ public abstract class AbstractQueryClause {
         List<Object> params = new ArrayList<Object>();
         for (int i = 0; i < whereCombos.size(); i++) {
             ComboViewer whereCombo = whereCombos.get(i);
-            Field attribute = getAttribute(whereCombo);
+            Method attribute = getAttribute(whereCombo);
             ComboViewer operatorCombo = operatorCombos.get(i);
             String operator = getOperator(operatorCombo);
             Text searchField = searchFields.get(i);
             String value = getValue(searchField);
             if (value.compareTo("") == 0 || value == null)
                 continue;
-            String attributeName = alias + "." + attribute.getName();
+            String attributeName = alias + "."
+                + AbstractQueryClause.getText(attribute);
 
             // convert value if necessary to correct type
-            if (attribute.getType().equals(Integer.class)
-                || attribute.getType().equals(Double.class))
+            if (attribute.getReturnType().equals(Integer.class)
+                || attribute.getReturnType().equals(Double.class))
                 params.add(Integer.valueOf(value));
             else
                 params.add(value);
@@ -158,14 +159,15 @@ public abstract class AbstractQueryClause {
         return comboViewer;
     }
 
-    protected void initAttributes() {
-        Field[] classFields = modelObjectClass.getDeclaredFields();
-        List<Field> attributes = new ArrayList<Field>();
-        for (Field field : classFields) {
-            if (field.getType().equals(String.class)
-                || field.getType().equals(Integer.class)
-                || field.getType().equals(Double.class))
-                attributes.add(field);
+    protected void initAttributes(List<Method> methods) {
+        List<Method> attributes = new ArrayList<Method>();
+        for (Method method : methods) {
+            if (method.getReturnType().equals(String.class)
+                || method.getReturnType().equals(Integer.class)
+                || method.getReturnType().equals(Double.class))
+
+                attributes.add(method);
+
         }
         this.attributes = attributes;
     }
@@ -176,8 +178,8 @@ public abstract class AbstractQueryClause {
             ComboViewer opCombo = operatorCombos.get(index);
             IStructuredSelection whereSelection = (IStructuredSelection) whereCombo
                 .getSelection();
-            Field whereField = (Field) whereSelection.getFirstElement();
-            Class<?> type = whereField.getType();
+            Method whereMethod = (Method) whereSelection.getFirstElement();
+            Class<?> type = whereMethod.getReturnType();
             if (type.equals(String.class))
                 opCombo.setInput(stringOps);
             else if (type.equals(Integer.class) || type.equals(Double.class))
@@ -189,7 +191,8 @@ public abstract class AbstractQueryClause {
             }
             opCombo.getCombo().select(0);
         } catch (Exception e) {
-            LOGGER.error("updateOperatorCombo", e);
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
     }
 
@@ -218,9 +221,11 @@ public abstract class AbstractQueryClause {
     public static String getText(Object element) {
         String[] s = element.toString().split("\\.");
         if (s.length > 0) {
-            String newstring = s[s.length - 1].substring(0, 1).toLowerCase();
-            newstring += s[s.length - 1].substring(1);
-            return newstring;
+            String filtered = s[s.length - 1].replace("Wrapper", "").replace(
+                "get", "").replace("()", "");
+            String lowercase = filtered.substring(0, 1).toLowerCase();
+            lowercase += filtered.substring(1);
+            return lowercase;
         } else
             return null;
     }
