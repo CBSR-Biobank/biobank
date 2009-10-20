@@ -89,7 +89,7 @@ public class ContactWrapper extends ModelWrapper<Contact> {
     }
 
     @SuppressWarnings("unchecked")
-    public Collection<StudyWrapper> getStudyCollection(boolean sort) {
+    public List<StudyWrapper> getStudyCollection(boolean sort) {
         List<StudyWrapper> clinicCollection = (List<StudyWrapper>) propertiesMap
             .get("studyCollection");
         if (clinicCollection == null) {
@@ -105,6 +105,10 @@ public class ContactWrapper extends ModelWrapper<Contact> {
         if ((clinicCollection != null) && sort)
             Collections.sort(clinicCollection);
         return clinicCollection;
+    }
+
+    public List<StudyWrapper> getStudyCollection() {
+        return getStudyCollection(false);
     }
 
     public void setStudyCollection(Collection<Study> studies, boolean setNull) {

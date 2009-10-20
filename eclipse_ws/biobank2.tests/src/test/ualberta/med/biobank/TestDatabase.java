@@ -3,6 +3,7 @@ package test.ualberta.med.biobank;
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
@@ -46,6 +47,7 @@ public class TestDatabase {
             add("java.util.Set");
             add("java.util.List");
             add("java.util.Collection");
+            add("[Ljava.lang.String;"); // array of strings
         }
     };
 
@@ -143,6 +145,7 @@ public class TestDatabase {
                 } else if (getReturnType.equals("java.util.Date")) {
                     parameter = getRandomDate();
                 } else {
+                    System.out.println(getReturnType);
                     throw new Exception("return type " + getReturnType
                         + " for method " + getterInfo.getMethod.getName()
                         + " for class " + w.getClass().getName()
@@ -354,7 +357,7 @@ public class TestDatabase {
             site.reload();
             removeContainers(site.getContainerCollection());
             removeStudies(site.getStudyCollection());
-            removeFromList(site.getClinicCollection());
+            removeClinics(site.getClinicCollection());
             removeFromList(site.getContainerTypeCollection());
             site.reload();
             site.delete();
@@ -379,6 +382,14 @@ public class TestDatabase {
             removePatients(study.getPatientCollection());
             study.reload();
             study.delete();
+        }
+    }
+
+    protected void removeClinics(List<ClinicWrapper> clinics) throws Exception {
+        for (ClinicWrapper clinic : clinics) {
+            removeFromList(clinic.getContactCollection());
+            clinic.reload();
+            clinic.delete();
         }
     }
 
@@ -464,20 +475,68 @@ public class TestDatabase {
         return clinic;
     }
 
-    protected ClinicWrapper addClinic(SiteWrapper site, String name)
-        throws Exception {
+    protected ClinicWrapper addClinic(SiteWrapper site, String name,
+        boolean addContacts) throws Exception {
         ClinicWrapper clinic = newClinic(site, name);
         clinic.persist();
+        if (addContacts) {
+            for (int i = 0; i < (r.nextInt(5) + 1); i++) {
+                addContact(clinic, name);
+            }
+            clinic.reload();
+        }
         return clinic;
     }
 
-    protected int addClinics(SiteWrapper site, String name) throws Exception {
+    protected ContactWrapper newContact(ClinicWrapper clinic, String name) {
+        ContactWrapper contact = new ContactWrapper(appService);
+        contact.setClinicWrapper(clinic);
+        contact.setName(name + r.nextInt());
+        contact.setEmailAddress("toto@gamil.com");
+        return contact;
+    }
+
+    protected ContactWrapper addContact(ClinicWrapper clinic, String name)
+        throws Exception {
+        ContactWrapper contact = newContact(clinic, name);
+        contact.persist();
+        return contact;
+    }
+
+    protected ClinicWrapper addClinic(SiteWrapper site, String name)
+        throws Exception {
+        return addClinic(site, name, false);
+    }
+
+    protected int addClinics(SiteWrapper site, String name, boolean addContacts)
+        throws Exception {
         int nber = r.nextInt(15) + 1;
         for (int i = 0; i < nber; i++) {
-            addClinic(site, name);
+            addClinic(site, name, addContacts);
         }
         site.reload();
         return nber;
     }
 
+    protected int addClinics(SiteWrapper site, String name) throws Exception {
+        return addClinics(site, name, false);
+    }
+
+    protected int addContactsToStudy(StudyWrapper study, String name)
+        throws Exception {
+        SiteWrapper site = study.getSite();
+        addClinics(site, name, true);
+        List<ClinicWrapper> clinics = site.getClinicCollection();
+        int nber = r.nextInt(clinics.size() - 1) + 1;
+        List<ContactWrapper> contacts = new ArrayList<ContactWrapper>();
+        for (int i = 0; i < nber; i++) {
+            ClinicWrapper clinic = clinics.get(i);
+            ContactWrapper contact = chooseRandomlyInList(clinic
+                .getContactCollection());
+            contacts.add(contact);
+        }
+        study.setContactCollection(contacts);
+        study.persist();
+        return nber;
+    }
 }
