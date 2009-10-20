@@ -30,6 +30,8 @@ public class TestDatabase {
 
 	protected Random r;
 
+	protected List<SiteWrapper> createdSites;
+
 	private static final List<String> IGNORE_RETURN_TYPES = new ArrayList<String>() {
 		private static final long serialVersionUID = 1L;
 		{
@@ -54,6 +56,7 @@ public class TestDatabase {
 			AllTests.setUp();
 			appService = AllTests.appService;
 		}
+		createdSites = new ArrayList<SiteWrapper>();
 	}
 
 	public Collection<GetterInfo> getGettersAndSetters(ModelWrapper<?> w) {
@@ -167,10 +170,18 @@ public class TestDatabase {
 		return site;
 	}
 
-	protected SiteWrapper addSite(String name) throws Exception {
+	protected SiteWrapper addSite(String name, boolean addToCreatedList)
+			throws Exception {
 		SiteWrapper site = newSite(name);
 		site.persist();
+		if (addToCreatedList) {
+			createdSites.add(site);
+		}
 		return site;
+	}
+
+	protected SiteWrapper addSite(String name) throws Exception {
+		return addSite(name, true);
 	}
 
 	protected int addSites(String name) throws Exception {
@@ -296,7 +307,11 @@ public class TestDatabase {
 	protected ContainerWrapper addContainerRandom(SiteWrapper site, String name)
 			throws Exception {
 		ContainerTypeWrapper type = addContainerTypeRandom(site, name);
-		return addContainer(name + "Random" + r.nextInt(), site, type);
+		String label = name + "Random" + r.nextInt();
+		ContainerWrapper container = addContainer(label, site, type);
+		container.setLabel(label);
+		container.persist();
+		return container;
 	}
 
 	protected int addContainersRandom(SiteWrapper site, String name)
@@ -307,5 +322,27 @@ public class TestDatabase {
 		}
 		site.reload();
 		return nber;
+	}
+
+	protected void deletedCreatedSites() throws Exception {
+		for (SiteWrapper site : createdSites) {
+			site.reload();
+			removeFromList(site.getContainerCollection());
+			removeFromList(site.getStudyCollection());
+			removeFromList(site.getClinicCollection());
+			removeFromList(site.getContainerTypeCollection());
+			site.reload();
+			site.delete();
+		}
+	}
+
+	protected void removeFromList(List<? extends ModelWrapper<?>> list)
+			throws Exception {
+		if (list != null) {
+			for (ModelWrapper<?> object : list) {
+				object.reload();
+				object.delete();
+			}
+		}
 	}
 }

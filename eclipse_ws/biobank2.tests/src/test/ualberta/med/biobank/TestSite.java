@@ -1,6 +1,5 @@
 package test.ualberta.med.biobank;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.After;
@@ -11,7 +10,6 @@ import org.junit.Test;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
@@ -21,13 +19,20 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class TestSite extends TestDatabase {
 
-	private List<SiteWrapper> createdSites;
-
 	@Override
 	@Before
 	public void setUp() throws Exception {
 		super.setUp();
-		createdSites = new ArrayList<SiteWrapper>();
+	}
+
+	@After
+	public void tearDown() {
+		try {
+			deletedCreatedSites();
+		} catch (Exception e) {
+			e.printStackTrace(System.err);
+			Assert.fail();
+		}
 	}
 
 	@Test
@@ -399,7 +404,7 @@ public class TestSite extends TestDatabase {
 
 	@Test
 	public void testDelete() throws Exception {
-		SiteWrapper site = super.addSite("testDelete");
+		SiteWrapper site = addSite("testDelete", false);
 		// object is in database
 		Assert.assertNotNull(site);
 		site.delete();
@@ -514,10 +519,11 @@ public class TestSite extends TestDatabase {
 
 	@Test
 	public void testGetSites() throws Exception {
-		int nber = addSites("testGetSites");
+		addSites("testGetSites");
 
 		List<SiteWrapper> siteWrappers = SiteWrapper.getSites(appService, null);
-		Assert.assertEquals(nber, siteWrappers.size());
+		int inDB = appService.search(Site.class, new Site()).size();
+		Assert.assertEquals(inDB, siteWrappers.size());
 
 		SiteWrapper site = chooseRandomlyInList(siteWrappers);
 		siteWrappers = SiteWrapper.getSites(appService, site.getId());
@@ -528,41 +534,6 @@ public class TestSite extends TestDatabase {
 		List<Integer> max = appService.query(criteria);
 		siteWrappers = SiteWrapper.getSites(appService, max.get(0) + 1000);
 		Assert.assertEquals(0, siteWrappers.size());
-	}
-
-	@Override
-	protected SiteWrapper addSite(String name) throws Exception {
-		SiteWrapper site = super.addSite(name);
-		createdSites.add(site);
-		return site;
-	}
-
-	@After
-	public void tearDown() {
-		try {
-			for (SiteWrapper site : createdSites) {
-				removeFromList(site.getContainerCollection());
-				removeFromList(site.getStudyCollection());
-				removeFromList(site.getClinicCollection());
-				removeFromList(site.getContainerTypeCollection());
-				site.reload();
-				site.delete();
-			}
-		} catch (Exception e) {
-			e.printStackTrace(System.err);
-			Assert.fail();
-		}
-
-	}
-
-	private void removeFromList(List<? extends ModelWrapper<?>> list)
-			throws Exception {
-		if (list != null) {
-			for (ModelWrapper<?> object : list) {
-				object.reload();
-				object.delete();
-			}
-		}
 	}
 
 }
