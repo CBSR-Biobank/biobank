@@ -48,6 +48,7 @@ public class SiteHelper extends DbHelper {
             site.reload();
             site.delete();
         }
+        createdSites.clear();
     }
 
 }
