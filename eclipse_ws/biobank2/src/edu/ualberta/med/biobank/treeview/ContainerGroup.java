@@ -20,7 +20,6 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.forms.ContainerEntryForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ContainerGroup extends AdapterBase {
 
@@ -62,8 +61,8 @@ public class ContainerGroup extends AdapterBase {
                             ContainerGroup.this, c);
                         openForm(new FormInput(adapter), ContainerEntryForm.ID);
                     }
-                } catch (ApplicationException ae) {
-                    LOGGER.error("Problem executing add container", ae);
+                } catch (Exception e) {
+                    LOGGER.error("Problem executing add container", e);
                 }
             }
 

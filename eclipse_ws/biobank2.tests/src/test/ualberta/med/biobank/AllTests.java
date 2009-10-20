@@ -10,7 +10,7 @@ import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
-@SuiteClasses( { TestSite.class, TestContact.class, TestContainerLabelingScheme.class, TestPvSampleSource.class, TestSample.class })
+@SuiteClasses( {TestSite.class, TestContact.class, TestContainerLabelingScheme.class, TestPvSampleSource.class, TestSample.class })
 public class AllTests {
 	public static WritableApplicationService appService = null;
 

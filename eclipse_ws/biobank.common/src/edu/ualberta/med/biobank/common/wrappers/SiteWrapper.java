@@ -572,6 +572,7 @@ public class SiteWrapper extends ModelWrapper<Site> {
     private Map<String, PvInfoTypeWrapper> getPvInfoTypeMap()
         throws ApplicationException {
         if (pvInfoTypeMap == null) {
+            pvInfoTypeMap = new HashMap<String, PvInfoTypeWrapper>();
             for (PvInfoTypeWrapper pit : PvInfoTypeWrapper
                 .getAllWrappers(appService)) {
                 pvInfoTypeMap.put(pit.getType(), pit);
@@ -606,6 +607,11 @@ public class SiteWrapper extends ModelWrapper<Site> {
         return pvInfoPossibleMap.keySet().toArray(new String[] {});
     }
 
+    public String[] getPvInfoTypes() throws ApplicationException {
+        getPvInfoTypeMap();
+        return pvInfoTypeMap.keySet().toArray(new String[] {});
+    }
+
     public Integer getPvInfoType(String label) {
         PvInfoPossibleWrapper pvInfoPossible = pvInfoPossibleMap.get(label);
         if (pvInfoPossible == null)
@@ -613,15 +619,10 @@ public class SiteWrapper extends ModelWrapper<Site> {
         return pvInfoPossible.getPvInfoType().getId();
     }
 
-    public PvInfoPossibleWrapper getPvInfoPossible(String label)
+    protected PvInfoPossibleWrapper getPvInfoPossible(String label)
         throws Exception {
         getPvInfoPossibleMap();
-        PvInfoPossibleWrapper pip = pvInfoPossibleMap.get(label);
-        if (pip == null) {
-            throw new Exception("PvInfoPossible with label \"" + label
-                + "\" does not exists");
-        }
-        return pip;
+        return pvInfoPossibleMap.get(label);
     }
 
     public void setPvInfoPossible(String label, String type, boolean global)
@@ -633,7 +634,6 @@ public class SiteWrapper extends ModelWrapper<Site> {
                 + "\" is invalid");
         }
 
-        getPvInfoPossibleMap();
         PvInfoPossibleWrapper pip = getPvInfoPossible(label);
         if (pip == null) {
             pip = new PvInfoPossibleWrapper(appService, new PvInfoPossible());
@@ -675,7 +675,7 @@ public class SiteWrapper extends ModelWrapper<Site> {
      * If "id" is null, then all sites are returned. If not not, then only sites
      * with that id are returned.
      */
-    public static Collection<SiteWrapper> getSites(
+    public static List<SiteWrapper> getSites(
         WritableApplicationService appService, Integer id) throws Exception {
         HQLCriteria criteria;
 
@@ -688,7 +688,7 @@ public class SiteWrapper extends ModelWrapper<Site> {
 
         List<Site> sites = appService.query(criteria);
 
-        Collection<SiteWrapper> wrappers = new HashSet<SiteWrapper>();
+        List<SiteWrapper> wrappers = new ArrayList<SiteWrapper>();
         for (Site s : sites) {
             wrappers.add(new SiteWrapper(appService, s));
         }
@@ -701,4 +701,5 @@ public class SiteWrapper extends ModelWrapper<Site> {
         pvInfoPossibleMap = null;
         pvInfoTypeMap = null;
     }
+
 }

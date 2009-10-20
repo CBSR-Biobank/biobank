@@ -498,7 +498,7 @@ public class StudyWrapper extends ModelWrapper<Study> {
         HQLCriteria criteria = new HQLCriteria(
             "select count(patient) from "
                 + Study.class.getName()
-                + " as study inner join study.patientCollection as patient where patient.id = ?",
+                + " as study inner join study.patientCollection as patient where study.id = ?",
             Arrays.asList(new Object[] { getId() }));
         List<Long> result = appService.query(criteria);
         if (result.size() != 1) {
