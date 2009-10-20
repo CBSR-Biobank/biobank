@@ -2,6 +2,7 @@ package test.ualberta.med.biobank;
 
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
+import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
@@ -22,6 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 
@@ -33,6 +35,8 @@ public class TestDatabase {
     private static final int ALPHABET_LEN = ALPHABET.length();
 
     protected Random r;
+
+    protected List<SiteWrapper> createdSites;
 
     private static final List<String> IGNORE_RETURN_TYPES = new ArrayList<String>() {
         private static final long serialVersionUID = 1L;
@@ -57,6 +61,17 @@ public class TestDatabase {
         if (appService == null) {
             AllTests.setUp();
             appService = AllTests.appService;
+        }
+        createdSites = new ArrayList<SiteWrapper>();
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        try {
+            deletedCreatedSites();
+        } catch (Exception e) {
+            e.printStackTrace(System.err);
+            Assert.fail();
         }
     }
 
@@ -191,6 +206,22 @@ public class TestDatabase {
         return container;
     }
 
+    protected ContainerTypeWrapper addContainerTypeRandom(SiteWrapper site,
+        String name) throws Exception {
+        return addContainerType(site, name + "Random" + r.nextInt(), "", null,
+            r.nextInt(10) + 1, r.nextInt(10) + 1, r.nextBoolean());
+    }
+
+    protected int addContainerTypesRandom(SiteWrapper site, String name)
+        throws Exception {
+        int nber = r.nextInt(15) + 1;
+        for (int i = 0; i < nber; i++) {
+            addContainerTypeRandom(site, name);
+        }
+        site.reload();
+        return nber;
+    }
+
     protected ContainerWrapper newContainer(String label, String barcode,
         ContainerWrapper parent, SiteWrapper site, ContainerTypeWrapper type)
         throws Exception {
@@ -241,7 +272,32 @@ public class TestDatabase {
             type, row, col);
         container.persist();
         return container;
+    }
 
+    protected ContainerWrapper addContainerRandom(SiteWrapper site, String name)
+        throws Exception {
+        ContainerTypeWrapper type = addContainerTypeRandom(site, name);
+        String label = null;
+        if ((type.getTopLevel() != null) && type.getTopLevel()) {
+            label = String.valueOf(r.nextInt());
+        }
+        ContainerWrapper container = addContainer(label, name + "Random"
+            + r.nextInt(), null, site, type);
+        if (label == null) {
+            container.setPosition(0, 0);
+        }
+        container.persist();
+        return container;
+    }
+
+    protected int addContainersRandom(SiteWrapper site, String name)
+        throws Exception {
+        int nber = r.nextInt(15) + 1;
+        for (int i = 0; i < nber; i++) {
+            addContainerRandom(site, name);
+        }
+        site.reload();
+        return nber;
     }
 
     protected PatientWrapper newPatient(String number) {
@@ -295,20 +351,56 @@ public class TestDatabase {
         return sample;
     }
 
-    protected StudyWrapper newStudy(String name, String nameShort,
-        SiteWrapper site) {
-        StudyWrapper study = new StudyWrapper(appService);
-        study.setName(name);
-        study.setNameShort(nameShort);
-        study.setSite(site);
-        return study;
+    protected void deletedCreatedSites() throws Exception {
+        for (SiteWrapper site : createdSites) {
+            site.reload();
+            removeContainers(site.getContainerCollection());
+            removeStudies(site.getStudyCollection());
+            removeFromList(site.getClinicCollection());
+            removeFromList(site.getContainerTypeCollection());
+            site.reload();
+            site.delete();
+        }
     }
 
-    protected StudyWrapper addStudy(String name, String nameShort,
-        SiteWrapper site) throws Exception {
-        StudyWrapper study = newStudy(name, nameShort, site);
-        study.persist();
-        return study;
+    protected void removeContainers(List<ContainerWrapper> containers)
+        throws Exception {
+        for (ContainerWrapper container : containers) {
+            if (container.hasChildren()) {
+                removeContainers(container.getChildren());
+            } else {
+                removeFromList(container.getSamples());
+            }
+            container.reload();
+            container.delete();
+        }
+    }
+
+    protected void removeStudies(List<StudyWrapper> studies) throws Exception {
+        for (StudyWrapper study : studies) {
+            removePatients(study.getPatientCollection());
+            study.reload();
+            study.delete();
+        }
+    }
+
+    protected void removePatients(List<PatientWrapper> patients)
+        throws Exception {
+        for (PatientWrapper patient : patients) {
+            removeFromList(patient.getPatientVisitCollection());
+            patient.reload();
+            patient.delete();
+        }
+    }
+
+    protected void removeFromList(List<? extends ModelWrapper<?>> list)
+        throws Exception {
+        if (list != null) {
+            for (ModelWrapper<?> object : list) {
+                object.reload();
+                object.delete();
+            }
+        }
     }
 
     protected SiteWrapper newSite(String name, String street1) {
@@ -318,10 +410,92 @@ public class TestDatabase {
         return site;
     }
 
-    protected SiteWrapper addSite(String name, String street1) throws Exception {
-        SiteWrapper site = newSite(name, street1);
-        site.persist();
+    protected SiteWrapper newSite(String name) throws Exception {
+        SiteWrapper site = new SiteWrapper(appService);
+        site.setName(name + r.nextInt());
+        site.setCity("");
         return site;
+    }
+
+    protected SiteWrapper addSite(String name, boolean addToCreatedList)
+        throws Exception {
+        SiteWrapper site = newSite(name);
+        site.persist();
+        if (addToCreatedList) {
+            createdSites.add(site);
+        }
+        return site;
+    }
+
+    protected SiteWrapper addSite(String name) throws Exception {
+        return addSite(name, true);
+    }
+
+    protected int addSites(String name) throws Exception {
+        int nber = r.nextInt(15) + 1;
+        for (int i = 0; i < nber; i++) {
+            addSite(name);
+        }
+        return nber;
+    }
+
+    protected StudyWrapper newStudy(String name, String nameShort,
+        SiteWrapper site) {
+        StudyWrapper study = new StudyWrapper(appService);
+        study.setName(name);
+        study.setNameShort(nameShort);
+        study.setSite(site);
+        return study;
+    }
+
+    protected StudyWrapper newStudy(SiteWrapper site, String name)
+        throws Exception {
+        StudyWrapper study = new StudyWrapper(appService);
+        study.setName(name + "Random" + r.nextInt());
+        study.setSite(site);
+        return study;
+    }
+
+    protected StudyWrapper addStudy(SiteWrapper site, String name)
+        throws Exception {
+        StudyWrapper study = newStudy(site, name);
+        study.persist();
+        return study;
+    }
+
+    protected int addStudies(SiteWrapper site, String name) throws Exception {
+        int studiesNber = r.nextInt(15) + 1;
+        for (int i = 0; i < studiesNber; i++) {
+            addStudy(site, name);
+        }
+        site.reload();
+        return studiesNber;
+    }
+
+    protected ClinicWrapper newClinic(SiteWrapper site, String name)
+        throws Exception {
+        ClinicWrapper clinic = new ClinicWrapper(appService);
+        clinic.setName(name + "Random" + r.nextInt());
+        clinic.setCity("");
+        clinic.setSite(site);
+
+        return clinic;
+    }
+
+    protected ClinicWrapper addClinic(SiteWrapper site, String name)
+        throws Exception {
+        ClinicWrapper clinic = newClinic(site, name);
+        clinic.persist();
+        return clinic;
+    }
+
+    protected int addClinics(SiteWrapper site, String name) throws Exception {
+        int nber = r.nextInt(15) + 1;
+        for (int i = 0; i < nber; i++) {
+            addClinic(site, name);
+        }
+        site.reload();
+        return nber;
     }
 
 }

@@ -39,6 +39,7 @@ public class TestContainer extends TestDatabase {
 
     private Map<String, ContainerWrapper> containerMap;
 
+    @Override
     @Before
     public void setUp() throws Exception {
         super.setUp();
@@ -59,6 +60,7 @@ public class TestContainer extends TestDatabase {
     }
 
     @After
+    @Override
     public void tearDown() throws Exception {
         deleteContainers();
         deleteContainerTypes();
