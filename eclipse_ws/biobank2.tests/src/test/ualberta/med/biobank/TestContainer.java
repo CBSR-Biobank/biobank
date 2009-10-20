@@ -67,6 +67,7 @@ public class TestContainer extends TestDatabase {
     @After
     @Override
     public void tearDown() throws Exception {
+        super.tearDown();
         deleteContainers();
         deleteContainerTypes();
     }
@@ -144,8 +145,9 @@ public class TestContainer extends TestDatabase {
 
     @Test
     public void testGettersAndSetters() throws BiobankCheckException, Exception {
-        ContainerHelper.addContainer(null, null, null, site, containerTypeMap
-            .get("TopCT"));
+        ContainerWrapper container = ContainerHelper.addContainer(null, null,
+            null, site, containerTypeMap.get("TopCT"));
+        testGettersAndSetters(container);
     }
 
     @Test
@@ -458,9 +460,9 @@ public class TestContainer extends TestDatabase {
         StudyWrapper study = StudyHelper.addStudy("Study1", "S1", site);
 
         PatientWrapper patient = PatientHelper.addPatient("1000", study);
-        PatientVisitWrapper pv = PatientVisitHelper
-            .addPatientVisit(patient, Utils.getRandomDate(), Utils
-                .getRandomDate(), Utils.getRandomDate());
+        PatientVisitWrapper pv = PatientVisitHelper.addPatientVisit(patient,
+            null, Utils.getRandomDate(), Utils.getRandomDate(), Utils
+                .getRandomDate());
         addContainerHierarchy();
         ContainerWrapper childL3 = containerMap.get("ChildL3");
         for (int i = 0, n = sampleTypeList.size(); i < n; ++i) {
@@ -490,9 +492,9 @@ public class TestContainer extends TestDatabase {
         StudyWrapper study = StudyHelper.addStudy("Study1", "S1", site);
 
         PatientWrapper patient = PatientHelper.addPatient("1000", study);
-        PatientVisitWrapper pv = PatientVisitHelper
-            .addPatientVisit(patient, Utils.getRandomDate(), Utils
-                .getRandomDate(), Utils.getRandomDate());
+        PatientVisitWrapper pv = PatientVisitHelper.addPatientVisit(patient,
+            null, Utils.getRandomDate(), Utils.getRandomDate(), Utils
+                .getRandomDate());
         addContainerHierarchy();
         ContainerWrapper childL3 = containerMap.get("ChildL3");
         for (int i = 0, n = sampleTypeList.size(); i < n; ++i) {

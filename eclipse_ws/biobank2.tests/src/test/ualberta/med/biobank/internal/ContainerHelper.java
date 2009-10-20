@@ -7,6 +7,8 @@ import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.common.wrappers.internal.ContainerLabelingSchemeWrapper;
+import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
 
 public class ContainerHelper extends DbHelper {
 
@@ -70,8 +72,7 @@ public class ContainerHelper extends DbHelper {
         if ((type.getTopLevel() != null) && type.getTopLevel()) {
             label = String.valueOf(r.nextInt());
         }
-        ContainerWrapper container = addContainer(label, name, null, site,
-            type);
+        ContainerWrapper container = addContainer(label, name, null, site, type);
         if (label == null) {
             container.setPosition(0, 0);
         }
@@ -104,4 +105,10 @@ public class ContainerHelper extends DbHelper {
         }
     }
 
+    public static ContainerLabelingSchemeWrapper newContainerLabelingScheme() {
+        ContainerLabelingSchemeWrapper clsw = new ContainerLabelingSchemeWrapper(
+            appService, new ContainerLabelingScheme());
+        clsw.setName("SchemeName");
+        return clsw;
+    }
 }

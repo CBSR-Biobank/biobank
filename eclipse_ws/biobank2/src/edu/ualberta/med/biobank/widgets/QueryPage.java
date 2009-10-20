@@ -1,5 +1,7 @@
 package edu.ualberta.med.biobank.widgets;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,14 +17,17 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 
-import edu.ualberta.med.biobank.model.Clinic;
-import edu.ualberta.med.biobank.model.Container;
-import edu.ualberta.med.biobank.model.ContainerType;
-import edu.ualberta.med.biobank.model.Patient;
-import edu.ualberta.med.biobank.model.Sample;
-import edu.ualberta.med.biobank.model.Site;
-import edu.ualberta.med.biobank.model.Study;
-import edu.ualberta.med.biobank.views.ReportsView;
+import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.views.AdvancedReportsView;
+import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class QueryPage extends Composite {
@@ -31,7 +36,7 @@ public class QueryPage extends Composite {
     private Composite whereBars;
     private Composite parent;
     private Composite subSection;
-    private ReportsView view;
+    private AdvancedReportsView view;
 
     private List<Class<?>> searchableModelObjects;
     private List<Method> modelObjectMethods;
@@ -39,9 +44,10 @@ public class QueryPage extends Composite {
     private AttributeQueryClause attributeClause;
     private List<ModelObjectQuery> modelObjectClauses;
 
-    public QueryPage(ReportsView view, Composite parent, int style) {
+    public QueryPage(AdvancedReportsView advancedReportsView, Composite parent,
+        int style) {
         super(parent, style);
-        this.view = view;
+        this.view = advancedReportsView;
         this.parent = parent;
         GridLayout queryLayout = new GridLayout(3, false);
         queryLayout.verticalSpacing = 20;
@@ -91,9 +97,9 @@ public class QueryPage extends Composite {
             .getSelection();
         Class<?> type = (Class<?>) typeSelection.getFirstElement();
         // Field[] classFields = type.getDeclaredFields();
-        List<Method> methods = filterMethods(type.getDeclaredMethods(), true);
+        List<Method> methods = filterMethods(type);
 
-        attributeClause = new AttributeQueryClause(whereBars, type,
+        attributeClause = new AttributeQueryClause(whereBars, methods,
             AttributeQueryClause.getText(type.getName()), view);
 
         modelObjectClauses = new ArrayList<ModelObjectQuery>();
@@ -117,6 +123,9 @@ public class QueryPage extends Composite {
             modelObjectClauses.add(new ModelObjectQuery(subSection, method,
                 AttributeQueryClause.getText(type.getName()), view));
 
+        // update parents
+        view.resetSearch();
+        view.updateScrollBars();
         QueryPage.this.parent.layout(true, true);
 
     }
@@ -132,28 +141,83 @@ public class QueryPage extends Composite {
         }
     }
 
-    public static List<Method> filterMethods(Method[] unfiltered,
-        boolean includeCollections) {
+    public static List<Method> filterMethods(Class<?> type) {
+        Method[] unfiltered = type.getDeclaredMethods();
         List<Method> filtered = new ArrayList<Method>();
-        for (int i = 0; i < unfiltered.length; i++)
-            if (unfiltered[i].getName().startsWith("get")
-                && !unfiltered[i].getName().contains("Proxied")
-                && !unfiltered[i].getName().contains("Call")
-                && !unfiltered[i].getName().contains("Advisors")
-                && !unfiltered[i].getName().contains("Target")
-                && (!unfiltered[i].getName().contains("Collection") || includeCollections))
-                filtered.add(unfiltered[i]);
+        Method getProperties = null;
+        String[] props = null;
+        if (type.getName().contains("Wrapper")) {
+            try {
+                getProperties = type
+                    .getDeclaredMethod("getPropertyChangesNames");
+                getProperties.setAccessible(true);
+            } catch (SecurityException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (NoSuchMethodException e) {
+                e.printStackTrace();
+            }
+            try {
+                Constructor<?> c = null;
+                try {
+                    c = type
+                        .getDeclaredConstructor(WritableApplicationService.class);
+                    c.setAccessible(true);
+                } catch (SecurityException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                } catch (NoSuchMethodException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+                Object arglist = null;
+                props = (String[]) getProperties.invoke(c.newInstance(arglist));
+            } catch (IllegalArgumentException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (InvocationTargetException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (InstantiationException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+        for (int i = 0; i < unfiltered.length; i++) {
+            String name = unfiltered[i].getName();
+            if (name.startsWith("get")
+                && unfiltered[i].getParameterTypes().length == 0) {
+                if (props != null) {
+                    for (int j = 0; j < props.length; j++) {
+                        if (name.substring(3).compareToIgnoreCase(props[j]) == 0) {
+                            filtered.add(unfiltered[i]);
+                            break;
+                        }
+                    }
+                } else
+                    filtered.add(unfiltered[i]);
+            }
+        }
         return filtered;
     }
 
+    public Class<?> getActiveWrapperClass() {
+        IStructuredSelection typeSelection = (IStructuredSelection) selectedTypeCombo
+            .getSelection();
+        return (Class<?>) (typeSelection.getFirstElement());
+    }
+
     private void createSearchablesList() {
-        searchableModelObjects.add(Container.class);
-        searchableModelObjects.add(ContainerType.class);
-        searchableModelObjects.add(Site.class);
-        searchableModelObjects.add(Patient.class);
-        searchableModelObjects.add(Study.class);
-        searchableModelObjects.add(Sample.class);
-        searchableModelObjects.add(Clinic.class);
+        searchableModelObjects.add(ContainerWrapper.class);
+        searchableModelObjects.add(ContainerTypeWrapper.class);
+        searchableModelObjects.add(SiteWrapper.class);
+        searchableModelObjects.add(PatientWrapper.class);
+        searchableModelObjects.add(StudyWrapper.class);
+        searchableModelObjects.add(SampleWrapper.class);
+        searchableModelObjects.add(ClinicWrapper.class);
     }
 
     @SuppressWarnings("unchecked")
@@ -163,8 +227,32 @@ public class QueryPage extends Composite {
             .getSelection();
         Class<?> type = (Class<?>) typeSelection.getFirstElement();
         String query = "select " + AttributeQueryClause.getText(type.getName());
-        query += " from " + type.getName() + " as "
-            + AttributeQueryClause.getText(type.getName());
+        try {
+            query += " from "
+                + ((ModelWrapper<?>) type.getDeclaredConstructor(
+                    WritableApplicationService.class).newInstance(
+                    SessionManager.getAppService())).getWrappedClass()
+                    .getName() + " as "
+                + AttributeQueryClause.getText(type.getName());
+        } catch (IllegalArgumentException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (SecurityException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (InstantiationException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (NoSuchMethodException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
 
         List<Object> params = new ArrayList<Object>();
 

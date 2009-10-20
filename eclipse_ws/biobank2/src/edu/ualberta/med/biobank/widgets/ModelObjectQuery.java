@@ -12,7 +12,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 
-import edu.ualberta.med.biobank.views.ReportsView;
+import edu.ualberta.med.biobank.views.AdvancedReportsView;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class ModelObjectQuery {
@@ -25,13 +25,9 @@ public class ModelObjectQuery {
     private Type modelObjectType;
     private String joins;
 
-    // private String alias;
-
     public ModelObjectQuery(Composite parent, Method modelObjectMethod,
-        String alias, ReportsView view) {
-
+        String alias, AdvancedReportsView view) {
         with = new Label(parent, SWT.NONE);
-        // this.alias = alias;
         joins = "";
 
         // is it a collection?
@@ -47,7 +43,7 @@ public class ModelObjectQuery {
             // it's not a collection
             modelObjectClass = (Class<?>) modelObjectType;
             with.setText("With: "
-                + AttributeQueryClause.getText(modelObjectClass));
+                + AttributeQueryClause.getText(modelObjectClass.toString()));
         }
         radio = new Button(parent, SWT.CHECK);
         radio.setSelection(false);
@@ -67,10 +63,10 @@ public class ModelObjectQuery {
             joins += alias;
         } else
             alias += "."
-                + AttributeQueryClause.getText(modelObjectClass.getName());
+                + AttributeQueryClause.getText(modelObjectMethod.getName());
 
-        clause = new AttributeQueryClause(attributeQueries, modelObjectClass,
-            alias, view);
+        clause = new AttributeQueryClause(attributeQueries, QueryPage
+            .filterMethods(modelObjectClass), alias, view);
 
         radio.addSelectionListener(new SelectionAdapter() {
             @Override

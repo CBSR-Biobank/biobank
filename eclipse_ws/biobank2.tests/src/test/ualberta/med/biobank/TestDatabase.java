@@ -22,15 +22,11 @@ public class TestDatabase {
 
     protected Random r;
 
-    private static final List<String> IGNORE_RETURN_TYPES = new ArrayList<String>() {
+    private static final List<Class<?>> IGNORE_RETURN_TYPES = new ArrayList<Class<?>>() {
         private static final long serialVersionUID = 1L;
         {
-            add("java.lang.Class");
-            add("java.lang.Object");
-            add("java.util.Set");
-            add("java.util.List");
-            add("java.util.Collection");
-            add("[Ljava.lang.String;"); // array of strings
+            add(java.lang.Class.class);
+            add(java.lang.Object.class);
         }
     };
 
@@ -66,10 +62,11 @@ public class TestDatabase {
         for (Method method : methods) {
             if (method.getName().startsWith("get")
                 && !method.getName().equals("getClass")
-                && !IGNORE_RETURN_TYPES.contains(method.getReturnType()
-                    .getName())
+                && !IGNORE_RETURN_TYPES.contains(method.getReturnType())
+                && !Collection.class.isAssignableFrom(method.getReturnType())
+                && !method.getReturnType().isArray()
                 && !method.getReturnType().getName().startsWith(
-                    "edu.ualberta.med.biobank.common.wrappers")) {
+                    "edu.ualberta.med.biobank.common")) {
                 GetterInfo getterInfo = new GetterInfo();
                 getterInfo.getMethod = method;
                 map.put(method.getName(), getterInfo);
@@ -105,25 +102,24 @@ public class TestDatabase {
                 continue;
             }
 
-            String getReturnType = getterInfo.getMethod.getReturnType()
-                .getName();
+            Class<?> returnType = getterInfo.getMethod.getReturnType();
 
             for (int i = 0; i < 5; ++i) {
                 Object parameter = null;
 
-                if (getReturnType.equals("java.lang.Boolean")) {
+                if (returnType.equals(java.lang.Boolean.class)) {
                     parameter = new Boolean(r.nextBoolean());
-                } else if (getReturnType.equals("java.lang.Integer")) {
+                } else if (returnType.equals(java.lang.Integer.class)) {
                     parameter = new Integer(r.nextInt());
-                } else if (getReturnType.equals("java.lang.Double")) {
+                } else if (returnType.equals(java.lang.Double.class)) {
                     parameter = new Double(r.nextDouble());
-                } else if (getReturnType.equals("java.lang.String")) {
+                } else if (returnType.equals(java.lang.String.class)) {
                     parameter = Utils.getRandomString(32);
-                } else if (getReturnType.equals("java.util.Date")) {
+                } else if (returnType.equals(java.util.Date.class)) {
                     parameter = Utils.getRandomDate();
                 } else {
-                    System.out.println(getReturnType);
-                    throw new Exception("return type " + getReturnType
+                    throw new Exception("return type "
+                        + getterInfo.getMethod.getReturnType().getName()
                         + " for method " + getterInfo.getMethod.getName()
                         + " for class " + w.getClass().getName()
                         + " not implemented");
@@ -141,5 +137,4 @@ public class TestDatabase {
         }
 
     }
-
 }
