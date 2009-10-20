@@ -9,6 +9,15 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
+import test.ualberta.med.biobank.internal.ClinicHelper;
+import test.ualberta.med.biobank.internal.ContainerHelper;
+import test.ualberta.med.biobank.internal.ContainerTypeHelper;
+import test.ualberta.med.biobank.internal.PatientHelper;
+import test.ualberta.med.biobank.internal.PatientVisitHelper;
+import test.ualberta.med.biobank.internal.SampleHelper;
+import test.ualberta.med.biobank.internal.SiteHelper;
+import test.ualberta.med.biobank.internal.StudyHelper;
+
 @RunWith(Suite.class)
 @SuiteClasses( { TestContainerType.class, TestContainer.class, TestSite.class,
     TestContact.class, TestContainerLabelingScheme.class,
@@ -23,6 +32,15 @@ public class AllTests {
             .getApplicationServiceFromUrl("http://"
                 + System.getProperty("server", "localhost:8080") + "/biobank2",
                 "testuser", "test");
+
+        ClinicHelper.setAppService(appService);
+        ContainerHelper.setAppService(appService);
+        ContainerTypeHelper.setAppService(appService);
+        PatientHelper.setAppService(appService);
+        PatientVisitHelper.setAppService(appService);
+        SampleHelper.setAppService(appService);
+        SiteHelper.setAppService(appService);
+        StudyHelper.setAppService(appService);
     }
 
     @AfterClass

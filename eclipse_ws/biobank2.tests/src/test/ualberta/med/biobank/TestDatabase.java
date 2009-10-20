@@ -1,21 +1,12 @@
 package test.ualberta.med.biobank;
 
 import edu.ualberta.med.biobank.common.BiobankCheckException;
-import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
-import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
-import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
@@ -151,302 +142,176 @@ public class TestDatabase {
 
     }
 
-    protected ContainerTypeWrapper newContainerType(SiteWrapper site,
-        String name, String nameShort, Integer labelingScheme,
-        Integer rowCapacity, Integer colCapacity, boolean isTopLevel) {
-        ContainerTypeWrapper ct = new ContainerTypeWrapper(appService);
-        ct.setSite(site);
-        ct.setName(name);
-        ct.setNameShort(nameShort);
-        ct.setChildLabelingScheme(labelingScheme);
-        if (rowCapacity != null)
-            ct.setRowCapacity(rowCapacity);
-        if (colCapacity != null)
-            ct.setColCapacity(colCapacity);
-        ct.setTopLevel(isTopLevel);
-        return ct;
-    }
-
-    protected ContainerTypeWrapper addContainerType(SiteWrapper site,
-        String name, String nameShort, Integer labelingScheme,
-        Integer rowCapacity, Integer colCapacity, boolean isTopLevel)
-        throws BiobankCheckException, Exception {
-        ContainerTypeWrapper container = newContainerType(site, name,
-            nameShort, labelingScheme, rowCapacity, colCapacity, isTopLevel);
-        container.persist();
-        return container;
-    }
-
-    protected ContainerTypeWrapper addContainerTypeRandom(SiteWrapper site,
-        String name) throws Exception {
-        return addContainerType(site, name + "Random" + r.nextInt(), "", null,
-            r.nextInt(10) + 1, r.nextInt(10) + 1, r.nextBoolean());
-    }
-
-    protected int addContainerTypesRandom(SiteWrapper site, String name)
-        throws Exception {
-        int nber = r.nextInt(15) + 1;
-        for (int i = 0; i < nber; i++) {
-            addContainerTypeRandom(site, name);
-        }
-        site.reload();
-        return nber;
-    }
-
-    protected ContainerWrapper newContainer(String label, String barcode,
-        ContainerWrapper parent, SiteWrapper site, ContainerTypeWrapper type)
-        throws Exception {
-        ContainerWrapper container;
-
-        container = new ContainerWrapper(appService);
-        if (label != null) {
-            if (type.getTopLevel()) {
-                container.setLabel(label);
-            } else {
-                throw new Exception(
-                    "cannot set label on non top level containers");
-            }
-        }
-        container.setProductBarcode(barcode);
-        if (parent != null) {
-            container.setParent(parent);
-        }
-        if (site != null) {
-            container.setSite(site);
-        }
-        container.setContainerType(type);
-        return container;
-    }
-
-    protected ContainerWrapper newContainer(String label, String barcode,
-        ContainerWrapper parent, SiteWrapper site, ContainerTypeWrapper type,
-        Integer row, Integer col) throws Exception {
-        ContainerWrapper container = newContainer(label, barcode, parent, site,
-            type);
-        container.setPosition(row, col);
-        return container;
-    }
-
-    protected ContainerWrapper addContainer(String label, String barcode,
-        ContainerWrapper parent, SiteWrapper site, ContainerTypeWrapper type)
-        throws Exception {
-        ContainerWrapper container = newContainer(label, barcode, parent, site,
-            type);
-        container.persist();
-        return container;
-    }
-
-    protected ContainerWrapper addContainer(String label, String barcode,
-        ContainerWrapper parent, SiteWrapper site, ContainerTypeWrapper type,
-        Integer row, Integer col) throws Exception {
-        ContainerWrapper container = newContainer(label, barcode, parent, site,
-            type, row, col);
-        container.persist();
-        return container;
-    }
-
-    protected ContainerWrapper addContainerRandom(SiteWrapper site, String name)
-        throws Exception {
-        ContainerTypeWrapper type = addContainerTypeRandom(site, name);
-        String label = null;
-        if ((type.getTopLevel() != null) && type.getTopLevel()) {
-            label = String.valueOf(r.nextInt());
-        }
-        ContainerWrapper container = addContainer(label, name + "Random"
-            + r.nextInt(), null, site, type);
-        if (label == null) {
-            container.setPosition(0, 0);
-        }
-        container.persist();
-        return container;
-    }
-
-    protected int addContainersRandom(SiteWrapper site, String name)
-        throws Exception {
-        int nber = r.nextInt(15) + 1;
-        for (int i = 0; i < nber; i++) {
-            addContainerRandom(site, name);
-        }
-        site.reload();
-        return nber;
-    }
-
-    protected PatientWrapper newPatient(String number) {
-        PatientWrapper patient = new PatientWrapper(appService);
-        patient.setNumber(number);
-        return patient;
-    }
-
-    protected PatientWrapper addPatient(String number, StudyWrapper study)
-        throws Exception {
-        PatientWrapper patient = newPatient(number);
-        patient.setStudy(study);
-        patient.persist();
-        return patient;
-    }
-
-    protected PatientVisitWrapper newPatientVisit(PatientWrapper patient,
-        Date dateDrawn, Date dateProcessed, Date dateReceived) {
-        PatientVisitWrapper pv = new PatientVisitWrapper(appService);
-        pv.setPatient(patient);
-        pv.setDateDrawn(dateDrawn);
-        pv.setDateProcessed(dateProcessed);
-        pv.setDateReceived(dateReceived);
-        return pv;
-    }
-
-    protected PatientVisitWrapper addPatientVisit(PatientWrapper patient,
-        Date dateDrawn, Date dateProcessed, Date dateReceived) throws Exception {
-        PatientVisitWrapper pv = newPatientVisit(patient, dateDrawn,
-            dateProcessed, dateReceived);
-        pv.persist();
-        return pv;
-    }
-
-    protected SampleWrapper newSample(SampleTypeWrapper sampleType,
-        ContainerWrapper container, PatientVisitWrapper pv, Integer row,
-        Integer col) {
-        SampleWrapper sample = new SampleWrapper(appService);
-        sample.setSampleType(sampleType);
-        sample.setParent(container);
-        sample.setPatientVisit(pv);
-        sample.setPosition(row, col);
-        return sample;
-    }
-
-    protected SampleWrapper addSample(SampleTypeWrapper sampleType,
-        ContainerWrapper container, PatientVisitWrapper pv, Integer row,
-        Integer col) throws Exception {
-        SampleWrapper sample = newSample(sampleType, container, pv, row, col);
-        sample.persist();
-        return sample;
-    }
-
-    // protected void deletedCreatedSites() throws Exception {
-    // for (SiteWrapper site : createdSites) {
-    // site.reload();
-    // removeContainers(site.getContainerCollection());
-    // removeStudies(site.getStudyCollection());
-    // removeClinics(site.getClinicCollection());
-    // removeFromList(site.getContainerTypeCollection());
-    // site.reload();
-    // site.delete();
-    // }
+    // protected ContainerTypeWrapper newContainerType(SiteWrapper site,
+    // String name, String nameShort, Integer labelingScheme,
+    // Integer rowCapacity, Integer colCapacity, boolean isTopLevel) {
+    // ContainerTypeWrapper ct = new ContainerTypeWrapper(appService);
+    // ct.setSite(site);
+    // ct.setName(name);
+    // ct.setNameShort(nameShort);
+    // ct.setChildLabelingScheme(labelingScheme);
+    // if (rowCapacity != null)
+    // ct.setRowCapacity(rowCapacity);
+    // if (colCapacity != null)
+    // ct.setColCapacity(colCapacity);
+    // ct.setTopLevel(isTopLevel);
+    // return ct;
     // }
     //
-    // protected void removeContainers(List<ContainerWrapper> containers)
+    // protected ContainerTypeWrapper addContainerType(SiteWrapper site,
+    // String name, String nameShort, Integer labelingScheme,
+    // Integer rowCapacity, Integer colCapacity, boolean isTopLevel)
+    // throws BiobankCheckException, Exception {
+    // ContainerTypeWrapper container = newContainerType(site, name,
+    // nameShort, labelingScheme, rowCapacity, colCapacity, isTopLevel);
+    // container.persist();
+    // return container;
+    // }
+    //
+    // protected ContainerTypeWrapper addContainerTypeRandom(SiteWrapper site,
+    // String name) throws Exception {
+    // return addContainerType(site, name + "Random" + r.nextInt(), "", null,
+    // r.nextInt(10) + 1, r.nextInt(10) + 1, r.nextBoolean());
+    // }
+    //
+    // protected int addContainerTypesRandom(SiteWrapper site, String name)
     // throws Exception {
-    // for (ContainerWrapper container : containers) {
-    // if (container.hasChildren()) {
-    // removeContainers(container.getChildren());
-    // } else {
-    // removeFromList(container.getSamples());
-    // }
-    // container.reload();
-    // container.delete();
-    // }
-    // }
-    //
-    // protected void removeStudies(List<StudyWrapper> studies) throws Exception
-    // {
-    // for (StudyWrapper study : studies) {
-    // removePatients(study.getPatientCollection());
-    // study.reload();
-    // study.delete();
-    // }
-    // }
-    //
-    // protected void removeClinics(List<ClinicWrapper> clinics) throws
-    // Exception {
-    // for (ClinicWrapper clinic : clinics) {
-    // removeFromList(clinic.getContactCollection());
-    // clinic.reload();
-    // clinic.delete();
-    // }
-    // }
-    //
-    // protected void removePatients(List<PatientWrapper> patients)
-    // throws Exception {
-    // for (PatientWrapper patient : patients) {
-    // removeFromList(patient.getPatientVisitCollection());
-    // patient.reload();
-    // patient.delete();
-    // }
-    // }
-    //
-    // protected void removeFromList(List<? extends ModelWrapper<?>> list)
-    // throws Exception {
-    // if (list != null) {
-    // for (ModelWrapper<?> object : list) {
-    // object.reload();
-    // object.delete();
-    // }
-    // }
-    // }
-    //
-    // protected SiteWrapper newSite(String name) throws Exception {
-    // SiteWrapper site = new SiteWrapper(appService);
-    // site.setName(name + r.nextInt());
-    // site.setCity("");
-    // return site;
-    // }
-    //
-    // protected SiteWrapper addSite(String name, boolean addToCreatedList)
-    // throws Exception {
-    // SiteWrapper site = newSite(name);
-    // site.persist();
-    // if (addToCreatedList) {
-    // createdSites.add(site);
-    // }
-    // return site;
-    // }
-    //
-    // protected SiteWrapper addSite(String name) throws Exception {
-    // return addSite(name, true);
-    // }
-    //
-    // protected int addSites(String name) throws Exception {
     // int nber = r.nextInt(15) + 1;
     // for (int i = 0; i < nber; i++) {
-    // addSite(name);
+    // addContainerTypeRandom(site, name);
     // }
+    // site.reload();
     // return nber;
     // }
     //
-    // protected StudyWrapper newStudy(SiteWrapper site, String name)
+    // protected ContainerWrapper newContainer(String label, String barcode,
+    // ContainerWrapper parent, SiteWrapper site, ContainerTypeWrapper type)
     // throws Exception {
-    // StudyWrapper study = new StudyWrapper(appService);
-    // study.setName(name + "Random" + r.nextInt());
-    // study.setSite(site);
-    // return study;
+    // ContainerWrapper container;
+    //
+    // container = new ContainerWrapper(appService);
+    // if (label != null) {
+    // if (type.getTopLevel()) {
+    // container.setLabel(label);
+    // } else {
+    // throw new Exception(
+    // "cannot set label on non top level containers");
+    // }
+    // }
+    // container.setProductBarcode(barcode);
+    // if (parent != null) {
+    // container.setParent(parent);
+    // }
+    // if (site != null) {
+    // container.setSite(site);
+    // }
+    // container.setContainerType(type);
+    // return container;
     // }
     //
-    // protected StudyWrapper addStudy(SiteWrapper site, String name)
-    // throws Exception {
-    // StudyWrapper study = newStudy(site, name);
-    // study.persist();
-    // return study;
+    // protected ContainerWrapper newContainer(String label, String barcode,
+    // ContainerWrapper parent, SiteWrapper site, ContainerTypeWrapper type,
+    // Integer row, Integer col) throws Exception {
+    // ContainerWrapper container = newContainer(label, barcode, parent, site,
+    // type);
+    // container.setPosition(row, col);
+    // return container;
     // }
     //
-    // protected int addStudies(SiteWrapper site, String name) throws Exception
-    // {
-    // int studiesNber = r.nextInt(15) + 1;
-    // for (int i = 0; i < studiesNber; i++) {
-    // addStudy(site, name);
+    // protected ContainerWrapper addContainer(String label, String barcode,
+    // ContainerWrapper parent, SiteWrapper site, ContainerTypeWrapper type)
+    // throws Exception {
+    // ContainerWrapper container = newContainer(label, barcode, parent, site,
+    // type);
+    // container.persist();
+    // return container;
+    // }
+    //
+    // protected ContainerWrapper addContainer(String label, String barcode,
+    // ContainerWrapper parent, SiteWrapper site, ContainerTypeWrapper type,
+    // Integer row, Integer col) throws Exception {
+    // ContainerWrapper container = newContainer(label, barcode, parent, site,
+    // type, row, col);
+    // container.persist();
+    // return container;
+    // }
+    //
+    // protected ContainerWrapper addContainerRandom(SiteWrapper site, String
+    // name)
+    // throws Exception {
+    // ContainerTypeWrapper type = addContainerTypeRandom(site, name);
+    // String label = null;
+    // if ((type.getTopLevel() != null) && type.getTopLevel()) {
+    // label = String.valueOf(r.nextInt());
+    // }
+    // ContainerWrapper container = addContainer(label, name + "Random"
+    // + r.nextInt(), null, site, type);
+    // if (label == null) {
+    // container.setPosition(0, 0);
+    // }
+    // container.persist();
+    // return container;
+    // }
+    //
+    // protected int addContainersRandom(SiteWrapper site, String name)
+    // throws Exception {
+    // int nber = r.nextInt(15) + 1;
+    // for (int i = 0; i < nber; i++) {
+    // addContainerRandom(site, name);
     // }
     // site.reload();
-    // return studiesNber;
+    // return nber;
     // }
     //
-    // protected ClinicWrapper newClinic(SiteWrapper site, String name)
+    // protected PatientWrapper newPatient(String number) {
+    // PatientWrapper patient = new PatientWrapper(appService);
+    // patient.setNumber(number);
+    // return patient;
+    // }
+    //
+    // protected PatientWrapper addPatient(String number, StudyWrapper study)
     // throws Exception {
-    // ClinicWrapper clinic = new ClinicWrapper(appService);
-    // clinic.setName(name + "Random" + r.nextInt());
-    // clinic.setCity("");
-    // clinic.setSite(site);
-    //
-    // return clinic;
+    // PatientWrapper patient = newPatient(number);
+    // patient.setStudy(study);
+    // patient.persist();
+    // return patient;
     // }
     //
+    // protected PatientVisitWrapper newPatientVisit(PatientWrapper patient,
+    // Date dateDrawn, Date dateProcessed, Date dateReceived) {
+    // PatientVisitWrapper pv = new PatientVisitWrapper(appService);
+    // pv.setPatient(patient);
+    // pv.setDateDrawn(dateDrawn);
+    // pv.setDateProcessed(dateProcessed);
+    // pv.setDateReceived(dateReceived);
+    // return pv;
+    // }
+    //
+    // protected PatientVisitWrapper addPatientVisit(PatientWrapper patient,
+    // Date dateDrawn, Date dateProcessed, Date dateReceived) throws Exception {
+    // PatientVisitWrapper pv = newPatientVisit(patient, dateDrawn,
+    // dateProcessed, dateReceived);
+    // pv.persist();
+    // return pv;
+    // }
+
+    // protected SampleWrapper newSample(SampleTypeWrapper sampleType,
+    // ContainerWrapper container, PatientVisitWrapper pv, Integer row,
+    // Integer col) {
+    // SampleWrapper sample = new SampleWrapper(appService);
+    // sample.setSampleType(sampleType);
+    // sample.setParent(container);
+    // sample.setPatientVisit(pv);
+    // sample.setPosition(row, col);
+    // return sample;
+    // }
+    //
+    // protected SampleWrapper addSample(SampleTypeWrapper sampleType,
+    // ContainerWrapper container, PatientVisitWrapper pv, Integer row,
+    // Integer col) throws Exception {
+    // SampleWrapper sample = newSample(sampleType, container, pv, row, col);
+    // sample.persist();
+    // return sample;
+    // }
 
 }
