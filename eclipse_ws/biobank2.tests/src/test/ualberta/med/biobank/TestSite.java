@@ -5,6 +5,7 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 
+import test.ualberta.med.biobank.internal.ClinicHelper;
 import test.ualberta.med.biobank.internal.SiteHelper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
@@ -95,7 +96,8 @@ public class TestSite extends TestDatabase {
     @Test
     public void testGetClinicCollection() throws Exception {
         SiteWrapper site = SiteHelper.addSite("testGetClinicCollection");
-        int clinicsNber = addClinics(site, "testGetClinicCollection");
+        int clinicsNber = r.nextInt(15) + 1;
+        ClinicHelper.addClinics(site, "testGetClinicCollection", clinicsNber);
 
         List<ClinicWrapper> clinics = site.getClinicCollection();
         int sizeFound = clinics.size();
@@ -106,7 +108,8 @@ public class TestSite extends TestDatabase {
     @Test
     public void testGetClinicCollectionBoolean() throws Exception {
         SiteWrapper site = SiteHelper.addSite("testGetClinicCollectionBoolean");
-        addClinics(site, "testGetClinicCollectionBoolean");
+        int nber = r.nextInt(15) + 1;
+        ClinicHelper.addClinics(site, "testGetClinicCollectionBoolean", nber);
 
         List<ClinicWrapper> clinics = site.getClinicCollection(true);
         if (clinics.size() > 1) {
@@ -121,7 +124,8 @@ public class TestSite extends TestDatabase {
     @Test
     public void testAddInClinicCollection() throws Exception {
         SiteWrapper site = SiteHelper.addSite("testAddInClinicCollection");
-        int nber = addClinics(site, "testAddInClinicCollection");
+        int nber = r.nextInt(15) + 1;
+        ClinicHelper.addClinics(site, "testAddInClinicCollection", nber);
 
         List<ClinicWrapper> clinics = site.getClinicCollection();
         ClinicWrapper clinic = new ClinicWrapper(appService);
@@ -140,7 +144,8 @@ public class TestSite extends TestDatabase {
     @Test
     public void testRemoveInClinicCollection() throws Exception {
         SiteWrapper site = SiteHelper.addSite("testRemoveInClinicCollection");
-        int nber = addClinics(site, "testRemoveInClinicCollection");
+        int nber = r.nextInt(15) + 1;
+        ClinicHelper.addClinics(site, "testRemoveInClinicCollection", nber);
 
         List<ClinicWrapper> clinics = site.getClinicCollection();
         ClinicWrapper clinic = chooseRandomlyInList(clinics);

@@ -13,14 +13,10 @@ public class DbHelper {
 
     protected static WritableApplicationService appService;
 
-    protected static Random r;
+    protected static Random r = new Random();
 
     public static void setAppService(WritableApplicationService appService) {
         DbHelper.appService = appService;
-    }
-
-    public static void setRandomc(Random r) {
-        DbHelper.r = r;
     }
 
     public static void removeContainers(List<ContainerWrapper> containers)

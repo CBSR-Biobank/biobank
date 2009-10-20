@@ -1,7 +1,6 @@
 package test.ualberta.med.biobank;
 
 import edu.ualberta.med.biobank.common.BiobankCheckException;
-import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
@@ -127,9 +126,9 @@ public class TestDatabase {
                 } else if (getReturnType.equals("java.lang.Double")) {
                     parameter = new Double(r.nextDouble());
                 } else if (getReturnType.equals("java.lang.String")) {
-                    parameter = Utils.getRandomString(r, 32);
+                    parameter = Utils.getRandomString(32);
                 } else if (getReturnType.equals("java.util.Date")) {
-                    parameter = Utils.getRandomDate(r);
+                    parameter = Utils.getRandomDate();
                 } else {
                     throw new Exception("return type " + getReturnType
                         + " for method " + getterInfo.getMethod.getName()
@@ -370,32 +369,6 @@ public class TestDatabase {
         }
         site.reload();
         return studiesNber;
-    }
-
-    protected ClinicWrapper newClinic(SiteWrapper site, String name)
-        throws Exception {
-        ClinicWrapper clinic = new ClinicWrapper(appService);
-        clinic.setName(name + "Random" + r.nextInt());
-        clinic.setCity("");
-        clinic.setSite(site);
-
-        return clinic;
-    }
-
-    protected ClinicWrapper addClinic(SiteWrapper site, String name)
-        throws Exception {
-        ClinicWrapper clinic = newClinic(site, name);
-        clinic.persist();
-        return clinic;
-    }
-
-    protected int addClinics(SiteWrapper site, String name) throws Exception {
-        int nber = r.nextInt(15) + 1;
-        for (int i = 0; i < nber; i++) {
-            addClinic(site, name);
-        }
-        site.reload();
-        return nber;
     }
 
 }

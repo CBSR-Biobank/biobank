@@ -13,8 +13,8 @@ public class SiteHelper extends DbHelper {
     public static SiteWrapper newSite(String name) {
         SiteWrapper site = new SiteWrapper(appService);
         site.setName(name);
-        site.setStreet1(Utils.getRandomString(r, 32));
-        site.setCity(Utils.getRandomString(r, 32));
+        site.setStreet1(Utils.getRandomString(32));
+        site.setCity(Utils.getRandomString(32));
         return site;
     }
 

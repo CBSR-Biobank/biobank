@@ -11,6 +11,8 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
+import test.ualberta.med.biobank.internal.SiteHelper;
+
 @RunWith(Suite.class)
 @SuiteClasses( { TestContainerType.class, TestContainer.class,
     TestPatient.class, TestPatientVisit.class, TestSite.class, TestStudy.class })
@@ -25,6 +27,7 @@ public class AllTests {
             .getApplicationServiceFromUrl("http://"
                 + System.getProperty("server", "localhost:8080") + "/biobank2",
                 "testuser", "test");
+        SiteHelper.setAppService(appService);
     }
 
     @AfterClass

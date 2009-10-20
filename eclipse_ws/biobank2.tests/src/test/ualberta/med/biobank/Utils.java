@@ -12,7 +12,9 @@ public class Utils {
 
     private static final int ALPHABET_LEN = ALPHABET.length();
 
-    public static String getRandomString(Random r, int maxlen) {
+    private static Random r = new Random();
+
+    public static String getRandomString(int maxlen) {
         String str = new String();
         for (int j = 0, n = r.nextInt(maxlen) + 1; j < n; ++j) {
             int begin = r.nextInt(ALPHABET_LEN - 1);
@@ -21,7 +23,7 @@ public class Utils {
         return str;
     }
 
-    public static Date getRandomDate(Random r) throws ParseException {
+    public static Date getRandomDate() throws ParseException {
         String dateStr = String.format("%04-%02-%02 %02:%02", 2000 + r
             .nextInt(40), r.nextInt(12) + 1, r.nextInt(30) + 1,
             r.nextInt(24) + 1, r.nextInt(60) + 1);

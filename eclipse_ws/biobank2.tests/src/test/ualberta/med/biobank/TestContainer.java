@@ -464,8 +464,8 @@ public class TestContainer extends TestDatabase {
         StudyWrapper study = addStudy("Study1", "S1", site);
 
         PatientWrapper patient = addPatient("1000", study);
-        PatientVisitWrapper pv = addPatientVisit(patient, Utils
-            .getRandomDate(r), Utils.getRandomDate(r), Utils.getRandomDate(r));
+        PatientVisitWrapper pv = addPatientVisit(patient,
+            Utils.getRandomDate(), Utils.getRandomDate(), Utils.getRandomDate());
         addContainerHierarchy();
         ContainerWrapper childL3 = containerMap.get("ChildL3");
         for (int i = 0, n = sampleTypeList.size(); i < n; ++i) {
@@ -495,8 +495,8 @@ public class TestContainer extends TestDatabase {
         StudyWrapper study = addStudy("Study1", "S1", site);
 
         PatientWrapper patient = addPatient("1000", study);
-        PatientVisitWrapper pv = addPatientVisit(patient, Utils
-            .getRandomDate(r), Utils.getRandomDate(r), Utils.getRandomDate(r));
+        PatientVisitWrapper pv = addPatientVisit(patient,
+            Utils.getRandomDate(), Utils.getRandomDate(), Utils.getRandomDate());
         addContainerHierarchy();
         ContainerWrapper childL3 = containerMap.get("ChildL3");
         for (int i = 0, n = sampleTypeList.size(); i < n; ++i) {
