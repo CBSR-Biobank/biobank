@@ -51,7 +51,7 @@ public class TestDatabase {
     @After
     public void tearDown() throws Exception {
         try {
-            SiteHelper.deletedCreatedSites();
+            SiteHelper.deleteCreatedSites();
         } catch (Exception e) {
             e.printStackTrace(System.err);
             Assert.fail();

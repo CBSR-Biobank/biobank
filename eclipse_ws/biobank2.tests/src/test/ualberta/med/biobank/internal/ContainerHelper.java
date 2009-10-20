@@ -1,9 +1,5 @@
 package test.ualberta.med.biobank.internal;
 
-import java.util.Iterator;
-import java.util.List;
-
-import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
@@ -86,23 +82,6 @@ public class ContainerHelper extends DbHelper {
             addContainerRandom(site, barcode + (i + 1));
         }
         site.reload();
-    }
-
-    // recursive method to delete child containers
-    public static void deleteContainers(List<ContainerWrapper> containerList)
-        throws BiobankCheckException, Exception {
-        if ((containerList == null) || (containerList.size() == 0))
-            return;
-
-        Iterator<ContainerWrapper> it = containerList.iterator();
-        while (it.hasNext()) {
-            ContainerWrapper container = it.next();
-            if (container.getChildren().size() > 0) {
-                deleteContainers(container.getChildren());
-            }
-            container.reload();
-            container.delete();
-        }
     }
 
     public static ContainerLabelingSchemeWrapper newContainerLabelingScheme() {

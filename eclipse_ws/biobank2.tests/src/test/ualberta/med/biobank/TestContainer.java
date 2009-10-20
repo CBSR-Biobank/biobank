@@ -10,7 +10,6 @@ import java.util.Map;
 
 import junit.framework.Assert;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -49,42 +48,11 @@ public class TestContainer extends TestDatabase {
     @Before
     public void setUp() throws Exception {
         super.setUp();
-        List<SiteWrapper> sites = SiteWrapper.getAllSites(appService);
         containerTypeMap = new HashMap<String, ContainerTypeWrapper>();
 
-        if (sites.size() > 0) {
-            site = sites.get(0);
-        } else {
-            site = SiteHelper.addSite("Site - Container Test");
-        }
-
-        deleteContainers();
-        deleteContainerTypes();
+        site = SiteHelper.addSite("Site - Container Test");
         addContainerTypes();
         addContainers();
-    }
-
-    @After
-    @Override
-    public void tearDown() throws Exception {
-        super.tearDown();
-        deleteContainers();
-        deleteContainerTypes();
-    }
-
-    private void deleteContainerTypes() throws Exception {
-        List<ContainerTypeWrapper> containerTypeList = site
-            .getContainerTypeCollection();
-        if (containerTypeList != null) {
-            for (ContainerTypeWrapper containerType : containerTypeList) {
-                containerType.delete();
-            }
-        }
-    }
-
-    private void deleteContainers() throws Exception {
-        site.reload();
-        ContainerHelper.deleteContainers(site.getTopContainerCollection());
     }
 
     private void addContainerTypes() throws BiobankCheckException, Exception {
@@ -148,6 +116,7 @@ public class TestContainer extends TestDatabase {
         ContainerWrapper container = ContainerHelper.addContainer(null, null,
             null, site, containerTypeMap.get("TopCT"));
         testGettersAndSetters(container);
+        System.out.println("testGettersAndSetters");
     }
 
     @Test
@@ -155,6 +124,7 @@ public class TestContainer extends TestDatabase {
         ContainerWrapper container = ContainerHelper.addContainer(null, null,
             null, site, containerTypeMap.get("TopCT"));
         Assert.assertEquals(Container.class, container.getWrappedClass());
+        System.out.println("testGetWrappedClass");
     }
 
     @Test
@@ -167,6 +137,7 @@ public class TestContainer extends TestDatabase {
         Container containerInDB = ModelUtils.getObjectWithId(appService,
             Container.class, id);
         Assert.assertNotNull(containerInDB);
+        System.out.println("createValidContainer");
     }
 
     @Test(expected = BiobankCheckException.class)
