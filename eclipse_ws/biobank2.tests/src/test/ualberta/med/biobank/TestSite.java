@@ -7,6 +7,7 @@ import org.junit.Test;
 
 import test.ualberta.med.biobank.internal.ClinicHelper;
 import test.ualberta.med.biobank.internal.SiteHelper;
+import test.ualberta.med.biobank.internal.StudyHelper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
@@ -28,7 +29,8 @@ public class TestSite extends TestDatabase {
     @Test
     public void testGetStudyCollection() throws Exception {
         SiteWrapper site = SiteHelper.addSite("testGetStudyCollection");
-        int studiesNber = addStudies(site, "testGetStudyCollection");
+        int studiesNber = r.nextInt(15) + 1;
+        StudyHelper.addStudies(site, "testGetStudyCollection", studiesNber);
 
         List<StudyWrapper> studies = site.getStudyCollection();
         int sizeFound = studies.size();
@@ -39,7 +41,8 @@ public class TestSite extends TestDatabase {
     @Test
     public void testGetStudyCollectionBoolean() throws Exception {
         SiteWrapper site = SiteHelper.addSite("testGetStudyCollectionBoolean");
-        addStudies(site, "testGetStudyCollectionBoolean");
+        StudyHelper.addStudies(site, "testGetStudyCollectionBoolean", r
+            .nextInt(15) + 1);
 
         List<StudyWrapper> studiesSorted = site.getStudyCollection(true);
         if (studiesSorted.size() > 1) {
@@ -54,7 +57,8 @@ public class TestSite extends TestDatabase {
     @Test
     public void testAddInStudyCollection() throws Exception {
         SiteWrapper site = SiteHelper.addSite("testAddInStudyCollection");
-        int studiesNber = addStudies(site, "testAddInStudyCollection");
+        int studiesNber = r.nextInt(15) + 1;
+        StudyHelper.addStudies(site, "testAddInStudyCollection", studiesNber);
 
         List<StudyWrapper> studies = site.getStudyCollection();
         StudyWrapper study = new StudyWrapper(appService);
@@ -72,7 +76,9 @@ public class TestSite extends TestDatabase {
     @Test
     public void testRemoveInStudyCollection() throws Exception {
         SiteWrapper site = SiteHelper.addSite("testRemoveInStudyCollection");
-        int studiesNber = addStudies(site, "testRemoveInStudyCollection");
+        int studiesNber = r.nextInt(15) + 1;
+        StudyHelper
+            .addStudies(site, "testRemoveInStudyCollection", studiesNber);
 
         List<StudyWrapper> studies = site.getStudyCollection();
         StudyWrapper study = chooseRandomlyInList(studies);

@@ -8,7 +8,7 @@ public class ClinicHelper extends DbHelper {
     public static ClinicWrapper newClinic(SiteWrapper site, String name)
         throws Exception {
         ClinicWrapper clinic = new ClinicWrapper(appService);
-        clinic.setName(name + "Random" + r.nextInt());
+        clinic.setName(name);
         clinic.setCity("");
         clinic.setSite(site);
 
@@ -25,7 +25,7 @@ public class ClinicHelper extends DbHelper {
     public static void addClinics(SiteWrapper site, String name, int count)
         throws Exception {
         for (int i = 0; i < count; i++) {
-            addClinic(site, name);
+            addClinic(site, name + (i + 1));
         }
         site.reload();
     }

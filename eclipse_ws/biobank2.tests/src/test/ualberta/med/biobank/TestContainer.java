@@ -16,6 +16,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import test.ualberta.med.biobank.internal.SiteHelper;
+import test.ualberta.med.biobank.internal.StudyHelper;
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.LabelingScheme;
 import edu.ualberta.med.biobank.common.RowColPos;
@@ -461,7 +462,7 @@ public class TestContainer extends TestDatabase {
         childTypeL3.setSampleTypeCollection(sampleTypeList);
         childTypeL3.persist();
 
-        StudyWrapper study = addStudy("Study1", "S1", site);
+        StudyWrapper study = StudyHelper.addStudy("Study1", "S1", site);
 
         PatientWrapper patient = addPatient("1000", study);
         PatientVisitWrapper pv = addPatientVisit(patient,
@@ -492,7 +493,7 @@ public class TestContainer extends TestDatabase {
         childTypeL3.setSampleTypeCollection(sampleTypeList);
         childTypeL3.persist();
 
-        StudyWrapper study = addStudy("Study1", "S1", site);
+        StudyWrapper study = StudyHelper.addStudy("Study1", "S1", site);
 
         PatientWrapper patient = addPatient("1000", study);
         PatientVisitWrapper pv = addPatientVisit(patient,

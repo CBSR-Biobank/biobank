@@ -6,6 +6,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import test.ualberta.med.biobank.internal.SiteHelper;
+import test.ualberta.med.biobank.internal.StudyHelper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.Study;
@@ -15,14 +16,15 @@ public class TestStudy extends TestDatabase {
     @Test
     public void testGettersAndSetters() throws Exception {
         SiteWrapper site = SiteHelper.addSite("testGettersAndSetters");
-        StudyWrapper study = addStudy(site, "testGettersAndSetters");
+        StudyWrapper study = StudyHelper
+            .addStudy(site, "testGettersAndSetters");
         testGettersAndSetters(study);
     }
 
     @Test
     public void testSetGetSite() throws Exception {
         SiteWrapper site = SiteHelper.addSite("testGetSite");
-        StudyWrapper study = addStudy(site, "testGetSite");
+        StudyWrapper study = StudyHelper.addStudy(site, "testGetSite");
 
         SiteWrapper site2 = SiteHelper.addSite("testGetSite-2-");
         study.setSite(site2);
@@ -42,7 +44,8 @@ public class TestStudy extends TestDatabase {
     // @Test
     // public void testGetContactCollection() {
     // SiteWrapper site = SiteHelper.addSite("testGetContactCollection");
-    // StudyWrapper study = addStudy(site, "testGetContactCollection");
+    // StudyWrapper study = StudyHelper.addStudy(site,
+    // "testGetContactCollection");
     // addContactsToStudy(study, "testGetContactCollection");
     //
     // List<ContactWrapper> contacts = study.getContactCollection();
@@ -196,8 +199,8 @@ public class TestStudy extends TestDatabase {
 
     @Test
     public void testDelete() throws Exception {
-        StudyWrapper study = addStudy(SiteHelper.addSite("testDelete"),
-            "testDelete");
+        StudyWrapper study = StudyHelper.addStudy(SiteHelper
+            .addSite("testDelete"), "testDelete");
         // object is in database
         Assert.assertNotNull(study);
         study.delete();
@@ -209,7 +212,7 @@ public class TestStudy extends TestDatabase {
 
     @Test
     public void testResetAlreadyInDatabase() throws Exception {
-        StudyWrapper study = addStudy(SiteHelper
+        StudyWrapper study = StudyHelper.addStudy(SiteHelper
             .addSite("testResetAlreadyInDatabase"),
             "testResetAlreadyInDatabase");
         study.reload();

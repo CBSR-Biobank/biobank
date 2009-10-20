@@ -331,44 +331,4 @@ public class TestDatabase {
         return sample;
     }
 
-    protected StudyWrapper newStudy(String name, String nameShort,
-        SiteWrapper site) {
-        StudyWrapper study = new StudyWrapper(appService);
-        study.setName(name);
-        study.setNameShort(nameShort);
-        study.setSite(site);
-        return study;
-    }
-
-    protected StudyWrapper newStudy(SiteWrapper site, String name)
-        throws Exception {
-        StudyWrapper study = new StudyWrapper(appService);
-        study.setName(name + "Random" + r.nextInt());
-        study.setSite(site);
-        return study;
-    }
-
-    protected StudyWrapper addStudy(String name, String nameShort,
-        SiteWrapper site) throws Exception {
-        StudyWrapper study = newStudy(name, nameShort, site);
-        study.persist();
-        return study;
-    }
-
-    protected StudyWrapper addStudy(SiteWrapper site, String name)
-        throws Exception {
-        StudyWrapper study = newStudy(site, name);
-        study.persist();
-        return study;
-    }
-
-    protected int addStudies(SiteWrapper site, String name) throws Exception {
-        int studiesNber = r.nextInt(15) + 1;
-        for (int i = 0; i < studiesNber; i++) {
-            addStudy(site, name);
-        }
-        site.reload();
-        return studiesNber;
-    }
-
 }

@@ -11,7 +11,9 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
+import test.ualberta.med.biobank.internal.ClinicHelper;
 import test.ualberta.med.biobank.internal.SiteHelper;
+import test.ualberta.med.biobank.internal.StudyHelper;
 
 @RunWith(Suite.class)
 @SuiteClasses( { TestContainerType.class, TestContainer.class,
@@ -28,6 +30,8 @@ public class AllTests {
                 + System.getProperty("server", "localhost:8080") + "/biobank2",
                 "testuser", "test");
         SiteHelper.setAppService(appService);
+        ClinicHelper.setAppService(appService);
+        StudyHelper.setAppService(appService);
     }
 
     @AfterClass
