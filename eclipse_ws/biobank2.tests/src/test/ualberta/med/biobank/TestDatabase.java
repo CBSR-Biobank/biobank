@@ -1,21 +1,12 @@
 package test.ualberta.med.biobank;
 
 import edu.ualberta.med.biobank.common.BiobankCheckException;
-import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
-import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
-import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
@@ -158,177 +149,6 @@ public class TestDatabase {
             return list.get(pos);
         }
         return null;
-    }
-
-    protected ContainerTypeWrapper newContainerType(SiteWrapper site,
-        String name, String nameShort, Integer labelingScheme,
-        Integer rowCapacity, Integer colCapacity, boolean isTopLevel) {
-        ContainerTypeWrapper ct = new ContainerTypeWrapper(appService);
-        ct.setSite(site);
-        ct.setName(name);
-        ct.setNameShort(nameShort);
-        ct.setChildLabelingScheme(labelingScheme);
-        if (rowCapacity != null)
-            ct.setRowCapacity(rowCapacity);
-        if (colCapacity != null)
-            ct.setColCapacity(colCapacity);
-        ct.setTopLevel(isTopLevel);
-        return ct;
-    }
-
-    protected ContainerTypeWrapper addContainerType(SiteWrapper site,
-        String name, String nameShort, Integer labelingScheme,
-        Integer rowCapacity, Integer colCapacity, boolean isTopLevel)
-        throws BiobankCheckException, Exception {
-        ContainerTypeWrapper container = newContainerType(site, name,
-            nameShort, labelingScheme, rowCapacity, colCapacity, isTopLevel);
-        container.persist();
-        return container;
-    }
-
-    protected ContainerTypeWrapper addContainerTypeRandom(SiteWrapper site,
-        String name) throws Exception {
-        return addContainerType(site, name + "Random" + r.nextInt(), "", null,
-            r.nextInt(10) + 1, r.nextInt(10) + 1, r.nextBoolean());
-    }
-
-    protected int addContainerTypesRandom(SiteWrapper site, String name)
-        throws Exception {
-        int nber = r.nextInt(15) + 1;
-        for (int i = 0; i < nber; i++) {
-            addContainerTypeRandom(site, name);
-        }
-        site.reload();
-        return nber;
-    }
-
-    protected ContainerWrapper newContainer(String label, String barcode,
-        ContainerWrapper parent, SiteWrapper site, ContainerTypeWrapper type)
-        throws Exception {
-        ContainerWrapper container;
-
-        container = new ContainerWrapper(appService);
-        if (label != null) {
-            if (type.getTopLevel()) {
-                container.setLabel(label);
-            } else {
-                throw new Exception(
-                    "cannot set label on non top level containers");
-            }
-        }
-        container.setProductBarcode(barcode);
-        if (parent != null) {
-            container.setParent(parent);
-        }
-        if (site != null) {
-            container.setSite(site);
-        }
-        container.setContainerType(type);
-        return container;
-    }
-
-    protected ContainerWrapper newContainer(String label, String barcode,
-        ContainerWrapper parent, SiteWrapper site, ContainerTypeWrapper type,
-        Integer row, Integer col) throws Exception {
-        ContainerWrapper container = newContainer(label, barcode, parent, site,
-            type);
-        container.setPosition(row, col);
-        return container;
-    }
-
-    protected ContainerWrapper addContainer(String label, String barcode,
-        ContainerWrapper parent, SiteWrapper site, ContainerTypeWrapper type)
-        throws Exception {
-        ContainerWrapper container = newContainer(label, barcode, parent, site,
-            type);
-        container.persist();
-        return container;
-    }
-
-    protected ContainerWrapper addContainer(String label, String barcode,
-        ContainerWrapper parent, SiteWrapper site, ContainerTypeWrapper type,
-        Integer row, Integer col) throws Exception {
-        ContainerWrapper container = newContainer(label, barcode, parent, site,
-            type, row, col);
-        container.persist();
-        return container;
-    }
-
-    protected ContainerWrapper addContainerRandom(SiteWrapper site, String name)
-        throws Exception {
-        ContainerTypeWrapper type = addContainerTypeRandom(site, name);
-        String label = null;
-        if ((type.getTopLevel() != null) && type.getTopLevel()) {
-            label = String.valueOf(r.nextInt());
-        }
-        ContainerWrapper container = addContainer(label, name + "Random"
-            + r.nextInt(), null, site, type);
-        if (label == null) {
-            container.setPosition(0, 0);
-        }
-        container.persist();
-        return container;
-    }
-
-    protected int addContainersRandom(SiteWrapper site, String name)
-        throws Exception {
-        int nber = r.nextInt(15) + 1;
-        for (int i = 0; i < nber; i++) {
-            addContainerRandom(site, name);
-        }
-        site.reload();
-        return nber;
-    }
-
-    protected PatientWrapper newPatient(String number) {
-        PatientWrapper patient = new PatientWrapper(appService);
-        patient.setNumber(number);
-        return patient;
-    }
-
-    protected PatientWrapper addPatient(String number, StudyWrapper study)
-        throws Exception {
-        PatientWrapper patient = newPatient(number);
-        patient.setStudy(study);
-        patient.persist();
-        return patient;
-    }
-
-    protected PatientVisitWrapper newPatientVisit(PatientWrapper patient,
-        Date dateDrawn, Date dateProcessed, Date dateReceived) {
-        PatientVisitWrapper pv = new PatientVisitWrapper(appService);
-        pv.setPatient(patient);
-        pv.setDateDrawn(dateDrawn);
-        pv.setDateProcessed(dateProcessed);
-        pv.setDateReceived(dateReceived);
-        return pv;
-    }
-
-    protected PatientVisitWrapper addPatientVisit(PatientWrapper patient,
-        Date dateDrawn, Date dateProcessed, Date dateReceived) throws Exception {
-        PatientVisitWrapper pv = newPatientVisit(patient, dateDrawn,
-            dateProcessed, dateReceived);
-        pv.persist();
-        return pv;
-    }
-
-    protected SampleWrapper newSample(SampleTypeWrapper sampleType,
-        ContainerWrapper container, PatientVisitWrapper pv, Integer row,
-        Integer col) {
-        SampleWrapper sample = new SampleWrapper(appService);
-        sample.setSampleType(sampleType);
-        sample.setParent(container);
-        sample.setPatientVisit(pv);
-        sample.setPosition(row, col);
-        return sample;
-    }
-
-    protected SampleWrapper addSample(SampleTypeWrapper sampleType,
-        ContainerWrapper container, PatientVisitWrapper pv, Integer row,
-        Integer col) throws Exception {
-        SampleWrapper sample = newSample(sampleType, container, pv, row, col);
-        sample.persist();
-        return sample;
     }
 
 }
