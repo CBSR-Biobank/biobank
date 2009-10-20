@@ -7,6 +7,9 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 
+import test.ualberta.med.biobank.internal.DbHelper;
+import test.ualberta.med.biobank.internal.SiteHelper;
+import test.ualberta.med.biobank.internal.StudyHelper;
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
@@ -18,17 +21,18 @@ public class TestStudy extends TestDatabase {
 
     @Test
     public void testGettersAndSetters() throws Exception {
-        SiteWrapper site = addSite("testGettersAndSetters");
-        StudyWrapper study = addStudy(site, "testGettersAndSetters");
+        SiteWrapper site = SiteHelper.addSite("testGettersAndSetters");
+        StudyWrapper study = StudyHelper
+            .addStudy(site, "testGettersAndSetters");
         testGettersAndSetters(study);
     }
 
     @Test
     public void testSetGetSite() throws Exception {
-        SiteWrapper site = addSite("testGetSite");
-        StudyWrapper study = addStudy(site, "testGetSite");
+        SiteWrapper site = SiteHelper.addSite("testGetSite");
+        StudyWrapper study = StudyHelper.addStudy(site, "testGetSite");
 
-        SiteWrapper site2 = addSite("testGetSite-2-");
+        SiteWrapper site2 = SiteHelper.addSite("testGetSite-2-");
         study.setSite(site2);
         study.persist();
 
@@ -45,9 +49,11 @@ public class TestStudy extends TestDatabase {
 
     @Test
     public void testGetContactCollection() throws Exception {
-        SiteWrapper site = addSite("testGetContactCollection");
-        StudyWrapper study = addStudy(site, "testGetContactCollection");
-        int nber = addContactsToStudy(study, "testGetContactCollection");
+        SiteWrapper site = SiteHelper.addSite("testGetContactCollection");
+        StudyWrapper study = StudyHelper.addStudy(site,
+            "testGetContactCollection");
+        int nber = StudyHelper.addContactsToStudy(study,
+            "testGetContactCollection");
 
         List<ContactWrapper> contacts = study.getContactCollection();
         int sizeFound = contacts.size();
@@ -57,9 +63,12 @@ public class TestStudy extends TestDatabase {
 
     @Test
     public void testGetContactCollectionBoolean() throws Exception {
-        SiteWrapper site = addSite("testGetContactCollectionBoolean");
-        StudyWrapper study = addStudy(site, "testGetContactCollectionBoolean");
-        addContactsToStudy(study, "testGetContactCollectionBoolean");
+        SiteWrapper site = SiteHelper
+            .addSite("testGetContactCollectionBoolean");
+        StudyWrapper study = StudyHelper.addStudy(site,
+            "testGetContactCollectionBoolean");
+        StudyHelper
+            .addContactsToStudy(study, "testGetContactCollectionBoolean");
 
         List<ContactWrapper> contacts = study.getContactCollection(true);
         if (contacts.size() > 1) {
@@ -73,9 +82,11 @@ public class TestStudy extends TestDatabase {
 
     @Test
     public void testAddInContactCollection() throws Exception {
-        SiteWrapper site = addSite("testAddInContactCollection");
-        StudyWrapper study = addStudy(site, "testAddInContactCollection");
-        int nber = addContactsToStudy(study, "testAddInContactCollection");
+        SiteWrapper site = SiteHelper.addSite("testAddInContactCollection");
+        StudyWrapper study = StudyHelper.addStudy(site,
+            "testAddInContactCollection");
+        int nber = StudyHelper.addContactsToStudy(study,
+            "testAddInContactCollection");
         site.reload();
 
         // get a clinic not yet added
@@ -84,9 +95,9 @@ public class TestStudy extends TestDatabase {
         for (ContactWrapper contact : contacts) {
             clinics.remove(contact.getClinicWrapper());
         }
-        ClinicWrapper clinicNotAdded = chooseRandomlyInList(clinics);
-        ContactWrapper contactToAdd = chooseRandomlyInList(clinicNotAdded
-            .getContactCollection());
+        ClinicWrapper clinicNotAdded = DbHelper.chooseRandomlyInList(clinics);
+        ContactWrapper contactToAdd = DbHelper
+            .chooseRandomlyInList(clinicNotAdded.getContactCollection());
         contacts.add(contactToAdd);
         study.setContactCollection(contacts);
         study.persist();
@@ -99,10 +110,11 @@ public class TestStudy extends TestDatabase {
     @Test
     public void testAddInContactCollectionFromClinicAlreadyChoosen()
         throws Exception {
-        SiteWrapper site = addSite("testAddInContactCollectionFromClinicAlreadyChoosen");
-        StudyWrapper study = addStudy(site,
+        SiteWrapper site = SiteHelper
+            .addSite("testAddInContactCollectionFromClinicAlreadyChoosen");
+        StudyWrapper study = StudyHelper.addStudy(site,
             "testAddInContactCollectionFromClinicAlreadyChoosen");
-        int nber = addContactsToStudy(study,
+        int nber = StudyHelper.addContactsToStudy(study,
             "testAddInContactCollectionFromClinicAlreadyChoosen");
         site.reload();
 
@@ -138,6 +150,16 @@ public class TestStudy extends TestDatabase {
         } else {
             Assert.fail("Was not able to perform test");
         }
+    }
+
+    @Test
+    public void testSetContactCollectionCollectionOfContactBoolean() {
+        fail("Not yet implemented");
+    }
+
+    @Test
+    public void testSetContactCollectionListOfContactWrapper() {
+        fail("Not yet implemented");
     }
 
     @Test
@@ -247,7 +269,8 @@ public class TestStudy extends TestDatabase {
 
     @Test
     public void testDelete() throws Exception {
-        StudyWrapper study = addStudy(addSite("testDelete"), "testDelete");
+        StudyWrapper study = StudyHelper.addStudy(SiteHelper
+            .addSite("testDelete"), "testDelete");
         // object is in database
         Assert.assertNotNull(study);
         study.delete();
@@ -259,7 +282,8 @@ public class TestStudy extends TestDatabase {
 
     @Test
     public void testResetAlreadyInDatabase() throws Exception {
-        StudyWrapper study = addStudy(addSite("testResetAlreadyInDatabase"),
+        StudyWrapper study = StudyHelper.addStudy(SiteHelper
+            .addSite("testResetAlreadyInDatabase"),
             "testResetAlreadyInDatabase");
         study.reload();
         String oldName = study.getName();

@@ -1,9 +1,6 @@
 package test.ualberta.med.biobank;
 
 import edu.ualberta.med.biobank.common.BiobankCheckException;
-import edu.ualberta.med.biobank.common.formatters.DateFormatter;
-import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
@@ -16,7 +13,6 @@ import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 import java.lang.reflect.Method;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -28,16 +24,12 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 
+import test.ualberta.med.biobank.internal.SiteHelper;
+
 public class TestDatabase {
     protected static WritableApplicationService appService;
 
-    private static final String ALPHABET = "abcdefghijklmnopqrstuvwxyz";
-
-    private static final int ALPHABET_LEN = ALPHABET.length();
-
     protected Random r;
-
-    protected List<SiteWrapper> createdSites;
 
     private static final List<String> IGNORE_RETURN_TYPES = new ArrayList<String>() {
         private static final long serialVersionUID = 1L;
@@ -64,13 +56,12 @@ public class TestDatabase {
             AllTests.setUp();
             appService = AllTests.appService;
         }
-        createdSites = new ArrayList<SiteWrapper>();
     }
 
     @After
     public void tearDown() throws Exception {
         try {
-            deletedCreatedSites();
+            SiteHelper.deletedCreatedSites();
         } catch (Exception e) {
             e.printStackTrace(System.err);
             Assert.fail();
@@ -136,14 +127,9 @@ public class TestDatabase {
                 } else if (getReturnType.equals("java.lang.Double")) {
                     parameter = new Double(r.nextDouble());
                 } else if (getReturnType.equals("java.lang.String")) {
-                    String str = new String();
-                    for (int j = 0, n = r.nextInt(32); j < n; ++j) {
-                        int begin = r.nextInt(ALPHABET_LEN - 1);
-                        str += ALPHABET.substring(begin, begin + 1);
-                    }
-                    parameter = str;
+                    parameter = Utils.getRandomString(32);
                 } else if (getReturnType.equals("java.util.Date")) {
-                    parameter = getRandomDate();
+                    parameter = Utils.getRandomDate();
                 } else {
                     System.out.println(getReturnType);
                     throw new Exception("return type " + getReturnType
@@ -163,24 +149,6 @@ public class TestDatabase {
             }
         }
 
-    }
-
-    public Date getRandomDate() throws ParseException {
-        String dateStr = String.format("%04-%02-%02 %02:%02", 2000 + r
-            .nextInt(40), r.nextInt(12) + 1, r.nextInt(30) + 1,
-            r.nextInt(24) + 1, r.nextInt(60) + 1);
-        return DateFormatter.dateFormatter.parse(dateStr);
-    }
-
-    public <T> T chooseRandomlyInList(List<T> list) {
-        if (list.size() == 1) {
-            return list.get(0);
-        }
-        if (list.size() > 1) {
-            int pos = r.nextInt(list.size());
-            return list.get(pos);
-        }
-        return null;
     }
 
     protected ContainerTypeWrapper newContainerType(SiteWrapper site,
@@ -309,8 +277,10 @@ public class TestDatabase {
         return patient;
     }
 
-    protected PatientWrapper addPatient(String number) throws Exception {
+    protected PatientWrapper addPatient(String number, StudyWrapper study)
+        throws Exception {
         PatientWrapper patient = newPatient(number);
+        patient.setStudy(study);
         patient.persist();
         return patient;
     }
@@ -352,191 +322,131 @@ public class TestDatabase {
         return sample;
     }
 
-    protected void deletedCreatedSites() throws Exception {
-        for (SiteWrapper site : createdSites) {
-            site.reload();
-            removeContainers(site.getContainerCollection());
-            removeStudies(site.getStudyCollection());
-            removeClinics(site.getClinicCollection());
-            removeFromList(site.getContainerTypeCollection());
-            site.reload();
-            site.delete();
-        }
-    }
+    // protected void deletedCreatedSites() throws Exception {
+    // for (SiteWrapper site : createdSites) {
+    // site.reload();
+    // removeContainers(site.getContainerCollection());
+    // removeStudies(site.getStudyCollection());
+    // removeClinics(site.getClinicCollection());
+    // removeFromList(site.getContainerTypeCollection());
+    // site.reload();
+    // site.delete();
+    // }
+    // }
+    //
+    // protected void removeContainers(List<ContainerWrapper> containers)
+    // throws Exception {
+    // for (ContainerWrapper container : containers) {
+    // if (container.hasChildren()) {
+    // removeContainers(container.getChildren());
+    // } else {
+    // removeFromList(container.getSamples());
+    // }
+    // container.reload();
+    // container.delete();
+    // }
+    // }
+    //
+    // protected void removeStudies(List<StudyWrapper> studies) throws Exception
+    // {
+    // for (StudyWrapper study : studies) {
+    // removePatients(study.getPatientCollection());
+    // study.reload();
+    // study.delete();
+    // }
+    // }
+    //
+    // protected void removeClinics(List<ClinicWrapper> clinics) throws
+    // Exception {
+    // for (ClinicWrapper clinic : clinics) {
+    // removeFromList(clinic.getContactCollection());
+    // clinic.reload();
+    // clinic.delete();
+    // }
+    // }
+    //
+    // protected void removePatients(List<PatientWrapper> patients)
+    // throws Exception {
+    // for (PatientWrapper patient : patients) {
+    // removeFromList(patient.getPatientVisitCollection());
+    // patient.reload();
+    // patient.delete();
+    // }
+    // }
+    //
+    // protected void removeFromList(List<? extends ModelWrapper<?>> list)
+    // throws Exception {
+    // if (list != null) {
+    // for (ModelWrapper<?> object : list) {
+    // object.reload();
+    // object.delete();
+    // }
+    // }
+    // }
+    //
+    // protected SiteWrapper newSite(String name) throws Exception {
+    // SiteWrapper site = new SiteWrapper(appService);
+    // site.setName(name + r.nextInt());
+    // site.setCity("");
+    // return site;
+    // }
+    //
+    // protected SiteWrapper addSite(String name, boolean addToCreatedList)
+    // throws Exception {
+    // SiteWrapper site = newSite(name);
+    // site.persist();
+    // if (addToCreatedList) {
+    // createdSites.add(site);
+    // }
+    // return site;
+    // }
+    //
+    // protected SiteWrapper addSite(String name) throws Exception {
+    // return addSite(name, true);
+    // }
+    //
+    // protected int addSites(String name) throws Exception {
+    // int nber = r.nextInt(15) + 1;
+    // for (int i = 0; i < nber; i++) {
+    // addSite(name);
+    // }
+    // return nber;
+    // }
+    //
+    // protected StudyWrapper newStudy(SiteWrapper site, String name)
+    // throws Exception {
+    // StudyWrapper study = new StudyWrapper(appService);
+    // study.setName(name + "Random" + r.nextInt());
+    // study.setSite(site);
+    // return study;
+    // }
+    //
+    // protected StudyWrapper addStudy(SiteWrapper site, String name)
+    // throws Exception {
+    // StudyWrapper study = newStudy(site, name);
+    // study.persist();
+    // return study;
+    // }
+    //
+    // protected int addStudies(SiteWrapper site, String name) throws Exception
+    // {
+    // int studiesNber = r.nextInt(15) + 1;
+    // for (int i = 0; i < studiesNber; i++) {
+    // addStudy(site, name);
+    // }
+    // site.reload();
+    // return studiesNber;
+    // }
+    //
+    // protected ClinicWrapper newClinic(SiteWrapper site, String name)
+    // throws Exception {
+    // ClinicWrapper clinic = new ClinicWrapper(appService);
+    // clinic.setName(name + "Random" + r.nextInt());
+    // clinic.setCity("");
+    // clinic.setSite(site);
+    //
+    // return clinic;
+    // }
+    //
 
-    protected void removeContainers(List<ContainerWrapper> containers)
-        throws Exception {
-        for (ContainerWrapper container : containers) {
-            if (container.hasChildren()) {
-                removeContainers(container.getChildren());
-            } else {
-                removeFromList(container.getSamples());
-            }
-            container.reload();
-            container.delete();
-        }
-    }
-
-    protected void removeStudies(List<StudyWrapper> studies) throws Exception {
-        for (StudyWrapper study : studies) {
-            removePatients(study.getPatientCollection());
-            study.reload();
-            study.delete();
-        }
-    }
-
-    protected void removeClinics(List<ClinicWrapper> clinics) throws Exception {
-        for (ClinicWrapper clinic : clinics) {
-            removeFromList(clinic.getContactCollection());
-            clinic.reload();
-            clinic.delete();
-        }
-    }
-
-    protected void removePatients(List<PatientWrapper> patients)
-        throws Exception {
-        for (PatientWrapper patient : patients) {
-            removeFromList(patient.getPatientVisitCollection());
-            patient.reload();
-            patient.delete();
-        }
-    }
-
-    protected void removeFromList(List<? extends ModelWrapper<?>> list)
-        throws Exception {
-        if (list != null) {
-            for (ModelWrapper<?> object : list) {
-                object.reload();
-                object.delete();
-            }
-        }
-    }
-
-    protected SiteWrapper newSite(String name) throws Exception {
-        SiteWrapper site = new SiteWrapper(appService);
-        site.setName(name + r.nextInt());
-        site.setCity("");
-        return site;
-    }
-
-    protected SiteWrapper addSite(String name, boolean addToCreatedList)
-        throws Exception {
-        SiteWrapper site = newSite(name);
-        site.persist();
-        if (addToCreatedList) {
-            createdSites.add(site);
-        }
-        return site;
-    }
-
-    protected SiteWrapper addSite(String name) throws Exception {
-        return addSite(name, true);
-    }
-
-    protected int addSites(String name) throws Exception {
-        int nber = r.nextInt(15) + 1;
-        for (int i = 0; i < nber; i++) {
-            addSite(name);
-        }
-        return nber;
-    }
-
-    protected StudyWrapper newStudy(SiteWrapper site, String name)
-        throws Exception {
-        StudyWrapper study = new StudyWrapper(appService);
-        study.setName(name + "Random" + r.nextInt());
-        study.setSite(site);
-        return study;
-    }
-
-    protected StudyWrapper addStudy(SiteWrapper site, String name)
-        throws Exception {
-        StudyWrapper study = newStudy(site, name);
-        study.persist();
-        return study;
-    }
-
-    protected int addStudies(SiteWrapper site, String name) throws Exception {
-        int studiesNber = r.nextInt(15) + 1;
-        for (int i = 0; i < studiesNber; i++) {
-            addStudy(site, name);
-        }
-        site.reload();
-        return studiesNber;
-    }
-
-    protected ClinicWrapper newClinic(SiteWrapper site, String name)
-        throws Exception {
-        ClinicWrapper clinic = new ClinicWrapper(appService);
-        clinic.setName(name + "Random" + r.nextInt());
-        clinic.setCity("");
-        clinic.setSite(site);
-
-        return clinic;
-    }
-
-    protected ClinicWrapper addClinic(SiteWrapper site, String name,
-        boolean addContacts) throws Exception {
-        ClinicWrapper clinic = newClinic(site, name);
-        clinic.persist();
-        if (addContacts) {
-            for (int i = 0; i < (r.nextInt(5) + 1); i++) {
-                addContact(clinic, name);
-            }
-            clinic.reload();
-        }
-        return clinic;
-    }
-
-    protected ContactWrapper newContact(ClinicWrapper clinic, String name) {
-        ContactWrapper contact = new ContactWrapper(appService);
-        contact.setClinicWrapper(clinic);
-        contact.setName(name + r.nextInt());
-        contact.setEmailAddress("toto@gamil.com");
-        return contact;
-    }
-
-    protected ContactWrapper addContact(ClinicWrapper clinic, String name)
-        throws Exception {
-        ContactWrapper contact = newContact(clinic, name);
-        contact.persist();
-        return contact;
-    }
-
-    protected ClinicWrapper addClinic(SiteWrapper site, String name)
-        throws Exception {
-        return addClinic(site, name, false);
-    }
-
-    protected int addClinics(SiteWrapper site, String name, boolean addContacts)
-        throws Exception {
-        int nber = r.nextInt(15) + 1;
-        for (int i = 0; i < nber; i++) {
-            addClinic(site, name, addContacts);
-        }
-        site.reload();
-        return nber;
-    }
-
-    protected int addClinics(SiteWrapper site, String name) throws Exception {
-        return addClinics(site, name, false);
-    }
-
-    protected int addContactsToStudy(StudyWrapper study, String name)
-        throws Exception {
-        SiteWrapper site = study.getSite();
-        addClinics(site, name, true);
-        List<ClinicWrapper> clinics = site.getClinicCollection();
-        int nber = r.nextInt(clinics.size() - 1) + 1;
-        List<ContactWrapper> contacts = new ArrayList<ContactWrapper>();
-        for (int i = 0; i < nber; i++) {
-            ClinicWrapper clinic = clinics.get(i);
-            ContactWrapper contact = chooseRandomlyInList(clinic
-                .getContactCollection());
-            contacts.add(contact);
-        }
-        study.setContactCollection(contacts);
-        study.persist();
-        return nber;
-    }
 }
