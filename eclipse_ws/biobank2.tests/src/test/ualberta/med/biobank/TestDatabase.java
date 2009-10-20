@@ -5,10 +5,15 @@ import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
+import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 import java.lang.reflect.Method;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -120,13 +125,7 @@ public class TestDatabase {
                     }
                     parameter = str;
                 } else if (getReturnType.equals("java.util.Date")) {
-                    String dateStr = String
-                        .format("%04-%02-%02 %02:%02", 2000 + r.nextInt(40), r
-                            .nextInt(12) + 1, r.nextInt(30) + 1,
-                            r.nextInt(24) + 1, r.nextInt(60) + 1);
-                    Date date = DateFormatter.parse(
-                        DateFormatter.dateFormatter, dateStr);
-                    parameter = date;
+                    parameter = getRandomDate();
                 } else {
                     throw new Exception("return type " + getReturnType
                         + " for method " + getterInfo.getMethod.getName()
@@ -145,6 +144,13 @@ public class TestDatabase {
             }
         }
 
+    }
+
+    public Date getRandomDate() throws ParseException {
+        String dateStr = String.format("%04-%02-%02 %02:%02", 2000 + r
+            .nextInt(40), r.nextInt(12) + 1, r.nextInt(30) + 1,
+            r.nextInt(24) + 1, r.nextInt(60) + 1);
+        return DateFormatter.dateFormatter.parse(dateStr);
     }
 
     public <T> T chooseRandomlyInList(List<T> list) {
@@ -236,4 +242,54 @@ public class TestDatabase {
         return container;
 
     }
+
+    protected PatientWrapper newPatient(String number) {
+        PatientWrapper patient = new PatientWrapper(appService);
+        patient.setNumber(number);
+        return patient;
+    }
+
+    protected PatientWrapper addPatient(String number) throws Exception {
+        PatientWrapper patient = newPatient(number);
+        patient.persist();
+        return patient;
+    }
+
+    protected PatientVisitWrapper newPatientVisit(PatientWrapper patient,
+        Date dateDrawn, Date dateProcessed, Date dateReceived) {
+        PatientVisitWrapper pv = new PatientVisitWrapper(appService);
+        pv.setPatient(patient);
+        pv.setDateDrawn(dateDrawn);
+        pv.setDateProcessed(dateProcessed);
+        pv.setDateReceived(dateReceived);
+        return pv;
+    }
+
+    protected PatientVisitWrapper addPatientVisit(PatientWrapper patient,
+        Date dateDrawn, Date dateProcessed, Date dateReceived) throws Exception {
+        PatientVisitWrapper pv = newPatientVisit(patient, dateDrawn,
+            dateProcessed, dateReceived);
+        pv.persist();
+        return pv;
+    }
+
+    protected SampleWrapper newSample(SampleTypeWrapper sampleType,
+        ContainerWrapper container, PatientVisitWrapper pv, Integer row,
+        Integer col) {
+        SampleWrapper sample = new SampleWrapper(appService);
+        sample.setSampleType(sampleType);
+        sample.setParent(container);
+        sample.setPatientVisit(pv);
+        sample.setPosition(row, col);
+        return sample;
+    }
+
+    protected SampleWrapper addSample(SampleTypeWrapper sampleType,
+        ContainerWrapper container, PatientVisitWrapper pv, Integer row,
+        Integer col) throws Exception {
+        SampleWrapper sample = newSample(sampleType, container, pv, row, col);
+        sample.persist();
+        return sample;
+    }
+
 }

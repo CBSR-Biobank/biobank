@@ -97,6 +97,10 @@ public class SampleWrapper extends ModelWrapper<Sample> {
             patientVisit);
     }
 
+    public void setPatientVisit(PatientVisitWrapper patientVisit) {
+        setPatientVisit(patientVisit.getWrappedObject());
+    }
+
     public PatientVisitWrapper getPatientVisit() {
         PatientVisit pv = wrappedObject.getPatientVisit();
         if (pv == null) {
