@@ -27,17 +27,10 @@ public class TestContact extends TestDatabase {
 	public void setUp() throws Exception {
 		super.setUp();
 		cw = new ContactWrapper(appService, new Contact());
-		ClinicWrapper clinicWrapper = new ClinicWrapper(appService, new Clinic());
-		SiteWrapper siteWrapper = new SiteWrapper(appService, new Site());
-		siteWrapper.setCity("city");
-		siteWrapper.setPostalCode("postal");
-		siteWrapper.setProvince("ab");
-		siteWrapper.setStreet1("stree1");
-		siteWrapper.setStreet2("street2");
-		siteWrapper.persist();
-		clinicWrapper.setSite(siteWrapper);
-		clinicWrapper.setStreet1("stree1");
-		clinicWrapper.persist();
+		String street="Street1";
+		SiteWrapper siteWrapper = addSiteWrapper(street);
+		ClinicWrapper clinicWrapper = addClinicWrapper(siteWrapper, street);
+		//TODO: delete both later
 		cw.setClinicWrapper(clinicWrapper);
 	}
 	    
@@ -47,7 +40,7 @@ public class TestContact extends TestDatabase {
 	List<StudyWrapper> oldStudyCollection= new ArrayList<StudyWrapper>();
 	List<StudyWrapper> modifiedStudyCollection= new ArrayList<StudyWrapper>();
 	List<ContactWrapper> studyContactWrappers = new ArrayList<ContactWrapper>();
-	StudyWrapper testWrapper = new StudyWrapper(appService);
+	StudyWrapper testWrapper = addStudyWrapper();
 	        
 	Contact dbContact;
 	Study dbStudy;
@@ -112,7 +105,7 @@ public class TestContact extends TestDatabase {
 		//get method matches
 		Assert.assertTrue(study.getId().equals(getCollection.get(i).getId()));
 		i++;
-}
+	}
 		
 		//set empty
 		modifiedStudyCollection.clear();
@@ -126,8 +119,8 @@ public class TestContact extends TestDatabase {
 		//deleting from midpoint of list
 		int middle = modifiedStudyCollection.size()+1;
 		
-		StudyWrapper testWrapper2= new StudyWrapper(appService);
-		StudyWrapper testWrapper3= new StudyWrapper(appService);
+		StudyWrapper testWrapper2= addStudyWrapper();
+		StudyWrapper testWrapper3= addStudyWrapper();
 		modifiedStudyCollection.add(testWrapper2);
 		modifiedStudyCollection.add(testWrapper);
 		modifiedStudyCollection.add(testWrapper3);
@@ -195,13 +188,8 @@ public class TestContact extends TestDatabase {
 		Assert.assertTrue(clinic!=null);
 		
 		//Set new clinic
-		ClinicWrapper newClinicWrapper = new ClinicWrapper(appService, new Clinic());
-		newClinicWrapper.setStreet1("stree1");
-		SiteWrapper siteWrapper = new SiteWrapper(appService, new Site());
-		siteWrapper.setStreet1("stresd");
-		siteWrapper.persist();
-		newClinicWrapper.setSite(siteWrapper);
-		newClinicWrapper.persist();
+		SiteWrapper siteWrapper = addSiteWrapper("street");
+		ClinicWrapper newClinicWrapper = addClinicWrapper(siteWrapper, "street");
 		cw.setClinicWrapper(newClinicWrapper);
 		cw.persist();
 		

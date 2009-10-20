@@ -2,6 +2,7 @@ package test.ualberta.med.biobank;
 
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
+import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
@@ -10,6 +11,9 @@ import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.model.Clinic;
+import edu.ualberta.med.biobank.model.Site;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 import java.lang.reflect.Method;
@@ -164,7 +168,29 @@ public class TestDatabase {
         return null;
     }
 
-    protected ContainerTypeWrapper newContainerType(SiteWrapper site,
+    protected ClinicWrapper addClinicWrapper(SiteWrapper site, String street) throws BiobankCheckException, Exception {
+    	ClinicWrapper clinicWrapper = new ClinicWrapper(appService, new Clinic());
+		clinicWrapper.setSite(site);
+		clinicWrapper.setStreet1("stree1");
+		clinicWrapper.persist();
+		return clinicWrapper;
+    }
+    
+    
+    protected SiteWrapper addSiteWrapper(String street) throws BiobankCheckException, Exception {
+    	SiteWrapper siteWrapper = new SiteWrapper(appService, new Site());
+		siteWrapper.setStreet1(street);
+		siteWrapper.persist();
+		return siteWrapper;
+	}
+    
+    protected StudyWrapper addStudyWrapper() throws BiobankCheckException, Exception {
+    	StudyWrapper studyWrapper = new StudyWrapper(appService);
+    	studyWrapper.persist();
+    	return studyWrapper;
+    }
+
+	protected ContainerTypeWrapper newContainerType(SiteWrapper site,
         String name, String nameShort, Integer labelingScheme,
         Integer rowCapacity, Integer colCapacity, boolean isTopLevel) {
         ContainerTypeWrapper ct = new ContainerTypeWrapper(appService);
