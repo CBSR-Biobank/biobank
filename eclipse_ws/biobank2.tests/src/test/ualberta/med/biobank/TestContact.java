@@ -10,6 +10,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import test.ualberta.med.biobank.internal.ClinicHelper;
+import test.ualberta.med.biobank.internal.ContactHelper;
 import test.ualberta.med.biobank.internal.SiteHelper;
 import test.ualberta.med.biobank.internal.StudyHelper;
 import edu.ualberta.med.biobank.common.BiobankCheckException;
@@ -29,13 +30,12 @@ public class TestContact extends TestDatabase {
     @Before
     public void setUp() throws Exception {
         super.setUp();
-        cw = ClinicHelper.newContact();
-        String street = "Street1";
-        SiteWrapper siteWrapper = SiteHelper.addSite(street);
+
+        SiteWrapper siteWrapper = SiteHelper.addSite("site");
         ClinicWrapper clinicWrapper = ClinicHelper.addClinic(siteWrapper,
-            street);
+            "clinic");
         // TODO: delete later
-        cw.setClinicWrapper(clinicWrapper);
+        cw = ContactHelper.newContact(clinicWrapper, "contact");
     }
 
     @Test

@@ -107,6 +107,10 @@ public class ContactWrapper extends ModelWrapper<Contact> {
         return clinicCollection;
     }
 
+    public List<StudyWrapper> getStudyCollection() {
+        return getStudyCollection(false);
+    }
+
     public void setStudyCollection(Collection<Study> studies, boolean setNull) {
         Collection<Study> oldStudies = wrappedObject.getStudyCollection();
         wrappedObject.setStudyCollection(studies);

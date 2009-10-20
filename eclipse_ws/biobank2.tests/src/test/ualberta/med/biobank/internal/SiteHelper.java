@@ -38,15 +38,19 @@ public class SiteHelper extends DbHelper {
         }
     }
 
+    public static void deleteSite(SiteWrapper site) throws Exception {
+        site.reload();
+        deleteContainers(site.getTopContainerCollection());
+        deleteStudies(site.getStudyCollection());
+        deleteFromList(site.getClinicCollection());
+        deleteFromList(site.getContainerTypeCollection());
+        site.reload();
+        site.delete();
+    }
+
     public static void deleteCreatedSites() throws Exception {
         for (SiteWrapper site : createdSites) {
-            site.reload();
-            deleteContainers(site.getContainerCollection());
-            deleteStudies(site.getStudyCollection());
-            deleteFromList(site.getClinicCollection());
-            deleteFromList(site.getContainerTypeCollection());
-            site.reload();
-            site.delete();
+            deleteSite(site);
         }
         createdSites.clear();
     }

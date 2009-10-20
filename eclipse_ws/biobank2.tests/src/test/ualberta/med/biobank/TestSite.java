@@ -3,13 +3,16 @@ package test.ualberta.med.biobank;
 import java.util.List;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 import test.ualberta.med.biobank.internal.ClinicHelper;
 import test.ualberta.med.biobank.internal.ContainerHelper;
 import test.ualberta.med.biobank.internal.ContainerTypeHelper;
+import test.ualberta.med.biobank.internal.DbHelper;
 import test.ualberta.med.biobank.internal.SiteHelper;
 import test.ualberta.med.biobank.internal.StudyHelper;
+import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
@@ -22,6 +25,15 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class TestSite extends TestDatabase {
 
+    private int currentRandomName;
+
+    @Override
+    @Before
+    public void setUp() throws Exception {
+        super.setUp();
+        currentRandomName = r.nextInt();
+    }
+
     @Test
     public void testGettersAndSetters() throws Exception {
         SiteWrapper site = SiteHelper.addSite("testGettersAndSetters");
@@ -30,9 +42,10 @@ public class TestSite extends TestDatabase {
 
     @Test
     public void testGetStudyCollection() throws Exception {
-        SiteWrapper site = SiteHelper.addSite("testGetStudyCollection");
+        String name = "testGetStudyCollection" + currentRandomName;
+        SiteWrapper site = SiteHelper.addSite(name);
         int studiesNber = r.nextInt(15) + 1;
-        StudyHelper.addStudies(site, "testGetStudyCollection", studiesNber);
+        StudyHelper.addStudies(site, name, studiesNber);
 
         List<StudyWrapper> studies = site.getStudyCollection();
         int sizeFound = studies.size();
@@ -42,9 +55,9 @@ public class TestSite extends TestDatabase {
 
     @Test
     public void testGetStudyCollectionBoolean() throws Exception {
-        SiteWrapper site = SiteHelper.addSite("testGetStudyCollectionBoolean");
-        StudyHelper.addStudies(site, "testGetStudyCollectionBoolean", r
-            .nextInt(15) + 1);
+        String name = "testGetStudyCollectionBoolean" + currentRandomName;
+        SiteWrapper site = SiteHelper.addSite(name);
+        StudyHelper.addStudies(site, name, r.nextInt(15) + 1);
 
         List<StudyWrapper> studiesSorted = site.getStudyCollection(true);
         if (studiesSorted.size() > 1) {
@@ -58,14 +71,13 @@ public class TestSite extends TestDatabase {
 
     @Test
     public void testAddInStudyCollection() throws Exception {
-        SiteWrapper site = SiteHelper.addSite("testAddInStudyCollection");
+        String name = "testGetStudyCollectionBoolean" + currentRandomName;
+        SiteWrapper site = SiteHelper.addSite(name);
         int studiesNber = r.nextInt(15) + 1;
-        StudyHelper.addStudies(site, "testAddInStudyCollection", studiesNber);
+        StudyHelper.addStudies(site, name, studiesNber);
 
         List<StudyWrapper> studies = site.getStudyCollection();
-        StudyWrapper study = new StudyWrapper(appService);
-        study.setName("testAddInStudyCollection" + r.nextInt());
-        study.setSite(site);
+        StudyWrapper study = StudyHelper.newStudy(site, name + "newStudy");
         studies.add(study);
         site.setStudyCollection(studies);
         site.persist();
@@ -77,13 +89,13 @@ public class TestSite extends TestDatabase {
 
     @Test
     public void testRemoveInStudyCollection() throws Exception {
-        SiteWrapper site = SiteHelper.addSite("testRemoveInStudyCollection");
+        String name = "testRemoveInStudyCollection" + currentRandomName;
+        SiteWrapper site = SiteHelper.addSite(name);
         int studiesNber = r.nextInt(15) + 1;
-        StudyHelper
-            .addStudies(site, "testRemoveInStudyCollection", studiesNber);
+        StudyHelper.addStudies(site, name, studiesNber);
 
         List<StudyWrapper> studies = site.getStudyCollection();
-        StudyWrapper study = chooseRandomlyInList(studies);
+        StudyWrapper study = DbHelper.chooseRandomlyInList(studies);
         int idStudy = study.getId();
         studies.remove(study);
         site.setStudyCollection(studies);
@@ -103,9 +115,10 @@ public class TestSite extends TestDatabase {
 
     @Test
     public void testGetClinicCollection() throws Exception {
-        SiteWrapper site = SiteHelper.addSite("testGetClinicCollection");
+        String name = "testGetClinicCollection" + currentRandomName;
+        SiteWrapper site = SiteHelper.addSite(name);
         int clinicsNber = r.nextInt(15) + 1;
-        ClinicHelper.addClinics(site, "testGetClinicCollection", clinicsNber);
+        ClinicHelper.addClinics(site, name, clinicsNber);
 
         List<ClinicWrapper> clinics = site.getClinicCollection();
         int sizeFound = clinics.size();
@@ -115,9 +128,10 @@ public class TestSite extends TestDatabase {
 
     @Test
     public void testGetClinicCollectionBoolean() throws Exception {
-        SiteWrapper site = SiteHelper.addSite("testGetClinicCollectionBoolean");
+        String name = "testGetClinicCollectionBoolean" + currentRandomName;
+        SiteWrapper site = SiteHelper.addSite(name);
         int nber = r.nextInt(15) + 1;
-        ClinicHelper.addClinics(site, "testGetClinicCollectionBoolean", nber);
+        ClinicHelper.addClinics(site, name, nber);
 
         List<ClinicWrapper> clinics = site.getClinicCollection(true);
         if (clinics.size() > 1) {
@@ -131,15 +145,13 @@ public class TestSite extends TestDatabase {
 
     @Test
     public void testAddInClinicCollection() throws Exception {
-        SiteWrapper site = SiteHelper.addSite("testAddInClinicCollection");
+        String name = "testAddInClinicCollection" + currentRandomName;
+        SiteWrapper site = SiteHelper.addSite(name);
         int nber = r.nextInt(15) + 1;
-        ClinicHelper.addClinics(site, "testAddInClinicCollection", nber);
+        ClinicHelper.addClinics(site, name, nber);
 
         List<ClinicWrapper> clinics = site.getClinicCollection();
-        ClinicWrapper clinic = new ClinicWrapper(appService);
-        clinic.setName("testAddInClinicCollection" + r.nextInt());
-        clinic.setCity("");
-        clinic.setSite(site);
+        ClinicWrapper clinic = ClinicHelper.newClinic(site, name + "newClinic");
         clinics.add(clinic);
         site.setClinicCollection(clinics);
         site.persist();
@@ -151,12 +163,13 @@ public class TestSite extends TestDatabase {
 
     @Test
     public void testRemoveInClinicCollection() throws Exception {
-        SiteWrapper site = SiteHelper.addSite("testRemoveInClinicCollection");
+        String name = "testRemoveInClinicCollection" + currentRandomName;
+        SiteWrapper site = SiteHelper.addSite(name);
         int nber = r.nextInt(15) + 1;
-        ClinicHelper.addClinics(site, "testRemoveInClinicCollection", nber);
+        ClinicHelper.addClinics(site, name, nber);
 
         List<ClinicWrapper> clinics = site.getClinicCollection();
-        ClinicWrapper clinic = chooseRandomlyInList(clinics);
+        ClinicWrapper clinic = DbHelper.chooseRandomlyInList(clinics);
         int idClinic = clinic.getId();
         clinics.remove(clinic);
         site.setClinicCollection(clinics);
@@ -176,10 +189,10 @@ public class TestSite extends TestDatabase {
 
     @Test
     public void testGetContainerTypeCollection() throws Exception {
-        SiteWrapper site = SiteHelper.addSite("testGetContainerTypeCollection");
+        String name = "testGetContainerTypeCollection" + currentRandomName;
+        SiteWrapper site = SiteHelper.addSite(name);
         int nber = r.nextInt(15) + 1;
-        ContainerTypeHelper.addContainerTypesRandom(site,
-            "testGetContainerTypeCollection", nber);
+        ContainerTypeHelper.addContainerTypesRandom(site, name, nber);
 
         List<ContainerTypeWrapper> types = site.getContainerTypeCollection();
         int sizeFound = types.size();
@@ -189,10 +202,11 @@ public class TestSite extends TestDatabase {
 
     @Test
     public void testGetContainerTypeCollectionBoolean() throws Exception {
-        SiteWrapper site = SiteHelper
-            .addSite("testGetContainerTypeCollectionBoolean");
-        ContainerTypeHelper.addContainerTypesRandom(site,
-            "testGetContainerTypeCollectionBoolean", r.nextInt(15) + 1);
+        String name = "testGetContainerTypeCollectionBoolean"
+            + currentRandomName;
+        SiteWrapper site = SiteHelper.addSite(name);
+        ContainerTypeHelper.addContainerTypesRandom(site, name,
+            r.nextInt(15) + 1);
 
         List<ContainerTypeWrapper> types = site
             .getContainerTypeCollection(true);
@@ -207,18 +221,14 @@ public class TestSite extends TestDatabase {
 
     @Test
     public void testAddInContainerTypeCollection() throws Exception {
-        SiteWrapper site = SiteHelper
-            .addSite("testAddInContainerTypeCollection");
+        String name = "testAddInContainerTypeCollection" + currentRandomName;
+        SiteWrapper site = SiteHelper.addSite(name);
         int nber = r.nextInt(15) + 1;
-        ContainerTypeHelper.addContainerTypesRandom(site,
-            "testAddInContainerTypeCollection", nber);
+        ContainerTypeHelper.addContainerTypesRandom(site, name, nber);
 
         List<ContainerTypeWrapper> types = site.getContainerTypeCollection();
-        ContainerTypeWrapper type = new ContainerTypeWrapper(appService);
-        type.setSite(site);
-        type.setName("testAddInContainerTypeCollection" + r.nextInt());
-        type.setRowCapacity(5);
-        type.setColCapacity(4);
+        ContainerTypeWrapper type = ContainerTypeHelper.newContainerType(site,
+            name + "newType", name, null, 5, 4, false);
         types.add(type);
         site.setContainerTypeCollection(types);
         site.persist();
@@ -230,14 +240,13 @@ public class TestSite extends TestDatabase {
 
     @Test
     public void testRemoveInContainerTypeCollection() throws Exception {
-        SiteWrapper site = SiteHelper
-            .addSite("testRemoveInContainerTypeCollection");
+        String name = "testRemoveInContainerTypeCollection" + currentRandomName;
+        SiteWrapper site = SiteHelper.addSite(name);
         int nber = r.nextInt(15) + 1;
-        ContainerTypeHelper.addContainerTypesRandom(site,
-            "testRemoveInContainerTypeCollection", nber);
+        ContainerTypeHelper.addContainerTypesRandom(site, name, nber);
 
         List<ContainerTypeWrapper> types = site.getContainerTypeCollection();
-        ContainerTypeWrapper type = chooseRandomlyInList(types);
+        ContainerTypeWrapper type = DbHelper.chooseRandomlyInList(types);
         int idType = type.getId();
         types.remove(type);
         site.setContainerTypeCollection(types);
@@ -257,10 +266,10 @@ public class TestSite extends TestDatabase {
 
     @Test
     public void testGetContainerCollection() throws Exception {
-        SiteWrapper site = SiteHelper.addSite("testGetContainerCollection");
+        String name = "testGetContainerCollection" + currentRandomName;
+        SiteWrapper site = SiteHelper.addSite(name);
         int nber = r.nextInt(15) + 1;
-        ContainerHelper.addContainersRandom(site, "testGetContainerCollection",
-            nber);
+        ContainerHelper.addContainersRandom(site, name, nber);
 
         List<ContainerWrapper> containers = site.getContainerCollection();
         int sizeFound = containers.size();
@@ -270,18 +279,16 @@ public class TestSite extends TestDatabase {
 
     @Test
     public void testAddInContainerCollection() throws Exception {
-        SiteWrapper site = SiteHelper.addSite("testAddInContainerCollection");
+        String name = "testAddInContainerCollection" + currentRandomName;
+        SiteWrapper site = SiteHelper.addSite(name);
         int nber = r.nextInt(15) + 1;
-        ContainerHelper.addContainersRandom(site,
-            "testAddInContainerCollection", nber);
+        ContainerHelper.addContainersRandom(site, name, nber);
 
         List<ContainerWrapper> containers = site.getContainerCollection();
-        ContainerWrapper container = new ContainerWrapper(appService);
-        container.setLabel("testAddInContainerCollection" + r.nextInt());
         ContainerTypeWrapper type = ContainerTypeHelper.addContainerTypeRandom(
-            site, "testAddInContainerCollection");
-        container.setContainerType(type);
-        container.setSite(site);
+            site, name);
+        ContainerWrapper container = ContainerHelper.newContainer(null, name
+            + "newContainer", null, site, type);
         containers.add(container);
         site.setContainerCollection(containers);
         site.persist();
@@ -293,14 +300,13 @@ public class TestSite extends TestDatabase {
 
     @Test
     public void testRemoveInContainerCollection() throws Exception {
-        SiteWrapper site = SiteHelper
-            .addSite("testRemoveInContainerCollection");
+        String name = "testRemoveInContainerCollection" + currentRandomName;
+        SiteWrapper site = SiteHelper.addSite(name);
         int nber = r.nextInt(15) + 1;
-        ContainerHelper.addContainersRandom(site,
-            "testRemoveInContainerCollection", nber);
+        ContainerHelper.addContainersRandom(site, name, nber);
 
         List<ContainerWrapper> containers = site.getContainerCollection();
-        ContainerWrapper container = chooseRandomlyInList(containers);
+        ContainerWrapper container = DbHelper.chooseRandomlyInList(containers);
         int idContainer = container.getId();
         containers.remove(container);
         site.setContainerCollection(containers);
@@ -320,8 +326,9 @@ public class TestSite extends TestDatabase {
 
     @Test
     public void testGetSampleTypeCollection() throws Exception {
-        SiteWrapper site = SiteHelper.addSite("testGetSampleTypeCollection");
-        int nber = addSampleTypes(site, "testGetSampleTypeCollection");
+        String name = "testGetSampleTypeCollection" + currentRandomName;
+        SiteWrapper site = SiteHelper.addSite(name);
+        int nber = addSampleTypes(site, name);
 
         List<SampleTypeWrapper> types = site.getSampleTypeCollection();
         int sizeFound = types.size();
@@ -331,9 +338,9 @@ public class TestSite extends TestDatabase {
 
     @Test
     public void testGetSampleTypeCollectionBoolean() throws Exception {
-        SiteWrapper site = SiteHelper
-            .addSite("testGetSampleTypeCollectionBoolean");
-        addSampleTypes(site, "testGetSampleTypeCollectionBoolean");
+        String name = "testGetSampleTypeCollectionBoolean" + currentRandomName;
+        SiteWrapper site = SiteHelper.addSite(name);
+        addSampleTypes(site, name);
 
         List<SampleTypeWrapper> types = site.getSampleTypeCollection(true);
         if (types.size() > 1) {
@@ -347,8 +354,9 @@ public class TestSite extends TestDatabase {
 
     @Test
     public void testAddInSampleTypeCollection() throws Exception {
-        SiteWrapper site = SiteHelper.addSite("testAddInSampleTypeCollection");
-        int nber = addSampleTypes(site, "testAddInSampleTypeCollection");
+        String name = "testAddInSampleTypeCollection" + currentRandomName;
+        SiteWrapper site = SiteHelper.addSite(name);
+        int nber = addSampleTypes(site, name);
 
         List<SampleTypeWrapper> types = site.getSampleTypeCollection();
         SampleTypeWrapper type = new SampleTypeWrapper(appService);
@@ -383,12 +391,12 @@ public class TestSite extends TestDatabase {
 
     @Test
     public void testRemoveInSampleTypeCollection() throws Exception {
-        SiteWrapper site = SiteHelper
-            .addSite("testRemoveInSampleTypeCollection");
-        int nber = addSampleTypes(site, "testRemoveInSampleTypeCollection");
+        String name = "testRemoveInSampleTypeCollection" + currentRandomName;
+        SiteWrapper site = SiteHelper.addSite(name);
+        int nber = addSampleTypes(site, name);
 
         List<SampleTypeWrapper> types = site.getSampleTypeCollection();
-        SampleTypeWrapper type = chooseRandomlyInList(types);
+        SampleTypeWrapper type = DbHelper.chooseRandomlyInList(types);
         int idContainer = type.getId();
         types.remove(type);
         site.setSampleTypeCollection(types);
@@ -409,14 +417,41 @@ public class TestSite extends TestDatabase {
     @Test
     public void testAddSite() throws Exception {
         int oldTotal = SiteWrapper.getAllSites(appService).size();
-        SiteHelper.addSite("testPersist");
+        SiteHelper.addSite("testPersist" + currentRandomName);
         int newTotal = SiteWrapper.getAllSites(appService).size();
         Assert.assertEquals(oldTotal + 1, newTotal);
     }
 
     @Test
+    public void testAddSiteFail() throws Exception {
+        String name = "testAddSiteFail" + currentRandomName;
+        SiteWrapper site = new SiteWrapper(appService);
+        site.setName(name);
+
+        try {
+            site.persist();
+            Assert.fail("Should not insert the site : no address");
+        } catch (BiobankCheckException bce) {
+            Assert.assertTrue(true);
+        }
+
+        site.setCity("Vesoul");
+        site.persist();
+
+        site = SiteHelper.newSite(name);
+        try {
+            site.persist();
+            Assert
+                .fail("Should not insert the site : same name already in database");
+        } catch (BiobankCheckException bce) {
+            Assert.assertTrue(true);
+        }
+    }
+
+    @Test
     public void testDelete() throws Exception {
-        SiteWrapper site = SiteHelper.addSite("testDelete", false);
+        SiteWrapper site = SiteHelper.addSite("testDelete" + currentRandomName,
+            false);
         // object is in database
         Assert.assertNotNull(site);
         site.delete();
@@ -428,7 +463,8 @@ public class TestSite extends TestDatabase {
 
     @Test
     public void testResetAlreadyInDatabase() throws Exception {
-        SiteWrapper site = SiteHelper.addSite("testResetAlreadyInDatabase");
+        SiteWrapper site = SiteHelper.addSite("testResetAlreadyInDatabase"
+            + currentRandomName);
         site.reload();
         String oldName = site.getName();
         site.setName("toto");
@@ -446,7 +482,8 @@ public class TestSite extends TestDatabase {
 
     @Test
     public void testSetPvInfoPossible() throws Exception {
-        SiteWrapper site = SiteHelper.addSite("testSetPvInfoPossible");
+        String name = "testSetPvInfoPossible" + currentRandomName;
+        SiteWrapper site = SiteHelper.addSite(name);
         site.reload();
 
         String[] types = site.getPvInfoTypes();
@@ -464,7 +501,7 @@ public class TestSite extends TestDatabase {
 
         Assert.assertEquals(type, site.getPvInfoType(labelGlobal));
 
-        SiteWrapper site2 = SiteHelper.addSite("SetPvInfoPossible");
+        SiteWrapper site2 = SiteHelper.addSite(name + "secondSite");
         types = site2.getPvInfoTypes();
         if (types.length == 0) {
             Assert.fail("Can't test without pvinfotypes");
@@ -497,9 +534,9 @@ public class TestSite extends TestDatabase {
 
     @Test
     public void testGetTopContainerCollection() throws Exception {
-        SiteWrapper site = SiteHelper.addSite("testGetTopContainerCollection");
-        ContainerHelper.addContainersRandom(site,
-            "testGetTopContainerCollection", r.nextInt(15) + 1);
+        String name = "testGetTopContainerCollection" + currentRandomName;
+        SiteWrapper site = SiteHelper.addSite(name);
+        ContainerHelper.addContainersRandom(site, name, r.nextInt(15) + 1);
 
         List<ContainerWrapper> containers = site.getTopContainerCollection();
         int sizeFound = containers.size();
@@ -516,9 +553,9 @@ public class TestSite extends TestDatabase {
 
     @Test
     public void testGetTopContainerCollectionBoolean() throws Exception {
-        SiteWrapper site = SiteHelper.addSite("testGetTopContainerCollection");
-        ContainerHelper.addContainersRandom(site,
-            "testGetTopContainerCollection", r.nextInt(15) + 1);
+        String name = "testGetTopContainerCollection" + currentRandomName;
+        SiteWrapper site = SiteHelper.addSite(name);
+        ContainerHelper.addContainersRandom(site, name, r.nextInt(15) + 1);
 
         List<ContainerWrapper> containers = site
             .getTopContainerCollection(true);
@@ -533,13 +570,14 @@ public class TestSite extends TestDatabase {
 
     @Test
     public void testGetSites() throws Exception {
-        SiteHelper.addSites("testGetSites", r.nextInt(15) + 1);
+        SiteHelper.addSites("testGetSites" + currentRandomName,
+            r.nextInt(15) + 1);
 
         List<SiteWrapper> siteWrappers = SiteWrapper.getSites(appService, null);
         int inDB = appService.search(Site.class, new Site()).size();
         Assert.assertEquals(inDB, siteWrappers.size());
 
-        SiteWrapper site = chooseRandomlyInList(siteWrappers);
+        SiteWrapper site = DbHelper.chooseRandomlyInList(siteWrappers);
         siteWrappers = SiteWrapper.getSites(appService, site.getId());
         Assert.assertEquals(1, siteWrappers.size());
 
@@ -549,5 +587,4 @@ public class TestSite extends TestDatabase {
         siteWrappers = SiteWrapper.getSites(appService, max.get(0) + 1000);
         Assert.assertEquals(0, siteWrappers.size());
     }
-
 }

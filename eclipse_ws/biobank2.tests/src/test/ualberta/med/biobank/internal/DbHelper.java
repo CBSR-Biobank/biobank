@@ -19,6 +19,17 @@ public class DbHelper {
         DbHelper.appService = appService;
     }
 
+    public static <T> T chooseRandomlyInList(List<T> list) {
+        if (list.size() == 1) {
+            return list.get(0);
+        }
+        if (list.size() > 1) {
+            int pos = r.nextInt(list.size());
+            return list.get(pos);
+        }
+        return null;
+    }
+
     public static void deleteContainers(List<ContainerWrapper> containers)
         throws Exception {
         if ((containers == null) || (containers.size() == 0))

@@ -27,9 +27,6 @@ public class TestDatabase {
         {
             add(java.lang.Class.class);
             add(java.lang.Object.class);
-            // add(java.util.Set.class);
-            // add(java.util.List.class);
-            add(java.util.Collection.class);
         }
     };
 
@@ -66,6 +63,8 @@ public class TestDatabase {
             if (method.getName().startsWith("get")
                 && !method.getName().equals("getClass")
                 && !IGNORE_RETURN_TYPES.contains(method.getReturnType())
+                && !Collection.class.isAssignableFrom(method.getReturnType())
+                && !method.getReturnType().isArray()
                 && !method.getReturnType().getName().startsWith(
                     "edu.ualberta.med.biobank.common")) {
                 GetterInfo getterInfo = new GetterInfo();
@@ -138,16 +137,4 @@ public class TestDatabase {
         }
 
     }
-
-    public <T> T chooseRandomlyInList(List<T> list) {
-        if (list.size() == 1) {
-            return list.get(0);
-        }
-        if (list.size() > 1) {
-            int pos = r.nextInt(list.size());
-            return list.get(pos);
-        }
-        return null;
-    }
-
 }

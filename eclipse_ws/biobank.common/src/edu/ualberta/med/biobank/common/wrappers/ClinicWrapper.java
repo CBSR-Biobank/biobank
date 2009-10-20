@@ -219,7 +219,7 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
     }
 
     @SuppressWarnings("unchecked")
-    public Collection<ContactWrapper> getContactCollection(boolean sort) {
+    public List<ContactWrapper> getContactCollection(boolean sort) {
         List<ContactWrapper> contactCollection = (List<ContactWrapper>) propertiesMap
             .get("contactCollection");
         if (contactCollection == null) {
@@ -237,7 +237,7 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
         return contactCollection;
     }
 
-    public Collection<ContactWrapper> getContactCollection() {
+    public List<ContactWrapper> getContactCollection() {
         return getContactCollection(false);
     }
 

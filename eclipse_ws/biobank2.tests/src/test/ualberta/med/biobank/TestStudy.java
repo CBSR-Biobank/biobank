@@ -2,11 +2,17 @@ package test.ualberta.med.biobank;
 
 import static org.junit.Assert.fail;
 
+import java.util.List;
+
 import org.junit.Assert;
 import org.junit.Test;
 
+import test.ualberta.med.biobank.internal.DbHelper;
 import test.ualberta.med.biobank.internal.SiteHelper;
 import test.ualberta.med.biobank.internal.StudyHelper;
+import edu.ualberta.med.biobank.common.BiobankCheckException;
+import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.Study;
@@ -41,46 +47,110 @@ public class TestStudy extends TestDatabase {
         Assert.assertFalse(site.getStudyCollection().contains(study));
     }
 
-    // @Test
-    // public void testGetContactCollection() {
-    // SiteWrapper site = SiteHelper.addSite("testGetContactCollection");
-    // StudyWrapper study = StudyHelper.addStudy(site,
-    // "testGetContactCollection");
-    // addContactsToStudy(study, "testGetContactCollection");
-    //
-    // List<ContactWrapper> contacts = study.getContactCollection();
-    // int sizeFound = contacts.size();
-    //
-    // Assert.assertEquals(studiesNber, sizeFound);
-    // }
-    //
-    // private void addContactsToStudy(StudyWrapper study, String name)
-    // throws Exception {
-    // SiteWrapper site = study.getSite();
-    // int nberClinics = addClinics(site, name);
-    // site.reload();
-    // int nber = r.nextInt(nberClinics) + 1;
-    // ClinicWrapper clinic =
-    // for (int i = 0; i < nber; i++) {
-    // ClinicWrapper clini=
-    // }
-    //
-    // }
+    @Test
+    public void testGetContactCollection() throws Exception {
+        SiteWrapper site = SiteHelper.addSite("testGetContactCollection");
+        StudyWrapper study = StudyHelper.addStudy(site,
+            "testGetContactCollection");
+        int nber = StudyHelper.addContactsToStudy(study,
+            "testGetContactCollection");
 
-    // @Test
-    // public void testGetContactCollectionBoolean() {
-    // SiteWrapper site = SiteHelper.addSite("testGetStudyCollectionBoolean");
-    // addStudies(site, "testGetStudyCollectionBoolean");
-    //
-    // List<StudyWrapper> studiesSorted = site.getStudyCollection(true);
-    // if (studiesSorted.size() > 1) {
-    // for (int i = 0; i < studiesSorted.size() - 1; i++) {
-    // StudyWrapper study1 = studiesSorted.get(i);
-    // StudyWrapper study2 = studiesSorted.get(i + 1);
-    // Assert.assertTrue(study1.compareTo(study2) <= 0);
-    // }
-    // }
-    // }
+        List<ContactWrapper> contacts = study.getContactCollection();
+        int sizeFound = contacts.size();
+
+        Assert.assertEquals(nber, sizeFound);
+    }
+
+    @Test
+    public void testGetContactCollectionBoolean() throws Exception {
+        SiteWrapper site = SiteHelper
+            .addSite("testGetContactCollectionBoolean");
+        StudyWrapper study = StudyHelper.addStudy(site,
+            "testGetContactCollectionBoolean");
+        StudyHelper
+            .addContactsToStudy(study, "testGetContactCollectionBoolean");
+
+        List<ContactWrapper> contacts = study.getContactCollection(true);
+        if (contacts.size() > 1) {
+            for (int i = 0; i < contacts.size() - 1; i++) {
+                ContactWrapper contact1 = contacts.get(i);
+                ContactWrapper contact2 = contacts.get(i + 1);
+                Assert.assertTrue(contact1.compareTo(contact2) <= 0);
+            }
+        }
+    }
+
+    @Test
+    public void testAddInContactCollection() throws Exception {
+        SiteWrapper site = SiteHelper.addSite("testAddInContactCollection");
+        StudyWrapper study = StudyHelper.addStudy(site,
+            "testAddInContactCollection");
+        int nber = StudyHelper.addContactsToStudy(study,
+            "testAddInContactCollection");
+        site.reload();
+
+        // get a clinic not yet added
+        List<ContactWrapper> contacts = study.getContactCollection();
+        List<ClinicWrapper> clinics = site.getClinicCollection();
+        for (ContactWrapper contact : contacts) {
+            clinics.remove(contact.getClinicWrapper());
+        }
+        ClinicWrapper clinicNotAdded = DbHelper.chooseRandomlyInList(clinics);
+        ContactWrapper contactToAdd = DbHelper
+            .chooseRandomlyInList(clinicNotAdded.getContactCollection());
+        contacts.add(contactToAdd);
+        study.setContactCollection(contacts);
+        study.persist();
+
+        study.reload();
+        // one contact added
+        Assert.assertEquals(nber + 1, study.getContactCollection().size());
+    }
+
+    @Test
+    public void testAddInContactCollectionFromClinicAlreadyChoosen()
+        throws Exception {
+        SiteWrapper site = SiteHelper
+            .addSite("testAddInContactCollectionFromClinicAlreadyChoosen");
+        StudyWrapper study = StudyHelper.addStudy(site,
+            "testAddInContactCollectionFromClinicAlreadyChoosen");
+        int nber = StudyHelper.addContactsToStudy(study,
+            "testAddInContactCollectionFromClinicAlreadyChoosen");
+        site.reload();
+
+        // get a clinic already added
+        List<ContactWrapper> contacts = study.getContactCollection();
+        ClinicWrapper clinicUsed = null;
+        ContactWrapper contactUsed = null;
+        for (ContactWrapper contact : contacts) {
+            if (contact.getClinicWrapper().getContactCollection().size() > 1) {
+                clinicUsed = contact.getClinicWrapper();
+                contactUsed = contact;
+                break;
+            }
+        }
+        if (clinicUsed != null) {
+            // get a different contact
+            ContactWrapper newContact = null;
+            for (ContactWrapper contact : clinicUsed.getContactCollection()) {
+                if (!contact.equals(contactUsed)) {
+                    newContact = contact;
+                    break;
+                }
+            }
+            contacts.add(newContact);
+            study.setContactCollection(contacts);
+            try {
+                study.persist();
+                Assert
+                    .fail("Exception expected - should not be able to add more than one contact from the same clinic");
+            } catch (BiobankCheckException bce) {
+                Assert.assertTrue(true);
+            }
+        } else {
+            Assert.fail("Was not able to perform test");
+        }
+    }
 
     @Test
     public void testSetContactCollectionCollectionOfContactBoolean() {

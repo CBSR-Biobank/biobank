@@ -9,43 +9,29 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
-import test.ualberta.med.biobank.internal.ClinicHelper;
-import test.ualberta.med.biobank.internal.ContainerHelper;
-import test.ualberta.med.biobank.internal.ContainerTypeHelper;
-import test.ualberta.med.biobank.internal.PatientHelper;
-import test.ualberta.med.biobank.internal.PatientVisitHelper;
-import test.ualberta.med.biobank.internal.SampleHelper;
-import test.ualberta.med.biobank.internal.SiteHelper;
-import test.ualberta.med.biobank.internal.StudyHelper;
+import test.ualberta.med.biobank.internal.DbHelper;
 
 @RunWith(Suite.class)
 @SuiteClasses( { TestContainerType.class, TestContainer.class, TestSite.class,
+    TestPatient.class, TestPatientVisit.class, TestStudy.class,
     TestContact.class, TestContainerLabelingScheme.class,
-    TestPvSampleSource.class, TestSample.class, TestPatient.class,
-    TestPatientVisit.class, TestStudy.class })
+    TestPvSampleSource.class, TestSample.class })
 public class AllTests {
-	public static WritableApplicationService appService = null;
+    public static WritableApplicationService appService = null;
 
-	@BeforeClass
-	public static void setUp() throws Exception {
-		appService = (WritableApplicationService) ApplicationServiceProvider
-				.getApplicationServiceFromUrl("http://"
+    @BeforeClass
+    public static void setUp() throws Exception {
+        appService = (WritableApplicationService) ApplicationServiceProvider
+            .getApplicationServiceFromUrl("http://"
                 + System.getProperty("server", "localhost:8080") + "/biobank2",
                 "testuser", "test");
 
-        ClinicHelper.setAppService(appService);
-        ContainerHelper.setAppService(appService);
-        ContainerTypeHelper.setAppService(appService);
-        PatientHelper.setAppService(appService);
-        PatientVisitHelper.setAppService(appService);
-        SampleHelper.setAppService(appService);
-        SiteHelper.setAppService(appService);
-        StudyHelper.setAppService(appService);
+        DbHelper.setAppService(appService);
     }
 
-	@AfterClass
-	public static void tearDown() {
-		System.out.println("tearing down");
-	}
+    @AfterClass
+    public static void tearDown() {
+        System.out.println("tearing down");
+    }
 
 }
