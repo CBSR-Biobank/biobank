@@ -1,7 +1,6 @@
 package test.ualberta.med.biobank;
 
 import edu.ualberta.med.biobank.common.BiobankCheckException;
-import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
@@ -15,7 +14,6 @@ import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 import java.lang.reflect.Method;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -27,16 +25,12 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 
+import test.ualberta.med.biobank.internal.SiteHelper;
+
 public class TestDatabase {
     protected static WritableApplicationService appService;
 
-    private static final String ALPHABET = "abcdefghijklmnopqrstuvwxyz";
-
-    private static final int ALPHABET_LEN = ALPHABET.length();
-
     protected Random r;
-
-    protected List<SiteWrapper> createdSites;
 
     private static final List<String> IGNORE_RETURN_TYPES = new ArrayList<String>() {
         private static final long serialVersionUID = 1L;
@@ -62,13 +56,12 @@ public class TestDatabase {
             AllTests.setUp();
             appService = AllTests.appService;
         }
-        createdSites = new ArrayList<SiteWrapper>();
     }
 
     @After
     public void tearDown() throws Exception {
         try {
-            deletedCreatedSites();
+            SiteHelper.deletedCreatedSites();
         } catch (Exception e) {
             e.printStackTrace(System.err);
             Assert.fail();
@@ -134,14 +127,9 @@ public class TestDatabase {
                 } else if (getReturnType.equals("java.lang.Double")) {
                     parameter = new Double(r.nextDouble());
                 } else if (getReturnType.equals("java.lang.String")) {
-                    String str = new String();
-                    for (int j = 0, n = r.nextInt(32); j < n; ++j) {
-                        int begin = r.nextInt(ALPHABET_LEN - 1);
-                        str += ALPHABET.substring(begin, begin + 1);
-                    }
-                    parameter = str;
+                    parameter = Utils.getRandomString(r, 32);
                 } else if (getReturnType.equals("java.util.Date")) {
-                    parameter = getRandomDate();
+                    parameter = Utils.getRandomDate(r);
                 } else {
                     throw new Exception("return type " + getReturnType
                         + " for method " + getterInfo.getMethod.getName()
@@ -160,13 +148,6 @@ public class TestDatabase {
             }
         }
 
-    }
-
-    public Date getRandomDate() throws ParseException {
-        String dateStr = String.format("%04-%02-%02 %02:%02", 2000 + r
-            .nextInt(40), r.nextInt(12) + 1, r.nextInt(30) + 1,
-            r.nextInt(24) + 1, r.nextInt(60) + 1);
-        return DateFormatter.dateFormatter.parse(dateStr);
     }
 
     public <T> T chooseRandomlyInList(List<T> list) {
@@ -351,94 +332,6 @@ public class TestDatabase {
         return sample;
     }
 
-    protected void deletedCreatedSites() throws Exception {
-        for (SiteWrapper site : createdSites) {
-            site.reload();
-            removeContainers(site.getContainerCollection());
-            removeStudies(site.getStudyCollection());
-            removeFromList(site.getClinicCollection());
-            removeFromList(site.getContainerTypeCollection());
-            site.reload();
-            site.delete();
-        }
-    }
-
-    protected void removeContainers(List<ContainerWrapper> containers)
-        throws Exception {
-        for (ContainerWrapper container : containers) {
-            if (container.hasChildren()) {
-                removeContainers(container.getChildren());
-            } else {
-                removeFromList(container.getSamples());
-            }
-            container.reload();
-            container.delete();
-        }
-    }
-
-    protected void removeStudies(List<StudyWrapper> studies) throws Exception {
-        for (StudyWrapper study : studies) {
-            removePatients(study.getPatientCollection());
-            study.reload();
-            study.delete();
-        }
-    }
-
-    protected void removePatients(List<PatientWrapper> patients)
-        throws Exception {
-        for (PatientWrapper patient : patients) {
-            removeFromList(patient.getPatientVisitCollection());
-            patient.reload();
-            patient.delete();
-        }
-    }
-
-    protected void removeFromList(List<? extends ModelWrapper<?>> list)
-        throws Exception {
-        if (list != null) {
-            for (ModelWrapper<?> object : list) {
-                object.reload();
-                object.delete();
-            }
-        }
-    }
-
-    protected SiteWrapper newSite(String name, String street1) {
-        SiteWrapper site = new SiteWrapper(appService);
-        site.setName(name);
-        site.setStreet1(street1);
-        return site;
-    }
-
-    protected SiteWrapper newSite(String name) throws Exception {
-        SiteWrapper site = new SiteWrapper(appService);
-        site.setName(name + r.nextInt());
-        site.setCity("");
-        return site;
-    }
-
-    protected SiteWrapper addSite(String name, boolean addToCreatedList)
-        throws Exception {
-        SiteWrapper site = newSite(name);
-        site.persist();
-        if (addToCreatedList) {
-            createdSites.add(site);
-        }
-        return site;
-    }
-
-    protected SiteWrapper addSite(String name) throws Exception {
-        return addSite(name, true);
-    }
-
-    protected int addSites(String name) throws Exception {
-        int nber = r.nextInt(15) + 1;
-        for (int i = 0; i < nber; i++) {
-            addSite(name);
-        }
-        return nber;
-    }
-
     protected StudyWrapper newStudy(String name, String nameShort,
         SiteWrapper site) {
         StudyWrapper study = new StudyWrapper(appService);
@@ -453,6 +346,13 @@ public class TestDatabase {
         StudyWrapper study = new StudyWrapper(appService);
         study.setName(name + "Random" + r.nextInt());
         study.setSite(site);
+        return study;
+    }
+
+    protected StudyWrapper addStudy(String name, String nameShort,
+        SiteWrapper site) throws Exception {
+        StudyWrapper study = newStudy(name, nameShort, site);
+        study.persist();
         return study;
     }
 

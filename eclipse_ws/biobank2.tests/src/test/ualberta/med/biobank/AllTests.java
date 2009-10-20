@@ -3,6 +3,8 @@ package test.ualberta.med.biobank;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.client.ApplicationServiceProvider;
 
+import java.util.Random;
+
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
@@ -14,6 +16,8 @@ import org.junit.runners.Suite.SuiteClasses;
     TestPatient.class, TestPatientVisit.class, TestSite.class, TestStudy.class })
 public class AllTests {
     public static WritableApplicationService appService = null;
+
+    public static Random r = new Random();
 
     @BeforeClass
     public static void setUp() throws Exception {

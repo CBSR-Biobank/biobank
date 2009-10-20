@@ -15,6 +15,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import test.ualberta.med.biobank.internal.SiteHelper;
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.LabelingScheme;
 import edu.ualberta.med.biobank.common.RowColPos;
@@ -50,7 +51,7 @@ public class TestContainer extends TestDatabase {
         if (sites.size() > 0) {
             site = sites.get(0);
         } else {
-            site = addSite("Site - Container Test", "street");
+            site = SiteHelper.addSite("Site - Container Test");
         }
 
         deleteContainers();
@@ -463,8 +464,8 @@ public class TestContainer extends TestDatabase {
         StudyWrapper study = addStudy("Study1", "S1", site);
 
         PatientWrapper patient = addPatient("1000", study);
-        PatientVisitWrapper pv = addPatientVisit(patient, getRandomDate(),
-            getRandomDate(), getRandomDate());
+        PatientVisitWrapper pv = addPatientVisit(patient, Utils
+            .getRandomDate(r), Utils.getRandomDate(r), Utils.getRandomDate(r));
         addContainerHierarchy();
         ContainerWrapper childL3 = containerMap.get("ChildL3");
         for (int i = 0, n = sampleTypeList.size(); i < n; ++i) {
@@ -494,8 +495,8 @@ public class TestContainer extends TestDatabase {
         StudyWrapper study = addStudy("Study1", "S1", site);
 
         PatientWrapper patient = addPatient("1000", study);
-        PatientVisitWrapper pv = addPatientVisit(patient, getRandomDate(),
-            getRandomDate(), getRandomDate());
+        PatientVisitWrapper pv = addPatientVisit(patient, Utils
+            .getRandomDate(r), Utils.getRandomDate(r), Utils.getRandomDate(r));
         addContainerHierarchy();
         ContainerWrapper childL3 = containerMap.get("ChildL3");
         for (int i = 0, n = sampleTypeList.size(); i < n; ++i) {
