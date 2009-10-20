@@ -388,10 +388,10 @@ public class ContainerWrapper extends ModelWrapper<Container> {
     }
 
     public void setSite(SiteWrapper siteWrapper) {
-        if (siteWrapper != null) {
-            setSite(siteWrapper.getWrappedObject());
-        } else {
+        if (siteWrapper == null) {
             setSite((Site) null);
+        } else {
+            setSite(siteWrapper.getWrappedObject());
         }
     }
 

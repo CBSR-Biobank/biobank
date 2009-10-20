@@ -15,6 +15,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import test.ualberta.med.biobank.internal.SiteHelper;
+import test.ualberta.med.biobank.internal.StudyHelper;
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.LabelingScheme;
 import edu.ualberta.med.biobank.common.RowColPos;
@@ -25,6 +27,7 @@ import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.Container;
 
 public class TestContainer extends TestDatabase {
@@ -38,6 +41,7 @@ public class TestContainer extends TestDatabase {
 
     private Map<String, ContainerWrapper> containerMap;
 
+    @Override
     @Before
     public void setUp() throws Exception {
         super.setUp();
@@ -48,10 +52,7 @@ public class TestContainer extends TestDatabase {
         if (sites.size() > 0) {
             site = sites.get(0);
         } else {
-            site = new SiteWrapper(appService);
-            site.setName("Site - Container Test");
-            site.setStreet1("street");
-            site.persist();
+            site = SiteHelper.addSite("Site - Container Test");
         }
 
         deleteContainers();
@@ -61,6 +62,7 @@ public class TestContainer extends TestDatabase {
     }
 
     @After
+    @Override
     public void tearDown() throws Exception {
         deleteContainers();
         deleteContainerTypes();
@@ -155,8 +157,7 @@ public class TestContainer extends TestDatabase {
 
     @Test
     public void testGettersAndSetters() throws BiobankCheckException, Exception {
-        ContainerWrapper container = addContainer(null, null, null, site,
-            containerTypeMap.get("TopCT"));
+        addContainer(null, null, null, site, containerTypeMap.get("TopCT"));
     }
 
     @Test
@@ -461,9 +462,11 @@ public class TestContainer extends TestDatabase {
         childTypeL3.setSampleTypeCollection(sampleTypeList);
         childTypeL3.persist();
 
-        PatientWrapper patient = addPatient("1000");
-        PatientVisitWrapper pv = addPatientVisit(patient, getRandomDate(),
-            getRandomDate(), getRandomDate());
+        StudyWrapper study = StudyHelper.addStudy("Study1", "S1", site);
+
+        PatientWrapper patient = addPatient("1000", study);
+        PatientVisitWrapper pv = addPatientVisit(patient,
+            Utils.getRandomDate(), Utils.getRandomDate(), Utils.getRandomDate());
         addContainerHierarchy();
         ContainerWrapper childL3 = containerMap.get("ChildL3");
         for (int i = 0, n = sampleTypeList.size(); i < n; ++i) {
@@ -490,9 +493,11 @@ public class TestContainer extends TestDatabase {
         childTypeL3.setSampleTypeCollection(sampleTypeList);
         childTypeL3.persist();
 
-        PatientWrapper patient = addPatient("1000");
-        PatientVisitWrapper pv = addPatientVisit(patient, getRandomDate(),
-            getRandomDate(), getRandomDate());
+        StudyWrapper study = StudyHelper.addStudy("Study1", "S1", site);
+
+        PatientWrapper patient = addPatient("1000", study);
+        PatientVisitWrapper pv = addPatientVisit(patient,
+            Utils.getRandomDate(), Utils.getRandomDate(), Utils.getRandomDate());
         addContainerHierarchy();
         ContainerWrapper childL3 = containerMap.get("ChildL3");
         for (int i = 0, n = sampleTypeList.size(); i < n; ++i) {

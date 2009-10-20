@@ -1,7 +1,6 @@
 package test.ualberta.med.biobank;
 
 import edu.ualberta.med.biobank.common.BiobankCheckException;
-import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
@@ -10,10 +9,10 @@ import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 import java.lang.reflect.Method;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -21,15 +20,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 
+import test.ualberta.med.biobank.internal.SiteHelper;
+
 public class TestDatabase {
     protected static WritableApplicationService appService;
-
-    private static final String ALPHABET = "abcdefghijklmnopqrstuvwxyz";
-
-    private static final int ALPHABET_LEN = ALPHABET.length();
 
     protected Random r;
 
@@ -56,6 +54,16 @@ public class TestDatabase {
         if (appService == null) {
             AllTests.setUp();
             appService = AllTests.appService;
+        }
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        try {
+            SiteHelper.deletedCreatedSites();
+        } catch (Exception e) {
+            e.printStackTrace(System.err);
+            Assert.fail();
         }
     }
 
@@ -118,14 +126,9 @@ public class TestDatabase {
                 } else if (getReturnType.equals("java.lang.Double")) {
                     parameter = new Double(r.nextDouble());
                 } else if (getReturnType.equals("java.lang.String")) {
-                    String str = new String();
-                    for (int j = 0, n = r.nextInt(32); j < n; ++j) {
-                        int begin = r.nextInt(ALPHABET_LEN - 1);
-                        str += ALPHABET.substring(begin, begin + 1);
-                    }
-                    parameter = str;
+                    parameter = Utils.getRandomString(32);
                 } else if (getReturnType.equals("java.util.Date")) {
-                    parameter = getRandomDate();
+                    parameter = Utils.getRandomDate();
                 } else {
                     throw new Exception("return type " + getReturnType
                         + " for method " + getterInfo.getMethod.getName()
@@ -144,13 +147,6 @@ public class TestDatabase {
             }
         }
 
-    }
-
-    public Date getRandomDate() throws ParseException {
-        String dateStr = String.format("%04-%02-%02 %02:%02", 2000 + r
-            .nextInt(40), r.nextInt(12) + 1, r.nextInt(30) + 1,
-            r.nextInt(24) + 1, r.nextInt(60) + 1);
-        return DateFormatter.dateFormatter.parse(dateStr);
     }
 
     public <T> T chooseRandomlyInList(List<T> list) {
@@ -188,6 +184,22 @@ public class TestDatabase {
             nameShort, labelingScheme, rowCapacity, colCapacity, isTopLevel);
         container.persist();
         return container;
+    }
+
+    protected ContainerTypeWrapper addContainerTypeRandom(SiteWrapper site,
+        String name) throws Exception {
+        return addContainerType(site, name + "Random" + r.nextInt(), "", null,
+            r.nextInt(10) + 1, r.nextInt(10) + 1, r.nextBoolean());
+    }
+
+    protected int addContainerTypesRandom(SiteWrapper site, String name)
+        throws Exception {
+        int nber = r.nextInt(15) + 1;
+        for (int i = 0; i < nber; i++) {
+            addContainerTypeRandom(site, name);
+        }
+        site.reload();
+        return nber;
     }
 
     protected ContainerWrapper newContainer(String label, String barcode,
@@ -240,7 +252,32 @@ public class TestDatabase {
             type, row, col);
         container.persist();
         return container;
+    }
 
+    protected ContainerWrapper addContainerRandom(SiteWrapper site, String name)
+        throws Exception {
+        ContainerTypeWrapper type = addContainerTypeRandom(site, name);
+        String label = null;
+        if ((type.getTopLevel() != null) && type.getTopLevel()) {
+            label = String.valueOf(r.nextInt());
+        }
+        ContainerWrapper container = addContainer(label, name + "Random"
+            + r.nextInt(), null, site, type);
+        if (label == null) {
+            container.setPosition(0, 0);
+        }
+        container.persist();
+        return container;
+    }
+
+    protected int addContainersRandom(SiteWrapper site, String name)
+        throws Exception {
+        int nber = r.nextInt(15) + 1;
+        for (int i = 0; i < nber; i++) {
+            addContainerRandom(site, name);
+        }
+        site.reload();
+        return nber;
     }
 
     protected PatientWrapper newPatient(String number) {
@@ -249,8 +286,10 @@ public class TestDatabase {
         return patient;
     }
 
-    protected PatientWrapper addPatient(String number) throws Exception {
+    protected PatientWrapper addPatient(String number, StudyWrapper study)
+        throws Exception {
         PatientWrapper patient = newPatient(number);
+        patient.setStudy(study);
         patient.persist();
         return patient;
     }
