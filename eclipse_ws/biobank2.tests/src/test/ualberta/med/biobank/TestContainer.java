@@ -67,6 +67,7 @@ public class TestContainer extends TestDatabase {
     @After
     @Override
     public void tearDown() throws Exception {
+        super.tearDown();
         deleteContainers();
         deleteContainerTypes();
     }
@@ -144,8 +145,9 @@ public class TestContainer extends TestDatabase {
 
     @Test
     public void testGettersAndSetters() throws BiobankCheckException, Exception {
-        ContainerHelper.addContainer(null, null, null, site, containerTypeMap
-            .get("TopCT"));
+        ContainerWrapper container = ContainerHelper.addContainer(null, null,
+            null, site, containerTypeMap.get("TopCT"));
+        testGettersAndSetters(container);
     }
 
     @Test
