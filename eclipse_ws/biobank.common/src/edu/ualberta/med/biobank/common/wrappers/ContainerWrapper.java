@@ -535,7 +535,8 @@ public class ContainerWrapper extends ModelWrapper<Container> {
     /**
      * Return true if this container can hold the type of sample
      */
-    public boolean canHold(SampleWrapper sample) throws ApplicationException {
+    public boolean canHoldSample(SampleWrapper sample)
+        throws ApplicationException {
         SampleTypeWrapper type = sample.getSampleType();
         HQLCriteria criteria = new HQLCriteria("select sampleType from "
             + ContainerType.class.getName()
@@ -585,6 +586,7 @@ public class ContainerWrapper extends ModelWrapper<Container> {
         }
     }
 
+    // fix
     public void assignNewParent(ContainerWrapper newParent, String newLabel)
         throws BiobankCheckException, Exception {
         // remove from old parent, add to new

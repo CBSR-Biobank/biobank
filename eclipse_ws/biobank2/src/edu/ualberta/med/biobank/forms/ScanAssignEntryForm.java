@@ -456,7 +456,7 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
                     return false;
                 }
                 // sample is a new one !
-                if (!currentPalletWrapper.canHold(foundSample)) {
+                if (!currentPalletWrapper.canHoldSample(foundSample)) {
                     // pallet can't hold this sample type
                     scanCell.setStatus(SampleCellStatus.ERROR);
                     scanCell.setInformation("This pallet type "
