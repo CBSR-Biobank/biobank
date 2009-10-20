@@ -23,7 +23,7 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 public class SampleWrapper extends ModelWrapper<Sample> {
 
     private SamplePositionWrapper samplePosition;
-    private Position position;
+    private RowColPos position;
 
     public SampleWrapper(WritableApplicationService appService,
         Sample wrappedObject) {
@@ -97,6 +97,10 @@ public class SampleWrapper extends ModelWrapper<Sample> {
             patientVisit);
     }
 
+    public void setPatientVisit(PatientVisitWrapper patientVisit) {
+        setPatientVisit(patientVisit.getWrappedObject());
+    }
+
     public PatientVisitWrapper getPatientVisit() {
         PatientVisit pv = wrappedObject.getPatientVisit();
         if (pv == null) {
@@ -111,7 +115,7 @@ public class SampleWrapper extends ModelWrapper<Sample> {
             positionString, parentContainer.getContainerType()
                 .getWrappedObject());
         if ((rcp.row > -1) && (rcp.col > -1)) {
-            setPosition(new Position(rcp.row, rcp.col));
+            setPosition(rcp);
         } else {
             throw new Exception("Position " + positionString + " not valid");
         }
@@ -119,20 +123,20 @@ public class SampleWrapper extends ModelWrapper<Sample> {
 
     private void initSamplePosition() {
         samplePosition = new SamplePositionWrapper(appService);
-        position = new Position();
+        position = new RowColPos();
         samplePosition.setSample(this);
         wrappedObject.setSamplePosition(samplePosition.getWrappedObject());
     }
 
-    public Position getPosition() {
+    public RowColPos getPosition() {
         if (samplePosition == null) {
             return null;
         }
         return position;
     }
 
-    public void setPosition(Position position) {
-        Position oldPosition = this.position;
+    public void setPosition(RowColPos position) {
+        RowColPos oldPosition = this.position;
         if (samplePosition == null) {
             initSamplePosition();
         }
@@ -141,6 +145,10 @@ public class SampleWrapper extends ModelWrapper<Sample> {
         this.position = position;
         propertyChangeSupport.firePropertyChange("position", oldPosition,
             position);
+    }
+
+    public void setPosition(Integer row, Integer col) {
+        setPosition(new RowColPos(row, col));
     }
 
     public ContainerWrapper getParent() {

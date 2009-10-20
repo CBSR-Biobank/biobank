@@ -38,7 +38,6 @@ import edu.ualberta.med.biobank.common.LabelingScheme;
 import edu.ualberta.med.biobank.common.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
-import edu.ualberta.med.biobank.common.wrappers.Position;
 import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
 import edu.ualberta.med.biobank.forms.listener.EnterKeyToNextFieldListener;
 import edu.ualberta.med.biobank.model.PalletCell;
@@ -457,7 +456,7 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
                     return false;
                 }
                 // sample is a new one !
-                if (!currentPalletWrapper.canHold(foundSample)) {
+                if (!currentPalletWrapper.canHoldSample(foundSample)) {
                     // pallet can't hold this sample type
                     scanCell.setStatus(SampleCellStatus.ERROR);
                     scanCell.setInformation("This pallet type "
@@ -499,7 +498,7 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
                     if (cell != null) {
                         SampleWrapper sample = cell.getSample();
                         if (sample != null) {
-                            sample.setPosition(new Position(i, j));
+                            sample.setPosition(new RowColPos(i, j));
                             sample.setParent(currentPalletWrapper);
                             sample.persist();
                             totalNb++;
@@ -633,7 +632,7 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
             List<SampleWrapper> samples = currentPalletWrapper.getSamples();
             if (samples != null) {
                 for (SampleWrapper sample : samples) {
-                    Position position = sample.getPosition();
+                    RowColPos position = sample.getPosition();
                     currentPalletSamples[position.row][position.col] = sample;
                 }
             }
