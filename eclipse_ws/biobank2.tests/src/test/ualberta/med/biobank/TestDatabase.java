@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 
@@ -62,6 +63,16 @@ public class TestDatabase {
 			appService = AllTests.appService;
 		}
 		createdSites = new ArrayList<SiteWrapper>();
+	}
+
+	@After
+	public void tearDown() throws Exception {
+		try {
+			deletedCreatedSites();
+		} catch (Exception e) {
+			e.printStackTrace(System.err);
+			Assert.fail();
+		}
 	}
 
 	public Collection<GetterInfo> getGettersAndSetters(ModelWrapper<?> w) {
@@ -268,8 +279,16 @@ public class TestDatabase {
 	protected ContainerWrapper addContainerRandom(SiteWrapper site, String name)
 			throws Exception {
 		ContainerTypeWrapper type = addContainerTypeRandom(site, name);
-		ContainerWrapper container = addContainer(
-				name + "Random" + r.nextInt(), "", null, site, type);
+		String label = null;
+		if ((type.getTopLevel() != null) && type.getTopLevel()) {
+			label = String.valueOf(r.nextInt());
+		}
+		ContainerWrapper container = addContainer(label, name + "Random"
+				+ r.nextInt(), null, site, type);
+		if (label == null) {
+			container.setPosition(0, 0);
+		}
+		container.persist();
 		return container;
 	}
 
@@ -336,12 +355,42 @@ public class TestDatabase {
 	protected void deletedCreatedSites() throws Exception {
 		for (SiteWrapper site : createdSites) {
 			site.reload();
-			removeFromList(site.getContainerCollection());
-			removeFromList(site.getStudyCollection());
+			removeContainers(site.getContainerCollection());
+			removeStudies(site.getStudyCollection());
 			removeFromList(site.getClinicCollection());
 			removeFromList(site.getContainerTypeCollection());
 			site.reload();
 			site.delete();
+		}
+	}
+
+	protected void removeContainers(List<ContainerWrapper> containers)
+			throws Exception {
+		for (ContainerWrapper container : containers) {
+			if (container.hasChildren()) {
+				removeContainers(container.getChildren());
+			} else {
+				removeFromList(container.getSamples());
+			}
+			container.reload();
+			container.delete();
+		}
+	}
+
+	protected void removeStudies(List<StudyWrapper> studies) throws Exception {
+		for (StudyWrapper study : studies) {
+			removePatients(study.getPatientCollection());
+			study.reload();
+			study.delete();
+		}
+	}
+
+	protected void removePatients(List<PatientWrapper> patients)
+			throws Exception {
+		for (PatientWrapper patient : patients) {
+			removeFromList(patient.getPatientVisitCollection());
+			patient.reload();
+			patient.delete();
 		}
 	}
 

@@ -2,9 +2,7 @@ package test.ualberta.med.biobank;
 
 import java.util.List;
 
-import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
@@ -18,22 +16,6 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class TestSite extends TestDatabase {
-
-	@Override
-	@Before
-	public void setUp() throws Exception {
-		super.setUp();
-	}
-
-	@After
-	public void tearDown() {
-		try {
-			deletedCreatedSites();
-		} catch (Exception e) {
-			e.printStackTrace(System.err);
-			Assert.fail();
-		}
-	}
 
 	@Test
 	public void testGettersAndSetters() throws Exception {
