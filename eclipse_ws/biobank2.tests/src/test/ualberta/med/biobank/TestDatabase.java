@@ -28,459 +28,456 @@ import org.junit.Assert;
 import org.junit.Before;
 
 public class TestDatabase {
-	protected static WritableApplicationService appService;
+    protected static WritableApplicationService appService;
 
-	private static final String ALPHABET = "abcdefghijklmnopqrstuvwxyz";
+    private static final String ALPHABET = "abcdefghijklmnopqrstuvwxyz";
 
-	private static final int ALPHABET_LEN = ALPHABET.length();
+    private static final int ALPHABET_LEN = ALPHABET.length();
 
-	protected Random r;
+    protected Random r;
 
-	protected List<SiteWrapper> createdSites;
+    protected List<SiteWrapper> createdSites;
 
-	private static final List<String> IGNORE_RETURN_TYPES = new ArrayList<String>() {
-		private static final long serialVersionUID = 1L;
-		{
-			add("java.lang.Class");
-			add("java.lang.Object");
-			add("java.util.Set");
-			add("java.util.List");
-			add("java.util.Collection");
-		}
-	};
+    private static final List<String> IGNORE_RETURN_TYPES = new ArrayList<String>() {
+        private static final long serialVersionUID = 1L;
+        {
+            add("java.lang.Class");
+            add("java.lang.Object");
+            add("java.util.Set");
+            add("java.util.List");
+            add("java.util.Collection");
+        }
+    };
 
-	private class GetterInfo {
-		Method getMethod;
-		Method setMethod;
-	}
+    private class GetterInfo {
+        Method getMethod;
+        Method setMethod;
+    }
 
-	@Before
-	public void setUp() throws Exception {
-		r = new Random();
-		appService = AllTests.appService;
-		if (appService == null) {
-			AllTests.setUp();
-			appService = AllTests.appService;
-		}
-		createdSites = new ArrayList<SiteWrapper>();
-	}
+    @Before
+    public void setUp() throws Exception {
+        r = new Random();
+        appService = AllTests.appService;
+        if (appService == null) {
+            AllTests.setUp();
+            appService = AllTests.appService;
+        }
+        createdSites = new ArrayList<SiteWrapper>();
+    }
 
-	@After
-	public void tearDown() throws Exception {
-		try {
-			deletedCreatedSites();
-		} catch (Exception e) {
-			e.printStackTrace(System.err);
-			Assert.fail();
-		}
-	}
+    @After
+    public void tearDown() throws Exception {
+        try {
+            deletedCreatedSites();
+        } catch (Exception e) {
+            e.printStackTrace(System.err);
+            Assert.fail();
+        }
+    }
 
-	public Collection<GetterInfo> getGettersAndSetters(ModelWrapper<?> w) {
-		HashMap<String, GetterInfo> map = new HashMap<String, GetterInfo>();
-		Method[] methods = w.getClass().getMethods();
+    public Collection<GetterInfo> getGettersAndSetters(ModelWrapper<?> w) {
+        HashMap<String, GetterInfo> map = new HashMap<String, GetterInfo>();
+        Method[] methods = w.getClass().getMethods();
 
-		for (Method method : methods) {
-			if (method.getName().startsWith("get")
-					&& !method.getName().equals("getClass")
-					&& !IGNORE_RETURN_TYPES.contains(method.getReturnType()
-							.getName())
-					&& !method.getReturnType().getName().startsWith(
-							"edu.ualberta.med.biobank.common.wrappers")) {
-				GetterInfo getterInfo = new GetterInfo();
-				getterInfo.getMethod = method;
-				map.put(method.getName(), getterInfo);
-			}
-		}
+        for (Method method : methods) {
+            if (method.getName().startsWith("get")
+                && !method.getName().equals("getClass")
+                && !IGNORE_RETURN_TYPES.contains(method.getReturnType()
+                    .getName())
+                && !method.getReturnType().getName().startsWith(
+                    "edu.ualberta.med.biobank.common.wrappers")) {
+                GetterInfo getterInfo = new GetterInfo();
+                getterInfo.getMethod = method;
+                map.put(method.getName(), getterInfo);
+            }
+        }
 
-		for (Method method : methods) {
-			if (method.getName().startsWith("set")
-					&& !method.getName().equals("setClass")) {
-				String setterName = method.getName();
-				String getterName = "g"
-						+ setterName.substring(1, setterName.length());
-				GetterInfo getterInfo = map.get(getterName);
-				if (getterInfo == null) {
-					System.out.println("no getter found for "
-							+ w.getClass().getName() + "." + setterName + "()");
-					continue;
-				}
-				getterInfo.setMethod = method;
-			}
-		}
-		return map.values();
-	}
+        for (Method method : methods) {
+            if (method.getName().startsWith("set")
+                && !method.getName().equals("setClass")) {
+                String setterName = method.getName();
+                String getterName = "g"
+                    + setterName.substring(1, setterName.length());
+                GetterInfo getterInfo = map.get(getterName);
+                if (getterInfo == null) {
+                    System.out.println("no getter found for "
+                        + w.getClass().getName() + "." + setterName + "()");
+                    continue;
+                }
+                getterInfo.setMethod = method;
+            }
+        }
+        return map.values();
+    }
 
-	public void testGettersAndSetters(ModelWrapper<?> w)
-			throws BiobankCheckException, Exception {
-		Collection<GetterInfo> gettersInfoList = getGettersAndSetters(w);
-		for (GetterInfo getterInfo : gettersInfoList) {
-			if (getterInfo.setMethod == null) {
-				System.out.println("no setter found for "
-						+ w.getClass().getName() + "."
-						+ getterInfo.getMethod.getName() + "()");
-				continue;
-			}
+    public void testGettersAndSetters(ModelWrapper<?> w)
+        throws BiobankCheckException, Exception {
+        Collection<GetterInfo> gettersInfoList = getGettersAndSetters(w);
+        for (GetterInfo getterInfo : gettersInfoList) {
+            if (getterInfo.setMethod == null) {
+                System.out.println("no setter found for "
+                    + w.getClass().getName() + "."
+                    + getterInfo.getMethod.getName() + "()");
+                continue;
+            }
 
-			String getReturnType = getterInfo.getMethod.getReturnType()
-					.getName();
+            String getReturnType = getterInfo.getMethod.getReturnType()
+                .getName();
 
-			for (int i = 0; i < 5; ++i) {
-				Object parameter = null;
+            for (int i = 0; i < 5; ++i) {
+                Object parameter = null;
 
-				if (getReturnType.equals("java.lang.Boolean")) {
-					parameter = new Boolean(r.nextBoolean());
-				} else if (getReturnType.equals("java.lang.Integer")) {
-					parameter = new Integer(r.nextInt());
-				} else if (getReturnType.equals("java.lang.Double")) {
-					parameter = new Double(r.nextDouble());
-				} else if (getReturnType.equals("java.lang.String")) {
-					String str = new String();
-					for (int j = 0, n = r.nextInt(32); j < n; ++j) {
-						int begin = r.nextInt(ALPHABET_LEN - 1);
-						str += ALPHABET.substring(begin, begin + 1);
-					}
-					parameter = str;
-				} else if (getReturnType.equals("java.util.Date")) {
-					parameter = getRandomDate();
-				} else {
-					throw new Exception("return type " + getReturnType
-							+ " for method " + getterInfo.getMethod.getName()
-							+ " for class " + w.getClass().getName()
-							+ " not implemented");
-				}
+                if (getReturnType.equals("java.lang.Boolean")) {
+                    parameter = new Boolean(r.nextBoolean());
+                } else if (getReturnType.equals("java.lang.Integer")) {
+                    parameter = new Integer(r.nextInt());
+                } else if (getReturnType.equals("java.lang.Double")) {
+                    parameter = new Double(r.nextDouble());
+                } else if (getReturnType.equals("java.lang.String")) {
+                    String str = new String();
+                    for (int j = 0, n = r.nextInt(32); j < n; ++j) {
+                        int begin = r.nextInt(ALPHABET_LEN - 1);
+                        str += ALPHABET.substring(begin, begin + 1);
+                    }
+                    parameter = str;
+                } else if (getReturnType.equals("java.util.Date")) {
+                    parameter = getRandomDate();
+                } else {
+                    throw new Exception("return type " + getReturnType
+                        + " for method " + getterInfo.getMethod.getName()
+                        + " for class " + w.getClass().getName()
+                        + " not implemented");
+                }
 
-				getterInfo.setMethod.invoke(w, parameter);
-				w.persist();
-				w.reload();
-				Object getResult = getterInfo.getMethod.invoke(w);
+                getterInfo.setMethod.invoke(w, parameter);
+                w.persist();
+                w.reload();
+                Object getResult = getterInfo.getMethod.invoke(w);
 
-				Assert.assertEquals(w.getClass().getName() + "."
-						+ getterInfo.getMethod.getName() + "()", parameter,
-						getResult);
-			}
-		}
+                Assert.assertEquals(w.getClass().getName() + "."
+                    + getterInfo.getMethod.getName() + "()", parameter,
+                    getResult);
+            }
+        }
 
-	}
+    }
 
-	public Date getRandomDate() throws ParseException {
-		String dateStr = String.format("%04-%02-%02 %02:%02", 2000 + r
-				.nextInt(40), r.nextInt(12) + 1, r.nextInt(30) + 1, r
-				.nextInt(24) + 1, r.nextInt(60) + 1);
-		return DateFormatter.dateFormatter.parse(dateStr);
-	}
+    public Date getRandomDate() throws ParseException {
+        String dateStr = String.format("%04-%02-%02 %02:%02", 2000 + r
+            .nextInt(40), r.nextInt(12) + 1, r.nextInt(30) + 1,
+            r.nextInt(24) + 1, r.nextInt(60) + 1);
+        return DateFormatter.dateFormatter.parse(dateStr);
+    }
 
-	public <T> T chooseRandomlyInList(List<T> list) {
-		if (list.size() == 1) {
-			return list.get(0);
-		}
-		if (list.size() > 1) {
-			int pos = r.nextInt(list.size());
-			return list.get(pos);
-		}
-		return null;
-	}
+    public <T> T chooseRandomlyInList(List<T> list) {
+        if (list.size() == 1) {
+            return list.get(0);
+        }
+        if (list.size() > 1) {
+            int pos = r.nextInt(list.size());
+            return list.get(pos);
+        }
+        return null;
+    }
 
-	protected ContainerTypeWrapper newContainerType(SiteWrapper site,
-			String name, String nameShort, Integer labelingScheme,
-			Integer rowCapacity, Integer colCapacity, boolean isTopLevel) {
-		ContainerTypeWrapper ct = new ContainerTypeWrapper(appService);
-		ct.setSite(site);
-		ct.setName(name);
-		ct.setNameShort(nameShort);
-		ct.setChildLabelingScheme(labelingScheme);
-		if (rowCapacity != null)
-			ct.setRowCapacity(rowCapacity);
-		if (colCapacity != null)
-			ct.setColCapacity(colCapacity);
-		ct.setTopLevel(isTopLevel);
-		return ct;
-	}
+    protected ContainerTypeWrapper newContainerType(SiteWrapper site,
+        String name, String nameShort, Integer labelingScheme,
+        Integer rowCapacity, Integer colCapacity, boolean isTopLevel) {
+        ContainerTypeWrapper ct = new ContainerTypeWrapper(appService);
+        ct.setSite(site);
+        ct.setName(name);
+        ct.setNameShort(nameShort);
+        ct.setChildLabelingScheme(labelingScheme);
+        if (rowCapacity != null)
+            ct.setRowCapacity(rowCapacity);
+        if (colCapacity != null)
+            ct.setColCapacity(colCapacity);
+        ct.setTopLevel(isTopLevel);
+        return ct;
+    }
 
-	protected ContainerTypeWrapper addContainerType(SiteWrapper site,
-			String name, String nameShort, Integer labelingScheme,
-			Integer rowCapacity, Integer colCapacity, boolean isTopLevel)
-			throws BiobankCheckException, Exception {
-		ContainerTypeWrapper container = newContainerType(site, name,
-				nameShort, labelingScheme, rowCapacity, colCapacity, isTopLevel);
-		container.persist();
-		return container;
-	}
+    protected ContainerTypeWrapper addContainerType(SiteWrapper site,
+        String name, String nameShort, Integer labelingScheme,
+        Integer rowCapacity, Integer colCapacity, boolean isTopLevel)
+        throws BiobankCheckException, Exception {
+        ContainerTypeWrapper container = newContainerType(site, name,
+            nameShort, labelingScheme, rowCapacity, colCapacity, isTopLevel);
+        container.persist();
+        return container;
+    }
 
-	protected ContainerTypeWrapper addContainerTypeRandom(SiteWrapper site,
-			String name) throws Exception {
-		return addContainerType(site, name + "Random" + r.nextInt(), "", null,
-				r.nextInt(10), r.nextInt(10), r.nextBoolean());
-	}
+    protected ContainerTypeWrapper addContainerTypeRandom(SiteWrapper site,
+        String name) throws Exception {
+        return addContainerType(site, name + "Random" + r.nextInt(), "", null,
+            r.nextInt(10) + 1, r.nextInt(10) + 1, r.nextBoolean());
+    }
 
-	protected int addContainerTypesRandom(SiteWrapper site, String name)
-			throws Exception {
-		int nber = r.nextInt(15);
-		for (int i = 0; i < nber; i++) {
-			addContainerTypeRandom(site, name);
-		}
-		site.reload();
-		return nber;
-	}
+    protected int addContainerTypesRandom(SiteWrapper site, String name)
+        throws Exception {
+        int nber = r.nextInt(15) + 1;
+        for (int i = 0; i < nber; i++) {
+            addContainerTypeRandom(site, name);
+        }
+        site.reload();
+        return nber;
+    }
 
-	protected ContainerWrapper newContainer(String label, String barcode,
-			ContainerWrapper parent, SiteWrapper site, ContainerTypeWrapper type)
-			throws Exception {
-		ContainerWrapper container;
+    protected ContainerWrapper newContainer(String label, String barcode,
+        ContainerWrapper parent, SiteWrapper site, ContainerTypeWrapper type)
+        throws Exception {
+        ContainerWrapper container;
 
-		container = new ContainerWrapper(appService);
-		if (label != null) {
-			if (type.getTopLevel()) {
-				container.setLabel(label);
-			} else {
-				throw new Exception(
-						"cannot set label on non top level containers");
-			}
-		}
-		container.setProductBarcode(barcode);
-		if (parent != null) {
-			container.setParent(parent);
-		}
-		if (site != null) {
-			container.setSite(site);
-		}
-		container.setContainerType(type);
-		return container;
-	}
+        container = new ContainerWrapper(appService);
+        if (label != null) {
+            if (type.getTopLevel()) {
+                container.setLabel(label);
+            } else {
+                throw new Exception(
+                    "cannot set label on non top level containers");
+            }
+        }
+        container.setProductBarcode(barcode);
+        if (parent != null) {
+            container.setParent(parent);
+        }
+        if (site != null) {
+            container.setSite(site);
+        }
+        container.setContainerType(type);
+        return container;
+    }
 
-	protected ContainerWrapper newContainer(String label, String barcode,
-			ContainerWrapper parent, SiteWrapper site,
-			ContainerTypeWrapper type, Integer row, Integer col)
-			throws Exception {
-		ContainerWrapper container = newContainer(label, barcode, parent, site,
-				type);
-		container.setPosition(row, col);
-		return container;
-	}
+    protected ContainerWrapper newContainer(String label, String barcode,
+        ContainerWrapper parent, SiteWrapper site, ContainerTypeWrapper type,
+        Integer row, Integer col) throws Exception {
+        ContainerWrapper container = newContainer(label, barcode, parent, site,
+            type);
+        container.setPosition(row, col);
+        return container;
+    }
 
-	protected ContainerWrapper addContainer(String label, String barcode,
-			ContainerWrapper parent, SiteWrapper site, ContainerTypeWrapper type)
-			throws Exception {
-		ContainerWrapper container = newContainer(label, barcode, parent, site,
-				type);
-		container.persist();
-		return container;
-	}
+    protected ContainerWrapper addContainer(String label, String barcode,
+        ContainerWrapper parent, SiteWrapper site, ContainerTypeWrapper type)
+        throws Exception {
+        ContainerWrapper container = newContainer(label, barcode, parent, site,
+            type);
+        container.persist();
+        return container;
+    }
 
-	protected ContainerWrapper addContainer(String label, String barcode,
-			ContainerWrapper parent, SiteWrapper site,
-			ContainerTypeWrapper type, Integer row, Integer col)
-			throws Exception {
-		ContainerWrapper container = newContainer(label, barcode, parent, site,
-				type, row, col);
-		container.persist();
-		return container;
-	}
+    protected ContainerWrapper addContainer(String label, String barcode,
+        ContainerWrapper parent, SiteWrapper site, ContainerTypeWrapper type,
+        Integer row, Integer col) throws Exception {
+        ContainerWrapper container = newContainer(label, barcode, parent, site,
+            type, row, col);
+        container.persist();
+        return container;
+    }
 
-	protected ContainerWrapper addContainerRandom(SiteWrapper site, String name)
-			throws Exception {
-		ContainerTypeWrapper type = addContainerTypeRandom(site, name);
-		String label = null;
-		if ((type.getTopLevel() != null) && type.getTopLevel()) {
-			label = String.valueOf(r.nextInt());
-		}
-		ContainerWrapper container = addContainer(label, name + "Random"
-				+ r.nextInt(), null, site, type);
-		if (label == null) {
-			container.setPosition(0, 0);
-		}
-		container.persist();
-		return container;
-	}
+    protected ContainerWrapper addContainerRandom(SiteWrapper site, String name)
+        throws Exception {
+        ContainerTypeWrapper type = addContainerTypeRandom(site, name);
+        String label = null;
+        if ((type.getTopLevel() != null) && type.getTopLevel()) {
+            label = String.valueOf(r.nextInt());
+        }
+        ContainerWrapper container = addContainer(label, name + "Random"
+            + r.nextInt(), null, site, type);
+        if (label == null) {
+            container.setPosition(0, 0);
+        }
+        container.persist();
+        return container;
+    }
 
-	protected int addContainersRandom(SiteWrapper site, String name)
-			throws Exception {
-		int nber = r.nextInt(15);
-		for (int i = 0; i < nber; i++) {
-			addContainerRandom(site, name);
-		}
-		site.reload();
-		return nber;
-	}
+    protected int addContainersRandom(SiteWrapper site, String name)
+        throws Exception {
+        int nber = r.nextInt(15) + 1;
+        for (int i = 0; i < nber; i++) {
+            addContainerRandom(site, name);
+        }
+        site.reload();
+        return nber;
+    }
 
-	protected PatientWrapper newPatient(String number) {
-		PatientWrapper patient = new PatientWrapper(appService);
-		patient.setNumber(number);
-		return patient;
-	}
+    protected PatientWrapper newPatient(String number) {
+        PatientWrapper patient = new PatientWrapper(appService);
+        patient.setNumber(number);
+        return patient;
+    }
 
-	protected PatientWrapper addPatient(String number) throws Exception {
-		PatientWrapper patient = newPatient(number);
-		patient.persist();
-		return patient;
-	}
+    protected PatientWrapper addPatient(String number) throws Exception {
+        PatientWrapper patient = newPatient(number);
+        patient.persist();
+        return patient;
+    }
 
-	protected PatientVisitWrapper newPatientVisit(PatientWrapper patient,
-			Date dateDrawn, Date dateProcessed, Date dateReceived) {
-		PatientVisitWrapper pv = new PatientVisitWrapper(appService);
-		pv.setPatient(patient);
-		pv.setDateDrawn(dateDrawn);
-		pv.setDateProcessed(dateProcessed);
-		pv.setDateReceived(dateReceived);
-		return pv;
-	}
+    protected PatientVisitWrapper newPatientVisit(PatientWrapper patient,
+        Date dateDrawn, Date dateProcessed, Date dateReceived) {
+        PatientVisitWrapper pv = new PatientVisitWrapper(appService);
+        pv.setPatient(patient);
+        pv.setDateDrawn(dateDrawn);
+        pv.setDateProcessed(dateProcessed);
+        pv.setDateReceived(dateReceived);
+        return pv;
+    }
 
-	protected PatientVisitWrapper addPatientVisit(PatientWrapper patient,
-			Date dateDrawn, Date dateProcessed, Date dateReceived)
-			throws Exception {
-		PatientVisitWrapper pv = newPatientVisit(patient, dateDrawn,
-				dateProcessed, dateReceived);
-		pv.persist();
-		return pv;
-	}
+    protected PatientVisitWrapper addPatientVisit(PatientWrapper patient,
+        Date dateDrawn, Date dateProcessed, Date dateReceived) throws Exception {
+        PatientVisitWrapper pv = newPatientVisit(patient, dateDrawn,
+            dateProcessed, dateReceived);
+        pv.persist();
+        return pv;
+    }
 
-	protected SampleWrapper newSample(SampleTypeWrapper sampleType,
-			ContainerWrapper container, PatientVisitWrapper pv, Integer row,
-			Integer col) {
-		SampleWrapper sample = new SampleWrapper(appService);
-		sample.setSampleType(sampleType);
-		sample.setParent(container);
-		sample.setPatientVisit(pv);
-		sample.setPosition(row, col);
-		return sample;
-	}
+    protected SampleWrapper newSample(SampleTypeWrapper sampleType,
+        ContainerWrapper container, PatientVisitWrapper pv, Integer row,
+        Integer col) {
+        SampleWrapper sample = new SampleWrapper(appService);
+        sample.setSampleType(sampleType);
+        sample.setParent(container);
+        sample.setPatientVisit(pv);
+        sample.setPosition(row, col);
+        return sample;
+    }
 
-	protected SampleWrapper addSample(SampleTypeWrapper sampleType,
-			ContainerWrapper container, PatientVisitWrapper pv, Integer row,
-			Integer col) throws Exception {
-		SampleWrapper sample = newSample(sampleType, container, pv, row, col);
-		sample.persist();
-		return sample;
-	}
+    protected SampleWrapper addSample(SampleTypeWrapper sampleType,
+        ContainerWrapper container, PatientVisitWrapper pv, Integer row,
+        Integer col) throws Exception {
+        SampleWrapper sample = newSample(sampleType, container, pv, row, col);
+        sample.persist();
+        return sample;
+    }
 
-	protected void deletedCreatedSites() throws Exception {
-		for (SiteWrapper site : createdSites) {
-			site.reload();
-			removeContainers(site.getContainerCollection());
-			removeStudies(site.getStudyCollection());
-			removeFromList(site.getClinicCollection());
-			removeFromList(site.getContainerTypeCollection());
-			site.reload();
-			site.delete();
-		}
-	}
+    protected void deletedCreatedSites() throws Exception {
+        for (SiteWrapper site : createdSites) {
+            site.reload();
+            removeContainers(site.getContainerCollection());
+            removeStudies(site.getStudyCollection());
+            removeFromList(site.getClinicCollection());
+            removeFromList(site.getContainerTypeCollection());
+            site.reload();
+            site.delete();
+        }
+    }
 
-	protected void removeContainers(List<ContainerWrapper> containers)
-			throws Exception {
-		for (ContainerWrapper container : containers) {
-			if (container.hasChildren()) {
-				removeContainers(container.getChildren());
-			} else {
-				removeFromList(container.getSamples());
-			}
-			container.reload();
-			container.delete();
-		}
-	}
+    protected void removeContainers(List<ContainerWrapper> containers)
+        throws Exception {
+        for (ContainerWrapper container : containers) {
+            if (container.hasChildren()) {
+                removeContainers(container.getChildren());
+            } else {
+                removeFromList(container.getSamples());
+            }
+            container.reload();
+            container.delete();
+        }
+    }
 
-	protected void removeStudies(List<StudyWrapper> studies) throws Exception {
-		for (StudyWrapper study : studies) {
-			removePatients(study.getPatientCollection());
-			study.reload();
-			study.delete();
-		}
-	}
+    protected void removeStudies(List<StudyWrapper> studies) throws Exception {
+        for (StudyWrapper study : studies) {
+            removePatients(study.getPatientCollection());
+            study.reload();
+            study.delete();
+        }
+    }
 
-	protected void removePatients(List<PatientWrapper> patients)
-			throws Exception {
-		for (PatientWrapper patient : patients) {
-			removeFromList(patient.getPatientVisitCollection());
-			patient.reload();
-			patient.delete();
-		}
-	}
+    protected void removePatients(List<PatientWrapper> patients)
+        throws Exception {
+        for (PatientWrapper patient : patients) {
+            removeFromList(patient.getPatientVisitCollection());
+            patient.reload();
+            patient.delete();
+        }
+    }
 
-	protected void removeFromList(List<? extends ModelWrapper<?>> list)
-			throws Exception {
-		if (list != null) {
-			for (ModelWrapper<?> object : list) {
-				object.reload();
-				object.delete();
-			}
-		}
-	}
+    protected void removeFromList(List<? extends ModelWrapper<?>> list)
+        throws Exception {
+        if (list != null) {
+            for (ModelWrapper<?> object : list) {
+                object.reload();
+                object.delete();
+            }
+        }
+    }
 
-	protected SiteWrapper newSite(String name) throws Exception {
-		SiteWrapper site = new SiteWrapper(appService);
-		site.setName(name + r.nextInt());
-		site.setCity("");
-		return site;
-	}
+    protected SiteWrapper newSite(String name) throws Exception {
+        SiteWrapper site = new SiteWrapper(appService);
+        site.setName(name + r.nextInt());
+        site.setCity("");
+        return site;
+    }
 
-	protected SiteWrapper addSite(String name, boolean addToCreatedList)
-			throws Exception {
-		SiteWrapper site = newSite(name);
-		site.persist();
-		if (addToCreatedList) {
-			createdSites.add(site);
-		}
-		return site;
-	}
+    protected SiteWrapper addSite(String name, boolean addToCreatedList)
+        throws Exception {
+        SiteWrapper site = newSite(name);
+        site.persist();
+        if (addToCreatedList) {
+            createdSites.add(site);
+        }
+        return site;
+    }
 
-	protected SiteWrapper addSite(String name) throws Exception {
-		return addSite(name, true);
-	}
+    protected SiteWrapper addSite(String name) throws Exception {
+        return addSite(name, true);
+    }
 
-	protected int addSites(String name) throws Exception {
-		int nber = r.nextInt(15);
-		for (int i = 0; i < nber; i++) {
-			addSite(name);
-		}
-		return nber;
-	}
+    protected int addSites(String name) throws Exception {
+        int nber = r.nextInt(15) + 1;
+        for (int i = 0; i < nber; i++) {
+            addSite(name);
+        }
+        return nber;
+    }
 
-	protected StudyWrapper newStudy(SiteWrapper site, String name)
-			throws Exception {
-		StudyWrapper study = new StudyWrapper(appService);
-		study.setName(name + "Random" + r.nextInt());
-		study.setSite(site);
-		return study;
-	}
+    protected StudyWrapper newStudy(SiteWrapper site, String name)
+        throws Exception {
+        StudyWrapper study = new StudyWrapper(appService);
+        study.setName(name + "Random" + r.nextInt());
+        study.setSite(site);
+        return study;
+    }
 
-	protected StudyWrapper addStudy(SiteWrapper site, String name)
-			throws Exception {
-		StudyWrapper study = newStudy(site, name);
-		study.persist();
-		return study;
-	}
+    protected StudyWrapper addStudy(SiteWrapper site, String name)
+        throws Exception {
+        StudyWrapper study = newStudy(site, name);
+        study.persist();
+        return study;
+    }
 
-	protected int addStudies(SiteWrapper site, String name) throws Exception {
-		int studiesNber = r.nextInt(15);
-		for (int i = 0; i < studiesNber; i++) {
-			addStudy(site, name);
-		}
-		site.reload();
-		return studiesNber;
-	}
+    protected int addStudies(SiteWrapper site, String name) throws Exception {
+        int studiesNber = r.nextInt(15) + 1;
+        for (int i = 0; i < studiesNber; i++) {
+            addStudy(site, name);
+        }
+        site.reload();
+        return studiesNber;
+    }
 
-	protected ClinicWrapper newClinic(SiteWrapper site, String name)
-			throws Exception {
-		ClinicWrapper clinic = new ClinicWrapper(appService);
-		clinic.setName(name + "Random" + r.nextInt());
-		clinic.setCity("");
-		clinic.setSite(site);
+    protected ClinicWrapper newClinic(SiteWrapper site, String name)
+        throws Exception {
+        ClinicWrapper clinic = new ClinicWrapper(appService);
+        clinic.setName(name + "Random" + r.nextInt());
+        clinic.setCity("");
+        clinic.setSite(site);
 
-		return clinic;
-	}
+        return clinic;
+    }
 
-	protected ClinicWrapper addClinic(SiteWrapper site, String name)
-			throws Exception {
-		ClinicWrapper clinic = newClinic(site, name);
-		clinic.persist();
-		return clinic;
-	}
+    protected ClinicWrapper addClinic(SiteWrapper site, String name)
+        throws Exception {
+        ClinicWrapper clinic = newClinic(site, name);
+        clinic.persist();
+        return clinic;
+    }
 
-	protected int addClinics(SiteWrapper site, String name) throws Exception {
-		int nber = r.nextInt(15);
-		for (int i = 0; i < nber; i++) {
-			addClinic(site, name);
-		}
-		site.reload();
-		return nber;
-	}
+    protected int addClinics(SiteWrapper site, String name) throws Exception {
+        int nber = r.nextInt(15) + 1;
+        for (int i = 0; i < nber; i++) {
+            addClinic(site, name);
+        }
+        site.reload();
+        return nber;
+    }
 
 }
