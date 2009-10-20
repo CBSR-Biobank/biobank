@@ -2,10 +2,14 @@ package test.ualberta.med.biobank;
 
 import static org.junit.Assert.fail;
 
+import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import edu.ualberta.med.biobank.common.BiobankCheckException;
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.model.Study;
 
 public class TestStudy extends TestDatabase {
 
@@ -15,30 +19,21 @@ public class TestStudy extends TestDatabase {
 		super.setUp();
 	}
 
+	@After
+	public void tearDown() {
+		try {
+			deletedCreatedSites();
+		} catch (Exception e) {
+			e.printStackTrace(System.err);
+			Assert.fail();
+		}
+	}
+
 	@Test
-	public void testGettersAndSetters() throws BiobankCheckException, Exception {
-		// StudyWrapper site = addStudy("testGettersAndSetters");
-		// testGettersAndSetters(site);
-		// }
-		//
-		// private StudyWrapper addStudy(SiteWrapper site, String name)
-		// throws Exception {
-		// StudyWrapper study = new StudyWrapper(appService);
-		// study.setName(name + "Random" + r.nextInt());
-		// study.setSite(site);
-		// study.persist();
-		// return study;
-		// }
-		//
-		// private int addStudies(SiteWrapper site, String name)
-		// throws BiobankCheckException, Exception {
-		// int studiesNber = r.nextInt(15);
-		// for (int i = 0; i < studiesNber; i++) {
-		// addStudy(site, name);
-		// }
-		// site.reload();
-		// return studiesNber;
-		// }
+	public void testGettersAndSetters() throws Exception {
+		SiteWrapper site = addSite("testGettersAndSetters");
+		StudyWrapper study = addStudy(site, "testGettersAndSetters");
+		testGettersAndSetters(study);
 	}
 
 	@Test
@@ -48,16 +43,6 @@ public class TestStudy extends TestDatabase {
 
 	@Test
 	public void testSetSiteSite() {
-		fail("Not yet implemented");
-	}
-
-	@Test
-	public void testSetSiteSiteWrapper() {
-		fail("Not yet implemented");
-	}
-
-	@Test
-	public void testGetWrappedClass() {
 		fail("Not yet implemented");
 	}
 
@@ -187,13 +172,34 @@ public class TestStudy extends TestDatabase {
 	}
 
 	@Test
-	public void testDelete() {
-		fail("Not yet implemented");
+	public void testDelete() throws Exception {
+		StudyWrapper study = addStudy(addSite("testDelete"), "testDelete");
+		// object is in database
+		Assert.assertNotNull(study);
+		study.delete();
+		Study studyInDB = ModelUtils.getObjectWithId(appService, Study.class,
+				study.getId());
+		// object is not anymore in database
+		Assert.assertNull(studyInDB);
 	}
 
 	@Test
-	public void testReset() {
-		fail("Not yet implemented");
+	public void testResetAlreadyInDatabase() throws Exception {
+		StudyWrapper study = addStudy(addSite("testResetAlreadyInDatabase"),
+				"testResetAlreadyInDatabase");
+		study.reload();
+		String oldName = study.getName();
+		study.setName("toto");
+		study.reset();
+		Assert.assertEquals(oldName, study.getName());
+	}
+
+	@Test
+	public void testResetNew() throws Exception {
+		StudyWrapper newStudy = new StudyWrapper(appService);
+		newStudy.setName("titi");
+		newStudy.reset();
+		Assert.assertEquals(null, newStudy.getName());
 	}
 
 }

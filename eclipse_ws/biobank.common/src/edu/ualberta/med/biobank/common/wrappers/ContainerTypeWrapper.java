@@ -378,7 +378,11 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
     }
 
     private void setChildLabelingScheme(ContainerLabelingSchemeWrapper scheme) {
-        setChildLabelingScheme(scheme.getWrappedObject());
+        if (scheme == null) {
+            setChildLabelingScheme((ContainerLabelingScheme) null);
+        } else {
+            setChildLabelingScheme(scheme.getWrappedObject());
+        }
     }
 
     private void setChildLabelingScheme(ContainerLabelingScheme scheme) {
