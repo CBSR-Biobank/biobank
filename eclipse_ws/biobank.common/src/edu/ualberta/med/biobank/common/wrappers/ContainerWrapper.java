@@ -849,4 +849,9 @@ public class ContainerWrapper extends ModelWrapper<Container> {
             : -1));
     }
 
+    @Override
+    public String toString() {
+        return getLabel() + " (" + getProductBarcode() + ")";
+    }
+
 }
