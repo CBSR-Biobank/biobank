@@ -195,10 +195,10 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
             .getAllLabelingSchemes(appService);
         Collection<LabelingScheme> labelingSchemeCollection = new HashSet<LabelingScheme>();
         for (Integer id : labelingSchemeMap.keySet()) {
-            LabelingScheme ls = new LabelingScheme();
-            ls.id = id;
-            ls.name = labelingSchemeMap.get(id);
-            if (id == currentSchemeId) {
+            LabelingScheme ls = new LabelingScheme(id, labelingSchemeMap
+                .get(id));
+            labelingSchemeCollection.add(ls);
+            if (id.equals(currentSchemeId)) {
                 currentScheme = ls;
             }
         }

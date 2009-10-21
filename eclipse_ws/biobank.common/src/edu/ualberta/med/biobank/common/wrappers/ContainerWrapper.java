@@ -517,6 +517,7 @@ public class ContainerWrapper extends ModelWrapper<Container> {
             if (positions != null) {
                 children = new ArrayList<ContainerWrapper>();
                 for (ContainerPosition position : positions) {
+                    System.err.println(position.getId());
                     children.add(new ContainerWrapper(appService, position
                         .getContainer()));
                 }
@@ -529,7 +530,7 @@ public class ContainerWrapper extends ModelWrapper<Container> {
     public boolean hasChildren() {
         Collection<ContainerPosition> positions = wrappedObject
             .getChildPositionCollection();
-        return positions != null && positions.size() > 0;
+        return ((positions != null) && (positions.size() > 0));
     }
 
     /**

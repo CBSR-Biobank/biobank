@@ -10,6 +10,7 @@ import test.ualberta.med.biobank.internal.ClinicHelper;
 import test.ualberta.med.biobank.internal.ContainerHelper;
 import test.ualberta.med.biobank.internal.ContainerTypeHelper;
 import test.ualberta.med.biobank.internal.DbHelper;
+import test.ualberta.med.biobank.internal.SampleTypeHelper;
 import test.ualberta.med.biobank.internal.SiteHelper;
 import test.ualberta.med.biobank.internal.StudyHelper;
 import edu.ualberta.med.biobank.common.BiobankCheckException;
@@ -25,13 +26,10 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class TestSite extends TestDatabase {
 
-    private int currentRandomName;
-
     @Override
     @Before
     public void setUp() throws Exception {
         super.setUp();
-        currentRandomName = r.nextInt();
     }
 
     @Test
@@ -42,7 +40,7 @@ public class TestSite extends TestDatabase {
 
     @Test
     public void testGetStudyCollection() throws Exception {
-        String name = "testGetStudyCollection" + currentRandomName;
+        String name = "testGetStudyCollection" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         int studiesNber = r.nextInt(15) + 1;
         StudyHelper.addStudies(site, name, studiesNber);
@@ -55,7 +53,7 @@ public class TestSite extends TestDatabase {
 
     @Test
     public void testGetStudyCollectionBoolean() throws Exception {
-        String name = "testGetStudyCollectionBoolean" + currentRandomName;
+        String name = "testGetStudyCollectionBoolean" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         StudyHelper.addStudies(site, name, r.nextInt(15) + 1);
 
@@ -71,7 +69,7 @@ public class TestSite extends TestDatabase {
 
     @Test
     public void testAddInStudyCollection() throws Exception {
-        String name = "testGetStudyCollectionBoolean" + currentRandomName;
+        String name = "testGetStudyCollectionBoolean" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         int studiesNber = r.nextInt(15) + 1;
         StudyHelper.addStudies(site, name, studiesNber);
@@ -89,7 +87,7 @@ public class TestSite extends TestDatabase {
 
     @Test
     public void testRemoveInStudyCollection() throws Exception {
-        String name = "testRemoveInStudyCollection" + currentRandomName;
+        String name = "testRemoveInStudyCollection" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         int studiesNber = r.nextInt(15) + 1;
         StudyHelper.addStudies(site, name, studiesNber);
@@ -115,7 +113,7 @@ public class TestSite extends TestDatabase {
 
     @Test
     public void testGetClinicCollection() throws Exception {
-        String name = "testGetClinicCollection" + currentRandomName;
+        String name = "testGetClinicCollection" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         int clinicsNber = r.nextInt(15) + 1;
         ClinicHelper.addClinics(site, name, clinicsNber);
@@ -128,7 +126,7 @@ public class TestSite extends TestDatabase {
 
     @Test
     public void testGetClinicCollectionBoolean() throws Exception {
-        String name = "testGetClinicCollectionBoolean" + currentRandomName;
+        String name = "testGetClinicCollectionBoolean" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         int nber = r.nextInt(15) + 1;
         ClinicHelper.addClinics(site, name, nber);
@@ -145,7 +143,7 @@ public class TestSite extends TestDatabase {
 
     @Test
     public void testAddInClinicCollection() throws Exception {
-        String name = "testAddInClinicCollection" + currentRandomName;
+        String name = "testAddInClinicCollection" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         int nber = r.nextInt(15) + 1;
         ClinicHelper.addClinics(site, name, nber);
@@ -163,7 +161,7 @@ public class TestSite extends TestDatabase {
 
     @Test
     public void testRemoveInClinicCollection() throws Exception {
-        String name = "testRemoveInClinicCollection" + currentRandomName;
+        String name = "testRemoveInClinicCollection" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         int nber = r.nextInt(15) + 1;
         ClinicHelper.addClinics(site, name, nber);
@@ -189,7 +187,7 @@ public class TestSite extends TestDatabase {
 
     @Test
     public void testGetContainerTypeCollection() throws Exception {
-        String name = "testGetContainerTypeCollection" + currentRandomName;
+        String name = "testGetContainerTypeCollection" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         int nber = r.nextInt(15) + 1;
         ContainerTypeHelper.addContainerTypesRandom(site, name, nber);
@@ -202,8 +200,7 @@ public class TestSite extends TestDatabase {
 
     @Test
     public void testGetContainerTypeCollectionBoolean() throws Exception {
-        String name = "testGetContainerTypeCollectionBoolean"
-            + currentRandomName;
+        String name = "testGetContainerTypeCollectionBoolean" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         ContainerTypeHelper.addContainerTypesRandom(site, name,
             r.nextInt(15) + 1);
@@ -221,7 +218,7 @@ public class TestSite extends TestDatabase {
 
     @Test
     public void testAddInContainerTypeCollection() throws Exception {
-        String name = "testAddInContainerTypeCollection" + currentRandomName;
+        String name = "testAddInContainerTypeCollection" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         int nber = r.nextInt(15) + 1;
         ContainerTypeHelper.addContainerTypesRandom(site, name, nber);
@@ -240,7 +237,7 @@ public class TestSite extends TestDatabase {
 
     @Test
     public void testRemoveInContainerTypeCollection() throws Exception {
-        String name = "testRemoveInContainerTypeCollection" + currentRandomName;
+        String name = "testRemoveInContainerTypeCollection" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         int nber = r.nextInt(15) + 1;
         ContainerTypeHelper.addContainerTypesRandom(site, name, nber);
@@ -266,7 +263,7 @@ public class TestSite extends TestDatabase {
 
     @Test
     public void testGetContainerCollection() throws Exception {
-        String name = "testGetContainerCollection" + currentRandomName;
+        String name = "testGetContainerCollection" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         int nber = r.nextInt(15) + 1;
         ContainerHelper.addContainersRandom(site, name, nber);
@@ -279,7 +276,7 @@ public class TestSite extends TestDatabase {
 
     @Test
     public void testAddInContainerCollection() throws Exception {
-        String name = "testAddInContainerCollection" + currentRandomName;
+        String name = "testAddInContainerCollection" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         int nber = r.nextInt(15) + 1;
         ContainerHelper.addContainersRandom(site, name, nber);
@@ -300,7 +297,7 @@ public class TestSite extends TestDatabase {
 
     @Test
     public void testRemoveInContainerCollection() throws Exception {
-        String name = "testRemoveInContainerCollection" + currentRandomName;
+        String name = "testRemoveInContainerCollection" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         int nber = r.nextInt(15) + 1;
         ContainerHelper.addContainersRandom(site, name, nber);
@@ -326,9 +323,9 @@ public class TestSite extends TestDatabase {
 
     @Test
     public void testGetSampleTypeCollection() throws Exception {
-        String name = "testGetSampleTypeCollection" + currentRandomName;
+        String name = "testGetSampleTypeCollection" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
-        int nber = addSampleTypes(site, name);
+        int nber = SampleTypeHelper.addSampleTypes(site, name);
 
         List<SampleTypeWrapper> types = site.getSampleTypeCollection();
         int sizeFound = types.size();
@@ -338,9 +335,9 @@ public class TestSite extends TestDatabase {
 
     @Test
     public void testGetSampleTypeCollectionBoolean() throws Exception {
-        String name = "testGetSampleTypeCollectionBoolean" + currentRandomName;
+        String name = "testGetSampleTypeCollectionBoolean" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
-        addSampleTypes(site, name);
+        SampleTypeHelper.addSampleTypes(site, name);
 
         List<SampleTypeWrapper> types = site.getSampleTypeCollection(true);
         if (types.size() > 1) {
@@ -354,14 +351,12 @@ public class TestSite extends TestDatabase {
 
     @Test
     public void testAddInSampleTypeCollection() throws Exception {
-        String name = "testAddInSampleTypeCollection" + currentRandomName;
+        String name = "testAddInSampleTypeCollection" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
-        int nber = addSampleTypes(site, name);
+        int nber = SampleTypeHelper.addSampleTypes(site, name);
 
         List<SampleTypeWrapper> types = site.getSampleTypeCollection();
-        SampleTypeWrapper type = new SampleTypeWrapper(appService);
-        type.setName("testAddInSampleTypeCollection" + r.nextInt());
-        type.setSite(site);
+        SampleTypeWrapper type = SampleTypeHelper.newSampleType(site, name);
         types.add(type);
         site.setSampleTypeCollection(types);
         site.persist();
@@ -371,29 +366,11 @@ public class TestSite extends TestDatabase {
         Assert.assertEquals(nber + 1, site.getSampleTypeCollection().size());
     }
 
-    private SampleTypeWrapper addSampleType(SiteWrapper site, String name)
-        throws Exception {
-        SampleTypeWrapper type = new SampleTypeWrapper(appService);
-        type.setName(name + "Random" + r.nextInt());
-        type.setSite(site);
-        type.persist();
-        return type;
-    }
-
-    private int addSampleTypes(SiteWrapper site, String name) throws Exception {
-        int nber = r.nextInt(15);
-        for (int i = 0; i < nber; i++) {
-            addSampleType(site, name);
-        }
-        site.reload();
-        return nber;
-    }
-
     @Test
     public void testRemoveInSampleTypeCollection() throws Exception {
-        String name = "testRemoveInSampleTypeCollection" + currentRandomName;
+        String name = "testRemoveInSampleTypeCollection" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
-        int nber = addSampleTypes(site, name);
+        int nber = SampleTypeHelper.addSampleTypes(site, name);
 
         List<SampleTypeWrapper> types = site.getSampleTypeCollection();
         SampleTypeWrapper type = DbHelper.chooseRandomlyInList(types);
@@ -417,14 +394,14 @@ public class TestSite extends TestDatabase {
     @Test
     public void testAddSite() throws Exception {
         int oldTotal = SiteWrapper.getAllSites(appService).size();
-        SiteHelper.addSite("testPersist" + currentRandomName);
+        SiteHelper.addSite("testPersist" + r.nextInt());
         int newTotal = SiteWrapper.getAllSites(appService).size();
         Assert.assertEquals(oldTotal + 1, newTotal);
     }
 
     @Test
     public void testAddSiteFail() throws Exception {
-        String name = "testAddSiteFail" + currentRandomName;
+        String name = "testAddSiteFail" + r.nextInt();
         SiteWrapper site = new SiteWrapper(appService);
         site.setName(name);
 
@@ -450,8 +427,8 @@ public class TestSite extends TestDatabase {
 
     @Test
     public void testDelete() throws Exception {
-        SiteWrapper site = SiteHelper.addSite("testDelete" + currentRandomName,
-            false);
+        SiteWrapper site = SiteHelper
+            .addSite("testDelete" + r.nextInt(), false);
         // object is in database
         Assert.assertNotNull(site);
         site.delete();
@@ -464,7 +441,7 @@ public class TestSite extends TestDatabase {
     @Test
     public void testResetAlreadyInDatabase() throws Exception {
         SiteWrapper site = SiteHelper.addSite("testResetAlreadyInDatabase"
-            + currentRandomName);
+            + r.nextInt());
         site.reload();
         String oldName = site.getName();
         site.setName("toto");
@@ -482,7 +459,7 @@ public class TestSite extends TestDatabase {
 
     @Test
     public void testSetPvInfoPossible() throws Exception {
-        String name = "testSetPvInfoPossible" + currentRandomName;
+        String name = "testSetPvInfoPossible" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         site.reload();
 
@@ -534,7 +511,7 @@ public class TestSite extends TestDatabase {
 
     @Test
     public void testGetTopContainerCollection() throws Exception {
-        String name = "testGetTopContainerCollection" + currentRandomName;
+        String name = "testGetTopContainerCollection" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         ContainerHelper.addContainersRandom(site, name, r.nextInt(15) + 1);
 
@@ -553,7 +530,7 @@ public class TestSite extends TestDatabase {
 
     @Test
     public void testGetTopContainerCollectionBoolean() throws Exception {
-        String name = "testGetTopContainerCollection" + currentRandomName;
+        String name = "testGetTopContainerCollection" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         ContainerHelper.addContainersRandom(site, name, r.nextInt(15) + 1);
 
@@ -570,8 +547,7 @@ public class TestSite extends TestDatabase {
 
     @Test
     public void testGetSites() throws Exception {
-        SiteHelper.addSites("testGetSites" + currentRandomName,
-            r.nextInt(15) + 1);
+        SiteHelper.addSites("testGetSites" + r.nextInt(), r.nextInt(15) + 1);
 
         List<SiteWrapper> siteWrappers = SiteWrapper.getSites(appService, null);
         int inDB = appService.search(Site.class, new Site()).size();

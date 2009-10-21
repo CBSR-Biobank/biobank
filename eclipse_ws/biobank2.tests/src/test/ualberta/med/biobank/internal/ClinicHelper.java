@@ -36,7 +36,7 @@ public class ClinicHelper extends DbHelper {
     public static void addClinics(SiteWrapper site, String name, int count,
         boolean addContacts) throws Exception {
         for (int i = 0; i < count; i++) {
-            addClinic(site, name + (i + 1), addContacts);
+            addClinic(site, name + i, addContacts);
         }
         site.reload();
     }
