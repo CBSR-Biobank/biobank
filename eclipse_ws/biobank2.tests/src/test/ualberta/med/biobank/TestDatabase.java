@@ -16,6 +16,7 @@ import org.junit.Assert;
 import org.junit.Before;
 
 import test.ualberta.med.biobank.internal.SampleSourceHelper;
+import test.ualberta.med.biobank.internal.SampleTypeHelper;
 import test.ualberta.med.biobank.internal.SiteHelper;
 
 public class TestDatabase {
@@ -49,6 +50,7 @@ public class TestDatabase {
     @After
     public void tearDown() throws Exception {
         try {
+            SampleTypeHelper.deleteCreatedSampleTypes();
             SiteHelper.deleteCreatedSites();
             SampleSourceHelper.deleteCreatedSampleSource();
         } catch (Exception e) {

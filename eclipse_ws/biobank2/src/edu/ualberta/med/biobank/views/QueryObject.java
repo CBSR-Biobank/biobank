@@ -89,7 +89,6 @@ public class QueryObject {
         try {
             results = SessionManager.getAppService().query(c);
         } catch (ApplicationException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
         return results;

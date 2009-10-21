@@ -252,11 +252,16 @@ public class TestClinic extends TestDatabase {
         String name = "testDelete" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         ClinicWrapper clinic = ClinicHelper.addClinic(site, name);
+
         // object is in database
-        Assert.assertNotNull(clinic);
-        clinic.delete();
         Clinic clinicInDB = ModelUtils.getObjectWithId(appService,
             Clinic.class, clinic.getId());
+        Assert.assertNotNull(clinicInDB);
+
+        clinic.delete();
+
+        clinicInDB = ModelUtils.getObjectWithId(appService, Clinic.class,
+            clinic.getId());
         // object is not anymore in database
         Assert.assertNull(clinicInDB);
     }

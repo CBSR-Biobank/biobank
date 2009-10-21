@@ -135,7 +135,6 @@ public class AdvancedReportsView extends ViewPart {
             List<Object> result = SessionManager.getAppService().query(c);
             return result;
         } catch (Exception e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
             return null;
         }

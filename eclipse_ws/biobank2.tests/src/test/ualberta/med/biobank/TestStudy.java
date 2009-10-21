@@ -521,11 +521,16 @@ public class TestStudy extends TestDatabase {
     public void testDelete() throws Exception {
         StudyWrapper study = StudyHelper.addStudy(SiteHelper
             .addSite("testDelete"), "testDelete");
+
         // object is in database
-        Assert.assertNotNull(study);
-        study.delete();
         Study studyInDB = ModelUtils.getObjectWithId(appService, Study.class,
             study.getId());
+        Assert.assertNotNull(studyInDB);
+
+        study.delete();
+
+        studyInDB = ModelUtils.getObjectWithId(appService, Study.class, study
+            .getId());
         // object is not anymore in database
         Assert.assertNull(studyInDB);
     }

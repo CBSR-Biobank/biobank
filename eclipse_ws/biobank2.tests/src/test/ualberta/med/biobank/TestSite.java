@@ -422,10 +422,15 @@ public class TestSite extends TestDatabase {
     public void testDelete() throws Exception {
         SiteWrapper site = SiteHelper
             .addSite("testDelete" + r.nextInt(), false);
+
         // object is in database
-        Assert.assertNotNull(site);
-        site.delete();
         Site siteInDB = ModelUtils.getObjectWithId(appService, Site.class, site
+            .getId());
+        Assert.assertNotNull(siteInDB);
+
+        site.delete();
+
+        siteInDB = ModelUtils.getObjectWithId(appService, Site.class, site
             .getId());
         // object is not anymore in database
         Assert.assertNull(siteInDB);

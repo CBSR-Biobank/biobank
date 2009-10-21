@@ -103,11 +103,16 @@ public class TestSampleStorage extends TestDatabase {
             appService, false);
         SampleStorageWrapper sampleStorage = SampleStorageHelper
             .addSampleStorage(study, DbHelper.chooseRandomlyInList(types));
+
         // object is in database
-        Assert.assertNotNull(sampleStorage);
-        sampleStorage.delete();
         SampleStorage ssInDB = ModelUtils.getObjectWithId(appService,
             SampleStorage.class, sampleStorage.getId());
+        Assert.assertNotNull(ssInDB);
+
+        sampleStorage.delete();
+
+        ssInDB = ModelUtils.getObjectWithId(appService, SampleStorage.class,
+            sampleStorage.getId());
         // object is not anymore in database
         Assert.assertNull(ssInDB);
     }

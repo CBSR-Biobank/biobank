@@ -335,7 +335,7 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
         return patientVisitCollection;
     }
 
-    protected void setPatientVisitCollection(
+    public void setPatientVisitCollection(
         Collection<PatientVisit> patientVisitCollection, boolean setNull) {
         Collection<PatientVisit> oldCollection = wrappedObject
             .getPatientVisitCollection();
