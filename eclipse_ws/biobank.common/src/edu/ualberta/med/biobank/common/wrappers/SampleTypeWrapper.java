@@ -158,23 +158,6 @@ public class SampleTypeWrapper extends ModelWrapper<SampleType> {
         return list;
     }
 
-    public static List<SampleTypeWrapper> getAllWrappers(
-        WritableApplicationService appService, boolean sort)
-        throws ApplicationException {
-        List<SampleType> sampleTypes = appService.search(SampleType.class,
-            new SampleType());
-        List<SampleTypeWrapper> list = transformToWrapperList(appService,
-            sampleTypes);
-        if (sort)
-            Collections.sort(list);
-        return list;
-    }
-
-    public static List<SampleTypeWrapper> getAllWrappers(
-        WritableApplicationService appService) throws ApplicationException {
-        return getAllWrappers(appService, false);
-    }
-
     public static List<SampleTypeWrapper> getGlobalSampleTypes(
         WritableApplicationService appService, boolean sort)
         throws ApplicationException {

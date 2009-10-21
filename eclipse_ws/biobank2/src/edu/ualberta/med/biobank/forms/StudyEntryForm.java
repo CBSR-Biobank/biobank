@@ -158,7 +158,8 @@ public class StudyEntryForm extends BiobankEntryForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         sampleStorageEntryWidget = new SampleStorageEntryWidget(client,
-            SWT.NONE, studyWrapper.getSampleStorageCollection(), toolkit);
+            SWT.NONE, studyWrapper.getSite(), studyWrapper
+                .getSampleStorageCollection(), toolkit);
         sampleStorageEntryWidget.addSelectionChangedListener(listener);
     }
 

@@ -28,6 +28,7 @@ import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.dialogs.SampleStorageDialog;
 import edu.ualberta.med.biobank.model.SampleStorage;
 import edu.ualberta.med.biobank.widgets.infotables.SampleStorageInfoTable;
@@ -64,11 +65,12 @@ public class SampleStorageEntryWidget extends BiobankWidget {
      *            form this parameter should be null.
      */
     public SampleStorageEntryWidget(Composite parent, int style,
+        SiteWrapper site,
         Collection<SampleStorageWrapper> sampleStorageCollection,
         FormToolkit toolkit) {
         super(parent, style);
         Assert.isNotNull(toolkit, "toolkit is null");
-        getSampleTypes();
+        getSampleTypes(site);
         selectedSampleStorage = sampleStorageCollection;
 
         setLayout(new GridLayout(1, false));
@@ -191,10 +193,9 @@ public class SampleStorageEntryWidget extends BiobankWidget {
         });
     }
 
-    private void getSampleTypes() {
+    private void getSampleTypes(SiteWrapper site) {
         try {
-            allSampleTypes = SampleTypeWrapper.getAllWrappers(SessionManager
-                .getAppService());
+            allSampleTypes = site.getAllSampleTypeCollection();
         } catch (final RemoteConnectFailureException exp) {
             BioBankPlugin.openRemoteConnectErrorMessage();
         } catch (ApplicationException e) {

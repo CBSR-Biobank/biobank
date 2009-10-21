@@ -458,6 +458,35 @@ public class SiteWrapper extends ModelWrapper<Site> {
         return getSampleTypeCollection(false);
     }
 
+    /**
+     * Include globals
+     * 
+     * @throws ApplicationException
+     */
+    @SuppressWarnings("unchecked")
+    public List<SampleTypeWrapper> getAllSampleTypeCollection(boolean sort)
+        throws ApplicationException {
+        List<SampleTypeWrapper> sampleTypeCollection = (List<SampleTypeWrapper>) propertiesMap
+            .get("allSampleTypeCollection");
+        if (sampleTypeCollection == null) {
+            List<SampleTypeWrapper> siteSampleTypes = getSampleTypeCollection();
+            List<SampleTypeWrapper> globalSampleTypes = SampleTypeWrapper
+                .getGlobalSampleTypes(appService, false);
+            sampleTypeCollection = new ArrayList<SampleTypeWrapper>();
+            sampleTypeCollection.addAll(siteSampleTypes);
+            sampleTypeCollection.addAll(globalSampleTypes);
+            propertiesMap.put("allSampleTypeCollection", sampleTypeCollection);
+        }
+        if ((sampleTypeCollection != null) && sort)
+            Collections.sort(sampleTypeCollection);
+        return sampleTypeCollection;
+    }
+
+    public List<SampleTypeWrapper> getAllSampleTypeCollection()
+        throws ApplicationException {
+        return getAllSampleTypeCollection(false);
+    }
+
     public void setSampleTypeCollection(Collection<SampleType> types,
         boolean setNull) {
         Collection<SampleType> oldTypes = wrappedObject
