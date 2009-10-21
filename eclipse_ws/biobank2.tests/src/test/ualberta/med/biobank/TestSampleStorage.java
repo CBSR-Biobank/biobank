@@ -2,16 +2,10 @@ package test.ualberta.med.biobank;
 
 import static org.junit.Assert.fail;
 
-import org.junit.Before;
 import org.junit.Test;
 
 //FIXME to be implemented by Delphine
 public class TestSampleStorage {
-
-    @Before
-    public void setUp() throws Exception {
-        fail("Not yet implemented");
-    }
 
     @Test
     public void testSampleStorageWrapperWritableApplicationServiceSampleStorage() {

@@ -20,10 +20,7 @@ public class ClinicHelper extends DbHelper {
         ClinicWrapper clinic = newClinic(site, name);
         clinic.persist();
         if (addContacts) {
-            for (int i = 0; i < (r.nextInt(5) + 1); i++) {
-                ContactHelper.addContact(clinic, name);
-            }
-            clinic.reload();
+            ContactHelper.addContactsToClinic(clinic, name);
         }
         return clinic;
     }

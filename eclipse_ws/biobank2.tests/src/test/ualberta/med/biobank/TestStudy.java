@@ -64,7 +64,7 @@ public class TestStudy extends TestDatabase {
         String name = "testGetContactCollection" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         StudyWrapper study = StudyHelper.addStudy(site, name);
-        int nber = ContactHelper.addContacts(study, name);
+        int nber = ContactHelper.addContactsToStudy(study, name);
 
         List<ContactWrapper> contacts = study.getContactCollection();
         int sizeFound = contacts.size();
@@ -77,7 +77,7 @@ public class TestStudy extends TestDatabase {
         String name = "testGetContactCollectionBoolean" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         StudyWrapper study = StudyHelper.addStudy(site, name);
-        ContactHelper.addContacts(study, name);
+        ContactHelper.addContactsToStudy(study, name);
 
         List<ContactWrapper> contacts = study.getContactCollection(true);
         if (contacts.size() > 1) {
@@ -94,7 +94,7 @@ public class TestStudy extends TestDatabase {
         String name = "testAddInContactCollection" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         StudyWrapper study = StudyHelper.addStudy(site, name);
-        int nber = ContactHelper.addContacts(study, name);
+        int nber = ContactHelper.addContactsToStudy(study, name);
         site.reload();
 
         // get a clinic not yet added
@@ -122,7 +122,7 @@ public class TestStudy extends TestDatabase {
             + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         StudyWrapper study = StudyHelper.addStudy(site, name);
-        ContactHelper.addContacts(study, name);
+        ContactHelper.addContactsToStudy(study, name);
         site.reload();
 
         // get a clinic already added
@@ -317,7 +317,7 @@ public class TestStudy extends TestDatabase {
         String name = "testGetClinicCollection" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         StudyWrapper study = StudyHelper.addStudy(site, name);
-        int nber = ContactHelper.addContacts(study, name);
+        int nber = ContactHelper.addContactsToStudy(study, name);
 
         List<ClinicWrapper> clinics = study.getClinicCollection();
         int sizeFound = clinics.size();
@@ -490,6 +490,31 @@ public class TestStudy extends TestDatabase {
 
         study1.reload();
         Assert.assertEquals(nber + nber2, study1.getPatientVisitCount());
+    }
+
+    @Test
+    public void testPersist() throws Exception {
+        int oldTotal = appService.search(Study.class, new Study()).size();
+        String name = "testPersist" + r.nextInt();
+        SiteWrapper site = SiteHelper.addSite(name);
+        StudyHelper.addStudy(site, name);
+        int newTotal = appService.search(Study.class, new Study()).size();
+        Assert.assertEquals(oldTotal + 1, newTotal);
+    }
+
+    @Test
+    public void testPersistFail() throws Exception {
+        String name = "testPersistFail" + r.nextInt();
+        SiteWrapper site = SiteHelper.addSite(name);
+        StudyHelper.addStudy(site, name);
+
+        try {
+            StudyHelper.addStudy(site, name);
+            Assert
+                .fail("Should not insert the study : same name already in database");
+        } catch (BiobankCheckException bce) {
+            Assert.assertTrue(true);
+        }
     }
 
     @Test

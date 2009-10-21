@@ -25,7 +25,7 @@ public class ContactHelper extends DbHelper {
         return contact;
     }
 
-    public static int addContacts(StudyWrapper study, String name, int min)
+    public static int addContactsToStudy(StudyWrapper study, String name, int min)
         throws Exception {
         SiteWrapper site = study.getSite();
         ClinicHelper.addClinics(site, name, r.nextInt(15) + min + 1, true);
@@ -43,9 +43,18 @@ public class ContactHelper extends DbHelper {
         return nber;
     }
 
-    public static int addContacts(StudyWrapper study, String name)
+    public static int addContactsToStudy(StudyWrapper study, String name)
         throws Exception {
-        return addContacts(study, name, 1);
+        return addContactsToStudy(study, name, 1);
     }
 
+    public static int addContactsToClinic(ClinicWrapper clinic, String name)
+        throws Exception {
+        int nber = r.nextInt(5) + 1;
+        for (int i = 0; i < nber; i++) {
+            ContactHelper.addContact(clinic, name + i);
+        }
+        clinic.reload();
+        return nber;
+    }
 }

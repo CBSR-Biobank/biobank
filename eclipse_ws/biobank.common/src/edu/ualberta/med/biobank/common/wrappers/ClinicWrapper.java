@@ -190,6 +190,10 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
                 "the clinic does not have an address");
         }
 
+        if (getSite() == null) {
+            throw new BiobankCheckException("the clinic does not have an site");
+        }
+
         if (!checkClinicNameUnique()) {
             throw new BiobankCheckException("A clinic with name \"" + getName()
                 + "\" already exists.");
@@ -201,12 +205,12 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
 
         if (getWrappedObject().getId() == null) {
             c = new HQLCriteria("from " + Clinic.class.getName()
-                + " where name = ?", Arrays.asList(new Object[] { getName() }));
+                + " where site.id = ? and name = ?", Arrays
+                .asList(new Object[] { getSite().getId(), getName() }));
         } else {
             c = new HQLCriteria("from " + Clinic.class.getName()
-                + " as clinic where site.id = ? and name = ? and clinic <> ?",
-                Arrays.asList(new Object[] { getSite().getId(), getName(),
-                    getWrappedObject() }));
+                + " where site.id = ? and name = ? and id <> ?", Arrays
+                .asList(new Object[] { getSite().getId(), getName(), getId() }));
         }
 
         List<Clinic> results = appService.query(c);
@@ -252,9 +256,17 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
         }
     }
 
+    public void setContactCollection(Collection<ContactWrapper> contacts) {
+        Collection<Contact> collection = new HashSet<Contact>();
+        for (ContactWrapper pv : contacts) {
+            collection.add(pv.getWrappedObject());
+        }
+        setContactCollection(collection, false);
+        propertiesMap.put("contactCollection", contacts);
+    }
+
     @SuppressWarnings("unchecked")
-    public Collection<StudyWrapper> getStudyCollection(boolean sort)
-        throws Exception {
+    public List<StudyWrapper> getStudyCollection(boolean sort) throws Exception {
         List<StudyWrapper> studyCollection = (List<StudyWrapper>) propertiesMap
             .get("studyCollection");
 
@@ -274,6 +286,10 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
             propertiesMap.put("studyCollection", studyCollection);
         }
         return studyCollection;
+    }
+
+    public List<StudyWrapper> getStudyCollection() throws Exception {
+        return getStudyCollection(false);
     }
 
     @Override
@@ -319,7 +335,7 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
         return patientVisitCollection;
     }
 
-    public void setPatientVisitCollection(
+    protected void setPatientVisitCollection(
         Collection<PatientVisit> patientVisitCollection, boolean setNull) {
         Collection<PatientVisit> oldCollection = wrappedObject
             .getPatientVisitCollection();
