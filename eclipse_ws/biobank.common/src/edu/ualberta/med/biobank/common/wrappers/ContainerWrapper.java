@@ -530,7 +530,7 @@ public class ContainerWrapper extends ModelWrapper<Container> {
     public boolean hasChildren() {
         Collection<ContainerPosition> positions = wrappedObject
             .getChildPositionCollection();
-        return positions != null && positions.size() > 0;
+        return ((positions != null) && (positions.size() > 0));
     }
 
     /**
