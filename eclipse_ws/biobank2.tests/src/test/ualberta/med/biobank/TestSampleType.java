@@ -10,8 +10,9 @@ import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.model.SampleType;
 
 //FIXME to be implemented by Delphine
-public class TestSampleType extends TestDatabase{
+public class TestSampleType extends TestDatabase {
 
+    @Override
     @Before
     public void setUp() throws Exception {
         fail("Not yet implemented");
@@ -127,10 +128,12 @@ public class TestSampleType extends TestDatabase{
         fail("Not yet implemented");
     }
 
-	public static SampleTypeWrapper addSampleTypeWrapper() throws BiobankCheckException, Exception {
-		SampleTypeWrapper stw = new SampleTypeWrapper(appService, new SampleType());
-		stw.persist();
-		return stw;
-	}
-	
+    public static SampleTypeWrapper addSampleTypeWrapper()
+        throws BiobankCheckException, Exception {
+        SampleTypeWrapper stw = new SampleTypeWrapper(appService,
+            new SampleType());
+        stw.persist();
+        return stw;
+    }
+
 }

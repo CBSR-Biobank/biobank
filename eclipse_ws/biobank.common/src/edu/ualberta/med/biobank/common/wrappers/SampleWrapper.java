@@ -66,9 +66,11 @@ public class SampleWrapper extends ModelWrapper<Sample> {
 
     public void checkInventoryIdUnique() throws BiobankCheckException,
         ApplicationException {
-        HQLCriteria criteria = new HQLCriteria("from " + Sample.class.getName()
-            + " where inventoryId  = ? and patientVisit.patient.study.site=?",
-            Arrays.asList(new Object[] { getInventoryId(), getSite() }));
+        HQLCriteria criteria = new HQLCriteria(
+            "from "
+                + Sample.class.getName()
+                + " where inventoryId  = ? and patientVisit.patient.study.site.id=?",
+            Arrays.asList(new Object[] { getInventoryId(), getSite().getId() }));
         List<Sample> samples = appService.query(criteria);
         if (samples.size() == 0) {
             return;

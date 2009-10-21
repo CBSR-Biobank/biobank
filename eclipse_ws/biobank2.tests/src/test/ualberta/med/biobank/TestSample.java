@@ -2,7 +2,6 @@ package test.ualberta.med.biobank;
 
 import java.util.Collection;
 
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -25,7 +24,6 @@ import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.PatientVisit;
-import edu.ualberta.med.biobank.model.SampleType;
 
 public class TestSample extends TestDatabase {
 
@@ -37,7 +35,6 @@ public class TestSample extends TestDatabase {
         super.setUp();
         SampleTypeWrapper sampleTypeWrapper = TestSampleType
             .addSampleTypeWrapper();
-        SiteHelper.deletedCreatedSites();
         SiteWrapper site = SiteHelper.addSite("sitename", true);
         ContainerWrapper container = ContainerHelper.addContainerRandom(site,
             "newcontainer");
@@ -49,12 +46,6 @@ public class TestSample extends TestDatabase {
         sample = SampleHelper.newSample(sampleTypeWrapper, container, pv, 3, 3);
     }
 
-    @Override
-    @After
-    public void tearDown() throws Exception {
-        SiteHelper.deletedCreatedSites();
-    }
-
     @Test(expected = BiobankCheckException.class)
     public void TestCheckInventoryIdUnique() throws BiobankCheckException,
         Exception {
@@ -62,8 +53,9 @@ public class TestSample extends TestDatabase {
             sample.getSampleType(), sample.getParent(), sample
                 .getPatientVisit(), 3, 3);
         // should be allowed same position?
+        sample.setInventoryId("1234");
+        duplicate.setInventoryId("1234");
         duplicate.persist();
-        sample.setInventoryId(duplicate.getInventoryId());
         sample.checkInventoryIdUnique();
 
     }
@@ -97,29 +89,30 @@ public class TestSample extends TestDatabase {
 
     @Test
     public void TestGetSetParent() throws Exception {
-        Assert.assertTrue(sample.getParent() == null);
-        ContainerWrapper parent = ContainerHelper.addContainer("newcontainer",
-            "barcode", sample.getParent(), sample.getSite(), sample.getParent()
-                .getContainerType());
+        ContainerWrapper parent = ContainerHelper.addContainer(null, "barcode",
+            sample.getParent(), sample.getSite(), sample.getParent()
+                .getContainerType(), 4, 4);
         sample.setParent(parent);
+        sample.persist();
+        parent.reload();
         Assert.assertTrue(sample.getParent() != null);
         Collection<SampleWrapper> sampleWrappers = parent.getSamples();
         boolean found = false;
         for (SampleWrapper sampleWrapper : sampleWrappers) {
-            if (sampleWrapper.getId() == sample.getId())
+            if (sampleWrapper.getId().equals(sample.getId()))
                 found = true;
         }
         Assert.assertTrue(found);
     }
 
     @Test
-    public void TestGetSetSampleType() {
+    public void TestGetSetSampleType() throws BiobankCheckException, Exception {
         SampleTypeWrapper stw = sample.getSampleType();
-        SampleTypeWrapper newStw = new SampleTypeWrapper(appService,
-            new SampleType());
+        SampleTypeWrapper newStw = TestSampleType.addSampleTypeWrapper();
+        stw.persist();
         Assert.assertTrue(stw.getId() != newStw.getId());
         sample.setSampleType(newStw);
-        Assert.assertTrue(stw.getId() == sample.getSampleType().getId());
+        Assert.assertTrue(newStw.getId() == sample.getSampleType().getId());
     }
 
     @Test
