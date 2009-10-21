@@ -1,5 +1,5 @@
 LOCK TABLES `SAMPLE_TYPE` WRITE;
-INSERT INTO `SAMPLE_TYPE` VALUES
+INSERT INTO `SAMPLE_TYPE` (ID, NAME, NAME_SHORT, SITE_ID) VALUES
 ( 1, "Plasma",                       "Plasma", NULL),
 ( 2, "Paxgene",                      "Paxgene", NULL),
 ( 3, "DNA (Blood)",                  "DNA(Blood)", NULL),

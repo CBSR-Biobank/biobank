@@ -1,5 +1,5 @@
 LOCK TABLES `SAMPLE_SOURCE` WRITE;
-INSERT INTO `SAMPLE_SOURCE` VALUES
+INSERT INTO `SAMPLE_SOURCE` (ID, NAME) VALUES
 ( 1, "10mL lavender top EDTA tube"),
 ( 2, "6mL lavender top EDTA tube"),
 ( 3, "4ml lavender top EDTA tube"),
