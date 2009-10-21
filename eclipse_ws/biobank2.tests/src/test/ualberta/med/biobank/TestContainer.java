@@ -457,7 +457,7 @@ public class TestContainer extends TestDatabase {
         childTypeL3.setSampleTypeCollection(sampleTypeList);
         childTypeL3.persist();
 
-        StudyWrapper study = StudyHelper.addStudy("Study1", "S1", site);
+        StudyWrapper study = StudyHelper.addStudy(site, "Study1");
 
         PatientWrapper patient = PatientHelper.addPatient("1000", study);
         PatientVisitWrapper pv = PatientVisitHelper.addPatientVisit(patient,
@@ -489,7 +489,7 @@ public class TestContainer extends TestDatabase {
         childTypeL3.setSampleTypeCollection(sampleTypeList);
         childTypeL3.persist();
 
-        StudyWrapper study = StudyHelper.addStudy("Study1", "S1", site);
+        StudyWrapper study = StudyHelper.addStudy(site, "Study1");
 
         PatientWrapper patient = PatientHelper.addPatient("1000", study);
         PatientVisitWrapper pv = PatientVisitHelper.addPatientVisit(patient,

@@ -34,11 +34,11 @@ public class SiteHelper extends DbHelper {
 
     public static void addSites(String basename, int count) throws Exception {
         for (int i = 0; i < count; i++) {
-            addSite(basename + (i + 1));
+            addSite(basename + i);
         }
     }
 
-    public static void deletedCreatedSites() throws Exception {
+    public static void deleteCreatedSites() throws Exception {
         for (SiteWrapper site : createdSites) {
             site.reload();
             removeContainers(site.getContainerCollection());

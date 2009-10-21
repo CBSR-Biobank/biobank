@@ -27,6 +27,10 @@ public class SampleStorageWrapper extends ModelWrapper<SampleStorage> {
         propertyChangeSupport.firePropertyChange("study", oldStudy, study);
     }
 
+    public void setStudy(StudyWrapper study) {
+        setStudy(study.wrappedObject);
+    }
+
     public SampleTypeWrapper getSampleType() {
         SampleType type = wrappedObject.getSampleType();
         if (type == null) {
