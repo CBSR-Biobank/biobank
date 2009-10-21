@@ -1,7 +1,9 @@
 package test.ualberta.med.biobank.internal;
 
+import java.text.ParseException;
 import java.util.Date;
 
+import test.ualberta.med.biobank.Utils;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
@@ -27,6 +29,15 @@ public class PatientVisitHelper extends DbHelper {
             dateProcessed, dateReceived);
         pv.persist();
         return pv;
+    }
+
+    public static int addPatientVisits(PatientWrapper patient,
+        ClinicWrapper clinic) throws ParseException, Exception {
+        int nber = r.nextInt(15) + 1;
+        for (int i = 0; i < nber; i++) {
+            addPatientVisit(patient, clinic, Utils.getRandomDate(), null, null);
+        }
+        return nber;
     }
 
 }

@@ -19,4 +19,14 @@ public class PatientHelper extends DbHelper {
         return patient;
     }
 
+    public static int addPatients(String number, StudyWrapper study)
+        throws Exception {
+        int nber = r.nextInt(15) + 1;
+        for (int i = 0; i < nber; i++) {
+            addPatient(number + i, study);
+        }
+        study.reload();
+        return nber;
+    }
+
 }

@@ -3,8 +3,8 @@ package test.ualberta.med.biobank.internal;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.SampleSourceWrapper;
+import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 
 public class SampleSourceHelper extends DbHelper {
 
@@ -36,6 +36,18 @@ public class SampleSourceHelper extends DbHelper {
             source.reload();
             source.delete();
         }
+    }
+
+    public static int addSampleSources(StudyWrapper study, String name)
+        throws Exception {
+        int nber = r.nextInt(15) + 1;
+        List<SampleSourceWrapper> sources = new ArrayList<SampleSourceWrapper>();
+        for (int i = 0; i < nber; i++) {
+            sources.add(SampleSourceHelper.addSampleSource(name + i));
+        }
+        study.setSampleSourceCollection(sources);
+        study.persist();
+        return nber;
     }
 
 }
