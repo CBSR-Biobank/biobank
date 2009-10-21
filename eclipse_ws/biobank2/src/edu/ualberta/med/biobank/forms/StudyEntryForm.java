@@ -76,7 +76,7 @@ public class StudyEntryForm extends BiobankEntryForm {
     };
 
     private class StudyPvCustomInfo extends PvCustomInfo {
-        public PvInfoWidget wiget;
+        public PvInfoWidget widget;
     }
 
     public StudyEntryForm() {
@@ -218,9 +218,9 @@ public class StudyEntryForm extends BiobankEntryForm {
             combinedPvInfo.type = studyWrapper.getPvInfoType(label);
             combinedPvInfo.allowedValues = studyWrapper
                 .getPvInfoAllowedValues(label);
-            combinedPvInfo.wiget = new PvInfoWidget(client, SWT.NONE,
+            combinedPvInfo.widget = new PvInfoWidget(client, SWT.NONE,
                 combinedPvInfo);
-            combinedPvInfo.wiget.addSelectionChangedListener(listener);
+            combinedPvInfo.widget.addSelectionChangedListener(listener);
             pvCustomInfoMap.put(label, combinedPvInfo);
         }
     }
@@ -264,12 +264,12 @@ public class StudyEntryForm extends BiobankEntryForm {
 
         for (Object object : pvCustomInfoMap.values()) {
             StudyPvCustomInfo pvCustomInfo = (StudyPvCustomInfo) object;
-            boolean selected = pvCustomInfo.wiget.getSelected();
+            boolean selected = pvCustomInfo.widget.getSelected();
 
             if (!selected)
                 continue;
 
-            String value = pvCustomInfo.wiget.getValues();
+            String value = pvCustomInfo.widget.getValues();
             if (pvCustomInfo.type.equals(4) || pvCustomInfo.type.equals(5)) {
                 studyWrapper.setPvInfoAllowedValues(pvCustomInfo.label, value
                     .split(";"));

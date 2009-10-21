@@ -36,6 +36,7 @@ public class SampleSourceHelper extends DbHelper {
             source.reload();
             source.delete();
         }
+        createdSampleSources.clear();
     }
 
     public static int addSampleSources(StudyWrapper study, String name)
