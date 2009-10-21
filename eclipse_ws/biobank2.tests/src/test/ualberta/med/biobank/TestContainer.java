@@ -57,13 +57,19 @@ public class TestContainer extends TestDatabase {
             // }
         }
 
-        site = SiteHelper.addSite("Site - Container Test");
+        site = SiteHelper.addSite("Site - Container Test"
+            + Utils.getRandomString(10));
         addContainerTypes();
         addContainers();
     }
 
     private void addContainerTypes() throws BiobankCheckException, Exception {
         ContainerTypeWrapper topType, childType;
+
+        childType = ContainerTypeHelper.newContainerType(site,
+            "Child L4 Container Type", "CCTL4", 4, 10, 10, false);
+        childType.persist();
+        containerTypeMap.put("ChildCtL4", childType);
 
         childType = ContainerTypeHelper.newContainerType(site,
             "Child L3 Container Type", "CCTL3", 4, CONTAINER_CHILD_L3_ROWS,
@@ -103,18 +109,37 @@ public class TestContainer extends TestDatabase {
     }
 
     private void addContainerHierarchy() throws Exception {
-        ContainerWrapper top, childL1, childL2, childL3;
+        ContainerWrapper top, childL1, childL2, childL3, childL4;
+        List<ContainerWrapper> children;
 
         top = containerMap.get("Top");
         childL1 = ContainerHelper.addContainer(null, "0001", top, site,
             containerTypeMap.get("ChildCtL1"), 0, 0);
+        containerMap.put("ChildL1", childL1);
+        top.reload();
+        children = top.getChildren();
+        Assert.assertTrue((children.size() == 1) && children.contains(childL1));
+
         childL2 = ContainerHelper.addContainer(null, "0002", childL1, site,
             containerTypeMap.get("ChildCtL2"), 0, 0);
+        containerMap.put("ChildL2", childL2);
+        childL1.reload();
+        children = childL1.getChildren();
+        Assert.assertTrue((children.size() == 1) && children.contains(childL2));
+
         childL3 = ContainerHelper.addContainer(null, "0003", childL2, site,
             containerTypeMap.get("ChildCtL3"), 0, 0);
-        containerMap.put("ChildL1", childL1);
-        containerMap.put("ChildL2", childL2);
         containerMap.put("ChildL3", childL3);
+        childL2.reload();
+        children = childL2.getChildren();
+        Assert.assertTrue((children.size() == 1) && children.contains(childL3));
+
+        childL4 = ContainerHelper.addContainer(null, "0004", childL3, site,
+            containerTypeMap.get("ChildCtL4"), 0, 0);
+        containerMap.put("ChildL4", childL4);
+        childL3.reload();
+        children = childL3.getChildren();
+        Assert.assertTrue((children.size() == 1) && children.contains(childL4));
     }
 
     @Test

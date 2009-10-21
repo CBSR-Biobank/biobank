@@ -104,4 +104,10 @@ public class ContainerPositionWrapper extends
         return 0;
     }
 
+    @Override
+    public String toString() {
+        return "[" + getRow() + ", " + getCol() + "] "
+            + getContainer().toString();
+    }
+
 }
