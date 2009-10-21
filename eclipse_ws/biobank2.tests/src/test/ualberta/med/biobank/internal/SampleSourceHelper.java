@@ -3,7 +3,6 @@ package test.ualberta.med.biobank.internal;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.SampleSourceWrapper;
 
 public class SampleSourceHelper extends DbHelper {
@@ -36,6 +35,7 @@ public class SampleSourceHelper extends DbHelper {
             source.reload();
             source.delete();
         }
+        createdSampleSources.clear();
     }
 
 }
