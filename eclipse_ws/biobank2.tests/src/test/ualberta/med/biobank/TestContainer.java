@@ -10,6 +10,7 @@ import java.util.Map;
 
 import junit.framework.Assert;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -50,6 +51,8 @@ public class TestContainer extends TestDatabase {
 
     private Map<String, ContainerTypeWrapper> containerTypeMap;
 
+    // TODO: test attempt to add too many children
+
     @Override
     @Before
     public void setUp() throws Exception {
@@ -75,6 +78,14 @@ public class TestContainer extends TestDatabase {
             newBarcode = Utils.getRandomString(10);
         } while (usedBarcodes.contains(newBarcode));
         return newBarcode;
+    }
+
+    @Override
+    @After
+    public void tearDown() throws Exception {
+        // temporary: this method should not be overridden
+        // 
+        // keep here till we can delete all containers from a site
     }
 
     private void addContainerTypes() throws BiobankCheckException, Exception {
@@ -155,9 +166,44 @@ public class TestContainer extends TestDatabase {
         Assert.assertTrue((children.size() == 1) && children.contains(childL4));
 
         containerMap.put(mapPrefix + "ChildL1", childL1);
-        containerMap.put(mapPrefix + "ChildL2", childL1);
-        containerMap.put(mapPrefix + "ChildL3", childL1);
-        containerMap.put(mapPrefix + "ChildL4", childL1);
+        containerMap.put(mapPrefix + "ChildL2", childL2);
+        containerMap.put(mapPrefix + "ChildL3", childL3);
+        containerMap.put(mapPrefix + "ChildL4", childL4);
+    }
+
+    public void addDupLabelledHierarchy() throws Exception {
+        ContainerTypeWrapper freezerType, hotelType, cabinetType, drawerType;
+
+        freezerType = ContainerTypeHelper.addContainerType(site, "freezer3x10",
+            "F3x10", 2, 3, 10, true);
+        containerTypeMap.put("frezer3x10", freezerType);
+        hotelType = ContainerTypeHelper.addContainerType(site, "Hotel13",
+            "H-13", 2, 1, 13, true);
+        containerTypeMap.put("hotel13", hotelType);
+        cabinetType = ContainerTypeHelper.addContainerType(site, "Cabinet",
+            "C", 2, 1, 4, true);
+        containerTypeMap.put("cabinet", cabinetType);
+        drawerType = ContainerTypeHelper.addContainerType(site, "Drawer36",
+            "D36", 2, 1, 36, true);
+        containerTypeMap.put("drawer36", drawerType);
+
+        ContainerWrapper freezer, cabinet, hotel, drawer;
+
+        freezer = ContainerHelper.addContainer("02", getNewBarcode(), null,
+            site, freezerType);
+        hotel = ContainerHelper.addContainer(null, getNewBarcode(), freezer,
+            site, hotelType, 0, 0);
+        freezer.reload();
+        containerMap.put("freezer02", freezer);
+        containerMap.put("H02AA", hotel);
+
+        cabinet = ContainerHelper.addContainer("02", getNewBarcode(), null,
+            site, cabinetType);
+        drawer = ContainerHelper.addContainer(null, getNewBarcode(), cabinet,
+            site, drawerType, 0, 0);
+        cabinet.reload();
+        containerMap.put("cabinet", cabinet);
+        containerMap.put("D02AA", drawer);
     }
 
     private void addContainerHierarchy(ContainerWrapper parent)
@@ -344,32 +390,75 @@ public class TestContainer extends TestDatabase {
 
     @Test
     public void testGetContainersHoldingContainerType() throws Exception {
-        ContainerWrapper top1, top2, child1, child2;
+        ContainerWrapper frezer, hotel, cabinet, drawer;
 
-        top1 = ContainerHelper.addContainer("02", getNewBarcode(), null, site,
-            containerTypeMap.get("TopCT"));
-        child1 = ContainerHelper.addContainer(null, "0001", top1, site,
-            containerTypeMap.get("ChildCtL1"), 0, 0);
+        addDupLabelledHierarchy();
+
+        frezer = containerMap.get("freezer02");
+        hotel = containerMap.get("H02AA");
+        cabinet = containerMap.get("cabinet");
+        drawer = containerMap.get("D02AA");
+
+        List<ContainerWrapper> list = frezer
+            .getContainersHoldingContainerType("02AA");
+        Assert.assertEquals(1, list.size());
+        Assert.assertTrue(list.contains(hotel));
+
+        list = cabinet.getContainersHoldingContainerType("02AA");
+        Assert.assertEquals(1, list.size());
+        Assert.assertTrue(list.contains(drawer));
+    }
+
+    @Test
+    public void testGetContainersInSite() throws Exception {
+        ContainerWrapper freezer, hotel, cabinet, drawer;
+
+        addDupLabelledHierarchy();
+
+        freezer = containerMap.get("freezer02");
+        hotel = containerMap.get("H02AA");
+        cabinet = containerMap.get("cabinet");
+        drawer = containerMap.get("D02AA");
+
+        List<ContainerWrapper> list = ContainerWrapper.getContainersInSite(
+            appService, site, "02AA");
+        Assert.assertEquals(2, list.size());
+        Assert.assertTrue(list.contains(hotel));
+        Assert.assertTrue(list.contains(drawer));
+
+        list = ContainerWrapper.getContainersInSite(appService, site, "02");
+        Assert.assertEquals(2, list.size());
+        Assert.assertTrue(list.contains(freezer));
+        Assert.assertTrue(list.contains(cabinet));
+    }
+
+    @Test
+    public void testGetPossibleParents() throws Exception {
+        ContainerWrapper top1, top2, childL1, childL2;
 
         ContainerTypeWrapper topType2 = ContainerTypeHelper.addContainerType(
             site, "Top Container Type 2", "TCT2", 2, 3, 10, true);
 
         top2 = ContainerHelper.addContainer("02", getNewBarcode(), null, site,
             topType2);
-        child2 = ContainerHelper.addContainer(null, "0002", top2, site,
+
+        top1 = ContainerHelper.addContainer("02", getNewBarcode(), null, site,
+            containerTypeMap.get("TopCT"));
+        childL1 = ContainerHelper.addContainer(null, "0001", top1, site,
             containerTypeMap.get("ChildCtL1"), 0, 0);
-
         top1.reload();
-        top2.reload();
 
-        List<ContainerWrapper> list = top1
-            .getContainersHoldingContainerType("02AA");
-        Assert.assertEquals(1, list.size());
-        Assert.assertTrue(list.contains(child1));
+        List<ContainerWrapper> parents = childL1.getPossibleParents("");
+        Assert.assertTrue(parents.contains(top1));
+        Assert.assertTrue(parents.contains(top2));
 
-        list = top2.getContainersHoldingContainerType("02AA");
-        Assert.assertEquals(1, list.size());
-        Assert.assertTrue(list.contains(child2));
+        childL2 = containerMap.get("ChildL1");
+        childL2 = containerMap.get("ChildL2");
+        parents = childL2.getPossibleParents("");
+        Assert.assertTrue((parents.size() == 1) && parents.contains(childL1));
+
+        parents = top1.getPossibleParents("");
+        Assert.assertTrue(parents.size() == 0);
     }
 
     @Test
@@ -658,32 +747,57 @@ public class TestContainer extends TestDatabase {
     }
 
     @Test
-    public void testGetPossibleParents() {
-        fail("Not yet implemented");
-    }
-
-    @Test
     public void testGetContainersHoldingSampleType() {
         fail("Not yet implemented");
     }
 
     @Test
-    public void testGetContainersInSite() {
-        fail("Not yet implemented");
+    public void testGetContainerWithProductBarcodeInSite() throws Exception {
+        ContainerWrapper top, childL1, result;
+
+        top = containerMap.get("Top");
+        addContainerHierarchy(top);
+
+        String barcode = getNewBarcode();
+        childL1 = ContainerHelper.addContainer(null, barcode, top, site,
+            containerTypeMap.get("ChildCtL1"), 1, 0);
+        top.reload();
+
+        result = ContainerWrapper.getContainerWithProductBarcodeInSite(
+            appService, site, barcode);
+        Assert.assertEquals(childL1, result);
     }
 
     @Test
-    public void testGetContainerWithProductBarcodeInSite() {
-        fail("Not yet implemented");
+    public void testInitChildrenWithType() throws Exception {
+        ContainerWrapper top;
+
+        ContainerTypeWrapper childType2 = ContainerTypeHelper.addContainerType(
+            site, "Child L1 Container Type - 2", "CCTL1-2", 3, 1, 15, false);
+
+        top = containerMap.get("Top");
+        addContainerHierarchy(top);
+
+        Assert.assertTrue(top.getChildren().size() == 1);
+        top.initChildrenWithType(childType2);
+        top.reload();
+        List<ContainerWrapper> children = top.getChildren();
+        Assert.assertTrue(children.size() == CONTAINER_TOP_ROWS
+            * CONTAINER_TOP_COLS);
+        for (ContainerWrapper container : children) {
+            if (container.getPosition().equals(0, 0)) {
+                Assert
+                    .assertTrue(children.get(0).getContainerType() == containerTypeMap
+                        .get("ChildCtL1"));
+            } else {
+                Assert
+                    .assertTrue(children.get(0).getContainerType() == childType2);
+            }
+        }
     }
 
     @Test
-    public void testInitChildrenWithType() {
-        fail("Not yet implemented");
-    }
-
-    @Test
-    public void testDeketeChildrenWithType() {
+    public void testDeleteChildrenWithType() {
         fail("Not yet implemented");
     }
 

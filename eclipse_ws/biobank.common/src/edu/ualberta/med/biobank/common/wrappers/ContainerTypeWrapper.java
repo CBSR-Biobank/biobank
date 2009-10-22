@@ -605,4 +605,9 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
             : -1));
     }
 
+    @Override
+    public String toString() {
+        return getName() + " (" + getNameShort() + ")";
+    }
+
 }

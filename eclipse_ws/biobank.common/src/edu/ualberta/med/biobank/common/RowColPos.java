@@ -14,6 +14,10 @@ public class RowColPos {
         this.col = col;
     }
 
+    public boolean equals(Integer row, Integer col) {
+        return ((this.row == row) && (this.col == col));
+    }
+
     @Override
     public String toString() {
         return "(" + row + "," + col + ")";
