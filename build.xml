@@ -267,7 +267,17 @@
 				</fileset>
 			</classpath>
 		</sql>
+	</target>   
+	
+	<target name="dbdump" description="makes a copy of the current biobank2 database">
+    <echo message="running mysqldump..." />
+    <exec executable="mysqldump" failonerror="true" output="biobank2.sql">
+        <arg line="-h${database.host} -P${database.port} -u${database.username} -p${database.password} ${database.name}" />
+    </exec>
+		<gzip src="biobank2.sql" destfile="biobank2.sql.gz"/>
+		<delete file="biobank2.sql" />
 	</target>
+
 
 	<!--Add the length="#" field into .hbm.xml, references the biobank.uml file for the VARCHAR(#) -->
 	<target name="string-length-field-addition" description="Add the length='#' field into .hbm.xml, references the biobank.uml file for the VARCHAR(#)" depends="check-cacore-sdk-uptodate">
