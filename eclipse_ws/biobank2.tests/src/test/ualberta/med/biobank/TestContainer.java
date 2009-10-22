@@ -639,11 +639,20 @@ public class TestContainer extends TestDatabase {
         Assert.assertTrue(childL3Parents.contains(childL1));
         Assert.assertTrue(childL3Parents.contains(childL2));
 
-        // fail cases
+        // invalid cases
         Assert.assertFalse(childL3Parents.contains(childL3));
-
-        List<ContainerWrapper> childL3Parents = childL3.getAllParents();
         Assert.assertFalse(childL2Parents.contains(childL3));
+        Assert.assertFalse(childL1Parents.contains(childL3));
+        Assert.assertFalse(topParents.contains(childL3));
+
+        Assert.assertFalse(childL2Parents.contains(childL2));
+        Assert.assertFalse(childL1Parents.contains(childL2));
+        Assert.assertFalse(topParents.contains(childL2));
+
+        Assert.assertFalse(childL1Parents.contains(childL1));
+        Assert.assertFalse(topParents.contains(childL1));
+
+        Assert.assertFalse(topParents.contains(top));
     }
 
     @Test
