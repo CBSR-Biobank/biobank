@@ -533,7 +533,6 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
         PatientVisitWrapper pv = getSelectedPatientVisit();
         if (pv != null) {
             String date = pv.getFormattedDateProcessed();
-            System.out.println(date);
             dateProcessedLabel.setText(date);
             appendLog("Visit selected " + date + " - "
                 + pv.getClinic().getName());

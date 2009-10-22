@@ -1,0 +1,3 @@
+DROP DATABASE IF EXISTS biobank2;
+CREATE DATABASE biobank2;
+

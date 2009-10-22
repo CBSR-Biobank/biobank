@@ -17,12 +17,16 @@ public class SampleStorageWrapper extends ModelWrapper<SampleStorage> {
         super(appService);
     }
 
-    public Study getStudy() {
-        return wrappedObject.getStudy();
+    public StudyWrapper getStudy() {
+        Study study = wrappedObject.getStudy();
+        if (study == null) {
+            return null;
+        }
+        return new StudyWrapper(appService, study);
     }
 
     public void setStudy(Study study) {
-        Study oldStudy = getStudy();
+        Study oldStudy = wrappedObject.getStudy();
         wrappedObject.setStudy(study);
         propertyChangeSupport.firePropertyChange("study", oldStudy, study);
     }
