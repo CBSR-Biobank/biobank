@@ -80,14 +80,16 @@ public class TestContainer extends TestDatabase {
     private void addContainerTypes() throws BiobankCheckException, Exception {
         ContainerTypeWrapper topType, childType;
 
-        childType = ContainerTypeHelper.newContainerType(site,
+        childType = ContainerTypeHelper.addContainerType(site,
             "Child L4 Container Type", "CCTL4", 4, 10, 10, false);
-        childType.persist();
         containerTypeMap.put("ChildCtL4", childType);
 
-        childType = ContainerTypeHelper.newContainerType(site,
+        childType = ContainerTypeHelper.addContainerType(site,
             "Child L3 Container Type", "CCTL3", 4, CONTAINER_CHILD_L3_ROWS,
             CONTAINER_CHILD_L3_COLS, false);
+        childType
+            .setChildContainerTypeCollection(new ArrayList<ContainerTypeWrapper>(
+                Arrays.asList(containerTypeMap.get("ChildCtL4"))));
         childType.persist();
         containerTypeMap.put("ChildCtL3", childType);
 
