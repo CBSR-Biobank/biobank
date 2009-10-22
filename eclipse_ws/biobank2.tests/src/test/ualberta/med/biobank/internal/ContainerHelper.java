@@ -8,6 +8,18 @@ import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
 
 public class ContainerHelper extends DbHelper {
 
+    /**
+     * Creates a new container object. It is not saved to the database.
+     * 
+     * @param label If the container is a top level container provide a label,
+     *            otherwise this parameter should be null.
+     * @param barcode The product barcode for this container.
+     * @param parent The containers parent container.
+     * @param site The site this container belongs to.
+     * @param type The container type for this container.
+     * @return The container wrapper for the container.
+     * @throws Exception
+     */
     public static ContainerWrapper newContainer(String label, String barcode,
         ContainerWrapper parent, SiteWrapper site, ContainerTypeWrapper type)
         throws Exception {
@@ -33,6 +45,23 @@ public class ContainerHelper extends DbHelper {
         return container;
     }
 
+    /**
+     * Creates a new container object. It is not saved to the database.
+     * 
+     * @param label If the container is a top level container provide a label,
+     *            otherwise this parameter should be null.
+     * @param barcode The product barcode for this container.
+     * @param parent The containers parent container.
+     * @param site The site this container belongs to.
+     * @param type The container type for this container.
+     * @param row If the container is a child container then this is the row
+     *            where this container is located in the parent container.
+     * @param col If the container is a child container then this is the column
+     *            where this container is located in the parent container.
+     * @return The container wrapper for the container.
+     * @throws Exception Exception is thrown if a label is specified and the
+     *             container is meant to be a child container.
+     */
     public static ContainerWrapper newContainer(String label, String barcode,
         ContainerWrapper parent, SiteWrapper site, ContainerTypeWrapper type,
         Integer row, Integer col) throws Exception {
@@ -42,6 +71,20 @@ public class ContainerHelper extends DbHelper {
         return container;
     }
 
+    /**
+     * Adds a container to the database.
+     * 
+     * @param label If the container is a top level container provide a label,
+     *            otherwise this parameter should be null.
+     * @param barcode The product barcode for this container.
+     * @param parent The containers parent container.
+     * @param site The site this container belongs to.
+     * @param type The container type for this container.
+     * @return The container wrapper for the container.
+     * @throws Exception Exception is thrown if a label is specified and the
+     *             container is meant to be a child container. An exception is
+     *             thrown if the container could not be added to the database.
+     */
     public static ContainerWrapper addContainer(String label, String barcode,
         ContainerWrapper parent, SiteWrapper site, ContainerTypeWrapper type)
         throws Exception {
@@ -51,6 +94,25 @@ public class ContainerHelper extends DbHelper {
         return container;
     }
 
+    /**
+     * Adds a container to the database.
+     * 
+     * @param label If the container is a top level container provide a label,
+     *            otherwise this parameter should be null.
+     * @param barcode The product barcode for this container.
+     * @param parent The containers parent container.
+     * @param site The site this container belongs to.
+     * @param type The container type for this container.
+     * @param row If the container is a child container then this is the row
+     *            where this container is located in the parent container.
+     * @param col If the container is a child container then this is the column
+     *            where this container is located in the parent container.
+     * @return The container wrapper for the container.
+     * @throws Exception Exception is thrown if a label is specified and the
+     *             container is meant to be a child container. Exception An
+     *             exception is thrown if the container could not be added to
+     *             the database.
+     */
     public static ContainerWrapper addContainer(String label, String barcode,
         ContainerWrapper parent, SiteWrapper site, ContainerTypeWrapper type,
         Integer row, Integer col) throws Exception {

@@ -23,10 +23,14 @@ public class Utils {
         return str;
     }
 
-    public static Date getRandomDate() throws ParseException {
-        String dateStr = String.format("%04d-%02d-%02d %02d:%02d", 2000 + r
-            .nextInt(40), r.nextInt(12) + 1, r.nextInt(30) + 1,
-            r.nextInt(24) + 1, r.nextInt(60) + 1);
-        return DateFormatter.dateFormatter.parse(dateStr);
+    public static Date getRandomDate() {
+        try {
+            String dateStr = String.format("%04d-%02d-%02d %02d:%02d", 2000 + r
+                .nextInt(40), r.nextInt(12) + 1, r.nextInt(30) + 1, r
+                .nextInt(24) + 1, r.nextInt(60) + 1);
+            return DateFormatter.dateFormatter.parse(dateStr);
+        } catch (ParseException e) {
+            throw new RuntimeException("could not generate a random date");
+        }
     }
 }

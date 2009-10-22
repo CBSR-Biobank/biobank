@@ -428,7 +428,6 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
             setPvInfoDataCollection(pvInfoDataMap.values());
         }
         super.persist();
-
     }
 
     @Override
