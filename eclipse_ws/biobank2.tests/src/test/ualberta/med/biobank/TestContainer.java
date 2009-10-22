@@ -620,17 +620,30 @@ public class TestContainer extends TestDatabase {
 
     @Test
     public void testGetAllParents() throws Exception {
-        ContainerWrapper top1, top2, childL1, childL2, childL3;
+        ContainerWrapper top, childL1, childL2, childL3;
+        List<ContainerWrapper> childL3Parents, childL2Parents, childL1Parents, topParents;
 
-        top1 = containerMap.get("Top");
-        addContainerHierarchy(top1);
+        top = containerMap.get("Top");
+        addContainerHierarchy(top);
 
         childL1 = containerMap.get("ChildL1");
         childL2 = containerMap.get("ChildL2");
         childL3 = containerMap.get("ChildL3");
-        
+
+        childL3Parents = childL3.getAllParents();
+        childL2Parents = childL2.getAllParents();
+        childL1Parents = childL1.getAllParents();
+        topParents = top.getAllParents();
+
+        Assert.assertTrue(childL3Parents.contains(top));
+        Assert.assertTrue(childL3Parents.contains(childL1));
+        Assert.assertTrue(childL3Parents.contains(childL2));
+
+        // fail cases
+        Assert.assertFalse(childL3Parents.contains(childL3));
+
         List<ContainerWrapper> childL3Parents = childL3.getAllParents();
-        Assert.assertTrue(childL3Parents
+        Assert.assertFalse(childL2Parents.contains(childL3));
     }
 
     @Test
