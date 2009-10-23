@@ -100,7 +100,7 @@ public class ContainerDisplayWidget extends AbstractGridContainerWidget {
         if (super.getContainerType() != null) {
             return parentLabel
                 + LabelingScheme.getPositionString(rowcol, super
-                    .getContainerType().getWrappedObject()) + sname;
+                    .getContainerType()) + sname;
         }
 
         String row = getValueForCell(firstRowSign, indexRow,

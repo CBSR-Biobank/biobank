@@ -9,8 +9,8 @@ import java.util.List;
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.LabelingScheme;
 import edu.ualberta.med.biobank.common.RowColPos;
+import edu.ualberta.med.biobank.common.wrappers.internal.AbstractPositionWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.SamplePositionWrapper;
-import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.Sample;
 import edu.ualberta.med.biobank.model.SamplePosition;
@@ -20,18 +20,15 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
-public class SampleWrapper extends ModelWrapper<Sample> {
+public class SampleWrapper extends
+    AbstractPositionHolder<Sample, SamplePosition> {
 
-    private SamplePositionWrapper samplePosition;
-    private RowColPos position;
+    // private SamplePositionWrapper samplePosition;
+    // private RowColPos rowColPosition;
 
     public SampleWrapper(WritableApplicationService appService,
         Sample wrappedObject) {
         super(appService, wrappedObject);
-        SamplePosition pos = wrappedObject.getSamplePosition();
-        if (pos != null) {
-            samplePosition = new SamplePositionWrapper(appService, pos);
-        }
     }
 
     public SampleWrapper(WritableApplicationService appService) {
@@ -112,8 +109,7 @@ public class SampleWrapper extends ModelWrapper<Sample> {
     public void setSamplePositionFromString(String positionString,
         ContainerWrapper parentContainer) throws Exception {
         RowColPos rcp = LabelingScheme.getRowColFromPositionString(
-            positionString, parentContainer.getContainerType()
-                .getWrappedObject());
+            positionString, parentContainer.getContainerType());
         if ((rcp.row > -1) && (rcp.col > -1)) {
             setPosition(rcp);
         } else {
@@ -121,56 +117,45 @@ public class SampleWrapper extends ModelWrapper<Sample> {
         }
     }
 
-    private void initSamplePosition() {
-        samplePosition = new SamplePositionWrapper(appService);
-        position = new RowColPos();
-        samplePosition.setSample(this);
-        wrappedObject.setSamplePosition(samplePosition.getWrappedObject());
-    }
+    // public RowColPos getPosition() {
+    // if (samplePosition == null) {
+    // return null;
+    // }
+    // return rowColPosition;
+    // }
+    //
+    // public void setPosition(RowColPos position) {
+    // RowColPos oldPosition = this.rowColPosition;
+    // if (samplePosition == null) {
+    // initSamplePosition();
+    // }
+    // samplePosition.setRow(position.row);
+    // samplePosition.setCol(position.col);
+    // this.rowColPosition = position;
+    // propertyChangeSupport.firePropertyChange("position", oldPosition,
+    // position);
+    // }
 
-    public RowColPos getPosition() {
-        if (samplePosition == null) {
-            return null;
-        }
-        return position;
-    }
-
-    public void setPosition(RowColPos position) {
-        RowColPos oldPosition = this.position;
-        if (samplePosition == null) {
-            initSamplePosition();
-        }
-        samplePosition.setRow(position.row);
-        samplePosition.setCol(position.col);
-        this.position = position;
-        propertyChangeSupport.firePropertyChange("position", oldPosition,
-            position);
-    }
-
-    public void setPosition(Integer row, Integer col) {
-        setPosition(new RowColPos(row, col));
-    }
+    // public void setPosition(Integer row, Integer col) {
+    // setPosition(new RowColPos(row, col));
+    // }
 
     public ContainerWrapper getParent() {
-        if (samplePosition == null) {
+        SamplePositionWrapper pos = (SamplePositionWrapper) getPositionWrapper();
+        if (pos == null) {
             return null;
         }
-        return samplePosition.getContainer();
+        return pos.getContainer();
     }
 
     public void setParent(ContainerWrapper parent) {
-        ContainerWrapper oldValue = null;
-        if (samplePosition == null) {
-            initSamplePosition();
-        } else {
-            oldValue = samplePosition.getContainer();
-        }
-        samplePosition.setContainer(parent);
+        ContainerWrapper oldValue = getParent();
+        setParent(parent);
         propertyChangeSupport.firePropertyChange("parent", oldValue, parent);
     }
 
     public boolean hasParent() {
-        return samplePosition != null;
+        return getParent() != null;
     }
 
     public void checkPosition(ContainerWrapper parentContainer)
@@ -257,27 +242,25 @@ public class SampleWrapper extends ModelWrapper<Sample> {
     }
 
     public String getPositionString(boolean fullString) {
-        SamplePosition position = wrappedObject.getSamplePosition();
+        RowColPos position = getPosition();
         if (position == null) {
             return "none";
         }
 
         if (!fullString) {
-            return LabelingScheme.getPositionString(position);
+            return LabelingScheme.getPositionString(position, getParent());
         }
-
-        Container container = position.getContainer();
-        Container topContainer = container;
-        while ((topContainer.getPosition() != null)
-            && (topContainer.getPosition().getParentContainer() != null)) {
-            topContainer = topContainer.getPosition().getParentContainer();
+        ContainerWrapper directParent = getParent();
+        ContainerWrapper topContainer = directParent;
+        while (topContainer.hasParent()) {
+            topContainer = topContainer.getParent();
         }
         String nameShort = topContainer.getContainerType().getNameShort();
         if (nameShort != null)
-            return nameShort + "-" + container.getLabel()
-                + LabelingScheme.getPositionString(position);
-        return container.getLabel()
-            + LabelingScheme.getPositionString(position);
+            return nameShort + "-" + directParent.getLabel()
+                + LabelingScheme.getPositionString(position, directParent);
+        return directParent.getLabel()
+            + LabelingScheme.getPositionString(position, directParent);
     }
 
     public static SampleWrapper createNewSample(
@@ -379,5 +362,24 @@ public class SampleWrapper extends ModelWrapper<Sample> {
             .asList(new Object[] { siteId }));
         List<Sample> samples = appService.query(criteria);
         return transformToWrapperList(appService, samples);
+    }
+
+    @Override
+    public SamplePosition getPositionObject() {
+        return wrappedObject.getSamplePosition();
+    }
+
+    @Override
+    public AbstractPositionWrapper<SamplePosition> initPositionWrapper(
+        SamplePosition position) {
+        return new SamplePositionWrapper(appService, position);
+    }
+
+    @Override
+    public AbstractPositionWrapper<SamplePosition> initPositionWrapper(
+        AbstractPositionHolder<Sample, SamplePosition> parent) {
+        SamplePositionWrapper pos = new SamplePositionWrapper(appService);
+        pos.setSample((SampleWrapper) parent);
+        return pos;
     }
 }

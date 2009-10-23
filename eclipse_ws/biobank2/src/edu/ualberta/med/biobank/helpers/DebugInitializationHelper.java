@@ -29,6 +29,7 @@ import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.LabelingScheme;
 import edu.ualberta.med.biobank.common.RowColPos;
+import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.Clinic;
@@ -363,7 +364,8 @@ public class DebugInitializationHelper {
         container.setContainerType(ct);
         if (parent != null) {
             RowColPos rc = LabelingScheme.getRowColFromPositionString(container
-                .getLabel(), parent.getContainerType());
+                .getLabel(), new ContainerTypeWrapper(appService, container
+                .getContainerType()));
             if (rc == null) {
                 throw new Exception(
                     "error while getting the position from string");
