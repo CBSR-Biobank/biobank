@@ -48,12 +48,6 @@ public class TestPvSampleSource extends TestDatabase {
         w.setSampleSource(ssw.getWrappedObject());
     }
 
-    @Test(expected = BiobankCheckException.class)
-    public void TestDeleteChecks() throws BiobankCheckException, Exception {
-        // not saved yet, should throw error
-        w.delete();
-    }
-
     @Test
     public void TestGetSetPatientVisit() throws BiobankCheckException,
         Exception {

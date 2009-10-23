@@ -41,6 +41,7 @@ public class SiteHelper extends DbHelper {
     public static void deleteSite(SiteWrapper site) throws Exception {
         site.reload();
         deleteContainers(site.getTopContainerCollection());
+        deleteContainers(site.getContainerCollection());
         deleteStudies(site.getStudyCollection());
         deleteFromList(site.getClinicCollection());
         deleteFromList(site.getContainerTypeCollection());

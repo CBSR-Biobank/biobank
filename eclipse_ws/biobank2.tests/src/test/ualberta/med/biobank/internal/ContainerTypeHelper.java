@@ -3,7 +3,6 @@ package test.ualberta.med.biobank.internal;
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
-import edu.ualberta.med.biobank.common.wrappers.internal.ContainerLabelingSchemeWrapper;
 
 public class ContainerTypeHelper extends DbHelper {
 
@@ -35,11 +34,8 @@ public class ContainerTypeHelper extends DbHelper {
 
     public static ContainerTypeWrapper addContainerTypeRandom(SiteWrapper site,
         String name) throws Exception {
-        ContainerLabelingSchemeWrapper scheme = ContainerHelper
-            .newContainerLabelingScheme();
-        scheme.persist();
-        return addContainerType(site, name, "", scheme.getId(),
-            r.nextInt(10) + 1, r.nextInt(10) + 1, r.nextBoolean());
+        return addContainerType(site, name, "", 1, r.nextInt(10) + 1, r
+            .nextInt(10) + 1, r.nextBoolean());
     }
 
     public static void addContainerTypesRandom(SiteWrapper site, String name,
