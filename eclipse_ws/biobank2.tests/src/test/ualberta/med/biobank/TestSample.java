@@ -3,7 +3,7 @@ package test.ualberta.med.biobank;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
- 
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -38,9 +38,10 @@ public class TestSample extends TestDatabase {
     @Before
     public void setUp() throws Exception {
         super.setUp();
-        SampleTypeWrapper sampleTypeWrapper = TestSampleType
-            .addSampleTypeWrapper();
+
         SiteWrapper site = SiteHelper.addSite("sitename", true);
+        SampleTypeWrapper sampleTypeWrapper = SampleTypeHelper.addSampleType(
+            site, "sampletype");
         ContainerWrapper container = ContainerHelper.addContainerRandom(site,
             "newcontainer");
         StudyWrapper study = StudyHelper.addStudy(site, "studyname");
@@ -118,7 +119,8 @@ public class TestSample extends TestDatabase {
     @Test
     public void TestGetSetSampleType() throws BiobankCheckException, Exception {
         SampleTypeWrapper stw = sample.getSampleType();
-        SampleTypeWrapper newStw = TestSampleType.addSampleTypeWrapper();
+        SampleTypeWrapper newStw = SampleTypeHelper.addSampleType(sample
+            .getSite(), "newStw");
         stw.persist();
         Assert.assertTrue(stw.getId() != newStw.getId());
         sample.setSampleType(newStw);
