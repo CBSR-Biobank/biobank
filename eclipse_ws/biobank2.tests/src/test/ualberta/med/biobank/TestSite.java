@@ -3,7 +3,6 @@ package test.ualberta.med.biobank;
 import java.util.List;
 
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
 import test.ualberta.med.biobank.internal.ClinicHelper;
@@ -25,12 +24,6 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class TestSite extends TestDatabase {
-
-    @Override
-    @Before
-    public void setUp() throws Exception {
-        super.setUp();
-    }
 
     @Test
     public void testGettersAndSetters() throws Exception {
@@ -392,7 +385,7 @@ public class TestSite extends TestDatabase {
     }
 
     @Test
-    public void testAddSite() throws Exception {
+    public void testPersist() throws Exception {
         int oldTotal = SiteWrapper.getAllSites(appService).size();
         SiteHelper.addSite("testPersist" + r.nextInt());
         int newTotal = SiteWrapper.getAllSites(appService).size();
@@ -400,8 +393,8 @@ public class TestSite extends TestDatabase {
     }
 
     @Test
-    public void testAddSiteFail() throws Exception {
-        String name = "testAddSiteFail" + r.nextInt();
+    public void testPersistFail() throws Exception {
+        String name = "testPersistFail" + r.nextInt();
         SiteWrapper site = new SiteWrapper(appService);
         site.setName(name);
 
@@ -429,10 +422,15 @@ public class TestSite extends TestDatabase {
     public void testDelete() throws Exception {
         SiteWrapper site = SiteHelper
             .addSite("testDelete" + r.nextInt(), false);
+
         // object is in database
-        Assert.assertNotNull(site);
-        site.delete();
         Site siteInDB = ModelUtils.getObjectWithId(appService, Site.class, site
+            .getId());
+        Assert.assertNotNull(siteInDB);
+
+        site.delete();
+
+        siteInDB = ModelUtils.getObjectWithId(appService, Site.class, site
             .getId());
         // object is not anymore in database
         Assert.assertNull(siteInDB);

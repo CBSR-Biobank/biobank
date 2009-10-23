@@ -43,7 +43,7 @@ public class SiteHelper extends DbHelper {
         deleteContainers(site.getTopContainerCollection());
         deleteContainers(site.getContainerCollection());
         deleteStudies(site.getStudyCollection());
-        deleteFromList(site.getClinicCollection());
+        deleteClinics(site.getClinicCollection());
         deleteFromList(site.getContainerTypeCollection());
         site.reload();
         site.delete();

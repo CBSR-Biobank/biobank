@@ -1,5 +1,6 @@
 package test.ualberta.med.biobank.internal;
 
+import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
@@ -67,6 +68,16 @@ public class DbHelper {
             deleteFromList(patient.getPatientVisitCollection());
             patient.reload();
             patient.delete();
+        }
+    }
+
+    public static void deleteClinics(List<ClinicWrapper> clinics)
+        throws Exception {
+        for (ClinicWrapper clinic : clinics) {
+            clinic.reload();
+            deleteFromList(clinic.getContactCollection());
+            clinic.reload();
+            clinic.delete();
         }
     }
 

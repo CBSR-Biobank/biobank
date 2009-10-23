@@ -191,7 +191,6 @@ public abstract class AbstractQueryClause {
             }
             opCombo.getCombo().select(0);
         } catch (Exception e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }

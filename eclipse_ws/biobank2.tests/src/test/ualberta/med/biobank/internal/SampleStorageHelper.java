@@ -12,6 +12,8 @@ public class SampleStorageHelper extends DbHelper {
             appService);
         sampleStorage.setStudy(study);
         sampleStorage.setSampleType(type);
+        sampleStorage.setQuantity(r.nextInt(10));
+        sampleStorage.setVolume(r.nextDouble());
         return sampleStorage;
     }
 

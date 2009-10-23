@@ -173,7 +173,6 @@ public class ReportsView extends ViewPart {
             }
             return query.executeQuery(params);
         } catch (Exception e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
             return null;
         }

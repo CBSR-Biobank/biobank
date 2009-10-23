@@ -507,8 +507,16 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
 
     private void checkLabelingScheme(ContainerType oldObject,
         boolean existsContainersWithType) throws BiobankCheckException {
-        if (!getChildLabelingScheme().equals(
-            oldObject.getChildLabelingScheme().getId())
+        ContainerTypeWrapper oldWrapper = new ContainerTypeWrapper(appService,
+            oldObject);
+        if (getChildLabelingScheme() == null
+            && oldWrapper.getChildLabelingScheme() == null) {
+            return;
+        }
+        if (getChildLabelingScheme() == null
+            || oldWrapper.getChildLabelingScheme() == null
+            || !getChildLabelingScheme().equals(
+                oldWrapper.getChildLabelingScheme())
             && existsContainersWithType) {
             throw new BiobankCheckException(
                 "Unable to change the \"Child Labeling scheme\" property. A container requiring this property exists in storage. Remove all instances before attempting to modify this container type.");
@@ -595,6 +603,11 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
         String c2Name = type.wrappedObject.getName();
         return ((c1Name.compareTo(c2Name) > 0) ? 1 : (c1Name.equals(c2Name) ? 0
             : -1));
+    }
+
+    @Override
+    public String toString() {
+        return getName() + " (" + getNameShort() + ")";
     }
 
 }

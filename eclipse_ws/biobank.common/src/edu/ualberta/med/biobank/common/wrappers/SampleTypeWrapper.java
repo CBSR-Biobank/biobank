@@ -52,18 +52,26 @@ public class SampleTypeWrapper extends ModelWrapper<SampleType> {
             nameShort);
     }
 
-    public Site getSite() {
-        return wrappedObject.getSite();
+    public SiteWrapper getSite() {
+        Site site = wrappedObject.getSite();
+        if (site == null) {
+            return null;
+        }
+        return new SiteWrapper(appService, site);
     }
 
     public void setSite(Site site) {
-        String oldNameShort = getNameShort();
+        Site oldSite = wrappedObject.getSite();
         wrappedObject.setSite(site);
-        propertyChangeSupport.firePropertyChange("site", oldNameShort, site);
+        propertyChangeSupport.firePropertyChange("site", oldSite, site);
     }
 
     public void setSite(SiteWrapper site) {
-        setSite(site.wrappedObject);
+        if (site == null) {
+            setSite((Site) null);
+        } else {
+            setSite(site.getWrappedObject());
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -158,23 +166,6 @@ public class SampleTypeWrapper extends ModelWrapper<SampleType> {
         return list;
     }
 
-    public static List<SampleTypeWrapper> getAllWrappers(
-        WritableApplicationService appService, boolean sort)
-        throws ApplicationException {
-        List<SampleType> sampleTypes = appService.search(SampleType.class,
-            new SampleType());
-        List<SampleTypeWrapper> list = transformToWrapperList(appService,
-            sampleTypes);
-        if (sort)
-            Collections.sort(list);
-        return list;
-    }
-
-    public static List<SampleTypeWrapper> getAllWrappers(
-        WritableApplicationService appService) throws ApplicationException {
-        return getAllWrappers(appService, false);
-    }
-
     public static List<SampleTypeWrapper> getGlobalSampleTypes(
         WritableApplicationService appService, boolean sort)
         throws ApplicationException {
@@ -200,7 +191,7 @@ public class SampleTypeWrapper extends ModelWrapper<SampleType> {
      * @throws BiobankCheckException
      * @throws Exception
      */
-    public static void setGlobalSampleTypes(
+    public static void persistGlobalSampleTypes(
         WritableApplicationService appService,
         List<SampleTypeWrapper> newGlobalSampleTypes)
         throws BiobankCheckException, Exception {

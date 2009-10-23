@@ -517,7 +517,6 @@ public class ContainerWrapper extends ModelWrapper<Container> {
             if (positions != null) {
                 children = new ArrayList<ContainerWrapper>();
                 for (ContainerPosition position : positions) {
-                    System.err.println(position.getId());
                     children.add(new ContainerWrapper(appService, position
                         .getContainer()));
                 }
@@ -847,6 +846,11 @@ public class ContainerWrapper extends ModelWrapper<Container> {
         String c2Name = wrapper.wrappedObject.getLabel();
         return ((c1Name.compareTo(c2Name) > 0) ? 1 : (c1Name.equals(c2Name) ? 0
             : -1));
+    }
+
+    @Override
+    public String toString() {
+        return getLabel() + " (" + getProductBarcode() + ")";
     }
 
 }

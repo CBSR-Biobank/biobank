@@ -262,8 +262,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         Collection<SampleTypeWrapper> stSamplesTypes = containerType
             .getSampleTypeCollection();
 
-        allSampleTypes = SampleTypeWrapper.getAllWrappers(appService);
-        // Collections.sort(allSampleTypes, new SampleTypeComparator());
+        allSampleTypes = site.getAllSampleTypeCollection();
 
         samplesMultiSelect = new MultiSelectWidget(parent, SWT.NONE,
             "Selected Sample Types", "Available Sample Types", 100);

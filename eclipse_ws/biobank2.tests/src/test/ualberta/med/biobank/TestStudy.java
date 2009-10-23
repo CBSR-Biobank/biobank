@@ -1,13 +1,17 @@
 package test.ualberta.med.biobank;
 
-import static org.junit.Assert.fail;
-
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
 
+import test.ualberta.med.biobank.internal.ClinicHelper;
+import test.ualberta.med.biobank.internal.ContactHelper;
 import test.ualberta.med.biobank.internal.DbHelper;
+import test.ualberta.med.biobank.internal.PatientHelper;
+import test.ualberta.med.biobank.internal.PatientVisitHelper;
 import test.ualberta.med.biobank.internal.SampleSourceHelper;
 import test.ualberta.med.biobank.internal.SampleStorageHelper;
 import test.ualberta.med.biobank.internal.SampleTypeHelper;
@@ -16,6 +20,7 @@ import test.ualberta.med.biobank.internal.StudyHelper;
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
+import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleSourceWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
@@ -59,7 +64,7 @@ public class TestStudy extends TestDatabase {
         String name = "testGetContactCollection" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         StudyWrapper study = StudyHelper.addStudy(site, name);
-        int nber = StudyHelper.addContactsToStudy(study, name);
+        int nber = ContactHelper.addContactsToStudy(study, name);
 
         List<ContactWrapper> contacts = study.getContactCollection();
         int sizeFound = contacts.size();
@@ -72,7 +77,7 @@ public class TestStudy extends TestDatabase {
         String name = "testGetContactCollectionBoolean" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         StudyWrapper study = StudyHelper.addStudy(site, name);
-        StudyHelper.addContactsToStudy(study, name);
+        ContactHelper.addContactsToStudy(study, name);
 
         List<ContactWrapper> contacts = study.getContactCollection(true);
         if (contacts.size() > 1) {
@@ -89,7 +94,7 @@ public class TestStudy extends TestDatabase {
         String name = "testAddInContactCollection" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         StudyWrapper study = StudyHelper.addStudy(site, name);
-        int nber = StudyHelper.addContactsToStudy(study, name);
+        int nber = ContactHelper.addContactsToStudy(study, name);
         site.reload();
 
         // get a clinic not yet added
@@ -117,7 +122,7 @@ public class TestStudy extends TestDatabase {
             + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         StudyWrapper study = StudyHelper.addStudy(site, name);
-        StudyHelper.addContactsToStudy(study, name);
+        ContactHelper.addContactsToStudy(study, name);
         site.reload();
 
         // get a clinic already added
@@ -213,7 +218,7 @@ public class TestStudy extends TestDatabase {
         String name = "testGetSampleSourceCollection" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         StudyWrapper study = StudyHelper.addStudy(site, name);
-        int nber = StudyHelper.addSampleSourcesToStudy(study, name);
+        int nber = SampleSourceHelper.addSampleSources(study, name);
 
         List<SampleSourceWrapper> storages = study.getSampleSourceCollection();
         int sizeFound = storages.size();
@@ -226,7 +231,7 @@ public class TestStudy extends TestDatabase {
         String name = "testGetSampleSourceCollectionBoolean" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         StudyWrapper study = StudyHelper.addStudy(site, name);
-        StudyHelper.addSampleSourcesToStudy(study, name);
+        SampleSourceHelper.addSampleSources(study, name);
 
         List<SampleSourceWrapper> sources = study
             .getSampleSourceCollection(true);
@@ -244,7 +249,7 @@ public class TestStudy extends TestDatabase {
         String name = "testAddInSampleSourceCollection" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         StudyWrapper study = StudyHelper.addStudy(site, name);
-        int nber = StudyHelper.addSampleSourcesToStudy(study, name);
+        int nber = SampleSourceHelper.addSampleSources(study, name);
 
         List<SampleSourceWrapper> sources = study.getSampleSourceCollection();
         SampleSourceWrapper source = SampleSourceHelper.addSampleSource(name);
@@ -258,28 +263,53 @@ public class TestStudy extends TestDatabase {
     }
 
     @Test
-    public void testGetPvInfoLabels() {
-        fail("Not yet implemented");
+    public void testGetPvInfoLabels() throws Exception {
+        String name = "testGetPvInfoLabels" + r.nextInt();
+        SiteWrapper site = SiteHelper.addSite(name);
+        StudyWrapper study = StudyHelper.addStudy(site, name);
+
+        study.setPvInfoAllowedValues("Worksheet", null);
+        study.setPvInfoAllowedValues("Consent", null);
+        study.persist();
+
+        study.reload();
+        Assert.assertEquals(2, study.getPvInfoLabels().length);
     }
 
     @Test
-    public void testGetPvInfo() {
-        fail("Not yet implemented");
+    public void testGetPvInfoType() throws Exception {
+        String name = "testGetPvInfoType" + r.nextInt();
+        SiteWrapper site = SiteHelper.addSite(name);
+        StudyWrapper study = StudyHelper.addStudy(site, name);
+
+        study.setPvInfoAllowedValues("Worksheet", null);
+        study.setPvInfoAllowedValues("Consent", null);
+        study.persist();
+
+        study.reload();
+        Integer typeId = site.getPvInfoType("Consent");
+        Assert.assertEquals(typeId, study.getPvInfoType("Consent"));
     }
 
     @Test
-    public void testGetPvInfoType() {
-        fail("Not yet implemented");
-    }
+    public void testGetPvInfoAllowedValues() throws Exception {
+        String name = "testGetPvInfoType" + r.nextInt();
+        SiteWrapper site = SiteHelper.addSite(name);
+        StudyWrapper study = StudyHelper.addStudy(site, name);
 
-    @Test
-    public void testGetPvInfoAllowedValues() {
-        fail("Not yet implemented");
-    }
+        String pvInfoLabel = "Visit Type";
+        study.setPvInfoAllowedValues("Worksheet", null);
+        String[] values = new String[] { "toto", "titi", "tata" };
+        study.setPvInfoAllowedValues(pvInfoLabel, values);
+        study.persist();
 
-    @Test
-    public void testSetPvInfoAllowedValues() {
-        fail("Not yet implemented");
+        study.reload();
+        String[] valuesFound = study.getPvInfoAllowedValues(pvInfoLabel);
+        List<String> valuesList = Arrays.asList(values);
+        Assert.assertTrue(valuesFound.length == values.length);
+        for (String s : valuesFound) {
+            Assert.assertTrue(valuesList.contains(s));
+        }
     }
 
     @Test
@@ -287,7 +317,7 @@ public class TestStudy extends TestDatabase {
         String name = "testGetClinicCollection" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         StudyWrapper study = StudyHelper.addStudy(site, name);
-        int nber = StudyHelper.addContactsToStudy(study, name);
+        int nber = ContactHelper.addContactsToStudy(study, name);
 
         List<ClinicWrapper> clinics = study.getClinicCollection();
         int sizeFound = clinics.size();
@@ -296,59 +326,211 @@ public class TestStudy extends TestDatabase {
     }
 
     @Test
-    public void testGetPatientCollection() {
-        fail("Not yet implemented");
+    public void testGetPatientCollection() throws Exception {
+        String name = "testGetPatientCollection" + r.nextInt();
+        SiteWrapper site = SiteHelper.addSite(name);
+        StudyWrapper study = StudyHelper.addStudy(site, name);
+        int nber = PatientHelper.addPatients(name, study);
+
+        List<PatientWrapper> patients = study.getPatientCollection();
+        int sizeFound = patients.size();
+
+        Assert.assertEquals(nber, sizeFound);
     }
 
     @Test
-    public void testGetPatientCollectionBoolean() {
-        fail("Not yet implemented");
+    public void testGetPatientCollectionBoolean() throws Exception {
+        String name = "testGetPatientCollectionBoolean" + r.nextInt();
+        SiteWrapper site = SiteHelper.addSite(name);
+        StudyWrapper study = StudyHelper.addStudy(site, name);
+        PatientHelper.addPatients(name, study);
+
+        List<PatientWrapper> patients = study.getPatientCollection(true);
+        if (patients.size() > 1) {
+            for (int i = 0; i < patients.size() - 1; i++) {
+                PatientWrapper patient1 = patients.get(i);
+                PatientWrapper patient2 = patients.get(i + 1);
+                Assert.assertTrue(patient1.compareTo(patient2) <= 0);
+            }
+        }
     }
 
     @Test
-    public void testAddInPatientCollection() {
-        fail("Not yet implemented");
+    public void testAddInPatientCollection() throws Exception {
+        String name = "testAddInPatientCollection" + r.nextInt();
+        SiteWrapper site = SiteHelper.addSite(name);
+        StudyWrapper study = StudyHelper.addStudy(site, name);
+        int nber = PatientHelper.addPatients(name, study);
+
+        List<PatientWrapper> patients = study.getPatientCollection();
+        PatientWrapper newPatient = PatientHelper.newPatient(name
+            + "newPatient");
+        patients.add(newPatient);
+        study.setPatientCollection(patients);
+        study.persist();
+
+        study.reload();
+        // one patient added
+        Assert.assertEquals(nber + 1, study.getPatientCollection().size());
     }
 
     @Test
     public void testGetPatientCountForClinic() throws Exception {
         String name = "testGetPatientCountForClinic" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
-        StudyWrapper study = StudyHelper.addStudy(site, name);
-        int nber = StudyHelper.addContactsToStudy(study, name);
 
-        fail("not finished");
+        ClinicWrapper clinic1 = ClinicHelper.addClinic(site, name + "CLINIC1");
+        ContactWrapper contact1 = ContactHelper.addContact(clinic1, name
+            + "CONTACT1");
+
+        ClinicWrapper clinic2 = ClinicHelper.addClinic(site, name + "CLINIC2");
+        ContactWrapper contact2 = ContactHelper.addContact(clinic2, name
+            + "CONTACT2");
+
+        List<ContactWrapper> contacts = new ArrayList<ContactWrapper>();
+        contacts.add(contact1);
+        contacts.add(contact2);
+
+        StudyWrapper study1 = StudyHelper.addStudy(site, name + "STUDY1");
+        study1.setContactCollection(contacts);
+        study1.persist();
+        PatientWrapper patient1 = PatientHelper.addPatient(name + "PATIENT1",
+            study1);
+        // clinic 1 = 1 patient pour study 1
+        PatientVisitHelper.addPatientVisits(patient1, clinic1);
+        PatientVisitHelper.addPatientVisits(patient1, clinic2);
+        PatientWrapper patient2 = PatientHelper.addPatient(name + "PATIENT2",
+            study1);
+        // clinic 2 = 2 patients pour study 1
+        PatientVisitHelper.addPatientVisits(patient2, clinic2);
+
+        StudyWrapper study2 = StudyHelper.addStudy(site, name + "STUDY2");
+        study2.setContactCollection(contacts);
+        study2.persist();
+        PatientWrapper patient3 = PatientHelper.addPatient(name + "PATIENT3",
+            study2);
+        // clinic 1 = 1 patient pour study2
+        PatientVisitHelper.addPatientVisits(patient3, clinic1);
+        // clinic 2= 1 patient pour study2
+        PatientVisitHelper.addPatientVisits(patient3, clinic2);
+
+        study1.reload();
+        Assert.assertEquals(1, study1.getPatientCountForClinic(clinic1));
+        Assert.assertEquals(2, study1.getPatientCountForClinic(clinic2));
     }
 
     @Test
     public void testGetPatientVisitCountForClinic() throws Exception {
         String name = "testGetPatientVisitCountForClinic" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
-        StudyWrapper study = StudyHelper.addStudy(site, name);
-        int nber = StudyHelper.addContactsToStudy(study, name);
 
-        fail("not finished");
+        ClinicWrapper clinic1 = ClinicHelper.addClinic(site, name + "CLINIC1");
+        ContactWrapper contact1 = ContactHelper.addContact(clinic1, name
+            + "CONTACT1");
+
+        ClinicWrapper clinic2 = ClinicHelper.addClinic(site, name + "CLINIC2");
+        ContactWrapper contact2 = ContactHelper.addContact(clinic2, name
+            + "CONTACT2");
+
+        List<ContactWrapper> contacts = new ArrayList<ContactWrapper>();
+        contacts.add(contact1);
+        contacts.add(contact2);
+
+        StudyWrapper study1 = StudyHelper.addStudy(site, name + "STUDY1");
+        study1.setContactCollection(contacts);
+        study1.persist();
+        PatientWrapper patient1 = PatientHelper.addPatient(name, study1);
+        int nber = PatientVisitHelper.addPatientVisits(patient1, clinic1);
+        int nber2 = PatientVisitHelper.addPatientVisits(patient1, clinic2);
+
+        StudyWrapper study2 = StudyHelper.addStudy(site, name + "STUDY2");
+        study2.setContactCollection(contacts);
+        study2.persist();
+        PatientWrapper patient2 = PatientHelper.addPatient(name, study2);
+        PatientVisitHelper.addPatientVisits(patient2, clinic1);
+        PatientVisitHelper.addPatientVisits(patient2, clinic2);
+
+        study1.reload();
+        Assert
+            .assertEquals(nber, study1.getPatientVisitCountForClinic(clinic1));
+        Assert.assertEquals(nber2, study1
+            .getPatientVisitCountForClinic(clinic2));
     }
 
     @Test
     public void testGetPatientVisitCount() throws Exception {
         String name = "testGetPatientVisitCount" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
-        StudyWrapper study = StudyHelper.addStudy(site, name);
-        int nber = StudyHelper.addContactsToStudy(study, name);
 
-        fail("not finished");
+        ClinicWrapper clinic1 = ClinicHelper.addClinic(site, name + "CLINIC1");
+        ContactWrapper contact1 = ContactHelper.addContact(clinic1, name
+            + "CONTACT1");
+
+        ClinicWrapper clinic2 = ClinicHelper.addClinic(site, name + "CLINIC2");
+        ContactWrapper contact2 = ContactHelper.addContact(clinic2, name
+            + "CONTACT2");
+
+        List<ContactWrapper> contacts = new ArrayList<ContactWrapper>();
+        contacts.add(contact1);
+        contacts.add(contact2);
+
+        StudyWrapper study1 = StudyHelper.addStudy(site, name + "STUDY1");
+        study1.setContactCollection(contacts);
+        study1.persist();
+        PatientWrapper patient1 = PatientHelper.addPatient(name, study1);
+        int nber = PatientVisitHelper.addPatientVisits(patient1, clinic1);
+        int nber2 = PatientVisitHelper.addPatientVisits(patient1, clinic2);
+
+        StudyWrapper study2 = StudyHelper.addStudy(site, name + "STUDY2");
+        study2.setContactCollection(contacts);
+        study2.persist();
+        PatientWrapper patient2 = PatientHelper.addPatient(name, study2);
+        PatientVisitHelper.addPatientVisits(patient2, clinic1);
+        PatientVisitHelper.addPatientVisits(patient2, clinic2);
+
+        study1.reload();
+        Assert.assertEquals(nber + nber2, study1.getPatientVisitCount());
+    }
+
+    @Test
+    public void testPersist() throws Exception {
+        int oldTotal = appService.search(Study.class, new Study()).size();
+        String name = "testPersist" + r.nextInt();
+        SiteWrapper site = SiteHelper.addSite(name);
+        StudyHelper.addStudy(site, name);
+        int newTotal = appService.search(Study.class, new Study()).size();
+        Assert.assertEquals(oldTotal + 1, newTotal);
+    }
+
+    @Test
+    public void testPersistFail() throws Exception {
+        String name = "testPersistFail" + r.nextInt();
+        SiteWrapper site = SiteHelper.addSite(name);
+        StudyHelper.addStudy(site, name);
+
+        try {
+            StudyHelper.addStudy(site, name);
+            Assert
+                .fail("Should not insert the study : same name already in database");
+        } catch (BiobankCheckException bce) {
+            Assert.assertTrue(true);
+        }
     }
 
     @Test
     public void testDelete() throws Exception {
         StudyWrapper study = StudyHelper.addStudy(SiteHelper
             .addSite("testDelete"), "testDelete");
+
         // object is in database
-        Assert.assertNotNull(study);
-        study.delete();
         Study studyInDB = ModelUtils.getObjectWithId(appService, Study.class,
             study.getId());
+        Assert.assertNotNull(studyInDB);
+
+        study.delete();
+
+        studyInDB = ModelUtils.getObjectWithId(appService, Study.class, study
+            .getId());
         // object is not anymore in database
         Assert.assertNull(studyInDB);
     }
