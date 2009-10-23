@@ -13,6 +13,7 @@ import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import test.ualberta.med.biobank.internal.ContactHelper;
 import test.ualberta.med.biobank.internal.ContainerHelper;
 import test.ualberta.med.biobank.internal.ContainerTypeHelper;
 import test.ualberta.med.biobank.internal.PatientHelper;
@@ -23,6 +24,7 @@ import test.ualberta.med.biobank.internal.StudyHelper;
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.LabelingScheme;
 import edu.ualberta.med.biobank.common.RowColPos;
+import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
@@ -118,7 +120,8 @@ public class TestContainer extends TestDatabase {
         containerMap.put("ChildL1", childL1);
         top.reload();
         children = top.getChildren();
-        Assert.assertTrue((children.size() == 1) && children.contains(childL1));
+        Assert.assertTrue("one child should be found", (children.size() == 1)
+            && children.contains(childL1));
 
         childL2 = ContainerHelper.addContainer(null, "0002", childL1, site,
             containerTypeMap.get("ChildCtL2"), 0, 0);
@@ -457,10 +460,13 @@ public class TestContainer extends TestDatabase {
         childTypeL3.persist();
 
         StudyWrapper study = StudyHelper.addStudy(site, "Study1");
+        ContactHelper.addContactsToStudy(study, "contactsStudy1");
+        ClinicWrapper clinic = study.getContactCollection().get(0)
+            .getClinicWrapper();
 
         PatientWrapper patient = PatientHelper.addPatient("1000", study);
         PatientVisitWrapper pv = PatientVisitHelper.addPatientVisit(patient,
-            null, Utils.getRandomDate(), Utils.getRandomDate(), Utils
+            clinic, Utils.getRandomDate(), Utils.getRandomDate(), Utils
                 .getRandomDate());
         addContainerHierarchy();
         ContainerWrapper childL3 = containerMap.get("ChildL3");

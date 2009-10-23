@@ -28,9 +28,6 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 public class ContainerWrapper extends
     AbstractPositionHolder<Container, ContainerPosition> {
 
-    // private RowColPos rowColPosition;
-    // private ContainerPositionWrapper containerPositionWrapper;
-
     public ContainerWrapper(WritableApplicationService appService,
         Container wrappedObject) {
         super(appService, wrappedObject);
@@ -55,24 +52,7 @@ public class ContainerWrapper extends
         checkLabelUniqueForType();
         checkProductBarcodeUnique();
         super.persistChecks();
-        // boolean positionSet = rowColPosition != null;
-        // ContainerPositionWrapper posWrapper =
-        // getPositionWrapper(positionSet);
-        // if (posWrapper != null) {
-        // if (positionSet) {
-        // posWrapper.setRow(rowColPosition.row);
-        // posWrapper.setCol(rowColPosition.col);
-        // }
-        // posWrapper.persistChecks();
-        // }
     }
-
-    // @Override
-    // public void reset() throws Exception {
-    // super.reset();
-    // rowColPosition = null;
-    // containerPositionWrapper = null;
-    // }
 
     private void checkProductBarcodeUnique() throws BiobankCheckException,
         ApplicationException {
@@ -302,71 +282,12 @@ public class ContainerWrapper extends
         return new ContainerTypeWrapper(appService, type);
     }
 
-    // public RowColPos getPosition() {
-    // if (rowColPosition == null) {
-    // ContainerPositionWrapper pos = getPositionWrapper();
-    // if (pos != null) {
-    // rowColPosition = new RowColPos(pos.getRow(), pos.getCol());
-    // }
-    // }
-    // return rowColPosition;
-    // }
-    //
-    // public void setPosition(RowColPos position) {
-    // RowColPos oldPosition = getPosition();
-    // this.rowColPosition = position;
-    // propertyChangeSupport.firePropertyChange("position", oldPosition,
-    // position);
-    // }
-
-    // private ContainerPositionWrapper getPositionWrapper() {
-    // return getPositionWrapper(false);
-    // }
-    //
-    // private ContainerPositionWrapper getPositionWrapper(boolean
-    // initIfNoPosition) {
-    // if (containerPositionWrapper == null) {
-    // ContainerPosition pos = wrappedObject.getPosition();
-    // if (pos != null) {
-    // containerPositionWrapper = new ContainerPositionWrapper(
-    // appService, pos);
-    // } else if (initIfNoPosition) {
-    // containerPositionWrapper = new ContainerPositionWrapper(
-    // appService);
-    // containerPositionWrapper.setContainer(this);
-    // }
-    // }
-    // return containerPositionWrapper;
-    // }
-
-    // public void setPosition(Integer row, Integer col) {
-    // setPosition(new RowColPos(row, col));
-    // }
-
     // FIX: still required new that label is assigned by wrapper for child
     // containers?
     public void setPosition(String positionAsString) throws Exception {
         ContainerPositionWrapper pos = (ContainerPositionWrapper) getPositionWrapper(true);
         pos.setPosition(positionAsString);
         setPosition(pos.getRow(), pos.getCol());
-    }
-
-    public ContainerWrapper getParent() {
-        ContainerPositionWrapper pos = (ContainerPositionWrapper) getPositionWrapper();
-        if (pos == null) {
-            return null;
-        }
-        return pos.getParentContainer();
-    }
-
-    public void setParent(ContainerWrapper parent) {
-        ContainerWrapper oldValue = getParent();
-        setParent(parent);
-        propertyChangeSupport.firePropertyChange("parent", oldValue, parent);
-    }
-
-    public boolean hasParent() {
-        return getParent() != null;
     }
 
     public void setActivityStatus(String activityStatus) {
@@ -660,20 +581,6 @@ public class ContainerWrapper extends
     }
 
     /**
-     * get a list of all containers that are above this container in the
-     * hierarchy
-     */
-    public List<ContainerWrapper> getAllParents() {
-        List<ContainerWrapper> list = new ArrayList<ContainerWrapper>();
-        ContainerWrapper parent = getParent();
-        if (parent != null) {
-            list.add(parent);
-            list.addAll(parent.getAllParents());
-        }
-        return list;
-    }
-
-    /**
      * Get containers with a given label that can hold this type of container
      * (in this container site)
      */
@@ -857,23 +764,41 @@ public class ContainerWrapper extends
         return getLabel() + " (" + getProductBarcode() + ")";
     }
 
-    @Override
-    public ContainerPosition getPositionObject() {
-        return wrappedObject.getPosition();
-    }
+    //
+    // @Override
+    // protected ContainerPosition getPositionObject() {
+    // return wrappedObject.getPosition();
+    // }
+    //
+    // @Override
+    // protected AbstractPositionWrapper<ContainerPosition> initPositionWrapper(
+    // ContainerPosition position) {
+    // return new ContainerPositionWrapper(appService, position);
+    // }
+    //
+    // @Override
+    // protected AbstractPositionWrapper<ContainerPosition> initPositionWrapper(
+    // AbstractPositionHolder<Container, ContainerPosition> parent) {
+    // ContainerPositionWrapper pos = new ContainerPositionWrapper(appService);
+    // pos.setContainer((ContainerWrapper) parent);
+    // wrappedObject.setPosition(pos.getWrappedObject());
+    // return pos;
+    // }
 
     @Override
-    public AbstractPositionWrapper<ContainerPosition> initPositionWrapper(
-        ContainerPosition position) {
-        return new ContainerPositionWrapper(appService, position);
-    }
-
-    @Override
-    public AbstractPositionWrapper<ContainerPosition> initPositionWrapper(
-        AbstractPositionHolder<Container, ContainerPosition> parent) {
-        ContainerPositionWrapper pos = new ContainerPositionWrapper(appService);
-        pos.setContainer((ContainerWrapper) parent);
-        return pos;
+    protected AbstractPositionWrapper<ContainerPosition> getSpecificPositionWrapper(
+        boolean initIfNoPosition) {
+        ContainerPosition pos = wrappedObject.getPosition();
+        if (pos != null) {
+            return new ContainerPositionWrapper(appService, pos);
+        } else if (initIfNoPosition) {
+            ContainerPositionWrapper posWrapper = new ContainerPositionWrapper(
+                appService);
+            posWrapper.setContainer(this);
+            wrappedObject.setPosition(posWrapper.getWrappedObject());
+            return posWrapper;
+        }
+        return null;
     }
 
 }

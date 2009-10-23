@@ -62,18 +62,18 @@ public class SamplePositionWrapper extends
         return new SampleWrapper(appService, sample);
     }
 
-    public void setContainer(Container container) {
+    private void setContainer(Container container) {
         Container oldContainer = wrappedObject.getContainer();
         wrappedObject.setContainer(container);
         propertyChangeSupport.firePropertyChange("container", oldContainer,
             container);
     }
 
-    public void setContainer(ContainerWrapper container) {
+    private void setContainer(ContainerWrapper container) {
         setContainer(container.getWrappedObject());
     }
 
-    public ContainerWrapper getContainer() {
+    private ContainerWrapper getContainer() {
         Container container = wrappedObject.getContainer();
         if (container == null) {
             return null;
@@ -84,6 +84,16 @@ public class SamplePositionWrapper extends
     @Override
     public int compareTo(ModelWrapper<SamplePosition> o) {
         return 0;
+    }
+
+    @Override
+    public ContainerWrapper getParent() {
+        return getContainer();
+    }
+
+    @Override
+    public void setParent(ContainerWrapper parent) {
+        setContainer(parent);
     }
 
 }

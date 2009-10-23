@@ -62,6 +62,25 @@ public abstract class AbstractPositionHolder<E, T extends AbstractPosition>
         setPosition(new RowColPos(row, col));
     }
 
+    public ContainerWrapper getParent() {
+        AbstractPositionWrapper<T> pos = getPositionWrapper();
+        if (pos == null) {
+            return null;
+        }
+        return pos.getParent();
+    }
+
+    public void setParent(ContainerWrapper parent) {
+        ContainerWrapper oldValue = getParent();
+        AbstractPositionWrapper<T> pos = getPositionWrapper(true);
+        pos.setParent(parent);
+        propertyChangeSupport.firePropertyChange("parent", oldValue, parent);
+    }
+
+    public boolean hasParent() {
+        return getParent() != null;
+    }
+
     protected AbstractPositionWrapper<T> getPositionWrapper() {
         return getPositionWrapper(false);
     }
@@ -69,20 +88,19 @@ public abstract class AbstractPositionHolder<E, T extends AbstractPosition>
     protected AbstractPositionWrapper<T> getPositionWrapper(
         boolean initIfNoPosition) {
         if (positionWrapper == null) {
-            T pos = getPositionObject();
-            if (pos != null) {
-                positionWrapper = initPositionWrapper(pos);
-            } else if (initIfNoPosition) {
-                positionWrapper = initPositionWrapper(this);
-            }
+            positionWrapper = getSpecificPositionWrapper(initIfNoPosition);
         }
         return positionWrapper;
     }
 
-    public abstract T getPositionObject();
+    protected abstract AbstractPositionWrapper<T> getSpecificPositionWrapper(
+        boolean initIfNoPosition);
 
-    public abstract AbstractPositionWrapper<T> initPositionWrapper(T position);
-
-    public abstract AbstractPositionWrapper<T> initPositionWrapper(
-        AbstractPositionHolder<E, T> parent);
+    // protected abstract T getPositionObject();
+    //
+    // protected abstract AbstractPositionWrapper<T> initPositionWrapper(T
+    // position);
+    //
+    // protected abstract AbstractPositionWrapper<T> initPositionWrapper(
+    // AbstractPositionHolder<E, T> parent);
 }

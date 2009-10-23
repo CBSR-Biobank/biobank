@@ -23,9 +23,6 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 public class SampleWrapper extends
     AbstractPositionHolder<Sample, SamplePosition> {
 
-    // private SamplePositionWrapper samplePosition;
-    // private RowColPos rowColPosition;
-
     public SampleWrapper(WritableApplicationService appService,
         Sample wrappedObject) {
         super(appService, wrappedObject);
@@ -55,6 +52,7 @@ public class SampleWrapper extends
 
     @Override
     protected void persistChecks() throws BiobankCheckException, Exception {
+        super.persistChecks();
     }
 
     public String getInventoryId() {
@@ -115,47 +113,6 @@ public class SampleWrapper extends
         } else {
             throw new Exception("Position " + positionString + " not valid");
         }
-    }
-
-    // public RowColPos getPosition() {
-    // if (samplePosition == null) {
-    // return null;
-    // }
-    // return rowColPosition;
-    // }
-    //
-    // public void setPosition(RowColPos position) {
-    // RowColPos oldPosition = this.rowColPosition;
-    // if (samplePosition == null) {
-    // initSamplePosition();
-    // }
-    // samplePosition.setRow(position.row);
-    // samplePosition.setCol(position.col);
-    // this.rowColPosition = position;
-    // propertyChangeSupport.firePropertyChange("position", oldPosition,
-    // position);
-    // }
-
-    // public void setPosition(Integer row, Integer col) {
-    // setPosition(new RowColPos(row, col));
-    // }
-
-    public ContainerWrapper getParent() {
-        SamplePositionWrapper pos = (SamplePositionWrapper) getPositionWrapper();
-        if (pos == null) {
-            return null;
-        }
-        return pos.getContainer();
-    }
-
-    public void setParent(ContainerWrapper parent) {
-        ContainerWrapper oldValue = getParent();
-        setParent(parent);
-        propertyChangeSupport.firePropertyChange("parent", oldValue, parent);
-    }
-
-    public boolean hasParent() {
-        return getParent() != null;
     }
 
     public void checkPosition(ContainerWrapper parentContainer)
@@ -364,22 +321,38 @@ public class SampleWrapper extends
         return transformToWrapperList(appService, samples);
     }
 
-    @Override
-    public SamplePosition getPositionObject() {
-        return wrappedObject.getSamplePosition();
-    }
+    // @Override
+    // protected SamplePosition getPositionObject() {
+    // return wrappedObject.getSamplePosition();
+    // }
+    //
+    // @Override
+    // protected AbstractPositionWrapper<SamplePosition> initPositionWrapper(
+    // SamplePosition position) {
+    // return new SamplePositionWrapper(appService, position);
+    // }
+    //
+    // @Override
+    // protected AbstractPositionWrapper<SamplePosition> initPositionWrapper(
+    // AbstractPositionHolder<Sample, SamplePosition> parent) {
+    // SamplePositionWrapper pos = new SamplePositionWrapper(appService);
+    // pos.setSample((SampleWrapper) parent);
+    // return pos;
+    // }
 
     @Override
-    public AbstractPositionWrapper<SamplePosition> initPositionWrapper(
-        SamplePosition position) {
-        return new SamplePositionWrapper(appService, position);
-    }
-
-    @Override
-    public AbstractPositionWrapper<SamplePosition> initPositionWrapper(
-        AbstractPositionHolder<Sample, SamplePosition> parent) {
-        SamplePositionWrapper pos = new SamplePositionWrapper(appService);
-        pos.setSample((SampleWrapper) parent);
-        return pos;
+    protected AbstractPositionWrapper<SamplePosition> getSpecificPositionWrapper(
+        boolean initIfNoPosition) {
+        SamplePosition pos = wrappedObject.getSamplePosition();
+        if (pos != null) {
+            return new SamplePositionWrapper(appService, pos);
+        } else if (initIfNoPosition) {
+            SamplePositionWrapper posWrapper = new SamplePositionWrapper(
+                appService);
+            posWrapper.setSample(this);
+            wrappedObject.setSamplePosition(posWrapper.getWrappedObject());
+            return posWrapper;
+        }
+        return null;
     }
 }

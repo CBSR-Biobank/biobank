@@ -45,11 +45,11 @@ public class ContainerPositionWrapper extends
             parentContainer);
     }
 
-    public void setParentContainer(ContainerWrapper parentContainer) {
+    private void setParentContainer(ContainerWrapper parentContainer) {
         setParentContainer(parentContainer.getWrappedObject());
     }
 
-    public ContainerWrapper getParentContainer() {
+    private ContainerWrapper getParentContainer() {
         Container parent = wrappedObject.getParentContainer();
         if (parent == null) {
             return null;
@@ -110,4 +110,13 @@ public class ContainerPositionWrapper extends
             + getContainer().toString();
     }
 
+    @Override
+    public ContainerWrapper getParent() {
+        return getParentContainer();
+    }
+
+    @Override
+    public void setParent(ContainerWrapper parent) {
+        setParentContainer(parent);
+    }
 }
