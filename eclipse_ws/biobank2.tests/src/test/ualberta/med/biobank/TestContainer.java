@@ -4,13 +4,13 @@ import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import junit.framework.Assert;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -82,14 +82,6 @@ public class TestContainer extends TestDatabase {
         return newBarcode;
     }
 
-    @Override
-    @After
-    public void tearDown() throws Exception {
-        // temporary: this method should not be overridden
-        // 
-        // keep here till we can delete all containers from a site
-    }
-
     private void addContainerTypes() throws BiobankCheckException, Exception {
         ContainerTypeWrapper topType, childType;
 
@@ -141,30 +133,30 @@ public class TestContainer extends TestDatabase {
     private void addContainerHierarchy(ContainerWrapper parent, String mapPrefix)
         throws Exception {
         ContainerWrapper childL1, childL2, childL3, childL4;
-        List<ContainerWrapper> children;
+        Collection<ContainerWrapper> children;
 
         childL1 = ContainerHelper.addContainer(null, getNewBarcode(), parent,
             site, containerTypeMap.get("ChildCtL1"), 0, 0);
         parent.reload();
-        children = parent.getChildren();
+        children = parent.getChildren().values();
         Assert.assertTrue((children.size() == 1) && children.contains(childL1));
 
         childL2 = ContainerHelper.addContainer(null, getNewBarcode(), childL1,
             site, containerTypeMap.get("ChildCtL2"), 0, 0);
         childL1.reload();
-        children = childL1.getChildren();
+        children = childL1.getChildren().values();
         Assert.assertTrue((children.size() == 1) && children.contains(childL2));
 
         childL3 = ContainerHelper.addContainer(null, getNewBarcode(), childL2,
             site, containerTypeMap.get("ChildCtL3"), 0, 0);
         childL2.reload();
-        children = childL2.getChildren();
+        children = childL2.getChildren().values();
         Assert.assertTrue((children.size() == 1) && children.contains(childL3));
 
         childL4 = ContainerHelper.addContainer(null, getNewBarcode(), childL3,
             site, containerTypeMap.get("ChildCtL4"), 0, 0);
         childL3.reload();
-        children = childL3.getChildren();
+        children = childL3.getChildren().values();
         Assert.assertTrue((children.size() == 1) && children.contains(childL4));
 
         containerMap.put(mapPrefix + "ChildL1", childL1);
@@ -515,6 +507,7 @@ public class TestContainer extends TestDatabase {
 
                 RowColPos result = container
                     .getPositionFromLabelingScheme(label);
+                Assert.assertNotNull(result);
                 Assert.assertEquals(row, result.row.intValue());
                 Assert.assertEquals(col, result.col.intValue());
             }
@@ -559,10 +552,10 @@ public class TestContainer extends TestDatabase {
     public void testHasParent() throws Exception {
         ContainerWrapper top = containerMap.get("Top");
         addContainerHierarchy(top);
-        Assert.assertEquals(false, containerMap.get("Top").hasParent());
-        Assert.assertEquals(true, containerMap.get("ChildL1").hasParent());
-        Assert.assertEquals(true, containerMap.get("ChildL2").hasParent());
-        Assert.assertEquals(true, containerMap.get("ChildL3").hasParent());
+        Assert.assertFalse(containerMap.get("Top").hasParent());
+        Assert.assertTrue(containerMap.get("ChildL1").hasParent());
+        Assert.assertTrue(containerMap.get("ChildL2").hasParent());
+        Assert.assertTrue(containerMap.get("ChildL3").hasParent());
     }
 
     @Test
@@ -621,10 +614,13 @@ public class TestContainer extends TestDatabase {
         childTypeL3.persist();
 
         StudyWrapper study = StudyHelper.addStudy(site, "Study1");
+        ContactHelper.addContactsToStudy(study, "contactsStudy1");
+        ClinicWrapper clinic = study.getContactCollection().get(0)
+            .getClinicWrapper();
 
         PatientWrapper patient = PatientHelper.addPatient("1000", study);
         PatientVisitWrapper pv = PatientVisitHelper.addPatientVisit(patient,
-            null, Utils.getRandomDate(), Utils.getRandomDate(), Utils
+            clinic, Utils.getRandomDate(), Utils.getRandomDate(), Utils
                 .getRandomDate());
 
         ContainerWrapper top = containerMap.get("Top");
@@ -635,7 +631,7 @@ public class TestContainer extends TestDatabase {
                 / CONTAINER_CHILD_L3_COLS, i % CONTAINER_CHILD_L3_COLS);
         }
 
-        List<SampleWrapper> samples = childL3.getSamples();
+        Collection<SampleWrapper> samples = childL3.getSamples().values();
         Assert.assertEquals(sampleTypeList.size(), samples.size());
         for (SampleWrapper sample : samples) {
             Assert.assertTrue(sampleTypeList.contains(sample.getSampleType()));
@@ -644,47 +640,56 @@ public class TestContainer extends TestDatabase {
 
     @Test
     public void testGetChildren() throws Exception {
-        ContainerWrapper top, childL1, childL2, childL3, childL3_2;
+        ContainerWrapper top, childL1, childL2, childL3, childL4, childL3_2;
 
         top = containerMap.get("Top");
         addContainerHierarchy(top);
         childL1 = containerMap.get("ChildL1");
         childL2 = containerMap.get("ChildL2");
         childL3 = containerMap.get("ChildL3");
+        childL4 = containerMap.get("ChildL4");
+        childL4.delete();
+        childL3.reload();
 
-        List<ContainerWrapper> childL2children = childL2.getChildren();
+        Collection<ContainerWrapper> childL2children = childL2.getChildren()
+            .values();
         Assert.assertTrue(childL2children.size() == 1);
         Assert.assertTrue(childL2children.contains(childL3));
 
-        List<ContainerWrapper> childL1children = childL1.getChildren();
+        Collection<ContainerWrapper> childL1children = childL1.getChildren()
+            .values();
         Assert.assertTrue(childL1children.size() == 1);
         Assert.assertTrue(childL1children.contains(childL2));
 
-        List<ContainerWrapper> topChildren = top.getChildren();
+        Collection<ContainerWrapper> topChildren = top.getChildren().values();
         Assert.assertTrue(topChildren.size() == 1);
         Assert.assertTrue(topChildren.contains(childL1));
 
         // remove childL3 from childL2
         childL3.delete();
+        childL2.reload();
         Assert.assertTrue(childL2.getChildren().size() == 0);
 
         // add again
         childL3 = ContainerHelper.addContainer(null, "0003", childL2, site,
             containerTypeMap.get("ChildCtL3"), 0, 0);
-        childL2children = childL2.getChildren();
+        childL2.reload();
+        childL2children = childL2.getChildren().values();
         Assert.assertTrue(childL2children.size() == 1);
         Assert.assertTrue(childL2children.contains(childL3));
 
         childL3_2 = ContainerHelper.addContainer(null, "0004", childL2, site,
-            containerTypeMap.get("ChildCtL3"), 0, 0);
-        childL2children = childL2.getChildren();
+            containerTypeMap.get("ChildCtL3"), 0, 1);
+        childL2.reload();
+        childL2children = childL2.getChildren().values();
         Assert.assertTrue(childL2children.size() == 2);
         Assert.assertTrue(childL2children.contains(childL3));
         Assert.assertTrue(childL2children.contains(childL3_2));
 
         // remove first child
         childL3.delete();
-        childL2children = childL2.getChildren();
+        childL2.reload();
+        childL2children = childL2.getChildren().values();
         Assert.assertTrue(childL2children.size() == 1);
         Assert.assertTrue(childL2children.contains(childL3_2));
 
@@ -749,17 +754,16 @@ public class TestContainer extends TestDatabase {
         Assert.assertTrue(top.getChildren().size() == 1);
         top.initChildrenWithType(childType2);
         top.reload();
-        List<ContainerWrapper> children = top.getChildren();
+        Collection<ContainerWrapper> children = top.getChildren().values();
         Assert.assertTrue(children.size() == CONTAINER_TOP_ROWS
             * CONTAINER_TOP_COLS);
+        ContainerWrapper child = children.iterator().next();
         for (ContainerWrapper container : children) {
             if (container.getPosition().equals(0, 0)) {
-                Assert
-                    .assertTrue(children.get(0).getContainerType() == containerTypeMap
-                        .get("ChildCtL1"));
+                Assert.assertTrue(child.getContainerType() == containerTypeMap
+                    .get("ChildCtL1"));
             } else {
-                Assert
-                    .assertTrue(children.get(0).getContainerType() == childType2);
+                Assert.assertTrue(child.getContainerType() == childType2);
             }
         }
     }
@@ -772,6 +776,12 @@ public class TestContainer extends TestDatabase {
     @Test
     public void testCompareTo() {
         fail("Not yet implemented");
+    }
+
+    public void testAddContainerInPositionAlReadyTaken() {
+        // should not be able to do that
+        // to be tested
+        fail("todo");
     }
 
 }

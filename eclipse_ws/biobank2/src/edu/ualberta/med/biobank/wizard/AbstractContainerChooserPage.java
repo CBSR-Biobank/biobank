@@ -123,7 +123,8 @@ public abstract class AbstractContainerChooserPage extends WizardPage {
         ContainerCell[][] cells = initGridSize();
         if (currentContainer != null) {
             // get cells informations
-            for (ContainerWrapper child : currentContainer.getChildren()) {
+            for (ContainerWrapper child : currentContainer.getChildren()
+                .values()) {
                 RowColPos position = child.getPosition();
                 ContainerCell cell = new ContainerCell(position.row,
                     position.col, child);

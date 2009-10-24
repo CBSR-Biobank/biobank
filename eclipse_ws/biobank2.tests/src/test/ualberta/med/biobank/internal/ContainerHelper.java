@@ -123,7 +123,7 @@ public class ContainerHelper extends DbHelper {
     }
 
     public static ContainerWrapper addContainerRandom(SiteWrapper site,
-        String name) throws Exception {
+        String name, ContainerWrapper parent) throws Exception {
         ContainerTypeWrapper type = ContainerTypeHelper.addContainerTypeRandom(
             site, name);
         String label = null;
@@ -132,6 +132,7 @@ public class ContainerHelper extends DbHelper {
         }
         ContainerWrapper container = addContainer(label, name, null, site, type);
         if (label == null) {
+            container.setParent(parent);
             container.setPosition(0, 0);
         }
         container.persist();
@@ -140,8 +141,12 @@ public class ContainerHelper extends DbHelper {
 
     public static void addContainersRandom(SiteWrapper site, String barcode,
         int count) throws Exception {
+        ContainerTypeWrapper type = ContainerTypeHelper.addContainerType(site,
+            "top" + barcode, "", 1, r.nextInt(10) + 1, r.nextInt(10) + 1, true);
+        ContainerWrapper parent = addContainer("top" + barcode,
+            "top" + barcode, null, site, type);
         for (int i = 0; i < count; i++) {
-            addContainerRandom(site, barcode + (i + 1));
+            addContainerRandom(site, barcode + (i + 1), parent);
         }
         site.reload();
     }

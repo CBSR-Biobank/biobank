@@ -70,9 +70,13 @@ public abstract class AbstractPositionWrapper<E extends AbstractPosition>
                     + " (excluded) and Col should be between 0 and "
                     + colCapacity + "(excluded)");
             }
+            checkObjectAtPosition();
         } else if (getRow() != null || getCol() != null) {
             throw new BiobankCheckException(
                 "Position should not be set when no parent set");
         }
     }
+
+    protected abstract void checkObjectAtPosition()
+        throws BiobankCheckException;
 }

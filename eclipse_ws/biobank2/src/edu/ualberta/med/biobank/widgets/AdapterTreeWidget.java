@@ -13,6 +13,7 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
@@ -22,12 +23,14 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbenchPartSite;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.dialogs.FilteredTree;
 
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.NodeContentProvider;
 import edu.ualberta.med.biobank.treeview.NodeLabelProvider;
 import edu.ualberta.med.biobank.views.IAdapterTreeView;
+import edu.ualberta.med.biobank.views.TreeFilter;
 
 public class AdapterTreeWidget extends Composite {
 
@@ -38,14 +41,15 @@ public class AdapterTreeWidget extends Composite {
 
         setLayout(new FillLayout());
 
-        // FilteredTree filteredTree = new FilteredTree(parent, SWT.BORDER
-        // | SWT.MULTI | SWT.V_SCROLL, new TreeFilter(), true);
-        // filteredTree.setBackground(parent.getDisplay().getSystemColor(
-        // SWT.COLOR_LIST_BACKGROUND));
-        // filteredTree
-        // .setCursor(new Cursor(parent.getDisplay(), SWT.CURSOR_HAND));
+        FilteredTree filteredTree = new FilteredTree(this, SWT.BORDER
+            | SWT.MULTI | SWT.V_SCROLL, new TreeFilter(), true);
+        filteredTree.setBackground(parent.getDisplay().getSystemColor(
+            SWT.COLOR_LIST_BACKGROUND));
+        filteredTree
+            .setCursor(new Cursor(parent.getDisplay(), SWT.CURSOR_HAND));
 
-        treeViewer = new TreeViewer(this);
+        // treeViewer = new TreeViewer(this);
+        treeViewer = filteredTree.getViewer();
         treeViewer.setLabelProvider(new NodeLabelProvider());
         treeViewer.setContentProvider(new NodeContentProvider());
         treeViewer.addDoubleClickListener(new IDoubleClickListener() {

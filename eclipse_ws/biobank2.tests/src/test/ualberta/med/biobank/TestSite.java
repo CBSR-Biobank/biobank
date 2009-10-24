@@ -371,6 +371,7 @@ public class TestSite extends TestDatabase {
         types.remove(type);
         site.setSampleTypeCollection(types);
         type.delete();
+        SampleTypeHelper.removeFromCreated(type);
         site.persist();
 
         site.reload();

@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.treeview;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -113,7 +114,8 @@ public class ContainerAdapter extends AdapterBase {
     @Override
     public void loadChildren(boolean updateNode) {
         try {
-            List<ContainerWrapper> children = getContainer().getChildren();
+            Collection<ContainerWrapper> children = getContainer()
+                .getChildren().values();
             if (children != null) {
                 // read from database again
                 for (ContainerWrapper child : children) {

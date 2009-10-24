@@ -321,25 +321,6 @@ public class SampleWrapper extends
         return transformToWrapperList(appService, samples);
     }
 
-    // @Override
-    // protected SamplePosition getPositionObject() {
-    // return wrappedObject.getSamplePosition();
-    // }
-    //
-    // @Override
-    // protected AbstractPositionWrapper<SamplePosition> initPositionWrapper(
-    // SamplePosition position) {
-    // return new SamplePositionWrapper(appService, position);
-    // }
-    //
-    // @Override
-    // protected AbstractPositionWrapper<SamplePosition> initPositionWrapper(
-    // AbstractPositionHolder<Sample, SamplePosition> parent) {
-    // SamplePositionWrapper pos = new SamplePositionWrapper(appService);
-    // pos.setSample((SampleWrapper) parent);
-    // return pos;
-    // }
-
     @Override
     protected AbstractPositionWrapper<SamplePosition> getSpecificPositionWrapper(
         boolean initIfNoPosition) {

@@ -364,7 +364,7 @@ public class DebugInitializationHelper {
         container.setContainerType(ct);
         if (parent != null) {
             RowColPos rc = LabelingScheme.getRowColFromPositionString(container
-                .getLabel(), new ContainerTypeWrapper(appService, container
+                .getLabel(), new ContainerTypeWrapper(appService, parent
                 .getContainerType()));
             if (rc == null) {
                 throw new Exception(

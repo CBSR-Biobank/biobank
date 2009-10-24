@@ -119,4 +119,17 @@ public class ContainerPositionWrapper extends
     public void setParent(ContainerWrapper parent) {
         setParentContainer(parent);
     }
+
+    @Override
+    protected void checkObjectAtPosition() throws BiobankCheckException {
+        ContainerWrapper parent = getParent();
+        if (parent != null) {
+            ContainerWrapper child = parent.getChild(getRow(), getCol());
+            if (child != null && !child.equals(getContainer())) {
+                throw new BiobankCheckException("Position " + getRow() + ":"
+                    + getCol() + " in container " + getParent().toString()
+                    + " is not available.");
+            }
+        }
+    }
 }

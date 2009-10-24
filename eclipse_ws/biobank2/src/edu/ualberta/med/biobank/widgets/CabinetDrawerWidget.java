@@ -2,7 +2,6 @@ package edu.ualberta.med.biobank.widgets;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.List;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.PaintEvent;
@@ -14,7 +13,6 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 
-import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.model.ContainerCell;
 import edu.ualberta.med.biobank.model.ContainerStatus;
 
@@ -52,13 +50,6 @@ public class CabinetDrawerWidget extends Canvas {
 
     public CabinetDrawerWidget(Composite parent) {
         super(parent, SWT.DOUBLE_BUFFERED);
-        cells = new ContainerCell[boxNumber][1];
-        for (int i = 0; i < boxNumber; i++) {
-            ContainerStatus stat = ContainerStatus.NOT_INITIALIZED;
-            ContainerCell cell = new ContainerCell(i, 0);
-            cell.setStatus(stat);
-            cells[i][0] = cell;
-        }
         addPaintListener(new PaintListener() {
             @Override
             public void paintControl(PaintEvent e) {
@@ -110,7 +101,10 @@ public class CabinetDrawerWidget extends Canvas {
                 width, height);
             gc.setForeground(e.display.getSystemColor(SWT.COLOR_BLACK));
 
-            ContainerStatus status = cells[boxIndex - 1][0].getStatus();
+            ContainerStatus status = null;
+            if (cells != null) {
+                status = cells[boxIndex - 1][0].getStatus();
+            }
             if (status == null)
                 status = ContainerStatus.NOT_INITIALIZED;
 
@@ -156,12 +150,9 @@ public class CabinetDrawerWidget extends Canvas {
         redraw();
     }
 
-    public void setContainersStatus(List<ContainerWrapper> children) {
-        for (ContainerWrapper child : children) {
-            int pos = child.getPosition().row;
-            cells[pos][0] = new ContainerCell(pos, 0, child);
-            cells[pos][0].setStatus(ContainerStatus.INITIALIZED);
-        }
+    public void setContainersStatus(ContainerCell[][] cells) {
+        this.cells = cells;
+        computeSize(-1, -1);
         LEGEND_WIDTH = WIDTH / legendStatus.size();
         redraw();
     }

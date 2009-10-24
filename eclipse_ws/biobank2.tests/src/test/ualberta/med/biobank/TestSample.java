@@ -101,7 +101,7 @@ public class TestSample extends TestDatabase {
             new Container());
         sw.setParent(parent);
         Assert.assertTrue(sw.getParent() != null);
-        Collection<SampleWrapper> sampleWrappers = parent.getSamples();
+        Collection<SampleWrapper> sampleWrappers = parent.getSamples().values();
         boolean found = false;
         for (SampleWrapper sampleWrapper : sampleWrappers) {
             if (sampleWrapper.getId() == sw.getId())

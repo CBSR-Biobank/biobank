@@ -96,4 +96,18 @@ public class SamplePositionWrapper extends
         setContainer(parent);
     }
 
+    @Override
+    protected void checkObjectAtPosition() throws BiobankCheckException {
+        ContainerWrapper parent = getParent();
+        if (parent != null) {
+            SampleWrapper sample = parent.getSample(getRow(), getCol());
+            if (sample != null && !sample.equals(getSample())) {
+                throw new BiobankCheckException("Position " + getRow() + ":"
+                    + getCol() + " in container " + getParent().toString()
+                    + " is not available.");
+            }
+        }
+
+    }
+
 }
