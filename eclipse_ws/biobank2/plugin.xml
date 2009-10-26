@@ -276,9 +276,6 @@
             <reference
                   definitionId="biobank2.loggedIn">
             </reference>
-            <reference
-                  definitionId="biobank2.siteSelected">
-            </reference>
            </and>
          </activeWhen>
       </handler>
@@ -580,6 +577,15 @@
       <menuContribution
             locationURI="toolbar:org.eclipse.ui.main.toolbar">
          <toolbar
+               id="edu.ualberta.med.biobank.toolbar.siteSelection">
+            <control
+                  class="edu.ualberta.med.biobank.rcp.SiteCombo">
+            </control>
+         </toolbar>
+      </menuContribution>
+      <menuContribution
+            locationURI="toolbar:org.eclipse.ui.main.toolbar">
+         <toolbar
                id="edu.ualberta.med.biobank.toolbar.serverCommands">
             <command
                   commandId="edu.ualberta.med.biobank.commands.login"
@@ -779,12 +785,6 @@
                      value="edu.ualberta.med.biobank.forms.CabinetLinkAssignEntryForm">
                </parameter>
             </command>
-         </toolbar>
-         <toolbar
-               id="edu.ualberta.med.biobank.toolbar.siteSelection">
-            <control
-                  class="edu.ualberta.med.biobank.rcp.SiteCombo">
-            </control>
          </toolbar>
       </menuContribution>
    </extension>

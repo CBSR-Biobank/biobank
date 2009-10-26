@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.rcp;
 
+import org.eclipse.ui.IPerspectiveDescriptor;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -34,6 +35,11 @@ public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
         IWorkbench workbench = PlatformUI.getWorkbench();
         IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();
         IWorkbenchPage page = window.getActivePage();
+        if (page.getPerspective().getId().equals(ReportsPerspective.ID)) {
+            IPerspectiveDescriptor main = workbench.getPerspectiveRegistry()
+                .findPerspectiveWithId(MainPerspective.ID);
+            page.setPerspective(main);
+        }
         if (BioBankPlugin.isAskPrint()
             && page.getPerspective().getId().equals(
                 SampleManagementPerspective.ID)) {
