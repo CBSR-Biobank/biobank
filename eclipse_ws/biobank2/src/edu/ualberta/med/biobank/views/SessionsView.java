@@ -27,7 +27,7 @@ public class SessionsView extends ViewPart implements IAdapterTreeView {
 
     @Override
     public void createPartControl(Composite parent) {
-        adaptersTree = new AdapterTreeWidget(parent, this);
+        adaptersTree = new AdapterTreeWidget(parent, this, true);
 
         getSite().setSelectionProvider(getTreeViewer());
         getTreeViewer().setInput(SessionManager.getInstance().getRootNode());

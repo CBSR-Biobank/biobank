@@ -692,31 +692,6 @@ public class TestContainer extends TestDatabase {
         childL2children = childL2.getChildren().values();
         Assert.assertTrue(childL2children.size() == 1);
         Assert.assertTrue(childL2children.contains(childL3_2));
-
-    }
-
-    @Test
-    public void testAssignNewParent() throws Exception {
-        // test both ContainerWrapper.assignNewParent() and
-        // ContainerWrapper.assignChildLabels().
-        ContainerWrapper top1, top2, childL1, childL2, childL3;
-
-        top1 = containerMap.get("Top");
-        addContainerHierarchy(top1);
-
-        childL1 = containerMap.get("ChildL1");
-        childL2 = containerMap.get("ChildL2");
-        childL3 = containerMap.get("ChildL3");
-
-        // create a new top container
-        top2 = ContainerHelper.addContainer("02", getNewBarcode(), null, site,
-            containerTypeMap.get("TopCT"));
-
-        childL1.assignNewParent(top2, "");
-
-        Assert.assertTrue(childL1.getLabel().equals("02AA"));
-        Assert.assertTrue(childL2.getLabel().equals("02AA01"));
-        Assert.assertTrue(childL3.getLabel().equals("02AA01A1"));
     }
 
     @Test

@@ -103,7 +103,8 @@ public class StudyWrapper extends ModelWrapper<Study> {
     }
 
     @Override
-    protected void deleteChecks() throws BiobankCheckException, Exception {
+    protected void deleteChecks() throws BiobankCheckException,
+        ApplicationException {
         if (hasPatients()) {
             throw new BiobankCheckException("Unable to delete study "
                 + getName() + ". All defined patients must be removed first.");
@@ -123,11 +124,13 @@ public class StudyWrapper extends ModelWrapper<Study> {
     }
 
     @Override
-    protected void persistChecks() throws BiobankCheckException, Exception {
+    protected void persistChecks() throws BiobankCheckException,
+        ApplicationException {
         checkStudyNameUnique();
     }
 
-    private void checkStudyNameUnique() throws BiobankCheckException, Exception {
+    private void checkStudyNameUnique() throws BiobankCheckException,
+        ApplicationException {
         HQLCriteria c;
 
         if (getWrappedObject().getId() == null) {
@@ -266,10 +269,11 @@ public class StudyWrapper extends ModelWrapper<Study> {
      * collection.
      * 
      * @param ssCollection
+     * @throws BiobankCheckException
      * @throws Exception
      */
     private void deleteSampleStorageDifference(Study origStudy)
-        throws Exception {
+        throws BiobankCheckException, ApplicationException, WrapperException {
         List<SampleStorageWrapper> newSampleStorage = getSampleStorageCollection();
         List<SampleStorageWrapper> oldSampleStorage = new StudyWrapper(
             appService, origStudy).getSampleStorageCollection();
@@ -334,9 +338,11 @@ public class StudyWrapper extends ModelWrapper<Study> {
      * collection.
      * 
      * @param newCollection
+     * @throws BiobankCheckException
      * @throws Exception
      */
-    private void deleteSampleSourceDifference(Study origStudy) throws Exception {
+    private void deleteSampleSourceDifference(Study origStudy)
+        throws BiobankCheckException, ApplicationException, WrapperException {
         List<SampleSourceWrapper> newSampleSource = getSampleSourceCollection();
         List<SampleSourceWrapper> oldSampleSource = new StudyWrapper(
             appService, origStudy).getSampleSourceCollection();
@@ -590,7 +596,8 @@ public class StudyWrapper extends ModelWrapper<Study> {
     }
 
     @Override
-    public void persist() throws BiobankCheckException, Exception {
+    public void persist() throws BiobankCheckException, ApplicationException,
+        WrapperException {
         if (pvInfoMap != null) {
             setPvInfoCollection(new ArrayList<PvInfoWrapper>(pvInfoMap.values()));
         }
@@ -600,9 +607,11 @@ public class StudyWrapper extends ModelWrapper<Study> {
 
     @Override
     protected void persistDependencies(Study origObject)
-        throws BiobankCheckException, Exception {
-        deleteSampleStorageDifference(origObject);
-        deleteSampleSourceDifference(origObject);
+        throws BiobankCheckException, ApplicationException, WrapperException {
+        if (origObject != null) {
+            deleteSampleStorageDifference(origObject);
+            deleteSampleSourceDifference(origObject);
+        }
     }
 
     @Override

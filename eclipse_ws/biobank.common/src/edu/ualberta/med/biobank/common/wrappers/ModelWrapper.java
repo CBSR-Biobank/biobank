@@ -113,21 +113,28 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     /**
      * using this wrapper id, retrieve the object from the database
      */
-    protected E getObjectFromDatabase() throws Exception {
-        Class<E> classType = getWrappedClass();
-        Constructor<E> constructor = classType.getConstructor();
-        Object instance = constructor.newInstance();
-        Method setIdMethod = classType.getMethod("setId", Integer.class);
-        Integer id = getId();
-        setIdMethod.invoke(instance, id);
+    protected E getObjectFromDatabase() throws WrapperException {
+        Class<E> classType = null;
+        Integer id = null;
+        List<E> list = null;
+        try {
+            classType = getWrappedClass();
+            Constructor<E> constructor = classType.getConstructor();
+            Object instance = constructor.newInstance();
+            Method setIdMethod = classType.getMethod("setId", Integer.class);
+            id = getId();
+            setIdMethod.invoke(instance, id);
 
-        List<E> list = appService.search(classType, instance);
+            list = appService.search(classType, instance);
+        } catch (Exception ex) {
+            throw new WrapperException(ex);
+        }
         if (list.size() == 0)
             return null;
         if (list.size() == 1) {
             return list.get(0);
         }
-        throw new Exception("Found " + list.size() + " objects of type "
+        throw new WrapperException("Found " + list.size() + " objects of type "
             + classType.getName() + " with id=" + id);
     }
 
@@ -137,16 +144,19 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
      * insert or update the object into the database
      */
     @SuppressWarnings("unchecked")
-    public void persist() throws BiobankCheckException, Exception {
+    public void persist() throws BiobankCheckException, ApplicationException,
+        WrapperException {
         persistChecks();
         SDKQuery query;
+        E origObject = null;
         if (isNew()) {
             query = new InsertExampleQuery(wrappedObject);
         } else {
             query = new UpdateExampleQuery(wrappedObject);
-            persistDependencies(getObjectFromDatabase());
-        }
+            origObject = getObjectFromDatabase();
 
+        }
+        persistDependencies(origObject);
         SDKQueryResult result = appService.executeQuery(query);
         wrappedObject = ((E) result.getObjectResult());
         propertiesMap.clear();
@@ -154,22 +164,24 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
 
     /**
      * should redefine this method if others updates (or deletes) need to be
-     * done when this object is update
+     * done when this object is update origObject can be null in the case of an
+     * insert
      */
     @SuppressWarnings("unused")
     protected void persistDependencies(E origObject)
-        throws BiobankCheckException, Exception {
+        throws BiobankCheckException, ApplicationException, WrapperException {
     }
 
     protected abstract void persistChecks() throws BiobankCheckException,
-        Exception;
+        ApplicationException, WrapperException;
 
     /**
      * delete the object into the database
      * 
      * @throws ApplicationException
      */
-    public void delete() throws BiobankCheckException, Exception {
+    public void delete() throws BiobankCheckException, ApplicationException,
+        WrapperException {
         if (!isNew()) {
             deleteChecks();
             appService.executeQuery(new DeleteExampleQuery(wrappedObject));
@@ -177,7 +189,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     }
 
     protected abstract void deleteChecks() throws BiobankCheckException,
-        Exception;
+        ApplicationException, WrapperException;
 
     public void reset() throws Exception {
         if (isNew()) {

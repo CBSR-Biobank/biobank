@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.treeview;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
@@ -11,12 +12,16 @@ import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 
 public class NodeSearchVisitor {
 
-    @SuppressWarnings("unchecked")
-    private Class typeSearched;
+    private Class<? extends ModelWrapper<?>> typeSearched;
     private int id;
 
     @SuppressWarnings("unchecked")
-    public NodeSearchVisitor(Class typeSearch, int id) {
+    public NodeSearchVisitor(ModelWrapper<?> wrapper) {
+        this((Class<? extends ModelWrapper<?>>) wrapper.getClass(), wrapper
+            .getId());
+    }
+
+    public NodeSearchVisitor(Class<? extends ModelWrapper<?>> typeSearch, int id) {
         this.typeSearched = typeSearch;
         this.id = id;
     }

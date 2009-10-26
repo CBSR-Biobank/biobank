@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.common.wrappers.internal;
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.model.Capacity;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class CapacityWrapper extends ModelWrapper<Capacity> {
@@ -44,7 +45,8 @@ public class CapacityWrapper extends ModelWrapper<Capacity> {
     }
 
     @Override
-    protected void deleteChecks() throws BiobankCheckException, Exception {
+    protected void deleteChecks() throws BiobankCheckException,
+        ApplicationException {
         // do nothing
     }
 
@@ -54,7 +56,8 @@ public class CapacityWrapper extends ModelWrapper<Capacity> {
     }
 
     @Override
-    public void persistChecks() throws BiobankCheckException, Exception {
+    public void persistChecks() throws BiobankCheckException,
+        ApplicationException {
         if (getRowCapacity() == null || getColCapacity() == null
             || getRowCapacity() < 0 || getColCapacity() < 0) {
             throw new BiobankCheckException("Capacity '" + getRowCapacity()

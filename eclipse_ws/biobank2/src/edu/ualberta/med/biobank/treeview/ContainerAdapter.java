@@ -202,7 +202,9 @@ public class ContainerAdapter extends AdapterBase {
                 } else
                     return;
             }
-            container.assignNewParent(newParent, newLabel);
+            newParent.addChild(newLabel.substring(newLabel.length() - 2),
+                container);
+            container.persist();
         }
         BioBankPlugin.openInformation("Container moved", "The container "
             + oldLabel + " has been moved to " + container.getLabel());

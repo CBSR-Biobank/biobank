@@ -4,6 +4,7 @@ import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.internal.AbstractPositionWrapper;
 import edu.ualberta.med.biobank.model.AbstractPosition;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public abstract class AbstractPositionHolder<E, T extends AbstractPosition>
@@ -22,7 +23,8 @@ public abstract class AbstractPositionHolder<E, T extends AbstractPosition>
     }
 
     @Override
-    protected void persistChecks() throws BiobankCheckException, Exception {
+    protected void persistChecks() throws BiobankCheckException,
+        ApplicationException {
         boolean positionSet = rowColPosition != null;
         AbstractPositionWrapper<T> posWrapper = getPositionWrapper(positionSet);
         if (posWrapper != null) {
@@ -96,11 +98,4 @@ public abstract class AbstractPositionHolder<E, T extends AbstractPosition>
     protected abstract AbstractPositionWrapper<T> getSpecificPositionWrapper(
         boolean initIfNoPosition);
 
-    // protected abstract T getPositionObject();
-    //
-    // protected abstract AbstractPositionWrapper<T> initPositionWrapper(T
-    // position);
-    //
-    // protected abstract AbstractPositionWrapper<T> initPositionWrapper(
-    // AbstractPositionHolder<E, T> parent);
 }

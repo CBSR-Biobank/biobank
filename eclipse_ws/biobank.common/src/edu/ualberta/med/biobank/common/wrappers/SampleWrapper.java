@@ -51,7 +51,8 @@ public class SampleWrapper extends
     }
 
     @Override
-    protected void persistChecks() throws BiobankCheckException, Exception {
+    protected void persistChecks() throws BiobankCheckException,
+        ApplicationException {
         super.persistChecks();
     }
 
@@ -258,7 +259,8 @@ public class SampleWrapper extends
     }
 
     @Override
-    protected void deleteChecks() throws BiobankCheckException, Exception {
+    protected void deleteChecks() throws BiobankCheckException,
+        ApplicationException {
     }
 
     public static List<SampleWrapper> getSamplesInSite(

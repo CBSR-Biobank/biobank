@@ -80,7 +80,8 @@ public class PatientWrapper extends ModelWrapper<Patient> {
     }
 
     @Override
-    protected void persistChecks() throws BiobankCheckException, Exception {
+    protected void persistChecks() throws BiobankCheckException,
+        ApplicationException {
         if (!checkPatientNumberUnique()) {
             throw new BiobankCheckException("A patient with number \""
                 + getNumber() + "\" already exists.");
@@ -150,7 +151,8 @@ public class PatientWrapper extends ModelWrapper<Patient> {
     }
 
     @Override
-    protected void deleteChecks() throws BiobankCheckException, Exception {
+    protected void deleteChecks() throws BiobankCheckException,
+        ApplicationException {
     }
 
     @Override

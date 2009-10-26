@@ -4,6 +4,7 @@ import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.model.AbstractPosition;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public abstract class AbstractPositionWrapper<E extends AbstractPosition>
@@ -48,7 +49,8 @@ public abstract class AbstractPositionWrapper<E extends AbstractPosition>
     public abstract void setParent(ContainerWrapper parent);
 
     @Override
-    public void persistChecks() throws BiobankCheckException, Exception {
+    public void persistChecks() throws BiobankCheckException,
+        ApplicationException {
         ContainerWrapper parent = getParent();
         if (parent != null) {
             if (getRow() == null) {

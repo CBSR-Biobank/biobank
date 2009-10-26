@@ -141,16 +141,12 @@ public class SessionManager {
         return null;
     }
 
-    public void openViewForm(Class<?> klass, int id) {
-        NodeSearchVisitor v = new NodeSearchVisitor(klass, id);
+    public void openViewForm(ModelWrapper<?> wrapper) {
+        NodeSearchVisitor v = new NodeSearchVisitor(wrapper);
         AdapterBase adapter = sessionAdapter.accept(v);
         Assert.isNotNull(adapter, "could not find adapter for class "
-            + klass.getName() + " id " + id);
+            + wrapper.getClass() + " id " + wrapper.getId());
         adapter.performDoubleClick();
-    }
-
-    public void openViewForm(ModelWrapper<?> wrapper) {
-        openViewForm(wrapper.getWrappedClass(), wrapper.getId());
     }
 
     public AdapterBase searchNode(ModelWrapper<?> wrapper) {

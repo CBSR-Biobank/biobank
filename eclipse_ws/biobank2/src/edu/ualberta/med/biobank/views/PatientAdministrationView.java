@@ -79,7 +79,7 @@ public class PatientAdministrationView extends ViewPart implements
         gd.grabExcessHorizontalSpace = true;
         patientNumberText.setLayoutData(gd);
 
-        adaptersTree = new AdapterTreeWidget(parent, this);
+        adaptersTree = new AdapterTreeWidget(parent, this, false);
         gd = new GridData();
         gd.horizontalAlignment = SWT.FILL;
         gd.verticalAlignment = SWT.FILL;

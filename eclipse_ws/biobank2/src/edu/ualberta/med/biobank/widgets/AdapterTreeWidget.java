@@ -36,20 +36,24 @@ public class AdapterTreeWidget extends Composite {
 
     private TreeViewer treeViewer;
 
-    public AdapterTreeWidget(Composite parent, final IAdapterTreeView parentView) {
+    public AdapterTreeWidget(Composite parent,
+        final IAdapterTreeView parentView, boolean patternFilter) {
         super(parent, SWT.NONE);
 
         setLayout(new FillLayout());
 
-        FilteredTree filteredTree = new FilteredTree(this, SWT.BORDER
-            | SWT.MULTI | SWT.V_SCROLL, new TreeFilter(), true);
-        filteredTree.setBackground(parent.getDisplay().getSystemColor(
-            SWT.COLOR_LIST_BACKGROUND));
-        filteredTree
-            .setCursor(new Cursor(parent.getDisplay(), SWT.CURSOR_HAND));
+        if (patternFilter) {
+            FilteredTree filteredTree = new FilteredTree(this, SWT.BORDER
+                | SWT.MULTI | SWT.V_SCROLL, new TreeFilter(), true);
+            filteredTree.setBackground(parent.getDisplay().getSystemColor(
+                SWT.COLOR_LIST_BACKGROUND));
+            filteredTree.setCursor(new Cursor(parent.getDisplay(),
+                SWT.CURSOR_HAND));
+            treeViewer = filteredTree.getViewer();
+        } else {
+            treeViewer = new TreeViewer(this);
+        }
 
-        // treeViewer = new TreeViewer(this);
-        treeViewer = filteredTree.getViewer();
         treeViewer.setLabelProvider(new NodeLabelProvider());
         treeViewer.setContentProvider(new NodeContentProvider());
         treeViewer.addDoubleClickListener(new IDoubleClickListener() {

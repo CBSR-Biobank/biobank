@@ -5,11 +5,11 @@ import java.util.Arrays;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.BiobankCheckException;
-import edu.ualberta.med.biobank.common.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerPosition;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class ContainerPositionWrapper extends
@@ -84,15 +84,16 @@ public class ContainerPositionWrapper extends
      * 
      * @throws Exception
      */
-    public void setPosition(String position) throws Exception {
-        ContainerWrapper parent = getParentContainer();
-        RowColPos rowColPos = parent.getPositionFromLabelingScheme(position);
-        setRow(rowColPos.row);
-        setCol(rowColPos.col);
-    }
+    // public void setPosition(String position) throws Exception {
+    // ContainerWrapper parent = getParentContainer();
+    // RowColPos rowColPos = parent.getPositionFromLabelingScheme(position);
+    // setRow(rowColPos.row);
+    // setCol(rowColPos.col);
+    // }
 
     @Override
-    protected void deleteChecks() throws BiobankCheckException, Exception {
+    protected void deleteChecks() throws BiobankCheckException,
+        ApplicationException {
     }
 
     @Override
@@ -126,9 +127,11 @@ public class ContainerPositionWrapper extends
         if (parent != null) {
             ContainerWrapper child = parent.getChild(getRow(), getCol());
             if (child != null && !child.equals(getContainer())) {
-                throw new BiobankCheckException("Position " + getRow() + ":"
-                    + getCol() + " in container " + getParent().toString()
-                    + " is not available.");
+                throw new BiobankCheckException("Position " + child.getLabel()
+                    + " (" + getRow() + ":" + getCol() + ") in container "
+                    + getParent().toString()
+                    + " is not available in container "
+                    + parent.getFullInfoLabel());
             }
         }
     }

@@ -183,7 +183,8 @@ public class SiteWrapper extends ModelWrapper<Site> {
     }
 
     @Override
-    protected void persistChecks() throws BiobankCheckException, Exception {
+    protected void persistChecks() throws BiobankCheckException,
+        ApplicationException {
         if (getAddress() == null) {
             throw new BiobankCheckException("the site does not have an address");
         }
@@ -216,7 +217,8 @@ public class SiteWrapper extends ModelWrapper<Site> {
     }
 
     @Override
-    protected void deleteChecks() throws BiobankCheckException, Exception {
+    protected void deleteChecks() throws BiobankCheckException,
+        ApplicationException {
         if ((getClinicCollection() != null && getClinicCollection().size() > 0)
             || (getContainerCollection() != null && getContainerCollection()
                 .size() > 0)
@@ -513,9 +515,11 @@ public class SiteWrapper extends ModelWrapper<Site> {
      * Removes the sample type objects that are not contained in the collection.
      * 
      * @param oldCollection
+     * @throws BiobankCheckException
      * @throws Exception
      */
-    private void deleteSampleTypeDifference(Site origSite) throws Exception {
+    private void deleteSampleTypeDifference(Site origSite)
+        throws BiobankCheckException, ApplicationException, WrapperException {
         List<SampleTypeWrapper> newSampleType = getSampleTypeCollection();
         List<SampleTypeWrapper> oldSampleSources = new SiteWrapper(appService,
             origSite).getSampleTypeCollection();
@@ -582,9 +586,11 @@ public class SiteWrapper extends ModelWrapper<Site> {
      * Removes the sample type objects that are not contained in the collection.
      * 
      * @param oldCollection
+     * @throws BiobankCheckException
      * @throws Exception
      */
-    private void deletePvInfoPossibleDifference(Site origSite) throws Exception {
+    private void deletePvInfoPossibleDifference(Site origSite)
+        throws BiobankCheckException, ApplicationException, WrapperException {
         List<PvInfoPossibleWrapper> newPvInfoPossible = getPvInfoPossibleCollection();
         List<PvInfoPossibleWrapper> oldSampleSources = new SiteWrapper(
             appService, origSite).getPvInfoPossibleCollection();
@@ -674,9 +680,11 @@ public class SiteWrapper extends ModelWrapper<Site> {
 
     @Override
     protected void persistDependencies(Site origObject)
-        throws BiobankCheckException, Exception {
-        deleteSampleTypeDifference(origObject);
-        deletePvInfoPossibleDifference(origObject);
+        throws BiobankCheckException, ApplicationException, WrapperException {
+        if (origObject != null) {
+            deleteSampleTypeDifference(origObject);
+            deletePvInfoPossibleDifference(origObject);
+        }
     }
 
     @Override

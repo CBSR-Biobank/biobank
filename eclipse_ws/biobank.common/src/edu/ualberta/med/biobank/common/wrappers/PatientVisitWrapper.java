@@ -311,7 +311,8 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
     }
 
     @Override
-    protected void persistChecks() throws BiobankCheckException, Exception {
+    protected void persistChecks() throws BiobankCheckException,
+        ApplicationException, WrapperException {
         if (!checkVisitDateDrawnUnique()) {
             throw new BiobankCheckException("A patient visit with date drawn "
                 + getDateDrawn() + " already exist in patient "
@@ -321,12 +322,14 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
 
     @Override
     protected void persistDependencies(PatientVisit origObject)
-        throws BiobankCheckException, Exception {
-        removeDeletedPvSampleSources(origObject);
+        throws BiobankCheckException, ApplicationException, WrapperException {
+        if (origObject != null) {
+            removeDeletedPvSampleSources(origObject);
+        }
     }
 
     private void removeDeletedPvSampleSources(PatientVisit pvDatabase)
-        throws BiobankCheckException, Exception {
+        throws BiobankCheckException, ApplicationException, WrapperException {
         List<PvSampleSourceWrapper> newSampleSources = getPvSampleSourceCollection();
         List<PvSampleSourceWrapper> oldSampleSources = new PatientVisitWrapper(
             appService, pvDatabase).getPvSampleSourceCollection();
@@ -398,7 +401,8 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
     }
 
     @Override
-    protected void deleteChecks() throws BiobankCheckException, Exception {
+    protected void deleteChecks() throws BiobankCheckException,
+        ApplicationException {
     }
 
     public class PvInfoPvInfoData {
@@ -423,7 +427,8 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
     }
 
     @Override
-    public void persist() throws BiobankCheckException, Exception {
+    public void persist() throws BiobankCheckException, ApplicationException,
+        WrapperException {
         if (pvInfoDataMap != null) {
             setPvInfoDataCollection(pvInfoDataMap.values());
         }
