@@ -125,7 +125,7 @@ public class ContainerHelper extends DbHelper {
     public static ContainerWrapper addContainerRandom(SiteWrapper site,
         String name, ContainerWrapper parent) throws Exception {
         ContainerTypeWrapper type = ContainerTypeHelper.addContainerTypeRandom(
-            site, name);
+            site, name, parent == null);
         String label = null;
         if ((type.getTopLevel() != null) && type.getTopLevel()) {
             label = String.valueOf(r.nextInt());

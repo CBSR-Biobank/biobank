@@ -46,8 +46,6 @@ public class DbHelper {
                 deleteFromList(container.getSamples().values());
             }
             container.reload();
-            System.out.println(container.getChildren().size() + "-- "
-                + container.getSamples().size());
             container.delete();
         }
     }

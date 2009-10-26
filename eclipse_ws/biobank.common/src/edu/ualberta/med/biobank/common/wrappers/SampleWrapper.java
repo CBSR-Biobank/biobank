@@ -14,7 +14,6 @@ import edu.ualberta.med.biobank.common.wrappers.internal.SamplePositionWrapper;
 import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.Sample;
 import edu.ualberta.med.biobank.model.SamplePosition;
-import edu.ualberta.med.biobank.model.SampleStorage;
 import edu.ualberta.med.biobank.model.SampleType;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -62,9 +61,11 @@ public class SampleWrapper extends
 
     public void checkInventoryIdUnique() throws BiobankCheckException,
         ApplicationException {
-        HQLCriteria criteria = new HQLCriteria("from " + Sample.class.getName()
-            + " where inventoryId  = ? and patientVisit.patient.study.site=?",
-            Arrays.asList(new Object[] { getInventoryId(), getSite() }));
+        HQLCriteria criteria = new HQLCriteria(
+            "from "
+                + Sample.class.getName()
+                + " where inventoryId  = ? and patientVisit.patient.study.site.id=?",
+            Arrays.asList(new Object[] { getInventoryId(), getSite().getId() }));
         List<Sample> samples = appService.query(criteria);
         if (samples.size() == 0) {
             return;
@@ -224,14 +225,14 @@ public class SampleWrapper extends
     public static SampleWrapper createNewSample(
         WritableApplicationService appService, String inventoryId,
         PatientVisitWrapper pv, SampleTypeWrapper type,
-        Collection<SampleStorage> sampleStorages) {
+        Collection<SampleStorageWrapper> sampleStorageWrappers) {
         Sample sample = new Sample();
         sample.setInventoryId(inventoryId);
         sample.setPatientVisit(pv.getWrappedObject());
         sample.setLinkDate(new Date());
         sample.setSampleType(type.getWrappedObject());
         Double volume = null;
-        for (SampleStorage ss : sampleStorages) {
+        for (SampleStorageWrapper ss : sampleStorageWrappers) {
             if (ss.getSampleType().getId().equals(type.getId())) {
                 volume = ss.getVolume();
             }
@@ -243,9 +244,13 @@ public class SampleWrapper extends
     public void setQuantityFromType() {
         StudyWrapper study = getPatientVisit().getPatient().getStudy();
         Double volume = null;
-        for (SampleStorageWrapper ss : study.getSampleStorageCollection()) {
-            if (ss.getSampleType().getId().equals(getSampleType().getId())) {
-                volume = ss.getVolume();
+        Collection<SampleStorageWrapper> sampleStorageCollection = study
+            .getSampleStorageCollection();
+        if (sampleStorageCollection != null) {
+            for (SampleStorageWrapper ss : sampleStorageCollection) {
+                if (ss.getSampleType().getId().equals(getSampleType().getId())) {
+                    volume = ss.getVolume();
+                }
             }
         }
         setQuantity(volume);
@@ -286,7 +291,7 @@ public class SampleWrapper extends
 
     @Override
     public int compareTo(ModelWrapper<Sample> o) {
-        return 0;
+        return this.getId().compareTo(o.getId());
     }
 
     public static List<SampleWrapper> getRandomSamplesAlreadyLinked(

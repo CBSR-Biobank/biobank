@@ -33,9 +33,14 @@ public class ContainerTypeHelper extends DbHelper {
     }
 
     public static ContainerTypeWrapper addContainerTypeRandom(SiteWrapper site,
+        String name, boolean topContainer) throws Exception {
+        return addContainerType(site, name, "", 1, r.nextInt(10) + 1, r
+            .nextInt(10) + 1, topContainer);
+    }
+
+    public static ContainerTypeWrapper addContainerTypeRandom(SiteWrapper site,
         String name) throws Exception {
-        return addContainerType(site, name, "", null, r.nextInt(10) + 1, r
-            .nextInt(10) + 1, r.nextBoolean());
+        return addContainerTypeRandom(site, name, r.nextBoolean());
     }
 
     public static void addContainerTypesRandom(SiteWrapper site, String name,

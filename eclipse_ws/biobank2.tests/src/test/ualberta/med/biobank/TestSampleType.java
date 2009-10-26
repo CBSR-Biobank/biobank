@@ -59,7 +59,7 @@ public class TestSampleType extends TestDatabase {
             ContainerTypeWrapper containerType = containerTypes.get(i);
             containerType.setSampleTypeCollection(sampleTypes);
             containerType.persist();
-        }
+    }
 
         type.reload();
         Assert.assertEquals(nber, type.getContainerTypeCollection().size());
@@ -82,7 +82,7 @@ public class TestSampleType extends TestDatabase {
             ContainerTypeWrapper containerType = containerTypes.get(i);
             containerType.setSampleTypeCollection(sampleTypes);
             containerType.persist();
-        }
+    }
 
         type.reload();
         List<ContainerTypeWrapper> containerTypesSorted = type

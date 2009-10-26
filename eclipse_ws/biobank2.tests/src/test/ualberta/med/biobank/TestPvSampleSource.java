@@ -32,7 +32,7 @@ public class TestPvSampleSource extends TestDatabase {
     @Before
     public void setUp() throws Exception {
         super.setUp();
-        w = PvSampleSourceHelper.newSampleSource(Utils.getRandomString(10));
+
         SiteWrapper site = SiteHelper.addSite("SiteName");
         StudyWrapper study = StudyHelper.addStudy(site, "studyname");
         ClinicWrapper clinic = ClinicHelper.addClinic(site, "clinicname");
@@ -40,17 +40,12 @@ public class TestPvSampleSource extends TestDatabase {
         PatientVisitWrapper pvw = PatientVisitHelper.addPatientVisit(patient,
             clinic, Utils.getRandomDate(), Utils.getRandomDate(), Utils
                 .getRandomDate());
-        w.setPatientVisit(pvw);
+        w = PvSampleSourceHelper.addPvSampleSource(Utils.getRandomString(10),
+            pvw);
         SampleSourceWrapper ssw = new SampleSourceWrapper(appService,
             new SampleSource());
         ssw.persist();
         w.setSampleSource(ssw.getWrappedObject());
-    }
-
-    @Test(expected = BiobankCheckException.class)
-    public void TestDeleteChecks() throws BiobankCheckException, Exception {
-        // not saved yet, should throw error
-        w.delete();
     }
 
     @Test
@@ -86,7 +81,8 @@ public class TestPvSampleSource extends TestDatabase {
     public void TestGetSetSampleSource() throws Exception {
         SampleSourceWrapper oldSource = w.getSampleSource();
         SampleSourceWrapper newSampleSource = PvSampleSourceHelper
-            .addSampleSource(Utils.getRandomString(10)).getSampleSource();
+            .addPvSampleSource(Utils.getRandomString(10), w.getPatientVisit())
+            .getSampleSource();
 
         w.setSampleSource(newSampleSource.getWrappedObject());
         w.persist();

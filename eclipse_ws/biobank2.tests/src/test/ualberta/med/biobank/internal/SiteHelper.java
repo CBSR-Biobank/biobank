@@ -43,8 +43,8 @@ public class SiteHelper extends DbHelper {
         deleteContainers(site.getTopContainerCollection());
         // in case containers with no top level type has been created without a
         // parent :
+        // TODO check if still need this with last modifications
         deleteContainers(site.getContainerCollection());
-
         deleteStudies(site.getStudyCollection());
         deleteClinics(site.getClinicCollection());
         deleteFromList(site.getContainerTypeCollection());

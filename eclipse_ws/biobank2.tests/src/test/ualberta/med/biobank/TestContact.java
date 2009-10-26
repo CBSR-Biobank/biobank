@@ -31,10 +31,9 @@ public class TestContact extends TestDatabase {
     public void setUp() throws Exception {
         super.setUp();
 
-        SiteWrapper siteWrapper = SiteHelper.addSite("site");
+        SiteWrapper siteWrapper = SiteHelper.addSite("site", true);
         ClinicWrapper clinicWrapper = ClinicHelper.addClinic(siteWrapper,
             "clinic");
-        // TODO: delete later
         cw = ContactHelper.newContact(clinicWrapper, "contact");
     }
 
