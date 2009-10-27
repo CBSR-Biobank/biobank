@@ -41,6 +41,10 @@ public class SiteHelper extends DbHelper {
     public static void deleteSite(SiteWrapper site) throws Exception {
         site.reload();
         deleteContainers(site.getTopContainerCollection());
+        // in case containers with no top level type has been created without a
+        // parent :
+        // TODO check if still need this with last modifications
+        site.reload();
         deleteContainers(site.getContainerCollection());
         deleteStudies(site.getStudyCollection());
         deleteClinics(site.getClinicCollection());

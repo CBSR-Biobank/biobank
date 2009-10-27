@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.forms;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.databinding.beans.BeansObservables;
@@ -84,8 +85,6 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
     protected ContainerWrapper currentPalletWrapper;
 
     private ContainerTypeWrapper onlyTypePossible;
-
-    protected SampleWrapper[][] currentPalletSamples;
 
     // for debugging only (fake scan) :
     private Button linkedOnlyButton;
@@ -289,8 +288,8 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
 
     protected void scan() {
         try {
-            boolean showResult = checkPallet();
             currentPalletWrapper.getWrappedObject().setId(null);
+            boolean showResult = checkPallet();
             if (showResult) {
                 appendLog("----");
                 appendLog("Scanning plate "
@@ -313,17 +312,18 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
                     }
                 }
                 boolean result = true;
+                Map<RowColPos, SampleWrapper> samples = currentPalletWrapper
+                    .getSamples();
                 for (int i = 0; i < cells.length; i++) { // rows
                     for (int j = 0; j < cells[i].length; j++) { // columns
                         SampleWrapper expectedSample = null;
-                        if (currentPalletSamples != null) {
-                            expectedSample = currentPalletSamples[i][j];
+                        if (samples != null) {
+                            expectedSample = samples.get(new RowColPos(i, j));
                         }
                         cells[i][j].setExpectedSample(expectedSample);
                         result = setStatus(cells[i][j]) && result;
                     }
                 }
-
                 scanValidValue.setValue(result);
                 palletWidget.setScannedElements(cells);
                 scanLaunchedValue.setValue(true);
@@ -582,7 +582,6 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
      * From the pallet product barcode, get existing information from database
      */
     private boolean checkPallet() throws Exception {
-        currentPalletSamples = null;
         boolean pursue = true;
         boolean needToCheckPosition = true;
         appendLog("----");
@@ -626,16 +625,6 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
             // samples
             appendLog("Pallet container type used: "
                 + currentPalletWrapper.getContainerType().getName());
-            currentPalletSamples = new SampleWrapper[currentPalletWrapper
-                .getContainerType().getRowCapacity()][currentPalletWrapper
-                .getContainerType().getColCapacity()];
-            List<SampleWrapper> samples = currentPalletWrapper.getSamples();
-            if (samples != null) {
-                for (SampleWrapper sample : samples) {
-                    RowColPos position = sample.getPosition();
-                    currentPalletSamples[position.row][position.col] = sample;
-                }
-            }
         }
         if (needToCheckPosition) {
             pursue = checkAndSetPosition();

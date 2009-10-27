@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.forms;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.Assert;
@@ -23,7 +24,6 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
-import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
@@ -36,7 +36,6 @@ import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.widgets.CabinetDrawerWidget;
 import edu.ualberta.med.biobank.widgets.ContainerDisplayWidget;
 import edu.ualberta.med.biobank.widgets.infotables.SamplesListWidget;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ContainerViewForm extends BiobankViewForm {
 
@@ -153,22 +152,19 @@ public class ContainerViewForm extends BiobankViewForm {
                 colCap = 1;
 
             cells = new ContainerCell[rowCap][colCap];
-            for (ContainerWrapper child : container.getChildren()) {
-                RowColPos position = child.getPosition();
-                Assert.isNotNull(position, "position is null");
-                Assert.isNotNull(position.row, "row is null");
-                Assert.isNotNull(position.col, "column is null");
-                ContainerCell cell = new ContainerCell(position.row,
-                    position.col, child);
-                cell.setStatus(ContainerStatus.INITIALIZED);
-                cells[position.row][position.col] = cell;
-            }
+            Map<RowColPos, ContainerWrapper> childrenMap = container
+                .getChildren();
             for (int i = 0; i < rowCap; i++) {
                 for (int j = 0; j < colCap; j++) {
-                    if (cells[i][j] == null) {
                         ContainerCell cell = new ContainerCell(i, j);
+                    cells[i][j] = cell;
+                    ContainerWrapper container = childrenMap.get(new RowColPos(
+                        i, j));
+                    if (container == null) {
                         cell.setStatus(ContainerStatus.NOT_INITIALIZED);
-                        cells[i][j] = cell;
+                    } else {
+                        cell.setContainer(container);
+                        cell.setStatus(ContainerStatus.INITIALIZED);
                     }
                 }
             }
@@ -187,10 +183,10 @@ public class ContainerViewForm extends BiobankViewForm {
     }
 
     private void refreshVis() {
+        initCells();
         if (isContainerDrawer()) {
-            cabWidget.setContainersStatus(container.getChildren());
+            cabWidget.setContainersStatus(cells);
         } else {
-            initCells();
             containerWidget.setContainersStatus(cells);
         }
     }
@@ -268,7 +264,7 @@ public class ContainerViewForm extends BiobankViewForm {
         GridData gdBin = new GridData();
         gdBin.verticalSpan = 2;
         cabWidget.setLayoutData(gdBin);
-        cabWidget.setContainersStatus(container.getChildren());
+        cabWidget.setContainersStatus(cells);
         cabWidget.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseDown(MouseEvent e) {
@@ -308,15 +304,16 @@ public class ContainerViewForm extends BiobankViewForm {
     private void initContainers(final ContainerTypeWrapper type) {
         BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
             public void run() {
-                boolean initDones = false;
+                boolean initDone = true;
                 try {
-                    initDones = container.initChildrenWithType(type);
-                } catch (ApplicationException ae) {
+                    container.initChildrenWithType(type);
+                } catch (Exception e) {
+                    initDone = false;
                     BioBankPlugin.openAsyncError(
-                        "Error while creating children", ae);
+                        "Error while creating children", e);
                 }
                 // refresh
-                if (initDones) {
+                if (initDone) {
                     PlatformUI.getWorkbench().getDisplay().asyncExec(
                         new Runnable() {
                             public void run() {
@@ -362,7 +359,7 @@ public class ContainerViewForm extends BiobankViewForm {
     }
 
     private void openFormFor(ContainerCell cell) {
-        AdapterBase newAdapter = null;
+        ContainerAdapter newAdapter = null;
         ContainerAdapter.closeEditor(new FormInput(containerAdapter));
         if (cells[cell.getRow()][cell.getCol()].getStatus() == ContainerStatus.NOT_INITIALIZED) {
             ContainerWrapper containerToOpen = cell.getContainer();
@@ -378,15 +375,11 @@ public class ContainerViewForm extends BiobankViewForm {
             AdapterBase.openForm(new FormInput(newAdapter),
                 ContainerEntryForm.ID);
         } else {
-            List<ContainerWrapper> children = container.getChildren();
-            Assert.isNotNull(children);
-            for (ContainerWrapper child : children) {
-                RowColPos position = child.getPosition();
-                if (position.row.equals(cell.getRow())
-                    && position.col.equals(cell.getCol())) {
-                    SessionManager.getInstance().openViewForm(child);
-                }
-            }
+            ContainerWrapper child = cell.getContainer();
+            Assert.isNotNull(child);
+            newAdapter = new ContainerAdapter(containerAdapter, child);
+            AdapterBase.openForm(new FormInput(newAdapter),
+                ContainerViewForm.ID);
         }
         containerAdapter.performExpand();
     }
@@ -417,7 +410,8 @@ public class ContainerViewForm extends BiobankViewForm {
 
     private void createSamplesSection() {
         Composite parent = createSectionWithClient("Samples");
-        samplesWidget = new SamplesListWidget(parent, container.getSamples());
+        samplesWidget = new SamplesListWidget(parent, container.getSamples()
+            .values());
         samplesWidget.adaptToToolkit(toolkit, true);
     }
 

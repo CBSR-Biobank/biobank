@@ -16,8 +16,7 @@ public class SiteClinicInfo {
     public String activityStatus;
 
     public void performDoubleClick() {
-        SessionManager.getInstance().openViewForm(Study.class,
-            clinicWrapper.getId());
+        SessionManager.getInstance().openViewForm(clinicWrapper);
     }
 
 }

@@ -46,7 +46,8 @@ public class ContainerLabelingSchemeWrapper extends
     }
 
     @Override
-    protected void deleteChecks() throws BiobankCheckException, Exception {
+    protected void deleteChecks() throws BiobankCheckException,
+        ApplicationException {
         if (hasContainerTypes()) {
             throw new BiobankCheckException(
                 "Can't delete this ContainerLabelingScheme: container types are using it.");
@@ -54,7 +55,8 @@ public class ContainerLabelingSchemeWrapper extends
     }
 
     @Override
-    protected void persistChecks() throws BiobankCheckException, Exception {
+    protected void persistChecks() throws BiobankCheckException,
+        ApplicationException {
     }
 
     private boolean hasContainerTypes() throws ApplicationException {

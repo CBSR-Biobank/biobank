@@ -45,4 +45,7 @@ public class ContainerCell {
         return container;
     }
 
+    public void setContainer(ContainerWrapper container) {
+        this.container = container;
+    }
 }

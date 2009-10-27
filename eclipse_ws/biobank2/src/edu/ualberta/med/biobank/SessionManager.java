@@ -148,7 +148,7 @@ public class SessionManager {
             + klass.getName() + " id " + id);
         selectTreeNode(adapter);
         adapter.performDoubleClick();
-    }
+    } 
 
     public void selectTreeNode(AdapterBase adapter) {
         SessionManager.getInstance().getTreeViewer().setSelection(

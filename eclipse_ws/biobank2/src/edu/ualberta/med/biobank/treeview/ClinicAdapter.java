@@ -93,7 +93,6 @@ public class ClinicAdapter extends AdapterBase {
 
     @Override
     public void loadChildren(boolean updateNode) {
-        Assert.isTrue(false, "Cannot add children to this adapter");
     }
 
     @Override

@@ -4,6 +4,7 @@ import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.PvSampleSource;
 import edu.ualberta.med.biobank.model.SampleSource;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class PvSampleSourceWrapper extends ModelWrapper<PvSampleSource> {
@@ -28,11 +29,13 @@ public class PvSampleSourceWrapper extends ModelWrapper<PvSampleSource> {
     }
 
     @Override
-    protected void persistChecks() throws BiobankCheckException, Exception {
+    protected void persistChecks() throws BiobankCheckException,
+        ApplicationException {
     }
 
     @Override
-    protected void deleteChecks() throws BiobankCheckException, Exception {
+    protected void deleteChecks() throws BiobankCheckException,
+        ApplicationException {
     }
 
     public Integer getQuantity() {

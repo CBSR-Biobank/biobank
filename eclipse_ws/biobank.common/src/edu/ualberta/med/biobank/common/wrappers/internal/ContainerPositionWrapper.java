@@ -5,12 +5,13 @@ import java.util.Arrays;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.BiobankCheckException;
-import edu.ualberta.med.biobank.common.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerPosition;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
+import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class ContainerPositionWrapper extends
     AbstractPositionWrapper<ContainerPosition> {
@@ -45,11 +46,11 @@ public class ContainerPositionWrapper extends
             parentContainer);
     }
 
-    public void setParentContainer(ContainerWrapper parentContainer) {
+    private void setParentContainer(ContainerWrapper parentContainer) {
         setParentContainer(parentContainer.getWrappedObject());
     }
 
-    public ContainerWrapper getParentContainer() {
+    private ContainerWrapper getParentContainer() {
         Container parent = wrappedObject.getParentContainer();
         if (parent == null) {
             return null;
@@ -76,23 +77,9 @@ public class ContainerPositionWrapper extends
             container);
     }
 
-    /**
-     * position is 2 letters, or 2 number or 1 letter and 1 number... this
-     * position string is used to set the correct row and column index for this
-     * position. Labeling scheme of parent container is used to get the correct
-     * indexes.
-     * 
-     * @throws Exception
-     */
-    public void setPosition(String position) throws Exception {
-        ContainerWrapper parent = getParentContainer();
-        RowColPos rowColPos = parent.getPositionFromLabelingScheme(position);
-        setRow(rowColPos.row);
-        setCol(rowColPos.col);
-    }
-
     @Override
-    protected void deleteChecks() throws BiobankCheckException, Exception {
+    protected void deleteChecks() throws BiobankCheckException,
+        ApplicationException {
     }
 
     @Override
@@ -110,4 +97,41 @@ public class ContainerPositionWrapper extends
             + getContainer().toString();
     }
 
+    @Override
+    public ContainerWrapper getParent() {
+        return getParentContainer();
+    }
+
+    @Override
+    public void setParent(ContainerWrapper parent) {
+        setParentContainer(parent);
+    }
+
+    @Override
+    protected void checkObjectAtPosition() throws ApplicationException,
+        BiobankCheckException {
+        ContainerWrapper parent = getParent();
+        if (parent != null) {
+            // do a hql query because parent might need a reload - but if we are
+            // in the middle of parent.persist, don't want to do that !
+            HQLCriteria criteria = new HQLCriteria("from "
+                + ContainerPosition.class.getName()
+                + " where parentContainer.id=? and row=? and col=?", Arrays
+                .asList(new Object[] { parent.getId(), getRow(), getCol() }));
+            List<ContainerPosition> positions = appService.query(criteria);
+            if (positions.size() == 0) {
+                return;
+            }
+            ContainerPositionWrapper childPosition = new ContainerPositionWrapper(
+                appService, positions.get(0));
+            if (!childPosition.getContainer().equals(getContainer())) {
+                throw new BiobankCheckException("Position "
+                    + childPosition.getContainer().getLabel() + " (" + getRow()
+                    + ":" + getCol() + ") in container "
+                    + getParent().toString()
+                    + " is not available in container "
+                    + parent.getFullInfoLabel());
+            }
+        }
+    }
 }

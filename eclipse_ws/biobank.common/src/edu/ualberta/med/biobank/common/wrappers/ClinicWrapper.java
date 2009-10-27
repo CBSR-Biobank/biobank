@@ -184,7 +184,8 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
     }
 
     @Override
-    protected void persistChecks() throws BiobankCheckException, Exception {
+    protected void persistChecks() throws BiobankCheckException,
+        ApplicationException {
         if (getAddress() == null) {
             throw new BiobankCheckException(
                 "the clinic does not have an address");
@@ -293,7 +294,8 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
     }
 
     @Override
-    protected void deleteChecks() throws BiobankCheckException, Exception {
+    protected void deleteChecks() throws BiobankCheckException,
+        ApplicationException {
         if (hasPatientVisits()) {
             throw new BiobankCheckException("Unable to delete clinic "
                 + getName()

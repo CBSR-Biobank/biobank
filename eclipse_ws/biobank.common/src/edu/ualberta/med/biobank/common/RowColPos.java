@@ -15,7 +15,30 @@ public class RowColPos {
     }
 
     public boolean equals(Integer row, Integer col) {
-        return ((this.row == row) && (this.col == col));
+        return (this.row.equals(row) && this.col.equals(col));
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof RowColPos) {
+            RowColPos pos = (RowColPos) o;
+            if (row != null && col != null) {
+                return row.equals(pos.row) && col.equals(pos.col);
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        String hash = "";
+        if (row != null) {
+            hash += row.toString();
+        }
+        if (col != null) {
+            hash += col.toString();
+        }
+        return hash.hashCode();
     }
 
     @Override

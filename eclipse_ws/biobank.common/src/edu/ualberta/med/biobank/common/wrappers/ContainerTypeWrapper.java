@@ -52,15 +52,30 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
     }
 
     @Override
-    protected void persistChecks() throws BiobankCheckException, Exception {
+    protected void persistChecks() throws BiobankCheckException,
+        ApplicationException, WrapperException {
+        checkSite();
         checkNameUnique();
+        if (getCapacity() == null) {
+            throw new BiobankCheckException("Capacity should be set");
+        }
         getCapacity().persistChecks();
+        if (getChildLabelingScheme() == null) {
+            throw new BiobankCheckException("Labeling scheme should be set");
+        }
         if (!isNew()) {
             boolean exists = isUsedByContainers();
             ContainerType oldObject = getObjectFromDatabase();
             checkNewCapacity(oldObject, exists);
             checkTopLevel(oldObject, exists);
             checkLabelingScheme(oldObject, exists);
+        }
+    }
+
+    private void checkSite() throws BiobankCheckException {
+        if (getSite() == null) {
+            throw new BiobankCheckException(
+                "Should assign a site to this container type");
         }
     }
 
@@ -99,7 +114,8 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
     }
 
     @Override
-    public void delete() throws BiobankCheckException, Exception {
+    public void delete() throws BiobankCheckException, ApplicationException,
+        WrapperException {
         if (!isNew()) {
             deleteChecks();
             // should remove this containerType from its parents
@@ -115,7 +131,8 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
     }
 
     @Override
-    protected void deleteChecks() throws BiobankCheckException, Exception {
+    protected void deleteChecks() throws BiobankCheckException,
+        ApplicationException {
         if (isUsedByContainers()) {
             throw new BiobankCheckException("Unable to delete container type "
                 + getName() + ". A container of this type exists in storage."
@@ -481,8 +498,7 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
      * Check if we can use the new capacity
      */
     private void checkNewCapacity(ContainerType oldObject,
-        boolean existsContainersWithType) throws BiobankCheckException,
-        Exception {
+        boolean existsContainersWithType) throws BiobankCheckException {
         CapacityWrapper currentCapacity = getCapacity();
         Capacity dbCapacity = oldObject.getCapacity();
         if (!(currentCapacity.getRowCapacity().equals(

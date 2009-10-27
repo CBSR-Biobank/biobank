@@ -7,6 +7,7 @@ import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Random;
 
@@ -31,16 +32,18 @@ public class DbHelper {
         return null;
     }
 
-    public static void deleteContainers(List<ContainerWrapper> containers)
+    public static void deleteContainers(Collection<ContainerWrapper> containers)
         throws Exception {
         if ((containers == null) || (containers.size() == 0))
             return;
 
         for (ContainerWrapper container : containers) {
+            container.reload();
             if (container.hasChildren()) {
-                deleteContainers(container.getChildren());
-            } else {
-                deleteFromList(container.getSamples());
+                deleteContainers(container.getChildren().values());
+            }
+            if (container.hasSamples()) {
+                deleteFromList(container.getSamples().values());
             }
             container.reload();
             container.delete();
@@ -81,7 +84,7 @@ public class DbHelper {
         }
     }
 
-    public static void deleteFromList(List<? extends ModelWrapper<?>> list)
+    public static void deleteFromList(Collection<? extends ModelWrapper<?>> list)
         throws Exception {
         if (list == null)
             return;

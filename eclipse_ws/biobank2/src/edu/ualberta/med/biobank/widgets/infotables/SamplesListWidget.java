@@ -10,8 +10,8 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
-import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.NodeSearchVisitor;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
@@ -60,8 +60,8 @@ public class SamplesListWidget extends InfoTableWidget<SampleWrapper> {
                 SampleWrapper sample = (SampleWrapper) item.o;
                 if (sample.hasParent()) {
                     AdapterBase node = siteAdapter
-                        .accept(new NodeSearchVisitor(Container.class, sample
-                            .getParent().getId()));
+                        .accept(new NodeSearchVisitor(ContainerWrapper.class,
+                            sample.getParent().getId()));
                     if (node != null) {
                         SessionManager.getInstance().setSelectedNode(node);
                         node.performDoubleClick();

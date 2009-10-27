@@ -82,11 +82,13 @@ public class SampleSourceWrapper extends ModelWrapper<SampleSource> {
     }
 
     @Override
-    protected void deleteChecks() throws BiobankCheckException, Exception {
+    protected void deleteChecks() throws BiobankCheckException,
+        ApplicationException {
     }
 
     @Override
-    protected void persistChecks() throws BiobankCheckException, Exception {
+    protected void persistChecks() throws BiobankCheckException,
+        ApplicationException {
     }
 
     public static List<SampleSourceWrapper> getAllSampleSources(

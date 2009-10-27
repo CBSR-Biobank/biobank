@@ -53,4 +53,8 @@ public class SampleTypeHelper extends DbHelper {
         createdSampleTypes.clear();
     }
 
+    public static void removeFromCreated(SampleTypeWrapper type) {
+        createdSampleTypes.remove(type);
+    }
+
 }

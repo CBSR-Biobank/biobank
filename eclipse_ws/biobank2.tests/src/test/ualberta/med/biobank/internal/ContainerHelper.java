@@ -27,12 +27,7 @@ public class ContainerHelper extends DbHelper {
 
         container = new ContainerWrapper(appService);
         if (label != null) {
-            if (type.getTopLevel()) {
-                container.setLabel(label);
-            } else {
-                throw new Exception(
-                    "cannot set label on non top level containers");
-            }
+            container.setLabel(label);
         }
         container.setProductBarcode(barcode);
         if (parent != null) {
@@ -123,27 +118,50 @@ public class ContainerHelper extends DbHelper {
     }
 
     public static ContainerWrapper addContainerRandom(SiteWrapper site,
-        String name) throws Exception {
+        String name, ContainerWrapper parent) throws Exception {
         ContainerTypeWrapper type = ContainerTypeHelper.addContainerTypeRandom(
-            site, name);
+            site, name, parent == null);
         String label = null;
         if ((type.getTopLevel() != null) && type.getTopLevel()) {
             label = String.valueOf(r.nextInt());
         }
         ContainerWrapper container = addContainer(label, name, null, site, type);
         if (label == null) {
+            container.setParent(parent);
             container.setPosition(0, 0);
         }
         container.persist();
         return container;
     }
 
-    public static void addContainersRandom(SiteWrapper site, String barcode,
-        int count) throws Exception {
+    public static ContainerWrapper addTopContainerRandom(SiteWrapper site,
+        String name, int typeCapacityRow, int typeCapacityCol) throws Exception {
+        ContainerTypeWrapper type = ContainerTypeHelper.addContainerType(site,
+            name, "", 1, typeCapacityRow, typeCapacityCol, true);
+        ContainerWrapper container = addContainer(name, name, null, site, type);
+        return container;
+    }
+
+    public static int addTopContainersWithChildren(SiteWrapper site,
+        String barcode, int count) throws Exception {
         for (int i = 0; i < count; i++) {
-            addContainerRandom(site, barcode + (i + 1));
+            ContainerWrapper topContainer = addTopContainerRandom(site, barcode
+                + "TOP" + (i + 1), 3, 6);
+            ContainerTypeWrapper type = ContainerTypeHelper
+                .addContainerTypeRandom(site, barcode + "children" + (i + 1),
+                    false);
+            int maxRow = topContainer.getRowCapacity();
+            for (int j = 0; j < 5; j++) {
+                ContainerWrapper child = newContainer(null, barcode + "child"
+                    + (i + 1) + "_" + j, topContainer, site, type);
+                int posRow = j % maxRow;
+                int posCol = j / maxRow;
+                topContainer.addChild(posRow, posCol, child);
+            }
+            topContainer.persist();
         }
         site.reload();
+        return count + count * 5;
     }
 
     public static ContainerLabelingSchemeWrapper newContainerLabelingScheme() {

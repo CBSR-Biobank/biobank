@@ -43,7 +43,7 @@ public class TestSample extends TestDatabase {
         SampleTypeWrapper sampleTypeWrapper = SampleTypeHelper.addSampleType(
             site, "sampletype");
         ContainerWrapper container = ContainerHelper.addContainerRandom(site,
-            "newcontainer");
+            "newcontainer", null);
         StudyWrapper study = StudyHelper.addStudy(site, "studyname");
         PatientWrapper patient = PatientHelper.addPatient("5684", study);
         ClinicWrapper clinic = ClinicHelper.addClinic(site, "clinicname");
@@ -98,7 +98,7 @@ public class TestSample extends TestDatabase {
     public void TestGetSetParent() throws Exception {
         ContainerWrapper oldParent = sample.getParent();
         ContainerWrapper parent = ContainerHelper.addContainerRandom(sample
-            .getSite(), "newParent");
+            .getSite(), "newParent", null);
         sample.setParent(parent);
         sample.persist();
         // check to make sure gone from old parent
@@ -107,7 +107,7 @@ public class TestSample extends TestDatabase {
         // check to make sure added to new parent
         parent.reload();
         Assert.assertTrue(sample.getParent() != null);
-        Collection<SampleWrapper> sampleWrappers = parent.getSamples();
+        Collection<SampleWrapper> sampleWrappers = parent.getSamples().values();
         boolean found = false;
         for (SampleWrapper sampleWrapper : sampleWrappers) {
             if (sampleWrapper.getId().equals(sample.getId()))

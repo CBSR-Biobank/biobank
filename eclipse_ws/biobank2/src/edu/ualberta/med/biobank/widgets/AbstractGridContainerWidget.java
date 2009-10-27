@@ -159,8 +159,7 @@ public abstract class AbstractGridContainerWidget extends Canvas {
         rowcol.col = indexCol;
         if (containerType != null) {
             return parentLabel
-                + LabelingScheme.getPositionString(rowcol, containerType
-                    .getWrappedObject());
+                + LabelingScheme.getPositionString(rowcol, containerType);
         }
 
         String row = getValueForCell(firstRowSign, indexRow,

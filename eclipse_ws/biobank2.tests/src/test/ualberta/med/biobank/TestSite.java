@@ -258,21 +258,21 @@ public class TestSite extends TestDatabase {
     public void testGetContainerCollection() throws Exception {
         String name = "testGetContainerCollection" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
-        int nber = r.nextInt(15) + 1;
-        ContainerHelper.addContainersRandom(site, name, nber);
+        int totalContainers = ContainerHelper.addTopContainersWithChildren(
+            site, name, r.nextInt(3) + 1);
 
         List<ContainerWrapper> containers = site.getContainerCollection();
         int sizeFound = containers.size();
 
-        Assert.assertEquals(nber, sizeFound);
+        Assert.assertEquals(totalContainers, sizeFound);
     }
 
     @Test
     public void testAddInContainerCollection() throws Exception {
         String name = "testAddInContainerCollection" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
-        int nber = r.nextInt(15) + 1;
-        ContainerHelper.addContainersRandom(site, name, nber);
+        int totalContainers = ContainerHelper.addTopContainersWithChildren(
+            site, name, r.nextInt(3) + 1);
 
         List<ContainerWrapper> containers = site.getContainerCollection();
         ContainerTypeWrapper type = ContainerTypeHelper.addContainerTypeRandom(
@@ -285,17 +285,19 @@ public class TestSite extends TestDatabase {
 
         site.reload();
         // one container added
-        Assert.assertEquals(nber + 1, site.getContainerCollection().size());
+        Assert.assertEquals(totalContainers + 1, site.getContainerCollection()
+            .size());
     }
 
     @Test
     public void testRemoveInContainerCollection() throws Exception {
         String name = "testRemoveInContainerCollection" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
-        int nber = r.nextInt(15) + 1;
-        ContainerHelper.addContainersRandom(site, name, nber);
+        int totalNber = ContainerHelper.addTopContainersWithChildren(site,
+            name, r.nextInt(3) + 1);
 
         List<ContainerWrapper> containers = site.getContainerCollection();
+        containers.removeAll(site.getTopContainerCollection());
         ContainerWrapper container = DbHelper.chooseRandomlyInList(containers);
         int idContainer = container.getId();
         containers.remove(container);
@@ -305,7 +307,8 @@ public class TestSite extends TestDatabase {
 
         site.reload();
         // one container removed
-        Assert.assertEquals(nber - 1, site.getContainerCollection().size());
+        Assert
+            .assertEquals(totalNber - 1, site.getContainerCollection().size());
 
         // container should not be anymore in the container collection
         // (removed the good one)
@@ -371,6 +374,7 @@ public class TestSite extends TestDatabase {
         types.remove(type);
         site.setSampleTypeCollection(types);
         type.delete();
+        SampleTypeHelper.removeFromCreated(type);
         site.persist();
 
         site.reload();
@@ -405,7 +409,8 @@ public class TestSite extends TestDatabase {
             Assert.assertTrue(true);
         }
 
-        site.setCity("Vesoul");
+        // really insert it this time:
+        site = SiteHelper.addSite(name);
         site.persist();
 
         site = SiteHelper.newSite(name);
@@ -511,26 +516,21 @@ public class TestSite extends TestDatabase {
     public void testGetTopContainerCollection() throws Exception {
         String name = "testGetTopContainerCollection" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
-        ContainerHelper.addContainersRandom(site, name, r.nextInt(15) + 1);
+        int topNber = r.nextInt(8) + 1;
+        ContainerHelper.addTopContainersWithChildren(site, name, topNber);
 
         List<ContainerWrapper> containers = site.getTopContainerCollection();
         int sizeFound = containers.size();
 
-        int expected = 0;
-        for (ContainerWrapper container : site.getContainerCollection()) {
-            if (Boolean.TRUE.equals(container.getContainerType().getTopLevel())) {
-                expected++;
-            }
-        }
-
-        Assert.assertEquals(expected, sizeFound);
+        Assert.assertEquals(topNber, sizeFound);
     }
 
     @Test
     public void testGetTopContainerCollectionBoolean() throws Exception {
         String name = "testGetTopContainerCollection" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
-        ContainerHelper.addContainersRandom(site, name, r.nextInt(15) + 1);
+        ContainerHelper.addTopContainersWithChildren(site, name,
+            r.nextInt(8) + 1);
 
         List<ContainerWrapper> containers = site
             .getTopContainerCollection(true);
