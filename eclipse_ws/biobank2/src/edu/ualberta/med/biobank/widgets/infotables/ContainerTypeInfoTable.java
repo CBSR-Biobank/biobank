@@ -9,11 +9,10 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 public class ContainerTypeInfoTable extends
     InfoTableWidget<ContainerTypeWrapper> {
 
-    private static final String[] HEADINGS = new String[] { "Name", "Status",
-        "Default Temperature" };
+    private static final String[] HEADINGS = new String[] { "Name", "Capacity",
+        "Status", "In Use", "Temperature" };
 
-    private static final int[] BOUNDS = new int[] { 200, 130, 130, -1, -1, -1,
-        -1 };
+    private static final int[] BOUNDS = new int[] { 160, 130, 130, 130, 130 };
 
     public ContainerTypeInfoTable(Composite parent,
         Collection<ContainerTypeWrapper> collection) {

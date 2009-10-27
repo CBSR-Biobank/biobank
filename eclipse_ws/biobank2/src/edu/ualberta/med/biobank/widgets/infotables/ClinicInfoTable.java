@@ -1,19 +1,21 @@
 package edu.ualberta.med.biobank.widgets.infotables;
 
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
 
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
+import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.model.SiteClinicInfo;
 
 public class ClinicInfoTable extends InfoTableWidget<ClinicWrapper> {
 
     private static final String[] HEADINGS = new String[] { "Name",
-        "Num Patient Visits" };
+        "Studies Participated", "Status", "Patients", "Patient Visits" };
 
-    private static final int[] BOUNDS = new int[] { 200, 130, -1, -1, -1, -1,
-        -1 };
+    private static final int[] BOUNDS = new int[] { 160, 130, 130, 130, 130 };
 
     public ClinicInfoTable(Composite parent,
         Collection<ClinicWrapper> collection) {
@@ -26,7 +28,14 @@ public class ClinicInfoTable extends InfoTableWidget<ClinicWrapper> {
         SiteClinicInfo info = new SiteClinicInfo();
         info.clinicWrapper = clinic;
         info.patientVisits = clinic.getPatientVisitCollection().size();
+        info.activityStatus = clinic.getActivityStatus();
+        info.studies = clinic.getStudyCollection().size();
+        List<PatientVisitWrapper> pvs = clinic.getPatientVisitCollection();
+        HashSet<Integer> patients = new HashSet<Integer>();
+        for (int i = 0; i < pvs.size(); i++) {
+            patients.add(pvs.get(i).getPatient().getId());
+        }
+        info.patients = patients.size();
         return info;
     }
-
 }

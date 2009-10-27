@@ -36,6 +36,7 @@ public class SampleTypesEntryForm extends BiobankEntryForm {
     public void init() throws Exception {
         SiteAdapter siteAdapter = (SiteAdapter) adapter;
         siteWrapper = siteAdapter.getWrapper();
+
         globalSampleTypes = SampleTypeWrapper.getGlobalSampleTypes(appService,
             true);
         siteSampleTypes = siteWrapper.getSampleTypeCollection(true);
@@ -46,8 +47,13 @@ public class SampleTypesEntryForm extends BiobankEntryForm {
     protected void createFormContent() {
         form.setText("Sample Type Information");
         form.getBody().setLayout(new GridLayout(1, false));
-        createSiteSampleTypeSection();
+        if (!siteWrapper.getName().equals("All Sites"))
+            createSiteSampleTypeSection();
         createGlobalSampleTypeSection();
+        if (!siteWrapper.getName().equals("All Sites"))
+            firstControl = siteSampleWidget;
+        else
+            firstControl = globalSampleWidget;
     }
 
     private void createSiteSampleTypeSection() {
@@ -60,7 +66,6 @@ public class SampleTypesEntryForm extends BiobankEntryForm {
         siteSampleWidget.adaptToToolkit(toolkit, true);
         siteSampleWidget.addSelectionChangedListener(listener);
         toolkit.paintBordersFor(siteSampleWidget);
-        firstControl = siteSampleWidget;
     }
 
     private void createGlobalSampleTypeSection() {
@@ -83,8 +88,8 @@ public class SampleTypesEntryForm extends BiobankEntryForm {
             .getTableSampleTypes();
         siteWrapper.setSampleTypeCollection(ssCollection);
         siteWrapper.persist();
-        SampleTypeWrapper.persistGlobalSampleTypes(appService, globalSampleWidget
-            .getTableSampleTypes());
+        SampleTypeWrapper.persistGlobalSampleTypes(appService,
+            globalSampleWidget.getTableSampleTypes());
     }
 
     @Override

@@ -8,10 +8,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import test.ualberta.med.biobank.internal.ContainerHelper;
-import test.ualberta.med.biobank.internal.ContainerTypeHelper;
-import test.ualberta.med.biobank.internal.SiteHelper;
 import edu.ualberta.med.biobank.common.BiobankCheckException;
-import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.ContainerLabelingSchemeWrapper;
 
 public class TestContainerLabelingScheme extends TestDatabase {
@@ -23,15 +20,6 @@ public class TestContainerLabelingScheme extends TestDatabase {
     public void setUp() throws Exception {
         super.setUp();
         clsw = ContainerHelper.newContainerLabelingScheme();
-    }
-
-    @Test(expected = BiobankCheckException.class)
-    public void TestDeleteChecks() throws BiobankCheckException, Exception {
-        SiteWrapper site = SiteHelper.addSite("sitename");
-        ContainerTypeHelper.addContainerType(site, "dummyCT", "dct", clsw
-            .getId(), 2, 2, false);
-        // should not be able to delete a cls that is in use
-        clsw.delete();
     }
 
     @Test
