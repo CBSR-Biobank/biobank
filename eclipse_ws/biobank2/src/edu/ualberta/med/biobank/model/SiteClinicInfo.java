@@ -13,6 +13,8 @@ public class SiteClinicInfo {
 
     public int patientVisits;
 
+    public String activityStatus;
+
     public void performDoubleClick() {
         SessionManager.getInstance().openViewForm(Study.class,
             clinicWrapper.getId());

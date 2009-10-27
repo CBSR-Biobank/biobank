@@ -13,8 +13,7 @@ public class ClinicStudyInfoTable extends InfoTableWidget<StudyWrapper> {
     private static final String[] HEADINGS = new String[] { "Study",
         "No. Patients", "No. Patient Visits" };
 
-    private static final int[] BOUNDS = new int[] { 200, 130, 100, -1, -1, -1,
-        -1 };
+    private static final int[] BOUNDS = new int[] { 160, 130, 100 };
 
     private ClinicWrapper clinicWrapper;
 

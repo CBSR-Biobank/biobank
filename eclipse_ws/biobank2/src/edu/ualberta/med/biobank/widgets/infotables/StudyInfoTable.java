@@ -10,10 +10,9 @@ import edu.ualberta.med.biobank.model.SiteStudyInfo;
 public class StudyInfoTable extends InfoTableWidget<StudyWrapper> {
 
     private static final String[] HEADINGS = new String[] { "Name",
-        "Short Name", "Activity Status", "Patients", "Patient Visists" };
+        "Short Name", "Status", "Patients", "Patient Visits" };
 
-    private static final int[] BOUNDS = new int[] { 200, 130, 130, 130, 130,
-        -1, -1 };
+    private static final int[] BOUNDS = new int[] { 160, 130, 130, 130, 130 };
 
     public StudyInfoTable(Composite parent, Collection<StudyWrapper> collection) {
         super(parent, collection, HEADINGS, BOUNDS);
