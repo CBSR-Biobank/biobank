@@ -23,6 +23,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
@@ -361,7 +362,7 @@ public class ContainerViewForm extends BiobankViewForm {
     }
 
     private void openFormFor(ContainerCell cell) {
-        ContainerAdapter newAdapter = null;
+        AdapterBase newAdapter = null;
         ContainerAdapter.closeEditor(new FormInput(containerAdapter));
         if (cells[cell.getRow()][cell.getCol()].getStatus() == ContainerStatus.NOT_INITIALIZED) {
             ContainerWrapper containerToOpen = cell.getContainer();
@@ -383,12 +384,9 @@ public class ContainerViewForm extends BiobankViewForm {
                 RowColPos position = child.getPosition();
                 if (position.row.equals(cell.getRow())
                     && position.col.equals(cell.getCol())) {
-                    newAdapter = new ContainerAdapter(containerAdapter, child);
+                    SessionManager.getInstance().openViewForm(child);
                 }
             }
-            Assert.isNotNull(newAdapter);
-            AdapterBase.openForm(new FormInput(newAdapter),
-                ContainerViewForm.ID);
         }
         containerAdapter.performExpand();
     }
