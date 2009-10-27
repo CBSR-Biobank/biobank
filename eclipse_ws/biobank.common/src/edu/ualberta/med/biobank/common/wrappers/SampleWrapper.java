@@ -119,11 +119,11 @@ public class SampleWrapper extends
 
     public void checkPosition(ContainerWrapper parentContainer)
         throws BiobankCheckException, ApplicationException {
-        SamplePosition sp = wrappedObject.getSamplePosition();
+        RowColPos position = getPosition();
         HQLCriteria criteria = new HQLCriteria("from " + Sample.class.getName()
             + " where samplePosition.row=? and samplePosition.col=?"
             + " and samplePosition.container=?", Arrays.asList(new Object[] {
-            sp.getRow(), sp.getCol(), parentContainer.getWrappedObject() }));
+            position.row, position.col, parentContainer.getWrappedObject() }));
 
         List<Sample> samples = appService.query(criteria);
         if (samples.size() == 0) {

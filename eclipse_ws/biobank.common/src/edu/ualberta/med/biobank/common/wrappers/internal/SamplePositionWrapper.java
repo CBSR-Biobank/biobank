@@ -13,6 +13,7 @@ import edu.ualberta.med.biobank.model.Sample;
 import edu.ualberta.med.biobank.model.SamplePosition;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
+import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class SamplePositionWrapper extends
     AbstractPositionWrapper<SamplePosition> {
@@ -99,11 +100,23 @@ public class SamplePositionWrapper extends
     }
 
     @Override
-    protected void checkObjectAtPosition() throws BiobankCheckException {
+    protected void checkObjectAtPosition() throws BiobankCheckException,
+        ApplicationException {
         ContainerWrapper parent = getParent();
         if (parent != null) {
-            SampleWrapper sample = parent.getSample(getRow(), getCol());
-            if (sample != null && !sample.equals(getSample())) {
+            // do a hql query because parent might need a reload - but if we are
+            // in the middle of parent.persist, don't want to do that !
+            HQLCriteria criteria = new HQLCriteria("from "
+                + SamplePosition.class.getName()
+                + " where container.id=? and row=? and col=?", Arrays
+                .asList(new Object[] { parent.getId(), getRow(), getCol() }));
+            List<SamplePosition> positions = appService.query(criteria);
+            if (positions.size() == 0) {
+                return;
+            }
+            SamplePositionWrapper samplePosition = new SamplePositionWrapper(
+                appService, positions.get(0));
+            if (!samplePosition.getSample().equals(getSample())) {
                 throw new BiobankCheckException("Position " + getRow() + ":"
                     + getCol() + " in container " + getParent().toString()
                     + " is not available.");

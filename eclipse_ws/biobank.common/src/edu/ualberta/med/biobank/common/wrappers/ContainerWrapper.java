@@ -404,6 +404,7 @@ public class ContainerWrapper extends
             }
         }
         sample.setPosition(row, col);
+        sample.setParent(this);
         samples.put(new RowColPos(row, col), sample);
     }
 
@@ -490,6 +491,7 @@ public class ContainerWrapper extends
             }
         }
         child.setPosition(row, col);
+        child.setParent(this);
         children.put(new RowColPos(row, col), child);
     }
 
@@ -497,7 +499,6 @@ public class ContainerWrapper extends
         throws Exception {
         RowColPos position = getPositionFromLabelingScheme(string);
         addChild(position.row, position.col, container);
-        container.setParent(this);
     }
 
     /**

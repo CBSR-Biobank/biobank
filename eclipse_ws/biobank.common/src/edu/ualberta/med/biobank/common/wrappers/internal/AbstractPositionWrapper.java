@@ -80,5 +80,5 @@ public abstract class AbstractPositionWrapper<E extends AbstractPosition>
     }
 
     protected abstract void checkObjectAtPosition()
-        throws BiobankCheckException;
+        throws ApplicationException, BiobankCheckException;
 }

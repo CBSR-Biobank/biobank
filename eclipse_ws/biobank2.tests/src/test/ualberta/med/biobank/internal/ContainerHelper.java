@@ -27,12 +27,7 @@ public class ContainerHelper extends DbHelper {
 
         container = new ContainerWrapper(appService);
         if (label != null) {
-            if (type.getTopLevel()) {
-                container.setLabel(label);
-            } else {
-                throw new Exception(
-                    "cannot set label on non top level containers");
-            }
+            container.setLabel(label);
         }
         container.setProductBarcode(barcode);
         if (parent != null) {
@@ -168,19 +163,6 @@ public class ContainerHelper extends DbHelper {
         site.reload();
         return count + count * 5;
     }
-
-    // public static void addContainersRandom(SiteWrapper site, String barcode,
-    // int count) throws Exception {
-    // ContainerTypeWrapper type = ContainerTypeHelper.addContainerType(site,
-    // "top" + barcode, "", 1, r.nextInt(10) + 1, r.nextInt(10) + 1, true);
-    // ContainerWrapper parent = addContainer("top" + barcode,
-    // "top" + barcode, null, site, type);
-    // for (int i = 0; i < count; i++) {
-    // parent.reload();
-    // addContainerRandom(site, barcode + (i + 1), parent);
-    // }
-    // site.reload();
-    // }
 
     public static ContainerLabelingSchemeWrapper newContainerLabelingScheme() {
         ContainerLabelingSchemeWrapper clsw = new ContainerLabelingSchemeWrapper(

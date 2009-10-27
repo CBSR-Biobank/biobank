@@ -749,6 +749,7 @@ public class TestContainer extends TestDatabase {
         Assert.assertTrue(top.getChildren().size() == 1);
         top.initChildrenWithType(childType2);
         top.reload();
+
         Collection<ContainerWrapper> children = top.getChildren().values();
         Assert.assertTrue(children.size() == CONTAINER_TOP_ROWS
             * CONTAINER_TOP_COLS);
@@ -773,10 +774,41 @@ public class TestContainer extends TestDatabase {
         fail("Not yet implemented");
     }
 
-    public void testAddContainerInPositionAlReadyTaken() {
-        // should not be able to do that
-        // to be tested
-        fail("todo");
-    }
+    @Test
+    public void testAddContainerFailing() throws Exception {
+        ContainerWrapper top = containerMap.get("Top");
+        ContainerTypeWrapper type = containerTypeMap.get("ChildCtL1");
 
+        String name = "testAddContainerFailing" + r.nextInt();
+        try {
+            ContainerHelper.addContainer(name, name, top, site, type);
+            Assert
+                .fail("Should not be able to add a container in a parent without any position");
+        } catch (BiobankCheckException bce) {
+            Assert.assertTrue(true);
+        }
+
+        ContainerHelper.addContainer(name, name, top, site, type, 0, 0);
+        ContainerWrapper container = ContainerHelper.newContainer(name + "_2",
+            name + "_2", top, site, type);
+        container.setPosition(0, 0);
+        try {
+            container.persist();
+            Assert
+                .fail("Should not be able to add a container in a position already used (in child insert)");
+        } catch (BiobankCheckException bce) {
+            Assert.assertTrue(true);
+        }
+
+        container = ContainerHelper.newContainer("", name + "_3", null, site,
+            type);
+        top.addChild(0, 0, container);
+        try {
+            top.persist();
+            Assert
+                .fail("Should not be able to add a container in a position already used (in parent update)");
+        } catch (BiobankCheckException bce) {
+            Assert.assertTrue(true);
+        }
+    }
 }
