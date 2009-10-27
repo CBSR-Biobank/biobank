@@ -139,17 +139,48 @@ public class ContainerHelper extends DbHelper {
         return container;
     }
 
-    public static void addContainersRandom(SiteWrapper site, String barcode,
-        int count) throws Exception {
+    public static ContainerWrapper addTopContainerRandom(SiteWrapper site,
+        String name, int typeCapacityRow, int typeCapacityCol) throws Exception {
         ContainerTypeWrapper type = ContainerTypeHelper.addContainerType(site,
-            "top" + barcode, "", 1, r.nextInt(10) + 1, r.nextInt(10) + 1, true);
-        ContainerWrapper parent = addContainer("top" + barcode,
-            "top" + barcode, null, site, type);
+            name, "", 1, typeCapacityRow, typeCapacityCol, true);
+        ContainerWrapper container = addContainer(name, name, null, site, type);
+        return container;
+    }
+
+    public static int addTopContainersWithChildren(SiteWrapper site,
+        String barcode, int count) throws Exception {
         for (int i = 0; i < count; i++) {
-            addContainerRandom(site, barcode + (i + 1), parent);
+            ContainerWrapper topContainer = addTopContainerRandom(site, barcode
+                + "TOP" + (i + 1), 3, 6);
+            ContainerTypeWrapper type = ContainerTypeHelper
+                .addContainerTypeRandom(site, barcode + "children" + (i + 1),
+                    false);
+            int maxRow = topContainer.getRowCapacity();
+            for (int j = 0; j < 5; j++) {
+                ContainerWrapper child = newContainer(null, barcode + "child"
+                    + (i + 1) + "_" + j, topContainer, site, type);
+                int posRow = j % maxRow;
+                int posCol = j / maxRow;
+                topContainer.addChild(posRow, posCol, child);
+            }
+            topContainer.persist();
         }
         site.reload();
+        return count + count * 5;
     }
+
+    // public static void addContainersRandom(SiteWrapper site, String barcode,
+    // int count) throws Exception {
+    // ContainerTypeWrapper type = ContainerTypeHelper.addContainerType(site,
+    // "top" + barcode, "", 1, r.nextInt(10) + 1, r.nextInt(10) + 1, true);
+    // ContainerWrapper parent = addContainer("top" + barcode,
+    // "top" + barcode, null, site, type);
+    // for (int i = 0; i < count; i++) {
+    // parent.reload();
+    // addContainerRandom(site, barcode + (i + 1), parent);
+    // }
+    // site.reload();
+    // }
 
     public static ContainerLabelingSchemeWrapper newContainerLabelingScheme() {
         ContainerLabelingSchemeWrapper clsw = new ContainerLabelingSchemeWrapper(

@@ -36,7 +36,6 @@ import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.widgets.CabinetDrawerWidget;
 import edu.ualberta.med.biobank.widgets.ContainerDisplayWidget;
 import edu.ualberta.med.biobank.widgets.infotables.SamplesListWidget;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ContainerViewForm extends BiobankViewForm {
 
@@ -305,15 +304,16 @@ public class ContainerViewForm extends BiobankViewForm {
     private void initContainers(final ContainerTypeWrapper type) {
         BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
             public void run() {
-                boolean initDones = false;
+                boolean initDone = true;
                 try {
-                    initDones = container.initChildrenWithType(type);
-                } catch (ApplicationException ae) {
+                    container.initChildrenWithType(type);
+                } catch (Exception e) {
+                    initDone = false;
                     BioBankPlugin.openAsyncError(
-                        "Error while creating children", ae);
+                        "Error while creating children", e);
                 }
                 // refresh
-                if (initDones) {
+                if (initDone) {
                     PlatformUI.getWorkbench().getDisplay().asyncExec(
                         new Runnable() {
                             public void run() {

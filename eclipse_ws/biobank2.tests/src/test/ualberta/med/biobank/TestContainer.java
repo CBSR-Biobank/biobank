@@ -172,13 +172,22 @@ public class TestContainer extends TestDatabase {
             "F3x10", 2, 3, 10, true);
         containerTypeMap.put("frezer3x10", freezerType);
         hotelType = ContainerTypeHelper.addContainerType(site, "Hotel13",
-            "H-13", 2, 1, 13, true);
+            "H-13", 2, 1, 13, false);
+        List<ContainerTypeWrapper> childContainerTypes = new ArrayList<ContainerTypeWrapper>();
+        childContainerTypes.add(hotelType);
+        freezerType.setChildContainerTypeCollection(childContainerTypes);
+        freezerType.persist();
         containerTypeMap.put("hotel13", hotelType);
+
         cabinetType = ContainerTypeHelper.addContainerType(site, "Cabinet",
             "C", 2, 1, 4, true);
         containerTypeMap.put("cabinet", cabinetType);
         drawerType = ContainerTypeHelper.addContainerType(site, "Drawer36",
-            "D36", 2, 1, 36, true);
+            "D36", 2, 1, 36, false);
+        childContainerTypes = new ArrayList<ContainerTypeWrapper>();
+        childContainerTypes.add(drawerType);
+        cabinetType.setChildContainerTypeCollection(childContainerTypes);
+        cabinetType.persist();
         containerTypeMap.put("drawer36", drawerType);
 
         ContainerWrapper freezer, cabinet, hotel, drawer;
@@ -372,35 +381,37 @@ public class TestContainer extends TestDatabase {
 
         // fail cases
         result = top.getContainer("01AB", containerTypeMap.get("ChildCtL1"));
-        Assert.assertEquals(false, result);
+        Assert.assertNull(result);
 
         result = top.getContainer("01AA02", containerTypeMap.get("ChildCtL1"));
-        Assert.assertEquals(false, result);
+        Assert.assertNull(result);
 
         result = top
             .getContainer("01AA01A2", containerTypeMap.get("ChildCtL3"));
-        Assert.assertEquals(false, result);
+        Assert.assertNull(result);
     }
 
     @Test
     public void testGetContainersHoldingContainerType() throws Exception {
-        ContainerWrapper frezer, hotel, cabinet, drawer;
+        ContainerWrapper freezer, hotel, cabinet, drawer;
 
         addDupLabelledHierarchy();
 
-        frezer = containerMap.get("freezer02");
+        freezer = containerMap.get("freezer02");
         hotel = containerMap.get("H02AA");
         cabinet = containerMap.get("cabinet");
         drawer = containerMap.get("D02AA");
 
-        List<ContainerWrapper> list = frezer
-            .getContainersHoldingContainerType("02AA");
+        List<ContainerWrapper> list = ContainerWrapper
+            .getContainersHoldingContainerType(appService, "02", site, hotel
+                .getContainerType());
         Assert.assertEquals(1, list.size());
-        Assert.assertTrue(list.contains(hotel));
+        Assert.assertTrue(list.contains(freezer));
 
-        list = cabinet.getContainersHoldingContainerType("02AA");
+        list = ContainerWrapper.getContainersHoldingContainerType(appService,
+            "02", site, drawer.getContainerType());
         Assert.assertEquals(1, list.size());
-        Assert.assertTrue(list.contains(drawer));
+        Assert.assertTrue(list.contains(cabinet));
     }
 
     @Test
@@ -442,17 +453,20 @@ public class TestContainer extends TestDatabase {
             containerTypeMap.get("ChildCtL1"), 0, 0);
         top1.reload();
 
-        List<ContainerWrapper> parents = childL1.getPossibleParents("");
+        List<ContainerWrapper> parents = childL1.getPossibleParents("02");
         Assert.assertTrue(parents.contains(top1));
-        Assert.assertTrue(parents.contains(top2));
+        Assert.assertFalse(parents.contains(top2));
 
-        childL2 = containerMap.get("ChildL1");
+        addContainerHierarchy(containerMap.get("Top"));
+        childL1 = containerMap.get("ChildL1");
         childL2 = containerMap.get("ChildL2");
-        parents = childL2.getPossibleParents("");
+        parents = childL2.getPossibleParents("01AA");
         Assert.assertTrue((parents.size() == 1) && parents.contains(childL1));
+        parents = childL2.getPossibleParents("01");
+        Assert.assertEquals(0, parents.size());
 
         parents = top1.getPossibleParents("");
-        Assert.assertTrue(parents.size() == 0);
+        Assert.assertEquals(0, parents.size());
     }
 
     @Test
@@ -460,18 +474,17 @@ public class TestContainer extends TestDatabase {
         ContainerWrapper top, child;
 
         top = containerMap.get("Top");
-        for (int row = 0; row < 5; ++row) {
-            for (int col = 0; col < 9; ++col) {
-                child = ContainerHelper.addContainer(null, "0001", top, site,
-                    containerTypeMap.get("ChildCtL1"), row, col);
-
+        ContainerTypeWrapper type = top.getContainerType();
+        for (int row = 0; row < type.getRowCapacity(); ++row) {
+            for (int col = 0; col < type.getColCapacity(); ++col) {
+                child = ContainerHelper.addContainer(null, "0001_" + row + "_"
+                    + col, top, site, containerTypeMap.get("ChildCtL1"), row,
+                    col);
                 top.reload();
 
-                int index = 9 * row + col;
-                int len = LabelingScheme.CBSR_LABELLING_PATTERN.length();
-                String label = String.format("01%c%c",
-                    LabelingScheme.CBSR_LABELLING_PATTERN.charAt(index / len),
-                    LabelingScheme.CBSR_LABELLING_PATTERN.charAt(index % len));
+                String label = "01"
+                    + LabelingScheme.getPositionString(new RowColPos(row, col),
+                        type);
 
                 ContainerWrapper result = top.getChildWithLabel(label);
                 Assert.assertEquals(child, result);
@@ -495,15 +508,21 @@ public class TestContainer extends TestDatabase {
                         + "%c%c", LabelingScheme.SBS_ROW_LABELLING_PATTERN
                         .charAt(row), LabelingScheme.CBSR_LABELLING_PATTERN
                         .charAt(col));
+                    break;
                 case 2:
                     label = String.format(container.getParent().getLabel()
                         + "%c%c", LabelingScheme.CBSR_LABELLING_PATTERN
                         .charAt(index / len),
                         LabelingScheme.CBSR_LABELLING_PATTERN.charAt(index
                             % len));
+                    break;
                 case 3:
                     label = new Integer(index).toString();
+                    break;
+                default:
+                    Assert.fail("labeling scheme not used");
                 }
+                Assert.assertNotNull(label);
 
                 RowColPos result = container
                     .getPositionFromLabelingScheme(label);
@@ -631,6 +650,7 @@ public class TestContainer extends TestDatabase {
                 / CONTAINER_CHILD_L3_COLS, i % CONTAINER_CHILD_L3_COLS);
         }
 
+        childL3.reload();
         Collection<SampleWrapper> samples = childL3.getSamples().values();
         Assert.assertEquals(sampleTypeList.size(), samples.size());
         for (SampleWrapper sample : samples) {
@@ -732,13 +752,13 @@ public class TestContainer extends TestDatabase {
         Collection<ContainerWrapper> children = top.getChildren().values();
         Assert.assertTrue(children.size() == CONTAINER_TOP_ROWS
             * CONTAINER_TOP_COLS);
-        ContainerWrapper child = children.iterator().next();
         for (ContainerWrapper container : children) {
             if (container.getPosition().equals(0, 0)) {
-                Assert.assertTrue(child.getContainerType() == containerTypeMap
-                    .get("ChildCtL1"));
+                Assert.assertTrue(container.getContainerType().equals(
+                    containerTypeMap.get("ChildCtL1")));
             } else {
-                Assert.assertTrue(child.getContainerType() == childType2);
+                Assert.assertTrue(container.getContainerType().equals(
+                    childType2));
             }
         }
     }

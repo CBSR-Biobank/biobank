@@ -22,7 +22,6 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.SDKQuery;
 import gov.nih.nci.system.query.example.DeleteExampleQuery;
-import gov.nih.nci.system.query.example.InsertExampleQuery;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class ContainerWrapper extends
@@ -208,19 +207,6 @@ public class ContainerWrapper extends
     }
 
     /**
-     * get the containers with label label and from same site as this
-     * containerWrapper and holding this container type
-     * 
-     * @param label label of the container
-     * @throws ApplicationException
-     */
-    public List<ContainerWrapper> getContainersHoldingContainerType(String label)
-        throws ApplicationException {
-        return getContainersHoldingContainerType(appService, label, getSite(),
-            getContainerType());
-    }
-
-    /**
      * compute the ContainerPosition for this container using its label. If the
      * parent container cannot hold the container type of this container, then
      * an exception is launched
@@ -230,15 +216,18 @@ public class ContainerWrapper extends
     public void computePositionFromLabel() throws Exception {
         String parentContainerLabel = getLabel().substring(0,
             getLabel().length() - 2);
-        List<ContainerWrapper> containersWithLabel = getContainersHoldingContainerType(parentContainerLabel);
-        if (containersWithLabel.size() == 0) {
+        List<ContainerWrapper> possibleParents = ContainerWrapper
+            .getContainersHoldingContainerType(appService,
+                parentContainerLabel, getSite(), getContainerType());
+
+        if (possibleParents.size() == 0) {
             throw new Exception("Can't find container with label "
                 + parentContainerLabel + " holding containers of type "
                 + getContainerType().getName());
         }
-        if (containersWithLabel.size() > 1) {
+        if (possibleParents.size() > 1) {
             throw new Exception(
-                containersWithLabel.size()
+                possibleParents.size()
                     + " containers with label "
                     + parentContainerLabel
                     + " and holding container types "
@@ -247,8 +236,8 @@ public class ContainerWrapper extends
         }
         // has the parent container. Can now find the position using the
         // parent labelling scheme
-        setParent(containersWithLabel.get(0));
-        containersWithLabel.get(0).addChild(
+        setParent(possibleParents.get(0));
+        possibleParents.get(0).addChild(
             getLabel().substring(getLabel().length() - 2), this);
 
     }
@@ -579,8 +568,8 @@ public class ContainerWrapper extends
     }
 
     /**
-     * get the containers with label label, with site site and container type
-     * type
+     * get containers with label label in site which can have children of type
+     * container type
      */
     public static List<ContainerWrapper> getContainersHoldingContainerType(
         WritableApplicationService appService, String label, SiteWrapper site,
@@ -668,10 +657,12 @@ public class ContainerWrapper extends
      * children already initialized)
      * 
      * @return true if at least one children has been initialized
+     * @throws BiobankCheckException
+     * @throws WrapperException
+     * @throws ApplicationException
      */
-    public boolean initChildrenWithType(ContainerTypeWrapper type)
-        throws ApplicationException {
-        List<SDKQuery> queries = new ArrayList<SDKQuery>();
+    public void initChildrenWithType(ContainerTypeWrapper type)
+        throws BiobankCheckException, ApplicationException, WrapperException {
         int rows = getContainerType().getRowCapacity().intValue();
         int cols = getContainerType().getColCapacity().intValue();
         for (int i = 0; i < rows; i++) {
@@ -683,20 +674,11 @@ public class ContainerWrapper extends
                     newContainer.setContainerType(type.getWrappedObject());
                     newContainer.setSite(getSite().getWrappedObject());
                     newContainer.setTemperature(getTemperature());
-
-                    newContainer.setPosition(new Integer(i), new Integer(j));
-                    newContainer.setParent(this);
-                    newContainer.setLabel(getLabel()
-                        + LabelingScheme.getPositionString(newContainer));
-                    queries.add(new InsertExampleQuery(newContainer));
+                    addChild(i, j, newContainer);
                 }
             }
         }
-        if (queries.size() > 0) {
-            appService.executeBatchQuery(queries);
-            return true;
-        }
-        return false;
+        persist();
     }
 
     /**
