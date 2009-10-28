@@ -267,7 +267,8 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
     }
 
     @SuppressWarnings("unchecked")
-    public List<StudyWrapper> getStudyCollection(boolean sort) throws Exception {
+    public List<StudyWrapper> getStudyCollection(boolean sort)
+        throws ApplicationException {
         List<StudyWrapper> studyCollection = (List<StudyWrapper>) propertiesMap
             .get("studyCollection");
 
@@ -289,7 +290,7 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
         return studyCollection;
     }
 
-    public List<StudyWrapper> getStudyCollection() throws Exception {
+    public List<StudyWrapper> getStudyCollection() throws ApplicationException {
         return getStudyCollection(false);
     }
 
@@ -300,6 +301,11 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
             throw new BiobankCheckException("Unable to delete clinic "
                 + getName()
                 + ". All defined patient visits must be removed first.");
+        }
+        List<StudyWrapper> studies = getStudyCollection();
+        if (studies != null && studies.size() > 0) {
+            throw new BiobankCheckException("Unable to delete clinic "
+                + getName() + ". No more study reference should exist.");
         }
     }
 

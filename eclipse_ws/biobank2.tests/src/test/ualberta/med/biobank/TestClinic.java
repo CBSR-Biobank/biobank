@@ -20,6 +20,7 @@ import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.Clinic;
+import edu.ualberta.med.biobank.model.Contact;
 
 public class TestClinic extends TestDatabase {
 
@@ -264,6 +265,47 @@ public class TestClinic extends TestDatabase {
             clinic.getId());
         // object is not anymore in database
         Assert.assertNull(clinicInDB);
+    }
+
+    @Test
+    public void testDeleteWithContacts() throws Exception {
+        String name = "testDeleteWithContacts" + r.nextInt();
+        SiteWrapper site = SiteHelper.addSite(name);
+        ClinicWrapper clinic = ClinicHelper.addClinic(site, name);
+        int contactId = ContactHelper.addContact(clinic, name).getId();
+        clinic.reload();
+
+        clinic.delete();
+
+        Contact contactInDB = ModelUtils.getObjectWithId(appService,
+            Contact.class, contactId);
+        Assert.assertNull(contactInDB);
+    }
+
+    @Test
+    public void testDeleteWithContactsLinkedToStudy() throws Exception {
+        String name = "testDeleteWithContacts" + r.nextInt();
+        SiteWrapper site = SiteHelper.addSite(name);
+        ClinicWrapper clinic = ClinicHelper.addClinic(site, name);
+        ContactWrapper contact = ContactHelper.addContact(clinic, name);
+
+        StudyWrapper study = StudyHelper.addStudy(site, name);
+        List<ContactWrapper> studyContacts = new ArrayList<ContactWrapper>();
+        studyContacts.add(contact);
+        study.setContactCollection(studyContacts);
+        study.persist();
+
+        clinic.reload();
+        contact.reload();
+
+        try {
+            clinic.delete();
+            Assert
+                .fail("Can't remove a clinic if a study linked to one of its contacts still exists");
+        } catch (BiobankCheckException bce) {
+            Assert.assertTrue(true);
+        }
+
     }
 
     @Test

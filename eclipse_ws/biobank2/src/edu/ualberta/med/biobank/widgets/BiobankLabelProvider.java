@@ -1,9 +1,6 @@
 package edu.ualberta.med.biobank.widgets;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
@@ -11,7 +8,6 @@ import org.eclipse.swt.graphics.Image;
 import org.springframework.util.Assert;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
-import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
@@ -33,8 +29,6 @@ import edu.ualberta.med.biobank.model.StudyContactAndPatientInfo;
 import edu.ualberta.med.biobank.model.StudyContactInfo;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.widgets.infotables.BiobankCollectionModel;
-import gov.nih.nci.system.applicationservice.ApplicationException;
-import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 /**
  * This code must not run in the UI thread.
@@ -93,22 +87,12 @@ public class BiobankLabelProvider extends LabelProvider implements
                 return ct.getActivityStatus();
 
             case 3:
-                HQLCriteria c = new HQLCriteria(
-                    "select count(*) from edu.ualberta.med.biobank.model.Container where containerType.id=?",
-                    Arrays.asList(new Object[] { ct.getId() }));
-                List<Object> results = new ArrayList<Object>();
+                long count = 0;
                 try {
-                    results = SessionManager.getAppService().query(c);
-                } catch (ApplicationException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
+                    count = ct.getContainersCount();
+                } catch (Exception e) {
                 }
-                if (results.size() != 1) {
-                    BioBankPlugin.openAsyncError("Bad Query Result",
-                        "Query failed to return useful results.");
-                    return "";
-                } else
-                    return String.valueOf(results.get(0));
+                return String.valueOf(count);
             case 4:
                 Double temp = ct.getDefaultTemperature();
                 if (temp == null) {

@@ -5,11 +5,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Random;
 
 import junit.framework.Assert;
 
-import org.junit.Before;
 import org.junit.Test;
 
 import edu.ualberta.med.biobank.model.AbstractPosition;
@@ -32,13 +30,6 @@ import gov.nih.nci.system.query.example.UpdateExampleQuery;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class TestFunctionalities extends TestDatabase {
-
-    private Random r;
-
-    @Before
-    public void setUp() throws Exception {
-        r = new Random();
-    }
 
     /**
      * Test equals method on object get from database
