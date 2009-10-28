@@ -38,7 +38,6 @@ public class SessionAdapter extends AdapterBase {
         setId(sessionId);
         setName(name);
         this.userName = userName;
-        // getUserCsmId();
     }
 
     @Override

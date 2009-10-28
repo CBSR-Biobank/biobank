@@ -45,6 +45,8 @@ public class PatientVisitViewForm extends BiobankViewForm {
 
     private Label commentsLabel;
 
+    private Label usernameLabel;
+
     public PatientVisitViewForm() {
         super();
         pvCustomInfoMap = new ListOrderedMap();
@@ -98,6 +100,9 @@ public class PatientVisitViewForm extends BiobankViewForm {
         commentsLabel = (Label) createWidget(client, Label.class, SWT.WRAP,
             "Comments");
 
+        usernameLabel = (Label) createWidget(client, Label.class, SWT.WRAP,
+            "Creator");
+
         setPatientVisitValues();
     }
 
@@ -150,14 +155,13 @@ public class PatientVisitViewForm extends BiobankViewForm {
             patientVisitWrapper.getClinic() == null ? "" : patientVisitWrapper
                 .getClinic().getName());
         FormUtils.setTextValue(dateProcessedLabel, patientVisitWrapper
-            .getDateProcessed() == null ? "" : patientVisitWrapper
-            .getDateProcessed());
+            .getFormattedDateProcessed());
         FormUtils.setTextValue(dateReceivedLabel, patientVisitWrapper
-            .getDateReceived() == null ? "" : patientVisitWrapper
-            .getDateReceived());
-        FormUtils.setTextValue(commentsLabel,
-            patientVisitWrapper.getComments() == null ? ""
-                : patientVisitWrapper.getComments());
+            .getFormattedDateReceived());
+        FormUtils
+            .setTextValue(commentsLabel, patientVisitWrapper.getComments());
+        FormUtils
+            .setTextValue(usernameLabel, patientVisitWrapper.getUsername());
         // FIXME update all pvinfos ?
     }
 

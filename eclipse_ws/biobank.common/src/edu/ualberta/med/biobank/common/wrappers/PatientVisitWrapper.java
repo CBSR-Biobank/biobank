@@ -41,7 +41,7 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
     protected String[] getPropertyChangesNames() {
         return new String[] { "patient", "dateDrawn", "dateProcessed",
             "dateReceived", "clinic", "comments", "pvInfoDataCollection",
-            "sampleCollection" };
+            "sampleCollection", "username" };
     }
 
     public Date getDateDrawn() {
@@ -318,6 +318,20 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
                 + getDateDrawn() + " already exist in patient "
                 + getPatient().getNumber() + ".");
         }
+        if (isNew() && getUsername() == null) {
+
+        }
+    }
+
+    public String getUsername() {
+        return wrappedObject.getUsername();
+    }
+
+    public void setUsername(String username) {
+        String oldUsername = wrappedObject.getUsername();
+        wrappedObject.setUsername(username);
+        propertyChangeSupport.firePropertyChange("username", oldUsername,
+            username);
     }
 
     @Override

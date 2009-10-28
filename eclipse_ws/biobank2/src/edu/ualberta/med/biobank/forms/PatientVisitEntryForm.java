@@ -27,6 +27,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
@@ -334,12 +335,15 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         patientVisitWrapper.setDateReceived(dateReceived.getDate());
         patientVisitWrapper.setComments(commentsText.getText());
 
-        // FIXME get csm_user_id and set it to the Patient Visit at insert
-
         setPvCustomInfo();
         patientVisitWrapper
             .setPvSampleSourceCollection(pvSampleSourceEntryWidget
                 .getPvSampleSources());
+
+        if (patientVisitWrapper.isNew()) {
+            patientVisitWrapper.setUsername(SessionManager.getInstance()
+                .getSession().getUserName());
+        }
         patientVisitWrapper.persist();
 
         patientAdapter.performExpand();
