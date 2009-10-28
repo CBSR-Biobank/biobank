@@ -207,6 +207,11 @@ public class SampleStorageEntryWidget extends BiobankWidget {
         return sampleStorageTable.getCollection();
     }
 
+    public void setSampleStorage(List<SampleStorageWrapper> sampleStorage) {
+        selectedSampleStorage = sampleStorage;
+        sampleStorageTable.setCollection(sampleStorage);
+    }
+
     @Override
     public boolean setFocus() {
         return addSampleStorageButton.setFocus();

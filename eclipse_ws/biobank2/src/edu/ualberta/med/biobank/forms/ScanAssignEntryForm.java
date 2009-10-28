@@ -144,6 +144,7 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
                 "productBarcode"), new NonEmptyString(
                 "Enter pallet position code"));
         palletCodeText.addKeyListener(EnterKeyToNextFieldListener.INSTANCE);
+        firstControl = palletCodeText;
 
         palletPositionText = (Text) createBoundWidgetWithLabel(fieldsComposite,
             Text.class, SWT.NONE, "Pallet label", null, BeansObservables
@@ -571,11 +572,6 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
     @Override
     protected String getOkMessage() {
         return "Assigning samples location.";
-    }
-
-    @Override
-    public void setFocus() {
-        palletCodeText.setFocus();
     }
 
     /**

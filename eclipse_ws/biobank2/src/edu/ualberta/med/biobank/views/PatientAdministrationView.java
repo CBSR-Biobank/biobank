@@ -190,11 +190,6 @@ public class PatientAdministrationView extends ViewPart implements
         }
     }
 
-    @Override
-    public void setFocus() {
-
-    }
-
     public TreeViewer getTreeViewer() {
         return adaptersTree.getTreeViewer();
     }
@@ -251,5 +246,10 @@ public class PatientAdministrationView extends ViewPart implements
             .getSourceProvider(SiteSelectionState.SITE_SELECTION_ID);
         siteSelectionStateSourceProvider
             .removeSourceProviderListener(siteStateListener);
+    }
+
+    @Override
+    public void setFocus() {
+
     }
 }

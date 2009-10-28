@@ -6,13 +6,8 @@ import org.apache.log4j.Logger;
 import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.ControlContribution;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -40,6 +35,10 @@ public abstract class BiobankViewForm extends BiobankFormBase {
     private static ImageDescriptor reloadActionImage = ImageDescriptor
         .createFromImage(BioBankPlugin.getDefault().getImageRegistry().get(
             BioBankPlugin.IMG_RELOAD_FORM));
+
+    private static ImageDescriptor editActionImage = ImageDescriptor
+        .createFromImage(BioBankPlugin.getDefault().getImageRegistry().get(
+            BioBankPlugin.IMG_EDIT_FORM));
 
     @Override
     public void createPartControl(Composite parent) {
@@ -97,18 +96,35 @@ public abstract class BiobankViewForm extends BiobankFormBase {
                 });
             }
         };
-
         reloadAction.setImageDescriptor(reloadActionImage);
         form.getToolBarManager().add(reloadAction);
 
-        ControlContribution edit = new ControlContribution("Edit") {
+        // ControlContribution edit = new ControlContribution("Edit") {
+        // @Override
+        // protected Control createControl(Composite parent) {
+        // final Button editButton = new Button(parent, SWT.PUSH);
+        // editButton.setText("Edit");
+        // editButton.addSelectionListener(new SelectionAdapter() {
+        // @Override
+        // public void widgetSelected(SelectionEvent e) {
+        // getSite().getPage().closeEditor(BiobankViewForm.this,
+        // false);
+        // try {
+        // getSite().getPage().openEditor(
+        // new FormInput(adapter), getEntryFormId(), true);
+        // } catch (PartInitException exp) {
+        // LOGGER.error("Can't open the entry form", exp);
+        // }
+        // }
+        // });
+        // return editButton;
+        // }
+        // };
+        Action edit = new Action("Edit") {
             @Override
-            protected Control createControl(Composite parent) {
-                final Button editButton = new Button(parent, SWT.PUSH);
-                editButton.setText("Edit");
-                editButton.addSelectionListener(new SelectionAdapter() {
-                    @Override
-                    public void widgetSelected(SelectionEvent e) {
+            public void run() {
+                BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
+                    public void run() {
                         getSite().getPage().closeEditor(BiobankViewForm.this,
                             false);
                         try {
@@ -119,10 +135,11 @@ public abstract class BiobankViewForm extends BiobankFormBase {
                         }
                     }
                 });
-                return editButton;
             }
         };
+        edit.setImageDescriptor(editActionImage);
         form.getToolBarManager().add(edit);
+
         form.updateToolBar();
     }
 

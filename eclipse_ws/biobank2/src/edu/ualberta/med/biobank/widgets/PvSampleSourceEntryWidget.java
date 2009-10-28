@@ -199,6 +199,12 @@ public class PvSampleSourceEntryWidget extends BiobankWidget {
         return pvSampleSourceTable.getCollection();
     }
 
+    public void setSelectedPvSampleSources(
+        List<PvSampleSourceWrapper> selectedPvSampleSources) {
+        this.selectedPvSampleSources = selectedPvSampleSources;
+        pvSampleSourceTable.setCollection(selectedPvSampleSources);
+    }
+
     @Override
     public boolean setFocus() {
         return addPvSampleSourceButton.setFocus();

@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank;
 
 import java.net.URL;
-import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -45,14 +44,6 @@ public class BioBankPlugin extends AbstractUIPlugin {
 
     public static final String IMAGE_ID = "biobank2.image";
 
-    public static final String DATE_FORMAT = "yyyy-MM-dd";
-
-    public SimpleDateFormat dateFormatter;
-
-    public static final String DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm";
-
-    public SimpleDateFormat dateTimeFormatter;
-
     public static final String IMG_FORM_BG = "formBg";
     public static final String IMG_ADD = "add";
     public static final String IMG_BIN = "bin";
@@ -75,6 +66,10 @@ public class BioBankPlugin extends AbstractUIPlugin {
     public static final String IMG_PATIENT = "patient";
     public static final String IMG_PATIENT_VISIT = "patientVisit";
     public static final String IMG_RELOAD_FORM = "reloadForm";
+    public static final String IMG_EDIT_FORM = "editForm";
+    public static final String IMG_RESET_FORM = "resetForm";
+    public static final String IMG_CANCEL_FORM = "cancelForm";
+    public static final String IMG_CONFIRM_FORM = "confirmForm";
     public static final String IMG_REPORTS = "reports";
     public static final String IMG_SCAN_ASSIGN = "scanAssign";
     public static final String IMG_SCAN_LINK = "scanLink";
@@ -167,6 +162,10 @@ public class BioBankPlugin extends AbstractUIPlugin {
         registerImage(registry, IMG_PATIENT, "patient.png");
         registerImage(registry, IMG_PATIENT_VISIT, "patientVisit.png");
         registerImage(registry, IMG_RELOAD_FORM, "reload.png");
+        registerImage(registry, IMG_EDIT_FORM, "edit.png");
+        registerImage(registry, IMG_RESET_FORM, "reset.png");
+        registerImage(registry, IMG_CANCEL_FORM, "cancel.png");
+        registerImage(registry, IMG_CONFIRM_FORM, "confirm.png");
         registerImage(registry, IMG_REPORTS, "reports.png");
         registerImage(registry, IMG_SCAN_ASSIGN, "scanAssign.png");
         registerImage(registry, IMG_SCAN_LINK, "scanLink.png");
@@ -345,21 +344,6 @@ public class BioBankPlugin extends AbstractUIPlugin {
             return Boolean.valueOf(realScan);
         }
         return true;
-    }
-
-    public static SimpleDateFormat getDateFormatter() {
-        if (getDefault().dateFormatter == null) {
-            getDefault().dateFormatter = new SimpleDateFormat(DATE_FORMAT);
-        }
-        return getDefault().dateFormatter;
-    }
-
-    public static SimpleDateFormat getDateTimeFormatter() {
-        if (getDefault().dateTimeFormatter == null) {
-            getDefault().dateTimeFormatter = new SimpleDateFormat(
-                DATE_TIME_FORMAT);
-        }
-        return getDefault().dateTimeFormatter;
     }
 
     public String getPrinter() {

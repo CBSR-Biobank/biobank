@@ -47,7 +47,8 @@ public class SiteWrapper extends ModelWrapper<Site> {
     protected String[] getPropertyChangesNames() {
         return new String[] { "name", "activityStatus", "comment", "address",
             "clinicCollection", "siteCollection", "containerCollection",
-            "sampleTypeCollection", "pvInfoPossibleCollection" };
+            "sampleTypeCollection", "pvInfoPossibleCollection", "street1",
+            "street2", "city", "province", "postalCode" };
     }
 
     public String getName() {
@@ -111,11 +112,13 @@ public class SiteWrapper extends ModelWrapper<Site> {
     }
 
     public void setStreet1(String street1) {
+        String old = getStreet1();
         AddressWrapper address = getAddress();
         if (address == null) {
             address = initAddress();
         }
         address.setStreet1(street1);
+        propertyChangeSupport.firePropertyChange("street1", old, street1);
     }
 
     public String getStreet2() {
@@ -127,11 +130,13 @@ public class SiteWrapper extends ModelWrapper<Site> {
     }
 
     public void setStreet2(String street2) {
+        String old = getStreet2();
         AddressWrapper address = getAddress();
         if (address == null) {
             address = initAddress();
         }
         address.setStreet2(street2);
+        propertyChangeSupport.firePropertyChange("street2", old, street2);
     }
 
     public String getCity() {
@@ -143,11 +148,13 @@ public class SiteWrapper extends ModelWrapper<Site> {
     }
 
     public void setCity(String city) {
+        String old = getCity();
         AddressWrapper address = getAddress();
         if (address == null) {
             address = initAddress();
         }
         address.setCity(city);
+        propertyChangeSupport.firePropertyChange("city", old, city);
     }
 
     public String getProvince() {
@@ -159,11 +166,13 @@ public class SiteWrapper extends ModelWrapper<Site> {
     }
 
     public void setProvince(String province) {
+        String old = getProvince();
         AddressWrapper address = getAddress();
         if (address == null) {
             address = initAddress();
         }
         address.setProvince(province);
+        propertyChangeSupport.firePropertyChange("province", old, province);
     }
 
     public String getPostalCode() {
@@ -175,11 +184,13 @@ public class SiteWrapper extends ModelWrapper<Site> {
     }
 
     public void setPostalCode(String postalCode) {
+        String old = postalCode;
         AddressWrapper address = getAddress();
         if (address == null) {
             address = initAddress();
         }
         address.setPostalCode(postalCode);
+        propertyChangeSupport.firePropertyChange("postalCode", old, postalCode);
     }
 
     @Override

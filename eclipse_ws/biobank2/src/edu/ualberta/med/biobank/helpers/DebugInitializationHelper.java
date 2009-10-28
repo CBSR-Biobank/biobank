@@ -1,15 +1,11 @@
 package edu.ualberta.med.biobank.helpers;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 
@@ -27,28 +23,27 @@ import org.eclipse.ui.progress.IProgressConstants;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.LabelingScheme;
 import edu.ualberta.med.biobank.common.RowColPos;
+import edu.ualberta.med.biobank.common.formatters.DateFormatter;
+import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
-import edu.ualberta.med.biobank.model.Address;
-import edu.ualberta.med.biobank.model.Capacity;
-import edu.ualberta.med.biobank.model.Clinic;
-import edu.ualberta.med.biobank.model.Contact;
-import edu.ualberta.med.biobank.model.Container;
+import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
+import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.common.wrappers.WrapperException;
 import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
-import edu.ualberta.med.biobank.model.ContainerPosition;
-import edu.ualberta.med.biobank.model.ContainerType;
-import edu.ualberta.med.biobank.model.Patient;
-import edu.ualberta.med.biobank.model.PatientVisit;
-import edu.ualberta.med.biobank.model.Sample;
 import edu.ualberta.med.biobank.model.SampleStorage;
 import edu.ualberta.med.biobank.model.SampleType;
-import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
-import gov.nih.nci.system.query.SDKQueryResult;
-import gov.nih.nci.system.query.example.DeleteExampleQuery;
 import gov.nih.nci.system.query.example.InsertExampleQuery;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
@@ -68,22 +63,22 @@ public class DebugInitializationHelper {
 
     private WritableApplicationService appService;
 
-    private Site site;
-    private Study study;
-    private Clinic[] clinics;
+    private SiteWrapper site;
+    private StudyWrapper study;
+    private ClinicWrapper[] clinics;
 
-    private ContainerType palletType;
-    private ContainerType hotel19Type;
-    private ContainerType hotel13Type;
-    private ContainerType freezerType;
+    private ContainerTypeWrapper palletType;
+    private ContainerTypeWrapper hotel19Type;
+    private ContainerTypeWrapper hotel13Type;
+    private ContainerTypeWrapper freezerType;
 
-    private Collection<Patient> patients;
+    private Collection<PatientWrapper> patients;
 
-    private Collection<PatientVisit> patientVisits;
+    private Collection<PatientVisitWrapper> patientVisits;
 
-    private ContainerType binType;
+    private ContainerTypeWrapper binType;
 
-    private ContainerType drawerType;
+    private ContainerTypeWrapper drawerType;
 
     private HashMap<String, ContainerLabelingScheme> numSchemeMap;
 
@@ -93,25 +88,13 @@ public class DebugInitializationHelper {
             protected IStatus run(IProgressMonitor monitor) {
                 try {
                     monitor.beginTask("Adding new objects to database...", 16);
-                    clinics = new Clinic[MAX_CLINICS];
+                    clinics = new ClinicWrapper[MAX_CLINICS];
                     numSchemeMap = new HashMap<String, ContainerLabelingScheme>();
 
                     appService = SessionManager.getInstance().getSession()
                         .getAppService();
 
-                    // new classes should be added here
-                    Class<?>[] classTypes = new Class<?>[] { Container.class,
-                        ContainerType.class, PatientVisit.class, Patient.class,
-                        Study.class, Clinic.class, Site.class };
-
-                    for (Class<?> classType : classTypes) {
-                        monitor.subTask("deleting all " + classType.getName()
-                            + " objects");
-                        deleteAll(classType);
-                        monitor.worked(1);
-                        if (monitor.isCanceled())
-                            throw new OperationCanceledException();
-                    }
+                    deleteSites(monitor);
 
                     // insert methods are listed here and order is important
                     String[] insertMethodNames = new String[] { "insertSite",
@@ -176,65 +159,58 @@ public class DebugInitializationHelper {
     }
 
     @SuppressWarnings("unused")
-    private void insertSite() throws ApplicationException {
-        site = new Site();
+    private void insertSite() throws ApplicationException,
+        BiobankCheckException, WrapperException {
+        site = new SiteWrapper(appService);
         site.setName("Site Edmonton Test");
-        Address address = new Address();
-        address.setCity("Edmonton");
-        site.setAddress(address);
-        SDKQueryResult res = appService.executeQuery(new InsertExampleQuery(
-            site));
-        site = (Site) res.getObjectResult();
+        site.setCity("Edmonton");
+        site.persist();
     }
 
     @SuppressWarnings("unused")
-    private void insertClinicsInSite() throws ApplicationException {
+    private void insertClinicsInSite() throws ApplicationException,
+        BiobankCheckException, WrapperException {
         for (int i = 0; i < 2; ++i) {
-            Clinic clinic = new Clinic();
+            ClinicWrapper clinic = new ClinicWrapper(appService);
             clinic.setName("Clinic " + (i + 1));
             clinic.setSite(site);
-
-            Address address = new Address();
-            address.setCity("Edmonton");
-            clinic.setAddress(address);
-
-            SDKQueryResult res = appService
-                .executeQuery(new InsertExampleQuery(clinic));
-            clinics[i] = (Clinic) res.getObjectResult();
+            clinic.setCity("Edmonton");
+            clinic.persist();
+            clinics[i] = clinic;
 
             for (int j = 0; j < 2; ++j) {
-                Contact contact = new Contact();
+                ContactWrapper contact = new ContactWrapper(appService);
                 contact.setName("Contact " + (i + 1) + "-" + (j + 1));
-                contact.setClinic(clinics[i]);
-
-                res = appService.executeQuery(new InsertExampleQuery(contact));
+                contact.setClinicWrapper(clinics[i]);
+                contact.persist();
             }
         }
     }
 
     @SuppressWarnings("unused")
-    private void insertStudyInSite() throws ApplicationException {
-        study = new Study();
+    private void insertStudyInSite() throws Exception {
+        study = new StudyWrapper(appService);
         study.setName("Blood Borne Pathogens");
         study.setNameShort("BBP");
         study.setSite(site);
-        SDKQueryResult res = appService.executeQuery(new InsertExampleQuery(
-            study));
-        study = (Study) res.getObjectResult();
+        clinics[0].reload();
+        study.setContactCollection(Arrays
+            .asList(new ContactWrapper[] { clinics[0].getContactCollection()
+                .get(0) }));
+        study.persist();
     }
 
     @SuppressWarnings("unused")
-    private void insertSampleInPatientVisit() throws ApplicationException {
-        for (PatientVisit patientVisit : patientVisits) {
-            Sample sample = new Sample();
+    private void insertSampleInPatientVisit() throws ApplicationException,
+        BiobankCheckException, WrapperException {
+        for (PatientVisitWrapper patientVisit : patientVisits) {
+            SampleWrapper sample = new SampleWrapper(appService);
             sample.setInventoryId(Integer.valueOf(new Random().nextInt(10000))
                 .toString());
             sample.setPatientVisit(patientVisit);
             sample.setLinkDate(new Date());
             sample.setSampleType(getSampleType());
-            SDKQueryResult res = appService
-                .executeQuery(new InsertExampleQuery(sample));
-            sample = (Sample) res.getObjectResult();
+            sample.persist();
         }
     }
 
@@ -245,59 +221,45 @@ public class DebugInitializationHelper {
 
     @SuppressWarnings("unused")
     private void insertPatientVisitsInPatient() throws Exception {
-        patientVisits = new ArrayList<PatientVisit>();
+        patientVisits = new ArrayList<PatientVisitWrapper>();
         Random r = new Random();
-        for (Patient patient : patients) {
+        for (PatientWrapper patient : patients) {
             createPatientVisit(r, patient);
             createPatientVisit(r, patient);
             createPatientVisit(r, patient);
         }
     }
 
-    private void createPatientVisit(Random r, Patient patient)
-        throws ParseException, ApplicationException {
-        PatientVisit patientVisit = new PatientVisit();
+    private void createPatientVisit(Random r, PatientWrapper patient)
+        throws ApplicationException, BiobankCheckException, WrapperException {
+        PatientVisitWrapper patientVisit = new PatientVisitWrapper(appService);
         patientVisit.setClinic(clinics[0]);
         String dateStr = String.format("2009-%02d-25 %02d:%02d",
             r.nextInt(12) + 1, r.nextInt(24), r.nextInt(60));
-        SimpleDateFormat sdf = new SimpleDateFormat(
-            BioBankPlugin.DATE_TIME_FORMAT);
-        patientVisit.setDateDrawn(sdf.parse(dateStr));
+        patientVisit.setDateDrawn(DateFormatter.parseToDateTime(dateStr));
 
         patientVisit.setPatient(patient);
-        SDKQueryResult res = appService.executeQuery(new InsertExampleQuery(
-            patientVisit));
-        patientVisit = (PatientVisit) res.getObjectResult();
+        patientVisit.persist();
         patientVisits.add(patientVisit);
     }
 
     @SuppressWarnings("unused")
-    private void insertPatientInStudy() throws ApplicationException {
-        patients = new ArrayList<Patient>();
+    private void insertPatientInStudy() throws ApplicationException,
+        BiobankCheckException, WrapperException {
+        patients = new ArrayList<PatientWrapper>();
         for (int i = 0; i < 100; i++) {
-            Patient patient = new Patient();
+            PatientWrapper patient = new PatientWrapper(appService);
             patient.setNumber(Integer.toString(i));
             patient.setStudy(study);
 
-            SDKQueryResult res = appService
-                .executeQuery(new InsertExampleQuery(patient));
-            patient = (Patient) res.getObjectResult();
+            patient.persist();
             patients.add(patient);
         }
     }
 
-    private void deleteAll(Class<?> classType) throws Exception {
-        Constructor<?> constructor = classType.getConstructor();
-        Object instance = constructor.newInstance();
-        List<?> list = appService.search(classType, instance);
-        for (Object o : list) {
-            appService.executeQuery(new DeleteExampleQuery(o));
-        }
-
-    }
-
     @SuppressWarnings("unused")
-    private void insertContainerTypesInSite() throws ApplicationException {
+    private void insertContainerTypesInSite() throws ApplicationException,
+        BiobankCheckException, WrapperException {
         List<ContainerLabelingScheme> numSchemes = appService.search(
             ContainerLabelingScheme.class, new ContainerLabelingScheme());
         Assert.isNotNull(numSchemes);
@@ -307,34 +269,39 @@ public class DebugInitializationHelper {
 
         // Freezer Types
         palletType = insertContainerTypeInSite("Pallet-96", "P96", false, 8,
-            12, null, numSchemeMap.get("SBS Standard"));
+            12, null, numSchemeMap.get("SBS Standard").getId());
         hotel13Type = insertContainerTypeInSite("Hotel-13", "H13", false, 13,
-            1, Arrays.asList(new ContainerType[] { palletType }), numSchemeMap
-                .get("2 char numeric"));
+            1, Arrays.asList(new ContainerTypeWrapper[] { palletType }),
+            numSchemeMap.get("2 char numeric").getId());
         hotel19Type = insertContainerTypeInSite("Hotel-19", "H19", false, 19,
-            1, Arrays.asList(new ContainerType[] { palletType }), numSchemeMap
-                .get("2 char numeric"));
-        freezerType = insertContainerTypeInSite("Freezer", "FR", true, 3, 10,
-            Arrays.asList(new ContainerType[] { hotel13Type, hotel19Type }),
-            numSchemeMap.get("CBSR 2 char alphabetic"));
+            1, Arrays.asList(new ContainerTypeWrapper[] { palletType }),
+            numSchemeMap.get("2 char numeric").getId());
+        freezerType = insertContainerTypeInSite(
+            "Freezer",
+            "FR",
+            true,
+            3,
+            10,
+            Arrays
+                .asList(new ContainerTypeWrapper[] { hotel13Type, hotel19Type }),
+            numSchemeMap.get("CBSR 2 char alphabetic").getId());
 
         // Cabinet Types
         binType = insertContainerTypeInSite("Bin", "Bin", false, 120, 1, null,
-            numSchemeMap.get("CBSR 2 char alphabetic"));
+            numSchemeMap.get("CBSR 2 char alphabetic").getId());
         drawerType = insertContainerTypeInSite("Drawer", "Dr", false, 36, 1,
-            Arrays.asList(new ContainerType[] { binType }), numSchemeMap
-                .get("2 char numeric"));
+            Arrays.asList(new ContainerTypeWrapper[] { binType }), numSchemeMap
+                .get("2 char numeric").getId());
         insertContainerTypeInSite("Cabinet", "Cab", true, 4, 1, Arrays
-            .asList(new ContainerType[] { drawerType }), numSchemeMap
-            .get("CBSR 2 char alphabetic"));
+            .asList(new ContainerTypeWrapper[] { drawerType }), numSchemeMap
+            .get("CBSR 2 char alphabetic").getId());
     }
 
-    private ContainerType insertContainerTypeInSite(String name,
+    private ContainerTypeWrapper insertContainerTypeInSite(String name,
         String shortName, boolean topLevel, int dim1, int dim2,
-        List<ContainerType> children,
-        ContainerLabelingScheme childLabelingScheme)
-        throws ApplicationException {
-        ContainerType ct = new ContainerType();
+        List<ContainerTypeWrapper> children, Integer childLabelingScheme)
+        throws ApplicationException, BiobankCheckException, WrapperException {
+        ContainerTypeWrapper ct = new ContainerTypeWrapper(appService);
         ct.setName(name);
         ct.setNameShort(shortName);
         ct.setTopLevel(topLevel);
@@ -342,53 +309,43 @@ public class DebugInitializationHelper {
         if (childLabelingScheme != null) {
             ct.setChildLabelingScheme(childLabelingScheme);
         }
-        Capacity capacity = new Capacity();
-        capacity.setRowCapacity(dim1);
-        capacity.setColCapacity(dim2);
-        ct.setCapacity(capacity);
+        ct.setRowCapacity(dim1);
+        ct.setColCapacity(dim2);
         if (children != null) {
-            ct.setChildContainerTypeCollection(new HashSet<ContainerType>(
-                children));
+            ct.setChildContainerTypeCollection(children);
         }
-        SDKQueryResult res = appService
-            .executeQuery(new InsertExampleQuery(ct));
-        return (ContainerType) res.getObjectResult();
+        ct.persist();
+        return ct;
     }
 
-    private Container insertContainer(String label, ContainerType ct,
-        Container parent) throws Exception {
-        Container container = new Container();
+    private ContainerWrapper insertContainer(String label,
+        ContainerTypeWrapper ct, ContainerWrapper parent) throws Exception {
+        ContainerWrapper container = new ContainerWrapper(appService);
         container.setLabel(label);
         container.setProductBarcode(label);
         container.setSite(site);
         container.setContainerType(ct);
         if (parent != null) {
             RowColPos rc = LabelingScheme.getRowColFromPositionString(container
-                .getLabel(), new ContainerTypeWrapper(appService, parent
-                .getContainerType()));
+                .getLabel(), parent.getContainerType());
             if (rc == null) {
                 throw new Exception(
                     "error while getting the position from string");
             }
-            ContainerPosition pos = new ContainerPosition();
-            pos.setContainer(container);
-            pos.setParentContainer(parent);
-            pos.setRow(rc.row);
-            pos.setCol(rc.col);
-            container.setPosition(pos);
+            container.setParent(parent);
+            container.setPosition(rc);
         }
-        SDKQueryResult res = appService.executeQuery(new InsertExampleQuery(
-            container));
-        return (Container) res.getObjectResult();
+        container.persist();
+        return container;
     }
 
     @SuppressWarnings("unused")
     private void insertContainers() throws Exception {
-        Container freezer = insertContainer("01", freezerType, null);
-        Container hotel1 = insertContainer("01AA", hotel19Type, freezer);
+        ContainerWrapper freezer = insertContainer("01", freezerType, null);
+        ContainerWrapper hotel1 = insertContainer("01AA", hotel19Type, freezer);
         insertContainer("01AA01", palletType, hotel1);
         insertContainer("01AA03", palletType, hotel1);
-        Container hotel2 = insertContainer("01AE", hotel13Type, freezer);
+        ContainerWrapper hotel2 = insertContainer("01AE", hotel13Type, freezer);
         insertContainer("01AE01", palletType, hotel2);
         insertContainer("01AE05", palletType, hotel2);
     }
@@ -436,6 +393,99 @@ public class DebugInitializationHelper {
             ss.setStudy(bbpStudy);
 
             appService.executeQuery(new InsertExampleQuery(ss));
+        }
+    }
+
+    public void deleteSites(IProgressMonitor monitor) throws Exception {
+        for (SiteWrapper site : SiteWrapper.getAllSites(appService)) {
+            monitor.subTask("deleting site " + site);
+            site.reload();
+            deleteContainers(site.getTopContainerCollection(), monitor);
+            // in case containers with no top level type has been created
+            // without a
+            // parent :
+            // TODO check if still need this with last modifications
+            site.reload();
+            deleteContainers(site.getContainerCollection(), monitor);
+            deleteStudies(site.getStudyCollection(), monitor);
+            deleteClinics(site.getClinicCollection(), monitor);
+            deleteFromList(site.getContainerTypeCollection(), monitor);
+            site.reload();
+            site.delete();
+            monitor.worked(1);
+        }
+    }
+
+    public void deleteContainers(Collection<ContainerWrapper> containers,
+        IProgressMonitor monitor) throws Exception {
+        if ((containers == null) || (containers.size() == 0))
+            return;
+
+        for (ContainerWrapper container : containers) {
+            monitor.subTask("deleting container " + container);
+            container.reload();
+            if (container.hasChildren()) {
+                deleteContainers(container.getChildren().values(), monitor);
+            }
+            if (container.hasSamples()) {
+                deleteFromList(container.getSamples().values(), monitor);
+            }
+            container.reload();
+            container.delete();
+            monitor.worked(1);
+        }
+    }
+
+    public void deleteStudies(List<StudyWrapper> studies,
+        IProgressMonitor monitor) throws Exception {
+        if (studies == null)
+            return;
+
+        for (StudyWrapper study : studies) {
+            monitor.subTask("deleting study " + study);
+            deletePatients(study.getPatientCollection(), monitor);
+            study.reload();
+            study.delete();
+            monitor.worked(1);
+        }
+    }
+
+    public void deletePatients(List<PatientWrapper> patients,
+        IProgressMonitor monitor) throws Exception {
+        if (patients == null)
+            return;
+
+        for (PatientWrapper patient : patients) {
+            monitor.subTask("deleting patient " + patient);
+            deleteFromList(patient.getPatientVisitCollection(), monitor);
+            patient.reload();
+            patient.delete();
+            monitor.worked(1);
+        }
+    }
+
+    public void deleteClinics(List<ClinicWrapper> clinics,
+        IProgressMonitor monitor) throws Exception {
+        for (ClinicWrapper clinic : clinics) {
+            monitor.subTask("deleting clinic " + clinic);
+            clinic.reload();
+            deleteFromList(clinic.getContactCollection(), monitor);
+            clinic.reload();
+            clinic.delete();
+            monitor.worked(1);
+        }
+    }
+
+    public void deleteFromList(Collection<? extends ModelWrapper<?>> list,
+        IProgressMonitor monitor) throws Exception {
+        if (list == null)
+            return;
+
+        for (ModelWrapper<?> object : list) {
+            monitor.subTask("deleting object " + object);
+            object.reload();
+            object.delete();
+            monitor.worked(1);
         }
     }
 

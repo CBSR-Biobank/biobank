@@ -209,8 +209,10 @@ public class StudyWrapper extends ModelWrapper<Study> {
 
     public void setContactCollection(List<ContactWrapper> contacts) {
         Collection<Contact> contactObjects = new HashSet<Contact>();
-        for (ContactWrapper contact : contacts) {
-            contactObjects.add(contact.getWrappedObject());
+        if (contacts != null) {
+            for (ContactWrapper contact : contacts) {
+                contactObjects.add(contact.getWrappedObject());
+            }
         }
         setContactCollection(contactObjects, false);
         propertiesMap.put("contactCollection", contacts);

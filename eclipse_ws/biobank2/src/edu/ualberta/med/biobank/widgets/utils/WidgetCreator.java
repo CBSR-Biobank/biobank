@@ -13,6 +13,8 @@ import org.eclipse.core.databinding.DataBindingContext;
 import org.eclipse.core.databinding.UpdateValueStrategy;
 import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
+import org.eclipse.core.databinding.observable.value.IValueChangeListener;
+import org.eclipse.core.databinding.observable.value.ValueChangeEvent;
 import org.eclipse.core.databinding.observable.value.WritableValue;
 import org.eclipse.core.databinding.validation.IValidator;
 import org.eclipse.core.databinding.validation.ValidationStatus;
@@ -130,11 +132,31 @@ public class WidgetCreator {
             return createText(composite, widgetOptions, modelObservableValue,
                 uvs);
         } else if (widgetClass == Combo.class) {
-            return createCombo(composite, widgetValues, modelObservableValue,
-                uvs, false);
+            final Combo combo = (Combo) createCombo(composite, widgetValues,
+                modelObservableValue, uvs, false);
+            modelObservableValue
+                .addValueChangeListener(new IValueChangeListener() {
+                    @Override
+                    public void handleValueChange(ValueChangeEvent event) {
+                        if (event.getObservableValue().getValue() == null) {
+                            combo.select(-1);
+                        }
+                    }
+                });
+            return combo;
         } else if (widgetClass == CCombo.class) {
-            return createCombo(composite, widgetValues, modelObservableValue,
-                uvs, true);
+            final CCombo combo = (CCombo) createCombo(composite, widgetValues,
+                modelObservableValue, uvs, true);
+            modelObservableValue
+                .addValueChangeListener(new IValueChangeListener() {
+                    @Override
+                    public void handleValueChange(ValueChangeEvent event) {
+                        if (event.getObservableValue().getValue() == null) {
+                            combo.select(-1);
+                        }
+                    }
+                });
+            return combo;
         } else if (widgetClass == Button.class) {
             return createButton(composite, modelObservableValue, uvs);
         } else {
@@ -238,7 +260,7 @@ public class WidgetCreator {
      * @see BiobankLabelProvider#getColumnText
      */
     public <T> ComboViewer createCComboViewerWithNoSelectionValidator(
-        Composite parent, String fieldLabel, Collection<?> input, T selection,
+        Composite parent, String fieldLabel, Collection<T> input, T selection,
         String errorMessage) {
         Assert.isNotNull(dbc);
         Label label = createLabel(parent, fieldLabel);

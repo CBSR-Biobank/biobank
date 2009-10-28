@@ -16,7 +16,9 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleSourceWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.PvCustomInfo;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
@@ -165,10 +167,17 @@ public class StudyEntryForm extends BiobankEntryForm {
 
     private void createSourceVesselsSection() throws Exception {
         Composite client = createSectionWithClient("Source Vessels");
+        allSampleSources = SampleSourceWrapper.getAllSampleSources(appService);
+        sampleSourceMultiSelect = new MultiSelectWidget(client, SWT.NONE,
+            "Selected Source Vessels", "Available Source Vessels", 100);
+        sampleSourceMultiSelect.adaptToToolkit(toolkit, true);
+        sampleSourceMultiSelect.addSelectionChangedListener(listener);
+        setSampleSourceWidgetSelections();
+    }
+
+    public void setSampleSourceWidgetSelections() {
         Collection<SampleSourceWrapper> studySampleSources = studyWrapper
             .getSampleSourceCollection();
-        allSampleSources = SampleSourceWrapper.getAllSampleSources(appService);
-
         ListOrderedMap availSampleSource = new ListOrderedMap();
         List<Integer> selSampleSource = new ArrayList<Integer>();
 
@@ -181,13 +190,8 @@ public class StudyEntryForm extends BiobankEntryForm {
         for (SampleSourceWrapper ss : allSampleSources) {
             availSampleSource.put(ss.getId(), ss.getName());
         }
-
-        sampleSourceMultiSelect = new MultiSelectWidget(client, SWT.NONE,
-            "Selected Source Vessels", "Available Source Vessels", 100);
-        sampleSourceMultiSelect.adaptToToolkit(toolkit, true);
-        sampleSourceMultiSelect.addSelections(availSampleSource,
+        sampleSourceMultiSelect.setSelections(availSampleSource,
             selSampleSource);
-        sampleSourceMultiSelect.addSelectionChangedListener(listener);
     }
 
     private void createPvCustomInfoSection() throws Exception {
@@ -263,19 +267,20 @@ public class StudyEntryForm extends BiobankEntryForm {
             "problem with sample source selections");
         studyWrapper.setSampleSourceCollection(selSampleSource);
 
-        for (Object object : pvCustomInfoMap.values()) {
-            StudyPvCustomInfo pvCustomInfo = (StudyPvCustomInfo) object;
-            boolean selected = pvCustomInfo.widget.getSelected();
-
-            if (!selected)
-                continue;
-
-            String value = pvCustomInfo.widget.getValues();
-            if (pvCustomInfo.type.equals(4) || pvCustomInfo.type.equals(5)) {
-                studyWrapper.setPvInfoAllowedValues(pvCustomInfo.label, value
-                    .split(";"));
-            }
-        }
+        // FIXME
+        // for (Object object : pvCustomInfoMap.values()) {
+        // StudyPvCustomInfo pvCustomInfo = (StudyPvCustomInfo) object;
+        // boolean selected = pvCustomInfo.widget.getSelected();
+        //
+        // if (!selected)
+        // continue;
+        //
+        // String value = pvCustomInfo.widget.getValues();
+        // if (pvCustomInfo.type.equals(4) || pvCustomInfo.type.equals(5)) {
+        // studyWrapper.setPvInfoAllowedValues(pvCustomInfo.label, value
+        // .split(";"));
+        // }
+        // }
         studyWrapper.setSampleStorageCollection(sampleStorageEntryWidget
             .getSampleStorage());
         saveStudy();
@@ -296,4 +301,23 @@ public class StudyEntryForm extends BiobankEntryForm {
         return StudyViewForm.ID;
     }
 
+    @Override
+    public void reset() {
+        super.reset();
+        List<ContactWrapper> contacts = studyWrapper.getContactCollection();
+        if (contacts != null) {
+            contactEntryWidget.setContacts(contacts);
+        }
+
+        List<SampleStorageWrapper> sampleStorages = studyWrapper
+            .getSampleStorageCollection();
+        if (sampleStorages != null) {
+            sampleStorageEntryWidget.setSampleStorage(sampleStorages);
+        }
+
+        setSampleSourceWidgetSelections();
+
+        // TODO reset PV CUSTOM INFO
+
+    }
 }

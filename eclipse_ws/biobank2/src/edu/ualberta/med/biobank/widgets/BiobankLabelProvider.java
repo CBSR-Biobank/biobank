@@ -1,13 +1,11 @@
 package edu.ualberta.med.biobank.widgets;
 
-import java.text.SimpleDateFormat;
-
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.swt.graphics.Image;
 import org.springframework.util.Assert;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
@@ -129,9 +127,8 @@ public class BiobankLabelProvider extends LabelProvider implements
             case 2:
                 return sample.getPositionString();
             case 3:
-                return sample.getLinkDate() == null ? ""
-                    : new SimpleDateFormat(BioBankPlugin.DATE_TIME_FORMAT)
-                        .format(sample.getLinkDate());
+                return sample.getLinkDate() == null ? "" : DateFormatter
+                    .formatAsDateTime(sample.getLinkDate());
             case 4:
                 return sample.getQuantity() == null ? "" : sample.getQuantity()
                     .toString();

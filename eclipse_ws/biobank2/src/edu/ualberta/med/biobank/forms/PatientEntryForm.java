@@ -9,6 +9,7 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -69,6 +70,7 @@ public class PatientEntryForm extends BiobankEntryForm {
         form.getBody().setLayout(new GridLayout(1, false));
         form.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
             BioBankPlugin.IMG_PATIENT));
+
         createPatientSection();
 
         if (patientAdapter.getWrapper().isNew()) {
@@ -142,8 +144,11 @@ public class PatientEntryForm extends BiobankEntryForm {
     }
 
     @Override
-    public void setFocus() {
-        firstControl.setFocus();
+    public void reset() {
+        super.reset();
+        StudyWrapper study = patientAdapter.getWrapper().getStudy();
+        if (study != null) {
+            studiesViewer.setSelection(new StructuredSelection(study));
+        }
     }
-
 }

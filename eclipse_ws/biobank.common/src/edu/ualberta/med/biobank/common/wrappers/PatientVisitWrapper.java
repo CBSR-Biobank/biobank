@@ -454,4 +454,9 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
         super.reload();
         pvInfoDataMap = null;
     }
+
+    @Override
+    public String toString() {
+        return getFormattedDateDrawn();
+    }
 }

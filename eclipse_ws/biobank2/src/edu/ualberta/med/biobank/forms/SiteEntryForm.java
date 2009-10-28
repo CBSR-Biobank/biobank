@@ -118,11 +118,6 @@ public class SiteEntryForm extends AddressEntryFormCommon {
     }
 
     @Override
-    public void setFocus() {
-        firstControl.setFocus();
-    }
-
-    @Override
     public String getNextOpenedFormID() {
         return SiteViewForm.ID;
     }

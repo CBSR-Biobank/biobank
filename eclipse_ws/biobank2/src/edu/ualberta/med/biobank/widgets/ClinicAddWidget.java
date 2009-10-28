@@ -29,7 +29,6 @@ import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.dialogs.SelectClinicContactDialog;
-import edu.ualberta.med.biobank.model.StudyContactInfo;
 import edu.ualberta.med.biobank.widgets.infotables.BiobankCollectionModel;
 import edu.ualberta.med.biobank.widgets.infotables.StudyContactEntryInfoTable;
 
@@ -108,7 +107,7 @@ public class ClinicAddWidget extends BiobankWidget {
 
                 BiobankCollectionModel item = (BiobankCollectionModel) stSelection
                     .getFirstElement();
-                ContactWrapper contact = ((StudyContactInfo) item.o).contact;
+                ContactWrapper contact = (ContactWrapper) item.o;
 
                 boolean confirm = MessageDialog.openConfirm(PlatformUI
                     .getWorkbench().getActiveWorkbenchWindow().getShell(),
@@ -160,5 +159,10 @@ public class ClinicAddWidget extends BiobankWidget {
 
     public List<ContactWrapper> getContacts() {
         return selectedContacts;
+    }
+
+    public void setContacts(List<ContactWrapper> contacts) {
+        this.selectedContacts = contacts;
+        contactInfoTable.setCollection(selectedContacts);
     }
 }
