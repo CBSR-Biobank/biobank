@@ -94,6 +94,9 @@ public class MultiSelectWidget extends BiobankWidget {
         }
     }
 
+    /**
+     * same as addSelections but remove previously set elements
+     */
     public void setSelections(ListOrderedMap available, List<Integer> selected) {
         selTreeRootNode.clear();
         availTreeRootNode.clear();

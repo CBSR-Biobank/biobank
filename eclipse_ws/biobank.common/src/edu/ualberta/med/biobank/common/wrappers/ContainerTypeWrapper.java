@@ -48,7 +48,7 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
         return new String[] { "name", "comment", "nameShort", "topLevel",
             "defaultTemperature", "activityStatus", "sampleTypeCollection",
             "childContainerTypeCollection", "site", "capacity",
-            "childLabelingScheme" };
+            "childLabelingScheme", "rowCapacity", "colCapacity" };
     }
 
     @Override
@@ -373,21 +373,25 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
     }
 
     public void setRowCapacity(Integer maxRows) {
+        Integer old = getRowCapacity();
         CapacityWrapper capacity = getCapacity();
         if (capacity == null) {
             capacity = new CapacityWrapper(appService, new Capacity());
         }
         capacity.setRow(maxRows);
         setCapacity(capacity);
+        propertyChangeSupport.firePropertyChange("rowCapacity", old, maxRows);
     }
 
     public void setColCapacity(Integer maxCols) {
+        Integer old = getColCapacity();
         CapacityWrapper capacity = getCapacity();
         if (capacity == null) {
             capacity = new CapacityWrapper(appService, new Capacity());
         }
         capacity.setCol(maxCols);
         setCapacity(capacity);
+        propertyChangeSupport.firePropertyChange("colCapacity", old, maxCols);
     }
 
     public void setChildLabelingScheme(Integer id) {

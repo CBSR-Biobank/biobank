@@ -9,7 +9,6 @@ import java.util.Map;
 import org.apache.commons.collections.map.ListOrderedMap;
 import org.apache.log4j.Logger;
 import org.eclipse.core.databinding.beans.BeansObservables;
-import org.eclipse.core.databinding.beans.PojoObservables;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.viewers.ComboViewer;
@@ -117,8 +116,6 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
     }
 
     private void retrieveSiteAndType() {
-        // FIXME once siteAdapter contains a wrapper, call reload on it
-        // to get last inserted types
         site = containerTypeAdapter.getParentFromClass(SiteAdapter.class)
             .getWrapper();
         try {
@@ -174,12 +171,12 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         toolkit.paintBordersFor(client);
 
         createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Rows", null,
-            PojoObservables.observeValue(containerType, "rowCapacity"),
-            new IntegerNumberValidator("Row capactiy is not a valid number",
+            BeansObservables.observeValue(containerType, "rowCapacity"),
+            new IntegerNumberValidator("Row capacity is not a valid number",
                 false));
 
         createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Columns",
-            null, PojoObservables.observeValue(containerType, "colCapacity"),
+            null, BeansObservables.observeValue(containerType, "colCapacity"),
             new IntegerNumberValidator("Column capacity is not a valid nubmer",
                 false));
 
@@ -243,11 +240,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
 
         createChildContainerTypesSection(client);
         createSampleTypesSection(client);
-        boolean containsSamples = containerType.getSampleTypeCollection() != null
-            && containerType.getSampleTypeCollection().size() > 0;
-        showSamples(containsSamples);
-        hasSamples.setSelection(containsSamples);
-        hasContainers.setSelection(!containsSamples);
+        showContainersOrSamples();
     }
 
     protected void showSamples(boolean show) {
@@ -259,9 +252,6 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
     }
 
     private void createSampleTypesSection(Composite parent) throws Exception {
-        Collection<SampleTypeWrapper> stSamplesTypes = containerType
-            .getSampleTypeCollection();
-
         allSampleTypes = site.getAllSampleTypeCollection();
 
         samplesMultiSelect = new MultiSelectWidget(parent, SWT.NONE,
@@ -272,6 +262,12 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         gd.horizontalSpan = 2;
         samplesMultiSelect.setLayoutData(gd);
 
+        setSampleTypesSelection();
+    }
+
+    private void setSampleTypesSelection() {
+        Collection<SampleTypeWrapper> stSamplesTypes = containerType
+            .getSampleTypeCollection();
         ListOrderedMap availSampleTypes = new ListOrderedMap();
         List<Integer> selSampleTypes = new ArrayList<Integer>();
 
@@ -284,7 +280,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         for (SampleTypeWrapper sampleType : allSampleTypes) {
             availSampleTypes.put(sampleType.getId(), sampleType.getName());
         }
-        samplesMultiSelect.addSelections(availSampleTypes, selSampleTypes);
+        samplesMultiSelect.setSelections(availSampleTypes, selSampleTypes);
     }
 
     private void createChildContainerTypesSection(Composite parent) {
@@ -299,6 +295,10 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         childContainerTypesMultiSelect
             .addSelectionChangedListener(multiSelectListener);
 
+        setChildContainerTypeSelection();
+    }
+
+    private void setChildContainerTypeSelection() {
         List<Integer> selChildContainerTypes = new ArrayList<Integer>();
         Collection<ContainerTypeWrapper> childContainerTypes = containerType
             .getChildContainerTypeCollection();
@@ -315,7 +315,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
                 }
             }
         }
-        childContainerTypesMultiSelect.addSelections(availContainerTypes,
+        childContainerTypesMultiSelect.setSelections(availContainerTypes,
             selChildContainerTypes);
     }
 
@@ -362,4 +362,20 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         return ContainerTypeViewForm.ID;
     }
 
+    @Override
+    public void reset() {
+        super.reset();
+
+        setChildContainerTypeSelection();
+        setSampleTypesSelection();
+        showContainersOrSamples();
+    }
+
+    private void showContainersOrSamples() {
+        boolean containsSamples = containerType.getSampleTypeCollection() != null
+            && containerType.getSampleTypeCollection().size() > 0;
+        showSamples(containsSamples);
+        hasSamples.setSelection(containsSamples);
+        hasContainers.setSelection(!containsSamples);
+    }
 }

@@ -218,4 +218,10 @@ public class SampleTypeEntryWidget extends BiobankWidget {
     public boolean setFocus() {
         return addSampleTypeButton.setFocus();
     }
+
+    public void setLists(Collection<SampleTypeWrapper> sampleTypeCollection,
+        Collection<SampleTypeWrapper> conflictTypes) {
+        this.conflictTypes = conflictTypes;
+        sampleTypeTable.setCollection(sampleTypeCollection);
+    }
 }
