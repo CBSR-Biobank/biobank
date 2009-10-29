@@ -27,6 +27,8 @@ import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionListener;
@@ -132,31 +134,11 @@ public class WidgetCreator {
             return createText(composite, widgetOptions, modelObservableValue,
                 uvs);
         } else if (widgetClass == Combo.class) {
-            final Combo combo = (Combo) createCombo(composite, widgetValues,
-                modelObservableValue, uvs, false);
-            modelObservableValue
-                .addValueChangeListener(new IValueChangeListener() {
-                    @Override
-                    public void handleValueChange(ValueChangeEvent event) {
-                        if (event.getObservableValue().getValue() == null) {
-                            combo.select(-1);
-                        }
-                    }
-                });
-            return combo;
+            return createCombo(composite, widgetValues, modelObservableValue,
+                uvs, false);
         } else if (widgetClass == CCombo.class) {
-            final CCombo combo = (CCombo) createCombo(composite, widgetValues,
-                modelObservableValue, uvs, true);
-            modelObservableValue
-                .addValueChangeListener(new IValueChangeListener() {
-                    @Override
-                    public void handleValueChange(ValueChangeEvent event) {
-                        if (event.getObservableValue().getValue() == null) {
-                            combo.select(-1);
-                        }
-                    }
-                });
-            return combo;
+            return createCombo(composite, widgetValues, modelObservableValue,
+                uvs, true);
         } else if (widgetClass == Button.class) {
             return createButton(composite, modelObservableValue, uvs);
         } else {
@@ -177,8 +159,8 @@ public class WidgetCreator {
     }
 
     private Composite createCombo(Composite composite, String[] widgetValues,
-        IObservableValue modelObservableValue, UpdateValueStrategy uvs,
-        boolean isCCombo) {
+        final IObservableValue modelObservableValue, UpdateValueStrategy uvs,
+        final boolean isCCombo) {
         Composite combo = null;
         if (isCCombo) {
             combo = new CCombo(composite, SWT.READ_ONLY);
@@ -211,6 +193,28 @@ public class WidgetCreator {
                 ((Combo) combo).addModifyListener(modifyListener);
             }
         }
+        final Composite comboForListener = combo;
+        final IValueChangeListener changeListener = new IValueChangeListener() {
+            @Override
+            public void handleValueChange(ValueChangeEvent event) {
+                if (event.getObservableValue().getValue() == null
+                    || event.getObservableValue().getValue().toString()
+                        .isEmpty()) {
+                    if (isCCombo) {
+                        ((CCombo) comboForListener).deselectAll();
+                    } else {
+                        ((Combo) comboForListener).deselectAll();
+                    }
+                }
+            }
+        };
+        modelObservableValue.addValueChangeListener(changeListener);
+        combo.addDisposeListener(new DisposeListener() {
+            @Override
+            public void widgetDisposed(DisposeEvent e) {
+                modelObservableValue.removeValueChangeListener(changeListener);
+            }
+        });
         return combo;
     }
 

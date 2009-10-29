@@ -2,7 +2,6 @@ package edu.ualberta.med.biobank.forms;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -75,6 +74,8 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
     private BiobankEntryFormWidgetListener multiSelectListener;
 
     private ComboViewer labelingSchemeComboViewer;
+
+    private List<LabelingScheme> labelingSchemeCollection;
 
     private Button hasSamples;
 
@@ -186,19 +187,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
             new DoubleNumberValidator(
                 "Default temperature is not a valid number"));
 
-        LabelingScheme currentScheme = null;
-        Integer currentSchemeId = containerType.getChildLabelingScheme();
-        Map<Integer, String> labelingSchemeMap = ContainerTypeWrapper
-            .getAllLabelingSchemes(appService);
-        Collection<LabelingScheme> labelingSchemeCollection = new HashSet<LabelingScheme>();
-        for (Integer id : labelingSchemeMap.keySet()) {
-            LabelingScheme ls = new LabelingScheme(id, labelingSchemeMap
-                .get(id));
-            labelingSchemeCollection.add(ls);
-            if (id.equals(currentSchemeId)) {
-                currentScheme = ls;
-            }
-        }
+        LabelingScheme currentScheme = getCurrentLabelingScheme();
         labelingSchemeComboViewer = createCComboViewerWithNoSelectionValidator(
             client, "Child Labeling Scheme", labelingSchemeCollection,
             currentScheme, MSG_CHILD_LABELING_SCHEME_EMPTY);
@@ -213,6 +202,23 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         GridData gd = new GridData(GridData.FILL_HORIZONTAL);
         gd.heightHint = 40;
         comment.setLayoutData(gd);
+    }
+
+    private LabelingScheme getCurrentLabelingScheme() {
+        LabelingScheme currentScheme = null;
+        Integer currentSchemeId = containerType.getChildLabelingScheme();
+        Map<Integer, String> labelingSchemeMap = ContainerTypeWrapper
+            .getAllLabelingSchemes(appService);
+        labelingSchemeCollection = new ArrayList<LabelingScheme>();
+        for (Integer id : labelingSchemeMap.keySet()) {
+            LabelingScheme ls = new LabelingScheme(id, labelingSchemeMap
+                .get(id));
+            labelingSchemeCollection.add(ls);
+            if (id.equals(currentSchemeId)) {
+                currentScheme = ls;
+            }
+        }
+        return currentScheme;
     }
 
     private void createContainsSection() throws Exception {
@@ -369,6 +375,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         setChildContainerTypeSelection();
         setSampleTypesSelection();
         showContainersOrSamples();
+
     }
 
     private void showContainersOrSamples() {
@@ -377,5 +384,13 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         showSamples(containsSamples);
         hasSamples.setSelection(containsSamples);
         hasContainers.setSelection(!containsSamples);
+
+        LabelingScheme currentScheme = getCurrentLabelingScheme();
+        if (currentScheme == null) {
+            labelingSchemeComboViewer.getCCombo().deselectAll();
+        } else {
+            labelingSchemeComboViewer.setSelection(new StructuredSelection(
+                currentScheme));
+        }
     }
 }

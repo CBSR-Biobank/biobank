@@ -176,7 +176,7 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
 
     public void setComment(String comment) {
         String oldComment = wrappedObject.getComment();
-        wrappedObject.setName(comment);
+        wrappedObject.setComment(comment);
         propertyChangeSupport
             .firePropertyChange("comment", oldComment, comment);
     }

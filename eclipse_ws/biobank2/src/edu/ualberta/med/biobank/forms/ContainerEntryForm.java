@@ -244,4 +244,16 @@ public class ContainerEntryForm extends BiobankEntryForm {
         return ContainerViewForm.ID;
     }
 
+    @Override
+    public void reset() {
+        super.reset();
+        currentContainerType = containerWrapper.getContainerType();
+        if (currentContainerType != null) {
+            containerTypeComboViewer.setSelection(new StructuredSelection(
+                currentContainerType));
+        } else if (containerTypeComboViewer.getCCombo().getItemCount() > 1) {
+            containerTypeComboViewer.getCCombo().deselectAll();
+        }
+    }
+
 }

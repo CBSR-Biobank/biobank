@@ -156,9 +156,12 @@ public class ContainerTypeViewForm extends BiobankViewForm {
     }
 
     private void setSampleTypesValues() {
-        sampleTypesList.removeAll();
-        for (SampleTypeWrapper type : containerType.getSampleTypeCollection()) {
-            sampleTypesList.add(type.getNameShort());
+        if (sampleTypesList != null) {
+            sampleTypesList.removeAll();
+            for (SampleTypeWrapper type : containerType
+                .getSampleTypeCollection()) {
+                sampleTypesList.add(type.getNameShort());
+            }
         }
     }
 
@@ -207,10 +210,12 @@ public class ContainerTypeViewForm extends BiobankViewForm {
     }
 
     private void setChildContainerTypesValues() {
-        childContainerTypesList.removeAll();
-        for (ContainerTypeWrapper type : containerType
-            .getChildContainerTypeCollection()) {
-            childContainerTypesList.add(type.getName());
+        if (childContainerTypesList != null) {
+            childContainerTypesList.removeAll();
+            for (ContainerTypeWrapper type : containerType
+                .getChildContainerTypeCollection()) {
+                childContainerTypesList.add(type.getName());
+            }
         }
     }
 

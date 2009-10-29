@@ -519,6 +519,9 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
 
     @Override
     public void reset() {
+        if (palletTypesViewer != null) {
+            palletTypesViewer.getCCombo().deselectAll();
+        }
         freezerWidget.setSelectedBox(null);
         hotelWidget.setSelectedBox(null);
         palletWidget.setScannedElements(null);

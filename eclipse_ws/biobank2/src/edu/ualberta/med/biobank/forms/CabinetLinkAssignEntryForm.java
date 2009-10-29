@@ -416,11 +416,16 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
             drawer = null;
             bin = null;
             cabinetWidget.setSelectedBox(null);
-            drawerWidget.setSelectedBin(0);
+            drawerWidget.setSelectedBin(-1);
             resultShownValue.setValue(Boolean.FALSE);
             selectedSampleTypeValue.setValue("");
+            patientNumberText.setText("");
+            viewerVisits.setInput(null);
             inventoryIdText.setText("");
             positionText.setText("");
+            if (comboViewerSampleTypes.getCCombo().getItemCount() > 1) {
+                comboViewerSampleTypes.getCCombo().deselectAll();
+            }
         } catch (Exception e) {
             LOGGER.error("Can't reset the form", e);
         }

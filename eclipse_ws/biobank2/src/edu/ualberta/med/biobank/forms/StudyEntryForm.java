@@ -249,7 +249,6 @@ public class StudyEntryForm extends BiobankEntryForm {
 
     @Override
     protected void saveForm() throws Exception {
-        studyWrapper.reload();
         // FIXME should be transfer to persitCheck method or others set Methods
         // of the wrapper
 

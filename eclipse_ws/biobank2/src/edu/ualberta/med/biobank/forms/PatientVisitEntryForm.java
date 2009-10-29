@@ -149,7 +149,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         FormUtils.setTextValue(siteLabel, patientVisitWrapper.getPatient()
             .getStudy().getWrappedObject().getSite().getName());
 
-        if (patientVisitWrapper.getId() == null) {
+        if (patientVisitWrapper.isNew()) {
             // choose clinic for new visit
             List<ClinicWrapper> studyClinics = study.getClinicCollection();
             ClinicWrapper selectedClinic = patientVisitWrapper.getClinic();
@@ -393,6 +393,12 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
     @Override
     public void reset() {
         super.reset();
+
+        if (patientVisitWrapper.isNew()
+            && clinicsComboViewer.getCCombo().getItemCount() > 1) {
+            clinicsComboViewer.getCCombo().deselectAll();
+        }
+
         if (patientVisitWrapper.getDateProcessed() == null) {
             patientVisitWrapper.setDateProcessed(new Date());
         }

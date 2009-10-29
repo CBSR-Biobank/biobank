@@ -78,7 +78,7 @@ public class PatientEntryForm extends BiobankEntryForm {
         }
     }
 
-    private void createPatientSection() {
+    private void createPatientSection() throws Exception {
         Composite client = toolkit.createComposite(form.getBody());
         GridLayout layout = new GridLayout(2, false);
         layout.horizontalSpacing = 10;
@@ -91,6 +91,7 @@ public class PatientEntryForm extends BiobankEntryForm {
         siteWrapper = SessionManager.getInstance().getCurrentSiteWrapper();
         labelSite.setText(siteWrapper.getName());
 
+        siteWrapper.reload();
         List<StudyWrapper> studies = new ArrayList<StudyWrapper>(siteWrapper
             .getStudyCollection());
         StudyWrapper selectedStudy = null;
