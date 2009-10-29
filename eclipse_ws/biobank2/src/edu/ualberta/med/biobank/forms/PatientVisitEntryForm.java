@@ -74,9 +74,9 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
 
     private DateTimeWidget dateDrawn;
 
-    private DateTimeWidget dateProcessed;
-
     private DateTimeWidget dateReceived;
+
+    private DateTimeWidget dateProcessed;
 
     private ComboViewer clinicsComboViewer;
 
@@ -173,16 +173,16 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
 
         firstControl = dateDrawn;
 
+        dateReceived = createDateTimeWidget(client, "Date Received",
+            patientVisitWrapper.getDateReceived(), "dateReceived",
+            "Date received should be set", false);
+
         if (patientVisitWrapper.getDateProcessed() == null) {
             patientVisitWrapper.setDateProcessed(new Date());
         }
         dateProcessed = createDateTimeWidget(client, "Date Processed",
             patientVisitWrapper.getDateProcessed(), "dateProcessed",
             "Date processed should be set", false);
-
-        dateReceived = createDateTimeWidget(client, "Date Received",
-            patientVisitWrapper.getDateReceived(), "dateReceived",
-            "Date received should be set", false);
 
         createPvDataSection(client);
 
