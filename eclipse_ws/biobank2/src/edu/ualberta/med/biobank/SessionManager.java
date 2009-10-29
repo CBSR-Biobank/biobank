@@ -54,6 +54,7 @@ public class SessionManager {
 
     public void setSessionsView(SessionsView view) {
         this.view = view;
+
         updateMenus();
     }
 
@@ -141,12 +142,22 @@ public class SessionManager {
         return null;
     }
 
-    public void openViewForm(ModelWrapper<?> wrapper) {
-        NodeSearchVisitor v = new NodeSearchVisitor(wrapper);
+    public void openViewForm(Class<?> klass, int id) {
+        NodeSearchVisitor v = new NodeSearchVisitor(
+            (Class<? extends ModelWrapper<?>>) klass, id);
         AdapterBase adapter = sessionAdapter.accept(v);
         Assert.isNotNull(adapter, "could not find adapter for class "
-            + wrapper.getClass() + " id " + wrapper.getId());
+            + klass.getName() + " id " + id);
         adapter.performDoubleClick();
+    }
+
+    public void selectTreeNode(AdapterBase adapter) {
+        SessionManager.getInstance().getTreeViewer().setSelection(
+            new StructuredSelection(adapter));
+    }
+
+    public void openViewForm(ModelWrapper<?> wrapper) {
+        openViewForm(wrapper.getClass(), wrapper.getId());
     }
 
     public AdapterBase searchNode(ModelWrapper<?> wrapper) {
