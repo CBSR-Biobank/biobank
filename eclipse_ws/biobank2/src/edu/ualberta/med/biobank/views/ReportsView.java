@@ -35,7 +35,6 @@ import edu.ualberta.med.biobank.widgets.infotables.InfoTableWidget;
 
 public class ReportsView extends ViewPart {
 
-    @SuppressWarnings("unused")
     public static Logger LOGGER = Logger.getLogger(ReportsView.class.getName());
 
     public static final String ID = "edu.ualberta.med.biobank.views.ReportsView";
