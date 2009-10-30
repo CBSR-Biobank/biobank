@@ -215,12 +215,13 @@ public class LoginDialog extends TitleAreaDialog {
             .getActiveWorkbenchWindow().getShell().getDisplay(), sessionHelper);
 
         Collection<SiteWrapper> sites = sessionHelper.getSites();
+        String realUsername = sessionHelper.getUserName();
 
         if (sites != null) {
             // login successful
             SessionManager.getInstance().addSession(
                 sessionHelper.getAppService(), serverText.getText(),
-                userNameText.getText(), sites);
+                realUsername, sites);
         }
         super.okPressed();
     }

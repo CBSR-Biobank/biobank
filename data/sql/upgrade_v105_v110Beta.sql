@@ -64,6 +64,9 @@ ALTER TABLE pv_info_possible
 
     ADD INDEX FK546E6B693F52C885 (SITE_ID);
 
+ALTER TABLE patient_visit
+    DROP COLUMN CSM_USER_ID,
+    ADD USERNAME varchar(50);
 
 #
 # DDL END
