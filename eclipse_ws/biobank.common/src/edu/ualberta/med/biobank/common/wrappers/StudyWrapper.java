@@ -621,4 +621,9 @@ public class StudyWrapper extends ModelWrapper<Study> {
         super.reload();
         pvInfoMap = null;
     }
+
+    @Override
+    public String toString() {
+        return getName();
+    }
 }

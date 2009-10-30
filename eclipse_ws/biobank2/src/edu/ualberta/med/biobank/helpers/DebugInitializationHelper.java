@@ -87,14 +87,8 @@ public class DebugInitializationHelper {
             @Override
             protected IStatus run(IProgressMonitor monitor) {
                 try {
-                    monitor.beginTask("Adding new objects to database...", 16);
-                    clinics = new ClinicWrapper[MAX_CLINICS];
-                    numSchemeMap = new HashMap<String, ContainerLabelingScheme>();
-
                     appService = SessionManager.getInstance().getSession()
                         .getAppService();
-
-                    deleteSites(monitor);
 
                     // insert methods are listed here and order is important
                     String[] insertMethodNames = new String[] { "insertSite",
@@ -103,7 +97,16 @@ public class DebugInitializationHelper {
                         "insertSampleInPatientVisit",
                         "insertContainerTypesInSite", "insertContainers",
                         "insertSampleStorage" };
+                    int taskNber = insertMethodNames.length
+                        + (5 * SiteWrapper.getAllSites(appService).size());
 
+                    monitor.beginTask("Adding new objects to database...",
+                        taskNber);
+
+                    deleteSites(monitor);
+
+                    clinics = new ClinicWrapper[MAX_CLINICS];
+                    numSchemeMap = new HashMap<String, ContainerLabelingScheme>();
                     // invokes all methods starting with "insert"
                     for (String methodName : insertMethodNames) {
                         monitor.subTask("invoking " + methodName);
@@ -407,12 +410,14 @@ public class DebugInitializationHelper {
             // TODO check if still need this with last modifications
             site.reload();
             deleteContainers(site.getContainerCollection(), monitor);
+
             deleteStudies(site.getStudyCollection(), monitor);
             deleteClinics(site.getClinicCollection(), monitor);
-            deleteFromList(site.getContainerTypeCollection(), monitor);
+            deleteFromList(site.getContainerTypeCollection(), monitor,
+                "Container Type");
+            monitor.worked(1);
             site.reload();
             site.delete();
-            monitor.worked(1);
         }
     }
 
@@ -428,12 +433,13 @@ public class DebugInitializationHelper {
                 deleteContainers(container.getChildren().values(), monitor);
             }
             if (container.hasSamples()) {
-                deleteFromList(container.getSamples().values(), monitor);
+                deleteFromList(container.getSamples().values(), monitor,
+                    "Sample");
             }
             container.reload();
             container.delete();
-            monitor.worked(1);
         }
+        monitor.worked(1);
     }
 
     public void deleteStudies(List<StudyWrapper> studies,
@@ -446,8 +452,8 @@ public class DebugInitializationHelper {
             deletePatients(study.getPatientCollection(), monitor);
             study.reload();
             study.delete();
-            monitor.worked(1);
         }
+        monitor.worked(1);
     }
 
     public void deletePatients(List<PatientWrapper> patients,
@@ -457,11 +463,12 @@ public class DebugInitializationHelper {
 
         for (PatientWrapper patient : patients) {
             monitor.subTask("deleting patient " + patient);
-            deleteFromList(patient.getPatientVisitCollection(), monitor);
+            deleteFromList(patient.getPatientVisitCollection(), monitor,
+                "PatientVisit");
             patient.reload();
             patient.delete();
-            monitor.worked(1);
         }
+        monitor.worked(1);
     }
 
     public void deleteClinics(List<ClinicWrapper> clinics,
@@ -469,24 +476,22 @@ public class DebugInitializationHelper {
         for (ClinicWrapper clinic : clinics) {
             monitor.subTask("deleting clinic " + clinic);
             clinic.reload();
-            deleteFromList(clinic.getContactCollection(), monitor);
+            deleteFromList(clinic.getContactCollection(), monitor, "Contact");
             clinic.reload();
             clinic.delete();
-            monitor.worked(1);
         }
+        monitor.worked(1);
     }
 
     public void deleteFromList(Collection<? extends ModelWrapper<?>> list,
-        IProgressMonitor monitor) throws Exception {
+        IProgressMonitor monitor, String objectName) throws Exception {
         if (list == null)
             return;
 
         for (ModelWrapper<?> object : list) {
-            monitor.subTask("deleting object " + object);
+            monitor.subTask("deleting " + objectName + " " + object);
             object.reload();
             object.delete();
-            monitor.worked(1);
         }
     }
-
 }

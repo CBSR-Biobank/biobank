@@ -384,4 +384,8 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
             .equals(wrapperName) ? 0 : -1));
     }
 
+    @Override
+    public String toString() {
+        return getName();
+    }
 }

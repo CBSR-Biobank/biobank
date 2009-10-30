@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.importer;
 
 import edu.ualberta.med.biobank.common.LabelingScheme;
 import edu.ualberta.med.biobank.common.RowColPos;
+import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.ContainerType;
@@ -44,17 +45,25 @@ public class SiteContainers {
         for (int i = 0; i < 30; ++i) {
             pos.row = i % 3;
             pos.col = i / 3;
+            Capacity freezerCapacity = freezerType.getCapacity();
             String hotelPosLabel = "01"
-                + LabelingScheme.getPositionString(pos, freezerType);
+                + LabelingScheme.getPositionString(pos,
+                    freezerType.getChildLabelingScheme().getId(),
+                    freezerCapacity.getRowCapacity(),
+                    freezerCapacity.getColCapacity());
             hotel = insertContainer(site, hotelPosLabel, hotelType, freezer01,
                 pos.row, pos.col);
 
             for (int j = 0; j < 17; ++j) {
                 pos.row = j;
                 pos.col = 0;
+                Capacity hotelCapacity = hotelType.getCapacity();
                 insertContainer(site, hotelPosLabel
-                    + LabelingScheme.getPositionString(pos, hotelType),
-                    palletType, hotel, pos.row, pos.col);
+                    + LabelingScheme.getPositionString(pos,
+                        hotelType.getChildLabelingScheme().getId(),
+                        hotelCapacity.getRowCapacity(),
+                        hotelCapacity.getColCapacity()), palletType, hotel,
+                    pos.row, pos.col);
             }
         }
     }
@@ -87,17 +96,25 @@ public class SiteContainers {
         for (ContainerType hotelType : hotelTypes) {
             pos.row = count % 5;
             pos.col = count / 5;
+            Capacity freezerCapacity = freezerType.getCapacity();
             String hotelPosLabel = "03"
-                + LabelingScheme.getPositionString(pos, freezerType);
+                + LabelingScheme.getPositionString(pos,
+                    freezerType.getChildLabelingScheme().getId(),
+                    freezerCapacity.getRowCapacity(),
+                    freezerCapacity.getColCapacity());
             hotel = insertContainer(site, hotelPosLabel, hotelType, freezer03,
                 pos.row, pos.col);
 
             for (int j = 0, n = hotelType.getCapacity().getRowCapacity(); j < n; ++j) {
                 pos.row = j;
                 pos.col = 0;
+                Capacity hotelCapacity = hotelType.getCapacity();
                 insertContainer(site, hotelPosLabel
-                    + LabelingScheme.getPositionString(pos, hotelType),
-                    palletType, hotel, pos.row, pos.col);
+                    + LabelingScheme.getPositionString(pos,
+                        hotelType.getChildLabelingScheme().getId(),
+                        hotelCapacity.getRowCapacity(),
+                        hotelCapacity.getColCapacity()), palletType, hotel,
+                    pos.row, pos.col);
             }
             ++count;
         }
@@ -117,8 +134,12 @@ public class SiteContainers {
         for (int i = 0; i < 4; ++i) {
             pos.row = i;
             pos.col = 0;
+            Capacity cabinetCapacity = cabinetType.getCapacity();
             String drawerPosLabel = "01"
-                + LabelingScheme.getPositionString(pos, cabinetType);
+                + LabelingScheme.getPositionString(pos,
+                    cabinetType.getChildLabelingScheme().getId(),
+                    cabinetCapacity.getRowCapacity(),
+                    cabinetCapacity.getColCapacity());
             drawer = insertContainer(site, drawerPosLabel,
                 SiteContainerTypes.getInstance().getContainerType("Drawer"),
                 cabinet, pos.row, pos.col);
@@ -126,9 +147,13 @@ public class SiteContainers {
             for (int j = 0; j < 36; ++j) {
                 pos.row = j;
                 pos.col = 0;
+                Capacity drawerCapacity = drawerType.getCapacity();
                 insertContainer(site, drawerPosLabel
-                    + LabelingScheme.getPositionString(pos, drawerType),
-                    binType, drawer, pos.row, pos.col);
+                    + LabelingScheme.getPositionString(pos,
+                        drawerType.getChildLabelingScheme().getId(),
+                        drawerCapacity.getRowCapacity(),
+                        drawerCapacity.getColCapacity()), binType, drawer,
+                    pos.row, pos.col);
             }
         }
     }

@@ -233,4 +233,9 @@ public class SampleTypeWrapper extends ModelWrapper<SampleType> {
         }
         return (compare > 0) ? 1 : -1;
     }
+
+    @Override
+    public String toString() {
+        return getName();
+    }
 }

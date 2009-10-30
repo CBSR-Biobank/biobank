@@ -4,6 +4,7 @@ package edu.ualberta.med.biobank.importer;
 import edu.ualberta.med.biobank.common.LabelingScheme;
 import edu.ualberta.med.biobank.common.RowColPos;
 import edu.ualberta.med.biobank.model.Address;
+import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.model.Container;
@@ -446,8 +447,11 @@ public class Importer {
                     "Invalid cabinet number: " + cabinetNum);
 
                 drawerName = rs.getString(6);
-                RowColPos pos = LabelingScheme.cbsrTwoCharToRowCol(cabinetType,
-                    drawerName);
+                Capacity capacity = cabinetType.getCapacity();
+                Integer rowCap = capacity.getRowCapacity();
+                Integer colCap = capacity.getColCapacity();
+                RowColPos pos = LabelingScheme.cbsrTwoCharToRowCol(drawerName,
+                    rowCap, colCap, cabinetType.getName());
                 drawerNum = pos.row;
 
                 if (drawerNum > 4) {
@@ -566,8 +570,10 @@ public class Importer {
                 }
 
                 freezerType = freezer.getContainerType();
-                hotelPos = LabelingScheme.cbsrTwoCharToRowCol(freezerType,
-                    hotelName);
+                Capacity freezerCapacity = freezerType.getCapacity();
+                hotelPos = LabelingScheme.cbsrTwoCharToRowCol(hotelName,
+                    freezerCapacity.getRowCapacity(),
+                    freezerCapacity.getColCapacity(), freezerType.getName());
 
                 palletNum = rs.getInt(6) - 1;
                 palletPos = rs.getString(14);

@@ -750,4 +750,9 @@ public class SiteWrapper extends ModelWrapper<Site> {
         pvInfoTypeMap = null;
     }
 
+    @Override
+    public String toString() {
+        return getName();
+    }
+
 }

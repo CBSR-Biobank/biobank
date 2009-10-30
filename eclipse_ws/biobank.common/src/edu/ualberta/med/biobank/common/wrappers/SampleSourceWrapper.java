@@ -109,4 +109,9 @@ public class SampleSourceWrapper extends ModelWrapper<SampleSource> {
         return ((name1.compareTo(name2) > 0) ? 1 : (name1.equals(name2) ? 0
             : -1));
     }
+
+    @Override
+    public String toString() {
+        return getName();
+    }
 }
