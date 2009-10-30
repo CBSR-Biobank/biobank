@@ -15,8 +15,8 @@ import test.ualberta.med.biobank.internal.DbHelper;
 @SuiteClasses( { TestSite.class, TestPatient.class, TestPatientVisit.class,
     TestStudy.class, TestContact.class, TestContainerLabelingScheme.class,
     TestPvSampleSource.class, TestSample.class, TestClinic.class,
-    TestSampleStorage.class, TestSampleType.class, TestContainer.class,
-    TestContainerType.class })
+    TestSampleStorage.class, TestSampleSource.class, TestSampleType.class,
+    TestContainer.class, TestContainerType.class })
 public class AllTests {
     public static WritableApplicationService appService = null;
 

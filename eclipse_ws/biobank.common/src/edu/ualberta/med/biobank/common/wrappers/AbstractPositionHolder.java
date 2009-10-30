@@ -25,6 +25,12 @@ public abstract class AbstractPositionHolder<E, T extends AbstractPosition>
     @Override
     public void persist() throws BiobankCheckException, ApplicationException,
         WrapperException {
+        boolean positionSet = rowColPosition != null;
+        AbstractPositionWrapper<T> posWrapper = getPositionWrapper(positionSet);
+        if (posWrapper != null && positionSet) {
+            posWrapper.setRow(rowColPosition.row);
+            posWrapper.setCol(rowColPosition.col);
+        }
         super.persist();
         rowColPosition = null;
         positionWrapper = null;
@@ -36,10 +42,6 @@ public abstract class AbstractPositionHolder<E, T extends AbstractPosition>
         boolean positionSet = rowColPosition != null;
         AbstractPositionWrapper<T> posWrapper = getPositionWrapper(positionSet);
         if (posWrapper != null) {
-            if (positionSet) {
-                posWrapper.setRow(rowColPosition.row);
-                posWrapper.setCol(rowColPosition.col);
-            }
             posWrapper.persistChecks();
         }
     }

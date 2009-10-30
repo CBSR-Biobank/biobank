@@ -13,6 +13,8 @@ import org.eclipse.core.databinding.DataBindingContext;
 import org.eclipse.core.databinding.UpdateValueStrategy;
 import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
+import org.eclipse.core.databinding.observable.value.IValueChangeListener;
+import org.eclipse.core.databinding.observable.value.ValueChangeEvent;
 import org.eclipse.core.databinding.observable.value.WritableValue;
 import org.eclipse.core.databinding.validation.IValidator;
 import org.eclipse.core.databinding.validation.ValidationStatus;
@@ -25,6 +27,8 @@ import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionListener;
@@ -155,8 +159,8 @@ public class WidgetCreator {
     }
 
     private Composite createCombo(Composite composite, String[] widgetValues,
-        IObservableValue modelObservableValue, UpdateValueStrategy uvs,
-        boolean isCCombo) {
+        final IObservableValue modelObservableValue, UpdateValueStrategy uvs,
+        final boolean isCCombo) {
         Composite combo = null;
         if (isCCombo) {
             combo = new CCombo(composite, SWT.READ_ONLY);
@@ -189,6 +193,28 @@ public class WidgetCreator {
                 ((Combo) combo).addModifyListener(modifyListener);
             }
         }
+        final Composite comboForListener = combo;
+        final IValueChangeListener changeListener = new IValueChangeListener() {
+            @Override
+            public void handleValueChange(ValueChangeEvent event) {
+                if (event.getObservableValue().getValue() == null
+                    || event.getObservableValue().getValue().toString()
+                        .isEmpty()) {
+                    if (isCCombo) {
+                        ((CCombo) comboForListener).deselectAll();
+                    } else {
+                        ((Combo) comboForListener).deselectAll();
+                    }
+                }
+            }
+        };
+        modelObservableValue.addValueChangeListener(changeListener);
+        combo.addDisposeListener(new DisposeListener() {
+            @Override
+            public void widgetDisposed(DisposeEvent e) {
+                modelObservableValue.removeValueChangeListener(changeListener);
+            }
+        });
         return combo;
     }
 
@@ -238,7 +264,7 @@ public class WidgetCreator {
      * @see BiobankLabelProvider#getColumnText
      */
     public <T> ComboViewer createCComboViewerWithNoSelectionValidator(
-        Composite parent, String fieldLabel, Collection<?> input, T selection,
+        Composite parent, String fieldLabel, Collection<T> input, T selection,
         String errorMessage) {
         Assert.isNotNull(dbc);
         Label label = createLabel(parent, fieldLabel);

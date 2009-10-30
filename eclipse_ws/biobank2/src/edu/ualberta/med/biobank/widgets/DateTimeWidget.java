@@ -1,9 +1,7 @@
 package edu.ualberta.med.biobank.widgets;
 
-import java.text.ParseException;
 import java.util.Date;
 
-import org.apache.log4j.Logger;
 import org.eclipse.nebula.widgets.cdatetime.CDT;
 import org.eclipse.nebula.widgets.cdatetime.CDateTime;
 import org.eclipse.swt.SWT;
@@ -12,7 +10,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 
 /**
  * Wrapper for around Nebula's CDateTime widget.
@@ -29,9 +27,6 @@ public class DateTimeWidget extends BiobankWidget {
 
     CDateTime cdt;
 
-    private static Logger LOGGER = Logger.getLogger(DateTimeWidget.class
-        .getName());
-
     /**
      * Allow date to be null.
      */
@@ -43,7 +38,7 @@ public class DateTimeWidget extends BiobankWidget {
 
         cdt = new CDateTime(this, CDT.BORDER | CDT.COMPACT | CDT.DROP_DOWN
             | CDT.DATE_LONG | CDT.TIME_MEDIUM);
-        cdt.setPattern(BioBankPlugin.DATE_TIME_FORMAT);
+        cdt.setPattern(DateFormatter.DATE_TIME_FORMAT);
         cdt.setSelection(date);
         cdt.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
     }
@@ -64,11 +59,10 @@ public class DateTimeWidget extends BiobankWidget {
         if (text.equals("<choose date>"))
             return null;
 
-        try {
-            return BioBankPlugin.getDateTimeFormatter().parse(cdt.getText());
-        } catch (ParseException e) {
-            LOGGER.error("Error parsing the date text", e);
-        }
-        return null;
+        return DateFormatter.parseToDateTime(cdt.getText());
+    }
+
+    public void setDate(Date date) {
+        cdt.setSelection(date);
     }
 }

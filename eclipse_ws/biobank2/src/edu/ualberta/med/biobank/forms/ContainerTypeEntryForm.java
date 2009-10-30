@@ -2,14 +2,12 @@ package edu.ualberta.med.biobank.forms;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.collections.map.ListOrderedMap;
 import org.apache.log4j.Logger;
 import org.eclipse.core.databinding.beans.BeansObservables;
-import org.eclipse.core.databinding.beans.PojoObservables;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.viewers.ComboViewer;
@@ -77,6 +75,8 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
 
     private ComboViewer labelingSchemeComboViewer;
 
+    private List<LabelingScheme> labelingSchemeCollection;
+
     private Button hasSamples;
 
     private Button hasContainers;
@@ -117,8 +117,6 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
     }
 
     private void retrieveSiteAndType() {
-        // FIXME once siteAdapter contains a wrapper, call reload on it
-        // to get last inserted types
         site = containerTypeAdapter.getParentFromClass(SiteAdapter.class)
             .getWrapper();
         try {
@@ -174,12 +172,12 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         toolkit.paintBordersFor(client);
 
         createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Rows", null,
-            PojoObservables.observeValue(containerType, "rowCapacity"),
-            new IntegerNumberValidator("Row capactiy is not a valid number",
+            BeansObservables.observeValue(containerType, "rowCapacity"),
+            new IntegerNumberValidator("Row capacity is not a valid number",
                 false));
 
         createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Columns",
-            null, PojoObservables.observeValue(containerType, "colCapacity"),
+            null, BeansObservables.observeValue(containerType, "colCapacity"),
             new IntegerNumberValidator("Column capacity is not a valid nubmer",
                 false));
 
@@ -189,19 +187,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
             new DoubleNumberValidator(
                 "Default temperature is not a valid number"));
 
-        LabelingScheme currentScheme = null;
-        Integer currentSchemeId = containerType.getChildLabelingScheme();
-        Map<Integer, String> labelingSchemeMap = ContainerTypeWrapper
-            .getAllLabelingSchemes(appService);
-        Collection<LabelingScheme> labelingSchemeCollection = new HashSet<LabelingScheme>();
-        for (Integer id : labelingSchemeMap.keySet()) {
-            LabelingScheme ls = new LabelingScheme(id, labelingSchemeMap
-                .get(id));
-            labelingSchemeCollection.add(ls);
-            if (id.equals(currentSchemeId)) {
-                currentScheme = ls;
-            }
-        }
+        LabelingScheme currentScheme = getCurrentLabelingScheme();
         labelingSchemeComboViewer = createCComboViewerWithNoSelectionValidator(
             client, "Child Labeling Scheme", labelingSchemeCollection,
             currentScheme, MSG_CHILD_LABELING_SCHEME_EMPTY);
@@ -216,6 +202,23 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         GridData gd = new GridData(GridData.FILL_HORIZONTAL);
         gd.heightHint = 40;
         comment.setLayoutData(gd);
+    }
+
+    private LabelingScheme getCurrentLabelingScheme() {
+        LabelingScheme currentScheme = null;
+        Integer currentSchemeId = containerType.getChildLabelingScheme();
+        Map<Integer, String> labelingSchemeMap = ContainerTypeWrapper
+            .getAllLabelingSchemes(appService);
+        labelingSchemeCollection = new ArrayList<LabelingScheme>();
+        for (Integer id : labelingSchemeMap.keySet()) {
+            LabelingScheme ls = new LabelingScheme(id, labelingSchemeMap
+                .get(id));
+            labelingSchemeCollection.add(ls);
+            if (id.equals(currentSchemeId)) {
+                currentScheme = ls;
+            }
+        }
+        return currentScheme;
     }
 
     private void createContainsSection() throws Exception {
@@ -243,11 +246,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
 
         createChildContainerTypesSection(client);
         createSampleTypesSection(client);
-        boolean containsSamples = containerType.getSampleTypeCollection() != null
-            && containerType.getSampleTypeCollection().size() > 0;
-        showSamples(containsSamples);
-        hasSamples.setSelection(containsSamples);
-        hasContainers.setSelection(!containsSamples);
+        showContainersOrSamples();
     }
 
     protected void showSamples(boolean show) {
@@ -259,9 +258,6 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
     }
 
     private void createSampleTypesSection(Composite parent) throws Exception {
-        Collection<SampleTypeWrapper> stSamplesTypes = containerType
-            .getSampleTypeCollection();
-
         allSampleTypes = site.getAllSampleTypeCollection();
 
         samplesMultiSelect = new MultiSelectWidget(parent, SWT.NONE,
@@ -272,6 +268,12 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         gd.horizontalSpan = 2;
         samplesMultiSelect.setLayoutData(gd);
 
+        setSampleTypesSelection();
+    }
+
+    private void setSampleTypesSelection() {
+        Collection<SampleTypeWrapper> stSamplesTypes = containerType
+            .getSampleTypeCollection();
         ListOrderedMap availSampleTypes = new ListOrderedMap();
         List<Integer> selSampleTypes = new ArrayList<Integer>();
 
@@ -284,7 +286,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         for (SampleTypeWrapper sampleType : allSampleTypes) {
             availSampleTypes.put(sampleType.getId(), sampleType.getName());
         }
-        samplesMultiSelect.addSelections(availSampleTypes, selSampleTypes);
+        samplesMultiSelect.setSelections(availSampleTypes, selSampleTypes);
     }
 
     private void createChildContainerTypesSection(Composite parent) {
@@ -299,6 +301,10 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         childContainerTypesMultiSelect
             .addSelectionChangedListener(multiSelectListener);
 
+        setChildContainerTypeSelection();
+    }
+
+    private void setChildContainerTypeSelection() {
         List<Integer> selChildContainerTypes = new ArrayList<Integer>();
         Collection<ContainerTypeWrapper> childContainerTypes = containerType
             .getChildContainerTypeCollection();
@@ -315,7 +321,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
                 }
             }
         }
-        childContainerTypesMultiSelect.addSelections(availContainerTypes,
+        childContainerTypesMultiSelect.setSelections(availContainerTypes,
             selChildContainerTypes);
     }
 
@@ -362,4 +368,29 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         return ContainerTypeViewForm.ID;
     }
 
+    @Override
+    public void reset() {
+        super.reset();
+
+        setChildContainerTypeSelection();
+        setSampleTypesSelection();
+        showContainersOrSamples();
+
+    }
+
+    private void showContainersOrSamples() {
+        boolean containsSamples = containerType.getSampleTypeCollection() != null
+            && containerType.getSampleTypeCollection().size() > 0;
+        showSamples(containsSamples);
+        hasSamples.setSelection(containsSamples);
+        hasContainers.setSelection(!containsSamples);
+
+        LabelingScheme currentScheme = getCurrentLabelingScheme();
+        if (currentScheme == null) {
+            labelingSchemeComboViewer.getCCombo().deselectAll();
+        } else {
+            labelingSchemeComboViewer.setSelection(new StructuredSelection(
+                currentScheme));
+        }
+    }
 }

@@ -33,7 +33,8 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
     @Override
     protected String[] getPropertyChangesNames() {
         return new String[] { "name", "activityStatus", "comment", "address",
-            "site", "contactCollection", "patientVisitCollection" };
+            "site", "contactCollection", "patientVisitCollection", "street1",
+            "street2", "city", "province", "postalCode" };
     }
 
     private AddressWrapper getAddress() {
@@ -112,11 +113,13 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
     }
 
     public void setStreet1(String street1) {
+        String old = getStreet1();
         AddressWrapper address = getAddress();
         if (address == null) {
             address = initAddress();
         }
         address.setStreet1(street1);
+        propertyChangeSupport.firePropertyChange("street1", old, street1);
     }
 
     public String getStreet2() {
@@ -128,11 +131,13 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
     }
 
     public void setStreet2(String street2) {
+        String old = getStreet2();
         AddressWrapper address = getAddress();
         if (address == null) {
             address = initAddress();
         }
         address.setStreet2(street2);
+        propertyChangeSupport.firePropertyChange("street2", old, street2);
     }
 
     public String getCity() {
@@ -144,11 +149,13 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
     }
 
     public void setCity(String city) {
+        String old = getCity();
         AddressWrapper address = getAddress();
         if (address == null) {
             address = initAddress();
         }
         address.setCity(city);
+        propertyChangeSupport.firePropertyChange("city", old, city);
     }
 
     public String getProvince() {
@@ -160,11 +167,13 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
     }
 
     public void setProvince(String province) {
+        String old = getProvince();
         AddressWrapper address = getAddress();
         if (address == null) {
             address = initAddress();
         }
         address.setProvince(province);
+        propertyChangeSupport.firePropertyChange("province", old, province);
     }
 
     public String getPostalCode() {
@@ -176,11 +185,13 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
     }
 
     public void setPostalCode(String postalCode) {
+        String old = getPostalCode();
         AddressWrapper address = getAddress();
         if (address == null) {
             address = initAddress();
         }
         address.setPostalCode(postalCode);
+        propertyChangeSupport.firePropertyChange("postalCode", old, postalCode);
     }
 
     @Override
@@ -267,7 +278,8 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
     }
 
     @SuppressWarnings("unchecked")
-    public List<StudyWrapper> getStudyCollection(boolean sort) throws Exception {
+    public List<StudyWrapper> getStudyCollection(boolean sort)
+        throws ApplicationException {
         List<StudyWrapper> studyCollection = (List<StudyWrapper>) propertiesMap
             .get("studyCollection");
 
@@ -289,7 +301,7 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
         return studyCollection;
     }
 
-    public List<StudyWrapper> getStudyCollection() throws Exception {
+    public List<StudyWrapper> getStudyCollection() throws ApplicationException {
         return getStudyCollection(false);
     }
 
@@ -300,6 +312,11 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
             throw new BiobankCheckException("Unable to delete clinic "
                 + getName()
                 + ". All defined patient visits must be removed first.");
+        }
+        List<StudyWrapper> studies = getStudyCollection();
+        if (studies != null && studies.size() > 0) {
+            throw new BiobankCheckException("Unable to delete clinic "
+                + getName() + ". No more study reference should exist.");
         }
     }
 

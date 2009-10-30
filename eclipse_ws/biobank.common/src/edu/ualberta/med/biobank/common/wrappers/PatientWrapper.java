@@ -162,4 +162,8 @@ public class PatientWrapper extends ModelWrapper<Patient> {
         return number1.compareTo(number2);
     }
 
+    @Override
+    public String toString() {
+        return getNumber();
+    }
 }

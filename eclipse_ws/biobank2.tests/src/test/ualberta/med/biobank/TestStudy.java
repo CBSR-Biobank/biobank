@@ -365,6 +365,7 @@ public class TestStudy extends TestDatabase {
         List<PatientWrapper> patients = study.getPatientCollection();
         PatientWrapper newPatient = PatientHelper.newPatient(name
             + "newPatient");
+        newPatient.setStudy(study);
         patients.add(newPatient);
         study.setPatientCollection(patients);
         study.persist();
@@ -533,6 +534,22 @@ public class TestStudy extends TestDatabase {
             .getId());
         // object is not anymore in database
         Assert.assertNull(studyInDB);
+    }
+
+    @Test
+    public void testDeleteWithPatient() throws Exception {
+        String name = "testDelete" + r.nextInt();
+        StudyWrapper study = StudyHelper.addStudy(SiteHelper.addSite(name),
+            name);
+        PatientHelper.addPatient(name, study);
+        study.reload();
+        try {
+            study.delete();
+            Assert
+                .fail("Should not delete : patients need to be removed first");
+        } catch (BiobankCheckException bce) {
+            Assert.assertTrue(true);
+        }
     }
 
     @Test

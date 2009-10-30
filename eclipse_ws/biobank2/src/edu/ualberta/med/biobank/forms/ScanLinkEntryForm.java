@@ -44,6 +44,7 @@ import org.springframework.remoting.RemoteConnectFailureException;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.LabelingScheme;
+import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
@@ -475,8 +476,7 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
             @Override
             public String getText(Object element) {
                 PatientVisitWrapper pv = (PatientVisitWrapper) element;
-                return BioBankPlugin.getDateTimeFormatter().format(
-                    pv.getDateDrawn());
+                return DateFormatter.formatAsDateTime(pv.getDateDrawn());
             }
         });
         viewerVisits.getCCombo().addKeyListener(new KeyAdapter() {

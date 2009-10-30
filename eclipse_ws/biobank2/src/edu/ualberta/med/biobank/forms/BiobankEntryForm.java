@@ -13,8 +13,9 @@ import org.eclipse.core.databinding.observable.value.WritableValue;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.jface.action.ControlContribution;
+import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.IMessageProvider;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
@@ -27,12 +28,10 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
@@ -69,7 +68,19 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
     // The widget that is to get the focus when the form is created
     protected Control firstControl;
 
-    private Button confirmButton;
+    private Action confirmAction;
+
+    private static ImageDescriptor resetActionImage = ImageDescriptor
+        .createFromImage(BioBankPlugin.getDefault().getImageRegistry().get(
+            BioBankPlugin.IMG_RESET_FORM));
+
+    private static ImageDescriptor cancelActionImage = ImageDescriptor
+        .createFromImage(BioBankPlugin.getDefault().getImageRegistry().get(
+            BioBankPlugin.IMG_CANCEL_FORM));
+
+    private static ImageDescriptor confirmActionImage = ImageDescriptor
+        .createFromImage(BioBankPlugin.getDefault().getImageRegistry().get(
+            BioBankPlugin.IMG_CONFIRM_FORM));
 
     protected KeyListener keyListener = new KeyAdapter() {
         @Override
@@ -198,7 +209,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
     }
 
     protected <T> ComboViewer createCComboViewerWithNoSelectionValidator(
-        Composite parent, String fieldLabel, Collection<?> input, T selection,
+        Composite parent, String fieldLabel, Collection<T> input, T selection,
         String errorMessage) {
         return widgetCreator.createCComboViewerWithNoSelectionValidator(parent,
             fieldLabel, input, selection, errorMessage);
@@ -236,8 +247,8 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
     }
 
     protected void setConfirmEnabled(boolean enabled) {
-        if (confirmButton != null && !confirmButton.isDisposed()) {
-            confirmButton.setEnabled(enabled);
+        if (confirmAction != null) {
+            confirmAction.setEnabled(enabled);
         }
     }
 
@@ -265,74 +276,87 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
     }
 
     private void addToolbarButtons() {
-        ControlContribution reset = new ControlContribution("Reset") {
+        // ControlContribution reset = new ControlContribution("Reset") {
+        // @Override
+        // protected Control createControl(Composite parent) {
+        // Button resetButton = new Button(parent, SWT.PUSH);
+        // resetButton.setText("Reset");
+        // resetButton.addSelectionListener(new SelectionAdapter() {
+        // @Override
+        // public void widgetSelected(SelectionEvent e) {
+        // reset();
+        // }
+        // });
+        // return resetButton;
+        // }
+        // };
+        Action reset = new Action("Reset") {
             @Override
-            protected Control createControl(Composite parent) {
-                Button resetButton = new Button(parent, SWT.PUSH);
-                resetButton.setText("Reset");
-                resetButton.addSelectionListener(new SelectionAdapter() {
-                    @Override
-                    public void widgetSelected(SelectionEvent e) {
+            public void run() {
+                BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
+                    public void run() {
                         reset();
                     }
                 });
-                return resetButton;
             }
         };
+        reset.setImageDescriptor(resetActionImage);
         form.getToolBarManager().add(reset);
 
-        ControlContribution cancel = new ControlContribution("Cancel") {
+        // ControlContribution cancel = new ControlContribution("Cancel") {
+        // @Override
+        // protected Control createControl(Composite parent) {
+        // Button cancelButton = new Button(parent, SWT.PUSH);
+        // cancelButton.setText("Cancel");
+        // cancelButton.addSelectionListener(new SelectionAdapter() {
+        // @Override
+        // public void widgetSelected(SelectionEvent e) {
+        // cancel();
+        // }
+        // });
+        // return cancelButton;
+        // }
+        // };
+        Action cancel = new Action("Cancel") {
             @Override
-            protected Control createControl(Composite parent) {
-                Button cancelButton = new Button(parent, SWT.PUSH);
-                cancelButton.setText("Cancel");
-                cancelButton.addSelectionListener(new SelectionAdapter() {
-                    @Override
-                    public void widgetSelected(SelectionEvent e) {
+            public void run() {
+                BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
+                    public void run() {
                         cancel();
                     }
                 });
-                return cancelButton;
             }
         };
+        cancel.setImageDescriptor(cancelActionImage);
         form.getToolBarManager().add(cancel);
 
-        ControlContribution confirm = new ControlContribution("Confirm") {
+        // ControlContribution confirm = new ControlContribution("Confirm") {
+        // @Override
+        // protected Control createControl(Composite parent) {
+        // confirmButton = new Button(parent, SWT.PUSH);
+        // confirmButton.setText("Confirm");
+        // confirmButton.addSelectionListener(new SelectionAdapter() {
+        // @Override
+        // public void widgetSelected(SelectionEvent e) {
+        // confirm();
+        // }
+        // });
+        // return confirmButton;
+        // }
+        // };
+        confirmAction = new Action("Confirm") {
             @Override
-            protected Control createControl(Composite parent) {
-                confirmButton = new Button(parent, SWT.PUSH);
-                confirmButton.setText("Confirm");
-                confirmButton.addKeyListener(new KeyListener() {
-                    @Override
-                    public void keyPressed(KeyEvent e) {
-                        if (e.keyCode == 13) {
-                            String text = ((Text) e.widget).getText();
-                            if (BioBankPlugin.getDefault().isConfirmBarcode(
-                                text)
-                                && confirmButton.isEnabled()) {
-                                setDirty(false);
-                                doSaveInternal();
-                            } else if (BioBankPlugin.getDefault()
-                                .isCancelBarcode(text)) {
-                                cancel();
-                            }
-                        }
-                    }
-
-                    @Override
-                    public void keyReleased(KeyEvent e) {
-                    }
-                });
-                confirmButton.addSelectionListener(new SelectionAdapter() {
-                    @Override
-                    public void widgetSelected(SelectionEvent e) {
+            public void run() {
+                BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
+                    public void run() {
                         confirm();
                     }
                 });
-                return confirmButton;
             }
         };
-        form.getToolBarManager().add(confirm);
+        confirmAction.setImageDescriptor(confirmActionImage);
+        form.getToolBarManager().add(confirmAction);
+
         form.updateToolBar();
     }
 

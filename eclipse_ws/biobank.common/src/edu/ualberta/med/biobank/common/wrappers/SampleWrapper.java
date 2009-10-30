@@ -142,7 +142,11 @@ public class SampleWrapper extends
     }
 
     public void setSampleType(SampleTypeWrapper type) {
-        setSampleType(type.wrappedObject);
+        if (type == null) {
+            setSampleType((SampleType) null);
+        } else {
+            setSampleType(type.wrappedObject);
+        }
     }
 
     public SampleTypeWrapper getSampleType() {

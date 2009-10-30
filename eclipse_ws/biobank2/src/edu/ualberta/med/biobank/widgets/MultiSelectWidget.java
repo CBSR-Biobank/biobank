@@ -82,7 +82,6 @@ public class MultiSelectWidget extends BiobankWidget {
 
     public void addSelections(ListOrderedMap available, List<Integer> selected) {
         MapIterator it = available.mapIterator();
-
         while (it.hasNext()) {
             Integer key = (Integer) it.next();
             if (selected.contains(key)) {
@@ -93,6 +92,15 @@ public class MultiSelectWidget extends BiobankWidget {
                     availTreeRootNode, key, (String) it.getValue()));
             }
         }
+    }
+
+    /**
+     * same as addSelections but remove previously set elements
+     */
+    public void setSelections(ListOrderedMap available, List<Integer> selected) {
+        selTreeRootNode.clear();
+        availTreeRootNode.clear();
+        addSelections(available, selected);
     }
 
     /**

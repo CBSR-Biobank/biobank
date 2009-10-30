@@ -10,6 +10,8 @@ import org.eclipse.core.databinding.UpdateValueStrategy;
 import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.databinding.beans.PojoObservables;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
+import org.eclipse.core.databinding.observable.value.IValueChangeListener;
+import org.eclipse.core.databinding.observable.value.ValueChangeEvent;
 import org.eclipse.core.databinding.observable.value.WritableValue;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.IMessageProvider;
@@ -27,6 +29,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
@@ -71,9 +74,9 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
 
     private DateTimeWidget dateDrawn;
 
-    private DateTimeWidget dateProcessed;
-
     private DateTimeWidget dateReceived;
+
+    private DateTimeWidget dateProcessed;
 
     private ComboViewer clinicsComboViewer;
 
@@ -146,7 +149,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         FormUtils.setTextValue(siteLabel, patientVisitWrapper.getPatient()
             .getStudy().getWrappedObject().getSite().getName());
 
-        if (patientVisitWrapper.getId() == null) {
+        if (patientVisitWrapper.isNew()) {
             // choose clinic for new visit
             List<ClinicWrapper> studyClinics = study.getClinicCollection();
             ClinicWrapper selectedClinic = patientVisitWrapper.getClinic();
@@ -165,21 +168,21 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         }
 
         dateDrawn = createDateTimeWidget(client, "Date Drawn",
-            patientVisitWrapper.getDateDrawn(), false,
-            "Date drawn should be set");
+            patientVisitWrapper.getDateDrawn(), "dateDrawn",
+            "Date drawn should be set", false);
 
         firstControl = dateDrawn;
 
-        Date processedDate = patientVisitWrapper.getDateProcessed();
-        if (processedDate == null) {
-            processedDate = new Date();
+        dateReceived = createDateTimeWidget(client, "Date Received",
+            patientVisitWrapper.getDateReceived(), "dateReceived",
+            "Date received should be set", false);
+
+        if (patientVisitWrapper.getDateProcessed() == null) {
+            patientVisitWrapper.setDateProcessed(new Date());
         }
         dateProcessed = createDateTimeWidget(client, "Date Processed",
-            processedDate, false, "Date processed should be set");
-
-        dateReceived = createDateTimeWidget(client, "Date Received",
-            patientVisitWrapper.getDateReceived(), false,
-            "Date received should be set");
+            patientVisitWrapper.getDateProcessed(), "dateProcessed",
+            "Date processed should be set", false);
 
         createPvDataSection(client);
 
@@ -225,7 +228,8 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
                     pvCustomInfo, "value"), null);
         case 3: // date_time
             return createDateTimeWidget(client, pvCustomInfo.label,
-                DateFormatter.parseToDateTime(pvCustomInfo.value), true, null);
+                DateFormatter.parseToDateTime(pvCustomInfo.value), null, null,
+                true);
         case 4: // select_single
             return createBoundWidgetWithLabel(client, Combo.class, SWT.NONE,
                 pvCustomInfo.label, pvCustomInfo.allowedValues, PojoObservables
@@ -265,17 +269,30 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
     }
 
     private DateTimeWidget createDateTimeWidget(Composite client,
-        String nameLabel, Date date, boolean canBeEmpty,
-        final String emptyMessage) {
+        String nameLabel, Date date, String propertyName,
+        final String emptyMessage, boolean canBeEmpty) {
         Label label = toolkit.createLabel(client, nameLabel + ":", SWT.NONE);
         label.setLayoutData(new GridData(GridData.VERTICAL_ALIGN_BEGINNING));
         final DateTimeWidget widget = new DateTimeWidget(client, SWT.NONE, date);
         widget.addSelectionListener(selectionListener);
         widget.adaptToToolkit(toolkit, true);
 
+        final IObservableValue dateValue = BeansObservables.observeValue(
+            patientVisitWrapper, propertyName);
+        widget.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                dateValue.setValue(widget.getDate());
+            }
+        });
+        dateValue.addValueChangeListener(new IValueChangeListener() {
+            @Override
+            public void handleValueChange(ValueChangeEvent event) {
+                widget.setDate((Date) dateValue.getValue());
+            }
+        });
+
         if (!canBeEmpty) {
-            final IObservableValue dateValue = new WritableValue(null,
-                Date.class);
             DateNotNulValidator validator = new DateNotNulValidator(
                 emptyMessage);
             validator.setControlDecoration(FormUtils.createDecorator(label,
@@ -283,13 +300,6 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
             UpdateValueStrategy uvs = new UpdateValueStrategy();
             uvs.setAfterConvertValidator(validator);
             bindValue(new WritableValue(null, Date.class), dateValue, uvs, uvs);
-            dateValue.setValue(date);
-            widget.addSelectionListener(new SelectionAdapter() {
-                @Override
-                public void widgetSelected(SelectionEvent e) {
-                    dateValue.setValue(widget.getDate());
-                }
-            });
         }
         return widget;
     }
@@ -334,12 +344,15 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         patientVisitWrapper.setDateReceived(dateReceived.getDate());
         patientVisitWrapper.setComments(commentsText.getText());
 
-        // FIXME get csm_user_id and set it to the Patient Visit at insert
-
         setPvCustomInfo();
         patientVisitWrapper
             .setPvSampleSourceCollection(pvSampleSourceEntryWidget
                 .getPvSampleSources());
+
+        if (patientVisitWrapper.isNew()) {
+            patientVisitWrapper.setUsername(SessionManager.getInstance()
+                .getSession().getUserName());
+        }
         patientVisitWrapper.persist();
 
         patientAdapter.performExpand();
@@ -378,7 +391,21 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
     }
 
     @Override
-    public void setFocus() {
-        firstControl.setFocus();
+    public void reset() {
+        super.reset();
+
+        if (patientVisitWrapper.isNew()
+            && clinicsComboViewer.getCCombo().getItemCount() > 1) {
+            clinicsComboViewer.getCCombo().deselectAll();
+        }
+
+        if (patientVisitWrapper.getDateProcessed() == null) {
+            patientVisitWrapper.setDateProcessed(new Date());
+        }
+        pvSampleSourceEntryWidget
+            .setSelectedPvSampleSources(patientVisitWrapper
+                .getPvSampleSourceCollection());
+
+        // TODO reset for optional values
     }
 }
