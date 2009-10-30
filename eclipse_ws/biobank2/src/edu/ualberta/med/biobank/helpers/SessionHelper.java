@@ -40,8 +40,9 @@ public class SessionHelper implements Runnable {
         try {
             if (userName.length() == 0) {
                 if (BioBankPlugin.getDefault().isDebugging()) {
+                    userName = "testuser";
                     appService = (WritableApplicationService) ApplicationServiceProvider
-                        .getApplicationServiceFromUrl(serverUrl, "testuser",
+                        .getApplicationServiceFromUrl(serverUrl, userName,
                             "test");
                 } else {
                     appService = (WritableApplicationService) ApplicationServiceProvider
@@ -76,5 +77,9 @@ public class SessionHelper implements Runnable {
 
     public Collection<SiteWrapper> getSites() {
         return siteWrappers;
+    }
+
+    public String getUserName() {
+        return userName;
     }
 }

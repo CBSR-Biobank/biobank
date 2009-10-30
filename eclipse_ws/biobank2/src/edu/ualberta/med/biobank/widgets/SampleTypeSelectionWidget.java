@@ -177,7 +177,6 @@ public class SampleTypeSelectionWidget {
         } else {
             dbc.addBinding(binding);
         }
-
     }
 
     public void removeBinding(WidgetCreator dbc) {

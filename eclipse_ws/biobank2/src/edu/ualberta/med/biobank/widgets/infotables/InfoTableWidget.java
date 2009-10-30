@@ -142,12 +142,14 @@ public class InfoTableWidget<T> extends BiobankWidget {
                             ((ModelWrapper<?>) item).loadAttributes();
                         }
 
-                        display.asyncExec(new Runnable() {
-                            public void run() {
-                                if (!viewer.getTable().isDisposed())
-                                    viewer.refresh(modelItem, false);
-                            }
-                        });
+                        if (!isDisposed()) {
+                            display.asyncExec(new Runnable() {
+                                public void run() {
+                                    if (!viewer.getTable().isDisposed())
+                                        viewer.refresh(modelItem, false);
+                                }
+                            });
+                        }
                         ++count;
                     }
                 } catch (Exception e) {

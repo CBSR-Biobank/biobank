@@ -315,6 +315,8 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
             SWT.NONE, patientVisitWrapper.getPvSampleSourceCollection(),
             patientVisitWrapper, toolkit);
         pvSampleSourceEntryWidget.addSelectionChangedListener(listener);
+        pvSampleSourceEntryWidget.addBinding(widgetCreator);
+
     }
 
     @Override

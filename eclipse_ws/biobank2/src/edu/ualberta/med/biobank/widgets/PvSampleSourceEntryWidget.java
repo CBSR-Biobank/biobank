@@ -6,9 +6,17 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.core.databinding.UpdateValueStrategy;
+import org.eclipse.core.databinding.observable.value.IObservableValue;
+import org.eclipse.core.databinding.observable.value.WritableValue;
+import org.eclipse.core.databinding.validation.IValidator;
+import org.eclipse.core.databinding.validation.ValidationStatus;
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.fieldassist.ControlDecoration;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -29,9 +37,11 @@ import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PvSampleSourceWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleSourceWrapper;
 import edu.ualberta.med.biobank.dialogs.PvSampleSourceDialog;
+import edu.ualberta.med.biobank.forms.FormUtils;
 import edu.ualberta.med.biobank.widgets.infotables.PvSampleSourceInfoTable;
 import edu.ualberta.med.biobank.widgets.listener.BiobankEntryFormWidgetListener;
 import edu.ualberta.med.biobank.widgets.listener.MultiSelectEvent;
+import edu.ualberta.med.biobank.widgets.utils.WidgetCreator;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 /**
@@ -49,6 +59,9 @@ public class PvSampleSourceEntryWidget extends BiobankWidget {
     private List<PvSampleSourceWrapper> selectedPvSampleSources;
 
     private PatientVisitWrapper patientVisit;
+
+    private IObservableValue sampleSourcesAdded = new WritableValue(
+        Boolean.FALSE, Boolean.class);
 
     /**
      * 
@@ -77,8 +90,8 @@ public class PvSampleSourceEntryWidget extends BiobankWidget {
         setLayout(new GridLayout(1, false));
         setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-        pvSampleSourceTable = new PvSampleSourceInfoTable(parent,
-            selectedPvSampleSources);
+        pvSampleSourceTable = new PvSampleSourceInfoTable(parent, null);
+        updateCollection();
         pvSampleSourceTable.adaptToToolkit(toolkit, true);
         addTableMenu();
         pvSampleSourceTable
@@ -104,6 +117,28 @@ public class PvSampleSourceEntryWidget extends BiobankWidget {
         });
     }
 
+    public void addBinding(WidgetCreator dbc) {
+        final ControlDecoration controlDecoration = FormUtils.createDecorator(
+            addPvSampleSourceButton,
+            "Sample sources should be selected for this visit");
+        WritableValue wv = new WritableValue(Boolean.FALSE, Boolean.class);
+        UpdateValueStrategy uvs = new UpdateValueStrategy();
+        uvs.setAfterGetValidator(new IValidator() {
+            @Override
+            public IStatus validate(Object value) {
+                if (value instanceof Boolean && !(Boolean) value) {
+                    controlDecoration.show();
+                    return ValidationStatus
+                        .error("Sample sources should be selected");
+                } else {
+                    controlDecoration.hide();
+                    return Status.OK_STATUS;
+                }
+            }
+        });
+        dbc.bindValue(wv, sampleSourcesAdded, uvs, uvs);
+    }
+
     private void addOrEditPvSampleSource(boolean add,
         PvSampleSourceWrapper pvSampleSource,
         Set<SampleSourceWrapper> availSampleSources) {
@@ -115,7 +150,7 @@ public class PvSampleSourceEntryWidget extends BiobankWidget {
                 // only add to the collection when adding and not editing
                 selectedPvSampleSources.add(dlg.getPvSampleSource());
             }
-            pvSampleSourceTable.setCollection(selectedPvSampleSources);
+            updateCollection();
             notifyListeners();
         }
     }
@@ -174,7 +209,7 @@ public class PvSampleSourceEntryWidget extends BiobankWidget {
                         }
                     }
                     selectedPvSampleSources.removeAll(ssToDelete);
-                    pvSampleSourceTable.setCollection(selectedPvSampleSources);
+                    updateCollection();
                     notifyListeners();
                 }
             }
@@ -182,6 +217,11 @@ public class PvSampleSourceEntryWidget extends BiobankWidget {
             public void widgetDefaultSelected(SelectionEvent e) {
             }
         });
+    }
+
+    private void updateCollection() {
+        pvSampleSourceTable.setCollection(selectedPvSampleSources);
+        sampleSourcesAdded.setValue(selectedPvSampleSources.size() > 0);
     }
 
     private void getSampleSources() {

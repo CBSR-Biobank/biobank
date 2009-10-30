@@ -318,9 +318,6 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
                 + getDateDrawn() + " already exist in patient "
                 + getPatient().getNumber() + ".");
         }
-        if (isNew() && getUsername() == null) {
-
-        }
     }
 
     public String getUsername() {
