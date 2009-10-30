@@ -321,11 +321,21 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
         if (isNew() && getUsername() == null) {
 
         }
+
+        boolean found = false;
+        Collection<StudyWrapper> studies = getClinic().getStudyCollection();
+        for (StudyWrapper study : studies)
+            if (study.getId().equals(getPatient().getStudy().getId()))
+                found = true;
+        if (!found)
+            throw new BiobankCheckException("A patient visit with date drawn "
+                + getDateDrawn() + " already exist in patient "
+                + getPatient().getNumber() + ".");
     }
 
     public String getUsername() {
         return wrappedObject.getUsername();
-        }
+    }
 
     public void setUsername(String username) {
         String oldUsername = wrappedObject.getUsername();
