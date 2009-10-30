@@ -74,8 +74,6 @@ public class DebugInitializationHelper {
 
     private Collection<PatientWrapper> patients;
 
-    private Collection<PatientVisitWrapper> patientVisits;
-
     private ContainerTypeWrapper binType;
 
     private ContainerTypeWrapper drawerType;
@@ -94,7 +92,6 @@ public class DebugInitializationHelper {
                     String[] insertMethodNames = new String[] { "insertSite",
                         "insertClinicsInSite", "insertStudyInSite",
                         "insertPatientInStudy", "insertPatientVisitsInPatient",
-                        "insertSampleInPatientVisit",
                         "insertContainerTypesInSite", "insertContainers",
                         "insertSampleStorage" };
                     int taskNber = insertMethodNames.length
@@ -178,15 +175,16 @@ public class DebugInitializationHelper {
             clinic.setName("Clinic " + (i + 1));
             clinic.setSite(site);
             clinic.setCity("Edmonton");
-            clinic.persist();
-            clinics[i] = clinic;
-
+            List<ContactWrapper> contacts = new ArrayList<ContactWrapper>();
             for (int j = 0; j < 2; ++j) {
                 ContactWrapper contact = new ContactWrapper(appService);
                 contact.setName("Contact " + (i + 1) + "-" + (j + 1));
-                contact.setClinicWrapper(clinics[i]);
-                contact.persist();
+                contact.setClinicWrapper(clinic);
+                contacts.add(contact);
             }
+            clinic.setContactCollection(contacts);
+            clinic.persist();
+            clinics[i] = clinic;
         }
     }
 
@@ -203,20 +201,6 @@ public class DebugInitializationHelper {
         study.persist();
     }
 
-    @SuppressWarnings("unused")
-    private void insertSampleInPatientVisit() throws ApplicationException,
-        BiobankCheckException, WrapperException {
-        for (PatientVisitWrapper patientVisit : patientVisits) {
-            SampleWrapper sample = new SampleWrapper(appService);
-            sample.setInventoryId(Integer.valueOf(new Random().nextInt(10000))
-                .toString());
-            sample.setPatientVisit(patientVisit);
-            sample.setLinkDate(new Date());
-            sample.setSampleType(getSampleType());
-            sample.persist();
-        }
-    }
-
     private SampleType getSampleType() throws ApplicationException {
         return (SampleType) appService.search(SampleType.class,
             new SampleType()).get(0);
@@ -224,40 +208,55 @@ public class DebugInitializationHelper {
 
     @SuppressWarnings("unused")
     private void insertPatientVisitsInPatient() throws Exception {
-        patientVisits = new ArrayList<PatientVisitWrapper>();
         Random r = new Random();
         for (PatientWrapper patient : patients) {
-            createPatientVisit(r, patient);
-            createPatientVisit(r, patient);
-            createPatientVisit(r, patient);
+            List<PatientVisitWrapper> visits = new ArrayList<PatientVisitWrapper>();
+            visits.add(createPatientVisit(r, patient));
+            visits.add(createPatientVisit(r, patient));
+            visits.add(createPatientVisit(r, patient));
         }
     }
 
-    private void createPatientVisit(Random r, PatientWrapper patient)
-        throws ApplicationException, BiobankCheckException, WrapperException {
+    private PatientVisitWrapper createPatientVisit(Random r,
+        PatientWrapper patient) throws ApplicationException {
         PatientVisitWrapper patientVisit = new PatientVisitWrapper(appService);
         patientVisit.setClinic(clinics[0]);
         String dateStr = String.format("2009-%02d-25 %02d:%02d",
             r.nextInt(12) + 1, r.nextInt(24), r.nextInt(60));
         patientVisit.setDateDrawn(DateFormatter.parseToDateTime(dateStr));
-
         patientVisit.setPatient(patient);
-        patientVisit.persist();
-        patientVisits.add(patientVisit);
+        SampleWrapper sample = createSample(patientVisit);
+        patientVisit.setSampleCollection(Arrays
+            .asList(new SampleWrapper[] { sample }));
+        return patientVisit;
+    }
+
+    private SampleWrapper createSample(PatientVisitWrapper patientVisit)
+        throws ApplicationException {
+        SampleWrapper sample = new SampleWrapper(appService);
+        sample.setInventoryId(Integer.valueOf(new Random().nextInt(10000))
+            .toString());
+        sample.setPatientVisit(patientVisit);
+        sample.setLinkDate(new Date());
+        sample.setSampleType(getSampleType());
+        return sample;
     }
 
     @SuppressWarnings("unused")
-    private void insertPatientInStudy() throws ApplicationException,
-        BiobankCheckException, WrapperException {
-        patients = new ArrayList<PatientWrapper>();
+    private void insertPatientInStudy() throws Exception {
+        List<PatientWrapper> studyPatients = new ArrayList<PatientWrapper>();
         for (int i = 0; i < 100; i++) {
             PatientWrapper patient = new PatientWrapper(appService);
             patient.setNumber(Integer.toString(i));
             patient.setStudy(study);
 
             patient.persist();
-            patients.add(patient);
+            studyPatients.add(patient);
         }
+        study.setPatientCollection(studyPatients);
+        study.persist();
+        study.reload();
+        patients = study.getPatientCollection();
     }
 
     @SuppressWarnings("unused")
@@ -423,50 +422,48 @@ public class DebugInitializationHelper {
 
     public void deleteContainers(Collection<ContainerWrapper> containers,
         IProgressMonitor monitor) throws Exception {
-        if ((containers == null) || (containers.size() == 0))
-            return;
+        if (containers != null && containers.size() > 0) {
 
-        for (ContainerWrapper container : containers) {
-            monitor.subTask("deleting container " + container);
-            container.reload();
-            if (container.hasChildren()) {
-                deleteContainers(container.getChildren().values(), monitor);
+            for (ContainerWrapper container : containers) {
+                monitor.subTask("deleting container " + container);
+                container.reload();
+                if (container.hasChildren()) {
+                    deleteContainers(container.getChildren().values(), monitor);
+                }
+                if (container.hasSamples()) {
+                    deleteFromList(container.getSamples().values(), monitor,
+                        "Sample");
+                }
+                container.reload();
+                container.delete();
             }
-            if (container.hasSamples()) {
-                deleteFromList(container.getSamples().values(), monitor,
-                    "Sample");
-            }
-            container.reload();
-            container.delete();
         }
         monitor.worked(1);
     }
 
     public void deleteStudies(List<StudyWrapper> studies,
         IProgressMonitor monitor) throws Exception {
-        if (studies == null)
-            return;
-
-        for (StudyWrapper study : studies) {
-            monitor.subTask("deleting study " + study);
-            deletePatients(study.getPatientCollection(), monitor);
-            study.reload();
-            study.delete();
+        if (studies != null) {
+            for (StudyWrapper study : studies) {
+                monitor.subTask("deleting study " + study);
+                deletePatients(study.getPatientCollection(), monitor);
+                study.reload();
+                study.delete();
+            }
         }
         monitor.worked(1);
     }
 
     public void deletePatients(List<PatientWrapper> patients,
         IProgressMonitor monitor) throws Exception {
-        if (patients == null)
-            return;
-
-        for (PatientWrapper patient : patients) {
-            monitor.subTask("deleting patient " + patient);
-            deleteFromList(patient.getPatientVisitCollection(), monitor,
-                "PatientVisit");
-            patient.reload();
-            patient.delete();
+        if (patients != null) {
+            for (PatientWrapper patient : patients) {
+                monitor.subTask("deleting patient " + patient);
+                deleteFromList(patient.getPatientVisitCollection(), monitor,
+                    "PatientVisit");
+                patient.reload();
+                patient.delete();
+            }
         }
         monitor.worked(1);
     }

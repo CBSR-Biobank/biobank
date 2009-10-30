@@ -1,9 +1,5 @@
 package edu.ualberta.med.biobank.forms;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
 import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
@@ -16,7 +12,6 @@ import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.treeview.ClinicAdapter;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
@@ -131,7 +126,7 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         contactEntryWidget = new ContactEntryWidget(client, SWT.NONE,
-            clinicWrapper.getContactCollection(), toolkit);
+            clinicWrapper, toolkit);
         contactEntryWidget.addSelectionChangedListener(listener);
     }
 
@@ -149,43 +144,8 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
         SiteAdapter siteAdapter = clinicAdapter
             .getParentFromClass(SiteAdapter.class);
         clinicWrapper.setSite(siteAdapter.getWrapper());
-        saveContacts();
+        clinicWrapper.setContactCollection(contactEntryWidget.getContacts());
         clinicWrapper.persist();
-    }
-
-    private void saveContacts() throws Exception {
-        Collection<ContactWrapper> contactCollection = contactEntryWidget
-            .getContacts();
-        removeDeletedContacts(contactCollection);
-
-        for (ContactWrapper cw : contactCollection) {
-            cw.setClinicWrapper(clinicWrapper);
-            cw.persist();
-        }
-    }
-
-    private void removeDeletedContacts(
-        Collection<ContactWrapper> newContactCollection) throws Exception {
-        // no need to remove if clinic is not yet in the database
-        if (clinicWrapper.getId() == null)
-            return;
-
-        Collection<ContactWrapper> contactCollection = clinicWrapper
-            .getContactCollection();
-
-        if (contactCollection == null)
-            return;
-
-        List<Integer> selectedContactIds = new ArrayList<Integer>();
-        for (ContactWrapper cw : newContactCollection) {
-            selectedContactIds.add(cw.getId());
-        }
-
-        for (ContactWrapper cw : contactCollection) {
-            if (!selectedContactIds.contains(cw.getId())) {
-                cw.delete();
-            }
-        }
     }
 
     @Override

@@ -134,7 +134,10 @@ public class ContactWrapper extends ModelWrapper<Contact> {
     @Override
     protected void deleteChecks() throws BiobankCheckException,
         ApplicationException {
-        // no checks required for contacts
+        if (getStudyCollection() != null && getStudyCollection().size() > 0) {
+            throw new BiobankCheckException("Unable to delete contact "
+                + getName() + ". No more study reference should exist.");
+        }
     }
 
     @Override

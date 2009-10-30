@@ -212,6 +212,24 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
         }
     }
 
+    @Override
+    protected void persistDependencies(Clinic origObject)
+        throws BiobankCheckException, ApplicationException, WrapperException {
+        // remove contacts which are not on the list anymore
+        if (origObject != null) {
+            List<ContactWrapper> contactsOrig = new ClinicWrapper(appService,
+                origObject).getContactCollection();
+            if (contactsOrig != null && contactsOrig.size() > 0) {
+                Collection<ContactWrapper> contactsNew = getContactCollection();
+                for (ContactWrapper cw : contactsOrig) {
+                    if (!contactsNew.contains(cw)) {
+                        cw.delete();
+                    }
+                }
+            }
+        }
+    }
+
     public boolean checkClinicNameUnique() throws ApplicationException {
         HQLCriteria c;
 
