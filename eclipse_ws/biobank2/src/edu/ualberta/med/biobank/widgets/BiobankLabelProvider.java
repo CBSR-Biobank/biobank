@@ -1,10 +1,16 @@
 package edu.ualberta.med.biobank.widgets;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.swt.graphics.Image;
 import org.springframework.util.Assert;
 
+import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
@@ -27,6 +33,8 @@ import edu.ualberta.med.biobank.model.StudyContactAndPatientInfo;
 import edu.ualberta.med.biobank.model.StudyContactInfo;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.widgets.infotables.BiobankCollectionModel;
+import gov.nih.nci.system.applicationservice.ApplicationException;
+import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 /**
  * This code must not run in the UI thread.
@@ -84,7 +92,7 @@ public class BiobankLabelProvider extends LabelProvider implements
             case 2:
                 return ct.getActivityStatus();
 
-            case 3:  
+            case 3:
                 HQLCriteria c = new HQLCriteria(
                     "select count(*) from edu.ualberta.med.biobank.model.Container where containerType.id=?",
                     Arrays.asList(new Object[] { ct.getId() }));

@@ -59,6 +59,7 @@ public class ReportsView extends ViewPart {
 
     @Override
     public void createPartControl(Composite parent) {
+
         sc = new ScrolledComposite(parent, SWT.V_SCROLL);
         sc.setLayout(new GridLayout(1, false));
         sc.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));

@@ -56,9 +56,9 @@ public class ContainerWrapper extends
         checkContainerTypeNotNull();
         // TODO check type is from same site ?
         // TODO check parent is from same site ?
-        // TODO check this type is available in parent type ?
         checkLabelUniqueForType();
         checkProductBarcodeUnique();
+        canHoldCTs();
         super.persistChecks();
     }
 
@@ -489,13 +489,21 @@ public class ContainerWrapper extends
         return children.get(new RowColPos(row, col));
     }
 
-    public boolean canHoldCT(ContainerTypeWrapper childType) {
-        List<ContainerTypeWrapper> allowed = getContainerType()
+    public void canHoldCTs() throws BiobankCheckException {
+        if (getContainerType().getTopLevel())
+            return;
+
+        boolean found = false;
+        List<ContainerTypeWrapper> allowed = getParent().getContainerType()
             .getChildContainerTypeCollection();
         for (ContainerTypeWrapper ct : allowed)
-            if (ct.getId().equals(childType.getId()))
-                return true;
-        return false;
+            if (ct.getId().equals(getContainerType().getId()))
+                found = true;
+        if (!found)
+            throw new BiobankCheckException("Container "
+                + getParent().getFullInfoLabel()
+                + " does not allow inserts of type "
+                + getContainerType().getName() + ".");
     }
 
     public void addChild(Integer row, Integer col, ContainerWrapper child)
@@ -504,10 +512,6 @@ public class ContainerWrapper extends
         if (children == null) {
             children = new HashMap<RowColPos, ContainerWrapper>();
             propertiesMap.put("children", children);
-        } else if (!canHoldCT(child.getContainerType())) {
-            throw new BiobankCheckException("Container " + getFullInfoLabel()
-                + " does not allow inserts of type "
-                + child.getContainerType().getName() + ".");
         } else {
             ContainerWrapper containerAtPosition = getChild(row, col);
             if (containerAtPosition != null) {
