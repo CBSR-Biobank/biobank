@@ -318,6 +318,19 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
                 + getDateDrawn() + " already exist in patient "
                 + getPatient().getNumber() + ".");
         }
+        boolean found = false;
+        Collection<ClinicWrapper> clinics = this.getPatient().getStudy()
+            .getClinicCollection();
+        Integer clinicId = this.getClinic().getId();
+        for (ClinicWrapper clinic : clinics) {
+            if (clinic.getId().equals(clinicId))
+                found = true;
+        }
+
+        if (!found)
+            throw new BiobankCheckException("Clinic " + getClinic().getName()
+                + " is not an available clinic for study "
+                + getPatient().getStudy().getName() + ".");
     }
 
     @Override

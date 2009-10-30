@@ -9,7 +9,6 @@ import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.widgets.AttributeQueryClause;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class QueryObject {
@@ -88,8 +87,9 @@ public class QueryObject {
         List<Object> results = new ArrayList<Object>();
         try {
             results = SessionManager.getAppService().query(c);
-        } catch (ApplicationException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            ReportsView.LOGGER.error("HQLQuery failed: " + c.toString() + "\n"
+                + e.toString());
         }
         return results;
     }

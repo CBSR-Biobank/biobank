@@ -7,6 +7,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
+
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.LabelingScheme;
 import edu.ualberta.med.biobank.common.RowColPos;
@@ -26,6 +28,9 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class ContainerWrapper extends
     AbstractPositionHolder<Container, ContainerPosition> {
+
+    private static Logger LOGGER = Logger.getLogger(ContainerWrapper.class
+        .getName());
 
     public ContainerWrapper(WritableApplicationService appService,
         Container wrappedObject) {
@@ -393,16 +398,26 @@ public class ContainerWrapper extends
         if (samples == null) {
             samples = new HashMap<RowColPos, SampleWrapper>();
             propertiesMap.put("samples", samples);
-        } else {
-            SampleWrapper sampleAtPosition = getSample(row, col);
-            if (sampleAtPosition != null) {
-                throw new BiobankCheckException("Container "
-                    + getFullInfoLabel()
-                    + " is already holding a sample at position "
-                    + sampleAtPosition.getPositionString(false) + " (" + row
-                    + ":" + col + ")");
+        } else
+            try {
+                if (!canHoldSample(sample)) {
+                    throw new BiobankCheckException("Container "
+                        + getFullInfoLabel()
+                        + " does not allow inserts of type "
+                        + sample.getSampleType().getName() + ".");
+                } else {
+                    SampleWrapper sampleAtPosition = getSample(row, col);
+                    if (sampleAtPosition != null) {
+                        throw new BiobankCheckException("Container "
+                            + getFullInfoLabel()
+                            + " is already holding a sample at position "
+                            + sampleAtPosition.getPositionString(false) + " ("
+                            + row + ":" + col + ")");
+                    }
+                }
+            } catch (ApplicationException e) {
+                LOGGER.error("Adding sample failed. " + "\n" + e.toString());
             }
-        }
         sample.setPosition(row, col);
         sample.setParent(this);
         samples.put(new RowColPos(row, col), sample);
@@ -474,12 +489,25 @@ public class ContainerWrapper extends
         return children.get(new RowColPos(row, col));
     }
 
+    public boolean canHoldCT(ContainerTypeWrapper childType) {
+        List<ContainerTypeWrapper> allowed = getContainerType()
+            .getChildContainerTypeCollection();
+        for (ContainerTypeWrapper ct : allowed)
+            if (ct.getId().equals(childType.getId()))
+                return true;
+        return false;
+    }
+
     public void addChild(Integer row, Integer col, ContainerWrapper child)
         throws BiobankCheckException {
         Map<RowColPos, ContainerWrapper> children = getChildren();
         if (children == null) {
             children = new HashMap<RowColPos, ContainerWrapper>();
             propertiesMap.put("children", children);
+        } else if (!canHoldCT(child.getContainerType())) {
+            throw new BiobankCheckException("Container " + getFullInfoLabel()
+                + " does not allow inserts of type "
+                + child.getContainerType().getName() + ".");
         } else {
             ContainerWrapper containerAtPosition = getChild(row, col);
             if (containerAtPosition != null) {

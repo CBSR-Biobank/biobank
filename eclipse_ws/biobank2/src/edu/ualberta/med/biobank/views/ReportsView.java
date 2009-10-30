@@ -36,8 +36,7 @@ import edu.ualberta.med.biobank.widgets.infotables.InfoTableWidget;
 public class ReportsView extends ViewPart {
 
     @SuppressWarnings("unused")
-    private static Logger LOGGER = Logger
-        .getLogger(ReportsView.class.getName());
+    public static Logger LOGGER = Logger.getLogger(ReportsView.class.getName());
 
     public static final String ID = "edu.ualberta.med.biobank.views.ReportsView";
     private ScrolledComposite sc;
@@ -163,19 +162,14 @@ public class ReportsView extends ViewPart {
     }
 
     private Collection<Object> search() {
-        try {
-            IStructuredSelection typeSelection = (IStructuredSelection) querySelect
-                .getSelection();
-            QueryObject query = (QueryObject) typeSelection.getFirstElement();
-            ArrayList<Object> params = new ArrayList<Object>();
-            for (int i = 0; i < textFields.size(); i++) {
-                params.add(textFields.get(i).getText());
-            }
-            return query.executeQuery(params);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
+        IStructuredSelection typeSelection = (IStructuredSelection) querySelect
+            .getSelection();
+        QueryObject query = (QueryObject) typeSelection.getFirstElement();
+        ArrayList<Object> params = new ArrayList<Object>();
+        for (int i = 0; i < textFields.size(); i++) {
+            params.add(textFields.get(i).getText());
         }
+        return query.executeQuery(params);
     }
 
     public void comboChanged() {

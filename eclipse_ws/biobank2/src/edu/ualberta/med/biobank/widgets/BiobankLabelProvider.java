@@ -100,8 +100,10 @@ public class BiobankLabelProvider extends LabelProvider implements
                 try {
                     results = SessionManager.getAppService().query(c);
                 } catch (ApplicationException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
+                    BioBankPlugin.openAsyncError("Bad Query Result",
+                        "Query failed to return useful results. "
+                            + e.toString());
+                    return "";
                 }
                 if (results.size() != 1) {
                     BioBankPlugin.openAsyncError("Bad Query Result",
@@ -109,6 +111,7 @@ public class BiobankLabelProvider extends LabelProvider implements
                     return "";
                 } else
                     return String.valueOf(results.get(0));
+
             case 4:
                 Double temp = ct.getDefaultTemperature();
                 if (temp == null) {
