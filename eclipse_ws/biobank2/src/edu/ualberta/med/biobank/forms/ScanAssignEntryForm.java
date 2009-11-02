@@ -443,18 +443,15 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
                     && !foundSample.getParent().getId().equals(
                         currentPalletWrapper.getId())) {
                     // the scanned sample has already a position but a different
-                    // one
-                    scanCell.setStatus(SampleCellStatus.ERROR);
+                    // one - ie MOVED
                     String expectedPosition = foundSample
                         .getPositionString(true);
                     scanCell
                         .setInformation("Sample registered on another pallet with position "
-                            + expectedPosition + "!");
-                    scanCell.setTitle("!");
-                    appendLogError(positionString, " tube " + value
+                            + expectedPosition);
+                    appendLog("MOVE in " + positionString + ": tube " + value
                         + " registered on another pallet at position "
                         + expectedPosition);
-                    return false;
                 }
                 // sample is a new one !
                 if (!currentPalletWrapper.canHoldSample(foundSample)) {
