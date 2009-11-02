@@ -87,7 +87,8 @@ public class ContainerAdapter extends AdapterBase {
             }
         });
 
-        if (!getContainer().getContainerType().getTopLevel()) {
+        Boolean topLevel = getContainer().getContainerType().getTopLevel();
+        if (topLevel == null || !topLevel) {
             mi = new MenuItem(menu, SWT.PUSH);
             mi.setText("Move Container");
             mi.addSelectionListener(new SelectionListener() {

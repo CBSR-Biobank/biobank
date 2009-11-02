@@ -281,7 +281,13 @@ public class SampleWrapper extends
                 + " where inventoryId = ? and patientVisit.patient.study.site.id = ?",
             Arrays.asList(new Object[] { inventoryId, siteWrapper.getId() }));
         List<Sample> samples = appService.query(criteria);
-        return transformToWrapperList(appService, samples);
+        List<SampleWrapper> list = new ArrayList<SampleWrapper>();
+        for (Sample sample : samples) {
+            if (sample.getInventoryId().equals(inventoryId)) {
+                list.add(new SampleWrapper(appService, sample));
+            }
+        }
+        return list;
     }
 
     public static List<SampleWrapper> transformToWrapperList(
@@ -346,5 +352,10 @@ public class SampleWrapper extends
             return posWrapper;
         }
         return null;
+    }
+
+    @Override
+    public String toString() {
+        return getInventoryId();
     }
 }

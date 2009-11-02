@@ -142,17 +142,26 @@ public class LabelingScheme {
      */
     public static String getPositionString(RowColPos rcp,
         ContainerTypeWrapper containerType) {
-        switch (containerType.getChildLabelingScheme()) {
+        return getPositionString(rcp, containerType.getChildLabelingScheme(),
+            containerType.getRowCapacity(), containerType.getColCapacity());
+    }
+
+    /**
+     * Get the 2 char string corresponding to a RowColPos position inside the
+     * given containerType
+     */
+    public static String getPositionString(RowColPos rcp,
+        Integer childLabelingSchemeId, Integer rowCapacity, Integer colCapacity) {
+        switch (childLabelingSchemeId) {
         case 1:
             // SBS standard
             return RowColToSbs(rcp);
         case 2:
             // CBSR 2 char alphabetic
-            return rowColToCbsrTwoChar(rcp, containerType.getRowCapacity(),
-                containerType.getColCapacity());
+            return rowColToCbsrTwoChar(rcp, rowCapacity, colCapacity);
         case 3:
             // 2 char numeric
-            return rowColToTwoCharNumeric(rcp, containerType.getRowCapacity());
+            return rowColToTwoCharNumeric(rcp, rowCapacity);
         }
         return null;
     }

@@ -20,6 +20,7 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.dialogs.ContactAddDialog;
 import edu.ualberta.med.biobank.widgets.infotables.ContactInfoTable;
@@ -34,15 +35,18 @@ public class ContactEntryWidget extends BiobankWidget {
 
     private Button addClinicButton;
 
+    private ClinicWrapper clinic;
+
     public ContactEntryWidget(Composite parent, int style,
-        Collection<ContactWrapper> selectedContacts, FormToolkit toolkit) {
+        ClinicWrapper clinic, FormToolkit toolkit) {
         super(parent, style);
+        this.clinic = clinic;
         Assert.isNotNull(toolkit, "toolkit is null");
 
+        selectedContacts = clinic.getContactCollection();
         if (selectedContacts == null) {
             selectedContacts = new HashSet<ContactWrapper>();
         }
-        this.selectedContacts = selectedContacts;
 
         setLayout(new GridLayout(1, false));
         setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -131,7 +135,9 @@ public class ContactEntryWidget extends BiobankWidget {
         if (dlg.open() == Dialog.OK) {
             if (add) {
                 // only add to the collection when adding and not editing
-                selectedContacts.add(dlg.getContactWrapper());
+                ContactWrapper contact = dlg.getContactWrapper();
+                contact.setClinicWrapper(clinic);
+                selectedContacts.add(contact);
             }
             contactInfoTable.setCollection(selectedContacts);
             notifyListeners();
