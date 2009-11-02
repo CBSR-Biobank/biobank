@@ -1,7 +1,5 @@
 package test.ualberta.med.biobank;
 
-import static org.junit.Assert.fail;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -45,32 +43,24 @@ public class TestContainer extends TestDatabase {
 
     private static final int CONTAINER_CHILD_L3_COLS = 12;
 
-    private static List<String> usedBarcodes = new ArrayList<String>();
+    private static List<String> usedBarcodes;
 
-    private Map<String, ContainerWrapper> containerMap = new HashMap<String, ContainerWrapper>();
+    private Map<String, ContainerWrapper> containerMap;
 
     private SiteWrapper site;
 
     private Map<String, ContainerTypeWrapper> containerTypeMap;
 
-    // TODO: test attempt to add too many children
-
     @Override
     @Before
     public void setUp() throws Exception {
         super.setUp();
+        usedBarcodes = new ArrayList<String>();
+        containerMap = new HashMap<String, ContainerWrapper>();
         containerTypeMap = new HashMap<String, ContainerTypeWrapper>();
-
-        List<SiteWrapper> sites = SiteWrapper.getAllSites(appService);
-        if (sites.size() > 0) {
-            // for (SiteWrapper site : sites) {
-            // SiteHelper.deleteSite(site);
-            // }
-        }
-
         site = SiteHelper.addSite("Site - Container Test"
             + Utils.getRandomString(10));
-        addContainerTypes();
+        addContainerTypes(site);
         addContainers();
     }
 
@@ -82,44 +72,41 @@ public class TestContainer extends TestDatabase {
         return newBarcode;
     }
 
-    private void addContainerTypes() throws BiobankCheckException, Exception {
+    private void addContainerTypes(SiteWrapper site)
+        throws BiobankCheckException, Exception {
         ContainerTypeWrapper topType, childType;
 
         childType = ContainerTypeHelper.addContainerType(site,
-            "Child L4 Container Type", "CCTL4", 4, 10, 10, false);
+            "Child L4 Container Type", "CCTL4", 3, 10, 10, false);
         containerTypeMap.put("ChildCtL4", childType);
 
         childType = ContainerTypeHelper.addContainerType(site,
             "Child L3 Container Type", "CCTL3", 4, CONTAINER_CHILD_L3_ROWS,
             CONTAINER_CHILD_L3_COLS, false);
-        childType
-            .setChildContainerTypeCollection(new ArrayList<ContainerTypeWrapper>(
-                Arrays.asList(containerTypeMap.get("ChildCtL4"))));
+        childType.setChildContainerTypeCollection(Arrays
+            .asList(containerTypeMap.get("ChildCtL4")));
         childType.persist();
         containerTypeMap.put("ChildCtL3", childType);
 
         childType = ContainerTypeHelper.newContainerType(site,
             "Child L2 Container Type", "CCTL2", 1, 1, 10, false);
-        childType
-            .setChildContainerTypeCollection(new ArrayList<ContainerTypeWrapper>(
-                Arrays.asList(containerTypeMap.get("ChildCtL3"))));
+        childType.setChildContainerTypeCollection(Arrays
+            .asList(containerTypeMap.get("ChildCtL3")));
         childType.persist();
         containerTypeMap.put("ChildCtL2", childType);
 
         childType = ContainerTypeHelper.newContainerType(site,
             "Child L1 Container Type", "CCTL1", 3, 1, 10, false);
-        childType
-            .setChildContainerTypeCollection(new ArrayList<ContainerTypeWrapper>(
-                Arrays.asList(containerTypeMap.get("ChildCtL2"))));
+        childType.setChildContainerTypeCollection(Arrays
+            .asList(containerTypeMap.get("ChildCtL2")));
         childType.persist();
         containerTypeMap.put("ChildCtL1", childType);
 
         topType = ContainerTypeHelper.newContainerType(site,
             "Top Container Type", "TCT", 2, CONTAINER_TOP_ROWS,
             CONTAINER_TOP_COLS, true);
-        topType
-            .setChildContainerTypeCollection(new ArrayList<ContainerTypeWrapper>(
-                Arrays.asList(containerTypeMap.get("ChildCtL1"))));
+        topType.setChildContainerTypeCollection(Arrays.asList(containerTypeMap
+            .get("ChildCtL1")));
         topType.persist();
         containerTypeMap.put("TopCT", topType);
     }
@@ -128,6 +115,27 @@ public class TestContainer extends TestDatabase {
         ContainerWrapper top = ContainerHelper.addContainer("01",
             getNewBarcode(), null, site, containerTypeMap.get("TopCT"));
         containerMap.put("Top", top);
+    }
+
+    public List<SampleTypeWrapper> getRandomSampleTypeList(
+        List<SampleTypeWrapper> list) {
+        List<SampleTypeWrapper> result = new ArrayList<SampleTypeWrapper>();
+        for (SampleTypeWrapper st : list) {
+            if (r.nextBoolean()) {
+                result.add(st);
+            }
+        }
+        return result;
+    }
+
+    public ContainerTypeWrapper addSampleTypes(ContainerTypeWrapper ct,
+        List<SampleTypeWrapper> sampleTypes) throws Exception {
+        Assert.assertTrue("not enough sample types for test", (sampleTypes
+            .size() > 10));
+        ct.setSampleTypeCollection(sampleTypes);
+        ct.persist();
+        ct.reload();
+        return ct;
     }
 
     private void addContainerHierarchy(ContainerWrapper parent, String mapPrefix)
@@ -579,21 +587,12 @@ public class TestContainer extends TestDatabase {
 
     @Test
     public void testCanHoldSample() throws Exception {
-        List<SampleTypeWrapper> sampleTypeList = SampleTypeWrapper
+        List<SampleTypeWrapper> allSampleTypes = SampleTypeWrapper
             .getGlobalSampleTypes(appService, true);
-        Assert.assertTrue("not enough sample types for test", (sampleTypeList
-            .size() > 10));
-
-        // assign all but first 10 sample types to container type
-        List<SampleTypeWrapper> removedList = new ArrayList<SampleTypeWrapper>();
-        for (int i = 0; i < 10; ++i) {
-            removedList.add(sampleTypeList.get(0));
-            sampleTypeList.remove(0);
-        }
-        ContainerTypeWrapper childTypeL3 = containerTypeMap.get("ChildCtL3");
-        childTypeL3.setSampleTypeCollection(sampleTypeList);
-        childTypeL3.persist();
-        childTypeL3.reload();
+        List<SampleTypeWrapper> selectedSampleTypes = getRandomSampleTypeList(allSampleTypes);
+        ContainerTypeWrapper childTypeL3 = addSampleTypes(containerTypeMap
+            .get("ChildCtL3"), selectedSampleTypes);
+        containerTypeMap.put("ChildCtL3", childTypeL3);
 
         StudyWrapper study = StudyHelper.addStudy(site, "Study1");
         ContactHelper.addContactsToStudy(study, "contactsStudy1");
@@ -608,29 +607,28 @@ public class TestContainer extends TestDatabase {
         ContainerWrapper top = containerMap.get("Top");
         addContainerHierarchy(top);
         ContainerWrapper childL3 = containerMap.get("ChildL3");
-        for (int i = 0, n = sampleTypeList.size(); i < n; ++i) {
-            SampleWrapper sample = SampleHelper.newSample(
-                sampleTypeList.get(i), childL3, pv, 0, 0);
-            Assert.assertTrue(childL3.canHoldSample(sample));
+
+        // reload because we changed container type
+        childL3.reload();
+        for (SampleTypeWrapper st : allSampleTypes) {
+            SampleWrapper sample = SampleHelper
+                .newSample(st, childL3, pv, 0, 0);
+            if (selectedSampleTypes.contains(st)) {
+                Assert.assertTrue(childL3.canHoldSample(sample));
+            } else {
+                Assert.assertTrue(!childL3.canHoldSample(sample));
+            }
         }
     }
 
     @Test
     public void testGetSamples() throws Exception {
-        List<SampleTypeWrapper> sampleTypeList = SampleTypeWrapper
+        List<SampleTypeWrapper> allSampleTypes = SampleTypeWrapper
             .getGlobalSampleTypes(appService, true);
-        Assert.assertTrue("not enough sample types for test", (sampleTypeList
-            .size() > 10));
-
-        // assign all but first 10 sample types to container type
-        List<SampleTypeWrapper> removedList = new ArrayList<SampleTypeWrapper>();
-        for (int i = 0; i < 10; ++i) {
-            removedList.add(sampleTypeList.get(0));
-            sampleTypeList.remove(0);
-        }
-        ContainerTypeWrapper childTypeL3 = containerTypeMap.get("ChildCtL3");
-        childTypeL3.setSampleTypeCollection(sampleTypeList);
-        childTypeL3.persist();
+        List<SampleTypeWrapper> selectedSampleTypes = getRandomSampleTypeList(allSampleTypes);
+        ContainerTypeWrapper childTypeL3 = addSampleTypes(containerTypeMap
+            .get("ChildCtL3"), selectedSampleTypes);
+        containerTypeMap.put("ChildCtL3", childTypeL3);
 
         StudyWrapper study = StudyHelper.addStudy(site, "Study1");
         ContactHelper.addContactsToStudy(study, "contactsStudy1");
@@ -645,16 +643,60 @@ public class TestContainer extends TestDatabase {
         ContainerWrapper top = containerMap.get("Top");
         addContainerHierarchy(top);
         ContainerWrapper childL3 = containerMap.get("ChildL3");
-        for (int i = 0, n = sampleTypeList.size(); i < n; ++i) {
-            SampleHelper.addSample(sampleTypeList.get(i), childL3, pv, i
+        for (int i = 0, n = selectedSampleTypes.size(); i < n; ++i) {
+            SampleHelper.addSample(selectedSampleTypes.get(i), childL3, pv, i
                 / CONTAINER_CHILD_L3_COLS, i % CONTAINER_CHILD_L3_COLS);
         }
 
         childL3.reload();
         Collection<SampleWrapper> samples = childL3.getSamples().values();
-        Assert.assertEquals(sampleTypeList.size(), samples.size());
+        Assert.assertEquals(selectedSampleTypes.size(), samples.size());
         for (SampleWrapper sample : samples) {
-            Assert.assertTrue(sampleTypeList.contains(sample.getSampleType()));
+            Assert.assertTrue(selectedSampleTypes.contains(sample
+                .getSampleType()));
+        }
+    }
+
+    @Test
+    public void testGetContainersHoldingSampleType() throws Exception {
+        List<SampleTypeWrapper> allSampleTypes = SampleTypeWrapper
+            .getGlobalSampleTypes(appService, true);
+        List<SampleTypeWrapper> selectedSampleTypes = getRandomSampleTypeList(allSampleTypes);
+        ContainerTypeWrapper childTypeL3 = addSampleTypes(containerTypeMap
+            .get("ChildCtL3"), selectedSampleTypes);
+        containerTypeMap.put("ChildCtL3", childTypeL3);
+
+        ContainerWrapper top = containerMap.get("Top");
+        addContainerHierarchy(top);
+        ContainerWrapper childL3 = containerMap.get("ChildL3");
+        childL3.reload();
+
+        List<ContainerWrapper> containers;
+
+        for (SampleTypeWrapper st : allSampleTypes) {
+            containers = ContainerWrapper.getContainersHoldingSampleType(
+                appService, top.getSite(), "01AA01A1", st);
+
+            if (selectedSampleTypes.contains(st)) {
+                Assert.assertEquals(1, containers.size());
+                Assert.assertTrue(containers.contains(childL3));
+
+                // containers higher in the hierarchy should not container the
+                // sample type
+                containers = ContainerWrapper.getContainersHoldingSampleType(
+                    appService, top.getSite(), "01AA01", st);
+                Assert.assertEquals(0, containers.size());
+
+                containers = ContainerWrapper.getContainersHoldingSampleType(
+                    appService, top.getSite(), "01AA", st);
+                Assert.assertEquals(0, containers.size());
+
+                containers = ContainerWrapper.getContainersHoldingSampleType(
+                    appService, top.getSite(), "01", st);
+                Assert.assertEquals(0, containers.size());
+            } else {
+                Assert.assertEquals(0, containers.size());
+            }
         }
     }
 
@@ -715,11 +757,6 @@ public class TestContainer extends TestDatabase {
     }
 
     @Test
-    public void testGetContainersHoldingSampleType() {
-        fail("Not yet implemented");
-    }
-
-    @Test
     public void testGetContainerWithProductBarcodeInSite() throws Exception {
         ContainerWrapper top, childL1, result;
 
@@ -765,50 +802,97 @@ public class TestContainer extends TestDatabase {
     }
 
     @Test
-    public void testDeleteChildrenWithType() {
-        fail("Not yet implemented");
+    public void testDeleteChildrenWithType() throws Exception {
+        ContainerWrapper top, childL1, childL2, childL3;
+
+        top = containerMap.get("Top");
+        addContainerHierarchy(top);
+        childL1 = containerMap.get("ChildL1");
+        childL2 = containerMap.get("ChildL2");
+        childL3 = containerMap.get("ChildL3");
+
+        Assert.assertTrue(childL3.deleteChildrenWithType(containerTypeMap
+            .get("ChildCtL4")));
+        Assert.assertTrue(childL2.deleteChildrenWithType(containerTypeMap
+            .get("ChildCtL3")));
+        Assert.assertTrue(childL1.deleteChildrenWithType(containerTypeMap
+            .get("ChildCtL2")));
+        Assert.assertTrue(top.deleteChildrenWithType(containerTypeMap
+            .get("ChildCtL1")));
+        Assert.assertFalse(top.deleteChildrenWithType(containerTypeMap
+            .get("TopCT")));
     }
 
     @Test
-    public void testCompareTo() {
-        fail("Not yet implemented");
+    public void testCompareTo() throws Exception {
+        ContainerWrapper top, childL1, childL2, childL3;
+
+        top = containerMap.get("Top");
+        addContainerHierarchy(top);
+        childL1 = containerMap.get("ChildL1");
+        childL2 = containerMap.get("ChildL2");
+        childL3 = containerMap.get("ChildL3");
+
+        Assert.assertEquals(-1, top.compareTo(childL1));
+        Assert.assertEquals(-1, childL1.compareTo(childL2));
+        Assert.assertEquals(-1, childL2.compareTo(childL3));
+        Assert.assertEquals(0, top.compareTo(top));
     }
 
-    @Test
-    public void testAddContainerFailing() throws Exception {
-        ContainerWrapper top = containerMap.get("Top");
-        ContainerTypeWrapper type = containerTypeMap.get("ChildCtL1");
+    @Test(expected = BiobankCheckException.class)
+    public void testContainerTypeSameSite() throws Exception {
+        SiteWrapper altSite = SiteHelper.addSite("Site2 - Container Test"
+            + Utils.getRandomString(10));
 
-        String name = "testAddContainerFailing" + r.nextInt();
-        try {
-            ContainerHelper.addContainer(name, name, top, site, type);
-            Assert
-                .fail("Should not be able to add a container in a parent without any position");
-        } catch (BiobankCheckException bce) {
-            Assert.assertTrue(true);
-        }
+        ContainerTypeWrapper altTopType = ContainerTypeHelper.newContainerType(
+            altSite, "Alt Top Container Type", "ATCT", 2, CONTAINER_TOP_ROWS,
+            CONTAINER_TOP_COLS, true);
+        altTopType.persist();
 
-        ContainerHelper.addContainer(name, name, top, site, type, 0, 0);
-        ContainerWrapper container = ContainerHelper.newContainer(name + "_2",
-            name + "_2", top, site, type);
-        container.setPosition(0, 0);
-        try {
-            container.persist();
-            Assert
-                .fail("Should not be able to add a container in a position already used (in child insert)");
-        } catch (BiobankCheckException bce) {
-            Assert.assertTrue(true);
-        }
+        ContainerHelper.addContainer("01", getNewBarcode(), null, site,
+            containerTypeMap.get("TopCT"));
+    }
 
-        container = ContainerHelper.newContainer("", name + "_3", null, site,
-            type);
-        top.addChild(0, 0, container);
-        try {
-            top.persist();
-            Assert
-                .fail("Should not be able to add a container in a position already used (in parent update)");
-        } catch (BiobankCheckException bce) {
-            Assert.assertTrue(true);
+    @Test(expected = BiobankCheckException.class)
+    public void testParentSameSite() throws Exception {
+        SiteWrapper altSite = SiteHelper.addSite("Site2 - Container Test"
+            + Utils.getRandomString(10));
+
+        ContainerTypeWrapper childType = ContainerTypeHelper.newContainerType(
+            altSite, "Alt Child L1 Container Type", "ACCTL1", 3, 1, 10, false);
+        childType.persist();
+
+        ContainerTypeWrapper altTopType = ContainerTypeHelper.newContainerType(
+            altSite, "Alt Top Container Type", "ATCT", 2, CONTAINER_TOP_ROWS,
+            CONTAINER_TOP_COLS, true);
+        altTopType.setChildContainerTypeCollection(Arrays
+            .asList(new ContainerTypeWrapper[] { childType }));
+        altTopType.persist();
+        altTopType.reload();
+
+        ContainerWrapper altTop = ContainerHelper.addContainer("01",
+            getNewBarcode(), null, altSite, altTopType);
+
+        ContainerHelper.addContainer(null, getNewBarcode(), altTop, site,
+            childType, 0, 0);
+    }
+
+    @Test(expected = BiobankCheckException.class)
+    public void testAddChildrenTooMany() throws Exception {
+        ContainerWrapper top;
+
+        top = containerMap.get("Top");
+        for (int row = 0; row < CONTAINER_TOP_ROWS; ++row) {
+            for (int col = 0; col < CONTAINER_TOP_COLS; ++col) {
+                top.addChild(row, col, ContainerHelper.addContainer(null,
+                    getNewBarcode(), top, site, containerTypeMap
+                        .get("ChildCtL1")));
+            }
         }
+        top.reload();
+
+        // now add one more
+        top.addChild(0, 0, ContainerHelper.addContainer(null, getNewBarcode(),
+            top, site, containerTypeMap.get("ChildCtL1")));
     }
 }
