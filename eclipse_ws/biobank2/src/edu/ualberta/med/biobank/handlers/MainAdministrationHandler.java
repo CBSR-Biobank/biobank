@@ -17,8 +17,10 @@ public class MainAdministrationHandler extends AbstractHandler implements
     public Object execute(ExecutionEvent event) throws ExecutionException {
         IWorkbench workbench = BioBankPlugin.getDefault().getWorkbench();
         try {
-            workbench.showPerspective(MainPerspective.ID, workbench
-                .getActiveWorkbenchWindow());
+            if (workbench.getActiveWorkbenchWindow().getActivePage()
+                .closeAllEditors(true))
+                workbench.showPerspective(MainPerspective.ID, workbench
+                    .getActiveWorkbenchWindow());
         } catch (WorkbenchException e) {
             throw new ExecutionException("Error while opening Main perpective",
                 e);
