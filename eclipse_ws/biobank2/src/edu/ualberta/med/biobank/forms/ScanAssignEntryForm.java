@@ -470,7 +470,7 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
                         + foundSample.getSampleType().getName());
                     return false;
                 }
-                scanCell.setStatus(SampleCellStatus.NEW);
+                scanCell.setStatus(SampleCellStatus.NEW_MOVED);
             }
             scanCell.setTitle(foundSample.getPatientVisit().getPatient()
                 .getNumber());
