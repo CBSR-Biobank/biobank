@@ -214,6 +214,8 @@ public class DebugInitializationHelper {
             visits.add(createPatientVisit(r, patient));
             visits.add(createPatientVisit(r, patient));
             visits.add(createPatientVisit(r, patient));
+            patient.setPatientVisitCollection(visits);
+            patient.persist();
         }
     }
 
