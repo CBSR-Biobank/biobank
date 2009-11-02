@@ -48,7 +48,6 @@ public class ReportsView extends ViewPart {
     private List<Label> textLabels;
 
     private Button searchButton;
-    private Button saveSearch;
     private Collection<Object> searchData;
     private InfoTableWidget<Object> searchTable;
 
@@ -141,15 +140,6 @@ public class ReportsView extends ViewPart {
                 searchTable.setCollection(searchData);
                 searchTable.redraw();
                 top.layout();
-
-            }
-        });
-
-        saveSearch = new Button(top, SWT.NONE);
-        saveSearch.setText("Save Search");
-        saveSearch.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
 
             }
         });
