@@ -707,9 +707,9 @@ public class ContainerWrapper extends
 
     @Override
     public int compareTo(ModelWrapper<Container> wrapper) {
-        String c1Name = wrappedObject.getLabel();
-        String c2Name = wrapper.wrappedObject.getLabel();
-        return ((c1Name.compareTo(c2Name) > 0) ? 1 : (c1Name.equals(c2Name) ? 0
+        String c1Label = wrappedObject.getLabel();
+        String c2Label = wrapper.wrappedObject.getLabel();
+        return ((c1Label.compareTo(c2Label) > 0) ? 1 : (c1Label.equals(c2Label) ? 0
             : -1));
     }
 
