@@ -34,6 +34,7 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
@@ -135,6 +136,7 @@ public class DebugInitializationHelper {
                     public void run() {
                         try {
                             SessionManager.getInstance().updateSites();
+                            SessionManager.getInstance().getSession().rebuild();
                             SessionManager.getInstance().getSession()
                                 .performExpand();
                             if (event.getResult().isOK()) {
@@ -262,8 +264,7 @@ public class DebugInitializationHelper {
     }
 
     @SuppressWarnings("unused")
-    private void insertContainerTypesInSite() throws ApplicationException,
-        BiobankCheckException, WrapperException {
+    private void insertContainerTypesInSite() throws Exception {
         List<ContainerLabelingScheme> numSchemes = appService.search(
             ContainerLabelingScheme.class, new ContainerLabelingScheme());
         Assert.isNotNull(numSchemes);
@@ -271,9 +272,22 @@ public class DebugInitializationHelper {
             numSchemeMap.put(scheme.getName(), scheme);
         }
 
+        SampleTypeWrapper hairST = new SampleTypeWrapper(appService);
+        hairST.getWrappedObject().setId(10);
+        hairST.reload();
+
+        SampleTypeWrapper dnaST = new SampleTypeWrapper(appService);
+        dnaST.getWrappedObject().setId(3);
+        dnaST.reload();
+
+        List<SampleTypeWrapper> types = SampleTypeWrapper.getGlobalSampleTypes(
+            appService, false);
+        types.remove(hairST);
+        types.remove(dnaST);
+
         // Freezer Types
         palletType = insertContainerTypeInSite("Pallet-96", "P96", false, 8,
-            12, null, numSchemeMap.get("SBS Standard").getId());
+            12, null, types, numSchemeMap.get("SBS Standard").getId());
         hotel13Type = insertContainerTypeInSite("Hotel-13", "H13", false, 13,
             1, Arrays.asList(new ContainerTypeWrapper[] { palletType }),
             numSchemeMap.get("2 char numeric").getId());
@@ -292,6 +306,7 @@ public class DebugInitializationHelper {
 
         // Cabinet Types
         binType = insertContainerTypeInSite("Bin", "Bin", false, 120, 1, null,
+            Arrays.asList(new SampleTypeWrapper[] { hairST, dnaST }),
             numSchemeMap.get("CBSR 2 char alphabetic").getId());
         drawerType = insertContainerTypeInSite("Drawer", "Dr", false, 36, 1,
             Arrays.asList(new ContainerTypeWrapper[] { binType }), numSchemeMap
@@ -305,6 +320,15 @@ public class DebugInitializationHelper {
         String shortName, boolean topLevel, int dim1, int dim2,
         List<ContainerTypeWrapper> children, Integer childLabelingScheme)
         throws ApplicationException, BiobankCheckException, WrapperException {
+        return insertContainerTypeInSite(name, shortName, topLevel, dim1, dim2,
+            children, null, childLabelingScheme);
+    }
+
+    private ContainerTypeWrapper insertContainerTypeInSite(String name,
+        String shortName, boolean topLevel, int dim1, int dim2,
+        List<ContainerTypeWrapper> children,
+        List<SampleTypeWrapper> sampleTypes, Integer childLabelingScheme)
+        throws ApplicationException, BiobankCheckException, WrapperException {
         ContainerTypeWrapper ct = new ContainerTypeWrapper(appService);
         ct.setName(name);
         ct.setNameShort(shortName);
@@ -317,6 +341,9 @@ public class DebugInitializationHelper {
         ct.setColCapacity(dim2);
         if (children != null) {
             ct.setChildContainerTypeCollection(children);
+        }
+        if (sampleTypes != null) {
+            ct.setSampleTypeCollection(sampleTypes);
         }
         ct.persist();
         return ct;
