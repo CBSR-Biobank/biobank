@@ -31,7 +31,9 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
@@ -117,6 +119,8 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
     @Override
     public void doSave(IProgressMonitor monitor) {
         setDirty(false);
+        if (!confirmAction.isEnabled())
+            monitor.setCanceled(true);
         doSaveInternal();
     }
 
@@ -124,7 +128,12 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
         BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
             public void run() {
                 try {
-                    saveForm();
+                    if (confirmAction.isEnabled())
+                        saveForm();
+                    else
+                        throw new BiobankCheckException(
+                            "Form in invalid state, save failed.");
+                    // TODO: prevent this tab from closing
                 } catch (final RemoteConnectFailureException exp) {
                     BioBankPlugin.openRemoteConnectErrorMessage();
                     setDirty(true);
@@ -150,6 +159,14 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
     public void init(IEditorSite editorSite, IEditorInput input)
         throws PartInitException {
         super.init(editorSite, input);
+        editorSite.getShell().addListener(SWT.CLOSE, new Listener() {
+
+            @Override
+            public void handleEvent(Event event) {
+                // TODO Auto-generated method stub
+
+            }
+        });
         setDirty(false);
     }
 
@@ -399,4 +416,5 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
      * performed and the current form closed
      */
     public abstract String getNextOpenedFormID();
+
 }

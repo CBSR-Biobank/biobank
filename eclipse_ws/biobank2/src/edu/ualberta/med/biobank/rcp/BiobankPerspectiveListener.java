@@ -9,6 +9,6 @@ public class BiobankPerspectiveListener extends PerspectiveAdapter {
     @Override
     public void perspectiveDeactivated(IWorkbenchPage page,
         IPerspectiveDescriptor perspective) {
-        page.closeAllEditors(true);
+        // page.closeAllEditors(true);
     }
 }

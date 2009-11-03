@@ -23,8 +23,10 @@ public class PatientAdministrationHandler extends AbstractHandler implements
     public Object execute(ExecutionEvent event) throws ExecutionException {
         IWorkbench workbench = BioBankPlugin.getDefault().getWorkbench();
         try {
-            workbench.showPerspective(PatientsAdministrationPerspective.ID,
-                workbench.getActiveWorkbenchWindow());
+            if (workbench.getActiveWorkbenchWindow().getActivePage()
+                .closeAllEditors(true))
+                workbench.showPerspective(PatientsAdministrationPerspective.ID,
+                    workbench.getActiveWorkbenchWindow());
         } catch (WorkbenchException e) {
             throw new ExecutionException(
                 "Error while opening patients perpective", e);
