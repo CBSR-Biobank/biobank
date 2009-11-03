@@ -490,7 +490,7 @@ public class ContainerWrapper extends
     }
 
     public void canHoldCTs() throws BiobankCheckException {
-        if (getContainerType().getTopLevel())
+        if (Boolean.TRUE.equals(getContainerType().getTopLevel()))
             return;
 
         boolean found = false;
@@ -741,8 +741,8 @@ public class ContainerWrapper extends
     public int compareTo(ModelWrapper<Container> wrapper) {
         String c1Label = wrappedObject.getLabel();
         String c2Label = wrapper.wrappedObject.getLabel();
-        return ((c1Label.compareTo(c2Label) > 0) ? 1 : (c1Label.equals(c2Label) ? 0
-            : -1));
+        return ((c1Label.compareTo(c2Label) > 0) ? 1
+            : (c1Label.equals(c2Label) ? 0 : -1));
     }
 
     @Override

@@ -109,8 +109,8 @@ public class ContainerEntryForm extends BiobankEntryForm {
         FormUtils.setTextValue(siteLabel, containerWrapper.getSite().getName());
 
         if (containerWrapper.isNew()
-            || (containerWrapper.getContainerType() != null && containerWrapper
-                .getContainerType().getTopLevel())) {
+            || (containerWrapper.getContainerType() != null && Boolean.TRUE
+                .equals(containerWrapper.getContainerType().getTopLevel()))) {
             // only allow edit to label on top level containers
             firstControl = createBoundWidgetWithLabel(client, Text.class,
                 SWT.NONE, "Label", null, BeansObservables.observeValue(
@@ -159,7 +159,7 @@ public class ContainerEntryForm extends BiobankEntryForm {
             }
         }
 
-        containerTypeComboViewer = createCComboViewerWithNoSelectionValidator(
+        containerTypeComboViewer = createComboViewerWithNoSelectionValidator(
             client, "Container Type", containerTypes, currentContainerType,
             MSG_CONTAINER_TYPE_EMPTY);
         containerTypeComboViewer
@@ -170,8 +170,7 @@ public class ContainerEntryForm extends BiobankEntryForm {
                         .getSelection();
                     ContainerTypeWrapper containerType = (ContainerTypeWrapper) selection
                         .getFirstElement();
-                    if (containerType.getTopLevel() != null
-                        && containerType.getTopLevel()) {
+                    if (Boolean.TRUE.equals(containerType.getTopLevel())) {
                         Double temp = containerType.getDefaultTemperature();
                         if (temp == null) {
                             tempWidget.setText("");
@@ -251,8 +250,8 @@ public class ContainerEntryForm extends BiobankEntryForm {
         if (currentContainerType != null) {
             containerTypeComboViewer.setSelection(new StructuredSelection(
                 currentContainerType));
-        } else if (containerTypeComboViewer.getCCombo().getItemCount() > 1) {
-            containerTypeComboViewer.getCCombo().deselectAll();
+        } else if (containerTypeComboViewer.getCombo().getItemCount() > 1) {
+            containerTypeComboViewer.getCombo().deselectAll();
         }
     }
 

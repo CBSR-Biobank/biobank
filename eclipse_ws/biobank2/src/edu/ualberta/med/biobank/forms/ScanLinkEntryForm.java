@@ -464,13 +464,13 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
     }
 
     private void createVisitCombo(Composite compositeFields) {
-        viewerVisits = createCComboViewerWithNoSelectionValidator(
+        viewerVisits = createComboViewerWithNoSelectionValidator(
             compositeFields, "Visit date drawn", null, null,
             "A visit should be selected");
         GridData gridData = new GridData();
         gridData.grabExcessHorizontalSpace = true;
         gridData.horizontalAlignment = SWT.FILL;
-        viewerVisits.getCCombo().setLayoutData(gridData);
+        viewerVisits.getCombo().setLayoutData(gridData);
 
         viewerVisits.setLabelProvider(new LabelProvider() {
             @Override
@@ -479,7 +479,7 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
                 return DateFormatter.formatAsDateTime(pv.getDateDrawn());
             }
         });
-        viewerVisits.getCCombo().addKeyListener(new KeyAdapter() {
+        viewerVisits.getCombo().addKeyListener(new KeyAdapter() {
             @Override
             public void keyReleased(KeyEvent e) {
                 if (e.keyCode == 13) {
@@ -488,14 +488,7 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
                 }
             }
         });
-        // viewerVisits
-        // .addSelectionChangedListener(new ISelectionChangedListener() {
-        // @Override
-        // public void selectionChanged(SelectionChangedEvent event) {
-        // setDateProcessedField();
-        // }
-        // });
-        viewerVisits.getCCombo().addFocusListener(new FocusAdapter() {
+        viewerVisits.getCombo().addFocusListener(new FocusAdapter() {
             @Override
             public void focusLost(FocusEvent e) {
                 setDateProcessedField();
@@ -521,8 +514,8 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
             List<PatientVisitWrapper> collection = currentPatient
                 .getPatientVisitCollection();
             viewerVisits.setInput(collection);
-            viewerVisits.getCCombo().select(0);
-            viewerVisits.getCCombo().setListVisible(true);
+            viewerVisits.getCombo().select(0);
+            viewerVisits.getCombo().setListVisible(true);
             setDateProcessedField();
         } else {
             viewerVisits.setInput(null);

@@ -63,12 +63,7 @@ public class SelectParentContainerDialog extends BiobankDialog {
     }
 
     private void createCombo(Composite parent) {
-        // CCombo combo = new CCombo(parent, SWT.DROP_DOWN | SWT.READ_ONLY);
-        // combo.setLayout(new GridLayout());
-        // combo.setLayoutData(new GridData(SWT.NONE, SWT.BOTTOM, true, false));
-
         comboViewer = new ComboViewer(parent);
-
         comboViewer.setContentProvider(new ArrayContentProvider());
         comboViewer.setLabelProvider(new LabelProvider() {
             @Override

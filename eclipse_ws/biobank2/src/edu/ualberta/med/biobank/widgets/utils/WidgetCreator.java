@@ -26,7 +26,6 @@ import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.KeyListener;
@@ -135,10 +134,7 @@ public class WidgetCreator {
                 uvs);
         } else if (widgetClass == Combo.class) {
             return createCombo(composite, widgetOptions, widgetValues,
-                modelObservableValue, uvs, false);
-        } else if (widgetClass == CCombo.class) {
-            return createCombo(composite, widgetOptions, widgetValues,
-                modelObservableValue, uvs, true);
+                modelObservableValue, uvs);
         } else if (widgetClass == Button.class) {
             return createButton(composite, modelObservableValue, uvs);
         } else {
@@ -158,53 +154,32 @@ public class WidgetCreator {
         return button;
     }
 
-    private Composite createCombo(Composite composite, int options,
+    private Combo createCombo(Composite composite, int options,
         String[] widgetValues, final IObservableValue modelObservableValue,
-        UpdateValueStrategy uvs, final boolean isCCombo) {
-        Composite combo = null;
-        if (isCCombo) {
-            combo = new CCombo(composite, SWT.READ_ONLY | SWT.BORDER | options);
-        } else {
-            combo = new Combo(composite, SWT.READ_ONLY | SWT.BORDER | options);
-        }
+        UpdateValueStrategy uvs) {
+        final Combo combo = new Combo(composite, SWT.READ_ONLY | SWT.BORDER
+            | options);
         combo.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
         Assert.isNotNull(widgetValues, "combo values not assigned");
-        if (isCCombo) {
-            ((CCombo) combo).setItems(widgetValues);
-        } else {
-            ((Combo) combo).setItems(widgetValues);
-        }
+        combo.setItems(widgetValues);
         if (toolkit != null) {
             toolkit.adapt(combo, true, true);
         }
         dbc.bindValue(SWTObservables.observeSelection(combo),
             modelObservableValue, uvs, null);
         if (selectionListener != null) {
-            if (isCCombo) {
-                ((CCombo) combo).addSelectionListener(selectionListener);
-            } else {
-                ((Combo) combo).addSelectionListener(selectionListener);
-            }
+            combo.addSelectionListener(selectionListener);
         }
         if (modifyListener != null) {
-            if (isCCombo) {
-                ((CCombo) combo).addModifyListener(modifyListener);
-            } else {
-                ((Combo) combo).addModifyListener(modifyListener);
-            }
+            combo.addModifyListener(modifyListener);
         }
-        final Composite comboForListener = combo;
         final IValueChangeListener changeListener = new IValueChangeListener() {
             @Override
             public void handleValueChange(ValueChangeEvent event) {
                 if (event.getObservableValue().getValue() == null
                     || event.getObservableValue().getValue().toString()
                         .isEmpty()) {
-                    if (isCCombo) {
-                        ((CCombo) comboForListener).deselectAll();
-                    } else {
-                        ((Combo) comboForListener).deselectAll();
-                    }
+                    combo.deselectAll();
                 }
             }
         };
@@ -263,13 +238,13 @@ public class WidgetCreator {
      * 
      * @see BiobankLabelProvider#getColumnText
      */
-    public <T> ComboViewer createCComboViewerWithNoSelectionValidator(
+    public <T> ComboViewer createComboViewerWithNoSelectionValidator(
         Composite parent, String fieldLabel, Collection<T> input, T selection,
         String errorMessage) {
         Assert.isNotNull(dbc);
         Label label = createLabel(parent, fieldLabel);
 
-        CCombo combo = new CCombo(parent, SWT.READ_ONLY | SWT.BORDER);
+        Combo combo = new Combo(parent, SWT.READ_ONLY | SWT.BORDER);
         ComboViewer comboViewer = new ComboViewer(combo);
         comboViewer.setContentProvider(new ArrayContentProvider());
         comboViewer.setLabelProvider(new BiobankLabelProvider());

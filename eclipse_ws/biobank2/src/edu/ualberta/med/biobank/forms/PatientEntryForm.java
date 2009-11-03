@@ -103,7 +103,7 @@ public class PatientEntryForm extends BiobankEntryForm {
             selectedStudy = patientAdapter.getWrapper().getStudy();
         }
 
-        studiesViewer = createCComboViewerWithNoSelectionValidator(client,
+        studiesViewer = createComboViewerWithNoSelectionValidator(client,
             "Study", studies, selectedStudy, "A study should be selected");
 
         firstControl = createBoundWidgetWithLabel(client, Text.class, SWT.NONE,

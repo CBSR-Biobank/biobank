@@ -8,9 +8,9 @@ import java.util.TreeSet;
 import org.eclipse.core.databinding.beans.PojoObservables;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
@@ -32,7 +32,7 @@ public class SampleStorageDialog extends BiobankDialog {
 
     private HashMap<String, SampleTypeWrapper> sampleTypeMap;
 
-    private CCombo sampleTypesCombo;
+    private Combo sampleTypesCombo;
 
     public SampleStorageDialog(Shell parent,
         SampleStorageWrapper sampleStorage,
@@ -75,7 +75,7 @@ public class SampleStorageDialog extends BiobankDialog {
 
         Label label = new Label(contents, SWT.NONE);
         label.setText("Sample Type:");
-        sampleTypesCombo = new CCombo(contents, SWT.BORDER | SWT.READ_ONLY);
+        sampleTypesCombo = new Combo(contents, SWT.BORDER | SWT.READ_ONLY);
         Set<String> sortedKeys = new TreeSet<String>(sampleTypeMap.keySet());
         for (String stName : sortedKeys) {
             sampleTypesCombo.add(stName);

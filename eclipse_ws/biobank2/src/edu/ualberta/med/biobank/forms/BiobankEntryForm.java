@@ -225,10 +225,10 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
             validator);
     }
 
-    protected <T> ComboViewer createCComboViewerWithNoSelectionValidator(
+    protected <T> ComboViewer createComboViewerWithNoSelectionValidator(
         Composite parent, String fieldLabel, Collection<T> input, T selection,
         String errorMessage) {
-        return widgetCreator.createCComboViewerWithNoSelectionValidator(parent,
+        return widgetCreator.createComboViewerWithNoSelectionValidator(parent,
             fieldLabel, input, selection, errorMessage);
     }
 

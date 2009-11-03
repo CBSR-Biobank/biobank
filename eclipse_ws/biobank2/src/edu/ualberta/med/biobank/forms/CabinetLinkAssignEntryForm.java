@@ -20,7 +20,6 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
-import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.KeyAdapter;
@@ -31,6 +30,7 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
@@ -257,8 +257,8 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
         inventoryIdText.setText(inventoryId);
         positionText.setText(position);
         patientNumberText.setEnabled(!moveMode);
-        viewerVisits.getCCombo().setEnabled(!moveMode);
-        viewerSampleTypes.getCCombo().setEnabled(!moveMode);
+        viewerVisits.getCombo().setEnabled(!moveMode);
+        viewerSampleTypes.getCombo().setEnabled(!moveMode);
     }
 
     private void createTypeCombo(Composite fieldsComposite) {
@@ -271,7 +271,7 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
             BioBankPlugin.openError("Initialisation failed", e);
             sampleTypes = new ArrayList<SampleTypeWrapper>();
         }
-        viewerSampleTypes = createCComboViewerWithNoSelectionValidator(
+        viewerSampleTypes = createComboViewerWithNoSelectionValidator(
             fieldsComposite, "Sample type", sampleTypes, null,
             "A sample type should be selected");
         viewerSampleTypes
@@ -285,14 +285,14 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
                 }
             });
         if (sampleTypes.size() == 1) {
-            viewerSampleTypes.getCCombo().select(0);
+            viewerSampleTypes.getCombo().select(0);
             sampleWrapper.setSampleType(sampleTypes.get(0).getWrappedObject());
         }
     }
 
     private void createVisitCombo(Composite client) {
-        CCombo comboVisits = (CCombo) createBoundWidgetWithLabel(client,
-            CCombo.class, SWT.NONE, "Visits", new String[0],
+        Combo comboVisits = (Combo) createBoundWidgetWithLabel(client,
+            Combo.class, SWT.NONE, "Visits", new String[0],
             visitSelectionValue, new NonEmptyString(
                 "A visit should be selected"));
         GridData gridData = new GridData();
@@ -343,8 +343,8 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
             List<PatientVisitWrapper> collection = currentPatient
                 .getPatientVisitCollection();
             viewerVisits.setInput(collection);
-            viewerVisits.getCCombo().select(0);
-            viewerVisits.getCCombo().setListVisible(true);
+            viewerVisits.getCombo().select(0);
+            viewerVisits.getCombo().setListVisible(true);
         } catch (ApplicationException e) {
             BioBankPlugin.openError("Error getting the patient", e);
         }
@@ -510,8 +510,8 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
             viewerVisits.setInput(null);
             inventoryIdText.setText("");
             positionText.setText("");
-            if (viewerSampleTypes.getCCombo().getItemCount() > 1) {
-                viewerSampleTypes.getCCombo().deselectAll();
+            if (viewerSampleTypes.getCombo().getItemCount() > 1) {
+                viewerSampleTypes.getCombo().deselectAll();
             }
         } catch (Exception e) {
             LOGGER.error("Can't reset the form", e);

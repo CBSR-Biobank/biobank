@@ -8,12 +8,12 @@ import java.util.TreeSet;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
@@ -31,7 +31,7 @@ public class SelectClinicContactDialog extends BiobankDialog {
 
     private HashMap<String, ClinicWrapper> clinicMap;
 
-    private CCombo clinicCombo;
+    private Combo clinicCombo;
 
     private ContactInfoTable contactInfoTable;
 
@@ -64,7 +64,7 @@ public class SelectClinicContactDialog extends BiobankDialog {
 
         Label label = new Label(contents, SWT.NONE);
         label.setText("Clinic:");
-        clinicCombo = new CCombo(contents, SWT.BORDER | SWT.READ_ONLY);
+        clinicCombo = new Combo(contents, SWT.BORDER | SWT.READ_ONLY);
         GridData gd = new GridData(SWT.LEFT, SWT.FILL, true, true);
         gd.widthHint = 250;
         clinicCombo.setLayoutData(gd);

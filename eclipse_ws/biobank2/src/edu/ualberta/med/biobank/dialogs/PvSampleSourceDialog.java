@@ -10,9 +10,9 @@ import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.observable.value.WritableValue;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
@@ -31,7 +31,7 @@ public class PvSampleSourceDialog extends BiobankDialog {
 
     private HashMap<String, SampleSourceWrapper> sampleSourceMap;
 
-    private CCombo sampleSourcesCombo;
+    private Combo sampleSourcesCombo;
 
     private IObservableValue sampleSourceSelection = new WritableValue("",
         String.class);
@@ -72,8 +72,8 @@ public class PvSampleSourceDialog extends BiobankDialog {
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
         Set<String> sortedKeys = new TreeSet<String>(sampleSourceMap.keySet());
-        sampleSourcesCombo = (CCombo) createBoundWidgetWithLabel(contents,
-            CCombo.class, SWT.BORDER, "Sample Source", sortedKeys
+        sampleSourcesCombo = (Combo) createBoundWidgetWithLabel(contents,
+            Combo.class, SWT.BORDER, "Sample Source", sortedKeys
                 .toArray(new String[sortedKeys.size()]), sampleSourceSelection,
             new NonEmptyString("a sample source should be selected"));
 

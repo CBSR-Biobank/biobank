@@ -273,7 +273,7 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
                     "No container type found with name containing "
                         + palletNameContains + "...");
             }
-            palletTypesViewer = createCComboViewerWithNoSelectionValidator(
+            palletTypesViewer = createComboViewerWithNoSelectionValidator(
                 parent, "Pallet Container Type", palletContainerTypes, null,
                 "A pallet type should be selected");
             palletTypesViewer
@@ -517,7 +517,7 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
     @Override
     public void reset() {
         if (palletTypesViewer != null) {
-            palletTypesViewer.getCCombo().deselectAll();
+            palletTypesViewer.getCombo().deselectAll();
         }
         freezerWidget.setSelectedBox(null);
         hotelWidget.setSelectedBox(null);
@@ -563,7 +563,7 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
                     && !palletPositionText.getText().isEmpty());
             }
             if (palletTypesViewer != null
-                && palletTypesViewer.getCCombo().getSelectionIndex() == -1) {
+                && palletTypesViewer.getCombo().getSelectionIndex() == -1) {
                 scanButton.setEnabled(false);
             }
         }

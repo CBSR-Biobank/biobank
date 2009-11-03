@@ -103,7 +103,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         allContainerTypes = site.getContainerTypeCollection();
         for (ContainerTypeWrapper type : new ArrayList<ContainerTypeWrapper>(
             allContainerTypes)) {
-            if (type.getTopLevel() != null && type.getTopLevel()) {
+            if (Boolean.TRUE.equals(type.getTopLevel())) {
                 allContainerTypes.remove(type);
             }
         }
@@ -188,7 +188,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
                 "Default temperature is not a valid number"));
 
         LabelingScheme currentScheme = getCurrentLabelingScheme();
-        labelingSchemeComboViewer = createCComboViewerWithNoSelectionValidator(
+        labelingSchemeComboViewer = createComboViewerWithNoSelectionValidator(
             client, "Child Labeling Scheme", labelingSchemeCollection,
             currentScheme, MSG_CHILD_LABELING_SCHEME_EMPTY);
 
@@ -387,7 +387,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
 
         LabelingScheme currentScheme = getCurrentLabelingScheme();
         if (currentScheme == null) {
-            labelingSchemeComboViewer.getCCombo().deselectAll();
+            labelingSchemeComboViewer.getCombo().deselectAll();
         } else {
             labelingSchemeComboViewer.setSelection(new StructuredSelection(
                 currentScheme));

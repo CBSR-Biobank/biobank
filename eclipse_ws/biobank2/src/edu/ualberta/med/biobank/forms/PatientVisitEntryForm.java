@@ -156,7 +156,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
             if (studyClinics.size() == 1) {
                 selectedClinic = studyClinics.get(0);
             }
-            clinicsComboViewer = createCComboViewerWithNoSelectionValidator(
+            clinicsComboViewer = createComboViewerWithNoSelectionValidator(
                 client, "Clinic", studyClinics, selectedClinic,
                 "A clinic should be selected");
         } else {
@@ -397,8 +397,8 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         super.reset();
 
         if (patientVisitWrapper.isNew()
-            && clinicsComboViewer.getCCombo().getItemCount() > 1) {
-            clinicsComboViewer.getCCombo().deselectAll();
+            && clinicsComboViewer.getCombo().getItemCount() > 1) {
+            clinicsComboViewer.getCombo().deselectAll();
         }
 
         if (patientVisitWrapper.getDateProcessed() == null) {
