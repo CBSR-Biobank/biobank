@@ -3,6 +3,7 @@ package test.ualberta.med.biobank;
 import static org.junit.Assert.fail;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -122,7 +123,7 @@ public class TestContainerType extends TestDatabase {
         ContainerTypeWrapper topType2;
 
         // use same name as containerTypeMap.get("TopCT")
-        topType2 = ContainerTypeHelper.addContainerType(site,
+        topType2 = ContainerTypeHelper.newContainerType(site,
             "Top Container Type", "TCT", 3, CONTAINER_TOP_ROWS + 1,
             CONTAINER_TOP_COLS - 1, true);
 
@@ -130,15 +131,41 @@ public class TestContainerType extends TestDatabase {
             topType2.persist();
             Assert
                 .fail("should not be allowed to add container type because of duplicate name");
-        } catch (Exception e) {
+        } catch (BiobankCheckException e) {
             Assert.assertTrue(true);
         }
-
     }
 
     @Test
-    public void testGetAllChildren() {
-        fail("Not yet implemented");
+    public void testGetAllChildren() throws Exception {
+        ContainerTypeWrapper topType, childTypeL1, childTypeL2, childTypeL3;
+
+        topType = addContainerTypeHierarchy(containerTypeMap.get("TopCT"));
+        childTypeL1 = containerTypeMap.get("ChildCtL1");
+        childTypeL2 = containerTypeMap.get("ChildCtL2");
+        childTypeL3 = containerTypeMap.get("ChildCtL3");
+
+        childTypeL1.reload();
+        childTypeL2.reload();
+        childTypeL3.reload();
+
+        Collection<ContainerTypeWrapper> children = topType.getAllChildren();
+        Assert.assertTrue(children.contains(childTypeL1));
+        Assert.assertTrue(children.contains(childTypeL2));
+        Assert.assertTrue(children.contains(childTypeL3));
+        Assert.assertFalse(children.contains(topType));
+
+        children = childTypeL1.getAllChildren();
+        Assert.assertTrue(children.contains(childTypeL2));
+        Assert.assertTrue(children.contains(childTypeL3));
+        Assert.assertFalse(children.contains(topType));
+        Assert.assertFalse(children.contains(childTypeL1));
+
+        children = childTypeL2.getAllChildren();
+        Assert.assertTrue(children.contains(childTypeL3));
+        Assert.assertFalse(children.contains(topType));
+        Assert.assertFalse(children.contains(childTypeL1));
+        Assert.assertFalse(children.contains(childTypeL2));
     }
 
     @Test

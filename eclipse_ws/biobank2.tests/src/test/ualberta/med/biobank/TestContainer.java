@@ -51,8 +51,6 @@ public class TestContainer extends TestDatabase {
 
     private Map<String, ContainerTypeWrapper> containerTypeMap;
 
-    // TODO add test to make sure cannot assign label to non top level container
-
     @Override
     @Before
     public void setUp() throws Exception {
@@ -271,6 +269,19 @@ public class TestContainer extends TestDatabase {
         } catch (Exception e) {
             Assert.assertTrue(true);
         }
+    }
+
+    @Test
+    public void testLabelNonTopLevel() throws Exception {
+        String label = "ABCDEF";
+        ContainerWrapper top, child;
+
+        top = containerMap.get("Top");
+        child = ContainerHelper.addContainer(label, "uvwxyz", top, site,
+            containerTypeMap.get("ChildCtL1"), 0, 0);
+        child.reload();
+        // label should be assigned correct value by wrapper
+        Assert.assertFalse(child.getLabel().equals(label));
     }
 
     @Test
