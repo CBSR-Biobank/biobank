@@ -61,22 +61,11 @@ public class SampleWrapper extends
 
     public void checkInventoryIdUnique() throws BiobankCheckException,
         ApplicationException {
-        HQLCriteria criteria = new HQLCriteria(
-            "from "
-                + Sample.class.getName()
-                + " where inventoryId  = ? and patientVisit.patient.study.site.id=?",
-            Arrays.asList(new Object[] { getInventoryId(), getSite().getId() }));
-        List<Sample> samples = appService.query(criteria);
-        if (samples.size() == 0) {
-            return;
-        }
-        for (Sample sample : samples) {
-            // need to do that for the upper and lower letter (not taken into
-            // account in the sql query
-            if (sample.getInventoryId().equals(getInventoryId())) {
-                throw new BiobankCheckException("A sample with inventoryId \""
-                    + getInventoryId() + "\" already exists.");
-            }
+        List<SampleWrapper> samples = getSamplesInSite(appService,
+            getInventoryId(), getSite());
+        if (samples.size() > 0) {
+            throw new BiobankCheckException("A sample with inventoryId \""
+                + getInventoryId() + "\" already exists.");
         }
     }
 

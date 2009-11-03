@@ -17,6 +17,7 @@ import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.custom.CCombo;
@@ -71,9 +72,8 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
     private CabinetDrawerWidget drawerWidget;
 
     private Text patientNumberText;
-    private CCombo comboVisits;
     private ComboViewer viewerVisits;
-    private ComboViewer comboViewerSampleTypes;
+    private ComboViewer viewerSampleTypes;
     private Text inventoryIdText;
     private Text positionText;
     private Button checkPositionButton;
@@ -96,6 +96,8 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
     private ContainerWrapper bin;
 
     private String cabinetNameContains = "";
+
+    private Button radioNew;
 
     private static final String CHECK_CLICK_MESSAGE = "Click on check";
 
@@ -124,6 +126,9 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
 
         addBooleanBinding(new WritableValue(Boolean.FALSE, Boolean.class),
             resultShownValue, CHECK_CLICK_MESSAGE);
+
+        radioNew.setSelection(true);
+        setMoveMode(false);
     }
 
     private void createLocationSection() {
@@ -156,7 +161,7 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
 
     }
 
-    private void createFieldsSection() {
+    private void createFieldsSection() throws Exception {
         Composite fieldsComposite = toolkit.createComposite(form.getBody());
         GridLayout layout = new GridLayout(2, false);
         layout.horizontalSpacing = 10;
@@ -166,6 +171,28 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
         gd.widthHint = 400;
         gd.verticalAlignment = SWT.TOP;
         fieldsComposite.setLayoutData(gd);
+
+        // radio button to choose new or move
+        radioNew = toolkit.createButton(fieldsComposite, "New sample",
+            SWT.RADIO);
+        final Button radioMove = toolkit.createButton(fieldsComposite,
+            "Move sample", SWT.RADIO);
+        radioNew.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                if (radioNew.getSelection()) {
+                    setMoveMode(false);
+                }
+            }
+        });
+        radioMove.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                if (radioMove.getSelection()) {
+                    setMoveMode(true);
+                }
+            }
+        });
 
         patientNumberText = (Text) createBoundWidgetWithLabel(fieldsComposite,
             Text.class, SWT.NONE, "Patient Number", new String[0],
@@ -190,17 +217,23 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
             BeansObservables.observeValue(sampleWrapper, "inventoryId"),
             new NonEmptyString("Enter Inventory Id"));
         inventoryIdText.addKeyListener(EnterKeyToNextFieldListener.INSTANCE);
+        inventoryIdText.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusLost(FocusEvent e) {
+                if (!radioNew.getSelection()) {
+                    // Move Mode
+                    try {
+                        retrieveSampleInformations();
+                    } catch (Exception ex) {
+                        BioBankPlugin.openAsyncError("Move - sample error", ex);
+                    }
+                }
+            }
+        });
 
         positionText = (Text) createBoundWidgetWithLabel(fieldsComposite,
             Text.class, SWT.NONE, "Position", new String[0], positionValue,
             new CabinetLabelValidator("Enter a position (eg 01AA01AB)"));
-        positionText.addListener(SWT.DefaultSelection, new Listener() {
-            public void handleEvent(Event e) {
-                if (checkPositionButton.isEnabled()) {
-                    checkPositionAndSample();
-                }
-            }
-        });
 
         createTypeCombo(fieldsComposite);
 
@@ -215,7 +248,17 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
                 checkPositionAndSample();
             }
         });
+    }
 
+    protected void setMoveMode(boolean moveMode) {
+        String inventoryId = inventoryIdText.getText();
+        String position = positionText.getText();
+        reset();
+        inventoryIdText.setText(inventoryId);
+        positionText.setText(position);
+        patientNumberText.setEnabled(!moveMode);
+        viewerVisits.getCCombo().setEnabled(!moveMode);
+        viewerSampleTypes.getCCombo().setEnabled(!moveMode);
     }
 
     private void createTypeCombo(Composite fieldsComposite) {
@@ -228,28 +271,28 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
             BioBankPlugin.openError("Initialisation failed", e);
             sampleTypes = new ArrayList<SampleTypeWrapper>();
         }
-        comboViewerSampleTypes = createCComboViewerWithNoSelectionValidator(
+        viewerSampleTypes = createCComboViewerWithNoSelectionValidator(
             fieldsComposite, "Sample type", sampleTypes, null,
             "A sample type should be selected");
-        comboViewerSampleTypes
+        viewerSampleTypes
             .addSelectionChangedListener(new ISelectionChangedListener() {
                 @Override
                 public void selectionChanged(SelectionChangedEvent event) {
-                    IStructuredSelection stSelection = (IStructuredSelection) comboViewerSampleTypes
+                    IStructuredSelection stSelection = (IStructuredSelection) viewerSampleTypes
                         .getSelection();
                     sampleWrapper.setSampleType((SampleTypeWrapper) stSelection
                         .getFirstElement());
                 }
             });
         if (sampleTypes.size() == 1) {
-            comboViewerSampleTypes.getCCombo().select(0);
+            viewerSampleTypes.getCCombo().select(0);
             sampleWrapper.setSampleType(sampleTypes.get(0).getWrappedObject());
         }
     }
 
     private void createVisitCombo(Composite client) {
-        comboVisits = (CCombo) createBoundWidgetWithLabel(client, CCombo.class,
-            SWT.READ_ONLY | SWT.BORDER | SWT.FLAT, "Visits", new String[0],
+        CCombo comboVisits = (CCombo) createBoundWidgetWithLabel(client,
+            CCombo.class, SWT.NONE, "Visits", new String[0],
             visitSelectionValue, new NonEmptyString(
                 "A visit should be selected"));
         GridData gridData = new GridData();
@@ -300,8 +343,8 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
             List<PatientVisitWrapper> collection = currentPatient
                 .getPatientVisitCollection();
             viewerVisits.setInput(collection);
-            comboVisits.select(0);
-            comboVisits.setListVisible(true);
+            viewerVisits.getCCombo().select(0);
+            viewerVisits.getCCombo().setListVisible(true);
         } catch (ApplicationException e) {
             BioBankPlugin.openError("Error getting the patient", e);
         }
@@ -312,9 +355,11 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
             public void run() {
                 try {
                     appendLog("----");
-                    appendLog("Checking inventoryID "
-                        + sampleWrapper.getInventoryId());
-                    sampleWrapper.checkInventoryIdUnique();
+                    if (radioNew.getSelection()) {
+                        appendLog("Checking inventoryID "
+                            + sampleWrapper.getInventoryId());
+                        sampleWrapper.checkInventoryIdUnique();
+                    }
                     String positionString = positionText.getText();
                     initParentContainersFromPosition(positionString);
                     if (bin == null) {
@@ -347,6 +392,48 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
             }
 
         });
+    }
+
+    /**
+     * In move mode, get informations from the existing sample
+     * 
+     * @throws Exception
+     */
+    protected void retrieveSampleInformations() throws Exception {
+        resultShownValue.setValue(false);
+        String inventoryId = inventoryIdText.getText();
+        sampleWrapper.getWrappedObject().setId(null);
+        reset();
+        sampleWrapper.setInventoryId(inventoryId);
+        inventoryIdText.setText(inventoryId);
+
+        appendLog("Getting informations for inventoryID "
+            + sampleWrapper.getInventoryId());
+        List<SampleWrapper> samples = SampleWrapper.getSamplesInSite(
+            appService, sampleWrapper.getInventoryId(), SessionManager
+                .getInstance().getCurrentSiteWrapper());
+        if (samples.size() > 1) {
+            throw new Exception(
+                "Error while retrieving sample with inventoryId "
+                    + sampleWrapper.getInventoryId()
+                    + ": more than one sample found.");
+        }
+        if (samples.size() == 0) {
+            throw new Exception("No sample found with inventoryId "
+                + sampleWrapper.getInventoryId());
+        }
+        sampleWrapper = samples.get(0);
+        currentPatient = sampleWrapper.getPatientVisit().getPatient();
+        patientNumberText.setText(currentPatient.getNumber());
+        List<PatientVisitWrapper> collection = currentPatient
+            .getPatientVisitCollection();
+        viewerVisits.setInput(collection);
+        viewerVisits.setSelection(new StructuredSelection(sampleWrapper
+            .getPatientVisit()));
+        viewerSampleTypes.setSelection(new StructuredSelection(sampleWrapper
+            .getSampleType()));
+        appendLog("Sample " + sampleWrapper.getInventoryId()
+            + ": current position = " + sampleWrapper.getPositionString());
     }
 
     private void showPositions() {
@@ -423,8 +510,8 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
             viewerVisits.setInput(null);
             inventoryIdText.setText("");
             positionText.setText("");
-            if (comboViewerSampleTypes.getCCombo().getItemCount() > 1) {
-                comboViewerSampleTypes.getCCombo().deselectAll();
+            if (viewerSampleTypes.getCCombo().getItemCount() > 1) {
+                viewerSampleTypes.getCCombo().deselectAll();
             }
         } catch (Exception e) {
             LOGGER.error("Can't reset the form", e);
@@ -433,11 +520,23 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
 
     @Override
     protected void saveForm() throws Exception {
-        sampleWrapper.setLinkDate(new Date());
-        sampleWrapper.setPatientVisit(getSelectedPatientVisit()
-            .getWrappedObject());
-        sampleWrapper.setQuantityFromType();
+        if (radioNew.getSelection()) {
+            sampleWrapper.setLinkDate(new Date());
+            sampleWrapper.setPatientVisit(getSelectedPatientVisit()
+                .getWrappedObject());
+            sampleWrapper.setQuantityFromType();
+        }
         sampleWrapper.persist();
+        if (radioNew.getSelection()) {
+            appendLog("Sample " + sampleWrapper.getInventoryId()
+                + " saved in position " + sampleWrapper.getPositionString()
+                + " for visit "
+                + sampleWrapper.getPatientVisit().getFormattedDateDrawn()
+                + "(patient " + currentPatient.getNumber() + ")");
+        } else {
+            appendLog("Sample " + sampleWrapper.getInventoryId()
+                + " moved to position " + sampleWrapper.getPositionString());
+        }
         setSaved(true);
     }
 

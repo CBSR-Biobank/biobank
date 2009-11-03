@@ -35,9 +35,7 @@ import edu.ualberta.med.biobank.widgets.infotables.InfoTableWidget;
 
 public class ReportsView extends ViewPart {
 
-    @SuppressWarnings("unused")
-    private static Logger LOGGER = Logger
-        .getLogger(ReportsView.class.getName());
+    public static Logger LOGGER = Logger.getLogger(ReportsView.class.getName());
 
     public static final String ID = "edu.ualberta.med.biobank.views.ReportsView";
     private ScrolledComposite sc;
@@ -50,7 +48,6 @@ public class ReportsView extends ViewPart {
     private List<Label> textLabels;
 
     private Button searchButton;
-    private Button saveSearch;
     private Collection<Object> searchData;
     private InfoTableWidget<Object> searchTable;
 
@@ -60,6 +57,7 @@ public class ReportsView extends ViewPart {
 
     @Override
     public void createPartControl(Composite parent) {
+
         sc = new ScrolledComposite(parent, SWT.V_SCROLL);
         sc.setLayout(new GridLayout(1, false));
         sc.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
@@ -146,15 +144,6 @@ public class ReportsView extends ViewPart {
             }
         });
 
-        saveSearch = new Button(top, SWT.NONE);
-        saveSearch.setText("Save Search");
-        saveSearch.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-
-            }
-        });
-
         querySelect.setSelection(new StructuredSelection(queryObjects.get(0)));
         top.layout();
         sc.setContent(top);
@@ -163,19 +152,14 @@ public class ReportsView extends ViewPart {
     }
 
     private Collection<Object> search() {
-        try {
-            IStructuredSelection typeSelection = (IStructuredSelection) querySelect
-                .getSelection();
-            QueryObject query = (QueryObject) typeSelection.getFirstElement();
-            ArrayList<Object> params = new ArrayList<Object>();
-            for (int i = 0; i < textFields.size(); i++) {
-                params.add(textFields.get(i).getText());
-            }
-            return query.executeQuery(params);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
+        IStructuredSelection typeSelection = (IStructuredSelection) querySelect
+            .getSelection();
+        QueryObject query = (QueryObject) typeSelection.getFirstElement();
+        ArrayList<Object> params = new ArrayList<Object>();
+        for (int i = 0; i < textFields.size(); i++) {
+            params.add(textFields.get(i).getText());
         }
+        return query.executeQuery(params);
     }
 
     public void comboChanged() {

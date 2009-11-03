@@ -71,7 +71,7 @@ public class PalletWidget extends AbstractGridContainerWidget {
         hasLegend = true;
         statusAvailable = new ArrayList<SampleCellStatus>();
         statusAvailable.add(SampleCellStatus.EMPTY);
-        statusAvailable.add(SampleCellStatus.NEW);
+        statusAvailable.add(SampleCellStatus.NEW_MOVED);
         statusAvailable.add(SampleCellStatus.FILLED);
         statusAvailable.add(SampleCellStatus.MISSING);
         statusAvailable.add(SampleCellStatus.ERROR);

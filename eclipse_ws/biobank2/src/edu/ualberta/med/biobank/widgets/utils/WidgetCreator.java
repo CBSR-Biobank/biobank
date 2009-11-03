@@ -134,11 +134,11 @@ public class WidgetCreator {
             return createText(composite, widgetOptions, modelObservableValue,
                 uvs);
         } else if (widgetClass == Combo.class) {
-            return createCombo(composite, widgetValues, modelObservableValue,
-                uvs, false);
+            return createCombo(composite, widgetOptions, widgetValues,
+                modelObservableValue, uvs, false);
         } else if (widgetClass == CCombo.class) {
-            return createCombo(composite, widgetValues, modelObservableValue,
-                uvs, true);
+            return createCombo(composite, widgetOptions, widgetValues,
+                modelObservableValue, uvs, true);
         } else if (widgetClass == Button.class) {
             return createButton(composite, modelObservableValue, uvs);
         } else {
@@ -158,14 +158,14 @@ public class WidgetCreator {
         return button;
     }
 
-    private Composite createCombo(Composite composite, String[] widgetValues,
-        final IObservableValue modelObservableValue, UpdateValueStrategy uvs,
-        final boolean isCCombo) {
+    private Composite createCombo(Composite composite, int options,
+        String[] widgetValues, final IObservableValue modelObservableValue,
+        UpdateValueStrategy uvs, final boolean isCCombo) {
         Composite combo = null;
         if (isCCombo) {
-            combo = new CCombo(composite, SWT.READ_ONLY);
+            combo = new CCombo(composite, SWT.READ_ONLY | SWT.BORDER | options);
         } else {
-            combo = new Combo(composite, SWT.READ_ONLY);
+            combo = new Combo(composite, SWT.READ_ONLY | SWT.BORDER | options);
         }
         combo.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
         Assert.isNotNull(widgetValues, "combo values not assigned");

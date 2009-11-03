@@ -611,7 +611,7 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
                         + " of patient "
                         + sample.getPatientVisit().getPatient().getNumber());
                 } else {
-                    cell.setStatus(SampleCellStatus.NEW);
+                    cell.setStatus(SampleCellStatus.NO_TYPE);
                 }
                 return true;
             } else {

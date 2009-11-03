@@ -30,8 +30,8 @@ public class LogoutHandler extends AbstractHandler {
             // }
         }
         // close all editors
-        activePage.closeAllEditors(true);
-        SessionManager.getInstance().deleteSession();
+        if (activePage.closeAllEditors(true))
+            SessionManager.getInstance().deleteSession();
         return null;
     }
 }

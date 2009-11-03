@@ -318,6 +318,16 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
                 + getDateDrawn() + " already exist in patient "
                 + getPatient().getNumber() + ".");
         }
+
+        boolean found = false;
+        Collection<StudyWrapper> studies = getClinic().getStudyCollection();
+        for (StudyWrapper study : studies)
+            if (study.getId().equals(getPatient().getStudy().getId()))
+                found = true;
+        if (!found)
+            throw new BiobankCheckException("A patient visit with date drawn "
+                + getDateDrawn() + " already exist in patient "
+                + getPatient().getNumber() + ".");
     }
 
     public String getUsername() {

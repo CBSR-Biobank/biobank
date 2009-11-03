@@ -127,7 +127,7 @@ public class ScanLinkPalletWidget extends PalletWidget {
             for (PalletCell cell : rowCells) {
                 if (PalletCell.hasValue(cell)) {
                     cell.setType(null);
-                    cell.setStatus(SampleCellStatus.NEW);
+                    cell.setStatus(SampleCellStatus.NO_TYPE);
                 }
             }
         }
