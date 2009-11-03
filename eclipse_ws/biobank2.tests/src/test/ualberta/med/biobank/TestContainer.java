@@ -51,6 +51,8 @@ public class TestContainer extends TestDatabase {
 
     private Map<String, ContainerTypeWrapper> containerTypeMap;
 
+    // TODO add test to make sure cannot assign label to non top level container
+
     @Override
     @Before
     public void setUp() throws Exception {
