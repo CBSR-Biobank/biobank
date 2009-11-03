@@ -292,8 +292,8 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
 
     private void createVisitCombo(Composite client) {
         CCombo comboVisits = (CCombo) createBoundWidgetWithLabel(client,
-            CCombo.class, SWT.READ_ONLY | SWT.BORDER | SWT.FLAT, "Visits",
-            new String[0], visitSelectionValue, new NonEmptyString(
+            CCombo.class, SWT.NONE, "Visits", new String[0],
+            visitSelectionValue, new NonEmptyString(
                 "A visit should be selected"));
         GridData gridData = new GridData();
         gridData.grabExcessHorizontalSpace = true;
