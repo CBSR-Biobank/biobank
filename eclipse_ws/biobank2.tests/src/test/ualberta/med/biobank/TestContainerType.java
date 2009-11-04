@@ -12,6 +12,7 @@ import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import test.ualberta.med.biobank.internal.ContainerHelper;
 import test.ualberta.med.biobank.internal.ContainerTypeHelper;
 import test.ualberta.med.biobank.internal.SiteHelper;
 import edu.ualberta.med.biobank.common.BiobankCheckException;
@@ -145,23 +146,22 @@ public class TestContainerType extends TestDatabase {
         childTypeL2 = containerTypeMap.get("ChildCtL2");
         childTypeL3 = containerTypeMap.get("ChildCtL3");
 
-        childTypeL1.reload();
-        childTypeL2.reload();
-        childTypeL3.reload();
-
         Collection<ContainerTypeWrapper> children = topType.getAllChildren();
+        Assert.assertEquals(3, children.size());
         Assert.assertTrue(children.contains(childTypeL1));
         Assert.assertTrue(children.contains(childTypeL2));
         Assert.assertTrue(children.contains(childTypeL3));
         Assert.assertFalse(children.contains(topType));
 
         children = childTypeL1.getAllChildren();
+        Assert.assertEquals(2, children.size());
         Assert.assertTrue(children.contains(childTypeL2));
         Assert.assertTrue(children.contains(childTypeL3));
         Assert.assertFalse(children.contains(topType));
         Assert.assertFalse(children.contains(childTypeL1));
 
         children = childTypeL2.getAllChildren();
+        Assert.assertEquals(1, children.size());
         Assert.assertTrue(children.contains(childTypeL3));
         Assert.assertFalse(children.contains(topType));
         Assert.assertFalse(children.contains(childTypeL1));
@@ -169,8 +169,27 @@ public class TestContainerType extends TestDatabase {
     }
 
     @Test
-    public void testIsUsedByContainers() {
-        fail("Not yet implemented");
+    public void testIsUsedByContainers() throws Exception {
+        addContainerTypeHierarchy(containerTypeMap.get("TopCT"));
+
+        String[] keys = new String[] { "TopCT", "ChildCtL1", "ChildCtL2",
+            "ChildCtL3" };
+
+        for (String key : keys) {
+            ContainerTypeWrapper ct = containerTypeMap.get(key);
+            Assert.assertFalse(ct.isUsedByContainers());
+
+            if (key.equals("TopCT")) {
+                ContainerHelper.addContainer("01", TestContainer
+                    .getNewBarcode(), null, site, ct);
+            } else {
+                ContainerHelper.addContainer(null, TestContainer
+                    .getNewBarcode(), null, site, ct, 0, 0);
+            }
+
+            ct.reload();
+            Assert.assertTrue(ct.isUsedByContainers());
+        }
     }
 
     @Test

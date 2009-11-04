@@ -55,7 +55,6 @@ public class TestContainer extends TestDatabase {
     @Before
     public void setUp() throws Exception {
         super.setUp();
-        usedBarcodes = new ArrayList<String>();
         containerMap = new HashMap<String, ContainerWrapper>();
         containerTypeMap = new HashMap<String, ContainerTypeWrapper>();
         site = SiteHelper.addSite("Site - Container Test"
@@ -64,7 +63,11 @@ public class TestContainer extends TestDatabase {
         addContainers();
     }
 
-    private static String getNewBarcode() {
+    public static String getNewBarcode() {
+        if (usedBarcodes == null) {
+            usedBarcodes = new ArrayList<String>();
+        }
+
         String newBarcode;
         do {
             newBarcode = Utils.getRandomString(10);
