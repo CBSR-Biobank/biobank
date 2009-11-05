@@ -2,9 +2,11 @@ package test.ualberta.med.biobank;
 
 import static org.junit.Assert.fail;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import junit.framework.Assert;
@@ -17,6 +19,7 @@ import test.ualberta.med.biobank.internal.ContainerTypeHelper;
 import test.ualberta.med.biobank.internal.SiteHelper;
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.model.ContainerType;
 
@@ -56,7 +59,7 @@ public class TestContainerType extends TestDatabase {
         ContainerTypeWrapper childType;
 
         childType = ContainerTypeHelper.addContainerType(site,
-            "Child L3 Container Type", "CCTL3", 4, CONTAINER_CHILD_L3_ROWS,
+            "Child L3 Container Type", "CCTL3", 1, CONTAINER_CHILD_L3_ROWS,
             CONTAINER_CHILD_L3_COLS, false);
         containerTypeMap.put("ChildCtL3", childType);
 
@@ -175,16 +178,19 @@ public class TestContainerType extends TestDatabase {
         String[] keys = new String[] { "TopCT", "ChildCtL1", "ChildCtL2",
             "ChildCtL3" };
 
+        List<ContainerWrapper> containers = new ArrayList<ContainerWrapper>();
+
         for (String key : keys) {
             ContainerTypeWrapper ct = containerTypeMap.get(key);
             Assert.assertFalse(ct.isUsedByContainers());
 
             if (key.equals("TopCT")) {
-                ContainerHelper.addContainer("01", TestContainer
-                    .getNewBarcode(), null, site, ct);
+                containers.add(ContainerHelper.addContainer("01", TestContainer
+                    .getNewBarcode(), null, site, ct));
             } else {
-                ContainerHelper.addContainer(null, TestContainer
-                    .getNewBarcode(), null, site, ct, 0, 0);
+                containers.add(ContainerHelper.addContainer(null, TestContainer
+                    .getNewBarcode(), containers.get(containers.size() - 1),
+                    site, ct, 0, 0));
             }
 
             ct.reload();
@@ -262,4 +268,8 @@ public class TestContainerType extends TestDatabase {
         fail("Not yet implemented");
     }
 
+    @Test
+    public void testGetContainersCount() {
+        fail("Not yet implemented");
+    }
 }
