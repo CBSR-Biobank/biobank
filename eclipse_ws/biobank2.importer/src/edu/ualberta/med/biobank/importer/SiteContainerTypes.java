@@ -73,78 +73,83 @@ public class SiteContainerTypes {
     }
 
     private void createFreezerTypes(Site site) throws Exception {
-        ContainerType box81 = assignContainerType(site, "Box-81",
-            labelingSchemeMap.get("SBS Standard"), 8, 12, null,
+        ContainerType box81 = assignContainerType(site, "Box-81", false,
+            labelingSchemeMap.get("SBS Standard"), 9, 9, null,
             freezerSampleTypes);
         containerTypeMap.put("Box-81", box81);
 
-        ContainerType pallet96 = assignContainerType(site, "Pallet-96",
+        ContainerType pallet96 = assignContainerType(site, "Pallet-96", false,
             labelingSchemeMap.get("SBS Standard"), 8, 12, null,
             freezerSampleTypes);
         containerTypeMap.put("Pallet-96", pallet96);
 
         ContainerType pallet384 = assignContainerType(site, "Pallet-384",
-            labelingSchemeMap.get("SBS Standard"), 16, 24, null,
+            false, labelingSchemeMap.get("SBS Standard"), 16, 24, null,
             freezerSampleTypes);
         containerTypeMap.put("Pallet-384", pallet384);
 
-        ContainerType hotel17 = assignContainerType(site, "Hotel-17",
+        ContainerType hotel17 = assignContainerType(site, "Hotel-17", false,
             labelingSchemeMap.get("2 char numeric"), 17, 1,
             Arrays.asList(new ContainerType [] { box81 }), null);
         containerTypeMap.put("Hotel-17", hotel17);
 
-        ContainerType hotel18 = assignContainerType(site, "Hotel-18",
+        ContainerType hotel18 = assignContainerType(site, "Hotel-18", false,
             labelingSchemeMap.get("2 char numeric"), 18, 1,
             Arrays.asList(new ContainerType [] { box81 }), null);
         containerTypeMap.put("Hotel-18", hotel17);
 
-        ContainerType hotel13 = assignContainerType(site, "Hotel-13",
+        ContainerType hotel13 = assignContainerType(site, "Hotel-13", false,
             labelingSchemeMap.get("2 char numeric"), 13, 1,
             Arrays.asList(new ContainerType [] { pallet96 }), null);
         containerTypeMap.put("Hotel-13", hotel13);
 
-        ContainerType hotel19 = assignContainerType(site, "Hotel-19",
+        ContainerType hotel19 = assignContainerType(site, "Hotel-19", false,
             labelingSchemeMap.get("2 char numeric"), 19, 1,
             Arrays.asList(new ContainerType [] { pallet96 }), null);
         containerTypeMap.put("Hotel-19", hotel19);
 
         containerTypeMap.put("Freezer-3x10", assignContainerType(site,
-            "Freezer-3x10", labelingSchemeMap.get("CBSR 2 char alphabetic"), 3,
-            10, Arrays.asList(new ContainerType [] { hotel17 }), null));
+            "Freezer-3x10", true,
+            labelingSchemeMap.get("CBSR 2 char alphabetic"), 3, 10,
+            Arrays.asList(new ContainerType [] { hotel17 }), null));
 
         containerTypeMap.put("Freezer-4x12", assignContainerType(site,
-            "Freezer-4x12", labelingSchemeMap.get("CBSR 2 char alphabetic"), 4,
-            12, Arrays.asList(new ContainerType [] { hotel18 }), null));
+            "Freezer-4x12", true,
+            labelingSchemeMap.get("CBSR 2 char alphabetic"), 4, 12,
+            Arrays.asList(new ContainerType [] { hotel18 }), null));
 
         containerTypeMap.put("Freezer-5x9", assignContainerType(site,
-            "Freezer-5x9", labelingSchemeMap.get("CBSR 2 char alphabetic"), 5,
-            9, Arrays.asList(new ContainerType [] { hotel13, hotel19 }), null));
+            "Freezer-5x9", true,
+            labelingSchemeMap.get("CBSR 2 char alphabetic"), 5, 9,
+            Arrays.asList(new ContainerType [] { hotel13, hotel19 }), null));
 
         containerTypeMap.put("Freezer-6x12", assignContainerType(site,
-            "Freezer-6x12", labelingSchemeMap.get("CBSR 2 char alphabetic"), 6,
-            12, Arrays.asList(new ContainerType [] { hotel13, hotel19 }), null));
+            "Freezer-6x12", true,
+            labelingSchemeMap.get("CBSR 2 char alphabetic"), 6, 12,
+            Arrays.asList(new ContainerType [] { hotel13, hotel19 }), null));
     }
 
     private void createCabinetTypes(Site site) throws Exception {
-        ContainerType bin = assignContainerType(site, "Bin",
+        ContainerType bin = assignContainerType(site, "Bin", false,
             labelingSchemeMap.get("CBSR 2 char alphabetic"), 120, 1, null,
             cabinetSampleTypes);
         containerTypeMap.put("Bin", bin);
-        ContainerType drawer = assignContainerType(site, "Drawer",
+        ContainerType drawer = assignContainerType(site, "Drawer", false,
             labelingSchemeMap.get("2 char numeric"), 36, 1,
             Arrays.asList(new ContainerType [] { bin }), null);
         containerTypeMap.put("Drawer", drawer);
         containerTypeMap.put("Cabinet", assignContainerType(site, "Cabinet",
-            labelingSchemeMap.get("CBSR 2 char alphabetic"), 4, 1,
+            true, labelingSchemeMap.get("CBSR 2 char alphabetic"), 4, 1,
             Arrays.asList(new ContainerType [] { drawer }), null));
     }
 
     private ContainerType assignContainerType(Site site, String name,
-        ContainerLabelingScheme childLabelingScheme, int dim1, int dim2,
-        List<ContainerType> children, Collection<SampleType> sampleTypes)
-        throws Exception {
+        boolean topLevel, ContainerLabelingScheme childLabelingScheme,
+        int dim1, int dim2, List<ContainerType> children,
+        Collection<SampleType> sampleTypes) throws Exception {
         ContainerType ct = new ContainerType();
         ct.setName(name);
+        ct.setTopLevel(topLevel);
         ct.setSite(site);
         Capacity capacity = new Capacity();
         capacity.setRowCapacity(dim1);
