@@ -270,12 +270,12 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
         return sampleTypeCollection;
     }
 
-    public Collection<SampleTypeWrapper> getSampleTypeCollectionRecursively()
+    public Set<SampleTypeWrapper> getSampleTypesRecursively()
         throws ApplicationException {
-        List<SampleTypeWrapper> sampleTypes = new ArrayList<SampleTypeWrapper>();
+        Set<SampleTypeWrapper> sampleTypes = new HashSet<SampleTypeWrapper>();
         sampleTypes.addAll(getSampleTypeCollection());
         for (ContainerTypeWrapper type : getChildContainerTypeCollection()) {
-            sampleTypes.addAll(type.getSampleTypeCollectionRecursively());
+            sampleTypes.addAll(type.getSampleTypesRecursively());
         }
         return sampleTypes;
     }
@@ -557,11 +557,11 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
     public static List<ContainerTypeWrapper> transformToWrapperList(
         WritableApplicationService appService,
         Collection<ContainerType> containerTypes) {
-        List<ContainerTypeWrapper> list = new ArrayList<ContainerTypeWrapper>();
+        Set<ContainerTypeWrapper> set = new HashSet<ContainerTypeWrapper>();
         for (ContainerType type : containerTypes) {
-            list.add(new ContainerTypeWrapper(appService, type));
+            set.add(new ContainerTypeWrapper(appService, type));
         }
-        return list;
+        return new ArrayList<ContainerTypeWrapper>(set);
     }
 
     /**

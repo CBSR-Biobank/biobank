@@ -447,9 +447,8 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
                     appendLog("MOVE in " + positionString + ": tube " + value
                         + " registered on another pallet at position "
                         + expectedPosition);
-                }
-                // sample is a new one !
-                if (!currentPalletWrapper.canHoldSample(foundSample)) {
+                    scanCell.setStatus(SampleCellStatus.MOVED);
+                } else if (!currentPalletWrapper.canHoldSample(foundSample)) {
                     // pallet can't hold this sample type
                     scanCell.setStatus(SampleCellStatus.ERROR);
                     scanCell.setInformation("This pallet type "
@@ -461,8 +460,9 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
                         + " can't hold this sample of type "
                         + foundSample.getSampleType().getName());
                     return false;
+                } else {
+                    scanCell.setStatus(SampleCellStatus.NEW);
                 }
-                scanCell.setStatus(SampleCellStatus.NEW_MOVED);
             }
             scanCell.setTitle(foundSample.getPatientVisit().getPatient()
                 .getNumber());
