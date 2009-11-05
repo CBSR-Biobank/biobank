@@ -1,10 +1,7 @@
 package edu.ualberta.med.biobank.views;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -25,13 +22,15 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.part.ViewPart;
 
+import edu.ualberta.med.biobank.reports.QueryObject;
+import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.widgets.ReportsLabelProvider;
 import edu.ualberta.med.biobank.widgets.infotables.InfoTableWidget;
-import edu.ualberta.med.biobank.widgets.queries.AbstractQueryClause;
-import edu.ualberta.med.biobank.widgets.queries.QueryPage;
 
 public class ReportsView extends ViewPart {
 
@@ -44,7 +43,7 @@ public class ReportsView extends ViewPart {
 
     private ComboViewer querySelect;
     private List<QueryObject> queryObjects;
-    private List<Text> textFields;
+    private List<Widget> widgetFields;
     private List<Label> textLabels;
 
     private Button searchButton;
@@ -101,31 +100,12 @@ public class ReportsView extends ViewPart {
                         .getSelection();
                     QueryObject query = (QueryObject) typeSelection
                         .getFirstElement();
-                    List<Method> filteredMethods = QueryPage
-                        .filterMethods(query.getReturnType());
-                    int[] bounds = new int[filteredMethods.size()];
-                    String[] names = new String[filteredMethods.size()];
-                    for (int i = 0; i < filteredMethods.size(); i++) {
-                        names[i] = filteredMethods.get(i).getName()
-                            .substring(3);
-                    }
-                    Arrays.sort(names, new Comparator<String>() {
+                    String[] names = query.getColumnNames();
+                    int[] bounds = new int[names.length];
 
-                        @Override
-                        public int compare(String o1, String o2) {
-                            if (o1.compareToIgnoreCase("Name") == 0)
-                                return -1;
-                            else if (o2.compareToIgnoreCase("Name") == 0)
-                                return 1;
-                            else
-                                return o1.compareToIgnoreCase(o2);
-                        }
-
-                    });
-                    for (int i = 0; i < filteredMethods.size(); i++) {
+                    for (int i = 0; i < names.length; i++) {
                         bounds[i] = 100 + names[i].length() * 2;
                     }
-
                     searchTable.dispose();
                     searchTable = new InfoTableWidget<Object>(top, searchData,
                         names, bounds);
@@ -156,8 +136,13 @@ public class ReportsView extends ViewPart {
             .getSelection();
         QueryObject query = (QueryObject) typeSelection.getFirstElement();
         ArrayList<Object> params = new ArrayList<Object>();
-        for (int i = 0; i < textFields.size(); i++) {
-            params.add(textFields.get(i).getText());
+        for (int i = 0; i < widgetFields.size(); i++) {
+            if (widgetFields.get(i) instanceof Text)
+                params.add(((Text) widgetFields.get(i)).getText());
+            else if (widgetFields.get(i) instanceof Combo)
+                params.add(((Combo) widgetFields.get(i)).getSelectionIndex());
+            else if (widgetFields.get(i) instanceof DateTimeWidget)
+                params.add(((DateTimeWidget) widgetFields.get(i)).getDate());
         }
         return query.executeQuery(params);
     }
@@ -170,7 +155,7 @@ public class ReportsView extends ViewPart {
         List<Class<?>> fields = query.getFieldTypes();
         List<String> fieldNames = query.getFieldNames();
         textLabels = new ArrayList<Label>();
-        textFields = new ArrayList<Text>();
+        widgetFields = new ArrayList<Widget>();
 
         if (subSection != null)
             subSection.dispose();
@@ -190,8 +175,17 @@ public class ReportsView extends ViewPart {
             Label fieldLabel = new Label(subSection, SWT.NONE);
             fieldLabel.setText(fieldNames.get(i) + ":");
             textLabels.add(fieldLabel);
-            Text textField = new Text(subSection, SWT.BORDER);
-            textFields.add(textField);
+            Widget widget;
+
+            if (fields.get(i) == Combo.class)
+                widget = new Combo(subSection, SWT.NONE);
+            else if (fields.get(i) == DateTimeWidget.class)
+                widget = new DateTimeWidget(subSection, SWT.NONE, null);
+            else if (fields.get(i) == Text.class)
+                widget = new Text(subSection, SWT.BORDER);
+            else
+                widget = null;
+            widgetFields.add(widget);
         }
 
         subSection.moveBelow(querySelect.getCombo());
@@ -215,8 +209,15 @@ public class ReportsView extends ViewPart {
     }
 
     public void resetSearch() {
-        if (searchTable != null)
+        if (searchTable != null) {
             searchTable.setCollection(new ArrayList<Object>());
+            TableColumn[] cols = searchTable.getTableViewer().getTable()
+                .getColumns();
+            for (TableColumn col : cols) {
+                col.setText("");
+            }
+        }
+
     }
 
     protected static ComboViewer createCombo(Composite parent, List<?> list) {
@@ -233,7 +234,7 @@ public class ReportsView extends ViewPart {
         comboViewer.setLabelProvider(new LabelProvider() {
             @Override
             public String getText(Object element) {
-                return AbstractQueryClause.getText(element);
+                return element.toString();
             }
         });
         comboViewer.setInput(list);

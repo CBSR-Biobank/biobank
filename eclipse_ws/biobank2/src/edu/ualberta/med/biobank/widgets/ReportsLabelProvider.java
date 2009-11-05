@@ -195,6 +195,9 @@ public class ReportsLabelProvider extends LabelProvider implements
             } else if (columnIndex == 0) {
                 return "loading ...";
             }
+        } else if (element instanceof Object[]) {
+            Object[] castedVals = (Object[]) element;
+            return castedVals[columnIndex].toString();
         }
         return "";
 
