@@ -635,8 +635,7 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
                     sample.persist();
                     sb.append("\nLINKED: ").append(cell.getValue());
                     sb.append(" - patient: ").append(
-                        patientVisit.getWrappedObject().getPatient()
-                            .getNumber());
+                        patientVisit.getPatient().getNumber());
                     sb.append(" - Visit: ").append(
                         patientVisit.getFormattedDateDrawn());
                     sb.append(" - ").append(patientVisit.getClinic().getName());

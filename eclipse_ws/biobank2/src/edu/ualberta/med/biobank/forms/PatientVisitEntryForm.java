@@ -147,7 +147,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         Label siteLabel = (Label) createWidget(client, Label.class, SWT.NONE,
             "Site");
         FormUtils.setTextValue(siteLabel, patientVisitWrapper.getPatient()
-            .getStudy().getWrappedObject().getSite().getName());
+            .getStudy().getSite().getName());
 
         if (patientVisitWrapper.isNew()) {
             // choose clinic for new visit
@@ -236,8 +236,8 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
                     .observeValue(pvCustomInfo, "value"), null);
         case 5: // select_multiple
             createFieldLabel(client, pvCustomInfo.label);
-            SelectMultipleWidget s = new SelectMultipleWidget(client, SWT.BORDER,
-                pvCustomInfo.allowedValues, selectionListener);
+            SelectMultipleWidget s = new SelectMultipleWidget(client,
+                SWT.BORDER, pvCustomInfo.allowedValues, selectionListener);
             s.adaptToToolkit(toolkit, true);
             if (pvCustomInfo.value != null) {
                 s.setSelections(pvCustomInfo.value.split(";"));
@@ -245,7 +245,8 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
             return s;
         case 6: // select_single_and_quantity_1_5_1
             createFieldLabel(client, pvCustomInfo.label);
-            ComboAndQuantityWidget c = new ComboAndQuantityWidget(client, SWT.BORDER);
+            ComboAndQuantityWidget c = new ComboAndQuantityWidget(client,
+                SWT.BORDER);
             c.adaptToToolkit(toolkit, true);
             if (pvCustomInfo.allowedValues != null) {
                 c.addValues(pvCustomInfo.allowedValues);

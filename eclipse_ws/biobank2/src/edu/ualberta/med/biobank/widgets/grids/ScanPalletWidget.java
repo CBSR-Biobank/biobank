@@ -59,7 +59,12 @@ public class ScanPalletWidget extends AbstractGridWidget {
                 if (cell != null) {
                     String msg = cell.getValue();
                     if (cell.getInformation() != null) {
-                        msg += " : " + cell.getInformation();
+                        if (msg == null) {
+                            msg = "";
+                        } else {
+                            msg += ": ";
+                        }
+                        msg += cell.getInformation();
                     }
                     setToolTipText(msg);
                 } else {
