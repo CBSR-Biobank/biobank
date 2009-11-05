@@ -13,17 +13,20 @@ public class QueryObject {
     private String description;
     private String queryString;
     protected List<String> fieldNames;
-    private Class<?> objectType;
     private String name;
+    private String[] columnNames;
+    protected List<Object> defaults;
 
-    public QueryObject(Class<?> objectType, String description, String name,
-        String queryString, List<Class<?>> fieldTypes, List<String> fieldNames) {
-        this.objectType = objectType;
+    public QueryObject(String description, String name, String queryString,
+        List<Class<?>> fieldTypes, List<Object> defaults,
+        List<String> fieldNames, String[] columnNames) {
         this.description = description;
         this.name = name;
         this.queryString = queryString;
         this.fieldTypes = fieldTypes;
+        this.defaults = defaults;
         this.fieldNames = fieldNames;
+        this.columnNames = columnNames;
     }
 
     public static List<QueryObject> getAllQueries() {
@@ -56,6 +59,8 @@ public class QueryObject {
 
     public List<Object> executeQuery(List<Object> params) {
         for (int i = 0; i < fieldTypes.size(); i++) {
+            if (params.get(i) == null)
+                params.set(i, defaults.get(i));
             if (fieldTypes.get(i).equals(String.class))
                 params.set(i, "%" + params.get(i) + "%");
         }
@@ -70,10 +75,6 @@ public class QueryObject {
         return postProcess(results);
     }
 
-    public Class<?> getReturnType() {
-        return objectType;
-    }
-
     @Override
     public String toString() {
         return name;
@@ -81,5 +82,9 @@ public class QueryObject {
 
     public List<Object> postProcess(List<Object> results) {
         return results;
+    }
+
+    public String[] getColumnNames() {
+        return columnNames;
     }
 }

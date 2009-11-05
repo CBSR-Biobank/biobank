@@ -26,7 +26,7 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class AdvancedReportsView extends ViewPart {
 
-    public static final String ID = "edu.ualberta.med.biobank.views.ReportsView";
+    public static final String ID = "edu.ualberta.med.biobank.views.AdvancedReportsView";
     private ScrolledComposite sc;
     private Composite top;
 

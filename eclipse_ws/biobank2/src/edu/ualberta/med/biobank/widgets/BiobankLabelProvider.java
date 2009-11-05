@@ -281,6 +281,7 @@ public class BiobankLabelProvider extends LabelProvider implements
         } else if (element instanceof ModelWrapper<?>) {
             return getColumnText(
                 ((ModelWrapper<?>) element).getWrappedObject(), columnIndex);
+
         } else {
             Assert.isTrue(false, "invalid object type: " + element.getClass());
         }

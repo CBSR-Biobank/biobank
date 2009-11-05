@@ -1,10 +1,7 @@
 package edu.ualberta.med.biobank.views;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -25,13 +22,13 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.part.ViewPart;
 
 import edu.ualberta.med.biobank.reports.QueryObject;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
-import edu.ualberta.med.biobank.widgets.QueryPage;
 import edu.ualberta.med.biobank.widgets.ReportsLabelProvider;
 import edu.ualberta.med.biobank.widgets.infotables.InfoTableWidget;
 
@@ -103,31 +100,12 @@ public class ReportsView extends ViewPart {
                         .getSelection();
                     QueryObject query = (QueryObject) typeSelection
                         .getFirstElement();
-                    List<Method> filteredMethods = QueryPage
-                        .filterMethods(query.getReturnType());
-                    int[] bounds = new int[filteredMethods.size()];
-                    String[] names = new String[filteredMethods.size()];
-                    for (int i = 0; i < filteredMethods.size(); i++) {
-                        names[i] = filteredMethods.get(i).getName()
-                            .substring(3);
-                    }
-                    Arrays.sort(names, new Comparator<String>() {
+                    String[] names = query.getColumnNames();
+                    int[] bounds = new int[names.length];
 
-                        @Override
-                        public int compare(String o1, String o2) {
-                            if (o1.compareToIgnoreCase("Name") == 0)
-                                return -1;
-                            else if (o2.compareToIgnoreCase("Name") == 0)
-                                return 1;
-                            else
-                                return o1.compareToIgnoreCase(o2);
-                        }
-
-                    });
-                    for (int i = 0; i < filteredMethods.size(); i++) {
+                    for (int i = 0; i < names.length; i++) {
                         bounds[i] = 100 + names[i].length() * 2;
                     }
-
                     searchTable.dispose();
                     searchTable = new InfoTableWidget<Object>(top, searchData,
                         names, bounds);
@@ -220,7 +198,7 @@ public class ReportsView extends ViewPart {
 
     }
 
-    @Override 
+    @Override
     public void setFocus() {
 
     }
@@ -231,8 +209,15 @@ public class ReportsView extends ViewPart {
     }
 
     public void resetSearch() {
-        if (searchTable != null)
+        if (searchTable != null) {
             searchTable.setCollection(new ArrayList<Object>());
+            TableColumn[] cols = searchTable.getTableViewer().getTable()
+                .getColumns();
+            for (TableColumn col : cols) {
+                col.setText("");
+            }
+        }
+
     }
 
     protected static ComboViewer createCombo(Composite parent, List<?> list) {
