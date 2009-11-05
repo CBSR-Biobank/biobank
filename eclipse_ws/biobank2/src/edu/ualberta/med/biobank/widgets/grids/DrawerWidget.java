@@ -1,8 +1,9 @@
-package edu.ualberta.med.biobank.widgets;
+package edu.ualberta.med.biobank.widgets.grids;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
@@ -10,13 +11,13 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 
+import edu.ualberta.med.biobank.common.RowColPos;
 import edu.ualberta.med.biobank.model.ContainerCell;
 import edu.ualberta.med.biobank.model.ContainerStatus;
 
-public class CabinetDrawerWidget extends Canvas {
+public class DrawerWidget extends AbstractContainerDisplayWidget {
 
     public static final int SQUARE_CELL_WIDTH = 70;
 
@@ -33,22 +34,22 @@ public class CabinetDrawerWidget extends Canvas {
 
     public static final int HEIGHT = GRID_HEIGHT + 10;
 
-    private int boxNumber = 36;
-
-    private int selectedBin = -1;
+    private RowColPos selection;
 
     private Boolean hasLegend = false;
 
-    // single dimension format, (boxNumber slots)
+    // suppose to be a 36*1 array
     private ContainerCell[][] cells;
 
     private ArrayList<ContainerStatus> legendStatus;
+
+    private static final int DRAWER_SIZE = 36;
 
     public static int LEGEND_WIDTH = 70;
 
     public static int LEGEND_HEIGHT = 20;
 
-    public CabinetDrawerWidget(Composite parent) {
+    public DrawerWidget(Composite parent) {
         super(parent, SWT.DOUBLE_BUFFERED);
         addPaintListener(new PaintListener() {
             @Override
@@ -58,6 +59,7 @@ public class CabinetDrawerWidget extends Canvas {
         });
     }
 
+    @Override
     public void initLegend() {
         hasLegend = true;
         legendStatus = new ArrayList<ContainerStatus>();
@@ -76,7 +78,7 @@ public class CabinetDrawerWidget extends Canvas {
         int rectYTotal = 0;
         int squareYTotal = 0;
         int squareXTotal = 0;
-        for (int boxIndex = 1; boxIndex <= boxNumber; boxIndex++) {
+        for (int boxIndex = 1; boxIndex <= DRAWER_SIZE; boxIndex++) {
             int width = SQUARE_CELL_WIDTH;
             int height = SQUARE_CELL_WIDTH;
             int rectXPosition = squareXTotal * SQUARE_CELL_WIDTH;
@@ -110,7 +112,7 @@ public class CabinetDrawerWidget extends Canvas {
 
             gc.setBackground(status.getColor());
             gc.fillRectangle(rectangle);
-            if ((selectedBin + 1) == boxIndex) {
+            if (selection != null && (selection.row + 1) == boxIndex) {
                 gc.setBackground(e.display.getSystemColor(SWT.COLOR_RED));
                 gc.fillRectangle(rectangle);
             }
@@ -145,19 +147,32 @@ public class CabinetDrawerWidget extends Canvas {
         gc.drawText(text, xTextPosition, yTextPosition, true);
     }
 
-    public void setSelectedBin(int bin) {
-        this.selectedBin = bin;
+    @Override
+    public void setSelection(RowColPos selection) {
+        this.selection = selection;
         redraw();
     }
 
-    public void setContainersStatus(ContainerCell[][] cells) {
+    public void setCellsStatus(ContainerCell[][] cells) {
         this.cells = cells;
+        Assert.isTrue(cells == null || cells.length == 36);
         computeSize(-1, -1);
-        LEGEND_WIDTH = WIDTH / legendStatus.size();
+        if (legendStatus != null) {
+            LEGEND_WIDTH = WIDTH / legendStatus.size();
+        }
         redraw();
     }
 
-    public ContainerCell getPositionAtCoordinates(int x, int y) {
+    @Override
+    public void setInput(Object object) {
+        Assert.isNotNull(object);
+        Assert.isTrue(object.getClass().isArray());
+        ContainerCell[][] cells = (ContainerCell[][]) object;
+        setCellsStatus(cells);
+    }
+
+    @Override
+    public Object getObjectAtCoordinates(int x, int y) {
         if (cells == null) {
             return null;
         }
@@ -201,7 +216,7 @@ public class CabinetDrawerWidget extends Canvas {
         if (hasLegend) {
             fullHeight += LEGEND_HEIGHT;
         }
-        return new Point(CabinetDrawerWidget.WIDTH, fullHeight);
+        return new Point(WIDTH, fullHeight);
     }
 
 }

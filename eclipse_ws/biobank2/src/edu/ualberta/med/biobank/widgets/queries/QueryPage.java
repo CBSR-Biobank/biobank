@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.widgets;
+package edu.ualberta.med.biobank.widgets.queries;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;

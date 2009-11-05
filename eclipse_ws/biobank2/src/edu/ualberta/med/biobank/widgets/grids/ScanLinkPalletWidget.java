@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.widgets;
+package edu.ualberta.med.biobank.widgets.grids;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,13 +18,13 @@ import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.model.PalletCell;
 import edu.ualberta.med.biobank.model.SampleCellStatus;
-import edu.ualberta.med.biobank.widgets.listener.ScanPalletModificationEvent;
+import edu.ualberta.med.biobank.widgets.listeners.ScanPalletModificationEvent;
 
 /**
  * Widget to draw a pallet for scan link screen. Can do selections inside the
  * pallet to assign a type
  */
-public class ScanLinkPalletWidget extends PalletWidget {
+public class ScanLinkPalletWidget extends ScanPalletWidget {
 
     private List<PalletCell> selectedCells;
     private PalletCell lastSelectedCell;
@@ -45,7 +45,7 @@ public class ScanLinkPalletWidget extends PalletWidget {
     }
 
     @Override
-    protected void initLegend() {
+    public void initLegend() {
         hasLegend = true;
         statusAvailable = new ArrayList<SampleCellStatus>();
         statusAvailable.add(SampleCellStatus.EMPTY);
@@ -139,7 +139,8 @@ public class ScanLinkPalletWidget extends PalletWidget {
             public void mouseDown(MouseEvent e) {
                 selectionTrackOn = true;
                 if (scannedElements != null) {
-                    PalletCell cell = getCellAtCoordinates(e.x, e.y);
+                    PalletCell cell = (PalletCell) getObjectAtCoordinates(e.x,
+                        e.y);
                     if (cell != null && cell.getValue() != null) {
                         switch (selectionMode) {
                         case MULTI:
@@ -181,7 +182,8 @@ public class ScanLinkPalletWidget extends PalletWidget {
             @Override
             public void mouseHover(MouseEvent e) {
                 if (selectionTrackOn) {
-                    PalletCell cell = getCellAtCoordinates(e.x, e.y);
+                    PalletCell cell = (PalletCell) getObjectAtCoordinates(e.x,
+                        e.y);
                     if (cell != null && !cell.equals(lastSelectedCell)) {
                         selectedCells.add(cell);
                         cell.setSelected(true);

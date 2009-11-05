@@ -38,7 +38,7 @@ public class BiobankPartListener implements IPartListener {
                     LOGGER.error("Error while opening patients perpective", e);
                 }
             }
-            SessionManager.getInstance().setSiteManagerEnabled(true);
+            SessionManager.getInstance().unlockSite();
         }
     }
 
@@ -49,7 +49,7 @@ public class BiobankPartListener implements IPartListener {
     @Override
     public void partOpened(IWorkbenchPart part) {
         if (part instanceof AbstractPatientAdminForm) {
-            SessionManager.getInstance().setSiteManagerEnabled(false);
+            SessionManager.getInstance().lockSite();
         }
     }
 

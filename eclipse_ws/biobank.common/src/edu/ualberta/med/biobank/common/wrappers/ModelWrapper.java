@@ -79,6 +79,10 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         return null;
     }
 
+    public WritableApplicationService getAppService() {
+        return appService;
+    }
+
     public void reload() throws Exception {
         if (!isNew()) {
             E oldValue = wrappedObject;

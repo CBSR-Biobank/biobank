@@ -20,7 +20,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -48,8 +47,8 @@ import edu.ualberta.med.biobank.validators.NonEmptyString;
 import edu.ualberta.med.biobank.validators.PalletBarCodeValidator;
 import edu.ualberta.med.biobank.validators.ScannerBarcodeValidator;
 import edu.ualberta.med.biobank.widgets.CancelConfirmWidget;
-import edu.ualberta.med.biobank.widgets.PalletWidget;
-import edu.ualberta.med.biobank.widgets.ViewContainerWidget;
+import edu.ualberta.med.biobank.widgets.grids.GridContainerWidget;
+import edu.ualberta.med.biobank.widgets.grids.ScanPalletWidget;
 import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
@@ -67,11 +66,11 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
     private Button scanButton;
 
     private Label freezerLabel;
-    private ViewContainerWidget freezerWidget;
+    private GridContainerWidget freezerWidget;
     private Label palletLabel;
-    private PalletWidget palletWidget;
+    private ScanPalletWidget palletWidget;
     private Label hotelLabel;
-    private ViewContainerWidget hotelWidget;
+    private GridContainerWidget hotelWidget;
 
     private IObservableValue plateToScanValue = new WritableValue("",
         String.class);
@@ -224,33 +223,32 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
         freezerComposite.setLayoutData(gdFreezer);
         freezerLabel = toolkit.createLabel(freezerComposite, "Freezer");
         freezerLabel.setLayoutData(new GridData());
-        freezerWidget = new ViewContainerWidget(freezerComposite);
+        freezerWidget = new GridContainerWidget(freezerComposite);
         toolkit.adapt(freezerWidget);
-        freezerWidget.setGridSizes(5, 10, PalletWidget.PALLET_WIDTH, 100);
+        freezerWidget.setGridSizes(5, 10, ScanPalletWidget.PALLET_WIDTH, 100);
 
         Composite hotelComposite = toolkit.createComposite(containersComposite);
         hotelComposite.setLayout(getNeutralGridLayout());
         hotelComposite.setLayoutData(new GridData());
         hotelLabel = toolkit.createLabel(hotelComposite, "Hotel");
-        hotelWidget = new ViewContainerWidget(hotelComposite);
+        hotelWidget = new GridContainerWidget(hotelComposite);
         toolkit.adapt(hotelWidget);
         hotelWidget.setGridSizes(11, 1, 100,
-            PalletWidget.PALLET_HEIGHT_AND_LEGEND);
+            ScanPalletWidget.PALLET_HEIGHT_AND_LEGEND);
 
         Composite palletComposite = toolkit
             .createComposite(containersComposite);
         palletComposite.setLayout(getNeutralGridLayout());
         palletComposite.setLayoutData(new GridData());
         palletLabel = toolkit.createLabel(palletComposite, "Pallet");
-        palletWidget = new PalletWidget(palletComposite);
+        palletWidget = new ScanPalletWidget(palletComposite);
         toolkit.adapt(palletWidget);
 
         showOnlyPallet(true);
     }
 
     private GridLayout getNeutralGridLayout() {
-        GridLayout layout;
-        layout = new GridLayout(1, false);
+        GridLayout layout = new GridLayout(1, false);
         layout.horizontalSpacing = 0;
         layout.marginWidth = 0;
         layout.verticalSpacing = 0;
@@ -363,14 +361,11 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
 
             freezerLabel.setText(freezerContainer.getFullInfoLabel());
             freezerWidget.setContainerType(freezerContainer.getContainerType());
-            freezerWidget.setSelectedBox(new Point(
-                hotelContainer.getPosition().row,
-                hotelContainer.getPosition().col));
+            freezerWidget.setSelection(hotelContainer.getPosition());
 
             hotelLabel.setText(hotelContainer.getFullInfoLabel());
             hotelWidget.setContainerType(hotelContainer.getContainerType());
-            hotelWidget.setSelectedBox(new Point(currentPalletWrapper
-                .getPosition().row, currentPalletWrapper.getPosition().col));
+            hotelWidget.setSelection(currentPalletWrapper.getPosition());
 
             palletLabel.setText(currentPalletWrapper.getLabel());
         }
@@ -519,8 +514,8 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
         if (palletTypesViewer != null) {
             palletTypesViewer.getCombo().deselectAll();
         }
-        freezerWidget.setSelectedBox(null);
-        hotelWidget.setSelectedBox(null);
+        freezerWidget.setSelection(null);
+        hotelWidget.setSelection(null);
         palletWidget.setScannedElements(null);
         cells = null;
         scanLaunchedValue.setValue(false);

@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.widgets;
+package edu.ualberta.med.biobank.widgets.listeners;
 
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
@@ -6,6 +6,9 @@ import org.eclipse.swt.dnd.DND;
 import org.eclipse.swt.dnd.DragSourceEvent;
 import org.eclipse.swt.dnd.DragSourceListener;
 import org.eclipse.swt.dnd.Transfer;
+
+import edu.ualberta.med.biobank.widgets.multiselect.MultiSelectNode;
+import edu.ualberta.med.biobank.widgets.multiselect.MultiSelectNodeTransfer;
 
 /**
  * Drag support for moving items between TreeViewers in this widget.

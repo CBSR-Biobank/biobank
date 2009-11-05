@@ -21,7 +21,7 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.model.ContainerCell;
 import edu.ualberta.med.biobank.model.ContainerStatus;
-import edu.ualberta.med.biobank.widgets.ContainerDisplayWidget;
+import edu.ualberta.med.biobank.widgets.grids.GridContainerWidget;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public abstract class AbstractContainerChooserPage extends WizardPage {
@@ -31,7 +31,7 @@ public abstract class AbstractContainerChooserPage extends WizardPage {
 
     private ContainerWrapper currentContainer;
 
-    protected ContainerDisplayWidget containerWidget;
+    protected GridContainerWidget containerWidget;
 
     protected Composite pageContainer;
 
@@ -76,7 +76,7 @@ public abstract class AbstractContainerChooserPage extends WizardPage {
         gd.grabExcessHorizontalSpace = true;
         gd.horizontalSpan = 2;
         gridParent.setLayoutData(gd);
-        containerWidget = new ContainerDisplayWidget(gridParent);
+        containerWidget = new GridContainerWidget(gridParent);
         List<ContainerStatus> legend = new ArrayList<ContainerStatus>();
         legend.add(ContainerStatus.FREE_LOCATIONS);
         legend.add(ContainerStatus.FULL);
@@ -101,7 +101,8 @@ public abstract class AbstractContainerChooserPage extends WizardPage {
     }
 
     protected ContainerCell positionSelection(MouseEvent e) {
-        ContainerCell cell = containerWidget.getPositionAtCoordinates(e.x, e.y);
+        ContainerCell cell = (ContainerCell) containerWidget
+            .getObjectAtCoordinates(e.x, e.y);
         if (cell == null || cell.getStatus() == ContainerStatus.NOT_INITIALIZED) {
             textPosition.setText("");
             setPageComplete(false);
@@ -132,7 +133,7 @@ public abstract class AbstractContainerChooserPage extends WizardPage {
                 cells[position.row][position.col] = cell;
             }
             initEmptyCells(cells);
-            containerWidget.setContainersStatus(cells);
+            containerWidget.setCellsStatus(cells);
         }
         containerWidget.setVisible(true);
     }

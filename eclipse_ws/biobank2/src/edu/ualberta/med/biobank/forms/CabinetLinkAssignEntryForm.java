@@ -26,7 +26,6 @@ import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -42,7 +41,6 @@ import org.springframework.remoting.RemoteConnectFailureException;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.BiobankCheckException;
-import edu.ualberta.med.biobank.common.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
@@ -52,9 +50,9 @@ import edu.ualberta.med.biobank.forms.listener.EnterKeyToNextFieldListener;
 import edu.ualberta.med.biobank.preferences.PreferenceConstants;
 import edu.ualberta.med.biobank.validators.CabinetLabelValidator;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
-import edu.ualberta.med.biobank.widgets.CabinetDrawerWidget;
 import edu.ualberta.med.biobank.widgets.CancelConfirmWidget;
-import edu.ualberta.med.biobank.widgets.ViewContainerWidget;
+import edu.ualberta.med.biobank.widgets.grids.DrawerWidget;
+import edu.ualberta.med.biobank.widgets.grids.GridContainerWidget;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
@@ -68,8 +66,8 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
 
     private Label cabinetLabel;
     private Label drawerLabel;
-    private ViewContainerWidget cabinetWidget;
-    private CabinetDrawerWidget drawerWidget;
+    private GridContainerWidget cabinetWidget;
+    private DrawerWidget drawerWidget;
 
     private Text patientNumberText;
     private ComboViewer viewerVisits;
@@ -144,16 +142,16 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
         cabinetLabel = toolkit.createLabel(client, "Cabinet");
         drawerLabel = toolkit.createLabel(client, "Drawer");
 
-        cabinetWidget = new ViewContainerWidget(client);
+        cabinetWidget = new GridContainerWidget(client);
         toolkit.adapt(cabinetWidget);
         cabinetWidget.setGridSizes(4, 1, 150, 150);
-        cabinetWidget.setFirstColSign('A');
-        cabinetWidget.setShowColumnFirst(true);
+        // cabinetWidget.setFirstColSign('A');
+        // cabinetWidget.setShowColumnFirst(true);
         GridData gdDrawer = new GridData();
         gdDrawer.verticalAlignment = SWT.TOP;
         cabinetWidget.setLayoutData(gdDrawer);
 
-        drawerWidget = new CabinetDrawerWidget(client);
+        drawerWidget = new DrawerWidget(client);
         toolkit.adapt(drawerWidget);
         GridData gdBin = new GridData();
         gdBin.verticalSpan = 2;
@@ -161,7 +159,7 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
 
     }
 
-    private void createFieldsSection() throws Exception {
+    private void createFieldsSection() {
         Composite fieldsComposite = toolkit.createComposite(form.getBody());
         GridLayout layout = new GridLayout(2, false);
         layout.horizontalSpacing = 10;
@@ -321,7 +319,7 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 PatientVisitWrapper pv = getSelectedPatientVisit();
-                sampleWrapper.setPatientVisit(pv.getWrappedObject());
+                sampleWrapper.setPatientVisit(pv);
                 appendLog("Visit selected " + pv.getFormattedDateProcessed()
                     + " - " + pv.getClinic().getName());
             }
@@ -438,15 +436,15 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
 
     private void showPositions() {
         if (drawer == null || bin == null || cabinet == null) {
-            cabinetWidget.setSelectedBox(null);
+            cabinetWidget.setSelection(null);
             cabinetLabel.setText("Cabinet");
-            drawerWidget.setSelectedBin(-1);
+            drawerWidget.setSelection(null);
             drawerLabel.setText("Drawer");
         } else {
-            RowColPos position = drawer.getPosition();
-            cabinetWidget.setSelectedBox(new Point(position.row, position.col));
+            cabinetWidget.setContainerType(cabinet.getContainerType());
+            cabinetWidget.setSelection(drawer.getPosition());
             cabinetLabel.setText("Cabinet " + cabinet.getLabel());
-            drawerWidget.setSelectedBin(bin.getPosition().row);
+            drawerWidget.setSelection(bin.getPosition());
             drawerLabel.setText("Drawer " + drawer.getLabel());
         }
         form.layout(true, true);
@@ -502,8 +500,8 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
             cabinet = null;
             drawer = null;
             bin = null;
-            cabinetWidget.setSelectedBox(null);
-            drawerWidget.setSelectedBin(-1);
+            cabinetWidget.setSelection(null);
+            drawerWidget.setSelection(null);
             resultShownValue.setValue(Boolean.FALSE);
             selectedSampleTypeValue.setValue("");
             patientNumberText.setText("");

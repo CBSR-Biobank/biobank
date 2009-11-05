@@ -1,10 +1,14 @@
-package edu.ualberta.med.biobank.widgets;
+package edu.ualberta.med.biobank.widgets.listeners;
 
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.ViewerDropAdapter;
 import org.eclipse.swt.dnd.DND;
 import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.dnd.TransferData;
+
+import edu.ualberta.med.biobank.widgets.multiselect.MultiSelectNode;
+import edu.ualberta.med.biobank.widgets.multiselect.MultiSelectNodeTransfer;
+import edu.ualberta.med.biobank.widgets.multiselect.MultiSelectWidget;
 
 /**
  * Drop support for moving items between TreeViewers in this widget.

@@ -28,10 +28,10 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.part.ViewPart;
 
-import edu.ualberta.med.biobank.widgets.AbstractQueryClause;
-import edu.ualberta.med.biobank.widgets.QueryPage;
 import edu.ualberta.med.biobank.widgets.ReportsLabelProvider;
 import edu.ualberta.med.biobank.widgets.infotables.InfoTableWidget;
+import edu.ualberta.med.biobank.widgets.queries.AbstractQueryClause;
+import edu.ualberta.med.biobank.widgets.queries.QueryPage;
 
 public class ReportsView extends ViewPart {
 

@@ -10,13 +10,13 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
-public class ComboAndQuantity extends BiobankWidget {
+public class ComboAndQuantityWidget extends BiobankWidget {
 
     private Combo valuesCombo;
 
     private Text quantitiesText;
 
-    public ComboAndQuantity(Composite parent, int style) {
+    public ComboAndQuantityWidget(Composite parent, int style) {
         super(parent, style | SWT.BORDER);
 
         GridLayout layout = new GridLayout(3, false);

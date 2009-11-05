@@ -81,30 +81,34 @@ public class SiteManager {
         }
     }
 
-    public void setCurrentSite(SiteWrapper siteWrapper) {
+    public void setCurrentSite(SiteWrapper site) {
         try {
-            currentSiteWrapper = siteWrapper;
+            currentSiteWrapper = site;
             Integer saveVal = -1;
-            if ((siteWrapper != null) && (siteWrapper.getId() != null))
-                saveVal = siteWrapper.getId();
+            if ((site != null) && (site.getId() != null))
+                saveVal = site.getId();
             Preferences prefs = new InstanceScope()
                 .getNode(Application.PLUGIN_ID);
             Preferences prefNode = prefs.node(SITE_PREF_NODE);
             prefNode.put(LAST_SERVER_PREF, sessionName);
             prefNode.putInt(LAST_SITE_PREF, saveVal);
             prefs.flush();
-            IWorkbenchWindow window = PlatformUI.getWorkbench()
-                .getActiveWorkbenchWindow();
-            ISourceProviderService service = (ISourceProviderService) window
-                .getService(ISourceProviderService.class);
-            SiteSelectionState siteSelectionStateSourceProvider = (SiteSelectionState) service
-                .getSourceProvider(SiteSelectionState.SITE_SELECTION_ID);
-            siteSelectionStateSourceProvider.setSiteSelection(siteWrapper);
+            setSiteSelectionState(site);
             setEnabled(true);
             SessionManager.getInstance().updateSession();
         } catch (BackingStoreException e) {
             LOGGER.error("Could not save site preferences", e);
         }
+    }
+
+    private void setSiteSelectionState(SiteWrapper site) {
+        IWorkbenchWindow window = PlatformUI.getWorkbench()
+            .getActiveWorkbenchWindow();
+        ISourceProviderService service = (ISourceProviderService) window
+            .getService(ISourceProviderService.class);
+        SiteSelectionState siteSelectionStateSourceProvider = (SiteSelectionState) service
+            .getSourceProvider(SiteSelectionState.SITE_SELECTION_ID);
+        siteSelectionStateSourceProvider.setSiteSelection(site);
     }
 
     public void updateSites(Collection<SiteWrapper> sites) {
@@ -172,8 +176,17 @@ public class SiteManager {
         if (!enabled) {
             currentSiteWrappers = new ArrayList<SiteWrapper>();
             siteCombo.setInput(currentSiteWrappers);
+            setSiteSelectionState(null);
         }
         siteCombo.setEnabled(enabled);
+    }
+
+    public void lockSite() {
+        siteCombo.setEnabled(false);
+    }
+
+    public void unlockSite() {
+        siteCombo.setEnabled(true);
     }
 
 }

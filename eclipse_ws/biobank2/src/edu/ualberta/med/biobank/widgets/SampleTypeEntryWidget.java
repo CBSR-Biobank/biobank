@@ -31,8 +31,8 @@ import edu.ualberta.med.biobank.dialogs.SampleTypeDialog;
 import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.widgets.infotables.BiobankCollectionModel;
 import edu.ualberta.med.biobank.widgets.infotables.SampleTypeInfoTable;
-import edu.ualberta.med.biobank.widgets.listener.BiobankEntryFormWidgetListener;
-import edu.ualberta.med.biobank.widgets.listener.MultiSelectEvent;
+import edu.ualberta.med.biobank.widgets.listeners.BiobankEntryFormWidgetListener;
+import edu.ualberta.med.biobank.widgets.listeners.MultiSelectEvent;
 
 /**
  * Displays the current sample storage collection and allows the user to add

@@ -393,13 +393,13 @@ public class WidgetCreator {
             fi = (FieldInfo) it.getValue();
 
             Control control = createWidget(parent, fi.widgetClass, SWT.NONE,
-                fi.label);
+                fi.label, null);
             controls.put(key, control);
         }
     }
 
     public Control createWidget(Composite parent, Class<?> widgetClass,
-        int widgetOptions, String fieldLabel) {
+        int widgetOptions, String fieldLabel, String value) {
         Label label = createLabel(parent, fieldLabel);
         label.setLayoutData(new GridData(GridData.VERTICAL_ALIGN_BEGINNING));
         if ((widgetClass == Combo.class) || (widgetClass == Text.class)
@@ -410,7 +410,9 @@ public class WidgetCreator {
             Label field = createLabel(parent, "", widgetOptions | SWT.LEFT
                 | SWT.BORDER, false);
             field.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
-
+            if (value != null) {
+                field.setText(value);
+            }
             return field;
         } else if (widgetClass == Button.class) {
             Button button = new Button(parent, SWT.CHECK | widgetOptions);

@@ -1,8 +1,9 @@
-package edu.ualberta.med.biobank.widgets;
+package edu.ualberta.med.biobank.widgets.grids;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseTrackAdapter;
@@ -13,18 +14,19 @@ import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 
+import edu.ualberta.med.biobank.common.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
 import edu.ualberta.med.biobank.model.PalletCell;
 import edu.ualberta.med.biobank.model.SampleCellStatus;
-import edu.ualberta.med.biobank.widgets.listener.ScanPalletModificationEvent;
-import edu.ualberta.med.biobank.widgets.listener.ScanPalletModificationListener;
+import edu.ualberta.med.biobank.widgets.listeners.ScanPalletModificationEvent;
+import edu.ualberta.med.biobank.widgets.listeners.ScanPalletModificationListener;
 import edu.ualberta.med.scanlib.ScanCell;
 
 /**
- * Specific widget to draw a 8*12 pallet
+ * Specific widget to draw a 8*12 pallet for scan features
  */
-public class PalletWidget extends AbstractGridContainerWidget {
+public class ScanPalletWidget extends AbstractGridWidget {
 
     public static final int SAMPLE_WIDTH = 50;
 
@@ -43,13 +45,17 @@ public class PalletWidget extends AbstractGridContainerWidget {
 
     List<ScanPalletModificationListener> listeners;
 
-    public PalletWidget(Composite parent) {
+    public ScanPalletWidget(Composite parent) {
+        this(parent, true);
+    }
+
+    public ScanPalletWidget(Composite parent, boolean hasLegend) {
         super(parent);
         listeners = new ArrayList<ScanPalletModificationListener>();
         addMouseTrackListener(new MouseTrackAdapter() {
             @Override
             public void mouseHover(MouseEvent e) {
-                PalletCell cell = getCellAtCoordinates(e.x, e.y);
+                PalletCell cell = (PalletCell) getObjectAtCoordinates(e.x, e.y);
                 if (cell != null) {
                     String msg = cell.getValue();
                     if (cell.getInformation() != null) {
@@ -64,10 +70,13 @@ public class PalletWidget extends AbstractGridContainerWidget {
         setCellWidth(SAMPLE_WIDTH);
         setCellHeight(SAMPLE_WIDTH);
         setStorageSize(ScanCell.ROW_MAX, ScanCell.COL_MAX);
-        initLegend();
+        if (hasLegend) {
+            initLegend();
+        }
     }
 
-    protected void initLegend() {
+    @Override
+    public void initLegend() {
         hasLegend = true;
         statusAvailable = new ArrayList<SampleCellStatus>();
         statusAvailable.add(SampleCellStatus.EMPTY);
@@ -84,9 +93,11 @@ public class PalletWidget extends AbstractGridContainerWidget {
         FontData fd2 = new FontData(fd.getName(), 8, fd.getStyle());
         e.gc.setFont(new Font(e.display, fd2));
         super.paintGrid(e);
-        for (int i = 0; i < statusAvailable.size(); i++) {
-            SampleCellStatus status = statusAvailable.get(i);
-            drawLegend(e, status.getColor(), i, status.getLegend());
+        if (hasLegend) {
+            for (int i = 0; i < statusAvailable.size(); i++) {
+                SampleCellStatus status = statusAvailable.get(i);
+                drawLegend(e, status.getColor(), i, status.getLegend());
+            }
         }
     }
 
@@ -146,11 +157,20 @@ public class PalletWidget extends AbstractGridContainerWidget {
         redraw();
     }
 
+    @Override
+    public void setInput(Object object) {
+        Assert.isNotNull(object);
+        Assert.isTrue(object.getClass().isArray());
+        PalletCell[][] cells = (PalletCell[][]) object;
+        setScannedElements(cells);
+    }
+
     public PalletCell[][] getScannedElements() {
         return scannedElements;
     }
 
-    public PalletCell getCellAtCoordinates(int xPosition, int yPosition) {
+    @Override
+    public Object getObjectAtCoordinates(int xPosition, int yPosition) {
         if (scannedElements == null) {
             return null;
         }
@@ -176,5 +196,9 @@ public class PalletWidget extends AbstractGridContainerWidget {
         for (ScanPalletModificationListener listener : listeners) {
             listener.modification(event);
         }
+    }
+
+    @Override
+    public void setSelection(RowColPos selection) {
     }
 }

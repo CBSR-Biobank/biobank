@@ -12,8 +12,7 @@ import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.treeview.ContainerTypeAdapter;
-import edu.ualberta.med.biobank.widgets.CabinetDrawerWidget;
-import edu.ualberta.med.biobank.widgets.ContainerDisplayWidget;
+import edu.ualberta.med.biobank.widgets.grids.ContainerDisplayFatory;
 
 public class ContainerTypeViewForm extends BiobankViewForm {
     public static final String ID = "edu.ualberta.med.biobank.forms.ContainerTypeViewForm";
@@ -186,27 +185,7 @@ public class ContainerTypeViewForm extends BiobankViewForm {
 
     protected void createVisualizeContainer() {
         Composite client = createSectionWithClient("Container Visual");
-        // get occupied positions
-        if (containerType.getName().startsWith("Drawer")) {
-            // if Drawer, requires special grid
-            CabinetDrawerWidget containerWidget = new CabinetDrawerWidget(
-                client);
-            GridData gdBin = new GridData();
-            gdBin.verticalSpan = 2;
-            containerWidget.setLayoutData(gdBin);
-        } else {
-            // otherwise, normal grid
-            ContainerDisplayWidget containerWidget = new ContainerDisplayWidget(
-                client);
-            containerWidget.setContainerType(containerType);
-            int dim2 = containerType.getColCapacity().intValue();
-            if (dim2 <= 1) {
-                // single dimension size
-                containerWidget.setCellWidth(150);
-                containerWidget.setCellHeight(20);
-                containerWidget.setLegendOnSide(true);
-            }
-        }
+        ContainerDisplayFatory.createWidget(client, containerType);
     }
 
     private void setChildContainerTypesValues() {

@@ -99,7 +99,8 @@ public class PalletPositionChooserPage extends AbstractContainerChooserPage {
     @Override
     protected ContainerCell positionSelection(MouseEvent e) {
         boolean complete = false;
-        ContainerCell cell = containerWidget.getPositionAtCoordinates(e.x, e.y);
+        ContainerCell cell = (ContainerCell) containerWidget
+            .getObjectAtCoordinates(e.x, e.y);
         if (cell.getStatus() == ContainerStatus.NOT_INITIALIZED) {
             this.selectedPosition = cell;
             int positionText = selectedPosition.getRow() + 1;
