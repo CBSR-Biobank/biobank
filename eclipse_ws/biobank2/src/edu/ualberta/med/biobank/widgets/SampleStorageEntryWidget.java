@@ -32,8 +32,8 @@ import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.dialogs.SampleStorageDialog;
 import edu.ualberta.med.biobank.model.SampleStorage;
 import edu.ualberta.med.biobank.widgets.infotables.SampleStorageInfoTable;
-import edu.ualberta.med.biobank.widgets.listener.BiobankEntryFormWidgetListener;
-import edu.ualberta.med.biobank.widgets.listener.MultiSelectEvent;
+import edu.ualberta.med.biobank.widgets.listeners.BiobankEntryFormWidgetListener;
+import edu.ualberta.med.biobank.widgets.listeners.MultiSelectEvent;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 /**

@@ -24,8 +24,8 @@ import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.dialogs.ContactAddDialog;
 import edu.ualberta.med.biobank.widgets.infotables.ContactInfoTable;
-import edu.ualberta.med.biobank.widgets.listener.BiobankEntryFormWidgetListener;
-import edu.ualberta.med.biobank.widgets.listener.MultiSelectEvent;
+import edu.ualberta.med.biobank.widgets.listeners.BiobankEntryFormWidgetListener;
+import edu.ualberta.med.biobank.widgets.listeners.MultiSelectEvent;
 
 public class ContactEntryWidget extends BiobankWidget {
 

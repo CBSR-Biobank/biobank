@@ -41,12 +41,12 @@ import edu.ualberta.med.biobank.treeview.PatientAdapter;
 import edu.ualberta.med.biobank.treeview.PatientVisitAdapter;
 import edu.ualberta.med.biobank.validators.DateNotNulValidator;
 import edu.ualberta.med.biobank.validators.DoubleNumberValidator;
-import edu.ualberta.med.biobank.widgets.ComboAndQuantity;
+import edu.ualberta.med.biobank.widgets.ComboAndQuantityWidget;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.widgets.PvSampleSourceEntryWidget;
-import edu.ualberta.med.biobank.widgets.SelectMultiple;
-import edu.ualberta.med.biobank.widgets.listener.BiobankEntryFormWidgetListener;
-import edu.ualberta.med.biobank.widgets.listener.MultiSelectEvent;
+import edu.ualberta.med.biobank.widgets.SelectMultipleWidget;
+import edu.ualberta.med.biobank.widgets.listeners.BiobankEntryFormWidgetListener;
+import edu.ualberta.med.biobank.widgets.listeners.MultiSelectEvent;
 
 public class PatientVisitEntryForm extends BiobankEntryForm {
 
@@ -236,7 +236,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
                     .observeValue(pvCustomInfo, "value"), null);
         case 5: // select_multiple
             createFieldLabel(client, pvCustomInfo.label);
-            SelectMultiple s = new SelectMultiple(client, SWT.BORDER,
+            SelectMultipleWidget s = new SelectMultipleWidget(client, SWT.BORDER,
                 pvCustomInfo.allowedValues, selectionListener);
             s.adaptToToolkit(toolkit, true);
             if (pvCustomInfo.value != null) {
@@ -245,7 +245,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
             return s;
         case 6: // select_single_and_quantity_1_5_1
             createFieldLabel(client, pvCustomInfo.label);
-            ComboAndQuantity c = new ComboAndQuantity(client, SWT.BORDER);
+            ComboAndQuantityWidget c = new ComboAndQuantityWidget(client, SWT.BORDER);
             c.adaptToToolkit(toolkit, true);
             if (pvCustomInfo.allowedValues != null) {
                 c.addValues(pvCustomInfo.allowedValues);
@@ -377,11 +377,11 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         if (pvCustomInfo.control instanceof DateTimeWidget) {
             pvCustomInfo.value = ((DateTimeWidget) pvCustomInfo.control)
                 .getText();
-        } else if (pvCustomInfo.control instanceof ComboAndQuantity) {
-            pvCustomInfo.value = ((ComboAndQuantity) pvCustomInfo.control)
+        } else if (pvCustomInfo.control instanceof ComboAndQuantityWidget) {
+            pvCustomInfo.value = ((ComboAndQuantityWidget) pvCustomInfo.control)
                 .getText();
-        } else if (pvCustomInfo.control instanceof SelectMultiple) {
-            String[] values = ((SelectMultiple) pvCustomInfo.control)
+        } else if (pvCustomInfo.control instanceof SelectMultipleWidget) {
+            String[] values = ((SelectMultipleWidget) pvCustomInfo.control)
                 .getSelections();
             pvCustomInfo.value = StringUtils.join(values, ";");
         }

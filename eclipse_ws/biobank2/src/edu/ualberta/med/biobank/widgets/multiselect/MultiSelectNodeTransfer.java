@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.widgets;
+package edu.ualberta.med.biobank.widgets.multiselect;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

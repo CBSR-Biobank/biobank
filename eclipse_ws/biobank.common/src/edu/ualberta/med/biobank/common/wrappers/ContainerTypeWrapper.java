@@ -93,7 +93,7 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
 
         List<Object> results = appService.query(c);
         if (results.size() != 0) {
-            throw new BiobankCheckException("A storage type with name \""
+            throw new BiobankCheckException("A container type with name \""
                 + getName() + "\" already exists.");
         }
     }
@@ -473,16 +473,18 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
             setChildContainerTypeCollection(selContainerTypes);
         } else {
             throw new BiobankCheckException(
-                "Unable to remove child type. This parent/child relationship exists in storage. Remove all instances before attempting to delete a child type.");
+                "Unable to remove child type. This parent/child relationship "
+                    + "exists in storage. Remove all instances before attempting to "
+                    + "delete a child type.");
         }
     }
 
     private boolean canRemoveChildrenContainer(List<Integer> missing)
         throws ApplicationException {
-        String queryString = "from "
-            + ContainerPosition.class.getName()
+        String queryString = "from " + ContainerPosition.class.getName()
             + " as cp inner join cp.parentContainer as cparent"
-            + " where cparent.containerType.id=? and cp.container.containerType.id in (select id from "
+            + " where cparent.containerType.id=? and "
+            + "cp.container.containerType.id in (select id from "
             + ContainerType.class.getName() + " as ct where ct.id=?";
         List<Object> params = new ArrayList<Object>();
         params.add(getId());
@@ -510,7 +512,9 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
             .equals(dbCapacity.getColCapacity()))
             && existsContainersWithType) {
             throw new BiobankCheckException(
-                "Unable to alter dimensions. A container of this type exists in storage. Remove all instances before attempting to modify this container type.");
+                "Unable to alter dimensions. A container of this type exists "
+                    + "in storage. Remove all instances before attempting to "
+                    + "modify this container type.");
         }
     }
 
@@ -521,7 +525,9 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
             || (getTopLevel() != null && oldObject.getTopLevel() != null && !getTopLevel()
                 .equals(oldObject.getTopLevel())) && existsContainersWithType) {
             throw new BiobankCheckException(
-                "Unable to change the \"Top Level\" property. A container requiring this property exists in storage. Remove all instances before attempting to modify this container type.");
+                "Unable to change the \"Top Level\" property. A container "
+                    + "requiring this property exists in storage. Remove all "
+                    + "instances before attempting to modify this container type.");
         }
     }
 
@@ -539,7 +545,10 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
                 oldWrapper.getChildLabelingScheme())
             && existsContainersWithType) {
             throw new BiobankCheckException(
-                "Unable to change the \"Child Labeling scheme\" property. A container requiring this property exists in storage. Remove all instances before attempting to modify this container type.");
+                "Unable to change the \"Child Labeling scheme\" property. "
+                    + "A container requiring this property exists in storage. "
+                    + "Remove all instances before attempting to modify this "
+                    + "container type.");
         }
     }
 

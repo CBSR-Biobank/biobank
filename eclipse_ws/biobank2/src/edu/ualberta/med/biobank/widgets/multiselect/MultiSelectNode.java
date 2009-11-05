@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.widgets;
+package edu.ualberta.med.biobank.widgets.multiselect;
 
 import java.util.ArrayList;
 import java.util.List;

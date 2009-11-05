@@ -19,9 +19,9 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.part.ViewPart;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.widgets.QueryPage;
 import edu.ualberta.med.biobank.widgets.ReportsLabelProvider;
 import edu.ualberta.med.biobank.widgets.infotables.InfoTableWidget;
+import edu.ualberta.med.biobank.widgets.queries.QueryPage;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class AdvancedReportsView extends ViewPart {

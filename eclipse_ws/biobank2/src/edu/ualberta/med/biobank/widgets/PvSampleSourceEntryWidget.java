@@ -39,8 +39,8 @@ import edu.ualberta.med.biobank.common.wrappers.SampleSourceWrapper;
 import edu.ualberta.med.biobank.dialogs.PvSampleSourceDialog;
 import edu.ualberta.med.biobank.forms.FormUtils;
 import edu.ualberta.med.biobank.widgets.infotables.PvSampleSourceInfoTable;
-import edu.ualberta.med.biobank.widgets.listener.BiobankEntryFormWidgetListener;
-import edu.ualberta.med.biobank.widgets.listener.MultiSelectEvent;
+import edu.ualberta.med.biobank.widgets.listeners.BiobankEntryFormWidgetListener;
+import edu.ualberta.med.biobank.widgets.listeners.MultiSelectEvent;
 import edu.ualberta.med.biobank.widgets.utils.WidgetCreator;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 

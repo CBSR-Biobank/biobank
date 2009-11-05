@@ -12,6 +12,7 @@ import org.eclipse.swt.widgets.Tree;
 import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
 import edu.ualberta.med.biobank.forms.SampleViewForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
+import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class SampleAdapter extends AdapterBase {
 
@@ -38,6 +39,11 @@ public class SampleAdapter extends AdapterBase {
     @Override
     public String getTitle() {
         return getTitle("Sample");
+    }
+
+    @Override
+    public WritableApplicationService getAppService() {
+        return modelObject.getAppService();
     }
 
     @Override

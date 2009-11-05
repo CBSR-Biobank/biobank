@@ -1,18 +1,17 @@
-package edu.ualberta.med.biobank.widgets;
+package edu.ualberta.med.biobank.widgets.grids;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 
-import edu.ualberta.med.biobank.common.LabelingScheme;
-import edu.ualberta.med.biobank.common.RowColPos;
 import edu.ualberta.med.biobank.model.ContainerCell;
 import edu.ualberta.med.biobank.model.ContainerStatus;
 
-public class ContainerDisplayWidget extends AbstractGridContainerWidget {
+public class GridContainerWidget extends AbstractGridWidget {
 
     private ContainerCell[][] cells;
 
@@ -23,11 +22,12 @@ public class ContainerDisplayWidget extends AbstractGridContainerWidget {
      */
     private ContainerStatus defaultStatus = ContainerStatus.NOT_INITIALIZED;
 
-    public ContainerDisplayWidget(Composite parent) {
+    public GridContainerWidget(Composite parent) {
         super(parent);
     }
 
-    public ContainerCell getPositionAtCoordinates(int x, int y) {
+    @Override
+    public Object getObjectAtCoordinates(int x, int y) {
         if (cells == null) {
             return null;
         }
@@ -39,18 +39,29 @@ public class ContainerDisplayWidget extends AbstractGridContainerWidget {
         return null;
     }
 
-    public void initDefaultLegend() {
+    @Override
+    public void initLegend() {
         List<ContainerStatus> legendStatus = new ArrayList<ContainerStatus>();
         legendStatus.add(ContainerStatus.NOT_INITIALIZED);
         legendStatus.add(ContainerStatus.INITIALIZED);
         setLegend(legendStatus);
     }
 
-    public void setContainersStatus(ContainerCell[][] cells) {
+    public void setCellsStatus(ContainerCell[][] cells) {
         this.cells = cells;
         computeSize(-1, -1);
-        legendWidth = gridWidth / legendStatus.size();
+        if (legendStatus != null) {
+            legendWidth = gridWidth / legendStatus.size();
+        }
         redraw();
+    }
+
+    @Override
+    public void setInput(Object object) {
+        Assert.isNotNull(object);
+        Assert.isTrue(object.getClass().isArray());
+        ContainerCell[][] cells = (ContainerCell[][]) object;
+        setCellsStatus(cells);
     }
 
     @Override
@@ -69,7 +80,6 @@ public class ContainerDisplayWidget extends AbstractGridContainerWidget {
         int indexRow, int indexCol) {
         if (cells != null) {
             ContainerCell cell = cells[indexRow][indexCol];
-
             if (cell == null) {
                 cell = new ContainerCell();
             }
@@ -89,20 +99,14 @@ public class ContainerDisplayWidget extends AbstractGridContainerWidget {
             ContainerCell cell = cells[indexRow][indexCol];
             if ((cell != null)
                 && (cell.getContainer() != null)
-                && (cell.getContainer().getContainerType().getNameShort() != null)
+                && (cell.getContainer().getContainerType() != null)
                 && (cell.getContainer().getContainerType().getNameShort() != null))
                 sname += "-"
                     + cell.getContainer().getContainerType().getNameShort();
         }
-        RowColPos rowcol = new RowColPos();
-        rowcol.row = indexRow;
-        rowcol.col = indexCol;
-        if (super.getContainerType() != null) {
-            return parentLabel
-                + LabelingScheme.getPositionString(rowcol, super
-                    .getContainerType()) + sname;
+        if (containerType != null) {
+            return super.getDefaultTextForBox(indexRow, indexCol) + sname;
         }
-
         String row = getValueForCell(firstRowSign, indexRow,
             firstColSign == null);
         String col = getValueForCell(firstColSign, indexCol,
@@ -121,4 +125,5 @@ public class ContainerDisplayWidget extends AbstractGridContainerWidget {
     public void setDefaultStatus(ContainerStatus status) {
         this.defaultStatus = status;
     }
+
 }

@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.widgets.listener;
+package edu.ualberta.med.biobank.widgets.listeners;
 
 import java.util.EventListener;
 

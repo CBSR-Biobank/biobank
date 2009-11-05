@@ -10,11 +10,11 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 
-public class SelectMultiple extends BiobankWidget {
+public class SelectMultipleWidget extends BiobankWidget {
 
     private HashMap<String, Button> checkBoxes;
 
-    public SelectMultiple(Composite parent, int style, String[] values,
+    public SelectMultipleWidget(Composite parent, int style, String[] values,
         SelectionListener listener) {
         super(parent, style | SWT.BORDER);
 

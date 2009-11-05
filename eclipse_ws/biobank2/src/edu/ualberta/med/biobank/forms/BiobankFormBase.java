@@ -182,9 +182,15 @@ public abstract class BiobankFormBase extends EditorPart {
     }
 
     protected Control createWidget(Composite parent, Class<?> widgetClass,
-        int widgetOptions, String fieldLabel) {
+        int widgetOptions, String fieldLabel, String value) {
         return widgetCreator.createWidget(parent, widgetClass, widgetOptions,
-            fieldLabel);
+            fieldLabel, value);
+    }
+
+    protected Control createWidget(Composite parent, Class<?> widgetClass,
+        int widgetOptions, String fieldLabel) {
+        return createWidget(parent, widgetClass, widgetOptions, fieldLabel,
+            null);
     }
 
     protected void createWidgetsFromMap(ListOrderedMap fieldsMap,

@@ -9,6 +9,7 @@ import java.util.List;
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.LabelingScheme;
 import edu.ualberta.med.biobank.common.RowColPos;
+import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.internal.AbstractPositionWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.SamplePositionWrapper;
 import edu.ualberta.med.biobank.model.PatientVisit;
@@ -154,6 +155,10 @@ public class SampleWrapper extends
 
     public Date getLinkDate() {
         return wrappedObject.getLinkDate();
+    }
+
+    public String getFormattedLinkDate() {
+        return DateFormatter.formatAsDateTime(wrappedObject.getLinkDate());
     }
 
     public void setQuantity(Double quantity) {

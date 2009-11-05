@@ -142,22 +142,17 @@ public class SessionManager {
         return null;
     }
 
-    public void openViewForm(Class<?> klass, int id) {
-        NodeSearchVisitor v = new NodeSearchVisitor(
-            (Class<? extends ModelWrapper<?>>) klass, id);
+    public void openViewForm(ModelWrapper<?> wrapper) {
+        NodeSearchVisitor v = new NodeSearchVisitor(wrapper);
         AdapterBase adapter = sessionAdapter.accept(v);
         Assert.isNotNull(adapter, "could not find adapter for class "
-            + klass.getName() + " id " + id);
+            + wrapper.getClass() + " id " + wrapper.getId());
         adapter.performDoubleClick();
     }
 
     public void selectTreeNode(AdapterBase adapter) {
         SessionManager.getInstance().getTreeViewer().setSelection(
             new StructuredSelection(adapter));
-    }
-
-    public void openViewForm(ModelWrapper<?> wrapper) {
-        openViewForm(wrapper.getClass(), wrapper.getId());
     }
 
     public AdapterBase searchNode(ModelWrapper<?> wrapper) {
@@ -181,6 +176,16 @@ public class SessionManager {
     public void setSiteManagerEnabled(boolean enable) {
         Assert.isNotNull(siteManager, "site manager is null");
         siteManager.setEnabled(enable);
+    }
+
+    public void lockSite() {
+        Assert.isNotNull(siteManager, "site manager is null");
+        siteManager.lockSite();
+    }
+
+    public void unlockSite() {
+        Assert.isNotNull(siteManager, "site manager is null");
+        siteManager.unlockSite();
     }
 
     public void setSiteCombo(SiteCombo siteCombo) {

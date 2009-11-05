@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.widgets;
+package edu.ualberta.med.biobank.widgets.grids;
 
 import java.text.DecimalFormat;
 
@@ -11,7 +11,6 @@ import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.common.LabelingScheme;
@@ -22,7 +21,7 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
  * Draw a grid according to specific parameters : total number of rows, total
  * number of columns, width and height of the cells
  */
-public abstract class AbstractGridContainerWidget extends Canvas {
+public abstract class AbstractGridWidget extends AbstractContainerDisplayWidget {
 
     private int cellWidth = 60;
 
@@ -35,10 +34,6 @@ public abstract class AbstractGridContainerWidget extends Canvas {
     private int rows;
 
     private int columns;
-
-    private ContainerTypeWrapper containerType;
-
-    protected String parentLabel;
 
     /**
      * First character or int used for the cells row labels
@@ -84,7 +79,13 @@ public abstract class AbstractGridContainerWidget extends Canvas {
 
     public boolean legendOnSide = false;
 
-    public AbstractGridContainerWidget(Composite parent) {
+    /**
+     * if we don't want to display information for cells, can specify a selected
+     * box to highlight
+     */
+    private RowColPos selection;
+
+    public AbstractGridWidget(Composite parent) {
         super(parent, SWT.DOUBLE_BUFFERED);
         addPaintListener(new PaintListener() {
             @Override
@@ -92,7 +93,6 @@ public abstract class AbstractGridContainerWidget extends Canvas {
                 paintGrid(e);
             }
         });
-        parentLabel = "";
     }
 
     protected void paintGrid(PaintEvent e) {
@@ -142,9 +142,14 @@ public abstract class AbstractGridContainerWidget extends Canvas {
         return new Point(width, height);
     }
 
-    @SuppressWarnings("unused")
     protected void drawRectangle(PaintEvent e, Rectangle rectangle,
         int indexRow, int indexCol) {
+        if (selection != null && selection.row == indexRow
+            && selection.col == indexCol) {
+            Color color = e.display.getSystemColor(SWT.COLOR_RED);
+            e.gc.setBackground(color);
+            e.gc.fillRectangle(rectangle);
+        }
         e.gc.setForeground(e.display.getSystemColor(SWT.COLOR_BLACK));
         e.gc.drawRectangle(rectangle);
     }
@@ -157,11 +162,14 @@ public abstract class AbstractGridContainerWidget extends Canvas {
         RowColPos rowcol = new RowColPos();
         rowcol.row = indexRow;
         rowcol.col = indexCol;
+        String parentLabel = "";
+        if (displayFullInfoString && container != null) {
+            parentLabel = container.getLabel();
+        }
         if (containerType != null) {
             return parentLabel
                 + LabelingScheme.getPositionString(rowcol, containerType);
         }
-
         String row = getValueForCell(firstRowSign, indexRow,
             firstColSign == null);
         String col = getValueForCell(firstColSign, indexCol,
@@ -186,6 +194,7 @@ public abstract class AbstractGridContainerWidget extends Canvas {
         return null;
     }
 
+    @Override
     public void setContainerType(ContainerTypeWrapper type) {
         this.containerType = type;
         Integer rowCap = containerType.getRowCapacity();
@@ -193,10 +202,12 @@ public abstract class AbstractGridContainerWidget extends Canvas {
         Assert.isNotNull(rowCap, "row capacity is null");
         Assert.isNotNull(colCap, "column capacity is null");
         setStorageSize(rowCap, colCap);
-    }
-
-    public void setParentLabel(String parentLabel) {
-        this.parentLabel = parentLabel;
+        if (colCap <= 1) {
+            // single dimension size
+            setCellWidth(150);
+            setCellHeight(20);
+            setLegendOnSide(true);
+        }
     }
 
     protected String getValueForCell(Object firstSign, int addValue,
@@ -350,8 +361,13 @@ public abstract class AbstractGridContainerWidget extends Canvas {
         return columns;
     }
 
-    public ContainerTypeWrapper getContainerType() {
-        return containerType;
+    /**
+     * selection start at 0:0
+     */
+    @Override
+    public void setSelection(RowColPos selectedBox) {
+        this.selection = selectedBox;
+        redraw();
     }
 
 }

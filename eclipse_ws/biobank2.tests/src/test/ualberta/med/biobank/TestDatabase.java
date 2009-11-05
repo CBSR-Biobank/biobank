@@ -114,7 +114,7 @@ public class TestDatabase {
                 if (returnType.equals(java.lang.Boolean.class)) {
                     parameter = new Boolean(r.nextBoolean());
                 } else if (returnType.equals(java.lang.Integer.class)) {
-                    parameter = new Integer(r.nextInt());
+                    parameter = new Integer(r.nextInt(Integer.MAX_VALUE));
                 } else if (returnType.equals(java.lang.Double.class)) {
                     parameter = new Double(r.nextDouble());
                 } else if (returnType.equals(java.lang.String.class)) {

@@ -220,7 +220,7 @@ public class ReportsView extends ViewPart {
 
     }
 
-    @Override
+    @Override 
     public void setFocus() {
 
     }

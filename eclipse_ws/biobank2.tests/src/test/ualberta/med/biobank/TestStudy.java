@@ -116,50 +116,6 @@ public class TestStudy extends TestDatabase {
     }
 
     @Test
-    public void testAddInContactCollectionFromClinicAlreadyChoosen()
-        throws Exception {
-        String name = "testAddInContactCollectionFromClinicAlreadyChoosen"
-            + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
-        StudyWrapper study = StudyHelper.addStudy(site, name);
-        ContactHelper.addContactsToStudy(study, name);
-        site.reload();
-
-        // get a clinic already added
-        List<ContactWrapper> contacts = study.getContactCollection();
-        ClinicWrapper clinicUsed = null;
-        ContactWrapper contactUsed = null;
-        for (ContactWrapper contact : contacts) {
-            if (contact.getClinicWrapper().getContactCollection().size() > 1) {
-                clinicUsed = contact.getClinicWrapper();
-                contactUsed = contact;
-                break;
-            }
-        }
-        if (clinicUsed != null) {
-            // get a different contact
-            ContactWrapper newContact = null;
-            for (ContactWrapper contact : clinicUsed.getContactCollection()) {
-                if (!contact.equals(contactUsed)) {
-                    newContact = contact;
-                    break;
-                }
-            }
-            contacts.add(newContact);
-            study.setContactCollection(contacts);
-            try {
-                study.persist();
-                Assert
-                    .fail("Exception expected - should not be able to add more than one contact from the same clinic");
-            } catch (BiobankCheckException bce) {
-                Assert.assertTrue(true);
-            }
-        } else {
-            Assert.fail("Was not able to perform test");
-        }
-    }
-
-    @Test
     public void testGetSampleStorageCollection() throws Exception {
         String name = "testGetSampleStorageCollection" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);

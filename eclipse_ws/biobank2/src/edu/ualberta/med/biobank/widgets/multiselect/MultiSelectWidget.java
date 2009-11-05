@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.widgets;
+package edu.ualberta.med.biobank.widgets.multiselect;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,6 +14,9 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 
 import edu.ualberta.med.biobank.forms.FormUtils;
+import edu.ualberta.med.biobank.widgets.BiobankWidget;
+import edu.ualberta.med.biobank.widgets.listeners.TreeViewerDragListener;
+import edu.ualberta.med.biobank.widgets.listeners.TreeViewerDropListener;
 
 public class MultiSelectWidget extends BiobankWidget {
 

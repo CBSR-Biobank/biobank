@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.forms;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -34,8 +33,8 @@ import edu.ualberta.med.biobank.model.ContainerStatus;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.ContainerAdapter;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
-import edu.ualberta.med.biobank.widgets.CabinetDrawerWidget;
-import edu.ualberta.med.biobank.widgets.ContainerDisplayWidget;
+import edu.ualberta.med.biobank.widgets.grids.AbstractContainerDisplayWidget;
+import edu.ualberta.med.biobank.widgets.grids.ContainerDisplayFatory;
 import edu.ualberta.med.biobank.widgets.infotables.SamplesListWidget;
 
 public class ContainerViewForm extends BiobankViewForm {
@@ -69,13 +68,9 @@ public class ContainerViewForm extends BiobankViewForm {
 
     private Label positionDimTwoLabel;
 
-    private CabinetDrawerWidget cabWidget;
-
-    private ContainerDisplayWidget containerWidget;
+    private AbstractContainerDisplayWidget containerWidget;
 
     private ContainerCell[][] cells;
-
-    private List<ContainerCell> selectedCells;
 
     private boolean childrenOk = true;
 
@@ -176,24 +171,9 @@ public class ContainerViewForm extends BiobankViewForm {
         }
     }
 
-    public void clearSelection() {
-        for (ContainerCell cell : selectedCells) {
-            cell.setStatus(ContainerStatus.NOT_INITIALIZED);
-        }
-        selectedCells.clear();
-    }
-
     private void refreshVis() {
         initCells();
-        if (isContainerDrawer()) {
-            cabWidget.setContainersStatus(cells);
-        } else {
-            containerWidget.setContainersStatus(cells);
-        }
-    }
-
-    public boolean isContainerDrawer() {
-        return container.getContainerType().getName().startsWith("Drawer");
+        containerWidget.setInput(cells);
     }
 
     protected void createVisualizeContainer() {
@@ -206,11 +186,21 @@ public class ContainerViewForm extends BiobankViewForm {
             label.setForeground(Display.getCurrent().getSystemColor(
                 SWT.COLOR_RED));
         }
-        if (isContainerDrawer()) {
-            initCabinetDrawerContainer(client);
-        } else {
-            initBasicContainer(client);
-        }
+        AbstractContainerDisplayWidget containerWidget = ContainerDisplayFatory
+            .createWidget(client, container);
+        containerWidget.initLegend();
+        containerWidget.setInput(cells);
+        containerWidget.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseDown(MouseEvent e) {
+                Object object = ((AbstractContainerDisplayWidget) e.widget)
+                    .getObjectAtCoordinates(e.x, e.y);
+                if (object != null)
+                    openFormFor((ContainerCell) object);
+            }
+        });
+        containerWidget.displayFullInfoString(true);
+
         addChildrenActions(client);
     }
 
@@ -258,49 +248,41 @@ public class ContainerViewForm extends BiobankViewForm {
         });
     }
 
-    private void initCabinetDrawerContainer(Composite client) {
-        // if Drawer, requires special grid
-        cabWidget = new CabinetDrawerWidget(client);
-        cabWidget.initLegend();
-        GridData gdBin = new GridData();
-        gdBin.verticalSpan = 2;
-        cabWidget.setLayoutData(gdBin);
-        cabWidget.setContainersStatus(cells);
-        cabWidget.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseDown(MouseEvent e) {
-                ContainerCell cell = ((CabinetDrawerWidget) e.widget)
-                    .getPositionAtCoordinates(e.x, e.y);
-                openFormFor(cell);
-            }
-        });
-    }
-
-    private void initBasicContainer(Composite client) {
-        // otherwise, normal grid
-        containerWidget = new ContainerDisplayWidget(client);
-        containerWidget.setContainerType(container.getContainerType());
-        containerWidget.setParentLabel(containerLabelLabel.getText());
-        containerWidget.initDefaultLegend();
-        selectedCells = new ArrayList<ContainerCell>();
-        int dim2 = cells[0].length;
-        if (dim2 <= 1) {
-            // single dimension size
-            containerWidget.setCellWidth(150);
-            containerWidget.setCellHeight(20);
-            containerWidget.setLegendOnSide(true);
-        }
-        containerWidget.setContainersStatus(cells);
-        containerWidget.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseDown(MouseEvent e) {
-                ContainerCell cell = ((ContainerDisplayWidget) e.widget)
-                    .getPositionAtCoordinates(e.x, e.y);
-                if (cell != null)
-                    openFormFor(cell);
-            }
-        });
-    }
+    // private void initCabinetDrawerContainer(Composite client) {
+    // // if Drawer, requires special grid
+    // cabWidget = new DrawerWidget(client);
+    // cabWidget.initLegend();
+    // GridData gdBin = new GridData();
+    // gdBin.verticalSpan = 2;
+    // cabWidget.setLayoutData(gdBin);
+    // cabWidget.setContainersStatus(cells);
+    // cabWidget.addMouseListener(new MouseAdapter() {
+    // @Override
+    // public void mouseDown(MouseEvent e) {
+    // ContainerCell cell = ((DrawerWidget) e.widget)
+    // .getPositionAtCoordinates(e.x, e.y);
+    // openFormFor(cell);
+    // }
+    // });
+    // }
+    //
+    // private void initBasicContainer(Composite client) {
+    // // otherwise, normal grid
+    // containerWidget = new GridContainerWidget(client);
+    // containerWidget.setContainerType(container.getContainerType());
+    // containerWidget.setParentLabel(containerLabelLabel.getText());
+    // containerWidget.initDefaultLegend();
+    // containerWidget.setContainersStatus(cells);
+    // containerWidget.addMouseListener(new MouseAdapter() {
+    // @Override
+    // public void mouseDown(MouseEvent e) {
+    // ContainerCell cell = ((GridContainerWidget) e.widget)
+    // .getPositionAtCoordinates(e.x, e.y);
+    // if (cell != null)
+    // openFormFor(cell);
+    // }
+    // });
+    // }
 
     private void initContainers(final ContainerTypeWrapper type) {
         BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
@@ -429,4 +411,5 @@ public class ContainerViewForm extends BiobankViewForm {
     protected String getEntryFormId() {
         return ContainerEntryForm.ID;
     }
+
 }

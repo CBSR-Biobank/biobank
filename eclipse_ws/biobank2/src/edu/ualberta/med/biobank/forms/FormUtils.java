@@ -60,10 +60,6 @@ public class FormUtils {
         return controlDecoration;
     }
 
-    public static Font getSectionFont() {
-        return new Font(null, "sans-serif", 9, SWT.BOLD);
-    }
-
     public static Font getHeadingFont() {
         return new Font(null, "sans-serif", 8, SWT.BOLD);
     }

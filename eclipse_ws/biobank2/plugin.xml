@@ -395,15 +395,6 @@
          </activeWhen>
       </handler>
       <handler
-            class="edu.ualberta.med.biobank.handlers.OpenPatientFormHandler"
-            commandId="edu.ualberta.med.biobank.commands.patients.openPatientForm">
-         <activeWhen>
-              <reference
-                    definitionId="biobank2.siteSelected">
-              </reference>
-          </activeWhen>
-      </handler>
-      <handler
             class="edu.ualberta.med.biobank.handlers.PatientVisitAddHandler"
             commandId="edu.ualberta.med.biobank.commands.patients.patientVisitAdd">
          <activeWhen>
