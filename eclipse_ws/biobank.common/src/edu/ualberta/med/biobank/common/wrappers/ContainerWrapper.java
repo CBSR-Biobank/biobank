@@ -58,7 +58,7 @@ public class ContainerWrapper extends
         // TODO check parent is from same site ?
         checkLabelUniqueForType();
         checkProductBarcodeUnique();
-        canHoldCTs();
+        checkHoldsContainerTypes();
         super.persistChecks();
     }
 
@@ -489,21 +489,23 @@ public class ContainerWrapper extends
         return children.get(new RowColPos(row, col));
     }
 
-    public void canHoldCTs() throws BiobankCheckException {
+    private void checkHoldsContainerTypes() throws BiobankCheckException {
         if (Boolean.TRUE.equals(getContainerType().getTopLevel()))
             return;
 
-        boolean found = false;
-        List<ContainerTypeWrapper> allowed = getParent().getContainerType()
-            .getChildContainerTypeCollection();
-        for (ContainerTypeWrapper ct : allowed)
-            if (ct.getId().equals(getContainerType().getId()))
-                found = true;
-        if (!found)
-            throw new BiobankCheckException("Container "
-                + getParent().getFullInfoLabel()
-                + " does not allow inserts of type "
-                + getContainerType().getName() + ".");
+        ContainerWrapper parent = getParent();
+        if (parent == null)
+            throw new BiobankCheckException("Container " + this
+                + " does not have a parent container");
+
+        if (getParent().getContainerType().getChildContainerTypeCollection()
+            .contains(getContainerType()))
+            return;
+
+        throw new BiobankCheckException("Container "
+            + getParent().getFullInfoLabel()
+            + " does not allow inserts of type " + getContainerType().getName()
+            + ".");
     }
 
     public void addChild(Integer row, Integer col, ContainerWrapper child)

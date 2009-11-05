@@ -668,7 +668,7 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
             }
             BioBankPlugin.openError("Position error",
                 "There is already a different pallet (product barcode = "
-                    + barcode + ") on this position");
+                    + barcode + ") in this position");
             appendLog("Pallet with product barcode " + barcode
                 + " is already in position " + currentPalletWrapper.getLabel());
             return false;
