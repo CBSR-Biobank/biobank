@@ -288,7 +288,9 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
 
     protected void scan() {
         try {
-            currentPalletWrapper.getWrappedObject().setId(null);
+            // if another scan has been done on this same form, need to reset
+            // values set before
+            reset(true);
             boolean showResult = checkPallet();
             if (showResult) {
                 appendLog("----");
@@ -486,7 +488,7 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
     protected void saveForm() throws Exception {
         currentPalletWrapper.persist();
         int totalNb = 0;
-        StringBuffer sb = new StringBuffer("Samples assigned:");
+        StringBuffer sb = new StringBuffer("Aliquots assigned:");
         try {
             for (int i = 0; i < cells.length; i++) {
                 for (int j = 0; j < cells[i].length; j++) {
@@ -523,15 +525,27 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
         }
         appendLog("----");
         appendLog(sb.toString());
-        appendLog("SCAN-ASSIGN: " + totalNb + " samples added to pallet "
-            + LabelingScheme.getPositionString(currentPalletWrapper));
+        appendLog("SCAN-ASSIGN: " + totalNb + " aliquots added to pallet "
+            + currentPalletWrapper.getLabel());
         setSaved(true);
     }
 
     @Override
     public void reset() {
-        if (palletTypesViewer != null) {
-            palletTypesViewer.getCombo().deselectAll();
+        reset(false);
+    }
+
+    public void reset(boolean beforeScanReset) {
+        String productBarcode = "";
+        String label = "";
+
+        if (beforeScanReset) {
+            productBarcode = currentPalletWrapper.getProductBarcode();
+            label = currentPalletWrapper.getLabel();
+        } else {
+            if (palletTypesViewer != null) {
+                palletTypesViewer.getCombo().deselectAll();
+            }
         }
         freezerWidget.setSelection(null);
         hotelWidget.setSelection(null);
@@ -544,7 +558,13 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
         } else {
             setContainerType();
         }
-        setDirty(false);
+
+        if (beforeScanReset) {
+            currentPalletWrapper.setProductBarcode(productBarcode);
+            currentPalletWrapper.setLabel(label);
+        } else {
+            setDirty(false);
+        }
     }
 
     private void initPalletValues() {
@@ -612,6 +632,7 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
                 // database !
                 currentPalletWrapper.setWrappedObject(palletFound
                     .getWrappedObject());
+                currentPalletWrapper.reset();
                 needToCheckPosition = false;
             } else {
                 pursue = MessageDialog.openConfirm(PlatformUI.getWorkbench()
