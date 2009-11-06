@@ -55,33 +55,44 @@ public class TestContainerType extends TestDatabase {
     }
 
     private ContainerTypeWrapper addContainerTypeHierarchy(
-        ContainerTypeWrapper topType) throws BiobankCheckException, Exception {
+        ContainerTypeWrapper topType, int level) throws Exception {
         ContainerTypeWrapper childType;
 
-        childType = ContainerTypeHelper.addContainerType(site,
-            "Child L3 Container Type", "CCTL3", 1, CONTAINER_CHILD_L3_ROWS,
-            CONTAINER_CHILD_L3_COLS, false);
-        containerTypeMap.put("ChildCtL3", childType);
+        if (level >= 3) {
+            childType = ContainerTypeHelper.addContainerType(site,
+                "Child L3 Container Type", "CCTL3", 1, CONTAINER_CHILD_L3_ROWS,
+                CONTAINER_CHILD_L3_COLS, false);
+            containerTypeMap.put("ChildCtL3", childType);
+        }
 
-        childType = ContainerTypeHelper.newContainerType(site,
-            "Child L2 Container Type", "CCTL2", 1, 1, 10, false);
-        childType.setChildContainerTypeCollection(Arrays
-            .asList(containerTypeMap.get("ChildCtL3")));
-        childType.persist();
-        containerTypeMap.put("ChildCtL2", childType);
+        if (level >= 2) {
+            childType = ContainerTypeHelper.newContainerType(site,
+                "Child L2 Container Type", "CCTL2", 1, 1, 10, false);
+            childType.setChildContainerTypeCollection(Arrays
+                .asList(containerTypeMap.get("ChildCtL3")));
+            childType.persist();
+            containerTypeMap.put("ChildCtL2", childType);
+        }
 
-        childType = ContainerTypeHelper.newContainerType(site,
-            "Child L1 Container Type", "CCTL1", 3, 1, 10, false);
-        childType.setChildContainerTypeCollection(Arrays
-            .asList(containerTypeMap.get("ChildCtL2")));
-        childType.persist();
-        containerTypeMap.put("ChildCtL1", childType);
+        if (level >= 1) {
+            childType = ContainerTypeHelper.newContainerType(site,
+                "Child L1 Container Type", "CCTL1", 3, 1, 10, false);
+            childType.setChildContainerTypeCollection(Arrays
+                .asList(containerTypeMap.get("ChildCtL2")));
+            childType.persist();
+            containerTypeMap.put("ChildCtL1", childType);
 
-        topType.setChildContainerTypeCollection(Arrays.asList(containerTypeMap
-            .get("ChildCtL1")));
-        topType.persist();
-        topType.reload();
+            topType.setChildContainerTypeCollection(Arrays
+                .asList(containerTypeMap.get("ChildCtL1")));
+            topType.persist();
+            topType.reload();
+        }
         return topType;
+    }
+
+    private ContainerTypeWrapper addContainerTypeHierarchy(
+        ContainerTypeWrapper topType) throws Exception {
+        return addContainerTypeHierarchy(topType, 3);
     }
 
     @Test
@@ -195,12 +206,30 @@ public class TestContainerType extends TestDatabase {
 
             ct.reload();
             Assert.assertTrue(ct.isUsedByContainers());
+
+        }
+
+        // now delete all containers
+        for (ContainerWrapper container : containers) {
+            container.delete();
+        }
+        containers.clear();
+
+        for (String key : keys) {
+            ContainerTypeWrapper ct = containerTypeMap.get(key);
+            Assert.assertFalse(ct.isUsedByContainers());
         }
     }
 
     @Test
-    public void testGetParentContainers() {
-        fail("Not yet implemented");
+    public void testGetParentContainerTypes() throws Exception {
+        addContainerTypeHierarchy(containerTypeMap.get("TopCT"), 1);
+
+        ContainerTypeWrapper childType = ContainerTypeHelper.newContainerType(
+            site, "Child L1 Container Type", "CCTL1", 3, 1, 10, false);
+        childType.setChildContainerTypeCollection(Arrays
+            .asList(containerTypeMap.get("ChildCtL2")));
+        childType.persist();
     }
 
     @Test
