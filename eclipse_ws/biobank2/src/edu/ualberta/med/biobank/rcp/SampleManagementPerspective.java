@@ -3,6 +3,9 @@ package edu.ualberta.med.biobank.rcp;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPerspectiveFactory;
 
+/**
+ * Perspective to manage samples using scanners
+ */
 public class SampleManagementPerspective implements IPerspectiveFactory {
 
     public final static String ID = "edu.ualberta.med.biobank.perspective.samplesManagement";

@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.model.ContainerType;
@@ -141,11 +142,11 @@ public class SampleTypeWrapper extends ModelWrapper<SampleType> {
         List<ContainerTypeWrapper> types = ContainerTypeWrapper
             .getContainerTypesInSite(appService, siteWrapper, typeNameContains,
                 false);
-        List<SampleTypeWrapper> sampleTypes = new ArrayList<SampleTypeWrapper>();
+        Set<SampleTypeWrapper> sampleTypes = new HashSet<SampleTypeWrapper>();
         for (ContainerTypeWrapper type : types) {
-            sampleTypes.addAll(type.getSampleTypeCollectionRecursively());
+            sampleTypes.addAll(type.getSampleTypesRecursively());
         }
-        return sampleTypes;
+        return new ArrayList<SampleTypeWrapper>(sampleTypes);
     }
 
     @Override

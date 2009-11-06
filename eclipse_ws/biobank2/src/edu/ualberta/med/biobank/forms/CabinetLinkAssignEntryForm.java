@@ -520,8 +520,7 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
     protected void saveForm() throws Exception {
         if (radioNew.getSelection()) {
             sampleWrapper.setLinkDate(new Date());
-            sampleWrapper.setPatientVisit(getSelectedPatientVisit()
-                .getWrappedObject());
+            sampleWrapper.setPatientVisit(getSelectedPatientVisit());
             sampleWrapper.setQuantityFromType();
         }
         sampleWrapper.persist();

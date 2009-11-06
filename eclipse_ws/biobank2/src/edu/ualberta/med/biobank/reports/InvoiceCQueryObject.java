@@ -12,7 +12,7 @@ public class InvoiceCQueryObject extends QueryObject {
     public InvoiceCQueryObject(String name) {
         super(
             "Lists all samples for a particular date range, grouped by clinic.",
-            name, "Select " + name + "Alias.patientVisit.clinic.id, " + name
+            name, "Select " + name + "Alias.patientVisit.clinic.name, " + name
                 + "Alias.patientVisit.patient.id, " + name
                 + "Alias.patientVisit.patient.number, " + name
                 + "Alias.linkDate, " + name + "Alias.sampleType.name"
@@ -24,7 +24,7 @@ public class InvoiceCQueryObject extends QueryObject {
                 + " ORDER BY " + name + "Alias.patientVisit.clinic.id, " + name
                 + "Alias.patientVisit.patient.id", new ArrayList<Class<?>>(),
             new ArrayList<Object>(), new ArrayList<String>(), new String[] {
-                "Clinic Id", "Patient Id", "Patient Number", "Link Date",
+                "Clinic", "Patient Id", "Patient Number", "Link Date",
                 "Sample Type" });
         fieldTypes.add(DateTimeWidget.class);
         fieldTypes.add(DateTimeWidget.class);

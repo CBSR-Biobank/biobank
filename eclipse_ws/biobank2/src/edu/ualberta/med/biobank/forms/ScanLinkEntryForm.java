@@ -618,7 +618,7 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
     protected void saveForm() throws Exception {
         PalletCell[][] cells = spw.getScannedElements();
         PatientVisitWrapper patientVisit = getSelectedPatientVisit();
-        StringBuffer sb = new StringBuffer("Samples linked:");
+        StringBuffer sb = new StringBuffer("Aliquots linked:");
         int nber = 0;
         StudyWrapper study = patientVisit.getPatient().getStudy();
         Collection<SampleStorageWrapper> sampleStorages = study
@@ -635,8 +635,7 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
                     sample.persist();
                     sb.append("\nLINKED: ").append(cell.getValue());
                     sb.append(" - patient: ").append(
-                        patientVisit.getWrappedObject().getPatient()
-                            .getNumber());
+                        patientVisit.getPatient().getNumber());
                     sb.append(" - Visit: ").append(
                         patientVisit.getFormattedDateDrawn());
                     sb.append(" - ").append(patientVisit.getClinic().getName());

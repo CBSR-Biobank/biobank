@@ -251,6 +251,16 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     }
 
     /**
+     * Returns hash code for the primary key of the object
+     **/
+    @Override
+    public int hashCode() {
+        if (getId() != null)
+            return getId().hashCode();
+        return 0;
+    }
+
+    /**
      * return the list of all objects of the database of this type
      */
     protected List<E> getAllObjects() throws Exception {
