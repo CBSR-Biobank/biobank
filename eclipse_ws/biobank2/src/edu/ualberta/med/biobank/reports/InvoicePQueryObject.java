@@ -13,8 +13,8 @@ public class InvoicePQueryObject extends QueryObject {
         super(
             "Lists all samples for a particular date range, grouped by patient.",
             name, "Select " + name + "Alias.patientVisit.patient.id, " + name
-                + "Alias.patientVisit.clinic.id, " + name
                 + "Alias.patientVisit.patient.number, " + name
+                + "Alias.patientVisit.clinic.name, " + name
                 + "Alias.linkDate, " + name + "Alias.sampleType.name"
                 + " from " + Sample.class.getName() + " as " + name
                 + "Alias where " + name + "Alias.linkDate > ? and " + name
@@ -23,8 +23,8 @@ public class InvoicePQueryObject extends QueryObject {
                 + SessionManager.getInstance().getCurrentSiteWrapper().getId()
                 + " ORDER BY " + name + "Alias.patientVisit.patient.id",
             new ArrayList<Class<?>>(), new ArrayList<Object>(),
-            new ArrayList<String>(), new String[] { "Patient Id", "Clinic Id",
-                "Patient Number", "Link Date", "Sample Type" });
+            new ArrayList<String>(), new String[] { "Patient Id",
+                "Patient Number", "Clinic", "Link Date", "Sample Type" });
         fieldTypes.add(DateTimeWidget.class);
         fieldTypes.add(DateTimeWidget.class);
         defaults.add(new Date(0));

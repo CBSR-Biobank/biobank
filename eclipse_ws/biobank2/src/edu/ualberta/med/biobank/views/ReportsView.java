@@ -1,10 +1,13 @@
 package edu.ualberta.med.biobank.views;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -14,19 +17,31 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
+import org.eclipse.swt.custom.StyledText;
+import org.eclipse.swt.custom.StyledTextPrintOptions;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.FontData;
+import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.printing.PrintDialog;
+import org.eclipse.swt.printing.Printer;
+import org.eclipse.swt.printing.PrinterData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Widget;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
 
+import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.reports.QueryObject;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.widgets.ReportsLabelProvider;
@@ -37,8 +52,14 @@ public class ReportsView extends ViewPart {
     public static Logger LOGGER = Logger.getLogger(ReportsView.class.getName());
 
     public static final String ID = "edu.ualberta.med.biobank.views.ReportsView";
+    private SimpleDateFormat dateFormat = new SimpleDateFormat(
+        "EEEE, MMMM dd, yyyy");
+
+    private GC gc;
+
     private ScrolledComposite sc;
     private Composite top;
+    private Composite header;
     private Composite subSection;
 
     private ComboViewer querySelect;
@@ -49,6 +70,8 @@ public class ReportsView extends ViewPart {
     private Button searchButton;
     private Collection<Object> searchData;
     private InfoTableWidget<Object> searchTable;
+
+    private Button printButton;
 
     public ReportsView() {
         searchData = new ArrayList<Object>();
@@ -67,8 +90,11 @@ public class ReportsView extends ViewPart {
         top.setLayout(new GridLayout(1, false));
         top.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
+        header = new Composite(top, SWT.NONE);
+        header.setLayout(new GridLayout(3, false));
+
         queryObjects = QueryObject.getAllQueries();
-        querySelect = createCombo(top, queryObjects);
+        querySelect = createCombo(header, queryObjects);
         querySelect
             .addSelectionChangedListener(new ISelectionChangedListener() {
                 @Override
@@ -77,19 +103,7 @@ public class ReportsView extends ViewPart {
                 }
             });
 
-        // create the query's display here
-        subSection = new Composite(top, SWT.NONE);
-
-        Label resultsLabel = new Label(top, SWT.NONE);
-        resultsLabel.setText("Results:");
-
-        searchTable = new InfoTableWidget<Object>(top, searchData,
-            new String[] {}, null);
-        GridData searchLayoutData = new GridData(SWT.FILL, SWT.FILL, true, true);
-        // searchLayoutData.minimumHeight = 300;
-        searchTable.setLayoutData(searchLayoutData);
-
-        searchButton = new Button(top, SWT.NONE);
+        searchButton = new Button(header, SWT.NONE);
         searchButton.setText("Search");
         searchButton.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -115,7 +129,7 @@ public class ReportsView extends ViewPart {
                         SWT.FILL, true, true);
                     searchLayoutData.minimumHeight = 500;
                     searchTable.setLayoutData(searchLayoutData);
-                    searchTable.moveAbove(searchButton);
+                    searchTable.moveBelow(subSection);
                 }
                 searchTable.setCollection(searchData);
                 searchTable.redraw();
@@ -123,6 +137,25 @@ public class ReportsView extends ViewPart {
 
             }
         });
+
+        printButton = new Button(header, SWT.NONE);
+        printButton.setText("Print");
+        printButton.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                printTable();
+            }
+        });
+
+        // create the query's display here
+        subSection = new Composite(top, SWT.NONE);
+        Label resultsLabel = new Label(top, SWT.NONE);
+        resultsLabel.setText("Results:");
+
+        searchTable = new InfoTableWidget<Object>(top, searchData,
+            new String[] {}, null);
+        GridData searchLayoutData = new GridData(SWT.FILL, SWT.FILL, true, true);
+        searchTable.setLayoutData(searchLayoutData);
 
         querySelect.setSelection(new StructuredSelection(queryObjects.get(0)));
         top.layout();
@@ -188,7 +221,7 @@ public class ReportsView extends ViewPart {
             widgetFields.add(widget);
         }
 
-        subSection.moveBelow(querySelect.getCombo());
+        subSection.moveBelow(header);
         subSection.setVisible(true);
 
         // update parents
@@ -239,5 +272,58 @@ public class ReportsView extends ViewPart {
         });
         comboViewer.setInput(list);
         return comboViewer;
+    }
+
+    public boolean printTable() {
+        boolean doPrint = MessageDialog.openQuestion(PlatformUI.getWorkbench()
+            .getActiveWorkbenchWindow().getShell(), "Confirm",
+            "Print table contents?");
+        if (doPrint) {
+            PrintDialog dialog = new PrintDialog(PlatformUI.getWorkbench()
+                .getActiveWorkbenchWindow().getShell(), SWT.NONE);
+            PrinterData data = dialog.open();
+            gc = new GC(new Printer(data));
+            searchTable.print(gc);
+            return true;
+        }
+        return false;
+    }
+
+    protected void print() {
+
+        PrinterData data = null;
+        if (!BioBankPlugin.getDefault().isDebugging()) {
+            data = Printer.getDefaultPrinterData();
+        }
+        if (data == null) {
+            PrintDialog dialog = new PrintDialog(PlatformUI.getWorkbench()
+                .getActiveWorkbenchWindow().getShell(), SWT.NONE);
+            data = dialog.open();
+        }
+        if (data == null)
+            return;
+
+        // use existing print functionality of swt styled texts
+        StyledText sText = new StyledText(top, SWT.NONE);
+        sText.setText(searchTable.toString());
+
+        FontData printerFd = new FontData("Sans", 8, SWT.NORMAL);
+        final Font font = new Font(Display.getCurrent(), printerFd);
+        sText.setFont(font);
+        final Printer printer = new Printer(data);
+        StyledTextPrintOptions options = new StyledTextPrintOptions();
+        options.footer = "Printed on " + dateFormat.format(new Date())
+            + StyledTextPrintOptions.SEPARATOR
+            + StyledTextPrintOptions.SEPARATOR
+            + StyledTextPrintOptions.PAGE_TAG;
+        options.header = "Biobank2 - Activity Report"
+            + StyledTextPrintOptions.SEPARATOR
+            + StyledTextPrintOptions.SEPARATOR + "USER:"
+            + SessionManager.getInstance().getSession().getUserName();
+        options.jobName = "scannedLinkedActivity";
+        final Runnable styledTextPrinter = sText.print(printer, options);
+        styledTextPrinter.run();
+        printer.dispose();
+        font.dispose();
     }
 }
