@@ -200,7 +200,6 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
             E oldValue = wrappedObject;
             wrappedObject = getNewObject();
             firePropertyChanges(oldValue, wrappedObject);
-            propertiesMap.clear();
         } else {
             reload();
         }

@@ -542,6 +542,7 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
         if (beforeScanReset) {
             productBarcode = currentPalletWrapper.getProductBarcode();
             label = currentPalletWrapper.getLabel();
+            currentPalletWrapper.getWrappedObject().setId(null);
         } else {
             if (palletTypesViewer != null) {
                 palletTypesViewer.getCombo().deselectAll();
