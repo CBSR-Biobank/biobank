@@ -575,7 +575,7 @@
          </toolbar>
       </menuContribution>
       <menuContribution
-            locationURI="toolbar:org.eclipse.ui.main.toolbar">
+            locationURI="toolbar:org.eclipse.ui.main.toolbar?before=edu.ualberta.med.biobank.toolbar.siteSelection">
          <toolbar
                id="edu.ualberta.med.biobank.toolbar.serverCommands">
             <command

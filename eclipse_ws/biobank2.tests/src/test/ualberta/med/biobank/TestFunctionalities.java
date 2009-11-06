@@ -48,6 +48,8 @@ public class TestFunctionalities extends TestDatabase {
 
         Assert.assertEquals(search1.getId(), search2.getId());
 
+        System.out.println(search1.getClass());
+        System.out.println(search2.getClass());
         Assert.assertEquals(search1, search2);
     }
 

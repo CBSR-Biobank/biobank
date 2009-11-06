@@ -92,8 +92,8 @@ public class PvSampleSourceDialog extends BiobankDialog {
 
     @Override
     protected void okPressed() {
-        pvSampleSource.setSampleSource(sampleSourceMap.get(
-            sampleSourcesCombo.getText()).getWrappedObject());
+        pvSampleSource.setSampleSource(sampleSourceMap.get(sampleSourcesCombo
+            .getText()));
         super.okPressed();
     }
 

@@ -36,15 +36,17 @@ public class OpenPatientFormHandler extends AbstractHandler implements IHandler 
         final String editorId = (String) parameters.get(EDITOR_ID_PARAM);
         IWorkbench workbench = BioBankPlugin.getDefault().getWorkbench();
         try {
-            workbench.showPerspective(SampleManagementPerspective.ID, workbench
-                .getActiveWorkbenchWindow());
-            IWorkbenchPage page = workbench.getActiveWorkbenchWindow()
-                .getActivePage();
-            // open the editor
-            page.openEditor(new FormInput(SessionManager.getInstance()
-                .getSession()), editorId, true);
-            // open the console view
-            hideConsoleViewIcons(page);
+            if (workbench.getActiveWorkbenchWindow().getActivePage()
+                .closeAllEditors(true)) {
+                workbench.showPerspective(SampleManagementPerspective.ID,
+                    workbench.getActiveWorkbenchWindow());
+                IWorkbenchPage page = workbench.getActiveWorkbenchWindow()
+                    .getActivePage();
+                // open the editor
+                page.openEditor(new FormInput(SessionManager.getInstance()
+                    .getSession()), editorId, true);
+                hideConsoleViewIcons(page);
+            }
         } catch (WorkbenchException e) {
             throw new ExecutionException(
                 "Error while opening sample management perspective", e);

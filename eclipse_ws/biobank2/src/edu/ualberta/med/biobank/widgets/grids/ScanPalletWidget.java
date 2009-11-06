@@ -59,7 +59,12 @@ public class ScanPalletWidget extends AbstractGridWidget {
                 if (cell != null) {
                     String msg = cell.getValue();
                     if (cell.getInformation() != null) {
-                        msg += " : " + cell.getInformation();
+                        if (msg == null) {
+                            msg = "";
+                        } else {
+                            msg += ": ";
+                        }
+                        msg += cell.getInformation();
                     }
                     setToolTipText(msg);
                 } else {
@@ -80,7 +85,8 @@ public class ScanPalletWidget extends AbstractGridWidget {
         hasLegend = true;
         statusAvailable = new ArrayList<SampleCellStatus>();
         statusAvailable.add(SampleCellStatus.EMPTY);
-        statusAvailable.add(SampleCellStatus.NEW_MOVED);
+        statusAvailable.add(SampleCellStatus.NEW);
+        statusAvailable.add(SampleCellStatus.MOVED);
         statusAvailable.add(SampleCellStatus.FILLED);
         statusAvailable.add(SampleCellStatus.MISSING);
         statusAvailable.add(SampleCellStatus.ERROR);
