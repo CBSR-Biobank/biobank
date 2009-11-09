@@ -405,7 +405,7 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
             // sample not found in site (not yet linked ?)
             String logMsg = "aliquot " + value + " not linked to any patient";
             setStatusWithLogMessage(scanCell, SampleCellStatus.ERROR,
-                "Aliquot not found", "-", positionString, logMsg);
+                "Aliquot not found", null, positionString, logMsg);
             return false;
         } else if (samples.size() == 1) {
             SampleWrapper foundSample = samples.get(0);
