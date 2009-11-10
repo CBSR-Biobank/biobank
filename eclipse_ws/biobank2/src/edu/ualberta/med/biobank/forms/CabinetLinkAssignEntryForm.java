@@ -200,7 +200,6 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
                 setVisitsList();
             }
         });
-        firstControl = patientNumberText;
         patientNumberText.addKeyListener(EnterKeyToNextFieldListener.INSTANCE);
         patientNumberText.addFocusListener(new FocusAdapter() {
             @Override
@@ -208,6 +207,8 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
                 setVisitsList();
             }
         });
+        firstControl = patientNumberText;
+
         createVisitCombo(fieldsComposite);
 
         inventoryIdText = (Text) createBoundWidgetWithLabel(fieldsComposite,
