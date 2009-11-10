@@ -490,6 +490,68 @@
                </visibleWhen>           
          </menu>
          <menu
+               id="edu.ualberta.med.biobank.menu.patients"
+               label="Patients">
+            <command
+                  commandId="edu.ualberta.med.biobank.commands.patients.patientAdd"
+                  icon="icons/patient_add.png"
+                  label="Add Patient"
+                  style="push">
+            </command>
+            <command
+                  commandId="edu.ualberta.med.biobank.commands.patients.patientVisitAdd"
+                  icon="icons/patientVisit_add.png"
+                  label="Add Patient Visit"
+                  style="push">
+            </command>
+            <visibleWhen
+                  checkEnabled="false">
+               <reference
+                     definitionId="biobank2.patientsPerpectiveSelected">
+               </reference>
+            </visibleWhen>
+         </menu>
+         <menu
+               id="edu.ualberta.med.biobank.menu.linkAssign"
+               label="Link / Assign">
+            <command
+                  commandId="edu.ualberta.med.biobank.commands.patients.openPatientForm"
+                  icon="icons/scanLink.png"
+                  label="Scan Link"
+                  style="push">
+               <parameter
+                     name="edu.ualberta.med.biobank.commands.patients.openPatientForm.editorId"
+                     value="edu.ualberta.med.biobank.forms.ScanLinkEntryForm">
+               </parameter>
+            </command>
+            <command
+                  commandId="edu.ualberta.med.biobank.commands.patients.openPatientForm"
+                  icon="icons/scanAssign.png"
+                  label="Scan Assign"
+                  style="push">
+               <parameter
+                     name="edu.ualberta.med.biobank.commands.patients.openPatientForm.editorId"
+                     value="edu.ualberta.med.biobank.forms.ScanAssignEntryForm">
+               </parameter>
+            </command>
+            <command
+                  commandId="edu.ualberta.med.biobank.commands.patients.openPatientForm"
+                  icon="icons/cabinetLinkAssign.png"
+                  label="Cabinet Link/Assign"
+                  style="push">
+               <parameter
+                     name="edu.ualberta.med.biobank.commands.patients.openPatientForm.editorId"
+                     value="edu.ualberta.med.biobank.forms.CabinetLinkAssignEntryForm">
+               </parameter>
+            </command>
+            <visibleWhen
+                  checkEnabled="false">
+               <reference
+                     definitionId="biobank2.patientsPerpectiveSelected">
+               </reference>
+            </visibleWhen>
+         </menu>
+         <menu
                id="edu.ualberta.med.biobank.menu.view"
                label="View">
             <command
@@ -1000,7 +1062,44 @@
       <key
             commandId="edu.ualberta.med.biobank.commands.quit"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="SHIFT+CTRL+Q">
+            sequence="CTRL+SHIFT+Q">
+      </key>
+      <key
+            commandId="edu.ualberta.med.biobank.commands.patients.patientAdd"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="ALT+P">
+      </key>
+      <key
+            commandId="edu.ualberta.med.biobank.commands.patients.patientVisitAdd"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="ALT+V">
+      </key>
+      <key
+            commandId="edu.ualberta.med.biobank.commands.patients.openPatientForm"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="ALT+SHIFT+L">
+         <parameter
+               id="edu.ualberta.med.biobank.commands.patients.openPatientForm.editorId"
+               value="edu.ualberta.med.biobank.forms.ScanLinkEntryForm">
+         </parameter>
+      </key>
+      <key
+            commandId="edu.ualberta.med.biobank.commands.patients.openPatientForm"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="ALT+SHIFT+A">
+         <parameter
+               id="edu.ualberta.med.biobank.commands.patients.openPatientForm.editorId"
+               value="edu.ualberta.med.biobank.forms.ScanAssignEntryForm">
+         </parameter>
+      </key>
+      <key
+            commandId="edu.ualberta.med.biobank.commands.patients.openPatientForm"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="ALT+SHIFT+C">
+         <parameter
+               id="edu.ualberta.med.biobank.commands.patients.openPatientForm.editorId"
+               value="edu.ualberta.med.biobank.forms.CabinetLinkAssignEntryForm">
+         </parameter>
       </key>
    </extension>
     <extension
