@@ -1028,56 +1028,56 @@
    <extension
          point="org.eclipse.ui.bindings">
       <key commandId="edu.ualberta.med.biobank.commands.mainAdmin"
-           schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-           sequence="SHIFT+CTRL+A">
+           schemeId="biobank2.scheme"
+           sequence="M1+M2+A">
       </key>
       <key commandId="edu.ualberta.med.biobank.commands.patientAdmin"
-           schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-           sequence="SHIFT+CTRL+P">
+           schemeId="biobank2.scheme"
+           sequence="M1+M2+P">
       </key>
       <key commandId="edu.ualberta.med.biobank.commands.reports"
-           schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-           sequence="SHIFT+CTRL+R">
+           schemeId="biobank2.scheme"
+           sequence="M1+M2+R">
       </key>
       <key commandId="edu.ualberta.med.biobank.commands.login"
-           schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-           sequence="CTRL+L">
+           schemeId="biobank2.scheme"
+           sequence="M1+L">
       </key>
       <key commandId="edu.ualberta.med.biobank.commands.logout"
-           schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-           sequence="CTRL+SHIFT+L">
+           schemeId="biobank2.scheme"
+           sequence="M1+M2+L">
       </key>
       <key commandId="edu.ualberta.med.biobank.commands.siteAdd"
-           schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-           sequence="ALT+R">
+           schemeId="biobank2.scheme"
+           sequence="M3+R">
       </key>
       <key commandId="edu.ualberta.med.biobank.commands.clinicAdd"
-           schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-           sequence="ALT+C">
+           schemeId="biobank2.scheme"
+           sequence="M3+C">
       </key>
       <key commandId="edu.ualberta.med.biobank.commands.studyAdd"
-           schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-           sequence="ALT+S">
+           schemeId="biobank2.scheme"
+           sequence="M3+S">
       </key>
       <key
             commandId="edu.ualberta.med.biobank.commands.quit"
-            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="CTRL+SHIFT+Q">
+            schemeId="biobank2.scheme"
+            sequence="M1+Q">
       </key>
       <key
             commandId="edu.ualberta.med.biobank.commands.patients.patientAdd"
-            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="ALT+P">
+            schemeId="biobank2.scheme"
+            sequence="M3+P">
       </key>
       <key
             commandId="edu.ualberta.med.biobank.commands.patients.patientVisitAdd"
-            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="ALT+V">
+            schemeId="biobank2.scheme"
+            sequence="M3+V">
       </key>
       <key
             commandId="edu.ualberta.med.biobank.commands.patients.openPatientForm"
-            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="ALT+SHIFT+L">
+            schemeId="biobank2.scheme"
+            sequence="M2+M3+L">
          <parameter
                id="edu.ualberta.med.biobank.commands.patients.openPatientForm.editorId"
                value="edu.ualberta.med.biobank.forms.ScanLinkEntryForm">
@@ -1085,8 +1085,8 @@
       </key>
       <key
             commandId="edu.ualberta.med.biobank.commands.patients.openPatientForm"
-            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="ALT+SHIFT+A">
+            schemeId="biobank2.scheme"
+            sequence="M2+M3+A">
          <parameter
                id="edu.ualberta.med.biobank.commands.patients.openPatientForm.editorId"
                value="edu.ualberta.med.biobank.forms.ScanAssignEntryForm">
@@ -1094,13 +1094,33 @@
       </key>
       <key
             commandId="edu.ualberta.med.biobank.commands.patients.openPatientForm"
-            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="ALT+SHIFT+C">
+            schemeId="biobank2.scheme"
+            sequence="M2+M3+C">
          <parameter
                id="edu.ualberta.med.biobank.commands.patients.openPatientForm.editorId"
                value="edu.ualberta.med.biobank.forms.CabinetLinkAssignEntryForm">
          </parameter>
       </key>
+      <key
+            commandId="org.eclipse.ui.file.close"
+            sequence="M1+W"
+            schemeId="biobank2.scheme" />
+      <key
+            commandId="org.eclipse.ui.file.close"
+            sequence="M1+F4"
+            schemeId="biobank2.scheme" />
+      <key
+            commandId="org.eclipse.ui.file.closeAll"
+            sequence="M1+M2+W"
+            schemeId="biobank2.scheme" />
+      <key
+            commandId="org.eclipse.ui.file.closeAll"
+            sequence="M1+M2+F4"
+            schemeId="biobank2.scheme" />
+      <scheme
+            id="biobank2.scheme"
+            name="Scheme Biobank">
+      </scheme>
    </extension>
     <extension
          point="org.eclipse.ui.preferencePages">
