@@ -99,6 +99,10 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
 
     protected ContainerWrapper palletFoundWithProductBarcode;
 
+    private boolean newPallet;
+
+    private String oldPalletPosition;
+
     @Override
     protected void init() {
         super.init();
@@ -527,8 +531,22 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
     @Override
     protected void saveForm() throws Exception {
         currentPalletWrapper.persist();
+        if (oldPalletPosition != null) {
+            appendLog("----");
+            appendLog("MOVED: Pallet "
+                + currentPalletWrapper.getProductBarcode() + " ("
+                + currentPalletWrapper.getContainerType().getName()
+                + ") MOVED from " + oldPalletPosition + " to "
+                + currentPalletWrapper.getLabel());
+        } else if (newPallet) {
+            appendLog("----");
+            appendLog("ADDED: Pallet "
+                + currentPalletWrapper.getProductBarcode() + " ("
+                + currentPalletWrapper.getContainerType().getName()
+                + ") ADDED to " + currentPalletWrapper.getLabel());
+        }
         int totalNb = 0;
-        StringBuffer sb = new StringBuffer("Aliquots assigned:");
+        StringBuffer sb = new StringBuffer("ALIQUOTS ASSIGNED:");
         try {
             for (int i = 0; i < cells.length; i++) {
                 for (int j = 0; j < cells[i].length; j++) {
@@ -654,6 +672,8 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
      */
     private boolean checkPallet() throws Exception {
         boolean pursue = true;
+        oldPalletPosition = null;
+        newPallet = true;
         boolean needToCheckPosition = true;
         appendLog("----");
         appendLog("Checking product barcode "
@@ -673,6 +693,7 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
                         .getWrappedObject());
                 currentPalletWrapper.reset();
                 needToCheckPosition = false;
+                newPallet = false;
             } else {
                 pursue = MessageDialog.openConfirm(PlatformUI.getWorkbench()
                     .getActiveWorkbenchWindow().getShell(),
@@ -684,6 +705,8 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
                 if (pursue) {
                     // need to use the container object retrieved from the
                     // database !
+                    oldPalletPosition = palletFoundWithProductBarcode
+                        .getLabel();
                     palletFoundWithProductBarcode.setLabel(currentPalletWrapper
                         .getLabel());
                     appendLog("Pallet "
