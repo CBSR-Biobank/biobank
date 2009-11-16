@@ -579,10 +579,13 @@ public class ContainerWrapper extends
     @Override
     protected void deleteChecks() throws BiobankCheckException,
         ApplicationException {
-        if (hasSamples() || hasChildren()) {
+        if (hasSamples()) {
             throw new BiobankCheckException("Unable to delete container "
-                + getLabel()
-                + ". All subcontainers/samples must be removed first.");
+                + getLabel() + ". All samples must be removed first.");
+        }
+        if (hasChildren()) {
+            throw new BiobankCheckException("Unable to delete container "
+                + getLabel() + ". All subcontainers must be removed first.");
         }
     }
 
