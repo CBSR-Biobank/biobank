@@ -411,8 +411,8 @@ public class ContainerWrapper extends
                         throw new BiobankCheckException("Container "
                             + getFullInfoLabel()
                             + " is already holding a sample at position "
-                            + sampleAtPosition.getPositionString(false) + " ("
-                            + row + ":" + col + ")");
+                            + sampleAtPosition.getPositionString(false, false)
+                            + " (" + row + ":" + col + ")");
                     }
                 }
             } catch (ApplicationException e) {

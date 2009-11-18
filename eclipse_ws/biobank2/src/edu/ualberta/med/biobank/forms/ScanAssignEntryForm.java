@@ -167,6 +167,9 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
                     if (palletFoundWithProductBarcode == null) {
                         palletTypesViewer.getCombo().setEnabled(true);
                     } else {
+                        palletPositionText
+                            .setText(palletFoundWithProductBarcode.getLabel());
+                        palletPositionText.selectAll();
                         palletTypesViewer.getCombo().setEnabled(false);
                         palletTypesViewer.setSelection(new StructuredSelection(
                             palletFoundWithProductBarcode.getContainerType()));
@@ -484,8 +487,7 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
                         currentPalletWrapper.getId())) {
                     // the scanned sample has already a position but a different
                     // one - ie MOVED
-                    String expectedPosition = foundSample
-                        .getPositionString(true);
+                    String expectedPosition = foundSample.getPositionString();
                     String info = "Aliquot registered on another pallet with position "
                         + expectedPosition;
                     String logMsg = "aliquot " + value

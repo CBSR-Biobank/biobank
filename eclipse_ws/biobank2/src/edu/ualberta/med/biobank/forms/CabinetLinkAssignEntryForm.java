@@ -429,6 +429,7 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
         viewerVisits.setInput(collection);
         viewerVisits.setSelection(new StructuredSelection(sampleWrapper
             .getPatientVisit()));
+        positionText.setText(sampleWrapper.getPositionString(true, false));
         viewerSampleTypes.setSelection(new StructuredSelection(sampleWrapper
             .getSampleType()));
         appendLog("Sample " + sampleWrapper.getInventoryId()

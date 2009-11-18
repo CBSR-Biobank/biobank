@@ -195,10 +195,11 @@ public class SampleWrapper extends
     }
 
     public String getPositionString() {
-        return getPositionString(true);
+        return getPositionString(true, true);
     }
 
-    public String getPositionString(boolean fullString) {
+    public String getPositionString(boolean fullString,
+        boolean addTopParentShortName) {
         RowColPos position = getPosition();
         if (position == null) {
             return "none";
@@ -213,7 +214,7 @@ public class SampleWrapper extends
             topContainer = topContainer.getParent();
         }
         String nameShort = topContainer.getContainerType().getNameShort();
-        if (nameShort != null)
+        if (addTopParentShortName && nameShort != null)
             return nameShort + "-" + directParent.getLabel()
                 + LabelingScheme.getPositionString(position, directParent);
         return directParent.getLabel()
@@ -257,7 +258,7 @@ public class SampleWrapper extends
     @Override
     public void loadAttributes() throws Exception {
         super.loadAttributes();
-        getPositionString(true);
+        getPositionString();
         wrappedObject.getSampleType().getName();
     }
 
