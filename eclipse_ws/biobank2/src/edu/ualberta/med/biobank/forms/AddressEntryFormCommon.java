@@ -10,6 +10,7 @@ import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
 
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.validators.NonEmptyString;
 import edu.ualberta.med.biobank.validators.PostalCode;
 
 @SuppressWarnings("serial")
@@ -24,8 +25,8 @@ public abstract class AddressEntryFormCommon extends BiobankEntryForm {
                 null, null, null));
             put("street2", new FieldInfo("Street 2", Text.class, SWT.NONE,
                 null, null, null));
-            put("city", new FieldInfo("City", Text.class, SWT.NONE, null, null,
-                null));
+            put("city", new FieldInfo("City", Text.class, SWT.NONE, null,
+                NonEmptyString.class, "Enter a city"));
             put("province", new FieldInfo("Province", Combo.class, SWT.NONE,
                 FormConstants.PROVINCES, null, null));
             put("postalCode", new FieldInfo("Postal Code", Text.class,
