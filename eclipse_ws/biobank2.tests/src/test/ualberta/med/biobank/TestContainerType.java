@@ -199,8 +199,14 @@ public class TestContainerType extends TestDatabase {
     }
 
     @Test
-    public void testGetParentContainers() {
-        fail("Not yet implemented");
+    public void testGetParentContainers() throws Exception {
+        ContainerTypeWrapper ct = addContainerTypeHierarchy(containerTypeMap
+            .get("TopCT"));
+        List<ContainerTypeWrapper> parents = ct.getParentContainerTypes();
+        Assert.assertEquals(0, parents.size());
+
+        parents = containerTypeMap.get("ChildCtL1").getParentContainerTypes();
+        Assert.assertEquals(1, parents.size());
     }
 
     @Test
