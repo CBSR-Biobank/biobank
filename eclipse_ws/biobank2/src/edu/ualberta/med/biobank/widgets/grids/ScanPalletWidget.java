@@ -15,7 +15,6 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.common.RowColPos;
-import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
 import edu.ualberta.med.biobank.model.PalletCell;
 import edu.ualberta.med.biobank.model.SampleCellStatus;
@@ -116,7 +115,7 @@ public class ScanPalletWidget extends AbstractGridWidget {
                 return title;
             }
         }
-        return "-";
+        return "";
     }
 
     @Override
@@ -129,18 +128,26 @@ public class ScanPalletWidget extends AbstractGridWidget {
         if (scannedElements != null
             && scannedElements[indexRow][indexCol] != null) {
             SampleWrapper sample = scannedElements[indexRow][indexCol]
-                .getExpectedSample();
+                .getSample();
             if (sample != null) {
-                PatientVisitWrapper pv = sample.getPatientVisit();
-                if (pv != null) {
-                    String number = pv.getPatient().getNumber();
-                    if (number != null) {
-                        return number;
-                    }
-                }
+                return sample.getSampleType().getNameShort();
             }
+            // else {
+            // SampleWrapper expectedSample =
+            // scannedElements[indexRow][indexCol]
+            // .getExpectedSample();
+            // if (expectedSample != null) {
+            // PatientVisitWrapper pv = expectedSample.getPatientVisit();
+            // if (pv != null) {
+            // String number = pv.getPatient().getNumber();
+            // if (number != null) {
+            // return number;
+            // }
+            // }
+            // }
+            // }
         }
-        return "-";
+        return "";
     }
 
     @Override

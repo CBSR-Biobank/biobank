@@ -78,7 +78,7 @@ public class TestSample extends TestDatabase {
     @Test
     public void TestSetSamplePositionFromString() throws Exception {
         sample.setSamplePositionFromString("A1", sample.getParent());
-        Assert.assertTrue(sample.getPositionString(false).equals("A1"));
+        Assert.assertTrue(sample.getPositionString(false, false).equals("A1"));
         RowColPos pos = sample.getPosition();
         Assert.assertTrue((pos.col == 0) && (pos.row == 0));
     }
