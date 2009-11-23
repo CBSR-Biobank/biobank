@@ -120,27 +120,6 @@ public class TestContainer extends TestDatabase {
         containerMap.put("Top", top);
     }
 
-    public List<SampleTypeWrapper> getRandomSampleTypeList(
-        List<SampleTypeWrapper> list) {
-        List<SampleTypeWrapper> result = new ArrayList<SampleTypeWrapper>();
-        for (SampleTypeWrapper st : list) {
-            if (r.nextBoolean()) {
-                result.add(st);
-            }
-        }
-        return result;
-    }
-
-    public ContainerTypeWrapper addSampleTypes(ContainerTypeWrapper ct,
-        List<SampleTypeWrapper> sampleTypes) throws Exception {
-        Assert.assertTrue("not enough sample types for test", (sampleTypes
-            .size() > 10));
-        ct.setSampleTypeCollection(sampleTypes);
-        ct.persist();
-        ct.reload();
-        return ct;
-    }
-
     private ContainerWrapper addContainerHierarchy(ContainerWrapper parent,
         String mapPrefix, int level) throws Exception {
         ContainerWrapper childL1, childL2, childL3, childL4;
@@ -637,10 +616,11 @@ public class TestContainer extends TestDatabase {
     public void testCanHoldSample() throws Exception {
         List<SampleTypeWrapper> allSampleTypes = SampleTypeWrapper
             .getGlobalSampleTypes(appService, true);
-        List<SampleTypeWrapper> selectedSampleTypes = getRandomSampleTypeList(allSampleTypes);
+        List<SampleTypeWrapper> selectedSampleTypes = TestCommon
+            .getRandomSampleTypeList(r, allSampleTypes);
 
-        ContainerTypeWrapper childTypeL3 = addSampleTypes(containerTypeMap
-            .get("ChildCtL3"), selectedSampleTypes);
+        ContainerTypeWrapper childTypeL3 = TestCommon.addSampleTypes(
+            containerTypeMap.get("ChildCtL3"), selectedSampleTypes);
         containerTypeMap.put("ChildCtL3", childTypeL3);
 
         addContainerHierarchy(containerMap.get("Top"));
@@ -664,9 +644,10 @@ public class TestContainer extends TestDatabase {
     public void testGetSamples() throws Exception {
         List<SampleTypeWrapper> allSampleTypes = SampleTypeWrapper
             .getGlobalSampleTypes(appService, true);
-        List<SampleTypeWrapper> selectedSampleTypes = getRandomSampleTypeList(allSampleTypes);
-        ContainerTypeWrapper childTypeL3 = addSampleTypes(containerTypeMap
-            .get("ChildCtL3"), selectedSampleTypes);
+        List<SampleTypeWrapper> selectedSampleTypes = TestCommon
+            .getRandomSampleTypeList(r, allSampleTypes);
+        ContainerTypeWrapper childTypeL3 = TestCommon.addSampleTypes(
+            containerTypeMap.get("ChildCtL3"), selectedSampleTypes);
         containerTypeMap.put("ChildCtL3", childTypeL3);
 
         StudyWrapper study = StudyHelper.addStudy(site, "Study1");
@@ -721,9 +702,10 @@ public class TestContainer extends TestDatabase {
     public void testGetContainersHoldingSampleType() throws Exception {
         List<SampleTypeWrapper> allSampleTypes = SampleTypeWrapper
             .getGlobalSampleTypes(appService, true);
-        List<SampleTypeWrapper> selectedSampleTypes = getRandomSampleTypeList(allSampleTypes);
-        ContainerTypeWrapper childTypeL3 = addSampleTypes(containerTypeMap
-            .get("ChildCtL3"), selectedSampleTypes);
+        List<SampleTypeWrapper> selectedSampleTypes = TestCommon
+            .getRandomSampleTypeList(r, allSampleTypes);
+        ContainerTypeWrapper childTypeL3 = TestCommon.addSampleTypes(
+            containerTypeMap.get("ChildCtL3"), selectedSampleTypes);
         containerTypeMap.put("ChildCtL3", childTypeL3);
 
         ContainerWrapper top = containerMap.get("Top");

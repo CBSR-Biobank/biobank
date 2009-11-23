@@ -6,6 +6,21 @@ import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 
 public class ContainerTypeHelper extends DbHelper {
 
+    /**
+     * Adds a new container type to the database.
+     * 
+     * @param site The site the container type belongs to.
+     * @param name The container type's name.
+     * @param nameShort The container type's short name.
+     * @param labelingScheme The container type's labeling scheme.
+     * @param rowCapacity The maximum number of rows for the container type.
+     * @param colCapacity The maximum number of columns for the container type.
+     * @param isTopLevel Whether this container type is for a container that is
+     *            not contained by other container types.
+     * @return
+     * @throws BiobankCheckException
+     * @throws Exception
+     */
     public static ContainerTypeWrapper newContainerType(SiteWrapper site,
         String name, String nameShort, Integer labelingScheme,
         Integer rowCapacity, Integer colCapacity, boolean isTopLevel) {
@@ -22,6 +37,21 @@ public class ContainerTypeHelper extends DbHelper {
         return ct;
     }
 
+    /**
+     * Adds a new container type to the database.
+     * 
+     * @param site The site the container type belongs to.
+     * @param name The container type's name.
+     * @param nameShort The container type's short name.
+     * @param labelingScheme The container type's labeling scheme.
+     * @param rowCapacity The maximum number of rows for the container type.
+     * @param colCapacity The maximum number of columns for the container type.
+     * @param isTopLevel Whether this container type is for a container that is
+     *            not contained by other container types.
+     * @return
+     * @throws BiobankCheckException
+     * @throws Exception
+     */
     public static ContainerTypeWrapper addContainerType(SiteWrapper site,
         String name, String nameShort, Integer labelingScheme,
         Integer rowCapacity, Integer colCapacity, boolean isTopLevel)
@@ -32,6 +62,15 @@ public class ContainerTypeHelper extends DbHelper {
         return container;
     }
 
+    /**
+     * 
+     * @param site The site the container type belongs to.
+     * @param name The container type's name.
+     * @param topContainer Whether this container type is for a container that
+     *            is not contained by other container types.
+     * @return
+     * @throws Exception
+     */
     public static ContainerTypeWrapper addContainerTypeRandom(SiteWrapper site,
         String name, boolean topContainer) throws Exception {
         return addContainerType(site, name, "", 1, r.nextInt(10) + 1, r
