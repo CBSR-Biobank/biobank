@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.common.wrappers;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -73,7 +74,7 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
     @Override
     protected void persistChecks() throws BiobankCheckException,
         ApplicationException, WrapperException {
-        if (!checkDateDrawnUnique()) {
+        if (getClinic() != null && !checkDateDrawnUnique()) {
             throw new BiobankCheckException("A shipment with date drawn "
                 + getDateDrawn() + " already exist in clinic "
                 + getClinic().getName() + ".");
@@ -155,7 +156,8 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
     }
 
     @SuppressWarnings("unchecked")
-    public List<ShptSampleSourceWrapper> getShptSampleSourceCollection() {
+    public List<ShptSampleSourceWrapper> getShptSampleSourceCollection(
+        boolean sort) {
         List<ShptSampleSourceWrapper> shptSampleSourceCollection = (List<ShptSampleSourceWrapper>) propertiesMap
             .get("shptSampleSourceCollection");
         if (shptSampleSourceCollection == null) {
@@ -171,7 +173,13 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
                     shptSampleSourceCollection);
             }
         }
+        if ((shptSampleSourceCollection != null) && sort)
+            Collections.sort(shptSampleSourceCollection);
         return shptSampleSourceCollection;
+    }
+
+    public List<ShptSampleSourceWrapper> getShptSampleSourceCollection() {
+        return getShptSampleSourceCollection(false);
     }
 
     public void setShptSampleSourceCollection(

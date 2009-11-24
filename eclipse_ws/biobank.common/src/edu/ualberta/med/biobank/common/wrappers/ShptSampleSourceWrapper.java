@@ -137,7 +137,7 @@ public class ShptSampleSourceWrapper extends ModelWrapper<ShptSampleSource> {
 
     @Override
     public int compareTo(ModelWrapper<ShptSampleSource> o) {
-        return 0;
+        return getSampleSource().compareTo(
+            ((ShptSampleSourceWrapper) o).getSampleSource());
     }
-
 }

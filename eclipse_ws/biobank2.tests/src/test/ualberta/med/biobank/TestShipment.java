@@ -2,13 +2,20 @@ package test.ualberta.med.biobank;
 
 import static org.junit.Assert.fail;
 
+import java.util.List;
+
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import test.ualberta.med.biobank.internal.ClinicHelper;
+import test.ualberta.med.biobank.internal.ShipmentHelper;
+import test.ualberta.med.biobank.internal.ShptSampleSourceHelper;
 import test.ualberta.med.biobank.internal.SiteHelper;
-import test.ualberta.med.biobank.internal.StudyHelper;
+import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ShptSampleSourceWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
-import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 
 public class TestShipment extends TestDatabase {
 
@@ -22,38 +29,92 @@ public class TestShipment extends TestDatabase {
     public void testGettersAndSetters() throws Exception {
         String name = "testGettersAndSetters" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
-        StudyWrapper study = StudyHelper.addStudy(site, name);
-        testGettersAndSetters(study);
+        ClinicWrapper clinic = ClinicHelper.addClinic(site, name);
+        ShipmentWrapper shipment = ShipmentHelper.addShipment(clinic);
+        testGettersAndSetters(shipment);
     }
 
     @Test
-    public void testGetClinic() {
-        fail("Not yet implemented");
+    public void testGetSetClinic() throws Exception {
+        String name = "testGetSetClinic" + r.nextInt();
+        SiteWrapper site = SiteHelper.addSite(name);
+        ClinicWrapper clinic = ClinicHelper.addClinic(site, name);
+        ShipmentWrapper shipment = ShipmentHelper.addShipment(clinic);
+
+        ClinicWrapper clinic2 = ClinicHelper.addClinic(site, name + "CLINIC2");
+
+        shipment.setClinic(clinic2);
+        shipment.persist();
+
+        shipment.reload();
+
+        Assert.assertFalse(clinic.equals(shipment.getClinic()));
+
+        Assert.assertEquals(clinic2, shipment.getClinic());
     }
 
     @Test
-    public void testSetClinicClinic() {
-        fail("Not yet implemented");
+    public void testGetShptSampleSourceCollection() throws Exception {
+        String name = "testGetShptSampleSourceCollection" + r.nextInt();
+        SiteWrapper site = SiteHelper.addSite(name);
+        ClinicWrapper clinic = ClinicHelper.addClinic(site, name);
+        ShipmentWrapper shipment = ShipmentHelper.addShipment(clinic);
+        int nber = r.nextInt(5) + 1;
+        ShptSampleSourceHelper.addShptSampleSources(name, shipment, nber);
+
+        shipment.reload();
+        List<ShptSampleSourceWrapper> sssList = shipment
+            .getShptSampleSourceCollection();
+        int sizeFound = sssList.size();
+
+        Assert.assertEquals(nber, sizeFound);
     }
 
     @Test
-    public void testSetClinicClinicWrapper() {
-        fail("Not yet implemented");
+    public void testGetShptSampleSourceCollectionBoolean() throws Exception {
+        String name = "testGetShptSampleSourceCollectionBoolean" + r.nextInt();
+        SiteWrapper site = SiteHelper.addSite(name);
+        ClinicWrapper clinic = ClinicHelper.addClinic(site, name);
+        ShipmentWrapper shipment = ShipmentHelper.addShipment(clinic);
+
+        ShptSampleSourceHelper.addShptSampleSource("c" + name, shipment);
+        ShptSampleSourceHelper.addShptSampleSource("a" + name, shipment);
+        ShptSampleSourceHelper.addShptSampleSource("d" + name, shipment);
+        shipment.reload();
+
+        List<ShptSampleSourceWrapper> sssList = shipment
+            .getShptSampleSourceCollection(true);
+        if (sssList.size() > 1) {
+            for (int i = 0; i < sssList.size() - 1; i++) {
+                ShptSampleSourceWrapper sss1 = sssList.get(i);
+                ShptSampleSourceWrapper sss2 = sssList.get(i + 1);
+                Assert.assertTrue(sss1.compareTo(sss2) <= 0);
+            }
+        }
     }
 
     @Test
-    public void testGetShptSampleSourceCollection() {
-        fail("Not yet implemented");
-    }
+    public void testAddInContactCollection() throws Exception {
+        String name = "testAddInContactCollection" + r.nextInt();
+        SiteWrapper site = SiteHelper.addSite(name);
+        ClinicWrapper clinic = ClinicHelper.addClinic(site, name);
+        ShipmentWrapper shipment = ShipmentHelper.addShipment(clinic);
+        int nber = r.nextInt(5) + 1;
+        ShptSampleSourceHelper.addShptSampleSources(name, shipment, nber);
 
-    @Test
-    public void testSetShptSampleSourceCollectionCollectionOfShptSampleSourceBoolean() {
-        fail("Not yet implemented");
-    }
+        shipment.reload();
+        List<ShptSampleSourceWrapper> sssList = shipment
+            .getShptSampleSourceCollection();
+        ShptSampleSourceWrapper sss = ShptSampleSourceHelper
+            .newShptSampleSource(name + "NEW", shipment);
+        sssList.add(sss);
+        shipment.setShptSampleSourceCollection(sssList);
+        shipment.persist();
 
-    @Test
-    public void testSetShptSampleSourceCollectionCollectionOfShptSampleSourceWrapper() {
-        fail("Not yet implemented");
+        shipment.reload();
+        // one contact added
+        Assert.assertEquals(nber + 1, shipment.getShptSampleSourceCollection()
+            .size());
     }
 
     @Test
@@ -111,16 +172,6 @@ public class TestShipment extends TestDatabase {
 
     @Test
     public void testSetPatientVisitCollectionCollectionOfPatientVisitWrapper() {
-        fail("Not yet implemented");
-    }
-
-    @Test
-    public void testGetComment() {
-        fail("Not yet implemented");
-    }
-
-    @Test
-    public void testSetComment() {
         fail("Not yet implemented");
     }
 

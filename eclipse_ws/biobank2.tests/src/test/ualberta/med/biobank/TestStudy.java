@@ -354,12 +354,12 @@ public class TestStudy extends TestDatabase {
         PatientWrapper patient1 = PatientHelper.addPatient(name + "PATIENT1",
             study1);
         // clinic 1 = 1 patient pour study 1
-        // PatientVisitHelper.addPatientVisits(patient1, clinic1);
-        // PatientVisitHelper.addPatientVisits(patient1, clinic2);
+        PatientVisitHelper.addPatientVisits(patient1, clinic1);
+        PatientVisitHelper.addPatientVisits(patient1, clinic2);
         PatientWrapper patient2 = PatientHelper.addPatient(name + "PATIENT2",
             study1);
         // clinic 2 = 2 patients pour study 1
-        // PatientVisitHelper.addPatientVisits(patient2, clinic2);
+        PatientVisitHelper.addPatientVisits(patient2, clinic2);
 
         StudyWrapper study2 = StudyHelper.addStudy(site, name + "STUDY2");
         study2.setContactCollection(contacts);
@@ -367,9 +367,9 @@ public class TestStudy extends TestDatabase {
         PatientWrapper patient3 = PatientHelper.addPatient(name + "PATIENT3",
             study2);
         // clinic 1 = 1 patient pour study2
-//        PatientVisitHelper.addPatientVisits(patient3, clinic1);
+        PatientVisitHelper.addPatientVisits(patient3, clinic1);
         // clinic 2= 1 patient pour study2
-//        PatientVisitHelper.addPatientVisits(patient3, clinic2);
+        PatientVisitHelper.addPatientVisits(patient3, clinic2);
 
         study1.reload();
         Assert.assertEquals(1, study1.getPatientCountForClinic(clinic1));

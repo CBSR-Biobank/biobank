@@ -59,7 +59,7 @@ public class TestSampleType extends TestDatabase {
             ContainerTypeWrapper containerType = containerTypes.get(i);
             containerType.setSampleTypeCollection(sampleTypes);
             containerType.persist();
-    }
+        }
 
         type.reload();
         Assert.assertEquals(nber, type.getContainerTypeCollection().size());
@@ -82,7 +82,7 @@ public class TestSampleType extends TestDatabase {
             ContainerTypeWrapper containerType = containerTypes.get(i);
             containerType.setSampleTypeCollection(sampleTypes);
             containerType.persist();
-    }
+        }
 
         type.reload();
         List<ContainerTypeWrapper> containerTypesSorted = type
@@ -117,6 +117,9 @@ public class TestSampleType extends TestDatabase {
         SampleTypeWrapper sampleType3 = SampleTypeHelper.addSampleType(site,
             "ST3");
         sampleTypes1.add(sampleType3);
+        SampleTypeWrapper sampleType4 = SampleTypeHelper.addSampleType(site,
+            "ST4");
+        sampleTypes2.add(sampleType4);
         containerType1.setSampleTypeCollection(sampleTypes1);
         int type1Size = sampleTypes1.size();
         containerType1.persist();
@@ -125,16 +128,18 @@ public class TestSampleType extends TestDatabase {
         containerType2.persist();
 
         List<SampleTypeWrapper> sampleTypesFound = SampleTypeWrapper
-            .getSampleTypeForContainerTypes(appService, site, "TYPE1");
+            .getSampleTypeForContainerTypes(appService, site, "YPE1");
         Assert.assertEquals(type1Size, sampleTypesFound.size());
 
         sampleTypesFound = SampleTypeWrapper.getSampleTypeForContainerTypes(
-            appService, site, "TYPE2");
+            appService, site, "YPE2");
         Assert.assertEquals(type2Size, sampleTypesFound.size());
 
         sampleTypesFound = SampleTypeWrapper.getSampleTypeForContainerTypes(
             appService, site, "YPE");
-        Assert.assertEquals(type1Size + type2Size, sampleTypesFound.size());
+        // We've got a sample type in 2 different container. The method return a
+        // set, so we have only one occurrence of this sample type
+        Assert.assertEquals(type1Size + type2Size - 1, sampleTypesFound.size());
     }
 
     @Test

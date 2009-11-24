@@ -13,10 +13,11 @@ import test.ualberta.med.biobank.internal.DbHelper;
 
 @RunWith(Suite.class)
 @SuiteClasses( { TestSite.class, TestPatient.class, TestPatientVisit.class,
-    TestStudy.class, TestContact.class, TestContainerLabelingScheme.class,
+    TestStudy.class, TestContainerLabelingScheme.class,
     TestShptSampleSource.class, TestSample.class, TestClinic.class,
     TestSampleStorage.class, TestSampleSource.class, TestSampleType.class,
-    TestContainer.class, TestContainerType.class, TestShipment.class })
+    TestContainer.class, TestContainerType.class, TestShipment.class,
+    TestContact.class })
 public class AllTests {
     public static WritableApplicationService appService = null;
 

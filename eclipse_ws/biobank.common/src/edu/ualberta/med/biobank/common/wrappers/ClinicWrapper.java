@@ -326,10 +326,9 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
     @Override
     protected void deleteChecks() throws BiobankCheckException,
         ApplicationException {
-        if (hasPatientVisits()) {
+        if (hasShipments()) {
             throw new BiobankCheckException("Unable to delete clinic "
-                + getName()
-                + ". All defined patient visits must be removed first.");
+                + getName() + ". All defined shipments must be removed first.");
         }
         List<StudyWrapper> studies = getStudyCollection();
         if (studies != null && studies.size() > 0) {
@@ -338,12 +337,12 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
         }
     }
 
-    public boolean hasPatientVisits() throws ApplicationException,
+    public boolean hasShipments() throws ApplicationException,
         BiobankCheckException {
         HQLCriteria criteria = new HQLCriteria(
-            "select count(visit) from "
+            "select count(shipment) from "
                 + Clinic.class.getName()
-                + " as clinic inner join clinic.patientVisitCollection as visit where clinic.id = ?",
+                + " as clinic inner join clinic.shipmentCollection as shipment where clinic.id = ?",
             Arrays.asList(new Object[] { getId() }));
         List<Long> result = appService.query(criteria);
         if (result.size() != 1) {

@@ -5,21 +5,16 @@ import org.junit.Before;
 import org.junit.Test;
 
 import test.ualberta.med.biobank.internal.ClinicHelper;
-import test.ualberta.med.biobank.internal.PatientHelper;
-import test.ualberta.med.biobank.internal.PatientVisitHelper;
+import test.ualberta.med.biobank.internal.SampleSourceHelper;
 import test.ualberta.med.biobank.internal.ShipmentHelper;
 import test.ualberta.med.biobank.internal.ShptSampleSourceHelper;
 import test.ualberta.med.biobank.internal.SiteHelper;
-import test.ualberta.med.biobank.internal.StudyHelper;
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
-import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
-import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleSourceWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShptSampleSourceWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
-import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.SampleSource;
 
 public class TestShptSampleSource extends TestDatabase {
@@ -32,61 +27,29 @@ public class TestShptSampleSource extends TestDatabase {
         super.setUp();
 
         SiteWrapper site = SiteHelper.addSite("SiteName");
-        StudyWrapper study = StudyHelper.addStudy(site, "studyname");
         ClinicWrapper clinic = ClinicHelper.addClinic(site, "clinicname");
         ShipmentWrapper shipment = ShipmentHelper.addShipment(clinic);
-        PatientWrapper patient = PatientHelper.addPatient("041234", study);
-        PatientVisitWrapper pvw = PatientVisitHelper.addPatientVisit(patient,
-            shipment, Utils.getRandomDate(), Utils.getRandomDate(), Utils
-                .getRandomDate());
-        w = ShptSampleSourceHelper.addPvSampleSource(Utils.getRandomString(10),
-            pvw);
-        SampleSourceWrapper ssw = new SampleSourceWrapper(appService,
-            new SampleSource());
-        ssw.persist();
+        w = ShptSampleSourceHelper.addShptSampleSource(Utils
+            .getRandomString(10), shipment);
+        SampleSourceWrapper ssw = SampleSourceHelper.addSampleSource("setUp");
         w.setSampleSource(ssw.getWrappedObject());
     }
 
-    // @Test
-    // public void TestGetSetPatientVisit() throws BiobankCheckException,
-    // Exception {
-    // PatientVisitWrapper oldWrapper = w.getPatientVisit();
-    // PatientVisitWrapper newVisit = PatientVisitHelper.addPatientVisit(
-    // oldWrapper.getPatient(), oldWrapper.getClinic(), Utils
-    // .getRandomDate(), Utils.getRandomDate(), Utils.getRandomDate());
-    //
-    // w.setPatientVisit(newVisit);
-    // w.persist();
-    // PatientVisit pv = ModelUtils.getObjectWithId(appService,
-    // PatientVisit.class, newVisit.getId());
-    // // Db contains correct new pv
-    // Assert.assertTrue(pv != null);
-    // Assert.assertTrue(!oldWrapper.getId().equals(
-    // w.getPatientVisit().getId()));
-    //
-    // w.setPatientVisit(oldWrapper);
-    // w.persist();
-    // Collection<PvSampleSource> pvsss = pv.getPvSampleSourceCollection();
-    // boolean found = false;
-    // for (PvSampleSource pvss : pvsss) {
-    // if (w.getId().equals(pvss.getId()))
-    // found = true;
-    // }
-    // // removed from the sample source list for the pv too
-    // Assert.assertFalse(found);
-    // }
+    @Test
+    public void checkModification() {
+        Assert.fail("Check nothing missing after model modification");
+    }
 
     @Test
-    public void TestGetSetSampleSource() throws Exception {
+    public void testGetSetSampleSource() throws Exception {
         SampleSourceWrapper oldSource = w.getSampleSource();
-        // FIXME
-        SampleSourceWrapper newSampleSource = null;
-        // ShptSampleSourceHelper
-        // .addPvSampleSource(Utils.getRandomString(10), w.getPatientVisit())
-        // .getSampleSource();
+        String name = "testGetSetSampleSource";
+        SampleSourceWrapper newSampleSource = SampleSourceHelper
+            .addSampleSource(name);
 
-        w.setSampleSource(newSampleSource.getWrappedObject());
+        w.setSampleSource(newSampleSource);
         w.persist();
+
         SampleSource ss = ModelUtils.getObjectWithId(appService,
             SampleSource.class, newSampleSource.getId());
         Assert.assertTrue(ss != null);
@@ -97,7 +60,7 @@ public class TestShptSampleSource extends TestDatabase {
     }
 
     @Test
-    public void TestBasicGettersAndSetters() throws BiobankCheckException,
+    public void testBasicGettersAndSetters() throws BiobankCheckException,
         Exception {
         testGettersAndSetters(w);
     }

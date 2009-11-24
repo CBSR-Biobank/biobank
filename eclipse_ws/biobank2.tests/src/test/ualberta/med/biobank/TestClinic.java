@@ -40,6 +40,8 @@ public class TestClinic extends TestDatabase {
         clinic.setSite(site2);
         clinic.persist();
 
+        clinic.reload();
+
         Assert.assertFalse(site.equals(clinic.getSite()));
 
         Assert.assertEquals(site2, clinic.getSite());

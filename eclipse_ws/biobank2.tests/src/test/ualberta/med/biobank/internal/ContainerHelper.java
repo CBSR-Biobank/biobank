@@ -1,5 +1,7 @@
 package test.ualberta.med.biobank.internal;
 
+import java.util.Arrays;
+
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
@@ -152,6 +154,8 @@ public class ContainerHelper extends DbHelper {
             ContainerTypeWrapper type = ContainerTypeHelper
                 .addContainerTypeRandom(site, barcode + "children" + (i + 1),
                     false);
+            topContainer.getContainerType().setChildContainerTypeCollection(
+                Arrays.asList(new ContainerTypeWrapper[] { type }));
             int maxRow = topContainer.getRowCapacity();
             for (int j = 0; j < 5; j++) {
                 ContainerWrapper child = newContainer(null, barcode + "child"

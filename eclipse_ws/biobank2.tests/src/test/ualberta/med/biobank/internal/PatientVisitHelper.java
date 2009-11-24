@@ -60,6 +60,8 @@ public class PatientVisitHelper extends DbHelper {
      */
     public static int addPatientVisits(PatientWrapper patient,
         ClinicWrapper clinic) throws ParseException, Exception {
+        // FIXME should use shipment now
+
         // int count = r.nextInt(15) + 1;
         // for (int i = 0; i < count; i++) {
         // addPatientVisit(patient, shipment, Utils.getRandomDate(), null,
@@ -68,5 +70,4 @@ public class PatientVisitHelper extends DbHelper {
         // return count;
         return 0;
     }
-
 }
