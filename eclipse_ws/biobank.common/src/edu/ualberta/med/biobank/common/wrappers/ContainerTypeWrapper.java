@@ -106,9 +106,12 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
     public Collection<ContainerTypeWrapper> getAllChildren()
         throws ApplicationException {
         List<ContainerTypeWrapper> allChildren = new ArrayList<ContainerTypeWrapper>();
-        for (ContainerTypeWrapper type : getChildContainerTypeCollection()) {
-            allChildren.addAll(type.getAllChildren());
-            allChildren.add(type);
+        List<ContainerTypeWrapper> children = getChildContainerTypeCollection();
+        if (children != null) {
+            for (ContainerTypeWrapper type : children) {
+                allChildren.addAll(type.getAllChildren());
+                allChildren.add(type);
+            }
         }
         return allChildren;
     }
@@ -576,7 +579,7 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
     /**
      * Get containers types defined in a site. if useStrictName is true, then
      * the container type name should be exactly containerName, otherwise, it
-     * will contains containerName.
+     * should contain containerName as a substring in the name.
      */
     public static List<ContainerTypeWrapper> getContainerTypesInSite(
         WritableApplicationService appService, SiteWrapper siteWrapper,
@@ -637,18 +640,5 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
     @Override
     public String toString() {
         return getName() + " (" + getNameShort() + ")";
-    }
-
-    public long getContainersCount() throws ApplicationException,
-        BiobankCheckException {
-        HQLCriteria c = new HQLCriteria("select count(*) from "
-            + Container.class.getName() + " where containerType.id=?",
-
-        Arrays.asList(new Object[] { getId() }));
-        List<Long> result = appService.query(c);
-        if (result.size() != 1) {
-            throw new BiobankCheckException("Invalid size for HQL query result");
-        }
-        return result.get(0);
     }
 }

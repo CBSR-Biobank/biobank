@@ -25,7 +25,9 @@ public class ContainerTypeHelper extends DbHelper {
         String name, String nameShort, Integer labelingScheme,
         Integer rowCapacity, Integer colCapacity, boolean isTopLevel) {
         ContainerTypeWrapper ct = new ContainerTypeWrapper(appService);
-        ct.setSite(site);
+        if (site != null) {
+            ct.setSite(site);
+        }
         ct.setName(name);
         ct.setNameShort(nameShort);
         ct.setChildLabelingScheme(labelingScheme);

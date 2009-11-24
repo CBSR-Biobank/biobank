@@ -1,7 +1,5 @@
 package test.ualberta.med.biobank;
 
-import static org.junit.Assert.fail;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -40,6 +38,9 @@ public class TestContainerType extends TestDatabase {
     // TODO test to check if change top level setting is allowed after a
     // container added to container type
 
+    // cannot use getter and setter test on ContainerTypeWrapper due to
+    // restrictions on labeling scheme
+
     @Override
     @Before
     public void setUp() throws Exception {
@@ -50,17 +51,18 @@ public class TestContainerType extends TestDatabase {
         addTopContainerType(site);
     }
 
-    private void addTopContainerType(SiteWrapper site) throws Exception {
-        ContainerTypeWrapper topType;
-        topType = ContainerTypeHelper.addContainerType(site,
-            "Top Container Type", "TCT", 2, CONTAINER_TOP_ROWS,
+    private ContainerTypeWrapper addTopContainerType(SiteWrapper site)
+        throws Exception {
+        ContainerTypeWrapper topType = ContainerTypeHelper.addContainerType(
+            site, "Top Container Type", "TCT", 2, CONTAINER_TOP_ROWS,
             CONTAINER_TOP_COLS, true);
         containerTypeMap.put("TopCT", topType);
+        return topType;
     }
 
     private ContainerTypeWrapper addContainerTypeHierarchy(
         ContainerTypeWrapper topType, int level) throws Exception {
-        ContainerTypeWrapper childType;
+        ContainerTypeWrapper childType, prevChildType;
 
         if (level >= 3) {
             childType = ContainerTypeHelper.addContainerType(site,
@@ -72,8 +74,11 @@ public class TestContainerType extends TestDatabase {
         if (level >= 2) {
             childType = ContainerTypeHelper.newContainerType(site,
                 "Child L2 Container Type", "CCTL2", 3, 1, 10, false);
-            childType.setChildContainerTypeCollection(Arrays
-                .asList(containerTypeMap.get("ChildCtL3")));
+            prevChildType = containerTypeMap.get("ChildCtL3");
+            if (prevChildType != null) {
+                childType.setChildContainerTypeCollection(Arrays
+                    .asList(containerTypeMap.get("ChildCtL3")));
+            }
             childType.persist();
             containerTypeMap.put("ChildCtL2", childType);
         }
@@ -81,8 +86,11 @@ public class TestContainerType extends TestDatabase {
         if (level >= 1) {
             childType = ContainerTypeHelper.newContainerType(site,
                 "Child L1 Container Type", "CCTL1", 3, 1, 10, false);
-            childType.setChildContainerTypeCollection(Arrays
-                .asList(containerTypeMap.get("ChildCtL2")));
+            prevChildType = containerTypeMap.get("ChildCtL2");
+            if (prevChildType != null) {
+                childType.setChildContainerTypeCollection(Arrays
+                    .asList(prevChildType));
+            }
             childType.persist();
             containerTypeMap.put("ChildCtL1", childType);
 
@@ -97,11 +105,6 @@ public class TestContainerType extends TestDatabase {
     private ContainerTypeWrapper addContainerTypeHierarchy(
         ContainerTypeWrapper topType) throws Exception {
         return addContainerTypeHierarchy(topType, 3);
-    }
-
-    @Test
-    public void testGettersAndSetters() throws Exception {
-        testGettersAndSetters(containerTypeMap.get("TopCT"));
     }
 
     @Test
@@ -138,6 +141,24 @@ public class TestContainerType extends TestDatabase {
     }
 
     @Test
+    public void testSite() throws Exception {
+        ContainerTypeWrapper topType2;
+
+        // use same name as containerTypeMap.get("TopCT")
+        topType2 = ContainerTypeHelper.newContainerType(null,
+            "Top Container Type 2", "TCT 2", 3, CONTAINER_TOP_ROWS + 1,
+            CONTAINER_TOP_COLS - 1, true);
+
+        try {
+            topType2.persist();
+            Assert
+                .fail("should not be allowed to add container type because of duplicate name");
+        } catch (BiobankCheckException e) {
+            Assert.assertTrue(true);
+        }
+    }
+
+    @Test
     public void testNameUnique() throws Exception {
         ContainerTypeWrapper topType2;
 
@@ -150,6 +171,108 @@ public class TestContainerType extends TestDatabase {
             topType2.persist();
             Assert
                 .fail("should not be allowed to add container type because of duplicate name");
+        } catch (BiobankCheckException e) {
+            Assert.assertTrue(true);
+        }
+    }
+
+    @Test
+    public void testCapacity() throws Exception {
+        ContainerTypeWrapper topType2;
+
+        topType2 = ContainerTypeHelper.newContainerType(site,
+            "Top Container Type 2", "TCT2", 3, null, 1, true);
+
+        try {
+            topType2.persist();
+            Assert
+                .fail("should not be allowed to add container with null rows");
+        } catch (BiobankCheckException e) {
+            Assert.assertTrue(true);
+        }
+
+        topType2 = ContainerTypeHelper.newContainerType(site,
+            "Top Container Type 2", "TCT2", 3, 1, null, true);
+
+        try {
+            topType2.persist();
+            Assert
+                .fail("should not be allowed to add container with null columns");
+        } catch (BiobankCheckException e) {
+            Assert.assertTrue(true);
+        }
+    }
+
+    @Test
+    public void testChangeLabelingScheme() throws Exception {
+        ContainerTypeWrapper topType;
+
+        topType = addContainerTypeHierarchy(containerTypeMap.get("TopCT"));
+        ContainerHelper.addContainer(null, TestCommon.getNewBarcode(r), null,
+            site, topType);
+        topType.setChildLabelingScheme(3);
+
+        try {
+            topType.persist();
+            Assert.fail("should not be allowed to change labeling scheme");
+        } catch (BiobankCheckException e) {
+            Assert.assertTrue(true);
+        }
+    }
+
+    @Test
+    public void testChangeTopLevel() throws Exception {
+        ContainerTypeWrapper topType;
+
+        topType = addContainerTypeHierarchy(containerTypeMap.get("TopCT"));
+        ContainerHelper.addContainer(null, TestCommon.getNewBarcode(r), null,
+            site, topType);
+        topType.setTopLevel(false);
+
+        try {
+            topType.persist();
+            Assert.fail("should not be allowed to change top level setting");
+        } catch (BiobankCheckException e) {
+            Assert.assertTrue(true);
+        }
+    }
+
+    @Test
+    public void testChangeCapacity() throws Exception {
+        ContainerTypeWrapper topType;
+
+        topType = addContainerTypeHierarchy(containerTypeMap.get("TopCT"));
+        ContainerHelper.addContainer(null, TestCommon.getNewBarcode(r), null,
+            site, topType);
+        topType.setRowCapacity(1);
+
+        try {
+            topType.persist();
+            Assert.fail("should not be allowed to change capacity");
+        } catch (BiobankCheckException e) {
+            Assert.assertTrue(true);
+        }
+
+        topType.setColCapacity(1);
+
+        try {
+            topType.persist();
+            Assert.fail("should not be allowed to change capacity");
+        } catch (BiobankCheckException e) {
+            Assert.assertTrue(true);
+        }
+    }
+
+    @Test
+    public void testDelete() throws Exception {
+        ContainerTypeWrapper topType;
+
+        topType = addContainerTypeHierarchy(containerTypeMap.get("TopCT"));
+        ContainerHelper.addContainer(null, TestCommon.getNewBarcode(r), null,
+            site, topType);
+
+        try {
+            topType.delete();
         } catch (BiobankCheckException e) {
             Assert.assertTrue(true);
         }
@@ -200,11 +323,11 @@ public class TestContainerType extends TestDatabase {
             Assert.assertFalse(ct.isUsedByContainers());
 
             if (key.equals("TopCT")) {
-                containers.add(ContainerHelper.addContainer("01", TestContainer
-                    .getNewBarcode(), null, site, ct));
+                containers.add(ContainerHelper.addContainer("01", TestCommon
+                    .getNewBarcode(r), null, site, ct));
             } else {
-                containers.add(ContainerHelper.addContainer(null, TestContainer
-                    .getNewBarcode(), containers.get(containers.size() - 1),
+                containers.add(ContainerHelper.addContainer(null, TestCommon
+                    .getNewBarcode(r), containers.get(containers.size() - 1),
                     site, ct, 0, 0));
             }
 
@@ -377,11 +500,11 @@ public class TestContainerType extends TestDatabase {
         Assert.assertTrue(list.contains(childTypeL3));
 
         // add a second child to childTypeL1
-        childTypeL2_2 = ContainerTypeHelper.newContainerType(site,
+        childTypeL2_2 = ContainerTypeHelper.addContainerType(site,
             "Child L2 Container Type 2", "CCTL2_2", 1, 4, 4, false);
         childTypeL1.setChildContainerTypeCollection(Arrays.asList(childTypeL2,
             childTypeL2_2));
-        childTypeL2_2.persist();
+        childTypeL1.persist();
 
         list = childTypeL1.getChildContainerTypeCollection();
         Assert.assertEquals(2, list.size());
@@ -389,11 +512,11 @@ public class TestContainerType extends TestDatabase {
         Assert.assertTrue(list.contains(childTypeL2_2));
 
         // add a third child to childTypeL1
-        childTypeL2_3 = ContainerTypeHelper.newContainerType(site,
+        childTypeL2_3 = ContainerTypeHelper.addContainerType(site,
             "Child L2 Container Type 3", "CCTL2_2", 1, 5, 7, false);
         childTypeL1.setChildContainerTypeCollection(Arrays.asList(childTypeL2,
             childTypeL2_2, childTypeL2_3));
-        childTypeL2_3.persist();
+        childTypeL1.persist();
 
         list = childTypeL1.getChildContainerTypeCollection();
         Assert.assertEquals(3, list.size());
@@ -501,21 +624,76 @@ public class TestContainerType extends TestDatabase {
 
     @Test
     public void testGetTopContainerTypesInSite() throws Exception {
-        addTopContainerType(site);
+        ContainerTypeWrapper topType, topType2, childType;
+
+        topType = containerTypeMap.get("TopCT");
+
+        topType2 = ContainerTypeHelper.addContainerType(site,
+            "Top Container Type 2", "TCT 2", 2, CONTAINER_TOP_ROWS - 1,
+            CONTAINER_TOP_COLS + 1, true);
+
+        childType = ContainerTypeHelper.addContainerType(site,
+            "Child L1 Container Type", "CCTL1", 3, 1, 10, false);
+
+        topType.setChildContainerTypeCollection(Arrays.asList(childType));
+        topType.persist();
+        topType.reload();
+
+        List<ContainerTypeWrapper> list = ContainerTypeWrapper
+            .getTopContainerTypesInSite(appService, site);
+        Assert.assertEquals(2, list.size());
+        Assert.assertTrue(list.contains(topType));
+        Assert.assertTrue(list.contains(topType2));
+        Assert.assertFalse(list.contains(childType));
     }
 
     @Test
-    public void testGetContainerTypesInSite() {
-        fail("Not yet implemented");
+    public void testGetContainerTypesInSite() throws Exception {
+        ContainerTypeWrapper topType, childTypeL1, childTypeL2, childTypeL3, childTypeL2_2;
+
+        topType = addContainerTypeHierarchy(containerTypeMap.get("TopCT"));
+        childTypeL1 = containerTypeMap.get("ChildCtL1");
+        childTypeL2 = containerTypeMap.get("ChildCtL2");
+        childTypeL3 = containerTypeMap.get("ChildCtL3");
+
+        // add a second child to childTypeL1
+        childTypeL2_2 = ContainerTypeHelper.addContainerType(site,
+            "Child L2 Container Type 2", "CCTL2_2", 1, 4, 4, false);
+        childTypeL1.setChildContainerTypeCollection(Arrays.asList(childTypeL2,
+            childTypeL2_2));
+        childTypeL1.persist();
+
+        List<ContainerTypeWrapper> list = ContainerTypeWrapper
+            .getContainerTypesInSite(appService, site, "Container", false);
+        Assert.assertEquals(5, list.size());
+        Assert.assertTrue(list.contains(topType));
+        Assert.assertTrue(list.contains(childTypeL1));
+        Assert.assertTrue(list.contains(childTypeL2));
+        Assert.assertTrue(list.contains(childTypeL2_2));
+        Assert.assertTrue(list.contains(childTypeL3));
+
+        list = ContainerTypeWrapper.getContainerTypesInSite(appService, site,
+            "Top Container Type", true);
+        Assert.assertEquals(1, list.size());
+        Assert.assertTrue(list.contains(topType));
+
+        childTypeL3.delete();
+
+        list = ContainerTypeWrapper.getContainerTypesInSite(appService, site,
+            "Container", false);
+        Assert.assertEquals(4, list.size());
+        Assert.assertTrue(list.contains(topType));
+        Assert.assertTrue(list.contains(childTypeL1));
+        Assert.assertTrue(list.contains(childTypeL2));
+        Assert.assertTrue(list.contains(childTypeL2_2));
     }
 
     @Test
     public void testGetAllLabelingSchemes() {
-        fail("Not yet implemented");
-    }
+        Map<Integer, String> map = ContainerTypeWrapper
+            .getAllLabelingSchemes(appService);
 
-    @Test
-    public void testGetContainersCount() {
-        fail("Not yet implemented");
+        // currently only 3 labeling schemes
+        Assert.assertEquals(3, map.size());
     }
 }
