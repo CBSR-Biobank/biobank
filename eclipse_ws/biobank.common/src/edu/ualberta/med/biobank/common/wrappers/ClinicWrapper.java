@@ -12,7 +12,7 @@ import edu.ualberta.med.biobank.common.wrappers.internal.AddressWrapper;
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Contact;
-import edu.ualberta.med.biobank.model.PatientVisit;
+import edu.ualberta.med.biobank.model.Shipment;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -33,7 +33,7 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
     @Override
     protected String[] getPropertyChangesNames() {
         return new String[] { "name", "activityStatus", "comment", "address",
-            "site", "contactCollection", "patientVisitCollection", "street1",
+            "site", "contactCollection", "shipmentCollection", "street1",
             "street2", "city", "province", "postalCode" };
     }
 
@@ -353,45 +353,43 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
     }
 
     @SuppressWarnings("unchecked")
-    public List<PatientVisitWrapper> getPatientVisitCollection() {
-        List<PatientVisitWrapper> patientVisitCollection = (List<PatientVisitWrapper>) propertiesMap
-            .get("patientVisitCollection");
-        if (patientVisitCollection == null) {
-            Collection<PatientVisit> children = wrappedObject
-                .getPatientVisitCollection();
+    public List<ShipmentWrapper> getShipmentCollection() {
+        List<ShipmentWrapper> shipmentCollection = (List<ShipmentWrapper>) propertiesMap
+            .get("shipmentCollection");
+        if (shipmentCollection == null) {
+            Collection<Shipment> children = wrappedObject
+                .getShipmentCollection();
             if (children != null) {
-                patientVisitCollection = new ArrayList<PatientVisitWrapper>();
-                for (PatientVisit pv : children) {
-                    patientVisitCollection.add(new PatientVisitWrapper(
-                        appService, pv));
+                shipmentCollection = new ArrayList<ShipmentWrapper>();
+                for (Shipment s : children) {
+                    shipmentCollection.add(new ShipmentWrapper(appService, s));
                 }
-                propertiesMap.put("patientVisitCollection",
-                    patientVisitCollection);
+                propertiesMap.put("shipmentCollection", shipmentCollection);
             }
         }
-        return patientVisitCollection;
+        return shipmentCollection;
     }
 
-    public void setPatientVisitCollection(
-        Collection<PatientVisit> patientVisitCollection, boolean setNull) {
-        Collection<PatientVisit> oldCollection = wrappedObject
-            .getPatientVisitCollection();
-        wrappedObject.setPatientVisitCollection(patientVisitCollection);
-        propertyChangeSupport.firePropertyChange("patientVisitCollection",
-            oldCollection, patientVisitCollection);
+    public void setShipmentCollection(Collection<Shipment> shipmentCollection,
+        boolean setNull) {
+        Collection<Shipment> oldCollection = wrappedObject
+            .getShipmentCollection();
+        wrappedObject.setShipmentCollection(shipmentCollection);
+        propertyChangeSupport.firePropertyChange("shipmentCollection",
+            oldCollection, shipmentCollection);
         if (setNull) {
-            propertiesMap.put("patientVisitCollection", null);
+            propertiesMap.put("shipmentCollection", null);
         }
     }
 
-    public void setPatientVisitCollection(
-        Collection<PatientVisitWrapper> patientVisitCollection) {
-        Collection<PatientVisit> pvCollection = new HashSet<PatientVisit>();
-        for (PatientVisitWrapper pv : patientVisitCollection) {
-            pvCollection.add(pv.getWrappedObject());
+    public void setShipmentCollection(
+        Collection<ShipmentWrapper> shipmentCollection) {
+        Collection<Shipment> sCollection = new HashSet<Shipment>();
+        for (ShipmentWrapper s : shipmentCollection) {
+            sCollection.add(s.getWrappedObject());
         }
-        setPatientVisitCollection(pvCollection, false);
-        propertiesMap.put("patientVisitCollection", patientVisitCollection);
+        setShipmentCollection(sCollection, false);
+        propertiesMap.put("shipmentCollection", shipmentCollection);
     }
 
     @Override

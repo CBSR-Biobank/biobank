@@ -2,18 +2,18 @@ package test.ualberta.med.biobank.internal;
 
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
-import edu.ualberta.med.biobank.common.wrappers.PvSampleSourceWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleSourceWrapper;
-import edu.ualberta.med.biobank.model.PvSampleSource;
+import edu.ualberta.med.biobank.common.wrappers.ShptSampleSourceWrapper;
 import edu.ualberta.med.biobank.model.SampleSource;
+import edu.ualberta.med.biobank.model.ShptSampleSource;
 
-public class PvSampleSourceHelper extends DbHelper {
+public class ShptSampleSourceHelper extends DbHelper {
 
-    public static PvSampleSourceWrapper addPvSampleSource(String name,
+    public static ShptSampleSourceWrapper addPvSampleSource(String name,
         PatientVisitWrapper pv) throws BiobankCheckException, Exception {
-        PvSampleSourceWrapper pss = new PvSampleSourceWrapper(appService,
-            new PvSampleSource());
-        pss.setPatientVisit(pv);
+        ShptSampleSourceWrapper pss = new ShptSampleSourceWrapper(appService,
+            new ShptSampleSource());
+        // FIXME to finish
         SampleSourceWrapper ssw = new SampleSourceWrapper(appService,
             new SampleSource());
         ssw.setName(name);

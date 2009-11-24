@@ -14,6 +14,7 @@ import test.ualberta.med.biobank.internal.PatientHelper;
 import test.ualberta.med.biobank.internal.PatientVisitHelper;
 import test.ualberta.med.biobank.internal.SampleHelper;
 import test.ualberta.med.biobank.internal.SampleTypeHelper;
+import test.ualberta.med.biobank.internal.ShipmentHelper;
 import test.ualberta.med.biobank.internal.SiteHelper;
 import test.ualberta.med.biobank.internal.StudyHelper;
 import edu.ualberta.med.biobank.common.BiobankCheckException;
@@ -25,6 +26,7 @@ import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.PatientVisit;
@@ -47,8 +49,9 @@ public class TestSample extends TestDatabase {
         StudyWrapper study = StudyHelper.addStudy(site, "studyname");
         PatientWrapper patient = PatientHelper.addPatient("5684", study);
         ClinicWrapper clinic = ClinicHelper.addClinic(site, "clinicname");
+        ShipmentWrapper shipment = ShipmentHelper.addShipment(clinic);
         PatientVisitWrapper pv = PatientVisitHelper.addPatientVisit(patient,
-            clinic, null, null, null);
+            shipment, null, null, null);
         sample = SampleHelper.newSample(sampleTypeWrapper, container, pv, 3, 3);
         container.reload();
     }

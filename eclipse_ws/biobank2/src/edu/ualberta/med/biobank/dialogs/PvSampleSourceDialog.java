@@ -18,7 +18,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
-import edu.ualberta.med.biobank.common.wrappers.PvSampleSourceWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ShptSampleSourceWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleSourceWrapper;
 import edu.ualberta.med.biobank.validators.IntegerNumberValidator;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
@@ -27,7 +27,7 @@ public class PvSampleSourceDialog extends BiobankDialog {
 
     private static final String TITLE = "Sample Source";
 
-    private PvSampleSourceWrapper pvSampleSource;
+    private ShptSampleSourceWrapper pvSampleSource;
 
     private HashMap<String, SampleSourceWrapper> sampleSourceMap;
 
@@ -37,7 +37,7 @@ public class PvSampleSourceDialog extends BiobankDialog {
         String.class);
 
     public PvSampleSourceDialog(Shell parent,
-        PvSampleSourceWrapper pvSampleSource,
+        ShptSampleSourceWrapper pvSampleSource,
         Collection<SampleSourceWrapper> sampleSources) {
         super(parent);
         Assert.isNotNull(pvSampleSource);
@@ -97,7 +97,7 @@ public class PvSampleSourceDialog extends BiobankDialog {
         super.okPressed();
     }
 
-    public PvSampleSourceWrapper getPvSampleSource() {
+    public ShptSampleSourceWrapper getPvSampleSource() {
         return pvSampleSource;
     }
 

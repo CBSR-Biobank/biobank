@@ -18,7 +18,7 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
-import edu.ualberta.med.biobank.common.wrappers.PvSampleSourceWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ShptSampleSourceWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleSourceWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
@@ -227,8 +227,8 @@ public class BiobankLabelProvider extends LabelProvider implements
             } else {
                 Assert.isTrue(false, "invalid column index: " + columnIndex);
             }
-        } else if (element instanceof PvSampleSourceWrapper) {
-            PvSampleSourceWrapper info = (PvSampleSourceWrapper) element;
+        } else if (element instanceof ShptSampleSourceWrapper) {
+            ShptSampleSourceWrapper info = (ShptSampleSourceWrapper) element;
             switch (columnIndex) {
             case 0:
                 return info.getSampleSource().getName();

@@ -13,15 +13,13 @@ import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.internal.PvInfoDataWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.PvInfoWrapper;
-import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.PvInfoData;
-import edu.ualberta.med.biobank.model.PvSampleSource;
 import edu.ualberta.med.biobank.model.Sample;
+import edu.ualberta.med.biobank.model.Shipment;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
-import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
 
@@ -39,17 +37,8 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
 
     @Override
     protected String[] getPropertyChangesNames() {
-        return new String[] { "patient", "dateDrawn", "dateProcessed",
-            "dateReceived", "clinic", "comments", "pvInfoDataCollection",
-            "sampleCollection", "username" };
-    }
-
-    public Date getDateDrawn() {
-        return wrappedObject.getDateDrawn();
-    }
-
-    public String getFormattedDateDrawn() {
-        return DateFormatter.formatAsDateTime(getDateDrawn());
+        return new String[] { "patient", "dateProcessed", "comment",
+            "pvInfoDataCollection", "sampleCollection", "username", "shipment" };
     }
 
     public Date getDateProcessed() {
@@ -60,16 +49,8 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
         return DateFormatter.formatAsDateTime(getDateProcessed());
     }
 
-    public Date getDateReceived() {
-        return wrappedObject.getDateReceived();
-    }
-
-    public String getFormattedDateReceived() {
-        return DateFormatter.formatAsDateTime(getDateReceived());
-    }
-
-    public String getComments() {
-        return wrappedObject.getComments();
+    public String getComment() {
+        return wrappedObject.getComment();
     }
 
     public PatientWrapper getPatient() {
@@ -134,34 +115,6 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
             collection.add(new SampleWrapper(appService, sample));
         }
         return collection;
-    }
-
-    public ClinicWrapper getClinic() {
-        Clinic clinic = wrappedObject.getClinic();
-        if (clinic == null) {
-            return null;
-        }
-        return new ClinicWrapper(appService, clinic);
-    }
-
-    @SuppressWarnings("unchecked")
-    public List<PvSampleSourceWrapper> getPvSampleSourceCollection() {
-        List<PvSampleSourceWrapper> pvSampleSourceCollection = (List<PvSampleSourceWrapper>) propertiesMap
-            .get("pvSampleSourceCollection");
-        if (pvSampleSourceCollection == null) {
-            Collection<PvSampleSource> children = wrappedObject
-                .getPvSampleSourceCollection();
-            if (children != null) {
-                pvSampleSourceCollection = new ArrayList<PvSampleSourceWrapper>();
-                for (PvSampleSource pvSampleSource : children) {
-                    pvSampleSourceCollection.add(new PvSampleSourceWrapper(
-                        appService, pvSampleSource));
-                }
-                propertiesMap.put("pvSampleSourceCollection",
-                    pvSampleSourceCollection);
-            }
-        }
-        return pvSampleSourceCollection;
     }
 
     @SuppressWarnings("unchecked")
@@ -284,12 +237,6 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
         pid.setValue(value);
     }
 
-    public void setDateDrawn(Date date) {
-        Date oldDate = getDateDrawn();
-        wrappedObject.setDateDrawn(date);
-        propertyChangeSupport.firePropertyChange("dateDrawn", oldDate, date);
-    }
-
     public void setDateProcessed(Date date) {
         Date oldDate = getDateProcessed();
         wrappedObject.setDateProcessed(date);
@@ -297,37 +244,31 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
             .firePropertyChange("dateProcessed", oldDate, date);
     }
 
-    public void setDateReceived(Date date) {
-        Date oldDate = getDateReceived();
-        wrappedObject.setDateReceived(date);
-        propertyChangeSupport.firePropertyChange("dateReceived", oldDate, date);
-    }
-
-    public void setComments(String comments) {
-        String oldComments = getComments();
-        wrappedObject.setComments(comments);
-        propertyChangeSupport.firePropertyChange("comments", oldComments,
-            comments);
+    public void setComment(String comment) {
+        String oldComment = getComment();
+        wrappedObject.setComment(comment);
+        propertyChangeSupport
+            .firePropertyChange("comment", oldComment, comment);
     }
 
     @Override
     protected void persistChecks() throws BiobankCheckException,
         ApplicationException, WrapperException {
-        if (!checkVisitDateDrawnUnique()) {
-            throw new BiobankCheckException("A patient visit with date drawn "
-                + getDateDrawn() + " already exist in patient "
-                + getPatient().getNumber() + ".");
-        }
+        // TODO check add only one shipment ? but should be done throught
+        // hibernate
 
-        boolean found = false;
-        Collection<StudyWrapper> studies = getClinic().getStudyCollection();
-        for (StudyWrapper study : studies)
-            if (study.getId().equals(getPatient().getStudy().getId()))
-                found = true;
-        if (!found)
-            throw new BiobankCheckException("A patient visit with date drawn "
-                + getDateDrawn() + " already exist in patient "
-                + getPatient().getNumber() + ".");
+        // TODO WAs checking study set to the patient visit was on the studies
+        // link to the clinic
+        // do there or in the shipment ?
+        // boolean found = false;
+        // Collection<StudyWrapper> studies = getClinic().getStudyCollection();
+        // for (StudyWrapper study : studies)
+        // if (study.getId().equals(getPatient().getStudy().getId()))
+        // found = true;
+        // if (!found)
+        // throw new BiobankCheckException("A patient visit with date drawn "
+        // + getDateDrawn() + " already exist in patient "
+        // + getPatient().getNumber() + ".");
     }
 
     public String getUsername() {
@@ -341,79 +282,22 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
             username);
     }
 
-    @Override
-    protected void persistDependencies(PatientVisit origObject)
-        throws BiobankCheckException, ApplicationException, WrapperException {
-        if (origObject != null) {
-            removeDeletedPvSampleSources(origObject);
+    public ShipmentWrapper getShipment() {
+        Shipment s = wrappedObject.getShipment();
+        if (s == null) {
+            return null;
         }
+        return new ShipmentWrapper(appService, s);
     }
 
-    private void removeDeletedPvSampleSources(PatientVisit pvDatabase)
-        throws BiobankCheckException, ApplicationException, WrapperException {
-        List<PvSampleSourceWrapper> newSampleSources = getPvSampleSourceCollection();
-        List<PvSampleSourceWrapper> oldSampleSources = new PatientVisitWrapper(
-            appService, pvDatabase).getPvSampleSourceCollection();
-        if (oldSampleSources != null) {
-            for (PvSampleSourceWrapper ss : oldSampleSources) {
-                if ((newSampleSources == null)
-                    || !newSampleSources.contains(ss)) {
-                    ss.delete();
-                }
-            }
-        }
+    public void setShipment(Shipment s) {
+        ShipmentWrapper oldShipment = getShipment();
+        wrappedObject.setShipment(s);
+        propertyChangeSupport.firePropertyChange("shipment", oldShipment, s);
     }
 
-    private boolean checkVisitDateDrawnUnique() throws ApplicationException {
-        String isSameVisit = "";
-        List<Object> params = new ArrayList<Object>();
-        params.add(getPatient().getId());
-        params.add(getDateDrawn());
-        if (!isNew()) {
-            isSameVisit = " and id <> ?";
-            params.add(getId());
-        }
-        HQLCriteria c = new HQLCriteria("from " + PatientVisit.class.getName()
-            + " where patient.id=? and dateDrawn = ?" + isSameVisit, params);
-
-        List<Object> results = appService.query(c);
-        return results.size() == 0;
-    }
-
-    public void setClinic(Clinic clinic) {
-        Clinic oldClinic = wrappedObject.getClinic();
-        wrappedObject.setClinic(clinic);
-        propertyChangeSupport.firePropertyChange("clinic", oldClinic, clinic);
-    }
-
-    public void setClinic(ClinicWrapper clinic) {
-        if (clinic == null) {
-            setClinic((Clinic) null);
-        } else {
-            setClinic(clinic.wrappedObject);
-        }
-    }
-
-    public void setPvSampleSourceCollection(
-        Collection<PvSampleSource> pvSampleSources, boolean setNull) {
-        Collection<PvSampleSource> oldCollection = wrappedObject
-            .getPvSampleSourceCollection();
-        wrappedObject.setPvSampleSourceCollection(pvSampleSources);
-        propertyChangeSupport.firePropertyChange("pvSampleSourceCollection",
-            oldCollection, pvSampleSources);
-        if (setNull) {
-            propertiesMap.put("pvSampleSourceCollection", null);
-        }
-    }
-
-    public void setPvSampleSourceCollection(
-        Collection<PvSampleSourceWrapper> pvSampleSources) {
-        Collection<PvSampleSource> pvCollection = new HashSet<PvSampleSource>();
-        for (PvSampleSourceWrapper pv : pvSampleSources) {
-            pvCollection.add(pv.getWrappedObject());
-        }
-        setPvSampleSourceCollection(pvCollection, false);
-        propertiesMap.put("pvSampleSourceCollection", pvSampleSources);
+    public void setShipment(ShipmentWrapper s) {
+        setShipment(s.wrappedObject);
     }
 
     @Override
@@ -441,10 +325,12 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
 
     @Override
     public int compareTo(ModelWrapper<PatientVisit> wrapper) {
-        Date v1Date = wrappedObject.getDateDrawn();
-        Date v2Date = wrapper.wrappedObject.getDateDrawn();
-        return ((v1Date.compareTo(v2Date) > 0) ? 1 : (v1Date.equals(v2Date) ? 0
-            : -1));
+        // Date v1Date = wrappedObject.getDateDrawn();
+        // Date v2Date = wrapper.wrappedObject.getDateDrawn();
+        // return ((v1Date.compareTo(v2Date) > 0) ? 1 : (v1Date.equals(v2Date) ?
+        // 0
+        // : -1));
+        return 0;
     }
 
     @Override
@@ -462,8 +348,8 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
         pvInfoDataMap = null;
     }
 
-    @Override
-    public String toString() {
-        return getFormattedDateDrawn();
-    }
+    // @Override
+    // public String toString() {
+    // return getFormattedDateDrawn();
+    // }
 }

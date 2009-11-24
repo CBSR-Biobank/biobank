@@ -13,7 +13,7 @@ import org.eclipse.swt.widgets.Label;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
-import edu.ualberta.med.biobank.common.wrappers.PvSampleSourceWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ShptSampleSourceWrapper;
 import edu.ualberta.med.biobank.model.PvCustomInfo;
 import edu.ualberta.med.biobank.treeview.PatientVisitAdapter;
 import edu.ualberta.med.biobank.widgets.infotables.PvSampleSourceInfoTable;
@@ -142,7 +142,7 @@ public class PatientVisitViewForm extends BiobankViewForm {
     private void createSourcesSection() {
         Composite client = createSectionWithClient("Source Vessels");
 
-        Collection<PvSampleSourceWrapper> sources = patientVisitWrapper
+        Collection<ShptSampleSourceWrapper> sources = patientVisitWrapper
             .getPvSampleSourceCollection();
         new PvSampleSourceInfoTable(client, sources);
     }
