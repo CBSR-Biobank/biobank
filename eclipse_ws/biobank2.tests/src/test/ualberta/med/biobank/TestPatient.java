@@ -1,54 +1,89 @@
 package test.ualberta.med.biobank;
 
-import static org.junit.Assert.fail;
+import java.util.HashMap;
+import java.util.Map;
 
+import junit.framework.Assert;
+
+import org.junit.Before;
 import org.junit.Test;
+
+import test.ualberta.med.biobank.internal.PatientHelper;
+import test.ualberta.med.biobank.internal.SiteHelper;
+import test.ualberta.med.biobank.internal.StudyHelper;
+import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 
 public class TestPatient extends TestDatabase {
 
+    private Map<String, PatientWrapper> patientMap;
+
+    private SiteWrapper site;
+
+    private StudyWrapper study;
+
+    @Override
+    @Before
+    public void setUp() throws Exception {
+        super.setUp();
+        patientMap = new HashMap<String, PatientWrapper>();
+        site = SiteHelper.addSite("Site - Container Test "
+            + Utils.getRandomString(10));
+        study = StudyHelper.addStudy(site, "Study - Container Test "
+            + Utils.getRandomString(10));
+    }
+
     @Test
     public void testGettersAndSetters() throws Exception {
-        fail("Not yet implemented");
+        PatientWrapper container = PatientHelper.addPatient(Utils
+            .getRandomNumericString(20), study);
+        testGettersAndSetters(container);
     }
 
     @Test
     public void testCompareTo() {
-        fail("Not yet implemented");
+        Assert.fail("Not yet implemented");
     }
 
     @Test
     public void testReset() throws Exception {
-        fail("Not yet implemented");
+        Assert.fail("Not yet implemented");
     }
 
     @Test
     public void testReload() throws Exception {
-        fail("Not yet implemented");
+        Assert.fail("Not yet implemented");
     }
 
     @Test
     public void testGetWrappedClass() {
-        fail("Not yet implemented");
+        Assert.fail("Not yet implemented");
+    }
+
+    @Test
+    public void testDelete() {
+        Assert.fail("Not yet implemented");
     }
 
     @Test
     public void testGetStudy() {
-        fail("Not yet implemented");
+        Assert.fail("Not yet implemented");
     }
 
     @Test
     public void testCheckPatientNumberUnique() {
-        fail("Not yet implemented");
+        Assert.fail("Not yet implemented");
     }
 
     @Test
     public void testGetPatientVisitCollection() {
-        fail("Not yet implemented");
+        Assert.fail("Not yet implemented");
     }
 
     @Test
     public void testGetPatientInSite() {
-        fail("Not yet implemented");
+        Assert.fail("Not yet implemented");
     }
 
 }

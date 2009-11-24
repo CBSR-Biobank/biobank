@@ -35,9 +35,6 @@ public class TestContainerType extends TestDatabase {
 
     private SiteWrapper site;
 
-    // TODO test to check if change top level setting is allowed after a
-    // container added to container type
-
     // cannot use getter and setter test on ContainerTypeWrapper due to
     // restrictions on labeling scheme
 

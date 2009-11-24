@@ -863,8 +863,7 @@ public class TestContainer extends TestDatabase {
     public void testCompareTo() throws Exception {
         ContainerWrapper top, childL1, childL2, childL3;
 
-        top = containerMap.get("Top");
-        addContainerHierarchy(top);
+        top = addContainerHierarchy(containerMap.get("Top"));
         childL1 = containerMap.get("ChildL1");
         childL2 = containerMap.get("ChildL2");
         childL3 = containerMap.get("ChildL3");
