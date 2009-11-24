@@ -37,6 +37,9 @@ public class TestContainerType extends TestDatabase {
 
     private SiteWrapper site;
 
+    // TODO test to check if change top level setting is allowed after a
+    // container added to container type
+
     @Override
     @Before
     public void setUp() throws Exception {
@@ -68,7 +71,7 @@ public class TestContainerType extends TestDatabase {
 
         if (level >= 2) {
             childType = ContainerTypeHelper.newContainerType(site,
-                "Child L2 Container Type", "CCTL2", 1, 1, 10, false);
+                "Child L2 Container Type", "CCTL2", 3, 1, 10, false);
             childType.setChildContainerTypeCollection(Arrays
                 .asList(containerTypeMap.get("ChildCtL3")));
             childType.persist();
@@ -479,33 +482,26 @@ public class TestContainerType extends TestDatabase {
         childTypeL2 = containerTypeMap.get("ChildCtL2");
         childTypeL3 = containerTypeMap.get("ChildCtL3");
 
-        Assert.assertEquals(CONTAINER_TOP_ROWS, topType.getRowCapacity()
-            .intValue());
+        Assert.assertEquals(2, topType.getChildLabelingScheme().intValue());
+        Assert.assertTrue(topType.getChildLabelingSchemeName().equals(
+            "CBSR 2 char alphabetic"));
+
+        Assert.assertEquals(3, childTypeL1.getChildLabelingScheme().intValue());
+        Assert.assertTrue(childTypeL1.getChildLabelingSchemeName().equals(
+            "2 char numeric"));
+
+        Assert.assertEquals(3, childTypeL2.getChildLabelingScheme().intValue());
+        Assert.assertTrue(childTypeL2.getChildLabelingSchemeName().equals(
+            "2 char numeric"));
+
+        Assert.assertEquals(1, childTypeL3.getChildLabelingScheme().intValue());
+        Assert.assertTrue(childTypeL3.getChildLabelingSchemeName().equals(
+            "SBS Standard"));
     }
 
     @Test
-    public void testCanRemoveChildrenContainer() {
-        fail("Not yet implemented");
-    }
-
-    @Test
-    public void testCheckNewCapacity() {
-        fail("Not yet implemented");
-    }
-
-    @Test
-    public void testCheckTopLevel() {
-        fail("Not yet implemented");
-    }
-
-    @Test
-    public void testCheckLabelingScheme() {
-        fail("Not yet implemented");
-    }
-
-    @Test
-    public void testGetTopContainerTypesInSite() {
-        fail("Not yet implemented");
+    public void testGetTopContainerTypesInSite() throws Exception {
+        addTopContainerType(site);
     }
 
     @Test
