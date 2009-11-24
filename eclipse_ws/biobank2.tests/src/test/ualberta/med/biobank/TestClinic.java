@@ -9,14 +9,11 @@ import org.junit.Test;
 import test.ualberta.med.biobank.internal.ClinicHelper;
 import test.ualberta.med.biobank.internal.ContactHelper;
 import test.ualberta.med.biobank.internal.DbHelper;
-import test.ualberta.med.biobank.internal.PatientHelper;
-import test.ualberta.med.biobank.internal.PatientVisitHelper;
 import test.ualberta.med.biobank.internal.SiteHelper;
 import test.ualberta.med.biobank.internal.StudyHelper;
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
-import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.Clinic;
@@ -42,6 +39,8 @@ public class TestClinic extends TestDatabase {
 
         clinic.setSite(site2);
         clinic.persist();
+
+        clinic.reload();
 
         Assert.assertFalse(site.equals(clinic.getSite()));
 
@@ -158,49 +157,6 @@ public class TestClinic extends TestDatabase {
                 Assert.assertTrue(s1.compareTo(s2) <= 0);
             }
         }
-    }
-
-    @Test
-    public void testGetPatientVisitCollection() throws Exception {
-        String name = "testGetPatientVisitCollection" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
-
-        ClinicWrapper clinic1 = ClinicHelper.addClinic(site, name + "CLINIC1");
-        ContactWrapper contact1 = ContactHelper.addContact(clinic1, name
-            + "CONTACT1");
-
-        ClinicWrapper clinic2 = ClinicHelper.addClinic(site, name + "CLINIC2");
-        ContactWrapper contact2 = ContactHelper.addContact(clinic2, name
-            + "CONTACT2");
-
-        List<ContactWrapper> contacts = new ArrayList<ContactWrapper>();
-        contacts.add(contact1);
-        contacts.add(contact2);
-
-        StudyWrapper study1 = StudyHelper.addStudy(site, name + "STUDY1");
-        study1.setContactCollection(contacts);
-        study1.persist();
-        PatientWrapper patient1 = PatientHelper.addPatient(name, study1);
-        int nbClinic1Study1 = PatientVisitHelper.addPatientVisits(patient1,
-            clinic1);
-        int nbClinic2Study1 = PatientVisitHelper.addPatientVisits(patient1,
-            clinic2);
-
-        StudyWrapper study2 = StudyHelper.addStudy(site, name + "STUDY2");
-        study2.setContactCollection(contacts);
-        study2.persist();
-        PatientWrapper patient2 = PatientHelper.addPatient(name, study2);
-        int nbClinic1Study2 = PatientVisitHelper.addPatientVisits(patient2,
-            clinic1);
-        int nbClinic2Study2 = PatientVisitHelper.addPatientVisits(patient2,
-            clinic2);
-
-        clinic1.reload();
-        Assert.assertEquals(nbClinic1Study1 + nbClinic1Study2, clinic1
-            .getPatientVisitCollection().size());
-        clinic2.reload();
-        Assert.assertEquals(nbClinic2Study1 + nbClinic2Study2, clinic2
-            .getPatientVisitCollection().size());
     }
 
     @Test
@@ -327,6 +283,10 @@ public class TestClinic extends TestDatabase {
         ClinicWrapper clinic = ClinicHelper.newClinic(site, name);
         clinic.reset();
         Assert.assertEquals(null, clinic.getName());
+    }
+
+    public void testGetPatientVisitCollection() {
+        Assert.fail("need to be implemented");
     }
 
 }

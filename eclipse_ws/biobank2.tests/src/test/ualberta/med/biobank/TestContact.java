@@ -38,9 +38,8 @@ public class TestContact extends TestDatabase {
     }
 
     @Test
-    public void TestGetSetStudyCollection() throws BiobankCheckException,
+    public void testGetSetStudyCollection() throws BiobankCheckException,
         Exception {
-
         List<StudyWrapper> oldStudyCollection = new ArrayList<StudyWrapper>();
         List<StudyWrapper> modifiedStudyCollection = new ArrayList<StudyWrapper>();
         List<ContactWrapper> studyContactWrappers = new ArrayList<ContactWrapper>();
@@ -210,7 +209,7 @@ public class TestContact extends TestDatabase {
     }
 
     @Test
-    public void TestGetSetClinicWrapper() throws BiobankCheckException,
+    public void testGetSetClinicWrapper() throws BiobankCheckException,
         Exception {
         // make sure we have an object in db, retrieve
         if (cw.getId() == null)
@@ -253,7 +252,7 @@ public class TestContact extends TestDatabase {
     }
 
     @Test
-    public void TestCompareTo() {
+    public void testCompareTo() {
         ContactWrapper contact1 = new ContactWrapper(appService, new Contact());
         contact1.setName("stuff");
         ContactWrapper contact2 = new ContactWrapper(appService, new Contact());

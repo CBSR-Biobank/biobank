@@ -51,7 +51,7 @@ public class SampleViewForm extends BiobankViewForm {
     protected void createFormContent() throws Exception {
         form.setText("Sample " + sample.getInventoryId() + " from patient "
             + sample.getPatientVisit().getPatient().getNumber() + " / visit "
-            + sample.getPatientVisit().getFormattedDateDrawn());
+            + sample.getPatientVisit().getShipment().getFormattedDateDrawn());
         GridLayout layout = new GridLayout(1, false);
         form.getBody().setLayout(layout);
         form.getBody().setLayoutData(new GridData(GridData.FILL_HORIZONTAL));

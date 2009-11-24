@@ -10,21 +10,25 @@ import org.junit.Test;
 
 import test.ualberta.med.biobank.internal.ClinicHelper;
 import test.ualberta.med.biobank.internal.ContainerHelper;
+import test.ualberta.med.biobank.internal.ContainerTypeHelper;
 import test.ualberta.med.biobank.internal.PatientHelper;
 import test.ualberta.med.biobank.internal.PatientVisitHelper;
 import test.ualberta.med.biobank.internal.SampleHelper;
 import test.ualberta.med.biobank.internal.SampleTypeHelper;
+import test.ualberta.med.biobank.internal.ShipmentHelper;
 import test.ualberta.med.biobank.internal.SiteHelper;
 import test.ualberta.med.biobank.internal.StudyHelper;
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.PatientVisit;
@@ -42,19 +46,22 @@ public class TestSample extends TestDatabase {
         SiteWrapper site = SiteHelper.addSite("sitename", true);
         SampleTypeWrapper sampleTypeWrapper = SampleTypeHelper.addSampleType(
             site, "sampletype");
-        ContainerWrapper container = ContainerHelper.addContainerRandom(site,
-            "newcontainer", null);
+        ContainerTypeWrapper type = ContainerTypeHelper.addContainerType(site,
+            "ctType", "ct", 1, 4, 5, true);
+        ContainerWrapper container = ContainerHelper.addContainer(
+            "newcontainer", "cc", null, site, type);
         StudyWrapper study = StudyHelper.addStudy(site, "studyname");
         PatientWrapper patient = PatientHelper.addPatient("5684", study);
         ClinicWrapper clinic = ClinicHelper.addClinic(site, "clinicname");
+        ShipmentWrapper shipment = ShipmentHelper.addShipment(clinic);
         PatientVisitWrapper pv = PatientVisitHelper.addPatientVisit(patient,
-            clinic, null, null, null);
+            shipment, null, null, null);
         sample = SampleHelper.newSample(sampleTypeWrapper, container, pv, 3, 3);
         container.reload();
     }
 
     @Test(expected = BiobankCheckException.class)
-    public void TestCheckInventoryIdUnique() throws BiobankCheckException,
+    public void testCheckInventoryIdUnique() throws BiobankCheckException,
         Exception {
         SampleWrapper duplicate = SampleHelper.addSample(
             sample.getSampleType(), sample.getParent(), sample
@@ -68,7 +75,7 @@ public class TestSample extends TestDatabase {
     }
 
     @Test
-    public void TestGetSetPatientVisit() {
+    public void testGetSetPatientVisit() {
         PatientVisitWrapper pvw = new PatientVisitWrapper(appService,
             new PatientVisit());
         sample.setPatientVisit(pvw.getWrappedObject());
@@ -76,7 +83,7 @@ public class TestSample extends TestDatabase {
     }
 
     @Test
-    public void TestSetSamplePositionFromString() throws Exception {
+    public void testSetSamplePositionFromString() throws Exception {
         sample.setSamplePositionFromString("A1", sample.getParent());
         Assert.assertTrue(sample.getPositionString(false, false).equals("A1"));
         RowColPos pos = sample.getPosition();
@@ -84,7 +91,7 @@ public class TestSample extends TestDatabase {
     }
 
     @Test
-    public void TestGetSetPosition() {
+    public void testGetSetPosition() {
         RowColPos position = new RowColPos();
         position.row = 1;
         position.col = 3;
@@ -95,10 +102,13 @@ public class TestSample extends TestDatabase {
     }
 
     @Test
-    public void TestGetSetParent() throws Exception {
+    public void testGetSetParent() throws Exception {
         ContainerWrapper oldParent = sample.getParent();
-        ContainerWrapper parent = ContainerHelper.addContainerRandom(sample
-            .getSite(), "newParent", null);
+        ContainerTypeWrapper type = ContainerTypeHelper.addContainerType(sample
+            .getSite(), "newCtType", "ctNew", 1, 4, 5, true);
+        ContainerWrapper parent = ContainerHelper.addContainer(
+            "newcontainerParent", "ccNew", null, sample.getSite(), type);
+
         sample.setParent(parent);
         sample.persist();
         // check to make sure gone from old parent
@@ -117,7 +127,7 @@ public class TestSample extends TestDatabase {
     }
 
     @Test
-    public void TestGetSetSampleType() throws BiobankCheckException, Exception {
+    public void testGetSetSampleType() throws BiobankCheckException, Exception {
         SampleTypeWrapper stw = sample.getSampleType();
         SampleTypeWrapper newStw = SampleTypeHelper.addSampleType(sample
             .getSite(), "newStw");
@@ -128,7 +138,7 @@ public class TestSample extends TestDatabase {
     }
 
     @Test
-    public void TestCreateNewSample() throws BiobankCheckException, Exception {
+    public void testCreateNewSample() throws BiobankCheckException, Exception {
 
         Collection<SampleStorageWrapper> ssCollection = new ArrayList<SampleStorageWrapper>();
         SampleStorageWrapper ss1 = new SampleStorageWrapper(appService);
@@ -164,7 +174,7 @@ public class TestSample extends TestDatabase {
     }
 
     @Test
-    public void TestGetSetQuantityFromType() throws Exception {
+    public void testGetSetQuantityFromType() throws Exception {
         Double quantity = sample.getQuantity();
         sample.setQuantityFromType();
         // no sample storages defined yet, should be null
@@ -198,7 +208,7 @@ public class TestSample extends TestDatabase {
     }
 
     @Test
-    public void TestCompareTo() throws BiobankCheckException, Exception {
+    public void testCompareTo() throws BiobankCheckException, Exception {
         sample.persist();
         Assert.assertTrue(sample.compareTo(sample) == 0);
     }

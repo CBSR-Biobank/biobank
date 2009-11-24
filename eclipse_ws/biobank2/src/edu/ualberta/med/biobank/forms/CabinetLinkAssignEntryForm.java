@@ -305,7 +305,7 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
             @Override
             public String getText(Object element) {
                 PatientVisitWrapper pv = (PatientVisitWrapper) element;
-                return pv.getFormattedDateDrawn();
+                return pv.getShipment().getFormattedDateDrawn();
             }
         });
         comboVisits.addKeyListener(new KeyAdapter() {
@@ -322,7 +322,7 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
                 PatientVisitWrapper pv = getSelectedPatientVisit();
                 sampleWrapper.setPatientVisit(pv);
                 appendLog("Visit selected " + pv.getFormattedDateProcessed()
-                    + " - " + pv.getClinic().getName());
+                    + " - " + pv.getShipment().getClinic().getName());
             }
         });
     }
@@ -527,11 +527,14 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
         }
         sampleWrapper.persist();
         if (radioNew.getSelection()) {
-            appendLog("Sample " + sampleWrapper.getInventoryId()
-                + " saved in position " + sampleWrapper.getPositionString()
+            appendLog("Sample "
+                + sampleWrapper.getInventoryId()
+                + " saved in position "
+                + sampleWrapper.getPositionString()
                 + " for visit "
-                + sampleWrapper.getPatientVisit().getFormattedDateDrawn()
-                + "(patient " + currentPatient.getNumber() + ")");
+                + sampleWrapper.getPatientVisit().getShipment()
+                    .getFormattedDateDrawn() + "(patient "
+                + currentPatient.getNumber() + ")");
         } else {
             appendLog("Sample " + sampleWrapper.getInventoryId()
                 + " moved to position " + sampleWrapper.getPositionString());

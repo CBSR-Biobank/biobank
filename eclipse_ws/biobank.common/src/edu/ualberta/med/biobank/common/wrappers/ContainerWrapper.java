@@ -498,14 +498,14 @@ public class ContainerWrapper extends
             throw new BiobankCheckException("Container " + this
                 + " does not have a parent container");
 
-        if (getParent().getContainerType().getChildContainerTypeCollection()
-            .contains(getContainerType()))
-            return;
-
-        throw new BiobankCheckException("Container "
-            + getParent().getFullInfoLabel()
-            + " does not allow inserts of type " + getContainerType().getName()
-            + ".");
+        List<ContainerTypeWrapper> types = getParent().getContainerType()
+            .getChildContainerTypeCollection();
+        if (types == null || !types.contains(getContainerType())) {
+            throw new BiobankCheckException("Container "
+                + getParent().getFullInfoLabel()
+                + " does not allow inserts of type "
+                + getContainerType().getName() + ".");
+        }
     }
 
     public void addChild(Integer row, Integer col, ContainerWrapper child)

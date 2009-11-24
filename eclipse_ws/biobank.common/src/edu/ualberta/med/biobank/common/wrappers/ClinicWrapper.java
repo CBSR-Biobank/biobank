@@ -13,6 +13,7 @@ import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.model.PatientVisit;
+import edu.ualberta.med.biobank.model.Shipment;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -33,8 +34,9 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
     @Override
     protected String[] getPropertyChangesNames() {
         return new String[] { "name", "activityStatus", "comment", "address",
-            "site", "contactCollection", "patientVisitCollection", "street1",
-            "street2", "city", "province", "postalCode" };
+            "site", "contactCollection", "shipmentCollection", "street1",
+            "street2", "city", "province", "postalCode",
+            "patientVisitCollection" };
     }
 
     private AddressWrapper getAddress() {
@@ -326,10 +328,9 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
     @Override
     protected void deleteChecks() throws BiobankCheckException,
         ApplicationException {
-        if (hasPatientVisits()) {
+        if (hasShipments()) {
             throw new BiobankCheckException("Unable to delete clinic "
-                + getName()
-                + ". All defined patient visits must be removed first.");
+                + getName() + ". All defined shipments must be removed first.");
         }
         List<StudyWrapper> studies = getStudyCollection();
         if (studies != null && studies.size() > 0) {
@@ -338,12 +339,12 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
         }
     }
 
-    public boolean hasPatientVisits() throws ApplicationException,
+    public boolean hasShipments() throws ApplicationException,
         BiobankCheckException {
         HQLCriteria criteria = new HQLCriteria(
-            "select count(visit) from "
+            "select count(shipment) from "
                 + Clinic.class.getName()
-                + " as clinic inner join clinic.patientVisitCollection as visit where clinic.id = ?",
+                + " as clinic inner join clinic.shipmentCollection as shipment where clinic.id = ?",
             Arrays.asList(new Object[] { getId() }));
         List<Long> result = appService.query(criteria);
         if (result.size() != 1) {
@@ -353,45 +354,43 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
     }
 
     @SuppressWarnings("unchecked")
-    public List<PatientVisitWrapper> getPatientVisitCollection() {
-        List<PatientVisitWrapper> patientVisitCollection = (List<PatientVisitWrapper>) propertiesMap
-            .get("patientVisitCollection");
-        if (patientVisitCollection == null) {
-            Collection<PatientVisit> children = wrappedObject
-                .getPatientVisitCollection();
+    public List<ShipmentWrapper> getShipmentCollection() {
+        List<ShipmentWrapper> shipmentCollection = (List<ShipmentWrapper>) propertiesMap
+            .get("shipmentCollection");
+        if (shipmentCollection == null) {
+            Collection<Shipment> children = wrappedObject
+                .getShipmentCollection();
             if (children != null) {
-                patientVisitCollection = new ArrayList<PatientVisitWrapper>();
-                for (PatientVisit pv : children) {
-                    patientVisitCollection.add(new PatientVisitWrapper(
-                        appService, pv));
+                shipmentCollection = new ArrayList<ShipmentWrapper>();
+                for (Shipment s : children) {
+                    shipmentCollection.add(new ShipmentWrapper(appService, s));
                 }
-                propertiesMap.put("patientVisitCollection",
-                    patientVisitCollection);
+                propertiesMap.put("shipmentCollection", shipmentCollection);
             }
         }
-        return patientVisitCollection;
+        return shipmentCollection;
     }
 
-    public void setPatientVisitCollection(
-        Collection<PatientVisit> patientVisitCollection, boolean setNull) {
-        Collection<PatientVisit> oldCollection = wrappedObject
-            .getPatientVisitCollection();
-        wrappedObject.setPatientVisitCollection(patientVisitCollection);
-        propertyChangeSupport.firePropertyChange("patientVisitCollection",
-            oldCollection, patientVisitCollection);
+    public void setShipmentCollection(Collection<Shipment> shipmentCollection,
+        boolean setNull) {
+        Collection<Shipment> oldCollection = wrappedObject
+            .getShipmentCollection();
+        wrappedObject.setShipmentCollection(shipmentCollection);
+        propertyChangeSupport.firePropertyChange("shipmentCollection",
+            oldCollection, shipmentCollection);
         if (setNull) {
-            propertiesMap.put("patientVisitCollection", null);
+            propertiesMap.put("shipmentCollection", null);
         }
     }
 
-    public void setPatientVisitCollection(
-        Collection<PatientVisitWrapper> patientVisitCollection) {
-        Collection<PatientVisit> pvCollection = new HashSet<PatientVisit>();
-        for (PatientVisitWrapper pv : patientVisitCollection) {
-            pvCollection.add(pv.getWrappedObject());
+    public void setShipmentCollection(
+        Collection<ShipmentWrapper> shipmentCollection) {
+        Collection<Shipment> sCollection = new HashSet<Shipment>();
+        for (ShipmentWrapper s : shipmentCollection) {
+            sCollection.add(s.getWrappedObject());
         }
-        setPatientVisitCollection(pvCollection, false);
-        propertiesMap.put("patientVisitCollection", patientVisitCollection);
+        setShipmentCollection(sCollection, false);
+        propertiesMap.put("shipmentCollection", shipmentCollection);
     }
 
     @Override
@@ -405,5 +404,33 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
     @Override
     public String toString() {
         return getName();
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<PatientVisitWrapper> getPatientVisitCollection(boolean sort)
+        throws ApplicationException {
+        List<PatientVisitWrapper> pvCollection = (List<PatientVisitWrapper>) propertiesMap
+            .get("patientVisitCollection");
+
+        if (pvCollection == null) {
+            pvCollection = new ArrayList<PatientVisitWrapper>();
+            HQLCriteria c = new HQLCriteria("select distinct pv from "
+                + PatientVisit.class.getName()
+                + " where shipment.clinic.id = ?", Arrays
+                .asList(new Object[] { getId() }));
+            List<PatientVisit> collection = appService.query(c);
+            for (PatientVisit pv : collection) {
+                pvCollection.add(new PatientVisitWrapper(appService, pv));
+            }
+            if (sort)
+                Collections.sort(pvCollection);
+            propertiesMap.put("patientVisitCollection", pvCollection);
+        }
+        return pvCollection;
+    }
+
+    public List<PatientVisitWrapper> getPatientVisitCollection()
+        throws ApplicationException {
+        return getPatientVisitCollection(false);
     }
 }

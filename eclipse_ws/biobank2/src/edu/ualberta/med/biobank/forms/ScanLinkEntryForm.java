@@ -44,7 +44,6 @@ import org.springframework.remoting.RemoteConnectFailureException;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.LabelingScheme;
-import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
@@ -476,7 +475,7 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
             @Override
             public String getText(Object element) {
                 PatientVisitWrapper pv = (PatientVisitWrapper) element;
-                return DateFormatter.formatAsDateTime(pv.getDateDrawn());
+                return pv.getShipment().getFormattedDateDrawn();
             }
         });
         viewerVisits.getCombo().addKeyListener(new KeyAdapter() {
@@ -528,7 +527,7 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
             String date = pv.getFormattedDateProcessed();
             dateProcessedLabel.setText(date);
             appendLog("Visit selected " + date + " - "
-                + pv.getClinic().getName());
+                + pv.getShipment().getClinic().getName());
         } else {
             dateProcessedLabel.setText("");
         }
@@ -599,9 +598,13 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
                     cell.setInformation(msg);
                     scanOk = false;
                     SampleWrapper sample = samples.get(0);
-                    appendLog("ERROR: " + value + " - " + msg + " see visit "
-                        + sample.getPatientVisit().getFormattedDateDrawn()
-                        + " of patient "
+                    appendLog("ERROR: "
+                        + value
+                        + " - "
+                        + msg
+                        + " see visit "
+                        + sample.getPatientVisit().getShipment()
+                            .getFormattedDateDrawn() + " of patient "
                         + sample.getPatientVisit().getPatient().getNumber());
                 } else {
                     cell.setStatus(SampleCellStatus.NO_TYPE);
@@ -637,8 +640,9 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
                     sb.append(" - patient: ").append(
                         patientVisit.getPatient().getNumber());
                     sb.append(" - Visit: ").append(
-                        patientVisit.getFormattedDateDrawn());
-                    sb.append(" - ").append(patientVisit.getClinic().getName());
+                        patientVisit.getShipment().getFormattedDateDrawn());
+                    sb.append(" - ").append(
+                        patientVisit.getShipment().getClinic().getName());
                     sb.append(" - ").append(cell.getType().getName());
                     nber++;
                 }

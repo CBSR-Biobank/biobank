@@ -18,6 +18,7 @@ import test.ualberta.med.biobank.internal.ContainerTypeHelper;
 import test.ualberta.med.biobank.internal.PatientHelper;
 import test.ualberta.med.biobank.internal.PatientVisitHelper;
 import test.ualberta.med.biobank.internal.SampleHelper;
+import test.ualberta.med.biobank.internal.ShipmentHelper;
 import test.ualberta.med.biobank.internal.SiteHelper;
 import test.ualberta.med.biobank.internal.StudyHelper;
 import edu.ualberta.med.biobank.common.BiobankCheckException;
@@ -30,6 +31,7 @@ import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.Container;
@@ -594,10 +596,11 @@ public class TestContainer extends TestDatabase {
         ContactHelper.addContactsToStudy(study, "contactsStudy1");
         ClinicWrapper clinic = study.getContactCollection().get(0)
             .getClinicWrapper();
+        ShipmentWrapper shipment = ShipmentHelper.addShipment(clinic);
 
         PatientWrapper patient = PatientHelper.addPatient("1000", study);
         PatientVisitWrapper pv = PatientVisitHelper.addPatientVisit(patient,
-            clinic, Utils.getRandomDate(), Utils.getRandomDate(), Utils
+            shipment, Utils.getRandomDate(), Utils.getRandomDate(), Utils
                 .getRandomDate());
         return pv;
     }
@@ -644,10 +647,10 @@ public class TestContainer extends TestDatabase {
         ContactHelper.addContactsToStudy(study, "contactsStudy1");
         ClinicWrapper clinic = study.getContactCollection().get(0)
             .getClinicWrapper();
-
+        ShipmentWrapper shipment = ShipmentHelper.addShipment(clinic);
         PatientWrapper patient = PatientHelper.addPatient("1000", study);
         PatientVisitWrapper pv = PatientVisitHelper.addPatientVisit(patient,
-            clinic, Utils.getRandomDate(), Utils.getRandomDate(), Utils
+            shipment, Utils.getRandomDate(), Utils.getRandomDate(), Utils
                 .getRandomDate());
 
         ContainerWrapper top = containerMap.get("Top");

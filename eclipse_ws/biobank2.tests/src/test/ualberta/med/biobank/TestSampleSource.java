@@ -29,7 +29,7 @@ public class TestSampleSource extends TestDatabase {
     }
 
     @Test
-    public void TestGetSetStudyCollection() throws Exception {
+    public void testGetSetStudyCollection() throws Exception {
         List<StudyWrapper> studies = new ArrayList<StudyWrapper>();
         List<StudyWrapper> oldStudies = new ArrayList<StudyWrapper>(studies);
 
@@ -88,7 +88,7 @@ public class TestSampleSource extends TestDatabase {
     }
 
     @Test
-    public void TestCompareTo() throws Exception {
+    public void testCompareTo() throws Exception {
         SampleSourceWrapper newSampleSource = SampleSourceHelper
             .addSampleSource(ssw.getName() + "1");
         Assert.assertTrue(newSampleSource.compareTo(ssw) > 0);

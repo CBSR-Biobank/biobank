@@ -9,6 +9,7 @@ import java.util.List;
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.PatientVisit;
+import edu.ualberta.med.biobank.model.ShptSampleSource;
 import edu.ualberta.med.biobank.model.Study;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -76,7 +77,8 @@ public class PatientWrapper extends ModelWrapper<Patient> {
      */
     @Override
     protected String[] getPropertyChangesNames() {
-        return new String[] { "number", "study", "patientVisitCollection" };
+        return new String[] { "number", "study", "patientVisitCollection",
+            "shptSampleSourceCollection" };
     }
 
     @Override
@@ -143,6 +145,48 @@ public class PatientWrapper extends ModelWrapper<Patient> {
             return new PatientWrapper(appService, patients.get(0));
         }
         return null;
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<ShptSampleSourceWrapper> getShptSampleSourceCollection() {
+        List<ShptSampleSourceWrapper> shptSampleSourceCollection = (List<ShptSampleSourceWrapper>) propertiesMap
+            .get("shptSampleSourceCollection");
+        if (shptSampleSourceCollection == null) {
+            Collection<ShptSampleSource> children = wrappedObject
+                .getShptSampleSourceCollection();
+            if (children != null) {
+                shptSampleSourceCollection = new ArrayList<ShptSampleSourceWrapper>();
+                for (ShptSampleSource pvSampleSource : children) {
+                    shptSampleSourceCollection.add(new ShptSampleSourceWrapper(
+                        appService, pvSampleSource));
+                }
+                propertiesMap.put("shptSampleSourceCollection",
+                    shptSampleSourceCollection);
+            }
+        }
+        return shptSampleSourceCollection;
+    }
+
+    public void setShptSampleSourceCollection(
+        Collection<ShptSampleSource> shptSampleSources, boolean setNull) {
+        Collection<ShptSampleSource> oldCollection = wrappedObject
+            .getShptSampleSourceCollection();
+        wrappedObject.setShptSampleSourceCollection(shptSampleSources);
+        propertyChangeSupport.firePropertyChange("shptSampleSourceCollection",
+            oldCollection, shptSampleSources);
+        if (setNull) {
+            propertiesMap.put("shptSampleSourceCollection", null);
+        }
+    }
+
+    public void setShptSampleSourceCollection(
+        Collection<ShptSampleSourceWrapper> shptSampleSources) {
+        Collection<ShptSampleSource> shptCollection = new HashSet<ShptSampleSource>();
+        for (ShptSampleSourceWrapper pv : shptSampleSources) {
+            shptCollection.add(pv.getWrappedObject());
+        }
+        setShptSampleSourceCollection(shptCollection, false);
+        propertiesMap.put("shptSampleSourceCollection", shptSampleSources);
     }
 
     @Override
