@@ -12,6 +12,7 @@ import edu.ualberta.med.biobank.common.wrappers.internal.AddressWrapper;
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Contact;
+import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.Shipment;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
@@ -34,7 +35,8 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
     protected String[] getPropertyChangesNames() {
         return new String[] { "name", "activityStatus", "comment", "address",
             "site", "contactCollection", "shipmentCollection", "street1",
-            "street2", "city", "province", "postalCode" };
+            "street2", "city", "province", "postalCode",
+            "patientVisitCollection" };
     }
 
     private AddressWrapper getAddress() {
@@ -402,5 +404,33 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
     @Override
     public String toString() {
         return getName();
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<PatientVisitWrapper> getPatientVisitCollection(boolean sort)
+        throws ApplicationException {
+        List<PatientVisitWrapper> pvCollection = (List<PatientVisitWrapper>) propertiesMap
+            .get("patientVisitCollection");
+
+        if (pvCollection == null) {
+            pvCollection = new ArrayList<PatientVisitWrapper>();
+            HQLCriteria c = new HQLCriteria("select distinct pv from "
+                + PatientVisit.class.getName()
+                + " where shipment.clinic.id = ?", Arrays
+                .asList(new Object[] { getId() }));
+            List<PatientVisit> collection = appService.query(c);
+            for (PatientVisit pv : collection) {
+                pvCollection.add(new PatientVisitWrapper(appService, pv));
+            }
+            if (sort)
+                Collections.sort(pvCollection);
+            propertiesMap.put("patientVisitCollection", pvCollection);
+        }
+        return pvCollection;
+    }
+
+    public List<PatientVisitWrapper> getPatientVisitCollection()
+        throws ApplicationException {
+        return getPatientVisitCollection(false);
     }
 }

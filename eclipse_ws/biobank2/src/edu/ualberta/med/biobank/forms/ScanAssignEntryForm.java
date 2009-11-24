@@ -434,10 +434,11 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
                 return true;
             }
             // sample missing
-            String logMsg = "aliquot " + expectedSample.getInventoryId()
+            String logMsg = "aliquot "
+                + expectedSample.getInventoryId()
                 + " from visit "
-                + expectedSample.getPatientVisit().getFormattedDateDrawn()
-                + " (patient "
+                + expectedSample.getPatientVisit().getShipment()
+                    .getFormattedDateDrawn() + " (patient "
                 + expectedSample.getPatientVisit().getPatient().getNumber()
                 + ") missing";
             setStatusWithLogMessage(scanCell, SampleCellStatus.MISSING,
@@ -571,9 +572,9 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
                             sb.append(" - Patient: ").append(
                                 visit.getPatient().getNumber());
                             sb.append(" - Visit: ").append(
-                                visit.getFormattedDateDrawn());
-                            sb.append(" - ")
-                                .append(visit.getClinic().getName());
+                                visit.getShipment().getFormattedDateDrawn());
+                            sb.append(" - ").append(
+                                visit.getShipment().getClinic().getName());
                             totalNb++;
                         }
                     }

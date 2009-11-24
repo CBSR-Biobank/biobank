@@ -3,6 +3,7 @@ package test.ualberta.med.biobank.internal;
 import edu.ualberta.med.biobank.common.wrappers.SampleSourceWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShptSampleSourceWrapper;
+import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 
 public class ShptSampleSourceHelper extends DbHelper {
 
@@ -28,4 +29,5 @@ public class ShptSampleSourceHelper extends DbHelper {
             addShptSampleSource(name + i, shipment);
         }
     }
+
 }

@@ -27,7 +27,7 @@
       <fontsize>12</fontsize>
       <defaultstereotypeview>0</defaultstereotypeview>
       <generationoutputdir>/tmp</generationoutputdir>
-      <activediagram>Clinic</activediagram>
+      <activediagram>DM-SHIPMENT</activediagram>
     </settings>
     <searchpath href="PROJECT_DIR" />
     <members>
@@ -125,7 +125,7 @@
 			UML 1.4
 		</plugin>
 </profile>
-<XMI xmi.version = '1.2' xmlns:UML = 'org.omg.xmi.namespace.UML' timestamp = 'Tue Nov 24 11:54:20 MST 2009'>
+<XMI xmi.version = '1.2' xmlns:UML = 'org.omg.xmi.namespace.UML' timestamp = 'Tue Nov 24 15:39:10 MST 2009'>
   <XMI.header>    <XMI.documentation>
       <XMI.exporter>ArgoUML (using Netbeans XMI Writer version 1.0)</XMI.exporter>
       <XMI.exporterVersion>0.26.2(6) revised on $Date: 2007-05-12 08:08:08 +0200 (Sat, 12 May 2007) $ </XMI.exporterVersion>
@@ -7326,6 +7326,13 @@
                             <UML:TagDefinition xmi.idref = '-64--88-0-1-19a32e0:1151feda71c:-8000:000000000000100B'/>
                           </UML:TaggedValue.type>
                         </UML:TaggedValue>
+                        <UML:TaggedValue xmi.id = '127-0-1-1-55593d91:12526fce6cc:-8000:000000000000276A'
+                          isSpecification = 'false'>
+                          <UML:TaggedValue.dataValue>edu.ualberta.med.biobank.model.ShptSampleSource.patientCollection</UML:TaggedValue.dataValue>
+                          <UML:TaggedValue.type>
+                            <UML:TagDefinition xmi.idref = '-64--88-1-107-8238f4:112105617ae:-8000:000000000000315F'/>
+                          </UML:TaggedValue.type>
+                        </UML:TaggedValue>
                       </UML:ModelElement.taggedValue>
                       <UML:StructuralFeature.type>
                         <UML:DataType xmi.idref = 'eaxmiid0'/>
@@ -7348,13 +7355,6 @@
                           <UML:TaggedValue.dataValue>edu.ualberta.med.biobank.model.ShptSampleSource.patientCollection</UML:TaggedValue.dataValue>
                           <UML:TaggedValue.type>
                             <UML:TagDefinition xmi.idref = '-64--88-0-1-19a32e0:1151feda71c:-8000:000000000000100B'/>
-                          </UML:TaggedValue.type>
-                        </UML:TaggedValue>
-                        <UML:TaggedValue xmi.id = '127-0-1-1-55593d91:12526fce6cc:-8000:0000000000002760'
-                          isSpecification = 'false'>
-                          <UML:TaggedValue.dataValue>edu.ualberta.med.biobank.model.Patient.shptSampleSourceCollection</UML:TaggedValue.dataValue>
-                          <UML:TaggedValue.type>
-                            <UML:TagDefinition xmi.idref = '-64--88-1-107-8238f4:112105617ae:-8000:000000000000315F'/>
                           </UML:TaggedValue.type>
                         </UML:TaggedValue>
                       </UML:ModelElement.taggedValue>
@@ -47810,7 +47810,7 @@
         x="281"
         y="403"
         width="571"
-        height="18"
+        height="15"
         fill="0"
         fillcolor="white"
         stroke="0"
@@ -47891,7 +47891,7 @@
         x="281"
         y="360"
         width="135"
-        height="21"
+        height="24"
         fill="0"
         fillcolor="white"
         stroke="0"

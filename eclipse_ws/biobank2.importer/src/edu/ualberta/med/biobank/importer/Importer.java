@@ -353,7 +353,7 @@ public class Importer {
                 pv.setDateDrawn(bbpdbDateFmt.parse(rs.getString(5)));
                 pv.setPatient(patient);
                 pv.setClinic(clinic);
-                pv.setComments(rs.getString(4));
+                pv.setComment(rs.getString(4));
                 pv = (PatientVisit) bioBank2Db.setObject(pv);
 
                 System.out.println("importing patient visit: patient/"

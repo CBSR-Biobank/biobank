@@ -34,8 +34,11 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SampleSourceWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ShptSampleSourceWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.common.wrappers.WrapperException;
@@ -91,8 +94,10 @@ public class DebugInitializationHelper {
 
                     // insert methods are listed here and order is important
                     String[] insertMethodNames = new String[] { "insertSite",
-                        "insertClinicsInSite", "insertStudyInSite",
-                        "insertPatientInStudy", "insertPatientVisitsInPatient",
+                        "insertClinicsInSite", "insertShipmentsInClinics",
+                        "insertStudyInSite", "insertPatientInStudy",
+                        "insertShptSampleSourceForShipment",
+                        "insertPatientVisitsInPatient",
                         "insertContainerTypesInSite", "insertContainers",
                         "insertSampleStorage" };
                     int taskNber = insertMethodNames.length
@@ -191,6 +196,21 @@ public class DebugInitializationHelper {
     }
 
     @SuppressWarnings("unused")
+    private void insertShipmentsInClinics() throws Exception {
+        insertShipmentsInClinic(clinics[0]);
+        insertShipmentsInClinic(clinics[1]);
+    }
+
+    private void insertShipmentsInClinic(ClinicWrapper clinic) throws Exception {
+        for (int i = 0; i < 50; i++) {
+            ShipmentWrapper shipment = new ShipmentWrapper(appService);
+            shipment.setClinic(clinic);
+            shipment.persist();
+        }
+        clinic.reload();
+    }
+
+    @SuppressWarnings("unused")
     private void insertStudyInSite() throws Exception {
         study = new StudyWrapper(appService);
         study.setName("Blood Borne Pathogens");
@@ -224,11 +244,15 @@ public class DebugInitializationHelper {
     private PatientVisitWrapper createPatientVisit(Random r,
         PatientWrapper patient) throws ApplicationException {
         PatientVisitWrapper patientVisit = new PatientVisitWrapper(appService);
-        patientVisit.setClinic(clinics[0]);
         String dateStr = String.format("2009-%02d-25 %02d:%02d",
             r.nextInt(12) + 1, r.nextInt(24), r.nextInt(60));
-        patientVisit.setDateDrawn(DateFormatter.parseToDateTime(dateStr));
+        patientVisit.setDateProcessed(DateFormatter.parseToDateTime(dateStr));
         patientVisit.setPatient(patient);
+        List<ShptSampleSourceWrapper> sssList = patient
+            .getShptSampleSourceCollection();
+        if (sssList.size() > 0) {
+            patientVisit.setShipment(sssList.get(0).getShipment());
+        }
         SampleWrapper sample = createSample(patientVisit);
         patientVisit.setSampleCollection(Arrays
             .asList(new SampleWrapper[] { sample }));
@@ -261,6 +285,28 @@ public class DebugInitializationHelper {
         study.persist();
         study.reload();
         patients = study.getPatientCollection();
+    }
+
+    @SuppressWarnings("unused")
+    private void insertShptSampleSourceForShipment() throws Exception {
+        List<ShipmentWrapper> shipmentCollection = new ArrayList<ShipmentWrapper>();
+        shipmentCollection.addAll(clinics[0].getShipmentCollection());
+        shipmentCollection.addAll(clinics[1].getShipmentCollection());
+        int i = 0;
+        List<SampleSourceWrapper> sampleSources = SampleSourceWrapper
+            .getAllSampleSources(appService);
+        for (PatientWrapper patient : patients) {
+            ShipmentWrapper shipment = shipmentCollection.get(i);
+            ShptSampleSourceWrapper sss = new ShptSampleSourceWrapper(
+                appService);
+            sss.setSampleSource(sampleSources.get(5));
+            sss.setQuantity(5);
+            sss.setPatientCollection(Arrays
+                .asList(new PatientWrapper[] { patient }));
+            sss.setShipment(shipment);
+            sss.persist();
+            i++;
+        }
     }
 
     @SuppressWarnings("unused")
@@ -503,6 +549,7 @@ public class DebugInitializationHelper {
             monitor.subTask("deleting clinic " + clinic);
             clinic.reload();
             deleteFromList(clinic.getContactCollection(), monitor, "Contact");
+            deleteFromList(clinic.getShipmentCollection(), monitor, "Shipment");
             clinic.reload();
             clinic.delete();
         }

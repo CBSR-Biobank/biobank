@@ -16,7 +16,6 @@ import org.eclipse.core.databinding.observable.value.WritableValue;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.viewers.ComboViewer;
-import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -31,11 +30,9 @@ import org.eclipse.swt.widgets.Text;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
-import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
-import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.PvCustomInfo;
 import edu.ualberta.med.biobank.treeview.PatientAdapter;
 import edu.ualberta.med.biobank.treeview.PatientVisitAdapter;
@@ -43,7 +40,6 @@ import edu.ualberta.med.biobank.validators.DateNotNulValidator;
 import edu.ualberta.med.biobank.validators.DoubleNumberValidator;
 import edu.ualberta.med.biobank.widgets.ComboAndQuantityWidget;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
-import edu.ualberta.med.biobank.widgets.PvSampleSourceEntryWidget;
 import edu.ualberta.med.biobank.widgets.SelectMultipleWidget;
 import edu.ualberta.med.biobank.widgets.listeners.BiobankEntryFormWidgetListener;
 import edu.ualberta.med.biobank.widgets.listeners.MultiSelectEvent;
@@ -72,17 +68,11 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         }
     };
 
-    private DateTimeWidget dateDrawn;
-
-    private DateTimeWidget dateReceived;
-
     private DateTimeWidget dateProcessed;
 
     private ComboViewer clinicsComboViewer;
 
-    private Text commentsText;
-
-    private PvSampleSourceEntryWidget pvSampleSourceEntryWidget;
+    private Text commentText;
 
     private PatientWrapper patientWrapper;
 
@@ -107,7 +97,8 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         if (patientVisitWrapper.isNew()) {
             tabName = "New Patient Visit";
         } else {
-            tabName = "Visit " + patientVisitWrapper.getFormattedDateDrawn();
+            tabName = "Visit "
+                + patientVisitWrapper.getShipment().getFormattedDateDrawn();
         }
         setPartName(tabName);
     }
@@ -118,7 +109,8 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
             patientWrapper.reload();
         } catch (Exception e) {
             LOGGER.error("Error while retrieving patient visit "
-                + patientVisitAdapter.getWrapper().getDateDrawn(), e);
+                + patientVisitAdapter.getWrapper().getShipment().getDateDrawn()
+                + " (Patient " + patientVisitWrapper.getPatient() + ")", e);
         }
     }
 
@@ -130,7 +122,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         form.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
             BioBankPlugin.IMG_PATIENT_VISIT));
         createMainSection(patientWrapper.getStudy());
-        createSourcesSection();
+        // createSourcesSection();
         if (patientVisitWrapper.isNew()) {
             setDirty(true);
         }
@@ -149,33 +141,24 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         FormUtils.setTextValue(siteLabel, patientVisitWrapper.getPatient()
             .getStudy().getSite().getName());
 
-        if (patientVisitWrapper.isNew()) {
-            // choose clinic for new visit
-            List<ClinicWrapper> studyClinics = study.getClinicCollection();
-            ClinicWrapper selectedClinic = patientVisitWrapper.getClinic();
-            if (studyClinics.size() == 1) {
-                selectedClinic = studyClinics.get(0);
-            }
-            clinicsComboViewer = createComboViewerWithNoSelectionValidator(
-                client, "Clinic", studyClinics, selectedClinic,
-                "A clinic should be selected");
-        } else {
-            Label clinicLabel = (Label) createWidget(client, Label.class,
-                SWT.NONE, "Clinic");
-            if (patientVisitWrapper.getClinic() != null) {
-                clinicLabel.setText(patientVisitWrapper.getClinic().getName());
-            }
-        }
-
-        dateDrawn = createDateTimeWidget(client, "Date Drawn",
-            patientVisitWrapper.getDateDrawn(), "dateDrawn",
-            "Date drawn should be set", false);
-
-        firstControl = dateDrawn;
-
-        dateReceived = createDateTimeWidget(client, "Date Received",
-            patientVisitWrapper.getDateReceived(), "dateReceived",
-            "Date received should be set", false);
+        // if (patientVisitWrapper.isNew()) {
+        // // choose clinic for new visit
+        // List<ClinicWrapper> studyClinics = study.getClinicCollection();
+        // ClinicWrapper selectedClinic = patientVisitWrapper.getShipment()
+        // .getClinic();
+        // if (studyClinics.size() == 1) {
+        // selectedClinic = studyClinics.get(0);
+        // }
+        // clinicsComboViewer = createComboViewerWithNoSelectionValidator(
+        // client, "Clinic", studyClinics, selectedClinic,
+        // "A clinic should be selected");
+        // } else {
+        // Label clinicLabel = (Label) createWidget(client, Label.class,
+        // SWT.NONE, "Clinic");
+        // if (patientVisitWrapper.getClinic() != null) {
+        // clinicLabel.setText(patientVisitWrapper.getClinic().getName());
+        // }
+        // }
 
         if (patientVisitWrapper.getDateProcessed() == null) {
             patientVisitWrapper.setDateProcessed(new Date());
@@ -186,7 +169,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
 
         createPvDataSection(client);
 
-        commentsText = (Text) createBoundWidgetWithLabel(client, Text.class,
+        commentText = (Text) createBoundWidgetWithLabel(client, Text.class,
             SWT.MULTI, "Comments", null, BeansObservables.observeValue(
                 patientVisitWrapper, "comments"), null);
     }
@@ -305,20 +288,20 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         return widget;
     }
 
-    private void createSourcesSection() {
-        Composite client = createSectionWithClient("Source Vessels");
-
-        GridLayout layout = new GridLayout(1, false);
-        client.setLayout(layout);
-        client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-
-        pvSampleSourceEntryWidget = new PvSampleSourceEntryWidget(client,
-            SWT.NONE, patientVisitWrapper.getPvSampleSourceCollection(),
-            patientVisitWrapper, toolkit);
-        pvSampleSourceEntryWidget.addSelectionChangedListener(listener);
-        pvSampleSourceEntryWidget.addBinding(widgetCreator);
-
-    }
+    // private void createSourcesSection() {
+    // Composite client = createSectionWithClient("Source Vessels");
+    //
+    // GridLayout layout = new GridLayout(1, false);
+    // client.setLayout(layout);
+    // client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+    //
+    // pvSampleSourceEntryWidget = new ShptSampleSourceEntryWidget(client,
+    // SWT.NONE, patientVisitWrapper.getPvSampleSourceCollection(),
+    // patientVisitWrapper, toolkit);
+    // pvSampleSourceEntryWidget.addSelectionChangedListener(listener);
+    // pvSampleSourceEntryWidget.addBinding(widgetCreator);
+    //
+    // }
 
     @Override
     protected String getOkMessage() {
@@ -331,26 +314,25 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         PatientAdapter patientAdapter = (PatientAdapter) patientVisitAdapter
             .getParent();
         patientVisitWrapper.setPatient(patientAdapter.getWrapper());
-        if (clinicsComboViewer != null) {
-            IStructuredSelection clinicSelection = (IStructuredSelection) clinicsComboViewer
-                .getSelection();
-            if ((clinicSelection != null) && (clinicSelection.size() > 0)) {
-                patientVisitWrapper.setClinic((ClinicWrapper) clinicSelection
-                    .getFirstElement());
-            } else {
-                patientVisitWrapper.setClinic((Clinic) null);
-            }
-        }
+        // if (clinicsComboViewer != null) {
+        // IStructuredSelection clinicSelection = (IStructuredSelection)
+        // clinicsComboViewer
+        // .getSelection();
+        // if ((clinicSelection != null) && (clinicSelection.size() > 0)) {
+        // patientVisitWrapper.setClinic((ClinicWrapper) clinicSelection
+        // .getFirstElement());
+        // } else {
+        // patientVisitWrapper.setClinic((Clinic) null);
+        // }
+        // }
 
-        patientVisitWrapper.setDateDrawn(dateDrawn.getDate());
         patientVisitWrapper.setDateProcessed(dateProcessed.getDate());
-        patientVisitWrapper.setDateReceived(dateReceived.getDate());
-        patientVisitWrapper.setComments(commentsText.getText());
+        patientVisitWrapper.setComment(commentText.getText());
 
         setPvCustomInfo();
-        patientVisitWrapper
-            .setPvSampleSourceCollection(pvSampleSourceEntryWidget
-                .getPvSampleSources());
+        // patientVisitWrapper
+        // .setPvSampleSourceCollection(pvSampleSourceEntryWidget
+        // .getPvSampleSources());
 
         if (patientVisitWrapper.isNew()) {
             patientVisitWrapper.setUsername(SessionManager.getInstance()
@@ -405,9 +387,9 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         if (patientVisitWrapper.getDateProcessed() == null) {
             patientVisitWrapper.setDateProcessed(new Date());
         }
-        pvSampleSourceEntryWidget
-            .setSelectedPvSampleSources(patientVisitWrapper
-                .getPvSampleSourceCollection());
+        // pvSampleSourceEntryWidget
+        // .setSelectedPvSampleSources(patientVisitWrapper
+        // .getPvSampleSourceCollection());
 
         // TODO reset for optional values
     }

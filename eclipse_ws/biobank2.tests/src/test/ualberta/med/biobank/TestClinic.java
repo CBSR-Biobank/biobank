@@ -285,4 +285,8 @@ public class TestClinic extends TestDatabase {
         Assert.assertEquals(null, clinic.getName());
     }
 
+    public void testGetPatientVisitCollection() {
+        Assert.fail("need to be implemented");
+    }
+
 }

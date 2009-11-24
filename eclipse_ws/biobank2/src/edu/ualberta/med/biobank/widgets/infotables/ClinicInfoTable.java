@@ -27,10 +27,10 @@ public class ClinicInfoTable extends InfoTableWidget<ClinicWrapper> {
         throws Exception {
         SiteClinicInfo info = new SiteClinicInfo();
         info.clinicWrapper = clinic;
-        info.patientVisits = clinic.getPatientVisitCollection().size();
+        List<PatientVisitWrapper> pvs = clinic.getPatientVisitCollection();
+        info.patientVisits = pvs.size();
         info.activityStatus = clinic.getActivityStatus();
         info.studies = clinic.getStudyCollection().size();
-        List<PatientVisitWrapper> pvs = clinic.getPatientVisitCollection();
         HashSet<Integer> patients = new HashSet<Integer>();
         for (int i = 0; i < pvs.size(); i++) {
             patients.add(pvs.get(i).getPatient().getId());

@@ -257,4 +257,9 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
             .firePropertyChange("comment", oldComment, comment);
     }
 
+    @Override
+    public String toString() {
+        return getFormattedDateDrawn();
+    }
+
 }

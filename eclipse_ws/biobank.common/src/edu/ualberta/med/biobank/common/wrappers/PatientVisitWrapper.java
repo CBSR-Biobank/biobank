@@ -325,12 +325,8 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
 
     @Override
     public int compareTo(ModelWrapper<PatientVisit> wrapper) {
-        // Date v1Date = wrappedObject.getDateDrawn();
-        // Date v2Date = wrapper.wrappedObject.getDateDrawn();
-        // return ((v1Date.compareTo(v2Date) > 0) ? 1 : (v1Date.equals(v2Date) ?
-        // 0
-        // : -1));
-        return 0;
+        return getShipment().compareTo(
+            ((PatientVisitWrapper) wrapper).getShipment());
     }
 
     @Override
@@ -348,8 +344,8 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
         pvInfoDataMap = null;
     }
 
-    // @Override
-    // public String toString() {
-    // return getFormattedDateDrawn();
-    // }
+    @Override
+    public String toString() {
+        return getShipment().getFormattedDateDrawn();
+    }
 }

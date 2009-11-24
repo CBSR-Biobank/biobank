@@ -18,11 +18,11 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ShptSampleSourceWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleSourceWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ShptSampleSourceWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.ClinicStudyInfo;
@@ -76,7 +76,7 @@ public class BiobankLabelProvider extends LabelProvider implements
             PatientVisitWrapper visit = (PatientVisitWrapper) element;
             switch (columnIndex) {
             case 0:
-                return visit.getFormattedDateDrawn();
+                return visit.getShipment().getFormattedDateDrawn();
             case 1:
                 return String.valueOf(visit.getSampleCollection().size());
             }
