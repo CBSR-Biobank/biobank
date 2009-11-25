@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.forms;
 
 import java.util.Collection;
+import java.util.Date;
 
 import org.acegisecurity.AccessDeniedException;
 import org.apache.commons.collections.map.ListOrderedMap;
@@ -48,6 +49,7 @@ import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.validators.AbstractValidator;
+import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 
 /**
  * Base class for data entry forms.
@@ -230,6 +232,13 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
         String errorMessage) {
         return widgetCreator.createComboViewerWithNoSelectionValidator(parent,
             fieldLabel, input, selection, errorMessage);
+    }
+
+    protected DateTimeWidget createDateTimeWidget(Composite client,
+        String nameLabel, Date date, Object observedObject,
+        String propertyName, final String emptyMessage, boolean canBeEmpty) {
+        return widgetCreator.createDateTimeWidget(client, nameLabel, date,
+            observedObject, propertyName, emptyMessage, canBeEmpty);
     }
 
     protected void bindChangeListener() {

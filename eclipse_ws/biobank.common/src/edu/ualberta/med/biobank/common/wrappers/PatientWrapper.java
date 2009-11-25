@@ -3,12 +3,14 @@ package edu.ualberta.med.biobank.common.wrappers;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.PatientVisit;
+import edu.ualberta.med.biobank.model.Shipment;
 import edu.ualberta.med.biobank.model.ShptSampleSource;
 import edu.ualberta.med.biobank.model.Study;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -78,7 +80,7 @@ public class PatientWrapper extends ModelWrapper<Patient> {
     @Override
     protected String[] getPropertyChangesNames() {
         return new String[] { "number", "study", "patientVisitCollection",
-            "shptSampleSourceCollection" };
+            "shptSampleSourceCollection", "shipmentCollection" };
     }
 
     @Override
@@ -187,6 +189,30 @@ public class PatientWrapper extends ModelWrapper<Patient> {
         }
         setShptSampleSourceCollection(shptCollection, false);
         propertiesMap.put("shptSampleSourceCollection", shptSampleSources);
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<ShipmentWrapper> getShipmentCollection(boolean sort)
+        throws ApplicationException {
+        List<ShipmentWrapper> shipmentCollection = (List<ShipmentWrapper>) propertiesMap
+            .get("shipmentCollection");
+
+        if (shipmentCollection == null) {
+            shipmentCollection = new ArrayList<ShipmentWrapper>();
+            HQLCriteria c = new HQLCriteria(
+                "select ss.shipment from "
+                    + Patient.class.getName()
+                    + "  as p inner join p.shptSampleSourceCollection as ss where p.id=?",
+                Arrays.asList(new Object[] { getId() }));
+            List<Shipment> collection = appService.query(c);
+            for (Shipment s : collection) {
+                shipmentCollection.add(new ShipmentWrapper(appService, s));
+            }
+            if (sort)
+                Collections.sort(shipmentCollection);
+            propertiesMap.put("shipmentCollection", shipmentCollection);
+        }
+        return shipmentCollection;
     }
 
     @Override

@@ -553,8 +553,8 @@ public class StudyWrapper extends ModelWrapper<Study> {
         HQLCriteria c = new HQLCriteria("select count(distinct patients) from "
             + Study.class.getName() + " as study"
             + " inner join study.patientCollection as patients"
-            + " inner join patients.patientVisitCollection as visits"
-            + " inner join visits.clinic as clinic"
+            + " inner join patients.shptSampleSourceCollection as ss"
+            + " inner join ss.shipment.clinic as clinic"
             + " where study.id=? and clinic.id=?", Arrays.asList(new Object[] {
             getId(), clinic.getId() }));
 
@@ -570,8 +570,9 @@ public class StudyWrapper extends ModelWrapper<Study> {
         HQLCriteria c = new HQLCriteria("select count(visits) from "
             + Study.class.getName() + " as study"
             + " inner join study.patientCollection as patients"
-            + " inner join patients.patientVisitCollection as visits"
-            + " inner join visits.clinic as clinic"
+            + " inner join patients.shptSampleSourceCollection as ss"
+            + " inner join ss.shipment.patientVisitCollection as visits"
+            + " inner join ss.shipment.clinic as clinic"
             + " where study.id=? and clinic.id=?", Arrays.asList(new Object[] {
             getId(), clinic.getId() }));
 

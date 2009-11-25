@@ -15,9 +15,10 @@ import org.eclipse.swt.widgets.Tree;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.forms.PatientEntryForm;
 import edu.ualberta.med.biobank.forms.PatientViewForm;
-import edu.ualberta.med.biobank.forms.PatientVisitEntryForm;
+import edu.ualberta.med.biobank.forms.ShipmentEntryForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 
 public class PatientAdapter extends AdapterBase {
@@ -78,19 +79,32 @@ public class PatientAdapter extends AdapterBase {
         });
 
         mi = new MenuItem(menu, SWT.PUSH);
-        mi.setText("Add Patient Visit");
+        mi.setText("Add Shipment");
         mi.addSelectionListener(new SelectionListener() {
             public void widgetSelected(SelectionEvent event) {
-                PatientVisitAdapter adapter = new PatientVisitAdapter(
-                    PatientAdapter.this, new PatientVisitWrapper(
-                        getAppService()));
-                adapter.getWrapper().setPatient(getWrapper());
-                openForm(new FormInput(adapter), PatientVisitEntryForm.ID);
+                ShipmentAdapter adapter = new ShipmentAdapter(
+                    PatientAdapter.this, new ShipmentWrapper(getAppService()));
+                openForm(new FormInput(adapter), ShipmentEntryForm.ID);
             }
 
             public void widgetDefaultSelected(SelectionEvent e) {
             }
         });
+
+        // mi = new MenuItem(menu, SWT.PUSH);
+        // mi.setText("Add Patient Visit");
+        // mi.addSelectionListener(new SelectionListener() {
+        // public void widgetSelected(SelectionEvent event) {
+        // PatientVisitAdapter adapter = new PatientVisitAdapter(
+        // PatientAdapter.this, new PatientVisitWrapper(
+        // getAppService()));
+        // adapter.getWrapper().setPatient(getWrapper());
+        // openForm(new FormInput(adapter), PatientVisitEntryForm.ID);
+        // }
+        //
+        // public void widgetDefaultSelected(SelectionEvent e) {
+        // }
+        // });
     }
 
     @Override

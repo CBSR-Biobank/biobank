@@ -1024,6 +1024,12 @@
             id="edu.ualberta.med.biobank.forms.SampleTypesEntryForm"
             name="View Sample Types">
       </editor>
+      <editor
+            class="edu.ualberta.med.biobank.forms.ShipmentEntryForm"
+            default="false"
+            id="edu.ualberta.med.biobank.forms.ShipmentEntryForm"
+            name="Shipment Entry">
+      </editor>
    </extension>
    <extension
          point="org.eclipse.ui.bindings">

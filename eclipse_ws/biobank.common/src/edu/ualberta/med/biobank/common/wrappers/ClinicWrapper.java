@@ -416,7 +416,7 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
             pvCollection = new ArrayList<PatientVisitWrapper>();
             HQLCriteria c = new HQLCriteria("select distinct pv from "
                 + PatientVisit.class.getName()
-                + " where shipment.clinic.id = ?", Arrays
+                + " as pv where shipment.clinic.id = ?", Arrays
                 .asList(new Object[] { getId() }));
             List<PatientVisit> collection = appService.query(c);
             for (PatientVisit pv : collection) {

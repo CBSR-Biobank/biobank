@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.widgets.utils;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 
 import org.apache.commons.collections.MapIterator;
@@ -30,6 +31,8 @@ import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
@@ -44,8 +47,10 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import edu.ualberta.med.biobank.forms.FieldInfo;
 import edu.ualberta.med.biobank.forms.FormUtils;
 import edu.ualberta.med.biobank.validators.AbstractValidator;
+import edu.ualberta.med.biobank.validators.DateNotNulValidator;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
+import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 
 public class WidgetCreator {
 
@@ -287,6 +292,45 @@ public class WidgetCreator {
             label = toolkit.createLabel(parent, text, options);
         }
         return label;
+    }
+
+    public DateTimeWidget createDateTimeWidget(Composite client,
+        String nameLabel, Date date, Object observedObject,
+        String propertyName, final String emptyMessage, boolean canBeEmpty) {
+        Label label = toolkit.createLabel(client, nameLabel + ":", SWT.NONE);
+        label.setLayoutData(new GridData(GridData.VERTICAL_ALIGN_BEGINNING));
+        final DateTimeWidget widget = new DateTimeWidget(client, SWT.NONE, date);
+        widget.addSelectionListener(selectionListener);
+        widget.adaptToToolkit(toolkit, true);
+
+        if (observedObject != null && propertyName != null) {
+            final IObservableValue dateValue = BeansObservables.observeValue(
+                observedObject, propertyName);
+            widget.addSelectionListener(new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent e) {
+                    dateValue.setValue(widget.getDate());
+                }
+            });
+            dateValue.addValueChangeListener(new IValueChangeListener() {
+                @Override
+                public void handleValueChange(ValueChangeEvent event) {
+                    widget.setDate((Date) dateValue.getValue());
+                }
+            });
+
+            if (!canBeEmpty) {
+                DateNotNulValidator validator = new DateNotNulValidator(
+                    emptyMessage);
+                validator.setControlDecoration(FormUtils.createDecorator(label,
+                    validator.getErrorMessage()));
+                UpdateValueStrategy uvs = new UpdateValueStrategy();
+                uvs.setAfterConvertValidator(validator);
+                bindValue(new WritableValue(null, Date.class), dateValue, uvs,
+                    uvs);
+            }
+        }
+        return widget;
     }
 
     public void addBooleanBinding(WritableValue writableValue,
