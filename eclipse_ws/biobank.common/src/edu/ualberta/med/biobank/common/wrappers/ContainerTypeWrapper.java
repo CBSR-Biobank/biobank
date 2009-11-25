@@ -44,7 +44,7 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
     }
 
     @Override
-    protected String[] getPropertyChangesNames() {
+    protected String[] getPropertyChangeNames() {
         return new String[] { "name", "comment", "nameShort", "topLevel",
             "defaultTemperature", "activityStatus", "sampleTypeCollection",
             "childContainerTypeCollection", "site", "capacity",

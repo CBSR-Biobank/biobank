@@ -2,18 +2,96 @@ package test.ualberta.med.biobank;
 
 import static org.junit.Assert.fail;
 
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+
+import junit.framework.Assert;
+
+import org.junit.Before;
 import org.junit.Test;
+
+import test.ualberta.med.biobank.internal.ClinicHelper;
+import test.ualberta.med.biobank.internal.PatientHelper;
+import test.ualberta.med.biobank.internal.PatientVisitHelper;
+import test.ualberta.med.biobank.internal.ShipmentHelper;
+import test.ualberta.med.biobank.internal.SiteHelper;
+import test.ualberta.med.biobank.internal.StudyHelper;
+import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
+import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
+import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 
 public class TestPatientVisit extends TestDatabase {
 
-    @Test
-    public void testGettersAndSetters() throws Exception {
-        fail("Not yet implemented");
+    private SiteWrapper site;
+
+    private StudyWrapper study;
+
+    private ClinicWrapper clinic;
+
+    private ShipmentWrapper shipment;
+
+    private PatientWrapper patient;
+
+    // the methods to skip in the getters and setters test
+    private static final List<String> GETTER_SKIP_METHODS = Arrays
+        .asList(new String[] { "getPvInfo", "getPvInfoType" });
+
+    @Override
+    @Before
+    public void setUp() throws Exception {
+        super.setUp();
+        site = SiteHelper.addSite("Site - Patient Visit Test "
+            + Utils.getRandomString(10));
+        study = StudyHelper.addStudy(site, "Study - Patient Visit Test "
+            + Utils.getRandomString(10));
+        clinic = ClinicHelper.addClinic(site, "Clinic - Patient Visit Test "
+            + Utils.getRandomString(10));
+        shipment = ShipmentHelper.addShipment(clinic, Utils.getRandomDate());
+        patient = PatientHelper.addPatient(Utils.getRandomNumericString(20),
+            study);
     }
 
     @Test
-    public void testCompareTo() {
-        fail("Not yet implemented");
+    public void testGettersAndSetters() throws Exception {
+        PatientVisitWrapper visit = PatientVisitHelper.addPatientVisit(patient,
+            shipment, Utils.getRandomDate());
+        testGettersAndSetters(visit, GETTER_SKIP_METHODS);
+    }
+
+    @Test
+    public void testCompareTo() throws Exception {
+        // visit2's date drawn is 1 day after visit1's
+        Date dateDrawn = Utils.getRandomDate();
+        PatientVisitWrapper visit1 = PatientVisitHelper.addPatientVisit(
+            patient, shipment, dateDrawn);
+
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(dateDrawn);
+        cal.add(Calendar.DATE, 1);
+        ShipmentWrapper shipment2 = ShipmentHelper.addShipment(clinic);
+        shipment2.setDateDrawn(cal.getTime());
+
+        PatientVisitWrapper visit2 = PatientVisitHelper.addPatientVisit(
+            patient, shipment2, cal.getTime());
+
+        Assert.assertEquals(-1, visit1.compareTo(visit2));
+
+        // visit2's date drawn is 1 day before visit1's
+        cal.add(Calendar.DATE, -2);
+        shipment.setDateDrawn(cal.getTime());
+        visit2.reload();
+        Assert.assertEquals(1, visit1.compareTo(visit2));
+
+        // visit2's date drawn is the same day as visit1's
+        cal.add(Calendar.DATE, 2);
+        shipment.setDateDrawn(cal.getTime());
+        visit2.reload();
+        Assert.assertEquals(0, visit1.compareTo(visit2));
     }
 
     @Test
@@ -27,7 +105,32 @@ public class TestPatientVisit extends TestDatabase {
     }
 
     @Test
+    public void testDelete() throws Exception {
+        fail("Not yet implemented");
+    }
+
+    @Test
     public void testGetWrappedClass() {
+        fail("Not yet implemented");
+    }
+
+    @Test
+    public void testGetSampleCollection() {
+        fail("Not yet implemented");
+    }
+
+    @Test
+    public void testGetPvInfo() {
+        fail("Not yet implemented");
+    }
+
+    @Test
+    public void testGetPvInfoType() {
+        fail("Not yet implemented");
+    }
+
+    @Test
+    public void testPvInfoAllowedValues() {
         fail("Not yet implemented");
     }
 
@@ -52,32 +155,12 @@ public class TestPatientVisit extends TestDatabase {
     }
 
     @Test
-    public void testGetSampleCollection() {
-        fail("Not yet implemented");
-    }
-
-    @Test
-    public void testGetClinic() {
+    public void testGetShipment() {
         fail("Not yet implemented");
     }
 
     @Test
     public void testGetPvInfoLabels() {
-        fail("Not yet implemented");
-    }
-
-    @Test
-    public void testGetPvInfo() {
-        fail("Not yet implemented");
-    }
-
-    @Test
-    public void testGetPvInfoType() {
-        fail("Not yet implemented");
-    }
-
-    @Test
-    public void testPvInfoAllowedValues() {
         fail("Not yet implemented");
     }
 

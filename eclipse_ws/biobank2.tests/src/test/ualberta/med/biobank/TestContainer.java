@@ -600,8 +600,7 @@ public class TestContainer extends TestDatabase {
 
         PatientWrapper patient = PatientHelper.addPatient("1000", study);
         PatientVisitWrapper pv = PatientVisitHelper.addPatientVisit(patient,
-            shipment, Utils.getRandomDate(), Utils.getRandomDate(), Utils
-                .getRandomDate());
+            shipment, Utils.getRandomDate());
         return pv;
     }
 
@@ -650,8 +649,7 @@ public class TestContainer extends TestDatabase {
         ShipmentWrapper shipment = ShipmentHelper.addShipment(clinic);
         PatientWrapper patient = PatientHelper.addPatient("1000", study);
         PatientVisitWrapper pv = PatientVisitHelper.addPatientVisit(patient,
-            shipment, Utils.getRandomDate(), Utils.getRandomDate(), Utils
-                .getRandomDate());
+            shipment, Utils.getRandomDate());
 
         ContainerWrapper top = containerMap.get("Top");
         addContainerHierarchy(top);

@@ -96,7 +96,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
      * return the list of the different properties we want to notify when we
      * call firePropertyChanges
      */
-    protected abstract String[] getPropertyChangesNames();
+    protected abstract String[] getPropertyChangeNames();
 
     /**
      * When retrieve the values from the database, need to fire the
@@ -104,7 +104,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
      */
     private void firePropertyChanges(Object oldWrappedObject,
         Object newWrappedObject) throws Exception {
-        String[] memberNames = getPropertyChangesNames();
+        String[] memberNames = getPropertyChangeNames();
         if (memberNames == null) {
             throw new Exception("memberNames cannot be null");
         }

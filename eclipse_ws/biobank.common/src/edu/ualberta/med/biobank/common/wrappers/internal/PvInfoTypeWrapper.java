@@ -21,7 +21,7 @@ public class PvInfoTypeWrapper extends ModelWrapper<PvInfoType> {
     }
 
     @Override
-    protected String[] getPropertyChangesNames() {
+    protected String[] getPropertyChangeNames() {
         return new String[] { "type" };
     }
 

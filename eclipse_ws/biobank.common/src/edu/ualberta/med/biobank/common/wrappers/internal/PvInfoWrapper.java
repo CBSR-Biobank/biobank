@@ -20,7 +20,7 @@ public class PvInfoWrapper extends ModelWrapper<PvInfo> {
     }
 
     @Override
-    protected String[] getPropertyChangesNames() {
+    protected String[] getPropertyChangeNames() {
         return new String[] { "label", "possibleValues", "pvInfoPossible",
             "pvInfoType" };
     }

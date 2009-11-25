@@ -141,7 +141,7 @@ public class ContactWrapper extends ModelWrapper<Contact> {
     }
 
     @Override
-    protected String[] getPropertyChangesNames() {
+    protected String[] getPropertyChangeNames() {
         return new String[] { "name", "title", "phoneNumber", "faxNumber",
             "emailAddress", "clinic", "studyCollection" };
     }

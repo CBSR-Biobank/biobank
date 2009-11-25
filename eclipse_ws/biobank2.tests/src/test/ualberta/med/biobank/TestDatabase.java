@@ -97,8 +97,33 @@ public class TestDatabase {
 
     public void testGettersAndSetters(ModelWrapper<?> w)
         throws BiobankCheckException, Exception {
+        testGettersAndSetters(w, null);
+    }
+
+    public void testGettersAndSetters(ModelWrapper<?> w,
+        List<String> skipMethods) throws BiobankCheckException, Exception {
         Collection<GetterInfo> gettersInfoList = getGettersAndSetters(w);
+
+        if (skipMethods != null) {
+            List<String> methodNames = new ArrayList<String>();
+            for (GetterInfo getterInfo : gettersInfoList) {
+                methodNames.add(getterInfo.getMethod.getName());
+            }
+
+            for (String methodName : skipMethods) {
+                if (!methodNames.contains(methodName)) {
+                    throw new Exception("method to skip does not exist: "
+                        + methodName);
+                }
+            }
+        }
+
         for (GetterInfo getterInfo : gettersInfoList) {
+            if ((skipMethods != null)
+                && skipMethods.contains(getterInfo.getMethod.getName())) {
+                continue;
+            }
+
             if (getterInfo.setMethod == null) {
                 System.out.println("no setter found for "
                     + w.getClass().getName() + "."
@@ -128,6 +153,9 @@ public class TestDatabase {
                         + " for class " + w.getClass().getName()
                         + " not implemented");
                 }
+
+                System.out.println("invoking " + w.getClass().getName() + "."
+                    + getterInfo.getMethod.getName());
 
                 getterInfo.setMethod.invoke(w, parameter);
                 w.persist();

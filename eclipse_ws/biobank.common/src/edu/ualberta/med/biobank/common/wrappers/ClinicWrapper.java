@@ -32,7 +32,7 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
     }
 
     @Override
-    protected String[] getPropertyChangesNames() {
+    protected String[] getPropertyChangeNames() {
         return new String[] { "name", "activityStatus", "comment", "address",
             "site", "contactCollection", "shipmentCollection", "street1",
             "street2", "city", "province", "postalCode",

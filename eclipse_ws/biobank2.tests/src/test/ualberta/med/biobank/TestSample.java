@@ -55,7 +55,7 @@ public class TestSample extends TestDatabase {
         ClinicWrapper clinic = ClinicHelper.addClinic(site, "clinicname");
         ShipmentWrapper shipment = ShipmentHelper.addShipment(clinic);
         PatientVisitWrapper pv = PatientVisitHelper.addPatientVisit(patient,
-            shipment, null, null, null);
+            shipment, null);
         sample = SampleHelper.newSample(sampleTypeWrapper, container, pv, 3, 3);
         container.reload();
     }

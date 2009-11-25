@@ -25,6 +25,19 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
 
     private Map<String, PvInfoDataWrapper> pvInfoDataMap;
 
+    public class PvInfoPvInfoData {
+        private PvInfoWrapper pvInfo;
+        private PvInfoDataWrapper pvInfoData;
+
+        public PvInfoWrapper getPvInfo() {
+            return pvInfo;
+        }
+
+        public PvInfoDataWrapper getPvInfoData() {
+            return pvInfoData;
+        }
+    }
+
     public PatientVisitWrapper(WritableApplicationService appService,
         PatientVisit wrappedObject) {
         super(appService, wrappedObject);
@@ -36,7 +49,7 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
     }
 
     @Override
-    protected String[] getPropertyChangesNames() {
+    protected String[] getPropertyChangeNames() {
         return new String[] { "patient", "dateProcessed", "comment",
             "pvInfoDataCollection", "sampleCollection", "username", "shipment" };
     }
@@ -107,14 +120,6 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
         }
         setSampleCollection(collection, false);
         propertiesMap.put("sampleCollection", sampleCollection);
-    }
-
-    public Collection<SampleWrapper> getSampleWrapperCollection() {
-        Collection<SampleWrapper> collection = new HashSet<SampleWrapper>();
-        for (Sample sample : wrappedObject.getSampleCollection()) {
-            collection.add(new SampleWrapper(appService, sample));
-        }
-        return collection;
     }
 
     @SuppressWarnings("unchecked")
@@ -254,7 +259,7 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
     @Override
     protected void persistChecks() throws BiobankCheckException,
         ApplicationException, WrapperException {
-        // TODO check add only one shipment ? but should be done throught
+        // TODO check add only one shipment ? but should be done through
         // hibernate
 
         // TODO WAs checking study set to the patient visit was on the studies
@@ -310,23 +315,13 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
         ApplicationException {
     }
 
-    public class PvInfoPvInfoData {
-        private PvInfoWrapper pvInfo;
-        private PvInfoDataWrapper pvInfoData;
-
-        public PvInfoWrapper getPvInfo() {
-            return pvInfo;
-        }
-
-        public PvInfoDataWrapper getPvInfoData() {
-            return pvInfoData;
-        }
-    }
-
     @Override
     public int compareTo(ModelWrapper<PatientVisit> wrapper) {
-        return getShipment().compareTo(
-            ((PatientVisitWrapper) wrapper).getShipment());
+        Date v1Date = wrappedObject.getDateProcessed();
+        Date v2Date = wrapper.wrappedObject.getDateProcessed();
+        return ((v1Date.compareTo(v2Date) > 0) ? 1 : (v1Date.equals(v2Date) ? 0
+            : -1));
+
     }
 
     @Override

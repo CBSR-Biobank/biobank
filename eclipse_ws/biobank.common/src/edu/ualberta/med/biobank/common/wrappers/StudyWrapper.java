@@ -112,7 +112,7 @@ public class StudyWrapper extends ModelWrapper<Study> {
     }
 
     @Override
-    protected String[] getPropertyChangesNames() {
+    protected String[] getPropertyChangeNames() {
         return new String[] { "name", "nameShort", "activityStatus", "comment",
             "site", "contactCollection", "sampleStorageCollection",
             "sampleSourceCollection", "pvInfoCollection", "patientCollection" };
