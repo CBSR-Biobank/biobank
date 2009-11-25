@@ -40,7 +40,7 @@ public class SampleWrapper extends
     }
 
     @Override
-    protected String[] getPropertyChangesNames() {
+    protected String[] getPropertyChangeNames() {
         return new String[] { "inventoryId", "patientVisit", "position",
             "linkDate", "sampleType", "quantity", "oldComment", "quantityUsed" };
     }

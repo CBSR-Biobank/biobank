@@ -61,7 +61,7 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
     // }
 
     @Override
-    protected String[] getPropertyChangesNames() {
+    protected String[] getPropertyChangeNames() {
         return new String[] { "dateDrawn", "dateReceived", "clinic", "comment",
             "shptSampleSourceCollection", "patientVisitCollection" };
     }

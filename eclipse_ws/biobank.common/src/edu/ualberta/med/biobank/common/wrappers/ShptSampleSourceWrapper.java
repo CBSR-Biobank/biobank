@@ -25,7 +25,7 @@ public class ShptSampleSourceWrapper extends ModelWrapper<ShptSampleSource> {
     }
 
     @Override
-    protected String[] getPropertyChangesNames() {
+    protected String[] getPropertyChangeNames() {
         return new String[] { "quantity", "shipment", "sampleSource",
             "patientCollection" };
     }

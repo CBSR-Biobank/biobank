@@ -26,9 +26,9 @@ public class ContainerPositionWrapper extends
     }
 
     @Override
-    protected String[] getPropertyChangesNames() {
+    protected String[] getPropertyChangeNames() {
         List<String> properties = new ArrayList<String>(Arrays.asList(super
-            .getPropertyChangesNames()));
+            .getPropertyChangeNames()));
         properties.add("parentContainer");
         properties.add("container");
         return properties.toArray(new String[properties.size()]);

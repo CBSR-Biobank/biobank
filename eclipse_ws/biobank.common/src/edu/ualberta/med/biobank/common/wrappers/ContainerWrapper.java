@@ -42,7 +42,7 @@ public class ContainerWrapper extends
     }
 
     @Override
-    protected String[] getPropertyChangesNames() {
+    protected String[] getPropertyChangeNames() {
         return new String[] { "productBarcode", "position", "activityStatus",
             "site", "label", "temperature", "comment",
             "samplePositionCollection", "samples", "childPositionCollection",

@@ -34,7 +34,7 @@ public class SampleSourceWrapper extends ModelWrapper<SampleSource> {
     }
 
     @Override
-    protected String[] getPropertyChangesNames() {
+    protected String[] getPropertyChangeNames() {
         return new String[] { "name" };
     }
 

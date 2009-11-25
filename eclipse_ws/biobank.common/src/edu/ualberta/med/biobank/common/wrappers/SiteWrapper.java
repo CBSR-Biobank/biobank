@@ -44,7 +44,7 @@ public class SiteWrapper extends ModelWrapper<Site> {
     }
 
     @Override
-    protected String[] getPropertyChangesNames() {
+    protected String[] getPropertyChangeNames() {
         return new String[] { "name", "activityStatus", "comment", "address",
             "clinicCollection", "siteCollection", "containerCollection",
             "sampleTypeCollection", "pvInfoPossibleCollection", "street1",

@@ -10,6 +10,8 @@ import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 
 public class TestCommon {
 
+    private static List<String> usedBarcodes;
+
     public static ContainerTypeWrapper addSampleTypes(ContainerTypeWrapper ct,
         List<SampleTypeWrapper> sampleTypes) throws Exception {
         Assert.assertTrue("not enough sample types for test", (sampleTypes
@@ -31,4 +33,15 @@ public class TestCommon {
         return result;
     }
 
+    public static String getNewBarcode(Random r) {
+        if (usedBarcodes == null) {
+            usedBarcodes = new ArrayList<String>();
+        }
+
+        String newBarcode;
+        do {
+            newBarcode = Utils.getRandomString(10);
+        } while (usedBarcodes.contains(newBarcode));
+        return newBarcode;
+    }
 }

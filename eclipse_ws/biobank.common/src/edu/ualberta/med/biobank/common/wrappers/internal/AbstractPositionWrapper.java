@@ -20,7 +20,7 @@ public abstract class AbstractPositionWrapper<E extends AbstractPosition>
     }
 
     @Override
-    protected String[] getPropertyChangesNames() {
+    protected String[] getPropertyChangeNames() {
         return new String[] { "row", "col" };
     }
 

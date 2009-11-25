@@ -31,7 +31,7 @@ public class ContainerLabelingSchemeWrapper extends
     }
 
     @Override
-    protected String[] getPropertyChangesNames() {
+    protected String[] getPropertyChangeNames() {
         return new String[] { "name" };
     }
 

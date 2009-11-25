@@ -77,7 +77,7 @@ public class AddressWrapper extends ModelWrapper<Address> {
     }
 
     @Override
-    protected String[] getPropertyChangesNames() {
+    protected String[] getPropertyChangeNames() {
         return new String[] { "street1", "street2", "city", "province",
             "postalCode" };
     }
