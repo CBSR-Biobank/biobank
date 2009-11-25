@@ -68,7 +68,6 @@ public class PatientVisitViewForm extends BiobankViewForm {
         form.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
             BioBankPlugin.IMG_PATIENT_VISIT));
         createMainSection();
-        // createSourcesSection();
         createSamplesSection();
     }
 
@@ -130,14 +129,6 @@ public class PatientVisitViewForm extends BiobankViewForm {
             widget.setLayoutData(gd);
         }
     }
-
-    // private void createSourcesSection() {
-    // Composite client = createSectionWithClient("Source Vessels");
-    //
-    // Collection<ShptSampleSourceWrapper> sources = patientVisitWrapper
-    // .getPvSampleSourceCollection();
-    // new PvSampleSourceInfoTable(client, sources);
-    // }
 
     private void setPatientVisitValues() {
         FormUtils.setTextValue(siteLabel, patientVisitWrapper.getShipment()

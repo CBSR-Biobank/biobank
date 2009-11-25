@@ -252,4 +252,12 @@ public class PatientAdministrationView extends ViewPart implements
     public void setFocus() {
 
     }
+
+    public static void setSelectedNode(AdapterBase node) {
+        if (currentInstance.adaptersTree != null) {
+            currentInstance.adaptersTree.getTreeViewer().setSelection(
+                new StructuredSelection(node));
+        }
+
+    }
 }

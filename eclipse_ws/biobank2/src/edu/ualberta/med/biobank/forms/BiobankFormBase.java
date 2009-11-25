@@ -26,6 +26,7 @@ import org.eclipse.ui.part.EditorPart;
 import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.widgets.utils.WidgetCreator;
@@ -60,6 +61,11 @@ public abstract class BiobankFormBase extends EditorPart {
 
     public BiobankFormBase() {
         widgetCreator = new WidgetCreator(controls);
+    }
+
+    @Override
+    public void setFocus() {
+        SessionManager.getInstance().setSelectedNode(adapter);
     }
 
     @Override
