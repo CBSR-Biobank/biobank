@@ -1,9 +1,11 @@
 package test.ualberta.med.biobank.internal;
 
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
-import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
+import test.ualberta.med.biobank.Utils;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
@@ -55,19 +57,21 @@ public class PatientVisitHelper extends DbHelper {
      * 
      * @param patient The patient that the patient visit belongs to.
      * @param clinic The clinic that the patient belongs to.
+     * @param shipment The shipment associated with the visit.
+     * 
      * @return A new patient visit wrapper.
+     * 
      * @throws Exception if the object could not be saved to the database.
      */
-    public static int addPatientVisits(PatientWrapper patient,
-        ClinicWrapper clinic) throws ParseException, Exception {
-        // FIXME should use shipment now
-
-        // int count = r.nextInt(15) + 1;
-        // for (int i = 0; i < count; i++) {
-        // addPatientVisit(patient, shipment, Utils.getRandomDate(), null,
-        // null);
-        // }
-        // return count;
-        return 0;
+    public static List<PatientVisitWrapper> addPatientVisits(
+        PatientWrapper patient, ShipmentWrapper shipment)
+        throws ParseException, Exception {
+        int count = r.nextInt(15) + 1;
+        List<PatientVisitWrapper> visits = new ArrayList<PatientVisitWrapper>();
+        for (int i = 0; i < count; i++) {
+            visits.add(addPatientVisit(patient, shipment,
+                Utils.getRandomDate(), null, null));
+        }
+        return visits;
     }
 }

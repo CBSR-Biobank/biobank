@@ -11,10 +11,16 @@ public class PatientHelper extends DbHelper {
         return patient;
     }
 
-    public static PatientWrapper addPatient(String number, StudyWrapper study)
+    public static PatientWrapper newPatient(String number, StudyWrapper study)
         throws Exception {
         PatientWrapper patient = newPatient(number);
         patient.setStudy(study);
+        return patient;
+    }
+
+    public static PatientWrapper addPatient(String number, StudyWrapper study)
+        throws Exception {
+        PatientWrapper patient = newPatient(number, study);
         patient.persist();
         return patient;
     }
