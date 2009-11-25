@@ -6,14 +6,15 @@ import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.common.wrappers.ShptSampleSourceWrapper;
 
-public class PvSampleSourceInfoTable extends
+public class ShptSampleSourceInfoTable extends
     InfoTableWidget<ShptSampleSourceWrapper> {
 
-    private final static String[] headings = new String[] { "Name", "Quantity" };
+    private final static String[] headings = new String[] { "Name", "Quantity",
+        "Patient(s)" };
 
-    private final static int[] bounds = new int[] { 250, -1, -1, -1, -1 };
+    private final static int[] bounds = new int[] { 250, 100, -1, -1, -1 };
 
-    public PvSampleSourceInfoTable(Composite parent,
+    public ShptSampleSourceInfoTable(Composite parent,
         Collection<ShptSampleSourceWrapper> collection) {
         super(parent, collection, headings, bounds);
     }

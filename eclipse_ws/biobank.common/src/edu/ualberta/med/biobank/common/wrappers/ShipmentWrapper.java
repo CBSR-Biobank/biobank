@@ -74,6 +74,10 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
     @Override
     protected void persistChecks() throws BiobankCheckException,
         ApplicationException, WrapperException {
+        if (getDateDrawn() == null) {
+            throw new BiobankCheckException(
+                "A date drawn should be set on this shipment");
+        }
         if (getClinic() != null && !checkDateDrawnUnique()) {
             throw new BiobankCheckException("A shipment with date drawn "
                 + getDateDrawn() + " already exist in clinic "

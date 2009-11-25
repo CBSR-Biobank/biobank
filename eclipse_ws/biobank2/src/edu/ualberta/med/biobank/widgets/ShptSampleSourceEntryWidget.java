@@ -33,12 +33,13 @@ import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
+import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleSourceWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShptSampleSourceWrapper;
-import edu.ualberta.med.biobank.dialogs.PvSampleSourceDialog;
+import edu.ualberta.med.biobank.dialogs.ShptSampleSourceDialog;
 import edu.ualberta.med.biobank.forms.FormUtils;
-import edu.ualberta.med.biobank.widgets.infotables.PvSampleSourceInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.ShptSampleSourceInfoTable;
 import edu.ualberta.med.biobank.widgets.listeners.BiobankEntryFormWidgetListener;
 import edu.ualberta.med.biobank.widgets.listeners.MultiSelectEvent;
 import edu.ualberta.med.biobank.widgets.utils.WidgetCreator;
@@ -50,51 +51,55 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
  */
 public class ShptSampleSourceEntryWidget extends BiobankWidget {
 
-    private PvSampleSourceInfoTable pvSampleSourceTable;
+    private ShptSampleSourceInfoTable shptSampleSourceTable;
 
-    private Button addPvSampleSourceButton;
+    private Button addShptSampleSourceButton;
 
     private List<SampleSourceWrapper> allSampleSources;
 
-    private List<ShptSampleSourceWrapper> selectedPvSampleSources;
+    private List<ShptSampleSourceWrapper> selectedShptSampleSources;
 
-    private PatientVisitWrapper patientVisit;
+    private ShipmentWrapper shipment;
 
     private IObservableValue sampleSourcesAdded = new WritableValue(
         Boolean.FALSE, Boolean.class);
+
+    private PatientWrapper currentPatient;
 
     /**
      * 
      * @param parent a composite control which will be the parent of the new
      *            instance (cannot be null)
      * @param style the style of control to construct
-     * @param pvSampleSourceCollection the sample storage already selected and
+     * @param shptSampleSourceCollection the sample storage already selected and
      *            to be displayed in the table viewer (can be null).
      * @param toolkit The toolkit is responsible for creating SWT controls
      *            adapted to work in Eclipse forms. If widget is not used in a
      *            form this parameter should be null.
      */
     public ShptSampleSourceEntryWidget(Composite parent, int style,
-        List<ShptSampleSourceWrapper> pvSampleSourceCollection,
-        PatientVisitWrapper patientVisit, FormToolkit toolkit) {
+        List<ShptSampleSourceWrapper> shptSampleSourceCollection,
+        ShipmentWrapper shipment, PatientWrapper currentPatient,
+        FormToolkit toolkit) {
         super(parent, style);
         Assert.isNotNull(toolkit, "toolkit is null");
         getSampleSources();
-        this.patientVisit = patientVisit;
-        if (pvSampleSourceCollection == null) {
-            selectedPvSampleSources = new ArrayList<ShptSampleSourceWrapper>();
+        this.shipment = shipment;
+        this.currentPatient = currentPatient;
+        if (shptSampleSourceCollection == null) {
+            selectedShptSampleSources = new ArrayList<ShptSampleSourceWrapper>();
         } else {
-            selectedPvSampleSources = pvSampleSourceCollection;
+            selectedShptSampleSources = shptSampleSourceCollection;
         }
 
         setLayout(new GridLayout(1, false));
         setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-        pvSampleSourceTable = new PvSampleSourceInfoTable(parent, null);
+        shptSampleSourceTable = new ShptSampleSourceInfoTable(parent, null);
         updateCollection();
-        pvSampleSourceTable.adaptToToolkit(toolkit, true);
+        shptSampleSourceTable.adaptToToolkit(toolkit, true);
         addTableMenu();
-        pvSampleSourceTable
+        shptSampleSourceTable
             .addSelectionChangedListener(new BiobankEntryFormWidgetListener() {
                 @Override
                 public void selectionChanged(MultiSelectEvent event) {
@@ -102,17 +107,19 @@ public class ShptSampleSourceEntryWidget extends BiobankWidget {
                 }
             });
 
-        addPvSampleSourceButton = toolkit.createButton(parent,
+        addShptSampleSourceButton = toolkit.createButton(parent,
             "Add Sample Source", SWT.PUSH);
-        addPvSampleSourceButton.addSelectionListener(new SelectionAdapter() {
+        addShptSampleSourceButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 ShptSampleSourceWrapper sampleSource = new ShptSampleSourceWrapper(
                     SessionManager.getAppService());
-                // FIXME modify for shipment
-                // sampleSource
-                // .setPatientVisit(PvSampleSourceEntryWidget.this.patientVisit);
-                addOrEditPvSampleSource(true, sampleSource,
+                sampleSource
+                    .setShipment(ShptSampleSourceEntryWidget.this.shipment);
+                List<PatientWrapper> patients = new ArrayList<PatientWrapper>();
+                patients.add(ShptSampleSourceEntryWidget.this.currentPatient);
+                sampleSource.setPatientCollection(patients);
+                addOrEditShptSampleSource(true, sampleSource,
                     getNonDuplicateSampleSources());
             }
         });
@@ -120,7 +127,7 @@ public class ShptSampleSourceEntryWidget extends BiobankWidget {
 
     public void addBinding(WidgetCreator dbc) {
         final ControlDecoration controlDecoration = FormUtils.createDecorator(
-            addPvSampleSourceButton,
+            addShptSampleSourceButton,
             "Sample sources should be selected for this visit");
         WritableValue wv = new WritableValue(Boolean.FALSE, Boolean.class);
         UpdateValueStrategy uvs = new UpdateValueStrategy();
@@ -140,16 +147,16 @@ public class ShptSampleSourceEntryWidget extends BiobankWidget {
         dbc.bindValue(wv, sampleSourcesAdded, uvs, uvs);
     }
 
-    private void addOrEditPvSampleSource(boolean add,
-        ShptSampleSourceWrapper pvSampleSource,
+    private void addOrEditShptSampleSource(boolean add,
+        ShptSampleSourceWrapper shptSampleSource,
         Set<SampleSourceWrapper> availSampleSources) {
-        PvSampleSourceDialog dlg = new PvSampleSourceDialog(PlatformUI
+        ShptSampleSourceDialog dlg = new ShptSampleSourceDialog(PlatformUI
             .getWorkbench().getActiveWorkbenchWindow().getShell(),
-            pvSampleSource, availSampleSources);
+            shptSampleSource, availSampleSources);
         if (dlg.open() == Dialog.OK) {
             if (add) {
                 // only add to the collection when adding and not editing
-                selectedPvSampleSources.add(dlg.getPvSampleSource());
+                selectedShptSampleSources.add(dlg.getShptSampleSource());
             }
             updateCollection();
             notifyListeners();
@@ -159,7 +166,7 @@ public class ShptSampleSourceEntryWidget extends BiobankWidget {
     // need sample types that have not yet been selected in sampleStorageTable
     private Set<SampleSourceWrapper> getNonDuplicateSampleSources() {
         Set<SampleSourceWrapper> nonDupSampleSources = new HashSet<SampleSourceWrapper>();
-        Collection<ShptSampleSourceWrapper> currentSampleSources = pvSampleSourceTable
+        Collection<ShptSampleSourceWrapper> currentSampleSources = shptSampleSourceTable
             .getCollection();
         for (SampleSourceWrapper ss : allSampleSources) {
             if (!currentSampleSources.contains(ss)) {
@@ -172,17 +179,17 @@ public class ShptSampleSourceEntryWidget extends BiobankWidget {
     private void addTableMenu() {
         Menu menu = new Menu(PlatformUI.getWorkbench()
             .getActiveWorkbenchWindow().getShell(), SWT.NONE);
-        pvSampleSourceTable.getTableViewer().getTable().setMenu(menu);
+        shptSampleSourceTable.getTableViewer().getTable().setMenu(menu);
 
         MenuItem item = new MenuItem(menu, SWT.PUSH);
         item.setText("Edit");
         item.addSelectionListener(new SelectionListener() {
             public void widgetSelected(SelectionEvent event) {
-                ShptSampleSourceWrapper pvss = pvSampleSourceTable
+                ShptSampleSourceWrapper svss = shptSampleSourceTable
                     .getSelection();
                 Set<SampleSourceWrapper> allowedSampleSources = getNonDuplicateSampleSources();
-                allowedSampleSources.add(pvss.getSampleSource());
-                addOrEditPvSampleSource(false, pvss, allowedSampleSources);
+                allowedSampleSources.add(svss.getSampleSource());
+                addOrEditShptSampleSource(false, svss, allowedSampleSources);
             }
 
             public void widgetDefaultSelected(SelectionEvent e) {
@@ -193,25 +200,24 @@ public class ShptSampleSourceEntryWidget extends BiobankWidget {
         item.setText("Delete");
         item.addSelectionListener(new SelectionListener() {
             public void widgetSelected(SelectionEvent event) {
-                ShptSampleSourceWrapper pvss = pvSampleSourceTable
+                ShptSampleSourceWrapper svss = shptSampleSourceTable
                     .getSelection();
 
                 boolean confirm = MessageDialog.openConfirm(PlatformUI
                     .getWorkbench().getActiveWorkbenchWindow().getShell(),
                     "Delete Sample Storage",
                     "Are you sure you want to delete sample source \""
-                        + pvss.getSampleSource().getName() + "\"");
+                        + svss.getSampleSource().getName() + "\"");
 
                 if (confirm) {
                     Collection<ShptSampleSourceWrapper> ssToDelete = new HashSet<ShptSampleSourceWrapper>();
-                    for (ShptSampleSourceWrapper ss : selectedPvSampleSources) {
+                    for (ShptSampleSourceWrapper ss : selectedShptSampleSources) {
                         if (ss.getSampleSource().getId().equals(
-                            pvss.getSampleSource().getId())) {
+                            svss.getSampleSource().getId())) {
                             ssToDelete.add(ss);
-                            // ss.setPatientVisit((PatientVisit) null);
                         }
                     }
-                    selectedPvSampleSources.removeAll(ssToDelete);
+                    selectedShptSampleSources.removeAll(ssToDelete);
                     updateCollection();
                     notifyListeners();
                 }
@@ -223,8 +229,8 @@ public class ShptSampleSourceEntryWidget extends BiobankWidget {
     }
 
     private void updateCollection() {
-        pvSampleSourceTable.setCollection(selectedPvSampleSources);
-        sampleSourcesAdded.setValue(selectedPvSampleSources.size() > 0);
+        shptSampleSourceTable.setCollection(selectedShptSampleSources);
+        sampleSourcesAdded.setValue(selectedShptSampleSources.size() > 0);
     }
 
     private void getSampleSources() {
@@ -238,18 +244,18 @@ public class ShptSampleSourceEntryWidget extends BiobankWidget {
         }
     }
 
-    public Collection<ShptSampleSourceWrapper> getPvSampleSources() {
-        return pvSampleSourceTable.getCollection();
+    public Collection<ShptSampleSourceWrapper> getShptSampleSources() {
+        return shptSampleSourceTable.getCollection();
     }
 
-    public void setSelectedPvSampleSources(
-        List<ShptSampleSourceWrapper> selectedPvSampleSources) {
-        this.selectedPvSampleSources = selectedPvSampleSources;
-        pvSampleSourceTable.setCollection(selectedPvSampleSources);
+    public void setSelectedShptSampleSources(
+        List<ShptSampleSourceWrapper> selectedShptSampleSources) {
+        this.selectedShptSampleSources = selectedShptSampleSources;
+        shptSampleSourceTable.setCollection(selectedShptSampleSources);
     }
 
     @Override
     public boolean setFocus() {
-        return addPvSampleSourceButton.setFocus();
+        return addShptSampleSourceButton.setFocus();
     }
 }

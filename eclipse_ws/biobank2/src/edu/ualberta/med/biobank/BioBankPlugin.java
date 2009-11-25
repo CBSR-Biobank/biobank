@@ -30,6 +30,7 @@ import edu.ualberta.med.biobank.treeview.ContainerTypeGroup;
 import edu.ualberta.med.biobank.treeview.PatientAdapter;
 import edu.ualberta.med.biobank.treeview.PatientVisitAdapter;
 import edu.ualberta.med.biobank.treeview.SessionAdapter;
+import edu.ualberta.med.biobank.treeview.ShipmentAdapter;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
 import edu.ualberta.med.biobank.treeview.StudyGroup;
@@ -65,6 +66,7 @@ public class BioBankPlugin extends AbstractUIPlugin {
     public static final String IMG_PALLET = "pallet";
     public static final String IMG_PATIENT = "patient";
     public static final String IMG_PATIENT_VISIT = "patientVisit";
+    public static final String IMG_SHIPMENT = "shipment";
     public static final String IMG_RELOAD_FORM = "reloadForm";
     public static final String IMG_EDIT_FORM = "editForm";
     public static final String IMG_RESET_FORM = "resetForm";
@@ -98,6 +100,7 @@ public class BioBankPlugin extends AbstractUIPlugin {
             put(PatientAdapter.class.getName(), BioBankPlugin.IMG_PATIENT);
             put(PatientVisitAdapter.class.getName(),
                 BioBankPlugin.IMG_PATIENT_VISIT);
+            put(ShipmentAdapter.class.getName(), BioBankPlugin.IMG_SHIPMENT);
         }
     };
 
@@ -161,6 +164,7 @@ public class BioBankPlugin extends AbstractUIPlugin {
         registerImage(registry, IMG_PALLET, "pallet.png");
         registerImage(registry, IMG_PATIENT, "patient.png");
         registerImage(registry, IMG_PATIENT_VISIT, "patientVisit.png");
+        registerImage(registry, IMG_SHIPMENT, "shipment.png");
         registerImage(registry, IMG_RELOAD_FORM, "reload.png");
         registerImage(registry, IMG_EDIT_FORM, "edit.png");
         registerImage(registry, IMG_RESET_FORM, "reset.png");

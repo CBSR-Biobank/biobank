@@ -234,6 +234,8 @@ public class BiobankLabelProvider extends LabelProvider implements
                 return info.getSampleSource().getName();
             case 1:
                 return info.getQuantity().toString();
+            case 2:
+                return info.getPatientsAsString();
             }
         } else if (element instanceof ContactWrapper) {
             ContactWrapper contact = (ContactWrapper) element;

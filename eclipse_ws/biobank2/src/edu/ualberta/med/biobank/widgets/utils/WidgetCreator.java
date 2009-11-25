@@ -217,8 +217,10 @@ public class WidgetCreator {
         if (keyListener != null) {
             text.addKeyListener(keyListener);
         }
-        dbc.bindValue(SWTObservables.observeText(text, SWT.Modify),
-            modelObservableValue, uvs, null);
+        if (modelObservableValue != null) {
+            dbc.bindValue(SWTObservables.observeText(text, SWT.Modify),
+                modelObservableValue, uvs, null);
+        }
         return text;
     }
 

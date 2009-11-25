@@ -18,16 +18,18 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
-import edu.ualberta.med.biobank.common.wrappers.ShptSampleSourceWrapper;
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.SampleSourceWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ShptSampleSourceWrapper;
 import edu.ualberta.med.biobank.validators.IntegerNumberValidator;
 import edu.ualberta.med.biobank.validators.NonEmptyString;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
-public class PvSampleSourceDialog extends BiobankDialog {
+public class ShptSampleSourceDialog extends BiobankDialog {
 
     private static final String TITLE = "Sample Source";
 
-    private ShptSampleSourceWrapper pvSampleSource;
+    private ShptSampleSourceWrapper shptSampleSource;
 
     private HashMap<String, SampleSourceWrapper> sampleSourceMap;
 
@@ -36,13 +38,15 @@ public class PvSampleSourceDialog extends BiobankDialog {
     private IObservableValue sampleSourceSelection = new WritableValue("",
         String.class);
 
-    public PvSampleSourceDialog(Shell parent,
+    private Text patientsText;
+
+    public ShptSampleSourceDialog(Shell parent,
         ShptSampleSourceWrapper pvSampleSource,
         Collection<SampleSourceWrapper> sampleSources) {
         super(parent);
         Assert.isNotNull(pvSampleSource);
         Assert.isNotNull(sampleSources);
-        this.pvSampleSource = pvSampleSource;
+        this.shptSampleSource = pvSampleSource;
         sampleSourceMap = new HashMap<String, SampleSourceWrapper>();
         for (SampleSourceWrapper ss : sampleSources) {
             sampleSourceMap.put(ss.getName(), ss);
@@ -52,7 +56,7 @@ public class PvSampleSourceDialog extends BiobankDialog {
     @Override
     protected void configureShell(Shell shell) {
         super.configureShell(shell);
-        Integer id = pvSampleSource.getId();
+        Integer id = shptSampleSource.getId();
         String title = new String();
 
         if (id == null) {
@@ -77,28 +81,39 @@ public class PvSampleSourceDialog extends BiobankDialog {
                 .toArray(new String[sortedKeys.size()]), sampleSourceSelection,
             new NonEmptyString("a sample source should be selected"));
 
-        SampleSourceWrapper ss = pvSampleSource.getSampleSource();
+        SampleSourceWrapper ss = shptSampleSource.getSampleSource();
         if (ss != null) {
             sampleSourcesCombo.setText(ss.getName());
         }
 
         createBoundWidgetWithLabel(contents, Text.class, SWT.BORDER,
             "Quantity", new String[0], BeansObservables.observeValue(
-                pvSampleSource, "quantity"), new IntegerNumberValidator(
+                shptSampleSource, "quantity"), new IntegerNumberValidator(
                 "quantity should be a whole number", false));
+
+        patientsText = (Text) createBoundWidgetWithLabel(contents, Text.class,
+            SWT.BORDER, "Patient(s)", new String[0], null, null);
+        patientsText.setText(shptSampleSource.getPatientsAsString());
 
         return contents;
     }
 
     @Override
     protected void okPressed() {
-        pvSampleSource.setSampleSource(sampleSourceMap.get(sampleSourcesCombo
+        shptSampleSource.setSampleSource(sampleSourceMap.get(sampleSourcesCombo
             .getText()));
+        try {
+            shptSampleSource.setPatientsFromString(patientsText.getText(),
+                SessionManager.getInstance().getCurrentSiteWrapper());
+        } catch (ApplicationException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
         super.okPressed();
     }
 
-    public ShptSampleSourceWrapper getPvSampleSource() {
-        return pvSampleSource;
+    public ShptSampleSourceWrapper getShptSampleSource() {
+        return shptSampleSource;
     }
 
 }

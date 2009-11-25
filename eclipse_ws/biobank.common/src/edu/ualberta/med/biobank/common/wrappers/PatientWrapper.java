@@ -215,6 +215,11 @@ public class PatientWrapper extends ModelWrapper<Patient> {
         return shipmentCollection;
     }
 
+    public List<ShipmentWrapper> getShipmentCollection()
+        throws ApplicationException {
+        return getShipmentCollection(false);
+    }
+
     @Override
     public Class<Patient> getWrappedClass() {
         return Patient.class;

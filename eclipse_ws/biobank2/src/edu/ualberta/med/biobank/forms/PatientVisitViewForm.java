@@ -56,14 +56,13 @@ public class PatientVisitViewForm extends BiobankViewForm {
         patientVisitWrapper = patientVisitAdapter.getWrapper();
         retrievePatientVisit();
 
-        setPartName("Visit "
-            + patientVisitWrapper.getShipment().getFormattedDateDrawn());
+        setPartName("Visit " + patientVisitWrapper.getFormattedDateProcessed());
     }
 
     @Override
     protected void createFormContent() throws Exception {
         form.setText("Visit Drawn Date: "
-            + patientVisitWrapper.getShipment().getFormattedDateDrawn());
+            + patientVisitWrapper.getFormattedDateProcessed());
         form.getBody().setLayout(new GridLayout(1, false));
         form.getBody().setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         form.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
@@ -165,7 +164,7 @@ public class PatientVisitViewForm extends BiobankViewForm {
     @Override
     protected void reload() {
         retrievePatientVisit();
-        String date = patientVisitWrapper.getShipment().getFormattedDateDrawn();
+        String date = patientVisitWrapper.getFormattedDateProcessed();
         setPartName("Visit " + date);
         form.setText("Visit Drawn Date: " + date);
         setPatientVisitValues();

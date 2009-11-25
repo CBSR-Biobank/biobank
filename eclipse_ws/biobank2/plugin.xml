@@ -910,84 +910,98 @@
       <editor
             class="edu.ualberta.med.biobank.forms.SiteEntryForm"
             default="false"
+            icon="icons/site.png"
             id="edu.ualberta.med.biobank.forms.SiteEntryForm"
             name="Site Entry">
       </editor>
       <editor
             class="edu.ualberta.med.biobank.forms.SiteViewForm"
             default="false"
+            icon="icons/site.png"
             id="edu.ualberta.med.biobank.forms.SiteViewForm"
             name="Site View">
       </editor>
       <editor
             class="edu.ualberta.med.biobank.forms.ClinicEntryForm"
             default="false"
+            icon="icons/clinic.png"
             id="edu.ualberta.med.biobank.forms.ClinicEntryForm"
             name="Clinic Entry">
       </editor>
       <editor
             class="edu.ualberta.med.biobank.forms.ClinicViewForm"
             default="false"
+            icon="icons/clinic.png"
             id="edu.ualberta.med.biobank.forms.ClinicViewForm"
             name="Clinic View">
       </editor>
       <editor
             class="edu.ualberta.med.biobank.forms.StudyEntryForm"
             default="false"
+            icon="icons/study.png"
             id="edu.ualberta.med.biobank.forms.StudyEntryForm"
             name="Study Entry">
       </editor>
       <editor
             class="edu.ualberta.med.biobank.forms.StudyViewForm"
             default="false"
+            icon="icons/study.png"
             id="edu.ualberta.med.biobank.forms.StudyViewForm"
             name="Study View">
       </editor>
       <editor
             class="edu.ualberta.med.biobank.forms.ContainerTypeEntryForm"
             default="false"
+            icon="icons/containerTypes.png"
             id="edu.ualberta.med.biobank.forms.ContainerTypeEntryForm"
             name="ContainerType Entry">
       </editor>
       <editor
             class="edu.ualberta.med.biobank.forms.ContainerTypeViewForm"
             default="false"
+            icon="icons/containerTypes.png"
             id="edu.ualberta.med.biobank.forms.ContainerTypeViewForm"
             name="ContainerType View">
       </editor>
       <editor
             class="edu.ualberta.med.biobank.forms.PatientEntryForm"
             default="false"
+            icon="icons/patient.png"
             id="edu.ualberta.med.biobank.forms.PatientEntryForm"
             name="Patient Entry">
       </editor>
       <editor
             class="edu.ualberta.med.biobank.forms.PatientViewForm"
             default="false"
+            icon="icons/patient.png"
             id="edu.ualberta.med.biobank.forms.PatientViewForm"
             name="Patient View">
       </editor>
       <editor
             class="edu.ualberta.med.biobank.forms.PatientVisitEntryForm"
             default="false"
+            icon="icons/patientVisit.png"
             id="edu.ualberta.med.biobank.forms.PatientVisitEntryForm"
             name="Patient Visit Entry">
       </editor>
       <editor
             class="edu.ualberta.med.biobank.forms.PatientVisitViewForm"
             default="false"
+            icon="icons/patientVisit.png"
             id="edu.ualberta.med.biobank.forms.PatientVisitViewForm"
             name="Patient Visit View">
       </editor>
       <editor
             class="edu.ualberta.med.biobank.forms.ContainerEntryForm"
             default="false"
+            icon="icons/containers.png"
             id="edu.ualberta.med.biobank.forms.ContainerEntryForm"
             name="Container Entry">
       </editor>
       <editor
             class="edu.ualberta.med.biobank.forms.ContainerViewForm"
             default="false"
+            icon="icons/containers.png"
             id="edu.ualberta.med.biobank.forms.ContainerViewForm"
             name="Container View">
       </editor>
@@ -1022,13 +1036,21 @@
             class="edu.ualberta.med.biobank.forms.SampleTypesEntryForm"
             default="false"
             id="edu.ualberta.med.biobank.forms.SampleTypesEntryForm"
-            name="View Sample Types">
+            name="Sample Types Entry">
       </editor>
       <editor
             class="edu.ualberta.med.biobank.forms.ShipmentEntryForm"
             default="false"
+            icon="icons/shipment.png"
             id="edu.ualberta.med.biobank.forms.ShipmentEntryForm"
             name="Shipment Entry">
+      </editor>
+      <editor
+            class="edu.ualberta.med.biobank.forms.ShipmentViewForm"
+            default="false"
+            icon="icons/shipment.png"
+            id="edu.ualberta.med.biobank.forms.ShipmentViewForm"
+            name="Shipment View">
       </editor>
    </extension>
    <extension

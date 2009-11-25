@@ -33,7 +33,12 @@ public class DateTimeWidget extends BiobankWidget {
     public DateTimeWidget(Composite parent, int style, Date date) {
         super(parent, style);
 
-        setLayout(new GridLayout(1, false));
+        GridLayout layout = new GridLayout(1, false);
+        layout.horizontalSpacing = 0;
+        layout.marginWidth = 0;
+        layout.verticalSpacing = 0;
+        setLayout(layout);
+
         setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
 
         cdt = new CDateTime(this, CDT.BORDER | CDT.COMPACT | CDT.DROP_DOWN

@@ -140,4 +140,33 @@ public class ShptSampleSourceWrapper extends ModelWrapper<ShptSampleSource> {
         return getSampleSource().compareTo(
             ((ShptSampleSourceWrapper) o).getSampleSource());
     }
+
+    public String getPatientsAsString() {
+        List<PatientWrapper> patients = getPatientCollection();
+        if (patients == null || patients.size() == 0) {
+            return "";
+        }
+        if (patients.size() == 1) {
+            return patients.get(0).getNumber();
+        }
+        StringBuffer sb = new StringBuffer();
+        for (PatientWrapper patient : patients) {
+            sb.append(patient.getNumber()).append("; ");
+        }
+        return sb.toString();
+    }
+
+    public void setPatientsFromString(String text, SiteWrapper site)
+        throws ApplicationException {
+        if (!text.equals(getPatientsAsString())) {
+            List<PatientWrapper> patients = new ArrayList<PatientWrapper>();
+            String[] numbers = text.split(";");
+            for (String number : numbers) {
+                number = number.trim();
+                patients.add(PatientWrapper.getPatientInSite(appService,
+                    number, site));
+            }
+            setPatientCollection(patients);
+        }
+    }
 }

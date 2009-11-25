@@ -202,8 +202,12 @@ public class DebugInitializationHelper {
     }
 
     private void insertShipmentsInClinic(ClinicWrapper clinic) throws Exception {
+        Random r = new Random();
         for (int i = 0; i < 50; i++) {
             ShipmentWrapper shipment = new ShipmentWrapper(appService);
+            String dateStr = String.format("2009-%02d-%02d %02d:%02d", r
+                .nextInt(12) + 1, r.nextInt(28), r.nextInt(24), r.nextInt(60));
+            shipment.setDateDrawn(DateFormatter.parseToDateTime(dateStr));
             shipment.setClinic(clinic);
             shipment.persist();
         }
