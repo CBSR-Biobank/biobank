@@ -21,7 +21,7 @@ public class PvInfoDataWrapper extends ModelWrapper<PvInfoData> {
     }
 
     @Override
-    protected String[] getPropertyChangesNames() {
+    protected String[] getPropertyChangeNames() {
         return new String[] { "pvInfo", "value", "patientVisit" };
     }
 

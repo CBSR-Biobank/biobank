@@ -81,7 +81,7 @@ public class SampleStorageWrapper extends ModelWrapper<SampleStorage> {
     }
 
     @Override
-    protected String[] getPropertyChangesNames() {
+    protected String[] getPropertyChangeNames() {
         return new String[] { "study", "sampleType", "quantity", "volume" };
     }
 

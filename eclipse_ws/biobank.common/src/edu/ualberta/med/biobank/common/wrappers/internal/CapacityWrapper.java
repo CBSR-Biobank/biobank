@@ -18,7 +18,7 @@ public class CapacityWrapper extends ModelWrapper<Capacity> {
     }
 
     @Override
-    protected String[] getPropertyChangesNames() {
+    protected String[] getPropertyChangeNames() {
         return new String[] { "rowCapacity", "colCapacity" };
     }
 

@@ -78,7 +78,7 @@ public class PatientWrapper extends ModelWrapper<Patient> {
      * @throws Exception
      */
     @Override
-    protected String[] getPropertyChangesNames() {
+    protected String[] getPropertyChangeNames() {
         return new String[] { "number", "study", "patientVisitCollection",
             "shptSampleSourceCollection", "shipmentCollection" };
     }

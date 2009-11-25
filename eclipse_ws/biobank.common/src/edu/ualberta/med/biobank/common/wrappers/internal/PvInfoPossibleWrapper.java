@@ -26,7 +26,7 @@ public class PvInfoPossibleWrapper extends ModelWrapper<PvInfoPossible> {
     }
 
     @Override
-    protected String[] getPropertyChangesNames() {
+    protected String[] getPropertyChangeNames() {
         return new String[] { "label", "isDefault", "pvInfoType", "site" };
     }
 

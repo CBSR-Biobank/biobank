@@ -27,7 +27,7 @@ public class SampleTypeWrapper extends ModelWrapper<SampleType> {
     }
 
     @Override
-    protected String[] getPropertyChangesNames() {
+    protected String[] getPropertyChangeNames() {
         return new String[] { "name", "nameShort", "site",
             "containerTypeCollection" };
     }
