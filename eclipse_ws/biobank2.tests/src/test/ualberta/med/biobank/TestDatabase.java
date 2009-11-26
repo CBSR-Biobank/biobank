@@ -85,8 +85,8 @@ public class TestDatabase {
                     + setterName.substring(1, setterName.length());
                 GetterInfo getterInfo = map.get(getterName);
                 if (getterInfo == null) {
-                    System.out.println("no getter found for "
-                        + w.getClass().getName() + "." + setterName + "()");
+                    // System.out.println("no getter found for "
+                    // + w.getClass().getName() + "." + setterName + "()");
                     continue;
                 }
                 getterInfo.setMethod = method;
@@ -125,9 +125,9 @@ public class TestDatabase {
             }
 
             if (getterInfo.setMethod == null) {
-                System.out.println("no setter found for "
-                    + w.getClass().getName() + "."
-                    + getterInfo.getMethod.getName() + "()");
+                // System.out.println("no setter found for "
+                // + w.getClass().getName() + "."
+                // + getterInfo.getMethod.getName() + "()");
                 continue;
             }
 
@@ -154,8 +154,8 @@ public class TestDatabase {
                         + " not implemented");
                 }
 
-                System.out.println("invoking " + w.getClass().getName() + "."
-                    + getterInfo.getMethod.getName());
+                // System.out.println("invoking " + w.getClass().getName() + "."
+                // + getterInfo.getMethod.getName());
 
                 getterInfo.setMethod.invoke(w, parameter);
                 w.persist();

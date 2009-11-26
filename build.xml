@@ -140,7 +140,7 @@
 
 	<!-- Eclipse -->
 
-	<target name="deploy-eclipse" description="deploys the caCORE SDK beans to the eclipse project" depends="sdk-files">
+	<target name="deploy-eclipse" description="deploys the caCORE SDK beans to the eclipse project" depends="sdk-files,jars-download">
 		<dependset>
 			<srcfilelist dir="${cacore.sdk.dir}/system/lib" files="${cacore.system.jar.files}" />
 			<targetfilelist dir="${eclipse.proj.dir.common}/lib" files="${cacore.system.jar.files}" />
@@ -366,6 +366,8 @@
 	<property name="dest.dir" value="${eclipse.proj.dir.junit}/build" />
 	<property name="dest.dir.classes" value="${dest.dir}/classes" />
 	<property name="dest.dir.lib" value="${eclipse.proj.dir.junit}/lib" />
+    <property name="dest.dir.results" value="testing" />
+    <property name="dest.dir.results.raw" value="${dest.dir.results}/raw" />
 
 	<path id="build.class.path">
 		<fileset dir="${dest.dir.lib}">
@@ -395,11 +397,14 @@
 
 	<target name="tests-clean">
 		<delete dir="${dest.dir}" />
+		<delete dir="${dest.dir.results}" />
 	</target>
 
 	<target name="prepare">
 		<mkdir dir="${dest.dir}" />
 		<mkdir dir="${dest.dir.classes}" />
+		<mkdir dir="${dest.dir.results}" />
+		<mkdir dir="${dest.dir.results.raw}" />
 	</target>
 
 	<target name="common-compile" depends="tests-clean,prepare,deploy-eclipse">
@@ -416,46 +421,35 @@
 	</target>
 
 	<target name="test" depends="tests-compile" description="executes test cases">
-		<junit printsummary="yes" haltonfailure="yes" showoutput="yes">
+		<junit printsummary="yes" haltonfailure="no" showoutput="yes" fork="true">
 			<classpath refid="junit.class.path" />
 			<classpath refid="application.config.class.path" />
 			<classpath refid="common.lib.class.path" />
 			<classpath refid="test.class.path" />
 
-			<formatter type="brief" />
+			<formatter usefile="yes" type="brief" />
 
-			<test name="test.ualberta.med.biobank.AllTests" haltonfailure="no" outfile="result">
+			<!--test name="test.ualberta.med.biobank.AllTests" haltonfailure="no" outfile="result">
 				<formatter type="xml" />
-			</test>
+			</test-->
 
-			<!--batchtest fork="yes" haltonfailure="no" todir="testing">
-				<fileset dir="${eclipse.proj.dir.junit}/src">
-					<include name="**/Test*.java" />
-                    <exclude name="**/TestCommon.java" />
-                    <exclude name="**/TestDatabase.java" />
-					<exclude name="**/AllTests.java" />
-				</fileset>
-			</batchtest-->
-		</junit>
-	</target>
-
-	<target name="test-brief" depends="tests-compile" description="executes test cases">
-		<junit showoutput="true" fork="true" failureproperty="tests.failed" errorproperty="tests.failed">
-			<classpath refid="junit.class.path" />
-			<classpath refid="application.config.class.path" />
-			<classpath refid="common.lib.class.path" />
-			<classpath refid="test.class.path" />
-			<formatter usefile="false" type="brief" />
-			<batchtest todir="testring">
+			<batchtest todir="testing/raw">
 				<fileset dir="${eclipse.proj.dir.junit}/src">
 					<include name="**/Test*.java" />
 					<exclude name="**/TestCommon.java" />
 					<exclude name="**/TestDatabase.java" />
+                    <exclude name="**/TestFuntionalities.java" />
 					<exclude name="**/AllTests.java" />
 				</fileset>
+				<formatter type="xml" />
 			</batchtest>
-			<!-- <formatter type="xml"/> If missing, only displays failed tests -->
 		</junit>
+		<junitreport todir="${dest.dir.results}">
+			<fileset dir="${dest.dir.results.raw}">
+				<include name="TEST-*.xml" />
+			</fileset>
+			<report format="noframes" todir="${dest.dir.results}/html" />
+		</junitreport>
 	</target>
-
+	
 </project>

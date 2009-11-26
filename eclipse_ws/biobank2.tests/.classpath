@@ -3,28 +3,6 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
-	<classpathentry kind="lib" path="lib/acegi-security-1.0.4.jar"/>
-	<classpathentry kind="lib" path="lib/antlr-2.7.6.jar"/>
-	<classpathentry kind="lib" path="lib/asm.jar"/>
-	<classpathentry kind="lib" path="lib/axis.jar"/>
-	<classpathentry kind="lib" path="lib/biobank2-beans.jar"/>
-	<classpathentry kind="lib" path="lib/caGrid-CQL-cql.1.0-1.2.jar"/>
-	<classpathentry kind="lib" path="lib/castor-1.0.2.jar"/>
-	<classpathentry kind="lib" path="lib/cglib-2.1.3.jar" sourcepath="/home/loyola/proj/cbsr/cglib-src-2.1_3.jar"/>
-	<classpathentry kind="lib" path="lib/cog-jglobus.jar"/>
-	<classpathentry kind="lib" path="lib/commons-codec-1.3.jar"/>
-	<classpathentry kind="lib" path="lib/commons-collections-3.2.jar"/>
-	<classpathentry kind="lib" path="lib/commons-discovery-0.2.jar"/>
-	<classpathentry kind="lib" path="lib/commons-logging-1.1.jar"/>
-	<classpathentry kind="lib" path="lib/hibernate3.jar"/>
-	<classpathentry kind="lib" path="lib/jaxrpc.jar"/>
-	<classpathentry kind="lib" path="lib/log4j-1.2.14.jar"/>
-	<classpathentry kind="lib" path="lib/sdk-client-framework.jar"/>
-	<classpathentry kind="lib" path="lib/sdk-grid-remoting.jar"/>
-	<classpathentry kind="lib" path="lib/sdk-security.jar"/>
-	<classpathentry kind="lib" path="lib/sdk-writable-client-framework.jar"/>
-	<classpathentry kind="lib" path="lib/spring.jar" sourcepath="/home/loyola/proj/cbsr/spring-framework-2.0.3/dist/spring-src.zip"/>
-	<classpathentry kind="lib" path="lib/xercesImpl.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/biobank.common"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
