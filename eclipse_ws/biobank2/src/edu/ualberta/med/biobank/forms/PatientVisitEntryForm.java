@@ -10,6 +10,8 @@ import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.databinding.beans.PojoObservables;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.IMessageProvider;
+import org.eclipse.jface.viewers.ComboViewer;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -24,11 +26,11 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
-import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.model.PvCustomInfo;
+import edu.ualberta.med.biobank.model.Shipment;
 import edu.ualberta.med.biobank.treeview.PatientAdapter;
 import edu.ualberta.med.biobank.treeview.PatientVisitAdapter;
-import edu.ualberta.med.biobank.treeview.ShipmentAdapter;
 import edu.ualberta.med.biobank.validators.DoubleNumberValidator;
 import edu.ualberta.med.biobank.widgets.ComboAndQuantityWidget;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
@@ -53,8 +55,6 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
 
     private DateTimeWidget dateProcessed;
 
-    private Text commentText;
-
     private PatientWrapper patientWrapper;
 
     private class FormPvCustomInfo extends PvCustomInfo {
@@ -62,6 +62,8 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
     }
 
     private List<FormPvCustomInfo> pvCustomInfoList;
+
+    private ComboViewer shipmentsComboViewer;
 
     @Override
     public void init() {
@@ -71,8 +73,8 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
 
         patientVisitAdapter = (PatientVisitAdapter) adapter;
         patientVisitWrapper = patientVisitAdapter.getWrapper();
-        patientWrapper = patientVisitAdapter.getParentFromClass(
-            PatientAdapter.class).getWrapper();
+        patientWrapper = ((PatientAdapter) patientVisitAdapter.getParent())
+            .getWrapper();
         retrieve();
         String tabName;
         if (patientVisitWrapper.isNew()) {
@@ -102,13 +104,13 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         form.getBody().setLayout(new GridLayout(1, false));
         form.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
             BioBankPlugin.IMG_PATIENT_VISIT));
-        createMainSection(patientWrapper.getStudy());
+        createMainSection();
         if (patientVisitWrapper.isNew()) {
             setDirty(true);
         }
     }
 
-    private void createMainSection(StudyWrapper study) throws Exception {
+    private void createMainSection() throws Exception {
         Composite client = toolkit.createComposite(form.getBody());
         GridLayout layout = new GridLayout(2, false);
         layout.horizontalSpacing = 10;
@@ -118,8 +120,18 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
 
         Label siteLabel = (Label) createWidget(client, Label.class, SWT.NONE,
             "Site");
-        FormUtils.setTextValue(siteLabel, patientVisitWrapper.getPatient()
-            .getStudy().getSite().getName());
+        FormUtils.setTextValue(siteLabel, patientWrapper.getStudy().getSite()
+            .getName());
+
+        List<ShipmentWrapper> patientShipments = patientWrapper
+            .getShipmentCollection();
+        ShipmentWrapper selectedShip = patientVisitWrapper.getShipment();
+        if (patientShipments.size() == 1) {
+            selectedShip = patientShipments.get(0);
+        }
+        shipmentsComboViewer = createComboViewerWithNoSelectionValidator(
+            client, "Shipment", patientShipments, selectedShip,
+            "A shipment should be selected");
 
         if (patientVisitWrapper.getDateProcessed() == null) {
             patientVisitWrapper.setDateProcessed(new Date());
@@ -131,9 +143,9 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
 
         createPvDataSection(client);
 
-        commentText = (Text) createBoundWidgetWithLabel(client, Text.class,
-            SWT.MULTI, "Comments", null, BeansObservables.observeValue(
-                patientVisitWrapper, "comment"), null);
+        createBoundWidgetWithLabel(client, Text.class, SWT.MULTI, "Comments",
+            null,
+            BeansObservables.observeValue(patientVisitWrapper, "comment"), null);
     }
 
     private void createPvDataSection(Composite client) throws Exception {
@@ -222,15 +234,18 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
 
     @Override
     protected void saveForm() throws Exception {
-        ShipmentAdapter shipmentAdapter = (ShipmentAdapter) patientVisitAdapter
-            .getParent();
-        patientVisitWrapper.setShipment(shipmentAdapter.getWrapper());
-        PatientAdapter patientAdapter = (PatientAdapter) shipmentAdapter
+        PatientAdapter patientAdapter = (PatientAdapter) patientVisitAdapter
             .getParent();
         patientVisitWrapper.setPatient(patientAdapter.getWrapper());
 
-        patientVisitWrapper.setDateProcessed(dateProcessed.getDate());
-        patientVisitWrapper.setComment(commentText.getText());
+        IStructuredSelection shipSelection = (IStructuredSelection) shipmentsComboViewer
+            .getSelection();
+        if ((shipSelection != null) && (shipSelection.size() > 0)) {
+            patientVisitWrapper.setShipment((ShipmentWrapper) shipSelection
+                .getFirstElement());
+        } else {
+            patientVisitWrapper.setShipment((Shipment) null);
+        }
 
         setPvCustomInfo();
 
@@ -240,7 +255,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         }
         patientVisitWrapper.persist();
 
-        shipmentAdapter.performExpand();
+        patientAdapter.performExpand();
     }
 
     private void setPvCustomInfo() throws Exception {

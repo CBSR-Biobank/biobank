@@ -15,7 +15,6 @@ import org.eclipse.swt.widgets.Tree;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
-import edu.ualberta.med.biobank.forms.PatientVisitEntryForm;
 import edu.ualberta.med.biobank.forms.ShipmentEntryForm;
 import edu.ualberta.med.biobank.forms.ShipmentViewForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
@@ -97,20 +96,6 @@ public class ShipmentAdapter extends AdapterBase {
             public void widgetSelected(SelectionEvent event) {
                 openForm(new FormInput(ShipmentAdapter.this),
                     ShipmentEntryForm.ID);
-            }
-        });
-
-        mi = new MenuItem(menu, SWT.PUSH);
-        mi.setText("Add Patient Visit");
-        mi.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent event) {
-                PatientVisitAdapter adapter = new PatientVisitAdapter(
-                    ShipmentAdapter.this, new PatientVisitWrapper(
-                        getAppService()));
-                adapter.getWrapper().setPatient(
-                    ((PatientAdapter) getParent()).getWrapper());
-                openForm(new FormInput(adapter), PatientVisitEntryForm.ID);
             }
         });
     }

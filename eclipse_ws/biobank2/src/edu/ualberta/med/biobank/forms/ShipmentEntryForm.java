@@ -44,12 +44,6 @@ public class ShipmentEntryForm extends BiobankEntryForm {
 
     private ComboViewer clinicsComboViewer;
 
-    private DateTimeWidget dateShippedWidget;
-
-    private DateTimeWidget dateReceivedWidget;
-
-    private Text commentText;
-
     private ShptSampleSourceEntryWidget shptSampleSourceEntryWidget;
 
     @Override
@@ -69,7 +63,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
         if (shipmentWrapper.isNew()) {
             tabName = "New Shipment";
         } else {
-            tabName = "Shipment " + shipmentWrapper.getFormattedDateShipped();
+            tabName = "Shipment " + shipmentWrapper.getWaybill();
         }
         setPartName(tabName);
     }
@@ -98,6 +92,10 @@ public class ShipmentEntryForm extends BiobankEntryForm {
         SiteWrapper site = SessionManager.getInstance().getCurrentSiteWrapper();
         FormUtils.setTextValue(siteLabel, site.getName());
 
+        createBoundWidgetWithLabel(client, Text.class, SWT.NONE,
+            "Waybill code", null, BeansObservables.observeValue(
+                shipmentWrapper, "waybill"), null);
+
         if (shipmentWrapper.isNew()) {
             // choose clinic for new shipment
             List<ClinicWrapper> siteClinics = site.getClinicCollection(true);
@@ -116,18 +114,18 @@ public class ShipmentEntryForm extends BiobankEntryForm {
             }
         }
 
-        dateShippedWidget = createDateTimeWidget(client, "Date Shipped",
-            shipmentWrapper.getDateShipped(), shipmentWrapper, "dateShipped",
-            "Date shipped should be set", false);
+        DateTimeWidget dateShippedWidget = createDateTimeWidget(client,
+            "Date Shipped", shipmentWrapper.getDateShipped(), shipmentWrapper,
+            "dateShipped", "Date shipped should be set", false);
         firstControl = dateShippedWidget;
 
-        dateReceivedWidget = createDateTimeWidget(client, "Date Received",
-            shipmentWrapper.getDateReceived(), shipmentWrapper, "dateReceived",
+        createDateTimeWidget(client, "Date Received", shipmentWrapper
+            .getDateReceived(), shipmentWrapper, "dateReceived",
             "Date received should be set", false);
 
-        commentText = (Text) createBoundWidgetWithLabel(client, Text.class,
-            SWT.MULTI, "Comments", null, BeansObservables.observeValue(
-                shipmentWrapper, "comment"), null);
+        createBoundWidgetWithLabel(client, Text.class, SWT.MULTI, "Comments",
+            null, BeansObservables.observeValue(shipmentWrapper, "comment"),
+            null);
     }
 
     private void createSourcesSection() {
@@ -174,11 +172,6 @@ public class ShipmentEntryForm extends BiobankEntryForm {
                 shipmentWrapper.setClinic((Clinic) null);
             }
         }
-
-        shipmentWrapper.setDateShipped(dateShippedWidget.getDate());
-        shipmentWrapper.setDateReceived(dateReceivedWidget.getDate());
-        shipmentWrapper.setComment(commentText.getText());
-
         shipmentWrapper
             .setShptSampleSourceCollection(shptSampleSourceEntryWidget
                 .getShptSampleSources());
@@ -186,23 +179,19 @@ public class ShipmentEntryForm extends BiobankEntryForm {
         shipmentWrapper.persist();
 
         shipmentAdapter.getParent().performExpand();
-
     }
 
     @Override
     public void reset() {
         super.reset();
-
         if (shipmentWrapper.isNew()
             && clinicsComboViewer.getCombo().getItemCount() > 1) {
             clinicsComboViewer.getCombo().deselectAll();
         }
-
         shptSampleSourceEntryWidget
             .setSelectedShptSampleSources(shipmentWrapper
                 .getShptSampleSourceCollection());
 
-        // TODO reset for optional values
     }
 
 }

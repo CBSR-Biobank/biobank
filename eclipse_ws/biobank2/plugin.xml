@@ -85,7 +85,7 @@
       </perspective>
       <perspective
             class="edu.ualberta.med.biobank.rcp.ShipmentAdministrationPerspective"
-            id="edu.ualberta.med.biobank.perspective.shipmentAdministration"
+            id="edu.ualberta.med.biobank.perspective.shipments"
             name="Shipment Perspective">
       </perspective>
    </extension>
@@ -605,9 +605,31 @@
                style="push">
                <visibleWhen
                      checkEnabled="false">
-                  <reference
-                        definitionId="biobank2.mainPerpectiveSelected">
-                  </reference>
+                  <or>
+                     <reference
+                           definitionId="biobank2.mainPerpectiveSelected">
+                     </reference>
+                     <reference
+                           definitionId="biobank2.shipmentsPerpectiveSelected">
+                     </reference>
+                  </or>
+               </visibleWhen>
+            </command>
+            <command
+                  commandId="edu.ualberta.med.biobank.commands.shipmentAdmin"
+                  icon="icons/shipmentPerpective.png"
+                  label="Shipment View"
+                  style="push">
+               <visibleWhen
+                     checkEnabled="false">
+                  <or>
+                     <reference
+                           definitionId="biobank2.mainPerpectiveSelected">
+                     </reference>
+                     <reference
+                           definitionId="biobank2.patientsPerpectiveSelected">
+                     </reference>
+                  </or>
                </visibleWhen>
             </command>
             <command
@@ -784,9 +806,14 @@
                   style="push">
                <visibleWhen
                      checkEnabled="false">
-                  <reference
-                        definitionId="biobank2.mainPerpectiveSelected">
-                  </reference>
+                  <or>
+                     <reference
+                           definitionId="biobank2.mainPerpectiveSelected">
+                     </reference>
+                     <reference
+                           definitionId="biobank2.shipmentsPerpectiveSelected">
+                     </reference>
+                  </or>
                </visibleWhen>
             </command>
             <command
@@ -869,6 +896,17 @@
                   icon="icons/shipmentPerpective.png"
                   label="Shipment View"
                   style="push">
+               <visibleWhen
+                     checkEnabled="false">
+                  <or>
+                     <reference
+                           definitionId="biobank2.mainPerpectiveSelected">
+                     </reference>
+                     <reference
+                           definitionId="biobank2.patientsPerpectiveSelected">
+                     </reference>
+                  </or>
+               </visibleWhen>
             </command>
          </toolbar>
       </menuContribution>
@@ -937,7 +975,7 @@
          </view>
       </perspectiveExtension>
       <perspectiveExtension
-            targetID="edu.ualberta.med.biobank.perspective.shipmentAdministration">
+            targetID="edu.ualberta.med.biobank.perspective.shipments">
          <view
                closeable="false"
                id="edu.ualberta.med.biobank.views.shipmentAdmin"
@@ -1311,6 +1349,15 @@
                variable="activeWorkbenchWindow.activePerspective">
             <equals
                   value="edu.ualberta.med.biobank.perspective.patients">
+            </equals>
+         </with>
+      </definition>
+          <definition
+            id="biobank2.shipmentsPerpectiveSelected">
+         <with
+               variable="activeWorkbenchWindow.activePerspective">
+            <equals
+                  value="edu.ualberta.med.biobank.perspective.shipments">
             </equals>
          </with>
       </definition>

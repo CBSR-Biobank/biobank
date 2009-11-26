@@ -44,11 +44,6 @@ public class ClinicAdapter extends AdapterBase {
     }
 
     @Override
-    public void addChild(AdapterBase child) {
-        Assert.isTrue(false, "Cannot add children to this adapter");
-    }
-
-    @Override
     public void performDoubleClick() {
         openForm(new FormInput(this), ClinicViewForm.ID);
     }

@@ -24,13 +24,15 @@ public class ShipmentViewForm extends BiobankViewForm {
 
     private Label siteLabel;
 
-    private Label dateDrawnLabel;
+    private Label clinicLabel;
+
+    private Label waybillLabel;
+
+    private Label dateShippedLabel;
 
     private Label dateReceivedLabel;
 
     private Label commentLabel;
-
-    private Label clinicLabel;
 
     @Override
     protected void init() throws Exception {
@@ -42,7 +44,7 @@ public class ShipmentViewForm extends BiobankViewForm {
         shipmentWrapper = shipmentAdapter.getWrapper();
         retrieveShipment();
 
-        setPartName("Shipment " + shipmentWrapper.getFormattedDateShipped());
+        setPartName("Shipment " + shipmentWrapper.getWaybill());
     }
 
     private void retrieveShipment() {
@@ -50,14 +52,13 @@ public class ShipmentViewForm extends BiobankViewForm {
             shipmentWrapper.reload();
         } catch (Exception ex) {
             LOGGER.error("Error while retrieving shipment "
-                + shipmentWrapper.getDateShipped(), ex);
+                + shipmentWrapper.getWaybill(), ex);
         }
     }
 
     @Override
     protected void createFormContent() throws Exception {
-        form.setText("Shipment Shipped Date: "
-            + shipmentWrapper.getFormattedDateShipped());
+        form.setText("Shipment waybill: " + shipmentWrapper.getWaybill());
         form.getBody().setLayout(new GridLayout(1, false));
         form.getBody().setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         form.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
@@ -76,11 +77,14 @@ public class ShipmentViewForm extends BiobankViewForm {
 
         siteLabel = (Label) createWidget(client, Label.class, SWT.NONE, "Site");
 
+        waybillLabel = (Label) createWidget(client, Label.class, SWT.NONE,
+            "Waybill");
+
         clinicLabel = (Label) createWidget(client, Label.class, SWT.NONE,
             "Clinic");
 
-        dateDrawnLabel = (Label) createWidget(client, Label.class, SWT.NONE,
-            "Date Drawn");
+        dateShippedLabel = (Label) createWidget(client, Label.class, SWT.NONE,
+            "Date Shipped");
 
         dateReceivedLabel = (Label) createWidget(client, Label.class, SWT.NONE,
             "Date received");
@@ -101,10 +105,11 @@ public class ShipmentViewForm extends BiobankViewForm {
     private void setShipmentValues() {
         FormUtils.setTextValue(siteLabel, shipmentWrapper.getClinic().getSite()
             .getName());
+        FormUtils.setTextValue(waybillLabel, shipmentWrapper.getWaybill());
         FormUtils.setTextValue(clinicLabel,
             shipmentWrapper.getClinic() == null ? "" : shipmentWrapper
                 .getClinic().getName());
-        FormUtils.setTextValue(dateDrawnLabel, shipmentWrapper
+        FormUtils.setTextValue(dateShippedLabel, shipmentWrapper
             .getFormattedDateShipped());
         FormUtils.setTextValue(dateReceivedLabel, shipmentWrapper
             .getFormattedDateReceived());
@@ -118,8 +123,10 @@ public class ShipmentViewForm extends BiobankViewForm {
 
     @Override
     protected void reload() throws Exception {
-        // TODO Auto-generated method stub
-
+        retrieveShipment();
+        setPartName("Shipment " + shipmentWrapper.getWaybill());
+        form.setText("Shipment waybill: " + shipmentWrapper.getWaybill());
+        setShipmentValues();
     }
 
 }

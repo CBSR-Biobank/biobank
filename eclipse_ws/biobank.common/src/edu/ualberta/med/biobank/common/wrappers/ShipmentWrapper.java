@@ -273,7 +273,7 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
 
     @Override
     public String toString() {
-        return getFormattedDateShipped();
+        return getWaybill();
     }
 
     /**

@@ -6,6 +6,7 @@ import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Menu;
@@ -13,11 +14,11 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.forms.PatientEntryForm;
 import edu.ualberta.med.biobank.forms.PatientViewForm;
-import edu.ualberta.med.biobank.forms.ShipmentEntryForm;
+import edu.ualberta.med.biobank.forms.PatientVisitEntryForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 
 public class PatientAdapter extends AdapterBase {
@@ -78,15 +79,15 @@ public class PatientAdapter extends AdapterBase {
         });
 
         mi = new MenuItem(menu, SWT.PUSH);
-        mi.setText("Add Shipment");
-        mi.addSelectionListener(new SelectionListener() {
+        mi.setText("Add Patient Visit");
+        mi.addSelectionListener(new SelectionAdapter() {
+            @Override
             public void widgetSelected(SelectionEvent event) {
-                ShipmentAdapter adapter = new ShipmentAdapter(
-                    PatientAdapter.this, new ShipmentWrapper(getAppService()));
-                openForm(new FormInput(adapter), ShipmentEntryForm.ID);
-            }
-
-            public void widgetDefaultSelected(SelectionEvent e) {
+                PatientVisitAdapter adapter = new PatientVisitAdapter(
+                    PatientAdapter.this, new PatientVisitWrapper(
+                        getAppService()));
+                adapter.getWrapper().setPatient(getWrapper());
+                openForm(new FormInput(adapter), PatientVisitEntryForm.ID);
             }
         });
     }
@@ -98,13 +99,13 @@ public class PatientAdapter extends AdapterBase {
             // read from database again
             patientWrapper.reload();
 
-            List<ShipmentWrapper> shipments = patientWrapper
-                .getShipmentCollection();
-            for (ShipmentWrapper shipment : shipments) {
-                ShipmentAdapter node = (ShipmentAdapter) getChild(shipment
+            List<PatientVisitWrapper> visits = patientWrapper
+                .getPatientVisitCollection();
+            for (PatientVisitWrapper visit : visits) {
+                PatientVisitAdapter node = (PatientVisitAdapter) getChild(visit
                     .getId());
                 if (node == null) {
-                    node = new ShipmentAdapter(this, shipment);
+                    node = new PatientVisitAdapter(this, visit);
                     addChild(node);
                 }
                 if (updateNode) {

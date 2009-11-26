@@ -1,12 +1,15 @@
 package edu.ualberta.med.biobank.dialogs;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import org.eclipse.core.databinding.beans.BeansObservables;
-import org.eclipse.core.databinding.observable.value.IObservableValue;
-import org.eclipse.core.databinding.observable.value.WritableValue;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.ComboViewer;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -19,12 +22,14 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
+import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleSourceWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShptSampleSourceWrapper;
+import edu.ualberta.med.biobank.common.wrappers.WrapperException;
 import edu.ualberta.med.biobank.validators.IntegerNumberValidator;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ShptSampleSourceDialog extends BiobankDialog {
 
@@ -32,12 +37,7 @@ public class ShptSampleSourceDialog extends BiobankDialog {
 
     private ShptSampleSourceWrapper shptSampleSource;
 
-    // private HashMap<String, SampleSourceWrapper> sampleSourceMap;
-
     private ComboViewer sampleSourcesComboViewer;
-
-    private IObservableValue sampleSourceSelection = new WritableValue("",
-        String.class);
 
     private Text patientText;
 
@@ -59,10 +59,6 @@ public class ShptSampleSourceDialog extends BiobankDialog {
         Assert.isNotNull(sampleSources);
         this.shptSampleSource = pvSampleSource;
         this.sampleSources = sampleSources;
-        // sampleSourceMap = new HashMap<String, SampleSourceWrapper>();
-        // for (SampleSourceWrapper ss : sampleSources) {
-        // sampleSourceMap.put(ss.getName(), ss);
-        // }
     }
 
     @Override
@@ -87,24 +83,25 @@ public class ShptSampleSourceDialog extends BiobankDialog {
         contents.setLayout(new GridLayout(3, false));
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-        // Set<String> sortedKeys = new
-        // TreeSet<String>(sampleSourceMap.keySet());
         sampleSourcesComboViewer = getWidgetCreator()
             .createComboViewerWithNoSelectionValidator(contents,
                 "Sample Source", sampleSources,
                 shptSampleSource.getSampleSource(),
                 "A sample source should be selected");
-        // sampleSourcesCombo = (Combo) createBoundWidgetWithLabel(contents,
-        // Combo.class, SWT.BORDER, , sortedKeys
-        // .toArray(new String[sortedKeys.size()]), sampleSourceSelection,
-        // new NonEmptyString("a sample source should be selected"));
+        sampleSourcesComboViewer
+            .addSelectionChangedListener(new ISelectionChangedListener() {
+                @Override
+                public void selectionChanged(SelectionChangedEvent event) {
+                    IStructuredSelection stSelection = (IStructuredSelection) sampleSourcesComboViewer
+                        .getSelection();
+                    shptSampleSource
+                        .setSampleSource((SampleSourceWrapper) stSelection
+                            .getFirstElement());
+                }
+            });
         GridData gd = new GridData();
         gd.horizontalSpan = 2;
         sampleSourcesComboViewer.getCombo().setLayoutData(gd);
-        // SampleSourceWrapper ss = shptSampleSource.getSampleSource();
-        // if (ss != null) {
-        // sampleSourcesCombo.setText(ss.getName());
-        // }
 
         Text quantityText = (Text) createBoundWidgetWithLabel(contents,
             Text.class, SWT.BORDER, "Quantity", new String[0], BeansObservables
@@ -123,23 +120,34 @@ public class ShptSampleSourceDialog extends BiobankDialog {
         gd.horizontalAlignment = SWT.FILL;
         dateDrawnWidget.setLayoutData(gd);
 
+        List<PatientWrapper> patients = shptSampleSource.getPatientCollection();
+        String firstPatient = "";
+        String secondPatient = "";
+        if (patients != null && patients.size() > 0) {
+            firstPatient = patients.get(0).getNumber();
+            if (patients.size() == 2) {
+                secondPatient = patients.get(1).getNumber();
+            }
+        }
         patientText = (Text) createBoundWidgetWithLabel(contents, Text.class,
             SWT.BORDER, "Patient Number", new String[0], null, null);
-        patientText.setText(shptSampleSource.getPatientsAsString());
+        patientText.setText(firstPatient);
         splitButton = new Button(contents, SWT.TOGGLE);
         splitButton.setText("Split");
 
         patient2Label = getWidgetCreator().createLabel(contents,
-            "Second Patient Number");
+            "Second Patient");
         patient2Label.setLayoutData(new GridData(
             GridData.VERTICAL_ALIGN_BEGINNING));
         patient2Text = (Text) getWidgetCreator().createBoundWidget(contents,
             Text.class, SWT.BORDER, null, null, null);
+        patient2Text.setText(secondPatient);
         gd = new GridData();
         gd.horizontalSpan = 2;
         gd.horizontalAlignment = SWT.FILL;
         patient2Text.setLayoutData(gd);
-        showSecondPatient(false);
+        splitButton.setSelection(!secondPatient.isEmpty());
+        showSecondPatient(!secondPatient.isEmpty());
 
         splitButton.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -162,14 +170,17 @@ public class ShptSampleSourceDialog extends BiobankDialog {
 
     @Override
     protected void okPressed() {
-        // shptSampleSource.setSampleSource(sampleSourceMap.get(sampleSourcesCombo
-        // .getText()));
+        List<String> patients = new ArrayList<String>();
+        patients.add(patientText.getText());
+        if (splitButton.getSelection()) {
+            patients.add(patient2Text.getText());
+        }
         try {
-            shptSampleSource.setPatientsFromString(patientText.getText(),
-                SessionManager.getInstance().getCurrentSiteWrapper());
-        } catch (ApplicationException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            shptSampleSource.setPatientsFromString(patients, SessionManager
+                .getInstance().getCurrentSiteWrapper());
+        } catch (WrapperException e) {
+            BioBankPlugin.openAsyncError("Patient error", e);
+            return;
         }
         super.okPressed();
     }

@@ -272,7 +272,9 @@ public class WidgetCreator {
         if (selection != null) {
             comboViewer.setSelection(new StructuredSelection(selection));
         }
-        combo.addModifyListener(modifyListener);
+        if (modifyListener != null) {
+            combo.addModifyListener(modifyListener);
+        }
         return comboViewer;
     }
 

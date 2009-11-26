@@ -157,32 +157,41 @@ public class ShptSampleSourceWrapper extends ModelWrapper<ShptSampleSource> {
             ((ShptSampleSourceWrapper) o).getSampleSource());
     }
 
+    public void setPatientsFromString(List<String> numbers, SiteWrapper site)
+        throws WrapperException {
+        List<PatientWrapper> patients = new ArrayList<PatientWrapper>();
+        for (String number : numbers) {
+            number = number.trim();
+            PatientWrapper p;
+            try {
+                p = PatientWrapper.getPatientInSite(appService, number, site);
+            } catch (ApplicationException e) {
+                throw new WrapperException(
+                    "Error while querying patient with number " + number + ".",
+                    e);
+            }
+            if (p == null) {
+                throw new WrapperException("Patient with number " + number
+                    + " doesn't exists.");
+            }
+            patients.add(p);
+        }
+        setPatientCollection(patients);
+    }
+
     public String getPatientsAsString() {
         List<PatientWrapper> patients = getPatientCollection();
         if (patients == null || patients.size() == 0) {
             return "";
         }
-        if (patients.size() == 1) {
-            return patients.get(0).getNumber();
-        }
         StringBuffer sb = new StringBuffer();
-        for (PatientWrapper patient : patients) {
-            sb.append(patient.getNumber()).append("; ");
+        for (int i = 0; i < patients.size(); i++) {
+            PatientWrapper patient = patients.get(i);
+            sb.append(patient.getNumber());
+            if (i < patients.size() - 1) {
+                sb.append(" / ");
+            }
         }
         return sb.toString();
-    }
-
-    public void setPatientsFromString(String text, SiteWrapper site)
-        throws ApplicationException {
-        if (!text.equals(getPatientsAsString())) {
-            List<PatientWrapper> patients = new ArrayList<PatientWrapper>();
-            String[] numbers = text.split(";");
-            for (String number : numbers) {
-                number = number.trim();
-                patients.add(PatientWrapper.getPatientInSite(appService,
-                    number, site));
-            }
-            setPatientCollection(patients);
-        }
     }
 }
