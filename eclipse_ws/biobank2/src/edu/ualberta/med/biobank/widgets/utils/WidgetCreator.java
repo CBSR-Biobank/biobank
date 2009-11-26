@@ -276,7 +276,7 @@ public class WidgetCreator {
         return comboViewer;
     }
 
-    private Label createLabel(Composite parent, String fieldLabel) {
+    public Label createLabel(Composite parent, String fieldLabel) {
         return createLabel(parent, fieldLabel, SWT.LEFT, true);
     }
 
@@ -299,11 +299,13 @@ public class WidgetCreator {
     public DateTimeWidget createDateTimeWidget(Composite client,
         String nameLabel, Date date, Object observedObject,
         String propertyName, final String emptyMessage, boolean canBeEmpty) {
-        Label label = toolkit.createLabel(client, nameLabel + ":", SWT.NONE);
+        Label label = createLabel(client, nameLabel, SWT.NONE, true);
         label.setLayoutData(new GridData(GridData.VERTICAL_ALIGN_BEGINNING));
         final DateTimeWidget widget = new DateTimeWidget(client, SWT.NONE, date);
         widget.addSelectionListener(selectionListener);
-        widget.adaptToToolkit(toolkit, true);
+        if (toolkit != null) {
+            widget.adaptToToolkit(toolkit, true);
+        }
 
         if (observedObject != null && propertyName != null) {
             final IObservableValue dateValue = BeansObservables.observeValue(

@@ -8,15 +8,5 @@ public class MainPerspective implements IPerspectiveFactory {
     public static final String ID = "edu.ualberta.med.biobank.perspective.main";
 
     public void createInitialLayout(IPageLayout layout) {
-        // layout.addView(SessionsView.ID, IPageLayout.LEFT, 0.3f, layout
-        // .getEditorArea());
-        // layout.getViewLayout(SessionsView.ID).setCloseable(false);
-        // layout.setEditorAreaVisible(false);
-
-        // layout.addView(SearchView.ID, IPageLayout.TOP, ratio, refId)
-        // IFolderLayout top = layout.createFolder("top", IPageLayout.TOP, 026f,
-        // layout.getEditorArea());
-        // top.addView();
-
     }
 }

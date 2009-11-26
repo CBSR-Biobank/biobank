@@ -475,7 +475,7 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
             @Override
             public String getText(Object element) {
                 PatientVisitWrapper pv = (PatientVisitWrapper) element;
-                return pv.getShipment().getFormattedDateDrawn();
+                return pv.getShipment().getFormattedDateShipped();
             }
         });
         viewerVisits.getCombo().addKeyListener(new KeyAdapter() {
@@ -604,7 +604,7 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
                         + msg
                         + " see visit "
                         + sample.getPatientVisit().getShipment()
-                            .getFormattedDateDrawn() + " of patient "
+                            .getFormattedDateShipped() + " of patient "
                         + sample.getPatientVisit().getPatient().getNumber());
                 } else {
                     cell.setStatus(SampleCellStatus.NO_TYPE);
@@ -640,7 +640,7 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
                     sb.append(" - patient: ").append(
                         patientVisit.getPatient().getNumber());
                     sb.append(" - Visit: ").append(
-                        patientVisit.getShipment().getFormattedDateDrawn());
+                        patientVisit.getShipment().getFormattedDateShipped());
                     sb.append(" - ").append(
                         patientVisit.getShipment().getClinic().getName());
                     sb.append(" - ").append(cell.getType().getName());

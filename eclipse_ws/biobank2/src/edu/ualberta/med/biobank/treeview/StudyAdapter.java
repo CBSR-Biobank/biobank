@@ -20,11 +20,6 @@ public class StudyAdapter extends AdapterBase {
 
     public static final int PATIENTS_NODE_ID = 0;
 
-    /**
-     * if true, enable normal actions of this adapter
-     */
-    private boolean enableActions = true;
-
     public StudyAdapter(AdapterBase parent, StudyWrapper studyWrapper,
         boolean enabledActions) {
         super(parent, studyWrapper);

@@ -23,15 +23,10 @@ public class SiteAdapter extends AdapterBase {
     public static final int STORAGE_TYPES_NODE_ID = 2;
     public static final int STORAGE_CONTAINERS_NODE_ID = 3;
 
-    /**
-     * if true, enable normal actions of this adapter
-     */
-    private boolean enableActions = true;
-
     public SiteAdapter(AdapterBase parent, SiteWrapper siteWrapper,
         boolean enableActions) {
-        super(parent, siteWrapper);
-        this.enableActions = enableActions;
+        super(parent, siteWrapper, enableActions);
+
         if (enableActions) {
             addChild(new ClinicGroup(this, CLINICS_NODE_ID));
             addChild(new StudyGroup(this, STUDIES_NODE_ID));

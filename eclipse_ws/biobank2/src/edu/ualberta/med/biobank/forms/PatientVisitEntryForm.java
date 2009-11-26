@@ -28,6 +28,7 @@ import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.PvCustomInfo;
 import edu.ualberta.med.biobank.treeview.PatientAdapter;
 import edu.ualberta.med.biobank.treeview.PatientVisitAdapter;
+import edu.ualberta.med.biobank.treeview.ShipmentAdapter;
 import edu.ualberta.med.biobank.validators.DoubleNumberValidator;
 import edu.ualberta.med.biobank.widgets.ComboAndQuantityWidget;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
@@ -89,7 +90,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
             patientWrapper.reload();
         } catch (Exception e) {
             LOGGER.error("Error while retrieving patient visit "
-                + patientVisitAdapter.getWrapper().getShipment().getDateDrawn()
+                + patientVisitAdapter.getWrapper().getFormattedDateProcessed()
                 + " (Patient " + patientVisitWrapper.getPatient() + ")", e);
         }
     }
@@ -221,7 +222,10 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
 
     @Override
     protected void saveForm() throws Exception {
-        PatientAdapter patientAdapter = (PatientAdapter) patientVisitAdapter
+        ShipmentAdapter shipmentAdapter = (ShipmentAdapter) patientVisitAdapter
+            .getParent();
+        patientVisitWrapper.setShipment(shipmentAdapter.getWrapper());
+        PatientAdapter patientAdapter = (PatientAdapter) shipmentAdapter
             .getParent();
         patientVisitWrapper.setPatient(patientAdapter.getWrapper());
 
@@ -236,7 +240,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         }
         patientVisitWrapper.persist();
 
-        patientAdapter.performExpand();
+        shipmentAdapter.performExpand();
     }
 
     private void setPvCustomInfo() throws Exception {

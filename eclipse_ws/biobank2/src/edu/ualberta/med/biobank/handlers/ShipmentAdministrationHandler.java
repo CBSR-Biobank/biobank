@@ -9,15 +9,12 @@ import org.eclipse.ui.WorkbenchException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.rcp.PatientsAdministrationPerspective;
+import edu.ualberta.med.biobank.rcp.ShipmentAdministrationPerspective;
 
-/**
- * This handler open the PatientAdministration perspective
- */
-public class PatientAdministrationHandler extends AbstractHandler implements
+public class ShipmentAdministrationHandler extends AbstractHandler implements
     IHandler {
 
-    public final static String ID = "edu.ualberta.med.biobank.commands.patientAdmin";
+    public final static String ID = "edu.ualberta.med.biobank.commands.shipmentAdmin";
 
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
@@ -25,11 +22,11 @@ public class PatientAdministrationHandler extends AbstractHandler implements
         try {
             if (workbench.getActiveWorkbenchWindow().getActivePage()
                 .closeAllEditors(true))
-                workbench.showPerspective(PatientsAdministrationPerspective.ID,
+                workbench.showPerspective(ShipmentAdministrationPerspective.ID,
                     workbench.getActiveWorkbenchWindow());
         } catch (WorkbenchException e) {
             throw new ExecutionException(
-                "Error while opening patients perspective", e);
+                "Error while opening shipment perspective", e);
         }
         return null;
     }

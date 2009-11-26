@@ -44,9 +44,20 @@ public abstract class AdapterBase {
 
     protected List<AdapterBase> children;
 
+    /**
+     * if true, enable normal actions of this adapter
+     */
+    protected boolean enableActions = true;
+
     public AdapterBase(AdapterBase parent, ModelWrapper<?> object) {
+        this(parent, object, true);
+    }
+
+    public AdapterBase(AdapterBase parent, ModelWrapper<?> object,
+        boolean enableActions) {
         this.modelObject = object;
         this.parent = parent;
+        this.enableActions = enableActions;
         children = new ArrayList<AdapterBase>();
         if (parent != null) {
             addListener(parent.listener);

@@ -7,12 +7,16 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.services.ISourceProviderService;
 
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.rcp.MainPerspective;
+import edu.ualberta.med.biobank.rcp.PatientsAdministrationPerspective;
 import edu.ualberta.med.biobank.rcp.SiteCombo;
 import edu.ualberta.med.biobank.sourceproviders.DebugState;
 import edu.ualberta.med.biobank.sourceproviders.SessionState;
@@ -20,6 +24,7 @@ import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.NodeSearchVisitor;
 import edu.ualberta.med.biobank.treeview.RootNode;
 import edu.ualberta.med.biobank.treeview.SessionAdapter;
+import edu.ualberta.med.biobank.views.PatientAdministrationView;
 import edu.ualberta.med.biobank.views.SessionsView;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
@@ -126,9 +131,17 @@ public class SessionManager {
     }
 
     public void setSelectedNode(AdapterBase node) {
-        if (view != null) {
+        IWorkbench workbench = BioBankPlugin.getDefault().getWorkbench();
+        IWorkbenchPage activePage = workbench.getActiveWorkbenchWindow()
+            .getActivePage();
+        if (activePage.getPerspective().getId().equals(MainPerspective.ID)
+            && view != null) {
             view.getTreeViewer().setSelection(new StructuredSelection(node));
+        } else if (activePage.getPerspective().getId().equals(
+            PatientsAdministrationPerspective.ID)) {
+            PatientAdministrationView.setSelectedNode(node);
         }
+
     }
 
     public AdapterBase getSelectedNode() {

@@ -18,7 +18,6 @@ import org.eclipse.ui.PartInitException;
 import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
-import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 
 /**
@@ -55,11 +54,6 @@ public abstract class BiobankViewForm extends BiobankFormBase {
     @Override
     public boolean isSaveAsAllowed() {
         return false;
-    }
-
-    @Override
-    public void setFocus() {
-        SessionManager.getInstance().setSelectedNode(adapter);
     }
 
     protected void setWidgetsValues(ListOrderedMap fieldsMap, Object bean) {

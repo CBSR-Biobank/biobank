@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.dialogs;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Date;
 
 import org.eclipse.core.databinding.observable.ChangeEvent;
 import org.eclipse.core.databinding.observable.IChangeListener;
@@ -23,6 +24,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Widget;
 
 import edu.ualberta.med.biobank.validators.AbstractValidator;
+import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.widgets.utils.WidgetCreator;
 
 public class BiobankDialog extends Dialog {
@@ -133,5 +135,16 @@ public class BiobankDialog extends Dialog {
         return widgetCreator.createBoundWidgetWithLabel(composite, widgetClass,
             widgetOptions, fieldLabel, widgetValues, modelObservableValue,
             validator);
+    }
+
+    protected DateTimeWidget createDateTimeWidget(Composite client,
+        String nameLabel, Date date, Object observedObject,
+        String propertyName, final String emptyMessage, boolean canBeEmpty) {
+        return widgetCreator.createDateTimeWidget(client, nameLabel, date,
+            observedObject, propertyName, emptyMessage, canBeEmpty);
+    }
+
+    protected WidgetCreator getWidgetCreator() {
+        return widgetCreator;
     }
 }

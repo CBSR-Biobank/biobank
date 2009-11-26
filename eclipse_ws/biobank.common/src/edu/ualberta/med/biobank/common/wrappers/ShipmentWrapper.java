@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -31,39 +32,38 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
     @Override
     protected void deleteChecks() throws BiobankCheckException,
         ApplicationException, WrapperException {
-        // TODO Auto-generated method stub
+        // FIXME Auto-generated method stub
 
     }
 
     @Override
     protected void persistDependencies(Shipment origObject)
         throws BiobankCheckException, ApplicationException, WrapperException {
-        // if (origObject != null) {
-        // removeDeletedPvSampleSources(origObject);
-        // }
-        // FIXME : should do or not ?
+        if (origObject != null) {
+            removeDeletedShptSampleSources(origObject);
+        }
     }
 
-    // private void removeDeletedPvSampleSources(PatientVisit pvDatabase)
-    // throws BiobankCheckException, ApplicationException, WrapperException {
-    // List<PvSampleSourceWrapper> newSampleSources =
-    // getPvSampleSourceCollection();
-    // List<PvSampleSourceWrapper> oldSampleSources = new PatientVisitWrapper(
-    // appService, pvDatabase).getPvSampleSourceCollection();
-    // if (oldSampleSources != null) {
-    // for (PvSampleSourceWrapper ss : oldSampleSources) {
-    // if ((newSampleSources == null)
-    // || !newSampleSources.contains(ss)) {
-    // ss.delete();
-    // }
-    // }
-    // }
-    // }
+    private void removeDeletedShptSampleSources(Shipment shptDatabase)
+        throws BiobankCheckException, ApplicationException, WrapperException {
+        List<ShptSampleSourceWrapper> newSampleSources = getShptSampleSourceCollection();
+        List<ShptSampleSourceWrapper> oldSampleSources = new ShipmentWrapper(
+            appService, shptDatabase).getShptSampleSourceCollection();
+        if (oldSampleSources != null) {
+            for (ShptSampleSourceWrapper ss : oldSampleSources) {
+                if ((newSampleSources == null)
+                    || !newSampleSources.contains(ss)) {
+                    ss.delete();
+                }
+            }
+        }
+    }
 
     @Override
     protected String[] getPropertyChangeNames() {
-        return new String[] { "dateDrawn", "dateReceived", "clinic", "comment",
-            "shptSampleSourceCollection", "patientVisitCollection" };
+        return new String[] { "dateShipped", "dateReceived", "clinic",
+            "comment", "shptSampleSourceCollection", "patientVisitCollection",
+            "waybill" };
     }
 
     @Override
@@ -74,28 +74,28 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
     @Override
     protected void persistChecks() throws BiobankCheckException,
         ApplicationException, WrapperException {
-        if (getDateDrawn() == null) {
+        if (getDateShipped() == null) {
             throw new BiobankCheckException(
-                "A date drawn should be set on this shipment");
+                "A date shipped should be set on this shipment");
         }
-        if (getClinic() != null && !checkDateDrawnUnique()) {
-            throw new BiobankCheckException("A shipment with date drawn "
-                + getDateDrawn() + " already exist in clinic "
+        if (getClinic() != null && !checkDateShippedUnique()) {
+            throw new BiobankCheckException("A shipment with date shipped "
+                + getDateShipped() + " already exist in clinic "
                 + getClinic().getName() + ".");
         }
     }
 
-    private boolean checkDateDrawnUnique() throws ApplicationException {
+    private boolean checkDateShippedUnique() throws ApplicationException {
         String isSameShipment = "";
         List<Object> params = new ArrayList<Object>();
         params.add(getClinic().getId());
-        params.add(getDateDrawn());
+        params.add(getDateShipped());
         if (!isNew()) {
             isSameShipment = " and id <> ?";
             params.add(getId());
         }
         HQLCriteria c = new HQLCriteria("from " + Shipment.class.getName()
-            + " where clinic.id=? and dateDrawn = ?" + isSameShipment, params);
+            + " where clinic.id=? and dateShipped = ?" + isSameShipment, params);
 
         List<Object> results = appService.query(c);
         return results.size() == 0;
@@ -103,24 +103,24 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
 
     @Override
     public int compareTo(ModelWrapper<Shipment> wrapper) {
-        Date v1Date = wrappedObject.getDateDrawn();
-        Date v2Date = wrapper.wrappedObject.getDateDrawn();
+        Date v1Date = wrappedObject.getDateShipped();
+        Date v2Date = wrapper.wrappedObject.getDateShipped();
         return ((v1Date.compareTo(v2Date) > 0) ? 1 : (v1Date.equals(v2Date) ? 0
             : -1));
     }
 
-    public Date getDateDrawn() {
-        return wrappedObject.getDateDrawn();
+    public Date getDateShipped() {
+        return wrappedObject.getDateShipped();
     }
 
-    public String getFormattedDateDrawn() {
-        return DateFormatter.formatAsDateTime(getDateDrawn());
+    public String getFormattedDateShipped() {
+        return DateFormatter.formatAsDateTime(getDateShipped());
     }
 
-    public void setDateDrawn(Date date) {
-        Date oldDate = getDateDrawn();
-        wrappedObject.setDateDrawn(date);
-        propertyChangeSupport.firePropertyChange("dateDrawn", oldDate, date);
+    public void setDateShipped(Date date) {
+        Date oldDate = getDateShipped();
+        wrappedObject.setDateShipped(date);
+        propertyChangeSupport.firePropertyChange("dateShipped", oldDate, date);
     }
 
     public Date getDateReceived() {
@@ -261,9 +261,35 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
             .firePropertyChange("comment", oldComment, comment);
     }
 
-    @Override
-    public String toString() {
-        return getFormattedDateDrawn();
+    public String getWaybill() {
+        return wrappedObject.getWaybill();
     }
 
+    public void setWaybill(String waybill) {
+        String old = getWaybill();
+        wrappedObject.setWaybill(waybill);
+        propertyChangeSupport.firePropertyChange("waybill", old, waybill);
+    }
+
+    @Override
+    public String toString() {
+        return getFormattedDateShipped();
+    }
+
+    /**
+     * Search for a shipment in the site with the given waybill
+     */
+    public static ShipmentWrapper getShipmentInSite(
+        WritableApplicationService appService, String waybill, SiteWrapper site)
+        throws ApplicationException {
+        HQLCriteria criteria = new HQLCriteria("from "
+            + Shipment.class.getName()
+            + " where clinic.site.id = ? and waybill = ?", Arrays
+            .asList(new Object[] { site.getId(), waybill }));
+        List<Shipment> shipments = appService.query(criteria);
+        if (shipments.size() == 1) {
+            return new ShipmentWrapper(appService, shipments.get(0));
+        }
+        return null;
+    }
 }

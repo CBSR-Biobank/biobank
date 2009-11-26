@@ -10,9 +10,9 @@ public class ShptSampleSourceInfoTable extends
     InfoTableWidget<ShptSampleSourceWrapper> {
 
     private final static String[] headings = new String[] { "Name", "Quantity",
-        "Patient(s)" };
+        "Patient Number", "Date Drawn" };
 
-    private final static int[] bounds = new int[] { 250, 100, -1, -1, -1 };
+    private final static int[] bounds = new int[] { 250, 100, 200, -1, -1 };
 
     public ShptSampleSourceInfoTable(Composite parent,
         Collection<ShptSampleSourceWrapper> collection) {

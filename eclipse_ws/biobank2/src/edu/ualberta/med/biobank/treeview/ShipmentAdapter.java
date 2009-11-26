@@ -38,7 +38,7 @@ public class ShipmentAdapter extends AdapterBase {
     public String getName() {
         ShipmentWrapper shipment = getWrapper();
         Assert.isNotNull(shipment.getWrappedObject(), "shipment is null");
-        return shipment.getFormattedDateDrawn();
+        return shipment.getFormattedDateShipped();
     }
 
     @Override
@@ -68,7 +68,7 @@ public class ShipmentAdapter extends AdapterBase {
             }
         } catch (Exception e) {
             LOGGER.error("Error while loading children of shipment "
-                + getWrapper().getFormattedDateDrawn(), e);
+                + getWrapper().getFormattedDateShipped(), e);
             throw new RuntimeException(e);
         }
     }
