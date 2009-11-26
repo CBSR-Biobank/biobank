@@ -33,7 +33,6 @@ public class AllTests {
 
     @AfterClass
     public static void tearDown() {
-        System.out.println("tearing down");
     }
 
 }

@@ -9,6 +9,7 @@ import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.PvInfoPossible;
 import edu.ualberta.med.biobank.model.SampleType;
+import edu.ualberta.med.biobank.model.Shipment;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -205,6 +206,48 @@ public class BioBank2Db {
             throw new Exception("Sample type " + sampleType.getName()
                 + " is not valid for container " + container.getLabel());
         }
+    }
+
+    public Shipment getShipment(String studyNameShort, String patientNum,
+        String dateDrawn) throws Exception {
+        Date date = biobank2DateFmt.parse(dateDrawn);
+        HQLCriteria c = new HQLCriteria("select visits"
+            + " from edu.ualberta.med.biobank.model.Study as study"
+            + " inner join study.patientCollection as patients"
+            + " inner join patients.patientVisitCollection as visits"
+            + " where study.nameShort=? and patients.number=?"
+            + " and visits.dateDrawn=?");
+
+        // System.out.println("getPatientVisit: studyNameShort/" +
+        // studyNameShort
+        // + " patientNum/" + patientNum + " dateDrawn/" + dateDrawn);
+
+        c.setParameters(Arrays.asList(new Object [] {
+            studyNameShort, patientNum, date }));
+
+        List<PatientVisit> results = appService.query(c);
+        if (results.size() != 1) {
+            if (results.size() == 0) {
+                System.out.println("ERROR: found 0 patient visits for studyName/"
+                    + studyNameShort
+                    + " patientNum/"
+                    + patientNum
+                    + " dateDrawn/" + dateDrawn);
+            }
+            else {
+                System.out.println("WARNING: found " + results.size()
+                    + " patient visits for studyName/" + studyNameShort
+                    + " patientNum/" + patientNum + " dateDrawn/" + dateDrawn);
+                for (PatientVisit v : results) {
+                    System.out.println("visit_id/" + v.getId() + " dateDrawn/"
+                        + biobank2DateFmt.format(v.getDateDrawn()) + " pid/"
+                        + v.getPatient().getId());
+                }
+            }
+            return null;
+        }
+        return results.get(0);
+
     }
 
     public PatientVisit getPatientVisit(String studyNameShort,

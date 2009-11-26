@@ -157,12 +157,12 @@
 			<srcfilelist dir="${req.jars.dir}" files="${biobank.importer.jar.files}" />
 			<targetfilelist dir="${eclipse.proj.dir.importer}/lib" files="${biobank.importer.jar.files}" />
 		</dependset>
-        <dependset>
-            <srcfilelist dir="${cacore.sdk.dir}/writable-api/dist" files="sdk-writable-client-framework.jar" />
-            <targetfilelist dir="${eclipse.proj.dir.common}/lib" files="sdk-writable-client-framework.jar" />
-            <targetfilelist dir="${eclipse.proj.dir.importer}/lib" files="sdk-writable-client-framework.jar" />
-            <targetfilelist dir="${eclipse.proj.dir.junit}/lib" files="sdk-writable-client-framework.jar" />
-        </dependset>
+		<dependset>
+			<srcfilelist dir="${cacore.sdk.dir}/writable-api/dist" files="sdk-writable-client-framework.jar" />
+			<targetfilelist dir="${eclipse.proj.dir.common}/lib" files="sdk-writable-client-framework.jar" />
+			<targetfilelist dir="${eclipse.proj.dir.importer}/lib" files="sdk-writable-client-framework.jar" />
+			<targetfilelist dir="${eclipse.proj.dir.junit}/lib" files="sdk-writable-client-framework.jar" />
+		</dependset>
 		<dependset>
 			<srcfilelist dir="${cacore.sdk.dir}/system/security/dist" files="sdk-security.jar" />
 			<targetfilelist dir="${eclipse.proj.dir.common}/lib" files="sdk-security.jar" />
@@ -267,14 +267,14 @@
 				</fileset>
 			</classpath>
 		</sql>
-	</target>   
-	
+	</target>
+
 	<target name="dbdump" description="makes a copy of the current biobank2 database">
-    <echo message="running mysqldump..." />
-    <exec executable="mysqldump" failonerror="true" output="biobank2.sql">
-        <arg line="-h${database.host} -P${database.port} -u${database.username} -p${database.password} ${database.name}" />
-    </exec>
-		<gzip src="biobank2.sql" destfile="biobank2.sql.gz"/>
+		<echo message="running mysqldump..." />
+		<exec executable="mysqldump" failonerror="true" output="biobank2.sql">
+			<arg line="-h${database.host} -P${database.port} -u${database.username} -p${database.password} ${database.name}" />
+		</exec>
+		<gzip src="biobank2.sql" destfile="biobank2.sql.gz" />
 		<delete file="biobank2.sql" />
 	</target>
 
@@ -359,6 +359,103 @@
 	<target name="clean" description="cleans caCORE SDK and deletes jars from eclipse projects">
 		<ant dir="${cacore.sdk.dir}" target="clean" inheritRefs="false" />
 		<ant target="clean-jars" />
+	</target>
+
+	<!-- JUnit -->
+
+	<property name="dest.dir" value="${eclipse.proj.dir.junit}/build" />
+	<property name="dest.dir.classes" value="${dest.dir}/classes" />
+	<property name="dest.dir.lib" value="${eclipse.proj.dir.junit}/lib" />
+
+	<path id="build.class.path">
+		<fileset dir="${dest.dir.lib}">
+			<include name="*.jar" />
+		</fileset>
+	</path>
+
+	<path id="junit.class.path">
+		<fileset dir="jars">
+			<include name="*.jar" />
+		</fileset>
+	</path>
+
+	<path id="application.config.class.path">
+		<pathelement location="${eclipse.proj.dir.common}/conf" />
+	</path>
+
+	<path id="common.lib.class.path">
+		<fileset dir="${eclipse.proj.dir.common}/lib">
+			<include name="**/*.jar" />
+		</fileset>
+	</path>
+
+	<path id="test.class.path">
+		<pathelement location="${dest.dir.classes}" />
+	</path>
+
+	<target name="tests-clean">
+		<delete dir="${dest.dir}" />
+	</target>
+
+	<target name="prepare">
+		<mkdir dir="${dest.dir}" />
+		<mkdir dir="${dest.dir.classes}" />
+	</target>
+
+	<target name="common-compile" depends="tests-clean,prepare,deploy-eclipse">
+		<javac srcdir="${eclipse.proj.dir.common}/src" destdir="${dest.dir.classes}" debug="true" debuglevel="lines,source">
+			<classpath refid="common.lib.class.path" />
+		</javac>
+	</target>
+
+	<target name="tests-compile" depends="common-compile">
+		<javac srcdir="${eclipse.proj.dir.junit}/src" destdir="${dest.dir.classes}" debug="true" debuglevel="lines,source">
+			<classpath refid="build.class.path" />
+			<classpath refid="junit.class.path" />
+		</javac>
+	</target>
+
+	<target name="test" depends="tests-compile" description="executes test cases">
+		<junit printsummary="yes" haltonfailure="yes" showoutput="yes">
+			<classpath refid="junit.class.path" />
+			<classpath refid="application.config.class.path" />
+			<classpath refid="common.lib.class.path" />
+			<classpath refid="test.class.path" />
+
+			<formatter type="brief" />
+
+			<test name="test.ualberta.med.biobank.AllTests" haltonfailure="no" outfile="result">
+				<formatter type="xml" />
+			</test>
+
+			<!--batchtest fork="yes" haltonfailure="no" todir="testing">
+				<fileset dir="${eclipse.proj.dir.junit}/src">
+					<include name="**/Test*.java" />
+                    <exclude name="**/TestCommon.java" />
+                    <exclude name="**/TestDatabase.java" />
+					<exclude name="**/AllTests.java" />
+				</fileset>
+			</batchtest-->
+		</junit>
+	</target>
+
+	<target name="test-brief" depends="tests-compile" description="executes test cases">
+		<junit showoutput="true" fork="true" failureproperty="tests.failed" errorproperty="tests.failed">
+			<classpath refid="junit.class.path" />
+			<classpath refid="application.config.class.path" />
+			<classpath refid="common.lib.class.path" />
+			<classpath refid="test.class.path" />
+			<formatter usefile="false" type="brief" />
+			<batchtest todir="testring">
+				<fileset dir="${eclipse.proj.dir.junit}/src">
+					<include name="**/Test*.java" />
+					<exclude name="**/TestCommon.java" />
+					<exclude name="**/TestDatabase.java" />
+					<exclude name="**/AllTests.java" />
+				</fileset>
+			</batchtest>
+			<!-- <formatter type="xml"/> If missing, only displays failed tests -->
+		</junit>
 	</target>
 
 </project>
