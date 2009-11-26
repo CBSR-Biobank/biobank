@@ -28,6 +28,7 @@ public class AllTests {
                 + System.getProperty("server", "localhost:8080") + "/biobank2",
                 "testuser", "test");
 
+        System.out.println("app service started");
         DbHelper.setAppService(appService);
     }
 

@@ -363,8 +363,18 @@
 
 	<!-- JUnit -->
 
+	<property name="dest.dir" value="${eclipse.proj.dir.junit}/build" />
+	<property name="dest.dir.classes" value="${dest.dir}/classes" />
+	<property name="dest.dir.lib" value="${eclipse.proj.dir.junit}/lib" />
+
+	<path id="build.class.path">
+		<fileset dir="${dest.dir.lib}">
+			<include name="*.jar" />
+		</fileset>
+	</path>
+
 	<path id="junit.class.path">
-		<fileset dir="testing">
+		<fileset dir="jars">
 			<include name="*.jar" />
 		</fileset>
 	</path>
@@ -379,50 +389,55 @@
 		</fileset>
 	</path>
 
-	<path id="common.classes.class.path">
-		<pathelement location="${eclipse.proj.dir.common}/bin/edu/ualberta/med/biobank/common" />
+	<path id="test.class.path">
+		<pathelement location="${dest.dir.classes}" />
 	</path>
 
-	<path id="test.class.path">
-		<pathelement location="${eclipse.proj.dir.junit}/bin/test/ualberta/med/biobank" />
-	</path>
-	
-	<property name="dest.dir" value="${eclipse.proj.dir.junit}/build" />
-	<property name="dest.dir.classes" value="${dest.dir}/classes" />
-	<property name="dest.dir.lib" value="${dest.dir}/lib" />
-	<property name="home" value="." />
+	<target name="tests-clean">
+		<delete dir="${dest.dir}" />
+	</target>
 
 	<target name="prepare">
 		<mkdir dir="${dest.dir}" />
 		<mkdir dir="${dest.dir.classes}" />
 	</target>
 
-	<target name="compile" depends="clean,prepare">
-		<javac srcdir="src" destdir="${dest.dir.classes}">
-			<classpath refid="build.class.path" />
+	<target name="common-compile" depends="tests-clean,prepare,deploy-eclipse">
+		<javac srcdir="${eclipse.proj.dir.common}/src" destdir="${dest.dir.classes}"
+			debug="true" debuglevel="lines,source">
+			<classpath refid="common.lib.class.path" />
 		</javac>
 	</target>
 
-	<target name="test" depends="clean,prepare">
-		<junit printsummary="yes" haltonfailure="yes">
+	<target name="tests-compile" depends="common-compile">
+		<javac srcdir="${eclipse.proj.dir.junit}/src" destdir="${dest.dir.classes}"
+			debug="true" debuglevel="lines,source">
+			<classpath refid="build.class.path" />
+			<classpath refid="junit.class.path" />
+		</javac>
+	</target>
+
+	<target name="test" depends="tests-compile">
+		<junit printsummary="yes" haltonfailure="yes" showoutput="yes">
 			<classpath refid="junit.class.path" />
 			<classpath refid="application.config.class.path" />
 			<classpath refid="common.lib.class.path" />
 			<classpath refid="test.class.path" />
-			<classpath refid="common.classes.class.path" />
 
 			<formatter type="plain" />
 
-			<test name="AllTests" haltonfailure="no" outfile="result">
+			<test name="test.ualberta.med.biobank.AllTests" haltonfailure="no" outfile="result">
 				<formatter type="xml" />
 			</test>
 
-			<batchtest fork="yes" todir="testing">
-				<fileset dir="${eclipse.proj.dir.junit}">
+			<!--batchtest fork="yes" haltonfailure="no" todir="testing">
+				<fileset dir="${eclipse.proj.dir.junit}/src">
 					<include name="**/Test*.java" />
+                    <exclude name="**/TestCommon.java" />
+                    <exclude name="**/TestDatabase.java" />
 					<exclude name="**/AllTests.java" />
 				</fileset>
-			</batchtest>
+			</batchtest-->
 		</junit>
 	</target>
 
