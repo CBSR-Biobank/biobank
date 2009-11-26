@@ -28,13 +28,11 @@ public class AllTests {
                 + System.getProperty("server", "localhost:8080") + "/biobank2",
                 "testuser", "test");
 
-        System.out.println("app service started");
         DbHelper.setAppService(appService);
     }
 
     @AfterClass
     public static void tearDown() {
-        System.out.println("tearing down");
     }
 
 }
