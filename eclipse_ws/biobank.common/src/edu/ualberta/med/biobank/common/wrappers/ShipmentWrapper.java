@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -31,7 +32,7 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
     @Override
     protected void deleteChecks() throws BiobankCheckException,
         ApplicationException, WrapperException {
-        // TODO Auto-generated method stub
+        // FIXME Auto-generated method stub
 
     }
 
@@ -63,7 +64,7 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
     @Override
     protected String[] getPropertyChangeNames() {
         return new String[] { "dateDrawn", "dateReceived", "clinic", "comment",
-            "shptSampleSourceCollection", "patientVisitCollection" };
+            "shptSampleSourceCollection", "patientVisitCollection", "waybill" };
     }
 
     @Override
@@ -261,9 +262,35 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
             .firePropertyChange("comment", oldComment, comment);
     }
 
+    public String getWaybill() {
+        return wrappedObject.getWaybill();
+    }
+
+    public void setWaybill(String waybill) {
+        String old = getWaybill();
+        wrappedObject.setWaybill(waybill);
+        propertyChangeSupport.firePropertyChange("waybill", old, waybill);
+    }
+
     @Override
     public String toString() {
         return getFormattedDateDrawn();
     }
 
+    /**
+     * Search for a shipment in the site with the given waybill
+     */
+    public static ShipmentWrapper getShipmentInSite(
+        WritableApplicationService appService, String waybill, SiteWrapper site)
+        throws ApplicationException {
+        HQLCriteria criteria = new HQLCriteria("from "
+            + Shipment.class.getName()
+            + " where clinic.site.id = ? and waybill = ?", Arrays
+            .asList(new Object[] { site.getId(), waybill }));
+        List<Shipment> shipments = appService.query(criteria);
+        if (shipments.size() == 1) {
+            return new ShipmentWrapper(appService, shipments.get(0));
+        }
+        return null;
+    }
 }

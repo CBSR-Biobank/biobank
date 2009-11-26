@@ -175,4 +175,9 @@ public class TestShipment extends TestDatabase {
         fail("Not yet implemented");
     }
 
+    @Test
+    public void testGetShipmentInSite() {
+        fail("Not yet implemented");
+    }
+
 }

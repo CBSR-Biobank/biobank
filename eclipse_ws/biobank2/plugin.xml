@@ -65,7 +65,7 @@
       <perspective
             class="edu.ualberta.med.biobank.rcp.MainPerspective"
             id="edu.ualberta.med.biobank.perspective.main"
-            name="Biobank Perspective">
+            name="Main Perspective">
       </perspective>
       <perspective
             class="edu.ualberta.med.biobank.rcp.ReportsPerspective"
@@ -76,12 +76,17 @@
             class="edu.ualberta.med.biobank.rcp.PatientsAdministrationPerspective"
             fixed="true"
             id="edu.ualberta.med.biobank.perspective.patients"
-            name="Patients Administration">
+            name="Patients Perspective">
       </perspective>
       <perspective
             class="edu.ualberta.med.biobank.rcp.SampleManagementPerspective"
             id="edu.ualberta.med.biobank.perspective.samplesManagement"
-            name="Samples Management">
+            name="Samples Management Perspective">
+      </perspective>
+      <perspective
+            class="edu.ualberta.med.biobank.rcp.ShipmentAdministrationPerspective"
+            id="edu.ualberta.med.biobank.perspective.shipmentAdministration"
+            name="Shipment Perspective">
       </perspective>
    </extension>
    <extension
@@ -164,6 +169,10 @@
       <command
             id="edu.ualberta.med.biobank.commands.patients.patientVisitAdd"
             name="Add Patient Visit">
+      </command>
+      <command
+            id="edu.ualberta.med.biobank.commands.shipmentAdmin"
+            name="Shipment administration">
       </command>
    </extension>
    <extension
@@ -412,6 +421,20 @@
                     definitionId="oneElementSelected">
               </reference>
          </enabledWhen>
+      </handler>
+      <handler
+            class="edu.ualberta.med.biobank.handlers.ShipmentAdministrationHandler"
+            commandId="edu.ualberta.med.biobank.commands.shipmentAdmin">
+         <activeWhen>
+            <and>
+               <reference
+                     definitionId="biobank2.loggedIn">
+               </reference>
+               <reference
+                     definitionId="biobank2.siteSelected">
+               </reference>
+            </and>
+         </activeWhen>
       </handler>
    </extension>
    <extension
@@ -839,6 +862,15 @@
                </parameter>
             </command>
          </toolbar>
+         <toolbar
+               id="edu.ualberta.med.biobank.toolbar.shipmentPerspective">
+            <command
+                  commandId="edu.ualberta.med.biobank.commands.shipmentAdmin"
+                  icon="icons/shipmentPerpective.png"
+                  label="Shipment View"
+                  style="push">
+            </command>
+         </toolbar>
       </menuContribution>
    </extension>
    <extension
@@ -901,6 +933,21 @@
                relative="org.eclipse.ui.editorss"
                showTitle="true"
                standalone="true"
+               visible="true">
+         </view>
+      </perspectiveExtension>
+      <perspectiveExtension
+            targetID="edu.ualberta.med.biobank.perspective.shipmentAdministration">
+         <view
+               closeable="false"
+               id="edu.ualberta.med.biobank.views.shipmentAdmin"
+               minimized="false"
+               moveable="false"
+               ratio="0.20"
+               relationship="left"
+               relative="org.eclipse.ui.editorss"
+               showTitle="false"
+               standalone="false"
                visible="true">
          </view>
       </perspectiveExtension>
@@ -1228,6 +1275,13 @@
             icon="icons/patientPerspective.png"
             id="edu.ualberta.med.biobank.views.patientsAdmin"
             name="Patients administration"
+            restorable="true">
+      </view>
+      <view
+            class="edu.ualberta.med.biobank.views.ShipmentAdministrationView"
+            icon="icons/shipmentPerpective.png"
+            id="edu.ualberta.med.biobank.views.shipmentAdmin"
+            name="Shipments administration"
             restorable="true">
       </view>
    </extension>

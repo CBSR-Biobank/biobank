@@ -134,6 +134,9 @@ public class PatientWrapper extends ModelWrapper<Patient> {
         propertiesMap.put("patientVisitCollection", patientVisitCollection);
     }
 
+    /**
+     * Search a patient in the site with the given number
+     */
     public static PatientWrapper getPatientInSite(
         WritableApplicationService appService, String patientNumber,
         SiteWrapper siteWrapper) throws ApplicationException {
@@ -141,8 +144,7 @@ public class PatientWrapper extends ModelWrapper<Patient> {
             + Patient.class.getName()
             + " where study.site.id = ? and number = ?", Arrays
             .asList(new Object[] { siteWrapper.getId(), patientNumber }));
-        List<Patient> patients;
-        patients = appService.query(criteria);
+        List<Patient> patients = appService.query(criteria);
         if (patients.size() == 1) {
             return new PatientWrapper(appService, patients.get(0));
         }
