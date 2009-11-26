@@ -90,7 +90,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
             patientWrapper.reload();
         } catch (Exception e) {
             LOGGER.error("Error while retrieving patient visit "
-                + patientVisitAdapter.getWrapper().getShipment().getDateDrawn()
+                + patientVisitAdapter.getWrapper().getFormattedDateProcessed()
                 + " (Patient " + patientVisitWrapper.getPatient() + ")", e);
         }
     }

@@ -305,7 +305,7 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
             @Override
             public String getText(Object element) {
                 PatientVisitWrapper pv = (PatientVisitWrapper) element;
-                return pv.getShipment().getFormattedDateDrawn();
+                return pv.getShipment().getFormattedDateShipped();
             }
         });
         comboVisits.addKeyListener(new KeyAdapter() {
@@ -533,7 +533,7 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
                 + sampleWrapper.getPositionString()
                 + " for visit "
                 + sampleWrapper.getPatientVisit().getShipment()
-                    .getFormattedDateDrawn() + "(patient "
+                    .getFormattedDateShipped() + "(patient "
                 + currentPatient.getNumber() + ")");
         } else {
             appendLog("Sample " + sampleWrapper.getInventoryId()

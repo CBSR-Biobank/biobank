@@ -2,10 +2,12 @@ package edu.ualberta.med.biobank.common.wrappers;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.BiobankCheckException;
+import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.SampleSource;
 import edu.ualberta.med.biobank.model.Shipment;
@@ -72,6 +74,20 @@ public class ShptSampleSourceWrapper extends ModelWrapper<ShptSampleSource> {
 
     public void setShipment(ShipmentWrapper s) {
         setShipment(s.wrappedObject);
+    }
+
+    public Date getDateDrawn() {
+        return wrappedObject.getDateDrawn();
+    }
+
+    public String getFormattedDateDrawn() {
+        return DateFormatter.formatAsDateTime(getDateDrawn());
+    }
+
+    public void setDateDrawn(Date date) {
+        Date oldDate = getDateDrawn();
+        wrappedObject.setDateDrawn(date);
+        propertyChangeSupport.firePropertyChange("dateDrawn", oldDate, date);
     }
 
     public SampleSourceWrapper getSampleSource() {

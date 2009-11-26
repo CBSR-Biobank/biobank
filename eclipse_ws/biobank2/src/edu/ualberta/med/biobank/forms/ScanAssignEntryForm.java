@@ -438,7 +438,7 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
                 + expectedSample.getInventoryId()
                 + " from visit "
                 + expectedSample.getPatientVisit().getShipment()
-                    .getFormattedDateDrawn() + " (patient "
+                    .getFormattedDateShipped() + " (patient "
                 + expectedSample.getPatientVisit().getPatient().getNumber()
                 + ") missing";
             setStatusWithLogMessage(scanCell, SampleCellStatus.MISSING,
@@ -572,7 +572,7 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
                             sb.append(" - Patient: ").append(
                                 visit.getPatient().getNumber());
                             sb.append(" - Visit: ").append(
-                                visit.getShipment().getFormattedDateDrawn());
+                                visit.getShipment().getFormattedDateShipped());
                             sb.append(" - ").append(
                                 visit.getShipment().getClinic().getName());
                             totalNb++;

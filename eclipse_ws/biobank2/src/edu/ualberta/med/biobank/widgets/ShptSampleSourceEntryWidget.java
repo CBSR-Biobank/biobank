@@ -33,7 +33,6 @@ import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleSourceWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShptSampleSourceWrapper;
@@ -64,8 +63,6 @@ public class ShptSampleSourceEntryWidget extends BiobankWidget {
     private IObservableValue sampleSourcesAdded = new WritableValue(
         Boolean.FALSE, Boolean.class);
 
-    private PatientWrapper currentPatient;
-
     /**
      * 
      * @param parent a composite control which will be the parent of the new
@@ -79,13 +76,11 @@ public class ShptSampleSourceEntryWidget extends BiobankWidget {
      */
     public ShptSampleSourceEntryWidget(Composite parent, int style,
         List<ShptSampleSourceWrapper> shptSampleSourceCollection,
-        ShipmentWrapper shipment, PatientWrapper currentPatient,
-        FormToolkit toolkit) {
+        ShipmentWrapper shipment, FormToolkit toolkit) {
         super(parent, style);
         Assert.isNotNull(toolkit, "toolkit is null");
         getSampleSources();
         this.shipment = shipment;
-        this.currentPatient = currentPatient;
         if (shptSampleSourceCollection == null) {
             selectedShptSampleSources = new ArrayList<ShptSampleSourceWrapper>();
         } else {
@@ -116,9 +111,6 @@ public class ShptSampleSourceEntryWidget extends BiobankWidget {
                     SessionManager.getAppService());
                 sampleSource
                     .setShipment(ShptSampleSourceEntryWidget.this.shipment);
-                List<PatientWrapper> patients = new ArrayList<PatientWrapper>();
-                patients.add(ShptSampleSourceEntryWidget.this.currentPatient);
-                sampleSource.setPatientCollection(patients);
                 addOrEditShptSampleSource(true, sampleSource,
                     getNonDuplicateSampleSources());
             }

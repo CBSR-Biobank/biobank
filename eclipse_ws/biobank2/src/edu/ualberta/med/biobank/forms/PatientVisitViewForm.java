@@ -166,8 +166,8 @@ public class PatientVisitViewForm extends BiobankViewForm {
             patientVisitWrapper.reload();
         } catch (Exception ex) {
             LOGGER.error("Error while retrieving patient visit "
-                + patientVisitWrapper.getShipment().getDateDrawn()
-                + "(patient " + patientVisitWrapper.getPatient() + ")", ex);
+                + patientVisitWrapper.getFormattedDateProcessed() + "(patient "
+                + patientVisitWrapper.getPatient() + ")", ex);
         }
     }
 

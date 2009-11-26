@@ -42,7 +42,7 @@ public class ShipmentViewForm extends BiobankViewForm {
         shipmentWrapper = shipmentAdapter.getWrapper();
         retrieveShipment();
 
-        setPartName("Shipment " + shipmentWrapper.getFormattedDateDrawn());
+        setPartName("Shipment " + shipmentWrapper.getFormattedDateShipped());
     }
 
     private void retrieveShipment() {
@@ -50,14 +50,14 @@ public class ShipmentViewForm extends BiobankViewForm {
             shipmentWrapper.reload();
         } catch (Exception ex) {
             LOGGER.error("Error while retrieving shipment "
-                + shipmentWrapper.getDateDrawn(), ex);
+                + shipmentWrapper.getDateShipped(), ex);
         }
     }
 
     @Override
     protected void createFormContent() throws Exception {
-        form.setText("Shipment Drawn Date: "
-            + shipmentWrapper.getFormattedDateDrawn());
+        form.setText("Shipment Shipped Date: "
+            + shipmentWrapper.getFormattedDateShipped());
         form.getBody().setLayout(new GridLayout(1, false));
         form.getBody().setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         form.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
@@ -105,7 +105,7 @@ public class ShipmentViewForm extends BiobankViewForm {
             shipmentWrapper.getClinic() == null ? "" : shipmentWrapper
                 .getClinic().getName());
         FormUtils.setTextValue(dateDrawnLabel, shipmentWrapper
-            .getFormattedDateDrawn());
+            .getFormattedDateShipped());
         FormUtils.setTextValue(dateReceivedLabel, shipmentWrapper
             .getFormattedDateReceived());
         FormUtils.setTextValue(commentLabel, shipmentWrapper.getComment());
