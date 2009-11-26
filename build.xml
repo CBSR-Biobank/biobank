@@ -417,7 +417,7 @@
 		</javac>
 	</target>
 
-	<target name="test" depends="tests-compile">
+	<target name="test" depends="tests-compile" description="executes test cases">
 		<junit printsummary="yes" haltonfailure="yes" showoutput="yes">
 			<classpath refid="junit.class.path" />
 			<classpath refid="application.config.class.path" />
