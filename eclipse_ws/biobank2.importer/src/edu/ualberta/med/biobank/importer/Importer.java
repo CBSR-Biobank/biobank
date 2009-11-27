@@ -112,24 +112,24 @@ public class Importer {
             }
 
             // the order here matters
-            // bioBank2Db.deleteAll(Sample.class);
-            // bioBank2Db.deleteAll(Container.class);
-            // bioBank2Db.deleteAll(ContainerType.class);
-            // bioBank2Db.deleteAll(PatientVisit.class);
-            // bioBank2Db.deleteAll(Patient.class);
-            // bioBank2Db.deleteAll(Clinic.class);
-            // bioBank2Db.deleteAll(Study.class);
-            // bioBank2Db.deleteAll(Site.class);
-            //
-            // cbsrSite = bioBank2Db.createSite();
-            //
-            // SiteContainerTypes.getInstance().insertContainerTypes(cbsrSite);
-            // SiteContainers.getInstance().insertContainers(cbsrSite);
-            //
-            // importStudies();
-            // importClinics();
-            // importPatients();
-            // importShipments();
+            bioBank2Db.deleteAll(Sample.class);
+            bioBank2Db.deleteAll(Container.class);
+            bioBank2Db.deleteAll(ContainerType.class);
+            bioBank2Db.deleteAll(PatientVisit.class);
+            bioBank2Db.deleteAll(Patient.class);
+            bioBank2Db.deleteAll(Clinic.class);
+            bioBank2Db.deleteAll(Study.class);
+            bioBank2Db.deleteAll(Site.class);
+
+            cbsrSite = bioBank2Db.createSite();
+
+            SiteContainerTypes.getInstance().insertContainerTypes(cbsrSite);
+            SiteContainers.getInstance().insertContainers(cbsrSite);
+
+            importStudies();
+            importClinics();
+            importPatients();
+            importShipments();
             importPatientVisits();
             importCabinetSamples();
             importFreezerSamples();
