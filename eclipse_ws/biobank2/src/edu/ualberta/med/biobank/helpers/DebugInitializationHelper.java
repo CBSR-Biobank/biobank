@@ -76,7 +76,7 @@ public class DebugInitializationHelper {
     private ContainerTypeWrapper hotel13Type;
     private ContainerTypeWrapper freezerType;
 
-    private Collection<PatientWrapper> patients;
+    private List<PatientWrapper> patients;
 
     private ContainerTypeWrapper binType;
 
@@ -94,9 +94,8 @@ public class DebugInitializationHelper {
 
                     // insert methods are listed here and order is important
                     String[] insertMethodNames = new String[] { "insertSite",
-                        "insertClinicsInSite", "insertShipmentsInClinics",
-                        "insertStudyInSite", "insertPatientInStudy",
-                        "insertShptSampleSourceForShipment",
+                        "insertClinicsInSite", "insertStudyInSite",
+                        "insertPatientInStudy", "insertShipmentsInClinics",
                         "insertPatientVisitsInPatient",
                         "insertContainerTypesInSite", "insertContainers",
                         "insertSampleStorage" };
@@ -203,6 +202,8 @@ public class DebugInitializationHelper {
 
     private void insertShipmentsInClinic(ClinicWrapper clinic) throws Exception {
         Random r = new Random();
+        List<SampleSourceWrapper> sampleSources = SampleSourceWrapper
+            .getAllSampleSources(appService);
         for (int i = 0; i < 50; i++) {
             ShipmentWrapper shipment = new ShipmentWrapper(appService);
             String dateStr = String.format("2009-%02d-%02d %02d:%02d", r
@@ -211,7 +212,19 @@ public class DebugInitializationHelper {
             dateStr = String.format("2009-%02d-%02d %02d:%02d",
                 r.nextInt(12) + 1, r.nextInt(28), r.nextInt(24), r.nextInt(60));
             shipment.setDateReceived(DateFormatter.parseToDateTime(dateStr));
+            shipment.setWaybill(r.nextInt() + getRandomString(r, 10));
             shipment.setClinic(clinic);
+
+            ShptSampleSourceWrapper sss = new ShptSampleSourceWrapper(
+                appService);
+            sss.setSampleSource(sampleSources.get(5));
+            sss.setQuantity(5);
+            sss.setPatientCollection(Arrays
+                .asList(new PatientWrapper[] { patients.get(i) }));
+            sss.setShipment(shipment);
+            shipment.setShptSampleSourceCollection(Arrays
+                .asList(new ShptSampleSourceWrapper[] { sss }));
+
             shipment.persist();
         }
         clinic.reload();
@@ -238,7 +251,8 @@ public class DebugInitializationHelper {
     @SuppressWarnings("unused")
     private void insertPatientVisitsInPatient() throws Exception {
         Random r = new Random();
-        for (PatientWrapper patient : patients) {
+        for (int i = 0; i < 50; i++) {
+            PatientWrapper patient = patients.get(i);
             List<PatientVisitWrapper> visits = new ArrayList<PatientVisitWrapper>();
             visits.add(createPatientVisit(r, patient));
             visits.add(createPatientVisit(r, patient));
@@ -294,7 +308,6 @@ public class DebugInitializationHelper {
         patients = study.getPatientCollection();
     }
 
-    @SuppressWarnings("unused")
     private void insertShptSampleSourceForShipment() throws Exception {
         List<ShipmentWrapper> shipmentCollection = new ArrayList<ShipmentWrapper>();
         shipmentCollection.addAll(clinics[0].getShipmentCollection());
@@ -573,5 +586,13 @@ public class DebugInitializationHelper {
             object.reload();
             object.delete();
         }
+    }
+
+    public String getRandomString(Random r, int maxlen) {
+        String str = new String();
+        for (int j = 0, n = r.nextInt(maxlen) + 1; j < n; ++j) {
+            str += (char) ('A' + r.nextInt(26));
+        }
+        return str;
     }
 }
