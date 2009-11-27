@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.common.wrappers;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -16,6 +17,7 @@ import edu.ualberta.med.biobank.common.wrappers.internal.PvInfoWrapper;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.PvInfoData;
+import edu.ualberta.med.biobank.model.PvSampleSource;
 import edu.ualberta.med.biobank.model.Sample;
 import edu.ualberta.med.biobank.model.Shipment;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -51,7 +53,8 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
     @Override
     protected String[] getPropertyChangeNames() {
         return new String[] { "patient", "dateProcessed", "comment",
-            "pvInfoDataCollection", "sampleCollection", "username", "shipment" };
+            "pvInfoDataCollection", "sampleCollection", "username", "shipment",
+            "pvSampleSourceCollection" };
     }
 
     public Date getDateProcessed() {
@@ -303,6 +306,54 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
 
     public void setShipment(ShipmentWrapper s) {
         setShipment(s.wrappedObject);
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<PvSampleSourceWrapper> getPvSampleSourceCollection(boolean sort) {
+        List<PvSampleSourceWrapper> pvSampleSourceCollection = (List<PvSampleSourceWrapper>) propertiesMap
+            .get("pvSampleSourceCollection");
+        if (pvSampleSourceCollection == null) {
+            Collection<PvSampleSource> children = wrappedObject
+                .getPvSampleSourceCollection();
+            if (children != null) {
+                pvSampleSourceCollection = new ArrayList<PvSampleSourceWrapper>();
+                for (PvSampleSource pvSampleSource : children) {
+                    pvSampleSourceCollection.add(new PvSampleSourceWrapper(
+                        appService, pvSampleSource));
+                }
+                propertiesMap.put("pvSampleSourceCollection",
+                    pvSampleSourceCollection);
+            }
+        }
+        if ((pvSampleSourceCollection != null) && sort)
+            Collections.sort(pvSampleSourceCollection);
+        return pvSampleSourceCollection;
+    }
+
+    public List<PvSampleSourceWrapper> getPvSampleSourceCollection() {
+        return getPvSampleSourceCollection(false);
+    }
+
+    public void setPvSampleSourceCollection(
+        Collection<PvSampleSource> pvSampleSources, boolean setNull) {
+        Collection<PvSampleSource> oldCollection = wrappedObject
+            .getPvSampleSourceCollection();
+        wrappedObject.setPvSampleSourceCollection(pvSampleSources);
+        propertyChangeSupport.firePropertyChange("pvSampleSourceCollection",
+            oldCollection, pvSampleSources);
+        if (setNull) {
+            propertiesMap.put("pvSampleSourceCollection", null);
+        }
+    }
+
+    public void setPvSampleSourceCollection(
+        Collection<PvSampleSourceWrapper> pvSampleSources) {
+        Collection<PvSampleSource> pvCollection = new HashSet<PvSampleSource>();
+        for (PvSampleSourceWrapper pv : pvSampleSources) {
+            pvCollection.add(pv.getWrappedObject());
+        }
+        setPvSampleSourceCollection(pvCollection, false);
+        propertiesMap.put("pvSampleSourceCollection", pvSampleSources);
     }
 
     @Override

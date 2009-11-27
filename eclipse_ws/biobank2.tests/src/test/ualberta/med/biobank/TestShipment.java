@@ -14,14 +14,12 @@ import test.ualberta.med.biobank.internal.ContactHelper;
 import test.ualberta.med.biobank.internal.PatientHelper;
 import test.ualberta.med.biobank.internal.PatientVisitHelper;
 import test.ualberta.med.biobank.internal.ShipmentHelper;
-import test.ualberta.med.biobank.internal.ShptSampleSourceHelper;
 import test.ualberta.med.biobank.internal.SiteHelper;
 import test.ualberta.med.biobank.internal.StudyHelper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ShptSampleSourceWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 
@@ -65,73 +63,6 @@ public class TestShipment extends TestDatabase {
     }
 
     @Test
-    public void testGetShptSampleSourceCollection() throws Exception {
-        String name = "testGetShptSampleSourceCollection" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
-        ClinicWrapper clinic = ClinicHelper.addClinic(site, name);
-        ShipmentWrapper shipment = ShipmentHelper.addShipmentWithRandomObjects(
-            clinic, name);
-        int nber = r.nextInt(5) + 1;
-        ShptSampleSourceHelper.addShptSampleSources(name, shipment, nber);
-
-        shipment.reload();
-        List<ShptSampleSourceWrapper> sssList = shipment
-            .getShptSampleSourceCollection();
-        int sizeFound = sssList.size();
-
-        Assert.assertEquals(nber + 1, sizeFound);
-    }
-
-    @Test
-    public void testGetShptSampleSourceCollectionBoolean() throws Exception {
-        String name = "testGetShptSampleSourceCollectionBoolean" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
-        ClinicWrapper clinic = ClinicHelper.addClinic(site, name);
-        ShipmentWrapper shipment = ShipmentHelper.addShipmentWithRandomObjects(
-            clinic, name);
-
-        ShptSampleSourceHelper.addShptSampleSource("c" + name, shipment);
-        ShptSampleSourceHelper.addShptSampleSource("a" + name, shipment);
-        ShptSampleSourceHelper.addShptSampleSource("d" + name, shipment);
-        shipment.reload();
-
-        List<ShptSampleSourceWrapper> sssList = shipment
-            .getShptSampleSourceCollection(true);
-        if (sssList.size() > 1) {
-            for (int i = 0; i < sssList.size() - 1; i++) {
-                ShptSampleSourceWrapper sss1 = sssList.get(i);
-                ShptSampleSourceWrapper sss2 = sssList.get(i + 1);
-                Assert.assertTrue(sss1.compareTo(sss2) <= 0);
-            }
-        }
-    }
-
-    @Test
-    public void testAddShptSampleSourceCollection() throws Exception {
-        String name = "testAddShptSampleSourceCollection" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
-        ClinicWrapper clinic = ClinicHelper.addClinic(site, name);
-        ShipmentWrapper shipment = ShipmentHelper.addShipmentWithRandomObjects(
-            clinic, name);
-        int nber = r.nextInt(5) + 1;
-        ShptSampleSourceHelper.addShptSampleSources(name, shipment, nber);
-
-        shipment.reload();
-        List<ShptSampleSourceWrapper> sssList = shipment
-            .getShptSampleSourceCollection();
-        ShptSampleSourceWrapper sss = ShptSampleSourceHelper
-            .newShptSampleSource(name + "NEW", shipment);
-        sssList.add(sss);
-        shipment.setShptSampleSourceCollection(sssList);
-        shipment.persist();
-
-        shipment.reload();
-        // one shptSS added (plus the one added
-        Assert.assertEquals(nber + 2, shipment.getShptSampleSourceCollection()
-            .size());
-    }
-
-    @Test
     public void testGetPatientVisitCollection() throws Exception {
         String name = "testGetPatientVisitCollection" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
@@ -152,10 +83,10 @@ public class TestShipment extends TestDatabase {
         study1.setContactCollection(contacts);
         study1.persist();
         PatientWrapper patient1 = PatientHelper.addPatient(name, study1);
-        ShipmentWrapper shipment1 = ShipmentHelper.addShipmentWithShptSampleSource(clinic1,
-            patient1);
-        ShipmentWrapper shipment2 = ShipmentHelper.addShipmentWithShptSampleSource(clinic2,
-            patient1);
+        ShipmentWrapper shipment1 = ShipmentHelper
+            .addShipmentWithShptSampleSource(clinic1, patient1);
+        ShipmentWrapper shipment2 = ShipmentHelper
+            .addShipmentWithShptSampleSource(clinic2, patient1);
         int nbClinic1Study1 = PatientVisitHelper.addPatientVisits(patient1,
             shipment1).size();
         int nbClinic2Study1 = PatientVisitHelper.addPatientVisits(patient1,
@@ -165,10 +96,10 @@ public class TestShipment extends TestDatabase {
         study2.setContactCollection(contacts);
         study2.persist();
         PatientWrapper patient2 = PatientHelper.addPatient(name, study2);
-        ShipmentWrapper shipment3 = ShipmentHelper.addShipmentWithShptSampleSource(clinic1,
-            patient2);
-        ShipmentWrapper shipment4 = ShipmentHelper.addShipmentWithShptSampleSource(clinic2,
-            patient2);
+        ShipmentWrapper shipment3 = ShipmentHelper
+            .addShipmentWithShptSampleSource(clinic1, patient2);
+        ShipmentWrapper shipment4 = ShipmentHelper
+            .addShipmentWithShptSampleSource(clinic2, patient2);
         int nbClinic1Study2 = PatientVisitHelper.addPatientVisits(patient2,
             shipment3).size();
         int nbClinic2Study2 = PatientVisitHelper.addPatientVisits(patient2,
@@ -194,6 +125,11 @@ public class TestShipment extends TestDatabase {
 
     @Test
     public void testGetShipmentInSite() {
+        fail("Not yet implemented");
+    }
+
+    @Test
+    public void testPatients() {
         fail("Not yet implemented");
     }
 

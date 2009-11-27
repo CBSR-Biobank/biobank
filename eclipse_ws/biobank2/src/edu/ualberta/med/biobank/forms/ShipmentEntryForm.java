@@ -24,9 +24,6 @@ import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.treeview.ShipmentAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
-import edu.ualberta.med.biobank.widgets.ShptSampleSourceEntryWidget;
-import edu.ualberta.med.biobank.widgets.listeners.BiobankEntryFormWidgetListener;
-import edu.ualberta.med.biobank.widgets.listeners.MultiSelectEvent;
 
 public class ShipmentEntryForm extends BiobankEntryForm {
 
@@ -44,8 +41,6 @@ public class ShipmentEntryForm extends BiobankEntryForm {
     private ShipmentWrapper shipmentWrapper;
 
     private ComboViewer clinicsComboViewer;
-
-    private ShptSampleSourceEntryWidget shptSampleSourceEntryWidget;
 
     @Override
     protected void init() throws Exception {
@@ -77,7 +72,6 @@ public class ShipmentEntryForm extends BiobankEntryForm {
         form.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
             BioBankPlugin.IMG_SHIPMENT));
         createMainSection();
-        createSourcesSection();
     }
 
     private void createMainSection() {
@@ -129,27 +123,6 @@ public class ShipmentEntryForm extends BiobankEntryForm {
             null);
     }
 
-    private void createSourcesSection() {
-        Composite client = createSectionWithClient("Source Vessels");
-
-        GridLayout layout = new GridLayout(1, false);
-        client.setLayout(layout);
-        client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-
-        shptSampleSourceEntryWidget = new ShptSampleSourceEntryWidget(client,
-            SWT.NONE, shipmentWrapper.getShptSampleSourceCollection(),
-            shipmentWrapper, toolkit);
-        shptSampleSourceEntryWidget
-            .addSelectionChangedListener(new BiobankEntryFormWidgetListener() {
-                @Override
-                public void selectionChanged(MultiSelectEvent event) {
-                    setDirty(true);
-                }
-            });
-        shptSampleSourceEntryWidget.addBinding(widgetCreator);
-
-    }
-
     @Override
     public String getNextOpenedFormID() {
         return ShipmentViewForm.ID;
@@ -173,10 +146,6 @@ public class ShipmentEntryForm extends BiobankEntryForm {
                 shipmentWrapper.setClinic((Clinic) null);
             }
         }
-        shipmentWrapper
-            .setShptSampleSourceCollection(shptSampleSourceEntryWidget
-                .getShptSampleSources());
-
         shipmentWrapper.persist();
 
         shipmentAdapter.getParent().performExpand();
@@ -189,10 +158,6 @@ public class ShipmentEntryForm extends BiobankEntryForm {
             && clinicsComboViewer.getCombo().getItemCount() > 1) {
             clinicsComboViewer.getCombo().deselectAll();
         }
-        shptSampleSourceEntryWidget
-            .setSelectedShptSampleSources(shipmentWrapper
-                .getShptSampleSourceCollection());
-
     }
 
 }

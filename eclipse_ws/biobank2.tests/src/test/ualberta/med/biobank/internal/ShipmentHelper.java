@@ -2,15 +2,12 @@ package test.ualberta.med.biobank.internal;
 
 import java.util.Arrays;
 import java.util.Date;
-import java.util.List;
 
 import test.ualberta.med.biobank.Utils;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SampleSourceWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ShptSampleSourceWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 
 public class ShipmentHelper extends DbHelper {
@@ -26,19 +23,8 @@ public class ShipmentHelper extends DbHelper {
         }
 
         if (patient != null) {
-            ShptSampleSourceWrapper sssw = new ShptSampleSourceWrapper(
-                appService);
-            sssw.setDateDrawn(Utils.getRandomDate());
-            sssw.setPatientCollection(Arrays
+            shipment.setPatientCollection(Arrays
                 .asList(new PatientWrapper[] { patient }));
-            sssw.setShipment(shipment);
-            sssw.setQuantity(r.nextInt(15));
-            List<SampleSourceWrapper> sswList = SampleSourceWrapper
-                .getAllSampleSources(appService);
-            sssw.setSampleSource(sswList.get(r.nextInt(sswList.size())));
-
-            shipment.setShptSampleSourceCollection(Arrays
-                .asList(new ShptSampleSourceWrapper[] { sssw }));
         }
 
         return shipment;

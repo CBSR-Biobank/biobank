@@ -11,7 +11,6 @@ import org.eclipse.swt.widgets.Label;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.treeview.ShipmentAdapter;
-import edu.ualberta.med.biobank.widgets.infotables.ShptSampleSourceInfoTable;
 
 public class ShipmentViewForm extends BiobankViewForm {
 
@@ -64,7 +63,6 @@ public class ShipmentViewForm extends BiobankViewForm {
         form.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
             BioBankPlugin.IMG_SHIPMENT));
         createMainSection();
-        createSourcesSection();
     }
 
     private void createMainSection() {
@@ -94,12 +92,6 @@ public class ShipmentViewForm extends BiobankViewForm {
 
         setShipmentValues();
 
-    }
-
-    private void createSourcesSection() {
-        Composite client = createSectionWithClient("Source Vessels");
-        new ShptSampleSourceInfoTable(client, shipmentWrapper
-            .getShptSampleSourceCollection());
     }
 
     private void setShipmentValues() {
