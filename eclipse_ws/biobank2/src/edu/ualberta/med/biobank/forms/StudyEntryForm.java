@@ -23,7 +23,7 @@ import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.PvCustomInfo;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
-import edu.ualberta.med.biobank.validators.NonEmptyString;
+import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.widgets.ClinicAddWidget;
 import edu.ualberta.med.biobank.widgets.PvInfoWidget;
 import edu.ualberta.med.biobank.widgets.SampleStorageEntryWidget;
@@ -45,9 +45,9 @@ public class StudyEntryForm extends BiobankEntryForm {
     public static final ListOrderedMap FIELDS = new ListOrderedMap() {
         {
             put("name", new FieldInfo("Name", Text.class, SWT.NONE, null,
-                NonEmptyString.class, "Study name cannot be blank"));
+                NonEmptyStringValidator.class, "Study name cannot be blank"));
             put("nameShort", new FieldInfo("Short Name", Text.class, SWT.NONE,
-                null, NonEmptyString.class, "Study short name cannot be blank"));
+                null, NonEmptyStringValidator.class, "Study short name cannot be blank"));
             put("activityStatus", new FieldInfo("Activity Status", Combo.class,
                 SWT.NONE, FormConstants.ACTIVITY_STATUS, null, null));
             put("comment", new FieldInfo("Comments", Text.class, SWT.MULTI,

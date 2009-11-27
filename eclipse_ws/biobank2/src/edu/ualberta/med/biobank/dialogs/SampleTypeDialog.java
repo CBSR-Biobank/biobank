@@ -12,7 +12,7 @@ import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.model.SampleType;
-import edu.ualberta.med.biobank.validators.NonEmptyString;
+import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 
 public class SampleTypeDialog extends BiobankDialog {
 
@@ -54,14 +54,14 @@ public class SampleTypeDialog extends BiobankDialog {
 
         Control c = createBoundWidgetWithLabel(client, Text.class, SWT.BORDER,
             "Name", null, PojoObservables.observeValue(sampleType, "name"),
-            new NonEmptyString(MSG_NO_ST_NAME));
+            new NonEmptyStringValidator(MSG_NO_ST_NAME));
         GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
         gd.widthHint = 200;
         c.setLayoutData(gd);
 
         createBoundWidgetWithLabel(client, Text.class, SWT.BORDER,
             "Short Name", null, PojoObservables.observeValue(sampleType,
-                "nameShort"), new NonEmptyString(MSG_NO_ST_SNAME));
+                "nameShort"), new NonEmptyStringValidator(MSG_NO_ST_SNAME));
 
         return client;
     }

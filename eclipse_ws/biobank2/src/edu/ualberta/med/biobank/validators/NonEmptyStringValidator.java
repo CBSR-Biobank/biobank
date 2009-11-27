@@ -1,18 +1,12 @@
 package edu.ualberta.med.biobank.validators;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import org.eclipse.core.databinding.validation.ValidationStatus;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 
-public class EmailAddress extends AbstractValidator {
+public class NonEmptyStringValidator extends AbstractValidator {
 
-    private static final Pattern pattern = Pattern
-        .compile("^([^@\\s]+)@((?:[-a-z0-9]+.)+[a-z]{2,})$");
-
-    public EmailAddress(String message) {
+    public NonEmptyStringValidator(String message) {
         super(message);
     }
 
@@ -23,13 +17,7 @@ public class EmailAddress extends AbstractValidator {
                 "Not supposed to be called for non-strings.");
         }
 
-        if (((String) value).length() == 0) {
-            controlDecoration.hide();
-            return Status.OK_STATUS;
-        }
-
-        Matcher m = pattern.matcher((String) value);
-        if (m.matches()) {
+        if (((String) value).length() != 0) {
             controlDecoration.hide();
             return Status.OK_STATUS;
         }
@@ -37,4 +25,5 @@ public class EmailAddress extends AbstractValidator {
         controlDecoration.show();
         return ValidationStatus.error(errorMessage);
     }
+
 }

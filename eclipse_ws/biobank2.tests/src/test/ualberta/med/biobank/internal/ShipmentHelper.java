@@ -1,7 +1,5 @@
 package test.ualberta.med.biobank.internal;
 
-import java.util.Date;
-
 import test.ualberta.med.biobank.Utils;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
@@ -9,9 +7,10 @@ import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 public class ShipmentHelper extends DbHelper {
 
     public static ShipmentWrapper newShipment(ClinicWrapper clinic,
-        Date dateReceived) throws Exception {
+        String waybill,  Date dateReceived) throws Exception {
         ShipmentWrapper shipment = new ShipmentWrapper(appService);
         shipment.setClinic(clinic);
+        shipment.setWaybill(waybill);
         if (dateReceived != null) {
             shipment.setDateReceived(dateReceived);
         }
@@ -21,15 +20,15 @@ public class ShipmentHelper extends DbHelper {
 
     public static ShipmentWrapper addShipment(ClinicWrapper clinic)
         throws Exception {
-        ShipmentWrapper shipment = newShipment(clinic, null);
+        ShipmentWrapper shipment = newShipment(clinic, Utils.getRandomString(5));
         shipment.setDateReceived(Utils.getRandomDate());
         shipment.persist();
         return shipment;
     }
 
     public static ShipmentWrapper addShipment(ClinicWrapper clinic,
-        Date dateDrawn) throws Exception {
-        ShipmentWrapper shipment = newShipment(clinic, dateDrawn);
+        String waybill, Date dateReceived) throws Exception {
+        ShipmentWrapper shipment = newShipment(clinic, waybill, dateReceived);
         shipment.persist();
         return shipment;
     }

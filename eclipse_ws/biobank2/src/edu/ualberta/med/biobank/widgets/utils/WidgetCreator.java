@@ -48,7 +48,7 @@ import edu.ualberta.med.biobank.forms.FieldInfo;
 import edu.ualberta.med.biobank.forms.FormUtils;
 import edu.ualberta.med.biobank.validators.AbstractValidator;
 import edu.ualberta.med.biobank.validators.DateNotNulValidator;
-import edu.ualberta.med.biobank.validators.NonEmptyString;
+import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 
@@ -260,7 +260,7 @@ public class WidgetCreator {
         }
 
         combo.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
-        NonEmptyString validator = new NonEmptyString(errorMessage);
+        NonEmptyStringValidator validator = new NonEmptyStringValidator(errorMessage);
         validator.setControlDecoration(FormUtils.createDecorator(label,
             errorMessage));
         UpdateValueStrategy uvs = new UpdateValueStrategy();
@@ -300,7 +300,7 @@ public class WidgetCreator {
 
     public DateTimeWidget createDateTimeWidget(Composite client,
         String nameLabel, Date date, Object observedObject,
-        String propertyName, final String emptyMessage, boolean canBeEmpty) {
+        String propertyName, final String emptyMessage) {
         Label label = createLabel(client, nameLabel, SWT.NONE, true);
         label.setLayoutData(new GridData(GridData.VERTICAL_ALIGN_BEGINNING));
         final DateTimeWidget widget = new DateTimeWidget(client, SWT.NONE, date);
@@ -325,7 +325,7 @@ public class WidgetCreator {
                 }
             });
 
-            if (!canBeEmpty) {
+            if (emptyMessage != null && !emptyMessage.isEmpty()) {
                 DateNotNulValidator validator = new DateNotNulValidator(
                     emptyMessage);
                 validator.setControlDecoration(FormUtils.createDecorator(label,

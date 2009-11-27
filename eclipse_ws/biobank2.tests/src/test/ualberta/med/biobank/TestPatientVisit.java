@@ -51,7 +51,7 @@ public class TestPatientVisit extends TestDatabase {
             + Utils.getRandomString(10));
         clinic = ClinicHelper.addClinic(site, "Clinic - Patient Visit Test "
             + Utils.getRandomString(10));
-        shipment = ShipmentHelper.addShipment(clinic, Utils.getRandomDate());
+        shipment = ShipmentHelper.addShipment(clinic);
         patient = PatientHelper.addPatient(Utils.getRandomNumericString(20),
             study);
     }
@@ -65,31 +65,32 @@ public class TestPatientVisit extends TestDatabase {
 
     @Test
     public void testCompareTo() throws Exception {
-        // visit2's date drawn is 1 day after visit1's
-        Date dateDrawn = Utils.getRandomDate();
+        // visit2's date processed is 1 day after visit1's
+        Date dateProcessed = Utils.getRandomDate();
         PatientVisitWrapper visit1 = PatientVisitHelper.addPatientVisit(
-            patient, shipment, dateDrawn);
+            patient, shipment, dateProcessed);
 
         Calendar cal = Calendar.getInstance();
-        cal.setTime(dateDrawn);
+        cal.setTime(dateProcessed);
         cal.add(Calendar.DATE, 1);
         ShipmentWrapper shipment2 = ShipmentHelper.addShipment(clinic);
-        shipment2.setDateReceived(cal.getTime());
 
         PatientVisitWrapper visit2 = PatientVisitHelper.addPatientVisit(
             patient, shipment2, cal.getTime());
 
         Assert.assertEquals(-1, visit1.compareTo(visit2));
 
-        // visit2's date drawn is 1 day before visit1's
+        // visit2's date processed is 1 day before visit1's
         cal.add(Calendar.DATE, -2);
-        shipment.setDateReceived(cal.getTime());
+        visit2.setDateProcessed(cal.getTime());
+        visit2.persist();
         visit2.reload();
         Assert.assertEquals(1, visit1.compareTo(visit2));
 
-        // visit2's date drawn is the same day as visit1's
-        cal.add(Calendar.DATE, 2);
-        shipment.setDateReceived(cal.getTime());
+        // visit2's date processed is the same day as visit1's
+        cal.add(Calendar.DATE, 1);
+        visit2.setDateProcessed(cal.getTime());
+        visit2.persist();
         visit2.reload();
         Assert.assertEquals(0, visit1.compareTo(visit2));
     }

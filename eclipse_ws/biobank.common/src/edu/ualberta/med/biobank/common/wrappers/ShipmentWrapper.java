@@ -74,28 +74,28 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
     @Override
     protected void persistChecks() throws BiobankCheckException,
         ApplicationException, WrapperException {
-        if (getDateShipped() == null) {
+        if (getWaybill() == null) {
             throw new BiobankCheckException(
-                "A date shipped should be set on this shipment");
+                "A waybill should be set on this shipment");
         }
-        if (getClinic() != null && !checkDateShippedUnique()) {
-            throw new BiobankCheckException("A shipment with date shipped "
-                + getDateShipped() + " already exist in clinic "
+        if (getClinic() != null && !checkWaybillUnique()) {
+            throw new BiobankCheckException("A shipment with waybill "
+                + getWaybill() + " already exist in clinic "
                 + getClinic().getName() + ".");
         }
     }
 
-    private boolean checkDateShippedUnique() throws ApplicationException {
+    private boolean checkWaybillUnique() throws ApplicationException {
         String isSameShipment = "";
         List<Object> params = new ArrayList<Object>();
         params.add(getClinic().getId());
-        params.add(getDateShipped());
+        params.add(getWaybill());
         if (!isNew()) {
             isSameShipment = " and id <> ?";
             params.add(getId());
         }
         HQLCriteria c = new HQLCriteria("from " + Shipment.class.getName()
-            + " where clinic.id=? and dateShipped = ?" + isSameShipment, params);
+            + " where clinic.id=? and waybill = ?" + isSameShipment, params);
 
         List<Object> results = appService.query(c);
         return results.size() == 0;
