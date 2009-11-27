@@ -161,19 +161,16 @@
 			<srcfilelist dir="${cacore.sdk.dir}/writable-api/dist" files="sdk-writable-client-framework.jar" />
 			<targetfilelist dir="${eclipse.proj.dir.common}/lib" files="sdk-writable-client-framework.jar" />
 			<targetfilelist dir="${eclipse.proj.dir.importer}/lib" files="sdk-writable-client-framework.jar" />
-			<targetfilelist dir="${eclipse.proj.dir.junit}/lib" files="sdk-writable-client-framework.jar" />
 		</dependset>
 		<dependset>
 			<srcfilelist dir="${cacore.sdk.dir}/system/security/dist" files="sdk-security.jar" />
 			<targetfilelist dir="${eclipse.proj.dir.common}/lib" files="sdk-security.jar" />
 			<targetfilelist dir="${eclipse.proj.dir.importer}/lib" files="sdk-security.jar" />
-			<targetfilelist dir="${eclipse.proj.dir.junit}/lib" files="sdk-security.jar" />
 		</dependset>
 		<dependset>
 			<srcfilelist dir="${cacore.sdk.dir}/output/biobank2/package/remote-client/lib" files="${sdk.jar.files.basename}" />
 			<targetfilelist dir="${eclipse.proj.dir.common}/lib" files="${sdk.jar.files.basename}" />
 			<targetfilelist dir="${eclipse.proj.dir.importer}/lib" files="${sdk.jar.files.basename}" />
-			<targetfilelist dir="${eclipse.proj.dir.junit}/lib" files="${sdk.jar.files.basename}" />
 		</dependset>
 		<copy todir="${eclipse.proj.dir.common}/lib">
 			<fileset dir="${req.jars.dir}">
@@ -198,7 +195,6 @@
 		</copy>
 		<copy todir="${eclipse.proj.dir.common}/lib" file="${cacore.sdk.dir}/system/security/dist/sdk-security.jar" />
 		<copy todir="${eclipse.proj.dir.importer}/lib" file="${cacore.sdk.dir}/system/security/dist/sdk-security.jar" />
-		<copy todir="${eclipse.proj.dir.junit}/lib" file="${cacore.sdk.dir}/system/security/dist/sdk-security.jar" />
 		<copy todir="${eclipse.proj.dir.common}/conf">
 			<fileset dir="${cacore.sdk.dir}/output/biobank2/package/remote-client/conf">
 				<include name="application-config-client*.xml" />
@@ -208,9 +204,6 @@
 			<fileset dir="${cacore.sdk.dir}/output/biobank2/package/remote-client/lib" />
 		</copy>
 		<copy todir="${eclipse.proj.dir.importer}/lib">
-			<fileset dir="${cacore.sdk.dir}/output/biobank2/package/remote-client/lib" />
-		</copy>
-		<copy todir="${eclipse.proj.dir.junit}/lib">
 			<fileset dir="${cacore.sdk.dir}/output/biobank2/package/remote-client/lib" />
 		</copy>
 	</target>

@@ -1,6 +1,7 @@
 package test.ualberta.med.biobank.internal;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import test.ualberta.med.biobank.Utils;
@@ -15,11 +16,14 @@ import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 public class ShipmentHelper extends DbHelper {
 
     public static ShipmentWrapper newShipmentWithShptSampleSource(
-        ClinicWrapper clinic, String waybill, PatientWrapper patient)
-        throws Exception {
+        ClinicWrapper clinic, String waybill, Date dateReceived,
+        PatientWrapper patient) throws Exception {
         ShipmentWrapper shipment = new ShipmentWrapper(appService);
         shipment.setClinic(clinic);
         shipment.setWaybill(waybill);
+        if (dateReceived != null) {
+            shipment.setDateReceived(dateReceived);
+        }
 
         if (patient != null) {
             ShptSampleSourceWrapper sssw = new ShptSampleSourceWrapper(
@@ -49,14 +53,14 @@ public class ShipmentHelper extends DbHelper {
     public static ShipmentWrapper newShipment(ClinicWrapper clinic)
         throws Exception {
         return newShipmentWithShptSampleSource(clinic,
-            Utils.getRandomString(5), null);
+            Utils.getRandomString(5), Utils.getRandomDate(), null);
     }
 
     public static ShipmentWrapper addShipmentWithShptSampleSource(
         ClinicWrapper clinic, String waybill, PatientWrapper patient)
         throws Exception {
         ShipmentWrapper shipment = newShipmentWithShptSampleSource(clinic,
-            waybill, patient);
+            waybill, Utils.getRandomDate(), patient);
         shipment.persist();
         return shipment;
     }

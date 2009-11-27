@@ -17,6 +17,8 @@ import edu.ualberta.med.biobank.model.PvInfoData;
 import edu.ualberta.med.biobank.model.Sample;
 import edu.ualberta.med.biobank.model.SamplePosition;
 import edu.ualberta.med.biobank.model.SampleType;
+import edu.ualberta.med.biobank.model.Shipment;
+import edu.ualberta.med.biobank.model.ShptSampleSource;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -110,23 +112,24 @@ public class Importer {
             }
 
             // the order here matters
-            bioBank2Db.deleteAll(Sample.class);
-            bioBank2Db.deleteAll(Container.class);
-            bioBank2Db.deleteAll(ContainerType.class);
-            bioBank2Db.deleteAll(PatientVisit.class);
-            bioBank2Db.deleteAll(Patient.class);
-            bioBank2Db.deleteAll(Clinic.class);
-            bioBank2Db.deleteAll(Study.class);
-            bioBank2Db.deleteAll(Site.class);
-
-            cbsrSite = bioBank2Db.createSite();
-
-            SiteContainerTypes.getInstance().insertContainerTypes(cbsrSite);
-            SiteContainers.getInstance().insertContainers(cbsrSite);
-
-            importStudies();
-            importClinics();
-            importPatients();
+            // bioBank2Db.deleteAll(Sample.class);
+            // bioBank2Db.deleteAll(Container.class);
+            // bioBank2Db.deleteAll(ContainerType.class);
+            // bioBank2Db.deleteAll(PatientVisit.class);
+            // bioBank2Db.deleteAll(Patient.class);
+            // bioBank2Db.deleteAll(Clinic.class);
+            // bioBank2Db.deleteAll(Study.class);
+            // bioBank2Db.deleteAll(Site.class);
+            //
+            // cbsrSite = bioBank2Db.createSite();
+            //
+            // SiteContainerTypes.getInstance().insertContainerTypes(cbsrSite);
+            // SiteContainers.getInstance().insertContainers(cbsrSite);
+            //
+            // importStudies();
+            // importClinics();
+            // importPatients();
+            // importShipments();
             importPatientVisits();
             importCabinetSamples();
             importFreezerSamples();
@@ -311,10 +314,87 @@ public class Importer {
         }
     }
 
+    private void importShipments() throws Exception {
+        Study study;
+        Clinic clinic;
+        String clinicName;
+        String dateReceived;
+        Shipment shipment;
+        BlowfishCipher cipher = new BlowfishCipher();
+
+        System.out.println("importing shipments ...");
+
+        String qryPart = "from patient_visit, study_list, patient "
+            + "where patient_visit.study_nr=study_list.study_nr "
+            + "and patient_visit.patient_nr=patient.patient_nr";
+
+        Statement s = con.createStatement();
+        s.execute("select count(*) " + qryPart);
+        ResultSet rs = s.getResultSet();
+        rs.next();
+        int numShipments = rs.getInt(1);
+
+        s.execute("select study_list.study_name_short, patient.chr_nr, "
+            + "patient_visit.clinic_site, patient_visit.date_received "
+            + qryPart);
+
+        rs = s.getResultSet();
+        int count = 1;
+        if (rs != null) {
+            while (rs.next()) {
+                study = bioBank2Db.getStudy(rs.getString(1));
+                clinicName = rs.getString(3);
+                clinic = bioBank2Db.getClinic(study, clinicName);
+                dateReceived = rs.getString(4);
+                if (clinic == null) {
+                    System.out.println("ERROR: no such clinic: " + clinicName);
+                    continue;
+                }
+
+                String patientNo = cipher.decode(rs.getBytes(2));
+                Patient patient = bioBank2Db.getPatient(patientNo);
+
+                // make sure the study is correct
+                if (!patient.getStudy().getNameShort().equals(
+                    study.getNameShort())) {
+                    throw new Exception();
+                }
+
+                shipment = bioBank2Db.getShipment(study.getNameShort(),
+                    clinicName, dateReceived);
+
+                if (shipment == null) {
+                    shipment = new Shipment();
+                    shipment.setClinic(clinic);
+                    shipment.setWaybill(dateReceived);
+                    shipment.setDateReceived(bbpdbDateFmt.parse(dateReceived));
+                    shipment = (Shipment) bioBank2Db.setObject(shipment);
+
+                    System.out.println("importing shipment: patient/"
+                        + patient.getNumber() + " shipment_date_received/"
+                        + dateReceived + " (" + count + "/" + numShipments
+                        + ")");
+                }
+
+                Collection<Patient> patients = new HashSet<Patient>();
+                patients.add(patient);
+
+                ShptSampleSource ss = new ShptSampleSource();
+                ss.setPatientCollection(patients);
+                ss.setQuantity(0);
+
+                ++count;
+
+            }
+        }
+
+    }
+
     private void importPatientVisits() throws Exception {
         Study study;
         Clinic clinic;
         String clinicName;
+        String dateReceived;
         PatientVisit pv;
         PvInfoData pvInfoData;
         BlowfishCipher cipher = new BlowfishCipher();
@@ -341,6 +421,7 @@ public class Importer {
                 study = bioBank2Db.getStudy(rs.getString(20));
                 clinicName = rs.getString(3);
                 clinic = bioBank2Db.getClinic(study, clinicName);
+                dateReceived = rs.getString(6);
                 if (clinic == null) {
                     System.out.println("ERROR: no such clinic: " + clinicName);
                     continue;
@@ -348,18 +429,26 @@ public class Importer {
 
                 String patientNo = cipher.decode(rs.getBytes(21));
                 Patient patient = bioBank2Db.getPatient(patientNo);
+                Shipment shipment = bioBank2Db.getShipment(
+                    study.getNameShort(), clinicName, dateReceived);
+
+                // make sure the study is correct
+                if (shipment == null) {
+                    throw new Exception("found 0 shipments for studyName/"
+                        + study.getNameShort() + " clinicName/" + clinicName
+                        + " dateReceived/" + dateReceived);
+                }
 
                 pv = new PatientVisit();
-                pv.setDateDrawn(bbpdbDateFmt.parse(rs.getString(5)));
+                pv.setDateProcessed(bbpdbDateFmt.parse(rs.getString(5)));
                 pv.setPatient(patient);
-                pv.setClinic(clinic);
+                pv.setShipment(shipment);
                 pv.setComment(rs.getString(4));
                 pv = (PatientVisit) bioBank2Db.setObject(pv);
 
                 System.out.println("importing patient visit: patient/"
-                    + patient.getNumber() + " visit date/"
-                    + biobank2DateFmt.format(pv.getDateDrawn()) + " (" + count
-                    + "/" + numPatientVisits + ")");
+                    + patient.getNumber() + " visit date/" + dateReceived
+                    + " (" + count + "/" + numPatientVisits + ")");
 
                 // make sure the study is correct
                 if (!patient.getStudy().getNameShort().equals(
