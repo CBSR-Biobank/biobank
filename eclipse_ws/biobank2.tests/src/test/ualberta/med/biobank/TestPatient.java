@@ -123,7 +123,7 @@ public class TestPatient extends TestDatabase {
 
         ClinicWrapper clinic = ClinicHelper.addClinic(site,
             "Clinic - Patient Test " + Utils.getRandomString(10));
-        ShipmentWrapper shipment = ShipmentHelper.addShipment(clinic);
+        ShipmentWrapper shipment = ShipmentHelper.addShipmentWithShptSampleSource(clinic, patient);
 
         List<PatientVisitWrapper> visitsAdded = PatientVisitHelper
             .addPatientVisits(patient, shipment);

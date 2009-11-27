@@ -63,7 +63,7 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
     protected String[] getPropertyChangeNames() {
         return new String[] { "dateShipped", "dateReceived", "clinic",
             "comment", "shptSampleSourceCollection", "patientVisitCollection",
-            "waybill" };
+            "waybill", "oldShipment" };
     }
 
     @Override
@@ -82,6 +82,15 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
             throw new BiobankCheckException("A shipment with waybill "
                 + getWaybill() + " already exist in clinic "
                 + getClinic().getName() + ".");
+        }
+        checkShptSampleSources();
+    }
+
+    private void checkShptSampleSources() throws BiobankCheckException {
+        List<ShptSampleSourceWrapper> shptSS = getShptSampleSourceCollection();
+        if (shptSS == null || shptSS.size() == 0) {
+            throw new BiobankCheckException(
+                "At least one sample source should be added to this shipment");
         }
     }
 
