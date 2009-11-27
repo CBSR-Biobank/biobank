@@ -365,17 +365,9 @@ public class TestStudy extends TestDatabase {
         // clinic 2 = 2 patients pour study 1
         PatientVisitHelper.addPatientVisits(patient2, shipment2);
 
-        StudyWrapper study2 = StudyHelper.addStudy(site, name + "STUDY2");
-        study2.setContactCollection(contacts);
-        study2.persist();
-        PatientWrapper patient3 = PatientHelper.addPatient(name + "PATIENT3",
-            study2);
-        // clinic 1 = 1 patient pour study2
-        PatientVisitHelper.addPatientVisits(patient3, shipment1);
-        // clinic 2= 1 patient pour study2
-        PatientVisitHelper.addPatientVisits(patient3, shipment2);
-
         study1.reload();
+        clinic1.reload();
+        clinic2.reload();
         Assert.assertEquals(1, study1.getPatientCountForClinic(clinic1));
         Assert.assertEquals(2, study1.getPatientCountForClinic(clinic2));
     }
@@ -408,14 +400,9 @@ public class TestStudy extends TestDatabase {
         int nber2 = PatientVisitHelper.addPatientVisits(patient1, shipment2)
             .size();
 
-        StudyWrapper study2 = StudyHelper.addStudy(site, name + "STUDY2");
-        study2.setContactCollection(contacts);
-        study2.persist();
-        PatientWrapper patient2 = PatientHelper.addPatient(name, study2);
-        PatientVisitHelper.addPatientVisits(patient2, shipment1);
-        PatientVisitHelper.addPatientVisits(patient2, shipment2);
-
         study1.reload();
+        clinic1.reload();
+        clinic2.reload();
         Assert
             .assertEquals(nber, study1.getPatientVisitCountForClinic(clinic1));
         Assert.assertEquals(nber2, study1
@@ -453,7 +440,7 @@ public class TestStudy extends TestDatabase {
         StudyWrapper study2 = StudyHelper.addStudy(site, name + "STUDY2");
         study2.setContactCollection(contacts);
         study2.persist();
-        PatientWrapper patient2 = PatientHelper.addPatient(name, study2);
+        PatientWrapper patient2 = PatientHelper.addPatient(name + "2", study2);
         PatientVisitHelper.addPatientVisits(patient2, shipment1);
         PatientVisitHelper.addPatientVisits(patient2, shipment2);
 
@@ -488,8 +475,9 @@ public class TestStudy extends TestDatabase {
 
     @Test
     public void testDelete() throws Exception {
-        StudyWrapper study = StudyHelper.addStudy(SiteHelper
-            .addSite("testDelete"), "testDelete");
+        String name = "testDelete" + r.nextInt();
+        StudyWrapper study = StudyHelper.addStudy(SiteHelper.addSite(name),
+            name);
 
         // object is in database
         Study studyInDB = ModelUtils.getObjectWithId(appService, Study.class,
@@ -506,7 +494,7 @@ public class TestStudy extends TestDatabase {
 
     @Test
     public void testDeleteWithPatient() throws Exception {
-        String name = "testDelete" + r.nextInt();
+        String name = "testDeleteWithPatient" + r.nextInt();
         StudyWrapper study = StudyHelper.addStudy(SiteHelper.addSite(name),
             name);
         PatientHelper.addPatient(name, study);
@@ -522,9 +510,9 @@ public class TestStudy extends TestDatabase {
 
     @Test
     public void testResetAlreadyInDatabase() throws Exception {
-        StudyWrapper study = StudyHelper.addStudy(SiteHelper
-            .addSite("testResetAlreadyInDatabase"),
-            "testResetAlreadyInDatabase");
+        String name = "testResetAlreadyInDatabase" + r.nextInt();
+        StudyWrapper study = StudyHelper.addStudy(SiteHelper.addSite(name),
+            name);
         study.reload();
         String oldName = study.getName();
         study.setName("toto");
