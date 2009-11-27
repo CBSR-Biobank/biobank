@@ -22,7 +22,7 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.treeview.PatientAdapter;
-import edu.ualberta.med.biobank.validators.NonEmptyString;
+import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.views.PatientAdministrationView;
 
 public class PatientEntryForm extends BiobankEntryForm {
@@ -108,7 +108,7 @@ public class PatientEntryForm extends BiobankEntryForm {
 
         firstControl = createBoundWidgetWithLabel(client, Text.class, SWT.NONE,
             "Patient Number", null, BeansObservables.observeValue(
-                patientAdapter.getWrapper(), "number"), new NonEmptyString(
+                patientAdapter.getWrapper(), "number"), new NonEmptyStringValidator(
                 MSG_NO_PATIENT_NUMBER));
     }
 

@@ -26,7 +26,7 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.treeview.ContainerAdapter;
 import edu.ualberta.med.biobank.validators.DoubleNumberValidator;
-import edu.ualberta.med.biobank.validators.NonEmptyString;
+import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 
 public class ContainerEntryForm extends BiobankEntryForm {
     public static final String ID = "edu.ualberta.med.biobank.forms.ContainerEntryForm";
@@ -114,7 +114,7 @@ public class ContainerEntryForm extends BiobankEntryForm {
             // only allow edit to label on top level containers
             firstControl = createBoundWidgetWithLabel(client, Text.class,
                 SWT.NONE, "Label", null, BeansObservables.observeValue(
-                    containerWrapper, "label"), new NonEmptyString(
+                    containerWrapper, "label"), new NonEmptyStringValidator(
                     MSG_CONTAINER_NAME_EMPTY));
         } else {
             Label l = (Label) createWidget(client, Label.class, SWT.NONE,

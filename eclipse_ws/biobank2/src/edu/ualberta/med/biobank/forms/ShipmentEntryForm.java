@@ -22,6 +22,7 @@ import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.treeview.ShipmentAdapter;
+import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.widgets.ShptSampleSourceEntryWidget;
 import edu.ualberta.med.biobank.widgets.listeners.BiobankEntryFormWidgetListener;
@@ -92,9 +93,9 @@ public class ShipmentEntryForm extends BiobankEntryForm {
         SiteWrapper site = SessionManager.getInstance().getCurrentSiteWrapper();
         FormUtils.setTextValue(siteLabel, site.getName());
 
-        createBoundWidgetWithLabel(client, Text.class, SWT.NONE,
-            "Waybill code", null, BeansObservables.observeValue(
-                shipmentWrapper, "waybill"), null);
+        createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Waybill",
+            null, BeansObservables.observeValue(shipmentWrapper, "waybill"),
+            new NonEmptyStringValidator("A waybill should be set"));
 
         if (shipmentWrapper.isNew()) {
             // choose clinic for new shipment
@@ -116,12 +117,12 @@ public class ShipmentEntryForm extends BiobankEntryForm {
 
         DateTimeWidget dateShippedWidget = createDateTimeWidget(client,
             "Date Shipped", shipmentWrapper.getDateShipped(), shipmentWrapper,
-            "dateShipped", "Date shipped should be set", false);
+            "dateShipped", "Date shipped should be set");
         firstControl = dateShippedWidget;
 
         createDateTimeWidget(client, "Date Received", shipmentWrapper
             .getDateReceived(), shipmentWrapper, "dateReceived",
-            "Date received should be set", false);
+            "Date received should be set");
 
         createBoundWidgetWithLabel(client, Text.class, SWT.MULTI, "Comments",
             null, BeansObservables.observeValue(shipmentWrapper, "comment"),

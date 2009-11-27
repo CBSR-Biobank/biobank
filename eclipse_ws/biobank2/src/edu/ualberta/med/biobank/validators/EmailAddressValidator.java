@@ -7,12 +7,12 @@ import org.eclipse.core.databinding.validation.ValidationStatus;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 
-public class PostalCode extends AbstractValidator {
+public class EmailAddressValidator extends AbstractValidator {
 
     private static final Pattern pattern = Pattern
-        .compile("^[abceghjklmnprstvxyABCEGHJKLMNPRSTVXY]\\d[a-zA-Z]-?\\d[a-zA-Z]\\d$");
+        .compile("^([^@\\s]+)@((?:[-a-z0-9]+.)+[a-z]{2,})$");
 
-    public PostalCode(String message) {
+    public EmailAddressValidator(String message) {
         super(message);
     }
 
@@ -23,14 +23,12 @@ public class PostalCode extends AbstractValidator {
                 "Not supposed to be called for non-strings.");
         }
 
-        String v = (String) value;
-
-        if (v.length() == 0) {
+        if (((String) value).length() == 0) {
             controlDecoration.hide();
             return Status.OK_STATUS;
         }
 
-        Matcher m = pattern.matcher(v);
+        Matcher m = pattern.matcher((String) value);
         if (m.matches()) {
             controlDecoration.hide();
             return Status.OK_STATUS;

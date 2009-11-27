@@ -33,7 +33,7 @@ import edu.ualberta.med.biobank.treeview.ContainerTypeAdapter;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.validators.DoubleNumberValidator;
 import edu.ualberta.med.biobank.validators.IntegerNumberValidator;
-import edu.ualberta.med.biobank.validators.NonEmptyString;
+import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.widgets.listeners.BiobankEntryFormWidgetListener;
 import edu.ualberta.med.biobank.widgets.listeners.MultiSelectEvent;
 import edu.ualberta.med.biobank.widgets.multiselect.MultiSelectWidget;
@@ -157,11 +157,11 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         FormUtils.setTextValue(siteLabel, containerType.getSite().getName());
         firstControl = createBoundWidgetWithLabel(client, Text.class, SWT.NONE,
             "Name", null, BeansObservables.observeValue(containerType, "name"),
-            new NonEmptyString(MSG_NO_CONTAINER_TYPE_NAME));
+            new NonEmptyStringValidator(MSG_NO_CONTAINER_TYPE_NAME));
 
         createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Short Name",
             null, BeansObservables.observeValue(containerType, "nameShort"),
-            new NonEmptyString(MSG_NO_CONTAINER_TYPE_NAME_SHORT));
+            new NonEmptyStringValidator(MSG_NO_CONTAINER_TYPE_NAME_SHORT));
 
         if (containerType.getTopLevel() == null) {
             containerType.setTopLevel(false);

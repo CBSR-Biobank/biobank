@@ -14,7 +14,7 @@ import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
-import edu.ualberta.med.biobank.validators.NonEmptyString;
+import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 
 public class SiteEntryForm extends AddressEntryFormCommon {
 
@@ -86,7 +86,7 @@ public class SiteEntryForm extends AddressEntryFormCommon {
 
         firstControl = createBoundWidgetWithLabel(client, Text.class, SWT.NONE,
             "Name", null, BeansObservables.observeValue(siteWrapper, "name"),
-            new NonEmptyString(MSG_NO_SITE_NAME));
+            new NonEmptyStringValidator(MSG_NO_SITE_NAME));
 
         createBoundWidgetWithLabel(client, Combo.class, SWT.NONE,
             "Activity Status", FormConstants.ACTIVITY_STATUS, BeansObservables

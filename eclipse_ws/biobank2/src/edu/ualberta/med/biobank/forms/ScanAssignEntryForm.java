@@ -47,7 +47,7 @@ import edu.ualberta.med.biobank.forms.listener.EnterKeyToNextFieldListener;
 import edu.ualberta.med.biobank.model.PalletCell;
 import edu.ualberta.med.biobank.model.SampleCellStatus;
 import edu.ualberta.med.biobank.preferences.PreferenceConstants;
-import edu.ualberta.med.biobank.validators.NonEmptyString;
+import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.validators.PalletBarCodeValidator;
 import edu.ualberta.med.biobank.validators.ScannerBarcodeValidator;
 import edu.ualberta.med.biobank.widgets.CancelConfirmWidget;
@@ -148,7 +148,7 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
         palletCodeText = (Text) createBoundWidgetWithLabel(fieldsComposite,
             Text.class, SWT.NONE, "Pallet product barcode", null,
             BeansObservables.observeValue(currentPalletWrapper,
-                "productBarcode"), new NonEmptyString(
+                "productBarcode"), new NonEmptyStringValidator(
                 "Enter pallet position code"));
         palletCodeText.addKeyListener(EnterKeyToNextFieldListener.INSTANCE);
         gd = new GridData();

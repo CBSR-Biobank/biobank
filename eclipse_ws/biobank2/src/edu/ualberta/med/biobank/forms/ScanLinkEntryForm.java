@@ -54,7 +54,7 @@ import edu.ualberta.med.biobank.forms.listener.EnterKeyToNextFieldListener;
 import edu.ualberta.med.biobank.model.PalletCell;
 import edu.ualberta.med.biobank.model.SampleCellStatus;
 import edu.ualberta.med.biobank.preferences.PreferenceConstants;
-import edu.ualberta.med.biobank.validators.NonEmptyString;
+import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.validators.ScannerBarcodeValidator;
 import edu.ualberta.med.biobank.widgets.CancelConfirmWidget;
 import edu.ualberta.med.biobank.widgets.SampleTypeSelectionWidget;
@@ -401,7 +401,7 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
 
         patientNumberText = (Text) createBoundWidgetWithLabel(fieldsComposite,
             Text.class, SWT.NONE, "Patient Number", new String[0],
-            patientNumberValue, new NonEmptyString("Enter a patient number"));
+            patientNumberValue, new NonEmptyStringValidator("Enter a patient number"));
         patientNumberText.addFocusListener(new FocusAdapter() {
             @Override
             public void focusLost(FocusEvent e) {

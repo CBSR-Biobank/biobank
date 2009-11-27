@@ -114,7 +114,7 @@ public class ShptSampleSourceDialog extends BiobankDialog {
         quantityText.setLayoutData(gd);
 
         dateDrawnWidget = createDateTimeWidget(contents, "Date drawn", null,
-            shptSampleSource, "dateDrawn", null, true);
+            shptSampleSource, "dateDrawn", "Date drawn should be selected");
         gd = new GridData();
         gd.horizontalSpan = 2;
         gd.horizontalAlignment = SWT.FILL;

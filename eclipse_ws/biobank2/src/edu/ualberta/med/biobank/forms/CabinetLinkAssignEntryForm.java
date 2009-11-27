@@ -49,7 +49,7 @@ import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
 import edu.ualberta.med.biobank.forms.listener.EnterKeyToNextFieldListener;
 import edu.ualberta.med.biobank.preferences.PreferenceConstants;
 import edu.ualberta.med.biobank.validators.CabinetLabelValidator;
-import edu.ualberta.med.biobank.validators.NonEmptyString;
+import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.widgets.CancelConfirmWidget;
 import edu.ualberta.med.biobank.widgets.grids.DrawerWidget;
 import edu.ualberta.med.biobank.widgets.grids.GridContainerWidget;
@@ -194,7 +194,7 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
 
         patientNumberText = (Text) createBoundWidgetWithLabel(fieldsComposite,
             Text.class, SWT.NONE, "Patient Number", new String[0],
-            patientNumberValue, new NonEmptyString("Enter a patient number"));
+            patientNumberValue, new NonEmptyStringValidator("Enter a patient number"));
         patientNumberText.addListener(SWT.DefaultSelection, new Listener() {
             public void handleEvent(Event e) {
                 setVisitsList();
@@ -214,7 +214,7 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
         inventoryIdText = (Text) createBoundWidgetWithLabel(fieldsComposite,
             Text.class, SWT.NONE, "Inventory ID", new String[0],
             BeansObservables.observeValue(sampleWrapper, "inventoryId"),
-            new NonEmptyString("Enter Inventory Id"));
+            new NonEmptyStringValidator("Enter Inventory Id"));
         inventoryIdText.addKeyListener(EnterKeyToNextFieldListener.INSTANCE);
         inventoryIdText.addFocusListener(new FocusAdapter() {
             @Override
@@ -292,7 +292,7 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
     private void createVisitCombo(Composite client) {
         Combo comboVisits = (Combo) createBoundWidgetWithLabel(client,
             Combo.class, SWT.NONE, "Visits", new String[0],
-            visitSelectionValue, new NonEmptyString(
+            visitSelectionValue, new NonEmptyStringValidator(
                 "A visit should be selected"));
         GridData gridData = new GridData();
         gridData.grabExcessHorizontalSpace = true;

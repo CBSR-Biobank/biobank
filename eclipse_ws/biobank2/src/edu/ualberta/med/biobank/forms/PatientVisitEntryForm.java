@@ -138,7 +138,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         }
         dateProcessed = createDateTimeWidget(client, "Date Processed",
             patientVisitWrapper.getDateProcessed(), patientVisitWrapper,
-            "dateProcessed", "Date processed should be set", false);
+            "dateProcessed", "Date processed should be set");
         firstControl = dateProcessed;
 
         createPvDataSection(client);
@@ -186,7 +186,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         case 3: // date_time
             return createDateTimeWidget(client, pvCustomInfo.label,
                 DateFormatter.parseToDateTime(pvCustomInfo.value), null, null,
-                null, true);
+                null);
         case 4: // select_single
             return createBoundWidgetWithLabel(client, Combo.class, SWT.NONE,
                 pvCustomInfo.label, pvCustomInfo.allowedValues, PojoObservables

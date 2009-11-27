@@ -4,9 +4,9 @@ import org.eclipse.core.databinding.validation.ValidationStatus;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 
-public class TelephoneNumber extends AbstractValidator {
+public class TelephoneNumberValidator extends AbstractValidator {
 
-    public TelephoneNumber(String message) {
+    public TelephoneNumberValidator(String message) {
         super(message);
     }
 
