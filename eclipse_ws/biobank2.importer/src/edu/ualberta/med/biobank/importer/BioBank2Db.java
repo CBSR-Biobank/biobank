@@ -208,61 +208,53 @@ public class BioBank2Db {
         }
     }
 
-    public Shipment getShipment(String studyNameShort, String patientNum,
-        String dateDrawn) throws Exception {
-        Date date = biobank2DateFmt.parse(dateDrawn);
-        HQLCriteria c = new HQLCriteria("select visits"
+    public Shipment getShipment(String studyNameShort, String clinicName,
+        String dateReceived) throws Exception {
+        Date date = biobank2DateFmt.parse(dateReceived);
+        HQLCriteria c = new HQLCriteria("select shipments"
             + " from edu.ualberta.med.biobank.model.Study as study"
-            + " inner join study.patientCollection as patients"
-            + " inner join patients.patientVisitCollection as visits"
-            + " where study.nameShort=? and patients.number=?"
-            + " and visits.dateDrawn=?");
-
-        // System.out.println("getPatientVisit: studyNameShort/" +
-        // studyNameShort
-        // + " patientNum/" + patientNum + " dateDrawn/" + dateDrawn);
+            + " inner join study.contactCollection as contacts"
+            + " inner join contacts.clinic as clinic"
+            + " inner join clinic.shipmentCollection as shipments"
+            + " where study.nameShort=? and clinic.name=?"
+            + " and shipments.dateReceived=?");
 
         c.setParameters(Arrays.asList(new Object [] {
-            studyNameShort, patientNum, date }));
+            studyNameShort, clinicName, date }));
 
-        List<PatientVisit> results = appService.query(c);
-        if (results.size() != 1) {
-            if (results.size() == 0) {
-                System.out.println("ERROR: found 0 patient visits for studyName/"
-                    + studyNameShort
-                    + " patientNum/"
-                    + patientNum
-                    + " dateDrawn/" + dateDrawn);
-            }
-            else {
-                System.out.println("WARNING: found " + results.size()
-                    + " patient visits for studyName/" + studyNameShort
-                    + " patientNum/" + patientNum + " dateDrawn/" + dateDrawn);
-                for (PatientVisit v : results) {
-                    System.out.println("visit_id/" + v.getId() + " dateDrawn/"
-                        + biobank2DateFmt.format(v.getDateDrawn()) + " pid/"
-                        + v.getPatient().getId());
-                }
-            }
-            return null;
+        List<Shipment> results = appService.query(c);
+        if (results.size() == 1) {
+            return results.get(0);
         }
-        return results.get(0);
+
+        if (results.size() > 0) {
+            System.out.println("WARNING: found " + results.size()
+                + " shipments for studyName/" + studyNameShort + " clinicName/"
+                + clinicName + " dateReceived/" + dateReceived);
+            for (Shipment shipment : results) {
+                System.out.println("shipment_id/" + shipment.getId()
+                    + " dateReceived/"
+                    + biobank2DateFmt.format(shipment.getDateReceived())
+                    + " cid/" + shipment.getClinic().getId());
+            }
+        }
+        return null;
 
     }
 
     public PatientVisit getPatientVisit(String studyNameShort,
-        String patientNum, String dateDrawn) throws Exception {
-        Date date = biobank2DateFmt.parse(dateDrawn);
+        String patientNum, String dateProcessed) throws Exception {
+        Date date = biobank2DateFmt.parse(dateProcessed);
         HQLCriteria c = new HQLCriteria("select visits"
             + " from edu.ualberta.med.biobank.model.Study as study"
             + " inner join study.patientCollection as patients"
             + " inner join patients.patientVisitCollection as visits"
             + " where study.nameShort=? and patients.number=?"
-            + " and visits.dateDrawn=?");
+            + " and visits.dateProcessed=?");
 
         // System.out.println("getPatientVisit: studyNameShort/" +
         // studyNameShort
-        // + " patientNum/" + patientNum + " dateDrawn/" + dateDrawn);
+        // + " patientNum/" + patientNum + " dateProcessed/" + dateProcessed);
 
         c.setParameters(Arrays.asList(new Object [] {
             studyNameShort, patientNum, date }));
@@ -274,16 +266,18 @@ public class BioBank2Db {
                     + studyNameShort
                     + " patientNum/"
                     + patientNum
-                    + " dateDrawn/" + dateDrawn);
+                    + " dateProcessed/" + dateProcessed);
             }
             else {
                 System.out.println("WARNING: found " + results.size()
                     + " patient visits for studyName/" + studyNameShort
-                    + " patientNum/" + patientNum + " dateDrawn/" + dateDrawn);
+                    + " patientNum/" + patientNum + " dateProcessed/"
+                    + dateProcessed);
                 for (PatientVisit v : results) {
-                    System.out.println("visit_id/" + v.getId() + " dateDrawn/"
-                        + biobank2DateFmt.format(v.getDateDrawn()) + " pid/"
-                        + v.getPatient().getId());
+                    System.out.println("visit_id/" + v.getId()
+                        + " dateProcessed/"
+                        + biobank2DateFmt.format(v.getDateProcessed())
+                        + " pid/" + v.getPatient().getId());
                 }
             }
             return null;

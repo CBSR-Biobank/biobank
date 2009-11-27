@@ -74,7 +74,7 @@ public class TestPatientVisit extends TestDatabase {
         cal.setTime(dateDrawn);
         cal.add(Calendar.DATE, 1);
         ShipmentWrapper shipment2 = ShipmentHelper.addShipment(clinic);
-        shipment2.setDateDrawn(cal.getTime());
+        shipment2.setDateReceived(cal.getTime());
 
         PatientVisitWrapper visit2 = PatientVisitHelper.addPatientVisit(
             patient, shipment2, cal.getTime());
@@ -83,13 +83,13 @@ public class TestPatientVisit extends TestDatabase {
 
         // visit2's date drawn is 1 day before visit1's
         cal.add(Calendar.DATE, -2);
-        shipment.setDateDrawn(cal.getTime());
+        shipment.setDateReceived(cal.getTime());
         visit2.reload();
         Assert.assertEquals(1, visit1.compareTo(visit2));
 
         // visit2's date drawn is the same day as visit1's
         cal.add(Calendar.DATE, 2);
-        shipment.setDateDrawn(cal.getTime());
+        shipment.setDateReceived(cal.getTime());
         visit2.reload();
         Assert.assertEquals(0, visit1.compareTo(visit2));
     }
