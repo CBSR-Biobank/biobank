@@ -1,6 +1,7 @@
 package test.ualberta.med.biobank;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Assert;
@@ -38,9 +39,9 @@ public class TestShptSampleSource extends TestDatabase {
 
         SiteWrapper site = SiteHelper.addSite("SiteName");
         ClinicWrapper clinic = ClinicHelper.addClinic(site, "clinicname");
-        ShipmentWrapper shipment = ShipmentHelper.addShipment(clinic);
-        w = ShptSampleSourceHelper.addShptSampleSource(Utils
-            .getRandomString(10), shipment);
+        ShipmentWrapper shipment = ShipmentHelper.addShipmentWithRandomObjects(
+            clinic, Utils.getRandomString(10));
+        w = shipment.getShptSampleSourceCollection().get(0);
         SampleSourceWrapper ssw = SampleSourceHelper.addSampleSource("setUp");
         w.setSampleSource(ssw.getWrappedObject());
     }
@@ -80,14 +81,17 @@ public class TestShptSampleSource extends TestDatabase {
         String name = "testGetPatientCollection" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         ClinicWrapper clinic = ClinicHelper.addClinic(site, name);
-        ShipmentWrapper shipment = ShipmentHelper.addShipment(clinic);
+        ShipmentWrapper shipment = ShipmentHelper.newShipment(clinic);
         ShptSampleSourceWrapper sss = ShptSampleSourceHelper
-            .addShptSampleSource(name, shipment);
+            .newShptSampleSource(name, shipment);
         StudyWrapper study = StudyHelper.addStudy(site, name);
         List<PatientWrapper> patients = new ArrayList<PatientWrapper>();
         patients.add(PatientHelper.addPatient(name, study));
         sss.setPatientCollection(patients);
-        sss.persist();
+        sss.setShipment(shipment);
+        shipment.setShptSampleSourceCollection(Arrays
+            .asList(new ShptSampleSourceWrapper[] { sss }));
+        shipment.persist();
         sss.reload();
 
         List<PatientWrapper> patientsCollection = sss.getPatientCollection();
