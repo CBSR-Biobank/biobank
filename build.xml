@@ -358,15 +358,14 @@
 
 	<property name="dest.dir" value="${eclipse.proj.dir.junit}/build" />
 	<property name="dest.dir.classes" value="${dest.dir}/classes" />
-	<property name="dest.dir.lib" value="${eclipse.proj.dir.junit}/lib" />
     <property name="dest.dir.results" value="testing" />
     <property name="dest.dir.results.raw" value="${dest.dir.results}/raw" />
 
-	<path id="build.class.path">
-		<fileset dir="${dest.dir.lib}">
-			<include name="*.jar" />
-		</fileset>
-	</path>
+    <path id="common.class.path">
+        <fileset dir="${eclipse.proj.dir.common}/lib">
+            <include name="*.jar" />
+        </fileset>
+    </path>
 
 	<path id="junit.class.path">
 		<fileset dir="jars">
@@ -408,7 +407,7 @@
 
 	<target name="tests-compile" depends="common-compile">
 		<javac srcdir="${eclipse.proj.dir.junit}/src" destdir="${dest.dir.classes}" debug="true" debuglevel="lines,source">
-			<classpath refid="build.class.path" />
+            <classpath refid="common.class.path" />
 			<classpath refid="junit.class.path" />
 		</javac>
 	</target>
