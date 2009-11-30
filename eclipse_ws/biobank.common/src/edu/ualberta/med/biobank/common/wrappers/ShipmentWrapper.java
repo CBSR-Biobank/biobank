@@ -33,33 +33,8 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
     @Override
     protected void deleteChecks() throws BiobankCheckException,
         ApplicationException, WrapperException {
-        // FIXME Auto-generated method stub
 
     }
-
-    @Override
-    protected void persistDependencies(Shipment origObject)
-        throws BiobankCheckException, ApplicationException, WrapperException {
-        // if (origObject != null) {
-        // removeDeletedShptSampleSources(origObject);
-        // }
-    }
-
-    // private void removeDeletedShptSampleSources(Shipment shptDatabase)
-    // throws BiobankCheckException, ApplicationException, WrapperException {
-    // List<PvSampleSourceWrapper> newSampleSources =
-    // getShptSampleSourceCollection();
-    // List<PvSampleSourceWrapper> oldSampleSources = new ShipmentWrapper(
-    // appService, shptDatabase).getShptSampleSourceCollection();
-    // if (oldSampleSources != null) {
-    // for (PvSampleSourceWrapper ss : oldSampleSources) {
-    // if ((newSampleSources == null)
-    // || !newSampleSources.contains(ss)) {
-    // ss.delete();
-    // }
-    // }
-    // }
-    // }
 
     @Override
     protected String[] getPropertyChangeNames() {

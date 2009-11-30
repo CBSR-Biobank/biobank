@@ -55,7 +55,9 @@ public class TestContainerLabelingScheme extends TestDatabase {
     @Test
     public void TestBasicGettersAndSetters() throws BiobankCheckException,
         Exception {
+        clsw.persist();
         testGettersAndSetters(clsw);
+        clsw.delete();
     }
 
 }

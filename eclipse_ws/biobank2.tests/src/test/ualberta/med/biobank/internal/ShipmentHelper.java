@@ -13,7 +13,7 @@ import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 public class ShipmentHelper extends DbHelper {
 
     public static ShipmentWrapper newShipment(ClinicWrapper clinic,
-        String waybill, Date dateReceived, PatientWrapper patient)
+        String waybill, Date dateReceived, PatientWrapper... patients)
         throws Exception {
         ShipmentWrapper shipment = new ShipmentWrapper(appService);
         shipment.setClinic(clinic);
@@ -22,9 +22,8 @@ public class ShipmentHelper extends DbHelper {
             shipment.setDateReceived(dateReceived);
         }
 
-        if (patient != null) {
-            shipment.setPatientCollection(Arrays
-                .asList(new PatientWrapper[] { patient }));
+        if (patients != null) {
+            shipment.setPatientCollection(Arrays.asList(patients));
         }
 
         return shipment;
@@ -33,18 +32,18 @@ public class ShipmentHelper extends DbHelper {
     public static ShipmentWrapper newShipment(ClinicWrapper clinic)
         throws Exception {
         return newShipment(clinic, Utils.getRandomString(5), Utils
-            .getRandomDate(), null);
+            .getRandomDate(), (PatientWrapper) null);
     }
 
     public static ShipmentWrapper addShipment(ClinicWrapper clinic,
-        PatientWrapper patient) throws Exception {
-        return addShipment(clinic, Utils.getRandomString(5), patient);
+        PatientWrapper... patients) throws Exception {
+        return addShipment(clinic, Utils.getRandomString(5), patients);
     }
 
     public static ShipmentWrapper addShipment(ClinicWrapper clinic,
-        String waybill, PatientWrapper patient) throws Exception {
+        String waybill, PatientWrapper... patients) throws Exception {
         ShipmentWrapper shipment = newShipment(clinic, waybill, Utils
-            .getRandomDate(), patient);
+            .getRandomDate(), patients);
         shipment.persist();
         return shipment;
     }

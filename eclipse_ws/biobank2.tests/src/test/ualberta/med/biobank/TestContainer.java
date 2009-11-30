@@ -595,7 +595,7 @@ public class TestContainer extends TestDatabase {
         StudyWrapper study = StudyHelper.addStudy(site, "Study1");
         ContactHelper.addContactsToStudy(study, "contactsStudy1");
         ClinicWrapper clinic = study.getContactCollection().get(0)
-            .getClinicWrapper();
+            .getClinic();
         PatientWrapper patient = PatientHelper.addPatient("1000", study);
         ShipmentWrapper shipment = ShipmentHelper.addShipment(clinic, patient);
         PatientVisitWrapper pv = PatientVisitHelper.addPatientVisit(patient,
@@ -644,7 +644,7 @@ public class TestContainer extends TestDatabase {
         StudyWrapper study = StudyHelper.addStudy(site, "Study1");
         ContactHelper.addContactsToStudy(study, "contactsStudy1");
         ClinicWrapper clinic = study.getContactCollection().get(0)
-            .getClinicWrapper();
+            .getClinic();
         PatientWrapper patient = PatientHelper.addPatient("1000", study);
         ShipmentWrapper shipment = ShipmentHelper.addShipment(clinic, patient);
         PatientVisitWrapper pv = PatientVisitHelper.addPatientVisit(patient,

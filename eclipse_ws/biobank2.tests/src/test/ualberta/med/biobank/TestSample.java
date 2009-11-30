@@ -1,6 +1,7 @@
 package test.ualberta.med.biobank;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -9,6 +10,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import test.ualberta.med.biobank.internal.ClinicHelper;
+import test.ualberta.med.biobank.internal.ContactHelper;
 import test.ualberta.med.biobank.internal.ContainerHelper;
 import test.ualberta.med.biobank.internal.ContainerTypeHelper;
 import test.ualberta.med.biobank.internal.PatientHelper;
@@ -21,6 +23,7 @@ import test.ualberta.med.biobank.internal.StudyHelper;
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
@@ -53,6 +56,12 @@ public class TestSample extends TestDatabase {
         StudyWrapper study = StudyHelper.addStudy(site, "studyname");
         PatientWrapper patient = PatientHelper.addPatient("5684", study);
         ClinicWrapper clinic = ClinicHelper.addClinic(site, "clinicname");
+        ContactWrapper contact = ContactHelper.addContact(clinic,
+            "ContactClinic");
+        study.setContactCollection(Arrays
+            .asList(new ContactWrapper[] { contact }));
+        study.persist();
+
         ShipmentWrapper shipment = ShipmentHelper.addShipment(clinic, patient);
         PatientVisitWrapper pv = PatientVisitHelper.addPatientVisit(patient,
             shipment, null);

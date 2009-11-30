@@ -106,7 +106,7 @@ public class ContactEntryWidget extends BiobankWidget {
 
                 boolean confirm = BioBankPlugin.openConfirm("Delete Clinic",
                     "Are you sure you want to delete clinic \""
-                        + contactWrapper.getClinicWrapper().getName() + "\"");
+                        + contactWrapper.getClinic().getName() + "\"");
 
                 if (confirm) {
                     Collection<ContactWrapper> contactToDelete = new HashSet<ContactWrapper>();

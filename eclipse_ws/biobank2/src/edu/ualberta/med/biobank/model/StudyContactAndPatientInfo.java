@@ -18,7 +18,7 @@ public class StudyContactAndPatientInfo {
 
     public void performDoubleClick() {
         Assert.isNotNull(contact, "contact is null");
-        ClinicWrapper clinic = contact.getClinicWrapper();
+        ClinicWrapper clinic = contact.getClinic();
         Assert.isNotNull(clinic, "clinic is null");
         SessionManager.getInstance().openViewForm(clinic);
     }

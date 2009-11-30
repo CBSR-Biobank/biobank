@@ -113,13 +113,13 @@ public class ClinicAddWidget extends BiobankWidget {
                     .getWorkbench().getActiveWorkbenchWindow().getShell(),
                     "Delete Clinic",
                     "Are you sure you want to delete clinic \""
-                        + contact.getClinicWrapper().getName() + "\"");
+                        + contact.getClinic().getName() + "\"");
 
                 if (confirm) {
                     Collection<ContactWrapper> contactToDelete = new HashSet<ContactWrapper>();
                     for (ContactWrapper c : selectedContacts) {
-                        if (c.getClinicWrapper().getName().equals(
-                            contact.getClinicWrapper().getName()))
+                        if (c.getClinic().getName().equals(
+                            contact.getClinic().getName()))
                             contactToDelete.add(c);
                     }
 
@@ -145,7 +145,7 @@ public class ClinicAddWidget extends BiobankWidget {
         // get the IDs of the selected clinics
         List<Integer> clinicIds = new ArrayList<Integer>();
         for (ContactWrapper contact : contactInfoTable.getCollection()) {
-            clinicIds.add(contact.getClinicWrapper().getId());
+            clinicIds.add(contact.getClinic().getId());
         }
 
         for (ClinicWrapper clinic : allClinics) {

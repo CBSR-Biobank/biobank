@@ -103,7 +103,7 @@ public class TestStudy extends TestDatabase {
         List<ContactWrapper> contacts = study.getContactCollection();
         List<ClinicWrapper> clinics = site.getClinicCollection();
         for (ContactWrapper contact : contacts) {
-            clinics.remove(contact.getClinicWrapper());
+            clinics.remove(contact.getClinic());
         }
         ClinicWrapper clinicNotAdded = DbHelper.chooseRandomlyInList(clinics);
         ContactWrapper contactToAdd = DbHelper
@@ -357,13 +357,13 @@ public class TestStudy extends TestDatabase {
             study1);
         ShipmentWrapper shipment1 = ShipmentHelper.addShipment(clinic1,
             patient1);
+        PatientWrapper patient2 = PatientHelper.addPatient(name + "PATIENT2",
+            study1);
         ShipmentWrapper shipment2 = ShipmentHelper.addShipment(clinic2,
-            patient1);
+            patient1, patient2);
         // clinic 1 = 1 patient pour study 1
         PatientVisitHelper.addPatientVisits(patient1, shipment1);
         PatientVisitHelper.addPatientVisits(patient1, shipment2);
-        PatientWrapper patient2 = PatientHelper.addPatient(name + "PATIENT2",
-            study1);
         // clinic 2 = 2 patients pour study 1
         PatientVisitHelper.addPatientVisits(patient2, shipment2);
 
@@ -434,19 +434,20 @@ public class TestStudy extends TestDatabase {
         study1.setContactCollection(contacts);
         study1.persist();
         PatientWrapper patient1 = PatientHelper.addPatient(name, study1);
-        ShipmentWrapper shipment1 = ShipmentHelper.addShipment(clinic1,
-            patient1);
-        ShipmentWrapper shipment2 = ShipmentHelper.addShipment(clinic2,
-            patient1);
-        int nber = PatientVisitHelper.addPatientVisits(patient1, shipment1)
-            .size();
-        int nber2 = PatientVisitHelper.addPatientVisits(patient1, shipment2)
-            .size();
 
         StudyWrapper study2 = StudyHelper.addStudy(site, name + "STUDY2");
         study2.setContactCollection(contacts);
         study2.persist();
         PatientWrapper patient2 = PatientHelper.addPatient(name + "2", study2);
+
+        ShipmentWrapper shipment1 = ShipmentHelper.addShipment(clinic1,
+            patient1, patient2);
+        ShipmentWrapper shipment2 = ShipmentHelper.addShipment(clinic2,
+            patient1, patient2);
+        int nber = PatientVisitHelper.addPatientVisits(patient1, shipment1)
+            .size();
+        int nber2 = PatientVisitHelper.addPatientVisits(patient1, shipment2)
+            .size();
         PatientVisitHelper.addPatientVisits(patient2, shipment1);
         PatientVisitHelper.addPatientVisits(patient2, shipment2);
 
@@ -465,8 +466,8 @@ public class TestStudy extends TestDatabase {
     }
 
     @Test
-    public void testPersistFail() throws Exception {
-        String name = "testPersistFail" + r.nextInt();
+    public void testPersistFailCheckStudyNameUnique() throws Exception {
+        String name = "testPersistFailCheckStudyNameUnique" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         StudyHelper.addStudy(site, name);
 
@@ -474,6 +475,26 @@ public class TestStudy extends TestDatabase {
             StudyHelper.addStudy(site, name);
             Assert
                 .fail("Should not insert the study : same name already in database");
+        } catch (BiobankCheckException bce) {
+            Assert.assertTrue(true);
+        }
+    }
+
+    @Test
+    public void testPersistFailCheckContactsFromSameSite() throws Exception {
+        String name = "testPersistFailCheckContactsFromSameSite";
+        SiteWrapper site = SiteHelper.addSite(name);
+        StudyWrapper study = StudyHelper.addStudy(site, name);
+
+        SiteWrapper site2 = SiteHelper.addSite(name + "_2");
+        ClinicWrapper clinic = ClinicHelper.addClinic(site2, name);
+        ContactWrapper contact = ContactHelper.addContact(clinic, name);
+
+        study.setContactCollection(Arrays
+            .asList(new ContactWrapper[] { contact }));
+        try {
+            study.persist();
+            Assert.fail("Contact should be in same site");
         } catch (BiobankCheckException bce) {
             Assert.assertTrue(true);
         }
