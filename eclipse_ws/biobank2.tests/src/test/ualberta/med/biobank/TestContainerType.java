@@ -532,6 +532,7 @@ public class TestContainerType extends TestDatabase {
         childTypeL2_2.delete();
 
         // test childTypeL1's children again
+        childTypeL1.reload();
         list = childTypeL1.getChildContainerTypeCollection();
         Assert.assertEquals(2, list.size());
         Assert.assertTrue(list.contains(childTypeL2));
@@ -541,12 +542,14 @@ public class TestContainerType extends TestDatabase {
         childTypeL2.delete();
 
         // test childTypeL3's parents again
+        childTypeL1.reload();
         list = childTypeL1.getChildContainerTypeCollection();
         Assert.assertEquals(1, list.size());
         Assert.assertTrue(list.contains(childTypeL2_3));
 
         // now delete childTypeL2_3
         childTypeL2_3.delete();
+        childTypeL1.reload();
         list = childTypeL1.getChildContainerTypeCollection();
         Assert.assertEquals(0, list.size());
     }

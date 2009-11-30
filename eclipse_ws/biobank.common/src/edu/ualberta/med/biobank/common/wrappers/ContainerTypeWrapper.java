@@ -247,8 +247,10 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
     public void setSampleTypeCollection(
         Collection<SampleTypeWrapper> sampleTypes) {
         Collection<SampleType> sampleTypesObjects = new HashSet<SampleType>();
-        for (SampleTypeWrapper type : sampleTypes) {
-            sampleTypesObjects.add(type.getWrappedObject());
+        if (sampleTypes != null) {
+            for (SampleTypeWrapper type : sampleTypes) {
+                sampleTypesObjects.add(type.getWrappedObject());
+            }
         }
         setSampleTypeCollection(sampleTypesObjects, false);
         propertiesMap.put("sampleTypeCollection", sampleTypes);
