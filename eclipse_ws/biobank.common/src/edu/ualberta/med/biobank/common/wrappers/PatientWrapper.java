@@ -195,32 +195,50 @@ public class PatientWrapper extends ModelWrapper<Patient> {
     // }
 
     @SuppressWarnings("unchecked")
-    public List<ShipmentWrapper> getShipmentCollection(boolean sort)
-        throws ApplicationException {
+    public List<ShipmentWrapper> getShipmentCollection(boolean sort) {
         List<ShipmentWrapper> shipmentCollection = (List<ShipmentWrapper>) propertiesMap
             .get("shipmentCollection");
-
         if (shipmentCollection == null) {
-            shipmentCollection = new ArrayList<ShipmentWrapper>();
-            HQLCriteria c = new HQLCriteria(
-                "select ss.shipment from "
-                    + Patient.class.getName()
-                    + "  as p inner join p.shptSampleSourceCollection as ss where p.id=?",
-                Arrays.asList(new Object[] { getId() }));
-            List<Shipment> collection = appService.query(c);
-            for (Shipment s : collection) {
-                shipmentCollection.add(new ShipmentWrapper(appService, s));
+            Collection<Shipment> children = wrappedObject
+                .getShipmentCollection();
+            if (children != null) {
+                shipmentCollection = new ArrayList<ShipmentWrapper>();
+                for (Shipment ship : children) {
+                    shipmentCollection
+                        .add(new ShipmentWrapper(appService, ship));
+                }
+                propertiesMap.put("shipmentCollection", shipmentCollection);
             }
-            if (sort)
-                Collections.sort(shipmentCollection);
-            propertiesMap.put("shipmentCollection", shipmentCollection);
+        }
+        if (sort) {
+            Collections.sort(shipmentCollection);
         }
         return shipmentCollection;
     }
 
-    public List<ShipmentWrapper> getShipmentCollection()
-        throws ApplicationException {
+    public List<ShipmentWrapper> getShipmentCollection() {
         return getShipmentCollection(false);
+    }
+
+    public void setShipmentCollection(Collection<Shipment> shipments,
+        boolean setNull) {
+        Collection<Shipment> oldCollection = wrappedObject
+            .getShipmentCollection();
+        wrappedObject.setShipmentCollection(shipments);
+        propertyChangeSupport.firePropertyChange("shipmentCollection",
+            oldCollection, shipments);
+        if (setNull) {
+            propertiesMap.put("shipmentCollection", null);
+        }
+    }
+
+    public void setShipmentCollection(Collection<ShipmentWrapper> shipments) {
+        Collection<Shipment> shptCollection = new HashSet<Shipment>();
+        for (ShipmentWrapper ship : shipments) {
+            shptCollection.add(ship.getWrappedObject());
+        }
+        setShipmentCollection(shptCollection, false);
+        propertiesMap.put("shipmentCollection", shipments);
     }
 
     @Override

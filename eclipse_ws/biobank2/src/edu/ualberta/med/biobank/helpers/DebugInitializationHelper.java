@@ -37,6 +37,7 @@ import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ShippingCompanyWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.common.wrappers.WrapperException;
@@ -194,13 +195,15 @@ public class DebugInitializationHelper {
 
     @SuppressWarnings("unused")
     private void insertShipmentsInClinics() throws Exception {
-        insertShipmentsInClinic(clinics[0]);
-        insertShipmentsInClinic(clinics[1]);
-    }
-
-    private void insertShipmentsInClinic(ClinicWrapper clinic) throws Exception {
+        ShippingCompanyWrapper shippingCompany = insertShippingCompany();
         Random r = new Random();
-        for (int i = 0; i < 50; i++) {
+        for (int i = 0; i < 100; i++) {
+            ClinicWrapper clinic;
+            if (i < 50) {
+                clinic = clinics[0];
+            } else {
+                clinic = clinics[1];
+            }
             ShipmentWrapper shipment = new ShipmentWrapper(appService);
             String dateStr = String.format("2009-%02d-%02d %02d:%02d", r
                 .nextInt(12) + 1, r.nextInt(28), r.nextInt(24), r.nextInt(60));
@@ -210,10 +213,20 @@ public class DebugInitializationHelper {
             shipment.setDateReceived(DateFormatter.parseToDateTime(dateStr));
             shipment.setWaybill(r.nextInt() + getRandomString(r, 10));
             shipment.setClinic(clinic);
-
+            shipment.setPatientCollection(Arrays
+                .asList(new PatientWrapper[] { patients.get(i) }));
+            shipment.setShippingCompany(shippingCompany);
             shipment.persist();
         }
-        clinic.reload();
+        clinics[0].reload();
+        clinics[1].reload();
+    }
+
+    private ShippingCompanyWrapper insertShippingCompany() throws Exception {
+        ShippingCompanyWrapper scw = new ShippingCompanyWrapper(appService);
+        scw.setName("Fedex");
+        scw.persist();
+        return scw;
     }
 
     @SuppressWarnings("unused")
