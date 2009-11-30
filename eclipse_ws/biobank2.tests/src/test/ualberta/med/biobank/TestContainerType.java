@@ -35,8 +35,9 @@ public class TestContainerType extends TestDatabase {
 
     private SiteWrapper site;
 
-    // cannot use getter and setter test on ContainerTypeWrapper due to
-    // restrictions on labeling scheme
+    // the methods to skip in the getters and setters test
+    private static final List<String> GETTER_SKIP_METHODS = Arrays
+        .asList(new String[] { "getChildLabelingScheme" });
 
     @Override
     @Before
@@ -102,6 +103,12 @@ public class TestContainerType extends TestDatabase {
     private ContainerTypeWrapper addContainerTypeHierarchy(
         ContainerTypeWrapper topType) throws Exception {
         return addContainerTypeHierarchy(topType, 3);
+    }
+
+    @Test
+    public void testGettersAndSetters() throws BiobankCheckException, Exception {
+        ContainerTypeWrapper topType = containerTypeMap.get("TopCT");
+        testGettersAndSetters(topType, GETTER_SKIP_METHODS);
     }
 
     @Test
