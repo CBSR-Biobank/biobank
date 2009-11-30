@@ -6,8 +6,8 @@ import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
@@ -39,16 +39,14 @@ public class StudyGroup extends AdapterBase {
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
         MenuItem mi = new MenuItem(menu, SWT.PUSH);
         mi.setText("Add Study");
-        mi.addSelectionListener(new SelectionListener() {
+        mi.addSelectionListener(new SelectionAdapter() {
+            @Override
             public void widgetSelected(SelectionEvent event) {
                 StudyWrapper study = new StudyWrapper(parent.getAppService());
                 study.setSite(getParentFromClass(SiteAdapter.class)
                     .getWrapper());
                 StudyAdapter adapter = new StudyAdapter(StudyGroup.this, study);
                 openForm(new FormInput(adapter), StudyEntryForm.ID);
-            }
-
-            public void widgetDefaultSelected(SelectionEvent e) {
             }
         });
     }

@@ -63,33 +63,12 @@ public class ContainerAdapter extends AdapterBase {
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-        MenuItem mi = new MenuItem(menu, SWT.PUSH);
-        mi.setText("Edit Container");
-        mi.addSelectionListener(new SelectionListener() {
-            public void widgetSelected(SelectionEvent event) {
-                openForm(new FormInput(ContainerAdapter.this),
-                    ContainerEntryForm.ID);
-            }
-
-            public void widgetDefaultSelected(SelectionEvent e) {
-            }
-        });
-
-        mi = new MenuItem(menu, SWT.PUSH);
-        mi.setText("View Container");
-        mi.addSelectionListener(new SelectionListener() {
-            public void widgetSelected(SelectionEvent event) {
-                openForm(new FormInput(ContainerAdapter.this),
-                    ContainerViewForm.ID);
-            }
-
-            public void widgetDefaultSelected(SelectionEvent e) {
-            }
-        });
+        addEditMenu(menu, "Container", ContainerEntryForm.ID);
+        addViewMenu(menu, "Container", ContainerViewForm.ID);
 
         Boolean topLevel = getContainer().getContainerType().getTopLevel();
         if (topLevel == null || !topLevel) {
-            mi = new MenuItem(menu, SWT.PUSH);
+            MenuItem mi = new MenuItem(menu, SWT.PUSH);
             mi.setText("Move Container");
             mi.addSelectionListener(new SelectionListener() {
                 public void widgetSelected(SelectionEvent event) {
@@ -100,16 +79,9 @@ public class ContainerAdapter extends AdapterBase {
                 }
             });
         }
-        mi = new MenuItem(menu, SWT.PUSH);
-        mi.setText("Delete Container");
-        mi.addSelectionListener(new SelectionListener() {
-            public void widgetSelected(SelectionEvent event) {
-                delete("Are you sure you want to delete this container?");
-            }
 
-            public void widgetDefaultSelected(SelectionEvent e) {
-            }
-        });
+        addDeleteMenu(menu, "Container",
+            "Are you sure you want to delete this container?");
     }
 
     @Override

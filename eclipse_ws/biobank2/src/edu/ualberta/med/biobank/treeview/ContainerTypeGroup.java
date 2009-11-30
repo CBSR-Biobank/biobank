@@ -7,8 +7,8 @@ import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
@@ -37,7 +37,8 @@ public class ContainerTypeGroup extends AdapterBase {
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
         MenuItem mi = new MenuItem(menu, SWT.PUSH);
         mi.setText("Add Container Type");
-        mi.addSelectionListener(new SelectionListener() {
+        mi.addSelectionListener(new SelectionAdapter() {
+            @Override
             public void widgetSelected(SelectionEvent event) {
                 ContainerTypeWrapper ct = new ContainerTypeWrapper(
                     getAppService());
@@ -45,9 +46,6 @@ public class ContainerTypeGroup extends AdapterBase {
                 ContainerTypeAdapter adapter = new ContainerTypeAdapter(
                     ContainerTypeGroup.this, ct);
                 openForm(new FormInput(adapter), ContainerTypeEntryForm.ID);
-            }
-
-            public void widgetDefaultSelected(SelectionEvent e) {
             }
         });
     }

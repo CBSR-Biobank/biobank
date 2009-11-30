@@ -6,9 +6,13 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchPage;
@@ -48,6 +52,11 @@ public abstract class AdapterBase {
      * if true, enable normal actions of this adapter
      */
     protected boolean enableActions = true;
+
+    /**
+     * if true, edit button and actions will be visible
+     */
+    private boolean editable = true;
 
     public AdapterBase(AdapterBase parent, ModelWrapper<?> object) {
         this(parent, object, true);
@@ -295,6 +304,48 @@ public abstract class AdapterBase {
 
     public abstract void popupMenu(TreeViewer tv, Tree tree, Menu menu);
 
+    protected void addEditMenu(Menu menu, String objectName,
+        final String editFormId) {
+        if (isEditable() && enableActions) {
+            MenuItem mi = new MenuItem(menu, SWT.PUSH);
+            mi.setText("Edit " + objectName);
+            mi.addSelectionListener(new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent event) {
+                    openForm(new FormInput(AdapterBase.this), editFormId);
+                }
+            });
+        }
+    }
+
+    protected void addViewMenu(Menu menu, String objectName,
+        final String viewFormId) {
+        if (enableActions) {
+            MenuItem mi = new MenuItem(menu, SWT.PUSH);
+            mi.setText("View " + objectName);
+            mi.addSelectionListener(new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent event) {
+                    openForm(new FormInput(AdapterBase.this), viewFormId);
+                }
+            });
+        }
+    }
+
+    protected void addDeleteMenu(Menu menu, String objectName,
+        final String question) {
+        if (enableActions) {
+            MenuItem mi = new MenuItem(menu, SWT.PUSH);
+            mi.setText("Delete " + objectName);
+            mi.addSelectionListener(new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent event) {
+                    delete(question);
+                }
+            });
+        }
+    }
+
     /**
      * Called to load it's children;
      * 
@@ -384,6 +435,14 @@ public abstract class AdapterBase {
 
     public AdapterBase searchChild(ModelWrapper<?> wrapper) {
         return accept(new NodeSearchVisitor(wrapper));
+    }
+
+    public boolean isEditable() {
+        return editable;
+    }
+
+    public void setEditable(boolean editable) {
+        this.editable = editable;
     }
 
 }
