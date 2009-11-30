@@ -23,10 +23,9 @@ LOCK TABLES `PV_INFO_POSSIBLE` WRITE;
 INSERT INTO `PV_INFO_POSSIBLE` (ID, LABEL, IS_DEFAULT, SITE_ID, PV_INFO_TYPE_ID)
 VALUES
        ( 1,'Visit Type',b'0',NULL, 4),
-       ( 2,'Clinic Shipped Date',b'0',NULL,3),
-       ( 3,'Consent',b'0',NULL, 5),
-       ( 4,'PBMC Count',b'0',NULL, 1),
-       ( 5,'Biopsy Length',b'0',NULL, 1),
-       ( 6,'Worksheet',b'0',NULL, 2);
+       ( 2,'Consent',b'0',NULL, 5),
+       ( 3,'PBMC Count',b'0',NULL, 1),
+       ( 4,'Biopsy Length',b'0',NULL, 1),
+       ( 5,'Worksheet',b'0',NULL, 2);
 UNLOCK TABLES;
 

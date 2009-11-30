@@ -129,7 +129,7 @@ public class StudyViewForm extends BiobankViewForm {
     }
 
     private void createPvCustomInfoSection() throws Exception {
-        Composite client = createSectionWithClient("Patient Visit Information Collected");
+        Composite client = createSectionWithClient("Additional Patient Visit Information Collected");
         client.setLayout(new GridLayout(1, false));
 
         for (String label : studyWrapper.getPvInfoLabels()) {
