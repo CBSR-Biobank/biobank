@@ -597,7 +597,7 @@ public class TestContainer extends TestDatabase {
         ClinicWrapper clinic = study.getContactCollection().get(0)
             .getClinicWrapper();
         PatientWrapper patient = PatientHelper.addPatient("1000", study);
-        ShipmentWrapper shipment = ShipmentHelper.addShipmentWithShptSampleSource(clinic, patient);
+        ShipmentWrapper shipment = ShipmentHelper.addShipment(clinic, patient);
         PatientVisitWrapper pv = PatientVisitHelper.addPatientVisit(patient,
             shipment, Utils.getRandomDate());
         return pv;
@@ -646,7 +646,7 @@ public class TestContainer extends TestDatabase {
         ClinicWrapper clinic = study.getContactCollection().get(0)
             .getClinicWrapper();
         PatientWrapper patient = PatientHelper.addPatient("1000", study);
-        ShipmentWrapper shipment = ShipmentHelper.addShipmentWithShptSampleSource(clinic, patient);
+        ShipmentWrapper shipment = ShipmentHelper.addShipment(clinic, patient);
         PatientVisitWrapper pv = PatientVisitHelper.addPatientVisit(patient,
             shipment, Utils.getRandomDate());
 

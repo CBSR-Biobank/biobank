@@ -355,9 +355,9 @@ public class TestStudy extends TestDatabase {
         study1.persist();
         PatientWrapper patient1 = PatientHelper.addPatient(name + "PATIENT1",
             study1);
-        ShipmentWrapper shipment1 = ShipmentHelper.addShipmentWithShptSampleSource(clinic1,
+        ShipmentWrapper shipment1 = ShipmentHelper.addShipment(clinic1,
             patient1);
-        ShipmentWrapper shipment2 = ShipmentHelper.addShipmentWithShptSampleSource(clinic2,
+        ShipmentWrapper shipment2 = ShipmentHelper.addShipment(clinic2,
             patient1);
         // clinic 1 = 1 patient pour study 1
         PatientVisitHelper.addPatientVisits(patient1, shipment1);
@@ -395,9 +395,9 @@ public class TestStudy extends TestDatabase {
         study1.setContactCollection(contacts);
         study1.persist();
         PatientWrapper patient1 = PatientHelper.addPatient(name, study1);
-        ShipmentWrapper shipment1 = ShipmentHelper.addShipmentWithShptSampleSource(clinic1,
+        ShipmentWrapper shipment1 = ShipmentHelper.addShipment(clinic1,
             patient1);
-        ShipmentWrapper shipment2 = ShipmentHelper.addShipmentWithShptSampleSource(clinic2,
+        ShipmentWrapper shipment2 = ShipmentHelper.addShipment(clinic2,
             patient1);
         int nber = PatientVisitHelper.addPatientVisits(patient1, shipment1)
             .size();
@@ -434,9 +434,9 @@ public class TestStudy extends TestDatabase {
         study1.setContactCollection(contacts);
         study1.persist();
         PatientWrapper patient1 = PatientHelper.addPatient(name, study1);
-        ShipmentWrapper shipment1 = ShipmentHelper.addShipmentWithShptSampleSource(clinic1,
+        ShipmentWrapper shipment1 = ShipmentHelper.addShipment(clinic1,
             patient1);
-        ShipmentWrapper shipment2 = ShipmentHelper.addShipmentWithShptSampleSource(clinic2,
+        ShipmentWrapper shipment2 = ShipmentHelper.addShipment(clinic2,
             patient1);
         int nber = PatientVisitHelper.addPatientVisits(patient1, shipment1)
             .size();

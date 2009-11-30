@@ -53,7 +53,7 @@ public class TestPatientVisit extends TestDatabase {
             + Utils.getRandomString(10));
         patient = PatientHelper.addPatient(Utils.getRandomNumericString(20),
             study);
-        shipment = ShipmentHelper.addShipmentWithShptSampleSource(clinic, patient);
+        shipment = ShipmentHelper.addShipment(clinic, patient);
     }
 
     @Test
@@ -73,7 +73,7 @@ public class TestPatientVisit extends TestDatabase {
         Calendar cal = Calendar.getInstance();
         cal.setTime(dateProcessed);
         cal.add(Calendar.DATE, 1);
-        ShipmentWrapper shipment2 = ShipmentHelper.addShipmentWithShptSampleSource(clinic, patient);
+        ShipmentWrapper shipment2 = ShipmentHelper.addShipment(clinic, patient);
 
         PatientVisitWrapper visit2 = PatientVisitHelper.addPatientVisit(
             patient, shipment2, cal.getTime());
