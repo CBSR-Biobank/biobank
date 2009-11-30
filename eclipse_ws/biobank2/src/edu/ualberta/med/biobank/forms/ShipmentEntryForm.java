@@ -19,11 +19,13 @@ import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ShippingCompanyWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.treeview.ShipmentAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ShipmentEntryForm extends BiobankEntryForm {
 
@@ -41,6 +43,8 @@ public class ShipmentEntryForm extends BiobankEntryForm {
     private ShipmentWrapper shipmentWrapper;
 
     private ComboViewer clinicsComboViewer;
+
+    private ComboViewer companyComboViewer;
 
     @Override
     protected void init() throws Exception {
@@ -74,7 +78,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
         createMainSection();
     }
 
-    private void createMainSection() {
+    private void createMainSection() throws ApplicationException {
         Composite client = toolkit.createComposite(form.getBody());
         GridLayout layout = new GridLayout(2, false);
         layout.horizontalSpacing = 10;
@@ -113,6 +117,16 @@ public class ShipmentEntryForm extends BiobankEntryForm {
             "Date Shipped", shipmentWrapper.getDateShipped(), shipmentWrapper,
             "dateShipped", "Date shipped should be set");
         firstControl = dateShippedWidget;
+
+        ShippingCompanyWrapper selectedCompany = shipmentWrapper
+            .getShippingCompany();
+        companyComboViewer = createComboViewerWithNoSelectionValidator(client,
+            "Shipping company", ShippingCompanyWrapper
+                .getShippingCompanies(appService), selectedCompany, null);
+
+        createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Box Number",
+            null, BeansObservables.observeValue(shipmentWrapper, "boxNumber"),
+            null);
 
         createDateTimeWidget(client, "Date Received", shipmentWrapper
             .getDateReceived(), shipmentWrapper, "dateReceived",

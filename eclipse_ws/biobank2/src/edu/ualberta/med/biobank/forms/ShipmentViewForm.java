@@ -33,6 +33,10 @@ public class ShipmentViewForm extends BiobankViewForm {
 
     private Label commentLabel;
 
+    private Label companyLabel;
+
+    private Label boxNumberLabel;
+
     @Override
     protected void init() throws Exception {
         Assert.isTrue((adapter instanceof ShipmentAdapter),
@@ -84,6 +88,12 @@ public class ShipmentViewForm extends BiobankViewForm {
         dateShippedLabel = (Label) createWidget(client, Label.class, SWT.NONE,
             "Date Shipped");
 
+        companyLabel = (Label) createWidget(client, Label.class, SWT.NONE,
+            "Shipping company");
+
+        boxNumberLabel = (Label) createWidget(client, Label.class, SWT.NONE,
+            "Box number");
+
         dateReceivedLabel = (Label) createWidget(client, Label.class, SWT.NONE,
             "Date received");
 
@@ -103,6 +113,10 @@ public class ShipmentViewForm extends BiobankViewForm {
                 .getClinic().getName());
         FormUtils.setTextValue(dateShippedLabel, shipmentWrapper
             .getFormattedDateShipped());
+        FormUtils.setTextValue(companyLabel, shipmentWrapper
+            .getShippingCompany() == null ? "" : shipmentWrapper
+            .getShippingCompany().getName());
+        FormUtils.setTextValue(boxNumberLabel, shipmentWrapper.getBoxNumber());
         FormUtils.setTextValue(dateReceivedLabel, shipmentWrapper
             .getFormattedDateReceived());
         FormUtils.setTextValue(commentLabel, shipmentWrapper.getComment());

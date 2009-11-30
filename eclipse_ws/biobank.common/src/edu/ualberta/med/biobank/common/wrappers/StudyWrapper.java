@@ -127,49 +127,49 @@ public class StudyWrapper extends ModelWrapper<Study> {
     protected void persistChecks() throws BiobankCheckException,
         ApplicationException {
         checkStudyNameUnique();
+        checkContactsFromSameSite();
     }
 
     private void checkStudyNameUnique() throws BiobankCheckException,
         ApplicationException {
-        HQLCriteria c;
-
-        if (getWrappedObject().getId() == null) {
-            c = new HQLCriteria("from " + Study.class.getName()
-                + " where site.id = ? and name = ?", Arrays
-                .asList(new Object[] { getSite().getId(), getName() }));
-        } else {
-            c = new HQLCriteria(
-                "from "
-                    + Study.class.getName()
-                    + " as study where site.id = ? and name = ?  and study.id <> ?",
-                Arrays.asList(new Object[] { getSite().getId(), getName(),
-                    getId() }));
+        String sameString = "";
+        List<Object> params = new ArrayList<Object>(Arrays.asList(new Object[] {
+            getSite().getId(), getName() }));
+        if (!isNew()) {
+            sameString = " and id <> ?";
+            params.add(getId());
         }
-
+        HQLCriteria c = new HQLCriteria("from " + Study.class.getName()
+            + " where site.id = ? and name = ?" + sameString, params);
         List<Object> results = appService.query(c);
         if (results.size() > 0) {
             throw new BiobankCheckException("A study with name \"" + getName()
                 + "\" already exists.");
         }
 
-        if (getWrappedObject().getId() == null) {
-            c = new HQLCriteria("from " + Study.class.getName()
-                + " where site.id = ? and nameShort = ?", Arrays
-                .asList(new Object[] { getSite().getId(), getNameShort() }));
-        } else {
-            c = new HQLCriteria(
-                "from "
-                    + Study.class.getName()
-                    + " as study"
-                    + " where site.id = ? and study.nameShort = ? and study.id <> ?",
-                Arrays.asList(new Object[] { getSite().getId(), getNameShort(),
-                    getId() }));
+        params = new ArrayList<Object>(Arrays.asList(new Object[] {
+            getSite().getId(), getNameShort() }));
+        if (!isNew()) {
+            sameString = " and id <> ?";
+            params.add(getId());
         }
-
+        c = new HQLCriteria("from " + Study.class.getName()
+            + " where site.id = ? and nameShort = ?" + sameString, params);
         results = appService.query(c);
         if (results.size() > 0) {
             throw new BiobankCheckException("A study with short name \""
                 + getNameShort() + "\" already exists.");
+        }
+    }
+
+    private void checkContactsFromSameSite() throws BiobankCheckException {
+        if (getContactCollection() != null) {
+            for (ContactWrapper contact : getContactCollection()) {
+                if (!contact.getClinic().getSite().equals(getSite())) {
+                    throw new BiobankCheckException(
+                        "Contact associated with this study should be from the same site.");
+                }
+            }
         }
     }
 

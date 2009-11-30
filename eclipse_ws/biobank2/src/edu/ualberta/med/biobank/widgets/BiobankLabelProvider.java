@@ -216,7 +216,7 @@ public class BiobankLabelProvider extends LabelProvider implements
             StudyContactInfo info = (StudyContactInfo) element;
             if (columnIndex == 0) {
                 if (info.contact != null)
-                    return info.contact.getClinicWrapper().getName();
+                    return info.contact.getClinic().getName();
                 return "";
             }
             return getContactWrapperColumnIndex(info.contact, columnIndex);

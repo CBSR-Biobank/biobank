@@ -20,8 +20,10 @@ import edu.ualberta.med.biobank.model.PvInfoData;
 import edu.ualberta.med.biobank.model.PvSampleSource;
 import edu.ualberta.med.biobank.model.Sample;
 import edu.ualberta.med.biobank.model.Shipment;
+import edu.ualberta.med.biobank.model.Study;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
+import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
 
@@ -262,21 +264,81 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
     @Override
     protected void persistChecks() throws BiobankCheckException,
         ApplicationException, WrapperException {
-        // TODO check add only one shipment ? but should be done through
-        // hibernate
 
-        // TODO WAs checking study set to the patient visit was on the studies
-        // link to the clinic
-        // do there or in the shipment ?
-        // boolean found = false;
-        // Collection<StudyWrapper> studies = getClinic().getStudyCollection();
-        // for (StudyWrapper study : studies)
-        // if (study.getId().equals(getPatient().getStudy().getId()))
-        // found = true;
-        // if (!found)
-        // throw new BiobankCheckException("A patient visit with date drawn "
-        // + getDateDrawn() + " already exist in patient "
-        // + getPatient().getNumber() + ".");
+        // FIXME check shipment/patient ??
+
+        checkVisitDateProcessedUnique();
+
+        checkPatientClinicInSameStudy();
+    }
+
+    private void checkPatientClinicInSameStudy() throws ApplicationException,
+        BiobankCheckException {
+        HQLCriteria c = new HQLCriteria(
+            "select count(study) from "
+                + Study.class.getName()
+                + " as study inner join study.contactCollection as studyContacts"
+                + " inner join studyContacts.clinic as clinic"
+                + " inner join clinic.shipmentCollection as shipments"
+                + " inner join shipments.patientCollection as patients"
+                + " where patients.study.id=study.id and shipments.id=? and patients.id = ?",
+            Arrays.asList(new Object[] { getShipment().getId(),
+                getPatient().getId() }));
+
+        List<Long> result = appService.query(c);
+        if (result.size() != 1) {
+            throw new BiobankCheckException("Invalid size for HQL query result");
+        }
+        if (result.get(0) == 0) {
+            throw new BiobankCheckException(
+                "The patient study is not linked with this clinic. Choose another clinic.");
+        }
+    }
+
+    private void checkVisitDateProcessedUnique() throws ApplicationException,
+        BiobankCheckException {
+        String isSameVisit = "";
+        List<Object> params = new ArrayList<Object>();
+        params.add(getPatient().getId());
+        params.add(getDateProcessed());
+        if (!isNew()) {
+            isSameVisit = " and id <> ?";
+            params.add(getId());
+        }
+        HQLCriteria c = new HQLCriteria("from " + PatientVisit.class.getName()
+            + " where patient.id=? and dateProcessed = ?" + isSameVisit, params);
+
+        List<Object> results = appService.query(c);
+        if (results.size() != 0) {
+            throw new BiobankCheckException(
+                "A patient visit with date processed "
+                    + getFormattedDateProcessed()
+                    + " already exist in patient " + getPatient().getNumber()
+                    + ".");
+        }
+    }
+
+    @Override
+    protected void persistDependencies(PatientVisit origObject)
+        throws BiobankCheckException, ApplicationException, WrapperException {
+        if (origObject != null) {
+            removeDeletedPvSampleSources(origObject);
+        }
+    }
+
+    private void removeDeletedPvSampleSources(PatientVisit pvDatabase)
+        throws BiobankCheckException, ApplicationException, WrapperException {
+        List<PvSampleSourceWrapper> newSampleSources = getPvSampleSourceCollection();
+        List<PvSampleSourceWrapper> oldSampleSources = new PatientVisitWrapper(
+            appService, pvDatabase).getPvSampleSourceCollection();
+        if (oldSampleSources != null) {
+            for (PvSampleSourceWrapper ss : oldSampleSources) {
+                if ((newSampleSources == null)
+                    || !newSampleSources.contains(ss)) {
+                    ss.delete();
+                }
+            }
+        }
     }
 
     public String getUsername() {

@@ -13,12 +13,15 @@ import org.junit.Before;
 import org.junit.Test;
 
 import test.ualberta.med.biobank.internal.ClinicHelper;
+import test.ualberta.med.biobank.internal.ContactHelper;
 import test.ualberta.med.biobank.internal.PatientHelper;
 import test.ualberta.med.biobank.internal.PatientVisitHelper;
 import test.ualberta.med.biobank.internal.ShipmentHelper;
 import test.ualberta.med.biobank.internal.SiteHelper;
 import test.ualberta.med.biobank.internal.StudyHelper;
+import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
@@ -51,9 +54,14 @@ public class TestPatientVisit extends TestDatabase {
             + Utils.getRandomString(10));
         clinic = ClinicHelper.addClinic(site, "Clinic - Patient Visit Test "
             + Utils.getRandomString(10));
+        ContactWrapper contact = ContactHelper.addContact(clinic,
+            "Contact - Patient Visit Test");
+        study.setContactCollection(Arrays
+            .asList(new ContactWrapper[] { contact }));
+        study.persist();
         patient = PatientHelper.addPatient(Utils.getRandomNumericString(20),
             study);
-        shipment = ShipmentHelper.addShipmentWithShptSampleSource(clinic, patient);
+        shipment = ShipmentHelper.addShipment(clinic, patient);
     }
 
     @Test
@@ -73,7 +81,7 @@ public class TestPatientVisit extends TestDatabase {
         Calendar cal = Calendar.getInstance();
         cal.setTime(dateProcessed);
         cal.add(Calendar.DATE, 1);
-        ShipmentWrapper shipment2 = ShipmentHelper.addShipmentWithShptSampleSource(clinic, patient);
+        ShipmentWrapper shipment2 = ShipmentHelper.addShipment(clinic, patient);
 
         PatientVisitWrapper visit2 = PatientVisitHelper.addPatientVisit(
             patient, shipment2, cal.getTime());
@@ -173,6 +181,18 @@ public class TestPatientVisit extends TestDatabase {
     @Test
     public void testCheckVisitDateDrawnUnique() {
         fail("Not yet implemented");
+    }
+
+    @Test
+    public void testPersist() throws Exception {
+        PatientVisitWrapper pv = PatientVisitHelper.newPatientVisit(patient,
+            shipment, DateFormatter.dateFormatter.parse("2009-12-25 00:00"));
+        pv.persist();
+    }
+
+    public void testPersistFail() throws Exception {
+        Assert.fail("check for checkVisitDateProcessedUnique");
+        Assert.fail("check for checkPatientClinicInSameStudy");
     }
 
 }

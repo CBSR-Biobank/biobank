@@ -12,9 +12,9 @@ import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 
 public class ShipmentHelper extends DbHelper {
 
-    public static ShipmentWrapper newShipmentWithShptSampleSource(
-        ClinicWrapper clinic, String waybill, Date dateReceived,
-        PatientWrapper patient) throws Exception {
+    public static ShipmentWrapper newShipment(ClinicWrapper clinic,
+        String waybill, Date dateReceived, PatientWrapper... patients)
+        throws Exception {
         ShipmentWrapper shipment = new ShipmentWrapper(appService);
         shipment.setClinic(clinic);
         shipment.setWaybill(waybill);
@@ -22,36 +22,33 @@ public class ShipmentHelper extends DbHelper {
             shipment.setDateReceived(dateReceived);
         }
 
-        if (patient != null) {
-            shipment.setPatientCollection(Arrays
-                .asList(new PatientWrapper[] { patient }));
+        if (patients != null) {
+            shipment.setPatientCollection(Arrays.asList(patients));
         }
 
         return shipment;
     }
 
-    public static ShipmentWrapper addShipmentWithShptSampleSource(
-        ClinicWrapper clinic, PatientWrapper patient) throws Exception {
-        return addShipmentWithShptSampleSource(clinic,
-            Utils.getRandomString(5), patient);
-    }
-
     public static ShipmentWrapper newShipment(ClinicWrapper clinic)
         throws Exception {
-        return newShipmentWithShptSampleSource(clinic,
-            Utils.getRandomString(5), Utils.getRandomDate(), null);
+        return newShipment(clinic, Utils.getRandomString(5), Utils
+            .getRandomDate(), (PatientWrapper) null);
     }
 
-    public static ShipmentWrapper addShipmentWithShptSampleSource(
-        ClinicWrapper clinic, String waybill, PatientWrapper patient)
-        throws Exception {
-        ShipmentWrapper shipment = newShipmentWithShptSampleSource(clinic,
-            waybill, Utils.getRandomDate(), patient);
+    public static ShipmentWrapper addShipment(ClinicWrapper clinic,
+        PatientWrapper... patients) throws Exception {
+        return addShipment(clinic, Utils.getRandomString(5), patients);
+    }
+
+    public static ShipmentWrapper addShipment(ClinicWrapper clinic,
+        String waybill, PatientWrapper... patients) throws Exception {
+        ShipmentWrapper shipment = newShipment(clinic, waybill, Utils
+            .getRandomDate(), patients);
         shipment.persist();
         return shipment;
     }
 
-    public static ShipmentWrapper addShipmentWithRandomObjects(
+    public static ShipmentWrapper addShipmentWithRandomPatient(
         ClinicWrapper clinic, String name) throws Exception {
         StudyWrapper study = StudyHelper.addStudy(clinic.getSite(), name);
         ContactWrapper contact = ContactHelper.addContact(clinic, name);
@@ -61,7 +58,7 @@ public class ShipmentHelper extends DbHelper {
 
         PatientWrapper patient = PatientHelper.addPatient(name, study);
 
-        return addShipmentWithShptSampleSource(clinic, patient);
+        return addShipment(clinic, patient);
     }
 
 }

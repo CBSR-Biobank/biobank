@@ -77,7 +77,7 @@ public class ContactWrapper extends ModelWrapper<Contact> {
             oldEmailAddress, emailAddress);
     }
 
-    public ClinicWrapper getClinicWrapper() {
+    public ClinicWrapper getClinic() {
         return new ClinicWrapper(appService, wrappedObject.getClinic());
     }
 
@@ -154,7 +154,6 @@ public class ContactWrapper extends ModelWrapper<Contact> {
     @Override
     protected void persistChecks() throws BiobankCheckException,
         ApplicationException {
-        // no checks required for contacts
     }
 
     @Override

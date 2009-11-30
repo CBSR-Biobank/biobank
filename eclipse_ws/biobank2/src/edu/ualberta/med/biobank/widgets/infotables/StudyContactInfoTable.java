@@ -42,7 +42,7 @@ public class StudyContactInfoTable extends InfoTableWidget<ContactWrapper> {
         throws Exception {
         StudyContactAndPatientInfo info = new StudyContactAndPatientInfo();
         info.contact = contact;
-        ClinicWrapper clinic = contact.getClinicWrapper();
+        ClinicWrapper clinic = contact.getClinic();
         info.clinicName = clinic.getName();
         info.patients = studyWrapper.getPatientCountForClinic(clinic);
         info.patientVisits = studyWrapper.getPatientVisitCountForClinic(clinic);

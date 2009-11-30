@@ -17,6 +17,7 @@ import org.junit.Before;
 
 import test.ualberta.med.biobank.internal.SampleSourceHelper;
 import test.ualberta.med.biobank.internal.SampleTypeHelper;
+import test.ualberta.med.biobank.internal.ShippingCompanyHelper;
 import test.ualberta.med.biobank.internal.SiteHelper;
 
 public class TestDatabase {
@@ -52,7 +53,8 @@ public class TestDatabase {
         try {
             SampleTypeHelper.deleteCreatedSampleTypes();
             SiteHelper.deleteCreatedSites();
-            SampleSourceHelper.deleteCreatedSampleSource();
+            SampleSourceHelper.deleteCreatedSampleSources();
+            ShippingCompanyHelper.deleteCreateShippingCompanies();
         } catch (Exception e) {
             e.printStackTrace(System.err);
             Assert.fail();

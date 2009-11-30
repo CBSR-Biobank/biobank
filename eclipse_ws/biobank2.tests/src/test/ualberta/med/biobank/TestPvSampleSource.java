@@ -31,7 +31,7 @@ public class TestPvSampleSource extends TestDatabase {
 
         SiteWrapper site = SiteHelper.addSite("SiteName");
         ClinicWrapper clinic = ClinicHelper.addClinic(site, "clinicname");
-        ShipmentWrapper shipment = ShipmentHelper.addShipmentWithRandomObjects(
+        ShipmentWrapper shipment = ShipmentHelper.addShipmentWithRandomPatient(
             clinic, Utils.getRandomString(10));
         PatientWrapper patient = shipment.getPatientCollection().get(0);
         PatientVisitWrapper pvw = PatientVisitHelper.addPatientVisit(patient,

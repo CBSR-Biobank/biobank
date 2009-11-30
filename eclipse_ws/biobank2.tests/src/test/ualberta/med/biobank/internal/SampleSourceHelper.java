@@ -31,7 +31,7 @@ public class SampleSourceHelper extends DbHelper {
         return addSampleSource(name, true);
     }
 
-    public static void deleteCreatedSampleSource() throws Exception {
+    public static void deleteCreatedSampleSources() throws Exception {
         for (SampleSourceWrapper source : createdSampleSources) {
             source.reload();
             source.delete();
