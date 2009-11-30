@@ -18,7 +18,6 @@ import edu.ualberta.med.biobank.model.Sample;
 import edu.ualberta.med.biobank.model.SamplePosition;
 import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.model.Shipment;
-import edu.ualberta.med.biobank.model.ShptSampleSource;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -376,12 +375,12 @@ public class Importer {
                         + ")");
                 }
 
-                Collection<Patient> patients = new HashSet<Patient>();
-                patients.add(patient);
-
-                ShptSampleSource ss = new ShptSampleSource();
-                ss.setPatientCollection(patients);
-                ss.setQuantity(0);
+                // Collection<Patient> patients =
+                // shipment.getPatientVisitCollection();
+                // if (patients == null) {
+                // patients = new HashSet<Patient>();
+                // }
+                // patients.add(patient);
 
                 ++count;
 
