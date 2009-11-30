@@ -226,8 +226,8 @@ public class TestStudy extends TestDatabase {
         SiteWrapper site = SiteHelper.addSite(name);
         StudyWrapper study = StudyHelper.addStudy(site, name);
 
-        study.setPvInfoAllowedValues("Worksheet", null);
-        study.setPvInfoAllowedValues("Consent", null);
+        study.setPvInfo("Worksheet");
+        study.setPvInfo("Consent");
         study.persist();
 
         study.reload();
@@ -240,13 +240,13 @@ public class TestStudy extends TestDatabase {
         SiteWrapper site = SiteHelper.addSite(name);
         StudyWrapper study = StudyHelper.addStudy(site, name);
 
-        study.setPvInfoAllowedValues("Worksheet", null);
-        study.setPvInfoAllowedValues("Consent", null);
+        study.setPvInfo("Worksheet");
+        study.setPvInfo("Consent");
         study.persist();
 
         study.reload();
-        Integer typeId = site.getPvInfoType("Consent");
-        Assert.assertEquals(typeId, study.getPvInfoType("Consent"));
+        String type = site.getPvInfoTypeName("Consent");
+        Assert.assertEquals(type, study.getPvInfoType("Consent"));
     }
 
     @Test
@@ -256,9 +256,9 @@ public class TestStudy extends TestDatabase {
         StudyWrapper study = StudyHelper.addStudy(site, name);
 
         String pvInfoLabel = "Visit Type";
-        study.setPvInfoAllowedValues("Worksheet", null);
+        study.setPvInfo("Worksheet");
         String[] values = new String[] { "toto", "titi", "tata" };
-        study.setPvInfoAllowedValues(pvInfoLabel, values);
+        study.setPvInfo(pvInfoLabel, values);
         study.persist();
 
         study.reload();
@@ -355,10 +355,10 @@ public class TestStudy extends TestDatabase {
         study1.persist();
         PatientWrapper patient1 = PatientHelper.addPatient(name + "PATIENT1",
             study1);
-        ShipmentWrapper shipment1 = ShipmentHelper.addShipmentWithShptSampleSource(clinic1,
-            patient1);
-        ShipmentWrapper shipment2 = ShipmentHelper.addShipmentWithShptSampleSource(clinic2,
-            patient1);
+        ShipmentWrapper shipment1 = ShipmentHelper
+            .addShipmentWithShptSampleSource(clinic1, patient1);
+        ShipmentWrapper shipment2 = ShipmentHelper
+            .addShipmentWithShptSampleSource(clinic2, patient1);
         // clinic 1 = 1 patient pour study 1
         PatientVisitHelper.addPatientVisits(patient1, shipment1);
         PatientVisitHelper.addPatientVisits(patient1, shipment2);
@@ -395,10 +395,10 @@ public class TestStudy extends TestDatabase {
         study1.setContactCollection(contacts);
         study1.persist();
         PatientWrapper patient1 = PatientHelper.addPatient(name, study1);
-        ShipmentWrapper shipment1 = ShipmentHelper.addShipmentWithShptSampleSource(clinic1,
-            patient1);
-        ShipmentWrapper shipment2 = ShipmentHelper.addShipmentWithShptSampleSource(clinic2,
-            patient1);
+        ShipmentWrapper shipment1 = ShipmentHelper
+            .addShipmentWithShptSampleSource(clinic1, patient1);
+        ShipmentWrapper shipment2 = ShipmentHelper
+            .addShipmentWithShptSampleSource(clinic2, patient1);
         int nber = PatientVisitHelper.addPatientVisits(patient1, shipment1)
             .size();
         int nber2 = PatientVisitHelper.addPatientVisits(patient1, shipment2)
@@ -434,10 +434,10 @@ public class TestStudy extends TestDatabase {
         study1.setContactCollection(contacts);
         study1.persist();
         PatientWrapper patient1 = PatientHelper.addPatient(name, study1);
-        ShipmentWrapper shipment1 = ShipmentHelper.addShipmentWithShptSampleSource(clinic1,
-            patient1);
-        ShipmentWrapper shipment2 = ShipmentHelper.addShipmentWithShptSampleSource(clinic2,
-            patient1);
+        ShipmentWrapper shipment1 = ShipmentHelper
+            .addShipmentWithShptSampleSource(clinic1, patient1);
+        ShipmentWrapper shipment2 = ShipmentHelper
+            .addShipmentWithShptSampleSource(clinic2, patient1);
         int nber = PatientVisitHelper.addPatientVisits(patient1, shipment1)
             .size();
         int nber2 = PatientVisitHelper.addPatientVisits(patient1, shipment2)
