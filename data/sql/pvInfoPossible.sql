@@ -15,8 +15,7 @@ INSERT INTO `PV_INFO_TYPE` (ID, TYPE) VALUES
        ( 2,'text'),
        ( 3,'date_time'),
        ( 4,'select_single'),
-       ( 5,'select_multiple'),
-       ( 6,'select_single');
+       ( 5,'select_multiple');
 UNLOCK TABLES;
 
 LOCK TABLES `PV_INFO_POSSIBLE` WRITE;

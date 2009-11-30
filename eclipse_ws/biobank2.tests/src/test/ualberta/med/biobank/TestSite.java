@@ -473,7 +473,7 @@ public class TestSite extends TestDatabase {
         }
         String labelGlobal = "labelGlobal" + r.nextInt();
         String type = types[r.nextInt(types.length)];
-        site.setPvInfoPossible(labelGlobal, type, true);
+        SiteWrapper.setGlobalPvInfoPossible(appService, labelGlobal, type);
         site.persist();
 
         site.reload();
@@ -489,7 +489,7 @@ public class TestSite extends TestDatabase {
         }
         String labelSite = "labelSite" + r.nextInt();
         type = types[r.nextInt(types.length)];
-        site2.setPvInfoPossible(labelSite, type, false);
+        site2.setPvInfoPossible(labelSite, type);
         site2.persist();
 
         site2.reload();

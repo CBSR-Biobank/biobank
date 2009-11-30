@@ -632,7 +632,6 @@ public class Importer {
             int palletNum;
             String studyName;
             String dateProcessed;
-            String dateDrawn;
             String hotelName;
             String palletPos;
             String sampleTypeNameShort;
@@ -673,7 +672,6 @@ public class Importer {
                 studyName = rs.getString(3);
                 String patientNo = cipher.decode(rs.getBytes(17));
                 dateProcessed = rs.getString(1);
-                dateDrawn = rs.getString(2);
 
                 visit = bioBank2Db.getPatientVisit(studyName, patientNo,
                     dateProcessed);
