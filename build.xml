@@ -265,7 +265,7 @@
 	<target name="dbdump" description="makes a copy of the current biobank2 database">
 		<echo message="running mysqldump..." />
 		<exec executable="mysqldump" failonerror="true" output="biobank2.sql">
-			<arg line="-h${database.host} -P${database.port} -u${database.username} -p${database.password} ${database.name}" />
+			<arg line="-h${database.host} -P${database.port} -u${database.username} -p${database.password} --skip-extended-insert ${database.name}" />
 		</exec>
 		<gzip src="biobank2.sql" destfile="biobank2.sql.gz" />
 		<delete file="biobank2.sql" />
@@ -344,7 +344,6 @@
 			<fileset dir="${eclipse.proj.dir}/lib" includes="**/*.jar" />
 			<fileset dir="${eclipse.proj.dir.common}/lib" includes="**/*.jar" />
 			<fileset dir="${eclipse.proj.dir.importer}/lib" includes="**/*.jar" />
-			<fileset dir="${eclipse.proj.dir.junit}/lib" includes="**/*.jar" />
 		</delete>
 		<delete dir="${req.jars.dir}" />
 	</target>
@@ -443,5 +442,5 @@
 			<report format="noframes" todir="${dest.dir.results}/html" />
 		</junitreport>
 	</target>
-	
+
 </project>

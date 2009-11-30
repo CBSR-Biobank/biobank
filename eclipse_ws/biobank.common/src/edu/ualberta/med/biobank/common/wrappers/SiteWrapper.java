@@ -546,24 +546,24 @@ public class SiteWrapper extends ModelWrapper<Site> {
     @SuppressWarnings("unchecked")
     protected List<PvInfoPossibleWrapper> getPvInfoPossibleCollection(
         boolean sort) {
-        List<PvInfoPossibleWrapper> PvInfoPossibleCollection = (List<PvInfoPossibleWrapper>) propertiesMap
+        List<PvInfoPossibleWrapper> pvInfoPossibleCollection = (List<PvInfoPossibleWrapper>) propertiesMap
             .get("PvInfoPossibleCollection");
-        if (PvInfoPossibleCollection == null) {
-            Collection<PvInfoPossible> children = wrappedObject
+        if (pvInfoPossibleCollection == null) {
+            Collection<PvInfoPossible> possibleCollection = wrappedObject
                 .getPvInfoPossibleCollection();
-            if (children != null) {
-                PvInfoPossibleCollection = new ArrayList<PvInfoPossibleWrapper>();
-                for (PvInfoPossible possible : children) {
-                    PvInfoPossibleCollection.add(new PvInfoPossibleWrapper(
+            if (possibleCollection != null) {
+                pvInfoPossibleCollection = new ArrayList<PvInfoPossibleWrapper>();
+                for (PvInfoPossible possible : possibleCollection) {
+                    pvInfoPossibleCollection.add(new PvInfoPossibleWrapper(
                         appService, possible));
                 }
                 propertiesMap.put("PvInfoPossibleCollection",
-                    PvInfoPossibleCollection);
+                    pvInfoPossibleCollection);
             }
         }
-        if ((PvInfoPossibleCollection != null) && sort)
-            Collections.sort(PvInfoPossibleCollection);
-        return PvInfoPossibleCollection;
+        if ((pvInfoPossibleCollection != null) && sort)
+            Collections.sort(pvInfoPossibleCollection);
+        return pvInfoPossibleCollection;
     }
 
     protected List<PvInfoPossibleWrapper> getPvInfoPossibleCollection() {
@@ -658,11 +658,11 @@ public class SiteWrapper extends ModelWrapper<Site> {
         return pvInfoTypeMap.keySet().toArray(new String[] {});
     }
 
-    public Integer getPvInfoType(String label) {
+    public String getPvInfoType(String label) {
         PvInfoPossibleWrapper pvInfoPossible = pvInfoPossibleMap.get(label);
         if (pvInfoPossible == null)
             return null;
-        return pvInfoPossible.getPvInfoType().getId();
+        return pvInfoPossible.getPvInfoType().getType();
     }
 
     protected PvInfoPossibleWrapper getPvInfoPossible(String label)
@@ -671,8 +671,17 @@ public class SiteWrapper extends ModelWrapper<Site> {
         return pvInfoPossibleMap.get(label);
     }
 
-    public void setPvInfoPossible(String label, String type, boolean global)
-        throws Exception {
+    /**
+     * Saves a possible patient visit information item that is only associated
+     * with this site. To add a global patient visit information item use
+     * setGlobalPvInfoPossible().
+     * 
+     * @param label The label to be used for the patient visit information item.
+     * @param type The patient visit information item's type (See database table
+     *            PV_INFO_POSSIBLE).
+     * @throws Exception
+     */
+    public void setPvInfoPossible(String label, String type) throws Exception {
         getPvInfoTypeMap();
         PvInfoTypeWrapper pit = pvInfoTypeMap.get(type);
         if (pit == null) {
@@ -685,8 +694,41 @@ public class SiteWrapper extends ModelWrapper<Site> {
             pip = new PvInfoPossibleWrapper(appService, new PvInfoPossible());
             pip.setLabel(label);
         }
-        pip.setSite(global ? null : this);
         pip.setPvInfoType(pit);
+        pip.setSite(this);
+
+        List<PvInfoPossibleWrapper> list = getPvInfoPossibleCollection();
+        if (list == null) {
+            list = new ArrayList<PvInfoPossibleWrapper>();
+        }
+        list.add(pip);
+        setPvInfoPossibleCollection(list);
+    }
+
+    /**
+     * Saves a possible patient visit information item that is global to every
+     * site. To add a patient visit information item for a single site see
+     * setPvInfoPossible().
+     * 
+     * @param label The label to be used for the patient visit information item.
+     * @param type The patient visit information item's type (See database table
+     *            PV_INFO_POSSIBLE).
+     * @throws Exception
+     */
+    public static void setGlobalPvInfoPossible(
+        WritableApplicationService appService, String label, String type)
+        throws Exception {
+        for (PvInfoTypeWrapper dbType : PvInfoTypeWrapper
+            .getAllWrappers(appService)) {
+            if (dbType.getType().equals(type)) {
+                PvInfoPossibleWrapper pip = new PvInfoPossibleWrapper(
+                    appService, new PvInfoPossible());
+                pip.setLabel(label);
+                pip.setPvInfoType(dbType);
+                pip.persist();
+                break;
+            }
+        }
     }
 
     @Override

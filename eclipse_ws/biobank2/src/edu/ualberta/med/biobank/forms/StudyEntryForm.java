@@ -47,7 +47,8 @@ public class StudyEntryForm extends BiobankEntryForm {
             put("name", new FieldInfo("Name", Text.class, SWT.NONE, null,
                 NonEmptyStringValidator.class, "Study name cannot be blank"));
             put("nameShort", new FieldInfo("Short Name", Text.class, SWT.NONE,
-                null, NonEmptyStringValidator.class, "Study short name cannot be blank"));
+                null, NonEmptyStringValidator.class,
+                "Study short name cannot be blank"));
             put("activityStatus", new FieldInfo("Activity Status", Combo.class,
                 SWT.NONE, FormConstants.ACTIVITY_STATUS, null, null));
             put("comment", new FieldInfo("Comments", Text.class, SWT.MULTI,
@@ -200,17 +201,18 @@ public class StudyEntryForm extends BiobankEntryForm {
 
         // START KLUDGE
         //
-        // create "date drawn" - not really a pv info but we'll pretend
+        // create "date processed" - not really a pv info but we'll pretend
         // we just want to show the user that this information is collected
         // by default. Date drawn is already part of the PatientVisit class.
-        //
-        String[] defaultFields = new String[] { "Date Drawn", "Date Processed",
-            "Date Received" };
+        String[] defaultFields = new String[] { "Date Processed" };
 
         for (String field : defaultFields) {
             StudyPvCustomInfo combinedPvInfo = new StudyPvCustomInfo();
             combinedPvInfo.label = field;
             combinedPvInfo.type = 3;
+            combinedPvInfo.isDefault = true;
+            combinedPvInfo.widget = new PvInfoWidget(client, SWT.NONE,
+                combinedPvInfo);
             pvCustomInfoMap.put(field, combinedPvInfo);
         }
         //
@@ -222,6 +224,7 @@ public class StudyEntryForm extends BiobankEntryForm {
             combinedPvInfo.type = studyWrapper.getPvInfoType(label);
             combinedPvInfo.allowedValues = studyWrapper
                 .getPvInfoAllowedValues(label);
+            combinedPvInfo.isDefault = false;
             combinedPvInfo.widget = new PvInfoWidget(client, SWT.NONE,
                 combinedPvInfo);
             combinedPvInfo.widget.addSelectionChangedListener(listener);

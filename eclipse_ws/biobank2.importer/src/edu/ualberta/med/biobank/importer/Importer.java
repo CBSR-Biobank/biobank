@@ -375,18 +375,16 @@ public class Importer {
                         + ")");
                 }
 
-                // Collection<Patient> patients =
-                // shipment.getPatientVisitCollection();
-                // if (patients == null) {
-                // patients = new HashSet<Patient>();
-                // }
-                // patients.add(patient);
+                Collection<Patient> patients = shipment.getPatientCollection();
+                if (patients == null) {
+                    patients = new HashSet<Patient>();
+                }
+                patients.add(patient);
 
                 ++count;
 
             }
         }
-
     }
 
     private void importPatientVisits() throws Exception {
@@ -431,7 +429,7 @@ public class Importer {
                 Shipment shipment = bioBank2Db.getShipment(
                     study.getNameShort(), clinicName, dateReceived);
 
-                // make sure the study is correct
+                // check for shipment
                 if (shipment == null) {
                     throw new Exception("found 0 shipments for studyName/"
                         + study.getNameShort() + " clinicName/" + clinicName
@@ -439,7 +437,7 @@ public class Importer {
                 }
 
                 pv = new PatientVisit();
-                pv.setDateProcessed(bbpdbDateFmt.parse(rs.getString(5)));
+                pv.setDateProcessed(bbpdbDateFmt.parse(dateReceived));
                 pv.setPatient(patient);
                 pv.setShipment(shipment);
                 pv.setComment(rs.getString(4));
@@ -506,7 +504,7 @@ public class Importer {
         rs.next();
         int numSamples = rs.getInt(1);
 
-        s.execute("select patient_visit.visit_nr, patient_visit.date_taken, "
+        s.execute("select patient_visit.visit_nr, patient_visit.date_received, patient_visit.date_taken, "
             + "study_list.study_name_short, sample_list.sample_name_short, cabinet.*, patient.chr_nr "
             + qryPart);
 
@@ -530,11 +528,11 @@ public class Importer {
             int count = 0;
             while (rs.next()) {
                 ++count;
-                cabinetNum = rs.getInt(5);
+                cabinetNum = rs.getInt(6);
                 if (cabinetNum != 1) throw new Exception(
                     "Invalid cabinet number: " + cabinetNum);
 
-                drawerName = rs.getString(6);
+                drawerName = rs.getString(7);
                 Capacity capacity = cabinetType.getCapacity();
                 Integer rowCap = capacity.getRowCapacity();
                 Integer colCap = capacity.getColCapacity();
@@ -548,8 +546,8 @@ public class Importer {
                     continue;
                 }
 
-                binNum = rs.getInt(7) - 1;
-                String binPosStr = rs.getString(8);
+                binNum = rs.getInt(8) - 1;
+                String binPosStr = rs.getString(9);
                 binPos = LabelingScheme.cbsrTwoCharToRowCol(binPosStr, 120, 1,
                     "bin");
 
@@ -557,16 +555,16 @@ public class Importer {
                     + drawerName + String.format("%02d", binNum) + binPosStr
                     + " (" + count + "/" + numSamples + ")");
 
-                String patientNo = cipher.decode(rs.getBytes(17));
+                String patientNo = cipher.decode(rs.getBytes(18));
 
-                visit = bioBank2Db.getPatientVisit(rs.getString(3), patientNo,
+                visit = bioBank2Db.getPatientVisit(rs.getString(4), patientNo,
                     rs.getString(2));
 
                 if (visit == null) {
                     continue;
                 }
 
-                sampleTypeNameShort = rs.getString(4);
+                sampleTypeNameShort = rs.getString(5);
 
                 drawer = bioBank2Db.getChildContainer(cabinet, drawerNum, 0);
                 bin = bioBank2Db.getChildContainer(drawer, binNum, 0);
@@ -585,9 +583,9 @@ public class Importer {
 
                 Sample sample = new Sample();
                 sample.setSampleType(sampleType);
-                sample.setInventoryId(rs.getString(12));
-                sample.setLinkDate(rs.getDate(13));
-                sample.setQuantity(rs.getDouble(14));
+                sample.setInventoryId(rs.getString(13));
+                sample.setLinkDate(rs.getDate(14));
+                sample.setQuantity(rs.getDouble(15));
                 sample.setSamplePosition(spos);
                 sample.setPatientVisit(visit);
                 spos.setSample(sample);
@@ -614,7 +612,7 @@ public class Importer {
         rs.next();
         int numSamples = rs.getInt(1);
 
-        s.execute("select patient_visit.date_taken, "
+        s.execute("select patient_visit.date_received, patient_visit.date_taken, "
             + "study_list.study_name_short, sample_list.sample_name_short, freezer.*, patient.chr_nr "
             + qryPart);
 
@@ -633,7 +631,7 @@ public class Importer {
             RowColPos hotelPos;
             int palletNum;
             String studyName;
-            String dateDrawn;
+            String dateProcessed;
             String hotelName;
             String palletPos;
             String sampleTypeNameShort;
@@ -642,8 +640,8 @@ public class Importer {
             int count = 0;
             while (rs.next()) {
                 ++count;
-                freezerNum = rs.getInt(4);
-                hotelName = rs.getString(5);
+                freezerNum = rs.getInt(5);
+                hotelName = rs.getString(6);
 
                 if (freezerNum == 1) {
                     freezer = freezer01;
@@ -663,24 +661,24 @@ public class Importer {
                     freezerCapacity.getRowCapacity(),
                     freezerCapacity.getColCapacity(), freezerType.getName());
 
-                palletNum = rs.getInt(6) - 1;
-                palletPos = rs.getString(14);
+                palletNum = rs.getInt(7) - 1;
+                palletPos = rs.getString(15);
 
                 System.out.println("importing freezer sample at position "
                     + String.format("%02d", freezerNum) + hotelName
                     + String.format("%02d", palletNum + 1) + palletPos + " ("
                     + count + "/" + numSamples + ")");
 
-                studyName = rs.getString(2);
-                String patientNo = cipher.decode(rs.getBytes(16));
-                dateDrawn = rs.getString(1);
+                studyName = rs.getString(3);
+                String patientNo = cipher.decode(rs.getBytes(17));
+                dateProcessed = rs.getString(1);
 
                 visit = bioBank2Db.getPatientVisit(studyName, patientNo,
-                    dateDrawn);
+                    dateProcessed);
 
                 if (visit == null) continue;
 
-                sampleTypeNameShort = rs.getString(3);
+                sampleTypeNameShort = rs.getString(4);
 
                 hotel = bioBank2Db.getChildContainer(freezer, hotelPos.row,
                     hotelPos.col);
@@ -701,9 +699,9 @@ public class Importer {
 
                 Sample sample = new Sample();
                 sample.setSampleType(sampleType);
-                sample.setInventoryId(rs.getString(10));
-                sample.setLinkDate(rs.getDate(11));
-                sample.setQuantity(rs.getDouble(15));
+                sample.setInventoryId(rs.getString(11));
+                sample.setLinkDate(rs.getDate(12));
+                sample.setQuantity(rs.getDouble(16));
                 sample.setSamplePosition(spos);
                 sample.setPatientVisit(visit);
                 spos.setSample(sample);
