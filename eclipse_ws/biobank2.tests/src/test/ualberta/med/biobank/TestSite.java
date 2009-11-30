@@ -467,7 +467,7 @@ public class TestSite extends TestDatabase {
         SiteWrapper site = SiteHelper.addSite(name);
         site.reload();
 
-        String[] types = site.getPvInfoTypes();
+        String[] types = site.getPvInfoTypeNames();
         if (types.length == 0) {
             Assert.fail("Can't test without pvinfotypes");
         }
@@ -480,10 +480,10 @@ public class TestSite extends TestDatabase {
         boolean labelExists = findLabel(site, labelGlobal);
         Assert.assertTrue(labelExists);
 
-        Assert.assertEquals(type, site.getPvInfoType(labelGlobal));
+        Assert.assertEquals(type, site.getPvInfoTypeName(labelGlobal));
 
         SiteWrapper site2 = SiteHelper.addSite(name + "secondSite");
-        types = site2.getPvInfoTypes();
+        types = site2.getPvInfoTypeNames();
         if (types.length == 0) {
             Assert.fail("Can't test without pvinfotypes");
         }
@@ -496,7 +496,7 @@ public class TestSite extends TestDatabase {
         labelExists = findLabel(site2, labelSite);
         Assert.assertTrue(labelExists);
 
-        Assert.assertEquals(type, site2.getPvInfoType(labelGlobal));
+        Assert.assertEquals(type, site2.getPvInfoTypeName(labelGlobal));
 
         labelExists = findLabel(site, labelSite);
         Assert.assertFalse(labelExists);

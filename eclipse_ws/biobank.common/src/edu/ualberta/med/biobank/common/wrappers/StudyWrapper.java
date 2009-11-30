@@ -266,6 +266,24 @@ public class StudyWrapper extends ModelWrapper<Study> {
         propertiesMap.put("sampleStorageCollection", ssCollection);
     }
 
+    /*
+     * Removes the PvInfo objects that are not contained in the collection.
+     */
+    private void deletePvInfoDifference(Study origStudy)
+        throws BiobankCheckException, ApplicationException, WrapperException {
+        List<PvInfoWrapper> oldPvInfoList = new StudyWrapper(appService,
+            origStudy).getPvInfoCollection();
+        if (oldPvInfoList == null) {
+            return;
+        }
+        List<PvInfoWrapper> newPvInfoList = getPvInfoCollection();
+        for (PvInfoWrapper st : oldPvInfoList) {
+            if ((newPvInfoList == null) || !newPvInfoList.contains(st)) {
+                st.delete();
+            }
+        }
+    }
+
     /**
      * Removes the sample storage objects that are not contained in the
      * collection.
@@ -427,36 +445,86 @@ public class StudyWrapper extends ModelWrapper<Study> {
         return getPvInfo(label).getPvInfoType().getId();
     }
 
+    private PvInfoWrapper getNewPvInfo(String label) throws Exception {
+        PvInfoWrapper pvInfo;
+        // is label a valid PvInfoPossible value?
+        SiteWrapper site = getSite();
+        if (site == null) {
+            throw new Exception("site is null");
+        }
+        PvInfoPossibleWrapper pip = site.getPvInfoPossible(label);
+        if (pip == null) {
+            throw new Exception("PvInfo with label \"" + label
+                + "\" is invalid: not in PvInfoPossible");
+        }
+
+        // label is a valid PvInfoPossible, add PvInfo to the study
+        pvInfo = new PvInfoWrapper(appService);
+        pvInfo.setPvInfoPossible(pip);
+        pvInfo.setPvInfoType(pip.getPvInfoType());
+        pvInfo.setLabel(label);
+        return pvInfo;
+    }
+
+    /**
+     * Retrieves the allowed values for a patient visit additional information
+     * item.
+     * 
+     * @param label The label to be used by the information item.
+     * @return Semicolon separated list of allowed values.
+     * @throws Exception hrown if there is no patient visit information item
+     *             with the label specified.
+     */
     public String[] getPvInfoAllowedValues(String label) throws Exception {
         getPvInfoMap();
         PvInfoWrapper pvInfo = getPvInfo(label);
+        if (pvInfo == null) {
+            // this pv info does not exist yet
+            pvInfo = getNewPvInfo(label);
+        }
         String joinedPossibleValues = pvInfo.getAllowedValues();
         if (joinedPossibleValues == null)
             return null;
         return joinedPossibleValues.split(";");
     }
 
-    public void setPvInfoAllowedValues(String label, String[] allowedValues)
+    /**
+     * Assigns patient visit additional information items.
+     * 
+     * @param label The label to be used for the information item. Note: the
+     *            label must already be in the patient visit possible values for
+     *            the site associated with the study.
+     * @param allowedValues If the information item is of type "select_single"
+     *            or "select_multiple" this array contains the possible values
+     *            as a String array. Otherwise, this parameter should be set to
+     *            null.
+     * 
+     * @throws Exception Thrown if there is no possible patient visit with the
+     *             label specified.
+     */
+    public void setPvInfo(String label, String[] allowedValues)
         throws Exception {
         getPvInfoMap();
         PvInfoWrapper pvInfo = pvInfoMap.get(label);
         if (pvInfo == null) {
-            // is label a valid PvInfoPossible value?
-            SiteWrapper site = getSite();
-            if (site == null) {
-                throw new Exception("site is null");
-            }
-            PvInfoPossibleWrapper pip = site.getPvInfoPossible(label);
-            if (pip == null) {
-                throw new Exception("PvInfo with label \"" + label
-                    + "\" is invalid: not in PvInfoPossible");
-            }
-            pvInfo = new PvInfoWrapper(appService, new PvInfo());
-            pvInfo.setPvInfoPossible(pip);
-            pvInfo.setLabel(label);
+            pvInfo = getNewPvInfo(label);
         }
         pvInfo.setAllowedValues(StringUtils.join(allowedValues, ';'));
         pvInfoMap.put(label, pvInfo);
+    }
+
+    /**
+     * Assigns patient visit additional information items.
+     * 
+     * @param label The label to be used for the information item. Note: the
+     *            label must already be in the patient visit possible values for
+     *            the site associated with the study.
+     * 
+     * @throws Exception Thrown if there is no possible patient visit with the
+     *             label specified.
+     */
+    public void setPvInfo(String label) throws Exception {
+        setPvInfo(label, null);
     }
 
     public List<ClinicWrapper> getClinicCollection()
@@ -601,21 +669,24 @@ public class StudyWrapper extends ModelWrapper<Study> {
     }
 
     @Override
-    public void persist() throws BiobankCheckException, ApplicationException,
-        WrapperException {
-        if (pvInfoMap != null) {
-            setPvInfoCollection(new ArrayList<PvInfoWrapper>(pvInfoMap.values()));
-        }
-        super.persist();
-
-    }
-
-    @Override
     protected void persistDependencies(Study origObject)
         throws BiobankCheckException, ApplicationException, WrapperException {
+        // add new PvInfos
+        if (pvInfoMap != null) {
+            List<PvInfoWrapper> list = new ArrayList<PvInfoWrapper>(pvInfoMap
+                .values());
+            for (PvInfoWrapper pvInfo : list) {
+                if (pvInfo.isNew()) {
+                    pvInfo.persist();
+                }
+            }
+            setPvInfoCollection(list);
+        }
+
         if (origObject != null) {
             deleteSampleStorageDifference(origObject);
             deleteSampleSourceDifference(origObject);
+            deletePvInfoDifference(origObject);
         }
     }
 

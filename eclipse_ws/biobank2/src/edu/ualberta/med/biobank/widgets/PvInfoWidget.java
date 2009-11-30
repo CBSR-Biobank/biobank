@@ -46,12 +46,6 @@ public class PvInfoWidget extends BiobankWidget {
     private static Map<String, LabelDialogInfo> LABEL_DLG_INFO = new HashMap<String, LabelDialogInfo>() {
         private static final long serialVersionUID = 1L;
         {
-            put("Aliquot Volume", new LabelDialogInfo(
-                "Allowed Aliquot Volumes", "Please enter a new volume:",
-                "To enter multiple volumes, separate with semicolon."));
-            put("Blood Received", new LabelDialogInfo(
-                "Allowed Blood Received Volumes", "Please enter a new volume:",
-                "To enter multiple volumes, separate with semicolon."));
             put(
                 "Visit Type",
                 new LabelDialogInfo("Visit Type Values",
@@ -64,7 +58,7 @@ public class PvInfoWidget extends BiobankWidget {
     };
 
     public PvInfoWidget(Composite parent, int style,
-        final PvCustomInfo pvCustomInfo) {
+        final PvCustomInfo pvCustomInfo, boolean selected) {
         super(parent, style);
 
         setLayout(new GridLayout(1, false));
@@ -72,7 +66,7 @@ public class PvInfoWidget extends BiobankWidget {
 
         hasListValues = (pvCustomInfo.type.equals(4) || pvCustomInfo.type
             .equals(5));
-        boolean selected = (pvCustomInfo.allowedValues != null);
+        selected |= (pvCustomInfo.allowedValues != null);
 
         if (hasListValues) {
             checkButton = new Button(this, SWT.CHECK);

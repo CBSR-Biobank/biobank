@@ -226,8 +226,8 @@ public class TestStudy extends TestDatabase {
         SiteWrapper site = SiteHelper.addSite(name);
         StudyWrapper study = StudyHelper.addStudy(site, name);
 
-        study.setPvInfoAllowedValues("Worksheet", null);
-        study.setPvInfoAllowedValues("Consent", null);
+        study.setPvInfo("Worksheet");
+        study.setPvInfo("Consent");
         study.persist();
 
         study.reload();
@@ -240,13 +240,13 @@ public class TestStudy extends TestDatabase {
         SiteWrapper site = SiteHelper.addSite(name);
         StudyWrapper study = StudyHelper.addStudy(site, name);
 
-        study.setPvInfoAllowedValues("Worksheet", null);
-        study.setPvInfoAllowedValues("Consent", null);
+        study.setPvInfo("Worksheet");
+        study.setPvInfo("Consent");
         study.persist();
 
         study.reload();
-        String typeId = site.getPvInfoType("Consent");
-        Assert.assertEquals(typeId, study.getPvInfoType("Consent"));
+        String type = site.getPvInfoTypeName("Consent");
+        Assert.assertEquals(type, study.getPvInfoType("Consent"));
     }
 
     @Test
@@ -256,9 +256,9 @@ public class TestStudy extends TestDatabase {
         StudyWrapper study = StudyHelper.addStudy(site, name);
 
         String pvInfoLabel = "Visit Type";
-        study.setPvInfoAllowedValues("Worksheet", null);
+        study.setPvInfo("Worksheet");
         String[] values = new String[] { "toto", "titi", "tata" };
-        study.setPvInfoAllowedValues(pvInfoLabel, values);
+        study.setPvInfo(pvInfoLabel, values);
         study.persist();
 
         study.reload();
