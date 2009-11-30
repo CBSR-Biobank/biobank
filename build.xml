@@ -344,7 +344,6 @@
 			<fileset dir="${eclipse.proj.dir}/lib" includes="**/*.jar" />
 			<fileset dir="${eclipse.proj.dir.common}/lib" includes="**/*.jar" />
 			<fileset dir="${eclipse.proj.dir.importer}/lib" includes="**/*.jar" />
-			<fileset dir="${eclipse.proj.dir.junit}/lib" includes="**/*.jar" />
 		</delete>
 		<delete dir="${req.jars.dir}" />
 	</target>
