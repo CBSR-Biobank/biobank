@@ -162,23 +162,13 @@ public class StudyWrapper extends ModelWrapper<Study> {
         }
     }
 
-    private void checkContactsFromSameSite() throws BiobankCheckException,
-        ApplicationException {
-        if (getContactCollection() != null && getContactCollection().size() > 0) {
-            HQLCriteria criteria = new HQLCriteria(
-                "select count(contact.clinic.site) from "
-                    + Study.class.getName()
-                    + " as study inner join study.contactCollection as contacts"
-                    + " where study.site.id = contacts.clinic.site and study.id = ?",
-                Arrays.asList(new Object[] { getId() }));
-            List<Long> result = appService.query(criteria);
-            if (result.size() != 1) {
-                throw new BiobankCheckException(
-                    "Invalid size for HQL query result");
-            }
-            if (result.get(0) == 0) {
-                throw new BiobankCheckException(
-                    "Contact associated with this study should be from the same site.");
+    private void checkContactsFromSameSite() throws BiobankCheckException {
+        if (getContactCollection() != null) {
+            for (ContactWrapper contact : getContactCollection()) {
+                if (!contact.getClinic().getSite().equals(getSite())) {
+                    throw new BiobankCheckException(
+                        "Contact associated with this study should be from the same site.");
+                }
             }
         }
     }
