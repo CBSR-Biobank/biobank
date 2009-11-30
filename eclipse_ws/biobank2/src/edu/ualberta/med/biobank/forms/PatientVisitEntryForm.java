@@ -34,7 +34,10 @@ import edu.ualberta.med.biobank.treeview.PatientVisitAdapter;
 import edu.ualberta.med.biobank.validators.DoubleNumberValidator;
 import edu.ualberta.med.biobank.widgets.ComboAndQuantityWidget;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
+import edu.ualberta.med.biobank.widgets.PvSampleSourceEntryWidget;
 import edu.ualberta.med.biobank.widgets.SelectMultipleWidget;
+import edu.ualberta.med.biobank.widgets.listeners.BiobankEntryFormWidgetListener;
+import edu.ualberta.med.biobank.widgets.listeners.MultiSelectEvent;
 
 public class PatientVisitEntryForm extends BiobankEntryForm {
 
@@ -64,6 +67,8 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
     private List<FormPvCustomInfo> pvCustomInfoList;
 
     private ComboViewer shipmentsComboViewer;
+
+    private PvSampleSourceEntryWidget pvSampleSourceEntryWidget;
 
     @Override
     public void init() {
@@ -105,6 +110,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         form.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
             BioBankPlugin.IMG_PATIENT_VISIT));
         createMainSection();
+        createSourcesSection();
         if (patientVisitWrapper.isNew()) {
             setDirty(true);
         }
@@ -146,6 +152,27 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         createBoundWidgetWithLabel(client, Text.class, SWT.MULTI, "Comments",
             null,
             BeansObservables.observeValue(patientVisitWrapper, "comment"), null);
+    }
+
+    private void createSourcesSection() {
+        Composite client = createSectionWithClient("Source Vessels");
+
+        GridLayout layout = new GridLayout(1, false);
+        client.setLayout(layout);
+        client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+        pvSampleSourceEntryWidget = new PvSampleSourceEntryWidget(client,
+            SWT.NONE, patientVisitWrapper.getPvSampleSourceCollection(),
+            toolkit);
+        pvSampleSourceEntryWidget
+            .addSelectionChangedListener(new BiobankEntryFormWidgetListener() {
+                @Override
+                public void selectionChanged(MultiSelectEvent event) {
+                    setDirty(true);
+                }
+            });
+        pvSampleSourceEntryWidget.addBinding(widgetCreator);
+
     }
 
     private void createPvDataSection(Composite client) throws Exception {
@@ -247,6 +274,10 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
             patientVisitWrapper.setShipment((Shipment) null);
         }
 
+        patientVisitWrapper
+            .setPvSampleSourceCollection(pvSampleSourceEntryWidget
+                .getPvSampleSources());
+
         setPvCustomInfo();
 
         if (patientVisitWrapper.isNew()) {
@@ -297,7 +328,9 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         if (patientVisitWrapper.getDateProcessed() == null) {
             patientVisitWrapper.setDateProcessed(new Date());
         }
-
+        pvSampleSourceEntryWidget
+            .setSelectedPvSampleSources(patientVisitWrapper
+                .getPvSampleSourceCollection());
         // TODO reset for optional values
     }
 }

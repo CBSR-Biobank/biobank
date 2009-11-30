@@ -27,7 +27,8 @@ public class TestSite extends TestDatabase {
 
     @Test
     public void testGettersAndSetters() throws Exception {
-        SiteWrapper site = SiteHelper.addSite("testGettersAndSetters");
+        SiteWrapper site = SiteHelper.addSite("testGettersAndSetters"
+            + r.nextInt());
         testGettersAndSetters(site);
     }
 

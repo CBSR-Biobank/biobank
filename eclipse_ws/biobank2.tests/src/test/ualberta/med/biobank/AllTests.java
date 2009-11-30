@@ -14,7 +14,7 @@ import test.ualberta.med.biobank.internal.DbHelper;
 @RunWith(Suite.class)
 @SuiteClasses( { TestSite.class, TestPatient.class, TestPatientVisit.class,
     TestStudy.class, TestContainerLabelingScheme.class,
-    TestShptSampleSource.class, TestSample.class, TestClinic.class,
+    TestPvSampleSource.class, TestSample.class, TestClinic.class,
     TestSampleStorage.class, TestSampleSource.class, TestSampleType.class,
     TestContainer.class, TestContainerType.class, TestShipment.class,
     TestContact.class })

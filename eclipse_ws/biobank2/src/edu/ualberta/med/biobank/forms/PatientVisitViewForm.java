@@ -13,6 +13,7 @@ import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.model.PvCustomInfo;
 import edu.ualberta.med.biobank.treeview.PatientVisitAdapter;
+import edu.ualberta.med.biobank.widgets.infotables.PvSampleSourceInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.SamplesListWidget;
 
 public class PatientVisitViewForm extends BiobankViewForm {
@@ -68,6 +69,7 @@ public class PatientVisitViewForm extends BiobankViewForm {
         form.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
             BioBankPlugin.IMG_PATIENT_VISIT));
         createMainSection();
+        createSourcesSection();
         createSamplesSection();
     }
 
@@ -94,6 +96,12 @@ public class PatientVisitViewForm extends BiobankViewForm {
             "Creator");
 
         setPatientVisitValues();
+    }
+
+    private void createSourcesSection() {
+        Composite client = createSectionWithClient("Source Vessels");
+        new PvSampleSourceInfoTable(client, patientVisitWrapper
+            .getPvSampleSourceCollection());
     }
 
     private void createPvDataSection(Composite client) throws Exception {

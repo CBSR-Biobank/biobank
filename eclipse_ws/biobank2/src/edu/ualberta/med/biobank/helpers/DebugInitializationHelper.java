@@ -34,11 +34,10 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SampleSourceWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ShptSampleSourceWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ShippingCompanyWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.common.wrappers.WrapperException;
@@ -196,15 +195,15 @@ public class DebugInitializationHelper {
 
     @SuppressWarnings("unused")
     private void insertShipmentsInClinics() throws Exception {
-        insertShipmentsInClinic(clinics[0]);
-        insertShipmentsInClinic(clinics[1]);
-    }
-
-    private void insertShipmentsInClinic(ClinicWrapper clinic) throws Exception {
+        ShippingCompanyWrapper shippingCompany = insertShippingCompany();
         Random r = new Random();
-        List<SampleSourceWrapper> sampleSources = SampleSourceWrapper
-            .getAllSampleSources(appService);
-        for (int i = 0; i < 50; i++) {
+        for (int i = 0; i < 100; i++) {
+            ClinicWrapper clinic;
+            if (i < 50) {
+                clinic = clinics[0];
+            } else {
+                clinic = clinics[1];
+            }
             ShipmentWrapper shipment = new ShipmentWrapper(appService);
             String dateStr = String.format("2009-%02d-%02d %02d:%02d", r
                 .nextInt(12) + 1, r.nextInt(28), r.nextInt(24), r.nextInt(60));
@@ -214,20 +213,20 @@ public class DebugInitializationHelper {
             shipment.setDateReceived(DateFormatter.parseToDateTime(dateStr));
             shipment.setWaybill(r.nextInt() + getRandomString(r, 10));
             shipment.setClinic(clinic);
-
-            ShptSampleSourceWrapper sss = new ShptSampleSourceWrapper(
-                appService);
-            sss.setSampleSource(sampleSources.get(5));
-            sss.setQuantity(5);
-            sss.setPatientCollection(Arrays
+            shipment.setPatientCollection(Arrays
                 .asList(new PatientWrapper[] { patients.get(i) }));
-            sss.setShipment(shipment);
-            shipment.setShptSampleSourceCollection(Arrays
-                .asList(new ShptSampleSourceWrapper[] { sss }));
-
+            shipment.setShippingCompany(shippingCompany);
             shipment.persist();
         }
-        clinic.reload();
+        clinics[0].reload();
+        clinics[1].reload();
+    }
+
+    private ShippingCompanyWrapper insertShippingCompany() throws Exception {
+        ShippingCompanyWrapper scw = new ShippingCompanyWrapper(appService);
+        scw.setName("Fedex");
+        scw.persist();
+        return scw;
     }
 
     @SuppressWarnings("unused")
@@ -269,10 +268,9 @@ public class DebugInitializationHelper {
             r.nextInt(12) + 1, r.nextInt(24), r.nextInt(60));
         patientVisit.setDateProcessed(DateFormatter.parseToDateTime(dateStr));
         patientVisit.setPatient(patient);
-        List<ShptSampleSourceWrapper> sssList = patient
-            .getShptSampleSourceCollection();
-        if (sssList.size() > 0) {
-            patientVisit.setShipment(sssList.get(0).getShipment());
+        List<ShipmentWrapper> shipments = patient.getShipmentCollection();
+        if (shipments.size() > 0) {
+            patientVisit.setShipment(shipments.get(0));
         }
         SampleWrapper sample = createSample(patientVisit);
         patientVisit.setSampleCollection(Arrays
@@ -306,27 +304,6 @@ public class DebugInitializationHelper {
         study.persist();
         study.reload();
         patients = study.getPatientCollection();
-    }
-
-    private void insertShptSampleSourceForShipment() throws Exception {
-        List<ShipmentWrapper> shipmentCollection = new ArrayList<ShipmentWrapper>();
-        shipmentCollection.addAll(clinics[0].getShipmentCollection());
-        shipmentCollection.addAll(clinics[1].getShipmentCollection());
-        int i = 0;
-        List<SampleSourceWrapper> sampleSources = SampleSourceWrapper
-            .getAllSampleSources(appService);
-        for (PatientWrapper patient : patients) {
-            ShipmentWrapper shipment = shipmentCollection.get(i);
-            ShptSampleSourceWrapper sss = new ShptSampleSourceWrapper(
-                appService);
-            sss.setSampleSource(sampleSources.get(5));
-            sss.setQuantity(5);
-            sss.setPatientCollection(Arrays
-                .asList(new PatientWrapper[] { patient }));
-            sss.setShipment(shipment);
-            sss.persist();
-            i++;
-        }
     }
 
     @SuppressWarnings("unused")

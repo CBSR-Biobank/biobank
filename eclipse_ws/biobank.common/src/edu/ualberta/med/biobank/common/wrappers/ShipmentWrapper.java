@@ -11,9 +11,10 @@ import java.util.List;
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.model.Clinic;
+import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.Shipment;
-import edu.ualberta.med.biobank.model.ShptSampleSource;
+import edu.ualberta.med.biobank.model.ShippingCompany;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -39,31 +40,32 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
     @Override
     protected void persistDependencies(Shipment origObject)
         throws BiobankCheckException, ApplicationException, WrapperException {
-        if (origObject != null) {
-            removeDeletedShptSampleSources(origObject);
-        }
+        // if (origObject != null) {
+        // removeDeletedShptSampleSources(origObject);
+        // }
     }
 
-    private void removeDeletedShptSampleSources(Shipment shptDatabase)
-        throws BiobankCheckException, ApplicationException, WrapperException {
-        List<ShptSampleSourceWrapper> newSampleSources = getShptSampleSourceCollection();
-        List<ShptSampleSourceWrapper> oldSampleSources = new ShipmentWrapper(
-            appService, shptDatabase).getShptSampleSourceCollection();
-        if (oldSampleSources != null) {
-            for (ShptSampleSourceWrapper ss : oldSampleSources) {
-                if ((newSampleSources == null)
-                    || !newSampleSources.contains(ss)) {
-                    ss.delete();
-                }
-            }
-        }
-    }
+    // private void removeDeletedShptSampleSources(Shipment shptDatabase)
+    // throws BiobankCheckException, ApplicationException, WrapperException {
+    // List<PvSampleSourceWrapper> newSampleSources =
+    // getShptSampleSourceCollection();
+    // List<PvSampleSourceWrapper> oldSampleSources = new ShipmentWrapper(
+    // appService, shptDatabase).getShptSampleSourceCollection();
+    // if (oldSampleSources != null) {
+    // for (PvSampleSourceWrapper ss : oldSampleSources) {
+    // if ((newSampleSources == null)
+    // || !newSampleSources.contains(ss)) {
+    // ss.delete();
+    // }
+    // }
+    // }
+    // }
 
     @Override
     protected String[] getPropertyChangeNames() {
         return new String[] { "dateShipped", "dateReceived", "clinic",
-            "comment", "shptSampleSourceCollection", "patientVisitCollection",
-            "waybill", "oldShipment" };
+            "comment", "patientVisitCollection", "waybill", "boxNumber",
+            "shippingCompany", "patientCollection" };
     }
 
     @Override
@@ -83,14 +85,14 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
                 + getWaybill() + " already exist in clinic "
                 + getClinic().getName() + ".");
         }
-        checkShptSampleSources();
+        checkPatients();
     }
 
-    private void checkShptSampleSources() throws BiobankCheckException {
-        List<ShptSampleSourceWrapper> shptSS = getShptSampleSourceCollection();
-        if (shptSS == null || shptSS.size() == 0) {
+    private void checkPatients() throws BiobankCheckException {
+        List<PatientWrapper> patients = getPatientCollection();
+        if (patients == null || patients.size() == 0) {
             throw new BiobankCheckException(
-                "At least one sample source should be added to this shipment");
+                "At least one patient source should be added to this shipment");
         }
     }
 
@@ -169,55 +171,6 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
     }
 
     @SuppressWarnings("unchecked")
-    public List<ShptSampleSourceWrapper> getShptSampleSourceCollection(
-        boolean sort) {
-        List<ShptSampleSourceWrapper> shptSampleSourceCollection = (List<ShptSampleSourceWrapper>) propertiesMap
-            .get("shptSampleSourceCollection");
-        if (shptSampleSourceCollection == null) {
-            Collection<ShptSampleSource> children = wrappedObject
-                .getShptSampleSourceCollection();
-            if (children != null) {
-                shptSampleSourceCollection = new ArrayList<ShptSampleSourceWrapper>();
-                for (ShptSampleSource pvSampleSource : children) {
-                    shptSampleSourceCollection.add(new ShptSampleSourceWrapper(
-                        appService, pvSampleSource));
-                }
-                propertiesMap.put("shptSampleSourceCollection",
-                    shptSampleSourceCollection);
-            }
-        }
-        if ((shptSampleSourceCollection != null) && sort)
-            Collections.sort(shptSampleSourceCollection);
-        return shptSampleSourceCollection;
-    }
-
-    public List<ShptSampleSourceWrapper> getShptSampleSourceCollection() {
-        return getShptSampleSourceCollection(false);
-    }
-
-    public void setShptSampleSourceCollection(
-        Collection<ShptSampleSource> shptSampleSources, boolean setNull) {
-        Collection<ShptSampleSource> oldCollection = wrappedObject
-            .getShptSampleSourceCollection();
-        wrappedObject.setShptSampleSourceCollection(shptSampleSources);
-        propertyChangeSupport.firePropertyChange("shptSampleSourceCollection",
-            oldCollection, shptSampleSources);
-        if (setNull) {
-            propertiesMap.put("shptSampleSourceCollection", null);
-        }
-    }
-
-    public void setShptSampleSourceCollection(
-        Collection<ShptSampleSourceWrapper> shptSampleSources) {
-        Collection<ShptSampleSource> shptCollection = new HashSet<ShptSampleSource>();
-        for (ShptSampleSourceWrapper pv : shptSampleSources) {
-            shptCollection.add(pv.getWrappedObject());
-        }
-        setShptSampleSourceCollection(shptCollection, false);
-        propertiesMap.put("shptSampleSourceCollection", shptSampleSources);
-    }
-
-    @SuppressWarnings("unchecked")
     public List<PatientVisitWrapper> getPatientVisitCollection() {
         List<PatientVisitWrapper> patientVisitCollection = (List<PatientVisitWrapper>) propertiesMap
             .get("patientVisitCollection");
@@ -278,6 +231,82 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
         String old = getWaybill();
         wrappedObject.setWaybill(waybill);
         propertyChangeSupport.firePropertyChange("waybill", old, waybill);
+    }
+
+    public String getBoxNumber() {
+        return wrappedObject.getBoxNumber();
+    }
+
+    public void setBoxNumber(String boxNumber) {
+        String old = getBoxNumber();
+        wrappedObject.setBoxNumber(boxNumber);
+        propertyChangeSupport.firePropertyChange("boxNumber", old, boxNumber);
+    }
+
+    public ShippingCompanyWrapper getShippingCompany() {
+        ShippingCompany sc = wrappedObject.getShippingCompany();
+        if (sc == null) {
+            return null;
+        }
+        return new ShippingCompanyWrapper(appService, sc);
+    }
+
+    public void setShippingCompany(ShippingCompany sc) {
+        ShippingCompany old = wrappedObject.getShippingCompany();
+        wrappedObject.setShippingCompany(sc);
+        propertyChangeSupport.firePropertyChange("shippingCompany", old, sc);
+    }
+
+    public void setShippingCompany(ShippingCompanyWrapper sc) {
+        if (sc == null) {
+            setShippingCompany((ShippingCompany) null);
+        } else {
+            setShippingCompany(sc.wrappedObject);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<PatientWrapper> getPatientCollection(boolean sort) {
+        List<PatientWrapper> patientCollection = (List<PatientWrapper>) propertiesMap
+            .get("patientCollection");
+        if (patientCollection == null) {
+            Collection<Patient> children = wrappedObject.getPatientCollection();
+            if (children != null) {
+                patientCollection = new ArrayList<PatientWrapper>();
+                for (Patient patient : children) {
+                    patientCollection.add(new PatientWrapper(appService,
+                        patient));
+                }
+                propertiesMap.put("patientCollection", patientCollection);
+            }
+        }
+        if ((patientCollection != null) && sort)
+            Collections.sort(patientCollection);
+        return patientCollection;
+    }
+
+    public List<PatientWrapper> getPatientCollection() {
+        return getPatientCollection(false);
+    }
+
+    public void setPatientCollection(Collection<Patient> patients,
+        boolean setNull) {
+        Collection<Patient> oldPatients = wrappedObject.getPatientCollection();
+        wrappedObject.setPatientCollection(patients);
+        propertyChangeSupport.firePropertyChange("patientCollection",
+            oldPatients, patients);
+        if (setNull) {
+            propertiesMap.put("patientCollection", null);
+        }
+    }
+
+    public void setPatientCollection(List<PatientWrapper> patients) {
+        Collection<Patient> patientsObjects = new HashSet<Patient>();
+        for (PatientWrapper p : patients) {
+            patientsObjects.add(p.getWrappedObject());
+        }
+        setPatientCollection(patientsObjects, false);
+        propertiesMap.put("patientCollection", patients);
     }
 
     @Override
