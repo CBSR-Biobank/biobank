@@ -1,6 +1,8 @@
 package edu.ualberta.med.biobank.forms;
 
-import org.apache.commons.collections.map.ListOrderedMap;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
@@ -11,6 +13,7 @@ import org.eclipse.swt.widgets.Label;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
+import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.PvCustomInfo;
 import edu.ualberta.med.biobank.treeview.PatientVisitAdapter;
 import edu.ualberta.med.biobank.widgets.infotables.PvSampleSourceInfoTable;
@@ -25,13 +28,13 @@ public class PatientVisitViewForm extends BiobankViewForm {
 
     private PatientVisitAdapter patientVisitAdapter;
 
-    private PatientVisitWrapper patientVisitWrapper;
+    private PatientVisitWrapper patientVisit;
 
     private Label siteLabel;
 
     private SamplesListInfoTable samplesWidget;
 
-    private ListOrderedMap pvCustomInfoMap;
+    private List<FormPvCustomInfo> pvCustomInfoList;
 
     private Label clinicLabel;
 
@@ -41,10 +44,8 @@ public class PatientVisitViewForm extends BiobankViewForm {
 
     private Label usernameLabel;
 
-    public PatientVisitViewForm() {
-        super();
-        pvCustomInfoMap = new ListOrderedMap();
-
+    private class FormPvCustomInfo extends PvCustomInfo {
+        Label widget;
     }
 
     @Override
@@ -54,16 +55,16 @@ public class PatientVisitViewForm extends BiobankViewForm {
                 + adapter.getClass().getName());
 
         patientVisitAdapter = (PatientVisitAdapter) adapter;
-        patientVisitWrapper = patientVisitAdapter.getWrapper();
+        patientVisit = patientVisitAdapter.getWrapper();
         retrievePatientVisit();
 
-        setPartName("Visit " + patientVisitWrapper.getFormattedDateProcessed());
+        setPartName("Visit " + patientVisit.getFormattedDateProcessed());
     }
 
     @Override
     protected void createFormContent() throws Exception {
         form.setText("Visit Drawn Date: "
-            + patientVisitWrapper.getFormattedDateProcessed());
+            + patientVisit.getFormattedDateProcessed());
         form.getBody().setLayout(new GridLayout(1, false));
         form.getBody().setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         form.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
@@ -98,24 +99,18 @@ public class PatientVisitViewForm extends BiobankViewForm {
         setPatientVisitValues();
     }
 
-    private void createSourcesSection() {
-        Composite client = createSectionWithClient("Source Vessels");
-        new PvSampleSourceInfoTable(client, patientVisitWrapper
-            .getPvSampleSourceCollection());
-    }
-
     private void createPvDataSection(Composite client) throws Exception {
-        String[] labels = patientVisitWrapper.getPvInfoLabels();
+        StudyWrapper study = patientVisit.getPatient().getStudy();
+        String[] labels = study.getPvInfoLabels();
         if (labels == null)
             return;
 
-        Label widget;
-        for (String label : labels) {
-            PvCustomInfo combinedPvInfo = new PvCustomInfo(label,
-                patientVisitWrapper.getPvInfoType(label), null);
-            combinedPvInfo.setValue(patientVisitWrapper.getPvInfo(label));
+        pvCustomInfoList = new ArrayList<FormPvCustomInfo>();
 
-            pvCustomInfoMap.put(label, combinedPvInfo);
+        for (String label : labels) {
+            FormPvCustomInfo combinedPvInfo = new FormPvCustomInfo();
+            combinedPvInfo.setLabel(label);
+            combinedPvInfo.setType(study.getPvInfoType(label));
 
             Label labelWidget = toolkit.createLabel(client, label + ":",
                 SWT.LEFT);
@@ -128,36 +123,49 @@ public class PatientVisitViewForm extends BiobankViewForm {
                 style |= SWT.WRAP;
             }
 
-            if ((combinedPvInfo.getValue() != null)
-                && combinedPvInfo.getType().equals(5)) {
-                combinedPvInfo.setValue(combinedPvInfo.getValue().replace(';',
-                    '\n'));
+            String value = patientVisit.getPvInfo(label);
+            if (combinedPvInfo.getType().equals(5) && (value != null)) {
+                combinedPvInfo.setValue(value.replace(';', '\n'));
+            } else {
+                combinedPvInfo.setValue(value);
             }
 
-            widget = toolkit.createLabel(client, combinedPvInfo.getValue(),
-                style);
+            combinedPvInfo.widget = toolkit.createLabel(client, combinedPvInfo
+                .getValue(), style);
             GridData gd = new GridData(GridData.FILL_HORIZONTAL);
-            widget.setLayoutData(gd);
+            combinedPvInfo.widget.setLayoutData(gd);
+
+            pvCustomInfoList.add(combinedPvInfo);
         }
     }
 
     private void setPatientVisitValues() {
-        FormUtils.setTextValue(siteLabel, patientVisitWrapper.getShipment()
+        FormUtils.setTextValue(siteLabel, patientVisit.getShipment()
             .getClinic().getSite().getName());
         FormUtils.setTextValue(clinicLabel,
-            patientVisitWrapper.getShipment() == null ? ""
-                : patientVisitWrapper.getShipment().getClinic().getName());
-        FormUtils.setTextValue(dateProcessedLabel, patientVisitWrapper
+            patientVisit.getShipment() == null ? "" : patientVisit
+                .getShipment().getClinic().getName());
+        FormUtils.setTextValue(dateProcessedLabel, patientVisit
             .getFormattedDateProcessed());
-        FormUtils.setTextValue(commentLabel, patientVisitWrapper.getComment());
-        FormUtils
-            .setTextValue(usernameLabel, patientVisitWrapper.getUsername());
-        // FIXME update all pvinfos ?
+        FormUtils.setTextValue(commentLabel, patientVisit.getComment());
+        FormUtils.setTextValue(usernameLabel, patientVisit.getUsername());
+
+        // assign PvInfo
+        for (FormPvCustomInfo combinedPvInfo : pvCustomInfoList) {
+            FormUtils.setTextValue(combinedPvInfo.widget, combinedPvInfo
+                .getValue());
+        }
+    }
+
+    private void createSourcesSection() {
+        Composite client = createSectionWithClient("Source Vessels");
+        new PvSampleSourceInfoTable(client, patientVisit
+            .getPvSampleSourceCollection());
     }
 
     private void createSamplesSection() {
         Composite parent = createSectionWithClient("Samples");
-        samplesWidget = new SamplesListInfoTable(parent, patientVisitWrapper
+        samplesWidget = new SamplesListInfoTable(parent, patientVisit
             .getSampleCollection());
         samplesWidget.adaptToToolkit(toolkit, true);
         samplesWidget.setSelection(patientVisitAdapter.getSelectedSample());
@@ -166,7 +174,7 @@ public class PatientVisitViewForm extends BiobankViewForm {
     @Override
     protected void reload() {
         retrievePatientVisit();
-        String date = patientVisitWrapper.getFormattedDateProcessed();
+        String date = patientVisit.getFormattedDateProcessed();
         setPartName("Visit " + date);
         form.setText("Visit Drawn Date: " + date);
         setPatientVisitValues();
@@ -174,11 +182,11 @@ public class PatientVisitViewForm extends BiobankViewForm {
 
     private void retrievePatientVisit() {
         try {
-            patientVisitWrapper.reload();
+            patientVisit.reload();
         } catch (Exception ex) {
             LOGGER.error("Error while retrieving patient visit "
-                + patientVisitWrapper.getFormattedDateProcessed() + "(patient "
-                + patientVisitWrapper.getPatient() + ")", ex);
+                + patientVisit.getFormattedDateProcessed() + "(patient "
+                + patientVisit.getPatient() + ")", ex);
         }
     }
 
