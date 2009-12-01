@@ -49,15 +49,25 @@ public class TestShipment extends TestDatabase {
             clinic, name);
 
         ClinicWrapper clinic2 = ClinicHelper.addClinic(site, name + "CLINIC2");
+        ContactWrapper contact = ContactHelper.addContact(clinic2, name
+            + "CONTACT2");
+        StudyWrapper study = clinic.getStudyCollection().get(0);
+        study.setContactCollection(Arrays
+            .asList(new ContactWrapper[] { contact }));
+        study.persist();
 
         shipment.setClinic(clinic2);
         shipment.persist();
+        clinic.reload();
+        clinic2.reload();
 
         shipment.reload();
 
-        Assert.assertFalse(clinic.equals(shipment.getClinic()));
-
         Assert.assertEquals(clinic2, shipment.getClinic());
+
+        Assert.assertTrue(clinic2.getShipmentCollection().contains(shipment));
+
+        Assert.assertFalse(clinic.getShipmentCollection().contains(shipment));
     }
 
     @Test
@@ -277,30 +287,6 @@ public class TestShipment extends TestDatabase {
         }
 
         // TODO test also clinic/study/patient not ok
-    }
-
-    @Test
-    public void testSetGetClinic() throws Exception {
-        String name = "testSetGetClinic" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
-        ClinicWrapper clinic = ClinicHelper.addClinic(site, name);
-        ShipmentWrapper shipment = ShipmentHelper.addShipmentWithRandomPatient(
-            clinic, name);
-
-        ClinicWrapper clinic2 = ClinicHelper.addClinic(site, name
-            + "secondClinic");
-        shipment.setClinic(clinic2);
-        shipment.persist();
-
-        shipment.reload();
-        clinic.reload();
-        clinic2.reload();
-
-        Assert.assertEquals(clinic2, shipment.getClinic());
-
-        Assert.assertTrue(clinic2.getShipmentCollection().contains(shipment));
-
-        Assert.assertFalse(clinic.getShipmentCollection().contains(shipment));
     }
 
     public void testDelete() {

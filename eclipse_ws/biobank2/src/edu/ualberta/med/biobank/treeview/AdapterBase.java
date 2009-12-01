@@ -211,6 +211,7 @@ public abstract class AdapterBase {
         if (itemToRemove != null) {
             children.remove(itemToRemove);
             fireRemove(itemToRemove);
+            // closeEditor(new FormInput(itemToRemove));
         }
     }
 

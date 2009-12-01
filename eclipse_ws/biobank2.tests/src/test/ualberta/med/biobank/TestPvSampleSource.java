@@ -46,11 +46,6 @@ public class TestPvSampleSource extends TestDatabase {
     }
 
     @Test
-    public void checkModification() {
-        Assert.fail("Check nothing missing after model modification");
-    }
-
-    @Test
     public void testGetSetSampleSource() throws Exception {
         SampleSourceWrapper oldSource = w.getSampleSource();
         String name = "testGetSetSampleSource";

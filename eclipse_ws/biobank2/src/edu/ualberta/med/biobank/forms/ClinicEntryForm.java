@@ -146,6 +146,8 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
         clinicWrapper.setSite(siteAdapter.getWrapper());
         clinicWrapper.setContactCollection(contactEntryWidget.getContacts());
         clinicWrapper.persist();
+
+        // clinicAdapter.getParent().performExpand();
     }
 
     @Override

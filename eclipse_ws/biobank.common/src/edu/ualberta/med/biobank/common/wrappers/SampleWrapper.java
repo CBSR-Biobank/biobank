@@ -53,7 +53,7 @@ public class SampleWrapper extends
     @Override
     protected void persistChecks() throws BiobankCheckException,
         ApplicationException {
-        super.persistChecks();
+        checkInventoryIdUnique();
     }
 
     public String getInventoryId() {

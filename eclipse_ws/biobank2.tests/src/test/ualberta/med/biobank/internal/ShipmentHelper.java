@@ -32,7 +32,7 @@ public class ShipmentHelper extends DbHelper {
     public static ShipmentWrapper newShipment(ClinicWrapper clinic)
         throws Exception {
         return newShipment(clinic, Utils.getRandomString(5), Utils
-            .getRandomDate(), (PatientWrapper) null);
+            .getRandomDate());
     }
 
     public static ShipmentWrapper addShipment(ClinicWrapper clinic,
