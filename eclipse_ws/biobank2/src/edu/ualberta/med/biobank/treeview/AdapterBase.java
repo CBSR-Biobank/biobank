@@ -209,9 +209,9 @@ public abstract class AdapterBase {
         }
 
         if (itemToRemove != null) {
+            closeEditor(new FormInput(itemToRemove));
             children.remove(itemToRemove);
             fireRemove(itemToRemove);
-            // closeEditor(new FormInput(itemToRemove));
         }
     }
 
