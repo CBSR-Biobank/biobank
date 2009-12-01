@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.forms;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -41,6 +40,7 @@ import org.springframework.remoting.RemoteConnectFailureException;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.BiobankCheckException;
+import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
@@ -51,8 +51,8 @@ import edu.ualberta.med.biobank.preferences.PreferenceConstants;
 import edu.ualberta.med.biobank.validators.CabinetLabelValidator;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.widgets.CancelConfirmWidget;
-import edu.ualberta.med.biobank.widgets.grids.DrawerWidget;
-import edu.ualberta.med.biobank.widgets.grids.GridContainerWidget;
+import edu.ualberta.med.biobank.widgets.grids.AbstractContainerDisplayWidget;
+import edu.ualberta.med.biobank.widgets.grids.ContainerDisplayFatory;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
@@ -66,8 +66,8 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
 
     private Label cabinetLabel;
     private Label drawerLabel;
-    private GridContainerWidget cabinetWidget;
-    private DrawerWidget drawerWidget;
+    private AbstractContainerDisplayWidget cabinetWidget;
+    private AbstractContainerDisplayWidget drawerWidget;
 
     private Text patientNumberText;
     private ComboViewer viewerVisits;
@@ -129,7 +129,7 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
         setMoveMode(false);
     }
 
-    private void createLocationSection() {
+    private void createLocationSection() throws ApplicationException {
         Composite client = toolkit.createComposite(form.getBody());
         GridLayout layout = new GridLayout(2, false);
         client.setLayout(layout);
@@ -142,22 +142,38 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
         cabinetLabel = toolkit.createLabel(client, "Cabinet");
         drawerLabel = toolkit.createLabel(client, "Drawer");
 
-        cabinetWidget = new GridContainerWidget(client);
+        List<ContainerTypeWrapper> types = ContainerTypeWrapper
+            .getContainerTypesInSite(appService, SessionManager.getInstance()
+                .getCurrentSiteWrapper(), cabinetNameContains, false);
+        ContainerTypeWrapper cabinetType = null;
+        ContainerTypeWrapper drawerType = null;
+        if (types.size() == 0) {
+            BioBankPlugin.openAsyncError("No container type",
+                "No container type found with name containing '"
+                    + cabinetNameContains + "'...");
+        } else {
+            cabinetType = types.get(0);
+            List<ContainerTypeWrapper> children = cabinetType
+                .getChildContainerTypeCollection();
+            if (children.size() > 0) {
+                drawerType = children.get(0);
+            }
+        }
+        cabinetWidget = ContainerDisplayFatory
+            .createWidget(client, cabinetType);
         toolkit.adapt(cabinetWidget);
-        cabinetWidget.setGridSizes(4, 1, 150, 150);
         GridData gdDrawer = new GridData();
         gdDrawer.verticalAlignment = SWT.TOP;
         cabinetWidget.setLayoutData(gdDrawer);
 
-        drawerWidget = new DrawerWidget(client);
+        drawerWidget = ContainerDisplayFatory.createWidget(client, drawerType);
         toolkit.adapt(drawerWidget);
         GridData gdBin = new GridData();
         gdBin.verticalSpan = 2;
         drawerWidget.setLayoutData(gdBin);
-
     }
 
-    private void createFieldsSection() {
+    private void createFieldsSection() throws ApplicationException {
         Composite fieldsComposite = toolkit.createComposite(form.getBody());
         GridLayout layout = new GridLayout(2, false);
         layout.horizontalSpacing = 10;
@@ -259,16 +275,12 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
         viewerSampleTypes.getCombo().setEnabled(!moveMode);
     }
 
-    private void createTypeCombo(Composite fieldsComposite) {
+    private void createTypeCombo(Composite fieldsComposite)
+        throws ApplicationException {
         List<SampleTypeWrapper> sampleTypes;
-        try {
-            sampleTypes = SampleTypeWrapper.getSampleTypeForContainerTypes(
-                appService, SessionManager.getInstance()
-                    .getCurrentSiteWrapper(), cabinetNameContains);
-        } catch (ApplicationException e) {
-            BioBankPlugin.openError("Initialisation failed", e);
-            sampleTypes = new ArrayList<SampleTypeWrapper>();
-        }
+        sampleTypes = SampleTypeWrapper.getSampleTypeForContainerTypes(
+            appService, SessionManager.getInstance().getCurrentSiteWrapper(),
+            cabinetNameContains);
         if (sampleTypes.size() == 0) {
             BioBankPlugin.openAsyncError("Sample types",
                 "No sample type found for container with type containing '"

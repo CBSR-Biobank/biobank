@@ -306,9 +306,9 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
             .getContainerTypesInSite(appService,
                 currentPalletWrapper.getSite(), palletNameContains, false);
         if (palletContainerTypes.size() == 0) {
-            BioBankPlugin.openError("No Pallet defined ?",
-                "No container type found with name containing "
-                    + palletNameContains + "...");
+            BioBankPlugin.openAsyncError("No Pallet defined ?",
+                "No container type found with name containing '"
+                    + palletNameContains + "'...");
         }
         palletTypesViewer = createComboViewerWithNoSelectionValidator(parent,
             "Pallet Container Type", palletContainerTypes, null,

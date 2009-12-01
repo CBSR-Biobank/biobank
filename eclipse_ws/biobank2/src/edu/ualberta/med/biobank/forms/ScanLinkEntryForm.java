@@ -271,6 +271,11 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
         List<SampleTypeWrapper> sampleTypes = SampleTypeWrapper
             .getSampleTypeForContainerTypes(appService, SessionManager
                 .getInstance().getCurrentSiteWrapper(), palletNameContains);
+        if (sampleTypes.size() == 0) {
+            BioBankPlugin.openAsyncError("Sample Types",
+                "No sample type found for containers of container type containing '"
+                    + palletNameContains + "'...");
+        }
         createTypeSelectionPerRowComposite(selectionComp, sampleTypes);
         createTypeSelectionCustom(selectionComp, sampleTypes);
         radioRowSelection.setSelection(true);
@@ -401,7 +406,8 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
 
         patientNumberText = (Text) createBoundWidgetWithLabel(fieldsComposite,
             Text.class, SWT.NONE, "Patient Number", new String[0],
-            patientNumberValue, new NonEmptyStringValidator("Enter a patient number"));
+            patientNumberValue, new NonEmptyStringValidator(
+                "Enter a patient number"));
         patientNumberText.addFocusListener(new FocusAdapter() {
             @Override
             public void focusLost(FocusEvent e) {
