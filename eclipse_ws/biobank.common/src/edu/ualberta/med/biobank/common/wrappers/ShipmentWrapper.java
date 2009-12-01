@@ -67,7 +67,7 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
         List<PatientWrapper> patients = getPatientCollection();
         if (patients == null || patients.size() == 0) {
             throw new BiobankCheckException(
-                "At least one patient source should be added to this shipment");
+                "At least one patient should be added to this shipment");
         }
     }
 

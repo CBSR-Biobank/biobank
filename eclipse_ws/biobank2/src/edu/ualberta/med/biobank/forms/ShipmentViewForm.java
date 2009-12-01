@@ -11,6 +11,7 @@ import org.eclipse.swt.widgets.Label;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.treeview.ShipmentAdapter;
+import edu.ualberta.med.biobank.widgets.ShipmentPatientsWidget;
 
 public class ShipmentViewForm extends BiobankViewForm {
 
@@ -67,6 +68,17 @@ public class ShipmentViewForm extends BiobankViewForm {
         form.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
             BioBankPlugin.IMG_SHIPMENT));
         createMainSection();
+        createPatientsSection();
+    }
+
+    private void createPatientsSection() {
+        Composite client = createSectionWithClient("Patients");
+        GridLayout layout = new GridLayout(1, false);
+        client.setLayout(layout);
+        client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        toolkit.paintBordersFor(client);
+        new ShipmentPatientsWidget(client, SWT.NONE, shipmentWrapper, toolkit,
+            false);
     }
 
     private void createMainSection() {

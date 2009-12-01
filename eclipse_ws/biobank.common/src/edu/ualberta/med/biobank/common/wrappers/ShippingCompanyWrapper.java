@@ -119,4 +119,9 @@ public class ShippingCompanyWrapper extends ModelWrapper<ShippingCompany> {
         }
         return wrappers;
     }
+
+    @Override
+    public String toString() {
+        return getName();
+    }
 }

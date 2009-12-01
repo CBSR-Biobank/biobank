@@ -16,8 +16,8 @@ import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
+import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PvSampleSourceWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleSourceWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
@@ -79,6 +79,14 @@ public class BiobankLabelProvider extends LabelProvider implements
                 return visit.getShipment().getFormattedDateShipped();
             case 1:
                 return String.valueOf(visit.getSampleCollection().size());
+            }
+        } else if (element instanceof PatientWrapper) {
+            PatientWrapper patient = (PatientWrapper) element;
+            switch (columnIndex) {
+            case 0:
+                return patient.getNumber();
+            case 1:
+                return patient.getStudy().getName();
             }
         } else if (element instanceof ContainerTypeWrapper) {
             final ContainerTypeWrapper ct = (ContainerTypeWrapper) element;
@@ -280,10 +288,6 @@ public class BiobankLabelProvider extends LabelProvider implements
             case 4:
                 return String.valueOf(siteClinicInfo.patientVisits);
             }
-        } else if (element instanceof ModelWrapper<?>) {
-            return getColumnText(
-                ((ModelWrapper<?>) element).getWrappedObject(), columnIndex);
-
         } else {
             Assert.isTrue(false, "invalid object type: " + element.getClass());
         }

@@ -22,9 +22,11 @@ import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingCompanyWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.model.Clinic;
+import edu.ualberta.med.biobank.model.ShippingCompany;
 import edu.ualberta.med.biobank.treeview.ShipmentAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
+import edu.ualberta.med.biobank.widgets.ShipmentPatientsWidget;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ShipmentEntryForm extends BiobankEntryForm {
@@ -45,6 +47,8 @@ public class ShipmentEntryForm extends BiobankEntryForm {
     private ComboViewer clinicsComboViewer;
 
     private ComboViewer companyComboViewer;
+
+    private ShipmentPatientsWidget patientsWidget;
 
     @Override
     protected void init() throws Exception {
@@ -76,6 +80,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
         form.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
             BioBankPlugin.IMG_SHIPMENT));
         createMainSection();
+        createPatientsSection();
     }
 
     private void createMainSection() throws ApplicationException {
@@ -137,6 +142,16 @@ public class ShipmentEntryForm extends BiobankEntryForm {
             null);
     }
 
+    private void createPatientsSection() {
+        Composite client = createSectionWithClient("Patients");
+        GridLayout layout = new GridLayout(1, false);
+        client.setLayout(layout);
+        client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        toolkit.paintBordersFor(client);
+        patientsWidget = new ShipmentPatientsWidget(client, SWT.NONE,
+            shipmentWrapper, toolkit, true);
+    }
+
     @Override
     public String getNextOpenedFormID() {
         return ShipmentViewForm.ID;
@@ -159,6 +174,15 @@ public class ShipmentEntryForm extends BiobankEntryForm {
             } else {
                 shipmentWrapper.setClinic((Clinic) null);
             }
+        }
+        IStructuredSelection companySelection = (IStructuredSelection) companyComboViewer
+            .getSelection();
+        if ((companySelection != null) && (companySelection.size() > 0)) {
+            shipmentWrapper
+                .setShippingCompany((ShippingCompanyWrapper) companySelection
+                    .getFirstElement());
+        } else {
+            shipmentWrapper.setShippingCompany((ShippingCompany) null);
         }
         shipmentWrapper.persist();
 

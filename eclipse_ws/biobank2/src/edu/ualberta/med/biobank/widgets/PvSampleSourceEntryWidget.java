@@ -20,7 +20,6 @@ import org.eclipse.jface.fieldassist.ControlDecoration;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -169,21 +168,20 @@ public class PvSampleSourceEntryWidget extends BiobankWidget {
 
         MenuItem item = new MenuItem(menu, SWT.PUSH);
         item.setText("Edit");
-        item.addSelectionListener(new SelectionListener() {
+        item.addSelectionListener(new SelectionAdapter() {
+            @Override
             public void widgetSelected(SelectionEvent event) {
                 PvSampleSourceWrapper svss = pvSampleSourceTable.getSelection();
                 Set<SampleSourceWrapper> allowedSampleSources = getNonDuplicateSampleSources();
                 allowedSampleSources.add(svss.getSampleSource());
                 addOrEditShptSampleSource(false, svss, allowedSampleSources);
             }
-
-            public void widgetDefaultSelected(SelectionEvent e) {
-            }
         });
 
         item = new MenuItem(menu, SWT.PUSH);
         item.setText("Delete");
-        item.addSelectionListener(new SelectionListener() {
+        item.addSelectionListener(new SelectionAdapter() {
+            @Override
             public void widgetSelected(SelectionEvent event) {
                 PvSampleSourceWrapper svss = pvSampleSourceTable.getSelection();
 
@@ -205,9 +203,6 @@ public class PvSampleSourceEntryWidget extends BiobankWidget {
                     updateCollection();
                     notifyListeners();
                 }
-            }
-
-            public void widgetDefaultSelected(SelectionEvent e) {
             }
         });
     }
