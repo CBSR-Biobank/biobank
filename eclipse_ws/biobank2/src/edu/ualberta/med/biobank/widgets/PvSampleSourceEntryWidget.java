@@ -189,7 +189,7 @@ public class PvSampleSourceEntryWidget extends BiobankWidget {
                     .getWorkbench().getActiveWorkbenchWindow().getShell(),
                     "Delete Sample Storage",
                     "Are you sure you want to delete sample source \""
-                        + svss.getSampleSource().getName() + "\"");
+                        + svss.getSampleSource().getName() + "\"?");
 
                 if (confirm) {
                     Collection<PvSampleSourceWrapper> ssToDelete = new HashSet<PvSampleSourceWrapper>();

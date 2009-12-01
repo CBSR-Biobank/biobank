@@ -275,6 +275,8 @@ public class TestShipment extends TestDatabase {
         } catch (BiobankCheckException bce) {
             Assert.assertTrue(true);
         }
+
+        // TODO test also clinic/study/patient not ok
     }
 
     @Test

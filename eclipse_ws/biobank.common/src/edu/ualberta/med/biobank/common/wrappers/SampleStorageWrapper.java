@@ -102,10 +102,13 @@ public class SampleStorageWrapper extends ModelWrapper<SampleStorage> {
 
     @Override
     public int compareTo(ModelWrapper<SampleStorage> wrapper) {
-        String name1 = wrappedObject.getSampleType().getName();
-        String name2 = wrapper.wrappedObject.getSampleType().getName();
-        return ((name1.compareTo(name2) > 0) ? 1 : (name1.equals(name2) ? 0
-            : -1));
+        if (wrapper instanceof SampleStorageWrapper) {
+            String name1 = wrappedObject.getSampleType().getName();
+            String name2 = wrapper.wrappedObject.getSampleType().getName();
+            return ((name1.compareTo(name2) > 0) ? 1 : (name1.equals(name2) ? 0
+                : -1));
+        }
+        return 0;
     }
 
 }

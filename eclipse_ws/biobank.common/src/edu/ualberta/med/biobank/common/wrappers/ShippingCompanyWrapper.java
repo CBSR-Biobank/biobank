@@ -61,7 +61,10 @@ public class ShippingCompanyWrapper extends ModelWrapper<ShippingCompany> {
 
     @Override
     public int compareTo(ModelWrapper<ShippingCompany> o) {
-        return getName().compareTo(o.getWrappedObject().getName());
+        if (o instanceof ShippingCompanyWrapper) {
+            return getName().compareTo(o.getWrappedObject().getName());
+        }
+        return 0;
     }
 
     @SuppressWarnings("unchecked")

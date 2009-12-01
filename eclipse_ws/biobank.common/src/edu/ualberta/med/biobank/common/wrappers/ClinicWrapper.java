@@ -395,10 +395,13 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
 
     @Override
     public int compareTo(ModelWrapper<Clinic> wrapper) {
-        String myName = wrappedObject.getName();
-        String wrapperName = wrapper.wrappedObject.getName();
-        return ((myName.compareTo(wrapperName) > 0) ? 1 : (myName
-            .equals(wrapperName) ? 0 : -1));
+        if (wrapper instanceof ClinicWrapper) {
+            String myName = wrappedObject.getName();
+            String wrapperName = wrapper.wrappedObject.getName();
+            return ((myName.compareTo(wrapperName) > 0) ? 1 : (myName
+                .equals(wrapperName) ? 0 : -1));
+        }
+        return 0;
     }
 
     @Override

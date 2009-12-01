@@ -260,7 +260,8 @@ public class WidgetCreator {
         }
 
         combo.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
-        NonEmptyStringValidator validator = new NonEmptyStringValidator(errorMessage);
+        NonEmptyStringValidator validator = new NonEmptyStringValidator(
+            errorMessage);
         validator.setControlDecoration(FormUtils.createDecorator(label,
             errorMessage));
         UpdateValueStrategy uvs = new UpdateValueStrategy();
@@ -318,10 +319,17 @@ public class WidgetCreator {
                     dateValue.setValue(widget.getDate());
                 }
             });
-            dateValue.addValueChangeListener(new IValueChangeListener() {
+            final IValueChangeListener changeListener = new IValueChangeListener() {
                 @Override
                 public void handleValueChange(ValueChangeEvent event) {
                     widget.setDate((Date) dateValue.getValue());
+                }
+            };
+            dateValue.addValueChangeListener(changeListener);
+            widget.addDisposeListener(new DisposeListener() {
+                @Override
+                public void widgetDisposed(DisposeEvent e) {
+                    dateValue.removeValueChangeListener(changeListener);
                 }
             });
 

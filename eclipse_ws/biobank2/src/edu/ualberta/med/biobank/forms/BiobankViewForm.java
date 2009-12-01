@@ -14,11 +14,11 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.ui.PartInitException;
 import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.forms.input.FormInput;
+import edu.ualberta.med.biobank.treeview.AdapterBase;
 
 /**
  * The base class for all BioBank2 Java Client view forms. The forms are usually
@@ -104,14 +104,8 @@ public abstract class BiobankViewForm extends BiobankFormBase {
                             public void run() {
                                 getSite().getPage().closeEditor(
                                     BiobankViewForm.this, false);
-                                try {
-                                    getSite().getPage().openEditor(
-                                        new FormInput(adapter),
-                                        getEntryFormId(), true);
-                                } catch (PartInitException exp) {
-                                    LOGGER.error("Can't open the entry form",
-                                        exp);
-                                }
+                                AdapterBase.openForm(new FormInput(adapter),
+                                    getEntryFormId());
                             }
                         });
                 }

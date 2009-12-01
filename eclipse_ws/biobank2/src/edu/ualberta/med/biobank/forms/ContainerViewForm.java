@@ -35,7 +35,7 @@ import edu.ualberta.med.biobank.treeview.ContainerAdapter;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.widgets.grids.AbstractContainerDisplayWidget;
 import edu.ualberta.med.biobank.widgets.grids.ContainerDisplayFatory;
-import edu.ualberta.med.biobank.widgets.infotables.SamplesListWidget;
+import edu.ualberta.med.biobank.widgets.infotables.SamplesListInfoTable;
 
 public class ContainerViewForm extends BiobankViewForm {
 
@@ -48,7 +48,7 @@ public class ContainerViewForm extends BiobankViewForm {
 
     private ContainerWrapper container;
 
-    private SamplesListWidget samplesWidget;
+    private SamplesListInfoTable samplesWidget;
 
     private Label siteLabel;
 
@@ -391,7 +391,7 @@ public class ContainerViewForm extends BiobankViewForm {
 
     private void createSamplesSection() {
         Composite parent = createSectionWithClient("Samples");
-        samplesWidget = new SamplesListWidget(parent, container.getSamples()
+        samplesWidget = new SamplesListInfoTable(parent, container.getSamples()
             .values());
         samplesWidget.adaptToToolkit(toolkit, true);
     }

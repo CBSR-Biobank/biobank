@@ -67,18 +67,21 @@ public class CapacityWrapper extends ModelWrapper<Capacity> {
 
     @Override
     public int compareTo(ModelWrapper<Capacity> cap) {
-        Integer rowCapacity1 = wrappedObject.getRowCapacity();
-        Integer rowCapacity2 = cap.getWrappedObject().getRowCapacity();
-        int compare = rowCapacity1.compareTo(rowCapacity2);
-        if (compare == 0) {
-            Integer colCapacity1 = wrappedObject.getColCapacity();
-            Integer colCapacity2 = cap.getWrappedObject().getColCapacity();
+        if (cap instanceof CapacityWrapper) {
+            Integer rowCapacity1 = wrappedObject.getRowCapacity();
+            Integer rowCapacity2 = cap.getWrappedObject().getRowCapacity();
+            int compare = rowCapacity1.compareTo(rowCapacity2);
+            if (compare == 0) {
+                Integer colCapacity1 = wrappedObject.getColCapacity();
+                Integer colCapacity2 = cap.getWrappedObject().getColCapacity();
 
-            return ((colCapacity1.compareTo(colCapacity2) > 0) ? 1
-                : (colCapacity1.equals(colCapacity2) ? 0 : -1));
+                return ((colCapacity1.compareTo(colCapacity2) > 0) ? 1
+                    : (colCapacity1.equals(colCapacity2) ? 0 : -1));
 
+            }
+            return (compare > 0) ? 1 : -1;
         }
-        return (compare > 0) ? 1 : -1;
+        return 0;
     }
 
 }

@@ -26,7 +26,12 @@ public class PatientAdapter extends AdapterBase {
         .getName());
 
     public PatientAdapter(AdapterBase parent, PatientWrapper patientWrapper) {
-        super(parent, patientWrapper);
+        this(parent, patientWrapper, true);
+    }
+
+    public PatientAdapter(AdapterBase parent, PatientWrapper patientWrapper,
+        boolean enableActions) {
+        super(parent, patientWrapper, enableActions);
         setHasChildren(true);
     }
 
@@ -57,18 +62,20 @@ public class PatientAdapter extends AdapterBase {
         addEditMenu(menu, "Patient", PatientEntryForm.ID);
         addViewMenu(menu, "Patient", PatientViewForm.ID);
 
-        MenuItem mi = new MenuItem(menu, SWT.PUSH);
-        mi.setText("Add Patient Visit");
-        mi.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent event) {
-                PatientVisitAdapter adapter = new PatientVisitAdapter(
-                    PatientAdapter.this, new PatientVisitWrapper(
-                        getAppService()));
-                adapter.getWrapper().setPatient(getWrapper());
-                openForm(new FormInput(adapter), PatientVisitEntryForm.ID);
-            }
-        });
+        if (enableActions) {
+            MenuItem mi = new MenuItem(menu, SWT.PUSH);
+            mi.setText("Add Patient Visit");
+            mi.addSelectionListener(new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent event) {
+                    PatientVisitAdapter adapter = new PatientVisitAdapter(
+                        PatientAdapter.this, new PatientVisitWrapper(
+                            getAppService()));
+                    adapter.getWrapper().setPatient(getWrapper());
+                    openForm(new FormInput(adapter), PatientVisitEntryForm.ID);
+                }
+            });
+        }
     }
 
     @Override

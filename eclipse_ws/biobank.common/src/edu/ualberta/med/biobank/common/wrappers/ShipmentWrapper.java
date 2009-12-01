@@ -63,11 +63,20 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
         checkPatients();
     }
 
-    private void checkPatients() throws BiobankCheckException {
+    private void checkPatients() throws BiobankCheckException,
+        ApplicationException {
         List<PatientWrapper> patients = getPatientCollection();
         if (patients == null || patients.size() == 0) {
             throw new BiobankCheckException(
                 "At least one patient should be added to this shipment");
+        }
+        for (PatientWrapper patient : patients) {
+            if (!patient.getStudy().getClinicCollection().contains(getClinic())) {
+                throw new BiobankCheckException("Patient "
+                    + patient.getNumber()
+                    + " is not part of a study that has contact with clinic "
+                    + getClinic().getName());
+            }
         }
     }
 
@@ -89,10 +98,13 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
 
     @Override
     public int compareTo(ModelWrapper<Shipment> wrapper) {
-        Date v1Date = wrappedObject.getDateShipped();
-        Date v2Date = wrapper.wrappedObject.getDateShipped();
-        return ((v1Date.compareTo(v2Date) > 0) ? 1 : (v1Date.equals(v2Date) ? 0
-            : -1));
+        if (wrapper instanceof ShipmentWrapper) {
+            Date v1Date = wrappedObject.getDateShipped();
+            Date v2Date = wrapper.wrappedObject.getDateShipped();
+            return ((v1Date.compareTo(v2Date) > 0) ? 1
+                : (v1Date.equals(v2Date) ? 0 : -1));
+        }
+        return 0;
     }
 
     public Date getDateShipped() {

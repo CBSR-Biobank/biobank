@@ -27,6 +27,8 @@ import edu.ualberta.med.biobank.treeview.ShipmentAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.widgets.ShipmentPatientsWidget;
+import edu.ualberta.med.biobank.widgets.listeners.BiobankEntryFormWidgetListener;
+import edu.ualberta.med.biobank.widgets.listeners.MultiSelectEvent;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ShipmentEntryForm extends BiobankEntryForm {
@@ -48,7 +50,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
 
     private ComboViewer companyComboViewer;
 
-    private ShipmentPatientsWidget patientsWidget;
+    private SiteWrapper site;
 
     @Override
     protected void init() throws Exception {
@@ -58,6 +60,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
 
         shipmentAdapter = (ShipmentAdapter) adapter;
         shipmentWrapper = shipmentAdapter.getWrapper();
+        site = SessionManager.getInstance().getCurrentSiteWrapper();
         try {
             shipmentWrapper.reload();
         } catch (Exception e) {
@@ -93,7 +96,6 @@ public class ShipmentEntryForm extends BiobankEntryForm {
 
         Label siteLabel = (Label) createWidget(client, Label.class, SWT.NONE,
             "Site");
-        SiteWrapper site = SessionManager.getInstance().getCurrentSiteWrapper();
         FormUtils.setTextValue(siteLabel, site.getName());
 
         createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Waybill",
@@ -148,8 +150,16 @@ public class ShipmentEntryForm extends BiobankEntryForm {
         client.setLayout(layout);
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
-        patientsWidget = new ShipmentPatientsWidget(client, SWT.NONE,
-            shipmentWrapper, toolkit, true);
+
+        ShipmentPatientsWidget shipmentPatientsWidget = new ShipmentPatientsWidget(
+            client, SWT.NONE, shipmentWrapper, site, toolkit, true);
+        shipmentPatientsWidget
+            .addSelectionChangedListener(new BiobankEntryFormWidgetListener() {
+                @Override
+                public void selectionChanged(MultiSelectEvent event) {
+                    setDirty(true);
+                }
+            });
     }
 
     @Override

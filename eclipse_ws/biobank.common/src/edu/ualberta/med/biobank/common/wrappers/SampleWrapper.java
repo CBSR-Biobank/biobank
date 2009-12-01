@@ -296,7 +296,11 @@ public class SampleWrapper extends
 
     @Override
     public int compareTo(ModelWrapper<Sample> o) {
-        return this.getId().compareTo(o.getId());
+        if (o instanceof SampleWrapper) {
+            return getInventoryId().compareTo(
+                ((SampleWrapper) o).getInventoryId());
+        }
+        return 0;
     }
 
     public static List<SampleWrapper> getRandomSamplesAlreadyLinked(

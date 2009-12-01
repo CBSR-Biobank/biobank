@@ -602,18 +602,21 @@ public class StudyWrapper extends ModelWrapper<Study> {
 
     @Override
     public int compareTo(ModelWrapper<Study> wrapper) {
-        String name1 = wrappedObject.getName();
-        String name2 = wrapper.wrappedObject.getName();
+        if (wrapper instanceof StudyWrapper) {
+            String name1 = wrappedObject.getName();
+            String name2 = wrapper.wrappedObject.getName();
 
-        int compare = name1.compareTo(name2);
-        if (compare == 0) {
-            String nameShort1 = wrappedObject.getNameShort();
-            String nameShort2 = wrapper.wrappedObject.getNameShort();
+            int compare = name1.compareTo(name2);
+            if (compare == 0) {
+                String nameShort1 = wrappedObject.getNameShort();
+                String nameShort2 = wrapper.wrappedObject.getNameShort();
 
-            return ((nameShort1.compareTo(nameShort2) > 0) ? 1 : (nameShort1
-                .equals(nameShort2) ? 0 : -1));
+                return ((nameShort1.compareTo(nameShort2) > 0) ? 1
+                    : (nameShort1.equals(nameShort2) ? 0 : -1));
+            }
+            return (compare > 0) ? 1 : -1;
         }
-        return (compare > 0) ? 1 : -1;
+        return 0;
     }
 
     public long getPatientCountForClinic(ClinicWrapper clinic)

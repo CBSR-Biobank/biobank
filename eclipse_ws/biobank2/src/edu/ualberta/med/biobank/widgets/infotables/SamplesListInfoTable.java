@@ -12,7 +12,7 @@ import org.eclipse.swt.widgets.Composite;
 import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
 import edu.ualberta.med.biobank.treeview.SampleAdapter;
 
-public class SamplesListWidget extends InfoTableWidget<SampleWrapper> {
+public class SamplesListInfoTable extends InfoTableWidget<SampleWrapper> {
 
     private static final String[] HEADINGS = new String[] { "Inventory ID",
         "Type", "Position", "Link Date", "Quantity (ml)", "Quantity Used",
@@ -21,7 +21,7 @@ public class SamplesListWidget extends InfoTableWidget<SampleWrapper> {
     private static final int[] BOUNDS = new int[] { 130, 130, 150, 150, -1, -1,
         -1 };
 
-    public SamplesListWidget(Composite parent,
+    public SamplesListInfoTable(Composite parent,
         Collection<SampleWrapper> sampleCollection) {
         super(parent, sampleCollection, HEADINGS, BOUNDS);
         GridData tableData = ((GridData) getLayoutData());
