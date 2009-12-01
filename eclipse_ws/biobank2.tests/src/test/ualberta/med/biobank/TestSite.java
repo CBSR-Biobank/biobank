@@ -1,5 +1,6 @@
 package test.ualberta.med.biobank;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Assert;
@@ -20,7 +21,6 @@ import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.Site;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class TestSite extends TestDatabase {
@@ -462,55 +462,52 @@ public class TestSite extends TestDatabase {
     }
 
     @Test
-    public void testSetPvInfoPossible() throws Exception {
-        String name = "testSetPvInfoPossible" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
-        site.reload();
+    public void testSetPvInfoPossibleGlobal() throws Exception {
+        String name = "testSetPvInfoPossibleGlobal" + r.nextInt();
 
+        // TODO any way to get the types without a site for global ?
+        SiteWrapper site = SiteHelper.addSite(name);
         String[] types = site.getPvInfoTypeNames();
         if (types.length == 0) {
             Assert.fail("Can't test without pvinfotypes");
         }
-        String labelGlobal = "labelGlobal" + r.nextInt();
+
         String type = types[r.nextInt(types.length)];
-        SiteWrapper.setGlobalPvInfoPossible(appService, labelGlobal, type);
-        site.persist();
+        SiteWrapper.setGlobalPvInfoPossible(appService, name, type);
+        // TODO any static method to get global pv info possible ?
+        Assert.assertTrue(Arrays.asList(site.getPvInfoPossibleLabels())
+            .contains(name));
+        Assert.assertEquals(type, site.getPvInfoTypeName(name));
 
-        site.reload();
-        boolean labelExists = findLabel(site, labelGlobal);
-        Assert.assertTrue(labelExists);
+        String pvInfoName2 = name + "_2";
+        SiteWrapper.setGlobalPvInfoPossible(appService, pvInfoName2, "toto");
+        // TODO any static method to get global pv info possible ?
+        Assert.assertFalse(Arrays.asList(site.getPvInfoPossibleLabels())
+            .contains(pvInfoName2));
+    }
 
-        Assert.assertEquals(type, site.getPvInfoTypeName(labelGlobal));
+    @Test
+    public void testSetPvInfoPossible() throws Exception {
+        String name = "testSetPvInfoPossible" + r.nextInt();
+
+        SiteWrapper site = SiteHelper.addSite(name);
 
         SiteWrapper site2 = SiteHelper.addSite(name + "secondSite");
-        types = site2.getPvInfoTypeNames();
+        String[] types = site2.getPvInfoTypeNames();
         if (types.length == 0) {
             Assert.fail("Can't test without pvinfotypes");
         }
-        String labelSite = "labelSite" + r.nextInt();
-        type = types[r.nextInt(types.length)];
-        site2.setPvInfoPossible(labelSite, type);
+
+        String type = types[r.nextInt(types.length)];
+        site2.setPvInfoPossible(name, type);
         site2.persist();
 
         site2.reload();
-        labelExists = findLabel(site2, labelSite);
-        Assert.assertTrue(labelExists);
-
-        Assert.assertEquals(type, site2.getPvInfoTypeName(labelGlobal));
-
-        labelExists = findLabel(site, labelSite);
-        Assert.assertFalse(labelExists);
-    }
-
-    private boolean findLabel(SiteWrapper site, String label)
-        throws ApplicationException {
-        String[] labels = site.getPvInfoPossibleLabels();
-        for (String l : labels) {
-            if (l.equals(label)) {
-                return true;
-            }
-        }
-        return false;
+        Assert.assertTrue(Arrays.asList(site2.getPvInfoPossibleLabels())
+            .contains(name));
+        Assert.assertEquals(type, site2.getPvInfoTypeName(name));
+        Assert.assertFalse(Arrays.asList(site.getPvInfoPossibleLabels())
+            .contains(name));
     }
 
     @Test
