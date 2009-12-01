@@ -111,10 +111,9 @@ public class PatientVisitViewForm extends BiobankViewForm {
 
         Label widget;
         for (String label : labels) {
-            PvCustomInfo combinedPvInfo = new PvCustomInfo();
-            combinedPvInfo.label = label;
-            combinedPvInfo.type = patientVisitWrapper.getPvInfoType(label);
-            combinedPvInfo.value = patientVisitWrapper.getPvInfo(label);
+            PvCustomInfo combinedPvInfo = new PvCustomInfo(label,
+                patientVisitWrapper.getPvInfoType(label), null);
+            combinedPvInfo.setValue(patientVisitWrapper.getPvInfo(label));
 
             pvCustomInfoMap.put(label, combinedPvInfo);
 
@@ -124,15 +123,19 @@ public class PatientVisitViewForm extends BiobankViewForm {
                 GridData.VERTICAL_ALIGN_BEGINNING));
 
             int style = SWT.BORDER | SWT.LEFT;
-            if (combinedPvInfo.type.equals(1) || combinedPvInfo.type.equals(5)) {
+            if (combinedPvInfo.getType().equals(1)
+                || combinedPvInfo.getType().equals(5)) {
                 style |= SWT.WRAP;
             }
 
-            if ((combinedPvInfo.value != null) && combinedPvInfo.type.equals(5)) {
-                combinedPvInfo.value = combinedPvInfo.value.replace(';', '\n');
+            if ((combinedPvInfo.getValue() != null)
+                && combinedPvInfo.getType().equals(5)) {
+                combinedPvInfo.setValue(combinedPvInfo.getValue().replace(';',
+                    '\n'));
             }
 
-            widget = toolkit.createLabel(client, combinedPvInfo.value, style);
+            widget = toolkit.createLabel(client, combinedPvInfo.getValue(),
+                style);
             GridData gd = new GridData(GridData.FILL_HORIZONTAL);
             widget.setLayoutData(gd);
         }

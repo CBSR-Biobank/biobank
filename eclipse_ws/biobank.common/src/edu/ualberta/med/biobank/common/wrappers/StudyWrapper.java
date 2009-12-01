@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -429,6 +430,17 @@ public class StudyWrapper extends ModelWrapper<Study> {
     public String[] getPvInfoLabels() {
         getPvInfoMap();
         return pvInfoMap.keySet().toArray(new String[] {});
+    }
+
+    public void setPvInfoLabels(String[] labels) {
+        getPvInfoMap();
+        List<String> labelList = Arrays.asList(labels);
+        for (Iterator<String> i = pvInfoMap.keySet().iterator(); i.hasNext();) {
+            String key = i.next();
+            if (!labelList.contains(key)) {
+                i.remove();
+            }
+        }
     }
 
     protected PvInfoWrapper getPvInfo(String label) throws Exception {
