@@ -81,16 +81,23 @@ public class DrawerWidget extends AbstractContainerDisplayWidget {
             int width = SQUARE_CELL_WIDTH;
             int height = SQUARE_CELL_WIDTH;
             int rectXPosition = squareXTotal * SQUARE_CELL_WIDTH;
+            int color;
             if (boxIndex % 3 == 0) {
+                // rectangle (ex: 03, 06, 09, 12, 15...)
                 rectYTotal++;
                 width = RECTANGLE_CELL_WIDTH;
                 height = RECTANGLE_CELL_HEIGHT;
                 currentX = 0;
+                color = SWT.COLOR_CYAN;
             } else {
                 if (currentX == 1) {
+                    // second square (ex: 02, 05, 08, 11, 14...)
                     rectXPosition += SQUARE_CELL_WIDTH;
+                    color = SWT.COLOR_RED;
                 } else {
+                    // first square (ex: 01, 04, 07, 10, 13...)
                     squareYTotal++;
+                    color = SWT.COLOR_GREEN;
                 }
                 currentX++;
             }
@@ -100,7 +107,7 @@ public class DrawerWidget extends AbstractContainerDisplayWidget {
             Rectangle rectangle = new Rectangle(rectXPosition, rectYPosition,
                 width, height);
 
-            gc.setForeground(e.display.getSystemColor(SWT.COLOR_BLACK));
+            gc.setForeground(e.display.getSystemColor(color));
             gc.setBackground(getStatus(boxIndex).getColor());
             gc.fillRectangle(rectangle);
             if (selection != null && (selection.row + 1) == boxIndex) {
@@ -110,12 +117,11 @@ public class DrawerWidget extends AbstractContainerDisplayWidget {
             gc.drawRectangle(rectangle);
 
             String text = getDefaultTextForBox(boxIndex - 1, 0);
-            // DecimalFormat df1 = new DecimalFormat("00");
-            // String text = df1.format(boxIndex);
             if (text != null) {
                 drawTextOnCenter(gc, text, rectangle);
             }
             if (boxIndex % 9 == 0) {
+                // one column of 9 boxes done
                 squareXTotal += 2;
                 squareYTotal = 0;
                 rectYTotal = 0;
@@ -185,7 +191,7 @@ public class DrawerWidget extends AbstractContainerDisplayWidget {
         int yGrid = y / (gridCellHeight);
         int cellNum;
         // get subcell position
-        if (y % gridCellHeight < SQUARE_CELL_WIDTH)
+        if (y % gridCellHeight < RECTANGLE_CELL_HEIGHT)
             cellNum = 9;
         else if (x % gridCellWidth > SQUARE_CELL_WIDTH)
             cellNum = 8;
@@ -196,7 +202,6 @@ public class DrawerWidget extends AbstractContainerDisplayWidget {
         int yGridCellNumOffset = 3;
         return cells[cellNum + xGrid * xGridCellNumOffset - yGrid
             * yGridCellNumOffset - 1][0];
-
     }
 
     protected void drawLegend(PaintEvent e, Color color, int index, String text) {

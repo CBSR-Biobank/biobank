@@ -602,6 +602,31 @@ CREATE TABLE `object_attribute` (
 /*!40000 ALTER TABLE `user` DISABLE KEYS */;
 /*!40000 ALTER TABLE `user` ENABLE KEYS */;
 UNLOCK TABLES;
+
+--
+-- Table structure for table `objectattributes`
+--
+
+DROP TABLE IF EXISTS `objectattributes`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `objectattributes` (
+  `LOG_ID` bigint(200) NOT NULL DEFAULT '0',
+  `OBJECT_ATTRIBUTE_ID` bigint(200) NOT NULL DEFAULT '0',
+  KEY `Index_2` (`LOG_ID`),
+  KEY `FK_objectattributes_2` (`OBJECT_ATTRIBUTE_ID`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `objectattributes`
+--
+
+LOCK TABLES `objectattributes` WRITE;
+/*!40000 ALTER TABLE `objectattributes` DISABLE KEYS */;
+/*!40000 ALTER TABLE `objectattributes` ENABLE KEYS */;
+UNLOCK TABLES;
+
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
