@@ -198,12 +198,6 @@ public class DebugInitializationHelper {
         ShippingCompanyWrapper shippingCompany = insertShippingCompany();
         Random r = new Random();
         for (int i = 0; i < 100; i++) {
-            ClinicWrapper clinic;
-            if (i < 50) {
-                clinic = clinics[0];
-            } else {
-                clinic = clinics[1];
-            }
             ShipmentWrapper shipment = new ShipmentWrapper(appService);
             String dateStr = String.format("2009-%02d-%02d %02d:%02d", r
                 .nextInt(12) + 1, r.nextInt(28), r.nextInt(24), r.nextInt(60));
@@ -212,14 +206,13 @@ public class DebugInitializationHelper {
                 r.nextInt(12) + 1, r.nextInt(28), r.nextInt(24), r.nextInt(60));
             shipment.setDateReceived(DateFormatter.parseToDateTime(dateStr));
             shipment.setWaybill(r.nextInt() + getRandomString(r, 10));
-            shipment.setClinic(clinic);
+            shipment.setClinic(clinics[0]);
             shipment.setPatientCollection(Arrays
                 .asList(new PatientWrapper[] { patients.get(i) }));
             shipment.setShippingCompany(shippingCompany);
             shipment.persist();
         }
         clinics[0].reload();
-        clinics[1].reload();
     }
 
     private ShippingCompanyWrapper insertShippingCompany() throws Exception {
