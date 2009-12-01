@@ -4,13 +4,13 @@ import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.ui.handlers.HandlerUtil;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.forms.StudyEntryForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
+import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
 
@@ -26,16 +26,7 @@ public class StudyAddHandler extends AbstractHandler {
         study.setSite(site);
         StudyAdapter studyNode = new StudyAdapter(siteAdapter
             .getStudiesGroupNode(), study);
-
-        FormInput input = new FormInput(studyNode);
-        try {
-            HandlerUtil.getActiveWorkbenchWindowChecked(event).getActivePage()
-                .openEditor(input, StudyEntryForm.ID, true);
-        } catch (Exception exp) {
-            throw new ExecutionException("Error opening form "
-                + StudyEntryForm.ID, exp);
-        }
-
+        AdapterBase.openForm(new FormInput(studyNode), StudyEntryForm.ID);
         return null;
     }
 

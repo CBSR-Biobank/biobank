@@ -179,7 +179,22 @@ public class TestSample extends TestDatabase {
         Assert.assertTrue(dbSample.getSampleType().getId().equals(
             sample.getSampleType().getId()));
         Assert.assertTrue(dbSample.getQuantity().equals(3.0));
+    }
 
+    @Test
+    public void testPersitFail() throws Exception {
+        sample.setInventoryId("defgh");
+        sample.persist();
+
+        SampleWrapper sample2 = SampleHelper.newSample(sample.getSampleType(),
+            sample.getParent(), sample.getPatientVisit(), 2, 3);
+        sample2.setInventoryId(sample.getInventoryId());
+        try {
+            sample2.persist();
+            Assert.fail("Should not insert: this inventoryID already exists");
+        } catch (BiobankCheckException bce) {
+            Assert.assertTrue(true);
+        }
     }
 
     @Test
@@ -218,7 +233,16 @@ public class TestSample extends TestDatabase {
 
     @Test
     public void testCompareTo() throws BiobankCheckException, Exception {
+        sample.setInventoryId("defgh");
         sample.persist();
-        Assert.assertTrue(sample.compareTo(sample) == 0);
+        SampleWrapper sample2 = SampleHelper.newSample(sample.getSampleType(),
+            sample.getParent(), sample.getPatientVisit(), 2, 3);
+        sample2.setInventoryId("awert");
+        sample2.persist();
+        Assert.assertTrue(sample.compareTo(sample2) > 0);
+
+        sample2.setInventoryId("qwerty");
+        sample2.persist();
+        Assert.assertTrue(sample.compareTo(sample2) < 0);
     }
 }

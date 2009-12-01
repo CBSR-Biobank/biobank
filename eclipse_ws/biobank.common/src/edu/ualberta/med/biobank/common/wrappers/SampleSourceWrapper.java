@@ -104,10 +104,13 @@ public class SampleSourceWrapper extends ModelWrapper<SampleSource> {
 
     @Override
     public int compareTo(ModelWrapper<SampleSource> wrapper) {
-        String name1 = wrappedObject.getName();
-        String name2 = wrapper.wrappedObject.getName();
-        return ((name1.compareTo(name2) > 0) ? 1 : (name1.equals(name2) ? 0
-            : -1));
+        if (wrapper instanceof SampleSourceWrapper) {
+            String name1 = wrappedObject.getName();
+            String name2 = wrapper.wrappedObject.getName();
+            return ((name1.compareTo(name2) > 0) ? 1 : (name1.equals(name2) ? 0
+                : -1));
+        }
+        return 0;
     }
 
     @Override

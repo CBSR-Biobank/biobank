@@ -107,87 +107,12 @@ public class PvSampleSourceWrapper extends ModelWrapper<PvSampleSource> {
         }
     }
 
-    // @SuppressWarnings("unchecked")
-    // public List<PatientWrapper> getPatientCollection() {
-    // List<PatientWrapper> patientCollection = (List<PatientWrapper>)
-    // propertiesMap
-    // .get("patientCollection");
-    // if (patientCollection == null) {
-    // Collection<Patient> children = wrappedObject.getPatientCollection();
-    // if (children != null) {
-    // patientCollection = new ArrayList<PatientWrapper>();
-    // for (Patient p : children) {
-    // patientCollection.add(new PatientWrapper(appService, p));
-    // }
-    // propertiesMap.put("patientCollection", patientCollection);
-    // }
-    // }
-    // return patientCollection;
-    // }
-    //
-    // public void setPatientCollection(Collection<Patient> patientCollection,
-    // boolean setNull) {
-    // Collection<Patient> oldCollection = wrappedObject
-    // .getPatientCollection();
-    // wrappedObject.setPatientCollection(patientCollection);
-    // propertyChangeSupport.firePropertyChange("patientCollection",
-    // oldCollection, patientCollection);
-    // if (setNull) {
-    // propertiesMap.put("patientCollection", null);
-    // }
-    // }
-    //
-    // public void setPatientCollection(
-    // Collection<PatientWrapper> patientCollection) {
-    // Collection<Patient> pCollection = new HashSet<Patient>();
-    // for (PatientWrapper p : patientCollection) {
-    // pCollection.add(p.getWrappedObject());
-    // }
-    // setPatientCollection(pCollection, false);
-    // propertiesMap.put("patientCollection", patientCollection);
-    // }
-
     @Override
     public int compareTo(ModelWrapper<PvSampleSource> o) {
-        return getSampleSource().compareTo(
-            ((PvSampleSourceWrapper) o).getSampleSource());
+        if (o instanceof PvSampleSourceWrapper) {
+            return getSampleSource().compareTo(
+                ((PvSampleSourceWrapper) o).getSampleSource());
+        }
+        return 0;
     }
-
-    // public void setPatientsFromString(List<String> numbers, SiteWrapper site)
-    // throws WrapperException {
-    // List<PatientWrapper> patients = new ArrayList<PatientWrapper>();
-    // for (String number : numbers) {
-    // number = number.trim();
-    // PatientWrapper p;
-    // try {
-    // p = PatientWrapper.getPatientInSite(appService, number, site);
-    // } catch (ApplicationException e) {
-    // throw new WrapperException(
-    // "Error while querying patient with number " + number + ".",
-    // e);
-    // }
-    // if (p == null) {
-    // throw new WrapperException("Patient with number " + number
-    // + " doesn't exists.");
-    // }
-    // patients.add(p);
-    // }
-    // setPatientCollection(patients);
-    // }
-    //
-    // public String getPatientsAsString() {
-    // List<PatientWrapper> patients = getPatientCollection();
-    // if (patients == null || patients.size() == 0) {
-    // return "";
-    // }
-    // StringBuffer sb = new StringBuffer();
-    // for (int i = 0; i < patients.size(); i++) {
-    // PatientWrapper patient = patients.get(i);
-    // sb.append(patient.getNumber());
-    // if (i < patients.size() - 1) {
-    // sb.append(" / ");
-    // }
-    // }
-    // return sb.toString();
-    // }
 }

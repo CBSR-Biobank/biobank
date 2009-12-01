@@ -430,11 +430,13 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
 
     @Override
     public int compareTo(ModelWrapper<PatientVisit> wrapper) {
-        Date v1Date = wrappedObject.getDateProcessed();
-        Date v2Date = wrapper.wrappedObject.getDateProcessed();
-        return ((v1Date.compareTo(v2Date) > 0) ? 1 : (v1Date.equals(v2Date) ? 0
-            : -1));
-
+        if (wrapper instanceof PatientVisitWrapper) {
+            Date v1Date = wrappedObject.getDateProcessed();
+            Date v2Date = wrapper.wrappedObject.getDateProcessed();
+            return ((v1Date.compareTo(v2Date) > 0) ? 1
+                : (v1Date.equals(v2Date) ? 0 : -1));
+        }
+        return 0;
     }
 
     @Override

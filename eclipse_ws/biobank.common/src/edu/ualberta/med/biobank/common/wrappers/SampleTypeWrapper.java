@@ -221,18 +221,21 @@ public class SampleTypeWrapper extends ModelWrapper<SampleType> {
 
     @Override
     public int compareTo(ModelWrapper<SampleType> wrapper) {
-        String name1 = wrappedObject.getName();
-        String name2 = wrapper.wrappedObject.getName();
+        if (wrapper instanceof SampleTypeWrapper) {
+            String name1 = wrappedObject.getName();
+            String name2 = wrapper.wrappedObject.getName();
 
-        int compare = name1.compareTo(name2);
-        if (compare == 0) {
-            String nameShort1 = wrappedObject.getNameShort();
-            String nameShort2 = wrapper.wrappedObject.getNameShort();
+            int compare = name1.compareTo(name2);
+            if (compare == 0) {
+                String nameShort1 = wrappedObject.getNameShort();
+                String nameShort2 = wrapper.wrappedObject.getNameShort();
 
-            return ((nameShort1.compareTo(nameShort2) > 0) ? 1 : (nameShort1
-                .equals(nameShort2) ? 0 : -1));
+                return ((nameShort1.compareTo(nameShort2) > 0) ? 1
+                    : (nameShort1.equals(nameShort2) ? 0 : -1));
+            }
+            return (compare > 0) ? 1 : -1;
         }
-        return (compare > 0) ? 1 : -1;
+        return 0;
     }
 
     @Override

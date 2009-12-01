@@ -7,8 +7,8 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
@@ -58,7 +58,8 @@ public class SessionAdapter extends AdapterBase {
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
         MenuItem mi = new MenuItem(menu, SWT.PUSH);
         mi.setText("Add Repository Site");
-        mi.addSelectionListener(new SelectionListener() {
+        mi.addSelectionListener(new SelectionAdapter() {
+            @Override
             public void widgetSelected(SelectionEvent event) {
                 IHandlerService handlerService = (IHandlerService) PlatformUI
                     .getWorkbench().getService(IHandlerService.class);
@@ -71,14 +72,12 @@ public class SessionAdapter extends AdapterBase {
                         "edu.ualberta.med.biobank.commands.addSite not found");
                 }
             }
-
-            public void widgetDefaultSelected(SelectionEvent e) {
-            }
         });
 
         mi = new MenuItem(menu, SWT.PUSH);
         mi.setText("Logout");
-        mi.addSelectionListener(new SelectionListener() {
+        mi.addSelectionListener(new SelectionAdapter() {
+            @Override
             public void widgetSelected(SelectionEvent event) {
                 IHandlerService handlerService = (IHandlerService) PlatformUI
                     .getWorkbench().getService(IHandlerService.class);
@@ -90,9 +89,6 @@ public class SessionAdapter extends AdapterBase {
                     throw new RuntimeException(
                         "edu.ualberta.med.biobank.commands.logout not found");
                 }
-            }
-
-            public void widgetDefaultSelected(SelectionEvent e) {
             }
         });
     }

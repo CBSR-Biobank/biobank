@@ -1,8 +1,6 @@
 package edu.ualberta.med.biobank.views;
 
-import org.apache.log4j.Logger;
 import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.ui.PartInitException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
@@ -16,9 +14,6 @@ import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
 
 public class PatientAdministrationView extends AbstractAdministrationView {
-
-    private static Logger LOGGER = Logger
-        .getLogger(PatientAdministrationView.class.getName());
 
     public static final String ID = "edu.ualberta.med.biobank.views.patientsAdmin";
 
@@ -78,15 +73,7 @@ public class PatientAdministrationView extends AbstractAdministrationView {
                 .getAppService());
             patient.setNumber(text);
             PatientAdapter adapter = new PatientAdapter(rootNode, patient);
-            try {
-                BioBankPlugin.getDefault().getWorkbench()
-                    .getActiveWorkbenchWindow().getActivePage().openEditor(
-                        new FormInput(adapter), PatientEntryForm.ID, true);
-            } catch (PartInitException e) {
-                String msg = "Wasn't able to open the form";
-                BioBankPlugin.openError("Patient Form", msg);
-                LOGGER.error(msg, e);
-            }
+            AdapterBase.openForm(new FormInput(adapter), PatientEntryForm.ID);
         }
     }
 

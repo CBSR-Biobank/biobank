@@ -8,13 +8,13 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.handlers.HandlerUtil;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.forms.ContainerEntryForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
+import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.ContainerAdapter;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 
@@ -46,9 +46,8 @@ public class ContainerAddHandler extends AbstractHandler {
             ContainerAdapter containerNode = new ContainerAdapter(siteAdapter
                 .getContainerTypesGroupNode(), containerWrapper);
 
-            FormInput input = new FormInput(containerNode);
-            HandlerUtil.getActiveWorkbenchWindowChecked(event).getActivePage()
-                .openEditor(input, ContainerEntryForm.ID, true);
+            AdapterBase.openForm(new FormInput(containerNode),
+                ContainerEntryForm.ID);
         } catch (Exception e) {
             throw new ExecutionException("Error on action Add Container", e);
         }

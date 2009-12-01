@@ -20,6 +20,7 @@ import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.rcp.SampleManagementPerspective;
+import edu.ualberta.med.biobank.treeview.AdapterBase;
 
 /**
  * Open a form in patient administration like scan link, scan assign or cabinet
@@ -43,8 +44,8 @@ public class OpenPatientFormHandler extends AbstractHandler implements IHandler 
                 IWorkbenchPage page = workbench.getActiveWorkbenchWindow()
                     .getActivePage();
                 // open the editor
-                page.openEditor(new FormInput(SessionManager.getInstance()
-                    .getSession()), editorId, true);
+                AdapterBase.openForm(new FormInput(SessionManager.getInstance()
+                    .getSession()), editorId);
                 hideConsoleViewIcons(page);
             }
         } catch (WorkbenchException e) {

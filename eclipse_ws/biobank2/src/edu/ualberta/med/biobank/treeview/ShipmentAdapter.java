@@ -5,11 +5,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
 
 import edu.ualberta.med.biobank.SessionManager;
@@ -79,25 +75,8 @@ public class ShipmentAdapter extends AdapterBase {
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-        MenuItem mi = new MenuItem(menu, SWT.PUSH);
-        mi.setText("Edit Shipment");
-        mi.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent event) {
-                openForm(new FormInput(ShipmentAdapter.this),
-                    ShipmentEntryForm.ID);
-            }
-        });
-
-        mi = new MenuItem(menu, SWT.PUSH);
-        mi.setText("View Shipment");
-        mi.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent event) {
-                openForm(new FormInput(ShipmentAdapter.this),
-                    ShipmentEntryForm.ID);
-            }
-        });
+        addEditMenu(menu, "Shipment", ShipmentEntryForm.ID);
+        addViewMenu(menu, "Shipment", ShipmentEntryForm.ID);
     }
 
     @Override

@@ -49,11 +49,6 @@ public class TestContact extends TestDatabase {
         // Assert.assertEquals(2, contact.getStudyCollection().size());
     }
 
-    @Override
-    public void tearDown() {
-
-    }
-
     @Test
     public void testGetSetClinicWrapper() throws BiobankCheckException,
         Exception {

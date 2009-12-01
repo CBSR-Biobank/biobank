@@ -15,7 +15,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
-import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
@@ -56,15 +55,11 @@ public class SiteViewForm extends AddressViewFormCommon {
     private SelectionListener addStudySelectionListener = new SelectionAdapter() {
         @Override
         public void widgetSelected(SelectionEvent e) {
-            try {
-                AdapterBase studiesNode = siteAdapter.getStudiesGroupNode();
-                StudyAdapter studyAdapter = new StudyAdapter(studiesNode,
-                    new StudyWrapper(siteAdapter.getAppService(), new Study()));
-                getSite().getPage().openEditor(new FormInput(studyAdapter),
-                    StudyEntryForm.ID, true);
-            } catch (PartInitException exp) {
-                LOGGER.error("Error opening form " + StudyEntryForm.ID, exp);
-            }
+            AdapterBase studiesNode = siteAdapter.getStudiesGroupNode();
+            StudyAdapter studyAdapter = new StudyAdapter(studiesNode,
+                new StudyWrapper(siteAdapter.getAppService(), new Study()));
+            AdapterBase
+                .openForm(new FormInput(studyAdapter), StudyEntryForm.ID);
         }
     };
 
@@ -194,16 +189,11 @@ public class SiteViewForm extends AddressViewFormCommon {
         clinic.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                try {
-                    ClinicAdapter clinicAdapter = new ClinicAdapter(siteAdapter
-                        .getClinicGroupNode(), new ClinicWrapper(appService,
-                        new Clinic()));
-                    getSite().getPage().openEditor(
-                        new FormInput(clinicAdapter), ClinicEntryForm.ID, true);
-                } catch (PartInitException exp) {
-                    LOGGER.error("Error opening form " + ClinicEntryForm.ID,
-                        exp);
-                }
+                ClinicAdapter clinicAdapter = new ClinicAdapter(siteAdapter
+                    .getClinicGroupNode(), new ClinicWrapper(appService,
+                    new Clinic()));
+                AdapterBase.openForm(new FormInput(clinicAdapter),
+                    ClinicEntryForm.ID);
             }
         });
 

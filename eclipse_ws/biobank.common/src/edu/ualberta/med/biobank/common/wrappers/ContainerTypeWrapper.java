@@ -633,10 +633,13 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
 
     @Override
     public int compareTo(ModelWrapper<ContainerType> type) {
-        String c1Name = wrappedObject.getName();
-        String c2Name = type.wrappedObject.getName();
-        return ((c1Name.compareTo(c2Name) > 0) ? 1 : (c1Name.equals(c2Name) ? 0
-            : -1));
+        if (type instanceof ContainerTypeWrapper) {
+            String c1Name = wrappedObject.getName();
+            String c2Name = type.wrappedObject.getName();
+            return ((c1Name.compareTo(c2Name) > 0) ? 1
+                : (c1Name.equals(c2Name) ? 0 : -1));
+        }
+        return 0;
     }
 
     @Override

@@ -14,7 +14,7 @@ import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.model.PvCustomInfo;
 import edu.ualberta.med.biobank.treeview.PatientVisitAdapter;
 import edu.ualberta.med.biobank.widgets.infotables.PvSampleSourceInfoTable;
-import edu.ualberta.med.biobank.widgets.infotables.SamplesListWidget;
+import edu.ualberta.med.biobank.widgets.infotables.SamplesListInfoTable;
 
 public class PatientVisitViewForm extends BiobankViewForm {
 
@@ -29,7 +29,7 @@ public class PatientVisitViewForm extends BiobankViewForm {
 
     private Label siteLabel;
 
-    private SamplesListWidget samplesWidget;
+    private SamplesListInfoTable samplesWidget;
 
     private ListOrderedMap pvCustomInfoMap;
 
@@ -157,7 +157,7 @@ public class PatientVisitViewForm extends BiobankViewForm {
 
     private void createSamplesSection() {
         Composite parent = createSectionWithClient("Samples");
-        samplesWidget = new SamplesListWidget(parent, patientVisitWrapper
+        samplesWidget = new SamplesListInfoTable(parent, patientVisitWrapper
             .getSampleCollection());
         samplesWidget.adaptToToolkit(toolkit, true);
         samplesWidget.setSelection(patientVisitAdapter.getSelectedSample());

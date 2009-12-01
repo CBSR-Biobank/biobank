@@ -303,20 +303,6 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
     }
 
     private void addToolbarButtons() {
-        // ControlContribution reset = new ControlContribution("Reset") {
-        // @Override
-        // protected Control createControl(Composite parent) {
-        // Button resetButton = new Button(parent, SWT.PUSH);
-        // resetButton.setText("Reset");
-        // resetButton.addSelectionListener(new SelectionAdapter() {
-        // @Override
-        // public void widgetSelected(SelectionEvent e) {
-        // reset();
-        // }
-        // });
-        // return resetButton;
-        // }
-        // };
         Action reset = new Action("Reset") {
             @Override
             public void run() {
@@ -330,20 +316,6 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
         reset.setImageDescriptor(resetActionImage);
         form.getToolBarManager().add(reset);
 
-        // ControlContribution cancel = new ControlContribution("Cancel") {
-        // @Override
-        // protected Control createControl(Composite parent) {
-        // Button cancelButton = new Button(parent, SWT.PUSH);
-        // cancelButton.setText("Cancel");
-        // cancelButton.addSelectionListener(new SelectionAdapter() {
-        // @Override
-        // public void widgetSelected(SelectionEvent e) {
-        // cancel();
-        // }
-        // });
-        // return cancelButton;
-        // }
-        // };
         Action cancel = new Action("Cancel") {
             @Override
             public void run() {
@@ -357,20 +329,6 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
         cancel.setImageDescriptor(cancelActionImage);
         form.getToolBarManager().add(cancel);
 
-        // ControlContribution confirm = new ControlContribution("Confirm") {
-        // @Override
-        // protected Control createControl(Composite parent) {
-        // confirmButton = new Button(parent, SWT.PUSH);
-        // confirmButton.setText("Confirm");
-        // confirmButton.addSelectionListener(new SelectionAdapter() {
-        // @Override
-        // public void widgetSelected(SelectionEvent e) {
-        // confirm();
-        // }
-        // });
-        // return confirmButton;
-        // }
-        // };
         confirmAction = new Action("Confirm") {
             @Override
             public void run() {

@@ -744,10 +744,13 @@ public class ContainerWrapper extends
 
     @Override
     public int compareTo(ModelWrapper<Container> wrapper) {
-        String c1Label = wrappedObject.getLabel();
-        String c2Label = wrapper.wrappedObject.getLabel();
-        return ((c1Label.compareTo(c2Label) > 0) ? 1
-            : (c1Label.equals(c2Label) ? 0 : -1));
+        if (wrapper instanceof ContainerWrapper) {
+            String c1Label = wrappedObject.getLabel();
+            String c2Label = wrapper.wrappedObject.getLabel();
+            return ((c1Label.compareTo(c2Label) > 0) ? 1 : (c1Label
+                .equals(c2Label) ? 0 : -1));
+        }
+        return 0;
     }
 
     @Override

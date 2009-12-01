@@ -7,8 +7,8 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
@@ -39,7 +39,8 @@ public class ContainerGroup extends AdapterBase {
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
         MenuItem mi = new MenuItem(menu, SWT.PUSH);
         mi.setText("Add a Container");
-        mi.addSelectionListener(new SelectionListener() {
+        mi.addSelectionListener(new SelectionAdapter() {
+            @Override
             public void widgetSelected(SelectionEvent event) {
                 try {
                     List<ContainerTypeWrapper> top = ContainerTypeWrapper
@@ -64,9 +65,6 @@ public class ContainerGroup extends AdapterBase {
                 } catch (Exception e) {
                     LOGGER.error("Problem executing add container", e);
                 }
-            }
-
-            public void widgetDefaultSelected(SelectionEvent e) {
             }
         });
     }

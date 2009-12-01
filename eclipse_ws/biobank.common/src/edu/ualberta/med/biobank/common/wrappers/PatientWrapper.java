@@ -253,9 +253,12 @@ public class PatientWrapper extends ModelWrapper<Patient> {
 
     @Override
     public int compareTo(ModelWrapper<Patient> wrapper) {
-        String number1 = wrappedObject.getNumber();
-        String number2 = wrapper.wrappedObject.getNumber();
-        return number1.compareTo(number2);
+        if (wrapper instanceof PatientWrapper) {
+            String number1 = wrappedObject.getNumber();
+            String number2 = wrapper.wrappedObject.getNumber();
+            return number1.compareTo(number2);
+        }
+        return 0;
     }
 
     @Override

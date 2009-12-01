@@ -2,11 +2,7 @@ package edu.ualberta.med.biobank.treeview;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
 
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
@@ -44,39 +40,10 @@ public class ContainerTypeAdapter extends AdapterBase {
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-        MenuItem mi = new MenuItem(menu, SWT.PUSH);
-        mi.setText("Edit Container Type");
-        mi.addSelectionListener(new SelectionListener() {
-            public void widgetSelected(SelectionEvent event) {
-                openForm(new FormInput(ContainerTypeAdapter.this),
-                    ContainerTypeEntryForm.ID);
-            }
-
-            public void widgetDefaultSelected(SelectionEvent e) {
-            }
-        });
-
-        mi = new MenuItem(menu, SWT.PUSH);
-        mi.setText("View Container Type");
-        mi.addSelectionListener(new SelectionListener() {
-            public void widgetSelected(SelectionEvent event) {
-                openForm(new FormInput(ContainerTypeAdapter.this),
-                    ContainerTypeViewForm.ID);
-            }
-
-            public void widgetDefaultSelected(SelectionEvent e) {
-            }
-        });
-        mi = new MenuItem(menu, SWT.PUSH);
-        mi.setText("Delete Container Type");
-        mi.addSelectionListener(new SelectionListener() {
-            public void widgetSelected(SelectionEvent event) {
-                delete("Are you sure you want to delete this container type?");
-            }
-
-            public void widgetDefaultSelected(SelectionEvent e) {
-            }
-        });
+        addEditMenu(menu, "Container Type", ContainerTypeEntryForm.ID);
+        addViewMenu(menu, "Container Type", ContainerTypeViewForm.ID);
+        addDeleteMenu(menu, "Container Type",
+            "Are you sure you want to delete this container type?");
     }
 
     @Override

@@ -8,7 +8,6 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
@@ -27,7 +26,12 @@ public class PatientAdapter extends AdapterBase {
         .getName());
 
     public PatientAdapter(AdapterBase parent, PatientWrapper patientWrapper) {
-        super(parent, patientWrapper);
+        this(parent, patientWrapper, true);
+    }
+
+    public PatientAdapter(AdapterBase parent, PatientWrapper patientWrapper,
+        boolean enableActions) {
+        super(parent, patientWrapper, enableActions);
         setHasChildren(true);
     }
 
@@ -55,41 +59,23 @@ public class PatientAdapter extends AdapterBase {
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-        MenuItem mi = new MenuItem(menu, SWT.PUSH);
-        mi.setText("Edit Patient");
-        mi.addSelectionListener(new SelectionListener() {
-            public void widgetSelected(SelectionEvent event) {
-                openForm(new FormInput(PatientAdapter.this),
-                    PatientEntryForm.ID);
-            }
+        addEditMenu(menu, "Patient", PatientEntryForm.ID);
+        addViewMenu(menu, "Patient", PatientViewForm.ID);
 
-            public void widgetDefaultSelected(SelectionEvent e) {
-            }
-        });
-
-        mi = new MenuItem(menu, SWT.PUSH);
-        mi.setText("View Patient");
-        mi.addSelectionListener(new SelectionListener() {
-            public void widgetSelected(SelectionEvent event) {
-                openForm(new FormInput(PatientAdapter.this), PatientViewForm.ID);
-            }
-
-            public void widgetDefaultSelected(SelectionEvent e) {
-            }
-        });
-
-        mi = new MenuItem(menu, SWT.PUSH);
-        mi.setText("Add Patient Visit");
-        mi.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent event) {
-                PatientVisitAdapter adapter = new PatientVisitAdapter(
-                    PatientAdapter.this, new PatientVisitWrapper(
-                        getAppService()));
-                adapter.getWrapper().setPatient(getWrapper());
-                openForm(new FormInput(adapter), PatientVisitEntryForm.ID);
-            }
-        });
+        if (enableActions) {
+            MenuItem mi = new MenuItem(menu, SWT.PUSH);
+            mi.setText("Add Patient Visit");
+            mi.addSelectionListener(new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent event) {
+                    PatientVisitAdapter adapter = new PatientVisitAdapter(
+                        PatientAdapter.this, new PatientVisitWrapper(
+                            getAppService()));
+                    adapter.getWrapper().setPatient(getWrapper());
+                    openForm(new FormInput(adapter), PatientVisitEntryForm.ID);
+                }
+            });
+        }
     }
 
     @Override

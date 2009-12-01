@@ -158,10 +158,13 @@ public class ContactWrapper extends ModelWrapper<Contact> {
 
     @Override
     public int compareTo(ModelWrapper<Contact> wrapper) {
-        String myName = wrappedObject.getName();
-        String wrapperName = wrapper.wrappedObject.getName();
-        return ((myName.compareTo(wrapperName) > 0) ? 1 : (myName
-            .equals(wrapperName) ? 0 : -1));
+        if (wrapper instanceof ContactWrapper) {
+            String myName = wrappedObject.getName();
+            String wrapperName = wrapper.wrappedObject.getName();
+            return ((myName.compareTo(wrapperName) > 0) ? 1 : (myName
+                .equals(wrapperName) ? 0 : -1));
+        }
+        return 0;
     }
 
     @Override
