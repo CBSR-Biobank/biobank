@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.widgets.grids;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 
+import edu.ualberta.med.biobank.common.LabelingScheme;
 import edu.ualberta.med.biobank.common.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
@@ -46,6 +47,25 @@ public abstract class AbstractContainerDisplayWidget extends Canvas {
 
     public void setContainerType(ContainerTypeWrapper type) {
         this.containerType = type;
+    }
+
+    /**
+     * Get the text to write inside the cell. This default implementation use
+     * the cell position and the containerType.
+     */
+    protected String getDefaultTextForBox(int indexRow, int indexCol) {
+        RowColPos rowcol = new RowColPos();
+        rowcol.row = indexRow;
+        rowcol.col = indexCol;
+        String parentLabel = "";
+        if (displayFullInfoString && container != null) {
+            parentLabel = container.getLabel();
+        }
+        if (containerType != null) {
+            return parentLabel
+                + LabelingScheme.getPositionString(rowcol, containerType);
+        }
+        return "";
     }
 
 }

@@ -145,8 +145,6 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
         cabinetWidget = new GridContainerWidget(client);
         toolkit.adapt(cabinetWidget);
         cabinetWidget.setGridSizes(4, 1, 150, 150);
-        // cabinetWidget.setFirstColSign('A');
-        // cabinetWidget.setShowColumnFirst(true);
         GridData gdDrawer = new GridData();
         gdDrawer.verticalAlignment = SWT.TOP;
         cabinetWidget.setLayoutData(gdDrawer);
@@ -194,7 +192,8 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
 
         patientNumberText = (Text) createBoundWidgetWithLabel(fieldsComposite,
             Text.class, SWT.NONE, "Patient Number", new String[0],
-            patientNumberValue, new NonEmptyStringValidator("Enter a patient number"));
+            patientNumberValue, new NonEmptyStringValidator(
+                "Enter a patient number"));
         patientNumberText.addListener(SWT.DefaultSelection, new Listener() {
             public void handleEvent(Event e) {
                 setVisitsList();
@@ -269,6 +268,11 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
         } catch (ApplicationException e) {
             BioBankPlugin.openError("Initialisation failed", e);
             sampleTypes = new ArrayList<SampleTypeWrapper>();
+        }
+        if (sampleTypes.size() == 0) {
+            BioBankPlugin.openAsyncError("Sample types",
+                "No sample type found for container with type containing '"
+                    + cabinetNameContains + "' in the same.");
         }
         viewerSampleTypes = createComboViewerWithNoSelectionValidator(
             fieldsComposite, "Sample type", sampleTypes, null,

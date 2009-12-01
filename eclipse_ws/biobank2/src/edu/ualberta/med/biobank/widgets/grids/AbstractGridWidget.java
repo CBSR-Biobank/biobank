@@ -1,7 +1,5 @@
 package edu.ualberta.med.biobank.widgets.grids;
 
-import java.text.DecimalFormat;
-
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.PaintEvent;
@@ -13,7 +11,6 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 
-import edu.ualberta.med.biobank.common.LabelingScheme;
 import edu.ualberta.med.biobank.common.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 
@@ -34,21 +31,6 @@ public abstract class AbstractGridWidget extends AbstractContainerDisplayWidget 
     private int rows;
 
     private int columns;
-
-    /**
-     * First character or int used for the cells row labels
-     */
-    protected Object firstRowSign = 'A';
-
-    /**
-     * First character or int used for the cells column labels
-     */
-    protected Object firstColSign = 1;
-
-    /**
-     * If yes, the first label in the box will be the column
-     */
-    protected boolean showColumnFirst = false;
 
     /**
      * max width this container will have : used to calculate cells width
@@ -154,32 +136,6 @@ public abstract class AbstractGridWidget extends AbstractContainerDisplayWidget 
         e.gc.drawRectangle(rectangle);
     }
 
-    /**
-     * Get the text to write inside the cell. This default implementation use
-     * the row sign, the column sign and the cell position.
-     */
-    protected String getDefaultTextForBox(int indexRow, int indexCol) {
-        RowColPos rowcol = new RowColPos();
-        rowcol.row = indexRow;
-        rowcol.col = indexCol;
-        String parentLabel = "";
-        if (displayFullInfoString && container != null) {
-            parentLabel = container.getLabel();
-        }
-        if (containerType != null) {
-            return parentLabel
-                + LabelingScheme.getPositionString(rowcol, containerType);
-        }
-        String row = getValueForCell(firstRowSign, indexRow,
-            firstColSign == null);
-        String col = getValueForCell(firstColSign, indexCol,
-            firstRowSign == null);
-        if (showColumnFirst) {
-            return col + row;
-        }
-        return row + col;
-    }
-
     @SuppressWarnings("unused")
     protected String getTopTextForBox(int indexRow, int indexCol) {
         return null;
@@ -196,7 +152,7 @@ public abstract class AbstractGridWidget extends AbstractContainerDisplayWidget 
 
     @Override
     public void setContainerType(ContainerTypeWrapper type) {
-        this.containerType = type;
+        super.setContainerType(type);
         Integer rowCap = containerType.getRowCapacity();
         Integer colCap = containerType.getColCapacity();
         Assert.isNotNull(rowCap, "row capacity is null");
@@ -208,25 +164,6 @@ public abstract class AbstractGridWidget extends AbstractContainerDisplayWidget 
             setCellHeight(20);
             setLegendOnSide(true);
         }
-    }
-
-    protected String getValueForCell(Object firstSign, int addValue,
-        boolean format) {
-        if (firstSign != null) {
-            Object total = null;
-            if (firstSign instanceof Integer) {
-                total = ((Integer) firstSign) + addValue;
-                if (format) {
-                    DecimalFormat df1 = new DecimalFormat("00");
-                    return df1.format(total);
-                }
-                return String.valueOf(total);
-            } else if (firstSign instanceof Character) {
-                total = (char) (((Character) firstSign).charValue() + addValue);
-                return String.valueOf(total);
-            }
-        }
-        return "";
     }
 
     /**
@@ -335,18 +272,6 @@ public abstract class AbstractGridWidget extends AbstractContainerDisplayWidget 
 
     public void setCellHeight(int cellHeight) {
         this.cellHeight = cellHeight;
-    }
-
-    public void setFirstRowSign(Object rowSign) {
-        this.firstRowSign = rowSign;
-    }
-
-    public void setFirstColSign(Object colSign) {
-        this.firstColSign = colSign;
-    }
-
-    public void setShowColumnFirst(boolean showColumnFirst) {
-        this.showColumnFirst = showColumnFirst;
     }
 
     public void setLegendOnSide(boolean onSide) {

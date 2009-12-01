@@ -42,8 +42,8 @@ public class PalletPositionChooserPage extends AbstractContainerChooserPage {
         super.initComponent();
         pageContainer.layout(true, true);
         containerWidget.setLegendOnSide(true);
-        containerWidget.setFirstColSign(null);
-        containerWidget.setFirstRowSign(1);
+        // containerWidget.setFirstColSign(null);
+        // containerWidget.setFirstRowSign(1);
         // containerWidget.setShowNullStatusAsEmpty(true);
 
         Label label = new Label(pageContainer, SWT.NONE);

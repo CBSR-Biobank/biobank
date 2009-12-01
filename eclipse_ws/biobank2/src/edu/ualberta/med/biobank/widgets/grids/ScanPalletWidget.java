@@ -120,7 +120,9 @@ public class ScanPalletWidget extends AbstractGridWidget {
 
     @Override
     protected String getTopTextForBox(int indexRow, int indexCol) {
-        return getDefaultTextForBox(indexRow, indexCol);
+        String row = new Character((char) (indexRow + 'A')).toString();
+        String col = new Integer(indexCol + 1).toString();
+        return row + col;
     }
 
     @Override
@@ -132,20 +134,6 @@ public class ScanPalletWidget extends AbstractGridWidget {
             if (sample != null) {
                 return sample.getSampleType().getNameShort();
             }
-            // else {
-            // SampleWrapper expectedSample =
-            // scannedElements[indexRow][indexCol]
-            // .getExpectedSample();
-            // if (expectedSample != null) {
-            // PatientVisitWrapper pv = expectedSample.getPatientVisit();
-            // if (pv != null) {
-            // String number = pv.getPatient().getNumber();
-            // if (number != null) {
-            // return number;
-            // }
-            // }
-            // }
-            // }
         }
         return "";
     }

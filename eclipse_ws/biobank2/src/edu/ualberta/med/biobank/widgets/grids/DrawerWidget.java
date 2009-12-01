@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.widgets.grids;
 
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 import org.eclipse.core.runtime.Assert;
@@ -98,19 +97,11 @@ public class DrawerWidget extends AbstractContainerDisplayWidget {
             int rectYPosition = GRID_HEIGHT
                 - (squareYTotal * SQUARE_CELL_WIDTH + rectYTotal
                     * RECTANGLE_CELL_HEIGHT);
-
             Rectangle rectangle = new Rectangle(rectXPosition, rectYPosition,
                 width, height);
+
             gc.setForeground(e.display.getSystemColor(SWT.COLOR_BLACK));
-
-            ContainerStatus status = null;
-            if (cells != null) {
-                status = cells[boxIndex - 1][0].getStatus();
-            }
-            if (status == null)
-                status = ContainerStatus.NOT_INITIALIZED;
-
-            gc.setBackground(status.getColor());
+            gc.setBackground(getStatus(boxIndex).getColor());
             gc.fillRectangle(rectangle);
             if (selection != null && (selection.row + 1) == boxIndex) {
                 gc.setBackground(e.display.getSystemColor(SWT.COLOR_RED));
@@ -118,8 +109,9 @@ public class DrawerWidget extends AbstractContainerDisplayWidget {
             }
             gc.drawRectangle(rectangle);
 
-            DecimalFormat df1 = new DecimalFormat("00");
-            String text = df1.format(boxIndex);
+            String text = getDefaultTextForBox(boxIndex - 1, 0);
+            // DecimalFormat df1 = new DecimalFormat("00");
+            // String text = df1.format(boxIndex);
             if (text != null) {
                 drawTextOnCenter(gc, text, rectangle);
             }
@@ -135,6 +127,16 @@ public class DrawerWidget extends AbstractContainerDisplayWidget {
                 drawLegend(e, status.getColor(), i, status.getLegend());
             }
         }
+    }
+
+    private ContainerStatus getStatus(int boxIndex) {
+        ContainerStatus status = null;
+        if (cells != null) {
+            status = cells[boxIndex - 1][0].getStatus();
+        }
+        if (status == null)
+            status = ContainerStatus.NOT_INITIALIZED;
+        return status;
     }
 
     /**

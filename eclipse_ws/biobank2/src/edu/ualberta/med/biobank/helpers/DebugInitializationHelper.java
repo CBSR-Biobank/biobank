@@ -243,7 +243,7 @@ public class DebugInitializationHelper {
     @SuppressWarnings("unused")
     private void insertPatientVisitsInPatient() throws Exception {
         Random r = new Random();
-        for (int i = 0; i < 50; i++) {
+        for (int i = 0; i < 100; i++) {
             PatientWrapper patient = patients.get(i);
             List<PatientVisitWrapper> visits = new ArrayList<PatientVisitWrapper>();
             visits.add(createPatientVisit(r, patient));

@@ -104,17 +104,11 @@ public class GridContainerWidget extends AbstractGridWidget {
                 sname += "-"
                     + cell.getContainer().getContainerType().getNameShort();
         }
-        if (containerType != null) {
-            return super.getDefaultTextForBox(indexRow, indexCol) + sname;
+        String text = super.getDefaultTextForBox(indexRow, indexCol);
+        if (!text.isEmpty()) {
+            return text + sname;
         }
-        String row = getValueForCell(firstRowSign, indexRow,
-            firstColSign == null);
-        String col = getValueForCell(firstColSign, indexCol,
-            firstRowSign == null);
-        if (showColumnFirst) {
-            return col + row;
-        }
-        return row + col;
+        return "";
     }
 
     public void setLegend(List<ContainerStatus> legendStatus) {

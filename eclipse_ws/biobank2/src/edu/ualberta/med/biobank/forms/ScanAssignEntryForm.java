@@ -305,10 +305,6 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
         List<ContainerTypeWrapper> palletContainerTypes = ContainerTypeWrapper
             .getContainerTypesInSite(appService,
                 currentPalletWrapper.getSite(), palletNameContains, false);
-        // if (palletContainerTypes.size() == 1) {
-        // onlyTypePossible = palletContainerTypes.get(0);
-        // currentPalletWrapper.setContainerType(onlyTypePossible);
-        // } else {
         if (palletContainerTypes.size() == 0) {
             BioBankPlugin.openError("No Pallet defined ?",
                 "No container type found with name containing "
