@@ -429,7 +429,7 @@ public class TestContainerType extends TestDatabase {
         ContainerTypeWrapper childTypeL3 = containerTypeMap.get("ChildCtL3");
         Collection<SampleTypeWrapper> collection = childTypeL3
             .getSampleTypeCollection();
-        Assert.assertEquals(null, collection);
+        Assert.assertTrue((collection == null) || (collection.size() == 0));
 
         List<SampleTypeWrapper> allSampleTypes = SampleTypeWrapper
             .getGlobalSampleTypes(appService, true);
@@ -447,7 +447,7 @@ public class TestContainerType extends TestDatabase {
 
         childTypeL3.setSampleTypeCollection(null);
         collection = childTypeL3.getSampleTypeCollection();
-        Assert.assertEquals(null, collection);
+        Assert.assertTrue((collection == null) || (collection.size() == 0));
     }
 
     @Test

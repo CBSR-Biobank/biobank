@@ -81,6 +81,11 @@ public class StudyEntryForm extends BiobankEntryForm {
 
     private class StudyPvCustomInfo extends PvCustomInfo {
         public PvInfoWidget widget;
+
+        public StudyPvCustomInfo(String label, Integer type,
+            String[] allowedValues) {
+            super(label, type, allowedValues);
+        }
     }
 
     public StudyEntryForm() {
@@ -209,10 +214,9 @@ public class StudyEntryForm extends BiobankEntryForm {
         String[] defaultFields = new String[] { "Date Processed" };
 
         for (String field : defaultFields) {
-            StudyPvCustomInfo combinedPvInfo = new StudyPvCustomInfo();
-            combinedPvInfo.label = field;
-            combinedPvInfo.type = 3;
-            combinedPvInfo.isDefault = true;
+            StudyPvCustomInfo combinedPvInfo = new StudyPvCustomInfo(field, 3,
+                null);
+            combinedPvInfo.setIsDefault(true);
             combinedPvInfo.widget = new PvInfoWidget(client, SWT.NONE,
                 combinedPvInfo, true);
             pvCustomInfoMap.put(field, combinedPvInfo);
@@ -225,15 +229,14 @@ public class StudyEntryForm extends BiobankEntryForm {
 
         for (String label : site.getPvInfoPossibleLabels()) {
             boolean selected = false;
-            StudyPvCustomInfo combinedPvInfo = new StudyPvCustomInfo();
-            combinedPvInfo.label = label;
-            combinedPvInfo.type = site.getPvInfoType(label);
+            StudyPvCustomInfo combinedPvInfo = new StudyPvCustomInfo(label,
+                site.getPvInfoType(label), null);
             if (studyPvInfoLabels.contains(label)) {
-                combinedPvInfo.allowedValues = study
-                    .getPvInfoAllowedValues(label);
+                combinedPvInfo.setAllowedValues(study
+                    .getPvInfoAllowedValues(label));
                 selected = true;
             }
-            combinedPvInfo.isDefault = false;
+            combinedPvInfo.setIsDefault(false);
             combinedPvInfo.widget = new PvInfoWidget(client, SWT.NONE,
                 combinedPvInfo, selected);
             combinedPvInfo.widget.addSelectionChangedListener(listener);
@@ -260,9 +263,6 @@ public class StudyEntryForm extends BiobankEntryForm {
 
     @Override
     protected void saveForm() throws Exception {
-        // FIXME should be transfer to persitCheck method or others set Methods
-        // of the wrapper
-
         // get the selected sample sources from widget
         List<Integer> selSampleSourceIds = sampleSourceMultiSelect
             .getSelected();
@@ -277,20 +277,27 @@ public class StudyEntryForm extends BiobankEntryForm {
             "problem with sample source selections");
         study.setSampleSourceCollection(selSampleSource);
 
+        List<String> newPvInfoLabels = new ArrayList<String>();
+
         for (Object object : pvCustomInfoMap.values()) {
             StudyPvCustomInfo pvCustomInfo = (StudyPvCustomInfo) object;
             boolean selected = pvCustomInfo.widget.getSelected();
 
-            if (!selected || pvCustomInfo.label.equals("Date Processed"))
+            if (!selected || pvCustomInfo.getLabel().equals("Date Processed"))
                 continue;
 
+            newPvInfoLabels.add(pvCustomInfo.getLabel());
             String value = pvCustomInfo.widget.getValues();
-            if (pvCustomInfo.type.equals(4) || pvCustomInfo.type.equals(5)) {
-                study.setPvInfo(pvCustomInfo.label, value.split(";"));
+            if (pvCustomInfo.getType().equals(4)
+                || pvCustomInfo.getType().equals(5)) {
+                if (value.length() > 0) {
+                    study.setPvInfo(pvCustomInfo.getLabel(), value.split(";"));
+                }
             } else {
-                study.setPvInfo(pvCustomInfo.label);
+                study.setPvInfo(pvCustomInfo.getLabel());
             }
         }
+        study.setPvInfoLabels(newPvInfoLabels.toArray(new String[0]));
 
         study.setSampleStorageCollection(sampleStorageEntryWidget
             .getSampleStorage());

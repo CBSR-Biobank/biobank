@@ -38,6 +38,11 @@ public class StudyViewForm extends BiobankViewForm {
 
     private class StudyPvCustomInfo extends PvCustomInfo {
         public Label wiget;
+
+        public StudyPvCustomInfo(String label, Integer type,
+            String[] allowedValues) {
+            super(label, type, allowedValues);
+        }
     }
 
     private List<StudyPvCustomInfo> pvCustomInfoList;
@@ -133,11 +138,9 @@ public class StudyViewForm extends BiobankViewForm {
         client.setLayout(new GridLayout(1, false));
 
         for (String label : studyWrapper.getPvInfoLabels()) {
-            StudyPvCustomInfo combinedPvInfo = new StudyPvCustomInfo();
-            combinedPvInfo.label = label;
-            combinedPvInfo.type = studyWrapper.getPvInfoType(label);
-            combinedPvInfo.allowedValues = studyWrapper
-                .getPvInfoAllowedValues(label);
+            StudyPvCustomInfo combinedPvInfo = new StudyPvCustomInfo(label,
+                studyWrapper.getPvInfoType(label), studyWrapper
+                    .getPvInfoAllowedValues(label));
             pvCustomInfoList.add(combinedPvInfo);
         }
 
@@ -152,14 +155,14 @@ public class StudyViewForm extends BiobankViewForm {
             subcomp = toolkit.createComposite(client);
             subcomp.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-            if (pvCustomInfo.allowedValues != null) {
+            if (pvCustomInfo.getAllowedValues() != null) {
                 subcomp.setLayout(new GridLayout(2, false));
 
                 pvCustomInfo.wiget = (Label) createWidget(subcomp, Label.class,
-                    SWT.NONE, pvCustomInfo.label);
+                    SWT.NONE, pvCustomInfo.getLabel());
             } else {
                 subcomp.setLayout(new GridLayout(1, false));
-                toolkit.createLabel(subcomp, pvCustomInfo.label);
+                toolkit.createLabel(subcomp, pvCustomInfo.getLabel());
             }
         }
     }
@@ -167,7 +170,8 @@ public class StudyViewForm extends BiobankViewForm {
     private void setPvDataSectionValues() throws Exception {
         for (StudyPvCustomInfo pvCustomInfo : pvCustomInfoList) {
             FormUtils.setTextValue(pvCustomInfo.wiget, StringUtils.join(
-                studyWrapper.getPvInfoAllowedValues(pvCustomInfo.label), "; "));
+                studyWrapper.getPvInfoAllowedValues(pvCustomInfo.getLabel()),
+                "; "));
         }
     }
 
