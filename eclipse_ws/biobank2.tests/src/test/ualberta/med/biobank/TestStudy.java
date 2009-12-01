@@ -245,7 +245,7 @@ public class TestStudy extends TestDatabase {
         study.persist();
 
         study.reload();
-        String type = site.getPvInfoTypeName("Consent");
+        Integer type = site.getPvInfoType("Consent");
         Assert.assertEquals(type, study.getPvInfoType("Consent"));
     }
 
