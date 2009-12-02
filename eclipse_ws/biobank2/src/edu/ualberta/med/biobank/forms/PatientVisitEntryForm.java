@@ -55,23 +55,14 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
 
     private PatientVisitAdapter patientVisitAdapter;
 
-    private PatientVisitWrapper patientVisitWrapper;
+    private PatientVisitWrapper patientVisit;
 
     private DateTimeWidget dateProcessed;
 
-    private PatientWrapper patientWrapper;
+    private PatientWrapper patient;
 
     private class FormPvCustomInfo extends PvCustomInfo {
         Control control;
-
-        public FormPvCustomInfo() {
-            super(null, null, null);
-        }
-
-        public FormPvCustomInfo(String label, Integer type,
-            String[] allowedValues) {
-            super(label, type, allowedValues);
-        }
     }
 
     private List<FormPvCustomInfo> pvCustomInfoList;
@@ -87,28 +78,27 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
                 + adapter.getClass().getName());
 
         patientVisitAdapter = (PatientVisitAdapter) adapter;
-        patientVisitWrapper = patientVisitAdapter.getWrapper();
-        patientWrapper = ((PatientAdapter) patientVisitAdapter.getParent())
+        patientVisit = patientVisitAdapter.getWrapper();
+        patient = ((PatientAdapter) patientVisitAdapter.getParent())
             .getWrapper();
         retrieve();
         String tabName;
-        if (patientVisitWrapper.isNew()) {
+        if (patientVisit.isNew()) {
             tabName = "New Patient Visit";
         } else {
-            tabName = "Visit "
-                + patientVisitWrapper.getFormattedDateProcessed();
+            tabName = "Visit " + patientVisit.getFormattedDateProcessed();
         }
         setPartName(tabName);
     }
 
     private void retrieve() {
         try {
-            patientVisitWrapper.reload();
-            patientWrapper.reload();
+            patientVisit.reload();
+            patient.reload();
         } catch (Exception e) {
             LOGGER.error("Error while retrieving patient visit "
                 + patientVisitAdapter.getWrapper().getFormattedDateProcessed()
-                + " (Patient " + patientVisitWrapper.getPatient() + ")", e);
+                + " (Patient " + patientVisit.getPatient() + ")", e);
         }
     }
 
@@ -121,7 +111,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
             BioBankPlugin.IMG_PATIENT_VISIT));
         createMainSection();
         createSourcesSection();
-        if (patientVisitWrapper.isNew()) {
+        if (patientVisit.isNew()) {
             setDirty(true);
         }
     }
@@ -136,12 +126,12 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
 
         Label siteLabel = (Label) createWidget(client, Label.class, SWT.NONE,
             "Site");
-        FormUtils.setTextValue(siteLabel, patientWrapper.getStudy().getSite()
+        FormUtils.setTextValue(siteLabel, patient.getStudy().getSite()
             .getName());
 
-        List<ShipmentWrapper> patientShipments = patientWrapper
+        List<ShipmentWrapper> patientShipments = patient
             .getShipmentCollection();
-        ShipmentWrapper selectedShip = patientVisitWrapper.getShipment();
+        ShipmentWrapper selectedShip = patientVisit.getShipment();
         if (patientShipments.size() == 1) {
             selectedShip = patientShipments.get(0);
         }
@@ -149,19 +139,18 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
             client, "Shipment", patientShipments, selectedShip,
             "A shipment should be selected");
 
-        if (patientVisitWrapper.getDateProcessed() == null) {
-            patientVisitWrapper.setDateProcessed(new Date());
+        if (patientVisit.getDateProcessed() == null) {
+            patientVisit.setDateProcessed(new Date());
         }
         dateProcessed = createDateTimeWidget(client, "Date Processed",
-            patientVisitWrapper.getDateProcessed(), patientVisitWrapper,
-            "dateProcessed", "Date processed should be set");
+            patientVisit.getDateProcessed(), patientVisit, "dateProcessed",
+            "Date processed should be set");
         firstControl = dateProcessed;
 
         createPvDataSection(client);
 
         createBoundWidgetWithLabel(client, Text.class, SWT.MULTI, "Comments",
-            null,
-            BeansObservables.observeValue(patientVisitWrapper, "comment"), null);
+            null, BeansObservables.observeValue(patientVisit, "comment"), null);
     }
 
     private void createSourcesSection() {
@@ -172,8 +161,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         pvSampleSourceEntryWidget = new PvSampleSourceEntryWidget(client,
-            SWT.NONE, patientVisitWrapper.getPvSampleSourceCollection(),
-            toolkit);
+            SWT.NONE, patientVisit.getPvSampleSourceCollection(), toolkit);
         pvSampleSourceEntryWidget
             .addSelectionChangedListener(new BiobankEntryFormWidgetListener() {
                 @Override
@@ -186,7 +174,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
     }
 
     private void createPvDataSection(Composite client) throws Exception {
-        StudyWrapper study = patientWrapper.getStudy();
+        StudyWrapper study = patient.getStudy();
         String[] labels = study.getPvInfoLabels();
         if (labels == null)
             return;
@@ -194,42 +182,41 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         pvCustomInfoList = new ArrayList<FormPvCustomInfo>();
 
         for (String label : labels) {
-            // calling constructor with label, type, and allowed values was
-            // causing hibernate to go into endless loop
             FormPvCustomInfo pvCustomInfo = new FormPvCustomInfo();
             pvCustomInfo.setLabel(label);
             pvCustomInfo.setType(study.getPvInfoType(label));
             pvCustomInfo.setAllowedValues(study.getPvInfoAllowedValues(label));
-            Control control = getControlForLabel(client, pvCustomInfo);
+            pvCustomInfo.setValue(patientVisit.getPvInfo(label));
+            pvCustomInfo.control = getControlForLabel(client, pvCustomInfo);
             pvCustomInfoList.add(pvCustomInfo);
-            if (control != null) {
-                GridData gd = new GridData(GridData.FILL_HORIZONTAL);
-                control.setLayoutData(gd);
-                controls.put(label, control);
-            }
         }
     }
 
     private Control getControlForLabel(Composite client,
         FormPvCustomInfo pvCustomInfo) {
+        Control control;
         switch (pvCustomInfo.getType()) {
         case 1: // number
-            return createBoundWidgetWithLabel(client, Text.class, SWT.NONE,
+            control = createBoundWidgetWithLabel(client, Text.class, SWT.NONE,
                 pvCustomInfo.getLabel(), null, PojoObservables.observeValue(
                     pvCustomInfo, "value"), new DoubleNumberValidator(
                     "You should select a valid number"));
+            break;
         case 2: // text
-            return createBoundWidgetWithLabel(client, Text.class, SWT.NONE,
+            control = createBoundWidgetWithLabel(client, Text.class, SWT.NONE,
                 pvCustomInfo.getLabel(), null, PojoObservables.observeValue(
                     pvCustomInfo, "value"), null);
+            break;
         case 3: // date_time
-            return createDateTimeWidget(client, pvCustomInfo.getLabel(),
+            control = createDateTimeWidget(client, pvCustomInfo.getLabel(),
                 DateFormatter.parseToDateTime(pvCustomInfo.getValue()), null,
                 null, null);
+            break;
         case 4: // select_single
-            return createBoundWidgetWithLabel(client, Combo.class, SWT.NONE,
+            control = createBoundWidgetWithLabel(client, Combo.class, SWT.NONE,
                 pvCustomInfo.getLabel(), pvCustomInfo.getAllowedValues(),
                 PojoObservables.observeValue(pvCustomInfo, "value"), null);
+            break;
         case 5: // select_multiple
             createFieldLabel(client, pvCustomInfo.getLabel());
             SelectMultipleWidget s = new SelectMultipleWidget(client,
@@ -238,26 +225,16 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
             if (pvCustomInfo.getValue() != null) {
                 s.setSelections(pvCustomInfo.getValue().split(";"));
             }
-            return s;
-        case 6: // select_single_and_quantity_1_5_1
-            createFieldLabel(client, pvCustomInfo.getLabel());
-            ComboAndQuantityWidget c = new ComboAndQuantityWidget(client,
-                SWT.BORDER);
-            c.adaptToToolkit(toolkit, true);
-            if (pvCustomInfo.getAllowedValues() != null) {
-                c.addValues(pvCustomInfo.getAllowedValues());
-            }
-            if (pvCustomInfo.getValue() != null) {
-                String[] values = pvCustomInfo.getValue().split(" ");
-                Assert.isTrue(values.length == 2);
-                c.setText(values[0], Integer.parseInt(values[1]));
-            }
-            return c;
+            control = s;
+            break;
         default:
             Assert.isTrue(false, "Invalid pvInfo type: "
                 + pvCustomInfo.getType());
+            return null;
         }
-        return null;
+        GridData gd = new GridData(GridData.FILL_HORIZONTAL);
+        control.setLayoutData(gd);
+        return control;
     }
 
     private void createFieldLabel(Composite parent, String label) {
@@ -268,7 +245,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
 
     @Override
     protected String getOkMessage() {
-        return (patientVisitWrapper.isNew()) ? MSG_NEW_PATIENT_VISIT_OK
+        return (patientVisit.isNew()) ? MSG_NEW_PATIENT_VISIT_OK
             : MSG_PATIENT_VISIT_OK;
     }
 
@@ -276,28 +253,27 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
     protected void saveForm() throws Exception {
         PatientAdapter patientAdapter = (PatientAdapter) patientVisitAdapter
             .getParent();
-        patientVisitWrapper.setPatient(patientAdapter.getWrapper());
+        patientVisit.setPatient(patientAdapter.getWrapper());
 
         IStructuredSelection shipSelection = (IStructuredSelection) shipmentsComboViewer
             .getSelection();
         if ((shipSelection != null) && (shipSelection.size() > 0)) {
-            patientVisitWrapper.setShipment((ShipmentWrapper) shipSelection
+            patientVisit.setShipment((ShipmentWrapper) shipSelection
                 .getFirstElement());
         } else {
-            patientVisitWrapper.setShipment((Shipment) null);
+            patientVisit.setShipment((Shipment) null);
         }
 
-        patientVisitWrapper
-            .setPvSampleSourceCollection(pvSampleSourceEntryWidget
-                .getPvSampleSources());
+        patientVisit.setPvSampleSourceCollection(pvSampleSourceEntryWidget
+            .getPvSampleSources());
 
         setPvCustomInfo();
 
-        if (patientVisitWrapper.isNew()) {
-            patientVisitWrapper.setUsername(SessionManager.getInstance()
-                .getSession().getUserName());
+        if (patientVisit.isNew()) {
+            patientVisit.setUsername(SessionManager.getInstance().getSession()
+                .getUserName());
         }
-        patientVisitWrapper.persist();
+        patientVisit.persist();
 
         patientAdapter.performExpand();
     }
@@ -305,12 +281,11 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
     private void setPvCustomInfo() throws Exception {
         for (FormPvCustomInfo combinedPvInfo : pvCustomInfoList) {
             setPvInfoValueFromControlType(combinedPvInfo);
-            if ((combinedPvInfo.getValue() == null)
-                || (combinedPvInfo.getValue().length() == 0))
+            String value = combinedPvInfo.getValue();
+            if (value == null)
                 continue;
 
-            patientVisitWrapper.setPvInfo(combinedPvInfo.getLabel(),
-                combinedPvInfo.getValue());
+            patientVisit.setPvInfo(combinedPvInfo.getLabel(), value);
         }
     }
 
@@ -339,12 +314,11 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
     public void reset() {
         super.reset();
 
-        if (patientVisitWrapper.getDateProcessed() == null) {
-            patientVisitWrapper.setDateProcessed(new Date());
+        if (patientVisit.getDateProcessed() == null) {
+            patientVisit.setDateProcessed(new Date());
         }
-        pvSampleSourceEntryWidget
-            .setSelectedPvSampleSources(patientVisitWrapper
-                .getPvSampleSourceCollection());
+        pvSampleSourceEntryWidget.setSelectedPvSampleSources(patientVisit
+            .getPvSampleSourceCollection());
         // TODO reset for optional values
     }
 }

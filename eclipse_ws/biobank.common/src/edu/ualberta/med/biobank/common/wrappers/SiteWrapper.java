@@ -714,6 +714,22 @@ public class SiteWrapper extends ModelWrapper<Site> {
         setPvInfoPossibleCollection(list);
     }
 
+    public static Map<String, Integer> getGlobalPvInfoPossible(
+        WritableApplicationService appService) throws Exception {
+        List<PvInfoPossibleWrapper> list = PvInfoPossibleWrapper
+            .getGlobalPvInfoPossible(appService, false);
+        if (list == null) {
+            throw new Exception("No PvInfoPossible items exist");
+        }
+
+        Map<String, Integer> result = new HashMap<String, Integer>();
+        for (PvInfoPossibleWrapper pvInfoPossible : list) {
+            result.put(pvInfoPossible.getLabel(), pvInfoPossible
+                .getPvInfoType().getId());
+        }
+        return result;
+    }
+
     /**
      * Saves a possible patient visit information item that is global to every
      * site. To add a patient visit information item for a single site see
@@ -738,6 +754,24 @@ public class SiteWrapper extends ModelWrapper<Site> {
                 break;
             }
         }
+    }
+
+    public static void deleteGlobalPvInfoPossible(
+        WritableApplicationService appService, String label) throws Exception {
+        List<PvInfoPossibleWrapper> list = PvInfoPossibleWrapper
+            .getGlobalPvInfoPossible(appService, false);
+        if (list == null) {
+            throw new Exception("No PvInfoPossible items exist");
+        }
+
+        for (PvInfoPossibleWrapper pvInfoPossible : list) {
+            if (pvInfoPossible.getLabel().equals(label)) {
+                pvInfoPossible.delete();
+                return;
+            }
+        }
+        throw new Exception("PvInfoPossible with label \"" + label
+            + "\" does not exist");
     }
 
     @Override

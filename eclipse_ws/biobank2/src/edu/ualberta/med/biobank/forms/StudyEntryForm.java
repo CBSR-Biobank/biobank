@@ -81,11 +81,6 @@ public class StudyEntryForm extends BiobankEntryForm {
 
     private class StudyPvCustomInfo extends PvCustomInfo {
         public PvInfoWidget widget;
-
-        public StudyPvCustomInfo(String label, Integer type,
-            String[] allowedValues) {
-            super(label, type, allowedValues);
-        }
     }
 
     public StudyEntryForm() {
@@ -214,8 +209,9 @@ public class StudyEntryForm extends BiobankEntryForm {
         String[] defaultFields = new String[] { "Date Processed" };
 
         for (String field : defaultFields) {
-            StudyPvCustomInfo combinedPvInfo = new StudyPvCustomInfo(field, 3,
-                null);
+            StudyPvCustomInfo combinedPvInfo = new StudyPvCustomInfo();
+            combinedPvInfo.setLabel(field);
+            combinedPvInfo.setType(3);
             combinedPvInfo.setIsDefault(true);
             combinedPvInfo.widget = new PvInfoWidget(client, SWT.NONE,
                 combinedPvInfo, true);
@@ -229,8 +225,9 @@ public class StudyEntryForm extends BiobankEntryForm {
 
         for (String label : site.getPvInfoPossibleLabels()) {
             boolean selected = false;
-            StudyPvCustomInfo combinedPvInfo = new StudyPvCustomInfo(label,
-                site.getPvInfoType(label), null);
+            StudyPvCustomInfo combinedPvInfo = new StudyPvCustomInfo();
+            combinedPvInfo.setLabel(label);
+            combinedPvInfo.setType(site.getPvInfoType(label));
             if (studyPvInfoLabels.contains(label)) {
                 combinedPvInfo.setAllowedValues(study
                     .getPvInfoAllowedValues(label));

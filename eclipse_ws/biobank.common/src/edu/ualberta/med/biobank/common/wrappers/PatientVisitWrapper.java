@@ -27,20 +27,9 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
 
+    private Map<String, PvInfoWrapper> pvInfoMap;
+
     private Map<String, PvInfoDataWrapper> pvInfoDataMap;
-
-    public class PvInfoPvInfoData {
-        private PvInfoWrapper pvInfo;
-        private PvInfoDataWrapper pvInfoData;
-
-        public PvInfoWrapper getPvInfo() {
-            return pvInfo;
-        }
-
-        public PvInfoDataWrapper getPvInfoData() {
-            return pvInfoData;
-        }
-    }
 
     public PatientVisitWrapper(WritableApplicationService appService,
         PatientVisit wrappedObject) {
@@ -168,7 +157,23 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
         propertiesMap.put("pvInfoDataCollection", pvInfoDataCollection);
     }
 
+    private Map<String, PvInfoWrapper> getPvInfoMap() {
+        if (pvInfoMap != null)
+            return pvInfoMap;
+
+        pvInfoMap = new HashMap<String, PvInfoWrapper>();
+        List<PvInfoWrapper> pvInfoCollection = getPatient().getStudy()
+            .getPvInfoCollection();
+        if (pvInfoCollection != null) {
+            for (PvInfoWrapper pvInfo : pvInfoCollection) {
+                pvInfoMap.put(pvInfo.getLabel(), pvInfo);
+            }
+        }
+        return pvInfoMap;
+    }
+
     private Map<String, PvInfoDataWrapper> getPvInfoDataMap() {
+        getPvInfoMap();
         if (pvInfoDataMap != null)
             return pvInfoDataMap;
 
@@ -190,58 +195,68 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
 
     public String getPvInfo(String label) throws Exception {
         getPvInfoDataMap();
-        PvInfoDataWrapper pvInfo = pvInfoDataMap.get(label);
-        if (pvInfo == null) {
-            // make sure "label" is a valid pvInfo for study
-            StudyWrapper study = getPatient().getStudy();
-            if (study == null) {
-                throw new Exception("study is null");
+        PvInfoDataWrapper pvInfoData = pvInfoDataMap.get(label);
+        if (pvInfoData == null) {
+            PvInfoWrapper pvInfo = pvInfoMap.get(label);
+            // make sure "label" is a valid pvInfo
+            if (pvInfo == null) {
+                throw new Exception("PvInfo with label \"" + label
+                    + "\" is invalid");
             }
-
-            // make sure label is valid PV custom info, make the method call
-            // and make sure exception is not thrown
-            study.getPvInfoAllowedValues(label);
-
-            // not assigned yet
+            // not assigned yet so return null
             return null;
         }
-        return pvInfo.getValue();
+        return pvInfoData.getValue();
     }
 
     public Integer getPvInfoType(String label) throws Exception {
-        StudyWrapper study = getPatient().getStudy();
-        if (study == null) {
-            throw new Exception("study is null");
+        getPvInfoDataMap();
+        PvInfoDataWrapper pvInfoData = pvInfoDataMap.get(label);
+        if (pvInfoData == null) {
+            throw new Exception("PvInfoData for label \"" + label
+                + "\" does not exist");
         }
-        return study.getPvInfoType(label);
+        return pvInfoData.getPvInfo().getPvInfoType().getId();
     }
 
     public String[] getPvInfoAllowedValues(String label) throws Exception {
-        StudyWrapper study = getPatient().getStudy();
-        if (study == null) {
-            throw new Exception("study is null");
+        getPvInfoDataMap();
+        PvInfoDataWrapper pvInfoData = pvInfoDataMap.get(label);
+        if (pvInfoData == null) {
+            throw new Exception("PvInfoData for label \"" + label
+                + "\" does not exist");
         }
-        return study.getPvInfoAllowedValues(label);
+        String allowedValues = pvInfoData.getPvInfo().getAllowedValues();
+        if (allowedValues == null) {
+            return null;
+        }
+        return pvInfoData.getPvInfo().getAllowedValues().split(";");
     }
 
     public void setPvInfo(String label, String value) throws Exception {
         getPvInfoDataMap();
         PvInfoDataWrapper pid = pvInfoDataMap.get(label);
         if (pid == null) {
-            StudyWrapper study = getPatient().getStudy();
-            if (study == null) {
-                throw new Exception("study is null");
+            PvInfoWrapper pvInfo = pvInfoMap.get(label);
+            if (pvInfo == null) {
+                throw new Exception("no PvInfo found for label \"" + label
+                    + "\"");
             }
-            List<String> allowedValList = Arrays.asList(study
-                .getPvInfoAllowedValues(label));
-            if (!allowedValList.contains(value)) {
-                throw new Exception("PvInfoData with label \"" + label
-                    + "\" and value \"" + value + "\" is invalid");
+            String allowedValues = pvInfo.getAllowedValues();
+            if (allowedValues != null) {
+                String[] allowedValuesSplit = allowedValues.split(";");
+                List<String> allowedValList = Arrays.asList(allowedValuesSplit);
+                for (String selectedValue : value.split(";")) {
+                    if (!allowedValList.contains(selectedValue)) {
+                        throw new Exception("PvInfoData with label \"" + label
+                            + "\" and value \"" + value + "\" is invalid");
+                    }
+                }
             }
 
             pid = new PvInfoDataWrapper(appService, new PvInfoData());
             pid.setPatientVisit(this);
-            pid.setPvInfo(study.getPvInfo(label));
+            pid.setPvInfo(pvInfo);
             pvInfoDataMap.put(label, pid);
         }
         pid.setValue(value);

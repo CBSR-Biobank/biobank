@@ -377,7 +377,7 @@ public class StudyWrapper extends ModelWrapper<Study> {
     }
 
     @SuppressWarnings("unchecked")
-    private List<PvInfoWrapper> getPvInfoCollection() {
+    protected List<PvInfoWrapper> getPvInfoCollection() {
         List<PvInfoWrapper> pvInfoCollection = (List<PvInfoWrapper>) propertiesMap
             .get("pvInfoCollection");
         if (pvInfoCollection == null) {

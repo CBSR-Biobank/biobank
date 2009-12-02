@@ -38,11 +38,13 @@ public class PvInfoPossibleWrapper extends ModelWrapper<PvInfoPossible> {
     @Override
     protected void persistChecks() throws BiobankCheckException,
         ApplicationException {
+        // FIXME make sure another object with same label is not present
     }
 
     @Override
     protected void deleteChecks() throws BiobankCheckException,
         ApplicationException {
+        // FIXME if used by any study then it cannot be deleted
     }
 
     public String getLabel() {

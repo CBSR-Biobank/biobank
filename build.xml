@@ -252,6 +252,7 @@
 			<transaction src="${data.sql.dir}/sampleSources.sql" />
 			<transaction src="${data.sql.dir}/sampleTypes.sql" />
 			<transaction src="${data.sql.dir}/containerLabelingScheme.sql" />
+			<transaction src="${data.sql.dir}/shippingCompany.sql" />
 			<transaction src="${secu-log.dir}/schemaSecurityLogDump.sql" />
 			<transaction>commit;</transaction>
 			<classpath>

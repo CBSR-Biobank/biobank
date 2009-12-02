@@ -38,11 +38,6 @@ public class StudyViewForm extends BiobankViewForm {
 
     private class StudyPvCustomInfo extends PvCustomInfo {
         public Label wiget;
-
-        public StudyPvCustomInfo(String label, Integer type,
-            String[] allowedValues) {
-            super(label, type, allowedValues);
-        }
     }
 
     private List<StudyPvCustomInfo> pvCustomInfoList;
@@ -138,9 +133,11 @@ public class StudyViewForm extends BiobankViewForm {
         client.setLayout(new GridLayout(1, false));
 
         for (String label : studyWrapper.getPvInfoLabels()) {
-            StudyPvCustomInfo combinedPvInfo = new StudyPvCustomInfo(label,
-                studyWrapper.getPvInfoType(label), studyWrapper
-                    .getPvInfoAllowedValues(label));
+            StudyPvCustomInfo combinedPvInfo = new StudyPvCustomInfo();
+            combinedPvInfo.setLabel(label);
+            combinedPvInfo.setType(studyWrapper.getPvInfoType(label));
+            combinedPvInfo.setAllowedValues(studyWrapper
+                .getPvInfoAllowedValues(label));
             pvCustomInfoList.add(combinedPvInfo);
         }
 

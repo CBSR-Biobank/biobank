@@ -7,12 +7,6 @@ public class PvCustomInfo {
     private String[] allowedValues;
     private String value;
 
-    public PvCustomInfo(String label, Integer type, String[] allowedValues) {
-        setLabel(label);
-        setType(type);
-        setAllowedValues(allowedValues);
-    }
-
     public Boolean getIsDefault() {
         return isDefault;
     }
