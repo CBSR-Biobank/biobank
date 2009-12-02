@@ -16,7 +16,6 @@ public class StudyPvInfo {
         PvInfo pvInfo = new PvInfo();
         pvInfo.setLabel(pvInfoPossible.getLabel());
         pvInfo.setPvInfoPossible(pvInfoPossible);
-        pvInfo.setPvInfoType(pvInfoPossible.getPvInfoType());
         return pvInfo;
     }
 

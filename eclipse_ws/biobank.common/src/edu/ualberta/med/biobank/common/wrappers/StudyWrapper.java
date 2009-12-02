@@ -473,7 +473,6 @@ public class StudyWrapper extends ModelWrapper<Study> {
         // label is a valid PvInfoPossible, add PvInfo to the study
         pvInfo = new PvInfoWrapper(appService);
         pvInfo.setPvInfoPossible(pip);
-        pvInfo.setPvInfoType(pip.getPvInfoType());
         pvInfo.setLabel(label);
         return pvInfo;
     }
