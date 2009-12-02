@@ -28,6 +28,7 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
@@ -101,7 +102,6 @@ public class TestPatient extends TestDatabase {
             TestCommon.getNewBarcode(r), top, site, containerTypeMap
                 .get("ChildCtL1"), 0, 0);
         containerMap.put("ChildL1", childL1);
-
     }
 
     @Test
@@ -158,6 +158,7 @@ public class TestPatient extends TestDatabase {
         PatientWrapper patient = PatientHelper.addPatient(Utils
             .getRandomNumericString(20), study);
         patient.delete();
+        study.reload();
 
         // create new patient with patient visits, should not be allowed to
         // delete
@@ -171,8 +172,8 @@ public class TestPatient extends TestDatabase {
             patient, shipment);
         List<SampleTypeWrapper> allSampleTypes = SampleTypeWrapper
             .getGlobalSampleTypes(appService, true);
-        SampleHelper.addSample(allSampleTypes.get(0), containerMap
-            .get("ChildL1"), visits.get(0), 0, 0);
+        SampleWrapper sample = SampleHelper.addSample(allSampleTypes.get(0),
+            containerMap.get("ChildL1"), visits.get(0), 0, 0);
         patient.reload();
 
         try {
@@ -181,6 +182,11 @@ public class TestPatient extends TestDatabase {
         } catch (Exception e) {
             Assert.assertTrue(true);
         }
+
+        // delete sample and patient
+        sample.delete();
+        patient.reload();
+        patient.delete();
     }
 
     @Test

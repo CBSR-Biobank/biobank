@@ -603,13 +603,13 @@ public class SiteWrapper extends ModelWrapper<Site> {
      */
     private void deletePvInfoPossibleDifference(Site origSite)
         throws BiobankCheckException, ApplicationException, WrapperException {
-        List<PvInfoPossibleWrapper> newPvInfoPossible = getPvInfoPossibleCollection();
-        List<PvInfoPossibleWrapper> oldSampleSources = new SiteWrapper(
+        int newPvInfoPossibleCount = pvInfoPossibleMap.size();
+        List<PvInfoPossibleWrapper> oldPvInfoPossible = new SiteWrapper(
             appService, origSite).getPvInfoPossibleCollection();
-        if (oldSampleSources != null) {
-            for (PvInfoPossibleWrapper st : oldSampleSources) {
-                if ((newPvInfoPossible == null)
-                    || !newPvInfoPossible.contains(st)) {
+        if (oldPvInfoPossible != null) {
+            for (PvInfoPossibleWrapper st : oldPvInfoPossible) {
+                if ((newPvInfoPossibleCount == 0)
+                    || (pvInfoPossibleMap.get(st.getLabel()) == null)) {
                     st.delete();
                 }
             }
@@ -723,7 +723,7 @@ public class SiteWrapper extends ModelWrapper<Site> {
             throw new Exception("PvInfoPossible with label \"" + label
                 + "\" does not exist");
         }
-        pvInfoPossible.delete();
+        pvInfoPossibleMap.remove(label);
     }
 
     public static Map<String, String> getGlobalPvInfoPossible(

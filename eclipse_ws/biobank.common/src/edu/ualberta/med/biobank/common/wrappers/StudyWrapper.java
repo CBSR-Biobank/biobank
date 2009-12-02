@@ -152,7 +152,7 @@ public class StudyWrapper extends ModelWrapper<Study> {
                             throw new BiobankCheckException(
                                 "Patient "
                                     + p.getNumber()
-                                    + " has been remove from the patients list: this patient should be deleted first.");
+                                    + " has been removed from the patients list: this patient should be deleted first.");
                         }
                     }
                 }
