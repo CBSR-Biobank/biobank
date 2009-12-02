@@ -205,6 +205,15 @@ public class SiteWrapper extends ModelWrapper<Site> {
             throw new BiobankCheckException("A site with name \"" + getName()
                 + "\" already exists.");
         }
+        if (!isNew()) {
+            Site origSite = new Site();
+            origSite.setId(getId());
+            origSite = (Site) appService.search(Site.class, origSite).get(0);
+            checkNoStudyRemoved(origSite);
+            checkNoClinicRemoved(origSite);
+            checkNoContainerTypeRemoved(origSite);
+            checkNoContainerRemoved(origSite);
+        }
     }
 
     private boolean checkSiteNameUnique() throws ApplicationException {
@@ -221,6 +230,106 @@ public class SiteWrapper extends ModelWrapper<Site> {
 
         List<Object> results = appService.query(c);
         return (results.size() == 0);
+    }
+
+    private void checkNoStudyRemoved(Site origSite)
+        throws BiobankCheckException, ApplicationException {
+        if (!isNew()) {
+            List<StudyWrapper> newStudies = getStudyCollection();
+            List<StudyWrapper> oldStudies = new SiteWrapper(appService,
+                origSite).getStudyCollection();
+            if (newStudies != null) {
+                for (StudyWrapper s : oldStudies) {
+                    if ((newStudies == null) || !newStudies.contains(s)) {
+                        Study dbStudy = new Study();
+                        dbStudy.setId(s.getId());
+                        // check if still in database
+                        if (appService.search(Study.class, dbStudy).size() == 1) {
+                            throw new BiobankCheckException(
+                                "Study "
+                                    + s.getName()
+                                    + " has been remove from the studies list: this study should be deleted first.");
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private void checkNoClinicRemoved(Site origSite)
+        throws BiobankCheckException, ApplicationException {
+        if (!isNew()) {
+            List<ClinicWrapper> newClinics = getClinicCollection();
+            List<ClinicWrapper> oldClinics = new SiteWrapper(appService,
+                origSite).getClinicCollection();
+            if (newClinics != null) {
+                for (ClinicWrapper c : oldClinics) {
+                    if ((newClinics == null) || !newClinics.contains(c)) {
+                        Clinic dbClinic = new Clinic();
+                        dbClinic.setId(c.getId());
+                        // check if still in database
+                        if (appService.search(Clinic.class, dbClinic).size() == 1) {
+                            throw new BiobankCheckException(
+                                "Clinic "
+                                    + c.getName()
+                                    + " has been remove from the clinics list: this clinic should be deleted first.");
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private void checkNoContainerTypeRemoved(Site origSite)
+        throws BiobankCheckException, ApplicationException {
+        if (!isNew()) {
+            List<ContainerTypeWrapper> newContainerTypes = getContainerTypeCollection();
+            List<ContainerTypeWrapper> oldContainerTypes = new SiteWrapper(
+                appService, origSite).getContainerTypeCollection();
+            if (newContainerTypes != null) {
+                for (ContainerTypeWrapper c : oldContainerTypes) {
+                    if ((newContainerTypes == null)
+                        || !newContainerTypes.contains(c)) {
+                        ContainerType dbContainerType = new ContainerType();
+                        dbContainerType.setId(c.getId());
+                        // check if still in database
+                        if (appService.search(ContainerType.class,
+                            dbContainerType).size() == 1) {
+                            throw new BiobankCheckException(
+                                "ContainerType "
+                                    + c.getName()
+                                    + " has been remove from the container types list: this type should be deleted first.");
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private void checkNoContainerRemoved(Site origSite)
+        throws BiobankCheckException, ApplicationException {
+        if (!isNew()) {
+            List<ContainerWrapper> newContainers = getContainerCollection();
+            List<ContainerWrapper> oldContainers = new SiteWrapper(
+                appService, origSite).getContainerCollection();
+            if (newContainers != null) {
+                for (ContainerWrapper c : oldContainers) {
+                    if ((newContainers == null)
+                        || !newContainers.contains(c)) {
+                        Container dbContainer = new Container();
+                        dbContainer.setId(c.getId());
+                        // check if still in database
+                        if (appService.search(Container.class, dbContainer)
+                            .size() == 1) {
+                            throw new BiobankCheckException(
+                                "Container "
+                                    + c.getFullInfoLabel()
+                                    + " has been remove from the containers list: this container should be deleted first.");
+                        }
+                    }
+                }
+            }
+        }
     }
 
     @Override
