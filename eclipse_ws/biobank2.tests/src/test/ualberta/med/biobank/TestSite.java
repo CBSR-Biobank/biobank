@@ -117,6 +117,14 @@ public class TestSite extends TestDatabase {
         int idStudy = study.getId();
         studies.remove(study);
         site.setStudyCollection(studies);
+
+        try {
+            site.persist();
+            Assert.fail("a study is missing and is not deleted");
+        } catch (BiobankCheckException bce) {
+            Assert.assertTrue(true);
+        }
+
         study.delete();
         site.persist();
 
@@ -191,9 +199,16 @@ public class TestSite extends TestDatabase {
         int idClinic = clinic.getId();
         clinics.remove(clinic);
         site.setClinicCollection(clinics);
+
+        try {
+            site.persist();
+            Assert.fail("a clinic is missing and is not deleted");
+        } catch (BiobankCheckException bce) {
+            Assert.assertTrue(true);
+        }
+
         clinic.delete();
         site.persist();
-
         site.reload();
         // one clinic removed
         Assert.assertEquals(nber - 1, site.getClinicCollection().size());
@@ -267,6 +282,14 @@ public class TestSite extends TestDatabase {
         int idType = type.getId();
         types.remove(type);
         site.setContainerTypeCollection(types);
+
+        try {
+            site.persist();
+            Assert.fail("a containertype is missing and is not deleted");
+        } catch (BiobankCheckException bce) {
+            Assert.assertTrue(true);
+        }
+
         type.delete();
         site.persist();
 
@@ -324,11 +347,22 @@ public class TestSite extends TestDatabase {
             name, r.nextInt(3) + 1);
 
         List<ContainerWrapper> containers = site.getContainerCollection();
-        containers.removeAll(site.getTopContainerCollection());
-        ContainerWrapper container = DbHelper.chooseRandomlyInList(containers);
+        List<ContainerWrapper> containersToChoose = new ArrayList<ContainerWrapper>(
+            containers);
+        containersToChoose.removeAll(site.getTopContainerCollection());
+        ContainerWrapper container = DbHelper
+            .chooseRandomlyInList(containersToChoose);
         int idContainer = container.getId();
         containers.remove(container);
         site.setContainerCollection(containers);
+
+        try {
+            site.persist();
+            Assert.fail("a container is missing and is not deleted");
+        } catch (BiobankCheckException bce) {
+            Assert.assertTrue(true);
+        }
+
         container.delete();
         site.persist();
 
@@ -400,6 +434,8 @@ public class TestSite extends TestDatabase {
         int idContainer = type.getId();
         types.remove(type);
         site.setSampleTypeCollection(types);
+        // don't need to delete the type, thanks to method
+        // deleteSampleTypeDifference of persistDependencies
         SampleTypeHelper.removeFromCreated(type);
         site.persist();
 
@@ -707,6 +743,32 @@ public class TestSite extends TestDatabase {
         Assert.assertEquals(type, site2.getPvInfoTypeName(name));
         Assert.assertFalse(Arrays.asList(site.getPvInfoPossibleLabels())
             .contains(name));
+    }
+
+    @Test
+    public void testRemovePvInfoPossible() throws Exception {
+        String name = "testRemovePvInfoPossible" + r.nextInt();
+
+        SiteWrapper site = SiteHelper.addSite(name);
+
+        int sizeOrig = site.getPvInfoPossibleLabels().length;
+        String[] types = site.getPvInfoTypeNames();
+        if (types.length < 2) {
+            Assert.fail("Can't test without pvinfotypes");
+        }
+        site.setPvInfoPossible(name, types[0]);
+        site.setPvInfoPossible(name + "_2", types[1]);
+        site.persist();
+
+        site.reload();
+        Assert
+            .assertEquals(sizeOrig + 2, site.getPvInfoPossibleLabels().length);
+        site.deletePvInfoPossible(name);
+        site.persist();
+
+        site.reload();
+        Assert
+            .assertEquals(sizeOrig + 1, site.getPvInfoPossibleLabels().length);
     }
 
     @Test
