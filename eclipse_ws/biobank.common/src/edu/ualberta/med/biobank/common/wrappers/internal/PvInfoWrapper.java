@@ -1,11 +1,16 @@
 package edu.ualberta.med.biobank.common.wrappers.internal;
 
+import java.util.Arrays;
+import java.util.List;
+
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.model.PvInfo;
+import edu.ualberta.med.biobank.model.PvInfoData;
 import edu.ualberta.med.biobank.model.PvInfoPossible;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
+import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class PvInfoWrapper extends ModelWrapper<PvInfo> {
 
@@ -37,6 +42,25 @@ public class PvInfoWrapper extends ModelWrapper<PvInfo> {
     @Override
     protected void deleteChecks() throws BiobankCheckException,
         ApplicationException {
+        if (isUsedByPatientVisits()) {
+            throw new BiobankCheckException(
+                "Unable to delete PvInfoData with id " + getId()
+                    + ". A patient visit using it exists in storage."
+                    + " Remove all instances before deleting this type.");
+        }
+    }
+
+    public boolean isUsedByPatientVisits() throws ApplicationException,
+        BiobankCheckException {
+        String queryString = "select count(pvd) from "
+            + PvInfoData.class.getName() + " as pvd where pvd.pvInfo = ?)";
+        HQLCriteria c = new HQLCriteria(queryString, Arrays
+            .asList(new Object[] { wrappedObject }));
+        List<Long> results = appService.query(c);
+        if (results.size() != 1) {
+            throw new BiobankCheckException("Invalid size for HQL query result");
+        }
+        return results.get(0) > 0;
     }
 
     public String getLabel() {
@@ -85,5 +109,4 @@ public class PvInfoWrapper extends ModelWrapper<PvInfo> {
     public int compareTo(ModelWrapper<PvInfo> o) {
         return 0;
     }
-
 }
