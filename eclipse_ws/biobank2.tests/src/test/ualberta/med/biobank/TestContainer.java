@@ -68,7 +68,7 @@ public class TestContainer extends TestDatabase {
         ContainerTypeWrapper topType, childType;
 
         childType = ContainerTypeHelper.addContainerType(site,
-            "Child L4 Container Type", "CCTL4", 3, 10, 10, false);
+            "Child L4 Container Type", "CCTL4", 3, 4, 9, false);
         containerTypeMap.put("ChildCtL4", childType);
 
         childType = ContainerTypeHelper.addContainerType(site,
@@ -80,14 +80,14 @@ public class TestContainer extends TestDatabase {
         containerTypeMap.put("ChildCtL3", childType);
 
         childType = ContainerTypeHelper.newContainerType(site,
-            "Child L2 Container Type", "CCTL2", 1, 1, 10, false);
+            "Child L2 Container Type", "CCTL2", 1, 3, 12, false);
         childType.setChildContainerTypeCollection(Arrays
             .asList(containerTypeMap.get("ChildCtL3")));
         childType.persist();
         containerTypeMap.put("ChildCtL2", childType);
 
         childType = ContainerTypeHelper.newContainerType(site,
-            "Child L1 Container Type", "CCTL1", 3, 1, 10, false);
+            "Child L1 Container Type", "CCTL1", 3, 4, 5, false);
         childType.setChildContainerTypeCollection(Arrays
             .asList(containerTypeMap.get("ChildCtL2")));
         childType.persist();
@@ -512,27 +512,29 @@ public class TestContainer extends TestDatabase {
 
         for (int row = 0, m = type.getRowCapacity(); row < m; ++row) {
             for (int col = 0, n = type.getColCapacity(); col < n; ++col) {
-                int index = n * row + col;
                 int len = LabelingScheme.CBSR_LABELLING_PATTERN.length();
                 String label = null;
 
                 switch (type.getChildLabelingScheme()) {
-                case 1:
-                    label = String.format(container.getParent().getLabel()
-                        + "%c%c", LabelingScheme.SBS_ROW_LABELLING_PATTERN
-                        .charAt(row), LabelingScheme.CBSR_LABELLING_PATTERN
-                        .charAt(col));
+                case 1: {
+                    label = String.format("%c%d",
+                        LabelingScheme.SBS_ROW_LABELLING_PATTERN.charAt(row),
+                        col + 1);
                     break;
-                case 2:
-                    label = String.format(container.getParent().getLabel()
-                        + "%c%c", LabelingScheme.CBSR_LABELLING_PATTERN
-                        .charAt(index / len),
+                }
+                case 2: {
+                    int index = m * col + row;
+                    label = String.format("%c%c",
                         LabelingScheme.CBSR_LABELLING_PATTERN.charAt(index
-                            % len));
+                            / len), LabelingScheme.CBSR_LABELLING_PATTERN
+                            .charAt(index % len));
                     break;
-                case 3:
-                    label = new Integer(index).toString();
+                }
+                case 3: {
+                    int index = m * col + row + 1;
+                    label = String.format("%02d", index);
                     break;
+                }
                 default:
                     Assert.fail("labeling scheme not used");
                 }
@@ -540,6 +542,11 @@ public class TestContainer extends TestDatabase {
 
                 RowColPos result = container
                     .getPositionFromLabelingScheme(label);
+
+                System.out.println("type/" + type + " scheme/"
+                    + type.getChildLabelingScheme() + " label/" + label
+                    + " row/" + result.row + " col/" + result.col);
+
                 Assert.assertNotNull(result);
                 Assert.assertEquals(row, result.row.intValue());
                 Assert.assertEquals(col, result.col.intValue());
@@ -594,8 +601,7 @@ public class TestContainer extends TestDatabase {
     private PatientVisitWrapper addPatientVisit() throws Exception {
         StudyWrapper study = StudyHelper.addStudy(site, "Study1");
         ContactHelper.addContactsToStudy(study, "contactsStudy1");
-        ClinicWrapper clinic = study.getContactCollection().get(0)
-            .getClinic();
+        ClinicWrapper clinic = study.getContactCollection().get(0).getClinic();
         PatientWrapper patient = PatientHelper.addPatient("1000", study);
         ShipmentWrapper shipment = ShipmentHelper.addShipment(clinic, patient);
         PatientVisitWrapper pv = PatientVisitHelper.addPatientVisit(patient,
@@ -643,8 +649,7 @@ public class TestContainer extends TestDatabase {
 
         StudyWrapper study = StudyHelper.addStudy(site, "Study1");
         ContactHelper.addContactsToStudy(study, "contactsStudy1");
-        ClinicWrapper clinic = study.getContactCollection().get(0)
-            .getClinic();
+        ClinicWrapper clinic = study.getContactCollection().get(0).getClinic();
         PatientWrapper patient = PatientHelper.addPatient("1000", study);
         ShipmentWrapper shipment = ShipmentHelper.addShipment(clinic, patient);
         PatientVisitWrapper pv = PatientVisitHelper.addPatientVisit(patient,
@@ -813,14 +818,23 @@ public class TestContainer extends TestDatabase {
     public void testInitChildrenWithType() throws Exception {
         ContainerWrapper top;
 
-        ContainerTypeWrapper childType2 = ContainerTypeHelper.addContainerType(
-            site, "Child L1 Container Type - 2", "CCTL1-2", 3, 1, 15, false);
-
         top = containerMap.get("Top");
         addContainerHierarchy(top);
 
+        // create a new child type to go under top level container
+        ContainerTypeWrapper childType1_2 = ContainerTypeHelper
+            .addContainerType(site, "Child L1 Container Type - 2", "CCTL1-2",
+                3, 1, 15, false);
+
+        ContainerTypeWrapper topType = containerTypeMap.get("TopCT");
+
+        topType.setChildContainerTypeCollection(Arrays.asList(containerTypeMap
+            .get("ChildCtL1"), childType1_2));
+        topType.persist();
+        topType.reload();
+
         Assert.assertTrue(top.getChildren().size() == 1);
-        top.initChildrenWithType(childType2);
+        top.initChildrenWithType(childType1_2);
         top.reload();
 
         Collection<ContainerWrapper> children = top.getChildren().values();
@@ -832,7 +846,7 @@ public class TestContainer extends TestDatabase {
                     containerTypeMap.get("ChildCtL1")));
             } else {
                 Assert.assertTrue(container.getContainerType().equals(
-                    childType2));
+                    childType1_2));
             }
         }
     }
@@ -890,12 +904,13 @@ public class TestContainer extends TestDatabase {
 
     @Test(expected = BiobankCheckException.class)
     public void testParentSameSite() throws Exception {
+        // create an alternate site and create a container type for the
+        // alternate site
         SiteWrapper altSite = SiteHelper.addSite("Site2 - Container Test"
             + Utils.getRandomString(10));
 
-        ContainerTypeWrapper childType = ContainerTypeHelper.newContainerType(
+        ContainerTypeWrapper childType = ContainerTypeHelper.addContainerType(
             altSite, "Alt Child L1 Container Type", "ACCTL1", 3, 1, 10, false);
-        childType.persist();
 
         ContainerTypeWrapper altTopType = ContainerTypeHelper.newContainerType(
             altSite, "Alt Top Container Type", "ATCT", 2, CONTAINER_TOP_ROWS,
@@ -903,11 +918,13 @@ public class TestContainer extends TestDatabase {
         altTopType.setChildContainerTypeCollection(Arrays
             .asList(new ContainerTypeWrapper[] { childType }));
         altTopType.persist();
-        altTopType.reload();
+        childType.reload();
 
         ContainerWrapper altTop = ContainerHelper.addContainer("01", TestCommon
             .getNewBarcode(r), null, altSite, altTopType);
 
+        // now a container of type container type for alternate site to the main
+        // site
         ContainerHelper.addContainer(null, TestCommon.getNewBarcode(r), altTop,
             site, childType, 0, 0);
     }
