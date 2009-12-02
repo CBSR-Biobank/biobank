@@ -532,11 +532,6 @@ public class TestSite extends TestDatabase {
     }
 
     @Test
-    public void testPersistDeletePvInfoDifference() {
-        Assert.fail("add a test to check this is ok");
-    }
-
-    @Test
     public void testDelete() throws Exception {
         SiteWrapper site = SiteHelper
             .addSite("testDelete" + r.nextInt(), false);

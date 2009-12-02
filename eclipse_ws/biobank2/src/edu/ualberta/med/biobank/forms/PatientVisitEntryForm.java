@@ -161,7 +161,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         pvSampleSourceEntryWidget = new PvSampleSourceEntryWidget(client,
-            SWT.NONE, patientVisit.getPvSampleSourceCollection(), toolkit);
+            SWT.NONE, patientVisit, toolkit);
         pvSampleSourceEntryWidget
             .addSelectionChangedListener(new BiobankEntryFormWidgetListener() {
                 @Override
