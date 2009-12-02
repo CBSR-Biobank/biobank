@@ -8,7 +8,7 @@ import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 
 public class SiteHelper extends DbHelper {
 
-    protected static List<SiteWrapper> createdSites = new ArrayList<SiteWrapper>();
+    public static List<SiteWrapper> createdSites = new ArrayList<SiteWrapper>();
 
     public static SiteWrapper newSite(String name) {
         SiteWrapper site = new SiteWrapper(appService);

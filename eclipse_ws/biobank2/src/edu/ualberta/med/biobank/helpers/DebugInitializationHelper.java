@@ -99,7 +99,7 @@ public class DebugInitializationHelper {
                         "insertContainerTypesInSite", "insertContainers",
                         "insertSampleStorage" };
                     int taskNber = insertMethodNames.length
-                        + (5 * SiteWrapper.getAllSites(appService).size());
+                        + (5 * SiteWrapper.getSites(appService).size());
 
                     monitor.beginTask("Adding new objects to database...",
                         taskNber);
@@ -464,7 +464,7 @@ public class DebugInitializationHelper {
     }
 
     public void deleteSites(IProgressMonitor monitor) throws Exception {
-        for (SiteWrapper site : SiteWrapper.getAllSites(appService)) {
+        for (SiteWrapper site : SiteWrapper.getSites(appService)) {
             monitor.subTask("deleting site " + site);
             site.reload();
             deleteContainers(site.getTopContainerCollection(), monitor);

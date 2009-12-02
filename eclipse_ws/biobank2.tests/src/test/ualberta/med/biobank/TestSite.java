@@ -1,5 +1,6 @@
 package test.ualberta.med.biobank;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -20,10 +21,34 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.common.wrappers.internal.PvInfoPossibleWrapper;
+import edu.ualberta.med.biobank.common.wrappers.internal.PvInfoTypeWrapper;
+import edu.ualberta.med.biobank.model.PvInfoType;
+import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.model.Site;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class TestSite extends TestDatabase {
+
+    private List<String> globalPvInfoPossibleAdded = new ArrayList<String>();
+
+    @Override
+    public void setUp() throws Exception {
+        super.setUp();
+    }
+
+    @Override
+    public void tearDown() throws Exception {
+        super.tearDown();
+        for (PvInfoPossibleWrapper pvInfoPossibleWrapper : PvInfoPossibleWrapper
+            .getGlobalPvInfoPossible(appService, false)) {
+            if (globalPvInfoPossibleAdded.contains(pvInfoPossibleWrapper
+                .getLabel())) {
+                pvInfoPossibleWrapper.delete();
+            }
+        }
+        globalPvInfoPossibleAdded.clear();
+    }
 
     @Test
     public void testGettersAndSetters() throws Exception {
@@ -62,8 +87,8 @@ public class TestSite extends TestDatabase {
     }
 
     @Test
-    public void testAddInStudyCollection() throws Exception {
-        String name = "testGetStudyCollectionBoolean" + r.nextInt();
+    public void testSetStudyCollectionAdd() throws Exception {
+        String name = "testSetStudyCollectionAdd" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         int studiesNber = r.nextInt(15) + 1;
         StudyHelper.addStudies(site, name, studiesNber);
@@ -80,8 +105,8 @@ public class TestSite extends TestDatabase {
     }
 
     @Test
-    public void testRemoveInStudyCollection() throws Exception {
-        String name = "testRemoveInStudyCollection" + r.nextInt();
+    public void testSetStudyCollectionRemove() throws Exception {
+        String name = "testSetStudyCollectionRemove" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         int studiesNber = r.nextInt(15) + 1;
         StudyHelper.addStudies(site, name, studiesNber);
@@ -136,8 +161,8 @@ public class TestSite extends TestDatabase {
     }
 
     @Test
-    public void testAddInClinicCollection() throws Exception {
-        String name = "testAddInClinicCollection" + r.nextInt();
+    public void testSetClinicCollectionAdd() throws Exception {
+        String name = "testSetClinicCollectionAdd" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         int nber = r.nextInt(15) + 1;
         ClinicHelper.addClinics(site, name, nber);
@@ -154,8 +179,8 @@ public class TestSite extends TestDatabase {
     }
 
     @Test
-    public void testRemoveInClinicCollection() throws Exception {
-        String name = "testRemoveInClinicCollection" + r.nextInt();
+    public void testSetClinicCollectionRemove() throws Exception {
+        String name = "testSetClinicCollectionRemove" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         int nber = r.nextInt(15) + 1;
         ClinicHelper.addClinics(site, name, nber);
@@ -211,8 +236,8 @@ public class TestSite extends TestDatabase {
     }
 
     @Test
-    public void testAddInContainerTypeCollection() throws Exception {
-        String name = "testAddInContainerTypeCollection" + r.nextInt();
+    public void testSetContainerTypeCollectionAdd() throws Exception {
+        String name = "testSetContainerTypeCollectionAdd" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         int nber = r.nextInt(15) + 1;
         ContainerTypeHelper.addContainerTypesRandom(site, name, nber);
@@ -230,8 +255,8 @@ public class TestSite extends TestDatabase {
     }
 
     @Test
-    public void testRemoveInContainerTypeCollection() throws Exception {
-        String name = "testRemoveInContainerTypeCollection" + r.nextInt();
+    public void testSetContainerTypeCollectionRemove() throws Exception {
+        String name = "testSetContainerTypeCollectionRemove" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         int nber = r.nextInt(15) + 1;
         ContainerTypeHelper.addContainerTypesRandom(site, name, nber);
@@ -269,8 +294,8 @@ public class TestSite extends TestDatabase {
     }
 
     @Test
-    public void testAddInContainerCollection() throws Exception {
-        String name = "testAddInContainerCollection" + r.nextInt();
+    public void testSetContainerCollectionAdd() throws Exception {
+        String name = "testSetContainerCollectionAdd" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         int totalContainers = ContainerHelper.addTopContainersWithChildren(
             site, name, r.nextInt(3) + 1);
@@ -291,8 +316,8 @@ public class TestSite extends TestDatabase {
     }
 
     @Test
-    public void testRemoveInContainerCollection() throws Exception {
-        String name = "testRemoveInContainerCollection" + r.nextInt();
+    public void testSetContainerCollectionRemove() throws Exception {
+        String name = "testSetContainerCollectionRemove" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         int totalNber = ContainerHelper.addTopContainersWithChildren(site,
             name, r.nextInt(3) + 1);
@@ -347,8 +372,8 @@ public class TestSite extends TestDatabase {
     }
 
     @Test
-    public void testAddInSampleTypeCollection() throws Exception {
-        String name = "testAddInSampleTypeCollection" + r.nextInt();
+    public void testSetSampleTypeCollectionAdd() throws Exception {
+        String name = "testSetSampleTypeCollectionAdd" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         int nber = SampleTypeHelper.addSampleTypes(site, name);
 
@@ -364,8 +389,8 @@ public class TestSite extends TestDatabase {
     }
 
     @Test
-    public void testRemoveInSampleTypeCollection() throws Exception {
-        String name = "testRemoveInSampleTypeCollection" + r.nextInt();
+    public void testSetSampleTypeCollectionRemove() throws Exception {
+        String name = "testSetSampleTypeCollectionRemove" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         int nber = SampleTypeHelper.addSampleTypes(site, name);
 
@@ -374,7 +399,6 @@ public class TestSite extends TestDatabase {
         int idContainer = type.getId();
         types.remove(type);
         site.setSampleTypeCollection(types);
-        type.delete();
         SampleTypeHelper.removeFromCreated(type);
         site.persist();
 
@@ -390,16 +414,46 @@ public class TestSite extends TestDatabase {
     }
 
     @Test
+    public void testGetAllSampleTypeCollection() throws Exception {
+        String name = "testGetAllSampleTypeCollection" + r.nextInt();
+        List<SampleType> types = appService.search(SampleType.class,
+            new SampleType());
+        SiteWrapper site = SiteHelper.addSite(name);
+        int nber = SampleTypeHelper.addSampleTypes(site, name);
+
+        site.reload();
+        List<SampleTypeWrapper> all = site.getAllSampleTypeCollection();
+        Assert.assertEquals(nber + types.size(), all.size());
+    }
+
+    @Test
+    public void testGetAllSampleTypeCollectionBoolean() throws Exception {
+        String name = "testGetAllSampleTypeCollectionBoolean" + r.nextInt();
+        SiteWrapper site = SiteHelper.addSite(name);
+        SampleTypeHelper.addSampleTypes(site, name);
+
+        List<SampleTypeWrapper> types = site.getAllSampleTypeCollection(true);
+        if (types.size() > 1) {
+            for (int i = 0; i < types.size() - 1; i++) {
+                SampleTypeWrapper type1 = types.get(i);
+                SampleTypeWrapper type2 = types.get(i + 1);
+                Assert.assertTrue(type1.compareTo(type2) <= 0);
+            }
+        }
+    }
+
+    @Test
     public void testPersist() throws Exception {
-        int oldTotal = SiteWrapper.getAllSites(appService).size();
+        int oldTotal = SiteWrapper.getSites(appService).size();
         SiteHelper.addSite("testPersist" + r.nextInt());
-        int newTotal = SiteWrapper.getAllSites(appService).size();
+        int newTotal = SiteWrapper.getSites(appService).size();
         Assert.assertEquals(oldTotal + 1, newTotal);
     }
 
     @Test
-    public void testPersistFail() throws Exception {
-        String name = "testPersistFail" + r.nextInt();
+    public void testPersistFailNoAddress() throws Exception {
+        int oldTotal = SiteWrapper.getSites(appService).size();
+        String name = "testPersistFailNoAddress" + r.nextInt();
         SiteWrapper site = new SiteWrapper(appService);
         site.setName(name);
 
@@ -410,18 +464,39 @@ public class TestSite extends TestDatabase {
             Assert.assertTrue(true);
         }
 
-        // really insert it this time:
+        site.setCity("Vesoul");
+        SiteHelper.createdSites.add(site);
+        site.persist();
+        int newTotal = SiteWrapper.getSites(appService).size();
+        Assert.assertEquals(oldTotal + 1, newTotal);
+    }
+
+    @Test
+    public void testPersistFailNameUnique() throws Exception {
+        int oldTotal = SiteWrapper.getSites(appService).size();
+        String name = "testPersistFailNameUnique" + r.nextInt();
+        SiteWrapper site = SiteHelper.newSite(name);
         site = SiteHelper.addSite(name);
         site.persist();
 
-        site = SiteHelper.newSite(name);
+        SiteWrapper site2 = SiteHelper.newSite(name);
         try {
-            site.persist();
+            site2.persist();
             Assert
                 .fail("Should not insert the site : same name already in database");
         } catch (BiobankCheckException bce) {
             Assert.assertTrue(true);
         }
+
+        site.setName("Other Name");
+        site.persist();
+        int newTotal = SiteWrapper.getSites(appService).size();
+        Assert.assertEquals(oldTotal + 1, newTotal);
+    }
+
+    @Test
+    public void testPersistDeletePvInfoDifference() {
+        Assert.fail("add a test to check this is ok");
     }
 
     @Test
@@ -440,6 +515,100 @@ public class TestSite extends TestDatabase {
             .getId());
         // object is not anymore in database
         Assert.assertNull(siteInDB);
+    }
+
+    @Test
+    public void testDeleteFailNoMoreStudy() throws Exception {
+        int oldTotal = SiteWrapper.getSites(appService).size();
+        String name = "testDeleteFailNoMoreStudy" + r.nextInt();
+        SiteWrapper site = SiteHelper.addSite(name, false);
+
+        StudyWrapper study = StudyHelper.addStudy(site, name);
+        site.reload();
+
+        try {
+            site.delete();
+            Assert.fail("Should not delete the site : a study is still there");
+        } catch (BiobankCheckException bce) {
+            Assert.assertEquals(oldTotal + 1, SiteWrapper.getSites(appService)
+                .size());
+        }
+        study.delete();
+        site.reload();
+        site.delete();
+        Assert.assertEquals(oldTotal, SiteWrapper.getSites(appService).size());
+    }
+
+    @Test
+    public void testDeleteFailNoMoreClinic() throws Exception {
+        int oldTotal = SiteWrapper.getSites(appService).size();
+        String name = "testDeleteFailNoMoreClinic" + r.nextInt();
+        SiteWrapper site = SiteHelper.addSite(name, false);
+
+        ClinicWrapper clinic = ClinicHelper.addClinic(site, name);
+        site.reload();
+
+        try {
+            site.delete();
+            Assert.fail("Should not delete the site : a clinic is still there");
+        } catch (BiobankCheckException bce) {
+            Assert.assertEquals(oldTotal + 1, SiteWrapper.getSites(appService)
+                .size());
+        }
+        clinic.delete();
+        site.reload();
+        site.delete();
+        Assert.assertEquals(oldTotal, SiteWrapper.getSites(appService).size());
+    }
+
+    @Test
+    public void testDeleteFailNoMoreContainerType() throws Exception {
+        int oldTotal = SiteWrapper.getSites(appService).size();
+        String name = "testDeleteFailNoMoreContainerType" + r.nextInt();
+        SiteWrapper site = SiteHelper.addSite(name, false);
+
+        ContainerTypeWrapper type = ContainerTypeHelper.addContainerType(site,
+            name, name, 1, 2, 3, false);
+        site.reload();
+
+        try {
+            site.delete();
+            Assert
+                .fail("Should not delete the site : a container type is still there");
+        } catch (BiobankCheckException bce) {
+            Assert.assertEquals(oldTotal + 1, SiteWrapper.getSites(appService)
+                .size());
+        }
+        type.delete();
+        site.reload();
+        site.delete();
+        Assert.assertEquals(oldTotal, SiteWrapper.getSites(appService).size());
+    }
+
+    @Test
+    public void testDeleteFailNoMoreContainer() throws Exception {
+        int oldTotal = SiteWrapper.getSites(appService).size();
+        String name = "testDeleteFailNoMoreContainer" + r.nextInt();
+        SiteWrapper site = SiteHelper.addSite(name, false);
+
+        ContainerWrapper container = ContainerHelper.addContainerRandom(site,
+            name, null);
+        site.reload();
+
+        try {
+            site.delete();
+            Assert
+                .fail("Should not delete the site : a container and a container type is still there");
+        } catch (BiobankCheckException bce) {
+            Assert.assertEquals(oldTotal + 1, SiteWrapper.getSites(appService)
+                .size());
+        }
+        ContainerTypeWrapper type = container.getContainerType();
+        container.delete();
+        type.delete();
+        site.reload();
+        site.delete();
+        Assert.assertEquals(oldTotal, SiteWrapper.getSites(appService).size());
     }
 
     @Test
@@ -462,10 +631,10 @@ public class TestSite extends TestDatabase {
     }
 
     @Test
-    public void testSetPvInfoPossibleGlobal() throws Exception {
-        String name = "testSetPvInfoPossibleGlobal" + r.nextInt();
+    public void testGetSetGlobalPvInfoPossible() throws Exception {
+        String name = "testGetSetGlobalPvInfoPossible" + r.nextInt();
 
-        // TODO any way to get the types without a site for global ?
+        // FIXME any way to get the types without a site for global ?
         SiteWrapper site = SiteHelper.addSite(name);
         String[] types = site.getPvInfoTypeNames();
         if (types.length == 0) {
@@ -474,27 +643,52 @@ public class TestSite extends TestDatabase {
 
         String type = types[r.nextInt(types.length)];
         SiteWrapper.setGlobalPvInfoPossible(appService, name, type);
-        // TODO any static method to get global pv info possible ?
-        Assert.assertTrue(Arrays.asList(site.getPvInfoPossibleLabels())
-            .contains(name));
-        Assert.assertEquals(type, site.getPvInfoTypeName(name));
+        Assert.assertNotNull(SiteWrapper.getGlobalPvInfoPossible(appService)
+            .get(name));
+        globalPvInfoPossibleAdded.add(name);
 
         String pvInfoName2 = name + "_2";
         SiteWrapper.setGlobalPvInfoPossible(appService, pvInfoName2, "toto");
-        // TODO any static method to get global pv info possible ?
-        Assert.assertFalse(Arrays.asList(site.getPvInfoPossibleLabels())
-            .contains(pvInfoName2));
-
-        // TODO delete the added global Pvinfo possible
+        Assert.assertNull(SiteWrapper.getGlobalPvInfoPossible(appService).get(
+            pvInfoName2));
     }
 
     @Test
-    public void testSetPvInfoPossible() throws Exception {
-        String name = "testSetPvInfoPossible" + r.nextInt();
+    public void testDeleteGlobalPvInfoPossible() throws Exception {
+        String name = "testGetSetGlobalPvInfoPossible" + r.nextInt();
+
+        // FIXME any way to get the types without a site for global ?
+        SiteWrapper site = SiteHelper.addSite(name);
+        String[] types = site.getPvInfoTypeNames();
+        if (types.length == 0) {
+            Assert.fail("Can't test without pvinfotypes");
+        }
+        String type = types[r.nextInt(types.length)];
+        SiteWrapper.setGlobalPvInfoPossible(appService, name, type);
+
+        List<PvInfoPossibleWrapper> beforeDeleteList = PvInfoPossibleWrapper
+            .getGlobalPvInfoPossible(appService, false);
+
+        SiteWrapper.deleteGlobalPvInfoPossible(appService, name);
+
+        List<PvInfoPossibleWrapper> afterDeleteList = PvInfoPossibleWrapper
+            .getGlobalPvInfoPossible(appService, false);
+        Assert
+            .assertEquals(beforeDeleteList.size() - 1, afterDeleteList.size());
+        Assert.assertNull(SiteWrapper.getGlobalPvInfoPossible(appService).get(
+            name));
+        for (PvInfoPossibleWrapper pvInfoPoss : afterDeleteList) {
+            Assert.assertFalse(pvInfoPoss.getLabel().equals(name));
+        }
+    }
+
+    @Test
+    public void testGetSetPvInfoPossible() throws Exception {
+        String name = "testGetSetPvInfoPossible" + r.nextInt();
 
         SiteWrapper site = SiteHelper.addSite(name);
 
-        SiteWrapper site2 = SiteHelper.addSite(name + "secondSite");
+        SiteWrapper site2 = SiteHelper.addSite(name + "_secondSite");
         String[] types = site2.getPvInfoTypeNames();
         if (types.length == 0) {
             Assert.fail("Can't test without pvinfotypes");
@@ -510,6 +704,68 @@ public class TestSite extends TestDatabase {
         Assert.assertEquals(type, site2.getPvInfoTypeName(name));
         Assert.assertFalse(Arrays.asList(site.getPvInfoPossibleLabels())
             .contains(name));
+    }
+
+    @Test
+    public void testGetPvInfoType() throws Exception {
+        String name = "testGetPvInfoType" + r.nextInt();
+        SiteWrapper site = SiteHelper.addSite(name);
+
+        List<PvInfoTypeWrapper> types = PvInfoTypeWrapper
+            .getAllWrappers(appService);
+        if (types.size() == 0) {
+            Assert.fail("Can't test without pvinfotypes");
+        }
+        PvInfoTypeWrapper type = types.get(0);
+        String label = "toto";
+        site.setPvInfoPossible(label, type.getType());
+
+        // my guess would be that the pvInfoPossible map inside the site should
+        // be updated in the setPvInfoPossible method
+        Assert.assertEquals(type.getId(), site.getPvInfoType(label));
+
+        site.persist();
+        site.reload();
+        Assert.assertEquals(type.getId(), site.getPvInfoType(label));
+    }
+
+    @Test
+    public void testGetPvInfoTypeName() throws Exception {
+        String name = "testGetPvInfoTypeName" + r.nextInt();
+        SiteWrapper site = SiteHelper.addSite(name);
+
+        List<PvInfoTypeWrapper> types = PvInfoTypeWrapper
+            .getAllWrappers(appService);
+        if (types.size() == 0) {
+            Assert.fail("Can't test without pvinfotypes");
+        }
+        PvInfoTypeWrapper type = types.get(0);
+        String label = "toto";
+        site.setPvInfoPossible(label, type.getType());
+
+        Assert.assertEquals(type.getType(), site.getPvInfoTypeName(label));
+
+        site.persist();
+        site.reload();
+        Assert.assertEquals(type.getType(), site.getPvInfoTypeName(label));
+    }
+
+    @Test
+    public void testGetPvInfoTypeNames() throws Exception {
+        String name = "testGetPvInfoTypeNames" + r.nextInt();
+        SiteWrapper site = SiteHelper.addSite(name);
+
+        List<PvInfoType> types = appService.search(PvInfoType.class,
+            new PvInfoType());
+        Assert.assertEquals(types.size(), site.getPvInfoTypeNames().length);
+
+        List<String> databaseTypesName = new ArrayList<String>();
+        for (PvInfoType type : types) {
+            databaseTypesName.add(type.getType());
+        }
+        for (String typeName : site.getPvInfoTypeNames()) {
+            Assert.assertTrue(databaseTypesName.contains(typeName));
+        }
     }
 
     @Test
@@ -545,13 +801,17 @@ public class TestSite extends TestDatabase {
 
     @Test
     public void testGetSites() throws Exception {
-        SiteHelper.addSites("testGetSites" + r.nextInt(), r.nextInt(15) + 1);
+        List<Site> sitesDBBefore = appService.search(Site.class, new Site());
+        int nberSite = r.nextInt(15) + 1;
+        SiteHelper.addSites("testGetSites" + r.nextInt(), nberSite);
 
-        List<SiteWrapper> siteWrappers = SiteWrapper.getSites(appService, null);
-        int inDB = appService.search(Site.class, new Site()).size();
-        Assert.assertEquals(inDB, siteWrappers.size());
+        List<SiteWrapper> siteWrappers = SiteWrapper.getSites(appService);
+        List<Site> sitesDB = appService.search(Site.class, new Site());
+        int nberAddedInDB = sitesDB.size() - sitesDBBefore.size();
+        Assert.assertEquals(nberSite, nberAddedInDB);
+        Assert.assertEquals(nberSite, siteWrappers.size());
 
-        SiteWrapper site = DbHelper.chooseRandomlyInList(siteWrappers);
+        Site site = DbHelper.chooseRandomlyInList(sitesDB);
         siteWrappers = SiteWrapper.getSites(appService, site.getId());
         Assert.assertEquals(1, siteWrappers.size());
 
@@ -561,4 +821,15 @@ public class TestSite extends TestDatabase {
         siteWrappers = SiteWrapper.getSites(appService, max.get(0) + 1000);
         Assert.assertEquals(0, siteWrappers.size());
     }
+
+    @Test
+    public void testCompareTo() throws Exception {
+        String name = "testCompareTo" + r.nextInt();
+        SiteWrapper site = SiteHelper.addSite("QWERTY" + name);
+        SiteWrapper site2 = SiteHelper.addSite("ASDFG" + name);
+
+        Assert.assertTrue(site.compareTo(site2) > 0);
+        Assert.assertTrue(site2.compareTo(site) < 0);
+    }
+
 }

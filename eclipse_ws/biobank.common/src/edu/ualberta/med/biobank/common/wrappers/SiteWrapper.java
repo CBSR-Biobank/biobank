@@ -48,7 +48,8 @@ public class SiteWrapper extends ModelWrapper<Site> {
         return new String[] { "name", "activityStatus", "comment", "address",
             "clinicCollection", "siteCollection", "containerCollection",
             "sampleTypeCollection", "pvInfoPossibleCollection", "street1",
-            "street2", "city", "province", "postalCode" };
+            "street2", "city", "province", "postalCode",
+            "allSampleTypeCollection" };
     }
 
     public String getName() {
@@ -472,7 +473,7 @@ public class SiteWrapper extends ModelWrapper<Site> {
     }
 
     /**
-     * Include globals
+     * Include globals sample types
      * 
      * @throws ApplicationException
      */
@@ -797,18 +798,13 @@ public class SiteWrapper extends ModelWrapper<Site> {
     /**
      * get all site existing
      */
-    public static List<SiteWrapper> getAllSites(
+    public static List<SiteWrapper> getSites(
         WritableApplicationService appService) throws Exception {
-        List<Site> sites = appService.search(Site.class, new Site());
-        List<SiteWrapper> wrappers = new ArrayList<SiteWrapper>();
-        for (Site s : sites) {
-            wrappers.add(new SiteWrapper(appService, s));
-        }
-        return wrappers;
+        return getSites(appService, null);
     }
 
     /**
-     * If "id" is null, then all sites are returned. If not not, then only sites
+     * If "id" is null, then all sites are returned. If not, then only sites
      * with that id are returned.
      */
     public static List<SiteWrapper> getSites(

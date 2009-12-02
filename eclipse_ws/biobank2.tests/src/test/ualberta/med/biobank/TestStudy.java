@@ -241,12 +241,13 @@ public class TestStudy extends TestDatabase {
         StudyWrapper study = StudyHelper.addStudy(site, name);
 
         study.setPvInfo("Worksheet");
-        study.setPvInfo("Consent");
+        String consentLabel = "Consent";
+        study.setPvInfo(consentLabel);
         study.persist();
 
         study.reload();
-        Integer type = site.getPvInfoType("Consent");
-        Assert.assertEquals(type, study.getPvInfoType("Consent"));
+        Integer type = site.getPvInfoType(consentLabel);
+        Assert.assertEquals(type, study.getPvInfoType(consentLabel));
     }
 
     @Test
@@ -255,8 +256,8 @@ public class TestStudy extends TestDatabase {
         SiteWrapper site = SiteHelper.addSite(name);
         StudyWrapper study = StudyHelper.addStudy(site, name);
 
-        String pvInfoLabel = "Visit Type";
         study.setPvInfo("Worksheet");
+        String pvInfoLabel = "Visit Type";
         String[] values = new String[] { "toto", "titi", "tata" };
         study.setPvInfo(pvInfoLabel, values);
         study.persist();
