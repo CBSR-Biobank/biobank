@@ -484,6 +484,8 @@ public class TestSite extends TestDatabase {
         // TODO any static method to get global pv info possible ?
         Assert.assertFalse(Arrays.asList(site.getPvInfoPossibleLabels())
             .contains(pvInfoName2));
+
+        // TODO delete the added global Pvinfo possible
     }
 
     @Test

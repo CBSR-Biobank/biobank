@@ -503,7 +503,6 @@ public class DebugInitializationHelper {
                 container.delete();
             }
         }
-        monitor.worked(1);
     }
 
     public void deleteStudies(List<StudyWrapper> studies,
@@ -516,7 +515,6 @@ public class DebugInitializationHelper {
                 study.delete();
             }
         }
-        monitor.worked(1);
     }
 
     public void deletePatients(List<PatientWrapper> patients,
@@ -530,7 +528,6 @@ public class DebugInitializationHelper {
                 patient.delete();
             }
         }
-        monitor.worked(1);
     }
 
     public void deleteClinics(List<ClinicWrapper> clinics,
@@ -543,7 +540,6 @@ public class DebugInitializationHelper {
             clinic.reload();
             clinic.delete();
         }
-        monitor.worked(1);
     }
 
     public void deleteFromList(Collection<? extends ModelWrapper<?>> list,

@@ -468,6 +468,8 @@ public class TestContainerType extends TestDatabase {
         childTypeL3 = TestCommon.addSampleTypes(childTypeL3,
             selectedSampleTypes);
         childTypeL3.setSampleTypeCollection(selectedSampleTypes);
+        childTypeL3.persist();
+        topType.reload();
         collection = topType.getSampleTypesRecursively();
         Assert.assertEquals(selectedSampleTypes.size(), collection.size());
         for (SampleTypeWrapper sample : selectedSampleTypes) {
@@ -475,8 +477,10 @@ public class TestContainerType extends TestDatabase {
         }
 
         childTypeL3.setSampleTypeCollection(null);
+        childTypeL3.persist();
+        topType.reload();
         collection = topType.getSampleTypesRecursively();
-        Assert.assertEquals(null, collection);
+        Assert.assertTrue((collection == null) || (collection.size() == 0));
     }
 
     @Test

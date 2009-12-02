@@ -2,9 +2,7 @@ package edu.ualberta.med.biobank.widgets;
 
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
-import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
-import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeViewerListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -20,8 +18,6 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
-import org.eclipse.ui.IViewSite;
-import org.eclipse.ui.IWorkbenchPartSite;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.FilteredTree;
 
@@ -82,19 +78,22 @@ public class AdapterTreeWidget extends Composite {
         treeViewer.setUseHashlookup(true);
         treeViewer.addSelectionChangedListener(new ISelectionChangedListener() {
             public void selectionChanged(SelectionChangedEvent event) {
-                ISelection selection = event.getSelection();
-                if (!selection.isEmpty()
-                    && selection instanceof IStructuredSelection) {
-                    AdapterBase node = (AdapterBase) ((IStructuredSelection) selection)
-                        .getFirstElement();
-                    IWorkbenchPartSite site = PlatformUI.getWorkbench()
-                        .getActiveWorkbenchWindow().getActivePage()
-                        .getActivePart().getSite();
-                    if (site instanceof IViewSite) {
-                        ((IViewSite) site).getActionBars()
-                            .getStatusLineManager().setMessage(node.getName());
-                    }
-                }
+                // TODO don't work well. Something prevent the status to be well
+                // printed all the time - see #123
+                // ISelection selection = event.getSelection();
+                // if (!selection.isEmpty()
+                // && selection instanceof IStructuredSelection) {
+                // AdapterBase node = (AdapterBase) ((IStructuredSelection)
+                // selection)
+                // .getFirstElement();
+                // IWorkbenchPartSite site = PlatformUI.getWorkbench()
+                // .getActiveWorkbenchWindow().getActivePage()
+                // .getActivePart().getSite();
+                // if (site instanceof IViewSite) {
+                // ((IViewSite) site).getActionBars()
+                // .getStatusLineManager().setMessage(node.getName());
+                // }
+                // }
             }
         });
 
