@@ -835,7 +835,7 @@ public class SiteWrapper extends ModelWrapper<Site> {
         pvInfoPossible.delete();
     }
 
-    public static Map<String, Integer> getGlobalPvInfoPossible(
+    public static Map<String, String> getGlobalPvInfoPossible(
         WritableApplicationService appService) throws Exception {
         List<PvInfoPossibleWrapper> list = PvInfoPossibleWrapper
             .getGlobalPvInfoPossible(appService, false);
@@ -843,10 +843,10 @@ public class SiteWrapper extends ModelWrapper<Site> {
             throw new Exception("No PvInfoPossible items exist");
         }
 
-        Map<String, Integer> result = new HashMap<String, Integer>();
+        Map<String, String> result = new HashMap<String, String>();
         for (PvInfoPossibleWrapper pvInfoPossible : list) {
             result.put(pvInfoPossible.getLabel(), pvInfoPossible
-                .getPvInfoType().getId());
+                .getPvInfoType().getType());
         }
         return result;
     }
