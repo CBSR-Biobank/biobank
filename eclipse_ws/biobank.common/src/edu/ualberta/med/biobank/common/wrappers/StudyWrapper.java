@@ -129,6 +129,35 @@ public class StudyWrapper extends ModelWrapper<Study> {
         ApplicationException {
         checkStudyNameUnique();
         checkContactsFromSameSite();
+        checkNoPatientRemoved();
+    }
+
+    private void checkNoPatientRemoved() throws BiobankCheckException,
+        ApplicationException {
+        if (!isNew()) {
+            List<PatientWrapper> newPatients = getPatientCollection();
+            Study origStudy = new Study();
+            origStudy.setId(getId());
+            origStudy = (Study) appService.search(Study.class, origStudy)
+                .get(0);
+            List<PatientWrapper> oldPatients = new StudyWrapper(appService,
+                origStudy).getPatientCollection();
+            if (oldPatients != null) {
+                for (PatientWrapper p : oldPatients) {
+                    if ((newPatients == null) || !newPatients.contains(p)) {
+                        Patient dbPatient = new Patient();
+                        dbPatient.setId(p.getId());
+                        // check if still in database
+                        if (appService.search(Patient.class, dbPatient).size() == 1) {
+                            throw new BiobankCheckException(
+                                "Patient "
+                                    + p.getNumber()
+                                    + " has been remove from the patients list: this patient should be deleted first.");
+                        }
+                    }
+                }
+            }
+        }
     }
 
     private void checkStudyNameUnique() throws BiobankCheckException,
