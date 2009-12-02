@@ -538,6 +538,16 @@ public class StudyWrapper extends ModelWrapper<Study> {
         setPvInfo(label, null);
     }
 
+    public void deletePvInfo(String label) throws Exception {
+        getPvInfoMap();
+        PvInfoWrapper pvInfo = pvInfoMap.get(label);
+        if (pvInfo == null) {
+            throw new Exception("PvInfo with label \"" + label
+                + "\" does not exist");
+        }
+        pvInfo.delete();
+    }
+
     public List<ClinicWrapper> getClinicCollection()
         throws ApplicationException {
         HQLCriteria c = new HQLCriteria("select distinct clinics from "

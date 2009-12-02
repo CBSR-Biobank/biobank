@@ -278,10 +278,22 @@ public class StudyEntryForm extends BiobankEntryForm {
 
         for (Object object : pvCustomInfoMap.values()) {
             StudyPvCustomInfo pvCustomInfo = (StudyPvCustomInfo) object;
-            boolean selected = pvCustomInfo.widget.getSelected();
-
-            if (!selected || pvCustomInfo.getLabel().equals("Date Processed"))
+            String label = pvCustomInfo.getLabel();
+            if (label.equals("Date Processed"))
                 continue;
+
+            if (!pvCustomInfo.widget.getSelected()) {
+                try {
+                    study.deletePvInfo(pvCustomInfo.getLabel());
+                } catch (Exception e) {
+                    // FIXME this is something invalid that the user did,
+                    // not really an error
+                    throw new RuntimeException(
+                        "Cannot delete "
+                            + label
+                            + " from study since it is already in use by patient visits.");
+                }
+            }
 
             newPvInfoLabels.add(pvCustomInfo.getLabel());
             String value = pvCustomInfo.widget.getValues();

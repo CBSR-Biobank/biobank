@@ -702,6 +702,7 @@ public class SiteWrapper extends ModelWrapper<Site> {
         if (pip == null) {
             pip = new PvInfoPossibleWrapper(appService, new PvInfoPossible());
             pip.setLabel(label);
+            pvInfoPossibleMap.put(label, pip);
         }
         pip.setPvInfoType(pit);
         pip.setSite(this);
@@ -712,6 +713,16 @@ public class SiteWrapper extends ModelWrapper<Site> {
         }
         list.add(pip);
         setPvInfoPossibleCollection(list);
+    }
+
+    public void deletePvInfoPossible(String label) throws Exception {
+        getPvInfoPossibleMap();
+        PvInfoPossibleWrapper pvInfoPossible = pvInfoPossibleMap.get(label);
+        if (pvInfoPossible == null) {
+            throw new Exception("PvInfoPossible with label \"" + label
+                + "\" does not exist");
+        }
+        pvInfoPossible.delete();
     }
 
     public static Map<String, Integer> getGlobalPvInfoPossible(
