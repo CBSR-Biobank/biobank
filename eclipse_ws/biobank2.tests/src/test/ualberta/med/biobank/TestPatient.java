@@ -1,7 +1,9 @@
 package test.ualberta.med.biobank;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import junit.framework.Assert;
 
@@ -10,16 +12,22 @@ import org.junit.Test;
 
 import test.ualberta.med.biobank.internal.ClinicHelper;
 import test.ualberta.med.biobank.internal.ContactHelper;
+import test.ualberta.med.biobank.internal.ContainerHelper;
+import test.ualberta.med.biobank.internal.ContainerTypeHelper;
 import test.ualberta.med.biobank.internal.PatientHelper;
 import test.ualberta.med.biobank.internal.PatientVisitHelper;
+import test.ualberta.med.biobank.internal.SampleHelper;
 import test.ualberta.med.biobank.internal.ShipmentHelper;
 import test.ualberta.med.biobank.internal.SiteHelper;
 import test.ualberta.med.biobank.internal.StudyHelper;
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
@@ -27,9 +35,17 @@ import edu.ualberta.med.biobank.model.Patient;
 
 public class TestPatient extends TestDatabase {
 
+    private Map<String, ContainerWrapper> containerMap;
+
+    private Map<String, ContainerTypeWrapper> containerTypeMap;
+
     private SiteWrapper site;
 
     private StudyWrapper study;
+
+    private ClinicWrapper clinic;
+
+    private ShipmentWrapper shipment;
 
     @Override
     @Before
@@ -39,6 +55,53 @@ public class TestPatient extends TestDatabase {
             + Utils.getRandomString(10));
         study = StudyHelper.addStudy(site, "Study - Patient Test "
             + Utils.getRandomString(10));
+        containerMap = new HashMap<String, ContainerWrapper>();
+        containerTypeMap = new HashMap<String, ContainerTypeWrapper>();
+    }
+
+    private void addClinicAndShipment(PatientWrapper patient) throws Exception {
+        clinic = ClinicHelper.addClinic(site, "Clinic - Patient Test "
+            + Utils.getRandomString(10));
+        ContactWrapper contact = ContactHelper.addContact(clinic,
+            "Contact - Patient Test");
+        study.setContactCollection(Arrays
+            .asList(new ContactWrapper[] { contact }));
+        study.persist();
+        shipment = ShipmentHelper.addShipment(clinic, patient);
+    }
+
+    private void addContainerTypes() throws Exception {
+        // first add container types
+        ContainerTypeWrapper topType, childType;
+
+        List<SampleTypeWrapper> allSampleTypes = SampleTypeWrapper
+            .getGlobalSampleTypes(appService, true);
+
+        childType = ContainerTypeHelper.newContainerType(site,
+            "Child L1 Container Type", "CCTL1", 3, 4, 5, false);
+        childType.setSampleTypeCollection(allSampleTypes);
+        childType.persist();
+        containerTypeMap.put("ChildCtL1", childType);
+
+        topType = ContainerTypeHelper.newContainerType(site,
+            "Top Container Type", "TCT", 2, 3, 10, true);
+        topType.setChildContainerTypeCollection(Arrays.asList(containerTypeMap
+            .get("ChildCtL1")));
+        topType.persist();
+        containerTypeMap.put("TopCT", topType);
+
+    }
+
+    private void addContainers() throws Exception {
+        ContainerWrapper top = ContainerHelper.addContainer("01", TestCommon
+            .getNewBarcode(r), null, site, containerTypeMap.get("TopCT"));
+        containerMap.put("Top", top);
+
+        ContainerWrapper childL1 = ContainerHelper.addContainer(null,
+            TestCommon.getNewBarcode(r), top, site, containerTypeMap
+                .get("ChildCtL1"), 0, 0);
+        containerMap.put("ChildL1", childL1);
+
     }
 
     @Test
@@ -96,18 +159,28 @@ public class TestPatient extends TestDatabase {
             .getRandomNumericString(20), study);
         patient.delete();
 
-        ClinicWrapper clinic = ClinicHelper.addClinic(site,
-            "Clinic - Patient Test " + Utils.getRandomString(10));
-        ContactWrapper contact = ContactHelper.addContact(clinic,
-            "Contact - Patient Test");
-        study.setContactCollection(Arrays
-            .asList(new ContactWrapper[] { contact }));
-        study.persist();
+        // create new patient with patient visits, should not be allowed to
+        // delete
+        patient = PatientHelper.addPatient(Utils.getRandomNumericString(20),
+            study);
+        addContainerTypes();
+        addContainers();
+        addClinicAndShipment(patient);
 
-        ShipmentWrapper shipment = ShipmentHelper.addShipment(clinic, patient);
+        List<PatientVisitWrapper> visits = PatientVisitHelper.addPatientVisits(
+            patient, shipment);
+        List<SampleTypeWrapper> allSampleTypes = SampleTypeWrapper
+            .getGlobalSampleTypes(appService, true);
+        SampleHelper.addSample(allSampleTypes.get(0), containerMap
+            .get("ChildL1"), visits.get(0), 0, 0);
+        patient.reload();
 
-        List<PatientVisitWrapper> visitsAdded = PatientVisitHelper
-            .addPatientVisits(patient, shipment);
+        try {
+            patient.delete();
+            Assert.fail("should not be allowed to delete patient");
+        } catch (Exception e) {
+            Assert.assertTrue(true);
+        }
     }
 
     @Test

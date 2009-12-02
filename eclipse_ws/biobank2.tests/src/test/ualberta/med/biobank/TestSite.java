@@ -3,6 +3,7 @@ package test.ualberta.med.biobank;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -657,13 +658,15 @@ public class TestSite extends TestDatabase {
     public void testDeleteGlobalPvInfoPossible() throws Exception {
         String name = "testGetSetGlobalPvInfoPossible" + r.nextInt();
 
-        // FIXME any way to get the types without a site for global ?
-        SiteWrapper site = SiteHelper.addSite(name);
-        String[] types = site.getPvInfoTypeNames();
-        if (types.length == 0) {
+        Map<String, String> globalPvInfoPossible = SiteWrapper
+            .getGlobalPvInfoPossible(appService);
+
+        List<String> types = new ArrayList<String>(globalPvInfoPossible
+            .values());
+        if (types.size() == 0) {
             Assert.fail("Can't test without pvinfotypes");
         }
-        String type = types[r.nextInt(types.length)];
+        String type = types.get(r.nextInt(types.size()));
         SiteWrapper.setGlobalPvInfoPossible(appService, name, type);
 
         List<PvInfoPossibleWrapper> beforeDeleteList = PvInfoPossibleWrapper
