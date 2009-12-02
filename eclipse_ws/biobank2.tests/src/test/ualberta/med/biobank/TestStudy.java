@@ -28,6 +28,7 @@ import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.common.wrappers.internal.PvInfoPossibleWrapper;
 import edu.ualberta.med.biobank.model.Study;
 
 public class TestStudy extends TestDatabase {
@@ -92,8 +93,8 @@ public class TestStudy extends TestDatabase {
     }
 
     @Test
-    public void testAddInContactCollection() throws Exception {
-        String name = "testAddInContactCollection" + r.nextInt();
+    public void testSetContactCollectionAdd() throws Exception {
+        String name = "testSetContactCollectionAdd" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         StudyWrapper study = StudyHelper.addStudy(site, name);
         int nber = ContactHelper.addContactsToStudy(study, name);
@@ -115,6 +116,27 @@ public class TestStudy extends TestDatabase {
         study.reload();
         // one contact added
         Assert.assertEquals(nber + 1, study.getContactCollection().size());
+    }
+
+    @Test
+    public void testSetContactCollectionRemove() throws Exception {
+        String name = "testSetContactCollectionRemove" + r.nextInt();
+        SiteWrapper site = SiteHelper.addSite(name);
+        StudyWrapper study = StudyHelper.addStudy(site, name);
+        int nber = ContactHelper.addContactsToStudy(study, name);
+        site.reload();
+
+        // get a clinic not yet added
+        List<ContactWrapper> contacts = study.getContactCollection();
+        ContactWrapper contact = DbHelper.chooseRandomlyInList(contacts);
+        contacts.remove(contact);
+        // don't have to delete contact because this is a *..* relation
+        study.setContactCollection(contacts);
+        study.persist();
+
+        study.reload();
+        // one contact added
+        Assert.assertEquals(nber - 1, study.getContactCollection().size());
     }
 
     @Test
@@ -150,8 +172,8 @@ public class TestStudy extends TestDatabase {
     }
 
     @Test
-    public void testAddInSampleStorageCollection() throws Exception {
-        String name = "testAddInSampleStorageCollection" + r.nextInt();
+    public void testSetSampleStorageCollectionAdd() throws Exception {
+        String name = "testSetSampleStorageCollectionAdd" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         StudyWrapper study = StudyHelper.addStudy(site, name);
         int nber = SampleStorageHelper.addSampleStorages(study, name);
@@ -169,6 +191,28 @@ public class TestStudy extends TestDatabase {
         // one storage added
         Assert
             .assertEquals(nber + 1, study.getSampleStorageCollection().size());
+    }
+
+    @Test
+    public void testSetSampleStorageCollectionRemove() throws Exception {
+        String name = "testSetSampleStorageCollectionRemove" + r.nextInt();
+        SiteWrapper site = SiteHelper.addSite(name);
+        StudyWrapper study = StudyHelper.addStudy(site, name);
+        int nber = SampleStorageHelper.addSampleStorages(study, name);
+
+        List<SampleStorageWrapper> storages = study
+            .getSampleStorageCollection();
+        SampleStorageWrapper storage = DbHelper.chooseRandomlyInList(storages);
+        storages.remove(storage);
+        // don't have to delete the storage thanks to
+        // deleteSampleStorageDifference method
+        study.setSampleStorageCollection(storages);
+        study.persist();
+
+        study.reload();
+        // one storage added
+        Assert
+            .assertEquals(nber - 1, study.getSampleStorageCollection().size());
     }
 
     @Test
@@ -203,8 +247,8 @@ public class TestStudy extends TestDatabase {
     }
 
     @Test
-    public void testAddInSampleSourceCollection() throws Exception {
-        String name = "testAddInSampleSourceCollection" + r.nextInt();
+    public void testSetSampleSourceCollectionAdd() throws Exception {
+        String name = "testSetSampleSourceCollectionAdd" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         StudyWrapper study = StudyHelper.addStudy(site, name);
         int nber = SampleSourceHelper.addSampleSources(study, name);
@@ -221,17 +265,61 @@ public class TestStudy extends TestDatabase {
     }
 
     @Test
-    public void testGetPvInfoLabels() throws Exception {
-        String name = "testGetPvInfoLabels" + r.nextInt();
+    public void testSetSampleSourceCollectionRemove() throws Exception {
+        String name = "testSetSampleSourceCollectionRemove" + r.nextInt();
+        SiteWrapper site = SiteHelper.addSite(name);
+        StudyWrapper study = StudyHelper.addStudy(site, name);
+        int nber = SampleSourceHelper.addSampleSources(study, name);
+
+        List<SampleSourceWrapper> sources = study.getSampleSourceCollection();
+        SampleSourceWrapper source = DbHelper.chooseRandomlyInList(sources);
+        sources.remove(source);
+        // don't have to delete the storage thanks to
+        // deleteSampleSourceDifference method
+        SampleSourceHelper.createdSampleSources.remove(source);
+        study.setSampleSourceCollection(sources);
+        study.persist();
+
+        study.reload();
+        // one storage added
+        Assert.assertEquals(nber - 1, study.getSampleSourceCollection().size());
+    }
+
+    @Test
+    public void testSetPvInfo() throws Exception {
+        String name = "testGetSetPvInfoLabels" + r.nextInt();
+        SiteWrapper site = SiteHelper.addSite(name);
+        StudyWrapper study = StudyHelper.addStudy(site, name);
+
+        study.setPvInfo("Worksheet");
+        study.setPvInfo("Visit Type", new String[] { "toto", "titi", "tata" });
+        study.persist();
+
+        Assert.assertEquals(2, study.getPvInfoLabels().length);
+    }
+
+    @Test
+    public void testGetSetPvInfoLabels() throws Exception {
+        String name = "testGetSetPvInfoLabels" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         StudyWrapper study = StudyHelper.addStudy(site, name);
 
         study.setPvInfo("Worksheet");
         study.setPvInfo("Consent");
-        study.persist();
+        Assert.assertEquals(2, study.getPvInfoLabels().length);
 
+        // test still ok after persist
+        study.persist();
         study.reload();
         Assert.assertEquals(2, study.getPvInfoLabels().length);
+
+        study.setPvInfoLabels(new String[] { "Consent" });
+        Assert.assertEquals(1, study.getPvInfoLabels().length);
+
+        // test still ok after persist
+        study.persist();
+        study.reload();
+        Assert.assertEquals(1, study.getPvInfoLabels().length);
     }
 
     @Test
@@ -240,14 +328,21 @@ public class TestStudy extends TestDatabase {
         SiteWrapper site = SiteHelper.addSite(name);
         StudyWrapper study = StudyHelper.addStudy(site, name);
 
-        study.setPvInfo("Worksheet");
-        String consentLabel = "Consent";
-        study.setPvInfo(consentLabel);
+        List<PvInfoPossibleWrapper> possibles = PvInfoPossibleWrapper
+            .getGlobalPvInfoPossible(appService, false);
+        if (possibles.size() < 2) {
+            Assert
+                .fail("no pv info possible available to execute this test case");
+        }
+
+        study.setPvInfo(possibles.get(0).getLabel());
+        PvInfoPossibleWrapper possible = possibles.get(1);
+        study.setPvInfo(possible.getLabel());
         study.persist();
 
         study.reload();
-        Integer type = site.getPvInfoType(consentLabel);
-        Assert.assertEquals(type, study.getPvInfoType(consentLabel));
+        Integer typeId = study.getPvInfoType(possible.getLabel());
+        Assert.assertEquals(possible.getPvInfoType().getId(), typeId);
     }
 
     @Test
@@ -315,8 +410,8 @@ public class TestStudy extends TestDatabase {
     }
 
     @Test
-    public void testAddInPatientCollection() throws Exception {
-        String name = "testAddInPatientCollection" + r.nextInt();
+    public void testSetPatientCollectionAdd() throws Exception {
+        String name = "testSetPatientCollectionAdd" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         StudyWrapper study = StudyHelper.addStudy(site, name);
         int nber = PatientHelper.addPatients(name, study);
@@ -332,6 +427,44 @@ public class TestStudy extends TestDatabase {
         study.reload();
         // one patient added
         Assert.assertEquals(nber + 1, study.getPatientCollection().size());
+    }
+
+    @Test
+    public void testSetPatientCollectionRemove() throws Exception {
+        String name = "testSetPatientCollectionRemove" + r.nextInt();
+        SiteWrapper site = SiteHelper.addSite(name);
+        StudyWrapper study = StudyHelper.addStudy(site, name);
+        int nber = PatientHelper.addPatients(name, study);
+
+        List<PatientWrapper> patients = study.getPatientCollection();
+        PatientWrapper patient = DbHelper.chooseRandomlyInList(patients);
+        patients.remove(patient);
+        study.setPatientCollection(patients);
+        try {
+            study.persist();
+            Assert.fail("a patient is missing and is not deleted");
+        } catch (BiobankCheckException bce) {
+            Assert.assertTrue(true);
+        }
+
+        patient.delete();
+        study.persist();
+
+        study.reload();
+        // one patient added
+        Assert.assertEquals(nber - 1, study.getPatientCollection().size());
+    }
+
+    @Test
+    public void testHasPatients() throws Exception {
+        String name = "testHasPatients" + r.nextInt();
+        SiteWrapper site = SiteHelper.addSite(name);
+        StudyWrapper study = StudyHelper.addStudy(site, name);
+
+        Assert.assertFalse(study.hasPatients());
+
+        PatientHelper.addPatients(name, study);
+        Assert.assertTrue(study.hasPatients());
     }
 
     @Test
@@ -521,8 +654,8 @@ public class TestStudy extends TestDatabase {
     }
 
     @Test
-    public void testDeleteWithPatient() throws Exception {
-        String name = "testDeleteWithPatient" + r.nextInt();
+    public void testDeleteFailNoMorePatient() throws Exception {
+        String name = "testDeleteFailNoMorePatient" + r.nextInt();
         StudyWrapper study = StudyHelper.addStudy(SiteHelper.addSite(name),
             name);
         PatientHelper.addPatient(name, study);
@@ -556,4 +689,14 @@ public class TestStudy extends TestDatabase {
         Assert.assertEquals(null, newStudy.getName());
     }
 
+    @Test
+    public void testCompareTo() throws Exception {
+        String name = "testCompareTo" + r.nextInt();
+        SiteWrapper site = SiteHelper.addSite(name);
+        StudyWrapper study = StudyHelper.addStudy(site, "WERTY" + name);
+        StudyWrapper study2 = StudyHelper.addStudy(site, "AASDF" + name);
+
+        Assert.assertTrue(study.compareTo(study2) > 0);
+        Assert.assertTrue(study2.compareTo(study) < 0);
+    }
 }

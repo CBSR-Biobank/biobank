@@ -8,7 +8,7 @@ import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 
 public class SampleSourceHelper extends DbHelper {
 
-    protected static List<SampleSourceWrapper> createdSampleSources = new ArrayList<SampleSourceWrapper>();
+    public static List<SampleSourceWrapper> createdSampleSources = new ArrayList<SampleSourceWrapper>();
 
     public static SampleSourceWrapper newSampleSource(String name) {
         SampleSourceWrapper source = new SampleSourceWrapper(appService);
