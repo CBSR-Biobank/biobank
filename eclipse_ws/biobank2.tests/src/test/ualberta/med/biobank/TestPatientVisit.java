@@ -95,27 +95,29 @@ public class TestPatientVisit extends TestDatabase {
         visit2.reload();
         Assert.assertEquals(1, visit1.compareTo(visit2));
 
-        // visit2's date processed is the same day as visit1's
-        cal.add(Calendar.DATE, 1);
-        visit2.setDateProcessed(cal.getTime());
-        visit2.persist();
-        visit2.reload();
-        Assert.assertEquals(0, visit1.compareTo(visit2));
+        // check against itself
+        Assert.assertEquals(0, visit1.compareTo(visit1));
     }
 
     @Test
     public void testReset() throws Exception {
-        fail("Not yet implemented");
+        PatientVisitWrapper visit = PatientVisitHelper.addPatientVisit(patient,
+            shipment, Utils.getRandomDate());
+        visit.reset();
     }
 
     @Test
     public void testReload() throws Exception {
-        fail("Not yet implemented");
+        PatientVisitWrapper visit = PatientVisitHelper.addPatientVisit(patient,
+            shipment, Utils.getRandomDate());
+        visit.reload();
     }
 
     @Test
     public void testDelete() throws Exception {
-        fail("Not yet implemented");
+        PatientVisitWrapper visit = PatientVisitHelper.addPatientVisit(patient,
+            shipment, Utils.getRandomDate());
+        visit.delete();
     }
 
     @Test

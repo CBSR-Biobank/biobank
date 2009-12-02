@@ -4,7 +4,6 @@ import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.model.PvInfo;
 import edu.ualberta.med.biobank.model.PvInfoPossible;
-import edu.ualberta.med.biobank.model.PvInfoType;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
@@ -78,18 +77,8 @@ public class PvInfoWrapper extends ModelWrapper<PvInfo> {
     }
 
     public PvInfoTypeWrapper getPvInfoType() {
-        return new PvInfoTypeWrapper(appService, wrappedObject.getPvInfoType());
-    }
-
-    public void setPvInfoType(PvInfoType pvInfoType) {
-        PvInfoType oldPvInfoType = wrappedObject.getPvInfoType();
-        wrappedObject.setPvInfoType(pvInfoType);
-        propertyChangeSupport.firePropertyChange("pvInfoType", oldPvInfoType,
-            pvInfoType);
-    }
-
-    public void setPvInfoType(PvInfoTypeWrapper pvInfoType) {
-        setPvInfoType(pvInfoType.getWrappedObject());
+        return new PvInfoTypeWrapper(appService, wrappedObject
+            .getPvInfoPossible().getPvInfoType());
     }
 
     @Override

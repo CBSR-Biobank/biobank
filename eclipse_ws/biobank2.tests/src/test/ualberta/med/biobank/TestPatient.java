@@ -91,8 +91,23 @@ public class TestPatient extends TestDatabase {
     }
 
     @Test
-    public void testDelete() {
-        Assert.fail("Not yet implemented");
+    public void testDelete() throws Exception {
+        PatientWrapper patient = PatientHelper.addPatient(Utils
+            .getRandomNumericString(20), study);
+        patient.delete();
+
+        ClinicWrapper clinic = ClinicHelper.addClinic(site,
+            "Clinic - Patient Test " + Utils.getRandomString(10));
+        ContactWrapper contact = ContactHelper.addContact(clinic,
+            "Contact - Patient Test");
+        study.setContactCollection(Arrays
+            .asList(new ContactWrapper[] { contact }));
+        study.persist();
+
+        ShipmentWrapper shipment = ShipmentHelper.addShipment(clinic, patient);
+
+        List<PatientVisitWrapper> visitsAdded = PatientVisitHelper
+            .addPatientVisits(patient, shipment);
     }
 
     @Test
