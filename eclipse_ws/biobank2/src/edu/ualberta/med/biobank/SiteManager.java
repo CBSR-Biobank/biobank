@@ -129,7 +129,7 @@ public class SiteManager {
 
     public void updateSites() {
         try {
-            updateSites(SiteWrapper.getSites(appService, null));
+            updateSites(SiteWrapper.getSites(appService));
         } catch (Exception e) {
             LOGGER.error("Cannot update Sites", e);
         }

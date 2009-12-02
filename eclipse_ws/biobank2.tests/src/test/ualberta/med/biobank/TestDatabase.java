@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import org.junit.After;
@@ -70,6 +71,7 @@ public class TestDatabase {
                 && !method.getName().equals("getClass")
                 && !IGNORE_RETURN_TYPES.contains(method.getReturnType())
                 && !Collection.class.isAssignableFrom(method.getReturnType())
+                && !Map.class.isAssignableFrom(method.getReturnType())
                 && !method.getReturnType().isArray()
                 && !method.getReturnType().getName().startsWith(
                     "edu.ualberta.med.biobank.common")) {

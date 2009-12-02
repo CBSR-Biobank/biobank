@@ -105,17 +105,6 @@ public class PvInfoPossibleWrapper extends ModelWrapper<PvInfoPossible> {
         }
     }
 
-    public static List<PvInfoPossibleWrapper> getAllWrappers(
-        WritableApplicationService appService) throws ApplicationException {
-        List<PvInfoPossible> objects = appService.search(PvInfoPossible.class,
-            new PvInfoPossible());
-        List<PvInfoPossibleWrapper> wrappers = new ArrayList<PvInfoPossibleWrapper>();
-        for (PvInfoPossible pv : objects) {
-            wrappers.add(new PvInfoPossibleWrapper(appService, pv));
-        }
-        return wrappers;
-    }
-
     public static List<PvInfoPossibleWrapper> transformToWrapperList(
         WritableApplicationService appService, List<PvInfoPossible> pipList) {
         List<PvInfoPossibleWrapper> list = new ArrayList<PvInfoPossibleWrapper>();
