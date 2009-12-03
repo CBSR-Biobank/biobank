@@ -132,4 +132,10 @@ public class PvInfoPossibleWrapper extends ModelWrapper<PvInfoPossible> {
     public int compareTo(ModelWrapper<PvInfoPossible> o) {
         return 0;
     }
+
+    @Override
+    public String toString() {
+        return "" + getId() + ":" + getLabel() + ":" + getIsDefault() + ":"
+            + getPvInfoType().getType();
+    }
 }

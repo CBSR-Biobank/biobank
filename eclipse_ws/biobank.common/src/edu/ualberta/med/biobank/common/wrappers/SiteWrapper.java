@@ -310,12 +310,11 @@ public class SiteWrapper extends ModelWrapper<Site> {
         throws BiobankCheckException, ApplicationException {
         if (!isNew()) {
             List<ContainerWrapper> newContainers = getContainerCollection();
-            List<ContainerWrapper> oldContainers = new SiteWrapper(
-                appService, origSite).getContainerCollection();
+            List<ContainerWrapper> oldContainers = new SiteWrapper(appService,
+                origSite).getContainerCollection();
             if (newContainers != null) {
                 for (ContainerWrapper c : oldContainers) {
-                    if ((newContainers == null)
-                        || !newContainers.contains(c)) {
+                    if ((newContainers == null) || !newContainers.contains(c)) {
                         Container dbContainer = new Container();
                         dbContainer.setId(c.getId());
                         // check if still in database
@@ -712,15 +711,15 @@ public class SiteWrapper extends ModelWrapper<Site> {
      */
     private void deletePvInfoPossibleDifference(Site origSite)
         throws BiobankCheckException, ApplicationException, WrapperException {
-        List<PvInfoPossibleWrapper> newPvInfoPossible = getPvInfoPossibleCollection();
-        List<PvInfoPossibleWrapper> oldSampleSources = new SiteWrapper(
+        List<PvInfoPossibleWrapper> oldPvInfoPossible = new SiteWrapper(
             appService, origSite).getPvInfoPossibleCollection();
-        if (oldSampleSources != null) {
-            for (PvInfoPossibleWrapper st : oldSampleSources) {
-                if ((newPvInfoPossible == null)
-                    || !newPvInfoPossible.contains(st)) {
-                    st.delete();
-                }
+        if (oldPvInfoPossible == null)
+            return;
+        int newPvInfoPossibleCount = pvInfoPossibleMap.size();
+        for (PvInfoPossibleWrapper st : oldPvInfoPossible) {
+            if ((newPvInfoPossibleCount == 0)
+                || (pvInfoPossibleMap.get(st.getLabel()) == null)) {
+                st.delete();
             }
         }
     }
@@ -832,7 +831,7 @@ public class SiteWrapper extends ModelWrapper<Site> {
             throw new Exception("PvInfoPossible with label \"" + label
                 + "\" does not exist");
         }
-        pvInfoPossible.delete();
+        pvInfoPossibleMap.remove(label);
     }
 
     public static Map<String, String> getGlobalPvInfoPossible(
@@ -898,6 +897,16 @@ public class SiteWrapper extends ModelWrapper<Site> {
     @Override
     protected void persistDependencies(Site origObject)
         throws BiobankCheckException, ApplicationException, WrapperException {
+        if (pvInfoPossibleMap != null) {
+            List<PvInfoPossibleWrapper> list = new ArrayList<PvInfoPossibleWrapper>(
+                pvInfoPossibleMap.values());
+            for (PvInfoPossibleWrapper pvInfoPossible : list) {
+                if (pvInfoPossible.isNew()) {
+                    pvInfoPossible.persist();
+                }
+            }
+            setPvInfoPossibleCollection(list);
+        }
         if (origObject != null) {
             deleteSampleTypeDifference(origObject);
             deletePvInfoPossibleDifference(origObject);

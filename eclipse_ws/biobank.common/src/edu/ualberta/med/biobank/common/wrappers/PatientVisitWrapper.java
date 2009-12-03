@@ -441,6 +441,27 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
     @Override
     protected void deleteChecks() throws BiobankCheckException,
         ApplicationException {
+        if (hasSamples()) {
+            throw new BiobankCheckException("Unable to delete patient visit "
+                + getDateProcessed()
+                + " since it has samples stored in database.");
+        }
+    }
+
+    public boolean hasSamples() throws ApplicationException,
+        BiobankCheckException {
+        String queryString = "select count(samples) from "
+            + Patient.class.getName() + " as p"
+            + " left join p.patientVisitCollection as visits"
+            + " left join visits.sampleCollection as samples"
+            + " where p = ? and visits = ?)";
+        HQLCriteria c = new HQLCriteria(queryString, Arrays
+            .asList(new Object[] { wrappedObject.getPatient(), wrappedObject }));
+        List<Long> results = appService.query(c);
+        if (results.size() != 1) {
+            throw new BiobankCheckException("Invalid size for HQL query result");
+        }
+        return results.get(0) > 0;
     }
 
     @Override

@@ -152,7 +152,7 @@ public class StudyWrapper extends ModelWrapper<Study> {
                             throw new BiobankCheckException(
                                 "Patient "
                                     + p.getNumber()
-                                    + " has been remove from the patients list: this patient should be deleted first.");
+                                    + " has been removed from the patients list: this patient should be deleted first.");
                         }
                     }
                 }
@@ -306,9 +306,9 @@ public class StudyWrapper extends ModelWrapper<Study> {
         if (oldPvInfoList == null) {
             return;
         }
-        List<PvInfoWrapper> newPvInfoList = getPvInfoCollection();
+        int newPvInfoCount = pvInfoMap.size();
         for (PvInfoWrapper st : oldPvInfoList) {
-            if ((newPvInfoList == null) || !newPvInfoList.contains(st)) {
+            if ((newPvInfoCount == 0) || (pvInfoMap.get(st.getLabel()) == null)) {
                 st.delete();
             }
         }
@@ -574,7 +574,7 @@ public class StudyWrapper extends ModelWrapper<Study> {
             throw new Exception("PvInfo with label \"" + label
                 + "\" does not exist");
         }
-        pvInfo.delete();
+        pvInfoMap.remove(label);
     }
 
     public List<ClinicWrapper> getClinicCollection()

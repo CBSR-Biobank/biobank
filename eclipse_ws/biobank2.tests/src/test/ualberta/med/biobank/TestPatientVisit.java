@@ -4,8 +4,11 @@ import static org.junit.Assert.fail;
 
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import junit.framework.Assert;
 
@@ -14,23 +17,36 @@ import org.junit.Test;
 
 import test.ualberta.med.biobank.internal.ClinicHelper;
 import test.ualberta.med.biobank.internal.ContactHelper;
+import test.ualberta.med.biobank.internal.ContainerHelper;
+import test.ualberta.med.biobank.internal.ContainerTypeHelper;
 import test.ualberta.med.biobank.internal.PatientHelper;
 import test.ualberta.med.biobank.internal.PatientVisitHelper;
+import test.ualberta.med.biobank.internal.SampleHelper;
 import test.ualberta.med.biobank.internal.ShipmentHelper;
 import test.ualberta.med.biobank.internal.SiteHelper;
 import test.ualberta.med.biobank.internal.StudyHelper;
+import edu.ualberta.med.biobank.common.RowColPos;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PvSampleSourceWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleSourceWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.model.PatientVisit;
 
 public class TestPatientVisit extends TestDatabase {
+
+    private Map<String, ContainerWrapper> containerMap;
+
+    private Map<String, ContainerTypeWrapper> containerTypeMap;
 
     private SiteWrapper site;
 
@@ -50,6 +66,8 @@ public class TestPatientVisit extends TestDatabase {
     @Before
     public void setUp() throws Exception {
         super.setUp();
+        containerMap = new HashMap<String, ContainerWrapper>();
+        containerTypeMap = new HashMap<String, ContainerTypeWrapper>();
         site = SiteHelper.addSite("Site - Patient Visit Test "
             + Utils.getRandomString(10));
         study = StudyHelper.addStudy(site, "Study - Patient Visit Test "
@@ -64,6 +82,39 @@ public class TestPatientVisit extends TestDatabase {
         patient = PatientHelper.addPatient(Utils.getRandomNumericString(20),
             study);
         shipment = ShipmentHelper.addShipment(clinic, patient);
+    }
+
+    private void addContainerTypes() throws Exception {
+        // first add container types
+        ContainerTypeWrapper topType, childType;
+
+        List<SampleTypeWrapper> allSampleTypes = SampleTypeWrapper
+            .getGlobalSampleTypes(appService, true);
+
+        childType = ContainerTypeHelper.newContainerType(site,
+            "Child L1 Container Type", "CCTL1", 3, 4, 5, false);
+        childType.setSampleTypeCollection(allSampleTypes);
+        childType.persist();
+        containerTypeMap.put("ChildCtL1", childType);
+
+        topType = ContainerTypeHelper.newContainerType(site,
+            "Top Container Type", "TCT", 2, 3, 10, true);
+        topType.setChildContainerTypeCollection(Arrays.asList(containerTypeMap
+            .get("ChildCtL1")));
+        topType.persist();
+        containerTypeMap.put("TopCT", topType);
+
+    }
+
+    private void addContainers() throws Exception {
+        ContainerWrapper top = ContainerHelper.addContainer("01", TestCommon
+            .getNewBarcode(r), null, site, containerTypeMap.get("TopCT"));
+        containerMap.put("Top", top);
+
+        ContainerWrapper childL1 = ContainerHelper.addContainer(null,
+            TestCommon.getNewBarcode(r), top, site, containerTypeMap
+                .get("ChildCtL1"), 0, 0);
+        containerMap.put("ChildL1", childL1);
     }
 
     @Test
@@ -120,16 +171,81 @@ public class TestPatientVisit extends TestDatabase {
         PatientVisitWrapper visit = PatientVisitHelper.addPatientVisit(patient,
             shipment, Utils.getRandomDate());
         visit.delete();
+
+        // make sure visit cannot be deleted if it has samples
+        visit = PatientVisitHelper.addPatientVisit(patient, shipment, Utils
+            .getRandomDate());
+        addContainerTypes();
+        addContainers();
+        List<SampleTypeWrapper> allSampleTypes = SampleTypeWrapper
+            .getGlobalSampleTypes(appService, true);
+        SampleWrapper sample = SampleHelper.addSample(allSampleTypes.get(0),
+            containerMap.get("ChildL1"), visit, 0, 0);
+        visit.reload();
+
+        try {
+            visit.delete();
+            Assert.fail("should not be allowed to delete patient visit");
+        } catch (Exception e) {
+            Assert.assertTrue(true);
+        }
+
+        // delete sample and visit
+        sample.delete();
+        visit.reload();
+        visit.delete();
     }
 
     @Test
-    public void testGetWrappedClass() {
-        fail("Not yet implemented");
+    public void testGetWrappedClass() throws Exception {
+        PatientVisitWrapper visit = PatientVisitHelper.addPatientVisit(patient,
+            shipment, Utils.getRandomDate());
+        Assert.assertEquals(PatientVisit.class, visit.getWrappedClass());
     }
 
     @Test
-    public void testGetSampleCollection() {
-        fail("Not yet implemented");
+    public void testGetSampleCollection() throws Exception {
+        PatientVisitWrapper visit = PatientVisitHelper.addPatientVisit(patient,
+            shipment, Utils.getRandomDate());
+        addContainerTypes();
+        addContainers();
+        List<SampleTypeWrapper> allSampleTypes = SampleTypeWrapper
+            .getGlobalSampleTypes(appService, true);
+        int allSampleTypesCount = allSampleTypes.size();
+        ContainerWrapper container = containerMap.get("ChildL1");
+
+        // fill container with random samples
+        Map<Integer, SampleWrapper> sampleMap = new HashMap<Integer, SampleWrapper>();
+        int rows = container.getRowCapacity().intValue();
+        int cols = container.getColCapacity().intValue();
+        for (int row = 0; row < rows; ++row) {
+            for (int col = 0; col < cols; ++col) {
+                if (r.nextGaussian() > 0.0)
+                    continue;
+                sampleMap.put(row + col * rows, SampleHelper.addSample(
+                    allSampleTypes.get(r.nextInt(allSampleTypesCount)),
+                    container, visit, row, col));
+            }
+        }
+        visit.reload();
+
+        // verify that all samples are there
+        Collection<SampleWrapper> visitSamples = visit.getSampleCollection();
+        Assert.assertEquals(sampleMap.size(), visitSamples.size());
+
+        for (SampleWrapper sample : visitSamples) {
+            RowColPos pos = sample.getPosition();
+            Assert
+                .assertEquals(sample, sampleMap.get(pos.row + pos.col * rows));
+        }
+
+        // delete all samples now
+        for (SampleWrapper sample : visitSamples) {
+            sample.delete();
+        }
+        visit.reload();
+        visitSamples = visit.getSampleCollection();
+        Assert.assertEquals(0, visitSamples.size());
     }
 
     @Test

@@ -261,7 +261,7 @@ public class PatientWrapper extends ModelWrapper<Patient> {
         String queryString = "select count(samples) from "
             + Patient.class.getName() + " as p"
             + " left join p.patientVisitCollection as visits"
-            + " left join visits.sampleCollection as samples" + " where p = ?)";
+            + " left join visits.sampleCollection as samples where p = ?)";
         HQLCriteria c = new HQLCriteria(queryString, Arrays
             .asList(new Object[] { wrappedObject }));
         List<Long> results = appService.query(c);
