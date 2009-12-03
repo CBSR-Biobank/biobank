@@ -81,7 +81,6 @@ public class BioBankPlugin extends AbstractUIPlugin {
     public static final String IMG_STUDY = "study";
     public static final String IMG_USER_ADD = "userAdd";
 
-    // FIXME: move this to preferences
     // 
     // ContainerTypeAdapter and Container missing on purpose.
     //

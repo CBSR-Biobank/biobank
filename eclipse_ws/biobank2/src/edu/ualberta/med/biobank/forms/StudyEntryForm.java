@@ -22,6 +22,7 @@ import edu.ualberta.med.biobank.common.wrappers.SampleSourceWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.exception.UserUIException;
 import edu.ualberta.med.biobank.model.PvCustomInfo;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
@@ -286,12 +287,11 @@ public class StudyEntryForm extends BiobankEntryForm {
                 try {
                     study.deletePvInfo(pvCustomInfo.getLabel());
                 } catch (Exception e) {
-                    // FIXME this is something invalid that the user did,
-                    // not really an error
-                    throw new RuntimeException(
+                    throw new UserUIException(
                         "Cannot delete "
                             + label
-                            + " from study since it is already in use by patient visits.");
+                            + " from study since it is already in use by patient visits.",
+                        e);
                 }
             }
 
