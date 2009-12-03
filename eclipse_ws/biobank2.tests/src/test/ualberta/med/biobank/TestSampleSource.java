@@ -14,6 +14,7 @@ import edu.ualberta.med.biobank.common.wrappers.SampleSourceWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.Study;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class TestSampleSource extends TestDatabase {
 
@@ -95,5 +96,30 @@ public class TestSampleSource extends TestDatabase {
         Assert.assertTrue(ssw.compareTo(newSampleSource) < 0);
         newSampleSource.setName(ssw.getName());
         Assert.assertTrue(newSampleSource.compareTo(ssw) == 0);
+    }
+
+    @Test
+    public void testResetAlreadyInDatabase() throws Exception {
+        String old = ssw.getName();
+        ssw.setName("toto");
+        ssw.reset();
+        Assert.assertEquals(old, ssw.getName());
+    }
+
+    @Test
+    public void testResetNew() throws Exception {
+        SampleSourceWrapper ssw = SampleSourceHelper
+            .newSampleSource("testResetNew");
+        ssw.setName("toto");
+        ssw.reset();
+        Assert.assertEquals(null, ssw.getName());
+    }
+
+    @Test
+    public void testGetAllSampleSources() throws ApplicationException {
+        List<SampleSourceWrapper> list = SampleSourceWrapper
+            .getAllSampleSources(appService);
+        Assert.assertTrue(list.contains(ssw));
+
     }
 }

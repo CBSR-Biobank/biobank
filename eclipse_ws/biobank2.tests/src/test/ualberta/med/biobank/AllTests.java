@@ -17,7 +17,7 @@ import test.ualberta.med.biobank.internal.DbHelper;
     TestPvSampleSource.class, TestSample.class, TestClinic.class,
     TestSampleStorage.class, TestSampleSource.class, TestSampleType.class,
     TestContainer.class, TestContainerType.class, TestShipment.class,
-    TestContact.class })
+    TestContact.class, TestShippingCompany.class })
 public class AllTests {
     public static WritableApplicationService appService = null;
 

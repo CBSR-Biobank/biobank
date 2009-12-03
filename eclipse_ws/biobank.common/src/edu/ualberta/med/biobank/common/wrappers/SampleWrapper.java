@@ -54,6 +54,7 @@ public class SampleWrapper extends
     protected void persistChecks() throws BiobankCheckException,
         ApplicationException {
         checkInventoryIdUnique();
+        checkPosition(getParent());
     }
 
     public String getInventoryId() {
@@ -64,7 +65,18 @@ public class SampleWrapper extends
         ApplicationException {
         List<SampleWrapper> samples = getSamplesInSite(appService,
             getInventoryId(), getSite());
-        if (samples.size() > 0) {
+        boolean alreadyExists = false;
+        if (samples.size() > 0 && isNew()) {
+            alreadyExists = true;
+        } else {
+            for (SampleWrapper sample : samples) {
+                if (!sample.getId().equals(getId())) {
+                    alreadyExists = true;
+                    break;
+                }
+            }
+        }
+        if (alreadyExists) {
             throw new BiobankCheckException("A sample with inventoryId \""
                 + getInventoryId() + "\" already exists.");
         }
@@ -110,19 +122,30 @@ public class SampleWrapper extends
     public void checkPosition(ContainerWrapper parentContainer)
         throws BiobankCheckException, ApplicationException {
         RowColPos position = getPosition();
-        HQLCriteria criteria = new HQLCriteria("from " + Sample.class.getName()
-            + " where samplePosition.row=? and samplePosition.col=?"
-            + " and samplePosition.container=?", Arrays.asList(new Object[] {
-            position.row, position.col, parentContainer.getWrappedObject() }));
+        if (position != null) {
+            String isSame = "";
+            List<Object> params = new ArrayList<Object>(Arrays
+                .asList(new Object[] { position.row, position.col,
+                    parentContainer.getWrappedObject() }));
+            if (!isNew()) {
+                isSame = " and id <> ?";
+                params.add(getId());
+            }
+            HQLCriteria criteria = new HQLCriteria("from "
+                + Sample.class.getName()
+                + " where samplePosition.row=? and samplePosition.col=?"
+                + " and samplePosition.container=?" + isSame, params);
 
-        List<Sample> samples = appService.query(criteria);
-        if (samples.size() == 0) {
-            return;
+            List<Sample> samples = appService.query(criteria);
+            if (samples.size() == 0) {
+                return;
+            }
+            Sample sample = samples.get(0);
+            throw new BiobankCheckException(
+                "Position already in use in container "
+                    + parentContainer.getLabel() + " by sample "
+                    + sample.getInventoryId());
         }
-        Sample sample = samples.get(0);
-        throw new BiobankCheckException("Position already in use in container "
-            + parentContainer.getLabel() + " by sample "
-            + sample.getInventoryId());
     }
 
     public void setSampleType(SampleType type) {

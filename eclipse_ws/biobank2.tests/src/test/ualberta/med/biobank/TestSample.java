@@ -46,7 +46,7 @@ public class TestSample extends TestDatabase {
     public void setUp() throws Exception {
         super.setUp();
 
-        SiteWrapper site = SiteHelper.addSite("sitename", true);
+        SiteWrapper site = SiteHelper.addSite("sitename" + r.nextInt());
         SampleTypeWrapper sampleTypeWrapper = SampleTypeHelper.addSampleType(
             site, "sampletype");
         ContainerTypeWrapper type = ContainerTypeHelper.addContainerType(site,
@@ -69,17 +69,54 @@ public class TestSample extends TestDatabase {
         container.reload();
     }
 
-    @Test(expected = BiobankCheckException.class)
-    public void testCheckInventoryIdUnique() throws BiobankCheckException,
+    @Test
+    public void testGettersAndSetters() throws Exception {
+        sample.persist();
+        testGettersAndSetters(sample);
+    }
+
+    @Test
+    public void testPersistCheckInventoryIdUnique()
+        throws BiobankCheckException, Exception {
+        sample.persist();
+
+        SampleWrapper duplicate = SampleHelper.newSample(
+            sample.getSampleType(), sample.getParent(), sample
+                .getPatientVisit(), 2, 2);
+        duplicate.setInventoryId(sample.getInventoryId());
+
+        try {
+            duplicate.persist();
+            Assert.fail("same inventory id !");
+        } catch (BiobankCheckException bce) {
+            Assert.assertTrue(true);
+        }
+
+        duplicate.setInventoryId("qqqq" + r.nextInt());
+        duplicate.persist();
+    }
+
+    @Test
+    public void testPersistPositionAlreadyUsed() throws BiobankCheckException,
         Exception {
-        SampleWrapper duplicate = SampleHelper.addSample(
+        sample.persist();
+
+        SampleWrapper duplicate = SampleHelper.newSample(
             sample.getSampleType(), sample.getParent(), sample
                 .getPatientVisit(), 3, 3);
-        // should be allowed same position?
-        sample.setInventoryId("1234");
-        duplicate.setInventoryId("1234");
+
+        try {
+            duplicate.persist();
+            Assert.fail("Position in used !");
+        } catch (BiobankCheckException bce) {
+            Assert.assertTrue(true);
+        }
+
+        duplicate.setPosition(2, 3);
         duplicate.persist();
-        sample.checkInventoryIdUnique();
+
+        duplicate.setInventoryId(Utils.getRandomString(5));
+        duplicate.persist();
 
     }
 
@@ -97,6 +134,11 @@ public class TestSample extends TestDatabase {
         Assert.assertTrue(sample.getPositionString(false, false).equals("A1"));
         RowColPos pos = sample.getPosition();
         Assert.assertTrue((pos.col == 0) && (pos.row == 0));
+
+        sample.setSamplePositionFromString("C2", sample.getParent());
+        Assert.assertTrue(sample.getPositionString(false, false).equals("C2"));
+        pos = sample.getPosition();
+        Assert.assertTrue((pos.col == 1) && (pos.row == 2));
     }
 
     @Test
@@ -148,7 +190,6 @@ public class TestSample extends TestDatabase {
 
     @Test
     public void testCreateNewSample() throws BiobankCheckException, Exception {
-
         Collection<SampleStorageWrapper> ssCollection = new ArrayList<SampleStorageWrapper>();
         SampleStorageWrapper ss1 = new SampleStorageWrapper(appService);
         ss1.setSampleType(SampleTypeHelper.addSampleType(sample.getSite(),
@@ -179,22 +220,6 @@ public class TestSample extends TestDatabase {
         Assert.assertTrue(dbSample.getSampleType().getId().equals(
             sample.getSampleType().getId()));
         Assert.assertTrue(dbSample.getQuantity().equals(3.0));
-    }
-
-    @Test
-    public void testPersitFail() throws Exception {
-        sample.setInventoryId("defgh");
-        sample.persist();
-
-        SampleWrapper sample2 = SampleHelper.newSample(sample.getSampleType(),
-            sample.getParent(), sample.getPatientVisit(), 2, 3);
-        sample2.setInventoryId(sample.getInventoryId());
-        try {
-            sample2.persist();
-            Assert.fail("Should not insert: this inventoryID already exists");
-        } catch (BiobankCheckException bce) {
-            Assert.assertTrue(true);
-        }
     }
 
     @Test
@@ -245,4 +270,54 @@ public class TestSample extends TestDatabase {
         sample2.persist();
         Assert.assertTrue(sample.compareTo(sample2) < 0);
     }
+
+    @Test
+    public void testGetSamplesInSite() throws Exception {
+        String name = "testGetSamplesInSite" + r.nextInt();
+        SiteWrapper site = SiteHelper.addSite(name);
+        SampleTypeWrapper sampleTypeWrapper = SampleTypeHelper.addSampleType(
+            site, name);
+        StudyWrapper study = StudyHelper.addStudy(site, name);
+        PatientWrapper patient = PatientHelper.addPatient(Utils
+            .getRandomNumericString(5), study);
+        ContactHelper.addContactsToStudy(study, name);
+
+        ShipmentWrapper shipment = ShipmentHelper.addShipment(study
+            .getClinicCollection().get(0), patient);
+        PatientVisitWrapper pv = PatientVisitHelper.addPatientVisit(patient,
+            shipment, Utils.getRandomDate());
+
+        ContainerTypeWrapper type = ContainerTypeHelper.addContainerType(site,
+            name, name, 1, 4, 5, true);
+        ContainerWrapper container = ContainerHelper.addContainer(name, name,
+            null, site, type);
+        SampleHelper.addSample(sampleTypeWrapper, container, pv, 0, 0);
+        SampleWrapper sample = SampleHelper.newSample(sampleTypeWrapper,
+            container, pv, 2, 3);
+        sample.setInventoryId(Utils.getRandomString(5));
+        sample.persist();
+        SampleHelper.addSample(sampleTypeWrapper, container, pv, 3, 3);
+
+        List<SampleWrapper> samples = SampleWrapper.getSamplesInSite(
+            appService, sample.getInventoryId(), site);
+        Assert.assertEquals(1, samples.size());
+        Assert.assertEquals(samples.get(0), sample);
+    }
+
+    @Test
+    public void testResetAlreadyInDatabase() throws Exception {
+        sample.persist();
+        String old = sample.getInventoryId();
+        sample.setInventoryId("toto");
+        sample.reset();
+        Assert.assertEquals(old, sample.getInventoryId());
+    }
+
+    @Test
+    public void testResetNew() throws Exception {
+        sample.setInventoryId("toto");
+        sample.reset();
+        Assert.assertEquals(null, sample.getInventoryId());
+    }
+
 }

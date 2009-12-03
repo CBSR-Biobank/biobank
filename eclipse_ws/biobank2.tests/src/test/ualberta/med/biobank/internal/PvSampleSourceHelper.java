@@ -11,6 +11,7 @@ public class PvSampleSourceHelper extends DbHelper {
         PvSampleSourceWrapper pss = new PvSampleSourceWrapper(appService);
         SampleSourceWrapper ssw = SampleSourceHelper.addSampleSource(name);
         pss.setSampleSource(ssw);
+        pss.setQuantity(r.nextInt(10));
         pss.setPatientVisit(visit);
         return pss;
     }

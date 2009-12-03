@@ -1,5 +1,6 @@
 package test.ualberta.med.biobank;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -45,7 +46,8 @@ public class TestContact extends TestDatabase {
 
         contact.reload();
         // Don't work because of the *..* relation : we have to choose one way
-        // only for updates
+        // only for updates, and this is study.setContactCollection() in this
+        // case
         // Assert.assertEquals(2, contact.getStudyCollection().size());
     }
 
@@ -103,7 +105,7 @@ public class TestContact extends TestDatabase {
 
     @Test
     public void testPersist() throws Exception {
-        String name = "testGetSetStudyCollection" + r.nextInt();
+        String name = "testPersist" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         ClinicWrapper clinic = ClinicHelper.addClinic(site, name);
 
@@ -111,4 +113,72 @@ public class TestContact extends TestDatabase {
         cw.persist();
     }
 
+    @Test
+    public void testDelete() throws Exception {
+        String name = "testDelete" + r.nextInt();
+        SiteWrapper site = SiteHelper.addSite(name);
+        ClinicWrapper clinic = ClinicHelper.addClinic(site, name);
+        ContactWrapper contact = ContactHelper.addContact(clinic, name);
+
+        contact.delete();
+
+        Contact contactDB = new Contact();
+        contactDB.setId(contact.getId());
+        Assert.assertEquals(0, appService.search(Contact.class, contactDB)
+            .size());
+    }
+
+    @Test
+    public void testDeleteFailNoMoreStudies() throws Exception {
+        String name = "testDeleteFailNoMoreStudies" + r.nextInt();
+        SiteWrapper site = SiteHelper.addSite(name);
+        ClinicWrapper clinic = ClinicHelper.addClinic(site, name);
+        ContactWrapper contact = ContactHelper.addContact(clinic, name);
+
+        StudyWrapper study = StudyHelper.addStudy(site, name);
+        study.setContactCollection(Arrays
+            .asList(new ContactWrapper[] { contact }));
+        study.persist();
+        contact.reload();
+
+        try {
+            contact.delete();
+            Assert.fail("one study still linked to this contact");
+        } catch (BiobankCheckException bce) {
+            Assert.assertTrue(true);
+        }
+
+        study.setContactCollection(new ArrayList<ContactWrapper>());
+        study.persist();
+        contact.reload();
+        contact.delete();
+
+        Contact contactDB = new Contact();
+        contactDB.setId(contact.getId());
+        Assert.assertEquals(0, appService.search(Contact.class, contactDB)
+            .size());
+    }
+
+    @Test
+    public void testResetAlreadyInDatabase() throws Exception {
+        String name = "testResetAlreadyInDatabase" + r.nextInt();
+        SiteWrapper site = SiteHelper.addSite(name);
+        ClinicWrapper clinic = ClinicHelper.addClinic(site, name);
+        ContactWrapper contact = ContactHelper.addContact(clinic, name);
+        String oldName = contact.getName();
+        contact.setName("toto");
+        contact.reset();
+        Assert.assertEquals(oldName, contact.getName());
+    }
+
+    @Test
+    public void testResetNew() throws Exception {
+        String name = "testResetAlreadyInDatabase" + r.nextInt();
+        SiteWrapper site = SiteHelper.addSite(name);
+        ClinicWrapper clinic = ClinicHelper.addClinic(site, name);
+        ContactWrapper contact = ContactHelper.newContact(clinic, name);
+        contact.setName("titi");
+        contact.reset();
+        Assert.assertEquals(null, contact.getName());
+    }
 }
