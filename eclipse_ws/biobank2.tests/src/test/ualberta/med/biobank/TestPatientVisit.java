@@ -33,8 +33,6 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
@@ -313,4 +311,25 @@ public class TestPatientVisit extends TestDatabase {
         Assert.fail("check for checkPatientClinicInSameStudy");
     }
 
+    @Test
+    public void testSetPvSampleSourceCollection() throws Exception {
+        PatientVisitWrapper visit = PatientVisitHelper.addPatientVisit(patient,
+            shipment, Utils.getRandomDate());
+
+        PvSampleSourceWrapper pvSampleSourceWrapper = new PvSampleSourceWrapper(
+            appService);
+        pvSampleSourceWrapper.setDateDrawn(Utils.getRandomDate());
+        pvSampleSourceWrapper.setPatientVisit(visit);
+        pvSampleSourceWrapper.setQuantity(2);
+        pvSampleSourceWrapper.setSampleSource(SampleSourceWrapper
+            .getAllSampleSources(appService).get(0));
+
+        visit.setPvSampleSourceCollection(Arrays
+            .asList(new PvSampleSourceWrapper[] { pvSampleSourceWrapper }));
+
+        visit.persist();
+
+        visit.reload();
+        Assert.assertEquals(1, visit.getPvSampleSourceCollection().size());
+    }
 }

@@ -32,6 +32,7 @@ import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PvSampleSourceWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleSourceWrapper;
 import edu.ualberta.med.biobank.dialogs.PvSampleSourceDialog;
@@ -54,32 +55,36 @@ public class PvSampleSourceEntryWidget extends BiobankWidget {
 
     private List<SampleSourceWrapper> allSampleSources;
 
-    private List<PvSampleSourceWrapper> selectedShptSampleSources;
+    private List<PvSampleSourceWrapper> selectedPvSampleSources;
 
     private IObservableValue sampleSourcesAdded = new WritableValue(
         Boolean.FALSE, Boolean.class);
+
+    private PatientVisitWrapper patientVisit;
 
     /**
      * 
      * @param parent a composite control which will be the parent of the new
      *            instance (cannot be null)
      * @param style the style of control to construct
-     * @param shptSampleSourceCollection the sample storage already selected and
+     * @param pvSampleSourceCollection the sample storage already selected and
      *            to be displayed in the table viewer (can be null).
      * @param toolkit The toolkit is responsible for creating SWT controls
      *            adapted to work in Eclipse forms. If widget is not used in a
      *            form this parameter should be null.
      */
     public PvSampleSourceEntryWidget(Composite parent, int style,
-        List<PvSampleSourceWrapper> shptSampleSourceCollection,
-        FormToolkit toolkit) {
+        PatientVisitWrapper visit, FormToolkit toolkit) {
         super(parent, style);
         Assert.isNotNull(toolkit, "toolkit is null");
         getSampleSources();
-        if (shptSampleSourceCollection == null) {
-            selectedShptSampleSources = new ArrayList<PvSampleSourceWrapper>();
+        this.patientVisit = visit;
+        List<PvSampleSourceWrapper> pvSampleSourceCollection = patientVisit
+            .getPvSampleSourceCollection();
+        if (pvSampleSourceCollection == null) {
+            selectedPvSampleSources = new ArrayList<PvSampleSourceWrapper>();
         } else {
-            selectedShptSampleSources = shptSampleSourceCollection;
+            selectedPvSampleSources = pvSampleSourceCollection;
         }
 
         setLayout(new GridLayout(1, false));
@@ -104,7 +109,8 @@ public class PvSampleSourceEntryWidget extends BiobankWidget {
             public void widgetSelected(SelectionEvent e) {
                 PvSampleSourceWrapper sampleSource = new PvSampleSourceWrapper(
                     SessionManager.getAppService());
-                addOrEditShptSampleSource(true, sampleSource,
+                sampleSource.setPatientVisit(patientVisit);
+                addOrEditPvSampleSource(true, sampleSource,
                     getNonDuplicateSampleSources());
             }
         });
@@ -132,16 +138,16 @@ public class PvSampleSourceEntryWidget extends BiobankWidget {
         dbc.bindValue(wv, sampleSourcesAdded, uvs, uvs);
     }
 
-    private void addOrEditShptSampleSource(boolean add,
-        PvSampleSourceWrapper shptSampleSource,
+    private void addOrEditPvSampleSource(boolean add,
+        PvSampleSourceWrapper pvSampleSource,
         Set<SampleSourceWrapper> availSampleSources) {
         PvSampleSourceDialog dlg = new PvSampleSourceDialog(PlatformUI
             .getWorkbench().getActiveWorkbenchWindow().getShell(),
-            shptSampleSource, availSampleSources);
+            pvSampleSource, availSampleSources);
         if (dlg.open() == Dialog.OK) {
             if (add) {
                 // only add to the collection when adding and not editing
-                selectedShptSampleSources.add(dlg.getPvSampleSource());
+                selectedPvSampleSources.add(dlg.getPvSampleSource());
             }
             updateCollection();
             notifyListeners();
@@ -174,7 +180,7 @@ public class PvSampleSourceEntryWidget extends BiobankWidget {
                 PvSampleSourceWrapper svss = pvSampleSourceTable.getSelection();
                 Set<SampleSourceWrapper> allowedSampleSources = getNonDuplicateSampleSources();
                 allowedSampleSources.add(svss.getSampleSource());
-                addOrEditShptSampleSource(false, svss, allowedSampleSources);
+                addOrEditPvSampleSource(false, svss, allowedSampleSources);
             }
         });
 
@@ -193,13 +199,13 @@ public class PvSampleSourceEntryWidget extends BiobankWidget {
 
                 if (confirm) {
                     Collection<PvSampleSourceWrapper> ssToDelete = new HashSet<PvSampleSourceWrapper>();
-                    for (PvSampleSourceWrapper ss : selectedShptSampleSources) {
+                    for (PvSampleSourceWrapper ss : selectedPvSampleSources) {
                         if (ss.getSampleSource().getId().equals(
                             svss.getSampleSource().getId())) {
                             ssToDelete.add(ss);
                         }
                     }
-                    selectedShptSampleSources.removeAll(ssToDelete);
+                    selectedPvSampleSources.removeAll(ssToDelete);
                     updateCollection();
                     notifyListeners();
                 }
@@ -208,8 +214,8 @@ public class PvSampleSourceEntryWidget extends BiobankWidget {
     }
 
     private void updateCollection() {
-        pvSampleSourceTable.setCollection(selectedShptSampleSources);
-        sampleSourcesAdded.setValue(selectedShptSampleSources.size() > 0);
+        pvSampleSourceTable.setCollection(selectedPvSampleSources);
+        sampleSourcesAdded.setValue(selectedPvSampleSources.size() > 0);
     }
 
     private void getSampleSources() {
@@ -228,9 +234,9 @@ public class PvSampleSourceEntryWidget extends BiobankWidget {
     }
 
     public void setSelectedPvSampleSources(
-        List<PvSampleSourceWrapper> selectedShptSampleSources) {
-        this.selectedShptSampleSources = selectedShptSampleSources;
-        pvSampleSourceTable.setCollection(selectedShptSampleSources);
+        List<PvSampleSourceWrapper> selectedPvSampleSources) {
+        this.selectedPvSampleSources = selectedPvSampleSources;
+        pvSampleSourceTable.setCollection(selectedPvSampleSources);
     }
 
     @Override
