@@ -257,7 +257,7 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
     }
 
     @SuppressWarnings("unchecked")
-    public Collection<SampleTypeWrapper> getSampleTypeCollection() {
+    public List<SampleTypeWrapper> getSampleTypeCollection() {
         List<SampleTypeWrapper> sampleTypeCollection = (List<SampleTypeWrapper>) propertiesMap
             .get("sampleTypeCollection");
         if (sampleTypeCollection == null) {

@@ -32,13 +32,6 @@ public class SampleWrapper extends
         super(appService);
     }
 
-    public void setInventoryId(String inventoryId) {
-        String oldInventoryId = inventoryId;
-        wrappedObject.setInventoryId(inventoryId);
-        propertyChangeSupport.firePropertyChange("inventoryId", oldInventoryId,
-            inventoryId);
-    }
-
     @Override
     protected String[] getPropertyChangeNames() {
         return new String[] { "inventoryId", "patientVisit", "position",
@@ -54,11 +47,19 @@ public class SampleWrapper extends
     protected void persistChecks() throws BiobankCheckException,
         ApplicationException {
         checkInventoryIdUnique();
-        checkPosition(getParent());
+        checkParentAcceptSampleType();
+        super.persistChecks();
     }
 
     public String getInventoryId() {
         return wrappedObject.getInventoryId();
+    }
+
+    public void setInventoryId(String inventoryId) {
+        String oldInventoryId = inventoryId;
+        wrappedObject.setInventoryId(inventoryId);
+        propertyChangeSupport.firePropertyChange("inventoryId", oldInventoryId,
+            inventoryId);
     }
 
     public void checkInventoryIdUnique() throws BiobankCheckException,
@@ -82,6 +83,21 @@ public class SampleWrapper extends
         }
     }
 
+    private void checkParentAcceptSampleType() throws BiobankCheckException {
+        ContainerWrapper parent = getParent();
+        if (parent != null) {
+            List<SampleTypeWrapper> types = getParent().getContainerType()
+                .getSampleTypeCollection();
+            if (types == null || !types.contains(getSampleType())) {
+                throw new BiobankCheckException("Container "
+                    + getParent().getFullInfoLabel()
+                    + " does not allow inserts of sample type "
+                    + getSampleType().getName() + ".");
+            }
+        }
+    }
+
+    @Override
     public SiteWrapper getSite() {
         if (getPatientVisit() != null) {
             return getPatientVisit().getPatient().getStudy().getSite();
@@ -119,8 +135,12 @@ public class SampleWrapper extends
         }
     }
 
-    public void checkPosition(ContainerWrapper parentContainer)
-        throws BiobankCheckException, ApplicationException {
+    /**
+     * Method used to check if the current position of this sample is available
+     * on the container. Return true if the position is free, false otherwise
+     */
+    public boolean isPositionFree(ContainerWrapper parentContainer)
+        throws ApplicationException {
         RowColPos position = getPosition();
         if (position != null) {
             String isSame = "";
@@ -137,15 +157,11 @@ public class SampleWrapper extends
                 + " and samplePosition.container=?" + isSame, params);
 
             List<Sample> samples = appService.query(criteria);
-            if (samples.size() == 0) {
-                return;
+            if (samples.size() > 0) {
+                return false;
             }
-            Sample sample = samples.get(0);
-            throw new BiobankCheckException(
-                "Position already in use in container "
-                    + parentContainer.getLabel() + " by sample "
-                    + sample.getInventoryId());
         }
+        return true;
     }
 
     public void setSampleType(SampleType type) {

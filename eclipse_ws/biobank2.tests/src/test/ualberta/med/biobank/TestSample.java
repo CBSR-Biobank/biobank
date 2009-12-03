@@ -51,6 +51,9 @@ public class TestSample extends TestDatabase {
             site, "sampletype");
         ContainerTypeWrapper type = ContainerTypeHelper.addContainerType(site,
             "ctType", "ct", 1, 4, 5, true);
+        type.setSampleTypeCollection(Arrays
+            .asList(new SampleTypeWrapper[] { sampleTypeWrapper }));
+        type.persist();
         ContainerWrapper container = ContainerHelper.addContainer(
             "newcontainer", "cc", null, site, type);
         StudyWrapper study = StudyHelper.addStudy(site, "studyname");
@@ -117,7 +120,25 @@ public class TestSample extends TestDatabase {
 
         duplicate.setInventoryId(Utils.getRandomString(5));
         duplicate.persist();
+    }
 
+    @Test
+    public void testPersistCheckParentAcceptSampleType()
+        throws BiobankCheckException, Exception {
+        SampleTypeWrapper oldSampleType = sample.getSampleType();
+
+        SampleTypeWrapper type2 = SampleTypeHelper.addSampleType(oldSampleType
+            .getSite(), "sampletype_2");
+        sample.setSampleType(type2);
+        try {
+            sample.persist();
+            Assert.fail("Container can't hold this type !");
+        } catch (BiobankCheckException bce) {
+            Assert.assertTrue(true);
+        }
+
+        sample.setSampleType(oldSampleType);
+        sample.persist();
     }
 
     @Test
@@ -157,6 +178,8 @@ public class TestSample extends TestDatabase {
         ContainerWrapper oldParent = sample.getParent();
         ContainerTypeWrapper type = ContainerTypeHelper.addContainerType(sample
             .getSite(), "newCtType", "ctNew", 1, 4, 5, true);
+        type.setSampleTypeCollection(Arrays
+            .asList(new SampleTypeWrapper[] { sample.getSampleType() }));
         ContainerWrapper parent = ContainerHelper.addContainer(
             "newcontainerParent", "ccNew", null, sample.getSite(), type);
 
@@ -275,8 +298,8 @@ public class TestSample extends TestDatabase {
     public void testGetSamplesInSite() throws Exception {
         String name = "testGetSamplesInSite" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
-        SampleTypeWrapper sampleTypeWrapper = SampleTypeHelper.addSampleType(
-            site, name);
+        SampleTypeWrapper sampleType = SampleTypeHelper.addSampleType(site,
+            name);
         StudyWrapper study = StudyHelper.addStudy(site, name);
         PatientWrapper patient = PatientHelper.addPatient(Utils
             .getRandomNumericString(5), study);
@@ -289,14 +312,16 @@ public class TestSample extends TestDatabase {
 
         ContainerTypeWrapper type = ContainerTypeHelper.addContainerType(site,
             name, name, 1, 4, 5, true);
+        type.setSampleTypeCollection(Arrays
+            .asList(new SampleTypeWrapper[] { sampleType }));
         ContainerWrapper container = ContainerHelper.addContainer(name, name,
             null, site, type);
-        SampleHelper.addSample(sampleTypeWrapper, container, pv, 0, 0);
-        SampleWrapper sample = SampleHelper.newSample(sampleTypeWrapper,
-            container, pv, 2, 3);
+        SampleHelper.addSample(sampleType, container, pv, 0, 0);
+        SampleWrapper sample = SampleHelper.newSample(sampleType, container,
+            pv, 2, 3);
         sample.setInventoryId(Utils.getRandomString(5));
         sample.persist();
-        SampleHelper.addSample(sampleTypeWrapper, container, pv, 3, 3);
+        SampleHelper.addSample(sampleType, container, pv, 3, 3);
 
         List<SampleWrapper> samples = SampleWrapper.getSamplesInSite(
             appService, sample.getInventoryId(), site);
@@ -318,6 +343,15 @@ public class TestSample extends TestDatabase {
         sample.setInventoryId("toto");
         sample.reset();
         Assert.assertEquals(null, sample.getInventoryId());
+    }
+
+    @Test
+    public void testCheckPosition() throws BiobankCheckException, Exception {
+        sample.persist();
+
+        SampleWrapper sample2 = new SampleWrapper(appService);
+        sample2.setPosition(3, 3);
+        sample2.isPositionFree(sample.getParent());
     }
 
 }

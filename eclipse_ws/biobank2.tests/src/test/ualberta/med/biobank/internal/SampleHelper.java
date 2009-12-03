@@ -13,7 +13,7 @@ public class SampleHelper extends DbHelper {
         Integer col) {
         SampleWrapper sample = new SampleWrapper(appService);
         sample.setSampleType(sampleType);
-        sample.setInventoryId(Utils.getRandomString(5));
+        sample.setInventoryId(Utils.getRandomString(20));
         sample.setParent(container);
         sample.setPatientVisit(pv);
         sample.setPosition(row, col);

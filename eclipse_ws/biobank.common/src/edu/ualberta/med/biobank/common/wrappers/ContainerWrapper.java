@@ -56,8 +56,7 @@ public class ContainerWrapper extends
         checkContainerTypeNotNull();
         checkLabelUniqueForType();
         checkProductBarcodeUnique();
-        checkHoldsContainerTypes();
-        checkParentFromSameSite();
+        checkParentAcceptContainerType();
         checkContainerTypeSameSite();
         super.persistChecks();
     }
@@ -67,13 +66,6 @@ public class ContainerWrapper extends
             && !getContainerType().getSite().equals(getSite())) {
             throw new BiobankCheckException(
                 "Type should be part of the same site");
-        }
-    }
-
-    private void checkParentFromSameSite() throws BiobankCheckException {
-        if (getParent() != null && !getParent().getSite().equals(getSite())) {
-            throw new BiobankCheckException(
-                "Parent should be part of the same site");
         }
     }
 
@@ -171,8 +163,7 @@ public class ContainerWrapper extends
 
     private void checkContainerTypeNotNull() throws BiobankCheckException {
         if (getContainerType() == null) {
-            throw new BiobankCheckException(
-                "This container should be associate to a site");
+            throw new BiobankCheckException("This container type should be set");
         }
     }
 
@@ -181,6 +172,7 @@ public class ContainerWrapper extends
         return Container.class;
     }
 
+    @Override
     public SiteWrapper getSite() {
         Site site = wrappedObject.getSite();
         if (site == null) {
@@ -504,7 +496,7 @@ public class ContainerWrapper extends
         return children.get(new RowColPos(row, col));
     }
 
-    private void checkHoldsContainerTypes() throws BiobankCheckException {
+    private void checkParentAcceptContainerType() throws BiobankCheckException {
         if (Boolean.TRUE.equals(getContainerType().getTopLevel()))
             return;
 
