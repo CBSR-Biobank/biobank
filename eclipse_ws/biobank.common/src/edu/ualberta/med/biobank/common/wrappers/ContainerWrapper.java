@@ -54,12 +54,27 @@ public class ContainerWrapper extends
         ApplicationException {
         checkSiteNotNull();
         checkContainerTypeNotNull();
-        // TODO check type is from same site ?
-        // TODO check parent is from same site ?
         checkLabelUniqueForType();
         checkProductBarcodeUnique();
         checkHoldsContainerTypes();
+        checkParentFromSameSite();
+        checkContainerTypeSameSite();
         super.persistChecks();
+    }
+
+    private void checkContainerTypeSameSite() throws BiobankCheckException {
+        if (getContainerType() != null
+            && !getContainerType().getSite().equals(getSite())) {
+            throw new BiobankCheckException(
+                "Type should be part of the same site");
+        }
+    }
+
+    private void checkParentFromSameSite() throws BiobankCheckException {
+        if (getParent() != null && !getParent().getSite().equals(getSite())) {
+            throw new BiobankCheckException(
+                "Parent should be part of the same site");
+        }
     }
 
     @Override

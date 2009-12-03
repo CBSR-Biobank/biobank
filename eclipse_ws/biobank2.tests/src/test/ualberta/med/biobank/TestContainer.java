@@ -902,7 +902,7 @@ public class TestContainer extends TestDatabase {
             site, containerTypeMap.get("TopCT"));
     }
 
-    @Test(expected = BiobankCheckException.class)
+    @Test
     public void testParentSameSite() throws Exception {
         // create an alternate site and create a container type for the
         // alternate site
@@ -925,8 +925,21 @@ public class TestContainer extends TestDatabase {
 
         // now a container of type container type for alternate site to the main
         // site
-        ContainerHelper.addContainer(null, TestCommon.getNewBarcode(r), altTop,
-            site, childType, 0, 0);
+        try {
+            ContainerHelper.addContainer(null, TestCommon.getNewBarcode(r),
+                altTop, site, childType, 0, 0);
+            Assert.fail("Parent should be in the same site");
+        } catch (BiobankCheckException bce) {
+            Assert.assertTrue(true);
+        }
+
+        try {
+            ContainerHelper.addContainer(null, TestCommon.getNewBarcode(r),
+                containerMap.get("Top"), site, childType, 0, 0);
+            Assert.fail("type should be in the same site");
+        } catch (BiobankCheckException bce) {
+            Assert.assertTrue(true);
+        }
     }
 
     @Test(expected = BiobankCheckException.class)

@@ -22,6 +22,7 @@ public class PatientHelper extends DbHelper {
         throws Exception {
         PatientWrapper patient = newPatient(number, study);
         patient.persist();
+        study.reload();
         return patient;
     }
 
