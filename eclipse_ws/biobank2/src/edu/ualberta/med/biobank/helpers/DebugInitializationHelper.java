@@ -164,11 +164,18 @@ public class DebugInitializationHelper {
     }
 
     @SuppressWarnings("unused")
-    private void insertSite() throws ApplicationException,
-        BiobankCheckException, WrapperException {
+    private void insertSite() throws Exception, BiobankCheckException,
+        WrapperException {
         site = new SiteWrapper(appService);
-        site.setName("Site Edmonton Test");
+        site.setName("CBSR");
         site.setCity("Edmonton");
+
+        site.setSitePvAttr("Biobpsy Length", "number");
+        site.setSitePvAttr("PMBC Count", "number");
+        site.setSitePvAttr("Worksheet", "text");
+        site.setSitePvAttr("Consent", "select_multiple");
+        site.setSitePvAttr("Visit Type", "select_single");
+
         site.persist();
     }
 

@@ -804,20 +804,20 @@ public class SiteWrapper extends ModelWrapper<Site> {
                 + "\" is invalid");
         }
 
-        SitePvAttrWrapper pip = getSitePvAttr(label);
-        if (pip == null) {
-            pip = new SitePvAttrWrapper(appService, new SitePvAttr());
-            pip.setLabel(label);
-            sitePvAttrMap.put(label, pip);
+        SitePvAttrWrapper sitePvAttr = getSitePvAttr(label);
+        if (sitePvAttr == null) {
+            sitePvAttr = new SitePvAttrWrapper(appService, new SitePvAttr());
+            sitePvAttr.setLabel(label);
+            sitePvAttr.setSite(this);
+            sitePvAttrMap.put(label, sitePvAttr);
         }
-        pip.setPvAttrType(pvAttrType);
-        pip.setSite(this);
+        sitePvAttr.setPvAttrType(pvAttrType);
 
         List<SitePvAttrWrapper> list = getSitePvAttrCollection();
         if (list == null) {
             list = new ArrayList<SitePvAttrWrapper>();
         }
-        list.add(pip);
+        list.add(sitePvAttr);
         setSitePvAttrCollection(list);
     }
 
@@ -837,16 +837,12 @@ public class SiteWrapper extends ModelWrapper<Site> {
         if (sitePvAttrMap != null) {
             List<SitePvAttrWrapper> list = new ArrayList<SitePvAttrWrapper>(
                 sitePvAttrMap.values());
-            List<SitePvAttrWrapper> siteSitePvAttrList = new ArrayList<SitePvAttrWrapper>();
             for (SitePvAttrWrapper sitePvAttr : list) {
-                if (sitePvAttr.getSite() != null) {
-                    if (sitePvAttr.isNew()) {
-                        sitePvAttr.persist();
-                    }
-                    siteSitePvAttrList.add(sitePvAttr);
+                if (sitePvAttr.isNew()) {
+                    sitePvAttr.persist();
                 }
             }
-            setSitePvAttrCollection(siteSitePvAttrList);
+            setSitePvAttrCollection(list);
         }
         if (origObject != null) {
             deleteSampleTypeDifference(origObject);
