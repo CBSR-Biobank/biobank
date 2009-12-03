@@ -41,7 +41,6 @@ public abstract class AbstractPatientAdminForm extends BiobankEntryForm {
         if (appender == null) {
             appender = new ActivityLogAppender(getActivityTitle());
             logger.addAppender(appender);
-            // TODO we need all this to be registered in the log database...
         }
     }
 

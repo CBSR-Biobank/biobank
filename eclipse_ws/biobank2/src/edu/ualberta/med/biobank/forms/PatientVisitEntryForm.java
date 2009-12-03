@@ -319,6 +319,6 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         }
         pvSampleSourceEntryWidget.setSelectedPvSampleSources(patientVisit
             .getPvSampleSourceCollection());
-        // TODO reset for optional values
+        // FIXME also reset for pv infos
     }
 }

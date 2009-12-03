@@ -152,8 +152,6 @@ public abstract class AbstractAdministrationView extends ViewPart implements
 
             @Override
             public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-                // TODO Auto-generated method stub
-
             }
         };
         return noPatientFoundAdapter;

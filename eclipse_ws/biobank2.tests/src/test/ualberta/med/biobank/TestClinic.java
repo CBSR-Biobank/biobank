@@ -216,6 +216,7 @@ public class TestClinic extends TestDatabase {
 
         clinic.setCity("Vesoul");
         clinic.persist();
+        site.reload();
         int newTotal = site.getClinicCollection().size();
         Assert.assertEquals(oldTotal + 1, newTotal);
     }

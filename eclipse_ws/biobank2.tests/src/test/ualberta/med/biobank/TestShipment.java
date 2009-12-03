@@ -98,8 +98,7 @@ public class TestShipment extends TestDatabase {
             patient1);
         int nbClinic1Study1 = PatientVisitHelper.addPatientVisits(patient1,
             shipment1).size();
-        int nbClinic2Study1 = PatientVisitHelper.addPatientVisits(patient1,
-            shipment2).size();
+        PatientVisitHelper.addPatientVisits(patient1, shipment2).size();
 
         StudyWrapper study2 = StudyHelper.addStudy(site, name + "STUDY2");
         study2.setContactCollection(contacts);
@@ -111,14 +110,13 @@ public class TestShipment extends TestDatabase {
             patient2);
         int nbClinic1Study2 = PatientVisitHelper.addPatientVisits(patient2,
             shipment3).size();
-        int nbClinic2Study2 = PatientVisitHelper.addPatientVisits(patient2,
-            shipment4).size();
+        PatientVisitHelper.addPatientVisits(patient2, shipment4).size();
 
         shipment1.reload();
-        Assert.assertEquals(nbClinic1Study1 + nbClinic1Study2, shipment1
+        shipment3.reload();
+        Assert.assertEquals(nbClinic1Study1, shipment1
             .getPatientVisitCollection().size());
-        clinic2.reload();
-        Assert.assertEquals(nbClinic2Study1 + nbClinic2Study2, shipment3
+        Assert.assertEquals(nbClinic1Study2, shipment3
             .getPatientVisitCollection().size());
     }
 
