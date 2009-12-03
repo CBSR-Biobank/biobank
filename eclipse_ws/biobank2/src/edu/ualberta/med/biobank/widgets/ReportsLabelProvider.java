@@ -45,7 +45,7 @@ public class ReportsLabelProvider extends LabelProvider implements
             case 4:
                 return study.getNameShort();
             case 5:
-                return String.valueOf(study.getPvInfoCollection().size());
+                return String.valueOf(study.getStudyPvAttrCollection().size());
             case 6:
                 return String.valueOf(study.getSampleSourceCollection().size());
             case 7:

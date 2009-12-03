@@ -28,17 +28,20 @@ import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
-import edu.ualberta.med.biobank.common.wrappers.internal.PvInfoPossibleWrapper;
 import edu.ualberta.med.biobank.model.Study;
 
 public class TestStudy extends TestDatabase {
+
+    // the methods to skip in the getters and setters test
+    private static final List<String> GETTER_SKIP_METHODS = Arrays
+        .asList(new String[] { "getStudyPvAttrLocked" });
 
     @Test
     public void testGettersAndSetters() throws Exception {
         String name = "testGettersAndSetters" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         StudyWrapper study = StudyHelper.addStudy(site, name);
-        testGettersAndSetters(study);
+        testGettersAndSetters(study, GETTER_SKIP_METHODS);
     }
 
     @Test
@@ -56,9 +59,7 @@ public class TestStudy extends TestDatabase {
         site2.reload();
 
         Assert.assertEquals(site2, study.getSite());
-
         Assert.assertTrue(site2.getStudyCollection().contains(study));
-
         Assert.assertFalse(site.getStudyCollection().contains(study));
     }
 
@@ -286,79 +287,70 @@ public class TestStudy extends TestDatabase {
     }
 
     @Test
-    public void testSetPvInfo() throws Exception {
-        String name = "testGetSetPvInfoLabels" + r.nextInt();
+    public void testSetStudyPvAttr() throws Exception {
+        String name = "testGetSetStudyPvAttrLabels" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         StudyWrapper study = StudyHelper.addStudy(site, name);
 
-        study.setPvInfo("Worksheet");
-        study.setPvInfo("Visit Type", new String[] { "toto", "titi", "tata" });
+        List<String> types = SiteWrapper.getPvAttrTypeNames(appService);
+        Assert.assertTrue(types.contains("text"));
+        Assert.assertTrue(types.contains("select_single"));
+
+        study.setStudyPvAttr("Worksheet", "text");
+        study.setStudyPvAttr("Visit Type", "select_single", new String[] {
+            "toto", "titi", "tata" });
         study.persist();
 
-        Assert.assertEquals(2, study.getPvInfoLabels().length);
+        Assert.assertEquals(2, study.getStudyPvAttrLabels().length);
     }
 
     @Test
-    public void testGetSetPvInfoLabels() throws Exception {
-        String name = "testGetSetPvInfoLabels" + r.nextInt();
+    public void testGetStudyPvAttrLabels() throws Exception {
+        String name = "testGetSetStudyPvAttrLabels" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         StudyWrapper study = StudyHelper.addStudy(site, name);
 
-        study.setPvInfo("Worksheet");
-        study.setPvInfo("Consent");
-        Assert.assertEquals(2, study.getPvInfoLabels().length);
+        study.setStudyPvAttr("Worksheet", "text");
+        study.setStudyPvAttr("Consent", "select_multiple");
+        Assert.assertEquals(2, study.getStudyPvAttrLabels().length);
 
         // test still ok after persist
         study.persist();
         study.reload();
-        Assert.assertEquals(2, study.getPvInfoLabels().length);
-
-        study.setPvInfoLabels(new String[] { "Consent" });
-        Assert.assertEquals(1, study.getPvInfoLabels().length);
-
-        // test still ok after persist
-        study.persist();
-        study.reload();
-        Assert.assertEquals(1, study.getPvInfoLabels().length);
+        Assert.assertEquals(2, study.getStudyPvAttrLabels().length);
     }
 
     @Test
-    public void testGetPvInfoType() throws Exception {
-        String name = "testGetPvInfoType" + r.nextInt();
+    public void testGetStudyPvAttrType() throws Exception {
+        String name = "testGetStudyPvAttrType" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         StudyWrapper study = StudyHelper.addStudy(site, name);
 
-        List<PvInfoPossibleWrapper> possibles = PvInfoPossibleWrapper
-            .getGlobalPvInfoPossible(appService, false);
-        if (possibles.size() < 2) {
-            Assert
-                .fail("no pv info possible available to execute this test case");
-        }
-
-        study.setPvInfo(possibles.get(0).getLabel());
-        PvInfoPossibleWrapper possible = possibles.get(1);
-        study.setPvInfo(possible.getLabel());
+        study.setStudyPvAttr("Worksheet", "text");
+        study.setStudyPvAttr("Visit Type", "select_single", new String[] {
+            "toto", "titi", "tata" });
         study.persist();
 
-        study.reload();
-        Integer typeId = study.getPvInfoType(possible.getLabel());
-        Assert.assertEquals(possible.getPvInfoType().getId(), typeId);
+        List<String> labels = Arrays.asList(study.getStudyPvAttrLabels());
+        Assert.assertEquals(2, labels.size());
+        Assert.assertTrue(labels.contains("Worksheet"));
+        Assert.assertTrue(labels.contains("Visit Type"));
     }
 
     @Test
-    public void testGetPvInfoAllowedValues() throws Exception {
-        String name = "testGetPvInfoType" + r.nextInt();
+    public void testGetStudyPvAttrPermissible() throws Exception {
+        String name = "testGetStudyPvAttrType" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         StudyWrapper study = StudyHelper.addStudy(site, name);
 
-        study.setPvInfo("Worksheet");
+        study.setStudyPvAttr("Worksheet", "text");
         String pvInfoLabel = "Visit Type";
         String[] values = new String[] { "toto", "titi", "tata" };
-        study.setPvInfo(pvInfoLabel, values);
+        study.setStudyPvAttr(pvInfoLabel, "select_single", values);
         study.persist();
 
         study.reload();
-        String[] valuesFound = study.getPvInfoAllowedValues(pvInfoLabel);
+        String[] valuesFound = study.getStudyPvAttrPermissible(pvInfoLabel);
         List<String> valuesList = Arrays.asList(values);
         Assert.assertTrue(valuesFound.length == values.length);
         for (String s : valuesFound) {

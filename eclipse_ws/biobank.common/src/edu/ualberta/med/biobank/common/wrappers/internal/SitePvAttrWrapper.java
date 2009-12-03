@@ -7,32 +7,32 @@ import java.util.List;
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
-import edu.ualberta.med.biobank.model.PvInfoPossible;
-import edu.ualberta.med.biobank.model.PvInfoType;
+import edu.ualberta.med.biobank.model.PvAttrType;
 import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.model.SitePvAttr;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
-public class PvInfoPossibleWrapper extends ModelWrapper<PvInfoPossible> {
+public class SitePvAttrWrapper extends ModelWrapper<SitePvAttr> {
 
-    public PvInfoPossibleWrapper(WritableApplicationService appService,
-        PvInfoPossible wrappedObject) {
+    public SitePvAttrWrapper(WritableApplicationService appService,
+        SitePvAttr wrappedObject) {
         super(appService, wrappedObject);
     }
 
-    public PvInfoPossibleWrapper(WritableApplicationService appService) {
+    public SitePvAttrWrapper(WritableApplicationService appService) {
         super(appService);
     }
 
     @Override
     protected String[] getPropertyChangeNames() {
-        return new String[] { "label", "isDefault", "pvInfoType", "site" };
+        return new String[] { "label", "pvAttrType", "site" };
     }
 
     @Override
-    public Class<PvInfoPossible> getWrappedClass() {
-        return PvInfoPossible.class;
+    public Class<SitePvAttr> getWrappedClass() {
+        return SitePvAttr.class;
     }
 
     @Override
@@ -57,30 +57,23 @@ public class PvInfoPossibleWrapper extends ModelWrapper<PvInfoPossible> {
         propertyChangeSupport.firePropertyChange("label", oldLabel, label);
     }
 
-    public Boolean getIsDefault() {
-        return wrappedObject.getIsDefault();
+    public PvAttrTypeWrapper getPvAttrType() {
+        PvAttrType pvAttrType = wrappedObject.getPvAttrType();
+        if (pvAttrType == null) {
+            return null;
+        }
+        return new PvAttrTypeWrapper(appService, pvAttrType);
     }
 
-    public void setIsDefault(Boolean isDefault) {
-        Boolean oldIsDefault = getIsDefault();
-        wrappedObject.setIsDefault(isDefault);
-        propertyChangeSupport.firePropertyChange("isDefault", oldIsDefault,
-            isDefault);
+    public void setPvAttrType(PvAttrType pvAttrType) {
+        PvAttrType oldPvInfo = wrappedObject.getPvAttrType();
+        wrappedObject.setPvAttrType(pvAttrType);
+        propertyChangeSupport.firePropertyChange("pvAttrType", oldPvInfo,
+            pvAttrType);
     }
 
-    public PvInfoTypeWrapper getPvInfoType() {
-        return new PvInfoTypeWrapper(appService, wrappedObject.getPvInfoType());
-    }
-
-    public void setPvInfoType(PvInfoType pvInfoType) {
-        PvInfoType oldPvInfo = wrappedObject.getPvInfoType();
-        wrappedObject.setPvInfoType(pvInfoType);
-        propertyChangeSupport.firePropertyChange("pvInfoType", oldPvInfo,
-            pvInfoType);
-    }
-
-    public void setPvInfoType(PvInfoTypeWrapper pvInfoType) {
-        setPvInfoType(pvInfoType.getWrappedObject());
+    public void setPvAttrType(PvAttrTypeWrapper pvAttrType) {
+        setPvAttrType(pvAttrType.getWrappedObject());
     }
 
     public SiteWrapper getSite() {
@@ -105,23 +98,23 @@ public class PvInfoPossibleWrapper extends ModelWrapper<PvInfoPossible> {
         }
     }
 
-    public static List<PvInfoPossibleWrapper> transformToWrapperList(
-        WritableApplicationService appService, List<PvInfoPossible> pipList) {
-        List<PvInfoPossibleWrapper> list = new ArrayList<PvInfoPossibleWrapper>();
-        for (PvInfoPossible type : pipList) {
-            list.add(new PvInfoPossibleWrapper(appService, type));
+    public static List<SitePvAttrWrapper> transformToWrapperList(
+        WritableApplicationService appService, List<SitePvAttr> pipList) {
+        List<SitePvAttrWrapper> list = new ArrayList<SitePvAttrWrapper>();
+        for (SitePvAttr type : pipList) {
+            list.add(new SitePvAttrWrapper(appService, type));
         }
         return list;
     }
 
-    public static List<PvInfoPossibleWrapper> getGlobalPvInfoPossible(
+    public static List<SitePvAttrWrapper> getGlobalSitePvAttr(
         WritableApplicationService appService, boolean sort)
         throws ApplicationException {
-        HQLCriteria c = new HQLCriteria("from "
-            + PvInfoPossible.class.getName() + " where site = null");
+        HQLCriteria c = new HQLCriteria("from " + SitePvAttr.class.getName()
+            + " where site = null");
 
-        List<PvInfoPossible> pipList = appService.query(c);
-        List<PvInfoPossibleWrapper> list = transformToWrapperList(appService,
+        List<SitePvAttr> pipList = appService.query(c);
+        List<SitePvAttrWrapper> list = transformToWrapperList(appService,
             pipList);
         if (sort)
             Collections.sort(list);
@@ -129,13 +122,15 @@ public class PvInfoPossibleWrapper extends ModelWrapper<PvInfoPossible> {
     }
 
     @Override
-    public int compareTo(ModelWrapper<PvInfoPossible> o) {
+    public int compareTo(ModelWrapper<SitePvAttr> o) {
         return 0;
     }
 
     @Override
     public String toString() {
-        return "" + getId() + ":" + getLabel() + ":" + getIsDefault() + ":"
-            + getPvInfoType().getType();
+        SiteWrapper site = getSite();
+        return "" + getId() + ":" + getLabel() + ":"
+            + getPvAttrType().getName() + ":"
+            + ((site == null) ? "no site" : site);
     }
 }

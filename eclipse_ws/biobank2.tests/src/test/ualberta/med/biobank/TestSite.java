@@ -3,7 +3,6 @@ package test.ualberta.med.biobank;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -22,33 +21,16 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
-import edu.ualberta.med.biobank.common.wrappers.internal.PvInfoPossibleWrapper;
-import edu.ualberta.med.biobank.common.wrappers.internal.PvInfoTypeWrapper;
-import edu.ualberta.med.biobank.model.PvInfoType;
+import edu.ualberta.med.biobank.common.wrappers.internal.PvAttrTypeWrapper;
 import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.model.Site;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class TestSite extends TestDatabase {
 
-    private List<String> globalPvInfoPossibleAdded = new ArrayList<String>();
-
     @Override
     public void setUp() throws Exception {
         super.setUp();
-    }
-
-    @Override
-    public void tearDown() throws Exception {
-        super.tearDown();
-        for (PvInfoPossibleWrapper pvInfoPossibleWrapper : PvInfoPossibleWrapper
-            .getGlobalPvInfoPossible(appService, false)) {
-            if (globalPvInfoPossibleAdded.contains(pvInfoPossibleWrapper
-                .getLabel())) {
-                pvInfoPossibleWrapper.delete();
-            }
-        }
-        globalPvInfoPossibleAdded.clear();
     }
 
     @Test
@@ -663,170 +645,109 @@ public class TestSite extends TestDatabase {
     }
 
     @Test
-    public void testGetSetGlobalPvInfoPossible() throws Exception {
-        String name = "testGetSetGlobalPvInfoPossible" + r.nextInt();
-
-        // FIXME any way to get the types without a site for global ?
-        SiteWrapper site = SiteHelper.addSite(name);
-        String[] types = site.getPvInfoTypeNames();
-        if (types.length == 0) {
-            Assert.fail("Can't test without pvinfotypes");
-        }
-
-        String type = types[r.nextInt(types.length)];
-        SiteWrapper.setGlobalPvInfoPossible(appService, name, type);
-        Assert.assertNotNull(SiteWrapper.getGlobalPvInfoPossible(appService)
-            .get(name));
-        globalPvInfoPossibleAdded.add(name);
-
-        String pvInfoName2 = name + "_2";
-        SiteWrapper.setGlobalPvInfoPossible(appService, pvInfoName2, "toto");
-        Assert.assertNull(SiteWrapper.getGlobalPvInfoPossible(appService).get(
-            pvInfoName2));
-    }
-
-    @Test
-    public void testDeleteGlobalPvInfoPossible() throws Exception {
-        String name = "testGetSetGlobalPvInfoPossible" + r.nextInt();
-
-        Map<String, String> globalPvInfoPossible = SiteWrapper
-            .getGlobalPvInfoPossible(appService);
-
-        List<String> types = new ArrayList<String>(globalPvInfoPossible
-            .values());
-        if (types.size() == 0) {
-            Assert.fail("Can't test without pvinfotypes");
-        }
-        String type = types.get(r.nextInt(types.size()));
-        SiteWrapper.setGlobalPvInfoPossible(appService, name, type);
-
-        List<PvInfoPossibleWrapper> beforeDeleteList = PvInfoPossibleWrapper
-            .getGlobalPvInfoPossible(appService, false);
-
-        SiteWrapper.deleteGlobalPvInfoPossible(appService, name);
-
-        List<PvInfoPossibleWrapper> afterDeleteList = PvInfoPossibleWrapper
-            .getGlobalPvInfoPossible(appService, false);
-        Assert
-            .assertEquals(beforeDeleteList.size() - 1, afterDeleteList.size());
-        Assert.assertNull(SiteWrapper.getGlobalPvInfoPossible(appService).get(
-            name));
-        for (PvInfoPossibleWrapper pvInfoPoss : afterDeleteList) {
-            Assert.assertFalse(pvInfoPoss.getLabel().equals(name));
-        }
-    }
-
-    @Test
-    public void testGetSetPvInfoPossible() throws Exception {
-        String name = "testGetSetPvInfoPossible" + r.nextInt();
+    public void testGetSetSitePvAttr() throws Exception {
+        String name = "testGetSetSitePvAttr" + r.nextInt();
 
         SiteWrapper site = SiteHelper.addSite(name);
 
         SiteWrapper site2 = SiteHelper.addSite(name + "_secondSite");
-        String[] types = site2.getPvInfoTypeNames();
-        if (types.length == 0) {
-            Assert.fail("Can't test without pvinfotypes");
+        List<String> types = SiteWrapper.getPvAttrTypeNames(appService);
+        if (types.size() == 0) {
+            Assert.fail("Can't test without PvAttrTypes");
         }
 
-        String type = types[r.nextInt(types.length)];
-        site2.setPvInfoPossible(name, type);
+        String type = types.get(r.nextInt(types.size()));
+        site2.setSitePvAttr(name, type);
         site2.persist();
 
         site2.reload();
-        Assert.assertTrue(Arrays.asList(site2.getPvInfoPossibleLabels())
-            .contains(name));
-        Assert.assertEquals(type, site2.getPvInfoTypeName(name));
-        Assert.assertFalse(Arrays.asList(site.getPvInfoPossibleLabels())
-            .contains(name));
+        Assert.assertTrue(Arrays.asList(site2.getSitePvAttrLabels()).contains(
+            name));
+        Assert.assertEquals(type, site2.getSitePvAttrTypeName(name));
+        Assert.assertFalse(Arrays.asList(site.getSitePvAttrLabels()).contains(
+            name));
     }
 
     @Test
-    public void testRemovePvInfoPossible() throws Exception {
-        String name = "testRemovePvInfoPossible" + r.nextInt();
+    public void testRemoveSitePvAttr() throws Exception {
+        String name = "testRemoveSitePvAttr" + r.nextInt();
 
         SiteWrapper site = SiteHelper.addSite(name);
 
-        int sizeOrig = site.getPvInfoPossibleLabels().length;
-        String[] types = site.getPvInfoTypeNames();
-        if (types.length < 2) {
-            Assert.fail("Can't test without pvinfotypes");
+        int sizeOrig = site.getSitePvAttrLabels().length;
+        List<String> types = SiteWrapper.getPvAttrTypeNames(appService);
+        if (types.size() < 2) {
+            Assert.fail("Can't test without PvAttrTypes");
         }
-        site.setPvInfoPossible(name, types[0]);
-        site.setPvInfoPossible(name + "_2", types[1]);
+        site.setSitePvAttr(name, types.get(0));
+        site.setSitePvAttr(name + "_2", types.get(1));
         site.persist();
 
         site.reload();
-        Assert
-            .assertEquals(sizeOrig + 2, site.getPvInfoPossibleLabels().length);
-        site.deletePvInfoPossible(name);
-        Assert
-            .assertEquals(sizeOrig + 1, site.getPvInfoPossibleLabels().length);
+        Assert.assertEquals(sizeOrig + 2, site.getSitePvAttrLabels().length);
+        site.deleteSitePvAttr(name);
+        Assert.assertEquals(sizeOrig + 1, site.getSitePvAttrLabels().length);
         site.persist();
 
         site.reload();
-        Assert
-            .assertEquals(sizeOrig + 1, site.getPvInfoPossibleLabels().length);
+        Assert.assertEquals(sizeOrig + 1, site.getSitePvAttrLabels().length);
     }
 
     @Test
-    public void testGetPvInfoType() throws Exception {
-        String name = "testGetPvInfoType" + r.nextInt();
+    public void testGetSitePvAttrType() throws Exception {
+        String name = "testGetSitePvAttrType" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
 
-        List<PvInfoTypeWrapper> types = PvInfoTypeWrapper
+        List<PvAttrTypeWrapper> types = PvAttrTypeWrapper
             .getAllWrappers(appService);
         if (types.size() == 0) {
-            Assert.fail("Can't test without pvinfotypes");
+            Assert.fail("Can't test without PvAttrTypes");
         }
-        PvInfoTypeWrapper type = types.get(0);
+        PvAttrTypeWrapper type = types.get(0);
         String label = "toto";
-        site.setPvInfoPossible(label, type.getType());
+        site.setSitePvAttr(label, type.getName());
 
-        // my guess would be that the pvInfoPossible map inside the site should
-        // be updated in the setPvInfoPossible method
-        Assert.assertEquals(type.getId(), site.getPvInfoType(label));
+        // my guess would be that the sitePvAttr map inside the site should
+        // be updated in the setSitePvAttr method
+        Assert.assertEquals(type.getId(), site.getSitePvAttrType(label));
 
         site.persist();
         site.reload();
-        Assert.assertEquals(type.getId(), site.getPvInfoType(label));
+        Assert.assertEquals(type.getId(), site.getSitePvAttrType(label));
     }
 
     @Test
-    public void testGetPvInfoTypeName() throws Exception {
-        String name = "testGetPvInfoTypeName" + r.nextInt();
+    public void testGetSitePvAttrTypeName() throws Exception {
+        String name = "testGetSitePvAttrTypeName" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
 
-        List<PvInfoTypeWrapper> types = PvInfoTypeWrapper
+        List<PvAttrTypeWrapper> types = PvAttrTypeWrapper
             .getAllWrappers(appService);
         if (types.size() == 0) {
-            Assert.fail("Can't test without pvinfotypes");
+            Assert.fail("Can't test without PvAttrTypes");
         }
-        PvInfoTypeWrapper type = types.get(0);
+        PvAttrTypeWrapper type = types.get(0);
         String label = "toto";
-        site.setPvInfoPossible(label, type.getType());
+        site.setSitePvAttr(label, type.getName());
 
-        Assert.assertEquals(type.getType(), site.getPvInfoTypeName(label));
+        Assert.assertEquals(type.getName(), site.getSitePvAttrTypeName(label));
 
         site.persist();
         site.reload();
-        Assert.assertEquals(type.getType(), site.getPvInfoTypeName(label));
+        Assert.assertEquals(type.getName(), site.getSitePvAttrTypeName(label));
     }
 
     @Test
-    public void testGetPvInfoTypeNames() throws Exception {
-        String name = "testGetPvInfoTypeNames" + r.nextInt();
+    public void testSetSitePvAttrTypeNames() throws Exception {
+        String name = "testGetSitePvAttrTypeNames" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
 
-        List<PvInfoType> types = appService.search(PvInfoType.class,
-            new PvInfoType());
-        Assert.assertEquals(types.size(), site.getPvInfoTypeNames().length);
-
-        List<String> databaseTypesName = new ArrayList<String>();
-        for (PvInfoType type : types) {
-            databaseTypesName.add(type.getType());
-        }
-        for (String typeName : site.getPvInfoTypeNames()) {
-            Assert.assertTrue(databaseTypesName.contains(typeName));
+        List<String> types = SiteWrapper.getPvAttrTypeNames(appService);
+        Assert.assertTrue("No PvAttrTypes", types.size() > 0);
+        int count = 1;
+        for (String type : types) {
+            site.setSitePvAttr(name + count, type);
+            ++count;
         }
     }
 

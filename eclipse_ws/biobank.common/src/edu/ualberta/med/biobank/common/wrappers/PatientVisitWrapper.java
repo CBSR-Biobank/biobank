@@ -12,11 +12,11 @@ import java.util.Map;
 
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
-import edu.ualberta.med.biobank.common.wrappers.internal.PvInfoDataWrapper;
-import edu.ualberta.med.biobank.common.wrappers.internal.PvInfoWrapper;
+import edu.ualberta.med.biobank.common.wrappers.internal.PvAttrWrapper;
+import edu.ualberta.med.biobank.common.wrappers.internal.StudyPvAttrWrapper;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.PatientVisit;
-import edu.ualberta.med.biobank.model.PvInfoData;
+import edu.ualberta.med.biobank.model.PvAttr;
 import edu.ualberta.med.biobank.model.PvSampleSource;
 import edu.ualberta.med.biobank.model.Sample;
 import edu.ualberta.med.biobank.model.Shipment;
@@ -26,14 +26,15 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
 
-    private Map<String, PvInfoWrapper> pvInfoMap;
+    private Map<String, StudyPvAttrWrapper> studyPvAttrMap;
 
-    private Map<String, PvInfoDataWrapper> pvInfoDataMap;
+    private Map<String, PvAttrWrapper> pvAttrMap;
 
     public PatientVisitWrapper(WritableApplicationService appService,
         PatientVisit wrappedObject) {
         super(appService, wrappedObject);
-        pvInfoDataMap = null;
+        studyPvAttrMap = null;
+        pvAttrMap = null;
     }
 
     public PatientVisitWrapper(WritableApplicationService appService) {
@@ -43,7 +44,7 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
     @Override
     protected String[] getPropertyChangeNames() {
         return new String[] { "patient", "dateProcessed", "comment",
-            "pvInfoDataCollection", "sampleCollection", "username", "shipment",
+            "pvAttrCollection", "sampleCollection", "username", "shipment",
             "pvSampleSourceCollection" };
     }
 
@@ -116,149 +117,149 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
     }
 
     @SuppressWarnings("unchecked")
-    private List<PvInfoDataWrapper> getPvInfoDataCollection() {
-        List<PvInfoDataWrapper> pvInfoDataCollection = (List<PvInfoDataWrapper>) propertiesMap
-            .get("pvInfoDataCollection");
-        if (pvInfoDataCollection == null) {
-            Collection<PvInfoData> children = wrappedObject
-                .getPvInfoDataCollection();
+    private List<PvAttrWrapper> getPvAttrCollection() {
+        List<PvAttrWrapper> pvAttrCollection = (List<PvAttrWrapper>) propertiesMap
+            .get("pvAttrCollection");
+        if (pvAttrCollection == null) {
+            Collection<PvAttr> children = wrappedObject.getPvAttrCollection();
             if (children != null) {
-                pvInfoDataCollection = new ArrayList<PvInfoDataWrapper>();
-                for (PvInfoData pvInfo : children) {
-                    pvInfoDataCollection.add(new PvInfoDataWrapper(appService,
-                        pvInfo));
+                pvAttrCollection = new ArrayList<PvAttrWrapper>();
+                for (PvAttr pvAttr : children) {
+                    pvAttrCollection.add(new PvAttrWrapper(appService, pvAttr));
                 }
-                propertiesMap.put("pvInfoDataCollection", pvInfoDataCollection);
+                propertiesMap.put("pvAttrCollection", pvAttrCollection);
             }
         }
-        return pvInfoDataCollection;
+        return pvAttrCollection;
     }
 
-    private void setPvInfoDataCollection(
-        Collection<PvInfoData> pvInfoDataCollection, boolean setNull) {
-        Collection<PvInfoData> oldCollection = wrappedObject
-            .getPvInfoDataCollection();
-        wrappedObject.setPvInfoDataCollection(pvInfoDataCollection);
-        propertyChangeSupport.firePropertyChange("pvInfoDataCollection",
-            oldCollection, pvInfoDataCollection);
+    private void setPvAttrCollection(Collection<PvAttr> pvAttrCollection,
+        boolean setNull) {
+        Collection<PvAttr> oldCollection = wrappedObject.getPvAttrCollection();
+        wrappedObject.setPvAttrCollection(pvAttrCollection);
+        propertyChangeSupport.firePropertyChange("pvAttrCollection",
+            oldCollection, pvAttrCollection);
         if (setNull) {
-            propertiesMap.put("pvInfoDataCollection", null);
+            propertiesMap.put("pvAttrCollection", null);
         }
     }
 
-    private void setPvInfoDataCollection(
-        Collection<PvInfoDataWrapper> pvInfoDataCollection) {
-        Collection<PvInfoData> pvCollection = new HashSet<PvInfoData>();
-        for (PvInfoDataWrapper pv : pvInfoDataCollection) {
+    private void setPvAttrCollection(Collection<PvAttrWrapper> pvAttrCollection) {
+        Collection<PvAttr> pvCollection = new HashSet<PvAttr>();
+        for (PvAttrWrapper pv : pvAttrCollection) {
             pvCollection.add(pv.getWrappedObject());
         }
-        setPvInfoDataCollection(pvCollection, false);
-        propertiesMap.put("pvInfoDataCollection", pvInfoDataCollection);
+        setPvAttrCollection(pvCollection, false);
+        propertiesMap.put("pvAttrCollection", pvAttrCollection);
     }
 
-    private Map<String, PvInfoWrapper> getPvInfoMap() {
-        if (pvInfoMap != null)
-            return pvInfoMap;
+    private Map<String, StudyPvAttrWrapper> getStudyPvAttrMap() {
+        if (studyPvAttrMap != null)
+            return studyPvAttrMap;
 
-        pvInfoMap = new HashMap<String, PvInfoWrapper>();
-        List<PvInfoWrapper> pvInfoCollection = getPatient().getStudy()
-            .getPvInfoCollection();
-        if (pvInfoCollection != null) {
-            for (PvInfoWrapper pvInfo : pvInfoCollection) {
-                pvInfoMap.put(pvInfo.getLabel(), pvInfo);
+        studyPvAttrMap = new HashMap<String, StudyPvAttrWrapper>();
+        List<StudyPvAttrWrapper> studyPvAttrCollection = getPatient()
+            .getStudy().getStudyPvAttrCollection();
+        if (studyPvAttrCollection != null) {
+            for (StudyPvAttrWrapper studyPvAttr : studyPvAttrCollection) {
+                studyPvAttrMap.put(studyPvAttr.getLabel(), studyPvAttr);
             }
         }
-        return pvInfoMap;
+        return studyPvAttrMap;
     }
 
-    private Map<String, PvInfoDataWrapper> getPvInfoDataMap() {
-        getPvInfoMap();
-        if (pvInfoDataMap != null)
-            return pvInfoDataMap;
+    private Map<String, PvAttrWrapper> getPvAttrMap() {
+        getStudyPvAttrMap();
+        if (pvAttrMap != null)
+            return pvAttrMap;
 
-        pvInfoDataMap = new HashMap<String, PvInfoDataWrapper>();
-        List<PvInfoDataWrapper> pvInfoCollection = getPvInfoDataCollection();
-        if (pvInfoCollection != null) {
-            for (PvInfoDataWrapper pvInfoData : pvInfoCollection) {
-                pvInfoDataMap
-                    .put(pvInfoData.getPvInfo().getLabel(), pvInfoData);
+        pvAttrMap = new HashMap<String, PvAttrWrapper>();
+        List<PvAttrWrapper> pvAttrCollection = getPvAttrCollection();
+        if (pvAttrCollection != null) {
+            for (PvAttrWrapper pvAttr : pvAttrCollection) {
+                pvAttrMap.put(pvAttr.getStudyPvAttr().getLabel(), pvAttr);
             }
         }
-        return pvInfoDataMap;
+        return pvAttrMap;
     }
 
-    public String[] getPvInfoLabels() {
-        getPvInfoDataMap();
-        return pvInfoDataMap.keySet().toArray(new String[] {});
+    public String[] getPvAttrLabels() {
+        getPvAttrMap();
+        return pvAttrMap.keySet().toArray(new String[] {});
     }
 
-    public String getPvInfo(String label) throws Exception {
-        getPvInfoDataMap();
-        PvInfoDataWrapper pvInfoData = pvInfoDataMap.get(label);
-        if (pvInfoData == null) {
-            PvInfoWrapper pvInfo = pvInfoMap.get(label);
-            // make sure "label" is a valid pvInfo
-            if (pvInfo == null) {
-                throw new Exception("PvInfo with label \"" + label
+    public String getPvAttrValue(String label) throws Exception {
+        getPvAttrMap();
+        PvAttrWrapper pvAttr = pvAttrMap.get(label);
+        if (pvAttr == null) {
+            StudyPvAttrWrapper studyPvAttr = studyPvAttrMap.get(label);
+            // make sure "label" is a valid study pv attr
+            if (studyPvAttr == null) {
+                throw new Exception("StudyPvAttr with label \"" + label
                     + "\" is invalid");
             }
             // not assigned yet so return null
             return null;
         }
-        return pvInfoData.getValue();
+        return pvAttr.getValue();
     }
 
-    public Integer getPvInfoType(String label) throws Exception {
-        getPvInfoDataMap();
-        PvInfoDataWrapper pvInfoData = pvInfoDataMap.get(label);
-        if (pvInfoData == null) {
-            throw new Exception("PvInfoData for label \"" + label
+    public Integer getPvAttrType(String label) throws Exception {
+        getPvAttrMap();
+        PvAttrWrapper pvAttr = pvAttrMap.get(label);
+        if (pvAttr == null) {
+            throw new Exception("PvAttr for label \"" + label
                 + "\" does not exist");
         }
-        return pvInfoData.getPvInfo().getPvInfoType().getId();
+        return pvAttr.getStudyPvAttr().getPvAttrType().getId();
     }
 
-    public String[] getPvInfoAllowedValues(String label) throws Exception {
-        getPvInfoDataMap();
-        PvInfoDataWrapper pvInfoData = pvInfoDataMap.get(label);
-        if (pvInfoData == null) {
-            throw new Exception("PvInfoData for label \"" + label
+    public String[] getPvAttrPermissible(String label) throws Exception {
+        getPvAttrMap();
+        PvAttrWrapper pvAttr = pvAttrMap.get(label);
+        if (pvAttr == null) {
+            throw new Exception("PvAttr for label \"" + label
                 + "\" does not exist");
         }
-        String allowedValues = pvInfoData.getPvInfo().getAllowedValues();
+        String allowedValues = pvAttr.getStudyPvAttr().getPermissible();
         if (allowedValues == null) {
             return null;
         }
-        return pvInfoData.getPvInfo().getAllowedValues().split(";");
+        return pvAttr.getStudyPvAttr().getPermissible().split(";");
     }
 
-    public void setPvInfo(String label, String value) throws Exception {
-        getPvInfoDataMap();
-        PvInfoDataWrapper pid = pvInfoDataMap.get(label);
-        if (pid == null) {
-            PvInfoWrapper pvInfo = pvInfoMap.get(label);
-            if (pvInfo == null) {
-                throw new Exception("no PvInfo found for label \"" + label
+    public void setPvAttrValue(String label, String value) throws Exception {
+        getPvAttrMap();
+        PvAttrWrapper pvAttr = pvAttrMap.get(label);
+        if (pvAttr == null) {
+            StudyPvAttrWrapper studyPvAttr = studyPvAttrMap.get(label);
+            if (studyPvAttr == null) {
+                throw new Exception("no StudyPvAttr found for label \"" + label
                     + "\"");
             }
-            String allowedValues = pvInfo.getAllowedValues();
+            String allowedValues = studyPvAttr.getPermissible();
             if (allowedValues != null) {
                 String[] allowedValuesSplit = allowedValues.split(";");
                 List<String> allowedValList = Arrays.asList(allowedValuesSplit);
                 for (String selectedValue : value.split(";")) {
                     if (!allowedValList.contains(selectedValue)) {
-                        throw new Exception("PvInfoData with label \"" + label
+                        throw new Exception("PvAttr with label \"" + label
                             + "\" and value \"" + value + "\" is invalid");
                     }
                 }
             }
 
-            pid = new PvInfoDataWrapper(appService, new PvInfoData());
-            pid.setPatientVisit(this);
-            pid.setPvInfo(pvInfo);
-            pvInfoDataMap.put(label, pid);
+            pvAttr = new PvAttrWrapper(appService, new PvAttr());
+            pvAttr.setPatientVisit(this);
+            pvAttr.setStudyPvAttr(studyPvAttr);
+            pvAttrMap.put(label, pvAttr);
         }
-        pid.setValue(value);
+        if (pvAttr.getStudyPvAttr().getLocked()) {
+            throw new Exception("no attribute for label \"" + label
+                + "\" is locked, changes not premitted");
+
+        }
+        pvAttr.setValue(value);
     }
 
     public void setDateProcessed(Date date) {
@@ -478,8 +479,8 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
     @Override
     public void persist() throws BiobankCheckException, ApplicationException,
         WrapperException {
-        if (pvInfoDataMap != null) {
-            setPvInfoDataCollection(pvInfoDataMap.values());
+        if (pvAttrMap != null) {
+            setPvAttrCollection(pvAttrMap.values());
         }
         super.persist();
     }
@@ -487,7 +488,7 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
     @Override
     public void reload() throws Exception {
         super.reload();
-        pvInfoDataMap = null;
+        pvAttrMap = null;
     }
 
     @Override

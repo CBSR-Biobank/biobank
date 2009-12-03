@@ -212,7 +212,7 @@ public class StudyEntryForm extends BiobankEntryForm {
         for (String field : defaultFields) {
             StudyPvCustomInfo combinedPvInfo = new StudyPvCustomInfo();
             combinedPvInfo.setLabel(field);
-            combinedPvInfo.setType(3);
+            combinedPvInfo.setType("date_time");
             combinedPvInfo.setIsDefault(true);
             combinedPvInfo.widget = new PvInfoWidget(client, SWT.NONE,
                 combinedPvInfo, true);
@@ -222,16 +222,17 @@ public class StudyEntryForm extends BiobankEntryForm {
         // END KLUDGE
 
         SiteWrapper site = study.getSite();
-        List<String> studyPvInfoLabels = Arrays.asList(study.getPvInfoLabels());
+        List<String> studyPvInfoLabels = Arrays.asList(study
+            .getStudyPvAttrLabels());
 
-        for (String label : site.getPvInfoPossibleLabels()) {
+        for (String label : site.getSitePvAttrLabels()) {
             boolean selected = false;
             StudyPvCustomInfo combinedPvInfo = new StudyPvCustomInfo();
             combinedPvInfo.setLabel(label);
-            combinedPvInfo.setType(site.getPvInfoType(label));
+            combinedPvInfo.setType(site.getSitePvAttrTypeName(label));
             if (studyPvInfoLabels.contains(label)) {
                 combinedPvInfo.setAllowedValues(study
-                    .getPvInfoAllowedValues(label));
+                    .getStudyPvAttrPermissible(label));
                 selected = true;
             }
             combinedPvInfo.setIsDefault(false);
@@ -285,7 +286,7 @@ public class StudyEntryForm extends BiobankEntryForm {
 
             if (!pvCustomInfo.widget.getSelected()) {
                 try {
-                    study.deletePvInfo(pvCustomInfo.getLabel());
+                    study.deleteStudyPvAttr(pvCustomInfo.getLabel());
                 } catch (Exception e) {
                     throw new UserUIException(
                         "Cannot delete "
@@ -300,13 +301,14 @@ public class StudyEntryForm extends BiobankEntryForm {
             if (pvCustomInfo.getType().equals(4)
                 || pvCustomInfo.getType().equals(5)) {
                 if (value.length() > 0) {
-                    study.setPvInfo(pvCustomInfo.getLabel(), value.split(";"));
+                    study.setStudyPvAttr(pvCustomInfo.getLabel(), pvCustomInfo
+                        .getType(), value.split(";"));
                 }
             } else {
-                study.setPvInfo(pvCustomInfo.getLabel());
+                study.setStudyPvAttr(pvCustomInfo.getLabel(), pvCustomInfo
+                    .getType());
             }
         }
-        study.setPvInfoLabels(newPvInfoLabels.toArray(new String[0]));
 
         study.setSampleStorageCollection(sampleStorageEntryWidget
             .getSampleStorage());

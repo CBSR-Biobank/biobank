@@ -101,7 +101,7 @@ public class PatientVisitViewForm extends BiobankViewForm {
 
     private void createPvDataSection(Composite client) throws Exception {
         StudyWrapper study = patientVisit.getPatient().getStudy();
-        String[] labels = study.getPvInfoLabels();
+        String[] labels = study.getStudyPvAttrLabels();
         if (labels == null)
             return;
 
@@ -110,7 +110,7 @@ public class PatientVisitViewForm extends BiobankViewForm {
         for (String label : labels) {
             FormPvCustomInfo combinedPvInfo = new FormPvCustomInfo();
             combinedPvInfo.setLabel(label);
-            combinedPvInfo.setType(study.getPvInfoType(label));
+            combinedPvInfo.setType(study.getStudyPvAttrType(label));
 
             Label labelWidget = toolkit.createLabel(client, label + ":",
                 SWT.LEFT);
@@ -123,7 +123,7 @@ public class PatientVisitViewForm extends BiobankViewForm {
                 style |= SWT.WRAP;
             }
 
-            String value = patientVisit.getPvInfo(label);
+            String value = patientVisit.getPvAttrValue(label);
             if (combinedPvInfo.getType().equals(5) && (value != null)) {
                 combinedPvInfo.setValue(value.replace(';', '\n'));
             } else {

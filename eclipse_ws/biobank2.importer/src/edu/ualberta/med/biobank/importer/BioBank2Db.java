@@ -7,10 +7,10 @@ import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.PatientVisit;
-import edu.ualberta.med.biobank.model.PvInfoPossible;
 import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.model.Shipment;
 import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.model.SitePvAttr;
 import edu.ualberta.med.biobank.model.Study;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -121,14 +121,16 @@ public class BioBank2Db {
         return list.get(0);
     }
 
-    public PvInfoPossible getPvInfoPossible(String label) throws Exception {
-        PvInfoPossible pvInfoPossible = new PvInfoPossible();
-        pvInfoPossible.setLabel(label);
+    public SitePvAttr getSitePvAttr(Site site, String label) throws Exception {
+        HQLCriteria c = new HQLCriteria("select spa"
+            + " from edu.ualberta.med.biobank.model.SitePvAttr as spa"
+            + " where spa.label=? and spa.site=?", Arrays.asList(new Object [] {
+            label, site }));
 
-        List<PvInfoPossible> list = appService.search(PvInfoPossible.class,
-            pvInfoPossible);
+        List<SitePvAttr> list = appService.query(c);
         if (list.size() != 1) throw new Exception(
-            "PvInfoPossible not found with label " + label);
+            "SitePvAttr not found with label " + label + " for site "
+                + site.getName());
         return list.get(0);
     }
 
@@ -146,9 +148,8 @@ public class BioBank2Db {
         HQLCriteria c = new HQLCriteria("select c"
             + " from edu.ualberta.med.biobank.model.Container as c"
             + " inner join c.containerType as ct"
-            + " where c.label=? and ct.name=?");
-
-        c.setParameters(Arrays.asList(new Object [] { label, type }));
+            + " where c.label=? and ct.name=?", Arrays.asList(new Object [] {
+            label, type }));
 
         List<Container> results = appService.query(c);
         if (results.size() != 1) {

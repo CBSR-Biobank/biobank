@@ -25,7 +25,7 @@ public class StudyViewForm extends BiobankViewForm {
     public static final String ID = "edu.ualberta.med.biobank.forms.StudyViewForm";
 
     private StudyAdapter studyAdapter;
-    private StudyWrapper studyWrapper;
+    private StudyWrapper study;
 
     private Label siteLabel;
     private Label nameShortLabel;
@@ -49,18 +49,18 @@ public class StudyViewForm extends BiobankViewForm {
                 + adapter.getClass().getName());
 
         studyAdapter = (StudyAdapter) adapter;
-        studyWrapper = studyAdapter.getWrapper();
+        study = studyAdapter.getWrapper();
         // retrieve info from database because study could have been modified
         // after first opening
-        studyWrapper.reload();
-        setPartName("Study " + studyWrapper.getNameShort());
+        study.reload();
+        setPartName("Study " + study.getNameShort());
         pvCustomInfoList = new ArrayList<StudyPvCustomInfo>();
     }
 
     @Override
     protected void createFormContent() throws Exception {
-        if (studyWrapper.getName() != null) {
-            form.setText("Study: " + studyWrapper.getName());
+        if (study.getName() != null) {
+            form.setText("Study: " + study.getName());
         }
 
         GridLayout layout = new GridLayout(1, false);
@@ -93,7 +93,7 @@ public class StudyViewForm extends BiobankViewForm {
     private void createClinicSection() {
         Composite client = createSectionWithClient("Clinics");
 
-        contactsTable = new StudyContactInfoTable(client, studyWrapper);
+        contactsTable = new StudyContactInfoTable(client, study);
         contactsTable.adaptToToolkit(toolkit, true);
         toolkit.paintBordersFor(contactsTable);
 
@@ -102,17 +102,16 @@ public class StudyViewForm extends BiobankViewForm {
     }
 
     private void setStudySectionValues() {
-        FormUtils.setTextValue(siteLabel, studyWrapper.getSite().getName());
-        FormUtils.setTextValue(nameShortLabel, studyWrapper.getNameShort());
-        FormUtils.setTextValue(activityStatusLabel, studyWrapper
-            .getActivityStatus());
-        FormUtils.setTextValue(commentLabel, studyWrapper.getComment());
+        FormUtils.setTextValue(siteLabel, study.getSite().getName());
+        FormUtils.setTextValue(nameShortLabel, study.getNameShort());
+        FormUtils.setTextValue(activityStatusLabel, study.getActivityStatus());
+        FormUtils.setTextValue(commentLabel, study.getComment());
     }
 
     private void createSampleStorageSection() {
         Section section = createSection("Sample Storage");
 
-        sampleStorageTable = new SampleStorageInfoTable(section, studyWrapper
+        sampleStorageTable = new SampleStorageInfoTable(section, study
             .getSampleStorageCollection());
         section.setClient(sampleStorageTable);
         sampleStorageTable.adaptToToolkit(toolkit, true);
@@ -121,7 +120,7 @@ public class StudyViewForm extends BiobankViewForm {
 
     private void createSampleSourceSection() {
         Section section = createSection("Source Vessels");
-        sampleSourceTable = new SampleSourceInfoTable(section, studyWrapper
+        sampleSourceTable = new SampleSourceInfoTable(section, study
             .getSampleSourceCollection());
         section.setClient(sampleSourceTable);
         sampleStorageTable.adaptToToolkit(toolkit, true);
@@ -132,12 +131,12 @@ public class StudyViewForm extends BiobankViewForm {
         Composite client = createSectionWithClient("Additional Patient Visit Information Collected");
         client.setLayout(new GridLayout(1, false));
 
-        for (String label : studyWrapper.getPvInfoLabels()) {
+        for (String label : study.getStudyPvAttrLabels()) {
             StudyPvCustomInfo combinedPvInfo = new StudyPvCustomInfo();
             combinedPvInfo.setLabel(label);
-            combinedPvInfo.setType(studyWrapper.getPvInfoType(label));
-            combinedPvInfo.setAllowedValues(studyWrapper
-                .getPvInfoAllowedValues(label));
+            combinedPvInfo.setType(study.getStudyPvAttrType(label));
+            combinedPvInfo.setAllowedValues(study
+                .getStudyPvAttrPermissible(label));
             pvCustomInfoList.add(combinedPvInfo);
         }
 
@@ -166,21 +165,19 @@ public class StudyViewForm extends BiobankViewForm {
 
     private void setPvDataSectionValues() throws Exception {
         for (StudyPvCustomInfo pvCustomInfo : pvCustomInfoList) {
-            FormUtils.setTextValue(pvCustomInfo.wiget, StringUtils.join(
-                studyWrapper.getPvInfoAllowedValues(pvCustomInfo.getLabel()),
-                "; "));
+            FormUtils.setTextValue(pvCustomInfo.wiget, StringUtils.join(study
+                .getStudyPvAttrPermissible(pvCustomInfo.getLabel()), "; "));
         }
     }
 
     @Override
     protected void reload() throws Exception {
-        studyWrapper.reload();
-        setPartName("Study " + studyWrapper.getNameShort());
-        form.setText("Study: " + studyWrapper.getName());
+        study.reload();
+        setPartName("Study " + study.getNameShort());
+        form.setText("Study: " + study.getName());
         setStudySectionValues();
         setPvDataSectionValues();
-        contactsTable.getTableViewer().setInput(
-            studyWrapper.getContactCollection());
+        contactsTable.getTableViewer().setInput(study.getContactCollection());
     }
 
     @Override
