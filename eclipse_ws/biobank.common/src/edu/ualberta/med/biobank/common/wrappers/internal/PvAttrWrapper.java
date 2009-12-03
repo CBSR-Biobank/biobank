@@ -4,30 +4,30 @@ import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.model.PatientVisit;
-import edu.ualberta.med.biobank.model.PvInfo;
-import edu.ualberta.med.biobank.model.PvInfoData;
+import edu.ualberta.med.biobank.model.PvAttr;
+import edu.ualberta.med.biobank.model.StudyPvAttr;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
-public class PvInfoDataWrapper extends ModelWrapper<PvInfoData> {
+public class PvAttrWrapper extends ModelWrapper<PvAttr> {
 
-    public PvInfoDataWrapper(WritableApplicationService appService,
-        PvInfoData wrappedObject) {
+    public PvAttrWrapper(WritableApplicationService appService,
+        PvAttr wrappedObject) {
         super(appService, wrappedObject);
     }
 
-    public PvInfoDataWrapper(WritableApplicationService appService) {
+    public PvAttrWrapper(WritableApplicationService appService) {
         super(appService);
     }
 
     @Override
     protected String[] getPropertyChangeNames() {
-        return new String[] { "pvInfo", "value", "patientVisit" };
+        return new String[] { "studyPvAttr", "value", "patientVisit" };
     }
 
     @Override
-    public Class<PvInfoData> getWrappedClass() {
-        return PvInfoData.class;
+    public Class<PvAttr> getWrappedClass() {
+        return PvAttr.class;
     }
 
     @Override
@@ -40,22 +40,23 @@ public class PvInfoDataWrapper extends ModelWrapper<PvInfoData> {
         ApplicationException {
     }
 
-    public PvInfoWrapper getPvInfo() {
-        PvInfo pvInfo = wrappedObject.getPvInfo();
-        if (pvInfo == null) {
+    public StudyPvAttrWrapper getStudyPvAttr() {
+        StudyPvAttr studyPvAttr = wrappedObject.getStudyPvAttr();
+        if (studyPvAttr == null) {
             return null;
         }
-        return new PvInfoWrapper(appService, pvInfo);
+        return new StudyPvAttrWrapper(appService, studyPvAttr);
     }
 
-    public void setPvInfo(PvInfo pvInfo) {
-        PvInfo oldInfo = wrappedObject.getPvInfo();
-        wrappedObject.setPvInfo(pvInfo);
-        propertyChangeSupport.firePropertyChange("pvInfo", oldInfo, pvInfo);
+    public void setStudyPvAttr(StudyPvAttr studyPvAttr) {
+        StudyPvAttr oldInfo = wrappedObject.getStudyPvAttr();
+        wrappedObject.setStudyPvAttr(studyPvAttr);
+        propertyChangeSupport.firePropertyChange("studyPvAttr", oldInfo,
+            studyPvAttr);
     }
 
-    public void setPvInfo(PvInfoWrapper pvInfo) {
-        setPvInfo(pvInfo.getWrappedObject());
+    public void setStudyPvAttr(StudyPvAttrWrapper studyPvAttr) {
+        setStudyPvAttr(studyPvAttr.getWrappedObject());
     }
 
     public void setValue(String value) {
@@ -87,7 +88,7 @@ public class PvInfoDataWrapper extends ModelWrapper<PvInfoData> {
     }
 
     @Override
-    public int compareTo(ModelWrapper<PvInfoData> o) {
+    public int compareTo(ModelWrapper<PvAttr> o) {
         return 0;
     }
 }

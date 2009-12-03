@@ -11,15 +11,15 @@ import java.util.Map;
 
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.internal.AddressWrapper;
-import edu.ualberta.med.biobank.common.wrappers.internal.PvInfoPossibleWrapper;
-import edu.ualberta.med.biobank.common.wrappers.internal.PvInfoTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.internal.PvAttrTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.internal.SitePvAttrWrapper;
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerType;
-import edu.ualberta.med.biobank.model.PvInfoPossible;
 import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.model.SitePvAttr;
 import edu.ualberta.med.biobank.model.Study;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -27,27 +27,27 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class SiteWrapper extends ModelWrapper<Site> {
 
-    private Map<String, PvInfoPossibleWrapper> pvInfoPossibleMap;
+    private static Map<String, PvAttrTypeWrapper> pvAttrTypeMap;
 
-    private Map<String, PvInfoTypeWrapper> pvInfoTypeMap;
+    private Map<String, SitePvAttrWrapper> sitePvAttrMap;
 
     public SiteWrapper(WritableApplicationService appService, Site wrappedObject) {
         super(appService, wrappedObject);
-        pvInfoPossibleMap = null;
-        pvInfoTypeMap = null;
+        sitePvAttrMap = null;
+        pvAttrTypeMap = null;
     }
 
     public SiteWrapper(WritableApplicationService appService) {
         super(appService);
-        pvInfoPossibleMap = null;
-        pvInfoTypeMap = null;
+        sitePvAttrMap = null;
+        pvAttrTypeMap = null;
     }
 
     @Override
     protected String[] getPropertyChangeNames() {
         return new String[] { "name", "activityStatus", "comment", "address",
             "clinicCollection", "siteCollection", "containerCollection",
-            "sampleTypeCollection", "pvInfoPossibleCollection", "street1",
+            "sampleTypeCollection", "sitePvAttrCollection", "street1",
             "street2", "city", "province", "postalCode",
             "allSampleTypeCollection" };
     }
@@ -653,53 +653,50 @@ public class SiteWrapper extends ModelWrapper<Site> {
     }
 
     @SuppressWarnings("unchecked")
-    protected List<PvInfoPossibleWrapper> getPvInfoPossibleCollection(
-        boolean sort) {
-        List<PvInfoPossibleWrapper> pvInfoPossibleCollection = (List<PvInfoPossibleWrapper>) propertiesMap
-            .get("PvInfoPossibleCollection");
-        if (pvInfoPossibleCollection == null) {
-            Collection<PvInfoPossible> possibleCollection = wrappedObject
-                .getPvInfoPossibleCollection();
+    protected List<SitePvAttrWrapper> getSitePvAttrCollection(boolean sort) {
+        List<SitePvAttrWrapper> sitePvAttrCollection = (List<SitePvAttrWrapper>) propertiesMap
+            .get("SitePvAttrCollection");
+        if (sitePvAttrCollection == null) {
+            Collection<SitePvAttr> possibleCollection = wrappedObject
+                .getSitePvAttrCollection();
             if (possibleCollection != null) {
-                pvInfoPossibleCollection = new ArrayList<PvInfoPossibleWrapper>();
-                for (PvInfoPossible possible : possibleCollection) {
-                    pvInfoPossibleCollection.add(new PvInfoPossibleWrapper(
-                        appService, possible));
+                sitePvAttrCollection = new ArrayList<SitePvAttrWrapper>();
+                for (SitePvAttr possible : possibleCollection) {
+                    sitePvAttrCollection.add(new SitePvAttrWrapper(appService,
+                        possible));
                 }
-                propertiesMap.put("PvInfoPossibleCollection",
-                    pvInfoPossibleCollection);
+                propertiesMap.put("SitePvAttrCollection", sitePvAttrCollection);
             }
         }
-        if ((pvInfoPossibleCollection != null) && sort)
-            Collections.sort(pvInfoPossibleCollection);
-        return pvInfoPossibleCollection;
+        if ((sitePvAttrCollection != null) && sort)
+            Collections.sort(sitePvAttrCollection);
+        return sitePvAttrCollection;
     }
 
-    protected List<PvInfoPossibleWrapper> getPvInfoPossibleCollection() {
-        return getPvInfoPossibleCollection(false);
+    protected List<SitePvAttrWrapper> getSitePvAttrCollection() {
+        return getSitePvAttrCollection(false);
     }
 
-    protected void setPvInfoPossibleCollection(
-        Collection<PvInfoPossible> collection, boolean setNull) {
-        Collection<PvInfoPossible> oldCollection = wrappedObject
-            .getPvInfoPossibleCollection();
-        wrappedObject.setPvInfoPossibleCollection(collection);
-        propertyChangeSupport.firePropertyChange("PvInfoPossibleCollection",
+    protected void setSitePvAttrCollection(Collection<SitePvAttr> collection,
+        boolean setNull) {
+        Collection<SitePvAttr> oldCollection = wrappedObject
+            .getSitePvAttrCollection();
+        wrappedObject.setSitePvAttrCollection(collection);
+        propertyChangeSupport.firePropertyChange("SitePvAttrCollection",
             oldCollection, collection);
         if (setNull) {
-            propertiesMap.put("PvInfoPossibleCollection", null);
+            propertiesMap.put("SitePvAttrCollection", null);
         }
     }
 
-    protected void setPvInfoPossibleCollection(
-        List<PvInfoPossibleWrapper> collection) {
-        Collection<PvInfoPossible> pipObjects = new HashSet<PvInfoPossible>();
-        for (PvInfoPossibleWrapper pip : collection) {
+    protected void setSitePvAttrCollection(List<SitePvAttrWrapper> collection) {
+        Collection<SitePvAttr> pipObjects = new HashSet<SitePvAttr>();
+        for (SitePvAttrWrapper pip : collection) {
             pip.setSite(this);
             pipObjects.add(pip.getWrappedObject());
         }
-        setPvInfoPossibleCollection(pipObjects, false);
-        propertiesMap.put("PvInfoPossibleCollection", collection);
+        setSitePvAttrCollection(pipObjects, false);
+        propertiesMap.put("SitePvAttrCollection", collection);
     }
 
     /**
@@ -709,209 +706,151 @@ public class SiteWrapper extends ModelWrapper<Site> {
      * @throws BiobankCheckException
      * @throws Exception
      */
-    private void deletePvInfoPossibleDifference(Site origSite)
+    private void deleteSitePvAttrDifference(Site origSite)
         throws BiobankCheckException, ApplicationException, WrapperException {
-        List<PvInfoPossibleWrapper> oldPvInfoPossible = new SiteWrapper(
-            appService, origSite).getPvInfoPossibleCollection();
-        if (oldPvInfoPossible == null)
+        List<SitePvAttrWrapper> oldSitePvAttr = new SiteWrapper(appService,
+            origSite).getSitePvAttrCollection();
+        if (oldSitePvAttr == null)
             return;
-        getPvInfoPossibleMap();
-        int newPvInfoPossibleCount = pvInfoPossibleMap.size();
-        for (PvInfoPossibleWrapper st : oldPvInfoPossible) {
-            if ((st.getSite() != null)
-                && ((newPvInfoPossibleCount == 0) || (pvInfoPossibleMap.get(st
+        getSitePvAttrMap();
+        int newSitePvAttrCount = sitePvAttrMap.size();
+        for (SitePvAttrWrapper pip : oldSitePvAttr) {
+            if ((pip.getSite() != null)
+                && ((newSitePvAttrCount == 0) || (sitePvAttrMap.get(pip
                     .getLabel()) == null))) {
-                st.delete();
+                pip.delete();
             }
         }
     }
 
-    private Map<String, PvInfoTypeWrapper> getPvInfoTypeMap()
-        throws ApplicationException {
-        if (pvInfoTypeMap == null) {
-            pvInfoTypeMap = new HashMap<String, PvInfoTypeWrapper>();
-            for (PvInfoTypeWrapper pit : PvInfoTypeWrapper
+    protected static Map<String, PvAttrTypeWrapper> getPvAttrTypeMap(
+        WritableApplicationService appService) throws ApplicationException {
+        if (pvAttrTypeMap == null) {
+            pvAttrTypeMap = new HashMap<String, PvAttrTypeWrapper>();
+            for (PvAttrTypeWrapper pit : PvAttrTypeWrapper
                 .getAllWrappers(appService)) {
-                pvInfoTypeMap.put(pit.getType(), pit);
+                pvAttrTypeMap.put(pit.getName(), pit);
             }
         }
-        return pvInfoTypeMap;
+        return pvAttrTypeMap;
     }
 
-    private Map<String, PvInfoPossibleWrapper> getPvInfoPossibleMap()
-        throws ApplicationException {
-        if (pvInfoPossibleMap != null)
-            return pvInfoPossibleMap;
+    public static List<String> getPvAttrTypeNames(
+        WritableApplicationService appService) throws ApplicationException {
+        getPvAttrTypeMap(appService);
+        return new ArrayList<String>(pvAttrTypeMap.keySet());
+    }
 
-        pvInfoPossibleMap = new HashMap<String, PvInfoPossibleWrapper>();
-        List<PvInfoPossibleWrapper> pipCollection = getPvInfoPossibleCollection();
+    private Map<String, SitePvAttrWrapper> getSitePvAttrMap()
+        throws ApplicationException {
+        if (sitePvAttrMap != null)
+            return sitePvAttrMap;
+
+        sitePvAttrMap = new HashMap<String, SitePvAttrWrapper>();
+        List<SitePvAttrWrapper> pipCollection = getSitePvAttrCollection();
         if (pipCollection != null) {
-            for (PvInfoPossibleWrapper pip : pipCollection) {
-                pvInfoPossibleMap.put(pip.getLabel(), pip);
+            for (SitePvAttrWrapper pip : pipCollection) {
+                sitePvAttrMap.put(pip.getLabel(), pip);
             }
         }
 
         // get global PIPs now
-        for (PvInfoPossibleWrapper pip : PvInfoPossibleWrapper
-            .getGlobalPvInfoPossible(appService, false)) {
-            pvInfoPossibleMap.put(pip.getLabel(), pip);
+        for (SitePvAttrWrapper pip : SitePvAttrWrapper.getGlobalSitePvAttr(
+            appService, false)) {
+            sitePvAttrMap.put(pip.getLabel(), pip);
         }
-        return pvInfoPossibleMap;
+        return sitePvAttrMap;
     }
 
-    public String[] getPvInfoPossibleLabels() throws ApplicationException {
-        getPvInfoPossibleMap();
-        return pvInfoPossibleMap.keySet().toArray(new String[] {});
+    public String[] getSitePvAttrLabels() throws ApplicationException {
+        getSitePvAttrMap();
+        return sitePvAttrMap.keySet().toArray(new String[] {});
     }
 
-    public String[] getPvInfoTypeNames() throws ApplicationException {
-        getPvInfoTypeMap();
-        return pvInfoTypeMap.keySet().toArray(new String[] {});
-    }
-
-    public String getPvInfoTypeName(String label) throws Exception {
-        getPvInfoPossibleMap();
-        PvInfoPossibleWrapper pvInfoPossible = pvInfoPossibleMap.get(label);
-        if (pvInfoPossible == null)
+    public String getSitePvAttrTypeName(String label) throws Exception {
+        getSitePvAttrMap();
+        SitePvAttrWrapper sitePvAttr = sitePvAttrMap.get(label);
+        if (sitePvAttr == null)
             return null;
-        return pvInfoPossible.getPvInfoType().getType();
+        return sitePvAttr.getPvAttrType().getName();
     }
 
-    public Integer getPvInfoType(String label) throws Exception {
-        getPvInfoPossibleMap();
-        PvInfoPossibleWrapper pvInfoPossible = pvInfoPossibleMap.get(label);
-        if (pvInfoPossible == null)
+    public Integer getSitePvAttrType(String label) throws Exception {
+        getSitePvAttrMap();
+        SitePvAttrWrapper sitePvAttr = sitePvAttrMap.get(label);
+        if (sitePvAttr == null)
             return null;
-        return pvInfoPossible.getPvInfoType().getId();
+        return sitePvAttr.getPvAttrType().getId();
     }
 
-    protected PvInfoPossibleWrapper getPvInfoPossible(String label)
-        throws Exception {
-        getPvInfoPossibleMap();
-        return pvInfoPossibleMap.get(label);
+    protected SitePvAttrWrapper getSitePvAttr(String label) throws Exception {
+        getSitePvAttrMap();
+        return sitePvAttrMap.get(label);
     }
 
     /**
-     * Saves a possible patient visit information item that is only associated
-     * with this site. To add a global patient visit information item use
-     * setGlobalPvInfoPossible().
+     * Saves a possible patient visit attribute that is global to this site.
      * 
      * @param label The label to be used for the patient visit information item.
      * @param type The patient visit information item's type (See database table
      *            PV_INFO_POSSIBLE).
      * @throws Exception
      */
-    public void setPvInfoPossible(String label, String type) throws Exception {
-        getPvInfoTypeMap();
-        PvInfoTypeWrapper pit = pvInfoTypeMap.get(type);
-        if (pit == null) {
-            throw new Exception("PvInfoType with type \"" + type
+    public void setSitePvAttr(String label, String type) throws Exception {
+        getPvAttrTypeMap(appService);
+        PvAttrTypeWrapper pvAttrType = pvAttrTypeMap.get(type);
+        if (pvAttrType == null) {
+            throw new Exception("PvAttrType with type \"" + type
                 + "\" is invalid");
         }
 
-        PvInfoPossibleWrapper pip = getPvInfoPossible(label);
+        SitePvAttrWrapper pip = getSitePvAttr(label);
         if (pip == null) {
-            pip = new PvInfoPossibleWrapper(appService, new PvInfoPossible());
+            pip = new SitePvAttrWrapper(appService, new SitePvAttr());
             pip.setLabel(label);
-            pvInfoPossibleMap.put(label, pip);
+            sitePvAttrMap.put(label, pip);
         }
-        pip.setPvInfoType(pit);
+        pip.setPvAttrType(pvAttrType);
         pip.setSite(this);
 
-        List<PvInfoPossibleWrapper> list = getPvInfoPossibleCollection();
+        List<SitePvAttrWrapper> list = getSitePvAttrCollection();
         if (list == null) {
-            list = new ArrayList<PvInfoPossibleWrapper>();
+            list = new ArrayList<SitePvAttrWrapper>();
         }
         list.add(pip);
-        setPvInfoPossibleCollection(list);
+        setSitePvAttrCollection(list);
     }
 
-    public void deletePvInfoPossible(String label) throws Exception {
-        getPvInfoPossibleMap();
-        PvInfoPossibleWrapper pvInfoPossible = pvInfoPossibleMap.get(label);
-        if (pvInfoPossible == null) {
-            throw new Exception("PvInfoPossible with label \"" + label
+    public void deleteSitePvAttr(String label) throws Exception {
+        getSitePvAttrMap();
+        SitePvAttrWrapper sitePvAttr = sitePvAttrMap.get(label);
+        if (sitePvAttr == null) {
+            throw new Exception("SitePvAttr with label \"" + label
                 + "\" does not exist");
         }
-        pvInfoPossibleMap.remove(label);
-    }
-
-    public static Map<String, String> getGlobalPvInfoPossible(
-        WritableApplicationService appService) throws Exception {
-        List<PvInfoPossibleWrapper> list = PvInfoPossibleWrapper
-            .getGlobalPvInfoPossible(appService, false);
-        if (list == null) {
-            throw new Exception("No PvInfoPossible items exist");
-        }
-
-        Map<String, String> result = new HashMap<String, String>();
-        for (PvInfoPossibleWrapper pvInfoPossible : list) {
-            result.put(pvInfoPossible.getLabel(), pvInfoPossible
-                .getPvInfoType().getType());
-        }
-        return result;
-    }
-
-    /**
-     * Saves a possible patient visit information item that is global to every
-     * site. To add a patient visit information item for a single site see
-     * setPvInfoPossible().
-     * 
-     * @param label The label to be used for the patient visit information item.
-     * @param type The patient visit information item's type (See database table
-     *            PV_INFO_POSSIBLE).
-     * @throws Exception
-     */
-    public static void setGlobalPvInfoPossible(
-        WritableApplicationService appService, String label, String type)
-        throws Exception {
-        for (PvInfoTypeWrapper dbType : PvInfoTypeWrapper
-            .getAllWrappers(appService)) {
-            if (dbType.getType().equals(type)) {
-                PvInfoPossibleWrapper pip = new PvInfoPossibleWrapper(
-                    appService, new PvInfoPossible());
-                pip.setLabel(label);
-                pip.setPvInfoType(dbType);
-                pip.persist();
-                break;
-            }
-        }
-    }
-
-    public static void deleteGlobalPvInfoPossible(
-        WritableApplicationService appService, String label) throws Exception {
-        List<PvInfoPossibleWrapper> list = PvInfoPossibleWrapper
-            .getGlobalPvInfoPossible(appService, false);
-        if (list == null) {
-            throw new Exception("No PvInfoPossible items exist");
-        }
-
-        for (PvInfoPossibleWrapper pvInfoPossible : list) {
-            if (pvInfoPossible.getLabel().equals(label)) {
-                pvInfoPossible.delete();
-                return;
-            }
-        }
-        throw new Exception("PvInfoPossible with label \"" + label
-            + "\" does not exist");
+        sitePvAttrMap.remove(label);
     }
 
     @Override
     protected void persistDependencies(Site origObject)
         throws BiobankCheckException, ApplicationException, WrapperException {
-        if (pvInfoPossibleMap != null) {
-            List<PvInfoPossibleWrapper> list = new ArrayList<PvInfoPossibleWrapper>(
-                pvInfoPossibleMap.values());
-            for (PvInfoPossibleWrapper pvInfoPossible : list) {
-                if (pvInfoPossible.isNew()) {
-                    pvInfoPossible.persist();
+        if (sitePvAttrMap != null) {
+            List<SitePvAttrWrapper> list = new ArrayList<SitePvAttrWrapper>(
+                sitePvAttrMap.values());
+            List<SitePvAttrWrapper> siteSitePvAttrList = new ArrayList<SitePvAttrWrapper>();
+            for (SitePvAttrWrapper sitePvAttr : list) {
+                if (sitePvAttr.getSite() != null) {
+                    if (sitePvAttr.isNew()) {
+                        sitePvAttr.persist();
+                    }
+                    siteSitePvAttrList.add(sitePvAttr);
                 }
             }
-            setPvInfoPossibleCollection(list);
+            setSitePvAttrCollection(siteSitePvAttrList);
         }
         if (origObject != null) {
             deleteSampleTypeDifference(origObject);
-            deletePvInfoPossibleDifference(origObject);
+            deleteSitePvAttrDifference(origObject);
         }
     }
 
@@ -961,8 +900,8 @@ public class SiteWrapper extends ModelWrapper<Site> {
     @Override
     public void reload() throws Exception {
         super.reload();
-        pvInfoPossibleMap = null;
-        pvInfoTypeMap = null;
+        sitePvAttrMap = null;
+        pvAttrTypeMap = null;
     }
 
     @Override

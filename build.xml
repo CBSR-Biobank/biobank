@@ -248,7 +248,7 @@
 		</sql>
 		<antcall target="schema" />
 		<sql driver="${mysql.driver.string}" url="jdbc:mysql://${database.host}:${database.port}/${database.name}" userid="${database.username}" password="${database.password}">
-			<transaction src="${data.sql.dir}/pvInfoPossible.sql" />
+			<transaction src="${data.sql.dir}/pvAttrType.sql" />
 			<transaction src="${data.sql.dir}/sampleSources.sql" />
 			<transaction src="${data.sql.dir}/sampleTypes.sql" />
 			<transaction src="${data.sql.dir}/containerLabelingScheme.sql" />

@@ -12,14 +12,14 @@ import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.PatientVisit;
-import edu.ualberta.med.biobank.model.PvInfo;
-import edu.ualberta.med.biobank.model.PvInfoData;
+import edu.ualberta.med.biobank.model.PvAttr;
 import edu.ualberta.med.biobank.model.Sample;
 import edu.ualberta.med.biobank.model.SamplePosition;
 import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.model.Shipment;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
+import edu.ualberta.med.biobank.model.StudyPvAttr;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.client.ApplicationServiceProvider;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -214,22 +214,22 @@ public class Importer {
                     + " ...");
 
                 if (studyNameShort.equals("KDCS")) {
-                    StudyPvInfo.assignKdcsInfo(study);
+                    CbsrStudyPvAttr.assignKdcsInfo(study);
                 }
                 else if (studyNameShort.equals("VAS")) {
-                    StudyPvInfo.assignVasInfo(study);
+                    CbsrStudyPvAttr.assignVasInfo(study);
                 }
                 else if (studyNameShort.equals("RVS")) {
-                    StudyPvInfo.assignRvsInfo(study);
+                    CbsrStudyPvAttr.assignRvsInfo(study);
                 }
                 else if (studyNameShort.equals("NHS")) {
-                    StudyPvInfo.assignNhsInfo(study);
+                    CbsrStudyPvAttr.assignNhsInfo(study);
                 }
                 else if (studyNameShort.equals("MPS")) {
-                    StudyPvInfo.assignMpsInfo(study);
+                    CbsrStudyPvAttr.assignMpsInfo(study);
                 }
                 else if (studyNameShort.equals("BBP")) {
-                    StudyPvInfo.assignBbpPvInfo(study);
+                    CbsrStudyPvAttr.assignBbpPvInfo(study);
                 }
                 else {
                     throw new Exception("Unknown study: " + studyNameShort);
@@ -393,7 +393,7 @@ public class Importer {
         String clinicName;
         String dateReceived;
         PatientVisit pv;
-        PvInfoData pvInfoData;
+        PvAttr pvAttr;
         BlowfishCipher cipher = new BlowfishCipher();
 
         System.out.println("importing patient visits ...");
@@ -454,18 +454,18 @@ public class Importer {
                 }
 
                 // now set corresponding patient visit info data
-                for (PvInfo pvInfo : study.getPvInfoCollection()) {
-                    pvInfoData = new PvInfoData();
-                    pvInfoData.setPvInfo(pvInfo);
-                    pvInfoData.setPatientVisit(pv);
+                for (StudyPvAttr studyPvAttr : study.getStudyPvAttrCollection()) {
+                    pvAttr = new PvAttr();
+                    pvAttr.setStudyPvAttr(studyPvAttr);
+                    pvAttr.setPatientVisit(pv);
 
-                    if (pvInfo.getLabel().equals("Date Received")) {
-                        pvInfoData.setValue(biobank2DateFmt.format(bbpdbDateFmt.parse(rs.getString(6))));
+                    if (studyPvAttr.getLabel().equals("Date Received")) {
+                        pvAttr.setValue(biobank2DateFmt.format(bbpdbDateFmt.parse(rs.getString(6))));
                     }
-                    else if (pvInfo.getLabel().equals("PBMC Count")) {
-                        pvInfoData.setValue(rs.getString(8));
+                    else if (studyPvAttr.getLabel().equals("PBMC Count")) {
+                        pvAttr.setValue(rs.getString(8));
                     }
-                    else if (pvInfo.getLabel().equals("Consent")) {
+                    else if (studyPvAttr.getLabel().equals("Consent")) {
                         ArrayList<String> consents = new ArrayList<String>();
                         if (rs.getInt(9) == 1) {
                             consents.add("Surveillance");
@@ -473,13 +473,13 @@ public class Importer {
                         if (rs.getInt(10) == 1) {
                             consents.add("Genetic predisposition");
                         }
-                        pvInfoData.setValue(StringUtils.join(consents, ";"));
+                        pvAttr.setValue(StringUtils.join(consents, ";"));
                     }
-                    else if (pvInfo.getLabel().equals("Worksheet")) {
-                        pvInfoData.setValue(rs.getString(15));
+                    else if (studyPvAttr.getLabel().equals("Worksheet")) {
+                        pvAttr.setValue(rs.getString(15));
                     }
 
-                    pvInfoData = (PvInfoData) bioBank2Db.setObject(pvInfoData);
+                    pvAttr = (PvAttr) bioBank2Db.setObject(pvAttr);
                 }
 
                 ++count;

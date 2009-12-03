@@ -175,7 +175,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
 
     private void createPvDataSection(Composite client) throws Exception {
         StudyWrapper study = patient.getStudy();
-        String[] labels = study.getPvInfoLabels();
+        String[] labels = study.getStudyPvAttrLabels();
         if (labels == null)
             return;
 
@@ -184,9 +184,10 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         for (String label : labels) {
             FormPvCustomInfo pvCustomInfo = new FormPvCustomInfo();
             pvCustomInfo.setLabel(label);
-            pvCustomInfo.setType(study.getPvInfoType(label));
-            pvCustomInfo.setAllowedValues(study.getPvInfoAllowedValues(label));
-            pvCustomInfo.setValue(patientVisit.getPvInfo(label));
+            pvCustomInfo.setType(study.getStudyPvAttrType(label));
+            pvCustomInfo.setAllowedValues(study
+                .getStudyPvAttrPermissible(label));
+            pvCustomInfo.setValue(patientVisit.getPvAttrValue(label));
             pvCustomInfo.control = getControlForLabel(client, pvCustomInfo);
             pvCustomInfoList.add(pvCustomInfo);
         }
@@ -195,29 +196,24 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
     private Control getControlForLabel(Composite client,
         FormPvCustomInfo pvCustomInfo) {
         Control control;
-        switch (pvCustomInfo.getType()) {
-        case 1: // number
+        if (pvCustomInfo.getType().equals("number")) {
             control = createBoundWidgetWithLabel(client, Text.class, SWT.NONE,
                 pvCustomInfo.getLabel(), null, PojoObservables.observeValue(
                     pvCustomInfo, "value"), new DoubleNumberValidator(
                     "You should select a valid number"));
-            break;
-        case 2: // text
+        } else if (pvCustomInfo.getType().equals("text")) {
             control = createBoundWidgetWithLabel(client, Text.class, SWT.NONE,
                 pvCustomInfo.getLabel(), null, PojoObservables.observeValue(
                     pvCustomInfo, "value"), null);
-            break;
-        case 3: // date_time
+        } else if (pvCustomInfo.getType().equals("date_time")) {
             control = createDateTimeWidget(client, pvCustomInfo.getLabel(),
                 DateFormatter.parseToDateTime(pvCustomInfo.getValue()), null,
                 null, null);
-            break;
-        case 4: // select_single
+        } else if (pvCustomInfo.getType().equals("select_single")) {
             control = createBoundWidgetWithLabel(client, Combo.class, SWT.NONE,
                 pvCustomInfo.getLabel(), pvCustomInfo.getAllowedValues(),
                 PojoObservables.observeValue(pvCustomInfo, "value"), null);
-            break;
-        case 5: // select_multiple
+        } else if (pvCustomInfo.getType().equals("select_multiple")) {
             createFieldLabel(client, pvCustomInfo.getLabel());
             SelectMultipleWidget s = new SelectMultipleWidget(client,
                 SWT.BORDER, pvCustomInfo.getAllowedValues(), selectionListener);
@@ -226,8 +222,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
                 s.setSelections(pvCustomInfo.getValue().split(";"));
             }
             control = s;
-            break;
-        default:
+        } else {
             Assert.isTrue(false, "Invalid pvInfo type: "
                 + pvCustomInfo.getType());
             return null;
@@ -285,7 +280,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
             if (value == null)
                 continue;
 
-            patientVisit.setPvInfo(combinedPvInfo.getLabel(), value);
+            patientVisit.setPvAttrValue(combinedPvInfo.getLabel(), value);
         }
     }
 

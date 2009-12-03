@@ -258,10 +258,10 @@ INSERT INTO `csm_protection_element` VALUES (6,'edu.ualberta.med.biobank.model.C
 INSERT INTO `csm_protection_element` VALUES (7,'edu.ualberta.med.biobank.model.ContainerPosition','edu.ualberta.med.biobank.model.ContainerPosition','edu.ualberta.med.biobank.model.ContainerPosition',NULL,NULL,NULL,2,'2009-07-22');
 INSERT INTO `csm_protection_element` VALUES (8,'edu.ualberta.med.biobank.model.Patient','edu.ualberta.med.biobank.model.Patient','edu.ualberta.med.biobank.model.Patient',NULL,NULL,NULL,2,'2009-07-22');
 INSERT INTO `csm_protection_element` VALUES (9,'edu.ualberta.med.biobank.model.PatientVisit','edu.ualberta.med.biobank.model.PatientVisit','edu.ualberta.med.biobank.model.PatientVisit',NULL,NULL,NULL,2,'2009-07-22');
-INSERT INTO `csm_protection_element` VALUES (10,'edu.ualberta.med.biobank.model.PvInfo','edu.ualberta.med.biobank.model.PvInfo','edu.ualberta.med.biobank.model.PvInfo',NULL,NULL,NULL,2,'2009-07-22');
-INSERT INTO `csm_protection_element` VALUES (11,'edu.ualberta.med.biobank.model.PvInfoData','edu.ualberta.med.biobank.model.PvInfoData','edu.ualberta.med.biobank.model.PvInfoData',NULL,NULL,NULL,2,'2009-07-22');
-INSERT INTO `csm_protection_element` VALUES (12,'edu.ualberta.med.biobank.model.PvInfoPossible','edu.ualberta.med.biobank.model.PvInfoPossible','edu.ualberta.med.biobank.model.PvInfoPossible',NULL,NULL,NULL,2,'2009-07-22');
-INSERT INTO `csm_protection_element` VALUES (13,'edu.ualberta.med.biobank.model.PvInfoType','edu.ualberta.med.biobank.model.PvInfoType','edu.ualberta.med.biobank.model.PvInfoType',NULL,NULL,NULL,2,'2009-07-22');
+INSERT INTO `csm_protection_element` VALUES (10,'edu.ualberta.med.biobank.model.StudyPvAttr','edu.ualberta.med.biobank.model.StudyPvAttr','edu.ualberta.med.biobank.model.StudyPvAttr','','','',2,'2009-12-03');
+INSERT INTO `csm_protection_element` VALUES (11,'edu.ualberta.med.biobank.model.PvAttr','edu.ualberta.med.biobank.model.PvAttr','edu.ualberta.med.biobank.model.PvAttr','','','',2,'2009-12-03');
+INSERT INTO `csm_protection_element` VALUES (12,'edu.ualberta.med.biobank.model.SitePvAttr','edu.ualberta.med.biobank.model.SitePvAttr','edu.ualberta.med.biobank.model.SitePvAttr','','','',2,'2009-12-03');
+INSERT INTO `csm_protection_element` VALUES (13,'edu.ualberta.med.biobank.model.PvAttrType','edu.ualberta.med.biobank.model.PvAttrType','edu.ualberta.med.biobank.model.PvAttrType','','','',2,'2009-12-03');
 INSERT INTO `csm_protection_element` VALUES (14,'edu.ualberta.med.biobank.model.Sample','edu.ualberta.med.biobank.model.Sample','edu.ualberta.med.biobank.model.Sample',NULL,NULL,NULL,2,'2009-07-22');
 INSERT INTO `csm_protection_element` VALUES (15,'edu.ualberta.med.biobank.model.SamplePosition','edu.ualberta.med.biobank.model.SamplePosition','edu.ualberta.med.biobank.model.SamplePosition',NULL,NULL,NULL,2,'2009-07-22');
 INSERT INTO `csm_protection_element` VALUES (16,'edu.ualberta.med.biobank.model.SampleType','edu.ualberta.med.biobank.model.SampleType','edu.ualberta.med.biobank.model.SampleType',NULL,NULL,NULL,2,'2009-07-22');
@@ -575,7 +575,7 @@ CREATE TABLE `log_message` (
   KEY `THREAD_LOGTAB_INDX` (`THREAD`),
   KEY `CREATED_ON_LOGTAB_INDX` (`CREATED_ON`),
   KEY `LOGID_LOGTAB_INDX` (`LOG_ID`)
-) ENGINE=MyISAM AUTO_INCREMENT=163892 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=163921 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -596,11 +596,8 @@ CREATE TABLE `object_attribute` (
   `ATTRIBUTE` varchar(255) NOT NULL DEFAULT '',
   PRIMARY KEY (`OBJECT_ATTRIBUTE_ID`),
   KEY `OAID_INDX` (`OBJECT_ATTRIBUTE_ID`)
-) ENGINE=MyISAM AUTO_INCREMENT=212460 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=212492 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
-/*!40000 ALTER TABLE `user` DISABLE KEYS */;
-/*!40000 ALTER TABLE `user` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -618,15 +615,7 @@ CREATE TABLE `objectattributes` (
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
---
--- Dumping data for table `objectattributes`
---
-
-LOCK TABLES `objectattributes` WRITE;
-/*!40000 ALTER TABLE `objectattributes` DISABLE KEYS */;
-/*!40000 ALTER TABLE `objectattributes` ENABLE KEYS */;
 UNLOCK TABLES;
-
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -637,4 +626,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2009-11-30 13:37:13
+-- Dump completed on 2009-12-03 15:00:00
