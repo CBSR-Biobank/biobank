@@ -3,6 +3,7 @@ package test.ualberta.med.biobank.internal;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -68,9 +69,21 @@ public class DbHelper {
             return;
 
         for (PatientWrapper patient : patients) {
-            deleteFromList(patient.getPatientVisitCollection());
+            deletePatientVisits(patient.getPatientVisitCollection());
             patient.reload();
             patient.delete();
+        }
+    }
+
+    public static void deletePatientVisits(List<PatientVisitWrapper> visits)
+        throws Exception {
+        if (visits == null)
+            return;
+
+        for (PatientVisitWrapper visit : visits) {
+            deleteFromList(visit.getSampleCollection());
+            visit.reload();
+            visit.delete();
         }
     }
 

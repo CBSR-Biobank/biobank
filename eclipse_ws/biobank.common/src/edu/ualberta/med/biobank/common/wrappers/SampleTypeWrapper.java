@@ -157,16 +157,6 @@ public class SampleTypeWrapper extends ModelWrapper<SampleType> {
     @Override
     protected void deleteChecks() throws BiobankCheckException,
         ApplicationException {
-        // do nothing for now
-    }
-
-    public static List<SampleTypeWrapper> transformToWrapperList(
-        WritableApplicationService appService, List<SampleType> sampleTypes) {
-        List<SampleTypeWrapper> list = new ArrayList<SampleTypeWrapper>();
-        for (SampleType type : sampleTypes) {
-            list.add(new SampleTypeWrapper(appService, type));
-        }
-        return list;
     }
 
     public static List<SampleTypeWrapper> getGlobalSampleTypes(
@@ -176,8 +166,10 @@ public class SampleTypeWrapper extends ModelWrapper<SampleType> {
             + " where site = null");
 
         List<SampleType> sampleTypes = appService.query(c);
-        List<SampleTypeWrapper> list = transformToWrapperList(appService,
-            sampleTypes);
+        List<SampleTypeWrapper> list = new ArrayList<SampleTypeWrapper>();
+        for (SampleType type : sampleTypes) {
+            list.add(new SampleTypeWrapper(appService, type));
+        }
         if (sort)
             Collections.sort(list);
         return list;

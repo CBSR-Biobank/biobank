@@ -759,6 +759,8 @@ public class TestSite extends TestDatabase {
         Assert
             .assertEquals(sizeOrig + 2, site.getPvInfoPossibleLabels().length);
         site.deletePvInfoPossible(name);
+        Assert
+            .assertEquals(sizeOrig + 1, site.getPvInfoPossibleLabels().length);
         site.persist();
 
         site.reload();

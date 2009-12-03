@@ -715,7 +715,10 @@ public class SiteWrapper extends ModelWrapper<Site> {
             appService, origSite).getPvInfoPossibleCollection();
         if (oldPvInfoPossible == null)
             return;
-        int newPvInfoPossibleCount = pvInfoPossibleMap.size();
+        int newPvInfoPossibleCount = 0;
+        if (pvInfoPossibleMap != null) {
+            newPvInfoPossibleCount = pvInfoPossibleMap.size();
+        }
         for (PvInfoPossibleWrapper st : oldPvInfoPossible) {
             if ((newPvInfoPossibleCount == 0)
                 || (pvInfoPossibleMap.get(st.getLabel()) == null)) {
