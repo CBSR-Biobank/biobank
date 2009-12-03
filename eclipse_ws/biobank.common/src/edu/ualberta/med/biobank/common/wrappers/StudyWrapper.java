@@ -306,10 +306,8 @@ public class StudyWrapper extends ModelWrapper<Study> {
         if (oldPvInfoList == null) {
             return;
         }
-        int newPvInfoCount = 0;
-        if (pvInfoMap != null) {
-            newPvInfoCount = pvInfoMap.size();
-        }
+        getPvInfoMap();
+        int newPvInfoCount = pvInfoMap.size();
         for (PvInfoWrapper st : oldPvInfoList) {
             if ((newPvInfoCount == 0) || (pvInfoMap.get(st.getLabel()) == null)) {
                 st.delete();
