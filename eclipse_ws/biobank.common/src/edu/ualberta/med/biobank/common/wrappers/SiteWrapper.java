@@ -651,7 +651,7 @@ public class SiteWrapper extends ModelWrapper<Site> {
     }
 
     @SuppressWarnings("unchecked")
-    protected List<SitePvAttrWrapper> getSitePvAttrCollection(boolean sort) {
+    protected List<SitePvAttrWrapper> getSitePvAttrCollection() {
         List<SitePvAttrWrapper> sitePvAttrCollection = (List<SitePvAttrWrapper>) propertiesMap
             .get("SitePvAttrCollection");
         if (sitePvAttrCollection == null) {
@@ -666,13 +666,7 @@ public class SiteWrapper extends ModelWrapper<Site> {
                 propertiesMap.put("SitePvAttrCollection", sitePvAttrCollection);
             }
         }
-        if ((sitePvAttrCollection != null) && sort)
-            Collections.sort(sitePvAttrCollection);
         return sitePvAttrCollection;
-    }
-
-    protected List<SitePvAttrWrapper> getSitePvAttrCollection() {
-        return getSitePvAttrCollection(false);
     }
 
     protected void setSitePvAttrCollection(Collection<SitePvAttr> collection,
@@ -732,57 +726,47 @@ public class SiteWrapper extends ModelWrapper<Site> {
         return pvAttrTypeMap;
     }
 
+    private Map<String, SitePvAttrWrapper> getSitePvAttrMap() {
+        if (sitePvAttrMap != null)
+            return sitePvAttrMap;
+
+        sitePvAttrMap = new HashMap<String, SitePvAttrWrapper>();
+        List<SitePvAttrWrapper> sitePvAttrCollection = getSitePvAttrCollection();
+        if (sitePvAttrCollection != null) {
+            for (SitePvAttrWrapper pip : sitePvAttrCollection) {
+                sitePvAttrMap.put(pip.getLabel(), pip);
+            }
+        }
+        return sitePvAttrMap;
+    }
+
     public static List<String> getPvAttrTypeNames(
         WritableApplicationService appService) throws ApplicationException {
         getPvAttrTypeMap(appService);
         return new ArrayList<String>(pvAttrTypeMap.keySet());
     }
 
-    private Map<String, SitePvAttrWrapper> getSitePvAttrMap()
-        throws ApplicationException {
-        if (sitePvAttrMap != null)
-            return sitePvAttrMap;
-
-        sitePvAttrMap = new HashMap<String, SitePvAttrWrapper>();
-        List<SitePvAttrWrapper> pipCollection = getSitePvAttrCollection();
-        if (pipCollection != null) {
-            for (SitePvAttrWrapper pip : pipCollection) {
-                sitePvAttrMap.put(pip.getLabel(), pip);
-            }
+    protected SitePvAttrWrapper getSitePvAttr(String label) throws Exception {
+        getSitePvAttrMap();
+        SitePvAttrWrapper sitePvAttr = sitePvAttrMap.get(label);
+        if (sitePvAttr == null) {
+            throw new Exception("SitePvAttr with label \"" + label
+                + "\" is invalid");
         }
-
-        // get global PIPs now
-        for (SitePvAttrWrapper pip : SitePvAttrWrapper.getGlobalSitePvAttr(
-            appService, false)) {
-            sitePvAttrMap.put(pip.getLabel(), pip);
-        }
-        return sitePvAttrMap;
+        return sitePvAttr;
     }
 
-    public String[] getSitePvAttrLabels() throws ApplicationException {
+    public String[] getSitePvAttrLabels() {
         getSitePvAttrMap();
         return sitePvAttrMap.keySet().toArray(new String[] {});
     }
 
     public String getSitePvAttrTypeName(String label) throws Exception {
-        getSitePvAttrMap();
-        SitePvAttrWrapper sitePvAttr = sitePvAttrMap.get(label);
-        if (sitePvAttr == null)
-            return null;
-        return sitePvAttr.getPvAttrType().getName();
+        return getSitePvAttr(label).getPvAttrType().getName();
     }
 
     public Integer getSitePvAttrType(String label) throws Exception {
-        getSitePvAttrMap();
-        SitePvAttrWrapper sitePvAttr = sitePvAttrMap.get(label);
-        if (sitePvAttr == null)
-            return null;
-        return sitePvAttr.getPvAttrType().getId();
-    }
-
-    protected SitePvAttrWrapper getSitePvAttr(String label) throws Exception {
-        getSitePvAttrMap();
-        return sitePvAttrMap.get(label);
+        return getSitePvAttr(label).getPvAttrType().getId();
     }
 
     /**
@@ -795,13 +779,14 @@ public class SiteWrapper extends ModelWrapper<Site> {
      */
     public void setSitePvAttr(String label, String type) throws Exception {
         getPvAttrTypeMap(appService);
+        getSitePvAttrMap();
         PvAttrTypeWrapper pvAttrType = pvAttrTypeMap.get(type);
         if (pvAttrType == null) {
             throw new Exception("PvAttrType with type \"" + type
                 + "\" is invalid");
         }
 
-        SitePvAttrWrapper sitePvAttr = getSitePvAttr(label);
+        SitePvAttrWrapper sitePvAttr = sitePvAttrMap.get(label);
         if (sitePvAttr == null) {
             sitePvAttr = new SitePvAttrWrapper(appService, new SitePvAttr());
             sitePvAttr.setLabel(label);
@@ -820,12 +805,11 @@ public class SiteWrapper extends ModelWrapper<Site> {
 
     public void deleteSitePvAttr(String label) throws Exception {
         getSitePvAttrMap();
-        SitePvAttrWrapper sitePvAttr = sitePvAttrMap.get(label);
-        if (sitePvAttr == null) {
-            throw new Exception("SitePvAttr with label \"" + label
-                + "\" does not exist");
-        }
+        // this call generates exception if label does not exist
+        getSitePvAttr(label);
         sitePvAttrMap.remove(label);
+        setSitePvAttrCollection(new ArrayList<SitePvAttrWrapper>(sitePvAttrMap
+            .values()));
     }
 
     @Override

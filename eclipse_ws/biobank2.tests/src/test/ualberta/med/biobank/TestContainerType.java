@@ -320,7 +320,6 @@ public class TestContainerType extends TestDatabase {
         String[] keys = new String[] { "TopCT", "ChildCtL1", "ChildCtL2",
             "ChildCtL3" };
 
-        ContainerWrapper topContainer = null;
         List<ContainerWrapper> containers = new ArrayList<ContainerWrapper>();
         for (String key : keys) {
             ContainerTypeWrapper ct = containerTypeMap.get(key);
@@ -330,7 +329,6 @@ public class TestContainerType extends TestDatabase {
                 ContainerWrapper top = ContainerHelper.addContainer("01",
                     TestCommon.getNewBarcode(r), null, site, ct);
                 containers.add(top);
-                topContainer = top;
             } else {
                 containers.add(ContainerHelper.addContainer(null, TestCommon
                     .getNewBarcode(r), containers.get(containers.size() - 1),
@@ -343,8 +341,10 @@ public class TestContainerType extends TestDatabase {
         }
 
         // now delete all containers
-        ContainerHelper.deleteContainers(Arrays
-            .asList(new ContainerWrapper[] { topContainer }));
+        containers.get(3).delete();
+        containers.get(2).delete();
+        containers.get(1).delete();
+        containers.get(0).delete();
         containers.clear();
 
         for (String key : keys) {

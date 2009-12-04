@@ -573,11 +573,7 @@ public class StudyWrapper extends ModelWrapper<Study> {
     public void setStudyPvAttrLocked(String label, Boolean enable)
         throws Exception {
         getStudyPvAttrMap();
-        StudyPvAttrWrapper studyPvAttr = studyPvAttrMap.get(label);
-        if (studyPvAttr == null) {
-            throw new Exception("the pv attribute \"" + label
-                + "\" does not exist for this study");
-        }
+        StudyPvAttrWrapper studyPvAttr = getStudyPvAttr(label);
         studyPvAttr.setLocked(enable);
     }
 
@@ -589,16 +585,14 @@ public class StudyWrapper extends ModelWrapper<Study> {
      */
     public void deleteStudyPvAttr(String label) throws Exception {
         getStudyPvAttrMap();
-        StudyPvAttrWrapper studyPvAttr = studyPvAttrMap.get(label);
-        if (studyPvAttr == null) {
-            throw new Exception("the pv attribute \"" + label
-                + "\" does not exist for this study");
-        }
+        StudyPvAttrWrapper studyPvAttr = getStudyPvAttr(label);
         if (studyPvAttr.isUsedByPatientVisits()) {
             throw new BiobankCheckException("StudyPvAttr with label \"" + label
                 + "\" is in use by patient visits");
         }
         studyPvAttrMap.remove(label);
+        setStudyPvAttrCollection(new ArrayList<StudyPvAttrWrapper>(
+            studyPvAttrMap.values()));
     }
 
     public List<ClinicWrapper> getClinicCollection()

@@ -600,9 +600,9 @@ public class TestContainer extends TestDatabase {
                 RowColPos result = container
                     .getPositionFromLabelingScheme(label);
 
-                System.out.println("type/" + type + " scheme/"
-                    + type.getChildLabelingScheme() + " label/" + label
-                    + " row/" + result.row + " col/" + result.col);
+                // System.out.println("type/" + type + " scheme/"
+                // + type.getChildLabelingScheme() + " label/" + label
+                // + " row/" + result.row + " col/" + result.col);
 
                 Assert.assertNotNull(result);
                 Assert.assertEquals(row, result.row.intValue());

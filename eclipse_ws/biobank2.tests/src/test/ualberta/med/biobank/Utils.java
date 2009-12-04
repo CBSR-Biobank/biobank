@@ -10,12 +10,16 @@ public class Utils {
 
     private static Random r = new Random();
 
-    public static String getRandomString(int maxlen) {
+    public static String getRandomString(int minlen, int maxlen) {
         String str = new String();
-        for (int j = 0, n = r.nextInt(maxlen) + 1; j < n; ++j) {
+        for (int j = 0, n = minlen + r.nextInt(maxlen - minlen) + 1; j < n; ++j) {
             str += (char) ('A' + r.nextInt(26));
         }
         return str;
+    }
+
+    public static String getRandomString(int maxlen) {
+        return getRandomString(0, maxlen);
     }
 
     public static String getRandomNumericString(int maxlen) {

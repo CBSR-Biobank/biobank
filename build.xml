@@ -430,7 +430,7 @@
 					<include name="**/Test*.java" />
 					<exclude name="**/TestCommon.java" />
 					<exclude name="**/TestDatabase.java" />
-                    <exclude name="**/TestFuntionalities.java" />
+                    <exclude name="**/TestFunctionalities.java" />
 					<exclude name="**/AllTests.java" />
 				</fileset>
 				<formatter type="xml" />

@@ -12,6 +12,8 @@ public class TestCommon {
 
     private static List<String> usedBarcodes;
 
+    private static List<String> inventoryIds;
+
     public static ContainerTypeWrapper addSampleTypes(ContainerTypeWrapper ct,
         List<SampleTypeWrapper> sampleTypes) throws Exception {
         Assert.assertTrue("not enough sample types for test", (sampleTypes
@@ -40,9 +42,21 @@ public class TestCommon {
 
         String newBarcode;
         do {
-            newBarcode = Utils.getRandomString(10);
+            newBarcode = Utils.getRandomString(10, 12);
         } while (usedBarcodes.contains(newBarcode));
         usedBarcodes.add(newBarcode);
         return newBarcode;
+    }
+
+    public static String getNewInventoryId(Random r) {
+        if (inventoryIds == null) {
+            inventoryIds = new ArrayList<String>();
+        }
+        String id;
+        do {
+            id = Utils.getRandomString(10, 20);
+        } while (inventoryIds.contains(id));
+        inventoryIds.add(id);
+        return id;
     }
 }

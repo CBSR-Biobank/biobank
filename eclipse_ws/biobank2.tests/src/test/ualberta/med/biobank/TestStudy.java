@@ -21,6 +21,7 @@ import test.ualberta.med.biobank.internal.StudyHelper;
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
+import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleSourceWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
@@ -31,6 +32,24 @@ import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.Study;
 
 public class TestStudy extends TestDatabase {
+
+    private static List<PatientVisitWrapper> studyAddPatientVisits(
+        StudyWrapper study) throws Exception {
+        String name = study.getName();
+        SiteWrapper site = study.getSite();
+        ClinicWrapper clinic = ClinicHelper.addClinic(site, name + "CLINIC1");
+        ContactWrapper contact = ContactHelper.addContact(clinic, name
+            + "CONTACT1");
+        List<ContactWrapper> contacts = new ArrayList<ContactWrapper>();
+        contacts.add(contact);
+        study.setContactCollection(contacts);
+        study.persist();
+        study.reload();
+        PatientWrapper patient = PatientHelper.addPatient(name, study);
+        ShipmentWrapper shipment = ShipmentHelper.addShipment(clinic, patient);
+        return PatientVisitHelper.addPatientVisits(patient, shipment);
+
+    }
 
     // the methods to skip in the getters and setters test
     private static final List<String> GETTER_SKIP_METHODS = Arrays
@@ -300,8 +319,43 @@ public class TestStudy extends TestDatabase {
         study.setStudyPvAttr("Visit Type", "select_single", new String[] {
             "toto", "titi", "tata" });
         study.persist();
+        study.reload();
+
+        // set non existing type, expect exception
+        try {
+            study.setStudyPvAttr(Utils.getRandomString(10, 15), Utils
+                .getRandomString(10, 15));
+            Assert.fail("call should generate an exception");
+        } catch (Exception e) {
+            Assert.assertTrue(true);
+        }
 
         Assert.assertEquals(2, study.getStudyPvAttrLabels().length);
+
+        study.deleteStudyPvAttr("Worksheet");
+        study.persist();
+        Assert.assertEquals(1, study.getStudyPvAttrLabels().length);
+
+        study.deleteStudyPvAttr("Visit Type");
+        study.persist();
+        Assert.assertEquals(0, study.getStudyPvAttrLabels().length);
+
+        // add patient visit that uses the attribute and try to delete
+        study.setStudyPvAttr("Worksheet", "text");
+        study.persist();
+        study.reload();
+        List<PatientVisitWrapper> visits = studyAddPatientVisits(study);
+        PatientVisitWrapper visit = visits.get(0);
+        visit.setPvAttrValue("Worksheet", Utils.getRandomString(10, 15));
+        visit.persist();
+
+        // delete non existing label, expect exception
+        try {
+            study.deleteStudyPvAttr("Worksheet");
+            Assert.fail("call should generate an exception");
+        } catch (Exception e) {
+            Assert.assertTrue(true);
+        }
     }
 
     @Test
@@ -335,6 +389,16 @@ public class TestStudy extends TestDatabase {
         Assert.assertEquals(2, labels.size());
         Assert.assertTrue(labels.contains("Worksheet"));
         Assert.assertTrue(labels.contains("Visit Type"));
+        Assert.assertEquals("text", study.getStudyPvAttrType("Worksheet"));
+        Assert.assertEquals("text", study.getStudyPvAttrType("Visit Type"));
+
+        // get non existing label, expect exception
+        try {
+            study.getStudyPvAttrType(Utils.getRandomString(10, 20));
+            Assert.fail("call should generate an exception");
+        } catch (Exception e) {
+            Assert.assertTrue(true);
+        }
     }
 
     @Test
@@ -356,6 +420,86 @@ public class TestStudy extends TestDatabase {
         for (String s : valuesFound) {
             Assert.assertTrue(valuesList.contains(s));
         }
+
+        // add attribute with no permissible values
+        study.setStudyPvAttr(name + "no_permissble", "select_single");
+        Assert.assertTrue(study.getStudyPvAttrPermissible(name
+            + "no_permissble") == null);
+    }
+
+    @Test
+    public void testGetStudyPvAttrLocked() throws Exception {
+        String name = "testGetStudyPvAttrType" + r.nextInt();
+        SiteWrapper site = SiteHelper.addSite(name);
+        StudyWrapper study = StudyHelper.addStudy(site, name);
+
+        study.setStudyPvAttr("Worksheet", "text");
+        study.persist();
+        study.reload();
+
+        // attributes are not locked by default
+        Assert.assertFalse(study.getStudyPvAttrLocked("Worksheet"));
+
+        // lock the attribute
+        study.setStudyPvAttrLocked("Worksheet", true);
+        Assert.assertTrue(study.getStudyPvAttrLocked("Worksheet"));
+
+        // get lock for non existing label, expect exception
+        try {
+            study.getStudyPvAttrLocked(Utils.getRandomString(10, 20));
+            Assert.fail("call should generate an exception");
+        } catch (Exception e) {
+            Assert.assertTrue(true);
+        }
+
+        // set lock for non existing label, expect exception
+        try {
+            study.setStudyPvAttrLocked(Utils.getRandomString(10, 20), true);
+            Assert.fail("call should generate an exception");
+        } catch (Exception e) {
+            Assert.assertTrue(true);
+        }
+        // add patient visit that uses the locked attribute
+        study.setStudyPvAttr("Worksheet", "text");
+        study.getStudyPvAttrLocked("Worksheet");
+        study.persist();
+        study.reload();
+        List<PatientVisitWrapper> visits = studyAddPatientVisits(study);
+        PatientVisitWrapper visit = visits.get(0);
+        visit.setPvAttrValue("Worksheet", Utils.getRandomString(10, 15));
+
+        try {
+            visit.persist();
+            Assert.fail("call should generate an exception");
+        } catch (Exception e) {
+            Assert.assertTrue(true);
+        }
+    }
+
+    @Test
+    public void testRemoveStudyPvAttr() throws Exception {
+        String name = "testRemoveStudyPvAttr" + r.nextInt();
+        SiteWrapper site = SiteHelper.addSite(name);
+        StudyWrapper study = StudyHelper.addStudy(site, name);
+
+        int sizeOrig = study.getStudyPvAttrLabels().length;
+        List<String> types = SiteWrapper.getPvAttrTypeNames(appService);
+        if (types.size() < 2) {
+            Assert.fail("Can't test without PvAttrTypes");
+        }
+
+        study.setStudyPvAttr(name, types.get(0));
+        study.setStudyPvAttr(name + "_2", types.get(1));
+        study.persist();
+
+        study.reload();
+        Assert.assertEquals(sizeOrig + 2, study.getStudyPvAttrLabels().length);
+        study.deleteStudyPvAttr(name);
+        Assert.assertEquals(sizeOrig + 1, study.getStudyPvAttrLabels().length);
+        site.persist();
+
+        site.reload();
+        Assert.assertEquals(sizeOrig + 1, study.getStudyPvAttrLabels().length);
     }
 
     @Test
