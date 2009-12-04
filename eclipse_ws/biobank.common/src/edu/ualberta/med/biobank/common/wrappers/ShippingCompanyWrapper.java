@@ -3,7 +3,6 @@ package edu.ualberta.med.biobank.common.wrappers;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.BiobankCheckException;
@@ -90,26 +89,6 @@ public class ShippingCompanyWrapper extends ModelWrapper<ShippingCompany> {
 
     public List<ShipmentWrapper> getShipmentCollection() {
         return getShipmentCollection(false);
-    }
-
-    public void setShipmentCollection(Collection<Shipment> shipments,
-        boolean setNull) {
-        Collection<Shipment> old = wrappedObject.getShipmentCollection();
-        wrappedObject.setShipmentCollection(shipments);
-        propertyChangeSupport.firePropertyChange("shipmentCollection", old,
-            shipments);
-        if (setNull) {
-            propertiesMap.put("shipmentCollection", null);
-        }
-    }
-
-    public void setShipmentCollection(List<ShipmentWrapper> shipments) {
-        Collection<Shipment> shipmentsObjects = new HashSet<Shipment>();
-        for (ShipmentWrapper s : shipments) {
-            shipmentsObjects.add(s.getWrappedObject());
-        }
-        setShipmentCollection(shipmentsObjects, false);
-        propertiesMap.put("shipmentCollection", shipments);
     }
 
     public static List<ShippingCompanyWrapper> getShippingCompanies(

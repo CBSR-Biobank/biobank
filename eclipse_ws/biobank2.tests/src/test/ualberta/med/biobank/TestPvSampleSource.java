@@ -19,6 +19,7 @@ import edu.ualberta.med.biobank.common.wrappers.SampleSourceWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.model.PatientVisit;
+import edu.ualberta.med.biobank.model.PvSampleSource;
 import edu.ualberta.med.biobank.model.SampleSource;
 
 public class TestPvSampleSource extends TestDatabase {
@@ -115,5 +116,16 @@ public class TestPvSampleSource extends TestDatabase {
         pvSs.setQuantity(5);
         pvSs.reset();
         Assert.assertEquals(null, pvSs.getQuantity());
+    }
+
+    @Test
+    public void testDelete() throws Exception {
+        pvSampleSource.persist();
+        int count = appService.search(PvSampleSource.class,
+            new PvSampleSource()).size();
+        pvSampleSource.delete();
+        int countAfter = appService.search(PvSampleSource.class,
+            new PvSampleSource()).size();
+        Assert.assertEquals(count - 1, countAfter);
     }
 }

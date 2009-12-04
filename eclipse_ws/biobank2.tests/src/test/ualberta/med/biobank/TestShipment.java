@@ -371,6 +371,27 @@ public class TestShipment extends TestDatabase {
     }
 
     @Test
+    public void testPersistFailPatientNoInStudyOwnByClinic() throws Exception {
+        String name = "testPersistFailPatientNoInStudyOwnByClinic"
+            + r.nextInt();
+        SiteWrapper site = SiteHelper.addSite(name);
+        ClinicWrapper clinic = ClinicHelper.addClinic(site, name);
+
+        StudyWrapper study = StudyHelper.addStudy(clinic.getSite(), name);
+        PatientWrapper patient = PatientHelper.addPatient(name, study);
+        ShipmentWrapper shipment = ShipmentHelper.newShipment(clinic, name,
+            Utils.getRandomDate(), patient);
+
+        try {
+            shipment.persist();
+            Assert
+                .fail("patient should be part of the sutdy that has contact with the clinic");
+        } catch (BiobankCheckException bce) {
+            Assert.assertTrue(true);
+        }
+    }
+
+    @Test
     public void testDelete() throws Exception {
         String name = "testDelete" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);

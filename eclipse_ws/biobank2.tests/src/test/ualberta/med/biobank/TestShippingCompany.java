@@ -1,6 +1,7 @@
 package test.ualberta.med.biobank;
 
 import java.util.Arrays;
+import java.util.List;
 
 import junit.framework.Assert;
 
@@ -67,6 +68,48 @@ public class TestShippingCompany extends TestDatabase {
         company2.reload();
         Assert.assertEquals(1, company1.getShipmentCollection().size());
         Assert.assertEquals(2, company2.getShipmentCollection().size());
+    }
+
+    @Test
+    public void testGetShipmentCollectionBoolean() throws Exception {
+        String name = "testGetShipmentCollectionBoolean" + r.nextInt();
+        SiteWrapper site = SiteHelper.addSite(name);
+        ClinicWrapper clinic = ClinicHelper.addClinic(site, name);
+        StudyWrapper study = StudyHelper.addStudy(clinic.getSite(), name);
+        ContactWrapper contact = ContactHelper.addContact(clinic, name);
+        study.setContactCollection(Arrays
+            .asList(new ContactWrapper[] { contact }));
+        study.persist();
+        PatientWrapper patient1 = PatientHelper.addPatient(name, study);
+
+        ShippingCompanyWrapper company = ShippingCompanyHelper
+            .addShippingCompany(name);
+
+        ShipmentWrapper shipment1 = ShipmentHelper
+            .addShipment(clinic, patient1);
+        shipment1.setShippingCompany(company);
+        shipment1.setWaybill("QWERTY" + name);
+        shipment1.persist();
+        ShipmentWrapper shipment2 = ShipmentHelper
+            .addShipment(clinic, patient1);
+        shipment2.setShippingCompany(company);
+        shipment1.setWaybill("ASDFG" + name);
+        shipment2.persist();
+        ShipmentWrapper shipment3 = ShipmentHelper
+            .addShipment(clinic, patient1);
+        shipment3.setShippingCompany(company);
+        shipment1.setWaybill("ghrtghd" + name);
+        shipment3.persist();
+
+        company.reload();
+        List<ShipmentWrapper> shipments = company.getShipmentCollection(true);
+        if (shipments.size() > 1) {
+            for (int i = 0; i < shipments.size() - 1; i++) {
+                ShipmentWrapper s1 = shipments.get(i);
+                ShipmentWrapper s2 = shipments.get(i + 1);
+                Assert.assertTrue(s1.compareTo(s2) <= 0);
+            }
+        }
     }
 
     @Test

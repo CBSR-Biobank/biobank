@@ -118,7 +118,10 @@ public class PalletCell {
 
     public String getTitle() {
         if (type != null) {
-            return type.getNameShort();
+            if (type.getNameShort() != null) {
+                return type.getNameShort();
+            }
+            return type.getName();
         }
         return title;
     }

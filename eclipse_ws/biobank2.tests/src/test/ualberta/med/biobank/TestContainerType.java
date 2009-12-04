@@ -320,15 +320,17 @@ public class TestContainerType extends TestDatabase {
         String[] keys = new String[] { "TopCT", "ChildCtL1", "ChildCtL2",
             "ChildCtL3" };
 
+        ContainerWrapper topContainer = null;
         List<ContainerWrapper> containers = new ArrayList<ContainerWrapper>();
-
         for (String key : keys) {
             ContainerTypeWrapper ct = containerTypeMap.get(key);
             Assert.assertFalse(ct.isUsedByContainers());
 
             if (key.equals("TopCT")) {
-                containers.add(ContainerHelper.addContainer("01", TestCommon
-                    .getNewBarcode(r), null, site, ct));
+                ContainerWrapper top = ContainerHelper.addContainer("01",
+                    TestCommon.getNewBarcode(r), null, site, ct);
+                containers.add(top);
+                topContainer = top;
             } else {
                 containers.add(ContainerHelper.addContainer(null, TestCommon
                     .getNewBarcode(r), containers.get(containers.size() - 1),
@@ -341,13 +343,13 @@ public class TestContainerType extends TestDatabase {
         }
 
         // now delete all containers
-        for (ContainerWrapper container : containers) {
-            container.delete();
-        }
+        ContainerHelper.deleteContainers(Arrays
+            .asList(new ContainerWrapper[] { topContainer }));
         containers.clear();
 
         for (String key : keys) {
             ContainerTypeWrapper ct = containerTypeMap.get(key);
+            ct.reload();
             Assert.assertFalse(ct.isUsedByContainers());
         }
     }

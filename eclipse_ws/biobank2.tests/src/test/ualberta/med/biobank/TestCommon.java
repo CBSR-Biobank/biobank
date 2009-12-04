@@ -42,6 +42,7 @@ public class TestCommon {
         do {
             newBarcode = Utils.getRandomString(10);
         } while (usedBarcodes.contains(newBarcode));
+        usedBarcodes.add(newBarcode);
         return newBarcode;
     }
 }

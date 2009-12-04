@@ -36,10 +36,15 @@ import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.Sample;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class TestSample extends TestDatabase {
 
-    SampleWrapper sample;
+    private SampleWrapper sample;
+
+    private Integer siteId;
+
+    private ContainerWrapper topContainer;
 
     @Override
     @Before
@@ -47,16 +52,30 @@ public class TestSample extends TestDatabase {
         super.setUp();
 
         SiteWrapper site = SiteHelper.addSite("sitename" + r.nextInt());
+        siteId = site.getId();
         SampleTypeWrapper sampleTypeWrapper = SampleTypeHelper.addSampleType(
-            site, "sampletype");
-        ContainerTypeWrapper type = ContainerTypeHelper.addContainerType(site,
-            "ctType", "ct", 1, 4, 5, true);
-        type.setSampleTypeCollection(Arrays
+            site, "sampletype" + r.nextInt());
+
+        ContainerTypeWrapper typeChild = ContainerTypeHelper.addContainerType(
+            site, "ctTypeChild" + r.nextInt(), "ctChild", 1, 4, 5, false);
+        typeChild.setSampleTypeCollection(Arrays
             .asList(new SampleTypeWrapper[] { sampleTypeWrapper }));
-        type.persist();
-        ContainerWrapper container = ContainerHelper.addContainer(
-            "newcontainer", "cc", null, site, type);
-        StudyWrapper study = StudyHelper.addStudy(site, "studyname");
+        typeChild.persist();
+
+        ContainerTypeWrapper topType = ContainerTypeHelper.addContainerType(
+            site, "topType" + r.nextInt(), "ct", 1, 4, 5, true);
+        topType.setChildContainerTypeCollection(Arrays
+            .asList(new ContainerTypeWrapper[] { typeChild }));
+        topType.persist();
+
+        topContainer = ContainerHelper.addContainer("newcontainer"
+            + r.nextInt(), "cc", null, site, topType);
+
+        ContainerWrapper container = ContainerHelper.addContainer(null, "2nd",
+            topContainer, site, typeChild, 0, 0);
+
+        StudyWrapper study = StudyHelper.addStudy(site, "studyname"
+            + r.nextInt());
         PatientWrapper patient = PatientHelper.addPatient("5684", study);
         ClinicWrapper clinic = ClinicHelper.addClinic(site, "clinicname");
         ContactWrapper contact = ContactHelper.addContact(clinic,
@@ -97,6 +116,15 @@ public class TestSample extends TestDatabase {
 
         duplicate.setInventoryId("qqqq" + r.nextInt());
         duplicate.persist();
+
+        duplicate.setInventoryId(sample.getInventoryId());
+        try {
+            duplicate.persist();
+            Assert
+                .fail("still can't save it with  the same inventoryId after a first add with anotehr inventoryId!");
+        } catch (BiobankCheckException bce) {
+            Assert.assertTrue(true);
+        }
     }
 
     @Test
@@ -142,6 +170,44 @@ public class TestSample extends TestDatabase {
     }
 
     @Test
+    public void testCheckPatientVisitNotNull() throws BiobankCheckException,
+        Exception {
+        sample.setPatientVisit((PatientVisit) null);
+        try {
+            sample.persist();
+            Assert.fail("Patient visit should be set!");
+        } catch (BiobankCheckException bce) {
+            Assert.assertTrue(true);
+        }
+    }
+
+    @Test
+    public void testCheckParentFromSameSite() throws BiobankCheckException,
+        Exception {
+        String name = "testCheckParentFromSameSite" + r.nextInt();
+        SiteWrapper newSite = SiteHelper.addSite(name);
+        StudyWrapper newStudy = StudyHelper.addStudy(newSite, name);
+        PatientWrapper newPatient = PatientHelper.addPatient(name, newStudy);
+        ClinicWrapper clinic = ClinicHelper.addClinic(newSite, name);
+        ContactWrapper contact = ContactHelper.addContact(clinic, name);
+        newStudy.setContactCollection(Arrays
+            .asList(new ContactWrapper[] { contact }));
+        newStudy.persist();
+        ShipmentWrapper shipment = ShipmentHelper.addShipment(clinic,
+            newPatient);
+        PatientVisitWrapper newVisit = PatientVisitHelper.addPatientVisit(
+            newPatient, shipment, null);
+
+        sample.setPatientVisit(newVisit);
+        try {
+            sample.persist();
+            Assert.fail("visit not form same site that parent");
+        } catch (BiobankCheckException bce) {
+            Assert.assertTrue(true);
+        }
+    }
+
+    @Test
     public void testGetSetPatientVisit() {
         PatientVisitWrapper pvw = new PatientVisitWrapper(appService,
             new PatientVisit());
@@ -160,6 +226,26 @@ public class TestSample extends TestDatabase {
         Assert.assertTrue(sample.getPositionString(false, false).equals("C2"));
         pos = sample.getPosition();
         Assert.assertTrue((pos.col == 1) && (pos.row == 2));
+
+        try {
+            sample.setSamplePositionFromString("79", sample.getParent());
+            Assert.fail("invalid position");
+        } catch (Exception bce) {
+            Assert.assertTrue(true);
+        }
+    }
+
+    @Test
+    public void testGetPositionString() throws Exception {
+        sample.setSamplePositionFromString("A1", sample.getParent());
+        Assert.assertTrue(sample.getPositionString(false, false).equals("A1"));
+        String parentLabel = sample.getParent().getLabel();
+        Assert.assertTrue(sample.getPositionString(true, false).equals(
+            parentLabel + "A1"));
+        Assert.assertTrue(sample.getPositionString(true, true).equals(
+            topContainer.getContainerType().getNameShort() + "-" + parentLabel
+                + "A1"));
+
     }
 
     @Test
@@ -351,7 +437,18 @@ public class TestSample extends TestDatabase {
 
         SampleWrapper sample2 = new SampleWrapper(appService);
         sample2.setPosition(3, 3);
-        sample2.isPositionFree(sample.getParent());
+
+        Assert.assertFalse(sample2.isPositionFree(sample.getParent()));
+
+        sample2.setPosition(2, 3);
+        Assert.assertTrue(sample2.isPositionFree(sample.getParent()));
     }
 
+    @Test
+    public void testDebugFakeMethods() throws ApplicationException {
+        // we only check they don't fail
+        SampleWrapper.getRandomSamplesAlreadyLinked(appService, siteId);
+        SampleWrapper.getRandomSamplesAlreadyAssigned(appService, siteId);
+        SampleWrapper.getRandomSamplesNotAssigned(appService, siteId);
+    }
 }

@@ -56,9 +56,21 @@ public class ContainerWrapper extends
         checkContainerTypeNotNull();
         checkLabelUniqueForType();
         checkProductBarcodeUnique();
+        checkTopAndParent();
         checkParentAcceptContainerType();
         checkContainerTypeSameSite();
         super.persistChecks();
+    }
+
+    /**
+     * a container can't be a topContainer and have a parent on the same time
+     */
+    private void checkTopAndParent() throws BiobankCheckException {
+        if (getParent() != null && getContainerType() != null
+            && Boolean.TRUE.equals(getContainerType().getTopLevel())) {
+            throw new BiobankCheckException(
+                "A top level container can't have a parent");
+        }
     }
 
     private void checkContainerTypeSameSite() throws BiobankCheckException {

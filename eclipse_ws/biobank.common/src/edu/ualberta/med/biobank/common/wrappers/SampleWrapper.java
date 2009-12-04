@@ -46,9 +46,16 @@ public class SampleWrapper extends
     @Override
     protected void persistChecks() throws BiobankCheckException,
         ApplicationException {
+        checkPatientVisitNotNull();
         checkInventoryIdUnique();
         checkParentAcceptSampleType();
         super.persistChecks();
+    }
+
+    private void checkPatientVisitNotNull() throws BiobankCheckException {
+        if (getPatientVisit() == null) {
+            throw new BiobankCheckException("patient visit should be set");
+        }
     }
 
     public String getInventoryId() {
@@ -143,18 +150,12 @@ public class SampleWrapper extends
         throws ApplicationException {
         RowColPos position = getPosition();
         if (position != null) {
-            String isSame = "";
-            List<Object> params = new ArrayList<Object>(Arrays
-                .asList(new Object[] { position.row, position.col,
-                    parentContainer.getWrappedObject() }));
-            if (!isNew()) {
-                isSame = " and id <> ?";
-                params.add(getId());
-            }
             HQLCriteria criteria = new HQLCriteria("from "
                 + Sample.class.getName()
                 + " where samplePosition.row=? and samplePosition.col=?"
-                + " and samplePosition.container=?" + isSame, params);
+                + " and samplePosition.container=?", Arrays
+                .asList(new Object[] { position.row, position.col,
+                    parentContainer.getWrappedObject() }));
 
             List<Sample> samples = appService.query(criteria);
             if (samples.size() > 0) {
@@ -324,15 +325,6 @@ public class SampleWrapper extends
         return list;
     }
 
-    public static List<SampleWrapper> transformToWrapperList(
-        WritableApplicationService appService, List<Sample> samples) {
-        List<SampleWrapper> list = new ArrayList<SampleWrapper>();
-        for (Sample sample : samples) {
-            list.add(new SampleWrapper(appService, sample));
-        }
-        return list;
-    }
-
     @Override
     public int compareTo(ModelWrapper<Sample> o) {
         if (o instanceof SampleWrapper) {
@@ -349,7 +341,11 @@ public class SampleWrapper extends
             + " as s where s.patientVisit.patient.study.site.id = ?", Arrays
             .asList(new Object[] { siteId }));
         List<Sample> samples = appService.query(criteria);
-        return transformToWrapperList(appService, samples);
+        List<SampleWrapper> list = new ArrayList<SampleWrapper>();
+        for (Sample sample : samples) {
+            list.add(new SampleWrapper(appService, sample));
+        }
+        return list;
     }
 
     public static List<SampleWrapper> getRandomSamplesAlreadyAssigned(
@@ -361,7 +357,11 @@ public class SampleWrapper extends
             + " as sp) and s.patientVisit.patient.study.site.id = ?", Arrays
             .asList(new Object[] { siteId }));
         List<Sample> samples = appService.query(criteria);
-        return transformToWrapperList(appService, samples);
+        List<SampleWrapper> list = new ArrayList<SampleWrapper>();
+        for (Sample sample : samples) {
+            list.add(new SampleWrapper(appService, sample));
+        }
+        return list;
     }
 
     public static List<SampleWrapper> getRandomSamplesNotAssigned(
@@ -373,7 +373,11 @@ public class SampleWrapper extends
             + " as sp) and s.patientVisit.patient.study.site.id = ?", Arrays
             .asList(new Object[] { siteId }));
         List<Sample> samples = appService.query(criteria);
-        return transformToWrapperList(appService, samples);
+        List<SampleWrapper> list = new ArrayList<SampleWrapper>();
+        for (Sample sample : samples) {
+            list.add(new SampleWrapper(appService, sample));
+        }
+        return list;
     }
 
     @Override

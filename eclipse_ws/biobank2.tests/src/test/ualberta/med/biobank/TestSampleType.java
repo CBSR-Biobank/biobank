@@ -75,7 +75,7 @@ public class TestSampleType extends TestDatabase {
         int containerTypeNber = 10;
         ContainerTypeHelper.addContainerTypesRandom(site, name,
             containerTypeNber);
-        int nber = r.nextInt(containerTypeNber) + 1;
+        int nber = r.nextInt(containerTypeNber) + 3;
         List<ContainerTypeWrapper> containerTypes = site
             .getContainerTypeCollection();
         for (int i = 0; i < nber; i++) {
@@ -94,13 +94,6 @@ public class TestSampleType extends TestDatabase {
                 Assert.assertTrue(cType1.compareTo(cType2) <= 0);
             }
         }
-    }
-
-    @Test
-    public void testSetContainerTypeCollectionBoolean() throws Exception {
-        Assert.assertTrue(
-            "can't test setContainerType because of the *..* relation : "
-                + "only containerType.setSampleTypeCollection will work", true);
     }
 
     @Test
@@ -151,9 +144,8 @@ public class TestSampleType extends TestDatabase {
 
     @Test
     public void testGetGlobalSampleTypes() throws Exception {
-        List<SampleTypeWrapper> types = SampleTypeWrapper.getGlobalSampleTypes(
-            appService, false);
-        int startSize = types.size();
+        int startSize = SampleTypeWrapper.getGlobalSampleTypes(appService,
+            false).size();
 
         String name = "testGetGlobalSampleTypes" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
@@ -161,10 +153,21 @@ public class TestSampleType extends TestDatabase {
         Assert.assertEquals(startSize, SampleTypeWrapper.getGlobalSampleTypes(
             appService, false).size());
 
-        SampleTypeHelper.addSampleType(null, name);
+        SampleTypeHelper.addSampleType(null, name + "_2");
         Assert.assertEquals(startSize + 1, SampleTypeWrapper
             .getGlobalSampleTypes(appService, false).size());
 
+        SampleTypeHelper.addSampleType(null, "QWERTY" + name);
+        SampleTypeHelper.addSampleType(null, "ASDFG" + name);
+        List<SampleTypeWrapper> types = SampleTypeWrapper.getGlobalSampleTypes(
+            appService, true);
+        if (types.size() > 1) {
+            for (int i = 0; i < types.size() - 1; i++) {
+                SampleTypeWrapper cType1 = types.get(i);
+                SampleTypeWrapper cType2 = types.get(i + 1);
+                Assert.assertTrue(cType1.compareTo(cType2) <= 0);
+            }
+        }
     }
 
     @Test
@@ -175,6 +178,7 @@ public class TestSampleType extends TestDatabase {
 
         String name = "testPersistGlobalSampleTypes" + r.nextInt();
         SampleTypeWrapper type = SampleTypeHelper.newSampleType(null, name);
+        SampleTypeHelper.createdSampleTypes.add(type);
         types.add(type);
         SampleTypeWrapper.persistGlobalSampleTypes(appService, types);
         Assert.assertEquals(startSize + 1, SampleTypeWrapper
@@ -199,6 +203,79 @@ public class TestSampleType extends TestDatabase {
         int newTotal = appService.search(SampleType.class, new SampleType())
             .size();
         Assert.assertEquals(oldTotal + 1, newTotal);
+    }
+
+    @Test
+    public void testPersistFailNoName() throws Exception {
+        String name = "testPersist" + r.nextInt();
+        SiteWrapper site = SiteHelper.addSite(name);
+        SampleTypeWrapper type = SampleTypeHelper.newSampleType(site, name);
+        type.setName(null);
+        try {
+            type.persist();
+            Assert.fail("name should be set");
+        } catch (BiobankCheckException bce) {
+            Assert.assertTrue(true);
+        }
+
+        type.setName(name);
+        type.persist();
+    }
+
+    @Test
+    public void testPersistFailNoNameShort() throws Exception {
+        String name = "testPersist" + r.nextInt();
+        SiteWrapper site = SiteHelper.addSite(name);
+        SampleTypeWrapper type = SampleTypeHelper.newSampleType(site, name);
+        type.setNameShort(null);
+        try {
+            type.persist();
+            Assert.fail("nameshort should be set");
+        } catch (BiobankCheckException bce) {
+            Assert.assertTrue(true);
+        }
+
+        type.setNameShort(name);
+        type.persist();
+    }
+
+    @Test
+    public void testPersistFailNameUnique() throws Exception {
+        String name = "testPersist" + r.nextInt();
+        SiteWrapper site = SiteHelper.addSite(name);
+        SampleTypeHelper.addSampleType(site, name);
+
+        SampleTypeWrapper type = SampleTypeHelper.newSampleType(site, name
+            + "_2");
+        type.setName(name);
+        try {
+            type.persist();
+            Assert.fail("name should be unique");
+        } catch (BiobankCheckException bce) {
+            Assert.assertTrue(true);
+        }
+
+        type.setName(name + "_2");
+        type.persist();
+    }
+
+    @Test
+    public void testPersistFailNameShortUnique() throws Exception {
+        String name = "testPersist" + r.nextInt();
+        SiteWrapper site = SiteHelper.addSite(name);
+        SampleTypeHelper.addSampleType(site, name);
+
+        SampleTypeWrapper type = SampleTypeHelper.newSampleType(site, name);
+        type.setName(name + "_2");
+        try {
+            type.persist();
+            Assert.fail("name short should be unique");
+        } catch (BiobankCheckException bce) {
+            Assert.assertTrue(true);
+        }
+
+        type.setNameShort(name + "_2");
+        type.persist();
     }
 
     @Test
@@ -250,7 +327,6 @@ public class TestSampleType extends TestDatabase {
             + name);
         SampleTypeWrapper type2 = SampleTypeHelper.addSampleType(site, "ASDFG"
             + name);
-
         Assert.assertTrue(type.compareTo(type2) > 0);
         Assert.assertTrue(type2.compareTo(type) < 0);
     }

@@ -218,14 +218,13 @@ public class SiteWrapper extends ModelWrapper<Site> {
 
     private boolean checkSiteNameUnique() throws ApplicationException {
         HQLCriteria c;
-
-        if (getWrappedObject().getId() == null) {
+        if (isNew()) {
             c = new HQLCriteria("from " + Site.class.getName()
                 + " where name = ?", Arrays.asList(new Object[] { getName() }));
         } else {
             c = new HQLCriteria("from " + Site.class.getName()
-                + " as site where site <> ? and name = ?", Arrays
-                .asList(new Object[] { getWrappedObject(), getName() }));
+                + " where id <> ? and name = ?", Arrays.asList(new Object[] {
+                getId(), getName() }));
         }
 
         List<Object> results = appService.query(c);

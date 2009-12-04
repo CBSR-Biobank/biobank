@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -101,27 +102,6 @@ public class SampleTypeWrapper extends ModelWrapper<SampleType> {
         return getContainerTypeCollection(false);
     }
 
-    public void setContainerTypeCollection(Collection<ContainerType> types,
-        boolean setNull) {
-        Collection<ContainerType> oldTypes = wrappedObject
-            .getContainerTypeCollection();
-        wrappedObject.setContainerTypeCollection(types);
-        propertyChangeSupport.firePropertyChange("containerTypeCollection",
-            oldTypes, types);
-        if (setNull) {
-            propertiesMap.put("containerTypeCollection", null);
-        }
-    }
-
-    public void setContainerTypeCollection(List<ContainerTypeWrapper> types) {
-        Collection<ContainerType> typeObjects = new HashSet<ContainerType>();
-        for (ContainerTypeWrapper type : types) {
-            typeObjects.add(type.getWrappedObject());
-        }
-        setContainerTypeCollection(typeObjects, false);
-        propertiesMap.put("containerTypeCollection", types);
-    }
-
     @Override
     public Class<SampleType> getWrappedClass() {
         return SampleType.class;
@@ -130,6 +110,49 @@ public class SampleTypeWrapper extends ModelWrapper<SampleType> {
     @Override
     protected void persistChecks() throws BiobankCheckException,
         ApplicationException {
+        if (getName() == null || getNameShort() == null) {
+            throw new BiobankCheckException(
+                "Name and short name of this sample type cannot be null.");
+        }
+        checkNameUnique();
+        checkNameShortUnique();
+    }
+
+    private void checkNameShortUnique() throws ApplicationException,
+        BiobankCheckException {
+        HQLCriteria c;
+        if (isNew()) {
+            c = new HQLCriteria("from " + SampleType.class.getName()
+                + " where nameShort = ?", Arrays
+                .asList(new Object[] { getNameShort() }));
+        } else {
+            c = new HQLCriteria("from " + SampleType.class.getName()
+                + " where id <> ? and nameShort = ?", Arrays
+                .asList(new Object[] { getId(), getNameShort() }));
+        }
+        List<Object> results = appService.query(c);
+        if (results.size() > 0) {
+            throw new BiobankCheckException("A sample with short name \""
+                + getNameShort() + "\" already exists.");
+        }
+    }
+
+    private void checkNameUnique() throws BiobankCheckException,
+        ApplicationException {
+        HQLCriteria c;
+        if (isNew()) {
+            c = new HQLCriteria("from " + SampleType.class.getName()
+                + " where name = ?", Arrays.asList(new Object[] { getName() }));
+        } else {
+            c = new HQLCriteria("from " + SampleType.class.getName()
+                + " where id <> ? and name = ?", Arrays.asList(new Object[] {
+                getId(), getName() }));
+        }
+        List<Object> results = appService.query(c);
+        if (results.size() > 0) {
+            throw new BiobankCheckException("A sample with name \"" + getName()
+                + "\" already exists.");
+        }
     }
 
     /**
@@ -216,16 +239,9 @@ public class SampleTypeWrapper extends ModelWrapper<SampleType> {
         if (wrapper instanceof SampleTypeWrapper) {
             String name1 = wrappedObject.getName();
             String name2 = wrapper.wrappedObject.getName();
-
-            int compare = name1.compareTo(name2);
-            if (compare == 0) {
-                String nameShort1 = wrappedObject.getNameShort();
-                String nameShort2 = wrapper.wrappedObject.getNameShort();
-
-                return ((nameShort1.compareTo(nameShort2) > 0) ? 1
-                    : (nameShort1.equals(nameShort2) ? 0 : -1));
+            if (name1 != null && name2 != null) {
+                return name1.compareTo(name2);
             }
-            return (compare > 0) ? 1 : -1;
         }
         return 0;
     }

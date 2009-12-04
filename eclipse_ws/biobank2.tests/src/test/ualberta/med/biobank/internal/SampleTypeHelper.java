@@ -8,12 +8,13 @@ import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 
 public class SampleTypeHelper extends DbHelper {
 
-    protected static List<SampleTypeWrapper> createdSampleTypes = new ArrayList<SampleTypeWrapper>();
+    public static List<SampleTypeWrapper> createdSampleTypes = new ArrayList<SampleTypeWrapper>();
 
     public static SampleTypeWrapper newSampleType(SiteWrapper site, String name)
         throws Exception {
         SampleTypeWrapper type = new SampleTypeWrapper(appService);
         type.setName(name);
+        type.setNameShort(name);
         type.setSite(site);
         return type;
     }
