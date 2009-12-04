@@ -33,7 +33,15 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
     @Override
     protected void deleteChecks() throws BiobankCheckException,
         ApplicationException, WrapperException {
+        checkNoMorePatientVisits();
+    }
 
+    private void checkNoMorePatientVisits() throws BiobankCheckException {
+        List<PatientVisitWrapper> patients = getPatientVisitCollection();
+        if (patients != null && patients.size() > 0) {
+            throw new BiobankCheckException(
+                "Visits are still linked to this shipment. Deletion can't be done.");
+        }
     }
 
     @Override
@@ -101,8 +109,9 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
         if (wrapper instanceof ShipmentWrapper) {
             Date v1Date = wrappedObject.getDateShipped();
             Date v2Date = wrapper.wrappedObject.getDateShipped();
-            return ((v1Date.compareTo(v2Date) > 0) ? 1
-                : (v1Date.equals(v2Date) ? 0 : -1));
+            if (v1Date != null && v2Date != null) {
+                return v1Date.compareTo(v2Date);
+            }
         }
         return 0;
     }

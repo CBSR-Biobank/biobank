@@ -16,6 +16,7 @@ import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.SampleStorage;
+import edu.ualberta.med.biobank.model.SampleType;
 
 public class TestSampleStorage extends TestDatabase {
 
@@ -51,7 +52,6 @@ public class TestSampleStorage extends TestDatabase {
 
         Assert.assertEquals(newStudy, sampleStorage.getStudy());
         Assert.assertFalse(study.equals(sampleStorage.getStudy()));
-
     }
 
     @Test
@@ -144,4 +144,30 @@ public class TestSampleStorage extends TestDatabase {
         Assert.assertEquals(null, sampleStorage.getVolume());
     }
 
+    @Test
+    public void testCompareTo() throws Exception {
+        String name = "testCompareTo" + r.nextInt();
+        SiteWrapper site = SiteHelper.addSite(name);
+        StudyWrapper study = StudyHelper.addStudy(site, name);
+
+        SampleType type = new SampleType();
+        type.setName("Plasma");
+        type = (SampleType) appService.search(SampleType.class, type).get(0);
+        SampleTypeWrapper typeWrapperPlasma = new SampleTypeWrapper(appService,
+            type);
+
+        type = new SampleType();
+        type.setName("Hair");
+        type = (SampleType) appService.search(SampleType.class, type).get(0);
+        SampleTypeWrapper typeWrapperHair = new SampleTypeWrapper(appService,
+            type);
+
+        SampleStorageWrapper sampleStorage1 = SampleStorageHelper
+            .addSampleStorage(study, typeWrapperPlasma);
+        SampleStorageWrapper sampleStorage2 = SampleStorageHelper
+            .addSampleStorage(study, typeWrapperHair);
+
+        Assert.assertTrue(sampleStorage1.compareTo(sampleStorage2) > 0);
+        Assert.assertTrue(sampleStorage2.compareTo(sampleStorage1) < 0);
+    }
 }

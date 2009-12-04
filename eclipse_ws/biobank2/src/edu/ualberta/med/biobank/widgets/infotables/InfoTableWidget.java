@@ -33,10 +33,6 @@ public class InfoTableWidget<T> extends BiobankWidget {
     private static Logger LOGGER = Logger.getLogger(InfoTableWidget.class
         .getName());
 
-    // FIXME - used to inform listeners of changes to the widget
-    // could be done in a better way
-    private int setCollectionCount;
-
     protected List<BiobankCollectionModel> model;
 
     public InfoTableWidget(Composite parent, Collection<T> collection,
@@ -89,9 +85,7 @@ public class InfoTableWidget<T> extends BiobankWidget {
             }
             getTableViewer().refresh();
             setCollection(collection);
-            setCollectionCount = 0;
-        } else
-            setCollectionCount = 1;
+        }
     }
 
     public void addDoubleClickListener(IDoubleClickListener listener) {

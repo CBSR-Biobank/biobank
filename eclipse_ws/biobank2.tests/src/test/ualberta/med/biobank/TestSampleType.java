@@ -97,6 +97,13 @@ public class TestSampleType extends TestDatabase {
     }
 
     @Test
+    public void testSetContainerTypeCollectionBoolean() throws Exception {
+        Assert.assertTrue(
+            "can't test setContainerType because of the *..* relation : "
+                + "only containerType.setSampleTypeCollection will work", true);
+    }
+
+    @Test
     public void testGetSampleTypeForContainerTypes() throws Exception {
         String name = "testGetContainerTypeCollection" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
@@ -235,4 +242,16 @@ public class TestSampleType extends TestDatabase {
         Assert.assertEquals(null, type.getName());
     }
 
+    @Test
+    public void testCompareTo() throws Exception {
+        String name = "testCompareTo" + r.nextInt();
+        SiteWrapper site = SiteHelper.addSite(name);
+        SampleTypeWrapper type = SampleTypeHelper.addSampleType(site, "QWERTY"
+            + name);
+        SampleTypeWrapper type2 = SampleTypeHelper.addSampleType(site, "ASDFG"
+            + name);
+
+        Assert.assertTrue(type.compareTo(type2) > 0);
+        Assert.assertTrue(type2.compareTo(type) < 0);
+    }
 }

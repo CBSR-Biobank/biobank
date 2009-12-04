@@ -385,13 +385,20 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
                     appendLog("Checking position " + positionString);
                     sampleWrapper.setSamplePositionFromString(positionString,
                         bin);
-                    sampleWrapper.checkPosition(bin);
-                    sampleWrapper.setParent(bin);
+                    if (sampleWrapper.isPositionFree(bin)) {
+                        sampleWrapper.setParent(bin);
 
-                    showPositions();
+                        showPositions();
 
-                    resultShownValue.setValue(Boolean.TRUE);
-                    cancelConfirmWidget.setFocus();
+                        resultShownValue.setValue(Boolean.TRUE);
+                        cancelConfirmWidget.setFocus();
+                    } else {
+                        String msg = "Position "
+                            + sampleWrapper.getPositionString()
+                            + " already in use in container " + bin.getLabel();
+                        BioBankPlugin.openAsyncError("Position not free", msg);
+                        appendLog("ERROR: " + msg);
+                    }
                 } catch (RemoteConnectFailureException exp) {
                     BioBankPlugin.openRemoteConnectErrorMessage();
                 } catch (BiobankCheckException bce) {

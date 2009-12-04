@@ -293,10 +293,67 @@ public class TestContainer extends TestDatabase {
         }
     }
 
-    @Test(expected = BiobankCheckException.class)
-    public void testCheckHoldsContainerTypes() throws Exception {
-        ContainerHelper.addContainer("02", TestCommon.getNewBarcode(r), null,
-            site, null);
+    @Test
+    public void testCheckParentAcceptContainerType() throws Exception {
+        ContainerTypeWrapper type = containerTypeMap.get("ChildCtL4");
+
+        ContainerWrapper container = ContainerHelper.newContainer("02",
+            TestCommon.getNewBarcode(r), null, site, type);
+        container.setPosition(0, 0);
+
+        // should have a parent
+        try {
+            container.persist();
+            Assert
+                .fail("this container type is not top level. A parent is needed");
+        } catch (BiobankCheckException bce) {
+            Assert.assertTrue(true);
+        }
+
+        ContainerWrapper parent = containerMap.get("Top");
+        container.setParent(parent);
+        try {
+            container.persist();
+            Assert.fail("Parent does not accept this container type");
+        } catch (BiobankCheckException bce) {
+            Assert.assertTrue(true);
+        }
+
+        container.setContainerType(parent.getContainerType()
+            .getChildContainerTypeCollection().get(0));
+        container.persist();
+    }
+
+    @Test
+    public void testCheckPositionOk() throws Exception {
+        ContainerWrapper parent = containerMap.get("Top");
+        ContainerTypeWrapper type = parent.getContainerType()
+            .getChildContainerTypeCollection().get(0);
+
+        ContainerWrapper container = ContainerHelper.newContainer("02",
+            TestCommon.getNewBarcode(r), parent, site, type);
+        container.setPosition(10, 10);
+        try {
+            container.persist();
+            Assert.fail("position not ok in parent container");
+        } catch (BiobankCheckException bce) {
+            Assert.assertTrue(true);
+        }
+
+        container.setPosition(0, 0);
+        container.persist();
+
+        ContainerWrapper container2 = ContainerHelper.newContainer(null,
+            TestCommon.getNewBarcode(r), null, site, type);
+        container2.setPosition(0, 0);
+        container2.setParent(parent);
+        container2.setContainerType(type);
+        try {
+            container2.persist();
+            Assert.fail("position not available");
+        } catch (BiobankCheckException bce) {
+            Assert.assertTrue(true);
+        }
     }
 
     @Test
@@ -970,8 +1027,11 @@ public class TestContainer extends TestDatabase {
             .getGlobalSampleTypes(appService, true);
         PatientVisitWrapper pv = addPatientVisit();
         ContainerWrapper childL4 = containerMap.get("ChildL4");
-        SampleWrapper sample = SampleHelper.addSample(allSampleTypes.get(0),
-            childL4, pv, 0, 0);
+        SampleTypeWrapper sampleType = allSampleTypes.get(0);
+        childL4.getContainerType().setSampleTypeCollection(
+            Arrays.asList(new SampleTypeWrapper[] { sampleType }));
+        SampleWrapper sample = SampleHelper.addSample(sampleType, childL4, pv,
+            0, 0);
 
         // attempt to delete the containers - should fail
         String[] names = new String[] { "ChildL4", "ChildL3", "ChildL2",

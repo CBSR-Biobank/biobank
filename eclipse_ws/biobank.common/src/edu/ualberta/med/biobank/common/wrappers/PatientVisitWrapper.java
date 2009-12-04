@@ -20,7 +20,6 @@ import edu.ualberta.med.biobank.model.PvAttr;
 import edu.ualberta.med.biobank.model.PvSampleSource;
 import edu.ualberta.med.biobank.model.Sample;
 import edu.ualberta.med.biobank.model.Shipment;
-import edu.ualberta.med.biobank.model.Study;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -281,31 +280,31 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
     protected void persistChecks() throws BiobankCheckException,
         ApplicationException, WrapperException {
 
-        // FIXME check shipment/patient ??
+        checkPatientInShipment();
 
         checkVisitDateProcessedUnique();
 
         checkPatientClinicInSameStudy();
     }
 
+    private void checkPatientInShipment() throws BiobankCheckException {
+        List<PatientWrapper> shipmentPatients = getShipment()
+            .getPatientCollection();
+        if (shipmentPatients == null
+            || !shipmentPatients.contains(getPatient())) {
+            throw new BiobankCheckException(
+                "The patient should be part of the shipment");
+        }
+    }
+
     private void checkPatientClinicInSameStudy() throws ApplicationException,
         BiobankCheckException {
-        HQLCriteria c = new HQLCriteria(
-            "select count(study) from "
-                + Study.class.getName()
-                + " as study inner join study.contactCollection as studyContacts"
-                + " inner join studyContacts.clinic as clinic"
-                + " inner join clinic.shipmentCollection as shipments"
-                + " inner join shipments.patientCollection as patients"
-                + " where patients.study.id=study.id and shipments.id=? and patients.id = ?",
-            Arrays.asList(new Object[] { getShipment().getId(),
-                getPatient().getId() }));
+        ClinicWrapper shipmentClinic = getShipment().getClinic();
+        List<ClinicWrapper> patientStudyClinics = getPatient().getStudy()
+            .getClinicCollection();
 
-        List<Long> result = appService.query(c);
-        if (result.size() != 1) {
-            throw new BiobankCheckException("Invalid size for HQL query result");
-        }
-        if (result.get(0) == 0) {
+        if (patientStudyClinics == null
+            || !patientStudyClinics.contains(shipmentClinic)) {
             throw new BiobankCheckException(
                 "The patient study is not linked with this clinic. Choose another clinic.");
         }
@@ -470,8 +469,9 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
         if (wrapper instanceof PatientVisitWrapper) {
             Date v1Date = wrappedObject.getDateProcessed();
             Date v2Date = wrapper.wrappedObject.getDateProcessed();
-            return ((v1Date.compareTo(v2Date) > 0) ? 1
-                : (v1Date.equals(v2Date) ? 0 : -1));
+            if (v1Date != null && v2Date != null) {
+                return v1Date.compareTo(v2Date);
+            }
         }
         return 0;
     }

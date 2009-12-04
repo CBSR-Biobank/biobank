@@ -22,6 +22,7 @@ public class ClinicHelper extends DbHelper {
         if (addContacts) {
             ContactHelper.addContactsToClinic(clinic, name);
         }
+        site.reload();
         return clinic;
     }
 

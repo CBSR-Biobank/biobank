@@ -44,7 +44,17 @@ public abstract class AbstractPositionHolder<E, T extends AbstractPosition>
         if (posWrapper != null) {
             posWrapper.persistChecks();
         }
+        checkParentFromSameSite();
     }
+
+    private void checkParentFromSameSite() throws BiobankCheckException {
+        if (getParent() != null && !getParent().getSite().equals(getSite())) {
+            throw new BiobankCheckException(
+                "Parent should be part of the same site");
+        }
+    }
+
+    public abstract SiteWrapper getSite();
 
     @Override
     public void reset() throws Exception {

@@ -410,7 +410,7 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
     }
 
     @SuppressWarnings("unchecked")
-    public List<PatientVisitWrapper> getPatientVisitCollection(boolean sort)
+    public List<PatientVisitWrapper> getPatientVisitCollection()
         throws ApplicationException {
         List<PatientVisitWrapper> pvCollection = (List<PatientVisitWrapper>) propertiesMap
             .get("patientVisitCollection");
@@ -425,15 +425,9 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
             for (PatientVisit pv : collection) {
                 pvCollection.add(new PatientVisitWrapper(appService, pv));
             }
-            if (sort)
-                Collections.sort(pvCollection);
             propertiesMap.put("patientVisitCollection", pvCollection);
         }
         return pvCollection;
     }
 
-    public List<PatientVisitWrapper> getPatientVisitCollection()
-        throws ApplicationException {
-        return getPatientVisitCollection(false);
-    }
 }

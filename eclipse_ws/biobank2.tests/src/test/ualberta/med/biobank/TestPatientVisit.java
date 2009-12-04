@@ -304,6 +304,16 @@ public class TestPatientVisit extends TestDatabase {
     }
 
     @Test
+    public void testCheckPatientInShipment() {
+        fail("Not yet implemented");
+    }
+
+    @Test
+    public void testCheckPatientClinicInSameStudy() {
+        fail("Not yet implemented");
+    }
+
+    @Test
     public void testPersist() throws Exception {
         PatientVisitWrapper pv = PatientVisitHelper.newPatientVisit(patient,
             shipment, DateFormatter.dateFormatter.parse("2009-12-25 00:00"));

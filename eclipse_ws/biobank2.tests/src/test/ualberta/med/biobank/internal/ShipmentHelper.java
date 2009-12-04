@@ -45,6 +45,7 @@ public class ShipmentHelper extends DbHelper {
         ShipmentWrapper shipment = newShipment(clinic, waybill, Utils
             .getRandomDate(), patients);
         shipment.persist();
+        clinic.reload();
         return shipment;
     }
 
