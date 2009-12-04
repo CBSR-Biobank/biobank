@@ -638,8 +638,7 @@ public class SiteWrapper extends ModelWrapper<Site> {
      * @throws BiobankCheckException
      * @throws Exception
      */
-    private void deleteSampleTypeDifference(Site origSite)
-        throws BiobankCheckException, ApplicationException, WrapperException {
+    private void deleteSampleTypeDifference(Site origSite) throws Exception {
         List<SampleTypeWrapper> newSampleType = getSampleTypeCollection();
         List<SampleTypeWrapper> oldSampleSources = new SiteWrapper(appService,
             origSite).getSampleTypeCollection();
@@ -706,8 +705,7 @@ public class SiteWrapper extends ModelWrapper<Site> {
      * @throws BiobankCheckException
      * @throws Exception
      */
-    private void deleteSitePvAttrDifference(Site origSite)
-        throws BiobankCheckException, ApplicationException, WrapperException {
+    private void deleteSitePvAttrDifference(Site origSite) throws Exception {
         List<SitePvAttrWrapper> oldSitePvAttr = new SiteWrapper(appService,
             origSite).getSitePvAttrCollection();
         if (oldSitePvAttr == null)
@@ -832,8 +830,7 @@ public class SiteWrapper extends ModelWrapper<Site> {
     }
 
     @Override
-    protected void persistDependencies(Site origObject)
-        throws BiobankCheckException, ApplicationException, WrapperException {
+    protected void persistDependencies(Site origObject) throws Exception {
         if (origObject != null) {
             deleteSampleTypeDifference(origObject);
             deleteSitePvAttrDifference(origObject);

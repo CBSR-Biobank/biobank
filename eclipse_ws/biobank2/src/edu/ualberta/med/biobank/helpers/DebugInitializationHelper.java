@@ -23,6 +23,7 @@ import org.eclipse.ui.progress.IProgressConstants;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.LabelingScheme;
 import edu.ualberta.med.biobank.common.RowColPos;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
@@ -39,6 +40,7 @@ import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingCompanyWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.common.wrappers.WrapperException;
 import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
 import edu.ualberta.med.biobank.model.SampleStorage;
 import edu.ualberta.med.biobank.model.SampleType;
@@ -178,8 +180,7 @@ public class DebugInitializationHelper {
     }
 
     @SuppressWarnings("unused")
-    private void insertClinicsInSite() throws ApplicationException,
-        BiobankCheckException, WrapperException {
+    private void insertClinicsInSite() throws Exception {
         for (int i = 0; i < 2; ++i) {
             ClinicWrapper clinic = new ClinicWrapper(appService);
             clinic.setName("Clinic " + (i + 1));
@@ -360,7 +361,7 @@ public class DebugInitializationHelper {
     private ContainerTypeWrapper insertContainerTypeInSite(String name,
         String shortName, boolean topLevel, int dim1, int dim2,
         List<ContainerTypeWrapper> children, Integer childLabelingScheme)
-        throws ApplicationException, BiobankCheckException, WrapperException {
+        throws Exception {
         return insertContainerTypeInSite(name, shortName, topLevel, dim1, dim2,
             children, null, childLabelingScheme);
     }
@@ -369,7 +370,7 @@ public class DebugInitializationHelper {
         String shortName, boolean topLevel, int dim1, int dim2,
         List<ContainerTypeWrapper> children,
         List<SampleTypeWrapper> sampleTypes, Integer childLabelingScheme)
-        throws ApplicationException, BiobankCheckException, WrapperException {
+        throws Exception {
         ContainerTypeWrapper ct = new ContainerTypeWrapper(appService);
         ct.setName(name);
         ct.setNameShort(shortName);
