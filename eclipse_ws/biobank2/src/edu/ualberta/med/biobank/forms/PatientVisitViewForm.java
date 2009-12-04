@@ -14,7 +14,7 @@ import org.eclipse.swt.widgets.Label;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
-import edu.ualberta.med.biobank.model.PvCustomInfo;
+import edu.ualberta.med.biobank.model.PvAttrCustom;
 import edu.ualberta.med.biobank.treeview.PatientVisitAdapter;
 import edu.ualberta.med.biobank.widgets.infotables.PvSampleSourceInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.SamplesListInfoTable;
@@ -44,7 +44,7 @@ public class PatientVisitViewForm extends BiobankViewForm {
 
     private Label usernameLabel;
 
-    private class FormPvCustomInfo extends PvCustomInfo {
+    private class FormPvCustomInfo extends PvAttrCustom {
         Label widget;
     }
 

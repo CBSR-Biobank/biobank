@@ -23,6 +23,7 @@ import org.eclipse.ui.progress.IProgressConstants;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.LabelingScheme;
 import edu.ualberta.med.biobank.common.RowColPos;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
@@ -39,6 +40,7 @@ import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingCompanyWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.common.wrappers.WrapperException;
 import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
 import edu.ualberta.med.biobank.model.SampleStorage;
 import edu.ualberta.med.biobank.model.SampleType;
@@ -162,10 +164,18 @@ public class DebugInitializationHelper {
     }
 
     @SuppressWarnings("unused")
-    private void insertSite() throws Exception {
+    private void insertSite() throws Exception, BiobankCheckException,
+        WrapperException {
         site = new SiteWrapper(appService);
-        site.setName("Site Edmonton Test");
+        site.setName("CBSR");
         site.setCity("Edmonton");
+
+        site.setSitePvAttr("Biobpsy Length", "number");
+        site.setSitePvAttr("PMBC Count", "number");
+        site.setSitePvAttr("Worksheet", "text");
+        site.setSitePvAttr("Consent", "select_multiple");
+        site.setSitePvAttr("Visit Type", "select_single");
+
         site.persist();
     }
 
