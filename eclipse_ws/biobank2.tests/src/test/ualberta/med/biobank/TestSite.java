@@ -666,6 +666,23 @@ public class TestSite extends TestDatabase {
         Assert.assertEquals(type, site2.getSitePvAttrTypeName(name));
         Assert.assertFalse(Arrays.asList(site.getSitePvAttrLabels()).contains(
             name));
+
+        // set non existing type, expect exception
+        try {
+            site.setSitePvAttr(Utils.getRandomString(10, 15), Utils
+                .getRandomString(10, 15));
+            Assert.fail("call should generate an exception");
+        } catch (Exception e) {
+            Assert.assertTrue(true);
+        }
+
+        // delete non existing label, expect exception
+        try {
+            site.deleteSitePvAttr(Utils.getRandomString(10, 15));
+            Assert.fail("call should generate an exception");
+        } catch (Exception e) {
+            Assert.assertTrue(true);
+        }
     }
 
     @Test
@@ -714,6 +731,14 @@ public class TestSite extends TestDatabase {
         site.persist();
         site.reload();
         Assert.assertEquals(type.getId(), site.getSitePvAttrType(label));
+
+        // get type for non existing label, expect exception
+        try {
+            site.getSitePvAttrType(Utils.getRandomString(10, 15));
+            Assert.fail("call should generate an exception");
+        } catch (Exception e) {
+            Assert.assertTrue(true);
+        }
     }
 
     @Test

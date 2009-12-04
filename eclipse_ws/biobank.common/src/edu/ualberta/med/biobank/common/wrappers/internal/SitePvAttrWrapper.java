@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.common.wrappers.internal;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.BiobankCheckException;
@@ -12,7 +11,6 @@ import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.SitePvAttr;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
-import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class SitePvAttrWrapper extends ModelWrapper<SitePvAttr> {
 
@@ -104,20 +102,6 @@ public class SitePvAttrWrapper extends ModelWrapper<SitePvAttr> {
         for (SitePvAttr type : pipList) {
             list.add(new SitePvAttrWrapper(appService, type));
         }
-        return list;
-    }
-
-    public static List<SitePvAttrWrapper> getGlobalSitePvAttr(
-        WritableApplicationService appService, boolean sort)
-        throws ApplicationException {
-        HQLCriteria c = new HQLCriteria("from " + SitePvAttr.class.getName()
-            + " where site = null");
-
-        List<SitePvAttr> pipList = appService.query(c);
-        List<SitePvAttrWrapper> list = transformToWrapperList(appService,
-            pipList);
-        if (sort)
-            Collections.sort(list);
         return list;
     }
 
