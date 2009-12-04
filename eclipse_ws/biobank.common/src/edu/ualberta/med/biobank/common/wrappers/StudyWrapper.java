@@ -599,6 +599,8 @@ public class StudyWrapper extends ModelWrapper<Study> {
                 + "\" is in use by patient visits");
         }
         studyPvAttrMap.remove(label);
+        setStudyPvAttrCollection(new ArrayList<StudyPvAttrWrapper>(
+            studyPvAttrMap.values()));
     }
 
     public List<ClinicWrapper> getClinicCollection()

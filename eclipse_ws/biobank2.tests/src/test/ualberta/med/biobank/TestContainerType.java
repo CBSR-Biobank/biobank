@@ -341,9 +341,10 @@ public class TestContainerType extends TestDatabase {
         }
 
         // now delete all containers
-        for (ContainerWrapper container : containers) {
-            container.delete();
-        }
+        containers.get(3).delete();
+        containers.get(2).delete();
+        containers.get(1).delete();
+        containers.get(0).delete();
         containers.clear();
 
         for (String key : keys) {

@@ -1,6 +1,8 @@
 package test.ualberta.med.biobank.internal;
 
-import test.ualberta.med.biobank.Utils;
+import java.util.Random;
+
+import test.ualberta.med.biobank.TestCommon;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
@@ -13,7 +15,7 @@ public class SampleHelper extends DbHelper {
         Integer col) {
         SampleWrapper sample = new SampleWrapper(appService);
         sample.setSampleType(sampleType);
-        sample.setInventoryId(Utils.getRandomString(20));
+        sample.setInventoryId(TestCommon.getNewInventoryId(new Random()));
         sample.setParent(container);
         sample.setPatientVisit(pv);
         sample.setPosition(row, col);

@@ -827,6 +827,8 @@ public class SiteWrapper extends ModelWrapper<Site> {
                 + "\" does not exist");
         }
         sitePvAttrMap.remove(label);
+        setSitePvAttrCollection(new ArrayList<SitePvAttrWrapper>(sitePvAttrMap
+            .values()));
     }
 
     @Override

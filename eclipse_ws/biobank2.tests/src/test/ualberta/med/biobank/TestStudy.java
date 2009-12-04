@@ -359,6 +359,32 @@ public class TestStudy extends TestDatabase {
     }
 
     @Test
+    public void testRemoveStudyPvAttr() throws Exception {
+        String name = "testRemoveStudyPvAttr" + r.nextInt();
+        SiteWrapper site = SiteHelper.addSite(name);
+        StudyWrapper study = StudyHelper.addStudy(site, name);
+
+        int sizeOrig = study.getStudyPvAttrLabels().length;
+        List<String> types = SiteWrapper.getPvAttrTypeNames(appService);
+        if (types.size() < 2) {
+            Assert.fail("Can't test without PvAttrTypes");
+        }
+
+        study.setStudyPvAttr(name, types.get(0));
+        study.setStudyPvAttr(name + "_2", types.get(1));
+        study.persist();
+
+        study.reload();
+        Assert.assertEquals(sizeOrig + 2, study.getStudyPvAttrLabels().length);
+        study.deleteStudyPvAttr(name);
+        Assert.assertEquals(sizeOrig + 1, study.getStudyPvAttrLabels().length);
+        site.persist();
+
+        site.reload();
+        Assert.assertEquals(sizeOrig + 1, study.getStudyPvAttrLabels().length);
+    }
+
+    @Test
     public void testGetClinicCollection() throws Exception {
         String name = "testGetClinicCollection" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
