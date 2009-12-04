@@ -28,7 +28,7 @@ import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
-import edu.ualberta.med.biobank.model.PvCustomInfo;
+import edu.ualberta.med.biobank.model.PvAttrCustom;
 import edu.ualberta.med.biobank.model.Shipment;
 import edu.ualberta.med.biobank.treeview.PatientAdapter;
 import edu.ualberta.med.biobank.treeview.PatientVisitAdapter;
@@ -61,7 +61,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
 
     private PatientWrapper patient;
 
-    private class FormPvCustomInfo extends PvCustomInfo {
+    private class FormPvCustomInfo extends PvAttrCustom {
         Control control;
     }
 

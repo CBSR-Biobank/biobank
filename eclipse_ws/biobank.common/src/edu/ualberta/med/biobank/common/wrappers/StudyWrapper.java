@@ -299,7 +299,8 @@ public class StudyWrapper extends ModelWrapper<Study> {
     /*
      * Removes the StudyPvAttr objects that are not contained in the collection.
      */
-    private void deleteStudyPvAttrDifference(Study origStudy) throws Exception {
+    private void deleteStudyPvAttrDifference(Study origStudy)
+        throws BiobankCheckException, ApplicationException, WrapperException {
         List<StudyPvAttrWrapper> oldStudyPvAttrList = new StudyWrapper(
             appService, origStudy).getStudyPvAttrCollection();
         if (oldStudyPvAttrList == null) {
@@ -324,7 +325,7 @@ public class StudyWrapper extends ModelWrapper<Study> {
      * @throws Exception
      */
     private void deleteSampleStorageDifference(Study origStudy)
-        throws Exception {
+        throws BiobankCheckException, ApplicationException, WrapperException {
         List<SampleStorageWrapper> newSampleStorage = getSampleStorageCollection();
         List<SampleStorageWrapper> oldSampleStorage = new StudyWrapper(
             appService, origStudy).getSampleStorageCollection();
@@ -392,7 +393,8 @@ public class StudyWrapper extends ModelWrapper<Study> {
      * @throws BiobankCheckException
      * @throws Exception
      */
-    private void deleteSampleSourceDifference(Study origStudy) throws Exception {
+    private void deleteSampleSourceDifference(Study origStudy)
+        throws BiobankCheckException, ApplicationException, WrapperException {
         List<SampleSourceWrapper> newSampleSource = getSampleSourceCollection();
         List<SampleSourceWrapper> oldSampleSource = new StudyWrapper(
             appService, origStudy).getSampleSourceCollection();
@@ -537,8 +539,13 @@ public class StudyWrapper extends ModelWrapper<Study> {
             studyPvAttr.setStudy(wrappedObject);
         }
         studyPvAttr.setLocked(false);
-        studyPvAttr.setPermissible(StringUtils.join(permissibleValues, ';'));
+        if (permissibleValues != null) {
+            studyPvAttr
+                .setPermissible(StringUtils.join(permissibleValues, ';'));
+        }
         studyPvAttrMap.put(label, studyPvAttr);
+        setStudyPvAttrCollection(new ArrayList<StudyPvAttrWrapper>(
+            studyPvAttrMap.values()));
     }
 
     /**
@@ -586,8 +593,12 @@ public class StudyWrapper extends ModelWrapper<Study> {
         getStudyPvAttrMap();
         StudyPvAttrWrapper studyPvAttr = studyPvAttrMap.get(label);
         if (studyPvAttr == null) {
-            throw new Exception("StudyPvAttr with label \"" + label
-                + "\" does not exist");
+            throw new Exception("the pv attribute \"" + label
+                + "\" does not exist for this study");
+        }
+        if (studyPvAttr.isUsedByPatientVisits()) {
+            throw new BiobankCheckException("StudyPvAttr with label \"" + label
+                + "\" is in use by patient visits");
         }
         studyPvAttrMap.remove(label);
     }
@@ -737,19 +748,8 @@ public class StudyWrapper extends ModelWrapper<Study> {
     }
 
     @Override
-    protected void persistDependencies(Study origObject) throws Exception {
-        // add new StudyPvAttrs
-        if (studyPvAttrMap != null) {
-            List<StudyPvAttrWrapper> list = new ArrayList<StudyPvAttrWrapper>(
-                studyPvAttrMap.values());
-            for (StudyPvAttrWrapper studyPvAttr : list) {
-                if (studyPvAttr.isNew()) {
-                    studyPvAttr.persist();
-                }
-            }
-            setStudyPvAttrCollection(list);
-        }
-
+    protected void persistDependencies(Study origObject)
+        throws BiobankCheckException, ApplicationException, WrapperException {
         if (origObject != null) {
             deleteSampleStorageDifference(origObject);
             deleteSampleSourceDifference(origObject);

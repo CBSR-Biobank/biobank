@@ -1,6 +1,6 @@
 package edu.ualberta.med.biobank.model;
 
-public class PvCustomInfo {
+public class PvAttrCustom {
     private Boolean isDefault;
     private String label;
     private String type;

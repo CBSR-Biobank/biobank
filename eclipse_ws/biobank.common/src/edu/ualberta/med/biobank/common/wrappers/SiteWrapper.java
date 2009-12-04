@@ -638,7 +638,8 @@ public class SiteWrapper extends ModelWrapper<Site> {
      * @throws BiobankCheckException
      * @throws Exception
      */
-    private void deleteSampleTypeDifference(Site origSite) throws Exception {
+    private void deleteSampleTypeDifference(Site origSite)
+        throws BiobankCheckException, ApplicationException, WrapperException {
         List<SampleTypeWrapper> newSampleType = getSampleTypeCollection();
         List<SampleTypeWrapper> oldSampleSources = new SiteWrapper(appService,
             origSite).getSampleTypeCollection();
@@ -705,7 +706,8 @@ public class SiteWrapper extends ModelWrapper<Site> {
      * @throws BiobankCheckException
      * @throws Exception
      */
-    private void deleteSitePvAttrDifference(Site origSite) throws Exception {
+    private void deleteSitePvAttrDifference(Site origSite)
+        throws BiobankCheckException, ApplicationException, WrapperException {
         List<SitePvAttrWrapper> oldSitePvAttr = new SiteWrapper(appService,
             origSite).getSitePvAttrCollection();
         if (oldSitePvAttr == null)
@@ -802,20 +804,20 @@ public class SiteWrapper extends ModelWrapper<Site> {
                 + "\" is invalid");
         }
 
-        SitePvAttrWrapper pip = getSitePvAttr(label);
-        if (pip == null) {
-            pip = new SitePvAttrWrapper(appService, new SitePvAttr());
-            pip.setLabel(label);
-            sitePvAttrMap.put(label, pip);
+        SitePvAttrWrapper sitePvAttr = getSitePvAttr(label);
+        if (sitePvAttr == null) {
+            sitePvAttr = new SitePvAttrWrapper(appService, new SitePvAttr());
+            sitePvAttr.setLabel(label);
+            sitePvAttr.setSite(this);
+            sitePvAttrMap.put(label, sitePvAttr);
         }
-        pip.setPvAttrType(pvAttrType);
-        pip.setSite(this);
+        sitePvAttr.setPvAttrType(pvAttrType);
 
         List<SitePvAttrWrapper> list = getSitePvAttrCollection();
         if (list == null) {
             list = new ArrayList<SitePvAttrWrapper>();
         }
-        list.add(pip);
+        list.add(sitePvAttr);
         setSitePvAttrCollection(list);
     }
 
@@ -830,21 +832,8 @@ public class SiteWrapper extends ModelWrapper<Site> {
     }
 
     @Override
-    protected void persistDependencies(Site origObject) throws Exception {
-        if (sitePvAttrMap != null) {
-            List<SitePvAttrWrapper> list = new ArrayList<SitePvAttrWrapper>(
-                sitePvAttrMap.values());
-            List<SitePvAttrWrapper> siteSitePvAttrList = new ArrayList<SitePvAttrWrapper>();
-            for (SitePvAttrWrapper sitePvAttr : list) {
-                if (sitePvAttr.getSite() != null) {
-                    if (sitePvAttr.isNew()) {
-                        sitePvAttr.persist();
-                    }
-                    siteSitePvAttrList.add(sitePvAttr);
-                }
-            }
-            setSitePvAttrCollection(siteSitePvAttrList);
-        }
+    protected void persistDependencies(Site origObject)
+        throws BiobankCheckException, ApplicationException, WrapperException {
         if (origObject != null) {
             deleteSampleTypeDifference(origObject);
             deleteSitePvAttrDifference(origObject);

@@ -162,15 +162,24 @@ public class DebugInitializationHelper {
     }
 
     @SuppressWarnings("unused")
-    private void insertSite() throws Exception {
+    private void insertSite() throws Exception, BiobankCheckException,
+        WrapperException {
         site = new SiteWrapper(appService);
-        site.setName("Site Edmonton Test");
+        site.setName("CBSR");
         site.setCity("Edmonton");
+
+        site.setSitePvAttr("Biobpsy Length", "number");
+        site.setSitePvAttr("PMBC Count", "number");
+        site.setSitePvAttr("Worksheet", "text");
+        site.setSitePvAttr("Consent", "select_multiple");
+        site.setSitePvAttr("Visit Type", "select_single");
+
         site.persist();
     }
 
     @SuppressWarnings("unused")
-    private void insertClinicsInSite() throws Exception {
+    private void insertClinicsInSite() throws ApplicationException,
+        BiobankCheckException, WrapperException {
         for (int i = 0; i < 2; ++i) {
             ClinicWrapper clinic = new ClinicWrapper(appService);
             clinic.setName("Clinic " + (i + 1));
@@ -351,7 +360,7 @@ public class DebugInitializationHelper {
     private ContainerTypeWrapper insertContainerTypeInSite(String name,
         String shortName, boolean topLevel, int dim1, int dim2,
         List<ContainerTypeWrapper> children, Integer childLabelingScheme)
-        throws Exception {
+        throws ApplicationException, BiobankCheckException, WrapperException {
         return insertContainerTypeInSite(name, shortName, topLevel, dim1, dim2,
             children, null, childLabelingScheme);
     }
@@ -360,7 +369,7 @@ public class DebugInitializationHelper {
         String shortName, boolean topLevel, int dim1, int dim2,
         List<ContainerTypeWrapper> children,
         List<SampleTypeWrapper> sampleTypes, Integer childLabelingScheme)
-        throws Exception {
+        throws ApplicationException, BiobankCheckException, WrapperException {
         ContainerTypeWrapper ct = new ContainerTypeWrapper(appService);
         ct.setName(name);
         ct.setNameShort(shortName);

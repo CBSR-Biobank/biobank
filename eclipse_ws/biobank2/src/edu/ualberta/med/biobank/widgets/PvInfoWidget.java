@@ -23,7 +23,7 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.dialogs.ListAddDialog;
-import edu.ualberta.med.biobank.model.PvCustomInfo;
+import edu.ualberta.med.biobank.model.PvAttrCustom;
 
 public class PvInfoWidget extends BiobankWidget {
     private Button checkButton;
@@ -59,14 +59,14 @@ public class PvInfoWidget extends BiobankWidget {
     };
 
     public PvInfoWidget(Composite parent, int style,
-        final PvCustomInfo pvCustomInfo, boolean selected) {
+        final PvAttrCustom pvCustomInfo, boolean selected) {
         super(parent, style);
 
         setLayout(new GridLayout(1, false));
         setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-        hasListValues = (pvCustomInfo.getType().equals(4) || pvCustomInfo
-            .getType().equals(5));
+        hasListValues = (pvCustomInfo.getType().equals("select_single") || pvCustomInfo
+            .getType().equals("select_multiple"));
         selected |= (pvCustomInfo.getAllowedValues() != null);
 
         if (hasListValues) {
