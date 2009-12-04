@@ -106,8 +106,6 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
 
     private PatientWrapper currentPatient;
 
-    private Label dateProcessedLabel;
-
     private String palletNameContains;
 
     private Button randomScan;
@@ -412,7 +410,6 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
             @Override
             public void focusLost(FocusEvent e) {
                 setVisitsList();
-
             }
         });
         patientNumberText.addModifyListener(new ModifyListener() {
@@ -470,7 +467,7 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
 
     private void createVisitCombo(Composite compositeFields) {
         viewerVisits = createComboViewerWithNoSelectionValidator(
-            compositeFields, "Visit date drawn", null, null,
+            compositeFields, "Visit date processed", null, null,
             "A visit should be selected");
         GridData gridData = new GridData();
         gridData.grabExcessHorizontalSpace = true;
@@ -481,7 +478,7 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
             @Override
             public String getText(Object element) {
                 PatientVisitWrapper pv = (PatientVisitWrapper) element;
-                return pv.getShipment().getFormattedDateShipped();
+                return pv.getFormattedDateProcessed();
             }
         });
         viewerVisits.getCombo().addKeyListener(new KeyAdapter() {
@@ -496,11 +493,14 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
         viewerVisits.getCombo().addFocusListener(new FocusAdapter() {
             @Override
             public void focusLost(FocusEvent e) {
-                setDateProcessedField();
+                PatientVisitWrapper pv = getSelectedPatientVisit();
+                if (pv != null) {
+                    appendLog("Visit selected "
+                        + pv.getFormattedDateProcessed() + " - "
+                        + pv.getShipment().getClinic().getName());
+                }
             }
         });
-        dateProcessedLabel = (Label) createWidget(compositeFields, Label.class,
-            SWT.NONE, "Date processed");
     }
 
     protected void setVisitsList() {
@@ -519,23 +519,10 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
             List<PatientVisitWrapper> collection = currentPatient
                 .getPatientVisitCollection();
             viewerVisits.setInput(collection);
-            viewerVisits.getCombo().select(0);
+            viewerVisits.getCombo().setFocus();
             viewerVisits.getCombo().setListVisible(true);
-            setDateProcessedField();
         } else {
             viewerVisits.setInput(null);
-        }
-    }
-
-    private void setDateProcessedField() {
-        PatientVisitWrapper pv = getSelectedPatientVisit();
-        if (pv != null) {
-            String date = pv.getFormattedDateProcessed();
-            dateProcessedLabel.setText(date);
-            appendLog("Visit selected " + date + " - "
-                + pv.getShipment().getClinic().getName());
-        } else {
-            dateProcessedLabel.setText("");
         }
     }
 
@@ -604,13 +591,9 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
                     cell.setInformation(msg);
                     scanOk = false;
                     SampleWrapper sample = samples.get(0);
-                    appendLog("ERROR: "
-                        + value
-                        + " - "
-                        + msg
-                        + " see visit "
-                        + sample.getPatientVisit().getShipment()
-                            .getFormattedDateShipped() + " of patient "
+                    appendLog("ERROR: " + value + " - " + msg + " see visit "
+                        + sample.getPatientVisit().getFormattedDateProcessed()
+                        + " of patient "
                         + sample.getPatientVisit().getPatient().getNumber());
                 } else {
                     cell.setStatus(SampleCellStatus.NO_TYPE);
@@ -646,7 +629,7 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
                     sb.append(" - patient: ").append(
                         patientVisit.getPatient().getNumber());
                     sb.append(" - Visit: ").append(
-                        patientVisit.getShipment().getFormattedDateShipped());
+                        patientVisit.getFormattedDateProcessed());
                     sb.append(" - ").append(
                         patientVisit.getShipment().getClinic().getName());
                     sb.append(" - ").append(cell.getType().getName());
@@ -708,7 +691,6 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
         cancelConfirmWidget.reset();
         scanButton.setEnabled(false);
         scannedValue.setValue(Boolean.FALSE);
-        dateProcessedLabel.setText("");
         if (resetAll) {
             patientNumberText.setText("");
             plateToScanText.setText("");

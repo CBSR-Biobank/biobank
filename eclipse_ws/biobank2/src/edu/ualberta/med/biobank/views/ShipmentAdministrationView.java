@@ -14,7 +14,6 @@ import edu.ualberta.med.biobank.treeview.PatientAdapter;
 import edu.ualberta.med.biobank.treeview.RootNode;
 import edu.ualberta.med.biobank.treeview.ShipmentAdapter;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
-import edu.ualberta.med.biobank.treeview.StudyAdapter;
 
 public class ShipmentAdministrationView extends AbstractAdministrationView {
 
@@ -82,13 +81,8 @@ public class ShipmentAdministrationView extends AbstractAdministrationView {
 
     public void displayPatient(PatientWrapper patient) {
         if (currentSiteAdapter != null) {
-            StudyAdapter studyAdapter = new StudyAdapter(currentSiteAdapter,
-                patient.getStudy(), false);
-            // the tree structure is created but is never added to the tree
-            // displayed. We don't want to see these nodes
-            PatientAdapter patientAdapter = new PatientAdapter(studyAdapter,
-                patient, false);
-            studyAdapter.addChild(patientAdapter);
+            PatientAdapter patientAdapter = new PatientAdapter(
+                currentInstance.rootNode, patient, false);
             FormInput input = new FormInput(patientAdapter);
             if (patient.isNew()) {
                 AdapterBase.openForm(input, PatientEntryForm.ID);

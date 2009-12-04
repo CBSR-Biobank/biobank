@@ -186,7 +186,7 @@ public class ContainerViewForm extends BiobankViewForm {
             label.setForeground(Display.getCurrent().getSystemColor(
                 SWT.COLOR_RED));
         }
-        AbstractContainerDisplayWidget containerWidget = ContainerDisplayFatory
+        containerWidget = ContainerDisplayFatory
             .createWidget(client, container);
         containerWidget.initLegend();
         containerWidget.setInput(cells);
@@ -247,42 +247,6 @@ public class ContainerViewForm extends BiobankViewForm {
             }
         });
     }
-
-    // private void initCabinetDrawerContainer(Composite client) {
-    // // if Drawer, requires special grid
-    // cabWidget = new DrawerWidget(client);
-    // cabWidget.initLegend();
-    // GridData gdBin = new GridData();
-    // gdBin.verticalSpan = 2;
-    // cabWidget.setLayoutData(gdBin);
-    // cabWidget.setContainersStatus(cells);
-    // cabWidget.addMouseListener(new MouseAdapter() {
-    // @Override
-    // public void mouseDown(MouseEvent e) {
-    // ContainerCell cell = ((DrawerWidget) e.widget)
-    // .getPositionAtCoordinates(e.x, e.y);
-    // openFormFor(cell);
-    // }
-    // });
-    // }
-    //
-    // private void initBasicContainer(Composite client) {
-    // // otherwise, normal grid
-    // containerWidget = new GridContainerWidget(client);
-    // containerWidget.setContainerType(container.getContainerType());
-    // containerWidget.setParentLabel(containerLabelLabel.getText());
-    // containerWidget.initDefaultLegend();
-    // containerWidget.setContainersStatus(cells);
-    // containerWidget.addMouseListener(new MouseAdapter() {
-    // @Override
-    // public void mouseDown(MouseEvent e) {
-    // ContainerCell cell = ((GridContainerWidget) e.widget)
-    // .getPositionAtCoordinates(e.x, e.y);
-    // if (cell != null)
-    // openFormFor(cell);
-    // }
-    // });
-    // }
 
     private void initContainers(final ContainerTypeWrapper type) {
         BusyIndicator.showWhile(Display.getDefault(), new Runnable() {

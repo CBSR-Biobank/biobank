@@ -55,6 +55,9 @@ public class ClinicAddWidget extends BiobankWidget {
         allClinics = site.getClinicCollection(true);
 
         selectedContacts = studyWrapper.getContactCollection();
+        if (selectedContacts == null) {
+            selectedContacts = new ArrayList<ContactWrapper>();
+        }
 
         setLayout(new GridLayout(1, false));
         setLayoutData(new GridData(GridData.FILL_HORIZONTAL));

@@ -62,9 +62,11 @@ public class ShipmentPatientsWidget extends BiobankWidget {
             newPatientText = toolkit.createText(this, "");
             newPatientText.addListener(SWT.DefaultSelection, new Listener() {
                 public void handleEvent(Event e) {
-                    addPatient();
+                    boolean newPatient = addPatient();
                     newPatientText.setFocus();
-                    newPatientText.setText("");
+                    if (!newPatient) {
+                        newPatientText.setText("");
+                    }
                 }
             });
             Button addButton = toolkit.createButton(this, "", SWT.PUSH);
@@ -107,7 +109,7 @@ public class ShipmentPatientsWidget extends BiobankWidget {
         addTableMenu();
     }
 
-    private void addPatient() {
+    private boolean addPatient() {
         String patientNumber = newPatientText.getText().trim();
         if (!patientNumber.isEmpty()) {
             try {
@@ -123,6 +125,7 @@ public class ShipmentPatientsWidget extends BiobankWidget {
                         patient.setNumber(patientNumber);
                         ShipmentAdministrationView.currentInstance
                             .displayPatient(patient);
+                        return true;
                     }
                 } else {
                     addPatient(patient);
@@ -132,6 +135,7 @@ public class ShipmentPatientsWidget extends BiobankWidget {
                     ae);
             }
         }
+        return false;
     }
 
     private void addPatient(PatientWrapper patient) {

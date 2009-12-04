@@ -796,6 +796,26 @@
                   </reference>
                </visibleWhen>
             </command>
+         </toolbar>
+         <toolbar
+               id="edu.ualberta.med.biobank.toolbar.shipmentPerspective">
+            <command
+                  commandId="edu.ualberta.med.biobank.commands.shipmentAdmin"
+                  icon="icons/shipmentPerpective.png"
+                  label="Shipment View"
+                  style="push">
+               <visibleWhen
+                     checkEnabled="false">
+                  <or>
+                     <reference
+                           definitionId="biobank2.mainPerpectiveSelected">
+                     </reference>
+                     <reference
+                           definitionId="biobank2.patientsPerpectiveSelected">
+                     </reference>
+                  </or>
+               </visibleWhen>
+            </command>
          </toolbar> 
          <toolbar
                id="edu.ualberta.med.biobank.toolbar.patientsPerspective">
@@ -887,26 +907,6 @@
                      name="edu.ualberta.med.biobank.commands.patients.openPatientForm.editorId"
                      value="edu.ualberta.med.biobank.forms.CabinetLinkAssignEntryForm">
                </parameter>
-            </command>
-         </toolbar>
-         <toolbar
-               id="edu.ualberta.med.biobank.toolbar.shipmentPerspective">
-            <command
-                  commandId="edu.ualberta.med.biobank.commands.shipmentAdmin"
-                  icon="icons/shipmentPerpective.png"
-                  label="Shipment View"
-                  style="push">
-               <visibleWhen
-                     checkEnabled="false">
-                  <or>
-                     <reference
-                           definitionId="biobank2.mainPerpectiveSelected">
-                     </reference>
-                     <reference
-                           definitionId="biobank2.patientsPerpectiveSelected">
-                     </reference>
-                  </or>
-               </visibleWhen>
             </command>
          </toolbar>
       </menuContribution>

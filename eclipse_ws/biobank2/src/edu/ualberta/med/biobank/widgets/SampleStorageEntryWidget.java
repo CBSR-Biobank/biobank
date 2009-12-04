@@ -51,7 +51,7 @@ public class SampleStorageEntryWidget extends BiobankWidget {
 
     private Collection<SampleTypeWrapper> allSampleTypes;
 
-    private Collection<SampleStorageWrapper> selectedSampleStorage;
+    private Collection<SampleStorageWrapper> selectedSampleStorages;
 
     /**
      * 
@@ -71,13 +71,17 @@ public class SampleStorageEntryWidget extends BiobankWidget {
         super(parent, style);
         Assert.isNotNull(toolkit, "toolkit is null");
         getSampleTypes(site);
-        selectedSampleStorage = sampleStorageCollection;
+        if (sampleStorageCollection == null) {
+            selectedSampleStorages = new ArrayList<SampleStorageWrapper>();
+        } else {
+            selectedSampleStorages = sampleStorageCollection;
+        }
 
         setLayout(new GridLayout(1, false));
         setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         sampleStorageTable = new SampleStorageInfoTable(parent,
-            selectedSampleStorage);
+            selectedSampleStorages);
         sampleStorageTable.adaptToToolkit(toolkit, true);
         addTableMenu();
         sampleStorageTable
@@ -109,9 +113,9 @@ public class SampleStorageEntryWidget extends BiobankWidget {
         if (dlg.open() == Dialog.OK) {
             if (add) {
                 // only add to the collection when adding and not editing
-                selectedSampleStorage.add(dlg.getSampleStorage());
+                selectedSampleStorages.add(dlg.getSampleStorage());
             }
-            sampleStorageTable.setCollection(selectedSampleStorage);
+            sampleStorageTable.setCollection(selectedSampleStorages);
             notifyListeners();
         }
     }
@@ -173,17 +177,17 @@ public class SampleStorageEntryWidget extends BiobankWidget {
 
                 if (confirm) {
                     Collection<SampleStorageWrapper> ssToDelete = new HashSet<SampleStorageWrapper>();
-                    for (SampleStorageWrapper ss : selectedSampleStorage) {
+                    for (SampleStorageWrapper ss : selectedSampleStorages) {
                         if (ss.getSampleType().getName().equals(
                             sampleStorage.getSampleType().getName()))
                             ssToDelete.add(ss);
                     }
 
                     for (SampleStorageWrapper ss : ssToDelete) {
-                        selectedSampleStorage.remove(ss);
+                        selectedSampleStorages.remove(ss);
                     }
 
-                    sampleStorageTable.setCollection(selectedSampleStorage);
+                    sampleStorageTable.setCollection(selectedSampleStorages);
                     notifyListeners();
                 }
             }
@@ -208,7 +212,7 @@ public class SampleStorageEntryWidget extends BiobankWidget {
     }
 
     public void setSampleStorage(List<SampleStorageWrapper> sampleStorage) {
-        selectedSampleStorage = sampleStorage;
+        selectedSampleStorages = sampleStorage;
         sampleStorageTable.setCollection(sampleStorage);
     }
 
