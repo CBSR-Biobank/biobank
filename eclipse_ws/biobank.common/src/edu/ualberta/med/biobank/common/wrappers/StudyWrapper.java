@@ -299,8 +299,7 @@ public class StudyWrapper extends ModelWrapper<Study> {
     /*
      * Removes the StudyPvAttr objects that are not contained in the collection.
      */
-    private void deleteStudyPvAttrDifference(Study origStudy)
-        throws BiobankCheckException, ApplicationException, WrapperException {
+    private void deleteStudyPvAttrDifference(Study origStudy) throws Exception {
         List<StudyPvAttrWrapper> oldStudyPvAttrList = new StudyWrapper(
             appService, origStudy).getStudyPvAttrCollection();
         if (oldStudyPvAttrList == null) {
@@ -325,7 +324,7 @@ public class StudyWrapper extends ModelWrapper<Study> {
      * @throws Exception
      */
     private void deleteSampleStorageDifference(Study origStudy)
-        throws BiobankCheckException, ApplicationException, WrapperException {
+        throws Exception {
         List<SampleStorageWrapper> newSampleStorage = getSampleStorageCollection();
         List<SampleStorageWrapper> oldSampleStorage = new StudyWrapper(
             appService, origStudy).getSampleStorageCollection();
@@ -393,8 +392,7 @@ public class StudyWrapper extends ModelWrapper<Study> {
      * @throws BiobankCheckException
      * @throws Exception
      */
-    private void deleteSampleSourceDifference(Study origStudy)
-        throws BiobankCheckException, ApplicationException, WrapperException {
+    private void deleteSampleSourceDifference(Study origStudy) throws Exception {
         List<SampleSourceWrapper> newSampleSource = getSampleSourceCollection();
         List<SampleSourceWrapper> oldSampleSource = new StudyWrapper(
             appService, origStudy).getSampleSourceCollection();
@@ -739,8 +737,7 @@ public class StudyWrapper extends ModelWrapper<Study> {
     }
 
     @Override
-    protected void persistDependencies(Study origObject)
-        throws BiobankCheckException, ApplicationException, WrapperException {
+    protected void persistDependencies(Study origObject) throws Exception {
         // add new StudyPvAttrs
         if (studyPvAttrMap != null) {
             List<StudyPvAttrWrapper> list = new ArrayList<StudyPvAttrWrapper>(

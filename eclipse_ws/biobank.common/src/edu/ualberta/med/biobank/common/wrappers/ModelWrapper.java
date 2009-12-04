@@ -148,8 +148,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
      * insert or update the object into the database
      */
     @SuppressWarnings("unchecked")
-    public void persist() throws BiobankCheckException, ApplicationException,
-        WrapperException {
+    public void persist() throws Exception {
         persistChecks();
         SDKQuery query;
         E origObject = null;
@@ -172,8 +171,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
      * insert
      */
     @SuppressWarnings("unused")
-    protected void persistDependencies(E origObject)
-        throws BiobankCheckException, ApplicationException, WrapperException {
+    protected void persistDependencies(E origObject) throws Exception {
     }
 
     protected abstract void persistChecks() throws BiobankCheckException,
@@ -184,9 +182,9 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
      * 
      * @throws ApplicationException
      */
-    public void delete() throws BiobankCheckException, ApplicationException,
-        WrapperException {
+    public void delete() throws Exception {
         if (!isNew()) {
+            reload();
             deleteChecks();
             appService.executeQuery(new DeleteExampleQuery(wrappedObject));
         }

@@ -309,6 +309,11 @@ public class TestPatientVisit extends TestDatabase {
     }
 
     @Test
+    public void testCheckHasShipment() {
+        fail("Not yet implemented");
+    }
+
+    @Test
     public void testCheckPatientClinicInSameStudy() {
         fail("Not yet implemented");
     }

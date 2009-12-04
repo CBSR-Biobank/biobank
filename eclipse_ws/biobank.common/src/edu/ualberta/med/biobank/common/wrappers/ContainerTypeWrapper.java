@@ -117,8 +117,7 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
     }
 
     @Override
-    public void delete() throws BiobankCheckException, ApplicationException,
-        WrapperException {
+    public void delete() throws Exception {
         if (!isNew()) {
             deleteChecks();
             // should remove this containerType from its parents

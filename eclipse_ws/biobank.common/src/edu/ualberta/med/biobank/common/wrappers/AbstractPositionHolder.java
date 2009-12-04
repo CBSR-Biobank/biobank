@@ -23,8 +23,7 @@ public abstract class AbstractPositionHolder<E, T extends AbstractPosition>
     }
 
     @Override
-    public void persist() throws BiobankCheckException, ApplicationException,
-        WrapperException {
+    public void persist() throws Exception {
         boolean positionSet = rowColPosition != null;
         AbstractPositionWrapper<T> posWrapper = getPositionWrapper(positionSet);
         if (posWrapper != null && positionSet) {

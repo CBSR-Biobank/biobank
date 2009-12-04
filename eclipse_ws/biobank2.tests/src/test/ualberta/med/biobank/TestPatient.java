@@ -183,9 +183,8 @@ public class TestPatient extends TestDatabase {
             Assert.assertTrue(true);
         }
 
-        // delete sample and patient
+        // // delete sample and patient
         sample.delete();
-        patient.reload();
         patient.delete();
     }
 

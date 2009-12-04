@@ -280,11 +280,20 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
     protected void persistChecks() throws BiobankCheckException,
         ApplicationException, WrapperException {
 
+        checkHasShipment();
+
         checkPatientInShipment();
 
         checkVisitDateProcessedUnique();
 
         checkPatientClinicInSameStudy();
+    }
+
+    private void checkHasShipment() throws BiobankCheckException {
+        if (getShipment() == null) {
+            throw new BiobankCheckException(
+                "This visit should contain a shipment");
+        }
     }
 
     private void checkPatientInShipment() throws BiobankCheckException {
@@ -335,14 +344,14 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
 
     @Override
     protected void persistDependencies(PatientVisit origObject)
-        throws BiobankCheckException, ApplicationException, WrapperException {
+        throws Exception {
         if (origObject != null) {
             removeDeletedPvSampleSources(origObject);
         }
     }
 
     private void removeDeletedPvSampleSources(PatientVisit pvDatabase)
-        throws BiobankCheckException, ApplicationException, WrapperException {
+        throws Exception {
         List<PvSampleSourceWrapper> newSampleSources = getPvSampleSourceCollection();
         List<PvSampleSourceWrapper> oldSampleSources = new PatientVisitWrapper(
             appService, pvDatabase).getPvSampleSourceCollection();
@@ -477,8 +486,7 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
     }
 
     @Override
-    public void persist() throws BiobankCheckException, ApplicationException,
-        WrapperException {
+    public void persist() throws Exception {
         if (pvAttrMap != null) {
             setPvAttrCollection(pvAttrMap.values());
         }

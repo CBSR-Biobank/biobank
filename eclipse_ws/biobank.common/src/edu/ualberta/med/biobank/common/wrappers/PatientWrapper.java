@@ -14,6 +14,7 @@ import edu.ualberta.med.biobank.model.Shipment;
 import edu.ualberta.med.biobank.model.Study;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
+import gov.nih.nci.system.query.example.DeleteExampleQuery;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class PatientWrapper extends ModelWrapper<Patient> {
@@ -244,6 +245,22 @@ public class PatientWrapper extends ModelWrapper<Patient> {
     @Override
     public Class<Patient> getWrappedClass() {
         return Patient.class;
+    }
+
+    @Override
+    public void delete() throws Exception {
+        if (!isNew()) {
+            reload();
+            deleteChecks();
+            List<PatientVisitWrapper> visits = getPatientVisitCollection();
+            if (visits != null) {
+                for (PatientVisitWrapper visit : visits) {
+                    visit.delete();
+                }
+            }
+            reload();
+            appService.executeQuery(new DeleteExampleQuery(wrappedObject));
+        }
     }
 
     @Override

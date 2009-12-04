@@ -70,8 +70,7 @@ public class ContainerWrapper extends
     }
 
     @Override
-    protected void persistDependencies(Container origObject)
-        throws BiobankCheckException, ApplicationException, WrapperException {
+    protected void persistDependencies(Container origObject) throws Exception {
         ContainerWrapper parent = getParent();
         if (parent != null) {
             if (isNew()
@@ -90,8 +89,7 @@ public class ContainerWrapper extends
         persistSamples();
     }
 
-    private void persistSamples() throws BiobankCheckException,
-        ApplicationException, WrapperException {
+    private void persistSamples() throws Exception {
         Map<RowColPos, SampleWrapper> samples = getSamples();
         if (samples != null) {
             for (SampleWrapper sample : samples.values()) {
@@ -101,8 +99,7 @@ public class ContainerWrapper extends
         }
     }
 
-    private void persistChildren() throws BiobankCheckException,
-        ApplicationException, WrapperException {
+    private void persistChildren() throws Exception {
         Map<RowColPos, ContainerWrapper> children = getChildren();
         if (children != null) {
             for (ContainerWrapper container : children.values()) {
@@ -707,7 +704,7 @@ public class ContainerWrapper extends
      * @throws ApplicationException
      */
     public void initChildrenWithType(ContainerTypeWrapper type)
-        throws BiobankCheckException, ApplicationException, WrapperException {
+        throws Exception {
         int rows = getContainerType().getRowCapacity().intValue();
         int cols = getContainerType().getColCapacity().intValue();
         for (int i = 0; i < rows; i++) {

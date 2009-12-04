@@ -215,8 +215,7 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
     }
 
     @Override
-    protected void persistDependencies(Clinic origObject)
-        throws BiobankCheckException, ApplicationException, WrapperException {
+    protected void persistDependencies(Clinic origObject) throws Exception {
         // remove contacts which are not on the list anymore
         if (origObject != null) {
             List<ContactWrapper> contactsOrig = new ClinicWrapper(appService,
