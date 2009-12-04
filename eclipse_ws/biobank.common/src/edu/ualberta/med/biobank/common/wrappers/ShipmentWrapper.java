@@ -33,7 +33,15 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
     @Override
     protected void deleteChecks() throws BiobankCheckException,
         ApplicationException, WrapperException {
+        checkNoMorePatientVisits();
+    }
 
+    private void checkNoMorePatientVisits() throws BiobankCheckException {
+        List<PatientVisitWrapper> patients = getPatientVisitCollection();
+        if (patients != null && patients.size() > 0) {
+            throw new BiobankCheckException(
+                "Visits are still linked to this shipment. Deletion can't be done.");
+        }
     }
 
     @Override

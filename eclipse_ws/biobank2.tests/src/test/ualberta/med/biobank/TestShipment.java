@@ -398,6 +398,47 @@ public class TestShipment extends TestDatabase {
     }
 
     @Test
+    public void testDeleteNoMoreVisits() throws Exception {
+        String name = "testDeleteNoMoreVisits" + r.nextInt();
+        SiteWrapper site = SiteHelper.addSite(name);
+        ClinicWrapper clinic = ClinicHelper.addClinic(site, name);
+        StudyWrapper study = StudyHelper.addStudy(clinic.getSite(), name);
+        ContactWrapper contact = ContactHelper.addContact(clinic, name);
+        study.setContactCollection(Arrays
+            .asList(new ContactWrapper[] { contact }));
+        study.persist();
+        PatientWrapper patient1 = PatientHelper.addPatient(name, study);
+        ShipmentHelper.addShipment(clinic, patient1);
+        ShipmentWrapper shipmentTest = ShipmentHelper.addShipment(clinic,
+            patient1);
+        ShipmentHelper.addShipment(clinic, patient1);
+
+        PatientVisitWrapper visit = PatientVisitHelper.addPatientVisit(
+            patient1, shipmentTest, Utils.getRandomDate());
+        shipmentTest.reload();
+
+        try {
+            shipmentTest.delete();
+            Assert.fail("one visit still there");
+        } catch (BiobankCheckException bce) {
+            Assert.assertTrue(true);
+        }
+
+        ShipmentWrapper shipment2 = ShipmentHelper
+            .addShipment(clinic, patient1);
+        visit.setShipment(shipment2);
+        visit.persist();
+
+        int countBefore = appService.search(Shipment.class, new Shipment())
+            .size();
+        shipmentTest.reload();
+        shipmentTest.delete();
+        int countAfter = appService.search(Shipment.class, new Shipment())
+            .size();
+        Assert.assertEquals(countBefore - 1, countAfter);
+    }
+
+    @Test
     public void testCompareTo() throws Exception {
         String name = "testCompareTo" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
