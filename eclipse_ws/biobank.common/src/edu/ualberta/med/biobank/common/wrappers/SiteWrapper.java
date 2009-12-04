@@ -834,16 +834,6 @@ public class SiteWrapper extends ModelWrapper<Site> {
     @Override
     protected void persistDependencies(Site origObject)
         throws BiobankCheckException, ApplicationException, WrapperException {
-        if (sitePvAttrMap != null) {
-            List<SitePvAttrWrapper> list = new ArrayList<SitePvAttrWrapper>(
-                sitePvAttrMap.values());
-            for (SitePvAttrWrapper sitePvAttr : list) {
-                if (sitePvAttr.isNew()) {
-                    sitePvAttr.persist();
-                }
-            }
-            setSitePvAttrCollection(list);
-        }
         if (origObject != null) {
             deleteSampleTypeDifference(origObject);
             deleteSitePvAttrDifference(origObject);

@@ -14,7 +14,7 @@ import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
-import edu.ualberta.med.biobank.model.PvCustomInfo;
+import edu.ualberta.med.biobank.model.PvAttrCustom;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
 import edu.ualberta.med.biobank.widgets.infotables.SampleSourceInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.SampleStorageInfoTable;
@@ -36,7 +36,7 @@ public class StudyViewForm extends BiobankViewForm {
     private SampleStorageInfoTable sampleStorageTable;
     private SampleSourceInfoTable sampleSourceTable;
 
-    private class StudyPvCustomInfo extends PvCustomInfo {
+    private class StudyPvCustomInfo extends PvAttrCustom {
         public Label wiget;
     }
 

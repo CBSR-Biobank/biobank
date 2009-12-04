@@ -539,8 +539,13 @@ public class StudyWrapper extends ModelWrapper<Study> {
             studyPvAttr.setStudy(wrappedObject);
         }
         studyPvAttr.setLocked(false);
-        studyPvAttr.setPermissible(StringUtils.join(permissibleValues, ';'));
+        if (permissibleValues != null) {
+            studyPvAttr
+                .setPermissible(StringUtils.join(permissibleValues, ';'));
+        }
         studyPvAttrMap.put(label, studyPvAttr);
+        setStudyPvAttrCollection(new ArrayList<StudyPvAttrWrapper>(
+            studyPvAttrMap.values()));
     }
 
     /**
@@ -588,8 +593,12 @@ public class StudyWrapper extends ModelWrapper<Study> {
         getStudyPvAttrMap();
         StudyPvAttrWrapper studyPvAttr = studyPvAttrMap.get(label);
         if (studyPvAttr == null) {
-            throw new Exception("StudyPvAttr with label \"" + label
-                + "\" does not exist");
+            throw new Exception("the pv attribute \"" + label
+                + "\" does not exist for this study");
+        }
+        if (studyPvAttr.isUsedByPatientVisits()) {
+            throw new BiobankCheckException("StudyPvAttr with label \"" + label
+                + "\" is in use by patient visits");
         }
         studyPvAttrMap.remove(label);
     }
@@ -741,18 +750,6 @@ public class StudyWrapper extends ModelWrapper<Study> {
     @Override
     protected void persistDependencies(Study origObject)
         throws BiobankCheckException, ApplicationException, WrapperException {
-        // add new StudyPvAttrs
-        if (studyPvAttrMap != null) {
-            List<StudyPvAttrWrapper> list = new ArrayList<StudyPvAttrWrapper>(
-                studyPvAttrMap.values());
-            for (StudyPvAttrWrapper studyPvAttr : list) {
-                if (studyPvAttr.isNew()) {
-                    studyPvAttr.persist();
-                }
-            }
-            setStudyPvAttrCollection(list);
-        }
-
         if (origObject != null) {
             deleteSampleStorageDifference(origObject);
             deleteSampleSourceDifference(origObject);

@@ -17,13 +17,14 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleSourceWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.exception.UserUIException;
-import edu.ualberta.med.biobank.model.PvCustomInfo;
+import edu.ualberta.med.biobank.model.PvAttrCustom;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
@@ -69,7 +70,7 @@ public class StudyEntryForm extends BiobankEntryForm {
 
     private MultiSelectWidget sampleSourceMultiSelect;
 
-    private ListOrderedMap pvCustomInfoMap;
+    private List<StudyPvAttrCustom> pvCustomInfoMap;
 
     private SampleStorageEntryWidget sampleStorageEntryWidget;
 
@@ -80,13 +81,14 @@ public class StudyEntryForm extends BiobankEntryForm {
         }
     };
 
-    private class StudyPvCustomInfo extends PvCustomInfo {
+    private class StudyPvAttrCustom extends PvAttrCustom {
         public PvInfoWidget widget;
+        public boolean inStudy;
     }
 
     public StudyEntryForm() {
         super();
-        pvCustomInfoMap = new ListOrderedMap();
+        pvCustomInfoMap = new ArrayList<StudyPvAttrCustom>();
     }
 
     @Override
@@ -204,19 +206,21 @@ public class StudyEntryForm extends BiobankEntryForm {
 
         // START KLUDGE
         //
-        // create "date processed" - not really a pv info but we'll pretend
-        // we just want to show the user that this information is collected
-        // by default. Date drawn is already part of the PatientVisit class.
+        // create "date processed" attribute - actually an attribute in
+        // PatientVisit - but we just want to show the user that this
+        // information is collected by default.
         String[] defaultFields = new String[] { "Date Processed" };
+        StudyPvAttrCustom studyPvAttrCustom;
 
         for (String field : defaultFields) {
-            StudyPvCustomInfo combinedPvInfo = new StudyPvCustomInfo();
-            combinedPvInfo.setLabel(field);
-            combinedPvInfo.setType("date_time");
-            combinedPvInfo.setIsDefault(true);
-            combinedPvInfo.widget = new PvInfoWidget(client, SWT.NONE,
-                combinedPvInfo, true);
-            pvCustomInfoMap.put(field, combinedPvInfo);
+            studyPvAttrCustom = new StudyPvAttrCustom();
+            studyPvAttrCustom.setLabel(field);
+            studyPvAttrCustom.setType("date_time");
+            studyPvAttrCustom.setIsDefault(true);
+            studyPvAttrCustom.widget = new PvInfoWidget(client, SWT.NONE,
+                studyPvAttrCustom, true);
+            studyPvAttrCustom.inStudy = false;
+            pvCustomInfoMap.add(studyPvAttrCustom);
         }
         //
         // END KLUDGE
@@ -227,19 +231,20 @@ public class StudyEntryForm extends BiobankEntryForm {
 
         for (String label : site.getSitePvAttrLabels()) {
             boolean selected = false;
-            StudyPvCustomInfo combinedPvInfo = new StudyPvCustomInfo();
-            combinedPvInfo.setLabel(label);
-            combinedPvInfo.setType(site.getSitePvAttrTypeName(label));
+            studyPvAttrCustom = new StudyPvAttrCustom();
+            studyPvAttrCustom.setLabel(label);
+            studyPvAttrCustom.setType(site.getSitePvAttrTypeName(label));
             if (studyPvInfoLabels.contains(label)) {
-                combinedPvInfo.setAllowedValues(study
+                studyPvAttrCustom.setAllowedValues(study
                     .getStudyPvAttrPermissible(label));
                 selected = true;
             }
-            combinedPvInfo.setIsDefault(false);
-            combinedPvInfo.widget = new PvInfoWidget(client, SWT.NONE,
-                combinedPvInfo, selected);
-            combinedPvInfo.widget.addSelectionChangedListener(listener);
-            pvCustomInfoMap.put(label, combinedPvInfo);
+            studyPvAttrCustom.setIsDefault(false);
+            studyPvAttrCustom.widget = new PvInfoWidget(client, SWT.NONE,
+                studyPvAttrCustom, selected);
+            studyPvAttrCustom.widget.addSelectionChangedListener(listener);
+            studyPvAttrCustom.inStudy = studyPvInfoLabels.contains(label);
+            pvCustomInfoMap.add(studyPvAttrCustom);
         }
     }
 
@@ -278,16 +283,16 @@ public class StudyEntryForm extends BiobankEntryForm {
 
         List<String> newPvInfoLabels = new ArrayList<String>();
 
-        for (Object object : pvCustomInfoMap.values()) {
-            StudyPvCustomInfo pvCustomInfo = (StudyPvCustomInfo) object;
-            String label = pvCustomInfo.getLabel();
+        for (StudyPvAttrCustom studyPvAttrCustom : pvCustomInfoMap) {
+            String label = studyPvAttrCustom.getLabel();
             if (label.equals("Date Processed"))
                 continue;
 
-            if (!pvCustomInfo.widget.getSelected()) {
+            if (!studyPvAttrCustom.widget.getSelected()
+                && studyPvAttrCustom.inStudy) {
                 try {
-                    study.deleteStudyPvAttr(pvCustomInfo.getLabel());
-                } catch (Exception e) {
+                    study.deleteStudyPvAttr(studyPvAttrCustom.getLabel());
+                } catch (BiobankCheckException e) {
                     throw new UserUIException(
                         "Cannot delete "
                             + label
@@ -296,17 +301,17 @@ public class StudyEntryForm extends BiobankEntryForm {
                 }
             }
 
-            newPvInfoLabels.add(pvCustomInfo.getLabel());
-            String value = pvCustomInfo.widget.getValues();
-            if (pvCustomInfo.getType().equals(4)
-                || pvCustomInfo.getType().equals(5)) {
+            newPvInfoLabels.add(studyPvAttrCustom.getLabel());
+            String value = studyPvAttrCustom.widget.getValues();
+            if (studyPvAttrCustom.getType().equals("select_single")
+                || studyPvAttrCustom.getType().equals("select_multiple")) {
                 if (value.length() > 0) {
-                    study.setStudyPvAttr(pvCustomInfo.getLabel(), pvCustomInfo
-                        .getType(), value.split(";"));
+                    study.setStudyPvAttr(studyPvAttrCustom.getLabel(),
+                        studyPvAttrCustom.getType(), value.split(";"));
                 }
             } else {
-                study.setStudyPvAttr(pvCustomInfo.getLabel(), pvCustomInfo
-                    .getType());
+                study.setStudyPvAttr(studyPvAttrCustom.getLabel(),
+                    studyPvAttrCustom.getType());
             }
         }
 
