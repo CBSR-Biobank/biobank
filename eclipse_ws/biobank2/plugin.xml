@@ -478,11 +478,13 @@
                <command
                      commandId="edu.ualberta.med.biobank.commands.clinicAdd"
                      id="edu.ualberta.med.biobank.menu.clinicAdd"
+                  icon="icons/clinics_add.png"
                      label="Add Clinic"
                      style="push">
                </command>
                <command
                      commandId="edu.ualberta.med.biobank.commands.studyAdd"
+                  icon="icons/studies_add.png"
                      id="edu.ualberta.med.biobank.menu.studyAdd"
                      label="Add Study"
                      style="push">
@@ -490,12 +492,14 @@
                <command
                      commandId="edu.ualberta.med.biobank.commands.containerTypeAdd"
                      id="edu.ualberta.med.biobank.menu.containerTypeAdd"
+                  icon="icons/containerTypes_add.png"
                      label="Add Container Type"
                      style="push">
                </command>
                <command
                      commandId="edu.ualberta.med.biobank.commands.containerAdd"
                      id="edu.ualberta.med.biobank.menu.containerAdd"
+                  icon="icons/containers_add.png"
                      label="Add Container"
                      style="push">
                </command>
@@ -648,12 +652,6 @@
          <menu
                id="edu.ualberta.med.biobank.menu.configuration"
                label="Configuration">
-            <command
-                  commandId="edu.ualberta.med.scannerconfig.commands.selectsource"
-                  icon="icons/selectScanner.png"
-                  label="Select Scanner"
-                  style="push">
-            </command>
             <command
                   commandId="org.eclipse.ui.window.preferences"
                   id="edu.ualberta.med.biobank.menu.preferences"
