@@ -243,6 +243,13 @@ public class TestContainer extends TestDatabase {
             .get("TopCT"));
     }
 
+    @Test(expected = BiobankCheckException.class)
+    public void createTopLevelNoParent() throws Exception {
+        ContainerWrapper top = containerMap.get("Top");
+        ContainerHelper.addContainer("01", TestCommon.getNewBarcode(r), top,
+            site, containerTypeMap.get("TopCT"));
+    }
+
     @Test
     public void testLabelUnique() throws Exception {
         ContainerWrapper container2;
