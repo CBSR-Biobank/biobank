@@ -155,6 +155,22 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
         createFieldsComposite();
 
         UpdateValueStrategy uvs = new UpdateValueStrategy();
+
+        uvs = new UpdateValueStrategy();
+        uvs.setAfterConvertValidator(new IValidator() {
+            @Override
+            public IStatus validate(Object value) {
+                if (value instanceof Boolean && !(Boolean) value) {
+                    return ValidationStatus.error("Scanner should be launched");
+                } else {
+                    return Status.OK_STATUS;
+                }
+            }
+        });
+        bindValue(new WritableValue(Boolean.FALSE, Boolean.class),
+            scannedValue, uvs, uvs);
+        scannedValue.setValue(false);
+
         uvs.setAfterConvertValidator(new IValidator() {
             @Override
             public IStatus validate(Object value) {
@@ -176,21 +192,6 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
         SampleTypeSelectionWidget lastWidget = sampleTypeWidgets
             .get(sampleTypeWidgets.size() - 1);
         lastWidget.setNextWidget(cancelConfirmWidget);
-
-        uvs = new UpdateValueStrategy();
-        uvs.setAfterConvertValidator(new IValidator() {
-            @Override
-            public IStatus validate(Object value) {
-                if (value instanceof Boolean && !(Boolean) value) {
-                    return ValidationStatus.error("Scanner should be launched");
-                } else {
-                    return Status.OK_STATUS;
-                }
-            }
-        });
-        bindValue(new WritableValue(Boolean.FALSE, Boolean.class),
-            scannedValue, uvs, uvs);
-        scannedValue.setValue(false);
 
         uvs = new UpdateValueStrategy();
         uvs.setAfterConvertValidator(new IValidator() {
