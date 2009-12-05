@@ -25,15 +25,14 @@ public class ContactHelper extends DbHelper {
         return contact;
     }
 
-    public static int addContactsToStudy(StudyWrapper study, String name,
-        int min) throws Exception {
+    public static int addContactsToStudy(StudyWrapper study, String name)
+        throws Exception {
         SiteWrapper site = study.getSite();
-        int clinicCount = r.nextInt(15) + min + 1;
-        ClinicHelper.addClinics(site, name, clinicCount, true);
+        ClinicHelper.addClinics(site, name, r.nextInt(15) + 3, true);
         List<ClinicWrapper> clinics = site.getClinicCollection();
-        int nber = r.nextInt(clinics.size() - 1) + min;
+        int nber = r.nextInt(clinics.size() - 2) + 1;
         List<ContactWrapper> contacts = new ArrayList<ContactWrapper>();
-        for (int i = 0; i < clinicCount; i++) {
+        for (int i = 0; i < nber; i++) {
             ClinicWrapper clinic = clinics.get(i);
             ContactWrapper contact = chooseRandomlyInList(clinic
                 .getContactCollection());
@@ -42,11 +41,6 @@ public class ContactHelper extends DbHelper {
         study.setContactCollection(contacts);
         study.persist();
         return nber;
-    }
-
-    public static int addContactsToStudy(StudyWrapper study, String name)
-        throws Exception {
-        return addContactsToStudy(study, name, 3);
     }
 
     public static int addContactsToClinic(ClinicWrapper clinic, String name)
