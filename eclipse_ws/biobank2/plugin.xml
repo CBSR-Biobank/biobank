@@ -650,16 +650,6 @@
             </command>
          </menu>
          <menu
-               id="edu.ualberta.med.biobank.menu.configuration"
-               label="Configuration">
-            <command
-                  commandId="org.eclipse.ui.window.preferences"
-                  id="edu.ualberta.med.biobank.menu.preferences"
-                  label="Preferences"
-                  style="push">
-            </command>
-         </menu>
-         <menu
                id="edu.ualberta.med.biobank.menu.debug"
                label="**Debug**">
             <visibleWhen
