@@ -35,12 +35,8 @@ public class ContainerHelper extends DbHelper {
         if (parent != null) {
             container.setParent(parent);
         }
-        if (site != null) {
-            container.setSite(site);
-        }
-        if (type != null) {
-            container.setContainerType(type);
-        }
+        container.setSite(site);
+        container.setContainerType(type);
         return container;
     }
 
