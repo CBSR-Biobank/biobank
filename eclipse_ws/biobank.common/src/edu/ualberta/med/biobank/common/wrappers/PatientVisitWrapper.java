@@ -204,30 +204,60 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
         return pvAttr.getValue();
     }
 
-    public Integer getPvAttrType(String label) throws Exception {
+    public String getPvAttrTypeName(String label) throws Exception {
         getPvAttrMap();
         PvAttrWrapper pvAttr = pvAttrMap.get(label);
-        if (pvAttr == null) {
-            throw new Exception("PvAttr for label \"" + label
-                + "\" does not exist");
+        StudyPvAttrWrapper studyPvAttr = null;
+        if (pvAttr != null) {
+            studyPvAttr = pvAttr.getStudyPvAttr();
+        } else {
+            studyPvAttr = studyPvAttrMap.get(label);
+            // make sure "label" is a valid study pv attr
+            if (studyPvAttr == null) {
+                throw new Exception("StudyPvAttr withr label \"" + label
+                    + "\" does not exist");
+            }
         }
-        return pvAttr.getStudyPvAttr().getPvAttrType().getId();
+        return studyPvAttr.getPvAttrType().getName();
     }
 
     public String[] getPvAttrPermissible(String label) throws Exception {
         getPvAttrMap();
         PvAttrWrapper pvAttr = pvAttrMap.get(label);
-        if (pvAttr == null) {
-            throw new Exception("PvAttr for label \"" + label
-                + "\" does not exist");
+        StudyPvAttrWrapper studyPvAttr = null;
+        if (pvAttr != null) {
+            studyPvAttr = pvAttr.getStudyPvAttr();
+        } else {
+            studyPvAttr = studyPvAttrMap.get(label);
+            // make sure "label" is a valid study pv attr
+            if (studyPvAttr == null) {
+                throw new Exception("PvAttr for label \"" + label
+                    + "\" does not exist");
+            }
         }
-        String allowedValues = pvAttr.getStudyPvAttr().getPermissible();
-        if (allowedValues == null) {
+        String permissible = studyPvAttr.getPermissible();
+        if (permissible == null) {
             return null;
         }
-        return pvAttr.getStudyPvAttr().getPermissible().split(";");
+        return permissible.split(";");
     }
 
+    /**
+     * Assigns a value to a patient visit attribute. The value is parsed for
+     * correctness.
+     * 
+     * @param label The attribute's label.
+     * @param value The value to assign.
+     * @throws Exception when assigning a label of type "select_single" or
+     *             "select_multiple" and the value is not one of the permissible
+     *             ones.
+     * @throws NumberFormatException when assigning a label of type "number" and
+     *             the value is not a valid double number.
+     * @throws ParseException when assigning a label of type "date_time" and the
+     *             value is not a valid date and time.
+     * @see edu.ualberta.med.biobank
+     *      .common.formatters.DateFormatter.DATE_TIME_FORMAT
+     */
     public void setPvAttrValue(String label, String value) throws Exception {
         getPvAttrMap();
         PvAttrWrapper pvAttr = pvAttrMap.get(label);
@@ -254,10 +284,44 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
             pvAttr.setStudyPvAttr(studyPvAttr);
             pvAttrMap.put(label, pvAttr);
         }
+
         if (pvAttr.getStudyPvAttr().getLocked()) {
             throw new Exception("no attribute for label \"" + label
                 + "\" is locked, changes not premitted");
+        }
 
+        if (value == null) {
+            pvAttr.setValue(null);
+            return;
+        }
+
+        // validate the value
+        String type = pvAttr.getStudyPvAttr().getPvAttrType().getName();
+        List<String> permissibleSplit = null;
+
+        if (type.equals("select_single") || type.equals("select_multiple")) {
+            String permissible = pvAttr.getStudyPvAttr().getPermissible();
+            if (permissible != null) {
+                permissibleSplit = Arrays.asList(permissible.split(";"));
+            }
+        }
+
+        if (type.equals("select_single")) {
+            if (!permissibleSplit.contains(value)) {
+                throw new Exception("value " + value
+                    + "is invalid for label \"" + label + "\"");
+            }
+        } else if (type.equals("select_multiple")) {
+            for (String singleVal : value.split(";")) {
+                if (!permissibleSplit.contains(singleVal)) {
+                    throw new Exception("value " + singleVal
+                        + "is invalid for label \"" + label + "\"");
+                }
+            }
+        } else if (type.equals("number")) {
+            Double.parseDouble(value);
+        } else if (type.equals("date")) {
+            DateFormatter.dateFormatter.parse(value);
         }
         pvAttr.setValue(value);
     }

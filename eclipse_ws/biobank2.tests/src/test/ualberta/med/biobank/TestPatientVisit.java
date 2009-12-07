@@ -60,7 +60,7 @@ public class TestPatientVisit extends TestDatabase {
 
     // the methods to skip in the getters and setters test
     private static final List<String> GETTER_SKIP_METHODS = Arrays
-        .asList(new String[] { "getPvInfo", "getPvInfoType" });
+        .asList(new String[] { "getPvAttr", "getPvAttrType" });
 
     @Override
     @Before
@@ -115,6 +115,22 @@ public class TestPatientVisit extends TestDatabase {
             TestCommon.getNewBarcode(r), top, site, containerTypeMap
                 .get("ChildCtL1"), 0, 0);
         containerMap.put("ChildL1", childL1);
+    }
+
+    private void addPvAttrs() throws Exception {
+        // add PvAtt to study
+        List<String> types = SiteWrapper.getPvAttrTypeNames(appService);
+        Assert
+            .assertTrue("PvAttrTypes not initialized", types.contains("text"));
+        study.setStudyPvAttr("PMBC Count", "number");
+        study.setStudyPvAttr("Worksheet", "text");
+        study.setStudyPvAttr("Date", "date_time");
+        study.setStudyPvAttr("Consent", "select_multiple", new String[] { "c1",
+            "c2", "c3" });
+        study.setStudyPvAttr("Visit", "select_single", new String[] { "v1",
+            "v2", "v3", "v4" });
+        study.persist();
+        study.reload();
     }
 
     @Test
@@ -258,18 +274,163 @@ public class TestPatientVisit extends TestDatabase {
     }
 
     @Test
-    public void testGetPvInfo() {
-        fail("Not yet implemented");
+    public void testGetPvAttrLabels() throws Exception {
+        addPvAttrs();
+        List<String> labels = Arrays.asList(study.getStudyPvAttrLabels());
+        Assert.assertEquals(5, labels.size());
+
+        PatientVisitWrapper visit = PatientVisitHelper.addPatientVisit(patient,
+            shipment, TestCommon.getUniqueDate(r));
+        visit.reload();
+
+        Assert.assertEquals(0, visit.getPvAttrLabels().length);
+
+        visit.setPvAttrValue("PMBC Count", "-0.543");
+        visit.setPvAttrValue("Worksheet", "abcdefghi");
+        visit.setPvAttrValue("Date", "1999-12-31 23:59");
+        visit.setPvAttrValue("Consent", "c1;c2;c3");
+        visit.setPvAttrValue("Visit", "v1");
+        visit.persist();
+
+        labels = Arrays.asList(visit.getPvAttrLabels());
+        Assert.assertEquals(5, labels.size());
+        Assert.assertTrue(labels.containsAll(Arrays.asList("PMBC Count",
+            "Worksheet", "Date", "Consent", "Visit")));
     }
 
     @Test
-    public void testGetPvInfoType() {
-        fail("Not yet implemented");
+    public void testEmptyGetPvAttr() throws Exception {
+        PatientVisitWrapper visit = PatientVisitHelper.addPatientVisit(patient,
+            shipment, TestCommon.getUniqueDate(r));
+        visit.reload();
+        List<String> pvAttr = Arrays.asList(visit.getPvAttrLabels());
+        Assert.assertEquals(0, pvAttr.size());
     }
 
     @Test
-    public void testPvInfoAllowedValues() {
-        fail("Not yet implemented");
+    public void testGetPvAttr() throws Exception {
+        addPvAttrs();
+
+        // assign PvAttrs correctly
+        PatientVisitWrapper visit = PatientVisitHelper.addPatientVisit(patient,
+            shipment, TestCommon.getUniqueDate(r));
+        visit.reload();
+        String worksheetValue = Utils.getRandomString(10, 20);
+        visit.setPvAttrValue("PMBC Count", "-0.543");
+        visit.setPvAttrValue("Worksheet", worksheetValue);
+        visit.setPvAttrValue("Date", "1999-12-31 23:59");
+        visit.setPvAttrValue("Consent", "c1;c2;c3");
+        visit.setPvAttrValue("Visit", "v1");
+        visit.persist();
+
+        visit.reload();
+        List<String> pvAttr = Arrays.asList(visit.getPvAttrLabels());
+        Assert.assertEquals(5, pvAttr.size());
+        Assert.assertEquals("-0.543", visit.getPvAttrValue("PMBC Count"));
+        Assert.assertEquals(worksheetValue, visit.getPvAttrValue("Worksheet"));
+        Assert.assertEquals("1999-12-31 23:59", visit.getPvAttrValue("Date"));
+        Assert.assertEquals("c1;c2;c3", visit.getPvAttrValue("Consent"));
+        Assert.assertEquals("v1", visit.getPvAttrValue("Visit"));
+
+        // select an invalid value for a number PvAttr
+        try {
+            visit.setPvAttrValue("PMBC Count", "abcdef");
+            Assert.fail("should not be allowed to assign invalid value");
+        } catch (Exception e) {
+            Assert.assertTrue(true);
+        }
+
+        // select an invalid value for a date_time PvAttr
+        try {
+            visit.setPvAttrValue("PMBC Count", "1999-12-31 2300:59");
+            Assert.fail("should not be allowed to assign invalid value");
+        } catch (Exception e) {
+            Assert.assertTrue(true);
+        }
+
+        // select an invalid value for a select_multiple PvAttr
+        try {
+            visit.setPvAttrValue("Consent", "c2;c99");
+            Assert.fail("should not be allowed to assign invalid value");
+        } catch (Exception e) {
+            Assert.assertTrue(true);
+        }
+
+        // select an invalid value for a select_single PvAttr
+        try {
+            visit.setPvAttrValue("Visit", "abcdef");
+            Assert.fail("should not be allowed to assign invalid value");
+        } catch (Exception e) {
+            Assert.assertTrue(true);
+        }
+    }
+
+    @Test
+    public void testGetPvAttrTypeName() throws Exception {
+        addPvAttrs();
+        List<String> labels = Arrays.asList(study.getStudyPvAttrLabels());
+        Assert.assertEquals(5, labels.size());
+
+        PatientVisitWrapper visit = PatientVisitHelper.addPatientVisit(patient,
+            shipment, TestCommon.getUniqueDate(r));
+        visit.reload();
+
+        // get types before they are assigned on patient visit
+        Assert.assertEquals("number", visit.getPvAttrTypeName("PMBC Count"));
+        Assert.assertEquals("text", visit.getPvAttrTypeName("Worksheet"));
+        Assert.assertEquals("date_time", visit.getPvAttrTypeName("Date"));
+        Assert.assertEquals("select_multiple", visit
+            .getPvAttrTypeName("Consent"));
+        Assert.assertEquals("select_single", visit.getPvAttrTypeName("Visit"));
+
+        // select an invalid label
+        try {
+            visit.getPvAttrTypeName("xyz");
+            Assert.fail("should not be allowed get type for invalid label");
+        } catch (Exception e) {
+            Assert.assertTrue(true);
+        }
+
+        visit.setPvAttrValue("PMBC Count", "-0.543");
+        visit.setPvAttrValue("Worksheet", "abcdefghi");
+        visit.setPvAttrValue("Date", "1999-12-31 23:59");
+        visit.setPvAttrValue("Consent", "c1;c2;c3");
+        visit.setPvAttrValue("Visit", "v1");
+        visit.persist();
+
+        // get types after they are assigned on patient visit
+        Assert.assertEquals("number", visit.getPvAttrTypeName("PMBC Count"));
+        Assert.assertEquals("text", visit.getPvAttrTypeName("Worksheet"));
+        Assert.assertEquals("date_time", visit.getPvAttrTypeName("Date"));
+        Assert.assertEquals("select_multiple", visit
+            .getPvAttrTypeName("Consent"));
+        Assert.assertEquals("select_single", visit.getPvAttrTypeName("Visit"));
+    }
+
+    @Test
+    public void testPvAttrPermissible() throws Exception {
+        addPvAttrs();
+        List<String> labels = Arrays.asList(study.getStudyPvAttrLabels());
+        Assert.assertEquals(5, labels.size());
+
+        PatientVisitWrapper visit = PatientVisitHelper.addPatientVisit(patient,
+            shipment, TestCommon.getUniqueDate(r));
+        visit.reload();
+
+        Assert.assertEquals(null, visit.getPvAttrPermissible("PMBC Count"));
+        Assert.assertEquals(null, visit.getPvAttrPermissible("Worksheet"));
+        Assert.assertEquals(null, visit.getPvAttrPermissible("Date"));
+
+        List<String> permissibles = Arrays.asList(visit
+            .getPvAttrPermissible("Consent"));
+        Assert.assertEquals(3, permissibles.size());
+        Assert.assertTrue(permissibles.containsAll(Arrays.asList("c1", "c2",
+            "c3")));
+
+        permissibles = Arrays.asList(visit.getPvAttrPermissible("Visit"));
+        Assert.assertEquals(4, permissibles.size());
+        Assert.assertTrue(permissibles.containsAll(Arrays.asList("v1", "v2",
+            "v3", "v4")));
     }
 
     @Test
@@ -294,11 +455,6 @@ public class TestPatientVisit extends TestDatabase {
 
     @Test
     public void testGetShipment() {
-        fail("Not yet implemented");
-    }
-
-    @Test
-    public void testGetPvInfoLabels() {
         fail("Not yet implemented");
     }
 
