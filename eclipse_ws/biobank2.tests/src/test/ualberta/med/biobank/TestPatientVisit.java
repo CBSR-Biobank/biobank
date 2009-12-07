@@ -222,11 +222,14 @@ public class TestPatientVisit extends TestDatabase {
             for (int col = 0; col < cols; ++col) {
                 if (r.nextGaussian() > 0.0)
                     continue;
-                sampleMap.put(row + col * rows, SampleHelper.addSample(
+                System.out.println("setting sample at: " + row + ", " + col);
+                sampleMap.put(row + col * rows, SampleHelper.newSample(
                     allSampleTypes.get(r.nextInt(allSampleTypesCount)),
                     container, visit, row, col));
             }
         }
+        visit.setSampleCollection(sampleMap.values());
+        visit.persist();
         visit.reload();
 
         // verify that all samples are there
@@ -235,6 +238,11 @@ public class TestPatientVisit extends TestDatabase {
 
         for (SampleWrapper sample : visitSamples) {
             RowColPos pos = sample.getPosition();
+            System.out.println("getting sample from: " + pos.row + ", "
+                + pos.col);
+            Assert.assertNotNull(pos.row);
+            Assert.assertNotNull(pos.col);
+            Assert.assertNotNull(sampleMap.get(pos.row + pos.col * rows));
             Assert
                 .assertEquals(sample, sampleMap.get(pos.row + pos.col * rows));
         }
