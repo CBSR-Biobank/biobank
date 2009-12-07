@@ -37,11 +37,6 @@ public class RootNode extends AdapterBase {
     }
 
     @Override
-    public AdapterBase accept(NodeSearchVisitor visitor) {
-        return null;
-    }
-
-    @Override
     public String getTitle() {
         return null;
     }
@@ -50,6 +45,11 @@ public class RootNode extends AdapterBase {
         if (treeViewer != null) {
             treeViewer.expandToLevel(child, 1);
         }
+    }
+
+    @Override
+    public AdapterBase accept(NodeSearchVisitor visitor) {
+        return visitor.visit(this);
     }
 
 }

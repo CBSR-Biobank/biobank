@@ -39,13 +39,13 @@ public class SampleTypeAdapter extends AdapterBase {
     }
 
     @Override
-    public AdapterBase accept(NodeSearchVisitor visitor) {
-        return visitor.visit(this);
+    public String getTitle() {
+        return getTitle("Sample Type");
     }
 
     @Override
-    public String getTitle() {
-        return getTitle("Sample Type");
+    public AdapterBase accept(NodeSearchVisitor visitor) {
+        return visitor.visit(this);
     }
 
 }

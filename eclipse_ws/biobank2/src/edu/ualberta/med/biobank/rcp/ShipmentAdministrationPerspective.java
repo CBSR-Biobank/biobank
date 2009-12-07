@@ -9,7 +9,6 @@ public class ShipmentAdministrationPerspective implements IPerspectiveFactory {
 
     @Override
     public void createInitialLayout(IPageLayout layout) {
-        System.out.println("creation");
     }
 
 }

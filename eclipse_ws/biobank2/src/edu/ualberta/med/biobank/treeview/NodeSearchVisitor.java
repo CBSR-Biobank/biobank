@@ -37,6 +37,10 @@ public class NodeSearchVisitor {
         return null;
     }
 
+    public AdapterBase visit(RootNode root) {
+        return visitChildren(root);
+    }
+
     public AdapterBase visit(SessionAdapter session) {
         if (typeSearched == SiteWrapper.class) {
             return session.getChild(id);
@@ -44,25 +48,8 @@ public class NodeSearchVisitor {
         return visitChildren(session);
     }
 
-    public AdapterBase visit(SiteAdapter siteAdapter) {
-        AdapterBase groupNode = null;
-        if (typeSearched == StudyWrapper.class
-            || typeSearched == PatientWrapper.class
-            || typeSearched == PatientVisitWrapper.class
-            || typeSearched == SampleWrapper.class) {
-            groupNode = siteAdapter.getChild(SiteAdapter.STUDIES_NODE_ID);
-        } else if (typeSearched == ClinicWrapper.class) {
-            groupNode = siteAdapter.getChild(SiteAdapter.CLINICS_NODE_ID);
-        } else if (typeSearched == ContainerTypeWrapper.class) {
-            groupNode = siteAdapter.getChild(SiteAdapter.STORAGE_TYPES_NODE_ID);
-        } else if (typeSearched == ContainerWrapper.class) {
-            groupNode = siteAdapter
-                .getChild(SiteAdapter.STORAGE_CONTAINERS_NODE_ID);
-        }
-        if (groupNode != null) {
-            return groupNode.accept(this);
-        }
-        return null;
+    public AdapterBase visit(SiteAdapter site) {
+        return visitChildren(site);
     }
 
     public AdapterBase visit(StudyGroup sGroup) {
@@ -125,6 +112,13 @@ public class NodeSearchVisitor {
                 return visitChildren(container);
             }
             return child;
+        }
+        return null;
+    }
+
+    public AdapterBase visit(ShipmentAdapter shipment) {
+        if (typeSearched == PatientVisitWrapper.class) {
+            return shipment.getChild(id, true);
         }
         return null;
     }

@@ -8,10 +8,10 @@ import edu.ualberta.med.biobank.forms.PatientEntryForm;
 import edu.ualberta.med.biobank.forms.PatientViewForm;
 import edu.ualberta.med.biobank.forms.ShipmentEntryForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
+import edu.ualberta.med.biobank.rcp.ShipmentAdministrationPerspective;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.ClinicAdapter;
 import edu.ualberta.med.biobank.treeview.PatientAdapter;
-import edu.ualberta.med.biobank.treeview.RootNode;
 import edu.ualberta.med.biobank.treeview.ShipmentAdapter;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 
@@ -25,6 +25,7 @@ public class ShipmentAdministrationView extends AbstractAdministrationView {
 
     public ShipmentAdministrationView() {
         currentInstance = this;
+        SessionManager.addView(ShipmentAdministrationPerspective.ID, this);
     }
 
     @Override
@@ -71,14 +72,6 @@ public class ShipmentAdministrationView extends AbstractAdministrationView {
         }
     }
 
-    public static RootNode getRootNode() {
-        return currentInstance.rootNode;
-    }
-
-    public static void setSelectedNode(AdapterBase node) {
-        currentInstance.selectNode(node);
-    }
-
     public void displayPatient(PatientWrapper patient) {
         if (currentSiteAdapter != null) {
             PatientAdapter patientAdapter = new PatientAdapter(
@@ -92,4 +85,5 @@ public class ShipmentAdministrationView extends AbstractAdministrationView {
             }
         }
     }
+
 }

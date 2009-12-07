@@ -434,10 +434,6 @@ public abstract class AdapterBase {
         }
     }
 
-    public AdapterBase searchChild(ModelWrapper<?> wrapper) {
-        return accept(new NodeSearchVisitor(wrapper));
-    }
-
     public boolean isEditable() {
         return editable;
     }

@@ -324,7 +324,7 @@ public class ContainerViewForm extends BiobankViewForm {
         } else {
             ContainerWrapper child = cell.getContainer();
             Assert.isNotNull(child);
-            SessionManager.getInstance().openViewForm(child);
+            SessionManager.openViewForm(child);
         }
         containerAdapter.performExpand();
     }

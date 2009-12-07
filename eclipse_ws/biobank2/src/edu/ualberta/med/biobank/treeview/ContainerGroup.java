@@ -85,7 +85,7 @@ public class ContainerGroup extends AdapterBase {
                     addChild(node);
                 }
                 if (updateNode) {
-                    SessionManager.getInstance().updateTreeNode(node);
+                    SessionManager.updateTreeNode(node);
                 }
             }
         } catch (Exception e) {
@@ -96,13 +96,13 @@ public class ContainerGroup extends AdapterBase {
     }
 
     @Override
-    public AdapterBase accept(NodeSearchVisitor visitor) {
-        return visitor.visit(this);
+    public String getTitle() {
+        return null;
     }
 
     @Override
-    public String getTitle() {
-        return null;
+    public AdapterBase accept(NodeSearchVisitor visitor) {
+        return visitor.visit(this);
     }
 
 }

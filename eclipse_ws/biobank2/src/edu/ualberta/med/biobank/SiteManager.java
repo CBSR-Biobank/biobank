@@ -10,7 +10,6 @@ import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
-import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.services.ISourceProviderService;
@@ -155,13 +154,7 @@ public class SiteManager {
 
                 currentSiteWrapper = siteWrapper;
                 setCurrentSite(currentSiteWrapper);
-                SessionManager.getInstance().getSession().rebuild();
-                TreeViewer tv = SessionManager.getInstance().getTreeViewer();
-                if (tv != null) {
-                    // can be null if we start on the
-                    // PatientAdministrationPerspective
-                    tv.expandToLevel(3);
-                }
+                SessionManager.getInstance().rebuildSession();
             }
         });
     }

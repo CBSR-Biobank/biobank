@@ -114,7 +114,7 @@ public class SessionAdapter extends AdapterBase {
                     addChild(node);
                 }
                 if (updateNode) {
-                    SessionManager.getInstance().updateTreeNode(node);
+                    SessionManager.updateTreeNode(node);
                 }
             }
         } catch (final RemoteAccessException exp) {
@@ -123,11 +123,6 @@ public class SessionAdapter extends AdapterBase {
             LOGGER.error("Error while loading sites for session " + getName(),
                 e);
         }
-    }
-
-    @Override
-    public AdapterBase accept(NodeSearchVisitor visitor) {
-        return visitor.visit(this);
     }
 
     @Override
@@ -142,6 +137,11 @@ public class SessionAdapter extends AdapterBase {
 
     public String getUserName() {
         return userName;
+    }
+
+    @Override
+    public AdapterBase accept(NodeSearchVisitor visitor) {
+        return visitor.visit(this);
     }
 
 }

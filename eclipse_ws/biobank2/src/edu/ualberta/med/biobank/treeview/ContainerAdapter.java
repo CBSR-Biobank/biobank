@@ -99,7 +99,7 @@ public class ContainerAdapter extends AdapterBase {
                         addChild(node);
                     }
                     if (updateNode) {
-                        SessionManager.getInstance().updateTreeNode(node);
+                        SessionManager.updateTreeNode(node);
                     }
                 }
             } else
@@ -109,11 +109,6 @@ public class ContainerAdapter extends AdapterBase {
                 "Error while loading storage container group children for storage container "
                     + getContainer().getLabel(), e);
         }
-    }
-
-    @Override
-    public AdapterBase accept(NodeSearchVisitor visitor) {
-        return visitor.visit(this);
     }
 
     private void moveAction() {
@@ -131,7 +126,7 @@ public class ContainerAdapter extends AdapterBase {
                         ContainerWrapper newParentContainer = getContainer()
                             .getParent();
                         ContainerAdapter parentAdapter = (ContainerAdapter) SessionManager
-                            .getInstance().searchNode(newParentContainer);
+                            .searchNode(newParentContainer);
                         if (parentAdapter != null) {
                             parentAdapter.getContainer().reload();
                             parentAdapter.performExpand();
@@ -181,6 +176,11 @@ public class ContainerAdapter extends AdapterBase {
         }
         BioBankPlugin.openInformation("Container moved", "The container "
             + oldLabel + " has been moved to " + container.getLabel());
+    }
+
+    @Override
+    public AdapterBase accept(NodeSearchVisitor visitor) {
+        return visitor.visit(this);
     }
 
 }

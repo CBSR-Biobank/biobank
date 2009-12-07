@@ -95,7 +95,7 @@ public class PatientAdapter extends AdapterBase {
                     addChild(node);
                 }
                 if (updateNode) {
-                    SessionManager.getInstance().updateTreeNode(node);
+                    SessionManager.updateTreeNode(node);
                 }
             }
         } catch (Exception e) {
@@ -109,5 +109,4 @@ public class PatientAdapter extends AdapterBase {
     public AdapterBase accept(NodeSearchVisitor visitor) {
         return visitor.visit(this);
     }
-
 }

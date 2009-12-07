@@ -32,6 +32,7 @@ import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.model.ClinicStudyInfo;
 import edu.ualberta.med.biobank.model.StudyContactAndPatientInfo;
@@ -84,6 +85,8 @@ public abstract class BiobankFormBase extends EditorPart {
                     } else if (item.o instanceof StudyContactAndPatientInfo) {
                         ((StudyContactAndPatientInfo) item.o)
                             .performDoubleClick();
+                    } else if (item.o instanceof ModelWrapper<?>) {
+                        SessionManager.openViewForm((ModelWrapper<?>) item.o);
                     }
                 }
             }
@@ -96,7 +99,7 @@ public abstract class BiobankFormBase extends EditorPart {
 
     @Override
     public void setFocus() {
-        SessionManager.getInstance().setSelectedNode(adapter);
+        SessionManager.setSelectedNode(adapter);
     }
 
     @Override

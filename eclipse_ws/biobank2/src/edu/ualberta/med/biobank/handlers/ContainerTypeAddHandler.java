@@ -17,7 +17,7 @@ public class ContainerTypeAddHandler extends AbstractHandler {
     public static final String ID = "edu.ualberta.med.biobank.commands.containerTypeAdd";
 
     public Object execute(ExecutionEvent event) throws ExecutionException {
-        SiteAdapter siteAdapter = (SiteAdapter) SessionManager.getInstance()
+        SiteAdapter siteAdapter = (SiteAdapter) SessionManager
             .searchNode(SessionManager.getInstance().getCurrentSiteWrapper());
         Assert.isNotNull(siteAdapter);
 

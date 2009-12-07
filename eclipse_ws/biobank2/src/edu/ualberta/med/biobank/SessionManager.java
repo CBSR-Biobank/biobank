@@ -1,12 +1,11 @@
 package edu.ualberta.med.biobank;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -16,15 +15,13 @@ import org.eclipse.ui.services.ISourceProviderService;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.rcp.MainPerspective;
-import edu.ualberta.med.biobank.rcp.PatientsAdministrationPerspective;
 import edu.ualberta.med.biobank.rcp.SiteCombo;
 import edu.ualberta.med.biobank.sourceproviders.DebugState;
 import edu.ualberta.med.biobank.sourceproviders.SessionState;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
-import edu.ualberta.med.biobank.treeview.NodeSearchVisitor;
 import edu.ualberta.med.biobank.treeview.RootNode;
 import edu.ualberta.med.biobank.treeview.SessionAdapter;
-import edu.ualberta.med.biobank.views.PatientAdministrationView;
+import edu.ualberta.med.biobank.views.AbstractViewWithTree;
 import edu.ualberta.med.biobank.views.SessionsView;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
@@ -45,9 +42,16 @@ public class SessionManager {
 
     private SiteManager siteManager;
 
+    /**
+     * Map a perspective ID to a AbstractViewWithTree instance visible when the
+     * perspective is set
+     */
+    public Map<String, AbstractViewWithTree> possibleViewMap;
+
     private SessionManager() {
         super();
         rootNode = new RootNode();
+        possibleViewMap = new HashMap<String, AbstractViewWithTree>();
     }
 
     public static SessionManager getInstance() {
@@ -59,7 +63,7 @@ public class SessionManager {
 
     public void setSessionsView(SessionsView view) {
         this.view = view;
-
+        addView(MainPerspective.ID, view);
         updateMenus();
     }
 
@@ -124,52 +128,50 @@ public class SessionManager {
         return getInstance().getSession().getAppService();
     }
 
-    public void updateTreeNode(AdapterBase node) {
+    public static void updateTreeNode(AdapterBase node) {
+        AbstractViewWithTree view = getCurrentViewWithTree();
         if (view != null) {
             view.getTreeViewer().update(node, null);
         }
     }
 
-    public void setSelectedNode(AdapterBase node) {
-        IWorkbench workbench = BioBankPlugin.getDefault().getWorkbench();
-        IWorkbenchPage activePage = workbench.getActiveWorkbenchWindow()
-            .getActivePage();
-        if (activePage.getPerspective().getId().equals(MainPerspective.ID)
-            && view != null) {
-            view.getTreeViewer().setSelection(new StructuredSelection(node));
-        } else if (activePage.getPerspective().getId().equals(
-            PatientsAdministrationPerspective.ID)) {
-            PatientAdministrationView.setSelectedNode(node);
+    public static void setSelectedNode(AdapterBase node) {
+        AbstractViewWithTree view = getCurrentViewWithTree();
+        if (view != null) {
+            view.setSelectedNode(node);
         }
-
     }
 
-    public AdapterBase getSelectedNode() {
+    public static AdapterBase getSelectedNode() {
+        AbstractViewWithTree view = getCurrentViewWithTree();
         if (view != null) {
-            IStructuredSelection treeSelection = (IStructuredSelection) view
-                .getTreeViewer().getSelection();
-            if (treeSelection != null && treeSelection.size() > 0) {
-                return (AdapterBase) treeSelection.getFirstElement();
-            }
+            AdapterBase selectedNode = view.getSelectedNode();
+            return selectedNode;
         }
         return null;
     }
 
-    public void openViewForm(ModelWrapper<?> wrapper) {
-        NodeSearchVisitor v = new NodeSearchVisitor(wrapper);
-        AdapterBase adapter = sessionAdapter.accept(v);
-        Assert.isNotNull(adapter, "could not find adapter for class "
-            + wrapper.getClass() + " id " + wrapper.getId());
-        adapter.performDoubleClick();
+    public static void openViewForm(ModelWrapper<?> wrapper) {
+        AdapterBase adapter = searchNode(wrapper);
+        if (adapter != null) {
+            adapter.performDoubleClick();
+        }
     }
 
-    public void selectTreeNode(AdapterBase adapter) {
-        SessionManager.getInstance().getTreeViewer().setSelection(
-            new StructuredSelection(adapter));
+    public static AbstractViewWithTree getCurrentViewWithTree() {
+        IWorkbench workbench = BioBankPlugin.getDefault().getWorkbench();
+        IWorkbenchPage activePage = workbench.getActiveWorkbenchWindow()
+            .getActivePage();
+        return getInstance().possibleViewMap.get(activePage.getPerspective()
+            .getId());
     }
 
-    public AdapterBase searchNode(ModelWrapper<?> wrapper) {
-        return sessionAdapter.searchChild(wrapper);
+    public static AdapterBase searchNode(ModelWrapper<?> wrapper) {
+        AbstractViewWithTree view = getCurrentViewWithTree();
+        if (view != null) {
+            return view.searchNode(wrapper);
+        }
+        return null;
     }
 
     public RootNode getRootNode() {
@@ -178,12 +180,6 @@ public class SessionManager {
 
     public SiteWrapper getCurrentSiteWrapper() {
         return siteManager.getCurrentSiteWrapper();
-    }
-
-    public TreeViewer getTreeViewer() {
-        if (view != null)
-            return view.getTreeViewer();
-        return null;
     }
 
     public void setSiteManagerEnabled(boolean enable) {
@@ -208,5 +204,16 @@ public class SessionManager {
     public void updateSites() {
         Assert.isNotNull(siteManager, "site manager is null");
         siteManager.updateSites();
+    }
+
+    public static void addView(String perspectiveId, AbstractViewWithTree view) {
+        getInstance().possibleViewMap.put(perspectiveId, view);
+    }
+
+    public void rebuildSession() {
+        SessionManager.getInstance().getSession().rebuild();
+        if (view != null) {
+            view.getTreeViewer().expandToLevel(3);
+        }
     }
 }

@@ -68,17 +68,17 @@ public class PatientVisitAdapter extends AdapterBase {
     public void loadChildren(boolean updateNode) {
     }
 
-    @Override
-    public AdapterBase accept(NodeSearchVisitor visitor) {
-        return null;
-    }
-
     public void setSelectedSample(SampleWrapper sample) {
         this.selectedSample = sample;
     }
 
     public SampleWrapper getSelectedSample() {
         return selectedSample;
+    }
+
+    @Override
+    public AdapterBase accept(NodeSearchVisitor visitor) {
+        return null;
     }
 
 }

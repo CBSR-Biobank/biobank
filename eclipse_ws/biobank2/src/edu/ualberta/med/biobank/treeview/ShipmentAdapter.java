@@ -58,7 +58,7 @@ public class ShipmentAdapter extends AdapterBase {
                     addChild(node);
                 }
                 if (updateNode) {
-                    SessionManager.getInstance().updateTreeNode(node);
+                    SessionManager.updateTreeNode(node);
                 }
             }
         } catch (Exception e) {
@@ -81,7 +81,7 @@ public class ShipmentAdapter extends AdapterBase {
 
     @Override
     public AdapterBase accept(NodeSearchVisitor visitor) {
-        return null;
+        return visitor.visit(this);
     }
 
 }

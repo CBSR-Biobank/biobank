@@ -36,8 +36,8 @@ public class ContainerAddHandler extends AbstractHandler {
             }
 
             SiteAdapter siteAdapter = (SiteAdapter) SessionManager
-                .getInstance().searchNode(
-                    SessionManager.getInstance().getCurrentSiteWrapper());
+                .searchNode(SessionManager.getInstance()
+                    .getCurrentSiteWrapper());
             Assert.isNotNull(siteAdapter);
 
             ContainerWrapper containerWrapper = new ContainerWrapper(

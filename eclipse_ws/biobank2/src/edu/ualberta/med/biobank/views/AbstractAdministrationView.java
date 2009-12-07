@@ -2,7 +2,6 @@ package edu.ualberta.med.biobank.views;
 
 import java.util.Map;
 
-import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -17,7 +16,6 @@ import org.eclipse.ui.ISourceProvider;
 import org.eclipse.ui.ISourceProviderListener;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.part.ViewPart;
 import org.eclipse.ui.services.ISourceProviderService;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
@@ -27,14 +25,9 @@ import edu.ualberta.med.biobank.treeview.NodeSearchVisitor;
 import edu.ualberta.med.biobank.treeview.RootNode;
 import edu.ualberta.med.biobank.widgets.AdapterTreeWidget;
 
-public abstract class AbstractAdministrationView extends ViewPart implements
-    IAdapterTreeView {
+public abstract class AbstractAdministrationView extends AbstractViewWithTree {
 
     protected Text treeText;
-
-    private AdapterTreeWidget adaptersTree;
-
-    protected RootNode rootNode;
 
     private ISourceProviderListener siteStateListener;
 
@@ -146,12 +139,12 @@ public abstract class AbstractAdministrationView extends ViewPart implements
             }
 
             @Override
-            public AdapterBase accept(NodeSearchVisitor visitor) {
-                return null;
+            public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
             }
 
             @Override
-            public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
+            public AdapterBase accept(NodeSearchVisitor visitor) {
+                return null;
             }
         };
         return noPatientFoundAdapter;
@@ -170,22 +163,6 @@ public abstract class AbstractAdministrationView extends ViewPart implements
             .getSourceProvider(SiteSelectionState.SITE_SELECTION_ID);
         siteSelectionStateSourceProvider
             .removeSourceProviderListener(siteStateListener);
-    }
-
-    @Override
-    public void setFocus() {
-
-    }
-
-    public TreeViewer getTreeViewer() {
-        return adaptersTree.getTreeViewer();
-    }
-
-    public void selectNode(AdapterBase node) {
-        if (adaptersTree != null) {
-            adaptersTree.getTreeViewer().setSelection(
-                new StructuredSelection(node));
-        }
     }
 
 }

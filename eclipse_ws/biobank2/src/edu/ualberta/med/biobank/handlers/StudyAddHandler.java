@@ -19,8 +19,7 @@ public class StudyAddHandler extends AbstractHandler {
 
     public Object execute(ExecutionEvent event) throws ExecutionException {
         SiteWrapper site = SessionManager.getInstance().getCurrentSiteWrapper();
-        SiteAdapter siteAdapter = (SiteAdapter) SessionManager.getInstance()
-            .searchNode(site);
+        SiteAdapter siteAdapter = (SiteAdapter) SessionManager.searchNode(site);
         Assert.isNotNull(siteAdapter);
         StudyWrapper study = new StudyWrapper(SessionManager.getAppService());
         study.setSite(site);

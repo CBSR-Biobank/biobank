@@ -7,6 +7,7 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.forms.PatientEntryForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
+import edu.ualberta.med.biobank.rcp.PatientsAdministrationPerspective;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.PatientAdapter;
 import edu.ualberta.med.biobank.treeview.RootNode;
@@ -23,6 +24,7 @@ public class PatientAdministrationView extends AbstractAdministrationView {
 
     public PatientAdministrationView() {
         currentInstance = this;
+        SessionManager.addView(PatientsAdministrationPerspective.ID, this);
     }
 
     @Override
@@ -83,10 +85,6 @@ public class PatientAdministrationView extends AbstractAdministrationView {
 
     public static PatientAdapter getCurrentPatientAdapter() {
         return currentPatientAdapter;
-    }
-
-    public static void setSelectedNode(AdapterBase node) {
-        currentInstance.selectNode(node);
     }
 
 }
