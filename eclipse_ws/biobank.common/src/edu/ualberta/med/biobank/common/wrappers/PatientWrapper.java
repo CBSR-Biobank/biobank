@@ -151,50 +151,10 @@ public class PatientWrapper extends ModelWrapper<Patient> {
         return null;
     }
 
-    // @SuppressWarnings("unchecked")
-    // public List<PvSampleSourceWrapper> getShptSampleSourceCollection() {
-    // List<PvSampleSourceWrapper> shptSampleSourceCollection =
-    // (List<PvSampleSourceWrapper>) propertiesMap
-    // .get("shptSampleSourceCollection");
-    // if (shptSampleSourceCollection == null) {
-    // Collection<ShptSampleSource> children = wrappedObject
-    // .getShptSampleSourceCollection();
-    // if (children != null) {
-    // shptSampleSourceCollection = new ArrayList<PvSampleSourceWrapper>();
-    // for (ShptSampleSource pvSampleSource : children) {
-    // shptSampleSourceCollection.add(new PvSampleSourceWrapper(
-    // appService, pvSampleSource));
-    // }
-    // propertiesMap.put("shptSampleSourceCollection",
-    // shptSampleSourceCollection);
-    // }
-    // }
-    // return shptSampleSourceCollection;
-    // }
-    //
-    // public void setShptSampleSourceCollection(
-    // Collection<ShptSampleSource> shptSampleSources, boolean setNull) {
-    // Collection<ShptSampleSource> oldCollection = wrappedObject
-    // .getShptSampleSourceCollection();
-    // wrappedObject.setShptSampleSourceCollection(shptSampleSources);
-    // propertyChangeSupport.firePropertyChange("shptSampleSourceCollection",
-    // oldCollection, shptSampleSources);
-    // if (setNull) {
-    // propertiesMap.put("shptSampleSourceCollection", null);
-    // }
-    // }
-    //
-    // public void setShptSampleSourceCollection(
-    // Collection<PvSampleSourceWrapper> shptSampleSources) {
-    // Collection<ShptSampleSource> shptCollection = new
-    // HashSet<ShptSampleSource>();
-    // for (PvSampleSourceWrapper pv : shptSampleSources) {
-    // shptCollection.add(pv.getWrappedObject());
-    // }
-    // setShptSampleSourceCollection(shptCollection, false);
-    // propertiesMap.put("shptSampleSourceCollection", shptSampleSources);
-    // }
-
+    /**
+     * Get the shipment collection. To link patients and shipments, use
+     * Shipment.setPatientCollection method
+     */
     @SuppressWarnings("unchecked")
     public List<ShipmentWrapper> getShipmentCollection(boolean sort) {
         List<ShipmentWrapper> shipmentCollection = (List<ShipmentWrapper>) propertiesMap
@@ -219,27 +179,6 @@ public class PatientWrapper extends ModelWrapper<Patient> {
 
     public List<ShipmentWrapper> getShipmentCollection() {
         return getShipmentCollection(false);
-    }
-
-    public void setShipmentCollection(Collection<Shipment> shipments,
-        boolean setNull) {
-        Collection<Shipment> oldCollection = wrappedObject
-            .getShipmentCollection();
-        wrappedObject.setShipmentCollection(shipments);
-        propertyChangeSupport.firePropertyChange("shipmentCollection",
-            oldCollection, shipments);
-        if (setNull) {
-            propertiesMap.put("shipmentCollection", null);
-        }
-    }
-
-    public void setShipmentCollection(Collection<ShipmentWrapper> shipments) {
-        Collection<Shipment> shptCollection = new HashSet<Shipment>();
-        for (ShipmentWrapper ship : shipments) {
-            shptCollection.add(ship.getWrappedObject());
-        }
-        setShipmentCollection(shptCollection, false);
-        propertiesMap.put("shipmentCollection", shipments);
     }
 
     @Override

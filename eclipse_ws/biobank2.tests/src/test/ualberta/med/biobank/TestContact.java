@@ -31,8 +31,7 @@ public class TestContact extends TestDatabase {
         StudyWrapper study = StudyHelper.addStudy(site, name);
         ContactWrapper contact = ContactHelper.addContact(clinic, name);
 
-        study.setContactCollection(Arrays
-            .asList(new ContactWrapper[] { contact }));
+        study.setContactCollection(Arrays.asList(contact));
         study.persist();
         contact.reload();
 
@@ -136,8 +135,7 @@ public class TestContact extends TestDatabase {
         ContactWrapper contact = ContactHelper.addContact(clinic, name);
 
         StudyWrapper study = StudyHelper.addStudy(site, name);
-        study.setContactCollection(Arrays
-            .asList(new ContactWrapper[] { contact }));
+        study.setContactCollection(Arrays.asList(contact));
         study.persist();
         contact.reload();
 

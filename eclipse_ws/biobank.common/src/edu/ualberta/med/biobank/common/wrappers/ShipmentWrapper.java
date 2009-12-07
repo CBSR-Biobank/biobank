@@ -199,7 +199,7 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
     }
 
     public void setPatientVisitCollection(
-        Collection<PatientVisitWrapper> patientVisitCollection) {
+        List<PatientVisitWrapper> patientVisitCollection) {
         Collection<PatientVisit> pvCollection = new HashSet<PatientVisit>();
         for (PatientVisitWrapper pv : patientVisitCollection) {
             pvCollection.add(pv.getWrappedObject());

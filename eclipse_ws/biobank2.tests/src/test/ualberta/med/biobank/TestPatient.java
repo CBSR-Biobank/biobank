@@ -47,8 +47,6 @@ public class TestPatient extends TestDatabase {
 
     private ClinicWrapper clinic;
 
-    private ShipmentWrapper shipment;
-
     @Override
     @Before
     public void setUp() throws Exception {
@@ -66,15 +64,8 @@ public class TestPatient extends TestDatabase {
             + Utils.getRandomString(10));
         ContactWrapper contact = ContactHelper.addContact(clinic,
             "Contact - Patient Test");
-        study.setContactCollection(Arrays
-            .asList(new ContactWrapper[] { contact }));
+        study.setContactCollection(Arrays.asList(contact));
         study.persist();
-    }
-
-    private void addClinicAndShipment(PatientWrapper patient) throws Exception {
-        addClinic(patient);
-        ShipmentWrapper shipment = ShipmentHelper.newShipment(clinic);
-        patient.setShipmentCollection(Arrays.asList(shipment));
     }
 
     private void addContainerTypes() throws Exception {
@@ -172,8 +163,11 @@ public class TestPatient extends TestDatabase {
             study);
         addContainerTypes();
         addContainers();
-        addClinicAndShipment(patient);
+        addClinic(patient);
         patient.persist();
+        ShipmentWrapper shipment = ShipmentHelper.newShipment(clinic);
+        shipment.setPatientCollection(Arrays.asList(patient));
+        shipment.persist();
         patient.reload();
 
         shipment = patient.getShipmentCollection().get(0);
@@ -242,14 +236,13 @@ public class TestPatient extends TestDatabase {
             "Clinic - Patient Test " + Utils.getRandomString(10));
         ContactWrapper contact = ContactHelper.addContact(clinic,
             "Contact - Patient Test");
-        study.setContactCollection(Arrays
-            .asList(new ContactWrapper[] { contact }));
+        study.setContactCollection(Arrays.asList(contact));
         study.persist();
 
         ShipmentWrapper shipment = ShipmentHelper.addShipment(clinic, patient);
 
         List<PatientVisitWrapper> visitsAdded = PatientVisitHelper
-            .addPatientVisits(patient, shipment);
+            .addPatientVisits(patient, shipment, 3);
 
         patient.reload();
         List<PatientVisitWrapper> visits = patient.getPatientVisitCollection();
@@ -293,18 +286,18 @@ public class TestPatient extends TestDatabase {
     }
 
     @Test
-    public void testGetpatientShipmentCollection() throws Exception {
+    public void testGetPatientShipmentCollection() throws Exception {
         PatientWrapper patient = PatientHelper.addPatient(Utils
             .getRandomNumericString(20), study);
         addClinic(patient);
 
         List<ShipmentWrapper> shipments = new ArrayList<ShipmentWrapper>();
-
         for (int i = 0, n = r.nextInt(10); i < n; ++i) {
-            shipments.add(ShipmentHelper.newShipment(clinic));
+            ShipmentWrapper ship = ShipmentHelper.newShipment(clinic);
+            ship.setPatientCollection(Arrays.asList(patient));
+            ship.persist();
+            shipments.add(ship);
         }
-        patient.setShipmentCollection(shipments);
-        patient.persist();
         patient.reload();
 
         List<ShipmentWrapper> savedShipments = patient.getShipmentCollection();
@@ -312,12 +305,5 @@ public class TestPatient extends TestDatabase {
         for (ShipmentWrapper shipment : savedShipments) {
             Assert.assertTrue(shipments.contains(shipment));
         }
-
-        // delete shipments
-        patient.setShipmentCollection(new ArrayList<ShipmentWrapper>());
-        patient.persist();
-        savedShipments = patient.getShipmentCollection();
-        Assert.assertEquals(0, savedShipments.size());
     }
-
 }

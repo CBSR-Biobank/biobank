@@ -53,7 +53,7 @@ public class TestStudy extends TestDatabase {
 
     // the methods to skip in the getters and setters test
     private static final List<String> GETTER_SKIP_METHODS = Arrays
-        .asList(new String[] { "getStudyPvAttrLocked" });
+        .asList("getStudyPvAttrLocked");
 
     @Test
     public void testGettersAndSetters() throws Exception {
@@ -760,8 +760,7 @@ public class TestStudy extends TestDatabase {
         ClinicWrapper clinic = ClinicHelper.addClinic(site2, name);
         ContactWrapper contact = ContactHelper.addContact(clinic, name);
 
-        study.setContactCollection(Arrays
-            .asList(new ContactWrapper[] { contact }));
+        study.setContactCollection(Arrays.asList(contact));
         try {
             study.persist();
             Assert.fail("Contact should be in same site");

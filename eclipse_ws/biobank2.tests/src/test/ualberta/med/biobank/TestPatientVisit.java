@@ -59,8 +59,8 @@ public class TestPatientVisit extends TestDatabase {
     private PatientWrapper patient;
 
     // the methods to skip in the getters and setters test
-    private static final List<String> GETTER_SKIP_METHODS = Arrays
-        .asList(new String[] { "getPvInfo", "getPvInfoType" });
+    private static final List<String> GETTER_SKIP_METHODS = Arrays.asList(
+        "getPvInfo", "getPvInfoType");
 
     @Override
     @Before
@@ -76,8 +76,7 @@ public class TestPatientVisit extends TestDatabase {
             + Utils.getRandomString(10));
         ContactWrapper contact = ContactHelper.addContact(clinic,
             "Contact - Patient Visit Test");
-        study.setContactCollection(Arrays
-            .asList(new ContactWrapper[] { contact }));
+        study.setContactCollection(Arrays.asList(contact));
         study.persist();
         patient = PatientHelper.addPatient(Utils.getRandomNumericString(20),
             study);
@@ -343,8 +342,7 @@ public class TestPatientVisit extends TestDatabase {
         pvSampleSourceWrapper.setSampleSource(SampleSourceWrapper
             .getAllSampleSources(appService).get(0));
 
-        visit.setPvSampleSourceCollection(Arrays
-            .asList(new PvSampleSourceWrapper[] { pvSampleSourceWrapper }));
+        visit.setPvSampleSourceCollection(Arrays.asList(pvSampleSourceWrapper));
 
         visit.persist();
 

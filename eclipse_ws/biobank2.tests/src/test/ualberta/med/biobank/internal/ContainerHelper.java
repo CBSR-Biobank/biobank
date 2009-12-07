@@ -151,7 +151,7 @@ public class ContainerHelper extends DbHelper {
                 .addContainerTypeRandom(site, barcode + "children" + (i + 1),
                     false);
             topContainer.getContainerType().setChildContainerTypeCollection(
-                Arrays.asList(new ContainerTypeWrapper[] { type }));
+                Arrays.asList(type));
             int maxRow = topContainer.getRowCapacity();
             for (int j = 0; j < 5; j++) {
                 ContainerWrapper child = newContainer(null, barcode + "child"

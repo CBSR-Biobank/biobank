@@ -34,7 +34,7 @@ public class HqlTester {
             + " inner join patients.study as study"
             + " where study.nameShort=?");
 
-        c.setParameters(Arrays.asList(new Object[] { "BBP" }));
+        c.setParameters(Arrays.asList("BBP"));
 
         List<Integer> results = appService.query(c);
         for (Integer id : results) {
@@ -69,7 +69,7 @@ public class HqlTester {
     @SuppressWarnings("unused")
     private void geContainerLike() throws Exception {
         HQLCriteria c = new HQLCriteria("from " + Container.class.getName()
-            + " where label like ?", Arrays.asList(new Object[] { "01%" }));
+            + " where label like ?", Arrays.asList("01%"));
 
         List<Container> results = appService.query(c);
         for (Container container : results) {
@@ -82,7 +82,7 @@ public class HqlTester {
         HQLCriteria criteria = new HQLCriteria("from "
             + Container.class.getName()
             + " where site.id = ? and position is null", Arrays
-            .asList(new Object[] { new Integer(1) }));
+            .asList(new Integer(1)));
         List<Container> containers = appService.query(criteria);
         for (Container container : containers) {
             System.out.println("getTopContainers: " + container.getLabel());

@@ -1,5 +1,9 @@
 package test.ualberta.med.biobank;
 
+import gov.nih.nci.system.applicationservice.ApplicationException;
+import gov.nih.nci.system.applicationservice.WritableApplicationService;
+import gov.nih.nci.system.query.hibernate.HQLCriteria;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -7,10 +11,6 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.springframework.util.Assert;
-
-import gov.nih.nci.system.applicationservice.ApplicationException;
-import gov.nih.nci.system.applicationservice.WritableApplicationService;
-import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class ModelUtils {
 
@@ -102,8 +102,8 @@ public class ModelUtils {
             query += " like ?";
             textParam = "%" + text + "%";
         }
-        return appService.query(new HQLCriteria(query, Arrays
-            .asList(new Object[] { textParam })));
+        return appService
+            .query(new HQLCriteria(query, Arrays.asList(textParam)));
     }
 
 }

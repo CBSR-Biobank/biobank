@@ -1184,8 +1184,7 @@ public class TestContainer extends TestDatabase {
         ContainerTypeWrapper altTopType = ContainerTypeHelper.newContainerType(
             altSite, "Alt Top Container Type", "ATCT", 2, CONTAINER_TOP_ROWS,
             CONTAINER_TOP_COLS, true);
-        altTopType.setChildContainerTypeCollection(Arrays
-            .asList(new ContainerTypeWrapper[] { childType }));
+        altTopType.setChildContainerTypeCollection(Arrays.asList(childType));
         altTopType.persist();
         childType.reload();
 
@@ -1248,7 +1247,7 @@ public class TestContainer extends TestDatabase {
         ContainerWrapper childL4 = containerMap.get("ChildL4");
         SampleTypeWrapper sampleType = allSampleTypes.get(0);
         childL4.getContainerType().setSampleTypeCollection(
-            Arrays.asList(new SampleTypeWrapper[] { sampleType }));
+            Arrays.asList(sampleType));
         SampleWrapper sample = SampleHelper.addSample(sampleType, childL4, pv,
             0, 0);
 

@@ -57,8 +57,7 @@ public class ShipmentHelper extends DbHelper {
         ClinicWrapper clinic, String name) throws Exception {
         StudyWrapper study = StudyHelper.addStudy(clinic.getSite(), name);
         ContactWrapper contact = ContactHelper.addContact(clinic, name);
-        study.setContactCollection(Arrays
-            .asList(new ContactWrapper[] { contact }));
+        study.setContactCollection(Arrays.asList(contact));
         study.persist();
 
         PatientWrapper patient = PatientHelper.addPatient(name, study);

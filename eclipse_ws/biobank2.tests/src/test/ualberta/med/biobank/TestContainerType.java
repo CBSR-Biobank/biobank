@@ -37,7 +37,7 @@ public class TestContainerType extends TestDatabase {
 
     // the methods to skip in the getters and setters test
     private static final List<String> GETTER_SKIP_METHODS = Arrays
-        .asList(new String[] { "getChildLabelingScheme" });
+        .asList("getChildLabelingScheme");
 
     @Override
     @Before
@@ -562,9 +562,8 @@ public class TestContainerType extends TestDatabase {
         childType3_2 = ContainerTypeHelper.addContainerType(site,
             "Child L3_2 Container Type", "CCTL3_2", 1,
             CONTAINER_CHILD_L3_ROWS - 1, CONTAINER_CHILD_L3_COLS - 1, false);
-        childType2.setChildContainerTypes(Arrays.asList(new Integer[] {
-            childType3.getId(), childType3_2.getId() }), Arrays
-            .asList(new ContainerTypeWrapper[] { childType3, childType3_2 }));
+        childType2.setChildContainerTypes(Arrays.asList(childType3.getId(),
+            childType3_2.getId()), Arrays.asList(childType3, childType3_2));
         childType2.persist();
         childType2.reload();
 
@@ -594,10 +593,9 @@ public class TestContainerType extends TestDatabase {
         childType1_3 = ContainerTypeHelper.addContainerType(site,
             "Child L1_3 Container Type", "CCTL1_3", 1, 2, 18, false);
 
-        topType.setChildContainerTypes(Arrays.asList(new Integer[] {
-            childType1.getId(), childType1_2.getId(), childType1_3.getId() }),
-            Arrays.asList(new ContainerTypeWrapper[] { childType1,
-                childType1_2, childType1_3 }));
+        topType.setChildContainerTypes(Arrays.asList(childType1.getId(),
+            childType1_2.getId(), childType1_3.getId()), Arrays.asList(
+            childType1, childType1_2, childType1_3));
         topType.persist();
         topType.reload();
 

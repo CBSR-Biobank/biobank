@@ -58,14 +58,12 @@ public class TestSample extends TestDatabase {
 
         ContainerTypeWrapper typeChild = ContainerTypeHelper.addContainerType(
             site, "ctTypeChild" + r.nextInt(), "ctChild", 1, 4, 5, false);
-        typeChild.setSampleTypeCollection(Arrays
-            .asList(new SampleTypeWrapper[] { sampleTypeWrapper }));
+        typeChild.setSampleTypeCollection(Arrays.asList(sampleTypeWrapper));
         typeChild.persist();
 
         ContainerTypeWrapper topType = ContainerTypeHelper.addContainerType(
             site, "topType" + r.nextInt(), "ct", 1, 4, 5, true);
-        topType.setChildContainerTypeCollection(Arrays
-            .asList(new ContainerTypeWrapper[] { typeChild }));
+        topType.setChildContainerTypeCollection(Arrays.asList(typeChild));
         topType.persist();
 
         topContainer = ContainerHelper.addContainer("newcontainer"
@@ -80,8 +78,7 @@ public class TestSample extends TestDatabase {
         ClinicWrapper clinic = ClinicHelper.addClinic(site, "clinicname");
         ContactWrapper contact = ContactHelper.addContact(clinic,
             "ContactClinic");
-        study.setContactCollection(Arrays
-            .asList(new ContactWrapper[] { contact }));
+        study.setContactCollection(Arrays.asList(contact));
         study.persist();
 
         ShipmentWrapper shipment = ShipmentHelper.addShipment(clinic, patient);
@@ -190,8 +187,7 @@ public class TestSample extends TestDatabase {
         PatientWrapper newPatient = PatientHelper.addPatient(name, newStudy);
         ClinicWrapper clinic = ClinicHelper.addClinic(newSite, name);
         ContactWrapper contact = ContactHelper.addContact(clinic, name);
-        newStudy.setContactCollection(Arrays
-            .asList(new ContactWrapper[] { contact }));
+        newStudy.setContactCollection(Arrays.asList(contact));
         newStudy.persist();
         ShipmentWrapper shipment = ShipmentHelper.addShipment(clinic,
             newPatient);
@@ -264,8 +260,7 @@ public class TestSample extends TestDatabase {
         ContainerWrapper oldParent = sample.getParent();
         ContainerTypeWrapper type = ContainerTypeHelper.addContainerType(sample
             .getSite(), "newCtType", "ctNew", 1, 4, 5, true);
-        type.setSampleTypeCollection(Arrays
-            .asList(new SampleTypeWrapper[] { sample.getSampleType() }));
+        type.setSampleTypeCollection(Arrays.asList(sample.getSampleType()));
         ContainerWrapper parent = ContainerHelper.addContainer(
             "newcontainerParent", "ccNew", null, sample.getSite(), type);
 
@@ -398,8 +393,7 @@ public class TestSample extends TestDatabase {
 
         ContainerTypeWrapper type = ContainerTypeHelper.addContainerType(site,
             name, name, 1, 4, 5, true);
-        type.setSampleTypeCollection(Arrays
-            .asList(new SampleTypeWrapper[] { sampleType }));
+        type.setSampleTypeCollection(Arrays.asList(sampleType));
         ContainerWrapper container = ContainerHelper.addContainer(name, name,
             null, site, type);
         SampleHelper.addSample(sampleType, container, pv, 0, 0);
