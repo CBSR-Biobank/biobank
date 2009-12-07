@@ -10,6 +10,13 @@ import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
 
 public class SampleHelper extends DbHelper {
 
+    public static SampleWrapper newSample(SampleTypeWrapper sampleType) {
+        SampleWrapper sample = new SampleWrapper(appService);
+        sample.setSampleType(sampleType);
+        sample.setInventoryId(TestCommon.getNewInventoryId(new Random()));
+        return sample;
+    }
+
     public static SampleWrapper newSample(SampleTypeWrapper sampleType,
         ContainerWrapper container, PatientVisitWrapper pv, Integer row,
         Integer col) {

@@ -66,15 +66,15 @@ public class ContainerWrapper extends
      * a container can't be a topContainer and have a parent on the same time
      */
     private void checkTopAndParent() throws BiobankCheckException {
-        if (getParent() != null && getContainerType() != null
-            && Boolean.TRUE.equals(getContainerType().getTopLevel())) {
+        if ((getParent() != null) && (getContainerType() != null)
+            && getContainerType().getTopLevel().booleanValue()) {
             throw new BiobankCheckException(
                 "A top level container can't have a parent");
         }
     }
 
     private void checkContainerTypeSameSite() throws BiobankCheckException {
-        if (getContainerType() != null
+        if ((getContainerType() != null)
             && !getContainerType().getSite().equals(getSite())) {
             throw new BiobankCheckException(
                 "Type should be part of the same site");
@@ -86,10 +86,10 @@ public class ContainerWrapper extends
         ContainerWrapper parent = getParent();
         if (parent != null) {
             if (isNew()
-                || (origObject != null && origObject.getPosition() != null && ((origObject
-                    .getPosition().getParentContainer() != null && origObject
+                || ((origObject != null && origObject.getPosition() != null) && (((origObject
+                    .getPosition().getParentContainer() != null) && (origObject
                     .getPosition().getParentContainer().getId() != parent
-                    .getId()) || (new RowColPos(origObject.getPosition()
+                    .getId())) || (new RowColPos(origObject.getPosition()
                     .getRow(), origObject.getPosition().getCol())
                     .equals(getPosition()))))) {
                 String label = parent.getLabel()

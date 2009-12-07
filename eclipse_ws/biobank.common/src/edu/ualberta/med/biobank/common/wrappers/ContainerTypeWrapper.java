@@ -399,6 +399,8 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
     }
 
     public void setChildLabelingScheme(Integer id) {
+        if (id == null)
+            return;
         setChildLabelingScheme(labelingSchemeMap.get(id));
     }
 
@@ -478,7 +480,7 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
         } else {
             throw new BiobankCheckException(
                 "Unable to remove child type. This parent/child relationship "
-                    + "exists in storage. Remove all instances before attempting to "
+                    + "exists in database. Remove all instances before attempting to "
                     + "delete a child type.");
         }
     }
