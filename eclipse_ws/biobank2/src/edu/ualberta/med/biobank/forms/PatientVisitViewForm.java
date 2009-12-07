@@ -140,20 +140,18 @@ public class PatientVisitViewForm extends BiobankViewForm {
     }
 
     private void setPatientVisitValues() {
-        FormUtils.setTextValue(siteLabel, patientVisit.getShipment()
-            .getClinic().getSite().getName());
-        FormUtils.setTextValue(clinicLabel,
-            patientVisit.getShipment() == null ? "" : patientVisit
-                .getShipment().getClinic().getName());
-        FormUtils.setTextValue(dateProcessedLabel, patientVisit
+        setTextValue(siteLabel, patientVisit.getShipment().getClinic()
+            .getSite().getName());
+        setTextValue(clinicLabel, patientVisit.getShipment() == null ? ""
+            : patientVisit.getShipment().getClinic().getName());
+        setTextValue(dateProcessedLabel, patientVisit
             .getFormattedDateProcessed());
-        FormUtils.setTextValue(commentLabel, patientVisit.getComment());
-        FormUtils.setTextValue(usernameLabel, patientVisit.getUsername());
+        setTextValue(commentLabel, patientVisit.getComment());
+        setTextValue(usernameLabel, patientVisit.getUsername());
 
         // assign PvInfo
         for (FormPvCustomInfo combinedPvInfo : pvCustomInfoList) {
-            FormUtils.setTextValue(combinedPvInfo.widget, combinedPvInfo
-                .getValue());
+            setTextValue(combinedPvInfo.widget, combinedPvInfo.getValue());
         }
     }
 

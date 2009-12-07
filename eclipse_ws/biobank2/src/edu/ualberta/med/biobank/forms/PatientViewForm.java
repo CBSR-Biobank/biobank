@@ -72,12 +72,11 @@ public class PatientViewForm extends BiobankViewForm {
         section.setClient(visitsTable);
         visitsTable.adaptToToolkit(toolkit, true);
         visitsTable.getTableViewer().addDoubleClickListener(
-            FormUtils.getBiobankCollectionDoubleClickListener());
+            collectionDoubleClickListener);
     }
 
     private void setValues() {
-        FormUtils.setTextValue(siteLabel, patientWrapper.getStudy().getSite()
-            .getName());
+        setTextValue(siteLabel, patientWrapper.getStudy().getSite().getName());
     }
 
     @Override

@@ -36,7 +36,6 @@ import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PvSampleSourceWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleSourceWrapper;
 import edu.ualberta.med.biobank.dialogs.PvSampleSourceDialog;
-import edu.ualberta.med.biobank.forms.FormUtils;
 import edu.ualberta.med.biobank.widgets.infotables.PvSampleSourceInfoTable;
 import edu.ualberta.med.biobank.widgets.listeners.BiobankEntryFormWidgetListener;
 import edu.ualberta.med.biobank.widgets.listeners.MultiSelectEvent;
@@ -117,7 +116,7 @@ public class PvSampleSourceEntryWidget extends BiobankWidget {
     }
 
     public void addBinding(WidgetCreator dbc) {
-        final ControlDecoration controlDecoration = FormUtils.createDecorator(
+        final ControlDecoration controlDecoration = createDecorator(
             addPvSampleSourceButton,
             "Sample sources should be selected for this visit");
         WritableValue wv = new WritableValue(Boolean.FALSE, Boolean.class);

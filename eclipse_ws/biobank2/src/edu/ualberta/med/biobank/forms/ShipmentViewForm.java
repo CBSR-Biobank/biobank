@@ -117,21 +117,19 @@ public class ShipmentViewForm extends BiobankViewForm {
     }
 
     private void setShipmentValues() {
-        FormUtils.setTextValue(siteLabel, shipmentWrapper.getClinic().getSite()
-            .getName());
-        FormUtils.setTextValue(waybillLabel, shipmentWrapper.getWaybill());
-        FormUtils.setTextValue(clinicLabel,
-            shipmentWrapper.getClinic() == null ? "" : shipmentWrapper
-                .getClinic().getName());
-        FormUtils.setTextValue(dateShippedLabel, shipmentWrapper
+        setTextValue(siteLabel, shipmentWrapper.getClinic().getSite().getName());
+        setTextValue(waybillLabel, shipmentWrapper.getWaybill());
+        setTextValue(clinicLabel, shipmentWrapper.getClinic() == null ? ""
+            : shipmentWrapper.getClinic().getName());
+        setTextValue(dateShippedLabel, shipmentWrapper
             .getFormattedDateShipped());
-        FormUtils.setTextValue(companyLabel, shipmentWrapper
-            .getShippingCompany() == null ? "" : shipmentWrapper
-            .getShippingCompany().getName());
-        FormUtils.setTextValue(boxNumberLabel, shipmentWrapper.getBoxNumber());
-        FormUtils.setTextValue(dateReceivedLabel, shipmentWrapper
+        setTextValue(companyLabel,
+            shipmentWrapper.getShippingCompany() == null ? "" : shipmentWrapper
+                .getShippingCompany().getName());
+        setTextValue(boxNumberLabel, shipmentWrapper.getBoxNumber());
+        setTextValue(dateReceivedLabel, shipmentWrapper
             .getFormattedDateReceived());
-        FormUtils.setTextValue(commentLabel, shipmentWrapper.getComment());
+        setTextValue(commentLabel, shipmentWrapper.getComment());
     }
 
     @Override

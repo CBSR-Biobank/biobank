@@ -8,11 +8,16 @@ import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.viewers.ComboViewer;
+import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.IDoubleClickListener;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
@@ -28,7 +33,10 @@ import org.springframework.remoting.RemoteConnectFailureException;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.forms.input.FormInput;
+import edu.ualberta.med.biobank.model.ClinicStudyInfo;
+import edu.ualberta.med.biobank.model.StudyContactAndPatientInfo;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
+import edu.ualberta.med.biobank.widgets.infotables.BiobankCollectionModel;
 import edu.ualberta.med.biobank.widgets.utils.WidgetCreator;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
@@ -58,6 +66,29 @@ public abstract class BiobankFormBase extends EditorPart {
     protected HashMap<String, Control> controls = new HashMap<String, Control>();
 
     protected WidgetCreator widgetCreator;
+
+    protected IDoubleClickListener collectionDoubleClickListener = new IDoubleClickListener() {
+        public void doubleClick(DoubleClickEvent event) {
+            Object selection = event.getSelection();
+            Object element = ((StructuredSelection) selection)
+                .getFirstElement();
+            if (element instanceof AdapterBase) {
+                ((AdapterBase) element).performDoubleClick();
+            } else if (element instanceof BiobankCollectionModel) {
+                BiobankCollectionModel item = (BiobankCollectionModel) element;
+                if (item.o != null) {
+                    if (item.o instanceof AdapterBase) {
+                        ((AdapterBase) item.o).performDoubleClick();
+                    } else if (item.o instanceof ClinicStudyInfo) {
+                        ((ClinicStudyInfo) item.o).performDoubleClick();
+                    } else if (item.o instanceof StudyContactAndPatientInfo) {
+                        ((StudyContactAndPatientInfo) item.o)
+                            .performDoubleClick();
+                    }
+                }
+            }
+        }
+    };
 
     public BiobankFormBase() {
         widgetCreator = new WidgetCreator(controls);
@@ -202,6 +233,24 @@ public abstract class BiobankFormBase extends EditorPart {
     protected void createWidgetsFromMap(ListOrderedMap fieldsMap,
         Composite parent) {
         widgetCreator.createWidgetsFromMap(fieldsMap, parent);
+    }
+
+    public static void setTextValue(Label label, String value) {
+        if (value != null) {
+            label.setText(value);
+        }
+    }
+
+    public static void setTextValue(Label label, Object value) {
+        if (value != null) {
+            setTextValue(label, value.toString());
+        }
+    }
+
+    public static void setCheckBoxValue(Button button, Boolean value) {
+        if (value != null) {
+            button.setSelection(value.booleanValue());
+        }
     }
 
 }

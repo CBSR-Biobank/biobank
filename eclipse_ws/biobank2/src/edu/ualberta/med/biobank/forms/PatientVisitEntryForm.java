@@ -126,8 +126,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
 
         Label siteLabel = (Label) createWidget(client, Label.class, SWT.NONE,
             "Site");
-        FormUtils.setTextValue(siteLabel, patient.getStudy().getSite()
-            .getName());
+        setTextValue(siteLabel, patient.getStudy().getSite().getName());
 
         List<ShipmentWrapper> patientShipments = patient
             .getShipmentCollection();

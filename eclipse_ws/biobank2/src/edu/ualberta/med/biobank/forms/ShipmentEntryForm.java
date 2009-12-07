@@ -96,7 +96,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
 
         Label siteLabel = (Label) createWidget(client, Label.class, SWT.NONE,
             "Site");
-        FormUtils.setTextValue(siteLabel, site.getName());
+        setTextValue(siteLabel, site.getName());
 
         createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Waybill",
             null, BeansObservables.observeValue(shipmentWrapper, "waybill"),

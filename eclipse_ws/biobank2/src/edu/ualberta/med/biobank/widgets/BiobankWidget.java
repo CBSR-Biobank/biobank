@@ -3,6 +3,10 @@ package edu.ualberta.med.biobank.widgets;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.jface.fieldassist.ControlDecoration;
+import org.eclipse.jface.fieldassist.FieldDecoration;
+import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.forms.widgets.FormToolkit;
@@ -13,6 +17,17 @@ import edu.ualberta.med.biobank.widgets.listeners.MultiSelectEvent;
 public class BiobankWidget extends Composite {
 
     List<BiobankEntryFormWidgetListener> listeners;
+
+    public static ControlDecoration createDecorator(Control control,
+        String message) {
+        ControlDecoration controlDecoration = new ControlDecoration(control,
+            SWT.RIGHT | SWT.TOP);
+        controlDecoration.setDescriptionText(message);
+        FieldDecoration fieldDecoration = FieldDecorationRegistry.getDefault()
+            .getFieldDecoration(FieldDecorationRegistry.DEC_ERROR);
+        controlDecoration.setImage(fieldDecoration.getImage());
+        return controlDecoration;
+    }
 
     public BiobankWidget(Composite parent, int style) {
         super(parent, style);

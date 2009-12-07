@@ -30,7 +30,6 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
-import edu.ualberta.med.biobank.forms.FormUtils;
 import edu.ualberta.med.biobank.widgets.utils.WidgetCreator;
 
 /**
@@ -66,7 +65,7 @@ public class SampleTypeSelectionWidget {
         data.horizontalAlignment = SWT.LEFT;
         textNumber.setLayoutData(data);
 
-        controlDecoration = FormUtils.createDecorator(combo,
+        controlDecoration = BiobankWidget.createDecorator(combo,
             "A sample type should be selected");
         setNumber(null);
     }

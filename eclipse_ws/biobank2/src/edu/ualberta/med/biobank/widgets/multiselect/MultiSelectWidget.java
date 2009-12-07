@@ -8,12 +8,12 @@ import org.apache.commons.collections.map.ListOrderedMap;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 
-import edu.ualberta.med.biobank.forms.FormUtils;
 import edu.ualberta.med.biobank.widgets.BiobankWidget;
 import edu.ualberta.med.biobank.widgets.listeners.TreeViewerDragListener;
 import edu.ualberta.med.biobank.widgets.listeners.TreeViewerDropListener;
@@ -60,7 +60,7 @@ public class MultiSelectWidget extends BiobankWidget {
 
         Label l = new Label(selComposite, SWT.NONE);
         l.setText(label);
-        l.setFont(FormUtils.getHeadingFont());
+        l.setFont(new Font(null, "sans-serif", 8, SWT.BOLD));
         gd = new GridData(SWT.FILL, SWT.FILL, true, true);
         gd.horizontalSpan = 2;
         gd.horizontalAlignment = SWT.CENTER;

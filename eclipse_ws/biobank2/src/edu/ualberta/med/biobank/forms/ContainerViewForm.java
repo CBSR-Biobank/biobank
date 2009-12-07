@@ -330,25 +330,20 @@ public class ContainerViewForm extends BiobankViewForm {
     }
 
     private void setContainerValues() {
-        FormUtils.setTextValue(siteLabel, container.getSite().getName());
-        FormUtils.setTextValue(containerLabelLabel, container.getLabel());
-        FormUtils.setTextValue(productBarcodeLabel, container
-            .getProductBarcode());
-        FormUtils.setTextValue(activityStatusLabel, container
-            .getActivityStatus());
-        FormUtils.setTextValue(commentsLabel, container.getComment());
-        FormUtils.setTextValue(containerTypeLabel, container.getContainerType()
-            .getName());
-        FormUtils.setTextValue(temperatureLabel, container.getTemperature());
+        setTextValue(siteLabel, container.getSite().getName());
+        setTextValue(containerLabelLabel, container.getLabel());
+        setTextValue(productBarcodeLabel, container.getProductBarcode());
+        setTextValue(activityStatusLabel, container.getActivityStatus());
+        setTextValue(commentsLabel, container.getComment());
+        setTextValue(containerTypeLabel, container.getContainerType().getName());
+        setTextValue(temperatureLabel, container.getTemperature());
         if (container.hasParent()) {
             if (positionDimOneLabel != null) {
-                FormUtils.setTextValue(positionDimOneLabel, container
-                    .getPosition().row);
+                setTextValue(positionDimOneLabel, container.getPosition().row);
             }
 
             if (positionDimTwoLabel != null) {
-                FormUtils.setTextValue(positionDimTwoLabel, container
-                    .getPosition().col);
+                setTextValue(positionDimTwoLabel, container.getPosition().col);
             }
         }
     }

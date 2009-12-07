@@ -45,11 +45,11 @@ import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
 import edu.ualberta.med.biobank.forms.FieldInfo;
-import edu.ualberta.med.biobank.forms.FormUtils;
 import edu.ualberta.med.biobank.validators.AbstractValidator;
 import edu.ualberta.med.biobank.validators.DateNotNulValidator;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
+import edu.ualberta.med.biobank.widgets.BiobankWidget;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 
 public class WidgetCreator {
@@ -230,7 +230,7 @@ public class WidgetCreator {
         AbstractValidator validator) {
 
         if (validator != null) {
-            validator.setControlDecoration(FormUtils.createDecorator(label,
+            validator.setControlDecoration(BiobankWidget.createDecorator(label,
                 validator.getErrorMessage()));
         }
 
@@ -262,7 +262,7 @@ public class WidgetCreator {
         combo.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
         NonEmptyStringValidator validator = new NonEmptyStringValidator(
             errorMessage);
-        validator.setControlDecoration(FormUtils.createDecorator(label,
+        validator.setControlDecoration(BiobankWidget.createDecorator(label,
             errorMessage));
         UpdateValueStrategy uvs = new UpdateValueStrategy();
         uvs.setAfterGetValidator(validator);
@@ -336,8 +336,8 @@ public class WidgetCreator {
             if (emptyMessage != null && !emptyMessage.isEmpty()) {
                 DateNotNulValidator validator = new DateNotNulValidator(
                     emptyMessage);
-                validator.setControlDecoration(FormUtils.createDecorator(label,
-                    validator.getErrorMessage()));
+                validator.setControlDecoration(BiobankWidget.createDecorator(
+                    label, validator.getErrorMessage()));
                 UpdateValueStrategy uvs = new UpdateValueStrategy();
                 uvs.setAfterConvertValidator(validator);
                 bindValue(new WritableValue(null, Date.class), dateValue, uvs,

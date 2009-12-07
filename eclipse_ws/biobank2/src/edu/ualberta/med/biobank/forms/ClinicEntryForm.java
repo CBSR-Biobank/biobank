@@ -100,7 +100,7 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
 
         Label siteLabel = (Label) createWidget(client, Label.class, SWT.NONE,
             "Site");
-        FormUtils.setTextValue(siteLabel, clinicWrapper.getSite().getName());
+        setTextValue(siteLabel, clinicWrapper.getSite().getName());
 
         firstControl = createBoundWidgetWithLabel(client, Text.class, SWT.NONE,
             "Name", null, BeansObservables.observeValue(clinicWrapper, "name"),

@@ -98,14 +98,14 @@ public class StudyViewForm extends BiobankViewForm {
         toolkit.paintBordersFor(contactsTable);
 
         contactsTable.getTableViewer().addDoubleClickListener(
-            FormUtils.getBiobankCollectionDoubleClickListener());
+            collectionDoubleClickListener);
     }
 
     private void setStudySectionValues() {
-        FormUtils.setTextValue(siteLabel, study.getSite().getName());
-        FormUtils.setTextValue(nameShortLabel, study.getNameShort());
-        FormUtils.setTextValue(activityStatusLabel, study.getActivityStatus());
-        FormUtils.setTextValue(commentLabel, study.getComment());
+        setTextValue(siteLabel, study.getSite().getName());
+        setTextValue(nameShortLabel, study.getNameShort());
+        setTextValue(activityStatusLabel, study.getActivityStatus());
+        setTextValue(commentLabel, study.getComment());
     }
 
     private void createSampleStorageSection() {
@@ -165,7 +165,7 @@ public class StudyViewForm extends BiobankViewForm {
 
     private void setPvDataSectionValues() throws Exception {
         for (StudyPvCustomInfo pvCustomInfo : pvCustomInfoList) {
-            FormUtils.setTextValue(pvCustomInfo.wiget, StringUtils.join(study
+            setTextValue(pvCustomInfo.wiget, StringUtils.join(study
                 .getStudyPvAttrPermissible(pvCustomInfo.getLabel()), "; "));
         }
     }

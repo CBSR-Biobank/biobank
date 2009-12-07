@@ -106,7 +106,7 @@ public class ContainerEntryForm extends BiobankEntryForm {
 
         Label siteLabel = (Label) createWidget(client, Label.class, SWT.NONE,
             "Site");
-        FormUtils.setTextValue(siteLabel, containerWrapper.getSite().getName());
+        setTextValue(siteLabel, containerWrapper.getSite().getName());
 
         if (containerWrapper.isNew()
             || (containerWrapper.getContainerType() != null && Boolean.TRUE
@@ -119,7 +119,7 @@ public class ContainerEntryForm extends BiobankEntryForm {
         } else {
             Label l = (Label) createWidget(client, Label.class, SWT.NONE,
                 "Label");
-            FormUtils.setTextValue(l, containerWrapper.getLabel());
+            setTextValue(l, containerWrapper.getLabel());
         }
 
         Control c = createBoundWidgetWithLabel(client, Text.class, SWT.NONE,

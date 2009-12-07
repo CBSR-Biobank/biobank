@@ -12,6 +12,7 @@ import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.treeview.ClinicAdapter;
 import edu.ualberta.med.biobank.widgets.infotables.ClinicStudyInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.ContactInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.ShipmentInfoTable;
 
 public class ClinicViewForm extends AddressViewFormCommon {
     public static final String ID = "edu.ualberta.med.biobank.forms.ClinicViewForm";
@@ -29,6 +30,8 @@ public class ClinicViewForm extends AddressViewFormCommon {
     private Label activityStatusLabel;
 
     private Label commentLabel;
+
+    private ShipmentInfoTable shipmentsTable;
 
     @Override
     protected void init() throws Exception {
@@ -55,6 +58,7 @@ public class ClinicViewForm extends AddressViewFormCommon {
         createAddressSection(clinicWrapper);
         createContactsSection();
         createStudiesSection();
+        createShipmentsSection();
         createButtonsSection();
     }
 
@@ -74,10 +78,9 @@ public class ClinicViewForm extends AddressViewFormCommon {
     }
 
     private void setClinicValues() {
-        FormUtils.setTextValue(siteLabel, clinicWrapper.getSite().getName());
-        FormUtils.setTextValue(activityStatusLabel, clinicWrapper
-            .getActivityStatus());
-        FormUtils.setTextValue(commentLabel, clinicWrapper.getComment());
+        setTextValue(siteLabel, clinicWrapper.getSite().getName());
+        setTextValue(activityStatusLabel, clinicWrapper.getActivityStatus());
+        setTextValue(commentLabel, clinicWrapper.getComment());
     }
 
     private void createContactsSection() {
@@ -89,7 +92,7 @@ public class ClinicViewForm extends AddressViewFormCommon {
         toolkit.paintBordersFor(contactsTable);
 
         contactsTable.getTableViewer().addDoubleClickListener(
-            FormUtils.getBiobankCollectionDoubleClickListener());
+            collectionDoubleClickListener);
     }
 
     protected void createStudiesSection() throws Exception {
@@ -100,7 +103,18 @@ public class ClinicViewForm extends AddressViewFormCommon {
         toolkit.paintBordersFor(studiesTable);
 
         studiesTable.getTableViewer().addDoubleClickListener(
-            FormUtils.getBiobankCollectionDoubleClickListener());
+            collectionDoubleClickListener);
+    }
+
+    protected void createShipmentsSection() {
+        Composite client = createSectionWithClient("Shipments");
+
+        shipmentsTable = new ShipmentInfoTable(client, clinicWrapper);
+        shipmentsTable.adaptToToolkit(toolkit, true);
+        toolkit.paintBordersFor(shipmentsTable);
+
+        shipmentsTable.getTableViewer().addDoubleClickListener(
+            collectionDoubleClickListener);
     }
 
     protected void createButtonsSection() {

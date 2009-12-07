@@ -116,23 +116,18 @@ public class ContainerTypeViewForm extends BiobankViewForm {
     }
 
     private void setContainerTypeValues() {
-        FormUtils.setTextValue(siteLabel, containerType.getSite().getName());
-        FormUtils.setTextValue(nameLabel, containerType.getName());
-        FormUtils.setTextValue(nameShortLabel, containerType.getNameShort());
-        FormUtils.setCheckBoxValue(isTopLevelButton, containerType
-            .getTopLevel());
-        FormUtils.setTextValue(dimOneCapacityLabel, containerType
-            .getRowCapacity());
-        FormUtils.setTextValue(dimTwoCapacityLabel, containerType
-            .getColCapacity());
-        FormUtils.setTextValue(defaultTempLabel, containerType
-            .getDefaultTemperature());
-        FormUtils.setTextValue(numSchemeLabel, containerType
-            .getChildLabelingScheme() == null ? "" : containerType
-            .getChildLabelingSchemeName());
-        FormUtils.setTextValue(activityStatusLabel, containerType
-            .getActivityStatus());
-        FormUtils.setTextValue(commentLabel, containerType.getComment());
+        setTextValue(siteLabel, containerType.getSite().getName());
+        setTextValue(nameLabel, containerType.getName());
+        setTextValue(nameShortLabel, containerType.getNameShort());
+        setCheckBoxValue(isTopLevelButton, containerType.getTopLevel());
+        setTextValue(dimOneCapacityLabel, containerType.getRowCapacity());
+        setTextValue(dimTwoCapacityLabel, containerType.getColCapacity());
+        setTextValue(defaultTempLabel, containerType.getDefaultTemperature());
+        setTextValue(numSchemeLabel,
+            containerType.getChildLabelingScheme() == null ? "" : containerType
+                .getChildLabelingSchemeName());
+        setTextValue(activityStatusLabel, containerType.getActivityStatus());
+        setTextValue(commentLabel, containerType.getComment());
     }
 
     private void createSampleTypesSection() {

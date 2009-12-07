@@ -107,9 +107,8 @@ public class SiteViewForm extends AddressViewFormCommon {
     }
 
     private void setSiteSectionValues() {
-        FormUtils.setTextValue(activityStatusLabel, siteWrapper
-            .getActivityStatus());
-        FormUtils.setTextValue(commentLabel, siteWrapper.getComment());
+        setTextValue(activityStatusLabel, siteWrapper.getActivityStatus());
+        setTextValue(commentLabel, siteWrapper.getComment());
     }
 
     private void createStudySection() {
@@ -127,8 +126,7 @@ public class SiteViewForm extends AddressViewFormCommon {
         studiesTable = new StudyInfoTable(client, siteWrapper
             .getStudyCollection());
         studiesTable.adaptToToolkit(toolkit, true);
-        studiesTable.addDoubleClickListener(FormUtils
-            .getBiobankCollectionDoubleClickListener());
+        studiesTable.addDoubleClickListener(collectionDoubleClickListener);
     }
 
     public void createClinicSection() {
@@ -144,7 +142,7 @@ public class SiteViewForm extends AddressViewFormCommon {
         section.setClient(clinicsTable);
         clinicsTable.adaptToToolkit(toolkit, true);
         clinicsTable.getTableViewer().addDoubleClickListener(
-            FormUtils.getBiobankCollectionDoubleClickListener());
+            collectionDoubleClickListener);
     }
 
     private void createContainerTypesSection() {
@@ -154,8 +152,8 @@ public class SiteViewForm extends AddressViewFormCommon {
             .getContainerTypeCollection());
         containerTypesTable.adaptToToolkit(toolkit, true);
 
-        containerTypesTable.addDoubleClickListener(FormUtils
-            .getBiobankCollectionDoubleClickListener());
+        containerTypesTable
+            .addDoubleClickListener(collectionDoubleClickListener);
     }
 
     private void createContainerSection() {
@@ -168,8 +166,8 @@ public class SiteViewForm extends AddressViewFormCommon {
             sContainersTable.adaptToToolkit(toolkit, true);
             toolkit.paintBordersFor(sContainersTable);
 
-            sContainersTable.addDoubleClickListener(FormUtils
-                .getBiobankCollectionDoubleClickListener());
+            sContainersTable
+                .addDoubleClickListener(collectionDoubleClickListener);
         } catch (Exception e) {
             LOGGER.error("Problem while queriyng top level containers", e);
         }
