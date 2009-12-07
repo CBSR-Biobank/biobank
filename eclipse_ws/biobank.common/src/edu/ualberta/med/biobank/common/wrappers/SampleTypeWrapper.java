@@ -76,6 +76,10 @@ public class SampleTypeWrapper extends ModelWrapper<SampleType> {
         }
     }
 
+    /**
+     * Get the list of container type that support this sample type. Use
+     * ContainerType.setSampleTypeCollection to link objects together
+     */
     @SuppressWarnings("unchecked")
     public List<ContainerTypeWrapper> getContainerTypeCollection(boolean sort) {
         List<ContainerTypeWrapper> containerTypeCollection = (List<ContainerTypeWrapper>) propertiesMap

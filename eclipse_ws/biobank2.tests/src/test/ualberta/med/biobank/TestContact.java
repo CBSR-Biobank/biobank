@@ -2,7 +2,6 @@ package test.ualberta.med.biobank;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 import junit.framework.Assert;
 
@@ -23,9 +22,9 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 public class TestContact extends TestDatabase {
 
     @Test
-    public void testGetSetStudyCollection() throws BiobankCheckException,
+    public void testGetStudyCollection() throws BiobankCheckException,
         Exception {
-        String name = "testGetSetStudyCollection" + r.nextInt();
+        String name = "testGetStudyCollection" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         ClinicWrapper clinic = ClinicHelper.addClinic(site, name);
         StudyWrapper study = StudyHelper.addStudy(site, name);
@@ -36,18 +35,6 @@ public class TestContact extends TestDatabase {
         contact.reload();
 
         Assert.assertEquals(1, contact.getStudyCollection().size());
-
-        StudyWrapper study2 = StudyHelper.addStudy(site, name + "_2");
-        List<StudyWrapper> studies = contact.getStudyCollection();
-        studies.add(study2);
-        contact.setStudyCollection(studies);
-        contact.persist();
-
-        contact.reload();
-        // Don't work because of the *..* relation : we have to choose one way
-        // only for updates, and this is study.setContactCollection() in this
-        // case
-        // Assert.assertEquals(2, contact.getStudyCollection().size());
     }
 
     @Test

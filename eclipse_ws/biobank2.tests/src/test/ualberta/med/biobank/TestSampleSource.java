@@ -1,6 +1,7 @@
 package test.ualberta.med.biobank;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Assert;
@@ -13,7 +14,6 @@ import test.ualberta.med.biobank.internal.StudyHelper;
 import edu.ualberta.med.biobank.common.wrappers.SampleSourceWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
-import edu.ualberta.med.biobank.model.Study;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class TestSampleSource extends TestDatabase {
@@ -30,62 +30,22 @@ public class TestSampleSource extends TestDatabase {
     }
 
     @Test
-    public void testGetSetStudyCollection() throws Exception {
+    public void testGetStudyCollection() throws Exception {
         List<StudyWrapper> studies = new ArrayList<StudyWrapper>();
-        List<StudyWrapper> oldStudies = new ArrayList<StudyWrapper>(studies);
-
-        // simple add
-        StudyWrapper newStudy = StudyHelper.addStudy(defaultSite, "newStudy");
-        studies.add(newStudy);
-        ssw.setStudyCollection(new ArrayList<StudyWrapper>(studies));
-        ssw.persist();
-        // check if study is attached in db and compare with get
-        Study dbStudy = ModelUtils.getObjectWithId(appService, Study.class,
-            newStudy.getId());
-        studies = new ArrayList<StudyWrapper>(ssw.getStudyCollection(false));
-        boolean found = false;
+        for (int i = 0; i < 3; i++) {
+            StudyWrapper newStudy = StudyHelper.newStudy(defaultSite,
+                "newStudy" + i);
+            newStudy.setSampleSourceCollection(Arrays.asList(ssw));
+            newStudy.persist();
+            studies.add(newStudy);
+        }
+        ssw.reload();
+        List<StudyWrapper> foundStudies = new ArrayList<StudyWrapper>(ssw
+            .getStudyCollection(false));
+        Assert.assertEquals(studies.size(), foundStudies.size());
         for (StudyWrapper study : studies) {
-            if (study.getId().equals(dbStudy.getId()))
-                found = true;
+            Assert.assertTrue(foundStudies.contains(study));
         }
-        Assert.assertTrue(found);
-
-        // simple delete
-
-        studies.remove(studies.size() - 1);
-        ssw.setStudyCollection(studies);
-        ssw.persist();
-
-        for (int i = 0; i < studies.size(); i++) {
-            Assert.assertTrue(studies.get(i).getId().equals(
-                oldStudies.get(i).getId()));
-        }
-
-        // add three, delete middle
-
-        StudyWrapper newStudy2 = StudyHelper.addStudy(defaultSite, "newStudy2");
-        StudyWrapper newStudy3 = StudyHelper.addStudy(defaultSite, "newStudy3");
-
-        int middle = studies.size() + 1;
-        studies.add(newStudy);
-        studies.add(newStudy2);
-        studies.add(newStudy3);
-
-        ssw.setStudyCollection(studies);
-        ssw.persist();
-        studies.remove(middle);
-        ssw.setStudyCollection(studies);
-        ssw.persist();
-        studies = new ArrayList<StudyWrapper>(ssw.getStudyCollection(true));
-
-        for (int i = 0; i < studies.size() - 2; i++) {
-            Assert.assertTrue(studies.get(i).getId().equals(
-                oldStudies.get(i).getId()));
-        }
-        Assert.assertTrue(studies.get(studies.size() - 2).getId().equals(
-            newStudy.getId()));
-        Assert.assertTrue(studies.get(studies.size() - 1).getId().equals(
-            newStudy3.getId()));
     }
 
     @Test

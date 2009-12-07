@@ -3,7 +3,6 @@ package edu.ualberta.med.biobank.common.wrappers;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.BiobankCheckException;
@@ -89,6 +88,10 @@ public class ContactWrapper extends ModelWrapper<Contact> {
             .firePropertyChange("clinic", oldClinic, newClinic);
     }
 
+    /**
+     * Get the studyCollection. Use Study.setContactCollection to link study and
+     * contact
+     */
     @SuppressWarnings("unchecked")
     public List<StudyWrapper> getStudyCollection(boolean sort) {
         List<StudyWrapper> clinicCollection = (List<StudyWrapper>) propertiesMap
@@ -110,25 +113,6 @@ public class ContactWrapper extends ModelWrapper<Contact> {
 
     public List<StudyWrapper> getStudyCollection() {
         return getStudyCollection(false);
-    }
-
-    public void setStudyCollection(Collection<Study> studies, boolean setNull) {
-        Collection<Study> oldStudies = wrappedObject.getStudyCollection();
-        wrappedObject.setStudyCollection(studies);
-        propertyChangeSupport.firePropertyChange("studyCollection", oldStudies,
-            studies);
-        if (setNull) {
-            propertiesMap.put("studyCollection", null);
-        }
-    }
-
-    public void setStudyCollection(List<StudyWrapper> studies) {
-        Collection<Study> studyObjects = new HashSet<Study>();
-        for (StudyWrapper study : studies) {
-            studyObjects.add(study.getWrappedObject());
-        }
-        setStudyCollection(studyObjects, false);
-        propertiesMap.put("studyCollection", studies);
     }
 
     @Override
