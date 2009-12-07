@@ -240,6 +240,7 @@ public class TestPatientVisit extends TestDatabase {
             RowColPos pos = sample.getPosition();
             System.out.println("getting sample from: " + pos.row + ", "
                 + pos.col);
+            Assert.assertNotNull(pos);
             Assert.assertNotNull(pos.row);
             Assert.assertNotNull(pos.col);
             Assert.assertNotNull(sampleMap.get(pos.row + pos.col * rows));
