@@ -77,13 +77,13 @@ public class StudyPvAttrWrapper extends ModelWrapper<StudyPvAttr> {
         return wrappedObject.getPermissible();
     }
 
-    public void setLocked(Integer enabled) {
-        Integer oldEnabled = wrappedObject.getLocked();
+    public void setLocked(Boolean enabled) {
+        Boolean oldEnabled = wrappedObject.getLocked();
         wrappedObject.setLocked(enabled);
         propertyChangeSupport.firePropertyChange("locked", oldEnabled, enabled);
     }
 
-    public Integer getLocked() {
+    public Boolean getLocked() {
         return wrappedObject.getLocked();
     }
 

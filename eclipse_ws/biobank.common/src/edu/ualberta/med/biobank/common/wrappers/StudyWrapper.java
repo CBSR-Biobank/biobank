@@ -503,7 +503,7 @@ public class StudyWrapper extends ModelWrapper<Study> {
      * @return True if the attribute is locked. False otherwise.
      * @throws Exception
      */
-    public Integer getStudyPvAttrLocked(String label) throws Exception {
+    public Boolean getStudyPvAttrLocked(String label) throws Exception {
         return getStudyPvAttr(label).getLocked();
     }
 
@@ -536,7 +536,7 @@ public class StudyWrapper extends ModelWrapper<Study> {
             studyPvAttr.setPvAttrType(pvAttrType);
             studyPvAttr.setStudy(wrappedObject);
         }
-        studyPvAttr.setLocked(0);
+        studyPvAttr.setLocked(false);
         if (permissibleValues != null) {
             studyPvAttr
                 .setPermissible(StringUtils.join(permissibleValues, ';'));
@@ -570,7 +570,7 @@ public class StudyWrapper extends ModelWrapper<Study> {
      * 
      * @throws Exception if attribute with label does not exist.
      */
-    public void setStudyPvAttrLocked(String label, Integer enable)
+    public void setStudyPvAttrLocked(String label, Boolean enable)
         throws Exception {
         getStudyPvAttrMap();
         StudyPvAttrWrapper studyPvAttr = getStudyPvAttr(label);

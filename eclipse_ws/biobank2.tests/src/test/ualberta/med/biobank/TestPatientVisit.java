@@ -473,7 +473,7 @@ public class TestPatientVisit extends TestDatabase {
         visit.reload();
 
         // lock an attribute
-        study.setStudyPvAttrLocked("Worksheet", 1);
+        study.setStudyPvAttrLocked("Worksheet", true);
         study.persist();
         visit.reload();
         try {
@@ -484,7 +484,7 @@ public class TestPatientVisit extends TestDatabase {
         }
 
         // unlock the attribute
-        study.setStudyPvAttrLocked("Worksheet", 0);
+        study.setStudyPvAttrLocked("Worksheet", false);
         study.persist();
         visit.reload();
         visit.setPvAttrValue("Worksheet", "xyz");
