@@ -1,8 +1,5 @@
 package edu.ualberta.med.biobank.common.wrappers.internal;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
@@ -94,15 +91,6 @@ public class SitePvAttrWrapper extends ModelWrapper<SitePvAttr> {
         } else {
             setSite(site.getWrappedObject());
         }
-    }
-
-    public static List<SitePvAttrWrapper> transformToWrapperList(
-        WritableApplicationService appService, List<SitePvAttr> pipList) {
-        List<SitePvAttrWrapper> list = new ArrayList<SitePvAttrWrapper>();
-        for (SitePvAttr type : pipList) {
-            list.add(new SitePvAttrWrapper(appService, type));
-        }
-        return list;
     }
 
     @Override
