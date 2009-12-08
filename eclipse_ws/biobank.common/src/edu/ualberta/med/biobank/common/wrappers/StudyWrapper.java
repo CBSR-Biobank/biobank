@@ -542,8 +542,6 @@ public class StudyWrapper extends ModelWrapper<Study> {
                 .setPermissible(StringUtils.join(permissibleValues, ';'));
         }
         studyPvAttrMap.put(label, studyPvAttr);
-        setStudyPvAttrCollection(new ArrayList<StudyPvAttrWrapper>(
-            studyPvAttrMap.values()));
     }
 
     /**
@@ -741,6 +739,10 @@ public class StudyWrapper extends ModelWrapper<Study> {
 
     @Override
     protected void persistDependencies(Study origObject) throws Exception {
+        if (studyPvAttrMap != null) {
+            setStudyPvAttrCollection(new ArrayList<StudyPvAttrWrapper>(
+                studyPvAttrMap.values()));
+        }
         if (origObject != null) {
             deleteSampleStorageDifference(origObject);
             deleteSampleSourceDifference(origObject);

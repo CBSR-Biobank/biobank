@@ -794,13 +794,6 @@ public class SiteWrapper extends ModelWrapper<Site> {
             sitePvAttrMap.put(label, sitePvAttr);
         }
         sitePvAttr.setPvAttrType(pvAttrType);
-
-        List<SitePvAttrWrapper> list = getSitePvAttrCollection();
-        if (list == null) {
-            list = new ArrayList<SitePvAttrWrapper>();
-        }
-        list.add(sitePvAttr);
-        setSitePvAttrCollection(list);
     }
 
     public void deleteSitePvAttr(String label) throws Exception {
@@ -814,6 +807,10 @@ public class SiteWrapper extends ModelWrapper<Site> {
 
     @Override
     protected void persistDependencies(Site origObject) throws Exception {
+        if (sitePvAttrMap != null) {
+            setSitePvAttrCollection(new ArrayList<SitePvAttrWrapper>(
+                sitePvAttrMap.values()));
+        }
         if (origObject != null) {
             deleteSampleTypeDifference(origObject);
             deleteSitePvAttrDifference(origObject);

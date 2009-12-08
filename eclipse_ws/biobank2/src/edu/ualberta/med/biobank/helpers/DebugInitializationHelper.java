@@ -272,8 +272,7 @@ public class DebugInitializationHelper {
             patientVisit.setShipment(shipments.get(0));
         }
         SampleWrapper sample = createSample(patientVisit);
-        patientVisit.setSampleCollection(Arrays
-            .asList(new SampleWrapper[] { sample }));
+        sample.setPatientVisit(patientVisit);
         return patientVisit;
     }
 

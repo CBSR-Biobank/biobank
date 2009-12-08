@@ -20,6 +20,7 @@ import test.ualberta.med.biobank.internal.ContainerHelper;
 import test.ualberta.med.biobank.internal.ContainerTypeHelper;
 import test.ualberta.med.biobank.internal.PatientHelper;
 import test.ualberta.med.biobank.internal.PatientVisitHelper;
+import test.ualberta.med.biobank.internal.PvSampleSourceHelper;
 import test.ualberta.med.biobank.internal.SampleHelper;
 import test.ualberta.med.biobank.internal.ShipmentHelper;
 import test.ualberta.med.biobank.internal.SiteHelper;
@@ -136,6 +137,9 @@ public class TestPatientVisit extends TestDatabase {
         PatientVisitWrapper visit = PatientVisitHelper.addPatientVisit(patient,
             shipment, Utils.getRandomDate());
         testGettersAndSetters(visit, GETTER_SKIP_METHODS);
+
+        visit = new PatientVisitWrapper(appService);
+        Assert.assertEquals(null, visit.getPatient());
     }
 
     @Test
@@ -326,6 +330,14 @@ public class TestPatientVisit extends TestDatabase {
         Assert.assertEquals(null, visit.getPvAttrValue("Consent"));
         Assert.assertEquals(null, visit.getPvAttrValue("Visit"));
 
+        // select an invalid PvAttr label
+        try {
+            visit.getPvAttrValue("abcdef");
+            Assert.fail("should not be query an invalid label");
+        } catch (Exception e) {
+            Assert.assertTrue(true);
+        }
+
         // assign PvAttrs correctly
         String worksheetValue = Utils.getRandomString(10, 20);
         visit.setPvAttrValue("PMBC Count", "-0.543");
@@ -410,6 +422,10 @@ public class TestPatientVisit extends TestDatabase {
         visit.setPvAttrValue("Visit", "v1");
         visit.persist();
 
+        // set value to null
+        visit.setPvAttrValue("PMBC Count", null);
+        visit.persist();
+
         // get types after they are assigned on patient visit
         Assert.assertEquals("number", visit.getPvAttrTypeName("PMBC Count"));
         Assert.assertEquals("text", visit.getPvAttrTypeName("Worksheet"));
@@ -489,7 +505,6 @@ public class TestPatientVisit extends TestDatabase {
         visit.reload();
         visit.setPvAttrValue("Worksheet", "xyz");
         visit.persist();
-
     }
 
     @Test
@@ -572,29 +587,6 @@ public class TestPatientVisit extends TestDatabase {
         try {
             visit.persist();
             Assert
-                .fail("should not be allowed to add a visit where patient and clinic not in same study");
-        } catch (Exception e) {
-            Assert.assertTrue(true);
-        }
-    }
-
-    @Test
-    public void testCheckPatientClinicInSameStudy() throws Exception {
-        // check valid case
-        PatientVisitWrapper visit = PatientVisitHelper.newPatientVisit(patient,
-            shipment, TestCommon.getUniqueDate(r));
-
-        // check invalid case
-        StudyWrapper study2 = StudyHelper.addStudy(site,
-            "Study - Patient Visit Test " + Utils.getRandomString(10));
-        PatientWrapper patient2 = PatientHelper.addPatient(Utils
-            .getRandomNumericString(20), study2);
-        visit = PatientVisitHelper.newPatientVisit(patient2, shipment,
-            TestCommon.getUniqueDate(r));
-
-        try {
-            visit.persist();
-            Assert
                 .fail("should not be allowed to add a visits with patient not in shipment");
         } catch (Exception e) {
             Assert.assertTrue(true);
@@ -613,19 +605,32 @@ public class TestPatientVisit extends TestDatabase {
         PatientVisitWrapper visit = PatientVisitHelper.addPatientVisit(patient,
             shipment, Utils.getRandomDate());
 
-        PvSampleSourceWrapper pvSampleSourceWrapper = new PvSampleSourceWrapper(
-            appService);
-        pvSampleSourceWrapper.setDateDrawn(Utils.getRandomDate());
-        pvSampleSourceWrapper.setPatientVisit(visit);
-        pvSampleSourceWrapper.setQuantity(2);
-        pvSampleSourceWrapper.setSampleSource(SampleSourceWrapper
-            .getAllSampleSources(appService).get(0));
+        PvSampleSourceWrapper ss1, ss2, ss3;
 
-        visit.setPvSampleSourceCollection(Arrays.asList(pvSampleSourceWrapper));
+        ss1 = PvSampleSourceHelper.newPvSampleSource(SampleSourceWrapper
+            .getAllSampleSources(appService).get(0).getName(), visit);
+        ss2 = PvSampleSourceHelper.newPvSampleSource(SampleSourceWrapper
+            .getAllSampleSources(appService).get(1).getName(), visit);
 
+        visit.setPvSampleSourceCollection(Arrays.asList(ss1, ss2));
         visit.persist();
 
         visit.reload();
-        Assert.assertEquals(1, visit.getPvSampleSourceCollection().size());
+        // get the sorted list
+        List<PvSampleSourceWrapper> list = visit
+            .getPvSampleSourceCollection(true);
+        Assert.assertEquals(2, list.size());
+        Assert.assertTrue(list.get(0).compareTo(list.get(1)) < 0);
+
+        ss3 = PvSampleSourceHelper.newPvSampleSource(SampleSourceWrapper
+            .getAllSampleSources(appService).get(1).getName(), visit);
+
+        list.remove(0);
+        list.add(ss3);
+        visit.setPvSampleSourceCollection(list);
+        visit.persist();
+
+        list = visit.getPvSampleSourceCollection();
+        Assert.assertEquals(2, list.size());
     }
 }
