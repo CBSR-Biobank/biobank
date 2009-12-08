@@ -197,7 +197,7 @@ public class TestSample extends TestDatabase {
         sample.setPatientVisit(newVisit);
         try {
             sample.persist();
-            Assert.fail("visit not form same site that parent");
+            Assert.fail("visit not from same site that parent");
         } catch (BiobankCheckException bce) {
             Assert.assertTrue(true);
         }

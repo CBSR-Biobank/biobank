@@ -754,6 +754,25 @@ public class TestStudy extends TestDatabase {
     }
 
     @Test
+    public void testPersistFailCheckStudyShortNameUnique() throws Exception {
+        String name = "testPersistFailCheckStudyShortNameUnique" + r.nextInt();
+        SiteWrapper site = SiteHelper.addSite(name);
+        StudyWrapper s1 = StudyHelper.newStudy(site, name);
+        s1.setNameShort(name);
+        s1.persist();
+
+        StudyWrapper s2 = StudyHelper.newStudy(site, name + "_2");
+        s2.setNameShort(name);
+        try {
+            s2.persist();
+            Assert
+                .fail("Should not insert the study : same short name already in database");
+        } catch (BiobankCheckException bce) {
+            Assert.assertTrue(true);
+        }
+    }
+
+    @Test
     public void testPersistFailCheckContactsFromSameSite() throws Exception {
         String name = "testPersistFailCheckContactsFromSameSite";
         SiteWrapper site = SiteHelper.addSite(name);
