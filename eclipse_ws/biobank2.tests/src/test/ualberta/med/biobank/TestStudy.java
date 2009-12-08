@@ -390,7 +390,8 @@ public class TestStudy extends TestDatabase {
         Assert.assertTrue(labels.contains("Worksheet"));
         Assert.assertTrue(labels.contains("Visit Type"));
         Assert.assertEquals("text", study.getStudyPvAttrType("Worksheet"));
-        Assert.assertEquals("text", study.getStudyPvAttrType("Visit Type"));
+        Assert.assertEquals("select_single", study
+            .getStudyPvAttrType("Visit Type"));
 
         // get non existing label, expect exception
         try {
@@ -443,7 +444,7 @@ public class TestStudy extends TestDatabase {
 
         // lock the attribute
         study.setStudyPvAttrLocked("Worksheet", true);
-        Assert.assertEquals(1, study.getStudyPvAttrLocked("Worksheet")
+        Assert.assertEquals(true, study.getStudyPvAttrLocked("Worksheet")
             .booleanValue());
 
         // get lock for non existing label, expect exception
@@ -463,15 +464,15 @@ public class TestStudy extends TestDatabase {
         }
         // add patient visit that uses the locked attribute
         study.setStudyPvAttr("Worksheet", "text");
-        study.getStudyPvAttrLocked("Worksheet");
+        study.setStudyPvAttrLocked("Worksheet", true);
         study.persist();
         study.reload();
         List<PatientVisitWrapper> visits = studyAddPatientVisits(study);
         PatientVisitWrapper visit = visits.get(0);
-        visit.setPvAttrValue("Worksheet", Utils.getRandomString(10, 15));
+        visit.reload();
 
         try {
-            visit.persist();
+            visit.setPvAttrValue("Worksheet", Utils.getRandomString(10, 15));
             Assert.fail("call should generate an exception");
         } catch (Exception e) {
             Assert.assertTrue(true);

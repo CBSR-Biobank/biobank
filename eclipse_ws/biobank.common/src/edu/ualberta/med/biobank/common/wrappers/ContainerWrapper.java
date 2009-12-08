@@ -325,7 +325,11 @@ public class ContainerWrapper extends
     }
 
     public void setContainerType(ContainerTypeWrapper containerType) {
-        setContainerType(containerType.getWrappedObject());
+        if (containerType == null) {
+            setContainerType((ContainerType) null);
+        } else {
+            setContainerType(containerType.getWrappedObject());
+        }
     }
 
     public void setContainerType(ContainerType containerType) {

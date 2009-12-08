@@ -250,7 +250,7 @@ public class TestContainer extends TestDatabase {
     }
 
     @Test
-    public void createNoSite() throws Exception {
+    public void testCreateNoSite() throws Exception {
         try {
             ContainerHelper.addContainer("05", null, null, null,
                 containerTypeMap.get("TopCT"));
@@ -264,7 +264,7 @@ public class TestContainer extends TestDatabase {
     }
 
     @Test
-    public void createNoContainerType() throws Exception {
+    public void testCreateNoContainerType() throws Exception {
         try {
             ContainerHelper.addContainer("05", null, null, site, null);
             Assert
