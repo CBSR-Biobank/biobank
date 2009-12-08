@@ -598,39 +598,6 @@ public class TestContainer extends TestDatabase {
         Assert.assertEquals(0, parents.size());
     }
 
-    @Test
-    public void testGetChildWithLabel() throws Exception {
-        ContainerWrapper top, child;
-
-        top = containerMap.get("Top");
-        ContainerTypeWrapper type = top.getContainerType();
-        int labelingScheme = type.getChildLabelingScheme();
-        int maxRows = type.getRowCapacity();
-        int maxCols = type.getColCapacity();
-
-        for (int row = 0; row < maxRows; ++row) {
-            for (int col = 0; col < maxCols; ++col) {
-                child = ContainerHelper.addContainer(null, "0001_" + row + "_"
-                    + col, top, site, containerTypeMap.get("ChildCtL1"), row,
-                    col);
-                top.reload();
-
-                String label = "01"
-                    + getLabel(labelingScheme, maxRows, maxCols, row, col);
-                ;
-
-                ContainerWrapper result = top.getChildWithLabel(label);
-                Assert.assertEquals(child, result);
-            }
-        }
-
-        // get one outside bounds
-        String label = "01"
-            + getLabel(labelingScheme, maxRows + 1, maxCols + 1, maxRows,
-                maxCols);
-        Assert.assertEquals(null, top.getChildWithLabel(label));
-    }
-
     private String getLabel(Integer labelingScheme, int maxRows, int maxCol,
         int row, int col) {
         String label = null;

@@ -7,7 +7,7 @@ import edu.ualberta.med.biobank.common.wrappers.ShippingCompanyWrapper;
 
 public class ShippingCompanyHelper extends DbHelper {
 
-    protected static List<ShippingCompanyWrapper> createdCompanies = new ArrayList<ShippingCompanyWrapper>();
+    public static List<ShippingCompanyWrapper> createdCompanies = new ArrayList<ShippingCompanyWrapper>();
 
     public static ShippingCompanyWrapper newShippingCompany(String name) {
         ShippingCompanyWrapper company = new ShippingCompanyWrapper(appService);

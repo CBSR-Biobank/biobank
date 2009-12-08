@@ -336,7 +336,7 @@ public class StudyEntryForm extends BiobankEntryForm {
     }
 
     @Override
-    public void reset() {
+    public void reset() throws Exception {
         super.reset();
         List<ContactWrapper> contacts = study.getContactCollection();
         if (contacts != null) {

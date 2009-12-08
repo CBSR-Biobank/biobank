@@ -299,7 +299,11 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
             public void run() {
                 BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
                     public void run() {
-                        reset();
+                        try {
+                            reset();
+                        } catch (Exception ex) {
+                            BioBankPlugin.openAsyncError("Error on reset", ex);
+                        }
                     }
                 });
             }
@@ -362,12 +366,8 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
         }
     }
 
-    public void reset() {
-        try {
-            adapter.resetObject();
-        } catch (Exception e) {
-            LOGGER.error("Can't reset the form", e);
-        }
+    public void reset() throws Exception {
+        adapter.resetObject();
     }
 
     /**

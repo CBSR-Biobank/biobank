@@ -682,7 +682,7 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
     }
 
     @Override
-    public void reset() {
+    public void reset() throws Exception {
         reset(true);
     }
 

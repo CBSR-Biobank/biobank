@@ -244,7 +244,7 @@ public class ContainerEntryForm extends BiobankEntryForm {
     }
 
     @Override
-    public void reset() {
+    public void reset() throws Exception {
         super.reset();
         currentContainerType = containerWrapper.getContainerType();
         if (currentContainerType != null) {

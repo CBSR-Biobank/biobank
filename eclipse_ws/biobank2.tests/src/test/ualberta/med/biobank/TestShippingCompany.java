@@ -128,9 +128,10 @@ public class TestShippingCompany extends TestDatabase {
     @Test
     public void testPersist() throws Exception {
         String name = "testPersist" + r.nextInt();
-        ShippingCompanyWrapper company = new ShippingCompanyWrapper(appService);
-        company.setName(name);
+        ShippingCompanyWrapper company = ShippingCompanyHelper
+            .newShippingCompany(name);
         company.persist();
+        ShippingCompanyHelper.createdCompanies.add(company);
 
         ShippingCompany shipComp = new ShippingCompany();
         shipComp.setId(company.getId());

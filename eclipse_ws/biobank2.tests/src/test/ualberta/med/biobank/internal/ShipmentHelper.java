@@ -1,11 +1,9 @@
 package test.ualberta.med.biobank.internal;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.List;
-import java.util.Random;
 
+import test.ualberta.med.biobank.TestCommon;
 import test.ualberta.med.biobank.Utils;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
@@ -14,8 +12,6 @@ import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 
 public class ShipmentHelper extends DbHelper {
-
-    public static List<String> usedWaybills;
 
     public static ShipmentWrapper newShipment(ClinicWrapper clinic,
         String waybill, Date dateReceived, PatientWrapper... patients)
@@ -36,12 +32,13 @@ public class ShipmentHelper extends DbHelper {
 
     public static ShipmentWrapper newShipment(ClinicWrapper clinic)
         throws Exception {
-        return newShipment(clinic, getNewWaybill(r), Utils.getRandomDate());
+        return newShipment(clinic, TestCommon.getNewWaybill(r), Utils
+            .getRandomDate());
     }
 
     public static ShipmentWrapper addShipment(ClinicWrapper clinic,
         PatientWrapper... patients) throws Exception {
-        return addShipment(clinic, Utils.getRandomString(5), patients);
+        return addShipment(clinic, TestCommon.getNewWaybill(r), patients);
     }
 
     public static ShipmentWrapper addShipment(ClinicWrapper clinic,
@@ -63,19 +60,6 @@ public class ShipmentHelper extends DbHelper {
         PatientWrapper patient = PatientHelper.addPatient(name, study);
 
         return addShipment(clinic, patient);
-    }
-
-    public static String getNewWaybill(Random r) {
-        if (usedWaybills == null) {
-            usedWaybills = new ArrayList<String>();
-        }
-
-        String waybill;
-        do {
-            waybill = Utils.getRandomString(10);
-        } while (usedWaybills.contains(waybill));
-        usedWaybills.add(waybill);
-        return waybill;
     }
 
 }

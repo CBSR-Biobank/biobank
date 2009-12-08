@@ -104,6 +104,20 @@ public abstract class AbstractPatientAdminForm extends BiobankEntryForm {
         styledTextPrinter.run();
         printer.dispose();
         font.dispose();
+
+        // JasperFillManager.fillReport(jasperReport, parameters);
+        // try {
+        // Map<String, Object> map = new HashMap<String, Object>();
+        // map.put("username", "toto");
+        // JasperPrint print = JasperFillManager.fillReport(
+        // AbstractPatientAdminForm.class
+        // .getResourceAsStream("ScanReportPrintForm.jasper"), map);
+        // JasperExportManager.exportReportToPdfFile(print,
+        // "/home/delphine/test.pdf");
+        // } catch (JRException e) {
+        // // TODO Auto-generated catch block
+        // e.printStackTrace();
+        // }
     }
 
     protected abstract String getActivityTitle();

@@ -369,7 +369,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
     }
 
     @Override
-    public void reset() {
+    public void reset() throws Exception {
         super.reset();
 
         setChildContainerTypeSelection();

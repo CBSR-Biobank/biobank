@@ -17,6 +17,8 @@ public class TestCommon {
 
     private static List<Date> usedDates;
 
+    public static List<String> usedWaybills;
+
     public static ContainerTypeWrapper addSampleTypes(ContainerTypeWrapper ct,
         List<SampleTypeWrapper> sampleTypes) throws Exception {
         Assert.assertTrue("not enough sample types for test", (sampleTypes
@@ -73,5 +75,18 @@ public class TestCommon {
         } while (usedDates.contains(id));
         usedDates.add(id);
         return id;
+    }
+
+    public static String getNewWaybill(Random r) {
+        if (usedWaybills == null) {
+            usedWaybills = new ArrayList<String>();
+        }
+
+        String waybill;
+        do {
+            waybill = Utils.getRandomString(10);
+        } while (usedWaybills.contains(waybill));
+        usedWaybills.add(waybill);
+        return waybill;
     }
 }

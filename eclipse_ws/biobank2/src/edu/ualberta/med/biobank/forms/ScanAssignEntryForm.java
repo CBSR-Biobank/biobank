@@ -587,15 +587,15 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
     }
 
     @Override
-    public void reset() {
+    public void reset() throws Exception {
         reset(false);
     }
 
-    public void reset(boolean beforeScanReset) {
+    public void reset(boolean beforeScan) {
         String productBarcode = "";
         String label = "";
 
-        if (beforeScanReset) {
+        if (beforeScan) {
             productBarcode = currentPalletWrapper.getProductBarcode();
             label = currentPalletWrapper.getLabel();
             currentPalletWrapper.getWrappedObject().setId(null);
@@ -616,7 +616,7 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
             setContainerType();
         }
 
-        if (beforeScanReset) {
+        if (beforeScan) {
             currentPalletWrapper.setProductBarcode(productBarcode);
             currentPalletWrapper.setLabel(label);
         } else {

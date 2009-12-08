@@ -14,6 +14,7 @@ import edu.ualberta.med.biobank.common.LabelingScheme;
 import edu.ualberta.med.biobank.common.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.internal.AbstractPositionWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.ContainerPositionWrapper;
+import edu.ualberta.med.biobank.common.wrappers.internal.SamplePositionWrapper;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.ContainerType;
@@ -264,23 +265,6 @@ public class ContainerWrapper extends
     }
 
     /**
-     * Get the child container of this container with label label
-     */
-    public ContainerWrapper getChildWithLabel(String label)
-        throws ApplicationException {
-        HQLCriteria criteria = new HQLCriteria("from "
-            + Container.class.getName()
-            + " where position.parentContainer = ? and label = ?", Arrays
-            .asList(new Object[] { wrappedObject, label }));
-
-        List<Container> containers = appService.query(criteria);
-        if (containers.size() == 1) {
-            return new ContainerWrapper(appService, containers.get(0));
-        }
-        return null;
-    }
-
-    /**
      * position is 2 letters, or 2 number or 1 letter and 1 number... this
      * position string is used to get the correct row and column index the given
      * position String.
@@ -404,7 +388,13 @@ public class ContainerWrapper extends
         return ((positions != null) && (positions.size() > 0));
     }
 
-    public SampleWrapper getSample(Integer row, Integer col) {
+    public SampleWrapper getSample(Integer row, Integer col)
+        throws BiobankCheckException {
+        SamplePositionWrapper samplePosition = new SamplePositionWrapper(
+            appService);
+        samplePosition.setRow(row);
+        samplePosition.setCol(col);
+        samplePosition.checkPositionValid(this);
         Map<RowColPos, SampleWrapper> samples = getSamples();
         if (samples == null) {
             return null;
@@ -413,7 +403,12 @@ public class ContainerWrapper extends
     }
 
     public void addSample(Integer row, Integer col, SampleWrapper sample)
-        throws BiobankCheckException {
+        throws Exception {
+        SamplePositionWrapper samplePosition = new SamplePositionWrapper(
+            appService);
+        samplePosition.setRow(row);
+        samplePosition.setCol(col);
+        samplePosition.checkPositionValid(this);
         Map<RowColPos, SampleWrapper> samples = getSamples();
         if (samples == null) {
             samples = new HashMap<RowColPos, SampleWrapper>();
@@ -530,6 +525,11 @@ public class ContainerWrapper extends
 
     public void addChild(Integer row, Integer col, ContainerWrapper child)
         throws BiobankCheckException {
+        ContainerPositionWrapper containerPosition = new ContainerPositionWrapper(
+            appService);
+        containerPosition.setRow(row);
+        containerPosition.setCol(col);
+        containerPosition.checkPositionValid(this);
         Map<RowColPos, ContainerWrapper> children = getChildren();
         if (children == null) {
             children = new HashMap<RowColPos, ContainerWrapper>();

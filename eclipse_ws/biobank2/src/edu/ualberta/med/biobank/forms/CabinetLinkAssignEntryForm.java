@@ -3,7 +3,6 @@ package edu.ualberta.med.biobank.forms;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.observable.value.WritableValue;
@@ -56,9 +55,6 @@ import edu.ualberta.med.biobank.widgets.grids.ContainerDisplayFatory;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
-
-    private static Logger LOGGER = Logger
-        .getLogger(CabinetLinkAssignEntryForm.class.getName());
 
     public static final String ID = "edu.ualberta.med.biobank.forms.CabinetLinkAssignEntryForm";
 
@@ -265,14 +261,19 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
     }
 
     protected void setMoveMode(boolean moveMode) {
-        String inventoryId = inventoryIdText.getText();
-        String position = positionText.getText();
-        reset();
-        inventoryIdText.setText(inventoryId);
-        positionText.setText(position);
-        patientNumberText.setEnabled(!moveMode);
-        viewerVisits.getCombo().setEnabled(!moveMode);
-        viewerSampleTypes.getCombo().setEnabled(!moveMode);
+        try {
+            String inventoryId = inventoryIdText.getText();
+            String position = positionText.getText();
+            reset();
+            inventoryIdText.setText(inventoryId);
+            positionText.setText(position);
+            patientNumberText.setEnabled(!moveMode);
+            viewerVisits.getCombo().setEnabled(!moveMode);
+            viewerSampleTypes.getCombo().setEnabled(!moveMode);
+        } catch (Exception ex) {
+            BioBankPlugin.openAsyncError("Error settind move mode " + moveMode,
+                ex);
+        }
     }
 
     private void createTypeCombo(Composite fieldsComposite)
@@ -519,25 +520,22 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
     }
 
     @Override
-    public void reset() {
-        try {
-            sampleWrapper.reset();
-            cabinet = null;
-            drawer = null;
-            bin = null;
-            cabinetWidget.setSelection(null);
-            drawerWidget.setSelection(null);
-            resultShownValue.setValue(Boolean.FALSE);
-            selectedSampleTypeValue.setValue("");
-            patientNumberText.setText("");
-            viewerVisits.setInput(null);
-            inventoryIdText.setText("");
-            positionText.setText("");
-            if (viewerSampleTypes.getCombo().getItemCount() > 1) {
-                viewerSampleTypes.getCombo().deselectAll();
-            }
-        } catch (Exception e) {
-            LOGGER.error("Can't reset the form", e);
+    public void reset() throws Exception {
+        sampleWrapper.getWrappedObject().setId(null);
+        sampleWrapper.reset();
+        cabinet = null;
+        drawer = null;
+        bin = null;
+        cabinetWidget.setSelection(null);
+        drawerWidget.setSelection(null);
+        resultShownValue.setValue(Boolean.FALSE);
+        selectedSampleTypeValue.setValue("");
+        patientNumberText.setText("");
+        viewerVisits.setInput(null);
+        inventoryIdText.setText("");
+        positionText.setText("");
+        if (viewerSampleTypes.getCombo().getItemCount() > 1) {
+            viewerSampleTypes.getCombo().deselectAll();
         }
     }
 

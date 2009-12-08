@@ -634,10 +634,10 @@ public class TestStudy extends TestDatabase {
             study1);
         ShipmentWrapper shipment2 = ShipmentHelper.addShipment(clinic2,
             patient1, patient2);
-        // clinic 1 = 1 patient pour study 1
+        // clinic 1 = 1 patient for study 1
         PatientVisitHelper.addPatientVisits(patient1, shipment1);
         PatientVisitHelper.addPatientVisits(patient1, shipment2);
-        // clinic 2 = 2 patients pour study 1
+        // clinic 2 = 2 patients for study 1
         PatientVisitHelper.addPatientVisits(patient2, shipment2);
 
         study1.reload();

@@ -305,7 +305,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
     }
 
     @Override
-    public void reset() {
+    public void reset() throws Exception {
         super.reset();
 
         if (patientVisit.getDateProcessed() == null) {

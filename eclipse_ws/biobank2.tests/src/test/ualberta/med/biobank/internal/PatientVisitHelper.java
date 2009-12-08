@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import test.ualberta.med.biobank.Utils;
+import test.ualberta.med.biobank.TestCommon;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
@@ -62,8 +62,8 @@ public class PatientVisitHelper extends DbHelper {
         int count = r.nextInt(15) + minimumNumber;
         List<PatientVisitWrapper> visits = new ArrayList<PatientVisitWrapper>();
         for (int i = 0; i < count; i++) {
-            visits
-                .add(addPatientVisit(patient, shipment, Utils.getRandomDate()));
+            visits.add(addPatientVisit(patient, shipment, TestCommon
+                .getUniqueDate(r)));
         }
         return visits;
     }

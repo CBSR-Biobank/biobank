@@ -108,7 +108,7 @@ public class SampleTypesEntryForm extends BiobankEntryForm {
     }
 
     @Override
-    public void reset() {
+    public void reset() throws Exception {
         super.reset();
         try {
             globalSampleTypes = SampleTypeWrapper.getGlobalSampleTypes(

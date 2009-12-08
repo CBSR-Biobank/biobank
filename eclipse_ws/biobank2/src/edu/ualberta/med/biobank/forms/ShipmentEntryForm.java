@@ -200,7 +200,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
     }
 
     @Override
-    public void reset() {
+    public void reset() throws Exception {
         super.reset();
         if (shipmentWrapper.isNew()
             && clinicsComboViewer.getCombo().getItemCount() > 1) {
