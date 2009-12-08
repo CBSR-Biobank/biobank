@@ -58,7 +58,7 @@ public class TestContainer extends TestDatabase {
         containerMap = new HashMap<String, ContainerWrapper>();
         containerTypeMap = new HashMap<String, ContainerTypeWrapper>();
         site = SiteHelper.addSite("Site - Container Test"
-            + Utils.getRandomString(10));
+            + Utils.getRandomString(5, 10));
         addContainerTypes(site);
         addContainers();
     }
