@@ -96,26 +96,6 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
         return sampleCollection;
     }
 
-    public void setSampleCollection(Collection<Sample> sampleCollection,
-        boolean setNull) {
-        Collection<Sample> oldCollection = wrappedObject.getSampleCollection();
-        wrappedObject.setSampleCollection(sampleCollection);
-        propertyChangeSupport.firePropertyChange("sampleCollection",
-            oldCollection, sampleCollection);
-        if (setNull) {
-            propertiesMap.put("sampleCollection", null);
-        }
-    }
-
-    public void setSampleCollection(Collection<SampleWrapper> sampleCollection) {
-        Collection<Sample> collection = new HashSet<Sample>();
-        for (SampleWrapper sample : sampleCollection) {
-            collection.add(sample.getWrappedObject());
-        }
-        setSampleCollection(collection, false);
-        propertiesMap.put("sampleCollection", sampleCollection);
-    }
-
     @SuppressWarnings("unchecked")
     private List<PvAttrWrapper> getPvAttrCollection() {
         List<PvAttrWrapper> pvAttrCollection = (List<PvAttrWrapper>) propertiesMap
@@ -273,7 +253,7 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
             }
         }
 
-        if (studyPvAttr.getLocked().equals(1)) {
+        if (studyPvAttr.getLocked().equals(true)) {
             throw new Exception("attribute for label \"" + label
                 + "\" is locked, changes not premitted");
         }
@@ -288,7 +268,7 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
         List<String> permissibleSplit = null;
 
         if (type.equals("select_single") || type.equals("select_multiple")) {
-            String permissible = pvAttr.getStudyPvAttr().getPermissible();
+            String permissible = studyPvAttr.getPermissible();
             if (permissible != null) {
                 permissibleSplit = Arrays.asList(permissible.split(";"));
             }
@@ -308,8 +288,12 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
             }
         } else if (type.equals("number")) {
             Double.parseDouble(value);
-        } else if (type.equals("date")) {
+        } else if (type.equals("date_time")) {
             DateFormatter.dateFormatter.parse(value);
+        } else if (type.equals("text")) {
+            // do nothing
+        } else {
+            throw new Exception("type \"" + type + "\" not tested");
         }
 
         pvAttr = new PvAttrWrapper(appService, new PvAttr());
@@ -339,7 +323,8 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
         checkHasShipment();
         checkPatientInShipment();
         checkDateProcessedUnique();
-        checkPatientClinicInSameStudy();
+        // patient to clinic relationship tested by shipment, so no need to
+        // test it again here
     }
 
     private void checkHasShipment() throws BiobankCheckException {
@@ -356,19 +341,6 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
             || !shipmentPatients.contains(getPatient())) {
             throw new BiobankCheckException(
                 "The patient should be part of the shipment");
-        }
-    }
-
-    private void checkPatientClinicInSameStudy() throws ApplicationException,
-        BiobankCheckException {
-        ClinicWrapper shipmentClinic = getShipment().getClinic();
-        List<ClinicWrapper> patientStudyClinics = getPatient().getStudy()
-            .getClinicCollection();
-
-        if (patientStudyClinics == null
-            || !patientStudyClinics.contains(shipmentClinic)) {
-            throw new BiobankCheckException(
-                "The patient study is not linked with this clinic. Choose another clinic.");
         }
     }
 
@@ -398,6 +370,9 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
     @Override
     protected void persistDependencies(PatientVisit origObject)
         throws Exception {
+        if (pvAttrMap != null) {
+            setPvAttrCollection(pvAttrMap.values());
+        }
         if (origObject != null) {
             removeDeletedPvSampleSources(origObject);
         }
@@ -536,14 +511,6 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
             }
         }
         return 0;
-    }
-
-    @Override
-    public void persist() throws Exception {
-        if (pvAttrMap != null) {
-            setPvAttrCollection(pvAttrMap.values());
-        }
-        super.persist();
     }
 
     @Override
