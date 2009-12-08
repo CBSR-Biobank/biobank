@@ -1,9 +1,9 @@
 package edu.ualberta.med.biobank.model;
 
-import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 
-public class ClinicStudyInfo {
+public class ClinicStudyInfo implements ITableInfo {
 
     public StudyWrapper studyWrapper;
 
@@ -13,8 +13,9 @@ public class ClinicStudyInfo {
 
     public long patientVisits;
 
-    public void performDoubleClick() {
-        SessionManager.openViewForm(studyWrapper);
+    @Override
+    public ModelWrapper<?> getDisplayedWrapper() {
+        return studyWrapper;
     }
 
 }

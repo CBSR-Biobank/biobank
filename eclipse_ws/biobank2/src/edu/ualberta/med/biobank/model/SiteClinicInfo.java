@@ -1,9 +1,9 @@
 package edu.ualberta.med.biobank.model;
 
-import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 
-public class SiteClinicInfo {
+public class SiteClinicInfo implements ITableInfo {
 
     public ClinicWrapper clinicWrapper;
 
@@ -15,8 +15,9 @@ public class SiteClinicInfo {
 
     public String activityStatus;
 
-    public void performDoubleClick() {
-        SessionManager.openViewForm(clinicWrapper);
+    @Override
+    public ModelWrapper<?> getDisplayedWrapper() {
+        return clinicWrapper;
     }
 
 }

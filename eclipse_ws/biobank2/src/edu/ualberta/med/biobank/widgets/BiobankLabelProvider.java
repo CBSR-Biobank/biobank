@@ -78,9 +78,13 @@ public class BiobankLabelProvider extends LabelProvider implements
             PatientVisitWrapper visit = (PatientVisitWrapper) element;
             switch (columnIndex) {
             case 0:
-                return visit.getShipment().getFormattedDateShipped();
+                return visit.getFormattedDateProcessed();
             case 1:
-                return String.valueOf(visit.getSampleCollection().size());
+                List<SampleWrapper> samples = visit.getSampleCollection();
+                if (samples == null) {
+                    return "0";
+                }
+                return String.valueOf(samples.size());
             }
         } else if (element instanceof PatientWrapper) {
             PatientWrapper patient = (PatientWrapper) element;

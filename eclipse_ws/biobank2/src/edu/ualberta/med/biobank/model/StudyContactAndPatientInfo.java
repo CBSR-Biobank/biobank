@@ -1,12 +1,9 @@
 package edu.ualberta.med.biobank.model;
 
-import org.eclipse.core.runtime.Assert;
-
-import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 
-public class StudyContactAndPatientInfo {
+public class StudyContactAndPatientInfo implements ITableInfo {
 
     public String clinicName;
 
@@ -16,11 +13,11 @@ public class StudyContactAndPatientInfo {
 
     public ContactWrapper contact;
 
-    public void performDoubleClick() {
-        Assert.isNotNull(contact, "contact is null");
-        ClinicWrapper clinic = contact.getClinic();
-        Assert.isNotNull(clinic, "clinic is null");
-        SessionManager.openViewForm(clinic);
+    @Override
+    public ModelWrapper<?> getDisplayedWrapper() {
+        if (contact != null) {
+            return contact.getClinic();
+        }
+        return null;
     }
-
 }

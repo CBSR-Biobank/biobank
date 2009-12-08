@@ -34,8 +34,7 @@ import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.forms.input.FormInput;
-import edu.ualberta.med.biobank.model.ClinicStudyInfo;
-import edu.ualberta.med.biobank.model.StudyContactAndPatientInfo;
+import edu.ualberta.med.biobank.model.ITableInfo;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.widgets.infotables.BiobankCollectionModel;
 import edu.ualberta.med.biobank.widgets.utils.WidgetCreator;
@@ -80,13 +79,11 @@ public abstract class BiobankFormBase extends EditorPart {
                 if (item.o != null) {
                     if (item.o instanceof AdapterBase) {
                         ((AdapterBase) item.o).performDoubleClick();
-                    } else if (item.o instanceof ClinicStudyInfo) {
-                        ((ClinicStudyInfo) item.o).performDoubleClick();
-                    } else if (item.o instanceof StudyContactAndPatientInfo) {
-                        ((StudyContactAndPatientInfo) item.o)
-                            .performDoubleClick();
                     } else if (item.o instanceof ModelWrapper<?>) {
                         SessionManager.openViewForm((ModelWrapper<?>) item.o);
+                    } else if (item.o instanceof ITableInfo) {
+                        SessionManager.openViewForm(((ITableInfo) item.o)
+                            .getDisplayedWrapper());
                     }
                 }
             }

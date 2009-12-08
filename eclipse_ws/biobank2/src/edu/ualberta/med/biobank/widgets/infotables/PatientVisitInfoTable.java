@@ -8,7 +8,7 @@ import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 
 public class PatientVisitInfoTable extends InfoTableWidget<PatientVisitWrapper> {
 
-    private static final String[] HEADINGS = new String[] { "Visit Number",
+    private static final String[] HEADINGS = new String[] { "Date processed",
         "Num Samples" };
 
     private static final int[] BOUNDS = new int[] { 200, 130, -1, -1, -1, -1,

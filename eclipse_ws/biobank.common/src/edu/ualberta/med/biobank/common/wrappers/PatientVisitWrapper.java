@@ -80,7 +80,7 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
     }
 
     @SuppressWarnings("unchecked")
-    public Collection<SampleWrapper> getSampleCollection() {
+    public List<SampleWrapper> getSampleCollection() {
         List<SampleWrapper> sampleCollection = (List<SampleWrapper>) propertiesMap
             .get("sampleCollection");
         if (sampleCollection == null) {
