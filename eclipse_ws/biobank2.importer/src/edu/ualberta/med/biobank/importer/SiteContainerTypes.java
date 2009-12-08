@@ -7,26 +7,22 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
-import edu.ualberta.med.biobank.model.Capacity;
-import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
-import edu.ualberta.med.biobank.model.ContainerType;
-import edu.ualberta.med.biobank.model.SampleType;
-import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 
 public class SiteContainerTypes {
 
     private static SiteContainerTypes instance = null;
 
-    private HashMap<String, ContainerType> containerTypeMap;
+    private HashMap<String, ContainerTypeWrapper> containerTypeMap;
 
-    private HashMap<String, ContainerLabelingScheme> labelingSchemeMap;
+    private Collection<SampleTypeWrapper> freezerSampleTypes;
 
-    private Collection<SampleType> freezerSampleTypes;
-
-    private Collection<SampleType> cabinetSampleTypes;
+    private Collection<SampleTypeWrapper> cabinetSampleTypes;
 
     private SiteContainerTypes() {
-        containerTypeMap = new HashMap<String, ContainerType>();
+        containerTypeMap = new HashMap<String, ContainerTypeWrapper>();
     }
 
     public static SiteContainerTypes getInstance() {
@@ -36,29 +32,22 @@ public class SiteContainerTypes {
         return instance;
     }
 
-    public ContainerType getContainerType(String name) throws Exception {
-        ContainerType st = containerTypeMap.get(name);
+    public ContainerTypeWrapper getContainerType(String name) throws Exception {
+        ContainerTypeWrapper st = containerTypeMap.get(name);
         if (st == null) {
             throw new Exception("Storage type " + name + " not in database");
         }
         return st;
     }
 
-    public void insertContainerTypes(Site site) throws Exception {
+    public void insertContainerTypes(SiteWrapper site) throws Exception {
         System.out.println("adding container types ...");
-        freezerSampleTypes = new HashSet<SampleType>();
-        cabinetSampleTypes = new HashSet<SampleType>();
+        freezerSampleTypes = new HashSet<SampleTypeWrapper>();
+        cabinetSampleTypes = new HashSet<SampleTypeWrapper>();
 
-        labelingSchemeMap = new HashMap<String, ContainerLabelingScheme>();
-        Collection<ContainerLabelingScheme> allLabelingSchemes = BioBank2Db.getInstance().getAppService().search(
-            ContainerLabelingScheme.class, new ContainerLabelingScheme());
-        for (ContainerLabelingScheme scheme : allLabelingSchemes) {
-            labelingSchemeMap.put(scheme.getName(), scheme);
-        }
-
-        Collection<SampleType> allSampleTypes = BioBank2Db.getInstance().getAppService().search(
-            SampleType.class, new SampleType());
-        for (SampleType st : allSampleTypes) {
+        Collection<SampleTypeWrapper> allSampleTypes = SampleTypeWrapper.getGlobalSampleTypes(
+            site.getAppService(), true);
+        for (SampleTypeWrapper st : allSampleTypes) {
             if (st.getNameShort().startsWith("DNA")
                 || st.getNameShort().startsWith("Hair")) {
                 cabinetSampleTypes.add(st);
@@ -72,99 +61,87 @@ public class SiteContainerTypes {
         createCabinetTypes(site);
     }
 
-    private void createFreezerTypes(Site site) throws Exception {
-        ContainerType box81 = assignContainerType(site, "Box-81", false,
-            labelingSchemeMap.get("SBS Standard"), 9, 9, null,
-            freezerSampleTypes);
+    private void createFreezerTypes(SiteWrapper site) throws Exception {
+        ContainerTypeWrapper box81 = assignContainerType(site, "Box-81", false,
+            1, 9, 9, null, freezerSampleTypes);
         containerTypeMap.put("Box-81", box81);
 
-        ContainerType pallet96 = assignContainerType(site, "Pallet-96", false,
-            labelingSchemeMap.get("SBS Standard"), 8, 12, null,
-            freezerSampleTypes);
+        ContainerTypeWrapper pallet96 = assignContainerType(site, "Pallet-96",
+            false, 1, 8, 12, null, freezerSampleTypes);
         containerTypeMap.put("Pallet-96", pallet96);
 
-        ContainerType pallet384 = assignContainerType(site, "Pallet-384",
-            false, labelingSchemeMap.get("SBS Standard"), 16, 24, null,
-            freezerSampleTypes);
+        ContainerTypeWrapper pallet384 = assignContainerType(site,
+            "Pallet-384", false, 1, 16, 24, null, freezerSampleTypes);
         containerTypeMap.put("Pallet-384", pallet384);
 
-        ContainerType hotel17 = assignContainerType(site, "Hotel-17", false,
-            labelingSchemeMap.get("2 char numeric"), 17, 1,
-            Arrays.asList(new ContainerType [] { box81 }), null);
+        ContainerTypeWrapper hotel17 = assignContainerType(site, "Hotel-17",
+            false, 3, 17, 1,
+            Arrays.asList(new ContainerTypeWrapper [] { box81 }), null);
         containerTypeMap.put("Hotel-17", hotel17);
 
-        ContainerType hotel18 = assignContainerType(site, "Hotel-18", false,
-            labelingSchemeMap.get("2 char numeric"), 18, 1,
-            Arrays.asList(new ContainerType [] { box81 }), null);
+        ContainerTypeWrapper hotel18 = assignContainerType(site, "Hotel-18",
+            false, 3, 18, 1,
+            Arrays.asList(new ContainerTypeWrapper [] { box81 }), null);
         containerTypeMap.put("Hotel-18", hotel17);
 
-        ContainerType hotel13 = assignContainerType(site, "Hotel-13", false,
-            labelingSchemeMap.get("2 char numeric"), 13, 1,
-            Arrays.asList(new ContainerType [] { pallet96 }), null);
+        ContainerTypeWrapper hotel13 = assignContainerType(site, "Hotel-13",
+            false, 3, 13, 1,
+            Arrays.asList(new ContainerTypeWrapper [] { pallet96 }), null);
         containerTypeMap.put("Hotel-13", hotel13);
 
-        ContainerType hotel19 = assignContainerType(site, "Hotel-19", false,
-            labelingSchemeMap.get("2 char numeric"), 19, 1,
-            Arrays.asList(new ContainerType [] { pallet96 }), null);
+        ContainerTypeWrapper hotel19 = assignContainerType(site, "Hotel-19",
+            false, 3, 19, 1,
+            Arrays.asList(new ContainerTypeWrapper [] { pallet96 }), null);
         containerTypeMap.put("Hotel-19", hotel19);
 
         containerTypeMap.put("Freezer-3x10", assignContainerType(site,
-            "Freezer-3x10", true,
-            labelingSchemeMap.get("CBSR 2 char alphabetic"), 3, 10,
-            Arrays.asList(new ContainerType [] { hotel17 }), null));
+            "Freezer-3x10", true, 2, 3, 10,
+            Arrays.asList(new ContainerTypeWrapper [] { hotel17 }), null));
 
         containerTypeMap.put("Freezer-4x12", assignContainerType(site,
-            "Freezer-4x12", true,
-            labelingSchemeMap.get("CBSR 2 char alphabetic"), 4, 12,
-            Arrays.asList(new ContainerType [] { hotel18 }), null));
+            "Freezer-4x12", true, 2, 4, 12,
+            Arrays.asList(new ContainerTypeWrapper [] { hotel18 }), null));
 
         containerTypeMap.put("Freezer-5x9", assignContainerType(site,
-            "Freezer-5x9", true,
-            labelingSchemeMap.get("CBSR 2 char alphabetic"), 5, 9,
-            Arrays.asList(new ContainerType [] { hotel13, hotel19 }), null));
+            "Freezer-5x9", true, 2, 5, 9,
+            Arrays.asList(new ContainerTypeWrapper [] { hotel13, hotel19 }),
+            null));
 
         containerTypeMap.put("Freezer-6x12", assignContainerType(site,
-            "Freezer-6x12", true,
-            labelingSchemeMap.get("CBSR 2 char alphabetic"), 6, 12,
-            Arrays.asList(new ContainerType [] { hotel13, hotel19 }), null));
+            "Freezer-6x12", true, 2, 6, 12,
+            Arrays.asList(new ContainerTypeWrapper [] { hotel13, hotel19 }),
+            null));
     }
 
-    private void createCabinetTypes(Site site) throws Exception {
-        ContainerType bin = assignContainerType(site, "Bin", false,
-            labelingSchemeMap.get("CBSR 2 char alphabetic"), 120, 1, null,
-            cabinetSampleTypes);
+    private void createCabinetTypes(SiteWrapper site) throws Exception {
+        ContainerTypeWrapper bin = assignContainerType(site, "Bin", false, 2,
+            120, 1, null, cabinetSampleTypes);
         containerTypeMap.put("Bin", bin);
-        ContainerType drawer = assignContainerType(site, "Drawer", false,
-            labelingSchemeMap.get("2 char numeric"), 36, 1,
-            Arrays.asList(new ContainerType [] { bin }), null);
+        ContainerTypeWrapper drawer = assignContainerType(site, "Drawer",
+            false, 3, 36, 1,
+            Arrays.asList(new ContainerTypeWrapper [] { bin }), null);
         containerTypeMap.put("Drawer", drawer);
         containerTypeMap.put("Cabinet", assignContainerType(site, "Cabinet",
-            true, labelingSchemeMap.get("CBSR 2 char alphabetic"), 4, 1,
-            Arrays.asList(new ContainerType [] { drawer }), null));
+            true, 2, 4, 1,
+            Arrays.asList(new ContainerTypeWrapper [] { drawer }), null));
     }
 
-    private ContainerType assignContainerType(Site site, String name,
-        boolean topLevel, ContainerLabelingScheme childLabelingScheme,
-        int dim1, int dim2, List<ContainerType> children,
-        Collection<SampleType> sampleTypes) throws Exception {
-        ContainerType ct = new ContainerType();
+    private ContainerTypeWrapper assignContainerType(SiteWrapper site,
+        String name, boolean topLevel, int childLabelingScheme, int dim1,
+        int dim2, List<ContainerTypeWrapper> children,
+        Collection<SampleTypeWrapper> sampleTypes) throws Exception {
+        ContainerTypeWrapper ct = new ContainerTypeWrapper(site.getAppService());
         ct.setName(name);
         ct.setTopLevel(topLevel);
         ct.setSite(site);
-        Capacity capacity = new Capacity();
-        capacity.setRowCapacity(dim1);
-        capacity.setColCapacity(dim2);
-        ct.setCapacity(capacity);
+        ct.setRowCapacity(dim1);
+        ct.setColCapacity(dim2);
         ct.setActivityStatus("Active");
         ct.setChildLabelingScheme(childLabelingScheme);
-        if (children != null) {
-            ct.setChildContainerTypeCollection(new HashSet<ContainerType>(
-                children));
-        }
-        if (sampleTypes != null) {
-            ct.setSampleTypeCollection(sampleTypes);
-        }
-
-        return (ContainerType) BioBank2Db.getInstance().setObject(ct);
+        ct.setChildContainerTypeCollection(children);
+        ct.setSampleTypeCollection(sampleTypes);
+        ct.persist();
+        ct.reload();
+        return ct;
     }
 }

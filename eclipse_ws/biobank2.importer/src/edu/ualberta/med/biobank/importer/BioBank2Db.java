@@ -1,7 +1,7 @@
 
 package edu.ualberta.med.biobank.importer;
 
-import edu.ualberta.med.biobank.model.Address;
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerType;
@@ -12,7 +12,6 @@ import edu.ualberta.med.biobank.model.Shipment;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.SitePvAttr;
 import edu.ualberta.med.biobank.model.Study;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.SDKQuery;
 import gov.nih.nci.system.query.SDKQueryResult;
@@ -68,16 +67,18 @@ public class BioBank2Db {
         }
     }
 
-    public Site createSite() throws ApplicationException {
-        Site site = new Site();
-        site.setName("CBSR");
-        Address address = new Address();
-        site.setAddress(address);
-
-        SDKQueryResult res = appService.executeQuery(new InsertExampleQuery(
-            site));
-        site = (Site) res.getObjectResult();
-
+    public SiteWrapper createSite() throws Exception {
+        SiteWrapper site = new SiteWrapper(appService);
+        site.setName("Canadian BioSample Repository");
+        site.setStreet1("471 Medical Sciences Building");
+        site.setStreet2("University of Alberta");
+        site.setCity("Edmonton");
+        site.setProvince("Alberta");
+        site.setPostalCode("T6G2H7");
+        site.persist();
+        site.setSitePvAttr("PBMC Count", "number");
+        site.setSitePvAttr("Consent", "select_multiple");
+        site.setSitePvAttr("Worksheet", "text");
         return site;
     }
 

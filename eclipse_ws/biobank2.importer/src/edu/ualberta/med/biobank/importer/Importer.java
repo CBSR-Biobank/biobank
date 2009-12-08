@@ -3,6 +3,8 @@ package edu.ualberta.med.biobank.importer;
 
 import edu.ualberta.med.biobank.common.LabelingScheme;
 import edu.ualberta.med.biobank.common.RowColPos;
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.Clinic;
@@ -65,7 +67,7 @@ public class Importer {
 
     private ArrayList<String> tables;
 
-    private Site cbsrSite;
+    private SiteWrapper cbsrSite;
 
     public static void main(String [] args) throws Exception {
         Importer.getInstance();
@@ -192,7 +194,7 @@ public class Importer {
     }
 
     private void importStudies() throws Exception {
-        Study study;
+        StudyWrapper study;
         String studyNameShort;
 
         System.out.println("importing studies ...");
@@ -203,18 +205,19 @@ public class Importer {
         if (rs != null) {
             while (rs.next()) {
                 studyNameShort = rs.getString(3);
-                study = new Study();
+                study = new StudyWrapper(appService);
                 study.setName(rs.getString(2));
                 study.setNameShort(studyNameShort);
                 study.setSite(cbsrSite);
                 study.setActivityStatus("Active");
-                study = (Study) bioBank2Db.setObject(study);
+                study.persist();
+                study.reload();
 
                 System.out.println("importing study " + study.getNameShort()
                     + " ...");
 
                 if (studyNameShort.equals("KDCS")) {
-                    CbsrStudyPvAttr.assignKdcsInfo(study);
+                    CbsrStudyPvAttr.assignKdcsAttr(study);
                 }
                 else if (studyNameShort.equals("VAS")) {
                     CbsrStudyPvAttr.assignVasInfo(study);
@@ -229,7 +232,7 @@ public class Importer {
                     CbsrStudyPvAttr.assignMpsInfo(study);
                 }
                 else if (studyNameShort.equals("BBP")) {
-                    CbsrStudyPvAttr.assignBbpPvInfo(study);
+                    CbsrStudyPvAttr.assignBbpspPvAttr(study);
                 }
                 else {
                     throw new Exception("Unknown study: " + studyNameShort);

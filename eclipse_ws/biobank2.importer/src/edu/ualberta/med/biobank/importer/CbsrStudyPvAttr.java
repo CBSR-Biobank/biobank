@@ -1,11 +1,9 @@
 
 package edu.ualberta.med.biobank.importer;
 
-import java.util.HashSet;
-
+import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.SitePvAttr;
-import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.StudyPvAttr;
 
 public class CbsrStudyPvAttr {
@@ -20,71 +18,63 @@ public class CbsrStudyPvAttr {
         return studyPvAttr;
     }
 
-    public static HashSet<StudyPvAttr> assignCommonPvInfo(Study study)
-        throws Exception {
-        String [] labels = { "Worksheet", "PBMC Count" };
-        HashSet<StudyPvAttr> pvInfoSet = new HashSet<StudyPvAttr>();
-
-        for (String label : labels) {
-            StudyPvAttr pvInfo = getSitePvAttr2SitePvAttr(study.getSite(),
-                label);
-
-            if (label.equals("Blood Received")) {
-                pvInfo.setPermissible("");
-            }
-
-            pvInfoSet.add((StudyPvAttr) BioBank2Db.getInstance().setObject(
-                pvInfo));
-        }
-        return pvInfoSet;
+    public static void assignAhfemPvAttr(StudyWrapper study) throws Exception {
+        study.setStudyPvAttr("Worksheet", "text");
     }
 
-    public static Study assignStudyPvAttr(Study study,
-        HashSet<StudyPvAttr> pvInfoSet) throws Exception {
-        study.setStudyPvAttrCollection(pvInfoSet);
-        return (Study) BioBank2Db.getInstance().setObject(study);
+    public static void assignBbpspPvAttr(StudyWrapper study) throws Exception {
+        study.setStudyPvAttr("PBMC Count", "number");
+        study.setStudyPvAttr("Consent", "select_multiple", new String [] {
+            "Surveillance", "Genetic Predisposition", "Previous Samples",
+            "Genetic Mutation" });
+        study.setStudyPvAttr("Worksheet", "text");
     }
 
-    public static Study assignBbpPvInfo(Study study) throws Exception {
-        HashSet<StudyPvAttr> pvInfoSet = assignCommonPvInfo(study);
-        StudyPvAttr pvInfo = getSitePvAttr2SitePvAttr(study.getSite(),
-            "Consent");
-        pvInfo.setPermissible("Surveillance;Genetic predisposition;Previous samples;Genetic mutation");
-        pvInfoSet.add((StudyPvAttr) BioBank2Db.getInstance().setObject(pvInfo));
-        return assignStudyPvAttr(study, pvInfoSet);
+    public static void assignCegiirPvAttr(StudyWrapper study) throws Exception {
+        study.setStudyPvAttr("PBMC Count", "number");
+        study.setStudyPvAttr("Worksheet", "text");
     }
 
-    public static Study assignKdcsInfo(Study study) throws Exception {
-        HashSet<StudyPvAttr> pvInfoSet = assignCommonPvInfo(study);
-        return assignStudyPvAttr(study, pvInfoSet);
+    public static void assignErcinPvAttr(StudyWrapper study) throws Exception {
+        study.setStudyPvAttr("Visit Type", "select_single", new String [] {
+            "Baseline", "Precath", "6hr Post", "24hr Post", "48-72hr Post" });
+        study.setStudyPvAttr("Worksheet", "text");
     }
 
-    public static Study assignVasInfo(Study study) throws Exception {
-        HashSet<StudyPvAttr> pvInfoSet = assignCommonPvInfo(study);
-        return assignStudyPvAttr(study, pvInfoSet);
+    public static void assignKdcsAttr(StudyWrapper study) throws Exception {
+        study.setStudyPvAttr("PBMC Count", "number");
+        study.setStudyPvAttr("Consent", "select_multiple",
+            new String [] { "Genetic" });
+        study.setStudyPvAttr("Worksheet", "text");
     }
 
-    public static Study assignRvsInfo(Study study) throws Exception {
-        HashSet<StudyPvAttr> pvInfoSet = assignCommonPvInfo(study);
-        return assignStudyPvAttr(study, pvInfoSet);
+    public static void assignKmsPvAttr(StudyWrapper study) throws Exception {
+        study.setStudyPvAttr("Worksheet", "text");
     }
 
-    public static Study assignNhsInfo(Study study) throws Exception {
-        HashSet<StudyPvAttr> pvInfoSet = assignCommonPvInfo(study);
-        StudyPvAttr pvInfo = getSitePvAttr2SitePvAttr(study.getSite(),
-            "Visit Type");
-        pvInfo.setPermissible("D0;D2;D4;W2;W4;M2;M6;M12;M18;M24;Unscheduled");
-        pvInfo = (StudyPvAttr) BioBank2Db.getInstance().setObject(pvInfo);
-        pvInfoSet.add((StudyPvAttr) BioBank2Db.getInstance().setObject(pvInfo));
-        return assignStudyPvAttr(study, pvInfoSet);
+    public static void assignMpsPvAttr(StudyWrapper study) throws Exception {
+        study.setStudyPvAttr("Worksheet", "text");
     }
 
-    public static Study assignMpsInfo(Study study) throws Exception {
-        HashSet<StudyPvAttr> pvInfoSet = assignCommonPvInfo(study);
-        StudyPvAttr pvInfo = getSitePvAttr2SitePvAttr(study.getSite(),
-            "Clinic Shipped Date");
-        pvInfo = (StudyPvAttr) BioBank2Db.getInstance().setObject(pvInfo);
-        pvInfoSet.add((StudyPvAttr) BioBank2Db.getInstance().setObject(pvInfo));
-        return assignStudyPvAttr(study, pvInfoSet);
+    public static void assignNhsPvAttr(StudyWrapper study) throws Exception {
+        study.setStudyPvAttr("Biopsy Length", "number");
+        study.setStudyPvAttr("Visit Type", "select_single", new String [] {
+            "D0", "D2", "D4", "Wk2", "Wk4", "M2", "M8", "M12", "M18", "M24" });
+        study.setStudyPvAttr("PBMC Count", "number");
+        study.setStudyPvAttr("Worksheet", "text");
+    }
+
+    public static void assignRvsPvAttr(StudyWrapper study) throws Exception {
+        study.setStudyPvAttr("Worksheet", "text");
+    }
+
+    public static void assignTcksPvAttr(StudyWrapper study) throws Exception {
+        study.setStudyPvAttr("PBMC Count", "number");
+        study.setStudyPvAttr("Worksheet", "text");
+    }
+
+    public static void assignVasPvAttr(StudyWrapper study) throws Exception {
+        study.setStudyPvAttr("PBMC Count", "number");
+        study.setStudyPvAttr("Worksheet", "text");
     }
 }
