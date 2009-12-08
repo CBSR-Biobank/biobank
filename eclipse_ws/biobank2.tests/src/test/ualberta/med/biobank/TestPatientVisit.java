@@ -1,7 +1,6 @@
 package test.ualberta.med.biobank;
 
-import static org.junit.Assert.fail;
-
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
@@ -60,7 +59,7 @@ public class TestPatientVisit extends TestDatabase {
 
     // the methods to skip in the getters and setters test
     private static final List<String> GETTER_SKIP_METHODS = Arrays
-        .asList(new String[] { "getPvAttr", "getPvAttrType" });
+        .asList(new String[] { "getPvAttrValue", "getPvAttrTypeName" });
 
     @Override
     @Before
@@ -238,14 +237,12 @@ public class TestPatientVisit extends TestDatabase {
             for (int col = 0; col < cols; ++col) {
                 if (r.nextGaussian() > 0.0)
                     continue;
-                System.out.println("setting sample at: " + row + ", " + col);
-                sampleMap.put(row + col * rows, SampleHelper.newSample(
+                // System.out.println("setting sample at: " + row + ", " + col);
+                sampleMap.put(row + col * rows, SampleHelper.addSample(
                     allSampleTypes.get(r.nextInt(allSampleTypesCount)),
                     container, visit, row, col));
             }
         }
-        visit.setSampleCollection(sampleMap.values());
-        visit.persist();
         visit.reload();
 
         // verify that all samples are there
@@ -254,8 +251,8 @@ public class TestPatientVisit extends TestDatabase {
 
         for (SampleWrapper sample : visitSamples) {
             RowColPos pos = sample.getPosition();
-            System.out.println("getting sample from: " + pos.row + ", "
-                + pos.col);
+            // System.out.println("getting sample from: " + pos.row + ", "
+            // + pos.col);
             Assert.assertNotNull(pos);
             Assert.assertNotNull(pos.row);
             Assert.assertNotNull(pos.col);
@@ -274,7 +271,7 @@ public class TestPatientVisit extends TestDatabase {
     }
 
     @Test
-    public void testGetPvAttrLabels() throws Exception {
+    public void testGetSetPvAttrLabels() throws Exception {
         addPvAttrs();
         List<String> labels = Arrays.asList(study.getStudyPvAttrLabels());
         Assert.assertEquals(5, labels.size());
@@ -296,6 +293,14 @@ public class TestPatientVisit extends TestDatabase {
         Assert.assertEquals(5, labels.size());
         Assert.assertTrue(labels.containsAll(Arrays.asList("PMBC Count",
             "Worksheet", "Date", "Consent", "Visit")));
+
+        // set an invalid label
+        try {
+            visit.setPvAttrValue("xyz", "abcdef");
+            Assert.fail("should not be allowed to assign invalid value");
+        } catch (Exception e) {
+            Assert.assertTrue(true);
+        }
     }
 
     @Test
@@ -311,10 +316,18 @@ public class TestPatientVisit extends TestDatabase {
     public void testGetPvAttr() throws Exception {
         addPvAttrs();
 
-        // assign PvAttrs correctly
         PatientVisitWrapper visit = PatientVisitHelper.addPatientVisit(patient,
             shipment, TestCommon.getUniqueDate(r));
         visit.reload();
+
+        // no values have been set yet, they should return null
+        Assert.assertEquals(null, visit.getPvAttrValue("PMBC Count"));
+        Assert.assertEquals(null, visit.getPvAttrValue("Worksheet"));
+        Assert.assertEquals(null, visit.getPvAttrValue("Date"));
+        Assert.assertEquals(null, visit.getPvAttrValue("Consent"));
+        Assert.assertEquals(null, visit.getPvAttrValue("Visit"));
+
+        // assign PvAttrs correctly
         String worksheetValue = Utils.getRandomString(10, 20);
         visit.setPvAttrValue("PMBC Count", "-0.543");
         visit.setPvAttrValue("Worksheet", worksheetValue);
@@ -417,6 +430,14 @@ public class TestPatientVisit extends TestDatabase {
             shipment, TestCommon.getUniqueDate(r));
         visit.reload();
 
+        visit.setPvAttrValue("PMBC Count", "-0.543");
+        visit.setPvAttrValue("Worksheet", "abcdefghi");
+        visit.setPvAttrValue("Date", "1999-12-31 23:59");
+        visit.setPvAttrValue("Consent", "c1;c2;c3");
+        visit.setPvAttrValue("Visit", "v1");
+        visit.persist();
+        visit.reload();
+
         Assert.assertEquals(null, visit.getPvAttrPermissible("PMBC Count"));
         Assert.assertEquals(null, visit.getPvAttrPermissible("Worksheet"));
         Assert.assertEquals(null, visit.getPvAttrPermissible("Date"));
@@ -431,56 +452,154 @@ public class TestPatientVisit extends TestDatabase {
         Assert.assertEquals(4, permissibles.size());
         Assert.assertTrue(permissibles.containsAll(Arrays.asList("v1", "v2",
             "v3", "v4")));
+
+        // select an invalid label
+        try {
+            visit.getPvAttrPermissible("xyz");
+            Assert
+                .fail("should not be allowed get permissible for invalid label");
+        } catch (Exception e) {
+            Assert.assertTrue(true);
+        }
     }
 
     @Test
-    public void testGetFormattedDateDrawn() {
-        fail("Not yet implemented");
+    public void testGetSetPvAttrLocked() throws Exception {
+        addPvAttrs();
+        List<String> labels = Arrays.asList(study.getStudyPvAttrLabels());
+        Assert.assertEquals(5, labels.size());
+
+        PatientVisitWrapper visit = PatientVisitHelper.addPatientVisit(patient,
+            shipment, TestCommon.getUniqueDate(r));
+        visit.reload();
+
+        // lock an attribute
+        study.setStudyPvAttrLocked("Worksheet", 1);
+        study.persist();
+        visit.reload();
+        try {
+            visit.setPvAttrValue("Worksheet", "xyz");
+            Assert.fail("should not be allowed set value for locked label");
+        } catch (Exception e) {
+            Assert.assertTrue(true);
+        }
+
+        // unlock the attribute
+        study.setStudyPvAttrLocked("Worksheet", 0);
+        study.persist();
+        visit.reload();
+        visit.setPvAttrValue("Worksheet", "xyz");
+        visit.persist();
+
     }
 
     @Test
-    public void testGetFormattedDateProcessed() {
-        fail("Not yet implemented");
+    public void testGetFormattedDateProcessed() throws Exception {
+        Date date = Utils.getRandomDate();
+        PatientVisitWrapper visit = PatientVisitHelper.addPatientVisit(patient,
+            shipment, date);
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+        Assert.assertTrue(sdf.format(date).equals(
+            visit.getFormattedDateProcessed()));
     }
 
     @Test
-    public void testGetFormattedDateReceived() {
-        fail("Not yet implemented");
+    public void testGetPatient() throws Exception {
+        PatientVisitWrapper visit = PatientVisitHelper.addPatientVisit(patient,
+            shipment, TestCommon.getUniqueDate(r));
+        Assert.assertEquals(patient, visit.getPatient());
     }
 
     @Test
-    public void testGetPatient() {
-        fail("Not yet implemented");
+    public void testGetShipment() throws Exception {
+        PatientVisitWrapper visit = PatientVisitHelper.addPatientVisit(patient,
+            shipment, TestCommon.getUniqueDate(r));
+        Assert.assertEquals(shipment, visit.getShipment());
+
+        // check for no shipment
+        visit = new PatientVisitWrapper(appService);
+        visit.setPatient(patient);
+        visit.setDateProcessed(TestCommon.getUniqueDate(r));
+        Assert.assertEquals(null, visit.getShipment());
     }
 
     @Test
-    public void testGetShipment() {
-        fail("Not yet implemented");
-    }
+    public void testCheckDateProcessedUnique() throws Exception {
+        Date date = TestCommon.getUniqueDate(r);
+        PatientVisitHelper.addPatientVisit(patient, shipment, date);
 
-    @Test
-    public void testRemoveDeletedPvSampleSources() {
-        fail("Not yet implemented");
-    }
-
-    @Test
-    public void testCheckVisitDateDrawnUnique() {
-        fail("Not yet implemented");
-    }
-
-    @Test
-    public void testCheckPatientInShipment() {
-        fail("Not yet implemented");
+        try {
+            PatientVisitHelper.addPatientVisit(patient, shipment, date);
+            Assert
+                .fail("should not be allowed to add a two visits with same date processed");
+        } catch (Exception e) {
+            Assert.assertTrue(true);
+        }
     }
 
     @Test
     public void testCheckHasShipment() {
-        fail("Not yet implemented");
+        // check valid case
+        PatientVisitWrapper visit = PatientVisitHelper.newPatientVisit(patient,
+            shipment, TestCommon.getUniqueDate(r));
+
+        // check invalid case
+        visit = new PatientVisitWrapper(appService);
+        visit.setPatient(patient);
+        visit.setDateProcessed(TestCommon.getUniqueDate(r));
+
+        try {
+            visit.persist();
+            Assert
+                .fail("should not be allowed to add a visits with no shipment");
+        } catch (Exception e) {
+            Assert.assertTrue(true);
+        }
     }
 
     @Test
-    public void testCheckPatientClinicInSameStudy() {
-        fail("Not yet implemented");
+    public void testCheckPatientInShipment() throws Exception {
+        // check valid case
+        PatientVisitWrapper visit = PatientVisitHelper.newPatientVisit(patient,
+            shipment, TestCommon.getUniqueDate(r));
+
+        // check invalid case
+        PatientWrapper patient2 = PatientHelper.addPatient(Utils
+            .getRandomNumericString(20), study);
+        visit = PatientVisitHelper.newPatientVisit(patient2, shipment,
+            TestCommon.getUniqueDate(r));
+
+        try {
+            visit.persist();
+            Assert
+                .fail("should not be allowed to add a visit where patient and clinic not in same study");
+        } catch (Exception e) {
+            Assert.assertTrue(true);
+        }
+    }
+
+    @Test
+    public void testCheckPatientClinicInSameStudy() throws Exception {
+        // check valid case
+        PatientVisitWrapper visit = PatientVisitHelper.newPatientVisit(patient,
+            shipment, TestCommon.getUniqueDate(r));
+
+        // check invalid case
+        StudyWrapper study2 = StudyHelper.addStudy(site,
+            "Study - Patient Visit Test " + Utils.getRandomString(10));
+        PatientWrapper patient2 = PatientHelper.addPatient(Utils
+            .getRandomNumericString(20), study2);
+        visit = PatientVisitHelper.newPatientVisit(patient2, shipment,
+            TestCommon.getUniqueDate(r));
+
+        try {
+            visit.persist();
+            Assert
+                .fail("should not be allowed to add a visits with patient not in shipment");
+        } catch (Exception e) {
+            Assert.assertTrue(true);
+        }
     }
 
     @Test
@@ -488,11 +607,6 @@ public class TestPatientVisit extends TestDatabase {
         PatientVisitWrapper pv = PatientVisitHelper.newPatientVisit(patient,
             shipment, DateFormatter.dateFormatter.parse("2009-12-25 00:00"));
         pv.persist();
-    }
-
-    public void testPersistFail() throws Exception {
-        Assert.fail("check for checkVisitDateProcessedUnique");
-        Assert.fail("check for checkPatientClinicInSameStudy");
     }
 
     @Test

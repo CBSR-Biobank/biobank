@@ -261,32 +261,20 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
     public void setPvAttrValue(String label, String value) throws Exception {
         getPvAttrMap();
         PvAttrWrapper pvAttr = pvAttrMap.get(label);
-        if (pvAttr == null) {
-            StudyPvAttrWrapper studyPvAttr = studyPvAttrMap.get(label);
+        StudyPvAttrWrapper studyPvAttr = null;
+
+        if (pvAttr != null) {
+            studyPvAttr = pvAttr.getStudyPvAttr();
+        } else {
+            studyPvAttr = studyPvAttrMap.get(label);
             if (studyPvAttr == null) {
                 throw new Exception("no StudyPvAttr found for label \"" + label
                     + "\"");
             }
-            String allowedValues = studyPvAttr.getPermissible();
-            if (allowedValues != null) {
-                String[] allowedValuesSplit = allowedValues.split(";");
-                List<String> allowedValList = Arrays.asList(allowedValuesSplit);
-                for (String selectedValue : value.split(";")) {
-                    if (!allowedValList.contains(selectedValue)) {
-                        throw new Exception("PvAttr with label \"" + label
-                            + "\" and value \"" + value + "\" is invalid");
-                    }
-                }
-            }
-
-            pvAttr = new PvAttrWrapper(appService, new PvAttr());
-            pvAttr.setPatientVisit(this);
-            pvAttr.setStudyPvAttr(studyPvAttr);
-            pvAttrMap.put(label, pvAttr);
         }
 
-        if (pvAttr.getStudyPvAttr().getLocked()) {
-            throw new Exception("no attribute for label \"" + label
+        if (studyPvAttr.getLocked().equals(1)) {
+            throw new Exception("attribute for label \"" + label
                 + "\" is locked, changes not premitted");
         }
 
@@ -296,7 +284,7 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
         }
 
         // validate the value
-        String type = pvAttr.getStudyPvAttr().getPvAttrType().getName();
+        String type = studyPvAttr.getPvAttrType().getName();
         List<String> permissibleSplit = null;
 
         if (type.equals("select_single") || type.equals("select_multiple")) {
@@ -323,7 +311,12 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
         } else if (type.equals("date")) {
             DateFormatter.dateFormatter.parse(value);
         }
+
+        pvAttr = new PvAttrWrapper(appService, new PvAttr());
+        pvAttr.setPatientVisit(this);
+        pvAttr.setStudyPvAttr(studyPvAttr);
         pvAttr.setValue(value);
+        pvAttrMap.put(label, pvAttr);
     }
 
     public void setDateProcessed(Date date) {
@@ -343,13 +336,9 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
     @Override
     protected void persistChecks() throws BiobankCheckException,
         ApplicationException, WrapperException {
-
         checkHasShipment();
-
         checkPatientInShipment();
-
-        checkVisitDateProcessedUnique();
-
+        checkDateProcessedUnique();
         checkPatientClinicInSameStudy();
     }
 
@@ -383,7 +372,7 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
         }
     }
 
-    private void checkVisitDateProcessedUnique() throws ApplicationException,
+    private void checkDateProcessedUnique() throws ApplicationException,
         BiobankCheckException {
         String isSameVisit = "";
         List<Object> params = new ArrayList<Object>();
@@ -561,6 +550,7 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
     public void reload() throws Exception {
         super.reload();
         pvAttrMap = null;
+        studyPvAttrMap = null;
     }
 
     @Override
