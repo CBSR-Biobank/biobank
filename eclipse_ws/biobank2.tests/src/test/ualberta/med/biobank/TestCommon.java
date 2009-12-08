@@ -1,6 +1,7 @@
 package test.ualberta.med.biobank;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
@@ -13,6 +14,8 @@ public class TestCommon {
     private static List<String> usedBarcodes;
 
     private static List<String> inventoryIds;
+
+    private static List<Date> usedDates;
 
     public static ContainerTypeWrapper addSampleTypes(ContainerTypeWrapper ct,
         List<SampleTypeWrapper> sampleTypes) throws Exception {
@@ -57,6 +60,18 @@ public class TestCommon {
             id = Utils.getRandomString(10, 20);
         } while (inventoryIds.contains(id));
         inventoryIds.add(id);
+        return id;
+    }
+
+    public static Date getUniqueDate(Random r) {
+        if (usedDates == null) {
+            usedDates = new ArrayList<Date>();
+        }
+        Date id;
+        do {
+            id = Utils.getRandomDate();
+        } while (usedDates.contains(id));
+        usedDates.add(id);
         return id;
     }
 }

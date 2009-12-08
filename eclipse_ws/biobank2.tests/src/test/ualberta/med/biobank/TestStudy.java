@@ -438,11 +438,13 @@ public class TestStudy extends TestDatabase {
         study.reload();
 
         // attributes are not locked by default
-        Assert.assertFalse(study.getStudyPvAttrLocked("Worksheet"));
+        Assert.assertEquals(false, study.getStudyPvAttrLocked("Worksheet")
+            .booleanValue());
 
         // lock the attribute
         study.setStudyPvAttrLocked("Worksheet", true);
-        Assert.assertTrue(study.getStudyPvAttrLocked("Worksheet"));
+        Assert.assertEquals(1, study.getStudyPvAttrLocked("Worksheet")
+            .booleanValue());
 
         // get lock for non existing label, expect exception
         try {
@@ -454,7 +456,7 @@ public class TestStudy extends TestDatabase {
 
         // set lock for non existing label, expect exception
         try {
-            study.setStudyPvAttrLocked(Utils.getRandomString(10, 20), true);
+            study.setStudyPvAttrLocked(Utils.getRandomString(10, 20), false);
             Assert.fail("call should generate an exception");
         } catch (Exception e) {
             Assert.assertTrue(true);
