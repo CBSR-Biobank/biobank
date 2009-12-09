@@ -164,8 +164,6 @@ public class CbsrContainerTypes {
         ct.persist();
         ct.reload();
         containerTypeMap.put(name, ct);
-        System.out.println("Added container type " + name + " (" + nameShort
-            + ")");
         return ct;
     }
 }

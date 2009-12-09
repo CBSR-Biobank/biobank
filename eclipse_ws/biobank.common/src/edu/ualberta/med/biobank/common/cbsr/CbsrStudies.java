@@ -1,4 +1,3 @@
-
 package edu.ualberta.med.biobank.common.cbsr;
 
 import java.util.Arrays;
@@ -24,11 +23,12 @@ public class CbsrStudies {
         study = addStudy(site, "Blood Borne Pathogens Surveillance Project",
             "BBPSP", null);
         study.setStudyPvAttr("PBMC Count", "number");
-        study.setStudyPvAttr("Consent", "select_multiple", new String [] {
+        study.setStudyPvAttr("Consent", "select_multiple", new String[] {
             "Surveillance", "Genetic Predisposition", "Previous Samples",
             "Genetic Mutation" });
         study.setStudyPvAttr("Worksheet", "text");
-        study.setContactCollection(Arrays.asList(CbsrClinics.getContact("Morna Brown")));
+        study.setContactCollection(Arrays.asList(CbsrClinics
+            .getContact("Morna Brown")));
         study.persist();
 
         study = addStudy(
@@ -46,7 +46,7 @@ public class CbsrStudies {
             site,
             "Exploring the Renoprotective effects of fluid prophylaxis strategies for Contrast Induced Nephropathy (Study)",
             "ERCIN", "Precath visit - only urine is collected");
-        study.setStudyPvAttr("Visit Type", "select_single", new String [] {
+        study.setStudyPvAttr("Visit Type", "select_single", new String[] {
             "Baseline", "Precath", "6hr Post", "24hr Post", "48-72hr Post" });
         study.setStudyPvAttr("Worksheet", "text");
         study.persist();
@@ -54,7 +54,7 @@ public class CbsrStudies {
         study = addStudy(site, "Kidney Disease Cohort Study", "KDCS", null);
         study.setStudyPvAttr("PBMC Count", "number");
         study.setStudyPvAttr("Consent", "select_multiple",
-            new String [] { "Genetic" });
+            new String[] { "Genetic" });
         study.setStudyPvAttr("Worksheet", "text");
         study.persist();
 
@@ -68,7 +68,7 @@ public class CbsrStudies {
 
         study = addStudy(site, "Novartis Hepatitis C Study", "NHS", null);
         study.setStudyPvAttr("Biopsy Length", "number");
-        study.setStudyPvAttr("Visit Type", "select_single", new String [] {
+        study.setStudyPvAttr("Visit Type", "select_single", new String[] {
             "D0", "D2", "D4", "Wk2", "Wk4", "M2", "M8", "M12", "M18", "M24" });
         study.setStudyPvAttr("PBMC Count", "number");
         study.setStudyPvAttr("Worksheet", "text");
@@ -99,7 +99,6 @@ public class CbsrStudies {
         study.persist();
         study.reload();
         studiesMap.put(nameShort, study);
-        System.out.println("Added study " + nameShort);
         return study;
     }
 

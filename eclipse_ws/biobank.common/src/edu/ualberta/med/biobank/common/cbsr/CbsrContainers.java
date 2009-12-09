@@ -110,8 +110,6 @@ public class CbsrContainers {
         container.setActivityStatus("Active");
         container.persist();
         container.reload();
-        System.out.println("Added container " + container.getLabel() + " ("
-            + type.getNameShort() + ")");
         return container;
     }
 
@@ -126,8 +124,6 @@ public class CbsrContainers {
         container.setParent(parent);
         container.persist();
         container.reload();
-        System.out.println("Added container " + container.getLabel() + " ("
-            + type.getNameShort() + ")");
         return container;
     }
 

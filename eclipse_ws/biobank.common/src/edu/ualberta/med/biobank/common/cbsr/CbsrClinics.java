@@ -1,4 +1,3 @@
-
 package edu.ualberta.med.biobank.common.cbsr;
 
 import java.util.HashMap;
@@ -181,7 +180,6 @@ public class CbsrClinics {
         clinic.persist();
         clinic.reload();
         clinicsMap.put(name, clinic);
-        System.out.println("Added clinic " + name);
         return clinic;
     }
 
@@ -207,7 +205,6 @@ public class CbsrClinics {
         contact.persist();
         contact.reload();
         contactsMap.put(name, contact);
-        System.out.println("Added contact " + name);
         return contact;
     }
 
