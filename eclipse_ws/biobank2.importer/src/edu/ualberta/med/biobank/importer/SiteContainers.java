@@ -1,87 +1,56 @@
 
 package edu.ualberta.med.biobank.importer;
 
-import edu.ualberta.med.biobank.common.LabelingScheme;
 import edu.ualberta.med.biobank.common.RowColPos;
-import edu.ualberta.med.biobank.model.Capacity;
-import edu.ualberta.med.biobank.model.Container;
-import edu.ualberta.med.biobank.model.ContainerPosition;
-import edu.ualberta.med.biobank.model.ContainerType;
-import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 
 public class SiteContainers {
 
-    private static SiteContainers instance = null;
-
-    private SiteContainers() {}
-
-    public static SiteContainers getInstance() {
-        if (instance != null) return instance;
-        instance = new SiteContainers();
-        return instance;
-    }
-
-    public void insertContainers(Site site) throws Exception {
+    public static void createContainers(SiteWrapper site) throws Exception {
         System.out.println("adding containers ...");
 
         createFreezer01(site);
+        createFreezer02(site);
         createFreezer03(site);
+        createFreezer04(site);
         createCabinet01(site);
     }
 
-    private void createFreezer01(Site site) throws Exception {
-        ContainerType freezerType = SiteContainerTypes.getInstance().getContainerType(
-            "Freezer-3x10");
-        Container freezer01 = insertContainer(site, "01", freezerType, null, 0,
-            0);
+    private static void createFreezer01(SiteWrapper site) throws Exception {
+        ContainerWrapper freezer01 = insertTopLevelContainer(site, "01",
+            SiteContainerTypes.getContainerType("Freezer 3x10"));
 
-        Container hotel;
-        ContainerType hotelType = SiteContainerTypes.getInstance().getContainerType(
-            "Hotel-17");
-        ContainerType palletType = SiteContainerTypes.getInstance().getContainerType(
-            "Box-81");
+        ContainerWrapper hotel;
+        ContainerTypeWrapper hotelType = SiteContainerTypes.getContainerType("Hotel 17");
+        ContainerTypeWrapper palletType = SiteContainerTypes.getContainerType("Box 81");
 
-        RowColPos pos = new RowColPos();
-        for (int i = 0; i < 30; ++i) {
-            pos.row = i % 3;
-            pos.col = i / 3;
-            Capacity freezerCapacity = freezerType.getCapacity();
-            String hotelPosLabel = "01"
-                + LabelingScheme.getPositionString(pos,
-                    freezerType.getChildLabelingScheme().getId(),
-                    freezerCapacity.getRowCapacity(),
-                    freezerCapacity.getColCapacity());
-            hotel = insertContainer(site, hotelPosLabel, hotelType, freezer01,
-                pos.row, pos.col);
+        for (int row = 0; row < 3; ++row) {
+            for (int col = 0; col < 10; ++col) {
+                hotel = insertContainer(site, hotelType, freezer01, row, col);
 
-            for (int j = 0; j < 17; ++j) {
-                pos.row = j;
-                pos.col = 0;
-                Capacity hotelCapacity = hotelType.getCapacity();
-                insertContainer(site, hotelPosLabel
-                    + LabelingScheme.getPositionString(pos,
-                        hotelType.getChildLabelingScheme().getId(),
-                        hotelCapacity.getRowCapacity(),
-                        hotelCapacity.getColCapacity()), palletType, hotel,
-                    pos.row, pos.col);
+                for (int j = 0; j < 17; ++j) {
+                    insertContainer(site, palletType, hotel, j, 0);
+                }
             }
         }
     }
 
-    private void createFreezer03(Site site) throws Exception {
-        Container hotel;
-        ContainerType freezerType = SiteContainerTypes.getInstance().getContainerType(
-            "Freezer-5x9");
-        Container freezer03 = insertContainer(site, "03", freezerType, null, 0,
-            0);
-        ContainerType hotel13Type = SiteContainerTypes.getInstance().getContainerType(
-            "Hotel-13");
-        ContainerType hotel19Type = SiteContainerTypes.getInstance().getContainerType(
-            "Hotel-19");
-        ContainerType palletType = SiteContainerTypes.getInstance().getContainerType(
-            "Pallet-96");
+    private static void createFreezer02(SiteWrapper site) throws Exception {
+        ContainerWrapper freezer02 = insertTopLevelContainer(site, "02",
+            SiteContainerTypes.getContainerType("Freezer 4x12"));
+    }
 
-        ContainerType [] hotelTypes = new ContainerType [] {
+    private static void createFreezer03(SiteWrapper site) throws Exception {
+        ContainerWrapper hotel;
+        ContainerWrapper freezer03 = insertTopLevelContainer(site, "03",
+            SiteContainerTypes.getContainerType("Freezer 5x9"));
+        ContainerTypeWrapper hotel13Type = SiteContainerTypes.getContainerType("Hotel 13");
+        ContainerTypeWrapper hotel19Type = SiteContainerTypes.getContainerType("Hotel 19");
+        ContainerTypeWrapper palletType = SiteContainerTypes.getContainerType("Pallet 96");
+
+        ContainerTypeWrapper [] hotelTypes = new ContainerTypeWrapper [] {
             hotel19Type, hotel13Type, hotel13Type, hotel19Type, hotel13Type,
             hotel19Type, hotel13Type, hotel19Type, hotel19Type, hotel13Type,
             hotel19Type, hotel13Type, hotel13Type, hotel13Type, hotel13Type,
@@ -89,95 +58,70 @@ public class SiteContainers {
             hotel19Type, hotel19Type, hotel13Type, hotel19Type, hotel19Type,
             hotel19Type, hotel13Type, hotel19Type, hotel13Type, hotel13Type,
             hotel13Type, hotel19Type, hotel13Type, hotel13Type, hotel13Type,
-            hotel19Type, hotel19Type, hotel13Type, };
+            hotel19Type, hotel19Type, hotel13Type };
 
         RowColPos pos = new RowColPos();
         int count = 0;
-        for (ContainerType hotelType : hotelTypes) {
+        for (ContainerTypeWrapper hotelType : hotelTypes) {
             pos.row = count % 5;
             pos.col = count / 5;
-            Capacity freezerCapacity = freezerType.getCapacity();
-            String hotelPosLabel = "03"
-                + LabelingScheme.getPositionString(pos,
-                    freezerType.getChildLabelingScheme().getId(),
-                    freezerCapacity.getRowCapacity(),
-                    freezerCapacity.getColCapacity());
-            hotel = insertContainer(site, hotelPosLabel, hotelType, freezer03,
-                pos.row, pos.col);
+            hotel = insertContainer(site, hotelType, freezer03, pos.row,
+                pos.col);
 
-            for (int j = 0, n = hotelType.getCapacity().getRowCapacity(); j < n; ++j) {
-                pos.row = j;
-                pos.col = 0;
-                Capacity hotelCapacity = hotelType.getCapacity();
-                insertContainer(site, hotelPosLabel
-                    + LabelingScheme.getPositionString(pos,
-                        hotelType.getChildLabelingScheme().getId(),
-                        hotelCapacity.getRowCapacity(),
-                        hotelCapacity.getColCapacity()), palletType, hotel,
-                    pos.row, pos.col);
+            for (int j = 0, n = hotelType.getRowCapacity(); j < n; ++j) {
+                insertContainer(site, palletType, hotel, j, 0);
             }
             ++count;
         }
     }
 
-    private void createCabinet01(Site site) throws Exception {
-        ContainerType binType = SiteContainerTypes.getInstance().getContainerType(
-            "Bin");
-        ContainerType drawerType = SiteContainerTypes.getInstance().getContainerType(
-            "Drawer");
-        ContainerType cabinetType = SiteContainerTypes.getInstance().getContainerType(
-            "Cabinet");
-        Container cabinet = insertContainer(site, "01", cabinetType, null, 0, 0);
+    private static void createFreezer04(SiteWrapper site) throws Exception {
+        ContainerWrapper freezer02 = insertTopLevelContainer(site, "04",
+            SiteContainerTypes.getContainerType("Freezer 6x12"));
+    }
 
-        RowColPos pos = new RowColPos();
-        Container drawer;
+    private static void createCabinet01(SiteWrapper site) throws Exception {
+        ContainerTypeWrapper ftaBinType = SiteContainerTypes.getContainerType("FTA Bin");
+        ContainerTypeWrapper drawerType = SiteContainerTypes.getContainerType("Drawer 36");
+        ContainerTypeWrapper cabinetType = SiteContainerTypes.getContainerType("Cabinet 4 drawer");
+        ContainerWrapper cabinet = insertTopLevelContainer(site, "01",
+            cabinetType);
+
+        ContainerWrapper drawer;
         for (int i = 0; i < 4; ++i) {
-            pos.row = i;
-            pos.col = 0;
-            Capacity cabinetCapacity = cabinetType.getCapacity();
-            String drawerPosLabel = "01"
-                + LabelingScheme.getPositionString(pos,
-                    cabinetType.getChildLabelingScheme().getId(),
-                    cabinetCapacity.getRowCapacity(),
-                    cabinetCapacity.getColCapacity());
-            drawer = insertContainer(site, drawerPosLabel,
-                SiteContainerTypes.getInstance().getContainerType("Drawer"),
-                cabinet, pos.row, pos.col);
+            drawer = insertContainer(site, drawerType, cabinet, i, 0);
 
-            for (int j = 0; j < 36; ++j) {
-                pos.row = j;
-                pos.col = 0;
-                Capacity drawerCapacity = drawerType.getCapacity();
-                insertContainer(site, drawerPosLabel
-                    + LabelingScheme.getPositionString(pos,
-                        drawerType.getChildLabelingScheme().getId(),
-                        drawerCapacity.getRowCapacity(),
-                        drawerCapacity.getColCapacity()), binType, drawer,
-                    pos.row, pos.col);
-            }
+            // don't know how FTA and Hair bins are layed out yet
+            // for (int j = 0; j < 36; ++j) {
+            // insertContainer(site, ftaBinType, drawer, j, 0);
+            // }
         }
     }
 
-    private Container insertContainer(Site site, String label,
-        ContainerType st, Container parent, int pos1, int pos2)
+    private static ContainerWrapper insertTopLevelContainer(SiteWrapper site,
+        String label, ContainerTypeWrapper type) throws Exception {
+        ContainerWrapper container = new ContainerWrapper(site.getAppService());
+        container.setProductBarcode(label);
+        container.setSite(site);
+        container.setLabel(label);
+        container.setContainerType(type);
+        container.setActivityStatus("Active");
+        container.persist();
+        container.reload();
+        return container;
+    }
+
+    private static ContainerWrapper insertContainer(SiteWrapper site,
+        ContainerTypeWrapper type, ContainerWrapper parent, int pos1, int pos2)
         throws Exception {
-        Container sc = new Container();
-        sc.setLabel(label);
-        sc.setProductBarcode(label);
-        sc.setSite(site);
-        sc.setContainerType(st);
-        sc.setActivityStatus("Active");
-
-        if (parent != null) {
-            ContainerPosition cp = new ContainerPosition();
-            cp.setContainer(sc);
-            cp.setParentContainer(parent);
-            cp.setRow(pos1);
-            cp.setCol(pos2);
-            sc.setPosition(cp);
-        }
-
-        return (Container) BioBank2Db.getInstance().setObject(sc);
+        ContainerWrapper container = new ContainerWrapper(site.getAppService());
+        container.setSite(site);
+        container.setContainerType(type);
+        container.setActivityStatus("Active");
+        container.setPosition(pos1, pos2);
+        container.persist();
+        container.reload();
+        return container;
     }
 
 }
