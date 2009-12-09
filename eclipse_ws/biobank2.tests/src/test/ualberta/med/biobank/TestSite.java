@@ -57,7 +57,7 @@ public class TestSite extends TestDatabase {
     public void testGetStudyCollectionBoolean() throws Exception {
         String name = "testGetStudyCollectionBoolean" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
-        StudyHelper.addStudies(site, name, r.nextInt(15) + 1);
+        StudyHelper.addStudies(site, name, r.nextInt(15) + 5);
 
         List<StudyWrapper> studiesSorted = site.getStudyCollection(true);
         if (studiesSorted.size() > 1) {
@@ -138,7 +138,7 @@ public class TestSite extends TestDatabase {
     public void testGetClinicCollectionBoolean() throws Exception {
         String name = "testGetClinicCollectionBoolean" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
-        int nber = r.nextInt(15) + 1;
+        int nber = r.nextInt(15) + 5;
         ClinicHelper.addClinics(site, name, nber);
 
         List<ClinicWrapper> clinics = site.getClinicCollection(true);
@@ -220,7 +220,7 @@ public class TestSite extends TestDatabase {
         String name = "testGetContainerTypeCollectionBoolean" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         ContainerTypeHelper.addContainerTypesRandom(site, name,
-            r.nextInt(15) + 1);
+            r.nextInt(15) + 5);
 
         List<ContainerTypeWrapper> types = site
             .getContainerTypeCollection(true);
@@ -794,7 +794,7 @@ public class TestSite extends TestDatabase {
         String name = "testGetTopContainerCollection" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         ContainerHelper.addTopContainersWithChildren(site, name,
-            r.nextInt(8) + 1);
+            r.nextInt(8) + 5);
 
         List<ContainerWrapper> containers = site
             .getTopContainerCollection(true);

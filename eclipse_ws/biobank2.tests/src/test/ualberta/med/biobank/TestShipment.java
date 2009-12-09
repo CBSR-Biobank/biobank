@@ -147,11 +147,6 @@ public class TestShipment extends TestDatabase {
     }
 
     @Test
-    public void testSetPatientVisitCollectionRemove() throws Exception {
-        // Should go trough patientVisit.setShipment ot modify this.
-    }
-
-    @Test
     public void testGetSetShippingCompany() throws Exception {
         String name = "testGetSetShippingCompany" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
@@ -202,6 +197,51 @@ public class TestShipment extends TestDatabase {
 
         shipment.reload();
         Assert.assertEquals(3, shipment.getPatientCollection().size());
+    }
+
+    @Test
+    public void testGetPatientCollectionBoolean() throws Exception {
+        String name = "testGetPatientCollectionBoolean" + r.nextInt();
+        SiteWrapper site = SiteHelper.addSite(name);
+        ClinicWrapper clinic1 = ClinicHelper.addClinic(site, name + "CLINIC1");
+        ContactWrapper contact1 = ContactHelper.addContact(clinic1, name
+            + "CONTACT1");
+        ClinicWrapper clinic2 = ClinicHelper.addClinic(site, name + "CLINIC2");
+        ContactWrapper contact2 = ContactHelper.addContact(clinic2, name
+            + "CONTACT2");
+
+        List<ContactWrapper> contacts = new ArrayList<ContactWrapper>();
+        contacts.add(contact1);
+        contacts.add(contact2);
+
+        StudyWrapper study1 = StudyHelper.addStudy(site, name + "STUDY1");
+        study1.setContactCollection(contacts);
+        study1.persist();
+        PatientWrapper patient1 = PatientHelper.addPatient("QWERTY" + name,
+            study1);
+        PatientWrapper patient2 = PatientHelper.addPatient("ASDFG" + name,
+            study1);
+
+        StudyWrapper study2 = StudyHelper.addStudy(site, name + "STUDY2");
+        study2.setContactCollection(contacts);
+        study2.persist();
+        PatientWrapper patient3 = PatientHelper.addPatient("ZXCVB" + name,
+            study2);
+
+        ShipmentWrapper shipment = ShipmentHelper.newShipment(clinic1);
+        shipment.setPatientCollection(Arrays.asList(patient1, patient2,
+            patient3));
+        shipment.persist();
+
+        shipment.reload();
+        List<PatientWrapper> patients = shipment.getPatientCollection(true);
+        if (patients.size() > 1) {
+            for (int i = 0; i < patients.size() - 1; i++) {
+                PatientWrapper p1 = patients.get(i);
+                PatientWrapper p2 = patients.get(i + 1);
+                Assert.assertTrue(p1.compareTo(p2) <= 0);
+            }
+        }
     }
 
     @Test

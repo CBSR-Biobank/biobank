@@ -120,7 +120,11 @@ public class SampleWrapper extends
     }
 
     public void setPatientVisit(PatientVisitWrapper patientVisit) {
-        setPatientVisit(patientVisit.getWrappedObject());
+        if (patientVisit == null) {
+            setPatientVisit((PatientVisit) null);
+        } else {
+            setPatientVisit(patientVisit.getWrappedObject());
+        }
     }
 
     public PatientVisitWrapper getPatientVisit() {

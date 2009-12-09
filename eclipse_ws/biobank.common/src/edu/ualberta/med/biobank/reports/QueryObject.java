@@ -68,10 +68,8 @@ public class QueryObject {
         ArrayList<QueryObject> queries = new ArrayList<QueryObject>();
 
         // create all pre-defined queries here
-        QueryObject invoicePQuery = new InvoicePQueryObject(
-            "SampleInvoiceByPatient", siteId);
-        QueryObject invoiceCQuery = new InvoiceCQueryObject(
-            "SampleInvoiceByClinic", siteId);
+        QueryObject invoicePQuery = new InvoicePQueryObject(siteId);
+        QueryObject invoiceCQuery = new InvoiceCQueryObject(siteId);
 
         queries.add(invoicePQuery);
         queries.add(invoiceCQuery);
@@ -94,14 +92,8 @@ public class QueryObject {
         }
         HQLCriteria c = new HQLCriteria(queryString);
         c.setParameters(params);
-        List<Object> results = new ArrayList<Object>();
-        results = appService.query(c);
+        List<Object> results = appService.query(c);
         return postProcess(results);
-    }
-
-    @Override
-    public String toString() {
-        return name;
     }
 
     public List<Object> postProcess(List<Object> results) {
@@ -114,5 +106,10 @@ public class QueryObject {
 
     public List<Option> getOptions() {
         return queryOptions;
+    }
+
+    @Override
+    public String toString() {
+        return name;
     }
 }

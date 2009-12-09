@@ -8,7 +8,6 @@ import junit.framework.Assert;
 import org.junit.Test;
 
 import test.ualberta.med.biobank.internal.ContainerTypeHelper;
-import test.ualberta.med.biobank.internal.DbHelper;
 import test.ualberta.med.biobank.internal.SampleTypeHelper;
 import test.ualberta.med.biobank.internal.SiteHelper;
 import edu.ualberta.med.biobank.common.BiobankCheckException;
@@ -75,7 +74,7 @@ public class TestSampleType extends TestDatabase {
         int containerTypeNber = 10;
         ContainerTypeHelper.addContainerTypesRandom(site, name,
             containerTypeNber);
-        int nber = r.nextInt(containerTypeNber) + 3;
+        int nber = r.nextInt(containerTypeNber) + 1;
         List<ContainerTypeWrapper> containerTypes = site
             .getContainerTypeCollection();
         for (int i = 0; i < nber; i++) {
@@ -178,13 +177,11 @@ public class TestSampleType extends TestDatabase {
 
         String name = "testPersistGlobalSampleTypes" + r.nextInt();
         SampleTypeWrapper type = SampleTypeHelper.newSampleType(null, name);
-        SampleTypeHelper.createdSampleTypes.add(type);
         types.add(type);
         SampleTypeWrapper.persistGlobalSampleTypes(appService, types);
         Assert.assertEquals(startSize + 1, SampleTypeWrapper
             .getGlobalSampleTypes(appService, false).size());
 
-        type = DbHelper.chooseRandomlyInList(types);
         types.remove(type);
         SampleTypeWrapper.persistGlobalSampleTypes(appService, types);
         Assert.assertEquals(startSize, SampleTypeWrapper.getGlobalSampleTypes(

@@ -854,4 +854,25 @@ public class TestContainerType extends TestDatabase {
         // currently only 3 labeling schemes
         Assert.assertEquals(3, map.size());
     }
+
+    @Test
+    public void testGetContainersCount() throws Exception {
+        ContainerTypeWrapper topType = addContainerTypeHierarchy(containerTypeMap
+            .get("TopCT"));
+        ContainerTypeWrapper childTypeL1 = containerTypeMap.get("ChildCtL1");
+
+        ContainerWrapper top = ContainerHelper.addContainer("01", "01", null,
+            site, topType);
+        ContainerHelper.addContainer(null, "1stChild", top, site, childTypeL1,
+            0, 0);
+        ContainerHelper.addContainer(null, "2ndChild", top, site, childTypeL1,
+            0, 1);
+        ContainerHelper.addContainer(null, "3rdChild", top, site, childTypeL1,
+            0, 2);
+
+        topType.reload();
+        childTypeL1.reload();
+        Assert.assertEquals(1, topType.getContainersCount());
+        Assert.assertEquals(3, childTypeL1.getContainersCount());
+    }
 }

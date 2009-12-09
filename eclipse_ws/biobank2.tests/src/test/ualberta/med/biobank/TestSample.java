@@ -36,7 +36,6 @@ import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.Sample;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class TestSample extends TestDatabase {
 
@@ -238,7 +237,7 @@ public class TestSample extends TestDatabase {
         String parentLabel = sample.getParent().getLabel();
         Assert.assertTrue(sample.getPositionString(true, false).equals(
             parentLabel + "A1"));
-        Assert.assertTrue(sample.getPositionString(true, true).equals(
+        Assert.assertTrue(sample.getPositionString().equals(
             topContainer.getContainerType().getNameShort() + "-" + parentLabel
                 + "A1"));
 
@@ -439,8 +438,33 @@ public class TestSample extends TestDatabase {
     }
 
     @Test
-    public void testDebugFakeMethods() throws ApplicationException {
-        // we only check they don't fail
+    public void testDebugRandomMethods() throws Exception {
+        String name = "testDebugRandomMethods" + r.nextInt();
+        SiteWrapper site = SiteHelper.addSite(name);
+        SampleTypeWrapper sampleType = SampleTypeHelper.addSampleType(site,
+            name);
+        StudyWrapper study = StudyHelper.addStudy(site, name);
+        PatientWrapper patient = PatientHelper.addPatient(Utils
+            .getRandomNumericString(5), study);
+        ContactHelper.addContactsToStudy(study, name);
+
+        ShipmentWrapper shipment = ShipmentHelper.addShipment(study
+            .getClinicCollection().get(0), patient);
+        PatientVisitWrapper pv = PatientVisitHelper.addPatientVisit(patient,
+            shipment, Utils.getRandomDate());
+
+        ContainerTypeWrapper type = ContainerTypeHelper.addContainerType(site,
+            name, name, 1, 4, 5, true);
+        type.setSampleTypeCollection(Arrays.asList(sampleType));
+        ContainerWrapper container = ContainerHelper.addContainer(name, name,
+            null, site, type);
+        SampleHelper.addSample(sampleType, container, pv, 0, 0);
+        SampleWrapper sample = SampleHelper.newSample(sampleType, container,
+            pv, 2, 3);
+        sample.setInventoryId(Utils.getRandomString(5));
+        sample.persist();
+        SampleHelper.addSample(sampleType, container, null, 3, 3);
+
         SampleWrapper.getRandomSamplesAlreadyLinked(appService, siteId);
         SampleWrapper.getRandomSamplesAlreadyAssigned(appService, siteId);
         SampleWrapper.getRandomSamplesNotAssigned(appService, siteId);

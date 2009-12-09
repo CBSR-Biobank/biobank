@@ -394,8 +394,7 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
                         resultShownValue.setValue(Boolean.TRUE);
                         cancelConfirmWidget.setFocus();
                     } else {
-                        String msg = "Position "
-                            + sampleWrapper.getPositionString()
+                        String msg = "Position " + positionString
                             + " already in use in container " + bin.getLabel();
                         BioBankPlugin.openAsyncError("Position not free", msg);
                         appendLog("ERROR: " + msg);

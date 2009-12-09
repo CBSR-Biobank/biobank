@@ -754,8 +754,8 @@ public class TestStudy extends TestDatabase {
     }
 
     @Test
-    public void testPersistFailCheckStudyShortNameUnique() throws Exception {
-        String name = "testPersistFailCheckStudyShortNameUnique" + r.nextInt();
+    public void testCheckStudyShortNameUnique() throws Exception {
+        String name = "testCheckStudyShortNameUnique" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         StudyWrapper s1 = StudyHelper.newStudy(site, name);
         s1.setNameShort(name);

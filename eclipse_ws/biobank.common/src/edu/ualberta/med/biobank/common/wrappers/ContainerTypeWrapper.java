@@ -632,6 +632,21 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
         return map;
     }
 
+    /**
+     * get count of container which type is this
+     */
+    public long getContainersCount() throws ApplicationException,
+        BiobankCheckException {
+        HQLCriteria c = new HQLCriteria("select count(*) from "
+            + Container.class.getName() + " where containerType.id=?", Arrays
+            .asList(new Object[] { getId() }));
+        List<Long> results = appService.query(c);
+        if (results.size() != 1) {
+            throw new BiobankCheckException("Invalid size for HQL query result");
+        }
+        return results.get(0);
+    }
+
     @Override
     public int compareTo(ModelWrapper<ContainerType> type) {
         if (type instanceof ContainerTypeWrapper) {

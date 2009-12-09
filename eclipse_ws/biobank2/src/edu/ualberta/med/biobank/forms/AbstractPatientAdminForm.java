@@ -1,6 +1,8 @@
 package edu.ualberta.med.biobank.forms;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -11,6 +13,7 @@ import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.logs.ActivityLogAppender;
 import edu.ualberta.med.biobank.logs.LogInfo;
+import edu.ualberta.med.biobank.reporting.ReportingUtils;
 
 public abstract class AbstractPatientAdminForm extends BiobankEntryForm {
 
@@ -56,9 +59,12 @@ public abstract class AbstractPatientAdminForm extends BiobankEntryForm {
             BioBankPlugin.openError("Print error", "Can't print: log error.");
         }
         try {
+            Map<String, Object> map = new HashMap<String, Object>();
+            map.put("username", SessionManager.getInstance().getSession()
+                .getUserName());
             List<LogInfo> logsList = appender.getLogsList();
-            LogInfo.printLogReport(SessionManager.getInstance().getSession()
-                .getUserName(), logsList);
+
+            ReportingUtils.printReport("ActivityReportForm", map, logsList);
         } catch (Exception e) {
             BioBankPlugin.openAsyncError("Print error", e);
         }

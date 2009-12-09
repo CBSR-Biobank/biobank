@@ -13,7 +13,7 @@
 	<pageHeader>
 		<band height="21">
 			<staticText>
-				<reportElement x="0" y="0" width="51" height="21"/>
+				<reportElement x="0" y="0" width="205" height="21"/>
 				<textElement/>
 				<text><![CDATA[Biobank2 - Activity Report]]></text>
 			</staticText>

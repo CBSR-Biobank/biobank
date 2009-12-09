@@ -36,7 +36,7 @@ public class SampleTypeHelper extends DbHelper {
 
     public static int addSampleTypes(SiteWrapper site, String name)
         throws Exception {
-        int nber = r.nextInt(15) + 1;
+        int nber = r.nextInt(15) + 2;
         for (int i = 0; i < nber; i++) {
             addSampleType(site, name + i);
         }

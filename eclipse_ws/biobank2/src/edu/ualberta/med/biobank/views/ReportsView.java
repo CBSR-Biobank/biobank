@@ -275,7 +275,7 @@ public class ReportsView extends ViewPart {
         combo = new Combo(parent, SWT.READ_ONLY);
 
         GridData combodata = new GridData();
-        combodata.widthHint = 130;
+        combodata.widthHint = 250;
         combo.setLayoutData(combodata);
 
         comboViewer = new ComboViewer(combo);
