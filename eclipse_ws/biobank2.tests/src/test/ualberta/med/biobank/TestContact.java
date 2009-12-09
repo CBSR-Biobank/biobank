@@ -73,7 +73,7 @@ public class TestContact extends TestDatabase {
         ContactWrapper contact = ContactHelper.addContact(clinic, name);
 
         ClinicWrapper clinic2 = ClinicHelper.addClinic(site, name + "_2");
-        contact.setClinicWrapper(clinic2);
+        contact.setClinic(clinic2);
         contact.persist();
 
         contact.reload();

@@ -178,6 +178,7 @@ public class SiteClinics {
         clinic.persist();
         clinic.reload();
         clinicsMap.put(name, clinic);
+        System.out.println("Added clinic " + name);
         return clinic;
     }
 
@@ -194,6 +195,7 @@ public class SiteClinics {
         String title, String phoneNumber, String faxNumber, String emailAddress)
         throws Exception {
         ContactWrapper contact = new ContactWrapper(clinic.getAppService());
+        contact.setClinic(clinic);
         contact.setName(name);
         contact.setTitle(title);
         contact.setPhoneNumber(phoneNumber);
@@ -202,6 +204,7 @@ public class SiteClinics {
         contact.persist();
         contact.reload();
         contactsMap.put(name, contact);
+        System.out.println("Added contact " + name);
         return contact;
     }
 

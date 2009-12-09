@@ -15,87 +15,91 @@ public class SiteStudies {
     public static void createStudies(SiteWrapper site) throws Exception {
         studiesMap = new HashMap<String, StudyWrapper>();
 
-        addStudy(site, "Acute Heart Failure-Emergency Management", "AHFEM",
-            null);
-        studiesMap.get("AHFEM").setStudyPvAttr("Worksheet", "text");
+        StudyWrapper study;
 
-        addStudy(site, "Blood Borne Pathogens Surveillance Project", "BBPSP",
-            null);
-        studiesMap.get("BBPSP").setStudyPvAttr("PBMC Count", "number");
-        studiesMap.get("BBPSP").setStudyPvAttr(
-            "Consent",
-            "select_multiple",
-            new String [] {
-                "Surveillance", "Genetic Predisposition", "Previous Samples",
-                "Genetic Mutation" });
-        studiesMap.get("BBPSP").setStudyPvAttr("Worksheet", "text");
-        studiesMap.get("BBPSP").setContactCollection(
-            Arrays.asList(SiteClinics.getContact("Morna Brown")));
+        study = addStudy(site, "Acute Heart Failure-Emergency Management",
+            "AHFEM", null);
+        study.setStudyPvAttr("Worksheet", "text");
 
-        addStudy(
+        study = addStudy(site, "Blood Borne Pathogens Surveillance Project",
+            "BBPSP", null);
+        study.setStudyPvAttr("PBMC Count", "number");
+        study.setStudyPvAttr("Consent", "select_multiple", new String [] {
+            "Surveillance", "Genetic Predisposition", "Previous Samples",
+            "Genetic Mutation" });
+        study.setStudyPvAttr("Worksheet", "text");
+        study.setContactCollection(Arrays.asList(SiteClinics.getContact("Morna Brown")));
+        study.persist();
+
+        study = addStudy(
             site,
             "Centre of Excellence for Gastrointestinal Inflammation and Immunity Research",
             "CEGIIR", null);
-        studiesMap.get("CEGIIR").setStudyPvAttr("PBMC Count", "number");
-        studiesMap.get("CEGIIR").setStudyPvAttr("Worksheet", "text");
+        study.setStudyPvAttr("PBMC Count", "number");
+        study.setStudyPvAttr("Worksheet", "text");
+        study.persist();
 
         addStudy(site, "Canadian Health Infant Longitudinal Development Study",
             "CHILD", null);
 
-        addStudy(
+        study = addStudy(
             site,
             "Exploring the Renoprotective effects of fluid prophylaxis strategies for Contrast Induced Nephropathy (Study)",
             "ERCIN", "Precath visit - only urine is collected");
-        studiesMap.get("ERCIN").setStudyPvAttr(
-            "Visit Type",
-            "select_single",
-            new String [] {
-                "Baseline", "Precath", "6hr Post", "24hr Post", "48-72hr Post" });
-        studiesMap.get("ERCIN").setStudyPvAttr("Worksheet", "text");
+        study.setStudyPvAttr("Visit Type", "select_single", new String [] {
+            "Baseline", "Precath", "6hr Post", "24hr Post", "48-72hr Post" });
+        study.setStudyPvAttr("Worksheet", "text");
+        study.persist();
 
-        addStudy(site, "Kidney Disease Cohort Study", "KDCS", null);
-        studiesMap.get("KDCS").setStudyPvAttr("PBMC Count", "number");
-        studiesMap.get("KDCS").setStudyPvAttr("Consent", "select_multiple",
+        study = addStudy(site, "Kidney Disease Cohort Study", "KDCS", null);
+        study.setStudyPvAttr("PBMC Count", "number");
+        study.setStudyPvAttr("Consent", "select_multiple",
             new String [] { "Genetic" });
-        studiesMap.get("KDCS").setStudyPvAttr("Worksheet", "text");
+        study.setStudyPvAttr("Worksheet", "text");
+        study.persist();
 
-        addStudy(site, "Kingston Merger Study", "KMS", null);
-        studiesMap.get("KMS").setStudyPvAttr("Worksheet", "text");
+        study = addStudy(site, "Kingston Merger Study", "KMS", null);
+        study.setStudyPvAttr("Worksheet", "text");
+        study.persist();
 
-        addStudy(site, "Man-Chui Poon Study", "MPS", null);
-        studiesMap.get("MPS").setStudyPvAttr("Worksheet", "text");
+        study = addStudy(site, "Man-Chui Poon Study", "MPS", null);
+        study.setStudyPvAttr("Worksheet", "text");
+        study.persist();
 
-        addStudy(site, "Novartis Hepatitis C Study", "NHS", null);
-        studiesMap.get("NHS").setStudyPvAttr("Biopsy Length", "number");
-        studiesMap.get("NHS").setStudyPvAttr(
-            "Visit Type",
-            "select_single",
-            new String [] {
-                "D0", "D2", "D4", "Wk2", "Wk4", "M2", "M8", "M12", "M18", "M24" });
-        studiesMap.get("NHS").setStudyPvAttr("PBMC Count", "number");
-        studiesMap.get("NHS").setStudyPvAttr("Worksheet", "text");
+        study = addStudy(site, "Novartis Hepatitis C Study", "NHS", null);
+        study.setStudyPvAttr("Biopsy Length", "number");
+        study.setStudyPvAttr("Visit Type", "select_single", new String [] {
+            "D0", "D2", "D4", "Wk2", "Wk4", "M2", "M8", "M12", "M18", "M24" });
+        study.setStudyPvAttr("PBMC Count", "number");
+        study.setStudyPvAttr("Worksheet", "text");
+        study.persist();
 
-        addStudy(site, "Retroviral Study", "RVS", null);
-        studiesMap.get("RVS").setStudyPvAttr("Worksheet", "text");
+        study = addStudy(site, "Retroviral Study", "RVS", null);
+        study.setStudyPvAttr("Worksheet", "text");
+        study.persist();
 
-        addStudy(site, "Tonelli Chronic Kidney Study", "TCKS", null);
-        studiesMap.get("TCKS").setStudyPvAttr("PBMC Count", "number");
-        studiesMap.get("TCKS").setStudyPvAttr("Worksheet", "text");
+        study = addStudy(site, "Tonelli Chronic Kidney Study", "TCKS", null);
+        study.setStudyPvAttr("PBMC Count", "number");
+        study.setStudyPvAttr("Worksheet", "text");
+        study.persist();
 
-        addStudy(site, "Vascular Access Study", "VAS", null);
-        studiesMap.get("VAS").setStudyPvAttr("PBMC Count", "number");
-        studiesMap.get("VAS").setStudyPvAttr("Worksheet", "text");
+        study = addStudy(site, "Vascular Access Study", "VAS", null);
+        study.setStudyPvAttr("PBMC Count", "number");
+        study.setStudyPvAttr("Worksheet", "text");
+        study.persist();
     }
 
     private static StudyWrapper addStudy(SiteWrapper site, String name,
         String nameShort, String comment) throws Exception {
         StudyWrapper study = new StudyWrapper(site.getAppService());
+        study.setSite(site);
         study.setName(name);
         study.setNameShort(nameShort);
         study.setComment(comment);
         study.persist();
         study.reload();
         studiesMap.put(nameShort, study);
+        System.out.println("Added study " + nameShort);
         return study;
     }
 
