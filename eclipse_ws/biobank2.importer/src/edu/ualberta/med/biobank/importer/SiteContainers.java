@@ -9,8 +9,6 @@ import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 public class SiteContainers {
 
     public static void createContainers(SiteWrapper site) throws Exception {
-        System.out.println("adding containers ...");
-
         createFreezer01(site);
         createFreezer02(site);
         createFreezer03(site);
@@ -19,7 +17,7 @@ public class SiteContainers {
     }
 
     private static void createFreezer01(SiteWrapper site) throws Exception {
-        ContainerWrapper freezer01 = insertTopLevelContainer(site, "01",
+        ContainerWrapper freezer01 = addTopLevelContainer(site, "01",
             SiteContainerTypes.getContainerType("Freezer 3x10"));
 
         ContainerWrapper hotel;
@@ -28,23 +26,23 @@ public class SiteContainers {
 
         for (int row = 0; row < 3; ++row) {
             for (int col = 0; col < 10; ++col) {
-                hotel = insertContainer(site, hotelType, freezer01, row, col);
+                hotel = addContainer(site, hotelType, freezer01, row, col);
 
                 for (int j = 0; j < 17; ++j) {
-                    insertContainer(site, palletType, hotel, j, 0);
+                    addContainer(site, palletType, hotel, j, 0);
                 }
             }
         }
     }
 
     private static void createFreezer02(SiteWrapper site) throws Exception {
-        ContainerWrapper freezer02 = insertTopLevelContainer(site, "02",
+        ContainerWrapper freezer02 = addTopLevelContainer(site, "02",
             SiteContainerTypes.getContainerType("Freezer 4x12"));
     }
 
     private static void createFreezer03(SiteWrapper site) throws Exception {
         ContainerWrapper hotel;
-        ContainerWrapper freezer03 = insertTopLevelContainer(site, "03",
+        ContainerWrapper freezer03 = addTopLevelContainer(site, "03",
             SiteContainerTypes.getContainerType("Freezer 5x9"));
         ContainerTypeWrapper hotel13Type = SiteContainerTypes.getContainerType("Hotel 13");
         ContainerTypeWrapper hotel19Type = SiteContainerTypes.getContainerType("Hotel 19");
@@ -65,18 +63,18 @@ public class SiteContainers {
         for (ContainerTypeWrapper hotelType : hotelTypes) {
             pos.row = count % 5;
             pos.col = count / 5;
-            hotel = insertContainer(site, hotelType, freezer03, pos.row,
+            hotel = addContainer(site, hotelType, freezer03, pos.row,
                 pos.col);
 
             for (int j = 0, n = hotelType.getRowCapacity(); j < n; ++j) {
-                insertContainer(site, palletType, hotel, j, 0);
+                addContainer(site, palletType, hotel, j, 0);
             }
             ++count;
         }
     }
 
     private static void createFreezer04(SiteWrapper site) throws Exception {
-        ContainerWrapper freezer02 = insertTopLevelContainer(site, "04",
+        ContainerWrapper freezer02 = addTopLevelContainer(site, "04",
             SiteContainerTypes.getContainerType("Freezer 6x12"));
     }
 
@@ -84,12 +82,12 @@ public class SiteContainers {
         ContainerTypeWrapper ftaBinType = SiteContainerTypes.getContainerType("FTA Bin");
         ContainerTypeWrapper drawerType = SiteContainerTypes.getContainerType("Drawer 36");
         ContainerTypeWrapper cabinetType = SiteContainerTypes.getContainerType("Cabinet 4 drawer");
-        ContainerWrapper cabinet = insertTopLevelContainer(site, "01",
+        ContainerWrapper cabinet = addTopLevelContainer(site, "01",
             cabinetType);
 
         ContainerWrapper drawer;
         for (int i = 0; i < 4; ++i) {
-            drawer = insertContainer(site, drawerType, cabinet, i, 0);
+            drawer = addContainer(site, drawerType, cabinet, i, 0);
 
             // don't know how FTA and Hair bins are layed out yet
             // for (int j = 0; j < 36; ++j) {
@@ -98,29 +96,33 @@ public class SiteContainers {
         }
     }
 
-    private static ContainerWrapper insertTopLevelContainer(SiteWrapper site,
+    private static ContainerWrapper addTopLevelContainer(SiteWrapper site,
         String label, ContainerTypeWrapper type) throws Exception {
         ContainerWrapper container = new ContainerWrapper(site.getAppService());
-        container.setProductBarcode(label);
-        container.setSite(site);
         container.setLabel(label);
+        container.setSite(site);
         container.setContainerType(type);
         container.setActivityStatus("Active");
         container.persist();
         container.reload();
+        System.out.println("Added container " + container.getLabel() + " ("
+            + type.getNameShort() + ")");
         return container;
     }
 
-    private static ContainerWrapper insertContainer(SiteWrapper site,
-        ContainerTypeWrapper type, ContainerWrapper parent, int pos1, int pos2)
+    private static ContainerWrapper addContainer(SiteWrapper site,
+        ContainerTypeWrapper type, ContainerWrapper parent, int row, int col)
         throws Exception {
         ContainerWrapper container = new ContainerWrapper(site.getAppService());
         container.setSite(site);
         container.setContainerType(type);
         container.setActivityStatus("Active");
-        container.setPosition(pos1, pos2);
+        container.setPosition(row, col);
+        container.setParent(parent);
         container.persist();
         container.reload();
+        System.out.println("Added container " + container.getLabel() + " ("
+            + type.getNameShort() + ")");
         return container;
     }
 

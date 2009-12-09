@@ -12,7 +12,7 @@ public class ContactHelper extends DbHelper {
 
     public static ContactWrapper newContact(ClinicWrapper clinic, String name) {
         ContactWrapper contact = new ContactWrapper(appService);
-        contact.setClinicWrapper(clinic);
+        contact.setClinic(clinic);
         contact.setName(name + r.nextInt());
         contact.setEmailAddress("toto@gmail.com");
         return contact;

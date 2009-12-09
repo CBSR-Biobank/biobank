@@ -136,7 +136,7 @@ public class ContactEntryWidget extends BiobankWidget {
             if (add) {
                 // only add to the collection when adding and not editing
                 ContactWrapper contact = dlg.getContactWrapper();
-                contact.setClinicWrapper(clinic);
+                contact.setClinic(clinic);
                 selectedContacts.add(contact);
             }
             contactInfoTable.setCollection(selectedContacts);
