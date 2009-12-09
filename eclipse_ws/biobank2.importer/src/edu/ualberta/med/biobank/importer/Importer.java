@@ -124,8 +124,8 @@ public class Importer {
 
             cbsrSite = bioBank2Db.createSite();
 
-            SiteContainerTypes.getInstance().insertContainerTypes(cbsrSite);
-            SiteContainers.getInstance().insertContainers(cbsrSite);
+            SiteContainerTypes.insertContainerTypes(cbsrSite);
+            SiteContainers.insertContainers(cbsrSite);
 
             importStudies();
             importClinics();
@@ -215,28 +215,6 @@ public class Importer {
 
                 System.out.println("importing study " + study.getNameShort()
                     + " ...");
-
-                if (studyNameShort.equals("BBPSP")) {
-                    CbsrStudyConfig.assignBbpsp(study);
-                }
-                else if (studyNameShort.equals("KDCS")) {
-                    CbsrStudyConfig.assignKdcs(study);
-                }
-                else if (studyNameShort.equals("VAS")) {
-                    CbsrStudyConfig.assignVas(study);
-                }
-                else if (studyNameShort.equals("RVS")) {
-                    CbsrStudyConfig.assignRvs(study);
-                }
-                else if (studyNameShort.equals("NHS")) {
-                    CbsrStudyConfig.assignNhs(study);
-                }
-                else if (studyNameShort.equals("MPS")) {
-                    CbsrStudyConfig.assignMps(study);
-                }
-                else {
-                    throw new Exception("Unknown study: " + studyNameShort);
-                }
             }
         }
     }
@@ -771,5 +749,9 @@ public class Importer {
             result[i - 1] = rs.getString(i);
         }
         return result;
+    }
+
+    public static WritableApplicationService getAppService() {
+        return getInstance().appService;
     }
 }

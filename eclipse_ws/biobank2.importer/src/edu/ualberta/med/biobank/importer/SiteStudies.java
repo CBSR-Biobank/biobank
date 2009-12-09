@@ -9,7 +9,7 @@ import java.util.Map;
 
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 
-public class CbsrStudyConfig {
+public class SiteStudies {
 
     private static final Map<String, List<String>> studyPvAttrConfigMap;
     static {
@@ -18,11 +18,11 @@ public class CbsrStudyConfig {
         studyPvAttrConfigMap = Collections.unmodifiableMap(aMap);
     };
 
-    public static void assignAhfem(StudyWrapper study) throws Exception {
+    public static void createAhfem(StudyWrapper study) throws Exception {
         study.setStudyPvAttr("Worksheet", "text");
     }
 
-    public static void assignBbpsp(StudyWrapper study) throws Exception {
+    public static void createBbpsp(StudyWrapper study) throws Exception {
         study.setStudyPvAttr("PBMC Count", "number");
         study.setStudyPvAttr("Consent", "select_multiple", new String [] {
             "Surveillance", "Genetic Predisposition", "Previous Samples",
@@ -30,33 +30,33 @@ public class CbsrStudyConfig {
         study.setStudyPvAttr("Worksheet", "text");
     }
 
-    public static void assignCegiir(StudyWrapper study) throws Exception {
+    public static void createCegiir(StudyWrapper study) throws Exception {
         study.setStudyPvAttr("PBMC Count", "number");
         study.setStudyPvAttr("Worksheet", "text");
     }
 
-    public static void assignErcin(StudyWrapper study) throws Exception {
+    public static void createErcin(StudyWrapper study) throws Exception {
         study.setStudyPvAttr("Visit Type", "select_single", new String [] {
             "Baseline", "Precath", "6hr Post", "24hr Post", "48-72hr Post" });
         study.setStudyPvAttr("Worksheet", "text");
     }
 
-    public static void assignKdcs(StudyWrapper study) throws Exception {
+    public static void createKdcs(StudyWrapper study) throws Exception {
         study.setStudyPvAttr("PBMC Count", "number");
         study.setStudyPvAttr("Consent", "select_multiple",
             new String [] { "Genetic" });
         study.setStudyPvAttr("Worksheet", "text");
     }
 
-    public static void assignKms(StudyWrapper study) throws Exception {
+    public static void createKms(StudyWrapper study) throws Exception {
         study.setStudyPvAttr("Worksheet", "text");
     }
 
-    public static void assignMps(StudyWrapper study) throws Exception {
+    public static void createMps(StudyWrapper study) throws Exception {
         study.setStudyPvAttr("Worksheet", "text");
     }
 
-    public static void assignNhs(StudyWrapper study) throws Exception {
+    public static void createNhs(StudyWrapper study) throws Exception {
         study.setStudyPvAttr("Biopsy Length", "number");
         study.setStudyPvAttr("Visit Type", "select_single", new String [] {
             "D0", "D2", "D4", "Wk2", "Wk4", "M2", "M8", "M12", "M18", "M24" });
@@ -64,16 +64,16 @@ public class CbsrStudyConfig {
         study.setStudyPvAttr("Worksheet", "text");
     }
 
-    public static void assignRvs(StudyWrapper study) throws Exception {
+    public static void createRvs(StudyWrapper study) throws Exception {
         study.setStudyPvAttr("Worksheet", "text");
     }
 
-    public static void assignTcks(StudyWrapper study) throws Exception {
+    public static void createTcks(StudyWrapper study) throws Exception {
         study.setStudyPvAttr("PBMC Count", "number");
         study.setStudyPvAttr("Worksheet", "text");
     }
 
-    public static void assignVas(StudyWrapper study) throws Exception {
+    public static void createVas(StudyWrapper study) throws Exception {
         study.setStudyPvAttr("PBMC Count", "number");
         study.setStudyPvAttr("Worksheet", "text");
     }
