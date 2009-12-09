@@ -216,23 +216,23 @@ public class Importer {
                 System.out.println("importing study " + study.getNameShort()
                     + " ...");
 
-                if (studyNameShort.equals("KDCS")) {
-                    CbsrStudyPvAttr.assignKdcsAttr(study);
+                if (studyNameShort.equals("BBPSP")) {
+                    CbsrStudyConfig.assignBbpsp(study);
+                }
+                else if (studyNameShort.equals("KDCS")) {
+                    CbsrStudyConfig.assignKdcs(study);
                 }
                 else if (studyNameShort.equals("VAS")) {
-                    CbsrStudyPvAttr.assignVasInfo(study);
+                    CbsrStudyConfig.assignVas(study);
                 }
                 else if (studyNameShort.equals("RVS")) {
-                    CbsrStudyPvAttr.assignRvsInfo(study);
+                    CbsrStudyConfig.assignRvs(study);
                 }
                 else if (studyNameShort.equals("NHS")) {
-                    CbsrStudyPvAttr.assignNhsInfo(study);
+                    CbsrStudyConfig.assignNhs(study);
                 }
                 else if (studyNameShort.equals("MPS")) {
-                    CbsrStudyPvAttr.assignMpsInfo(study);
-                }
-                else if (studyNameShort.equals("BBP")) {
-                    CbsrStudyPvAttr.assignBbpspPvAttr(study);
+                    CbsrStudyConfig.assignMps(study);
                 }
                 else {
                     throw new Exception("Unknown study: " + studyNameShort);
@@ -256,7 +256,6 @@ public class Importer {
                 clinic = new Clinic();
                 clinic.setName(rs.getString(1));
                 clinic.setComment(rs.getString(2));
-                clinic.setSite(cbsrSite);
                 clinic.setActivityStatus("Active");
 
                 Address address = new Address();
