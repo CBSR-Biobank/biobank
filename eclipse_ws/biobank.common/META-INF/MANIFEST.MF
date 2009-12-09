@@ -48,6 +48,8 @@ Export-Package: edu.ualberta.med.biobank.common;uses:="edu.ualberta.med.biobank.
  org.apache.commons.collections,
  org.apache.commons.collections.map,
  org.apache.commons.lang,
+ org.apache.commons.logging,
+ org.apache.commons.logging.impl,
  org.apache.log4j,
  org.apache.log4j.spi,
  org.springframework.remoting

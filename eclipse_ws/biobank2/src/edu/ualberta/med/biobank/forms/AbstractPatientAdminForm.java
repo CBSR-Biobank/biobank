@@ -64,7 +64,9 @@ public abstract class AbstractPatientAdminForm extends BiobankEntryForm {
                 .getUserName());
             List<LogInfo> logsList = appender.getLogsList();
 
+            System.out.println("before print");
             ReportingUtils.printReport("ActivityReportForm", map, logsList);
+            System.out.println("after print");
         } catch (Exception e) {
             BioBankPlugin.openAsyncError("Print error", e);
         }

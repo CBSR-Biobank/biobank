@@ -39,44 +39,49 @@ public class ReportingUtils {
         PrintDialog dialog = new PrintDialog(PlatformUI.getWorkbench()
             .getActiveWorkbenchWindow().getShell(), SWT.NONE);
         PrinterData data = dialog.open();
-        if (data.printToFile == true) {
-            String fileName = data.fileName;
-            if (fileName.endsWith(".pdf")) {
-                String prefix = "file://";
-                if (fileName.startsWith(prefix)) {
-                    fileName = fileName.substring(prefix.length());
+        if (data != null) {
+            if (data.printToFile == true) {
+                String fileName = data.fileName;
+                if (fileName.endsWith(".pdf")) {
+                    String prefix = "file://";
+                    if (fileName.startsWith(prefix)) {
+                        fileName = fileName.substring(prefix.length());
+                    }
+                    JasperExportManager.exportReportToPdfFile(jasperPrint,
+                        fileName);
+                } else {
+                    throw new Exception("Can't save to file type "
+                        + data.fileName);
                 }
-                JasperExportManager
-                    .exportReportToPdfFile(jasperPrint, fileName);
             } else {
-                throw new Exception("Can't save to file type " + data.fileName);
-            }
-        } else {
-            PrintService[] services = PrintServiceLookup.lookupPrintServices(
-                DocFlavor.SERVICE_FORMATTED.PRINTABLE, null);
-            PrintService service = null;
-            for (PrintService ps : services) {
-                if (ps.getName().equals(data.name)) {
-                    service = ps;
+                PrintService[] services = PrintServiceLookup
+                    .lookupPrintServices(DocFlavor.SERVICE_FORMATTED.PRINTABLE,
+                        null);
+                PrintService service = null;
+                for (PrintService ps : services) {
+                    if (ps.getName().equals(data.name)) {
+                        service = ps;
+                    }
                 }
-            }
-            if (service == null) {
-                throw new Exception("Error with printer");
-            }
-            JRExporter exporter = new JRPrintServiceExporter();
-            exporter
-                .setParameter(JRExporterParameter.JASPER_PRINT, jasperPrint);
-            exporter.setParameter(
-                JRPrintServiceExporterParameter.PRINT_SERVICE_ATTRIBUTE_SET,
-                service.getAttributes());
-            exporter.setParameter(
-                JRPrintServiceExporterParameter.DISPLAY_PAGE_DIALOG,
-                Boolean.FALSE);
-            exporter.setParameter(
-                JRPrintServiceExporterParameter.DISPLAY_PRINT_DIALOG,
-                Boolean.FALSE);
+                if (service == null) {
+                    throw new Exception("Error with printer");
+                }
+                JRExporter exporter = new JRPrintServiceExporter();
+                exporter.setParameter(JRExporterParameter.JASPER_PRINT,
+                    jasperPrint);
+                exporter
+                    .setParameter(
+                        JRPrintServiceExporterParameter.PRINT_SERVICE_ATTRIBUTE_SET,
+                        service.getAttributes());
+                exporter.setParameter(
+                    JRPrintServiceExporterParameter.DISPLAY_PAGE_DIALOG,
+                    Boolean.FALSE);
+                exporter.setParameter(
+                    JRPrintServiceExporterParameter.DISPLAY_PRINT_DIALOG,
+                    Boolean.FALSE);
 
-            exporter.exportReport();
+                exporter.exportReport();
+            }
         }
     }
 
