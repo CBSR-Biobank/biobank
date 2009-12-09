@@ -1,5 +1,4 @@
-
-package edu.ualberta.med.biobank.importer;
+package edu.ualberta.med.biobank.common.cbsr;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -11,31 +10,31 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 
-public class SiteContainerTypes {
+public class CbsrContainerTypes {
 
     private static Map<String, SampleTypeWrapper> sampleTypeMap;
 
     private static Map<String, ContainerTypeWrapper> containerTypeMap = new HashMap<String, ContainerTypeWrapper>();
 
-    private static String [] biopsyPallet96SampleTypes = new String [] {
+    private static String[] biopsyPallet96SampleTypes = new String[] {
         "Descending Colon", "Stomach, Body", "Stomach, Antrum", "Duodenum",
         "Jejunum", "Ileum", "Ascending Colon", "Transverse Colon", };
 
-    private static String [] box81SampleTypes = new String [] {
-        "Plasma", "Paxgene", "DNA (Blood)", "Cells", "Urine", "Hemodialysate",
+    private static String[] box81SampleTypes = new String[] { "Plasma",
+        "Paxgene", "DNA (Blood)", "Cells", "Urine", "Hemodialysate",
         "Peritoneal Dialysate", "Serum", "Finger Nails", "Buffy coat",
         "Toe Nails", "Whole Blood EDTA", "RNAlater Biopsies", "Heparin Blood",
         "Filtered Urine", "Serum (Beige top)", "Centrifuged Urine",
         "Sodium Azide Urine", "Source Water", "Meconium - BABY", "WB DMSO" };
 
-    private static String [] cellPallet96SampleTypes = new String [] { "Cells" };
+    private static String[] cellPallet96SampleTypes = new String[] { "Cells" };
 
-    private static String [] ftaBinSampleTypes = new String [] { "DNA (Blood)" };
+    private static String[] ftaBinSampleTypes = new String[] { "DNA (Blood)" };
 
-    private static String [] hairBinSampleTypes = new String [] { "Hair" };
+    private static String[] hairBinSampleTypes = new String[] { "Hair" };
 
-    private static String [] pallet96SampleTypes = new String [] {
-        "Plasma", "Paxgene", "DNA (Blood)", "Cells", "Urine", "Hemodialysate",
+    private static String[] pallet96SampleTypes = new String[] { "Plasma",
+        "Paxgene", "DNA (Blood)", "Cells", "Urine", "Hemodialysate",
         "Peritoneal Dialysate", "Serum", "Finger Nails", "Buffy coat",
         "Toe Nails", "Whole Blood EDTA", "RNAlater Biopsies", "Heparin Blood",
         "Filtered Urine", "Serum (Beige top)", "Centrifuged Urine",
@@ -44,11 +43,12 @@ public class SiteContainerTypes {
         "WB Plasma - BABY", "Cord Blood Mononuclear Cells", "RNA CBMC",
         "Meconium - BABY", "WB DMSO" };
 
-    private static void getSampleTypeMap() throws Exception {
-        if (sampleTypeMap != null) return;
+    private static void getSampleTypeMap(SiteWrapper site) throws Exception {
+        if (sampleTypeMap != null)
+            return;
 
-        List<SampleTypeWrapper> allSampleTypes = SampleTypeWrapper.getGlobalSampleTypes(
-            Importer.getAppService(), true);
+        List<SampleTypeWrapper> allSampleTypes = SampleTypeWrapper
+            .getGlobalSampleTypes(site.getAppService(), true);
         if ((allSampleTypes == null) || (allSampleTypes.size() == 0)) {
             throw new Exception("no global sample types found in the database");
         }
@@ -69,7 +69,7 @@ public class SiteContainerTypes {
     }
 
     public static void createContainerTypes(SiteWrapper site) throws Exception {
-        getSampleTypeMap();
+        getSampleTypeMap(site);
         createFreezerTypes(site);
         createCabinetTypes(site);
     }
@@ -90,32 +90,32 @@ public class SiteContainerTypes {
             "P96", false, 1, 8, 12, null, pallet96SampleTypes);
 
         ContainerTypeWrapper hotel13 = addContainerType(site, "Hotel 13",
-            "H13", false, 3, 13, 1,
-            Arrays.asList(new ContainerTypeWrapper [] { pallet96 }));
+            "H13", false, 3, 13, 1, Arrays
+                .asList(new ContainerTypeWrapper[] { pallet96 }));
 
         ContainerTypeWrapper hotel17 = addContainerType(site, "Hotel 17",
-            "H17", false, 3, 17, 1,
-            Arrays.asList(new ContainerTypeWrapper [] { box81 }));
+            "H17", false, 3, 17, 1, Arrays
+                .asList(new ContainerTypeWrapper[] { box81 }));
 
         ContainerTypeWrapper hotel18 = addContainerType(site, "Hotel 18",
-            "H18", false, 3, 18, 1,
-            Arrays.asList(new ContainerTypeWrapper [] { box81 }));
+            "H18", false, 3, 18, 1, Arrays
+                .asList(new ContainerTypeWrapper[] { box81 }));
 
         ContainerTypeWrapper hotel19 = addContainerType(site, "Hotel 19",
-            "H19", false, 3, 19, 1, Arrays.asList(new ContainerTypeWrapper [] {
+            "H19", false, 3, 19, 1, Arrays.asList(new ContainerTypeWrapper[] {
                 biopsyPallet96, cellPallet96, pallet96 }));
 
-        addContainerType(site, "Freezer 3x10", "F3x10", true, 2, 3, 10,
-            Arrays.asList(new ContainerTypeWrapper [] { hotel17 }));
+        addContainerType(site, "Freezer 3x10", "F3x10", true, 2, 3, 10, Arrays
+            .asList(new ContainerTypeWrapper[] { hotel17 }));
 
-        addContainerType(site, "Freezer 4x12", "F4x12", true, 2, 4, 12,
-            Arrays.asList(new ContainerTypeWrapper [] { hotel18 }));
+        addContainerType(site, "Freezer 4x12", "F4x12", true, 2, 4, 12, Arrays
+            .asList(new ContainerTypeWrapper[] { hotel18 }));
 
-        addContainerType(site, "Freezer 5x9", "F5x9", true, 2, 5, 9,
-            Arrays.asList(new ContainerTypeWrapper [] { hotel13, hotel19 }));
+        addContainerType(site, "Freezer 5x9", "F5x9", true, 2, 5, 9, Arrays
+            .asList(new ContainerTypeWrapper[] { hotel13, hotel19 }));
 
-        addContainerType(site, "Freezer 6x12", "F6x12", true, 2, 6, 12,
-            Arrays.asList(new ContainerTypeWrapper [] { hotel13, hotel19 }));
+        addContainerType(site, "Freezer 6x12", "F6x12", true, 2, 6, 12, Arrays
+            .asList(new ContainerTypeWrapper[] { hotel13, hotel19 }));
     }
 
     private static void createCabinetTypes(SiteWrapper site) throws Exception {
@@ -126,10 +126,10 @@ public class SiteContainerTypes {
             "HBin", false, 2, 120, 1, null, hairBinSampleTypes);
 
         ContainerTypeWrapper drawer36 = addContainerType(site, "Drawer 36",
-            "D36", false, 3, 36, 1, Arrays.asList(new ContainerTypeWrapper [] {
+            "D36", false, 3, 36, 1, Arrays.asList(new ContainerTypeWrapper[] {
                 ftaBin, hairBin }));
         addContainerType(site, "Cabinet 4 drawer", "Cabinet 4", true, 2, 4, 1,
-            Arrays.asList(new ContainerTypeWrapper [] { drawer36 }));
+            Arrays.asList(new ContainerTypeWrapper[] { drawer36 }));
     }
 
     private static ContainerTypeWrapper addContainerType(SiteWrapper site,

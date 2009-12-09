@@ -1,5 +1,5 @@
 
-package edu.ualberta.med.biobank.importer;
+package edu.ualberta.med.biobank.common.cbsr;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -8,7 +8,7 @@ import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 
-public class SiteClinics {
+public class CbsrClinics {
 
     private static Map<String, ClinicWrapper> clinicsMap = null;
 

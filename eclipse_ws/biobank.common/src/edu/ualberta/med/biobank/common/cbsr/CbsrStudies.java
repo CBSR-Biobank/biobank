@@ -1,5 +1,5 @@
 
-package edu.ualberta.med.biobank.importer;
+package edu.ualberta.med.biobank.common.cbsr;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -8,7 +8,7 @@ import java.util.Map;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 
-public class SiteStudies {
+public class CbsrStudies {
 
     private static Map<String, StudyWrapper> studiesMap = null;
 
@@ -28,7 +28,7 @@ public class SiteStudies {
             "Surveillance", "Genetic Predisposition", "Previous Samples",
             "Genetic Mutation" });
         study.setStudyPvAttr("Worksheet", "text");
-        study.setContactCollection(Arrays.asList(SiteClinics.getContact("Morna Brown")));
+        study.setContactCollection(Arrays.asList(CbsrClinics.getContact("Morna Brown")));
         study.persist();
 
         study = addStudy(

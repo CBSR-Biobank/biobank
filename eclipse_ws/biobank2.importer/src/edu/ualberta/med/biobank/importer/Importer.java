@@ -1,7 +1,7 @@
 
 package edu.ualberta.med.biobank.importer;
 
-import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.common.cbsr.CbsrSite;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerType;
@@ -36,8 +36,6 @@ public class Importer {
 
     private static ArrayList<String> tables;
 
-    private static SiteWrapper cbsrSite;
-
     public static void main(String [] args) throws Exception {
         tables = new ArrayList<String>();
 
@@ -59,7 +57,7 @@ public class Importer {
             deleteAll(Study.class);
             deleteAll(Site.class);
 
-            createConfiguration();
+            CbsrSite.createConfiguration(appService);
 
             con = getMysqlConnection();
 
@@ -135,23 +133,6 @@ public class Importer {
             if (tables.get(i).equals(name)) return true;
         }
         return false;
-    }
-
-    private static void createConfiguration() throws Exception {
-        cbsrSite = new SiteWrapper(appService);
-        cbsrSite.setName("Canadian BioSample Repository");
-        cbsrSite.setStreet1("471 Medical Sciences Building");
-        cbsrSite.setStreet2("University of Alberta");
-        cbsrSite.setCity("Edmonton");
-        cbsrSite.setProvince("Alberta");
-        cbsrSite.setPostalCode("T6G2H7");
-        cbsrSite.persist();
-        cbsrSite.reload();
-
-        SiteClinics.createClinics(cbsrSite);
-        SiteStudies.createStudies(cbsrSite);
-        SiteContainerTypes.createContainerTypes(cbsrSite);
-        SiteContainers.createContainers(cbsrSite);
     }
 
     // private void importStudies() throws Exception {
