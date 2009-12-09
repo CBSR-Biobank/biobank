@@ -1,5 +1,8 @@
 package edu.ualberta.med.biobank.logs;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.PatternLayout;
 import org.apache.log4j.spi.LoggingEvent;
@@ -12,7 +15,7 @@ public class ActivityLogAppender extends AppenderSkeleton {
 
     private MessageConsole messageConsole;
     private MessageConsoleStream msg;
-    private StringBuffer logBuffer;
+    private List<LogInfo> logsList;
 
     public ActivityLogAppender(String name) {
         setName(name);
@@ -21,14 +24,14 @@ public class ActivityLogAppender extends AppenderSkeleton {
             new IConsole[] { messageConsole });
         msg = messageConsole.newMessageStream();
         setLayout(new PatternLayout("%d{ABSOLUTE} %m%n"));
-        logBuffer = new StringBuffer();
+        logsList = new ArrayList<LogInfo>();
     }
 
     @Override
     protected void append(LoggingEvent event) {
         String text = this.layout.format(event);
         msg.print(text);
-        logBuffer.append(text);
+        logsList.add(new LogInfo(text));
     }
 
     @Override
@@ -42,8 +45,8 @@ public class ActivityLogAppender extends AppenderSkeleton {
         return true;
     }
 
-    public StringBuffer getLogBuffer() {
-        return logBuffer;
+    public List<LogInfo> getLogsList() {
+        return logsList;
     }
 
 }

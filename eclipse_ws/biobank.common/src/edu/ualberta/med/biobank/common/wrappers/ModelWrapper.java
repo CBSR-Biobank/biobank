@@ -183,11 +183,12 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
      * @throws ApplicationException
      */
     public void delete() throws Exception {
-        if (!isNew()) {
-            reload();
-            deleteChecks();
-            appService.executeQuery(new DeleteExampleQuery(wrappedObject));
+        if (isNew()) {
+            throw new Exception("Can't delete an object not yet persisted");
         }
+        reload();
+        deleteChecks();
+        appService.executeQuery(new DeleteExampleQuery(wrappedObject));
     }
 
     protected abstract void deleteChecks() throws BiobankCheckException,

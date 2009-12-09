@@ -1243,4 +1243,88 @@ public class TestContainer extends TestDatabase {
             container.delete();
         }
     }
+
+    @Test
+    public void testSetPositionAndParentFromLabel() throws Exception {
+        addContainerHierarchy(containerMap.get("Top"));
+        ContainerWrapper childL2 = containerMap.get("ChildL2");
+        ContainerTypeWrapper type = childL2.getContainerType()
+            .getChildContainerTypeCollection().get(0);
+        ContainerWrapper newContainer = ContainerHelper.newContainer(null,
+            "testaddNew", null, site, type);
+        // expect position 1:5
+        String label = "01AA01B6";
+        newContainer.setPositionAndParentFromLabel(label);
+
+        Assert.assertEquals(childL2, newContainer.getParent());
+        Assert.assertEquals(new RowColPos(1, 5), newContainer.getPosition());
+        newContainer.persist();
+        Assert.assertEquals(label, newContainer.getLabel());
+    }
+
+    @Test
+    public void testSetPositionAndParentFromLabelFailHoldType()
+        throws Exception {
+        addContainerHierarchy(containerMap.get("Top"));
+        ContainerTypeWrapper type2 = containerTypeMap.get("ChildCtL1");
+        ContainerWrapper newContainer = ContainerHelper.newContainer(null,
+            "testaddNew_2", null, site, type2);
+        try {
+            newContainer.setPositionAndParentFromLabel("01AA01B6");
+            Assert.fail("No container with label 01AA01 can hold this type");
+        } catch (BiobankCheckException bce) {
+            Assert.assertTrue(true);
+        }
+    }
+
+    @Test
+    public void testSetPositionAndParentFromLabelFail() throws Exception {
+        addContainerHierarchy(containerMap.get("Top"));
+        ContainerTypeWrapper existingType = containerTypeMap.get("ChildCtL2");
+        ContainerTypeWrapper newChildType1 = ContainerTypeHelper
+            .addContainerType(site, "newChild1", "NC1", 3, 15, 1, false);
+        newChildType1.setChildContainerTypeCollection(Arrays
+            .asList(existingType));
+        newChildType1.persist();
+        ContainerTypeWrapper newTopType = ContainerTypeHelper.addContainerType(
+            site, "NewTop", "NT", 2, 3, 5, true);
+        newTopType
+            .setChildContainerTypeCollection(Arrays.asList(newChildType1));
+        newTopType.persist();
+
+        ContainerWrapper newTopContainer = ContainerHelper.addContainer("01",
+            "new-01", null, site, newTopType);
+        ContainerWrapper child1 = ContainerHelper.newContainer(null,
+            "new-01AA", newTopContainer, site, newChildType1);
+        newTopContainer.addChild(0, 0, child1);
+        newTopContainer.persist();
+
+        ContainerWrapper newContainer = ContainerHelper.newContainer(null,
+            "testsetPosition", null, site, existingType);
+        try {
+            newContainer.setPositionAndParentFromLabel("01AA01");
+            Assert.fail("Two container with label 01AA can hold this type");
+        } catch (BiobankCheckException bce) {
+            Assert.assertTrue(true);
+        }
+    }
+
+    @Test
+    public void testCheckParentFromSameSite() throws BiobankCheckException,
+        Exception {
+        String name = "testCheckParentFromSameSite" + r.nextInt();
+        ContainerWrapper top = addContainerHierarchy(containerMap.get("Top"));
+
+        SiteWrapper newSite = SiteHelper.addSite(name);
+        ContainerTypeWrapper type = ContainerTypeHelper.addContainerType(
+            newSite, name, "N", 1, 3, 5, false);
+        ContainerWrapper newContainer = ContainerHelper.newContainer(null,
+            name, top, newSite, type);
+        try {
+            newContainer.persist();
+            Assert.fail("container not from same site that parent");
+        } catch (BiobankCheckException bce) {
+            Assert.assertTrue(true);
+        }
+    }
 }

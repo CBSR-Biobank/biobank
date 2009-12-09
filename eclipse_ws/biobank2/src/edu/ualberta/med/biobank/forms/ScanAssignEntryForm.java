@@ -742,7 +742,8 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
             .getContainer(currentPalletWrapper.getLabel(), currentPalletWrapper
                 .getContainerType());
         if (containerAtPosition == null) {
-            currentPalletWrapper.computePositionFromLabel();
+            currentPalletWrapper
+                .setPositionAndParentFromLabel(currentPalletWrapper.getLabel());
             return true;
         } else {
             String barcode = containerAtPosition.getProductBarcode();

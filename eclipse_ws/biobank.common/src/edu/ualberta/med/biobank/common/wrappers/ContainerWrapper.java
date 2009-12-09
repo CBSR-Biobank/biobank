@@ -232,23 +232,19 @@ public class ContainerWrapper extends
      * compute the ContainerPosition for this container using its label. If the
      * parent container cannot hold the container type of this container, then
      * an exception is launched
-     * 
-     * FIX: is this required once code is added to compute child labels?
      */
-    public void computePositionFromLabel() throws Exception {
-        String parentContainerLabel = getLabel().substring(0,
-            getLabel().length() - 2);
+    public void setPositionAndParentFromLabel(String label) throws Exception {
+        String parentContainerLabel = label.substring(0, label.length() - 2);
         List<ContainerWrapper> possibleParents = ContainerWrapper
             .getContainersHoldingContainerType(appService,
                 parentContainerLabel, getSite(), getContainerType());
-
         if (possibleParents.size() == 0) {
-            throw new Exception("Can't find container with label "
+            throw new BiobankCheckException("Can't find container with label "
                 + parentContainerLabel + " holding containers of type "
                 + getContainerType().getName());
         }
         if (possibleParents.size() > 1) {
-            throw new Exception(
+            throw new BiobankCheckException(
                 possibleParents.size()
                     + " containers with label "
                     + parentContainerLabel
@@ -259,9 +255,8 @@ public class ContainerWrapper extends
         // has the parent container. Can now find the position using the
         // parent labelling scheme
         setParent(possibleParents.get(0));
-        possibleParents.get(0).addChild(
-            getLabel().substring(getLabel().length() - 2), this);
-
+        possibleParents.get(0).addChild(label.substring(label.length() - 2),
+            this);
     }
 
     /**

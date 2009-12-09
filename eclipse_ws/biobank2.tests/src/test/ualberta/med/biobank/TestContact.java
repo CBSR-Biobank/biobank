@@ -2,6 +2,7 @@ package test.ualberta.med.biobank;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import junit.framework.Assert;
 
@@ -35,6 +36,32 @@ public class TestContact extends TestDatabase {
         contact.reload();
 
         Assert.assertEquals(1, contact.getStudyCollection().size());
+    }
+
+    @Test
+    public void testGetStudyCollectionBoolean() throws BiobankCheckException,
+        Exception {
+        String name = "testGetStudyCollectionBoolean" + r.nextInt();
+        SiteWrapper site = SiteHelper.addSite(name);
+        ClinicWrapper clinic = ClinicHelper.addClinic(site, name);
+        StudyWrapper study = StudyHelper.addStudy(site, "QWERTY" + name);
+        StudyWrapper study2 = StudyHelper.addStudy(site, "ASDFG" + name);
+        ContactWrapper contact = ContactHelper.addContact(clinic, name);
+
+        study.setContactCollection(Arrays.asList(contact));
+        study.persist();
+        study2.setContactCollection(Arrays.asList(contact));
+        study2.persist();
+        contact.reload();
+
+        List<StudyWrapper> studiesSorted = contact.getStudyCollection(true);
+        if (studiesSorted.size() > 1) {
+            for (int i = 0; i < studiesSorted.size() - 1; i++) {
+                StudyWrapper s1 = studiesSorted.get(i);
+                StudyWrapper s2 = studiesSorted.get(i + 1);
+                Assert.assertTrue(s1.compareTo(s2) <= 0);
+            }
+        }
     }
 
     @Test

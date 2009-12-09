@@ -6,7 +6,11 @@ Bundle-ClassPath: .,
  lib/ini4j-0.5.1.jar,
  lib/org.eclipse.nebula.cwt_0.9.0.HEAD.jar,
  lib/org.eclipse.nebula.widgets.cdatetime_0.14.0.HEAD.jar,
- lib/jasperreports-3.7.0.jar
+ lib/jasperreports-3.7.0.jar,
+ lib/commons-beanutils-1.8.0.jar,
+ lib/commons-digester-1.7.jar,
+ lib/commons-lang-2.4.jar,
+ lib/iText-2.1.0.jar
 Bundle-Activator: edu.ualberta.med.biobank.BioBankPlugin
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ManifestVersion: 2
