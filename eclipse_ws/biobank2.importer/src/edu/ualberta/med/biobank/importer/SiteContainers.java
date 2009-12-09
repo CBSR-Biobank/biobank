@@ -8,7 +8,7 @@ import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 
 public class SiteContainers {
 
-    public static void insertContainers(SiteWrapper site) throws Exception {
+    public static void createContainers(SiteWrapper site) throws Exception {
         System.out.println("adding containers ...");
 
         createFreezer01(site);

@@ -68,7 +68,7 @@ public class SiteContainerTypes {
         return type;
     }
 
-    public static void insertContainerTypes(SiteWrapper site) throws Exception {
+    public static void createContainerTypes(SiteWrapper site) throws Exception {
         getSampleTypeMap();
         System.out.println("adding container types ...");
 
