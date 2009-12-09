@@ -17,7 +17,6 @@ import org.osgi.service.prefs.BackingStoreException;
 import org.osgi.service.prefs.Preferences;
 
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
-import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.rcp.Application;
 import edu.ualberta.med.biobank.rcp.SiteCombo;
 import edu.ualberta.med.biobank.sourceproviders.SiteSelectionState;
@@ -50,7 +49,7 @@ public class SiteManager {
         this.appService = appService;
         this.sessionName = sessionName;
         currentSiteWrappers = new ArrayList<SiteWrapper>();
-        allSiteWrapper = new SiteWrapper(appService, new Site());
+        allSiteWrapper = new SiteWrapper(appService);
         allSiteWrapper.setName("All Sites");
     }
 

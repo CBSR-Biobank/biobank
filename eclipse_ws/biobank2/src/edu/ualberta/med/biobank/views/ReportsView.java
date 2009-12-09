@@ -43,9 +43,11 @@ import org.eclipse.ui.part.ViewPart;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.reports.QueryObject;
+import edu.ualberta.med.biobank.reports.QueryObject.Option;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.widgets.ReportsLabelProvider;
 import edu.ualberta.med.biobank.widgets.infotables.InfoTableWidget;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ReportsView extends ViewPart {
 
@@ -93,7 +95,8 @@ public class ReportsView extends ViewPart {
         header = new Composite(top, SWT.NONE);
         header.setLayout(new GridLayout(3, false));
 
-        queryObjects = QueryObject.getAllQueries();
+        queryObjects = QueryObject.getAllQueries(SessionManager.getInstance()
+            .getCurrentSiteWrapper().getId());
         querySelect = createCombo(header, queryObjects);
         querySelect
             .addSelectionChangedListener(new ISelectionChangedListener() {
@@ -108,32 +111,37 @@ public class ReportsView extends ViewPart {
         searchButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                searchData = search();
-                if (searchData.size() > 0) {
-                    IStructuredSelection typeSelection = (IStructuredSelection) querySelect
-                        .getSelection();
-                    QueryObject query = (QueryObject) typeSelection
-                        .getFirstElement();
-                    String[] names = query.getColumnNames();
-                    int[] bounds = new int[names.length];
+                try {
+                    searchData = search();
 
-                    for (int i = 0; i < names.length; i++) {
-                        bounds[i] = 100 + names[i].length() * 2;
+                    if (searchData.size() > 0) {
+                        IStructuredSelection typeSelection = (IStructuredSelection) querySelect
+                            .getSelection();
+                        QueryObject query = (QueryObject) typeSelection
+                            .getFirstElement();
+                        String[] names = query.getColumnNames();
+                        int[] bounds = new int[names.length];
+
+                        for (int i = 0; i < names.length; i++) {
+                            bounds[i] = 100 + names[i].length() * 2;
+                        }
+                        searchTable.dispose();
+                        searchTable = new InfoTableWidget<Object>(top,
+                            searchData, names, bounds);
+                        searchTable.getTableViewer().setLabelProvider(
+                            new ReportsLabelProvider());
+                        GridData searchLayoutData = new GridData(SWT.FILL,
+                            SWT.FILL, true, true);
+                        searchLayoutData.minimumHeight = 500;
+                        searchTable.setLayoutData(searchLayoutData);
+                        searchTable.moveBelow(subSection);
                     }
-                    searchTable.dispose();
-                    searchTable = new InfoTableWidget<Object>(top, searchData,
-                        names, bounds);
-                    searchTable.getTableViewer().setLabelProvider(
-                        new ReportsLabelProvider());
-                    GridData searchLayoutData = new GridData(SWT.FILL,
-                        SWT.FILL, true, true);
-                    searchLayoutData.minimumHeight = 500;
-                    searchTable.setLayoutData(searchLayoutData);
-                    searchTable.moveBelow(subSection);
+                    searchTable.setCollection(searchData);
+                    searchTable.redraw();
+                    top.layout();
+                } catch (ApplicationException ae) {
+                    BioBankPlugin.openAsyncError("Search error", ae);
                 }
-                searchTable.setCollection(searchData);
-                searchTable.redraw();
-                top.layout();
 
             }
         });
@@ -164,7 +172,7 @@ public class ReportsView extends ViewPart {
 
     }
 
-    private Collection<Object> search() {
+    private Collection<Object> search() throws ApplicationException {
         IStructuredSelection typeSelection = (IStructuredSelection) querySelect
             .getSelection();
         QueryObject query = (QueryObject) typeSelection.getFirstElement();
@@ -177,7 +185,7 @@ public class ReportsView extends ViewPart {
             else if (widgetFields.get(i) instanceof DateTimeWidget)
                 params.add(((DateTimeWidget) widgetFields.get(i)).getDate());
         }
-        return query.executeQuery(params);
+        return query.executeQuery(SessionManager.getAppService(), params);
     }
 
     public void comboChanged() {
@@ -185,8 +193,7 @@ public class ReportsView extends ViewPart {
             .getSelection();
         QueryObject query = (QueryObject) typeSelection.getFirstElement();
 
-        List<Class<?>> fields = query.getFieldTypes();
-        List<String> fieldNames = query.getFieldNames();
+        List<Option> queryOptions = query.getOptions();
         textLabels = new ArrayList<Label>();
         widgetFields = new ArrayList<Widget>();
 
@@ -204,17 +211,26 @@ public class ReportsView extends ViewPart {
         gd2.horizontalSpan = 2;
         description.setLayoutData(gd2);
 
-        for (int i = 0; i < fields.size(); i++) {
+        for (int i = 0; i < queryOptions.size(); i++) {
+            Option option = queryOptions.get(i);
             Label fieldLabel = new Label(subSection, SWT.NONE);
-            fieldLabel.setText(fieldNames.get(i) + ":");
+            fieldLabel.setText(option.getName() + ":");
             textLabels.add(fieldLabel);
             Widget widget;
 
-            if (fields.get(i) == Combo.class)
+            // if (fields.get(i) == Combo.class)
+            // widget = new Combo(subSection, SWT.NONE);
+            // else if (fields.get(i) == DateTimeWidget.class)
+            // widget = new DateTimeWidget(subSection, SWT.NONE, null);
+            // else if (fields.get(i) == Text.class)
+            // widget = new Text(subSection, SWT.BORDER);
+            // else
+            // widget = null;
+            if (option.getType() == List.class)
                 widget = new Combo(subSection, SWT.NONE);
-            else if (fields.get(i) == DateTimeWidget.class)
+            else if (option.getType() == Date.class)
                 widget = new DateTimeWidget(subSection, SWT.NONE, null);
-            else if (fields.get(i) == Text.class)
+            else if (option.getType() == String.class)
                 widget = new Text(subSection, SWT.BORDER);
             else
                 widget = null;

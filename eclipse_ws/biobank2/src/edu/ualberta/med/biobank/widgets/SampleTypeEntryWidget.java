@@ -28,7 +28,6 @@ import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.dialogs.SampleTypeDialog;
-import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.widgets.infotables.BiobankCollectionModel;
 import edu.ualberta.med.biobank.widgets.infotables.SampleTypeInfoTable;
 import edu.ualberta.med.biobank.widgets.listeners.BiobankEntryFormWidgetListener;
@@ -98,7 +97,7 @@ public class SampleTypeEntryWidget extends BiobankWidget {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 addOrEditSampleType(true, new SampleTypeWrapper(SessionManager
-                    .getAppService(), new SampleType()), getRestrictedTypes());
+                    .getAppService()), getRestrictedTypes());
             }
         });
     }

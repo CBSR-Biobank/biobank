@@ -817,7 +817,7 @@ public class TestSite extends TestDatabase {
         List<Site> sitesDB = appService.search(Site.class, new Site());
         int nberAddedInDB = sitesDB.size() - sitesDBBefore.size();
         Assert.assertEquals(nberSite, nberAddedInDB);
-        Assert.assertEquals(nberSite, siteWrappers.size());
+        Assert.assertEquals(siteWrappers.size(), siteWrappers.size());
 
         Site site = DbHelper.chooseRandomlyInList(sitesDB);
         siteWrappers = SiteWrapper.getSites(appService, site.getId());

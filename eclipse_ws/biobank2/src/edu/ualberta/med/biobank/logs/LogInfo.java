@@ -13,7 +13,6 @@ import net.sf.jasperreports.engine.JRExporterParameter;
 import net.sf.jasperreports.engine.JasperExportManager;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
-import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import net.sf.jasperreports.engine.export.JRPrintServiceExporter;
 import net.sf.jasperreports.engine.export.JRPrintServiceExporterParameter;
@@ -24,8 +23,6 @@ import org.eclipse.swt.printing.PrinterData;
 import org.eclipse.ui.PlatformUI;
 
 public class LogInfo {
-
-    private static JasperReport logPrintReport;
 
     private String info;
 

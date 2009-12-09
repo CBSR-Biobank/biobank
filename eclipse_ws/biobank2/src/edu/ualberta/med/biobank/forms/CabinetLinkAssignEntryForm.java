@@ -425,7 +425,6 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
     protected void retrieveSampleInformations() throws Exception {
         resultShownValue.setValue(false);
         String inventoryId = inventoryIdText.getText();
-        sampleWrapper.getWrappedObject().setId(null);
         reset();
         sampleWrapper.setInventoryId(inventoryId);
         inventoryIdText.setText(inventoryId);
@@ -521,8 +520,7 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
 
     @Override
     public void reset() throws Exception {
-        sampleWrapper.getWrappedObject().setId(null);
-        sampleWrapper.reset();
+        sampleWrapper.resetToNewObject();
         cabinet = null;
         drawer = null;
         bin = null;

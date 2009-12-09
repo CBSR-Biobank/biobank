@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.forms;
 
-import java.text.SimpleDateFormat;
 import java.util.List;
 
 import org.apache.log4j.Level;
@@ -21,8 +20,6 @@ public abstract class AbstractPatientAdminForm extends BiobankEntryForm {
     private boolean isSaved = false;
     private static Logger logger;
     private static ActivityLogAppender appender;
-    private SimpleDateFormat dateFormat = new SimpleDateFormat(
-        "EEEE, MMMM dd, yyyy");
 
     @Override
     protected void init() {

@@ -11,7 +11,6 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
-import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 
 public class SampleTypeDialog extends BiobankDialog {
@@ -24,13 +23,13 @@ public class SampleTypeDialog extends BiobankDialog {
     private SampleTypeWrapper origSampleType;
 
     // this is the object that is modified via the bound widgets
-    private SampleType sampleType;
+    private SampleTypeWrapper sampleType;
 
     public SampleTypeDialog(Shell parent, SampleTypeWrapper sampleType) {
         super(parent);
         Assert.isNotNull(sampleType);
         origSampleType = sampleType;
-        this.sampleType = new SampleType();
+        this.sampleType = new SampleTypeWrapper(sampleType.getAppService());
         this.sampleType.setName(sampleType.getName());
         this.sampleType.setNameShort(sampleType.getNameShort());
     }

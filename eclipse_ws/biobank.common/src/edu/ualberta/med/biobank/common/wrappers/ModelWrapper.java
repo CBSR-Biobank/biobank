@@ -196,13 +196,23 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
 
     public void reset() throws Exception {
         if (isNew()) {
-            E oldValue = wrappedObject;
-            wrappedObject = getNewObject();
-            firePropertyChanges(oldValue, wrappedObject);
+            resetToNewObject();
         } else {
             reload();
         }
         propertiesMap.clear();
+    }
+
+    /**
+     * even if this object was loaded form database, start form scratch (so
+     * isNew = true)
+     * 
+     * @throws Exception
+     */
+    public void resetToNewObject() throws Exception {
+        E oldValue = wrappedObject;
+        wrappedObject = getNewObject();
+        firePropertyChanges(oldValue, wrappedObject);
     }
 
     protected E getNewObject() throws Exception {

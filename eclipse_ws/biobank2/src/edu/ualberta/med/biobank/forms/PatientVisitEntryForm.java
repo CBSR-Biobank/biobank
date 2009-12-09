@@ -29,7 +29,6 @@ import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.PvAttrCustom;
-import edu.ualberta.med.biobank.model.Shipment;
 import edu.ualberta.med.biobank.treeview.PatientAdapter;
 import edu.ualberta.med.biobank.treeview.PatientVisitAdapter;
 import edu.ualberta.med.biobank.validators.DoubleNumberValidator;
@@ -255,7 +254,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
             patientVisit.setShipment((ShipmentWrapper) shipSelection
                 .getFirstElement());
         } else {
-            patientVisit.setShipment((Shipment) null);
+            patientVisit.setShipment((ShipmentWrapper) null);
         }
 
         patientVisit.setPvSampleSourceCollection(pvSampleSourceEntryWidget

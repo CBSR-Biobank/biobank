@@ -21,8 +21,6 @@ import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingCompanyWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
-import edu.ualberta.med.biobank.model.Clinic;
-import edu.ualberta.med.biobank.model.ShippingCompany;
 import edu.ualberta.med.biobank.treeview.ShipmentAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
@@ -182,7 +180,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
                 shipmentWrapper.setClinic((ClinicWrapper) clinicSelection
                     .getFirstElement());
             } else {
-                shipmentWrapper.setClinic((Clinic) null);
+                shipmentWrapper.setClinic((ClinicWrapper) null);
             }
         }
         IStructuredSelection companySelection = (IStructuredSelection) companyComboViewer
@@ -192,7 +190,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
                 .setShippingCompany((ShippingCompanyWrapper) companySelection
                     .getFirstElement());
         } else {
-            shipmentWrapper.setShippingCompany((ShippingCompany) null);
+            shipmentWrapper.setShippingCompany((ShippingCompanyWrapper) null);
         }
         shipmentWrapper.persist();
 

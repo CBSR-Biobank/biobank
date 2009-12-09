@@ -53,6 +53,7 @@ Export-Package: antlr;
  edu.ualberta.med.biobank.common.formatters,
  edu.ualberta.med.biobank.common.wrappers,
  edu.ualberta.med.biobank.model,
+ edu.ualberta.med.biobank.reports,
  gov.nih.nci.cagrid.cqlquery;uses:="org.apache.axis.description,org.apache.axis.encoding,javax.xml.namespace",
  gov.nih.nci.cagrid.cqlresultset;
   uses:="org.apache.axis.message,

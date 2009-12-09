@@ -9,7 +9,6 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.forms.SiteEntryForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
-import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.SessionAdapter;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
@@ -20,8 +19,7 @@ public class SiteAddHandler extends AbstractHandler {
         SessionAdapter sessionAdapter = SessionManager.getInstance()
             .getSession();
         Assert.isNotNull(sessionAdapter);
-        SiteWrapper site = new SiteWrapper(SessionManager.getAppService(),
-            new Site());
+        SiteWrapper site = new SiteWrapper(SessionManager.getAppService());
         SiteAdapter siteNode = new SiteAdapter(sessionAdapter, site);
         AdapterBase.openForm(new FormInput(siteNode), SiteEntryForm.ID);
         return null;
