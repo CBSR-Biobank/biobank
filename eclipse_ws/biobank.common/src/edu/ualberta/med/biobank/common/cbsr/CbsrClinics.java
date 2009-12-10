@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.common.cbsr;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -198,7 +199,8 @@ public class CbsrClinics {
         if (clinicsMap == null) {
             throw new Exception("clinics have not been added");
         }
-        return new ArrayList<String>(clinicsMap.keySet());
+        return Collections.unmodifiableList(new ArrayList<String>(clinicsMap
+            .keySet()));
     }
 
     private static ContactWrapper addContact(ClinicWrapper clinic, String name,

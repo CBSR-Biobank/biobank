@@ -3,7 +3,6 @@ package edu.ualberta.med.biobank.helpers;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
@@ -22,12 +21,13 @@ import org.eclipse.ui.progress.IProgressConstants;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.cbsr.CbsrClinics;
+import edu.ualberta.med.biobank.common.cbsr.CbsrContainerTypes;
+import edu.ualberta.med.biobank.common.cbsr.CbsrContainers;
 import edu.ualberta.med.biobank.common.cbsr.CbsrSite;
 import edu.ualberta.med.biobank.common.cbsr.CbsrStudies;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
@@ -40,6 +40,7 @@ import edu.ualberta.med.biobank.model.SampleStorage;
 import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.model.Study;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
+import gov.nih.nci.system.query.example.InsertExampleQuery;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 /**
@@ -55,8 +56,6 @@ public class CbsrConfigurationJob {
 
     private SiteWrapper cbsrSite;
 
-    private List<PatientWrapper> patients;
-
     private List<SampleTypeWrapper> sampleTypesList;
 
     private List<ShippingCompanyWrapper> shippingCompaniesList;
@@ -64,6 +63,7 @@ public class CbsrConfigurationJob {
     private Random r = new Random();
 
     public CbsrConfigurationJob() {
+        appService = SessionManager.getInstance().getSession().getAppService();
 
         try {
             sampleTypesList = SampleTypeWrapper.getGlobalSampleTypes(
@@ -76,13 +76,10 @@ public class CbsrConfigurationJob {
             return;
         }
 
-        Job job = new Job("Init Examples") {
+        Job job = new Job("CBSR Configuration") {
             @Override
             protected IStatus run(IProgressMonitor monitor) {
                 try {
-                    appService = SessionManager.getInstance().getSession()
-                        .getAppService();
-
                     // insert methods are listed here and order is important
                     String[] addMethodNames = new String[] { "addSite",
                         "addClinicsInSite", "addStudyInSite",
@@ -92,10 +89,12 @@ public class CbsrConfigurationJob {
                     int taskNber = addMethodNames.length
                         + (5 * SiteWrapper.getSites(appService).size());
 
+                    monitor.beginTask(
+                        "removing previous CBSR configuration...", taskNber);
+                    deleteConfiguration();
+
                     monitor.beginTask("Adding new objects to database...",
                         taskNber);
-
-                    deleteSites(monitor);
 
                     for (String methodName : addMethodNames) {
                         monitor.subTask("invoking " + methodName);
@@ -167,9 +166,35 @@ public class CbsrConfigurationJob {
         int numClinics = clinicNames.size();
         int numShippingCompanies = shippingCompaniesList.size();
 
+        List<ContactWrapper> contacts;
+        List<StudyWrapper> studies;
+        List<PatientWrapper> patients;
+        ClinicWrapper clinic;
+        StudyWrapper study;
+        PatientWrapper patient;
+
         for (int i = 0; i < 100; i++) {
-            ClinicWrapper clinic = CbsrClinics.getClinic(clinicNames.get(r
-                .nextInt(numClinics)));
+
+            /*
+             * comment out for now, uncomment when all studies have a contact
+             * 
+             * clinic = CbsrClinics.getClinic(clinicNames.get(r
+             * .nextInt(numClinics))); contacts = clinic.getContactCollection();
+             * studies = contacts.get(r.nextInt(contacts.size()))
+             * .getStudyCollection(); study =
+             * studies.get(r.nextInt(studies.size()));
+             */
+
+            study = CbsrStudies.getStudy("BBPSP");
+            clinic = study.getContactCollection().get(0).getClinic();
+
+            /*
+             * 
+             */
+
+            patients = study.getPatientCollection();
+            patient = patients.get(r.nextInt(patients.size()));
+
             ShipmentWrapper shipment = new ShipmentWrapper(appService);
             String dateStr = String.format("2009-%02d-%02d %02d:%02d", r
                 .nextInt(12) + 1, r.nextInt(28), r.nextInt(24), r.nextInt(60));
@@ -195,8 +220,19 @@ public class CbsrConfigurationJob {
 
     @SuppressWarnings("unused")
     private void addPatientVisitsInPatient() throws Exception {
+        List<StudyWrapper> studies;
+        List<PatientWrapper> patients;
+        StudyWrapper study;
+        PatientWrapper patient;
+
+        studies = cbsrSite.getStudyCollection();
+        int numStudies = studies.size();
+
         for (int i = 0; i < 100; i++) {
-            PatientWrapper patient = patients.get(i);
+            study = studies.get(r.nextInt(numStudies));
+            patients = study.getPatientCollection();
+            patient = patients.get(r.nextInt(patients.size()));
+
             List<PatientVisitWrapper> visits = new ArrayList<PatientVisitWrapper>();
             visits.add(createPatientVisit(patient));
             visits.add(createPatientVisit(patient));
@@ -233,6 +269,12 @@ public class CbsrConfigurationJob {
 
     @SuppressWarnings("unused")
     private void addPatientInStudy() throws Exception {
+        List<String> studyNames = CbsrStudies.getStudyNames();
+        int numStudies = studyNames.size();
+
+        StudyWrapper study = CbsrStudies.getStudy(studyNames.get(r
+            .nextInt(numStudies)));
+
         List<PatientWrapper> studyPatients = new ArrayList<PatientWrapper>();
         for (int i = 0; i < 100; i++) {
             PatientWrapper patient = new PatientWrapper(appService);
@@ -245,11 +287,16 @@ public class CbsrConfigurationJob {
         study.setPatientCollection(studyPatients);
         study.persist();
         study.reload();
-        patients = study.getPatientCollection();
     }
 
     @SuppressWarnings("unused")
     private void addContainerTypesInSite() throws Exception {
+        CbsrContainerTypes.createContainerTypes(cbsrSite);
+    }
+
+    @SuppressWarnings("unused")
+    private void addContainers() throws Exception {
+        CbsrContainers.createContainers(cbsrSite);
     }
 
     @SuppressWarnings("unused")
@@ -294,48 +341,12 @@ public class CbsrConfigurationJob {
             ss.setSampleType(type);
             ss.setStudy(bbpStudy);
 
-            appService.executeQuery(new addExampleQuery(ss));
+            appService.executeQuery(new InsertExampleQuery(ss));
         }
     }
 
-    public void deleteSites(IProgressMonitor monitor) throws Exception {
-    }
-
-    public void deleteContainers(Collection<ContainerWrapper> containers,
-        IProgressMonitor monitor) throws Exception {
-    }
-
-    public void deleteStudies(List<StudyWrapper> studies,
-        IProgressMonitor monitor) throws Exception {
-    }
-
-    public void deletePatients(List<PatientWrapper> patients,
-        IProgressMonitor monitor) throws Exception {
-        if (patients != null) {
-            for (PatientWrapper patient : patients) {
-                monitor.subTask("deleting patient " + patient);
-                deleteFromList(patient.getPatientVisitCollection(), monitor,
-                    "PatientVisit");
-                patient.reload();
-                patient.delete();
-            }
-        }
-    }
-
-    public void deleteClinics(List<ClinicWrapper> clinics,
-        IProgressMonitor monitor) throws Exception {
-    }
-
-    public void deleteFromList(Collection<? extends ModelWrapper<?>> list,
-        IProgressMonitor monitor, String objectName) throws Exception {
-        if (list == null)
-            return;
-
-        for (ModelWrapper<?> object : list) {
-            monitor.subTask("deleting " + objectName + " " + object);
-            object.reload();
-            object.delete();
-        }
+    public void deleteConfiguration() throws Exception {
+        CbsrSite.deleteConfiguration(appService);
     }
 
     public String getRandomString(int maxlen) {

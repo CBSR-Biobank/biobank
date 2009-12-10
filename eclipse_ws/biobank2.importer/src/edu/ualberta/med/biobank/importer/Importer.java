@@ -2,26 +2,15 @@
 package edu.ualberta.med.biobank.importer;
 
 import edu.ualberta.med.biobank.common.cbsr.CbsrSite;
-import edu.ualberta.med.biobank.model.Clinic;
-import edu.ualberta.med.biobank.model.Container;
-import edu.ualberta.med.biobank.model.ContainerType;
-import edu.ualberta.med.biobank.model.Patient;
-import edu.ualberta.med.biobank.model.PatientVisit;
-import edu.ualberta.med.biobank.model.Sample;
-import edu.ualberta.med.biobank.model.Site;
-import edu.ualberta.med.biobank.model.Study;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.client.ApplicationServiceProvider;
-import gov.nih.nci.system.query.example.DeleteExampleQuery;
 
-import java.lang.reflect.Constructor;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.List;
 
 /*
  *  need to remove the password on MS Access side.
@@ -46,16 +35,6 @@ public class Importer {
             // checkCabinet();
             // checkFreezer();
             // System.exit(0);
-
-            // the order here matters
-            deleteAll(Sample.class);
-            deleteAll(Container.class);
-            deleteAll(ContainerType.class);
-            deleteAll(PatientVisit.class);
-            deleteAll(Patient.class);
-            deleteAll(Clinic.class);
-            deleteAll(Study.class);
-            deleteAll(Site.class);
 
             CbsrSite.createConfiguration(appService);
 
@@ -704,16 +683,6 @@ public class Importer {
             throw new Exception("appService has not been initialized");
         }
         return appService;
-    }
-
-    public static void deleteAll(Class<?> classType) throws Exception {
-        System.out.println("deleting all " + classType.getName() + " instances");
-        Constructor<?> constructor = classType.getConstructor();
-        Object instance = constructor.newInstance();
-        List<?> list = appService.search(classType, instance);
-        for (Object o : list) {
-            appService.executeQuery(new DeleteExampleQuery(o));
-        }
     }
 
 }
