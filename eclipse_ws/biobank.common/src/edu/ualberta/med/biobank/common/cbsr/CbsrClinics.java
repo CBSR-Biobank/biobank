@@ -1,6 +1,8 @@
 package edu.ualberta.med.biobank.common.cbsr;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
@@ -192,6 +194,13 @@ public class CbsrClinics {
         return clinic;
     }
 
+    public static List<String> getClinicNames() throws Exception {
+        if (clinicsMap == null) {
+            throw new Exception("clinics have not been added");
+        }
+        return new ArrayList<String>(clinicsMap.keySet());
+    }
+
     private static ContactWrapper addContact(ClinicWrapper clinic, String name,
         String title, String phoneNumber, String faxNumber, String emailAddress)
         throws Exception {
@@ -215,6 +224,13 @@ public class CbsrClinics {
                 + "\" does not exist");
         }
         return contact;
+    }
+
+    public static List<String> getContactNames() throws Exception {
+        if (contactsMap == null) {
+            throw new Exception("contacts have not been added");
+        }
+        return new ArrayList<String>(contactsMap.keySet());
     }
 
 }

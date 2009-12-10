@@ -5,13 +5,12 @@ import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.helpers.DebugInitializationHelper;
+import edu.ualberta.med.biobank.helpers.CbsrConfigurationJob;
 
-public class InitExamplesHandler extends AbstractHandler {
-    public static final String ID = "edu.ualberta.med.biobank.commands.addClinic";
+public class CbsrConfigurationHandler extends AbstractHandler {
 
     public Object execute(ExecutionEvent event) throws ExecutionException {
-        new DebugInitializationHelper();
+        new CbsrConfigurationJob();
         return null;
     }
 

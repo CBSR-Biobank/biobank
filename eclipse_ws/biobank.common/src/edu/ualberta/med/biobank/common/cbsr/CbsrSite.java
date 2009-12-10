@@ -16,7 +16,7 @@ public class CbsrSite {
         CbsrContainers.createContainers(cbsrSite);
     }
 
-    private static SiteWrapper addSite(WritableApplicationService appService)
+    public static SiteWrapper addSite(WritableApplicationService appService)
         throws Exception {
         cbsrSite = new SiteWrapper(appService);
         cbsrSite.setName("Canadian BioSample Repository");
