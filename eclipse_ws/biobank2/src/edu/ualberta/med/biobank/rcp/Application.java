@@ -1,11 +1,17 @@
 package edu.ualberta.med.biobank.rcp;
 
+import java.net.URL;
+
+import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.equinox.app.IApplicationContext;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.PlatformUI;
+
+import edu.ualberta.med.biobank.common.ResourceResolver;
+import edu.ualberta.med.biobank.common.ServiceConnection;
 
 /**
  * This class controls all aspects of the application's execution
@@ -21,6 +27,13 @@ public class Application implements IApplication {
      */
     public Object start(IApplicationContext context) throws Exception {
         Display display = PlatformUI.createDisplay();
+
+        ServiceConnection.setResourceResolver(new ResourceResolver() {
+            @Override
+            public URL resolveURL(URL url) throws Exception {
+                return FileLocator.resolve(url);
+            }
+        });
 
         boolean trace = "true".equalsIgnoreCase(Platform
             .getDebugOption(PlatformUI.PLUGIN_ID + "/trace/graphics"));
