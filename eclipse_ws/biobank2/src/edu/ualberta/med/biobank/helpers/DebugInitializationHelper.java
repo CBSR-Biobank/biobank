@@ -527,11 +527,24 @@ public class DebugInitializationHelper {
         if (patients != null) {
             for (PatientWrapper patient : patients) {
                 monitor.subTask("deleting patient " + patient);
-                deleteFromList(patient.getPatientVisitCollection(), monitor,
-                    "PatientVisit");
+                deletePatientVisits(patient.getPatientVisitCollection(),
+                    monitor);
                 patient.reload();
                 patient.delete();
             }
+        }
+    }
+
+    public void deletePatientVisits(List<PatientVisitWrapper> visits,
+        IProgressMonitor monitor) throws Exception {
+        if (visits == null)
+            return;
+
+        for (PatientVisitWrapper visit : visits) {
+            monitor.subTask("deleting visit " + visit);
+            deleteFromList(visit.getSampleCollection(), monitor, "Sample");
+            visit.reload();
+            visit.delete();
         }
     }
 

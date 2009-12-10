@@ -1118,9 +1118,9 @@ public class TestContainer extends TestDatabase {
         childL2 = containerMap.get("ChildL2");
         childL3 = containerMap.get("ChildL3");
 
-        Assert.assertEquals(-1, top.compareTo(childL1));
-        Assert.assertEquals(-1, childL1.compareTo(childL2));
-        Assert.assertEquals(-1, childL2.compareTo(childL3));
+        Assert.assertTrue(top.compareTo(childL1) < 0);
+        Assert.assertTrue(childL1.compareTo(childL2) < 0);
+        Assert.assertTrue(childL2.compareTo(childL3) < 0);
         Assert.assertEquals(0, top.compareTo(top));
     }
 
@@ -1326,5 +1326,63 @@ public class TestContainer extends TestDatabase {
         } catch (BiobankCheckException bce) {
             Assert.assertTrue(true);
         }
+    }
+
+    /**
+     * see ContainerAdapter.setNewPositionFromLabel
+     * 
+     * @throws Exception
+     */
+    @Test
+    public void testMoveOtherContainer() throws Exception {
+        addContainerHierarchy(containerMap.get("Top"));
+        ContainerWrapper child = containerMap.get("ChildL1"); // 01AA01
+
+        ContainerWrapper top2 = ContainerHelper.addContainer("02", TestCommon
+            .getNewBarcode(r), null, site, containerTypeMap.get("TopCT"));
+
+        String newLabel = "02AF";
+        String newParentContainerLabel = newLabel.substring(0, newLabel
+            .length() - 2);
+        List<ContainerWrapper> newParentContainers = child
+            .getPossibleParents(newParentContainerLabel);
+        Assert.assertEquals(1, newParentContainers.size());
+        ContainerWrapper newParent = newParentContainers.get(0);
+        Assert.assertEquals(top2, newParent);
+
+        newParent.addChild(newLabel.substring(newLabel.length() - 2), child);
+        child.persist();
+        child.reload();
+        Assert.assertEquals(top2, child.getParent());
+        Assert.assertEquals(newLabel, child.getLabel());
+    }
+
+    /**
+     * see ContainerAdapter.setNewPositionFromLabel
+     * 
+     * @throws Exception
+     */
+    @Test
+    public void testMoveSameContainer() throws Exception {
+        ContainerWrapper top = addContainerHierarchy(containerMap.get("Top"));
+        ContainerWrapper child = containerMap.get("ChildL1"); // 01AA
+
+        ContainerHelper.addContainer("02", TestCommon.getNewBarcode(r), null,
+            site, containerTypeMap.get("TopCT"));
+
+        String newLabel = "01AF";
+        String newParentContainerLabel = newLabel.substring(0, newLabel
+            .length() - 2);
+        List<ContainerWrapper> newParentContainers = child
+            .getPossibleParents(newParentContainerLabel);
+        Assert.assertEquals(1, newParentContainers.size());
+        ContainerWrapper newParent = newParentContainers.get(0);
+        Assert.assertEquals(top, newParent);
+
+        newParent.addChild(newLabel.substring(newLabel.length() - 2), child);
+        child.persist();
+        child.reload();
+        Assert.assertEquals(top, child.getParent());
+        Assert.assertEquals(newLabel, child.getLabel());
     }
 }

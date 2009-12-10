@@ -205,7 +205,7 @@ public class WidgetCreator {
         }
         Text text = null;
         if (toolkit == null) {
-            text = new Text(composite, widgetOptions);
+            text = new Text(composite, SWT.BORDER | widgetOptions);
         } else {
             text = toolkit.createText(composite, "", widgetOptions);
         }

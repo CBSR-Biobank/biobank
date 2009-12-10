@@ -90,7 +90,7 @@ public class ContainerWrapper extends
                 || ((origObject != null && origObject.getPosition() != null) && (((origObject
                     .getPosition().getParentContainer() != null) && (origObject
                     .getPosition().getParentContainer().getId() != parent
-                    .getId())) || (new RowColPos(origObject.getPosition()
+                    .getId())) || (!new RowColPos(origObject.getPosition()
                     .getRow(), origObject.getPosition().getCol())
                     .equals(getPosition()))))) {
                 String label = parent.getLabel()
@@ -762,8 +762,7 @@ public class ContainerWrapper extends
         if (wrapper instanceof ContainerWrapper) {
             String c1Label = wrappedObject.getLabel();
             String c2Label = wrapper.wrappedObject.getLabel();
-            return ((c1Label.compareTo(c2Label) > 0) ? 1 : (c1Label
-                .equals(c2Label) ? 0 : -1));
+            return c1Label.compareTo(c2Label);
         }
         return 0;
     }
