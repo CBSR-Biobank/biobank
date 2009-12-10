@@ -1,7 +1,7 @@
 package test.ualberta.med.biobank;
 
+import edu.ualberta.med.biobank.common.ServiceConnection;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
-import gov.nih.nci.system.client.ApplicationServiceProvider;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -23,10 +23,9 @@ public class AllTests {
 
     @BeforeClass
     public static void setUp() throws Exception {
-        appService = (WritableApplicationService) ApplicationServiceProvider
-            .getApplicationServiceFromUrl("http://"
-                + System.getProperty("server", "localhost:8080") + "/biobank2",
-                "testuser", "test");
+        appService = ServiceConnection.getAppService("https://"
+            + System.getProperty("server", "localhost:8443") + "/biobank2",
+            "testuser", "test");
 
         DbHelper.setAppService(appService);
     }

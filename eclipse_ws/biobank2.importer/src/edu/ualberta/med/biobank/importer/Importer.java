@@ -1,6 +1,7 @@
 
 package edu.ualberta.med.biobank.importer;
 
+import edu.ualberta.med.biobank.common.ServiceConnection;
 import edu.ualberta.med.biobank.common.cbsr.CbsrSite;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Container;
@@ -11,7 +12,6 @@ import edu.ualberta.med.biobank.model.Sample;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
-import gov.nih.nci.system.client.ApplicationServiceProvider;
 import gov.nih.nci.system.query.example.DeleteExampleQuery;
 
 import java.lang.reflect.Constructor;
@@ -40,8 +40,8 @@ public class Importer {
         tables = new ArrayList<String>();
 
         try {
-            appService = (WritableApplicationService) ApplicationServiceProvider.getApplicationServiceFromUrl(
-                "http://localhost:8080/biobank2", "testuser", "test");
+            appService = ServiceConnection.getAppService(
+                "https://localhost:8443/biobank2", "testuser", "test");
 
             // checkCabinet();
             // checkFreezer();

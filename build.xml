@@ -222,8 +222,10 @@
 	<target name="deploy-jboss" depends="package-webapp-orm,check-jboss-uptodate" description="deploys the caCORE SDK webapp to JBoss" unless="jboss.uptodate">
 		<fail unless="env.JBOSS_HOME" message="$JBOSS_HOME not defined" />
 		<copy file="${secu-log.dir}/jboss/login-config.xml" tofile="${env.JBOSS_HOME}/server/default/conf/login-config.xml" overwrite="true" />
-		<delete file="${env.JBOSS_HOME}/server/default/deploy/mysql-ds.xml" />
+		<copy file="${secu-log.dir}/jboss/server.xml" tofile="${env.JBOSS_HOME}/server/default/deploy/jbossweb-tomcat55.sar/server.xml" overwrite="true" />
+		<copy file="${secu-log.dir}/jboss/biobank.keystore" tofile="${env.JBOSS_HOME}/server/default/conf/biobank.keystore" overwrite="true" />
 		<!-- for compatibility: this file has been split -->
+		<delete file="${env.JBOSS_HOME}/server/default/deploy/mysql-ds.xml" />
 		<copy file="${secu-log.dir}/jboss/upt-ds.xml" tofile="${env.JBOSS_HOME}/server/default/deploy/upt-ds.xml" overwrite="true" />
 		<copy file="${secu-log.dir}/jboss/upt.war" tofile="${env.JBOSS_HOME}/server/default/deploy/upt.war" overwrite="true" />
 		<copy file="${secu-log.dir}/jboss/llt-ds.xml" tofile="${env.JBOSS_HOME}/server/default/deploy/llt-ds.xml" overwrite="true" />

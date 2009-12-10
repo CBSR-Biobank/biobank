@@ -7,10 +7,10 @@ import org.apache.log4j.Logger;
 import org.springframework.remoting.RemoteAccessException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.common.ServiceConnection;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
-import gov.nih.nci.system.client.ApplicationServiceProvider;
 
 public class SessionHelper implements Runnable {
 
@@ -28,7 +28,7 @@ public class SessionHelper implements Runnable {
     private Collection<SiteWrapper> siteWrappers;
 
     public SessionHelper(String server, String userName, String password) {
-        this.serverUrl = "http://" + server + "/biobank2";
+        this.serverUrl = "https://" + server + "/biobank2";
         this.userName = userName;
         this.password = password;
 
@@ -41,16 +41,14 @@ public class SessionHelper implements Runnable {
             if (userName.length() == 0) {
                 if (BioBankPlugin.getDefault().isDebugging()) {
                     userName = "testuser";
-                    appService = (WritableApplicationService) ApplicationServiceProvider
-                        .getApplicationServiceFromUrl(serverUrl, userName,
-                            "test");
+                    appService = ServiceConnection.getAppService(serverUrl,
+                        userName, "test");
                 } else {
-                    appService = (WritableApplicationService) ApplicationServiceProvider
-                        .getApplicationServiceFromUrl(serverUrl);
+                    appService = ServiceConnection.getAppService(serverUrl);
                 }
             } else {
-                appService = (WritableApplicationService) ApplicationServiceProvider
-                    .getApplicationServiceFromUrl(serverUrl, userName, password);
+                appService = ServiceConnection.getAppService(serverUrl,
+                    userName, password);
             }
 
             siteWrappers = SiteWrapper.getSites(appService);
