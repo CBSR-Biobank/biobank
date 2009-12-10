@@ -159,7 +159,7 @@
          </commandParameter>
       </command>
       <command
-            id="edu.ualberta.med.biobank.commands.debug.initExamples"
+            id="edu.ualberta.med.biobank.commands.debug.cbsrConfiguration"
             name="Debug - Init Examples">
       </command>
       <command
@@ -362,8 +362,8 @@
          </enabledWhen>
       </handler>
       <handler
-            class="edu.ualberta.med.biobank.handlers.InitExamplesHandler"
-            commandId="edu.ualberta.med.biobank.commands.debug.initExamples">
+            class="edu.ualberta.med.biobank.handlers.CbsrConfigurationHandler"
+            commandId="edu.ualberta.med.biobank.commands.debug.cbsrConfiguration">
          <activeWhen>
             <reference
                   definitionId="biobank2.loggedIn">
@@ -659,9 +659,9 @@
                </reference>
             </visibleWhen>
             <command
-                  commandId="edu.ualberta.med.biobank.commands.debug.initExamples"
-                  id="edu.ualberta.med.biobank.menu.debug.initExamples"
-                  label="Init Examples"
+                  commandId="edu.ualberta.med.biobank.commands.debug.cbsrConfiguration"
+                  id="edu.ualberta.med.biobank.menu.debug.cbsrConfiguration"
+                  label="Create CBSR Configuration"
                   style="push">
             </command>
          </menu>

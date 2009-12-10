@@ -1,7 +1,9 @@
 package edu.ualberta.med.biobank.common.cbsr;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
@@ -109,6 +111,13 @@ public class CbsrStudies {
                 + "\" does not exist");
         }
         return study;
+    }
+
+    public static List<String> getStudyNames() throws Exception {
+        if (studiesMap == null) {
+            throw new Exception("contacts have not been added");
+        }
+        return new ArrayList<String>(studiesMap.keySet());
     }
 
 }
