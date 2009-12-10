@@ -80,12 +80,15 @@ public class ContactWrapper extends ModelWrapper<Contact> {
         return new ClinicWrapper(appService, wrappedObject.getClinic());
     }
 
-    public void setClinicWrapper(ClinicWrapper clinicWrapper) {
+    public void setClinic(Clinic clinic) {
         Clinic oldClinic = wrappedObject.getClinic();
-        Clinic newClinic = clinicWrapper.getWrappedObject();
-        wrappedObject.setClinic(newClinic);
-        propertyChangeSupport
-            .firePropertyChange("clinic", oldClinic, newClinic);
+        wrappedObject.setClinic(clinic);
+        propertyChangeSupport.firePropertyChange("clinic", oldClinic, clinic);
+
+    }
+
+    public void setClinic(ClinicWrapper clinic) {
+        setClinic(clinic.getWrappedObject());
     }
 
     /**

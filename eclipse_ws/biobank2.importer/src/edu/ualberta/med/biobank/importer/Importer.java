@@ -1,16 +1,27 @@
 
 package edu.ualberta.med.biobank.importer;
 
-import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.common.cbsr.CbsrSite;
+import edu.ualberta.med.biobank.model.Clinic;
+import edu.ualberta.med.biobank.model.Container;
+import edu.ualberta.med.biobank.model.ContainerType;
+import edu.ualberta.med.biobank.model.Patient;
+import edu.ualberta.med.biobank.model.PatientVisit;
+import edu.ualberta.med.biobank.model.Sample;
+import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.model.Study;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.client.ApplicationServiceProvider;
+import gov.nih.nci.system.query.example.DeleteExampleQuery;
 
+import java.lang.reflect.Constructor;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 
 /*
  *  need to remove the password on MS Access side.
@@ -25,8 +36,6 @@ public class Importer {
 
     private static ArrayList<String> tables;
 
-    private static SiteWrapper cbsrSite;
-
     public static void main(String [] args) throws Exception {
         tables = new ArrayList<String>();
 
@@ -38,11 +47,24 @@ public class Importer {
             // checkFreezer();
             // System.exit(0);
 
+            // the order here matters
+            deleteAll(Sample.class);
+            deleteAll(Container.class);
+            deleteAll(ContainerType.class);
+            deleteAll(PatientVisit.class);
+            deleteAll(Patient.class);
+            deleteAll(Clinic.class);
+            deleteAll(Study.class);
+            deleteAll(Site.class);
+
+            CbsrSite.createConfiguration(appService);
+
             con = getMysqlConnection();
 
             getTables();
-            if (tables.size() == 0) throw new Exception(
-                "No tables found in database");
+            if (tables.size() == 0) {
+                throw new Exception("No tables found in database");
+            }
 
             String [] reqdTables = {
                 "clinics", "study_list", "patient", "patient_visit", "cabinet",
@@ -52,8 +74,6 @@ public class Importer {
                 if (!tableExists(table)) throw new Exception("Table " + table
                     + " not found");
             }
-
-            createConfiguration();
 
             // importStudies();
             // importClinics();
@@ -113,21 +133,6 @@ public class Importer {
             if (tables.get(i).equals(name)) return true;
         }
         return false;
-    }
-
-    private static void createConfiguration() throws Exception {
-        cbsrSite = new SiteWrapper(appService);
-        cbsrSite.setName("Canadian BioSample Repository");
-        cbsrSite.setStreet1("471 Medical Sciences Building");
-        cbsrSite.setStreet2("University of Alberta");
-        cbsrSite.setCity("Edmonton");
-        cbsrSite.setProvince("Alberta");
-        cbsrSite.setPostalCode("T6G2H7");
-
-        SiteClinics.createClinics(cbsrSite);
-        SiteStudies.createStudies(cbsrSite);
-        SiteContainerTypes.createContainerTypes(cbsrSite);
-        SiteContainers.createContainers(cbsrSite);
     }
 
     // private void importStudies() throws Exception {
@@ -700,4 +705,15 @@ public class Importer {
         }
         return appService;
     }
+
+    public static void deleteAll(Class<?> classType) throws Exception {
+        System.out.println("deleting all " + classType.getName() + " instances");
+        Constructor<?> constructor = classType.getConstructor();
+        Object instance = constructor.newInstance();
+        List<?> list = appService.search(classType, instance);
+        for (Object o : list) {
+            appService.executeQuery(new DeleteExampleQuery(o));
+        }
+    }
+
 }

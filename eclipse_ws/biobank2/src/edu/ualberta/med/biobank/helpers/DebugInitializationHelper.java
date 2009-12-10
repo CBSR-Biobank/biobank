@@ -190,7 +190,7 @@ public class DebugInitializationHelper {
             for (int j = 0; j < 2; ++j) {
                 ContactWrapper contact = new ContactWrapper(appService);
                 contact.setName("Contact " + (i + 1) + "-" + (j + 1));
-                contact.setClinicWrapper(clinic);
+                contact.setClinic(clinic);
                 contacts.add(contact);
             }
             clinic.setContactCollection(contacts);
