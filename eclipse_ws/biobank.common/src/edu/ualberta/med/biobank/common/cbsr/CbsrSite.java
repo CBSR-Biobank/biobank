@@ -8,8 +8,8 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PvSampleSourceWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SampleSourceWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -80,7 +80,7 @@ public class CbsrSite {
             }
             site.reload();
         }
-        List<ContainerWrapper> containers = site.getContainerCollection();
+        List<ContainerWrapper> containers = site.getTopContainerCollection();
         if (containers != null) {
             for (ContainerWrapper container : containers) {
                 containerDeleteSubObjects(container);
@@ -105,14 +105,6 @@ public class CbsrSite {
             return;
         for (PatientWrapper patient : patients) {
             patientDeleteSubObjects(patient);
-        }
-        study.reload();
-        List<SampleSourceWrapper> sampleSources = study
-            .getSampleSourceCollection();
-        if (sampleSources != null) {
-            for (SampleSourceWrapper sampleSource : sampleSources) {
-                sampleSource.delete();
-            }
         }
         study.reload();
         study.delete();
@@ -153,31 +145,36 @@ public class CbsrSite {
     private static void clinicDeleteSubObjects(ClinicWrapper clinic)
         throws Exception {
         List<ContactWrapper> contacts = clinic.getContactCollection();
-        if (contacts == null)
-            return;
-        for (ContactWrapper contact : contacts) {
-            contact.delete();
+        if (contacts != null) {
+            for (ContactWrapper contact : contacts) {
+                contact.delete();
+            }
+            clinic.reload();
         }
-        clinic.reload();
+        List<ShipmentWrapper> shipments = clinic.getShipmentCollection();
+        if (shipments != null) {
+            for (ShipmentWrapper contact : shipments) {
+                contact.delete();
+            }
+            clinic.reload();
+        }
         clinic.delete();
     }
 
     private static void containerDeleteSubObjects(ContainerWrapper container)
         throws Exception {
         Map<RowColPos, SampleWrapper> samples = container.getSamples();
-        if ((samples != null) && (samples.size() > 0)) {
+        if (samples.size() > 0) {
             // samples should be deleted when patient visits are deleted
             throw new Exception(
                 "error with deletetion: containers should have no samples left");
         }
 
         Map<RowColPos, ContainerWrapper> children = container.getChildren();
-        if (children != null) {
-            for (ContainerWrapper child : children.values()) {
-                containerDeleteSubObjects(child);
-            }
-            container.reload();
+        for (ContainerWrapper child : children.values()) {
+            containerDeleteSubObjects(child);
         }
+        container.reload();
         container.delete();
     }
 
