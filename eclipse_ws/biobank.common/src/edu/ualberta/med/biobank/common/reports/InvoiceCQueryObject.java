@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.reports;
+package edu.ualberta.med.biobank.common.reports;
 
 import java.text.MessageFormat;
 import java.util.Date;

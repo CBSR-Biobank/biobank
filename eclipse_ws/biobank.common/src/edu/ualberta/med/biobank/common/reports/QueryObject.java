@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.reports;
+package edu.ualberta.med.biobank.common.reports;
 
 import java.util.ArrayList;
 import java.util.List;
