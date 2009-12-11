@@ -459,6 +459,7 @@
                label="Server">
             <command
                   commandId="edu.ualberta.med.biobank.commands.login"
+                  icon="icons/login.png"
                   id="edu.ualberta.med.biobank.menu.login"
                   label="Login"
                   mnemonic="i"
@@ -466,6 +467,7 @@
             </command>
             <command
                   commandId="edu.ualberta.med.biobank.commands.logout"
+                  icon="icons/logout.png"
                   id="edu.ualberta.med.biobank.menu.logout"
                   label="Logout"
                   mnemonic="o"
@@ -473,6 +475,7 @@
             </command>
             <command
                   commandId="edu.ualberta.med.biobank.commands.quit"
+                  icon="icons/quit.png"
                   id="edu.ualberta.med.biobank.menu.quit"
                   label="Quit"
                   mnemonic="Q"
@@ -1160,6 +1163,10 @@
       <key commandId="edu.ualberta.med.biobank.commands.patientAdmin"
            schemeId="biobank2.scheme"
            sequence="M1+M2+P">
+      </key>
+      <key commandId="edu.ualberta.med.biobank.commands.shipmentAdmin"
+           schemeId="biobank2.scheme"
+           sequence="M1+M2+S">
       </key>
       <key commandId="edu.ualberta.med.biobank.commands.reports"
            schemeId="biobank2.scheme"

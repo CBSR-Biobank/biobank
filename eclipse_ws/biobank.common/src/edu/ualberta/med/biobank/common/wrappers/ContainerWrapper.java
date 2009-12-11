@@ -444,7 +444,7 @@ public class ContainerWrapper extends
             || getContainerType().getNameShort() == null) {
             return getLabel();
         }
-        return getLabel() + "(" + getContainerType().getNameShort() + ")";
+        return getLabel() + " (" + getContainerType().getNameShort() + ")";
     }
 
     public void setTemperature(Double temperature) {
