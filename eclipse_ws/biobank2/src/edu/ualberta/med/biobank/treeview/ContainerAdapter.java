@@ -47,7 +47,7 @@ public class ContainerAdapter extends AdapterBase {
             return container.getLabel();
         }
         return container.getLabel() + " ("
-            + container.getContainerType().getName() + ")";
+            + container.getContainerType().getNameShort() + ")";
     }
 
     @Override

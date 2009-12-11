@@ -117,7 +117,7 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
 
     @Override
     protected void createFormContent() throws Exception {
-        form.setText("Assign samples locations using the scanner");
+        form.setText("Assign sample locations using the scanner");
         GridLayout layout = new GridLayout(2, false);
         form.getBody().setLayout(layout);
 
