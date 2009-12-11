@@ -235,7 +235,7 @@ public class StudyEntryForm extends BiobankEntryForm {
             studyPvAttrCustom.setLabel(label);
             studyPvAttrCustom.setType(site.getSitePvAttrTypeName(label));
             if (studyPvInfoLabels.contains(label)) {
-                studyPvAttrCustom.setAllowedValues(study
+                studyPvAttrCustom.setPermissible(study
                     .getStudyPvAttrPermissible(label));
                 selected = true;
             }

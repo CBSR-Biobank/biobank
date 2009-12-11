@@ -128,14 +128,21 @@ public class StudyViewForm extends BiobankViewForm {
     }
 
     private void createPvCustomInfoSection() throws Exception {
-        Composite client = createSectionWithClient("Additional Patient Visit Information Collected");
+        Composite client = createSectionWithClient("Patient Visit Information Collected");
         client.setLayout(new GridLayout(1, false));
 
+        StudyPvCustomInfo combinedPvInfo;
+
+        combinedPvInfo = new StudyPvCustomInfo();
+        combinedPvInfo.setLabel("Date Processed");
+        combinedPvInfo.setType("date");
+        pvCustomInfoList.add(combinedPvInfo);
+
         for (String label : study.getStudyPvAttrLabels()) {
-            StudyPvCustomInfo combinedPvInfo = new StudyPvCustomInfo();
+            combinedPvInfo = new StudyPvCustomInfo();
             combinedPvInfo.setLabel(label);
             combinedPvInfo.setType(study.getStudyPvAttrType(label));
-            combinedPvInfo.setAllowedValues(study
+            combinedPvInfo.setPermissible(study
                 .getStudyPvAttrPermissible(label));
             pvCustomInfoList.add(combinedPvInfo);
         }
@@ -165,8 +172,13 @@ public class StudyViewForm extends BiobankViewForm {
 
     private void setPvDataSectionValues() throws Exception {
         for (StudyPvCustomInfo pvCustomInfo : pvCustomInfoList) {
+            String label = pvCustomInfo.getLabel();
+            if (label.equals("Date Processed")) {
+                // skip this attribute since its already part of PatientVisit
+                continue;
+            }
             setTextValue(pvCustomInfo.wiget, StringUtils.join(study
-                .getStudyPvAttrPermissible(pvCustomInfo.getLabel()), "; "));
+                .getStudyPvAttrPermissible(label), "; "));
         }
     }
 
