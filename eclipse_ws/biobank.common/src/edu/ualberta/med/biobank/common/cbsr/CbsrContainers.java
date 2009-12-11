@@ -37,8 +37,11 @@ public class CbsrContainers {
     }
 
     private static void createFreezer02(SiteWrapper site) throws Exception {
-        ContainerWrapper freezer02 = addTopLevelContainer(site, "02",
-            CbsrContainerTypes.getContainerType("Freezer 4x12"));
+        // ContainerWrapper freezer02 = addTopLevelContainer(site, "02",
+        // CbsrContainerTypes.getContainerType("Freezer 4x12"));
+
+        addTopLevelContainer(site, "02", CbsrContainerTypes
+            .getContainerType("Freezer 4x12"));
     }
 
     private static void createFreezer03(SiteWrapper site) throws Exception {
@@ -77,22 +80,25 @@ public class CbsrContainers {
     }
 
     private static void createFreezer04(SiteWrapper site) throws Exception {
-        ContainerWrapper freezer02 = addTopLevelContainer(site, "04",
-            CbsrContainerTypes.getContainerType("Freezer 6x12"));
+        // ContainerWrapper freezer04 = addTopLevelContainer(site, "04",
+        // CbsrContainerTypes.getContainerType("Freezer 6x12"));
+        addTopLevelContainer(site, "04", CbsrContainerTypes
+            .getContainerType("Freezer 6x12"));
     }
 
     private static void createCabinet01(SiteWrapper site) throws Exception {
-        ContainerTypeWrapper ftaBinType = CbsrContainerTypes
-            .getContainerType("FTA Bin");
+        // ContainerTypeWrapper ftaBinType = CbsrContainerTypes
+        // .getContainerType("FTA Bin");
         ContainerTypeWrapper drawerType = CbsrContainerTypes
             .getContainerType("Drawer 36");
         ContainerTypeWrapper cabinetType = CbsrContainerTypes
             .getContainerType("Cabinet 4 drawer");
         ContainerWrapper cabinet = addTopLevelContainer(site, "01", cabinetType);
 
-        ContainerWrapper drawer;
+        // ContainerWrapper drawer;
         for (int i = 0; i < 4; ++i) {
-            drawer = addContainer(site, drawerType, cabinet, i, 0);
+            // drawer =
+            addContainer(site, drawerType, cabinet, i, 0);
 
             // don't know how FTA and Hair bins are layed out yet
             // for (int j = 0; j < 36; ++j) {

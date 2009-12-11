@@ -1,11 +1,10 @@
 package edu.ualberta.med.biobank.helpers;
 
-import java.lang.reflect.Method;
 import java.util.Collections;
-import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -52,27 +51,28 @@ public class CbsrConfigJob {
 
     // methods that add objects to database, plus a message to display in job
     // dialog
-    protected static Map<String, String> addMethodMap;
+    protected static Set<String> defaultSubTasks;
     static {
-        Map<String, String> aMap = new LinkedHashMap<String, String>();
+        Set<String> aSet = new LinkedHashSet<String>();
 
         // insert methods are listed here and order is important
-        aMap.put("addSite", "Adding sites");
-        aMap.put("addClinicsToSite", "Adding clinics");
-        aMap.put("addStudiesToSite", "Adding studies");
-        aMap.put("addContainerTypesInSite", "Adding container types");
-        aMap.put("addContainers", "Adding containers");
-        addMethodMap = Collections.unmodifiableMap(aMap);
+        aSet.add("Removing previous CBSR configuration");
+        aSet.add("Adding sites");
+        aSet.add("Adding clinics");
+        aSet.add("Adding studies");
+        aSet.add("Adding container types");
+        aSet.add("Adding containers");
+        defaultSubTasks = Collections.unmodifiableSet(aSet);
     };
 
     public CbsrConfigJob() {
-        this(addMethodMap);
+        this(defaultSubTasks);
     }
 
     /*
      * Sub classes can invoke this method with their now methodMap.
      */
-    protected CbsrConfigJob(final Map<String, String> methodMap) {
+    protected CbsrConfigJob(final Set<String> subTasks) {
         appService = SessionManager.getInstance().getSession().getAppService();
 
         try {
@@ -90,26 +90,20 @@ public class CbsrConfigJob {
             @Override
             protected IStatus run(IProgressMonitor monitor) {
                 try {
-                    int taskNber = methodMap.size() + 1;
-
                     monitor.beginTask("Adding new objects to database...",
-                        taskNber);
+                        subTasks.size());
 
-                    monitor.subTask("Removing previous CBSR configuration...");
-                    deleteConfiguration();
-                    monitor.worked(1);
-
-                    for (String methodName : methodMap.keySet()) {
-                        monitor.subTask(methodMap.get(methodName) + "...");
-                        Method method = CbsrConfigJob.this.getClass()
-                            .getDeclaredMethod(methodName, new Class<?>[] {});
-                        method.setAccessible(true);
-                        method.invoke(CbsrConfigJob.this.getClass(),
-                            new Object[] {});
+                    int subTaskCount = 0;
+                    for (String stepName : subTasks) {
+                        monitor.subTask(stepName + "...");
+                        performSubTask(subTaskCount);
                         monitor.worked(1);
-                        method.setAccessible(false);
-                        if (monitor.isCanceled())
+
+                        if (monitor.isCanceled()) {
                             throw new OperationCanceledException();
+                        }
+
+                        ++subTaskCount;
                     }
                 } catch (Exception e) {
                     LOGGER.error("initialization error", e);
@@ -153,27 +147,29 @@ public class CbsrConfigJob {
         job.schedule();
     }
 
-    protected void addSite() throws Exception {
-        cbsrSite = CbsrSite.addSite(appService);
-    }
-
-    protected void addClinicsToSite() throws Exception {
-        CbsrClinics.createClinics(cbsrSite);
-    }
-
-    protected void addStudiesToSite() throws Exception {
-        CbsrStudies.createStudies(cbsrSite);
-    }
-
-    protected void addContainerTypesInSite() throws Exception {
-        CbsrContainerTypes.createContainerTypes(cbsrSite);
-    }
-
-    protected void addContainers() throws Exception {
-        CbsrContainers.createContainers(cbsrSite);
-    }
-
-    protected void deleteConfiguration() throws Exception {
-        CbsrSite.deleteConfiguration(appService);
+    protected void performSubTask(int subTaskNumber) throws Exception {
+        switch (subTaskNumber) {
+        case 0:
+            CbsrSite.deleteConfiguration(appService);
+            break;
+        case 1:
+            cbsrSite = CbsrSite.addSite(appService);
+            break;
+        case 2:
+            CbsrClinics.createClinics(cbsrSite);
+            break;
+        case 3:
+            CbsrStudies.createStudies(cbsrSite);
+            break;
+        case 4:
+            CbsrContainerTypes.createContainerTypes(cbsrSite);
+            break;
+        case 5:
+            CbsrContainers.createContainers(cbsrSite);
+            break;
+        default:
+            throw new Exception("sub task number " + subTaskNumber
+                + " is invalid");
+        }
     }
 }

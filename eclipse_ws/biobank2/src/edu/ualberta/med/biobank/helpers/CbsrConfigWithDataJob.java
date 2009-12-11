@@ -4,15 +4,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
-import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 
-import edu.ualberta.med.biobank.common.cbsr.CbsrClinics;
 import edu.ualberta.med.biobank.common.cbsr.CbsrStudies;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
@@ -21,23 +19,48 @@ import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 
 public class CbsrConfigWithDataJob extends CbsrConfigJob {
 
-    private static Map<String, String> withDataMethodMap;
+    private static Set<String> withDataSubTasks;
     static {
-        Map<String, String> aMap = new LinkedHashMap<String, String>();
+        Set<String> aSet = new LinkedHashSet<String>();
 
         // insert methods are listed here and order is important
-        aMap.putAll(CbsrConfigJob.addMethodMap);
-        aMap.put("addPatientsToStudies", "Adding patients to studies");
-        aMap.put("addShipmentsInClinics", "Adding shipments to clinics");
-        aMap.put("addPatientVisitsInPatient", "Adding patient visits");
-        withDataMethodMap = Collections.unmodifiableMap(aMap);
+        aSet.addAll(CbsrConfigJob.defaultSubTasks);
+        aSet.add("Adding patients to studies");
+        aSet.add("Adding shipments to clinics");
+        aSet.add("Adding patient visits");
+        withDataSubTasks = Collections.unmodifiableSet(aSet);
     };
 
     public CbsrConfigWithDataJob() {
-        super(withDataMethodMap);
+        super(withDataSubTasks);
     }
 
-    @SuppressWarnings("unused")
+    @Override
+    protected void performSubTask(int subTaskNumber) throws Exception {
+        switch (subTaskNumber) {
+        case 0:
+        case 1:
+        case 2:
+        case 3:
+        case 4:
+        case 5:
+            super.performSubTask(subTaskNumber);
+            break;
+        case 6:
+            addPatientsToStudies();
+            break;
+        case 7:
+            addShipmentsInClinics();
+            break;
+        case 8:
+            addPatientVisitsInPatient();
+            break;
+        default:
+            throw new Exception("sub task number " + subTaskNumber
+                + " is invalid");
+        }
+    }
+
     private void addPatientsToStudies() throws Exception {
         List<StudyWrapper> studies = cbsrSite.getStudyCollection();
         if ((studies == null) || (studies.size() == 0)) {
@@ -63,14 +86,9 @@ public class CbsrConfigWithDataJob extends CbsrConfigJob {
         }
     }
 
-    @SuppressWarnings("unused")
     private void addShipmentsInClinics() throws Exception {
-        List<String> clinicNames = CbsrClinics.getClinicNames();
-        int numClinics = clinicNames.size();
         int numShippingCompanies = shippingCompaniesList.size();
 
-        List<ContactWrapper> contacts;
-        List<StudyWrapper> studies;
         List<PatientWrapper> patients;
         ClinicWrapper clinic;
         StudyWrapper study;
@@ -122,13 +140,11 @@ public class CbsrConfigWithDataJob extends CbsrConfigJob {
         }
     }
 
-    @SuppressWarnings("unused")
     private void addPatientVisitsInPatient() throws Exception {
         List<StudyWrapper> studies;
         List<PatientWrapper> patients;
 
         studies = cbsrSite.getStudyCollection();
-        int numStudies = studies.size();
 
         if (studies.size() == 0) {
             throw new Exception(
@@ -147,7 +163,7 @@ public class CbsrConfigWithDataJob extends CbsrConfigJob {
                 List<PatientVisitWrapper> visits = new ArrayList<PatientVisitWrapper>();
 
                 for (int j = 0, n = 1 + r.nextInt(5); j < n; ++j) {
-                    PatientVisitWrapper visit = createPatientVisit(patient);
+                    PatientVisitWrapper visit = addPatientVisit(patient);
                     if (visit == null)
                         continue;
                     visits.add(visit);
@@ -158,7 +174,7 @@ public class CbsrConfigWithDataJob extends CbsrConfigJob {
         }
     }
 
-    private PatientVisitWrapper createPatientVisit(PatientWrapper patient) {
+    private PatientVisitWrapper addPatientVisit(PatientWrapper patient) {
         List<ShipmentWrapper> shipments = patient.getShipmentCollection();
         if (shipments.size() == 0) {
             return null;
@@ -169,13 +185,13 @@ public class CbsrConfigWithDataJob extends CbsrConfigJob {
             r.nextInt(12) + 1, r.nextInt(24), r.nextInt(60));
         patientVisit.setDateProcessed(DateFormatter.parseToDateTime(dateStr));
         patientVisit.setPatient(patient);
-        SampleWrapper sample = createSample(patientVisit);
+        SampleWrapper sample = addSample(patientVisit);
         sample.setPatientVisit(patientVisit);
         patientVisit.setShipment(shipments.get(r.nextInt(shipments.size())));
         return patientVisit;
     }
 
-    private SampleWrapper createSample(PatientVisitWrapper patientVisit) {
+    private SampleWrapper addSample(PatientVisitWrapper patientVisit) {
         SampleWrapper sample = new SampleWrapper(appService);
         sample.setInventoryId(Integer.valueOf(r.nextInt(10000)).toString());
         sample.setPatientVisit(patientVisit);
