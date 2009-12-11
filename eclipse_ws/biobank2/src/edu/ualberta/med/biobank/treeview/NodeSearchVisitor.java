@@ -97,6 +97,23 @@ public class NodeSearchVisitor {
                     .getTopLevel())) {
                     return scGroup.getChild(wrapper.getId(), true);
                 } else {
+                    List<ContainerWrapper> parents = new ArrayList<ContainerWrapper>();
+                    ContainerWrapper currentContainer = container;
+                    while (currentContainer.hasParent()) {
+                        currentContainer = currentContainer.getParent();
+                        parents.add(currentContainer);
+                    }
+                    for (AdapterBase child : scGroup.getChildren()) {
+                        if (child instanceof ContainerAdapter) {
+                            visitChildContainers((ContainerAdapter) child,
+                                parents);
+                        } else {
+                            AdapterBase foundChild = child.accept(this);
+                            if (foundChild != null) {
+                                return foundChild;
+                            }
+                        }
+                    }
                     return visitChildren(scGroup);
                 }
             }
@@ -105,13 +122,20 @@ public class NodeSearchVisitor {
     }
 
     public AdapterBase visit(ContainerAdapter container) {
+        return visit(container, null);
+    }
+
+    public AdapterBase visit(ContainerAdapter container,
+        List<ContainerWrapper> parents) {
         if (wrapper instanceof ContainerWrapper) {
             ContainerWrapper containerWrapper = (ContainerWrapper) wrapper;
-            List<ContainerWrapper> parents = new ArrayList<ContainerWrapper>();
-            ContainerWrapper currentContainer = containerWrapper;
-            while (currentContainer.hasParent()) {
-                currentContainer = currentContainer.getParent();
-                parents.add(currentContainer);
+            if (parents == null) {
+                parents = new ArrayList<ContainerWrapper>();
+                ContainerWrapper currentContainer = containerWrapper;
+                while (currentContainer.hasParent()) {
+                    currentContainer = currentContainer.getParent();
+                    parents.add(currentContainer);
+                }
             }
             return visitChildContainers(container, parents);
         }
@@ -135,6 +159,8 @@ public class NodeSearchVisitor {
                     }
                 }
 
+            } else {
+                return child;
             }
         }
         return null;
