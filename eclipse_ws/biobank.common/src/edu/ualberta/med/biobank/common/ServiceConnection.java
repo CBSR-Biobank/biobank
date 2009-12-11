@@ -7,6 +7,9 @@ import gov.nih.nci.system.client.ApplicationServiceProvider;
 
 public class ServiceConnection {
 
+    /**
+     * if not null, called to resolved the address
+     */
     private static ResourceResolver resourceResolver;
 
     public static WritableApplicationService getAppService(String serverUrl,
