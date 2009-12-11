@@ -31,7 +31,7 @@ public class ActivityLogAppender extends AppenderSkeleton {
     protected void append(LoggingEvent event) {
         String text = this.layout.format(event);
         msg.print(text);
-        logsList.add(new LogInfo(text));
+        logsList.add(new LogInfo(text.substring(0, text.lastIndexOf("\n"))));
     }
 
     @Override
