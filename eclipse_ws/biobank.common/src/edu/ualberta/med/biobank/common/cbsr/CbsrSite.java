@@ -42,6 +42,10 @@ public class CbsrSite {
         cbsrSite.setCity("Edmonton");
         cbsrSite.setProvince("Alberta");
         cbsrSite.setPostalCode("T6G2H7");
+        cbsrSite.setSitePvAttr("PBMC Count", "number");
+        cbsrSite.setSitePvAttr("Worksheet", "text");
+        cbsrSite.setSitePvAttr("Consent", "select_multiple");
+        cbsrSite.setSitePvAttr("Visit", "select_single");
         cbsrSite.persist();
         cbsrSite.reload();
         return cbsrSite;

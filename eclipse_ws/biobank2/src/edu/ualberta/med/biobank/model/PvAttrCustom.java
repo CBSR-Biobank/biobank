@@ -35,7 +35,7 @@ public class PvAttrCustom {
         return allowedValues;
     }
 
-    public void setAllowedValues(String[] allowedValues) {
+    public void setPermissible(String[] allowedValues) {
         this.allowedValues = allowedValues;
     }
 

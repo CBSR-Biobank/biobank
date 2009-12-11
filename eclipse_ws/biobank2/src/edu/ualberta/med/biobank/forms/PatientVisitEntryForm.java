@@ -183,7 +183,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
             FormPvCustomInfo pvCustomInfo = new FormPvCustomInfo();
             pvCustomInfo.setLabel(label);
             pvCustomInfo.setType(study.getStudyPvAttrType(label));
-            pvCustomInfo.setAllowedValues(study
+            pvCustomInfo.setPermissible(study
                 .getStudyPvAttrPermissible(label));
             pvCustomInfo.setValue(patientVisit.getPvAttrValue(label));
             pvCustomInfo.control = getControlForLabel(client, pvCustomInfo);
