@@ -1,5 +1,8 @@
 package edu.ualberta.med.biobank.treeview;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
@@ -12,18 +15,10 @@ import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 
 public class NodeSearchVisitor {
 
-    private Class<? extends ModelWrapper<?>> typeSearched;
-    private int id;
+    private ModelWrapper<?> wrapper;
 
-    @SuppressWarnings("unchecked")
     public NodeSearchVisitor(ModelWrapper<?> wrapper) {
-        this((Class<? extends ModelWrapper<?>>) wrapper.getClass(), wrapper
-            .getId());
-    }
-
-    public NodeSearchVisitor(Class<? extends ModelWrapper<?>> typeSearch, int id) {
-        this.typeSearched = typeSearch;
-        this.id = id;
+        this.wrapper = wrapper;
     }
 
     private AdapterBase visitChildren(AdapterBase node) {
@@ -42,8 +37,8 @@ public class NodeSearchVisitor {
     }
 
     public AdapterBase visit(SessionAdapter session) {
-        if (typeSearched == SiteWrapper.class) {
-            return session.getChild(id);
+        if (wrapper instanceof SiteWrapper) {
+            return session.getChild(wrapper.getId(), true);
         }
         return visitChildren(session);
     }
@@ -53,72 +48,101 @@ public class NodeSearchVisitor {
     }
 
     public AdapterBase visit(StudyGroup sGroup) {
-        if (typeSearched == StudyWrapper.class) {
-            return sGroup.getChild(id, true);
+        if (wrapper instanceof StudyWrapper) {
+            return sGroup.getChild(wrapper.getId(), true);
         }
         return null;
     }
 
     public AdapterBase visit(StudyAdapter study) {
-        if (typeSearched == PatientWrapper.class) {
-            return study.getChild(id, true);
+        if (wrapper instanceof PatientWrapper) {
+            return study.getChild(wrapper.getId(), true);
         }
         return visitChildren(study);
     }
 
     public AdapterBase visit(PatientAdapter patient) {
-        if (typeSearched == PatientVisitWrapper.class) {
-            return patient.getChild(id, true);
+        if (wrapper instanceof PatientVisitWrapper) {
+            return patient.getChild(wrapper.getId(), true);
         }
         return visitChildren(patient);
     }
 
     public AdapterBase visit(SampleTypeAdapter sampleType) {
-        if (typeSearched == SampleWrapper.class) {
-            return sampleType.getChild(id, true);
+        if (wrapper instanceof SampleWrapper) {
+            return sampleType.getChild(wrapper.getId(), true);
         }
         return null;
     }
 
     public AdapterBase visit(ClinicGroup clinics) {
-        if (typeSearched == ClinicWrapper.class) {
-            return clinics.getChild(id, true);
+        if (wrapper instanceof ClinicWrapper) {
+            return clinics.getChild(wrapper.getId(), true);
         }
         return null;
     }
 
     public AdapterBase visit(ContainerTypeGroup stGroup) {
-        if (typeSearched == ContainerTypeWrapper.class) {
-            return stGroup.getChild(id, true);
+        if (wrapper instanceof ContainerTypeWrapper) {
+            return stGroup.getChild(wrapper.getId(), true);
         }
         return null;
     }
 
     public AdapterBase visit(ContainerGroup scGroup) {
-        if (typeSearched == ContainerWrapper.class) {
-            AdapterBase child = scGroup.getChild(id, true);
-            if (child == null) {
-                return visitChildren(scGroup);
+        if (wrapper instanceof ContainerWrapper) {
+            ContainerWrapper container = (ContainerWrapper) wrapper;
+            if (container.getContainerType() != null) {
+                if (Boolean.TRUE.equals(container.getContainerType()
+                    .getTopLevel())) {
+                    return scGroup.getChild(wrapper.getId(), true);
+                } else {
+                    return visitChildren(scGroup);
+                }
             }
-            return child;
         }
         return null;
     }
 
     public AdapterBase visit(ContainerAdapter container) {
-        if (typeSearched == ContainerWrapper.class) {
-            AdapterBase child = container.getChild(id, true);
-            if (child == null) {
-                return visitChildren(container);
+        if (wrapper instanceof ContainerWrapper) {
+            ContainerWrapper containerWrapper = (ContainerWrapper) wrapper;
+            List<ContainerWrapper> parents = new ArrayList<ContainerWrapper>();
+            ContainerWrapper currentContainer = containerWrapper;
+            while (currentContainer.hasParent()) {
+                currentContainer = currentContainer.getParent();
+                parents.add(currentContainer);
             }
-            return child;
+            return visitChildContainers(container, parents);
+        }
+        return null;
+    }
+
+    private AdapterBase visitChildContainers(ContainerAdapter container,
+        final List<ContainerWrapper> parents) {
+        if (parents.contains(container.getContainer())) {
+            AdapterBase child = container.getChild(wrapper.getId(), true);
+            if (child == null) {
+                for (AdapterBase childContainer : container.getChildren()) {
+                    if (childContainer instanceof ContainerAdapter) {
+                        visitChildContainers((ContainerAdapter) childContainer,
+                            parents);
+                    } else {
+                        AdapterBase foundChild = childContainer.accept(this);
+                        if (foundChild != null) {
+                            return foundChild;
+                        }
+                    }
+                }
+
+            }
         }
         return null;
     }
 
     public AdapterBase visit(ShipmentAdapter shipment) {
-        if (typeSearched == PatientVisitWrapper.class) {
-            return shipment.getChild(id, true);
+        if (wrapper instanceof PatientVisitWrapper) {
+            return shipment.getChild(wrapper.getId(), true);
         }
         return null;
     }

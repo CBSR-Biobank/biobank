@@ -27,7 +27,11 @@
          </property>
          <property
                name="aboutText"
-               value="BioBank2 version 1.05">
+               value="Canadian BioSample Repository&#x0A;Version 1.1.0&#x0A;by AICML">
+         </property>
+         <property
+               name="aboutImage"
+               value="icons/about.png">
          </property>
       </product>
    </extension>
