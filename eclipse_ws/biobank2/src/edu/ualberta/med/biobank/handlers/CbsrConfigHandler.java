@@ -5,12 +5,12 @@ import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.helpers.CbsrConfigurationJob;
+import edu.ualberta.med.biobank.helpers.CbsrConfigJob;
 
-public class CbsrConfigurationHandler extends AbstractHandler {
+public class CbsrConfigHandler extends AbstractHandler {
 
     public Object execute(ExecutionEvent event) throws ExecutionException {
-        new CbsrConfigurationJob();
+        new CbsrConfigJob();
         return null;
     }
 

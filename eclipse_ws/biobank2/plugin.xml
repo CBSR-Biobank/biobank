@@ -159,8 +159,12 @@
          </commandParameter>
       </command>
       <command
-            id="edu.ualberta.med.biobank.commands.debug.cbsrConfiguration"
-            name="Debug - Init Examples">
+            id="edu.ualberta.med.biobank.commands.debug.cbsrConfig"
+            name="CBSR Configuration">
+      </command>
+      <command
+            id="edu.ualberta.med.biobank.commands.debug.cbsrConfigWithData"
+            name="CBSR Configuration with data">
       </command>
       <command
             id="edu.ualberta.med.biobank.commands.patients.patientAdd"
@@ -362,8 +366,17 @@
          </enabledWhen>
       </handler>
       <handler
-            class="edu.ualberta.med.biobank.handlers.CbsrConfigurationHandler"
-            commandId="edu.ualberta.med.biobank.commands.debug.cbsrConfiguration">
+            class="edu.ualberta.med.biobank.handlers.CbsrConfigHandler"
+            commandId="edu.ualberta.med.biobank.commands.debug.cbsrConfig">
+         <activeWhen>
+            <reference
+                  definitionId="biobank2.loggedIn">
+            </reference>
+         </activeWhen>
+      </handler>
+      <handler
+            class="edu.ualberta.med.biobank.handlers.CbsrConfigWithDataHandler"
+            commandId="edu.ualberta.med.biobank.commands.debug.cbsrConfigWithData">
          <activeWhen>
             <reference
                   definitionId="biobank2.loggedIn">
@@ -659,9 +672,15 @@
                </reference>
             </visibleWhen>
             <command
-                  commandId="edu.ualberta.med.biobank.commands.debug.cbsrConfiguration"
-                  id="edu.ualberta.med.biobank.menu.debug.cbsrConfiguration"
+                  commandId="edu.ualberta.med.biobank.commands.debug.cbsrConfig"
+                  id="edu.ualberta.med.biobank.menu.debug.cbsrConfig"
                   label="Create CBSR Configuration"
+                  style="push">
+            </command>
+            <command
+                  commandId="edu.ualberta.med.biobank.commands.debug.cbsrConfigWithData"
+                  id="edu.ualberta.med.biobank.menu.debug.cbsrConfigWithData"
+                  label="Create CBSR Configuration with data"
                   style="push">
             </command>
          </menu>
