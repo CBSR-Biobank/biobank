@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Biobank Commons
 Bundle-SymbolicName: biobank.common
-Bundle-Version: 1.0.0
+Bundle-Version: 1.1.0
 Bundle-ClassPath: conf/,
  bin/,
  lib/acegi-security-1.0.4.jar,
