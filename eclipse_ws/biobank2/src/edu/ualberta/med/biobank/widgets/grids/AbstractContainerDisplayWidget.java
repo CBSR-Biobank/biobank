@@ -1,5 +1,7 @@
 package edu.ualberta.med.biobank.widgets.grids;
 
+import java.util.Map;
+
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 
@@ -7,12 +9,15 @@ import edu.ualberta.med.biobank.common.LabelingScheme;
 import edu.ualberta.med.biobank.common.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
+import edu.ualberta.med.biobank.model.Cell;
 
 /**
  * This class is there to give a common parent class to grid container widgets
  * and drawers widgets
  */
 public abstract class AbstractContainerDisplayWidget extends Canvas {
+
+    protected Map<RowColPos, ? extends Cell> cells;
 
     protected ContainerWrapper container;
 
@@ -22,17 +27,32 @@ public abstract class AbstractContainerDisplayWidget extends Canvas {
      */
     protected boolean displayFullInfoString = false;
 
+    private MultiSelectionManager multiSelectionManager;
+
     public AbstractContainerDisplayWidget(Composite parent, int style) {
         super(parent, style);
+        multiSelectionManager = new MultiSelectionManager(this);
     }
 
-    public abstract void setSelection(RowColPos selection);
+    /**
+     * if we don't want to display information for cells, can specify a selected
+     * box to highlight
+     */
+    protected RowColPos selection;
 
-    public abstract Object getObjectAtCoordinates(int x, int y);
-
-    public abstract void setInput(Object object);
+    public abstract Cell getObjectAtCoordinates(int x, int y);
 
     public abstract void initLegend();
+
+    public void setCells(Map<RowColPos, ? extends Cell> cells) {
+        this.cells = cells;
+        redraw();
+    }
+
+    public void setSelection(RowColPos selection) {
+        this.selection = selection;
+        redraw();
+    }
 
     public void displayFullInfoString(boolean display) {
         this.displayFullInfoString = display;
@@ -68,4 +88,11 @@ public abstract class AbstractContainerDisplayWidget extends Canvas {
         return "";
     }
 
+    public Map<RowColPos, ? extends Cell> getCells() {
+        return cells;
+    }
+
+    public MultiSelectionManager getMultiSelectionManager() {
+        return multiSelectionManager;
+    }
 }

@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 
@@ -706,10 +707,10 @@ public class ContainerWrapper extends
     }
 
     /**
-     * Initialize all children of this container with the given type (except
-     * children already initialized)
+     * Initialise all children of this container with the given type (except
+     * children already initialised)
      * 
-     * @return true if at least one children has been initialized
+     * @return true if at least one children has been initialised
      * @throws BiobankCheckException
      * @throws WrapperException
      * @throws ApplicationException
@@ -720,18 +721,39 @@ public class ContainerWrapper extends
         int cols = getContainerType().getColCapacity().intValue();
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
-                Boolean filled = (getChild(i, j) != null);
-                if (!filled) {
-                    ContainerWrapper newContainer = new ContainerWrapper(
-                        appService);
-                    newContainer.setContainerType(type.getWrappedObject());
-                    newContainer.setSite(getSite().getWrappedObject());
-                    newContainer.setTemperature(getTemperature());
-                    addChild(i, j, newContainer);
-                }
+                initPosition(type, i, j);
             }
         }
         persist();
+    }
+
+    /**
+     * Initialise children at given position with the given type (except
+     * children already initialised)
+     * 
+     * @return true if at least one children has been initialised
+     * @throws BiobankCheckException
+     * @throws WrapperException
+     * @throws ApplicationException
+     */
+    public void initChildrenWithType(ContainerTypeWrapper type,
+        Set<RowColPos> positions) throws Exception {
+        for (RowColPos rcp : positions) {
+            initPosition(type, rcp.row, rcp.col);
+        }
+        persist();
+    }
+
+    private void initPosition(ContainerTypeWrapper type, int i, int j)
+        throws BiobankCheckException {
+        Boolean filled = (getChild(i, j) != null);
+        if (!filled) {
+            ContainerWrapper newContainer = new ContainerWrapper(appService);
+            newContainer.setContainerType(type.getWrappedObject());
+            newContainer.setSite(getSite().getWrappedObject());
+            newContainer.setTemperature(getTemperature());
+            addChild(i, j, newContainer);
+        }
     }
 
     /**

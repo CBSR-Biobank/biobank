@@ -2,18 +2,19 @@ package edu.ualberta.med.biobank.widgets.grids;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 
+import edu.ualberta.med.biobank.common.RowColPos;
+import edu.ualberta.med.biobank.model.Cell;
 import edu.ualberta.med.biobank.model.ContainerCell;
 import edu.ualberta.med.biobank.model.ContainerStatus;
 
 public class GridContainerWidget extends AbstractGridWidget {
-
-    private ContainerCell[][] cells;
 
     private List<ContainerStatus> legendStatus;
 
@@ -27,14 +28,14 @@ public class GridContainerWidget extends AbstractGridWidget {
     }
 
     @Override
-    public Object getObjectAtCoordinates(int x, int y) {
+    public Cell getObjectAtCoordinates(int x, int y) {
         if (cells == null) {
             return null;
         }
         int col = x / getCellWidth();
         int row = y / getCellHeight();
         if (col >= 0 && col < getCols() && row >= 0 && row < getRows()) {
-            return cells[row][col];
+            return cells.get(new RowColPos(row, col));
         }
         return null;
     }
@@ -47,7 +48,7 @@ public class GridContainerWidget extends AbstractGridWidget {
         setLegend(legendStatus);
     }
 
-    public void setCellsStatus(ContainerCell[][] cells) {
+    public void setCellsStatus(Map<RowColPos, ContainerCell> cells) {
         this.cells = cells;
         computeSize(-1, -1);
         if (legendStatus != null) {
@@ -56,12 +57,11 @@ public class GridContainerWidget extends AbstractGridWidget {
         redraw();
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public void setInput(Object object) {
-        Assert.isNotNull(object);
-        Assert.isTrue(object.getClass().isArray());
-        ContainerCell[][] cells = (ContainerCell[][]) object;
-        setCellsStatus(cells);
+    public void setCells(Map<RowColPos, ? extends Cell> cells) {
+        Assert.isNotNull(cells);
+        setCellsStatus((Map<RowColPos, ContainerCell>) cells);
     }
 
     @Override
@@ -79,7 +79,8 @@ public class GridContainerWidget extends AbstractGridWidget {
     protected void drawRectangle(PaintEvent e, Rectangle rectangle,
         int indexRow, int indexCol) {
         if (cells != null) {
-            ContainerCell cell = cells[indexRow][indexCol];
+            ContainerCell cell = (ContainerCell) cells.get(new RowColPos(
+                indexRow, indexCol));
             if (cell == null) {
                 cell = new ContainerCell();
             }
@@ -96,7 +97,8 @@ public class GridContainerWidget extends AbstractGridWidget {
     protected String getDefaultTextForBox(int indexRow, int indexCol) {
         String sname = "";
         if (cells != null) {
-            ContainerCell cell = cells[indexRow][indexCol];
+            ContainerCell cell = (ContainerCell) cells.get(new RowColPos(
+                indexRow, indexCol));
             if ((cell != null)
                 && (cell.getContainer() != null)
                 && (cell.getContainer().getContainerType() != null)

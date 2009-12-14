@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.widgets.grids;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
@@ -13,6 +14,7 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.common.RowColPos;
+import edu.ualberta.med.biobank.model.Cell;
 import edu.ualberta.med.biobank.model.ContainerCell;
 import edu.ualberta.med.biobank.model.ContainerStatus;
 
@@ -33,12 +35,7 @@ public class DrawerWidget extends AbstractContainerDisplayWidget {
 
     public static final int HEIGHT = GRID_HEIGHT + 10;
 
-    private RowColPos selection;
-
     private Boolean hasLegend = false;
-
-    // suppose to be a 36*1 array
-    private ContainerCell[][] cells;
 
     private ArrayList<ContainerStatus> legendStatus;
 
@@ -122,6 +119,20 @@ public class DrawerWidget extends AbstractContainerDisplayWidget {
                 squareYTotal = 0;
                 rectYTotal = 0;
             }
+
+            if (cells != null) {
+                if (getMultiSelectionManager().isEnabled()) {
+                    Cell cell = cells.get(new RowColPos(boxIndex - 1, 0));
+                    if (cell != null && cell.isSelected()) {
+                        Rectangle rect = new Rectangle(rectangle.x + 5,
+                            rectangle.y + 5, rectangle.width - 10,
+                            rectangle.height - 10);
+                        Color color = e.display.getSystemColor(SWT.COLOR_BLUE);
+                        e.gc.setForeground(color);
+                        e.gc.drawRectangle(rect);
+                    }
+                }
+            }
         }
         if (hasLegend) {
             for (int i = 0; i < legendStatus.size(); i++) {
@@ -134,7 +145,8 @@ public class DrawerWidget extends AbstractContainerDisplayWidget {
     private ContainerStatus getStatus(int boxIndex) {
         ContainerStatus status = null;
         if (cells != null) {
-            status = cells[boxIndex - 1][0].getStatus();
+            status = ((ContainerCell) cells.get(new RowColPos(boxIndex - 1, 0)))
+                .getStatus();
         }
         if (status == null)
             status = ContainerStatus.NOT_INITIALIZED;
@@ -151,15 +163,9 @@ public class DrawerWidget extends AbstractContainerDisplayWidget {
         gc.drawText(text, xTextPosition, yTextPosition, true);
     }
 
-    @Override
-    public void setSelection(RowColPos selection) {
-        this.selection = selection;
-        redraw();
-    }
-
-    public void setCellsStatus(ContainerCell[][] cells) {
+    public void setCellsStatus(Map<RowColPos, ContainerCell> cells) {
         this.cells = cells;
-        Assert.isTrue(cells == null || cells.length == 36);
+        Assert.isTrue(cells != null);
         computeSize(-1, -1);
         if (legendStatus != null) {
             LEGEND_WIDTH = WIDTH / legendStatus.size();
@@ -167,16 +173,15 @@ public class DrawerWidget extends AbstractContainerDisplayWidget {
         redraw();
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public void setInput(Object object) {
-        Assert.isNotNull(object);
-        Assert.isTrue(object.getClass().isArray());
-        ContainerCell[][] cells = (ContainerCell[][]) object;
-        setCellsStatus(cells);
+    public void setCells(Map<RowColPos, ? extends Cell> cells) {
+        Assert.isNotNull(cells);
+        setCellsStatus((Map<RowColPos, ContainerCell>) cells);
     }
 
     @Override
-    public Object getObjectAtCoordinates(int x, int y) {
+    public Cell getObjectAtCoordinates(int x, int y) {
         if (cells == null) {
             return null;
         }
@@ -196,8 +201,8 @@ public class DrawerWidget extends AbstractContainerDisplayWidget {
         // convert subcell to real cell
         int xGridCellNumOffset = 9;
         int yGridCellNumOffset = 3;
-        return cells[cellNum + xGrid * xGridCellNumOffset - yGrid
-            * yGridCellNumOffset - 1][0];
+        return cells.get(new RowColPos(cellNum + xGrid * xGridCellNumOffset
+            - yGrid * yGridCellNumOffset - 1, 0));
     }
 
     protected void drawLegend(PaintEvent e, Color color, int index, String text) {

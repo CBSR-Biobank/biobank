@@ -13,6 +13,7 @@ import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.common.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
+import edu.ualberta.med.biobank.model.Cell;
 
 /**
  * Draw a grid according to specific parameters : total number of rows, total
@@ -60,12 +61,6 @@ public abstract class AbstractGridWidget extends AbstractContainerDisplayWidget 
     protected boolean hasLegend = false;
 
     public boolean legendOnSide = false;
-
-    /**
-     * if we don't want to display information for cells, can specify a selected
-     * box to highlight
-     */
-    private RowColPos selection;
 
     public AbstractGridWidget(Composite parent) {
         super(parent, SWT.DOUBLE_BUFFERED);
@@ -134,6 +129,19 @@ public abstract class AbstractGridWidget extends AbstractContainerDisplayWidget 
         }
         e.gc.setForeground(e.display.getSystemColor(SWT.COLOR_BLACK));
         e.gc.drawRectangle(rectangle);
+        if (cells != null) {
+            if (getMultiSelectionManager().isEnabled()) {
+                Cell cell = cells.get(new RowColPos(indexRow, indexCol));
+                if (cell != null && cell.isSelected()) {
+                    Rectangle rect = new Rectangle(rectangle.x + 5,
+                        rectangle.y + 5, rectangle.width - 10,
+                        rectangle.height - 10);
+                    Color color = e.display.getSystemColor(SWT.COLOR_BLUE);
+                    e.gc.setForeground(color);
+                    e.gc.drawRectangle(rect);
+                }
+            }
+        }
     }
 
     @SuppressWarnings("unused")
@@ -284,15 +292,6 @@ public abstract class AbstractGridWidget extends AbstractContainerDisplayWidget 
 
     public int getCols() {
         return columns;
-    }
-
-    /**
-     * selection start at 0:0
-     */
-    @Override
-    public void setSelection(RowColPos selectedBox) {
-        this.selection = selectedBox;
-        redraw();
     }
 
 }

@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.forms;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -83,7 +84,7 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
     private IObservableValue scanValidValue = new WritableValue(Boolean.TRUE,
         Boolean.class);
 
-    private PalletCell[][] cells;
+    private Map<RowColPos, PalletCell> cells;
 
     protected ContainerWrapper currentPalletWrapper;
 
@@ -326,7 +327,6 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
             palletTypesViewer.setSelection(new StructuredSelection(
                 palletContainerTypes.get(0)));
         }
-        // }
     }
 
     protected void scan() {
@@ -359,22 +359,21 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
                 boolean result = true;
                 Map<RowColPos, SampleWrapper> samples = currentPalletWrapper
                     .getSamples();
-                for (int i = 0; i < cells.length; i++) { // rows
-                    for (int j = 0; j < cells[i].length; j++) { // columns
-                        SampleWrapper expectedSample = null;
-                        if (samples != null) {
-                            expectedSample = samples.get(new RowColPos(i, j));
-                        }
-                        cells[i][j].setExpectedSample(expectedSample);
-                        result = setStatus(cells[i][j]) && result;
+                for (RowColPos rcp : cells.keySet()) {
+                    SampleWrapper expectedSample = null;
+                    if (samples != null) {
+                        expectedSample = samples.get(rcp);
                     }
+                    PalletCell cell = cells.get(rcp);
+                    cell.setExpectedSample(expectedSample);
+                    result = setStatus(cell) && result;
                 }
                 scanValidValue.setValue(result);
-                palletWidget.setScannedElements(cells);
+                palletWidget.setCells(cells);
                 scanLaunchedValue.setValue(true);
                 setDirty(true);
             } else {
-                palletWidget.setScannedElements(PalletCell.getEmptyCells());
+                palletWidget.setCells(new HashMap<RowColPos, PalletCell>());
                 showOnlyPallet(true);
                 scanValidValue.setValue(false);
             }
@@ -546,32 +545,29 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
         int totalNb = 0;
         StringBuffer sb = new StringBuffer("ALIQUOTS ASSIGNED:");
         try {
-            for (int i = 0; i < cells.length; i++) {
-                for (int j = 0; j < cells[i].length; j++) {
-                    PalletCell cell = cells[i][j];
-                    if (cell != null
-                        && (cell.getStatus() == SampleCellStatus.NEW || cell
-                            .getStatus() == SampleCellStatus.MOVED)) {
-                        SampleWrapper sample = cell.getSample();
-                        if (sample != null) {
-                            sample.setPosition(new RowColPos(i, j));
-                            sample.setParent(currentPalletWrapper);
-                            sample.persist();
-                            PatientVisitWrapper visit = sample
-                                .getPatientVisit();
-                            sb.append("\nASSIGNED position ").append(
-                                sample.getPositionString());
-                            sb.append(" to aliquot ").append(cell.getValue());
-                            sb.append(" - Type: ").append(
-                                sample.getSampleType().getName());
-                            sb.append(" - Patient: ").append(
-                                visit.getPatient().getNumber());
-                            sb.append(" - Visit: ").append(
-                                visit.getFormattedDateProcessed());
-                            sb.append(" - ").append(
-                                visit.getShipment().getClinic().getName());
-                            totalNb++;
-                        }
+            for (RowColPos rcp : cells.keySet()) {
+                PalletCell cell = cells.get(rcp);
+                if (cell != null
+                    && (cell.getStatus() == SampleCellStatus.NEW || cell
+                        .getStatus() == SampleCellStatus.MOVED)) {
+                    SampleWrapper sample = cell.getSample();
+                    if (sample != null) {
+                        sample.setPosition(rcp);
+                        sample.setParent(currentPalletWrapper);
+                        sample.persist();
+                        PatientVisitWrapper visit = sample.getPatientVisit();
+                        sb.append("\nASSIGNED position ").append(
+                            sample.getPositionString());
+                        sb.append(" to aliquot ").append(cell.getValue());
+                        sb.append(" - Type: ").append(
+                            sample.getSampleType().getName());
+                        sb.append(" - Patient: ").append(
+                            visit.getPatient().getNumber());
+                        sb.append(" - Visit: ").append(
+                            visit.getFormattedDateProcessed());
+                        sb.append(" - ").append(
+                            visit.getShipment().getClinic().getName());
+                        totalNb++;
                     }
                 }
             }
@@ -606,7 +602,7 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
         }
         freezerWidget.setSelection(null);
         hotelWidget.setSelection(null);
-        palletWidget.setScannedElements(null);
+        palletWidget.setCells(null);
         cells = null;
         scanLaunchedValue.setValue(false);
         initPalletValues();

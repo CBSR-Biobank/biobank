@@ -1,22 +1,23 @@
 package edu.ualberta.med.biobank.model;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import edu.ualberta.med.biobank.common.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
 import edu.ualberta.med.scanlib.ScanCell;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
-public class PalletCell {
+public class PalletCell extends Cell {
 
     private SampleCellStatus status;
 
     private String information;
 
     private String title;
-
-    private boolean selected = false;
 
     private SampleTypeWrapper type;
 
@@ -30,23 +31,24 @@ public class PalletCell {
         this.scanCell = scanCell;
     }
 
-    public static PalletCell[][] convertArray(ScanCell[][] scancells) {
-        PalletCell[][] palletScanned = new PalletCell[ScanCell.ROW_MAX][ScanCell.COL_MAX];
+    public static Map<RowColPos, PalletCell> convertArray(ScanCell[][] scancells) {
+        Map<RowColPos, PalletCell> palletScanned = new HashMap<RowColPos, PalletCell>();
         for (int i = 0; i < ScanCell.ROW_MAX; i++) {
             for (int j = 0; j < ScanCell.COL_MAX; j++) {
-                palletScanned[i][j] = new PalletCell(scancells[i][j]);
+                palletScanned.put(new RowColPos(i, j), new PalletCell(
+                    scancells[i][j]));
             }
         }
         return palletScanned;
     }
 
-    public static PalletCell[][] getRandomScanLink() {
+    public static Map<RowColPos, PalletCell> getRandomScanLink() {
         return convertArray(ScanCell.getRandom());
     }
 
-    public static PalletCell[][] getRandomScanLinkWithSamplesAlreadyLinked(
+    public static Map<RowColPos, PalletCell> getRandomScanLinkWithSamplesAlreadyLinked(
         WritableApplicationService appService, Integer siteId) throws Exception {
-        PalletCell[][] cells = convertArray(ScanCell.getRandom());
+        Map<RowColPos, PalletCell> cells = convertArray(ScanCell.getRandom());
         List<SampleWrapper> samples = SampleWrapper
             .getRandomSamplesAlreadyLinked(appService, siteId);
         if (samples.size() > 1) {
@@ -54,55 +56,55 @@ public class PalletCell {
             int col = 3;
             ScanCell scanCell = new ScanCell(row, col, samples.get(0)
                 .getInventoryId());
-            cells[row][col] = new PalletCell(scanCell);
+            cells.put(new RowColPos(row, col), new PalletCell(scanCell));
             row = 3;
             col = 1;
             scanCell = new ScanCell(row, col, samples.get(1).getInventoryId());
-            cells[row][col] = new PalletCell(scanCell);
+            cells.put(new RowColPos(row, col), new PalletCell(scanCell));
         }
         return cells;
     }
 
-    public static PalletCell[][] getRandomSamplesAlreadyAssigned(
+    public static Map<RowColPos, PalletCell> getRandomSamplesAlreadyAssigned(
         WritableApplicationService appService, Integer siteId) throws Exception {
-        PalletCell[][] palletScanned = initArray();
+        Map<RowColPos, PalletCell> palletScanned = initArray();
         List<SampleWrapper> randomSamples = SampleWrapper
             .getRandomSamplesAlreadyAssigned(appService, siteId);
         if (randomSamples.size() > 0) {
-            palletScanned[0][0] = new PalletCell(new ScanCell(0, 0,
-                randomSamples.get(0).getInventoryId()));
+            palletScanned.put(new RowColPos(0, 0), new PalletCell(new ScanCell(
+                0, 0, randomSamples.get(0).getInventoryId())));
         }
         if (randomSamples.size() > 1) {
-            palletScanned[2][4] = new PalletCell(new ScanCell(2, 4,
-                randomSamples.get(1).getInventoryId()));
+            palletScanned.put(new RowColPos(2, 4), new PalletCell(new ScanCell(
+                2, 4, randomSamples.get(1).getInventoryId())));
         }
         return palletScanned;
     }
 
-    public static PalletCell[][] getRandomSamplesNotAssigned(
+    public static Map<RowColPos, PalletCell> getRandomSamplesNotAssigned(
         WritableApplicationService appService, Integer siteId)
         throws ApplicationException {
-        PalletCell[][] palletScanned = initArray();
+        Map<RowColPos, PalletCell> palletScanned = initArray();
         List<SampleWrapper> randomSamples = SampleWrapper
             .getRandomSamplesNotAssigned(appService, siteId);
         if (randomSamples.size() > 1) {
             // Random r = new Random();
             // int sample1 = r.nextInt(samples.size());
             // int sample2 = r.nextInt(samples.size());
-            palletScanned[0][0] = new PalletCell(new ScanCell(0, 0,
-                randomSamples.get(0).getInventoryId()));
+            palletScanned.put(new RowColPos(0, 0), new PalletCell(new ScanCell(
+                0, 0, randomSamples.get(0).getInventoryId())));
             // palletScanned[2][4] = new PalletCell(new ScanCell(2, 4, samples
             // .get(1).getInventoryId()));
         }
         return palletScanned;
     }
 
-    private static PalletCell[][] initArray() {
-        PalletCell[][] palletScanned = new PalletCell[ScanCell.ROW_MAX][ScanCell.COL_MAX];
+    private static Map<RowColPos, PalletCell> initArray() {
+        Map<RowColPos, PalletCell> palletScanned = new HashMap<RowColPos, PalletCell>();
         for (int indexRow = 0; indexRow < ScanCell.ROW_MAX; indexRow++) {
             for (int indexCol = 0; indexCol < ScanCell.COL_MAX; indexCol++) {
-                palletScanned[indexRow][indexCol] = new PalletCell(
-                    new ScanCell(indexRow, indexCol, null));
+                palletScanned.put(new RowColPos(indexRow, indexCol),
+                    new PalletCell(new ScanCell(indexRow, indexCol, null)));
             }
         }
         return palletScanned;
@@ -138,14 +140,6 @@ public class PalletCell {
         this.information = information;
     }
 
-    public boolean isSelected() {
-        return selected;
-    }
-
-    public void setSelected(boolean selected) {
-        this.selected = selected;
-    }
-
     public SampleTypeWrapper getType() {
         return type;
     }
@@ -169,6 +163,7 @@ public class PalletCell {
         return null;
     }
 
+    @Override
     public Integer getRow() {
         if (scanCell != null) {
             return scanCell.getRow();
@@ -176,6 +171,7 @@ public class PalletCell {
         return null;
     }
 
+    @Override
     public Integer getCol() {
         if (scanCell != null) {
             return scanCell.getColumn();
@@ -187,10 +183,6 @@ public class PalletCell {
         return cell != null && cell.getValue() != null;
     }
 
-    public static PalletCell[][] getEmptyCells() {
-        return new PalletCell[ScanCell.ROW_MAX][ScanCell.COL_MAX];
-    }
-
     public void setExpectedSample(SampleWrapper expectedSample) {
         this.expectedSample = expectedSample;
     }
@@ -198,4 +190,5 @@ public class PalletCell {
     public SampleWrapper getExpectedSample() {
         return expectedSample;
     }
+
 }

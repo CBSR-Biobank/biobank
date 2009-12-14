@@ -3,7 +3,6 @@ package edu.ualberta.med.biobank.widgets.grids;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseTrackAdapter;
@@ -16,10 +15,9 @@ import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.common.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
+import edu.ualberta.med.biobank.model.Cell;
 import edu.ualberta.med.biobank.model.PalletCell;
 import edu.ualberta.med.biobank.model.SampleCellStatus;
-import edu.ualberta.med.biobank.widgets.listeners.ScanPalletModificationEvent;
-import edu.ualberta.med.biobank.widgets.listeners.ScanPalletModificationListener;
 import edu.ualberta.med.scanlib.ScanCell;
 
 /**
@@ -40,17 +38,12 @@ public class ScanPalletWidget extends AbstractGridWidget {
     public static final int PALLET_HEIGHT_AND_LEGEND = PALLET_HEIGHT
         + LEGEND_HEIGHT + 4;
 
-    protected PalletCell[][] scannedElements;
-
-    List<ScanPalletModificationListener> listeners;
-
     public ScanPalletWidget(Composite parent) {
         this(parent, true);
     }
 
     public ScanPalletWidget(Composite parent, boolean hasLegend) {
         super(parent);
-        listeners = new ArrayList<ScanPalletModificationListener>();
         addMouseTrackListener(new MouseTrackAdapter() {
             @Override
             public void mouseHover(MouseEvent e) {
@@ -108,11 +101,14 @@ public class ScanPalletWidget extends AbstractGridWidget {
 
     @Override
     protected String getMiddleTextForBox(int indexRow, int indexCol) {
-        if (scannedElements != null
-            && scannedElements[indexRow][indexCol] != null) {
-            String title = scannedElements[indexRow][indexCol].getTitle();
-            if (title != null) {
-                return title;
+        if (cells != null) {
+            PalletCell cell = (PalletCell) cells.get(new RowColPos(indexRow,
+                indexCol));
+            if (cell != null) {
+                String title = cell.getTitle();
+                if (title != null) {
+                    return title;
+                }
             }
         }
         return "";
@@ -127,12 +123,14 @@ public class ScanPalletWidget extends AbstractGridWidget {
 
     @Override
     protected String getBottomTextForBox(int indexRow, int indexCol) {
-        if (scannedElements != null
-            && scannedElements[indexRow][indexCol] != null) {
-            SampleWrapper sample = scannedElements[indexRow][indexCol]
-                .getSample();
-            if (sample != null) {
-                return sample.getSampleType().getNameShort();
+        if (cells != null) {
+            PalletCell cell = (PalletCell) cells.get(new RowColPos(indexRow,
+                indexCol));
+            if (cell != null) {
+                SampleWrapper sample = cell.getSample();
+                if (sample != null) {
+                    return sample.getSampleType().getNameShort();
+                }
             }
         }
         return "";
@@ -141,65 +139,32 @@ public class ScanPalletWidget extends AbstractGridWidget {
     @Override
     protected void drawRectangle(PaintEvent e, Rectangle rectangle,
         int indexRow, int indexCol) {
-        if (scannedElements != null
-            && scannedElements[indexRow][indexCol] != null
-            && scannedElements[indexRow][indexCol].getStatus() != null) {
-            Color color = scannedElements[indexRow][indexCol].getStatus()
-                .getColor();
-            e.gc.setBackground(color);
-            e.gc.fillRectangle(rectangle);
+        if (cells != null) {
+            PalletCell cell = (PalletCell) cells.get(new RowColPos(indexRow,
+                indexCol));
+            if (cell != null && cell.getStatus() != null) {
+                Color color = cell.getStatus().getColor();
+                e.gc.setBackground(color);
+                e.gc.fillRectangle(rectangle);
+            }
         }
         e.gc.setForeground(e.display.getSystemColor(SWT.COLOR_BLACK));
         e.gc.drawRectangle(rectangle);
-    }
 
-    public void setScannedElements(PalletCell[][] elements) {
-        this.scannedElements = elements;
-        redraw();
     }
 
     @Override
-    public void setInput(Object object) {
-        Assert.isNotNull(object);
-        Assert.isTrue(object.getClass().isArray());
-        PalletCell[][] cells = (PalletCell[][]) object;
-        setScannedElements(cells);
-    }
-
-    public PalletCell[][] getScannedElements() {
-        return scannedElements;
-    }
-
-    @Override
-    public Object getObjectAtCoordinates(int xPosition, int yPosition) {
-        if (scannedElements == null) {
+    public Cell getObjectAtCoordinates(int xPosition, int yPosition) {
+        if (cells == null) {
             return null;
         }
         int col = xPosition / getCellWidth();
         int row = yPosition / getCellHeight();
         if (col >= 0 && col < ScanCell.COL_MAX && row >= 0
             && row < ScanCell.ROW_MAX) {
-            return scannedElements[row][col];
+            return cells.get(new RowColPos(row, col));
         }
         return null;
     }
 
-    public void addModificationListener(ScanPalletModificationListener listener) {
-        listeners.add(listener);
-    }
-
-    public void removeModificationListener(
-        ScanPalletModificationListener listener) {
-        listeners.remove(listener);
-    }
-
-    public void notifyListeners(ScanPalletModificationEvent event) {
-        for (ScanPalletModificationListener listener : listeners) {
-            listener.modification(event);
-        }
-    }
-
-    @Override
-    public void setSelection(RowColPos selection) {
-    }
 }

@@ -2,7 +2,7 @@ package edu.ualberta.med.biobank.model;
 
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 
-public class ContainerCell {
+public class ContainerCell extends Cell {
 
     private Integer row;
 
@@ -33,10 +33,12 @@ public class ContainerCell {
         this.status = status;
     }
 
+    @Override
     public Integer getRow() {
         return row;
     }
 
+    @Override
     public Integer getCol() {
         return col;
     }
@@ -48,4 +50,5 @@ public class ContainerCell {
     public void setContainer(ContainerWrapper container) {
         this.container = container;
     }
+
 }

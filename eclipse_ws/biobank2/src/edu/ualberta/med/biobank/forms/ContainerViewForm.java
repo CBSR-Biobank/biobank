@@ -1,7 +1,9 @@
 package edu.ualberta.med.biobank.forms;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.Assert;
@@ -28,6 +30,7 @@ import edu.ualberta.med.biobank.common.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.forms.input.FormInput;
+import edu.ualberta.med.biobank.model.Cell;
 import edu.ualberta.med.biobank.model.ContainerCell;
 import edu.ualberta.med.biobank.model.ContainerStatus;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
@@ -35,6 +38,9 @@ import edu.ualberta.med.biobank.treeview.ContainerAdapter;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.widgets.grids.AbstractContainerDisplayWidget;
 import edu.ualberta.med.biobank.widgets.grids.ContainerDisplayFatory;
+import edu.ualberta.med.biobank.widgets.grids.MultiSelectionEvent;
+import edu.ualberta.med.biobank.widgets.grids.MultiSelectionListener;
+import edu.ualberta.med.biobank.widgets.grids.MultiSelectionSpecificBehaviour;
 import edu.ualberta.med.biobank.widgets.infotables.SamplesListInfoTable;
 
 public class ContainerViewForm extends BiobankViewForm {
@@ -70,9 +76,13 @@ public class ContainerViewForm extends BiobankViewForm {
 
     private AbstractContainerDisplayWidget containerWidget;
 
-    private ContainerCell[][] cells;
+    private Map<RowColPos, ContainerCell> cells;
 
     private boolean childrenOk = true;
+
+    private ComboViewer initSelectionCv;
+
+    private Button initializeSelectionButton;
 
     @Override
     public void init() throws Exception {
@@ -147,13 +157,13 @@ public class ContainerViewForm extends BiobankViewForm {
             if (colCap == 0)
                 colCap = 1;
 
-            cells = new ContainerCell[rowCap][colCap];
+            cells = new HashMap<RowColPos, ContainerCell>();
             Map<RowColPos, ContainerWrapper> childrenMap = container
                 .getChildren();
             for (int i = 0; i < rowCap; i++) {
                 for (int j = 0; j < colCap; j++) {
                     ContainerCell cell = new ContainerCell(i, j);
-                    cells[i][j] = cell;
+                    cells.put(new RowColPos(i, j), cell);
                     ContainerWrapper container = childrenMap.get(new RowColPos(
                         i, j));
                     if (container == null) {
@@ -173,7 +183,7 @@ public class ContainerViewForm extends BiobankViewForm {
 
     private void refreshVis() {
         initCells();
-        containerWidget.setInput(cells);
+        containerWidget.setCells(cells);
     }
 
     protected void createVisualizeContainer() {
@@ -189,16 +199,36 @@ public class ContainerViewForm extends BiobankViewForm {
         containerWidget = ContainerDisplayFatory
             .createWidget(client, container);
         containerWidget.initLegend();
-        containerWidget.setInput(cells);
+        containerWidget.setCells(cells);
         containerWidget.addMouseListener(new MouseAdapter() {
             @Override
-            public void mouseDown(MouseEvent e) {
+            public void mouseDoubleClick(MouseEvent e) {
                 Object object = ((AbstractContainerDisplayWidget) e.widget)
                     .getObjectAtCoordinates(e.x, e.y);
                 if (object != null)
                     openFormFor((ContainerCell) object);
             }
         });
+        containerWidget.getMultiSelectionManager().enableMultiSelection(
+            new MultiSelectionSpecificBehaviour() {
+                @Override
+                public void removeSelection(Cell cell) {
+                }
+
+                @Override
+                public boolean isSelectable(Cell cell) {
+                    return true;
+                }
+            });
+        containerWidget.getMultiSelectionManager().addMultiSelectionListener(
+            new MultiSelectionListener() {
+                @Override
+                public void selectionChanged(MultiSelectionEvent mse) {
+                    boolean enable = mse.selections > 0;
+                    initSelectionCv.getCombo().setEnabled(enable);
+                    initializeSelectionButton.setEnabled(enable);
+                }
+            });
         containerWidget.displayFullInfoString(true);
 
         addChildrenActions(client);
@@ -246,6 +276,22 @@ public class ContainerViewForm extends BiobankViewForm {
                 }
             }
         });
+
+        // Initialisation action for selections
+        initSelectionCv = createComboViewer(multiSection,
+            "Initialize selection to", containerTypes, containerTypes.get(0));
+        initializeSelectionButton = toolkit.createButton(multiSection,
+            "Initialize", SWT.PUSH);
+        initializeSelectionButton.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                ContainerTypeWrapper type = (ContainerTypeWrapper) ((IStructuredSelection) initSelectionCv
+                    .getSelection()).getFirstElement();
+                initSelection(type);
+            }
+        });
+        initSelectionCv.getCombo().setEnabled(false);
+        initializeSelectionButton.setEnabled(false);
     }
 
     private void initContainers(final ContainerTypeWrapper type) {
@@ -259,23 +305,27 @@ public class ContainerViewForm extends BiobankViewForm {
                     BioBankPlugin.openAsyncError(
                         "Error while creating children", e);
                 }
-                // refresh
-                if (initDone) {
-                    PlatformUI.getWorkbench().getDisplay().asyncExec(
-                        new Runnable() {
-                            public void run() {
-                                try {
-                                    reload();
-                                } catch (Exception e) {
-                                    LOGGER.error("Error loading", e);
-                                }
-                                containerAdapter.performExpand();
-                            }
-                        });
-                }
+                refresh(initDone, false);
             }
         });
+    }
 
+    private void refresh(boolean initDone, final boolean rebuild) {
+        if (initDone) {
+            PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable() {
+                public void run() {
+                    try {
+                        reload();
+                    } catch (Exception e) {
+                        LOGGER.error("Error loading", e);
+                    }
+                    if (rebuild) {
+                        containerAdapter.rebuild();
+                    }
+                    containerAdapter.performExpand();
+                }
+            });
+        }
     }
 
     private void deleteContainers(final ContainerTypeWrapper type) {
@@ -287,28 +337,34 @@ public class ContainerViewForm extends BiobankViewForm {
                 } catch (Exception ex) {
                     BioBankPlugin.openAsyncError("Can't Delete Containers", ex);
                 }
-                if (deleteDones) {
-                    PlatformUI.getWorkbench().getDisplay().asyncExec(
-                        new Runnable() {
-                            public void run() {
-                                try {
-                                    reload();
-                                } catch (Exception e) {
-                                    LOGGER.error("Error loading", e);
-                                }
-                                containerAdapter.rebuild();
-                                containerAdapter.performExpand();
-                            }
-                        });
-                }
+                refresh(deleteDones, true);
             }
         });
+    }
+
+    private void initSelection(final ContainerTypeWrapper type) {
+        BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
+            public void run() {
+                boolean initDone = true;
+                try {
+                    Set<RowColPos> positions = containerWidget
+                        .getMultiSelectionManager().getSelectedPositions();
+                    container.initChildrenWithType(type, positions);
+                } catch (Exception e) {
+                    initDone = false;
+                    BioBankPlugin.openAsyncError(
+                        "Error while creating children", e);
+                }
+                refresh(initDone, false);
+            }
+        });
+
     }
 
     private void openFormFor(ContainerCell cell) {
         ContainerAdapter newAdapter = null;
         ContainerAdapter.closeEditor(new FormInput(containerAdapter));
-        if (cells[cell.getRow()][cell.getCol()].getStatus() == ContainerStatus.NOT_INITIALIZED) {
+        if (cell.getStatus() == ContainerStatus.NOT_INITIALIZED) {
             ContainerWrapper containerToOpen = cell.getContainer();
             if (containerToOpen == null) {
                 containerToOpen = new ContainerWrapper(appService);

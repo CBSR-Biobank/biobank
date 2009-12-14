@@ -1087,6 +1087,10 @@ public class TestContainer extends TestDatabase {
         }
     }
 
+    public void testInitChildrenWithTypeWithPositionList() throws Exception {
+        Assert.fail("not yet implemented");
+    }
+
     @Test
     public void testDeleteChildrenWithType() throws Exception {
         ContainerWrapper top, childL1, childL2, childL3;
