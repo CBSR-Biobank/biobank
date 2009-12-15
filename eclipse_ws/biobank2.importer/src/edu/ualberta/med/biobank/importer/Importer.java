@@ -53,8 +53,7 @@ public class Importer {
 
     public static final String DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
-    public static final SimpleDateFormat dateTimeFormatter = new SimpleDateFormat(
-        DATE_TIME_FORMAT);
+    public static SimpleDateFormat dateTimeFormatter;
 
     private static WritableApplicationService appService;
 
@@ -84,6 +83,8 @@ public class Importer {
     };
 
     public static void main(String [] args) throws Exception {
+        dateTimeFormatter = new SimpleDateFormat(DATE_TIME_FORMAT);
+
         tables = new ArrayList<String>();
 
         try {
@@ -228,7 +229,7 @@ public class Importer {
 
             if (study == null) {
                 System.out.println("ERROR: study with short name \""
-                    + studyNameShort + "\" not found. Patient id: "
+                    + studyNameShort + "\" not found, patient id: "
                     + rs.getInt(1));
                 continue;
             }
@@ -306,6 +307,11 @@ public class Importer {
                 shipment.setClinic(clinic);
                 shipment.setWaybill(dateReceived);
                 shipment.setDateReceived(dateTimeFormatter.parse(dateReceived));
+
+                List<PatientWrapper> patients = shipment.getPatientCollection();
+                patients.add(patient);
+                shipment.setPatientCollection(patients);
+
                 shipment.persist();
 
                 System.out.println("importing shipment: patient/"
