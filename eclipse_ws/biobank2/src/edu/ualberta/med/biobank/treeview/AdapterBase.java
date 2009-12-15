@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.treeview;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -18,11 +19,15 @@ import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import org.springframework.remoting.RemoteAccessException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.forms.input.FormInput;
+import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedEvent;
+import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedListener;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 /**
@@ -34,7 +39,8 @@ public abstract class AdapterBase {
     private static Logger LOGGER = Logger
         .getLogger(AdapterBase.class.getName());
 
-    protected IDeltaListener listener = NullDeltaListener.getSoleInstance();
+    protected IDeltaListener deltaListener = NullDeltaListener
+        .getSoleInstance();
 
     protected ModelWrapper<?> modelObject;
 
@@ -58,6 +64,9 @@ public abstract class AdapterBase {
      */
     private boolean editable = true;
 
+    // FIXME can we merge this list of listeners with the DeltaListener ?
+    private List<AdapterChangedListener> listeners;
+
     public AdapterBase(AdapterBase parent, ModelWrapper<?> object) {
         this(parent, object, true);
     }
@@ -69,9 +78,9 @@ public abstract class AdapterBase {
         this.enableActions = enableActions;
         children = new ArrayList<AdapterBase>();
         if (parent != null) {
-            addListener(parent.listener);
+            addListener(parent.deltaListener);
         }
-
+        listeners = new ArrayList<AdapterChangedListener>();
         Assert.isTrue(checkIntegrity(), "integrity checks failed");
     }
 
@@ -182,7 +191,7 @@ public abstract class AdapterBase {
 
         child.setParent(this);
         children.add(child);
-        child.addListener(listener);
+        child.addListener(deltaListener);
         fireAdd(child);
     }
 
@@ -192,22 +201,19 @@ public abstract class AdapterBase {
             + existingNode.getName());
         newNode.setParent(this);
         children.add(pos + 1, newNode);
-        newNode.addListener(listener);
+        newNode.addListener(deltaListener);
         fireAdd(newNode);
     }
 
     public void removeChild(AdapterBase item) {
         if (children.size() == 0)
             return;
-
         AdapterBase itemToRemove = null;
-
         for (AdapterBase child : children) {
             if ((child.getId() == item.getId())
                 && child.getName().equals(item.getName()))
                 itemToRemove = child;
         }
-
         if (itemToRemove != null) {
             closeEditor(new FormInput(itemToRemove));
             children.remove(itemToRemove);
@@ -218,14 +224,11 @@ public abstract class AdapterBase {
     public void removeByName(String name) {
         if (children.size() == 0)
             return;
-
         AdapterBase itemToRemove = null;
-
         for (AdapterBase child : children) {
             if (child.getName().equals(name))
                 itemToRemove = child;
         }
-
         if (itemToRemove != null) {
             children.remove(itemToRemove);
             fireRemove(itemToRemove);
@@ -236,6 +239,7 @@ public abstract class AdapterBase {
         for (AdapterBase child : new ArrayList<AdapterBase>(getChildren())) {
             removeChild(child);
         }
+        notifyListeners();
     }
 
     public AdapterBase contains(AdapterBase item) {
@@ -275,21 +279,21 @@ public abstract class AdapterBase {
     }
 
     public void addListener(IDeltaListener listener) {
-        this.listener = listener;
+        this.deltaListener = listener;
     }
 
     public void removeListener(IDeltaListener listener) {
-        if (this.listener.equals(listener)) {
-            this.listener = NullDeltaListener.getSoleInstance();
+        if (this.deltaListener.equals(listener)) {
+            this.deltaListener = NullDeltaListener.getSoleInstance();
         }
     }
 
     protected void fireAdd(Object added) {
-        listener.add(new DeltaEvent(added));
+        deltaListener.add(new DeltaEvent(added));
     }
 
     protected void fireRemove(Object removed) {
-        listener.remove(new DeltaEvent(removed));
+        deltaListener.remove(new DeltaEvent(removed));
     }
 
     public abstract void performDoubleClick();
@@ -352,7 +356,45 @@ public abstract class AdapterBase {
      * 
      * @param updateNode If not null, the node in the treeview to update.
      */
-    public abstract void loadChildren(boolean updateNode);
+    public void loadChildren(boolean updateNode) {
+        try {
+            Collection<? extends ModelWrapper<?>> children = getWrapperChildren();
+            if (children != null) {
+                for (ModelWrapper<?> child : children) {
+                    AdapterBase node = getChild(child.getId());
+                    if (node == null) {
+                        node = createChildNode(child);
+                        addChild(node);
+                    }
+                    if (updateNode) {
+                        SessionManager.updateTreeNode(node);
+                    }
+                }
+                notifyListeners();
+            }
+        } catch (final RemoteAccessException exp) {
+            BioBankPlugin.openRemoteAccessErrorMessage();
+        } catch (Exception e) {
+            LOGGER.error("Error while loading children of node "
+                + modelObject.toString(), e);
+        }
+    }
+
+    /**
+     * Create a adequat node child for this node
+     * 
+     * @param child the child model object
+     */
+    protected abstract AdapterBase createChildNode(ModelWrapper<?> child);
+
+    /**
+     * get the list of this model object children that this node should have as
+     * children nodes.
+     * 
+     * @throws Exception
+     */
+    protected abstract Collection<? extends ModelWrapper<?>> getWrapperChildren()
+        throws Exception;
 
     public static void closeEditor(FormInput input) {
         IWorkbenchPage page = PlatformUI.getWorkbench()
@@ -423,6 +465,8 @@ public abstract class AdapterBase {
                         if (modelObject != null) {
                             modelObject.delete();
                             getParent().removeChild(AdapterBase.this);
+                            getParent().notifyListeners();
+                            notifyListeners();
                         }
                     } catch (BiobankCheckException bce) {
                         BioBankPlugin.openAsyncError("Delete failed", bce);
@@ -440,6 +484,24 @@ public abstract class AdapterBase {
 
     public void setEditable(boolean editable) {
         this.editable = editable;
+    }
+
+    public void addChangedListener(AdapterChangedListener listener) {
+        listeners.add(listener);
+    }
+
+    public void removeChangedListener(AdapterChangedListener listener) {
+        listeners.remove(listener);
+    }
+
+    public void notifyListeners(AdapterChangedEvent event) {
+        for (AdapterChangedListener listener : listeners) {
+            listener.changed(event);
+        }
+    }
+
+    public void notifyListeners() {
+        notifyListeners(new AdapterChangedEvent(this));
     }
 
 }
