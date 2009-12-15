@@ -14,11 +14,16 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IEditorSite;
+import org.eclipse.ui.PartInitException;
 import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
+import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedEvent;
+import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedListener;
 
 /**
  * The base class for all BioBank2 Java Client view forms. The forms are usually
@@ -39,6 +44,22 @@ public abstract class BiobankViewForm extends BiobankFormBase {
     private static ImageDescriptor editActionImage = ImageDescriptor
         .createFromImage(BioBankPlugin.getDefault().getImageRegistry().get(
             BioBankPlugin.IMG_EDIT_FORM));
+
+    @Override
+    public void init(IEditorSite editorSite, IEditorInput input)
+        throws PartInitException {
+        super.init(editorSite, input);
+        adapter.addChangedListener(new AdapterChangedListener() {
+            @Override
+            public void changed(AdapterChangedEvent event) {
+                try {
+                    reload();
+                } catch (Exception e) {
+                    LOGGER.error("Error sending event", e);
+                }
+            }
+        });
+    }
 
     @Override
     public void createPartControl(Composite parent) {

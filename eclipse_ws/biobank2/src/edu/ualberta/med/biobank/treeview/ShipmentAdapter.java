@@ -1,14 +1,13 @@
 package edu.ualberta.med.biobank.treeview;
 
-import java.util.List;
+import java.util.Collection;
 
-import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 
-import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.forms.ShipmentEntryForm;
@@ -16,9 +15,6 @@ import edu.ualberta.med.biobank.forms.ShipmentViewForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 
 public class ShipmentAdapter extends AdapterBase {
-
-    private static Logger LOGGER = Logger.getLogger(ShipmentAdapter.class
-        .getName());
 
     public ShipmentAdapter(AdapterBase parent, ShipmentWrapper shipment) {
         super(parent, shipment);
@@ -42,33 +38,6 @@ public class ShipmentAdapter extends AdapterBase {
     }
 
     @Override
-    public void loadChildren(boolean updateNode) {
-        try {
-            ShipmentWrapper shipment = getWrapper();
-            // read from database again
-            shipment.reload();
-
-            List<PatientVisitWrapper> visits = shipment
-                .getPatientVisitCollection();
-            for (PatientVisitWrapper visit : visits) {
-                PatientVisitAdapter node = (PatientVisitAdapter) getChild(visit
-                    .getId());
-                if (node == null) {
-                    node = new PatientVisitAdapter(this, visit);
-                    addChild(node);
-                }
-                if (updateNode) {
-                    SessionManager.updateTreeNode(node);
-                }
-            }
-        } catch (Exception e) {
-            LOGGER.error("Error while loading children of shipment "
-                + getWrapper().getFormattedDateShipped(), e);
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
     public void performDoubleClick() {
         openForm(new FormInput(this), ShipmentViewForm.ID);
     }
@@ -82,6 +51,19 @@ public class ShipmentAdapter extends AdapterBase {
     @Override
     public AdapterBase accept(NodeSearchVisitor visitor) {
         return visitor.visit(this);
+    }
+
+    @Override
+    protected AdapterBase createChildNode(ModelWrapper<?> child) {
+        Assert.isTrue(child instanceof PatientVisitWrapper);
+        return new PatientVisitAdapter(this, (PatientVisitWrapper) child);
+    }
+
+    @Override
+    protected Collection<? extends ModelWrapper<?>> getWrapperChildren()
+        throws Exception {
+        getWrapper().reload();
+        return getWrapper().getPatientVisitCollection();
     }
 
 }

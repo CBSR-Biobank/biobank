@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.treeview;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -17,9 +18,11 @@ import org.eclipse.ui.PlatformUI;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.forms.ContainerEntryForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
+import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedEvent;
 
 public class ContainerGroup extends AdapterBase {
 
@@ -70,32 +73,6 @@ public class ContainerGroup extends AdapterBase {
     }
 
     @Override
-    public void loadChildren(boolean updateNode) {
-        SiteWrapper parentSite = ((SiteAdapter) getParent()).getWrapper();
-        Assert.isNotNull(parentSite, "site null");
-        try {
-            // read from database again
-            parentSite.reload();
-            for (ContainerWrapper containerWrapper : parentSite
-                .getTopContainerCollection()) {
-                ContainerAdapter node = (ContainerAdapter) getChild(containerWrapper
-                    .getId());
-                if (node == null) {
-                    node = new ContainerAdapter(this, containerWrapper);
-                    addChild(node);
-                }
-                if (updateNode) {
-                    SessionManager.updateTreeNode(node);
-                }
-            }
-        } catch (Exception e) {
-            LOGGER.error(
-                "Error while loading storage container group children for site "
-                    + parentSite.getName(), e);
-        }
-    }
-
-    @Override
     public String getTitle() {
         return null;
     }
@@ -105,4 +82,23 @@ public class ContainerGroup extends AdapterBase {
         return visitor.visit(this);
     }
 
+    @Override
+    protected AdapterBase createChildNode(ModelWrapper<?> child) {
+        Assert.isTrue(child instanceof ContainerWrapper);
+        return new ContainerAdapter(this, (ContainerWrapper) child);
+    }
+
+    @Override
+    protected Collection<? extends ModelWrapper<?>> getWrapperChildren()
+        throws Exception {
+        SiteWrapper parentSite = ((SiteAdapter) getParent()).getWrapper();
+        Assert.isNotNull(parentSite, "site null");
+        parentSite.reload();
+        return parentSite.getTopContainerCollection();
+    }
+
+    @Override
+    public void notifyListeners(AdapterChangedEvent event) {
+        getParent().notifyListeners(event);
+    }
 }

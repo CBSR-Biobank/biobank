@@ -396,13 +396,15 @@ public class ContainerViewForm extends BiobankViewForm {
 
     @Override
     protected void reload() throws Exception {
-        containerAdapter.getContainer().reload();
-        form.setText("Container " + container.getLabel() + " ("
-            + container.getContainerType().getName() + ")");
-        if (container.getContainerType().getChildContainerTypeCollection()
-            .size() > 0)
-            refreshVis();
-        setContainerValues();
+        if (!form.isDisposed()) {
+            containerAdapter.getContainer().reload();
+            form.setText("Container " + container.getLabel() + " ("
+                + container.getContainerType().getName() + ")");
+            if (container.getContainerType().getChildContainerTypeCollection()
+                .size() > 0)
+                refreshVis();
+            setContainerValues();
+        }
     }
 
     @Override

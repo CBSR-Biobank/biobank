@@ -1,10 +1,13 @@
 package edu.ualberta.med.biobank.treeview;
 
+import java.util.Collection;
+
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 
+import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.forms.SiteEntryForm;
 import edu.ualberta.med.biobank.forms.SiteViewForm;
@@ -81,13 +84,19 @@ public class SiteAdapter extends AdapterBase {
     }
 
     @Override
-    public void loadChildren(boolean updateNode) {
-
+    public AdapterBase accept(NodeSearchVisitor visitor) {
+        return visitor.visit(this);
     }
 
     @Override
-    public AdapterBase accept(NodeSearchVisitor visitor) {
-        return visitor.visit(this);
+    protected AdapterBase createChildNode(ModelWrapper<?> child) {
+        return null;
+    }
+
+    @Override
+    protected Collection<? extends ModelWrapper<?>> getWrapperChildren()
+        throws Exception {
+        return null;
     }
 
 }

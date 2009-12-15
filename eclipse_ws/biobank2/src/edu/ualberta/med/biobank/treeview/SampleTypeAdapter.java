@@ -1,10 +1,13 @@
 package edu.ualberta.med.biobank.treeview;
 
+import java.util.Collection;
+
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 
+import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 
 public class SampleTypeAdapter extends AdapterBase {
@@ -35,10 +38,6 @@ public class SampleTypeAdapter extends AdapterBase {
     }
 
     @Override
-    public void loadChildren(boolean updateNode) {
-    }
-
-    @Override
     public String getTitle() {
         return getTitle("Sample Type");
     }
@@ -46,6 +45,17 @@ public class SampleTypeAdapter extends AdapterBase {
     @Override
     public AdapterBase accept(NodeSearchVisitor visitor) {
         return visitor.visit(this);
+    }
+
+    @Override
+    protected AdapterBase createChildNode(ModelWrapper<?> child) {
+        return null;
+    }
+
+    @Override
+    protected Collection<? extends ModelWrapper<?>> getWrapperChildren()
+        throws Exception {
+        return null;
     }
 
 }

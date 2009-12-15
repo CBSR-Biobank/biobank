@@ -1,10 +1,13 @@
 package edu.ualberta.med.biobank.treeview;
 
+import java.util.Collection;
+
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class RootNode extends AdapterBase {
@@ -33,10 +36,6 @@ public class RootNode extends AdapterBase {
     }
 
     @Override
-    public void loadChildren(boolean updateNode) {
-    }
-
-    @Override
     public String getTitle() {
         return null;
     }
@@ -50,6 +49,17 @@ public class RootNode extends AdapterBase {
     @Override
     public AdapterBase accept(NodeSearchVisitor visitor) {
         return visitor.visit(this);
+    }
+
+    @Override
+    protected AdapterBase createChildNode(ModelWrapper<?> child) {
+        return null;
+    }
+
+    @Override
+    protected Collection<? extends ModelWrapper<?>> getWrapperChildren()
+        throws Exception {
+        return null;
     }
 
 }

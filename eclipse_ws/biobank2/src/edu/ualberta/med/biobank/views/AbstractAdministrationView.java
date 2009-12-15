@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.views;
 
+import java.util.Collection;
 import java.util.Map;
 
 import org.eclipse.jface.viewers.TreeViewer;
@@ -19,6 +20,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.services.ISourceProviderService;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.sourceproviders.SiteSelectionState;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.NodeSearchVisitor;
@@ -130,10 +132,6 @@ public abstract class AbstractAdministrationView extends AbstractViewWithTree {
             }
 
             @Override
-            public void loadChildren(boolean updateNode) {
-            }
-
-            @Override
             public String getTitle() {
                 return null;
             }
@@ -144,6 +142,17 @@ public abstract class AbstractAdministrationView extends AbstractViewWithTree {
 
             @Override
             public AdapterBase accept(NodeSearchVisitor visitor) {
+                return null;
+            }
+
+            @Override
+            protected AdapterBase createChildNode(ModelWrapper<?> child) {
+                return null;
+            }
+
+            @Override
+            protected Collection<? extends ModelWrapper<?>> getWrapperChildren()
+                throws Exception {
                 return null;
             }
         };
