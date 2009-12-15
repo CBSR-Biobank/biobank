@@ -148,17 +148,17 @@ public class NodeSearchVisitor {
             AdapterBase child = container.getChild(wrapper.getId(), true);
             if (child == null) {
                 for (AdapterBase childContainer : container.getChildren()) {
+                    AdapterBase foundChild;
                     if (childContainer instanceof ContainerAdapter) {
-                        visitChildContainers((ContainerAdapter) childContainer,
-                            parents);
+                        foundChild = visitChildContainers(
+                            (ContainerAdapter) childContainer, parents);
                     } else {
-                        AdapterBase foundChild = childContainer.accept(this);
-                        if (foundChild != null) {
-                            return foundChild;
-                        }
+                        foundChild = childContainer.accept(this);
+                    }
+                    if (foundChild != null) {
+                        return foundChild;
                     }
                 }
-
             } else {
                 return child;
             }

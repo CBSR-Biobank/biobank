@@ -203,10 +203,10 @@ public class ContainerViewForm extends BiobankViewForm {
         containerWidget.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseDoubleClick(MouseEvent e) {
-                Object object = ((AbstractContainerDisplayWidget) e.widget)
+                Cell cell = ((AbstractContainerDisplayWidget) e.widget)
                     .getObjectAtCoordinates(e.x, e.y);
-                if (object != null)
-                    openFormFor((ContainerCell) object);
+                if (cell != null)
+                    openFormFor((ContainerCell) cell);
             }
         });
         containerWidget.getMultiSelectionManager().enableMultiSelection(
