@@ -92,18 +92,19 @@ public class MultiSelectionManager {
     }
 
     private void addAllCellsInRange(Cell cell) {
-        int startRow = lastSelectedCell.getRow();
+        Cell firstCell = lastSelectedCell;
+        int startRow = firstCell.getRow();
         int endRow = cell.getRow();
         if (startRow > endRow) {
             startRow = cell.getRow();
-            endRow = lastSelectedCell.getRow();
+            endRow = firstCell.getRow();
         }
         for (int indexRow = startRow; indexRow <= endRow; indexRow++) {
-            int startCol = lastSelectedCell.getCol();
+            int startCol = firstCell.getCol();
             int endCol = cell.getCol();
             if (startCol > endCol) {
                 startCol = cell.getCol();
-                endCol = lastSelectedCell.getCol();
+                endCol = firstCell.getCol();
             }
             for (int indexCol = startCol; indexCol <= endCol; indexCol++) {
                 Cell cellToAdd = container.getCells().get(
