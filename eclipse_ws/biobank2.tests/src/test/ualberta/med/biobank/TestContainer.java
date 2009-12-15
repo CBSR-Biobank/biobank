@@ -1014,8 +1014,8 @@ public class TestContainer extends TestDatabase {
         Assert.assertTrue(childrenMap.size() == 2);
         Assert.assertEquals(childrenMap.get(new RowColPos(0, 0)), childL3);
         Assert.assertEquals(childrenMap.get(new RowColPos(0, 1)), childL3_2);
-        Assert.assertEquals(childL2.getChild(0, 0), childL3);
-        Assert.assertEquals(childL2.getChild(0, 1), childL3_2);
+        Assert.assertEquals(childL2.getChild(new RowColPos(0, 0)), childL3);
+        Assert.assertEquals(childL2.getChild(new RowColPos(0, 1)), childL3_2);
 
         // remove first child
         childL3.delete();
@@ -1070,7 +1070,7 @@ public class TestContainer extends TestDatabase {
         topType.reload();
 
         Assert.assertTrue(top.getChildren().size() == 1);
-        top.initChildrenWithType(childType1_2);
+        top.initChildrenWithType(childType1_2, null);
         top.reload();
 
         Collection<ContainerWrapper> children = top.getChildren().values();
@@ -1102,15 +1102,20 @@ public class TestContainer extends TestDatabase {
         childL3 = containerMap.get("ChildL3");
 
         Assert.assertTrue(childL3.deleteChildrenWithType(containerTypeMap
-            .get("ChildCtL4")));
+            .get("ChildCtL4"), null));
         Assert.assertTrue(childL2.deleteChildrenWithType(containerTypeMap
-            .get("ChildCtL3")));
+            .get("ChildCtL3"), null));
         Assert.assertTrue(childL1.deleteChildrenWithType(containerTypeMap
-            .get("ChildCtL2")));
+            .get("ChildCtL2"), null));
         Assert.assertTrue(top.deleteChildrenWithType(containerTypeMap
-            .get("ChildCtL1")));
+            .get("ChildCtL1"), null));
         Assert.assertFalse(top.deleteChildrenWithType(containerTypeMap
-            .get("TopCT")));
+            .get("TopCT"), null));
+    }
+
+    @Test
+    public void testDeleteChildrenWithTypeWithPositionList() throws Exception {
+        Assert.fail("not implemented");
     }
 
     @Test
