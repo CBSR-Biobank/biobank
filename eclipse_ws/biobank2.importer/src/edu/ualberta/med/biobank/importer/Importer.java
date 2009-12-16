@@ -5,8 +5,6 @@ import edu.ualberta.med.biobank.common.LabelingScheme;
 import edu.ualberta.med.biobank.common.RowColPos;
 import edu.ualberta.med.biobank.common.ServiceConnection;
 import edu.ualberta.med.biobank.common.cbsr.CbsrClinics;
-import edu.ualberta.med.biobank.common.cbsr.CbsrContainerTypes;
-import edu.ualberta.med.biobank.common.cbsr.CbsrContainers;
 import edu.ualberta.med.biobank.common.cbsr.CbsrSite;
 import edu.ualberta.med.biobank.common.cbsr.CbsrStudies;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
@@ -17,7 +15,6 @@ import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerPosition;
@@ -44,7 +41,6 @@ import java.util.Map;
 import org.apache.commons.lang.StringUtils;
 
 /*
- *  need to remove the password on MS Access side.
  * a call to get a column from a result set can only be made once, otherwise the
  * driver generates an exception.
  */
@@ -96,27 +92,27 @@ public class Importer {
             // checkFreezer();
             // System.exit(0);
 
-            CbsrSite.deleteConfiguration(appService);
-            System.out.println("creating CBSR site...");
-            SiteWrapper cbsrSite = CbsrSite.addSite(appService);
-
-            System.out.println("creating clinics...");
-            CbsrClinics.createClinics(cbsrSite);
-
-            System.out.println("creating studies... ");
-            CbsrStudies.createStudies(cbsrSite);
-
-            System.out.println("creating container types...");
-            CbsrContainerTypes.createContainerTypes(cbsrSite);
-
-            System.out.println("creating containers...");
-            CbsrContainers.createContainers(cbsrSite);
+            // CbsrSite.deleteConfiguration(appService);
+            // System.out.println("creating CBSR site...");
+            // SiteWrapper cbsrSite = CbsrSite.addSite(appService);
+            //
+            // System.out.println("creating clinics...");
+            // CbsrClinics.createClinics(cbsrSite);
+            //
+            // System.out.println("creating studies... ");
+            // CbsrStudies.createStudies(cbsrSite);
+            //
+            // System.out.println("creating container types...");
+            // CbsrContainerTypes.createContainerTypes(cbsrSite);
+            //
+            // System.out.println("creating containers...");
+            // CbsrContainers.createContainers(cbsrSite);
 
             con = getMysqlConnection();
 
             getTables();
             if (tables.size() == 0) {
-                throw new Exception("No tables found in database");
+                throw new Exception("No tables found in export database");
             }
 
             String [] reqdTables = {
@@ -128,7 +124,7 @@ public class Importer {
                     + " not found");
             }
 
-            importPatients();
+            // importPatients();
             importShipments();
             importPatientVisits();
 
