@@ -133,7 +133,7 @@ public class Importer {
                 initTopContainersMap();
                 getSampleTypeMap();
 
-                importShipments();
+                importPatientVisits();
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -386,6 +386,7 @@ public class Importer {
                 continue;
             }
 
+            clinic.reload();
             dateReceivedStr = rs.getString(4);
             dateReceived = dateTimeFormatter.parse(dateReceivedStr);
 
@@ -403,7 +404,11 @@ public class Importer {
                 .getShipmentCollection();
             if (clinicShipments != null) {
                 for (ShipmentWrapper cs : clinicShipments) {
-                    if (cs.getDateReceived().equals(dateReceived)) {
+                    // Date.equals() checks for milliseconds and for some reason
+                    // they are not the same, instead have to convert to string
+                    // and then compare strings
+                    if (dateTimeFormatter.format(cs.getDateReceived()).equals(
+                        dateTimeFormatter.format(dateReceived))) {
                         shipment = cs;
                     }
                 }
@@ -438,7 +443,7 @@ public class Importer {
                 shipment.setPatientCollection(patients);
                 shipment.persist();
 
-                logger.debug("adding patient to shipment: patient/"
+                logger.debug("adding to shipment: patient/"
                     + patient.getNumber() + " clinic/" + clinic.getName()
                     + " shipment/" + dateReceivedStr + " (" + count + "/"
                     + numShipments + ")");
@@ -448,7 +453,29 @@ public class Importer {
         }
     }
 
+    private static void removeAllPatientVisits() throws Exception {
+        logger.debug("removing old patient visits ...");
+
+        for (StudyWrapper study : studiesMap.values()) {
+            List<PatientWrapper> patients = study.getPatientCollection();
+            if (patients == null)
+                continue;
+            for (PatientWrapper patient : patients) {
+                List<PatientVisitWrapper> visits = patient
+                    .getPatientVisitCollection();
+                if (visits == null)
+                    continue;
+                for (PatientVisitWrapper visit : visits) {
+                    visit.delete();
+                }
+            }
+            study.reload();
+        }
+    }
+
     private static void importPatientVisits() throws Exception {
+        removeAllPatientVisits();
+
         String studyNameShort;
         StudyWrapper study;
         String clinicName;
