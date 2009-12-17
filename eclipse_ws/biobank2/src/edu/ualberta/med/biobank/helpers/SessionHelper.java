@@ -50,7 +50,6 @@ public class SessionHelper implements Runnable {
                 appService = ServiceConnection.getAppService(serverUrl,
                     userName, password);
             }
-
             siteWrappers = SiteWrapper.getSites(appService);
         } catch (ApplicationException exp) {
             LOGGER.error("Error while logging to application", exp);
