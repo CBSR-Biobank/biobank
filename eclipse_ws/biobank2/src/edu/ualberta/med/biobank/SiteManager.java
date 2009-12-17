@@ -45,7 +45,8 @@ public class SiteManager {
 
     private List<SiteWrapper> currentSiteWrappers;
 
-    public SiteManager(WritableApplicationService appService, String sessionName) {
+    protected void init(WritableApplicationService appService,
+        String sessionName) {
         this.appService = appService;
         this.sessionName = sessionName;
         currentSiteWrappers = new ArrayList<SiteWrapper>();
@@ -139,23 +140,26 @@ public class SiteManager {
 
     public void setSiteCombo(SiteCombo combo) {
         Assert.isNotNull(combo, "site combo is null");
-        siteCombo = combo;
-        siteCombo.addSelectionChangedListener(new ISelectionChangedListener() {
-            @Override
-            public void selectionChanged(SelectionChangedEvent event) {
-                IStructuredSelection selection = (IStructuredSelection) event
-                    .getSelection();
-                SiteWrapper siteWrapper = (SiteWrapper) selection
-                    .getFirstElement();
+        if (siteCombo != combo) {
+            siteCombo = combo;
+            siteCombo
+                .addSelectionChangedListener(new ISelectionChangedListener() {
+                    @Override
+                    public void selectionChanged(SelectionChangedEvent event) {
+                        IStructuredSelection selection = (IStructuredSelection) event
+                            .getSelection();
+                        SiteWrapper siteWrapper = (SiteWrapper) selection
+                            .getFirstElement();
 
-                if (siteWrapper == null)
-                    return;
+                        if (siteWrapper == null)
+                            return;
 
-                currentSiteWrapper = siteWrapper;
-                setCurrentSite(currentSiteWrapper);
-                SessionManager.getInstance().rebuildSession();
-            }
-        });
+                        currentSiteWrapper = siteWrapper;
+                        setCurrentSite(currentSiteWrapper);
+                        SessionManager.getInstance().rebuildSession();
+                    }
+                });
+        }
     }
 
     public SiteCombo getSiteCombo() {

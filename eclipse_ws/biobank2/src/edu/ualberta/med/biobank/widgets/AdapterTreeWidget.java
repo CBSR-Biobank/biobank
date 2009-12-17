@@ -115,7 +115,6 @@ public class AdapterTreeWidget extends Composite {
                 }
             }
         });
-
         treeViewer.getTree().setMenu(menu);
 
         treeViewer.setComparator(new ViewerComparator() {
