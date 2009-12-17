@@ -27,10 +27,15 @@ public class CbsrClinics {
         addContact(clinic, "Morna Brown", null, "403-944-4057", "403-944-1745",
             "morna.brown@calgaryhealthregion.ca");
 
-        clinic = addClinic(site, "CL1-Charlynn", "Charlynn Ursu",
+        clinic = addClinic(site, "CL1-KDCS", "Charlynn Ursu",
             "715 Fort Alice Cresecent SE", null, "Calgary", "Alberta", "T2A2C8");
         addContact(clinic, "Charlynn Ursu", null, "403-944-9883", null,
             "charlynn.ursu@calgaryhealthservices.ca");
+        addContact(clinic, "Coralea Bignell", null, "403-944-9885",
+            "403-620-8075 cell", "coralea.bignell@albertahealthservices.ca");
+        addContact(clinic, "Sharon Gulewich", null, "403-944-9882",
+            "403-816-1501 work cell",
+            "sharon.gulewich@albertahealthservices.ca");
 
         clinic = addClinic(site, "CL1-NHS", "Shirley Cole",
             "Heritage Medical Research Clinic",
@@ -38,33 +43,37 @@ public class CbsrClinics {
         addContact(clinic, "Shirley Cole", null, "403-220-4988", null,
             "coles@ualberta.ca");
 
-        clinic = addClinic(site, "CL1-Sharon", "Sharon Gulewich",
-            "3820 Marlborough Drive NE", null, "Calgary", "Alberta", "T2A4L1");
-        addContact(clinic, "Sharon Gulewich", null, "403-944-9882",
-            "403-944-9905", "sharon.gulewich@calgaryhealthregion.ca");
-
         clinic = addClinic(site, "CL2", null, "Alberta Children's Hospital",
             "2888 Shaganappi Trail NW", "Calgary", "Alberta", "t3b6a8");
 
         clinic = addClinic(site, "ED1", null, "University of Alberta Hospital",
             null, "Edmonton", "Alberta", "T6G2B7");
+        addContact(clinic, "Erin Rezanoff", "Study Coordinator",
+            "780-407-7448", "780-407-3324",
+            "erin.rezanoff@albertahealthservices.ca");
         addContact(clinic, "Melanie Peters", null, "780-407-6588", null,
             "melaniepeters@cha.ab.ca");
         addContact(clinic, "Candace Dando", "Research Nurse", "780-721-8013",
             "780-445-7324 (pager)", "candace.dando@capitalhealth.ca");
-        addContact(clinic, "Dawn Opgenorth", "STudy Coordinator",
+        addContact(clinic, "Dawn Opgenorth", "Study Coordinator",
             "780-407-1543", "780-445-7621 (pager)", "dawno@ualberta.ca");
         addContact(clinic, "Dr. Andrew Mason", "Principle Investigator",
             "780-492-8172", null, "andrew.mason@ualberta.ca");
 
         clinic = addClinic(site, "FM1", "Philo King", "124 Beardsley Crescent",
             null, "Fort McMurray", "Alberta", "T9H2S2");
+        addContact(clinic, "Phillo King", null, "780-799-4382", null,
+            "pmking@nlhr.ca");
 
         clinic = addClinic(site, "GP1", "Sharon Mollins", "Renal Dialysis 2W",
             "10409-98 Street", "Grande Prairie", "Alberta", "T8V0E2");
+        addContact(clinic, "Sharon Mollins", null, "780-538-7576", null,
+            "sharon.mollins@pchr.ca");
 
         clinic = addClinic(site, "HL1", null, "QE11 Health Sciences Centre",
             "5788 University Avenue", "Halifax", "Nova Scotia", "B3H1V8");
+        addContact(clinic, "Niki Davis", "Data Management Coordinator",
+            "902-473-4611", "902-473-4667", "nicki.davis@cdha.nshealth.ca");
 
         clinic = addClinic(site, "HL2", null, "IWK Health Centre",
             "5850 University Ave PO Box 9700", "Halifax", "Nova Scotia",
@@ -75,15 +84,23 @@ public class CbsrClinics {
         clinic = addClinic(site, "HM1", null,
             "McMaster University Medical Centre", "1200 Main street West",
             "Hamilton", "Ontario", "L8N3Z5");
+        addContact(clinic, "Theresa Almonte", null, "905-521-2348", null,
+            "almontet@hhsc.ca");
 
         clinic = addClinic(site, "KN1", null, "Kingston Cancer Centre",
             "25 King Street", "Kingston", "Ontario", "K7L5P9");
+        addContact(clinic, "Maryanne Gibson", null, "613-544-2631 x6625", null,
+            "maryanne.gibson@krcc.on.ca");
 
         clinic = addClinic(site, "LM1", "Janilee Dow", "3820 43 Avenue",
             "Room 307", "Lloydminister", "Saskatchewan", "S9V1Y5");
+        addContact(clinic, "Janilee Dow", null, "306-825-3058 Home", null,
+            "jdow15@hotmail.com");
 
         clinic = addClinic(site, "LN1", null, "St Joseph's Health Centre",
             "800 Comissioners Road East", "London", "Ontario", "N6A4V2");
+        addContact(clinic, "Sheila Schembri", null, "519-685-8500 x53582",
+            null, "sheila.schembri@lhsc.on.ca");
 
         clinic = addClinic(site, "MC1", null, "Moncton Hospital",
             "135 MacBeath", "Moncton", "New Brunswick", "E1C6Z8");
@@ -97,16 +114,23 @@ public class CbsrClinics {
 
         clinic = addClinic(site, "MN2", null, "Montreal Children's Hospital",
             "2300 rue Tupper", "Montreal", "Quebec", "H3H1P3");
+        addContact(clinic, "Nathalie Aubin", null, "514-412-4420", null,
+            "nathalie.aubin@muhc.mcgill.ca");
 
         clinic = addClinic(site, "OL1", "Jodie Hingst", "5123 42 Street", null,
             "Olds", "Alberta", "T4H1X1");
+        addContact(clinic, "Jodie Hingst", null, "403-507-8520", null, null);
 
         clinic = addClinic(site, "OT1", null, "Ottawa Hospital",
             "501 Smyth Road", "Ottawa", "Ontario", "K1H8L6");
+        addContact(clinic, "Lucie Lacasse", null, "613-737-8252", null,
+            "llacasse@ottawahospital.on.ca");
 
         clinic = addClinic(site, "OT2", null,
             "Children's Hospital of Eastern Ontario", "401 Smyth Road",
             "Ottawa", "Ontario", "K1G4X3");
+        addContact(clinic, "Tammy Burtenshaw", null, "613-373-7600 x2368",
+            null, "tburtenshaw@cheo.on.ca");
 
         clinic = addClinic(site, "QB1", null, "CHA Hopital Enfant-Jesus",
             "1401 18e Rue", "Quebec City", "Quebec", "G1J1Z4");

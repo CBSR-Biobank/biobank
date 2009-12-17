@@ -41,7 +41,22 @@ public class CbsrStudies {
             "Genetic Mutation" });
         study.setStudyPvAttr("Worksheet", "text");
         study.setContactCollection(Arrays.asList(CbsrClinics
-            .getContact("Morna Brown")));
+            .getContact("Morna Brown"), CbsrClinics
+            .getContact("Melanie Peters"),
+            CbsrClinics.getContact("Niki Davis"), CbsrClinics
+                .getContact("Aleasha Warner"), CbsrClinics
+                .getContact("Theresa Almonte"), CbsrClinics
+                .getContact("Maryanne Gibson"), CbsrClinics
+                .getContact("Sheila Schembri"), CbsrClinics
+                .getContact("Dorine Belliveau"), CbsrClinics
+                .getContact("Elaine Gloutnez"), CbsrClinics
+                .getContact("Nathalie Aubin"), CbsrClinics
+                .getContact("Lucie Lacasse"), CbsrClinics
+                .getContact("Tammy Burtenshaw"), CbsrClinics
+                .getContact("Chantal Gagne"), CbsrClinics
+                .getContact("Elizabeth-Ann Paradis"), CbsrClinics
+                .getContact("Dianne Dufour"), CbsrClinics
+                .getContact("Colleen Fitzgerald")));
         study.setSampleSourceCollection(Arrays.asList(sampleSourceMap
             .get("10mL lavender top EDTA tube")));
         study.persist();
@@ -67,6 +82,9 @@ public class CbsrStudies {
         study.setStudyPvAttr("Visit Type", "select_single", new String[] {
             "Baseline", "Precath", "6hr Post", "24hr Post", "48-72hr Post" });
         study.setStudyPvAttr("Worksheet", "text");
+        study.setContactCollection(Arrays.asList(CbsrClinics
+            .getContact("Candace Dando"), CbsrClinics
+            .getContact("Daisy Gibbons")));
         study.persist();
 
         // STUDY - KDCS
@@ -75,10 +93,25 @@ public class CbsrStudies {
         study.setStudyPvAttr("Consent", "select_multiple",
             new String[] { "Genetic" });
         study.setStudyPvAttr("Worksheet", "text");
+        study.setContactCollection(Arrays.asList(CbsrClinics
+            .getContact("Charlynn Ursu"), CbsrClinics
+            .getContact("Coralea Bignell"), CbsrClinics
+            .getContact("Sharon Gulewich"), CbsrClinics
+            .getContact("Dawn Opgenorth"), CbsrClinics
+            .getContact("Phillo King"), CbsrClinics
+            .getContact("Sharon Mollins"), CbsrClinics
+            .getContact("Janilee Dow"), CbsrClinics.getContact("Jodie Hingst"),
+            CbsrClinics.getContact("Ann Chala"), CbsrClinics
+                .getContact("Cathy Lent")));
         study.persist();
 
         // STUDY - KMS
         study = addStudy(site, "Kingston Merger Study", "KMS", null);
+        study.setStudyPvAttr("Worksheet", "text");
+        study.persist();
+
+        // STUDY - LCS
+        study = addStudy(site, "Laboratory Cotnrols Study", "LCS", null);
         study.setStudyPvAttr("Worksheet", "text");
         study.persist();
 
@@ -94,23 +127,42 @@ public class CbsrStudies {
             "D0", "D2", "D4", "Wk2", "Wk4", "M2", "M8", "M12", "M18", "M24" });
         study.setStudyPvAttr("PBMC Count", "number");
         study.setStudyPvAttr("Worksheet", "text");
+        study.setContactCollection(Arrays.asList(CbsrClinics
+            .getContact("Shirley Cole"), CbsrClinics
+            .getContact("Dr. Andrew Mason")));
         study.persist();
 
         // STUDY - RVS
         study = addStudy(site, "Retroviral Study", "RVS", null);
         study.setStudyPvAttr("Worksheet", "text");
+        study.setContactCollection(Arrays.asList(CbsrClinics
+            .getContact("Dr. Andrew Mason")));
         study.persist();
 
         // STUDY - TCKS
         study = addStudy(site, "Tonelli Chronic Kidney Study", "TCKS", null);
         study.setStudyPvAttr("PBMC Count", "number");
         study.setStudyPvAttr("Worksheet", "text");
+        study.setContactCollection(Arrays.asList(CbsrClinics
+            .getContact("Charlynn Ursu"), CbsrClinics
+            .getContact("Coralea Bignell"), CbsrClinics
+            .getContact("Sharon Gulewich"), CbsrClinics
+            .getContact("Dawn Opgenorth")));
         study.persist();
 
         // STUDY - VAS
         study = addStudy(site, "Vascular Access Study", "VAS", null);
         study.setStudyPvAttr("PBMC Count", "number");
         study.setStudyPvAttr("Worksheet", "text");
+        study.setContactCollection(Arrays.asList(CbsrClinics
+            .getContact("Charlynn Ursu"), CbsrClinics
+            .getContact("Coralea Bignell"), CbsrClinics
+            .getContact("Sharon Gulewich"), CbsrClinics
+            .getContact("Dawn Opgenorth"), CbsrClinics
+            .getContact("Phillo King"), CbsrClinics
+            .getContact("Sharon Mollins"), CbsrClinics
+            .getContact("Janilee Dow"), CbsrClinics.getContact("Ann Chala"),
+            CbsrClinics.getContact("Cathy Lent")));
         study.persist();
     }
 
