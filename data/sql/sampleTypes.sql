@@ -31,11 +31,12 @@ INSERT INTO `SAMPLE_TYPE` (ID, NAME, NAME_SHORT, SITE_ID) VALUES
 (29, "Descending Colon",             "Colon, D", NULL),
 (30, "Stomach, Body",                "Stomach, B", NULL),
 (31, "Stomach, Antrum",              "Stomach, A", NULL),
-(32, "Duodenum",                     "Dudenum", NULL),
+(32, "Duodenum",                     "Duodenum", NULL),
 (33, "Jejunum",                      "Jejunum", NULL),
 (34, "Ileum",                        "Ileum", NULL),
 (35, "Ascending Colon",              "Colon, A", NULL),
 (36, "Transverse Colon",             "Colon, T", NULL),
 (37, "Meconium - BABY",              "Meconium", NULL),
-(38, "WB DMSO",                      "WB DMSO", NULL);
+(38, "WB DMSO",                      "WB DMSO", NULL),
+(39, "DNA (WBC)",                    "DNA(WBC)", NULL);
 UNLOCK TABLES;

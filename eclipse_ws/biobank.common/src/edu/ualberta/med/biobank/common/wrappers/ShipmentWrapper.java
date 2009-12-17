@@ -326,4 +326,21 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
         }
         return null;
     }
+
+    /**
+     * Search for a shipment in the site with the given date received.
+     */
+    public static ShipmentWrapper getShipmentInSite(
+        WritableApplicationService appService, Date dateReceived,
+        SiteWrapper site) throws ApplicationException {
+        HQLCriteria criteria = new HQLCriteria("from "
+            + Shipment.class.getName()
+            + " where clinic.site.id = ? and dateReceived = ?", Arrays
+            .asList(new Object[] { site.getId(), dateReceived }));
+        List<Shipment> shipments = appService.query(criteria);
+        if (shipments.size() == 1) {
+            return new ShipmentWrapper(appService, shipments.get(0));
+        }
+        return null;
+    }
 }

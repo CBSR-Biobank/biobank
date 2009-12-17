@@ -12,52 +12,29 @@ import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 
 public class CbsrContainerTypes {
 
-    private static Map<String, SampleTypeWrapper> sampleTypeMap;
-
     private static Map<String, ContainerTypeWrapper> containerTypeMap = new HashMap<String, ContainerTypeWrapper>();
 
     private static String[] biopsyPallet96SampleTypes = new String[] {
-        "Descending Colon", "Stomach, Body", "Stomach, Antrum", "Duodenum",
-        "Jejunum", "Ileum", "Ascending Colon", "Transverse Colon", };
+        "Colon, D", "Stomach, B", "Stomach, A", "Duodenum", "Jejunum", "Ileum",
+        "Colon, A", "Colon, T", };
 
     private static String[] box81SampleTypes = new String[] { "Plasma",
-        "Paxgene", "DNA (Blood)", "Cells", "Urine", "Hemodialysate",
-        "Peritoneal Dialysate", "Serum", "Finger Nails", "Buffy coat",
-        "Toe Nails", "Whole Blood EDTA", "RNAlater Biopsies", "Heparin Blood",
-        "Filtered Urine", "Serum (Beige top)", "Centrifuged Urine",
-        "Sodium Azide Urine", "Source Water", "Meconium - BABY", "WB DMSO" };
+        "Paxgene", "Cells", "Urine", "Dialysate", "Effluent", "Serum",
+        "F Nails", "BC", "T Nails", "WBE", "RNA Biopsy", "HB", "F Urine",
+        "Serum B", "C Urine", "Z Urine", "S Water", "Meconium", "WB DMSO" };
 
     private static String[] cellPallet96SampleTypes = new String[] { "Cells" };
 
-    private static String[] ftaBinSampleTypes = new String[] { "DNA (Blood)" };
+    private static String[] ftaBinSampleTypes = new String[] { "DNA(Blood)",
+        "DNA(WBC)" };
 
     private static String[] hairBinSampleTypes = new String[] { "Hair" };
 
-    private static String[] pallet96SampleTypes = new String[] { "Plasma",
-        "Paxgene", "DNA (Blood)", "Cells", "Urine", "Hemodialysate",
-        "Peritoneal Dialysate", "Serum", "Finger Nails", "Buffy coat",
-        "Toe Nails", "Whole Blood EDTA", "RNAlater Biopsies", "Heparin Blood",
-        "Filtered Urine", "Serum (Beige top)", "Centrifuged Urine",
-        "Sodium Azide Urine", "Source Water", "Plasma (Na Heparin) - DAD",
-        "WB Serum - BABY", "SerumPellet - BABY", "WB - BABY", "WB RNA - BABY",
-        "WB Plasma - BABY", "Cord Blood Mononuclear Cells", "RNA CBMC",
-        "Meconium - BABY", "WB DMSO" };
-
-    private static void getSampleTypeMap(SiteWrapper site) throws Exception {
-        if (sampleTypeMap != null)
-            return;
-
-        List<SampleTypeWrapper> allSampleTypes = SampleTypeWrapper
-            .getGlobalSampleTypes(site.getAppService(), true);
-        if ((allSampleTypes == null) || (allSampleTypes.size() == 0)) {
-            throw new Exception("no global sample types found in the database");
-        }
-
-        sampleTypeMap = new HashMap<String, SampleTypeWrapper>();
-        for (SampleTypeWrapper sampleType : allSampleTypes) {
-            sampleTypeMap.put(sampleType.getName(), sampleType);
-        }
-    }
+    private static String[] pallet96SampleTypes = new String[] { "BC", "Cells",
+        "C Urine", "CBMC", "F Urine", "F Nails", "Dialysate", "HB", "Meconium",
+        "Paxgene", "Effluent", "Plasma SH", "Plasma", "CBMC RNA", "RNA Biopsy",
+        "Serum B", "Serum", "Serum B", "Z Urine", "S Water", "T Nails",
+        "Urine", "WBlood", "WB DMSO", "WB Plasma", "WB RNA", "WB Serum", "WBE" };
 
     public static ContainerTypeWrapper getContainerType(String name)
         throws Exception {
@@ -69,7 +46,6 @@ public class CbsrContainerTypes {
     }
 
     public static void createContainerTypes(SiteWrapper site) throws Exception {
-        getSampleTypeMap(site);
         createFreezerTypes(site);
         createCabinetTypes(site);
     }
@@ -153,11 +129,8 @@ public class CbsrContainerTypes {
 
         List<SampleTypeWrapper> list = new ArrayList<SampleTypeWrapper>();
         for (String sampleTypeName : sampleTypeNames) {
-            SampleTypeWrapper sampleType = sampleTypeMap.get(sampleTypeName);
-            if (sampleType == null) {
-                throw new Exception("sample type name is invalid: "
-                    + sampleTypeName);
-            }
+            SampleTypeWrapper sampleType = CbsrSite
+                .getSampleType(sampleTypeName);
             list.add(sampleType);
         }
         ct.setSampleTypeCollection(list);
