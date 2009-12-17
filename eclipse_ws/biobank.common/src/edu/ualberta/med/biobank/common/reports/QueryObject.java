@@ -68,11 +68,36 @@ public class QueryObject {
         ArrayList<QueryObject> queries = new ArrayList<QueryObject>();
 
         // create all pre-defined queries here
-        QueryObject invoicePQuery = new InvoicePQueryObject(siteId);
-        QueryObject invoiceCQuery = new InvoiceCQueryObject(siteId);
+        QueryObject invoicePQuery = new InvoicePQueryObject(
+            "SampleInvoiceByPatient", siteId);
+        QueryObject invoiceCQuery = new InvoiceCQueryObject(
+            "SampleInvoiceByClinic", siteId);
+        QueryObject sampleCountQuery = new SampleCountQueryObject(
+            "SampleCount", siteId);
+        QueryObject sampleSCountQuery = new SampleSCountQueryObject(
+            "SampleCountByStudy", siteId);
+        QueryObject fvlPatientVisitsQuery = new FvLPatientVisitsQueryObject(
+            "FirstvsLastPatientVisitsByClinic", siteId);
+        QueryObject freezerSSamplesQuery = new FreezerSSamplesQueryObject(
+            "FreezerSamplesByStudy", siteId);
+        QueryObject freezerCSamplesQuery = new FreezerCSamplesQueryObject(
+            "FreezerSamplesByStudyClinic", siteId);
+        QueryObject freezerDSamplesQuery = new FreezerDSamplesQueryObject(
+            "FreezerSamplesByDate", siteId);
+        // missing queries
+        QueryObject newPatientCountQuery = new NewPatientCountQueryObject(
+            "NewPatientCountByStudyClinic", siteId);
 
         queries.add(invoicePQuery);
         queries.add(invoiceCQuery);
+        queries.add(sampleCountQuery);
+        queries.add(sampleSCountQuery);
+        queries.add(fvlPatientVisitsQuery);
+        queries.add(freezerSSamplesQuery);
+        queries.add(freezerCSamplesQuery);
+        queries.add(freezerDSamplesQuery);
+        // missing queries
+        queries.add(newPatientCountQuery);
 
         return queries;
     }

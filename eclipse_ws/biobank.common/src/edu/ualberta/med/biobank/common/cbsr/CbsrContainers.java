@@ -8,11 +8,11 @@ import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 public class CbsrContainers {
 
     public static void createContainers(SiteWrapper site) throws Exception {
-        createFreezer01(site);
-        createFreezer02(site);
-        createFreezer03(site);
-        createFreezer04(site);
-        createCabinet01(site);
+        // createFreezer01(site);
+        // createFreezer02(site);
+        // createFreezer03(site);
+        // createFreezer04(site);
+        // createCabinet01(site);
     }
 
     private static void createFreezer01(SiteWrapper site) throws Exception {
