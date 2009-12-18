@@ -734,18 +734,20 @@ public class ContainerWrapper extends
                 initPosition(type, rcp.row, rcp.col);
             }
         }
-        persist();
+        reload();
     }
 
     private void initPosition(ContainerTypeWrapper type, int i, int j)
-        throws BiobankCheckException {
+        throws Exception {
         Boolean filled = (getChild(i, j) != null);
         if (!filled) {
             ContainerWrapper newContainer = new ContainerWrapper(appService);
             newContainer.setContainerType(type.getWrappedObject());
             newContainer.setSite(getSite().getWrappedObject());
             newContainer.setTemperature(getTemperature());
-            addChild(i, j, newContainer);
+            newContainer.setPosition(i, j);
+            newContainer.setParent(this);
+            newContainer.persist();
         }
     }
 
