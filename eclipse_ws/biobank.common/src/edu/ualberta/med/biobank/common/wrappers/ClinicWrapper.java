@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 
@@ -390,6 +391,22 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
         }
         setShipmentCollection(sCollection, false);
         propertiesMap.put("shipmentCollection", shipmentCollection);
+    }
+
+    /**
+     * Search for a shipment in the clinic with the given date received.
+     */
+    public ShipmentWrapper getShipment(Date dateReceived)
+        throws ApplicationException {
+        HQLCriteria criteria = new HQLCriteria("from "
+            + Shipment.class.getName()
+            + " where clinic.id = ? and dateReceived = ?", Arrays
+            .asList(new Object[] { getId(), dateReceived }));
+        List<Shipment> shipments = appService.query(criteria);
+        if (shipments.size() == 1) {
+            return new ShipmentWrapper(appService, shipments.get(0));
+        }
+        return null;
     }
 
     @Override

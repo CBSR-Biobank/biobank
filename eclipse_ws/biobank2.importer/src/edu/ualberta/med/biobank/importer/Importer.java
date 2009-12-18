@@ -1,5 +1,27 @@
-
 package edu.ualberta.med.biobank.importer;
+
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
 
 import edu.ualberta.med.biobank.common.LabelingScheme;
 import edu.ualberta.med.biobank.common.RowColPos;
@@ -21,35 +43,19 @@ import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerPosition;
+import edu.ualberta.med.biobank.model.Sample;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.commons.lang.StringUtils;
-
 /*
- *  need to remove the password on MS Access side.
  * a call to get a column from a result set can only be made once, otherwise the
  * driver generates an exception.
  */
 
 public class Importer {
+
+    private static final Logger logger = Logger.getLogger(Importer.class
+        .getName());
 
     public static final String DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
@@ -79,67 +85,193 @@ public class Importer {
         aMap.put("SPARK", "SPARK");
         aMap.put("TCKS", "TCKS");
         aMap.put("VAS", "VAS");
+        aMap.put("A", "KDCS");
+        aMap.put("C", "CCCS");
+        aMap.put("E", "ERCIN");
+        aMap.put("G", "CEGIIR");
+        aMap.put("H", "AHFEM");
+        aMap.put("K", "KMS");
+        aMap.put("L", "LCS");
+        aMap.put("M", "MPS");
+        aMap.put("N", "NHS");
+        aMap.put("P", "CHILD");
+        aMap.put("R", "RVS");
+        aMap.put("S", "SPARK");
+        aMap.put("V", "VAS");
+        aMap.put("Z", "TCKS");
         newStudyShortNameMap = Collections.unmodifiableMap(aMap);
     };
 
-    public static void main(String [] args) throws Exception {
-        dateTimeFormatter = new SimpleDateFormat(DATE_TIME_FORMAT);
+    private static final Map<String, String> patientNrToClinicMap;
+    static {
+        Map<String, String> aMap = new HashMap<String, String>();
+        aMap.put("AA", "ED1");
+        aMap.put("AB", "CL1-KDCS");
+        aMap.put("AC", "VN1");
+        aMap.put("CC", "ED1");
+        aMap.put("ER", "SF1");
+        aMap.put("EA", "ED1");
+        aMap.put("GR", "ED1");
+        aMap.put("HA", "ED1");
+        aMap.put("KN", "KN1");
+        aMap.put("LC", "ED1");
+        aMap.put("MP", "ED1");
+        aMap.put("NH", "ED1");
+        aMap.put("PA", "ED1");
+        aMap.put("RV", "ED1");
+        aMap.put("SA", "ED1");
+        aMap.put("VA", "ED1");
+        aMap.put("ZA", "ED1");
+        aMap.put("ZB", "CL1");
+        aMap.put("ZC", "VN1");
 
+        patientNrToClinicMap = Collections.unmodifiableMap(aMap);
+    };
+
+    private static SiteWrapper cbsrSite = null;
+
+    private static Map<String, ClinicWrapper> clinicsMap = null;
+
+    private static Map<String, StudyWrapper> studiesMap = null;
+
+    private static Map<String, ContainerTypeWrapper> containerTypesMap = null;
+
+    private static Map<String, ContainerWrapper> topContainersMap = null;
+
+    private static Map<String, SampleTypeWrapper> sampleTypeMap;
+
+    public static void main(String[] args) throws Exception {
+        dateTimeFormatter = new SimpleDateFormat(DATE_TIME_FORMAT);
         tables = new ArrayList<String>();
+        PropertyConfigurator.configure("conf/log4j.properties");
 
         try {
-            appService = ServiceConnection.getAppService("https://"
-                + System.getProperty("server", "localhost:8443") + "/biobank2",
-                "testuser", "test");
-
-            // checkCabinet();
-            // checkFreezer();
-            // System.exit(0);
-
-            CbsrSite.deleteConfiguration(appService);
-            System.out.println("creating CBSR site...");
-            SiteWrapper cbsrSite = CbsrSite.addSite(appService);
-
-            System.out.println("creating clinics...");
-            CbsrClinics.createClinics(cbsrSite);
-
-            System.out.println("creating studies... ");
-            CbsrStudies.createStudies(cbsrSite);
-
-            System.out.println("creating container types...");
-            CbsrContainerTypes.createContainerTypes(cbsrSite);
-
-            System.out.println("creating containers...");
-            CbsrContainers.createContainers(cbsrSite);
-
             con = getMysqlConnection();
 
             getTables();
             if (tables.size() == 0) {
-                throw new Exception("No tables found in database");
+                throw new Exception("No tables found in export database");
             }
 
-            String [] reqdTables = {
-                "clinics", "study_list", "patient", "patient_visit", "cabinet",
-                "freezer", "sample_list" };
+            String[] reqdTables = { "clinics", "study_list", "patient",
+                "patient_visit", "cabinet", "freezer", "sample_list" };
 
             for (String table : reqdTables) {
-                if (!tableExists(table)) throw new Exception("Table " + table
-                    + " not found");
+                if (!tableExists(table))
+                    throw new Exception("Table " + table + " not found");
             }
 
-            importPatients();
-            importShipments();
-            importPatientVisits();
+            appService = ServiceConnection.getAppService("http://"
+                + System.getProperty("server", "localhost:8080") + "/biobank2",
+                "testuser", "test");
 
-            importCabinetSamples();
-            // importFreezerSamples();
+            cbsrSite = getCbsrSite();
 
-            System.out.println("importing complete.");
+            if (cbsrSite == null) {
+                importAll();
+            } else {
+                initClinicsMap();
+                initStudiesMap();
+                initContainerTypesMap();
+                initTopContainersMap();
+                getSampleTypeMap();
 
-        }
-        catch (Exception e) {
+                // removeAllPatientVisits();
+                // importShipments();
+                // importPatientVisits();
+                importCabinetSamples();
+            }
+
+            logger.info("import complete");
+        } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    private static void importAll() throws Exception {
+        // checkCabinet();
+        // checkFreezer();
+        // System.exit(0);
+
+        CbsrSite.deleteConfiguration(appService);
+        logger.info("creating CBSR site...");
+        cbsrSite = CbsrSite.addSite(appService);
+
+        logger.info("creating clinics...");
+        CbsrClinics.createClinics(cbsrSite);
+
+        logger.info("creating studies... ");
+        CbsrStudies.createStudies(cbsrSite);
+
+        logger.info("creating container types...");
+        CbsrContainerTypes.createContainerTypes(cbsrSite);
+
+        logger.info("creating containers...");
+        CbsrContainers.createContainers(cbsrSite);
+
+        initClinicsMap();
+        initStudiesMap();
+        initContainerTypesMap();
+        initTopContainersMap();
+        getSampleTypeMap();
+
+        importPatients();
+        importShipments();
+        importPatientVisits();
+
+        importCabinetSamples();
+        // importFreezerSamples();
+
+        logger.info("importing complete.");
+    }
+
+    private static SiteWrapper getCbsrSite() throws Exception {
+        for (SiteWrapper site : SiteWrapper.getSites(appService)) {
+            if (site.getName().equals("Canadian BioSample Repository")) {
+                return site;
+            }
+        }
+        return null;
+    }
+
+    private static void initClinicsMap() {
+        clinicsMap = new HashMap<String, ClinicWrapper>();
+        for (ClinicWrapper clinic : cbsrSite.getClinicCollection()) {
+            clinicsMap.put(clinic.getName(), clinic);
+        }
+    }
+
+    private static void initStudiesMap() {
+        studiesMap = new HashMap<String, StudyWrapper>();
+        for (StudyWrapper study : cbsrSite.getStudyCollection()) {
+            studiesMap.put(study.getNameShort(), study);
+        }
+    }
+
+    private static void initContainerTypesMap() {
+        containerTypesMap = new HashMap<String, ContainerTypeWrapper>();
+        for (ContainerTypeWrapper type : cbsrSite.getContainerTypeCollection()) {
+            containerTypesMap.put(type.getName(), type);
+        }
+    }
+
+    private static void initTopContainersMap() throws Exception {
+        topContainersMap = new HashMap<String, ContainerWrapper>();
+        for (ContainerWrapper container : cbsrSite.getTopContainerCollection()) {
+            topContainersMap.put(container.getLabel(), container);
+        }
+    }
+
+    public static void getSampleTypeMap() throws Exception {
+        List<SampleTypeWrapper> allSampleTypes = SampleTypeWrapper
+            .getGlobalSampleTypes(appService, true);
+        if ((allSampleTypes == null) || (allSampleTypes.size() == 0)) {
+            throw new Exception("no global sample types found in the database");
+        }
+
+        sampleTypeMap = new HashMap<String, SampleTypeWrapper>();
+        for (SampleTypeWrapper sampleType : allSampleTypes) {
+            sampleTypeMap.put(sampleType.getNameShort(), sampleType);
         }
     }
 
@@ -168,11 +300,11 @@ public class Importer {
     private static void getTables() throws SQLException {
         DatabaseMetaData meta = con.getMetaData();
         ResultSet res = meta.getTables(null, null, null,
-            new String [] { "TABLE" });
+            new String[] { "TABLE" });
         while (res.next()) {
             tables.add(res.getString("TABLE_NAME"));
 
-            // System.out.println("   " + res.getString("TABLE_CAT") + ", "
+            // logger.debug("   " + res.getString("TABLE_CAT") + ", "
             // + res.getString("TABLE_SCHEM") + ", "
             // + res.getString("TABLE_NAME") + ", "
             // + res.getString("TABLE_TYPE") + ", " + res.getString("REMARKS"));
@@ -186,17 +318,13 @@ public class Importer {
         if (newShortName == null) {
             throw new Exception("no study mapped with old name: " + shortName);
         }
-        try {
-            return CbsrStudies.getStudy(newShortName);
-        }
-        catch (Exception e) {
-            return null;
-        }
+        return studiesMap.get(newShortName);
     }
 
     private static boolean tableExists(String name) {
         for (int i = 0; i < tables.size(); ++i) {
-            if (tables.get(i).equals(name)) return true;
+            if (tables.get(i).equals(name))
+                return true;
         }
         return false;
     }
@@ -204,8 +332,9 @@ public class Importer {
     private static void importPatients() throws Exception {
         BlowfishCipher cipher = new BlowfishCipher();
         StudyWrapper study;
+        String studyNameShort;
         PatientWrapper patient;
-        System.out.println("importing patients ...");
+        logger.info("importing patients ...");
 
         String qryPart = "from patient, study_list where patient.study_nr=study_list.study_nr";
 
@@ -223,24 +352,43 @@ public class Importer {
         }
 
         while (rs.next()) {
-            String studyNameShort = rs.getString(5);
             String patientNo = cipher.decode(rs.getBytes(2));
+
+            if (patientNo.length() == 6) {
+                studyNameShort = getStudyShortNameFromPatientNr(patientNo);
+            } else {
+                studyNameShort = rs.getString(5);
+            }
+
             study = getStudyFromOldShortName(studyNameShort);
 
             if (study == null) {
-                System.out.println("ERROR: study with short name \""
-                    + studyNameShort + "\" not found, patient id: "
-                    + rs.getInt(1));
+                logger.debug("ERROR: study with short name \"" + studyNameShort
+                    + "\" not found, patient id: " + rs.getInt(1));
                 continue;
             }
 
-            System.out.println("importing patient number " + patientNo + " ("
-                + count + "/" + numPatients + ")");
+            logger.debug("importing patient number " + patientNo + " (" + count
+                + "/" + numPatients + ")");
             patient = new PatientWrapper(appService);
             patient.setNumber(patientNo);
             patient.setStudy(study);
             patient.persist();
             ++count;
+        }
+    }
+
+    private static void removeAllShipments() throws Exception {
+        logger.info("removing old shipments ...");
+
+        for (ClinicWrapper clinic : clinicsMap.values()) {
+            List<ShipmentWrapper> shipments = clinic.getShipmentCollection();
+            if (shipments == null)
+                continue;
+            for (ShipmentWrapper shipment : shipments) {
+                shipment.delete();
+            }
+            clinic.reload();
         }
     }
 
@@ -250,11 +398,14 @@ public class Importer {
         String clinicName;
         ClinicWrapper clinic;
         PatientWrapper patient;
-        String dateReceived;
+        String dateReceivedStr;
+        Date dateReceived;
         ShipmentWrapper shipment;
         BlowfishCipher cipher = new BlowfishCipher();
 
-        System.out.println("importing shipments ...");
+        removeAllShipments();
+
+        logger.info("importing shipments ...");
 
         String qryPart = "from patient_visit, study_list, patient "
             + "where patient_visit.study_nr=study_list.study_nr "
@@ -277,15 +428,36 @@ public class Importer {
 
         int count = 1;
         while (rs.next()) {
-            studyNameShort = rs.getString(1);
-            study = getStudyFromOldShortName(studyNameShort);
-            clinicName = rs.getString(3);
-            clinic = CbsrClinics.getClinic(clinicName);
-            dateReceived = rs.getString(4);
-
             String patientNo = cipher.decode(rs.getBytes(2));
+            if (patientNo.length() == 6) {
+                studyNameShort = getStudyShortNameFromPatientNr(patientNo);
+                clinicName = getClinicNameFromPatientNr(patientNo);
+            } else {
+                studyNameShort = rs.getString(1);
+                clinicName = rs.getString(3);
+            }
+
+            study = getStudyFromOldShortName(studyNameShort);
+            clinic = clinicsMap.get(clinicName);
+
+            if (clinic == null) {
+                logger.error("no clinic \"" + clinicName + "\"for patient "
+                    + patientNo);
+                continue;
+            }
+
+            clinic.reload();
+            dateReceivedStr = rs.getString(4);
+            dateReceived = dateTimeFormatter.parse(dateReceivedStr);
+
+            Calendar cal = new GregorianCalendar();
+            cal.setTime(dateReceived);
+            cal.set(Calendar.MILLISECOND, 0);
+            cal.set(Calendar.SECOND, 0);
+            dateReceived = cal.getTime();
+
             patient = PatientWrapper.getPatientInSite(appService, patientNo,
-                CbsrSite.cbsrSite);
+                cbsrSite);
 
             // make sure the study is correct
             if (!patient.getStudy().getNameShort().equals(study.getNameShort())) {
@@ -293,47 +465,98 @@ public class Importer {
                     + patient.getNumber() + ",  " + studyNameShort);
             }
 
-            shipment = ShipmentWrapper.getShipmentInSite(appService,
-                dateTimeFormatter.parse(dateReceived), CbsrSite.cbsrSite);
+            shipment = null;
+            List<ShipmentWrapper> clinicShipments = clinic
+                .getShipmentCollection();
+            if (clinicShipments != null) {
+                for (ShipmentWrapper cs : clinicShipments) {
+                    // Date.equals() checks for milliseconds and for some reason
+                    // they are not the same, instead have to convert to string
+                    // and then compare strings
+                    if (dateTimeFormatter.format(cs.getDateReceived()).equals(
+                        dateTimeFormatter.format(dateReceived))) {
+                        shipment = cs;
+                    }
+                }
+            }
 
-            // make sure the clinic is correct
-            if ((shipment != null) && !shipment.getClinic().equals(clinic)) {
-                throw new Exception("shipment and clinic do not match: "
-                    + dateReceived + ",  " + clinicName);
+            // make sure the clinic and study are linked via a contact
+            if (!study.getClinicCollection().contains(clinic)) {
+                logger.debug("ERROR: study " + study.getNameShort()
+                    + " for patient " + patientNo + " is not linked to clinic "
+                    + clinic.getName() + " via a contact");
+                continue;
             }
 
             if (shipment == null) {
                 shipment = new ShipmentWrapper(appService);
                 shipment.setClinic(clinic);
-                shipment.setWaybill(dateReceived);
-                shipment.setDateReceived(dateTimeFormatter.parse(dateReceived));
-
-                List<PatientWrapper> patients = shipment.getPatientCollection();
-                patients.add(patient);
-                shipment.setPatientCollection(patients);
-
+                shipment.setWaybill(dateReceivedStr);
+                shipment.setDateReceived(dateReceived);
+                shipment.setPatientCollection(Arrays.asList(patient));
                 shipment.persist();
 
-                System.out.println("importing shipment: patient/"
-                    + patient.getNumber() + " shipment_date_received/"
-                    + dateReceived + " (" + count + "/" + numShipments + ")");
+                logger.debug("importing shipment: patient/"
+                    + patient.getNumber() + " clinic/" + clinic.getName()
+                    + " shipment/" + dateReceivedStr + " (" + count + "/"
+                    + numShipments + ")");
+            } else {
+                List<PatientWrapper> patients = shipment.getPatientCollection();
+                if (patients == null) {
+                    patients = new ArrayList<PatientWrapper>();
+                }
+                patients.add(patient);
+                shipment.setPatientCollection(patients);
+                shipment.persist();
+
+                logger.debug("adding to shipment: patient/"
+                    + patient.getNumber() + " clinic/" + clinic.getName()
+                    + " shipment/" + dateReceivedStr + " (" + count + "/"
+                    + numShipments + ")");
             }
+
             ++count;
         }
     }
 
+    private static void removeAllPatientVisits() throws Exception {
+        logger.info("removing old patient visits ...");
+
+        for (StudyWrapper study : studiesMap.values()) {
+            if (study.getPatientVisitCount() == 0)
+                continue;
+
+            List<PatientWrapper> patients = study.getPatientCollection();
+            if (patients == null)
+                continue;
+            for (PatientWrapper patient : patients) {
+                List<PatientVisitWrapper> visits = patient
+                    .getPatientVisitCollection();
+                if (visits == null)
+                    continue;
+                for (PatientVisitWrapper visit : visits) {
+                    visit.delete();
+                }
+            }
+            study.reload();
+        }
+    }
+
     private static void importPatientVisits() throws Exception {
+        removeAllPatientVisits();
+
         String studyNameShort;
         StudyWrapper study;
         String clinicName;
         ClinicWrapper clinic;
-        String dateReceived;
+        String dateProcessedStr;
+        Date dateProcessed;
         PatientWrapper patient;
         ShipmentWrapper shipment;
         PatientVisitWrapper pv;
         BlowfishCipher cipher = new BlowfishCipher();
 
-        System.out.println("importing patient visits ...");
+        logger.info("importing patient visits ...");
 
         String qryPart = "from patient_visit, study_list, patient "
             + "where patient_visit.study_nr=study_list.study_nr "
@@ -345,8 +568,9 @@ public class Importer {
         rs.next();
         int numPatientVisits = rs.getInt(1);
 
-        s.execute("select patient_visit.*, study_list.study_name_short, patient.chr_nr "
-            + qryPart);
+        s
+            .execute("select patient_visit.*, study_list.study_name_short, patient.chr_nr "
+                + qryPart);
 
         rs = s.getResultSet();
         if (rs == null) {
@@ -355,30 +579,42 @@ public class Importer {
 
         int count = 1;
         while (rs.next()) {
-            studyNameShort = rs.getString(1);
-            study = getStudyFromOldShortName(studyNameShort);
-            clinicName = rs.getString(3);
-            clinic = CbsrClinics.getClinic(clinicName);
-            dateReceived = rs.getString(4);
-
             String patientNo = cipher.decode(rs.getBytes(21));
-            patient = PatientWrapper.getPatientInSite(appService, patientNo,
-                CbsrSite.cbsrSite);
-
-            shipment = ShipmentWrapper.getShipmentInSite(appService,
-                dateTimeFormatter.parse(dateReceived), CbsrSite.cbsrSite);
-
-            // check for shipment
-            if (shipment == null) {
-                throw new Exception("found 0 shipments for studyName/"
-                    + study.getNameShort() + " clinicName/" + clinicName
-                    + " dateReceived/" + dateReceived);
+            if (patientNo.length() == 6) {
+                studyNameShort = getStudyShortNameFromPatientNr(patientNo);
+                clinicName = getClinicNameFromPatientNr(patientNo);
+            } else {
+                studyNameShort = rs.getString(20);
+                clinicName = rs.getString(3);
             }
+
+            study = getStudyFromOldShortName(studyNameShort);
+            clinic = clinicsMap.get(clinicName);
+
+            if (clinic == null) {
+                logger.error("no clinic \"" + clinicName + "\"for patient "
+                    + patientNo);
+                continue;
+            }
+
+            dateProcessedStr = rs.getString(6);
+            dateProcessed = dateTimeFormatter.parse(dateProcessedStr);
+
+            patient = PatientWrapper.getPatientInSite(appService, patientNo,
+                cbsrSite);
+
+            Calendar cal = new GregorianCalendar();
+            cal.setTime(dateProcessed);
+            cal.set(Calendar.MILLISECOND, 0);
+            cal.set(Calendar.SECOND, 0);
+            dateProcessed = cal.getTime();
+
+            shipment = clinic.getShipment(dateProcessed);
 
             // make sure the clinic is correct
             if ((shipment != null) && !shipment.getClinic().equals(clinic)) {
                 throw new Exception("shipment and clinic do not match: "
-                    + dateReceived + ",  " + clinicName);
+                    + dateProcessed + ",  " + clinicName);
             }
 
             // make sure the study is correct
@@ -387,35 +623,45 @@ public class Importer {
                     "patient study does not match patient visit study");
             }
 
+            // check for shipment
+            if (shipment == null) {
+                logger.error("found 0 shipments for studyName/"
+                    + study.getNameShort() + " clinicName/" + clinicName
+                    + " dateReceived/" + dateProcessed);
+                continue;
+            }
+
+            // check if there is a visit for this date
+            if (patient.getVisit(dateProcessed) != null) {
+                logger.error("patient " + patientNo
+                    + " already has a visit on " + dateProcessed);
+                continue;
+            }
+
             pv = new PatientVisitWrapper(appService);
-            pv.setDateProcessed(dateTimeFormatter.parse(dateReceived));
+            pv.setDateProcessed(dateProcessed);
             pv.setPatient(patient);
             pv.setShipment(shipment);
             pv.setComment(rs.getString(4));
 
-            System.out.println("importing patient visit: patient/"
-                + patient.getNumber() + " visit date/" + dateReceived + " ("
+            logger.debug("importing patient visit: patient/"
+                + patient.getNumber() + " visit date/" + dateProcessed + " ("
                 + count + "/" + numPatientVisits + ")");
 
             // now set corresponding patient visit info data
             for (String label : study.getStudyPvAttrLabels()) {
-                if (label.equals("Date Received")) {
-                    pv.setPvAttrValue(label, rs.getString(6));
-                }
-                else if (label.equals("PBMC Count")) {
+                if (label.equals("PBMC Count")) {
                     pv.setPvAttrValue(label, rs.getString(8));
-                }
-                else if (label.equals("Consent")) {
+                } else if (label.equals("Consent")) {
                     ArrayList<String> consents = new ArrayList<String>();
                     if (rs.getInt(9) == 1) {
                         consents.add("Surveillance");
                     }
                     if (rs.getInt(10) == 1) {
-                        consents.add("Genetic predisposition");
+                        consents.add("Genetic Predisposition");
                     }
                     pv.setPvAttrValue(label, StringUtils.join(consents, ";"));
-                }
-                else if (label.equals("Worksheet")) {
+                } else if (label.equals("Worksheet")) {
                     pv.setPvAttrValue(label, rs.getString(15));
                 }
             }
@@ -425,8 +671,20 @@ public class Importer {
         }
     }
 
+    private static void removeAllCabinetSamples() throws Exception {
+        logger.info("removing old patient visits ...");
+
+        HQLCriteria criteria = new HQLCriteria("from " + Sample.class.getName());
+        List<Sample> samples = appService.query(criteria);
+        for (Sample sample : samples) {
+            SampleWrapper sw = new SampleWrapper(appService, sample);
+            sw.delete();
+        }
+    }
+
     private static void importCabinetSamples() throws Exception {
-        System.out.println("importing cabinet samples ...");
+        removeAllCabinetSamples();
+        logger.info("importing cabinet samples ...");
 
         String qryPart = "from cabinet, study_list, patient_visit, sample_list, patient "
             + "where cabinet.study_nr=study_list.study_nr "
@@ -442,9 +700,10 @@ public class Importer {
         rs.next();
         int numSamples = rs.getInt(1);
 
-        s.execute("select patient_visit.visit_nr, patient_visit.date_received, patient_visit.date_taken, "
-            + "study_list.study_name_short, sample_list.sample_name_short, cabinet.*, patient.chr_nr "
-            + qryPart);
+        s
+            .execute("select patient_visit.visit_nr, patient_visit.date_received, patient_visit.date_taken, "
+                + "study_list.study_name_short, sample_list.sample_name_short, cabinet.*, patient.chr_nr "
+                + qryPart);
 
         rs = s.getResultSet();
         if (rs == null) {
@@ -454,7 +713,7 @@ public class Importer {
         ContainerWrapper cabinet = null;
 
         for (ContainerWrapper container : ContainerWrapper.getContainersInSite(
-            appService, CbsrSite.getSite(), "01")) {
+            appService, cbsrSite, "01")) {
             if (container.getContainerType().getName().equals(
                 "Cabinet 4 drawer")) {
                 cabinet = container;
@@ -470,11 +729,13 @@ public class Importer {
         ContainerTypeWrapper cabinetType = cabinet.getContainerType();
 
         int cabinetNum;
+        StudyWrapper study;
         ContainerWrapper drawer;
         ContainerWrapper bin;
         String studyNameShort;
         PatientWrapper patient;
         PatientVisitWrapper visit;
+        String dateProcessedStr;
         Date dateProcessed;
         SampleTypeWrapper sampleType;
         int drawerNum;
@@ -488,8 +749,8 @@ public class Importer {
         while (rs.next()) {
             ++count;
             cabinetNum = rs.getInt(6);
-            if (cabinetNum != 1) throw new Exception("Invalid cabinet number: "
-                + cabinetNum);
+            if (cabinetNum != 1)
+                throw new Exception("Invalid cabinet number: " + cabinetNum);
 
             drawerName = rs.getString(7);
             Integer rowCap = cabinet.getRowCapacity();
@@ -508,27 +769,30 @@ public class Importer {
             binPos = LabelingScheme.cbsrTwoCharToRowCol(binPosStr, 120, 1,
                 "bin");
 
-            System.out.println("importing Cabinet sample at position "
-                + drawerName + String.format("%02d", binNum) + binPosStr + " ("
-                + count + "/" + numSamples + ")");
+            logger.debug("importing Cabinet sample at position " + drawerName
+                + String.format("%02d", binNum) + binPosStr + " (" + count
+                + "/" + numSamples + ")");
 
             String patientNo = cipher.decode(rs.getBytes(18));
             patient = PatientWrapper.getPatientInSite(appService, patientNo,
-                CbsrSite.cbsrSite);
+                cbsrSite);
 
             studyNameShort = rs.getString(4);
-            if (!patient.getStudy().getNameShort().equals(studyNameShort)) {
+            study = getStudyFromOldShortName(studyNameShort);
+            if (!patient.getStudy().equals(study)) {
                 throw new Exception("patient and study do not match: "
                     + patient.getNumber() + ",  " + studyNameShort);
             }
 
-            visit = null;
-            dateProcessed = dateTimeFormatter.parse(rs.getString(2));
-            for (PatientVisitWrapper v : patient.getPatientVisitCollection()) {
-                if (v.getDateProcessed().equals(dateProcessed)) {
-                    visit = v;
-                }
-            }
+            dateProcessedStr = rs.getString(2);
+            dateProcessed = dateTimeFormatter.parse(dateProcessedStr);
+            Calendar cal = new GregorianCalendar();
+            cal.setTime(dateProcessed);
+            cal.set(Calendar.MILLISECOND, 0);
+            cal.set(Calendar.SECOND, 0);
+            dateProcessed = cal.getTime();
+
+            visit = patient.getVisit(dateProcessed);
 
             if (visit == null) {
                 throw new Exception("patient visit not found for date: "
@@ -538,7 +802,7 @@ public class Importer {
             sampleTypeNameShort = rs.getString(5);
             drawer = cabinet.getChild(pos.row, 0);
             bin = drawer.getChild(binNum, 0);
-            sampleType = CbsrSite.getSampleType(sampleTypeNameShort);
+            sampleType = sampleTypeMap.get(sampleTypeNameShort);
 
             SampleWrapper sample = new SampleWrapper(appService);
             sample.setSampleType(sampleType);
@@ -556,7 +820,7 @@ public class Importer {
     }
 
     // private void importFreezerSamples() throws Exception {
-    // System.out.println("importing freezer samples ...");
+    // logger.debug("importing freezer samples ...");
     //
     // String qryPart =
     // "from freezer, study_list, patient_visit, sample_list,patient "
@@ -612,7 +876,7 @@ public class Importer {
     // freezer = freezer03;
     // }
     // else {
-    // System.out.println("Ignoring samples for freezer number "
+    // logger.debug("Ignoring samples for freezer number "
     // + freezerNum);
     // continue;
     // }
@@ -626,7 +890,7 @@ public class Importer {
     // palletNum = rs.getInt(7) - 1;
     // palletPos = rs.getString(15);
     //
-    // System.out.println("importing freezer sample at position "
+    // logger.debug("importing freezer sample at position "
     // + String.format("%02d", freezerNum) + hotelName
     // + String.format("%02d", palletNum + 1) + palletPos + " ("
     // + count + "/" + numSamples + ")");
@@ -678,9 +942,10 @@ public class Importer {
         HQLCriteria c = new HQLCriteria("select sc"
             + " from edu.ualberta.med.biobank.model.Container as sc"
             + " where sc.name=?");
-        c.setParameters(Arrays.asList(new Object [] { "Cabinet" }));
+        c.setParameters(Arrays.asList(new Object[] { "Cabinet" }));
 
-        System.out.println("CName        Type         CParent      pos1 pos2 SampleSize");
+        System.out
+            .println("CName        Type         CParent      pos1 pos2 SampleSize");
         List<Container> containers = appService.query(c);
         for (Container sc : containers) {
             printContainerPositions(sc.getChildPositionCollection());
@@ -693,9 +958,10 @@ public class Importer {
         HQLCriteria c = new HQLCriteria("select sc"
             + " from edu.ualberta.med.biobank.model.Container as sc"
             + " where sc.name=?");
-        c.setParameters(Arrays.asList(new Object [] { "FR01" }));
+        c.setParameters(Arrays.asList(new Object[] { "FR01" }));
 
-        System.out.println("CName        Type         CParent      pos1 pos2 SampleSize");
+        System.out
+            .println("CName        Type         CParent      pos1 pos2 SampleSize");
         List<Container> containers = appService.query(c);
         for (Container sc : containers) {
             printContainerPositions(sc.getChildPositionCollection());
@@ -703,28 +969,28 @@ public class Importer {
     }
 
     private void printContainerPositions(Collection<ContainerPosition> positions) {
-        if (positions == null) return;
+        if (positions == null)
+            return;
 
         for (ContainerPosition pos : positions) {
-            System.out.println(String.format(
-                "%-12s %-12s %-12s %2d  %2d    %3d",
-                pos.getContainer().getLabel(),
-                pos.getContainer().getContainerType().getName(),
-                pos.getParentContainer().getLabel(), pos.getRow(),
-                pos.getCol(),
-                pos.getContainer().getSamplePositionCollection().size()));
+            logger.debug(String.format("%-12s %-12s %-12s %2d  %2d    %3d", pos
+                .getContainer().getLabel(), pos.getContainer()
+                .getContainerType().getName(), pos.getParentContainer()
+                .getLabel(), pos.getRow(), pos.getCol(), pos.getContainer()
+                .getSamplePositionCollection().size()));
         }
 
         for (ContainerPosition pos : positions) {
-            printContainerPositions(pos.getContainer().getChildPositionCollection());
+            printContainerPositions(pos.getContainer()
+                .getChildPositionCollection());
         }
     }
 
     @SuppressWarnings("unused")
-    private String [] getRowData(ResultSet rs) throws SQLException {
+    private String[] getRowData(ResultSet rs) throws SQLException {
         ResultSetMetaData rsMetaData = rs.getMetaData();
         int numCols = rsMetaData.getColumnCount();
-        String [] result = new String [numCols];
+        String[] result = new String[numCols];
 
         for (int i = 1; i <= numCols; ++i) {
             result[i - 1] = rs.getString(i);
@@ -739,4 +1005,31 @@ public class Importer {
         return appService;
     }
 
+    /*
+     * Selects the study based on the first letter of a patient number
+     */
+    private static String getStudyShortNameFromPatientNr(String patientNr)
+        throws Exception {
+        String studyLetter = patientNr.substring(0, 1);
+        String studyName = newStudyShortNameMap.get(studyLetter);
+        if (studyName == null) {
+            throw new Exception("no study name associated for patient number "
+                + patientNr);
+        }
+        return studyName;
+    }
+
+    /*
+     * Selects the clinic based on the first two letters of a patient number.
+     */
+    private static String getClinicNameFromPatientNr(String patientNr)
+        throws Exception {
+        String prefix = patientNr.substring(0, 2);
+        String clinicName = patientNrToClinicMap.get(prefix);
+        if (clinicName == null) {
+            throw new Exception("no clinic name associated for patient number "
+                + patientNr);
+        }
+        return clinicName;
+    }
 }

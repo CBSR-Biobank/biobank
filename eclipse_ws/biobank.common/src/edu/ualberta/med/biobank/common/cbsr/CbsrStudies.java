@@ -1,15 +1,40 @@
 package edu.ualberta.med.biobank.common.cbsr;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleSourceWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 
+/**
+ * Query to generate studies:
+ * 
+ * select name, name_short, comment from study
+ * 
+ * Query to generate sample sources:
+ * 
+ * select study.name_short, sample_source.name from study join
+ * study_sample_source on study.id=study_sample_source.study_id join
+ * sample_source on sample_source.id=study_sample_source.sample_source_id order
+ * by study.name_short
+ * 
+ * Query to generate study pv attributes:
+ * 
+ * select study.name_short, study_pv_attr.label, pv_attr_type.name,
+ * study_pv_attr.permissible from study join study_pv_attr on
+ * study_pv_attr.study_id=study.id join pv_attr_type on
+ * pv_attr_type.id=study_pv_attr.pv_attr_type_id order by study.name_short
+ * 
+ * Query to generate study contacts:
+ * 
+ * select contact.name, study.name_short from contact join clinic on
+ * clinic.id=contact.clinic_id left join study_contact on contact.id=contact_id
+ * join study on study.id=study_contact.study_id order by study.name_short
+ */
 public class CbsrStudies {
 
     private static Map<String, StudyWrapper> studiesMap = null;
@@ -25,93 +50,205 @@ public class CbsrStudies {
             sampleSourceMap.put(sampleSource.getName(), sampleSource);
         }
 
-        StudyWrapper study;
-
-        // STUDY - AHFEM
-        study = addStudy(site, "Acute Heart Failure-Emergency Management",
-            "AHFEM", null);
-        study.setStudyPvAttr("Worksheet", "text");
-
-        // STUDY - BBPSP
-        study = addStudy(site, "Blood Borne Pathogens Surveillance Project",
-            "BBPSP", null);
-        study.setStudyPvAttr("PBMC Count", "number");
-        study.setStudyPvAttr("Consent", "select_multiple", new String[] {
-            "Surveillance", "Genetic Predisposition", "Previous Samples",
-            "Genetic Mutation" });
-        study.setStudyPvAttr("Worksheet", "text");
-        study.setContactCollection(Arrays.asList(CbsrClinics
-            .getContact("Morna Brown")));
-        study.setSampleSourceCollection(Arrays.asList(sampleSourceMap
-            .get("10mL lavender top EDTA tube")));
-        study.persist();
-
-        // STUDY - CEGIIR
-        study = addStudy(
+        addStudy(site, "Acute Heart Failure-Emergency Management", "AHFEM",
+            null);
+        addStudy(site, "Blood Borne Pathogens Surveillance Project", "BBPSP",
+            null);
+        addStudy(
             site,
             "Centre of Excellence for Gastrointestinal Inflammation and Immunity Research",
             "CEGIIR", null);
-        study.setStudyPvAttr("PBMC Count", "number");
-        study.setStudyPvAttr("Worksheet", "text");
-        study.persist();
-
-        // STUDY - CHILD
         addStudy(site, "Canadian Health Infant Longitudinal Development Study",
             "CHILD", null);
-
-        // STUDY - ERCIN
-        study = addStudy(
-            site,
-            "Exploring the Renoprotective effects of fluid prophylaxis strategies for Contrast Induced Nephropathy (Study)",
+        addStudy(site,
+            "Exploring the Renoprotective effects of fluid prophylaxis "
+                + "strategies for Contrast Induced Nephropathy (Study)",
             "ERCIN", "Precath visit - only urine is collected");
-        study.setStudyPvAttr("Visit Type", "select_single", new String[] {
-            "Baseline", "Precath", "6hr Post", "24hr Post", "48-72hr Post" });
-        study.setStudyPvAttr("Worksheet", "text");
-        study.persist();
+        addStudy(site, "Kidney Disease Cohort Study", "KDCS", null);
+        addStudy(site, "Kingston Merger Study", "KMS", null);
+        addStudy(site, "Man-Chui Poon Study", "MPS", null);
+        addStudy(site, "Novartis Hepatitis C Study", "NHS", null);
+        addStudy(site, "Retroviral Study", "RVS", null);
+        addStudy(site, "Tonelli Chronic Kidney Study", "TCKS", null);
+        addStudy(site, "Vascular Access Study", "VAS", null);
+        addStudy(site, "Critical Care Cohort Study", "CCCS", null);
+        addStudy(
+            site,
+            "A phase II randomized blinded controlled trial of the effect of "
+                + "furoSemide in cricially ill Patients with eARly acute Kidney injury",
+            "SPARK", null);
+        addStudy(
+            site,
+            "Laboratory Controls Study",
+            "LCS",
+            "Created so that we could give locations/track samples that we "
+                + "use as controls. Also used to store leftover aliquots of staff "
+                + "blood  used in experiments");
 
-        // STUDY - KDCS
-        study = addStudy(site, "Kidney Disease Cohort Study", "KDCS", null);
-        study.setStudyPvAttr("PBMC Count", "number");
-        study.setStudyPvAttr("Consent", "select_multiple",
-            new String[] { "Genetic" });
-        study.setStudyPvAttr("Worksheet", "text");
-        study.persist();
+        addSampleSource("AHFEM", "5mL gold top serum tube");
+        addSampleSource("AHFEM", "6ml light green top lithium heparin tube");
+        addSampleSource("AHFEM", "EDTA cryovial");
+        addSampleSource("AHFEM", "AHFEM processing pallet ");
+        addSampleSource("BBPSP", "10mL lavender top EDTA tube");
+        addSampleSource("BBPSP", "4ml lavender top EDTA tube");
+        addSampleSource("BBPSP", "3mL lavender top EDTA tube");
+        addSampleSource("BBPSP", "10ml orange top PAXgene tube");
+        addSampleSource("BBPSP", "urine cup");
+        addSampleSource("CCCS", "6mL lavender top EDTA tube");
+        addSampleSource("CCCS", "6mL beige top tube");
+        addSampleSource("CCCS", "urine cup");
+        addSampleSource("CEGIIR", "10mL lavender top EDTA tube");
+        addSampleSource("CEGIIR", "6mL beige top tube");
+        addSampleSource("CEGIIR", "15ml centrifuge tube (sodium azide urine)");
+        addSampleSource("CHILD", "6mL beige top tube");
+        addSampleSource("CHILD", "10ml green top sodium heparin tube");
+        addSampleSource("CHILD", "urine cup");
+        addSampleSource("CHILD", "Nasal Swab");
+        addSampleSource("CHILD", "Breast milk");
+        addSampleSource("CHILD", "Meconium");
+        addSampleSource("CHILD", "Stool");
+        addSampleSource("ERCIN", "ERCIN Serum processing pallet");
+        addSampleSource("ERCIN", "ERCIN Urine processing pallet");
+        addSampleSource("KDCS", "10mL lavender top EDTA tube");
+        addSampleSource("KDCS", "3mL lavender top EDTA tube");
+        addSampleSource("KDCS", "6mL beige top tube");
+        addSampleSource("KDCS", "3mL red top tube (hemodialysate)");
+        addSampleSource("KDCS", "3ml red top tube (source water)");
+        addSampleSource("KDCS", "10ml orange top PAXgene tube");
+        addSampleSource("KDCS", "15ml centrifuge tube (sodium azide urine)");
+        addSampleSource("KDCS", "6ml beige top tube (tap water)");
+        addSampleSource("KDCS", "fingernail tube");
+        addSampleSource("KDCS", "toenail tube");
+        addSampleSource("KDCS", "hair bagette");
+        addSampleSource("KMS", "EDTA cryovial");
+        addSampleSource("LCS", "N/A");
+        addSampleSource("LCS", "10mL lavender top EDTA tube");
+        addSampleSource("LCS", "6mL lavender top EDTA tube");
+        addSampleSource("LCS", "4ml lavender top EDTA tube");
+        addSampleSource("LCS", "3mL lavender top EDTA tube");
+        addSampleSource("LCS", "5mL gold top serum tube");
+        addSampleSource("LCS", "6mL beige top tube");
+        addSampleSource("LCS", "3mL red top tube (hemodialysate)");
+        addSampleSource("LCS", "3ml red top tube (source water)");
+        addSampleSource("LCS", "10ml green top sodium heparin tube");
+        addSampleSource("LCS", "6ml light green top lithium heparin tube");
+        addSampleSource("LCS", "10ml orange top PAXgene tube");
+        addSampleSource("LCS", "15ml centrifuge tube (sodium azide urine)");
+        addSampleSource("LCS", "6ml beige top tube (tap water)");
+        addSampleSource("LCS", "urine cup");
+        addSampleSource("LCS", "fingernail tube");
+        addSampleSource("LCS", "toenail tube");
+        addSampleSource("LCS", "hair bagette");
+        addSampleSource("LCS", "4.5mL blue top Sodium citrate tube");
+        addSampleSource("LCS", "2.7mL blue top Sodium citrate tube");
+        addSampleSource("LCS", "15ml centrifuge tube (ascites fluid)");
+        addSampleSource("LCS", "EDTA cryovial");
+        addSampleSource("LCS", "Nasal Swab");
+        addSampleSource("LCS", "Breast milk");
+        addSampleSource("LCS", "Meconium");
+        addSampleSource("LCS", "Stool");
+        addSampleSource("LCS", "ERCIN Serum processing pallet");
+        addSampleSource("LCS", "ERCIN Urine processing pallet");
+        addSampleSource("LCS", "AHFEM processing pallet ");
+        addSampleSource("MPS", "2.7mL blue top Sodium citrate tube");
+        addSampleSource("NHS", "4ml lavender top EDTA tube");
+        addSampleSource("NHS", "5mL gold top serum tube");
+        addSampleSource("RVS", "10mL lavender top EDTA tube");
+        addSampleSource("RVS", "5mL gold top serum tube");
+        addSampleSource("RVS", "10ml orange top PAXgene tube");
+        addSampleSource("RVS", "15ml centrifuge tube (sodium azide urine)");
+        addSampleSource("SPARK", "4ml lavender top EDTA tube");
+        addSampleSource("SPARK", "urine cup");
+        addSampleSource("TCKS", "10mL lavender top EDTA tube");
+        addSampleSource("TCKS", "6mL beige top tube");
+        addSampleSource("TCKS", "10ml orange top PAXgene tube");
+        addSampleSource("TCKS", "15ml centrifuge tube (sodium azide urine)");
+        addSampleSource("TCKS", "fingernail tube");
+        addSampleSource("TCKS", "toenail tube");
+        addSampleSource("TCKS", "hair bagette");
+        addSampleSource("VAS", "10mL lavender top EDTA tube");
+        addSampleSource("VAS", "5mL gold top serum tube");
+        addSampleSource("VAS", "6mL beige top tube");
+        addSampleSource("VAS", "10ml orange top PAXgene tube");
 
-        // STUDY - KMS
-        study = addStudy(site, "Kingston Merger Study", "KMS", null);
-        study.setStudyPvAttr("Worksheet", "text");
-        study.persist();
+        addPvAttr("AHFEM", "Worksheet", "text");
+        addPvAttr("BBPSP", "Consent", "select_multiple",
+            "Surveillance;Genetic Predisposition;Previous Samples;Genetic Mutation");
+        addPvAttr("BBPSP", "Worksheet", "text");
+        addPvAttr("BBPSP", "PBMC Count", "number");
+        addPvAttr("CCCS", "PBMC Count", "number");
+        addPvAttr("CCCS", "Worksheet", "text");
+        addPvAttr("CEGIIR", "Worksheet", "text");
+        addPvAttr("CEGIIR", "PBMC Count", "number");
+        addPvAttr("CHILD", "PBMC Count", "number");
+        addPvAttr("CHILD", "Worksheet", "text");
+        addPvAttr("ERCIN", "Worksheet", "text");
+        addPvAttr("ERCIN", "PBMC Count", "number");
+        addPvAttr("ERCIN", "Visit Type", "select_single",
+            "Baseline;Precath;6hr Post;24hr Post;48-72hr Post");
+        addPvAttr("KDCS", "Worksheet", "text");
+        addPvAttr("KDCS", "Consent", "select_multiple", "Genetic");
+        addPvAttr("KDCS", "PBMC Count", "number");
+        addPvAttr("KMS", "PBMC Count", "number");
+        addPvAttr("KMS", "Worksheet", "text");
+        addPvAttr("LCS", "PBMC Count", "number");
+        addPvAttr("LCS", "Worksheet", "text");
+        addPvAttr("MPS", "PBMC Count", "number");
+        addPvAttr("MPS", "PBMC Count", "number");
+        addPvAttr("MPS", "Worksheet", "text");
+        addPvAttr("NHS", "PBMC Count", "number");
+        addPvAttr("NHS", "Worksheet", "text");
+        addPvAttr("NHS", "Visit Type", "select_single",
+            "D0;D2;D4;Wk2;Wk4;M2;M8;M12;M18;M24");
+        addPvAttr("NHS", "Biopsy Length", "number");
+        addPvAttr("RVS", "PBMC Count", "number");
+        addPvAttr("RVS", "Worksheet", "text");
+        addPvAttr("SPARK", "PBMC Count", "number");
+        addPvAttr("SPARK", "Worksheet", "text");
+        addPvAttr("TCKS", "PBMC Count", "number");
+        addPvAttr("TCKS", "Worksheet", "text");
+        addPvAttr("VAS", "PBMC Count", "number");
+        addPvAttr("VAS", "Worksheet", "text");
 
-        // STUDY - MPS
-        study = addStudy(site, "Man-Chui Poon Study", "MPS", null);
-        study.setStudyPvAttr("Worksheet", "text");
-        study.persist();
-
-        // STUDY - NHS
-        study = addStudy(site, "Novartis Hepatitis C Study", "NHS", null);
-        study.setStudyPvAttr("Biopsy Length", "number");
-        study.setStudyPvAttr("Visit Type", "select_single", new String[] {
-            "D0", "D2", "D4", "Wk2", "Wk4", "M2", "M8", "M12", "M18", "M24" });
-        study.setStudyPvAttr("PBMC Count", "number");
-        study.setStudyPvAttr("Worksheet", "text");
-        study.persist();
-
-        // STUDY - RVS
-        study = addStudy(site, "Retroviral Study", "RVS", null);
-        study.setStudyPvAttr("Worksheet", "text");
-        study.persist();
-
-        // STUDY - TCKS
-        study = addStudy(site, "Tonelli Chronic Kidney Study", "TCKS", null);
-        study.setStudyPvAttr("PBMC Count", "number");
-        study.setStudyPvAttr("Worksheet", "text");
-        study.persist();
-
-        // STUDY - VAS
-        study = addStudy(site, "Vascular Access Study", "VAS", null);
-        study.setStudyPvAttr("PBMC Count", "number");
-        study.setStudyPvAttr("Worksheet", "text");
-        study.persist();
+        addContact("Dr. Justin Ezekowitz", "AHFEM");
+        addContact("Morna Brown", "BBPSP");
+        addContact("Melanie Peters", "BBPSP");
+        addContact("Aleasha Warner", "BBPSP");
+        addContact("Dorine Belliveau", "BBPSP");
+        addContact("Elaine Gloutnez", "BBPSP");
+        addContact("Chantal Gagne", "BBPSP");
+        addContact("Elizabeth-Ann Paradis", "BBPSP");
+        addContact("Dianne Dufour", "BBPSP");
+        addContact("Colleen Fitzgerald", "BBPSP");
+        addContact("Niki Davis", "BBPSP");
+        addContact("Theresa Almonte", "BBPSP");
+        addContact("Maryanne Gibson", "BBPSP");
+        addContact("Sheila Schembri", "BBPSP");
+        addContact("Nathalie Aubin", "BBPSP");
+        addContact("Lucie Lacasse", "BBPSP");
+        addContact("Tammy Burtenshaw", "BBPSP");
+        addContact("Louise Bedard", "BBPSP");
+        addContact("Janet D Sharun", "BBPSP");
+        addContact("Kathy Hjalmarsson", "BBPSP");
+        addContact("unknown", "BBPSP");
+        addContact("Dr. Neesh Pannu", "CCCS");
+        addContact("Wanda MacDonald", "CEGIIR");
+        addContact("Dellanee Kahlke", "CHILD");
+        addContact("Candace Dando", "ERCIN");
+        addContact("Daisy Gibbons", "ERCIN");
+        addContact("Dawn Opgenorth", "KDCS");
+        addContact("Sharon Gulewich", "KDCS");
+        addContact("Elizabeth Taylor", "KMS");
+        addContact("Elizabeth Taylor", "LCS");
+        addContact("Bonny Granfield", "MPS");
+        addContact("Shirley Cole", "NHS");
+        addContact("Dr. Andrew Mason", "NHS");
+        addContact("Dr. Andrew Mason", "RVS");
+        addContact("Erin Rezanoff", "SPARK");
+        addContact("Sharon Gulewich", "TCKS");
+        addContact("Sue Szigety", "TCKS");
+        addContact("Dawn Opgenorth", "VAS");
+        addPvAttr("AHFEM", "PBMC Count", "number");
     }
 
     private static StudyWrapper addStudy(SiteWrapper site, String name,
@@ -141,6 +278,57 @@ public class CbsrStudies {
             throw new Exception("contacts have not been added");
         }
         return new ArrayList<String>(studiesMap.keySet());
+    }
+
+    private static void addSampleSource(String studyNameShort,
+        String sampleSourceName) throws Exception {
+        StudyWrapper study = getStudy(studyNameShort);
+        SampleSourceWrapper ss = sampleSourceMap.get(sampleSourceName);
+        if (ss == null) {
+            throw new Exception("invalid sample source name: "
+                + sampleSourceName);
+        }
+
+        List<SampleSourceWrapper> list = study.getSampleSourceCollection();
+        if (list == null) {
+            list = new ArrayList<SampleSourceWrapper>();
+        }
+        list.add(ss);
+        study.setSampleSourceCollection(list);
+        study.persist();
+        study.reload();
+    }
+
+    private static void addPvAttr(String studyNameShort, String label,
+        String type, String permissible) throws Exception {
+        StudyWrapper study = getStudy(studyNameShort);
+        if ((permissible != null) && (permissible.length() > 0)) {
+            study.setStudyPvAttr(label, type, permissible.split(";"));
+        } else {
+            study.setStudyPvAttr(label, type);
+        }
+        study.persist();
+        study.reload();
+    }
+
+    private static void addPvAttr(String studyNameShort, String label,
+        String type) throws Exception {
+        addPvAttr(studyNameShort, label, type, null);
+    }
+
+    private static void addContact(String contactName, String studyNameShort)
+        throws Exception {
+        ContactWrapper contact = CbsrClinics.getContact(contactName);
+        StudyWrapper study = getStudy(studyNameShort);
+
+        List<ContactWrapper> contacts = study.getContactCollection();
+        if (contacts == null) {
+            contacts = new ArrayList<ContactWrapper>();
+        }
+        contacts.add(contact);
+        study.setContactCollection(contacts);
+        study.persist();
+        study.reload();
     }
 
 }
