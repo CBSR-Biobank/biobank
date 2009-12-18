@@ -43,6 +43,7 @@ import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerPosition;
+import edu.ualberta.med.biobank.model.Sample;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
@@ -137,7 +138,8 @@ public class Importer {
 
                 // removeAllPatientVisits();
                 // importShipments();
-                importPatientVisits();
+                // importPatientVisits();
+                importCabinetSamples();
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -610,7 +612,19 @@ public class Importer {
         }
     }
 
+    private static void removeAllCabinetSamples() throws Exception {
+        logger.debug("removing old patient visits ...");
+
+        HQLCriteria criteria = new HQLCriteria("from " + Sample.class.getName());
+        List<Sample> samples = appService.query(criteria);
+        for (Sample sample : samples) {
+            SampleWrapper sw = new SampleWrapper(appService, sample);
+            sw.delete();
+        }
+    }
+
     private static void importCabinetSamples() throws Exception {
+        removeAllCabinetSamples();
         logger.debug("importing cabinet samples ...");
 
         String qryPart = "from cabinet, study_list, patient_visit, sample_list, patient "
@@ -656,11 +670,13 @@ public class Importer {
         ContainerTypeWrapper cabinetType = cabinet.getContainerType();
 
         int cabinetNum;
+        StudyWrapper study;
         ContainerWrapper drawer;
         ContainerWrapper bin;
         String studyNameShort;
         PatientWrapper patient;
         PatientVisitWrapper visit;
+        String dateProcessedStr;
         Date dateProcessed;
         SampleTypeWrapper sampleType;
         int drawerNum;
@@ -703,18 +719,21 @@ public class Importer {
                 cbsrSite);
 
             studyNameShort = rs.getString(4);
-            if (!patient.getStudy().getNameShort().equals(studyNameShort)) {
+            study = getStudyFromOldShortName(studyNameShort);
+            if (!patient.getStudy().equals(study)) {
                 throw new Exception("patient and study do not match: "
                     + patient.getNumber() + ",  " + studyNameShort);
             }
 
-            visit = null;
-            dateProcessed = dateTimeFormatter.parse(rs.getString(2));
-            for (PatientVisitWrapper v : patient.getPatientVisitCollection()) {
-                if (v.getDateProcessed().equals(dateProcessed)) {
-                    visit = v;
-                }
-            }
+            dateProcessedStr = rs.getString(2);
+            dateProcessed = dateTimeFormatter.parse(dateProcessedStr);
+            Calendar cal = new GregorianCalendar();
+            cal.setTime(dateProcessed);
+            cal.set(Calendar.MILLISECOND, 0);
+            cal.set(Calendar.SECOND, 0);
+            dateProcessed = cal.getTime();
+
+            visit = patient.getVisit(dateProcessed);
 
             if (visit == null) {
                 throw new Exception("patient visit not found for date: "
@@ -724,7 +743,7 @@ public class Importer {
             sampleTypeNameShort = rs.getString(5);
             drawer = cabinet.getChild(pos.row, 0);
             bin = drawer.getChild(binNum, 0);
-            sampleType = CbsrSite.getSampleType(sampleTypeNameShort);
+            sampleType = sampleTypeMap.get(sampleTypeNameShort);
 
             SampleWrapper sample = new SampleWrapper(appService);
             sample.setSampleType(sampleType);
