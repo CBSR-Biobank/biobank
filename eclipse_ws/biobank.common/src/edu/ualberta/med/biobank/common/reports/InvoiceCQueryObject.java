@@ -7,7 +7,6 @@ import java.util.List;
 import edu.ualberta.med.biobank.model.Sample;
 
 public class InvoiceCQueryObject extends QueryObject {
-
     private static String QUERY_STRING = "Select {0}Alias.patientVisit.shipment.clinic.name, "
         + "{0}Alias.patientVisit.patient.id, {0}Alias.patientVisit.patient.number, "
         + "{0}Alias.linkDate, {0}Alias.sampleType.name  from "
@@ -16,12 +15,12 @@ public class InvoiceCQueryObject extends QueryObject {
         + "{0}Alias.patientVisit.patient.study.site.id = {1} ORDER BY "
         + "{0}Alias.patientVisit.shipment.clinic.id, {0}Alias.patientVisit.patient.id";
 
-    public InvoiceCQueryObject(Integer siteId) {
+    public InvoiceCQueryObject(String name, Integer siteId) {
         super(
-            "Lists all samples for a particular date range, grouped by clinic.",
-            "Sample Invoice By Clinic", MessageFormat.format(QUERY_STRING,
-                "SIBC", siteId), new String[] { "Clinic", "Patient Id",
-                "Patient Number", "Link Date", "Sample Type" });
+            "Lists all samples linked in a particular date range, ordered by clinic.",
+            name, MessageFormat.format(QUERY_STRING, name, siteId),
+            new String[] { "Clinic", "Patient Id", "Patient Number",
+                "Link Date", "Sample Type" });
         addOption("Start Date", Date.class, new Date(0));
         addOption("End Date", Date.class, new Date());
     }
