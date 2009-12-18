@@ -19,7 +19,7 @@ PWD=$3
 DBNAME=$4
 
 # tables to skip
-skip_tables=(csm_application csm_filter_clause csm_group csm_pg_pe csm_privilege csm_protection_element csm_protection_group csm_role csm_role_privilege csm_user csm_user_group csm_user_group_role_pg csm_user_pe log_message object_attribute objectattributes )
+skip_tables=( log_message object_attribute objectattributes )
 
 if [ -z "$DBNAME" ]; then
     DBNAME=biobank2
@@ -31,4 +31,4 @@ for (( i = 0; i < n; i++ )) do
         OPTS[$i]="--ignore-table=${DBNAME}.${skip_tables[$i]}"
 done
 
-$MYSQLDUMP ${OPTS[*]} -h$HOST -u$USER -p$PWD $DBNAME | gzip > ${DBNAME}_`date +%y_%m_%d`.sql.gz
+$MYSQLDUMP --skip-extended-insert ${OPTS[*]} -h$HOST -u$USER -p$PWD $DBNAME | gzip > ${DBNAME}_`date +%y_%m_%d`.sql.gz

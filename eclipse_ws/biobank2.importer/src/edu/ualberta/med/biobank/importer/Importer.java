@@ -85,7 +85,47 @@ public class Importer {
         aMap.put("SPARK", "SPARK");
         aMap.put("TCKS", "TCKS");
         aMap.put("VAS", "VAS");
+        aMap.put("A", "KDCS");
+        aMap.put("C", "CCCS");
+        aMap.put("E", "ERCIN");
+        aMap.put("G", "CEGIIR");
+        aMap.put("H", "AHFEM");
+        aMap.put("K", "KMS");
+        aMap.put("L", "LCS");
+        aMap.put("M", "MPS");
+        aMap.put("N", "NHS");
+        aMap.put("P", "CHILD");
+        aMap.put("R", "RVS");
+        aMap.put("S", "SPARK");
+        aMap.put("V", "VAS");
+        aMap.put("Z", "TCKS");
         newStudyShortNameMap = Collections.unmodifiableMap(aMap);
+    };
+
+    private static final Map<String, String> patientNrToClinicMap;
+    static {
+        Map<String, String> aMap = new HashMap<String, String>();
+        aMap.put("AA", "ED1");
+        aMap.put("AB", "CL1-KDCS");
+        aMap.put("AC", "VN1");
+        aMap.put("CC", "ED1");
+        aMap.put("ER", "SF1");
+        aMap.put("EA", "ED1");
+        aMap.put("GR", "ED1");
+        aMap.put("HA", "ED1");
+        aMap.put("KN", "KN1");
+        aMap.put("LC", "ED1");
+        aMap.put("MP", "ED1");
+        aMap.put("NH", "ED1");
+        aMap.put("PA", "ED1");
+        aMap.put("RV", "ED1");
+        aMap.put("SA", "ED1");
+        aMap.put("VA", "ED1");
+        aMap.put("ZA", "ED1");
+        aMap.put("ZB", "CL1");
+        aMap.put("ZC", "VN1");
+
+        patientNrToClinicMap = Collections.unmodifiableMap(aMap);
     };
 
     private static SiteWrapper cbsrSite = null;
@@ -141,6 +181,8 @@ public class Importer {
                 // importPatientVisits();
                 importCabinetSamples();
             }
+
+            logger.info("import complete");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -290,8 +332,9 @@ public class Importer {
     private static void importPatients() throws Exception {
         BlowfishCipher cipher = new BlowfishCipher();
         StudyWrapper study;
+        String studyNameShort;
         PatientWrapper patient;
-        logger.debug("importing patients ...");
+        logger.info("importing patients ...");
 
         String qryPart = "from patient, study_list where patient.study_nr=study_list.study_nr";
 
@@ -309,8 +352,14 @@ public class Importer {
         }
 
         while (rs.next()) {
-            String studyNameShort = rs.getString(5);
             String patientNo = cipher.decode(rs.getBytes(2));
+
+            if (patientNo.length() == 6) {
+                studyNameShort = getStudyShortNameFromPatientNr(patientNo);
+            } else {
+                studyNameShort = rs.getString(5);
+            }
+
             study = getStudyFromOldShortName(studyNameShort);
 
             if (study == null) {
@@ -330,7 +379,7 @@ public class Importer {
     }
 
     private static void removeAllShipments() throws Exception {
-        logger.debug("removing old shipments ...");
+        logger.info("removing old shipments ...");
 
         for (ClinicWrapper clinic : clinicsMap.values()) {
             List<ShipmentWrapper> shipments = clinic.getShipmentCollection();
@@ -356,7 +405,7 @@ public class Importer {
 
         removeAllShipments();
 
-        logger.debug("importing shipments ...");
+        logger.info("importing shipments ...");
 
         String qryPart = "from patient_visit, study_list, patient "
             + "where patient_visit.study_nr=study_list.study_nr "
@@ -379,9 +428,14 @@ public class Importer {
 
         int count = 1;
         while (rs.next()) {
-            studyNameShort = rs.getString(1);
             String patientNo = cipher.decode(rs.getBytes(2));
-            clinicName = rs.getString(3);
+            if (patientNo.length() == 6) {
+                studyNameShort = getStudyShortNameFromPatientNr(patientNo);
+                clinicName = getClinicNameFromPatientNr(patientNo);
+            } else {
+                studyNameShort = rs.getString(1);
+                clinicName = rs.getString(3);
+            }
 
             study = getStudyFromOldShortName(studyNameShort);
             clinic = clinicsMap.get(clinicName);
@@ -466,7 +520,7 @@ public class Importer {
     }
 
     private static void removeAllPatientVisits() throws Exception {
-        logger.debug("removing old patient visits ...");
+        logger.info("removing old patient visits ...");
 
         for (StudyWrapper study : studiesMap.values()) {
             if (study.getPatientVisitCount() == 0)
@@ -502,7 +556,7 @@ public class Importer {
         PatientVisitWrapper pv;
         BlowfishCipher cipher = new BlowfishCipher();
 
-        logger.debug("importing patient visits ...");
+        logger.info("importing patient visits ...");
 
         String qryPart = "from patient_visit, study_list, patient "
             + "where patient_visit.study_nr=study_list.study_nr "
@@ -525,9 +579,14 @@ public class Importer {
 
         int count = 1;
         while (rs.next()) {
-            studyNameShort = rs.getString(20);
-            clinicName = rs.getString(3);
             String patientNo = cipher.decode(rs.getBytes(21));
+            if (patientNo.length() == 6) {
+                studyNameShort = getStudyShortNameFromPatientNr(patientNo);
+                clinicName = getClinicNameFromPatientNr(patientNo);
+            } else {
+                studyNameShort = rs.getString(20);
+                clinicName = rs.getString(3);
+            }
 
             study = getStudyFromOldShortName(studyNameShort);
             clinic = clinicsMap.get(clinicName);
@@ -613,7 +672,7 @@ public class Importer {
     }
 
     private static void removeAllCabinetSamples() throws Exception {
-        logger.debug("removing old patient visits ...");
+        logger.info("removing old patient visits ...");
 
         HQLCriteria criteria = new HQLCriteria("from " + Sample.class.getName());
         List<Sample> samples = appService.query(criteria);
@@ -625,7 +684,7 @@ public class Importer {
 
     private static void importCabinetSamples() throws Exception {
         removeAllCabinetSamples();
-        logger.debug("importing cabinet samples ...");
+        logger.info("importing cabinet samples ...");
 
         String qryPart = "from cabinet, study_list, patient_visit, sample_list, patient "
             + "where cabinet.study_nr=study_list.study_nr "
@@ -946,4 +1005,31 @@ public class Importer {
         return appService;
     }
 
+    /*
+     * Selects the study based on the first letter of a patient number
+     */
+    private static String getStudyShortNameFromPatientNr(String patientNr)
+        throws Exception {
+        String studyLetter = patientNr.substring(0, 1);
+        String studyName = newStudyShortNameMap.get(studyLetter);
+        if (studyName == null) {
+            throw new Exception("no study name associated for patient number "
+                + patientNr);
+        }
+        return studyName;
+    }
+
+    /*
+     * Selects the clinic based on the first two letters of a patient number.
+     */
+    private static String getClinicNameFromPatientNr(String patientNr)
+        throws Exception {
+        String prefix = patientNr.substring(0, 2);
+        String clinicName = patientNrToClinicMap.get(prefix);
+        if (clinicName == null) {
+            throw new Exception("no clinic name associated for patient number "
+                + patientNr);
+        }
+        return clinicName;
+    }
 }
