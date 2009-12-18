@@ -52,6 +52,7 @@ public class SessionManager {
         super();
         rootNode = new RootNode();
         possibleViewMap = new HashMap<String, AbstractViewWithTree>();
+        siteManager = new SiteManager();
     }
 
     public static SessionManager getInstance() {
@@ -75,9 +76,8 @@ public class SessionManager {
             serverName, userName);
         rootNode.addChild(sessionAdapter);
 
+        siteManager.init(appService, serverName);
         Assert.isNotNull(siteCombo, "site combo is null");
-
-        siteManager = new SiteManager(appService, serverName);
         siteManager.setSiteCombo(siteCombo);
         siteManager.getCurrentSite(serverName, sites);
         siteManager.updateSites(sites);

@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.forms;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,6 +21,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.PlatformUI;
@@ -80,9 +82,7 @@ public class ContainerViewForm extends BiobankViewForm {
 
     private boolean childrenOk = true;
 
-    private ComboViewer initSelectionCv;
-
-    private Button initializeSelectionButton;
+    private Composite childrenActionSection;
 
     @Override
     public void init() throws Exception {
@@ -203,10 +203,10 @@ public class ContainerViewForm extends BiobankViewForm {
         containerWidget.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseDoubleClick(MouseEvent e) {
-                Object object = ((AbstractContainerDisplayWidget) e.widget)
+                Cell cell = ((AbstractContainerDisplayWidget) e.widget)
                     .getObjectAtCoordinates(e.x, e.y);
-                if (object != null)
-                    openFormFor((ContainerCell) object);
+                if (cell != null)
+                    openFormFor((ContainerCell) cell);
             }
         });
         containerWidget.getMultiSelectionManager().enableMultiSelection(
@@ -224,64 +224,27 @@ public class ContainerViewForm extends BiobankViewForm {
             new MultiSelectionListener() {
                 @Override
                 public void selectionChanged(MultiSelectionEvent mse) {
-                    boolean enable = mse.selections > 0;
-                    initSelectionCv.getCombo().setEnabled(enable);
-                    initializeSelectionButton.setEnabled(enable);
+                    setChildrenActionSectionEnabled(mse.selections > 0);
                 }
             });
         containerWidget.displayFullInfoString(true);
 
-        addChildrenActions(client);
+        createChildrenActionsSection(client);
     }
 
-    private void addChildrenActions(Composite client) {
-        Composite multiSection = toolkit.createComposite(client);
-        multiSection.setLayout(new GridLayout(3, false));
+    private void createChildrenActionsSection(Composite client) {
+        childrenActionSection = toolkit.createComposite(client);
+        childrenActionSection.setLayout(new GridLayout(3, false));
 
         List<ContainerTypeWrapper> containerTypes = container
             .getContainerType().getChildContainerTypeCollection();
 
-        // Initialisation action
-        final ComboViewer initCv = createComboViewer(multiSection,
-            "Initialize all available containers to", containerTypes,
+        // Initialisation action for selection
+        final ComboViewer initSelectionCv = createComboViewer(
+            childrenActionSection, "Initialize selection to", containerTypes,
             containerTypes.get(0));
-        Button initialize = toolkit.createButton(multiSection, "Initialize",
-            SWT.PUSH);
-        initialize.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                ContainerTypeWrapper type = (ContainerTypeWrapper) ((IStructuredSelection) initCv
-                    .getSelection()).getFirstElement();
-                initContainers(type);
-            }
-        });
-
-        // Delete action
-        final ComboViewer deleteCv = createComboViewer(multiSection,
-            "Delete all initialized containers of type", containerTypes,
-            containerTypes.get(0));
-        Button deleteButton = toolkit.createButton(multiSection, "Delete",
-            SWT.PUSH);
-        deleteButton.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                Boolean confirm = MessageDialog.openConfirm(PlatformUI
-                    .getWorkbench().getActiveWorkbenchWindow().getShell(),
-                    "Confirm Delete",
-                    "Are you sure you want to delete these containers?");
-                if (confirm) {
-                    ContainerTypeWrapper type = (ContainerTypeWrapper) ((IStructuredSelection) deleteCv
-                        .getSelection()).getFirstElement();
-                    deleteContainers(type);
-                }
-            }
-        });
-
-        // Initialisation action for selections
-        initSelectionCv = createComboViewer(multiSection,
-            "Initialize selection to", containerTypes, containerTypes.get(0));
-        initializeSelectionButton = toolkit.createButton(multiSection,
-            "Initialize", SWT.PUSH);
+        Button initializeSelectionButton = toolkit.createButton(
+            childrenActionSection, "Initialize", SWT.PUSH);
         initializeSelectionButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -290,22 +253,75 @@ public class ContainerViewForm extends BiobankViewForm {
                 initSelection(type);
             }
         });
-        initSelectionCv.getCombo().setEnabled(false);
-        initializeSelectionButton.setEnabled(false);
+
+        // Delete action for selection
+        List<Object> deleteComboList = new ArrayList<Object>();
+        deleteComboList.add("All");
+        deleteComboList.addAll(containerTypes);
+        final ComboViewer deleteCv = createComboViewer(childrenActionSection,
+            "Delete selected containers of type", deleteComboList, "All");
+        Button deleteButton = toolkit.createButton(childrenActionSection,
+            "Delete", SWT.PUSH);
+        deleteButton.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                Boolean confirm = MessageDialog.openConfirm(PlatformUI
+                    .getWorkbench().getActiveWorkbenchWindow().getShell(),
+                    "Confirm Delete",
+                    "Are you sure you want to delete these containers?");
+                if (confirm) {
+                    Object selection = ((IStructuredSelection) deleteCv
+                        .getSelection()).getFirstElement();
+                    if (selection instanceof ContainerTypeWrapper) {
+                        deleteSelection((ContainerTypeWrapper) selection);
+                    } else {
+                        deleteSelection(null);
+                    }
+                }
+            }
+        });
+        setChildrenActionSectionEnabled(false);
     }
 
-    private void initContainers(final ContainerTypeWrapper type) {
+    private void setChildrenActionSectionEnabled(boolean enable) {
+        // don't use the method seEnabled on the composite because the children
+        // are not greyed out in this case
+        for (Control c : childrenActionSection.getChildren()) {
+            c.setEnabled(enable);
+        }
+    }
+
+    private void initSelection(final ContainerTypeWrapper type) {
         BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
             public void run() {
                 boolean initDone = true;
                 try {
-                    container.initChildrenWithType(type);
+                    Set<RowColPos> positions = containerWidget
+                        .getMultiSelectionManager().getSelectedPositions();
+                    container.initChildrenWithType(type, positions);
                 } catch (Exception e) {
                     initDone = false;
                     BioBankPlugin.openAsyncError(
                         "Error while creating children", e);
                 }
                 refresh(initDone, false);
+            }
+        });
+    }
+
+    private void deleteSelection(final ContainerTypeWrapper type) {
+        BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
+            public void run() {
+                boolean deleteDones = false;
+                try {
+                    Set<RowColPos> positions = containerWidget
+                        .getMultiSelectionManager().getSelectedPositions();
+                    deleteDones = container.deleteChildrenWithType(type,
+                        positions);
+                } catch (Exception ex) {
+                    BioBankPlugin.openAsyncError("Can't Delete Containers", ex);
+                }
+                refresh(deleteDones, true);
             }
         });
     }
@@ -326,39 +342,6 @@ public class ContainerViewForm extends BiobankViewForm {
                 }
             });
         }
-    }
-
-    private void deleteContainers(final ContainerTypeWrapper type) {
-        BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
-            public void run() {
-                boolean deleteDones = false;
-                try {
-                    deleteDones = container.deleteChildrenWithType(type);
-                } catch (Exception ex) {
-                    BioBankPlugin.openAsyncError("Can't Delete Containers", ex);
-                }
-                refresh(deleteDones, true);
-            }
-        });
-    }
-
-    private void initSelection(final ContainerTypeWrapper type) {
-        BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
-            public void run() {
-                boolean initDone = true;
-                try {
-                    Set<RowColPos> positions = containerWidget
-                        .getMultiSelectionManager().getSelectedPositions();
-                    container.initChildrenWithType(type, positions);
-                } catch (Exception e) {
-                    initDone = false;
-                    BioBankPlugin.openAsyncError(
-                        "Error while creating children", e);
-                }
-                refresh(initDone, false);
-            }
-        });
-
     }
 
     private void openFormFor(ContainerCell cell) {
@@ -413,13 +396,15 @@ public class ContainerViewForm extends BiobankViewForm {
 
     @Override
     protected void reload() throws Exception {
-        containerAdapter.getContainer().reload();
-        form.setText("Container " + container.getLabel() + " ("
-            + container.getContainerType().getName() + ")");
-        if (container.getContainerType().getChildContainerTypeCollection()
-            .size() > 0)
-            refreshVis();
-        setContainerValues();
+        if (!form.isDisposed()) {
+            containerAdapter.getContainer().reload();
+            form.setText("Container " + container.getLabel() + " ("
+                + container.getContainerType().getName() + ")");
+            if (container.getContainerType().getChildContainerTypeCollection()
+                .size() > 0)
+                refreshVis();
+            setContainerValues();
+        }
     }
 
     @Override

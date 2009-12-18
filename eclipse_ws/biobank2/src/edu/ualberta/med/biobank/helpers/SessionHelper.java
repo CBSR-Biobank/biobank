@@ -27,8 +27,14 @@ public class SessionHelper implements Runnable {
 
     private Collection<SiteWrapper> siteWrappers;
 
-    public SessionHelper(String server, String userName, String password) {
-        this.serverUrl = "https://" + server + "/biobank2";
+    public SessionHelper(String server, boolean secureConnection,
+        String userName, String password) {
+        if (secureConnection) {
+            this.serverUrl = "https://";
+        } else {
+            this.serverUrl = "http://";
+        }
+        this.serverUrl += server + "/biobank2";
         this.userName = userName;
         this.password = password;
 
@@ -50,7 +56,6 @@ public class SessionHelper implements Runnable {
                 appService = ServiceConnection.getAppService(serverUrl,
                     userName, password);
             }
-
             siteWrappers = SiteWrapper.getSites(appService);
         } catch (ApplicationException exp) {
             LOGGER.error("Error while logging to application", exp);

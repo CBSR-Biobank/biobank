@@ -1,10 +1,9 @@
 package edu.ualberta.med.biobank.treeview;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.Collection;
 
-import org.apache.log4j.Logger;
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -14,17 +13,13 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.handlers.IHandlerService;
-import org.springframework.remoting.RemoteAccessException;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class SessionAdapter extends AdapterBase {
-
-    private static Logger LOGGER = Logger.getLogger(SessionAdapter.class
-        .getName());
 
     private WritableApplicationService appService;
 
@@ -94,38 +89,6 @@ public class SessionAdapter extends AdapterBase {
     }
 
     @Override
-    public void loadChildren(boolean updateNode) {
-        try {
-            // read from database again
-            Integer siteId = null;
-            SiteWrapper currentSite = SessionManager.getInstance()
-                .getCurrentSiteWrapper();
-            if (currentSite != null)
-                siteId = currentSite.getId();
-
-            List<SiteWrapper> siteCollection = new ArrayList<SiteWrapper>(
-                SiteWrapper.getSites(appService, siteId));
-            Collections.sort(siteCollection);
-
-            for (SiteWrapper siteWrapper : siteCollection) {
-                SiteAdapter node = (SiteAdapter) getChild(siteWrapper.getId());
-                if (node == null) {
-                    node = new SiteAdapter(this, siteWrapper);
-                    addChild(node);
-                }
-                if (updateNode) {
-                    SessionManager.updateTreeNode(node);
-                }
-            }
-        } catch (final RemoteAccessException exp) {
-            BioBankPlugin.openRemoteAccessErrorMessage();
-        } catch (Exception e) {
-            LOGGER.error("Error while loading sites for session " + getName(),
-                e);
-        }
-    }
-
-    @Override
     public String getTreeText() {
         if (userName.isEmpty()) {
             return super.getTreeText();
@@ -142,6 +105,25 @@ public class SessionAdapter extends AdapterBase {
     @Override
     public AdapterBase accept(NodeSearchVisitor visitor) {
         return visitor.visit(this);
+    }
+
+    @Override
+    protected AdapterBase createChildNode(ModelWrapper<?> child) {
+        Assert.isTrue(child instanceof SiteWrapper);
+        return new SiteAdapter(this, (SiteWrapper) child);
+    }
+
+    @Override
+    protected Collection<? extends ModelWrapper<?>> getWrapperChildren()
+        throws Exception {
+        SiteWrapper currentSite = SessionManager.getInstance()
+            .getCurrentSiteWrapper();
+        Integer siteId = null;
+        if (currentSite != null) {
+            siteId = currentSite.getId();
+        }
+        return new ArrayList<SiteWrapper>(SiteWrapper.getSites(appService,
+            siteId));
     }
 
 }

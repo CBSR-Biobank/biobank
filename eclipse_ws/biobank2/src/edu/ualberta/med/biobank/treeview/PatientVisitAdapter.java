@@ -7,6 +7,7 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 
+import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
 import edu.ualberta.med.biobank.forms.PatientVisitEntryForm;
@@ -64,10 +65,6 @@ public class PatientVisitAdapter extends AdapterBase {
         addViewMenu(menu, "Visit", PatientVisitViewForm.ID);
     }
 
-    @Override
-    public void loadChildren(boolean updateNode) {
-    }
-
     public void setSelectedSample(SampleWrapper sample) {
         this.selectedSample = sample;
     }
@@ -78,6 +75,17 @@ public class PatientVisitAdapter extends AdapterBase {
 
     @Override
     public AdapterBase accept(NodeSearchVisitor visitor) {
+        return null;
+    }
+
+    @Override
+    protected AdapterBase createChildNode(ModelWrapper<?> child) {
+        return null;
+    }
+
+    @Override
+    protected Collection<? extends ModelWrapper<?>> getWrapperChildren()
+        throws Exception {
         return null;
     }
 

@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE log4j:configuration SYSTEM ".\log4j.dtd">
+
+<log4j:configuration xmlns:log4j='http://jakarta.apache.org/log4j/'>
+
+@ENABLE_CLM_LOGGER_CFG_GENERATION_START@
+	<appender name="CLM_APPENDER"
+		class="gov.nih.nci.logging.api.appender.jdbc.JDBCAppender">
+		<param name="application" value="@CLM_PROJECT_NAME@" />
+		<param name="maxBufferSize" value="1" />
+		<param name="dbDriverClass" value="@CLM_DB_DRIVER@" />
+		<param name="dbUrl" value="@CLM_DB_CONNECTION_URL@" />
+		<param name="dbUser" value="@CLM_DB_USERNAME@" />
+		<param name="dbPwd" value="@CLM_DB_PASSWORD@" />
+		<param name="useFilter" value="true" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern"
+				value=":: [%d{ISO8601}] %-5p %c{1}.%M() %x - %m%n" />
+		</layout>
+	</appender>
+@ENABLE_CLM_LOGGER_CFG_GENERATION_END@	
+
+	<appender name="CONSOLE" class="org.apache.log4j.ConsoleAppender">
+		<!--      <errorHandler class="org.jboss.logging.util.OnlyOnceErrorHandler"/>-->
+		<param name="Target" value="System.out" />
+		<param name="Threshold" value="INFO" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<!-- The default pattern: Date Priority [Category] Message\n -->
+			<param name="ConversionPattern"
+				value="%d{ABSOLUTE} %-5p [%c{1}] %m%n" />
+		</layout>
+	</appender>
+
+	<appender name="hibernateLog"
+		class="org.apache.log4j.FileAppender">
+		<param name="Append" value="false" />
+		<param name="File"
+			value="${jboss_home}/server/default/log/hibernate.log" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern"
+				value="%d{ABSOLUTE} %5p %c{1}:%L - %m%n" />
+		</layout>
+	</appender>
+
+<!--	
+        <category name="CSM.Audit.Logging.Event.Authentication">
+		<level value="info" />
+		<appender-ref ref="CLM_APPENDER" />
+	</category>
+-->
+@ENABLE_CLM_LOGGER_CFG_GENERATION_START@
+	<category name="CSM.Audit.Logging.Event.Authorization">
+		<level value="info" />
+		<appender-ref ref="CLM_APPENDER" />
+	</category>
+	<category name="CSM.Audit.Logging.ObjectState.Authorization">
+		<level value="INFO" />
+		<appender-ref ref="CLM_APPENDER" />
+	</category>
+@ENABLE_CLM_LOGGER_CFG_GENERATION_END@
+
+	<category name="org.apache.dbcp">
+		<level value="INFO" />
+		<appender-ref ref="CONSOLE" />
+	</category>
+
+	<category name="com.mchange.v2.c3p0">
+		<level value="INFO" />
+		<appender-ref ref="CONSOLE" />
+	</category>
+
+	<logger name="org.hibernate">
+		<level value="info" />
+	</logger>
+
+	<logger name="org.apache">
+		<level value="warn" />
+	</logger>
+
+	<logger name="org.hibernate.SQL">
+		<level value="debug" />
+	</logger>
+
+	<logger name="org.hibernate.type">
+		<level value="info" />
+	</logger>
+
+	<logger name="org.hibernate.tool.hbm2ddl">
+		<level value="info" />
+	</logger>
+
+	<logger name="org.hibernate.cache">
+		<level value="debug" />
+	</logger>
+
+	<logger name="org.hibernate.jdbc">
+		<level value="debug" />
+	</logger>
+
+	<logger	name="org.hibernate.connection.DriverManagerConnectionProvider">
+		<level value="trace" />
+	</logger>
+
+	<logger name="gov.nih.nci">
+		<level value="info" />
+	</logger>
+	
+	<root>
+		<priority value="debug" />
+		<appender-ref ref="CONSOLE" />
+	</root>
+</log4j:configuration>

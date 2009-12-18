@@ -3,7 +3,6 @@ package edu.ualberta.med.biobank.treeview;
 import java.util.Collection;
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.viewers.TreeViewer;
@@ -19,6 +18,7 @@ import org.eclipse.ui.PlatformUI;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.dialogs.MoveContainerDialog;
 import edu.ualberta.med.biobank.dialogs.SelectParentContainerDialog;
 import edu.ualberta.med.biobank.forms.ContainerEntryForm;
@@ -26,9 +26,6 @@ import edu.ualberta.med.biobank.forms.ContainerViewForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 
 public class ContainerAdapter extends AdapterBase {
-
-    private static Logger LOGGER = Logger.getLogger(SessionManager.class
-        .getName());
 
     public ContainerAdapter(AdapterBase parent, ContainerWrapper container) {
         super(parent, container);
@@ -82,33 +79,6 @@ public class ContainerAdapter extends AdapterBase {
 
         addDeleteMenu(menu, "Container",
             "Are you sure you want to delete this container?");
-    }
-
-    @Override
-    public void loadChildren(boolean updateNode) {
-        try {
-            Collection<ContainerWrapper> children = getContainer()
-                .getChildren().values();
-            if (children != null) {
-                // read from database again
-                for (ContainerWrapper child : children) {
-                    ContainerAdapter node = (ContainerAdapter) getChild(child
-                        .getId());
-                    if (node == null) {
-                        node = new ContainerAdapter(this, child);
-                        addChild(node);
-                    }
-                    if (updateNode) {
-                        SessionManager.updateTreeNode(node);
-                    }
-                }
-            } else
-                throw new Exception("Children null.");
-        } catch (Exception e) {
-            LOGGER.error(
-                "Error while loading storage container group children for storage container "
-                    + getContainer().getLabel(), e);
-        }
     }
 
     private void moveAction() {
@@ -181,6 +151,17 @@ public class ContainerAdapter extends AdapterBase {
     @Override
     public AdapterBase accept(NodeSearchVisitor visitor) {
         return visitor.visit(this);
+    }
+
+    @Override
+    protected AdapterBase createChildNode(ModelWrapper<?> child) {
+        Assert.isTrue(child instanceof ContainerWrapper);
+        return new ContainerAdapter(this, (ContainerWrapper) child);
+    }
+
+    @Override
+    protected Collection<? extends ModelWrapper<?>> getWrapperChildren() {
+        return getContainer().getChildren().values();
     }
 
 }

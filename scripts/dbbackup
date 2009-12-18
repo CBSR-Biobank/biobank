@@ -1,4 +1,34 @@
 #!/bin/bash
 
-# Database
-/usr/bin/mysqldump -udummy -pozzy498 biobank2 | gzip > backup/db/biobank_`date +%y_%m_%d`.sql.gz
+#set -o verbose
+
+ARGS=3
+E_BADARGS=85
+
+if [ $# -lt $ARGS ]  # Correct number of arguments passed to script?
+then
+  echo "Usage: `basename $0` HOST USER PWD [DBNAME] "
+  exit $E_BADARGS
+fi
+
+MYSQLDUMP="/usr/bin/mysqldump"
+
+HOST=$1
+USER=$2
+PWD=$3
+DBNAME=$4
+
+# tables to skip
+skip_tables=( log_message object_attribute objectattributes )
+
+if [ -z "$DBNAME" ]; then
+    DBNAME=biobank2
+fi
+
+OPTS=
+n=${#skip_tables[@]}
+for (( i = 0; i < n; i++ )) do
+        OPTS[$i]="--ignore-table=${DBNAME}.${skip_tables[$i]}"
+done
+
+$MYSQLDUMP --skip-extended-insert ${OPTS[*]} -h$HOST -u$USER -p$PWD $DBNAME | gzip > ${DBNAME}_`date +%y_%m_%d`.sql.gz

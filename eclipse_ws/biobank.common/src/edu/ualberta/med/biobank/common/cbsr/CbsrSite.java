@@ -8,12 +8,14 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PvSampleSourceWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -22,6 +24,8 @@ public class CbsrSite {
     public static WritableApplicationService appService;
 
     public static SiteWrapper cbsrSite = null;
+
+    private static Map<String, SampleTypeWrapper> sampleTypeMap;
 
     public static void createConfiguration(WritableApplicationService appServ)
         throws Exception {
@@ -35,6 +39,7 @@ public class CbsrSite {
 
     public static SiteWrapper addSite(WritableApplicationService appService)
         throws Exception {
+        getSampleTypeMap(appService);
         cbsrSite = new SiteWrapper(appService);
         cbsrSite.setName("Canadian BioSample Repository");
         cbsrSite.setStreet1("471 Medical Sciences Building");
@@ -53,6 +58,33 @@ public class CbsrSite {
 
     public static SiteWrapper getSite() {
         return cbsrSite;
+    }
+
+    public static void getSampleTypeMap(WritableApplicationService appService)
+        throws Exception {
+        if (sampleTypeMap != null)
+            return;
+
+        List<SampleTypeWrapper> allSampleTypes = SampleTypeWrapper
+            .getGlobalSampleTypes(appService, true);
+        if ((allSampleTypes == null) || (allSampleTypes.size() == 0)) {
+            throw new Exception("no global sample types found in the database");
+        }
+
+        sampleTypeMap = new HashMap<String, SampleTypeWrapper>();
+        for (SampleTypeWrapper sampleType : allSampleTypes) {
+            sampleTypeMap.put(sampleType.getNameShort(), sampleType);
+        }
+    }
+
+    public static SampleTypeWrapper getSampleType(String nameShort)
+        throws Exception {
+        SampleTypeWrapper sampleType = sampleTypeMap.get(nameShort);
+        if (sampleType == null) {
+            throw new Exception("sample type \"" + nameShort
+                + "\" not found in the database");
+        }
+        return sampleType;
     }
 
     public static void deleteConfiguration(WritableApplicationService appServ)

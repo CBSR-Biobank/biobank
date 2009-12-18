@@ -493,11 +493,15 @@ public class ContainerWrapper extends
     }
 
     public ContainerWrapper getChild(Integer row, Integer col) {
+        return getChild(new RowColPos(row, col));
+    }
+
+    public ContainerWrapper getChild(RowColPos rcp) {
         Map<RowColPos, ContainerWrapper> children = getChildren();
         if (children == null) {
             return null;
         }
-        return children.get(new RowColPos(row, col));
+        return children.get(rcp);
     }
 
     private void checkParentAcceptContainerType() throws BiobankCheckException {
@@ -707,29 +711,9 @@ public class ContainerWrapper extends
     }
 
     /**
-     * Initialise all children of this container with the given type (except
-     * children already initialised)
-     * 
-     * @return true if at least one children has been initialised
-     * @throws BiobankCheckException
-     * @throws WrapperException
-     * @throws ApplicationException
-     */
-    public void initChildrenWithType(ContainerTypeWrapper type)
-        throws Exception {
-        int rows = getContainerType().getRowCapacity().intValue();
-        int cols = getContainerType().getColCapacity().intValue();
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < cols; j++) {
-                initPosition(type, i, j);
-            }
-        }
-        persist();
-    }
-
-    /**
      * Initialise children at given position with the given type (except
-     * children already initialised)
+     * children already initialised). If the positions list is null, initialise
+     * all the children
      * 
      * @return true if at least one children has been initialised
      * @throws BiobankCheckException
@@ -738,8 +722,17 @@ public class ContainerWrapper extends
      */
     public void initChildrenWithType(ContainerTypeWrapper type,
         Set<RowColPos> positions) throws Exception {
-        for (RowColPos rcp : positions) {
-            initPosition(type, rcp.row, rcp.col);
+        if (positions == null) {
+            for (int i = 0; i < getContainerType().getRowCapacity().intValue(); i++) {
+                for (int j = 0; j < getContainerType().getColCapacity()
+                    .intValue(); j++) {
+                    initPosition(type, i, j);
+                }
+            }
+        } else {
+            for (RowColPos rcp : positions) {
+                initPosition(type, rcp.row, rcp.col);
+            }
         }
         persist();
     }
@@ -757,19 +750,24 @@ public class ContainerWrapper extends
     }
 
     /**
-     * Delete all children of this container with the given type
+     * Delete the children at positions of this container with the given type
+     * (or all if positions list is null)- If type== null, delete all types.
      * 
      * @return true if at least one children has been deleted
      * @throws Exception
      * @throws BiobankCheckException
      */
-    public boolean deleteChildrenWithType(ContainerTypeWrapper type)
-        throws BiobankCheckException, Exception {
+    public boolean deleteChildrenWithType(ContainerTypeWrapper type,
+        Set<RowColPos> positions) throws BiobankCheckException, Exception {
         List<SDKQuery> queries = new ArrayList<SDKQuery>();
-        for (ContainerWrapper pos : getChildren().values()) {
-            if (pos.getContainerType().equals(type)) {
-                pos.deleteChecks();
-                queries.add(new DeleteExampleQuery(pos.getWrappedObject()));
+        if (positions == null) {
+            for (ContainerWrapper child : getChildren().values()) {
+                addToDeleteList(queries, child, type);
+            }
+        } else {
+            for (RowColPos rcp : positions) {
+                ContainerWrapper child = getChild(rcp);
+                addToDeleteList(queries, child, type);
             }
         }
         if (queries.size() > 0) {
@@ -777,6 +775,15 @@ public class ContainerWrapper extends
             return true;
         }
         return false;
+    }
+
+    private void addToDeleteList(List<SDKQuery> queries,
+        ContainerWrapper child, ContainerTypeWrapper type)
+        throws BiobankCheckException, ApplicationException {
+        if (type == null || child.getContainerType().equals(type)) {
+            child.deleteChecks();
+            queries.add(new DeleteExampleQuery(child.getWrappedObject()));
+        }
     }
 
     @Override
