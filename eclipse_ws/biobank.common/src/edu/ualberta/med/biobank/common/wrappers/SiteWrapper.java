@@ -590,12 +590,16 @@ public class SiteWrapper extends ModelWrapper<Site> {
         List<SampleTypeWrapper> sampleTypeCollection = (List<SampleTypeWrapper>) propertiesMap
             .get("allSampleTypeCollection");
         if (sampleTypeCollection == null) {
+            sampleTypeCollection = new ArrayList<SampleTypeWrapper>();
             List<SampleTypeWrapper> siteSampleTypes = getSampleTypeCollection();
+            if (siteSampleTypes != null) {
+                sampleTypeCollection.addAll(siteSampleTypes);
+            }
             List<SampleTypeWrapper> globalSampleTypes = SampleTypeWrapper
                 .getGlobalSampleTypes(appService, false);
-            sampleTypeCollection = new ArrayList<SampleTypeWrapper>();
-            sampleTypeCollection.addAll(siteSampleTypes);
-            sampleTypeCollection.addAll(globalSampleTypes);
+            if (globalSampleTypes != null) {
+                sampleTypeCollection.addAll(globalSampleTypes);
+            }
             propertiesMap.put("allSampleTypeCollection", sampleTypeCollection);
         }
         if ((sampleTypeCollection != null) && sort)
