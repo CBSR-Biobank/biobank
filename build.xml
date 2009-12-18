@@ -125,7 +125,6 @@
 
 	<target name="sdk" depends="cacore-download,check-cacore-sdk-uptodate" unless="cacore.sdk.uptodate" description="builds the caCORE SDK from the data model">
 		<copy file="sdk_conf/deploy.properties" tofile="${cacore.sdk.dir}/conf/deploy.properties" />
-                <echo>coucou</echo>
                 <copy file="security-logs/clm-log4j/log4j.xml" tofile="${cacore.sdk.dir}/conf/system/web/WEB-INF/classes/log4j.xml"/>
 		<ant dir="${cacore.sdk.dir}" target="build-system" inheritRefs="false" />
 	</target>
