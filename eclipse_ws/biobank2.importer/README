@@ -3,4 +3,10 @@ CONTACTS
   join clinic on clinic.id=contact.clinic_id 
   left join study_contact on contact.id=contact_id
   join study on study.id=study_contact.study_id
-
+  
+  
+CABINET
+  SELECT distinct(sample_list.sample_name), cabinet.drawer, cabinet.bin
+  FROM cabinet
+  join sample_list on sample_list.sample_nr=cabinet.sample_nr
+  where cnum=1
