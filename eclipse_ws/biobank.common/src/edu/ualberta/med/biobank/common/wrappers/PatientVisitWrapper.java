@@ -258,42 +258,43 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
                 + "\" is locked, changes not premitted");
         }
 
-        if (value == null) {
-            pvAttr.setValue(null);
-            return;
-        }
+        if (value != null) {
+            // validate the value
+            value = value.trim();
+            String type = studyPvAttr.getPvAttrType().getName();
+            List<String> permissibleSplit = null;
 
-        // validate the value
-        String type = studyPvAttr.getPvAttrType().getName();
-        List<String> permissibleSplit = null;
-
-        if (type.equals("select_single") || type.equals("select_multiple")) {
-            String permissible = studyPvAttr.getPermissible();
-            if (permissible != null) {
-                permissibleSplit = Arrays.asList(permissible.split(";"));
-            }
-        }
-
-        if (type.equals("select_single")) {
-            if (!permissibleSplit.contains(value)) {
-                throw new Exception("value " + value
-                    + "is invalid for label \"" + label + "\"");
-            }
-        } else if (type.equals("select_multiple")) {
-            for (String singleVal : value.split(";")) {
-                if (!permissibleSplit.contains(singleVal)) {
-                    throw new Exception("value " + singleVal
-                        + "is invalid for label \"" + label + "\"");
+            if (type.equals("select_single") || type.equals("select_multiple")) {
+                String permissible = studyPvAttr.getPermissible();
+                if (permissible != null) {
+                    permissibleSplit = Arrays.asList(permissible.split(";"));
                 }
             }
-        } else if (type.equals("number")) {
-            Double.parseDouble(value);
-        } else if (type.equals("date_time")) {
-            DateFormatter.dateFormatter.parse(value);
-        } else if (type.equals("text")) {
-            // do nothing
-        } else {
-            throw new Exception("type \"" + type + "\" not tested");
+
+            if (type.equals("select_single")) {
+                if (!permissibleSplit.contains(value)) {
+                    throw new Exception("value " + value
+                        + "is invalid for label \"" + label + "\"");
+                }
+            } else if (type.equals("select_multiple")) {
+                if (value.length() > 0) {
+                    for (String singleVal : value.split(";")) {
+                        if (!permissibleSplit.contains(singleVal)) {
+                            throw new Exception("value " + singleVal + " ("
+                                + value + ") is invalid for label \"" + label
+                                + "\"");
+                        }
+                    }
+                }
+            } else if (type.equals("number")) {
+                Double.parseDouble(value);
+            } else if (type.equals("date_time")) {
+                DateFormatter.dateFormatter.parse(value);
+            } else if (type.equals("text")) {
+                // do nothing
+            } else {
+                throw new Exception("type \"" + type + "\" not tested");
+            }
         }
 
         pvAttr = new PvAttrWrapper(appService, new PvAttr());

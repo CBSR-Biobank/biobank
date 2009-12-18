@@ -10,9 +10,11 @@ import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -118,8 +120,8 @@ public class Importer {
                     throw new Exception("Table " + table + " not found");
             }
 
-            appService = ServiceConnection.getAppService("https://"
-                + System.getProperty("server", "localhost:8443") + "/biobank2",
+            appService = ServiceConnection.getAppService("http://"
+                + System.getProperty("server", "localhost:8080") + "/biobank2",
                 "testuser", "test");
 
             cbsrSite = getCbsrSite();
@@ -133,6 +135,8 @@ public class Importer {
                 initTopContainersMap();
                 getSampleTypeMap();
 
+                // removeAllPatientVisits();
+                // importShipments();
                 importPatientVisits();
             }
         } catch (Exception e) {
@@ -390,6 +394,12 @@ public class Importer {
             dateReceivedStr = rs.getString(4);
             dateReceived = dateTimeFormatter.parse(dateReceivedStr);
 
+            Calendar cal = new GregorianCalendar();
+            cal.setTime(dateReceived);
+            cal.set(Calendar.MILLISECOND, 0);
+            cal.set(Calendar.SECOND, 0);
+            dateReceived = cal.getTime();
+
             patient = PatientWrapper.getPatientInSite(appService, patientNo,
                 cbsrSite);
 
@@ -457,6 +467,9 @@ public class Importer {
         logger.debug("removing old patient visits ...");
 
         for (StudyWrapper study : studiesMap.values()) {
+            if (study.getPatientVisitCount() == 0)
+                continue;
+
             List<PatientWrapper> patients = study.getPatientCollection();
             if (patients == null)
                 continue;
@@ -480,7 +493,8 @@ public class Importer {
         StudyWrapper study;
         String clinicName;
         ClinicWrapper clinic;
-        String dateReceived;
+        String dateProcessedStr;
+        Date dateProcessed;
         PatientWrapper patient;
         ShipmentWrapper shipment;
         PatientVisitWrapper pv;
@@ -509,30 +523,37 @@ public class Importer {
 
         int count = 1;
         while (rs.next()) {
-            studyNameShort = rs.getString(1);
-            study = getStudyFromOldShortName(studyNameShort);
+            studyNameShort = rs.getString(20);
             clinicName = rs.getString(3);
-            clinic = clinicsMap.get(clinicName);
-            dateReceived = rs.getString(4);
-
             String patientNo = cipher.decode(rs.getBytes(21));
+
+            study = getStudyFromOldShortName(studyNameShort);
+            clinic = clinicsMap.get(clinicName);
+
+            if (clinic == null) {
+                logger.error("no clinic \"" + clinicName + "\"for patient "
+                    + patientNo);
+                continue;
+            }
+
+            dateProcessedStr = rs.getString(6);
+            dateProcessed = dateTimeFormatter.parse(dateProcessedStr);
+
             patient = PatientWrapper.getPatientInSite(appService, patientNo,
                 cbsrSite);
 
-            shipment = ShipmentWrapper.getShipmentInSite(appService,
-                dateTimeFormatter.parse(dateReceived), cbsrSite);
+            Calendar cal = new GregorianCalendar();
+            cal.setTime(dateProcessed);
+            cal.set(Calendar.MILLISECOND, 0);
+            cal.set(Calendar.SECOND, 0);
+            dateProcessed = cal.getTime();
 
-            // check for shipment
-            if (shipment == null) {
-                throw new Exception("found 0 shipments for studyName/"
-                    + study.getNameShort() + " clinicName/" + clinicName
-                    + " dateReceived/" + dateReceived);
-            }
+            shipment = clinic.getShipment(dateProcessed);
 
             // make sure the clinic is correct
             if ((shipment != null) && !shipment.getClinic().equals(clinic)) {
                 throw new Exception("shipment and clinic do not match: "
-                    + dateReceived + ",  " + clinicName);
+                    + dateProcessed + ",  " + clinicName);
             }
 
             // make sure the study is correct
@@ -541,21 +562,34 @@ public class Importer {
                     "patient study does not match patient visit study");
             }
 
+            // check for shipment
+            if (shipment == null) {
+                logger.error("found 0 shipments for studyName/"
+                    + study.getNameShort() + " clinicName/" + clinicName
+                    + " dateReceived/" + dateProcessed);
+                continue;
+            }
+
+            // check if there is a visit for this date
+            if (patient.getVisit(dateProcessed) != null) {
+                logger.error("patient " + patientNo
+                    + " already has a visit on " + dateProcessed);
+                continue;
+            }
+
             pv = new PatientVisitWrapper(appService);
-            pv.setDateProcessed(dateTimeFormatter.parse(dateReceived));
+            pv.setDateProcessed(dateProcessed);
             pv.setPatient(patient);
             pv.setShipment(shipment);
             pv.setComment(rs.getString(4));
 
             logger.debug("importing patient visit: patient/"
-                + patient.getNumber() + " visit date/" + dateReceived + " ("
+                + patient.getNumber() + " visit date/" + dateProcessed + " ("
                 + count + "/" + numPatientVisits + ")");
 
             // now set corresponding patient visit info data
             for (String label : study.getStudyPvAttrLabels()) {
-                if (label.equals("Date Received")) {
-                    pv.setPvAttrValue(label, rs.getString(6));
-                } else if (label.equals("PBMC Count")) {
+                if (label.equals("PBMC Count")) {
                     pv.setPvAttrValue(label, rs.getString(8));
                 } else if (label.equals("Consent")) {
                     ArrayList<String> consents = new ArrayList<String>();
@@ -563,7 +597,7 @@ public class Importer {
                         consents.add("Surveillance");
                     }
                     if (rs.getInt(10) == 1) {
-                        consents.add("Genetic predisposition");
+                        consents.add("Genetic Predisposition");
                     }
                     pv.setPvAttrValue(label, StringUtils.join(consents, ";"));
                 } else if (label.equals("Worksheet")) {
